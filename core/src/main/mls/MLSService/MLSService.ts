@@ -38,6 +38,7 @@ import {Converter, Decoder, Encoder} from 'bazinga64';
 import {MLSCallbacks, MLSConfig} from '../types';
 import {sendMessage} from '../../conversation/message/messageSender';
 import {parseFullQualifiedClientId} from '../../util/fullyQualifiedClientIdUtils';
+import {PostMlsMessageResponse} from '@wireapp/api-client/src/conversation';
 //@todo: this function is temporary, we wait for the update from core-crypto side
 //they are returning regular array instead of Uint8Array for commit and welcome messages
 export const optionalToUint8Array = (array: Uint8Array | []): Uint8Array => {
@@ -168,7 +169,7 @@ export class MLSService {
    * @param generateCommit The function that will generate a coreCrypto CommitBundle
    */
   private async processCommitAction(groupId: ConversationId, generateCommit: () => Promise<CommitBundle>) {
-    return sendMessage(async () => {
+    return sendMessage<PostMlsMessageResponse | null>(async () => {
       await this.commitPendingProposals(groupId);
       const commitBundle = await generateCommit();
       return this.uploadCommitBundle(groupId, commitBundle);

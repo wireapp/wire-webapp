@@ -19,9 +19,9 @@
 
 /* eslint-disable no-magic-numbers */
 
-import {Priority, PriorityQueue} from '@wireapp/priority-queue';
+import {Item, Priority, PriorityQueue} from '@wireapp/priority-queue';
 
-beforeAll(() => (jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000));
+beforeAll(() => jest.setTimeout(10000));
 
 describe('PriorityQueue', () => {
   describe('"constructor"', () => {
@@ -41,18 +41,18 @@ describe('PriorityQueue', () => {
 
       setTimeout(() => (isLocked = false), 1500);
       const queue = new PriorityQueue({maxRetries: Infinity, retryDelay: 3000});
-      queue.add(businessLogic);
+      void queue.add(businessLogic);
     });
 
     it('supports limiting the amount of retries', async () => {
-      const businessLogic = jasmine.createSpy().and.returnValue(Promise.reject(new Error('Error')));
+      const businessLogic = jest.fn().mockReturnValue(Promise.reject(new Error('Error')));
       const queue = new PriorityQueue({maxRetries: 1});
       try {
         await queue.add(businessLogic);
-        fail();
       } catch (error) {
+      } finally {
         expect(queue.size).toBe(0);
-        expect(businessLogic.calls.count()).toBe(2);
+        expect(businessLogic).toHaveBeenCalledTimes(2);
       }
     });
   });
@@ -60,24 +60,23 @@ describe('PriorityQueue', () => {
   describe('"add"', () => {
     it('adds objects', () => {
       const queue = new PriorityQueue();
-      queue.isPending = true;
 
-      queue.add(() => 'ape');
-      queue.add(() => 'cat');
-      queue.add(() => 'dog');
-      queue.add(() => 'zebra');
+      void queue.add(() => 'ape');
+      void queue.add(() => 'cat');
+      void queue.add(() => 'dog');
+      void queue.add(() => 'zebra');
 
-      expect(queue.size).withContext('When adding four items, three are in the queue and one is in progress.').toBe(3);
+      // When adding four items, three are in the queue and one is in progress.
+      expect(queue.size).toBe(3);
     });
 
     it('adds objects with priorities', async () => {
       const queue = new PriorityQueue();
-      queue.isPending = true;
 
-      queue.add(() => 'ape');
-      queue.add(() => 'cat', Priority.LOW);
-      queue.add(() => 'dog', Priority.HIGH);
-      queue.add(() => 'zebra');
+      void queue.add(() => 'ape');
+      void queue.add(() => 'cat', Priority.LOW);
+      void queue.add(() => 'dog', Priority.HIGH);
+      void queue.add(() => 'zebra');
 
       const dog = await queue.first.fn();
       expect(dog).toBe('dog');
@@ -107,13 +106,14 @@ describe('PriorityQueue', () => {
       const queue = new PriorityQueue();
       const ape = () => Promise.resolve('ape').then(done());
 
-      queue.add(ape);
-      queue.add(() => 'cat');
-      queue.add(() => 'dog');
-      queue.add(() => 'zebra');
+      void queue.add(ape);
+      void queue.add(() => 'cat');
+      void queue.add(() => 'dog');
+      void queue.add(() => 'zebra');
     });
 
     it('executes an item from the queue with different priorities', done => {
+      expect.assertions(3);
       const queue = new PriorityQueue();
 
       const promise1 = () =>
@@ -134,9 +134,9 @@ describe('PriorityQueue', () => {
           done();
         });
 
-      queue.add(promise1, Priority.HIGH);
-      queue.add(promise2, Priority.MEDIUM);
-      queue.add(promise3, Priority.LOW);
+      void queue.add(promise1, Priority.HIGH);
+      void queue.add(promise2, Priority.MEDIUM);
+      void queue.add(promise3, Priority.LOW);
     });
 
     it('retries on error until the error gets resolved', done => {
@@ -154,21 +154,22 @@ describe('PriorityQueue', () => {
       };
 
       const unlock = () => {
-        return new Promise(resolve => {
+        return new Promise<void>(resolve => {
           isLocked = false;
           resolve();
         });
       };
 
       const queue = new PriorityQueue({maxRetries: Infinity});
-      queue.add(businessLogic);
+      void queue.add(businessLogic);
       setTimeout(() => queue.add(unlock, Priority.HIGH), 200);
     });
 
     it('works with error-catching Promises', done => {
       const queue = new PriorityQueue();
+      expect.assertions(2);
 
-      function businessLogic(param) {
+      function businessLogic(param: any) {
         return new Promise((resolve, reject) => {
           if (isNaN(param)) {
             reject(new TypeError('Not a Number'));
@@ -185,9 +186,9 @@ describe('PriorityQueue', () => {
       const promise2 = () => Promise.resolve('two').then(item => expect(item).toBe('two'));
       const promise3 = () => Promise.resolve('three').then(() => done());
 
-      queue.add(promise1, Priority.HIGH);
-      queue.add(promise2, Priority.MEDIUM);
-      queue.add(promise3, Priority.LOW);
+      void queue.add(promise1, Priority.HIGH);
+      void queue.add(promise2, Priority.MEDIUM);
+      void queue.add(promise3, Priority.LOW);
     });
 
     it('executes a high priority element prior to other running elements', done => {
@@ -204,9 +205,9 @@ describe('PriorityQueue', () => {
         done();
       };
 
-      queue.add(promise1);
-      queue.add(promise2);
-      queue.add(promise3, Priority.HIGH);
+      void queue.add(promise1);
+      void queue.add(promise2);
+      void queue.add(promise3, Priority.HIGH);
     });
   });
 
@@ -225,7 +226,7 @@ describe('PriorityQueue', () => {
       };
 
       const unlock = () => {
-        return new Promise(resolve => {
+        return new Promise<void>(resolve => {
           isLocked = false;
           resolve();
         });
@@ -233,7 +234,7 @@ describe('PriorityQueue', () => {
 
       const queue = new PriorityQueue({maxRetries: Infinity, retryDelay: 100});
       setTimeout(() => queue.add(unlock, Priority.HIGH), 1000);
-      queue.add(businessLogic).then(() => {
+      void queue.add(businessLogic).then(() => {
         expect(queue.size).toBe(0);
         done();
       });
@@ -244,12 +245,12 @@ describe('PriorityQueue', () => {
     it('uses a descending priority order by default', async () => {
       const queue = new PriorityQueue();
       // prevents item processing
-      queue.isRunning = true;
+      queue['isRunning'] = true;
 
-      queue.add(() => 'ape', Priority.HIGH);
-      queue.add(() => 'cat');
-      queue.add(() => 'dog');
-      queue.add(() => 'zebra', Priority.LOW);
+      void queue.add(() => 'ape', Priority.HIGH);
+      void queue.add(() => 'cat');
+      void queue.add(() => 'dog');
+      void queue.add(() => 'zebra', Priority.LOW);
 
       const zebra = await queue.last.fn();
       expect(zebra).toBe('zebra');
@@ -258,15 +259,15 @@ describe('PriorityQueue', () => {
     });
 
     it('supports a custom comparator', async () => {
-      const ascendingPriority = (first, second) => first.priority - second.priority;
+      const ascendingPriority = (first: Item, second: Item) => first.priority - second.priority;
       const queue = new PriorityQueue({comparator: ascendingPriority});
       // prevents item processing
-      queue.isRunning = true;
+      queue['isRunning'] = true;
 
-      queue.add(() => 'ape', Priority.HIGH);
-      queue.add(() => 'cat');
-      queue.add(() => 'dog');
-      queue.add(() => 'zebra', Priority.LOW);
+      void queue.add(() => 'ape', Priority.HIGH);
+      void queue.add(() => 'cat');
+      void queue.add(() => 'dog');
+      void queue.add(() => 'zebra', Priority.LOW);
 
       const zebra = await queue.first.fn();
       expect(zebra).toBe('zebra');
@@ -291,9 +292,9 @@ describe('PriorityQueue', () => {
           done();
         });
 
-      queue.add(promise1);
-      queue.add(promise2).catch(() => {});
-      queue.add(promise3);
+      void queue.add(promise1);
+      void queue.add(promise2).catch(() => {});
+      void queue.add(promise3);
     });
   });
 });

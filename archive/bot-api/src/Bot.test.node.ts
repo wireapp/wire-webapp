@@ -40,8 +40,8 @@ describe('Bot', () => {
 
       const bot2 = new Bot(credentials, config);
 
-      expect(bot['config']).not.toEqual(jasmine.objectContaining(config));
-      expect(bot2['config']).toEqual(jasmine.objectContaining(config));
+      expect(bot['config']).not.toEqual(expect.objectContaining(config));
+      expect(bot2['config']).toEqual(expect.objectContaining(config));
     });
   });
 });

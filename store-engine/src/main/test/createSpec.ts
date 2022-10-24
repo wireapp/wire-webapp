@@ -30,9 +30,9 @@ export const createSpec = {
 
     try {
       await engine.create(TABLE_NAME, PRIMARY_KEY, entity);
-      fail(new Error('Method is supposed to throw an error.'));
+      throw new Error('Method is supposed to throw an error.');
     } catch (error) {
-      expect(error).toEqual(jasmine.any(RecordTypeError));
+      expect(error).toEqual(expect.any(RecordTypeError));
     }
   },
   "doesn't save null values.": async (engine: CRUDEngine) => {
@@ -42,9 +42,9 @@ export const createSpec = {
 
     try {
       await engine.create(TABLE_NAME, PRIMARY_KEY, entity);
-      fail(new Error('Method is supposed to throw an error.'));
+      throw new Error('Method is supposed to throw an error.');
     } catch (error) {
-      expect(error).toEqual(jasmine.any(RecordTypeError));
+      expect(error).toEqual(expect.any(RecordTypeError));
     }
   },
   'saves objects.': async (engine: CRUDEngine) => {
@@ -94,9 +94,9 @@ export const createSpec = {
     try {
       await engine.create(TABLE_NAME, PRIMARY_KEY, firstEntity);
       await engine.create(TABLE_NAME, PRIMARY_KEY, secondEntity);
-      fail();
+      throw new Error('Method is supposed to throw an error.');
     } catch (error) {
-      expect(error).toEqual(jasmine.any(RecordAlreadyExistsError));
+      expect(error).toEqual(expect.any(RecordAlreadyExistsError));
     }
   },
 };

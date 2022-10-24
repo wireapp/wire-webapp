@@ -45,9 +45,8 @@ export const updateSpec = {
 
     try {
       await engine.update(TABLE_NAME, PRIMARY_KEY, updates);
-      fail();
     } catch (error) {
-      expect(error).toEqual(jasmine.any(RecordNotFoundError));
+      expect(error).toEqual(expect.any(RecordNotFoundError));
     }
   },
   'updates an existing database record.': async (engine: CRUDEngine) => {

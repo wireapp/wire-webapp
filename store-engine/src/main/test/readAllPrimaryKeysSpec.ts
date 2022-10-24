@@ -54,8 +54,8 @@ export const readAllPrimaryKeysSpec = {
     ]);
     const primaryKeys = await engine.readAllPrimaryKeys(TABLE_NAME);
     expect(primaryKeys.length).toBe(3);
-    expect(primaryKeys.includes(homer.primaryKey)).toBeTrue();
-    expect(primaryKeys.includes(lisa.primaryKey)).toBeTrue();
-    expect(primaryKeys.includes(marge.primaryKey)).toBeTrue();
+    expect(primaryKeys.includes(homer.primaryKey)).toBeTruthy();
+    expect(primaryKeys.includes(lisa.primaryKey)).toBeTruthy();
+    expect(primaryKeys.includes(marge.primaryKey)).toBeTruthy();
   },
 };

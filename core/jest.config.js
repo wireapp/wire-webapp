@@ -17,8 +17,14 @@
  *
  */
 
+const baseConfig = require('../../jest.config.base');
+const { TextDecoder, TextEncoder } = require('util')
+
 module.exports = {
-  clearMocks: true,
-  testMatch: ['**/?(*.)+(spec|test).node.[t]s?(x)'],
-  testRunner: 'jest-jasmine2',
+  ...baseConfig,
+  testEnvironment: "node",
+  globals: {
+    TextDecoder,
+    TextEncoder,
+  }
 };

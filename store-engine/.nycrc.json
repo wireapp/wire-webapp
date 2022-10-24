@@ -1,9 +1,0 @@
-{
-  "all": false,
-  "exclude": ["**/*.d.ts", "**/*.test*.ts"],
-  "extension": [".ts"],
-  "include": ["src/**/*.ts"],
-  "per-file": false,
-  "reporter": ["html"],
-  "require": ["ts-node/register"]
-}

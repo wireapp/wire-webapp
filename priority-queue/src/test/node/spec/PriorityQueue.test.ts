@@ -17,14 +17,16 @@
  *
  */
 
-/* eslint-disable no-magic-numbers */
+import {PriorityQueue as PQType} from '../../../main';
 
-const {PriorityQueue} = require('@wireapp/priority-queue');
+import {PriorityQueue} from '@wireapp/priority-queue';
 
-beforeAll(() => (jasmine.DEFAULT_TIMEOUT_INTERVAL = 5000));
+beforeAll(() => {
+  jest.useRealTimers();
+});
 
 describe('PriorityQueue', () => {
-  let queue = undefined;
+  let queue: PQType;
 
   afterEach(() => {
     if (queue) {
@@ -88,96 +90,98 @@ describe('PriorityQueue', () => {
       queue = new PriorityQueue({maxRetries: 3, retryDelay: 100});
       try {
         await queue.add(() => notHappyFn());
-        fail();
       } catch (error) {
-        expect(error.message).toBe('not so happy');
+        // eslint-disable-next-line jest/no-conditional-expect
+        expect((error as Error).message).toBe('not so happy');
       }
     });
 
-    it('supports adding a label', () => {
-      const promise = new Promise(resolve => setTimeout(() => resolve(), 200000));
+    it('supports adding a label', async () => {
+      const promise = new Promise<void>(resolve => setTimeout(() => resolve(), 10000));
 
       queue = new PriorityQueue();
-      queue.add(() => promise, 1, 'get request');
-      queue.add(() => promise, 1, 'put request');
-      queue.add(() => promise, 5, 'access token refresh');
-      queue.add(() => promise, 1, 'another get request');
+
+      void queue.add(() => promise, 1, 'get request');
+      void queue.add(() => promise, 1, 'put request');
+      void queue.add(() => promise, 5, 'access token refresh');
+      void queue.add(() => promise, 1, 'another get request');
 
       const promisesByPriority = queue.all;
       expect(promisesByPriority[0].label).toBe('access token refresh');
-    });
+    }, 10000);
 
     it('does not retry execution with maxRetries set to 0', async () => {
-      const task = jasmine.createSpy().and.returnValue(Promise.reject(new Error('nope')));
+      const task = jest.fn().mockReturnValue(Promise.reject(new Error('nope')));
 
       queue = new PriorityQueue({maxRetries: 0});
       try {
         await queue.add(task);
       } catch (error) {
-        expect(task.calls.count()).toBe(1);
+      } finally {
+        expect(task).toHaveBeenCalledTimes(1);
       }
     });
 
     it('does retry execution with maxRetries set to 1', async () => {
-      const task = jasmine.createSpy().and.returnValue(Promise.reject(new Error('nope')));
+      const task = jest.fn().mockReturnValue(Promise.reject(new Error('nope')));
 
       queue = new PriorityQueue({maxRetries: 1});
       try {
         await queue.add(task);
       } catch (error) {
-        expect(task.calls.count()).toBe(2);
+      } finally {
+        expect(task).toHaveBeenCalledTimes(2);
       }
     });
   });
 
   describe('"delete"', () => {
     it("deletes a Promise from the queue by it's UUID", () => {
-      const promise = new Promise(resolve => setTimeout(() => resolve(), 200000));
+      const promise = new Promise<void>(resolve => setTimeout(() => resolve(), 10000));
 
       queue = new PriorityQueue();
-      queue.add(() => promise, 1);
-      queue.add(() => promise, 1);
-      queue.add(() => promise, 1, 'delete-me');
-      queue.add(() => promise, 1);
+      void queue.add(() => promise, 1);
+      void queue.add(() => promise, 1);
+      void queue.add(() => promise, 1, 'delete-me');
+      void queue.add(() => promise, 1);
 
-      expect(queue.all.length)
-        .withContext('When adding four items, three are in the queue and one is in progress.')
-        .toBe(3);
+      // When adding four items, three are in the queue and one is in progress.
+      expect(queue.all.length).toBe(3);
 
       queue.delete('delete-me');
 
-      expect(queue.all.length)
-        .withContext('After deleting one item, two are in the queue and one is in progress.')
-        .toBe(2);
-    });
+      // After deleting one item, two are in the queue and one is in progress.
+      expect(queue.all.length).toBe(2);
+    }, 10000);
   });
 
   describe('"deleteAll"', () => {
     it('deletes all queued Promises', () => {
-      const promise = new Promise(resolve => setTimeout(() => resolve(), 200000));
+      const promise = new Promise<void>(resolve => setTimeout(() => resolve(), 10000));
 
       queue = new PriorityQueue();
-      queue.add(() => promise);
-      queue.add(() => promise);
-      queue.add(() => promise);
+      void queue.add(() => promise);
+      void queue.add(() => promise);
+      void queue.add(() => promise);
 
-      expect(queue.all.length)
-        .withContext('When adding three items, two are in the queue and one is in progress.')
-        .toBe(2);
+      // When adding three items, two are in the queue and one is in progress.
+      expect(queue.all.length).toBe(2);
 
       queue.deleteAll();
 
       expect(queue.all.length).toBe(0);
-    });
+    }, 10000);
   });
 
   describe('"getGrowingDelay"', () => {
     it('delay is growing exponentially', () => {
       queue = new PriorityQueue({maxRetries: 3, retryDelay: 1000, retryGrowthFactor: 1.3});
-
-      expect(queue.getGrowingDelay(0)).withContext('first try').toBe(1000);
-      expect(queue.getGrowingDelay(1)).withContext('one try left').toBe(1300);
-      expect(queue.getGrowingDelay(2)).withContext('last try').toBe(2600);
+      // first try
+      expect(queue['getGrowingDelay'](0)).toBe(1000);
+      // one try lef
+      expect(queue['getGrowingDelay'](1)).toBe(1300);
+      // last try
+      expect(queue['getGrowingDelay'](2)).toBe(2600);
     });
 
     it('does not exceed maxRetryDelay', () => {
@@ -189,7 +193,7 @@ describe('PriorityQueue', () => {
       };
       queue = new PriorityQueue(config);
 
-      expect(queue.getGrowingDelay(1)).toBe(config.maxRetryDelay);
+      expect(queue['getGrowingDelay'](1)).toBe(config.maxRetryDelay);
     });
   });
 });

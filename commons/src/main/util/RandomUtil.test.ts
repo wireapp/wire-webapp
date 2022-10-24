@@ -19,6 +19,8 @@
 
 const {RandomUtil} = require('@wireapp/commons');
 
+jest.useRealTimers();
+
 /**
  * @testEnvironment node
  */
@@ -29,10 +31,10 @@ describe('RandomUtil', () => {
       const randomLimit = 10;
       for (let index = 0; index < iterations; index++) {
         if (RandomUtil.randomInt(randomLimit) > randomLimit) {
-          fail(`randomInt() exeeded limit "${randomLimit}"`);
+          throw new Error(`randomInt() exeeded limit "${randomLimit}"`);
         }
       }
-    });
+    }, 100000);
   });
 
   describe('"randomArrayElement"', () => {

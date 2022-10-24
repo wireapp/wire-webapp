@@ -1,4 +1,5 @@
 {
+  "strict": true,
   "compilerOptions": {
     "esModuleInterop": true,
     "outDir": "src/main",

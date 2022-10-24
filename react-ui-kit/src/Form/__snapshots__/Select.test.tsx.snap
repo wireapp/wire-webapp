@@ -204,9 +204,11 @@ exports[`"Select" renders 1`] = `
 >
   <div
     className="emotion-1"
+    data-uie-name="test"
   >
     <div
       className=" emotion-2"
+      id="test"
       onKeyDown={[Function]}
     >
       <div
@@ -487,9 +489,11 @@ exports[`"Select" renders as disabled 1`] = `
 >
   <div
     className="emotion-1"
+    data-uie-name="test"
   >
     <div
       className=" emotion-2"
+      id="test"
       onKeyDown={[Function]}
     >
       <div
@@ -771,9 +775,11 @@ exports[`"Select" renders as invalid 1`] = `
 >
   <div
     className="emotion-1"
+    data-uie-name="test"
   >
     <div
       className=" emotion-2"
+      id="test"
       onKeyDown={[Function]}
     >
       <div

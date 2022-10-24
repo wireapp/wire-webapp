@@ -57,6 +57,6 @@ export const readAllSpec = {
     await engine.create(TABLE_NAME, marge.primaryKey, marge.entity);
     const records = await engine.readAll<DomainEntity>(TABLE_NAME);
     expect(records.length).toBe(3);
-    expect(records).toEqual(jasmine.arrayContaining([homer.entity, lisa.entity, marge.entity]));
+    expect(records).toEqual(expect.arrayContaining([homer.entity, lisa.entity, marge.entity]));
   },
 };

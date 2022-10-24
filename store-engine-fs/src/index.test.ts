@@ -132,7 +132,7 @@ describe('FileEngine', () => {
       for (const operation of functionNames) {
         try {
           await engine[operation]('../etc', 'primary-key', {});
-          fail();
+          throw new Error('Expected error to be thrown.');
         } catch (error) {
           expect(error instanceof expectedError).toBe(true);
         }

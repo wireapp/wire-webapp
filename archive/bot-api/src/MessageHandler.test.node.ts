@@ -45,9 +45,11 @@ describe('MessageHandler', () => {
     await mainHandler.account!.initServices({userId: 'user-id', clientType: ClientType.NONE});
     await mainHandler.account!['apiClient']['createContext']('user-id', ClientType.NONE);
 
-    spyOn(mainHandler.account!.service!.conversation, 'send').and.returnValue(
-      Promise.resolve({state: PayloadBundleState.OUTGOING_SENT, sentAt: new Date().toISOString(), id: createId()}),
-    );
+    jest
+      .spyOn(mainHandler.account!.service!.conversation, 'send')
+      .and.returnValue(
+        Promise.resolve({state: PayloadBundleState.OUTGOING_SENT, sentAt: new Date().toISOString(), id: createId()}),
+      );
   });
 
   describe('sendConnectionResponse', () => {
@@ -55,12 +57,12 @@ describe('MessageHandler', () => {
       const userId = UUID.genV4().toString();
       const acceptConnection = true;
 
-      spyOn(mainHandler.account!.service!.connection, 'acceptConnection').and.returnValue(
-        Promise.resolve({} as Connection),
-      );
-      spyOn(mainHandler.account!.service!.connection, 'ignoreConnection').and.returnValue(
-        Promise.resolve({} as Connection),
-      );
+      jest
+        .spyOn(mainHandler.account!.service!.connection, 'acceptConnection')
+        .and.returnValue(Promise.resolve({} as Connection));
+      jest
+        .spyOn(mainHandler.account!.service!.connection, 'ignoreConnection')
+        .and.returnValue(Promise.resolve({} as Connection));
 
       await mainHandler.sendConnectionResponse(userId, acceptConnection);
       expect(mainHandler.account!.service!.connection.acceptConnection).toHaveBeenCalledWith(userId);
@@ -71,12 +73,12 @@ describe('MessageHandler', () => {
       const userId = UUID.genV4().toString();
       const acceptConnection = false;
 
-      spyOn(mainHandler.account!.service!.connection, 'acceptConnection').and.returnValue(
-        Promise.resolve({} as Connection),
-      );
-      spyOn(mainHandler.account!.service!.connection, 'ignoreConnection').and.returnValue(
-        Promise.resolve({} as Connection),
-      );
+      jest
+        .spyOn(mainHandler.account!.service!.connection, 'acceptConnection')
+        .and.returnValue(Promise.resolve({} as Connection));
+      jest
+        .spyOn(mainHandler.account!.service!.connection, 'ignoreConnection')
+        .and.returnValue(Promise.resolve({} as Connection));
 
       await mainHandler.sendConnectionResponse(userId, acceptConnection);
       expect(mainHandler.account!.service!.connection.ignoreConnection).toHaveBeenCalledWith(userId);
@@ -96,7 +98,7 @@ describe('MessageHandler', () => {
         },
       ];
 
-      spyOn(MessageBuilder, 'buildTextMessage').and.callThrough();
+      jest.spyOn(MessageBuilder, 'buildTextMessage');
 
       await mainHandler.sendText(conversationId, messageText, mentionData);
 
@@ -104,10 +106,10 @@ describe('MessageHandler', () => {
         text: messageText,
       });
       expect(mainHandler.account!.service!.conversation.send).toHaveBeenCalledWith(
-        jasmine.objectContaining({
+        expect.objectContaining({
           protocol: ConversationProtocol.PROTEUS,
-          payload: jasmine.objectContaining({
-            content: jasmine.objectContaining({mentions: mentionData, text: messageText}),
+          payload: expect.objectContaining({
+            content: expect.objectContaining({mentions: mentionData, text: messageText}),
           }),
         }),
       );
@@ -117,7 +119,7 @@ describe('MessageHandler', () => {
       const conversationId = UUID.genV4().toString();
       const message = UUID.genV4().toString();
 
-      spyOn(MessageBuilder, 'buildTextMessage').and.callThrough();
+      jest.spyOn(MessageBuilder, 'buildTextMessage');
 
       await mainHandler.sendText(conversationId, message);
 
@@ -125,9 +127,9 @@ describe('MessageHandler', () => {
         text: message,
       });
       expect(mainHandler.account!.service!.conversation.send).toHaveBeenCalledWith(
-        jasmine.objectContaining({
+        expect.objectContaining({
           protocol: ConversationProtocol.PROTEUS,
-          payload: jasmine.objectContaining({content: jasmine.objectContaining({text: message})}),
+          payload: expect.objectContaining({content: expect.objectContaining({text: message})}),
         }),
       );
     });
@@ -137,7 +139,7 @@ describe('MessageHandler', () => {
       const message = UUID.genV4().toString();
       const userIds = [UUID.genV4().toString(), UUID.genV4().toString()];
 
-      spyOn(MessageBuilder, 'buildTextMessage').and.callThrough();
+      jest.spyOn(MessageBuilder, 'buildTextMessage');
 
       await mainHandler.sendText(conversationId, message, undefined, undefined, userIds);
 
@@ -145,9 +147,9 @@ describe('MessageHandler', () => {
         text: message,
       });
       expect(mainHandler.account!.service!.conversation.send).toHaveBeenCalledWith(
-        jasmine.objectContaining({
+        expect.objectContaining({
           protocol: ConversationProtocol.PROTEUS,
-          payload: jasmine.objectContaining({content: jasmine.objectContaining({text: message})}),
+          payload: expect.objectContaining({content: expect.objectContaining({text: message})}),
           userIds,
         }),
       );
@@ -158,8 +160,8 @@ describe('MessageHandler', () => {
     it('sends the correct data when typing started', async () => {
       const conversationId = UUID.genV4().toString();
 
-      spyOn(mainHandler.account!.service!.conversation, 'sendTypingStart').and.returnValue(Promise.resolve());
-      spyOn(mainHandler.account!.service!.conversation, 'sendTypingStop').and.returnValue(Promise.resolve());
+      jest.spyOn(mainHandler.account!.service!.conversation, 'sendTypingStart').mockReturnValue(Promise.resolve());
+      jest.spyOn(mainHandler.account!.service!.conversation, 'sendTypingStop').mockReturnValue(Promise.resolve());
 
       await mainHandler.sendTyping(conversationId, CONVERSATION_TYPING.STARTED);
 
@@ -170,8 +172,8 @@ describe('MessageHandler', () => {
     it('sends the correct data when typing stopped', async () => {
       const conversationId = UUID.genV4().toString();
 
-      spyOn(mainHandler.account!.service!.conversation, 'sendTypingStart').and.returnValue(Promise.resolve());
-      spyOn(mainHandler.account!.service!.conversation, 'sendTypingStop').and.returnValue(Promise.resolve());
+      jest.spyOn(mainHandler.account!.service!.conversation, 'sendTypingStart').mockReturnValue(Promise.resolve());
+      jest.spyOn(mainHandler.account!.service!.conversation, 'sendTypingStop').mockReturnValue(Promise.resolve());
 
       await mainHandler.sendTyping(conversationId, CONVERSATION_TYPING.STOPPED);
 

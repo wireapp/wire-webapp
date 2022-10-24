@@ -17,10 +17,10 @@
  *
  */
 
+const baseConfig = require('../../jest.config.base');
+
 module.exports = {
-  clearMocks: true,
-  testMatch: ['**/?(*.)+(spec|test).+(ts|tsx)', 'test/**/*.+(ts|tsx)'],
-  transform: {
-    '^.+\\.(ts|tsx)$': 'ts-jest',
-  },
+  ...baseConfig,
+  testEnvironment: 'node',
 };
+

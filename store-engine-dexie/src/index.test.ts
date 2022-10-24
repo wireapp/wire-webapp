@@ -129,7 +129,7 @@ describe('IndexedDBEngine', () => {
     });
   });
 
-  describe('readAllPrimaryKeys', async () => {
+  describe('readAllPrimaryKeys', () => {
     beforeEach(async () => (engine = await initEngine()));
 
     Object.entries(readAllPrimaryKeysSpec).map(([description, testFunction]) => {
@@ -198,7 +198,7 @@ describe('IndexedDBEngine', () => {
 
       type ExpectedResult = typeof entity & {primaryKey: number};
 
-      const primaryKey = await engine.updateOrCreate<number>(TABLE_NAME, undefined, entity);
+      const primaryKey = await engine.updateOrCreate<number>(TABLE_NAME, -1, entity);
       expect(primaryKey).toBe(1);
       const record = await engine.read<ExpectedResult, number>(TABLE_NAME, primaryKey);
       expect(record.primaryKey).toBe(1);
@@ -206,7 +206,7 @@ describe('IndexedDBEngine', () => {
     });
   });
 
-  describe('updateOrCreate', async () => {
+  describe('updateOrCreate', () => {
     it(Object.keys(updateOrCreateSpec)[0], async () => {
       /**
        * For tests that are based on records without primary keys, we need to use an IndexedDB schema with out-of-line

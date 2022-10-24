@@ -17,10 +17,9 @@
  *
  */
 
+const baseConfig = require('../../jest.config.base');
+
 module.exports = {
-  setupFilesAfterEnv: [],
+  ...baseConfig,
   snapshotSerializers: ['@emotion/jest/serializer'],
-  testPathIgnorePatterns: ['[a-z]+.test.js', 'node_modules'],
-  verbose: true,
-    testEnvironment: 'jest-environment-jsdom',
 };

@@ -3,9 +3,8 @@
  * https://jestjs.io/docs/configuration
  */
 
+const baseConfig = require('../../jest.config.base');
+
 module.exports = {
-  collectCoverage: true,
-  coverageDirectory: 'coverage',
-  roots: ['src'],
-  testEnvironment: 'jest-environment-jsdom',
+  ...baseConfig,
 };

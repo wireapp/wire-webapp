@@ -17,7 +17,7 @@
  *
  */
 
-const {ValidationUtil} = require('@wireapp/commons');
+import {ValidationUtil} from '@wireapp/commons';
 
 /**
  * @testEnvironment node

@@ -62,7 +62,7 @@ describe('LoginSanitizer', () => {
       };
 
       LoginSanitizer.removeNonPrintableCharacters(loginData);
-      expect(loginData.password).toEqual(jasmine.any(String));
+      expect(loginData.password).toEqual(expect.any(String));
     });
   });
 });

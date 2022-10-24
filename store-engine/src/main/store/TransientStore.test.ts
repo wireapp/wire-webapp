@@ -49,7 +49,7 @@ describe('store.TransientStore', () => {
 
     it("saves a record together with it's expiration date.", async () => {
       const bundle = await store.set(primaryKey, entity, ttl);
-      expect(bundle.expires).toEqual(jasmine.any(Number));
+      expect(bundle.expires).toEqual(expect.any(Number));
     });
 
     it("saves a record together with it's timeoutID.", async () => {
@@ -58,12 +58,12 @@ describe('store.TransientStore', () => {
     });
 
     it("doesn't overwrite an existing record.", async () => {
+      expect.assertions(2);
       try {
         await store.set(primaryKey, entity, ttl);
         await store.set(primaryKey, {access_token: 'ABC'}, ttl);
-        fail();
       } catch (error) {
-        expect(error).toEqual(jasmine.any(RecordAlreadyExistsError));
+        expect(error).toEqual(expect.any(RecordAlreadyExistsError));
         expect((error as RecordAlreadyExistsError).code).toBe(1);
       }
     });
@@ -84,7 +84,7 @@ describe('store.TransientStore', () => {
       if (bundle) {
         expect(bundle.payload).toEqual(entity);
       } else {
-        fail();
+        throw new Error('Bundle is not defined.');
       }
     });
 
@@ -97,7 +97,7 @@ describe('store.TransientStore', () => {
       if (bundle) {
         expect(bundle.payload).toEqual(entity);
       } else {
-        fail();
+        throw new Error('Bundle is not defined.');
       }
     });
 
@@ -125,26 +125,27 @@ describe('store.TransientStore', () => {
     const minuteInMillis = 60000;
 
     beforeEach(() => {
-      jasmine.clock().install();
-      jasmine.clock().mockDate();
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date('20 Aug 2020 00:12:00 GMT').getTime());
     });
 
-    afterEach(() => jasmine.clock().uninstall());
+    afterEach(() => jest.useRealTimers());
 
     // eslint-disable-next-line jest/no-done-callback
     it('publishes an event when an entity expires.', async () => {
+      expect.assertions(2);
       store.on(TransientStore.TOPIC.EXPIRED, expiredBundle => {
         expect(expiredBundle.payload).toBe(entity);
         expect(expiredBundle.primaryKey).toBe(primaryKey);
       });
 
       await store.set(primaryKey, entity, minuteInMillis);
-      jasmine.clock().tick(minuteInMillis + 1);
+      jest.advanceTimersByTime(minuteInMillis + 1);
     });
 
     it('deletes expired entities.', async () => {
       await store.set(primaryKey, entity, minuteInMillis);
-      jasmine.clock().tick(minuteInMillis + 1);
+      jest.advanceTimersByTime(minuteInMillis + 1);
 
       const bundle = await store.get(primaryKey);
       expect(bundle).toBeUndefined();

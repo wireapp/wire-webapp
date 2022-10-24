@@ -199,7 +199,7 @@ describe('CryptographyService', () => {
       expect(Object.keys(encrypted).length).toBe(2);
       expect(Object.keys(encrypted[firstUserID]).length).toBe(3);
       expect(Object.keys(encrypted[secondUserID]).length).toBe(2);
-      expect(encrypted[firstUserID][firstClientId]).toEqual(jasmine.any(Uint8Array));
+      expect(encrypted[firstUserID][firstClientId]).toEqual(expect.any(Uint8Array));
       expect(encrypted[firstUserID][noPrekeyClient]).not.toBeDefined();
     });
 

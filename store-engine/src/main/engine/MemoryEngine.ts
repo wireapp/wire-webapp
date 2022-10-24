@@ -154,6 +154,9 @@ export class MemoryEngine implements CRUDEngine {
   }
 
   private prepareTable(tableName: string): void {
+    if (!this.stores[this.storeName]) {
+      this.stores[this.storeName] = {};
+    }
     if (!this.stores[this.storeName][tableName]) {
       this.stores[this.storeName][tableName] = {};
     }

@@ -41,10 +41,10 @@ describe('AssetService', () => {
       const asset = await (await assetService.uploadAsset(Buffer.from([1, 2, 3]))).response;
 
       expect(asset).toEqual(
-        jasmine.objectContaining({
+        expect.objectContaining({
           key: assetServerData.key,
-          keyBytes: jasmine.any(Buffer),
-          sha256: jasmine.any(Buffer),
+          keyBytes: expect.any(Buffer),
+          sha256: expect.any(Buffer),
           token: assetServerData.token,
         }),
       );

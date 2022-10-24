@@ -17,7 +17,6 @@
  *
  */
 
-import axios from 'axios';
 import {exec} from 'child_process';
 import path from 'path';
 import {promisify} from 'util';
@@ -27,6 +26,7 @@ import fs from 'fs-extra';
 import JSZip from 'jszip';
 import rimraf from 'rimraf';
 import File from 'vinyl';
+import axios from 'axios';
 
 export async function copyAsync(source: string, destination: string): Promise<File[]> {
   if (isFile(destination)) {

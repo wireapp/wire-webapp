@@ -29,9 +29,7 @@
     "clean": "rimraf \"src/**/*.{js?(.map),d.ts}\"",
     "dist": "yarn clean && yarn build",
     "start": "ts-node -r tsconfig-paths/register src/index.ts",
-    "test": "yarn test:node",
-    "test:project": "yarn dist && yarn test",
-    "test:node": "exit 0"
+    "test": "exit 0"
   },
   "version": "11.2.35",
   "gitHead": "5339f01fe01ef0871da8c8bc8662fbe9e604754a"
