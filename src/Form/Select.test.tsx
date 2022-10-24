@@ -17,30 +17,26 @@
  *
  */
 
+/* eslint-disable jest/expect-expect */
+
 import React from 'react';
 import {matchComponent} from '../test/testUtil';
 import {Select} from './Select';
 
+const props: React.ComponentProps<typeof Select> = {
+  options: [],
+  id: 'test',
+  dataUieName: 'test',
+};
+
 describe('"Select"', () => {
   it('renders', () =>
     matchComponent(
-      <Select>
+      <Select {...props}>
         <option>a</option>
         <option>b</option>
       </Select>,
     ));
-  it('renders as disabled', () =>
-    matchComponent(
-      <Select disabled>
-        <option>a</option>
-        <option>b</option>
-      </Select>,
-    ));
-  it('renders as invalid', () =>
-    matchComponent(
-      <Select markInvalid>
-        <option>a</option>
-        <option>b</option>
-      </Select>,
-    ));
+  it('renders as disabled', () => matchComponent(<Select {...props} disabled></Select>));
+  it('renders as invalid', () => matchComponent(<Select {...props} markInvalid></Select>));
 });
