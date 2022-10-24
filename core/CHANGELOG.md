@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [34.1.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@34.1.3...@wireapp/core@34.1.4) (2022-10-24)
+
+### Bug Fixes
+
+* More resilient id comparison for external proposals ([#4559](https://github.com/wireapp/wire-web-packages/issues/4559)) ([f351f79](https://github.com/wireapp/wire-web-packages/commit/f351f7984c136f888418e084eb4a3f8e526ca126))
+
 ## [34.1.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@34.1.2...@wireapp/core@34.1.3) (2022-10-24)
 
 **Note:** Version bump only for package @wireapp/core
