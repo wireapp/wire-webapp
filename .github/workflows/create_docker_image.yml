@@ -43,4 +43,4 @@ jobs:
         env:
           DOCKER_PASSWORD: ${{secrets.WEBTEAM_QUAY_PASSWORD}}
           DOCKER_USERNAME: ${{secrets.WEBTEAM_QUAY_USERNAME}}
-        run: yarn docker '' "${{input.tag}}"
+        run: yarn docker '' "${{inputs.tag}}"
