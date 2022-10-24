@@ -2,10 +2,11 @@ name: Create Docker image
 
 on:
   workflow_dispatch:
-    tag:
-      description: 'tagname for the Docker image'
-      required: true
-      type: string
+    inputs:
+      tag:
+        description: 'tagname for the Docker image'
+        required: true
+        type: string
 
 concurrency:
   group: ci-${{ github.ref }}
