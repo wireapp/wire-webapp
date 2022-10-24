@@ -50,8 +50,9 @@ const addTask = ({task, firingDate, key}: ScheduleTaskParams) => {
 
   const timeout = setTimeout(
     async () => {
-      await task();
+      logger.info(`Executing task with key "${key}"`);
       delete activeTimeouts[key];
+      await task();
     },
     delay > 0 ? delay : 0,
   );

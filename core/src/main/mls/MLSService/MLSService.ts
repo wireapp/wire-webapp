@@ -39,6 +39,7 @@ import {MLSCallbacks, MLSConfig} from '../types';
 import {sendMessage} from '../../conversation/message/messageSender';
 import {parseFullQualifiedClientId} from '../../util/fullyQualifiedClientIdUtils';
 import {PostMlsMessageResponse} from '@wireapp/api-client/src/conversation';
+import logdown from 'logdown';
 //@todo: this function is temporary, we wait for the update from core-crypto side
 //they are returning regular array instead of Uint8Array for commit and welcome messages
 export const optionalToUint8Array = (array: Uint8Array | []): Uint8Array => {
@@ -46,6 +47,7 @@ export const optionalToUint8Array = (array: Uint8Array | []): Uint8Array => {
 };
 
 export class MLSService {
+  logger = logdown('@wireapp/core/MLSService');
   groupIdFromConversationId?: MLSCallbacks['groupIdFromConversationId'];
 
   constructor(
@@ -70,6 +72,9 @@ export class MLSService {
           optionalToUint8Array(commit),
         );
         await this.coreCryptoClient.commitAccepted(groupId);
+        const newEpoch = await this.getEpoch(groupId);
+        const groupIdStr = Encoder.toBase64(groupId).asString;
+        this.logger.log(`Commit have been accepted for group "${groupIdStr}". New epoch is "${newEpoch}"`);
         if (welcome) {
           // If the commit went well, we can send the Welcome
           //@todo: it's temporary - we wait for core-crypto fix to return the actual Uint8Array instead of regular array
@@ -95,7 +100,7 @@ export class MLSService {
         const {user} = parseFullQualifiedClientId(decoder.decode(client));
         return otherClients.some(client => {
           const {user: otherUser} = parseFullQualifiedClientId(decoder.decode(client));
-          return otherUser === user;
+          return otherUser.toLowerCase() === user.toLowerCase();
         });
       },
     });
