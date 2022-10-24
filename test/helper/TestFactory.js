@@ -23,17 +23,17 @@
 
 // Polyfill for "tsyringe" dependency injection
 import {ClientClassification, ClientType} from '@wireapp/api-client/src/client/';
-import {Cryptobox} from '@wireapp/cryptobox';
 import 'core-js/full/reflect';
-import ko from 'knockout';
 import {container} from 'tsyringe';
+import ko from 'knockout';
 
-import {AssetRepository} from 'src/script/assets/AssetRepository';
-import {AssetService} from 'src/script/assets/AssetService';
-import {BackupRepository} from 'src/script/backup/BackupRepository';
-import {BackupService} from 'src/script/backup/BackupService';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
-import {ClientEntity} from 'src/script/client/ClientEntity';
+import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
+import {User} from 'src/script/entity/User';
+import {BackupRepository} from 'src/script/backup/BackupRepository';
+import {UserRepository} from 'src/script/user/UserRepository';
+import {NotificationRepository} from 'src/script/notification/NotificationRepository';
+import {StorageRepository} from 'src/script/storage/StorageRepository';
 import {ClientRepository} from 'src/script/client/ClientRepository';
 import {EventTrackingRepository} from 'src/script/tracking/EventTrackingRepository';
 import {ClientEntity} from 'src/script/client/ClientEntity';
@@ -47,37 +47,28 @@ import {CryptographyRepository} from 'src/script/cryptography/CryptographyReposi
 import {TeamRepository} from 'src/script/team/TeamRepository';
 import {SearchRepository} from 'src/script/search/SearchRepository';
 import {ConversationService} from 'src/script/conversation/ConversationService';
-import {ConversationState} from 'src/script/conversation/ConversationState';
+import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
-import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
-import {CryptographyService} from 'src/script/cryptography/CryptographyService';
-import {User} from 'src/script/entity/User';
-import {EventRepository} from 'src/script/event/EventRepository';
-import {EventService} from 'src/script/event/EventService';
-import {EventServiceNoCompound} from 'src/script/event/EventServiceNoCompound';
-import {NotificationService} from 'src/script/event/NotificationService';
-import {MediaRepository} from 'src/script/media/MediaRepository';
-import {NotificationRepository} from 'src/script/notification/NotificationRepository';
-import {PermissionRepository} from 'src/script/permission/PermissionRepository';
+import {SelfService} from 'src/script/self/SelfService';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {PropertiesService} from 'src/script/properties/PropertiesService';
-import {SearchRepository} from 'src/script/search/SearchRepository';
-import {SearchService} from 'src/script/search/SearchService';
-import {SelfService} from 'src/script/self/SelfService';
-import {Core} from 'src/script/service/CoreSingleton';
-import {createStorageEngine, DatabaseTypes} from 'src/script/service/StoreEngineProvider';
-import {StorageService} from 'src/script/storage';
-import {StorageRepository} from 'src/script/storage/StorageRepository';
-import {TeamRepository} from 'src/script/team/TeamRepository';
-import {TeamService} from 'src/script/team/TeamService';
-import {TeamState} from 'src/script/team/TeamState';
-import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
-import {EventTrackingRepository} from 'src/script/tracking/EventTrackingRepository';
-import {UserRepository} from 'src/script/user/UserRepository';
 import {UserService} from 'src/script/user/UserService';
+import {BackupService} from 'src/script/backup/BackupService';
+import {StorageService} from 'src/script/storage';
+import {MediaRepository} from 'src/script/media/MediaRepository';
+import {PermissionRepository} from 'src/script/permission/PermissionRepository';
+import {ClientService} from 'src/script/client/ClientService';
+import {TeamService} from 'src/script/team/TeamService';
+import {SearchService} from 'src/script/search/SearchService';
+import {AssetRepository} from 'src/script/assets/AssetRepository';
 import {UserState} from 'src/script/user/UserState';
-
+import {ClientState} from 'src/script/client/ClientState';
+import {TeamState} from 'src/script/team/TeamState';
+import {ConversationState} from 'src/script/conversation/ConversationState';
+import {AssetService} from 'src/script/assets/AssetService';
 import {entities} from '../api/payloads';
+import {createStorageEngine, DatabaseTypes} from 'src/script/service/StoreEngineProvider';
+import {Core} from 'src/script/service/CoreSingleton';
 
 export class TestFactory {
   constructor() {

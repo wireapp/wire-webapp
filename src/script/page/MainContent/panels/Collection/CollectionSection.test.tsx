@@ -21,7 +21,7 @@ import {render, fireEvent} from '@testing-library/react';
 
 import {createRandomUuid} from 'Util/util';
 
-import CollectionSection from './CollectionSection';
+import {CollectionSection} from './CollectionSection';
 
 import {ContentMessage} from '../../../../entity/message/ContentMessage';
 
