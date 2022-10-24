@@ -389,7 +389,7 @@ export class ContentViewModel {
           PrimaryModal.show(
             PrimaryModal.type.ACCOUNT_READ_RECEIPTS_CHANGED,
             {
-              data: aggregatedNotifications.pop().data as boolean,
+              data: aggregatedNotifications.pop()?.data as boolean,
               preventClose: true,
             },
             undefined,
