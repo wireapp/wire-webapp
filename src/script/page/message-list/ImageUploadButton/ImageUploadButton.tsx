@@ -18,30 +18,28 @@
  */
 
 import {useRef} from 'react';
-import {Config} from '../../Config';
 import {t} from 'Util/LocalizerUtil';
 import Icon from 'Components/Icon';
+import {Config} from '../../../Config';
 
-interface AssetUploadButtonProps {
-  onSelectFiles: (files: File[]) => void;
+interface ImageUploadButtonProps {
+  onSelectImages: (files: File[]) => void;
 }
 
-export const AssetUploadButton = ({onSelectFiles}: AssetUploadButtonProps) => {
-  const acceptedFileTypes = Config.getConfig().FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS.join(',');
+export const ImageUploadButton = ({onSelectImages}: ImageUploadButtonProps) => {
+  const acceptedImageTypes = Config.getConfig().ALLOWED_IMAGE_TYPES.join(',');
 
-  const fileRef = useRef<HTMLInputElement>(null);
+  const imageRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const {files} = event.target;
 
     if (!files) {
       return;
     }
 
-    onSelectFiles(Array.from(files));
-
-    //reset file input's value resetting form wrapper
+    onSelectImages(Array.from(files));
     formRef.current?.reset();
   };
 
@@ -49,19 +47,20 @@ export const AssetUploadButton = ({onSelectFiles}: AssetUploadButtonProps) => {
     <form ref={formRef}>
       <button
         type="button"
-        aria-label={t('tooltipConversationFile')}
-        title={t('tooltipConversationFile')}
+        aria-label={t('tooltipConversationAddImage')}
+        title={t('tooltipConversationAddImage')}
         className="conversation-button controls-right-button no-radius file-button"
-        onClick={() => fileRef.current?.click()}
-        data-uie-name="do-share-file"
+        onClick={() => imageRef.current?.click()}
+        data-uie-name="do-share-image"
       >
-        <Icon.Attachment />
+        <Icon.Image />
+
         <input
-          ref={fileRef}
-          accept={acceptedFileTypes ?? null}
-          id="conversation-input-bar-files"
+          ref={imageRef}
+          accept={acceptedImageTypes}
           tabIndex={-1}
-          onChange={handleFileChange}
+          id="conversation-input-bar-photo"
+          onChange={handleImageFileChange}
           type="file"
         />
       </button>
