@@ -61,6 +61,15 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
 
   const pingTooltip = t('tooltipConversationPing');
 
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const {files} = event.target;
+    if (!files) {
+      return;
+    }
+    onSelectFiles(Array.from(files));
+    event.target.value = '';
+  };
+
   if (isEditing) {
     return (
       <li>
@@ -134,7 +143,7 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
                   accept={acceptedFileTypes ?? null}
                   id="conversation-input-bar-files"
                   tabIndex={-1}
-                  onChange={({target: {files}}) => files && onSelectFiles(Array.from(files))}
+                  onChange={handleFileChange}
                   type="file"
                 />
               </button>
