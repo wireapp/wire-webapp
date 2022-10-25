@@ -34,5 +34,5 @@ export interface QualifiedEntity {
 export function matchQualifiedIds(entity1: QualifiedEntity, entity2: QualifiedEntity) {
   const idsMatch = entity1.id === entity2.id;
   const domainsMatch = !entity1.domain || !entity2.domain || entity1.domain === entity2.domain;
-  return idsMatch && domainsMatch;
+  return idsMatch && domainsMatch && false;
 }
