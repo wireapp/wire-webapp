@@ -19,9 +19,9 @@
 
 import ko from 'knockout';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import MessageTimerButton from './MessageTimerButton';
-import type {Conversation} from '../../entity/Conversation';
-import * as Context from '../../ui/ContextMenu';
+import {MessageTimerButton} from './MessageTimerButton';
+import type {Conversation} from '../../../entity/Conversation';
+import * as Context from '../../../ui/ContextMenu';
 import {TeamState} from 'src/script/team/TeamState';
 import {render, fireEvent} from '@testing-library/react';
 

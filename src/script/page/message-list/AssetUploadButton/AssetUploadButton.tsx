@@ -18,7 +18,7 @@
  */
 
 import {useRef} from 'react';
-import {Config} from '../../Config';
+import {Config} from '../../../Config';
 import {t} from 'Util/LocalizerUtil';
 import Icon from 'Components/Icon';
 

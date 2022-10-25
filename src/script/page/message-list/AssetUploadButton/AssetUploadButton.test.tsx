@@ -18,9 +18,9 @@
  */
 
 import {render, fireEvent} from '@testing-library/react';
-import {AssetUploadButton} from './AssetUploadButton';
+import {AssetUploadButton} from './';
 
-jest.mock('../../Config', () => ({
+jest.mock('../../../Config', () => ({
   Config: {
     getConfig: () => ({
       ALLOWED_IMAGE_TYPES: ['image/gif', 'image/avif'],

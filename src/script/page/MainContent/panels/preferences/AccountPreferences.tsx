@@ -39,7 +39,7 @@ import {RichProfileRepository} from '../../../../user/RichProfileRepository';
 import type {UserRepository} from '../../../../user/UserRepository';
 import {UserState} from '../../../../user/UserState';
 import {modals, ModalsViewModel} from '../../../../view_model/ModalsViewModel';
-import AccentColorPicker from '../../../AccentColorPicker';
+import {AccentColorPicker} from '../../../AccentColorPicker';
 import AccountInput from './accountPreferences/AccountInput';
 import AccountSecuritySection from './accountPreferences/AccountSecuritySection';
 import AvailabilityButtons from './accountPreferences/AvailabilityButtons';

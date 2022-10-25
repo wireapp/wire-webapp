@@ -19,11 +19,11 @@
 
 import Icon from 'Components/Icon';
 import React from 'react';
-import MessageTimerButton from '../MessageTimerButton';
+import {MessageTimerButton} from '../MessageTimerButton';
 import {t} from 'Util/LocalizerUtil';
 import {Conversation} from 'src/script/entity/Conversation';
 import {AssetUploadButton} from '../AssetUploadButton';
-import {ImageUploadButton} from '../ImageUploadButton/ImageUploadButton';
+import {ImageUploadButton} from '../ImageUploadButton';
 
 export type ControlButtonsProps = {
   input: string;

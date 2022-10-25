@@ -23,13 +23,13 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {FeatureStatus} from '@wireapp/api-client/src/team/feature/';
 
-import type {ClientRepository} from '../client/ClientRepository';
-import AppLock, {APPLOCK_STATE} from './AppLock';
-import {AppLockState} from '../user/AppLockState';
-import {AppLockRepository} from '../user/AppLockRepository';
-import {UserState} from '../user/UserState';
+import type {ClientRepository} from '../../client/ClientRepository';
+import AppLock, {APPLOCK_STATE} from './';
+import {AppLockState} from '../../user/AppLockState';
+import {AppLockRepository} from '../../user/AppLockRepository';
+import {UserState} from '../../user/UserState';
 import {createRandomUuid} from 'Util/util';
-import {TeamState} from '../team/TeamState';
+import {TeamState} from '../../team/TeamState';
 import {render} from '@testing-library/react';
 
 // https://github.com/jedisct1/libsodium.js/issues/235
