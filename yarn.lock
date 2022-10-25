@@ -2881,7 +2881,7 @@
   resolved "https://registry.yarnpkg.com/@wireapp/antiscroll-2/-/antiscroll-2-1.3.1.tgz#bcb66f72c6dadc306e43235256b768ed3f89039c"
   integrity sha512-vWmWYAzSdyxs+xlgSPGtiNSTCM1z0nxM+jSPa/xz1/kuFKy80BrJP5xaGwNNLljBAz8ymlSPUUZlylUd0tFr1Q==
 
-"@wireapp/api-client@^20.6.7":
+"@wireapp/api-client@20.6.7":
   version "20.6.7"
   resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-20.6.7.tgz#996b7f13b36a18f5cfe7ab919ba3cbffc5ff5668"
   integrity sha512-vZSMcfNw6EKIeo8wI3lAeBjYAoiWaSq8ySze7jPVSPgvY4BkTGIqCRw5I9g0sftX/5FeBin8lK9NP8Rog9xBEQ==
@@ -2908,7 +2908,7 @@
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-4.7.3.tgz#b6ea9a487a7834fbdb9ba3941fee6c7aaf9a9d51"
   integrity sha512-RmD+k3EkiOqovqRX1mXplyfHS5/YKb20Wc4ucfKPvzHyfDhCmCPH1bV7jaZp87WrYWyGu0xBTfG+3USw60d0Kg==
 
-"@wireapp/commons@^4.4.6":
+"@wireapp/commons@4.4.6", "@wireapp/commons@^4.4.6":
   version "4.4.6"
   resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-4.4.6.tgz#9418ce096f6b0c66c5a51d94dc7249057c956c70"
   integrity sha512-csaddG7/4tjs4tFo29uQ33q3ZsR/Au1M1uBOjzcbkVuirsFpEFUvEKfWG8l1RufQuiMU1y0n9LyL6zJJ1rEo1Q==
@@ -2936,17 +2936,17 @@
   resolved "https://registry.yarnpkg.com/@wireapp/core-crypto/-/core-crypto-0.5.2.tgz#73f7787529d80fee68a42881003a5bded40486d9"
   integrity sha512-D/lnVk/omd2xltMOpWjWkWfv/AHYzD0EepKLOqTq456coi5lwHNWja0niuFc6cBccXXrlkv3mh/ClDf2lGPvvg==
 
-"@wireapp/core@32.0.3":
-  version "32.0.3"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-32.0.3.tgz#8548e87c2d21d34f7c352f2c27a3723d0336a7dc"
-  integrity sha512-J/YL2GhyaltHr50CL5ty/d40D/CkyQo65xkZC4VGF/llJNStqYj0IQ+7GwmZNHnenwvTZ2hxv/4Cp2Bc+ya+LA==
+"@wireapp/core@32.0.3-2":
+  version "32.0.3-2"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-32.0.3-2.tgz#1e70e249dde9cbf1b0474f20e709aa567837defc"
+  integrity sha512-wXjmEgG2hyCuM417BUpIapDclepcs22o+giy+LuGWAG0AW2Ltkq2TWh/v0J2sUpfVs8y8/VtZhGk+X13NEl/4w==
   dependencies:
-    "@wireapp/api-client" "^20.6.7"
-    "@wireapp/commons" "^4.4.6"
+    "@wireapp/api-client" "20.6.7"
+    "@wireapp/commons" "4.4.6"
     "@wireapp/core-crypto" "0.5.2"
     "@wireapp/cryptobox" "12.8.0"
-    "@wireapp/promise-queue" "^1.3.0"
-    "@wireapp/store-engine-dexie" "^1.7.6"
+    "@wireapp/promise-queue" "1.3.0"
+    "@wireapp/store-engine-dexie" "1.7.6"
     axios "^0.27.2"
     bazinga64 "5.11.6"
     hash.js "1.1.7"
@@ -2992,11 +2992,11 @@
     "@types/node" "~14"
 
 "@wireapp/priority-queue@^1.8.6":
-  version "1.8.6"
-  resolved "https://registry.yarnpkg.com/@wireapp/priority-queue/-/priority-queue-1.8.6.tgz#9d1e2c27883813a4df9010d9219c45a5787ff5b6"
-  integrity sha512-h0r/KDf8Af92hjd8tEi41u3k8Tf4lP6I/UwJM5+yoBU56lDPZV0Ca8UNJmeUVXwaXYagAZ9TzZnkL9W0Z1eS+g==
+  version "1.8.11"
+  resolved "https://registry.yarnpkg.com/@wireapp/priority-queue/-/priority-queue-1.8.11.tgz#f141f1f5cc0d0a3808c510e155bf6d605a51c4b0"
+  integrity sha512-Kbc6IKJrz2xLsaf86ZezuCO+MossLqURyhVgloHpUj3lKW6cAJWh3dvZFwYIUvt6e2hAXdQifoxMMs/rc55Dmg==
 
-"@wireapp/promise-queue@^1.3.0":
+"@wireapp/promise-queue@1.3.0":
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/@wireapp/promise-queue/-/promise-queue-1.3.0.tgz#d98a11e8d28779964b3bba835ae308b9c1a77540"
   integrity sha512-wZsUhNTqB9Ns8u+R/lLzeDqFlgZESkWs8EajEcLpuL8q3RQakkTIRxZtSIzsyRp/+kxC28QF/BJy+GYmCLkbVA==
@@ -3030,7 +3030,7 @@
     react-select "5.4.0"
     react-transition-group "4.4.2"
 
-"@wireapp/store-engine-dexie@1.7.6", "@wireapp/store-engine-dexie@^1.7.6":
+"@wireapp/store-engine-dexie@1.7.6":
   version "1.7.6"
   resolved "https://registry.yarnpkg.com/@wireapp/store-engine-dexie/-/store-engine-dexie-1.7.6.tgz#cfd4ecb694ed057a9f2e4959a14b2e75028d7bf7"
   integrity sha512-D1Se/nJeIKECqdz7m7QWJ+orSpKjzTV3Y3J5DagBfw2Ju+AxOBkWOotSYtct6uyoJTdTFPicAT5qh0ebJ7Jfow==
