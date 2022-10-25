@@ -20,15 +20,10 @@
     "uuidjs": "4.2.12"
   },
   "devDependencies": {
-    "@babel/core": "^7.19.1",
-    "@babel/preset-env": "^7.19.1",
-    "@babel/preset-typescript": "^7.18.6",
     "@faker-js/faker": "^7.6.0",
     "@swc/core": "^1.3.10",
     "@swc/jest": "^0.2.23",
-    "@types/babel__core": "^7",
     "@types/jest": "^29.2.0",
-    "@types/long": "4.0.1",
     "@types/tough-cookie": "4.0.2",
     "@wireapp/commons": "workspace:^",
     "@wireapp/store-engine-dexie": "workspace:^",
