@@ -25,17 +25,16 @@ import {container} from 'tsyringe';
 import {CallingContainer} from 'Components/calling/CallingOverlayContainer';
 import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationModal';
 import {LegalHoldModal} from 'Components/Modals/LegalHoldModal/LegalHoldModal';
+import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {AppLock} from './AppLock';
 import {LeftSidebar} from './LeftSidebar';
 import {MainContent} from './MainContent';
-import {RightSidebar} from './RightSidebar';
-import {PanelEntity, PanelState} from './RightSidebar/RightSidebar';
+import {PanelEntity, PanelState, RightSidebar} from './RightSidebar';
 import {RootProvider} from './RootProvider';
 import {useAppMainState, ViewType} from './state';
 
-import {PrimaryModalComponent} from '../components/Modals/PrimaryModal/PrimaryModal';
 import {User} from '../entity/User';
 import {TeamState} from '../team/TeamState';
 import {UserState} from '../user/UserState';
@@ -63,13 +62,9 @@ const AppContainer: FC<AppContainerProps> = ({root}) => {
   const currentState = history.at(-1);
 
   const toggleRightSidebar = (panelState: PanelState, params: RightSidebarParams) => {
-    const newParamId = params.entity?.id;
-    const currentParamId = currentEntity?.id;
-
     const isDifferentState = currentState !== panelState;
-    const isDifferentParams = newParamId !== currentParamId;
 
-    if (isDifferentState || isDifferentParams) {
+    if (isDifferentState) {
       goTo(panelState, params);
 
       return;
