@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.17.8](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@8.17.7...@wireapp/react-ui-kit@8.17.8) (2022-10-25)
+
+### Bug Fixes
+
+* font weight on windows pcs (FS-1081) ([#4560](https://github.com/wireapp/wire-web-packages/issues/4560)) ([710df83](https://github.com/wireapp/wire-web-packages/commit/710df8371966081cbea09a2800fa7db68bb7c4ba))
+
 ## [8.17.7](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@8.17.6...@wireapp/react-ui-kit@8.17.7) (2022-10-24)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit

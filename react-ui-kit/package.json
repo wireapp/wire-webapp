@@ -68,5 +68,5 @@
     "test:watch": "jest --watch",
     "test:update": "jest --updateSnapshot"
   },
-  "version": "8.17.7"
+  "version": "8.17.8"
 }
