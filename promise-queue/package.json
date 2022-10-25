@@ -1,11 +1,7 @@
 {
   "devDependencies": {
-    "@babel/core": "^7.19.1",
-    "@babel/preset-env": "^7.19.1",
-    "@babel/preset-typescript": "7.18.6",
     "@swc/core": "^1.3.10",
     "@swc/jest": "^0.2.23",
-    "@types/babel__preset-env": "^7",
     "@types/jest": "^29.2.0",
     "@wireapp/commons": "workspace:^",
     "jest": "^29.2.1"

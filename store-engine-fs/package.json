@@ -7,7 +7,7 @@
     "@swc/jest": "^0.2.23",
     "@types/fs-extra": "9.0.13",
     "@types/jest": "^29.2.0",
-    "@types/node": "^18.11.2",
+    "@types/node": "^18.11.4",
     "@wireapp/store-engine": "workspace:^",
     "jest": "^29.2.1",
     "ts-node": "10.9.1",
