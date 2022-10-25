@@ -20,7 +20,6 @@
 import React, {useEffect, useMemo, useState} from 'react';
 
 import {ClientClassification} from '@wireapp/api-client/src/client/';
-import ko from 'knockout';
 
 import {partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -166,25 +165,3 @@ const UserDevices: React.FC<UserDevicesProps> = ({
 };
 
 export {UserDevices};
-
-export const makeUserDevicesHistory = () => {
-  const history = ko.observableArray<UserDevicesHistoryEntry>();
-  const current = ko.pureComputed(() => history()[history().length - 1]);
-  const reset = () => {
-    history.removeAll();
-    history.push({headline: '', state: UserDevicesState.DEVICE_LIST});
-  };
-
-  reset();
-
-  return {
-    current,
-    goBack: () => {
-      history.pop();
-    },
-    goTo: (state: UserDevicesState, headline: string) => {
-      history.push({headline, state});
-    },
-    reset,
-  };
-};
