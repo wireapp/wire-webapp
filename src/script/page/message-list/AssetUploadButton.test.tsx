@@ -32,12 +32,12 @@ jest.mock('../../Config', () => ({
 const pngFile = new File(['(⌐□_□)'], 'chucknorris.png', {type: 'image/png'});
 
 describe('AssetUploadButton', () => {
-  it('Does call onSelectFiles with uploaded file', async () => {
+  it('Does call onSelectFiles with uploaded file', () => {
     const onSelectFiles = jest.fn();
 
-    const {getByTestId} = render(<AssetUploadButton onSelectFiles={onSelectFiles} />);
+    const {container} = render(<AssetUploadButton onSelectFiles={onSelectFiles} />);
+    const fileInput = container.querySelector('input[type="file"]') as HTMLInputElement;
 
-    const fileInput = getByTestId('conversation-input-bar-files') as HTMLInputElement;
     fireEvent.change(fileInput, {
       target: {files: [pngFile]},
     });
@@ -45,23 +45,22 @@ describe('AssetUploadButton', () => {
     expect(onSelectFiles).toHaveBeenCalledWith([pngFile]);
   });
 
-  it('Does reset file input after upload', async () => {
+  it('Does reset a form with input after upload', () => {
     const onSelectFiles = jest.fn();
 
-    const {getByTestId} = render(<AssetUploadButton onSelectFiles={onSelectFiles} />);
+    const {container} = render(<AssetUploadButton onSelectFiles={onSelectFiles} />);
 
-    const getFileInput = () => getByTestId('conversation-input-bar-files') as HTMLInputElement;
-    let fileInput = getFileInput();
+    const form = container.querySelector('form');
+    jest.spyOn(form!, 'reset');
+
+    const fileInput = container.querySelector('input[type="file"]') as HTMLInputElement;
 
     fireEvent.change(fileInput, {
       target: {files: [pngFile]},
     });
 
-    expect(fileInput.files?.[0].name).toEqual(pngFile.name);
     expect(onSelectFiles).toHaveBeenCalledWith([pngFile]);
-
-    //input did reset we grab new reference
-    fileInput = getFileInput();
-    expect(fileInput.files).toHaveLength(0);
+    expect(fileInput.files?.[0].name).toEqual(pngFile.name);
+    expect(form!.reset).toHaveBeenCalled();
   });
 });

@@ -17,7 +17,7 @@
  *
  */
 
-import {useState, useRef} from 'react';
+import {useRef} from 'react';
 import {Config} from '../../Config';
 import {t} from 'Util/LocalizerUtil';
 import Icon from 'Components/Icon';
@@ -27,9 +27,9 @@ interface AssetUploadButtonProps {
 }
 
 export const AssetUploadButton = ({onSelectFiles}: AssetUploadButtonProps) => {
-  const [inputKey, setInputKey] = useState(Date.now());
   const acceptedFileTypes = Config.getConfig().FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS.join(',');
   const fileRef = useRef<HTMLInputElement>(null!);
+  const formRef = useRef<HTMLFormElement>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const {files} = event.target;
@@ -40,30 +40,30 @@ export const AssetUploadButton = ({onSelectFiles}: AssetUploadButtonProps) => {
 
     onSelectFiles(Array.from(files));
 
-    //reset file input's value by re-rendering the component
-    setInputKey(Date.now());
+    //reset file input's value resetting form wrapper
+    formRef.current?.reset();
   };
 
   return (
-    <button
-      type="button"
-      aria-label={t('tooltipConversationFile')}
-      title={t('tooltipConversationFile')}
-      className="conversation-button controls-right-button no-radius file-button"
-      onClick={() => fileRef.current?.click()}
-      data-uie-name="do-share-file"
-    >
-      <Icon.Attachment />
-      <input
-        key={inputKey}
-        ref={fileRef}
-        accept={acceptedFileTypes ?? null}
-        id="conversation-input-bar-files"
-        data-uie-name="conversation-input-bar-files"
-        tabIndex={-1}
-        onChange={handleFileChange}
-        type="file"
-      />
-    </button>
+    <form ref={formRef}>
+      <button
+        type="button"
+        aria-label={t('tooltipConversationFile')}
+        title={t('tooltipConversationFile')}
+        className="conversation-button controls-right-button no-radius file-button"
+        onClick={() => fileRef.current?.click()}
+        data-uie-name="do-share-file"
+      >
+        <Icon.Attachment />
+        <input
+          ref={fileRef}
+          accept={acceptedFileTypes ?? null}
+          id="conversation-input-bar-files"
+          tabIndex={-1}
+          onChange={handleFileChange}
+          type="file"
+        />
+      </button>
+    </form>
   );
 };
