@@ -27,6 +27,7 @@ import {
   useState,
 } from 'react';
 
+import {useMatchMedia} from '@wireapp/react-ui-kit';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 import {groupBy} from 'underscore';
@@ -96,6 +97,9 @@ const ConversationList: FC<ConversationListProps> = ({
   const {is1to1, isRequest} = useKoSubscribableChildren(activeConversation!, ['is1to1', 'isRequest']);
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
   const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
+
+  // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
+  const smBreakpoint = useMatchMedia('max-width: 620px');
 
   useEffect(() => {
     if (readMessagesBuffer.length) {
@@ -383,7 +387,8 @@ const ConversationList: FC<ConversationListProps> = ({
             const callingViewModel = mainViewModel.calling;
             const callingRepository = callingViewModel.callingRepository;
             return (
-              conversation && (
+              conversation &&
+              smBreakpoint && (
                 <div className="calling-cell" key={conversation.id}>
                   <ConversationCallingCell
                     classifiedDomains={undefined}
