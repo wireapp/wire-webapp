@@ -24,7 +24,7 @@ import {GlobalCssVariables} from './GlobalCssVariables';
 
 import {Theme} from './Layout';
 
-const globalStyles: (theme: Theme) => CSSObject = (theme: Theme) => ({
+const getGlobalStyles: (theme: Theme) => CSSObject = (theme: Theme) => ({
   '*': {
     boxSizing: 'border-box',
   },
@@ -39,9 +39,6 @@ const globalStyles: (theme: Theme) => CSSObject = (theme: Theme) => ({
     color: theme.general.color,
     display: 'flex',
     flexDirection: 'column',
-    fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Helvetica, Arial, sans-serif',
-    fontWeight: 300,
-    lineHeight: 1.5,
     minHeight: '100vh',
     transition: 'background 0.15s',
   },
@@ -60,11 +57,23 @@ const globalStyles: (theme: Theme) => CSSObject = (theme: Theme) => ({
   },
 });
 
-const globalStyle = (theme: Theme) => css`
-  ${emotionNormalize}
-  ${globalStyles(theme)}
-`;
+const getGlobalFontStyle = (): CSSObject => ({
+  body: {
+    fontFamily:
+      '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";',
+    fontWeight: navigator.platform === 'Win32' ? 400 : 300,
+    lineHeight: 1.5,
+  },
+});
 
 export const GlobalStyle = withTheme(({theme}: {theme: Theme}) => {
-  return <Global styles={globalStyle(theme)} />;
+  return (
+    <Global
+      styles={css`
+        ${emotionNormalize}
+        ${getGlobalStyles(theme)}
+        ${getGlobalFontStyle()}
+      `}
+    />
+  );
 });
