@@ -21,6 +21,10 @@ import React from 'react';
 
 import {createRoot, Root} from 'react-dom/client';
 
+import {getLogger} from './Logger';
+
+const logger = getLogger('renderElement');
+
 const roots = new Map<
   string,
   {
@@ -60,25 +64,32 @@ const renderElement =
     style?: Partial<CSSStyleDeclaration>,
   ) =>
   (props: T) => {
-    const currentElementId = parentElementId;
+    cleanUpElement(parentElementId);
 
-    cleanUpElement(currentElementId);
+    const parentElement = document.getElementById(parentElementId);
+
+    if (!parentElement) {
+      logger.warn(`Unable to find element with id: ${parentElementId}`);
+
+      return;
+    }
+
     const elementContainer = document.createElement('div');
 
     if (style) {
       elementContainer.setAttribute('style', generateStyleString(style));
     }
 
-    document.getElementById(currentElementId)?.appendChild(elementContainer);
+    parentElement.appendChild(elementContainer);
     const reactRoot = createRoot(elementContainer);
 
-    roots.set(currentElementId, {
+    roots.set(parentElementId, {
       elementContainer,
       reactRoot,
     });
 
     const onClose = () => {
-      cleanUpElement(currentElementId);
+      cleanUpElement(parentElementId);
       props.onClose?.();
     };
 
