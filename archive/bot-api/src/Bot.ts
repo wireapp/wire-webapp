@@ -18,10 +18,10 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
-import {ClientType} from '@wireapp/api-client/src/client/';
-import {ConversationEvent, TeamEvent, UserEvent} from '@wireapp/api-client/src/event';
+import {ClientType} from '@wireapp/api-client/lib/client/';
+import {ConversationEvent, TeamEvent, UserEvent} from '@wireapp/api-client/lib/event';
 import {Account} from '@wireapp/core';
-import {PayloadBundle, PayloadBundleType} from '@wireapp/core/src/main/conversation/';
+import {PayloadBundle, PayloadBundleType} from '@wireapp/core/lib/conversation/';
 import {CRUDEngine} from '@wireapp/store-engine';
 import logdown from 'logdown';
 import UUID from 'uuidjs';
@@ -33,7 +33,7 @@ import {
   AUTH_COOKIE_KEY,
   AUTH_TABLE_NAME,
   Cookie,
-} from '@wireapp/api-client/src/auth';
+} from '@wireapp/api-client/lib/auth';
 
 const defaultConfig: Required<BotConfig> = {
   backend: 'production',

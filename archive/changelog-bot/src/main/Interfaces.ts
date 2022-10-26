@@ -17,7 +17,7 @@
  *
  */
 
-import {LoginData} from '@wireapp/api-client/src/auth/';
+import {LoginData} from '@wireapp/api-client/lib/auth/';
 
 export interface ChangelogData {
   content: string;

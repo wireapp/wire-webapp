@@ -1,7 +1,12 @@
 {
-  "bin": {
-    "wire-cli": "dist/index.js"
-  },
+  "name": "@wireapp/cli-client",
+  "license": "GPL-3.0",
+  "description": "Command-line interface for Wire's secure messaging platform.",
+  "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/cli-client",
+  "files": [
+    "lib"
+  ],
+  "main": "lib/index",
   "dependencies": {
     "@wireapp/api-client": "workspace:^",
     "@wireapp/core": "workspace:^",
@@ -14,25 +19,19 @@
   "devDependencies": {
     "@types/fs-extra": "9.0.13",
     "@types/rimraf": "^3.0.2",
-    "rimraf": "^3.0.2"
+    "rimraf": "^3.0.2",
+    "typescript": "^4.8.4"
   },
-  "description": "Command-line interface for Wire's secure messaging platform.",
-  "files": [
-    "src",
-    "!src/**/!(*.d).ts"
-  ],
-  "license": "GPL-3.0",
-  "main": "src/index",
-  "name": "@wireapp/cli-client",
-  "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/cli-client",
   "scripts": {
-    "build": "yarn build:node",
-    "build:node": "tsc",
-    "clean": "rimraf \"src/**/*.{js?(.map),d.ts}\"",
-    "dist": "yarn clean && yarn build",
-    "start": "ts-node -r tsconfig-paths/register src/index.ts",
+    "build": "yarn clean && tsc",
+    "clean": "rimraf lib",
+    "dist": "yarn build",
+    "start": "ts-node -r tsconfig-paths/register lib/index.ts",
     "test": "exit 0"
   },
-  "version": "11.2.39",
+  "bin": {
+    "wire-cli": "dist/index.js"
+  },
+  "version": "11.2.37",
   "gitHead": "5339f01fe01ef0871da8c8bc8662fbe9e604754a"
 }

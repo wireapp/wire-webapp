@@ -20,10 +20,10 @@
 import * as moment from 'moment';
 import momentDurationFormatSetup from 'moment-duration-format';
 
-import {PayloadBundle, PayloadBundleSource, PayloadBundleType} from '@wireapp/core/src/main/conversation/';
-import {QuotableMessage} from '@wireapp/core/src/main/conversation/message/OtrMessage';
+import {PayloadBundle, PayloadBundleSource, PayloadBundleType} from '@wireapp/core/lib/conversation/';
+import {QuotableMessage} from '@wireapp/core/lib/conversation/message/OtrMessage';
 import {MessageHandler} from '@wireapp/bot-api';
-import {TextContent} from '@wireapp/core/src/main/conversation/content';
+import {TextContent} from '@wireapp/core/lib/conversation/content';
 
 momentDurationFormatSetup(moment as any);
 

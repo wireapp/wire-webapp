@@ -1,8 +1,16 @@
 {
+  "name": "@wireapp/api-client",
+  "license": "GPL-3.0",
+  "description": "Wire API Client to send and receive data.",
+  "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client",
+  "files": [
+    "lib"
+  ],
+  "main": "lib/APIClient",
   "browser": {
-    "./src/shims/node/buffer": "./src/shims/browser/buffer.js",
-    "./src/shims/node/cookie": "./src/shims/browser/cookie.js",
-    "./src/shims/node/websocket": "./src/shims/browser/websocket.js"
+    "./lib/shims/node/buffer": "./lib/shims/browser/buffer.js",
+    "./lib/shims/node/cookie": "./lib/shims/browser/cookie.js",
+    "./lib/shims/node/websocket": "./lib/shims/browser/websocket.js"
   },
   "dependencies": {
     "@wireapp/commons": "workspace:^",
@@ -44,23 +52,12 @@
     "webpack": "^5.74.0",
     "ws": "8.9.0"
   },
-  "description": "Wire API Client to send and receive data.",
-  "files": [
-    "src",
-    "!src/demo",
-    "!src/**/*.test.*",
-    "!src/**/!(*.d).ts"
-  ],
-  "license": "GPL-3.0",
-  "main": "src/APIClient",
-  "name": "@wireapp/api-client",
-  "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client",
   "scripts": {
-    "build": "tsc",
-    "clean": "rimraf \"src/**/*.{js?(.map),d.ts}\"",
+    "build": "yarn clean && tsc",
+    "clean": "rimraf lib",
+    "dist": "yarn build",
     "demo:http401": "cross-env NODE_DEBUG='@wireapp/api-client*' ts-node src/demo/http401.ts",
     "demo:self": "cross-env NODE_DEBUG='@wireapp/api-client*' ts-node src/demo/self.ts",
-    "dist": "yarn clean && yarn build",
     "start": "concurrently \"tsc -w\" \"webpack -w\" \"browser-sync start -c bs-config.js\"",
     "start:node": "cross-env NODE_DEBUG='@wireapp*' node --inspect -r ts-node/register demo.ts",
     "test": "jest",
@@ -68,6 +65,6 @@
     "watch": "webpack serve --config webpack.browser.js",
     "prepare": "yarn dist"
   },
-  "version": "21.0.6",
+  "version": "21.0.5",
   "gitHead": "5339f01fe01ef0871da8c8bc8662fbe9e604754a"
 }

@@ -19,15 +19,15 @@
 
 import Dexie from 'dexie';
 
-import {createSpec} from '@wireapp/store-engine/src/main/test/createSpec';
-import {deleteAllSpec} from '@wireapp/store-engine/src/main/test/deleteAllSpec';
-import {deleteSpec} from '@wireapp/store-engine/src/main/test/deleteSpec';
-import {purgeSpec} from '@wireapp/store-engine/src/main/test/purgeSpec';
-import {readAllPrimaryKeysSpec} from '@wireapp/store-engine/src/main/test/readAllPrimaryKeysSpec';
-import {readAllSpec} from '@wireapp/store-engine/src/main/test/readAllSpec';
-import {readSpec} from '@wireapp/store-engine/src/main/test/readSpec';
-import {updateOrCreateSpec} from '@wireapp/store-engine/src/main/test/updateOrCreateSpec';
-import {updateSpec} from '@wireapp/store-engine/src/main/test/updateSpec';
+import {createSpec} from '@wireapp/store-engine/lib/test/createSpec';
+import {deleteAllSpec} from '@wireapp/store-engine/lib/test/deleteAllSpec';
+import {deleteSpec} from '@wireapp/store-engine/lib/test/deleteSpec';
+import {purgeSpec} from '@wireapp/store-engine/lib/test/purgeSpec';
+import {readAllPrimaryKeysSpec} from '@wireapp/store-engine/lib/test/readAllPrimaryKeysSpec';
+import {readAllSpec} from '@wireapp/store-engine/lib/test/readAllSpec';
+import {readSpec} from '@wireapp/store-engine/lib/test/readSpec';
+import {updateOrCreateSpec} from '@wireapp/store-engine/lib/test/updateOrCreateSpec';
+import {updateSpec} from '@wireapp/store-engine/lib/test/updateSpec';
 import UUID from 'uuidjs';
 
 import {IndexedDBEngine} from './index';

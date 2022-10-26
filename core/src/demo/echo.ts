@@ -20,17 +20,17 @@
 import * as path from 'path';
 import * as logdown from 'logdown';
 import {Account} from '@wireapp/core';
-import {PayloadBundleType} from '@wireapp/core/src/main/conversation/';
+import {PayloadBundleType} from '@wireapp/core/lib/conversation/';
 import {APIClient} from '@wireapp/api-client';
-import {WebSocketClient} from '@wireapp/api-client/src/tcp/';
-import {ClientType} from '@wireapp/api-client/src/client/ClientType';
-import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
-import {CONVERSATION_TYPING} from '@wireapp/api-client/src/conversation/data/';
+import {WebSocketClient} from '@wireapp/api-client/lib/tcp/';
+import {ClientType} from '@wireapp/api-client/lib/client/ClientType';
+import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
+import {CONVERSATION_TYPING} from '@wireapp/api-client/lib/conversation/data/';
 import {LegalHoldStatus, Confirmation} from '@wireapp/protocol-messaging';
 import {AssetContent} from '../main/conversation/content/AssetContent';
 import {LinkPreviewUploadedContent} from '../main/conversation/content';
 import {MessageBuilder} from '../main/conversation/message/MessageBuilder';
-import {ConversationProtocol} from '@wireapp/api-client/src/conversation';
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 
 const logger = logdown('@wireapp/core/demo/echo.js', {
   logger: console,

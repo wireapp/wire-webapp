@@ -18,8 +18,8 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
-import {ClientType} from '@wireapp/api-client/src/client/';
-import {ConversationProtocol} from '@wireapp/api-client/src/conversation';
+import {ClientType} from '@wireapp/api-client/lib/client/';
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {Account, MessageBuilder} from '@wireapp/core';
 import {MemoryEngine} from '@wireapp/store-engine';
 import * as logdown from 'logdown';

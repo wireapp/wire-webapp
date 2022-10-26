@@ -17,12 +17,12 @@
  *
  */
 
-import {Conversation, ConversationProtocol, UserClients} from '@wireapp/api-client/src/conversation';
-import {CONVERSATION_TYPING} from '@wireapp/api-client/src/conversation/data';
-import {ConversationEvent, TeamEvent, UserEvent} from '@wireapp/api-client/src/event';
-import {QualifiedId, User} from '@wireapp/api-client/src/user/';
+import {Conversation, ConversationProtocol, UserClients} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_TYPING} from '@wireapp/api-client/lib/conversation/data';
+import {ConversationEvent, TeamEvent, UserEvent} from '@wireapp/api-client/lib/event';
+import {QualifiedId, User} from '@wireapp/api-client/lib/user/';
 import {Account} from '@wireapp/core';
-import {PayloadBundle, ReactionType} from '@wireapp/core/src/main/conversation/';
+import {PayloadBundle, ReactionType} from '@wireapp/core/lib/conversation/';
 import {
   ButtonActionConfirmationContent,
   CallingContent,
@@ -32,14 +32,14 @@ import {
   LinkPreviewContent,
   LocationContent,
   MentionContent,
-} from '@wireapp/core/src/main/conversation/content/';
-import {QuotableMessage} from '@wireapp/core/src/main/conversation/message/OtrMessage';
+} from '@wireapp/core/lib/conversation/content/';
+import {QuotableMessage} from '@wireapp/core/lib/conversation/message/OtrMessage';
 import {Asset, Confirmation} from '@wireapp/protocol-messaging';
 import {promisify} from 'util';
 import fs from 'fs';
 import path from 'path';
 import FileType = require('file-type');
-import {DefaultConversationRoleName} from '@wireapp/api-client/src/conversation';
+import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation';
 import {MessageBuilder} from '@wireapp/core';
 
 export abstract class MessageHandler {

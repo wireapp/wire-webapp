@@ -34,7 +34,7 @@ import {promisify} from 'util';
 import {TimeUtil} from '@wireapp/commons';
 import {Account} from '@wireapp/core';
 import {APIClient} from '@wireapp/api-client';
-import {ClientType} from '@wireapp/api-client/src/client/';
+import {ClientType} from '@wireapp/api-client/lib/client/';
 import {FileEngine} from '@wireapp/store-engine-fs';
 import {MessageBuilder} from '../main/conversation/message/MessageBuilder';
 

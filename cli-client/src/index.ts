@@ -18,10 +18,10 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
-import {ClientType, RegisteredClient} from '@wireapp/api-client/src/client/';
-import {BackendErrorLabel} from '@wireapp/api-client/src/http/';
+import {ClientType, RegisteredClient} from '@wireapp/api-client/lib/client/';
+import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import {Account} from '@wireapp/core';
-import {PayloadBundleType} from '@wireapp/core/src/main/conversation/';
+import {PayloadBundleType} from '@wireapp/core/lib/conversation/';
 import {FileEngine} from '@wireapp/store-engine-fs';
 import {program as commander} from 'commander';
 import dotenv from 'dotenv';
@@ -29,8 +29,8 @@ import fs from 'fs-extra';
 import os from 'os';
 import path from 'path';
 import axios from 'axios';
-import {buildTextMessage} from '@wireapp/core/src/main/conversation/message/MessageBuilder';
-import {ConversationProtocol} from '@wireapp/api-client/src/conversation';
+import {buildTextMessage} from '@wireapp/core/lib/conversation/message/MessageBuilder';
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 
 dotenv.config();
 

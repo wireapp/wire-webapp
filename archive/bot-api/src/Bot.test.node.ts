@@ -18,7 +18,7 @@
  */
 
 import {Bot} from '@wireapp/bot-api';
-import {ClientType} from '@wireapp/api-client/src/client/';
+import {ClientType} from '@wireapp/api-client/lib/client/';
 
 describe('Bot', () => {
   let bot: Bot;

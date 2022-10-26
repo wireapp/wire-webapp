@@ -1,8 +1,9 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "src/main",
-    "rootDir": "src/main"
+    "esModuleInterop": true,
+    "outDir": "lib"
   },
-  "exclude": ["src/**/*.test.ts", "src/test/**/*", "node_modules"],
-  "extends": "../../tsconfig.json"
+  "exclude": ["node_modules", "src/**/*.test.ts"],
+  "include": ["src"]
 }

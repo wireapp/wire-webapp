@@ -19,14 +19,14 @@
 
 import {MessageHandler} from '@wireapp/bot-api';
 import {Account} from '@wireapp/core';
-import {CONVERSATION_TYPING} from '@wireapp/api-client/src/conversation/data/';
+import {CONVERSATION_TYPING} from '@wireapp/api-client/lib/conversation/data/';
 import UUID from 'uuidjs';
-import {ClientType} from '@wireapp/api-client/src/client';
-import {Connection} from '@wireapp/api-client/src/connection';
+import {ClientType} from '@wireapp/api-client/lib/client';
+import {Connection} from '@wireapp/api-client/lib/connection';
 import {MessageBuilder} from '@wireapp/core';
-import {ConversationProtocol} from '@wireapp/api-client/src/conversation';
-import {PayloadBundleState} from '@wireapp/core/src/main/conversation';
-import {createId} from '@wireapp/core/src/main/conversation/message/MessageBuilder';
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
+import {PayloadBundleState} from '@wireapp/core/lib/conversation';
+import {createId} from '@wireapp/core/lib/conversation/message/MessageBuilder';
 
 describe('MessageHandler', () => {
   let mainHandler: MessageHandler;

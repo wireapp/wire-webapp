@@ -67,7 +67,7 @@ import {
 } from '../ConversationError';
 import {QualifiedId} from '../../user';
 import {BackendFeatures} from '../../APIClient';
-import {chunk} from '@wireapp/commons/src/main/util/ArrayUtil';
+import {chunk} from '@wireapp/commons/lib/util/ArrayUtil';
 import {MlsEvent} from '../data/MlsEventData';
 
 export type PostMlsMessageResponse = {

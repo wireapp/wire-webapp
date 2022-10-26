@@ -1,4 +1,15 @@
 {
+  "name": "@wireapp/store-engine-fs",
+  "license": "GPL-3.0",
+  "description": "Store Engine implementation for Node.js' File System.",
+  "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/store-engine-fs",
+  "files": [
+    "lib"
+  ],
+  "main": "lib/index",
+  "peerDependencies": {
+    "@wireapp/store-engine": "4.x.x"
+  },
   "dependencies": {
     "fs-extra": "10.1.0"
   },
@@ -8,31 +19,19 @@
     "@types/fs-extra": "9.0.13",
     "@types/jest": "^29.2.0",
     "@types/node": "^18.11.5",
+    "@types/rimraf": "^3.0.2",
     "@wireapp/store-engine": "workspace:^",
     "jest": "^29.2.1",
+    "rimraf": "^3.0.2",
     "ts-node": "10.9.1",
-    "typescript": "4.8.4"
+    "typescript": "^4.8.4"
   },
-  "description": "Store Engine implementation for Node.js' File System.",
-  "files": [
-    "src",
-    "!src/**/*.test.*",
-    "!src/**/!(*.d).ts"
-  ],
-  "license": "GPL-3.0",
-  "main": "src/index",
-  "name": "@wireapp/store-engine-fs",
-  "peerDependencies": {
-    "@wireapp/store-engine": "4.x.x"
-  },
-  "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/store-engine-fs",
   "scripts": {
-    "build": "yarn build:node",
-    "build:node": "tsc",
-    "clean": "rimraf \"src/**/{!(test*).js,*.js.map,*.d.ts}\"",
-    "dist": "yarn clean && yarn build",
+    "build": "yarn clean && tsc",
+    "clean": "rimraf lib",
+    "dist": "yarn build",
     "test": "jest",
     "test:coverage": "jest --coverage"
   },
-  "version": "2.5.13"
+  "version": "2.5.12"
 }

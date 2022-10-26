@@ -1,8 +1,9 @@
 {
-  "description": "Wire ESLint config",
-  "license": "GPL-3.0",
-  "main": "eslintrc.js",
   "name": "@wireapp/eslint-config",
+  "license": "GPL-3.0",
+  "description": "Wire ESLint config",
+  "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config",
+  "main": "eslintrc.js",
   "peerDependencies": {
     "@babel/eslint-parser": ">=7",
     "@typescript-eslint/eslint-plugin": ">=3",
@@ -18,6 +19,8 @@
     "eslint-plugin-unused-imports": ">=1.1",
     "prettier": ">=2"
   },
-  "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config",
-  "version": "1.12.12"
+  "version": "1.12.12",
+  "devDependencies": {
+    "typescript": "^4.8.4"
+  }
 }

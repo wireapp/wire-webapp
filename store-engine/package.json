@@ -1,4 +1,19 @@
 {
+  "name": "@wireapp/store-engine",
+  "license": "GPL-3.0",
+  "description": "Provides a storage wrapper API to unify access to different storage technologies.",
+  "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/store-engine",
+  "files": [
+    "lib"
+  ],
+  "main": "lib/index",
+  "keywords": [
+    "generic",
+    "persistence",
+    "storage",
+    "transient",
+    "wrapper"
+  ],
   "devDependencies": {
     "@swc/core": "^1.3.10",
     "@swc/jest": "^0.2.23",
@@ -8,32 +23,14 @@
     "jest": "^29.2.1",
     "rimraf": "^3.0.2",
     "ts-node": "10.9.1",
-    "typescript": "4.8.4"
+    "typescript": "^4.8.4"
   },
-  "description": "Provides a storage wrapper API to unify access to different storage technologies.",
-  "files": [
-    "src",
-    "!src/**/*.test.*",
-    "!src/**/!(*.d).ts",
-    "!src/main/test"
-  ],
-  "keywords": [
-    "generic",
-    "persistence",
-    "storage",
-    "transient",
-    "wrapper"
-  ],
-  "license": "GPL-3.0",
-  "main": "src/main/index",
-  "name": "@wireapp/store-engine",
-  "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/store-engine",
   "scripts": {
-    "build": "tsc",
-    "clean": "rimraf \"src/**/*.{js?(.map),d.ts}\"",
-    "dist": "yarn clean && yarn build",
+    "build": "yarn clean && tsc",
+    "clean": "rimraf lib",
+    "dist": "yarn build",
     "test": "jest",
     "test:coverage": "jest --coverage"
   },
-  "version": "4.10.13"
+  "version": "4.10.12"
 }

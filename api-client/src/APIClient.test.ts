@@ -20,7 +20,7 @@
 /* eslint-disable no-magic-numbers, dot-notation */
 
 import nock from 'nock';
-import {AccentColor} from '@wireapp/commons/src/main';
+import {AccentColor} from '@wireapp/commons/lib';
 
 import {APIClient, BackendVersionResponse} from './APIClient';
 import {AuthAPI} from './auth/AuthAPI';

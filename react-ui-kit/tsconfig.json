@@ -1,15 +1,15 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "emitDeclarationOnly": true,
     "esModuleInterop": true,
     "noImplicitAny": false,
     "noImplicitReturns": false,
     "noUnusedLocals": false,
-    "outDir": "src",
-    "rootDir": "src",
+    "outDir": "lib",
     "strict": false,
     "skipLibCheck": true
   },
   "exclude": ["node_modules", "src/**/*.test.ts", "src/**/*.test.tsx", "src/test/**/*"],
-  "extends": "../../tsconfig.json"
+  "include": ["src"]
 }

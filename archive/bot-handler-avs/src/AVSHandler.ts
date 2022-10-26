@@ -18,7 +18,7 @@
  */
 
 import {MessageHandler} from '@wireapp/bot-api';
-import {PayloadBundle} from '@wireapp/core/src/main/conversation/';
+import {PayloadBundle} from '@wireapp/core/lib/conversation/';
 import {
   CALL_TYPE,
   CONV_TYPE,
@@ -31,7 +31,7 @@ import {
   WcallParticipantChangedHandler,
 } from '@wireapp/avs';
 import axios from 'axios';
-import {CallMessage} from '@wireapp/core/src/main/conversation/message/OtrMessage';
+import {CallMessage} from '@wireapp/core/lib/conversation/message/OtrMessage';
 
 import {Call} from './Call';
 
