@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.11.12](https://github.com/wireapp/wire-web-packages/compare/bazinga64@5.11.11...bazinga64@5.11.12) (2022-10-26)
+
+### Bug Fixes
+
+* update @wireapp/protocol-messaging & @types/node ([#4562](https://github.com/wireapp/wire-web-packages/issues/4562)) ([a19451e](https://github.com/wireapp/wire-web-packages/commit/a19451ec6669506c601627fd3b978bca00addf1e))
+
 ## [5.11.11](https://github.com/wireapp/wire-web-packages/compare/bazinga64@5.11.10...bazinga64@5.11.11) (2022-10-24)
 
 **Note:** Version bump only for package bazinga64

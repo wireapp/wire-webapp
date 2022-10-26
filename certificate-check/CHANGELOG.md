@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.11](https://github.com/wireapp/wire-web-packages/compare/@wireapp/certificate-check@0.5.10...@wireapp/certificate-check@0.5.11) (2022-10-26)
+
+### Bug Fixes
+
+* update @wireapp/protocol-messaging & @types/node ([#4562](https://github.com/wireapp/wire-web-packages/issues/4562)) ([a19451e](https://github.com/wireapp/wire-web-packages/commit/a19451ec6669506c601627fd3b978bca00addf1e))
+
 ## [0.5.10](https://github.com/wireapp/wire-web-packages/compare/@wireapp/certificate-check@0.5.9...@wireapp/certificate-check@0.5.10) (2022-10-24)
 
 **Note:** Version bump only for package @wireapp/certificate-check

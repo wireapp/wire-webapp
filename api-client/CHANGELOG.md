@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [21.0.6](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@21.0.5...@wireapp/api-client@21.0.6) (2022-10-26)
+
+### Bug Fixes
+
+* update @wireapp/protocol-messaging & @types/node ([#4562](https://github.com/wireapp/wire-web-packages/issues/4562)) ([a19451e](https://github.com/wireapp/wire-web-packages/commit/a19451ec6669506c601627fd3b978bca00addf1e))
+
 ## [21.0.5](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@21.0.4...@wireapp/api-client@21.0.5) (2022-10-24)
 
 **Note:** Version bump only for package @wireapp/api-client

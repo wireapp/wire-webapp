@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.10.13](https://github.com/wireapp/wire-web-packages/compare/@wireapp/store-engine@4.10.12...@wireapp/store-engine@4.10.13) (2022-10-26)
+
+### Bug Fixes
+
+* update @wireapp/protocol-messaging & @types/node ([#4562](https://github.com/wireapp/wire-web-packages/issues/4562)) ([a19451e](https://github.com/wireapp/wire-web-packages/commit/a19451ec6669506c601627fd3b978bca00addf1e))
+
 ## [4.10.12](https://github.com/wireapp/wire-web-packages/compare/@wireapp/store-engine@4.10.11...@wireapp/store-engine@4.10.12) (2022-10-24)
 
 **Note:** Version bump only for package @wireapp/store-engine

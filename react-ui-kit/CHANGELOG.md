@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.17.9](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@8.17.8...@wireapp/react-ui-kit@8.17.9) (2022-10-26)
+
+### Bug Fixes
+
+* update @wireapp/protocol-messaging & @types/node ([#4562](https://github.com/wireapp/wire-web-packages/issues/4562)) ([a19451e](https://github.com/wireapp/wire-web-packages/commit/a19451ec6669506c601627fd3b978bca00addf1e))
+
 ## [8.17.8](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@8.17.7...@wireapp/react-ui-kit@8.17.8) (2022-10-25)
 
 ### Bug Fixes
