@@ -23,11 +23,11 @@ import {
   BackendEvent,
   ConversationEvent,
   ConversationOtrMessageAddEvent,
-} from '@wireapp/api-client/src/event/';
-import type {QualifiedId} from '@wireapp/api-client/src/user';
-import type {Notification} from '@wireapp/api-client/src/notification/';
-import {MemberLeaveReason} from '@wireapp/api-client/src/conversation/data/';
-import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
+} from '@wireapp/api-client/lib/event/';
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import type {Notification} from '@wireapp/api-client/lib/notification/';
+import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
+import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {util as ProteusUtil} from '@wireapp/proteus';
 import Dexie from 'dexie';
 import {container} from 'tsyringe';
@@ -54,7 +54,7 @@ import {UserState} from '../user/UserState';
 import {ConversationState} from '../conversation/ConversationState';
 import {CallState} from '../calling/CallState';
 import {MessageCategory} from '../message/MessageCategory';
-import {isQualifiedId} from '@wireapp/core/src/main/util';
+import {isQualifiedId} from '@wireapp/core/lib/util';
 import {Core} from '../service/CoreSingleton';
 
 function downloadText(text: string, filename: string = 'default.txt'): number {

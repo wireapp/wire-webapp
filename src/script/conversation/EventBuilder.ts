@@ -18,9 +18,9 @@
  */
 
 import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
-import {MemberLeaveReason} from '@wireapp/api-client/src/conversation/data/';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
-import type {QualifiedId} from '@wireapp/api-client/src/user/';
+import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
+import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import type {REASON as AVS_REASON} from '@wireapp/avs';
 
 import {createRandomUuid} from 'Util/util';
@@ -32,8 +32,8 @@ import type {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
 import type {User} from '../entity/User';
 import {AssetRecord, EventRecord} from '../storage';
-import {ReactionType} from '@wireapp/core/src/main/conversation';
-import {ConversationOtrMessageAddEvent} from '@wireapp/api-client/src/event';
+import {ReactionType} from '@wireapp/core/lib/conversation';
+import {ConversationOtrMessageAddEvent} from '@wireapp/api-client/lib/event';
 import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
 
 export interface BaseEvent {

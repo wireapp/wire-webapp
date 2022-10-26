@@ -25,7 +25,7 @@
 import 'core-js/full/reflect';
 import {container} from 'tsyringe';
 import ko from 'knockout';
-import {ClientClassification, ClientType} from '@wireapp/api-client/src/client/';
+import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
 
 import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';

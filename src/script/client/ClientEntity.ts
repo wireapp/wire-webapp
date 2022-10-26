@@ -17,7 +17,7 @@
  *
  */
 
-import {ClientClassification, ClientType} from '@wireapp/api-client/src/client/';
+import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
 import ko from 'knockout';
 import {splitFingerprint} from 'Util/StringUtil';
 

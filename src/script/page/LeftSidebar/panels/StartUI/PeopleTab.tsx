@@ -19,7 +19,7 @@
 
 import React, {useEffect, useRef, useState} from 'react';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {BackendErrorLabel} from '@wireapp/api-client/src/http';
+import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {TeamState} from '../../../../team/TeamState';
 import {UserState} from '../../../../user/UserState';
 import {t} from 'Util/LocalizerUtil';

@@ -18,9 +18,9 @@
  */
 
 import ko from 'knockout';
-import {ClientType, PublicClient, RegisteredClient, ClientCapability} from '@wireapp/api-client/src/client/';
-import {USER_EVENT, UserClientAddEvent, UserClientRemoveEvent} from '@wireapp/api-client/src/event';
-import {QualifiedId} from '@wireapp/api-client/src/user/';
+import {ClientType, PublicClient, RegisteredClient, ClientCapability} from '@wireapp/api-client/lib/client/';
+import {USER_EVENT, UserClientAddEvent, UserClientRemoveEvent} from '@wireapp/api-client/lib/event';
+import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {Runtime} from '@wireapp/commons';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';

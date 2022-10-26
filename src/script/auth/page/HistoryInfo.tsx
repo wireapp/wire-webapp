@@ -17,7 +17,7 @@
  *
  */
 
-import {ClientType} from '@wireapp/api-client/src/client';
+import {ClientType} from '@wireapp/api-client/lib/client';
 import {Button, ContainerXS, H1, Link, Paragraph} from '@wireapp/react-ui-kit';
 import React from 'react';
 import {FormattedMessage, useIntl} from 'react-intl';

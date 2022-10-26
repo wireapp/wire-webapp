@@ -25,7 +25,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {isBeforeToday, formatDateNumeral, formatTimeShort} from 'Util/TimeUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
 
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {QuoteEntity} from '../../../../message/QuoteEntity';
 import {ConversationError} from '../../../../error/ConversationError';
 import type {Conversation} from '../../../../entity/Conversation';

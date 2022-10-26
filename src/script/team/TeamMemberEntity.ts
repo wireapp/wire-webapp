@@ -17,8 +17,8 @@
  *
  */
 
-import type {PermissionsData} from '@wireapp/api-client/src/team/member/PermissionsData';
-import type {LegalHoldMemberStatus} from '@wireapp/api-client/src/team/legalhold/LegalHoldMemberStatus';
+import type {PermissionsData} from '@wireapp/api-client/lib/team/member/PermissionsData';
+import type {LegalHoldMemberStatus} from '@wireapp/api-client/lib/team/legalhold/LegalHoldMemberStatus';
 
 export class TeamMemberEntity {
   permissions?: PermissionsData;

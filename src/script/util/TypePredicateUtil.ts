@@ -17,10 +17,10 @@
  *
  */
 
-import type {BackendError} from '@wireapp/api-client/src/http/';
+import type {BackendError} from '@wireapp/api-client/lib/http/';
 import {AxiosError} from 'axios';
 import {User} from '../entity/User';
-import type {QualifiedId} from '@wireapp/api-client/src/user/';
+import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {Conversation} from '../entity/Conversation';
 import {ClientRecord} from '../storage/record/ClientRecord';
 import {QualifiedUserClientEntityMap} from '../client/ClientRepository';

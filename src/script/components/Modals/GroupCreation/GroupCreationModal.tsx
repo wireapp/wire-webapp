@@ -23,8 +23,8 @@ import cx from 'classnames';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {Button, ButtonVariant, Select, StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
-import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data/ConversationReceiptModeUpdateData';
-import {ConversationProtocol} from '@wireapp/api-client/src/conversation/NewConversation';
+import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/ConversationReceiptModeUpdateData';
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
 
 import {getLogger} from 'Util/Logger';
 import {sortUsersByPriority} from 'Util/StringUtil';

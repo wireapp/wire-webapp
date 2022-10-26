@@ -19,10 +19,10 @@
 
 import axios from 'axios';
 import {Runtime} from '@wireapp/commons';
-import type {WebappProperties} from '@wireapp/api-client/src/user/data';
-import type {QualifiedId} from '@wireapp/api-client/src/user';
-import type {CallConfigData} from '@wireapp/api-client/src/account/CallConfigData';
-import type {UserClients, QualifiedUserClients} from '@wireapp/api-client/src/conversation';
+import type {WebappProperties} from '@wireapp/api-client/lib/user/data';
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import type {CallConfigData} from '@wireapp/api-client/lib/account/CallConfigData';
+import type {UserClients, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {
   CALL_TYPE,
@@ -45,11 +45,8 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import 'webrtc-adapter';
 import {container} from 'tsyringe';
-import {isQualifiedUserClients} from '@wireapp/core/src/main/util';
-import {
-  flattenQualifiedUserClients,
-  flattenUserClients,
-} from '@wireapp/core/src/main/conversation/message/UserClientsUtil';
+import {isQualifiedUserClients} from '@wireapp/core/lib/util';
+import {flattenQualifiedUserClients, flattenUserClients} from '@wireapp/core/lib/conversation/message/UserClientsUtil';
 
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
@@ -82,7 +79,7 @@ import {APIClient} from '../service/APIClientSingleton';
 import {ConversationState} from '../conversation/ConversationState';
 import {TeamState} from '../team/TeamState';
 import Warnings from '../view_model/WarningsContainer';
-import {PayloadBundleState} from '@wireapp/core/src/main/conversation';
+import {PayloadBundleState} from '@wireapp/core/lib/conversation';
 import {Core} from '../service/CoreSingleton';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 

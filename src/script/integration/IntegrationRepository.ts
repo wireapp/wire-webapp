@@ -20,7 +20,7 @@
 import ko from 'knockout';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import type {ConversationMemberJoinEvent} from '@wireapp/api-client/src/event/';
+import type {ConversationMemberJoinEvent} from '@wireapp/api-client/lib/event/';
 import {container} from 'tsyringe';
 
 import {t} from 'Util/LocalizerUtil';

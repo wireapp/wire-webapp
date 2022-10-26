@@ -34,7 +34,7 @@ import type {ContentMessage} from '../../entity/message/ContentMessage';
 import type {MemberMessage} from '../../entity/message/MemberMessage';
 import type {PanelParams} from '../PanelViewModel';
 import type {ReadReceipt} from '../../storage/record/EventRecord';
-import type {QualifiedId} from '@wireapp/api-client/src/user/';
+import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 export class MessageDetailsViewModel extends BasePanelViewModel {
   conversationRepository: ConversationRepository;

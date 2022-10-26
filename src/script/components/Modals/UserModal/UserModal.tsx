@@ -20,7 +20,7 @@
 import React, {useState, useEffect} from 'react';
 import {container} from 'tsyringe';
 import cx from 'classnames';
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {replaceLink, t} from 'Util/LocalizerUtil';
 

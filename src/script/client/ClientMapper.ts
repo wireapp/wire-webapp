@@ -17,7 +17,7 @@
  *
  */
 
-import type {PublicClient, RegisteredClient} from '@wireapp/api-client/src/client';
+import type {PublicClient, RegisteredClient} from '@wireapp/api-client/lib/client';
 import {ClientRecord} from '../storage';
 import {isClientRecord} from '../util/TypePredicateUtil';
 import {ClientEntity} from './ClientEntity';

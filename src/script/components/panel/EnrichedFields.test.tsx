@@ -18,7 +18,7 @@
  */
 
 import {waitFor} from '@testing-library/react';
-import type {RichInfo} from '@wireapp/api-client/src/user/';
+import type {RichInfo} from '@wireapp/api-client/lib/user/';
 import {act} from 'react-dom/test-utils';
 import {User} from 'src/script/entity/User';
 import {RichProfileRepository} from 'src/script/user/RichProfileRepository';

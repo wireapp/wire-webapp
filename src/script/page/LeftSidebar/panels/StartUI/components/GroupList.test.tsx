@@ -17,14 +17,14 @@
  *
  */
 
-import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import GroupList from './GroupList';
 import {createRandomUuid, noop} from 'Util/util';
 import {AssetRepository} from '../../../../../assets/AssetRepository';
 import {Conversation} from '../../../../../entity/Conversation';
 import {User} from '../../../../../entity/User';
 import {Router} from '../../../../../router/Router';
-import type {QualifiedId} from '@wireapp/api-client/src/user/';
+import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {render, fireEvent} from '@testing-library/react';
 
 const getGroupItemById = (container: HTMLElement, id: string) =>

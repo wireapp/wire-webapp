@@ -17,7 +17,7 @@
  *
  */
 
-import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
+import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {container, singleton} from 'tsyringe';
 import ko from 'knockout';
 
@@ -27,7 +27,7 @@ import {Conversation} from '../entity/Conversation';
 import {TeamState} from '../team/TeamState';
 import {User} from '../entity/User';
 import {UserState} from '../user/UserState';
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
 @singleton()

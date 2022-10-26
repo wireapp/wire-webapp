@@ -25,7 +25,7 @@ import {Logger, getLogger} from 'Util/Logger';
 
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {EventBuilder} from '../conversation/EventBuilder';
-import type {QualifiedId} from '@wireapp/api-client/src/user/';
+import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {EventRecord} from '../storage';
 import {VerificationMessageType} from '../message/VerificationMessageType';
 import type {ClientEntity} from '../client/ClientEntity';

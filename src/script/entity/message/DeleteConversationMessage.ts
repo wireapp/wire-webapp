@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 
-import {TEAM_EVENT} from '@wireapp/api-client/src/event/TeamEvent';
+import {TEAM_EVENT} from '@wireapp/api-client/lib/event/TeamEvent';
 import {t} from 'Util/LocalizerUtil';
 import {SystemMessageType} from '../../message/SystemMessageType';
 import type {Conversation} from '../Conversation';

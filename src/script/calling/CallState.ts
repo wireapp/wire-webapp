@@ -25,7 +25,7 @@ import {CallViewTab} from '../view_model/CallingViewModel';
 import {Config} from '../Config';
 import type {ElectronDesktopCapturerSource} from '../media/MediaDevicesHandler';
 import {matchQualifiedIds} from 'Util/QualifiedId';
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 export enum MuteState {
   NOT_MUTED,

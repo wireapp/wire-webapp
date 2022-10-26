@@ -17,7 +17,7 @@
  *
  */
 
-import {ProgressCallback} from '@wireapp/api-client/src/http/';
+import {ProgressCallback} from '@wireapp/api-client/lib/http/';
 import {singleton, container} from 'tsyringe';
 import {legacyAsset, assetV3, isValidApiPath} from 'Util/ValidationUtil';
 

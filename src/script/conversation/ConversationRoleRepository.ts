@@ -17,7 +17,7 @@
  *
  */
 
-import {DefaultConversationRoleName as DefaultRole, ConversationRole} from '@wireapp/api-client/src/conversation/';
+import {DefaultConversationRoleName as DefaultRole, ConversationRole} from '@wireapp/api-client/lib/conversation/';
 import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';

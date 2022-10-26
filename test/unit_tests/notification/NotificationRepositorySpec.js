@@ -18,10 +18,10 @@
  */
 
 import {amplify} from 'amplify';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
 import {Availability} from '@wireapp/protocol-messaging';
-import {NotificationPreference} from '@wireapp/api-client/src/user/data/';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
+import {NotificationPreference} from '@wireapp/api-client/lib/user/data/';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {Runtime} from '@wireapp/commons';
 

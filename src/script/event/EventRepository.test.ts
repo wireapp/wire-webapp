@@ -18,7 +18,7 @@
  */
 
 import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
-import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/src/event/';
+import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/lib/event/';
 import {createRandomUuid} from 'Util/util';
 import {ClientEvent} from 'src/script/event/Client';
 import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';

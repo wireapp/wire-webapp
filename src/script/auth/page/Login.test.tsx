@@ -26,7 +26,7 @@ import {TypeUtil} from '@wireapp/commons';
 import {actionRoot} from '../module/action';
 
 import {ROUTE} from '../route';
-import {ClientType} from '@wireapp/api-client/src/client';
+import {ClientType} from '@wireapp/api-client/lib/client';
 import {BackendError} from '../module/action/BackendError';
 import {fireEvent, waitFor} from '@testing-library/react';
 

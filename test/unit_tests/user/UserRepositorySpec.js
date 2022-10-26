@@ -18,7 +18,7 @@
  */
 
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
+import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 
 import {ConsentValue} from 'src/script/user/ConsentValue';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';

@@ -37,7 +37,7 @@ import {connect} from 'react-redux';
 import {Navigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 import {noop} from 'Util/util';
-import type {RegisterData} from '@wireapp/api-client/src/auth';
+import type {RegisterData} from '@wireapp/api-client/lib/auth';
 import {Config} from '../../Config';
 import {conversationJoinStrings} from '../../strings';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';

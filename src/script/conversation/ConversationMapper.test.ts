@@ -25,9 +25,9 @@ import {
   Member as MemberBackendData,
   OtherMember as OtherMemberBackendData,
   RemoteConversations,
-} from '@wireapp/api-client/src/conversation/';
+} from '@wireapp/api-client/lib/conversation/';
 import {createRandomUuid} from 'Util/util';
-import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
+import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {Conversation} from 'src/script/entity/Conversation';
 import {
   ConversationDatabaseData,
@@ -38,7 +38,7 @@ import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
 import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
 import {BaseError} from 'src/script/error/BaseError';
 import {entities, payload} from '../../../test/api/payloads';
-import type {QualifiedId} from '@wireapp/api-client/src/user/';
+import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 describe('ConversationMapper', () => {
   describe('mapConversations', () => {

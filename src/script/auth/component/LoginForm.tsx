@@ -17,7 +17,7 @@
  *
  */
 
-import {LoginData} from '@wireapp/api-client/src/auth';
+import {LoginData} from '@wireapp/api-client/lib/auth';
 import {Input, Loading, Button} from '@wireapp/react-ui-kit';
 import React, {useRef, useState} from 'react';
 import {useIntl} from 'react-intl';

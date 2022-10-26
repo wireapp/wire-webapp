@@ -24,13 +24,13 @@ import type {
   Conversation as BackendConversation,
   ConversationCode,
   NewOTRMessage,
-} from '@wireapp/api-client/src/conversation';
+} from '@wireapp/api-client/lib/conversation';
 import type {
   ConversationMemberUpdateData,
   ConversationOtherMemberUpdateData,
   ConversationReceiptModeUpdateData,
   ConversationJoinData,
-} from '@wireapp/api-client/src/conversation/data';
+} from '@wireapp/api-client/lib/conversation/data';
 import type {
   ConversationCodeDeleteEvent,
   ConversationCodeUpdateEvent,
@@ -40,7 +40,7 @@ import type {
   ConversationMessageTimerUpdateEvent,
   ConversationReceiptModeUpdateEvent,
   ConversationRenameEvent,
-} from '@wireapp/api-client/src/event';
+} from '@wireapp/api-client/lib/event';
 import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
@@ -53,7 +53,7 @@ import {StorageService} from '../storage';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {APIClient} from '../service/APIClientSingleton';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 export class ConversationService {
   private readonly eventService: EventService;

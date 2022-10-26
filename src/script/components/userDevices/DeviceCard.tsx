@@ -19,7 +19,7 @@
 
 import React from 'react';
 import cx from 'classnames';
-import {ClientClassification} from '@wireapp/api-client/src/client';
+import {ClientClassification} from '@wireapp/api-client/lib/client';
 
 import {t} from 'Util/LocalizerUtil';
 import DeviceId from 'Components/DeviceId';

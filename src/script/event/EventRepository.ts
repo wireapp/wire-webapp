@@ -21,7 +21,7 @@ import {Asset as ProtobufAsset, GenericMessage} from '@wireapp/protocol-messagin
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
-import {USER_EVENT, CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
+import {USER_EVENT, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import {container} from 'tsyringe';
 import {getLogger, Logger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -47,10 +47,10 @@ import {UserState} from '../user/UserState';
 import {AssetData, CryptographyMapper} from '../cryptography/CryptographyMapper';
 import Warnings from '../view_model/WarningsContainer';
 import {Account, ConnectionState, ProcessedEventPayload} from '@wireapp/core';
-import {HandledEventPayload} from '@wireapp/core/src/main/notification';
+import {HandledEventPayload} from '@wireapp/core/lib/notification';
 import {EventBuilder} from '../conversation/EventBuilder';
 import {EventName} from '../tracking/EventName';
-import {PayloadBundleSource} from '@wireapp/core/src/main/conversation';
+import {PayloadBundleSource} from '@wireapp/core/lib/conversation';
 
 export class EventRepository {
   logger: Logger;

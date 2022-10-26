@@ -21,7 +21,7 @@ import ko from 'knockout';
 import {act} from '@testing-library/react';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
-import {FeatureStatus} from '@wireapp/api-client/src/team/feature/';
+import {FeatureStatus} from '@wireapp/api-client/lib/team/feature/';
 
 import type {ClientRepository} from '../../client/ClientRepository';
 import AppLock, {APPLOCK_STATE} from './';

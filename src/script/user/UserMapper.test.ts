@@ -24,7 +24,7 @@ import {User} from 'src/script/entity/User';
 import {UserMapper} from './UserMapper';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 import {entities, payload} from 'test/api/payloads';
-import {UserAsset, UserAssetType} from '@wireapp/api-client/src/user';
+import {UserAsset, UserAssetType} from '@wireapp/api-client/lib/user';
 
 describe('User Mapper', () => {
   const userState: any = {self: () => ({domain: 'local.test'})};

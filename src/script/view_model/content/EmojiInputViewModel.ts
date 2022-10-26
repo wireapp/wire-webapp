@@ -18,7 +18,7 @@
  */
 
 import {WebAppEvents} from '@wireapp/webapp-events';
-import type {WebappProperties} from '@wireapp/api-client/src/user/data/';
+import type {WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {loadValue, storeValue} from 'Util/StorageUtil';

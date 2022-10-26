@@ -20,7 +20,7 @@
 import React, {useEffect, useState} from 'react';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
-import {WebappProperties} from '@wireapp/api-client/src/user/data/';
+import {WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {t} from 'Util/LocalizerUtil';

@@ -19,7 +19,7 @@
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Asset} from 'src/script/entity/message/Asset';
 import type {FileAsset} from 'src/script/entity/message/FileAsset';
 import type {MediumImage} from 'src/script/entity/message/MediumImage';

@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
-import {FeatureList, FeatureStatus, SelfDeletingTimeout} from '@wireapp/api-client/src/team/feature/';
+import {FeatureList, FeatureStatus, SelfDeletingTimeout} from '@wireapp/api-client/lib/team/feature/';
 
 import {sortUsersByPriority} from 'Util/StringUtil';
 

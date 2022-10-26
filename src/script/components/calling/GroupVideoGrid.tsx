@@ -28,7 +28,7 @@ import Video from './Video';
 import type {Participant} from '../../calling/Participant';
 import GroupVideoGridTile from './GroupVideoGridTile';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 export interface GroupVideoGripProps {
   grid: Grid;

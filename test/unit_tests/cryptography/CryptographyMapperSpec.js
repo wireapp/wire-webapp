@@ -35,8 +35,8 @@ import {
   Text,
 } from '@wireapp/protocol-messaging';
 import {isObject} from 'underscore';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
-import {ReactionType} from '@wireapp/core/src/main/conversation/';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
+import {ReactionType} from '@wireapp/core/lib/conversation/';
 
 import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 import {CryptographyMapper} from 'src/script/cryptography/CryptographyMapper';

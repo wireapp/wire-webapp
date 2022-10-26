@@ -24,7 +24,7 @@ import {UserState} from '../../../../../user/UserState';
 import {ConversationState} from '../../../../../conversation/ConversationState';
 import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from '../../../../../util/ComponentUtil';
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {t} from 'Util/LocalizerUtil';
 import VerifiedIcon from 'Components/VerifiedIcon';
 import Icon from 'Components/Icon';

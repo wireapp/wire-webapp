@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 import {Article, LinkPreview} from '@wireapp/protocol-messaging';
-import {CONVERSATION_EVENT, ConversationMessageTimerUpdateEvent} from '@wireapp/api-client/src/event/';
+import {CONVERSATION_EVENT, ConversationMessageTimerUpdateEvent} from '@wireapp/api-client/lib/event/';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';

@@ -18,7 +18,7 @@
  */
 
 import {render} from '@testing-library/react';
-import {RecursivePartial} from '@wireapp/commons/src/main/util/TypeUtil';
+import {RecursivePartial} from '@wireapp/commons/lib/util/TypeUtil';
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 import React from 'react';
 import {IntlProvider} from 'react-intl';

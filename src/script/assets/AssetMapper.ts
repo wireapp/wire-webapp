@@ -17,9 +17,9 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/src/user';
-import type {UserAsset as APIClientUserAsset} from '@wireapp/api-client/src/user/';
-import type {Picture as APIClientPicture} from '@wireapp/api-client/src/self/';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
+import type {UserAsset as APIClientUserAsset} from '@wireapp/api-client/lib/user/';
+import type {Picture as APIClientPicture} from '@wireapp/api-client/lib/self/';
 
 import {AssetRemoteData} from './AssetRemoteData';
 import type {User} from '../entity/User';

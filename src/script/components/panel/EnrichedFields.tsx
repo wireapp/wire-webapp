@@ -17,7 +17,7 @@
  *
  */
 
-import type {RichInfoField} from '@wireapp/api-client/src/user/RichInfo';
+import type {RichInfoField} from '@wireapp/api-client/lib/user/RichInfo';
 import React, {useEffect, useState} from 'react';
 import {container} from 'tsyringe';
 

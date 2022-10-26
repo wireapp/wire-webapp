@@ -33,7 +33,7 @@ import {Runtime} from '@wireapp/commons';
 import {PanelViewModel} from '../../view_model/PanelViewModel';
 import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
 import {User} from '../../entity/User';
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {ContentViewModel} from '../../view_model/ContentViewModel';
 

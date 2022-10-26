@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
 
 import {t, setStrings} from 'Util/LocalizerUtil';
 import {createRandomUuid} from 'Util/util';

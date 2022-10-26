@@ -17,7 +17,7 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {UserState} from 'src/script/user/UserState';
 import {TeamState} from 'src/script/team/TeamState';

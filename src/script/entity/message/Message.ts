@@ -19,13 +19,13 @@
 
 import ko from 'knockout';
 import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
-import type {ReactionType} from '@wireapp/core/src/main/conversation/';
+import type {ReactionType} from '@wireapp/core/lib/conversation/';
 
 import {getUserName} from 'Util/SanitizationUtil';
 import {TIME_IN_MILLIS, formatDurationCaption, formatTimeShort, formatDateNumeral, fromUnixTime} from 'Util/TimeUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {AssetTransferState} from '../../assets/AssetTransferState';
 import {AssetType} from '../../assets/AssetType';
 import {EphemeralStatusType} from '../../message/EphemeralStatusType';

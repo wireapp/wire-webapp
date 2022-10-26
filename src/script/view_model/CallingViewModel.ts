@@ -47,7 +47,7 @@ import {TeamState} from '../team/TeamState';
 import {Config} from '../Config';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {ROLE} from '../user/UserPermission';
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';

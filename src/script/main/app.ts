@@ -23,7 +23,7 @@ import 'core-js/full/reflect';
 import ko from 'knockout';
 import platform from 'platform';
 import {container} from 'tsyringe';
-import {ClientType, ClientClassification} from '@wireapp/api-client/src/client/';
+import {ClientType, ClientClassification} from '@wireapp/api-client/lib/client/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import Dexie from 'dexie';

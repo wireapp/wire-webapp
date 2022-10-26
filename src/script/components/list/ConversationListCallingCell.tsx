@@ -21,7 +21,7 @@ import React, {useState, useCallback} from 'react';
 import {container} from 'tsyringe';
 import {CALL_TYPE, CONV_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import cx from 'classnames';
-import {DefaultConversationRoleName} from '@wireapp/api-client/src/conversation/';
+import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation/';
 import {KEY} from 'Util/KeyboardUtil';
 
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
