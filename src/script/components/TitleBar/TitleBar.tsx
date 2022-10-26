@@ -51,7 +51,7 @@ import {ViewModelRepositories} from '../../view_model/MainViewModel';
 export interface TitleBarProps {
   callActions: CallActions;
   conversation: Conversation;
-  openRightSidebar: (panelState: PanelState, params: RightSidebarParams) => void;
+  openRightSidebar: (panelState: PanelState, params: RightSidebarParams, compareEntityId?: boolean) => void;
   repositories: ViewModelRepositories;
   userState: UserState;
   teamState: TeamState;

@@ -53,7 +53,7 @@ const Animated: FC<{children: ReactNode}> = ({children, ...rest}) => (
 );
 
 interface MainContentProps {
-  openRightSidebar: (panelState: PanelState, params: RightSidebarParams) => void;
+  openRightSidebar: (panelState: PanelState, params: RightSidebarParams, compareEntityId?: boolean) => void;
   isRightSidebarOpen?: boolean;
   conversationState?: ConversationState;
 }
