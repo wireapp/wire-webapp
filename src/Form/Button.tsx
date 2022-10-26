@@ -115,20 +115,21 @@ export const buttonStyle: <T>(theme: Theme, props: ButtonProps<T>) => CSSObject 
     }),
   }),
   ...(variant === ButtonVariant.SECONDARY && {
-    backgroundColor: backgroundColor || (disabled ? COLOR_V2.GRAY_20 : COLOR_V2.WHITE),
-    border: `1px solid ${COLOR_V2.GRAY_40}`,
-    color: disabled ? COLOR_V2.GRAY_60 : COLOR_V2.BLACK,
+    backgroundColor:
+      backgroundColor || (disabled ? theme.IconButton.primaryDisabledBgColor : theme.IconButton.primaryBgColor),
+    border: `1px solid ${theme.IconButton.primaryBorderColor}`,
+    color: disabled ? theme.Input.placeholderColor : theme.general.color,
     ...(!disabled && {
       '&:hover, &:focus': {
-        border: `1px solid ${COLOR_V2.BLUE}`,
+        border: `1px solid ${theme.Button.secondaryHoverBorder}`,
       },
       '&:focus': {
-        color: COLOR_V2.BLUE,
+        color: theme.IconButton.primaryActiveFillColor,
       },
       '&:active': {
-        backgroundColor: COLOR_V2.BLUE_LIGHT_50,
-        border: `1px solid ${COLOR_V2.BLUE}`,
-        color: COLOR_V2.BLUE,
+        backgroundColor: theme.Button.secondaryActiveBg,
+        border: `1px solid ${theme.Button.secondaryActiveBorder}`,
+        color: theme.general.primaryColor,
       },
     }),
   }),
