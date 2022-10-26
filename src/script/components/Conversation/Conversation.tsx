@@ -41,6 +41,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {safeMailOpen, safeWindowOpen} from 'Util/SanitizationUtil';
+import {incomingCssClass, removeAnimationsClass} from 'Util/util';
 
 import {ConversationState} from '../../conversation/ConversationState';
 import {Conversation as ConversationEntity} from '../../entity/Conversation';
@@ -361,7 +362,11 @@ const ConversationList: FC<ConversationListProps> = ({
   };
 
   return (
-    <div id="conversation" className={cx('conversation', {loading: !isConversationLoaded})}>
+    <div
+      id="conversation"
+      className={cx('conversation', {[incomingCssClass]: isConversationLoaded, loading: !isConversationLoaded})}
+      ref={removeAnimationsClass}
+    >
       {activeConversation && (
         <>
           <TitleBar

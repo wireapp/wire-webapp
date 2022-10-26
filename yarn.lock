@@ -2629,13 +2629,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@juggle/resize-observer@npm:^3.3.1":
-  version: 3.3.1
-  resolution: "@juggle/resize-observer@npm:3.3.1"
-  checksum: ddabc4044276a2cb57d469c4917206c7e39f2463aa8e3430e33e4eda554412afe29c22afa40e6708b49dad5d56768dc83acd68a704b1dcd49a0906bb96b991b2
-  languageName: node
-  linkType: hard
-
 "@koush/wrtc@npm:0.5.3":
   version: 0.5.3
   resolution: "@koush/wrtc@npm:0.5.3"
@@ -3505,15 +3498,6 @@ __metadata:
   version: 7.3.12
   resolution: "@types/semver@npm:7.3.12"
   checksum: 35536b2fc5602904f21cae681f6c9498e177dab3f54ae37c92f9a1b7e43c35f18bcd81e1c98c1cf0d33ee046bb06c771e9928c1c00a401d56a03f56549252a15
-  languageName: node
-  linkType: hard
-
-"@types/simplebar@npm:5.3.3":
-  version: 5.3.3
-  resolution: "@types/simplebar@npm:5.3.3"
-  dependencies:
-    simplebar: "*"
-  checksum: db0dfe8e8dbbe9a98ffa840aeb9e14ee8a8d5d5cc3042f5348be470c5864d40278459636124ef631bd700e749aa9cdafc6844e43f805b28edf090ce24eb982f4
   languageName: node
   linkType: hard
 
@@ -5437,13 +5421,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"can-use-dom@npm:^0.1.0":
-  version: 0.1.0
-  resolution: "can-use-dom@npm:0.1.0"
-  checksum: 488fc94c40f2fcce46ebd41abf17ef0449acf0d6b145116036cd592a8e977e5729918d4b3b7c642ce7b1f5b83d330ade39a172cf6b6ef91093785991a868b308
-  languageName: node
-  linkType: hard
-
 "caniuse-api@npm:^3.0.0":
   version: 3.0.0
   resolution: "caniuse-api@npm:3.0.0"
@@ -6024,7 +6001,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"core-js@npm:3.25.5, core-js@npm:^3.0.1":
+"core-js@npm:3.25.5":
   version: 3.25.5
   resolution: "core-js@npm:3.25.5"
   checksum: 208b308c49bc022f90d4349d4c99802a73c9d55053976b3c529f10014c1e37845926defad8c519f2c7f71ea0acf18d2b323ab6aaee34dc85b4c4b3ced0623f3f
@@ -10460,20 +10437,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jquery-mousewheel@npm:3.1.13":
-  version: 3.1.13
-  resolution: "jquery-mousewheel@npm:3.1.13"
-  checksum: 3be0b9320a8846d64bfc705c6b23eb6489dc0d5ba73800a94c7aafbc82f54d103a0909f0d619756adc124b48b6158ff8e601619dd4aaef213e0c68818cb99b21
-  languageName: node
-  linkType: hard
-
-"jquery@npm:3.6.1":
-  version: 3.6.1
-  resolution: "jquery@npm:3.6.1"
-  checksum: 6177d866a74f1137cad800f142c7cdbd5ab19cd4282546f8bdb4890c9f933b1d542ab96f2aa15d007e43c98de7315b0513e849ec5359d3ac5640f720892fe547
-  languageName: node
-  linkType: hard
-
 "js-cookie@npm:3.0.1":
   version: 3.0.1
   resolution: "js-cookie@npm:3.0.1"
@@ -11146,13 +11109,6 @@ __metadata:
   version: 4.7.0
   resolution: "lodash.sortby@npm:4.7.0"
   checksum: db170c9396d29d11fe9a9f25668c4993e0c1331bcb941ddbd48fb76f492e732add7f2a47cfdf8e9d740fa59ac41bbfaf931d268bc72aab3ab49e9f89354d718c
-  languageName: node
-  linkType: hard
-
-"lodash.throttle@npm:^4.1.1":
-  version: 4.1.1
-  resolution: "lodash.throttle@npm:4.1.1"
-  checksum: 129c0a28cee48b348aef146f638ef8a8b197944d4e9ec26c1890c19d9bf5a5690fe11b655c77a4551268819b32d27f4206343e30c78961f60b561b8608c8c805
   languageName: node
   linkType: hard
 
@@ -14768,20 +14724,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"simplebar@npm:*, simplebar@npm:5.3.9":
-  version: 5.3.9
-  resolution: "simplebar@npm:5.3.9"
-  dependencies:
-    "@juggle/resize-observer": ^3.3.1
-    can-use-dom: ^0.1.0
-    core-js: ^3.0.1
-    lodash.debounce: ^4.0.8
-    lodash.memoize: ^4.1.2
-    lodash.throttle: ^4.1.1
-  checksum: 11918d02c946b4925068852b4fb2dcc5008e2fb91b7eeba6c27aed810f23b985de043b12fef674fbffbbfa6201904e09d8fbc29e9959562fa6a5cfb9935751d1
-  languageName: node
-  linkType: hard
-
 "sinon@npm:14.0.1":
   version: 14.0.1
   resolution: "sinon@npm:14.0.1"
@@ -16855,7 +16797,6 @@ __metadata:
     "@types/react-redux": 7.1.24
     "@types/react-transition-group": 4.4.5
     "@types/redux-mock-store": 1.0.3
-    "@types/simplebar": 5.3.3
     "@types/sinon": 10.0.13
     "@types/speakingurl": 13.0.3
     "@types/uint32": 0.2.0
@@ -16928,8 +16869,6 @@ __metadata:
     jest-canvas-mock: 2.4.0
     jest-environment-jsdom: 29.2.1
     jest-jasmine2: 29.2.1
-    jquery: 3.6.1
-    jquery-mousewheel: 3.1.13
     js-cookie: 3.0.1
     jsdom-worker: 0.3.0
     jszip: 3.10.1
@@ -16966,7 +16905,6 @@ __metadata:
     redux-mock-store: 1.5.4
     redux-thunk: 2.4.1
     simple-git: 3.14.1
-    simplebar: 5.3.9
     sinon: 14.0.1
     snabbdom: 3.5.1
     speakingurl: 14.0.1

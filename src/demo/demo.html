@@ -145,27 +145,39 @@
     <div id="emojis"></div>
 
     <script>
-      $(() => {
+      (() => {
         // microbar
-        $('.microbar > li').click(event => {
-          const item = $(event.currentTarget);
-          $('body')
-            .removeClass()
-            .addClass('theme-' + item.text())
-            .addClass('main-accent-color-' + (item.index('li') + 1));
+        const microbar = document.querySelector('.microbar > li');
+        microbar?.addEventListener('click', event => {
+          const item = event.currentTarget;
+          const body = document.querySelector('body');
+          body.className = `theme-${item.text()} main-accent-color-${item.index('li') + 1}`;
         });
 
         let previousScroll = 0;
-        $(window).scroll(() => {
-          const scroll = $(window).scrollTop();
-          $('.microbar').toggleClass('microbar-hidden', scroll > previousScroll);
+
+        window.addEventListener('scroll', () => {
+          const scroll = window.scrollY;
+
+          if (scroll > previousScroll) {
+            microbar.classList.add('microbar-hidden');
+          } else {
+            microbar.classList.remove('microbar-hidden');
+          }
+
           previousScroll = scroll;
         });
 
         // user avatars animation
-        $('.avatar-image-loaded').click(function() {
-          const avatar = $(this).removeClass('avatar-loading-transition avatar-image-loaded');
-          window.setTimeout(() => avatar.addClass('avatar-loading-transition avatar-image-loaded'), 200);
+        const avatarLoaded = document.querySelector('.avatar-image-loaded');
+        avatarLoaded.addEventListener('click', () => {
+          avatarLoaded.classList.remove('avatar-loading-transition');
+          avatarLoaded.classList.remove('avatar-image-loaded');
+
+          setTimeout(() => {
+            avatarLoaded.classList.add('avatar-loading-transition');
+            avatarLoaded.classList.add('avatar-loading-loaded');
+          }, 200);
         });
 
         const generateEmojis = () => {
@@ -176,7 +188,7 @@
           const rules = styleSheets.map(sheet => Array.from(sheet.cssRules || sheet.rules || []));
           const allRules = [].concat(...rules);
           const emojiFontFace = allRules.find(
-            rule => rule.constructor.name === 'CSSFontFaceRule' && rule.style.fontFamily === 'emoji'
+            rule => rule.constructor.name === 'CSSFontFaceRule' && rule.style.fontFamily === 'emoji',
           );
           const range = emojiFontFace.style.unicodeRange || '';
           const values = range.replace(/u\+|\s/gi, '').split(',');
@@ -187,11 +199,11 @@
           const unicodeValues = [].concat(...ranges);
 
           return String.fromCodePoint(...unicodeValues);
-        }
+        };
 
         ko.applyBindings(() => {}, document.querySelector('#icons'));
         document.querySelector('#emojis').textContent = generateEmojis();
-      });
+      })();
     </script>
   </body>
 </html>

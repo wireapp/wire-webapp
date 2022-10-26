@@ -19,6 +19,7 @@
 
 import {FC, ReactNode, useContext, useState} from 'react';
 
+import cx from 'classnames';
 import {CSSTransition, SwitchTransition} from 'react-transition-group';
 import {container} from 'tsyringe';
 
@@ -29,6 +30,7 @@ import {HistoryImport} from 'Components/HistoryImport';
 import {Icon} from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
+import {incomingCssClass, removeAnimationsClass} from 'Util/util';
 
 import {Collection} from './panels/Collection';
 import {AboutPreferences} from './panels/preferences/AboutPreferences';
@@ -118,13 +120,21 @@ const MainContent: FC<MainContentProps> = ({
             )}
 
             {state === ContentState.PREFERENCES_ABOUT && (
-              <div id="preferences-about" className="preferences-page preferences-about">
+              <div
+                id="preferences-about"
+                className={cx('preferences-page preferences-about', incomingCssClass)}
+                ref={removeAnimationsClass}
+              >
                 <AboutPreferences />
               </div>
             )}
 
             {state === ContentState.PREFERENCES_ACCOUNT && (
-              <div id="preferences-account" className="preferences-page preferences-account">
+              <div
+                id="preferences-account"
+                className={cx('preferences-page preferences-account', incomingCssClass)}
+                ref={removeAnimationsClass}
+              >
                 <AccountPreferences
                   importFile={onFileUpload}
                   showDomain={isFederated}
@@ -138,7 +148,11 @@ const MainContent: FC<MainContentProps> = ({
             )}
 
             {state === ContentState.PREFERENCES_AV && (
-              <div id="preferences-av" className="preferences-page preferences-av">
+              <div
+                id="preferences-av"
+                className={cx('preferences-page preferences-av', incomingCssClass)}
+                ref={removeAnimationsClass}
+              >
                 <AVPreferences
                   callingRepository={repositories.calling}
                   mediaRepository={repositories.media}
@@ -148,21 +162,33 @@ const MainContent: FC<MainContentProps> = ({
             )}
 
             {state === ContentState.PREFERENCES_DEVICES && (
-              <DevicesPreferences
-                clientState={container.resolve(ClientState)}
-                conversationState={conversationState}
-                cryptographyRepository={repositories.cryptography}
-                removeDevice={contentViewModel.mainViewModel.actions.deleteClient}
-                resetSession={(userId, device, conversation) =>
-                  repositories.message.resetSession(userId, device.id, conversation)
-                }
-                userState={container.resolve(UserState)}
-                verifyDevice={(userId, device, verified) => repositories.client.verifyClient(userId, device, verified)}
-              />
+              <div
+                id="preferences-devices"
+                className={cx('preferences-page preferences-devices', incomingCssClass)}
+                ref={removeAnimationsClass}
+              >
+                <DevicesPreferences
+                  clientState={container.resolve(ClientState)}
+                  conversationState={conversationState}
+                  cryptographyRepository={repositories.cryptography}
+                  removeDevice={contentViewModel.mainViewModel.actions.deleteClient}
+                  resetSession={(userId, device, conversation) =>
+                    repositories.message.resetSession(userId, device.id, conversation)
+                  }
+                  userState={container.resolve(UserState)}
+                  verifyDevice={(userId, device, verified) =>
+                    repositories.client.verifyClient(userId, device, verified)
+                  }
+                />
+              </div>
             )}
 
             {state === ContentState.PREFERENCES_OPTIONS && (
-              <div id="preferences-options" className="preferences-page preferences-options">
+              <div
+                id="preferences-options"
+                className={cx('preferences-page preferences-options', incomingCssClass)}
+                ref={removeAnimationsClass}
+              >
                 <OptionPreferences propertiesRepository={repositories.properties} />
               </div>
             )}

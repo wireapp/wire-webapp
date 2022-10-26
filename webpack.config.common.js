@@ -94,10 +94,8 @@ module.exports = {
   },
   plugins: [
     new webpack.ProvidePlugin({
-      $: 'jquery',
       Buffer: ['buffer', 'Buffer'],
       _: 'underscore',
-      jQuery: 'jquery',
       ko: 'knockout',
     }),
     new WorkboxPlugin.InjectManifest({

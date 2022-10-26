@@ -18,48 +18,11 @@
  */
 
 // eslint-disable-next-line id-length
-import $ from 'jquery';
 import ko from 'knockout';
 
 import '../../../src/script/view_model/bindings/CommonBindings';
 
 describe('ko.bindingHandlers', () => {
-  describe('ko.bindingHandlers.enter', () => {
-    const binding = ko.bindingHandlers.enter;
-    let element = null;
-    let handler = null;
-
-    beforeEach(() => {
-      element = document.createElement('div');
-
-      handler = {on_enter: () => 'yay'};
-
-      // we need the callFake since the spyOn will overwrite the on_enter property
-      spyOn(handler, 'on_enter').and.callFake(() => () => 'yay');
-
-      binding.init(element, handler.on_enter);
-    });
-
-    it('can execute callback when enter is pressed', () => {
-      const keyboardEvent = new KeyboardEvent('keypress', {key: 'Enter'});
-      element.dispatchEvent(keyboardEvent);
-
-      expect(handler.on_enter).toHaveBeenCalled();
-    });
-
-    it('can not execute callback when another key is pressed', () => {
-      $(element).trigger($.Event('keypress', {key: 'Esc'}));
-
-      expect(handler.on_enter).not.toHaveBeenCalled();
-    });
-
-    it('can not execute callback when another event is triggered', () => {
-      $(element).trigger($.Event('keyup', {key: 'Enter'}));
-
-      expect(handler.on_enter).not.toHaveBeenCalled();
-    });
-  });
-
   describe('ko.subscribable.fn.subscribe_once', () => {
     let observable = null;
     let handler = null;

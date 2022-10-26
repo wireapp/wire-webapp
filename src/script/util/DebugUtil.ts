@@ -77,8 +77,6 @@ export class DebugUtil {
   /** Used by QA test automation. */
   public readonly userRepository: UserRepository;
   /** Used by QA test automation. */
-  public readonly $: JQueryStatic;
-  /** Used by QA test automation. */
   public readonly Dexie: typeof Dexie;
 
   constructor(
@@ -89,7 +87,6 @@ export class DebugUtil {
     private readonly callState = container.resolve(CallState),
     private readonly core = container.resolve(Core),
   ) {
-    this.$ = $;
     this.Dexie = Dexie;
 
     const {calling, client, connection, conversation, cryptography, event, user, storage, message} = repositories;

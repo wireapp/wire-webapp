@@ -31,7 +31,7 @@ export class WindowHandler {
   }
 
   private _listenToUnhandledPromiseRejection(): void {
-    $(window).on('unhandledrejection', (event: any): void | false => {
+    window.addEventListener('unhandledrejection', (event: any): void | false => {
       const promiseRejectionEvent = event.originalEvent;
       const error = promiseRejectionEvent.reason || {};
 

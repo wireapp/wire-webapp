@@ -28,7 +28,6 @@ import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {isConversationEntity} from 'Util/TypePredicateUtil';
-import {alias} from 'Util/util';
 
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 
@@ -153,22 +152,15 @@ export class ContentViewModel {
     amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, this.showConversation);
   }
 
-  private _shiftContent(contentSelector: string, hideSidebar: boolean = false): void {
-    const incomingCssClass = 'content-animation-incoming-horizontal-left';
+  private _shiftContent(hideSidebar: boolean = false): void {
+    const sidebar = document.querySelector(`#${this.sidebarId}`) as HTMLElement | null;
 
-    $(contentSelector)
-      .removeClass(incomingCssClass)
-      .off(alias.animationend)
-      .addClass(incomingCssClass)
-      .one(alias.animationend, function () {
-        $(this).removeClass(incomingCssClass).off(alias.animationend);
-      });
-
-    const sidebar = $(`#${this.sidebarId}`);
     if (hideSidebar) {
-      sidebar.css('visibility', 'hidden');
-    } else {
-      sidebar.removeAttr('style');
+      if (sidebar) {
+        sidebar.style.visibility = 'hidden';
+      }
+    } else if (sidebar) {
+      sidebar.style.visibility = '';
     }
   }
 
@@ -360,7 +352,6 @@ export class ContentViewModel {
     this.state(newContentState);
 
     return this._shiftContent(
-      this.getElementOfContent(newContentState),
       newContentState === ContentState.HISTORY_EXPORT || newContentState === ContentState.HISTORY_IMPORT,
     );
   };
