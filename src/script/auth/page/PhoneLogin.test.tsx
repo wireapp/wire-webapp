@@ -18,7 +18,7 @@
  */
 
 import {fireEvent, waitFor} from '@testing-library/react';
-import {PasswordExistsError} from '@wireapp/api-client/src/auth';
+import {PasswordExistsError} from '@wireapp/api-client/lib/auth';
 
 import {PhoneLogin} from './PhoneLogin';
 

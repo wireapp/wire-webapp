@@ -19,15 +19,15 @@
 
 import React, {useEffect, useRef, useState} from 'react';
 
-import {LoginData} from '@wireapp/api-client/src/auth';
-import {ClientType} from '@wireapp/api-client/src/client/index';
+import {LoginData} from '@wireapp/api-client/lib/auth';
+import {ClientType} from '@wireapp/api-client/lib/client/index';
 import {Runtime, UrlUtil} from '@wireapp/commons';
 import {
   ArrowIcon,
-  COLOR,
   Checkbox,
   CheckboxLabel,
   CodeInput,
+  COLOR,
   Column,
   Columns,
   Container,
@@ -35,14 +35,14 @@ import {
   Form,
   H1,
   H2,
-  Label,
   IsMobile,
-  TextLink,
+  Label,
+  Link,
+  LinkVariant,
   Loading,
   Muted,
   Text,
-  LinkVariant,
-  Link,
+  TextLink,
 } from '@wireapp/react-ui-kit';
 import {StatusCodes} from 'http-status-codes';
 import {useIntl} from 'react-intl';
@@ -66,7 +66,7 @@ import {actionRoot} from '../module/action/';
 import {BackendError} from '../module/action/BackendError';
 import {LabeledError} from '../module/action/LabeledError';
 import {ValidationError} from '../module/action/ValidationError';
-import {RootState, bindActionCreators} from '../module/reducer';
+import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {QUERY_KEY, ROUTE} from '../route';
 import {parseError, parseValidationErrors} from '../util/errorUtil';

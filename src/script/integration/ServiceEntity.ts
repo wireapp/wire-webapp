@@ -17,7 +17,7 @@
  *
  */
 
-import type {UserAsset as APIClientUserAsset} from '@wireapp/api-client/src/user/';
+import type {UserAsset as APIClientUserAsset} from '@wireapp/api-client/lib/user/';
 import ko from 'knockout';
 
 import {AssetRemoteData} from '../assets/AssetRemoteData';

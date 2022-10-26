@@ -19,7 +19,7 @@
 
 import React, {useEffect, useRef, useState} from 'react';
 
-import {BackendErrorLabel} from '@wireapp/api-client/src/http';
+import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';

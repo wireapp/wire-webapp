@@ -19,7 +19,7 @@
 
 import React, {useEffect, useMemo, useState} from 'react';
 
-import {ClientClassification} from '@wireapp/api-client/src/client/';
+import {ClientClassification} from '@wireapp/api-client/lib/client/';
 
 import {partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';

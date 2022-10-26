@@ -19,7 +19,7 @@
 
 import React from 'react';
 
-import {ClientClassification} from '@wireapp/api-client/src/client';
+import {ClientClassification} from '@wireapp/api-client/lib/client';
 import cx from 'classnames';
 
 import {DeviceId} from 'Components/DeviceId';

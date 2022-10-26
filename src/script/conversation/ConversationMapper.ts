@@ -18,16 +18,16 @@
  */
 
 import {
+  ACCESS_ROLE_V2,
   Conversation as ConversationBackendData,
   ConversationCode,
-  DefaultConversationRoleName,
   CONVERSATION_ACCESS,
   CONVERSATION_ACCESS_ROLE,
-  ACCESS_ROLE_V2,
   CONVERSATION_TYPE,
+  DefaultConversationRoleName,
   RemoteConversations,
-} from '@wireapp/api-client/src/conversation';
-import {QualifiedId} from '@wireapp/api-client/src/user';
+} from '@wireapp/api-client/lib/conversation';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import ko from 'knockout';
 import {isObject} from 'underscore';
@@ -38,7 +38,7 @@ import {ACCESS_STATE} from './AccessState';
 import {ConversationStatus} from './ConversationStatus';
 
 import {Conversation} from '../entity/Conversation';
-import {BASE_ERROR_TYPE, BaseError} from '../error/BaseError';
+import {BaseError, BASE_ERROR_TYPE} from '../error/BaseError';
 import {ConversationError} from '../error/ConversationError';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 

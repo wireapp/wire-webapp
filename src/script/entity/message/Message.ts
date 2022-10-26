@@ -17,14 +17,14 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/src/user';
-import type {ReactionType} from '@wireapp/core/src/main/conversation/';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
+import type {ReactionType} from '@wireapp/core/lib/conversation/';
 import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import ko from 'knockout';
 
 import {t} from 'Util/LocalizerUtil';
 import {getUserName} from 'Util/SanitizationUtil';
-import {TIME_IN_MILLIS, formatDurationCaption, formatTimeShort, formatDateNumeral, fromUnixTime} from 'Util/TimeUtil';
+import {formatDateNumeral, formatDurationCaption, formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {CallingTimeoutMessage} from './CallingTimeoutMessage';
 import type {CallMessage} from './CallMessage';

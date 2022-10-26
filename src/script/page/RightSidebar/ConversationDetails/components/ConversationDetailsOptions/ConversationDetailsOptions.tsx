@@ -19,7 +19,7 @@
 
 import {FC} from 'react';
 
-import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data/';
+import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/';
 
 import {Icon} from 'Components/Icon';
 import {ReceiptModeToggle} from 'Components/toggle/ReceiptModeToggle';

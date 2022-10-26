@@ -17,9 +17,9 @@
  *
  */
 
-import React, {useState, useCallback} from 'react';
+import React, {useCallback, useState} from 'react';
 
-import {DefaultConversationRoleName} from '@wireapp/api-client/src/conversation/';
+import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation/';
 import {CALL_TYPE, CONV_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -47,7 +47,7 @@ import type {Multitasking} from '../../notification/NotificationRepository';
 import {generateConversationUrl} from '../../router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from '../../router/routerBindings';
 import {TeamState} from '../../team/TeamState';
-import {showContextMenu, ContextMenuEntry} from '../../ui/ContextMenu';
+import {ContextMenuEntry, showContextMenu} from '../../ui/ContextMenu';
 import {initFadingScrollbar} from '../../ui/fadingScrollbar';
 import {CallActions, CallViewTab} from '../../view_model/CallingViewModel';
 

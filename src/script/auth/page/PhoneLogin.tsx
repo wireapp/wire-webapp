@@ -24,14 +24,14 @@ import {
   InvalidPhoneNumberError,
   LoginData,
   PasswordExistsError,
-} from '@wireapp/api-client/src/auth';
-import {ClientType} from '@wireapp/api-client/src/client/index';
+} from '@wireapp/api-client/lib/auth';
+import {ClientType} from '@wireapp/api-client/lib/client/index';
 import {Runtime} from '@wireapp/commons';
 import {
   ArrowIcon,
-  COLOR,
   Checkbox,
   CheckboxLabel,
+  COLOR,
   Column,
   Columns,
   Container,
@@ -53,7 +53,7 @@ import {PhoneLoginForm} from '../component/PhoneLoginForm';
 import {RouterLink} from '../component/RouterLink';
 import {actionRoot} from '../module/action';
 import {ValidationError} from '../module/action/ValidationError';
-import {RootState, bindActionCreators} from '../module/reducer';
+import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
 import {isValidationError, parseError, parseValidationErrors} from '../util/errorUtil';

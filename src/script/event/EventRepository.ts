@@ -17,10 +17,10 @@
  *
  */
 
-import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/src/event/';
+import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/lib/event/';
 import {Account, ConnectionState, ProcessedEventPayload} from '@wireapp/core';
-import {PayloadBundleSource} from '@wireapp/core/src/main/conversation';
-import {HandledEventPayload} from '@wireapp/core/src/main/notification';
+import {PayloadBundleSource} from '@wireapp/core/lib/conversation';
+import {HandledEventPayload} from '@wireapp/core/lib/notification';
 import {Asset as ProtobufAsset, GenericMessage} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';

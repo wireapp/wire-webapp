@@ -20,13 +20,13 @@
 import {
   FC,
   Fragment,
-  MouseEvent as ReactMouseEvent,
   KeyboardEvent as ReactKeyboardEvent,
+  MouseEvent as ReactMouseEvent,
   useEffect,
   useState,
 } from 'react';
 
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import cx from 'classnames';
@@ -38,7 +38,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
-import {isBeforeToday, formatDateNumeral, formatTimeShort} from 'Util/TimeUtil';
+import {formatDateNumeral, formatTimeShort, isBeforeToday} from 'Util/TimeUtil';
 import {useDisposableRef} from 'Util/useDisposableRef';
 
 import {AudioAsset} from './asset/AudioAsset';

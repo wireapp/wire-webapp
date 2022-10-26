@@ -17,7 +17,7 @@
  *
  */
 
-import {ConversationProtocol} from '@wireapp/api-client/src/conversation';
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 
 import {createRandomUuid} from 'Util/util';
 

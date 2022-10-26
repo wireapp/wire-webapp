@@ -19,16 +19,16 @@
 
 import React, {useRef, useState} from 'react';
 
-import {LoginData} from '@wireapp/api-client/src/auth';
+import {LoginData} from '@wireapp/api-client/lib/auth';
 import {
   ArrowIcon,
   Input,
   InputBlock,
   InputSubmitCombo,
   Loading,
-  QUERY,
   RoundIconButton,
   Select,
+  QUERY,
   useMatchMedia,
 } from '@wireapp/react-ui-kit';
 import {useIntl} from 'react-intl';

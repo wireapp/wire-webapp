@@ -17,8 +17,8 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/src/user';
-import {Mention, IMention} from '@wireapp/protocol-messaging';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {IMention, Mention} from '@wireapp/protocol-messaging';
 
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {isUUID} from 'Util/ValidationUtil';

@@ -19,7 +19,7 @@
 
 import {FC, useCallback, useEffect, useRef, useState} from 'react';
 
-import {LegalHoldMemberStatus} from '@wireapp/api-client/src/team/legalhold/';
+import {LegalHoldMemberStatus} from '@wireapp/api-client/lib/team/legalhold/';
 import cx from 'classnames';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 

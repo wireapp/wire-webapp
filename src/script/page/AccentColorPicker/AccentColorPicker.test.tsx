@@ -17,13 +17,13 @@
  *
  */
 
-import {render, act} from '@testing-library/react';
+import {act, render} from '@testing-library/react';
 import {AccentColor} from '@wireapp/commons';
 import ko from 'knockout';
 
-import {AccentColorPicker, AccentColorPickerProps} from './AccentColorPicker';
+import {User} from 'src/script/entity/User';
 
-import {User} from '../entity/User';
+import {AccentColorPicker, AccentColorPickerProps} from './AccentColorPicker';
 
 describe('AccentColorPicker', () => {
   it('shows expected accent colors', async () => {

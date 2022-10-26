@@ -19,9 +19,9 @@
 
 //@ts-check
 
-import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
+import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {ConnectionMapper} from 'src/script/connection/ConnectionMapper';
@@ -1079,7 +1079,7 @@ describe('Conversation', () => {
     it('updates the participating user IDs with the user ID of the other party', () => {
       const connector_user_id = 'b43b376d-7b5a-4d77-89be-81a02892db8c';
 
-      /** @type {import('@wireapp/api-client/src/connection/').Connection} */
+      /** @type {import('@wireapp/api-client/lib/connection/').Connection} */
       const payload_connection = {
         conversation: '15a7f358-8eba-4b8e-bcf2-61a08eb53349',
         from: '616cbbeb-1360-4e17-b333-e000662257bd',

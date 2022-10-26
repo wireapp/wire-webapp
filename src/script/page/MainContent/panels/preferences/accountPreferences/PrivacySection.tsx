@@ -19,7 +19,7 @@
 
 import React from 'react';
 
-import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
+import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 import {container} from 'tsyringe';
 

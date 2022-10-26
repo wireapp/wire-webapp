@@ -19,8 +19,8 @@
 
 import React, {useEffect} from 'react';
 
-import {pathWithParams} from '@wireapp/commons/src/main/util/UrlUtil';
-import {StyledApp, Loading, ContainerXS, THEME_ID} from '@wireapp/react-ui-kit';
+import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
+import {ContainerXS, Loading, StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 import {IntlProvider} from 'react-intl';
 import {connect} from 'react-redux';
 import {HashRouter as Router, Navigate, Route, Routes} from 'react-router-dom';
@@ -54,7 +54,7 @@ import {VerifyPhoneCode} from './VerifyPhoneCode';
 import {Config} from '../../Config';
 import {mapLanguage, normalizeLanguage} from '../localeConfig';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
-import {RootState, bindActionCreators} from '../module/reducer';
+import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as CookieSelector from '../module/selector/CookieSelector';
 import * as LanguageSelector from '../module/selector/LanguageSelector';

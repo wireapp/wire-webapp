@@ -17,10 +17,10 @@
  *
  */
 
-import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
-import {ConversationProtocol} from '@wireapp/api-client/src/conversation/NewConversation';
-import {PayloadBundleState} from '@wireapp/core/src/main/conversation';
+import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
+import {PayloadBundleState} from '@wireapp/core/lib/conversation';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {container} from 'tsyringe';
 

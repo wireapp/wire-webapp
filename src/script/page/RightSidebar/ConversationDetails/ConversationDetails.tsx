@@ -19,7 +19,7 @@
 
 import {FC, useCallback, useEffect, useMemo, useState} from 'react';
 
-import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data/';
+import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/';
 
 import {Icon} from 'Components/Icon';
 import {PanelActions} from 'Components/panel/PanelActions';

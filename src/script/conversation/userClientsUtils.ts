@@ -17,7 +17,7 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 type UserClientsContainer<T> = {[userId: string]: T[]};
 type QualifiedUserClientsContainer<T> = {[domain: string]: UserClientsContainer<T>};
