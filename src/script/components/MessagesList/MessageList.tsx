@@ -173,6 +173,10 @@ const MessagesList: FC<MessagesListParams> = ({
   const focusedElement = useRef<FocusedElement | null>(null);
   const conversationLastReadTimestamp = useRef(conversation.last_read_timestamp());
 
+  useEffect(() => {
+    conversationLastReadTimestamp.current = conversation.last_read_timestamp();
+  }, [conversation]);
+
   const updateScroll = (container: Element | null) => {
     const scrollingContainer = container?.parentElement;
 
