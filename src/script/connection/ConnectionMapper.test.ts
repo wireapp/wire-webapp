@@ -17,7 +17,7 @@
  *
  */
 
-import {ConnectionStatus, Connection} from '@wireapp/api-client/src/connection/';
+import {ConnectionStatus, Connection} from '@wireapp/api-client/lib/connection/';
 
 import {ConnectionMapper} from './ConnectionMapper';
 

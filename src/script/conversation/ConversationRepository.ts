@@ -23,8 +23,8 @@ import {
   NewConversation,
   Conversation as BackendConversation,
   ConversationProtocol,
-} from '@wireapp/api-client/src/conversation/';
-import {ConversationReceiptModeUpdateData} from '@wireapp/api-client/src/conversation/data/';
+} from '@wireapp/api-client/lib/conversation/';
+import {ConversationReceiptModeUpdateData} from '@wireapp/api-client/lib/conversation/data/';
 import {
   CONVERSATION_EVENT,
   ConversationMessageTimerUpdateEvent,
@@ -35,10 +35,10 @@ import {
   ConversationReceiptModeUpdateEvent,
   ConversationMemberLeaveEvent,
   ConversationMemberUpdateEvent,
-} from '@wireapp/api-client/src/event';
-import {BackendErrorLabel} from '@wireapp/api-client/src/http/';
-import type {QualifiedId} from '@wireapp/api-client/src/user/';
-import {MLSReturnType} from '@wireapp/core/src/main/conversation';
+} from '@wireapp/api-client/lib/event';
+import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
+import type {QualifiedId} from '@wireapp/api-client/lib/user/';
+import {MLSReturnType} from '@wireapp/core/lib/conversation';
 import {Confirmation, LegalHoldStatus, Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';

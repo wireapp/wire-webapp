@@ -19,7 +19,7 @@
 
 import React, {useEffect, useState} from 'react';
 
-import type {RichInfoField} from '@wireapp/api-client/src/user/RichInfo';
+import type {RichInfoField} from '@wireapp/api-client/lib/user/RichInfo';
 import {container} from 'tsyringe';
 
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';

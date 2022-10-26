@@ -21,7 +21,7 @@ import {useEffect, useState} from 'react';
 
 import {Runtime, UrlUtil} from '@wireapp/commons';
 import {COLOR, ContainerXS, FlexBox, Text} from '@wireapp/react-ui-kit';
-import {SVGIcon} from '@wireapp/react-ui-kit/src/Icon/SVGIcon';
+import {SVGIcon} from '@wireapp/react-ui-kit/lib/Icon/SVGIcon';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';

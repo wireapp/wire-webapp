@@ -17,7 +17,7 @@
  *
  */
 
-import {UserAsset, UserAssetType} from '@wireapp/api-client/src/user';
+import {UserAsset, UserAssetType} from '@wireapp/api-client/lib/user';
 
 import {ACCENT_ID, Config} from 'src/script/Config';
 import {User} from 'src/script/entity/User';

@@ -19,7 +19,7 @@
 
 import React from 'react';
 
-import {ClientType} from '@wireapp/api-client/src/client/index';
+import {ClientType} from '@wireapp/api-client/lib/client/index';
 import {ContainerXS, Loading} from '@wireapp/react-ui-kit';
 import {connect} from 'react-redux';
 import {useNavigate} from 'react-router-dom';

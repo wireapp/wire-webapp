@@ -17,8 +17,8 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/src/user';
-import type {ReactionType} from '@wireapp/core/src/main/conversation/ReactionType';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
+import type {ReactionType} from '@wireapp/core/lib/conversation/ReactionType';
 import ko from 'knockout';
 
 import {copyText} from 'Util/ClipboardUtil';

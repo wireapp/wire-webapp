@@ -26,8 +26,8 @@ import {
   ACCESS_ROLE_V2,
   CONVERSATION_TYPE,
   RemoteConversations,
-} from '@wireapp/api-client/src/conversation';
-import {QualifiedId} from '@wireapp/api-client/src/user';
+} from '@wireapp/api-client/lib/conversation';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import ko from 'knockout';
 import {isObject} from 'underscore';

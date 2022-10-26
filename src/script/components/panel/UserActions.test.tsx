@@ -18,7 +18,7 @@
  */
 
 import {render} from '@testing-library/react';
-import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
+import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import ko from 'knockout';
 
 import {ConversationRoleRepository} from 'src/script/conversation/ConversationRoleRepository';

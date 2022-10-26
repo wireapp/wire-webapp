@@ -17,7 +17,7 @@
  *
  */
 
-import {AssetOptions, AssetRetentionPolicy} from '@wireapp/api-client/src/asset/';
+import {AssetOptions, AssetRetentionPolicy} from '@wireapp/api-client/lib/asset/';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import ko from 'knockout';

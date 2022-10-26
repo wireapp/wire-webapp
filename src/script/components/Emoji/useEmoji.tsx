@@ -19,7 +19,7 @@
 
 import {KeyboardEvent, useEffect, useRef, useState} from 'react';
 
-import type {WebappProperties} from '@wireapp/api-client/src/user/data/';
+import type {WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 

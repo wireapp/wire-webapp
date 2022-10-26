@@ -18,7 +18,7 @@
  */
 
 // Polyfill for "tsyringe" dependency injection
-import {ClientType, ClientClassification} from '@wireapp/api-client/src/client/';
+import {ClientType, ClientClassification} from '@wireapp/api-client/lib/client/';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';

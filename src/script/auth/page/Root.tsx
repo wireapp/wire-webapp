@@ -19,7 +19,7 @@
 
 import React, {useEffect} from 'react';
 
-import {pathWithParams} from '@wireapp/commons/src/main/util/UrlUtil';
+import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
 import {StyledApp, Loading, ContainerXS, THEME_ID} from '@wireapp/react-ui-kit';
 import {IntlProvider} from 'react-intl';
 import {connect} from 'react-redux';

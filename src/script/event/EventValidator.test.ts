@@ -17,8 +17,8 @@
  *
  */
 
-import {CONVERSATION_TYPING} from '@wireapp/api-client/src/conversation/data/';
-import {CONVERSATION_EVENT, ConversationTypingEvent} from '@wireapp/api-client/src/event/';
+import {CONVERSATION_TYPING} from '@wireapp/api-client/lib/conversation/data/';
+import {CONVERSATION_EVENT, ConversationTypingEvent} from '@wireapp/api-client/lib/event/';
 
 import {EventSource} from './EventSource';
 import {EventValidation} from './EventValidation';

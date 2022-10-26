@@ -19,8 +19,8 @@
 
 import React, {useContext, useEffect, useState, useMemo} from 'react';
 
-import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data/ConversationReceiptModeUpdateData';
-import {ConversationProtocol} from '@wireapp/api-client/src/conversation/NewConversation';
+import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/ConversationReceiptModeUpdateData';
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
 import {Button, ButtonVariant, Select} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';

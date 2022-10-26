@@ -17,7 +17,7 @@
  *
  */
 
-import type {ConversationMemberJoinEvent} from '@wireapp/api-client/src/event/';
+import type {ConversationMemberJoinEvent} from '@wireapp/api-client/lib/event/';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 

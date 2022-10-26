@@ -17,7 +17,7 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import hljs from 'highlight.js';
 import MarkdownIt from 'markdown-it';
 import type Token from 'markdown-it/lib/token';

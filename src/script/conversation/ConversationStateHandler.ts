@@ -17,9 +17,9 @@
  *
  */
 
-import {ConversationCode} from '@wireapp/api-client/src/conversation/';
-import {ConversationAccessUpdateData, ConversationAccessV2UpdateData} from '@wireapp/api-client/src/conversation/data/';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
+import {ConversationCode} from '@wireapp/api-client/lib/conversation/';
+import {ConversationAccessUpdateData, ConversationAccessV2UpdateData} from '@wireapp/api-client/lib/conversation/data/';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {t} from 'Util/LocalizerUtil';

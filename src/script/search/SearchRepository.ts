@@ -17,7 +17,7 @@
  *
  */
 
-import type {QualifiedId} from '@wireapp/api-client/src/user/';
+import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {container} from 'tsyringe';
 
 import {EMOJI_RANGES} from 'Util/EmojiUtil';

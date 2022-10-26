@@ -17,7 +17,7 @@
  *
  */
 
-import {ClientType, RegisteredClient} from '@wireapp/api-client/src/client/';
+import {ClientType, RegisteredClient} from '@wireapp/api-client/lib/client/';
 
 import type {RootState} from '../reducer';
 

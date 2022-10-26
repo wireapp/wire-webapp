@@ -18,8 +18,8 @@
  */
 
 import {fireEvent, render} from '@testing-library/react';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
-import type {QualifiedId} from '@wireapp/api-client/src/user/';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {createRandomUuid, noop} from 'Util/util';
 

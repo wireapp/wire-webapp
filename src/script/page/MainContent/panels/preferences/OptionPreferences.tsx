@@ -19,7 +19,7 @@
 
 import React, {useEffect, useState} from 'react';
 
-import {AudioPreference, WebappProperties, NotificationPreference} from '@wireapp/api-client/src/user/data/';
+import {AudioPreference, WebappProperties, NotificationPreference} from '@wireapp/api-client/lib/user/data/';
 import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';

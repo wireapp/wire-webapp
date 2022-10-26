@@ -17,7 +17,7 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import ko from 'knockout';
 import {singleton} from 'tsyringe';

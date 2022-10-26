@@ -17,7 +17,7 @@
  *
  */
 
-import type {ConversationRolesList} from '@wireapp/api-client/src/conversation/ConversationRole';
+import type {ConversationRolesList} from '@wireapp/api-client/lib/conversation/ConversationRole';
 import type {
   TeamConversationDeleteEvent,
   TeamDeleteEvent,
@@ -26,11 +26,11 @@ import type {
   TeamMemberLeaveEvent,
   TeamMemberUpdateEvent,
   TeamUpdateEvent,
-} from '@wireapp/api-client/src/event';
-import {TEAM_EVENT} from '@wireapp/api-client/src/event/TeamEvent';
-import {FeatureStatus, FEATURE_KEY, SelfDeletingTimeout} from '@wireapp/api-client/src/team/feature/';
-import type {FeatureList} from '@wireapp/api-client/src/team/feature/';
-import type {TeamData} from '@wireapp/api-client/src/team/team/TeamData';
+} from '@wireapp/api-client/lib/event';
+import {TEAM_EVENT} from '@wireapp/api-client/lib/event/TeamEvent';
+import {FeatureStatus, FEATURE_KEY, SelfDeletingTimeout} from '@wireapp/api-client/lib/team/feature/';
+import type {FeatureList} from '@wireapp/api-client/lib/team/feature/';
+import type {TeamData} from '@wireapp/api-client/lib/team/team/TeamData';
 import {Runtime} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';

@@ -17,22 +17,22 @@
  *
  */
 
-import type {AddedClient, PublicClient} from '@wireapp/api-client/src/client';
+import type {AddedClient, PublicClient} from '@wireapp/api-client/lib/client';
 import {
   UserEvent,
   UserLegalHoldDisableEvent,
   UserLegalHoldRequestEvent,
   USER_EVENT,
-} from '@wireapp/api-client/src/event';
-import type {BackendError, TraceState} from '@wireapp/api-client/src/http';
-import {BackendErrorLabel} from '@wireapp/api-client/src/http';
-import {ConsentType, Self as APIClientSelf} from '@wireapp/api-client/src/self/';
-import type {QualifiedHandle, User as APIClientUser} from '@wireapp/api-client/src/user';
+} from '@wireapp/api-client/lib/event';
+import type {BackendError, TraceState} from '@wireapp/api-client/lib/http';
+import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
+import {ConsentType, Self as APIClientSelf} from '@wireapp/api-client/lib/self/';
+import type {QualifiedHandle, User as APIClientUser} from '@wireapp/api-client/lib/user';
 import {
   QualifiedId,
   UserAsset as APIClientUserAsset,
   UserAssetType as APIClientUserAssetType,
-} from '@wireapp/api-client/src/user';
+} from '@wireapp/api-client/lib/user';
 import type {AccentColor} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';

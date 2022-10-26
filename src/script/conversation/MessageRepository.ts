@@ -23,9 +23,9 @@ import {
   MessageSendingStatus,
   QualifiedUserClients,
   UserClients,
-} from '@wireapp/api-client/src/conversation';
-import {QualifiedId, RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/src/user';
-import {MessageTargetMode, PayloadBundleState, ReactionType} from '@wireapp/core/src/main/conversation';
+} from '@wireapp/api-client/lib/conversation';
+import {QualifiedId, RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/lib/user';
+import {MessageTargetMode, PayloadBundleState, ReactionType} from '@wireapp/core/lib/conversation';
 import {
   AudioMetaData,
   EditedTextContent,
@@ -35,11 +35,11 @@ import {
   LinkPreviewUploadedContent,
   TextContent,
   VideoMetaData,
-} from '@wireapp/core/src/main/conversation/content';
-import * as MessageBuilder from '@wireapp/core/src/main/conversation/message/MessageBuilder';
-import {OtrMessage} from '@wireapp/core/src/main/conversation/message/OtrMessage';
-import {TextContentBuilder} from '@wireapp/core/src/main/conversation/message/TextContentBuilder';
-import {isQualifiedUserClients, isUserClients} from '@wireapp/core/src/main/util';
+} from '@wireapp/core/lib/conversation/content';
+import * as MessageBuilder from '@wireapp/core/lib/conversation/message/MessageBuilder';
+import {OtrMessage} from '@wireapp/core/lib/conversation/message/OtrMessage';
+import {TextContentBuilder} from '@wireapp/core/lib/conversation/message/TextContentBuilder';
+import {isQualifiedUserClients, isUserClients} from '@wireapp/core/lib/util';
 import {Asset, Availability, Confirmation, GenericMessage} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';

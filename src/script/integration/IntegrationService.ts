@@ -17,7 +17,7 @@
  *
  */
 
-import type {Provider, Service} from '@wireapp/api-client/src/team/service/';
+import type {Provider, Service} from '@wireapp/api-client/lib/team/service/';
 import {container} from 'tsyringe';
 
 import {APIClient} from '../service/APIClientSingleton';

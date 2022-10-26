@@ -19,11 +19,11 @@
 
 import React, {useEffect, useRef, useState} from 'react';
 
-import {ClientType} from '@wireapp/api-client/src/client/index';
-import {BackendErrorLabel} from '@wireapp/api-client/src/http';
+import {ClientType} from '@wireapp/api-client/lib/client/index';
+import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {UrlUtil, Runtime} from '@wireapp/commons';
-import {pathWithParams} from '@wireapp/commons/src/main/util/UrlUtil';
-import {PATTERN, isValidEmail} from '@wireapp/commons/src/main/util/ValidationUtil';
+import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
+import {PATTERN, isValidEmail} from '@wireapp/commons/lib/util/ValidationUtil';
 import {
   ArrowIcon,
   Checkbox,

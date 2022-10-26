@@ -17,8 +17,8 @@
  *
  */
 
-import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE, CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
-import {ConversationProtocol} from '@wireapp/api-client/src/conversation/NewConversation';
+import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE, CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
 
 import {ConversationFilter} from './ConversationFilter';
 import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';

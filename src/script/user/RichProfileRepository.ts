@@ -17,7 +17,7 @@
  *
  */
 
-import type {RichInfo} from '@wireapp/api-client/src/user/';
+import type {RichInfo} from '@wireapp/api-client/lib/user/';
 import {container, singleton} from 'tsyringe';
 
 import {APIClient} from '../service/APIClientSingleton';

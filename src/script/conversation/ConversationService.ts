@@ -24,13 +24,13 @@ import type {
   Conversation as BackendConversation,
   ConversationCode,
   NewOTRMessage,
-} from '@wireapp/api-client/src/conversation';
+} from '@wireapp/api-client/lib/conversation';
 import type {
   ConversationMemberUpdateData,
   ConversationOtherMemberUpdateData,
   ConversationReceiptModeUpdateData,
   ConversationJoinData,
-} from '@wireapp/api-client/src/conversation/data';
+} from '@wireapp/api-client/lib/conversation/data';
 import type {
   ConversationCodeDeleteEvent,
   ConversationCodeUpdateEvent,
@@ -40,8 +40,8 @@ import type {
   ConversationMessageTimerUpdateEvent,
   ConversationReceiptModeUpdateEvent,
   ConversationRenameEvent,
-} from '@wireapp/api-client/src/event';
-import {QualifiedId} from '@wireapp/api-client/src/user';
+} from '@wireapp/api-client/lib/event';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';

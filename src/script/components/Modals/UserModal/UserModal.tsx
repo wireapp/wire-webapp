@@ -19,7 +19,7 @@
 
 import React, {useState, useEffect} from 'react';
 
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
 import {noop} from 'jquery';
 import {container} from 'tsyringe';

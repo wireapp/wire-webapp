@@ -17,18 +17,18 @@
  *
  */
 
-import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
-import {MemberLeaveReason} from '@wireapp/api-client/src/conversation/data/';
+import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
+import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
 import {
   CONVERSATION_EVENT,
   USER_EVENT,
   BackendEvent,
   ConversationEvent,
   ConversationOtrMessageAddEvent,
-} from '@wireapp/api-client/src/event/';
-import type {Notification} from '@wireapp/api-client/src/notification/';
-import type {QualifiedId} from '@wireapp/api-client/src/user';
-import {isQualifiedId} from '@wireapp/core/src/main/util';
+} from '@wireapp/api-client/lib/event/';
+import type {Notification} from '@wireapp/api-client/lib/notification/';
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import {isQualifiedId} from '@wireapp/core/lib/util';
 import {util as ProteusUtil} from '@wireapp/proteus';
 import Dexie from 'dexie';
 import {container} from 'tsyringe';

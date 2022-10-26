@@ -17,7 +17,7 @@
  *
  */
 
-import type {Consent, Self} from '@wireapp/api-client/src/self/';
+import type {Consent, Self} from '@wireapp/api-client/lib/self/';
 
 import type {AppAction} from '.';
 

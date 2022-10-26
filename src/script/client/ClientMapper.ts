@@ -17,7 +17,7 @@
  *
  */
 
-import type {PublicClient, RegisteredClient} from '@wireapp/api-client/src/client';
+import type {PublicClient, RegisteredClient} from '@wireapp/api-client/lib/client';
 
 import {ClientEntity} from './ClientEntity';
 

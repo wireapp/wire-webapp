@@ -17,11 +17,11 @@
  *
  */
 
-import {MemberLeaveReason} from '@wireapp/api-client/src/conversation/data/';
-import {CONVERSATION_EVENT, ConversationOtrMessageAddEvent} from '@wireapp/api-client/src/event/';
-import type {QualifiedId} from '@wireapp/api-client/src/user/';
+import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
+import {CONVERSATION_EVENT, ConversationOtrMessageAddEvent} from '@wireapp/api-client/lib/event/';
+import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import type {REASON as AVS_REASON} from '@wireapp/avs';
-import {ReactionType} from '@wireapp/core/src/main/conversation';
+import {ReactionType} from '@wireapp/core/lib/conversation';
 import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {createRandomUuid} from 'Util/util';

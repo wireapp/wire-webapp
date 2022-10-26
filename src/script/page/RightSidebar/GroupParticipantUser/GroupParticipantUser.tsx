@@ -19,7 +19,7 @@
 
 import {FC, useEffect} from 'react';
 
-import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/src/conversation/';
+import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/lib/conversation/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 

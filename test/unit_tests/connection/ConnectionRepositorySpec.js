@@ -17,7 +17,7 @@
  *
  */
 
-import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
+import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';

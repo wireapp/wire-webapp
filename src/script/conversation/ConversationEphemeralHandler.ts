@@ -17,7 +17,7 @@
  *
  */
 
-import {CONVERSATION_EVENT, ConversationMessageTimerUpdateEvent} from '@wireapp/api-client/src/event/';
+import {CONVERSATION_EVENT, ConversationMessageTimerUpdateEvent} from '@wireapp/api-client/lib/event/';
 import {Article, LinkPreview} from '@wireapp/protocol-messaging';
 import ko from 'knockout';
 

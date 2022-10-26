@@ -17,7 +17,7 @@
  *
  */
 
-import {AssetUploadData} from '@wireapp/api-client/src/asset/';
+import {AssetUploadData} from '@wireapp/api-client/lib/asset/';
 import {container} from 'tsyringe';
 
 import {createRandomUuid} from 'Util/util';

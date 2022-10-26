@@ -17,7 +17,7 @@
  *
  */
 
-import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/src/event/';
+import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/lib/event/';
 import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';

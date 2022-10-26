@@ -19,8 +19,8 @@
 
 import React, {useEffect, useRef, useState} from 'react';
 
-import {LoginData} from '@wireapp/api-client/src/auth';
-import {ClientType} from '@wireapp/api-client/src/client/index';
+import {LoginData} from '@wireapp/api-client/lib/auth';
+import {ClientType} from '@wireapp/api-client/lib/client/index';
 import {Runtime, UrlUtil} from '@wireapp/commons';
 import {
   ArrowIcon,

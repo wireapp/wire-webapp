@@ -17,9 +17,9 @@
  *
  */
 
-import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
-import {NotificationPreference} from '@wireapp/api-client/src/user/data/';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
+import {NotificationPreference} from '@wireapp/api-client/lib/user/data/';
 import {Runtime} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';

@@ -19,7 +19,7 @@
 
 import React, {useRef, useState} from 'react';
 
-import {LoginData} from '@wireapp/api-client/src/auth';
+import {LoginData} from '@wireapp/api-client/lib/auth';
 import {
   ArrowIcon,
   Input,

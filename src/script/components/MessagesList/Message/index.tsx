@@ -24,7 +24,7 @@ import React, {
   useRef,
 } from 'react';
 
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
 
 import {InViewport} from 'Components/utils/InViewport';
