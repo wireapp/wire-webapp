@@ -3,6 +3,70 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.0.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@1.12.12...@wireapp/eslint-config@2.0.0) (2022-10-26)
+
+### Code Refactoring
+
+* produce output of packages in lib folders ([#4561](https://github.com/wireapp/wire-web-packages/issues/4561)) ([2b7ea4c](https://github.com/wireapp/wire-web-packages/commit/2b7ea4c13f244bad5fe3cbcb80f82b5de6741db7))
+
+### BREAKING CHANGES
+
+* Imports that point to @wireapp/packageName/src/** need to be changed to @wireapp/packageName/lib/**
+
+* feat: changed api-client, bazinga64, certificate-check, cli-client
+
+* feat: cleanup commons
+
+* feat: change copy-config
+
+* feat: change core
+
+* feat: update license-collector
+
+* fix: update @wireapp/protocol-messaging, long and @types/node no longer needed
+
+* fix: update @wireapp/protocol-messaging, long and @types/node no longer needed
+
+* fix: node modules and yarn.lock
+
+* fix: add @types/node again to get rid of yarn resolution warnings
+
+* fix: add @types/node again to get rid of yarn resolution warnings
+
+* chore: update lockfile
+
+* fix: core tests
+
+* feat: update priority-queue
+
+* feat: update promise-queue
+
+* feat: update react-ui-kit
+
+* fix: add long back into core
+
+* feat: update store-engine
+
+* feat: update store-engine-dexie
+
+* feat: update store-engine-fs
+
+* feat: update webapp-events
+
+* fix: eslint
+
+* chore: cleanup last bits. everything changed to /lib/
+
+* fix: add typescript to our packages for users that dont have ts available globally (tsc not found)
+
+* fix: read old gitignore rules for now to avoid problems (unexpected commits) for existing local environments
+
+* chore: remove not needed gitignore entries
+
+* fix: formatting for package.json
+
+* chore: let tests execute in parallel
+
 ## [1.12.12](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@1.12.11...@wireapp/eslint-config@1.12.12) (2022-10-18)
 
 **Note:** Version bump only for package @wireapp/eslint-config
