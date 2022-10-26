@@ -173,10 +173,6 @@ const MessagesList: FC<MessagesListParams> = ({
   const focusedElement = useRef<FocusedElement | null>(null);
   const conversationLastReadTimestamp = useRef(conversation.last_read_timestamp());
 
-  useEffect(() => {
-    conversationLastReadTimestamp.current = conversation.last_read_timestamp();
-  }, [conversation]);
-
   const updateScroll = (container: Element | null) => {
     const scrollingContainer = container?.parentElement;
 
@@ -247,6 +243,7 @@ const MessagesList: FC<MessagesListParams> = ({
   useEffect(() => {
     onLoading(true);
     setLoaded(false);
+    conversationLastReadTimestamp.current = conversation.last_read_timestamp();
     loadConversation(conversation, initialMessage).then(() => {
       setTimeout(() => {
         setLoaded(true);
