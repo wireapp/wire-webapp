@@ -25,11 +25,11 @@ import {formatDuration, DurationUnit} from 'Util/TimeUtil';
 import Icon from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-import {EphemeralTimings} from '../../ephemeral/EphemeralTimings';
-import {showContextMenu} from '../../ui/ContextMenu';
-import type {Conversation} from '../../entity/Conversation';
+import {EphemeralTimings} from '../../../ephemeral/EphemeralTimings';
+import {showContextMenu} from '../../../ui/ContextMenu';
+import type {Conversation} from '../../../entity/Conversation';
 import {container} from 'tsyringe';
-import {TeamState} from '../../team/TeamState';
+import {TeamState} from '../../../team/TeamState';
 import {KEY} from 'Util/KeyboardUtil';
 import {setContextMenuPosition} from 'Util/util';
 
@@ -125,5 +125,3 @@ export const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({
     </button>
   );
 };
-
-export default MessageTimerButton;

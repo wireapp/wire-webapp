@@ -18,7 +18,7 @@
  */
 
 import {useRef} from 'react';
-import {Config} from '../../Config';
+import {Config} from '../../../Config';
 import {t} from 'Util/LocalizerUtil';
 import Icon from 'Components/Icon';
 
@@ -28,7 +28,8 @@ interface AssetUploadButtonProps {
 
 export const AssetUploadButton = ({onSelectFiles}: AssetUploadButtonProps) => {
   const acceptedFileTypes = Config.getConfig().FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS.join(',');
-  const fileRef = useRef<HTMLInputElement>(null!);
+
+  const fileRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {

@@ -21,9 +21,9 @@ import React from 'react';
 import {CSS_SQUARE} from 'Util/CSSMixin';
 import {t} from 'Util/LocalizerUtil';
 import {CSSObject} from '@emotion/serialize';
-import {User} from '../entity/User';
+import {User} from '../../entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {ACCENT_ID} from '../Config';
+import {ACCENT_ID} from '../../Config';
 
 export interface AccentColorPickerProps {
   doSetAccentColor: (id: number) => void;
@@ -37,7 +37,7 @@ const headerStyles: CSSObject = {
   textAlign: 'center',
 };
 
-const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({user, doSetAccentColor}) => {
+export const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({user, doSetAccentColor}) => {
   const {accent_id: accentId} = useKoSubscribableChildren(user, ['accent_id']);
   return (
     <>
@@ -142,5 +142,3 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
     </>
   );
 };
-
-export default AccentColorPicker;
