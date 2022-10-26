@@ -1,6 +1,5 @@
 {
   "devDependencies": {
-    "@types/node": "^14.18.29",
     "@wireapp/bot-api": "workspace:^",
     "jasmine": "3.8.0"
   },

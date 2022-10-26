@@ -12,7 +12,9 @@
     "fs-extra": "10.1.0"
   },
   "devDependencies": {
-    "@types/fs-extra": "9.0.13"
+    "@types/fs-extra": "9.0.13",
+    "@types/rimraf": "^3.0.2",
+    "rimraf": "^3.0.2"
   },
   "description": "Command-line interface for Wire's secure messaging platform.",
   "files": [

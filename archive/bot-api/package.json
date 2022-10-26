@@ -10,7 +10,6 @@
   },
   "devDependencies": {
     "@types/jasmine": "3.8.2",
-    "@types/node": "^14.18.29",
     "@types/readable-stream": "2.3.9",
     "cross-env": "7.0.3",
     "dotenv-defaults": "2.0.2",
