@@ -17,7 +17,7 @@
  *
  */
 
-import {TeamData} from '@wireapp/api-client/src/team';
+import {TeamData} from '@wireapp/api-client/lib/team';
 import React from 'react';
 import {connect} from 'react-redux';
 import {Navigate} from 'react-router-dom';

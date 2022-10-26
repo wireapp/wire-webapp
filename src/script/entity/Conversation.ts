@@ -20,8 +20,8 @@
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {Availability, LegalHoldStatus} from '@wireapp/protocol-messaging';
-import {QualifiedId} from '@wireapp/api-client/src/user';
-import {ConversationProtocol} from '@wireapp/api-client/src/conversation/NewConversation';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
 import {Cancelable, debounce} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {
@@ -29,7 +29,7 @@ import {
   CONVERSATION_ACCESS,
   CONVERSATION_ACCESS_ROLE,
   CONVERSATION_TYPE,
-} from '@wireapp/api-client/src/conversation/';
+} from '@wireapp/api-client/lib/conversation/';
 import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {truncate} from 'Util/StringUtil';
@@ -49,7 +49,7 @@ import type {Message} from './message/Message';
 import type {SystemMessage} from './message/SystemMessage';
 import {Config} from '../Config';
 import type {Call} from '../calling/Call';
-import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
+import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
 import {CallMessage} from './message/CallMessage';

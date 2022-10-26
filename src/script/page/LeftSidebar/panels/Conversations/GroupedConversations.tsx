@@ -36,7 +36,7 @@ import {ConversationState} from '../../../../conversation/ConversationState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import GroupedConversationsFolder from './GroupedConversationsFolder';
 import {CallState} from '../../../../calling/CallState';
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {useFolderState} from './state';
 
 const useLabels = (conversationLabelRepository: ConversationLabelRepository) => {

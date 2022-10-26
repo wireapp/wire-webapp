@@ -19,7 +19,7 @@
 
 import {amplify} from 'amplify';
 import {Asset, Confirmation, GenericMessage, Availability} from '@wireapp/protocol-messaging';
-import {ReactionType, MessageTargetMode, PayloadBundleState} from '@wireapp/core/src/main/conversation';
+import {ReactionType, MessageTargetMode, PayloadBundleState} from '@wireapp/core/lib/conversation';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {
   ClientMismatch,
@@ -27,8 +27,8 @@ import {
   MessageSendingStatus,
   UserClients,
   ConversationProtocol,
-} from '@wireapp/api-client/src/conversation';
-import {QualifiedId, RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/src/user';
+} from '@wireapp/api-client/lib/conversation';
+import {QualifiedId, RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/lib/user';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {
   AudioMetaData,
@@ -39,8 +39,8 @@ import {
   LinkPreviewContent,
   TextContent,
   EditedTextContent,
-} from '@wireapp/core/src/main/conversation/content';
-import {TextContentBuilder} from '@wireapp/core/src/main/conversation/message/TextContentBuilder';
+} from '@wireapp/core/lib/conversation/content';
+import {TextContentBuilder} from '@wireapp/core/lib/conversation/message/TextContentBuilder';
 import {MessageBuilder} from '@wireapp/core';
 import {container} from 'tsyringe';
 
@@ -92,9 +92,9 @@ import {ClientState} from '../client/ClientState';
 import {UserType} from '../tracking/attribute';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {Core} from '../service/CoreSingleton';
-import {OtrMessage} from '@wireapp/core/src/main/conversation/message/OtrMessage';
+import {OtrMessage} from '@wireapp/core/lib/conversation/message/OtrMessage';
 import {User} from '../entity/User';
-import {isQualifiedUserClients, isUserClients} from '@wireapp/core/src/main/util';
+import {isQualifiedUserClients, isUserClients} from '@wireapp/core/lib/util';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 import {findDeletedClients} from './ClientMismatchUtil';
 import {protoFromType} from '../user/AvailabilityMapper';

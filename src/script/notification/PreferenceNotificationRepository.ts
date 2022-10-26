@@ -20,9 +20,9 @@
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {groupBy} from 'underscore';
-import {USER_EVENT, UserEvent} from '@wireapp/api-client/src/event';
-import type {QualifiedId} from '@wireapp/api-client/src/user';
-import {ClientType} from '@wireapp/api-client/src/client';
+import {USER_EVENT, UserEvent} from '@wireapp/api-client/lib/event';
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import {ClientType} from '@wireapp/api-client/lib/client';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {loadValue, resetStoreValue, storeValue} from 'Util/StorageUtil';
 import type {ClientEntity} from '../client/ClientEntity';

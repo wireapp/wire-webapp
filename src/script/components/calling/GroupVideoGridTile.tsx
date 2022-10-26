@@ -27,7 +27,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import Video from './Video';
 import type {Participant} from '../../calling/Participant';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 export interface GroupVideoGridTileProps {
   isMaximized: boolean;

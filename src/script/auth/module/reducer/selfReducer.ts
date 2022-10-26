@@ -17,7 +17,7 @@
  *
  */
 
-import type {Self} from '@wireapp/api-client/src/self/';
+import type {Self} from '@wireapp/api-client/lib/self/';
 
 import {AppActions, SELF_ACTION} from '../action/creator/';
 

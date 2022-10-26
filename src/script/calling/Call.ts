@@ -26,7 +26,7 @@ import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import type {Participant, ClientId} from './Participant';
 import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import {Config} from '../Config';
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {MuteState} from './CallState';
 

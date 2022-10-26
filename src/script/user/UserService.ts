@@ -17,7 +17,7 @@
  *
  */
 
-import type {User as APIClientUser, QualifiedHandle, QualifiedId} from '@wireapp/api-client/src/user/';
+import type {User as APIClientUser, QualifiedHandle, QualifiedId} from '@wireapp/api-client/lib/user/';
 import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';

@@ -18,7 +18,7 @@
  */
 
 import {Account} from '@wireapp/core';
-import {ClientType} from '@wireapp/api-client/src/client/';
+import {ClientType} from '@wireapp/api-client/lib/client/';
 import {container, singleton} from 'tsyringe';
 import {APIClient} from './APIClientSingleton';
 import {createStorageEngine, DatabaseTypes} from './StoreEngineProvider';

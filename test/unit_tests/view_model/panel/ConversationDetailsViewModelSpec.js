@@ -17,7 +17,7 @@
  *
  */
 
-import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
 import {noop} from 'Util/util';
 
 import {ConversationDetailsViewModel} from 'src/script/view_model/panel/ConversationDetailsViewModel';

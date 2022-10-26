@@ -19,7 +19,7 @@
 
 import {amplify} from 'amplify';
 import {Availability} from '@wireapp/protocol-messaging';
-import {ConsentType, Self as APIClientSelf} from '@wireapp/api-client/src/self/';
+import {ConsentType, Self as APIClientSelf} from '@wireapp/api-client/lib/self/';
 import {container} from 'tsyringe';
 import {flatten} from 'underscore';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
@@ -28,18 +28,18 @@ import {
   UserLegalHoldRequestEvent,
   UserLegalHoldDisableEvent,
   USER_EVENT,
-} from '@wireapp/api-client/src/event';
+} from '@wireapp/api-client/lib/event';
 import {
   UserAsset as APIClientUserAsset,
   UserAssetType as APIClientUserAssetType,
   QualifiedId,
-} from '@wireapp/api-client/src/user';
+} from '@wireapp/api-client/lib/user';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import type {AccentColor} from '@wireapp/commons';
-import type {BackendError, TraceState} from '@wireapp/api-client/src/http';
-import {BackendErrorLabel} from '@wireapp/api-client/src/http';
-import type {PublicClient, AddedClient} from '@wireapp/api-client/src/client';
-import type {User as APIClientUser, QualifiedHandle} from '@wireapp/api-client/src/user';
+import type {BackendError, TraceState} from '@wireapp/api-client/lib/http';
+import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
+import type {PublicClient, AddedClient} from '@wireapp/api-client/lib/client';
+import type {User as APIClientUser, QualifiedHandle} from '@wireapp/api-client/lib/user';
 
 import {chunk, partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';

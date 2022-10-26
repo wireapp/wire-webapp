@@ -33,7 +33,7 @@ import PanelActions from './PanelActions';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {ACCESS_STATE} from '../../conversation/AccessState';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 
 export enum Actions {
   ACCEPT_REQUEST = 'UserActions.ACCEPT_REQUEST',

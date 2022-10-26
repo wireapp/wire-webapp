@@ -17,7 +17,7 @@
  *
  */
 
-import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import {
   Asset,
   Availability,

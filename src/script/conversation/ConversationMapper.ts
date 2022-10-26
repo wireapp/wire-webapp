@@ -29,8 +29,8 @@ import {
   ACCESS_ROLE_V2,
   CONVERSATION_TYPE,
   RemoteConversations,
-} from '@wireapp/api-client/src/conversation';
-import {QualifiedId} from '@wireapp/api-client/src/user';
+} from '@wireapp/api-client/lib/conversation';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {ACCESS_STATE} from './AccessState';
 import {ConversationStatus} from './ConversationStatus';
 import {Conversation} from '../entity/Conversation';

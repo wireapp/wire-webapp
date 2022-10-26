@@ -19,7 +19,7 @@
 
 import React from 'react';
 
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {Conversation} from 'src/script/entity/Conversation';

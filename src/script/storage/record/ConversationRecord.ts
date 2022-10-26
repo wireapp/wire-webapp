@@ -25,11 +25,11 @@ import {
   CONVERSATION_ACCESS,
   CONVERSATION_ACCESS_ROLE,
   CONVERSATION_TYPE,
-} from '@wireapp/api-client/src/conversation';
-import type {QualifiedId} from '@wireapp/api-client/src/user/';
+} from '@wireapp/api-client/lib/conversation';
+import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
-import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
-import {ConversationProtocol} from '@wireapp/api-client/src/conversation/NewConversation';
+import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
 
 export interface ConversationRecord {
   access_role: CONVERSATION_ACCESS_ROLE | ACCESS_ROLE_V2[];

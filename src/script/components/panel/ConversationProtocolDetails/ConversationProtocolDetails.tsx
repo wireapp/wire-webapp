@@ -19,7 +19,7 @@
 
 import {CSSObject} from '@emotion/react';
 import React from 'react';
-import {ConversationProtocol} from '@wireapp/api-client/src/conversation/NewConversation';
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
 
 import {registerReactComponent} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';

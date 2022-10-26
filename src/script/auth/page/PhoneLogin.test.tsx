@@ -17,7 +17,7 @@
  *
  */
 
-import {PasswordExistsError} from '@wireapp/api-client/src/auth';
+import {PasswordExistsError} from '@wireapp/api-client/lib/auth';
 
 import {actionRoot} from '../module/action';
 import {initialRootState} from '../module/reducer';

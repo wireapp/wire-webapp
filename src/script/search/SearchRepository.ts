@@ -25,7 +25,7 @@ import {validateHandle} from '../user/UserHandleGenerator';
 import type {SearchService} from './SearchService';
 import type {UserRepository} from '../user/UserRepository';
 import type {User} from '../entity/User';
-import type {QualifiedId} from '@wireapp/api-client/src/user/';
+import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {container} from 'tsyringe';
 import {Core} from '../service/CoreSingleton';
 

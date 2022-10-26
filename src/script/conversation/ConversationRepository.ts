@@ -32,7 +32,7 @@ import {
   ConversationEvent,
   ConversationReceiptModeUpdateEvent,
   ConversationMemberLeaveEvent,
-} from '@wireapp/api-client/src/event';
+} from '@wireapp/api-client/lib/event';
 
 import {
   DefaultConversationRoleName as DefaultRole,
@@ -40,11 +40,11 @@ import {
   NewConversation,
   Conversation as BackendConversation,
   ConversationProtocol,
-} from '@wireapp/api-client/src/conversation/';
+} from '@wireapp/api-client/lib/conversation/';
 import {container} from 'tsyringe';
-import {ConversationReceiptModeUpdateData} from '@wireapp/api-client/src/conversation/data/';
-import {BackendErrorLabel} from '@wireapp/api-client/src/http/';
-import type {QualifiedId} from '@wireapp/api-client/src/user/';
+import {ConversationReceiptModeUpdateData} from '@wireapp/api-client/lib/conversation/data/';
+import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
+import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {Logger, getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {PromiseQueue} from 'Util/PromiseQueue';
@@ -118,14 +118,14 @@ import {ConversationState} from './ConversationState';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {UserFilter} from '../user/UserFilter';
 import {ConversationFilter} from './ConversationFilter';
-import {ConversationMemberUpdateEvent} from '@wireapp/api-client/src/event';
+import {ConversationMemberUpdateEvent} from '@wireapp/api-client/lib/event';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {extractClientDiff} from './ClientMismatchUtil';
 import {Core} from '../service/CoreSingleton';
 import {updateAccessRights} from './ConversationAccessPermission';
 import {ClientState} from '../client/ClientState';
-import {MLSReturnType} from '@wireapp/core/src/main/conversation';
+import {MLSReturnType} from '@wireapp/core/lib/conversation';
 import {isMemberMessage} from '../guards/Message';
 import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
 import {mlsConversationState} from '../mls/mlsConversationState';

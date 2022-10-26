@@ -17,7 +17,7 @@
  *
  */
 
-import {AssetUploadData} from '@wireapp/api-client/src/asset/';
+import {AssetUploadData} from '@wireapp/api-client/lib/asset/';
 
 import {createRandomUuid} from 'Util/util';
 import {ValidationUtilError} from 'Util/ValidationUtil';

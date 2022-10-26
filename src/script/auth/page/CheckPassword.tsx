@@ -17,8 +17,8 @@
  *
  */
 
-import {LoginData} from '@wireapp/api-client/src/auth';
-import {BackendErrorLabel} from '@wireapp/api-client/src/http';
+import {LoginData} from '@wireapp/api-client/lib/auth';
+import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {
   ArrowIcon,
   ContainerXS,

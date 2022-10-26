@@ -17,7 +17,7 @@
  *
  */
 
-import {CONVERSATION_EVENT, ConversationEvent} from '@wireapp/api-client/src/event/';
+import {CONVERSATION_EVENT, ConversationEvent} from '@wireapp/api-client/lib/event/';
 import {LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
 import {getLogger, Logger} from 'Util/Logger';

@@ -20,7 +20,7 @@
 import ko from 'knockout';
 
 import {copyText} from 'Util/ClipboardUtil';
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {t} from 'Util/LocalizerUtil';
 import {formatLocale, formatTimeShort} from 'Util/TimeUtil';
 import type {QuoteEntity} from '../../message/QuoteEntity';
@@ -33,7 +33,7 @@ import {Message} from './Message';
 import {Text as TextAsset} from './Text';
 import {AssetRepository} from '../../assets/AssetRepository';
 import {UserReactionMap} from '../../storage';
-import type {ReactionType} from '@wireapp/core/src/main/conversation/ReactionType';
+import type {ReactionType} from '@wireapp/core/lib/conversation/ReactionType';
 
 export class ContentMessage extends Message {
   private readonly isLikedProvisional: ko.Observable<boolean>;

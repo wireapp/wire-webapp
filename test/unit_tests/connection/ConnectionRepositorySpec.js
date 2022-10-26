@@ -17,7 +17,7 @@
  *
  */
 
-import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
+import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {createRandomUuid} from 'Util/util';
 import {Conversation} from 'src/script/entity/Conversation';

@@ -17,8 +17,8 @@
  *
  */
 
-import {LoginData} from '@wireapp/api-client/src/auth';
-import {ClientType} from '@wireapp/api-client/src/client/index';
+import {LoginData} from '@wireapp/api-client/lib/auth';
+import {ClientType} from '@wireapp/api-client/lib/client/index';
 import {
   ArrowIcon,
   COLOR,

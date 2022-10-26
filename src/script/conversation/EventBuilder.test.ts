@@ -24,7 +24,7 @@ import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {ClientEvent} from 'src/script/event/Client';
 import {DegradedMessageEventData, EventBuilder, GroupCreationEventData} from 'src/script/conversation/EventBuilder';
-import type {QualifiedId} from '@wireapp/api-client/src/user/';
+import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
 import {SuperType} from 'src/script/message/SuperType';
 import {EventRecord} from '../storage';

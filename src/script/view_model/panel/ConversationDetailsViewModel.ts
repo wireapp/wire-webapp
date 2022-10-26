@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 import {amplify} from 'amplify';
-import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data/';
+import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {container} from 'tsyringe';
 

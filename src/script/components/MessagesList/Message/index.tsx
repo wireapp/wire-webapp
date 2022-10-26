@@ -17,7 +17,7 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {Message as BaseMessage} from '../../../entity/message/Message';
 import type {ContentMessage} from '../../../entity/message/ContentMessage';

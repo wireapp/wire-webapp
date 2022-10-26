@@ -20,12 +20,12 @@
 import ko from 'knockout';
 import sinon from 'sinon';
 import {amplify} from 'amplify';
-import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
+import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
-import {ConversationProtocol} from '@wireapp/api-client/src/conversation/NewConversation';
-import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
-import {ClientClassification} from '@wireapp/api-client/src/client/';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
+import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
+import {ClientClassification} from '@wireapp/api-client/lib/client/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {createRandomUuid} from 'Util/util';
 import {Conversation} from 'src/script/entity/Conversation';
@@ -36,7 +36,7 @@ import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandling
 import {EventRepository} from 'src/script/event/EventRepository';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {EventBuilder, DeleteEvent, MessageHiddenEvent} from 'src/script/conversation/EventBuilder';
-import {CONVERSATION_EVENT, ConversationCreateEvent, ConversationMemberJoinEvent} from '@wireapp/api-client/src/event/';
+import {CONVERSATION_EVENT, ConversationCreateEvent, ConversationMemberJoinEvent} from '@wireapp/api-client/lib/event/';
 import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
 import {ConversationDatabaseData, ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {StorageSchemata} from 'src/script/storage/StorageSchemata';
@@ -45,7 +45,7 @@ import {Config} from 'src/script/Config';
 import {ConversationError} from 'src/script/error/ConversationError';
 import {EventRecord, StorageService} from '../storage';
 import {ConversationRepository} from './ConversationRepository';
-import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE} from '@wireapp/api-client/src/conversation';
+import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE} from '@wireapp/api-client/lib/conversation';
 import {escapeRegex} from 'Util/SanitizationUtil';
 
 import {UserGenerator} from '../../../test/helper/UserGenerator';

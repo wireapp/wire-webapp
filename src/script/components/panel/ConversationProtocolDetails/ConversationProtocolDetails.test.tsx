@@ -17,7 +17,7 @@
  *
  */
 
-import {ConversationProtocol} from '@wireapp/api-client/src/conversation/NewConversation';
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
 import ConversationProtocolDetails, {Ciphersuite} from './ConversationProtocolDetails';
 import {render} from '@testing-library/react';
 

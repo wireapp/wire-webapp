@@ -18,7 +18,7 @@
  */
 
 import {container} from 'tsyringe';
-import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
+import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {getLogger, Logger} from 'Util/Logger';
 import {StatusType} from '../../message/StatusType';
 import {ClientEvent} from '../Client';

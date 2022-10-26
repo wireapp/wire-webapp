@@ -17,7 +17,7 @@
  *
  */
 
-import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import {container} from 'tsyringe';
 
 import {getLogger, Logger} from 'Util/Logger';
@@ -27,7 +27,7 @@ import type {ConversationRepository} from '../../conversation/ConversationReposi
 import {EventRecord} from '../../storage/record/EventRecord';
 import type {UserRepository} from '../../user/UserRepository';
 import {ClientEvent} from '../Client';
-import type {QualifiedId} from '@wireapp/api-client/src/user/';
+import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {QualifiedUserId} from '@wireapp/protocol-messaging';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 

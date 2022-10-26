@@ -17,7 +17,7 @@
  *
  */
 
-import type {SearchResult} from '@wireapp/api-client/src/user/';
+import type {SearchResult} from '@wireapp/api-client/lib/user/';
 import {container} from 'tsyringe';
 
 import {APIClient} from '../service/APIClientSingleton';

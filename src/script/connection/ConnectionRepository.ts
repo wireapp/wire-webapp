@@ -17,13 +17,13 @@
  *
  */
 
-import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
-import {USER_EVENT, UserConnectionEvent} from '@wireapp/api-client/src/event/';
-import type {BackendEventType} from '@wireapp/api-client/src/event/BackendEvent';
-import type {UserConnectionData} from '@wireapp/api-client/src/user/data/';
+import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
+import {USER_EVENT, UserConnectionEvent} from '@wireapp/api-client/lib/event/';
+import type {BackendEventType} from '@wireapp/api-client/lib/event/BackendEvent';
+import type {UserConnectionData} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {BackendErrorLabel} from '@wireapp/api-client/src/http/';
+import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import {container} from 'tsyringe';
 import {getLogger, Logger} from 'Util/Logger';
 import {replaceLink, t} from 'Util/LocalizerUtil';
@@ -41,7 +41,7 @@ import {ConnectionState} from './ConnectionState';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {Config} from '../Config';
 import {matchQualifiedIds} from 'Util/QualifiedId';
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 export class ConnectionRepository {
   private readonly connectionService: ConnectionService;

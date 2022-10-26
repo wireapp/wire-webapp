@@ -20,7 +20,7 @@
 import ko from 'knockout';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {AssetOptions, AssetRetentionPolicy} from '@wireapp/api-client/src/asset/';
+import {AssetOptions, AssetRetentionPolicy} from '@wireapp/api-client/lib/asset/';
 import {singleton, container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';

@@ -19,7 +19,7 @@
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
-import type {WebappProperties} from '@wireapp/api-client/src/user/data/';
+import type {WebappProperties} from '@wireapp/api-client/lib/user/data/';
 
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 import type {PropertiesRepository} from '../properties/PropertiesRepository';

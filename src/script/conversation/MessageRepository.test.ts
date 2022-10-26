@@ -17,9 +17,9 @@
  *
  */
 
-import {ConversationProtocol} from '@wireapp/api-client/src/conversation/NewConversation';
-import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
+import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {createRandomUuid} from 'Util/util';
 import {Conversation} from 'src/script/entity/Conversation';
@@ -44,7 +44,7 @@ import {container} from 'tsyringe';
 import {ClientEntity} from '../client/ClientEntity';
 import {TeamState} from '../team/TeamState';
 import {ContentMessage} from '../entity/message/ContentMessage';
-import {PayloadBundleState} from '@wireapp/core/src/main/conversation';
+import {PayloadBundleState} from '@wireapp/core/lib/conversation';
 import {ConversationState} from './ConversationState';
 
 const selfUser = new User('selfid', '');

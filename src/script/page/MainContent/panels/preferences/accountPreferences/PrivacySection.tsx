@@ -19,7 +19,7 @@
 
 import React from 'react';
 import {AppLockState} from '../../../../../user/AppLockState';
-import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
+import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {t} from 'Util/LocalizerUtil';
 import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';

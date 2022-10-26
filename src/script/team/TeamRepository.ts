@@ -19,12 +19,12 @@
 
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import type {ConversationRolesList} from '@wireapp/api-client/src/conversation/ConversationRole';
-import type {TeamData} from '@wireapp/api-client/src/team/team/TeamData';
+import type {ConversationRolesList} from '@wireapp/api-client/lib/conversation/ConversationRole';
+import type {TeamData} from '@wireapp/api-client/lib/team/team/TeamData';
 import {Availability} from '@wireapp/protocol-messaging';
-import {TEAM_EVENT} from '@wireapp/api-client/src/event/TeamEvent';
-import type {FeatureList} from '@wireapp/api-client/src/team/feature/';
-import {FeatureStatus, FEATURE_KEY, SelfDeletingTimeout} from '@wireapp/api-client/src/team/feature/';
+import {TEAM_EVENT} from '@wireapp/api-client/lib/event/TeamEvent';
+import type {FeatureList} from '@wireapp/api-client/lib/team/feature/';
+import {FeatureStatus, FEATURE_KEY, SelfDeletingTimeout} from '@wireapp/api-client/lib/team/feature/';
 import {formatDuration} from 'Util/TimeUtil';
 import type {
   TeamConversationDeleteEvent,
@@ -34,7 +34,7 @@ import type {
   TeamMemberLeaveEvent,
   TeamMemberUpdateEvent,
   TeamUpdateEvent,
-} from '@wireapp/api-client/src/event';
+} from '@wireapp/api-client/lib/event';
 import {Runtime} from '@wireapp/commons';
 import {container} from 'tsyringe';
 

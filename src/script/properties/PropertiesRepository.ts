@@ -20,9 +20,9 @@
 import ko from 'knockout';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {AudioPreference, NotificationPreference, WebappProperties} from '@wireapp/api-client/src/user/data/';
-import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
-import {ConsentType} from '@wireapp/api-client/src/self/';
+import {AudioPreference, NotificationPreference, WebappProperties} from '@wireapp/api-client/lib/user/data/';
+import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
+import {ConsentType} from '@wireapp/api-client/lib/self/';
 
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
