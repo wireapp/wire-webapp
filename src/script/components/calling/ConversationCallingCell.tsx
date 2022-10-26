@@ -42,9 +42,9 @@ export interface CallingCellProps {
   call: Call;
   callActions: CallActions;
   callingRepository: Pick<CallingRepository, 'supportsScreenSharing' | 'sendModeratorMute'>;
+  conversation: Conversation;
   callState?: CallState;
   classifiedDomains?: string[];
-  conversation: Conversation;
   temporaryUserStyle?: boolean;
 }
 
@@ -101,7 +101,7 @@ const ConversationCallingCell: React.FC<CallingCellProps> = ({
             >
               {!temporaryUserStyle && (
                 <div className="conversation-list-cell-left">
-                  {isGroup && <GroupAvatar users={conversationParticipants} isLight={true} />}
+                  {isGroup && <GroupAvatar users={conversationParticipants} isLight />}
                   {!isGroup && !!conversationParticipants.length && (
                     <Avatar participant={conversationParticipants[0]} avatarSize={AVATAR_SIZE.SMALL} />
                   )}
@@ -133,18 +133,17 @@ const ConversationCallingCell: React.FC<CallingCellProps> = ({
             </div>
 
             <div className="conversation-list-cell-right">
-              {isConnecting ||
-                (isOngoing && (
-                  <button
-                    className="call-ui__button call-ui__button--red"
-                    onClick={() => callActions.leave(call)}
-                    title={t('videoCallOverlayHangUp')}
-                    type="button"
-                    data-uie-name="do-call-controls-call-leave"
-                  >
-                    <Icon.Hangup className="small-icon" style={{maxWidth: 17}} />
-                  </button>
-                ))}
+              {(isConnecting || isOngoing) && (
+                <button
+                  className="call-ui__button call-ui__button--red"
+                  onClick={() => callActions.leave(call)}
+                  title={t('videoCallOverlayHangUp')}
+                  type="button"
+                  data-uie-name="do-call-controls-call-leave"
+                >
+                  <Icon.Hangup className="small-icon" style={{maxWidth: 17}} />
+                </button>
+              )}
             </div>
           </div>
 
