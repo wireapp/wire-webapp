@@ -20,8 +20,8 @@ yarn add @wireapp/core
 
 ```ts
 import {Account} from '@wireapp/core';
-import {LoginData} from '@wireapp/api-client/src/auth/';
-import {ClientType} from '@wireapp/api-client/src/client';
+import {LoginData} from '@wireapp/api-client/lib/auth/';
+import {ClientType} from '@wireapp/api-client/lib/client';
 
 const credentials: LoginData = {
   clientType: ClientType.TEMPORARY,

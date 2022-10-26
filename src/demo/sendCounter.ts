@@ -32,7 +32,7 @@ import * as path from 'path';
 import {TimeUtil} from '@wireapp/commons';
 import {Account} from '@wireapp/core';
 import {APIClient} from '@wireapp/api-client';
-import {ClientType} from '@wireapp/api-client/src/client/';
+import {ClientType} from '@wireapp/api-client/lib/client/';
 import {FileEngine} from '@wireapp/store-engine-fs';
 
 commander.option('-c, --conversationId <conversationId>').parse(process.argv);

@@ -1182,7 +1182,7 @@ const textPayload = account.service.conversation.messageBuilder.createText(...);
 With
 
 ```
-import {MessageBuilder} from '@wireapp/core/src/main/conversation/message/MessageBuilder';
+import {MessageBuilder} from '@wireapp/core/lib/conversation/message/MessageBuilder';
 //...
 const textPayload = MessageBuilder.createText(...);
 ```
