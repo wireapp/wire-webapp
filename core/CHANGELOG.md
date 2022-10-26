@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [34.1.6](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@34.1.5...@wireapp/core@34.1.6) (2022-10-26)
+
+### Bug Fixes
+
+* Make sure clientId is set before init cryptobox ([#4563](https://github.com/wireapp/wire-web-packages/issues/4563)) ([9a346e1](https://github.com/wireapp/wire-web-packages/commit/9a346e148b384d796f98f49ebf8985986ddb22fd))
+
 ## [34.1.5](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@34.1.4...@wireapp/core@34.1.5) (2022-10-26)
 
 ### Bug Fixes
