@@ -444,11 +444,10 @@ export class Account<T = any> extends EventEmitter {
   }
 
   public async loadAndValidateLocalClient(entropyData?: Uint8Array): Promise<RegisteredClient> {
-    await this.service!.cryptography.initCryptobox();
-
     const loadedClient = await this.service!.client.getLocalClient();
     await this.apiClient.api.client.getClient(loadedClient.id);
     this.apiClient.context!.clientId = loadedClient.id;
+    await this.service!.cryptography.initCryptobox();
     if (this.mlsConfig && this.backendFeatures.supportsMLS) {
       this.coreCryptoClient = await this.createMLSClient(
         loadedClient,
