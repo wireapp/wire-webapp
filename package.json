@@ -3,7 +3,7 @@
     "@emotion/react": "11.10.4",
     "@wireapp/avs": "8.2.16",
     "@wireapp/core": "34.1.4",
-    "@wireapp/react-ui-kit": "8.17.5",
+    "@wireapp/react-ui-kit": "8.17.10",
     "@wireapp/store-engine-dexie": "1.7.11",
     "@wireapp/store-engine-sqleet": "1.8.9",
     "@wireapp/webapp-events": "0.14.9",

@@ -4180,14 +4180,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/react-ui-kit@npm:8.17.5":
-  version: 8.17.5
-  resolution: "@wireapp/react-ui-kit@npm:8.17.5"
+"@wireapp/react-ui-kit@npm:8.17.10":
+  version: 8.17.10
+  resolution: "@wireapp/react-ui-kit@npm:8.17.10"
   dependencies:
     "@types/color": 3.0.3
     color: 4.2.3
     emotion-normalize: 11.0.1
-    react-select: 5.5.2
+    react-select: 5.5.4
     react-transition-group: 4.4.5
   peerDependencies:
     "@emotion/react": 11.10.4
@@ -4197,7 +4197,7 @@ __metadata:
   peerDependenciesMeta:
     "@types/react":
       optional: true
-  checksum: ee35c4aaf067c1a67b958b4ebd862c3a1b570c019393001faa5a067e4dfd814605d2065c9cb512f41bbb0d13fcfcc8e6bd88c246fd7a174afa394769fcfad72e
+  checksum: b7bdd5475a558c2de1331e596109a7e7ccafb9090b9c438189a933630ade0c0d3935fb7d4ecc946e029949b93d1e70def00b3a13148f297d1ed64e9b446d8d78
   languageName: node
   linkType: hard
 
@@ -11458,10 +11458,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"memoize-one@npm:^5.0.0":
-  version: 5.2.1
-  resolution: "memoize-one@npm:5.2.1"
-  checksum: a3cba7b824ebcf24cdfcd234aa7f86f3ad6394b8d9be4c96ff756dafb8b51c7f71320785fbc2304f1af48a0467cbbd2a409efc9333025700ed523f254cb52e3d
+"memoize-one@npm:^6.0.0":
+  version: 6.0.0
+  resolution: "memoize-one@npm:6.0.0"
+  checksum: f185ea69f7cceae5d1cb596266dcffccf545e8e7b4106ec6aa93b71ab9d16460dd118ac8b12982c55f6d6322fcc1485de139df07eacffaae94888b9b3ad7675f
   languageName: node
   linkType: hard
 
@@ -13897,23 +13897,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-select@npm:5.5.2":
-  version: 5.5.2
-  resolution: "react-select@npm:5.5.2"
+"react-select@npm:5.5.4":
+  version: 5.5.4
+  resolution: "react-select@npm:5.5.4"
   dependencies:
     "@babel/runtime": ^7.12.0
     "@emotion/cache": ^11.4.0
     "@emotion/react": ^11.8.1
     "@floating-ui/dom": ^1.0.1
     "@types/react-transition-group": ^4.4.0
-    memoize-one: ^5.0.0
+    memoize-one: ^6.0.0
     prop-types: ^15.6.0
     react-transition-group: ^4.3.0
     use-isomorphic-layout-effect: ^1.1.2
   peerDependencies:
     react: ^16.8.0 || ^17.0.0 || ^18.0.0
     react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
-  checksum: 3c340052dfe9558f0ef5e8dc84f8cece6ff424c9d6c56da3f3c551c84b563f616f32a8769bbfb5582cfb6e625d817b74e6562646e6218b39b6c450b146a68345
+  checksum: 3870bef752f8242dd9fed6d3445da525623d2a022801e40999af597f36d416e5deb7db1ba690b4d5aff70d8a00b17ae9200c6001bfc7c6812c0e7b0f4de79454
   languageName: node
   linkType: hard
 
@@ -16868,7 +16868,7 @@ __metadata:
     "@wireapp/core": 34.1.4
     "@wireapp/eslint-config": 1.12.12
     "@wireapp/prettier-config": 0.4.7
-    "@wireapp/react-ui-kit": 8.17.5
+    "@wireapp/react-ui-kit": 8.17.10
     "@wireapp/store-engine-dexie": 1.7.11
     "@wireapp/store-engine-sqleet": 1.8.9
     "@wireapp/webapp-events": 0.14.9
