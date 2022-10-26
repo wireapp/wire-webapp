@@ -22,7 +22,7 @@ import * as AuthSelector from '../module/selector/AuthSelector';
 import {Button, ButtonVariant, ContainerXS, ErrorMessage, Text} from '@wireapp/react-ui-kit';
 import React, {useEffect, useState} from 'react';
 import {FormattedMessage, useIntl} from 'react-intl';
-import {useNavigate} from 'react-router-dom';
+import {Navigate, useNavigate} from 'react-router-dom';
 import {Config} from '../../Config';
 import '../../localization/Localizer';
 import {indexStrings, logoutReasonStrings} from '../../strings';
@@ -42,30 +42,22 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
   const [logoutReason, setLogoutReason] = useState<string>();
 
   useEffect(() => {
-    // Redirect to prefilled SSO login if default SSO code is set on backend
-    if (defaultSSOCode) {
-      navigate(`${ROUTE.SSO}/wire-${defaultSSOCode}`);
-    }
-  }, [defaultSSOCode]);
-
-  useEffect(() => {
     const queryLogoutReason = UrlUtil.getURLParameter(QUERY_KEY.LOGOUT_REASON) || null;
     if (queryLogoutReason) {
       setLogoutReason(queryLogoutReason);
     }
   }, []);
 
-  useEffect(() => {
-    // Navigate directly to email login because it's the only available option on the index page
-    if (
-      !Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY &&
-      !Config.getConfig().FEATURE.ENABLE_SSO &&
-      !Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION
-    ) {
-      navigate(ROUTE.LOGIN);
-    }
-  }, []);
+  if (defaultSSOCode) {
+    // Redirect to prefilled SSO login if default SSO code is set on backend
+    return <Navigate to={`${ROUTE.SSO}/wire-${defaultSSOCode}`} />;
+  }
+
   const features = Config.getConfig().FEATURE;
+  if (!features.ENABLE_DOMAIN_DISCOVERY && !features.ENABLE_SSO && !features.ENABLE_ACCOUNT_REGISTRATION) {
+    // Navigate directly to email login because it's the only available option on the index page
+    return <Navigate to={ROUTE.LOGIN} />;
+  }
 
   return (
     <Page>

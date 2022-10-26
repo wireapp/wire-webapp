@@ -23,7 +23,7 @@ import 'core-js/full/reflect';
 import ko from 'knockout';
 import platform from 'platform';
 import {container} from 'tsyringe';
-import {ClientType} from '@wireapp/api-client/src/client/';
+import {ClientType, ClientClassification} from '@wireapp/api-client/src/client/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import Dexie from 'dexie';
@@ -31,7 +31,7 @@ import {Runtime} from '@wireapp/commons';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
-import {arrayToBase64, checkIndexedDb, createRandomUuid} from 'Util/util';
+import {arrayToBase64, checkIndexedDb, createRandomUuid, supportsMLS} from 'Util/util';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {enableLogging} from 'Util/LoggerUtil';
 import {Environment} from 'Util/Environment';
@@ -98,7 +98,6 @@ import {PropertiesService} from '../properties/PropertiesService';
 import {AssetService} from '../assets/AssetService';
 import {UserService} from '../user/UserService';
 import {AudioRepository} from '../audio/AudioRepository';
-import {MessageSender} from '../message/MessageSender';
 import {StorageService} from '../storage';
 import {BackupService} from '../backup/BackupService';
 import {MediaRepository} from '../media/MediaRepository';
@@ -110,7 +109,6 @@ import {ClientService} from '../client/ClientService';
 import {ConnectionService} from '../connection/ConnectionService';
 import {TeamService} from '../team/TeamService';
 import {SearchService} from '../search/SearchService';
-import {CryptographyService} from '../cryptography/CryptographyService';
 import {AccessTokenError, ACCESS_TOKEN_ERROR_TYPE} from '../error/AccessTokenError';
 import {ClientError, CLIENT_ERROR_TYPE} from '../error/ClientError';
 import {AuthError} from '../error/AuthError';
@@ -153,8 +151,8 @@ class App {
     storage: StorageService;
   };
   repository: ViewModelRepositories = {} as ViewModelRepositories;
-  debug: DebugUtil;
-  util: {debug: DebugUtil};
+  debug?: DebugUtil;
+  util?: {debug: DebugUtil};
   singleInstanceHandler: SingleInstanceHandler;
 
   static get CONFIG() {
@@ -224,7 +222,6 @@ class App {
   private _setupRepositories() {
     const repositories: ViewModelRepositories = {} as ViewModelRepositories;
     const selfService = new SelfService();
-    const sendingMessageQueue = new MessageSender();
 
     repositories.asset = container.resolve(AssetRepository);
 
@@ -233,7 +230,7 @@ class App {
     repositories.serverTime = serverTimeHandler;
     repositories.storage = new StorageRepository();
 
-    repositories.cryptography = new CryptographyRepository(new CryptographyService());
+    repositories.cryptography = new CryptographyRepository();
     repositories.client = new ClientRepository(new ClientService(), repositories.cryptography, repositories.storage);
     repositories.media = new MediaRepository(new PermissionRepository());
     repositories.audio = new AudioRepository(repositories.media.devicesHandler);
@@ -260,7 +257,6 @@ class App {
       () => repositories.conversation,
       repositories.cryptography,
       repositories.event,
-      sendingMessageQueue,
       repositories.properties,
       serverTimeHandler,
       repositories.user,
@@ -384,7 +380,6 @@ class App {
         client: clientRepository,
         connection: connectionRepository,
         conversation: conversationRepository,
-        cryptography: cryptographyRepository,
         event: eventRepository,
         eventTracker: eventTrackerRepository,
         properties: propertiesRepository,
@@ -397,7 +392,13 @@ class App {
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
 
       try {
-        await this.core.init(clientType);
+        await this.core.init(clientType, {
+          onNewClient({userId, clientId, domain}) {
+            const qualifiedId = {domain: domain ?? '', id: userId};
+            const newClient = {class: ClientClassification.UNKNOWN, id: clientId};
+            userRepository.addClientToUser(qualifiedId, newClient, true);
+          },
+        });
       } catch (error) {
         throw new ClientError(CLIENT_ERROR_TYPE.NO_VALID_CLIENT, 'Client has been deleted on backend');
       }
@@ -419,8 +420,6 @@ class App {
       telemetry.timeStep(AppInitTimingsStep.VALIDATED_CLIENT);
       telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity().type ?? 'unknown');
 
-      await cryptographyRepository.init(this.core.service!.cryptography.cryptobox, clientEntity);
-
       loadingView.updateProgress(10);
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
@@ -428,7 +427,7 @@ class App {
 
       const conversationEntities = await conversationRepository.getConversations();
 
-      if (Config.getConfig().FEATURE.ENABLE_MLS) {
+      if (supportsMLS()) {
         // We send external proposal to all the MLS conversations that are in an unknown state (not established nor pendingWelcome)
         await mlsConversationState.getState().sendExternalToPendingJoin(
           conversationEntities,
@@ -921,7 +920,7 @@ class App {
 $(async () => {
   const config = Config.getConfig();
   const apiClient = container.resolve(APIClient);
-  await apiClient.useVersion(config.SUPPORTED_API_VERSIONS, config.FEATURE.ENABLE_MLS);
+  await apiClient.useVersion(config.SUPPORTED_API_VERSIONS, config.ENABLE_DEV_BACKEND_API);
   const core = container.resolve(Core);
 
   enableLogging(Config.getConfig().FEATURE.ENABLE_DEBUG);

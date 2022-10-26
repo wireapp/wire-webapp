@@ -43,11 +43,11 @@ function keepAlive() {
   global.addEventListener('install', event => event.waitUntil(global.skipWaiting()));
   global.addEventListener('message', event => {
     const client = event.ports[0];
-    const action = actions[event.data.action];
-    if (!action) {
+    if (!actions.hasOwnProperty(event.data.action)) {
       console.error(`Action '${event.data.action}' doesn't exist in value store service worker`);
       return;
     }
+    const action = actions[event.data.action];
     const value = action(event.data.value);
     client.postMessage(value);
   });

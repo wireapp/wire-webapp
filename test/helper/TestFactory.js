@@ -37,7 +37,6 @@ import {StorageRepository} from 'src/script/storage/StorageRepository';
 import {ClientRepository} from 'src/script/client/ClientRepository';
 import {EventTrackingRepository} from 'src/script/tracking/EventTrackingRepository';
 import {ClientEntity} from 'src/script/client/ClientEntity';
-import {Cryptobox} from '@wireapp/cryptobox';
 import {EventRepository} from 'src/script/event/EventRepository';
 import {EventServiceNoCompound} from 'src/script/event/EventServiceNoCompound';
 import {EventService} from 'src/script/event/EventService';
@@ -45,7 +44,6 @@ import {NotificationService} from 'src/script/event/NotificationService';
 import {ConnectionService} from 'src/script/connection/ConnectionService';
 import {ConnectionRepository} from 'src/script/connection/ConnectionRepository';
 import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
-import {CryptographyService} from 'src/script/cryptography/CryptographyService';
 import {TeamRepository} from 'src/script/team/TeamRepository';
 import {SearchRepository} from 'src/script/search/SearchRepository';
 import {ConversationService} from 'src/script/conversation/ConversationService';
@@ -54,7 +52,6 @@ import {MessageRepository} from 'src/script/conversation/MessageRepository';
 import {SelfService} from 'src/script/self/SelfService';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {PropertiesService} from 'src/script/properties/PropertiesService';
-import {MessageSender} from 'src/script/message/MessageSender';
 import {UserService} from 'src/script/user/UserService';
 import {BackupService} from 'src/script/backup/BackupService';
 import {StorageService} from 'src/script/storage';
@@ -113,22 +110,13 @@ export class TestFactory {
   }
 
   /**
-   * @param {boolean} mockCryptobox do not initialize a full cryptobox (cryptobox initialization is a very costy operation)
    * @returns {Promise<CryptographyRepository>} The cryptography repository.
    */
-  async exposeCryptographyActors(mockCryptobox = true) {
-    const storageRepository = await this.exposeStorageActors();
+  async exposeCryptographyActors() {
+    await this.exposeStorageActors();
     const currentClient = new ClientEntity(true, null);
     currentClient.id = entities.clients.john_doe.permanent.id;
-    this.cryptography_service = new CryptographyService();
-
-    this.cryptography_repository = new CryptographyRepository(this.cryptography_service);
-
-    if (!mockCryptobox) {
-      const storeEngine = storageRepository.storageService['engine'];
-      this.cryptography_repository.init(new Cryptobox(storeEngine, 10), ko.observable(currentClient));
-      await this.cryptography_repository.cryptobox.create();
-    }
+    this.cryptography_repository = new CryptographyRepository();
 
     return this.cryptography_repository;
   }
@@ -294,7 +282,6 @@ export class TestFactory {
       () => this.conversation_repository,
       this.cryptography_repository,
       this.event_repository,
-      new MessageSender(),
       this.propertyRepository,
       serverTimeHandler,
       this.user_repository,

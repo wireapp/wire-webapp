@@ -26,7 +26,6 @@ import {container} from 'tsyringe';
 import {getLogger, Logger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
-import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
 import {AssetTransferState} from '../assets/AssetTransferState';
 
 import {EVENT_TYPE} from './EventType';
@@ -131,6 +130,7 @@ export class EventRepository {
   //##############################################################################
 
   private readonly updateConnectivitityStatus = (state: ConnectionState) => {
+    this.logger.log('Websocket connection state changed to', state);
     switch (state) {
       case ConnectionState.CONNECTING: {
         amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.NO_INTERNET);
@@ -186,7 +186,7 @@ export class EventRepository {
       // We make sure there is only be a single active connection to the WebSocket.
       this.disconnectWebSocket?.();
       return new Promise<void>(async resolve => {
-        this.disconnectWebSocket = await account.listen({
+        this.disconnectWebSocket = account.listen({
           onConnectionStateChanged: connectionState => {
             this.updateConnectivitityStatus(connectionState);
             if (connectionState === ConnectionState.LIVE) {
@@ -445,12 +445,6 @@ export class EventRepository {
         this.updateLastEventDate(eventDate as string);
       }
     }
-
-    const isCallEvent = event.type === ClientEvent.CALL.E_CALL;
-    if (isCallEvent) {
-      this.validateCallEventLifetime(event);
-    }
-
     return this.distributeEvent(event, source);
   }
 
@@ -653,39 +647,5 @@ export class EventRepository {
     const baseErrorMessage = 'Event validation failed:';
     this.logger.warn(`${baseLogMessage} ${logMessage || errorMessage}`, event);
     throw new EventError(EventError.TYPE.VALIDATION_FAILED, `${baseErrorMessage} ${errorMessage}`);
-  }
-
-  /**
-   * Check if call event is handled within its valid lifespan.
-   *
-   * @param event Event to validate
-   * @returns `true` if event is handled within it's lifetime, otherwise throws error
-   */
-  private validateCallEventLifetime(event: EventRecord): boolean {
-    const {content = {}, conversation: conversationId, time, type} = event;
-    const forcedEventTypes = [CALL_MESSAGE_TYPE.CANCEL, CALL_MESSAGE_TYPE.GROUP_LEAVE];
-
-    const correctedTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const thresholdTimestamp = new Date(time).getTime() + EventRepository.CONFIG.E_CALL_EVENT_LIFETIME;
-
-    const isForcedEventType = forcedEventTypes.includes((content as {type: CALL_MESSAGE_TYPE}).type);
-    const eventWithinThreshold = correctedTimestamp < thresholdTimestamp;
-    const stateIsWebSocket = this.notificationHandlingState() === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
-
-    const isValidEvent = isForcedEventType || eventWithinThreshold || stateIsWebSocket;
-    if (isValidEvent) {
-      return true;
-    }
-
-    const eventIsoDate = new Date(time).toISOString();
-    const logMessage = `Ignored outdated calling event '${type}' (${eventIsoDate}) in conversation '${conversationId}'`;
-    const logObject = {
-      eventJson: JSON.stringify(event),
-      eventObject: event,
-      eventTime: eventIsoDate,
-      localTime: new Date(correctedTimestamp).toISOString(),
-    };
-    this.logger.info(logMessage, logObject);
-    throw new EventError(EventError.TYPE.OUTDATED_E_CALL_EVENT, EventError.MESSAGE.OUTDATED_E_CALL_EVENT);
   }
 }

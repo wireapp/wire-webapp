@@ -26,15 +26,15 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {t} from 'Util/LocalizerUtil';
 
-import {ClientRepository} from '../client/ClientRepository';
-import {Config} from '../Config';
+import {ClientRepository} from '../../client/ClientRepository';
+import {Config} from '../../Config';
 import ModalComponent from 'Components/ModalComponent';
-import {SIGN_OUT_REASON} from '../auth/SignOutReason';
-import {ClientState} from '../client/ClientState';
-import {AppLockState} from '../user/AppLockState';
-import {AppLockRepository} from '../user/AppLockRepository';
+import {SIGN_OUT_REASON} from '../../auth/SignOutReason';
+import {ClientState} from '../../client/ClientState';
+import {AppLockState} from '../../user/AppLockState';
+import {AppLockRepository} from '../../user/AppLockRepository';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {ModalsViewModel} from '../view_model/ModalsViewModel';
+import {ModalsViewModel} from '../../view_model/ModalsViewModel';
 import Icon from 'Components/Icon';
 
 export enum APPLOCK_STATE {

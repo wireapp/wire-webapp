@@ -39,6 +39,13 @@ describe('when entering account data', () => {
         <AccountForm onSubmit={() => {}} />,
         mockStoreFactory()({
           ...initialRootState,
+          authState: {
+            account: {
+              email: '',
+              name: '',
+              password: '',
+            },
+          },
           runtimeState: {
             hasCookieSupport: true,
             hasIndexedDbSupport: true,

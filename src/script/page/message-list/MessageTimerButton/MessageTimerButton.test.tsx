@@ -18,25 +18,12 @@
  */
 
 import ko from 'knockout';
-import TestPage from 'Util/test/TestPage';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import MessageTimerButton, {MessageTimerButtonProps} from './MessageTimerButton';
-import type {Conversation} from '../../entity/Conversation';
-import * as Context from '../../ui/ContextMenu';
+import {MessageTimerButton} from './MessageTimerButton';
+import type {Conversation} from '../../../entity/Conversation';
+import * as Context from '../../../ui/ContextMenu';
 import {TeamState} from 'src/script/team/TeamState';
-
-class MessageTimerButtonPage extends TestPage<MessageTimerButtonProps> {
-  constructor(props?: MessageTimerButtonProps) {
-    super(MessageTimerButton, props);
-  }
-
-  getMessageTimerElement = () => this.get('[data-uie-name="do-set-ephemeral-timer"]');
-  clickMessageTimerElement = () => this.click(this.getMessageTimerElement());
-  getMessageTimerButton = () => this.get('[data-uie-name="message-timer-button"]');
-  getMessageTimerIcon = () => this.get('[data-uie-name="message-timer-icon"]');
-  getMessageTimerButtonSymbol = () => this.get('[data-uie-name="message-timer-button-symbol"]');
-  getMessageTimerButtonValue = () => this.get('[data-uie-name="message-timer-button-value"]');
-}
+import {render, fireEvent} from '@testing-library/react';
 
 describe('MessageTimerButton', () => {
   it('hides the timer button when the feature is disabled', () => {
@@ -49,13 +36,15 @@ describe('MessageTimerButton', () => {
       isSelfDeletingMessagesEnabled: ko.pureComputed(() => false),
     };
 
-    const messageTimerButtonPage = new MessageTimerButtonPage({
+    const props = {
       conversation: conversation as Conversation,
       teamState: mockTeamState as TeamState,
-    });
+    };
 
-    expect(messageTimerButtonPage.getMessageTimerButton()).toBeNull();
-    expect(messageTimerButtonPage.getMessageTimerIcon()).toBeNull();
+    const {queryByTestId} = render(<MessageTimerButton {...props} />);
+
+    expect(queryByTestId('message-timer-button')).toBeNull();
+    expect(queryByTestId('message-timer-icon')).toBeNull();
   });
 
   it('shows the inactive message timer button', () => {
@@ -68,13 +57,15 @@ describe('MessageTimerButton', () => {
       isSelfDeletingMessagesEnabled: ko.pureComputed(() => true),
     };
 
-    const messageTimerButtonPage = new MessageTimerButtonPage({
+    const props = {
       conversation: conversation as Conversation,
       teamState: mockTeamState as TeamState,
-    });
+    };
 
-    expect(messageTimerButtonPage.getMessageTimerButton()).toBeNull();
-    expect(messageTimerButtonPage.getMessageTimerIcon()).not.toBeNull();
+    const {queryByTestId} = render(<MessageTimerButton {...props} />);
+
+    expect(queryByTestId('message-timer-button')).toBeNull();
+    expect(queryByTestId('message-timer-icon')).not.toBeNull();
   });
 
   it('activates the context menu', () => {
@@ -89,15 +80,20 @@ describe('MessageTimerButton', () => {
       isSelfDeletingMessagesEnabled: ko.pureComputed(() => true),
     };
 
-    const messageTimerButtonPage = new MessageTimerButtonPage({
+    const props = {
       conversation: conversation as Conversation,
       teamState: mockTeamState as TeamState,
-    });
+    };
 
-    expect(messageTimerButtonPage.getMessageTimerElement().getAttribute('data-uie-value')).toBe('enabled');
+    const {getByTestId} = render(<MessageTimerButton {...props} />);
+
+    const messageTimerElement = getByTestId('do-set-ephemeral-timer');
+    expect(messageTimerElement.getAttribute('data-uie-value')).toBe('enabled');
 
     expect(Context.showContextMenu).toHaveBeenCalledTimes(0);
-    messageTimerButtonPage.clickMessageTimerElement();
+
+    fireEvent.click(messageTimerElement);
+
     expect(Context.showContextMenu).toHaveBeenCalledTimes(1);
   });
 
@@ -114,16 +110,19 @@ describe('MessageTimerButton', () => {
       isSelfDeletingMessagesEnabled: ko.pureComputed(() => true),
     };
 
-    const messageTimerButtonPage = new MessageTimerButtonPage({
+    const props = {
       conversation: conversation as Conversation,
       teamState: mockTeamState as TeamState,
-    });
+    };
 
-    expect(messageTimerButtonPage.getMessageTimerButton()).not.toBeNull();
-    expect(messageTimerButtonPage.getMessageTimerIcon()).toBeNull();
-    expect(messageTimerButtonPage.getMessageTimerButtonValue().textContent).toBe(minutes.toString());
-    expect(messageTimerButtonPage.getMessageTimerButtonSymbol().textContent).toBe('m');
-    expect(messageTimerButtonPage.getMessageTimerElement().getAttribute('data-uie-value')).toBe('enabled');
+    const {queryByTestId, getByText, getByTestId} = render(<MessageTimerButton {...props} />);
+
+    expect(queryByTestId('message-timer-button')).not.toBeNull();
+    expect(queryByTestId('message-timer-icon')).toBeNull();
+
+    expect(getByText(minutes.toString())).not.toBeNull();
+    expect(getByText('m')).not.toBeNull();
+    expect(getByTestId('do-set-ephemeral-timer').getAttribute('data-uie-value')).toBe('enabled');
   });
 
   it('shows the disabled message timer button when conversation message timer is set', () => {
@@ -139,16 +138,18 @@ describe('MessageTimerButton', () => {
       isSelfDeletingMessagesEnabled: ko.pureComputed(() => true),
     };
 
-    const messageTimerButtonPage = new MessageTimerButtonPage({
+    const props = {
       conversation: conversation as Conversation,
       teamState: mockTeamState as TeamState,
-    });
+    };
 
-    expect(messageTimerButtonPage.getMessageTimerButton()).not.toBeNull();
-    expect(messageTimerButtonPage.getMessageTimerIcon()).toBeNull();
-    expect(messageTimerButtonPage.getMessageTimerButtonValue().textContent).toBe(minutes.toString());
-    expect(messageTimerButtonPage.getMessageTimerButtonSymbol().textContent).toBe('m');
-    expect(messageTimerButtonPage.getMessageTimerElement().getAttribute('data-uie-value')).toBe('disabled');
+    const {queryByTestId, getByText, getByTestId} = render(<MessageTimerButton {...props} />);
+
+    expect(queryByTestId('message-timer-button')).not.toBeNull();
+    expect(queryByTestId('message-timer-icon')).toBeNull();
+    expect(getByText(minutes.toString())).not.toBeNull();
+    expect(getByText('m')).not.toBeNull();
+    expect(getByTestId('do-set-ephemeral-timer').getAttribute('data-uie-value')).toBe('disabled');
   });
 
   it('shows the disabled message timer button when team message timer is enforced', () => {
@@ -165,16 +166,18 @@ describe('MessageTimerButton', () => {
       isSelfDeletingMessagesEnforced: ko.pureComputed(() => true),
     };
 
-    const messageTimerButtonPage = new MessageTimerButtonPage({
+    const props = {
       conversation: conversation as Conversation,
       teamState: mockTeamState as TeamState,
-    });
+    };
 
-    expect(messageTimerButtonPage.getMessageTimerButton()).not.toBeNull();
-    expect(messageTimerButtonPage.getMessageTimerIcon()).toBeNull();
-    expect(messageTimerButtonPage.getMessageTimerButtonValue().textContent).toBe(minutes.toString());
-    expect(messageTimerButtonPage.getMessageTimerButtonSymbol().textContent).toBe('m');
-    expect(messageTimerButtonPage.getMessageTimerElement().getAttribute('data-uie-value')).toBe('disabled');
+    const {queryByTestId, getByText, getByTestId} = render(<MessageTimerButton {...props} />);
+
+    expect(queryByTestId('message-timer-button')).not.toBeNull();
+    expect(queryByTestId('message-timer-icon')).toBeNull();
+    expect(getByText(minutes.toString())).not.toBeNull();
+    expect(getByText('m')).not.toBeNull();
+    expect(getByTestId('do-set-ephemeral-timer').getAttribute('data-uie-value')).toBe('disabled');
   });
 
   it(`doesn't activate the context menu on a disabled message timer button`, () => {
@@ -191,15 +194,19 @@ describe('MessageTimerButton', () => {
       isSelfDeletingMessagesEnabled: ko.pureComputed(() => true),
     };
 
-    const messageTimerButtonPage = new MessageTimerButtonPage({
+    const props = {
       conversation: conversation as Conversation,
       teamState: mockTeamState as TeamState,
-    });
+    };
 
-    expect(messageTimerButtonPage.getMessageTimerElement().getAttribute('data-uie-value')).toBe('disabled');
+    const {getByTestId} = render(<MessageTimerButton {...props} />);
+
+    const messageTimerElement = getByTestId('do-set-ephemeral-timer');
+    expect(messageTimerElement.getAttribute('data-uie-value')).toBe('disabled');
 
     expect(Context.showContextMenu).toHaveBeenCalledTimes(0);
-    messageTimerButtonPage.clickMessageTimerElement();
+
+    fireEvent.click(messageTimerElement);
     expect(Context.showContextMenu).toHaveBeenCalledTimes(0);
   });
 });

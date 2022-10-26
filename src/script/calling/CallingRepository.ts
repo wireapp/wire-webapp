@@ -74,7 +74,7 @@ import type {User} from '../entity/User';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import type {UserRepository} from '../user/UserRepository';
 import type {EventRecord} from '../storage';
-import type {EventSource} from '../event/EventSource';
+import {EventSource} from '../event/EventSource';
 import {CONSENT_TYPE, MessageRepository, MessageSendingOptions} from '../conversation/MessageRepository';
 import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import {NoAudioInputError} from '../error/NoAudioInputError';
@@ -85,6 +85,8 @@ import Warnings from '../view_model/WarningsContainer';
 import {PayloadBundleState} from '@wireapp/core/src/main/conversation';
 import {Core} from '../service/CoreSingleton';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
+
+const avsLogger = getLogger('avs');
 
 interface MediaStreamQuery {
   audio?: boolean;
@@ -233,7 +235,18 @@ export class CallingRepository {
   }
 
   private configureCallingApi(wCall: Wcall): Wcall {
-    const avsLogger = getLogger('avs');
+    wCall.setLogHandler(this.avsLogHandler);
+
+    const avsEnv = Runtime.isFirefox() ? AVS_ENV.FIREFOX : AVS_ENV.DEFAULT;
+    wCall.init(avsEnv);
+    wCall.setUserMediaHandler(this.getCallMediaStream);
+    wCall.setAudioStreamHandler(this.updateCallAudioStreams);
+    wCall.setVideoStreamHandler(this.updateParticipantVideoStream);
+    setInterval(() => wCall.poll(), 500);
+    return wCall;
+  }
+
+  private readonly avsLogHandler = (level: LOG_LEVEL, message: string, error: Error | unknown) => {
     const logLevels: Record<LOG_LEVEL, string> = {
       [LOG_LEVEL.DEBUG]: 'DEBUG',
       [LOG_LEVEL.INFO]: 'INFO ',
@@ -246,21 +259,10 @@ export class CallingRepository {
       [LOG_LEVEL.WARN]: avsLogger.warn,
       [LOG_LEVEL.ERROR]: avsLogger.error,
     };
-
-    wCall.setLogHandler((level: LOG_LEVEL, message: string, error: Error) => {
-      const trimmedMessage = message.trim();
-      logFunctions[level].call(avsLogger, trimmedMessage, error);
-      this.callLog.push(`${new Date().toISOString()} [${logLevels[level]}] ${trimmedMessage}`);
-    });
-
-    const avsEnv = Runtime.isFirefox() ? AVS_ENV.FIREFOX : AVS_ENV.DEFAULT;
-    wCall.init(avsEnv);
-    wCall.setUserMediaHandler(this.getCallMediaStream);
-    wCall.setAudioStreamHandler(this.updateCallAudioStreams);
-    wCall.setVideoStreamHandler(this.updateParticipantVideoStream);
-    setInterval(() => wCall.poll(), 500);
-    return wCall;
-  }
+    const trimmedMessage = message.trim();
+    logFunctions[level].call(avsLogger, trimmedMessage, error);
+    this.callLog.push(`${new Date().toISOString()} [${logLevels[level]}] ${trimmedMessage}`);
+  };
 
   private createWUser(wCall: Wcall, selfUserId: string, selfClientId: string): number {
     /* cspell:disable */
@@ -271,8 +273,8 @@ export class CallingRepository {
       this.sendMessage, // `sendh`,
       this.sendSFTRequest, // `sfth`
       this.incomingCall, // `incomingh`,
-      () => {}, // `missedh`,
-      () => {}, // `answerh`,
+      this.handleMissedCall, // `missedh`,
+      () => {}, // `answer
       () => {}, // `estabh`,
       this.callClosed, // `closeh`,
       () => {}, // `metricsh`,
@@ -292,6 +294,18 @@ export class CallingRepository {
     return wUser;
   }
 
+  private readonly handleMissedCall = (conversationId: string, timestamp: number, userId: string) => {
+    const callDuration = 0;
+    this.injectDeactivateEvent(
+      this.parseQualifiedId(conversationId),
+      this.parseQualifiedId(userId),
+      callDuration,
+      REASON.CANCELED,
+      new Date(timestamp * 1000).toISOString(),
+      EventSource.INJECTED,
+    );
+  };
+
   private readonly updateMuteState = (isMuted: number) => {
     const activeStates = [CALL_STATE.MEDIA_ESTAB, CALL_STATE.ANSWERED, CALL_STATE.OUTGOING];
     const activeCall = this.callState.calls().find(call => activeStates.includes(call.state()));
@@ -307,7 +321,7 @@ export class CallingRepository {
     const {id, domain} = call.conversationId;
     const allClients = conversation.isUsingMLSProtocol
       ? await this.core.service!.conversation.fetchAllParticipantsClients(id, domain)
-      : await this.core.service!.conversation.getAllParticipantsClients(id, domain);
+      : await this.core.service!.conversation.getAllParticipantsClients(call.conversationId);
     const qualifiedClients = isQualifiedUserClients(allClients)
       ? flattenQualifiedUserClients(allClients)
       : flattenUserClients(allClients);
@@ -559,6 +573,7 @@ export class CallingRepository {
       qualified_from,
       sender: clientId,
       time = new Date().toISOString(),
+      senderClientId: senderFullyQualifiedClientId = '',
     } = event;
     const isFederated = this.core.backendFeatures.isFederated && qualified_conversation && qualified_from;
     const userId = isFederated ? qualified_from : {domain: '', id: from};
@@ -572,28 +587,13 @@ export class CallingRepository {
       this.logger.warn(`Unable to find a conversation with id of ${conversationId}`);
       return;
     }
-
     switch (content.type) {
-      case CALL_MESSAGE_TYPE.GROUP_LEAVE: {
-        const isAnotherSelfClient =
-          this.selfUser && matchQualifiedIds(userId, this.selfUser.qualifiedId) && clientId !== this.selfClientId;
-        if (isAnotherSelfClient) {
-          const call = this.findCall(conversationId);
-          if (call?.state() === CALL_STATE.INCOMING) {
-            // If the group leave was sent from the self user from another device,
-            // we reset the reason so that the call is not shown in the UI.
-            // If the call is already accepted, we keep the call UI.
-            call.reason(REASON.STILL_ONGOING);
-          }
-        }
-        break;
-      }
       case CALL_MESSAGE_TYPE.CONFKEY: {
         if (source !== EventRepository.SOURCE.STREAM) {
           const {id, domain} = conversationId;
           const allClients = conversationEntity.isUsingMLSProtocol
             ? await this.core.service!.conversation.fetchAllParticipantsClients(id, domain)
-            : await this.core.service!.conversation.getAllParticipantsClients(id, domain);
+            : await this.core.service!.conversation.getAllParticipantsClients(conversationId);
           // We warn the message repository that a mismatch has happened outside of its lifecycle (eventually triggering a conversation degradation)
           const shouldContinue = await this.messageRepository.updateMissingClients(
             conversationEntity,
@@ -620,6 +620,11 @@ export class CallingRepository {
       }
     }
 
+    let senderClientId = '';
+    if (senderFullyQualifiedClientId) {
+      senderClientId = this.parseQualifiedId(senderFullyQualifiedClientId).id.split(':')[1];
+    }
+
     const res = this.wCall?.recvMsg(
       this.wUser,
       contentStr,
@@ -628,7 +633,7 @@ export class CallingRepository {
       toSecond(new Date(time).getTime()),
       this.serializeQualifiedId(conversationId),
       this.serializeQualifiedId(userId),
-      conversationEntity?.isUsingMLSProtocol ? content.src_clientid : clientId,
+      conversationEntity?.isUsingMLSProtocol ? senderClientId : clientId,
     );
 
     if (res !== 0) {
@@ -640,32 +645,8 @@ export class CallingRepository {
       ) {
         this.warnOutdatedClient(conversationId);
       }
-      return;
     }
-    return this.handleCallEventSaving(content.type, conversationId, userId, time, source);
   };
-
-  private handleCallEventSaving(
-    type: string,
-    conversationId: QualifiedId,
-    userId: QualifiedId,
-    time: string,
-    source: string,
-  ): void {
-    // save event if needed
-    switch (type) {
-      case CALL_MESSAGE_TYPE.SETUP:
-      case CALL_MESSAGE_TYPE.CONF_START:
-      case CALL_MESSAGE_TYPE.GROUP_START:
-        const activeCall = this.findCall(conversationId);
-        const ignoreNotificationStates = [CALL_STATE.MEDIA_ESTAB, CALL_STATE.ANSWERED, CALL_STATE.OUTGOING];
-        if (!activeCall || !ignoreNotificationStates.includes(activeCall.state())) {
-          // we want to ignore call start events that already have an active call (whether it's ringing or connected).
-          this.injectActivateEvent(conversationId, userId, time, source);
-        }
-        break;
-    }
-  }
 
   //##############################################################################
   // Call actions
@@ -1052,9 +1033,9 @@ export class CallingRepository {
     return recipients;
   }
 
-  private injectActivateEvent(conversationId: QualifiedId, userId: QualifiedId, time: string, source: string): void {
+  private injectActivateEvent(conversationId: QualifiedId, userId: QualifiedId, time: string): void {
     const event = EventBuilder.buildVoiceChannelActivate(conversationId, userId, time, this.avsVersion);
-    this.eventRepository.injectEvent(event as unknown as EventRecord, source as EventSource);
+    this.eventRepository.injectEvent(event as unknown as EventRecord, EventSource.INJECTED);
   }
 
   private injectDeactivateEvent(
@@ -1063,7 +1044,7 @@ export class CallingRepository {
     duration: number,
     reason: REASON,
     time: string,
-    source: string,
+    source: EventSource,
   ): void {
     const event = EventBuilder.buildVoiceChannelDeactivate(
       conversationId,
@@ -1186,11 +1167,17 @@ export class CallingRepository {
     _: number,
   ): number => {
     (async () => {
-      const response = await axios.post(url, data);
+      try {
+        const response = await axios.post(url, data);
 
-      const {status, data: axiosData} = response;
-      const jsonData = JSON.stringify(axiosData);
-      this.wCall?.sftResp(this.wUser!, status, jsonData, jsonData.length, context);
+        const {status, data: axiosData} = response;
+        const jsonData = JSON.stringify(axiosData);
+        this.wCall?.sftResp(this.wUser!, status, jsonData, jsonData.length, context);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : error;
+        this.avsLogHandler(LOG_LEVEL.WARN, `Request to sft server failed with error: ${message}`, error);
+        avsLogger.warn(`Request to sft server failed with error`, error);
+      }
     })();
 
     return 0;
@@ -1277,7 +1264,7 @@ export class CallingRepository {
         call.startedAt() ? Date.now() - (call.startedAt() || 0) : 0,
         reason,
         new Date().toISOString(),
-        EventRepository.SOURCE.WEB_SOCKET,
+        EventSource.WEBSOCKET,
       );
       this.removeCall(call);
       return;
@@ -1334,6 +1321,7 @@ export class CallingRepository {
     shouldRing: number,
     conversationType: CONV_TYPE,
   ) => {
+    const qualifiedUserId = this.parseQualifiedId(userId);
     const conversationId = this.parseQualifiedId(convId);
     const conversation = this.conversationState.findConversation(conversationId);
     if (!conversation || !this.selfUser || !this.selfClientId) {
@@ -1354,7 +1342,7 @@ export class CallingRepository {
     const isVideoCall = hasVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
     const isMuted = Config.getConfig().FEATURE.CONFERENCE_AUTO_MUTE && conversationType === CONV_TYPE.CONFERENCE;
     const call = new Call(
-      this.parseQualifiedId(userId),
+      qualifiedUserId,
       conversation.qualifiedId,
       conversationType,
       selfParticipant,
@@ -1370,6 +1358,7 @@ export class CallingRepository {
     if (canRing && isVideoCall) {
       this.warmupMediaStreams(call, true, true);
     }
+    this.injectActivateEvent(conversationId, qualifiedUserId, new Date(timestamp * 1000).toISOString());
 
     this.storeCall(call);
     this.incomingCallCallback(call);

@@ -17,9 +17,10 @@
  *
  */
 
+import type {Config} from 'jest';
 process.env.TZ = 'UTC';
 
-module.exports = {
+const config: Config = {
   collectCoverageFrom: ['src/script/**/*.{ts,tsx}', '!src/script/util/test/**/*.*'],
   moduleDirectories: ['node_modules', __dirname],
   // Must be in sync with tsconfig.json >> paths
@@ -30,6 +31,7 @@ module.exports = {
     'Util/(.*)': '<rootDir>/src/script/util/$1',
     '^react(.*)$': '<rootDir>/node_modules/react$1',
   },
+  reporters: ['default', 'github-actions'],
   setupFilesAfterEnv: ['<rootDir>/setupTests.js'],
   testEnvironment: 'jsdom',
   testEnvironmentOptions: {
@@ -39,3 +41,5 @@ module.exports = {
   testRegex: '(test|Spec)\\.[tj]sx?$',
   testRunner: 'jest-jasmine2',
 };
+
+export default config;

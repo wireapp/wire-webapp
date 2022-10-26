@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2019 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,24 +17,4 @@
  *
  */
 
-import {PromiseFn, PromiseQueue} from 'Util/PromiseQueue';
-
-export class MessageSender {
-  private readonly sendingQueue: PromiseQueue;
-
-  constructor() {
-    this.sendingQueue = new PromiseQueue({name: 'MessageSender', paused: true});
-  }
-
-  get queuedMessages(): number {
-    return this.sendingQueue.getLength();
-  }
-
-  queueMessage<T>(sendingFunction: PromiseFn<T>): Promise<T> {
-    return this.sendingQueue.push(sendingFunction);
-  }
-
-  pauseQueue(pauseState: boolean): void {
-    this.sendingQueue.pause(pauseState);
-  }
-}
+export * from './AssetUploadButton';

@@ -246,7 +246,7 @@ export class CryptographyMapper {
       }
     }
 
-    const {conversation, qualified_conversation, from, qualified_from} = event;
+    const {conversation, qualified_conversation, from, qualified_from, senderClientId} = event;
     const genericContent = {
       conversation,
       from,
@@ -254,6 +254,7 @@ export class CryptographyMapper {
       id: genericMessage.messageId,
       qualified_conversation,
       qualified_from,
+      senderClientId,
       status: event.status,
       time: event.time,
     };
@@ -360,7 +361,7 @@ export class CryptographyMapper {
   _mapAssetMetaData(original: Asset.IOriginal): MappedAssetMetaData | undefined {
     const audioData = original.audio;
     if (audioData) {
-      const loudnessArray = audioData.normalizedLoudness ? audioData.normalizedLoudness.buffer : new ArrayBuffer(0);
+      const loudnessArray = audioData.normalizedLoudness || new ArrayBuffer(0);
       const durationInSeconds = audioData.durationInMillis
         ? Number(audioData.durationInMillis) / TIME_IN_MILLIS.SECOND
         : 0;
