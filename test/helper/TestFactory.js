@@ -23,7 +23,6 @@
 
 // Polyfill for "tsyringe" dependency injection
 import {ClientClassification, ClientType} from '@wireapp/api-client/src/client/';
-import {Cryptobox} from '@wireapp/cryptobox';
 import 'core-js/full/reflect';
 import ko from 'knockout';
 import {container} from 'tsyringe';
@@ -44,7 +43,6 @@ import {ConversationService} from 'src/script/conversation/ConversationService';
 import {ConversationState} from 'src/script/conversation/ConversationState';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
 import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
-import {CryptographyService} from 'src/script/cryptography/CryptographyService';
 import {User} from 'src/script/entity/User';
 import {EventRepository} from 'src/script/event/EventRepository';
 import {EventService} from 'src/script/event/EventService';
@@ -113,22 +111,13 @@ export class TestFactory {
   }
 
   /**
-   * @param {boolean} mockCryptobox do not initialize a full cryptobox (cryptobox initialization is a very costy operation)
    * @returns {Promise<CryptographyRepository>} The cryptography repository.
    */
-  async exposeCryptographyActors(mockCryptobox = true) {
-    const storageRepository = await this.exposeStorageActors();
+  async exposeCryptographyActors() {
+    await this.exposeStorageActors();
     const currentClient = new ClientEntity(true, null);
     currentClient.id = entities.clients.john_doe.permanent.id;
-    this.cryptography_service = new CryptographyService();
-
-    this.cryptography_repository = new CryptographyRepository(this.cryptography_service);
-
-    if (!mockCryptobox) {
-      const storeEngine = storageRepository.storageService['engine'];
-      this.cryptography_repository.init(new Cryptobox(storeEngine, 10), ko.observable(currentClient));
-      await this.cryptography_repository.cryptobox.create();
-    }
+    this.cryptography_repository = new CryptographyRepository();
 
     return this.cryptography_repository;
   }

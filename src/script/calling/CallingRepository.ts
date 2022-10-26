@@ -572,6 +572,7 @@ export class CallingRepository {
       qualified_from,
       sender: clientId,
       time = new Date().toISOString(),
+      senderClientId: senderFullyQualifiedClientId = '',
     } = event;
     const isFederated = this.core.backendFeatures.isFederated && qualified_conversation && qualified_from;
     const userId = isFederated ? qualified_from : {domain: '', id: from};
@@ -619,6 +620,11 @@ export class CallingRepository {
       }
     }
 
+    let senderClientId = '';
+    if (senderFullyQualifiedClientId) {
+      senderClientId = this.parseQualifiedId(senderFullyQualifiedClientId).id.split(':')[1];
+    }
+
     const res = this.wCall?.recvMsg(
       this.wUser,
       contentStr,
@@ -627,7 +633,7 @@ export class CallingRepository {
       toSecond(new Date(time).getTime()),
       this.serializeQualifiedId(conversationId),
       this.serializeQualifiedId(userId),
-      conversationEntity?.isUsingMLSProtocol ? content.src_clientid : clientId,
+      conversationEntity?.isUsingMLSProtocol ? senderClientId : clientId,
     );
 
     if (res !== 0) {

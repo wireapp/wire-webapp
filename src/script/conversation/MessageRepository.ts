@@ -273,6 +273,7 @@ export class MessageRepository {
         conversation,
         {mentions, quote},
       ),
+      messageId,
     );
 
     return this.sendAndInjectMessage(editMessage, conversation, {syncTimestamp: false});

@@ -75,6 +75,7 @@ export interface CallingEvent {
   sender: string;
   time?: string;
   type: CALL;
+  senderClientId?: string;
 }
 
 export interface BackendEventMessage<T> extends Omit<BaseEvent, 'id'> {
