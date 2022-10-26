@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.0.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.0.0...@wireapp/react-ui-kit@9.0.1) (2022-10-26)
+
+### Bug Fixes
+
+* build with tsc ([#4565](https://github.com/wireapp/wire-web-packages/issues/4565)) ([ef7ae0a](https://github.com/wireapp/wire-web-packages/commit/ef7ae0a8664b7111ee32089496f9efc12def4df8))
+
 # [9.0.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@8.17.10...@wireapp/react-ui-kit@9.0.0) (2022-10-26)
 
 ### Code Refactoring
