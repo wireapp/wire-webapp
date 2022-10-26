@@ -121,6 +121,7 @@ import {Core} from '../service/CoreSingleton';
 import {migrateToQualifiedSessionIds} from './sessionIdMigrator';
 import showUserModal from 'Components/Modals/UserModal';
 import {mlsConversationState} from '../mls/mlsConversationState';
+import {BackendError} from '../auth/module/action/BackendError';
 
 function doRedirect(signOutReason: SIGN_OUT_REASON) {
   let url = `/auth/${location.search}`;
@@ -400,6 +401,7 @@ class App {
           },
         });
       } catch (error) {
+        throw new BackendError(error);
         throw new ClientError(CLIENT_ERROR_TYPE.NO_VALID_CLIENT, 'Client has been deleted on backend');
       }
 
