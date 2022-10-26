@@ -22,7 +22,7 @@ import ko from 'knockout';
 import {container} from 'tsyringe';
 
 import {t} from 'Util/LocalizerUtil';
-import {Logger, getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 import {compareTransliteration, sortByPriority} from 'Util/StringUtil';
 
 import {IntegrationMapper} from './IntegrationMapper';

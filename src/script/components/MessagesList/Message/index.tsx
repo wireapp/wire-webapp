@@ -18,8 +18,8 @@
  */
 
 import React, {
-  MouseEvent as ReactMouseEvent,
   KeyboardEvent as ReactKeyboardEvent,
+  MouseEvent as ReactMouseEvent,
   useLayoutEffect,
   useRef,
 } from 'react';

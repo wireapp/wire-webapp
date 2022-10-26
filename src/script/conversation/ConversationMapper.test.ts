@@ -18,10 +18,10 @@
  */
 
 import {
-  CONVERSATION_TYPE,
+  Conversation as ConversationBackendData,
   CONVERSATION_ACCESS,
   CONVERSATION_ACCESS_ROLE,
-  Conversation as ConversationBackendData,
+  CONVERSATION_TYPE,
   Member as MemberBackendData,
   OtherMember as OtherMemberBackendData,
   RemoteConversations,

@@ -28,8 +28,8 @@ import type {
   TeamUpdateEvent,
 } from '@wireapp/api-client/lib/event';
 import {TEAM_EVENT} from '@wireapp/api-client/lib/event/TeamEvent';
-import {FeatureStatus, FEATURE_KEY, SelfDeletingTimeout} from '@wireapp/api-client/lib/team/feature/';
 import type {FeatureList} from '@wireapp/api-client/lib/team/feature/';
+import {FeatureStatus, FEATURE_KEY, SelfDeletingTimeout} from '@wireapp/api-client/lib/team/feature/';
 import type {TeamData} from '@wireapp/api-client/lib/team/team/TeamData';
 import {Runtime} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
@@ -39,7 +39,7 @@ import {container} from 'tsyringe';
 
 import {Environment} from 'Util/Environment';
 import {replaceLink, t} from 'Util/LocalizerUtil';
-import {Logger, getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 import {formatDuration, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {loadDataUrl} from 'Util/util';
 
@@ -58,7 +58,7 @@ import {EventSource} from '../event/EventSource';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {IntegrationMapper} from '../integration/IntegrationMapper';
 import {ServiceEntity} from '../integration/ServiceEntity';
-import {roleFromTeamPermissions, ROLE, ROLE as TEAM_ROLE} from '../user/UserPermission';
+import {ROLE, ROLE as TEAM_ROLE, roleFromTeamPermissions} from '../user/UserPermission';
 import {UserRepository} from '../user/UserRepository';
 import {UserState} from '../user/UserState';
 

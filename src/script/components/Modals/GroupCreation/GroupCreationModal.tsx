@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useContext, useEffect, useState, useMemo} from 'react';
+import React, {useContext, useEffect, useMemo, useState} from 'react';
 
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/ConversationReceiptModeUpdateData';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
@@ -35,7 +35,7 @@ import {BaseToggle} from 'Components/toggle/BaseToggle';
 import {InfoToggle} from 'Components/toggle/InfoToggle';
 import {UserSearchableList} from 'Components/UserSearchableList';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {onEscKey, offEscKey, handleEnterDown} from 'Util/KeyboardUtil';
+import {handleEnterDown, offEscKey, onEscKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {sortUsersByPriority} from 'Util/StringUtil';

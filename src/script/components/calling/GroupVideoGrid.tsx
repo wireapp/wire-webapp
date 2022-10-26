@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useState, useEffect, CSSProperties} from 'react';
+import React, {CSSProperties, useEffect, useState} from 'react';
 
 import {css} from '@emotion/react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';

@@ -30,6 +30,7 @@ module.exports = {
     'Util/(.*)': '<rootDir>/src/script/util/$1',
     '^react(.*)$': '<rootDir>/node_modules/react$1',
   },
+  reporters: ['default', 'github-actions'],
   setupFilesAfterEnv: ['<rootDir>/setupTests.js'],
   testEnvironment: 'jsdom',
   testEnvironmentOptions: {

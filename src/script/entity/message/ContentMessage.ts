@@ -35,7 +35,7 @@ import {AssetRepository} from '../../assets/AssetRepository';
 import type {QuoteEntity} from '../../message/QuoteEntity';
 import {SuperType} from '../../message/SuperType';
 import {UserReactionMap} from '../../storage';
-import type {User} from '../User';
+import {User} from '../User';
 
 export class ContentMessage extends Message {
   private readonly isLikedProvisional: ko.Observable<boolean>;

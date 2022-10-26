@@ -46,6 +46,7 @@ import {amplify} from 'amplify';
 import axios from 'axios';
 import ko from 'knockout';
 import {container} from 'tsyringe';
+
 import 'webrtc-adapter';
 
 import {flatten} from 'Util/ArrayUtil';

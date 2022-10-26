@@ -27,11 +27,11 @@ import ko from 'knockout';
 import {container} from 'tsyringe';
 
 import {Declension, t} from 'Util/LocalizerUtil';
-import {Logger, getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 import {getRenderedTextContent} from 'Util/messageRenderer';
 import {getUserName} from 'Util/SanitizationUtil';
 import {truncate} from 'Util/StringUtil';
-import {TIME_IN_MILLIS, formatDuration} from 'Util/TimeUtil';
+import {formatDuration, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {ValidationUtilError} from 'Util/ValidationUtil';
 
 import {PermissionState} from './PermissionState';

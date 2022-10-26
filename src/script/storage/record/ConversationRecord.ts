@@ -19,10 +19,10 @@
 
 import {
   ACCESS_ROLE_V2,
-  DefaultConversationRoleName,
   CONVERSATION_ACCESS,
   CONVERSATION_ACCESS_ROLE,
   CONVERSATION_TYPE,
+  DefaultConversationRoleName,
 } from '@wireapp/api-client/lib/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';

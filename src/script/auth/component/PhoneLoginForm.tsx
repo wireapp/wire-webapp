@@ -26,9 +26,9 @@ import {
   InputBlock,
   InputSubmitCombo,
   Loading,
-  QUERY,
   RoundIconButton,
   Select,
+  QUERY,
   useMatchMedia,
 } from '@wireapp/react-ui-kit';
 import {useIntl} from 'react-intl';

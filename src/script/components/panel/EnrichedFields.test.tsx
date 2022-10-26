@@ -17,7 +17,7 @@
  *
  */
 
-import {waitFor, render} from '@testing-library/react';
+import {render, waitFor} from '@testing-library/react';
 import type {RichInfo} from '@wireapp/api-client/lib/user/';
 import {act} from 'react-dom/test-utils';
 

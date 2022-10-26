@@ -242,9 +242,11 @@ class Server {
           };
           this.server = https
             .createServer(options, this.app)
-            .listen(this.config.SERVER.PORT_HTTP, () => resolve(this.config.SERVER.PORT_HTTP));
+            .listen(this.config.SERVER.PORT_HTTP, '0.0.0.0', () => resolve(this.config.SERVER.PORT_HTTP));
         } else {
-          this.server = this.app.listen(this.config.SERVER.PORT_HTTP, () => resolve(this.config.SERVER.PORT_HTTP));
+          this.server = this.app.listen(this.config.SERVER.PORT_HTTP, '0.0.0.0', () =>
+            resolve(this.config.SERVER.PORT_HTTP),
+          );
         }
       } else {
         reject('Server port not specified.');

@@ -17,8 +17,8 @@
  *
  */
 
-import {ClientType, PublicClient, RegisteredClient, ClientCapability} from '@wireapp/api-client/lib/client/';
-import {USER_EVENT, UserClientAddEvent, UserClientRemoveEvent} from '@wireapp/api-client/lib/event';
+import {ClientCapability, ClientType, PublicClient, RegisteredClient} from '@wireapp/api-client/lib/client/';
+import {UserClientAddEvent, UserClientRemoveEvent, USER_EVENT} from '@wireapp/api-client/lib/event';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -29,7 +29,7 @@ import murmurhash from 'murmurhash';
 import {container} from 'tsyringe';
 
 import {t} from 'Util/LocalizerUtil';
-import {Logger, getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {loadValue} from 'Util/StorageUtil';
 

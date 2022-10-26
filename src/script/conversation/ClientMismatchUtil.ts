@@ -20,8 +20,8 @@
 import type {
   ClientMismatch,
   MessageSendingStatus,
-  UserClients,
   QualifiedUserClients,
+  UserClients,
 } from '@wireapp/api-client/lib/conversation/';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {flattenQualifiedUserClients, flattenUserClients} from '@wireapp/core/lib/conversation/message/UserClientsUtil';

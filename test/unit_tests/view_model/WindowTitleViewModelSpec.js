@@ -17,11 +17,14 @@
  *
  */
 
-import 'src/script/localization/Localizer';
-
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
+
+import {setStrings, t} from 'Util/LocalizerUtil';
+import {createRandomUuid} from 'Util/util';
+
+import 'src/script/localization/Localizer';
 
 import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
 import {Conversation} from 'src/script/entity/Conversation';
@@ -29,8 +32,6 @@ import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {User} from 'src/script/entity/User';
 import {ContentState} from 'src/script/view_model/ContentViewModel';
 import {WindowTitleViewModel} from 'src/script/view_model/WindowTitleViewModel';
-import {t, setStrings} from 'Util/LocalizerUtil';
-import {createRandomUuid} from 'Util/util';
 
 import {TestFactory} from '../../helper/TestFactory';
 

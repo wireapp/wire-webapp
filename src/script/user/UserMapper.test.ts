@@ -22,7 +22,7 @@ import {UserAsset, UserAssetType} from '@wireapp/api-client/lib/user';
 import {ACCENT_ID, Config} from 'src/script/Config';
 import {User} from 'src/script/entity/User';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
-import {payload, entities} from 'test/api/payloads';
+import {entities, payload} from 'test/api/payloads';
 import {createRandomUuid} from 'Util/util';
 
 import {UserMapper} from './UserMapper';

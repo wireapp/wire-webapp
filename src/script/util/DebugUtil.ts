@@ -20,11 +20,11 @@
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
 import {
-  CONVERSATION_EVENT,
-  USER_EVENT,
   BackendEvent,
   ConversationEvent,
   ConversationOtrMessageAddEvent,
+  CONVERSATION_EVENT,
+  USER_EVENT,
 } from '@wireapp/api-client/lib/event/';
 import type {Notification} from '@wireapp/api-client/lib/notification/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';

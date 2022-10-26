@@ -26,7 +26,7 @@ import ko from 'knockout';
 
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
-import {Logger, getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 
 import type {PropertiesService} from './PropertiesService';
 import {PROPERTIES_TYPE} from './PropertiesType';

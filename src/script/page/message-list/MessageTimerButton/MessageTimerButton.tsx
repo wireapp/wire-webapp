@@ -30,7 +30,7 @@ import {showContextMenu} from 'src/script/ui/ContextMenu';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
-import {formatDuration, DurationUnit} from 'Util/TimeUtil';
+import {DurationUnit, formatDuration} from 'Util/TimeUtil';
 import {setContextMenuPosition} from 'Util/util';
 
 export interface MessageTimerButtonProps {

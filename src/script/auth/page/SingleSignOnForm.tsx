@@ -21,9 +21,9 @@ import React, {useEffect, useRef, useState} from 'react';
 
 import {ClientType} from '@wireapp/api-client/lib/client/index';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
-import {UrlUtil, Runtime} from '@wireapp/commons';
+import {Runtime, UrlUtil} from '@wireapp/commons';
 import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
-import {PATTERN, isValidEmail} from '@wireapp/commons/lib/util/ValidationUtil';
+import {isValidEmail, PATTERN} from '@wireapp/commons/lib/util/ValidationUtil';
 import {
   ArrowIcon,
   Checkbox,
@@ -33,12 +33,12 @@ import {
   Input,
   InputBlock,
   InputSubmitCombo,
-  RoundIconButton,
   Loading,
+  RoundIconButton,
 } from '@wireapp/react-ui-kit';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {useNavigate, Navigate} from 'react-router-dom';
+import {Navigate, useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
 import {Config} from '../../Config';
@@ -46,7 +46,7 @@ import {loginStrings, logoutReasonStrings, ssoLoginStrings} from '../../strings'
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {BackendError} from '../module/action/BackendError';
 import {ValidationError} from '../module/action/ValidationError';
-import {RootState, bindActionCreators} from '../module/reducer';
+import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import {QUERY_KEY, ROUTE} from '../route';

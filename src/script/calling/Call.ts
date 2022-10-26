@@ -27,7 +27,7 @@ import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {MuteState} from './CallState';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
-import type {Participant, ClientId} from './Participant';
+import type {ClientId, Participant} from './Participant';
 
 import {Config} from '../Config';
 import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';

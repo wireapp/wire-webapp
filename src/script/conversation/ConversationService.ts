@@ -18,18 +18,18 @@
  */
 
 import type {
-  CONVERSATION_ACCESS,
   ACCESS_ROLE_V2,
   ClientMismatch,
   Conversation as BackendConversation,
   ConversationCode,
+  CONVERSATION_ACCESS,
   NewOTRMessage,
 } from '@wireapp/api-client/lib/conversation';
 import type {
+  ConversationJoinData,
   ConversationMemberUpdateData,
   ConversationOtherMemberUpdateData,
   ConversationReceiptModeUpdateData,
-  ConversationJoinData,
 } from '@wireapp/api-client/lib/conversation/data';
 import type {
   ConversationCodeDeleteEvent,
@@ -44,7 +44,7 @@ import type {
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
-import {Logger, getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 
 import type {Conversation as ConversationEntity} from '../entity/Conversation';
 import type {EventService} from '../event/EventService';

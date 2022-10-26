@@ -24,7 +24,7 @@ import ko from 'knockout';
 
 import {t} from 'Util/LocalizerUtil';
 import {getUserName} from 'Util/SanitizationUtil';
-import {TIME_IN_MILLIS, formatDurationCaption, formatTimeShort, formatDateNumeral, fromUnixTime} from 'Util/TimeUtil';
+import {formatDateNumeral, formatDurationCaption, formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {CallingTimeoutMessage} from './CallingTimeoutMessage';
 import type {CallMessage} from './CallMessage';

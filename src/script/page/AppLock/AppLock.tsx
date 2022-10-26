@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useState, useEffect, useRef, useCallback} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 
 import {ValidationUtil} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';

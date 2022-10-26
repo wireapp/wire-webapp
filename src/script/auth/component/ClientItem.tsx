@@ -24,14 +24,14 @@ import {
   COLOR,
   ContainerXS,
   DeviceIcon,
+  FlexBox,
   Form,
+  IconButton,
   Input,
   Line,
-  IconButton,
   Small,
   Text,
   TrashIcon,
-  FlexBox,
 } from '@wireapp/react-ui-kit';
 import {useIntl} from 'react-intl';
 

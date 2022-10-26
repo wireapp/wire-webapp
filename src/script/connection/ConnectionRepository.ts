@@ -18,7 +18,7 @@
  */
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
-import {USER_EVENT, UserConnectionEvent} from '@wireapp/api-client/lib/event/';
+import {UserConnectionEvent, USER_EVENT} from '@wireapp/api-client/lib/event/';
 import type {BackendEventType} from '@wireapp/api-client/lib/event/BackendEvent';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import {QualifiedId} from '@wireapp/api-client/lib/user';

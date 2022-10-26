@@ -18,7 +18,7 @@
  */
 
 import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
-import {CONVERSATION_EVENT, ConversationOtrMessageAddEvent} from '@wireapp/api-client/lib/event/';
+import {ConversationOtrMessageAddEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import type {REASON as AVS_REASON} from '@wireapp/avs';
 import {ReactionType} from '@wireapp/core/lib/conversation';
@@ -30,7 +30,7 @@ import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
 import type {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
 import type {User} from '../entity/User';
-import {CALL, CONVERSATION, ClientEvent} from '../event/Client';
+import {CALL, ClientEvent, CONVERSATION} from '../event/Client';
 import {StatusType} from '../message/StatusType';
 import {VerificationMessageType} from '../message/VerificationMessageType';
 import {AssetRecord, EventRecord} from '../storage';

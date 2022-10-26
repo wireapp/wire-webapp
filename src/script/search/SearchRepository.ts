@@ -21,8 +21,8 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {container} from 'tsyringe';
 
 import {EMOJI_RANGES} from 'Util/EmojiUtil';
-import {Logger, getLogger} from 'Util/Logger';
-import {startsWith, computeTransliteration, sortByPriority, transliterationIndex} from 'Util/StringUtil';
+import {getLogger, Logger} from 'Util/Logger';
+import {computeTransliteration, sortByPriority, startsWith, transliterationIndex} from 'Util/StringUtil';
 
 import type {SearchService} from './SearchService';
 

@@ -22,7 +22,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
-import {PreferenceNotificationRepository, Notification} from 'src/script/notification/PreferenceNotificationRepository';
+import {Notification, PreferenceNotificationRepository} from 'src/script/notification/PreferenceNotificationRepository';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {createRandomUuid} from 'Util/util';
 

@@ -3989,6 +3989,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@wireapp/antiscroll-2@npm:1.3.1":
+  version: 1.3.1
+  resolution: "@wireapp/antiscroll-2@npm:1.3.1"
+  checksum: 28464b4a02250c13ad3816a0a7303fc9cf3cd4586b4202c192d25b82f64541dc3ebc7f5c147548f3e478df4a56e4ffa26edfcb806438d3ae453c7ba9fcd3b124
+  languageName: node
+  linkType: hard
+
 "@wireapp/api-client@npm:^22.0.0":
   version: 22.0.0
   resolution: "@wireapp/api-client@npm:22.0.0"
@@ -16997,6 +17004,7 @@ __metadata:
     "@types/webpack-env": 1.18.0
     "@typescript-eslint/eslint-plugin": 5.40.1
     "@typescript-eslint/parser": 5.40.1
+    "@wireapp/antiscroll-2": 1.3.1
     "@wireapp/avs": 8.2.17
     "@wireapp/copy-config": 2.0.0
     "@wireapp/core": 35.0.0

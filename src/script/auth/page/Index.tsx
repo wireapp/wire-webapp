@@ -24,7 +24,7 @@ import {Button, ButtonVariant, ContainerXS, ErrorMessage, Text} from '@wireapp/r
 import {SVGIcon} from '@wireapp/react-ui-kit/lib/Icon/SVGIcon';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {useNavigate, Navigate} from 'react-router-dom';
+import {Navigate, useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
 import {Page} from './Page';
