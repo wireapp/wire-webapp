@@ -7,7 +7,7 @@
   "dependencies": {
     "@wireapp/commons": "workspace:^",
     "@wireapp/priority-queue": "workspace:^",
-    "@wireapp/protocol-messaging": "1.39.0",
+    "@wireapp/protocol-messaging": "1.42.0",
     "axios": "1.1.2",
     "axios-retry": "3.3.1",
     "http-status-codes": "2.2.0",
@@ -22,7 +22,7 @@
     "@swc/jest": "^0.2.23",
     "@types/axios": "^0.14.0",
     "@types/jest": "^29.2.0",
-    "@types/node": "^18.11.4",
+    "@types/node": "^18.11.5",
     "@types/spark-md5": "3.0.2",
     "@types/tough-cookie": "4.0.2",
     "@types/ws": "8.5.3",
