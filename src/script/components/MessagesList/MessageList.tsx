@@ -142,6 +142,7 @@ const MessagesList: FC<MessagesListParams> = ({
     'hasAdditionalMessages',
   ]);
 
+  const messageListRef = useRef<HTMLDivElement | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [focusedMessage, setFocusedMessage] = useState<string | undefined>(initialMessage?.id);
 
@@ -249,6 +250,12 @@ const MessagesList: FC<MessagesListParams> = ({
     });
   }, [conversation, initialMessage]);
 
+  useLayoutEffect(() => {
+    if (loaded && messageListRef.current) {
+      onHitTopOrBottom(messageListRef.current, loadPrecedingMessages, loadFollowingMessages);
+    }
+  }, [loaded]);
+
   if (!loaded) {
     return null;
   }
@@ -257,7 +264,7 @@ const MessagesList: FC<MessagesListParams> = ({
     <div
       ref={element => {
         initFadingScrollbar(element);
-        onHitTopOrBottom(element, loadPrecedingMessages, loadFollowingMessages);
+        messageListRef.current = element;
       }}
       id="message-list"
       className="message-list"
