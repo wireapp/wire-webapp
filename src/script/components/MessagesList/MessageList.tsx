@@ -242,6 +242,7 @@ const MessagesList: FC<MessagesListParams> = ({
 
   useEffect(() => {
     onLoading(true);
+    setLoaded(false);
     loadConversation(conversation, initialMessage).then(() => {
       setTimeout(() => {
         setLoaded(true);
