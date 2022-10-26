@@ -17,9 +17,10 @@
  *
  */
 
+import type {Config} from 'jest';
 process.env.TZ = 'UTC';
 
-module.exports = {
+const config: Config = {
   collectCoverageFrom: ['src/script/**/*.{ts,tsx}', '!src/script/util/test/**/*.*'],
   moduleDirectories: ['node_modules', __dirname],
   // Must be in sync with tsconfig.json >> paths
@@ -40,3 +41,6 @@ module.exports = {
   testRegex: '(test|Spec)\\.[tj]sx?$',
   testRunner: 'jest-jasmine2',
 };
+
+// eslint-disable-next-line import/no-default-export
+export default config;
