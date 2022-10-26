@@ -39,6 +39,9 @@ export interface Theme extends ETheme {
     primaryFocusBorder: String;
     primaryDisabledBg: String;
     primaryDisabledText: String;
+    secondaryActiveBg: String;
+    secondaryActiveBorder: String;
+    secondaryHoverBorder: String;
     tertiaryBg: String;
     tertiaryBorder: String;
     tertiaryHoverBg: String;
@@ -103,6 +106,9 @@ export const themes: {[themeId in THEME_ID]: Theme} = {
       primaryFocusBorder: 'var(--button-primary-focus-border)',
       primaryDisabledBg: 'var(--button-primary-disabled-bg)',
       primaryDisabledText: 'var(--button-primary-disabled-text)',
+      secondaryActiveBg: 'var(--button-secondary-active-bg)',
+      secondaryActiveBorder: 'var(--button-secondary-active-border)',
+      secondaryHoverBorder: 'var(--button-secondary-hover-border)',
       tertiaryBg: 'var(--button-tertiary-bg)',
       tertiaryBorder: 'var(--button-tertiary-border)',
       tertiaryHoverBg: 'var(--button-tertiary-hover-bg)',
@@ -165,6 +171,9 @@ export const themes: {[themeId in THEME_ID]: Theme} = {
       primaryFocusBorder: 'var(--button-primary-focus-border)',
       primaryDisabledBg: 'var(--button-primary-disabled-bg)',
       primaryDisabledText: 'var(--button-primary-disabled-text)',
+      secondaryActiveBg: 'var(--button-secondary-active-bg)',
+      secondaryActiveBorder: 'var(--button-secondary-active-border)',
+      secondaryHoverBorder: 'var(--button-secondary-hover-border)',
       tertiaryBg: 'var(--button-tertiary-bg)',
       tertiaryBorder: 'var(--button-tertiary-border)',
       tertiaryHoverBg: 'var(--button-tertiary-hover-bg)',
@@ -227,6 +236,9 @@ export const themes: {[themeId in THEME_ID]: Theme} = {
       primaryFocusBorder: 'var(--button-primary-focus-border)',
       primaryDisabledBg: 'var(--button-primary-disabled-bg)',
       primaryDisabledText: 'var(--button-primary-disabled-text)',
+      secondaryActiveBg: 'var(--button-secondary-active-bg)',
+      secondaryActiveBorder: 'var(--button-secondary-active-border)',
+      secondaryHoverBorder: 'var(--button-secondary-hover-border)',
       tertiaryBg: 'var(--button-tertiary-bg)',
       tertiaryBorder: 'var(--button-tertiary-border)',
       tertiaryHoverBg: 'var(--button-tertiary-hover-bg)',

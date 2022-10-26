@@ -121,6 +121,9 @@ const accentColors: () => CSSObject = () => ({
   '--button-primary-active': COLOR_V2.BLUE_LIGHT_700,
   '--button-primary-active-border': COLOR_V2.BLUE_LIGHT_700,
   '--button-primary-focus-border': COLOR_V2.BLUE_LIGHT_700,
+  '--button-secondary-active-bg)': COLOR_V2.BLUE_LIGHT_50,
+  '--button-secondary-active-border)': COLOR_V2.BLUE_LIGHT_500,
+  '--button-secondary-hover-border)': COLOR_V2.BLUE_LIGHT_500,
 });
 
 export const GlobalCssVariables = {
