@@ -181,7 +181,6 @@ class Server {
         fileExtensionRegx.test(req.path) ||
         req.path.startsWith('/commit') ||
         req.path.startsWith('/test') ||
-        req.path.startsWith('/demo') ||
         req.path.startsWith('/_health') ||
         req.path.startsWith('/join') ||
         req.path.startsWith('/auth') ||
