@@ -18,15 +18,18 @@
  */
 
 import {amplify} from 'amplify';
+import jQuery from 'jquery';
 import ko from 'knockout';
+
+import {t} from 'Util/LocalizerUtil';
 
 import {WireModule} from './Wire.types';
 
-import {t} from '../script/util/LocalizerUtil';
-
 declare global {
   interface Window {
+    $: typeof jQuery;
     amplify: amplify.Static;
+    jQuery: typeof jQuery;
     ko: typeof ko;
     t: typeof t;
     wire: WireModule;

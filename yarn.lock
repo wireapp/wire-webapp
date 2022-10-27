@@ -3249,6 +3249,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/jquery@npm:^3":
+  version: 3.5.14
+  resolution: "@types/jquery@npm:3.5.14"
+  dependencies:
+    "@types/sizzle": "*"
+  checksum: 159d6f804ed1a204b3f79f2d591a271d82e866bd45bd49fb6ef40561a25dbe0f47ec7815681b44cc2db5598425f72811e7e80ab0e983d980470998ac56feb375
+  languageName: node
+  linkType: hard
+
 "@types/js-cookie@npm:3.0.2":
   version: 3.0.2
   resolution: "@types/js-cookie@npm:3.0.2"
@@ -10446,6 +10455,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"jquery@npm:3.6.1":
+  version: 3.6.1
+  resolution: "jquery@npm:3.6.1"
+  checksum: 6177d866a74f1137cad800f142c7cdbd5ab19cd4282546f8bdb4890c9f933b1d542ab96f2aa15d007e43c98de7315b0513e849ec5359d3ac5640f720892fe547
+  languageName: node
+  linkType: hard
+
 "js-cookie@npm:3.0.1":
   version: 3.0.1
   resolution: "js-cookie@npm:3.0.1"
@@ -16924,6 +16940,7 @@ __metadata:
     "@types/generate-changelog": 1.8.1
     "@types/highlight.js": 10.1.0
     "@types/jest": 29.2.0
+    "@types/jquery": ^3
     "@types/js-cookie": 3.0.2
     "@types/jsdom": 20.0.0
     "@types/keyboardjs": 2.5.0
@@ -17011,6 +17028,7 @@ __metadata:
     jest-canvas-mock: 2.4.0
     jest-environment-jsdom: 29.2.1
     jest-jasmine2: 29.2.1
+    jquery: 3.6.1
     js-cookie: 3.0.1
     jsdom-worker: 0.3.0
     jszip: 3.10.1

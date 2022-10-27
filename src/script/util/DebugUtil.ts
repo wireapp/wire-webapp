@@ -52,8 +52,7 @@ import {EventRepository} from '../event/EventRepository';
 import {checkVersion} from '../lifecycle/newVersionHandler';
 import {MessageCategory} from '../message/MessageCategory';
 import {Core} from '../service/CoreSingleton';
-import {EventRecord, StorageRepository} from '../storage';
-import {StorageSchemata} from '../storage/StorageSchemata';
+import {EventRecord, StorageRepository, StorageSchemata} from '../storage';
 import {UserRepository} from '../user/UserRepository';
 import {UserState} from '../user/UserState';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
@@ -74,6 +73,7 @@ export class DebugUtil {
   private readonly eventRepository: EventRepository;
   private readonly storageRepository: StorageRepository;
   private readonly messageRepository: MessageRepository;
+  public readonly $: JQueryStatic;
   /** Used by QA test automation. */
   public readonly userRepository: UserRepository;
   /** Used by QA test automation. */
@@ -87,6 +87,7 @@ export class DebugUtil {
     private readonly callState = container.resolve(CallState),
     private readonly core = container.resolve(Core),
   ) {
+    this.$ = $;
     this.Dexie = Dexie;
 
     const {calling, client, connection, conversation, cryptography, event, user, storage, message} = repositories;

@@ -308,31 +308,6 @@ export class ContentViewModel {
     return state;
   };
 
-  private readonly getElementOfContent = (state: string) => {
-    switch (state) {
-      case ContentState.COLLECTION:
-        return '.collection';
-      case ContentState.CONVERSATION:
-        return '.conversation';
-      case ContentState.CONNECTION_REQUESTS:
-        return '.connect-requests';
-      case ContentState.PREFERENCES_ABOUT:
-        return '.preferences-about';
-      case ContentState.PREFERENCES_ACCOUNT:
-        return '.preferences-account';
-      case ContentState.PREFERENCES_AV:
-        return '.preferences-av';
-      case ContentState.PREFERENCES_DEVICE_DETAILS:
-        return '.preferences-device-details';
-      case ContentState.PREFERENCES_DEVICES:
-        return '.preferences-devices';
-      case ContentState.PREFERENCES_OPTIONS:
-        return '.preferences-options';
-      default:
-        return '.watermark';
-    }
-  };
-
   private readonly releaseContent = (newContentState: ContentState) => {
     this.previousState = this.state();
 

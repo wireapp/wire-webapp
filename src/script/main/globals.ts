@@ -18,6 +18,7 @@
  */
 
 import {amplify} from 'amplify';
+import jQuery from 'jquery';
 import ko from 'knockout';
 
 import 'Components/icons';
@@ -31,4 +32,6 @@ import '../localization/Localizer';
 import '../view_model/MainViewModel';
 
 window.amplify = amplify;
+// we need to publish jQuery on the window so that knockout can use it
+window.jQuery = jQuery;
 window.ko = ko;

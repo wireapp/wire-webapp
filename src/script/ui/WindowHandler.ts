@@ -31,8 +31,7 @@ export class WindowHandler {
   }
 
   private _listenToUnhandledPromiseRejection(): void {
-    window.addEventListener('unhandledrejection', (event: any): void | false => {
-      const promiseRejectionEvent = event.originalEvent;
+    window.addEventListener('unhandledrejection', (promiseRejectionEvent: any): void | false => {
       const error = promiseRejectionEvent.reason || {};
 
       const isDegraded = error.type === ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION;

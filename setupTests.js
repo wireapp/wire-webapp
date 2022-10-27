@@ -64,6 +64,10 @@ window.ko = ko;
 const {amplify} = require('amplify');
 window.amplify = amplify;
 
+const jQuery = require('jquery');
+window.jQuery = jQuery;
+window.$ = jQuery;
+
 window.wire = {
   env: {
     FEATURE: {},
