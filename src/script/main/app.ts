@@ -30,6 +30,7 @@ import {container} from 'tsyringe';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showUserModal} from 'Components/Modals/UserModal';
+import {dbMigrationStateStore} from 'Util/dbMigrationStateStore';
 import {DebugUtil} from 'Util/DebugUtil';
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
@@ -388,7 +389,13 @@ class App {
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
 
       try {
+        const dbMigrationState = dbMigrationStateStore.getDBMigrationState();
+
         await this.core.init(clientType, {
+          dbMigrationConfig: dbMigrationState && {
+            onSuccess: dbMigrationStateStore.deleteDBMigrationState,
+            storeName: dbMigrationState.storeName,
+          },
           onNewClient({userId, clientId, domain}) {
             const qualifiedId = {domain: domain ?? '', id: userId};
             const newClient = {class: ClientClassification.UNKNOWN, id: clientId};
