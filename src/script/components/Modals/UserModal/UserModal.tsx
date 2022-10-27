@@ -54,7 +54,7 @@ const brandName = Config.getConfig().BRAND_NAME;
 
 const UserModal: React.FC<UserModalProps> = ({
   userId,
-  onClose = () => undefined,
+  onClose = () => {},
   userRepository,
   actionsViewModel,
   core = container.resolve(Core),
