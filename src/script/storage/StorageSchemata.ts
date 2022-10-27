@@ -22,6 +22,7 @@ import type {Dexie, Transaction} from 'dexie';
 import {base64ToArray} from 'Util/util';
 
 import {categoryFromEvent} from '../message/MessageCategorization';
+import {Core} from '../service/CoreSingleton';
 
 interface DexieSchema {
   schema: Record<string, string>;
@@ -47,7 +48,7 @@ export class StorageSchemata {
     };
   }
 
-  static get SCHEMATA(): DexieSchema[] {
+  static getSchema(core: Core): DexieSchema[] {
     return [
       {
         schema: {
@@ -413,6 +414,13 @@ export class StorageSchemata {
       {
         schema: {},
         version: 19,
+      },
+      {
+        schema: {},
+        upgrade: transaction => {
+          core.scheduleDBMigration({storeName: transaction.db.name});
+        },
+        version: 20,
       },
     ];
   }

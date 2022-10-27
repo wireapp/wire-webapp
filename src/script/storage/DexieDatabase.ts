@@ -18,6 +18,7 @@
  */
 
 import {Dexie, Table, Transaction} from 'dexie';
+import {container} from 'tsyringe';
 
 import {getLogger, Logger} from 'Util/Logger';
 
@@ -25,6 +26,8 @@ import {AmplifyRecord, ConversationRecord, CryptoboxRecord, EventRecord, UserRec
 import {ClientRecord} from './record/ClientRecord';
 import {GroupIdRecord} from './record/GroupIdRecord';
 import {StorageSchemata} from './StorageSchemata';
+
+import {Core} from '../service/CoreSingleton';
 
 /**
  * TypeScript representation of local IndexedDB schema managed with Dexie.
@@ -45,11 +48,11 @@ export class DexieDatabase extends Dexie {
 
   private readonly logger: Logger;
 
-  constructor(dbName: string) {
+  constructor(dbName: string, private readonly _core = container.resolve(Core)) {
     super(dbName);
     this.logger = getLogger(`Dexie (${dbName})`);
 
-    StorageSchemata.SCHEMATA.forEach(({schema, upgrade, version}) => {
+    StorageSchemata.getSchema(this._core).forEach(({schema, upgrade, version}) => {
       const versionInstance = this.version(version).stores(schema);
       if (upgrade) {
         versionInstance.upgrade((transaction: Transaction) => {

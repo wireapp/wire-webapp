@@ -441,7 +441,7 @@ class App {
             }
             return conversationRepository.conversationRoleRepository.isUserGroupAdmin(conversation, selfUser);
           },
-          groupIdFromConversationId: async conversationId => {
+          clientIsExistingGroupUser: async conversationId => {
             const conversation = await conversationRepository.getConversationById(conversationId);
             return conversation?.groupId;
           },
