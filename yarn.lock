@@ -7373,14 +7373,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-testing-library@npm:5.7.2":
-  version: 5.7.2
-  resolution: "eslint-plugin-testing-library@npm:5.7.2"
+"eslint-plugin-testing-library@npm:5.9.1":
+  version: 5.9.1
+  resolution: "eslint-plugin-testing-library@npm:5.9.1"
   dependencies:
     "@typescript-eslint/utils": ^5.13.0
   peerDependencies:
     eslint: ^7.5.0 || ^8.0.0
-  checksum: 33ab09b0bc77b80ea61b9bac4d48ca3f83916a0cb9deaf0e8d2eaab80707346feb7e808a68a625fa27baf278d1d8130b1ca5d2f8eb0904804793601d8f1c8f40
+  checksum: d09f9486945807e9587d52b6979117bc41b750df741567381a06219671096afb318696a0e0db63e253e150fead40e77ef9653ee00f1dda83fc8920e3b3c47107
   languageName: node
   linkType: hard
 
@@ -17004,7 +17004,7 @@ __metadata:
     eslint-plugin-react: 7.31.10
     eslint-plugin-react-hooks: 4.6.0
     eslint-plugin-sort-keys-fix: 1.1.2
-    eslint-plugin-testing-library: 5.7.2
+    eslint-plugin-testing-library: 5.9.1
     eslint-plugin-typescript-sort-keys: 2.1.0
     eslint-plugin-unused-imports: 2.0.0
     fake-indexeddb: 4.0.0
