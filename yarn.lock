@@ -4868,7 +4868,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"autoprefixer@npm:10.4.12, autoprefixer@npm:^10.4.11":
+"autoprefixer@npm:9.8.8":
+  version: 9.8.8
+  resolution: "autoprefixer@npm:9.8.8"
+  dependencies:
+    browserslist: ^4.12.0
+    caniuse-lite: ^1.0.30001109
+    normalize-range: ^0.1.2
+    num2fraction: ^1.2.2
+    picocolors: ^0.2.1
+    postcss: ^7.0.32
+    postcss-value-parser: ^4.1.0
+  bin:
+    autoprefixer: bin/autoprefixer
+  checksum: 8f017672fbac248db0cf4e86aa707d8b148d9abadb842b5cf4c6be306d80fa6a654fadefd17e46213234c1f0947612acce2864f93e903f3e736b183fc1aedc45
+  languageName: node
+  linkType: hard
+
+"autoprefixer@npm:^10.4.11":
   version: 10.4.12
   resolution: "autoprefixer@npm:10.4.12"
   dependencies:
@@ -5209,7 +5226,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"browserslist@npm:^4.0.0, browserslist@npm:^4.14.5, browserslist@npm:^4.16.6, browserslist@npm:^4.20.3, browserslist@npm:^4.21.3, browserslist@npm:^4.21.4":
+"browserslist@npm:^4.0.0, browserslist@npm:^4.12.0, browserslist@npm:^4.14.5, browserslist@npm:^4.16.6, browserslist@npm:^4.20.3, browserslist@npm:^4.21.3, browserslist@npm:^4.21.4":
   version: 4.21.4
   resolution: "browserslist@npm:4.21.4"
   dependencies:
@@ -5374,7 +5391,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"caniuse-lite@npm:^1.0.0, caniuse-lite@npm:^1.0.30001400, caniuse-lite@npm:^1.0.30001407, caniuse-lite@npm:^1.0.30001423":
+"caniuse-lite@npm:^1.0.0, caniuse-lite@npm:^1.0.30001109, caniuse-lite@npm:^1.0.30001400, caniuse-lite@npm:^1.0.30001407, caniuse-lite@npm:^1.0.30001423":
   version: 1.0.30001423
   resolution: "caniuse-lite@npm:1.0.30001423"
   checksum: fe443f323f5dc6a858ef7d7deddb93db5e5f9a35e22970c4a65c4ef793bb696c1e2f038df572722d9edf29021e43ed16f5131faafde783563bd0d9eccf486592
@@ -11941,6 +11958,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"num2fraction@npm:^1.2.2":
+  version: 1.2.2
+  resolution: "num2fraction@npm:1.2.2"
+  checksum: 1da9c6797b505d3f5b17c7f694c4fa31565bdd5c0e5d669553253aed848a580804cd285280e8a73148bd9628839267daee4967f24b53d4e893e44b563e412635
+  languageName: node
+  linkType: hard
+
 "number-is-nan@npm:^1.0.0":
   version: 1.0.1
   resolution: "number-is-nan@npm:1.0.1"
@@ -12486,6 +12510,13 @@ __metadata:
   version: 2.1.0
   resolution: "performance-now@npm:2.1.0"
   checksum: 534e641aa8f7cba160f0afec0599b6cecefbb516a2e837b512be0adbe6c1da5550e89c78059c7fabc5c9ffdf6627edabe23eb7c518c4500067a898fa65c2b550
+  languageName: node
+  linkType: hard
+
+"picocolors@npm:^0.2.1":
+  version: 0.2.1
+  resolution: "picocolors@npm:0.2.1"
+  checksum: 3b0f441f0062def0c0f39e87b898ae7461c3a16ffc9f974f320b44c799418cabff17780ee647fda42b856a1dc45897e2c62047e1b546d94d6d5c6962f45427b2
   languageName: node
   linkType: hard
 
@@ -13310,7 +13341,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss-value-parser@npm:^4.2.0":
+"postcss-value-parser@npm:^4.1.0, postcss-value-parser@npm:^4.2.0":
   version: 4.2.0
   resolution: "postcss-value-parser@npm:4.2.0"
   checksum: 819ffab0c9d51cf0acbabf8996dffbfafbafa57afc0e4c98db88b67f2094cb44488758f06e5da95d7036f19556a4a732525e84289a425f4f6fd8e412a9d7442f
@@ -13339,7 +13370,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss@npm:^7.0.1":
+"postcss@npm:^7.0.1, postcss@npm:^7.0.32":
   version: 7.0.35
   resolution: "postcss@npm:7.0.35"
   dependencies:
@@ -16662,7 +16693,7 @@ __metadata:
     "@wireapp/webapp-events": 0.15.0
     adm-zip: 0.5.9
     amplify: "https://github.com/wireapp/amplify#head=master"
-    autoprefixer: 10.4.12
+    autoprefixer: 9.8.8
     babel-loader: 8.2.5
     caniuse-lite: ^1.0.30001423
     classnames: 2.3.2
