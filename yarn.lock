@@ -3358,7 +3358,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:>=13.7.0, @types/node@npm:^18.11.3":
+"@types/node@npm:*, @types/node@npm:>=13.7.0":
   version: 18.11.3
   resolution: "@types/node@npm:18.11.3"
   checksum: 3a2a9142d891a90a195c296149bf64a69cc0abcc42f543be911ab22b2e0ead85ff077f90af92f0f13f6e3e5e72501469200fd753dfd1101825d4646a89d3ee47
@@ -3369,6 +3369,13 @@ __metadata:
   version: 13.13.4
   resolution: "@types/node@npm:13.13.4"
   checksum: 07b869f5e9e477ef116eec4183cb9cbb1cdec1f6390fba925471235a668032e897bb1bff446d9df8bd17d0d81a4dbfe4e69458baaad0a05b6a64b0b4c59df5aa
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^18.11.7":
+  version: 18.11.7
+  resolution: "@types/node@npm:18.11.7"
+  checksum: 69d630825cf6fbf580d08d76a4d4836ef8c34ed4fe0842221ade87d275f517099cbfabe8e22397208e564bd24926db97699ab9db5c091383269a432b336665e2
   languageName: node
   linkType: hard
 
@@ -16947,7 +16954,7 @@ __metadata:
     "@types/libsodium-wrappers-sumo": 0.7.5
     "@types/linkify-it": 3.0.2
     "@types/markdown-it": 12.2.3
-    "@types/node": ^18.11.3
+    "@types/node": ^18.11.7
     "@types/open-graph": 0.2.2
     "@types/platform": 1.3.4
     "@types/react": 18.0.21
