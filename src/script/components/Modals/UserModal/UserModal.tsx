@@ -63,7 +63,6 @@ const UserModalUserActionsSection: React.FC<UserModalUserActionsSectionProps> = 
   selfUser,
 }) => {
   const {isBlockedLegalHold} = useKoSubscribableChildren(user, ['isBlockedLegalHold']);
-  const replaceLinkLegalHold = replaceLink(Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK, '', 'read-more-legal-hold');
   const mainViewModel = useContext(RootContext);
 
   return isBlockedLegalHold ? (
