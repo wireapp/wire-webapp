@@ -118,6 +118,25 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   const isConnecting = state === CALL_STATE.ANSWERED;
   const isOngoing = state === CALL_STATE.MEDIA_ESTAB;
 
+  type labels = {dataUieName: string; text: string};
+
+  const callStatus: Partial<Record<CALL_STATE, labels>> = {
+    [CALL_STATE.OUTGOING]: {
+      dataUieName: 'call-label-outgoing',
+      text: t('callStateOutgoing'),
+    },
+    [CALL_STATE.INCOMING]: {
+      dataUieName: 'call-label-incoming',
+      text: t('callStateIncoming'),
+    },
+    [CALL_STATE.ANSWERED]: {
+      dataUieName: 'call-label-connecting',
+      text: t('callStateConnecting'),
+    },
+  };
+
+  const currentCallStatus = callStatus[state];
+
   const showNoCameraPreview = !hasAccessToCamera && call.initialType === CALL_TYPE.VIDEO && !isOngoing;
   const showVideoButton = isVideoCallingEnabled && (call.initialType === CALL_TYPE.VIDEO || isOngoing);
   const showParticipantsButton = isOngoing && isGroup;
@@ -238,36 +257,27 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                   'conversation-list-cell-center-no-left': temporaryUserStyle,
                 })}
               >
-                <span className="conversation-list-cell-name">{conversationName}</span>
+                <p className="conversation-list-cell-name">{conversationName}</p>
 
-                {isIncoming && (
-                  <span className="conversation-list-cell-description" data-uie-name="call-label-incoming">
-                    {t('callStateIncoming')}
-                  </span>
+                {currentCallStatus && (
+                  <p className="conversation-list-cell-description" data-uie-name={currentCallStatus.dataUieName}>
+                    {currentCallStatus.text}
+                  </p>
                 )}
-                {isOutgoing && (
-                  <span className="conversation-list-cell-description" data-uie-name="call-label-outgoing">
-                    {t('callStateOutgoing')}
-                  </span>
-                )}
-                {isConnecting && (
-                  <span className="conversation-list-cell-description" data-uie-name="call-label-connecting">
-                    {t('callStateConnecting')}
-                  </span>
-                )}
+
                 {isOngoing && startedAt && (
                   <div className="conversation-list-info-wrapper">
-                    <span
+                    <p
                       className="conversation-list-cell-description"
                       data-uie-name="call-duration"
                       aria-label={t('callDurationLabel')}
                     >
                       <Duration {...{startedAt}} />
-                    </span>
+                    </p>
                     {isCbrEnabled && (
-                      <span className="conversation-list-cell-description" data-uie-name="call-cbr">
+                      <p className="conversation-list-cell-description" data-uie-name="call-cbr">
                         {t('callStateCbr')}
-                      </span>
+                      </p>
                     )}
                   </div>
                 )}
