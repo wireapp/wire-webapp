@@ -195,7 +195,7 @@
     "grunt-legacy-util/getobject": "^1.1.0"
   },
   "scripts": {
-    "build:prod": "yarn build:server && yarn bundle:prod && grunt build_prod",
+    "build:prod": "grunt clean && yarn build:server && yarn bundle:prod && grunt build_prod",
     "build:server": "cd server && yarn build",
     "build:style": "node ./bin/less.js",
     "bundle:dev": "webpack --config webpack.config.dev.js --progress",

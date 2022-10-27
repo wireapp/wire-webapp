@@ -65,7 +65,7 @@ module.exports = grunt => {
   });
   /* eslint-enable sort-keys-fix/sort-keys-fix */
 
-  grunt.registerTask('build', ['clean', 'set_version', 'build_style', 'copy', 'build_markup']);
+  grunt.registerTask('build', ['set_version', 'build_style', 'copy', 'build_markup']);
 
   grunt.registerTask('build_style', ['shell:less', 'postcss']);
 
