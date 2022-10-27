@@ -25,7 +25,6 @@ import {Core} from 'src/script/service/CoreSingleton';
 import {TeamState} from 'src/script/team/TeamState';
 import {UserRepository} from 'src/script/user/UserRepository';
 import {UserState} from 'src/script/user/UserState';
-import {ActionsViewModel} from 'src/script/view_model/ActionsViewModel';
 
 import {UserModal, UserModalProps} from './UserModal';
 import {showUserModal} from './UserModal.state';
@@ -38,7 +37,6 @@ describe('UserModal', () => {
     });
 
     const props: UserModalProps = {
-      actionsViewModel: {} as ActionsViewModel,
       core: {} as Core,
       teamState: {} as TeamState,
       userRepository: {
@@ -61,7 +59,6 @@ describe('UserModal', () => {
     });
 
     const props: UserModalProps = {
-      actionsViewModel: {} as ActionsViewModel,
       core: {} as Core,
       teamState: {} as TeamState,
       userRepository: {
