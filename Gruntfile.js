@@ -28,7 +28,6 @@ module.exports = grunt => {
   const dir = {
     src_: SRC_PATH,
     src: {
-      demo: `${SRC_PATH}/demo`,
       ext: `${SRC_PATH}/ext`,
       page: `${SRC_PATH}/page`,
       style: `${SRC_PATH}/style`,
