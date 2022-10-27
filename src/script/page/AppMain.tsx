@@ -125,6 +125,7 @@ const AppContainer: FC<AppContainerProps> = ({root}) => {
           />
 
           {/*The order of these elements matter to show proper modals stack upon each other*/}
+          <div id="user-modal-container"></div>
           <PrimaryModalComponent />
           <GroupCreationModal userState={userState} teamState={teamState} />
         </main>
