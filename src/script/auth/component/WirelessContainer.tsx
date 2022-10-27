@@ -20,7 +20,7 @@
 import React from 'react';
 
 import {CloseIcon, Content, Footer, Header, Link, Small} from '@wireapp/react-ui-kit';
-import {SVGIcon} from '@wireapp/react-ui-kit/src/Icon/SVGIcon';
+import {SVGIcon} from '@wireapp/react-ui-kit/lib/Icon/SVGIcon';
 import {FormattedMessage, useIntl} from 'react-intl';
 
 import {Config} from '../../Config';

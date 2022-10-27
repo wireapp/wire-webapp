@@ -17,7 +17,7 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {CALL_TYPE, CONV_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 import ko from 'knockout';
 
@@ -27,7 +27,7 @@ import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {MuteState} from './CallState';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
-import type {Participant, ClientId} from './Participant';
+import type {ClientId, Participant} from './Participant';
 
 import {Config} from '../Config';
 import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';

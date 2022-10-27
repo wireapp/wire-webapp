@@ -17,7 +17,7 @@
  *
  */
 
-import {ClientType} from '@wireapp/api-client/src/client/';
+import {ClientType} from '@wireapp/api-client/lib/client/';
 import {Account} from '@wireapp/core';
 import {container, singleton} from 'tsyringe';
 

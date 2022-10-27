@@ -18,16 +18,16 @@
  */
 
 import {
-  CONVERSATION_TYPE,
+  Conversation as ConversationBackendData,
   CONVERSATION_ACCESS,
   CONVERSATION_ACCESS_ROLE,
-  Conversation as ConversationBackendData,
+  CONVERSATION_TYPE,
   Member as MemberBackendData,
   OtherMember as OtherMemberBackendData,
   RemoteConversations,
-} from '@wireapp/api-client/src/conversation/';
-import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
-import type {QualifiedId} from '@wireapp/api-client/src/user/';
+} from '@wireapp/api-client/lib/conversation/';
+import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
+import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {
   ConversationDatabaseData,

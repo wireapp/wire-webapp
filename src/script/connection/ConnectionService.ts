@@ -17,8 +17,8 @@
  *
  */
 
-import type {Connection, ConnectionStatus} from '@wireapp/api-client/src/connection/';
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import type {Connection, ConnectionStatus} from '@wireapp/api-client/lib/connection/';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
 import {APIClient} from '../service/APIClientSingleton';

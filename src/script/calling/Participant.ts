@@ -17,7 +17,7 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {VIDEO_STATE} from '@wireapp/avs';
 import ko from 'knockout';
 

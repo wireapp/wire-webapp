@@ -18,7 +18,7 @@
  */
 
 import {fireEvent, waitFor} from '@testing-library/react';
-import {ClientType} from '@wireapp/api-client/src/client';
+import {ClientType} from '@wireapp/api-client/lib/client';
 import {TypeUtil} from '@wireapp/commons';
 
 import {Login} from './Login';
@@ -30,6 +30,7 @@ import {initialRootState} from '../module/reducer';
 import {ROUTE} from '../route';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
+
 jest.mock('../util/SVGProvider');
 describe('Login', () => {
   it('successfully logs in with email', async () => {

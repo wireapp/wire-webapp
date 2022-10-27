@@ -19,19 +19,19 @@
 
 import React, {useEffect, useState} from 'react';
 
-import {RegisteredClient} from '@wireapp/api-client/src/client/index';
+import {RegisteredClient} from '@wireapp/api-client/lib/client/index';
 import {
   COLOR,
   ContainerXS,
   DeviceIcon,
+  FlexBox,
   Form,
+  IconButton,
   Input,
   Line,
-  IconButton,
   Small,
   Text,
   TrashIcon,
-  FlexBox,
 } from '@wireapp/react-ui-kit';
 import {useIntl} from 'react-intl';
 

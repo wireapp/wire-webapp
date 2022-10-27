@@ -17,7 +17,7 @@
  *
  */
 
-import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
+import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {ClientMapper} from 'src/script/client/ClientMapper';

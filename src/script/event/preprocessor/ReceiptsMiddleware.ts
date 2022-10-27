@@ -17,7 +17,7 @@
  *
  */
 
-import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
+import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {container} from 'tsyringe';
 
 import {getLogger, Logger} from 'Util/Logger';

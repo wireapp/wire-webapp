@@ -19,7 +19,7 @@
 
 import React from 'react';
 
-import {ClientType} from '@wireapp/api-client/src/client/index';
+import {ClientType} from '@wireapp/api-client/lib/client/index';
 import {ContainerXS, Loading} from '@wireapp/react-ui-kit';
 import {connect} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
@@ -31,7 +31,7 @@ import {ClientItem} from './ClientItem';
 
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import * as LocalStorageAction from '../module/action/LocalStorageAction';
-import {RootState, bindActionCreators} from '../module/reducer';
+import {bindActionCreators, RootState} from '../module/reducer';
 import {getEntropy} from '../module/selector/AuthSelector';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';

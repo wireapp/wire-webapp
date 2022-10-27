@@ -17,9 +17,9 @@
  *
  */
 
-import {MemberLeaveReason} from '@wireapp/api-client/src/conversation/data/';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
-import type {QualifiedId} from '@wireapp/api-client/src/user/';
+import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
+import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import ko from 'knockout';
 
 import {Declension, joinNames, replaceLink, t} from 'Util/LocalizerUtil';

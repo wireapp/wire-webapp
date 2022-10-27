@@ -18,7 +18,7 @@
  */
 
 import {render} from '@testing-library/react';
-import {ClientClassification} from '@wireapp/api-client/src/client/';
+import {ClientClassification} from '@wireapp/api-client/lib/client/';
 import ko from 'knockout';
 
 import {DeviceCard} from './DeviceCard';

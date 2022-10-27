@@ -17,10 +17,10 @@
  *
  */
 
-import type {DomainData} from '@wireapp/api-client/src/account/DomainData';
-import type {LoginData, RegisterData, SendLoginCode} from '@wireapp/api-client/src/auth/';
-import {VerificationActionType} from '@wireapp/api-client/src/auth/VerificationActionType';
-import {ClientType} from '@wireapp/api-client/src/client/';
+import type {DomainData} from '@wireapp/api-client/lib/account/DomainData';
+import type {LoginData, RegisterData, SendLoginCode} from '@wireapp/api-client/lib/auth/';
+import {VerificationActionType} from '@wireapp/api-client/lib/auth/VerificationActionType';
+import {ClientType} from '@wireapp/api-client/lib/client/';
 import type {Account} from '@wireapp/core';
 import type {CRUDEngine} from '@wireapp/store-engine';
 import {SQLeetEngine} from '@wireapp/store-engine-sqleet';

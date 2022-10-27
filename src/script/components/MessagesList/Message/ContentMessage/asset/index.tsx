@@ -17,7 +17,7 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {Asset} from 'src/script/entity/message/Asset';
 import type {FileAsset as FileAssetType} from 'src/script/entity/message/FileAsset';

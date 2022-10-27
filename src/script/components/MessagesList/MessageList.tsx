@@ -242,6 +242,8 @@ const MessagesList: FC<MessagesListParams> = ({
 
   useEffect(() => {
     onLoading(true);
+    setLoaded(false);
+    conversationLastReadTimestamp.current = conversation.last_read_timestamp();
     loadConversation(conversation, initialMessage).then(() => {
       setTimeout(() => {
         setLoaded(true);

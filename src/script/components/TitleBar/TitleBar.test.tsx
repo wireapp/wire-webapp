@@ -18,7 +18,7 @@
  */
 
 import {fireEvent, render, waitFor} from '@testing-library/react';
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Runtime} from '@wireapp/commons';
 import * as uiKit from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';

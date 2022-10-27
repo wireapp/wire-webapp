@@ -19,7 +19,7 @@
 
 import React, {useEffect, useState} from 'react';
 
-import {LoginData} from '@wireapp/api-client/src/auth';
+import {LoginData} from '@wireapp/api-client/lib/auth';
 import {CodeInput, Column, Columns, ContainerXS, H1} from '@wireapp/react-ui-kit';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
@@ -35,7 +35,7 @@ import {actionRoot} from '../module/action';
 import {BackendError} from '../module/action/BackendError';
 import {LabeledError} from '../module/action/LabeledError';
 import {ValidationError} from '../module/action/ValidationError';
-import {RootState, bindActionCreators} from '../module/reducer';
+import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
 import {parseError} from '../util/errorUtil';

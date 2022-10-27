@@ -17,7 +17,7 @@
  *
  */
 
-import type {QualifiedId} from '@wireapp/api-client/src/user/';
+import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {DegradedMessageEventData, EventBuilder, GroupCreationEventData} from 'src/script/conversation/EventBuilder';
 import {EventMapper} from 'src/script/conversation/EventMapper';

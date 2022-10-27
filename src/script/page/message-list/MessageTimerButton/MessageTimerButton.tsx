@@ -23,16 +23,15 @@ import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import {Icon} from 'Components/Icon';
+import {Conversation} from 'src/script/entity/Conversation';
+import {EphemeralTimings} from 'src/script/ephemeral/EphemeralTimings';
+import {TeamState} from 'src/script/team/TeamState';
+import {showContextMenu} from 'src/script/ui/ContextMenu';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
-import {formatDuration, DurationUnit} from 'Util/TimeUtil';
+import {DurationUnit, formatDuration} from 'Util/TimeUtil';
 import {setContextMenuPosition} from 'Util/util';
-
-import type {Conversation} from '../../entity/Conversation';
-import {EphemeralTimings} from '../../ephemeral/EphemeralTimings';
-import {TeamState} from '../../team/TeamState';
-import {showContextMenu} from '../../ui/ContextMenu';
 
 export interface MessageTimerButtonProps {
   conversation: Conversation;

@@ -68,7 +68,7 @@ interface ConversationListProps {
   readonly initialMessage?: Message;
   readonly teamState: TeamState;
   readonly userState: UserState;
-  openRightSidebar: (panelState: PanelState, params: RightSidebarParams) => void;
+  openRightSidebar: (panelState: PanelState, params: RightSidebarParams, compareEntityId?: boolean) => void;
   isRightSidebarOpen?: boolean;
 }
 
@@ -160,9 +160,9 @@ const ConversationList: FC<ConversationListProps> = ({
     const serviceEntity = userEntity.isService && (await repositories.integration.getServiceFromUser(userEntity));
 
     if (serviceEntity) {
-      openRightSidebar(panelId, {entity: {...serviceEntity, id: userEntity.id}});
+      openRightSidebar(panelId, {entity: {...serviceEntity, id: userEntity.id}}, true);
     } else {
-      openRightSidebar(panelId, {entity: userEntity});
+      openRightSidebar(panelId, {entity: userEntity}, true);
     }
   };
 

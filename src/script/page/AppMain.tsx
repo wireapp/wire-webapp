@@ -61,10 +61,11 @@ const AppContainer: FC<AppContainerProps> = ({root}) => {
   const {history, entity: currentEntity, clearHistory, goTo} = useAppMainState(state => state.rightSidebar);
   const currentState = history.at(-1);
 
-  const toggleRightSidebar = (panelState: PanelState, params: RightSidebarParams) => {
+  const toggleRightSidebar = (panelState: PanelState, params: RightSidebarParams, compareEntityId = false) => {
     const isDifferentState = currentState !== panelState;
+    const isDifferentId = compareEntityId && currentEntity?.id !== params?.entity?.id;
 
-    if (isDifferentState) {
+    if (isDifferentId || isDifferentState) {
       goTo(panelState, params);
 
       return;
@@ -87,9 +88,11 @@ const AppContainer: FC<AppContainerProps> = ({root}) => {
             {(!smBreakpoint || isLeftSidebarVisible) && (
               <LeftSidebar listViewModel={root.list} selfUser={selfUser} isActivatedAccount={isActivatedAccount} />
             )}
+
             {(!smBreakpoint || !isLeftSidebarVisible) && (
               <MainContent isRightSidebarOpen={!!currentState} openRightSidebar={toggleRightSidebar} />
             )}
+
             {currentState && (
               <RightSidebar
                 currentEntity={currentEntity}
@@ -122,7 +125,6 @@ const AppContainer: FC<AppContainerProps> = ({root}) => {
           />
 
           {/*The order of these elements matter to show proper modals stack upon each other*/}
-          <div id="user-modal-container"></div>
           <PrimaryModalComponent />
           <GroupCreationModal userState={userState} teamState={teamState} />
         </main>

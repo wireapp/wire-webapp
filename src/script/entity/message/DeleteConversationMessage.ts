@@ -17,7 +17,7 @@
  *
  */
 
-import {TEAM_EVENT} from '@wireapp/api-client/src/event/TeamEvent';
+import {TEAM_EVENT} from '@wireapp/api-client/lib/event/TeamEvent';
 import ko from 'knockout';
 
 import {t} from 'Util/LocalizerUtil';

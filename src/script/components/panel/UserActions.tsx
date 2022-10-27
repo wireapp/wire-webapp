@@ -19,7 +19,7 @@
 
 import React from 'react';
 
-import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 
