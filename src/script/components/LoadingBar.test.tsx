@@ -17,8 +17,9 @@
  *
  */
 
-import LoadingBar from './LoadingBar';
 import {render} from '@testing-library/react';
+
+import {LoadingBar} from './LoadingBar';
 
 describe('LoadingBar', () => {
   it('renders correct progress', async () => {

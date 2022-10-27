@@ -20,15 +20,16 @@
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 
 import {t} from 'Util/LocalizerUtil';
-import {noop} from 'Util/util';
 import {isScrolledBottom} from 'Util/scroll-helpers';
-import useEffectRef from 'Util/useEffectRef';
+import {useEffectRef} from 'Util/useEffectRef';
+import {noop} from 'Util/util';
 
-import type {Message} from '../../../../entity/message/Message';
-import useDebounce from '../../../../hooks/useDebounce';
-import {getSearchRegex} from '../../../../search/FullTextSearch';
+import {FullSearchItem} from './fullSearch/FullSearchItem';
+
 import {ContentMessage} from '../../../../entity/message/ContentMessage';
-import FullSearchItem from './fullSearch/FullSearchItem';
+import type {Message} from '../../../../entity/message/Message';
+import {useDebounce} from '../../../../hooks/useDebounce';
+import {getSearchRegex} from '../../../../search/FullTextSearch';
 
 export interface FullSearchProps {
   change?: (query: string) => void;
@@ -158,4 +159,4 @@ const FullSearch: React.FC<FullSearchProps> = ({searchProvider, click = noop, ch
   );
 };
 
-export default FullSearch;
+export {FullSearch};

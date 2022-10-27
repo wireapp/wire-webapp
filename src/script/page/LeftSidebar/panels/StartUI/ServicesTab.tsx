@@ -18,14 +18,16 @@
  */
 
 import React, {useState} from 'react';
-import {t} from 'Util/LocalizerUtil';
-import useDebounce from '../../../../hooks/useDebounce';
-import Icon from 'Components/Icon';
-import ServiceList from 'Components/ServiceList';
-import {ServiceEntity} from 'src/script/integration/ServiceEntity';
+
+import {Icon} from 'Components/Icon';
+import {ServiceList} from 'Components/ServiceList';
 import {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
-import {getManageServicesUrl} from '../../../../externalRoute';
+import {ServiceEntity} from 'src/script/integration/ServiceEntity';
+import {t} from 'Util/LocalizerUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
+
+import {getManageServicesUrl} from '../../../../externalRoute';
+import {useDebounce} from '../../../../hooks/useDebounce';
 
 export const ServicesTab: React.FC<{
   canManageServices: boolean;
@@ -66,7 +68,7 @@ export const ServicesTab: React.FC<{
                   <span className="left-column-icon">
                     <Icon.Service />
                   </span>
-                  <span className="center-column">{t('searchManageServices')}</span>
+                  <span className="column-center">{t('searchManageServices')}</span>
                 </button>
               </li>
             </ul>

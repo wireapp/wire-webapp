@@ -17,12 +17,14 @@
  *
  */
 
-import type {Self} from '@wireapp/api-client/src/self/';
+import type {Self} from '@wireapp/api-client/lib/self/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-import {actionRoot} from '.';
-import {mockStoreFactory} from '../../util/test/mockStoreFactory';
 import {SelfActionCreator} from './creator/';
+
+import {mockStoreFactory} from '../../util/test/mockStoreFactory';
+
+import {actionRoot} from '.';
 
 describe('SelfAction', () => {
   it('fetches the self user', async () => {

@@ -18,14 +18,17 @@
  */
 
 import React from 'react';
+
 import cx from 'classnames';
-import type {Conversation} from '../entity/Conversation';
-import type {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
-import Icon from 'Components/Icon';
-import {registerReactComponent} from 'Util/ComponentUtil';
+
+import {Icon} from 'Components/Icon';
+import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {t} from 'Util/LocalizerUtil';
 
+import type {Conversation} from '../entity/Conversation';
+
 export interface LegalHoldDotProps {
+  isInteractive?: boolean;
   className?: string;
   conversation?: Conversation;
   dataUieName?: string;
@@ -33,34 +36,41 @@ export interface LegalHoldDotProps {
   isMessage?: boolean;
   large?: boolean;
   showText?: boolean;
-  legalHoldModal?: LegalHoldModalViewModel;
 }
 
 const LegalHoldDot: React.FC<LegalHoldDotProps> = ({
+  isInteractive = false,
   conversation,
   isPending,
   isMessage = false,
   large,
-  legalHoldModal,
   showText = false,
   className = '',
   dataUieName = 'legal-hold-dot-pending-icon',
 }) => {
-  const isInteractive = !!legalHoldModal;
+  const {showRequestModal, showUsers} = useLegalHoldModalState(state => state);
+
   const onClick = (event: React.MouseEvent) => {
     event.stopPropagation();
-    if (isInteractive) {
-      if (isPending) {
-        legalHoldModal.showRequestModal(true);
-        return;
-      }
 
-      legalHoldModal.showUsers(conversation);
+    if (isPending) {
+      showRequestModal(false, true);
+
+      return;
     }
+
+    showUsers(false, conversation);
   };
 
   return (
-    <button type="button" className="legal-hold-dot-button" onClick={onClick} data-uie-name={dataUieName}>
+    <button
+      id="legal-hold-button-interactive"
+      type="button"
+      className="legal-hold-dot-button legal-hold-dot-button--interactive"
+      onClick={onClick}
+      data-uie-name={dataUieName}
+      disabled={!isInteractive}
+    >
       <span
         className={cx(
           'legal-hold-dot',
@@ -75,11 +85,10 @@ const LegalHoldDot: React.FC<LegalHoldDotProps> = ({
       >
         {isPending && <Icon.Pending className="pending-icon" />}
       </span>
+
       {showText && <span className="visibility-hidden legal-hold-dot--text">{t('legalHoldHeadline')}</span>}
     </button>
   );
 };
 
-export default LegalHoldDot;
-
-registerReactComponent('legal-hold-dot', LegalHoldDot);
+export {LegalHoldDot};

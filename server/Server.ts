@@ -19,14 +19,15 @@
 
 import express from 'express';
 import expressSitemapXml from 'express-sitemap-xml';
-import fs from 'fs';
 import hbs from 'hbs';
 import helmet from 'helmet';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import nocache from 'nocache';
+
+import fs from 'fs';
 import http from 'http';
 import https from 'https';
-import nocache from 'nocache';
 import path from 'path';
-import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {HealthCheckRoute} from './routes/_health/HealthRoute';
 import {AppleAssociationRoute} from './routes/appleassociation/AppleAssociationRoute';
@@ -180,7 +181,6 @@ class Server {
         fileExtensionRegx.test(req.path) ||
         req.path.startsWith('/commit') ||
         req.path.startsWith('/test') ||
-        req.path.startsWith('/demo') ||
         req.path.startsWith('/_health') ||
         req.path.startsWith('/join') ||
         req.path.startsWith('/auth') ||
@@ -241,9 +241,11 @@ class Server {
           };
           this.server = https
             .createServer(options, this.app)
-            .listen(this.config.SERVER.PORT_HTTP, () => resolve(this.config.SERVER.PORT_HTTP));
+            .listen(this.config.SERVER.PORT_HTTP, '0.0.0.0', () => resolve(this.config.SERVER.PORT_HTTP));
         } else {
-          this.server = this.app.listen(this.config.SERVER.PORT_HTTP, () => resolve(this.config.SERVER.PORT_HTTP));
+          this.server = this.app.listen(this.config.SERVER.PORT_HTTP, '0.0.0.0', () =>
+            resolve(this.config.SERVER.PORT_HTTP),
+          );
         }
       } else {
         reject('Server port not specified.');

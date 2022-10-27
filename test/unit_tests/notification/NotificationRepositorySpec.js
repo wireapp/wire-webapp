@@ -17,49 +17,45 @@
  *
  */
 
-import {amplify} from 'amplify';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
-import {Availability} from '@wireapp/protocol-messaging';
-import {NotificationPreference} from '@wireapp/api-client/src/user/data/';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
+import {NotificationPreference} from '@wireapp/api-client/lib/user/data/';
 import {Runtime} from '@wireapp/commons';
-
-import {t} from 'Util/LocalizerUtil';
-import {createRandomUuid} from 'Util/util';
-import {truncate} from 'Util/StringUtil';
-
-import 'src/script/localization/Localizer';
-
-import {Conversation} from 'src/script/entity/Conversation';
-import {MediumImage} from 'src/script/entity/message/MediumImage';
-import {User} from 'src/script/entity/User';
-import {MessageTimerUpdateMessage} from 'src/script/entity/message/MessageTimerUpdateMessage';
-import {RenameMessage} from 'src/script/entity/message/RenameMessage';
-import {Location} from 'src/script/entity/message/Location';
-import {MemberMessage} from 'src/script/entity/message/MemberMessage';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
-import {Text} from 'src/script/entity/message/Text';
-import {PingMessage} from 'src/script/entity/message/PingMessage';
+import {Availability} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
 
 import {TERMINATION_REASON} from 'src/script/calling/enum/TerminationReason';
+import {ConnectionMapper} from 'src/script/connection/ConnectionMapper';
+import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
+import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
+import {Conversation} from 'src/script/entity/Conversation';
+import {CallMessage} from 'src/script/entity/message/CallMessage';
+import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
+import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import {Location} from 'src/script/entity/message/Location';
+import {MediumImage} from 'src/script/entity/message/MediumImage';
+import {MemberMessage} from 'src/script/entity/message/MemberMessage';
+import {MessageTimerUpdateMessage} from 'src/script/entity/message/MessageTimerUpdateMessage';
+import {PingMessage} from 'src/script/entity/message/PingMessage';
+import {RenameMessage} from 'src/script/entity/message/RenameMessage';
+import {Text} from 'src/script/entity/message/Text';
+import {User} from 'src/script/entity/User';
+import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
+import 'src/script/localization/Localizer';
+import {CALL_MESSAGE_TYPE} from 'src/script/message/CallMessageType';
+import {MentionEntity} from 'src/script/message/MentionEntity';
+import {QuoteEntity} from 'src/script/message/QuoteEntity';
+import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import {NotificationRepository} from 'src/script/notification/NotificationRepository';
 import {PermissionStatusState} from 'src/script/permission/PermissionStatusState';
-import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
-import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
+import {ContentState} from 'src/script/view_model/ContentViewModel';
+import {t} from 'Util/LocalizerUtil';
+import {truncate} from 'Util/StringUtil';
+import {createRandomUuid} from 'Util/util';
 
-import {CallMessage} from 'src/script/entity/message/CallMessage';
-import {SystemMessageType} from 'src/script/message/SystemMessageType';
-import {CALL_MESSAGE_TYPE} from 'src/script/message/CallMessageType';
-import {QuoteEntity} from 'src/script/message/QuoteEntity';
-import {MentionEntity} from 'src/script/message/MentionEntity';
-
-import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
-import {ConnectionMapper} from 'src/script/connection/ConnectionMapper';
-import {ContentViewModel} from 'src/script/view_model/ContentViewModel';
-import {TestFactory} from '../../helper/TestFactory';
 import {entities, payload} from '../../api/payloads';
+import {TestFactory} from '../../helper/TestFactory';
 
 window.wire = window.wire || {};
 window.wire.app = window.wire.app || {};
@@ -115,7 +111,7 @@ describe('NotificationRepository', () => {
       spyOn(testFactory.notification_repository.assetRepository, 'generateAssetUrl').and.returnValue(
         Promise.resolve('/image/logo/notification.png'),
       );
-      contentViewModelState.state = ko.observable(ContentViewModel.STATE.CONVERSATION);
+      contentViewModelState.state = ko.observable(ContentState.CONVERSATION);
       contentViewModelState.multitasking = {
         isMinimized: () => true,
       };
@@ -502,6 +498,7 @@ describe('NotificationRepository', () => {
       it('when preference is set to obfuscate', () => {
         const notification_preference = NotificationPreference.OBFUSCATE;
         testFactory.notification_repository.notificationsPreference(notification_preference);
+        expect(expected_body).toBeDefined();
         return verifyNotificationObfuscated(conversation_et, message_et, notification_preference);
       });
     });
@@ -544,6 +541,7 @@ describe('NotificationRepository', () => {
       message_et.memberMessageType = SystemMessageType.CONVERSATION_CREATE;
 
       const expected_body = `${user_et.name()} started a conversation`;
+      expect(expected_body).toBeDefined();
       return verifyNotificationSystem(conversation_et, message_et, expected_body);
     });
 
@@ -553,6 +551,7 @@ describe('NotificationRepository', () => {
       message_et.name = 'Lorem Ipsum Conversation';
 
       const expected_body = `${user_et.name()} renamed the conversation to ${message_et.name}`;
+      expect(expected_body).toBeDefined();
       return verifyNotificationSystem(conversation_et, message_et, expected_body);
     });
 
@@ -561,6 +560,7 @@ describe('NotificationRepository', () => {
       message_et.user(user_et);
 
       const expectedBody = `${user_et.name()} set the message timer to 5 ${t('ephemeralUnitsSeconds')}`;
+      expect(expectedBody).toBeDefined();
       return verifyNotificationSystem(conversation_et, message_et, expectedBody);
     });
 
@@ -569,6 +569,7 @@ describe('NotificationRepository', () => {
       message_et.user(user_et);
 
       const expectedBody = `${user_et.name()} turned off the message timer`;
+      expect(expectedBody).toBeDefined();
       return verifyNotificationSystem(conversation_et, message_et, expectedBody);
     });
   });
@@ -598,6 +599,7 @@ describe('NotificationRepository', () => {
 
         const user_name_added = entities.user.jane_roe.name;
         const expected_body = `${user_et.name()} added ${user_name_added} to the conversation`;
+        expect(expected_body).toBeDefined();
         return verifyNotificationSystem(conversation_et, message_et, expected_body);
       });
 
@@ -606,6 +608,7 @@ describe('NotificationRepository', () => {
         message_et.userEntities([other_user_et]);
 
         const expected_body = `${user_et.name()} added you to the conversation`;
+        expect(expected_body).toBeDefined();
         return verifyNotificationSystem(conversation_et, message_et, expected_body);
       });
 
@@ -614,6 +617,7 @@ describe('NotificationRepository', () => {
         message_et.userIds(user_ids);
 
         const expected_body = `${user_et.name()} added 2 people to the conversation`;
+        expect(expected_body).toBeDefined();
         return verifyNotificationSystem(conversation_et, message_et, expected_body);
       });
     });
@@ -640,6 +644,7 @@ describe('NotificationRepository', () => {
         message_et.userEntities([other_user_et]);
 
         const expected_body = `${user_et.name()} removed you from the conversation`;
+        expect(expected_body).toBeDefined();
         return verifyNotificationSystem(conversation_et, message_et, expected_body);
       });
 
@@ -679,6 +684,7 @@ describe('NotificationRepository', () => {
       message_et.memberMessageType = SystemMessageType.CONNECTION_REQUEST;
 
       const expected_body = z.string.notificationConnectionRequest;
+      expect(expected_body).toBeDefined();
       return verifyNotificationSystem(conversation_et, message_et, expected_body, expected_title);
     });
 
@@ -686,6 +692,7 @@ describe('NotificationRepository', () => {
       message_et.memberMessageType = SystemMessageType.CONNECTION_ACCEPTED;
 
       const expected_body = z.string.notificationConnectionAccepted;
+      expect(expected_body).toBeDefined();
       return verifyNotificationSystem(conversation_et, message_et, expected_body, expected_title);
     });
 
@@ -693,6 +700,7 @@ describe('NotificationRepository', () => {
       message_et.memberMessageType = SystemMessageType.CONNECTION_CONNECTED;
 
       const expected_body = z.string.notificationConnectionConnected;
+      expect(expected_body).toBeDefined();
       return verifyNotificationSystem(conversation_et, message_et, expected_body, expected_title);
     });
   });

@@ -17,4 +17,4 @@
  *
  */
 
-export {default} from './MentionSuggestions';
+export * from './MentionSuggestions';

@@ -22,55 +22,54 @@
 /* eslint no-undef: "off" */
 
 // Polyfill for "tsyringe" dependency injection
+import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
 import 'core-js/full/reflect';
-import {container} from 'tsyringe';
 import ko from 'knockout';
-import {ClientClassification, ClientType} from '@wireapp/api-client/src/client/';
+import {container} from 'tsyringe';
 
-import {CallingRepository} from 'src/script/calling/CallingRepository';
-import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
-import {User} from 'src/script/entity/User';
+import {AssetRepository} from 'src/script/assets/AssetRepository';
+import {AssetService} from 'src/script/assets/AssetService';
 import {BackupRepository} from 'src/script/backup/BackupRepository';
-import {UserRepository} from 'src/script/user/UserRepository';
-import {NotificationRepository} from 'src/script/notification/NotificationRepository';
-import {StorageRepository} from 'src/script/storage/StorageRepository';
-import {ClientRepository} from 'src/script/client/ClientRepository';
-import {EventTrackingRepository} from 'src/script/tracking/EventTrackingRepository';
+import {BackupService} from 'src/script/backup/BackupService';
+import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {ClientEntity} from 'src/script/client/ClientEntity';
-import {Cryptobox} from '@wireapp/cryptobox';
-import {EventRepository} from 'src/script/event/EventRepository';
-import {EventServiceNoCompound} from 'src/script/event/EventServiceNoCompound';
-import {EventService} from 'src/script/event/EventService';
-import {NotificationService} from 'src/script/event/NotificationService';
-import {ConnectionService} from 'src/script/connection/ConnectionService';
+import {ClientRepository} from 'src/script/client/ClientRepository';
+import {ClientService} from 'src/script/client/ClientService';
+import {ClientState} from 'src/script/client/ClientState';
 import {ConnectionRepository} from 'src/script/connection/ConnectionRepository';
-import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
-import {CryptographyService} from 'src/script/cryptography/CryptographyService';
-import {TeamRepository} from 'src/script/team/TeamRepository';
-import {SearchRepository} from 'src/script/search/SearchRepository';
-import {ConversationService} from 'src/script/conversation/ConversationService';
+import {ConnectionService} from 'src/script/connection/ConnectionService';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
+import {ConversationService} from 'src/script/conversation/ConversationService';
+import {ConversationState} from 'src/script/conversation/ConversationState';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
-import {SelfService} from 'src/script/self/SelfService';
+import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
+import {User} from 'src/script/entity/User';
+import {EventRepository} from 'src/script/event/EventRepository';
+import {EventService} from 'src/script/event/EventService';
+import {EventServiceNoCompound} from 'src/script/event/EventServiceNoCompound';
+import {NotificationService} from 'src/script/event/NotificationService';
+import {MediaRepository} from 'src/script/media/MediaRepository';
+import {NotificationRepository} from 'src/script/notification/NotificationRepository';
+import {PermissionRepository} from 'src/script/permission/PermissionRepository';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {PropertiesService} from 'src/script/properties/PropertiesService';
-import {UserService} from 'src/script/user/UserService';
-import {BackupService} from 'src/script/backup/BackupService';
-import {StorageService} from 'src/script/storage';
-import {MediaRepository} from 'src/script/media/MediaRepository';
-import {PermissionRepository} from 'src/script/permission/PermissionRepository';
-import {ClientService} from 'src/script/client/ClientService';
-import {TeamService} from 'src/script/team/TeamService';
+import {SearchRepository} from 'src/script/search/SearchRepository';
 import {SearchService} from 'src/script/search/SearchService';
-import {AssetRepository} from 'src/script/assets/AssetRepository';
-import {UserState} from 'src/script/user/UserState';
-import {ClientState} from 'src/script/client/ClientState';
-import {TeamState} from 'src/script/team/TeamState';
-import {ConversationState} from 'src/script/conversation/ConversationState';
-import {AssetService} from 'src/script/assets/AssetService';
-import {entities} from '../api/payloads';
-import {createStorageEngine, DatabaseTypes} from 'src/script/service/StoreEngineProvider';
+import {SelfService} from 'src/script/self/SelfService';
 import {Core} from 'src/script/service/CoreSingleton';
+import {createStorageEngine, DatabaseTypes} from 'src/script/service/StoreEngineProvider';
+import {StorageService} from 'src/script/storage';
+import {StorageRepository} from 'src/script/storage/StorageRepository';
+import {TeamRepository} from 'src/script/team/TeamRepository';
+import {TeamService} from 'src/script/team/TeamService';
+import {TeamState} from 'src/script/team/TeamState';
+import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
+import {EventTrackingRepository} from 'src/script/tracking/EventTrackingRepository';
+import {UserRepository} from 'src/script/user/UserRepository';
+import {UserService} from 'src/script/user/UserService';
+import {UserState} from 'src/script/user/UserState';
+
+import {entities} from '../api/payloads';
 
 export class TestFactory {
   constructor() {
@@ -112,22 +111,13 @@ export class TestFactory {
   }
 
   /**
-   * @param {boolean} mockCryptobox do not initialize a full cryptobox (cryptobox initialization is a very costy operation)
    * @returns {Promise<CryptographyRepository>} The cryptography repository.
    */
-  async exposeCryptographyActors(mockCryptobox = true) {
-    const storageRepository = await this.exposeStorageActors();
+  async exposeCryptographyActors() {
+    await this.exposeStorageActors();
     const currentClient = new ClientEntity(true, null);
     currentClient.id = entities.clients.john_doe.permanent.id;
-    this.cryptography_service = new CryptographyService();
-
-    this.cryptography_repository = new CryptographyRepository(this.cryptography_service);
-
-    if (!mockCryptobox) {
-      const storeEngine = storageRepository.storageService['engine'];
-      this.cryptography_repository.init(new Cryptobox(storeEngine, 10), ko.observable(currentClient));
-      await this.cryptography_repository.cryptobox.create();
-    }
+    this.cryptography_repository = new CryptographyRepository();
 
     return this.cryptography_repository;
   }

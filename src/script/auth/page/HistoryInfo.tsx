@@ -17,23 +17,32 @@
  *
  */
 
-import {ClientType} from '@wireapp/api-client/src/client';
-import {Button, ContainerXS, H1, Link, Paragraph} from '@wireapp/react-ui-kit';
 import React from 'react';
+
+import {ClientType} from '@wireapp/api-client/lib/client';
+import {Button, ContainerXS, H1, Link, Paragraph} from '@wireapp/react-ui-kit';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {Navigate, useNavigate} from 'react-router-dom';
+
+import {KEY} from 'Util/KeyboardUtil';
+
+import {Page} from './Page';
+
 import {Config} from '../../Config';
 import {historyInfoStrings} from '../../strings';
 import {RootState} from '../module/reducer';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import {ROUTE} from '../route';
-import Page from './Page';
-import {KEY} from 'Util/KeyboardUtil';
 
-interface Props extends React.HTMLProps<HTMLDivElement> {}
+type Props = React.HTMLProps<HTMLDivElement>;
 
-const HistoryInfo = ({hasHistory, clients, currentSelfClient, isNewCurrentSelfClient}: Props & ConnectedProps) => {
+const HistoryInfoComponent = ({
+  hasHistory,
+  clients,
+  currentSelfClient,
+  isNewCurrentSelfClient,
+}: Props & ConnectedProps) => {
   const {formatMessage: _} = useIntl();
   const navigate = useNavigate();
 
@@ -102,4 +111,6 @@ const mapStateToProps = (state: RootState) => ({
   isNewCurrentSelfClient: ClientSelector.isNewCurrentSelfClient(state),
 });
 
-export default connect(mapStateToProps)(HistoryInfo);
+const HistoryInfo = connect(mapStateToProps)(HistoryInfoComponent);
+
+export {HistoryInfo};

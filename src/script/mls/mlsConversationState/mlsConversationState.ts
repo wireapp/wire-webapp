@@ -17,10 +17,12 @@
  *
  */
 
-import createVanilla from 'zustand/vanilla';
 import create from 'zustand';
-import {Conversation} from '../../entity/Conversation';
+import createVanilla from 'zustand/vanilla';
+
 import {loadState, saveState} from './conversationStateStorage';
+
+import {Conversation} from '../../entity/Conversation';
 
 export interface MLSConversationState {
   /** list of conversations that are fully joined */

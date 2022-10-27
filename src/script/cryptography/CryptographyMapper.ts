@@ -17,7 +17,7 @@
  *
  */
 
-import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import {
   Asset,
   Availability,
@@ -51,13 +51,12 @@ import {base64ToArray, arrayToBase64, createRandomUuid} from 'Util/util';
 
 import {decryptAesAsset} from '../assets/AssetCrypto';
 import {AssetTransferState} from '../assets/AssetTransferState';
-
+import {ConversationEphemeralHandler} from '../conversation/ConversationEphemeralHandler';
+import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
+import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
+import {CryptographyError} from '../error/CryptographyError';
 import {ClientEvent, CONVERSATION} from '../event/Client';
 import {StatusType} from '../message/StatusType';
-import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
-import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
-import {ConversationEphemeralHandler} from '../conversation/ConversationEphemeralHandler';
-import {CryptographyError} from '../error/CryptographyError';
 import {EventRecord} from '../storage';
 
 export interface MappedText {
@@ -246,7 +245,7 @@ export class CryptographyMapper {
       }
     }
 
-    const {conversation, qualified_conversation, from, qualified_from} = event;
+    const {conversation, qualified_conversation, from, qualified_from, senderClientId} = event;
     const genericContent = {
       conversation,
       from,
@@ -254,6 +253,7 @@ export class CryptographyMapper {
       id: genericMessage.messageId,
       qualified_conversation,
       qualified_from,
+      senderClientId,
       status: event.status,
       time: event.time,
     };
@@ -360,7 +360,7 @@ export class CryptographyMapper {
   _mapAssetMetaData(original: Asset.IOriginal): MappedAssetMetaData | undefined {
     const audioData = original.audio;
     if (audioData) {
-      const loudnessArray = audioData.normalizedLoudness ? audioData.normalizedLoudness.buffer : new ArrayBuffer(0);
+      const loudnessArray = audioData.normalizedLoudness || new ArrayBuffer(0);
       const durationInSeconds = audioData.durationInMillis
         ? Number(audioData.durationInMillis) / TIME_IN_MILLIS.SECOND
         : 0;

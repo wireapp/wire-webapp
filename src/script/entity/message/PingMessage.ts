@@ -21,8 +21,9 @@ import ko from 'knockout';
 
 import {t} from 'Util/LocalizerUtil';
 
-import {SuperType} from '../../message/SuperType';
 import {Message} from './Message';
+
+import {SuperType} from '../../message/SuperType';
 
 export class PingMessage extends Message {
   public readonly caption: ko.PureComputed<string>;

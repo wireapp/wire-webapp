@@ -17,14 +17,15 @@
  *
  */
 
-import {createRandomUuid} from 'Util/util';
+import {UserAsset, UserAssetType} from '@wireapp/api-client/lib/user';
 
 import {ACCENT_ID, Config} from 'src/script/Config';
 import {User} from 'src/script/entity/User';
-import {UserMapper} from './UserMapper';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 import {entities, payload} from 'test/api/payloads';
-import {UserAsset, UserAssetType} from '@wireapp/api-client/src/user';
+import {createRandomUuid} from 'Util/util';
+
+import {UserMapper} from './UserMapper';
 
 describe('User Mapper', () => {
   const userState: any = {self: () => ({domain: 'local.test'})};

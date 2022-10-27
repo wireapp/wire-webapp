@@ -17,24 +17,25 @@
  *
  */
 
-import ko from 'knockout';
+import {AssetOptions, AssetRetentionPolicy} from '@wireapp/api-client/lib/asset/';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {AssetOptions, AssetRetentionPolicy} from '@wireapp/api-client/src/asset/';
-import {singleton, container} from 'tsyringe';
+import ko from 'knockout';
+import {container, singleton} from 'tsyringe';
 
-import {Logger, getLogger} from 'Util/Logger';
-import {loadFileBuffer, loadImage, downloadBlob} from 'Util/util';
+import {getLogger, Logger} from 'Util/Logger';
+import {downloadBlob, loadFileBuffer, loadImage} from 'Util/util';
 import {WebWorker} from 'Util/worker';
 
-import {AssetService} from './AssetService';
-import {Conversation} from '../entity/Conversation';
 import {decryptAesAsset} from './AssetCrypto';
 import {AssetRemoteData} from './AssetRemoteData';
-import {getAssetUrl, setAssetUrl} from './AssetURLCache';
-import type {User} from '../entity/User';
-import {FileAsset} from '../entity/message/FileAsset';
+import {AssetService} from './AssetService';
 import {AssetTransferState} from './AssetTransferState';
+import {getAssetUrl, setAssetUrl} from './AssetURLCache';
+
+import {Conversation} from '../entity/Conversation';
+import {FileAsset} from '../entity/message/FileAsset';
+import type {User} from '../entity/User';
 import {Core} from '../service/CoreSingleton';
 
 export interface CompressedImage {

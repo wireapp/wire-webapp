@@ -18,16 +18,17 @@
  */
 
 import React, {useState} from 'react';
+
 import {Runtime} from '@wireapp/commons';
 
-import {t} from 'Util/LocalizerUtil';
-
-import ModalComponent from 'Components/ModalComponent';
+import {Icon} from 'Components/Icon';
+import {ModalComponent} from 'Components/ModalComponent';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import Icon from 'Components/Icon';
+import {t} from 'Util/LocalizerUtil';
+import {renderElement} from 'Util/renderElement';
+
 import {Config} from '../../../Config';
 import {UserState} from '../../../user/UserState';
-import renderModal from 'Util/renderModal';
 
 export interface InviteModalProps {
   readonly userState: UserState;
@@ -36,7 +37,7 @@ export interface InviteModalProps {
 
 const {BRAND_NAME: brandName} = Config.getConfig();
 
-const InviteModalComponent: React.FC<InviteModalProps> = ({userState, onClose}) => {
+const InviteModal: React.FC<InviteModalProps> = ({userState, onClose}) => {
   const [isInviteMessageSelected, setIsInviteMessageSelected] = useState<boolean>(false);
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
   const userName = selfUser.username();
@@ -91,6 +92,6 @@ const InviteModalComponent: React.FC<InviteModalProps> = ({userState, onClose}) 
   );
 };
 
-export default InviteModalComponent;
+const showInviteModal = renderElement<InviteModalProps>(InviteModal);
 
-export const showInviteModal = renderModal<InviteModalProps>(InviteModalComponent);
+export {InviteModal, showInviteModal};

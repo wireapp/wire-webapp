@@ -17,26 +17,30 @@
  *
  */
 
-import {ClientType} from '@wireapp/api-client/src/client/index';
-import {ContainerXS, Loading} from '@wireapp/react-ui-kit';
 import React from 'react';
+
+import {ClientType} from '@wireapp/api-client/lib/client/index';
+import {ContainerXS, Loading} from '@wireapp/react-ui-kit';
 import {connect} from 'react-redux';
-import {AnyAction, Dispatch} from 'redux';
 import {useNavigate} from 'react-router-dom';
+import {AnyAction, Dispatch} from 'redux';
+
 import {getLogger} from 'Util/Logger';
+
+import {ClientItem} from './ClientItem';
+
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import * as LocalStorageAction from '../module/action/LocalStorageAction';
-import {RootState, bindActionCreators} from '../module/reducer';
-import * as ClientSelector from '../module/selector/ClientSelector';
+import {bindActionCreators, RootState} from '../module/reducer';
 import {getEntropy} from '../module/selector/AuthSelector';
+import * as ClientSelector from '../module/selector/ClientSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import {QUERY_KEY, ROUTE} from '../route';
-import ClientItem from './ClientItem';
 
 const logger = getLogger('ClientList');
 
-interface Props extends React.HTMLProps<HTMLDivElement> {}
-const ClientList = ({
+type Props = React.HTMLProps<HTMLDivElement>;
+const ClientListComponent = ({
   clientError,
   isFetching,
   isNoPasswordSSO,
@@ -129,4 +133,6 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(mapStateToProps, mapDispatchToProps)(ClientList);
+const ClientList = connect(mapStateToProps, mapDispatchToProps)(ClientListComponent);
+
+export {ClientList};

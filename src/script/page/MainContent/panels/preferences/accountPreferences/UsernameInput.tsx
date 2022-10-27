@@ -17,13 +17,17 @@
  *
  */
 
-import React, {useState} from 'react';
+import React, {FormEvent, useState} from 'react';
+
 import cx from 'classnames';
+
+import {t} from 'Util/LocalizerUtil';
+
+import {AccountInput, useInputDone} from './AccountInput';
+
 import {UserError} from '../../../../../error/UserError';
 import {validateHandle} from '../../../../../user/UserHandleGenerator';
 import {UserRepository} from '../../../../../user/UserRepository';
-import {t} from 'Util/LocalizerUtil';
-import AccountInput, {useInputDone} from './AccountInput';
 
 enum UserNameState {
   AVAILABLE = 'AVAILABLE',
@@ -111,7 +115,7 @@ const UsernameInput: React.FC<UsernameInputProps> = ({username, domain, userRepo
       <AccountInput
         label={t('preferencesAccountUsername')}
         value={username}
-        onInput={({target}) => verifyUsername((target as HTMLInputElement).value)}
+        onInput={({target}: FormEvent) => verifyUsername((target as HTMLInputElement).value)}
         readOnly={!canEditProfile}
         prefix="@"
         suffix={domain && `@${domain}`}
@@ -144,4 +148,4 @@ const UsernameInput: React.FC<UsernameInputProps> = ({username, domain, userRepo
   );
 };
 
-export default UsernameInput;
+export {UsernameInput};

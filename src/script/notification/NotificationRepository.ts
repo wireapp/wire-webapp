@@ -17,32 +17,33 @@
  *
  */
 
-import {NotificationPreference, WebappProperties} from '@wireapp/api-client/src/user/data/';
-import type {QualifiedId} from '@wireapp/api-client/src/user/';
+import type {QualifiedId} from '@wireapp/api-client/lib/user/';
+import {NotificationPreference, WebappProperties} from '@wireapp/api-client/lib/user/data/';
+import {Runtime} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {container} from 'tsyringe';
-import {Runtime} from '@wireapp/commons';
 
 import {Declension, t} from 'Util/LocalizerUtil';
-import {Logger, getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
+import {getRenderedTextContent} from 'Util/messageRenderer';
 import {getUserName} from 'Util/SanitizationUtil';
 import {truncate} from 'Util/StringUtil';
-import {TIME_IN_MILLIS, formatDuration} from 'Util/TimeUtil';
+import {formatDuration, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {ValidationUtilError} from 'Util/ValidationUtil';
-import {getRenderedTextContent} from 'Util/messageRenderer';
 
-import {AudioType} from '../audio/AudioType';
-import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
-import {PermissionStatusState} from '../permission/PermissionStatusState';
-import {PermissionType} from '../permission/PermissionType';
 import {PermissionState} from './PermissionState';
 
+import {AssetRepository} from '../assets/AssetRepository';
+import {AudioType} from '../audio/AudioType';
+import {CallState} from '../calling/CallState';
+import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
 import type {ConnectionEntity} from '../connection/ConnectionEntity';
 import {ConversationEphemeralHandler} from '../conversation/ConversationEphemeralHandler';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
+import {ConversationState} from '../conversation/ConversationState';
 import type {Conversation} from '../entity/Conversation';
 import type {CallMessage} from '../entity/message/CallMessage';
 import type {ContentMessage} from '../entity/message/ContentMessage';
@@ -56,12 +57,11 @@ import type {User} from '../entity/User';
 import {SuperType} from '../message/SuperType';
 import {SystemMessageType} from '../message/SystemMessageType';
 import type {PermissionRepository} from '../permission/PermissionRepository';
-import {ContentViewModel} from '../view_model/ContentViewModel';
-import {AssetRepository} from '../assets/AssetRepository';
+import {PermissionStatusState} from '../permission/PermissionStatusState';
+import {PermissionType} from '../permission/PermissionType';
 import {UserState} from '../user/UserState';
-import {ConversationState} from '../conversation/ConversationState';
-import {CallState} from '../calling/CallState';
-import Warnings from '../view_model/WarningsContainer';
+import {ContentState} from '../view_model/ContentViewModel';
+import {Warnings} from '../view_model/WarningsContainer';
 
 export interface Multitasking {
   isMinimized: ko.Observable<boolean>;
@@ -660,7 +660,7 @@ export class NotificationRepository {
     const isConnectionRequest = messageEntity.isMember() && (messageEntity as MemberMessage).isConnectionRequest();
     if (isConnectionRequest) {
       return () => {
-        amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.CONNECTION_REQUESTS);
+        amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentState.CONNECTION_REQUESTS);
       };
     }
 
@@ -760,12 +760,12 @@ export class NotificationRepository {
 
   // Request browser permission for notifications.
   private async requestPermission(): Promise<void> {
-    amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.REQUEST_NOTIFICATION);
+    Warnings.showWarning(Warnings.TYPE.REQUEST_NOTIFICATION);
     // Note: The callback will be only triggered in Chrome.
     // If you ignore a permission request on Firefox, then the callback will not be triggered.
     if (window.Notification.requestPermission) {
       const permissionState = await window.Notification.requestPermission();
-      amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.REQUEST_NOTIFICATION);
+      Warnings.hideWarning(Warnings.TYPE.REQUEST_NOTIFICATION);
       this.updatePermissionState(permissionState);
     }
   }
@@ -802,7 +802,7 @@ export class NotificationRepository {
     const inActiveConversation = conversationEntity
       ? this.conversationState.isActiveConversation(conversationEntity)
       : false;
-    const inConversationView = this.contentViewModelState.state() === ContentViewModel.STATE.CONVERSATION;
+    const inConversationView = this.contentViewModelState.state() === ContentState.CONVERSATION;
     const inMaximizedCall = !!this.callState.joinedCall() && !this.contentViewModelState.multitasking.isMinimized();
 
     const activeConversation = document.hasFocus() && inConversationView && inActiveConversation && !inMaximizedCall;

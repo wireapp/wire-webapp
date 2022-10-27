@@ -20,6 +20,7 @@
 import dotenv from 'dotenv-extended';
 import fs from 'fs-extra';
 import logdown from 'logdown';
+
 import path from 'path';
 
 import type {ServerConfig} from './ServerConfig';
@@ -122,6 +123,7 @@ const config: ServerConfig = {
     BRAND_NAME: process.env.BRAND_NAME,
     CHROME_ORIGIN_TRIAL_TOKEN: process.env.CHROME_ORIGIN_TRIAL_TOKEN,
     COUNTLY_API_KEY: process.env.COUNTLY_API_KEY,
+    ENABLE_DEV_BACKEND_API: process.env.ENABLE_DEV_BACKEND_API == 'true',
     ENVIRONMENT: nodeEnvironment,
     FEATURE: {
       ALLOWED_FILE_UPLOAD_EXTENSIONS: (process.env.FEATURE_ALLOWED_FILE_UPLOAD_EXTENSIONS || '*')

@@ -17,17 +17,16 @@
  *
  */
 
-import {createRandomUuid} from 'Util/util';
-import {t} from 'Util/LocalizerUtil';
-
-import {Conversation} from 'src/script/entity/Conversation';
-import {User} from 'src/script/entity/User';
-import {Text} from 'src/script/entity/message/Text';
-import {PingMessage} from 'src/script/entity/message/PingMessage';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
-import {ConversationStatusIcon} from 'src/script/conversation/ConversationStatusIcon';
 import {generateCellState} from 'src/script/conversation/ConversationCellState';
+import {ConversationStatusIcon} from 'src/script/conversation/ConversationStatusIcon';
+import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
+import {Conversation} from 'src/script/entity/Conversation';
+import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import {PingMessage} from 'src/script/entity/message/PingMessage';
+import {Text} from 'src/script/entity/message/Text';
+import {User} from 'src/script/entity/User';
+import {t} from 'Util/LocalizerUtil';
+import {createRandomUuid} from 'Util/util';
 
 describe('ConversationCellState', () => {
   describe('Notification state icon', () => {

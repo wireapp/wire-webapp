@@ -18,18 +18,20 @@
  */
 
 import React, {useMemo} from 'react';
-import {container} from 'tsyringe';
+
 import {WebAppEvents} from '@wireapp/webapp-events';
-import cx from 'classnames';
-
-import {t} from 'Util/LocalizerUtil';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-
-import DeviceCard from './DeviceCard';
-import DeviceId from '../DeviceId';
-import type {CryptographyRepository} from '../../cryptography/CryptographyRepository';
-import {ClientState} from '../../client/ClientState';
 import {amplify} from 'amplify';
+import cx from 'classnames';
+import {container} from 'tsyringe';
+
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
+
+import {DeviceCard} from './DeviceCard';
+
+import {ClientState} from '../../client/ClientState';
+import type {CryptographyRepository} from '../../cryptography/CryptographyRepository';
+import {DeviceId} from '../DeviceId';
 
 interface SelfFingerprintProps {
   clientState?: ClientState;
@@ -42,7 +44,10 @@ const SelfFingerprint: React.FC<SelfFingerprintProps> = ({
   noPadding,
   clientState = container.resolve(ClientState),
 }) => {
-  const fingerprintLocal = useMemo<string>(() => cryptographyRepository.getLocalFingerprint(), []);
+  const fingerprintLocal = useMemo<string>(
+    () => cryptographyRepository.getLocalFingerprint(),
+    [cryptographyRepository],
+  );
   const {currentClient} = useKoSubscribableChildren(clientState, ['currentClient']);
 
   return (
@@ -64,4 +69,4 @@ const SelfFingerprint: React.FC<SelfFingerprintProps> = ({
   );
 };
 
-export default SelfFingerprint;
+export {SelfFingerprint};

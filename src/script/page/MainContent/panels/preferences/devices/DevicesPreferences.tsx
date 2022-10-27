@@ -18,23 +18,27 @@
  */
 
 import React, {useState} from 'react';
-import {ClientEntity} from 'src/script/client/ClientEntity';
-import {ClientState} from '../../../../../client/ClientState';
-import {UserState} from '../../../../../user/UserState';
-import {ConversationState} from '../../../../../conversation/ConversationState';
+
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
-import {useKoSubscribableChildren} from '../../../../../util/ComponentUtil';
-import {QualifiedId} from '@wireapp/api-client/src/user';
-import {t} from 'Util/LocalizerUtil';
-import VerifiedIcon from 'Components/VerifiedIcon';
-import Icon from 'Components/Icon';
+
+import {Icon} from 'Components/Icon';
+import {VerifiedIcon} from 'Components/VerifiedIcon';
+import {ClientEntity} from 'src/script/client/ClientEntity';
 import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
-import {initFadingScrollbar} from '../../../../../ui/fadingScrollbar';
-import DetailedDevice from './components/DetailedDevice';
-import DeviceDetailsPreferences from './DeviceDetailsPreferences';
-import {Conversation} from '../../../../../entity/Conversation';
-import {FormattedId} from './components/FormattedId';
 import {handleKeyDown} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
+
+import {DetailedDevice} from './components/DetailedDevice';
+import {FormattedId} from './components/FormattedId';
+import {DeviceDetailsPreferences} from './DeviceDetailsPreferences';
+
+import {ClientState} from '../../../../../client/ClientState';
+import {ConversationState} from '../../../../../conversation/ConversationState';
+import {Conversation} from '../../../../../entity/Conversation';
+import {UserState} from '../../../../../user/UserState';
+import {useKoSubscribableChildren} from '../../../../../util/ComponentUtil';
+import {PreferencesPage} from '../components/PreferencesPage';
 
 interface DevicesPreferencesProps {
   clientState: ClientState;
@@ -60,9 +64,11 @@ const Device: React.FC<{
     e.stopPropagation();
     onRemove(device);
   };
+
   const handleKeyPress = (e: React.KeyboardEvent<HTMLButtonElement>) => {
     e.stopPropagation();
   };
+
   return (
     <div
       className="preferences-devices-card"
@@ -75,6 +81,7 @@ const Device: React.FC<{
         <div className="preferences-devices-card-icon" data-uie-value={device.id} data-uie-name="device-id">
           <VerifiedIcon data-uie-name={`user-device-${isVerified ? '' : 'not-'}verified`} isVerified={isVerified} />
         </div>
+
         <div className="preferences-devices-card-info">
           <div
             className="preferences-devices-model"
@@ -83,14 +90,17 @@ const Device: React.FC<{
           >
             {device.getName()}
           </div>
+
           <div className="preferences-devices-id">
             <span>{t('preferencesDevicesId')}</span>
+
             <span data-uie-name="preferences-device-active-id">
               <FormattedId idSlices={device.formatId()} />
             </span>
           </div>
         </div>
       </div>
+
       <div className="preferences-devices-card-action">
         {!device.isLegalHold() && (
           <button
@@ -104,12 +114,13 @@ const Device: React.FC<{
             <Icon.Delete />
           </button>
         )}
+
         <button
           className="icon-forward preferences-devices-card-action__forward"
           data-uie-name="go-device-details"
           aria-label={t('accessibility.headings.preferencesDeviceDetails')}
           aria-hidden
-        ></button>
+        />
       </div>
     </div>
   );
@@ -148,35 +159,32 @@ const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
   }
 
   return (
-    <div id="preferences-devices" className="preferences-page preferences-devices">
-      <h2 className="preferences-titlebar">{t('preferencesDevices')}</h2>
-      <div className="preferences-content" ref={initFadingScrollbar}>
-        <fieldset className="preferences-section" data-uie-name="preferences-device-current">
-          <legend className="preferences-header">{t('preferencesDevicesCurrent')}</legend>
-          <DetailedDevice device={currentClient} fingerprint={cryptographyRepository.getLocalFingerprint()} />
+    <PreferencesPage title={t('preferencesDevices')}>
+      <fieldset className="preferences-section" data-uie-name="preferences-device-current">
+        <legend className="preferences-header">{t('preferencesDevicesCurrent')}</legend>
+        <DetailedDevice device={currentClient} fingerprint={cryptographyRepository.getLocalFingerprint()} />
+      </fieldset>
+
+      <hr className="preferences-devices-separator preferences-separator" />
+
+      {clients.length > 0 && (
+        <fieldset className="preferences-section">
+          <legend className="preferences-header">{t('preferencesDevicesActive')}</legend>
+          {clients.map((device, index) => (
+            <Device
+              device={device}
+              key={device.id}
+              isSSO={isSSO}
+              onSelect={setSelectedDevice}
+              onRemove={removeDevice}
+              deviceNumber={++index}
+            />
+          ))}
+          <p className="preferences-detail">{t('preferencesDevicesActiveDetail')}</p>
         </fieldset>
-
-        <hr className="preferences-devices-separator preferences-separator" />
-
-        {clients.length > 0 && (
-          <fieldset className="preferences-section">
-            <legend className="preferences-header">{t('preferencesDevicesActive')}</legend>
-            {clients.map((device, index) => (
-              <Device
-                device={device}
-                key={device.id}
-                isSSO={isSSO}
-                onSelect={setSelectedDevice}
-                onRemove={removeDevice}
-                deviceNumber={++index}
-              />
-            ))}
-            <p className="preferences-detail">{t('preferencesDevicesActiveDetail')}</p>
-          </fieldset>
-        )}
-      </div>
-    </div>
+      )}
+    </PreferencesPage>
   );
 };
 
-export default DevicesPreferences;
+export {DevicesPreferences};

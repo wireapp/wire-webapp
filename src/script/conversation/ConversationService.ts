@@ -18,19 +18,19 @@
  */
 
 import type {
-  CONVERSATION_ACCESS,
   ACCESS_ROLE_V2,
   ClientMismatch,
   Conversation as BackendConversation,
   ConversationCode,
+  CONVERSATION_ACCESS,
   NewOTRMessage,
-} from '@wireapp/api-client/src/conversation';
+} from '@wireapp/api-client/lib/conversation';
 import type {
+  ConversationJoinData,
   ConversationMemberUpdateData,
   ConversationOtherMemberUpdateData,
   ConversationReceiptModeUpdateData,
-  ConversationJoinData,
-} from '@wireapp/api-client/src/conversation/data';
+} from '@wireapp/api-client/lib/conversation/data';
 import type {
   ConversationCodeDeleteEvent,
   ConversationCodeUpdateEvent,
@@ -40,20 +40,20 @@ import type {
   ConversationMessageTimerUpdateEvent,
   ConversationReceiptModeUpdateEvent,
   ConversationRenameEvent,
-} from '@wireapp/api-client/src/event';
+} from '@wireapp/api-client/lib/event';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
-import {Logger, getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 
 import type {Conversation as ConversationEntity} from '../entity/Conversation';
 import type {EventService} from '../event/EventService';
 import {MessageCategory} from '../message/MessageCategory';
 import {search as fullTextSearch} from '../search/FullTextSearch';
-import {StorageService} from '../storage';
-import {StorageSchemata} from '../storage/StorageSchemata';
 import {APIClient} from '../service/APIClientSingleton';
+import {StorageService} from '../storage';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import {StorageSchemata} from '../storage/StorageSchemata';
 
 export class ConversationService {
   private readonly eventService: EventService;

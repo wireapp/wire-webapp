@@ -19,8 +19,8 @@
 
 import React from 'react';
 
-import {getMapsUrl} from 'Util/LocationUtil';
 import {t} from 'Util/LocalizerUtil';
+import {getMapsUrl} from 'Util/LocationUtil';
 
 import type {Location} from '../../../../../entity/message/Location';
 
@@ -51,4 +51,4 @@ const LocationAsset: React.FC<LocationAssetProps> = ({asset}) => {
   );
 };
 
-export default LocationAsset;
+export {LocationAsset};

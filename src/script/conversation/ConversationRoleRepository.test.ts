@@ -17,15 +17,16 @@
  *
  */
 
-import {ConversationRole, DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/src/conversation/';
+import {ConversationRole, DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/lib/conversation/';
 
 import {createRandomUuid} from 'Util/util';
 
+import {ConversationRoleRepository, Permissions} from './ConversationRoleRepository';
+
+import {TestFactory} from '../../../test/helper/TestFactory';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {TeamEntity} from '../team/TeamEntity';
-import {TestFactory} from '../../../test/helper/TestFactory';
-import {ConversationRoleRepository, Permissions} from './ConversationRoleRepository';
 
 describe('ConversationRoleRepository', () => {
   const testFactory = new TestFactory();

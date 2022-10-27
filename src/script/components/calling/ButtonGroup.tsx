@@ -18,6 +18,7 @@
  */
 
 import React from 'react';
+
 import {CSSObject} from '@emotion/react';
 
 export interface ButtonGroupTab {
@@ -103,4 +104,4 @@ const ButtonGroup: React.FC<ButtonGroupProps> = ({style, items, currentItem, onC
   );
 };
 
-export default ButtonGroup;
+export {ButtonGroup};

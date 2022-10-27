@@ -17,10 +17,13 @@
  *
  */
 
-import ko from 'knockout';
-import {PingMessage as PingMessageEntity} from 'src/script/entity/message/PingMessage';
-import PingMessage from './PingMessage';
 import {render} from '@testing-library/react';
+import ko from 'knockout';
+
+import {PingMessage as PingMessageEntity} from 'src/script/entity/message/PingMessage';
+
+import {PingMessage} from './PingMessage';
+
 import {ReadReceipt} from '../../../storage';
 
 const createPingMessage = (partialPingMessage: Partial<PingMessageEntity>) => {

@@ -17,10 +17,11 @@
  *
  */
 
-import type {ConversationEvent} from '@wireapp/api-client/src/event/';
+import type {ConversationEvent} from '@wireapp/api-client/lib/event/';
+
+import {ConversationActionCreator} from './creator/';
 
 import type {ThunkAction} from '../reducer';
-import {ConversationActionCreator} from './creator/';
 
 export class ConversationAction {
   doCheckConversationCode = (key: string, code: string, uri?: string): ThunkAction => {

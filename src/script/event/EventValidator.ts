@@ -17,7 +17,7 @@
  *
  */
 
-import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/src/event/';
+import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/lib/event/';
 
 import {EventSource} from './EventSource';
 import {EventValidation} from './EventValidation';

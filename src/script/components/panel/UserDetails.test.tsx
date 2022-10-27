@@ -17,11 +17,14 @@
  *
  */
 
-import {createRandomUuid} from 'Util/util';
-import {User} from '../../entity/User';
-import UserDetails from './UserDetails';
-import {ClientEntity} from '../../client/ClientEntity';
 import {render} from '@testing-library/react';
+
+import {createRandomUuid} from 'Util/util';
+
+import {UserDetails} from './UserDetails';
+
+import {ClientEntity} from '../../client/ClientEntity';
+import {User} from '../../entity/User';
 
 describe('UserDetails', () => {
   it('renders the correct infos for a user', () => {

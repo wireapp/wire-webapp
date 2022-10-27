@@ -17,18 +17,20 @@
  *
  */
 
-import ko from 'knockout';
 import React from 'react';
 
-import {CSS_FILL_PARENT} from 'Util/CSSMixin';
-import Icon from 'Components/Icon';
+import ko from 'knockout';
 
-import AvatarBackground from './AvatarBackground';
-import AvatarBorder from './AvatarBorder';
-import AvatarImage from './AvatarImage';
-import AvatarWrapper from './AvatarWrapper';
-import {AVATAR_SIZE} from '../Avatar';
+import {Icon} from 'Components/Icon';
+import {CSS_FILL_PARENT} from 'Util/CSSMixin';
+
+import {AvatarBackground} from './AvatarBackground';
+import {AvatarBorder} from './AvatarBorder';
+import {AvatarImage} from './AvatarImage';
+import {AvatarWrapper} from './AvatarWrapper';
+
 import {ServiceEntity} from '../../integration/ServiceEntity';
+import {AVATAR_SIZE} from '../Avatar';
 
 export interface ServiceAvatarProps extends React.HTMLProps<HTMLDivElement> {
   avatarSize: AVATAR_SIZE;
@@ -79,4 +81,4 @@ const ServiceAvatar: React.FunctionComponent<ServiceAvatarProps> = ({participant
   );
 };
 
-export default ServiceAvatar;
+export {ServiceAvatar};

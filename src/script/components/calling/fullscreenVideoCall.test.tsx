@@ -17,16 +17,26 @@
  *
  */
 
+import {render, waitFor, act} from '@testing-library/react';
+import * as uiKit from '@wireapp/react-ui-kit';
 import ko from 'knockout';
 
+import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {Call} from 'src/script/calling/Call';
 import {Participant} from 'src/script/calling/Participant';
+import {Grid} from 'src/script/calling/videoGridHandler';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
-import FullscreenVideoCall, {FullscreenVideoCallProps} from './FullscreenVideoCall';
-import {Grid} from 'src/script/calling/videoGridHandler';
 import {MediaDevicesHandler} from 'src/script/media/MediaDevicesHandler';
-import {render, waitFor, act} from '@testing-library/react';
+
+import {FullscreenVideoCall, FullscreenVideoCallProps} from './FullscreenVideoCall';
+
+jest.mock('@wireapp/react-ui-kit', () => ({
+  ...(jest.requireActual('@wireapp/react-ui-kit') as any),
+  useMatchMedia: jest.fn(),
+}));
+
+const mockedUiKit = uiKit as jest.Mocked<typeof uiKit>;
 
 describe('fullscreenVideoCall', () => {
   const createProps = (): FullscreenVideoCallProps => {
@@ -70,9 +80,10 @@ describe('fullscreenVideoCall', () => {
   afterEach(() => jest.useRealTimers());
 
   it('shows the available screens', () => {
+    mockedUiKit.useMatchMedia.mockReturnValue(false);
     const props = createProps();
 
-    const {queryByText} = render(<FullscreenVideoCall {...props} />);
+    const {queryByText} = render(withTheme(<FullscreenVideoCall {...props} />));
 
     expect(queryByText('videoCallOverlayConversations')).not.toBe(null);
   });
@@ -80,7 +91,7 @@ describe('fullscreenVideoCall', () => {
   it('shows the calling timer', async () => {
     const props = createProps();
 
-    const {getByText} = render(<FullscreenVideoCall {...props} />);
+    const {getByText} = render(withTheme(withTheme(<FullscreenVideoCall {...props} />)));
     const now = Date.now();
 
     jest.setSystemTime(now);
@@ -99,7 +110,7 @@ describe('fullscreenVideoCall', () => {
 
   it('has no active speaker toggle for calls with more less than 3 participants', () => {
     const props = createProps();
-    const {queryByText} = render(<FullscreenVideoCall {...props} />);
+    const {queryByText} = render(withTheme(<FullscreenVideoCall {...props} />));
 
     expect(queryByText('videoSpeakersTabSpeakers')).toBeNull();
   });
@@ -114,7 +125,7 @@ describe('fullscreenVideoCall', () => {
     props.call.addParticipant(new Participant(new User('c'), 'd'));
     props.call.addParticipant(new Participant(new User('e'), 'f'));
 
-    const {getByText} = render(<FullscreenVideoCall {...props} />);
+    const {getByText} = render(withTheme(<FullscreenVideoCall {...props} />));
     const speakersButtonLabel = 'videoSpeakersTabSpeakers'.toUpperCase();
     await waitFor(() => getByText(speakersButtonLabel));
 

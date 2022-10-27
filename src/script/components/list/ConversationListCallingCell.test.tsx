@@ -17,30 +17,30 @@
  *
  */
 
-import {act} from 'react-dom/test-utils';
+import {render, waitFor} from '@testing-library/react';
+import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 import ko from 'knockout';
-import {STATE as CALL_STATE, CALL_TYPE} from '@wireapp/avs';
-
-import {createRandomUuid} from 'Util/util';
+import {act} from 'react-dom/test-utils';
 
 import {Call} from 'src/script/calling/Call';
+import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {Participant} from 'src/script/calling/Participant';
 import {Conversation} from 'src/script/entity/Conversation';
-import ConversationListCallingCell, {CallingCellProps} from './ConversationListCallingCell';
 import {User} from 'src/script/entity/User';
 import {MediaDevicesHandler} from 'src/script/media/MediaDevicesHandler';
-import {CallActions} from 'src/script/view_model/CallingViewModel';
-import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {TeamState} from 'src/script/team/TeamState';
-import {waitFor, render} from '@testing-library/react';
+import {CallActions} from 'src/script/view_model/CallingViewModel';
+import {createRandomUuid} from 'Util/util';
 
-jest.mock(
-  'Components/utils/InViewport',
-  () =>
-    function MockInViewport() {
-      return <div></div>;
-    },
-);
+import {CallingCellProps, ConversationListCallingCell} from './ConversationListCallingCell';
+
+jest.mock('Components/utils/InViewport', () => ({
+  InViewport: ({onVisible, children}: {onVisible: () => void; children: any}) => {
+    onVisible();
+    return <div>{children}</div>;
+  },
+  __esModule: true,
+}));
 
 const createCall = (state: CALL_STATE, selfUser = new User(createRandomUuid()), selfClientId = createRandomUuid()) => {
   const selfParticipant = new Participant(selfUser, selfClientId);

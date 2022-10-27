@@ -35,21 +35,6 @@ module.exports = {
     src: 'auth.html',
   },
 
-  prod_demo: {
-    cwd: '<%= dir.src.demo %>',
-    dest: '<%= dir.dist.static %>/demo',
-    expand: true,
-    options: {
-      globals: {
-        dest: '_prod',
-      },
-      includesDir: '<%= dir.src.demo %>/template',
-      prefix: '#',
-    },
-    rename: dest => `${dest}/index.html`,
-    src: 'demo.html',
-  },
-
   prod_index: {
     cwd: '<%= dir.src.page %>',
     dest: '<%= dir.dist.static %>',

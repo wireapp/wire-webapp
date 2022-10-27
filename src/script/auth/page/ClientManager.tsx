@@ -17,22 +17,25 @@
  *
  */
 
-import {Button, ButtonVariant, ContainerXS, H1, Muted, useTimeout} from '@wireapp/react-ui-kit';
 import React, {useEffect} from 'react';
+
+import {Button, ButtonVariant, ContainerXS, H1, Muted, useTimeout} from '@wireapp/react-ui-kit';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
+
+import {Page} from './Page';
+
 import {Config} from '../../Config';
 import {clientManagerStrings} from '../../strings';
-import ClientList from '../component/ClientList';
+import {ClientList} from '../component/ClientList';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {RootState, bindActionCreators} from '../module/reducer';
 import {QUERY_KEY} from '../route';
-import Page from './Page';
 
-interface Props extends React.HTMLProps<HTMLDivElement> {}
+type Props = React.HTMLProps<HTMLDivElement>;
 
-const ClientManager = ({doGetAllClients, doLogout}: Props & ConnectedProps & DispatchProps) => {
+const ClientManagerComponent = ({doGetAllClients, doLogout}: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
   const SFAcode = localStorage.getItem(QUERY_KEY.CONVERSATION_CODE);
   const timeRemaining = JSON.parse(localStorage.getItem(QUERY_KEY.JOIN_EXPIRES) ?? '{}')?.data ?? Date.now();
@@ -100,4 +103,6 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(mapStateToProps, mapDispatchToProps)(ClientManager);
+const ClientManager = connect(mapStateToProps, mapDispatchToProps)(ClientManagerComponent);
+
+export {ClientManager};

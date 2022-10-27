@@ -17,11 +17,13 @@
  *
  */
 
-import SearchInput from 'Components/SearchInput';
+import {fireEvent, render} from '@testing-library/react';
 import ko from 'knockout';
-import {User} from '../entity/User';
+
+import {SearchInput} from 'Components/SearchInput';
 import {KEY} from 'Util/KeyboardUtil';
-import {render, fireEvent} from '@testing-library/react';
+
+import {User} from '../entity/User';
 
 describe('SearchInput', () => {
   it('lists all selected users', async () => {

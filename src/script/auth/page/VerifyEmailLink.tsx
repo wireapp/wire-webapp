@@ -17,21 +17,24 @@
  *
  */
 
-import {ContainerXS, H1, H3, Muted} from '@wireapp/react-ui-kit';
 import React, {useEffect} from 'react';
+
+import {ContainerXS, H1, H3, Muted} from '@wireapp/react-ui-kit';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
+
+import {Page} from './Page';
+
 import {setEmailStrings} from '../../strings';
+import {RouterLink} from '../component/RouterLink';
 import {RootState} from '../module/reducer';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import {ROUTE} from '../route';
-import Page from './Page';
-import RouterLink from '../component/RouterLink';
 
-interface Props extends React.HTMLProps<HTMLDivElement> {}
+type Props = React.HTMLProps<HTMLDivElement>;
 
-const VerifyEmailLink = ({hasSelfEmail}: Props & ConnectedProps) => {
+const VerifyEmailLinkComponent = ({hasSelfEmail}: Props & ConnectedProps) => {
   const {formatMessage: _} = useIntl();
   const navigate = useNavigate();
 
@@ -75,4 +78,6 @@ const mapStateToProps = (state: RootState) => ({
   hasSelfEmail: SelfSelector.hasSelfEmail(state),
 });
 
-export default connect(mapStateToProps)(VerifyEmailLink);
+const VerifyEmailLink = connect(mapStateToProps)(VerifyEmailLinkComponent);
+
+export {VerifyEmailLink};

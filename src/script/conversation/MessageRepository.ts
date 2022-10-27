@@ -17,89 +17,90 @@
  *
  */
 
-import {amplify} from 'amplify';
-import {Asset, Confirmation, GenericMessage, Availability} from '@wireapp/protocol-messaging';
-import {ReactionType, MessageTargetMode, PayloadBundleState} from '@wireapp/core/src/main/conversation';
-import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {
   ClientMismatch,
-  QualifiedUserClients,
-  MessageSendingStatus,
-  UserClients,
   ConversationProtocol,
-} from '@wireapp/api-client/src/conversation';
-import {QualifiedId, RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/src/user';
-import {WebAppEvents} from '@wireapp/webapp-events';
+  MessageSendingStatus,
+  QualifiedUserClients,
+  UserClients,
+} from '@wireapp/api-client/lib/conversation';
+import {QualifiedId, RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/lib/user';
+import {MessageTargetMode, PayloadBundleState, ReactionType} from '@wireapp/core/lib/conversation';
 import {
   AudioMetaData,
-  VideoMetaData,
-  ImageMetaData,
-  FileMetaDataContent,
-  LinkPreviewUploadedContent,
-  LinkPreviewContent,
-  TextContent,
   EditedTextContent,
-} from '@wireapp/core/src/main/conversation/content';
-import {TextContentBuilder} from '@wireapp/core/src/main/conversation/message/TextContentBuilder';
-import {MessageBuilder} from '@wireapp/core';
+  FileMetaDataContent,
+  ImageMetaData,
+  LinkPreviewContent,
+  LinkPreviewUploadedContent,
+  TextContent,
+  VideoMetaData,
+} from '@wireapp/core/lib/conversation/content';
+import * as MessageBuilder from '@wireapp/core/lib/conversation/message/MessageBuilder';
+import {OtrMessage} from '@wireapp/core/lib/conversation/message/OtrMessage';
+import {TextContentBuilder} from '@wireapp/core/lib/conversation/message/TextContentBuilder';
+import {isQualifiedUserClients, isUserClients} from '@wireapp/core/lib/util';
+import {Asset, Availability, Confirmation, GenericMessage} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
+import {partition} from 'underscore';
 
-import {Logger, getLogger} from 'Util/Logger';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {Declension, joinNames, t} from 'Util/LocalizerUtil';
-import {createRandomUuid, loadUrlBlob} from 'Util/util';
+import {getLogger, Logger} from 'Util/Logger';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
-import {capitalizeFirstChar} from 'Util/StringUtil';
 import {roundLogarithmic} from 'Util/NumberUtil';
+import {matchQualifiedIds} from 'Util/QualifiedId';
+import {capitalizeFirstChar} from 'Util/StringUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {createRandomUuid, loadUrlBlob} from 'Util/util';
 
+import {findDeletedClients} from './ClientMismatchUtil';
+import {ConversationRepository} from './ConversationRepository';
+import {ConversationState} from './ConversationState';
+import {ConversationVerificationState} from './ConversationVerificationState';
+import {EventMapper} from './EventMapper';
+import {getLinkPreviewFromString} from './linkPreviews';
+
+import {buildMetadata, ImageMetadata, isAudio, isImage, isVideo} from '../assets/AssetMetaDataBuilder';
+import {AssetRepository} from '../assets/AssetRepository';
+import {AssetTransferState} from '../assets/AssetTransferState';
+import {AudioType} from '../audio/AudioType';
+import {ClientState} from '../client/ClientState';
+import {PrimaryModal} from '../components/Modals/PrimaryModal';
+import {EventBuilder} from '../conversation/EventBuilder';
+import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
+import {Conversation} from '../entity/Conversation';
+import {CompositeMessage} from '../entity/message/CompositeMessage';
+import {ContentMessage} from '../entity/message/ContentMessage';
+import {FileAsset} from '../entity/message/FileAsset';
+import {Message} from '../entity/message/Message';
+import {User} from '../entity/User';
+import {ConversationError} from '../error/ConversationError';
+import {EventRepository} from '../event/EventRepository';
+import {EventService} from '../event/EventService';
 import {EventTypeHandling} from '../event/EventTypeHandling';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
-import {EventRepository} from '../event/EventRepository';
-import {EventBuilder} from '../conversation/EventBuilder';
-import {Conversation} from '../entity/Conversation';
-import {Message} from '../entity/message/Message';
-import * as trackingHelpers from '../tracking/Helpers';
-import {EventMapper} from './EventMapper';
-import {ConversationVerificationState} from './ConversationVerificationState';
-import {buildMetadata, isVideo, isImage, isAudio, ImageMetadata} from '../assets/AssetMetaDataBuilder';
-import {AssetTransferState} from '../assets/AssetTransferState';
-import {ModalOptions, ModalsViewModel} from '../view_model/ModalsViewModel';
-import {AudioType} from '../audio/AudioType';
-import {EventName} from '../tracking/EventName';
-import {StatusType} from '../message/StatusType';
 import {showLegalHoldWarningModal} from '../legal-hold/LegalHoldWarning';
-import {ConversationError} from '../error/ConversationError';
-import {Segmentation} from '../tracking/Segmentation';
-import {AssetRepository} from '../assets/AssetRepository';
-import {CryptographyRepository} from '../cryptography/CryptographyRepository';
-import {ConversationRepository} from './ConversationRepository';
-import {getLinkPreviewFromString} from './linkPreviews';
-import {UserRepository} from '../user/UserRepository';
-import {PropertiesRepository} from '../properties/PropertiesRepository';
-import {ServerTimeHandler} from '../time/serverTimeHandler';
-import {ContentMessage} from '../entity/message/ContentMessage';
-import {EventService} from '../event/EventService';
-import {QuoteEntity} from '../message/QuoteEntity';
-import {CompositeMessage} from '../entity/message/CompositeMessage';
 import {MentionEntity} from '../message/MentionEntity';
-import {FileAsset} from '../entity/message/FileAsset';
-import type {EventRecord} from '../storage';
-import {UserState} from '../user/UserState';
-import {TeamState} from '../team/TeamState';
-import {ClientState} from '../client/ClientState';
-import {UserType} from '../tracking/attribute';
-import {matchQualifiedIds} from 'Util/QualifiedId';
-import {Core} from '../service/CoreSingleton';
-import {OtrMessage} from '@wireapp/core/src/main/conversation/message/OtrMessage';
-import {User} from '../entity/User';
-import {isQualifiedUserClients, isUserClients} from '@wireapp/core/src/main/util';
+import {QuoteEntity} from '../message/QuoteEntity';
+import {StatusType} from '../message/StatusType';
+import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
-import {findDeletedClients} from './ClientMismatchUtil';
+import {Core} from '../service/CoreSingleton';
+import type {EventRecord} from '../storage';
+import {TeamState} from '../team/TeamState';
+import {ServerTimeHandler} from '../time/serverTimeHandler';
+import {UserType} from '../tracking/attribute';
+import {EventName} from '../tracking/EventName';
+import * as trackingHelpers from '../tracking/Helpers';
+import {Segmentation} from '../tracking/Segmentation';
 import {protoFromType} from '../user/AvailabilityMapper';
-import {partition} from 'underscore';
-import {ConversationState} from './ConversationState';
+import {UserRepository} from '../user/UserRepository';
+import {UserState} from '../user/UserState';
 
 export interface MessageSendingOptions {
   /** Send native push notification for message. Default is `true`. */
@@ -272,6 +273,7 @@ export class MessageRepository {
         conversation,
         {mentions, quote},
       ),
+      messageId,
     );
 
     return this.sendAndInjectMessage(editMessage, conversation, {syncTimestamp: false});
@@ -635,7 +637,7 @@ export class MessageRepository {
     const titleString = users[0].isMe ? t('modalConversationNewDeviceHeadlineYou', titleSubstitutions) : baseTitle;
 
     return new Promise(resolve => {
-      const options: ModalOptions = {
+      const options = {
         close: () => resolve(false),
         primaryAction: {
           action: () => {
@@ -650,7 +652,7 @@ export class MessageRepository {
         },
       };
 
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, options, `degraded-${conversation.id}`);
+      PrimaryModal.show(PrimaryModal.type.CONFIRM, options, `degraded-${conversation.id}`);
     });
   }
 

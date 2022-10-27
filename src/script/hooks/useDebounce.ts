@@ -26,4 +26,4 @@ const useDebounce = (callback: () => void, time: number, deps?: DependencyList) 
   }, deps);
 };
 
-export default useDebounce;
+export {useDebounce};

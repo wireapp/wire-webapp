@@ -18,10 +18,17 @@
  */
 
 import React, {useEffect, useState} from 'react';
+
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
-import type {ConversationRepository} from '../../../../conversation/ConversationRepository';
-import type {Conversation} from '../../../../entity/Conversation';
+import {ListViewModel} from 'src/script/view_model/ListViewModel';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+
+import {GroupedConversationsFolder} from './GroupedConversationsFolder';
+import {useFolderState} from './state';
+
+import {CallState} from '../../../../calling/CallState';
 import {
   ConversationLabel,
   ConversationLabelRepository,
@@ -30,14 +37,9 @@ import {
   createLabelGroups,
   createLabelPeople,
 } from '../../../../conversation/ConversationLabelRepository';
-
-import {ListViewModel} from 'src/script/view_model/ListViewModel';
+import type {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import {ConversationState} from '../../../../conversation/ConversationState';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import GroupedConversationsFolder from './GroupedConversationsFolder';
-import {CallState} from '../../../../calling/CallState';
-import {QualifiedId} from '@wireapp/api-client/src/user';
-import {useFolderState} from './state';
+import type {Conversation} from '../../../../entity/Conversation';
 
 const useLabels = (conversationLabelRepository: ConversationLabelRepository) => {
   const {labels: conversationLabels} = useKoSubscribableChildren(conversationLabelRepository, ['labels']);
@@ -118,4 +120,4 @@ const GroupedConversations: React.FC<GroupedConversationsProps> = ({
   );
 };
 
-export default GroupedConversations;
+export {GroupedConversations};

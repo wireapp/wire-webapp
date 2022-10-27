@@ -17,25 +17,27 @@
  *
  */
 
-import type {DomainData} from '@wireapp/api-client/src/account/DomainData';
-import type {LoginData, RegisterData, SendLoginCode} from '@wireapp/api-client/src/auth/';
-import {ClientType} from '@wireapp/api-client/src/client/';
+import type {DomainData} from '@wireapp/api-client/lib/account/DomainData';
+import type {LoginData, RegisterData, SendLoginCode} from '@wireapp/api-client/lib/auth/';
+import {VerificationActionType} from '@wireapp/api-client/lib/auth/VerificationActionType';
+import {ClientType} from '@wireapp/api-client/lib/client/';
 import type {Account} from '@wireapp/core';
 import type {CRUDEngine} from '@wireapp/store-engine';
 import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
 import {LowDiskSpaceError} from '@wireapp/store-engine/src/main/engine/error/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {VerificationActionType} from '@wireapp/api-client/src/auth/VerificationActionType';
 
 import {isTemporaryClientAndNonPersistent} from 'Util/util';
-import {currentCurrency, currentLanguage} from '../../localeConfig';
-import type {Api, RootState, ThunkAction, ThunkDispatch} from '../reducer';
-import type {RegistrationDataState} from '../reducer/authReducer';
-import {COOKIE_NAME_APP_OPENED} from '../selector/CookieSelector';
+
 import {BackendError} from './BackendError';
 import {AuthActionCreator} from './creator/';
 import {LabeledError} from './LabeledError';
 import {LocalStorageAction, LocalStorageKey} from './LocalStorageAction';
+
+import {currentCurrency, currentLanguage} from '../../localeConfig';
+import type {Api, RootState, ThunkAction, ThunkDispatch} from '../reducer';
+import type {RegistrationDataState} from '../reducer/authReducer';
+import {COOKIE_NAME_APP_OPENED} from '../selector/CookieSelector';
 
 type LoginLifecycleFunction = (dispatch: ThunkDispatch, getState: () => RootState, global: Api) => Promise<void>;
 
@@ -172,7 +174,7 @@ export class AuthAction {
       dispatch(AuthActionCreator.startLogin());
       try {
         // we first init the core without initializing the client for now (this will be done later on)
-        await core.init(clientType, undefined, false);
+        await core.init(clientType, {initClient: false});
         await this.persistAuthData(clientType, core, dispatch, localStorageAction);
         await dispatch(selfAction.fetchSelf());
         await dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: getConfig().APP_INSTANCE_ID}));
@@ -361,7 +363,7 @@ export class AuthAction {
         }
         const clientType = persist ? ClientType.PERMANENT : ClientType.TEMPORARY;
 
-        await core.init(clientType, undefined, false);
+        await core.init(clientType, {initClient: false});
         await this.persistAuthData(clientType, core, dispatch, localStorageAction);
 
         if (options.shouldValidateLocalClient) {

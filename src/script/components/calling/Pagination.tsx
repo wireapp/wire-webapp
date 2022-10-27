@@ -18,6 +18,7 @@
  */
 
 import React from 'react';
+
 import {CSSObject} from '@emotion/react';
 
 export interface PaginationProps {
@@ -98,4 +99,4 @@ const Pagination: React.FC<PaginationProps> = ({totalPages, currentPage, onChang
   );
 };
 
-export default Pagination;
+export {Pagination};

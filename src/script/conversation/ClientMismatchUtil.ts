@@ -20,18 +20,17 @@
 import type {
   ClientMismatch,
   MessageSendingStatus,
-  UserClients,
   QualifiedUserClients,
-} from '@wireapp/api-client/src/conversation/';
-import {
-  flattenQualifiedUserClients,
-  flattenUserClients,
-} from '@wireapp/core/src/main/conversation/message/UserClientsUtil';
-import {isQualifiedUserClients} from '@wireapp/core/src/main/util';
-import {QualifiedId} from '@wireapp/api-client/src/user';
-import {User} from '../entity/User';
+  UserClients,
+} from '@wireapp/api-client/lib/conversation/';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {flattenQualifiedUserClients, flattenUserClients} from '@wireapp/core/lib/conversation/message/UserClientsUtil';
+import {isQualifiedUserClients} from '@wireapp/core/lib/util';
 import {difference, intersection} from 'underscore';
+
 import {matchQualifiedIds} from 'Util/QualifiedId';
+
+import {User} from '../entity/User';
 
 type UserClient = {clients: string[]; userId: QualifiedId};
 

@@ -18,110 +18,105 @@
  */
 
 // Polyfill for "tsyringe" dependency injection
+import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
+import {Runtime} from '@wireapp/commons';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
 import 'core-js/full/reflect';
-
+import Dexie from 'dexie';
 import ko from 'knockout';
 import platform from 'platform';
 import {container} from 'tsyringe';
-import {ClientType} from '@wireapp/api-client/src/client/';
-import {WebAppEvents} from '@wireapp/webapp-events';
-import {amplify} from 'amplify';
-import Dexie from 'dexie';
-import {Runtime} from '@wireapp/commons';
 
-import {getLogger, Logger} from 'Util/Logger';
-import {t} from 'Util/LocalizerUtil';
-import {arrayToBase64, checkIndexedDb, createRandomUuid} from 'Util/util';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {enableLogging} from 'Util/LoggerUtil';
-import {Environment} from 'Util/Environment';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {showUserModal} from 'Components/Modals/UserModal';
 import {DebugUtil} from 'Util/DebugUtil';
-import {exposeWrapperGlobals} from 'Util/wrapper';
-import {includesString} from 'Util/StringUtil';
-import {appendParameter} from 'Util/UrlUtil';
+import {Environment} from 'Util/Environment';
+import {t} from 'Util/LocalizerUtil';
+import {getLogger, Logger} from 'Util/Logger';
+import {enableLogging} from 'Util/LoggerUtil';
 import {loadValue} from 'Util/StorageUtil';
+import {includesString} from 'Util/StringUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {appendParameter} from 'Util/UrlUtil';
+import {arrayToBase64, checkIndexedDb, createRandomUuid, supportsMLS} from 'Util/util';
+import {exposeWrapperGlobals} from 'Util/wrapper';
 
-import {Config} from '../Config';
-import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
-import {LoadingViewModel} from '../view_model/LoadingViewModel';
-import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
-import * as UserPermission from '../user/UserPermission';
-import {UserRepository} from '../user/UserRepository';
-import {serverTimeHandler} from '../time/serverTimeHandler';
-import {CallingRepository} from '../calling/CallingRepository';
+import {migrateToQualifiedSessionIds} from './sessionIdMigrator';
+import {SingleInstanceHandler} from './SingleInstanceHandler';
+
+import {AssetRepository} from '../assets/AssetRepository';
+import {AssetService} from '../assets/AssetService';
+import {AudioRepository} from '../audio/AudioRepository';
+import {SIGN_OUT_REASON} from '../auth/SignOutReason';
+import {URLParameter} from '../auth/URLParameter';
 import {BackupRepository} from '../backup/BackupRepository';
-import {NotificationRepository} from '../notification/NotificationRepository';
-import {IntegrationRepository} from '../integration/IntegrationRepository';
-import {IntegrationService} from '../integration/IntegrationService';
-import {StorageRepository} from '../storage/StorageRepository';
-import {StorageKey} from '../storage/StorageKey';
-import {EventTrackingRepository} from '../tracking/EventTrackingRepository';
+import {BackupService} from '../backup/BackupService';
+import {CacheRepository} from '../cache/CacheRepository';
+import {CallingRepository} from '../calling/CallingRepository';
+import {ClientRepository} from '../client/ClientRepository';
+import {ClientService} from '../client/ClientService';
+import {Config} from '../Config';
 import {ConnectionRepository} from '../connection/ConnectionRepository';
-import {CryptographyRepository} from '../cryptography/CryptographyRepository';
-import {TeamRepository} from '../team/TeamRepository';
-import {SearchRepository} from '../search/SearchRepository';
+import {ConnectionService} from '../connection/ConnectionService';
 import {ConversationRepository} from '../conversation/ConversationRepository';
+import {ConversationService} from '../conversation/ConversationService';
+import {MessageRepository} from '../conversation/MessageRepository';
+import {CryptographyRepository} from '../cryptography/CryptographyRepository';
+import {AccessTokenError, ACCESS_TOKEN_ERROR_TYPE} from '../error/AccessTokenError';
+import {AuthError} from '../error/AuthError';
+import {BaseError} from '../error/BaseError';
+import {ClientError, CLIENT_ERROR_TYPE} from '../error/ClientError';
+import {TeamError} from '../error/TeamError';
 import {EventRepository} from '../event/EventRepository';
-import {EventServiceNoCompound} from '../event/EventServiceNoCompound';
 import {EventService} from '../event/EventService';
+import {EventServiceNoCompound} from '../event/EventServiceNoCompound';
 import {NotificationService} from '../event/NotificationService';
 import {QuotedMessageMiddleware} from '../event/preprocessor/QuotedMessageMiddleware';
-import {ServiceMiddleware} from '../event/preprocessor/ServiceMiddleware';
-import {ConversationService} from '../conversation/ConversationService';
-import {SingleInstanceHandler} from './SingleInstanceHandler';
-import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';
-import {AppInitTimingsStep} from '../telemetry/app_init/AppInitTimingsStep';
-import {AppInitTelemetry} from '../telemetry/app_init/AppInitTelemetry';
-import {MainViewModel, ViewModelRepositories} from '../view_model/MainViewModel';
-import {ThemeViewModel} from '../view_model/ThemeViewModel';
-import {WindowHandler} from '../ui/WindowHandler';
-import {Router} from '../router/Router';
-import {initRouterBindings} from '../router/routerBindings';
-
-import './globals';
-
 import {ReceiptsMiddleware} from '../event/preprocessor/ReceiptsMiddleware';
-
-import {getWebsiteUrl} from '../externalRoute';
-
-import {modals} from '../view_model/ModalsViewModel';
-import {showInitialModal} from '../user/AvailabilityModal';
-
-import {URLParameter} from '../auth/URLParameter';
-import {SIGN_OUT_REASON} from '../auth/SignOutReason';
-import {ClientRepository} from '../client/ClientRepository';
-import {ContentViewModel} from '../view_model/ContentViewModel';
-import {CacheRepository} from '../cache/CacheRepository';
-import {SelfService} from '../self/SelfService';
-import {PropertiesRepository} from '../properties/PropertiesRepository';
-import {PropertiesService} from '../properties/PropertiesService';
-import {AssetService} from '../assets/AssetService';
-import {UserService} from '../user/UserService';
-import {AudioRepository} from '../audio/AudioRepository';
-import {StorageService} from '../storage';
-import {BackupService} from '../backup/BackupService';
-import {MediaRepository} from '../media/MediaRepository';
+import {ServiceMiddleware} from '../event/preprocessor/ServiceMiddleware';
 import {GiphyRepository} from '../extension/GiphyRepository';
 import {GiphyService} from '../extension/GiphyService';
-import {PermissionRepository} from '../permission/PermissionRepository';
-import {APIClient} from '../service/APIClientSingleton';
-import {ClientService} from '../client/ClientService';
-import {ConnectionService} from '../connection/ConnectionService';
-import {TeamService} from '../team/TeamService';
-import {SearchService} from '../search/SearchService';
-import {CryptographyService} from '../cryptography/CryptographyService';
-import {AccessTokenError, ACCESS_TOKEN_ERROR_TYPE} from '../error/AccessTokenError';
-import {ClientError, CLIENT_ERROR_TYPE} from '../error/ClientError';
-import {AuthError} from '../error/AuthError';
-import {AssetRepository} from '../assets/AssetRepository';
-import {BaseError} from '../error/BaseError';
-import {MessageRepository} from '../conversation/MessageRepository';
-import {TeamError} from '../error/TeamError';
-import Warnings from '../view_model/WarningsContainer';
-import {Core} from '../service/CoreSingleton';
-import {migrateToQualifiedSessionIds} from './sessionIdMigrator';
-import showUserModal from 'Components/Modals/UserModal';
+import {getWebsiteUrl} from '../externalRoute';
+import {IntegrationRepository} from '../integration/IntegrationRepository';
+import {IntegrationService} from '../integration/IntegrationService';
+import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
+import {MediaRepository} from '../media/MediaRepository';
 import {mlsConversationState} from '../mls/mlsConversationState';
+import {NotificationRepository} from '../notification/NotificationRepository';
+import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
+import {PermissionRepository} from '../permission/PermissionRepository';
+import {PropertiesRepository} from '../properties/PropertiesRepository';
+import {PropertiesService} from '../properties/PropertiesService';
+import {Router} from '../router/Router';
+import {initRouterBindings} from '../router/routerBindings';
+import {SearchRepository} from '../search/SearchRepository';
+import {SearchService} from '../search/SearchService';
+import {SelfService} from '../self/SelfService';
+import {APIClient} from '../service/APIClientSingleton';
+import {Core} from '../service/CoreSingleton';
+import {StorageService} from '../storage';
+import {StorageKey} from '../storage/StorageKey';
+import {StorageRepository} from '../storage/StorageRepository';
+import {TeamRepository} from '../team/TeamRepository';
+import {TeamService} from '../team/TeamService';
+import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';
+import {AppInitTelemetry} from '../telemetry/app_init/AppInitTelemetry';
+import {AppInitTimingsStep} from '../telemetry/app_init/AppInitTimingsStep';
+import {serverTimeHandler} from '../time/serverTimeHandler';
+import {EventTrackingRepository} from '../tracking/EventTrackingRepository';
+import {WindowHandler} from '../ui/WindowHandler';
+import {showInitialModal} from '../user/AvailabilityModal';
+import * as UserPermission from '../user/UserPermission';
+import {UserRepository} from '../user/UserRepository';
+import {UserService} from '../user/UserService';
+import {ContentState} from '../view_model/ContentViewModel';
+import {LoadingViewModel} from '../view_model/LoadingViewModel';
+import {MainViewModel, ViewModelRepositories} from '../view_model/MainViewModel';
+import {ThemeViewModel} from '../view_model/ThemeViewModel';
+import {Warnings} from '../view_model/WarningsContainer';
+
+import './globals';
 
 function doRedirect(signOutReason: SIGN_OUT_REASON) {
   let url = `/auth/${location.search}`;
@@ -152,8 +147,8 @@ class App {
     storage: StorageService;
   };
   repository: ViewModelRepositories = {} as ViewModelRepositories;
-  debug: DebugUtil;
-  util: {debug: DebugUtil};
+  debug?: DebugUtil;
+  util?: {debug: DebugUtil};
   singleInstanceHandler: SingleInstanceHandler;
 
   static get CONFIG() {
@@ -231,7 +226,7 @@ class App {
     repositories.serverTime = serverTimeHandler;
     repositories.storage = new StorageRepository();
 
-    repositories.cryptography = new CryptographyRepository(new CryptographyService());
+    repositories.cryptography = new CryptographyRepository();
     repositories.client = new ClientRepository(new ClientService(), repositories.cryptography, repositories.storage);
     repositories.media = new MediaRepository(new PermissionRepository());
     repositories.audio = new AudioRepository(repositories.media.devicesHandler);
@@ -381,7 +376,6 @@ class App {
         client: clientRepository,
         connection: connectionRepository,
         conversation: conversationRepository,
-        cryptography: cryptographyRepository,
         event: eventRepository,
         eventTracker: eventTrackerRepository,
         properties: propertiesRepository,
@@ -394,7 +388,13 @@ class App {
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
 
       try {
-        await this.core.init(clientType);
+        await this.core.init(clientType, {
+          onNewClient({userId, clientId, domain}) {
+            const qualifiedId = {domain: domain ?? '', id: userId};
+            const newClient = {class: ClientClassification.UNKNOWN, id: clientId};
+            userRepository.addClientToUser(qualifiedId, newClient, true);
+          },
+        });
       } catch (error) {
         throw new ClientError(CLIENT_ERROR_TYPE.NO_VALID_CLIENT, 'Client has been deleted on backend');
       }
@@ -416,8 +416,6 @@ class App {
       telemetry.timeStep(AppInitTimingsStep.VALIDATED_CLIENT);
       telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity().type ?? 'unknown');
 
-      await cryptographyRepository.init(this.core.service!.cryptography.cryptobox, clientEntity);
-
       loadingView.updateProgress(10);
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
@@ -425,7 +423,7 @@ class App {
 
       const conversationEntities = await conversationRepository.getConversations();
 
-      if (Config.getConfig().FEATURE.ENABLE_MLS) {
+      if (supportsMLS()) {
         // We send external proposal to all the MLS conversations that are in an unknown state (not established nor pendingWelcome)
         await mlsConversationState.getState().sendExternalToPendingJoin(
           conversationEntities,
@@ -495,7 +493,7 @@ class App {
       loadingView.removeFromView();
       telemetry.report();
       amplify.publish(WebAppEvents.LIFECYCLE.LOADED);
-      modals.ready();
+      PrimaryModal.init();
       showInitialModal(userRepository['userState'].self().availability());
       telemetry.timeStep(AppInitTimingsStep.UPDATED_CONVERSATIONS);
       if (userRepository['userState'].isActivatedAccount()) {
@@ -668,9 +666,7 @@ class App {
   }
 
   private _registerSingleInstanceCleaning() {
-    $(window).on('beforeunload', () => {
-      this.singleInstanceHandler.deregisterInstance();
-    });
+    window.addEventListener('beforeunload', () => this.singleInstanceHandler.deregisterInstance());
   }
 
   /**
@@ -689,7 +685,7 @@ class App {
     } else if (conversationEntity) {
       mainView.content.showConversation(conversationEntity, {});
     } else if (this.repository.user['userState'].connectRequests().length) {
-      amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.CONNECTION_REQUESTS);
+      amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentState.CONNECTION_REQUESTS);
     }
 
     const redirect = localStorage.getItem(App.LOCAL_STORAGE_LOGIN_REDIRECT_KEY);
@@ -716,12 +712,7 @@ class App {
       '/preferences/devices': () => mainView.list.openPreferencesDevices(),
       '/preferences/options': () => mainView.list.openPreferencesOptions(),
       '/user/:userId(/:domain)': (userId: string, domain: string = this.apiClient.context?.domain ?? '') => {
-        showUserModal({
-          actionsViewModel: mainView.actions,
-          onClose: () => router.navigate('/'),
-          userId: {domain, id: userId},
-          userRepository: this.repository.user,
-        });
+        showUserModal({domain, id: userId}, () => router.navigate('/'));
       },
     });
     initRouterBindings(router);
@@ -738,7 +729,7 @@ class App {
    * Subscribe to 'beforeunload' to stop calls and disconnect the WebSocket.
    */
   private _subscribeToUnloadEvents(): void {
-    $(window).on('unload', () => {
+    window.addEventListener('unload', () => {
       this.logger.info("'window.onunload' was triggered, so we will disconnect from the backend.");
       this.repository.event.disconnectWebSocket();
       this.repository.calling.destroy();
@@ -826,6 +817,7 @@ class App {
         }
       }
 
+      await this.core.logout(clearData);
       return _redirectToLogin();
     };
 
@@ -855,7 +847,7 @@ class App {
     }
 
     this.logger.warn('No internet access. Continuing when internet connectivity regained.');
-    $(window).on('online', () => _logoutOnBackend());
+    window.addEventListener('online', () => _logoutOnBackend());
   };
 
   /**
@@ -877,7 +869,7 @@ class App {
    * Notify about found update
    */
   readonly update = (): void => {
-    amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.LIFECYCLE_UPDATE);
+    Warnings.showWarning(Warnings.TYPE.LIFECYCLE_UPDATE);
   };
 
   /**
@@ -915,10 +907,10 @@ class App {
 // Setting up the App
 //##############################################################################
 
-$(async () => {
+(async () => {
   const config = Config.getConfig();
   const apiClient = container.resolve(APIClient);
-  await apiClient.useVersion(config.SUPPORTED_API_VERSIONS, config.FEATURE.ENABLE_MLS);
+  await apiClient.useVersion(config.SUPPORTED_API_VERSIONS, config.ENABLE_DEV_BACKEND_API);
   const core = container.resolve(Core);
 
   enableLogging(Config.getConfig().FEATURE.ENABLE_DEBUG);
@@ -939,6 +931,6 @@ $(async () => {
       app.initApp(shouldPersist ? ClientType.PERMANENT : ClientType.TEMPORARY);
     }
   }
-});
+})();
 
 export {App};

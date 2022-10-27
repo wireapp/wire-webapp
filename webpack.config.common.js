@@ -17,10 +17,12 @@
  *
  */
 
-const path = require('path');
+const CopyPlugin = require('copy-webpack-plugin');
 const webpack = require('webpack');
 const WorkboxPlugin = require('workbox-webpack-plugin');
-const CopyPlugin = require('copy-webpack-plugin');
+
+const path = require('path');
+
 const {ROOT_PATH, DIST_PATH, SRC_PATH} = require('./locations');
 
 const dist = path.resolve(DIST_PATH, 'static');
@@ -121,6 +123,8 @@ module.exports = {
       I18n: path.resolve(SRC_PATH, 'i18n'),
       Resource: path.resolve(ROOT_PATH, 'resource'),
       Util: path.resolve(srcScript, 'util'),
+      src: path.resolve(ROOT_PATH, 'src'),
+      test: path.resolve(ROOT_PATH, 'test'),
     },
     extensions: ['.js', '.jsx', '.ts', '.tsx', '.svg'],
     fallback: {

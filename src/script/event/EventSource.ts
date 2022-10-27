@@ -17,7 +17,7 @@
  *
  */
 
-import {PayloadBundleSource} from '@wireapp/core/src/main/conversation';
+import {PayloadBundleSource} from '@wireapp/core/lib/conversation';
 
 enum WebAppEventSource {
   BACKEND_RESPONSE = 'backend_response',

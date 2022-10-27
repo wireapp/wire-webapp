@@ -17,8 +17,8 @@
  *
  */
 
-import {MentionEntity} from '../message/MentionEntity';
 import {User} from '../entity/User';
+import {MentionEntity} from '../message/MentionEntity';
 
 export const findMentionAtPosition = (position: number, mentions: MentionEntity[]) =>
   mentions.find(({startIndex, endIndex}) => position > startIndex && position < endIndex);
@@ -78,13 +78,13 @@ export const updateMentionRanges = (
 ): MentionEntity[] => {
   const remainingMentions = currentMentions.filter(({startIndex, endIndex}) => endIndex <= start || startIndex >= end);
 
-  remainingMentions.forEach(mention => {
+  return remainingMentions.map(mention => {
     if (mention.startIndex >= end) {
-      mention.startIndex += difference;
+      return new MentionEntity(mention.startIndex + difference, mention.length, mention.userId, mention.domain);
     }
-  });
 
-  return remainingMentions;
+    return mention;
+  });
 };
 
 export const createMentionEntity = (

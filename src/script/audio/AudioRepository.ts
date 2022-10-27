@@ -17,18 +17,19 @@
  *
  */
 
-import {AudioPreference, WebappProperties} from '@wireapp/api-client/src/user/data/';
+import {AudioPreference, WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
 
-import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
-import {DeviceTypes, MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import {AudioPlayingType} from './AudioPlayingType';
 import {AudioState} from './AudioState';
 import {AudioType} from './AudioType';
+
+import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
+import {DeviceTypes, MediaDevicesHandler} from '../media/MediaDevicesHandler';
 
 enum AUDIO_PLAY_PERMISSION {
   ALLOWED = 0,

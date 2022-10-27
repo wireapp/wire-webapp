@@ -17,9 +17,9 @@
  *
  */
 
-import {ValidationUtil} from '@wireapp/commons';
+import {ValidationUtil, Runtime} from '@wireapp/commons';
+
 import {createRandomUuid} from 'Util/util';
-import {Runtime} from '@wireapp/commons';
 const env = window.wire.env;
 
 export const ACCENT_ID = {
@@ -40,6 +40,7 @@ export class Configuration {
   readonly BACKEND_WS = env.BACKEND_WS || 'wss://prod-nginz-ssl.wire.com';
   readonly BRAND_NAME = env.BRAND_NAME || 'Wire';
   readonly COUNTLY_API_KEY = env.COUNTLY_API_KEY;
+  readonly ENABLE_DEV_BACKEND_API = env.ENABLE_DEV_BACKEND_API;
   readonly ENVIRONMENT = env.ENVIRONMENT || 'production';
   readonly FEATURE = {
     ...env.FEATURE,

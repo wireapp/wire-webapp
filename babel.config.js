@@ -30,12 +30,7 @@ const presetEnvConfig = {
 module.exports = {
   env: {
     test: {
-      plugins: [
-        '@babel/plugin-proposal-class-properties',
-        '@babel/plugin-proposal-nullish-coalescing-operator',
-        '@babel/plugin-proposal-optional-chaining',
-        '@emotion',
-      ],
+      plugins: ['@emotion'],
       presets: [
         ['@babel/preset-react', {importSource: '@emotion/react', runtime: 'automatic'}],
         '@babel/preset-typescript',
@@ -43,14 +38,7 @@ module.exports = {
       ],
     },
   },
-  plugins: [
-    ['@babel/plugin-proposal-decorators', {legacy: true}],
-    '@babel/plugin-proposal-class-properties',
-    '@babel/plugin-proposal-nullish-coalescing-operator',
-    '@babel/plugin-proposal-optional-chaining',
-    '@babel/plugin-syntax-dynamic-import',
-    '@emotion',
-  ],
+  plugins: [['@babel/plugin-proposal-decorators', {legacy: true}], '@emotion'],
   presets: [
     ['@babel/preset-react', {importSource: '@emotion/react', runtime: 'automatic'}],
     '@babel/preset-typescript',
