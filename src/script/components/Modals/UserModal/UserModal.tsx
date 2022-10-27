@@ -21,7 +21,6 @@ import React, {useEffect, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
-import {noop} from 'jquery';
 import {container} from 'tsyringe';
 
 import {Icon} from 'Components/Icon';
@@ -55,7 +54,7 @@ const brandName = Config.getConfig().BRAND_NAME;
 
 const UserModal: React.FC<UserModalProps> = ({
   userId,
-  onClose = noop,
+  onClose = () => {},
   userRepository,
   actionsViewModel,
   core = container.resolve(Core),
