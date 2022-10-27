@@ -26,6 +26,7 @@ import {CallingContainer} from 'Components/calling/CallingOverlayContainer';
 import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationModal';
 import {LegalHoldModal} from 'Components/Modals/LegalHoldModal/LegalHoldModal';
 import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
+import {UserModal} from 'Components/Modals/UserModal';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {AppLock} from './AppLock';
@@ -35,7 +36,6 @@ import {PanelEntity, PanelState, RightSidebar} from './RightSidebar';
 import {RootProvider} from './RootProvider';
 import {useAppMainState, ViewType} from './state';
 
-import {UserModal} from 'Components/Modals/UserModal';
 import {User} from '../entity/User';
 import {TeamState} from '../team/TeamState';
 import {UserState} from '../user/UserState';
