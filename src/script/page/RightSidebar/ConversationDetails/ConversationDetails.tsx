@@ -166,7 +166,8 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
 
   const guestOptionsText = isTeamOnly ? t('conversationDetailsOff') : t('conversationDetailsOn');
   const servicesOptionsText = isServicesRoom ? t('conversationDetailsOn') : t('conversationDetailsOff');
-  const notificationStatusText = notificationState ? getNotificationText(notificationState) : '';
+
+  const notificationStatusText = getNotificationText(notificationState);
   const timedMessagesText =
     hasTimer && globalMessageTimer ? formatDuration(globalMessageTimer).text : t('ephemeralUnitsNone');
 
