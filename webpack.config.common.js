@@ -23,7 +23,7 @@ const WorkboxPlugin = require('workbox-webpack-plugin');
 
 const path = require('path');
 
-const {ROOT_PATH, DIST_PATH, SRC_PATH, SERVER_PATH} = require('./locations');
+const {ROOT_PATH, DIST_PATH, SRC_PATH} = require('./locations');
 
 const dist = path.resolve(DIST_PATH, 'static');
 const auth = path.resolve(SRC_PATH, 'script/auth');
@@ -113,8 +113,6 @@ module.exports = {
           from: '*.wasm',
           to: `${dist}/min/core-crypto.wasm`,
         },
-        // copying certificates
-        {context: SERVER_PATH, from: 'certificate', to: `${DIST_PATH}/certificate`},
         // copying all static resources (audio, images, fonts...)
         {from: 'resource', to: dist},
         // copying worker files

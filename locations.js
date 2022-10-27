@@ -22,6 +22,5 @@ const path = require('path');
 module.exports = {
   DIST_PATH: path.resolve(__dirname, 'server/dist'),
   ROOT_PATH: path.resolve(__dirname),
-  SERVER_PATH: path.resolve(__dirname, 'server'),
   SRC_PATH: path.resolve(__dirname, 'src'),
 };
