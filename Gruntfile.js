@@ -30,7 +30,6 @@ module.exports = grunt => {
   const dir = {
     src_: SRC_PATH,
     src: {
-      ext: `${SRC_PATH}/ext`,
       page: `${SRC_PATH}/page`,
       style: `${SRC_PATH}/style`,
     },
@@ -41,12 +40,7 @@ module.exports = grunt => {
       templates: `${DIST_PATH}/templates`,
     },
     dist_: DIST_PATH,
-    docs: {
-      api: 'docs/api',
-      coverage: 'docs/coverage',
-    },
     resource: 'resource',
-    test_: 'test',
     test: {
       api: 'test/api',
       coverage: 'test/coverage',
@@ -57,34 +51,27 @@ module.exports = grunt => {
 
   grunt.initConfig({
     dir,
-    clean: require('./grunt/config/clean'),
+    clean: {
+      dist: '<%= dir.dist.static %>',
+      dist_src: '<%= dir.dist.templates %>/<%= dir.src_ %>',
+      dist_s3: '<%= dir.dist.s3 %>',
+    },
     compress: require('./grunt/config/compress'),
     copy: require('./grunt/config/copy'),
     includereplace: require('./grunt/config/includereplace'),
-    open: require('./grunt/config/open'),
     postcss: require('./grunt/config/postcss'),
     shell: require('./grunt/config/shell'),
     watch: require('./grunt/config/watch'),
   });
   /* eslint-enable sort-keys-fix/sort-keys-fix */
 
-  grunt.registerTask('build', [
-    'clean:dist',
-    'clean:dist_src',
-    'clean:dist_s3',
-    'set_version',
-    'build_style',
-    'copy:dist_serviceworker',
-    'copy:dist_resource',
-    'copy:dist_certificate',
-    'build_markup',
-  ]);
+  grunt.registerTask('build', ['clean', 'set_version', 'build_style', 'copy', 'build_markup']);
 
   grunt.registerTask('build_style', ['shell:less', 'postcss']);
 
   grunt.registerTask('build_markup', ['includereplace:prod_index', 'includereplace:prod_auth']);
 
-  grunt.registerTask('build_prod', ['build', 'shell:dist_bundle', 'compress']);
+  grunt.registerTask('build_prod', ['build', 'compress']);
 
   grunt.registerTask('set_version', () => {
     const version = format(new Date(), 'yyyy.MM.dd.HH.mm');

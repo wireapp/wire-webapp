@@ -8933,17 +8933,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"grunt-open@npm:0.2.4":
-  version: 0.2.4
-  resolution: "grunt-open@npm:0.2.4"
-  dependencies:
-    opn: ^5.4.0
-  bin:
-    grunt-open: bin/grunt-open
-  checksum: 614a579081bb6f6784c7f90b92b03edf6d2c1c3eecf10173621eb9b4124fd6fedc7430c5b470a28dbcfce27bc5f14648ead2ea10944ef9e0771689c8d16c6c9e
-  languageName: node
-  linkType: hard
-
 "grunt-postcss@npm:0.9.0":
   version: 0.9.0
   resolution: "grunt-postcss@npm:0.9.0"
@@ -10009,13 +9998,6 @@ __metadata:
   version: 1.0.2
   resolution: "is-windows@npm:1.0.2"
   checksum: 438b7e52656fe3b9b293b180defb4e448088e7023a523ec21a91a80b9ff8cdb3377ddb5b6e60f7c7de4fa8b63ab56e121b6705fe081b3cf1b828b0a380009ad7
-  languageName: node
-  linkType: hard
-
-"is-wsl@npm:^1.1.0":
-  version: 1.1.0
-  resolution: "is-wsl@npm:1.1.0"
-  checksum: ea157d232351e68c92bd62fc541771096942fe72f69dff452dd26dcc31466258c570a3b04b8cda2e01cd2968255b02951b8670d08ea4ed76d6b1a646061ac4fe
   languageName: node
   linkType: hard
 
@@ -12487,15 +12469,6 @@ __metadata:
   dependencies:
     mimic-fn: ^4.0.0
   checksum: 0846ce78e440841335d4e9182ef69d5762e9f38aa7499b19f42ea1c4cd40f0b4446094c455c713f9adac3f4ae86f613bb5e30c99e52652764d06a89f709b3788
-  languageName: node
-  linkType: hard
-
-"opn@npm:^5.4.0":
-  version: 5.5.0
-  resolution: "opn@npm:5.5.0"
-  dependencies:
-    is-wsl: ^1.1.0
-  checksum: 35b677b5a1fd6c8cb1996b0607671ba79f7ce9fa029217d54eafaf6bee13eb7e700691c6a415009140fd02a435fffdfd143875f3b233b60f3f9d631c6f6b81a0
   languageName: node
   linkType: hard
 
@@ -17222,7 +17195,6 @@ __metadata:
     grunt-contrib-copy: 1.0.0
     grunt-contrib-watch: 1.1.0
     grunt-include-replace: 5.0.0
-    grunt-open: 0.2.4
     grunt-postcss: 0.9.0
     grunt-shell: 4.0.0
     highlight.js: 11.6.0
