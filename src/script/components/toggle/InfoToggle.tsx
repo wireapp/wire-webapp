@@ -79,4 +79,4 @@ const InfoToggle: React.FC<InfoToggleProps> = ({
   );
 };
 
-export default InfoToggle;
+export {InfoToggle};

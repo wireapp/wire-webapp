@@ -57,4 +57,4 @@ const CopyToClipboard: React.FC<CopyToClipboardProps> = ({text, className = '', 
   );
 };
 
-export default CopyToClipboard;
+export {CopyToClipboard};

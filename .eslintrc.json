@@ -23,7 +23,20 @@
     "RTCAudioSource": true
   },
   "plugins": ["sort-keys-fix", "import", "react-hooks", "eslint-plugin-testing-library", "@typescript-eslint"],
-  "ignorePatterns": [".git/", "docs/", "bin/", "node_modules/", "resource/", "server/bin/", "server/dist/", "server/node_modules/", "src/ext/", "src/script/localization/**/webapp*.js", "src/worker/"],
+  "ignorePatterns": [
+    ".git/",
+    "docs/",
+    "bin/",
+    "node_modules/",
+    "resource/",
+    "server/bin/",
+    "server/dist/",
+    "server/node_modules/",
+    "src/ext/",
+    "src/script/localization/**/webapp*.js",
+    "src/worker/",
+    "*.js"
+  ],
   "overrides": [
     {
       "files": ["*.ts", "*.tsx"],
@@ -44,8 +57,8 @@
     }
   ],
   "rules": {
-    "id-length": "warn",
-    "no-magic-numbers": "warn",
+    "id-length": "off",
+    "no-magic-numbers": ["warn", {"ignoreArrayIndexes": true}],
     "jest/no-jasmine-globals": "off",
     "jest/no-identical-title": "warn",
     "jest/no-done-callback": "warn",
@@ -59,8 +72,8 @@
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",
     "import/no-unresolved": "error",
-    "import/no-default-export": "warn",
-    "@typescript-eslint/explicit-module-boundary-types": "warn",
+    "import/no-default-export": "error",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/no-empty-interface": "warn",
     "@typescript-eslint/ban-ts-comment": "off",
     "@typescript-eslint/no-var-requires": "warn",

@@ -17,45 +17,32 @@
  *
  */
 
+import {fireEvent, render} from '@testing-library/react';
 import ko from 'knockout';
 
-import SearchInput, {SearchInputProps} from 'Components/SearchInput';
+import {SearchInput} from 'Components/SearchInput';
 import {KEY} from 'Util/KeyboardUtil';
-import TestPage from 'Util/test/TestPage';
 
 import {User} from '../entity/User';
 
-class SearchInputPage extends TestPage<SearchInputProps> {
-  constructor(props?: SearchInputProps) {
-    super(SearchInput, props);
-  }
-
-  getInput = () => this.get('[data-uie-name="enter-users"]');
-  getSelectedUsers = () => this.getAll('[data-uie-name="item-selected"]');
-  pressBackSpace = () => this.keyDown(this.getInput(), KEY.BACKSPACE);
-}
-
 describe('SearchInput', () => {
   it('lists all selected users', async () => {
-    const userInputPage = new SearchInputPage({
+    const props = {
       enter: () => {},
       input: '',
       placeholder: '',
-      selectedUsers: [new User('1', null), new User('2', null), new User('3', null), new User('4', null)],
+      selectedUsers: ['1', '2', '3', '4'].map(id => new User(id)),
       setInput: ko.observable(''),
       setSelectedUsers: ko.observableArray([]),
-    });
+    };
 
-    expect(userInputPage.getSelectedUsers().length).toBe(4);
+    const {getAllByTestId} = render(<SearchInput {...props} />);
+
+    expect(getAllByTestId('item-selected')).toHaveLength(4);
   });
 
-  it('allows to deselect a user when pressing "backspace"', () => {
-    const selectedUsers = ko.observableArray([
-      new User('1', null),
-      new User('2', null),
-      new User('3', null),
-      new User('4', null),
-    ]);
+  it('allows to deselect a user when pressing "backspace"', async () => {
+    const selectedUsers = ko.observableArray(['1', '2', '3', '4'].map(id => new User(id)));
 
     const props = {
       enter: () => {},
@@ -66,15 +53,17 @@ describe('SearchInput', () => {
       setSelectedUsers: selectedUsers,
     };
 
-    const userInputPage = new SearchInputPage(props);
-    expect(userInputPage.getSelectedUsers().length).toBe(4);
+    const {getByTestId, getAllByTestId, rerender} = render(<SearchInput {...props} />);
 
-    userInputPage.pressBackSpace();
-    userInputPage.setProps({
-      ...props,
-      selectedUsers: ko.unwrap(selectedUsers),
-    });
+    expect(getAllByTestId('item-selected')).toHaveLength(4);
 
-    expect(userInputPage.getSelectedUsers().length).toBe(3);
+    const inputElement = getByTestId('enter-users');
+
+    fireEvent.keyDown(inputElement, {code: KEY.BACKSPACE, key: KEY.BACKSPACE});
+
+    props.selectedUsers = ko.unwrap(selectedUsers);
+    rerender(<SearchInput {...props} />);
+
+    expect(getAllByTestId('item-selected')).toHaveLength(3);
   });
 });

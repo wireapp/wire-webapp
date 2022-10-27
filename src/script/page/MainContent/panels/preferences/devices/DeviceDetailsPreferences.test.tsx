@@ -23,7 +23,7 @@ import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {createRandomUuid} from 'Util/util';
 
-import DeviceDetailsPreferences from './DeviceDetailsPreferences';
+import {DeviceDetailsPreferences} from './DeviceDetailsPreferences';
 
 describe('DeviceDetailsPreferences', () => {
   const device = new ClientEntity(true, '', createRandomUuid());

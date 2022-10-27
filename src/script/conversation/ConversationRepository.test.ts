@@ -17,18 +17,17 @@
  *
  */
 
-import {ClientClassification} from '@wireapp/api-client/src/client/';
-import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
-import {CONVERSATION_TYPE, CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE} from '@wireapp/api-client/src/conversation/';
-import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
-import {ConversationProtocol} from '@wireapp/api-client/src/conversation/NewConversation';
-import {CONVERSATION_EVENT, ConversationCreateEvent, ConversationMemberJoinEvent} from '@wireapp/api-client/src/event/';
+import {ClientClassification} from '@wireapp/api-client/lib/client/';
+import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
+import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE, CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
+import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
+import {ConversationCreateEvent, ConversationMemberJoinEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import ko from 'knockout';
 import sinon from 'sinon';
-import Sinon from 'sinon';
 import {container} from 'tsyringe';
 
 import {ClientEntity} from 'src/script/client/ClientEntity';
@@ -36,7 +35,7 @@ import {Config} from 'src/script/Config';
 import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
 import {ConversationDatabaseData, ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
-import {EventBuilder, DeleteEvent, MessageHiddenEvent} from 'src/script/conversation/EventBuilder';
+import {DeleteEvent, EventBuilder, MessageHiddenEvent} from 'src/script/conversation/EventBuilder';
 import {Conversation} from 'src/script/entity/Conversation';
 import {Message} from 'src/script/entity/message/Message';
 import {User} from 'src/script/entity/User';
@@ -63,7 +62,7 @@ describe('ConversationRepository', () => {
 
   let conversation_et: Conversation;
   let self_user_et;
-  let server: Sinon.SinonFakeServer;
+  let server: sinon.SinonFakeServer;
   let storage_service: StorageService;
   const messageSenderId = createRandomUuid();
 

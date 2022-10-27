@@ -21,7 +21,7 @@ import React from 'react';
 
 import {listCSS} from './PanelActions.styles';
 
-import Icon from '../../Icon';
+import {Icon} from '../../Icon';
 
 export interface MenuItem {
   click: () => void;
@@ -53,4 +53,4 @@ const PanelActions: React.FC<PanelActionsProps> = ({items}) => {
   );
 };
 
-export default PanelActions;
+export {PanelActions};

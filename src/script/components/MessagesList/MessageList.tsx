@@ -22,6 +22,7 @@ import React, {
   MouseEvent as ReactMouseEvent,
   KeyboardEvent as ReactKeyboardEvent,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
 } from 'react';
@@ -39,13 +40,13 @@ import {User} from 'src/script/entity/User';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-import Message from './Message';
+import {Message} from './Message';
 
 import {Conversation as ConversationEntity, Conversation} from '../../entity/Conversation';
 import {isMemberMessage, isContentMessage} from '../../guards/Message';
 import {StatusType} from '../../message/StatusType';
 import {initFadingScrollbar} from '../../ui/fadingScrollbar';
-import onHitTopOrBottom from '../../ui/onHitTopOrBottom';
+import {onHitTopOrBottom} from '../../ui/onHitTopOrBottom';
 import {useResizeObserver} from '../../ui/resizeObserver';
 
 type FocusedElement = {center?: boolean; element: Element};
@@ -141,12 +142,13 @@ const MessagesList: FC<MessagesListParams> = ({
     'hasAdditionalMessages',
   ]);
 
+  const messageListRef = useRef<HTMLDivElement | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [focusedMessage, setFocusedMessage] = useState<string | undefined>(initialMessage?.id);
 
   const filteredMessages = filterDuplicatedMemberMessages(filterHiddenMessages(allMessages));
 
-  const messageContainerRef = useRef<HTMLDivElement>(null);
+  const [messagesContainer, setMessageContainer] = useState<HTMLDivElement | null>(null);
 
   const shouldShowInvitePeople = isActiveParticipant && inTeam && (isGuestRoom || isGuestAndServicesRoom);
 
@@ -207,9 +209,9 @@ const MessagesList: FC<MessagesListParams> = ({
   };
 
   // Listen to resizes of the the container element (if it's resized it means something has changed in the message list)
-  useResizeObserver(() => updateScroll(messageContainerRef.current), messageContainerRef.current);
+  useResizeObserver(() => updateScroll(messagesContainer), messagesContainer);
   // Also listen to the scrolling container resizes (when the window resizes or the inputBar changes)
-  useResizeObserver(() => updateScroll(messageContainerRef.current), messageContainerRef.current?.parentElement);
+  useResizeObserver(() => updateScroll(messagesContainer), messagesContainer?.parentElement);
 
   const loadPrecedingMessages = async (): Promise<void> => {
     const shouldPullMessages = !isPending && hasAdditionalMessages;
@@ -232,14 +234,16 @@ const MessagesList: FC<MessagesListParams> = ({
     }
   };
 
-  useEffect(() => {
-    if (loaded && messageContainerRef.current) {
-      updateScroll(messageContainerRef.current);
+  useLayoutEffect(() => {
+    if (messagesContainer) {
+      updateScroll(messagesContainer);
     }
-  }, [filteredMessages.length, loaded]);
+  }, [messagesContainer, filteredMessages.length]);
 
   useEffect(() => {
     onLoading(true);
+    setLoaded(false);
+    conversationLastReadTimestamp.current = conversation.last_read_timestamp();
     loadConversation(conversation, initialMessage).then(() => {
       setTimeout(() => {
         setLoaded(true);
@@ -247,6 +251,12 @@ const MessagesList: FC<MessagesListParams> = ({
       }, 10);
     });
   }, [conversation, initialMessage]);
+
+  useLayoutEffect(() => {
+    if (loaded && messageListRef.current) {
+      onHitTopOrBottom(messageListRef.current, loadPrecedingMessages, loadFollowingMessages);
+    }
+  }, [loaded]);
 
   if (!loaded) {
     return null;
@@ -256,17 +266,18 @@ const MessagesList: FC<MessagesListParams> = ({
     <div
       ref={element => {
         initFadingScrollbar(element);
-        onHitTopOrBottom(element, loadPrecedingMessages, loadFollowingMessages);
+        messageListRef.current = element;
       }}
       id="message-list"
       className="message-list"
     >
-      <div ref={messageContainerRef} className={cx('messages', {'flex-center': verticallyCenterMessage()})}>
+      <div ref={setMessageContainer} className={cx('messages', {'flex-center': verticallyCenterMessage()})}>
         {filteredMessages.map((message, index) => {
           const previousMessage = filteredMessages[index - 1];
           const isLastDeliveredMessage = lastDeliveredMessage?.id === message.id;
 
           const visibleCallback = getVisibleCallback(conversation, message);
+
           const key = `${message.id || 'message'}-${message.timestamp()}`;
 
           return (
@@ -281,14 +292,14 @@ const MessagesList: FC<MessagesListParams> = ({
               isLastDeliveredMessage={isLastDeliveredMessage}
               isMarked={!!focusedMessage && focusedMessage === message.id}
               scrollTo={({element, center}, isUnread) => {
-                if (isUnread && messageContainerRef.current) {
+                if (isUnread && messagesContainer) {
                   // if it's a new unread message, but we are not on the first render of the list,
                   // we do not need to scroll to the unread message
                   return;
                 }
                 focusedElement.current = {center, element};
                 setTimeout(() => (focusedElement.current = null), 1000);
-                updateScroll(messageContainerRef.current);
+                updateScroll(messagesContainer);
               }}
               isSelfTemporaryGuest={selfUser.isTemporaryGuest()}
               messageRepository={messageRepository}
@@ -324,4 +335,4 @@ const MessagesList: FC<MessagesListParams> = ({
   );
 };
 
-export default MessagesList;
+export {MessagesList};

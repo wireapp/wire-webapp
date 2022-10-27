@@ -45,4 +45,4 @@ const RestrictedVideo: React.FC<RestrictedVideoProps> = ({showMessage = true, is
   );
 };
 
-export default RestrictedVideo;
+export {RestrictedVideo};

@@ -32,7 +32,7 @@ import {PermissionError} from '../error/PermissionError';
 import type {PermissionRepository} from '../permission/PermissionRepository';
 import {PermissionStatusState} from '../permission/PermissionStatusState';
 import {PermissionType} from '../permission/PermissionType';
-import Warnings from '../view_model/WarningsContainer';
+import {Warnings} from '../view_model/WarningsContainer';
 
 export class MediaStreamHandler {
   static get CONFIG() {

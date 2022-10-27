@@ -17,8 +17,8 @@
  *
  */
 
-import type {BackendError} from '@wireapp/api-client/src/http/';
-import type {QualifiedId} from '@wireapp/api-client/src/user/';
+import type {BackendError} from '@wireapp/api-client/lib/http/';
+import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {AxiosError} from 'axios';
 
 import {QualifiedUserClientEntityMap} from '../client/ClientRepository';

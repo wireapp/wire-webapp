@@ -19,19 +19,19 @@
 
 import React, {useEffect, useState} from 'react';
 
-import {RegisteredClient} from '@wireapp/api-client/src/client/index';
+import {RegisteredClient} from '@wireapp/api-client/lib/client/index';
 import {
   COLOR,
   ContainerXS,
   DeviceIcon,
+  FlexBox,
   Form,
+  IconButton,
   Input,
   Line,
-  IconButton,
   Small,
   Text,
   TrashIcon,
-  FlexBox,
 } from '@wireapp/react-ui-kit';
 import {useIntl} from 'react-intl';
 
@@ -65,18 +65,24 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
   const [password, setPassword] = useState('');
   const [isValidPassword, setIsValidPassword] = useState(true);
   const [validationError, setValidationError] = useState<ValidationError | null>(null);
+  const [isOpen, setIsOpen] = useState(requirePassword && (isSelected || isAnimating));
 
   useEffect(() => {
     if (!selected && isSelected) {
       setIsAnimating(true);
       setIsSelected(false);
+      setIsOpen(false);
       requestAnimationFrame(() => executeAnimateOut());
     } else if (selected && !isSelected) {
       setIsAnimating(true);
       setIsSelected(true);
+      setIsOpen(true);
       requestAnimationFrame(() => executeAnimateIn());
+    } else if (selected && isSelected) {
+      setIsOpen(true);
     } else {
       setAnimationStep(0);
+      setIsOpen(false);
     }
   }, [selected]);
 
@@ -206,7 +212,6 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
   const animationPosition = animationStep / CONFIG.animationSteps;
   const smoothHeight = animationPosition * inputContainerHeight;
   const smoothMarginTop = animationPosition * animatedCardSpacing.m;
-  const isOpen = requirePassword && (isSelected || isAnimating);
 
   return (
     <ContainerXS>
@@ -322,4 +327,4 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
   );
 };
 
-export default ClientItem;
+export {ClientItem};

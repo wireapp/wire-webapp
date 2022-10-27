@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useState, useEffect, useRef, useCallback} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 
 import {ValidationUtil} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -25,18 +25,17 @@ import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
 
-import Icon from 'Components/Icon';
-import ModalComponent from 'Components/ModalComponent';
-import PrimaryModal from 'Components/Modals/PrimaryModal';
+import {Icon} from 'Components/Icon';
+import {ModalComponent} from 'Components/ModalComponent';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
+import {ClientRepository} from 'src/script/client/ClientRepository';
+import {ClientState} from 'src/script/client/ClientState';
+import {Config} from 'src/script/Config';
+import {AppLockRepository} from 'src/script/user/AppLockRepository';
+import {AppLockState} from 'src/script/user/AppLockState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-
-import {SIGN_OUT_REASON} from '../auth/SignOutReason';
-import {ClientRepository} from '../client/ClientRepository';
-import {ClientState} from '../client/ClientState';
-import {Config} from '../Config';
-import {AppLockRepository} from '../user/AppLockRepository';
-import {AppLockState} from '../user/AppLockState';
 
 export enum APPLOCK_STATE {
   FORGOT = 'applock.forgot',
@@ -554,4 +553,4 @@ const AppLock: React.FC<AppLockProps> = ({
   );
 };
 
-export default AppLock;
+export {AppLock};

@@ -21,7 +21,7 @@ import React, {useEffect, useState} from 'react';
 
 import cx from 'classnames';
 
-import Icon from 'Components/Icon';
+import {Icon} from 'Components/Icon';
 import {Message} from 'src/script/entity/message/Message';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -76,7 +76,9 @@ const ReadReceiptStatus: React.FC<ReadReceiptStatusProps> = ({
             'with-tooltip with-tooltip--receipt': readReceiptTooltip,
           })}
           data-tooltip={readReceiptTooltip}
-          onClick={!is1to1Conversation && onClickReceipts ? () => onClickReceipts(message) : undefined}
+          {...(!is1to1Conversation && {
+            onClick: () => onClickReceipts?.(message),
+          })}
           data-uie-name="status-message-read-receipts"
           aria-label={t('accessibility.messageDetailsReadReceipts', readReceiptText)}
         >
@@ -90,4 +92,4 @@ const ReadReceiptStatus: React.FC<ReadReceiptStatusProps> = ({
   );
 };
 
-export default ReadReceiptStatus;
+export {ReadReceiptStatus};

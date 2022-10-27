@@ -17,17 +17,17 @@
  *
  */
 
-import React, {ChangeEvent, useState} from 'react';
+import React, {ChangeEvent, useId, useState} from 'react';
 
-import {Checkbox, CheckboxLabel, StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 import cx from 'classnames';
 
-import AvailabilityState from 'Components/AvailabilityState';
-import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
-import ParticipantMicOnIcon from 'Components/calling/ParticipantMicOnIcon';
-import Icon from 'Components/Icon';
+import {AvailabilityState} from 'Components/AvailabilityState';
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {ParticipantMicOnIcon} from 'Components/calling/ParticipantMicOnIcon';
+import {Icon} from 'Components/Icon';
 import {UserlistMode} from 'Components/UserList';
-import InViewport from 'Components/utils/InViewport';
+import {InViewport} from 'Components/utils/InViewport';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -82,6 +82,8 @@ const ParticipantItem = <UserType extends User | ServiceEntity>(
     onClick = noop,
     onKeyDown = noop,
   } = props;
+  const checkboxId = useId();
+
   const [isInViewport, setIsInViewport] = useState(false);
   const isUser = participant instanceof User && !participant.isService;
   const isService = participant instanceof ServiceEntity || participant.isService;
@@ -139,12 +141,7 @@ const ParticipantItem = <UserType extends User | ServiceEntity>(
 
   const RenderParticipant = () => {
     return (
-      <InViewport
-        className="participant-item"
-        data-uie-name={isUser ? 'item-user' : 'item-service'}
-        data-uie-value={participantName}
-        onVisible={() => setIsInViewport(true)}
-      >
+      <InViewport className="participant-item" onVisible={() => setIsInViewport(true)}>
         {isInViewport && (
           <>
             <div className="participant-item__image">
@@ -258,52 +255,56 @@ const ParticipantItem = <UserType extends User | ServiceEntity>(
     );
   };
 
+  const dataUieValues = {
+    'data-uie-name': isUser ? 'item-user' : 'item-service',
+    'data-uie-value': participantName,
+  };
+
+  const commonClassName = cx('participant-item-wrapper', {
+    highlighted,
+    'no-interaction': noInteraction,
+    'no-underline': noUnderline,
+  });
+
   return (
-    <StyledApp themeId={THEME_ID.DEFAULT}>
+    <>
       {canSelect ? (
         <div
-          className={cx('participant-item-wrapper', {
-            highlighted,
-            'no-interaction': noInteraction,
-            'no-underline': noUnderline,
-          })}
           onContextMenu={onContextMenu}
           aria-label={t('accessibility.openConversation', participantName)}
+          className={commonClassName}
         >
           <Checkbox
             checked={isSelected}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              onClick(participant, event);
-            }}
-            data-uie-name="status-selected"
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => onClick(participant, event)}
+            id={checkboxId}
             labelBeforeCheckbox={true}
             aligncenter={false}
             outlineOffset="0"
           >
-            <CheckboxLabel htmlFor="status-selected">
-              <RenderParticipant />
+            <CheckboxLabel htmlFor={checkboxId}>
+              <div {...dataUieValues}>
+                <RenderParticipant />
+              </div>
             </CheckboxLabel>
           </Checkbox>
         </div>
       ) : (
         <div
-          className={cx('participant-item-wrapper', {
-            highlighted,
-            'no-interaction': noInteraction,
-            'no-underline': noUnderline,
-          })}
           tabIndex={0}
           role="button"
           onContextMenu={onContextMenu}
           onClick={noInteraction ? onContextMenu : event => onClick(participant, event.nativeEvent)}
           onKeyDown={noInteraction ? handleContextKeyDown : event => onKeyDown(participant, event.nativeEvent)}
+          {...dataUieValues}
           aria-label={t('accessibility.openConversation', participantName)}
+          className={commonClassName}
         >
           <RenderParticipant />
         </div>
       )}
-    </StyledApp>
+    </>
   );
 };
 
-export default ParticipantItem;
+export {ParticipantItem};

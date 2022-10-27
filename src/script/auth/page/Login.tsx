@@ -19,15 +19,15 @@
 
 import React, {useEffect, useRef, useState} from 'react';
 
-import {LoginData} from '@wireapp/api-client/src/auth';
-import {ClientType} from '@wireapp/api-client/src/client/index';
+import {LoginData} from '@wireapp/api-client/lib/auth';
+import {ClientType} from '@wireapp/api-client/lib/client/index';
 import {Runtime, UrlUtil} from '@wireapp/commons';
 import {
   ArrowIcon,
-  COLOR,
   Checkbox,
   CheckboxLabel,
   CodeInput,
+  COLOR,
   Column,
   Columns,
   Container,
@@ -35,13 +35,14 @@ import {
   Form,
   H1,
   H2,
-  Label,
   IsMobile,
+  Label,
   Link,
-  TextLink,
+  LinkVariant,
   Loading,
   Muted,
   Text,
+  TextLink,
 } from '@wireapp/react-ui-kit';
 import {StatusCodes} from 'http-status-codes';
 import {useIntl} from 'react-intl';
@@ -52,27 +53,27 @@ import {AnyAction, Dispatch} from 'redux';
 
 import {getLogger} from 'Util/Logger';
 
-import EntropyContainer from './EntropyContainer';
-import Page from './Page';
+import {EntropyContainer} from './EntropyContainer';
+import {Page} from './Page';
 
 import {Config} from '../../Config';
 import {loginStrings, verifyStrings} from '../../strings';
-import AppAlreadyOpen from '../component/AppAlreadyOpen';
-import LoginForm from '../component/LoginForm';
-import RouterLink from '../component/RouterLink';
+import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
+import {LoginForm} from '../component/LoginForm';
+import {RouterLink} from '../component/RouterLink';
 import {EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot} from '../module/action/';
 import {BackendError} from '../module/action/BackendError';
 import {LabeledError} from '../module/action/LabeledError';
 import {ValidationError} from '../module/action/ValidationError';
-import {RootState, bindActionCreators} from '../module/reducer';
+import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {QUERY_KEY, ROUTE} from '../route';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const Login = ({
+const LoginComponent = ({
   loginError,
   resetAuthError,
   doCheckConversationCode,
@@ -349,24 +350,25 @@ const Login = ({
                         )}
                       </Form>
                     </div>
-                    <Columns>
-                      <Column>
-                        <Link
-                          href={EXTERNAL_ROUTE.WIRE_ACCOUNT_PASSWORD_RESET}
-                          target="_blank"
-                          data-uie-name="go-forgot-password"
-                        >
-                          {_(loginStrings.forgotPassword)}
-                        </Link>
-                      </Column>
-                      {Config.getConfig().FEATURE.ENABLE_PHONE_LOGIN && (
-                        <Column>
-                          <RouterLink to={ROUTE.LOGIN_PHONE} data-uie-name="go-sign-in-phone">
-                            {_(loginStrings.phoneLogin)}
-                          </RouterLink>
-                        </Column>
-                      )}
-                    </Columns>
+                    <Link
+                      variant={LinkVariant.PRIMARY}
+                      style={{paddingTop: '24px', textAlign: 'center'}}
+                      href={EXTERNAL_ROUTE.WIRE_ACCOUNT_PASSWORD_RESET}
+                      target="_blank"
+                      data-uie-name="go-forgot-password"
+                    >
+                      {_(loginStrings.forgotPassword)}
+                    </Link>
+                    {Config.getConfig().FEATURE.ENABLE_PHONE_LOGIN && (
+                      <RouterLink
+                        variant={LinkVariant.PRIMARY}
+                        style={{paddingTop: '12px', textAlign: 'center'}}
+                        to={ROUTE.LOGIN_PHONE}
+                        data-uie-name="go-sign-in-phone"
+                      >
+                        {_(loginStrings.phoneLogin)}
+                      </RouterLink>
+                    )}
                   </>
                 )}
               </ContainerXS>
@@ -375,6 +377,9 @@ const Login = ({
           </Columns>
         </Container>
       )}
+      <IsMobile>
+        <div style={{minWidth: 48}} />
+      </IsMobile>
     </Page>
   );
 };
@@ -406,4 +411,6 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(mapStateToProps, mapDispatchToProps)(Login);
+const Login = connect(mapStateToProps, mapDispatchToProps)(LoginComponent);
+
+export {Login};

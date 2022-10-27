@@ -28,7 +28,7 @@ import {createRandomUuid} from 'Util/util';
 
 import {Text} from '../../entity/message/Text';
 
-import MessagesList from './';
+import {MessagesList} from './';
 
 const getDefaultParams = (): React.ComponentProps<typeof MessagesList> => {
   const conversation = new Conversation(createRandomUuid());

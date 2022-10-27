@@ -19,7 +19,7 @@
 
 import {KeyboardEvent, useEffect, useRef, useState} from 'react';
 
-import type {WebappProperties} from '@wireapp/api-client/src/user/data/';
+import type {WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 
@@ -30,8 +30,8 @@ import {loadValue, storeValue} from 'Util/StorageUtil';
 import {sortByPriority} from 'Util/StringUtil';
 
 import emojiBindings from './emoji.json';
-import EmojiItem from './EmojiItem';
-import inlineReplacements from './inlineReplacements';
+import {EmojiItem} from './EmojiItem';
+import {inlineReplacements} from './inlineReplacements';
 
 import {MentionEntity} from '../../message/MentionEntity';
 import {PropertiesRepository} from '../../properties/PropertiesRepository';
@@ -480,4 +480,4 @@ const useEmoji = (
   return {onInputKeyDown, onInputKeyUp, renderEmojiComponent};
 };
 
-export default useEmoji;
+export {useEmoji};

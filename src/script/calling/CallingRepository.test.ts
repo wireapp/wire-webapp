@@ -175,7 +175,7 @@ describe('CallingRepository', () => {
       const call = new Call(userId, createConversationId(), CONV_TYPE.CONFERENCE, selfParticipant, CALL_TYPE.NORMAL, {
         currentAvailableDeviceId: mediaDevices,
       } as MediaDevicesHandler);
-      const source = new RTCAudioSource();
+      const source = new window.RTCAudioSource();
       const audioTrack = source.createTrack();
       const selfMediaStream = new MediaStream([audioTrack]);
       selfParticipant.audioStream(selfMediaStream);
@@ -204,7 +204,7 @@ describe('CallingRepository', () => {
           currentAvailableDeviceId: mediaDevices,
         } as MediaDevicesHandler,
       );
-      const source = new RTCAudioSource();
+      const source = new window.RTCAudioSource();
       const audioTrack = source.createTrack();
       const selfMediaStream = new MediaStream([audioTrack]);
       spyOn(callingRepository['mediaStreamHandler'], 'requestMediaStream').and.returnValue(
@@ -413,10 +413,10 @@ describe.skip('E2E audio call', () => {
   beforeAll(() => {
     spyOn(client, 'fetchConfig').and.returnValue(Promise.resolve({ice_servers: []}));
     spyOn<any>(client, 'getCallMediaStream').and.returnValue(
-      Promise.resolve(new MediaStream([new RTCAudioSource().createTrack()])),
+      Promise.resolve(new MediaStream([new window.RTCAudioSource().createTrack()])),
     );
     spyOn<any>(client, 'getMediaStream').and.returnValue(
-      Promise.resolve(new MediaStream([new RTCAudioSource().createTrack()])),
+      Promise.resolve(new MediaStream([new window.RTCAudioSource().createTrack()])),
     );
     spyOn(client, 'onCallEvent').and.callThrough();
     spyOn<any>(client, 'updateParticipantStream').and.callThrough();

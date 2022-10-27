@@ -17,26 +17,21 @@
  *
  */
 
-import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
-import type {QualifiedId} from '@wireapp/api-client/src/user/';
+import {fireEvent, render} from '@testing-library/react';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import TestPage from 'Util/test/TestPage';
 import {createRandomUuid, noop} from 'Util/util';
 
-import GroupList, {GroupListProps} from './GroupList';
+import {GroupList} from './GroupList';
 
 import {AssetRepository} from '../../../../../assets/AssetRepository';
 import {Conversation} from '../../../../../entity/Conversation';
 import {User} from '../../../../../entity/User';
 import {Router} from '../../../../../router/Router';
 
-class GroupListPage extends TestPage<GroupListProps> {
-  constructor(props?: GroupListProps) {
-    super(GroupList, props);
-  }
-  getGroupConversationItem = (groupId: string) => this.get(`[data-uie-name="item-group"][data-uie-uid="${groupId}"]`);
-  clickGroupConversationItem = (groupId: string) => this.click(this.getGroupConversationItem(groupId));
-}
+const getGroupItemById = (container: HTMLElement, id: string) =>
+  container.querySelector(`[data-uie-name="item-group"][data-uie-uid="${id}"]`);
 
 describe('GroupList', () => {
   const createGroupConversation = (name: string, id = createRandomUuid()) => {
@@ -68,14 +63,17 @@ describe('GroupList', () => {
     const assetRepository: Partial<AssetRepository> = {};
     const router: Partial<Router> = {};
 
-    const groupListPage = new GroupListPage({
+    const props = {
       assetRepository: assetRepository as AssetRepository,
       click: noop,
       groups,
       router: router as Router,
-    });
-    expect(groupListPage.getGroupConversationItem(groups[0].id)).not.toBeNull();
-    expect(groupListPage.getGroupConversationItem(groups[1].id)).not.toBeNull();
+    };
+
+    const {container} = render(<GroupList {...props} />);
+
+    expect(getGroupItemById(container, groups[0].id)).not.toBeNull();
+    expect(getGroupItemById(container, groups[1].id)).not.toBeNull();
   });
 
   it('shows group list and navigates conversation on click', () => {
@@ -85,18 +83,25 @@ describe('GroupList', () => {
       navigate: jest.fn(),
     };
     const onClickSpy = jest.fn();
-    const groupListPage = new GroupListPage({
+
+    const props = {
       assetRepository: assetRepository as AssetRepository,
       click: onClickSpy,
       groups,
       router: router as Router,
-    });
+    };
 
-    groupListPage.clickGroupConversationItem(groups[0].id);
+    const {container} = render(<GroupList {...props} />);
+
+    const itemGroup1 = getGroupItemById(container, groups[0].id);
+    fireEvent.click(itemGroup1!);
+
     expect(router.navigate).toHaveBeenCalledWith(`/conversation/${groups[0].id}`);
     expect(onClickSpy).toHaveBeenCalledWith(groups[0]);
 
-    groupListPage.clickGroupConversationItem(groups[1].id);
+    const itemGroup2 = getGroupItemById(container, groups[1].id);
+    fireEvent.click(itemGroup2!);
+
     expect(router.navigate).toHaveBeenCalledWith(`/conversation/${groups[1].id}`);
     expect(onClickSpy).toHaveBeenCalledWith(groups[1]);
   });

@@ -21,8 +21,8 @@ import React, {forwardRef} from 'react';
 
 import cx from 'classnames';
 
-import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
-import Icon from 'Components/Icon';
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {Icon} from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 
@@ -35,7 +35,7 @@ type MentionSuggestionsItemProps = {
   suggestion: User;
 };
 
-const MentionSuggestionsItem: React.ForwardRefRenderFunction<HTMLDivElement, MentionSuggestionsItemProps> = (
+const MentionSuggestionsItemComponent: React.ForwardRefRenderFunction<HTMLDivElement, MentionSuggestionsItemProps> = (
   {suggestion, onSuggestionClick, onMouseEnter, isSelected},
   ref,
 ) => {
@@ -92,4 +92,6 @@ const MentionSuggestionsItem: React.ForwardRefRenderFunction<HTMLDivElement, Men
   );
 };
 
-export default forwardRef(MentionSuggestionsItem);
+const MentionSuggestionsItem = forwardRef(MentionSuggestionsItemComponent);
+
+export {MentionSuggestionsItem};

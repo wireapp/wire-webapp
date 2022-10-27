@@ -17,42 +17,47 @@
  *
  */
 
-import {FC, useEffect, useState} from 'react';
+import {FC, useCallback, useEffect, useRef, useState} from 'react';
 
-import {LegalHoldMemberStatus} from '@wireapp/api-client/src/team/legalhold/';
-import {amplify} from 'amplify';
+import {LegalHoldMemberStatus} from '@wireapp/api-client/lib/team/legalhold/';
 import cx from 'classnames';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import ko from 'knockout';
 
-import Icon from 'Components/Icon';
-import LegalHoldDot from 'Components/LegalHoldDot';
-import ModalComponent from 'Components/ModalComponent';
-import UserDevices, {UserDevicesState, useUserDevicesHistory} from 'Components/UserDevices';
-import UserSearchableList from 'Components/UserSearchableList';
+import {Icon} from 'Components/Icon';
+import {LegalHoldDot} from 'Components/LegalHoldDot';
+import {ModalComponent} from 'Components/ModalComponent';
+import {useUserDevicesHistory, UserDevicesState, UserDevices} from 'Components/UserDevices';
+import {UserSearchableList} from 'Components/UserSearchableList';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {handleEnterDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
-import {splitFingerprint} from 'Util/StringUtil';
+
+import {useLegalHoldModalState} from './LegalHoldModal.state';
 
 import {ClientRepository} from '../../../client/ClientRepository';
 import {ConversationRepository} from '../../../conversation/ConversationRepository';
 import {MessageRepository} from '../../../conversation/MessageRepository';
 import {CryptographyRepository} from '../../../cryptography/CryptographyRepository';
-import {Conversation} from '../../../entity/Conversation';
 import {User} from '../../../entity/User';
-import {LegalHoldModalState} from '../../../legal-hold/LegalHoldModalState';
 import {SearchRepository} from '../../../search/SearchRepository';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {UserState} from '../../../user/UserState';
 
+const DISABLE_SUBMIT_TEXT_LENGTH = 1;
+
+export enum LegalHoldModalType {
+  REQUEST = 'request',
+  USERS = 'users',
+}
+
 export interface LegalHoldModalProps {
-  userState: UserState;
-  conversationRepository: ConversationRepository;
-  searchRepository: SearchRepository;
-  teamRepository: TeamRepository;
   clientRepository: ClientRepository;
+  conversationRepository: ConversationRepository;
   cryptographyRepository: CryptographyRepository;
   messageRepository: MessageRepository;
+  searchRepository: SearchRepository;
+  teamRepository: TeamRepository;
+  userState: UserState;
 }
 
 const LegalHoldModal: FC<LegalHoldModalProps> = ({
@@ -64,50 +69,56 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
   cryptographyRepository,
   messageRepository,
 }) => {
-  const [isShown, setIsShown] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isSelfInfo, setIsSelfInfo] = useState<boolean>(false);
-  const [showRequest, setShowRequest] = useState<boolean>(false);
-  const [requiresPassword, setRequiresPassword] = useState<boolean>(true);
-  const [skipShowUsers, setSkipShowUsers] = useState<boolean>(false);
-  const [isSendingApprove, setIsSendingApprove] = useState<boolean>(false);
+  const skipShowUsersRef = useRef(false);
 
-  const [requestFingerprint, setRequestFingerprint] = useState<string>('');
+  const {
+    fingerprint,
+    setFingerprint,
+    closeModal,
+    closeRequestModal,
+    type,
+    setType,
+    isLoading,
+    isOpen,
+    setIsLoading,
+    isInitialized,
+    setIsModalOpen,
+    conversation: currentConversation,
+    isSelfInfo,
+    users,
+    setUsers,
+  } = useLegalHoldModalState();
+
+  const isRequest = type === LegalHoldModalType.REQUEST;
+  const isUsers = type === LegalHoldModalType.USERS;
+
+  const [isPending, setIsPending] = useState<boolean>(false);
+  const [isSendingApprove, setIsSendingApprove] = useState<boolean>(false);
   const [passwordValue, setPasswordValue] = useState<string>('');
   const [requestError, setRequestError] = useState<string>('');
-
   const [userDevices, setUserDevices] = useState<User | undefined>(undefined);
 
-  const [users, setUsers] = useState<User[]>([]);
-
-  const [conversationId, setConversationId] = useState<string | null>(null);
-
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
-  const disableSubmit = requiresPassword && passwordValue.length < 1;
+
+  const requiresPassword = isRequest && !selfUser.isNoPasswordSSO;
+  const disableSubmit = requiresPassword && passwordValue.length < DISABLE_SUBMIT_TEXT_LENGTH;
 
   const userDevicesHistory = useUserDevicesHistory();
   const showDeviceList = userDevicesHistory.current.state === UserDevicesState.DEVICE_LIST;
 
-  const onClose = () => {
-    setIsShown(false);
-    setUsers([]);
+  const onClose = useCallback(() => {
+    closeModal();
+
     setUserDevices(undefined);
-    setShowRequest(false);
     setPasswordValue('');
     setRequestError('');
-    setIsLoading(false);
-  };
+  }, []);
 
-  const hideModal = () => {
-    onClose();
-    setConversationId(null);
-  };
-
-  const onBgClick = () => {
-    if (!showRequest) {
-      hideModal();
+  const onBgClick = useCallback(() => {
+    if (!isRequest) {
+      onClose();
     }
-  };
+  }, [isRequest]);
 
   const onBackClick = () => {
     if (!showDeviceList) {
@@ -118,8 +129,8 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
   };
 
   const closeRequest = () => {
-    if (showRequest) {
-      hideModal();
+    if (isRequest) {
+      closeRequestModal();
     }
   };
 
@@ -136,15 +147,19 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
         return;
       }
 
-      const password = requiresPassword ? passwordValue : '';
+      const password = requiresPassword ? passwordValue : undefined;
+      // @ts-ignore Need to check if it will work with undefined password for SSO login
       await teamRepository.teamService.sendLegalHoldApproval(selfUser.teamId, selfUser.id, password);
-
-      onClose();
-      setIsSendingApprove(false);
-      setSkipShowUsers(true);
       selfUser.hasPendingLegalHold(false);
 
       await clientRepository.updateClientsForSelf();
+
+      setIsSendingApprove(false);
+      skipShowUsersRef.current = true;
+      closeRequest();
+      setUserDevices(undefined);
+      setPasswordValue('');
+      setRequestError('');
     } catch ({code, message}) {
       switch (code) {
         case HTTP_STATUS.BAD_REQUEST: {
@@ -164,21 +179,19 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
     }
   };
 
-  const showRequestModal = async (showLoading?: boolean, fingerprint?: string) => {
-    setShowRequest(true);
-    setIsShown(true);
-
+  const showRequestModal = useCallback(async () => {
     const setModalParams = (value: boolean) => {
-      setIsShown(value);
+      setIsModalOpen(value);
       setIsLoading(value);
-      setShowRequest(value);
+
+      if (!value) {
+        setType(null);
+      }
     };
 
-    if (showLoading) {
+    if (isLoading) {
       setModalParams(true);
     }
-
-    setRequiresPassword(!selfUser.isNoPasswordSSO);
 
     if (!selfUser.inTeam()) {
       setModalParams(false);
@@ -186,105 +199,103 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
       return;
     }
 
-    if (!fingerprint) {
-      if (!selfUser.teamId) {
-        return;
-      }
-
+    if (!fingerprint && selfUser.teamId) {
       const response = await teamRepository.teamService.getLegalHoldState(selfUser.teamId, selfUser.id);
-
       if (response.status === LegalHoldMemberStatus.PENDING) {
-        fingerprint = await cryptographyRepository.getRemoteFingerprint(
+        const newFingerprint = await cryptographyRepository.getRemoteFingerprint(
           selfUser,
           response.client.id,
           response.last_prekey,
         );
         selfUser.hasPendingLegalHold(true);
+        setFingerprint(newFingerprint);
+        setIsModalOpen(true);
+        setIsLoading(false);
       } else {
         setModalParams(false);
 
-        return;
+        if (!isInitialized) {
+          setType(LegalHoldModalType.USERS);
+        }
       }
     }
+  }, [
+    isInitialized,
+    cryptographyRepository,
+    fingerprint,
+    isLoading,
+    selfUser,
+    setFingerprint,
+    setIsLoading,
+    setIsModalOpen,
+    teamRepository.teamService,
+  ]);
 
-    setIsShown(true);
-    setIsLoading(false);
-
-    const formattedFingerprint = splitFingerprint(fingerprint || '')
-      .map(part => `<span>${part} </span>`)
-      .join('');
-
-    setRequestFingerprint(formattedFingerprint);
-  };
-
-  const showUsers = async (conversation?: Conversation) => {
-    if (skipShowUsers) {
-      setSkipShowUsers(false);
-
+  const checkLegalHoldState = useCallback(async () => {
+    if (!selfUser.teamId) {
       return;
     }
 
-    setShowRequest(false);
+    const response = await teamRepository.teamService.getLegalHoldState(selfUser.teamId, selfUser.id);
+    const isPendingStatus = response.status === LegalHoldMemberStatus.PENDING;
 
-    if (conversation === undefined) {
-      setUsers([selfUser]);
-      setIsSelfInfo(true);
-      setIsLoading(false);
-      setIsShown(true);
-
-      setConversationId('self');
-      return;
+    if (isPendingStatus) {
+      setIsPending(isPendingStatus);
+      setIsModalOpen(true);
     }
-
-    conversation = ko.unwrap(conversation);
-
-    setIsSelfInfo(false);
-    setIsLoading(true);
-    setIsShown(true);
-
-    await messageRepository.updateAllClients(conversation, false);
-    const allUsers = await conversationRepository.getAllUsersInConversation(conversation);
-    const legalHoldUsers = allUsers.filter(user => user.isOnLegalHold());
-
-    if (!legalHoldUsers.length) {
-      setIsShown(false);
-
-      return;
-    }
-
-    setUsers(legalHoldUsers);
-    setConversationId(conversation.id);
-
-    setIsLoading(false);
-  };
-
-  const hideLegalHoldModal = (currentConversationId?: string) => {
-    const isCurrentConversation = conversationId === currentConversationId;
-
-    if (!showRequest && isCurrentConversation) {
-      hideModal();
-    }
-  };
+  }, [selfUser.id, selfUser.teamId, teamRepository.teamService]);
 
   useEffect(() => {
-    amplify.subscribe(LegalHoldModalState.SHOW_REQUEST, (fingerprint?: string) => showRequestModal(false, fingerprint));
-    amplify.subscribe(LegalHoldModalState.HIDE_REQUEST, hideModal);
-    amplify.subscribe(LegalHoldModalState.SHOW_DETAILS, showUsers);
-    amplify.subscribe(LegalHoldModalState.HIDE_DETAILS, hideLegalHoldModal);
+    if (type) {
+      checkLegalHoldState();
+    }
+  }, [type, checkLegalHoldState]);
 
-    return () => {
-      amplify.unsubscribe(LegalHoldModalState.SHOW_REQUEST, (fingerprint?: string) =>
-        showRequestModal(false, fingerprint),
-      );
-      amplify.unsubscribe(LegalHoldModalState.HIDE_REQUEST, hideModal);
-      amplify.unsubscribe(LegalHoldModalState.SHOW_DETAILS, showUsers);
-      amplify.unsubscribe(LegalHoldModalState.HIDE_DETAILS, hideLegalHoldModal);
-    };
-  }, []);
+  useEffect(() => {
+    if (isPending && isOpen && isRequest) {
+      showRequestModal();
+    }
+  }, [isPending, showRequestModal, isOpen, isRequest]);
+
+  // Show users
+  const getLegalHoldUsers = useCallback(async () => {
+    if (skipShowUsersRef.current) {
+      skipShowUsersRef.current = false;
+
+      closeModal();
+
+      return;
+    }
+
+    if (currentConversation) {
+      await messageRepository.updateAllClients(currentConversation, false);
+      const allUsers = await conversationRepository.getAllUsersInConversation(currentConversation);
+      const legalHoldUsers = allUsers.filter(user => user.isOnLegalHold());
+
+      if (!legalHoldUsers.length) {
+        setIsModalOpen(false);
+
+        return;
+      }
+
+      setUsers(legalHoldUsers);
+    } else {
+      setUsers([selfUser]);
+    }
+
+    setIsLoading(false);
+    setIsModalOpen(true);
+  }, [conversationRepository, currentConversation, messageRepository, selfUser]);
+
+  useEffect(() => {
+    if (isOpen && isUsers) {
+      getLegalHoldUsers();
+    }
+  }, [getLegalHoldUsers, isOpen, isUsers]);
 
   return (
     <ModalComponent
-      isShown={isShown}
+      isShown={isOpen}
       onBgClick={onBgClick}
       onClosed={onClose}
       data-uie-name="legal-hold-modal"
@@ -295,16 +306,16 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
       <div className="modal__header">
         {userDevices && (
           <button
-            className="button-reset-default"
+            className="button-reset-default modal__header__button modal__header__button__left"
             type="button"
             onClick={onBackClick}
             data-uie-name="go-back-participant-devices"
           >
-            <Icon.ArrowLeft className="modal__header__button modal__header__button__left" />
+            <Icon.ArrowLeft />
           </button>
         )}
 
-        {showRequest ? (
+        {isRequest ? (
           <h2 className="modal__header__title" data-uie-name="status-modal-title">
             {t('legalHoldModalTitle')}
           </h2>
@@ -315,8 +326,8 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
         )}
       </div>
 
-      <div className={cx('modal__body legal-hold-modal__wrapper', {'legal-hold-modal__wrapper--request': showRequest})}>
-        {showRequest && (
+      <div className={cx('modal__body legal-hold-modal__wrapper', {'legal-hold-modal__wrapper--request': isRequest})}>
+        {isRequest && (
           <>
             <div className="modal__text" data-uie-name="status-modal-text">
               <p
@@ -326,7 +337,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
                     {},
                     {
                       br: '<br>',
-                      fingerprint: `<span class="legal-hold-modal__fingerprint" data-uie-name="status-modal-fingerprint">${requestFingerprint}</span>`,
+                      fingerprint: `<span class="legal-hold-modal__fingerprint" data-uie-name="status-modal-fingerprint">${fingerprint}</span>`,
                     },
                   ),
                 }}
@@ -342,6 +353,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
                 value={passwordValue}
                 placeholder={t('login.passwordPlaceholder')}
                 onChange={ev => setPasswordValue(ev.target.value)}
+                onKeyDown={ev => handleEnterDown(ev, acceptRequest)}
               />
             )}
 
@@ -379,50 +391,54 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
           </>
         )}
 
-        {!showRequest && !userDevices ? (
+        {!isRequest && (
           <>
-            <div className="legal-hold-modal__logo">
-              <LegalHoldDot large dataUieName="status-modal-legal-hold-icon" />
-            </div>
+            {!userDevices ? (
+              <>
+                <div className="legal-hold-modal__logo">
+                  <LegalHoldDot large dataUieName="status-modal-legal-hold-icon" />
+                </div>
 
-            <div className="legal-hold-modal__headline" data-uie-name="status-modal-title">
-              {t('legalHoldHeadline')}
-            </div>
+                <div className="legal-hold-modal__headline" data-uie-name="status-modal-title">
+                  {t('legalHoldHeadline')}
+                </div>
 
-            <p
-              className="legal-hold-modal__info"
-              data-uie-name="status-modal-text"
-              dangerouslySetInnerHTML={{
-                __html: isSelfInfo ? t('legalHoldDescriptionSelf') : t('legalHoldDescriptionOthers'),
-              }}
-            />
+                <p
+                  className="legal-hold-modal__info"
+                  data-uie-name="status-modal-text"
+                  dangerouslySetInnerHTML={{
+                    __html: isSelfInfo ? t('legalHoldDescriptionSelf') : t('legalHoldDescriptionOthers'),
+                  }}
+                />
 
-            <div className="legal-hold-modal__subjects">{t('legalHoldSubjects')}</div>
+                <div className="legal-hold-modal__subjects">{t('legalHoldSubjects')}</div>
 
-            <UserSearchableList
-              users={users}
-              userState={userState}
-              conversationRepository={conversationRepository}
-              searchRepository={searchRepository}
-              teamRepository={teamRepository}
-              onClick={setUserDevices}
-              noUnderline
-            />
+                <UserSearchableList
+                  users={users}
+                  userState={userState}
+                  conversationRepository={conversationRepository}
+                  searchRepository={searchRepository}
+                  teamRepository={teamRepository}
+                  onClick={setUserDevices}
+                  noUnderline
+                />
+              </>
+            ) : (
+              <UserDevices
+                clientRepository={clientRepository}
+                cryptographyRepository={cryptographyRepository}
+                messageRepository={messageRepository}
+                user={userDevices as User}
+                current={userDevicesHistory.current}
+                goTo={userDevicesHistory.goTo}
+                noPadding
+              />
+            )}
           </>
-        ) : (
-          <UserDevices
-            clientRepository={clientRepository}
-            cryptographyRepository={cryptographyRepository}
-            messageRepository={messageRepository}
-            user={userDevices as User}
-            current={userDevicesHistory.current}
-            goTo={userDevicesHistory.goTo}
-            noPadding
-          />
         )}
       </div>
     </ModalComponent>
   );
 };
 
-export default LegalHoldModal;
+export {LegalHoldModal};

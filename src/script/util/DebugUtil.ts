@@ -17,18 +17,18 @@
  *
  */
 
-import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
-import {MemberLeaveReason} from '@wireapp/api-client/src/conversation/data/';
+import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
+import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
 import {
-  CONVERSATION_EVENT,
-  USER_EVENT,
   BackendEvent,
   ConversationEvent,
   ConversationOtrMessageAddEvent,
-} from '@wireapp/api-client/src/event/';
-import type {Notification} from '@wireapp/api-client/src/notification/';
-import type {QualifiedId} from '@wireapp/api-client/src/user';
-import {isQualifiedId} from '@wireapp/core/src/main/util';
+  CONVERSATION_EVENT,
+  USER_EVENT,
+} from '@wireapp/api-client/lib/event/';
+import type {Notification} from '@wireapp/api-client/lib/notification/';
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import {isQualifiedId} from '@wireapp/core/lib/util';
 import {util as ProteusUtil} from '@wireapp/proteus';
 import Dexie from 'dexie';
 import {container} from 'tsyringe';
@@ -116,7 +116,7 @@ export class DebugUtil {
   async breakSession(userId: string | QualifiedId, clientId: string): Promise<void> {
     const qualifiedId = isQualifiedId(userId) ? userId : {domain: '', id: userId};
     const sessionId = this.core.service!.cryptography.constructSessionId(qualifiedId, clientId);
-    const cryptobox = this.cryptographyRepository.cryptobox;
+    const cryptobox = this.cryptographyRepository.cryptographyService.cryptobox;
     const cryptoboxSession = await cryptobox.session_load(sessionId);
     cryptoboxSession.session.session_states = {};
 
@@ -250,7 +250,7 @@ export class DebugUtil {
     const clientId = this.clientState.currentClient().id;
     const userId = this.userState.self().id;
     const fileName = `cryptobox-${userId}-${clientId}.json`;
-    const cryptobox = await this.cryptographyRepository.cryptobox.serialize();
+    const cryptobox = await this.cryptographyRepository.cryptographyService.cryptobox.serialize();
     downloadText(JSON.stringify(cryptobox), fileName);
   }
 

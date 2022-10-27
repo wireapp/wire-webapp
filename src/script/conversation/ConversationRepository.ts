@@ -18,28 +18,28 @@
  */
 
 import {
-  DefaultConversationRoleName as DefaultRole,
-  CONVERSATION_TYPE,
-  NewConversation,
   Conversation as BackendConversation,
   ConversationProtocol,
-} from '@wireapp/api-client/src/conversation/';
-import {ConversationReceiptModeUpdateData} from '@wireapp/api-client/src/conversation/data/';
+  CONVERSATION_TYPE,
+  DefaultConversationRoleName as DefaultRole,
+  NewConversation,
+} from '@wireapp/api-client/lib/conversation/';
+import {ConversationReceiptModeUpdateData} from '@wireapp/api-client/lib/conversation/data/';
 import {
-  CONVERSATION_EVENT,
-  ConversationMessageTimerUpdateEvent,
-  ConversationRenameEvent,
-  ConversationMemberJoinEvent,
   ConversationCreateEvent,
   ConversationEvent,
-  ConversationReceiptModeUpdateEvent,
+  ConversationMemberJoinEvent,
   ConversationMemberLeaveEvent,
   ConversationMemberUpdateEvent,
-} from '@wireapp/api-client/src/event';
-import {BackendErrorLabel} from '@wireapp/api-client/src/http/';
-import type {QualifiedId} from '@wireapp/api-client/src/user/';
-import {MLSReturnType} from '@wireapp/core/src/main/conversation';
-import {Confirmation, LegalHoldStatus, Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
+  ConversationMessageTimerUpdateEvent,
+  ConversationReceiptModeUpdateEvent,
+  ConversationRenameEvent,
+  CONVERSATION_EVENT,
+} from '@wireapp/api-client/lib/event';
+import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
+import type {QualifiedId} from '@wireapp/api-client/lib/user/';
+import {MLSReturnType} from '@wireapp/core/lib/conversation';
+import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
@@ -50,15 +50,15 @@ import {flatten} from 'underscore';
 import {getNextItem} from 'Util/ArrayUtil';
 import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/FileTypeUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
-import {Logger, getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 import {PromiseQueue} from 'Util/PromiseQueue';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {
   compareTransliteration,
-  sortByPriority,
-  startsWith,
-  sortUsersByPriority,
   fixWebsocketString,
+  sortByPriority,
+  sortUsersByPriority,
+  startsWith,
 } from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {base64ToArray, createRandomUuid, noop} from 'Util/util';
@@ -69,7 +69,7 @@ import {updateAccessRights} from './ConversationAccessPermission';
 import {ConversationEphemeralHandler} from './ConversationEphemeralHandler';
 import {ConversationFilter} from './ConversationFilter';
 import {ConversationLabelRepository} from './ConversationLabelRepository';
-import {ConversationMapper, ConversationDatabaseData} from './ConversationMapper';
+import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';
 import {ConversationRoleRepository} from './ConversationRoleRepository';
 import {ConversationService} from './ConversationService';
 import {ConversationState} from './ConversationState';
@@ -84,7 +84,7 @@ import {NOTIFICATION_STATE} from './NotificationSetting';
 import {AssetTransferState} from '../assets/AssetTransferState';
 import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
 import {ClientState} from '../client/ClientState';
-import PrimaryModal from '../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
 import {ConnectionRepository} from '../connection/ConnectionRepository';
@@ -1615,7 +1615,7 @@ export class ConversationRepository {
    */
   async updateConversationMessageTimer(
     conversationEntity: Conversation,
-    messageTimer: number,
+    messageTimer: number | null,
   ): Promise<ConversationMessageTimerUpdateEvent> {
     messageTimer = ConversationEphemeralHandler.validateTimer(messageTimer);
 

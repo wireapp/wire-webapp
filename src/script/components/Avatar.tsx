@@ -21,9 +21,9 @@ import {FC, HTMLProps, MouseEvent as ReactMouseEvent} from 'react';
 
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-import ServiceAvatar from './avatar/ServiceAvatar';
-import TemporaryGuestAvatar from './avatar/TemporaryGuestAvatar';
-import UserAvatar from './avatar/UserAvatar';
+import {ServiceAvatar} from './avatar/ServiceAvatar';
+import {TemporaryGuestAvatar} from './avatar/TemporaryGuestAvatar';
+import {UserAvatar} from './avatar/UserAvatar';
 
 import {User} from '../entity/User';
 import {isServiceEntity} from '../guards/Service';
@@ -152,5 +152,5 @@ const Avatar: FC<AvatarProps> = ({
   );
 };
 
-export default Avatar;
+export {Avatar};
 registerReactComponent('participant-avatar', Avatar);

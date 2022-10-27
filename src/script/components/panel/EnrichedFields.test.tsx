@@ -17,15 +17,15 @@
  *
  */
 
-import {waitFor, render} from '@testing-library/react';
-import type {RichInfo} from '@wireapp/api-client/src/user/';
+import {render, waitFor} from '@testing-library/react';
+import type {RichInfo} from '@wireapp/api-client/lib/user/';
 import {act} from 'react-dom/test-utils';
 
 import {User} from 'src/script/entity/User';
 import {RichProfileRepository} from 'src/script/user/RichProfileRepository';
 import {createRandomUuid} from 'Util/util';
 
-import EnrichedFields from './EnrichedFields';
+import {EnrichedFields} from './EnrichedFields';
 
 const richInfo: Partial<RichInfo> = {
   fields: [

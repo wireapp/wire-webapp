@@ -17,7 +17,7 @@
  *
  */
 
-import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import ko from 'knockout';
 
 import {t} from 'Util/LocalizerUtil';

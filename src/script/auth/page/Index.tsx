@@ -20,14 +20,14 @@
 import React, {useEffect, useState} from 'react';
 
 import {UrlUtil} from '@wireapp/commons';
-import {Button, ButtonVariant, COLOR, ContainerXS, ErrorMessage, Text} from '@wireapp/react-ui-kit';
-import {SVGIcon} from '@wireapp/react-ui-kit/src/Icon/SVGIcon';
+import {Button, ButtonVariant, ContainerXS, ErrorMessage, Text} from '@wireapp/react-ui-kit';
+import {SVGIcon} from '@wireapp/react-ui-kit/lib/Icon/SVGIcon';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {useNavigate} from 'react-router-dom';
+import {Navigate, useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
-import Page from './Page';
+import {Page} from './Page';
 
 import {Config} from '../../Config';
 import '../../localization/Localizer';
@@ -35,21 +35,14 @@ import {indexStrings, logoutReasonStrings} from '../../strings';
 import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {QUERY_KEY, ROUTE} from '../route';
-import SVGProvider from '../util/SVGProvider';
+import {getSVG} from '../util/SVGProvider';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
+const IndexComponent = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
   const navigate = useNavigate();
   const [logoutReason, setLogoutReason] = useState<string>();
-
-  useEffect(() => {
-    // Redirect to prefilled SSO login if default SSO code is set on backend
-    if (defaultSSOCode) {
-      navigate(`${ROUTE.SSO}/wire-${defaultSSOCode}`);
-    }
-  }, [defaultSSOCode]);
 
   useEffect(() => {
     const queryLogoutReason = UrlUtil.getURLParameter(QUERY_KEY.LOGOUT_REASON) || null;
@@ -58,16 +51,17 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
     }
   }, []);
 
-  useEffect(() => {
+  if (defaultSSOCode) {
+    // Redirect to prefilled SSO login if default SSO code is set on backend
+    return <Navigate to={`${ROUTE.SSO}/wire-${defaultSSOCode}`} />;
+  }
+
+  const features = Config.getConfig().FEATURE;
+  if (!features.ENABLE_DOMAIN_DISCOVERY && !features.ENABLE_SSO && !features.ENABLE_ACCOUNT_REGISTRATION) {
     // Navigate directly to email login because it's the only available option on the index page
-    if (
-      !Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY &&
-      !Config.getConfig().FEATURE.ENABLE_SSO &&
-      !Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION
-    ) {
-      navigate(ROUTE.LOGIN);
-    }
-  }, []);
+    return <Navigate to={ROUTE.LOGIN} />;
+  }
+
   return (
     <Page>
       <ContainerXS centerText verticalCenter style={{width: '380px'}}>
@@ -79,7 +73,7 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
           style={{marginBottom: '80px'}}
           data-uie-name="ui-wire-logo"
         >
-          <g dangerouslySetInnerHTML={{__html: SVGProvider['logo-full-icon']?.documentElement?.innerHTML}} />
+          <g dangerouslySetInnerHTML={{__html: getSVG('logo-full-icon')?.documentElement?.innerHTML}} />
         </SVGIcon>
         <Text
           block
@@ -89,81 +83,40 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
         >
           {_(indexStrings.welcome, {brandName: Config.getConfig().BACKEND_NAME})}
         </Text>
-        {Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION ? (
-          <>
-            <Button
-              type="button"
-              onClick={() => navigate(ROUTE.SET_ACCOUNT_TYPE)}
-              block
-              data-uie-name="go-set-account-type"
-            >
-              {_(indexStrings.createAccount)}
-            </Button>
-            <Button type="button" onClick={() => navigate(ROUTE.LOGIN)} block data-uie-name="go-login">
-              {_(indexStrings.logIn)}
-            </Button>
-            {logoutReason && (
-              <ErrorMessage data-uie-name="status-logout-reason">
-                <FormattedMessage
-                  {...logoutReasonStrings[logoutReason]}
-                  values={{
-                    newline: <br />,
-                  }}
-                />
-              </ErrorMessage>
-            )}
-            {(Config.getConfig().FEATURE.ENABLE_SSO || Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY) && (
-              <Button
-                type="button"
-                variant={ButtonVariant.SECONDARY}
-                onClick={() => navigate(ROUTE.SSO)}
-                block
-                style={{marginTop: '120px'}}
-                data-uie-name="go-sso-login"
-              >
-                {_(
-                  Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ? indexStrings.enterprise : indexStrings.ssoLogin,
-                )}
-              </Button>
-            )}
-          </>
-        ) : (
-          <>
-            <Button
-              type="button"
-              onClick={() => navigate(ROUTE.LOGIN)}
-              block
-              style={{fontSize: '13px'}}
-              data-uie-name="go-login"
-            >
-              {_(indexStrings.logIn)}
-            </Button>
-            {(Config.getConfig().FEATURE.ENABLE_SSO || Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY) && (
-              <Button
-                type="button"
-                onClick={() => navigate(ROUTE.SSO)}
-                block
-                backgroundColor={'transparent'}
-                color={COLOR.BLUE}
-                style={{border: `1px solid ${COLOR.BLUE}`, fontSize: '13px'}}
-                data-uie-name="go-sso-login"
-              >
-                {_(
-                  Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ? indexStrings.enterprise : indexStrings.ssoLogin,
-                )}
-              </Button>
-            )}
-            {logoutReason && (
-              <ErrorMessage data-uie-name="status-logout-reason">
-                <FormattedMessage
-                  {...logoutReasonStrings[logoutReason]}
-                  values={{
-                    newline: <br />,
-                  }}
-                />
-              </ErrorMessage>
-            )}
-          </>
+        {features.ENABLE_ACCOUNT_REGISTRATION && (
+          <Button
+            type="button"
+            onClick={() => navigate(ROUTE.SET_ACCOUNT_TYPE)}
+            block
+            data-uie-name="go-set-account-type"
+          >
+            {_(indexStrings.createAccount)}
+          </Button>
+        )}
+        <Button type="button" onClick={() => navigate(ROUTE.LOGIN)} block data-uie-name="go-login">
+          {_(indexStrings.logIn)}
+        </Button>
+        {logoutReason && (
+          <ErrorMessage data-uie-name="status-logout-reason">
+            <FormattedMessage
+              {...logoutReasonStrings[logoutReason]}
+              values={{
+                newline: <br />,
+              }}
+            />
+          </ErrorMessage>
+        )}
+        {(features.ENABLE_SSO || features.ENABLE_DOMAIN_DISCOVERY) && (
+          <Button
+            type="button"
+            variant={ButtonVariant.SECONDARY}
+            onClick={() => navigate(ROUTE.SSO)}
+            block
+            style={{marginTop: '120px'}}
+            data-uie-name="go-sso-login"
+          >
+            {_(features.ENABLE_DOMAIN_DISCOVERY ? indexStrings.enterprise : indexStrings.ssoLogin)}
+          </Button>
         )}
       </ContainerXS>
     </Page>
@@ -178,4 +131,6 @@ const mapStateToProps = (state: RootState) => ({
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
 const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => bindActionCreators({}, dispatch);
 
-export default connect(mapStateToProps, mapDispatchToProps)(Index);
+const Index = connect(mapStateToProps, mapDispatchToProps)(IndexComponent);
+
+export {Index};

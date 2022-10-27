@@ -26,7 +26,7 @@ import cx from 'classnames';
 import {CSS_SQUARE} from 'Util/CSSMixin';
 import {KEY} from 'Util/KeyboardUtil';
 
-import Icon from './Icon';
+import {Icon} from './Icon';
 
 export interface AvailabilityStateProps {
   availability: Availability.Type;
@@ -172,4 +172,4 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
   return wrappedContent;
 };
 
-export default AvailabilityState;
+export {AvailabilityState};

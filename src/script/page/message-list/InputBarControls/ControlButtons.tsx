@@ -17,16 +17,17 @@
  *
  */
 
-import React, {useRef} from 'react';
+import React from 'react';
 
-import Icon from 'Components/Icon';
+import {Icon} from 'Components/Icon';
 import {Conversation} from 'src/script/entity/Conversation';
 import {t} from 'Util/LocalizerUtil';
 
-import GiphyButton from './GiphyButton';
+import {GiphyButton} from './GiphyButton';
 
-import {Config} from '../../../Config';
-import MessageTimerButton from '../MessageTimerButton';
+import {AssetUploadButton} from '../AssetUploadButton';
+import {ImageUploadButton} from '../ImageUploadButton';
+import {MessageTimerButton} from '../MessageTimerButton';
 
 export type ControlButtonsProps = {
   input: string;
@@ -57,12 +58,6 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
   onCancelEditing,
   onGifClick,
 }) => {
-  const acceptedImageTypes = Config.getConfig().ALLOWED_IMAGE_TYPES.join(',');
-  const acceptedFileTypes = Config.getConfig().FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS.join(',');
-
-  const imageRef = useRef<HTMLInputElement>(null!);
-  const fileRef = useRef<HTMLInputElement>(null!);
-
   const pingTooltip = t('tooltipConversationPing');
 
   if (isEditing) {
@@ -103,47 +98,11 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
             </li>
 
             <li>
-              <button
-                type="button"
-                aria-label={t('tooltipConversationAddImage')}
-                title={t('tooltipConversationAddImage')}
-                className={`conversation-button controls-right-button no-radius file-button`}
-                onClick={() => imageRef.current?.click()}
-                data-uie-name="do-share-image"
-              >
-                <Icon.Image />
-
-                <input
-                  ref={imageRef}
-                  accept={acceptedImageTypes}
-                  tabIndex={-1}
-                  id="conversation-input-bar-photo"
-                  onChange={({target: {files}}) => files && onSelectImages(Array.from(files))}
-                  type="file"
-                />
-              </button>
+              <ImageUploadButton onSelectImages={onSelectImages} />
             </li>
 
             <li>
-              <button
-                type="button"
-                aria-label={t('tooltipConversationFile')}
-                title={t('tooltipConversationFile')}
-                className={`conversation-button controls-right-button no-radius file-button`}
-                onClick={() => fileRef.current?.click()}
-                data-uie-name="do-share-file"
-              >
-                <Icon.Attachment />
-
-                <input
-                  ref={fileRef}
-                  accept={acceptedFileTypes ?? null}
-                  id="conversation-input-bar-files"
-                  tabIndex={-1}
-                  onChange={({target: {files}}) => files && onSelectFiles(Array.from(files))}
-                  type="file"
-                />
-              </button>
+              <AssetUploadButton onSelectFiles={onSelectFiles} />
             </li>
           </>
         )}
@@ -158,4 +117,4 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
   return <>{showGiphyButton && !disableFilesharing && <GiphyButton onGifClick={onGifClick} />}</>;
 };
 
-export default ControlButtons;
+export {ControlButtons};

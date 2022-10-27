@@ -19,7 +19,7 @@
 
 import React, {useEffect, useRef, useState} from 'react';
 
-import type {WebappProperties} from '@wireapp/api-client/src/user/data/';
+import type {WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
@@ -30,7 +30,7 @@ import {Config} from '../../../../../Config';
 import type {MediaConstraintsHandler} from '../../../../../media/MediaConstraintsHandler';
 import type {PropertiesRepository} from '../../../../../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../../../../../properties/PropertiesType';
-import PreferencesSection from '../components/PreferencesSection';
+import {PreferencesSection} from '../components/PreferencesSection';
 
 interface CallOptionsProps {
   constraintsHandler: MediaConstraintsHandler;
@@ -115,4 +115,4 @@ const CallOptions: React.FC<CallOptionsProps> = ({constraintsHandler, properties
   );
 };
 
-export default CallOptions;
+export {CallOptions};

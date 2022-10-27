@@ -18,20 +18,21 @@
  */
 
 import React, {
-  MouseEvent as ReactMouseEvent,
   KeyboardEvent as ReactKeyboardEvent,
+  MouseEvent as ReactMouseEvent,
   useLayoutEffect,
   useRef,
 } from 'react';
 
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
+import cx from 'classnames';
 
-import InViewport from 'Components/utils/InViewport';
+import {InViewport} from 'Components/utils/InViewport';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getMessageMarkerType, MessageMarkerType} from 'Util/conversationMessages';
 
-import MessageTime from './MessageTime';
+import {MessageTime} from './MessageTime';
 import {MessageWrapper} from './MessageWrapper';
 
 import type {MessageRepository} from '../../../conversation/MessageRepository';
@@ -117,7 +118,7 @@ const Message: React.FC<
 
   const content = <MessageWrapper {...props} hasMarker={markerType !== MessageMarkerType.NONE} />;
   const wrappedContent = onVisible ? (
-    <InViewport requireFullyInView allowBiggerThanViewport onVisible={onVisible}>
+    <InViewport requireFullyInView allowBiggerThanViewport checkOverlay onVisible={onVisible}>
       {content}
     </InViewport>
   ) : (
@@ -125,7 +126,7 @@ const Message: React.FC<
   );
   return (
     <div
-      className={`message ${isMarked ? 'message-marked' : ''}`}
+      className={cx('message', {'message-marked': isMarked})}
       ref={messageElementRef}
       data-uie-uid={message.id}
       data-uie-value={message.super_type}
@@ -133,7 +134,7 @@ const Message: React.FC<
       data-uie-send-status={status}
       data-uie-name="item-message"
     >
-      <div className={`message-header message-timestamp ${getTimestampClass()}`}>
+      <div className={cx('message-header message-timestamp', getTimestampClass())}>
         <div className="message-header-icon">
           <span className="message-unread-dot"></span>
         </div>
@@ -151,4 +152,4 @@ const Message: React.FC<
   );
 };
 
-export default Message;
+export {Message};

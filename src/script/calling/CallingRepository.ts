@@ -17,10 +17,10 @@
  *
  */
 
-import type {CallConfigData} from '@wireapp/api-client/src/account/CallConfigData';
-import type {QualifiedUserClients, UserClients} from '@wireapp/api-client/src/conversation';
-import type {QualifiedId} from '@wireapp/api-client/src/user';
-import type {WebappProperties} from '@wireapp/api-client/src/user/data';
+import type {CallConfigData} from '@wireapp/api-client/lib/account/CallConfigData';
+import type {QualifiedUserClients, UserClients} from '@wireapp/api-client/lib/conversation';
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import type {WebappProperties} from '@wireapp/api-client/lib/user/data';
 import {
   CALL_TYPE,
   CONV_TYPE,
@@ -38,17 +38,15 @@ import {
   WcallMember,
 } from '@wireapp/avs';
 import {Runtime} from '@wireapp/commons';
-import {PayloadBundleState} from '@wireapp/core/src/main/conversation';
-import {
-  flattenQualifiedUserClients,
-  flattenUserClients,
-} from '@wireapp/core/src/main/conversation/message/UserClientsUtil';
-import {isQualifiedUserClients} from '@wireapp/core/src/main/util';
+import {PayloadBundleState} from '@wireapp/core/lib/conversation';
+import {flattenQualifiedUserClients, flattenUserClients} from '@wireapp/core/lib/conversation/message/UserClientsUtil';
+import {isQualifiedUserClients} from '@wireapp/core/lib/util';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import axios from 'axios';
 import ko from 'knockout';
 import {container} from 'tsyringe';
+
 import 'webrtc-adapter';
 
 import {flatten} from 'Util/ArrayUtil';
@@ -64,7 +62,7 @@ import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 import {ClientId, Participant, UserId} from './Participant';
 
-import PrimaryModal from '../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
 import {ConversationState} from '../conversation/ConversationState';
 import {CallingEvent, EventBuilder} from '../conversation/EventBuilder';
@@ -85,7 +83,9 @@ import {EventName} from '../tracking/EventName';
 import * as trackingHelpers from '../tracking/Helpers';
 import {Segmentation} from '../tracking/Segmentation';
 import type {UserRepository} from '../user/UserRepository';
-import Warnings from '../view_model/WarningsContainer';
+import {Warnings} from '../view_model/WarningsContainer';
+
+const avsLogger = getLogger('avs');
 
 interface MediaStreamQuery {
   audio?: boolean;
@@ -234,7 +234,18 @@ export class CallingRepository {
   }
 
   private configureCallingApi(wCall: Wcall): Wcall {
-    const avsLogger = getLogger('avs');
+    wCall.setLogHandler(this.avsLogHandler);
+
+    const avsEnv = Runtime.isFirefox() ? AVS_ENV.FIREFOX : AVS_ENV.DEFAULT;
+    wCall.init(avsEnv);
+    wCall.setUserMediaHandler(this.getCallMediaStream);
+    wCall.setAudioStreamHandler(this.updateCallAudioStreams);
+    wCall.setVideoStreamHandler(this.updateParticipantVideoStream);
+    setInterval(() => wCall.poll(), 500);
+    return wCall;
+  }
+
+  private readonly avsLogHandler = (level: LOG_LEVEL, message: string, error: Error | unknown) => {
     const logLevels: Record<LOG_LEVEL, string> = {
       [LOG_LEVEL.DEBUG]: 'DEBUG',
       [LOG_LEVEL.INFO]: 'INFO ',
@@ -247,21 +258,10 @@ export class CallingRepository {
       [LOG_LEVEL.WARN]: avsLogger.warn,
       [LOG_LEVEL.ERROR]: avsLogger.error,
     };
-
-    wCall.setLogHandler((level: LOG_LEVEL, message: string, error: Error) => {
-      const trimmedMessage = message.trim();
-      logFunctions[level].call(avsLogger, trimmedMessage, error);
-      this.callLog.push(`${new Date().toISOString()} [${logLevels[level]}] ${trimmedMessage}`);
-    });
-
-    const avsEnv = Runtime.isFirefox() ? AVS_ENV.FIREFOX : AVS_ENV.DEFAULT;
-    wCall.init(avsEnv);
-    wCall.setUserMediaHandler(this.getCallMediaStream);
-    wCall.setAudioStreamHandler(this.updateCallAudioStreams);
-    wCall.setVideoStreamHandler(this.updateParticipantVideoStream);
-    setInterval(() => wCall.poll(), 500);
-    return wCall;
-  }
+    const trimmedMessage = message.trim();
+    logFunctions[level].call(avsLogger, trimmedMessage, error);
+    this.callLog.push(`${new Date().toISOString()} [${logLevels[level]}] ${trimmedMessage}`);
+  };
 
   private createWUser(wCall: Wcall, selfUserId: string, selfClientId: string): number {
     /* cspell:disable */
@@ -320,7 +320,7 @@ export class CallingRepository {
     const {id, domain} = call.conversationId;
     const allClients = conversation.isUsingMLSProtocol
       ? await this.core.service!.conversation.fetchAllParticipantsClients(id, domain)
-      : await this.core.service!.conversation.getAllParticipantsClients(id, domain);
+      : await this.core.service!.conversation.getAllParticipantsClients(call.conversationId);
     const qualifiedClients = isQualifiedUserClients(allClients)
       ? flattenQualifiedUserClients(allClients)
       : flattenUserClients(allClients);
@@ -570,6 +570,7 @@ export class CallingRepository {
       qualified_from,
       sender: clientId,
       time = new Date().toISOString(),
+      senderClientId: senderFullyQualifiedClientId = '',
     } = event;
     const isFederated = this.core.backendFeatures.isFederated && qualified_conversation && qualified_from;
     const userId = isFederated ? qualified_from : {domain: '', id: from};
@@ -589,7 +590,7 @@ export class CallingRepository {
           const {id, domain} = conversationId;
           const allClients = conversationEntity.isUsingMLSProtocol
             ? await this.core.service!.conversation.fetchAllParticipantsClients(id, domain)
-            : await this.core.service!.conversation.getAllParticipantsClients(id, domain);
+            : await this.core.service!.conversation.getAllParticipantsClients(conversationId);
           // We warn the message repository that a mismatch has happened outside of its lifecycle (eventually triggering a conversation degradation)
           // We warn the message repository that a mismatch has happened outside of its lifecycle (eventually triggering a conversation degradation)
           const shouldContinue = await this.messageRepository.updateMissingClients(
@@ -617,6 +618,11 @@ export class CallingRepository {
       }
     }
 
+    let senderClientId = '';
+    if (senderFullyQualifiedClientId) {
+      senderClientId = this.parseQualifiedId(senderFullyQualifiedClientId).id.split(':')[1];
+    }
+
     const res = this.wCall?.recvMsg(
       this.wUser,
       contentStr,
@@ -625,7 +631,7 @@ export class CallingRepository {
       toSecond(new Date(time).getTime()),
       this.serializeQualifiedId(conversationId),
       this.serializeQualifiedId(userId),
-      conversationEntity?.isUsingMLSProtocol ? content.src_clientid : clientId,
+      conversationEntity?.isUsingMLSProtocol ? senderClientId : clientId,
     );
 
     if (res !== 0) {
@@ -1159,11 +1165,17 @@ export class CallingRepository {
     _: number,
   ): number => {
     (async () => {
-      const response = await axios.post(url, data);
+      try {
+        const response = await axios.post(url, data);
 
-      const {status, data: axiosData} = response;
-      const jsonData = JSON.stringify(axiosData);
-      this.wCall?.sftResp(this.wUser!, status, jsonData, jsonData.length, context);
+        const {status, data: axiosData} = response;
+        const jsonData = JSON.stringify(axiosData);
+        this.wCall?.sftResp(this.wUser!, status, jsonData, jsonData.length, context);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : error;
+        this.avsLogHandler(LOG_LEVEL.WARN, `Request to sft server failed with error: ${message}`, error);
+        avsLogger.warn(`Request to sft server failed with error`, error);
+      }
     })();
 
     return 0;

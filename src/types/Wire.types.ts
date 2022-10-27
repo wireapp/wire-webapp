@@ -81,6 +81,7 @@ export type WireEnvironmentVariables = {
   BRAND_NAME: string;
   CHROME_ORIGIN_TRIAL_TOKEN: string;
   COUNTLY_API_KEY: string;
+  ENABLE_DEV_BACKEND_API: boolean;
   ENVIRONMENT: string;
   FEATURE: FeatureVariables;
   MAX_GROUP_PARTICIPANTS: number;

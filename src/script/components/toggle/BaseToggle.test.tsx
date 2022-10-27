@@ -19,7 +19,7 @@
 
 import {render, fireEvent} from '@testing-library/react';
 
-import BaseToggle from './BaseToggle';
+import {BaseToggle} from './BaseToggle';
 
 describe('BaseToggle', () => {
   it('toggles check property', async () => {

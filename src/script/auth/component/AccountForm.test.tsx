@@ -19,7 +19,7 @@
 
 import {fireEvent, RenderResult} from '@testing-library/react';
 
-import AccountForm from './AccountForm';
+import {AccountForm} from './AccountForm';
 
 import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
@@ -41,6 +41,13 @@ describe('when entering account data', () => {
         <AccountForm onSubmit={() => {}} />,
         mockStoreFactory()({
           ...initialRootState,
+          authState: {
+            account: {
+              email: '',
+              name: '',
+              password: '',
+            },
+          },
           runtimeState: {
             hasCookieSupport: true,
             hasIndexedDbSupport: true,

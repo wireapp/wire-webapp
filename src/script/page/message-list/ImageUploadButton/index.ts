@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,24 +17,4 @@
  *
  */
 
-// https://github.com/MathieuLoutre/grunt-aws-s3
-
-module.exports = {
-  default: {
-    files: [
-      {
-        dest: '/<%= grunt.config("aws.deploy.options.version") %>.zip',
-        src: '<%= dir.dist.s3 %>/ebs.zip',
-        stream: true,
-      },
-    ],
-    options: {
-      bucket: 'wire-webapp',
-    },
-  },
-  options: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    region: 'eu-central-1',
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  },
-};
+export * from './ImageUploadButton';

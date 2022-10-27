@@ -17,11 +17,11 @@
  *
  */
 
-import {CONVERSATION_EVENT, ConversationMessageTimerUpdateEvent} from '@wireapp/api-client/src/event/';
+import {ConversationMessageTimerUpdateEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import {Article, LinkPreview} from '@wireapp/protocol-messaging';
 import ko from 'knockout';
 
-import {Logger, getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 import {clamp} from 'Util/NumberUtil';
 import {obfuscate} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';

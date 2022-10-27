@@ -17,7 +17,7 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';

@@ -17,7 +17,7 @@
  *
  */
 
-import {BackendError, BackendErrorLabel} from '@wireapp/api-client/src/http/';
+import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import type {AxiosError} from 'axios';
 
 import {isAxiosError, isBackendError, isQualifiedUserClientEntityMap} from 'Util/TypePredicateUtil';

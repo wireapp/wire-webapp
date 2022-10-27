@@ -22,7 +22,7 @@ import ko from 'knockout';
 
 import {PingMessage as PingMessageEntity} from 'src/script/entity/message/PingMessage';
 
-import PingMessage from './PingMessage';
+import {PingMessage} from './PingMessage';
 
 import {ReadReceipt} from '../../../storage';
 

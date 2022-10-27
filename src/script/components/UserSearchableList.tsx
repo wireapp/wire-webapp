@@ -27,7 +27,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {sortByPriority} from 'Util/StringUtil';
 
-import UserList from './UserList';
+import {UserList} from './UserList';
 
 import {ConversationState} from '../conversation/ConversationState';
 import type {User} from '../entity/User';
@@ -175,4 +175,4 @@ const UserSearchableList: React.FC<UserListProps> = ({
   );
 };
 
-export default UserSearchableList;
+export {UserSearchableList};

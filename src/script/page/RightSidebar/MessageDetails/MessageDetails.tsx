@@ -19,13 +19,13 @@
 
 import {FC, useCallback, useEffect, useMemo, useState} from 'react';
 
-import type {QualifiedId} from '@wireapp/api-client/src/user/';
+import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 
-import Icon from 'Components/Icon';
-import UserSearchableList from 'Components/UserSearchableList';
+import {Icon} from 'Components/Icon';
+import {UserSearchableList} from 'Components/UserSearchableList';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatLocale} from 'Util/TimeUtil';
@@ -42,7 +42,7 @@ import {UserReactionMap} from '../../../storage';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {UserRepository} from '../../../user/UserRepository';
-import PanelHeader from '../PanelHeader';
+import {PanelHeader} from '../PanelHeader';
 
 const MESSAGE_STATES = {
   LIKES: 'likes',
@@ -86,7 +86,7 @@ const MessageDetails: FC<MessageDetailsProps> = ({
   const [likeUsers, setLikeUsers] = useState<User[]>([]);
   const [messageId, setMessageId] = useState<string>(messageEntity.id);
 
-  const [isReceiptsOpen, setIsReceiptsOpen] = useState<boolean>(showLikes);
+  const [isReceiptsOpen, setIsReceiptsOpen] = useState<boolean>(!showLikes);
 
   const {
     timestamp,
@@ -136,7 +136,7 @@ const MessageDetails: FC<MessageDetailsProps> = ({
       times[userId] = formatTime(time);
       return times;
     }, {});
-  }, []);
+  }, [readReceipts]);
 
   const sentFooter = timestamp ? formatTime(timestamp) : '';
 
@@ -156,7 +156,7 @@ const MessageDetails: FC<MessageDetailsProps> = ({
     }
 
     return t('messageDetailsTitle');
-  }, [supportsReceipts, supportsLikes]);
+  }, [supportsReceipts, supportsLikes, likesTitle, receiptsTitle]);
 
   const showTabs = supportsReceipts && supportsLikes;
 
@@ -219,7 +219,7 @@ const MessageDetails: FC<MessageDetailsProps> = ({
       <div className="panel__content" ref={initFadingScrollbar} style={{flexGrow: 1}}>
         {messageState === MESSAGE_STATES.RECEIPTS && (
           <UserSearchableList
-            data-uie-name="read-list"
+            dataUieName="read-list"
             users={receiptUsers}
             infos={receiptTimes}
             noUnderline
@@ -231,7 +231,7 @@ const MessageDetails: FC<MessageDetailsProps> = ({
 
         {messageState === MESSAGE_STATES.LIKES && (
           <UserSearchableList
-            data-uie-name="like-list"
+            dataUieName="like-list"
             users={likeUsers}
             noUnderline
             conversationRepository={conversationRepository}
@@ -277,4 +277,4 @@ const MessageDetails: FC<MessageDetailsProps> = ({
   );
 };
 
-export default MessageDetails;
+export {MessageDetails};

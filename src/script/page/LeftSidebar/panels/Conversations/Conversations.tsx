@@ -23,10 +23,10 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import AvailabilityState from 'Components/AvailabilityState';
-import Icon from 'Components/Icon';
-import LegalHoldDot from 'Components/LegalHoldDot';
-import ConversationListCallingCell from 'Components/list/ConversationListCallingCell';
+import {AvailabilityState} from 'Components/AvailabilityState';
+import {Icon} from 'Components/Icon';
+import {LegalHoldDot} from 'Components/LegalHoldDot';
+import {ConversationListCallingCell} from 'Components/list/ConversationListCallingCell';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isTabKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -39,7 +39,7 @@ import {DefaultLabelIds} from '../../../../conversation/ConversationLabelReposit
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import {ConversationState} from '../../../../conversation/ConversationState';
 import {User} from '../../../../entity/User';
-import useRoveFocus from '../../../../hooks/useRoveFocus';
+import {useRoveFocus} from '../../../../hooks/useRoveFocus';
 import {useMLSConversationState} from '../../../../mls/mlsConversationState';
 import {PreferenceNotificationRepository} from '../../../../notification/PreferenceNotificationRepository';
 import {PropertiesRepository} from '../../../../properties/PropertiesRepository';
@@ -50,8 +50,8 @@ import {Shortcut} from '../../../../ui/Shortcut';
 import {ShortcutType} from '../../../../ui/ShortcutType';
 import {UserState} from '../../../../user/UserState';
 import {ListState, ListViewModel} from '../../../../view_model/ListViewModel';
-import {useAppMainState} from '../../../state';
-import ListWrapper from '../ListWrapper';
+import {useAppMainState, ViewType} from '../../../state';
+import {ListWrapper} from '../ListWrapper';
 
 type ConversationsProps = {
   callState?: CallState;
@@ -113,6 +113,17 @@ const Conversations: React.FC<ConversationsProps> = ({
   const {conversationLabelRepository} = conversationRepository;
   const [isConversationListFocus, focusConversationList] = useState(false);
 
+  const {setCurrentView} = useAppMainState(state => state.responsiveView);
+
+  const showLegalHold = isOnLegalHold || hasPendingLegalHold;
+
+  const onClickPreferences = () => {
+    setCurrentView(ViewType.LEFT_SIDEBAR);
+    switchList(ListState.PREFERENCES);
+    const {rightSidebar} = useAppMainState.getState();
+    rightSidebar.clearHistory();
+  };
+
   useEffect(() => {
     if (!activeConversation) {
       return () => {};
@@ -150,11 +161,7 @@ const Conversations: React.FC<ConversationsProps> = ({
         type="button"
         className={`conversations-settings-button accent-text ${showBadge ? 'conversations-settings--badge' : ''}`}
         title={t('tooltipConversationsPreferences')}
-        onClick={() => {
-          switchList(ListState.PREFERENCES);
-          const {rightSidebar} = useAppMainState.getState();
-          rightSidebar.clearHistory();
-        }}
+        onClick={onClickPreferences}
         data-uie-name="go-preferences"
       >
         <Icon.Settings />
@@ -165,6 +172,7 @@ const Conversations: React.FC<ConversationsProps> = ({
           <button
             type="button"
             className="left-list-header-availability"
+            css={{...(showLegalHold && {gridColumn: '2/3'})}}
             onClick={event => AvailabilityContextMenu.show(event.nativeEvent, 'left-list-availability-menu')}
             onBlur={event => {
               // on blur conversation list should get the focus
@@ -179,7 +187,7 @@ const Conversations: React.FC<ConversationsProps> = ({
             />
           </button>
 
-          {(isOnLegalHold || hasPendingLegalHold) && (
+          {showLegalHold && (
             <LegalHoldDot
               isPending={hasPendingLegalHold}
               dataUieName={hasPendingLegalHold ? 'status-legal-hold-pending' : 'status-legal-hold'}
@@ -342,4 +350,4 @@ const Conversations: React.FC<ConversationsProps> = ({
   );
 };
 
-export default Conversations;
+export {Conversations};

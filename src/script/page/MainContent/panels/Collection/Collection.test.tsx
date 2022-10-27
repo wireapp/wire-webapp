@@ -28,27 +28,20 @@ import {MediumImage} from 'src/script/entity/message/MediumImage';
 import {MessageCategory} from 'src/script/message/MessageCategory';
 import {createRandomUuid} from 'Util/util';
 
-import Collection from './Collection';
+import {Collection} from './Collection';
 
 import {AssetRepository} from '../../../../assets/AssetRepository';
-import {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import {MessageRepository} from '../../../../conversation/MessageRepository';
 import {Text} from '../../../../entity/message/Text';
 
-jest.mock(
-  './CollectionDetails',
-  () =>
-    function CollectionDetails() {
-      return <div>CollectionDetails</div>;
-    },
-);
-jest.mock(
-  './CollectionItem',
-  () =>
-    function CollectionItem() {
-      return <div>CollectionItem</div>;
-    },
-);
+jest.mock('./CollectionDetails', () => ({
+  CollectionDetails: () => <div>CollectionDetails</div>,
+  __esModule: true,
+}));
+jest.mock('./CollectionItem', () => ({
+  CollectionItem: () => <div>CollectionItem</div>,
+  __esModule: true,
+}));
 
 const createImageMessage = (timestamp: number = Date.now()) => {
   const message = new ContentMessage(createRandomUuid());
@@ -91,17 +84,17 @@ describe('Collection', () => {
   const mockConversationRepository = {
     getEventsForCategory: jest.fn().mockResolvedValue(messages),
     searchInConversation: jest.fn().mockResolvedValue({messageEntities: [createLinkMessage()], query: 'term'}),
-  } as Partial<ConversationRepository>;
+  };
   const mockAssetRepository = container.resolve(AssetRepository);
   const mockMessageRepository = {} as MessageRepository;
 
   it('displays all image assets', async () => {
     const {getAllByText, getByText, queryByText} = render(
       <Collection
-        conversation={conversation}
-        conversationRepository={mockConversationRepository as ConversationRepository}
-        messageRepository={mockMessageRepository}
         assetRepository={mockAssetRepository}
+        conversation={conversation}
+        conversationRepository={mockConversationRepository as any}
+        messageRepository={mockMessageRepository}
       />,
     );
 
@@ -115,12 +108,16 @@ describe('Collection', () => {
   });
 
   it('displays collection details when a section is selected', async () => {
+    const IMAGE_COLLECTION_LENGTH = 13;
+    const imageMessages = new Array(IMAGE_COLLECTION_LENGTH).fill(null).map(createImageMessage);
+    mockConversationRepository.getEventsForCategory.mockResolvedValueOnce(imageMessages);
+
     const {getAllByText, getByText} = render(
       <Collection
-        conversation={conversation}
-        conversationRepository={mockConversationRepository as ConversationRepository}
-        messageRepository={mockMessageRepository}
         assetRepository={mockAssetRepository}
+        messageRepository={mockMessageRepository}
+        conversation={conversation}
+        conversationRepository={mockConversationRepository as any}
       />,
     );
 
@@ -133,19 +130,19 @@ describe('Collection', () => {
 
   it('should display search results when term is typed', async () => {
     jest.useFakeTimers();
-    const {getAllByText, queryByText, container} = render(
+    const {getAllByText, queryByText, getByTestId} = render(
       <Collection
-        conversation={conversation}
-        conversationRepository={mockConversationRepository as ConversationRepository}
-        messageRepository={mockMessageRepository}
         assetRepository={mockAssetRepository}
+        messageRepository={mockMessageRepository}
+        conversation={conversation}
+        conversationRepository={mockConversationRepository as any}
       />,
     );
 
     await waitFor(() => getAllByText('CollectionItem'));
     await act(async () => {
-      const input: HTMLInputElement | null = container.querySelector('[data-uie-name=full-search-header-input]');
-      fireEvent.change(input!, {target: {value: 'term'}});
+      const input = getByTestId('full-search-header-input');
+      fireEvent.change(input, {target: {value: 'term'}});
       jest.advanceTimersByTime(500);
       await waitFor(() => expect(mockConversationRepository.searchInConversation).toHaveBeenCalled());
     });

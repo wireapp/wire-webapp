@@ -20,7 +20,7 @@
 import React from 'react';
 
 import {CSSObject} from '@emotion/react';
-import {ConversationProtocol} from '@wireapp/api-client/src/conversation/NewConversation';
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
 
 import {t} from 'Util/LocalizerUtil';
 
@@ -101,4 +101,4 @@ const ConversationProtocolDetails: React.FC<ConversationProtocolDetailsProps> = 
   );
 };
 
-export default ConversationProtocolDetails;
+export {ConversationProtocolDetails};

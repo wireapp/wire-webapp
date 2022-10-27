@@ -21,10 +21,10 @@ import React, {useEffect, useMemo, useRef, useState} from 'react';
 
 import cx from 'classnames';
 
-import AvailabilityState from 'Components/AvailabilityState';
-import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
-import GroupAvatar from 'Components/avatar/GroupAvatar';
-import Icon from 'Components/Icon';
+import {AvailabilityState} from 'Components/AvailabilityState';
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {GroupAvatar} from 'Components/avatar/GroupAvatar';
+import {Icon} from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isKey, isOneOfKeys, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -320,4 +320,4 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
   );
 };
 
-export default ConversationListCell;
+export {ConversationListCell};

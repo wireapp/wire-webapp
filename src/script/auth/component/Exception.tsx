@@ -65,4 +65,4 @@ const Exception = ({errors = []}: ExceptionProps) => {
   );
 };
 
-export default Exception;
+export {Exception};

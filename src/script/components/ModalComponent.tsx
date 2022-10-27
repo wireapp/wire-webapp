@@ -23,7 +23,7 @@ import {CSSObject} from '@emotion/react';
 
 import {noop, preventFocusOutside} from 'Util/util';
 
-import Icon from './Icon';
+import {Icon} from './Icon';
 
 interface ModalComponentProps {
   children: React.ReactNode;
@@ -170,4 +170,4 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
   );
 };
 
-export default ModalComponent;
+export {ModalComponent};

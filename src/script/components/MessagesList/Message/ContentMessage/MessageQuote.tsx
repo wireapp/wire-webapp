@@ -20,31 +20,31 @@
 import {
   FC,
   Fragment,
-  MouseEvent as ReactMouseEvent,
   KeyboardEvent as ReactKeyboardEvent,
+  MouseEvent as ReactMouseEvent,
   useEffect,
   useState,
 } from 'react';
 
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 
-import Icon from 'Components/Icon';
-import Image from 'Components/Image';
+import {Icon} from 'Components/Icon';
+import {Image} from 'Components/Image';
 import {Text} from 'src/script/entity/message/Text';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
-import {isBeforeToday, formatDateNumeral, formatTimeShort} from 'Util/TimeUtil';
+import {formatDateNumeral, formatTimeShort, isBeforeToday} from 'Util/TimeUtil';
 import {useDisposableRef} from 'Util/useDisposableRef';
 
-import AudioAsset from './asset/AudioAsset';
-import FileAssetComponent from './asset/FileAssetComponent';
-import LocationAsset from './asset/LocationAsset';
-import VideoAsset from './asset/VideoAsset';
+import {AudioAsset} from './asset/AudioAsset';
+import {FileAsset} from './asset/FileAssetComponent';
+import {LocationAsset} from './asset/LocationAsset';
+import {VideoAsset} from './asset/VideoAsset';
 
 import type {Conversation} from '../../../../entity/Conversation';
 import type {ContentMessage} from '../../../../entity/message/ContentMessage';
@@ -267,7 +267,7 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
           )}
 
           {asset.isFile() && (
-            <FileAssetComponent
+            <FileAsset
               message={quotedMessage}
               // className="message-quote__file"
               data-uie-name="media-file-quote"
@@ -295,4 +295,4 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
   );
 };
 
-export default Quote;
+export {Quote, QuotedMessage};

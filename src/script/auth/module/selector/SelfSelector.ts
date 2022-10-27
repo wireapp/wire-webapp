@@ -17,7 +17,7 @@
  *
  */
 
-import type {Self} from '@wireapp/api-client/src/self/';
+import type {Self} from '@wireapp/api-client/lib/self/';
 
 import {Config} from '../../../Config';
 import type {RootState} from '../reducer';

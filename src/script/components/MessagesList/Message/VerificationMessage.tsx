@@ -22,7 +22,7 @@ import React, {useMemo} from 'react';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 
-import VerifiedIcon from 'Components/VerifiedIcon';
+import {VerifiedIcon} from 'Components/VerifiedIcon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {Declension, joinNames, t} from 'Util/LocalizerUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
@@ -119,4 +119,4 @@ const VerificationMessage: React.FC<VerificationMessageProps> = ({message}) => {
   );
 };
 
-export default VerificationMessage;
+export {VerificationMessage};

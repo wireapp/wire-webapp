@@ -19,7 +19,7 @@
 
 import React from 'react';
 
-import {ClientType} from '@wireapp/api-client/src/client/index';
+import {ClientType} from '@wireapp/api-client/lib/client/index';
 import {ContainerXS, Loading} from '@wireapp/react-ui-kit';
 import {connect} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
@@ -27,11 +27,11 @@ import {AnyAction, Dispatch} from 'redux';
 
 import {getLogger} from 'Util/Logger';
 
-import ClientItem from './ClientItem';
+import {ClientItem} from './ClientItem';
 
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import * as LocalStorageAction from '../module/action/LocalStorageAction';
-import {RootState, bindActionCreators} from '../module/reducer';
+import {bindActionCreators, RootState} from '../module/reducer';
 import {getEntropy} from '../module/selector/AuthSelector';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
@@ -40,7 +40,7 @@ import {QUERY_KEY, ROUTE} from '../route';
 const logger = getLogger('ClientList');
 
 type Props = React.HTMLProps<HTMLDivElement>;
-const ClientList = ({
+const ClientListComponent = ({
   clientError,
   isFetching,
   isNoPasswordSSO,
@@ -50,6 +50,7 @@ const ClientList = ({
   doRemoveClient,
   getLocalStorage,
   resetAuthError,
+  resetClientError,
   removeLocalStorage,
 }: Props & ConnectedProps & DispatchProps) => {
   const navigate = useNavigate();
@@ -62,6 +63,7 @@ const ClientList = ({
     const selectedClientId = isSelectedClient ? null : clientId;
     setCurrentlySelectedClient(selectedClientId);
     resetAuthError();
+    resetClientError();
   };
 
   const removeClient = async (clientId: string, password?: string) => {
@@ -71,12 +73,12 @@ const ClientList = ({
       await doRemoveClient(clientId, password);
       const persist = await getLocalStorage(LocalStorageAction.LocalStorageKey.AUTH.PERSIST);
       await doInitializeClient(persist ? ClientType.PERMANENT : ClientType.TEMPORARY, password, SFAcode, entropy);
+      removeLocalStorage(QUERY_KEY.CONVERSATION_CODE);
+      removeLocalStorage(QUERY_KEY.JOIN_EXPIRES);
       return navigate(ROUTE.HISTORY_INFO);
     } catch (error) {
       logger.error(error);
     } finally {
-      removeLocalStorage(QUERY_KEY.CONVERSATION_CODE);
-      removeLocalStorage(QUERY_KEY.JOIN_EXPIRES);
       setShowLoading(false);
     }
   };
@@ -126,8 +128,11 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
       getLocalStorage: ROOT_ACTIONS.localStorageAction.getLocalStorage,
       removeLocalStorage: ROOT_ACTIONS.localStorageAction.deleteLocalStorage,
       resetAuthError: ROOT_ACTIONS.authAction.resetAuthError,
+      resetClientError: ROOT_ACTIONS.clientAction.resetClientError,
     },
     dispatch,
   );
 
-export default connect(mapStateToProps, mapDispatchToProps)(ClientList);
+const ClientList = connect(mapStateToProps, mapDispatchToProps)(ClientListComponent);
+
+export {ClientList};

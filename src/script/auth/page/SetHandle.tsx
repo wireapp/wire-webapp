@@ -19,7 +19,7 @@
 
 import React, {useEffect, useState} from 'react';
 
-import {ConsentType} from '@wireapp/api-client/src/self/index';
+import {ConsentType} from '@wireapp/api-client/lib/self/index';
 import {
   ArrowIcon,
   ContainerXS,
@@ -37,13 +37,13 @@ import {connect} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
-import Page from './Page';
+import {Page} from './Page';
 
 import {chooseHandleStrings} from '../../strings';
-import AcceptNewsModal from '../component/AcceptNewsModal';
+import {AcceptNewsModal} from '../component/AcceptNewsModal';
 import {actionRoot as ROOT_ACTIONS} from '../module/action';
 import {BackendError} from '../module/action/BackendError';
-import {RootState, bindActionCreators} from '../module/reducer';
+import {bindActionCreators, RootState} from '../module/reducer';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import {ROUTE} from '../route';
 import {parseError} from '../util/errorUtil';
@@ -51,7 +51,7 @@ import {createSuggestions} from '../util/handleUtil';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const SetHandle = ({
+const SetHandleComponent = ({
   doGetConsents,
   doSetConsent,
   doSetHandle,
@@ -171,4 +171,6 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(mapStateToProps, mapDispatchToProps)(SetHandle);
+const SetHandle = connect(mapStateToProps, mapDispatchToProps)(SetHandleComponent);
+
+export {SetHandle};

@@ -17,10 +17,10 @@
  *
  */
 
-import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/src/event/';
+import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/lib/event/';
 import {Account, ConnectionState, ProcessedEventPayload} from '@wireapp/core';
-import {PayloadBundleSource} from '@wireapp/core/src/main/conversation';
-import {HandledEventPayload} from '@wireapp/core/src/main/notification';
+import {PayloadBundleSource} from '@wireapp/core/lib/conversation';
+import {HandledEventPayload} from '@wireapp/core/lib/notification';
 import {Asset as ProtobufAsset, GenericMessage} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
@@ -51,7 +51,7 @@ import type {EventRecord} from '../storage';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import {EventName} from '../tracking/EventName';
 import {UserState} from '../user/UserState';
-import Warnings from '../view_model/WarningsContainer';
+import {Warnings} from '../view_model/WarningsContainer';
 
 export class EventRepository {
   logger: Logger;
@@ -131,6 +131,7 @@ export class EventRepository {
   //##############################################################################
 
   private readonly updateConnectivitityStatus = (state: ConnectionState) => {
+    this.logger.log('Websocket connection state changed to', state);
     switch (state) {
       case ConnectionState.CONNECTING: {
         Warnings.hideWarning(Warnings.TYPE.NO_INTERNET);
@@ -186,7 +187,7 @@ export class EventRepository {
       // We make sure there is only be a single active connection to the WebSocket.
       this.disconnectWebSocket?.();
       return new Promise<void>(async resolve => {
-        this.disconnectWebSocket = await account.listen({
+        this.disconnectWebSocket = account.listen({
           onConnectionStateChanged: connectionState => {
             this.updateConnectivitityStatus(connectionState);
             if (connectionState === ConnectionState.LIVE) {

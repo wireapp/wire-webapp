@@ -19,7 +19,7 @@
 
 import {render, fireEvent} from '@testing-library/react';
 
-import PanelActions, {MenuItem} from './PanelActions';
+import {PanelActions, MenuItem} from './PanelActions';
 
 describe('PanelActions', () => {
   it('displays a single action', () => {

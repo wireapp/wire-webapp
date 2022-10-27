@@ -19,8 +19,18 @@
 
 import React, {useRef, useState} from 'react';
 
-import {LoginData} from '@wireapp/api-client/src/auth';
-import {ArrowIcon, Input, InputBlock, InputSubmitCombo, Loading, RoundIconButton, Select} from '@wireapp/react-ui-kit';
+import {LoginData} from '@wireapp/api-client/lib/auth';
+import {
+  ArrowIcon,
+  Input,
+  InputBlock,
+  InputSubmitCombo,
+  Loading,
+  RoundIconButton,
+  Select,
+  QUERY,
+  useMatchMedia,
+} from '@wireapp/react-ui-kit';
 import {useIntl} from 'react-intl';
 
 import {COUNTRY_CODES, getCountryByCode, getCountryCode} from 'Util/CountryCodes';
@@ -50,6 +60,9 @@ const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
     ...countryList,
   ];
   const currentSelectValue = expandedCountryList.find(selectedCountry => selectedCountry.value === country);
+
+  const isTiny = useMatchMedia('max-width: 480px');
+  const isMobile = useMatchMedia(QUERY.mobile);
 
   const onCountryCodeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const {value} = event.target;
@@ -101,7 +114,7 @@ const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
             id="enter-phone"
             name="phone-login"
             onChange={onPhoneNumberChange}
-            style={{width: 260}}
+            style={{width: isTiny ? 'calc(100vw - 200px)' : isMobile ? 'calc(100vw - 250px)' : '280px'}}
             ref={phoneInput}
             markInvalid={!validInput}
             value={phoneNumber}
@@ -116,7 +129,6 @@ const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
             <Loading size={32} />
           ) : (
             <RoundIconButton
-              style={{marginLeft: 16}}
               disabled={!phoneNumber}
               type="submit"
               formNoValidate
@@ -131,4 +143,4 @@ const PhoneLoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
     </div>
   );
 };
-export default PhoneLoginForm;
+export {PhoneLoginForm};

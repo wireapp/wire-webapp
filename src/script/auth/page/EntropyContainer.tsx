@@ -26,7 +26,7 @@ import {KEY} from 'Util/KeyboardUtil';
 
 import {setEntropyStrings} from '../../strings';
 import {EntropyData} from '../../util/Entropy';
-import EntropyCanvas from '../component/EntropyCanvas';
+import {EntropyCanvas} from '../component/EntropyCanvas';
 import {ProgressBar} from '../component/ProgressBar';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {
@@ -104,4 +104,4 @@ const EntropyContainer = ({onSetEntropy, containerSize = 400}: Props) => {
   );
 };
 
-export default EntropyContainer;
+export {EntropyContainer};

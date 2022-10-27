@@ -104,4 +104,4 @@ const ButtonGroup: React.FC<ButtonGroupProps> = ({style, items, currentItem, onC
   );
 };
 
-export default ButtonGroup;
+export {ButtonGroup};

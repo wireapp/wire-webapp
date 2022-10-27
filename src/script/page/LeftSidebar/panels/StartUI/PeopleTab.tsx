@@ -19,14 +19,14 @@
 
 import React, {useEffect, useRef, useState} from 'react';
 
-import {BackendErrorLabel} from '@wireapp/api-client/src/http';
+import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {partition} from 'underscore';
 
-import Icon from 'Components/Icon';
-import UserList, {UserlistMode} from 'Components/UserList';
+import {Icon} from 'Components/Icon';
+import {UserList, UserlistMode} from 'Components/UserList';
 import {Conversation} from 'src/script/entity/Conversation';
 import {UserRepository} from 'src/script/user/UserRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -36,14 +36,14 @@ import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {sortByPriority} from 'Util/StringUtil';
 import {isBackendError} from 'Util/TypePredicateUtil';
 
-import GroupList from './components/GroupList';
-import TopPeople from './components/TopPeople';
+import {GroupList} from './components/GroupList';
+import {TopPeople} from './components/TopPeople';
 
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import {ConversationState} from '../../../../conversation/ConversationState';
 import {User} from '../../../../entity/User';
 import {getManageTeamUrl} from '../../../../externalRoute';
-import useDebounce from '../../../../hooks/useDebounce';
+import {useDebounce} from '../../../../hooks/useDebounce';
 import {SearchRepository} from '../../../../search/SearchRepository';
 import {TeamRepository} from '../../../../team/TeamRepository';
 import {TeamState} from '../../../../team/TeamState';

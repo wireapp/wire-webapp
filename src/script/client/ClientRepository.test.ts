@@ -17,7 +17,7 @@
  *
  */
 
-import {ClientClassification, ClientType} from '@wireapp/api-client/src/client/';
+import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
 import {Runtime} from '@wireapp/commons';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 

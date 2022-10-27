@@ -26,7 +26,7 @@ import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {ContentState} from '../../../../../view_model/ContentViewModel';
-import PreferencesSection from '../components/PreferencesSection';
+import {PreferencesSection} from '../components/PreferencesSection';
 
 interface HistoryBackupSectionProps {
   brandName: string;
@@ -98,4 +98,4 @@ const HistoryBackupSection: FC<HistoryBackupSectionProps> = ({brandName, importF
   );
 };
 
-export default HistoryBackupSection;
+export {HistoryBackupSection};

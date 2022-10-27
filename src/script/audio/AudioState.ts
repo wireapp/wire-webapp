@@ -17,7 +17,7 @@
  *
  */
 
-import {AudioPreference} from '@wireapp/api-client/src/user/data/';
+import {AudioPreference} from '@wireapp/api-client/lib/user/data/';
 import ko from 'knockout';
 import {singleton} from 'tsyringe';
 

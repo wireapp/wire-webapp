@@ -21,12 +21,12 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import PrimaryModal, {removeCurrentModal, usePrimaryModalState} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal, removeCurrentModal, usePrimaryModalState} from 'Components/Modals/PrimaryModal';
 import {t} from 'Util/LocalizerUtil';
+import {isBackendError} from 'Util/TypePredicateUtil';
 
 import type {MainViewModel} from './MainViewModel';
 
-import {BackendError} from '../auth/module/action/BackendError';
 import type {ClientEntity} from '../client/ClientEntity';
 import type {ClientRepository} from '../client/ClientRepository';
 import type {ConnectionRepository} from '../connection/ConnectionRepository';
@@ -39,6 +39,7 @@ import type {User} from '../entity/User';
 import {BackendClientError} from '../error/BackendClientError';
 import type {IntegrationRepository} from '../integration/IntegrationRepository';
 import type {ServiceEntity} from '../integration/ServiceEntity';
+import {useAppMainState} from '../page/state';
 import {UserState} from '../user/UserState';
 
 export class ActionsViewModel {
@@ -178,7 +179,7 @@ export class ActionsViewModel {
                   removeCurrentModal();
                   resolve();
                 } catch (error) {
-                  if (error instanceof BackendError) {
+                  if (isBackendError(error)) {
                     const {updateErrorMessage} = usePrimaryModalState.getState();
                     updateErrorMessage(expectedErrors[error.label] || error.message);
                   }
@@ -289,6 +290,8 @@ export class ActionsViewModel {
         PrimaryModal.show(PrimaryModal.type.CONFIRM, {
           primaryAction: {
             action: () => {
+              const {rightSidebar} = useAppMainState.getState();
+              rightSidebar.clearHistory();
               return this.conversationRepository.deleteConversation(conversationEntity);
             },
             text: t('modalConversationDeleteGroupAction'),

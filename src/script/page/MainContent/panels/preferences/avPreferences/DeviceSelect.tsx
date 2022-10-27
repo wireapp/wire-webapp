@@ -83,4 +83,4 @@ const DeviceSelect: React.FC<DeviceSelectProps> = ({
   );
 };
 
-export default DeviceSelect;
+export {DeviceSelect};

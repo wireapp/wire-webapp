@@ -22,10 +22,10 @@ import {
   CONVERSATION_ACCESS,
   CONVERSATION_ACCESS_ROLE,
   CONVERSATION_TYPE,
-} from '@wireapp/api-client/src/conversation/';
-import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
-import {ConversationProtocol} from '@wireapp/api-client/src/conversation/NewConversation';
-import {QualifiedId} from '@wireapp/api-client/src/user';
+} from '@wireapp/api-client/lib/conversation/';
+import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Availability, LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
@@ -33,6 +33,7 @@ import ko from 'knockout';
 import {container} from 'tsyringe';
 import {Cancelable, debounce} from 'underscore';
 
+import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
@@ -56,7 +57,6 @@ import {ConversationStatus} from '../conversation/ConversationStatus';
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
 import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
 import {ConversationError} from '../error/ConversationError';
-import {LegalHoldModalState} from '../legal-hold/LegalHoldModalState';
 import {StatusType} from '../message/StatusType';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {TeamState} from '../team/TeamState';
@@ -111,7 +111,7 @@ export class Conversation {
   public readonly display_name: ko.PureComputed<string>;
   public readonly firstUserEntity: ko.PureComputed<User>;
   public readonly enforcedTeamMessageTimer: ko.PureComputed<number>;
-  public readonly globalMessageTimer: ko.Observable<number>;
+  public readonly globalMessageTimer: ko.Observable<number | null>;
   public readonly hasAdditionalMessages: ko.Observable<boolean>;
   public readonly hasGlobalMessageTimer: ko.PureComputed<boolean>;
   public readonly hasGuest: ko.PureComputed<boolean>;
@@ -327,12 +327,16 @@ export class Conversation {
     this.hasLegalHold = ko.computed(() => {
       const isInitialized = this.hasInitializedUsers();
       const hasLegalHold = isInitialized && this.allUserEntities.some(userEntity => userEntity.isOnLegalHold());
+
       if (isInitialized) {
         this.legalHoldStatus(hasLegalHold ? LegalHoldStatus.ENABLED : LegalHoldStatus.DISABLED);
       }
+
       if (!hasLegalHold) {
-        amplify.publish(LegalHoldModalState.HIDE_DETAILS, this.id);
+        const {closeRequestModal} = useLegalHoldModalState.getState();
+        closeRequestModal(this.id);
       }
+
       return hasLegalHold;
     });
 

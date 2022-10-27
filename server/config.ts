@@ -60,7 +60,6 @@ const defaultCSP = {
   imgSrc: ["'self'", 'blob:', 'data:', 'https://*.giphy.com'],
   manifestSrc: ["'self'"],
   mediaSrc: ["'self'", 'blob:', 'data:'],
-  objectSrc: ["'none'"],
   prefetchSrc: ["'self'"],
   scriptSrc: ["'self'", "'unsafe-eval'"],
   styleSrc: ["'self'", "'unsafe-inline'"],
@@ -89,6 +88,7 @@ function parseCommaSeparatedList(list: string = ''): string[] {
 }
 
 function mergedCSP(): Record<string, Iterable<string>> {
+  const objectSrc = parseCommaSeparatedList(process.env.CSP_EXTRA_OBJECT_SRC);
   const csp = {
     connectSrc: [
       ...defaultCSP.connectSrc,
@@ -102,7 +102,7 @@ function mergedCSP(): Record<string, Iterable<string>> {
     imgSrc: [...defaultCSP.imgSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_IMG_SRC)],
     manifestSrc: [...defaultCSP.manifestSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_MANIFEST_SRC)],
     mediaSrc: [...defaultCSP.mediaSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_MEDIA_SRC)],
-    objectSrc: [...defaultCSP.objectSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_OBJECT_SRC)],
+    objectSrc: objectSrc.length > 0 ? objectSrc : ["'none'"],
     prefetchSrc: [...defaultCSP.prefetchSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_PREFETCH_SRC)],
     scriptSrc: [...defaultCSP.scriptSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_SCRIPT_SRC)],
     styleSrc: [...defaultCSP.styleSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_STYLE_SRC)],
@@ -123,6 +123,7 @@ const config: ServerConfig = {
     BRAND_NAME: process.env.BRAND_NAME,
     CHROME_ORIGIN_TRIAL_TOKEN: process.env.CHROME_ORIGIN_TRIAL_TOKEN,
     COUNTLY_API_KEY: process.env.COUNTLY_API_KEY,
+    ENABLE_DEV_BACKEND_API: process.env.ENABLE_DEV_BACKEND_API == 'true',
     ENVIRONMENT: nodeEnvironment,
     FEATURE: {
       ALLOWED_FILE_UPLOAD_EXTENSIONS: (process.env.FEATURE_ALLOWED_FILE_UPLOAD_EXTENSIONS || '*')

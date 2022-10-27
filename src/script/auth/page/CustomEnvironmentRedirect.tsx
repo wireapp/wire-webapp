@@ -17,27 +17,27 @@
  *
  */
 
-import {useState, useEffect} from 'react';
+import {useEffect, useState} from 'react';
 
-import {UrlUtil, Runtime} from '@wireapp/commons';
-import {ContainerXS, FlexBox, COLOR, Text} from '@wireapp/react-ui-kit';
-import {SVGIcon} from '@wireapp/react-ui-kit/src/Icon/SVGIcon';
+import {Runtime, UrlUtil} from '@wireapp/commons';
+import {COLOR, ContainerXS, FlexBox, Text} from '@wireapp/react-ui-kit';
+import {SVGIcon} from '@wireapp/react-ui-kit/lib/Icon/SVGIcon';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 
 import {afterRender} from 'Util/util';
 
-import Page from './Page';
+import {Page} from './Page';
 
 import {customEnvRedirectStrings} from '../../strings';
 import {actionRoot} from '../module/action';
 import {bindActionCreators} from '../module/reducer';
 import {QUERY_KEY} from '../route';
-import SVGProvider from '../util/SVGProvider';
+import {getSVG} from '../util/SVGProvider';
 
 const REDIRECT_DELAY = 5000;
-const CustomEnvironmentRedirect = ({doNavigate, doSendNavigationEvent}: DispatchProps) => {
+const CustomEnvironmentRedirectComponent = ({doNavigate, doSendNavigationEvent}: DispatchProps) => {
   const {formatMessage: _} = useIntl();
 
   const [destinationUrl, setDestinationUrl] = useState<string | null>(null);
@@ -87,7 +87,7 @@ const CustomEnvironmentRedirect = ({doNavigate, doSendNavigationEvent}: Dispatch
             }}
           >
             <SVGIcon aria-hidden="true" color={COLOR.WHITE} realWidth={47} realHeight={38}>
-              <g dangerouslySetInnerHTML={{__html: SVGProvider['logo-icon']?.documentElement?.innerHTML}} />
+              <g dangerouslySetInnerHTML={{__html: getSVG('logo-icon')?.documentElement?.innerHTML}} />
             </SVGIcon>
             <svg
               aria-hidden="true"
@@ -143,4 +143,6 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(null, mapDispatchToProps)(CustomEnvironmentRedirect);
+const CustomEnvironmentRedirect = connect(null, mapDispatchToProps)(CustomEnvironmentRedirectComponent);
+
+export {CustomEnvironmentRedirect};

@@ -17,12 +17,12 @@
  *
  */
 
-import type {ConversationMemberJoinEvent} from '@wireapp/api-client/src/event/';
+import type {ConversationMemberJoinEvent} from '@wireapp/api-client/lib/event/';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
 import {t} from 'Util/LocalizerUtil';
-import {Logger, getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 import {compareTransliteration, sortByPriority} from 'Util/StringUtil';
 
 import {IntegrationMapper} from './IntegrationMapper';
@@ -30,7 +30,7 @@ import type {IntegrationService} from './IntegrationService';
 import {ProviderEntity} from './ProviderEntity';
 import {ServiceEntity} from './ServiceEntity';
 
-import PrimaryModal from '../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {ACCESS_STATE} from '../conversation/AccessState';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationState} from '../conversation/ConversationState';
@@ -75,14 +75,13 @@ export class IntegrationRepository {
    * Get provider name for entity.
    * @param entity Service or user to add provider name to
    */
-  async addProviderNameToParticipant(entity: ServiceEntity): Promise<ServiceEntity | ProviderEntity>;
-  async addProviderNameToParticipant(entity: User): Promise<User | ProviderEntity>;
   async addProviderNameToParticipant(entity: ServiceEntity | User): Promise<ServiceEntity | User | ProviderEntity> {
-    const shouldUpdateProviderName = !!entity.providerName() && !entity.providerName().trim();
-
-    if (shouldUpdateProviderName) {
+    if (entity.providerId) {
       const providerEntity = await this.getProviderById(entity.providerId);
-      entity.providerName(providerEntity.name);
+
+      if (providerEntity) {
+        entity.providerName(providerEntity.name);
+      }
     }
 
     return entity;

@@ -19,8 +19,8 @@
 
 import {FC, useMemo, useState} from 'react';
 
-import SearchInput from 'Components/SearchInput';
-import UserSearchableList from 'Components/UserSearchableList';
+import {SearchInput} from 'Components/SearchInput';
+import {UserSearchableList} from 'Components/UserSearchableList';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
@@ -32,7 +32,7 @@ import {isServiceEntity} from '../../../guards/Service';
 import {SearchRepository} from '../../../search/SearchRepository';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
-import PanelHeader from '../PanelHeader';
+import {PanelHeader} from '../PanelHeader';
 import {PanelEntity, PanelState} from '../RightSidebar';
 
 interface ConversationParticipantsProps {
@@ -76,7 +76,7 @@ const ConversationParticipants: FC<ConversationParticipantsProps> = ({
       return isUser ? [user] : [];
     });
 
-    if (removedFromConversation && selfUser) {
+    if (!removedFromConversation && selfUser) {
       return [...users, selfUser].sort(sortUsersByPriority);
     }
 
@@ -101,10 +101,8 @@ const ConversationParticipants: FC<ConversationParticipantsProps> = ({
         />
 
         <div className="conversation-participants__list panel__content" ref={initFadingScrollbar}>
-          {/* TODO: Need to update dataUieName for UserSearchableList - make it in another PR, and change other UserSearchableList */}
-          {/*data-uie-name="list-conversation-participants"*/}
-
           <UserSearchableList
+            dataUieName="list-conversation-participants"
             users={participants}
             filter={searchInput}
             highlightedUsers={highlightedUsers}
@@ -123,4 +121,4 @@ const ConversationParticipants: FC<ConversationParticipantsProps> = ({
   );
 };
 
-export default ConversationParticipants;
+export {ConversationParticipants};

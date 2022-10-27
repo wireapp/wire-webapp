@@ -17,9 +17,9 @@
  *
  */
 
-import {ClientClassification, ClientType, RegisteredClient} from '@wireapp/api-client/src/client/';
+import {ClientClassification, ClientType, RegisteredClient} from '@wireapp/api-client/lib/client/';
 import {Runtime} from '@wireapp/commons';
-import type {ClientInfo} from '@wireapp/core/src/main/client/';
+import type {ClientInfo} from '@wireapp/core/lib/client/';
 
 import {ClientActionCreator} from './creator/';
 
@@ -102,6 +102,12 @@ export class ClientAction {
       cookieLabel: undefined,
       label: deviceLabel,
       model: deviceModel,
+    };
+  };
+
+  resetClientError = (): ThunkAction => {
+    return async dispatch => {
+      dispatch(ClientActionCreator.resetError());
     };
   };
 }

@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, ReactNode, cloneElement, useEffect, useState} from 'react';
+import {cloneElement, FC, ReactNode, useEffect, useState} from 'react';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
@@ -26,22 +26,22 @@ import {container} from 'tsyringe';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-import AddParticipants from './AddParticipants';
-import ConversationDetails from './ConversationDetails';
-import ConversationParticipants from './ConversationParticipants';
-import GroupParticipantService from './GroupParticipantService';
-import GroupParticipantUser from './GroupParticipantUser';
-import GuestServicesOptions from './GuestServicesOptions';
-import MessageDetails from './MessageDetails';
-import Notifications from './Notifications';
-import ParticipantDevices from './ParticipantDevices';
-import TimedMessages from './TimedMessages';
+import {AddParticipants} from './AddParticipants';
+import {ConversationDetails} from './ConversationDetails';
+import {ConversationParticipants} from './ConversationParticipants';
+import {GroupParticipantService} from './GroupParticipantService';
+import {GroupParticipantUser} from './GroupParticipantUser';
+import {GuestServicesOptions} from './GuestServicesOptions';
+import {MessageDetails} from './MessageDetails';
+import {Notifications} from './Notifications';
+import {ParticipantDevices} from './ParticipantDevices';
+import {TimedMessages} from './TimedMessages';
 
 import {ConversationState} from '../../conversation/ConversationState';
 import {Conversation} from '../../entity/Conversation';
 import {Message} from '../../entity/message/Message';
 import {User} from '../../entity/User';
-import {isContentMessage} from '../../guards/Message';
+import {isReadableMessage} from '../../guards/Message';
 import {isUserEntity, isUserServiceEntity} from '../../guards/Panel';
 import {isServiceEntity} from '../../guards/Service';
 import {ServiceEntity} from '../../integration/ServiceEntity';
@@ -115,7 +115,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
 
   const userEntity = currentEntity && isUserEntity(currentEntity) ? currentEntity : null;
   const userServiceEntity = currentEntity && isUserServiceEntity(currentEntity) ? currentEntity : null;
-  const messageEntity = currentEntity && isContentMessage(currentEntity) ? currentEntity : null;
+  const messageEntity = currentEntity && isReadableMessage(currentEntity) ? currentEntity : null;
   const serviceEntity = currentEntity && isServiceEntity(currentEntity) ? currentEntity : null;
 
   const goToRoot = () => {
@@ -133,13 +133,17 @@ const RightSidebar: FC<RightSidebarProps> = ({
   };
 
   const onBackClick = (entity: PanelEntity | null = activeConversation) => {
-    rightSidebar.goBack(entity);
+    const previousHistory = rightSidebar.history.slice(0, -1);
+    const hasPreviousHistory = !!previousHistory.length;
     setAnimatePanelToLeft(false);
-  };
 
-  const onBackToDetails = (entity: PanelEntity | null = activeConversation) => {
+    if (hasPreviousHistory) {
+      rightSidebar.goBack(entity);
+
+      return;
+    }
+
     rightSidebar.goTo(PanelState.CONVERSATION_DETAILS, {entity});
-    setAnimatePanelToLeft(false);
   };
 
   const showDevices = (entity: User) => {
@@ -200,7 +204,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
 
           {currentState === PanelState.GROUP_PARTICIPANT_USER && userEntity && (
             <GroupParticipantUser
-              onBack={onBackToDetails}
+              onBack={onBackClick}
               onClose={closePanel}
               goToRoot={goToRoot}
               showDevices={showDevices}
@@ -220,7 +224,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
               activeConversation={activeConversation}
               repositories={repositories}
               onClose={closePanel}
-              onGoBack={onBackToDetails}
+              onGoBack={onBackClick}
             />
           )}
 
@@ -260,7 +264,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
               actionsViewModel={actionsViewModel}
               integrationRepository={integrationRepository}
               goToRoot={goToRoot}
-              onBack={onBackToDetails}
+              onBack={onBackClick}
               onClose={closePanel}
               serviceEntity={serviceEntity}
               userEntity={userServiceEntity}
@@ -316,4 +320,4 @@ const RightSidebar: FC<RightSidebarProps> = ({
   );
 };
 
-export default RightSidebar;
+export {RightSidebar};

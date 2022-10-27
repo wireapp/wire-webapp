@@ -18,12 +18,12 @@
  */
 
 import {render, waitFor} from '@testing-library/react';
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {Conversation} from 'src/script/entity/Conversation';
 import {createRandomUuid} from 'Util/util';
 
-import MessageDetails from './MessageDetails';
+import {MessageDetails} from './MessageDetails';
 
 import {TestFactory} from '../../../../../test/helper/TestFactory';
 import {ConversationRepository} from '../../../conversation/ConversationRepository';

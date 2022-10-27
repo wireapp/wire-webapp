@@ -74,4 +74,4 @@ const GroupAvatar: React.FC<GroupAvatarProps> = ({users, isLight = false, classN
   );
 };
 
-export default GroupAvatar;
+export {GroupAvatar};

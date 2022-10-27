@@ -17,4 +17,4 @@
  *
  */
 
-export {default} from './UserConversationDetails';
+export * from './UserConversationDetails';

@@ -31,17 +31,17 @@ import cx from 'classnames';
 import {container} from 'tsyringe';
 import {groupBy} from 'underscore';
 
-import Giphy from 'Components/Giphy';
-import InputBar from 'Components/InputBar';
-import MessagesList from 'Components/MessagesList';
+import {Giphy} from 'Components/Giphy';
+import {InputBar} from 'Components/InputBar';
+import {MessagesList} from 'Components/MessagesList';
 import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {TitleBar} from 'Components/TitleBar';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {safeMailOpen, safeWindowOpen} from 'Util/SanitizationUtil';
 
-import PrimaryModal from '../../components/Modals/PrimaryModal';
 import {ConversationState} from '../../conversation/ConversationState';
 import {Conversation as ConversationEntity} from '../../entity/Conversation';
 import {ContentMessage} from '../../entity/message/ContentMessage';
@@ -56,7 +56,7 @@ import {isServiceEntity} from '../../guards/Service';
 import {ServiceEntity} from '../../integration/ServiceEntity';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {RightSidebarParams} from '../../page/AppMain';
-import {PanelState} from '../../page/RightSidebar/RightSidebar';
+import {PanelState} from '../../page/RightSidebar';
 import {RootContext} from '../../page/RootProvider';
 import {TeamState} from '../../team/TeamState';
 import {UserState} from '../../user/UserState';
@@ -67,7 +67,7 @@ interface ConversationListProps {
   readonly initialMessage?: Message;
   readonly teamState: TeamState;
   readonly userState: UserState;
-  openRightSidebar: (panelState: PanelState, params: RightSidebarParams) => void;
+  openRightSidebar: (panelState: PanelState, params: RightSidebarParams, compareEntityId?: boolean) => void;
   isRightSidebarOpen?: boolean;
 }
 
@@ -139,10 +139,11 @@ const ConversationList: FC<ConversationListProps> = ({
     }
   };
 
-  const showUserDetails = (userEntity: User | ServiceEntity) => {
+  const showUserDetails = async (userEntity: User | ServiceEntity) => {
     const isSingleModeConversation = is1to1 || isRequest;
 
     const isUserEntity = !isServiceEntity(userEntity);
+
     if (
       activeConversation &&
       isUserEntity &&
@@ -155,7 +156,13 @@ const ConversationList: FC<ConversationListProps> = ({
 
     const panelId = userEntity.isService ? PanelState.GROUP_PARTICIPANT_SERVICE : PanelState.GROUP_PARTICIPANT_USER;
 
-    openRightSidebar(panelId, {entity: userEntity});
+    const serviceEntity = userEntity.isService && (await repositories.integration.getServiceFromUser(userEntity));
+
+    if (serviceEntity) {
+      openRightSidebar(panelId, {entity: {...serviceEntity, id: userEntity.id}}, true);
+    } else {
+      openRightSidebar(panelId, {entity: userEntity}, true);
+    }
   };
 
   const showParticipants = (participants: User[]) => {
@@ -212,10 +219,10 @@ const ConversationList: FC<ConversationListProps> = ({
     const userId = mentionElement?.dataset.userId;
     const domain = mentionElement?.dataset.userDomain;
 
-    if (userId && domain) {
+    if (userId) {
       (async () => {
         try {
-          const userEntity = await repositories.user.getUserById({domain, id: userId});
+          const userEntity = await repositories.user.getUserById({domain: domain || '', id: userId});
           showUserDetails(userEntity);
         } catch (error) {
           if (error instanceof UserError && error.type !== UserError.TYPE.USER_NOT_FOUND) {
@@ -318,7 +325,7 @@ const ConversationList: FC<ConversationListProps> = ({
     const isUnreadMessage = messageTimestamp > conversationEntity.last_read_timestamp();
     const isNotOwnMessage = !messageEntity.user().isMe;
 
-    let shouldSendReadReceipt = true;
+    let shouldSendReadReceipt = false;
 
     if (messageEntity.expectsReadConfirmation) {
       if (conversationEntity.is1to1()) {
@@ -414,4 +421,4 @@ const ConversationList: FC<ConversationListProps> = ({
   );
 };
 
-export default ConversationList;
+export {ConversationList};

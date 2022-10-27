@@ -26,8 +26,8 @@ import {NOTIFICATION_STATE, getNotificationText} from '../../../conversation/Not
 import {Conversation} from '../../../entity/Conversation';
 import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';
-import PreferencesRadio from '../../MainContent/panels/preferences/components/PreferencesRadio';
-import PanelHeader from '../PanelHeader';
+import {PreferencesRadio} from '../../MainContent/panels/preferences/components/PreferencesRadio';
+import {PanelHeader} from '../PanelHeader';
 
 export interface NotificationsProps {
   activeConversation: Conversation;
@@ -78,4 +78,4 @@ const Notifications: FC<NotificationsProps> = ({activeConversation, onGoBack, on
   );
 };
 
-export default Notifications;
+export {Notifications};

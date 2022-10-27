@@ -21,11 +21,11 @@ import React from 'react';
 
 import {REASON} from '@wireapp/avs';
 
-import Icon from 'Components/Icon';
+import {Icon} from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import MessageTime from './MessageTime';
+import {MessageTime} from './MessageTime';
 
 import {CallingTimeoutMessage} from '../../../entity/message/CallingTimeoutMessage';
 
@@ -62,4 +62,4 @@ const CallTimeoutMessage: React.FC<CallTimeoutMessageProps> = ({message}) => {
   );
 };
 
-export default CallTimeoutMessage;
+export {CallTimeoutMessage};

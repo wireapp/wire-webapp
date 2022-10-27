@@ -19,7 +19,7 @@
 
 import {render, fireEvent} from '@testing-library/react';
 
-import DeviceToggleButton from './DeviceToggleButton';
+import {DeviceToggleButton} from './DeviceToggleButton';
 
 describe('deviceToggleButton', () => {
   const devices = ['first', 'second'];

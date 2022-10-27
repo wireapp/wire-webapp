@@ -17,93 +17,65 @@
  *
  */
 
-import TestPage from 'Util/test/TestPage';
+import {fireEvent, render} from '@testing-library/react';
 
-import Avatar, {AvatarProps} from './Avatar';
+import {Avatar} from './Avatar';
 
 import {User} from '../entity/User';
 import {ServiceEntity} from '../integration/ServiceEntity';
 
-jest.mock('../auth/util/SVGProvider');
-
-class AvatarPage extends TestPage<AvatarProps> {
-  constructor(props?: AvatarProps) {
-    super(Avatar, props);
-  }
-
-  getUserParticipantAvatar = () => this.get('div[data-uie-name="element-avatar-user"]');
-  getServiceParticipantAvatar = () => this.get('div[data-uie-name="service-avatar"]');
-  getTemporaryGuestAvatar = () => this.get('div[data-uie-name="element-avatar-temporary-guest"]');
-  getServiceAvatar = () => this.get('div[data-uie-name="element-avatar-service"]');
-  getUserAvatar = () => this.get('div[data-uie-name="element-avatar-user"]');
-
-  clickUserAvatar = () => this.click(this.getUserParticipantAvatar()!);
-}
-
 describe('Avatar', () => {
   it('executes onClick with current participant', () => {
-    const participant = new User('id', null);
+    const participant = new User('id');
     participant.name('Anton Bertha');
 
-    const participantAvatar = new AvatarPage({
+    const props = {
       onAvatarClick: jasmine.createSpy(),
       participant,
-    });
+    };
 
-    participantAvatar.clickUserAvatar();
+    const {getByTestId} = render(<Avatar {...props} />);
 
-    expect(participantAvatar.getProps()?.onAvatarClick).toHaveBeenCalledWith(
-      participantAvatar.getProps()?.participant,
-      jasmine.anything(),
-    );
+    const userAvatar = getByTestId('element-avatar-user');
+    fireEvent.click(userAvatar);
+
+    expect(props.onAvatarClick).toHaveBeenCalledWith(props.participant, expect.anything());
   });
 
   it('renders temporary guest avatar', () => {
-    const participant = new User('id', null);
+    const participant = new User('id');
     participant.name('Anton Bertha');
     participant.isTemporaryGuest(true);
 
-    const participantAvatar = new AvatarPage({
-      participant,
-    });
-
-    expect(participantAvatar.getTemporaryGuestAvatar()).not.toBeNull();
+    const {getByTestId} = render(<Avatar participant={participant} />);
+    expect(getByTestId('element-avatar-temporary-guest')).not.toBeNull();
   });
 
   it('renders service avatar', () => {
     const participant = new ServiceEntity({id: 'id'});
     participant.name('Anton Bertha');
 
-    const participantAvatar = new AvatarPage({
-      participant,
-    });
-
-    expect(participantAvatar.getServiceAvatar()).not.toBeNull();
+    const {getByTestId} = render(<Avatar participant={participant} />);
+    expect(getByTestId('element-avatar-service')).not.toBeNull();
   });
 
   /**
    * This behaviour exists in the message list for message avatars and in the conversation details in the services section.
    */
   it('renders service avatar with participant of type User but isService = true', () => {
-    const participant = new User('id', null);
+    const participant = new User('id');
     participant.name('Anton Bertha');
     participant.isService = true;
 
-    const participantAvatar = new AvatarPage({
-      participant,
-    });
-
-    expect(participantAvatar.getServiceAvatar()).not.toBeNull();
+    const {getByTestId} = render(<Avatar participant={participant} />);
+    expect(getByTestId('element-avatar-service')).not.toBeNull();
   });
 
   it('renders user avatar', () => {
-    const participant = new User('id', null);
+    const participant = new User('id');
     participant.name('Anton Bertha');
 
-    const participantAvatar = new AvatarPage({
-      participant,
-    });
-
-    expect(participantAvatar.getUserAvatar()).not.toBeNull();
+    const {getByTestId} = render(<Avatar participant={participant} />);
+    expect(getByTestId('element-avatar-user')).not.toBeNull();
   });
 });

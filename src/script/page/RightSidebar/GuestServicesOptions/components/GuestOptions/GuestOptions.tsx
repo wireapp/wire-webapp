@@ -21,10 +21,10 @@ import {FC, useCallback, useEffect, useMemo, useState} from 'react';
 
 import cx from 'classnames';
 
-import CopyToClipboard from 'Components/CopyToClipboard';
-import Icon from 'Components/Icon';
-import PrimaryModal from 'Components/Modals/PrimaryModal';
-import BaseToggle from 'Components/toggle/BaseToggle';
+import {CopyToClipboard} from 'Components/CopyToClipboard';
+import {Icon} from 'Components/Icon';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {BaseToggle} from 'Components/toggle/BaseToggle';
 import {copyText} from 'Util/ClipboardUtil';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -135,7 +135,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
     }
   };
 
-  const updateCode = async () => {
+  const updateCode = useCallback(async () => {
     const canUpdateCode = (isGuestRoom || isGuestAndServicesRoom) && !accessCode && isGuestLinkEnabled;
 
     if (canUpdateCode) {
@@ -143,7 +143,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
       await conversationRepository.stateHandler.getAccessCode(activeConversation);
       setIsRequestOngoing(false);
     }
-  };
+  }, [accessCode, activeConversation, isGuestAndServicesRoom, isGuestLinkEnabled, isGuestRoom, setIsRequestOngoing]);
 
   const initializeOptions = useCallback(async () => {
     if (!inTeam && !isGuestLinkEnabled) {
@@ -152,7 +152,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
     }
 
     await updateCode();
-  }, [activeConversation, inTeam, isGuestLinkEnabled]);
+  }, [activeConversation, inTeam, isGuestLinkEnabled, updateCode]);
 
   useEffect(() => {
     initializeOptions();
@@ -264,4 +264,4 @@ const GuestOptions: FC<GuestOptionsProps> = ({
   );
 };
 
-export default GuestOptions;
+export {GuestOptions};

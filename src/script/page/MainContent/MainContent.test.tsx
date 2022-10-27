@@ -17,24 +17,21 @@
  *
  */
 
-import {act, render, waitFor} from '@testing-library/react';
+import {act, render, screen, waitFor} from '@testing-library/react';
 import ko from 'knockout';
 
 import {ContentState, ContentViewModel} from 'src/script/view_model/ContentViewModel';
 
-import MainContent from './MainContent';
+import {MainContent} from './MainContent';
 
 import {withTheme} from '../../auth/util/test/TestUtil';
 import {MainViewModel} from '../../view_model/MainViewModel';
-import RootProvider from '../RootProvider';
+import {RootProvider} from '../RootProvider';
 
-jest.mock(
-  './panels/preferences/AccountPreferences',
-  () =>
-    function AccountPreferences() {
-      return <span>AccountPreferences</span>;
-    },
-);
+jest.mock('./panels/preferences/AccountPreferences', () => ({
+  AccountPreferences: () => <span>AccountPreferences</span>,
+  __esModule: true,
+}));
 
 describe('Preferences', () => {
   const mainViewModel = {
@@ -50,24 +47,25 @@ describe('Preferences', () => {
 
   it('renders the right component according to view state', () => {
     jest.useFakeTimers();
-    const {queryByText, getByText} = render(
+    render(
       withTheme(
         <RootProvider value={mainViewModel}>
           <MainContent {...defaultParams} />
         </RootProvider>,
       ),
     );
-    expect(queryByText('accessibility.headings.preferencesAbout')).toBeNull();
-    expect(queryByText('AccountPreferences')).not.toBeNull();
+    expect(screen.queryByText('accessibility.headings.preferencesAbout')).toBeNull();
+    expect(screen.queryByText('AccountPreferences')).not.toBeNull();
 
     act(() => {
       mainViewModel.content.state(ContentState.PREFERENCES_ABOUT);
     });
-    waitFor(() => getByText('accessibility.headings.preferencesAbout'));
+    waitFor(() => screen.getByText('accessibility.headings.preferencesAbout'));
     act(() => {
       jest.advanceTimersByTime(1000);
     });
-    expect(queryByText('AccountPreferences')).toBeNull();
-    expect(queryByText('accessibility.headings.preferencesAbout')).not.toBeNull();
+    expect(screen.queryByText('AccountPreferences')).toBeNull();
+    expect(screen.queryByText('accessibility.headings.preferencesAbout')).not.toBeNull();
+    jest.useRealTimers();
   });
 });

@@ -25,7 +25,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import PrimaryModal from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
@@ -36,7 +36,7 @@ import {TeamState} from '../../../../../team/TeamState';
 import {AppLockState} from '../../../../../user/AppLockState';
 import {FEATURES, hasAccessToFeature} from '../../../../../user/UserPermission';
 import {UserRepository} from '../../../../../user/UserRepository';
-import PreferencesSection from '../components/PreferencesSection';
+import {PreferencesSection} from '../components/PreferencesSection';
 
 interface AccountSecuritySectionProps {
   appLockState?: AppLockState;
@@ -132,4 +132,4 @@ const AccountSecuritySection: React.FC<AccountSecuritySectionProps> = ({
   );
 };
 
-export default AccountSecuritySection;
+export {AccountSecuritySection};

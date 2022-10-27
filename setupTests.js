@@ -51,11 +51,6 @@ jest.mock('axios', () => {
 
 require('test/api/payloads');
 
-const Adapter = require('@wojtekmaj/enzyme-adapter-react-17');
-const {configure} = require('enzyme');
-
-configure({adapter: new Adapter()});
-
 const encoding = require('text-encoding');
 window.TextEncoder = encoding.TextEncoder;
 window.TextDecoder = encoding.TextDecoder;
@@ -80,6 +75,8 @@ window.wire = {
 };
 
 window.z = {userPermission: {}};
+
+window.URL.createObjectURL = jest.fn();
 
 const testLib = require('@testing-library/react');
 testLib.configure({testIdAttribute: 'data-uie-name'});

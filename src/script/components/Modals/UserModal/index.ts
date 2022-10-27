@@ -17,4 +17,4 @@
  *
  */
 
-export {showUserModal as default} from './UserModal';
+export * from './UserModal';

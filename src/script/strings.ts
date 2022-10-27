@@ -36,7 +36,7 @@
  *
  */
 
-import {BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/src/http/';
+import {BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
 import {defineMessages} from 'react-intl';
 
 import {BackendError} from './auth/module/action/BackendError';

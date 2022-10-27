@@ -100,4 +100,4 @@ const InputLevel: React.FC<InputLevelProps> = ({disabled, mediaStream, className
   );
 };
 
-export default InputLevel;
+export {InputLevel};

@@ -17,7 +17,7 @@
  *
  */
 
-import type {Self} from '@wireapp/api-client/src/self/';
+import type {Self} from '@wireapp/api-client/lib/self/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {SelfActionCreator} from './creator/';

@@ -21,7 +21,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import create from 'zustand';
 
-import PrimaryModal from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {safeWindowOpen} from 'Util/SanitizationUtil';

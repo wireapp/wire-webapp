@@ -19,18 +19,17 @@
 
 import React, {useEffect, useMemo, useState} from 'react';
 
-import {ClientClassification} from '@wireapp/api-client/src/client/';
-import ko from 'knockout';
+import {ClientClassification} from '@wireapp/api-client/lib/client/';
 
 import {partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 
-import DeviceDetails from './userDevices/DeviceDetails';
-import DeviceList from './userDevices/DeviceList';
-import NoDevicesFound from './userDevices/NoDevicesFound';
-import SelfFingerprint from './userDevices/SelfFingerprint';
+import {DeviceDetails} from './userDevices/DeviceDetails';
+import {DeviceList} from './userDevices/DeviceList';
+import {NoDevicesFound} from './userDevices/NoDevicesFound';
+import {SelfFingerprint} from './userDevices/SelfFingerprint';
 
 import {ClientEntity} from '../client/ClientEntity';
 import {ClientRepository} from '../client/ClientRepository';
@@ -126,7 +125,7 @@ const UserDevices: React.FC<UserDevicesProps> = ({
   const clickOnDevice = (clientEntity: ClientEntity) => {
     setSelectedClient(clientEntity);
     const headline = user.isMe ? clientEntity.label || clientEntity.model : capitalizeFirstChar(clientEntity.class);
-    goTo(UserDevicesState.DEVICE_DETAILS, headline);
+    goTo(UserDevicesState.DEVICE_DETAILS, headline || '');
   };
 
   const clickToShowSelfFingerprint = () => {
@@ -165,26 +164,4 @@ const UserDevices: React.FC<UserDevicesProps> = ({
   );
 };
 
-export default UserDevices;
-
-export const makeUserDevicesHistory = () => {
-  const history = ko.observableArray<UserDevicesHistoryEntry>();
-  const current = ko.pureComputed(() => history()[history().length - 1]);
-  const reset = () => {
-    history.removeAll();
-    history.push({headline: '', state: UserDevicesState.DEVICE_LIST});
-  };
-
-  reset();
-
-  return {
-    current,
-    goBack: () => {
-      history.pop();
-    },
-    goTo: (state: UserDevicesState, headline: string) => {
-      history.push({headline, state});
-    },
-    reset,
-  };
-};
+export {UserDevices};

@@ -67,4 +67,4 @@ const ClassifiedBar: React.FC<ClassifiedBarProps> = ({users, classifiedDomains, 
   );
 };
 
-export default ClassifiedBar;
+export {ClassifiedBar};

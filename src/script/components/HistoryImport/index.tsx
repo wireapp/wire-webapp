@@ -19,8 +19,8 @@
 
 import {FC, useEffect, useState} from 'react';
 
-import Icon from 'Components/Icon';
-import LoadingBar from 'Components/LoadingBar';
+import {Icon} from 'Components/Icon';
+import {LoadingBar} from 'Components/LoadingBar';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {formatDuration} from 'Util/TimeUtil';
@@ -205,4 +205,4 @@ const HistoryImport: FC<HistoryImportProps> = ({backupRepository, file, switchCo
   );
 };
 
-export default HistoryImport;
+export {HistoryImport};

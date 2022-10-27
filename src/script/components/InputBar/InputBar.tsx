@@ -20,8 +20,8 @@
 import {
   ChangeEvent,
   ClipboardEvent as ReactClipboardEvent,
-  KeyboardEvent as ReactKeyboardEvent,
   FormEvent,
+  KeyboardEvent as ReactKeyboardEvent,
   useEffect,
   useMemo,
   useRef,
@@ -29,20 +29,29 @@ import {
 } from 'react';
 
 import {Availability} from '@wireapp/protocol-messaging';
-import {StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
+import {useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
-import useEmoji from 'Components/Emoji/useEmoji';
-import Icon from 'Components/Icon';
-import ClassifiedBar from 'Components/input/ClassifiedBar';
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {useEmoji} from 'Components/Emoji/useEmoji';
+import {Icon} from 'Components/Icon';
+import {ClassifiedBar} from 'Components/input/ClassifiedBar';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {useDropFiles} from 'src/script/hooks/useDropFiles';
+import {useResizeTarget} from 'src/script/hooks/useResizeTarget';
+import {useScrollSync} from 'src/script/hooks/useScrollSync';
+import {useTextAreaFocus} from 'src/script/hooks/useTextAreaFocus';
+import {ControlButtons} from 'src/script/page/message-list/InputBarControls/ControlButtons';
+import {GiphyButton} from 'src/script/page/message-list/InputBarControls/GiphyButton';
+import {MentionSuggestionList} from 'src/script/page/message-list/MentionSuggestions';
+import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {loadDraftState, saveDraftState} from 'Util/DraftStateUtil';
 import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/FileTypeUtil';
-import isHittingUploadLimit from 'Util/isHittingUploadLimit';
+import {isHittingUploadLimit} from 'Util/isHittingUploadLimit';
 import {insertAtCaret, isFunctionKey, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {
@@ -54,9 +63,9 @@ import {
 import {formatLocale, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {formatBytes, getSelectionPosition} from 'Util/util';
 
-import getRichTextInput from './getRichTextInput';
-import PastedFileControls from './PastedFileControls';
-import ReplyBar from './ReplyBar';
+import {getRichTextInput} from './getRichTextInput';
+import {PastedFileControls} from './PastedFileControls';
+import {ReplyBar} from './ReplyBar';
 
 import {AssetRepository} from '../../assets/AssetRepository';
 import {Config} from '../../Config';
@@ -68,22 +77,14 @@ import {Text as TextAsset} from '../../entity/message/Text';
 import {User} from '../../entity/User';
 import {ConversationError} from '../../error/ConversationError';
 import {EventRepository} from '../../event/EventRepository';
-import useDropFiles from '../../hooks/useDropFiles';
-import useResizeTarget from '../../hooks/useResizeTarget';
-import useScrollSync from '../../hooks/useScrollSync';
-import useTextAreaFocus from '../../hooks/useTextAreaFocus';
 import {MentionEntity} from '../../message/MentionEntity';
 import {MessageHasher} from '../../message/MessageHasher';
 import {QuoteEntity} from '../../message/QuoteEntity';
-import ControlButtons from '../../page/message-list/InputBarControls/ControlButtons';
-import GiphyButton from '../../page/message-list/InputBarControls/GiphyButton';
-import MentionSuggestionList from '../../page/message-list/MentionSuggestions';
-import {PropertiesRepository} from '../../properties/PropertiesRepository';
+import {useAppMainState} from '../../page/state';
 import {SearchRepository} from '../../search/SearchRepository';
 import {StorageRepository} from '../../storage';
 import {TeamState} from '../../team/TeamState';
 import {UserState} from '../../user/UserState';
-import PrimaryModal from '../Modals/PrimaryModal';
 
 const CONFIG = {
   ...Config.getConfig(),
@@ -170,6 +171,10 @@ const InputBar = ({
   const [pingDisabled, setIsPingDisabled] = useState<boolean>(false);
   const [editedMention, setEditedMention] = useState<{startIndex: number; term: string} | undefined>(undefined);
 
+  const {rightSidebar} = useAppMainState.getState();
+  const currentState = rightSidebar.history.at(-1);
+  const isRightSidebarOpen = !!currentState;
+
   const availabilityIsNone = availability === Availability.Type.NONE;
   const showAvailabilityTooltip = firstUserEntity && inTeam && is1to1 && !availabilityIsNone;
   const availabilityStrings: Record<string, string> = {
@@ -196,6 +201,7 @@ const InputBar = ({
 
   const richTextInput = getRichTextInput(currentMentions, inputValue);
 
+  // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
   const isScaledDown = useMatchMedia('max-width: 768px');
 
   const config = {
@@ -718,8 +724,6 @@ const InputBar = ({
   };
 
   useEffect(() => {
-    loadInitialStateForConversation();
-
     amplify.subscribe(WebAppEvents.CONVERSATION.IMAGE.SEND, uploadImages);
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.EDIT, editMessage);
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REPLY, replyMessage);
@@ -731,6 +735,10 @@ const InputBar = ({
       amplify.unsubscribeAll(WebAppEvents.SHORTCUT.PING);
     };
   }, []);
+
+  useEffect(() => {
+    loadInitialStateForConversation();
+  }, [conversationEntity]);
 
   useEffect(() => {
     if (!isEditing) {
@@ -848,89 +856,88 @@ const InputBar = ({
   };
 
   return (
-    <StyledApp themeId={THEME_ID.DEFAULT}>
-      <div id="conversation-input-bar" className="conversation-input-bar">
-        {classifiedDomains && !isConnectionRequest && (
-          <ClassifiedBar users={participatingUserEts} classifiedDomains={classifiedDomains} />
-        )}
+    <div
+      id="conversation-input-bar"
+      className={cx('conversation-input-bar', {'is-right-panel-open': isRightSidebarOpen})}
+    >
+      {classifiedDomains && !isConnectionRequest && (
+        <ClassifiedBar users={participatingUserEts} classifiedDomains={classifiedDomains} />
+      )}
 
-        {isReplying && !isEditing && <ReplyBar replyMessageEntity={replyMessageEntity} onCancel={handleCancelReply} />}
+      {isReplying && !isEditing && <ReplyBar replyMessageEntity={replyMessageEntity} onCancel={handleCancelReply} />}
 
-        <div className={cx('conversation-input-bar__input', {'conversation-input-bar__input--editing': isEditing})}>
-          {!isOutgoingRequest && (
-            <>
-              <div className="controls-left">
-                {!!inputValue.length && (
-                  <Avatar className="cursor-default" participant={selfUser} avatarSize={AVATAR_SIZE.X_SMALL} />
-                )}
-              </div>
+      <div className={cx('conversation-input-bar__input', {'conversation-input-bar__input--editing': isEditing})}>
+        {!isOutgoingRequest && (
+          <>
+            <div className="controls-left">
+              {!!inputValue.length && (
+                <Avatar className="cursor-default" participant={selfUser} avatarSize={AVATAR_SIZE.X_SMALL} />
+              )}
+            </div>
 
-              {!removedFromConversation && !pastedFile && (
-                <>
-                  {renderEmojiComponent()}
+            {!removedFromConversation && !pastedFile && (
+              <>
+                {renderEmojiComponent()}
 
-                  <div className="controls-center">
-                    <textarea
-                      ref={textareaRef}
-                      id="conversation-input-bar-text"
-                      className={cx('conversation-input-bar-text', {
-                        'conversation-input-bar-text--accent': hasLocalEphemeralTimer,
-                      })}
-                      onKeyDown={onTextAreaKeyDown}
-                      onKeyUp={onTextareaKeyUp}
-                      onClick={handleMentionFlow}
-                      onInput={updateMentions}
-                      onChange={onChange}
-                      onPaste={onPasteFiles}
-                      value={inputValue}
-                      placeholder={inputPlaceholder}
-                      aria-label={inputPlaceholder}
-                      data-uie-name="input-message"
-                      dir="auto"
-                    />
-
-                    <div
-                      ref={shadowInputRef}
-                      className="shadow-input"
-                      dangerouslySetInnerHTML={{__html: richTextInput}}
-                      data-uie-name="input-message-rich-text"
-                      dir="auto"
-                    />
-                  </div>
-
-                  <MentionSuggestionList
-                    targetInput={textareaRef.current}
-                    suggestions={mentionSuggestions}
-                    onSelectionValidated={addMention}
+                <div className="controls-center">
+                  <textarea
+                    ref={textareaRef}
+                    id="conversation-input-bar-text"
+                    className={cx('conversation-input-bar-text', {
+                      'conversation-input-bar-text--accent': hasLocalEphemeralTimer,
+                    })}
+                    onKeyDown={onTextAreaKeyDown}
+                    onKeyUp={onTextareaKeyUp}
+                    onClick={handleMentionFlow}
+                    onInput={updateMentions}
+                    onChange={onChange}
+                    onPaste={onPasteFiles}
+                    value={inputValue}
+                    placeholder={inputPlaceholder}
+                    aria-label={inputPlaceholder}
+                    data-uie-name="input-message"
+                    dir="auto"
                   />
-                  {isScaledDown ? (
-                    <>
-                      <ul className="controls-right buttons-group" css={{minWidth: '95px'}}>
-                        {showGiphyButton && <GiphyButton onGifClick={onGifClick} />}
-                        {sendButton}
-                      </ul>
-                      <ul className="controls-right buttons-group" css={{justifyContent: 'center', width: '100%'}}>
-                        <ControlButtons {...controlButtonsProps} isScaledDown={isScaledDown} />
-                      </ul>
-                    </>
-                  ) : (
-                    <ul className="controls-right buttons-group">
-                      <ControlButtons {...controlButtonsProps} showGiphyButton={showGiphyButton} />
+
+                  <div
+                    ref={shadowInputRef}
+                    className="shadow-input"
+                    dangerouslySetInnerHTML={{__html: richTextInput}}
+                    data-uie-name="input-message-rich-text"
+                    dir="auto"
+                  />
+                </div>
+
+                <MentionSuggestionList
+                  targetInput={textareaRef.current}
+                  suggestions={mentionSuggestions}
+                  onSelectionValidated={addMention}
+                />
+                {isScaledDown ? (
+                  <>
+                    <ul className="controls-right buttons-group" css={{minWidth: '95px'}}>
+                      {showGiphyButton && <GiphyButton onGifClick={onGifClick} />}
                       {sendButton}
                     </ul>
-                  )}
-                </>
-              )}
-            </>
-          )}
+                    <ul className="controls-right buttons-group" css={{justifyContent: 'center', width: '100%'}}>
+                      <ControlButtons {...controlButtonsProps} isScaledDown={isScaledDown} />
+                    </ul>
+                  </>
+                ) : (
+                  <ul className="controls-right buttons-group">
+                    <ControlButtons {...controlButtonsProps} showGiphyButton={showGiphyButton} />
+                    {sendButton}
+                  </ul>
+                )}
+              </>
+            )}
+          </>
+        )}
 
-          {pastedFile && (
-            <PastedFileControls pastedFile={pastedFile} onClear={clearPastedFile} onSend={sendPastedFile} />
-          )}
-        </div>
+        {pastedFile && <PastedFileControls pastedFile={pastedFile} onClear={clearPastedFile} onSend={sendPastedFile} />}
       </div>
-    </StyledApp>
+    </div>
   );
 };
 
-export default InputBar;
+export {InputBar};

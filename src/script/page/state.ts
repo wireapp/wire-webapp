@@ -19,9 +19,14 @@
 
 import create from 'zustand';
 
-import {PanelEntity, PanelState} from './RightSidebar/RightSidebar';
+import {PanelEntity, PanelState} from './RightSidebar';
 
 import {User} from '../entity/User';
+
+export enum ViewType {
+  CENTRAL_COLUMN = 0,
+  LEFT_SIDEBAR = 1,
+}
 
 type RightSidebarParams = {
   entity: PanelEntity | null;
@@ -30,6 +35,10 @@ type RightSidebarParams = {
 };
 
 type AppMainState = {
+  responsiveView: {
+    currentView: ViewType;
+    setCurrentView: (view: ViewType) => void;
+  };
   rightSidebar: {
     clearHistory: () => void;
     entity: RightSidebarParams['entity'];
@@ -44,6 +53,11 @@ type AppMainState = {
 };
 
 const useAppMainState = create<AppMainState>((set, get) => ({
+  responsiveView: {
+    currentView: ViewType.LEFT_SIDEBAR,
+    setCurrentView: (view: ViewType) =>
+      set(state => ({...state, responsiveView: {...state.responsiveView, currentView: view}})),
+  },
   rightSidebar: {
     clearHistory: () =>
       set(state => ({
@@ -63,17 +77,24 @@ const useAppMainState = create<AppMainState>((set, get) => ({
         ...state,
         rightSidebar: {...state.rightSidebar, entity, history: state.rightSidebar.history.slice(0, -1)},
       })),
-    goTo: (panel: PanelState, params: RightSidebarParams) =>
-      set(state => ({
-        ...state,
-        rightSidebar: {
-          ...state.rightSidebar,
-          entity: params?.entity || null,
-          highlightedUsers: params?.highlighted || [],
-          history: [...state.rightSidebar.history, panel],
-          showLikes: !!params?.showLikes,
-        },
-      })),
+    goTo: (panel: PanelState, params: RightSidebarParams) => {
+      return set(state => {
+        const {rightSidebar} = state;
+        const previousState = rightSidebar.history.at(-1);
+        const replacedNewState = previousState === panel ? rightSidebar.history.slice(0, -1) : rightSidebar.history;
+
+        return {
+          ...state,
+          rightSidebar: {
+            ...state.rightSidebar,
+            entity: params?.entity || null,
+            highlightedUsers: params?.highlighted || [],
+            history: [...replacedNewState, panel],
+            showLikes: !!params?.showLikes,
+          },
+        };
+      });
+    },
     goToRoot: (entity: RightSidebarParams['entity']) =>
       set(state => ({
         ...state,

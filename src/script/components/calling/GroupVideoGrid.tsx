@@ -17,18 +17,18 @@
  *
  */
 
-import React, {useState, useEffect, CSSProperties} from 'react';
+import React, {CSSProperties, useEffect, useState} from 'react';
 
 import {css} from '@emotion/react';
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
-import Icon from 'Components/Icon';
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {Icon} from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import GroupVideoGridTile from './GroupVideoGridTile';
-import Video from './Video';
+import {GroupVideoGridTile} from './GroupVideoGridTile';
+import {Video} from './Video';
 
 import type {Participant} from '../../calling/Participant';
 import type {Grid} from '../../calling/videoGridHandler';
@@ -201,4 +201,4 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
   );
 };
 
-export default GroupVideoGrid;
+export {GroupVideoGrid};

@@ -21,27 +21,28 @@ import React, {useEffect, useMemo, useState} from 'react';
 
 import {css} from '@emotion/react';
 import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
+import {IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import Icon from 'Components/Icon';
-import ClassifiedBar from 'Components/input/ClassifiedBar';
+import {Icon} from 'Components/Icon';
+import {ClassifiedBar} from 'Components/input/ClassifiedBar';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {KEY} from 'Util/KeyboardUtil';
 import {preventFocusOutside} from 'Util/util';
 
-import ButtonGroup from './ButtonGroup';
-import DeviceToggleButton from './DeviceToggleButton';
-import Duration from './Duration';
+import {ButtonGroup} from './ButtonGroup';
+import {DeviceToggleButton} from './DeviceToggleButton';
+import {Duration} from './Duration';
 import {
   videoControlActiveStyles,
   videoControlInActiveStyles,
   videoControlDisabledStyles,
   paginationButtonStyles,
 } from './FullscreenVideoCallStyles';
-import GroupVideoGrid from './GroupVideoGrid';
-import Pagination from './Pagination';
+import {GroupVideoGrid} from './GroupVideoGrid';
+import {Pagination} from './Pagination';
 
 import type {Call} from '../../calling/Call';
 import {MuteState} from '../../calling/CallState';
@@ -170,6 +171,11 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     return true;
   };
 
+  // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
+  const horizontalSmBreakpoint = useMatchMedia('max-width: 680px');
+  const horizontalXsBreakpoint = useMatchMedia('max-width: 500px');
+  const verticalBreakpoint = useMatchMedia('max-height: 420px');
+
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent): void => {
       preventFocusOutside(event, 'video-calling');
@@ -182,7 +188,21 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
 
   return (
     <div id="video-calling" className="video-calling">
-      <div id="video-title" className="video-title">
+      <div
+        id="video-title"
+        className="video-title"
+        css={{
+          ...(verticalBreakpoint && {height: '30px', lineHeight: '12px'}),
+        }}
+      >
+        {horizontalSmBreakpoint && (
+          <IconButton
+            variant={IconButtonVariant.SECONDARY}
+            className=" icon-back"
+            css={{height: '25px', left: '5px', position: 'absolute', top: verticalBreakpoint ? '3px' : '10px'}}
+            onClick={minimize}
+          />
+        )}
         {classifiedDomains && (
           <ClassifiedBar
             users={conversationParticipants}
@@ -217,7 +237,13 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
         )}
       </div>
 
-      <div id="video-element-remote" className="video-element-remote">
+      <div
+        id="video-element-remote"
+        className="video-element-remote"
+        css={{
+          height: verticalBreakpoint ? 'calc(100% - 105px)' : 'calc(100% - 179px)',
+        }}
+      >
         <GroupVideoGrid
           maximizedParticipant={maximizedParticipant}
           selfParticipant={selfParticipant}
@@ -266,43 +292,60 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
               <Icon.ArrowNext css={{position: 'relative', right: 4, transform: 'rotate(180deg)'}} />
             </button>
           )}
-          <div css={{bottom: 108, display: 'flex', justifyContent: 'center', position: 'absolute', width: '100%'}}>
-            <Pagination
-              totalPages={totalPages}
-              currentPage={currentPage}
-              onChangePage={newPage => changePage(newPage, call)}
-            />
-          </div>
+          {!verticalBreakpoint && (
+            <div css={{bottom: 108, display: 'flex', justifyContent: 'center', position: 'absolute', width: '100%'}}>
+              <Pagination
+                totalPages={totalPages}
+                currentPage={currentPage}
+                onChangePage={newPage => changePage(newPage, call)}
+              />
+            </div>
+          )}
         </>
       )}
       {!isChoosingScreen && (
         <div id="video-controls" className="video-controls">
-          <ul className="video-controls__wrapper">
-            <li className="video-controls__item__minimize">
-              <button
-                className="video-controls__button"
-                css={videoControlInActiveStyles}
-                onClick={minimize}
-                type="button"
-                aria-labelledby="minimize-label"
-                data-uie-name="do-call-controls-video-minimize"
-              >
-                {hasUnreadMessages ? (
-                  <Icon.MessageUnread
-                    css={{
-                      marginRight: '-2px',
-                      marginTop: '-2px',
-                    }}
-                  />
-                ) : (
-                  <Icon.Message />
-                )}
-                <span id="minimize-label" className="video-controls__button__label">
-                  {t('videoCallOverlayConversations')}
-                </span>
-              </button>
-            </li>
-            <div className="video-controls__centered-items" css={{display: 'flex'}}>
+          <ul
+            className="video-controls__wrapper"
+            css={{
+              ...(horizontalSmBreakpoint && {justifyContent: 'center'}),
+              padding: verticalBreakpoint ? '10px' : horizontalXsBreakpoint ? '32px 10px' : '32px 40px 0 40px',
+            }}
+          >
+            {!horizontalSmBreakpoint && (
+              <li className="video-controls__item__minimize">
+                <button
+                  className="video-controls__button"
+                  css={videoControlInActiveStyles}
+                  onClick={minimize}
+                  type="button"
+                  aria-labelledby="minimize-label"
+                  data-uie-name="do-call-controls-video-minimize"
+                >
+                  {hasUnreadMessages ? (
+                    <Icon.MessageUnread
+                      css={{
+                        marginRight: '-2px',
+                        marginTop: '-2px',
+                      }}
+                    />
+                  ) : (
+                    <Icon.Message />
+                  )}
+                  <span id="minimize-label" className="video-controls__button__label">
+                    {t('videoCallOverlayConversations')}
+                  </span>
+                </button>
+              </li>
+            )}
+            <div
+              className="video-controls__centered-items"
+              css={{
+                display: 'flex',
+                justifyContent: horizontalXsBreakpoint ? 'space-around' : 'space-between',
+                ...(horizontalXsBreakpoint && {width: '100%'}),
+              }}
+            >
               <li className="video-controls__item">
                 <button
                   className="video-controls__button"
@@ -321,7 +364,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
 
                   {isMuted ? <Icon.MicOff width={16} height={16} /> : <Icon.MicOn width={16} height={16} />}
 
-                  {showSwitchMicrophone && (
+                  {showSwitchMicrophone && !verticalBreakpoint && (
                     <DeviceToggleButton
                       styles={css`
                         position: absolute;
@@ -361,7 +404,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                       {t('videoCallOverlayCamera')}
                     </span>
 
-                    {showSwitchCamera && (
+                    {showSwitchCamera && !verticalBreakpoint && (
                       <DeviceToggleButton
                         styles={css`
                           position: absolute;
@@ -422,19 +465,23 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                 </button>
               </li>
             </div>
-            <div css={{display: 'flex', justifyContent: 'flex-end', minWidth: '157px'}}>
-              {participants.length > 2 && (
-                <ButtonGroup
-                  items={Object.values(CallViewTabs)}
-                  onChangeItem={item => {
-                    setActiveCallViewTab(item);
-                    setMaximizedParticipant(call, null);
-                  }}
-                  currentItem={activeCallViewTab}
-                  textSubstitute={participants.length.toString()}
-                />
-              )}
-            </div>
+            {!horizontalXsBreakpoint && (
+              <div
+                css={{...(!horizontalSmBreakpoint && {minWidth: '157px'}), display: 'flex', justifyContent: 'flex-end'}}
+              >
+                {participants.length > 2 && !horizontalXsBreakpoint && (
+                  <ButtonGroup
+                    items={Object.values(CallViewTabs)}
+                    onChangeItem={item => {
+                      setActiveCallViewTab(item);
+                      setMaximizedParticipant(call, null);
+                    }}
+                    currentItem={activeCallViewTab}
+                    textSubstitute={participants.length.toString()}
+                  />
+                )}
+              </div>
+            )}
           </ul>
         </div>
       )}
@@ -442,4 +489,4 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   );
 };
 
-export default FullscreenVideoCall;
+export {FullscreenVideoCall};

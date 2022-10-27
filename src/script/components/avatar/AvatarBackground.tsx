@@ -40,4 +40,4 @@ const AvatarBackground: React.FunctionComponent<AvatarBackgroundProps> = ({
   />
 );
 
-export default AvatarBackground;
+export {AvatarBackground};

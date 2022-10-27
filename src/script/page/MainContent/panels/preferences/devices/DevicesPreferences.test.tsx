@@ -27,7 +27,7 @@ import {CryptographyRepository} from 'src/script/cryptography/CryptographyReposi
 import {UserState} from 'src/script/user/UserState';
 import {createRandomUuid} from 'Util/util';
 
-import DevicesPreferences from './DevicesPreferences';
+import {DevicesPreferences} from './DevicesPreferences';
 
 function createDevice(): ClientEntity {
   const device = new ClientEntity(true, '', createRandomUuid());

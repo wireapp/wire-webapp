@@ -21,12 +21,11 @@ import React from 'react';
 
 import {CSSObject} from '@emotion/serialize';
 
+import {ACCENT_ID} from 'src/script/Config';
+import {User} from 'src/script/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {CSS_SQUARE} from 'Util/CSSMixin';
 import {t} from 'Util/LocalizerUtil';
-
-import {ACCENT_ID} from '../Config';
-import {User} from '../entity/User';
 
 export interface AccentColorPickerProps {
   doSetAccentColor: (id: number) => void;
@@ -73,29 +72,29 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
                   data-uie-name="do-set-accent-color"
                   data-uie-value={id}
                   css={{
-                    '& + label > span:first-child': {
+                    '& + label > span:first-of-type': {
                       color: color,
                       cursor: 'pointer',
                       display: 'inline-block',
                       position: 'relative',
                     },
-                    '& + label > span:first-child::after': {
+                    '& + label > span:first-of-type::after': {
                       ...CSS_SQUARE(10),
                       background: 'currentColor',
                       transform: 'translate(-50%, -50%)',
                     },
-                    '& + label > span:first-child::before': {
+                    '& + label > span:first-of-type::before': {
                       ...CSS_SQUARE(16),
                       transform: 'translate(-50%, -50%)',
                     },
-                    '& + label > span:first-child::before, & + label > span:first-child::after': {
+                    '& + label > span:first-of-type::before, & + label > span:first-of-type::after': {
                       borderRadius: '50%',
                       content: '""',
                       display: 'inline-block',
                       position: 'absolute',
                       transition: 'all 0.15s ease-out',
                     },
-                    '&:checked + label > span:first-child::before': {
+                    '&:checked + label > span:first-of-type::before': {
                       border: '1px solid currentColor',
                     },
                     '&:focus-visible + label': {
@@ -146,4 +145,4 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
   );
 };
 
-export default AccentColorPicker;
+export {AccentColorPicker};

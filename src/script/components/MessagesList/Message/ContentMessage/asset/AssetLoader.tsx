@@ -21,7 +21,7 @@ import React from 'react';
 
 import {handleKeyDown} from 'Util/KeyboardUtil';
 
-import Icon from '../../../../Icon';
+import {Icon} from '../../../../Icon';
 
 export interface AssetLoaderProps {
   large?: boolean;
@@ -66,4 +66,4 @@ const AssetLoader: React.FC<AssetLoaderProps> = ({large, loadProgress, onCancel}
   );
 };
 
-export default AssetLoader;
+export {AssetLoader};

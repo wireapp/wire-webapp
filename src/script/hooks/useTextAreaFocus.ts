@@ -67,4 +67,4 @@ const useTextAreaFocus = (callback: () => void) => {
   }, []);
 };
 
-export default useTextAreaFocus;
+export {useTextAreaFocus};

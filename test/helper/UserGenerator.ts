@@ -18,8 +18,8 @@
  */
 
 import {faker} from '@faker-js/faker';
-import type {User as APIClientUser} from '@wireapp/api-client/src/user/';
-import {UserAssetType} from '@wireapp/api-client/src/user/';
+import type {User as APIClientUser} from '@wireapp/api-client/lib/user/';
+import {UserAssetType} from '@wireapp/api-client/lib/user/';
 
 import {createRandomUuid} from 'Util/util';
 

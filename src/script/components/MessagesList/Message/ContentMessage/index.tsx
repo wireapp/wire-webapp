@@ -19,10 +19,10 @@
 
 import React from 'react';
 
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
-import Icon from 'Components/Icon';
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {Icon} from 'Components/Icon';
 import {Conversation} from 'src/script/entity/Conversation';
 import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
@@ -32,17 +32,17 @@ import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {setContextMenuPosition} from 'Util/util';
 
-import ContentAsset from './asset';
-import MessageFooterLike from './MessageFooterLike';
-import MessageLike from './MessageLike';
-import MessageQuote from './MessageQuote';
+import {ContentAsset} from './asset';
+import {MessageFooterLike} from './MessageFooterLike';
+import {MessageLike} from './MessageLike';
+import {Quote} from './MessageQuote';
 
 import {MessageActions} from '..';
 import {EphemeralStatusType} from '../../../../message/EphemeralStatusType';
 import {ContextMenuEntry, showContextMenu} from '../../../../ui/ContextMenu';
-import EphemeralTimer from '../EphemeralTimer';
-import MessageTime from '../MessageTime';
-import ReadReceiptStatus from '../ReadReceiptStatus';
+import {EphemeralTimer} from '../EphemeralTimer';
+import {MessageTime} from '../MessageTime';
+import {ReadReceiptStatus} from '../ReadReceiptStatus';
 
 export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetSession'> {
   contextMenu: {entries: ko.Subscribable<ContextMenuEntry[]>};
@@ -163,7 +163,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
     <>
       {avatarSection}
       {message.quote() && (
-        <MessageQuote
+        <Quote
           conversation={conversation}
           quote={message.quote()}
           selfId={selfId}
@@ -248,4 +248,4 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   );
 };
 
-export default ContentMessageComponent;
+export {ContentMessageComponent};

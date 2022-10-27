@@ -54,4 +54,4 @@ const MessageLike: React.FC<MessageLikeProps> = ({message, onLike, className}) =
   );
 };
 
-export default MessageLike;
+export {MessageLike};

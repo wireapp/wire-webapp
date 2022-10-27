@@ -17,58 +17,63 @@
  *
  */
 
-import {fireEvent} from '@testing-library/react';
+import {render, screen, fireEvent} from '@testing-library/react';
 import ko from 'knockout';
 
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
 import {Conversation} from 'src/script/entity/Conversation';
-import TestPage from 'Util/test/TestPage';
+import {TestFactory} from 'test/helper/TestFactory';
 
-import Notifications, {NotificationsProps} from './Notifications';
+import {Notifications} from './Notifications';
 
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';
 
-class NotificationsPanelPage extends TestPage<NotificationsProps> {
-  constructor(props?: NotificationsProps) {
-    super(Notifications, props);
-  }
+const testFactory = new TestFactory();
+let conversationRepository: ConversationRepository;
 
-  getCheckedInput = () => this.get('input[checked]') as HTMLInputElement;
-  getInputWithValue = (value: number) => this.get(`input[value="${value}"]`);
-}
+beforeAll(() => {
+  testFactory.exposeConversationActors().then(factory => {
+    conversationRepository = factory;
+    return conversationRepository;
+  });
+});
+
+const getDefaultParams = () => {
+  return {
+    onClose: jest.fn(),
+    onGoBack: jest.fn(),
+    repositories: {} as ViewModelRepositories,
+  };
+};
 
 describe('Notifications', () => {
-  const onGoBack = jest.fn();
-  const onClose = jest.fn();
-
   it('has the correct input checked', () => {
     const conversation = new Conversation();
     Object.defineProperty(conversation, 'notificationState', {
       value: ko.observable(NOTIFICATION_STATE.MENTIONS_AND_REPLIES),
     });
-    const notificationsPanel = new NotificationsPanelPage({
-      activeConversation: conversation,
-      onClose,
-      onGoBack,
-      repositories: {} as ViewModelRepositories,
-    });
-    expect(notificationsPanel.getCheckedInput().value).toEqual(NOTIFICATION_STATE.MENTIONS_AND_REPLIES.toString());
+    const defaultProps = getDefaultParams();
+    render(<Notifications {...defaultProps} activeConversation={conversation} />);
+    expect(screen.getByLabelText('notificationSettingsMentionsAndReplies')).toBeDefined();
   });
 
   it('sets the correct new value on the ative conversation', () => {
     const conversation = new Conversation();
-    const conversationRepo = {
+    const conversationRepository = {
       setNotificationState: jest.fn(),
     } as Partial<ConversationRepository>;
-    const notificationsPanel = new NotificationsPanelPage({
-      activeConversation: conversation,
-      onClose,
-      onGoBack,
-      repositories: {conversation: conversationRepo} as ViewModelRepositories,
-    });
-    fireEvent.click(notificationsPanel.getInputWithValue(NOTIFICATION_STATE.MENTIONS_AND_REPLIES)!);
-    expect(conversationRepo.setNotificationState).toHaveBeenCalledWith(
+    const defaultProps = getDefaultParams();
+    render(
+      <Notifications
+        {...defaultProps}
+        activeConversation={conversation}
+        repositories={{conversation: conversationRepository} as unknown as ViewModelRepositories}
+      />,
+    );
+    const input = screen.getByTestId(`preferences-options-notifications-${NOTIFICATION_STATE.MENTIONS_AND_REPLIES}`);
+    fireEvent.click(input);
+    expect(conversationRepository.setNotificationState).toHaveBeenCalledWith(
       conversation,
       NOTIFICATION_STATE.MENTIONS_AND_REPLIES,
     );

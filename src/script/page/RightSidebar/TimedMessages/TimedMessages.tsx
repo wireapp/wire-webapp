@@ -27,7 +27,7 @@ import {Conversation} from '../../../entity/Conversation';
 import {EphemeralTimings} from '../../../ephemeral/EphemeralTimings';
 import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';
-import PanelHeader from '../PanelHeader';
+import {PanelHeader} from '../PanelHeader';
 
 interface TimedMessagesPanelProps {
   activeConversation: Conversation;
@@ -78,10 +78,8 @@ const TimedMessages: FC<TimedMessagesPanelProps> = ({activeConversation, onClose
   const timedMessageChange = (value: number): void => {
     const finalTimer = value === 0 ? null : value;
 
-    if (finalTimer) {
-      activeConversation.globalMessageTimer(finalTimer);
-      repositories.conversation.updateConversationMessageTimer(activeConversation, finalTimer);
-    }
+    activeConversation.globalMessageTimer(finalTimer);
+    repositories.conversation.updateConversationMessageTimer(activeConversation, finalTimer);
   };
 
   return (
@@ -118,4 +116,4 @@ const TimedMessages: FC<TimedMessagesPanelProps> = ({activeConversation, onClose
   );
 };
 
-export default TimedMessages;
+export {TimedMessages};

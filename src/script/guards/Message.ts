@@ -23,6 +23,11 @@ import {ContentMessage} from '../entity/message/ContentMessage';
 import {MemberMessage} from '../entity/message/MemberMessage';
 import {SuperType} from '../message/SuperType';
 
+export const isReadableMessage = (message: any): message is ContentMessage =>
+  message &&
+  'super_type' in message &&
+  (message.super_type === SuperType.CONTENT || message.super_type === SuperType.PING);
+
 export const isContentMessage = (message: any): message is ContentMessage =>
   message && 'super_type' in message && message.super_type === SuperType.CONTENT;
 

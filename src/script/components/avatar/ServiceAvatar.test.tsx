@@ -17,58 +17,54 @@
  *
  */
 
-import {AVATAR_SIZE} from 'Components/Avatar';
-import TestPage from 'Util/test/TestPage';
+import {render} from '@testing-library/react';
 
-import ServiceAvatar, {ServiceAvatarProps} from './ServiceAvatar';
+import {AVATAR_SIZE} from 'Components/Avatar';
+
+import {ServiceAvatar} from './ServiceAvatar';
 
 import {ServiceEntity} from '../../integration/ServiceEntity';
-
 jest.mock('../../auth/util/SVGProvider');
-
-class ServiceAvatarPage extends TestPage<ServiceAvatarProps> {
-  constructor(props?: ServiceAvatarProps) {
-    super(ServiceAvatar, props);
-  }
-
-  getInitials = () => this.get('div[data-uie-name="element-avatar-initials"]');
-  getServiceIcon = () => this.get('div[data-uie-name="element-avatar-service-icon"]');
-  getUserBadgeIcon = () => this.get('div[data-uie-name="element-avatar-user-badge-icon"]');
-}
 
 describe('ServiceAvatar', () => {
   it('shows a service icon', async () => {
     const service = new ServiceEntity({id: 'id'});
 
-    const serviceAvatar = new ServiceAvatarPage({
+    const props = {
       avatarSize: AVATAR_SIZE.LARGE,
       participant: service,
-    });
+    };
 
-    expect(serviceAvatar.getServiceIcon()).not.toBeNull();
+    const {getByTestId} = render(<ServiceAvatar {...props} />);
+
+    expect(getByTestId('element-avatar-service-icon')).not.toBeNull();
   });
 
   it('does not show initials', async () => {
     const service = new ServiceEntity({id: 'id'});
     service.name('Anton Bertha');
 
-    const serviceAvatar = new ServiceAvatarPage({
+    const props = {
       avatarSize: AVATAR_SIZE.LARGE,
       participant: service,
-    });
+    };
 
-    expect(serviceAvatar.getInitials()).toBeNull();
+    const {queryByTestId} = render(<ServiceAvatar {...props} />);
+
+    expect(queryByTestId('element-avatar-initials')).toBeNull();
   });
 
   it('does not show avatar badge', async () => {
     const service = new ServiceEntity({id: 'id'});
     service.name('Anton Bertha');
 
-    const serviceAvatar = new ServiceAvatarPage({
+    const props = {
       avatarSize: AVATAR_SIZE.LARGE,
       participant: service,
-    });
+    };
 
-    expect(serviceAvatar.getUserBadgeIcon()).toBeNull();
+    const {queryByTestId} = render(<ServiceAvatar {...props} />);
+
+    expect(queryByTestId('element-avatar-user-badge-icon')).toBeNull();
   });
 });

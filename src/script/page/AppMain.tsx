@@ -19,26 +19,27 @@
 
 import {FC} from 'react';
 
-import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+import {StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
 import {container} from 'tsyringe';
 
-import CallingContainer from 'Components/calling/CallingOverlayContainer';
+import {CallingContainer} from 'Components/calling/CallingOverlayContainer';
+import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationModal';
+import {LegalHoldModal} from 'Components/Modals/LegalHoldModal/LegalHoldModal';
+import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-import AppLock from './AppLock';
-import LeftSidebar from './LeftSidebar';
-import MainContent from './MainContent';
-import RightSidebar from './RightSidebar';
-import {PanelEntity, PanelState} from './RightSidebar/RightSidebar';
-import RootProvider from './RootProvider';
-import {useAppMainState} from './state';
+import {AppLock} from './AppLock';
+import {LeftSidebar} from './LeftSidebar';
+import {MainContent} from './MainContent';
+import {PanelEntity, PanelState, RightSidebar} from './RightSidebar';
+import {RootProvider} from './RootProvider';
+import {useAppMainState, ViewType} from './state';
 
-import {PrimaryModalComponent} from '../components/Modals/PrimaryModal/PrimaryModal';
 import {User} from '../entity/User';
 import {TeamState} from '../team/TeamState';
 import {UserState} from '../user/UserState';
 import {MainViewModel} from '../view_model/MainViewModel';
-import WarningsContainer from '../view_model/WarningsContainer/WarningsContainer';
+import {WarningsContainer} from '../view_model/WarningsContainer/WarningsContainer';
 
 export type RightSidebarParams = {
   entity: PanelEntity | null;
@@ -51,41 +52,51 @@ interface AppContainerProps {
 }
 
 const AppContainer: FC<AppContainerProps> = ({root}) => {
+  const {repositories} = root.content;
   const teamState = container.resolve(TeamState);
   const userState = container.resolve(UserState);
 
   const {self: selfUser, isActivatedAccount} = useKoSubscribableChildren(userState, ['self', 'isActivatedAccount']);
 
-  const rightSidebar = useAppMainState(state => state.rightSidebar);
-  const currentState = rightSidebar.history.at(-1);
+  const {history, entity: currentEntity, clearHistory, goTo} = useAppMainState(state => state.rightSidebar);
+  const currentState = history.at(-1);
 
-  const closeRightSidebar = () => {
-    rightSidebar.clearHistory();
-  };
+  const toggleRightSidebar = (panelState: PanelState, params: RightSidebarParams, compareEntityId = false) => {
+    const isDifferentState = currentState !== panelState;
+    const isDifferentId = compareEntityId && currentEntity?.id !== params?.entity?.id;
 
-  const toggleRightSidebar = (panelState: PanelState, params: RightSidebarParams) => {
-    if (currentState !== panelState) {
-      rightSidebar.goTo(panelState, params);
+    if (isDifferentId || isDifferentState) {
+      goTo(panelState, params);
 
       return;
     }
 
-    closeRightSidebar();
+    clearHistory();
   };
+
+  // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
+  const smBreakpoint = useMatchMedia('max-width: 620px');
+
+  const {currentView} = useAppMainState(state => state.responsiveView);
+  const isLeftSidebarVisible = currentView == ViewType.LEFT_SIDEBAR;
 
   return (
     <StyledApp themeId={THEME_ID.DEFAULT} css={{backgroundColor: 'unset', height: '100%'}}>
       <RootProvider value={root}>
         <main>
           <div id="app" className="app">
-            <LeftSidebar listViewModel={root.list} selfUser={selfUser} isActivatedAccount={isActivatedAccount} />
+            {(!smBreakpoint || isLeftSidebarVisible) && (
+              <LeftSidebar listViewModel={root.list} selfUser={selfUser} isActivatedAccount={isActivatedAccount} />
+            )}
 
-            <MainContent isRightSidebarOpen={!!currentState} openRightSidebar={toggleRightSidebar} />
+            {(!smBreakpoint || !isLeftSidebarVisible) && (
+              <MainContent isRightSidebarOpen={!!currentState} openRightSidebar={toggleRightSidebar} />
+            )}
 
             {currentState && (
               <RightSidebar
-                currentEntity={rightSidebar.entity}
-                repositories={root.content.repositories}
+                currentEntity={currentEntity}
+                repositories={repositories}
                 actionsViewModel={root.actions}
                 isFederated={root.isFederated}
                 teamState={teamState}
@@ -94,18 +105,28 @@ const AppContainer: FC<AppContainerProps> = ({root}) => {
             )}
           </div>
 
-          <AppLock clientRepository={root.content.repositories.client} />
+          <AppLock clientRepository={repositories.client} />
           <WarningsContainer />
 
           <CallingContainer
             multitasking={root.multitasking}
-            callingRepository={root.content.repositories.calling}
-            mediaRepository={root.content.repositories.media}
+            callingRepository={repositories.calling}
+            mediaRepository={repositories.media}
+          />
+
+          <LegalHoldModal
+            userState={userState}
+            conversationRepository={repositories.conversation}
+            searchRepository={repositories.search}
+            teamRepository={repositories.team}
+            clientRepository={repositories.client}
+            messageRepository={repositories.message}
+            cryptographyRepository={repositories.cryptography}
           />
 
           {/*The order of these elements matter to show proper modals stack upon each other*/}
-          <div id="user-modal-container"></div>
           <PrimaryModalComponent />
+          <GroupCreationModal userState={userState} teamState={teamState} />
         </main>
       </RootProvider>
     </StyledApp>
@@ -114,4 +135,4 @@ const AppContainer: FC<AppContainerProps> = ({root}) => {
 
 registerReactComponent('app-container', AppContainer);
 
-export default AppContainer;
+export {AppContainer};

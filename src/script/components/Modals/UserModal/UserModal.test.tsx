@@ -18,7 +18,7 @@
  */
 
 import {render, waitFor} from '@testing-library/react';
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {User} from 'src/script/entity/User';
 import {Core} from 'src/script/service/CoreSingleton';
@@ -27,7 +27,7 @@ import {UserRepository} from 'src/script/user/UserRepository';
 import {UserState} from 'src/script/user/UserState';
 import {ActionsViewModel} from 'src/script/view_model/ActionsViewModel';
 
-import UserModal from './UserModal';
+import {UserModal} from './UserModal';
 
 describe('UserModal', () => {
   it('correctly fetches user from user repository', async () => {

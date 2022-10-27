@@ -46,4 +46,4 @@ const Video = ({srcObject, ...props}: VideoProps) => {
   return <video ref={refVideo} {...props} />;
 };
 
-export default Video;
+export {Video};

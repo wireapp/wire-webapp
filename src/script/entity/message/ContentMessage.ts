@@ -17,8 +17,8 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/src/user';
-import type {ReactionType} from '@wireapp/core/src/main/conversation/ReactionType';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
+import type {ReactionType} from '@wireapp/core/lib/conversation/ReactionType';
 import ko from 'knockout';
 
 import {copyText} from 'Util/ClipboardUtil';
@@ -35,7 +35,7 @@ import {AssetRepository} from '../../assets/AssetRepository';
 import type {QuoteEntity} from '../../message/QuoteEntity';
 import {SuperType} from '../../message/SuperType';
 import {UserReactionMap} from '../../storage';
-import type {User} from '../User';
+import {User} from '../User';
 
 export class ContentMessage extends Message {
   private readonly isLikedProvisional: ko.Observable<boolean>;

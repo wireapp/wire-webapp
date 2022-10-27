@@ -17,12 +17,11 @@
  *
  */
 
-import {ClientClassification} from '@wireapp/api-client/src/client/';
+import {render} from '@testing-library/react';
+import {ClientClassification} from '@wireapp/api-client/lib/client/';
 import ko from 'knockout';
 
-import TestPage from 'Util/test/TestPage';
-
-import DeviceCard, {DeviceCardProps} from './DeviceCard';
+import {DeviceCard} from './DeviceCard';
 
 import type {ClientEntity} from '../../client/ClientEntity';
 
@@ -37,21 +36,9 @@ function createClientEntity(clientEntity: Partial<ClientEntity>): ClientEntity {
   return device as ClientEntity;
 }
 
-class DeviceCardPage extends TestPage<DeviceCardProps> {
-  constructor(props?: DeviceCardProps) {
-    super(DeviceCard, props);
-  }
-
-  getDesktopIcon = () => this.get('svg[data-uie-name="status-desktop-device"]');
-  getMobileDeviceIcon = () => this.get('svg[data-uie-name="status-mobile-device"]');
-  getDiscloseIcon = () => this.get('svg[data-uie-name="disclose-icon"]');
-  getVerifiedIcon = () => this.get('svg[data-uie-name="user-device-verified"]');
-  getNotVerifiedIcon = () => this.get('svg[data-uie-name="user-device-not-verified"]');
-}
-
 describe('DeviceCard', () => {
   it('renders desktop icon for desktop clients', async () => {
-    const deviceCard = new DeviceCardPage({
+    const props = {
       device: createClientEntity({
         class: ClientClassification.DESKTOP,
         meta: {
@@ -59,13 +46,14 @@ describe('DeviceCard', () => {
         },
       }),
       showIcon: true,
-    });
+    };
 
-    expect(deviceCard.getDesktopIcon()).not.toBeNull();
+    const {getByTestId} = render(<DeviceCard {...props} />);
+    expect(getByTestId('status-desktop-device')).not.toBeNull();
   });
 
   it('renders mobile devices icon for non-desktop clients', async () => {
-    const deviceCard = new DeviceCardPage({
+    const props = {
       device: createClientEntity({
         class: ClientClassification.PHONE,
         meta: {
@@ -73,14 +61,15 @@ describe('DeviceCard', () => {
         },
       }),
       showIcon: true,
-    });
+    };
 
-    expect(deviceCard.getMobileDeviceIcon()).not.toBeNull();
+    const {getByTestId} = render(<DeviceCard {...props} />);
+    expect(getByTestId('status-mobile-device')).not.toBeNull();
   });
 
   it('shows disclose icon when component is clickable', async () => {
-    const deviceCard = new DeviceCardPage({
-      click: () => undefined,
+    const props = {
+      click: jest.fn(),
       device: createClientEntity({
         class: ClientClassification.PHONE,
         meta: {
@@ -88,13 +77,14 @@ describe('DeviceCard', () => {
         },
       }),
       showIcon: true,
-    });
+    };
 
-    expect(deviceCard.getDiscloseIcon()).not.toBeNull();
+    const {getByTestId} = render(<DeviceCard {...props} />);
+    expect(getByTestId('disclose-icon')).not.toBeNull();
   });
 
   it('shows verified icon', async () => {
-    const deviceCard = new DeviceCardPage({
+    const props = {
       device: createClientEntity({
         class: ClientClassification.PHONE,
         meta: {
@@ -103,13 +93,14 @@ describe('DeviceCard', () => {
       }),
       showIcon: true,
       showVerified: true,
-    });
+    };
 
-    expect(deviceCard.getVerifiedIcon()).not.toBeNull();
+    const {getByTestId} = render(<DeviceCard {...props} />);
+    expect(getByTestId('user-device-verified')).not.toBeNull();
   });
 
   it('shows unverified icon', async () => {
-    const deviceCard = new DeviceCardPage({
+    const props = {
       device: createClientEntity({
         class: ClientClassification.PHONE,
         meta: {
@@ -118,8 +109,9 @@ describe('DeviceCard', () => {
       }),
       showIcon: true,
       showVerified: true,
-    });
+    };
 
-    expect(deviceCard.getNotVerifiedIcon()).not.toBeNull();
+    const {getByTestId} = render(<DeviceCard {...props} />);
+    expect(getByTestId('user-device-not-verified')).not.toBeNull();
   });
 });

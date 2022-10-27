@@ -19,7 +19,7 @@
 
 import {FC} from 'react';
 
-import Icon from 'Components/Icon';
+import {Icon} from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatLocale} from 'Util/TimeUtil';
@@ -45,10 +45,9 @@ const DetailViewModalHeader: FC<DetailViewModalHeaderProps> = ({messageEntity, o
           className="label-bold-xs"
           data-uie-name="fullscreen-picture-sender"
           data-uie-uid={user.id}
-          data-uie-value={user.username()}
+          data-uie-value={user.name()}
         >
           {unsafeSenderName}
-          {messageEntity.id}
         </div>
 
         <div className="label-xs" data-timestamp={timestamp}>
@@ -69,4 +68,4 @@ const DetailViewModalHeader: FC<DetailViewModalHeaderProps> = ({messageEntity, o
   );
 };
 
-export default DetailViewModalHeader;
+export {DetailViewModalHeader};

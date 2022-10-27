@@ -17,12 +17,13 @@
  *
  */
 
-import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
+import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
+import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
@@ -31,7 +32,7 @@ import {alias} from 'Util/util';
 
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 
-import PrimaryModal from '../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationState} from '../conversation/ConversationState';
@@ -39,7 +40,6 @@ import {MessageRepository} from '../conversation/MessageRepository';
 import {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
 import {ConversationError} from '../error/ConversationError';
-import {LegalHoldModalState} from '../legal-hold/LegalHoldModalState';
 import {
   ClientNotificationData,
   Notification,
@@ -141,8 +141,10 @@ export class ContentViewModel {
     });
 
     this._initSubscriptions();
+
     if (this.teamState.supportsLegalHold()) {
-      amplify.publish(LegalHoldModalState.SHOW_REQUEST);
+      const {showRequestModal} = useLegalHoldModalState.getState();
+      showRequestModal(true);
     }
   }
 
@@ -387,7 +389,7 @@ export class ContentViewModel {
           PrimaryModal.show(
             PrimaryModal.type.ACCOUNT_READ_RECEIPTS_CHANGED,
             {
-              data: aggregatedNotifications.pop().data as boolean,
+              data: aggregatedNotifications.pop()?.data as boolean,
               preventClose: true,
             },
             undefined,

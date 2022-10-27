@@ -17,9 +17,9 @@
  *
  */
 
-import {ClientType, PublicClient, RegisteredClient, ClientCapability} from '@wireapp/api-client/src/client/';
-import {USER_EVENT, UserClientAddEvent, UserClientRemoveEvent} from '@wireapp/api-client/src/event';
-import {QualifiedId} from '@wireapp/api-client/src/user/';
+import {ClientCapability, ClientType, PublicClient, RegisteredClient} from '@wireapp/api-client/lib/client/';
+import {UserClientAddEvent, UserClientRemoveEvent, USER_EVENT} from '@wireapp/api-client/lib/event';
+import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
@@ -29,7 +29,7 @@ import murmurhash from 'murmurhash';
 import {container} from 'tsyringe';
 
 import {t} from 'Util/LocalizerUtil';
-import {Logger, getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {loadValue} from 'Util/StorageUtil';
 
@@ -39,7 +39,7 @@ import type {ClientService} from './ClientService';
 import {ClientState} from './ClientState';
 
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
-import PrimaryModal from '../components/Modals/PrimaryModal';
+import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import type {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import type {User} from '../entity/User';
 import {ClientError} from '../error/ClientError';
@@ -292,7 +292,7 @@ export class ClientRepository {
    */
   async deleteClient(clientId: string, password?: string): Promise<ClientEntity[]> {
     const selfUser = this.selfUser();
-    await this.core.service.client.deleteClient(clientId, password);
+    await this.core.service!.client.deleteClient(clientId, password);
     selfUser.removeClient(clientId);
     amplify.publish(WebAppEvents.USER.CLIENT_REMOVED, selfUser.qualifiedId, clientId);
     return this.clientState.clients();

@@ -19,13 +19,13 @@
 
 import React, {useEffect, useState} from 'react';
 
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
 import {ListViewModel} from 'src/script/view_model/ListViewModel';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-import GroupedConversationsFolder from './GroupedConversationsFolder';
+import {GroupedConversationsFolder} from './GroupedConversationsFolder';
 import {useFolderState} from './state';
 
 import {CallState} from '../../../../calling/CallState';
@@ -120,4 +120,4 @@ const GroupedConversations: React.FC<GroupedConversationsProps> = ({
   );
 };
 
-export default GroupedConversations;
+export {GroupedConversations};

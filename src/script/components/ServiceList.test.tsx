@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2021 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,61 +17,52 @@
  *
  */
 
-import TestPage from 'Util/test/TestPage';
+import {render} from '@testing-library/react';
+
 import {createRandomUuid} from 'Util/util';
 
-import ServiceList, {ServiceListProps} from './ServiceList';
+import {ServiceList} from './ServiceList';
 
 import {ServiceEntity} from '../integration/ServiceEntity';
 
-jest.mock(
-  'Components/utils/InViewport',
-  () =>
-    function MockInViewport() {
-      return <div></div>;
-    },
-);
-
-class ServiceListPage extends TestPage<ServiceListProps> {
-  constructor(props?: ServiceListProps) {
-    super(ServiceList, props);
-  }
-
-  getNoResultsElement = () => this.get('[data-uie-name="service-list-no-results"]');
-  getServiceElement = (serviceId: string) => this.get(`[data-uie-name="service-list-service-${serviceId}"]`);
-}
+jest.mock('Components/utils/InViewport', () => ({
+  InViewport: ({onVisible, children}: {onVisible: () => void; children: any}) => {
+    onVisible();
+    return <div>{children}</div>;
+  },
+  __esModule: true,
+}));
 
 describe('ServiceList', () => {
   it('lists the services', () => {
     const serviceEntity1 = new ServiceEntity({id: createRandomUuid()});
     const serviceEntity2 = new ServiceEntity({id: createRandomUuid()});
 
-    const serviceList = new ServiceListPage({
+    const props = {
       arrow: false,
       click: () => {},
       isSearching: false,
       noUnderline: true,
       services: [serviceEntity1, serviceEntity2],
-    });
+    };
 
-    const serviceElement1 = serviceList.getServiceElement(serviceEntity1.id);
-    const serviceElement2 = serviceList.getServiceElement(serviceEntity2.id);
+    const {getByTestId} = render(<ServiceList {...props} />);
 
-    expect(serviceElement1).not.toBeNull();
-    expect(serviceElement2).not.toBeNull();
+    expect(expect(getByTestId(`service-list-service-${serviceEntity1.id}`))).not.toBeNull();
+    expect(expect(getByTestId(`service-list-service-${serviceEntity2.id}`))).not.toBeNull();
   });
 
   it('shows the "no results found" element when there are no services', () => {
-    const serviceList = new ServiceListPage({
+    const props = {
       arrow: false,
       click: () => {},
       isSearching: true,
       noUnderline: true,
-      services: [],
-    });
+      services: [] as ServiceEntity[],
+    };
 
-    const noResultsElement = serviceList.getNoResultsElement();
+    const {getByTestId} = render(<ServiceList {...props} />);
 
-    expect(noResultsElement).not.toBeNull();
+    expect(getByTestId('service-list-no-results')).not.toBeNull();
   });
 });

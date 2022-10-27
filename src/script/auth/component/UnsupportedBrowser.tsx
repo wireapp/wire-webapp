@@ -24,7 +24,7 @@ import {Container, ContainerXS, H1, H2, H3, Loading, Logo, Text} from '@wireapp/
 import {MessageDescriptor, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 
-import WirelessContainer from './WirelessContainer';
+import {WirelessContainer} from './WirelessContainer';
 
 import {Config} from '../../Config';
 import {unsupportedJoinStrings, unsupportedStrings} from '../../strings';
@@ -53,7 +53,7 @@ export interface UnsupportedBrowserProps extends React.HTMLProps<HTMLDivElement>
   isTemporaryGuest?: boolean;
 }
 
-export const UnsupportedBrowser = ({
+export const UnsupportedBrowserComponent = ({
   children,
   hasCookieSupport,
   hasIndexedDbSupport,
@@ -128,4 +128,6 @@ const mapStateToProps = (state: RootState) => ({
   isSupportedBrowser: RuntimeSelector.isSupportedBrowser(state),
 });
 
-export default connect(mapStateToProps)(UnsupportedBrowser);
+const UnsupportedBrowser = connect(mapStateToProps)(UnsupportedBrowserComponent);
+
+export {UnsupportedBrowser};

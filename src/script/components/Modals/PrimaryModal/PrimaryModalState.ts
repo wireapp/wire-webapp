@@ -100,7 +100,11 @@ const addNewModalToQueue = (type: PrimaryModalType, options: ModalOptions, modal
 };
 
 const showNextModalInQueue = (): void => {
-  const {queue, removeFirstItemInQueue} = usePrimaryModalState.getState();
+  const {queue, currentModalId, removeFirstItemInQueue} = usePrimaryModalState.getState();
+  if (currentModalId) {
+    // we already have a modal open which is awaiting a manual user action
+    return;
+  }
   if (queue.length > 0) {
     const nextModalToShow = queue[0];
     const {type, options, id} = nextModalToShow;

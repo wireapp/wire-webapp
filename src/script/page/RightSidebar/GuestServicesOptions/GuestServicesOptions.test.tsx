@@ -22,7 +22,7 @@ import ko from 'knockout';
 
 import {Conversation} from 'src/script/entity/Conversation';
 
-import GuestServicesOptions from './GuestServicesOptions';
+import {GuestServicesOptions} from './GuestServicesOptions';
 
 import {TestFactory} from '../../../../../test/helper/TestFactory';
 import {ACCESS_STATE} from '../../../conversation/AccessState';

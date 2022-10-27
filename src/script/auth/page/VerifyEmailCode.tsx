@@ -27,11 +27,11 @@ import {AnyAction, Dispatch} from 'redux';
 
 import {getLogger} from 'Util/Logger';
 
-import Page from './Page';
+import {Page} from './Page';
 
 import {verifyStrings} from '../../strings';
-import LinkButton from '../component/LinkButton';
-import RouterLink from '../component/RouterLink';
+import {LinkButton} from '../component/LinkButton';
+import {RouterLink} from '../component/RouterLink';
 import {actionRoot as ROOT_ACTIONS} from '../module/action';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
@@ -46,7 +46,7 @@ const changeEmailRedirect = {
   [AuthSelector.REGISTER_FLOW.TEAM]: ROUTE.CREATE_TEAM_ACCOUNT,
 };
 
-const VerifyEmailCode = ({
+const VerifyEmailCodeComponent = ({
   account,
   authError,
   currentFlow,
@@ -145,4 +145,6 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(mapStateToProps, mapDispatchToProps)(VerifyEmailCode);
+const VerifyEmailCode = connect(mapStateToProps, mapDispatchToProps)(VerifyEmailCodeComponent);
+
+export {VerifyEmailCode};
