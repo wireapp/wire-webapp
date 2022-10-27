@@ -18,12 +18,13 @@
  */
 
 import type {BackendError} from '@wireapp/api-client/lib/http/';
-import {AxiosError} from 'axios';
-import {User} from '../entity/User';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
-import {Conversation} from '../entity/Conversation';
-import {ClientRecord} from '../storage/record/ClientRecord';
+import {AxiosError} from 'axios';
+
 import {QualifiedUserClientEntityMap} from '../client/ClientRepository';
+import {Conversation} from '../entity/Conversation';
+import {User} from '../entity/User';
+import {ClientRecord} from '../storage/record/ClientRecord';
 
 export function isAxiosError(errorCandidate: any): errorCandidate is AxiosError {
   return errorCandidate && errorCandidate.isAxiosError === true;

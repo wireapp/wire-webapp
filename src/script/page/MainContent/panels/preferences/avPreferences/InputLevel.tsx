@@ -18,7 +18,9 @@
  */
 
 import React, {useEffect, useRef} from 'react';
+
 import cx from 'classnames';
+
 import {getLogger} from 'Util/Logger';
 
 export interface InputLevelProps extends React.HTMLProps<HTMLDivElement> {
@@ -98,4 +100,4 @@ const InputLevel: React.FC<InputLevelProps> = ({disabled, mediaStream, className
   );
 };
 
-export default InputLevel;
+export {InputLevel};

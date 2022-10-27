@@ -18,6 +18,7 @@
  */
 
 import React from 'react';
+
 import {LinkProps, linkStyle, Theme} from '@wireapp/react-ui-kit';
 
 const linkButtonStyle = {
@@ -36,4 +37,4 @@ const LinkButton = (props: React.ButtonHTMLAttributes<HTMLButtonElement>) => (
   />
 );
 
-export default LinkButton;
+export {LinkButton};

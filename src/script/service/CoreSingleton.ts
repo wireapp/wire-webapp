@@ -17,12 +17,15 @@
  *
  */
 
-import {Account} from '@wireapp/core';
 import {ClientType} from '@wireapp/api-client/lib/client/';
+import {Account} from '@wireapp/core';
 import {container, singleton} from 'tsyringe';
+
+import {isTemporaryClientAndNonPersistent, supportsMLS} from 'Util/util';
+
 import {APIClient} from './APIClientSingleton';
 import {createStorageEngine, DatabaseTypes} from './StoreEngineProvider';
-import {isTemporaryClientAndNonPersistent, supportsMLS} from 'Util/util';
+
 import {Config} from '../Config';
 
 declare global {

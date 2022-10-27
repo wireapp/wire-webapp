@@ -18,6 +18,7 @@
  */
 
 import React, {useState, useEffect} from 'react';
+
 import {formatSeconds} from 'Util/TimeUtil';
 
 export interface DurationProps {
@@ -43,4 +44,4 @@ const Duration: React.FC<DurationProps> = ({startedAt}) => {
   return <>{duration}</>;
 };
 
-export default Duration;
+export {Duration};

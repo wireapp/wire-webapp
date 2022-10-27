@@ -17,15 +17,17 @@
  *
  */
 
-import {Config} from '../../Config';
-import {initialRootState} from '../module/reducer';
-import {mockStoreFactory} from '../util/test/mockStoreFactory';
-import {mountComponent} from '../util/test/TestUtil';
-import Index from './Index';
-import {ROUTE} from '../route';
-import {initialAuthState} from '../module/reducer/authReducer';
 import {act, waitFor} from '@testing-library/react';
 import {Navigate} from 'react-router-dom';
+
+import {Index} from './Index';
+
+import {Config} from '../../Config';
+import {initialRootState} from '../module/reducer';
+import {initialAuthState} from '../module/reducer/authReducer';
+import {ROUTE} from '../route';
+import {mockStoreFactory} from '../util/test/mockStoreFactory';
+import {mountComponent} from '../util/test/TestUtil';
 
 jest.mock('../util/SVGProvider');
 

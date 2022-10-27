@@ -18,16 +18,21 @@
  */
 
 import React from 'react';
+
 import {css} from '@emotion/react';
+
+import {ConversationListCell} from 'Components/list/ConversationListCell';
 import type {ConversationLabel} from 'src/script/conversation/ConversationLabelRepository';
+import {Conversation} from 'src/script/entity/Conversation';
+import {ListViewModel} from 'src/script/view_model/ListViewModel';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import ConversationListCell from 'Components/list/ConversationListCell';
-import GroupedConversationHeader from './GroupedConversationHeader';
+
+import {GroupedConversationHeader} from './GroupedConversationHeader';
+
+import {useRoveFocus} from '../../../../hooks/useRoveFocus';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
 import {createNavigate} from '../../../../router/routerBindings';
-import {ListViewModel} from 'src/script/view_model/ListViewModel';
-import {Conversation} from 'src/script/entity/Conversation';
-import useRoveFocus from '../../../../hooks/useRoveFocus';
+import {useAppMainState} from '../../../state';
 
 export interface GroupedConversationsFolderProps {
   expandedFolders: string[];
@@ -68,7 +73,14 @@ const GroupedConversationsFolder: React.FC<GroupedConversationsFolderProps> = ({
               isConversationListFocus
               handleFocus={setCurrentFocus}
               handleArrowKeyDown={handleKeyDown}
-              onClick={makeOnClick(conversation.id, conversation.domain)}
+              onClick={event => {
+                if (!isSelectedConversation(conversation)) {
+                  const {rightSidebar} = useAppMainState.getState();
+                  rightSidebar.clearHistory();
+                }
+
+                makeOnClick(conversation.id, conversation.domain)(event);
+              }}
               rightClick={(_, event) => listViewModel.onContextMenu(conversation, event)}
               conversation={conversation}
               showJoinButton={hasJoinableCall(conversation)}
@@ -82,4 +94,4 @@ const GroupedConversationsFolder: React.FC<GroupedConversationsFolderProps> = ({
   );
 };
 
-export default GroupedConversationsFolder;
+export {GroupedConversationsFolder};

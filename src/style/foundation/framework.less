@@ -22,7 +22,7 @@
   .full-screen;
 
   display: flex;
-  min-width: @screen-md-min;
+  min-width: @screen-sm-min;
   background-color: var(--app-bg);
   transition: filter 0.3s;
 
@@ -47,6 +47,7 @@
 
   .center-column {
     position: relative;
+    min-width: @screen-sm-min;
     flex: 1 1 auto;
 
     &__overlay {
@@ -62,29 +63,32 @@
     #conversation-input-bar,
     #conversation-title-bar {
       width: 100%;
+      transition: width @animation-timing-fast @ease-out-quart;
+
+      @media (min-width: 1000px) {
+        &.is-right-panel-open {
+          width: calc(100% - @right-width);
+        }
+      }
     }
   }
 
   .right-column {
+    position: absolute;
     z-index: @z-index-panel;
+    right: 0;
+    right: 0;
     overflow: hidden;
-    width: 0;
+    width: @right-width;
+    //width: 0;
     height: 100vh;
     max-height: 100%;
     border-left: 1px solid var(--sidebar-border-color);
     background-color: var(--sidebar-bg);
     transform: scale(1, 1);
-  }
 
-  &.app--panel-open {
     .center-column__overlay {
       display: block;
-    }
-
-    .right-column {
-      position: absolute;
-      right: 0;
-      width: @right-width;
     }
 
     @media (min-width: 1000px) {
@@ -103,5 +107,12 @@
   }
   &--large-offset {
     top: 64px;
+  }
+
+  // @media (max-width: calc(@screen-sm-min*2)) {
+  @media (max-width: 620px) {
+    .left-column {
+      width: 100%;
+    }
   }
 }

@@ -17,6 +17,8 @@
  *
  */
 
+import {useEffect, useState} from 'react';
+
 import {t} from 'Util/LocalizerUtil';
 import {
   TIME_IN_MILLIS,
@@ -32,7 +34,6 @@ import {
   formatDayMonth,
   isThisYear,
 } from 'Util/TimeUtil';
-import {useEffect, useState} from 'react';
 
 export function useRelativeTimestamp(timestamp: number, asDay = false) {
   const calculateTimestamp = (ts: number, isDay: boolean) => {

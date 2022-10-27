@@ -17,4 +17,4 @@
  *
  */
 
-export {default} from './StartUI';
+export * from './StartUI';

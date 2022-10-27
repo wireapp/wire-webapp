@@ -17,8 +17,10 @@
  *
  */
 
-const path = require('path');
 const {format} = require('date-fns');
+
+const path = require('path');
+
 const {SRC_PATH, DIST_PATH} = require('./locations');
 
 module.exports = grunt => {
@@ -28,7 +30,6 @@ module.exports = grunt => {
   const dir = {
     src_: SRC_PATH,
     src: {
-      demo: `${SRC_PATH}/demo`,
       ext: `${SRC_PATH}/ext`,
       page: `${SRC_PATH}/page`,
       style: `${SRC_PATH}/style`,

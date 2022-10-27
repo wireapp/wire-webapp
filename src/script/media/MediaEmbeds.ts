@@ -18,6 +18,7 @@
  */
 
 import {Runtime} from '@wireapp/commons';
+
 import {formatString} from 'Util/StringUtil';
 
 interface IFrameOptions {

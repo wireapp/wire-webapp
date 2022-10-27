@@ -17,13 +17,10 @@
  *
  */
 
-import axios from 'axios';
-import {Runtime} from '@wireapp/commons';
-import type {WebappProperties} from '@wireapp/api-client/lib/user/data';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {CallConfigData} from '@wireapp/api-client/lib/account/CallConfigData';
-import type {UserClients, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
-import {matchQualifiedIds} from 'Util/QualifiedId';
+import type {QualifiedUserClients, UserClients} from '@wireapp/api-client/lib/conversation';
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import type {WebappProperties} from '@wireapp/api-client/lib/user/data';
 import {
   CALL_TYPE,
   CONV_TYPE,
@@ -40,48 +37,53 @@ import {
   WcallClient,
   WcallMember,
 } from '@wireapp/avs';
+import {Runtime} from '@wireapp/commons';
+import {PayloadBundleState} from '@wireapp/core/lib/conversation';
+import {flattenQualifiedUserClients, flattenUserClients} from '@wireapp/core/lib/conversation/message/UserClientsUtil';
+import {isQualifiedUserClients} from '@wireapp/core/lib/util';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
+import axios from 'axios';
 import ko from 'knockout';
-import 'webrtc-adapter';
 import {container} from 'tsyringe';
-import {isQualifiedUserClients} from '@wireapp/core/lib/util';
-import {flattenQualifiedUserClients, flattenUserClients} from '@wireapp/core/lib/conversation/message/UserClientsUtil';
 
-import {t} from 'Util/LocalizerUtil';
-import {Logger, getLogger} from 'Util/Logger';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import 'webrtc-adapter';
+
 import {flatten} from 'Util/ArrayUtil';
+import {t} from 'Util/LocalizerUtil';
+import {getLogger, Logger} from 'Util/Logger';
 import {roundLogarithmic} from 'Util/NumberUtil';
+import {matchQualifiedIds} from 'Util/QualifiedId';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
-import {Config} from '../Config';
-import {ModalsViewModel} from '../view_model/ModalsViewModel';
-import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
-import {CallingEvent, EventBuilder} from '../conversation/EventBuilder';
-import {EventRepository} from '../event/EventRepository';
-import {MediaType} from '../media/MediaType';
 import {Call, SerializedConversationId} from './Call';
 import {CallState, MuteState} from './CallState';
-import {ClientId, Participant, UserId} from './Participant';
-import {EventName} from '../tracking/EventName';
-import {Segmentation} from '../tracking/Segmentation';
-import * as trackingHelpers from '../tracking/Helpers';
-import type {MediaStreamHandler} from '../media/MediaStreamHandler';
-import type {User} from '../entity/User';
-import type {ServerTimeHandler} from '../time/serverTimeHandler';
-import type {UserRepository} from '../user/UserRepository';
-import type {EventRecord} from '../storage';
-import {EventSource} from '../event/EventSource';
-import {CONSENT_TYPE, MessageRepository, MessageSendingOptions} from '../conversation/MessageRepository';
-import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
-import {NoAudioInputError} from '../error/NoAudioInputError';
-import {APIClient} from '../service/APIClientSingleton';
-import {ConversationState} from '../conversation/ConversationState';
-import {TeamState} from '../team/TeamState';
-import Warnings from '../view_model/WarningsContainer';
-import {PayloadBundleState} from '@wireapp/core/lib/conversation';
-import {Core} from '../service/CoreSingleton';
+import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
+import {ClientId, Participant, UserId} from './Participant';
+
+import {PrimaryModal} from '../components/Modals/PrimaryModal';
+import {Config} from '../Config';
+import {ConversationState} from '../conversation/ConversationState';
+import {CallingEvent, EventBuilder} from '../conversation/EventBuilder';
+import {CONSENT_TYPE, MessageRepository, MessageSendingOptions} from '../conversation/MessageRepository';
+import type {User} from '../entity/User';
+import {NoAudioInputError} from '../error/NoAudioInputError';
+import {EventRepository} from '../event/EventRepository';
+import {EventSource} from '../event/EventSource';
+import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
+import type {MediaStreamHandler} from '../media/MediaStreamHandler';
+import {MediaType} from '../media/MediaType';
+import {APIClient} from '../service/APIClientSingleton';
+import {Core} from '../service/CoreSingleton';
+import type {EventRecord} from '../storage';
+import {TeamState} from '../team/TeamState';
+import type {ServerTimeHandler} from '../time/serverTimeHandler';
+import {EventName} from '../tracking/EventName';
+import * as trackingHelpers from '../tracking/Helpers';
+import {Segmentation} from '../tracking/Segmentation';
+import type {UserRepository} from '../user/UserRepository';
+import {Warnings} from '../view_model/WarningsContainer';
 
 const avsLogger = getLogger('avs');
 
@@ -362,9 +364,9 @@ export class CallingRepository {
       users = [...users, userId];
     }
     if (users.length === call.participants.length - 1) {
-      amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.CALL_QUALITY_POOR);
+      Warnings.showWarning(Warnings.TYPE.CALL_QUALITY_POOR);
     } else {
-      amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.CALL_QUALITY_POOR);
+      Warnings.hideWarning(Warnings.TYPE.CALL_QUALITY_POOR);
     }
 
     switch (quality) {
@@ -511,12 +513,11 @@ export class CallingRepository {
 
       if (participant) {
         this.leaveCall(activeCall.conversationId, LEAVE_CALL_REASON.USER_TURNED_UNVERIFIED);
-        amplify.publish(
-          WebAppEvents.WARNING.MODAL,
-          ModalsViewModel.TYPE.ACKNOWLEDGE,
+        PrimaryModal.show(
+          PrimaryModal.type.ACKNOWLEDGE,
           {
-            action: {
-              title: t('callDegradationAction'),
+            primaryAction: {
+              text: t('callDegradationAction'),
             },
             text: {
               message: t('callDegradationDescription', participant.user.name()),
@@ -544,9 +545,8 @@ export class CallingRepository {
 
   private warnOutdatedClient(conversationId: QualifiedId) {
     const brandName = Config.getConfig().BRAND_NAME;
-    amplify.publish(
-      WebAppEvents.WARNING.MODAL,
-      ModalsViewModel.TYPE.ACKNOWLEDGE,
+    PrimaryModal.show(
+      PrimaryModal.type.ACKNOWLEDGE,
       {
         close: () => this.acceptVersionWarning(conversationId),
         text: {
@@ -591,6 +591,7 @@ export class CallingRepository {
           const allClients = conversationEntity.isUsingMLSProtocol
             ? await this.core.service!.conversation.fetchAllParticipantsClients(id, domain)
             : await this.core.service!.conversation.getAllParticipantsClients(conversationId);
+          // We warn the message repository that a mismatch has happened outside of its lifecycle (eventually triggering a conversation degradation)
           // We warn the message repository that a mismatch has happened outside of its lifecycle (eventually triggering a conversation degradation)
           const shouldContinue = await this.messageRepository.updateMissingClients(
             conversationEntity,
@@ -1196,7 +1197,7 @@ export class CallingRepository {
   };
 
   private readonly callClosed = (reason: REASON, convId: SerializedConversationId) => {
-    amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.CALL_QUALITY_POOR);
+    Warnings.hideWarning(Warnings.TYPE.CALL_QUALITY_POOR);
     const conversationId = this.parseQualifiedId(convId);
     const call = this.findCall(conversationId);
     if (!call) {
@@ -1734,7 +1735,7 @@ export class CallingRepository {
     }
 
     return new Promise((resolve, reject) => {
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
         primaryAction: {
           action: () => {
             if (activeCall.state() === CALL_STATE.INCOMING) {
@@ -1773,7 +1774,7 @@ export class CallingRepository {
         title: t('modalNoAudioInputTitle'),
       },
     };
-    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, modalOptions);
+    PrimaryModal.show(PrimaryModal.type.CONFIRM, modalOptions);
   }
 
   private showNoCameraModal(): void {
@@ -1789,7 +1790,7 @@ export class CallingRepository {
         title: t('modalNoCameraTitle'),
       },
     };
-    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
+    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, modalOptions);
   }
 
   //##############################################################################

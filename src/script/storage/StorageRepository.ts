@@ -17,12 +17,14 @@
  *
  */
 
-import {Logger, getLogger} from 'Util/Logger';
 import {container} from 'tsyringe';
 
-import {StorageSchemata} from '../storage/StorageSchemata';
+import {Logger, getLogger} from 'Util/Logger';
+
 import {StorageService} from './StorageService';
+
 import {StorageError} from '../error/StorageError';
+import {StorageSchemata} from '../storage/StorageSchemata';
 
 type AmplifyRecord = {key: string; value: string};
 

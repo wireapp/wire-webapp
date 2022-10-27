@@ -17,16 +17,17 @@
  *
  */
 
+import {render, waitFor} from '@testing-library/react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {UserState} from 'src/script/user/UserState';
-import {TeamState} from 'src/script/team/TeamState';
-import {Core} from 'src/script/service/CoreSingleton';
-import UserModal from './UserModal';
-import {UserRepository} from 'src/script/user/UserRepository';
-import {ActionsViewModel} from 'src/script/view_model/ActionsViewModel';
 import {User} from 'src/script/entity/User';
-import {render, waitFor} from '@testing-library/react';
+import {Core} from 'src/script/service/CoreSingleton';
+import {TeamState} from 'src/script/team/TeamState';
+import {UserRepository} from 'src/script/user/UserRepository';
+import {UserState} from 'src/script/user/UserState';
+
+import {UserModal, UserModalProps} from './UserModal';
+import {showUserModal} from './UserModal.state';
 
 describe('UserModal', () => {
   it('correctly fetches user from user repository', async () => {
@@ -35,17 +36,15 @@ describe('UserModal', () => {
       return new User('mock-id', 'test-domain.mock');
     });
 
-    const props = {
-      actionsViewModel: {} as ActionsViewModel,
+    const props: UserModalProps = {
       core: {} as Core,
       teamState: {} as TeamState,
-      userId: {domain: 'test-domain.mock', id: 'mock-id'},
       userRepository: {
         getUserById,
       } as unknown as UserRepository,
       userState: {} as UserState,
     };
-
+    showUserModal({domain: 'test-domain.mock', id: 'mock-id'});
     render(<UserModal {...props} />);
 
     expect(getUserById).toHaveBeenCalledTimes(1);
@@ -59,16 +58,16 @@ describe('UserModal', () => {
       return user;
     });
 
-    const props = {
-      actionsViewModel: {} as ActionsViewModel,
+    const props: UserModalProps = {
       core: {} as Core,
       teamState: {} as TeamState,
-      userId: {domain: 'test-domain.mock', id: 'mock-id'},
       userRepository: {
         getUserById,
       } as unknown as UserRepository,
       userState: {} as UserState,
     };
+
+    showUserModal({domain: 'test-domain.mock', id: 'mock-id'});
 
     const {getByTestId} = render(<UserModal {...props} />);
 

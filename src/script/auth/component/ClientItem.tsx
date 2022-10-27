@@ -17,24 +17,27 @@
  *
  */
 
+import React, {useEffect, useState} from 'react';
+
 import {RegisteredClient} from '@wireapp/api-client/lib/client/index';
 import {
   COLOR,
   ContainerXS,
   DeviceIcon,
+  FlexBox,
   Form,
+  IconButton,
   Input,
   Line,
-  IconButton,
   Small,
   Text,
   TrashIcon,
-  FlexBox,
 } from '@wireapp/react-ui-kit';
-import React, {useEffect, useState} from 'react';
 import {useIntl} from 'react-intl';
+
 import {t} from 'Util/LocalizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';
+
 import {clientItemStrings} from '../../strings';
 import {ValidationError} from '../module/action/ValidationError';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
@@ -324,4 +327,4 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
   );
 };
 
-export default ClientItem;
+export {ClientItem};

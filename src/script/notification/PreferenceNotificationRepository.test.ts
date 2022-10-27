@@ -17,16 +17,17 @@
  *
  */
 
-import ko from 'knockout';
-import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {USER_EVENT} from '@wireapp/api-client/lib/event/';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
+import ko from 'knockout';
 
-import {PreferenceNotificationRepository, Notification} from 'src/script/notification/PreferenceNotificationRepository';
+import {Notification, PreferenceNotificationRepository} from 'src/script/notification/PreferenceNotificationRepository';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {createRandomUuid} from 'Util/util';
-import {User} from '../entity/User';
+
 import {ClientEntity} from '../client/ClientEntity';
+import {User} from '../entity/User';
 
 describe('PreferenceNotificationRepository', () => {
   const user = new User(createRandomUuid(), null);

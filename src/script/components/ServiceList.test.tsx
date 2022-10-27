@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2021 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,11 +17,21 @@
  *
  */
 
+import {render} from '@testing-library/react';
+
 import {createRandomUuid} from 'Util/util';
 
+import {ServiceList} from './ServiceList';
+
 import {ServiceEntity} from '../integration/ServiceEntity';
-import ServiceList from './ServiceList';
-import {render} from '@testing-library/react';
+
+jest.mock('Components/utils/InViewport', () => ({
+  InViewport: ({onVisible, children}: {onVisible: () => void; children: any}) => {
+    onVisible();
+    return <div>{children}</div>;
+  },
+  __esModule: true,
+}));
 
 describe('ServiceList', () => {
   it('lists the services', () => {

@@ -17,23 +17,22 @@
  *
  */
 
-import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {Runtime} from '@wireapp/commons';
 
 import {getLogger, Logger} from 'Util/Logger';
 
-import {MediaError} from '../error/MediaError';
-import {PermissionError} from '../error/PermissionError';
-import type {PermissionRepository} from '../permission/PermissionRepository';
-import {PermissionStatusState} from '../permission/PermissionStatusState';
-import {PermissionType} from '../permission/PermissionType';
 import {MediaConstraintsHandler, ScreensharingMethods} from './MediaConstraintsHandler';
 import {MEDIA_STREAM_ERROR} from './MediaStreamError';
 import {MEDIA_STREAM_ERROR_TYPES} from './MediaStreamErrorTypes';
 import {MediaType} from './MediaType';
+
+import {MediaError} from '../error/MediaError';
 import {NoAudioInputError} from '../error/NoAudioInputError';
-import Warnings from '../view_model/WarningsContainer';
+import {PermissionError} from '../error/PermissionError';
+import type {PermissionRepository} from '../permission/PermissionRepository';
+import {PermissionStatusState} from '../permission/PermissionStatusState';
+import {PermissionType} from '../permission/PermissionType';
+import {Warnings} from '../view_model/WarningsContainer';
 
 export class MediaStreamHandler {
   static get CONFIG() {
@@ -239,17 +238,17 @@ export class MediaStreamHandler {
 
   private hidePermissionFailedHint(audio: boolean, video: boolean, screen: boolean): void {
     const warningType = this.selectPermissionDeniedWarningType(audio, video, screen);
-    amplify.publish(WebAppEvents.WARNING.DISMISS, warningType);
+    Warnings.hideWarning(warningType);
   }
 
   private hidePermissionRequestHint(audio: boolean, video: boolean, screen: boolean): void {
     if (!Runtime.isDesktopApp()) {
       const warningType = this.selectPermissionRequestWarningType(audio, video, screen);
-      amplify.publish(WebAppEvents.WARNING.DISMISS, warningType);
+      Warnings.hideWarning(warningType);
     }
   }
 
-  private selectPermissionDeniedWarningType(audio: boolean, video: boolean, screen: boolean): string {
+  private selectPermissionDeniedWarningType(audio: boolean, video: boolean, screen: boolean) {
     if (video) {
       return Warnings.TYPE.DENIED_CAMERA;
     }
@@ -259,7 +258,7 @@ export class MediaStreamHandler {
     return Warnings.TYPE.DENIED_MICROPHONE;
   }
 
-  private selectPermissionRequestWarningType(audio: boolean, video: boolean, screen: boolean): string {
+  private selectPermissionRequestWarningType(audio: boolean, video: boolean, screen: boolean) {
     if (video) {
       return Warnings.TYPE.REQUEST_CAMERA;
     }
@@ -272,7 +271,7 @@ export class MediaStreamHandler {
   private showPermissionRequestHint(audio: boolean, video: boolean, screen: boolean): void {
     if (!Runtime.isDesktopApp()) {
       const warningType = this.selectPermissionRequestWarningType(audio, video, screen);
-      amplify.publish(WebAppEvents.WARNING.SHOW, warningType);
+      Warnings.showWarning(warningType);
     }
   }
 }

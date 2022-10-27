@@ -44,7 +44,6 @@
 }
 
 .video-element-remote {
-  height: calc(100% - 179px);
   // fade in animation
   animation: video-fade-in @animation-timing-slower @ease-out-quart forwards;
   opacity: 0;
@@ -111,7 +110,6 @@
     display: flex;
     width: 100%;
     justify-content: space-between;
-    padding: 32px 40px 0 40px;
     margin: 0;
   }
 
@@ -132,6 +130,11 @@
     margin: 0 10px;
     cursor: pointer;
     line-height: 0;
+
+    @media (max-height: 420px) {
+      width: 40px;
+      height: 40px;
+    }
 
     &__label {
       position: absolute;

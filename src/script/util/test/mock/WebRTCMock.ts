@@ -17,8 +17,16 @@
  *
  */
 
-const wrtc = require('@koush/wrtc');
+import wrtc from '@koush/wrtc';
+
 const {RTCAudioSource} = wrtc.nonstandard;
+
+declare global {
+  interface Window {
+    MediaStream: typeof wrtc.MediaStream;
+    RTCAudioSource: typeof RTCAudioSource;
+  }
+}
 
 Object.defineProperty(window, 'MediaStream', {
   value: wrtc.MediaStream,

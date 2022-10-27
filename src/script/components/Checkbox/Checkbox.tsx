@@ -18,8 +18,10 @@
  */
 
 import React from 'react';
-import {getInputCSS, getInputCSSDark, getLabelCSS, getSvgCSS} from './Checkbox.styles';
+
 import {Global} from '@emotion/react';
+
+import {getInputCSS, getInputCSSDark, getLabelCSS, getSvgCSS} from './Checkbox.styles';
 
 interface CheckboxProps {
   disabled?: boolean;
@@ -78,4 +80,4 @@ const Checkbox: React.FC<CheckboxProps> = ({disabled, label, isChecked, name, on
   );
 };
 
-export default Checkbox;
+export {Checkbox};

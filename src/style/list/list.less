@@ -24,7 +24,6 @@
   bottom: 0;
   left: 0;
   display: flex;
-  width: @conversation-list-width;
   flex-direction: column;
 
   .team-mode & {
@@ -45,13 +44,12 @@
 }
 
 .left-list-header {
-  .flex-center;
   position: relative;
+  display: grid;
   height: @content-title-bar-height;
   flex-shrink: 0;
-  justify-content: flex-start;
-  padding: 0 12px;
   border-bottom: 1px solid var(--sidebar-border-color);
+  grid-template-columns: 50px 1fr 50px 50px;
 }
 
 body.theme-dark {
@@ -65,11 +63,11 @@ body.theme-dark {
   .button-reset-default;
   position: relative;
   overflow: hidden;
-  max-width: 208px;
   height: 100%;
   flex: 1;
   justify-content: center;
   cursor: pointer;
+  grid-column: 2 / span 2;
 
   &:focus-visible {
     .focus-border-radius;
@@ -88,20 +86,16 @@ body.theme-dark {
 .left-list-header-text {
   .ellipsis-nowrap;
   .heading-h3;
-
   display: inline-block;
-  max-width: @conversation-list-width - 40px;
-  flex-grow: 1;
+
+  align-self: center;
+  grid-column: 2 / span 2;
+  justify-self: center;
   text-align: center;
 }
 
 .left-list-header-close-button {
   .button-reset-default;
-  position: absolute;
-  top: 50%;
-  right: 16px;
-  padding: 8px;
-  transform: translateY(-50%);
 }
 
 .left-list-center {
@@ -205,8 +199,8 @@ body.theme-dark {
     }
   }
 
-  > .center-column,
-  > .left-list-item-button > .center-column {
+  > .column-center,
+  > .left-list-item-button > .column-center {
     .ellipsis;
 
     position: relative;
@@ -216,6 +210,7 @@ body.theme-dark {
     align-items: center;
     margin-right: -8px;
     cursor: pointer;
+    font-size: @font-size-medium;
     font-weight: @font-weight-medium;
   }
 
@@ -264,8 +259,8 @@ body.theme-dark {
 
 body.theme-dark {
   .left-list-item {
-    > .center-column,
-    > .left-list-item-button > .center-column {
+    > .column-center,
+    > .left-list-item-button > .column-center {
       border-bottom-color: var(--gray-90);
     }
   }

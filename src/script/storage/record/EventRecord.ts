@@ -17,9 +17,10 @@
  *
  */
 
-import {StatusType} from '../../message/StatusType';
-import type {ReactionType} from '@wireapp/core/lib/conversation/';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import type {ReactionType} from '@wireapp/core/lib/conversation/';
+
+import {StatusType} from '../../message/StatusType';
 
 export interface ReadReceipt {
   domain?: string;

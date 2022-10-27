@@ -17,20 +17,20 @@
  *
  */
 
-import {amplify} from 'amplify';
 import React from 'react';
-import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 import {container} from 'tsyringe';
 
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {t} from 'Util/LocalizerUtil';
 import {getCurrentDate} from 'Util/TimeUtil';
 import {downloadBlob} from 'Util/util';
-import {Config} from '../../../../../Config';
-import PreferencesSection from '../components/PreferencesSection';
+
 import type {CallingRepository} from '../../../../../calling/CallingRepository';
-import {ModalsViewModel} from '../../../../../view_model/ModalsViewModel';
+import {Config} from '../../../../../Config';
 import {UserState} from '../../../../../user/UserState';
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
+import {PreferencesSection} from '../components/PreferencesSection';
 
 interface SaveCallLogsProps {
   callingRepository: CallingRepository;
@@ -52,7 +52,7 @@ const SaveCallLogs: React.FC<SaveCallLogsProps> = ({callingRepository, userState
 
       downloadBlob(blob, filename);
     } else {
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
         text: {
           closeBtnLabel: t('modalCallEmptyLogCloseBtn'),
           message: t('modalCallEmptyLogMessage'),
@@ -81,4 +81,4 @@ const SaveCallLogs: React.FC<SaveCallLogsProps> = ({callingRepository, userState
   );
 };
 
-export default SaveCallLogs;
+export {SaveCallLogs};

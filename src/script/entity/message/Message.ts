@@ -17,38 +17,39 @@
  *
  */
 
-import ko from 'knockout';
-import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
-import type {ReactionType} from '@wireapp/core/lib/conversation/';
-
-import {getUserName} from 'Util/SanitizationUtil';
-import {TIME_IN_MILLIS, formatDurationCaption, formatTimeShort, formatDateNumeral, fromUnixTime} from 'Util/TimeUtil';
-import {t} from 'Util/LocalizerUtil';
-
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import type {ReactionType} from '@wireapp/core/lib/conversation/';
+import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
+import ko from 'knockout';
+
+import {t} from 'Util/LocalizerUtil';
+import {getUserName} from 'Util/SanitizationUtil';
+import {formatDateNumeral, formatDurationCaption, formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
+
+import {CallingTimeoutMessage} from './CallingTimeoutMessage';
+import type {CallMessage} from './CallMessage';
+import type {CompositeMessage} from './CompositeMessage';
+import type {ContentMessage} from './ContentMessage';
+import type {DecryptErrorMessage} from './DecryptErrorMessage';
+import {DeleteMessage} from './DeleteMessage';
+import type {FileAsset} from './FileAsset';
+import {FileTypeRestrictedMessage} from './FileTypeRestrictedMessage';
+import type {LegalHoldMessage} from './LegalHoldMessage';
+import type {LinkPreview} from './LinkPreview';
+import type {MemberMessage} from './MemberMessage';
+import {MissedMessage} from './MissedMessage';
+import type {PingMessage} from './PingMessage';
+import type {SystemMessage} from './SystemMessage';
+import type {VerificationMessage} from './VerificationMessage';
+
 import {AssetTransferState} from '../../assets/AssetTransferState';
 import {AssetType} from '../../assets/AssetType';
 import {EphemeralStatusType} from '../../message/EphemeralStatusType';
 import type {MessageCategory} from '../../message/MessageCategory';
 import {StatusType} from '../../message/StatusType';
 import {SuperType} from '../../message/SuperType';
-import {User} from '../User';
-import type {CallMessage} from './CallMessage';
-import type {ContentMessage} from './ContentMessage';
-import type {FileAsset} from './FileAsset';
-import type {CompositeMessage} from './CompositeMessage';
-import type {MemberMessage} from './MemberMessage';
-import type {SystemMessage} from './SystemMessage';
-import type {VerificationMessage} from './VerificationMessage';
-import type {LegalHoldMessage} from './LegalHoldMessage';
-import type {DecryptErrorMessage} from './DecryptErrorMessage';
-import type {PingMessage} from './PingMessage';
-import type {LinkPreview} from './LinkPreview';
 import type {ReadReceipt} from '../../storage/record/EventRecord';
-import {DeleteMessage} from './DeleteMessage';
-import {MissedMessage} from './MissedMessage';
-import {CallingTimeoutMessage} from './CallingTimeoutMessage';
-import {FileTypeRestrictedMessage} from './FileTypeRestrictedMessage';
+import {User} from '../User';
 
 export class Message {
   private messageTimerStarted: boolean;

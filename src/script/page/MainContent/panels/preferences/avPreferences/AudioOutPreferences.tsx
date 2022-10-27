@@ -18,12 +18,15 @@
  */
 
 import React from 'react';
-import Icon from 'Components/Icon';
+
+import {Icon} from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-import PreferencesSection from '../components/PreferencesSection';
-import DeviceSelect from './DeviceSelect';
+
+import {DeviceSelect} from './DeviceSelect';
+
 import {DeviceTypes, MediaDevicesHandler} from '../../../../../media/MediaDevicesHandler';
+import {PreferencesSection} from '../components/PreferencesSection';
 
 interface AudioOutPreferencesProps {
   devicesHandler: MediaDevicesHandler;
@@ -53,4 +56,4 @@ const AudioOutPreferences: React.FC<AudioOutPreferencesProps> = ({devicesHandler
   );
 };
 
-export default AudioOutPreferences;
+export {AudioOutPreferences};

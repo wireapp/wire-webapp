@@ -18,19 +18,19 @@
  */
 
 import React from 'react';
+
 import cx from 'classnames';
-
-import {t} from 'Util/LocalizerUtil';
-import {formatDuration, DurationUnit} from 'Util/TimeUtil';
-import Icon from 'Components/Icon';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-
-import {EphemeralTimings} from '../../../ephemeral/EphemeralTimings';
-import {showContextMenu} from '../../../ui/ContextMenu';
-import type {Conversation} from '../../../entity/Conversation';
 import {container} from 'tsyringe';
-import {TeamState} from '../../../team/TeamState';
+
+import {Icon} from 'Components/Icon';
+import {Conversation} from 'src/script/entity/Conversation';
+import {EphemeralTimings} from 'src/script/ephemeral/EphemeralTimings';
+import {TeamState} from 'src/script/team/TeamState';
+import {showContextMenu} from 'src/script/ui/ContextMenu';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {KEY} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
+import {DurationUnit, formatDuration} from 'Util/TimeUtil';
 import {setContextMenuPosition} from 'Util/util';
 
 export interface MessageTimerButtonProps {
@@ -38,7 +38,7 @@ export interface MessageTimerButtonProps {
   teamState?: TeamState;
 }
 
-export const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({
+const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({
   conversation,
   teamState = container.resolve(TeamState),
 }) => {
@@ -125,3 +125,5 @@ export const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({
     </button>
   );
 };
+
+export {MessageTimerButton};

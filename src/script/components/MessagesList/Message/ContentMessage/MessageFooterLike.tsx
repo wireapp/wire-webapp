@@ -18,12 +18,14 @@
  */
 
 import React from 'react';
+
 import cx from 'classnames';
 
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {Message} from 'src/script/entity/message/Message';
-import MessageLike from './MessageLike';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+
+import {MessageLike} from './MessageLike';
 
 export interface MessageFooterLikeProps {
   is1to1Conversation: boolean;
@@ -59,4 +61,4 @@ const MessageFooterLike: React.FC<MessageFooterLikeProps> = ({message, is1to1Con
   );
 };
 
-export default MessageFooterLike;
+export {MessageFooterLike};

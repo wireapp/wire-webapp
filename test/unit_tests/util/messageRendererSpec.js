@@ -17,8 +17,8 @@
  *
  */
 
-import {renderMessage, getRenderedTextContent} from 'Util/messageRenderer';
 import {MentionEntity} from 'src/script/message/MentionEntity';
+import {renderMessage, getRenderedTextContent} from 'Util/messageRenderer';
 
 const escapeLink = link => link.replace(/&/g, '&amp;');
 

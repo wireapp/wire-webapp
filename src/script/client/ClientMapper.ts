@@ -18,9 +18,11 @@
  */
 
 import type {PublicClient, RegisteredClient} from '@wireapp/api-client/lib/client';
+
+import {ClientEntity} from './ClientEntity';
+
 import {ClientRecord} from '../storage';
 import {isClientRecord} from '../util/TypePredicateUtil';
-import {ClientEntity} from './ClientEntity';
 
 export class ClientMapper {
   static get CONFIG() {

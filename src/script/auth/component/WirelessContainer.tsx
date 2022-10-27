@@ -17,14 +17,16 @@
  *
  */
 
-import {CloseIcon, Content, Footer, Header, Link, Small} from '@wireapp/react-ui-kit';
 import React from 'react';
+
+import {CloseIcon, Content, Footer, Header, Link, Small} from '@wireapp/react-ui-kit';
+import {SVGIcon} from '@wireapp/react-ui-kit/lib/Icon/SVGIcon';
 import {FormattedMessage, useIntl} from 'react-intl';
+
+import {Config} from '../../Config';
 import {cookiePolicyStrings, footerStrings} from '../../strings';
 import {EXTERNAL_ROUTE} from '../externalRoute';
-import {SVGIcon} from '@wireapp/react-ui-kit/lib/Icon/SVGIcon';
-import SVGProvider from '../util/SVGProvider';
-import {Config} from '../../Config';
+import {getSVG} from '../util/SVGProvider';
 
 export interface Props extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
@@ -32,7 +34,7 @@ export interface Props extends React.HTMLAttributes<HTMLDivElement> {
   showCookiePolicyBanner?: boolean;
 }
 
-export const WirelessContainer: React.FC<Props> = ({showCookiePolicyBanner, onCookiePolicyBannerClose, children}) => {
+const WirelessContainer: React.FC<Props> = ({showCookiePolicyBanner, onCookiePolicyBannerClose, children}) => {
   const {formatMessage: _} = useIntl();
   return (
     <div
@@ -93,7 +95,7 @@ export const WirelessContainer: React.FC<Props> = ({showCookiePolicyBanner, onCo
       <Content>
         <Header style={{height: '40px', marginLeft: '8px', marginTop: '20px'}}>
           <SVGIcon aria-hidden="true" scale={0.9} realWidth={78} realHeight={25}>
-            <g dangerouslySetInnerHTML={{__html: SVGProvider['logo-full-icon']?.documentElement?.innerHTML}} />
+            <g dangerouslySetInnerHTML={{__html: getSVG('logo-full-icon')?.documentElement?.innerHTML}} />
           </SVGIcon>
         </Header>
         <Content style={{flex: '1', paddingLeft: '8px', width: '100%'}}>{children}</Content>
@@ -106,4 +108,4 @@ export const WirelessContainer: React.FC<Props> = ({showCookiePolicyBanner, onCo
   );
 };
 
-export default WirelessContainer;
+export {WirelessContainer};

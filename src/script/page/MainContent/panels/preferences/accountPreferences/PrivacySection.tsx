@@ -18,16 +18,19 @@
  */
 
 import React from 'react';
-import {AppLockState} from '../../../../../user/AppLockState';
+
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
-import {t} from 'Util/LocalizerUtil';
+import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 import {container} from 'tsyringe';
+
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
+import {formatDurationCaption} from 'Util/TimeUtil';
+
 import {PropertiesRepository} from '../../../../../properties/PropertiesRepository';
 import {AppLockRepository} from '../../../../../user/AppLockRepository';
-import {formatDurationCaption} from 'Util/TimeUtil';
-import PreferencesSection from '../components/PreferencesSection';
-import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
+import {AppLockState} from '../../../../../user/AppLockState';
+import {PreferencesSection} from '../components/PreferencesSection';
 
 interface PrivacySectionProps {
   appLockRepository?: AppLockRepository;
@@ -91,4 +94,4 @@ const PrivacySection: React.FC<PrivacySectionProps> = ({
   );
 };
 
-export default PrivacySection;
+export {PrivacySection};
