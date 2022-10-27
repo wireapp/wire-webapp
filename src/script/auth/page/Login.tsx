@@ -213,6 +213,7 @@ const Login = ({
             break;
           }
           case BackendError.LABEL.INVALID_CREDENTIALS:
+          case BackendError.LABEL.SUSPENDED:
           case LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE: {
             break;
           }
