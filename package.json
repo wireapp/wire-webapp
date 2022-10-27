@@ -92,7 +92,7 @@
     "@wireapp/eslint-config": "2.0.0",
     "@wireapp/prettier-config": "0.5.0",
     "adm-zip": "0.5.9",
-    "autoprefixer": "9.8.8",
+    "autoprefixer": "10.4.12",
     "babel-loader": "8.2.5",
     "caniuse-lite": "^1.0.30001423",
     "concurrently": "7.5.0",
