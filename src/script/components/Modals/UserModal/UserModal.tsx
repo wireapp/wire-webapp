@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -34,15 +34,14 @@ import {useUserModalState} from './UserModalState';
 
 import {Config} from '../../../Config';
 import {User} from '../../../entity/User';
+import {RootContext} from '../../../page/RootProvider';
 import {Core} from '../../../service/CoreSingleton';
 import {TeamState} from '../../../team/TeamState';
 import {UserRepository} from '../../../user/UserRepository';
 import {UserState} from '../../../user/UserState';
-import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 
 export interface UserModalProps {
   userRepository: UserRepository;
-  actionsViewModel: ActionsViewModel;
   userState?: UserState;
   teamState?: TeamState;
   core?: Core;
@@ -52,7 +51,6 @@ const brandName = Config.getConfig().BRAND_NAME;
 
 interface UserModalUserActionsSectionProps {
   user: User;
-  actionsViewModel: ActionsViewModel;
   onAction: () => void;
   isSelfActivated: boolean;
   selfUser: User;
@@ -60,13 +58,13 @@ interface UserModalUserActionsSectionProps {
 
 const UserModalUserActionsSection: React.FC<UserModalUserActionsSectionProps> = ({
   user,
-  actionsViewModel,
   onAction,
   isSelfActivated,
   selfUser,
 }) => {
   const {isBlockedLegalHold} = useKoSubscribableChildren(user, ['isBlockedLegalHold']);
   const replaceLinkLegalHold = replaceLink(Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK, '', 'read-more-legal-hold');
+  const mainViewModel = useContext(RootContext);
 
   return isBlockedLegalHold ? (
     <div
@@ -75,19 +73,20 @@ const UserModalUserActionsSection: React.FC<UserModalUserActionsSectionProps> = 
       dangerouslySetInnerHTML={{__html: t('modalUserBlockedForLegalHold', {}, replaceLinkLegalHold)}}
     />
   ) : (
-    <UserActions
-      user={user}
-      actionsViewModel={actionsViewModel}
-      onAction={onAction}
-      isSelfActivated={isSelfActivated}
-      selfUser={selfUser}
-    />
+    mainViewModel && (
+      <UserActions
+        user={user}
+        actionsViewModel={mainViewModel.actions}
+        onAction={onAction}
+        isSelfActivated={isSelfActivated}
+        selfUser={selfUser}
+      />
+    )
   );
 };
 
 const UserModal: React.FC<UserModalProps> = ({
   userRepository,
-  actionsViewModel,
   core = container.resolve(Core),
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
@@ -159,7 +158,6 @@ const UserModal: React.FC<UserModalProps> = ({
 
               <UserModalUserActionsSection
                 user={user}
-                actionsViewModel={actionsViewModel}
                 onAction={hide}
                 isSelfActivated={isActivatedAccount}
                 selfUser={self}
