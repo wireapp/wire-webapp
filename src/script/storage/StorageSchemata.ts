@@ -420,7 +420,7 @@ export class StorageSchemata {
         upgrade: transaction => {
           dbMigrationStateStore.setDBMigrationState({storeName: transaction.db.name});
         },
-        version: 21,
+        version: 20,
       },
     ];
   }
