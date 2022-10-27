@@ -27,7 +27,8 @@ import {UserRepository} from 'src/script/user/UserRepository';
 import {UserState} from 'src/script/user/UserState';
 import {ActionsViewModel} from 'src/script/view_model/ActionsViewModel';
 
-import {UserModal} from './UserModal';
+import {UserModal, UserModalProps} from './UserModal';
+import {showUserModal} from './UserModalState';
 
 describe('UserModal', () => {
   it('correctly fetches user from user repository', async () => {
@@ -36,17 +37,16 @@ describe('UserModal', () => {
       return new User('mock-id', 'test-domain.mock');
     });
 
-    const props = {
+    const props: UserModalProps = {
       actionsViewModel: {} as ActionsViewModel,
       core: {} as Core,
       teamState: {} as TeamState,
-      userId: {domain: 'test-domain.mock', id: 'mock-id'},
       userRepository: {
         getUserById,
       } as unknown as UserRepository,
       userState: {} as UserState,
     };
-
+    showUserModal({domain: 'test-domain.mock', id: 'mock-id'});
     render(<UserModal {...props} />);
 
     expect(getUserById).toHaveBeenCalledTimes(1);
@@ -60,16 +60,17 @@ describe('UserModal', () => {
       return user;
     });
 
-    const props = {
+    const props: UserModalProps = {
       actionsViewModel: {} as ActionsViewModel,
       core: {} as Core,
       teamState: {} as TeamState,
-      userId: {domain: 'test-domain.mock', id: 'mock-id'},
       userRepository: {
         getUserById,
       } as unknown as UserRepository,
       userState: {} as UserState,
     };
+
+    showUserModal({domain: 'test-domain.mock', id: 'mock-id'});
 
     const {getByTestId} = render(<UserModal {...props} />);
 

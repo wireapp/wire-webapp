@@ -35,6 +35,7 @@ import {PanelEntity, PanelState, RightSidebar} from './RightSidebar';
 import {RootProvider} from './RootProvider';
 import {useAppMainState, ViewType} from './state';
 
+import {UserModal} from '../components/Modals/UserModal';
 import {User} from '../entity/User';
 import {TeamState} from '../team/TeamState';
 import {UserState} from '../user/UserState';
@@ -125,7 +126,7 @@ const AppContainer: FC<AppContainerProps> = ({root}) => {
           />
 
           {/*The order of these elements matter to show proper modals stack upon each other*/}
-          <div id="user-modal-container"></div>
+          <UserModal actionsViewModel={root.actions} userRepository={repositories.user} />
           <PrimaryModalComponent />
           <GroupCreationModal userState={userState} teamState={teamState} />
         </main>
