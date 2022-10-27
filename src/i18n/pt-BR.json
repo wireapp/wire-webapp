@@ -89,7 +89,7 @@
   "accessibility.conversationStatusUnreadPing": "Ping perdido",
   "accessibility.conversationStatusUnreadReply": "Resposta não lida",
   "accessibility.giphyModal.close": "Fechar a janela 'GIF'",
-  "accessibility.giphyModal.loading": "Carregando gif",
+  "accessibility.giphyModal.loading": "Loading giphy",
   "accessibility.giphyModal.selectGif": "Selecionar gif",
   "accessibility.giphyModal.sendGif": "Enviar gif",
   "accessibility.giphyModal.showGifs": "Abrir todos os gifs",
