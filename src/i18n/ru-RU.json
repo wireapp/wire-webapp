@@ -89,7 +89,7 @@
   "accessibility.conversationStatusUnreadPing": "Пропущенный пинг",
   "accessibility.conversationStatusUnreadReply": "Непрочитанный ответ",
   "accessibility.giphyModal.close": "Закрыть окно GIF",
-  "accessibility.giphyModal.loading": "Загрузка GIF",
+  "accessibility.giphyModal.loading": "Loading giphy",
   "accessibility.giphyModal.selectGif": "Выбрать GIF",
   "accessibility.giphyModal.sendGif": "Отправить GIF",
   "accessibility.giphyModal.showGifs": "Открыть все GIF",
