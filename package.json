@@ -127,7 +127,6 @@
     "grunt-contrib-copy": "1.0.0",
     "grunt-contrib-watch": "1.1.0",
     "grunt-include-replace": "5.0.0",
-    "grunt-open": "0.2.4",
     "grunt-postcss": "0.9.0",
     "grunt-shell": "4.0.0",
     "husky": "7.0.4",
@@ -196,7 +195,7 @@
     "grunt-legacy-util/getobject": "^1.1.0"
   },
   "scripts": {
-    "build:prod": "yarn build:server && grunt build_prod",
+    "build:prod": "yarn build:server && yarn bundle:prod && grunt build_prod",
     "build:server": "cd server && yarn build",
     "build:style": "node ./bin/less.js",
     "bundle:dev": "webpack --config webpack.config.dev.js --progress",
@@ -205,9 +204,8 @@
     "changelog:dev": "ts-node ./bin/changelog.ts dev",
     "changelog:rc": "ts-node ./bin/changelog.ts master",
     "configure": "copy-config",
-    "deploy": "yarn && yarn build:prod && eb deploy",
+    "deploy": "yarn build:prod && eb deploy",
     "dev": "yarn start",
-    "dist": "grunt build",
     "docker": "node ./bin/push_docker.js",
     "fix": "yarn fix:other && yarn fix:code",
     "fix:other": "yarn prettier --write && yarn stylelint --fix",
