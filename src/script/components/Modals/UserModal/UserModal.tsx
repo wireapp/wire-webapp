@@ -30,7 +30,7 @@ import {UserDetails} from 'Components/panel/UserDetails';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 
-import {useUserModalState} from './UserModalState';
+import {useUserModalState} from './UserModal.state';
 
 import {Config} from '../../../Config';
 import {User} from '../../../entity/User';

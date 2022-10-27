@@ -19,4 +19,4 @@
 
 export * from './UserModal';
 
-export {showUserModal} from './UserModalState';
+export {showUserModal} from './UserModal.state';
