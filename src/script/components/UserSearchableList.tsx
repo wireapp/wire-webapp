@@ -58,7 +58,7 @@ const UserSearchableList: React.FC<UserListProps> = ({
   dataUieName = '',
   filter = '',
   highlightedUsers,
-  selected: selectedUsers = [],
+  selected: selectedUsers,
   users,
   ...props
 }) => {
@@ -140,13 +140,15 @@ const UserSearchableList: React.FC<UserListProps> = ({
     );
   };
 
-  const toggleUserSelection = (user: User) => {
-    if (selectedUsers.find(selectedUser => selectedUser.id === user.id)) {
-      onUpdateSelectedUsers?.([...selectedUsers].filter(selectedUser => selectedUser.id !== user.id));
-    } else {
-      onUpdateSelectedUsers?.([...selectedUsers, user]);
-    }
-  };
+  const toggleUserSelection = selectedUsers
+    ? (user: User) => {
+        if (selectedUsers.find(selectedUser => selectedUser.id === user.id)) {
+          onUpdateSelectedUsers?.([...selectedUsers].filter(selectedUser => selectedUser.id !== user.id));
+        } else {
+          onUpdateSelectedUsers?.([...selectedUsers, user]);
+        }
+      }
+    : undefined;
 
   const userList = foundUserEntities();
   const isEmptyUserList = userList.length === 0;
@@ -166,9 +168,7 @@ const UserSearchableList: React.FC<UserListProps> = ({
           users={userList}
           selectedUsers={selectedUsers}
           highlightedUsers={highlightedUsers}
-          {...(!!selectedUsers && {
-            onSelectUser: toggleUserSelection,
-          })}
+          onSelectUser={toggleUserSelection}
         />
       )}
     </div>
