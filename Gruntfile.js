@@ -57,7 +57,6 @@ module.exports = grunt => {
       dist_s3: '<%= dir.dist.s3 %>',
     },
     compress: require('./grunt/config/compress'),
-    copy: require('./grunt/config/copy'),
     includereplace: require('./grunt/config/includereplace'),
     postcss: require('./grunt/config/postcss'),
     shell: require('./grunt/config/shell'),
@@ -65,7 +64,7 @@ module.exports = grunt => {
   });
   /* eslint-enable sort-keys-fix/sort-keys-fix */
 
-  grunt.registerTask('build', ['set_version', 'build_style', 'copy', 'build_markup']);
+  grunt.registerTask('build', ['set_version', 'build_style', 'build_markup']);
 
   grunt.registerTask('build_style', ['shell:less', 'postcss']);
 
