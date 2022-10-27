@@ -21,9 +21,9 @@ import {amplify} from 'amplify';
 import jQuery from 'jquery';
 import ko from 'knockout';
 
-import {WireModule} from './Wire.types';
+import {t} from 'Util/LocalizerUtil';
 
-import {t} from '../script/util/LocalizerUtil';
+import {WireModule} from './Wire.types';
 
 declare global {
   interface Window {
