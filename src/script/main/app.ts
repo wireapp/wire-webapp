@@ -712,12 +712,7 @@ class App {
       '/preferences/devices': () => mainView.list.openPreferencesDevices(),
       '/preferences/options': () => mainView.list.openPreferencesOptions(),
       '/user/:userId(/:domain)': (userId: string, domain: string = this.apiClient.context?.domain ?? '') => {
-        showUserModal({
-          actionsViewModel: mainView.actions,
-          onClose: () => router.navigate('/'),
-          userId: {domain, id: userId},
-          userRepository: this.repository.user,
-        });
+        showUserModal({domain, id: userId}, () => router.navigate('/'));
       },
     });
     initRouterBindings(router);

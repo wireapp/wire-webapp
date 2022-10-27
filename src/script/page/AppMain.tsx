@@ -26,6 +26,7 @@ import {CallingContainer} from 'Components/calling/CallingOverlayContainer';
 import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationModal';
 import {LegalHoldModal} from 'Components/Modals/LegalHoldModal/LegalHoldModal';
 import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
+import {UserModal} from 'Components/Modals/UserModal';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {AppLock} from './AppLock';
@@ -125,7 +126,7 @@ const AppContainer: FC<AppContainerProps> = ({root}) => {
           />
 
           {/*The order of these elements matter to show proper modals stack upon each other*/}
-          <div id="user-modal-container"></div>
+          <UserModal userRepository={repositories.user} />
           <PrimaryModalComponent />
           <GroupCreationModal userState={userState} teamState={teamState} />
         </main>
