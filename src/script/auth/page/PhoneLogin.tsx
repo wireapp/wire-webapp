@@ -17,6 +17,8 @@
  *
  */
 
+import React, {useState} from 'react';
+
 import {
   ForbiddenPhoneNumberError,
   InvalidPhoneNumberError,
@@ -24,11 +26,12 @@ import {
   PasswordExistsError,
 } from '@wireapp/api-client/lib/auth';
 import {ClientType} from '@wireapp/api-client/lib/client/index';
+import {Runtime} from '@wireapp/commons';
 import {
   ArrowIcon,
-  COLOR,
   Checkbox,
   CheckboxLabel,
+  COLOR,
   Column,
   Columns,
   Container,
@@ -37,27 +40,27 @@ import {
   H1,
   IsMobile,
 } from '@wireapp/react-ui-kit';
-import React, {useState} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {AnyAction, Dispatch} from 'redux';
 import {useNavigate} from 'react-router-dom';
+import {AnyAction, Dispatch} from 'redux';
+
+import {Page} from './Page';
+
 import {loginStrings, phoneLoginStrings} from '../../strings';
-import AppAlreadyOpen from '../component/AppAlreadyOpen';
-import PhoneLoginForm from '../component/PhoneLoginForm';
+import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
+import {PhoneLoginForm} from '../component/PhoneLoginForm';
+import {RouterLink} from '../component/RouterLink';
 import {actionRoot} from '../module/action';
 import {ValidationError} from '../module/action/ValidationError';
-import {RootState, bindActionCreators} from '../module/reducer';
+import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
-import {Runtime} from '@wireapp/commons';
 import {isValidationError, parseError, parseValidationErrors} from '../util/errorUtil';
-import Page from './Page';
-import RouterLink from '../component/RouterLink';
 
-interface Props extends React.HTMLProps<HTMLDivElement> {}
+type Props = React.HTMLProps<HTMLDivElement>;
 
-const PhoneLogin = ({
+const PhoneLoginComponent = ({
   pushLoginData,
   doSendPhoneLoginCode,
   isFetching,
@@ -149,6 +152,9 @@ const PhoneLogin = ({
           <Column />
         </Columns>
       </Container>
+      <IsMobile>
+        <div style={{minWidth: 48}} />
+      </IsMobile>
     </Page>
   );
 };
@@ -169,4 +175,6 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(mapStateToProps, mapDispatchToProps)(PhoneLogin);
+const PhoneLogin = connect(mapStateToProps, mapDispatchToProps)(PhoneLoginComponent);
+
+export {PhoneLogin};

@@ -17,11 +17,14 @@
  *
  */
 
-import {User} from '../../../../../entity/User';
-import TopContact from './topPeople/TopContact';
 import React from 'react';
+
 import {container} from 'tsyringe';
+
+import {TopContact} from './topPeople/TopContact';
+
 import {AssetRepository} from '../../../../../assets/AssetRepository';
+import {User} from '../../../../../entity/User';
 
 interface TopPeopleProps {
   clickOnUser: (user: User, event: React.UIEvent) => void;
@@ -39,4 +42,4 @@ const TopPeople: React.FC<TopPeopleProps> = ({clickOnUser, max, users}) => {
   return <div className="search-list search-list-sm">{searchListItems}</div>;
 };
 
-export default TopPeople;
+export {TopPeople};

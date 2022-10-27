@@ -17,9 +17,11 @@
  *
  */
 
-import GroupAvatar from './GroupAvatar';
-import {User} from '../../entity/User';
 import {render} from '@testing-library/react';
+
+import {GroupAvatar} from './GroupAvatar';
+
+import {User} from '../../entity/User';
 
 describe('GroupAvatar', () => {
   it('renders avatar', async () => {

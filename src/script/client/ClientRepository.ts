@@ -17,32 +17,35 @@
  *
  */
 
-import ko from 'knockout';
-import {ClientType, PublicClient, RegisteredClient, ClientCapability} from '@wireapp/api-client/lib/client/';
-import {USER_EVENT, UserClientAddEvent, UserClientRemoveEvent} from '@wireapp/api-client/lib/event';
+import {ClientCapability, ClientType, PublicClient, RegisteredClient} from '@wireapp/api-client/lib/client/';
+import {UserClientAddEvent, UserClientRemoveEvent, USER_EVENT} from '@wireapp/api-client/lib/event';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {Runtime} from '@wireapp/commons';
-import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {container} from 'tsyringe';
+import ko from 'knockout';
 import murmurhash from 'murmurhash';
+import {container} from 'tsyringe';
+
 import {t} from 'Util/LocalizerUtil';
-import {Logger, getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 import {loadValue} from 'Util/StorageUtil';
-import {SIGN_OUT_REASON} from '../auth/SignOutReason';
-import {StorageKey} from '../storage/StorageKey';
-import {ModalsViewModel} from '../view_model/ModalsViewModel';
+
 import {ClientEntity} from './ClientEntity';
 import {ClientMapper} from './ClientMapper';
 import type {ClientService} from './ClientService';
+import {ClientState} from './ClientState';
+
+import {SIGN_OUT_REASON} from '../auth/SignOutReason';
+import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import type {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import type {User} from '../entity/User';
 import {ClientError} from '../error/ClientError';
-import {ClientRecord, StorageRepository} from '../storage';
-import {ClientState} from './ClientState';
-import {matchQualifiedIds} from 'Util/QualifiedId';
 import {Core} from '../service/CoreSingleton';
+import {ClientRecord, StorageRepository} from '../storage';
+import {StorageKey} from '../storage/StorageKey';
 
 export type UserClientEntityMap = {[userId: string]: ClientEntity[]};
 export type QualifiedUserClientEntityMap = {[domain: string]: UserClientEntityMap};
@@ -289,7 +292,7 @@ export class ClientRepository {
    */
   async deleteClient(clientId: string, password?: string): Promise<ClientEntity[]> {
     const selfUser = this.selfUser();
-    await this.core.service.client.deleteClient(clientId, password);
+    await this.core.service!.client.deleteClient(clientId, password);
     selfUser.removeClient(clientId);
     amplify.publish(WebAppEvents.USER.CLIENT_REMOVED, selfUser.qualifiedId, clientId);
     return this.clientState.clients();
@@ -308,7 +311,7 @@ export class ClientRepository {
         await this.deleteLocalTemporaryClient();
         amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, true);
       } else {
-        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.OPTION, {
+        PrimaryModal.show(PrimaryModal.type.OPTION, {
           preventClose: true,
           primaryAction: {
             action: (clearData: boolean) => {
@@ -568,9 +571,8 @@ export class ClientRepository {
     const localClients = await this.getClientsForSelf();
     const removedClient = localClients.find(client => client.id === clientId);
     if (removedClient?.isLegalHold()) {
-      amplify.publish(
-        WebAppEvents.WARNING.MODAL,
-        ModalsViewModel.TYPE.ACKNOWLEDGE,
+      PrimaryModal.show(
+        PrimaryModal.type.ACKNOWLEDGE,
         {
           text: {
             message: t('modalLegalHoldDeactivatedMessage'),

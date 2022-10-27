@@ -21,8 +21,9 @@ import {useEffect, useState} from 'react';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-import type {Participant} from '../calling/Participant';
 import {Call} from './Call';
+
+import type {Participant} from '../calling/Participant';
 
 export interface Grid {
   grid: Participant[];

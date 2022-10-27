@@ -30,7 +30,10 @@
 
   &__page {
     display: flex;
+    height: 100%;
     flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: overlay;
 
     &--move-out--left,
     &--move-out--right,
@@ -94,22 +97,13 @@
         right: -@panel-width;
       }
     }
-
-    &--visible {
-      height: 100%;
-      opacity: 1;
-    }
-
-    &:not(&--visible) {
-      opacity: 0;
-    }
   }
 
   &__content {
     position: relative;
     display: flex;
-    overflow: hidden;
     width: @panel-width;
+    min-height: @panel-content-min-height;
     flex-direction: column;
     overflow-x: hidden;
     overflow-y: auto;
@@ -381,7 +375,7 @@
       justify-content: center;
     }
 
-    .service-icon svg {
+    .service-icon {
       width: 16px;
       height: 16px;
     }
@@ -397,7 +391,6 @@
     min-height: @content-title-bar-height;
     align-items: center;
     justify-content: space-between;
-    opacity: 1;
 
     & > .icon-button {
       display: flex;
@@ -463,10 +456,9 @@
     margin-bottom: -1px;
     color: var(--background);
     cursor: pointer;
-    font-size: 11px;
-    font-weight: 600;
+    font-size: @font-size-medium;
+    font-weight: @font-weight-semibold;
     opacity: 0.56;
-    text-transform: uppercase;
 
     &--active {
       border-bottom-color: var(--background-fade-32);
@@ -484,7 +476,8 @@
   }
 }
 
-button.panel__action-item {
+button.panel__action-item,
+.panel__action-button {
   .button-states();
   .text-medium;
 }

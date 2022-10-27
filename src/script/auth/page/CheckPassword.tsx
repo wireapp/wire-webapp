@@ -17,6 +17,8 @@
  *
  */
 
+import React, {useEffect, useRef, useState} from 'react';
+
 import {LoginData} from '@wireapp/api-client/lib/auth';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {
@@ -31,26 +33,32 @@ import {
   Loading,
   RoundIconButton,
 } from '@wireapp/react-ui-kit';
-import React, {useEffect, useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {AnyAction, Dispatch} from 'redux';
 import {useNavigate} from 'react-router-dom';
+import {AnyAction, Dispatch} from 'redux';
+
+import {Page} from './Page';
+
 import {loginStrings, phoneLoginStrings} from '../../strings';
-import Exception from '../component/Exception';
+import {Exception} from '../component/Exception';
 import {EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot} from '../module/action';
 import {LabeledError} from '../module/action/LabeledError';
 import {ValidationError} from '../module/action/ValidationError';
-import {RootState, bindActionCreators} from '../module/reducer';
+import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
 import * as UrlUtil from '../util/urlUtil';
-import Page from './Page';
 
-interface Props extends React.HTMLProps<HTMLDivElement> {}
+type Props = React.HTMLProps<HTMLDivElement>;
 
-const CheckPassword = ({loginData, doLogin, resetAuthError, isFetching}: Props & ConnectedProps & DispatchProps) => {
+const CheckPasswordComponent = ({
+  loginData,
+  doLogin,
+  resetAuthError,
+  isFetching,
+}: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
   const navigate = useNavigate();
 
@@ -182,4 +190,6 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(mapStateToProps, mapDispatchToProps)(CheckPassword);
+const CheckPassword = connect(mapStateToProps, mapDispatchToProps)(CheckPasswordComponent);
+
+export {CheckPassword};

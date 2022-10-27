@@ -17,19 +17,22 @@
  *
  */
 
-import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/lib/event/';
-import {createRandomUuid} from 'Util/util';
-import {ClientEvent} from 'src/script/event/Client';
-import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
-import {EventRepository} from 'src/script/event/EventRepository';
+import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
+
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 import {EventError} from 'src/script/error/EventError';
-import {TestFactory} from '../../../test/helper/TestFactory';
-import {EventSource} from './EventSource';
-import {EventRecord} from '../storage';
+import {ClientEvent} from 'src/script/event/Client';
+import {EventRepository} from 'src/script/event/EventRepository';
+import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
+import {createRandomUuid} from 'Util/util';
+
 import {EventService} from './EventService';
+import {EventSource} from './EventSource';
+
+import {TestFactory} from '../../../test/helper/TestFactory';
 import {StatusType} from '../message/StatusType';
+import {EventRecord} from '../storage';
 
 const testFactory = new TestFactory();
 

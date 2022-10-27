@@ -18,7 +18,8 @@
  */
 
 import React from 'react';
-import Icon from './Icon';
+
+import {Icon} from './Icon';
 
 export interface VerifiedIconProps {
   className?: string;
@@ -37,4 +38,4 @@ const VerifiedIcon: React.FC<VerifiedIconProps> = ({isVerified, dataUieName, cla
   );
 };
 
-export default VerifiedIcon;
+export {VerifiedIcon};

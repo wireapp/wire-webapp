@@ -18,6 +18,7 @@
  */
 
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
+
 import {BaseError} from './BaseError';
 
 export class BackendClientError extends BaseError {

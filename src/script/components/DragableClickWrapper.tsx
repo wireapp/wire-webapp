@@ -18,6 +18,7 @@
  */
 
 import React from 'react';
+
 import {Runtime} from '@wireapp/commons';
 
 interface DragableClickWrapperProps {
@@ -61,4 +62,4 @@ const DragableClickWrapper: React.FC<DragableClickWrapperProps> = ({onClick, chi
   });
 };
 
-export default DragableClickWrapper;
+export {DragableClickWrapper};

@@ -18,12 +18,14 @@
  */
 
 import React, {useEffect, useLayoutEffect, useRef} from 'react';
-import {registerReactComponent} from 'Util/ComponentUtil';
+
+import {isRemovalAction, isEnterKey} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
+
+import {Icon} from './Icon';
+
 import type {User} from '../entity/User';
 import {MAX_HANDLE_LENGTH} from '../user/UserHandleGenerator';
-import {isEnterKey, isRemovalAction} from 'Util/KeyboardUtil';
-import Icon from 'Components/Icon';
-import {t} from 'Util/LocalizerUtil';
 
 export interface SearchInputProps {
   enter?: () => void | Promise<void>;
@@ -113,6 +115,4 @@ const SearchInput: React.FC<SearchInputProps> = ({
   );
 };
 
-export default SearchInput;
-
-registerReactComponent('user-input', SearchInput);
+export {SearchInput};

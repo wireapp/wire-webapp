@@ -18,6 +18,7 @@
  */
 
 import React from 'react';
+
 import {t} from 'Util/LocalizerUtil';
 
 export interface MissedMessageProps {}
@@ -33,4 +34,4 @@ const MissedMessage: React.FC<MissedMessageProps> = ({}) => {
   );
 };
 
-export default MissedMessage;
+export {MissedMessage};

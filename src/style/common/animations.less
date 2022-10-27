@@ -72,3 +72,121 @@
     }
   }
 }
+
+.right-column {
+  animation: slide-left @animation-timing-fast ease;
+}
+
+@keyframes slide-left {
+  0% {
+    transform: translateX(304px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.right-to-left-enter,
+.right-to-left-exit,
+.left-to-right-enter,
+.left-to-right-exit {
+  position: absolute;
+  top: 0;
+}
+
+// new
+.right-to-left-enter {
+  .panel__header {
+    opacity: 0;
+  }
+
+  .panel__content,
+  .panel__footer {
+    transform: translateX(@panel-width);
+  }
+}
+
+.right-to-left-enter-active {
+  .panel__header {
+    opacity: 1;
+    transition: opacity @animation-timing-fast @ease-out-quart;
+  }
+
+  .panel__content,
+  .panel__footer {
+    transform: translateX(0);
+    transition: transform @animation-timing-fast @ease-out-quart;
+  }
+}
+
+.right-to-left-exit {
+  .panel__header {
+    opacity: 1;
+  }
+
+  .panel__content,
+  .panel__footer {
+    transform: translateX(0);
+  }
+}
+
+.right-to-left-exit-active {
+  .panel__header {
+    opacity: 0;
+    transition: opacity @animation-timing-fast @ease-out-quart;
+  }
+
+  .panel__content,
+  .panel__footer {
+    transform: translateX(-@panel-width);
+    transition: transform @animation-timing-fast @ease-out-quart;
+  }
+}
+
+.left-to-right-enter {
+  .panel__header {
+    opacity: 0;
+  }
+
+  .panel__content,
+  .panel__footer {
+    transform: translateX(-@panel-width);
+  }
+}
+
+.left-to-right-enter-active {
+  .panel__header {
+    opacity: 1;
+    transition: opacity @animation-timing-fast @ease-out-quart;
+  }
+
+  .panel__content,
+  .panel__footer {
+    transform: translateX(0);
+    transition: transform @animation-timing-fast @ease-out-quart;
+  }
+}
+
+.left-to-right-exit {
+  .panel__header {
+    opacity: 1;
+  }
+
+  .panel__content,
+  .panel__footer {
+    transform: translateX(0);
+  }
+}
+
+.left-to-right-exit-active {
+  .panel__header {
+    opacity: 0;
+    transition: opacity @animation-timing-fast @ease-out-quart;
+  }
+
+  .panel__content,
+  .panel__footer {
+    transform: translateX(@panel-width);
+    transition: transform @animation-timing-fast @ease-out-quart;
+  }
+}

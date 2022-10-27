@@ -17,82 +17,8 @@
  *
  */
 
-import ko from 'knockout';
-import {container} from 'tsyringe';
 import 'jquery-mousewheel';
-
-import {
-  isArrowKey,
-  isPageUpDownKey,
-  isMetaKey,
-  isTabKey,
-  isPasteAction,
-  isEnterKey,
-  isSpaceKey,
-  isFunctionKey,
-} from 'Util/KeyboardUtil';
-import {noop} from 'Util/util';
-
-import {viewportObserver} from '../../ui/viewportObserver';
-import {AssetRepository} from '../../assets/AssetRepository';
-
-/**
- * Focus input field when user starts typing if no other input field or textarea is selected.
- */
-ko.bindingHandlers.focus_on_keydown = {
-  init(element, _valueAccessor, _allBindings, _data, context) {
-    return ko.applyBindingsToNode(
-      window as any,
-      {
-        event: {
-          keydown(_data: unknown, jquery_event: JQuery.Event<HTMLElement, KeyboardEvent>) {
-            if ($('.detail-view').hasClass('modal-show')) {
-              return false;
-            }
-            const keyboard_event = (jquery_event.originalEvent || jquery_event) as KeyboardEvent;
-            // check for activeElement needed, because in IE11 it could be undefined under some circumstances
-            const active_element_is_input =
-              document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName);
-            const is_pageupdown_key = isPageUpDownKey(keyboard_event);
-
-            if (is_pageupdown_key) {
-              (document.activeElement as HTMLElement).blur();
-            } else if (
-              !active_element_is_input &&
-              !isArrowKey(keyboard_event) &&
-              !isTabKey(keyboard_event) &&
-              !isEnterKey(keyboard_event) &&
-              !isSpaceKey(keyboard_event) &&
-              !isFunctionKey(keyboard_event)
-            ) {
-              if (!isMetaKey(keyboard_event) || isPasteAction(keyboard_event)) {
-                element.focus();
-              }
-            }
-
-            return true;
-          },
-        },
-      },
-      context,
-    );
-  },
-};
-
-/**
- * Show timestamp when hovering over the element.
- */
-ko.bindingHandlers.showAllTimestamps = {
-  init(element) {
-    const toggleShowTimeStamp = (force?: boolean) => {
-      const times = document.querySelectorAll('.time');
-      times.forEach(time => time.classList.toggle('show-timestamp', force));
-    };
-
-    element.addEventListener('mouseenter', () => toggleShowTimeStamp(true));
-    element.addEventListener('mouseleave', () => toggleShowTimeStamp(false));
-  },
-};
+import ko from 'knockout';
 
 ko.bindingHandlers.infinite_scroll = {
   init(scrollingElement: HTMLElement, params: () => {onHitBottom: () => void; onHitTop: () => void}) {
@@ -133,42 +59,6 @@ ko.bindingHandlers.infinite_scroll = {
     ko.utils.domNodeDisposal.addDisposeCallback(scrollingElement, () => {
       scrollingElement.removeEventListener('scroll', onScroll);
       scrollingElement.removeEventListener('wheel', onMouseWheel);
-    });
-  },
-};
-
-/**
- * Start loading image once they are in the viewport.
- */
-ko.bindingHandlers.background_image = {
-  init(element, valueAccessor) {
-    const assetRepository = container.resolve(AssetRepository);
-    const asset = valueAccessor();
-
-    if (!asset) {
-      return;
-    }
-
-    const imageElement = $(element).find('img');
-    let objectUrl: string;
-
-    const loadImage = () => {
-      assetRepository
-        .load(asset)
-        .then(blob => {
-          objectUrl = window.URL.createObjectURL(blob);
-          imageElement[0].src = objectUrl;
-        })
-        .catch(noop);
-    };
-
-    viewportObserver.onElementInViewport(element, loadImage);
-
-    ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
-      viewportObserver.removeElement(element);
-      if (objectUrl) {
-        window.URL.revokeObjectURL(objectUrl);
-      }
     });
   },
 };

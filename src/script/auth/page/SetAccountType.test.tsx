@@ -18,12 +18,13 @@
  */
 
 import {TypeUtil} from '@wireapp/commons';
+
+import {SetAccountType} from './SetAccountType';
+
+import {Config, Configuration} from '../../Config';
 import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
-import SetAccountType from './SetAccountType';
-import {Config, Configuration} from '../../Config';
-
 jest.mock('../util/SVGProvider');
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),

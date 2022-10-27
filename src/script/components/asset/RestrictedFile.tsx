@@ -18,8 +18,8 @@
  */
 
 import React from 'react';
-import {FileAsset} from 'src/script/entity/message/FileAsset';
 
+import {FileAsset} from 'src/script/entity/message/FileAsset';
 import {t} from 'Util/LocalizerUtil';
 import {trimFileExtension} from 'Util/util';
 
@@ -48,4 +48,4 @@ const RestrictedFile: React.FC<RestrictedFileProps> = ({asset}) => {
   );
 };
 
-export default RestrictedFile;
+export {RestrictedFile};

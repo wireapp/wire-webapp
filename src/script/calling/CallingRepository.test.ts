@@ -18,28 +18,29 @@
  */
 
 import 'jsdom-worker';
-
-import ko, {Subscription} from 'knockout';
-import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {CONV_TYPE, CALL_TYPE, STATE as CALL_STATE, REASON, Wcall} from '@wireapp/avs';
-import {CallingRepository} from 'src/script/calling/CallingRepository';
-import {EventRepository} from 'src/script/event/EventRepository';
-import {Participant} from 'src/script/calling/Participant';
+import {amplify} from 'amplify';
+import ko, {Subscription} from 'knockout';
+
 import {Call} from 'src/script/calling/Call';
+import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {CallState} from 'src/script/calling/CallState';
-import {User} from 'src/script/entity/User';
-import {MediaType} from 'src/script/media/MediaType';
+import {Participant} from 'src/script/calling/Participant';
 import {Conversation} from 'src/script/entity/Conversation';
-import {ModalsViewModel} from 'src/script/view_model/ModalsViewModel';
+import {User} from 'src/script/entity/User';
+import {EventRepository} from 'src/script/event/EventRepository';
+import {MediaType} from 'src/script/media/MediaType';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
-import {createRandomUuid} from 'Util/util';
 import {TestFactory} from 'test/helper/TestFactory';
-import {MediaDevicesHandler} from '../media/MediaDevicesHandler';
+import {createRandomUuid} from 'Util/util';
+
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
-import {CALL} from '../event/Client';
-import {UserRepository} from '../user/UserRepository';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
+
+import {usePrimaryModalState} from '../components/Modals/PrimaryModal';
+import {CALL} from '../event/Client';
+import {MediaDevicesHandler} from '../media/MediaDevicesHandler';
+import {UserRepository} from '../user/UserRepository';
 
 const createSelfParticipant = () => {
   const selfUser = new User();
@@ -103,12 +104,7 @@ describe('CallingRepository', () => {
       spyOn(wCall, 'start');
       callingRepository.startCall(conversationId, conversationType, callType).catch(done);
       setTimeout(() => {
-        expect(amplify.publish).toHaveBeenCalledWith(
-          WebAppEvents.WARNING.MODAL,
-          ModalsViewModel.TYPE.CONFIRM,
-          jasmine.any(Object),
-        );
-
+        expect(usePrimaryModalState.getState().currentModalId).not.toBeNull();
         expect(wCall.start).not.toHaveBeenCalled();
         done();
       }, 10);
@@ -179,7 +175,7 @@ describe('CallingRepository', () => {
       const call = new Call(userId, createConversationId(), CONV_TYPE.CONFERENCE, selfParticipant, CALL_TYPE.NORMAL, {
         currentAvailableDeviceId: mediaDevices,
       } as MediaDevicesHandler);
-      const source = new RTCAudioSource();
+      const source = new window.RTCAudioSource();
       const audioTrack = source.createTrack();
       const selfMediaStream = new MediaStream([audioTrack]);
       selfParticipant.audioStream(selfMediaStream);
@@ -208,7 +204,7 @@ describe('CallingRepository', () => {
           currentAvailableDeviceId: mediaDevices,
         } as MediaDevicesHandler,
       );
-      const source = new RTCAudioSource();
+      const source = new window.RTCAudioSource();
       const audioTrack = source.createTrack();
       const selfMediaStream = new MediaStream([audioTrack]);
       spyOn(callingRepository['mediaStreamHandler'], 'requestMediaStream').and.returnValue(
@@ -395,6 +391,7 @@ describe('CallingRepository ISO', () => {
   });
 });
 
+// eslint-disable-next-line jest/no-disabled-tests
 describe.skip('E2E audio call', () => {
   const messageRepository = {
     grantMessage: () => Promise.resolve(true),
@@ -416,10 +413,10 @@ describe.skip('E2E audio call', () => {
   beforeAll(() => {
     spyOn(client, 'fetchConfig').and.returnValue(Promise.resolve({ice_servers: []}));
     spyOn<any>(client, 'getCallMediaStream').and.returnValue(
-      Promise.resolve(new MediaStream([new RTCAudioSource().createTrack()])),
+      Promise.resolve(new MediaStream([new window.RTCAudioSource().createTrack()])),
     );
     spyOn<any>(client, 'getMediaStream').and.returnValue(
-      Promise.resolve(new MediaStream([new RTCAudioSource().createTrack()])),
+      Promise.resolve(new MediaStream([new window.RTCAudioSource().createTrack()])),
     );
     spyOn(client, 'onCallEvent').and.callThrough();
     spyOn<any>(client, 'updateParticipantStream').and.callThrough();

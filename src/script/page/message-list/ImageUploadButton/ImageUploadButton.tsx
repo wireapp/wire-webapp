@@ -18,8 +18,10 @@
  */
 
 import {useRef} from 'react';
+
+import {Icon} from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
-import Icon from 'Components/Icon';
+
 import {Config} from '../../../Config';
 
 interface ImageUploadButtonProps {

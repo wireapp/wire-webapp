@@ -18,17 +18,20 @@
  */
 
 import React from 'react';
-import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
-import {User} from '../../../../../entity/User';
-import {t} from 'Util/LocalizerUtil';
-import FileInput from './FileInput';
-import {UserError} from '../../../../../error/UserError';
-import {Config} from '../../../../../Config';
-import {UserRepository} from '../../../../../user/UserRepository';
-import {validateProfileImageResolution} from 'Util/util';
-import {getLogger} from 'Util/Logger';
-import {modals, ModalsViewModel} from '../../../../../view_model/ModalsViewModel';
+
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {handleKeyDown} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
+import {getLogger} from 'Util/Logger';
+import {validateProfileImageResolution} from 'Util/util';
+
+import {FileInput} from './FileInput';
+
+import {Config} from '../../../../../Config';
+import {User} from '../../../../../entity/User';
+import {UserError} from '../../../../../error/UserError';
+import {UserRepository} from '../../../../../user/UserRepository';
 
 interface AvatarInputProps {
   isActivatedAccount: boolean;
@@ -48,7 +51,7 @@ const AvatarInput: React.FC<AvatarInputProps> = ({selfUser, isActivatedAccount, 
 
   const showUploadWarning = (title: string, message: string): Promise<never> => {
     const modalOptions = {text: {message, title}};
-    modals.showModal(ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions, undefined);
+    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, modalOptions, undefined);
     return Promise.reject(new UserError(UserError.TYPE.INVALID_UPDATE, UserError.MESSAGE.INVALID_UPDATE));
   };
 
@@ -133,4 +136,4 @@ const AvatarInput: React.FC<AvatarInputProps> = ({selfUser, isActivatedAccount, 
   );
 };
 
-export default AvatarInput;
+export {AvatarInput};

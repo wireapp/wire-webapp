@@ -17,9 +17,9 @@
  *
  */
 
-import {singleton} from 'tsyringe';
-import ko from 'knockout';
 import {AudioPreference} from '@wireapp/api-client/lib/user/data/';
+import ko from 'knockout';
+import {singleton} from 'tsyringe';
 
 @singleton()
 export class AudioState {

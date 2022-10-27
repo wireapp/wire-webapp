@@ -18,8 +18,8 @@
  */
 
 import React, {useId} from 'react';
+
 import cx from 'classnames';
-import {registerReactComponent} from 'Util/ComponentUtil';
 
 export interface InfoToggleProps {
   dataUieName: string;
@@ -79,6 +79,4 @@ const InfoToggle: React.FC<InfoToggleProps> = ({
   );
 };
 
-export default InfoToggle;
-
-registerReactComponent('info-toggle', InfoToggle);
+export {InfoToggle};

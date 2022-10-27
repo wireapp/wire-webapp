@@ -19,10 +19,10 @@
 
 import React from 'react';
 
-import type {ServiceEntity} from '../../integration/ServiceEntity';
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
-import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
+import type {ServiceEntity} from '../../integration/ServiceEntity';
 
 export interface ServiceDetailsProps {
   service: ServiceEntity;
@@ -30,20 +30,24 @@ export interface ServiceDetailsProps {
 
 const ServiceDetails: React.FC<ServiceDetailsProps> = ({service}) => {
   const {providerName, name} = useKoSubscribableChildren(service, ['providerName', 'name']);
+
   return (
     <div className="panel-participant">
       <div className="panel-participant__name" data-uie-name="status-service-name">
         {name}
       </div>
+
       <div className="panel-participant__provider-name" data-uie-name="status-service-provider">
         {providerName}
       </div>
+
       <Avatar
         className="panel-participant__avatar"
         participant={service}
         avatarSize={AVATAR_SIZE.X_LARGE}
         data-uie-name="status-profile-picture"
       />
+
       <div className="panel-participant__service-description" data-uie-name="status-service-description">
         {service.description}
       </div>
@@ -51,6 +55,4 @@ const ServiceDetails: React.FC<ServiceDetailsProps> = ({service}) => {
   );
 };
 
-export default ServiceDetails;
-
-registerReactComponent('panel-service-details', ServiceDetails);
+export {ServiceDetails};

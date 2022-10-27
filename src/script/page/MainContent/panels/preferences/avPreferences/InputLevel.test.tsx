@@ -17,8 +17,9 @@
  *
  */
 
-import InputLevel, {MAX_AUDIO_BULLETS} from './InputLevel';
 import {render} from '@testing-library/react';
+
+import {InputLevel, MAX_AUDIO_BULLETS} from './InputLevel';
 
 describe('InputLevel', () => {
   let originalAudioContext: any;

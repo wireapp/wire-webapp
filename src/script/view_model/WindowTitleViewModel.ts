@@ -17,20 +17,21 @@
  *
  */
 
-import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
+import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
+import {getLogger, Logger} from 'Util/Logger';
+
+import {ContentState} from './ContentViewModel';
+import type {MainViewModel} from './MainViewModel';
 
 import {Config} from '../Config';
-import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
-import {ContentViewModel} from './ContentViewModel';
-import type {MainViewModel} from './MainViewModel';
-import {UserState} from '../user/UserState';
 import {ConversationState} from '../conversation/ConversationState';
+import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
+import {UserState} from '../user/UserState';
 
 export class WindowTitleViewModel {
   contentState: ko.Observable<string>;
@@ -76,7 +77,7 @@ export class WindowTitleViewModel {
         amplify.publish(WebAppEvents.LIFECYCLE.UNREAD_COUNT, unreadCount);
 
         switch (this.contentState()) {
-          case ContentViewModel.STATE.CONNECTION_REQUESTS: {
+          case ContentState.CONNECTION_REQUESTS: {
             const multipleRequests = connectionRequests > 1;
             const requestsString = multipleRequests
               ? t('conversationsConnectionRequestMany', connectionRequests)
@@ -85,39 +86,39 @@ export class WindowTitleViewModel {
             break;
           }
 
-          case ContentViewModel.STATE.CONVERSATION: {
+          case ContentState.CONVERSATION: {
             if (this.conversationState.activeConversation()) {
               specificTitle += this.conversationState.activeConversation().display_name();
             }
             break;
           }
 
-          case ContentViewModel.STATE.PREFERENCES_ABOUT: {
+          case ContentState.PREFERENCES_ABOUT: {
             specificTitle += t('preferencesAbout');
             break;
           }
 
-          case ContentViewModel.STATE.PREFERENCES_ACCOUNT: {
+          case ContentState.PREFERENCES_ACCOUNT: {
             specificTitle += t('preferencesAccount');
             break;
           }
 
-          case ContentViewModel.STATE.PREFERENCES_AV: {
+          case ContentState.PREFERENCES_AV: {
             specificTitle += t('preferencesAV');
             break;
           }
 
-          case ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS: {
+          case ContentState.PREFERENCES_DEVICE_DETAILS: {
             specificTitle += t('preferencesDeviceDetails');
             break;
           }
 
-          case ContentViewModel.STATE.PREFERENCES_DEVICES: {
+          case ContentState.PREFERENCES_DEVICES: {
             specificTitle += t('preferencesDevices');
             break;
           }
 
-          case ContentViewModel.STATE.PREFERENCES_OPTIONS: {
+          case ContentState.PREFERENCES_OPTIONS: {
             specificTitle += t('preferencesOptions');
             break;
           }

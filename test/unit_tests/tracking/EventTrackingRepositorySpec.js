@@ -18,6 +18,7 @@
  */
 
 import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {TestFactory} from '../../helper/TestFactory';
 
 describe('EventTrackingRepository', () => {

@@ -17,8 +17,9 @@
  *
  */
 
-import ko from 'knockout';
+// eslint-disable-next-line id-length
 import $ from 'jquery';
+import ko from 'knockout';
 
 import '../../../src/script/view_model/bindings/CommonBindings';
 

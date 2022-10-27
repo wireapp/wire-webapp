@@ -18,11 +18,12 @@
  */
 
 import React from 'react';
-import cx from 'classnames';
-import {t} from 'Util/LocalizerUtil';
 
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import cx from 'classnames';
+
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
 
 export interface MessageLikeProps {
   className?: string;
@@ -53,4 +54,4 @@ const MessageLike: React.FC<MessageLikeProps> = ({message, onLike, className}) =
   );
 };
 
-export default MessageLike;
+export {MessageLike};

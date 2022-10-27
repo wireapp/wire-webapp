@@ -18,11 +18,11 @@
  */
 
 import React from 'react';
+
 import cx from 'classnames';
 
-import {registerReactComponent} from 'Util/ComponentUtil';
+import {Icon} from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
-import Icon from 'Components/Icon';
 
 export interface RestrictedImageProps extends React.HTMLProps<HTMLDivElement> {
   isSmall?: boolean;
@@ -42,6 +42,4 @@ const RestrictedImage: React.FC<RestrictedImageProps> = ({showMessage = true, is
   );
 };
 
-export default RestrictedImage;
-
-registerReactComponent('image-restricted', RestrictedImage);
+export {RestrictedImage};

@@ -17,17 +17,18 @@
  *
  */
 
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 
 import {renderMessage} from 'Util/messageRenderer';
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {Asset} from './Asset';
+import type {LinkPreview} from './LinkPreview';
+
 import {AssetType} from '../../assets/AssetType';
 import {containsOnlyLink} from '../../conversation/linkPreviews/helpers';
 import {mediaParser} from '../../media/MediaParser';
 import type {MentionEntity} from '../../message/MentionEntity';
-import {Asset} from './Asset';
-import type {LinkPreview} from './LinkPreview';
 
 export class Text extends Asset {
   public readonly mentions: ko.ObservableArray<MentionEntity>;

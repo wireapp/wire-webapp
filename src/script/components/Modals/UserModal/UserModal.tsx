@@ -17,28 +17,29 @@
  *
  */
 
-import React, {useState, useEffect} from 'react';
-import {container} from 'tsyringe';
-import cx from 'classnames';
+import React, {useEffect, useState} from 'react';
+
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import cx from 'classnames';
+import {noop} from 'jquery';
+import {container} from 'tsyringe';
 
-import {replaceLink, t} from 'Util/LocalizerUtil';
-
-import {TeamState} from '../../../team/TeamState';
-import {UserState} from '../../../user/UserState';
+import {Icon} from 'Components/Icon';
+import {ModalComponent} from 'Components/ModalComponent';
+import {EnrichedFields} from 'Components/panel/EnrichedFields';
+import {UserActions} from 'Components/panel/UserActions';
+import {UserDetails} from 'Components/panel/UserDetails';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {UserRepository} from '../../../user/UserRepository';
-import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
-import ModalComponent from 'Components/ModalComponent';
-import Icon from 'Components/Icon';
-import UserDetails from 'Components/panel/UserDetails';
-import EnrichedFields from 'Components/panel/EnrichedFields';
-import UserActions from 'Components/panel/UserActions';
+import {replaceLink, t} from 'Util/LocalizerUtil';
+import {renderElement} from 'Util/renderElement';
+
 import {Config} from '../../../Config';
 import {User} from '../../../entity/User';
-import {noop} from 'Util/util';
 import {Core} from '../../../service/CoreSingleton';
-import renderModal from 'Util/renderModal';
+import {TeamState} from '../../../team/TeamState';
+import {UserRepository} from '../../../user/UserRepository';
+import {UserState} from '../../../user/UserState';
+import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 
 export interface UserModalProps {
   userId: QualifiedId;
@@ -52,7 +53,7 @@ export interface UserModalProps {
 
 const brandName = Config.getConfig().BRAND_NAME;
 
-const UserModalComponent: React.FC<UserModalProps> = ({
+const UserModal: React.FC<UserModalProps> = ({
   userId,
   onClose = noop,
   userRepository,
@@ -165,6 +166,6 @@ const UserModalComponent: React.FC<UserModalProps> = ({
   );
 };
 
-export default UserModalComponent;
+const showUserModal = renderElement<UserModalProps>(UserModal, 'user-modal-container');
 
-export const showUserModal = renderModal<UserModalProps>(UserModalComponent);
+export {UserModal, showUserModal};

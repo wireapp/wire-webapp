@@ -17,11 +17,13 @@
  *
  */
 
-import {render, fireEvent} from '@testing-library/react';
+import {fireEvent, render} from '@testing-library/react';
 
-import CollectionSection from './CollectionSection';
-import {ContentMessage} from '../../../../entity/message/ContentMessage';
 import {createRandomUuid} from 'Util/util';
+
+import {CollectionSection} from './CollectionSection';
+
+import {ContentMessage} from '../../../../entity/message/ContentMessage';
 
 const NUMBER_OF_ASSETS = 5;
 

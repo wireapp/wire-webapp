@@ -17,13 +17,16 @@
  *
  */
 
-import {useEffect, useState, useRef, FC, InputHTMLAttributes} from 'react';
-import Icon from 'Components/Icon';
-import useIsMounted from 'Util/useIsMounted';
-import {MotionDuration} from '../../../../../motion/MotionDuration';
-import TextInput from 'Components/TextInput';
+import {FC, InputHTMLAttributes, useEffect, useRef, useState} from 'react';
+
 import {IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
-import {isTabKey, isEnterKey} from '../../../../../util/KeyboardUtil';
+
+import {Icon} from 'Components/Icon';
+import {TextInput} from 'Components/TextInput';
+import {useIsMounted} from 'Util/useIsMounted';
+
+import {MotionDuration} from '../../../../../motion/MotionDuration';
+import {isEnterKey, isTabKey} from '../../../../../util/KeyboardUtil';
 
 interface AccountInputProps extends InputHTMLAttributes<HTMLInputElement> {
   allowedChars?: string;
@@ -79,7 +82,7 @@ const AccountInput: FC<AccountInputProps> = ({
   valueUie,
   ...rest
 }) => {
-  const inputWrapperRef = useRef<HTMLDivElement>(null);
+  const inputWrapperRef = useRef<HTMLInputElement | null>(null);
 
   const [input, setInput] = useState<string>('');
   const [isEditing, setIsEditing] = useState(false);
@@ -215,4 +218,4 @@ const AccountInput: FC<AccountInputProps> = ({
   );
 };
 
-export default AccountInput;
+export {AccountInput};

@@ -17,4 +17,4 @@
  *
  */
 
-export {showServiceModal as default} from './ServiceModal';
+export * from './ServiceModal';

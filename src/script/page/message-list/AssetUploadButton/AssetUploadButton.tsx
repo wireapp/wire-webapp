@@ -18,9 +18,11 @@
  */
 
 import {useRef} from 'react';
-import {Config} from '../../../Config';
+
+import {Icon} from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
-import Icon from 'Components/Icon';
+
+import {Config} from '../../../Config';
 
 interface AssetUploadButtonProps {
   onSelectFiles: (files: File[]) => void;

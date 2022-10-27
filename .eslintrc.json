@@ -3,7 +3,15 @@
     "jasmine": true,
     "jest/globals": true
   },
-  "extends": ["@wireapp/eslint-config", "plugin:jest/recommended", "plugin:jsx-a11y/recommended"],
+  "extends": [
+    "@wireapp/eslint-config",
+    "plugin:jest/recommended",
+    "plugin:jsx-a11y/recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "prettier",
+    "plugin:import/recommended",
+    "plugin:import/typescript"
+  ],
   "globals": {
     "$": true,
     "amplify": true,
@@ -14,8 +22,21 @@
     "z": true,
     "RTCAudioSource": true
   },
-  "plugins": ["sort-keys-fix", "react-hooks"],
-  "ignorePatterns": [".git/", "docs/", "bin/", "node_modules/", "resource/", "server/bin/", "server/dist/", "server/node_modules/", "src/ext/", "src/script/localization/**/webapp*.js", "src/worker/"],
+  "plugins": ["sort-keys-fix", "import", "react-hooks", "eslint-plugin-testing-library", "@typescript-eslint"],
+  "ignorePatterns": [
+    ".git/",
+    "docs/",
+    "bin/",
+    "node_modules/",
+    "resource/",
+    "server/bin/",
+    "server/dist/",
+    "server/node_modules/",
+    "src/ext/",
+    "src/script/localization/**/webapp*.js",
+    "src/worker/",
+    "*.js"
+  ],
   "overrides": [
     {
       "files": ["*.ts", "*.tsx"],
@@ -37,7 +58,7 @@
   ],
   "rules": {
     "id-length": "off",
-    "no-magic-numbers": "off",
+    "no-magic-numbers": ["warn", {"ignoreArrayIndexes": true}],
     "jest/no-jasmine-globals": "off",
     "jest/no-identical-title": "warn",
     "jest/no-done-callback": "warn",
@@ -45,14 +66,55 @@
     "jest/no-conditional-expect": "warn",
     "sort-keys-fix/sort-keys-fix": "warn",
     "jsx-a11y/media-has-caption": "warn",
+    "jsx-a11y/no-noninteractive-tabindex": "warn",
+    "react/no-unknown-property": ["error", {"ignore": ["css"]}],
     "react/react-in-jsx-scope": "off",
-    "react/no-unknown-property": ["error", {"ignore": ["css", "transform-origin"]}],
     "react-hooks/rules-of-hooks": "error",
-    "react-hooks/exhaustive-deps": "warn"
+    "react-hooks/exhaustive-deps": "warn",
+    "import/no-unresolved": "error",
+    "import/no-default-export": "error",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/no-empty-interface": "warn",
+    "@typescript-eslint/ban-ts-comment": "off",
+    "@typescript-eslint/no-var-requires": "warn",
+    "@typescript-eslint/no-non-null-assertion": "warn",
+    "import/order": [
+      "error",
+      {
+        "groups": ["external", "builtin", "internal", "sibling", "parent", "index"],
+        "pathGroups": [
+          {
+            "pattern": "react",
+            "group": "external",
+            "position": "before"
+          }
+        ],
+        "pathGroupsExcludedImportTypes": ["react"],
+        "newlines-between": "always",
+        "alphabetize": {
+          "order": "asc",
+          "caseInsensitive": true
+        },
+        "warnOnUnassignedImports": false
+      }
+    ]
   },
   "settings": {
     "react": {
       "version": "detect"
+    },
+    "import/resolver": {
+      "alias": {
+        "map": [
+          ["Util", "./src/script/util/"],
+          ["Components", "./src/script/components/"],
+          ["I18n", "./src/i18n/"],
+          ["Resource", "./resource/"],
+          ["src", "./src/"],
+          ["test", "./test/"]
+        ],
+        "extensions": [".ts", ".js", ".jsx", ".tsx", ".json"]
+      }
     }
   }
 }

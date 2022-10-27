@@ -18,6 +18,7 @@
  */
 
 import React from 'react';
+
 import {CSS_FILL_PARENT, CSS_FLEX_CENTER, CSS_ICON} from 'Util/CSSMixin';
 
 import {STATE} from '../Avatar';
@@ -49,4 +50,4 @@ const AvatarBadge: React.FunctionComponent<AvatarBadgeProps> = ({state}) => {
   );
 };
 
-export default AvatarBadge;
+export {AvatarBadge};

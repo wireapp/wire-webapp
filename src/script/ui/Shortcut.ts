@@ -17,14 +17,14 @@
  *
  */
 
+import {Runtime} from '@wireapp/commons';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import keyboardJS from 'keyboardjs';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {capitalizeFirstChar, includesString} from 'Util/StringUtil';
 
 import {ShortcutType} from './ShortcutType';
-import {Runtime} from '@wireapp/commons';
 
 interface Shortcut {
   event: string;

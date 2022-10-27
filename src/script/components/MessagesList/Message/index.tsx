@@ -17,27 +17,34 @@
  *
  */
 
+import React, {
+  KeyboardEvent as ReactKeyboardEvent,
+  MouseEvent as ReactMouseEvent,
+  useLayoutEffect,
+  useRef,
+} from 'react';
+
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import cx from 'classnames';
 
-import {Message as BaseMessage} from '../../../entity/message/Message';
-import type {ContentMessage} from '../../../entity/message/ContentMessage';
-import type {MemberMessage as MemberMessageEntity} from '../../../entity/message/MemberMessage';
-import type {Text} from '../../../entity/message/Text';
-import type {Conversation} from '../../../entity/Conversation';
-import type {User} from '../../../entity/User';
-import type {DecryptErrorMessage} from '../../../entity/message/DecryptErrorMessage';
-import type {MessageRepository} from '../../../conversation/MessageRepository';
-import {TeamState} from '../../../team/TeamState';
-
+import {InViewport} from 'Components/utils/InViewport';
+import {ServiceEntity} from 'src/script/integration/ServiceEntity';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getMessageMarkerType, MessageMarkerType} from 'Util/conversationMessages';
 
-import React, {useLayoutEffect, useRef} from 'react';
-import InViewport from 'Components/utils/InViewport';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import MessageTime from './MessageTime';
+import {MessageTime} from './MessageTime';
 import {MessageWrapper} from './MessageWrapper';
+
+import type {MessageRepository} from '../../../conversation/MessageRepository';
+import type {Conversation} from '../../../entity/Conversation';
+import type {ContentMessage} from '../../../entity/message/ContentMessage';
+import type {DecryptErrorMessage} from '../../../entity/message/DecryptErrorMessage';
+import type {MemberMessage as MemberMessageEntity} from '../../../entity/message/MemberMessage';
+import {Message as BaseMessage} from '../../../entity/message/Message';
+import type {Text} from '../../../entity/message/Text';
+import type {User} from '../../../entity/User';
 import {useRelativeTimestamp} from '../../../hooks/useRelativeTimestamp';
-import {ServiceEntity} from 'src/script/integration/ServiceEntity';
+import {TeamState} from '../../../team/TeamState';
 
 export interface MessageActions {
   onClickAvatar: (user: User | ServiceEntity) => void;
@@ -45,7 +52,7 @@ export interface MessageActions {
   onClickImage: (message: ContentMessage, event: React.UIEvent) => void;
   onClickInvitePeople: () => void;
   onClickLikes: (message: BaseMessage) => void;
-  onClickMessage: (message: ContentMessage | Text, event: React.UIEvent) => void;
+  onClickMessage: (message: ContentMessage | Text, event: ReactMouseEvent | ReactKeyboardEvent<HTMLElement>) => void;
   onClickParticipants: (participants: User[]) => void;
   onClickReceipts: (message: BaseMessage) => void;
   onClickResetSession: (messageError: DecryptErrorMessage) => void;
@@ -119,7 +126,7 @@ const Message: React.FC<
   );
   return (
     <div
-      className={`message ${isMarked ? 'message-marked' : ''}`}
+      className={cx('message', {'message-marked': isMarked})}
       ref={messageElementRef}
       data-uie-uid={message.id}
       data-uie-value={message.super_type}
@@ -127,7 +134,7 @@ const Message: React.FC<
       data-uie-send-status={status}
       data-uie-name="item-message"
     >
-      <div className={`message-header message-timestamp ${getTimestampClass()}`}>
+      <div className={cx('message-header message-timestamp', getTimestampClass())}>
         <div className="message-header-icon">
           <span className="message-unread-dot"></span>
         </div>
@@ -145,4 +152,4 @@ const Message: React.FC<
   );
 };
 
-export default Message;
+export {Message};

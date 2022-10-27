@@ -17,12 +17,14 @@
  *
  */
 
-import {Conversation} from '../entity/Conversation';
+import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE, CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
+
 import {ConversationFilter} from './ConversationFilter';
 import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';
 import {ConversationStatus} from './ConversationStatus';
-import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE, CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
+
+import {Conversation} from '../entity/Conversation';
 
 describe('ConversationFilter', () => {
   describe('showCallControls', () => {

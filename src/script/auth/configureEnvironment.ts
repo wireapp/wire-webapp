@@ -17,8 +17,9 @@
  *
  */
 
-const jQuery = require('jquery');
 import {amplify} from 'amplify';
+
+const jQuery = require('jquery');
 
 import '../event/Client';
 import '../message/MessageCategorization';

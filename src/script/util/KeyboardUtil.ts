@@ -17,8 +17,9 @@
  *
  */
 
-import {Runtime} from '@wireapp/commons';
 import type {KeyboardEvent as ReactKeyboardEvent} from 'react';
+
+import {Runtime} from '@wireapp/commons';
 
 export const KEY = {
   ARROW_DOWN: Runtime.isEdge() ? 'Down' : 'ArrowDown',

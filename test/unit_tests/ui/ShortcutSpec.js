@@ -17,9 +17,10 @@
  *
  */
 
+import {Runtime} from '@wireapp/commons';
+
 import {Shortcut} from 'src/script/ui/Shortcut';
 import {ShortcutType} from 'src/script/ui/ShortcutType';
-import {Runtime} from '@wireapp/commons';
 
 describe('Shortcut', () => {
   const map = Shortcut.shortcutMap;

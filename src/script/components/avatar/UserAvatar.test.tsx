@@ -17,10 +17,13 @@
  *
  */
 
-import UserAvatar from './UserAvatar';
+import {render} from '@testing-library/react';
+
+import {UserAvatar} from './UserAvatar';
+
 import {User} from '../../entity/User';
 import {AVATAR_SIZE, STATE} from '../Avatar';
-import {render} from '@testing-library/react';
+jest.mock('../../auth/util/SVGProvider');
 
 describe('UserAvatar', () => {
   it('shows participant initials if no avatar is defined', async () => {

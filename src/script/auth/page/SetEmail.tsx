@@ -17,24 +17,32 @@
  *
  */
 
-import {Button, ContainerXS, Form, H1, Input} from '@wireapp/react-ui-kit';
 import React, {useRef, useState} from 'react';
+
+import {Button, ContainerXS, Form, H1, Input} from '@wireapp/react-ui-kit';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {AnyAction, Dispatch} from 'redux';
 import {Navigate, useNavigate} from 'react-router-dom';
+import {AnyAction, Dispatch} from 'redux';
+
+import {Page} from './Page';
+
 import {setEmailStrings} from '../../strings';
-import Exception from '../component/Exception';
+import {Exception} from '../component/Exception';
 import {actionRoot} from '../module/action';
 import {ValidationError} from '../module/action/ValidationError';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import {ROUTE} from '../route';
-import Page from './Page';
 
-interface Props extends React.HTMLProps<HTMLDivElement> {}
+type Props = React.HTMLProps<HTMLDivElement>;
 
-const SetEmail = ({hasSelfEmail, isSelfSSOUser, doSetEmail, isFetching}: Props & ConnectedProps & DispatchProps) => {
+const SetEmailComponent = ({
+  hasSelfEmail,
+  isSelfSSOUser,
+  doSetEmail,
+  isFetching,
+}: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
 
   const emailInput = useRef<HTMLInputElement>();
@@ -128,4 +136,6 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(mapStateToProps, mapDispatchToProps)(SetEmail);
+const SetEmail = connect(mapStateToProps, mapDispatchToProps)(SetEmailComponent);
+
+export {SetEmail};

@@ -18,14 +18,15 @@
  */
 
 import React from 'react';
-import {act, render} from '@testing-library/react';
 
-import Conversations from './';
-import {ListState} from 'src/script/view_model/ListViewModel';
+import {act, render} from '@testing-library/react';
+import ko from 'knockout';
 
 import {User} from 'src/script/entity/User';
 import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
-import ko from 'knockout';
+import {ListState} from 'src/script/view_model/ListViewModel';
+
+import {Conversations} from './';
 
 describe('Conversations', () => {
   const defaultParams: React.ComponentProps<typeof Conversations> = {
