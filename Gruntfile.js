@@ -52,9 +52,6 @@ module.exports = grunt => {
   grunt.initConfig({
     dir,
     clean: {
-      //##############################################################################
-      // Amazon Web Services related
-      //##############################################################################
       dist: '<%= dir.dist.static %>',
       dist_src: '<%= dir.dist.templates %>/<%= dir.src_ %>',
       dist_s3: '<%= dir.dist.s3 %>',
@@ -68,17 +65,7 @@ module.exports = grunt => {
   });
   /* eslint-enable sort-keys-fix/sort-keys-fix */
 
-  grunt.registerTask('build', [
-    'clean:dist',
-    'clean:dist_src',
-    'clean:dist_s3',
-    'set_version',
-    'build_style',
-    'copy:dist_serviceworker',
-    'copy:dist_resource',
-    'copy:dist_certificate',
-    'build_markup',
-  ]);
+  grunt.registerTask('build', ['clean', 'set_version', 'build_style', 'copy', 'build_markup']);
 
   grunt.registerTask('build_style', ['shell:less', 'postcss']);
 
