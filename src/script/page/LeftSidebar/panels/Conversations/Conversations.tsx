@@ -306,7 +306,7 @@ const Conversations: React.FC<ConversationsProps> = ({
                 callActions={callingViewModel.callActions}
                 callingRepository={callingRepository}
                 conversation={conversation}
-                fullUi
+                isFullUi
                 hasAccessToCamera={callingViewModel.hasAccessToCamera()}
                 isSelfVerified={selfUser.is_verified()}
                 multitasking={callingViewModel.multitasking}

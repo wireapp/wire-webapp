@@ -57,17 +57,21 @@ interface VideoCallProps {
   isSelfVerified?: boolean;
   teamState?: TeamState;
 }
+
 interface AnsweringControlsProps {
   call: Call;
   callActions: CallActions;
   callingRepository: Pick<CallingRepository, 'supportsScreenSharing' | 'sendModeratorMute'>;
   conversation: Conversation;
-  fullUi?: boolean;
+  isFullUi?: boolean;
   callState?: CallState;
   classifiedDomains?: string[];
   temporaryUserStyle?: boolean;
 }
+
 export type CallingCellProps = VideoCallProps & AnsweringControlsProps;
+
+type labels = {dataUieName: string; text: string};
 
 const CallingCell: React.FC<CallingCellProps> = ({
   conversation,
@@ -75,7 +79,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
   temporaryUserStyle,
   call,
   callActions,
-  fullUi = false,
+  isFullUi = false,
   multitasking,
   hasAccessToCamera,
   isSelfVerified,
@@ -122,8 +126,6 @@ const CallingCell: React.FC<CallingCellProps> = ({
   const isIncoming = state === CALL_STATE.INCOMING;
   const isConnecting = state === CALL_STATE.ANSWERED;
   const isOngoing = state === CALL_STATE.MEDIA_ESTAB;
-
-  type labels = {dataUieName: string; text: string};
 
   const callStatus: Partial<Record<CALL_STATE, labels>> = {
     [CALL_STATE.OUTGOING]: {
@@ -220,7 +222,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
 
   return (
     <div className="conversation-calling-cell">
-      {showJoinButton && fullUi && (
+      {showJoinButton && isFullUi && (
         <button
           className="call-ui__button call-ui__button--green call-ui__button--join"
           style={{margin: '40px 16px 0px 16px'}}
@@ -239,7 +241,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
           data-uie-id={conversation.id}
           data-uie-value={conversation.display_name()}
         >
-          {muteState === MuteState.REMOTE_MUTED && fullUi && (
+          {muteState === MuteState.REMOTE_MUTED && isFullUi && (
             <div className="conversation-list-calling-cell__info-bar">{t('muteStateRemoteMute')}</div>
           )}
           <div className="conversation-list-cell-right__calling">
@@ -306,7 +308,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
             </div>
           </div>
 
-          {(isOngoing || selfHasActiveVideo) && isMinimized && !!videoGrid?.grid?.length && fullUi ? (
+          {(isOngoing || selfHasActiveVideo) && isMinimized && !!videoGrid?.grid?.length && isFullUi ? (
             <div
               className="group-video__minimized-wrapper"
               onClick={handleMinimizedClick}
@@ -329,7 +331,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
             </div>
           ) : (
             showNoCameraPreview &&
-            fullUi && (
+            isFullUi && (
               <div
                 className="group-video__minimized-wrapper group-video__minimized-wrapper--no-camera-access"
                 data-uie-name="label-no-camera-access-preview"
@@ -345,7 +347,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
             <>
               <div className="conversation-list-calling-cell-controls">
                 <ul className="conversation-list-calling-cell-controls-left">
-                  {fullUi && (
+                  {isFullUi && (
                     <>
                       <li className="conversation-list-calling-cell-controls-item">
                         <button
@@ -414,7 +416,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
                 </ul>
 
                 <ul className="conversation-list-calling-cell-controls-right">
-                  {showParticipantsButton && fullUi && (
+                  {showParticipantsButton && isFullUi && (
                     <li className="conversation-list-calling-cell-controls-item">
                       <button
                         className={cx('call-ui__button call-ui__button--participants', {
@@ -464,7 +466,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
                   )}
                 </ul>
               </div>
-              {fullUi && (
+              {isFullUi && (
                 <div
                   className={cx('call-ui__participant-list__wrapper', {
                     'call-ui__participant-list__wrapper--active': showParticipants,
