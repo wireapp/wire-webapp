@@ -386,21 +386,22 @@ const ConversationList: FC<ConversationListProps> = ({
             const conversation = conversationState.findConversation(call.conversationId);
             const callingViewModel = mainViewModel.calling;
             const callingRepository = callingViewModel.callingRepository;
-            if (!conversation && !smBreakpoint) {
-                return null;
+
+            if (!conversation || !smBreakpoint) {
+              return null;
             }
-            
+
             return (
-                <div className="calling-cell" key={conversation.id}>
-                  <CallingCell
-                    classifiedDomains={undefined}
-                    call={call}
-                    callActions={callingViewModel.callActions}
-                    callingRepository={callingRepository}
-                    conversation={conversation}
-                    multitasking={callingViewModel.multitasking}
-                  />
-                </div>
+              <div className="calling-cell" key={conversation.id}>
+                <CallingCell
+                  classifiedDomains={undefined}
+                  call={call}
+                  callActions={callingViewModel.callActions}
+                  callingRepository={callingRepository}
+                  conversation={conversation}
+                  multitasking={callingViewModel.multitasking}
+                />
+              </div>
             );
           })}
 
