@@ -389,13 +389,7 @@ class App {
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
 
       try {
-        const dbMigrationState = dbMigrationStateStore.getDBMigrationState();
-
         await this.core.init(clientType, {
-          dbMigrationConfig: dbMigrationState && {
-            onSuccess: dbMigrationStateStore.deleteDBMigrationState,
-            storeName: dbMigrationState.storeName,
-          },
           onNewClient({userId, clientId, domain}) {
             const qualifiedId = {domain: domain ?? '', id: userId};
             const newClient = {class: ClientClassification.UNKNOWN, id: clientId};
@@ -620,6 +614,19 @@ class App {
     }
 
     await container.resolve(StorageService).init(this.core.storage);
+
+    //storage was initialised, possible version upgrade, we can try running migration
+    const dbMigrationState = dbMigrationStateStore.getDBMigrationState();
+
+    if (dbMigrationState) {
+      try {
+        await this.core.service?.mls.proteusCryptoboxMigrate(dbMigrationState.storeName);
+        dbMigrationStateStore.deleteDBMigrationState();
+      } catch (error) {
+        this.logger.error('Client was not able to perform DB migration:', error);
+      }
+    }
+
     this.repository.client.init(userEntity);
     await this.repository.properties.init(userEntity);
 
