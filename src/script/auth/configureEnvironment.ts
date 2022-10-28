@@ -25,7 +25,7 @@ import '../event/Client';
 import '../message/MessageCategorization';
 import '../message/MessageCategory';
 import '../service/BackendEnvironment';
-import '../storage/StorageSchemata';
+import '../storage/StorageSchema';
 
 window.amplify = amplify;
 window.jQuery = jQuery;

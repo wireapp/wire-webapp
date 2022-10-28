@@ -32,7 +32,7 @@ import {Logger, getLogger} from 'Util/Logger';
 import {APIClient} from '../service/APIClientSingleton';
 import type {ClientRecord} from '../storage';
 import {StorageService} from '../storage';
-import {StorageSchemata} from '../storage/StorageSchemata';
+import {StorageSchema} from '../storage/StorageSchema';
 
 export class ClientService {
   private readonly logger: Logger;
@@ -52,7 +52,7 @@ export class ClientService {
   ) {
     this.logger = getLogger('ClientService');
 
-    this.CLIENT_STORE_NAME = StorageSchemata.OBJECT_STORE.CLIENTS;
+    this.CLIENT_STORE_NAME = StorageSchema.OBJECT_STORE.CLIENTS;
   }
 
   //##############################################################################

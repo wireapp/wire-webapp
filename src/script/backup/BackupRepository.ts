@@ -39,7 +39,7 @@ import type {ConversationRepository} from '../conversation/ConversationRepositor
 import type {Conversation} from '../entity/Conversation';
 import {ClientEvent} from '../event/Client';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
-import {StorageSchemata} from '../storage/StorageSchemata';
+import {StorageSchema} from '../storage/StorageSchema';
 import {UserState} from '../user/UserState';
 import {WebWorker} from '../util/worker';
 
@@ -138,9 +138,9 @@ export class BackupRepository {
     const tableData: Record<string, any[]> = {};
 
     const conversationsData = await this.exportHistoryConversations(tables, progressCallback);
-    tableData[StorageSchemata.OBJECT_STORE.CONVERSATIONS] = conversationsData;
+    tableData[StorageSchema.OBJECT_STORE.CONVERSATIONS] = conversationsData;
     const eventsData = await this.exportHistoryEvents(tables, progressCallback);
-    tableData[StorageSchemata.OBJECT_STORE.EVENTS] = eventsData;
+    tableData[StorageSchema.OBJECT_STORE.EVENTS] = eventsData;
     return tableData;
   }
 
@@ -148,7 +148,7 @@ export class BackupRepository {
     tables: Dexie.Table<any, string>[],
     progressCallback: (chunkLength: number) => void,
   ): Promise<any[]> {
-    const conversationsTable = tables.find(table => table.name === StorageSchemata.OBJECT_STORE.CONVERSATIONS);
+    const conversationsTable = tables.find(table => table.name === StorageSchema.OBJECT_STORE.CONVERSATIONS);
     const onProgress = (tableRows: any[], exportedEntitiesCount: number) => {
       progressCallback(tableRows.length);
       this.logger.log(`Exported '${exportedEntitiesCount}' conversation states from history`);
@@ -163,7 +163,7 @@ export class BackupRepository {
     tables: Dexie.Table<any, string>[],
     progressCallback: (chunkLength: number) => void,
   ): Promise<any[]> {
-    const eventsTable = tables.find(table => table.name === StorageSchemata.OBJECT_STORE.EVENTS);
+    const eventsTable = tables.find(table => table.name === StorageSchema.OBJECT_STORE.EVENTS);
     const onProgress = (tableRows: any[], exportedEntitiesCount: number) => {
       progressCallback(tableRows.length);
       this.logger.log(`Exported '${exportedEntitiesCount}' events from history`);
@@ -309,7 +309,7 @@ export class BackupRepository {
     const entityChunks = chunk(entities, BackupService.CONFIG.BATCH_SIZE);
 
     const importEventChunk = async (eventChunk: any[]): Promise<void> => {
-      await this.backupService.importEntities(StorageSchemata.OBJECT_STORE.EVENTS, eventChunk);
+      await this.backupService.importEntities(StorageSchema.OBJECT_STORE.EVENTS, eventChunk);
       importedEntities += eventChunk.length;
       this.logger.log(`Imported '${importedEntities}' of '${entityCount}' events from backup`);
       progressCallback(eventChunk.length);
@@ -364,7 +364,7 @@ export class BackupRepository {
     }
 
     const lowestDbVersion = Math.min(archiveMetadata.version, localMetadata.version);
-    const involvesDatabaseMigration = StorageSchemata.SCHEMATA.reduce((involvesMigration, schemaData) => {
+    const involvesDatabaseMigration = StorageSchema.SCHEMA.reduce((involvesMigration, schemaData) => {
       if (schemaData.version > lowestDbVersion) {
         return involvesMigration || !!schemaData.upgrade;
       }

@@ -21,7 +21,7 @@ import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 import {ConversationError} from 'src/script/error/ConversationError';
 import {StorageError} from 'src/script/error/StorageError';
 import {MessageCategory} from 'src/script/message/MessageCategory';
-import {StorageSchemata} from 'src/script/storage/StorageSchemata';
+import {StorageSchema} from 'src/script/storage/StorageSchema';
 import {createRandomUuid} from 'Util/util';
 
 import {TestFactory} from '../../helper/TestFactory';
@@ -33,7 +33,7 @@ const testEventServiceClass = (testedServiceName, className) => {
     const senderId = '8b497692-7a38-4a5d-8287-e3d1006577d6';
 
     const testFactory = new TestFactory();
-    const eventStoreName = StorageSchemata.OBJECT_STORE.EVENTS;
+    const eventStoreName = StorageSchema.OBJECT_STORE.EVENTS;
 
     beforeEach(() => testFactory.exposeEventActors());
 

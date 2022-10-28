@@ -27,7 +27,7 @@ import {Logger, getLogger} from 'Util/Logger';
 import {loadValue, storeValue} from 'Util/StorageUtil';
 
 import {DexieDatabase} from './DexieDatabase';
-import {StorageSchemata} from './StorageSchemata';
+import {StorageSchema} from './StorageSchema';
 
 import {StorageError} from '../error/StorageError';
 
@@ -103,7 +103,7 @@ export class StorageService {
       });
     };
 
-    const listenableTables = [StorageSchemata.OBJECT_STORE.EVENTS];
+    const listenableTables = [StorageSchema.OBJECT_STORE.EVENTS];
 
     listenableTables.forEach(table => {
       db.table(table).hook(
@@ -302,7 +302,7 @@ export class StorageService {
 
   async loadFromSimpleStorage<T = Object>(primaryKey: string): Promise<T | undefined> {
     if (this.isTemporaryAndNonPersistent) {
-      return this.load<T>(StorageSchemata.OBJECT_STORE.AMPLIFY, primaryKey);
+      return this.load<T>(StorageSchema.OBJECT_STORE.AMPLIFY, primaryKey);
     }
 
     return loadValue(primaryKey);
@@ -350,7 +350,7 @@ export class StorageService {
 
   async saveToSimpleStorage<T = Object>(primaryKey: string, entity: T): Promise<void> {
     if (this.isTemporaryAndNonPersistent) {
-      await this.engine.updateOrCreate(StorageSchemata.OBJECT_STORE.AMPLIFY, primaryKey, entity);
+      await this.engine.updateOrCreate(StorageSchema.OBJECT_STORE.AMPLIFY, primaryKey, entity);
     } else {
       storeValue(primaryKey, entity);
     }

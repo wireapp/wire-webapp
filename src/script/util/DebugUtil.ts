@@ -53,7 +53,7 @@ import {checkVersion} from '../lifecycle/newVersionHandler';
 import {MessageCategory} from '../message/MessageCategory';
 import {Core} from '../service/CoreSingleton';
 import {EventRecord, StorageRepository} from '../storage';
-import {StorageSchemata} from '../storage/StorageSchemata';
+import {StorageSchema} from '../storage/StorageSchema';
 import {UserRepository} from '../user/UserRepository';
 import {UserState} from '../user/UserState';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
@@ -129,7 +129,7 @@ export class DebugUtil {
 
     cryptobox['cachedSessions'].set(sessionId, cryptoboxSession);
 
-    const sessionStoreName = StorageSchemata.OBJECT_STORE.SESSIONS;
+    const sessionStoreName = StorageSchema.OBJECT_STORE.SESSIONS;
     await this.storageRepository.storageService.update(sessionStoreName, sessionId, record);
     this.logger.log(`Corrupted Session ID '${sessionId}'`);
   }

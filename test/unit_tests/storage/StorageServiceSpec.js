@@ -18,14 +18,14 @@
  */
 
 import {StorageError} from 'src/script/error/StorageError';
-import {StorageSchemata, StorageService} from 'src/script/storage/';
+import {StorageSchema, StorageService} from 'src/script/storage/';
 
 describe('StorageRepository', () => {
   describe('save', () => {
     it('does not save "null" values', () => {
       const storageService = new StorageService();
       return storageService
-        .save(StorageSchemata.OBJECT_STORE.AMPLIFY, 'primary_key', null)
+        .save(StorageSchema.OBJECT_STORE.AMPLIFY, 'primary_key', null)
         .then(fail)
         .catch(error => {
           expect(error.type).toEqual(StorageError.TYPE.NO_DATA);

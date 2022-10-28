@@ -19,24 +19,24 @@
 
 import {SQLiteProvidedSchema, SQLiteType} from '@wireapp/store-engine-sqleet';
 
-import {StorageSchemata} from './StorageSchemata';
+import {StorageSchema} from './StorageSchema';
 
-interface SQLeetSchema {
+interface SQLeetSchemaType {
   schema: SQLiteProvidedSchema<string>;
   version: number;
 }
 
-export class SQLeetSchemata {
+export class SQLeetSchema {
   static getLatest(): SQLiteProvidedSchema<string> {
-    return SQLeetSchemata.SCHEMATA[SQLeetSchemata.SCHEMATA.length - 1].schema;
+    return SQLeetSchema.SCHEMA[SQLeetSchema.SCHEMA.length - 1].schema;
   }
 
-  static get SCHEMATA(): SQLeetSchema[] {
+  static get SCHEMA(): SQLeetSchemaType[] {
     return [
       {
         schema: {
-          [StorageSchemata.OBJECT_STORE.AMPLIFY]: SQLiteType.JSON_OR_TEXT,
-          [StorageSchemata.OBJECT_STORE.CLIENTS]: {
+          [StorageSchema.OBJECT_STORE.AMPLIFY]: SQLiteType.JSON_OR_TEXT,
+          [StorageSchema.OBJECT_STORE.CLIENTS]: {
             address: SQLiteType.TEXT,
             class: SQLiteType.TEXT,
             id: SQLiteType.TEXT,
@@ -47,7 +47,7 @@ export class SQLeetSchemata {
             time: SQLiteType.TEXT,
             type: SQLiteType.TEXT,
           },
-          [StorageSchemata.OBJECT_STORE.CONVERSATIONS]: {
+          [StorageSchema.OBJECT_STORE.CONVERSATIONS]: {
             accessModes: SQLiteType.JSON,
             accessRole: SQLiteType.TEXT,
             archived_state: SQLiteType.BOOLEAN,
@@ -66,7 +66,7 @@ export class SQLeetSchemata {
             team_id: SQLiteType.TEXT,
             type: SQLiteType.INTEGER,
           },
-          [StorageSchemata.OBJECT_STORE.EVENTS]: {
+          [StorageSchema.OBJECT_STORE.EVENTS]: {
             category: SQLiteType.INTEGER,
             conversation: SQLiteType.TEXT,
             data: SQLiteType.JSON,
@@ -83,25 +83,25 @@ export class SQLeetSchemata {
             type: SQLiteType.TEXT,
             version: SQLiteType.INTEGER,
           },
-          [StorageSchemata.OBJECT_STORE.KEYS]: {
+          [StorageSchema.OBJECT_STORE.KEYS]: {
             created: SQLiteType.INTEGER,
             id: SQLiteType.TEXT,
             serialised: SQLiteType.TEXT,
             version: SQLiteType.TEXT,
           },
-          [StorageSchemata.OBJECT_STORE.PRE_KEYS]: {
+          [StorageSchema.OBJECT_STORE.PRE_KEYS]: {
             created: SQLiteType.INTEGER,
             id: SQLiteType.TEXT,
             serialised: SQLiteType.TEXT,
             version: SQLiteType.TEXT,
           },
-          [StorageSchemata.OBJECT_STORE.SESSIONS]: {
+          [StorageSchema.OBJECT_STORE.SESSIONS]: {
             created: SQLiteType.INTEGER,
             id: SQLiteType.TEXT,
             serialised: SQLiteType.TEXT,
             version: SQLiteType.TEXT,
           },
-          [StorageSchemata.OBJECT_STORE.USERS]: {
+          [StorageSchema.OBJECT_STORE.USERS]: {
             id: SQLiteType.TEXT,
           },
         },

@@ -27,7 +27,7 @@ import {
   IncompatiblePlatformError,
 } from 'src/script/backup/Error';
 import {ClientEvent} from 'src/script/event/Client';
-import {StorageSchemata} from 'src/script/storage/StorageSchemata';
+import {StorageSchema} from 'src/script/storage/StorageSchema';
 import {noop} from 'Util/util';
 
 import {TestFactory} from '../../helper/TestFactory';
@@ -98,7 +98,7 @@ describe('BackupRepository', () => {
   });
 
   describe('generateHistory', () => {
-    const eventStoreName = StorageSchemata.OBJECT_STORE.EVENTS;
+    const eventStoreName = StorageSchema.OBJECT_STORE.EVENTS;
 
     beforeEach(() => {
       return Promise.all([
@@ -132,7 +132,7 @@ describe('BackupRepository', () => {
         type: ClientEvent.CONVERSATION.VERIFICATION,
       };
 
-      await testFactory.storage_service.save(StorageSchemata.OBJECT_STORE.EVENTS, undefined, verificationEvent);
+      await testFactory.storage_service.save(StorageSchema.OBJECT_STORE.EVENTS, undefined, verificationEvent);
       const blob = await backupRepository.generateHistory(noop);
       const zip = await new JSZip().loadAsync(blob);
 
@@ -245,7 +245,7 @@ describe('BackupRepository', () => {
 
         expect(backupRepo.conversationRepository.updateConversationStates).toHaveBeenCalledWith([conversation]);
         expect(backupRepo.backupService.importEntities).toHaveBeenCalledWith(
-          StorageSchemata.OBJECT_STORE.EVENTS,
+          StorageSchema.OBJECT_STORE.EVENTS,
           messages,
         );
       }

@@ -31,7 +31,7 @@ import {StorageError} from '../error/StorageError';
 import {categoryFromEvent} from '../message/MessageCategorization';
 import {MessageCategory} from '../message/MessageCategory';
 import {StorageService, DatabaseListenerCallback, EventRecord} from '../storage';
-import {StorageSchemata} from '../storage/StorageSchemata';
+import {StorageSchema} from '../storage/StorageSchema';
 
 export type Includes = {includeFrom: boolean; includeTo: boolean};
 type DexieCollection = Dexie.Collection<any, any>;
@@ -63,7 +63,7 @@ export class EventService {
     try {
       if (this.storageService.db) {
         const events = await this.storageService.db
-          .table(StorageSchemata.OBJECT_STORE.EVENTS)
+          .table(StorageSchema.OBJECT_STORE.EVENTS)
           .where('id')
           .anyOf(eventIds)
           .filter(record => record.conversation === conversationId)
@@ -71,7 +71,7 @@ export class EventService {
         return events;
       }
 
-      const records = (await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS)) as EventRecord[];
+      const records = (await this.storageService.getAll(StorageSchema.OBJECT_STORE.EVENTS)) as EventRecord[];
       return records
         .filter(record => record.conversation === conversationId && eventIds.includes(record.id))
         .sort(compareEventsById);
@@ -93,7 +93,7 @@ export class EventService {
     try {
       if (this.storageService.db) {
         const events = await this.storageService.db
-          .table(StorageSchemata.OBJECT_STORE.EVENTS)
+          .table(StorageSchema.OBJECT_STORE.EVENTS)
           .where('conversation')
           .equals(conversationId)
           .and(record => !!record.ephemeral_expires)
@@ -101,7 +101,7 @@ export class EventService {
         return events;
       }
 
-      const records = (await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS)) as EventRecord[];
+      const records = (await this.storageService.getAll(StorageSchema.OBJECT_STORE.EVENTS)) as EventRecord[];
       return records
         .filter(record => record.conversation === conversationId && !!record.ephemeral_expires)
         .sort(compareEventsById);
@@ -127,7 +127,7 @@ export class EventService {
     try {
       if (this.storageService.db) {
         const entry = await this.storageService.db
-          .table(StorageSchemata.OBJECT_STORE.EVENTS)
+          .table(StorageSchema.OBJECT_STORE.EVENTS)
           .where('id')
           .equals(eventId)
           .filter(record => record.conversation === conversationId)
@@ -135,7 +135,7 @@ export class EventService {
         return entry;
       }
 
-      const records = (await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS)) as EventRecord[];
+      const records = (await this.storageService.getAll(StorageSchema.OBJECT_STORE.EVENTS)) as EventRecord[];
       return records
         .filter(record => record.id === eventId && record.conversation === conversationId)
         .sort(compareEventsById)
@@ -169,7 +169,7 @@ export class EventService {
 
     if (this.storageService.db) {
       const events = await this.storageService.db
-        .table(StorageSchemata.OBJECT_STORE.EVENTS)
+        .table(StorageSchema.OBJECT_STORE.EVENTS)
         .where('[conversation+category]')
         .between([conversationId, categoryMin], [conversationId, categoryMax], true, true)
         .and(filterExpired)
@@ -177,7 +177,7 @@ export class EventService {
       return events;
     }
 
-    const records = (await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS)) as EventRecord[];
+    const records = (await this.storageService.getAll(StorageSchema.OBJECT_STORE.EVENTS)) as EventRecord[];
     return records
       .filter(
         record =>
@@ -190,7 +190,7 @@ export class EventService {
   async loadEventsReplyingToMessage(conversationId: string, quotedMessageId: string, quotedMessageTime: string) {
     if (this.storageService.db) {
       const events = await this.storageService.db
-        .table(StorageSchemata.OBJECT_STORE.EVENTS)
+        .table(StorageSchema.OBJECT_STORE.EVENTS)
         .where(['conversation', 'time'])
         .between([conversationId, quotedMessageTime], [conversationId, new Date().toISOString()], true, true)
         .filter(event => event.data && event.data.quote && event.data.quote.message_id === quotedMessageId)
@@ -198,7 +198,7 @@ export class EventService {
       return events;
     }
 
-    const records = (await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS)) as EventRecord[];
+    const records = (await this.storageService.getAll(StorageSchema.OBJECT_STORE.EVENTS)) as EventRecord[];
     return records
       .filter(record => {
         return (
@@ -300,7 +300,7 @@ export class EventService {
 
     if (this.storageService.db) {
       const events = await this.storageService.db
-        .table(StorageSchemata.OBJECT_STORE.EVENTS)
+        .table(StorageSchema.OBJECT_STORE.EVENTS)
         .where('[conversation+time]')
         .between(
           [conversationId, fromDate.toISOString()],
@@ -312,7 +312,7 @@ export class EventService {
       return events;
     }
 
-    const records = (await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS)) as EventRecord[];
+    const records = (await this.storageService.getAll(StorageSchema.OBJECT_STORE.EVENTS)) as EventRecord[];
     return records
       .filter(record => {
         const recordDate = eventTimeToDate(record.time).getTime();
@@ -334,13 +334,13 @@ export class EventService {
    */
   async saveEvent(event: EventRecord): Promise<EventRecord> {
     event.category = categoryFromEvent(event);
-    event.primary_key = await this.storageService.save(StorageSchemata.OBJECT_STORE.EVENTS, undefined, event);
+    event.primary_key = await this.storageService.save(StorageSchema.OBJECT_STORE.EVENTS, undefined, event);
     if (this.storageService.isTemporaryAndNonPersistent) {
       /**
        * Dexie supports auto-incrementing primary keys and saves those keys to a predefined column.
        * The SQLeetEngine also supports auto-incrementing primary keys but it does not save them to a predefined column, so we have to do that manually:
        */
-      await this.storageService.update(StorageSchemata.OBJECT_STORE.EVENTS, event.primary_key, {
+      await this.storageService.update(StorageSchema.OBJECT_STORE.EVENTS, event.primary_key, {
         primary_key: event.primary_key,
       });
     }
@@ -348,16 +348,16 @@ export class EventService {
   }
 
   async replaceEvent<T extends Partial<EventRecord>>(event: T): Promise<T> {
-    await this.storageService.update(StorageSchemata.OBJECT_STORE.EVENTS, event.primary_key, event);
+    await this.storageService.update(StorageSchema.OBJECT_STORE.EVENTS, event.primary_key, event);
     return event;
   }
 
   addEventUpdatedListener(callback: DatabaseListenerCallback): void {
-    this.storageService.addUpdatedListener(StorageSchemata.OBJECT_STORE.EVENTS, callback);
+    this.storageService.addUpdatedListener(StorageSchema.OBJECT_STORE.EVENTS, callback);
   }
 
   addEventDeletedListener(callback: DatabaseListenerCallback): void {
-    this.storageService.addDeletedListener(StorageSchemata.OBJECT_STORE.EVENTS, callback);
+    this.storageService.addDeletedListener(StorageSchema.OBJECT_STORE.EVENTS, callback);
   }
 
   /**
@@ -371,7 +371,7 @@ export class EventService {
     reason: ProtobufAsset.NotUploaded | AssetTransferState,
   ): Promise<EventRecord | undefined> {
     const record = await this.storageService.load<EventRecord<AssetData>>(
-      StorageSchemata.OBJECT_STORE.EVENTS,
+      StorageSchema.OBJECT_STORE.EVENTS,
       primaryKey,
     );
     if (!record) {
@@ -424,15 +424,15 @@ export class EventService {
 
     if (this.storageService.db) {
       // Create a DB transaction to avoid concurrent sequential update.
-      return this.storageService.db.transaction('rw', StorageSchemata.OBJECT_STORE.EVENTS, async () => {
-        const record = await this.storageService.load<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey);
+      return this.storageService.db.transaction('rw', StorageSchema.OBJECT_STORE.EVENTS, async () => {
+        const record = await this.storageService.load<EventRecord>(StorageSchema.OBJECT_STORE.EVENTS, primaryKey);
         if (!record) {
           throw new StorageError(StorageError.TYPE.NOT_FOUND, StorageError.MESSAGE.NOT_FOUND);
         }
         const databaseVersion = record.version || 1;
         const isSequentialUpdate = changes.version === databaseVersion + 1;
         if (isSequentialUpdate) {
-          return this.storageService.update(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey, changes);
+          return this.storageService.update(StorageSchema.OBJECT_STORE.EVENTS, primaryKey, changes);
         }
         const logMessage = 'Failed sequential database update';
         const logObject = {
@@ -443,7 +443,7 @@ export class EventService {
         throw new StorageError(StorageError.TYPE.NON_SEQUENTIAL_UPDATE, StorageError.MESSAGE.NON_SEQUENTIAL_UPDATE);
       });
     }
-    return this.storageService.update(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey, changes);
+    return this.storageService.update(StorageSchema.OBJECT_STORE.EVENTS, primaryKey, changes);
   }
 
   /**
@@ -453,7 +453,7 @@ export class EventService {
    * @param eventId ID of the actual message
    */
   async deleteEvent(conversationId: string, eventId: string): Promise<number> {
-    return this.storageService.deleteEventInConversation(StorageSchemata.OBJECT_STORE.EVENTS, conversationId, eventId);
+    return this.storageService.deleteEventInConversation(StorageSchema.OBJECT_STORE.EVENTS, conversationId, eventId);
   }
 
   /**
@@ -462,7 +462,7 @@ export class EventService {
    * @param primaryKey ID of the actual message
    */
   deleteEventByKey(primaryKey: string): Promise<string> {
-    return this.storageService.delete(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey);
+    return this.storageService.delete(StorageSchema.OBJECT_STORE.EVENTS, primaryKey);
   }
 
   /**
@@ -472,6 +472,6 @@ export class EventService {
    * @param isoDate Date in ISO string format as upper bound which events should be removed
    */
   async deleteEvents(conversationId: string, isoDate?: string): Promise<number> {
-    return this.storageService.deleteEventsByDate(StorageSchemata.OBJECT_STORE.EVENTS, conversationId, isoDate);
+    return this.storageService.deleteEventsByDate(StorageSchema.OBJECT_STORE.EVENTS, conversationId, isoDate);
   }
 }

@@ -20,5 +20,5 @@
 export * from './record/';
 export * from './StorageKey';
 export * from './StorageRepository';
-export * from './StorageSchemata';
+export * from './StorageSchema';
 export * from './StorageService';

@@ -24,7 +24,7 @@ import {getLogger, Logger} from 'Util/Logger';
 import {AmplifyRecord, ConversationRecord, CryptoboxRecord, EventRecord, UserRecord} from './record';
 import {ClientRecord} from './record/ClientRecord';
 import {GroupIdRecord} from './record/GroupIdRecord';
-import {StorageSchemata} from './StorageSchemata';
+import {StorageSchema} from './StorageSchema';
 
 /**
  * TypeScript representation of local IndexedDB schema managed with Dexie.
@@ -49,7 +49,7 @@ export class DexieDatabase extends Dexie {
     super(dbName);
     this.logger = getLogger(`Dexie (${dbName})`);
 
-    StorageSchemata.SCHEMATA.forEach(({schema, upgrade, version}) => {
+    StorageSchema.SCHEMA.forEach(({schema, upgrade, version}) => {
       const versionInstance = this.version(version).stores(schema);
       if (upgrade) {
         versionInstance.upgrade((transaction: Transaction) => {
@@ -59,15 +59,15 @@ export class DexieDatabase extends Dexie {
       }
     });
 
-    this.amplify = this.table(StorageSchemata.OBJECT_STORE.AMPLIFY);
-    this.clients = this.table(StorageSchemata.OBJECT_STORE.CLIENTS);
-    this.conversation_events = this.table(StorageSchemata.OBJECT_STORE.CONVERSATION_EVENTS);
-    this.conversations = this.table(StorageSchemata.OBJECT_STORE.CONVERSATIONS);
-    this.events = this.table(StorageSchemata.OBJECT_STORE.EVENTS);
-    this.keys = this.table(StorageSchemata.OBJECT_STORE.KEYS);
-    this.prekeys = this.table(StorageSchemata.OBJECT_STORE.PRE_KEYS);
-    this.sessions = this.table(StorageSchemata.OBJECT_STORE.SESSIONS);
-    this.users = this.table(StorageSchemata.OBJECT_STORE.USERS);
-    this.groupIds = this.table(StorageSchemata.OBJECT_STORE.GROUP_IDS);
+    this.amplify = this.table(StorageSchema.OBJECT_STORE.AMPLIFY);
+    this.clients = this.table(StorageSchema.OBJECT_STORE.CLIENTS);
+    this.conversation_events = this.table(StorageSchema.OBJECT_STORE.CONVERSATION_EVENTS);
+    this.conversations = this.table(StorageSchema.OBJECT_STORE.CONVERSATIONS);
+    this.events = this.table(StorageSchema.OBJECT_STORE.EVENTS);
+    this.keys = this.table(StorageSchema.OBJECT_STORE.KEYS);
+    this.prekeys = this.table(StorageSchema.OBJECT_STORE.PRE_KEYS);
+    this.sessions = this.table(StorageSchema.OBJECT_STORE.SESSIONS);
+    this.users = this.table(StorageSchema.OBJECT_STORE.USERS);
+    this.groupIds = this.table(StorageSchema.OBJECT_STORE.GROUP_IDS);
   }
 }

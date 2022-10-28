@@ -21,10 +21,10 @@ import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
 
+import {StorageSchema} from './StorageSchema';
 import {StorageService} from './StorageService';
 
 import {StorageError} from '../error/StorageError';
-import {StorageSchemata} from '../storage/StorageSchemata';
 
 type AmplifyRecord = {key: string; value: string};
 
@@ -35,18 +35,18 @@ export class StorageRepository {
   static get CONFIG() {
     return {
       CRYPTOGRAPHY_TABLES: [
-        StorageSchemata.OBJECT_STORE.AMPLIFY,
-        StorageSchemata.OBJECT_STORE.CLIENTS,
-        StorageSchemata.OBJECT_STORE.KEYS,
-        StorageSchemata.OBJECT_STORE.SESSIONS,
-        StorageSchemata.OBJECT_STORE.PRE_KEYS,
+        StorageSchema.OBJECT_STORE.AMPLIFY,
+        StorageSchema.OBJECT_STORE.CLIENTS,
+        StorageSchema.OBJECT_STORE.KEYS,
+        StorageSchema.OBJECT_STORE.SESSIONS,
+        StorageSchema.OBJECT_STORE.PRE_KEYS,
       ],
     };
   }
 
   constructor(public readonly storageService = container.resolve(StorageService)) {
     this.logger = getLogger('StorageRepository');
-    this.AMPLIFY_STORE_NAME = StorageSchemata.OBJECT_STORE.AMPLIFY;
+    this.AMPLIFY_STORE_NAME = StorageSchema.OBJECT_STORE.AMPLIFY;
   }
 
   clearStores(): Promise<void> {

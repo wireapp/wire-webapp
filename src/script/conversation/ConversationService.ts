@@ -53,7 +53,7 @@ import {search as fullTextSearch} from '../search/FullTextSearch';
 import {APIClient} from '../service/APIClientSingleton';
 import {StorageService} from '../storage';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
-import {StorageSchemata} from '../storage/StorageSchemata';
+import {StorageSchema} from '../storage/StorageSchema';
 
 export class ConversationService {
   private readonly eventService: EventService;
@@ -325,12 +325,12 @@ export class ConversationService {
    */
   async deleteConversationFromDb({id, domain}: QualifiedId): Promise<string> {
     const key = domain ? `${id}@${domain}` : id;
-    const primaryKey = await this.storageService.delete(StorageSchemata.OBJECT_STORE.CONVERSATIONS, key);
+    const primaryKey = await this.storageService.delete(StorageSchema.OBJECT_STORE.CONVERSATIONS, key);
     return primaryKey;
   }
 
   loadConversation<T>(conversationId: string): Promise<T | undefined> {
-    return this.storageService.load(StorageSchemata.OBJECT_STORE.CONVERSATIONS, conversationId);
+    return this.storageService.load(StorageSchema.OBJECT_STORE.CONVERSATIONS, conversationId);
   }
 
   /**
@@ -345,12 +345,12 @@ export class ConversationService {
 
     if (this.storageService.db) {
       events = await this.storageService.db
-        .table(StorageSchemata.OBJECT_STORE.EVENTS)
+        .table(StorageSchema.OBJECT_STORE.EVENTS)
         .where('time')
         .aboveOrEqual(min_date.toISOString())
         .toArray();
     } else {
-      const records = await this.storageService.getAll<{time: number}>(StorageSchemata.OBJECT_STORE.EVENTS);
+      const records = await this.storageService.getAll<{time: number}>(StorageSchema.OBJECT_STORE.EVENTS);
       events = records
         .filter(record => record.time.toString() >= min_date.toISOString())
         .sort((a, b) => a.time - b.time);
@@ -372,7 +372,7 @@ export class ConversationService {
    * @returns Resolves with all the stored conversation states
    */
   loadConversationStatesFromDb<T>(): Promise<T[]> {
-    return this.storageService.getAll(StorageSchemata.OBJECT_STORE.CONVERSATIONS);
+    return this.storageService.getAll(StorageSchema.OBJECT_STORE.CONVERSATIONS);
   }
 
   /**
@@ -383,10 +383,10 @@ export class ConversationService {
   async saveConversationsInDb(conversations: ConversationRecord[]): Promise<ConversationRecord[]> {
     if (this.storageService.db) {
       const keys = conversations.map(conversation => conversation.id);
-      await this.storageService.db.table(StorageSchemata.OBJECT_STORE.CONVERSATIONS).bulkPut(conversations, keys);
+      await this.storageService.db.table(StorageSchema.OBJECT_STORE.CONVERSATIONS).bulkPut(conversations, keys);
     } else {
       for (const conversation of conversations) {
-        await this.storageService.save(StorageSchemata.OBJECT_STORE.CONVERSATIONS, conversation.id, conversation);
+        await this.storageService.save(StorageSchema.OBJECT_STORE.CONVERSATIONS, conversation.id, conversation);
       }
     }
 
@@ -402,7 +402,7 @@ export class ConversationService {
     const conversationData = conversation_et.serialize();
 
     return this.storageService
-      .save(StorageSchemata.OBJECT_STORE.CONVERSATIONS, conversation_et.id, conversationData)
+      .save(StorageSchema.OBJECT_STORE.CONVERSATIONS, conversation_et.id, conversationData)
       .then(primary_key => {
         this.logger.info(`State of conversation '${primary_key}' was stored`, conversationData);
         return conversation_et;

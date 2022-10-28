@@ -23,7 +23,7 @@ import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
 
-import {StorageSchemata, StorageService} from '../storage';
+import {StorageSchema, StorageService} from '../storage';
 
 export class BackupService {
   private readonly logger: Logger;
@@ -31,7 +31,7 @@ export class BackupService {
   static get CONFIG() {
     return {
       BATCH_SIZE: 10_000,
-      SUPPORTED_TABLES: [StorageSchemata.OBJECT_STORE.CONVERSATIONS, StorageSchemata.OBJECT_STORE.EVENTS],
+      SUPPORTED_TABLES: [StorageSchema.OBJECT_STORE.CONVERSATIONS, StorageSchema.OBJECT_STORE.EVENTS],
     };
   }
 
@@ -66,7 +66,7 @@ export class BackupService {
 
   async importEntities(tableName: string, entities: any[]): Promise<void> {
     // We don't want to set the primaryKey for the events table
-    const isEventsTable = tableName === StorageSchemata.OBJECT_STORE.EVENTS;
+    const isEventsTable = tableName === StorageSchema.OBJECT_STORE.EVENTS;
     const primaryKeys = isEventsTable ? undefined : entities.map(entity => entity.id);
     if (this.storageService.db) {
       await this.storageService.db.table(tableName).bulkPut(entities, primaryKeys);

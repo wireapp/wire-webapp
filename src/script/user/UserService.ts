@@ -24,7 +24,7 @@ import {Logger, getLogger} from 'Util/Logger';
 
 import type {User} from '../entity/User';
 import {APIClient} from '../service/APIClientSingleton';
-import {StorageSchemata} from '../storage/StorageSchemata';
+import {StorageSchema} from '../storage/StorageSchema';
 import {StorageService} from '../storage/StorageService';
 import {constructUserPrimaryKey} from '../util/StorageUtil';
 
@@ -37,7 +37,7 @@ export class UserService {
     private readonly apiClient = container.resolve(APIClient),
   ) {
     this.logger = getLogger('UserService');
-    this.USER_STORE_NAME = StorageSchemata.OBJECT_STORE.USERS;
+    this.USER_STORE_NAME = StorageSchema.OBJECT_STORE.USERS;
   }
 
   //##############################################################################

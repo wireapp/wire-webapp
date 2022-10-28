@@ -43,7 +43,7 @@ import {ConversationError} from 'src/script/error/ConversationError';
 import {ClientEvent} from 'src/script/event/Client';
 import {EventRepository} from 'src/script/event/EventRepository';
 import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
-import {StorageSchemata} from 'src/script/storage/StorageSchemata';
+import {StorageSchema} from 'src/script/storage/StorageSchema';
 import {escapeRegex} from 'Util/SanitizationUtil';
 import {createRandomUuid} from 'Util/util';
 
@@ -353,8 +353,8 @@ describe('ConversationRepository', () => {
        *  - With Dexie 2.x, specifying a key when saving a record with an auto-inc. inbound key results in an error: "Data provided to an operation does not meet requirements"
        *  - With Dexie 3.x, specifying a key when saving a record with an auto-inc. inbound key just fails silently
        */
-      await storage_service.save(StorageSchemata.OBJECT_STORE.EVENTS, bad_message_key, messageWithoutTime);
-      await storage_service.save(StorageSchemata.OBJECT_STORE.EVENTS, undefined, messageWithTime);
+      await storage_service.save(StorageSchema.OBJECT_STORE.EVENTS, bad_message_key, messageWithoutTime);
+      await storage_service.save(StorageSchema.OBJECT_STORE.EVENTS, undefined, messageWithTime);
       const loadedEvents = await testFactory.conversation_repository.getPrecedingMessages(conversation_et);
 
       expect(loadedEvents.length).toBe(1);

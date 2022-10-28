@@ -26,7 +26,7 @@ import Dexie from 'dexie';
 import {saveRandomEncryptionKey} from 'Util/ephemeralValueStore';
 
 import {DexieDatabase} from '../storage/DexieDatabase';
-import {SQLeetSchemata} from '../storage/SQLeetSchemata';
+import {SQLeetSchema} from '../storage/SQLeetSchema';
 
 export enum DatabaseTypes {
   /** a permament storage that will still live after logout */
@@ -51,7 +51,7 @@ const providePermanentEngine = async (storeName: string, requestPersistentStorag
 const provideTemporaryAndNonPersistentEngine = async (storeName: string): Promise<CRUDEngine> => {
   await Dexie.delete('/sqleet');
   const encryptionKey = await saveRandomEncryptionKey();
-  const engine = new SQLeetEngine('/worker/sqleet-worker.js', SQLeetSchemata.getLatest(), encryptionKey);
+  const engine = new SQLeetEngine('/worker/sqleet-worker.js', SQLeetSchema.getLatest(), encryptionKey);
   await engine.init(storeName);
   return engine;
 };
