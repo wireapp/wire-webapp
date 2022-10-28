@@ -94,6 +94,7 @@ const ConversationList: FC<ConversationListProps> = ({
   const conversationState = container.resolve(ConversationState);
   const callState = container.resolve(CallState);
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
+  const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
   const {is1to1, isRequest} = useKoSubscribableChildren(activeConversation!, ['is1to1', 'isRequest']);
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
   const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
@@ -394,7 +395,7 @@ const ConversationList: FC<ConversationListProps> = ({
             return (
               <div className="calling-cell" key={conversation.id}>
                 <CallingCell
-                  classifiedDomains={undefined}
+                  classifiedDomains={classifiedDomains}
                   call={call}
                   callActions={callingViewModel.callActions}
                   callingRepository={callingRepository}
