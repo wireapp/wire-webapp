@@ -24,9 +24,9 @@ import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
 import {AvailabilityState} from 'Components/AvailabilityState';
+import {CallingCell} from 'Components/calling/CallingCell';
 import {Icon} from 'Components/Icon';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
-import {ConversationListCallingCell} from 'Components/list/ConversationListCallingCell';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isTabKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -300,12 +300,13 @@ const Conversations: React.FC<ConversationsProps> = ({
         return (
           conversation && (
             <div className="calling-cell" key={conversation.id}>
-              <ConversationListCallingCell
+              <CallingCell
                 classifiedDomains={classifiedDomains}
                 call={call}
                 callActions={callingViewModel.callActions}
                 callingRepository={callingRepository}
                 conversation={conversation}
+                isFullUi
                 hasAccessToCamera={callingViewModel.hasAccessToCamera()}
                 isSelfVerified={selfUser.is_verified()}
                 multitasking={callingViewModel.multitasking}

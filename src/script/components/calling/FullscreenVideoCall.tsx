@@ -188,13 +188,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
 
   return (
     <div id="video-calling" className="video-calling">
-      <div
-        id="video-title"
-        className="video-title"
-        css={{
-          ...(verticalBreakpoint && {height: '30px', lineHeight: '12px'}),
-        }}
-      >
+      <div id="video-title" className="video-title">
         {horizontalSmBreakpoint && (
           <IconButton
             variant={IconButtonVariant.SECONDARY}
@@ -237,13 +231,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
         )}
       </div>
 
-      <div
-        id="video-element-remote"
-        className="video-element-remote"
-        css={{
-          height: verticalBreakpoint ? 'calc(100% - 105px)' : 'calc(100% - 179px)',
-        }}
-      >
+      <div id="video-element-remote" className="video-element-remote">
         <GroupVideoGrid
           maximizedParticipant={maximizedParticipant}
           selfParticipant={selfParticipant}
@@ -305,13 +293,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
       )}
       {!isChoosingScreen && (
         <div id="video-controls" className="video-controls">
-          <ul
-            className="video-controls__wrapper"
-            css={{
-              ...(horizontalSmBreakpoint && {justifyContent: 'center'}),
-              padding: verticalBreakpoint ? '10px' : horizontalXsBreakpoint ? '32px 10px' : '32px 40px 0 40px',
-            }}
-          >
+          <ul className="video-controls__wrapper">
             {!horizontalSmBreakpoint && (
               <li className="video-controls__item__minimize">
                 <button
@@ -338,14 +320,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                 </button>
               </li>
             )}
-            <div
-              className="video-controls__centered-items"
-              css={{
-                display: 'flex',
-                justifyContent: horizontalXsBreakpoint ? 'space-around' : 'space-between',
-                ...(horizontalXsBreakpoint && {width: '100%'}),
-              }}
-            >
+            <div className="video-controls__centered-items">
               <li className="video-controls__item">
                 <button
                   className="video-controls__button"
