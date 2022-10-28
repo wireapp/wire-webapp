@@ -680,9 +680,7 @@ class App {
   }
 
   private _registerSingleInstanceCleaning() {
-    $(window).on('beforeunload', () => {
-      this.singleInstanceHandler.deregisterInstance();
-    });
+    window.addEventListener('beforeunload', () => this.singleInstanceHandler.deregisterInstance());
   }
 
   /**
@@ -728,12 +726,7 @@ class App {
       '/preferences/devices': () => mainView.list.openPreferencesDevices(),
       '/preferences/options': () => mainView.list.openPreferencesOptions(),
       '/user/:userId(/:domain)': (userId: string, domain: string = this.apiClient.context?.domain ?? '') => {
-        showUserModal({
-          actionsViewModel: mainView.actions,
-          onClose: () => router.navigate('/'),
-          userId: {domain, id: userId},
-          userRepository: this.repository.user,
-        });
+        showUserModal({domain, id: userId}, () => router.navigate('/'));
       },
     });
     initRouterBindings(router);
@@ -750,7 +743,7 @@ class App {
    * Subscribe to 'beforeunload' to stop calls and disconnect the WebSocket.
    */
   private _subscribeToUnloadEvents(): void {
-    $(window).on('unload', () => {
+    window.addEventListener('unload', () => {
       this.logger.info("'window.onunload' was triggered, so we will disconnect from the backend.");
       this.repository.event.disconnectWebSocket();
       this.repository.calling.destroy();
@@ -868,7 +861,7 @@ class App {
     }
 
     this.logger.warn('No internet access. Continuing when internet connectivity regained.');
-    $(window).on('online', () => _logoutOnBackend());
+    window.addEventListener('online', () => _logoutOnBackend());
   };
 
   /**
@@ -928,7 +921,7 @@ class App {
 // Setting up the App
 //##############################################################################
 
-$(async () => {
+(async () => {
   const config = Config.getConfig();
   const apiClient = container.resolve(APIClient);
   await apiClient.useVersion(config.SUPPORTED_API_VERSIONS, config.ENABLE_DEV_BACKEND_API);
@@ -952,6 +945,6 @@ $(async () => {
       app.initApp(shouldPersist ? ClientType.PERMANENT : ClientType.TEMPORARY);
     }
   }
-});
+})();
 
 export {App};

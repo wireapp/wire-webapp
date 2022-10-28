@@ -131,11 +131,7 @@ const StartUI: React.FC<StartUIProps> = ({
       return;
     }
 
-    showUserModal({
-      actionsViewModel: mainViewModel.actions,
-      userId: {domain: user.domain, id: user.id},
-      userRepository: userRepository,
-    });
+    showUserModal({domain: user.domain, id: user.id});
   };
 
   const openService = (service: ServiceEntity) => {

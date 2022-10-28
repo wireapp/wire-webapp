@@ -404,3 +404,15 @@ export const getSelectionPosition = (element: HTMLTextAreaElement, currentMentio
 // temporary hack that disables mls for old 'broken' desktop clients, see https://github.com/wireapp/wire-desktop/pull/6094
 export const supportsMLS = () =>
   Config.getConfig().FEATURE.ENABLE_MLS && (!Runtime.isDesktopApp() || window.systemCrypto);
+
+export const incomingCssClass = 'content-animation-incoming-horizontal-left';
+
+export const removeAnimationsClass = (element: HTMLElement | null) => {
+  if (element) {
+    element.addEventListener('animationend', () => {
+      if (element.classList.contains(incomingCssClass)) {
+        element.classList.remove(incomingCssClass);
+      }
+    });
+  }
+};

@@ -13,9 +13,7 @@
     "plugin:import/typescript"
   ],
   "globals": {
-    "$": true,
     "amplify": true,
-    "jQuery": true,
     "ko": true,
     "sinon": true,
     "wire": true,

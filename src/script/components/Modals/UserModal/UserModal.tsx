@@ -17,11 +17,9 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
-import {noop} from 'jquery';
 import {container} from 'tsyringe';
 
 import {Icon} from 'Components/Icon';
@@ -31,21 +29,19 @@ import {UserActions} from 'Components/panel/UserActions';
 import {UserDetails} from 'Components/panel/UserDetails';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
-import {renderElement} from 'Util/renderElement';
+
+import {useUserModalState} from './UserModal.state';
 
 import {Config} from '../../../Config';
 import {User} from '../../../entity/User';
+import {RootContext} from '../../../page/RootProvider';
 import {Core} from '../../../service/CoreSingleton';
 import {TeamState} from '../../../team/TeamState';
 import {UserRepository} from '../../../user/UserRepository';
 import {UserState} from '../../../user/UserState';
-import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 
 export interface UserModalProps {
-  userId: QualifiedId;
   userRepository: UserRepository;
-  actionsViewModel: ActionsViewModel;
-  onClose?: () => void;
   userState?: UserState;
   teamState?: TeamState;
   core?: Core;
@@ -53,15 +49,63 @@ export interface UserModalProps {
 
 const brandName = Config.getConfig().BRAND_NAME;
 
+interface UserModalUserActionsSectionProps {
+  user: User;
+  onAction: () => void;
+  isSelfActivated: boolean;
+  selfUser: User;
+}
+
+const UserModalUserActionsSection: React.FC<UserModalUserActionsSectionProps> = ({
+  user,
+  onAction,
+  isSelfActivated,
+  selfUser,
+}) => {
+  const {isBlockedLegalHold} = useKoSubscribableChildren(user, ['isBlockedLegalHold']);
+  const mainViewModel = useContext(RootContext);
+
+  if (isBlockedLegalHold) {
+    const replaceLinkLegalHold = replaceLink(
+      Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK,
+      '',
+      'read-more-legal-hold',
+    );
+
+    return (
+      <div
+        className="modal__message"
+        data-uie-name="status-blocked-legal-hold"
+        dangerouslySetInnerHTML={{__html: t('modalUserBlockedForLegalHold', {}, replaceLinkLegalHold)}}
+      />
+    );
+  }
+
+  if (!mainViewModel) {
+    return null;
+  }
+
+  return (
+    <UserActions
+      user={user}
+      actionsViewModel={mainViewModel.actions}
+      onAction={onAction}
+      isSelfActivated={isSelfActivated}
+      selfUser={selfUser}
+    />
+  );
+};
+
 const UserModal: React.FC<UserModalProps> = ({
-  userId,
-  onClose = noop,
   userRepository,
-  actionsViewModel,
   core = container.resolve(Core),
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
 }) => {
+  const onClose = useUserModalState(state => state.onClose);
+  const userId = useUserModalState(state => state.userId);
+  const resetState = useUserModalState(state => state.resetState);
+
   const [isShown, setIsShown] = useState<boolean>(false);
   const [userNotFound, setUserNotFound] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
@@ -69,14 +113,13 @@ const UserModal: React.FC<UserModalProps> = ({
   const onModalClosed = () => {
     setUser(null);
     setUserNotFound(false);
-    onClose();
+    onClose?.();
+    resetState();
   };
-  const {isBlockedLegalHold} = useKoSubscribableChildren(user, ['isBlockedLegalHold']);
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
   const {self, isActivatedAccount} = useKoSubscribableChildren(userState, ['self', 'isActivatedAccount']);
   const {is_verified: isSelfVerified} = useKoSubscribableChildren(self, ['is_verified']);
   const isFederated = core.backendFeatures?.isFederated;
-  const replaceLinkLegalHold = replaceLink(Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK, '', 'read-more-legal-hold');
 
   useEffect(() => {
     if (userId) {
@@ -124,21 +167,12 @@ const UserModal: React.FC<UserModalProps> = ({
 
               <EnrichedFields user={user} showDomain={isFederated} />
 
-              {isBlockedLegalHold ? (
-                <div
-                  className="modal__message"
-                  data-uie-name="status-blocked-legal-hold"
-                  dangerouslySetInnerHTML={{__html: t('modalUserBlockedForLegalHold', {}, replaceLinkLegalHold)}}
-                />
-              ) : (
-                <UserActions
-                  user={user}
-                  actionsViewModel={actionsViewModel}
-                  onAction={hide}
-                  isSelfActivated={isActivatedAccount}
-                  selfUser={self}
-                />
-              )}
+              <UserModalUserActionsSection
+                user={user}
+                onAction={hide}
+                isSelfActivated={isActivatedAccount}
+                selfUser={self}
+              />
             </>
           )}
           {isShown && !user && !userNotFound && (
@@ -166,6 +200,4 @@ const UserModal: React.FC<UserModalProps> = ({
   );
 };
 
-const showUserModal = renderElement<UserModalProps>(UserModal, 'user-modal-container');
-
-export {UserModal, showUserModal};
+export {UserModal};
