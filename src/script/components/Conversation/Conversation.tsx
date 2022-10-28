@@ -386,9 +386,11 @@ const ConversationList: FC<ConversationListProps> = ({
             const conversation = conversationState.findConversation(call.conversationId);
             const callingViewModel = mainViewModel.calling;
             const callingRepository = callingViewModel.callingRepository;
+            if (!conversation && !smBreakpoint) {
+                return null;
+            }
+            
             return (
-              conversation &&
-              smBreakpoint && (
                 <div className="calling-cell" key={conversation.id}>
                   <CallingCell
                     classifiedDomains={undefined}
@@ -399,7 +401,6 @@ const ConversationList: FC<ConversationListProps> = ({
                     multitasking={callingViewModel.multitasking}
                   />
                 </div>
-              )
             );
           })}
 
