@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,12 +30,12 @@ import {Duration} from 'Components/calling/Duration';
 import {GroupVideoGrid} from 'Components/calling/GroupVideoGrid';
 import {Icon} from 'Components/Icon';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';
+import {ParticipantItem} from 'Components/list/ParticipantItem';
+import {useAppMainState, ViewType} from 'src/script/page/state';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
-
-import {ParticipantItem} from './ParticipantItem';
 
 import type {Call} from '../../calling/Call';
 import type {CallingRepository} from '../../calling/CallingRepository';
@@ -51,26 +51,31 @@ import {ContextMenuEntry, showContextMenu} from '../../ui/ContextMenu';
 import {initFadingScrollbar} from '../../ui/fadingScrollbar';
 import {CallActions, CallViewTab} from '../../view_model/CallingViewModel';
 
-export interface CallingCellProps {
+interface VideoCallProps {
+  multitasking: Multitasking;
+  hasAccessToCamera?: boolean;
+  isSelfVerified?: boolean;
+  teamState?: TeamState;
+}
+interface AnsweringControlsProps {
   call: Call;
   callActions: CallActions;
   callingRepository: Pick<CallingRepository, 'supportsScreenSharing' | 'sendModeratorMute'>;
   conversation: Conversation;
-  hasAccessToCamera: boolean;
-  isSelfVerified: boolean;
-  multitasking: Multitasking;
+  fullUi?: boolean;
   callState?: CallState;
   classifiedDomains?: string[];
-  teamState?: TeamState;
   temporaryUserStyle?: boolean;
 }
+export type CallingCellProps = VideoCallProps & AnsweringControlsProps;
 
-const ConversationListCallingCell: React.FC<CallingCellProps> = ({
+const CallingCell: React.FC<CallingCellProps> = ({
   conversation,
   classifiedDomains,
   temporaryUserStyle,
   call,
   callActions,
+  fullUi = false,
   multitasking,
   hasAccessToCamera,
   isSelfVerified,
@@ -198,7 +203,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
         return;
       }
       if (event.key === KEY.ENTER || event.key === KEY.SPACE) {
-        multitasking.isMinimized(false);
+        multitasking?.isMinimized(false);
       }
     },
     [isOngoing, multitasking],
@@ -208,12 +213,14 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
     if (!isOngoing) {
       return;
     }
-    multitasking.isMinimized(false);
+    multitasking?.isMinimized(false);
   }, [isOngoing, multitasking]);
+
+  const {setCurrentView} = useAppMainState(state => state.responsiveView);
 
   return (
     <div className="conversation-calling-cell">
-      {showJoinButton && (
+      {showJoinButton && fullUi && (
         <button
           className="call-ui__button call-ui__button--green call-ui__button--join"
           style={{margin: '40px 16px 0px 16px'}}
@@ -232,7 +239,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
           data-uie-id={conversation.id}
           data-uie-value={conversation.display_name()}
         >
-          {muteState === MuteState.REMOTE_MUTED && (
+          {muteState === MuteState.REMOTE_MUTED && fullUi && (
             <div className="conversation-list-calling-cell__info-bar">{t('muteStateRemoteMute')}</div>
           )}
           <div className="conversation-list-cell-right__calling">
@@ -299,7 +306,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
             </div>
           </div>
 
-          {(isOngoing || selfHasActiveVideo) && isMinimized && !!videoGrid?.grid?.length ? (
+          {(isOngoing || selfHasActiveVideo) && isMinimized && !!videoGrid?.grid?.length && fullUi ? (
             <div
               className="group-video__minimized-wrapper"
               onClick={handleMinimizedClick}
@@ -321,7 +328,8 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
               )}
             </div>
           ) : (
-            showNoCameraPreview && (
+            showNoCameraPreview &&
+            fullUi && (
               <div
                 className="group-video__minimized-wrapper group-video__minimized-wrapper--no-camera-access"
                 data-uie-name="label-no-camera-access-preview"
@@ -337,72 +345,76 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
             <>
               <div className="conversation-list-calling-cell-controls">
                 <ul className="conversation-list-calling-cell-controls-left">
-                  <li className="conversation-list-calling-cell-controls-item">
-                    <button
-                      className={cx('call-ui__button', {'call-ui__button--active': !isMuted})}
-                      onClick={() => callActions.toggleMute(call, !isMuted)}
-                      data-uie-name="do-toggle-mute"
-                      data-uie-value={isMuted ? 'active' : 'inactive'}
-                      title={t('videoCallOverlayMicrophone')}
-                      type="button"
-                      role="switch"
-                      aria-checked={!isMuted}
-                      disabled={isConnecting}
-                    >
-                      {isMuted ? <Icon.MicOff className="small-icon" /> : <Icon.MicOn className="small-icon" />}
-                    </button>
-                  </li>
+                  {fullUi && (
+                    <>
+                      <li className="conversation-list-calling-cell-controls-item">
+                        <button
+                          className={cx('call-ui__button', {'call-ui__button--active': !isMuted})}
+                          onClick={() => callActions.toggleMute(call, !isMuted)}
+                          data-uie-name="do-toggle-mute"
+                          data-uie-value={isMuted ? 'active' : 'inactive'}
+                          title={t('videoCallOverlayMicrophone')}
+                          type="button"
+                          role="switch"
+                          aria-checked={!isMuted}
+                          disabled={isConnecting}
+                        >
+                          {isMuted ? <Icon.MicOff className="small-icon" /> : <Icon.MicOn className="small-icon" />}
+                        </button>
+                      </li>
 
-                  {showVideoButton && (
-                    <li className="conversation-list-calling-cell-controls-item">
-                      <button
-                        className={cx('call-ui__button', {'call-ui__button--active': selfSharesCamera})}
-                        onClick={() => callActions.toggleCamera(call)}
-                        disabled={disableVideoButton}
-                        data-uie-name="do-toggle-video"
-                        title={t('videoCallOverlayCamera')}
-                        type="button"
-                        role="switch"
-                        aria-checked={selfSharesCamera}
-                        data-uie-value={selfSharesCamera ? 'active' : 'inactive'}
-                      >
-                        {selfSharesCamera ? (
-                          <Icon.Camera className="small-icon" />
-                        ) : (
-                          <Icon.CameraOff className="small-icon" />
-                        )}
-                      </button>
-                    </li>
-                  )}
+                      {showVideoButton && (
+                        <li className="conversation-list-calling-cell-controls-item">
+                          <button
+                            className={cx('call-ui__button', {'call-ui__button--active': selfSharesCamera})}
+                            onClick={() => callActions.toggleCamera(call)}
+                            disabled={disableVideoButton}
+                            data-uie-name="do-toggle-video"
+                            title={t('videoCallOverlayCamera')}
+                            type="button"
+                            role="switch"
+                            aria-checked={selfSharesCamera}
+                            data-uie-value={selfSharesCamera ? 'active' : 'inactive'}
+                          >
+                            {selfSharesCamera ? (
+                              <Icon.Camera className="small-icon" />
+                            ) : (
+                              <Icon.CameraOff className="small-icon" />
+                            )}
+                          </button>
+                        </li>
+                      )}
 
-                  {isOngoing && (
-                    <li className="conversation-list-calling-cell-controls-item">
-                      <button
-                        className={cx('call-ui__button', {
-                          'call-ui__button--active': selfSharesScreen,
-                          'call-ui__button--disabled': disableScreenButton,
-                          'with-tooltip with-tooltip--bottom': disableScreenButton,
-                        })}
-                        data-tooltip={disableScreenButton ? t('videoCallScreenShareNotSupported') : undefined}
-                        onClick={() => callActions.toggleScreenshare(call)}
-                        type="button"
-                        data-uie-name="do-call-controls-toggle-screenshare"
-                        data-uie-value={selfSharesScreen ? 'active' : 'inactive'}
-                        data-uie-enabled={disableScreenButton ? 'false' : 'true'}
-                        title={t('videoCallOverlayShareScreen')}
-                      >
-                        {selfSharesScreen ? (
-                          <Icon.Screenshare className="small-icon" />
-                        ) : (
-                          <Icon.ScreenshareOff className="small-icon" />
-                        )}
-                      </button>
-                    </li>
+                      {isOngoing && (
+                        <li className="conversation-list-calling-cell-controls-item">
+                          <button
+                            className={cx('call-ui__button', {
+                              'call-ui__button--active': selfSharesScreen,
+                              'call-ui__button--disabled': disableScreenButton,
+                              'with-tooltip with-tooltip--bottom': disableScreenButton,
+                            })}
+                            data-tooltip={disableScreenButton ? t('videoCallScreenShareNotSupported') : undefined}
+                            onClick={() => callActions.toggleScreenshare(call)}
+                            type="button"
+                            data-uie-name="do-call-controls-toggle-screenshare"
+                            data-uie-value={selfSharesScreen ? 'active' : 'inactive'}
+                            data-uie-enabled={disableScreenButton ? 'false' : 'true'}
+                            title={t('videoCallOverlayShareScreen')}
+                          >
+                            {selfSharesScreen ? (
+                              <Icon.Screenshare className="small-icon" />
+                            ) : (
+                              <Icon.ScreenshareOff className="small-icon" />
+                            )}
+                          </button>
+                        </li>
+                      )}
+                    </>
                   )}
                 </ul>
 
                 <ul className="conversation-list-calling-cell-controls-right">
-                  {showParticipantsButton && (
+                  {showParticipantsButton && fullUi && (
                     <li className="conversation-list-calling-cell-controls-item">
                       <button
                         className={cx('call-ui__button call-ui__button--participants', {
@@ -437,7 +449,10 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                     <li className="conversation-list-calling-cell-controls-item">
                       <button
                         className="call-ui__button call-ui__button--green call-ui__button--large"
-                        onClick={() => callActions.answer(call)}
+                        onClick={() => {
+                          callActions.answer(call);
+                          setCurrentView(ViewType.LEFT_SIDEBAR);
+                        }}
                         type="button"
                         title={t('callAccept')}
                         aria-label={t('callAccept')}
@@ -449,37 +464,40 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                   )}
                 </ul>
               </div>
-
-              <div
-                className={cx('call-ui__participant-list__wrapper', {
-                  'call-ui__participant-list__wrapper--active': showParticipants,
-                })}
-              >
-                <div ref={initFadingScrollbar} className="call-ui__participant-list__container">
-                  <ul className="call-ui__participant-list" data-uie-name="list-call-ui-participants">
-                    {participants
-                      .slice()
-                      .sort((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user))
-                      .map(participant => (
-                        <li key={participant.clientId} className="call-ui__participant-list__participant">
-                          <ParticipantItem
-                            key={participant.clientId}
-                            participant={participant.user}
-                            hideInfo
-                            noUnderline
-                            callParticipant={participant}
-                            selfInTeam={selfUser?.inTeam()}
-                            isSelfVerified={isSelfVerified}
-                            external={teamState.isExternal(participant.user.id)}
-                            onContextMenu={isModerator ? event => getParticipantContext(event, participant) : undefined}
-                            showDropdown={isModerator}
-                            noInteraction
-                          />
-                        </li>
-                      ))}
-                  </ul>
+              {fullUi && (
+                <div
+                  className={cx('call-ui__participant-list__wrapper', {
+                    'call-ui__participant-list__wrapper--active': showParticipants,
+                  })}
+                >
+                  <div ref={initFadingScrollbar} className="call-ui__participant-list__container">
+                    <ul className="call-ui__participant-list" data-uie-name="list-call-ui-participants">
+                      {participants
+                        .slice()
+                        .sort((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user))
+                        .map(participant => (
+                          <li key={participant.clientId} className="call-ui__participant-list__participant">
+                            <ParticipantItem
+                              key={participant.clientId}
+                              participant={participant.user}
+                              hideInfo
+                              noUnderline
+                              callParticipant={participant}
+                              selfInTeam={selfUser?.inTeam()}
+                              isSelfVerified={isSelfVerified}
+                              external={teamState.isExternal(participant.user.id)}
+                              onContextMenu={
+                                isModerator ? event => getParticipantContext(event, participant) : undefined
+                              }
+                              showDropdown={isModerator}
+                              noInteraction
+                            />
+                          </li>
+                        ))}
+                    </ul>
+                  </div>
                 </div>
-              </div>
+              )}
             </>
           )}
         </div>
@@ -488,4 +506,4 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   );
 };
 
-export {ConversationListCallingCell};
+export {CallingCell};

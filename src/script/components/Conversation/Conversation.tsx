@@ -32,7 +32,7 @@ import cx from 'classnames';
 import {container} from 'tsyringe';
 import {groupBy} from 'underscore';
 
-import {ConversationCallingCell} from 'Components/calling/ConversationCallingCell';
+import {CallingCell} from 'Components/calling/CallingCell';
 import {Giphy} from 'Components/Giphy';
 import {InputBar} from 'Components/InputBar';
 import {MessagesList} from 'Components/MessagesList';
@@ -390,12 +390,13 @@ const ConversationList: FC<ConversationListProps> = ({
               conversation &&
               smBreakpoint && (
                 <div className="calling-cell" key={conversation.id}>
-                  <ConversationCallingCell
+                  <CallingCell
                     classifiedDomains={undefined}
                     call={call}
                     callActions={callingViewModel.callActions}
                     callingRepository={callingRepository}
                     conversation={conversation}
+                    multitasking={callingViewModel.multitasking}
                   />
                 </div>
               )
