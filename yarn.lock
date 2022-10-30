@@ -435,9 +435,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/plugin-proposal-decorators@npm:7.19.6":
-  version: 7.19.6
-  resolution: "@babel/plugin-proposal-decorators@npm:7.19.6"
+"@babel/plugin-proposal-decorators@npm:7.20.0":
+  version: 7.20.0
+  resolution: "@babel/plugin-proposal-decorators@npm:7.20.0"
   dependencies:
     "@babel/helper-create-class-features-plugin": ^7.19.0
     "@babel/helper-plugin-utils": ^7.19.0
@@ -446,7 +446,7 @@ __metadata:
     "@babel/plugin-syntax-decorators": ^7.19.0
   peerDependencies:
     "@babel/core": ^7.0.0-0
-  checksum: 69162475282507e1579232fdaae26330cfcfa7843f4a943383d76c61a5e225ea1fe08edd7c700c400694ab9b57e8b3928b757da985ac613ddfc78be5a9b61c47
+  checksum: b882bf758c9e098ead68a05e3e912f427a5b286c7174a582ccf38cf02a679ce1372282a45fb1987b2ffd7e9923fc38e6913fa54e165f5640c334c2c6a74e761f
   languageName: node
   linkType: hard
 
@@ -17049,7 +17049,7 @@ __metadata:
   dependencies:
     "@babel/core": 7.19.6
     "@babel/eslint-parser": 7.19.1
-    "@babel/plugin-proposal-decorators": 7.19.6
+    "@babel/plugin-proposal-decorators": 7.20.0
     "@babel/preset-env": 7.19.4
     "@babel/preset-react": 7.18.6
     "@babel/preset-typescript": 7.18.6
