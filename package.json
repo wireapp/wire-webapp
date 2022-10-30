@@ -97,7 +97,7 @@
     "caniuse-lite": "^1.0.30001427",
     "concurrently": "7.5.0",
     "cross-env": "7.0.3",
-    "cspell": "6.12.0",
+    "cspell": "6.13.1",
     "cssnano": "4.1.11",
     "dexie": "^3.2.2",
     "dotenv": "16.0.3",
