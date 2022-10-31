@@ -55,6 +55,7 @@ declare global {
         FEATURE: {
           ALLOWED_FILE_UPLOAD_EXTENSIONS: string[];
           APPLOCK_SCHEDULED_TIMEOUT: number;
+          CC_PROTEUS_ENABLED: boolean;
           CHECK_CONSENT: boolean;
           CONFERENCE_AUTO_MUTE: boolean;
           DEFAULT_LOGIN_TEMPORARY_CLIENT: boolean;
