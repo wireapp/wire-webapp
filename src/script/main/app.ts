@@ -613,6 +613,19 @@ class App {
       }
     }
 
+    await this._initiateStorage();
+
+    this.repository.client.init(userEntity);
+    await this.repository.properties.init(userEntity);
+
+    return userEntity;
+  }
+
+  /**
+   * Initiate storage service.
+   * Trigger db migration script if relevant.
+   */
+  private async _initiateStorage() {
     await container.resolve(StorageService).init(this.core.storage);
 
     //storage was initialised, possible version upgrade, we can try running migration
@@ -626,11 +639,6 @@ class App {
         this.logger.error('Client was not able to perform DB migration:', error);
       }
     }
-
-    this.repository.client.init(userEntity);
-    await this.repository.properties.init(userEntity);
-
-    return userEntity;
   }
 
   /**
