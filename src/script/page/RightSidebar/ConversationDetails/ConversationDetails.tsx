@@ -22,6 +22,7 @@ import {FC, useCallback, useEffect, useMemo, useState} from 'react';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/';
 
 import {Icon} from 'Components/Icon';
+import {ConversationProtocolDetails} from 'Components/panel/ConversationProtocolDetails/ConversationProtocolDetails';
 import {PanelActions} from 'Components/panel/PanelActions';
 import {ServiceDetails} from 'Components/panel/ServiceDetails';
 import {ServiceList} from 'Components/ServiceList';
@@ -409,6 +410,11 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
             <PanelActions items={conversationActions} />
           </>
         )}
+
+        <ConversationProtocolDetails
+          protocol={activeConversation.protocol}
+          cipherSuite={activeConversation.cipherSuite}
+        />
       </div>
     </div>
   );

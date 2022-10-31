@@ -446,6 +446,8 @@ class App {
             const conversation = await conversationRepository.getConversationById(conversationId);
             return conversation?.groupId;
           },
+          // @todo update this when external commits are being implemented
+          userAuthorize: () => false,
         });
       }
 
