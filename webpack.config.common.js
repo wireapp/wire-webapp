@@ -62,6 +62,41 @@ module.exports = {
         },
         test: /\.svg$/,
       },
+      {
+        test: /\.less$/i,
+        use: [
+          'style-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              sourceMap: true,
+              url: false,
+            },
+          },
+          {
+            loader: 'postcss-loader',
+            options: {
+              postcssOptions: {
+                plugins: [
+                  [
+                    'autoprefixer',
+                    {
+                      browsers: ['Chrome >= 51', 'Edge >= 14', 'Firefox >= 52', 'Opera >= 40'],
+                    },
+                  ],
+                  [require('cssnano')()],
+                ],
+              },
+            },
+          },
+          {
+            loader: 'less-loader',
+            options: {
+              sourceMap: true,
+            },
+          },
+        ],
+      },
     ],
   },
   optimization: {

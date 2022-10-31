@@ -37,6 +37,6 @@ module.exports = {
       debounceDelay: 250,
       spawn: false,
     },
-    tasks: ['build_style', 'build_markup'],
+    tasks: ['build_markup'],
   },
 };
