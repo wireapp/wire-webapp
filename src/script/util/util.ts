@@ -401,9 +401,13 @@ export const getSelectionPosition = (element: HTMLTextAreaElement, currentMentio
   return {newEnd, newStart};
 };
 
-// temporary hack that disables mls for old 'broken' desktop clients, see https://github.com/wireapp/wire-desktop/pull/6094
-export const supportsMLS = () =>
-  Config.getConfig().FEATURE.ENABLE_MLS && (!Runtime.isDesktopApp() || window.systemCrypto);
+const supportsSecretStorage = () => !Runtime.isDesktopApp() || window.systemCrypto;
+
+// disables mls for old 'broken' desktop clients, see https://github.com/wireapp/wire-desktop/pull/6094
+export const supportsMLS = () => Config.getConfig().FEATURE.ENABLE_MLS && supportsSecretStorage();
+
+export const supportsCoreCryptoProteus = () =>
+  Config.getConfig().FEATURE.ENABLE_PROTEUS_CORE_CRYPTO && supportsSecretStorage();
 
 export const incomingCssClass = 'content-animation-incoming-horizontal-left';
 
