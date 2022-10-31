@@ -17,6 +17,8 @@
  *
  */
 
+/* eslint-disable import/order */
+
 // Polyfill for "tsyringe" dependency injection
 require('core-js/full/reflect');
 require('intersection-observer');
@@ -31,6 +33,7 @@ require('src/script/util/test/mock/navigatorPermissionsMock');
 require('src/script/util/test/mock/ResponseMock');
 require('src/script/util/test/mock/SVGProviderMock');
 require('src/script/util/test/mock/WebRTCMock');
+require('src/script/util/test/mock/resizeObserver.mock');
 
 jest.mock('axios', () => {
   return {
@@ -72,6 +75,8 @@ window.wire = {
 };
 
 window.z = {userPermission: {}};
+
+window.URL.createObjectURL = jest.fn();
 
 const testLib = require('@testing-library/react');
 testLib.configure({testIdAttribute: 'data-uie-name'});

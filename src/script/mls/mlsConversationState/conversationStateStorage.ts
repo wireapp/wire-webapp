@@ -18,6 +18,7 @@
  */
 
 import {getStorage} from 'Util/localStorage';
+
 import {MLSConversationState} from './mlsConversationState';
 
 const storageKey = 'mlsConversationsState';

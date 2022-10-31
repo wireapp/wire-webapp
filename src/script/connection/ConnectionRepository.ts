@@ -18,15 +18,26 @@
  */
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
-import {USER_EVENT, UserConnectionEvent} from '@wireapp/api-client/lib/event/';
+import {UserConnectionEvent, USER_EVENT} from '@wireapp/api-client/lib/event/';
 import type {BackendEventType} from '@wireapp/api-client/lib/event/BackendEvent';
-import type {UserConnectionData} from '@wireapp/api-client/lib/user/data/';
-import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
+import type {UserConnectionData} from '@wireapp/api-client/lib/user/data/';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
 import {container} from 'tsyringe';
-import {getLogger, Logger} from 'Util/Logger';
+
 import {replaceLink, t} from 'Util/LocalizerUtil';
+import {getLogger, Logger} from 'Util/Logger';
+import {matchQualifiedIds} from 'Util/QualifiedId';
+
+import type {ConnectionEntity} from './ConnectionEntity';
+import {ConnectionMapper} from './ConnectionMapper';
+import type {ConnectionService} from './ConnectionService';
+import {ConnectionState} from './ConnectionState';
+
+import {PrimaryModal} from '../components/Modals/PrimaryModal';
+import {Config} from '../Config';
 import type {Conversation} from '../entity/Conversation';
 import {MemberMessage} from '../entity/message/MemberMessage';
 import type {User} from '../entity/User';
@@ -34,14 +45,6 @@ import {EventRepository} from '../event/EventRepository';
 import type {EventSource} from '../event/EventSource';
 import {SystemMessageType} from '../message/SystemMessageType';
 import type {UserRepository} from '../user/UserRepository';
-import type {ConnectionEntity} from './ConnectionEntity';
-import {ConnectionMapper} from './ConnectionMapper';
-import type {ConnectionService} from './ConnectionService';
-import {ConnectionState} from './ConnectionState';
-import {ModalsViewModel} from '../view_model/ModalsViewModel';
-import {Config} from '../Config';
-import {matchQualifiedIds} from 'Util/QualifiedId';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 export class ConnectionRepository {
   private readonly connectionService: ConnectionService;
@@ -192,7 +195,7 @@ export class ConnectionRepository {
           '',
           'read-more-legal-hold',
         );
-        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+        PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
           text: {
             htmlMessage: t('modalUserCannotConnectLegalHoldMessage', {}, replaceLinkLegalHold),
             title: t('modalUserCannotConnectLegalHoldHeadline'),

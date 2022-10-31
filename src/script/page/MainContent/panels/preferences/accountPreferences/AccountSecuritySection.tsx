@@ -17,23 +17,26 @@
  *
  */
 
+import React from 'react';
+
 import {Runtime} from '@wireapp/commons';
+import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
-import React from 'react';
+import {container} from 'tsyringe';
+
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
+import {safeWindowOpen} from 'Util/SanitizationUtil';
+
 import {User} from '../../../../../entity/User';
 import {getAccountPagesUrl, getCreateTeamUrl, getManageTeamUrl, URL_PATH} from '../../../../../externalRoute';
 import {TeamState} from '../../../../../team/TeamState';
 import {AppLockState} from '../../../../../user/AppLockState';
 import {FEATURES, hasAccessToFeature} from '../../../../../user/UserPermission';
 import {UserRepository} from '../../../../../user/UserRepository';
-import {modals, ModalsViewModel} from '../../../../../view_model/ModalsViewModel';
-import {container} from 'tsyringe';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
-import {safeWindowOpen} from 'Util/SanitizationUtil';
-import PreferencesSection from '../components/PreferencesSection';
-import {Link, LinkVariant} from '@wireapp/react-ui-kit';
+import {PreferencesSection} from '../components/PreferencesSection';
 
 interface AccountSecuritySectionProps {
   appLockState?: AppLockState;
@@ -56,8 +59,8 @@ const AccountSecuritySection: React.FC<AccountSecuritySectionProps> = ({
   const isMacOsWrapper = Runtime.isDesktopApp() && Runtime.isMacOS();
 
   const onClickDeleteAccount = () =>
-    modals.showModal(
-      ModalsViewModel.TYPE.CONFIRM,
+    PrimaryModal.show(
+      PrimaryModal.type.CONFIRM,
       {
         primaryAction: {
           action: () => userRepository.deleteMe(),
@@ -129,4 +132,4 @@ const AccountSecuritySection: React.FC<AccountSecuritySectionProps> = ({
   );
 };
 
-export default AccountSecuritySection;
+export {AccountSecuritySection};

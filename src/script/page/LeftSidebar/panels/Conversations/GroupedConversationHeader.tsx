@@ -18,12 +18,13 @@
  */
 
 import React, {useEffect, useState} from 'react';
+
 import cx from 'classnames';
 
+import {Icon} from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import type {ConversationLabel} from '../../../../conversation/ConversationLabelRepository';
-import Icon from 'Components/Icon';
 
 export interface GroupedConversationHeaderProps {
   conversationLabel: ConversationLabel;
@@ -64,4 +65,4 @@ const GroupedConversationHeader: React.FC<GroupedConversationHeaderProps> = ({on
   );
 };
 
-export default GroupedConversationHeader;
+export {GroupedConversationHeader};

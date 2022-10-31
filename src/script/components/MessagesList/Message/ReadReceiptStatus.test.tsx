@@ -17,12 +17,14 @@
  *
  */
 
+import {render, fireEvent} from '@testing-library/react';
 import ko from 'knockout';
+
 import {Message as MessageEntity} from 'src/script/entity/message/Message';
-import ReadReceiptStatus from './ReadReceiptStatus';
 import {ReadReceipt} from 'src/script/storage';
 import {formatTimeShort} from 'Util/TimeUtil';
-import {render, fireEvent} from '@testing-library/react';
+
+import {ReadReceiptStatus} from './ReadReceiptStatus';
 
 const createReadReceiptMessage = (partialReadReceiptStatus: Partial<MessageEntity>) => {
   const readReceiptMessage: Partial<MessageEntity> = {

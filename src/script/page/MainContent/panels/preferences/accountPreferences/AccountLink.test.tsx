@@ -17,20 +17,19 @@
  *
  */
 
-import {render, fireEvent, screen} from '@testing-library/react';
-import AccountLink from './AccountLink';
-import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
+import {fireEvent, render, screen} from '@testing-library/react';
+
+import {withTheme} from 'src/script/auth/util/test/TestUtil';
+
+import {AccountLink} from './AccountLink';
+
 import * as utils from '../../../../../util/ClipboardUtil';
 
 test('copies correct text', async () => {
   const mockCopy: any = jest.spyOn(utils, 'copyText');
   mockCopy.mockImplementation((text: string) => text);
 
-  render(
-    <StyledApp themeId={THEME_ID.DEFAULT}>
-      <AccountLink label="test" value="test-value" />
-    </StyledApp>,
-  );
+  render(withTheme(<AccountLink label="test" value="test-value" />));
 
   const button = await screen.findByRole('button');
   fireEvent.click(button);
@@ -40,11 +39,7 @@ test('copies correct text', async () => {
 });
 
 test('renders elements correctly', () => {
-  render(
-    <StyledApp themeId={THEME_ID.DEFAULT}>
-      <AccountLink label="test" value="test-value" />
-    </StyledApp>,
-  );
+  render(withTheme(<AccountLink label="test" value="test-value" />));
   const label = screen.getByTestId('label-profile-link');
   const value = screen.getByTestId('profile-link');
   const button = screen.getByTestId('do-copy-profile-link');

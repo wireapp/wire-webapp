@@ -17,9 +17,9 @@
  *
  */
 
+import type {TraceState} from '@wireapp/api-client/lib/http/';
 import type {Consent, Self} from '@wireapp/api-client/lib/self/';
 import type {UserUpdate} from '@wireapp/api-client/lib/user/';
-import type {TraceState} from '@wireapp/api-client/lib/http/';
 import {container} from 'tsyringe';
 
 import {APIClient} from '../service/APIClientSingleton';

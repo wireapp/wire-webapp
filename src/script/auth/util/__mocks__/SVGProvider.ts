@@ -19,4 +19,7 @@
 
 const svgs: {[index: string]: Document} = {};
 
-export default svgs;
+const getAllSVGs = () => svgs;
+const getSVG = (iconName: string) => svgs[iconName];
+
+export {getAllSVGs, getSVG};

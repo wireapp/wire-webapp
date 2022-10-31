@@ -42,4 +42,5 @@ const config: Config = {
   testRunner: 'jest-jasmine2',
 };
 
+// eslint-disable-next-line import/no-default-export
 export default config;

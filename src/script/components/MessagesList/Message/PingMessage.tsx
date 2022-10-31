@@ -18,13 +18,16 @@
  */
 
 import React from 'react';
-import cx from 'classnames';
-import {PingMessage as PingMessageEntity} from '../../../entity/message/PingMessage';
 
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import MessageTime from './MessageTime';
-import ReadReceiptStatus from './ReadReceiptStatus';
+import cx from 'classnames';
+
 import {Message} from 'src/script/entity/message/Message';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+
+import {MessageTime} from './MessageTime';
+import {ReadReceiptStatus} from './ReadReceiptStatus';
+
+import {PingMessage as PingMessageEntity} from '../../../entity/message/PingMessage';
 
 export interface PingMessageProps {
   is1to1Conversation: boolean;
@@ -79,4 +82,4 @@ const PingMessage: React.FC<PingMessageProps> = ({
   );
 };
 
-export default PingMessage;
+export {PingMessage};

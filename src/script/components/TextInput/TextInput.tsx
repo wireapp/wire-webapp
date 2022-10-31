@@ -17,12 +17,15 @@
  *
  */
 
-import React, {forwardRef, useEffect, useRef} from 'react';
-import Icon from 'Components/Icon';
+import React, {forwardRef, useEffect} from 'react';
+
 import {CheckIcon, COLOR} from '@wireapp/react-ui-kit';
-import {cancelButtonCSS, containerCSS, errorMessageCSS, getIconCSS, getInputCSS, getLabelCSS} from './TextInput.styles';
-import {t} from 'Util/LocalizerUtil';
+
+import {Icon} from 'Components/Icon';
 import {isTabKey} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
+
+import {cancelButtonCSS, containerCSS, errorMessageCSS, getIconCSS, getInputCSS, getLabelCSS} from './TextInput.styles';
 
 export interface UserInputProps {
   autoFocus?: boolean;
@@ -41,104 +44,114 @@ export interface UserInputProps {
   value?: string;
   uieName?: string;
   errorUieName?: string;
+  inputWrapperRef?: React.RefObject<HTMLDivElement>;
   setIsEditing?: (x: boolean) => void;
 }
 
 const SUCCESS_DISMISS_TIMEOUT = 2500;
 
-const TextInput: React.ForwardRefRenderFunction<HTMLDivElement, UserInputProps> = (
-  {
-    autoFocus,
-    disabled,
-    errorMessage,
-    isError,
-    isSuccess,
-    label,
-    name,
-    onCancel,
-    onChange,
-    onBlur,
-    onKeyDown,
-    onSuccessDismissed,
-    placeholder,
-    value,
-    uieName,
-    errorUieName,
-    setIsEditing,
-  }: UserInputProps,
-  ref,
-) => {
-  const isFilled = Boolean(value);
-  const textInputRef = useRef<HTMLInputElement>(null);
+const TextInput = forwardRef<HTMLInputElement, UserInputProps>(
+  (
+    {
+      autoFocus,
+      disabled,
+      errorMessage,
+      isError,
+      isSuccess,
+      label,
+      name,
+      onCancel,
+      onChange,
+      onBlur,
+      onKeyDown,
+      onSuccessDismissed,
+      placeholder,
+      value,
+      uieName,
+      errorUieName,
+      inputWrapperRef,
+      setIsEditing,
+    },
+    textInputRef,
+  ) => {
+    const isFilled = Boolean(value);
 
-  useEffect(() => {
-    if (isSuccess && onSuccessDismissed) {
-      setTimeout(() => {
-        onSuccessDismissed();
-      }, SUCCESS_DISMISS_TIMEOUT);
+    useEffect(() => {
+      if (isSuccess && onSuccessDismissed) {
+        setTimeout(() => {
+          onSuccessDismissed();
+        }, SUCCESS_DISMISS_TIMEOUT);
+      }
+    }, [isSuccess, onSuccessDismissed]);
+
+    let changedColor = undefined;
+    if (isError) {
+      changedColor = 'var(--text-input-alert) !important';
     }
-  }, [isSuccess, onSuccessDismissed]);
+    if (isSuccess) {
+      changedColor = 'var(--text-input-success) !important';
+    }
 
-  let changedColor = undefined;
-  if (isError) {
-    changedColor = 'var(--text-input-alert) !important';
-  }
-  if (isSuccess) {
-    changedColor = 'var(--text-input-success) !important';
-  }
+    return (
+      <div css={containerCSS} ref={inputWrapperRef}>
+        {isError && errorMessage && (
+          <span className="label" css={errorMessageCSS} data-uie-name={errorUieName}>
+            {errorMessage}
+          </span>
+        )}
 
-  return (
-    <div css={containerCSS} ref={ref}>
-      {isError && errorMessage && (
-        <span className="label" css={errorMessageCSS} data-uie-name={errorUieName}>
-          {errorMessage}
-        </span>
-      )}
+        {/* eslint jsx-a11y/no-autofocus : "off" */}
+        <input
+          autoFocus={autoFocus}
+          className="text-input"
+          css={getInputCSS(disabled, changedColor)}
+          disabled={disabled}
+          id={name}
+          name={name}
+          value={value}
+          onChange={onChange}
+          onBlur={onBlur}
+          onKeyDown={onKeyDown}
+          placeholder={placeholder}
+          ref={textInputRef}
+          data-uie-name={uieName}
+        />
 
-      {/* eslint jsx-a11y/no-autofocus : "off" */}
-      <input
-        autoFocus={autoFocus}
-        className="text-input"
-        css={getInputCSS(disabled, changedColor)}
-        disabled={disabled}
-        id={name}
-        name={name}
-        value={value}
-        onChange={onChange}
-        onBlur={onBlur}
-        onKeyDown={onKeyDown}
-        placeholder={placeholder}
-        ref={textInputRef}
-        data-uie-name={uieName}
-      />
-      <label className="label-medium" css={getLabelCSS(changedColor)} htmlFor={name}>
-        {label}
-      </label>
-      {isFilled && !isSuccess && !isError && (
-        <button
-          type="button"
-          css={cancelButtonCSS}
-          onClick={() => {
-            onCancel();
-            textInputRef.current?.focus();
-          }}
-          aria-label={t('accessibility.userProfileDeleteEntry')}
-          onKeyDown={(event: React.KeyboardEvent<HTMLButtonElement>): void => {
-            if (event.shiftKey && isTabKey(event)) {
-              // shift+tab from clear button should focus on the input field
-              setIsEditing?.(true);
-            } else if (isTabKey(event)) {
-              // tab from clear button should close the editable field
-              setIsEditing?.(false);
-            }
-          }}
-        >
-          <Icon.Close css={{fill: 'var(--text-input-background)', height: 8, width: 8}} />
-        </button>
-      )}
-      {isSuccess && !isError && <CheckIcon css={getIconCSS(changedColor)} color={COLOR.TEXT} />}
-      {isError && <Icon.ExclamationMark css={getIconCSS(changedColor)} color={COLOR.TEXT} />}
-    </div>
-  );
-};
-export default forwardRef(TextInput);
+        <label className="label-medium" css={getLabelCSS(changedColor)} htmlFor={name}>
+          {label}
+        </label>
+
+        {isFilled && !isSuccess && !isError && (
+          <button
+            type="button"
+            css={cancelButtonCSS}
+            onClick={() => {
+              onCancel();
+              if (textInputRef && 'current' in textInputRef) {
+                textInputRef.current?.focus();
+              }
+            }}
+            aria-label={t('accessibility.userProfileDeleteEntry')}
+            onKeyDown={(event: React.KeyboardEvent<HTMLButtonElement>): void => {
+              if (event.shiftKey && isTabKey(event)) {
+                // shift+tab from clear button should focus on the input field
+                setIsEditing?.(true);
+              } else if (isTabKey(event)) {
+                // tab from clear button should close the editable field
+                setIsEditing?.(false);
+              }
+            }}
+          >
+            <Icon.Close css={{fill: 'var(--text-input-background)', height: 8, width: 8}} />
+          </button>
+        )}
+        {isSuccess && !isError && <CheckIcon css={getIconCSS(changedColor)} color={COLOR.TEXT} />}
+        {isError && <Icon.ExclamationMark css={getIconCSS(changedColor)} color={COLOR.TEXT} />}
+      </div>
+    );
+  },
+);
+
+TextInput.displayName = 'TextInput';
+
+export {TextInput};

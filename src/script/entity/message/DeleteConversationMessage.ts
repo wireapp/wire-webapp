@@ -17,13 +17,15 @@
  *
  */
 
+import {TEAM_EVENT} from '@wireapp/api-client/lib/event/TeamEvent';
 import ko from 'knockout';
 
-import {TEAM_EVENT} from '@wireapp/api-client/lib/event/TeamEvent';
 import {t} from 'Util/LocalizerUtil';
+
+import {SystemMessage} from './SystemMessage';
+
 import {SystemMessageType} from '../../message/SystemMessageType';
 import type {Conversation} from '../Conversation';
-import {SystemMessage} from './SystemMessage';
 
 export class DeleteConversationMessage extends SystemMessage {
   public readonly system_message_type: SystemMessageType;

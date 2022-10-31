@@ -18,26 +18,28 @@
  */
 
 import React, {useEffect} from 'react';
-import {CSSTransition, SwitchTransition} from 'react-transition-group';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {container} from 'tsyringe';
 
-import {ListViewModel, ListState} from '../../view_model/ListViewModel';
-import {User} from '../../entity/User';
-import {AssetRepository} from '../../assets/AssetRepository';
-
-import Preferences from './panels/Preferences';
-import Archive from './panels/Archive';
-import Conversations from './panels/Conversations';
-import TemporaryGuestConversations from './panels/TemporatyGuestConversations';
-import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import StartUI from './panels/StartUI';
+import {amplify} from 'amplify';
+import cx from 'classnames';
+import {CSSTransition, SwitchTransition} from 'react-transition-group';
+
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
+
+import {Archive} from './panels/Archive';
+import {Conversations} from './panels/Conversations';
+import {Preferences} from './panels/Preferences';
+import {StartUI} from './panels/StartUI';
+import {TemporaryGuestConversations} from './panels/TemporatyGuestConversations';
+
+import {User} from '../../entity/User';
+import {ListState, ListViewModel} from '../../view_model/ListViewModel';
 
 type LeftSidebarProps = {
-  assetRepository?: AssetRepository;
   listViewModel: ListViewModel;
   selfUser: User;
+  isActivatedAccount: boolean;
 };
 const Animated: React.FC<{children: React.ReactNode}> = ({children, ...rest}) => {
   return (
@@ -47,22 +49,18 @@ const Animated: React.FC<{children: React.ReactNode}> = ({children, ...rest}) =>
   );
 };
 
-const LeftSidebar: React.FC<LeftSidebarProps> = ({
-  listViewModel,
-  assetRepository = container.resolve(AssetRepository),
-  selfUser,
-}) => {
+const LeftSidebar: React.FC<LeftSidebarProps> = ({listViewModel, selfUser, isActivatedAccount}) => {
   const {conversationRepository, propertiesRepository} = listViewModel;
   const repositories = listViewModel.contentViewModel.repositories;
 
   const {state} = useKoSubscribableChildren(listViewModel, ['state']);
-  let content = <span></span>;
+
   const switchList = (list: ListState) => listViewModel.switchList(list);
-  const goHome = () => {
-    return selfUser.isTemporaryGuest()
+
+  const goHome = () =>
+    selfUser.isTemporaryGuest()
       ? listViewModel.switchList(ListViewModel.STATE.TEMPORARY_GUEST)
       : listViewModel.switchList(ListViewModel.STATE.CONVERSATIONS);
-  };
 
   useEffect(() => {
     amplify.subscribe(WebAppEvents.SHORTCUT.START, () => {
@@ -70,73 +68,68 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
     });
   }, []);
 
-  switch (state) {
-    case ListState.CONVERSATIONS:
-      content = (
-        <Conversations
-          listViewModel={listViewModel}
-          preferenceNotificationRepository={repositories.preferenceNotification}
-          conversationRepository={conversationRepository}
-          propertiesRepository={propertiesRepository}
-          switchList={switchList}
-          selfUser={selfUser}
-        />
-      );
-      break;
-    case ListState.PREFERENCES:
-      content = (
-        <Preferences
-          contentViewModel={listViewModel.contentViewModel}
-          teamRepository={repositories.team}
-          onClose={goHome}
-        ></Preferences>
-      );
-      break;
-
-    case ListState.ARCHIVE:
-      content = (
-        <Archive
-          answerCall={listViewModel.answerCall}
-          conversationRepository={conversationRepository}
-          listViewModel={listViewModel}
-          onClose={goHome}
-        ></Archive>
-      );
-      break;
-
-    case ListState.TEMPORARY_GUEST:
-      content = (
-        <TemporaryGuestConversations
-          callingViewModel={listViewModel.callingViewModel}
-          listViewModel={listViewModel}
-          selfUser={selfUser}
-        />
-      );
-      break;
-
-    case ListState.START_UI:
-      content = (
-        <StartUI
-          onClose={goHome}
-          conversationRepository={conversationRepository}
-          searchRepository={repositories.search}
-          teamRepository={repositories.team}
-          integrationRepository={repositories.integration}
-          mainViewModel={listViewModel.mainViewModel}
-          userRepository={repositories.user}
-          isFederated={listViewModel.isFederated}
-        />
-      );
-  }
   return (
-    <>
+    <div id="left-column" className={cx('left-column', {'left-column--light-theme': !isActivatedAccount})}>
+      <header>
+        <h1 className="visually-hidden">{t('accessibility.headings.sidebar')}</h1>
+      </header>
+
       <SwitchTransition>
-        <Animated key={state}>{content}</Animated>
+        <Animated key={state}>
+          <>
+            {state === ListState.CONVERSATIONS && (
+              <Conversations
+                listViewModel={listViewModel}
+                preferenceNotificationRepository={repositories.preferenceNotification}
+                conversationRepository={conversationRepository}
+                propertiesRepository={propertiesRepository}
+                switchList={switchList}
+                selfUser={selfUser}
+              />
+            )}
+
+            {state === ListState.PREFERENCES && (
+              <Preferences
+                contentViewModel={listViewModel.contentViewModel}
+                teamRepository={repositories.team}
+                onClose={goHome}
+              />
+            )}
+
+            {state === ListState.ARCHIVE && (
+              <Archive
+                answerCall={listViewModel.answerCall}
+                conversationRepository={conversationRepository}
+                listViewModel={listViewModel}
+                onClose={goHome}
+              />
+            )}
+
+            {state === ListState.TEMPORARY_GUEST && (
+              <TemporaryGuestConversations
+                callingViewModel={listViewModel.callingViewModel}
+                listViewModel={listViewModel}
+                selfUser={selfUser}
+              />
+            )}
+
+            {state === ListState.START_UI && (
+              <StartUI
+                onClose={goHome}
+                conversationRepository={conversationRepository}
+                searchRepository={repositories.search}
+                teamRepository={repositories.team}
+                integrationRepository={repositories.integration}
+                mainViewModel={listViewModel.mainViewModel}
+                userRepository={repositories.user}
+                isFederated={listViewModel.isFederated}
+              />
+            )}
+          </>
+        </Animated>
       </SwitchTransition>
-    </>
+    </div>
   );
 };
 
-export default LeftSidebar;
-
-registerReactComponent('left-sidebar', LeftSidebar);
+export {LeftSidebar};

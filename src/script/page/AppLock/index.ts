@@ -18,4 +18,3 @@
  */
 
 export * from './AppLock';
-export {default} from './AppLock';

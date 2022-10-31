@@ -19,14 +19,15 @@
 
 import express from 'express';
 import expressSitemapXml from 'express-sitemap-xml';
-import fs from 'fs';
 import hbs from 'hbs';
 import helmet from 'helmet';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import nocache from 'nocache';
+
+import fs from 'fs';
 import http from 'http';
 import https from 'https';
-import nocache from 'nocache';
 import path from 'path';
-import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {HealthCheckRoute} from './routes/_health/HealthRoute';
 import {AppleAssociationRoute} from './routes/appleassociation/AppleAssociationRoute';
@@ -180,7 +181,6 @@ class Server {
         fileExtensionRegx.test(req.path) ||
         req.path.startsWith('/commit') ||
         req.path.startsWith('/test') ||
-        req.path.startsWith('/demo') ||
         req.path.startsWith('/_health') ||
         req.path.startsWith('/join') ||
         req.path.startsWith('/auth') ||

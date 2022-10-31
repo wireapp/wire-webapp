@@ -18,9 +18,11 @@
  */
 
 import React from 'react';
+
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {t} from 'Util/LocalizerUtil';
-import CollectionItem from './CollectionItem';
+
+import {CollectionItem} from './CollectionItem';
 
 const CollectionSection: React.FC<{
   children: React.ReactNode;
@@ -29,7 +31,8 @@ const CollectionSection: React.FC<{
   messages: ContentMessage[];
   onSelect: () => void;
   uieName: string;
-}> = ({messages, limit, uieName, onSelect, children, label}) => {
+  onImageClick?: (message: ContentMessage) => void;
+}> = ({messages, limit, uieName, onSelect, children, label, onImageClick}) => {
   if (messages.length === 0) {
     return null;
   }
@@ -50,11 +53,11 @@ const CollectionSection: React.FC<{
       </header>
       <div className="collection-images">
         {topMessages.map(message => (
-          <CollectionItem message={message} allMessages={[]} key={message.id} />
+          <CollectionItem message={message} allMessages={[]} key={message.id} onImageClick={onImageClick} />
         ))}
       </div>
     </section>
   );
 };
 
-export default CollectionSection;
+export {CollectionSection};

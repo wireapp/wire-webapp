@@ -17,8 +17,9 @@
  *
  */
 
-import {container, singleton} from 'tsyringe';
 import sodium from 'libsodium-wrappers-sumo';
+import {container, singleton} from 'tsyringe';
+
 import {AppLockState} from './AppLockState';
 import {UserState} from './UserState';
 

@@ -17,13 +17,15 @@
  *
  */
 
+import {fireEvent, render} from '@testing-library/react';
 import ko from 'knockout';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {MessageTimerButton} from './MessageTimerButton';
-import type {Conversation} from '../../../entity/Conversation';
-import * as Context from '../../../ui/ContextMenu';
+
+import type {Conversation} from 'src/script/entity/Conversation';
 import {TeamState} from 'src/script/team/TeamState';
-import {render, fireEvent} from '@testing-library/react';
+import * as Context from 'src/script/ui/ContextMenu';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+
+import {MessageTimerButton} from './MessageTimerButton';
 
 describe('MessageTimerButton', () => {
   it('hides the timer button when the feature is disabled', () => {

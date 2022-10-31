@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 
-jest.mock('Components/icons', () => {});
+jest.mock('Components/icons', () => ({Icon: {}}));
 
 ko.components.register('profile-icon', {template: '<span></span>'});
 ko.components.register('leave-icon', {template: '<span></span>'});

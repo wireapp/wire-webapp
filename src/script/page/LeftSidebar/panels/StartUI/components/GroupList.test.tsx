@@ -17,15 +17,18 @@
  *
  */
 
+import {fireEvent, render} from '@testing-library/react';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
-import GroupList from './GroupList';
+import type {QualifiedId} from '@wireapp/api-client/lib/user/';
+
 import {createRandomUuid, noop} from 'Util/util';
+
+import {GroupList} from './GroupList';
+
 import {AssetRepository} from '../../../../../assets/AssetRepository';
 import {Conversation} from '../../../../../entity/Conversation';
 import {User} from '../../../../../entity/User';
 import {Router} from '../../../../../router/Router';
-import type {QualifiedId} from '@wireapp/api-client/lib/user/';
-import {render, fireEvent} from '@testing-library/react';
 
 const getGroupItemById = (container: HTMLElement, id: string) =>
   container.querySelector(`[data-uie-name="item-group"][data-uie-uid="${id}"]`);

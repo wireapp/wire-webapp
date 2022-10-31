@@ -18,6 +18,7 @@
  */
 
 import React from 'react';
+
 import cx from 'classnames';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -57,4 +58,4 @@ const NoDevicesFound: React.FC<NoDevicesFoundProps> = ({user, noPadding}) => {
   );
 };
 
-export default NoDevicesFound;
+export {NoDevicesFound};

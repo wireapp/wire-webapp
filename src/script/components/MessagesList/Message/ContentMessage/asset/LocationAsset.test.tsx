@@ -19,9 +19,9 @@
 
 import {render} from '@testing-library/react';
 
-import LocationAsset from './LocationAsset';
-
 import type {Location} from 'src/script/entity/message/Location';
+
+import {LocationAsset} from './LocationAsset';
 
 describe('LocationAsset', () => {
   const location: Partial<Location> = {latitude: '52.31', longitude: '13.24', name: 'Berlin', zoom: '0'};

@@ -18,12 +18,13 @@
  */
 
 import {ClientClassification, ClientType, RegisteredClient} from '@wireapp/api-client/lib/client/';
+import {Runtime} from '@wireapp/commons';
 import type {ClientInfo} from '@wireapp/core/lib/client/';
 
-import {Runtime} from '@wireapp/commons';
+import {ClientActionCreator} from './creator/';
+
 import * as StringUtil from '../../util/stringUtil';
 import type {ThunkAction} from '../reducer';
-import {ClientActionCreator} from './creator/';
 
 export class ClientAction {
   doGetAllClients = (): ThunkAction<Promise<RegisteredClient[]>> => {

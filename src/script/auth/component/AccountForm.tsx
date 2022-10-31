@@ -17,13 +17,18 @@
  *
  */
 
-import {ValidationUtil} from '@wireapp/commons';
-import {Button, Checkbox, CheckboxLabel, Form, Input, InputBlock, Small} from '@wireapp/react-ui-kit';
 import React from 'react';
+
+import {ValidationUtil} from '@wireapp/commons';
+import {Button, Checkbox, CheckboxLabel, Form, Input, Small} from '@wireapp/react-ui-kit';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
+
 import {KEY} from 'Util/KeyboardUtil';
+
+import {Exception} from './Exception';
+
 import {Config} from '../../Config';
 import {accountFormStrings} from '../../strings';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
@@ -32,7 +37,6 @@ import {ValidationError} from '../module/action/ValidationError';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as AccentColor from '../util/AccentColor';
-import Exception from './Exception';
 
 interface Props extends React.HTMLProps<HTMLFormElement> {
   beforeSubmit?: () => Promise<void>;
@@ -40,7 +44,7 @@ interface Props extends React.HTMLProps<HTMLFormElement> {
   submitText?: string;
 }
 
-const AccountForm = ({account, ...props}: Props & ConnectedProps & DispatchProps) => {
+const AccountFormComponent = ({account, ...props}: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
   const [registrationData, setRegistrationData] = React.useState({
     accent_id: AccentColor.random().id,
@@ -139,77 +143,75 @@ const AccountForm = ({account, ...props}: Props & ConnectedProps & DispatchProps
   return (
     <Form onSubmit={handleSubmit} style={{display: 'flex', flexDirection: 'column'}}>
       <div>
-        <InputBlock>
-          <Input
-            name="name"
-            id="name"
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              inputs.name.current.setCustomValidity('');
-              setRegistrationData({...registrationData, name: event.target.value});
-              setValidInputs({...validInputs, name: true});
-            }}
-            ref={inputs.name}
-            markInvalid={!validInputs.name}
-            value={registrationData.name}
-            autoComplete="section-create-team username"
-            placeholder={_(accountFormStrings.namePlaceholder)}
-            onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
-              if (event.key === KEY.ENTER) {
-                inputs.email.current.focus();
-              }
-            }}
-            maxLength={64}
-            minLength={2}
-            pattern=".{2,64}"
-            required
-            data-uie-name="enter-name"
-          />
-          <Input
-            name="email"
-            id="email"
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              inputs.email.current.setCustomValidity('');
-              setRegistrationData({...registrationData, email: event.target.value});
-              setValidInputs({...validInputs, email: true});
-            }}
-            ref={inputs.email}
-            markInvalid={!validInputs.email}
-            value={registrationData.email}
-            autoComplete="section-create-team email"
-            placeholder={_(
-              props.isPersonalFlow
-                ? accountFormStrings.emailPersonalPlaceholder
-                : accountFormStrings.emailTeamPlaceholder,
-            )}
-            onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
-              if (event.key === KEY.ENTER) {
-                inputs.password.current.focus();
-              }
-            }}
-            maxLength={128}
-            type="email"
-            required
-            data-uie-name="enter-email"
-          />
-          <Input
-            name="password"
-            id="password"
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              inputs.password.current.setCustomValidity('');
-              setRegistrationData({...registrationData, password: event.target.value});
-              setValidInputs({...validInputs, password: true});
-            }}
-            ref={inputs.password}
-            markInvalid={!validInputs.password}
-            value={registrationData.password}
-            autoComplete="section-create-team new-password"
-            type="password"
-            placeholder={_(accountFormStrings.passwordPlaceholder)}
-            pattern={ValidationUtil.getNewPasswordPattern(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH)}
-            required
-            data-uie-name="enter-password"
-          />
-        </InputBlock>
+        <Input
+          name="name"
+          id="name"
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            inputs.name.current.setCustomValidity('');
+            setRegistrationData({...registrationData, name: event.target.value});
+            setValidInputs({...validInputs, name: true});
+          }}
+          ref={inputs.name}
+          markInvalid={!validInputs.name}
+          value={registrationData.name}
+          autoComplete="section-create-team username"
+          placeholder={_(accountFormStrings.namePlaceholder)}
+          onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
+            if (event.key === KEY.ENTER) {
+              inputs.email.current.focus();
+            }
+          }}
+          maxLength={64}
+          minLength={2}
+          pattern=".{2,64}"
+          required
+          data-uie-name="enter-name"
+        />
+        <Input
+          name="email"
+          id="email"
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            inputs.email.current.setCustomValidity('');
+            setRegistrationData({...registrationData, email: event.target.value});
+            setValidInputs({...validInputs, email: true});
+          }}
+          ref={inputs.email}
+          markInvalid={!validInputs.email}
+          value={registrationData.email}
+          autoComplete="section-create-team email"
+          placeholder={_(
+            props.isPersonalFlow
+              ? accountFormStrings.emailPersonalPlaceholder
+              : accountFormStrings.emailTeamPlaceholder,
+          )}
+          onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
+            if (event.key === KEY.ENTER) {
+              inputs.password.current.focus();
+            }
+          }}
+          maxLength={128}
+          type="email"
+          required
+          data-uie-name="enter-email"
+        />
+        <Input
+          name="password"
+          id="password"
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            inputs.password.current.setCustomValidity('');
+            setRegistrationData({...registrationData, password: event.target.value});
+            setValidInputs({...validInputs, password: true});
+          }}
+          ref={inputs.password}
+          markInvalid={!validInputs.password}
+          value={registrationData.password}
+          autoComplete="section-create-team new-password"
+          type="password"
+          placeholder={_(accountFormStrings.passwordPlaceholder)}
+          pattern={ValidationUtil.getNewPasswordPattern(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH)}
+          required
+          data-uie-name="enter-password"
+        />
         <Small
           style={{
             display: validationErrors.length ? 'none' : 'block',
@@ -333,4 +335,6 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(mapStateToProps, mapDispatchToProps)(AccountForm);
+const AccountForm = connect(mapStateToProps, mapDispatchToProps)(AccountFormComponent);
+
+export {AccountForm};

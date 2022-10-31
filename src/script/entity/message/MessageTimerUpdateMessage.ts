@@ -17,15 +17,16 @@
  *
  */
 
-import ko from 'knockout';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
+import ko from 'knockout';
 
 import {t} from 'Util/LocalizerUtil';
 import {formatDuration} from 'Util/TimeUtil';
 
+import {SystemMessage} from './SystemMessage';
+
 import {ConversationEphemeralHandler} from '../../conversation/ConversationEphemeralHandler';
 import {SystemMessageType} from '../../message/SystemMessageType';
-import {SystemMessage} from './SystemMessage';
 
 export class MessageTimerUpdateMessage extends SystemMessage {
   public readonly message_timer: number;

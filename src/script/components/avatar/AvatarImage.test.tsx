@@ -17,12 +17,16 @@
  *
  */
 
-import {waitFor, render} from '@testing-library/react';
-import AvatarImage from './AvatarImage';
-import {User} from '../../entity/User';
-import {AssetRepository} from '../../assets/AssetRepository';
+import {render, waitFor} from '@testing-library/react';
+
 import {AVATAR_SIZE} from 'Components/Avatar';
 import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
+
+import {AvatarImage} from './AvatarImage';
+
+import {AssetRepository} from '../../assets/AssetRepository';
+import {User} from '../../entity/User';
+jest.mock('../../auth/util/SVGProvider');
 
 describe('AvatarImage', () => {
   it('fetches full avatar image for large avatars', async () => {

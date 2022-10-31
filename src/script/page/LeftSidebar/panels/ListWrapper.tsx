@@ -21,9 +21,11 @@ import React, {ReactElement} from 'react';
 
 import {css} from '@emotion/react';
 import {throttle} from 'underscore';
-import {isScrollable, isScrolledBottom, isScrolledTop} from 'Util/scroll-helpers';
-import Icon from 'Components/Icon';
+
+import {Icon} from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
+import {isScrollable, isScrolledBottom, isScrolledTop} from 'Util/scroll-helpers';
+
 import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 
 type LeftListWrapperProps = {
@@ -41,6 +43,7 @@ type LeftListWrapperProps = {
 const scrollStyle = css`
   position: relative;
   flex: 1 1 auto;
+  min-height: 150px;
   overflow-x: hidden;
   overflow-y: auto;
 `;
@@ -51,6 +54,7 @@ const style = css`
   flex-direction: column;
   width: 100%;
   height: 100%;
+  overflow-y: overlay;
 `;
 
 const ListWrapper: React.FC<LeftListWrapperProps> = ({
@@ -122,4 +126,4 @@ const ListWrapper: React.FC<LeftListWrapperProps> = ({
   );
 };
 
-export default ListWrapper;
+export {ListWrapper};

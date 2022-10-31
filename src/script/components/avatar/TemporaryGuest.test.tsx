@@ -17,10 +17,13 @@
  *
  */
 
-import TemporaryGuestAvatar from './TemporaryGuestAvatar';
+import {render} from '@testing-library/react';
+
+import {TemporaryGuestAvatar} from './TemporaryGuestAvatar';
+
 import {User} from '../../entity/User';
 import {AVATAR_SIZE, STATE} from '../Avatar';
-import {render} from '@testing-library/react';
+jest.mock('../../auth/util/SVGProvider');
 
 describe('TemporaryGuestAvatar', () => {
   it('shows expiration circle', async () => {

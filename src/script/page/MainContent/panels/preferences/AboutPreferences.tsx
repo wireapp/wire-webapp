@@ -17,16 +17,20 @@
  *
  */
 
-import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 import React, {useMemo} from 'react';
+
+import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 import {container} from 'tsyringe';
+
 import {t} from 'Util/LocalizerUtil';
+
+import {PreferencesPage} from './components/PreferencesPage';
+import {PreferencesSection} from './components/PreferencesSection';
+
 import {Config} from '../../../../Config';
 import {getPrivacyPolicyUrl, getTermsOfUsePersonalUrl, getTermsOfUseTeamUrl, URL} from '../../../../externalRoute';
 import {UserState} from '../../../../user/UserState';
 import {useKoSubscribableChildren} from '../../../../util/ComponentUtil';
-import PreferencesPage from './components/PreferencesPage';
-import PreferencesSection from './components/PreferencesSection';
 
 interface AboutPreferencesProps {
   userState?: UserState;
@@ -111,4 +115,4 @@ const AboutPreferences: React.FC<AboutPreferencesProps> = ({userState = containe
   );
 };
 
-export default AboutPreferences;
+export {AboutPreferences};

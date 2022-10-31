@@ -17,13 +17,13 @@
  *
  */
 
+import type {ConversationRolesList} from '@wireapp/api-client/lib/conversation/ConversationRole';
+import type {FeatureList} from '@wireapp/api-client/lib/team/feature/';
+import {FeatureStatus, FEATURE_KEY} from '@wireapp/api-client/lib/team/feature/';
 import type {LegalHoldMemberData} from '@wireapp/api-client/lib/team/legalhold/';
 import type {MemberData, Members} from '@wireapp/api-client/lib/team/member/';
-import type {FeatureList} from '@wireapp/api-client/lib/team/feature/';
 import type {Services} from '@wireapp/api-client/lib/team/service/';
-import type {ConversationRolesList} from '@wireapp/api-client/lib/conversation/ConversationRole';
 import type {TeamData} from '@wireapp/api-client/lib/team/team/';
-import {FeatureStatus, FEATURE_KEY} from '@wireapp/api-client/lib/team/feature/';
 import {container} from 'tsyringe';
 
 import {APIClient} from '../service/APIClientSingleton';

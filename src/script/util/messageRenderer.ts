@@ -17,6 +17,7 @@
  *
  */
 
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import hljs from 'highlight.js';
 import MarkdownIt from 'markdown-it';
 import type Token from 'markdown-it/lib/token';
@@ -24,7 +25,6 @@ import {escape} from 'underscore';
 
 import {replaceInRange} from './StringUtil';
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {MentionEntity} from '../message/MentionEntity';
 
 interface MentionText {

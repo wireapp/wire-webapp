@@ -17,9 +17,9 @@
  *
  */
 
+import {FeatureStatus} from '@wireapp/api-client/lib/team/feature/';
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
-import {FeatureStatus} from '@wireapp/api-client/lib/team/feature/';
 
 import {TeamState} from '../team/TeamState';
 

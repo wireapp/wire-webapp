@@ -17,8 +17,10 @@
  *
  */
 
-import cx from 'classnames';
 import React, {CSSProperties, useEffect, useState} from 'react';
+
+import cx from 'classnames';
+
 import {clamp} from 'Util/NumberUtil';
 
 export interface SeekBarProps extends React.HTMLProps<HTMLDivElement> {
@@ -101,4 +103,4 @@ const SeekBar: React.FC<SeekBarProps> = ({
   );
 };
 
-export default SeekBar;
+export {SeekBar};

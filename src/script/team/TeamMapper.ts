@@ -23,10 +23,11 @@ import type {PermissionsData} from '@wireapp/api-client/lib/team/member/Permissi
 
 import {Logger, getLogger} from 'Util/Logger';
 
-import {roleFromTeamPermissions} from '../user/UserPermission';
 import {TeamEntity} from './TeamEntity';
 import {TeamMemberEntity} from './TeamMemberEntity';
+
 import type {User} from '../entity/User';
+import {roleFromTeamPermissions} from '../user/UserPermission';
 
 export class TeamMapper {
   private readonly logger: Logger;

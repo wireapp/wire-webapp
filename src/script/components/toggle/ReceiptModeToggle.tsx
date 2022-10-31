@@ -18,12 +18,12 @@
  */
 
 import React, {Fragment} from 'react';
+
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 
-import {registerReactComponent} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import Icon from '../Icon';
+import {Icon} from '../Icon';
 
 export interface ReceiptModeToggleProps {
   onReceiptModeChanged: (receiptMode: RECEIPT_MODE) => void;
@@ -81,6 +81,4 @@ const ReceiptModeToggle: React.FC<ReceiptModeToggleProps> = ({receiptMode, onRec
   );
 };
 
-export default ReceiptModeToggle;
-
-registerReactComponent('read-receipt-toggle', ReceiptModeToggle);
+export {ReceiptModeToggle};

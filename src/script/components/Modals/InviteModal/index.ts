@@ -17,4 +17,4 @@
  *
  */
 
-export {showInviteModal as default} from './InviteModal';
+export * from './InviteModal';

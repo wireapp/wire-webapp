@@ -17,43 +17,43 @@
  *
  */
 
+import {ClientClassification} from '@wireapp/api-client/lib/client/';
+import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
+import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE, CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
+import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
+import {ConversationCreateEvent, ConversationMemberJoinEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import ko from 'knockout';
 import sinon from 'sinon';
-import {amplify} from 'amplify';
-import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
-import {WebAppEvents} from '@wireapp/webapp-events';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
-import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
-import {ClientClassification} from '@wireapp/api-client/lib/client/';
-import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {createRandomUuid} from 'Util/util';
-import {Conversation} from 'src/script/entity/Conversation';
-import {User} from 'src/script/entity/User';
-import {Message} from 'src/script/entity/message/Message';
-import {ClientEvent} from 'src/script/event/Client';
-import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
-import {EventRepository} from 'src/script/event/EventRepository';
-import {ClientEntity} from 'src/script/client/ClientEntity';
-import {EventBuilder, DeleteEvent, MessageHiddenEvent} from 'src/script/conversation/EventBuilder';
-import {CONVERSATION_EVENT, ConversationCreateEvent, ConversationMemberJoinEvent} from '@wireapp/api-client/lib/event/';
-import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
-import {ConversationDatabaseData, ConversationMapper} from 'src/script/conversation/ConversationMapper';
-import {StorageSchemata} from 'src/script/storage/StorageSchemata';
-import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
-import {Config} from 'src/script/Config';
-import {ConversationError} from 'src/script/error/ConversationError';
-import {EventRecord, StorageService} from '../storage';
-import {ConversationRepository} from './ConversationRepository';
-import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE} from '@wireapp/api-client/lib/conversation';
-import {escapeRegex} from 'Util/SanitizationUtil';
-
-import {UserGenerator} from '../../../test/helper/UserGenerator';
-import {TestFactory} from '../../../test/helper/TestFactory';
-import {entities, payload} from '../../../test/api/payloads';
-import Sinon from 'sinon';
-import {Core} from '../service/CoreSingleton';
 import {container} from 'tsyringe';
+
+import {ClientEntity} from 'src/script/client/ClientEntity';
+import {Config} from 'src/script/Config';
+import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
+import {ConversationDatabaseData, ConversationMapper} from 'src/script/conversation/ConversationMapper';
+import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
+import {DeleteEvent, EventBuilder, MessageHiddenEvent} from 'src/script/conversation/EventBuilder';
+import {Conversation} from 'src/script/entity/Conversation';
+import {Message} from 'src/script/entity/message/Message';
+import {User} from 'src/script/entity/User';
+import {ConversationError} from 'src/script/error/ConversationError';
+import {ClientEvent} from 'src/script/event/Client';
+import {EventRepository} from 'src/script/event/EventRepository';
+import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
+import {StorageSchemata} from 'src/script/storage/StorageSchemata';
+import {escapeRegex} from 'Util/SanitizationUtil';
+import {createRandomUuid} from 'Util/util';
+
+import {ConversationRepository} from './ConversationRepository';
+
+import {entities, payload} from '../../../test/api/payloads';
+import {TestFactory} from '../../../test/helper/TestFactory';
+import {UserGenerator} from '../../../test/helper/UserGenerator';
+import {Core} from '../service/CoreSingleton';
+import {EventRecord, StorageService} from '../storage';
 
 jest.deepUnmock('axios');
 
@@ -62,7 +62,7 @@ describe('ConversationRepository', () => {
 
   let conversation_et: Conversation;
   let self_user_et;
-  let server: Sinon.SinonFakeServer;
+  let server: sinon.SinonFakeServer;
   let storage_service: StorageService;
   const messageSenderId = createRandomUuid();
 

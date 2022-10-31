@@ -17,30 +17,29 @@
  *
  */
 
-import LegalHoldDot from 'Components/LegalHoldDot';
-import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
 import {render} from '@testing-library/react';
 
-jest.mock('Components/Icon', () => ({
-  Pending: function PeningIcon() {
-    return <span>pendingIcon</span>;
-  },
-}));
+import {LegalHoldDot} from 'Components/LegalHoldDot';
 
 describe('LegalHoldDot', () => {
   it('shows a pending icon', () => {
-    const legalHoldModal = {
-      showRequestModal: () => Promise.resolve(),
-      showUsers: () => Promise.resolve(),
-    } as LegalHoldModalViewModel;
+    const {getByTestId} = render(<LegalHoldDot isPending />);
+    expect(getByTestId('legal-hold-dot-pending-icon')).not.toBeNull();
+  });
 
-    const props = {
-      isPending: true,
-      legalHoldModal,
-    };
+  it('is not interactive dot', async () => {
+    const interactiveUieData = 'legal-hold-dot';
+    const {getByTestId} = await render(<LegalHoldDot dataUieName={interactiveUieData} />);
 
-    const {getByText} = render(<LegalHoldDot {...props} />);
+    const button = getByTestId(interactiveUieData);
+    expect(button.getAttribute('disabled')).toBeDefined();
+  });
 
-    expect(getByText('pendingIcon')).not.toBeNull();
+  it('is interactive dot', async () => {
+    const interactiveUieData = 'legal-hold-dot';
+    const {getByTestId} = await render(<LegalHoldDot isInteractive dataUieName={interactiveUieData} />);
+
+    const button = getByTestId(interactiveUieData);
+    expect(button.getAttribute('disabled')).toBeNull();
   });
 });

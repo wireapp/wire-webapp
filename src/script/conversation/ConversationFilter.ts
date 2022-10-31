@@ -18,6 +18,7 @@
  */
 
 import {matchQualifiedIds} from 'Util/QualifiedId';
+
 import type {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
 

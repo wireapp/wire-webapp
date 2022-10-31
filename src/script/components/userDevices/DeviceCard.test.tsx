@@ -17,11 +17,13 @@
  *
  */
 
-import ko from 'knockout';
-import {ClientClassification} from '@wireapp/api-client/lib/client/';
-import DeviceCard from './DeviceCard';
-import type {ClientEntity} from '../../client/ClientEntity';
 import {render} from '@testing-library/react';
+import {ClientClassification} from '@wireapp/api-client/lib/client/';
+import ko from 'knockout';
+
+import {DeviceCard} from './DeviceCard';
+
+import type {ClientEntity} from '../../client/ClientEntity';
 
 function createClientEntity(clientEntity: Partial<ClientEntity>): ClientEntity {
   const device: Partial<ClientEntity> = {
