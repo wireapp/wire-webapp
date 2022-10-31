@@ -31,7 +31,7 @@ describe('ConversationProtocolDetails', () => {
 
     const {queryByText} = render(<ConversationProtocolDetails {...props} />);
 
-    expect(queryByText('mls')).not.toBeNull();
+    expect(queryByText('MLS')).not.toBeNull();
     expect(queryByText('MLS_128_DHKEMP256_AES128GCM_SHA256_P256')).not.toBeNull();
   });
 
@@ -42,6 +42,6 @@ describe('ConversationProtocolDetails', () => {
 
     const {queryByText} = render(<ConversationProtocolDetails {...props} />);
 
-    expect(queryByText('proteus')).not.toBeNull();
+    expect(queryByText('PROTEUS')).not.toBeNull();
   });
 });
