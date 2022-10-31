@@ -45,7 +45,7 @@ const barStyle = (highContrast: boolean): CSSObject => ({
   borderWidth: '1px 0',
   color: `var(--${highContrast ? 'app-bg' : 'background'})`,
   display: 'flex',
-  fontSize: 11,
+  fontSize: '0.6875rem',
   fontWeight: 600,
   height: '16px',
   justifyContent: 'center',

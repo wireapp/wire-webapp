@@ -129,7 +129,7 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
                   <span />
                   <span
                     style={{
-                      fontSize: '11px',
+                      fontSize: '0.6875rem',
                       marginTop: '14px',
                     }}
                   >

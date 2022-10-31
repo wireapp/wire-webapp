@@ -78,7 +78,7 @@ const IndexComponent = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps
         <Text
           block
           center
-          style={{fontSize: '32px', fontWeight: 300, marginBottom: '48px'}}
+          style={{fontSize: '2rem', fontWeight: 300, marginBottom: '48px'}}
           data-uie-name="welcome-text"
         >
           {_(indexStrings.welcome, {brandName: Config.getConfig().BACKEND_NAME})}

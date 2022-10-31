@@ -43,7 +43,7 @@ const ConversationJoinInvalid = ({}: Props) => {
               }}
             />
           </H2>
-          <Text style={{fontSize: '16px', marginTop: '10px'}} data-uie-name="status-invalid-text">
+          <Text style={{fontSize: '1rem', marginTop: '10px'}} data-uie-name="status-invalid-text">
             {_(conversationJoinStrings.invalidSubhead)}
           </Text>
         </ContainerXS>
