@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.0.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.0.1...@wireapp/react-ui-kit@9.0.2) (2022-10-31)
+
+**Note:** Version bump only for package @wireapp/react-ui-kit
+
 ## [9.0.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.0.0...@wireapp/react-ui-kit@9.0.1) (2022-10-26)
 
 ### Bug Fixes
