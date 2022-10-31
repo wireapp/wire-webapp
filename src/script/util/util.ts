@@ -401,5 +401,5 @@ export const getSelectionPosition = (element: HTMLTextAreaElement, currentMentio
 
 // temporary hack that disables mls for old 'broken' desktop clients, see https://github.com/wireapp/wire-desktop/pull/6094
 export const supportsMLS = () =>
-  (Config.getConfig().FEATURE.ENABLE_MLS || Config.getConfig().FEATURE.CC_PROTEUS_ENABLED) &&
+  (Config.getConfig().FEATURE.ENABLE_MLS || Config.getConfig().FEATURE.ENABLE_CC_PROTEUS) &&
   (!Runtime.isDesktopApp() || window.systemCrypto);
