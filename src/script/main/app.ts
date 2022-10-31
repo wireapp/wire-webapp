@@ -441,12 +441,12 @@ class App {
             }
             return conversationRepository.conversationRoleRepository.isUserGroupAdmin(conversation, selfUser);
           },
-          // TODO update this when external commits are being implemented
           groupIdFromConversationId: async conversationId => {
             const conversation = await conversationRepository.getConversationById(conversationId);
             return conversation?.groupId;
           },
-          userAuthorize: () => true,
+          // @todo update this when external commits are being implemented
+          userAuthorize: () => false,
         });
       }
 
