@@ -58,15 +58,11 @@ module.exports = grunt => {
     },
     compress: require('./grunt/config/compress'),
     includereplace: require('./grunt/config/includereplace'),
-    postcss: require('./grunt/config/postcss'),
-    shell: require('./grunt/config/shell'),
     watch: require('./grunt/config/watch'),
   });
   /* eslint-enable sort-keys-fix/sort-keys-fix */
 
-  grunt.registerTask('build', ['set_version', 'build_style', 'build_markup']);
-
-  grunt.registerTask('build_style', ['shell:less', 'postcss']);
+  grunt.registerTask('build', ['set_version', 'build_markup']);
 
   grunt.registerTask('build_markup', ['includereplace:prod_index', 'includereplace:prod_auth']);
 
