@@ -25,7 +25,7 @@ type SecretCrypto<T> = {
   decrypt: (payload: T) => Promise<Uint8Array>;
 };
 
-export interface MLSCallbacks extends Pick<CoreCryptoCallbacks, 'authorize'> {
+export interface MLSCallbacks extends Pick<CoreCryptoCallbacks, 'authorize' | 'userAuthorize'> {
   /**
    * Should return a groupId corresponding to the conversation ID given
    * Used for the core to know what core-crypto conversation we are dealing with when receiving events
@@ -35,7 +35,7 @@ export interface MLSCallbacks extends Pick<CoreCryptoCallbacks, 'authorize'> {
   groupIdFromConversationId: (conversationId: QualifiedId) => Promise<string | undefined>;
 }
 
-export interface MLSConfig<T = any> {
+export interface CryptoProtocolConfig<T = any> {
   /**
    * encrypt/decrypt function pair that will be called before storing/fetching secrets in the secrets database.
    * If not provided will use the built in encryption mechanism
@@ -49,8 +49,14 @@ export interface MLSConfig<T = any> {
    */
   coreCrypoWasmFilePath: string;
 
-  /**
-   * (milliseconds) period of time between automatic updates of the keying material (30 days by default)
-   */
-  keyingMaterialUpdateThreshold?: number;
+  /** If set will create an MLS capable device from the current device */
+  mls?: {
+    /**
+     * (milliseconds) period of time between automatic updates of the keying material (30 days by default)
+     */
+    keyingMaterialUpdateThreshold?: number;
+  };
+
+  /** if set to true, will use experimental proteus encryption/decryption library (core-crypto). If not set will fallback to the legacy proteus library (cryptobox) */
+  proteus?: boolean;
 }

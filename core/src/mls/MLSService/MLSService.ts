@@ -35,7 +35,7 @@ import {
 import {APIClient} from '@wireapp/api-client';
 import {QualifiedUsers} from '../../conversation';
 import {Converter, Decoder, Encoder} from 'bazinga64';
-import {MLSCallbacks, MLSConfig} from '../types';
+import {CryptoProtocolConfig, MLSCallbacks} from '../types';
 import {sendMessage} from '../../conversation/message/messageSender';
 import {parseFullQualifiedClientId} from '../../util/fullyQualifiedClientIdUtils';
 import {PostMlsMessageResponse} from '@wireapp/api-client/lib/conversation';
@@ -51,9 +51,9 @@ export class MLSService {
   groupIdFromConversationId?: MLSCallbacks['groupIdFromConversationId'];
 
   constructor(
-    public readonly config: MLSConfig | undefined,
     private readonly apiClient: APIClient,
     private readonly coreCryptoClientProvider: () => CoreCrypto | undefined,
+    public readonly config: CryptoProtocolConfig['mls'],
   ) {}
 
   private get coreCryptoClient() {
@@ -95,7 +95,7 @@ export class MLSService {
   public configureMLSCallbacks({groupIdFromConversationId, ...coreCryptoCallbacks}: MLSCallbacks): void {
     this.coreCryptoClient.registerCallbacks({
       ...coreCryptoCallbacks,
-      clientIdBelongsToOneOf: (client, otherClients) => {
+      clientIsExistingGroupUser: (client, otherClients) => {
         const decoder = new TextDecoder();
         const {user} = parseFullQualifiedClientId(decoder.decode(client));
         return otherClients.some(client => {

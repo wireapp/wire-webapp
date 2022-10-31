@@ -519,7 +519,6 @@ export class NotificationService extends EventEmitter {
     //given period of time (30 days by default) after last update date renew key material
     const keyingMaterialUpdateThreshold =
       this.mlsService.config?.keyingMaterialUpdateThreshold || DEFAULT_KEYING_MATERIAL_UPDATE_THRESHOLD;
-
     const firingDate = previousUpdateDate + keyingMaterialUpdateThreshold;
 
     const key = this.createKeyMaterialUpdateTaskSchedulerId(groupId);
