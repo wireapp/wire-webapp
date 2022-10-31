@@ -48,7 +48,7 @@ import {CryptographyService, SessionId} from './cryptography/';
 import {GiphyService} from './giphy/';
 import {LinkPreviewService} from './linkPreview';
 import {MLSService} from './mls';
-import {MLSCallbacks, MLSConfig} from './mls/types';
+import {MLSCallbacks, CryptoProtocolConfig} from './mls/types';
 import {HandledEventPayload, NotificationService} from './notification/';
 import {SelfService} from './self/';
 import {TeamService} from './team/';
@@ -128,9 +128,9 @@ interface AccountOptions<T> {
   nbPrekeys?: number;
 
   /**
-   * Config for MLS devices. Will not load corecrypt or create MLS devices if undefined
+   * Config for MLS and proteus devices. Will fallback to the old proteus logic if not provided
    */
-  mlsConfig?: MLSConfig<T>;
+  cryptoProtocolConfig?: CryptoProtocolConfig<T>;
 }
 
 type InitOptions = {
@@ -159,7 +159,7 @@ export class Account<T = any> extends EventEmitter {
   private readonly createStore: CreateStoreFn;
   private storeEngine?: CRUDEngine;
   private readonly nbPrekeys: number;
-  private readonly mlsConfig?: MLSConfig<T>;
+  private readonly cryptoProtocolConfig?: CryptoProtocolConfig<T>;
   private coreCryptoClient?: CoreCrypto;
 
   public static readonly TOPIC = TOPIC;
@@ -187,12 +187,12 @@ export class Account<T = any> extends EventEmitter {
    */
   constructor(
     apiClient: APIClient = new APIClient(),
-    {createStore = () => undefined, nbPrekeys = 2, mlsConfig}: AccountOptions<T> = {},
+    {createStore = () => undefined, nbPrekeys = 2, cryptoProtocolConfig}: AccountOptions<T> = {},
   ) {
     super();
     this.apiClient = apiClient;
     this.backendFeatures = this.apiClient.backendFeatures;
-    this.mlsConfig = mlsConfig;
+    this.cryptoProtocolConfig = cryptoProtocolConfig;
     this.nbPrekeys = nbPrekeys;
     this.createStore = createStore;
 
@@ -271,7 +271,7 @@ export class Account<T = any> extends EventEmitter {
     if (initClient) {
       await this.initClient({clientType});
 
-      if (this.mlsConfig && this.backendFeatures.supportsMLS) {
+      if (this.cryptoProtocolConfig?.mls && this.backendFeatures.supportsMLS) {
         // initialize schedulers for pending mls proposals once client is initialized
         await this.service?.notification.checkExistingPendingProposals();
 
@@ -398,7 +398,11 @@ export class Account<T = any> extends EventEmitter {
     });
 
     const clientService = new ClientService(this.apiClient, this.storeEngine, cryptographyService);
-    const mlsService = new MLSService(this.mlsConfig, this.apiClient, () => this.coreCryptoClient);
+    const mlsService = new MLSService(
+      this.apiClient,
+      () => this.coreCryptoClient,
+      this.cryptoProtocolConfig?.mls ?? {},
+    );
     const connectionService = new ConnectionService(this.apiClient);
     const giphyService = new GiphyService(this.apiClient);
     const linkPreviewService = new LinkPreviewService(assetService);
@@ -448,11 +452,11 @@ export class Account<T = any> extends EventEmitter {
     await this.apiClient.api.client.getClient(loadedClient.id);
     this.apiClient.context!.clientId = loadedClient.id;
     await this.service!.cryptography.initCryptobox();
-    if (this.mlsConfig && this.backendFeatures.supportsMLS) {
+    if (this.cryptoProtocolConfig?.mls && this.backendFeatures.supportsMLS) {
       this.coreCryptoClient = await this.createMLSClient(
         loadedClient,
         this.apiClient.context!,
-        this.mlsConfig,
+        this.cryptoProtocolConfig,
         entropyData,
       );
     }
@@ -463,7 +467,7 @@ export class Account<T = any> extends EventEmitter {
   private async createMLSClient(
     client: RegisteredClient,
     context: Context,
-    mlsConfig: MLSConfig,
+    cryptoProtocolConfig: CryptoProtocolConfig,
     entropyData?: Uint8Array,
   ) {
     if (!this.service) {
@@ -472,8 +476,8 @@ export class Account<T = any> extends EventEmitter {
     const coreCryptoKeyId = 'corecrypto-key';
     const dbName = this.generateSecretsDbName(context);
 
-    const secretStore = mlsConfig.systemCrypto
-      ? await createCustomEncryptedStore(dbName, mlsConfig.systemCrypto)
+    const secretStore = cryptoProtocolConfig.systemCrypto
+      ? await createCustomEncryptedStore(dbName, cryptoProtocolConfig.systemCrypto)
       : await createEncryptedStore(dbName);
 
     let key = await secretStore.getsecretValue(coreCryptoKeyId);
@@ -490,7 +494,7 @@ export class Account<T = any> extends EventEmitter {
       databaseName: `corecrypto-${this.generateDbName(context)}`,
       key: Encoder.toBase64(key).asString,
       clientId: `${userId}:${client.id}@${domain}`,
-      wasmFilePath: mlsConfig.coreCrypoWasmFilePath,
+      wasmFilePath: cryptoProtocolConfig.coreCrypoWasmFilePath,
       entropySeed: entropyData,
     });
 
@@ -511,13 +515,13 @@ export class Account<T = any> extends EventEmitter {
     if (!this.service) {
       throw new Error('Services are not set.');
     }
-    this.logger.info(`Creating new client {mls: ${!!this.mlsConfig}}`);
+    this.logger.info(`Creating new client {mls: ${!!this.cryptoProtocolConfig}}`);
     const registeredClient = await this.service.client.register(loginData, clientInfo, entropyData);
-    if (this.mlsConfig && this.backendFeatures.supportsMLS) {
+    if (this.cryptoProtocolConfig && this.backendFeatures.supportsMLS) {
       this.coreCryptoClient = await this.createMLSClient(
         registeredClient,
         this.apiClient.context!,
-        this.mlsConfig,
+        this.cryptoProtocolConfig,
         entropyData,
       );
     }
