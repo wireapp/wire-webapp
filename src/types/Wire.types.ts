@@ -35,6 +35,7 @@ type FeatureVariables = {
   ENABLE_MEDIA_EMBEDS: boolean;
   ENABLE_MLS: boolean;
   ENABLE_PHONE_LOGIN: boolean;
+  ENABLE_PROTEUS_CORE_CRYPTO: boolean;
   ENABLE_SSO: boolean;
   ENFORCE_CONSTANT_BITRATE: boolean;
   MLS_CONFIG_KEYING_MATERIAL_UPDATE_THRESHOLD: number;
