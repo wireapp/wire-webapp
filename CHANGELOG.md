@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [36.0.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@35.0.0...@wireapp/core@36.0.0) (2022-10-31)
+
+### Bug Fixes
+
+* Prepare for core-crypto proteus support ([#4575](https://github.com/wireapp/wire-web-packages/issues/4575)) ([6873748](https://github.com/wireapp/wire-web-packages/commit/6873748f078572c72aa0068359f14f79aca557c8))
+
+### BREAKING CHANGES
+
+* the coreCrypto callbacks now need a `userAuthorize` callback to be set. The `mlsConfig` has changed quite a bit
+
 # [35.0.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@34.1.6...@wireapp/core@35.0.0) (2022-10-26)
 
 ### Code Refactoring
