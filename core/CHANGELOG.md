@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [36.1.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@36.0.2...@wireapp/core@36.1.0) (2022-11-01)
+
+### Features
+
+* migrate mls event handling logic into MLSService  ([#4578](https://github.com/wireapp/wire-web-packages/issues/4578)) ([99a7f02](https://github.com/wireapp/wire-web-packages/commit/99a7f02d36d283c29000167cef40432f633eece8))
+
 ## [36.0.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@36.0.1...@wireapp/core@36.0.2) (2022-11-01)
 
 **Note:** Version bump only for package @wireapp/core
