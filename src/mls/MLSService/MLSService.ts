@@ -17,6 +17,8 @@
  *
  */
 
+import {APIClient} from '@wireapp/api-client';
+import {PostMlsMessageResponse} from '@wireapp/api-client/lib/conversation';
 import {
   AddProposalArgs,
   CommitBundle,
@@ -32,17 +34,17 @@ import {
   ProposalType,
   RemoveProposalArgs,
 } from '@wireapp/core-crypto';
-import {APIClient} from '@wireapp/api-client';
-import {QualifiedUsers} from '../../conversation';
 import {Converter, Decoder, Encoder} from 'bazinga64';
+import logdown from 'logdown';
+import {QualifiedUsers} from '../../conversation';
 import {sendMessage} from '../../conversation/message/messageSender';
 import {parseFullQualifiedClientId} from '../../util/fullyQualifiedClientIdUtils';
-import {PostMlsMessageResponse} from '@wireapp/api-client/lib/conversation';
-import logdown from 'logdown';
-import {cancelRecurringTask, registerRecurringTask} from '../../util/RecurringTaskScheduler';
-import {TimeUtil} from '@wireapp/commons';
-import {keyMaterialUpdatesStore} from './keyMaterialUpdatesStore';
 import {MLSCallbacks} from '../types';
+
+import {TimeUtil} from '@wireapp/commons';
+import {cancelRecurringTask, registerRecurringTask} from '../../util/RecurringTaskScheduler';
+import {BackendEvent, EventHandlerResult, handleBackendEvent, PayloadBundleSource} from '../EventHandler';
+import {keyMaterialUpdatesStore} from './keyMaterialUpdatesStore';
 
 //@todo: this function is temporary, we wait for the update from core-crypto side
 //they are returning regular array instead of Uint8Array for commit and welcome messages
@@ -350,5 +352,13 @@ export class MLSService {
 
   public async wipeConversation(conversationId: ConversationId): Promise<void> {
     return this.coreCryptoClient.wipeConversation(conversationId);
+  }
+
+  public async handleMLSEvent(
+    event: BackendEvent,
+    source: PayloadBundleSource,
+    dryRun: boolean = false,
+  ): EventHandlerResult {
+    return handleBackendEvent({event, source, dryRun, mlsService: this});
   }
 }
