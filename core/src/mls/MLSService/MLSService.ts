@@ -40,6 +40,9 @@ import {sendMessage} from '../../conversation/message/messageSender';
 import {parseFullQualifiedClientId} from '../../util/fullyQualifiedClientIdUtils';
 import {PostMlsMessageResponse} from '@wireapp/api-client/lib/conversation';
 import logdown from 'logdown';
+import {registerRecurringTask} from '../../util/RecurringTaskScheduler';
+import {TimeUtil} from '@wireapp/commons';
+
 //@todo: this function is temporary, we wait for the update from core-crypto side
 //they are returning regular array instead of Uint8Array for commit and welcome messages
 export const optionalToUint8Array = (array: Uint8Array | []): Uint8Array => {
@@ -53,7 +56,7 @@ export class MLSService {
   constructor(
     private readonly apiClient: APIClient,
     private readonly coreCryptoClientProvider: () => CoreCrypto | undefined,
-    public readonly config: CryptoProtocolConfig['mls'],
+    public readonly config: CryptoProtocolConfig['mls'] & {nbKeyPackages: number},
   ) {}
 
   private get coreCryptoClient() {
@@ -213,6 +216,37 @@ export class MLSService {
 
   public async clientKeypackages(amountRequested: number): Promise<Uint8Array[]> {
     return this.coreCryptoClient.clientKeypackages(amountRequested);
+  }
+
+  /**
+   * Get date of last key packages count query and schedule a task to sync it with backend
+   * Function must only be called once, after application start
+   */
+  public async checkForKeyPackagesBackendSync() {
+    registerRecurringTask({
+      every: TimeUtil.TimeInMillis.DAY,
+      key: 'try-key-packages-backend-sync',
+      task: () => this.syncKeyPackages(),
+    });
+  }
+
+  private async syncKeyPackages() {
+    const validKeyPackagesCount = await this.clientValidKeypackagesCount();
+    const minAllowedNumberOfKeyPackages = this.config.nbKeyPackages / 2;
+
+    if (validKeyPackagesCount <= minAllowedNumberOfKeyPackages) {
+      const clientId = this.apiClient.validatedClientId;
+
+      //check numbers of keys on backend
+      const backendKeyPackagesCount = await this.apiClient.api.client.getMLSKeyPackageCount(clientId);
+
+      if (backendKeyPackagesCount <= minAllowedNumberOfKeyPackages) {
+        //upload new keys
+        const newKeyPackages = await this.clientKeypackages(this.config.nbKeyPackages);
+
+        await this.uploadMLSKeyPackages(newKeyPackages, clientId);
+      }
+    }
   }
 
   /**

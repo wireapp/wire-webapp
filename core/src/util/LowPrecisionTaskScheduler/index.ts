@@ -17,30 +17,4 @@
  *
  */
 
-export interface KeyPackagesStatusStore {
-  lastQueryDate: number;
-}
-
-const storageKey = 'keyPackagesStatus';
-
-const getState = (): KeyPackagesStatusStore => {
-  const storedState = localStorage.getItem(storageKey);
-  if (!storedState) {
-    return {
-      lastQueryDate: 0,
-    };
-  }
-  const parsedState = JSON.parse(storedState);
-  return {
-    lastQueryDate: Number(parsedState.lastQueryDate),
-  };
-};
-
-const saveState = ({lastQueryDate}: KeyPackagesStatusStore) => {
-  localStorage.setItem(storageKey, JSON.stringify({lastQueryDate}));
-};
-
-export const keyPackagesStatusStore = {
-  getState,
-  saveState,
-};
+export * from './LowPrecisionTaskScheduler';
