@@ -33,7 +33,7 @@ import {NotificationBackendRepository} from './NotificationBackendRepository';
 import {NotificationDatabaseRepository} from './NotificationDatabaseRepository';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 import {AbortHandler} from '@wireapp/api-client/lib/tcp';
-import {Decoder, Encoder} from 'bazinga64';
+import {Decoder} from 'bazinga64';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {CommitPendingProposalsParams, HandlePendingProposalsParams} from '../mls/types';
 import {TaskScheduler} from '../util/TaskScheduler/TaskScheduler';
@@ -265,18 +265,14 @@ export class NotificationService extends EventEmitter {
     source: PayloadBundleSource,
     dryRun: boolean = false,
   ): Promise<HandledEventPayload | undefined> {
-    switch (event.type) {
-      case Events.CONVERSATION_EVENT.MLS_WELCOME_MESSAGE:
-        const data = Decoder.fromBase64(event.data).asBytes;
-        // We extract the groupId from the welcome message and let coreCrypto store this group
-        const newGroupId = await this.mlsService.processWelcomeMessage(data);
-        const groupIdStr = Encoder.toBase64(newGroupId).asString;
-        // The groupId can then be sent back to the consumer
-        return {
-          event: {...event, data: groupIdStr},
-          mappedEvent: ConversationMapper.mapConversationEvent({...event, data: groupIdStr}, source),
-        };
+    // Handle MLS Events
+    const result = await this.mlsService.handleMLSEvent(event, source, dryRun);
+    if (result) {
+      return result;
+    }
 
+    // Fallback to other events
+    switch (event.type) {
       case Events.CONVERSATION_EVENT.MLS_MESSAGE_ADD:
         const encryptedData = Decoder.fromBase64(event.data).asBytes;
 
