@@ -279,7 +279,7 @@ export class Account<T = any> extends EventEmitter {
         await this.service?.notification.checkForKeyMaterialsUpdate();
 
         // initialize scheduler for syncing key packages with backend
-        await this.service?.notification.checkForKeyPackagesBackendSync();
+        await this.service?.mls.checkForKeyPackagesBackendSync();
       }
     }
     return context;
@@ -398,11 +398,10 @@ export class Account<T = any> extends EventEmitter {
     });
 
     const clientService = new ClientService(this.apiClient, this.storeEngine, cryptographyService);
-    const mlsService = new MLSService(
-      this.apiClient,
-      () => this.coreCryptoClient,
-      this.cryptoProtocolConfig?.mls ?? {},
-    );
+    const mlsService = new MLSService(this.apiClient, () => this.coreCryptoClient, {
+      ...this.cryptoProtocolConfig?.mls,
+      nbKeyPackages: this.nbPrekeys,
+    });
     const connectionService = new ConnectionService(this.apiClient);
     const giphyService = new GiphyService(this.apiClient);
     const linkPreviewService = new LinkPreviewService(assetService);

@@ -20,7 +20,7 @@
 interface IntervalTask {
   key: string;
   firingDate: number;
-  task: () => Promise<any>;
+  task: () => void;
 }
 
 interface ScheduleLowPrecisionTaskParams extends IntervalTask {
@@ -48,18 +48,13 @@ const addTask = ({key, firingDate, task, intervalDelay}: ScheduleLowPrecisionTas
 
     const tasks = intervals[intervalDelay]?.tasks;
     if (tasks?.length !== 0) {
-      const tasksToExecute = await tasks.reduce(async (accPromise, {firingDate, task}) => {
-        const acc = await accPromise;
-
+      for (const taskData of tasks) {
         if (nowTime >= firingDate) {
-          const taskPromise = task();
-          acc.push(taskPromise);
+          const {task, key} = taskData;
+          task();
           cancelTask({intervalDelay, key});
         }
-        return acc;
-      }, Promise.resolve([] as Promise<void>[]));
-
-      await Promise.all(tasksToExecute);
+      }
     }
   }, intervalDelay);
 
