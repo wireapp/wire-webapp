@@ -35,13 +35,14 @@ import {
 import {APIClient} from '@wireapp/api-client';
 import {QualifiedUsers} from '../../conversation';
 import {Converter, Decoder, Encoder} from 'bazinga64';
-import {CryptoProtocolConfig, MLSCallbacks} from '../types';
 import {sendMessage} from '../../conversation/message/messageSender';
 import {parseFullQualifiedClientId} from '../../util/fullyQualifiedClientIdUtils';
 import {PostMlsMessageResponse} from '@wireapp/api-client/lib/conversation';
 import logdown from 'logdown';
-import {registerRecurringTask} from '../../util/RecurringTaskScheduler';
+import {cancelRecurringTask, registerRecurringTask} from '../../util/RecurringTaskScheduler';
 import {TimeUtil} from '@wireapp/commons';
+import {keyMaterialUpdatesStore} from './keyMaterialUpdatesStore';
+import {MLSCallbacks} from '../types';
 
 //@todo: this function is temporary, we wait for the update from core-crypto side
 //they are returning regular array instead of Uint8Array for commit and welcome messages
@@ -49,15 +50,33 @@ export const optionalToUint8Array = (array: Uint8Array | []): Uint8Array => {
   return Array.isArray(array) ? Uint8Array.from(array) : array;
 };
 
+interface MLSServiceConfig {
+  keyingMaterialUpdateThreshold: number;
+  nbKeyPackages: number;
+}
+const defaultConfig: MLSServiceConfig = {
+  keyingMaterialUpdateThreshold: 1000 * 60 * 60 * 24 * 30, //30 days
+  nbKeyPackages: 100,
+};
+
 export class MLSService {
   logger = logdown('@wireapp/core/MLSService');
+  config: MLSServiceConfig;
   groupIdFromConversationId?: MLSCallbacks['groupIdFromConversationId'];
 
   constructor(
     private readonly apiClient: APIClient,
     private readonly coreCryptoClientProvider: () => CoreCrypto | undefined,
-    public readonly config: CryptoProtocolConfig['mls'] & {nbKeyPackages: number},
-  ) {}
+    {
+      keyingMaterialUpdateThreshold = defaultConfig.keyingMaterialUpdateThreshold,
+      nbKeyPackages = defaultConfig.nbKeyPackages,
+    }: Partial<MLSServiceConfig>,
+  ) {
+    this.config = {
+      keyingMaterialUpdateThreshold,
+      nbKeyPackages,
+    };
+  }
 
   private get coreCryptoClient() {
     const client = this.coreCryptoClientProvider();
@@ -219,10 +238,71 @@ export class MLSService {
   }
 
   /**
+   * Renew key material for a given groupId
+   *
+   * @param groupId groupId of the conversation
+   */
+  private async renewKeyMaterial(groupId: string) {
+    try {
+      const groupConversationExists = await this.conversationExists(Decoder.fromBase64(groupId).asBytes);
+
+      if (!groupConversationExists) {
+        keyMaterialUpdatesStore.deleteLastKeyMaterialUpdateDate({groupId});
+        return;
+      }
+
+      const groupIdDecodedFromBase64 = Decoder.fromBase64(groupId).asBytes;
+      await this.updateKeyingMaterial(groupIdDecodedFromBase64);
+    } catch (error) {
+      this.logger.error(`Error while renewing key material for groupId ${groupId}`, error);
+    }
+  }
+
+  private createKeyMaterialUpdateTaskSchedulerId(groupId: string) {
+    return `renew-key-material-update-${groupId}`;
+  }
+
+  /**
+   * Will reset the renewal to the threshold given as config
+   * @param groupId The group that should have its key material updated
+   */
+  public resetKeyMaterialRenewal(groupId: string) {
+    cancelRecurringTask(this.createKeyMaterialUpdateTaskSchedulerId(groupId));
+    this.scheduleKeyMaterialRenewal(groupId);
+  }
+
+  /**
+   * Will schedule a task to update the key material of the conversation according to the threshold given as config
+   * @param groupId
+   */
+  public scheduleKeyMaterialRenewal(groupId: string) {
+    const key = this.createKeyMaterialUpdateTaskSchedulerId(groupId);
+
+    registerRecurringTask({
+      task: () => this.renewKeyMaterial(groupId),
+      every: this.config.keyingMaterialUpdateThreshold,
+      key,
+    });
+  }
+
+  /**
+   * Get all keying material last update dates and schedule tasks for renewal
+   * Function must only be called once, after application start
+   */
+  public checkForKeyMaterialsUpdate() {
+    try {
+      const keyMaterialUpdateDates = keyMaterialUpdatesStore.getAllUpdateDates();
+      keyMaterialUpdateDates.forEach(({groupId}) => this.scheduleKeyMaterialRenewal(groupId));
+    } catch (error) {
+      this.logger.error('Could not get last key material update dates', error);
+    }
+  }
+
+  /**
    * Get date of last key packages count query and schedule a task to sync it with backend
    * Function must only be called once, after application start
    */
-  public async checkForKeyPackagesBackendSync() {
+  public checkForKeyPackagesBackendSync() {
     registerRecurringTask({
       every: TimeUtil.TimeInMillis.DAY,
       key: 'try-key-packages-backend-sync',

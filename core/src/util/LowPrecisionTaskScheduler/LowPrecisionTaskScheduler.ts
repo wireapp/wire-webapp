@@ -17,6 +17,8 @@
  *
  */
 
+import logdown from 'logdown';
+
 interface IntervalTask {
   key: string;
   firingDate: number;
@@ -32,6 +34,7 @@ interface CancelLowPrecisionTaskParams {
   intervalDelay: number;
 }
 
+const logger = logdown('@wireapp/core/TaskScheduler');
 const intervals: Record<number, {timeoutId: NodeJS.Timeout; tasks: IntervalTask[]}> = {};
 
 const addTask = ({key, firingDate, task, intervalDelay}: ScheduleLowPrecisionTaskParams) => {
@@ -51,6 +54,7 @@ const addTask = ({key, firingDate, task, intervalDelay}: ScheduleLowPrecisionTas
       for (const taskData of tasks) {
         if (nowTime >= firingDate) {
           const {task, key} = taskData;
+          logger.info(`Executing task with key "${key}"`);
           task();
           cancelTask({intervalDelay, key});
         }
@@ -58,6 +62,7 @@ const addTask = ({key, firingDate, task, intervalDelay}: ScheduleLowPrecisionTas
     }
   }, intervalDelay);
 
+  logger.info(`New scheduled task to be executed at "${new Date(firingDate)}" with key "${key}"`);
   intervals[intervalDelay] = {timeoutId, tasks};
 };
 
@@ -72,6 +77,7 @@ const cancelTask = ({intervalDelay, key}: CancelLowPrecisionTaskParams) => {
     const newTasks = tasks.filter(task => task.key !== key);
     intervals[intervalDelay].tasks = newTasks;
 
+    logger.info(`Scheduled task with key "${key}" prematurely cleared`);
     if (newTasks.length === 0) {
       clearInterval(intervals[intervalDelay].timeoutId);
       delete intervals[intervalDelay];

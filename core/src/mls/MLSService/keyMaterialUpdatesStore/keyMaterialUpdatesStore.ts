@@ -17,7 +17,7 @@
  *
  */
 
-import {CommonMLS, LastKeyMaterialUpdateParams} from '../../notification/types';
+import {CommonMLS, LastKeyMaterialUpdateParams} from '../../types';
 
 export interface KeyMaterialUpdatesStore {
   [groupId: string]: LastKeyMaterialUpdateParams;
@@ -38,9 +38,9 @@ const getAllUpdateDates = (): LastKeyMaterialUpdateParams[] => {
   return Object.values(storedStateMap);
 };
 
-const storeLastKeyMaterialUpdateDate = ({groupId, previousUpdateDate}: LastKeyMaterialUpdateParams) => {
+const storeLastKeyMaterialUpdateDate = ({groupId}: LastKeyMaterialUpdateParams) => {
   const storedState = getUpdateDatesMap();
-  const newStoredState = {...storedState, [groupId]: {groupId, previousUpdateDate}};
+  const newStoredState = {...storedState, [groupId]: {groupId}};
   localStorage.setItem(storageKey, JSON.stringify(newStoredState));
 };
 

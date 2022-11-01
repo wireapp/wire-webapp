@@ -582,12 +582,8 @@ export class ConversationService {
       );
     }
 
-    //We store the info when conversation (along with key material) was created, so we will know when to renew it
-    const groupCreationTimeStamp = new Date().getTime();
-    await this.notificationService.storeLastKeyMaterialUpdateDate({
-      previousUpdateDate: groupCreationTimeStamp,
-      groupId,
-    });
+    // We schedule a key material renewal
+    this.mlsService.scheduleKeyMaterialRenewal(groupId);
 
     // We fetch the fresh version of the conversation created on backend with the newly added users
     const conversation = await this.getConversations(qualifiedId.id);
@@ -632,15 +628,12 @@ export class ConversationService {
     );
     const conversation = await this.getConversations(conversationId.id);
 
+    //We store the info when user was added (and key material was created), so we will know when to renew it
+    this.mlsService.resetKeyMaterialRenewal(groupId);
     return {
       events: response?.events || [],
       conversation,
     };
-  }
-
-  private async storeLastKeyMaterialUpdateDateWithCurrentTime(groupId: string) {
-    const currentTime = new Date().getTime();
-    await this.notificationService.storeLastKeyMaterialUpdateDate({groupId, previousUpdateDate: currentTime});
   }
 
   public async removeUsersFromMLSConversation({
@@ -662,7 +655,7 @@ export class ConversationService {
     );
 
     //key material gets updated after removing a user from the group, so we can reset last key update time value in the store
-    await this.storeLastKeyMaterialUpdateDateWithCurrentTime(groupId);
+    this.mlsService.resetKeyMaterialRenewal(groupId);
 
     const conversation = await this.getConversations(conversationId.id);
 
@@ -691,7 +684,7 @@ export class ConversationService {
       );
 
       //We store the info when user was added (and key material was created), so we will know when to renew it
-      await this.storeLastKeyMaterialUpdateDateWithCurrentTime(conversationGroupId);
+      this.mlsService.resetKeyMaterialRenewal(conversationGroupId);
     });
   }
 

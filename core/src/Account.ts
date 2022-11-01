@@ -276,10 +276,10 @@ export class Account<T = any> extends EventEmitter {
         await this.service?.notification.checkExistingPendingProposals();
 
         // initialize schedulers for renewing key materials
-        await this.service?.notification.checkForKeyMaterialsUpdate();
+        this.service?.mls.checkForKeyMaterialsUpdate();
 
         // initialize scheduler for syncing key packages with backend
-        await this.service?.mls.checkForKeyPackagesBackendSync();
+        this.service?.mls.checkForKeyPackagesBackendSync();
       }
     }
     return context;

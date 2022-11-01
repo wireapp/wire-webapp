@@ -41,8 +41,9 @@ export function registerRecurringTask({every, task, key}: TaskParams) {
     },
   };
 
-  if (every > TimeUtil.TimeInMillis.DAY) {
-    // If the firing date is in more that a day, we could switch to a lowPrecision scheduler that will avoid hitting the limit of setTimeout
+  if (every > TimeUtil.TimeInMillis.DAY * 20) {
+    // If the firing date is in more that 20 days, we could switch to a lowPrecision scheduler that will avoid hitting the limit of setTimeout
+    // (see https://developer.mozilla.org/en-US/docs/Web/API/setTimeout#maximum_delay_value)
     LowPrecisionTaskScheduler.addTask({...taskConfig, intervalDelay: TimeUtil.TimeInMillis.MINUTE});
   } else {
     TaskScheduler.addTask(taskConfig);

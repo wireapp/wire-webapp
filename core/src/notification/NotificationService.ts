@@ -18,7 +18,6 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
-import {TimeUtil} from '@wireapp/commons';
 import * as Events from '@wireapp/api-client/lib/event';
 import {Notification} from '@wireapp/api-client/lib/notification/';
 import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
@@ -36,11 +35,9 @@ import {GenericMessage} from '@wireapp/protocol-messaging';
 import {AbortHandler} from '@wireapp/api-client/lib/tcp';
 import {Decoder, Encoder} from 'bazinga64';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {CommitPendingProposalsParams, HandlePendingProposalsParams, LastKeyMaterialUpdateParams} from './types';
+import {CommitPendingProposalsParams, HandlePendingProposalsParams} from '../mls/types';
 import {TaskScheduler} from '../util/TaskScheduler/TaskScheduler';
 import {MLSService, optionalToUint8Array} from '../mls';
-import {LowPrecisionTaskScheduler} from '../util/LowPrecisionTaskScheduler/LowPrecisionTaskScheduler';
-import {keyMaterialUpdatesStore} from '../mls/keyMaterialUpdatesStore';
 
 export type HandledEventPayload = {
   event: Events.BackendEvent;
@@ -52,8 +49,6 @@ export type HandledEventPayload = {
 enum TOPIC {
   NOTIFICATION_ERROR = 'NotificationService.TOPIC.NOTIFICATION_ERROR',
 }
-
-const DEFAULT_KEYING_MATERIAL_UPDATE_THRESHOLD = 1000 * 60 * 60 * 24 * 30; //30 days
 
 export type NotificationHandler = (
   notification: Notification,
@@ -467,79 +462,6 @@ export class NotificationService extends EventEmitter {
       }
     } catch (error) {
       this.logger.error('Could not get pending proposals', error);
-    }
-  }
-
-  /**
-   * ## MLS only ##
-   * Store groupIds with last key material update dates.
-   *
-   * @param {groupId} params.groupId - groupId of the mls conversation
-   * @param {previousUpdateDate} params.previousUpdateDate - date of the previous key material update
-   */
-  public async storeLastKeyMaterialUpdateDate(params: LastKeyMaterialUpdateParams) {
-    keyMaterialUpdatesStore.storeLastKeyMaterialUpdateDate(params);
-    await this.scheduleTaskToRenewKeyMaterial(params);
-  }
-
-  /**
-   * ## MLS only ##
-   * Renew key material for a given groupId
-   *
-   * @param groupId groupId of the conversation
-   */
-  private async renewKeyMaterial({groupId}: Omit<LastKeyMaterialUpdateParams, 'previousUpdateDate'>) {
-    try {
-      const groupConversationExists = await this.mlsService.conversationExists(Decoder.fromBase64(groupId).asBytes);
-
-      if (!groupConversationExists) {
-        keyMaterialUpdatesStore.deleteLastKeyMaterialUpdateDate({groupId});
-        return;
-      }
-
-      const groupIdDecodedFromBase64 = Decoder.fromBase64(groupId).asBytes;
-      await this.mlsService.updateKeyingMaterial(groupIdDecodedFromBase64);
-
-      const keyRenewalTime = new Date().getTime();
-      const keyMaterialUpdateDate = {groupId, previousUpdateDate: keyRenewalTime};
-      await this.storeLastKeyMaterialUpdateDate(keyMaterialUpdateDate);
-    } catch (error) {
-      this.logger.error(`Error while renewing key material for groupId ${groupId}`, error);
-    }
-  }
-
-  private createKeyMaterialUpdateTaskSchedulerId(groupId: string) {
-    return `renew-key-material-update-${groupId}`;
-  }
-
-  private async scheduleTaskToRenewKeyMaterial({groupId, previousUpdateDate}: LastKeyMaterialUpdateParams) {
-    //given period of time (30 days by default) after last update date renew key material
-    const keyingMaterialUpdateThreshold =
-      this.mlsService.config?.keyingMaterialUpdateThreshold || DEFAULT_KEYING_MATERIAL_UPDATE_THRESHOLD;
-    const firingDate = previousUpdateDate + keyingMaterialUpdateThreshold;
-
-    const key = this.createKeyMaterialUpdateTaskSchedulerId(groupId);
-
-    LowPrecisionTaskScheduler.addTask({
-      task: () => this.renewKeyMaterial({groupId}),
-      intervalDelay: TimeUtil.TimeInMillis.MINUTE,
-      firingDate,
-      key,
-    });
-  }
-
-  /**
-   * ## MLS only ##
-   * Get all keying material last update dates and schedule tasks for renewal
-   * Function must only be called once, after application start
-   *
-   */
-  public async checkForKeyMaterialsUpdate() {
-    try {
-      const keyMaterialUpdateDates = keyMaterialUpdatesStore.getAllUpdateDates();
-      keyMaterialUpdateDates.forEach(date => this.scheduleTaskToRenewKeyMaterial(date));
-    } catch (error) {
-      this.logger.error('Could not get last key material update dates', error);
     }
   }
 }

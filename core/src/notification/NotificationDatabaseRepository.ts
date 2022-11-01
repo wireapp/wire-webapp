@@ -22,7 +22,7 @@ import {Notification} from '@wireapp/api-client/lib/notification/';
 import {CRUDEngine} from '@wireapp/store-engine';
 
 import {CryptographyDatabaseRepository} from '../cryptography/CryptographyDatabaseRepository';
-import {CommonMLS, StorePendingProposalsParams} from './types';
+import {CommonMLS, StorePendingProposalsParams} from '../mls/types';
 
 export enum DatabaseStores {
   EVENTS = 'events',
