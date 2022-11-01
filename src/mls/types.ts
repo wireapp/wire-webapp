@@ -35,6 +35,24 @@ export interface MLSCallbacks extends Pick<CoreCryptoCallbacks, 'authorize' | 'u
   groupIdFromConversationId: (conversationId: QualifiedId) => Promise<string | undefined>;
 }
 
+export type CommonMLS = {
+  groupId: string;
+};
+
+export type HandlePendingProposalsParams = {
+  delayInMs: number;
+  eventTime: string;
+} & CommonMLS;
+
+export type CommitPendingProposalsParams = {
+  skipDelete?: boolean;
+} & CommonMLS;
+
+export type StorePendingProposalsParams = {
+  firingDate: number;
+} & CommonMLS;
+
+export type LastKeyMaterialUpdateParams = CommonMLS;
 export interface CryptoProtocolConfig<T = any> {
   /**
    * encrypt/decrypt function pair that will be called before storing/fetching secrets in the secrets database.

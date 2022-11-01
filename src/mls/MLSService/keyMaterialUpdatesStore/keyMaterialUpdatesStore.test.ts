@@ -18,12 +18,9 @@
  */
 
 import {keyMaterialUpdatesStore} from './keyMaterialUpdatesStore';
-import {LastKeyMaterialUpdateParams} from '../../notification/types';
+import {LastKeyMaterialUpdateParams} from '../../types';
 
-const mockUpdateEntries: LastKeyMaterialUpdateParams[] = [
-  {groupId: 'group0', previousUpdateDate: 0},
-  {groupId: 'group1', previousUpdateDate: 1},
-];
+const mockUpdateEntries: LastKeyMaterialUpdateParams[] = [{groupId: 'group0'}, {groupId: 'group1'}];
 // Storage Mock
 function storageMock() {
   const storage: any = {};
