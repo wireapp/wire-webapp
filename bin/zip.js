@@ -27,8 +27,8 @@ const SERVER_PATH = path.resolve(ROOT_PATH, 'server');
 const DIST_PATH = path.resolve(ROOT_PATH, 'server/dist');
 const S3_PATH = path.resolve(ROOT_PATH, 'server/dist/s3');
 
-archive.file(path.join(SERVER_PATH, 'package.json'), false);
-archive.file(path.join(ROOT_PATH, '.env.defaults'), false);
+archive.file(path.join(SERVER_PATH, 'package.json'), {name: 'package.json'});
+archive.file(path.join(ROOT_PATH, '.env.defaults'), {name: '.env.defaults'});
 archive.directory(DIST_PATH, false);
 
 fs.mkdirSync(S3_PATH);
