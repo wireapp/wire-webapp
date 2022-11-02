@@ -173,10 +173,12 @@ module.exports = {
     new webpack.IgnorePlugin({resourceRegExp: /.*\.wasm/}),
     // @todo: We should merge these when main & auth app are merged.
     new HtmlWebpackPlugin({
+      inject: false,
       template: path.resolve(SRC_PATH, 'page/index.ejs'),
       templateParameters,
     }),
     new HtmlWebpackPlugin({
+      inject: false,
       filename: 'auth/index.html',
       template: path.resolve(SRC_PATH, 'page/auth.ejs'),
       templateParameters,
