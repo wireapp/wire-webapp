@@ -17,8 +17,8 @@
  *
  */
 
-const TerserJSPlugin = require('terser-webpack-plugin');
 const webpack = require('webpack');
+const TerserJSPlugin = require('terser-webpack-plugin');
 
 const commonConfig = require('./webpack.config.common');
 
