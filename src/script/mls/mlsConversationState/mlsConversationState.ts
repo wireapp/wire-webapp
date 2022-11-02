@@ -17,6 +17,7 @@
  *
  */
 
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import create from 'zustand';
 import createVanilla from 'zustand/vanilla';
 
@@ -47,7 +48,7 @@ type StoreState = MLSConversationState & {
   sendExternalToPendingJoin(
     conversations: Conversation[],
     isEstablishedConversation: (groupId: string) => Promise<boolean>,
-    sendExternalProposal: (conversationDetails: {groupId: string; epoch: number}) => Promise<void>,
+    sendExternalProposal: (conversationId: QualifiedId) => Promise<void>,
   ): Promise<void>;
 };
 
@@ -75,9 +76,9 @@ export const mlsConversationState = createVanilla<StoreState>((set, get) => {
 
     pendingWelcome: initialState.pendingWelcome,
 
-    async sendExternalToPendingJoin(conversations, isAlreadyEstablished, sendExternalProposal): Promise<void> {
+    async sendExternalToPendingJoin(conversations, isAlreadyEstablished, sendExternalCommit): Promise<void> {
       const currentState = get();
-      const pendingConversations: {groupId: string; epoch: number}[] = [];
+      const pendingConversations: {groupId: string; conversationId: QualifiedId}[] = [];
       const alreadyEstablishedConversations: string[] = [];
 
       for (const conversation of conversations) {
@@ -90,12 +91,19 @@ export const mlsConversationState = createVanilla<StoreState>((set, get) => {
             // check is the conversation is not actually already established
             alreadyEstablishedConversations.push(groupId);
           } else {
-            pendingConversations.push({epoch: conversation.epoch, groupId});
+            pendingConversations.push({conversationId: conversation.qualifiedId, groupId});
           }
         }
       }
 
-      await pendingConversations.map(sendExternalProposal);
+      await Promise.all(
+        pendingConversations.map(async ({conversationId, groupId}) => {
+          try {
+            await sendExternalCommit(conversationId);
+            alreadyEstablishedConversations.push(groupId);
+          } catch (e) {}
+        }),
+      );
 
       set({
         ...currentState,
