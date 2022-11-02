@@ -78,7 +78,8 @@ export const mlsConversationState = createVanilla<StoreState>((set, get) => {
 
     async sendExternalToPendingJoin(conversations, isAlreadyEstablished, sendExternalCommit): Promise<void> {
       const currentState = get();
-      const pendingConversations: {groupId: string; conversationId: QualifiedId}[] = [];
+      const conversationsToJoin: {groupId: string; conversationId: QualifiedId}[] = [];
+      const pendingConversations: string[] = [];
       const alreadyEstablishedConversations: string[] = [];
 
       for (const conversation of conversations) {
@@ -91,24 +92,26 @@ export const mlsConversationState = createVanilla<StoreState>((set, get) => {
             // check is the conversation is not actually already established
             alreadyEstablishedConversations.push(groupId);
           } else {
-            pendingConversations.push({conversationId: conversation.qualifiedId, groupId});
+            conversationsToJoin.push({conversationId: conversation.qualifiedId, groupId});
           }
         }
       }
 
       await Promise.all(
-        pendingConversations.map(async ({conversationId, groupId}) => {
+        conversationsToJoin.map(async ({conversationId, groupId}) => {
           try {
             await sendExternalCommit(conversationId);
             alreadyEstablishedConversations.push(groupId);
-          } catch (e) {}
+          } catch {
+            pendingConversations.push(groupId);
+          }
         }),
       );
 
       set({
         ...currentState,
         established: new Set([...currentState.established, ...alreadyEstablishedConversations]),
-        pendingWelcome: new Set([...currentState.pendingWelcome, ...pendingConversations.map(({groupId}) => groupId)]),
+        pendingWelcome: new Set([...currentState.pendingWelcome, ...pendingConversations]),
       });
     },
   };
