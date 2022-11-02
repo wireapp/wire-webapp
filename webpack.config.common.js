@@ -77,15 +77,7 @@ module.exports = {
             loader: 'postcss-loader',
             options: {
               postcssOptions: {
-                plugins: [
-                  [
-                    'autoprefixer',
-                    {
-                      browsers: ['Chrome >= 51', 'Edge >= 14', 'Firefox >= 52', 'Opera >= 40'],
-                    },
-                  ],
-                  [require('cssnano')()],
-                ],
+                plugins: [['autoprefixer'], [require('cssnano')()]],
               },
             },
           },
