@@ -17,33 +17,17 @@
  *
  */
 
-const path = require('path');
-const webpack = require('webpack');
 const CopyPlugin = require('copy-webpack-plugin');
+const webpack = require('webpack');
 const WorkboxPlugin = require('workbox-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-const DIST_PATH = path.resolve(__dirname, 'server/dist');
-const ROOT_PATH = path.resolve(__dirname);
-const SRC_PATH = path.resolve(__dirname, 'src');
+const path = require('path');
+
+const {ROOT_PATH, DIST_PATH, SRC_PATH} = require('./locations');
 
 const dist = path.resolve(DIST_PATH, 'static');
 const auth = path.resolve(SRC_PATH, 'script/auth');
 const srcScript = path.resolve(SRC_PATH, 'script');
-
-const {
-  config: {SERVER: serverConfigs, CLIENT: clientConfigs},
-} = require(path.resolve(DIST_PATH, 'config.js'));
-
-const templateParameters = {
-  VERSION: clientConfigs.VERSION,
-  BRAND_NAME: clientConfigs.BRAND_NAME,
-  APP_BASE: serverConfigs.APP_BASE,
-  CHROME_ORIGIN_TRIAL_TOKEN: clientConfigs.CHROME_ORIGIN_TRIAL_TOKEN,
-  OPEN_GRAPH_TITLE: serverConfigs.OPEN_GRAPH.TITLE,
-  OPEN_GRAPH_DESCRIPTION: serverConfigs.OPEN_GRAPH.DESCRIPTION,
-  OPEN_GRAPH_IMAGE_URL: serverConfigs.OPEN_GRAPH.IMAGE_URL,
-};
 
 module.exports = {
   cache: {
@@ -171,16 +155,6 @@ module.exports = {
       ],
     }),
     new webpack.IgnorePlugin({resourceRegExp: /.*\.wasm/}),
-    // @todo: We should merge these when main & auth app are merged.
-    new HtmlWebpackPlugin({
-      template: path.resolve(SRC_PATH, 'page/index.ejs'),
-      templateParameters,
-    }),
-    new HtmlWebpackPlugin({
-      filename: 'auth/index.html',
-      template: path.resolve(SRC_PATH, 'page/auth.ejs'),
-      templateParameters,
-    }),
   ],
   resolve: {
     alias: {
