@@ -40,9 +40,6 @@ const config: Config = {
   testPathIgnorePatterns: ['<rootDir>/server'],
   testRegex: '(test|Spec)\\.[tj]sx?$',
   testRunner: 'jest-jasmine2',
-  transform: {
-    '^.+\\.(js|ts|tsx)$': '@swc/jest',
-  },
 };
 
 // eslint-disable-next-line import/no-default-export

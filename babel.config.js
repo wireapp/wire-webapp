@@ -17,28 +17,15 @@
  *
  */
 
-const presetEnvConfig = {
-  corejs: 'core-js>=3.a',
-  debug: false,
-  modules: false,
-  useBuiltIns: 'usage',
-};
-
 module.exports = {
   env: {
     test: {
-      plugins: ['@emotion'],
+      plugins: ['@emotion', ['@babel/plugin-proposal-decorators', {legacy: true}]],
       presets: [
         ['@babel/preset-react', {importSource: '@emotion/react', runtime: 'automatic'}],
         '@babel/preset-typescript',
-        ['@babel/preset-env', {...presetEnvConfig, modules: 'commonjs'}],
+        ['@babel/preset-env', {targets: {node: 'current'}}],
       ],
     },
   },
-  plugins: [['@babel/plugin-proposal-decorators', {legacy: true}], '@emotion'],
-  presets: [
-    ['@babel/preset-react', {importSource: '@emotion/react', runtime: 'automatic'}],
-    '@babel/preset-typescript',
-    ['@babel/preset-env', presetEnvConfig],
-  ],
 };
