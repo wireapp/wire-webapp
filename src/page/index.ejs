@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<!-- Wire, Copyright (C) 2022 Wire Swiss GmbH -->
+<!-- <%= VERSION %> -->
+<html id="wire-main-app">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="geoip" content="{{ country }}" />
+    <%if (!!CHROME_ORIGIN_TRIAL_TOKEN) { %>
+    <meta http-equiv="origin-trial" content="{<%= CHROME_ORIGIN_TRIAL_TOKEN %>}" />
+    <% } %>
+    <link href="/image/favicon.ico?<%= VERSION %>" type="image/x-icon" rel="shortcut icon" sizes="48x48" />
+    <link href="/image/meta/wire-icon-256.png?<%= VERSION %>" rel="icon" sizes="256x256" type="image/png" />
+    <link href="/image/meta/wire-icon-128.png?<%= VERSION %>" rel="icon" sizes="128x128" type="image/png" />
+    <link href="/image/meta/wire-icon-64.png?<%= VERSION %>" rel="icon" sizes="64x64" type="image/png" />
+
+    <meta property="og:title" content="<%= OPEN_GRAPH_TITLE %>" />
+    <meta property="og:description" name="description" content="<%= OPEN_GRAPH_DESCRIPTION %>" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="<%= APP_BASE %>" />
+    <meta property="og:image" content="<%= OPEN_GRAPH_IMAGE_URL %>" />
+
+    <title><%= BRAND_NAME %></title>
+  </head>
+
+  <body>
+    <app-container
+      id="wire-main"
+      class="off"
+      data-bind="css: mainClasses()"
+      params="root: $root"
+      data-uie-name="status-webapp"
+      data-uie-value="is-loading"
+    ></app-container>
+
+    <div id="loading-screen" class="loading-screen">
+      <loading-bar params="message: loadingMessage, progress: loadingProgress"></loading-bar>
+    </div>
+
+    <script src="./config.js?<%= VERSION %>"></script>
+    <script src="./min/dexie.js?<%= VERSION %>"></script>
+    <script src="./min/vendor.js?<%= VERSION %>"></script>
+    <script src="./min/runtime.js?<%= VERSION %>"></script>
+    <script src="./min/app.js?<%= VERSION %>"></script>
+  </body>
+</html>

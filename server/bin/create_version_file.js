@@ -17,35 +17,24 @@
  *
  */
 
-// https://github.com/alanshaw/grunt-include-replace
+const fs = require('fs-extra');
+const path = require('path');
 
-module.exports = {
-  prod_auth: {
-    cwd: '<%= dir.src.page %>',
-    dest: '<%= dir.dist.static %>/auth',
-    expand: true,
-    options: {
-      globals: {
-        dest: '_prod',
-      },
-      includesDir: '<%= dir.src.page %>/template',
-      prefix: '#',
-    },
-    rename: dest => `${dest}/index.html`,
-    src: 'auth.html',
-  },
+const distFolder = 'dist';
 
-  prod_index: {
-    cwd: '<%= dir.src.page %>',
-    dest: '<%= dir.dist.static %>',
-    expand: true,
-    options: {
-      globals: {
-        dest: '_prod',
-      },
-      includesDir: '<%= dir.src.page %>/template',
-      prefix: '#',
-    },
-    src: 'index.html',
-  },
-};
+function padTo2Digits(num) {
+  return num.toString().padStart(2, '0');
+}
+
+function formatDate(date) {
+  return `${[date.getFullYear(), padTo2Digits(date.getMonth() + 1), padTo2Digits(date.getDate())].join('.')}.${[
+    padTo2Digits(date.getHours()),
+    padTo2Digits(date.getMinutes()),
+  ].join('.')}`;
+}
+
+const version = formatDate(new Date());
+
+console.log(`Version set to ${version}`);
+
+fs.outputFileSync(path.resolve(distFolder, 'version'), version);
