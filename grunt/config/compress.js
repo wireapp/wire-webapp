@@ -17,29 +17,19 @@
  *
  */
 
-const TerserJSPlugin = require('terser-webpack-plugin');
-const webpack = require('webpack');
-
-const commonConfig = require('./webpack.config.common');
+// https://github.com/gruntjs/grunt-contrib-compress
 
 module.exports = {
-  ...commonConfig,
-  mode: 'production',
-  optimization: {
-    ...commonConfig.optimization,
-    minimizer: [
-      new TerserJSPlugin({
-        /* Dexie has issues with UglifyJS */
-        exclude: /dexie/g,
-      }),
-    ],
-  },
-  plugins: [
-    ...commonConfig.plugins,
-    new webpack.DefinePlugin({
-      'process.env': {
-        NODE_ENV: `"production"`,
+  server: {
+    files: [
+      {
+        cwd: '<%= dir.dist_ %>',
+        expand: true,
+        src: ['../package.json', '../../.env.defaults', '**/*', '.**/*', '!<%= dir.dist.s3 %>'],
       },
-    }),
-  ],
+    ],
+    options: {
+      archive: '<%= dir.dist.s3 %>/ebs.zip',
+    },
+  },
 };

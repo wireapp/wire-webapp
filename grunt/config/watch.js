@@ -17,29 +17,26 @@
  *
  */
 
-const TerserJSPlugin = require('terser-webpack-plugin');
-const webpack = require('webpack');
-
-const commonConfig = require('./webpack.config.common');
+// https://github.com/gruntjs/grunt-contrib-watch
 
 module.exports = {
-  ...commonConfig,
-  mode: 'production',
-  optimization: {
-    ...commonConfig.optimization,
-    minimizer: [
-      new TerserJSPlugin({
-        /* Dexie has issues with UglifyJS */
-        exclude: /dexie/g,
-      }),
-    ],
+  markup: {
+    files: ['<%= dir.src_ %>/**/*.htm*'],
+    options: {
+      debounceDelay: 250,
+      spawn: false,
+    },
+    tasks: ['build_markup'],
   },
-  plugins: [
-    ...commonConfig.plugins,
-    new webpack.DefinePlugin({
-      'process.env': {
-        NODE_ENV: `"production"`,
-      },
-    }),
-  ],
+  options: {
+    livereload: 32123,
+  },
+  style: {
+    files: ['<%= dir.src_ %>/**/*.less'],
+    options: {
+      debounceDelay: 250,
+      spawn: false,
+    },
+    tasks: ['build_markup'],
+  },
 };
