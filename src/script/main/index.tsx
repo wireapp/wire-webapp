@@ -40,16 +40,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   exposeWrapperGlobals();
 
   const appContainer = document.getElementById('wire-app');
+
   if (!appContainer) {
     throw new Error('container for application does not exist in the DOM');
   }
 
   const enforceDesktopApplication = config.FEATURE.ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY && !Runtime.isDesktopApp();
+
   if (enforceDesktopApplication) {
     doRedirect(SIGN_OUT_REASON.APP_INIT);
   }
 
   const shouldPersist = loadValue<boolean>(StorageKey.AUTH.PERSIST);
+
   if (shouldPersist === undefined) {
     return doRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);
   }

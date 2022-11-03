@@ -61,7 +61,7 @@ export const AppLoader: FC<AppLoaderProps> = ({init, children}) => {
   }
 
   return (
-    <div css={styles}>
+    <div css={styles} data-uie-name="status-webapp" data-uie-value="is-loading">
       <LoadingBar {...loadingState} />
     </div>
   );

@@ -218,62 +218,63 @@ const AppMain: FC<AppMainProps> = ({app, mainView, selfUser}) => {
   }, [contentState]);
 
   return (
-    <div id="wire-main" className={`main-accent-color-${accent_id} show`}>
-      <StyledApp themeId={THEME_ID.DEFAULT} css={{backgroundColor: 'unset', height: '100%'}}>
-        <RootProvider value={mainView}>
-          <main>
-            <div id="app" className="app">
-              {(!smBreakpoint || isLeftSidebarVisible) && (
-                <LeftSidebar
-                  listViewModel={mainView.list}
-                  selfUser={selfUser}
-                  isActivatedAccount={isActivatedAccount}
-                />
-              )}
+    <StyledApp
+      themeId={THEME_ID.DEFAULT}
+      css={{backgroundColor: 'unset', height: '100%'}}
+      className={`main-accent-color-${accent_id} show`}
+      id="wire-main"
+      data-uie-name="status-webapp"
+      data-uie-value="is-loaded"
+    >
+      <RootProvider value={mainView}>
+        <>
+          <div id="app" className="app">
+            {(!smBreakpoint || isLeftSidebarVisible) && (
+              <LeftSidebar listViewModel={mainView.list} selfUser={selfUser} isActivatedAccount={isActivatedAccount} />
+            )}
 
-              {(!smBreakpoint || !isLeftSidebarVisible) && (
-                <MainContent isRightSidebarOpen={!!currentState} openRightSidebar={toggleRightSidebar} />
-              )}
+            {(!smBreakpoint || !isLeftSidebarVisible) && (
+              <MainContent isRightSidebarOpen={!!currentState} openRightSidebar={toggleRightSidebar} />
+            )}
 
-              {currentState && (
-                <RightSidebar
-                  currentEntity={currentEntity}
-                  repositories={repositories}
-                  actionsViewModel={mainView.actions}
-                  isFederated={mainView.isFederated}
-                  teamState={teamState}
-                  userState={userState}
-                />
-              )}
-            </div>
+            {currentState && (
+              <RightSidebar
+                currentEntity={currentEntity}
+                repositories={repositories}
+                actionsViewModel={mainView.actions}
+                isFederated={mainView.isFederated}
+                teamState={teamState}
+                userState={userState}
+              />
+            )}
+          </div>
 
-            <AppLock clientRepository={repositories.client} />
-            <WarningsContainer />
+          <AppLock clientRepository={repositories.client} />
+          <WarningsContainer />
 
-            <CallingContainer
-              multitasking={mainView.multitasking}
-              callingRepository={repositories.calling}
-              mediaRepository={repositories.media}
-            />
+          <CallingContainer
+            multitasking={mainView.multitasking}
+            callingRepository={repositories.calling}
+            mediaRepository={repositories.media}
+          />
 
-            <LegalHoldModal
-              userState={userState}
-              conversationRepository={repositories.conversation}
-              searchRepository={repositories.search}
-              teamRepository={repositories.team}
-              clientRepository={repositories.client}
-              messageRepository={repositories.message}
-              cryptographyRepository={repositories.cryptography}
-            />
+          <LegalHoldModal
+            userState={userState}
+            conversationRepository={repositories.conversation}
+            searchRepository={repositories.search}
+            teamRepository={repositories.team}
+            clientRepository={repositories.client}
+            messageRepository={repositories.message}
+            cryptographyRepository={repositories.cryptography}
+          />
 
-            {/*The order of these elements matter to show proper modals stack upon each other*/}
-            <UserModal userRepository={repositories.user} />
-            <PrimaryModalComponent />
-            <GroupCreationModal userState={userState} teamState={teamState} />
-          </main>
-        </RootProvider>
-      </StyledApp>
-    </div>
+          {/*The order of these elements matter to show proper modals stack upon each other*/}
+          <UserModal userRepository={repositories.user} />
+          <PrimaryModalComponent />
+          <GroupCreationModal userState={userState} teamState={teamState} />
+        </>
+      </RootProvider>
+    </StyledApp>
   );
 };
 

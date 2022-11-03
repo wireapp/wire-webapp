@@ -173,9 +173,7 @@ export class App {
 
     new WindowHandler();
 
-    // done.
     this.service = this._setupServices();
-    // done.
     this.repository = this._setupRepositories();
 
     if (Config.getConfig().FEATURE.ENABLE_DEBUG) {
@@ -401,9 +399,9 @@ export class App {
 
       const selfUser = await this.initiateSelfUser();
 
-      if (this.apiClient.backendFeatures.isFederated && this.repository.storage.storageService.db) {
+      if (this.apiClient.backendFeatures.isFederated && this.repository.storage.storageService.db && context.domain) {
         // Migrate all existing session to fully qualified ids (if need be)
-        await migrateToQualifiedSessionIds(this.repository.storage.storageService.db.sessions, context.domain ?? '');
+        await migrateToQualifiedSessionIds(this.repository.storage.storageService.db.sessions, context.domain);
       }
 
       onProgress(5, t('initReceivedSelfUser', selfUser.name()));
