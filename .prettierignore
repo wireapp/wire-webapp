@@ -1,5 +1,4 @@
 src/i18n/
-.nyc_output
 .vscode/
 /config
 /docs/auth-coverage
