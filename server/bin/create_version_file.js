@@ -17,11 +17,14 @@
  *
  */
 
-module.exports = {
-  less: {
-    command: 'yarn build:style',
-    options: {
-      stdout: true,
-    },
-  },
-};
+const path = require('path');
+const fs = require('fs-extra');
+const {format} = require('date-fns');
+
+const distFolder = 'dist';
+
+const version = format(new Date(), 'yyyy.MM.dd.HH.mm');
+
+console.log(`Version set to ${version}`);
+
+fs.outputFileSync(path.resolve(distFolder, 'version'), version);

@@ -21,9 +21,6 @@ const presetEnvConfig = {
   corejs: 'core-js>=3.a',
   debug: false,
   modules: false,
-  targets: {
-    browsers: ['chrome >= 51', 'firefox >= 60', 'edge >= 15', 'opera >= 43'],
-  },
   useBuiltIns: 'usage',
 };
 
