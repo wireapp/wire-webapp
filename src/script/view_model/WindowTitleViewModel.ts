@@ -83,8 +83,10 @@ export class WindowTitleViewModel {
           }
 
           case ContentState.CONVERSATION: {
-            if (this.conversationState.activeConversation()) {
-              specificTitle += this.conversationState.activeConversation().display_name();
+            const conversation = this.conversationState.activeConversation();
+
+            if (conversation) {
+              specificTitle += conversation.display_name();
             }
             break;
           }

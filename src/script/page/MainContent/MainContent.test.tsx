@@ -44,9 +44,9 @@ describe('Preferences', () => {
     openRightSidebar: jest.fn(),
   };
 
-  const {setContentState} = useAppState.getState();
-
   it('renders the right component according to view state', () => {
+    const {setContentState} = useAppState.getState();
+
     jest.useFakeTimers();
     render(
       withTheme(
@@ -55,16 +55,19 @@ describe('Preferences', () => {
         </RootProvider>,
       ),
     );
+
     expect(screen.queryByText('accessibility.headings.preferencesAbout')).toBeNull();
-    expect(screen.queryByText('AccountPreferences')).not.toBeNull();
 
     act(() => {
       setContentState(ContentState.PREFERENCES_ABOUT);
     });
+
     waitFor(() => screen.getByText('accessibility.headings.preferencesAbout'));
+
     act(() => {
       jest.advanceTimersByTime(1000);
     });
+
     expect(screen.queryByText('AccountPreferences')).toBeNull();
     expect(screen.queryByText('accessibility.headings.preferencesAbout')).not.toBeNull();
     jest.useRealTimers();

@@ -67,6 +67,9 @@ describe('WindowTitleViewModel', () => {
     });
 
     it('sets the name of the conversation (when the conversation is selected)', () => {
+      const {setContentState} = useAppState.getState();
+      setContentState(ContentState.CONVERSATION);
+
       const selected_conversation = new Conversation(createRandomUuid());
       selected_conversation.name('Selected Conversation');
       selected_conversation.type(CONVERSATION_TYPE.REGULAR);
@@ -79,6 +82,9 @@ describe('WindowTitleViewModel', () => {
     });
 
     it('sets the name of the conversation and a badge count (when the conversation is selected and when there are unread messages)', () => {
+      const {setContentState} = useAppState.getState();
+      setContentState(ContentState.CONVERSATION);
+
       const message = new ContentMessage();
       message.id = createRandomUuid();
       message.timestamp(Date.now());
