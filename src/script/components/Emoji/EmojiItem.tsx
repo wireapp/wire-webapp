@@ -39,7 +39,6 @@ const EmojiItem: FC<EmojiItemProps> = ({emoji, onClick, onMouseEnter, selectedEm
     onMouseEnter={onMouseEnter}
     onClick={onClick}
     aria-label={emoji.name}
-    tabIndex={0}
   >
     <span css={symbolStyle}>{emoji.icon}</span>
     <span css={nameStyle}>{emoji.name}</span>
