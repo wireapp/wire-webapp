@@ -26,7 +26,6 @@ export enum DatabaseStores {
   PRE_KEYS = 'prekeys',
   SESSIONS = 'sessions',
   GROUP_IDS = 'group_ids',
-  PENDING_PROPOSALS = 'pending_proposals',
 }
 
 export class CryptographyDatabaseRepository {

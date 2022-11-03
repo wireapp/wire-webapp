@@ -39,7 +39,6 @@ import {MessageTimer, PayloadBundleState, RemoveUsersParams} from '../../convers
 import {RemoteData} from '../content';
 import {CryptographyService} from '../../cryptography/';
 import {MLSService} from '../../mls';
-import {NotificationService} from '../../notification';
 import {decryptAsset} from '../../cryptography/AssetCryptography';
 import {isStringArray, isQualifiedIdArray, isQualifiedUserClients, isUserClients} from '../../util/TypePredicateUtil';
 import {MessageService} from '../message/MessageService';
@@ -73,7 +72,6 @@ export class ConversationService {
     private readonly apiClient: APIClient,
     cryptographyService: CryptographyService,
     private readonly config: {useQualifiedIds?: boolean},
-    private readonly notificationService: NotificationService,
     private readonly mlsService: MLSService,
   ) {
     this.messageTimer = new MessageTimer();
@@ -598,7 +596,7 @@ export class ConversationService {
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
 
     // immediately execute pending commits before sending the message
-    await this.notificationService.commitPendingProposals({groupId});
+    await this.mlsService.commitPendingProposals({groupId});
 
     const encrypted = await this.mlsService.encryptMessage(groupIdBytes, GenericMessage.encode(payload).finish());
 

@@ -273,7 +273,7 @@ export class Account<T = any> extends EventEmitter {
 
       if (this.cryptoProtocolConfig?.mls && this.backendFeatures.supportsMLS) {
         // initialize schedulers for pending mls proposals once client is initialized
-        await this.service?.notification.checkExistingPendingProposals();
+        await this.service?.mls.checkExistingPendingProposals();
 
         // initialize schedulers for renewing key materials
         this.service?.mls.checkForKeyMaterialsUpdate();
@@ -418,7 +418,6 @@ export class Account<T = any> extends EventEmitter {
         // We can use qualified ids to send messages as long as the backend supports federated endpoints
         useQualifiedIds: this.backendFeatures.federationEndpoints,
       },
-      notificationService,
       mlsService,
     );
 
