@@ -39,6 +39,7 @@ import {PanelEntity, PanelState, RightSidebar} from './RightSidebar';
 import {RootProvider} from './RootProvider';
 import {useAppMainState, ViewType} from './state';
 import {useAppState, ContentState} from './useAppState';
+import {useWindowTitle} from './useWindowTitle';
 
 import {User} from '../entity/User';
 import {App} from '../main/app';
@@ -86,6 +87,7 @@ const AppMain: FC<AppMainProps> = ({app, mainView, selfUser}) => {
   const teamState = container.resolve(TeamState);
   const userState = container.resolve(UserState);
 
+  useWindowTitle();
   const {isActivatedAccount} = useKoSubscribableChildren(userState, ['isActivatedAccount']);
 
   const {history, entity: currentEntity, clearHistory, goTo} = useAppMainState(state => state.rightSidebar);

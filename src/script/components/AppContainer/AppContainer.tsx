@@ -22,14 +22,13 @@ import {FC} from 'react';
 import {ClientType} from '@wireapp/api-client/lib/client/';
 import {container} from 'tsyringe';
 
-import {AppLoader} from './AppLoader';
-
-import {Configuration} from '../Config';
-import {App} from '../main/app';
-import {AppMain} from '../page/AppMain';
-import {APIClient} from '../service/APIClientSingleton';
-import {Core} from '../service/CoreSingleton';
-import {MainViewModel} from '../view_model/MainViewModel';
+import {Configuration} from '../../Config';
+import {App} from '../../main/app';
+import {AppMain} from '../../page/AppMain';
+import {APIClient} from '../../service/APIClientSingleton';
+import {Core} from '../../service/CoreSingleton';
+import {MainViewModel} from '../../view_model/MainViewModel';
+import {AppLoader} from '../AppLoader';
 
 interface AppProps {
   config: Configuration;

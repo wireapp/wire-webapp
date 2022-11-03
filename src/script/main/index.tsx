@@ -23,7 +23,7 @@ import {ClientType} from '@wireapp/api-client/lib/client/';
 import {Runtime} from '@wireapp/commons';
 import {createRoot} from 'react-dom/client';
 
-import {AppContainer} from 'Components/AppContainer';
+import {AppContainer} from 'Components/AppContainer/AppContainer';
 import {enableLogging} from 'Util/LoggerUtil';
 import {loadValue} from 'Util/StorageUtil';
 import {exposeWrapperGlobals} from 'Util/wrapper';
