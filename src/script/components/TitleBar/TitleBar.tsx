@@ -137,7 +137,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
 
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
   const mdBreakpoint = useMatchMedia('max-width: 768px');
-  const smBreakpoint = useMatchMedia('max-width: 620px');
+  const smBreakpoint = useMatchMedia('max-width: 640px');
 
   const {setCurrentView: setView} = useAppMainState(state => state.responsiveView);
 
