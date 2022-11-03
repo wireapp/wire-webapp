@@ -201,7 +201,7 @@ export class NotificationRepository {
       notification.close();
       if (notification.data) {
         const {conversationId, messageId} = notification.data;
-        this.logger.info(`Notification for '${messageId}' in '${conversationId}' closed on unload.`, notification);
+        this.logger.info(`Notification for '${messageId}' in '${conversationId?.id}' closed on unload.`, notification);
       }
     });
   }

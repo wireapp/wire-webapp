@@ -33,7 +33,6 @@
     },
     "resolveJsonModule": true,
     "rootDirs": ["src/script"],
-    "sourceMap": true,
     "target": "es2017",
     "typeRoots": ["src/types", "node_modules/@types", "node_modules/amplify/typings"],
     "strict": true

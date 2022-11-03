@@ -106,6 +106,7 @@ import {ThemeViewModel} from '../view_model/ThemeViewModel';
 import {Warnings} from '../view_model/WarningsContainer';
 
 import './globals';
+import '../../style/default.less';
 
 export function doRedirect(signOutReason: SIGN_OUT_REASON) {
   let url = `/auth/${location.search}`;
@@ -442,6 +443,8 @@ export class App {
             const conversation = await conversationRepository.getConversationById(conversationId);
             return conversation?.groupId;
           },
+          // @todo update this when external commits are being implemented
+          userAuthorize: () => false,
         });
       }
 

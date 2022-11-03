@@ -27,6 +27,7 @@ const srcScript = 'src/script/';
 
 module.exports = {
   ...commonConfig,
+  devtool: 'eval-source-map',
   entry: {
     ...commonConfig.entry,
     app: ['webpack-hot-middleware/client?reload=true', path.resolve(__dirname, srcScript, 'main/index.tsx')],
@@ -34,8 +35,8 @@ module.exports = {
   },
   mode: 'development',
   plugins: [...commonConfig.plugins, new webpack.HotModuleReplacementPlugin()],
-  resolve: {...commonConfig.resolve, alias: {...commonConfig.resolve.alias}},
   snapshot: {
+    // This will make sure that changes in the node_modules will be detected and recompiled automatically (when using yalc for example)
     managedPaths: [],
   },
 };

@@ -17,24 +17,14 @@
  *
  */
 
-module.exports = {
-  aws_deploy: {
-    command:
-      'aws elasticbeanstalk create-application-version --application-name Webapp --version-label <%= grunt.config("aws.deploy.options.version") %> --source-bundle S3Bucket="wire-webapp",S3Key="<%= grunt.config("aws.deploy.options.version") %>.zip" --auto-create-application',
-    options: {
-      stdout: true,
-    },
-  },
-  dist_bundle: {
-    command: 'yarn && yarn bundle:prod',
-    options: {
-      stdout: true,
-    },
-  },
-  less: {
-    command: 'yarn build:style',
-    options: {
-      stdout: true,
-    },
-  },
-};
+const path = require('path');
+const fs = require('fs-extra');
+const {format} = require('date-fns');
+
+const distFolder = 'dist';
+
+const version = format(new Date(), 'yyyy.MM.dd.HH.mm');
+
+console.log(`Version set to ${version}`);
+
+fs.outputFileSync(path.resolve(distFolder, 'version'), version);

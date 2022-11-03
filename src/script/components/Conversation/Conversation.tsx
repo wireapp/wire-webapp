@@ -27,16 +27,19 @@ import {
   useState,
 } from 'react';
 
+import {useMatchMedia} from '@wireapp/react-ui-kit';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 import {groupBy} from 'underscore';
 
+import {CallingCell} from 'Components/calling/CallingCell';
 import {Giphy} from 'Components/Giphy';
 import {InputBar} from 'Components/InputBar';
 import {MessagesList} from 'Components/MessagesList';
 import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {TitleBar} from 'Components/TitleBar';
+import {CallState} from 'src/script/calling/CallState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
@@ -90,9 +93,15 @@ const ConversationList: FC<ConversationListProps> = ({
   const [readMessagesBuffer, setReadMessagesBuffer] = useState<ReadMessageBuffer[]>([]);
 
   const conversationState = container.resolve(ConversationState);
+  const callState = container.resolve(CallState);
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
+  const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
   const {is1to1, isRequest} = useKoSubscribableChildren(activeConversation!, ['is1to1', 'isRequest']);
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
+  const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
+
+  // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
+  const smBreakpoint = useMatchMedia('max-width: 620px');
 
   useEffect(() => {
     if (readMessagesBuffer.length) {
@@ -378,6 +387,29 @@ const ConversationList: FC<ConversationListProps> = ({
             openRightSidebar={openRightSidebar}
             isRightSidebarOpen={isRightSidebarOpen}
           />
+
+          {activeCalls.map(call => {
+            const conversation = conversationState.findConversation(call.conversationId);
+            const callingViewModel = mainViewModel.calling;
+            const callingRepository = callingViewModel.callingRepository;
+
+            if (!conversation || !smBreakpoint) {
+              return null;
+            }
+
+            return (
+              <div className="calling-cell" key={conversation.id}>
+                <CallingCell
+                  classifiedDomains={classifiedDomains}
+                  call={call}
+                  callActions={callingViewModel.callActions}
+                  callingRepository={callingRepository}
+                  conversation={conversation}
+                  multitasking={callingViewModel.multitasking}
+                />
+              </div>
+            );
+          })}
 
           <MessagesList
             conversation={activeConversation}

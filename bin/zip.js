@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,10 +17,23 @@
  *
  */
 
+const fs = require('fs');
 const path = require('path');
+const archiver = require('archiver');
+const archive = archiver('zip');
 
-module.exports = {
-  DIST_PATH: path.resolve(__dirname, 'server/dist'),
-  ROOT_PATH: path.resolve(__dirname),
-  SRC_PATH: path.resolve(__dirname, 'src'),
-};
+const ROOT_PATH = path.resolve(__dirname, '..');
+const SERVER_PATH = path.resolve(ROOT_PATH, 'server');
+const DIST_PATH = path.resolve(ROOT_PATH, 'server/dist');
+const S3_PATH = path.resolve(ROOT_PATH, 'server/dist/s3');
+
+archive.file(path.join(SERVER_PATH, 'package.json'), {name: 'package.json'});
+archive.file(path.join(ROOT_PATH, '.env.defaults'), {name: '.env.defaults'});
+archive.directory(DIST_PATH, false);
+
+fs.mkdirSync(S3_PATH);
+const output = fs.createWriteStream(path.join(S3_PATH, 'ebs.zip'));
+
+archive.pipe(output);
+
+archive.finalize();

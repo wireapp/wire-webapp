@@ -21,8 +21,8 @@ import React from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
+import {CallingCell} from 'Components/calling/CallingCell';
 import {Icon} from 'Components/Icon';
-import {ConversationListCallingCell} from 'Components/list/ConversationListCallingCell';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -75,7 +75,7 @@ const TemporaryGuestConversations: React.FC<TemporaryGuestConversations> = ({
         const conversation = getConversationById(call.conversationId);
         return (
           <div key={call.conversationId.id} className="calling-cell">
-            <ConversationListCallingCell
+            <CallingCell
               data-uie-name="item-call"
               data-uie-uid={call.conversationId.id}
               data-uie-value={conversation.display_name()}
