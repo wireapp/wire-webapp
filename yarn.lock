@@ -8598,11 +8598,11 @@ __metadata:
   linkType: hard
 
 "hosted-git-info@npm:^3.0.6":
-  version: 3.0.7
-  resolution: "hosted-git-info@npm:3.0.7"
+  version: 3.0.8
+  resolution: "hosted-git-info@npm:3.0.8"
   dependencies:
     lru-cache: ^6.0.0
-  checksum: e9da1f0852e732d8f59e95e501d14be643b4a63136107c1a733f1219b091f213a651d6e145d847f68322420fb77294475022b13da5d40eef8d6e67d087ea8978
+  checksum: 5af7a69581acb84206a7b8e009f4680c36396814e92c8a83973dfb3b87e44e44d1f7b8eaf3e4a953686482770ecb78406a4ce4666bfdfe447762434127871d8d
   languageName: node
   linkType: hard
 
