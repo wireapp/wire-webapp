@@ -1,0 +1,50 @@
+/*
+ * Wire
+ * Copyright (C) 2022 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {PendingProposalsParams, pendingProposalsStore} from './pendingProposalsStore';
+import {storageMock} from '../stores.mock';
+
+const mockEntries: PendingProposalsParams[] = [
+  {groupId: 'group0', firingDate: 1},
+  {groupId: 'group1', firingDate: 2},
+];
+// Storage Mock
+(global as any).localStorage = storageMock();
+
+describe('pendingProposalsStore', () => {
+  it('adds and retrieves items to/from dates store', () => {
+    pendingProposalsStore.storeItem(mockEntries[0]);
+    expect(pendingProposalsStore.getAllItems()).toContainEqual(mockEntries[0]);
+
+    pendingProposalsStore.storeItem(mockEntries[1]);
+    const stored = pendingProposalsStore.getAllItems();
+    expect(stored).toContainEqual(mockEntries[1]);
+    expect(stored).toContainEqual(mockEntries[0]);
+    expect(stored).toHaveLength(2);
+  });
+
+  it('removes items from dates store', () => {
+    pendingProposalsStore.storeItem(mockEntries[0]);
+    expect(pendingProposalsStore.getAllItems()).toContainEqual(mockEntries[0]);
+
+    pendingProposalsStore.deleteItem({groupId: mockEntries[0].groupId});
+
+    expect(pendingProposalsStore.getAllItems()).not.toContainEqual(mockEntries[0]);
+  });
+});

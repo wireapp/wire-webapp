@@ -28,5 +28,5 @@ export type EventHandlerParams = {
   mlsService: MLSService;
   event: BackendEvent;
   source: PayloadBundleSource;
-  dryRun: boolean;
+  dryRun?: boolean;
 };

@@ -22,7 +22,6 @@ import {Notification} from '@wireapp/api-client/lib/notification/';
 import {CRUDEngine} from '@wireapp/store-engine';
 
 import {CryptographyDatabaseRepository} from '../cryptography/CryptographyDatabaseRepository';
-import {CommonMLS, StorePendingProposalsParams} from '../mls/types';
 
 export enum DatabaseStores {
   EVENTS = 'events',
@@ -77,37 +76,5 @@ export class NotificationDatabaseRepository {
       value: lastNotification.id,
     });
     return lastNotification.id;
-  }
-
-  /**
-   * ## MLS only ##
-   * Store groupIds with pending proposals and a delay in the DB until the proposals get committed.
-   *
-   * @param groupId groupId of the mls conversation
-   * @param firingDate date when the pending proposals should be committed
-   */
-  public async storePendingProposal(params: StorePendingProposalsParams) {
-    await this.storeEngine.updateOrCreate(STORES.PENDING_PROPOSALS, `${params.groupId}`, params);
-    return true;
-  }
-
-  /**
-   * ## MLS only ##
-   * Delete stored entries for pending proposals that have been committed.
-   *
-   * @param groupId groupId of the mls conversation
-   */
-  public async deletePendingProposal({groupId}: CommonMLS) {
-    await this.storeEngine.delete(STORES.PENDING_PROPOSALS, `${groupId}`);
-    return true;
-  }
-
-  /**
-   * ## MLS only ##
-   * Get all stored entries for pending proposals.
-   *
-   */
-  public async getStoredPendingProposals() {
-    return this.storeEngine.readAll<StorePendingProposalsParams>(STORES.PENDING_PROPOSALS);
   }
 }

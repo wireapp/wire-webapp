@@ -17,9 +17,5 @@
  *
  */
 
-import {EventHandlerResult, EventHandlerParams} from './EventHandler.types';
-import {handleConversationEvent} from './ConversationEvent';
-
-const handleBackendEvent = async (params: EventHandlerParams): EventHandlerResult => handleConversationEvent(params);
-
-export {handleBackendEvent};
+export * from './welcomeMessage';
+export * from './messageAdd';

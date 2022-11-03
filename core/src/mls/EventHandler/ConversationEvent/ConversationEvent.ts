@@ -17,33 +17,19 @@
  *
  */
 
-import {BackendEvent, ConversationMLSWelcomeEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
-import {Decoder, Encoder} from 'bazinga64';
 import {EventHandlerParams, EventHandlerResult} from '..';
+import {isWelcomeMessageEvent, handleWelcomeMessage, isMLSMessageAddEvent, handleMLSMessageAdd} from './events';
+import logdown from 'logdown';
 
-// extract typeguards to separate file once we have more than one
-const isWelcomeMessage = (event: BackendEvent): event is ConversationMLSWelcomeEvent =>
-  event.type === CONVERSATION_EVENT.MLS_WELCOME_MESSAGE;
-
-// extract handlers to separate file once we have more than one
-interface HandleWelcomeMessageParams extends EventHandlerParams {
-  event: ConversationMLSWelcomeEvent;
-}
-const handleWelcomeMessage = async ({mlsService, event, source}: HandleWelcomeMessageParams): EventHandlerResult => {
-  const data = Decoder.fromBase64(event.data).asBytes;
-  // We extract the groupId from the welcome message and let coreCrypto store this group
-  const newGroupId = await mlsService.processWelcomeMessage(data);
-  const groupIdStr = Encoder.toBase64(newGroupId).asString;
-  // The groupId can then be sent back to the consumer
-  return {
-    event: {...event, data: groupIdStr},
-  };
-};
+const logger = logdown('@wireapp/core/EventHandler/ConversationEvent');
 
 const handleConversationEvent = async (params: EventHandlerParams): EventHandlerResult => {
-  const event = params.event;
-  if (isWelcomeMessage(event)) {
+  const {event} = params;
+  if (isWelcomeMessageEvent(event)) {
     return handleWelcomeMessage({...params, event});
+  }
+  if (isMLSMessageAddEvent(event)) {
+    return handleMLSMessageAdd({...params, event, logger});
   }
 };
 

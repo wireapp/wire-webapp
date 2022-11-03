@@ -17,8 +17,9 @@
  *
  */
 
-import {CommonMLS, LastKeyMaterialUpdateParams} from '../../types';
+import {CommonMLS} from '../../../types';
 
+export type LastKeyMaterialUpdateParams = CommonMLS;
 export interface KeyMaterialUpdatesStore {
   [groupId: string]: LastKeyMaterialUpdateParams;
 }

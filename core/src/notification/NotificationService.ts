@@ -33,11 +33,7 @@ import {NotificationBackendRepository} from './NotificationBackendRepository';
 import {NotificationDatabaseRepository} from './NotificationDatabaseRepository';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 import {AbortHandler} from '@wireapp/api-client/lib/tcp';
-import {Decoder} from 'bazinga64';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {CommitPendingProposalsParams, HandlePendingProposalsParams} from '../mls/types';
-import {TaskScheduler} from '../util/TaskScheduler/TaskScheduler';
-import {MLSService, optionalToUint8Array} from '../mls';
+import {MLSService} from '../mls';
 
 export type HandledEventPayload = {
   event: Events.BackendEvent;
@@ -266,62 +262,13 @@ export class NotificationService extends EventEmitter {
     dryRun: boolean = false,
   ): Promise<HandledEventPayload | undefined> {
     // Handle MLS Events
-    const result = await this.mlsService.handleMLSEvent(event, source, dryRun);
+    const result = await this.mlsService.handleMLSEvent({event, source, dryRun});
     if (result) {
       return result;
     }
 
     // Fallback to other events
     switch (event.type) {
-      case Events.CONVERSATION_EVENT.MLS_MESSAGE_ADD:
-        const encryptedData = Decoder.fromBase64(event.data).asBytes;
-
-        const groupId = await this.getGroupIdFromConversationId(
-          event.qualified_conversation ?? {id: event.conversation, domain: ''},
-        );
-        const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
-
-        const {
-          proposals,
-          commitDelay,
-          message,
-          senderClientId: encodedSenderClientId,
-        } = await this.mlsService.decryptMessage(groupIdBytes, encryptedData);
-
-        if (encodedSenderClientId) {
-          const decoder = new TextDecoder();
-          const senderClientId = decoder.decode(optionalToUint8Array(encodedSenderClientId));
-          event.senderClientId = senderClientId;
-        }
-
-        // Check if the message includes proposals
-        if (typeof commitDelay === 'number' || proposals.length > 0) {
-          // we are dealing with a proposal, add a task to process this proposal later on
-          // Those proposals are stored inside of coreCrypto and will be handled after a timeout
-          await this.handlePendingProposals({
-            groupId,
-            delayInMs: commitDelay ?? 0,
-            eventTime: event.time,
-          });
-          // This is not a text message, there is nothing more to do
-          return undefined;
-        }
-
-        if (!message) {
-          const newEpoch = await this.mlsService.getEpoch(groupIdBytes);
-          this.logger.log(`Received commit message for group "${groupId}". New epoch is "${newEpoch}"`);
-          return undefined;
-        }
-        const decryptedData = GenericMessage.decode(message);
-        /**
-         * @todo Find a proper solution to add mappedEvent to this return
-         * otherwise event.data will be base64 raw data of the received event
-         */
-        return {
-          event,
-          decryptedData,
-        };
-
       // Encrypted Proteus events
       case Events.CONVERSATION_EVENT.OTR_MESSAGE_ADD: {
         if (dryRun) {
@@ -367,97 +314,5 @@ export class NotificationService extends EventEmitter {
       }
     }
     return {event};
-  }
-
-  /**
-   * ## MLS only ##
-   * If there is a matching conversationId => groupId pair in the database,
-   * we can find the groupId and return it as a string
-   *
-   * @param conversationQualifiedId
-   */
-  private async getGroupIdFromConversationId(conversationQualifiedId: QualifiedId): Promise<string> {
-    const {id: conversationId, domain: conversationDomain} = conversationQualifiedId;
-    const groupId = await this.mlsService.groupIdFromConversationId?.(conversationQualifiedId);
-
-    if (!groupId) {
-      throw new Error(`Could not find a group_id for conversation ${conversationId}@${conversationDomain}`);
-    }
-    return groupId;
-  }
-
-  /**
-   * ## MLS only ##
-   * If there are pending proposals, we need to either process them,
-   * or save them in the database for later processing
-   *
-   * @param groupId groupId of the mls conversation
-   * @param delayInMs delay in ms before processing proposals
-   * @param eventTime time of the event that had the proposals
-   */
-  private async handlePendingProposals({delayInMs, groupId, eventTime}: HandlePendingProposalsParams) {
-    if (delayInMs > 0) {
-      const eventDate = new Date(eventTime);
-      const firingDate = eventDate.setTime(eventDate.getTime() + delayInMs);
-      try {
-        await this.database.storePendingProposal({
-          groupId,
-          firingDate,
-        });
-      } catch (error) {
-        this.logger.error('Could not store pending proposal', error);
-      } finally {
-        TaskScheduler.addTask({
-          task: () => this.commitPendingProposals({groupId}),
-          firingDate,
-          key: groupId,
-        });
-      }
-    } else {
-      await this.commitPendingProposals({groupId, skipDelete: true});
-    }
-  }
-
-  /**
-   * ## MLS only ##
-   * Commit all pending proposals for a given groupId
-   *
-   * @param groupId groupId of the conversation
-   * @param skipDelete if true, do not delete the pending proposals from the database
-   */
-  public async commitPendingProposals({groupId, skipDelete = false}: CommitPendingProposalsParams) {
-    try {
-      await this.mlsService.commitPendingProposals(Decoder.fromBase64(groupId).asBytes);
-
-      if (!skipDelete) {
-        TaskScheduler.cancelTask(groupId);
-        await this.database.deletePendingProposal({groupId});
-      }
-    } catch (error) {
-      this.logger.error(`Error while committing pending proposals for groupId ${groupId}`, error);
-    }
-  }
-
-  /**
-   * ## MLS only ##
-   * Get all pending proposals from the database and schedule them
-   * Function must only be called once, after application start
-   *
-   */
-  public async checkExistingPendingProposals() {
-    try {
-      const pendingProposals = await this.database.getStoredPendingProposals();
-      if (pendingProposals.length > 0) {
-        pendingProposals.forEach(({groupId, firingDate}) =>
-          TaskScheduler.addTask({
-            task: () => this.commitPendingProposals({groupId}),
-            firingDate,
-            key: groupId,
-          }),
-        );
-      }
-    } catch (error) {
-      this.logger.error('Could not get pending proposals', error);
-    }
   }
 }

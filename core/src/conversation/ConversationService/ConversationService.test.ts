@@ -28,7 +28,6 @@ import {CryptographyService} from '../../cryptography';
 import * as PayloadHelper from '../../test/PayloadHelper';
 import {MessageTargetMode} from './ConversationService.types';
 import * as MessageBuilder from '../message/MessageBuilder';
-import {NotificationService} from '../../notification/NotificationService';
 import {MLSService} from '../../mls';
 
 jest.mock('../message/messageSender', () => ({
@@ -38,6 +37,7 @@ jest.mock('../message/messageSender', () => ({
 
 const mockedMLSService = {
   encryptMessage: () => {},
+  commitPendingProposals: () => Promise.resolve(),
 } as unknown as MLSService;
 
 describe('ConversationService', () => {
@@ -79,9 +79,6 @@ describe('ConversationService', () => {
       {
         useQualifiedIds: federated,
       },
-      {
-        commitPendingProposals: () => Promise.resolve(),
-      } as unknown as NotificationService,
       mockedMLSService,
     );
   }

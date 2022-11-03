@@ -17,34 +17,11 @@
  *
  */
 
-import {keyMaterialUpdatesStore} from './keyMaterialUpdatesStore';
-import {LastKeyMaterialUpdateParams} from '../../types';
+import {keyMaterialUpdatesStore, LastKeyMaterialUpdateParams} from './keyMaterialUpdatesStore';
+import {storageMock} from '../stores.mock';
 
 const mockUpdateEntries: LastKeyMaterialUpdateParams[] = [{groupId: 'group0'}, {groupId: 'group1'}];
 // Storage Mock
-function storageMock() {
-  const storage: any = {};
-
-  return {
-    setItem: function (key: any, value: any) {
-      storage[key] = value || '';
-    },
-    getItem: function (key: any) {
-      return key in storage ? storage[key] : null;
-    },
-    removeItem: function (key: any) {
-      delete storage[key];
-    },
-    get length() {
-      return Object.keys(storage).length;
-    },
-    key: function (i: any) {
-      const keys = Object.keys(storage);
-      return keys[i] || null;
-    },
-  };
-}
-
 (global as any).localStorage = storageMock();
 
 describe('keyMaterialUpdatesStore', () => {

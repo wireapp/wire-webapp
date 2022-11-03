@@ -39,12 +39,15 @@ import logdown from 'logdown';
 import {QualifiedUsers} from '../../conversation';
 import {sendMessage} from '../../conversation/message/messageSender';
 import {parseFullQualifiedClientId} from '../../util/fullyQualifiedClientIdUtils';
-import {MLSCallbacks} from '../types';
+import {CommitPendingProposalsParams, HandlePendingProposalsParams, MLSCallbacks} from '../types';
 
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {TimeUtil} from '@wireapp/commons';
 import {cancelRecurringTask, registerRecurringTask} from '../../util/RecurringTaskScheduler';
-import {BackendEvent, EventHandlerResult, handleBackendEvent, PayloadBundleSource} from '../EventHandler';
-import {keyMaterialUpdatesStore} from './keyMaterialUpdatesStore';
+import {TaskScheduler} from '../../util/TaskScheduler';
+import {EventHandlerParams, EventHandlerResult, handleBackendEvent} from '../EventHandler';
+import {keyMaterialUpdatesStore} from './stores/keyMaterialUpdatesStore';
+import {pendingProposalsStore} from './stores/pendingProposalsStore';
 
 //@todo: this function is temporary, we wait for the update from core-crypto side
 //they are returning regular array instead of Uint8Array for commit and welcome messages
@@ -199,7 +202,7 @@ export class MLSService {
    */
   private async processCommitAction(groupId: ConversationId, generateCommit: () => Promise<CommitBundle>) {
     return sendMessage<PostMlsMessageResponse | null>(async () => {
-      await this.commitPendingProposals(groupId);
+      await this.commitProposals(groupId);
       const commitBundle = await generateCommit();
       return this.uploadCommitBundle(groupId, commitBundle);
     });
@@ -222,7 +225,7 @@ export class MLSService {
     );
   }
 
-  public async commitPendingProposals(groupId: ConversationId): Promise<void> {
+  private async commitProposals(groupId: ConversationId): Promise<void> {
     const commitBundle = await this.coreCryptoClient.commitPendingProposals(groupId);
     return commitBundle ? void (await this.uploadCommitBundle(groupId, commitBundle)) : undefined;
   }
@@ -354,11 +357,92 @@ export class MLSService {
     return this.coreCryptoClient.wipeConversation(conversationId);
   }
 
-  public async handleMLSEvent(
-    event: BackendEvent,
-    source: PayloadBundleSource,
-    dryRun: boolean = false,
-  ): EventHandlerResult {
-    return handleBackendEvent({event, source, dryRun, mlsService: this});
+  public async handleMLSEvent(params: Omit<EventHandlerParams, 'mlsService'>): EventHandlerResult {
+    return handleBackendEvent({...params, mlsService: this});
+  }
+
+  /**
+   * If there is a matching conversationId => groupId pair in the database,
+   * we can find the groupId and return it as a string
+   *
+   * @param conversationQualifiedId
+   */
+  public async getGroupIdFromConversationId(conversationQualifiedId: QualifiedId): Promise<string> {
+    const {id: conversationId, domain: conversationDomain} = conversationQualifiedId;
+    const groupId = await this.groupIdFromConversationId?.(conversationQualifiedId);
+
+    if (!groupId) {
+      throw new Error(`Could not find a group_id for conversation ${conversationId}@${conversationDomain}`);
+    }
+    return groupId;
+  }
+
+  /**
+   * If there are pending proposals, we need to either process them,
+   * or save them in the database for later processing
+   *
+   * @param groupId groupId of the mls conversation
+   * @param delayInMs delay in ms before processing proposals
+   * @param eventTime time of the event that had the proposals
+   */
+  public async handlePendingProposals({delayInMs, groupId, eventTime}: HandlePendingProposalsParams) {
+    if (delayInMs > 0) {
+      const eventDate = new Date(eventTime);
+      const firingDate = eventDate.setTime(eventDate.getTime() + delayInMs);
+
+      pendingProposalsStore.storeItem({
+        groupId,
+        firingDate,
+      });
+
+      TaskScheduler.addTask({
+        task: () => this.commitPendingProposals({groupId}),
+        firingDate,
+        key: groupId,
+      });
+    } else {
+      await this.commitPendingProposals({groupId, skipDelete: true});
+    }
+  }
+
+  /**
+   * Commit all pending proposals for a given groupId
+   *
+   * @param groupId groupId of the conversation
+   * @param skipDelete if true, do not delete the pending proposals from the database
+   */
+  public async commitPendingProposals({groupId, skipDelete = false}: CommitPendingProposalsParams) {
+    try {
+      await this.commitProposals(Decoder.fromBase64(groupId).asBytes);
+
+      if (!skipDelete) {
+        TaskScheduler.cancelTask(groupId);
+        pendingProposalsStore.deleteItem({groupId});
+      }
+    } catch (error) {
+      this.logger.error(`Error while committing pending proposals for groupId ${groupId}`, error);
+    }
+  }
+
+  /**
+   * Get all pending proposals from the database and schedule them
+   * Function must only be called once, after application start
+   *
+   */
+  public async checkExistingPendingProposals() {
+    try {
+      const pendingProposals = pendingProposalsStore.getAllItems();
+      if (pendingProposals.length > 0) {
+        pendingProposals.forEach(({groupId, firingDate}) =>
+          TaskScheduler.addTask({
+            task: () => this.commitPendingProposals({groupId}),
+            firingDate,
+            key: groupId,
+          }),
+        );
+      }
+    } catch (error) {
+      this.logger.error('Could not get pending proposals', error);
+    }
   }
 }
