@@ -31,6 +31,9 @@ const dist = path.resolve(DIST_PATH, 'static');
 const auth = path.resolve(SRC_PATH, 'script/auth');
 const srcScript = path.resolve(SRC_PATH, 'script');
 
+const HOME_TEMPLATE_PATH = path.resolve(SRC_PATH, 'page/index.ejs');
+const AUTH_TEMPLATE_PATH = path.resolve(SRC_PATH, 'page/auth.ejs');
+
 const {
   config: {SERVER: serverConfigs, CLIENT: clientConfigs},
 } = require(path.resolve(DIST_PATH, 'config.js'));
@@ -174,13 +177,13 @@ module.exports = {
     // @todo: We should merge these when main & auth app are merged.
     new HtmlWebpackPlugin({
       inject: false,
-      template: path.resolve(SRC_PATH, 'page/index.ejs'),
+      template: HOME_TEMPLATE_PATH,
       templateParameters,
     }),
     new HtmlWebpackPlugin({
       inject: false,
       filename: 'auth/index.html',
-      template: path.resolve(SRC_PATH, 'page/auth.ejs'),
+      template: AUTH_TEMPLATE_PATH,
       templateParameters,
     }),
   ],
