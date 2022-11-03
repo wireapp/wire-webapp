@@ -50,7 +50,7 @@ const ConnectRequests: FC<ConnectRequestsProps> = ({
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
 
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
-  const smBreakpoint = useMatchMedia('max-width: 620px');
+  const smBreakpoint = useMatchMedia('max-width: 640px');
 
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
 
