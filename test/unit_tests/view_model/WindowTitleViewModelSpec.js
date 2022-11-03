@@ -30,10 +30,10 @@ import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
 import {Conversation} from 'src/script/entity/Conversation';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {User} from 'src/script/entity/User';
-import {ContentState} from 'src/script/view_model/ContentViewModel';
 import {WindowTitleViewModel} from 'src/script/view_model/WindowTitleViewModel';
 
 import {TestFactory} from '../../helper/TestFactory';
+import {ContentState, useAppState} from 'src/script/page/useAppState';
 
 describe('WindowTitleViewModel', () => {
   const suffix = 'Wire';
@@ -46,11 +46,6 @@ describe('WindowTitleViewModel', () => {
 
     return testFactory.exposeConversationActors().then(conversationRepository => {
       title_view_model = new WindowTitleViewModel(
-        {
-          content: {
-            state: ko.observable(ContentState.CONVERSATION),
-          },
-        },
         testFactory.user_repository.userState,
         conversationRepository.conversationState,
       );
@@ -63,7 +58,9 @@ describe('WindowTitleViewModel', () => {
     afterEach(() => jest.useRealTimers());
 
     it('sets a default title when there is an unknown state', () => {
-      title_view_model.contentState('invalid or unknown');
+      const {setContentState} = useAppState.getState();
+      setContentState('invalid or unknown');
+
       title_view_model.initiateTitleUpdates();
 
       expect(window.document.title).toBe(suffix);
@@ -160,7 +157,8 @@ describe('WindowTitleViewModel', () => {
     });
 
     it('sets the name when opening the preferences about page', () => {
-      title_view_model.contentState(ContentState.PREFERENCES_ABOUT);
+      const {setContentState} = useAppState.getState();
+      setContentState(ContentState.PREFERENCES_ABOUT);
 
       const expected_title = `${z.string.preferencesAbout} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
@@ -169,7 +167,8 @@ describe('WindowTitleViewModel', () => {
     });
 
     it('sets the name when opening the preferences account page', () => {
-      title_view_model.contentState(ContentState.PREFERENCES_ACCOUNT);
+      const {setContentState} = useAppState.getState();
+      setContentState(ContentState.PREFERENCES_ACCOUNT);
 
       const expected_title = `${z.string.preferencesAccount} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
@@ -178,7 +177,8 @@ describe('WindowTitleViewModel', () => {
     });
 
     it('sets the name when opening the preferences av page', () => {
-      title_view_model.contentState(ContentState.PREFERENCES_AV);
+      const {setContentState} = useAppState.getState();
+      setContentState(ContentState.PREFERENCES_AV);
 
       const expected_title = `${z.string.preferencesAV} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
@@ -187,7 +187,8 @@ describe('WindowTitleViewModel', () => {
     });
 
     it('sets the name when opening the preferences device details page', () => {
-      title_view_model.contentState(ContentState.PREFERENCES_DEVICE_DETAILS);
+      const {setContentState} = useAppState.getState();
+      setContentState(ContentState.PREFERENCES_DEVICE_DETAILS);
 
       const expected_title = `${z.string.preferencesDeviceDetails} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
@@ -196,7 +197,8 @@ describe('WindowTitleViewModel', () => {
     });
 
     it('sets the name when opening the preferences devices page', () => {
-      title_view_model.contentState(ContentState.PREFERENCES_DEVICES);
+      const {setContentState} = useAppState.getState();
+      setContentState(ContentState.PREFERENCES_DEVICES);
 
       const expected_title = `${z.string.preferencesDevices} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
@@ -205,7 +207,8 @@ describe('WindowTitleViewModel', () => {
     });
 
     it('sets the name when opening the preferences options page', () => {
-      title_view_model.contentState(ContentState.PREFERENCES_OPTIONS);
+      const {setContentState} = useAppState.getState();
+      setContentState(ContentState.PREFERENCES_OPTIONS);
 
       const expected_title = `${z.string.preferencesOptions} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
@@ -214,7 +217,8 @@ describe('WindowTitleViewModel', () => {
     });
 
     it('shows the number of connection requests when viewing the inbox', () => {
-      title_view_model.contentState(ContentState.CONNECTION_REQUESTS);
+      const {setContentState} = useAppState.getState();
+      setContentState(ContentState.CONNECTION_REQUESTS);
       title_view_model.userState.connectRequests = ko.observableArray([]);
 
       const firstConnectedUser = new User(createRandomUuid());

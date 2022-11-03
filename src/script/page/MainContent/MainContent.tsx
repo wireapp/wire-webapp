@@ -43,10 +43,10 @@ import {ClientState} from '../../client/ClientState';
 import {ConversationState} from '../../conversation/ConversationState';
 import {TeamState} from '../../team/TeamState';
 import {UserState} from '../../user/UserState';
-import {ContentState} from '../../view_model/ContentViewModel';
 import {RightSidebarParams} from '../AppMain';
-import {PanelState} from '../RightSidebar/RightSidebar';
+import {PanelState} from '../RightSidebar';
 import {RootContext} from '../RootProvider';
+import {ContentState, useAppState} from '../useAppState';
 
 const Animated: FC<{children: ReactNode}> = ({children, ...rest}) => (
   <CSSTransition classNames="slide-in-left" timeout={{enter: 500}} {...rest}>
@@ -68,14 +68,14 @@ const MainContent: FC<MainContentProps> = ({
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const mainViewModel = useContext(RootContext);
 
+  const {contentState} = useAppState();
+
   if (!mainViewModel) {
     return null;
   }
   const {content: contentViewModel} = mainViewModel;
   const {initialMessage, isFederated, repositories, switchContent} = contentViewModel;
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const {state} = useKoSubscribableChildren(contentViewModel, ['state']);
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
 
@@ -96,7 +96,7 @@ const MainContent: FC<MainContentProps> = ({
     [ContentState.WATERMARK]: t('accessibility.headings.noConversation'),
   };
 
-  const title = statesTitle[state];
+  const title = statesTitle[contentState];
 
   const onFileUpload = (file: File) => {
     switchContent(ContentState.HISTORY_IMPORT);
@@ -108,9 +108,9 @@ const MainContent: FC<MainContentProps> = ({
       <h1 className="visually-hidden">{title}</h1>
 
       <SwitchTransition>
-        <Animated key={state}>
+        <Animated key={contentState}>
           <>
-            {state === ContentState.COLLECTION && activeConversation && (
+            {contentState === ContentState.COLLECTION && activeConversation && (
               <Collection
                 conversation={activeConversation}
                 conversationRepository={repositories.conversation}
@@ -119,7 +119,7 @@ const MainContent: FC<MainContentProps> = ({
               />
             )}
 
-            {state === ContentState.PREFERENCES_ABOUT && (
+            {contentState === ContentState.PREFERENCES_ABOUT && (
               <div
                 id="preferences-about"
                 className={cx('preferences-page preferences-about', incomingCssClass)}
@@ -129,7 +129,7 @@ const MainContent: FC<MainContentProps> = ({
               </div>
             )}
 
-            {state === ContentState.PREFERENCES_ACCOUNT && (
+            {contentState === ContentState.PREFERENCES_ACCOUNT && (
               <div
                 id="preferences-account"
                 className={cx('preferences-page preferences-account', incomingCssClass)}
@@ -147,7 +147,7 @@ const MainContent: FC<MainContentProps> = ({
               </div>
             )}
 
-            {state === ContentState.PREFERENCES_AV && (
+            {contentState === ContentState.PREFERENCES_AV && (
               <div
                 id="preferences-av"
                 className={cx('preferences-page preferences-av', incomingCssClass)}
@@ -161,7 +161,7 @@ const MainContent: FC<MainContentProps> = ({
               </div>
             )}
 
-            {state === ContentState.PREFERENCES_DEVICES && (
+            {contentState === ContentState.PREFERENCES_DEVICES && (
               <div
                 id="preferences-devices"
                 className={cx('preferences-page preferences-devices', incomingCssClass)}
@@ -183,7 +183,7 @@ const MainContent: FC<MainContentProps> = ({
               </div>
             )}
 
-            {state === ContentState.PREFERENCES_OPTIONS && (
+            {contentState === ContentState.PREFERENCES_OPTIONS && (
               <div
                 id="preferences-options"
                 className={cx('preferences-page preferences-options', incomingCssClass)}
@@ -193,7 +193,7 @@ const MainContent: FC<MainContentProps> = ({
               </div>
             )}
 
-            {state === ContentState.WATERMARK && (
+            {contentState === ContentState.WATERMARK && (
               <div className="watermark">
                 <span className="absolute-center" aria-hidden="true" data-uie-name="no-conversation">
                   <Icon.Watermark />
@@ -201,11 +201,11 @@ const MainContent: FC<MainContentProps> = ({
               </div>
             )}
 
-            {state === ContentState.CONNECTION_REQUESTS && (
+            {contentState === ContentState.CONNECTION_REQUESTS && (
               <ConnectRequests teamState={teamState} userState={userState} />
             )}
 
-            {state === ContentState.CONVERSATION && (
+            {contentState === ContentState.CONVERSATION && (
               <ConversationList
                 initialMessage={initialMessage}
                 teamState={teamState}
@@ -215,11 +215,11 @@ const MainContent: FC<MainContentProps> = ({
               />
             )}
 
-            {state === ContentState.HISTORY_EXPORT && (
+            {contentState === ContentState.HISTORY_EXPORT && (
               <HistoryExport userState={userState} switchContent={switchContent} />
             )}
 
-            {state === ContentState.HISTORY_IMPORT && uploadedFile && (
+            {contentState === ContentState.HISTORY_IMPORT && uploadedFile && (
               <HistoryImport file={uploadedFile} backupRepository={repositories.backup} switchContent={switchContent} />
             )}
           </>

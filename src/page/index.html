@@ -11,16 +11,16 @@
   </head>
 
   <body>
-    <app-container
-      id="wire-main"
-      class="off"
-      data-bind="css: mainClasses()"
-      params="root: $root"
-      data-uie-name="status-webapp"
-      data-uie-value="is-loading"
-    ></app-container>
+    <div id="wire-app"></div>
 
-    #include('loading.htm')
+    <!--    <app-container-->
+    <!--      id="wire-main"-->
+    <!--      class="off"-->
+    <!--      data-bind="css: mainClasses()"-->
+    <!--      params="root: $root"-->
+    <!--      data-uie-name="status-webapp"-->
+    <!--      data-uie-value="is-loading"-->
+    <!--    ></app-container>-->
 
     <script src="./config.js?{{@config.VERSION}}"></script>
     <script src="./min/dexie.js?{{@config.VERSION}}"></script>

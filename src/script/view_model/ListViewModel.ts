@@ -24,23 +24,24 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {iterateItem} from 'Util/ArrayUtil';
 import {isEscapeKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import type {ActionsViewModel} from './ActionsViewModel';
 import {CallingViewModel} from './CallingViewModel';
-import {ContentState, ContentViewModel} from './ContentViewModel';
+import {ContentViewModel} from './ContentViewModel';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 
 import type {CallingRepository} from '../calling/CallingRepository';
-import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationState} from '../conversation/ConversationState';
 import type {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
-import {PanelState} from '../page/RightSidebar/RightSidebar';
+import {PanelState} from '../page/RightSidebar';
 import {useAppMainState} from '../page/state';
+import {ContentState, ListState, useAppState} from '../page/useAppState';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {SearchRepository} from '../search/SearchRepository';
 import type {TeamRepository} from '../team/TeamRepository';
@@ -51,22 +52,12 @@ import {Shortcut} from '../ui/Shortcut';
 import {ShortcutType} from '../ui/ShortcutType';
 import {UserState} from '../user/UserState';
 
-export enum ListState {
-  ARCHIVE = 'ListViewModel.STATE.ARCHIVE',
-  CONVERSATIONS = 'ListViewModel.STATE.CONVERSATIONS',
-  PREFERENCES = 'ListViewModel.STATE.PREFERENCES',
-  START_UI = 'ListViewModel.STATE.START_UI',
-  TEMPORARY_GUEST = 'ListViewModel.STATE.TEMPORARY_GUEST',
-}
-
 export class ListViewModel {
   private readonly userState: UserState;
   private readonly teamState: TeamState;
   private readonly conversationState: ConversationState;
 
   readonly isActivatedAccount: ko.PureComputed<boolean>;
-  readonly webappLoaded: ko.Observable<boolean>;
-  readonly state: ko.Observable<string>;
   readonly lastUpdate: ko.Observable<number>;
   readonly isFederated: boolean;
   readonly repositories: ViewModelRepositories;
@@ -83,16 +74,6 @@ export class ListViewModel {
   private readonly isProAccount: ko.PureComputed<boolean>;
   public readonly selfUser: ko.Observable<User>;
   private readonly visibleListItems: ko.PureComputed<(string | Conversation)[]>;
-
-  static get STATE() {
-    return {
-      ARCHIVE: ListState.ARCHIVE,
-      CONVERSATIONS: ListState.CONVERSATIONS,
-      PREFERENCES: ListState.PREFERENCES,
-      START_UI: ListState.START_UI,
-      TEMPORARY_GUEST: ListState.TEMPORARY_GUEST,
-    };
-  }
 
   constructor(mainViewModel: MainViewModel, repositories: ViewModelRepositories) {
     this.userState = container.resolve(UserState);
@@ -117,12 +98,12 @@ export class ListViewModel {
     this.selfUser = this.userState.self;
 
     // State
-    this.state = ko.observable(ListViewModel.STATE.CONVERSATIONS);
     this.lastUpdate = ko.observable();
-    this.webappLoaded = ko.observable(false);
 
     this.visibleListItems = ko.pureComputed(() => {
-      const isStatePreferences = this.state() === ListViewModel.STATE.PREFERENCES;
+      const {listState} = useAppState.getState();
+      const isStatePreferences = listState === ListState.PREFERENCES;
+
       if (isStatePreferences) {
         const preferenceItems = [
           ContentState.PREFERENCES_ACCOUNT,
@@ -140,6 +121,7 @@ export class ListViewModel {
 
       const hasConnectRequests = !!this.userState.connectRequests().length;
       const states: (string | Conversation)[] = hasConnectRequests ? [ContentState.CONNECTION_REQUESTS] : [];
+
       return states.concat(this.conversationState.conversations_unarchived());
     });
 
@@ -148,7 +130,6 @@ export class ListViewModel {
 
   private readonly _initSubscriptions = () => {
     amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, this.openConversations);
-    amplify.subscribe(WebAppEvents.LIFECYCLE.LOADED, () => this.webappLoaded(true));
     amplify.subscribe(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT, this.openPreferencesAccount);
     amplify.subscribe(WebAppEvents.PREFERENCES.MANAGE_DEVICES, this.openPreferencesDevices);
     amplify.subscribe(WebAppEvents.PREFERENCES.SHOW_AV, this.openPreferencesAudioVideo);
@@ -163,9 +144,11 @@ export class ListViewModel {
 
   readonly answerCall = (conversationEntity: Conversation): void => {
     const call = this.callingRepository.findCall(conversationEntity.qualifiedId);
+
     if (!call) {
       return;
     }
+
     if (call.conversationType === CONV_TYPE.CONFERENCE && !this.callingRepository.supportsConferenceCalling) {
       PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
         text: {
@@ -197,27 +180,28 @@ export class ListViewModel {
 
   onKeyDownListView = (keyboardEvent: KeyboardEvent) => {
     if (isEscapeKey(keyboardEvent)) {
-      const newState = this.isActivatedAccount()
-        ? ListViewModel.STATE.CONVERSATIONS
-        : ListViewModel.STATE.TEMPORARY_GUEST;
+      const newState = this.isActivatedAccount() ? ListState.CONVERSATIONS : ListState.TEMPORARY_GUEST;
       this.switchList(newState);
     }
   };
 
   private readonly iterateActiveItem = (reverse = false) => {
-    const isStatePreferences = this.state() === ListViewModel.STATE.PREFERENCES;
+    const {listState} = useAppState.getState();
+    const isStatePreferences = listState === ListState.PREFERENCES;
+
     return isStatePreferences ? this.iterateActivePreference(reverse) : this.iterateActiveConversation(reverse);
   };
 
   private readonly iterateActiveConversation = (reverse: boolean) => {
-    const isStateRequests = this.contentViewModel.state() === ContentState.CONNECTION_REQUESTS;
+    const {contentState} = useAppState.getState();
+
+    const isStateRequests = contentState === ContentState.CONNECTION_REQUESTS;
     const activeConversationItem = isStateRequests
       ? ContentState.CONNECTION_REQUESTS
       : this.conversationState.activeConversation();
-
     const nextItem = iterateItem(this.visibleListItems(), activeConversationItem, reverse);
-
     const isConnectionRequestItem = nextItem === ContentState.CONNECTION_REQUESTS;
+
     if (isConnectionRequestItem) {
       return this.contentViewModel.switchContent(ContentState.CONNECTION_REQUESTS);
     }
@@ -228,14 +212,16 @@ export class ListViewModel {
   };
 
   private readonly iterateActivePreference = (reverse: boolean) => {
-    let activePreference = this.contentViewModel.state();
-
+    const {contentState} = useAppState.getState();
+    let activePreference = contentState;
     const isDeviceDetails = activePreference === ContentState.PREFERENCES_DEVICE_DETAILS;
+
     if (isDeviceDetails) {
       activePreference = ContentState.PREFERENCES_DEVICES;
     }
 
     const nextPreference = iterateItem(this.visibleListItems(), activePreference, reverse) as ContentState;
+
     if (nextPreference) {
       this.contentViewModel.switchContent(nextPreference);
     }
@@ -244,36 +230,42 @@ export class ListViewModel {
   openPreferencesAccount = async (): Promise<void> => {
     await this.teamRepository.getTeam();
 
-    this.switchList(ListViewModel.STATE.PREFERENCES);
+    this.switchList(ListState.PREFERENCES);
     this.contentViewModel.switchContent(ContentState.PREFERENCES_ACCOUNT);
   };
 
   readonly openPreferencesDevices = (): void => {
-    this.switchList(ListViewModel.STATE.PREFERENCES);
+    this.switchList(ListState.PREFERENCES);
+
     return this.contentViewModel.switchContent(ContentState.PREFERENCES_DEVICES);
   };
 
   readonly openPreferencesAbout = (): void => {
-    this.switchList(ListViewModel.STATE.PREFERENCES);
+    this.switchList(ListState.PREFERENCES);
+
     return this.contentViewModel.switchContent(ContentState.PREFERENCES_ABOUT);
   };
 
   readonly openPreferencesAudioVideo = (): void => {
-    this.switchList(ListViewModel.STATE.PREFERENCES);
+    this.switchList(ListState.PREFERENCES);
+
     return this.contentViewModel.switchContent(ContentState.PREFERENCES_AV);
   };
 
   readonly openPreferencesOptions = (): void => {
-    this.switchList(ListViewModel.STATE.PREFERENCES);
+    this.switchList(ListState.PREFERENCES);
+
     return this.contentViewModel.switchContent(ContentState.PREFERENCES_OPTIONS);
   };
 
   readonly openStartUI = (): void => {
-    this.switchList(ListViewModel.STATE.START_UI);
+    this.switchList(ListState.START_UI);
   };
 
-  readonly switchList = (newListState: string, respectLastState = true): void => {
-    const isStateChange = this.state() !== newListState;
+  readonly switchList = (newListState: ListState, respectLastState = true): void => {
+    const {listState} = useAppState.getState();
+    const isStateChange = listState !== newListState;
+
     if (isStateChange) {
       this.hideList();
       this.updateList(newListState, respectLastState);
@@ -282,9 +274,7 @@ export class ListViewModel {
   };
 
   readonly openConversations = (): void => {
-    const newState = this.isActivatedAccount()
-      ? ListViewModel.STATE.CONVERSATIONS
-      : ListViewModel.STATE.TEMPORARY_GUEST;
+    const newState = this.isActivatedAccount() ? ListState.CONVERSATIONS : ListState.TEMPORARY_GUEST;
     this.switchList(newState, false);
   };
 
@@ -292,16 +282,18 @@ export class ListViewModel {
     document.removeEventListener('keydown', this.onKeyDownListView);
   };
 
-  private readonly showList = (newListState: string): void => {
-    this.state(newListState);
+  private readonly showList = (newListState: ListState): void => {
+    const {setListState} = useAppState.getState();
+
+    setListState(newListState);
     this.lastUpdate(Date.now());
 
     document.addEventListener('keydown', this.onKeyDownListView);
   };
 
-  private readonly updateList = (newListState: string, respectLastState: boolean): void => {
+  private readonly updateList = (newListState: ListState, respectLastState: boolean): void => {
     switch (newListState) {
-      case ListViewModel.STATE.PREFERENCES:
+      case ListState.PREFERENCES:
         amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentState.PREFERENCES_ACCOUNT);
         break;
       default:
@@ -312,7 +304,7 @@ export class ListViewModel {
   };
 
   readonly showTemporaryGuest = (): void => {
-    this.switchList(ListViewModel.STATE.TEMPORARY_GUEST);
+    this.switchList(ListState.TEMPORARY_GUEST);
     const conversationEntity = this.conversationRepository.getMostRecentConversation();
     amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
   };
@@ -350,6 +342,7 @@ export class ListViewModel {
 
     if (!conversationEntity.is_archived()) {
       const {conversationLabelRepository} = this.conversationRepository;
+
       if (!conversationLabelRepository.isFavorite(conversationEntity)) {
         entries.push({
           click: () => {
@@ -365,6 +358,7 @@ export class ListViewModel {
       }
 
       const customLabel = conversationLabelRepository.getConversationCustomLabel(conversationEntity);
+
       if (customLabel) {
         entries.push({
           click: () => conversationLabelRepository.removeConversationFromLabel(customLabel, conversationEntity),
@@ -471,13 +465,14 @@ export class ListViewModel {
   readonly clickToUnarchive = (conversationEntity: Conversation): void => {
     this.conversationRepository.unarchiveConversation(conversationEntity, true, 'manual un-archive').then(() => {
       if (!this.conversationState.conversations_archived().length) {
-        this.switchList(ListViewModel.STATE.CONVERSATIONS);
+        this.switchList(ListState.CONVERSATIONS);
       }
     });
   };
 
   private readonly shouldHideConversation = (conversationEntity: Conversation): boolean => {
-    const isStateConversations = this.state() === ListViewModel.STATE.CONVERSATIONS;
+    const {listState} = useAppState.getState();
+    const isStateConversations = listState === ListState.CONVERSATIONS;
     const isActiveConversation = this.conversationState.isActiveConversation(conversationEntity);
 
     return isStateConversations && isActiveConversation;

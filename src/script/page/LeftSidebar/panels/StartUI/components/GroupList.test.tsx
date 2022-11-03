@@ -25,7 +25,6 @@ import {createRandomUuid, noop} from 'Util/util';
 
 import {GroupList} from './GroupList';
 
-import {AssetRepository} from '../../../../../assets/AssetRepository';
 import {Conversation} from '../../../../../entity/Conversation';
 import {User} from '../../../../../entity/User';
 import {Router} from '../../../../../router/Router';
@@ -60,11 +59,9 @@ describe('GroupList', () => {
 
   it('shows group list', () => {
     const groups = [createGroupConversation('groupA'), create1on1Conversation('groupB')];
-    const assetRepository: Partial<AssetRepository> = {};
     const router: Partial<Router> = {};
 
     const props = {
-      assetRepository: assetRepository as AssetRepository,
       click: noop,
       groups,
       router: router as Router,
@@ -78,14 +75,12 @@ describe('GroupList', () => {
 
   it('shows group list and navigates conversation on click', () => {
     const groups = [createGroupConversation('groupA'), create1on1Conversation('groupB')];
-    const assetRepository: Partial<AssetRepository> = {};
     const router: Partial<Router> = {
       navigate: jest.fn(),
     };
     const onClickSpy = jest.fn();
 
     const props = {
-      assetRepository: assetRepository as AssetRepository,
       click: onClickSpy,
       groups,
       router: router as Router,

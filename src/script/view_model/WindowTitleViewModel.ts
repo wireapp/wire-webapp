@@ -25,16 +25,13 @@ import {container} from 'tsyringe';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 
-import {ContentState} from './ContentViewModel';
-import type {MainViewModel} from './MainViewModel';
-
 import {Config} from '../Config';
 import {ConversationState} from '../conversation/ConversationState';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
+import {ContentState, useAppState} from '../page/useAppState';
 import {UserState} from '../user/UserState';
 
 export class WindowTitleViewModel {
-  contentState: ko.Observable<string>;
   logger: Logger;
   updateWindowTitle: ko.Observable<boolean>;
 
@@ -43,11 +40,9 @@ export class WindowTitleViewModel {
   }
 
   constructor(
-    mainViewModel: MainViewModel,
     private readonly userState = container.resolve(UserState),
     private readonly conversationState = container.resolve(ConversationState),
   ) {
-    this.contentState = mainViewModel.content.state;
     this.logger = getLogger('WindowTitleViewModel');
 
     this.updateWindowTitle = ko.observable(false);
@@ -65,6 +60,7 @@ export class WindowTitleViewModel {
     ko.computed(() => {
       if (this.updateWindowTitle()) {
         const connectionRequests = this.userState.connectRequests().length;
+        const {contentState} = useAppState.getState();
 
         const unreadConversations = this.conversationState
           .conversations_unarchived()
@@ -76,7 +72,7 @@ export class WindowTitleViewModel {
 
         amplify.publish(WebAppEvents.LIFECYCLE.UNREAD_COUNT, unreadCount);
 
-        switch (this.contentState()) {
+        switch (contentState) {
           case ContentState.CONNECTION_REQUESTS: {
             const multipleRequests = connectionRequests > 1;
             const requestsString = multipleRequests

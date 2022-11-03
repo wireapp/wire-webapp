@@ -48,10 +48,10 @@ import {ServiceEntity} from '../../integration/ServiceEntity';
 import {TeamState} from '../../team/TeamState';
 import {UserState} from '../../user/UserState';
 import {ActionsViewModel} from '../../view_model/ActionsViewModel';
-import {ContentState} from '../../view_model/ContentViewModel';
 import {ViewModelRepositories} from '../../view_model/MainViewModel';
 import {RightSidebarParams} from '../AppMain';
 import {useAppMainState} from '../state';
+import {ContentState} from '../useAppState';
 
 export const OPEN_CONVERSATION_DETAILS = 'OPEN_CONVERSATION_DETAILS';
 export const rightPanelAnimationTimeout = 350; // ms

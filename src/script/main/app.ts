@@ -18,6 +18,7 @@
  */
 
 // Polyfill for "tsyringe" dependency injection
+import {Context} from '@wireapp/api-client/lib/auth';
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -28,19 +29,14 @@ import ko from 'knockout';
 import platform from 'platform';
 import {container} from 'tsyringe';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {showUserModal} from 'Components/Modals/UserModal';
 import {DebugUtil} from 'Util/DebugUtil';
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
-import {enableLogging} from 'Util/LoggerUtil';
-import {loadValue} from 'Util/StorageUtil';
 import {includesString} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {appendParameter} from 'Util/UrlUtil';
 import {arrayToBase64, checkIndexedDb, createRandomUuid, supportsMLS} from 'Util/util';
-import {exposeWrapperGlobals} from 'Util/wrapper';
 
 import {migrateToQualifiedSessionIds} from './sessionIdMigrator';
 import {SingleInstanceHandler} from './SingleInstanceHandler';
@@ -56,7 +52,7 @@ import {CacheRepository} from '../cache/CacheRepository';
 import {CallingRepository} from '../calling/CallingRepository';
 import {ClientRepository} from '../client/ClientRepository';
 import {ClientService} from '../client/ClientService';
-import {Config} from '../Config';
+import {Config, Configuration} from '../Config';
 import {ConnectionRepository} from '../connection/ConnectionRepository';
 import {ConnectionService} from '../connection/ConnectionService';
 import {ConversationRepository} from '../conversation/ConversationRepository';
@@ -88,16 +84,12 @@ import {PreferenceNotificationRepository} from '../notification/PreferenceNotifi
 import {PermissionRepository} from '../permission/PermissionRepository';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PropertiesService} from '../properties/PropertiesService';
-import {Router} from '../router/Router';
-import {initRouterBindings} from '../router/routerBindings';
 import {SearchRepository} from '../search/SearchRepository';
 import {SearchService} from '../search/SearchService';
 import {SelfService} from '../self/SelfService';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
-import {StorageService} from '../storage';
-import {StorageKey} from '../storage/StorageKey';
-import {StorageRepository} from '../storage/StorageRepository';
+import {StorageKey, StorageRepository, StorageService} from '../storage';
 import {TeamRepository} from '../team/TeamRepository';
 import {TeamService} from '../team/TeamService';
 import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';
@@ -106,19 +98,16 @@ import {AppInitTimingsStep} from '../telemetry/app_init/AppInitTimingsStep';
 import {serverTimeHandler} from '../time/serverTimeHandler';
 import {EventTrackingRepository} from '../tracking/EventTrackingRepository';
 import {WindowHandler} from '../ui/WindowHandler';
-import {showInitialModal} from '../user/AvailabilityModal';
 import * as UserPermission from '../user/UserPermission';
 import {UserRepository} from '../user/UserRepository';
 import {UserService} from '../user/UserService';
-import {ContentState} from '../view_model/ContentViewModel';
-import {LoadingViewModel} from '../view_model/LoadingViewModel';
-import {MainViewModel, ViewModelRepositories} from '../view_model/MainViewModel';
+import {ViewModelRepositories} from '../view_model/MainViewModel';
 import {ThemeViewModel} from '../view_model/ThemeViewModel';
 import {Warnings} from '../view_model/WarningsContainer';
 
 import './globals';
 
-function doRedirect(signOutReason: SIGN_OUT_REASON) {
+export function doRedirect(signOutReason: SIGN_OUT_REASON) {
   let url = `/auth/${location.search}`;
 
   if (location.hash.startsWith('#/user/') && signOutReason === SIGN_OUT_REASON.NOT_SIGNED_IN) {
@@ -134,7 +123,7 @@ function doRedirect(signOutReason: SIGN_OUT_REASON) {
   window.location.replace(url);
 }
 
-class App {
+export class App {
   static readonly LOCAL_STORAGE_LOGIN_REDIRECT_KEY = 'LOGIN_REDIRECT_KEY';
   static readonly LOCAL_STORAGE_LOGIN_CONVERSATION_KEY = 'LOGIN_CONVERSATION_KEY';
   logger: Logger;
@@ -174,23 +163,20 @@ class App {
   }
 
   /**
-   * @param appContainer DOM element that will hold the app
-   * @param encryptedEngine Encrypted database handler
+   * @param core
    * @param apiClient Configured backend client
    */
-  constructor(
-    private readonly appContainer: HTMLElement,
-    private readonly core: Core,
-    private readonly apiClient: APIClient,
-  ) {
+  constructor(private readonly core: Core, private readonly apiClient: APIClient) {
     this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () => this.logout(SIGN_OUT_REASON.SESSION_EXPIRED, false));
     this.logger = getLogger('App');
-    this.appContainer = appContainer;
 
     new WindowHandler();
 
+    // done.
     this.service = this._setupServices();
+    // done.
     this.repository = this._setupRepositories();
+
     if (Config.getConfig().FEATURE.ENABLE_DEBUG) {
       import('Util/DebugUtil').then(({DebugUtil}) => {
         this.debug = new DebugUtil(this.repository);
@@ -324,6 +310,10 @@ class App {
     };
   }
 
+  getAPIContext(): Context | undefined {
+    return this.apiClient.context;
+  }
+
   /**
    * Subscribe to amplify events.
    */
@@ -357,8 +347,16 @@ class App {
    * @todo Check if we really need to logout the user in all these error cases or how to recover from them
    *
    * @param clientType
+   * @param config
+   * @param onProgress
    */
-  async initApp(clientType: ClientType) {
+  async initApp(
+    clientType: ClientType,
+    config: Configuration,
+    onProgress: (progress: number, message?: string) => void,
+  ) {
+    await this.apiClient.useVersion(config.SUPPORTED_API_VERSIONS);
+
     // add body information
     const osCssClass = Runtime.isMacOS() ? 'os-mac' : 'os-pc';
     const platformCssClass = Runtime.isDesktopApp() ? 'platform-electron' : 'platform-web';
@@ -367,8 +365,8 @@ class App {
     const isReload = this._isReload();
     this.logger.debug(`App init starts (isReload: '${isReload}')`);
     new ThemeViewModel(this.repository.properties);
-    const loadingView = new LoadingViewModel();
     const telemetry = new AppInitTelemetry();
+
     try {
       const {
         audio: audioRepository,
@@ -384,11 +382,12 @@ class App {
       } = this.repository;
       await checkIndexedDb();
       this._registerSingleInstance();
-      loadingView.updateProgress(2.5);
+      onProgress(2.5);
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
 
+      let context: Context;
       try {
-        await this.core.init(clientType, {
+        context = await this.core.init(clientType, {
           onNewClient({userId, clientId, domain}) {
             const qualifiedId = {domain: domain ?? '', id: userId};
             const newClient = {class: ClientClassification.UNKNOWN, id: clientId};
@@ -400,23 +399,21 @@ class App {
       }
 
       const selfUser = await this.initiateSelfUser();
-      if (this.apiClient.backendFeatures.isFederated) {
+
+      if (this.apiClient.backendFeatures.isFederated && this.repository.storage.storageService.db) {
         // Migrate all existing session to fully qualified ids (if need be)
-        const sessions = this.repository.storage.storageService.db?.sessions;
-        const domain = this.apiClient.context?.domain;
-        if (sessions && domain) {
-          await migrateToQualifiedSessionIds(sessions, domain);
-        }
+        await migrateToQualifiedSessionIds(this.repository.storage.storageService.db.sessions, context.domain ?? '');
       }
-      loadingView.updateProgress(5, t('initReceivedSelfUser', selfUser.name()));
+
+      onProgress(5, t('initReceivedSelfUser', selfUser.name()));
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_SELF_USER);
       const clientEntity = await this._initiateSelfUserClients();
       callingRepository.initAvs(selfUser, clientEntity().id);
-      loadingView.updateProgress(7.5, t('initValidatedClient'));
+      onProgress(7.5, t('initValidatedClient'));
       telemetry.timeStep(AppInitTimingsStep.VALIDATED_CLIENT);
-      telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity().type ?? 'unknown');
+      telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity().type ?? clientType);
 
-      loadingView.updateProgress(10);
+      onProgress(10);
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
       await teamRepository.initTeam();
@@ -449,7 +446,7 @@ class App {
       }
 
       const connectionEntities = await connectionRepository.getConnections();
-      loadingView.updateProgress(25, t('initReceivedUserData'));
+      onProgress(25, t('initReceivedUserData'));
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_USER_DATA);
       telemetry.addStatistic(AppInitStatisticsValue.CONVERSATIONS, conversationEntities.length, 50);
       telemetry.addStatistic(AppInitStatisticsValue.CONNECTIONS, connectionEntities.length, 50);
@@ -463,7 +460,12 @@ class App {
       await userRepository.loadUsers();
 
       await eventRepository.connectWebSocket(this.core, ({done, total}) => {
-        loadingView.updateProgress(25 + 50 * (done / total), t('initDecryption'), {handled: done, total});
+        const baseMessage = t('initDecryption');
+        const extraInfo = Config.getConfig().FEATURE.SHOW_LOADING_INFORMATION
+          ? ` ${t('initProgress', {number1: done.toString(), number2: total.toString()})}`
+          : '';
+
+        onProgress(25 + 50 * (done / total), `${baseMessage}${extraInfo}`);
       });
       const notificationsCount = eventRepository.notificationsTotal;
 
@@ -472,11 +474,11 @@ class App {
 
       eventTrackerRepository.init(propertiesRepository.properties.settings.privacy.telemetry_sharing);
       await conversationRepository.initializeConversations();
-      loadingView.updateProgress(97.5, t('initUpdatedFromNotifications', Config.getConfig().BRAND_NAME));
+      onProgress(97.5, t('initUpdatedFromNotifications', Config.getConfig().BRAND_NAME));
 
       const clientEntities = await clientRepository.updateClientsForSelf();
 
-      loadingView.updateProgress(99);
+      onProgress(99);
 
       telemetry.addStatistic(AppInitStatisticsValue.CLIENTS, clientEntities.length);
       telemetry.timeStep(AppInitTimingsStep.APP_PRE_LOADED);
@@ -488,13 +490,11 @@ class App {
       await conversationRepository.conversationLabelRepository.loadLabels();
 
       telemetry.timeStep(AppInitTimingsStep.APP_LOADED);
-      this._showInterface();
+      // this._showInterface();
 
-      loadingView.removeFromView();
       telemetry.report();
       amplify.publish(WebAppEvents.LIFECYCLE.LOADED);
-      PrimaryModal.init();
-      showInitialModal(userRepository['userState'].self().availability());
+
       telemetry.timeStep(AppInitTimingsStep.UPDATED_CONVERSATIONS);
       if (userRepository['userState'].isActivatedAccount()) {
         // start regularly polling the server to check if there is a new version of Wire
@@ -504,17 +504,21 @@ class App {
       conversationRepository.cleanupConversations();
       callingRepository.setReady();
       this.logger.info('App fully loaded');
+
+      return selfUser;
     } catch (error) {
       if (error instanceof BaseError) {
         this._appInitFailure(error, isReload);
       }
+
+      return undefined;
     }
   }
 
   /**
    * Initialize ServiceWorker if supported.
    */
-  initServiceWorker(): void {
+  private initServiceWorker(): void {
     if (navigator.serviceWorker) {
       navigator.serviceWorker
         .register(`/sw.js?${Environment.version(false)}`)
@@ -524,9 +528,11 @@ class App {
 
   private _appInitFailure(error: BaseError, isReload: boolean) {
     let logMessage = `Could not initialize app version '${Environment.version(false)}'`;
+
     if (Runtime.isDesktopApp()) {
       logMessage += ` - Electron '${platform.os?.family}' '${Environment.version()}'`;
     }
+
     this.logger.warn(`${logMessage}: ${error.message}`, {error});
 
     const {message, type} = error;
@@ -670,62 +676,6 @@ class App {
   }
 
   /**
-   * Hide the loading spinner and show the application UI.
-   */
-  private _showInterface() {
-    const mainView = new MainViewModel(this.repository);
-    ko.applyBindings(mainView, this.appContainer);
-    this.repository.notification.setContentViewModelStates(mainView.content.state, mainView.multitasking);
-
-    const conversationEntity = this.repository.conversation.getMostRecentConversation();
-
-    this.logger.info('Showing application UI');
-    if (this.repository.user['userState'].isTemporaryGuest()) {
-      mainView.list.showTemporaryGuest();
-    } else if (conversationEntity) {
-      mainView.content.showConversation(conversationEntity, {});
-    } else if (this.repository.user['userState'].connectRequests().length) {
-      amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentState.CONNECTION_REQUESTS);
-    }
-
-    const redirect = localStorage.getItem(App.LOCAL_STORAGE_LOGIN_REDIRECT_KEY);
-    if (redirect) {
-      localStorage.removeItem(App.LOCAL_STORAGE_LOGIN_REDIRECT_KEY);
-      window.location.replace(redirect);
-    }
-
-    const conversationRedirect = localStorage.getItem(App.LOCAL_STORAGE_LOGIN_CONVERSATION_KEY);
-    if (conversationRedirect) {
-      const {conversation, domain} = JSON.parse(conversationRedirect)?.data;
-      localStorage.removeItem(App.LOCAL_STORAGE_LOGIN_CONVERSATION_KEY);
-      window.location.replace(`#/conversation/${conversation}${domain ? `/${domain}` : ''}`);
-    }
-
-    const router = new Router({
-      '/conversation/:conversationId(/:domain)': (
-        conversationId: string,
-        domain: string = this.apiClient.context?.domain ?? '',
-      ) => mainView.content.showConversation(conversationId, {}, domain),
-      '/preferences/about': () => mainView.list.openPreferencesAbout(),
-      '/preferences/account': () => mainView.list.openPreferencesAccount(),
-      '/preferences/av': () => mainView.list.openPreferencesAudioVideo(),
-      '/preferences/devices': () => mainView.list.openPreferencesDevices(),
-      '/preferences/options': () => mainView.list.openPreferencesOptions(),
-      '/user/:userId(/:domain)': (userId: string, domain: string = this.apiClient.context?.domain ?? '') => {
-        showUserModal({domain, id: userId}, () => router.navigate('/'));
-      },
-    });
-    initRouterBindings(router);
-    container.registerInstance(Router, router);
-
-    this.appContainer.dataset.uieValue = 'is-loaded';
-
-    this.repository.properties.checkPrivacyPermission().then(() => {
-      window.setTimeout(() => this.repository.notification.checkPermission(), App.CONFIG.NOTIFICATION_CHECK);
-    });
-  }
-
-  /**
    * Subscribe to 'beforeunload' to stop calls and disconnect the WebSocket.
    */
   private _subscribeToUnloadEvents(): void {
@@ -759,7 +709,7 @@ class App {
    * @param signOutReason Cause for logout
    * @param clearData Keep data in database
    */
-  readonly logout = (signOutReason: SIGN_OUT_REASON, clearData: boolean): Promise<void> | void => {
+  private readonly logout = (signOutReason: SIGN_OUT_REASON, clearData: boolean): Promise<void> | void => {
     const _redirectToLogin = () => {
       amplify.publish(WebAppEvents.LIFECYCLE.SIGNED_OUT, clearData);
       this._redirectToLogin(signOutReason);
@@ -777,7 +727,7 @@ class App {
       try {
         keepPermanentDatabase = this.repository.client.isCurrentClientPermanent() && !clearData;
       } catch (error) {
-        if (error instanceof BaseError && error.type === ClientError.TYPE.CLIENT_NOT_SET) {
+        if (error instanceof ClientError && error.type === ClientError.TYPE.CLIENT_NOT_SET) {
           keepPermanentDatabase = false;
         }
       }
@@ -853,7 +803,7 @@ class App {
   /**
    * Refresh the web app or desktop wrapper
    */
-  readonly refresh = (): void => {
+  private readonly refresh = (): void => {
     this.logger.info('Refresh to update started');
     if (Runtime.isDesktopApp()) {
       // if we are in a desktop env, we just warn the wrapper that we need to reload. It then decide what should be done
@@ -868,7 +818,7 @@ class App {
   /**
    * Notify about found update
    */
-  readonly update = (): void => {
+  private readonly update = (): void => {
     Warnings.showWarning(Warnings.TYPE.LIFECYCLE_UPDATE);
   };
 
@@ -880,8 +830,10 @@ class App {
     this.logger.info(`Redirecting to login after connectivity verification. Reason: ${signOutReason}`);
     const isTemporaryGuestReason = App.CONFIG.SIGN_OUT_REASONS.TEMPORARY_GUEST.includes(signOutReason);
     const isLeavingGuestRoom = isTemporaryGuestReason && this.repository.user['userState'].isTemporaryGuest();
+
     if (isLeavingGuestRoom) {
       const websiteUrl = getWebsiteUrl();
+
       if (websiteUrl) {
         return window.location.replace(websiteUrl);
       }
@@ -902,35 +854,3 @@ class App {
     }).subscribe(role => window.z.userPermission(UserPermission.generatePermissionHelpers(role)));
   }
 }
-
-//##############################################################################
-// Setting up the App
-//##############################################################################
-
-(async () => {
-  const config = Config.getConfig();
-  const apiClient = container.resolve(APIClient);
-  await apiClient.useVersion(config.SUPPORTED_API_VERSIONS, config.ENABLE_DEV_BACKEND_API);
-  const core = container.resolve(Core);
-
-  enableLogging(Config.getConfig().FEATURE.ENABLE_DEBUG);
-  exposeWrapperGlobals();
-  const appContainer = document.getElementById('wire-main');
-  if (appContainer) {
-    const enforceDesktopApplication =
-      Config.getConfig().FEATURE.ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY && !Runtime.isDesktopApp();
-    if (enforceDesktopApplication) {
-      doRedirect(SIGN_OUT_REASON.APP_INIT);
-    }
-    const shouldPersist = loadValue<boolean>(StorageKey.AUTH.PERSIST);
-    if (shouldPersist === undefined) {
-      doRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);
-    } else {
-      const app = new App(appContainer, core, apiClient);
-      window.wire.app = app;
-      app.initApp(shouldPersist ? ClientType.PERMANENT : ClientType.TEMPORARY);
-    }
-  }
-})();
-
-export {App};

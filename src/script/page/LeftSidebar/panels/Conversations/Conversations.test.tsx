@@ -23,8 +23,8 @@ import {act, render} from '@testing-library/react';
 import ko from 'knockout';
 
 import {User} from 'src/script/entity/User';
+import {ListState} from 'src/script/page/useAppState';
 import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
-import {ListState} from 'src/script/view_model/ListViewModel';
 
 import {Conversations} from './';
 
