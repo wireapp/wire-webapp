@@ -60,7 +60,6 @@ export class EventRepository {
   previousHandlingState: NOTIFICATION_HANDLING_STATE | undefined;
   notificationsHandled: number;
   notificationsTotal: number;
-  lastNotificationId: ko.Observable<string | undefined>;
   lastEventDate: ko.Observable<string | undefined>;
   eventProcessMiddlewares: Function[];
 
@@ -110,7 +109,6 @@ export class EventRepository {
     this.notificationsHandled = 0;
     this.notificationsTotal = 0;
 
-    this.lastNotificationId = ko.observable();
     this.lastEventDate = ko.observable();
 
     this.eventProcessMiddlewares = [];
@@ -260,7 +258,7 @@ export class EventRepository {
     const shouldUpdatePersistedId = missedNotificationId !== notificationId;
     if (shouldUpdatePersistedId) {
       amplify.publish(WebAppEvents.CONVERSATION.MISSED_EVENTS);
-      this.notificationService.saveMissedIdToDb(this.lastNotificationId());
+      this.notificationService.saveMissedIdToDb(missedNotificationId);
     }
   };
 
