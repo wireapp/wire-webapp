@@ -83,10 +83,18 @@ export class EntropyData {
   get entropyBits(): number {
     const entropyData = this.entropyData;
     const entropy = shannonEntropy(entropyData);
-    const deltaValues = calculateDeltaValues(entropyData, ~~(entropyData.length / this.frames.length));
+    const valuesPerFrame = ~~(entropyData.length / this.frames.length);
+    // 1st derivation
+    const deltaValues = calculateDeltaValues(entropyData, valuesPerFrame);
     const deltaEntropy = shannonEntropy(deltaValues);
+    // 2nd derivation
+    const delta2Values = calculateDeltaValues(deltaValues, valuesPerFrame);
+    const delta2Entropy = shannonEntropy(delta2Values);
+    // 3rd derivation
+    const delta3Values = calculateDeltaValues(delta2Values, valuesPerFrame);
+    const delta3Entropy = shannonEntropy(delta3Values);
 
-    return Math.min(entropy * entropyData.length, deltaEntropy * deltaValues.length);
+    return Math.min(entropy, deltaEntropy, delta2Entropy, delta3Entropy) * entropyData.length;
   }
 
   addFrame(value: EntropyFrame, duplicateCheck = true): void {
