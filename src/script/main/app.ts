@@ -491,7 +491,6 @@ export class App {
       await conversationRepository.conversationLabelRepository.loadLabels();
 
       telemetry.timeStep(AppInitTimingsStep.APP_LOADED);
-      // this._showInterface();
 
       telemetry.report();
       amplify.publish(WebAppEvents.LIFECYCLE.LOADED);

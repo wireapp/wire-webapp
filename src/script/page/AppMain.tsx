@@ -278,6 +278,4 @@ const AppMain: FC<AppMainProps> = ({app, mainView, selfUser}) => {
   );
 };
 
-// registerReactComponent('app-container', AppMain);
-
 export {AppMain};
