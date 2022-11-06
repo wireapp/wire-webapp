@@ -37,7 +37,7 @@
     "react-transition-group": "4.4.5",
     "redux": "4.2.0",
     "redux-logdown": "1.0.4",
-    "redux-thunk": "2.4.1",
+    "redux-thunk": "2.4.2",
     "speakingurl": "14.0.1",
     "switch-path": "1.2.0",
     "tsyringe": "4.7.0",
