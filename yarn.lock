@@ -5576,10 +5576,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"caniuse-lite@npm:^1.0.30001426, caniuse-lite@npm:^1.0.30001427":
+"caniuse-lite@npm:^1.0.30001426":
   version: 1.0.30001427
   resolution: "caniuse-lite@npm:1.0.30001427"
   checksum: 7b21a7d1f10c07130cecb7e7c7c38fd031f3dbd49afaee53fa4bb07355f9765686cad14f6296fbb49838f525c35292278b2c5ee9109c363edea5e134514ab6bb
+  languageName: node
+  linkType: hard
+
+"caniuse-lite@npm:^1.0.30001430":
+  version: 1.0.30001430
+  resolution: "caniuse-lite@npm:1.0.30001430"
+  checksum: 15200fe2658871807341a451b01e3d6ae2bf5e0e30b60af86e1e8d9e1655a5f5011bb23fdc3d6b696019d63d3e60ad6864b15c40c80c538c4500ac5098b9701b
   languageName: node
   linkType: hard
 
@@ -16330,7 +16337,7 @@ __metadata:
     archiver: ^5.3.1
     autoprefixer: ^10.4.13
     babel-loader: 9.1.0
-    caniuse-lite: ^1.0.30001427
+    caniuse-lite: ^1.0.30001430
     classnames: 2.3.2
     copy-webpack-plugin: 11.0.0
     core-js: 3.25.5
