@@ -10843,6 +10843,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"long@npm:5.2.1":
+  version: 5.2.1
+  resolution: "long@npm:5.2.1"
+  checksum: 9264da12d1b7df67e5aa6da4498144293caf1ad12e7f092efe4e9a2d32c53f0bbf7334f7cef997080a2a3af061142558ab366efa71698d98b1cdb883477445a7
+  languageName: node
+  linkType: hard
+
 "loose-envify@npm:^1.1.0, loose-envify@npm:^1.4.0":
   version: 1.4.0
   resolution: "loose-envify@npm:1.4.0"
@@ -16289,7 +16296,7 @@ __metadata:
     less-loader: ^11.1.0
     linkify-it: 4.0.1
     lint-staged: 13.0.3
-    long: 5.2.0
+    long: 5.2.1
     markdown-it: 13.0.1
     murmurhash: 2.0.1
     node-fetch: 2.6.7
