@@ -97,7 +97,7 @@
     "babel-loader": "9.0.0",
     "caniuse-lite": "^1.0.30001427",
     "cross-env": "7.0.3",
-    "cspell": "6.13.1",
+    "cspell": "6.14.0",
     "css-loader": "^6.7.1",
     "cssnano": "^5.1.14",
     "dexie": "^3.2.2",
