@@ -65,7 +65,7 @@
     "@types/fs-extra": "9.0.13",
     "@types/generate-changelog": "1.8.1",
     "@types/highlight.js": "10.1.0",
-    "@types/jest": "29.2.0",
+    "@types/jest": "29.2.2",
     "@types/jquery": "^3",
     "@types/js-cookie": "3.0.2",
     "@types/jsdom": "20.0.0",
