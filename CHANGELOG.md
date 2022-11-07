@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [36.3.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@36.2.0...@wireapp/core@36.3.0) (2022-11-07)
+
+### Features
+
+* External commits support ([#4601](https://github.com/wireapp/wire-web-packages/issues/4601)) ([ba93a1d](https://github.com/wireapp/wire-web-packages/commit/ba93a1d720b97e5d18910804386cc3f9f024ca0b))
+
 # [36.2.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@36.1.1...@wireapp/core@36.2.0) (2022-11-07)
 
 ### Features
