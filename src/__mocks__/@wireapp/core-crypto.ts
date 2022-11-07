@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2019 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,23 +17,13 @@
  *
  */
 
-import {initRouterBindings} from 'src/script/router/routerBindings';
-
-import {bindHtml} from '../../helper/knockoutHelpers';
-
-describe('routerBindings', () => {
-  let mockRouter;
-  beforeEach(() => {
-    mockRouter = {navigate: () => {}};
-    initRouterBindings(mockRouter);
-    spyOn(mockRouter, 'navigate');
-  });
-
-  it('handles click and triggers router navigation', async () => {
-    const url = '/conversation/uuid';
-    const domElement = await bindHtml(`<a data-bind="link_to: '${url}'">click me</a>`);
-    domElement.querySelector('a').click();
-
-    expect(mockRouter.navigate).toHaveBeenCalledWith(url);
-  });
-});
+export interface CommitBundle {}
+export enum PublicGroupStateEncryptionType {
+  Plaintext = 1,
+  JweEncrypted = 2,
+}
+export enum RatchetTreeType {
+  Full = 1,
+  Delta = 2,
+  ByRef = 3,
+}

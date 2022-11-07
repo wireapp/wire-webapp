@@ -24,19 +24,17 @@ import {GroupAvatar} from 'Components/avatar/GroupAvatar';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 
-import {AssetRepository} from '../../../../../../assets/AssetRepository';
 import type {Conversation} from '../../../../../../entity/Conversation';
 import {generateConversationUrl} from '../../../../../../router/routeGenerator';
 import {Router} from '../../../../../../router/Router';
 
 export interface GroupListItemProps {
-  assetRepository: AssetRepository;
   click: (group: Conversation) => void;
   group: Conversation;
   router: Router;
 }
 
-const GroupListItem: React.FC<GroupListItemProps> = ({assetRepository, click, group, router}) => {
+const GroupListItem: React.FC<GroupListItemProps> = ({click, group, router}) => {
   const {
     display_name: displayName,
     participating_user_ets: participatingUserEts,

@@ -28,6 +28,7 @@ import {container} from 'tsyringe';
 import {Icon} from 'Components/Icon';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {useAppMainState, ViewType} from 'src/script/page/state';
+import {ContentState} from 'src/script/page/useAppState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {StringIdentifer, t} from 'Util/LocalizerUtil';
@@ -45,7 +46,6 @@ import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
 import {UserState} from '../../user/UserState';
 import {CallActions} from '../../view_model/CallingViewModel';
-import {ContentState} from '../../view_model/ContentViewModel';
 import {ViewModelRepositories} from '../../view_model/MainViewModel';
 
 export interface TitleBarProps {
@@ -137,7 +137,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
 
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
   const mdBreakpoint = useMatchMedia('max-width: 768px');
-  const smBreakpoint = useMatchMedia('max-width: 620px');
+  const smBreakpoint = useMatchMedia('max-width: 640px');
 
   const {setCurrentView: setView} = useAppMainState(state => state.responsiveView);
 

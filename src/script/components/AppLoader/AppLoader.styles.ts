@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,29 +17,15 @@
  *
  */
 
-const webpack = require('webpack');
-const TerserJSPlugin = require('terser-webpack-plugin');
+import {CSSObject} from '@emotion/react';
 
-const commonConfig = require('./webpack.config.common');
-
-module.exports = {
-  ...commonConfig,
-  mode: 'production',
-  optimization: {
-    ...commonConfig.optimization,
-    minimizer: [
-      new TerserJSPlugin({
-        /* Dexie has issues with UglifyJS */
-        exclude: /dexie/g,
-      }),
-    ],
-  },
-  plugins: [
-    ...commonConfig.plugins,
-    new webpack.DefinePlugin({
-      'process.env': {
-        NODE_ENV: `"production"`,
-      },
-    }),
-  ],
+export const styles: CSSObject = {
+  alignItems: 'center',
+  backgroundColor: 'var(--app-bg)',
+  color: 'var(--foreground)',
+  display: 'flex',
+  height: '100%',
+  justifyContent: 'center',
+  position: 'absolute',
+  width: '100%',
 };

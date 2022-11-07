@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,26 +17,4 @@
  *
  */
 
-// https://github.com/gruntjs/grunt-contrib-watch
-
-module.exports = {
-  markup: {
-    files: ['<%= dir.src_ %>/**/*.htm*'],
-    options: {
-      debounceDelay: 250,
-      spawn: false,
-    },
-    tasks: ['build_markup'],
-  },
-  options: {
-    livereload: 32123,
-  },
-  style: {
-    files: ['<%= dir.src_ %>/**/*.less'],
-    options: {
-      debounceDelay: 250,
-      spawn: false,
-    },
-    tasks: ['build_markup'],
-  },
-};
+export * from './LoadingBar';
