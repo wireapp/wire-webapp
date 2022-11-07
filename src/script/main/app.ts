@@ -52,7 +52,7 @@ import {CacheRepository} from '../cache/CacheRepository';
 import {CallingRepository} from '../calling/CallingRepository';
 import {ClientRepository} from '../client/ClientRepository';
 import {ClientService} from '../client/ClientService';
-import {Config} from '../Config';
+import {Configuration} from '../Config';
 import {ConnectionRepository} from '../connection/ConnectionRepository';
 import {ConnectionService} from '../connection/ConnectionService';
 import {ConversationRepository} from '../conversation/ConversationRepository';
@@ -167,7 +167,12 @@ export class App {
    * @param core
    * @param apiClient Configured backend client
    */
-  constructor(private readonly core: Core, private readonly apiClient: APIClient) {
+  constructor(
+    private readonly core: Core,
+    private readonly apiClient: APIClient,
+    private readonly config: Configuration,
+  ) {
+    this.config = config;
     this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () => this.logout(SIGN_OUT_REASON.SESSION_EXPIRED, false));
     this.logger = getLogger('App');
 
@@ -176,7 +181,7 @@ export class App {
     this.service = this._setupServices();
     this.repository = this._setupRepositories();
 
-    if (Config.getConfig().FEATURE.ENABLE_DEBUG) {
+    if (config.FEATURE.ENABLE_DEBUG) {
       import('Util/DebugUtil').then(({DebugUtil}) => {
         this.debug = new DebugUtil(this.repository);
         this.util = {debug: this.debug}; // Alias for QA
@@ -456,7 +461,7 @@ export class App {
 
       await eventRepository.connectWebSocket(this.core, ({done, total}) => {
         const baseMessage = t('initDecryption');
-        const extraInfo = Config.getConfig().FEATURE.SHOW_LOADING_INFORMATION
+        const extraInfo = this.config.FEATURE.SHOW_LOADING_INFORMATION
           ? ` ${t('initProgress', {number1: done.toString(), number2: total.toString()})}`
           : '';
 
@@ -469,7 +474,7 @@ export class App {
 
       eventTrackerRepository.init(propertiesRepository.properties.settings.privacy.telemetry_sharing);
       await conversationRepository.initializeConversations();
-      onProgress(97.5, t('initUpdatedFromNotifications', Config.getConfig().BRAND_NAME));
+      onProgress(97.5, t('initUpdatedFromNotifications', this.config.BRAND_NAME));
 
       const clientEntities = await clientRepository.updateClientsForSelf();
 
