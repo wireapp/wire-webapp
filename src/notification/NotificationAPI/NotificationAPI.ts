@@ -19,7 +19,7 @@
 
 import axios, {AxiosRequestConfig} from 'axios';
 
-import {HttpClient} from '../../http';
+import {BackendError, BackendErrorLabel, HttpClient, StatusCode} from '../../http';
 import {Notification, NotificationList} from '..';
 
 export const NOTIFICATION_SIZE_MAXIMUM = 10000;
@@ -87,8 +87,8 @@ export class NotificationAPI {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/push/fetchNotifications
    */
   public async getAllNotifications(clientId?: string, lastNotificationId?: string): Promise<NotificationsReponse> {
-    let notificationList: Notification[] = [];
     const getNotificationChunks = async (
+      notificationList: Notification[],
       currentClientId?: string,
       currentNotificationId?: string,
     ): Promise<NotificationsReponse> => {
@@ -103,13 +103,33 @@ export class NotificationAPI {
       try {
         payload = await this.getNotifications(currentClientId, NOTIFICATION_SIZE_MAXIMUM, currentNotificationId);
       } catch (error) {
-        if (axios.isAxiosError(error)) {
-          if (error.response?.data?.notifications) {
-            hasMissedNotifications = true;
-            payload = {...defaultPayload, ...error.response?.data};
-          }
-        } else {
-          throw error;
+        const isAxiosError = axios.isAxiosError(error);
+
+        //error with response body (before v3 API)
+        const isErrorWithNotifications = isAxiosError && error.response?.data?.notifications;
+
+        //uuid parsing error
+        const isBadRequestError = isAxiosError && error.response?.status === StatusCode.BAD_REQUEST;
+
+        //notification was not found in the database,
+        const isNotFoundError = error instanceof BackendError && error.label === BackendErrorLabel.NOT_FOUND;
+
+        if (isBadRequestError || isNotFoundError) {
+          //we need to load all the notifications from the beginning (without 'since' param)
+          const payload = await getNotificationChunks(notificationList, currentClientId);
+
+          //we have to manually add missedNotification value since it won't be included when called without 'since' param
+          return {...payload, missedNotification: currentNotificationId};
+        }
+
+        if (isErrorWithNotifications) {
+          hasMissedNotifications = true;
+          payload = {...defaultPayload, ...error.response?.data};
+        }
+
+        //throw error for other BackendError type errors
+        if (!isAxiosError) {
+          throw Error;
         }
       }
 
@@ -122,7 +142,7 @@ export class NotificationAPI {
       if (has_more) {
         const lastNotification = notifications[notifications.length - 1];
         if (lastNotification) {
-          return getNotificationChunks(currentClientId, lastNotification.id);
+          return getNotificationChunks(notificationList, currentClientId, lastNotification.id);
         }
       }
 
@@ -132,7 +152,7 @@ export class NotificationAPI {
       };
     };
 
-    return getNotificationChunks(clientId, lastNotificationId);
+    return getNotificationChunks([], clientId, lastNotificationId);
   }
 
   /**
