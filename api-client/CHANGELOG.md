@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [22.3.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@22.2.0...@wireapp/api-client@22.3.0) (2022-11-07)
+
+### Features
+
+* **api-client:** fetch all notifications when 404 without body returned [FS-1139] ([#4580](https://github.com/wireapp/wire-web-packages/issues/4580)) ([cacd850](https://github.com/wireapp/wire-web-packages/commit/cacd850f07f6c108df2ea16ea9792e17f356817c))
+
 # [22.2.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@22.1.0...@wireapp/api-client@22.2.0) (2022-11-07)
 
 ### Features
