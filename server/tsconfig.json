@@ -16,7 +16,7 @@
     "sourceMap": true,
     "target": "es2017"
   },
-  "files": ["index.tsx"],
+  "files": ["index.ts"],
   "include": ["./**/*.test.ts"],
   "exclude": ["node_modules"]
 }
