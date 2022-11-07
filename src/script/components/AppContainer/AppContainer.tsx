@@ -37,6 +37,7 @@ interface AppProps {
 
 export const AppContainer: FC<AppProps> = ({config, clientType}) => {
   const app = new App(container.resolve(Core), container.resolve(APIClient), config);
+  // Publishing application on the global scope for debug and testing purposes.
   window.wire.app = app;
   const mainView = new MainViewModel(app.repository);
 
