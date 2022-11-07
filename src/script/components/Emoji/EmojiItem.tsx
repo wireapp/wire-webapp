@@ -34,7 +34,7 @@ interface EmojiItemProps {
 const EmojiItem: FC<EmojiItemProps> = ({emoji, onClick, onMouseEnter, selectedEmoji = false}) => (
   <button
     type="button"
-    className={cx('button-reset-default', {selected: selectedEmoji})}
+    className={cx('button-reset-default', 'emoji', {selected: selectedEmoji})}
     css={itemStyle}
     onMouseEnter={onMouseEnter}
     onClick={onClick}
