@@ -22,14 +22,13 @@ import React, {useEffect, useMemo, useState} from 'react';
 import {css} from '@emotion/react';
 import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
 import {IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
-import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
 import {Icon} from 'Components/Icon';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {KEY} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
 import {preventFocusOutside} from 'Util/util';
 
 import {ButtonGroup} from './ButtonGroup';
@@ -51,8 +50,8 @@ import type {Grid} from '../../calling/videoGridHandler';
 import type {Conversation} from '../../entity/Conversation';
 import {DeviceTypes, ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
 import type {Multitasking} from '../../notification/NotificationRepository';
+import {useAppState} from '../../page/useAppState';
 import {TeamState} from '../../team/TeamState';
-import {t} from '../../util/LocalizerUtil';
 import {CallViewTab, CallViewTabs} from '../../view_model/CallingViewModel';
 
 export interface FullscreenVideoCallProps {
@@ -152,11 +151,11 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   const showSwitchMicrophone = availableMicrophones.length > 1;
 
   const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
-  const updateUnreadCount = (unreadCount: number) => setHasUnreadMessages(unreadCount > 0);
+  const {unreadMessagesCount} = useAppState();
+
   useEffect(() => {
-    amplify.subscribe(WebAppEvents.LIFECYCLE.UNREAD_COUNT, updateUnreadCount);
-    return () => amplify.unsubscribe(WebAppEvents.LIFECYCLE.UNREAD_COUNT, updateUnreadCount);
-  }, []);
+    setHasUnreadMessages(unreadMessagesCount > 0);
+  }, [unreadMessagesCount]);
 
   const totalPages = callPages.length;
 

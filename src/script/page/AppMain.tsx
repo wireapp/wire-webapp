@@ -88,6 +88,7 @@ const AppMain: FC<AppMainProps> = ({app, mainView, selfUser}) => {
   const userState = container.resolve(UserState);
 
   useWindowTitle();
+
   const {isActivatedAccount} = useKoSubscribableChildren(userState, ['isActivatedAccount']);
 
   const {history, entity: currentEntity, clearHistory, goTo} = useAppMainState(state => state.rightSidebar);
