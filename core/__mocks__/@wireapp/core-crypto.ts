@@ -17,4 +17,13 @@
  *
  */
 
-module.exports = {};
+export interface CommitBundle {}
+export enum PublicGroupStateEncryptionType {
+  Plaintext = 1,
+  JweEncrypted = 2,
+}
+export enum RatchetTreeType {
+  Full = 1,
+  Delta = 2,
+  ByRef = 3,
+}

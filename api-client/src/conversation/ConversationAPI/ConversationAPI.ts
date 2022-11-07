@@ -819,14 +819,15 @@ export class ConversationAPI {
    * @see https://messaginglayersecurity.rocks/mls-protocol/draft-ietf-mls-protocol.html#name-message-framing
    * @see https://staging-nginz-https.zinfra.io/api/swagger-ui/#/default/post_mls_welcome
    */
-  public async postMlsWelcomeMessage(messageData: Uint8Array): Promise<void> {
+  public async postMlsCommitBundle(messageData: Uint8Array): Promise<PostMlsMessageResponse> {
     const config: AxiosRequestConfig = {
       data: messageData,
       method: 'post',
-      url: `${ConversationAPI.URL.MLS}/welcome`,
+      url: `${ConversationAPI.URL.MLS}/commit-bundles`,
     };
 
-    await this.client.sendProtocolMls<void>(config, true);
+    const response = await this.client.sendProtocolBuffer<PostMlsMessageResponse>(config, true);
+    return response.data;
   }
 
   public async postForClients(clientId: string, conversationId: string): Promise<void> {

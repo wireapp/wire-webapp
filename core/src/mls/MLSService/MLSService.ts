@@ -40,6 +40,7 @@ import {QualifiedUsers} from '../../conversation';
 import {sendMessage} from '../../conversation/message/messageSender';
 import {parseFullQualifiedClientId} from '../../util/fullyQualifiedClientIdUtils';
 import {CommitPendingProposalsParams, HandlePendingProposalsParams, MLSCallbacks} from '../types';
+import {toProtobufCommitBundle} from './commitBundleUtil';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {TimeUtil} from '@wireapp/commons';
@@ -91,24 +92,23 @@ export class MLSService {
     return client;
   }
 
-  private async uploadCommitBundle(groupId: Uint8Array, {commit, welcome}: CommitBundle) {
-    if (commit) {
-      try {
-        const messageResponse = await this.apiClient.api.conversation.postMlsMessage(
-          //@todo: it's temporary - we wait for core-crypto fix to return the actual Uint8Array instead of regular array
-          optionalToUint8Array(commit),
-        );
+  private async uploadCommitBundle(groupId: Uint8Array, commitBundle: CommitBundle, isExternalCommit?: boolean) {
+    const bundlePayload = toProtobufCommitBundle(commitBundle);
+    try {
+      const response = await this.apiClient.api.conversation.postMlsCommitBundle(bundlePayload.slice());
+      if (isExternalCommit) {
+        await this.coreCryptoClient.mergePendingGroupFromExternalCommit(groupId, {});
+      } else {
         await this.coreCryptoClient.commitAccepted(groupId);
-        const newEpoch = await this.getEpoch(groupId);
-        const groupIdStr = Encoder.toBase64(groupId).asString;
-        this.logger.log(`Commit have been accepted for group "${groupIdStr}". New epoch is "${newEpoch}"`);
-        if (welcome) {
-          // If the commit went well, we can send the Welcome
-          //@todo: it's temporary - we wait for core-crypto fix to return the actual Uint8Array instead of regular array
-          await this.apiClient.api.conversation.postMlsWelcomeMessage(optionalToUint8Array(welcome));
-        }
-        return messageResponse;
-      } catch (error) {
+      }
+      const newEpoch = await this.getEpoch(groupId);
+      const groupIdStr = Encoder.toBase64(groupId).asString;
+      this.logger.log(`Commit have been accepted for group "${groupIdStr}". New epoch is "${newEpoch}"`);
+      return response;
+    } catch (error) {
+      if (isExternalCommit) {
+        await this.coreCryptoClient.clearPendingGroupFromExternalCommit(groupId);
+      } else {
         await this.coreCryptoClient.clearPendingCommit(groupId);
       }
     }
