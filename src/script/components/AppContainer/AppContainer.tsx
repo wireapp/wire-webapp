@@ -37,6 +37,7 @@ interface AppProps {
 
 export const AppContainer: FC<AppProps> = ({config, clientType}) => {
   const app = new App(container.resolve(Core), container.resolve(APIClient), config);
+  window.wire.app = app;
   const mainView = new MainViewModel(app.repository);
 
   return (
