@@ -429,7 +429,7 @@ class App {
         await mlsConversationState.getState().sendExternalToPendingJoin(
           conversationEntities,
           groupId => this.core.service!.conversation.isMLSConversationEstablished(groupId),
-          ({groupId, epoch}) => this.core.service!.conversation.sendExternalJoinProposal(groupId, epoch),
+          conversationId => this.core.service!.conversation.joinByExternalCommit(conversationId),
         );
 
         this.core.configureMLSCallbacks({
@@ -446,8 +446,8 @@ class App {
             const conversation = await conversationRepository.getConversationById(conversationId);
             return conversation?.groupId;
           },
-          // @todo update this when external commits are being implemented
-          userAuthorize: () => false,
+          // This is enforced by backend, no need to implement this on the client side.
+          userAuthorize: () => true,
         });
       }
 

@@ -4526,9 +4526,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^22.0.1":
-  version: 22.0.1
-  resolution: "@wireapp/api-client@npm:22.0.1"
+"@wireapp/api-client@npm:^22.2.0":
+  version: 22.2.0
+  resolution: "@wireapp/api-client@npm:22.2.0"
   dependencies:
     "@wireapp/commons": ^5.0.0
     "@wireapp/priority-queue": ^2.0.0
@@ -4541,7 +4541,7 @@ __metadata:
     spark-md5: 3.0.2
     tough-cookie: 4.1.2
     ws: 8.10.0
-  checksum: d39498cf0c73c42766acf4791bef8d108bd31814d04e0b956ed0b35dcb81083bffd99c70d92c3f08255f5aef8619a4a9ee508c96da8295c1d4af3ea84f3ca663
+  checksum: 4c23ef4f95acc6798701c00845da1cf685abdd2aaad8e27304f184f877245fdc27862a28b6da0758d1ac12a2f1dc8080e5e374f0a9716d7bbf51158cadb4f8f2
   languageName: node
   linkType: hard
 
@@ -4587,20 +4587,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core-crypto@npm:0.6.0-pre.2":
-  version: 0.6.0-pre.2
-  resolution: "@wireapp/core-crypto@npm:0.6.0-pre.2"
-  checksum: a3e41cfa813228da709566a100b4da13f94c466bc2bb393ef44b8c7161d890e99ce06bfe1764762c2f1f984774fc1bd924e6051aaf3e56878e3ccd8d8a1cfa68
+"@wireapp/core-crypto@npm:0.6.0-pre.4":
+  version: 0.6.0-pre.4
+  resolution: "@wireapp/core-crypto@npm:0.6.0-pre.4"
+  checksum: 2b707b598ee3bfe702f9364dc0ece095acee8d1a18d58a46074f9297c660950f0b6e546f35ed5193b80f459e442fda2299cff9ae38b1c4da6f6d8ae706644c05
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:36.1.1":
-  version: 36.1.1
-  resolution: "@wireapp/core@npm:36.1.1"
+"@wireapp/core@npm:36.3.0":
+  version: 36.3.0
+  resolution: "@wireapp/core@npm:36.3.0"
   dependencies:
-    "@wireapp/api-client": ^22.0.1
+    "@wireapp/api-client": ^22.2.0
     "@wireapp/commons": ^5.0.0
-    "@wireapp/core-crypto": 0.6.0-pre.2
+    "@wireapp/core-crypto": 0.6.0-pre.4
     "@wireapp/cryptobox": 12.8.0
     "@wireapp/promise-queue": ^2.0.0
     "@wireapp/protocol-messaging": 1.42.0
@@ -4609,11 +4609,11 @@ __metadata:
     bazinga64: 6.0.0
     hash.js: 1.1.7
     http-status-codes: 2.2.0
-    idb: 7.1.0
+    idb: 7.1.1
     logdown: 3.3.1
     long: ^5.2.0
     uuidjs: 4.2.12
-  checksum: 51a355bbfbb86c1722c304a4c7ae56cb24ce31325bdb6463244e1a6be0f711bf2fc8f81c0a9a54cb7f19cc46023164ae777e9e6b4239488999c2edc3972bb91e
+  checksum: 2ac2f0701d8e98e9888edcbb354727aa557b15b0dbf5383a8c5189384cdcf5ba69afa71e117129f482f6fd6e3d003e90d2beddf0af2f730c97f14d134f177837
   languageName: node
   linkType: hard
 
@@ -9181,7 +9181,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"idb@npm:7.1.0, idb@npm:^7.0.1":
+"idb@npm:7.1.1":
+  version: 7.1.1
+  resolution: "idb@npm:7.1.1"
+  checksum: 1973c28d53c784b177bdef9f527ec89ec239ec7cf5fcbd987dae75a16c03f5b7dfcc8c6d3285716fd0309dd57739805390bd9f98ce23b1b7d8849a3b52de8d56
+  languageName: node
+  linkType: hard
+
+"idb@npm:^7.0.1":
   version: 7.1.0
   resolution: "idb@npm:7.1.0"
   checksum: 1ae62bcf9f0545390b39ce82a5162720ffeb4cf461a6e64e8bb595df6a4fe94a7f73bba8412ac683e291e5614bab1c6659d961dd4175cb1fa3ee29c1c8631549
@@ -16608,7 +16615,7 @@ __metadata:
     "@wireapp/antiscroll-2": 1.3.1
     "@wireapp/avs": 8.2.17
     "@wireapp/copy-config": 2.0.0
-    "@wireapp/core": 36.1.1
+    "@wireapp/core": 36.3.0
     "@wireapp/eslint-config": 2.0.0
     "@wireapp/prettier-config": 0.5.0
     "@wireapp/react-ui-kit": 9.0.2
