@@ -48,7 +48,7 @@ type StoreState = MLSConversationState & {
   sendExternalToPendingJoin(
     conversations: Conversation[],
     isEstablishedConversation: (groupId: string) => Promise<boolean>,
-    sendExternalProposal: (conversationId: QualifiedId) => Promise<void>,
+    sendExternalProposal: (conversationId: QualifiedId) => Promise<unknown>,
   ): Promise<void>;
 };
 
