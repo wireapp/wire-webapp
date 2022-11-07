@@ -40,7 +40,7 @@ export const AppContainer: FC<AppProps> = ({config, clientType}) => {
   const mainView = new MainViewModel(app.repository);
 
   return (
-    <AppLoader init={onProgress => app.initApp(clientType, config, onProgress)}>
+    <AppLoader init={onProgress => app.initApp(clientType, onProgress)}>
       {selfUser => <AppMain app={app} selfUser={selfUser} mainView={mainView} />}
     </AppLoader>
   );

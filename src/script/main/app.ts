@@ -52,7 +52,7 @@ import {CacheRepository} from '../cache/CacheRepository';
 import {CallingRepository} from '../calling/CallingRepository';
 import {ClientRepository} from '../client/ClientRepository';
 import {ClientService} from '../client/ClientService';
-import {Config, Configuration} from '../Config';
+import {Config} from '../Config';
 import {ConnectionRepository} from '../connection/ConnectionRepository';
 import {ConnectionService} from '../connection/ConnectionService';
 import {ConversationRepository} from '../conversation/ConversationRepository';
@@ -349,13 +349,7 @@ export class App {
    * @param config
    * @param onProgress
    */
-  async initApp(
-    clientType: ClientType,
-    config: Configuration,
-    onProgress: (progress: number, message?: string) => void,
-  ) {
-    await this.apiClient.useVersion(config.SUPPORTED_API_VERSIONS);
-
+  async initApp(clientType: ClientType, onProgress: (progress: number, message?: string) => void) {
     // add body information
     const osCssClass = Runtime.isMacOS() ? 'os-mac' : 'os-pc';
     const platformCssClass = Runtime.isDesktopApp() ? 'platform-electron' : 'platform-web';
