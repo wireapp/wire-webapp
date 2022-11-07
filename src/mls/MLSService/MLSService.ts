@@ -49,12 +49,25 @@ import {TaskScheduler} from '../../util/TaskScheduler';
 import {EventHandlerParams, EventHandlerResult, handleBackendEvent} from '../EventHandler';
 import {keyMaterialUpdatesStore} from './stores/keyMaterialUpdatesStore';
 import {pendingProposalsStore} from './stores/pendingProposalsStore';
+import axios from 'axios';
 
 //@todo: this function is temporary, we wait for the update from core-crypto side
 //they are returning regular array instead of Uint8Array for commit and welcome messages
 export const optionalToUint8Array = (array: Uint8Array | []): Uint8Array => {
   return Array.isArray(array) ? Uint8Array.from(array) : array;
 };
+
+interface UploadCommitOptions {
+  /**
+   * If uploading the commit fails and we endup in a scenario where a retrial is possible, then this callback will be called to re-generate a new commit bundle
+   */
+  regenerateCommitBundle?: () => Promise<CommitBundle>;
+
+  /**
+   * Is the current commitBundle an external commit.
+   */
+  isExternalCommit?: boolean;
+}
 
 interface MLSServiceConfig {
   keyingMaterialUpdateThreshold: number;
@@ -92,7 +105,11 @@ export class MLSService {
     return client;
   }
 
-  private async uploadCommitBundle(groupId: Uint8Array, commitBundle: CommitBundle, isExternalCommit?: boolean) {
+  private async uploadCommitBundle(
+    groupId: Uint8Array,
+    commitBundle: CommitBundle,
+    {regenerateCommitBundle, isExternalCommit}: UploadCommitOptions = {},
+  ): Promise<PostMlsMessageResponse | null> {
     const bundlePayload = toProtobufCommitBundle(commitBundle);
     try {
       const response = await this.apiClient.api.conversation.postMlsCommitBundle(bundlePayload.slice());
@@ -106,6 +123,15 @@ export class MLSService {
       this.logger.log(`Commit have been accepted for group "${groupIdStr}". New epoch is "${newEpoch}"`);
       return response;
     } catch (error) {
+      const shouldRetry = axios.isAxiosError(error) && error.code === '409';
+      if (shouldRetry && regenerateCommitBundle) {
+        // in case of a 409, we want to retry to generate the commit and resend it
+        // could be that we are trying to upload a commit to a conversation that has a different epoch on backend
+        // in this case we will most likely receive a commit from backend that will increase our local epoch
+        this.logger.warn(`Uploading commitBundle failed. Will retry generating a new bundle`);
+        const updatedCommitBundle = await regenerateCommitBundle();
+        return this.uploadCommitBundle(groupId, updatedCommitBundle, {isExternalCommit});
+      }
       if (isExternalCommit) {
         await this.coreCryptoClient.clearPendingGroupFromExternalCommit(groupId);
       } else {
@@ -169,6 +195,19 @@ export class MLSService {
 
   public async newProposal(proposalType: ProposalType, args: ProposalArgs | AddProposalArgs | RemoveProposalArgs) {
     return this.coreCryptoClient.newProposal(proposalType, args);
+  }
+
+  public async joinByExternalCommit(getGroupInfo: () => Promise<Uint8Array>) {
+    const generateCommit = async () => {
+      const groupInfo = await getGroupInfo();
+      const {conversationId, ...commitBundle} = await this.coreCryptoClient.joinByExternalCommit(groupInfo);
+      return {groupId: conversationId, commitBundle};
+    };
+    const {commitBundle, groupId} = await generateCommit();
+    return this.uploadCommitBundle(groupId, commitBundle, {
+      isExternalCommit: true,
+      regenerateCommitBundle: async () => (await generateCommit()).commitBundle,
+    });
   }
 
   public async newExternalProposal(
