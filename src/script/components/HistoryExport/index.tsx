@@ -21,7 +21,8 @@ import {FC, useContext, useEffect, useState} from 'react';
 
 import {container} from 'tsyringe';
 
-import {LoadingBar} from 'Components/LoadingBar';
+import {LoadingBar} from 'Components/LoadingBar/LoadingBar';
+import {ContentState} from 'src/script/page/useAppState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
@@ -32,7 +33,6 @@ import {CancelError} from '../../backup/Error';
 import {Config} from '../../Config';
 import {RootContext} from '../../page/RootProvider';
 import {UserState} from '../../user/UserState';
-import {ContentState} from '../../view_model/ContentViewModel';
 
 enum ExportState {
   COMPRESSING = 'ExportState.STATE.COMPRESSING',

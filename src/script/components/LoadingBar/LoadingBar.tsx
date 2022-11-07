@@ -17,11 +17,9 @@
  *
  */
 
-import React from 'react';
+import {FC} from 'react';
 
 import cx from 'classnames';
-
-import {registerReactComponent} from 'Util/ComponentUtil';
 
 export interface LoadingBarProps {
   message: string;
@@ -29,7 +27,7 @@ export interface LoadingBarProps {
   className?: string;
 }
 
-const LoadingBar: React.FC<LoadingBarProps> = ({progress, message, className = ''}) => (
+const LoadingBar: FC<LoadingBarProps> = ({progress, message, className = ''}) => (
   <div className={cx('loading-bar text-center', className)}>
     <div className="progress-console">{message}</div>
     <div className="progress-bar">
@@ -39,5 +37,3 @@ const LoadingBar: React.FC<LoadingBarProps> = ({progress, message, className = '
 );
 
 export {LoadingBar};
-
-registerReactComponent('loading-bar', LoadingBar);

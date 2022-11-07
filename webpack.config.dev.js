@@ -30,7 +30,7 @@ module.exports = {
   devtool: 'eval-source-map',
   entry: {
     ...commonConfig.entry,
-    app: ['webpack-hot-middleware/client?reload=true', path.resolve(__dirname, srcScript, 'main/app.ts')],
+    app: ['webpack-hot-middleware/client?reload=true', path.resolve(__dirname, srcScript, 'main/index.tsx')],
     auth: ['webpack-hot-middleware/client', path.resolve(__dirname, srcScript, 'auth/main.tsx')],
   },
   mode: 'development',

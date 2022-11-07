@@ -27,6 +27,7 @@ import {AvailabilityState} from 'Components/AvailabilityState';
 import {CallingCell} from 'Components/calling/CallingCell';
 import {Icon} from 'Components/Icon';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
+import {ListState} from 'src/script/page/useAppState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isTabKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -49,7 +50,7 @@ import {AvailabilityContextMenu} from '../../../../ui/AvailabilityContextMenu';
 import {Shortcut} from '../../../../ui/Shortcut';
 import {ShortcutType} from '../../../../ui/ShortcutType';
 import {UserState} from '../../../../user/UserState';
-import {ListState, ListViewModel} from '../../../../view_model/ListViewModel';
+import {ListViewModel} from '../../../../view_model/ListViewModel';
 import {useAppMainState, ViewType} from '../../../state';
 import {ListWrapper} from '../ListWrapper';
 

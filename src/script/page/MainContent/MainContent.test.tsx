@@ -18,15 +18,15 @@
  */
 
 import {act, render, screen, waitFor} from '@testing-library/react';
-import ko from 'knockout';
 
-import {ContentState, ContentViewModel} from 'src/script/view_model/ContentViewModel';
+import {ContentViewModel} from 'src/script/view_model/ContentViewModel';
 
 import {MainContent} from './MainContent';
 
 import {withTheme} from '../../auth/util/test/TestUtil';
 import {MainViewModel} from '../../view_model/MainViewModel';
 import {RootProvider} from '../RootProvider';
+import {ContentState, useAppState} from '../useAppState';
 
 jest.mock('./panels/preferences/AccountPreferences', () => ({
   AccountPreferences: () => <span>AccountPreferences</span>,
@@ -37,7 +37,6 @@ describe('Preferences', () => {
   const mainViewModel = {
     content: {
       repositories: {} as any,
-      state: ko.observable(ContentState.PREFERENCES_ACCOUNT),
     } as ContentViewModel,
   } as MainViewModel;
 
@@ -46,6 +45,8 @@ describe('Preferences', () => {
   };
 
   it('renders the right component according to view state', () => {
+    const {setContentState} = useAppState.getState();
+
     jest.useFakeTimers();
     render(
       withTheme(
@@ -54,16 +55,19 @@ describe('Preferences', () => {
         </RootProvider>,
       ),
     );
+
     expect(screen.queryByText('accessibility.headings.preferencesAbout')).toBeNull();
-    expect(screen.queryByText('AccountPreferences')).not.toBeNull();
 
     act(() => {
-      mainViewModel.content.state(ContentState.PREFERENCES_ABOUT);
+      setContentState(ContentState.PREFERENCES_ABOUT);
     });
+
     waitFor(() => screen.getByText('accessibility.headings.preferencesAbout'));
+
     act(() => {
       jest.advanceTimersByTime(1000);
     });
+
     expect(screen.queryByText('AccountPreferences')).toBeNull();
     expect(screen.queryByText('accessibility.headings.preferencesAbout')).not.toBeNull();
     jest.useRealTimers();

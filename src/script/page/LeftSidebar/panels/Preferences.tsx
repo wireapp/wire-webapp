@@ -22,14 +22,14 @@ import React, {useEffect} from 'react';
 import {Runtime} from '@wireapp/commons';
 
 import {Icon} from 'Components/Icon';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {ListWrapper} from './ListWrapper';
 
 import {TeamRepository} from '../../../team/TeamRepository';
-import {ContentState, ContentViewModel} from '../../../view_model/ContentViewModel';
+import {ContentViewModel} from '../../../view_model/ContentViewModel';
 import {useAppMainState, ViewType} from '../../state';
+import {ContentState, useAppState} from '../../useAppState';
 
 type PreferencesProps = {
   contentViewModel: ContentViewModel;
@@ -62,7 +62,7 @@ const PreferenceItem: React.FC<{
 };
 
 const Preferences: React.FC<PreferencesProps> = ({contentViewModel, teamRepository, onClose}) => {
-  const {state: contentState} = useKoSubscribableChildren(contentViewModel, ['state']);
+  const {contentState} = useAppState();
 
   useEffect(() => {
     // Update local team
