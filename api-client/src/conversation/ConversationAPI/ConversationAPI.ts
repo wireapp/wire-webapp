@@ -421,6 +421,18 @@ export class ConversationAPI {
   }
 
   /**
+   * see https://staging-nginz-https.zinfra.io/api/swagger-ui/#/default/get_conversations__cnv_domain___cnv__groupinfo
+   */
+  public async getGroupInfo({id, domain}: QualifiedId) {
+    const url = `/conversations/${domain}/${id}/groupinfo`;
+    const response = await this.client.sendRequest<ArrayBuffer>({
+      url,
+      responseType: 'arraybuffer',
+    });
+    return new Uint8Array(response.data);
+  }
+
+  /**
    * Get existing roles available for the given conversation.
    * @param conversationId The Conversation ID to get roles for
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/getConversationsRoles

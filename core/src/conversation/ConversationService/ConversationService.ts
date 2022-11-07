@@ -544,7 +544,7 @@ export class ConversationService {
       throw new Error('No group_id found in response which is required for creating MLS conversations.');
     }
 
-    const groupIdDecodedFromBase64 = Decoder.fromBase64(groupId).asBytes;
+    const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
     const {qualified_users: qualifiedUsers = [], selfUserId} = conversationData;
     if (!selfUserId) {
       throw new Error('You need to pass self user qualified id in order to create an MLS conversation');
@@ -557,7 +557,7 @@ export class ConversationService {
       ciphersuite: 1, // TODO: Use the correct ciphersuite enum.
     };
 
-    await this.mlsService.createConversation(groupIdDecodedFromBase64, config);
+    await this.mlsService.createConversation(groupIdBytes, config);
 
     const coreCryptoKeyPackagesPayload = await this.mlsService.getKeyPackagesPayload([
       {
@@ -574,10 +574,7 @@ export class ConversationService {
 
     let response;
     if (coreCryptoKeyPackagesPayload.length !== 0) {
-      response = await this.mlsService.addUsersToExistingConversation(
-        groupIdDecodedFromBase64,
-        coreCryptoKeyPackagesPayload,
-      );
+      response = await this.mlsService.addUsersToExistingConversation(groupIdBytes, coreCryptoKeyPackagesPayload);
     }
 
     // We schedule a key material renewal
@@ -618,12 +615,9 @@ export class ConversationService {
     groupId,
     conversationId,
   }: Required<AddUsersParams>): Promise<MLSReturnType> {
-    const groupIdDecodedFromBase64 = Decoder.fromBase64(groupId!).asBytes;
+    const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
     const coreCryptoKeyPackagesPayload = await this.mlsService.getKeyPackagesPayload([...qualifiedUserIds]);
-    const response = await this.mlsService.addUsersToExistingConversation(
-      groupIdDecodedFromBase64,
-      coreCryptoKeyPackagesPayload,
-    );
+    const response = await this.mlsService.addUsersToExistingConversation(groupIdBytes, coreCryptoKeyPackagesPayload);
     const conversation = await this.getConversations(conversationId.id);
 
     //We store the info when user was added (and key material was created), so we will know when to renew it
@@ -639,7 +633,7 @@ export class ConversationService {
     conversationId,
     qualifiedUserIds,
   }: RemoveUsersParams): Promise<MLSReturnType> {
-    const groupIdDecodedFromBase64 = Decoder.fromBase64(groupId).asBytes;
+    const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
 
     const clientsToRemove = await this.apiClient.api.user.postListClients({qualified_users: qualifiedUserIds});
 
@@ -647,10 +641,7 @@ export class ConversationService {
       clientsToRemove.qualified_user_map,
     );
 
-    const messageResponse = await this.mlsService.removeClientsFromConversation(
-      groupIdDecodedFromBase64,
-      fullyQualifiedClientIds,
-    );
+    const messageResponse = await this.mlsService.removeClientsFromConversation(groupIdBytes, fullyQualifiedClientIds);
 
     //key material gets updated after removing a user from the group, so we can reset last key update time value in the store
     this.mlsService.resetKeyMaterialRenewal(groupId);
@@ -663,18 +654,22 @@ export class ConversationService {
     };
   }
 
+  public async joinByExternalCommit(conversationId: QualifiedId) {
+    return this.mlsService.joinByExternalCommit(() => this.apiClient.api.conversation.getGroupInfo(conversationId));
+  }
+
   /**
    * Will send an external proposal for the current device to join a specific conversation.
    * In order for the external proposal to be sent correctly, the underlying mls conversation needs to be in a non-established state
-   * @param conversationGroupId The conversation to join
+   * @param groupId The conversation to join
    * @param epoch The current epoch of the local conversation
    */
-  public async sendExternalJoinProposal(conversationGroupId: string, epoch: number) {
+  public async sendExternalJoinProposal(groupId: string, epoch: number) {
     return sendMessage(async () => {
-      const groupIdDecodedFromBase64 = Decoder.fromBase64(conversationGroupId!).asBytes;
+      const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
       const externalProposal = await this.mlsService.newExternalProposal(ExternalProposalType.Add, {
         epoch,
-        conversationId: groupIdDecodedFromBase64,
+        conversationId: groupIdBytes,
       });
       await this.apiClient.api.conversation.postMlsMessage(
         //@todo: it's temporary - we wait for core-crypto fix to return the actual Uint8Array instead of regular array
@@ -682,16 +677,16 @@ export class ConversationService {
       );
 
       //We store the info when user was added (and key material was created), so we will know when to renew it
-      this.mlsService.resetKeyMaterialRenewal(conversationGroupId);
+      this.mlsService.resetKeyMaterialRenewal(groupId);
     });
   }
 
-  public async isMLSConversationEstablished(conversationGroupId: string) {
-    const groupIdDecodedFromBase64 = Decoder.fromBase64(conversationGroupId!).asBytes;
-    return this.mlsService.conversationExists(groupIdDecodedFromBase64);
+  public async isMLSConversationEstablished(groupId: string) {
+    const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
+    return this.mlsService.conversationExists(groupIdBytes);
   }
 
-  public async wipeMLSConversation(conversationId: Uint8Array): Promise<void> {
-    return this.mlsService.wipeConversation(conversationId);
+  public async wipeMLSConversation(groupId: Uint8Array): Promise<void> {
+    return this.mlsService.wipeConversation(groupId);
   }
 }
