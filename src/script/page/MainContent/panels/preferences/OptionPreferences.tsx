@@ -39,11 +39,13 @@ import {THEMES as ThemeViewModelThemes} from '../../../../view_model/ThemeViewMo
 
 interface OptionPreferencesProps {
   propertiesRepository: PropertiesRepository;
+  switchPreviousContent: () => void;
   userState?: UserState;
 }
 
 const OptionPreferences: React.FC<OptionPreferencesProps> = ({
   propertiesRepository,
+  switchPreviousContent,
   userState = container.resolve(UserState),
 }) => {
   const {isActivatedAccount} = useKoSubscribableChildren(userState, ['self', 'isActivatedAccount']);
@@ -102,7 +104,7 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
   };
 
   return (
-    <PreferencesPage title={t('preferencesOptions')}>
+    <PreferencesPage title={t('preferencesOptions')} switchPreviousContent={switchPreviousContent}>
       <PreferencesSection title={t('preferencesOptionsAudio')}>
         <PreferencesRadio
           name="preferences-options-audio"

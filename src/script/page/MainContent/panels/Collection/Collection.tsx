@@ -38,8 +38,14 @@ import {AssetRepository} from '../../../../assets/AssetRepository';
 import {MessageRepository} from '../../../../conversation/MessageRepository';
 import {Conversation} from '../../../../entity/Conversation';
 import {MessageCategory} from '../../../../message/MessageCategory';
+import {ShowConversationOptions} from '../../../AppMain';
 
 interface CollectionDetailsProps {
+  showConversation: (
+    conversation: Conversation | string,
+    options: ShowConversationOptions,
+    domain?: string | null,
+  ) => void;
   conversation: Conversation;
   conversationRepository: ConversationRepository;
   assetRepository: AssetRepository;
@@ -76,6 +82,7 @@ function splitIntoCategories(messages: ContentMessage[]): Categories {
 }
 
 const Collection: React.FC<CollectionDetailsProps> = ({
+  showConversation,
   conversation,
   conversationRepository,
   assetRepository,
@@ -191,7 +198,7 @@ const Collection: React.FC<CollectionDetailsProps> = ({
           <button
             className="content-titlebar-icon"
             data-uie-name="do-close-collection"
-            onClick={() => amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversation, {})}
+            onClick={() => showConversation(conversation, {})}
             aria-label={t('fullsearchCancelLabel')}
           >
             <Icon.Close />
@@ -205,7 +212,7 @@ const Collection: React.FC<CollectionDetailsProps> = ({
           <FullSearch
             searchProvider={query => conversationRepository.searchInConversation(conversation, query)}
             change={setSearchTerm}
-            click={message => amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversation, {exposeMessage: message})}
+            click={message => showConversation(conversation, {exposeMessage: message})}
           />
           {content}
         </div>

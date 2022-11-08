@@ -20,14 +20,12 @@
 import {render} from '@testing-library/react';
 import {Runtime} from '@wireapp/commons';
 
-import {ContentViewModel} from 'src/script/view_model/ContentViewModel';
-
 import {Preferences} from './Preferences';
 
 describe('Preferences', () => {
   const defaultParams = {
-    contentViewModel: {} as ContentViewModel,
     onClose: jest.fn(),
+    switchContent: jest.fn(),
     teamRepository: {getTeam: jest.fn()},
   };
 

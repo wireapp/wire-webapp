@@ -18,20 +18,17 @@
  */
 
 import {CONV_TYPE} from '@wireapp/avs';
-import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {iterateItem} from 'Util/ArrayUtil';
 import {isEscapeKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import type {ActionsViewModel} from './ActionsViewModel';
 import {CallingViewModel} from './CallingViewModel';
-import {ContentViewModel} from './ContentViewModel';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 
 import type {CallingRepository} from '../calling/CallingRepository';
@@ -39,8 +36,6 @@ import type {ConversationRepository} from '../conversation/ConversationRepositor
 import {ConversationState} from '../conversation/ConversationState';
 import type {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
-import {PanelState} from '../page/RightSidebar';
-import {useAppMainState} from '../page/state';
 import {ContentState, ListState, useAppState} from '../page/useAppState';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {SearchRepository} from '../search/SearchRepository';
@@ -69,11 +64,9 @@ export class ListViewModel {
   public readonly teamRepository: TeamRepository;
   public readonly searchRepository: SearchRepository;
   private readonly actionsViewModel: ActionsViewModel;
-  public readonly contentViewModel: ContentViewModel;
   public readonly callingViewModel: CallingViewModel;
   private readonly isProAccount: ko.PureComputed<boolean>;
   public readonly selfUser: ko.Observable<User>;
-  private readonly visibleListItems: ko.PureComputed<(string | Conversation)[]>;
 
   constructor(mainViewModel: MainViewModel, repositories: ViewModelRepositories) {
     this.userState = container.resolve(UserState);
@@ -90,7 +83,6 @@ export class ListViewModel {
     this.searchRepository = repositories.search;
 
     this.actionsViewModel = mainViewModel.actions;
-    this.contentViewModel = mainViewModel.content;
     this.callingViewModel = mainViewModel.calling;
 
     this.isActivatedAccount = this.userState.isActivatedAccount;
@@ -100,31 +92,7 @@ export class ListViewModel {
     // State
     this.lastUpdate = ko.observable();
 
-    this.visibleListItems = ko.pureComputed(() => {
-      const {listState} = useAppState.getState();
-      const isStatePreferences = listState === ListState.PREFERENCES;
-
-      if (isStatePreferences) {
-        const preferenceItems = [
-          ContentState.PREFERENCES_ACCOUNT,
-          ContentState.PREFERENCES_DEVICES,
-          ContentState.PREFERENCES_OPTIONS,
-          ContentState.PREFERENCES_AV,
-        ];
-
-        if (!Runtime.isDesktopApp()) {
-          preferenceItems.push(ContentState.PREFERENCES_ABOUT);
-        }
-
-        return preferenceItems;
-      }
-
-      const hasConnectRequests = !!this.userState.connectRequests().length;
-      const states: (string | Conversation)[] = hasConnectRequests ? [ContentState.CONNECTION_REQUESTS] : [];
-
-      return states.concat(this.conversationState.conversations_unarchived());
-    });
-
+    // done.
     this._initSubscriptions();
   }
 
@@ -134,12 +102,6 @@ export class ListViewModel {
     amplify.subscribe(WebAppEvents.PREFERENCES.MANAGE_DEVICES, this.openPreferencesDevices);
     amplify.subscribe(WebAppEvents.PREFERENCES.SHOW_AV, this.openPreferencesAudioVideo);
     amplify.subscribe(WebAppEvents.SEARCH.SHOW, this.openStartUI);
-    amplify.subscribe(WebAppEvents.SHORTCUT.NEXT, this.goToNext);
-    amplify.subscribe(WebAppEvents.SHORTCUT.PREV, this.goToPrevious);
-    amplify.subscribe(WebAppEvents.SHORTCUT.ARCHIVE, this.clickToArchive);
-    amplify.subscribe(WebAppEvents.SHORTCUT.DELETE, this.clickToClear);
-    amplify.subscribe(WebAppEvents.SHORTCUT.NOTIFICATIONS, this.changeNotificationSetting);
-    amplify.subscribe(WebAppEvents.SHORTCUT.SILENCE, this.changeNotificationSetting); // todo: deprecated - remove when user base of wrappers version >= 3.4 is large enough
   };
 
   readonly answerCall = (conversationEntity: Conversation): void => {
@@ -161,23 +123,6 @@ export class ListViewModel {
     }
   };
 
-  readonly changeNotificationSetting = () => {
-    if (this.isProAccount()) {
-      const {rightSidebar} = useAppMainState.getState();
-      rightSidebar.goTo(PanelState.NOTIFICATIONS, {entity: this.conversationState.activeConversation()});
-    } else {
-      this.clickToToggleMute();
-    }
-  };
-
-  readonly goToNext = () => {
-    this.iterateActiveItem(true);
-  };
-
-  readonly goToPrevious = () => {
-    this.iterateActiveItem(false);
-  };
-
   onKeyDownListView = (keyboardEvent: KeyboardEvent) => {
     if (isEscapeKey(keyboardEvent)) {
       const newState = this.isActivatedAccount() ? ListState.CONVERSATIONS : ListState.TEMPORARY_GUEST;
@@ -185,77 +130,26 @@ export class ListViewModel {
     }
   };
 
-  private readonly iterateActiveItem = (reverse = false) => {
-    const {listState} = useAppState.getState();
-    const isStatePreferences = listState === ListState.PREFERENCES;
-
-    return isStatePreferences ? this.iterateActivePreference(reverse) : this.iterateActiveConversation(reverse);
-  };
-
-  private readonly iterateActiveConversation = (reverse: boolean) => {
-    const {contentState} = useAppState.getState();
-
-    const isStateRequests = contentState === ContentState.CONNECTION_REQUESTS;
-    const activeConversationItem = isStateRequests
-      ? ContentState.CONNECTION_REQUESTS
-      : this.conversationState.activeConversation();
-    const nextItem = iterateItem(this.visibleListItems(), activeConversationItem, reverse);
-    const isConnectionRequestItem = nextItem === ContentState.CONNECTION_REQUESTS;
-
-    if (isConnectionRequestItem) {
-      return this.contentViewModel.switchContent(ContentState.CONNECTION_REQUESTS);
-    }
-
-    if (nextItem) {
-      amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextItem, {});
-    }
-  };
-
-  private readonly iterateActivePreference = (reverse: boolean) => {
-    const {contentState} = useAppState.getState();
-    let activePreference = contentState;
-    const isDeviceDetails = activePreference === ContentState.PREFERENCES_DEVICE_DETAILS;
-
-    if (isDeviceDetails) {
-      activePreference = ContentState.PREFERENCES_DEVICES;
-    }
-
-    const nextPreference = iterateItem(this.visibleListItems(), activePreference, reverse) as ContentState;
-
-    if (nextPreference) {
-      this.contentViewModel.switchContent(nextPreference);
-    }
-  };
-
   openPreferencesAccount = async (): Promise<void> => {
     await this.teamRepository.getTeam();
 
     this.switchList(ListState.PREFERENCES);
-    this.contentViewModel.switchContent(ContentState.PREFERENCES_ACCOUNT);
   };
 
   readonly openPreferencesDevices = (): void => {
     this.switchList(ListState.PREFERENCES);
-
-    return this.contentViewModel.switchContent(ContentState.PREFERENCES_DEVICES);
   };
 
   readonly openPreferencesAbout = (): void => {
     this.switchList(ListState.PREFERENCES);
-
-    return this.contentViewModel.switchContent(ContentState.PREFERENCES_ABOUT);
   };
 
   readonly openPreferencesAudioVideo = (): void => {
     this.switchList(ListState.PREFERENCES);
-
-    return this.contentViewModel.switchContent(ContentState.PREFERENCES_AV);
   };
 
   readonly openPreferencesOptions = (): void => {
     this.switchList(ListState.PREFERENCES);
-
-    return this.contentViewModel.switchContent(ContentState.PREFERENCES_OPTIONS);
   };
 
   readonly openStartUI = (): void => {
@@ -294,19 +188,19 @@ export class ListViewModel {
   private readonly updateList = (newListState: ListState, respectLastState: boolean): void => {
     switch (newListState) {
       case ListState.PREFERENCES:
-        amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentState.PREFERENCES_ACCOUNT);
+        const {setContentState} = useAppState.getState();
+        setContentState(ContentState.PREFERENCES_ACCOUNT);
         break;
       default:
         if (respectLastState) {
-          this.contentViewModel.switchPreviousContent();
+          // TODO: Will be moved in ListViewModel refactor
+          amplify.publish('SWITCH_PREVIOUS_CONTENT');
         }
     }
   };
 
   readonly showTemporaryGuest = (): void => {
     this.switchList(ListState.TEMPORARY_GUEST);
-    const conversationEntity = this.conversationRepository.getMostRecentConversation();
-    amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
   };
 
   readonly onContextMenu = (
@@ -424,7 +318,7 @@ export class ListViewModel {
   };
 
   readonly clickToArchive = (conversationEntity = this.conversationState.activeConversation()): void => {
-    if (this.isActivatedAccount()) {
+    if (this.isActivatedAccount() && conversationEntity) {
       this.actionsViewModel.archiveConversation(conversationEntity);
     }
   };
@@ -445,7 +339,9 @@ export class ListViewModel {
   };
 
   readonly clickToClear = (conversationEntity = this.conversationState.activeConversation()): void => {
-    this.actionsViewModel.clearConversation(conversationEntity);
+    if (conversationEntity) {
+      this.actionsViewModel.clearConversation(conversationEntity);
+    }
   };
 
   readonly clickToLeave = (conversationEntity: Conversation): void => {
@@ -453,7 +349,9 @@ export class ListViewModel {
   };
 
   readonly clickToToggleMute = (conversationEntity = this.conversationState.activeConversation()): void => {
-    this.actionsViewModel.toggleMuteConversation(conversationEntity);
+    if (conversationEntity) {
+      this.actionsViewModel.toggleMuteConversation(conversationEntity);
+    }
   };
 
   readonly clickToOpenNotificationSettings = (

@@ -660,7 +660,8 @@ export class NotificationRepository {
     const isConnectionRequest = messageEntity.isMember() && (messageEntity as MemberMessage).isConnectionRequest();
     if (isConnectionRequest) {
       return () => {
-        amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentState.CONNECTION_REQUESTS);
+        const {setContentState} = useAppState.getState();
+        setContentState(ContentState.CONNECTION_REQUESTS);
       };
     }
 

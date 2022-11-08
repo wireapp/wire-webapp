@@ -32,15 +32,26 @@ import {Preferences} from './panels/Preferences';
 import {StartUI} from './panels/StartUI';
 import {TemporaryGuestConversations} from './panels/TemporatyGuestConversations';
 
+import {Conversation} from '../../entity/Conversation';
 import {User} from '../../entity/User';
 import {ListViewModel} from '../../view_model/ListViewModel';
-import {useAppState, ListState} from '../useAppState';
+import {ViewModelRepositories} from '../../view_model/MainViewModel';
+import {ShowConversationOptions} from '../AppMain';
+import {useAppState, ListState, ContentState} from '../useAppState';
 
 type LeftSidebarProps = {
   listViewModel: ListViewModel;
   selfUser: User;
   isActivatedAccount: boolean;
+  showConversation: (
+    conversation: Conversation | string,
+    options: ShowConversationOptions,
+    domain?: string | null,
+  ) => void;
+  switchContent: (contentState: ContentState) => void;
+  repositories: ViewModelRepositories;
 };
+
 const Animated: React.FC<{children: React.ReactNode}> = ({children, ...rest}) => {
   return (
     <CSSTransition classNames="fade-in-out" timeout={{enter: 700, exit: 300}} {...rest}>
@@ -49,10 +60,17 @@ const Animated: React.FC<{children: React.ReactNode}> = ({children, ...rest}) =>
   );
 };
 
-const LeftSidebar: React.FC<LeftSidebarProps> = ({listViewModel, selfUser, isActivatedAccount}) => {
-  const {conversationRepository, propertiesRepository} = listViewModel;
-  const repositories = listViewModel.contentViewModel.repositories;
+const LeftSidebar: React.FC<LeftSidebarProps> = ({
+  listViewModel,
+  selfUser,
+  isActivatedAccount,
+  showConversation,
+  switchContent,
+  repositories,
+}) => {
   const {listState} = useAppState();
+
+  const {conversation: conversationRepository, properties: propertiesRepository} = repositories;
 
   const switchList = (list: ListState) => listViewModel.switchList(list);
 
@@ -83,16 +101,14 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({listViewModel, selfUser, isAct
                 conversationRepository={conversationRepository}
                 propertiesRepository={propertiesRepository}
                 switchList={switchList}
+                switchContent={switchContent}
                 selfUser={selfUser}
+                showConversation={showConversation}
               />
             )}
 
             {listState === ListState.PREFERENCES && (
-              <Preferences
-                contentViewModel={listViewModel.contentViewModel}
-                teamRepository={repositories.team}
-                onClose={goHome}
-              />
+              <Preferences teamRepository={repositories.team} onClose={goHome} switchContent={switchContent} />
             )}
 
             {listState === ListState.ARCHIVE && (
@@ -101,6 +117,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({listViewModel, selfUser, isAct
                 conversationRepository={conversationRepository}
                 listViewModel={listViewModel}
                 onClose={goHome}
+                showConversation={showConversation}
               />
             )}
 
@@ -122,6 +139,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({listViewModel, selfUser, isAct
                 mainViewModel={listViewModel.mainViewModel}
                 userRepository={repositories.user}
                 isFederated={listViewModel.isFederated}
+                showConversation={showConversation}
               />
             )}
           </>

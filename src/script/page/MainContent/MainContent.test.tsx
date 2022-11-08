@@ -19,13 +19,13 @@
 
 import {act, render, screen, waitFor} from '@testing-library/react';
 
-import {ContentViewModel} from 'src/script/view_model/ContentViewModel';
-
 import {MainContent} from './MainContent';
 
 import {withTheme} from '../../auth/util/test/TestUtil';
-import {MainViewModel} from '../../view_model/MainViewModel';
-import {RootProvider} from '../RootProvider';
+import {Conversation} from '../../entity/Conversation';
+import {ActionsViewModel} from '../../view_model/ActionsViewModel';
+import {CallingViewModel} from '../../view_model/CallingViewModel';
+import {ViewModelRepositories} from '../../view_model/MainViewModel';
 import {ContentState, useAppState} from '../useAppState';
 
 jest.mock('./panels/preferences/AccountPreferences', () => ({
@@ -34,27 +34,24 @@ jest.mock('./panels/preferences/AccountPreferences', () => ({
 }));
 
 describe('Preferences', () => {
-  const mainViewModel = {
-    content: {
-      repositories: {} as any,
-    } as ContentViewModel,
-  } as MainViewModel;
-
   const defaultParams = {
+    actionsView: {} as ActionsViewModel,
+    activeConversation: new Conversation(),
+    callingView: {} as CallingViewModel,
+    isFederated: true,
     openRightSidebar: jest.fn(),
+    removeDevice: jest.fn(),
+    repositories: {} as ViewModelRepositories,
+    showConversation: jest.fn(),
+    switchContent: jest.fn(),
+    switchPreviousContent: jest.fn(),
   };
 
   it('renders the right component according to view state', () => {
     const {setContentState} = useAppState.getState();
 
     jest.useFakeTimers();
-    render(
-      withTheme(
-        <RootProvider value={mainViewModel}>
-          <MainContent {...defaultParams} />
-        </RootProvider>,
-      ),
-    );
+    render(withTheme(<MainContent {...defaultParams} />));
 
     expect(screen.queryByText('accessibility.headings.preferencesAbout')).toBeNull();
 

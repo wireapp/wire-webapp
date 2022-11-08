@@ -51,7 +51,7 @@ import {ActionsViewModel} from '../../view_model/ActionsViewModel';
 import {ViewModelRepositories} from '../../view_model/MainViewModel';
 import {RightSidebarParams} from '../AppMain';
 import {useAppMainState} from '../state';
-import {ContentState} from '../useAppState';
+import {ContentState, useAppState} from '../useAppState';
 
 export const OPEN_CONVERSATION_DETAILS = 'OPEN_CONVERSATION_DETAILS';
 export const rightPanelAnimationTimeout = 350; // ms
@@ -110,7 +110,8 @@ const RightSidebar: FC<RightSidebarProps> = ({
   const [isAddMode, setIsAddMode] = useState<boolean>(false);
   const [animatePanelToLeft, setAnimatePanelToLeft] = useState<boolean>(true);
 
-  const {rightSidebar} = useAppMainState.getState();
+  const {contentState} = useAppState();
+  const {rightSidebar} = useAppMainState();
   const currentState = rightSidebar.history.at(-1);
 
   const userEntity = currentEntity && isUserEntity(currentEntity) ? currentEntity : null;
@@ -160,7 +161,6 @@ const RightSidebar: FC<RightSidebarProps> = ({
   };
 
   useEffect(() => {
-    amplify.subscribe(WebAppEvents.CONTENT.SWITCH, switchContent);
     amplify.subscribe(OPEN_CONVERSATION_DETAILS, goToRoot);
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, (oldId: string, updatedMessageEntity: Message) => {
       if (currentState === PanelState.MESSAGE_DETAILS && oldId === currentEntity?.id) {
@@ -168,6 +168,10 @@ const RightSidebar: FC<RightSidebarProps> = ({
       }
     });
   }, []);
+
+  useEffect(() => {
+    switchContent(contentState);
+  }, [contentState]);
 
   if (!activeConversation) {
     return null;

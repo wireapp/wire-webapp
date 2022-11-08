@@ -59,6 +59,7 @@ import {UserState} from '../../../../user/UserState';
 import {AccentColorPicker} from '../../../AccentColorPicker';
 
 interface AccountPreferencesProps {
+  switchPreviousContent: () => void;
   importFile: (file: File) => void;
   clientRepository: ClientRepository;
   conversationRepository: ConversationRepository;
@@ -75,6 +76,7 @@ interface AccountPreferencesProps {
 const logger = getLogger('AccountPreferences');
 
 const AccountPreferences: React.FC<AccountPreferencesProps> = ({
+  switchPreviousContent,
   importFile,
   clientRepository,
   userRepository,
@@ -131,7 +133,7 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
   };
 
   return (
-    <PreferencesPage title={t('preferencesAccount')}>
+    <PreferencesPage title={t('preferencesAccount')} switchPreviousContent={switchPreviousContent}>
       <div
         css={{
           alignItems: 'center',

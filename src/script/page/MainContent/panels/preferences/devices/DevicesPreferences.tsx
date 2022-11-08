@@ -41,6 +41,7 @@ import {useKoSubscribableChildren} from '../../../../../util/ComponentUtil';
 import {PreferencesPage} from '../components/PreferencesPage';
 
 interface DevicesPreferencesProps {
+  switchPreviousContent: () => void;
   clientState: ClientState;
   conversationState: ConversationState;
   cryptographyRepository: CryptographyRepository;
@@ -127,6 +128,7 @@ const Device: React.FC<{
 };
 
 const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
+  switchPreviousContent,
   clientState = container.resolve(ClientState),
   userState = container.resolve(UserState),
   conversationState = container.resolve(ConversationState),
@@ -159,7 +161,7 @@ const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
   }
 
   return (
-    <PreferencesPage title={t('preferencesDevices')}>
+    <PreferencesPage title={t('preferencesDevices')} switchPreviousContent={switchPreviousContent}>
       <fieldset className="preferences-section" data-uie-name="preferences-device-current">
         <legend className="preferences-header">{t('preferencesDevicesCurrent')}</legend>
         <DetailedDevice device={currentClient} fingerprint={cryptographyRepository.getLocalFingerprint()} />

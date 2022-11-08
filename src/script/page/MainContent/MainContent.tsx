@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, ReactNode, useContext, useState} from 'react';
+import {FC, ReactNode, useState} from 'react';
 
 import cx from 'classnames';
 import {CSSTransition, SwitchTransition} from 'react-transition-group';
@@ -28,7 +28,6 @@ import {ConversationList} from 'Components/Conversation';
 import {HistoryExport} from 'Components/HistoryExport';
 import {HistoryImport} from 'Components/HistoryImport';
 import {Icon} from 'Components/Icon';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {incomingCssClass, removeAnimationsClass} from 'Util/util';
 
@@ -39,13 +38,18 @@ import {AVPreferences} from './panels/preferences/AVPreferences';
 import {DevicesPreferences} from './panels/preferences/devices/DevicesPreferences';
 import {OptionPreferences} from './panels/preferences/OptionPreferences';
 
+import {ClientEntity} from '../../client/ClientEntity';
 import {ClientState} from '../../client/ClientState';
 import {ConversationState} from '../../conversation/ConversationState';
+import {Conversation} from '../../entity/Conversation';
+import {Message} from '../../entity/message/Message';
 import {TeamState} from '../../team/TeamState';
 import {UserState} from '../../user/UserState';
-import {RightSidebarParams} from '../AppMain';
+import {ActionsViewModel} from '../../view_model/ActionsViewModel';
+import {CallingViewModel} from '../../view_model/CallingViewModel';
+import {ViewModelRepositories} from '../../view_model/MainViewModel';
+import {RightSidebarParams, ShowConversationOptions} from '../AppMain';
 import {PanelState} from '../RightSidebar';
-import {RootContext} from '../RootProvider';
 import {ContentState, useAppState} from '../useAppState';
 
 const Animated: FC<{children: ReactNode}> = ({children, ...rest}) => (
@@ -54,47 +58,61 @@ const Animated: FC<{children: ReactNode}> = ({children, ...rest}) => (
   </CSSTransition>
 );
 
+const statesTitle: Partial<Record<ContentState, string>> = {
+  [ContentState.CONNECTION_REQUESTS]: t('accessibility.headings.connectionRequests'),
+  [ContentState.CONVERSATION]: t('accessibility.headings.conversation'),
+  [ContentState.HISTORY_EXPORT]: t('accessibility.headings.historyExport'),
+  [ContentState.HISTORY_IMPORT]: t('accessibility.headings.historyImport'),
+  [ContentState.COLLECTION]: t('accessibility.headings.collection'),
+  [ContentState.PREFERENCES_ABOUT]: t('accessibility.headings.preferencesAbout'),
+  [ContentState.PREFERENCES_ACCOUNT]: t('accessibility.headings.preferencesAccount'),
+  [ContentState.PREFERENCES_AV]: t('accessibility.headings.preferencesAV'),
+  [ContentState.PREFERENCES_DEVICES]: t('accessibility.headings.preferencesDevices'),
+  [ContentState.PREFERENCES_OPTIONS]: t('accessibility.headings.preferencesOptions'),
+  [ContentState.WATERMARK]: t('accessibility.headings.noConversation'),
+};
+
 interface MainContentProps {
+  activeConversation: Conversation;
+  actionsView: ActionsViewModel;
+  callingView: CallingViewModel;
   openRightSidebar: (panelState: PanelState, params: RightSidebarParams, compareEntityId?: boolean) => void;
+  switchPreviousContent: () => void;
+  showConversation: (
+    conversation: Conversation | string,
+    options: ShowConversationOptions,
+    domain?: string | null,
+  ) => void;
+  repositories: ViewModelRepositories;
+  switchContent: (contentState: ContentState) => void;
+  isFederated: boolean;
+  removeDevice: (clientEntity: ClientEntity) => Promise<ClientEntity[]> | Promise<void>;
+  initialMessage?: Message;
   isRightSidebarOpen?: boolean;
   conversationState?: ConversationState;
 }
 
 const MainContent: FC<MainContentProps> = ({
+  activeConversation,
+  actionsView,
+  callingView,
   openRightSidebar,
+  switchPreviousContent,
+  showConversation,
+  repositories,
+  switchContent,
+  isFederated,
+  removeDevice,
+  initialMessage,
   isRightSidebarOpen = false,
   conversationState = container.resolve(ConversationState),
 }) => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const mainViewModel = useContext(RootContext);
 
   const {contentState} = useAppState();
 
-  if (!mainViewModel) {
-    return null;
-  }
-  const {content: contentViewModel} = mainViewModel;
-  const {initialMessage, isFederated, repositories, switchContent} = contentViewModel;
-
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
-
   const teamState = container.resolve(TeamState);
   const userState = container.resolve(UserState);
-
-  const statesTitle: Partial<Record<ContentState, string>> = {
-    [ContentState.CONNECTION_REQUESTS]: t('accessibility.headings.connectionRequests'),
-    [ContentState.CONVERSATION]: t('accessibility.headings.conversation'),
-    [ContentState.HISTORY_EXPORT]: t('accessibility.headings.historyExport'),
-    [ContentState.HISTORY_IMPORT]: t('accessibility.headings.historyImport'),
-    [ContentState.COLLECTION]: t('accessibility.headings.collection'),
-    [ContentState.PREFERENCES_ABOUT]: t('accessibility.headings.preferencesAbout'),
-    [ContentState.PREFERENCES_ACCOUNT]: t('accessibility.headings.preferencesAccount'),
-    [ContentState.PREFERENCES_AV]: t('accessibility.headings.preferencesAV'),
-    [ContentState.PREFERENCES_DEVICES]: t('accessibility.headings.preferencesDevices'),
-    [ContentState.PREFERENCES_OPTIONS]: t('accessibility.headings.preferencesOptions'),
-    [ContentState.WATERMARK]: t('accessibility.headings.noConversation'),
-  };
 
   const title = statesTitle[contentState];
 
@@ -112,10 +130,11 @@ const MainContent: FC<MainContentProps> = ({
           <>
             {contentState === ContentState.COLLECTION && activeConversation && (
               <Collection
+                assetRepository={repositories.asset}
                 conversation={activeConversation}
                 conversationRepository={repositories.conversation}
-                assetRepository={repositories.asset}
                 messageRepository={repositories.message}
+                showConversation={showConversation}
               />
             )}
 
@@ -125,7 +144,7 @@ const MainContent: FC<MainContentProps> = ({
                 className={cx('preferences-page preferences-about', incomingCssClass)}
                 ref={removeAnimationsClass}
               >
-                <AboutPreferences />
+                <AboutPreferences switchPreviousContent={switchPreviousContent} />
               </div>
             )}
 
@@ -136,6 +155,7 @@ const MainContent: FC<MainContentProps> = ({
                 ref={removeAnimationsClass}
               >
                 <AccountPreferences
+                  switchPreviousContent={switchPreviousContent}
                   importFile={onFileUpload}
                   showDomain={isFederated}
                   switchContent={switchContent}
@@ -157,6 +177,7 @@ const MainContent: FC<MainContentProps> = ({
                   callingRepository={repositories.calling}
                   mediaRepository={repositories.media}
                   propertiesRepository={repositories.properties}
+                  switchPreviousContent={switchPreviousContent}
                 />
               </div>
             )}
@@ -171,10 +192,11 @@ const MainContent: FC<MainContentProps> = ({
                   clientState={container.resolve(ClientState)}
                   conversationState={conversationState}
                   cryptographyRepository={repositories.cryptography}
-                  removeDevice={contentViewModel.mainViewModel.actions.deleteClient}
+                  removeDevice={removeDevice}
                   resetSession={(userId, device, conversation) =>
                     repositories.message.resetSession(userId, device.id, conversation)
                   }
+                  switchPreviousContent={switchPreviousContent}
                   userState={container.resolve(UserState)}
                   verifyDevice={(userId, device, verified) =>
                     repositories.client.verifyClient(userId, device, verified)
@@ -189,7 +211,10 @@ const MainContent: FC<MainContentProps> = ({
                 className={cx('preferences-page preferences-options', incomingCssClass)}
                 ref={removeAnimationsClass}
               >
-                <OptionPreferences propertiesRepository={repositories.properties} />
+                <OptionPreferences
+                  propertiesRepository={repositories.properties}
+                  switchPreviousContent={switchPreviousContent}
+                />
               </div>
             )}
 
@@ -202,21 +227,29 @@ const MainContent: FC<MainContentProps> = ({
             )}
 
             {contentState === ContentState.CONNECTION_REQUESTS && (
-              <ConnectRequests teamState={teamState} userState={userState} />
+              <ConnectRequests actionsView={actionsView} teamState={teamState} userState={userState} />
             )}
 
-            {contentState === ContentState.CONVERSATION && (
+            {contentState === ContentState.CONVERSATION && activeConversation && (
               <ConversationList
+                activeConversation={activeConversation}
+                actionsView={actionsView}
+                callingView={callingView}
                 initialMessage={initialMessage}
                 teamState={teamState}
                 userState={userState}
                 isRightSidebarOpen={isRightSidebarOpen}
                 openRightSidebar={openRightSidebar}
+                repositories={repositories}
               />
             )}
 
             {contentState === ContentState.HISTORY_EXPORT && (
-              <HistoryExport userState={userState} switchContent={switchContent} />
+              <HistoryExport
+                backupRepository={repositories.backup}
+                userState={userState}
+                switchContent={switchContent}
+              />
             )}
 
             {contentState === ContentState.HISTORY_IMPORT && uploadedFile && (

@@ -41,10 +41,11 @@ import {Conversation} from '../../../../entity/Conversation';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
 import {createNavigate} from '../../../../router/routerBindings';
 import {ListViewModel} from '../../../../view_model/ListViewModel';
+import {ShowConversationOptions} from '../../../AppMain';
 import {useAppMainState, ViewType} from '../../../state';
 import {ContentState, useAppState} from '../../../useAppState';
 
-export const ConversationsList: React.FC<{
+interface ConversationsListProps {
   callState: CallState;
   connectRequests: User[];
   conversationRepository: ConversationRepository;
@@ -56,7 +57,15 @@ export const ConversationsList: React.FC<{
   isConversationListFocus: boolean;
   handleFocus: (index: number) => void;
   handleArrowKeyDown: (e: React.KeyboardEvent) => void;
-}> = ({
+  showConversation: (
+    conversation: Conversation | string,
+    options: ShowConversationOptions,
+    domain?: string | null,
+  ) => void;
+  switchContent: (contentState: ContentState) => void;
+}
+
+export const ConversationsList: React.FC<ConversationsListProps> = ({
   conversations,
   listViewModel,
   viewStyle,
@@ -68,6 +77,8 @@ export const ConversationsList: React.FC<{
   isConversationListFocus,
   handleFocus,
   handleArrowKeyDown,
+  showConversation,
+  switchContent,
 }) => {
   const {contentState} = useAppState();
 
@@ -91,10 +102,11 @@ export const ConversationsList: React.FC<{
   };
 
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
+  const {clearHistory} = useAppMainState(state => state.rightSidebar);
 
   const onConnectionRequestClick = () => {
     setCurrentView(ViewType.CENTRAL_COLUMN);
-    listViewModel.contentViewModel.switchContent(ContentState.CONNECTION_REQUESTS);
+    switchContent(ContentState.CONNECTION_REQUESTS);
   };
 
   const conversationView =
@@ -113,10 +125,10 @@ export const ConversationsList: React.FC<{
               conversation={conversation}
               onClick={event => {
                 if (!isActiveConversation(conversation)) {
-                  const {rightSidebar} = useAppMainState.getState();
-                  rightSidebar.clearHistory();
+                  clearHistory();
                 }
 
+                showConversation(conversation.id, {}, conversation.domain);
                 createNavigate(generateConversationUrl(conversation.id, conversation.domain))(event);
               }}
               isSelected={isActiveConversation}

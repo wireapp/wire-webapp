@@ -25,7 +25,6 @@ import {getLogger, Logger} from 'Util/Logger';
 
 import {ActionsViewModel} from './ActionsViewModel';
 import {CallingViewModel} from './CallingViewModel';
-import {ContentViewModel} from './ContentViewModel';
 import {FaviconViewModel} from './FaviconViewModel';
 import {ListViewModel} from './ListViewModel';
 
@@ -86,7 +85,6 @@ export interface ViewModelRepositories {
 export class MainViewModel {
   actions: ActionsViewModel;
   calling: CallingViewModel;
-  content: ContentViewModel;
   favicon: FaviconViewModel;
   list: ListViewModel;
   logger: Logger;
@@ -146,7 +144,6 @@ export class MainViewModel {
       this.selfUser,
       this.multitasking,
     );
-    this.content = new ContentViewModel(this, repositories);
     this.list = new ListViewModel(this, repositories);
 
     this.favicon = new FaviconViewModel(amplify);

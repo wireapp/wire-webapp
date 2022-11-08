@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, useContext, useEffect, useState} from 'react';
+import {FC, useEffect, useState} from 'react';
 
 import {container} from 'tsyringe';
 
@@ -29,9 +29,9 @@ import {getLogger} from 'Util/Logger';
 import {getCurrentDate} from 'Util/TimeUtil';
 import {downloadBlob} from 'Util/util';
 
+import {BackupRepository} from '../../backup/BackupRepository';
 import {CancelError} from '../../backup/Error';
 import {Config} from '../../Config';
-import {RootContext} from '../../page/RootProvider';
 import {UserState} from '../../user/UserState';
 
 enum ExportState {
@@ -46,11 +46,16 @@ export const CONFIG = {
 };
 
 interface HistoryExportProps {
+  backupRepository: BackupRepository;
   switchContent: (contentState: ContentState) => void;
   readonly userState: UserState;
 }
 
-const HistoryExport: FC<HistoryExportProps> = ({switchContent, userState = container.resolve(UserState)}) => {
+const HistoryExport: FC<HistoryExportProps> = ({
+  backupRepository,
+  switchContent,
+  userState = container.resolve(UserState),
+}) => {
   const logger = getLogger('HistoryExport');
 
   const [historyState, setHistoryState] = useState<ExportState>(ExportState.PREPARING);
@@ -63,18 +68,9 @@ const HistoryExport: FC<HistoryExportProps> = ({switchContent, userState = conta
 
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
 
-  const mainViewModel = useContext(RootContext);
-
   useEffect(() => {
     exportHistory();
   }, []);
-
-  if (!mainViewModel) {
-    return null;
-  }
-
-  const {content: contentViewModel} = mainViewModel;
-  const backupRepository = contentViewModel.repositories.backup;
 
   const loadingProgress = Math.floor((numberOfProcessedRecords / numberOfRecords) * 100);
 

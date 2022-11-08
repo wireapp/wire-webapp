@@ -34,6 +34,7 @@ import {EmojiItem} from './EmojiItem';
 import {inlineReplacements} from './inlineReplacements';
 
 import {MentionEntity} from '../../message/MentionEntity';
+import {useAppState} from '../../page/useAppState';
 import {PropertiesRepository} from '../../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 import {StorageKey} from '../../storage';
@@ -103,6 +104,8 @@ const useEmoji = (
   const [emojiList, setEmojiList] = useState<EmojiListItem[]>();
 
   const [mappedEmojiList, setMappedEmojiList] = useState<EmojiListItem[]>([]);
+
+  const {contentState} = useAppState();
 
   const emojiUsageCount: Record<string, number> = loadValue(StorageKey.CONVERSATION.EMOJI_USAGE_COUNT) || {};
 
@@ -461,6 +464,10 @@ const useEmoji = (
   }, []);
 
   useEffect(() => {
+    removeEmojiPopup();
+  }, [contentState]);
+
+  useEffect(() => {
     if (textareaElement && emojiWrapperRef.current && mappedEmojiList.length) {
       const {top, left} = getEmojiPopupPosition(textareaElement, emojiWrapperRef.current);
 
@@ -470,7 +477,6 @@ const useEmoji = (
   }, [mappedEmojiList, textareaElement]);
 
   useEffect(() => {
-    amplify.subscribe(WebAppEvents.CONTENT.SWITCH, removeEmojiPopup);
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE, setShouldReplaceEmoji);
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, (properties: WebappProperties) => {
       setShouldReplaceEmoji(properties.settings.emoji.replace_inline);

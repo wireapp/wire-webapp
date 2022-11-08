@@ -27,14 +27,13 @@ import {t} from 'Util/LocalizerUtil';
 import {ListWrapper} from './ListWrapper';
 
 import {TeamRepository} from '../../../team/TeamRepository';
-import {ContentViewModel} from '../../../view_model/ContentViewModel';
 import {useAppMainState, ViewType} from '../../state';
 import {ContentState, useAppState} from '../../useAppState';
 
 type PreferencesProps = {
-  contentViewModel: ContentViewModel;
   onClose: () => void;
   teamRepository: Pick<TeamRepository, 'getTeam'>;
+  switchContent: (contentState: ContentState) => void;
 };
 
 const PreferenceItem: React.FC<{
@@ -61,7 +60,7 @@ const PreferenceItem: React.FC<{
   );
 };
 
-const Preferences: React.FC<PreferencesProps> = ({contentViewModel, teamRepository, onClose}) => {
+const Preferences: React.FC<PreferencesProps> = ({teamRepository, onClose, switchContent}) => {
   const {contentState} = useAppState();
 
   useEffect(() => {
@@ -76,7 +75,7 @@ const Preferences: React.FC<PreferencesProps> = ({contentViewModel, teamReposito
 
   const onClickSelect = (item: typeof items[number]) => {
     setCurrentView(ViewType.CENTRAL_COLUMN);
-    contentViewModel.switchContent(item.id);
+    switchContent(item.id);
   };
 
   const items = [

@@ -49,6 +49,7 @@ import {TeamRepository} from '../../../../team/TeamRepository';
 import {TeamState} from '../../../../team/TeamState';
 import {validateHandle} from '../../../../user/UserHandleGenerator';
 import {UserState} from '../../../../user/UserState';
+import {ShowConversationOptions} from '../../../AppMain';
 
 export type SearchResultsData = {contacts: User[]; groups: Conversation[]; others: User[]};
 
@@ -71,6 +72,11 @@ export const PeopleTab: React.FC<{
   teamState: TeamState;
   userRepository: UserRepository;
   userState: UserState;
+  showConversation: (
+    conversation: Conversation | string,
+    options: ShowConversationOptions,
+    domain?: string | null,
+  ) => void;
 }> = ({
   searchQuery,
   isTeam,
@@ -90,6 +96,7 @@ export const PeopleTab: React.FC<{
   onClickConversation,
   onClickUser,
   onSearchResults,
+  showConversation,
 }) => {
   const logger = getLogger('PeopleSearch');
   const [topPeople, setTopPeople] = useState<User[]>([]);
@@ -276,7 +283,9 @@ export const PeopleTab: React.FC<{
                   type="button"
                   onClick={() =>
                     conversationRepository.createGuestRoom().then(conversation => {
-                      amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversation, {});
+                      if (conversation) {
+                        showConversation(conversation, {});
+                      }
                     })
                   }
                   data-uie-name="do-create-guest-room"

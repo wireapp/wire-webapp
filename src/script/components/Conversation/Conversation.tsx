@@ -22,7 +22,6 @@ import {
   MouseEvent as ReactMouseEvent,
   KeyboardEvent as ReactKeyboardEvent,
   UIEvent,
-  useContext,
   useEffect,
   useState,
 } from 'react';
@@ -47,7 +46,7 @@ import {safeMailOpen, safeWindowOpen} from 'Util/SanitizationUtil';
 import {incomingCssClass, removeAnimationsClass} from 'Util/util';
 
 import {ConversationState} from '../../conversation/ConversationState';
-import {Conversation as ConversationEntity} from '../../entity/Conversation';
+import {Conversation, Conversation as ConversationEntity} from '../../entity/Conversation';
 import {ContentMessage} from '../../entity/message/ContentMessage';
 import {DecryptErrorMessage} from '../../entity/message/DecryptErrorMessage';
 import {MemberMessage} from '../../entity/message/MemberMessage';
@@ -61,30 +60,38 @@ import {ServiceEntity} from '../../integration/ServiceEntity';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {RightSidebarParams} from '../../page/AppMain';
 import {PanelState} from '../../page/RightSidebar';
-import {RootContext} from '../../page/RootProvider';
 import {TeamState} from '../../team/TeamState';
 import {UserState} from '../../user/UserState';
+import {ActionsViewModel} from '../../view_model/ActionsViewModel';
+import {CallingViewModel} from '../../view_model/CallingViewModel';
+import {ViewModelRepositories} from '../../view_model/MainViewModel';
 
 type ReadMessageBuffer = {conversation: ConversationEntity; message: Message};
 
 interface ConversationListProps {
-  readonly initialMessage?: Message;
   readonly teamState: TeamState;
   readonly userState: UserState;
+  activeConversation: Conversation;
+  actionsView: ActionsViewModel;
+  callingView: CallingViewModel;
   openRightSidebar: (panelState: PanelState, params: RightSidebarParams, compareEntityId?: boolean) => void;
+  repositories: ViewModelRepositories;
+  readonly initialMessage?: Message;
   isRightSidebarOpen?: boolean;
 }
 
 const ConversationList: FC<ConversationListProps> = ({
+  activeConversation,
   initialMessage,
+  actionsView,
+  callingView,
   teamState,
   userState,
   openRightSidebar,
+  repositories,
   isRightSidebarOpen = false,
 }) => {
   const messageListLogger = getLogger('ConversationList');
-
-  const mainViewModel = useContext(RootContext);
 
   const [isConversationLoaded, setIsConversationLoaded] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>('');
@@ -94,9 +101,8 @@ const ConversationList: FC<ConversationListProps> = ({
 
   const conversationState = container.resolve(ConversationState);
   const callState = container.resolve(CallState);
-  const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
-  const {is1to1, isRequest} = useKoSubscribableChildren(activeConversation!, ['is1to1', 'isRequest']);
+  const {is1to1, isRequest} = useKoSubscribableChildren(activeConversation, ['is1to1', 'isRequest']);
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
   const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
 
@@ -124,13 +130,6 @@ const ConversationList: FC<ConversationListProps> = ({
     }
   }, [readMessagesBuffer.length]);
 
-  if (!mainViewModel) {
-    return null;
-  }
-
-  const {content: contentViewModel} = mainViewModel;
-  const {conversationRepository, repositories} = contentViewModel;
-
   const openGiphy = (text: string) => {
     setInputValue(text);
     setIsGiphyModalOpen(true);
@@ -144,8 +143,8 @@ const ConversationList: FC<ConversationListProps> = ({
 
   const clickOnCancelRequest = (messageEntity: MemberMessage): void => {
     if (activeConversation) {
-      const nextConversationEntity = conversationRepository.getNextConversation(activeConversation);
-      mainViewModel.actions.cancelConnectionRequest(messageEntity.otherUser(), true, nextConversationEntity);
+      const nextConversationEntity = repositories.conversation.getNextConversation(activeConversation);
+      actionsView.cancelConnectionRequest(messageEntity.otherUser(), true, nextConversationEntity);
     }
   };
 
@@ -383,15 +382,14 @@ const ConversationList: FC<ConversationListProps> = ({
             conversation={activeConversation}
             userState={userState}
             teamState={teamState}
-            callActions={mainViewModel.calling.callActions}
+            callActions={callingView.callActions}
             openRightSidebar={openRightSidebar}
             isRightSidebarOpen={isRightSidebarOpen}
           />
 
           {activeCalls.map(call => {
             const conversation = conversationState.findConversation(call.conversationId);
-            const callingViewModel = mainViewModel.calling;
-            const callingRepository = callingViewModel.callingRepository;
+            const callingRepository = callingView.callingRepository;
 
             if (!conversation || !smBreakpoint) {
               return null;
@@ -402,10 +400,10 @@ const ConversationList: FC<ConversationListProps> = ({
                 <CallingCell
                   classifiedDomains={classifiedDomains}
                   call={call}
-                  callActions={callingViewModel.callActions}
+                  callActions={callingView.callActions}
                   callingRepository={callingRepository}
                   conversation={conversation}
-                  multitasking={callingViewModel.multitasking}
+                  multitasking={callingView.multitasking}
                 />
               </div>
             );
@@ -415,9 +413,9 @@ const ConversationList: FC<ConversationListProps> = ({
             conversation={activeConversation}
             selfUser={selfUser}
             initialMessage={initialMessage}
-            conversationRepository={conversationRepository}
+            conversationRepository={repositories.conversation}
             messageRepository={repositories.message}
-            messageActions={mainViewModel.actions}
+            messageActions={actionsView}
             invitePeople={clickOnInvitePeople}
             cancelConnectionRequest={clickOnCancelRequest}
             showUserDetails={showUserDetails}

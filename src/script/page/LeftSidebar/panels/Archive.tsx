@@ -19,8 +19,6 @@
 
 import React, {useEffect} from 'react';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
 import {ConversationListCell} from 'Components/list/ConversationListCell';
@@ -34,6 +32,7 @@ import {ConversationState} from '../../../conversation/ConversationState';
 import {Conversation} from '../../../entity/Conversation';
 import {useRoveFocus} from '../../../hooks/useRoveFocus';
 import {ListViewModel} from '../../../view_model/ListViewModel';
+import {ShowConversationOptions} from '../../AppMain';
 
 type ArchiveProps = {
   answerCall: (conversation: Conversation) => void;
@@ -41,6 +40,11 @@ type ArchiveProps = {
   conversationState?: ConversationState;
   listViewModel: ListViewModel;
   onClose: () => void;
+  showConversation: (
+    conversation: Conversation | string,
+    options: ShowConversationOptions,
+    domain?: string | null,
+  ) => void;
 };
 
 const Archive: React.FC<ArchiveProps> = ({
@@ -48,6 +52,7 @@ const Archive: React.FC<ArchiveProps> = ({
   conversationRepository,
   answerCall,
   onClose,
+  showConversation,
   conversationState = container.resolve(ConversationState),
 }) => {
   const {conversations_archived: conversations} = useKoSubscribableChildren(conversationState, [
@@ -57,7 +62,7 @@ const Archive: React.FC<ArchiveProps> = ({
   const onClickConversation = async (conversation: Conversation) => {
     await conversationRepository.unarchiveConversation(conversation, true, 'opened conversation from archive');
     onClose();
-    amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversation, {});
+    showConversation(conversation, {});
   };
 
   useEffect(() => {

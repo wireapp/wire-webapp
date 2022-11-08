@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -34,13 +34,14 @@ import {useUserModalState} from './UserModal.state';
 
 import {Config} from '../../../Config';
 import {User} from '../../../entity/User';
-import {RootContext} from '../../../page/RootProvider';
 import {Core} from '../../../service/CoreSingleton';
 import {TeamState} from '../../../team/TeamState';
 import {UserRepository} from '../../../user/UserRepository';
 import {UserState} from '../../../user/UserState';
+import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 
 export interface UserModalProps {
+  actionsView: ActionsViewModel;
   userRepository: UserRepository;
   userState?: UserState;
   teamState?: TeamState;
@@ -50,6 +51,7 @@ export interface UserModalProps {
 const brandName = Config.getConfig().BRAND_NAME;
 
 interface UserModalUserActionsSectionProps {
+  actionsView: ActionsViewModel;
   user: User;
   onAction: () => void;
   isSelfActivated: boolean;
@@ -57,13 +59,13 @@ interface UserModalUserActionsSectionProps {
 }
 
 const UserModalUserActionsSection: React.FC<UserModalUserActionsSectionProps> = ({
+  actionsView,
   user,
   onAction,
   isSelfActivated,
   selfUser,
 }) => {
   const {isBlockedLegalHold} = useKoSubscribableChildren(user, ['isBlockedLegalHold']);
-  const mainViewModel = useContext(RootContext);
 
   if (isBlockedLegalHold) {
     const replaceLinkLegalHold = replaceLink(
@@ -81,14 +83,10 @@ const UserModalUserActionsSection: React.FC<UserModalUserActionsSectionProps> = 
     );
   }
 
-  if (!mainViewModel) {
-    return null;
-  }
-
   return (
     <UserActions
       user={user}
-      actionsViewModel={mainViewModel.actions}
+      actionsViewModel={actionsView}
       onAction={onAction}
       isSelfActivated={isSelfActivated}
       selfUser={selfUser}
@@ -97,6 +95,7 @@ const UserModalUserActionsSection: React.FC<UserModalUserActionsSectionProps> = 
 };
 
 const UserModal: React.FC<UserModalProps> = ({
+  actionsView,
   userRepository,
   core = container.resolve(Core),
   userState = container.resolve(UserState),
@@ -168,6 +167,7 @@ const UserModal: React.FC<UserModalProps> = ({
               <EnrichedFields user={user} showDomain={isFederated} />
 
               <UserModalUserActionsSection
+                actionsView={actionsView}
                 user={user}
                 onAction={hide}
                 isSelfActivated={isActivatedAccount}

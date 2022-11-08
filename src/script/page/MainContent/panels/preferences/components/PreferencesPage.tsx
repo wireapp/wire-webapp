@@ -17,29 +17,25 @@
  *
  */
 
-import React, {useContext} from 'react';
+import {FC, ReactNode} from 'react';
 
 import {IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
 
-import {RootContext} from 'src/script/page/RootProvider';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {initFadingScrollbar} from 'src/script/ui/fadingScrollbar';
 
 interface PreferencesPageProps {
-  children: React.ReactNode;
+  children: ReactNode;
+  switchPreviousContent: () => void;
   title: string;
 }
 
-const PreferencesPage: React.FC<PreferencesPageProps> = ({title, children}) => {
+const PreferencesPage: FC<PreferencesPageProps> = ({title, switchPreviousContent, children}) => {
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
   const smBreakpoint = useMatchMedia('max-width: 640px');
 
   const {currentView, setCurrentView} = useAppMainState(state => state.responsiveView);
   const isCentralColumn = currentView == ViewType.CENTRAL_COLUMN;
-
-  const root = useContext(RootContext);
-
-  const goHome = () => root?.content.switchPreviousContent();
 
   return (
     <div style={{display: 'flex', flexDirection: 'column', height: '100vh'}}>
@@ -58,7 +54,7 @@ const PreferencesPage: React.FC<PreferencesPageProps> = ({title, children}) => {
             variant={IconButtonVariant.SECONDARY}
             className="conversation-title-bar-icon icon-close"
             css={{marginBottom: 0}}
-            onClick={goHome}
+            onClick={switchPreviousContent}
           />
         )}
       </div>

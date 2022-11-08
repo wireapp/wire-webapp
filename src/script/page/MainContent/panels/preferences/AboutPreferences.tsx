@@ -33,10 +33,14 @@ import {UserState} from '../../../../user/UserState';
 import {useKoSubscribableChildren} from '../../../../util/ComponentUtil';
 
 interface AboutPreferencesProps {
+  switchPreviousContent: () => void;
   userState?: UserState;
 }
 
-const AboutPreferences: React.FC<AboutPreferencesProps> = ({userState = container.resolve(UserState)}) => {
+const AboutPreferences: React.FC<AboutPreferencesProps> = ({
+  switchPreviousContent,
+  userState = container.resolve(UserState),
+}) => {
   const {self} = useKoSubscribableChildren(userState, ['self']);
   const {inTeam} = useKoSubscribableChildren(self, ['inTeam']);
   const config = Config.getConfig();
@@ -53,7 +57,7 @@ const AboutPreferences: React.FC<AboutPreferencesProps> = ({userState = containe
   const showSupportSection = !!(config.URL.SUPPORT.INDEX || config.URL.SUPPORT.CONTACT);
 
   return (
-    <PreferencesPage title={t('preferencesAbout')}>
+    <PreferencesPage title={t('preferencesAbout')} switchPreviousContent={switchPreviousContent}>
       {showSupportSection && (
         <PreferencesSection title={t('preferencesAboutSupport')}>
           <ul className="preferences-about-list">

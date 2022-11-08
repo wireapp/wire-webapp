@@ -38,12 +38,14 @@ interface AVPreferencesProps {
   callingRepository: CallingRepository;
   mediaRepository: MediaRepository;
   propertiesRepository: PropertiesRepository;
+  switchPreviousContent: () => void;
 }
 
 const AVPreferences: React.FC<AVPreferencesProps> = ({
   mediaRepository: {devicesHandler, constraintsHandler, streamHandler},
   propertiesRepository,
   callingRepository,
+  switchPreviousContent,
 }) => {
   const deviceSupport = useKoSubscribableChildren(devicesHandler?.deviceSupport, [
     DeviceTypes.AUDIO_INPUT,
@@ -52,7 +54,7 @@ const AVPreferences: React.FC<AVPreferencesProps> = ({
   ]);
 
   return (
-    <PreferencesPage title={t('preferencesAV')}>
+    <PreferencesPage title={t('preferencesAV')} switchPreviousContent={switchPreviousContent}>
       {deviceSupport.audioInput && (
         <MicrophonePreferences
           {...{devicesHandler, streamHandler}}

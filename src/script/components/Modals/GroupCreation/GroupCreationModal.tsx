@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useContext, useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/ConversationReceiptModeUpdateData';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
@@ -48,15 +48,23 @@ import {
   toggleFeature,
 } from '../../../conversation/ConversationAccessPermission';
 import {ConversationRepository} from '../../../conversation/ConversationRepository';
+import {Conversation} from '../../../entity/Conversation';
 import {User} from '../../../entity/User';
 import {isProtocolOption, ProtocolOption} from '../../../guards/Protocol';
-import {RootContext} from '../../../page/RootProvider';
+import {ShowConversationOptions} from '../../../page/AppMain';
 import {useAppMainState} from '../../../page/state';
 import {TeamState} from '../../../team/TeamState';
 import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {UserState} from '../../../user/UserState';
+import {ViewModelRepositories} from '../../../view_model/MainViewModel';
 
 interface GroupCreationModalProps {
+  showConversation: (
+    conversation: Conversation | string,
+    options: ShowConversationOptions,
+    domain?: string | null,
+  ) => void;
+  repositories: ViewModelRepositories;
   userState?: UserState;
   teamState?: TeamState;
 }
@@ -70,6 +78,8 @@ enum GroupCreationModalState {
 const logger = getLogger('GroupCreationModal');
 
 const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
+  showConversation,
+  repositories,
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
 }) => {
@@ -78,6 +88,8 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
     isMLSEnabled: isMLSEnabledForTeam,
     isProtocolToggleEnabledForUser,
   } = useKoSubscribableChildren(teamState, ['isTeam', 'isMLSEnabled', 'isProtocolToggleEnabledForUser']);
+
+  const {clearHistory} = useAppMainState(state => state.rightSidebar);
 
   const isMLSFeatureEnabled = Config.getConfig().FEATURE.ENABLE_MLS;
 
@@ -111,8 +123,6 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   const [groupCreationState, setGroupCreationState] = useState<GroupCreationModalState>(
     GroupCreationModalState.DEFAULT,
   );
-
-  const mainViewModel = useContext(RootContext);
 
   useEffect(() => {
     const showCreateGroup = (_: string, userEntity: User) => {
@@ -177,16 +187,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
     };
   }, [stateIsParticipants]);
 
-  if (!mainViewModel) {
-    return null;
-  }
-
-  const {content: contentViewModel} = mainViewModel;
-  const {
-    conversation: conversationRepository,
-    search: searchRepository,
-    team: teamRepository,
-  } = contentViewModel.repositories;
+  const {conversation: conversationRepository, search: searchRepository, team: teamRepository} = repositories;
 
   const maxNameLength = ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
   const maxSize = ConversationRepository.CONFIG.GROUP.MAX_SIZE;
@@ -215,11 +216,12 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
             receipt_mode: enableReadReceipts ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF,
           },
         );
-        setIsShown(false);
-        amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
 
-        const {rightSidebar} = useAppMainState.getState();
-        rightSidebar.clearHistory();
+        if (conversationEntity) {
+          setIsShown(false);
+          showConversation(conversationEntity, {});
+          clearHistory();
+        }
       } catch (error) {
         setIsCreatingConversation(false);
         logger.error(error);

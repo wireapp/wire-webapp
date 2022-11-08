@@ -27,7 +27,7 @@ import ko from 'knockout';
 
 import {TitleBar} from 'Components/TitleBar';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {ContentState} from 'src/script/page/useAppState';
+import {ContentState, useAppState} from 'src/script/page/useAppState';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
 import {CallingRepository} from '../../calling/CallingRepository';
@@ -121,9 +121,9 @@ describe('TitleBar', () => {
     const searchButton = getByText('tooltipConversationSearch');
     expect(searchButton).toBeDefined();
 
-    spyOn(amplify, 'publish').and.returnValue(undefined);
     fireEvent.click(searchButton);
-    expect(amplify.publish).toHaveBeenCalledWith(WebAppEvents.CONTENT.SWITCH, ContentState.COLLECTION);
+    const {contentState} = useAppState.getState();
+    expect(contentState).toBe(ContentState.COLLECTION);
   });
 
   it('opens conversation details on conversation name click', async () => {

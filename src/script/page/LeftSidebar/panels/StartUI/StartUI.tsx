@@ -46,6 +46,7 @@ import {TeamRepository} from '../../../../team/TeamRepository';
 import {TeamState} from '../../../../team/TeamState';
 import {generatePermissionHelpers} from '../../../../user/UserPermission';
 import {UserState} from '../../../../user/UserState';
+import {ShowConversationOptions} from '../../../AppMain';
 import {useAppMainState} from '../../../state';
 import {ListWrapper} from '../ListWrapper';
 
@@ -58,6 +59,11 @@ type StartUIProps = {
   onClose: () => void;
   searchRepository: SearchRepository;
   teamRepository: TeamRepository;
+  showConversation: (
+    conversation: Conversation | string,
+    options: ShowConversationOptions,
+    domain?: string | null,
+  ) => void;
   teamState?: TeamState;
   userRepository: UserRepository;
   userState?: UserState;
@@ -80,6 +86,7 @@ const StartUI: React.FC<StartUIProps> = ({
   mainViewModel,
   userRepository,
   isFederated,
+  showConversation,
 }) => {
   const brandName = Config.getConfig().BRAND_NAME;
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
@@ -210,6 +217,7 @@ const StartUI: React.FC<StartUIProps> = ({
         onClickConversation={openConversation}
         onClickUser={openOther}
         onSearchResults={searchResult => (peopleSearchResults.current = searchResult)}
+        showConversation={showConversation}
       />
     ) : (
       <ServicesTab

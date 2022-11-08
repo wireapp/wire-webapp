@@ -27,7 +27,7 @@ import {AvailabilityState} from 'Components/AvailabilityState';
 import {CallingCell} from 'Components/calling/CallingCell';
 import {Icon} from 'Components/Icon';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
-import {ListState} from 'src/script/page/useAppState';
+import {ContentState, ListState} from 'src/script/page/useAppState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isTabKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -39,6 +39,7 @@ import {CallState} from '../../../../calling/CallState';
 import {DefaultLabelIds} from '../../../../conversation/ConversationLabelRepository';
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import {ConversationState} from '../../../../conversation/ConversationState';
+import {Conversation} from '../../../../entity/Conversation';
 import {User} from '../../../../entity/User';
 import {useRoveFocus} from '../../../../hooks/useRoveFocus';
 import {useMLSConversationState} from '../../../../mls/mlsConversationState';
@@ -51,6 +52,7 @@ import {Shortcut} from '../../../../ui/Shortcut';
 import {ShortcutType} from '../../../../ui/ShortcutType';
 import {UserState} from '../../../../user/UserState';
 import {ListViewModel} from '../../../../view_model/ListViewModel';
+import {ShowConversationOptions} from '../../../AppMain';
 import {useAppMainState, ViewType} from '../../../state';
 import {ListWrapper} from '../ListWrapper';
 
@@ -63,6 +65,12 @@ type ConversationsProps = {
   propertiesRepository: PropertiesRepository;
   selfUser: User;
   switchList: (list: ListState) => void;
+  switchContent: (contentState: ContentState) => void;
+  showConversation: (
+    conversation: Conversation | string,
+    options: ShowConversationOptions,
+    domain?: string | null,
+  ) => void;
   teamState?: TeamState;
   userState?: UserState;
 };
@@ -77,12 +85,14 @@ const Conversations: React.FC<ConversationsProps> = ({
   conversationRepository,
   preferenceNotificationRepository,
   listViewModel,
+  showConversation,
   conversationState = container.resolve(ConversationState),
   teamState = container.resolve(TeamState),
   callState = container.resolve(CallState),
   userState = container.resolve(UserState),
   selfUser,
   switchList,
+  switchContent,
 }) => {
   const {
     name: userName,
@@ -115,14 +125,14 @@ const Conversations: React.FC<ConversationsProps> = ({
   const [isConversationListFocus, focusConversationList] = useState(false);
 
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
+  const {clearHistory} = useAppMainState(state => state.rightSidebar);
 
   const showLegalHold = isOnLegalHold || hasPendingLegalHold;
 
   const onClickPreferences = () => {
     setCurrentView(ViewType.LEFT_SIDEBAR);
     switchList(ListState.PREFERENCES);
-    const {rightSidebar} = useAppMainState.getState();
-    rightSidebar.clearHistory();
+    clearHistory();
   };
 
   useEffect(() => {
@@ -346,6 +356,8 @@ const Conversations: React.FC<ConversationsProps> = ({
           currentFocus={currentFocus}
           isConversationListFocus={isConversationListFocus}
           handleArrowKeyDown={handleKeyDown}
+          showConversation={showConversation}
+          switchContent={switchContent}
         />
       )}
     </ListWrapper>

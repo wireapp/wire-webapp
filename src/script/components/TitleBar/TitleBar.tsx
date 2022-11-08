@@ -28,7 +28,7 @@ import {container} from 'tsyringe';
 import {Icon} from 'Components/Icon';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {useAppMainState, ViewType} from 'src/script/page/state';
-import {ContentState} from 'src/script/page/useAppState';
+import {ContentState, useAppState} from 'src/script/page/useAppState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {StringIdentifer, t} from 'Util/LocalizerUtil';
@@ -140,6 +140,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
   const smBreakpoint = useMatchMedia('max-width: 640px');
 
   const {setCurrentView: setView} = useAppMainState(state => state.responsiveView);
+  const {setContentState} = useAppState();
 
   const setLeftSidebar = () => setView(ViewType.LEFT_SIDEBAR);
 
@@ -183,7 +184,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
     };
   }, [isActivatedAccount, showAddParticipant, showDetails]);
 
-  const onClickCollectionButton = () => amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentState.COLLECTION);
+  const onClickCollectionButton = () => setContentState(ContentState.COLLECTION);
 
   const onClickDetails = () => showDetails(false);
 

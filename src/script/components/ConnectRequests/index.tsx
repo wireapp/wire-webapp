@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, useContext, useEffect, useRef} from 'react';
+import {FC, useEffect, useRef} from 'react';
 
 import {Button, ButtonVariant, IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
 import {container} from 'tsyringe';
@@ -29,23 +29,24 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {User} from '../../entity/User';
-import {RootContext} from '../../page/RootProvider';
 import {TeamState} from '../../team/TeamState';
 import {UserState} from '../../user/UserState';
+import {ActionsViewModel} from '../../view_model/ActionsViewModel';
 
 interface ConnectRequestsProps {
+  actionsView: ActionsViewModel;
   readonly userState: UserState;
   readonly teamState: TeamState;
 }
 
 const ConnectRequests: FC<ConnectRequestsProps> = ({
+  actionsView,
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
 }) => {
   const connectRequestsRefEnd = useRef<HTMLDivElement | null>(null);
   const temporaryConnectRequestsCount = useRef<number>(0);
 
-  const mainViewModel = useContext(RootContext);
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
 
@@ -72,25 +73,19 @@ const ConnectRequests: FC<ConnectRequestsProps> = ({
     scrollToBottom();
   }, []);
 
-  if (!mainViewModel) {
-    return null;
-  }
-
-  const actionsViewModel = mainViewModel.actions;
-
   const onIgnoreClick = (userEntity: User): void => {
-    actionsViewModel.ignoreConnectionRequest(userEntity);
+    actionsView.ignoreConnectionRequest(userEntity);
   };
 
   const onAcceptClick = async (userEntity: User) => {
-    await actionsViewModel.acceptConnectionRequest(userEntity);
-    const conversationEntity = await actionsViewModel.getOrCreate1to1Conversation(userEntity);
+    await actionsView.acceptConnectionRequest(userEntity);
+    const conversationEntity = await actionsView.getOrCreate1to1Conversation(userEntity);
 
     if (connectRequests.length === 1) {
       /**
        * In the connect request view modal, we show an overview of all incoming connection requests. When there are multiple open connection requests, we want that the user sees them all and can accept them one-by-one. When the last open connection request gets accepted, we want the user to switch to this conversation.
        */
-      actionsViewModel.open1to1Conversation(conversationEntity);
+      actionsView.open1to1Conversation(conversationEntity);
     }
   };
 
