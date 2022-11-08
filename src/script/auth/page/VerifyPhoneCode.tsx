@@ -116,6 +116,7 @@ const VerifyPhoneCodeComponent = ({
         centerText
         verticalCenter
         style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
+        css
       >
         <div>
           <H1 center>{_(phoneLoginStrings.verifyCodeDescription, {number: loginData.phone})}</H1>
