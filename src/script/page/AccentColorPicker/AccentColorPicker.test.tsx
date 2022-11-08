@@ -18,8 +18,9 @@
  */
 
 import {act, render} from '@testing-library/react';
-import {AccentColor} from '@wireapp/commons';
 import ko from 'knockout';
+
+import {AccentColor} from '@wireapp/commons';
 
 import {User} from 'src/script/entity/User';
 

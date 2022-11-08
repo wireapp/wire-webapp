@@ -18,6 +18,7 @@
  */
 
 import {CONVERSATION_EVENT, ConversationEvent} from '@wireapp/api-client/lib/event/';
+
 import {LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
 import {t} from 'Util/LocalizerUtil';

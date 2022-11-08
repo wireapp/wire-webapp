@@ -17,8 +17,9 @@
  *
  */
 
-import {APIClient as APIClientUnconfigured} from '@wireapp/api-client';
 import {singleton} from 'tsyringe';
+
+import {APIClient as APIClientUnconfigured} from '@wireapp/api-client';
 
 import {Config} from '../Config';
 

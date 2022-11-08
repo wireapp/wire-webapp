@@ -17,11 +17,12 @@
  *
  */
 
-import {UrlUtil, Runtime} from '@wireapp/commons';
 import {Decoder, Encoder} from 'bazinga64';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import type {ObservableArray} from 'knockout';
 import UUID from 'uuidjs';
+
+import {UrlUtil, Runtime} from '@wireapp/commons';
 
 import {isTabKey} from 'Util/KeyboardUtil';
 import {findMentionAtPosition} from 'Util/MentionUtil';

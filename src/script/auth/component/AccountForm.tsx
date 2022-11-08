@@ -19,11 +19,12 @@
 
 import React from 'react';
 
-import {ValidationUtil} from '@wireapp/commons';
-import {Button, Checkbox, CheckboxLabel, Form, Input, Small} from '@wireapp/react-ui-kit';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
+
+import {ValidationUtil} from '@wireapp/commons';
+import {Button, Checkbox, CheckboxLabel, Form, Input, Small} from '@wireapp/react-ui-kit';
 
 import {KEY} from 'Util/KeyboardUtil';
 

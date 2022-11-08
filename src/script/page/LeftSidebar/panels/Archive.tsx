@@ -19,9 +19,10 @@
 
 import React, {useEffect} from 'react';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ConversationListCell} from 'Components/list/ConversationListCell';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';

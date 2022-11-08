@@ -19,9 +19,10 @@
 
 import React, {useEffect, useMemo, useState} from 'react';
 
-import {Availability} from '@wireapp/protocol-messaging';
 import cx from 'classnames';
 import {createRoot, Root} from 'react-dom/client';
+
+import {Availability} from '@wireapp/protocol-messaging';
 
 import {Icon} from 'Components/Icon';
 import {isEnterKey, isEscapeKey, isKey, isOneOfKeys, isSpaceKey, KEY} from 'Util/KeyboardUtil';

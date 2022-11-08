@@ -19,11 +19,12 @@
 
 import React from 'react';
 
+import {amplify} from 'amplify';
+import {container} from 'tsyringe';
+
 import {Runtime} from '@wireapp/commons';
 import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {amplify} from 'amplify';
-import {container} from 'tsyringe';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';

@@ -21,8 +21,9 @@ import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
 import {PayloadBundleState} from '@wireapp/core/lib/conversation';
-import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {container} from 'tsyringe';
+
+import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
@@ -79,7 +80,7 @@ async function buildMessageRepository(): Promise<[MessageRepository, MessageRepo
   clientState.currentClient(new ClientEntity(true, ''));
   const core = container.resolve(Core);
   await core.initServices({} as any);
-  /* eslint-disable sort-keys-fix/sort-keys-fix */
+
   const conversationState = new ConversationState(userState);
   const selfConversation = new Conversation(selfUser.id);
   selfConversation.selfUser(selfUser);
@@ -98,7 +99,7 @@ async function buildMessageRepository(): Promise<[MessageRepository, MessageRepo
     conversationState,
     core,
   };
-  /* eslint-disable sort-keys-fix/sort-keys-fix */
+
   const deps = Object.values(dependencies) as ConstructorParameters<typeof MessageRepository>;
   const messageRepository = new MessageRepository(...deps);
   jest.spyOn(messageRepository as any, 'updateMessageAsSent').mockReturnValue(undefined);

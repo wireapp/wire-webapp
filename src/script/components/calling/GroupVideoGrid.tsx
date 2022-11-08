@@ -61,12 +61,12 @@ const GroupVideoThumbnailWrapper: React.FC<{children?: React.ReactNode; minimize
     css={
       minimized
         ? css`
-            top: 8px;
-            right: 8px;
             bottom: unset;
-            width: 70px;
-            height: 40px;
             box-shadow: 0 0 0 1px var(--gray-90);
+            height: 40px;
+            right: 8px;
+            top: 8px;
+            width: 70px;
           `
         : undefined
     }

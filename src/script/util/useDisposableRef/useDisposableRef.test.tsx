@@ -21,10 +21,12 @@ import {render, waitFor} from '@testing-library/react';
 
 import {useDisposableRef} from './useDisposableRef';
 
-const Component: React.FC<{callback: (element: HTMLElement) => () => void; state?: number; otherState?: number}> = ({
-  callback,
-  state = 0,
-}) => {
+interface ComponentProps {
+  callback: (element: HTMLElement) => () => void;
+  state?: number;
+  otherState?: number;
+}
+const Component: React.FC<ComponentProps> = ({callback, state = 0}: ComponentProps) => {
   const disposableRef = useDisposableRef(callback, [state]);
 
   return (

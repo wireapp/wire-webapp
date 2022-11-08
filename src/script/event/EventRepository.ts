@@ -18,14 +18,15 @@
  */
 
 import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/lib/event/';
-import {Account, ConnectionState, ProcessedEventPayload} from '@wireapp/core';
 import {PayloadBundleSource} from '@wireapp/core/lib/conversation';
 import {HandledEventPayload} from '@wireapp/core/lib/notification';
-import {Asset as ProtobufAsset, GenericMessage} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
+
+import {Account, ConnectionState, ProcessedEventPayload} from '@wireapp/core';
+import {Asset as ProtobufAsset, GenericMessage} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';

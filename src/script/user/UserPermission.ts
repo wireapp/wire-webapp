@@ -17,7 +17,6 @@
  *
  */
 
-/* eslint-disable sort-keys-fix/sort-keys-fix */
 import type {PermissionsData} from '@wireapp/api-client/lib/team/member/PermissionsData';
 
 import {capitalizeFirstChar} from 'Util/StringUtil';

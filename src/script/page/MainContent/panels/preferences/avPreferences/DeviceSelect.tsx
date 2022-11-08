@@ -19,8 +19,9 @@
 
 import React from 'react';
 
-import {Select} from '@wireapp/react-ui-kit';
 import cx from 'classnames';
+
+import {Select} from '@wireapp/react-ui-kit';
 
 interface DeviceSelectProps {
   defaultDeviceName?: string;
