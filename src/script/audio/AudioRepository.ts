@@ -207,6 +207,7 @@ export class AudioRepository {
     if (!audioElement?.paused) {
       this.logger.info(`Stopping sound '${audioId}'`);
       audioElement.pause();
+      audioElement.load();
     }
   };
 
