@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,8 +18,7 @@
  */
 
 import {amplify} from 'amplify';
-
-const jQuery = require('jquery');
+import jQuery from 'jquery';
 
 import '../event/Client';
 import '../message/MessageCategorization';
@@ -29,4 +28,5 @@ import '../storage/StorageSchemata';
 
 window.amplify = amplify;
 window.jQuery = jQuery;
+// eslint-disable-next-line id-length
 window.$ = jQuery;

@@ -19,6 +19,7 @@
 
 import {joaatHash} from './Crypto';
 
+/* eslint-disable no-magic-numbers */
 describe('Crypto', () => {
   describe(`Jenkins' one-at-a-time hash`, () => {
     const sample: {[uuid: string]: number} = {

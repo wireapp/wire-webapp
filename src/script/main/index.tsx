@@ -17,8 +17,8 @@
  *
  */
 
-import 'core-js/full/reflect';
 import {ClientType} from '@wireapp/api-client/lib/client/';
+import 'core-js/full/reflect';
 import {createRoot} from 'react-dom/client';
 
 import {Runtime} from '@wireapp/commons';

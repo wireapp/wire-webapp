@@ -25,6 +25,9 @@
     "src/worker/",
     "*.js"
   ],
+  "parserOptions": {
+    "project": ["./tsconfig.build.json", "./server/tsconfig.json"]
+  },
   "plugins": ["@emotion"],
   "rules": {
     "@emotion/pkg-renaming": "error",
