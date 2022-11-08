@@ -1,17 +1,8 @@
 {
+  "extends": ["@wireapp/eslint-config"],
   "env": {
-    "jasmine": true,
-    "jest/globals": true
+    "jasmine": true
   },
-  "extends": [
-    "@wireapp/eslint-config",
-    "plugin:jest/recommended",
-    "plugin:jsx-a11y/recommended",
-    "plugin:@typescript-eslint/eslint-recommended",
-    "prettier",
-    "plugin:import/recommended",
-    "plugin:import/typescript"
-  ],
   "globals": {
     "amplify": true,
     "ko": true,
@@ -20,12 +11,11 @@
     "z": true,
     "RTCAudioSource": true
   },
-  "plugins": ["sort-keys-fix", "import", "react-hooks", "eslint-plugin-testing-library", "@typescript-eslint"],
   "ignorePatterns": [
     ".git/",
     "docs/",
     "bin/",
-    "node_modules/",
+    "**/node_modules/",
     "resource/",
     "server/bin/",
     "server/dist/",
@@ -35,72 +25,27 @@
     "src/worker/",
     "*.js"
   ],
-  "overrides": [
-    {
-      "files": ["*.ts", "*.tsx"],
-      "parser": "@typescript-eslint/parser",
-      "parserOptions": {
-        "project": ["./tsconfig.build.json", "./server/tsconfig.json"]
-      },
-      "rules": {
-        "@typescript-eslint/no-floating-promises": "off",
-        "@typescript-eslint/typedef": "off",
-        "no-dupe-class-members": "off",
-        "no-undef": "off",
-        "no-unsanitized/property": "off",
-        "no-unused-vars": "off",
-        "prefer-promise-reject-errors": "off",
-        "valid-jsdoc": "off"
-      }
-    }
-  ],
+  "plugins": ["@emotion"],
   "rules": {
-    "id-length": "off",
-    "no-magic-numbers": ["warn", {"ignoreArrayIndexes": true}],
-    "jest/no-jasmine-globals": "off",
-    "jest/no-identical-title": "warn",
-    "jest/no-done-callback": "warn",
-    "jest/no-disabled-tests": "warn",
-    "jest/no-conditional-expect": "warn",
-    "sort-keys-fix/sort-keys-fix": "warn",
-    "jsx-a11y/media-has-caption": "warn",
-    "jsx-a11y/no-noninteractive-tabindex": "warn",
-    "react/no-unknown-property": ["error", {"ignore": ["css"]}],
-    "react/react-in-jsx-scope": "off",
-    "react-hooks/rules-of-hooks": "error",
-    "react-hooks/exhaustive-deps": "warn",
-    "import/no-unresolved": "error",
-    "import/no-default-export": "error",
+    "@emotion/pkg-renaming": "error",
+    "@emotion/no-vanilla": "error",
+    "@emotion/import-from-emotion": "error",
+    "@emotion/styled-import": "error",
+    "id-length": "warn",
     "@typescript-eslint/explicit-module-boundary-types": "off",
-    "@typescript-eslint/no-empty-interface": "warn",
     "@typescript-eslint/ban-ts-comment": "off",
-    "@typescript-eslint/no-var-requires": "warn",
-    "@typescript-eslint/no-non-null-assertion": "warn",
-    "import/order": [
-      "error",
-      {
-        "groups": ["external", "builtin", "internal", "sibling", "parent", "index"],
-        "pathGroups": [
-          {
-            "pattern": "react",
-            "group": "external",
-            "position": "before"
-          }
-        ],
-        "pathGroupsExcludedImportTypes": ["react"],
-        "newlines-between": "always",
-        "alphabetize": {
-          "order": "asc",
-          "caseInsensitive": true
-        },
-        "warnOnUnassignedImports": false
-      }
-    ]
+    "@typescript-eslint/no-var-requires": "off",
+    "@typescript-eslint/no-non-null-assertion": "off",
+    "@typescript-eslint/no-floating-promises": "off",
+    "@typescript-eslint/typedef": "off",
+    "no-dupe-class-members": "off",
+    "no-undef": "off",
+    "no-unsanitized/property": "off",
+    "prefer-promise-reject-errors": "off",
+    "valid-jsdoc": "off",
+    "jest/no-jasmine-globals": "off"
   },
   "settings": {
-    "react": {
-      "version": "detect"
-    },
     "import/resolver": {
       "alias": {
         "map": [
