@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useMemo} from 'react';
 
 import {css} from '@emotion/react';
 import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
@@ -150,12 +150,8 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   );
   const showSwitchMicrophone = availableMicrophones.length > 1;
 
-  const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
   const {unreadMessagesCount} = useAppState();
-
-  useEffect(() => {
-    setHasUnreadMessages(unreadMessagesCount > 0);
-  }, [unreadMessagesCount]);
+  const hasUnreadMessages = unreadMessagesCount > 0;
 
   const totalPages = callPages.length;
 
