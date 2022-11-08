@@ -62,5 +62,14 @@
         "extensions": [".ts", ".js", ".jsx", ".tsx", ".json"]
       }
     }
-  }
+  },
+  "overrides": [
+    {
+      "files": ["**/*.test.tsx", "**/*.test.ts", "**/test/**/*", "**/mocks/**/*"],
+      "rules": {
+        "no-magic-numbers": "off",
+        "id-length": "off"
+      }
+    }
+  ]
 }
