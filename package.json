@@ -91,7 +91,7 @@
     "@typescript-eslint/eslint-plugin": "^5.42.1",
     "@typescript-eslint/parser": "^5.42.1",
     "@wireapp/copy-config": "2.0.3",
-    "@wireapp/eslint-config": "2.0.3",
+    "@wireapp/eslint-config": "2.1.0",
     "@wireapp/prettier-config": "0.5.2",
     "@wireapp/store-engine": "^5.0.3",
     "adm-zip": "0.5.9",

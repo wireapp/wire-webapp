@@ -4106,26 +4106,35 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/eslint-config@npm:2.0.3":
-  version: 2.0.3
-  resolution: "@wireapp/eslint-config@npm:2.0.3"
+"@wireapp/eslint-config@npm:2.1.0":
+  version: 2.1.0
+  resolution: "@wireapp/eslint-config@npm:2.1.0"
   peerDependencies:
-    "@babel/eslint-parser": ">=7"
-    "@typescript-eslint/eslint-plugin": ">=5"
-    "@typescript-eslint/parser": ">=5"
-    eslint: ">=8"
-    eslint-config-prettier: ">=8"
-    eslint-plugin-header: ">=3"
-    eslint-plugin-jsdoc: ">=39"
-    eslint-plugin-jsx-a11y: ">=6"
-    eslint-plugin-no-unsanitized: ">=4"
-    eslint-plugin-prettier: ">=4"
-    eslint-plugin-react: ">=7"
-    eslint-plugin-react-hooks: ">=4"
-    eslint-plugin-unused-imports: ">=2"
-    prettier: ">=2"
-    typescript: ">=4"
-  checksum: 96f8664938bb44341c8839ffb02230452e548df72f8f2d9e71fcc40b97c446478dd7fdb2f5664871090f782d5888224c57a78140a01724f0495ba840d0ef2bb6
+    "@types/eslint": ^8
+    "@types/prettier": ^2
+    "@typescript-eslint/eslint-plugin": ^5
+    "@typescript-eslint/parser": ^5
+    eslint: ^8
+    eslint-config-prettier: ^8
+    eslint-import-resolver-alias: ^1
+    eslint-import-resolver-typescript: ^3
+    eslint-plugin-better-styled-components: ^1
+    eslint-plugin-header: ^3
+    eslint-plugin-import: ^2
+    eslint-plugin-jest: ^27
+    eslint-plugin-jest-dom: ^4
+    eslint-plugin-jsdoc: ^39
+    eslint-plugin-jsx-a11y: ^6
+    eslint-plugin-no-unsanitized: ^4
+    eslint-plugin-prettier: ^4
+    eslint-plugin-react: ^7
+    eslint-plugin-react-hooks: ^4
+    eslint-plugin-simple-import-sort: ^8
+    eslint-plugin-testing-library: ^5
+    eslint-plugin-unused-imports: ^2
+    prettier: ^2
+    typescript: ^4
+  checksum: 1b0e61533b7f477d3b4ac6b4a03a5c1f1484ef17e997513b60d11675cbcfdbda25ed17c25465c24ccc08d7f48097d95cde927475b7049ed9cdb83d0c5fd04be5
   languageName: node
   linkType: hard
 
@@ -16074,7 +16083,7 @@ __metadata:
     "@wireapp/avs": 8.2.17
     "@wireapp/copy-config": 2.0.3
     "@wireapp/core": 36.4.3
-    "@wireapp/eslint-config": 2.0.3
+    "@wireapp/eslint-config": 2.1.0
     "@wireapp/prettier-config": 0.5.2
     "@wireapp/react-ui-kit": 9.0.6
     "@wireapp/store-engine": ^5.0.3
