@@ -21,9 +21,10 @@ import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
 import {USER_EVENT, UserConnectionEvent} from '@wireapp/api-client/lib/event';
 import {UserConnectionData} from '@wireapp/api-client/lib/user/data';
 
+import {UserMapper} from './UserMapper';
+
 import {PayloadBundleSource, PayloadBundleState, PayloadBundleType} from '../conversation';
 import {UserConnectionMessage} from '../conversation/message/UserMessage';
-import {UserMapper} from './UserMapper';
 
 describe('UserMapper', () => {
   describe('"mapUserEvent"', () => {

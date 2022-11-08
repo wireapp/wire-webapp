@@ -17,8 +17,8 @@
  *
  */
 
-import {EventHandlerResult, EventHandlerParams} from './EventHandler.types';
 import {handleConversationEvent} from './ConversationEvent';
+import {EventHandlerResult, EventHandlerParams} from './EventHandler.types';
 
 const handleBackendEvent = async (params: EventHandlerParams): EventHandlerResult => handleConversationEvent(params);
 

@@ -18,9 +18,11 @@
  */
 
 import {BackendEvent, ConversationMLSWelcomeEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
+
+import {handleWelcomeMessage, isWelcomeMessageEvent} from './welcomeMessage';
+
 import {PayloadBundleSource} from '../../..';
 import {MLSService} from '../../../..';
-import {handleWelcomeMessage, isWelcomeMessageEvent} from './welcomeMessage';
 
 jest.mock('bazinga64', () => ({
   ...jest.requireActual('bazinga64'),

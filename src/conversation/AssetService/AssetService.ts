@@ -17,9 +17,10 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
 import {AssetOptions} from '@wireapp/api-client/lib/asset';
 import {ProgressCallback, RequestCancelable} from '@wireapp/api-client/lib/http';
+
+import {APIClient} from '@wireapp/api-client';
 
 import {EncryptedAssetUploaded} from '../../cryptography';
 import {encryptAsset} from '../../cryptography/AssetCryptography';

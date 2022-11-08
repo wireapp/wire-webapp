@@ -17,24 +17,26 @@
  *
  */
 
-import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {APIClient} from '@wireapp/api-client';
 import {AuthAPI} from '@wireapp/api-client/lib/auth';
 import {ClientAPI, ClientType, RegisteredClient} from '@wireapp/api-client/lib/client';
-import {Self, SelfAPI} from '@wireapp/api-client/lib/self';
 import {ConversationAPI} from '@wireapp/api-client/lib/conversation';
+import {BackendEvent} from '@wireapp/api-client/lib/event';
 import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {NotificationAPI} from '@wireapp/api-client/lib/notification';
+import {Self, SelfAPI} from '@wireapp/api-client/lib/self';
+import {WebSocketClient} from '@wireapp/api-client/lib/tcp';
+import {ReconnectingWebsocket} from '@wireapp/api-client/lib/tcp/ReconnectingWebsocket';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {WS} from 'jest-websocket-mock';
+import nock, {cleanAll} from 'nock';
+
+import {APIClient} from '@wireapp/api-client';
 import {AccentColor, ValidationUtil} from '@wireapp/commons';
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
-import nock from 'nock';
+
 import {Account, ConnectionState} from './Account';
 import {PayloadBundleSource, PayloadBundleType} from './conversation';
 import * as MessageBuilder from './conversation/message/MessageBuilder';
-import {WebSocketClient} from '@wireapp/api-client/lib/tcp';
-import WS from 'jest-websocket-mock';
-import {ReconnectingWebsocket} from '@wireapp/api-client/lib/tcp/ReconnectingWebsocket';
-import {BackendEvent} from '@wireapp/api-client/lib/event';
 
 const BASE_URL = 'mock-backend.wire.com';
 const MOCK_BACKEND = {
@@ -72,6 +74,8 @@ const waitFor = (assertion: () => void) => {
     attempt();
   });
 };
+
+/* eslint-disable jest/no-conditional-expect */
 
 describe('Account', () => {
   const CLIENT_ID = '4e37b32f57f6da55';
@@ -152,7 +156,7 @@ describe('Account', () => {
   });
 
   afterEach(() => {
-    nock.cleanAll();
+    cleanAll();
   });
 
   describe('"createText"', () => {
@@ -212,6 +216,7 @@ describe('Account', () => {
     it('does not log in with incorrect credentials', async () => {
       const apiClient = new APIClient({urls: MOCK_BACKEND});
       const account = new Account(apiClient);
+      let backendError;
 
       await account.initServices({clientType: ClientType.TEMPORARY, userId: ''});
 
@@ -221,10 +226,10 @@ describe('Account', () => {
           email: 'hello@example.com',
           password: 'wrong',
         });
-
         throw new Error('Should not be logged in');
       } catch (error) {
-        const backendError = error as BackendError;
+        backendError = error as BackendError;
+      } finally {
         expect(backendError.code).toBe(HTTP_STATUS.FORBIDDEN);
         expect(backendError.label).toBe(BackendErrorLabel.INVALID_CREDENTIALS);
       }

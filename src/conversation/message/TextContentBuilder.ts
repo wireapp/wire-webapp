@@ -17,6 +17,8 @@
  *
  */
 
+import {QuotableMessage} from './OtrMessage';
+
 import {MessageHashService} from '../../cryptography';
 import {
   EditedTextContent,
@@ -26,7 +28,6 @@ import {
   QuoteContent,
   TextContent,
 } from '../content';
-import {QuotableMessage} from './OtrMessage';
 
 export class TextContentBuilder<T extends TextContent | EditedTextContent> {
   private readonly content: T;

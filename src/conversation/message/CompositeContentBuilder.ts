@@ -19,9 +19,10 @@
 
 import {Button, Composite, Text} from '@wireapp/protocol-messaging';
 
-import {CompositeContent, LegalHoldStatus} from '../content';
-import {CompositeMessage} from './OtrMessage';
 import {createId} from './MessageBuilder';
+import {CompositeMessage} from './OtrMessage';
+
+import {CompositeContent, LegalHoldStatus} from '../content';
 
 export class CompositeContentBuilder {
   private readonly content: CompositeContent = {};

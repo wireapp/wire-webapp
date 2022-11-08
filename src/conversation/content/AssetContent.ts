@@ -20,8 +20,9 @@
 import {Asset} from '@wireapp/protocol-messaging';
 
 import {AbortReason, AssetTransferState} from '..';
-import {FileContent, FileMetaDataContent, ImageContent, LegalHoldStatus} from '.';
 import {EncryptedAssetUploaded} from '../../cryptography';
+
+import {FileContent, FileMetaDataContent, ImageContent, LegalHoldStatus} from '.';
 
 export type ImageMetaData = Asset.IImageMetaData;
 export type VideoMetaData = Asset.IVideoMetaData;

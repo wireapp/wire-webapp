@@ -17,8 +17,9 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
 import {Notification} from '@wireapp/api-client/lib/notification/';
+
+import {APIClient} from '@wireapp/api-client';
 
 export class NotificationBackendRepository {
   constructor(private readonly apiClient: APIClient) {}

@@ -18,6 +18,7 @@
  */
 
 import {TimeUtil} from '@wireapp/commons';
+
 import {cancelRecurringTask, registerRecurringTask} from './RecurringTaskScheduler';
 
 // Storage Mock

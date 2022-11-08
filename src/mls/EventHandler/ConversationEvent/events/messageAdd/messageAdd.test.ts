@@ -18,8 +18,10 @@
  */
 
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
-import {BackendEvent} from '../../../EventHandler.types';
+
 import {isMLSMessageAddEvent} from './messageAdd';
+
+import {BackendEvent} from '../../../EventHandler.types';
 
 describe('MLS messageAdd eventHandler', () => {
   describe('isMessageAdd', () => {

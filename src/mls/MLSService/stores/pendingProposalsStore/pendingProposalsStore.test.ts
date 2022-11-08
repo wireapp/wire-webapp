@@ -18,6 +18,7 @@
  */
 
 import {PendingProposalsParams, pendingProposalsStore} from './pendingProposalsStore';
+
 import {storageMock} from '../stores.mock';
 
 const mockEntries: PendingProposalsParams[] = [

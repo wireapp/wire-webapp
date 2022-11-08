@@ -19,6 +19,7 @@
 
 import {BackendEvent} from '@wireapp/api-client/lib/event';
 import {Notification} from '@wireapp/api-client/lib/notification/';
+
 import {CRUDEngine} from '@wireapp/store-engine';
 
 import {CryptographyDatabaseRepository} from '../cryptography/CryptographyDatabaseRepository';

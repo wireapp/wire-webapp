@@ -17,23 +17,27 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
 import * as Events from '@wireapp/api-client/lib/event';
 import {Notification} from '@wireapp/api-client/lib/notification/';
-import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
-import {EventEmitter} from 'events';
+import {AbortHandler} from '@wireapp/api-client/lib/tcp';
 import logdown from 'logdown';
+
+import {EventEmitter} from 'events';
+
+import {APIClient} from '@wireapp/api-client';
+import {GenericMessage} from '@wireapp/protocol-messaging';
+import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
+
+import {NotificationBackendRepository} from './NotificationBackendRepository';
+import {NotificationDatabaseRepository} from './NotificationDatabaseRepository';
+
 import {PayloadBundle, PayloadBundleSource, PayloadBundleType} from '../conversation';
 import {AssetContent} from '../conversation/content';
 import {ConversationMapper} from '../conversation/ConversationMapper';
 import {CoreError, NotificationError} from '../CoreError';
 import {CryptographyService, DecryptionError} from '../cryptography';
-import {UserMapper} from '../user/UserMapper';
-import {NotificationBackendRepository} from './NotificationBackendRepository';
-import {NotificationDatabaseRepository} from './NotificationDatabaseRepository';
-import {GenericMessage} from '@wireapp/protocol-messaging';
-import {AbortHandler} from '@wireapp/api-client/lib/tcp';
 import {MLSService} from '../mls';
+import {UserMapper} from '../user/UserMapper';
 
 export type HandledEventPayload = {
   event: Events.BackendEvent;

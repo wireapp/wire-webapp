@@ -18,6 +18,7 @@
  */
 
 import {keyMaterialUpdatesStore, LastKeyMaterialUpdateParams} from './keyMaterialUpdatesStore';
+
 import {storageMock} from '../stores.mock';
 
 const mockUpdateEntries: LastKeyMaterialUpdateParams[] = [{groupId: 'group0'}, {groupId: 'group1'}];

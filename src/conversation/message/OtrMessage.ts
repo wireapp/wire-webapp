@@ -17,6 +17,8 @@
  *
  */
 
+import {BasePayloadBundle, PayloadBundleType} from './PayloadBundle';
+
 import {
   AssetContent,
   ButtonActionContent,
@@ -38,7 +40,6 @@ import {
   ReactionContent,
   TextContent,
 } from '../content';
-import {BasePayloadBundle, PayloadBundleType} from './PayloadBundle';
 
 export interface TextMessage extends BasePayloadBundle {
   content: TextContent;
