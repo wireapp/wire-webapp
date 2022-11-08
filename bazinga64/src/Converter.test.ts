@@ -17,7 +17,6 @@
  *
  */
 
-import * as bazinga64 from './index';
 import {
   helloDecodedArray,
   helloDecodedString,
@@ -26,6 +25,8 @@ import {
   numberDecoded,
   numberString,
 } from './test/TestValues';
+
+import * as bazinga64 from './index';
 
 describe('arrayBufferViewToStringUTF8', () => {
   it('handles UTF-8 conversions', () => {
@@ -204,14 +205,6 @@ describe('stringToArrayBufferViewUTF16', () => {
     const expectedView = new Uint16Array(helloEncodedArray);
     expect(view.constructor.name).toBe('Uint16Array');
     expect(view).toEqual(expectedView);
-  });
-});
-
-describe('stringToArrayBufferViewUTF16', () => {
-  it('handles UTF-16 conversions', () => {
-    const cyrillicCapitalLetterDje = '\u0402';
-    const encoded = bazinga64.Converter.stringToArrayBufferViewUTF16(cyrillicCapitalLetterDje);
-    expect(encoded.length).toBe(1);
   });
 });
 

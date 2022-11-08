@@ -6,21 +6,20 @@
   "main": "eslintrc.js",
   "peerDependencies": {
     "@babel/eslint-parser": ">=7",
-    "@typescript-eslint/eslint-plugin": ">=3",
-    "@typescript-eslint/parser": ">=3",
-    "eslint": ">=7",
-    "eslint-config-prettier": ">=6",
-    "eslint-plugin-header": ">=3.1",
-    "eslint-plugin-jsdoc": ">=25",
-    "eslint-plugin-no-unsanitized": ">=3",
-    "eslint-plugin-prettier": ">=3",
+    "@typescript-eslint/eslint-plugin": ">=5",
+    "@typescript-eslint/parser": ">=5",
+    "eslint": ">=8",
+    "eslint-config-prettier": ">=8",
+    "eslint-plugin-header": ">=3",
+    "eslint-plugin-jsdoc": ">=39",
+    "eslint-plugin-jsx-a11y": ">=6",
+    "eslint-plugin-no-unsanitized": ">=4",
+    "eslint-plugin-prettier": ">=4",
     "eslint-plugin-react": ">=7",
-    "eslint-plugin-react-hooks": ">=2",
-    "eslint-plugin-unused-imports": ">=1.1",
-    "prettier": ">=2"
+    "eslint-plugin-react-hooks": ">=4",
+    "eslint-plugin-unused-imports": ">=2",
+    "prettier": ">=2",
+    "typescript": ">=4"
   },
-  "version": "2.0.0",
-  "devDependencies": {
-    "typescript": "^4.8.4"
-  }
+  "version": "2.0.0"
 }

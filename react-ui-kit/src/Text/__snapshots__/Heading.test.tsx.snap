@@ -76,7 +76,7 @@ exports[`"Heading" renders H1 1`] = `
 </div>
 `;
 
-exports[`"Heading" renders H1 2`] = `
+exports[`"Heading" renders H1 as default 1`] = `
 .emotion-0 {
   background: #edeff0;
   -webkit-transition: background 0.15s;

@@ -21,17 +21,18 @@
 
 /* eslint-disable header/header */
 
-import * as fs from 'fs-extra';
-import * as path from 'path';
+import {readFileSync, writeJSON} from 'fs-extra';
+
+import path from 'path';
 
 import {LicenseCollector} from './LicenseCollector';
 
-const repositories = fs.readFileSync('repositories.txt', 'utf8').split('\n').filter(Boolean);
+const repositories = readFileSync('repositories.txt', 'utf8').split('\n').filter(Boolean);
 
 let filter: string[] = [];
 
 try {
-  filter = fs.readFileSync('filter.txt', 'utf8').split('\n').filter(Boolean);
+  filter = readFileSync('filter.txt', 'utf8').split('\n').filter(Boolean);
 } catch (error) {}
 
 const outputFile = path.resolve('licenses.json');
@@ -39,7 +40,7 @@ const outputFile = path.resolve('licenses.json');
 (async () => {
   const licenses = await new LicenseCollector({devDependencies: false, filter, repositories}).collect();
   if (licenses.length) {
-    await fs.writeJSON(outputFile, licenses, {spaces: 2});
+    await writeJSON(outputFile, licenses, {spaces: 2});
     console.info(`Saved licenses to "${outputFile}".`);
   } else {
     console.info('No licenses collected.');

@@ -19,6 +19,7 @@
 
 require('fake-indexeddb/auto');
 import nodeCrypto from 'crypto';
+
 import {createCustomEncryptedStore, createEncryptedStore} from './encryptedStore';
 
 describe('encryptedStore', () => {

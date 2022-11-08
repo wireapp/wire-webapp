@@ -17,9 +17,6 @@
  *
  */
 
-import UUID from 'uuidjs';
-import {StatusCodes} from 'http-status-codes';
-import {APIClient} from '@wireapp/api-client';
 import {
   ClientMismatch,
   MessageSendingStatus,
@@ -28,9 +25,15 @@ import {
   QualifiedUserClients,
   UserClients,
 } from '@wireapp/api-client/lib/conversation';
+import {StatusCodes} from 'http-status-codes';
+import {genV4} from 'uuidjs';
+
+import {APIClient} from '@wireapp/api-client';
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
-import {CryptographyService} from '../../cryptography';
+
 import {MessageService} from './MessageService';
+
+import {CryptographyService} from '../../cryptography';
 import {getUUID} from '../../test/PayloadHelper';
 
 const baseMessageSendingStatus: MessageSendingStatus = {
@@ -43,12 +46,12 @@ const baseMessageSendingStatus: MessageSendingStatus = {
 
 type TestUser = {id: string; domain: string; clients: string[]};
 const user1: TestUser = {
-  id: UUID.genV4().toString(),
+  id: genV4().toString(),
   domain: '1.wire.test',
   clients: ['client1.1', 'client1.2', 'client1.3', 'client1.4'],
 };
 const user2: TestUser = {
-  id: UUID.genV4().toString(),
+  id: genV4().toString(),
   domain: '2.wire.test',
   clients: ['client2.1', 'client2.2', 'client2.3', 'client2.4'],
 };

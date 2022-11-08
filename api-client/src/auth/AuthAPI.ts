@@ -19,14 +19,15 @@
 
 import {AxiosRequestConfig, AxiosResponse} from 'axios';
 
-import {BackendError, BackendErrorLabel, HttpClient} from '../http/';
-import {ClientType} from '../client/';
 import {ForbiddenPhoneNumberError, InvalidPhoneNumberError, PasswordExistsError} from './AuthenticationError';
-import {retrieveCookie, sendRequestWithCookie} from '../shims/node/cookie';
-import {AccessTokenData, LoginData, SendLoginCode} from '../auth/';
 import {CookieList} from './CookieList';
 import {LoginCodeResponse} from './LoginCodeResponse';
 import {RegisterData} from './RegisterData';
+
+import {AccessTokenData, LoginData, SendLoginCode} from '../auth/';
+import {ClientType} from '../client/';
+import {BackendError, BackendErrorLabel, HttpClient} from '../http/';
+import {retrieveCookie, sendRequestWithCookie} from '../shims/node/cookie';
 import {User} from '../user/';
 
 export class AuthAPI {

@@ -17,13 +17,13 @@
  *
  */
 
-/** @jsx jsx */
-import {CSSObject, jsx} from '@emotion/react';
-import React from 'react';
+import * as React from 'react';
+
+import {CSSObject} from '@emotion/react';
 
 export type HeaderProps<T = HTMLHeadingElement> = React.HTMLProps<T>;
 
-export const headerStyle: <T>(props: HeaderProps<T>) => CSSObject = props => ({
+export const headerStyle: <T>(props: HeaderProps<T>) => CSSObject = _ => ({
   alignItems: 'center',
   display: 'flex',
   height: '64px',

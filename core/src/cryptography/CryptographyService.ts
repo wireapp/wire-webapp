@@ -17,7 +17,6 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
 import {PreKey} from '@wireapp/api-client/lib/auth/';
 import {RegisteredClient} from '@wireapp/api-client/lib/client/';
 import {
@@ -29,18 +28,21 @@ import {
 } from '@wireapp/api-client/lib/conversation/';
 import {ConversationOtrMessageAddEvent} from '@wireapp/api-client/lib/event';
 import {QualifiedId, QualifiedUserPreKeyBundleMap, UserPreKeyBundleMap} from '@wireapp/api-client/lib/user/';
+import {Decoder, Encoder} from 'bazinga64';
+import logdown from 'logdown';
+
+import {APIClient} from '@wireapp/api-client';
 import {Cryptobox, CryptoboxSession} from '@wireapp/cryptobox';
 import {errors as ProteusErrors, keys as ProteusKeys} from '@wireapp/proteus';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 import {CRUDEngine} from '@wireapp/store-engine';
-import {Decoder, Encoder} from 'bazinga64';
-import logdown from 'logdown';
+
+import {CryptographyDatabaseRepository} from './CryptographyDatabaseRepository';
+import {GenericMessageMapper} from './GenericMessageMapper';
 
 import {GenericMessageType, PayloadBundle, PayloadBundleSource} from '../conversation';
 import {SessionPayloadBundle} from '../cryptography/';
 import {isUserClients} from '../util';
-import {CryptographyDatabaseRepository} from './CryptographyDatabaseRepository';
-import {GenericMessageMapper} from './GenericMessageMapper';
 
 export type DecryptionError = {code: number; message: string};
 

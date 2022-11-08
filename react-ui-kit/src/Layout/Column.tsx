@@ -17,13 +17,14 @@
  *
  */
 
-/** @jsx jsx */
-import React from 'react';
-import {CSSObject, jsx} from '@emotion/react';
+import * as React from 'react';
+
+import {CSSObject} from '@emotion/react';
+
+import {GUTTER} from './sizes';
 
 import {QueryKeys, media} from '../mediaQueries';
 import {filterProps} from '../util';
-import {GUTTER} from './sizes';
 
 export interface ColumnsProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   query?: QueryKeys;
@@ -43,7 +44,7 @@ export const Columns = (props: ColumnsProps) => <div css={columnsStyle(props)} {
 
 export type ColumnProps<T = HTMLDivElement> = React.HTMLProps<T>;
 
-const columnStyle: <T>(props: ColumnProps<T>) => CSSObject = props => ({
+const columnStyle: <T>(props: ColumnProps<T>) => CSSObject = _ => ({
   display: 'block',
   flexBasis: '0',
   flexGrow: 1,

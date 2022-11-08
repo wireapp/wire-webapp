@@ -18,6 +18,7 @@
  */
 
 import {AxiosError, AxiosResponse} from 'axios';
+
 import {
   client,
   getAllNotificationsResult,
@@ -25,6 +26,7 @@ import {
   mockedResultData,
   notificationAPI,
 } from './NotificationsAPI.mocks';
+
 import {BackendError, BackendErrorLabel} from '../../http';
 
 describe('NotificationAPI', () => {

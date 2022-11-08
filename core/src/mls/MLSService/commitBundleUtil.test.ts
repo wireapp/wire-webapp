@@ -17,9 +17,11 @@
  *
  */
 
-import {CommitBundle, PublicGroupStateEncryptionType, RatchetTreeType} from '@wireapp/core-crypto';
 import {mls} from '@wireapp/protocol-messaging/web/mls';
 import {Encoder} from 'bazinga64';
+
+import {CommitBundle, PublicGroupStateEncryptionType, RatchetTreeType} from '@wireapp/core-crypto';
+
 import {toProtobufCommitBundle} from './commitBundleUtil';
 
 describe('toProtobufCommitBundle', () => {

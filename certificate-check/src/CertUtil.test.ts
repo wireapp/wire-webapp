@@ -20,8 +20,9 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-import {buildCert, getFingerprint, hostnameShouldBePinned, verifyPinning, WILDCARD_CERT_FINGERPRINT} from './';
 import {ElectronCertificate} from './CertUtil';
+
+import {buildCert, getFingerprint, hostnameShouldBePinned, verifyPinning, WILDCARD_CERT_FINGERPRINT} from './';
 
 describe('hostnameShouldBePinned', () => {
   it('pins app.wire.com', () => {

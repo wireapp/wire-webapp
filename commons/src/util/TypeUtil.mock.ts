@@ -62,9 +62,4 @@ const invalidXorKeys: XOR<MessageSettings, UserSettings> = {
   },
 };
 
-allPartial;
-optionalKeys;
-requiredKeys;
-invalidKeys;
-xorKeys;
-invalidXorKeys;
+export {allPartial, invalidPartial, optionalKeys, requiredKeys, invalidKeys, xorKeys, invalidXorKeys};

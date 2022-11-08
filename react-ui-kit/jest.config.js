@@ -21,5 +21,27 @@ const baseConfig = require('../../jest.config.base');
 
 module.exports = {
   ...baseConfig,
+  transform: {
+    '^.+\\.(ts|tsx)$': [
+      '@swc/jest',
+      {
+        sourceMaps: true,
+        jsc: {
+          parser: {
+            syntax: 'typescript',
+            tsx: true,
+            decorators: false,
+            dynamicImport: false,
+          },
+          transform: {
+            react: {
+              runtime: 'automatic',
+              importSource: '@emotion/react',
+            },
+          },
+        },
+      },
+    ],
+  },
   snapshotSerializers: ['@emotion/jest/serializer'],
 };

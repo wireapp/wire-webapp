@@ -129,7 +129,7 @@ describe('UrlUtil', () => {
       expect(actual).toEqual(expected);
     });
 
-    it('returns parameter value if parameter exist in both possible sources', () => {
+    it('returns parameter value if parameter exist in both possible sources 2', () => {
       const expected = '';
       const actual = UrlUtil.getURLParameterFromAny('q', '#q=', '?q=3');
       expect(actual).toEqual(expected);

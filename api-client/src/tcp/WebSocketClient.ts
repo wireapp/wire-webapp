@@ -17,13 +17,15 @@
  *
  */
 
-import {EventEmitter} from 'events';
 import logdown from 'logdown';
-import {CloseEvent, ErrorEvent} from 'reconnecting-websocket';
+import {ErrorEvent} from 'reconnecting-websocket';
 
-import {HttpClient, NetworkError} from '../http/';
-import {InvalidTokenError, MissingCookieError} from '../auth/';
+import {EventEmitter} from 'events';
+
 import {ReconnectingWebsocket, WEBSOCKET_STATE} from './ReconnectingWebsocket';
+
+import {InvalidTokenError, MissingCookieError} from '../auth/';
+import {HttpClient, NetworkError} from '../http/';
 import {Notification} from '../notification/';
 
 enum TOPIC {
@@ -117,7 +119,7 @@ export class WebSocketClient extends EventEmitter {
     this.onStateChange(this.socket.getState());
   };
 
-  private readonly onClose = (event: CloseEvent) => {
+  private readonly onClose = () => {
     this.abortHandler?.abort();
     this.bufferedMessages = [];
     this.onStateChange(this.socket.getState());

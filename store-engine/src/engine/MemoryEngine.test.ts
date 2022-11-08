@@ -17,6 +17,9 @@
  *
  */
 
+import {CRUDEngine} from './CRUDEngine';
+import {MemoryEngine} from './MemoryEngine';
+
 import {createSpec} from '../test/createSpec';
 import {deleteAllSpec} from '../test/deleteAllSpec';
 import {deleteSpec} from '../test/deleteSpec';
@@ -26,12 +29,12 @@ import {readAllSpec} from '../test/readAllSpec';
 import {readSpec} from '../test/readSpec';
 import {updateOrCreateSpec} from '../test/updateOrCreateSpec';
 import {updateSpec} from '../test/updateSpec';
-import {CRUDEngine} from './CRUDEngine';
-import {MemoryEngine} from './MemoryEngine';
 
 const STORE_NAME = 'store-name';
 
 let engine: CRUDEngine;
+
+/* eslint-disable jest/expect-expect, jest/valid-title */
 
 async function initEngine(shouldCreateNewEngine = true): Promise<MemoryEngine | CRUDEngine> {
   const storeEngine = shouldCreateNewEngine ? new MemoryEngine() : engine;

@@ -17,23 +17,32 @@
  *
  */
 
-import {APIClient, BackendFeatures} from '@wireapp/api-client';
-import {RegisterData} from '@wireapp/api-client/lib/auth';
-import {AUTH_COOKIE_KEY, AUTH_TABLE_NAME, Context, Cookie, CookieStore, LoginData} from '@wireapp/api-client/lib/auth/';
+import {
+  RegisterData,
+  AUTH_COOKIE_KEY,
+  AUTH_TABLE_NAME,
+  Context,
+  Cookie,
+  CookieStore,
+  LoginData,
+} from '@wireapp/api-client/lib/auth';
 import {ClientClassification, ClientType, RegisteredClient} from '@wireapp/api-client/lib/client/';
 import * as Events from '@wireapp/api-client/lib/event';
 import {Notification} from '@wireapp/api-client/lib/notification/';
 import {AbortHandler, WebSocketClient} from '@wireapp/api-client/lib/tcp/';
-import * as cryptobox from '@wireapp/cryptobox';
-import {CRUDEngine, error as StoreEngineError, MemoryEngine} from '@wireapp/store-engine';
-import {EventEmitter} from 'events';
+import {WEBSOCKET_STATE} from '@wireapp/api-client/lib/tcp/ReconnectingWebsocket';
+import axios from 'axios';
+import {Encoder} from 'bazinga64';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import logdown from 'logdown';
 
-import {WEBSOCKET_STATE} from '@wireapp/api-client/lib/tcp/ReconnectingWebsocket';
+import {EventEmitter} from 'events';
+
+import {APIClient, BackendFeatures} from '@wireapp/api-client';
 import {CoreCrypto} from '@wireapp/core-crypto';
-import axios from 'axios';
-import {Encoder} from 'bazinga64';
+import * as cryptobox from '@wireapp/cryptobox';
+import {CRUDEngine, error as StoreEngineError, MemoryEngine} from '@wireapp/store-engine';
+
 import {AccountService} from './account/';
 import {LoginSanitizer} from './auth/';
 import {BroadcastService} from './broadcast/';

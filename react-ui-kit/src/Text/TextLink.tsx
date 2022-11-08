@@ -17,12 +17,12 @@
  *
  */
 
-/** @jsx jsx */
-import {CSSObject, jsx} from '@emotion/react';
+import {CSSObject} from '@emotion/react';
+
+import {LinkProps, filterLinkProps, linkStyle} from './Link';
 
 import {COLOR_V2} from '../Identity/colors-v2';
 import {Theme} from '../Layout';
-import {LinkProps, filterLinkProps, linkStyle} from './Link';
 
 export type TextLinkProps<T = HTMLAnchorElement> = LinkProps<T>;
 
@@ -34,5 +34,5 @@ export const textLinkStyle: <T>(theme: Theme, props: TextLinkProps<T>) => CSSObj
 });
 
 export const TextLink = (props: TextLinkProps<HTMLAnchorElement>) => (
-  <a css={(theme: Theme) => textLinkStyle(theme, props)} rel="noopener noreferrer" {...filterLinkProps(props)} />
+  <a css={(theme: Theme) => textLinkStyle(theme, props)} rel="noopener noreferrer" {...filterLinkProps(props)}></a>
 );

@@ -17,7 +17,6 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
 import {
   ClientMismatch,
   MessageSendingStatus,
@@ -25,6 +24,8 @@ import {
   UserClients,
 } from '@wireapp/api-client/lib/conversation';
 import {UserPreKeyBundleMap} from '@wireapp/api-client/lib/user/';
+
+import {APIClient} from '@wireapp/api-client';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {MessageService} from '../conversation/message/MessageService';

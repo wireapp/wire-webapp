@@ -17,22 +17,22 @@
  *
  */
 
+import axios from 'axios';
+import copy from 'copy';
+import {ensureDir, remove, readFile, writeFile, createWriteStream} from 'fs-extra';
+import JSZip from 'jszip';
+import rimraf from 'rimraf';
+import File from 'vinyl';
+
 import {exec} from 'child_process';
 import path from 'path';
 import {promisify} from 'util';
 
-import copy from 'copy';
-import fs from 'fs-extra';
-import JSZip from 'jszip';
-import rimraf from 'rimraf';
-import File from 'vinyl';
-import axios from 'axios';
-
 export async function copyAsync(source: string, destination: string): Promise<File[]> {
   if (isFile(destination)) {
-    await fs.ensureDir(path.dirname(destination));
+    await ensureDir(path.dirname(destination));
   } else {
-    await fs.ensureDir(destination);
+    await ensureDir(destination);
   }
 
   return new Promise((resolve, reject) =>
@@ -42,10 +42,10 @@ export async function copyAsync(source: string, destination: string): Promise<Fi
 
 export async function downloadFileAsync(url: string, baseDir: string): Promise<void> {
   const zipFile = path.join(baseDir, 'archive.zip');
-  await fs.ensureDir(baseDir);
+  await ensureDir(baseDir);
 
   await new Promise((resolve, reject) => {
-    const writer = fs.createWriteStream(zipFile).on('error', reject).on('finish', resolve);
+    const writer = createWriteStream(zipFile).on('error', reject).on('finish', resolve);
 
     return axios
       .request({
@@ -59,14 +59,14 @@ export async function downloadFileAsync(url: string, baseDir: string): Promise<v
   });
 
   await extractAsync(zipFile, baseDir);
-  await fs.remove(zipFile);
+  await remove(zipFile);
 }
 
 export async function extractAsync(zipFile: string, destination: string): Promise<void> {
   const jszip = new JSZip();
-  await fs.ensureDir(destination);
+  await ensureDir(destination);
 
-  const data = await fs.readFile(zipFile);
+  const data = await readFile(zipFile);
   const entries: [string, JSZip.JSZipObject][] = [];
 
   await jszip.loadAsync(data, {createFolders: true});
@@ -77,10 +77,10 @@ export async function extractAsync(zipFile: string, destination: string): Promis
     entries.map(async ([filePath, entry]) => {
       const resolvedFilePath = path.join(destination, filePath.replace(stripEntry, ''));
       if (entry.dir) {
-        await fs.ensureDir(resolvedFilePath);
+        await ensureDir(resolvedFilePath);
       } else {
         const content = await entry.async('nodebuffer');
-        await fs.writeFile(resolvedFilePath, content);
+        await writeFile(resolvedFilePath, content);
       }
     }),
   );

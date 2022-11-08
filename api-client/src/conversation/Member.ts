@@ -18,6 +18,7 @@
  */
 
 import {QualifiedId} from '../user';
+
 import {DefaultConversationRoleName, MutedStatus, ServiceRef} from './';
 
 export interface Member {

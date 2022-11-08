@@ -17,18 +17,20 @@
  *
  */
 
-/** @jsx jsx */
-import {CSSObject, jsx} from '@emotion/react';
-import React, {FC, forwardRef} from 'react';
-import {TextProps} from '../Text';
-import {Theme} from '../Layout';
-import InputLabel from './InputLabel';
+import {FC, forwardRef} from 'react';
+
+import {CSSObject} from '@emotion/react';
+
+import {InputLabel} from './InputLabel';
 import {
   getImageCropZoomInputStyles,
   getValueLabelStyles,
   rangeInputWrapperStyles,
   ValueLabelPosition,
 } from './RangeInput.styles';
+
+import {Theme} from '../Layout';
+import {TextProps} from '../Text';
 
 export interface RangeInputProps<T = HTMLInputElement> extends TextProps<T> {
   label?: string;
@@ -67,7 +69,10 @@ export const RangeInput: FC<RangeInputProps> = forwardRef<HTMLInputElement, Rang
           {maxValueLabel && <span css={getValueLabelStyles(ValueLabelPosition.RIGHT)}>{maxValueLabel}</span>}
           <input
             ref={ref}
-            css={(theme: Theme) => getImageCropZoomInputStyles(theme, backgroundSize)}
+            css={(theme: Theme) => {
+              console.info('hallo', theme, backgroundSize);
+              return getImageCropZoomInputStyles(theme, backgroundSize);
+            }}
             id={id}
             name={id}
             min={min}
@@ -82,3 +87,4 @@ export const RangeInput: FC<RangeInputProps> = forwardRef<HTMLInputElement, Rang
     );
   },
 );
+RangeInput.displayName = 'RangeInput';

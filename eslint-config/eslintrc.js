@@ -5,42 +5,45 @@ module.exports = {
     browser: true,
     es6: true,
     node: true,
+    jest: true
   },
-
-  extends: ['prettier', 'plugin:react/recommended', 'plugin:no-unsanitized/DOM'],
-  overrides: [
-    {
-      files: ['*.ts', '*.tsx'],
-      parser: '@typescript-eslint/parser',
-      rules: {
-        '@typescript-eslint/array-type': 'error',
-        '@typescript-eslint/consistent-type-assertions': 'error',
-        '@typescript-eslint/no-floating-promises': 'error',
-        '@typescript-eslint/no-this-alias': 'error',
-        '@typescript-eslint/prefer-readonly': 'error',
-        '@typescript-eslint/return-await': ['error', 'in-try-catch'],
-        '@typescript-eslint/typedef': 'error',
-      },
-    },
+  extends: [
+    "plugin:jest/recommended",
+    "plugin:jsx-a11y/recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "prettier",
+    "plugin:import/recommended",
+    "plugin:import/typescript",
+    'plugin:react/recommended',
+    'plugin:no-unsanitized/DOM',
+    'plugin:react/jsx-runtime',
   ],
-  parser: '@babel/eslint-parser',
+  ignorePatterns: [
+    ".git/",
+    "docs/",
+    "bin/",
+    "**/node_modules/",
+  ],
+  parser: "@typescript-eslint/parser",
   parserOptions: {
-    requireConfigFile: false,
-    ecmaFeatures: {
-      jsx: true,
-    },
-    ecmaVersion: 6,
-    sourceType: 'module',
+    tsconfigRootDir: ".",
+    sourceType: "module",
+    project: ["./tsconfig.json"]
   },
   plugins: [
-    '@typescript-eslint',
     'jsdoc',
     'no-unsanitized',
     'prettier',
     'react',
     'react-hooks',
-    'unused-imports',
     'header',
+    "import",
+    "react-hooks",
+    "eslint-plugin-testing-library",
+    "@typescript-eslint",
+    'unused-imports',
+    "eslint-plugin-jest-dom",
+    "better-styled-components"
   ],
   rules: {
     'constructor-super': 'error',
@@ -73,7 +76,6 @@ module.exports = {
       ],
       2,
     ],
-    'id-length': 'error',
     'no-cond-assign': 'error',
     'no-console': [
       'error',
@@ -87,12 +89,12 @@ module.exports = {
     'no-else-return': 'error',
     'no-inner-declarations': 'error',
     'no-lonely-if': 'error',
-    'no-magic-numbers': [
-      'error',
-      {
-        ignore: [-1, 0, 1, 2],
-      },
-    ],
+    "no-magic-numbers": ["warn", {
+      "ignore": [-1, 0, 1],
+      "ignoreArrayIndexes": true,
+      "detectObjects": true,
+      "ignoreDefaultValues": true
+    }],
     'no-restricted-globals': [
       'warn',
       {
@@ -104,14 +106,13 @@ module.exports = {
         name: 'fdescribe',
       },
     ],
-    'no-return-await': 'off',
     'no-sequences': 'error',
     'no-sparse-arrays': 'error',
     'no-trailing-spaces': 'error',
     'no-undef': 'error',
     'no-unneeded-ternary': 'error',
     'no-unused-expressions': 'error',
-    'no-unused-vars': [
+    '@typescript-eslint/no-unused-vars': [
       'error',
       {
         args: 'none',
@@ -127,12 +128,50 @@ module.exports = {
     'prefer-spread': 'error',
     'prefer-template': 'error',
     'prettier/prettier': 'error',
+    "jest/no-jasmine-globals": "error",
+    "jest/no-identical-title": "warn",
+    "jest/no-done-callback": "warn",
+    "jest/no-disabled-tests": "warn",
+    "jest/no-conditional-expect": "warn",
+    "jsx-a11y/media-has-caption": "warn",
+    "jsx-a11y/no-noninteractive-tabindex": "warn",
+    'react/jsx-uses-react': 'error',
     'react/jsx-uses-vars': 'error',
     'react/prefer-stateless-function': 'error',
-    'react/prop-types': 'off',
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
+    "react/no-unknown-property": ["error", { "ignore": ["css"] }],
     'sort-vars': 'error',
     strict: ['error', 'global'],
-    'unused-imports/no-unused-imports': 'error',
+    "unused-imports/no-unused-imports": "error",
+    "import/no-unresolved": "error",
+    "import/no-default-export": "error",
+    "import/order": [
+      "error",
+      {
+        "groups": ["external", "builtin", "internal", "sibling", "parent", "index"],
+        "pathGroups": [
+          {
+            "pattern": "react",
+            "group": "external",
+            "position": "before"
+          },
+          {
+            "pattern": "@wireapp/*",
+            "group": "internal",
+            "position": "before"
+          }
+        ],
+        "pathGroupsExcludedImportTypes": ["react", "@wireapp/*"],
+        "newlines-between": "always",
+        "alphabetize": {
+          "order": "asc",
+          "caseInsensitive": true
+        },
+        "warnOnUnassignedImports": true
+      }
+    ],
+    "better-styled-components/sort-declarations-alphabetically": 2,
     'valid-jsdoc': [
       'error',
       {
@@ -153,7 +192,17 @@ module.exports = {
   },
   settings: {
     react: {
-      version: 'latest',
+      version: "detect"
     },
+    "import/parsers": {
+      "@typescript-eslint/parser": [".js", ".jsx", ".ts", ".tsx"]
+    },
+    "import/resolver": {
+      typescript: {
+        alwaysTryTypes: true,
+        // always try to resolve types under `<root>@types` directory even it doesn't contain any source code, like `@types/unist`
+        paths: "./tsconfig.json"
+      }
+    }
   },
-};
+}

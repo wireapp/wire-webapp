@@ -17,15 +17,15 @@
  *
  */
 
-/** @jsx jsx */
-import {CSSObject, jsx} from '@emotion/react';
+import {CSSObject} from '@emotion/react';
 
-import {Loading} from '../Misc';
-import {COLOR} from '../Identity';
-import {filterProps} from '../util';
-import {filterTextProps} from '../Text';
 import {ButtonProps, buttonStyle} from './Button';
+
+import {COLOR} from '../Identity';
 import {Theme} from '../Layout';
+import {Loading} from '../Misc';
+import {filterTextProps} from '../Text';
+import {filterProps} from '../util';
 
 export const buttonLinkStyle: (theme: Theme, props: ButtonProps<HTMLAnchorElement>) => CSSObject = (theme, props) => ({
   ...buttonStyle(theme, props),

@@ -17,8 +17,9 @@
  *
  */
 
-import {Crypto} from './interfaces';
 import * as cryptoLib from 'crypto';
+
+import {Crypto} from './interfaces';
 
 export const crypto: Crypto = {
   async digest(cipherText: Uint8Array): Promise<Uint8Array> {

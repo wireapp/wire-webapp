@@ -17,9 +17,12 @@
  *
  */
 
-import {EventEmitter} from 'events';
 import logdown from 'logdown';
 
+import {EventEmitter} from 'events';
+
+import {AccountAPI} from './account/AccountAPI';
+import {AssetAPI} from './asset/';
 import {
   AccessTokenData,
   AccessTokenStore,
@@ -31,22 +34,22 @@ import {
   MissingCookieError,
   RegisterData,
 } from './auth/';
-import {AccountAPI} from './account/AccountAPI';
-import {AssetAPI} from './asset/';
-import {Backend} from './env/';
+import {CookieStore} from './auth/CookieStore';
+import {parseAccessToken} from './auth/parseAccessToken';
 import {BroadcastAPI} from './broadcast/';
 import {ClientAPI, ClientType} from './client/';
+import {Config} from './Config';
 import {ConnectionAPI} from './connection/';
 import {ConversationAPI} from './conversation/';
-import {CookieStore} from './auth/CookieStore';
+import {Backend} from './env/';
 import {GiphyAPI} from './giphy/';
 import {BackendError, HttpClient} from './http/';
 import {NotificationAPI} from './notification/';
 import {ObfuscationUtil} from './obfuscation/';
-import {OnConnect, WebSocketClient} from './tcp/';
 import {SelfAPI} from './self/';
 import {ServiceProviderAPI} from './serviceProvider';
 import {ServicesAPI} from './services';
+import {OnConnect, WebSocketClient} from './tcp/';
 import {
   FeatureAPI,
   IdentityProviderAPI,
@@ -59,11 +62,9 @@ import {
   TeamConversationAPI,
   TeamInvitationAPI,
 } from './team/';
-import {UserAPI} from './user/';
-import {Config} from './Config';
-import {TeamSearchAPI} from './team/search';
-import {parseAccessToken} from './auth/parseAccessToken';
 import {ScimAPI} from './team/scim/ScimAPI';
+import {TeamSearchAPI} from './team/search';
+import {UserAPI} from './user/';
 
 const {version}: {version: string} = require('../package.json');
 

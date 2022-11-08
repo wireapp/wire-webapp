@@ -18,11 +18,8 @@
  */
 
 import axios, {AxiosRequestConfig} from 'axios';
-
-import {TeamAPI} from '../team/';
-import {HttpClient, BackendErrorLabel, BackendError} from '../../http/';
-import {NewTeamInvitation, TeamInvitation, TeamInvitationChunk} from '../invitation/';
 import {StatusCodes as StatusCode} from 'http-status-codes';
+
 import {
   InvitationInvalidPhoneError,
   InvitationInvalidEmailError,
@@ -31,6 +28,10 @@ import {
   InvitationNotFoundError,
   InvitationMultipleError,
 } from './InvitationError';
+
+import {HttpClient, BackendErrorLabel, BackendError} from '../../http/';
+import {NewTeamInvitation, TeamInvitation, TeamInvitationChunk} from '../invitation/';
+import {TeamAPI} from '../team/';
 
 export class TeamInvitationAPI {
   public static readonly MAX_CHUNK_SIZE = 100;

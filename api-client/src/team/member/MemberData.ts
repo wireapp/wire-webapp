@@ -17,8 +17,9 @@
  *
  */
 
-import {LegalHoldMemberStatus} from '../legalhold';
 import {PermissionsData} from './PermissionsData';
+
+import {LegalHoldMemberStatus} from '../legalhold';
 
 export interface MemberData {
   /** Timestamp of invitation creation. */

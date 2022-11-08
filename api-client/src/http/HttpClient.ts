@@ -17,11 +17,14 @@
  *
  */
 
-import {EventEmitter} from 'events';
-import {PriorityQueue} from '@wireapp/priority-queue';
-import {TimeUtil} from '@wireapp/commons';
 import axios, {AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse} from 'axios';
+import axiosRetry, {isNetworkOrIdempotentRequestError, exponentialDelay} from 'axios-retry';
 import logdown from 'logdown';
+
+import {EventEmitter} from 'events';
+
+import {TimeUtil} from '@wireapp/commons';
+import {PriorityQueue} from '@wireapp/priority-queue';
 
 import {
   AccessTokenData,
@@ -31,11 +34,10 @@ import {
   MissingCookieError,
   TokenExpiredError,
 } from '../auth/';
+import {Config} from '../Config';
 import {BackendError, BackendErrorMapper, ConnectionState, ContentType, StatusCode} from '../http/';
 import {ObfuscationUtil} from '../obfuscation/';
 import {sendRequestWithCookie} from '../shims/node/cookie';
-import {Config} from '../Config';
-import axiosRetry, {isNetworkOrIdempotentRequestError} from 'axios-retry';
 
 enum TOPIC {
   ON_CONNECTION_STATE_CHANGE = 'HttpClient.TOPIC.ON_CONNECTION_STATE_CHANGE',
@@ -66,7 +68,7 @@ export class HttpClient extends EventEmitter {
     });
     axiosRetry(this.client, {
       retries: Infinity,
-      retryDelay: axiosRetry.exponentialDelay,
+      retryDelay: exponentialDelay,
       retryCondition: (error: AxiosError) => {
         const {response, request} = error;
         const isNetworkError = !response && request && !Object.keys(request).length;

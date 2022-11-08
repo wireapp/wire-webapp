@@ -19,10 +19,11 @@
 
 import {AccentColor} from '@wireapp/commons';
 
+import {QualifiedId} from './QualifiedId';
+
 import {ServiceRef} from '../conversation/';
 import {Picture} from '../self/';
 import {UserAsset} from '../user/';
-import {QualifiedId} from './QualifiedId';
 
 export interface User {
   accent_id?: AccentColor.AccentColorID;

@@ -37,7 +37,7 @@ export class Converter {
     const chunkSize = 32000;
     const array = Array.from(arrayBufferView);
     const chunkCount = Math.ceil(array.length / chunkSize);
-    return Array.from({length: chunkCount}, (value, index) =>
+    return Array.from({length: chunkCount}, (_, index) =>
       String.fromCharCode.apply(null, array.slice(index * chunkSize, (index + 1) * chunkSize)),
     ).join('');
   }
@@ -120,7 +120,7 @@ export class Converter {
   public static stringToArrayBufferViewUTF8(data: string): Uint8Array {
     const escapedString = encodeURIComponent(data);
 
-    const binaryString = escapedString.replace(/%([0-9A-F]{2})/g, (match, position) => {
+    const binaryString = escapedString.replace(/%([0-9A-F]{2})/g, (_, position) => {
       const code = parseInt(`0x${position}`, 16);
       return String.fromCharCode(code);
     });

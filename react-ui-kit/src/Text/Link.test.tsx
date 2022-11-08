@@ -17,10 +17,11 @@
  *
  */
 
-import React from 'react';
 import {THEME_ID} from '../Layout';
 import {matchComponent} from '../test/testUtil';
 import {Link} from '../Text';
+
+/* eslint-disable jest/expect-expect */
 
 describe('"Link"', () => {
   it('renders', () => matchComponent(<Link>Link</Link>));

@@ -21,6 +21,7 @@ import {AxiosRequestConfig} from 'axios';
 
 import {GiphySearchOptions, GiphyRandomOptions, GiphyTrendingOptions, GiphyIdOptions} from './GiphyOptions';
 import {GiphyResult, GiphyMultipleResult} from './GiphyResult';
+
 import {HttpClient} from '../http/';
 
 export class GiphyAPI {

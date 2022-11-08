@@ -1,9 +1,0 @@
-{
-  "compilerOptions": {
-    "esModuleInterop": true,
-    "outDir": "src/main",
-    "rootDir": "src/main"
-  },
-  "exclude": ["node_modules"],
-  "extends": "../../tsconfig.json"
-}

@@ -17,8 +17,9 @@
  *
  */
 
-import {HttpClient} from '../../http';
 import {ConversationAPI} from './ConversationAPI';
+
+import {HttpClient} from '../../http';
 
 describe('ConversationAPI', () => {
   const httpClientMock = new HttpClient({urls: {name: 'test', rest: 'https://test', ws: 'ws://test'}}, {} as any);

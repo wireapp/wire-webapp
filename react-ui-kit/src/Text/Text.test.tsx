@@ -17,11 +17,13 @@
  *
  */
 
-import React from 'react';
+import {Bold, Large, Muted, Small, Text, Uppercase} from './Text';
+
 import {COLOR} from '../Identity';
 import {THEME_ID} from '../Layout';
 import {matchComponent} from '../test/testUtil';
-import {Bold, Large, Muted, Small, Text, Uppercase} from './Text';
+
+/* eslint-disable jest/expect-expect */
 
 describe('"Text"', () => {
   it('renders', () => matchComponent(<Text>Text</Text>));

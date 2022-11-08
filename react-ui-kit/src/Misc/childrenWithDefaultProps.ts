@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import * as React from 'react';
 
 export interface ChildrenProps<T extends Element, P extends React.HTMLProps<T>> {
   children: React.ReactNode;

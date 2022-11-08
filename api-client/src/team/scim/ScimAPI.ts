@@ -19,9 +19,10 @@
 
 import {AxiosRequestConfig} from 'axios';
 
-import {HttpClient} from '../../http';
 import {NewScimToken} from './NewScimToken';
 import {ScimTokenInfoList} from './ScimTokenInfoList';
+
+import {HttpClient} from '../../http';
 
 export class ScimAPI {
   constructor(private readonly client: HttpClient) {}

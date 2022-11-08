@@ -17,12 +17,6 @@
  *
  */
 
-import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {AxiosError} from 'axios';
-import {proteus as ProtobufOTR} from '@wireapp/protocol-messaging/web/otr';
-import Long from 'long';
-import {uuidToBytes} from '@wireapp/commons/lib/util/StringUtil';
-import {APIClient} from '@wireapp/api-client';
 import {
   ClientMismatch,
   MessageSendingStatus,
@@ -32,15 +26,23 @@ import {
   QualifiedUserClients,
   UserClients,
 } from '@wireapp/api-client/lib/conversation';
-import {Encoder} from 'bazinga64';
-
-import {encryptAsset} from '../../cryptography/AssetCryptography';
-import {CryptographyService} from '../../cryptography';
 import {QualifiedId, QualifiedUserPreKeyBundleMap, UserPreKeyBundleMap} from '@wireapp/api-client/lib/user';
-import {createId} from './MessageBuilder';
+import {uuidToBytes} from '@wireapp/commons/lib/util/StringUtil';
+import {proteus as ProtobufOTR} from '@wireapp/protocol-messaging/web/otr';
+import {AxiosError} from 'axios';
+import {Encoder} from 'bazinga64';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import Long from 'long';
+
+import {APIClient} from '@wireapp/api-client';
 import {GenericMessage} from '@wireapp/protocol-messaging';
-import {GenericMessageType} from '..';
+
+import {createId} from './MessageBuilder';
 import {flattenUserClients, flattenQualifiedUserClients} from './UserClientsUtil';
+
+import {GenericMessageType} from '..';
+import {CryptographyService} from '../../cryptography';
+import {encryptAsset} from '../../cryptography/AssetCryptography';
 import {isQualifiedIdArray, isStringArray} from '../../util';
 
 type ClientMismatchError = AxiosError<ClientMismatch | MessageSendingStatus>;

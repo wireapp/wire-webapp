@@ -17,18 +17,22 @@
  *
  */
 
+import * as bazinga64 from 'bazinga64';
+
+import * as crypto from 'crypto';
+import {promisify} from 'util';
+
 import {APIClient} from '@wireapp/api-client';
 import {Cryptobox} from '@wireapp/cryptobox';
 import * as Proteus from '@wireapp/proteus';
 import {CRUDEngine, MemoryEngine} from '@wireapp/store-engine';
-import * as bazinga64 from 'bazinga64';
-import * as crypto from 'crypto';
-import {promisify} from 'util';
-import {SessionPayloadBundle} from '.';
 
-import * as CryptographyHelper from '../test/CryptographyHelper';
 import {decryptAsset, encryptAsset} from './AssetCryptography';
 import {CryptographyService} from './CryptographyService';
+
+import * as CryptographyHelper from '../test/CryptographyHelper';
+
+import {SessionPayloadBundle} from '.';
 
 async function createEngine(storeName: string): Promise<CRUDEngine> {
   const engine = new MemoryEngine();

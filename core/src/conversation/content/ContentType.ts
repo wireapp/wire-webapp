@@ -20,6 +20,7 @@
 import {Connection} from '@wireapp/api-client/lib/connection/';
 
 import {ClientActionType} from '..';
+
 import {
   AssetContent,
   ClearedContent,

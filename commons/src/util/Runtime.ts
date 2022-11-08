@@ -17,7 +17,7 @@
  *
  */
 
-import * as platform from 'platform';
+import platform from 'platform';
 
 import {BROWSER, WEBAPP_SUPPORTED_BROWSERS} from '../config/CommonConfig';
 

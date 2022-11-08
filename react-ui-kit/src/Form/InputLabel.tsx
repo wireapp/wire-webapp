@@ -17,11 +17,10 @@
  *
  */
 
-/** @jsx jsx */
-import {jsx} from '@emotion/react';
+import {FC, ReactNode} from 'react';
+
 import {COLOR_V2} from '../Identity';
 import {Theme} from '../Layout';
-import React, {FC, ReactNode} from 'react';
 
 export interface InputLabelProps {
   children: ReactNode | string;
@@ -47,4 +46,4 @@ const InputLabel: FC<InputLabelProps> = ({htmlFor, markInvalid, isRequired, chil
   </label>
 );
 
-export default InputLabel;
+export {InputLabel};

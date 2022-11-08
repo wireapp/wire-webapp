@@ -17,7 +17,6 @@
  *
  */
 
-import * as bazinga64 from './index';
 import {
   helloDecodedArray,
   helloDecodedString,
@@ -25,6 +24,8 @@ import {
   helloEncodedString,
   numberEncoded,
 } from './test/TestValues';
+
+import * as bazinga64 from './index';
 
 const fixtures = require('./test/fixtures.json');
 

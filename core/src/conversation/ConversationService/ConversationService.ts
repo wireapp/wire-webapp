@@ -17,8 +17,6 @@
  *
  */
 
-import {ConversationConfiguration, ExternalProposalType} from '@wireapp/core-crypto';
-import {APIClient} from '@wireapp/api-client';
 import {
   MessageSendingStatus,
   Conversation,
@@ -33,16 +31,13 @@ import {
 import {CONVERSATION_TYPING, ConversationMemberUpdateData} from '@wireapp/api-client/lib/conversation/data';
 import {ConversationMemberLeaveEvent} from '@wireapp/api-client/lib/event';
 import {QualifiedId, QualifiedUserPreKeyBundleMap, UserPreKeyBundleMap} from '@wireapp/api-client/lib/user';
+import {XOR} from '@wireapp/commons/lib/util/TypeUtil';
+import {Decoder} from 'bazinga64';
+
+import {APIClient} from '@wireapp/api-client';
+import {ConversationConfiguration, ExternalProposalType} from '@wireapp/core-crypto';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
-import {MessageTimer, PayloadBundleState, RemoveUsersParams} from '../../conversation/';
-import {RemoteData} from '../content';
-import {CryptographyService} from '../../cryptography/';
-import {MLSService} from '../../mls';
-import {decryptAsset} from '../../cryptography/AssetCryptography';
-import {isStringArray, isQualifiedIdArray, isQualifiedUserClients, isUserClients} from '../../util/TypePredicateUtil';
-import {MessageService} from '../message/MessageService';
-import {XOR} from '@wireapp/commons/lib/util/TypeUtil';
 import {
   AddUsersParams,
   MessageSendingOptions,
@@ -51,10 +46,16 @@ import {
   SendMlsMessageParams,
   SendProteusMessageParams,
 } from './ConversationService.types';
-import {Decoder} from 'bazinga64';
+
+import {MessageTimer, PayloadBundleState, RemoveUsersParams} from '../../conversation/';
+import {CryptographyService} from '../../cryptography/';
+import {decryptAsset} from '../../cryptography/AssetCryptography';
+import {MLSService, optionalToUint8Array} from '../../mls';
 import {mapQualifiedUserClientIdsToFullyQualifiedClientIds} from '../../util/fullyQualifiedClientIdUtils';
-import {optionalToUint8Array} from '../../mls';
+import {isStringArray, isQualifiedIdArray, isQualifiedUserClients, isUserClients} from '../../util/TypePredicateUtil';
+import {RemoteData} from '../content';
 import {sendMessage} from '../message/messageSender';
+import {MessageService} from '../message/MessageService';
 
 type SendResult = {
   /** The id of the message sent */

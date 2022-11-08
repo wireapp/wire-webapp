@@ -17,8 +17,6 @@
  *
  */
 
-import {PriorityQueue as PQType} from '../../../main';
-
 import {PriorityQueue} from '@wireapp/priority-queue';
 
 beforeAll(() => {
@@ -26,7 +24,7 @@ beforeAll(() => {
 });
 
 describe('PriorityQueue', () => {
-  let queue: PQType;
+  let queue: PriorityQueue;
 
   afterEach(() => {
     if (queue) {

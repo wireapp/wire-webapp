@@ -20,6 +20,7 @@
 import ansiRegex from 'ansi-regex';
 import * as fs from 'fs-extra';
 import logdown from 'logdown';
+
 import * as os from 'os';
 import * as path from 'path';
 

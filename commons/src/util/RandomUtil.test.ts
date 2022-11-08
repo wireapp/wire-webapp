@@ -26,6 +26,7 @@ jest.useRealTimers();
  */
 describe('RandomUtil', () => {
   describe('"randomInt"', () => {
+    // eslint-disable-next-line jest/expect-expect
     it('respects limit', () => {
       const iterations = 100;
       const randomLimit = 10;

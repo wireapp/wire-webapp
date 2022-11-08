@@ -17,7 +17,6 @@
  *
  */
 
-import * as bazinga64 from './index';
 import {
   helloDecodedArray,
   helloDecodedString,
@@ -25,6 +24,8 @@ import {
   numberDecoded,
   numberEncoded,
 } from './test/TestValues';
+
+import * as bazinga64 from './index';
 
 describe('toBase64', () => {
   it('encodes arrays', () => {

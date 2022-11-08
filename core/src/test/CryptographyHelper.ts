@@ -17,9 +17,10 @@
  *
  */
 
+import * as bazinga64 from 'bazinga64';
+
 import {Cryptobox} from '@wireapp/cryptobox';
 import {init, keys} from '@wireapp/proteus';
-import * as bazinga64 from 'bazinga64';
 
 import {CryptographyService} from '../cryptography';
 

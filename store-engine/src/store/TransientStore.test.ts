@@ -17,9 +17,10 @@
  *
  */
 
+import {TransientStore} from './TransientStore';
+
 import {CRUDEngine, MemoryEngine} from '../engine';
 import {RecordAlreadyExistsError} from '../engine/error';
-import {TransientStore} from './TransientStore';
 
 describe('store.TransientStore', () => {
   const STORE_NAME = 'database-name';
@@ -59,12 +60,15 @@ describe('store.TransientStore', () => {
 
     it("doesn't overwrite an existing record.", async () => {
       expect.assertions(2);
+      let errorMessage;
       try {
         await store.set(primaryKey, entity, ttl);
         await store.set(primaryKey, {access_token: 'ABC'}, ttl);
       } catch (error) {
-        expect(error).toEqual(expect.any(RecordAlreadyExistsError));
-        expect((error as RecordAlreadyExistsError).code).toBe(1);
+        errorMessage = error;
+      } finally {
+        expect(errorMessage).toEqual(expect.any(RecordAlreadyExistsError));
+        expect((errorMessage as RecordAlreadyExistsError).code).toBe(1);
       }
     });
   });
@@ -81,11 +85,7 @@ describe('store.TransientStore', () => {
       await store.set(primaryKey, entity, ttl);
       const bundle = await store.get(primaryKey);
 
-      if (bundle) {
-        expect(bundle.payload).toEqual(entity);
-      } else {
-        throw new Error('Bundle is not defined.');
-      }
+      expect(bundle?.payload).toEqual(entity);
     });
 
     it(`returns a saved record with an "@" in it's primary key.`, async () => {
@@ -94,11 +94,7 @@ describe('store.TransientStore', () => {
       await store.set(primaryKey, entity, ttl);
       const bundle = await store.get(primaryKey);
 
-      if (bundle) {
-        expect(bundle.payload).toEqual(entity);
-      } else {
-        throw new Error('Bundle is not defined.');
-      }
+      expect(bundle?.payload).toEqual(entity);
     });
 
     it('returns a non-existent record as "undefined".', async () => {

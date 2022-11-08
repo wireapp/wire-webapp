@@ -29,6 +29,7 @@ import {
 import {ConversationIsUnknownError, ConversationOperationError} from '../conversation/';
 import {InvalidInvitationCodeError, InviteEmailInUseError, ServiceNotFoundError} from '../team/';
 import {UnconnectedUserError, UserIsUnknownError} from '../user/';
+
 import {BackendError, BackendErrorLabel, StatusCode} from './';
 
 export class BackendErrorMapper {

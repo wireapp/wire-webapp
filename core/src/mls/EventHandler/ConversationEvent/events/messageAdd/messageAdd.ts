@@ -18,9 +18,11 @@
  */
 
 import {BackendEvent, ConversationMLSMessageAddEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
-import {GenericMessage} from '@wireapp/protocol-messaging';
 import {Decoder} from 'bazinga64';
 import logdown from 'logdown';
+
+import {GenericMessage} from '@wireapp/protocol-messaging';
+
 import {optionalToUint8Array} from '../../../../MLSService/MLSService';
 import {EventHandlerParams, EventHandlerResult} from '../../../EventHandler.types';
 

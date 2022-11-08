@@ -18,8 +18,9 @@
  */
 
 import {CSSObject} from '@emotion/react';
-import {Theme} from '../Layout';
+
 import {COLOR_V2} from '../Identity';
+import {Theme} from '../Layout';
 import {manySelectors} from '../util';
 
 export const rangeInputWrapperStyles: CSSObject = {

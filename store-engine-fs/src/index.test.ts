@@ -17,10 +17,6 @@
  *
  */
 
-import fs from 'fs-extra';
-import path from 'path';
-
-import {error as StoreEngineError} from '@wireapp/store-engine';
 import {createSpec} from '@wireapp/store-engine/lib/test/createSpec';
 import {deleteAllSpec} from '@wireapp/store-engine/lib/test/deleteAllSpec';
 import {deleteSpec} from '@wireapp/store-engine/lib/test/deleteSpec';
@@ -30,8 +26,15 @@ import {readAllSpec} from '@wireapp/store-engine/lib/test/readAllSpec';
 import {readSpec} from '@wireapp/store-engine/lib/test/readSpec';
 import {updateOrCreateSpec} from '@wireapp/store-engine/lib/test/updateOrCreateSpec';
 import {updateSpec} from '@wireapp/store-engine/lib/test/updateSpec';
+import {statSync, remove} from 'fs-extra';
+
+import path from 'path';
+
+import {error as StoreEngineError} from '@wireapp/store-engine';
 
 import {FileEngine} from './index';
+
+/* eslint-disable jest/expect-expect, jest/valid-title */
 
 describe('FileEngine', () => {
   const BASE_DIRECTORY = path.join(process.cwd(), '.tmp');
@@ -51,7 +54,7 @@ describe('FileEngine', () => {
     engine = await initEngine();
   });
 
-  afterEach(async () => fs.remove(TEST_DIRECTORY));
+  afterEach(async () => remove(TEST_DIRECTORY));
 
   describe('enforcePathRestrictions', () => {
     const enforcePathRestrictions = (givenTrustedRoot: string, givenPath: string) => () =>
@@ -130,11 +133,14 @@ describe('FileEngine', () => {
       ];
 
       for (const operation of functionNames) {
+        let errorMessage;
         try {
           await engine[operation]('../etc', 'primary-key', {});
           throw new Error('Expected error to be thrown.');
         } catch (error) {
-          expect(error instanceof expectedError).toBe(true);
+          errorMessage = error;
+        } finally {
+          expect(errorMessage instanceof expectedError).toBe(true);
         }
       }
     });
@@ -147,7 +153,7 @@ describe('FileEngine', () => {
       };
       engine = new FileEngine(BASE_DIRECTORY);
       const directory = await engine.init(STORE_NAME, options);
-      const fileStatus = fs.statSync(directory);
+      const fileStatus = statSync(directory);
       expect(fileStatus.isDirectory()).toBe(true);
     });
   });

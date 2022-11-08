@@ -17,12 +17,12 @@
  *
  */
 
-/** @jsx jsx */
-import {CSSObject, jsx} from '@emotion/react';
+import {CSSObject} from '@emotion/react';
+
+import {TextProps, filterTextProps, textStyle} from './Text';
 
 import {Theme} from '../Layout';
 import {QueryKeys, media} from '../mediaQueries';
-import {TextProps, filterTextProps, textStyle} from './Text';
 
 interface HeadingProps<T = HTMLHeadingElement> extends TextProps<T> {
   level?: string;

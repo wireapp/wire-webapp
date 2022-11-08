@@ -17,13 +17,13 @@
  *
  */
 
-/** @jsx jsx */
-import {CSSObject, jsx} from '@emotion/react';
+import {CSSObject} from '@emotion/react';
+
+import {COLOR} from './colors';
 
 import {SVGIcon, SVGIconProps} from '../Icon/SVGIcon';
 import {defaultTransition} from '../Identity/motions';
 import {Theme} from '../Layout';
-import {COLOR} from './colors';
 
 export interface LogoProps<T = SVGSVGElement> extends SVGIconProps<T> {
   hover?: boolean;

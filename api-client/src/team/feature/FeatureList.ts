@@ -17,7 +17,6 @@
  *
  */
 
-import {FeatureConversationGuestLink} from '.';
 import {
   FeatureAppLock,
   FeatureClassifiedDomains,
@@ -31,6 +30,8 @@ import {
   FeatureVideoCalling,
   FeatureWithoutConfig,
 } from './Feature';
+
+import {FeatureConversationGuestLink} from '.';
 
 export enum FEATURE_KEY {
   APPLOCK = 'appLock',

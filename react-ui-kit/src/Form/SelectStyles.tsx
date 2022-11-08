@@ -17,8 +17,9 @@
  *
  */
 
-import {Theme} from '../Layout';
 import {inputStyle} from './Input';
+
+import {Theme} from '../Layout';
 
 export const customStyles = (theme: Theme, markInvalid = false) => ({
   indicatorSeparator: () => ({
@@ -27,7 +28,7 @@ export const customStyles = (theme: Theme, markInvalid = false) => ({
   indicatorsContainer: provided => ({
     ...provided,
   }),
-  container: (provided, {isDisabled, selectProps}) => {
+  container: (_, {isDisabled, selectProps}) => {
     const {menuIsOpen} = selectProps;
     const isSelectDisabled = selectProps.isDisabled;
 

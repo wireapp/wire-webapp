@@ -17,12 +17,13 @@
  *
  */
 
-import {TimeUtil} from '@wireapp/commons';
 import logdown from 'logdown';
 import RWS, {CloseEvent, ErrorEvent, Event, Options} from 'reconnecting-websocket';
-import WebSocketClass from '../shims/node/websocket';
+
+import {TimeUtil} from '@wireapp/commons';
 
 import * as buffer from '../shims/node/buffer';
+import {WebSocketNode} from '../shims/node/websocket';
 
 export enum CloseEventCode {
   NORMAL_CLOSURE = 1000,
@@ -45,7 +46,7 @@ export enum PingMessage {
 
 export class ReconnectingWebsocket {
   private static readonly RECONNECTING_OPTIONS: Options = {
-    WebSocket: WebSocketClass,
+    WebSocket: WebSocketNode,
     connectionTimeout: TimeUtil.TimeInMillis.SECOND * 4,
     debug: false,
     maxReconnectionDelay: TimeUtil.TimeInMillis.SECOND * 10,

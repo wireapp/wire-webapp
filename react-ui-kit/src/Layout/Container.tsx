@@ -17,13 +17,14 @@
  *
  */
 
-/** @jsx jsx */
-import {CSSObject, jsx} from '@emotion/react';
-import React from 'react';
+import * as React from 'react';
+
+import {CSSObject} from '@emotion/react';
+
+import {GUTTER, WIDTH} from './sizes';
 
 import {QueryKeys, media} from '../mediaQueries';
 import {filterProps} from '../util';
-import {GUTTER, WIDTH} from './sizes';
 
 export interface ContainerProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   centerText?: boolean;
@@ -70,21 +71,31 @@ const filterContainerProps = (props: ContainerProps) => filterProps(props, ['cen
 export const Container: React.FC<ContainerProps> = React.forwardRef<HTMLDivElement, ContainerProps>((props, ref) => (
   <div ref={ref} css={containerStyle(props)} {...filterContainerProps(props)} />
 ));
+Container.displayName = 'Container';
 
 export type LevelContainerProps = Omit<ContainerProps, 'level'>;
 
 export const ContainerLG = React.forwardRef<HTMLDivElement, LevelContainerProps>((props, ref) => (
   <Container ref={ref} level={'lg'} {...props} />
 ));
+ContainerLG.displayName = 'ContainerLG';
+
 export const ContainerMD = React.forwardRef<HTMLDivElement, LevelContainerProps>((props, ref) => (
   <Container ref={ref} level={'md'} {...props} />
 ));
+ContainerMD.displayName = 'ContainerMD';
+
 export const ContainerSM = React.forwardRef<HTMLDivElement, LevelContainerProps>((props, ref) => (
   <Container ref={ref} level={'sm'} {...props} />
 ));
+ContainerSM.displayName = 'ContainerSM';
+
 export const ContainerXS = React.forwardRef<HTMLDivElement, LevelContainerProps>((props, ref) => (
   <Container ref={ref} level={'xs'} {...props} />
 ));
+ContainerXS.displayName = 'ContainerXS';
+
 export const ContainerXXS = React.forwardRef<HTMLDivElement, LevelContainerProps>((props, ref) => (
   <Container ref={ref} level={'xxs'} {...props} />
 ));
+ContainerXXS.displayName = 'ContainerXXS';

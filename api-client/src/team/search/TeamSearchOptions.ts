@@ -17,8 +17,9 @@
  *
  */
 
-import {Role} from '..';
 import {TeamContact} from './TeamContact';
+
+import {Role} from '..';
 
 export enum SearchOrder {
   ASCENDING = 'asc',

@@ -19,8 +19,8 @@
 
 /* eslint-disable no-magic-numbers, dot-notation */
 
-import nock from 'nock';
 import {AccentColor} from '@wireapp/commons/lib';
+import nock from 'nock';
 
 import {APIClient, BackendVersionResponse} from './APIClient';
 import {AuthAPI} from './auth/AuthAPI';
@@ -87,10 +87,13 @@ describe('APIClient', () => {
         .get('/api-version')
         .reply(200, {supported: [0, 1]});
       const client = new APIClient();
+      let errorMessage;
       try {
         await client.useVersion([2, 3]);
       } catch (error) {
-        expect((error as any).message).toContain('does not support');
+        errorMessage = error.message;
+      } finally {
+        expect(errorMessage).toContain('does not support');
       }
     });
 
@@ -234,6 +237,7 @@ describe('APIClient', () => {
       expect(client['accessTokenStore'].accessToken?.access_token).toBe(accessTokenData.access_token);
     });
 
+    // eslint-disable-next-line jest/expect-expect
     it('can login after a logout', async () => {
       const client = new APIClient();
       await client.login(loginData);
@@ -269,6 +273,7 @@ describe('APIClient', () => {
       nock(baseUrl).post(`${AuthAPI.URL.ACCESS}/${AuthAPI.URL.LOGOUT}`).reply(StatusCode.OK);
     });
 
+    // eslint-disable-next-line jest/expect-expect
     it('can logout a user', async () => {
       const client = new APIClient();
 

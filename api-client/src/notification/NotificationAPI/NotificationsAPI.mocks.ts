@@ -17,9 +17,10 @@
  *
  */
 
+import {NotificationAPI} from './NotificationAPI';
+
 import {AccessTokenStore} from '../../auth';
 import {HttpClient} from '../../http';
-import {NotificationAPI} from './NotificationAPI';
 
 const domain = 'https://test.zinfra.io';
 const testConfig = {urls: {rest: domain, ws: '', name: 'test'}};

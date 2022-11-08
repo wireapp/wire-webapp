@@ -19,7 +19,6 @@
 
 import {AxiosRequestConfig} from 'axios';
 
-import {HttpClient, ProgressCallback} from '../http';
 import {
   Client,
   Self,
@@ -29,8 +28,10 @@ import {
   ClientSeenByService,
   ServiceMessage,
 } from './Service';
-import {PreKey} from '../auth';
+
 import {AssetOptions, AssetAPI} from '../asset';
+import {PreKey} from '../auth';
+import {HttpClient, ProgressCallback} from '../http';
 
 export class ServicesAPI {
   constructor(private readonly client: HttpClient, private readonly assetAPI: AssetAPI) {}

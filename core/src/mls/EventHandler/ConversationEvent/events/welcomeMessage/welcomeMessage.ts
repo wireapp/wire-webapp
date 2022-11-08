@@ -19,6 +19,7 @@
 
 import {BackendEvent, ConversationMLSWelcomeEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 import {Decoder, Encoder} from 'bazinga64';
+
 import {EventHandlerParams, EventHandlerResult} from '../../../EventHandler.types';
 
 const isWelcomeMessageEvent = (event: BackendEvent): event is ConversationMLSWelcomeEvent =>

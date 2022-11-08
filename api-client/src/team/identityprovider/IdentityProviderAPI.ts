@@ -19,9 +19,10 @@
 
 import {AxiosRequestConfig} from 'axios';
 
-import {HttpClient} from '../../http';
 import {IdentityProvider} from './IdentityProvider';
 import {IdentityProviders} from './IdentityProviders';
+
+import {HttpClient} from '../../http';
 
 export class IdentityProviderAPI {
   constructor(private readonly client: HttpClient) {}

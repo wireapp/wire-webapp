@@ -17,8 +17,8 @@
  *
  */
 
-/** @jsx jsx */
 import {CSSObject} from '@emotion/react';
+
 import {COLOR, COLOR_V2} from './Identity';
 
 const light: () => CSSObject = () => ({

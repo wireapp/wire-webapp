@@ -17,9 +17,9 @@
  *
  */
 
-/** @jsx jsx */
-import {jsx, ThemeProvider as EmotionThemeProvider, Theme as ETheme} from '@emotion/react';
-import React from 'react';
+import * as React from 'react';
+
+import {ThemeProvider as EmotionThemeProvider, Theme as ETheme} from '@emotion/react';
 
 import {COLOR} from '../Identity/colors';
 import {COLOR_V2, BASE_DARK_COLOR, BASE_LIGHT_COLOR} from '../Identity/colors-v2';

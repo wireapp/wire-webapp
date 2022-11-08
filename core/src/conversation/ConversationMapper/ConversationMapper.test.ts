@@ -18,6 +18,13 @@
  */
 
 import {
+  CONVERSATION_TYPING,
+  ConversationMemberJoinData,
+  ConversationMessageTimerUpdateData,
+  ConversationRenameData,
+  ConversationTypingData,
+} from '@wireapp/api-client/lib/conversation/data';
+import {
   CONVERSATION_EVENT,
   ConversationMemberJoinEvent,
   ConversationMessageTimerUpdateEvent,
@@ -25,14 +32,8 @@ import {
   ConversationTypingEvent,
 } from '@wireapp/api-client/lib/event';
 
-import {
-  CONVERSATION_TYPING,
-  ConversationMemberJoinData,
-  ConversationMessageTimerUpdateData,
-  ConversationRenameData,
-  ConversationTypingData,
-} from '@wireapp/api-client/lib/conversation/data';
 import {ConversationMapper} from './ConversationMapper';
+
 import {PayloadBundle, PayloadBundleSource, PayloadBundleState, PayloadBundleType} from '../message/PayloadBundle';
 
 describe('ConversationMapper', () => {

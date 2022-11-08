@@ -17,15 +17,16 @@
  *
  */
 
-/** @jsx jsx */
-import {CSSObject, jsx} from '@emotion/react';
-import React from 'react';
+import * as React from 'react';
+
+import {CSSObject} from '@emotion/react';
+
+import {Avatar, DEFAULT_AVATAR_SIZE} from './Avatar';
+import {COLOR} from './colors';
 
 import {AvatarProps} from '../Identity/';
 import {IsInViewport} from '../Misc/';
 import {filterProps} from '../util';
-import {Avatar, DEFAULT_AVATAR_SIZE} from './Avatar';
-import {COLOR} from './colors';
 
 interface Props<T = HTMLDivElement> extends React.HTMLProps<T> {
   backgroundColor?: string;

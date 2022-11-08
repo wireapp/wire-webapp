@@ -19,8 +19,8 @@
 
 import {QualifiedId, User} from '../../user';
 import {DefaultConversationRoleName} from '../ConversationRole';
-import {OtherMember} from '../OtherMember';
 import {Member} from '../Member';
+import {OtherMember} from '../OtherMember';
 
 export interface MlsEvent {
   conversation: string;

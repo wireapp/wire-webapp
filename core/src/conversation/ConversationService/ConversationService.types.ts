@@ -17,7 +17,6 @@
  *
  */
 
-import {GenericMessage} from '@wireapp/protocol-messaging';
 import {
   QualifiedUserClients,
   ClientMismatch,
@@ -26,8 +25,10 @@ import {
   UserClients,
   Conversation,
 } from '@wireapp/api-client/lib/conversation';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {MlsEvent} from '@wireapp/api-client/lib/conversation/data/MlsEventData';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
+
+import {GenericMessage} from '@wireapp/protocol-messaging';
 
 export enum MessageTargetMode {
   NONE,

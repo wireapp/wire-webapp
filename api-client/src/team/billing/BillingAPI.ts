@@ -18,7 +18,7 @@
  */
 
 import {AxiosRequestConfig} from 'axios';
-import {HttpClient} from '../../http';
+
 import {BillingData} from './BillingInfo';
 import {BillingTeamData} from './BillingTeamData';
 import {CardData} from './CardData';
@@ -26,6 +26,8 @@ import {InvoiceListData} from './InvoiceListData';
 import {Coupon, InvoiceUpcomingData} from './InvoiceUpcomingData';
 import {PlanData, PlanInterval} from './PlanData';
 import {SupportedCurrency} from './SupportedCurrency';
+
+import {HttpClient} from '../../http';
 
 export class BillingAPI {
   public static readonly DEFAULT_INVOICES_CHUNK_SIZE = 10;

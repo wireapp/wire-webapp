@@ -17,8 +17,6 @@
  *
  */
 
-/** @jsx jsx */
-import {jsx} from '@emotion/react';
 import {SVGIcon, SVGIconProps} from './SVGIcon';
 
 export const UploadIcon = (props: SVGIconProps) => (

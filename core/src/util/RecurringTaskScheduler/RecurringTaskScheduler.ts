@@ -18,9 +18,11 @@
  */
 
 import {TimeUtil} from '@wireapp/commons';
-import {TaskScheduler} from '../TaskScheduler';
-import {LowPrecisionTaskScheduler} from '../LowPrecisionTaskScheduler';
+
 import {saveState, loadState} from './RecurringTaskScheduler.store';
+
+import {LowPrecisionTaskScheduler} from '../LowPrecisionTaskScheduler';
+import {TaskScheduler} from '../TaskScheduler';
 
 interface TaskParams {
   every: number;

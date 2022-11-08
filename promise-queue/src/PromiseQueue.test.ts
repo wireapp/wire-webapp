@@ -62,6 +62,7 @@ describe('PromiseQueue', () => {
       expect(resolvingPromiseSpy).toHaveBeenCalled();
     });
 
+    // eslint-disable-next-line jest/no-done-callback
     it('processes promises even when one of them times out (with retries)', done => {
       jest.useFakeTimers();
       const resolvingPromiseSpy = jest.fn().mockImplementation(() => Promise.resolve(0));

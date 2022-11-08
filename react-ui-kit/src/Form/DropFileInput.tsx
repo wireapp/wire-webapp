@@ -17,15 +17,15 @@
  *
  */
 
-/** @jsx jsx */
-import {CSSObject, jsx} from '@emotion/react';
-import React, {useState, FC, forwardRef, DragEvent} from 'react';
+import {useState, FC, forwardRef, DragEvent} from 'react';
+import * as React from 'react';
 
-import {COLOR} from '../Identity';
-import {Theme} from '../Layout';
-import {TextProps} from '../Text';
+import {CSSObject} from '@emotion/react';
+
 import {UploadIcon} from '../Icon';
-import {FlexBox} from '../Layout';
+import {COLOR} from '../Identity';
+import {Theme, FlexBox} from '../Layout';
+import {TextProps} from '../Text';
 
 export interface DropFileInputProps<T = HTMLInputElement> extends TextProps<T> {
   onFilesUploaded: (files: File[]) => void;
@@ -50,7 +50,7 @@ export const dropFileWrapperStyle: CSSObject = {
   maxWidth: '330px',
 };
 
-export const dropFileZoneWrapperStyle: <T>(theme: Theme, isDraggedOver: boolean) => CSSObject = (
+export const dropFileZoneWrapperStyle: (theme: Theme, isDraggedOver: boolean) => CSSObject = (
   theme,
   isDraggedOver,
 ) => ({
@@ -67,7 +67,7 @@ export const dropFileZoneWrapperStyle: <T>(theme: Theme, isDraggedOver: boolean)
   color: COLOR.GRAY,
 });
 
-export const dropFileZoneLabelStyle: <T>(theme: Theme) => CSSObject = theme => ({
+export const dropFileZoneLabelStyle: (theme: Theme) => CSSObject = theme => ({
   color: theme.general.primaryColor,
   cursor: 'pointer',
   ':focus-within': {
@@ -204,3 +204,4 @@ export const DropFileInput: FC<DropFileInputProps<HTMLInputElement>> = forwardRe
     );
   },
 );
+DropFileInput.displayName = 'DropFileInput';

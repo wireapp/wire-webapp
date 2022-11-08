@@ -8,7 +8,7 @@
   ],
   "main": "lib/index",
   "peerDependencies": {
-    "@wireapp/store-engine": "4.x.x"
+    "@wireapp/store-engine": "5.x.x"
   },
   "dependencies": {
     "dexie": "3.2.2"

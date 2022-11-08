@@ -17,15 +17,15 @@
  *
  */
 
+import * as fs from 'fs-extra';
+import logdown from 'logdown';
+import pkginfo from 'npm-registry-package-info';
+
 import {exec} from 'child_process';
 import crypto from 'crypto';
 import os from 'os';
 import path from 'path';
 import {promisify} from 'util';
-
-import fs from 'fs-extra';
-import logdown from 'logdown';
-import pkginfo from 'npm-registry-package-info';
 
 const execAsync = promisify(exec);
 

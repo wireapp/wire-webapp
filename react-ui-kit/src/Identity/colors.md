@@ -1,5 +1,4 @@
 ```js
-/** @jsx jsx */
 import {jsx} from '@emotion/react';
 import {COLOR, Container, H1, H2, Line} from '@wireapp/react-ui-kit';
 import Color from 'color';

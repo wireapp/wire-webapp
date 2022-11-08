@@ -17,8 +17,9 @@
  *
  */
 
-import * as crypto from 'crypto';
 import rs = require('jsrsasign');
+
+import * as crypto from 'crypto';
 
 import {KNOWN_PINS} from './pinningData';
 

@@ -19,10 +19,12 @@
 
 /* eslint-disable no-magic-numbers */
 
-import {TimeUtil} from '@wireapp/commons';
 import {Server as WebSocketServer} from 'ws';
 
 import {AddressInfo} from 'net';
+
+import {TimeUtil} from '@wireapp/commons';
+
 import {ReconnectingWebsocket} from './ReconnectingWebsocket';
 
 const reservedPorts: number[] = [];
@@ -65,6 +67,8 @@ function startEchoServer(): WebSocketServer {
   server.on('error', error => console.error(`Echo WebSocket server error: "${error.message}"`));
   return server;
 }
+
+/* eslint-disable jest/no-done-callback */
 
 describe('ReconnectingWebsocket', () => {
   let server: WebSocketServer | undefined;

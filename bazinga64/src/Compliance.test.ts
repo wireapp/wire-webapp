@@ -18,6 +18,7 @@
  */
 
 import * as _sodium from 'libsodium-wrappers-sumo';
+
 import * as bazinga64 from './index';
 
 let sodium: typeof _sodium;

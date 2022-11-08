@@ -18,11 +18,13 @@
  */
 
 import Axios, {AxiosRequestConfig} from 'axios';
+
+import {TeamSearchOptions} from './TeamSearchOptions';
+import {TeamSearchResult} from './TeamSearchResult';
+
 import {BackendError, HttpClient, RequestCancelable, SyntheticErrorLabel} from '../../http';
 import {RequestCancellationError} from '../../user';
 import {TeamAPI} from '../team';
-import {TeamSearchOptions} from './TeamSearchOptions';
-import {TeamSearchResult} from './TeamSearchResult';
 
 export class TeamSearchAPI {
   constructor(private readonly client: HttpClient) {}
