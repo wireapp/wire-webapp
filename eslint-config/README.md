@@ -8,44 +8,66 @@ For licensing information, see the attached LICENSE file and the list of third-p
 
 ## @wireapp/eslint-config
 
-> Wire's [ESLint](https://eslint.org/docs/developer-guide/shareable-configs) config.
+> Wire's [ESLint](https://eslint.org/docs/developer-guide/shareable-configs) config. Made with typescript in mind.
 
 ### Usage
 
 **Install (macOS, Linux)**:
 
 ```bash
-yarn add --dev @wireapp/eslint-config \
-               @typescript-eslint/eslint-plugin \
-               @typescript-eslint/parser \
-               eslint-config-prettier \
-               eslint-plugin-jsdoc \
-               eslint-plugin-no-unsanitized \
-               eslint-plugin-prettier \
-               eslint-plugin-react \
-               eslint-plugin-react-hooks \
-               eslint-plugin-sort-keys-fix \
-               eslint-plugin-typescript-sort-keys \
-               prettier \
-               eslint
+yarn add -D @types/eslint \
+@types/prettier \
+@typescript-eslint/eslint-plugin \
+@typescript-eslint/parser \
+eslint \
+eslint-config-prettier \
+eslint-import-resolver-alias \
+eslint-import-resolver-typescript \
+eslint-plugin-better-styled-components \
+eslint-plugin-header \
+eslint-plugin-import \
+eslint-plugin-jest \
+eslint-plugin-jest-dom \
+eslint-plugin-jsdoc \
+eslint-plugin-jsx-a11y \
+eslint-plugin-no-unsanitized \
+eslint-plugin-prettier \
+eslint-plugin-react \
+eslint-plugin-react-hooks \
+eslint-plugin-simple-import-sort \
+eslint-plugin-testing-library \
+eslint-plugin-unused-imports \
+prettier \
+typescript
 ```
 
 **Install (Windows)**:
 
 ```powershell
-yarn add --dev @wireapp/eslint-config ^
-               @typescript-eslint/eslint-plugin ^
-               @typescript-eslint/parser ^
-               eslint-config-prettier ^
-               eslint-plugin-jsdoc ^
-               eslint-plugin-no-unsanitized ^
-               eslint-plugin-prettier ^
-               eslint-plugin-react ^
-               eslint-plugin-react-hooks ^
-               eslint-plugin-sort-keys-fix ^
-               eslint-plugin-typescript-sort-keys ^
-               prettier ^
-               eslint
+yarn add -D @types/eslint ^
+@types/prettier ^
+@typescript-eslint/eslint-plugin ^
+@typescript-eslint/parser ^
+eslint ^
+eslint-config-prettier ^
+eslint-import-resolver-alias ^
+eslint-import-resolver-typescript ^
+eslint-plugin-better-styled-components ^
+eslint-plugin-header ^
+eslint-plugin-import ^
+eslint-plugin-jest ^
+eslint-plugin-jest-dom ^
+eslint-plugin-jsdoc ^
+eslint-plugin-jsx-a11y ^
+eslint-plugin-no-unsanitized ^
+eslint-plugin-prettier ^
+eslint-plugin-react ^
+eslint-plugin-react-hooks ^
+eslint-plugin-simple-import-sort ^
+eslint-plugin-testing-library ^
+eslint-plugin-unused-imports ^
+prettier ^
+typescript
 ```
 
 **Edit `.eslintrc.json`**:
