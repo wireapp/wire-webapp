@@ -65,6 +65,6 @@
     "watch": "webpack serve --config webpack.browser.js",
     "prepare": "yarn dist"
   },
-  "version": "22.3.2",
+  "version": "22.3.3",
   "gitHead": "5339f01fe01ef0871da8c8bc8662fbe9e604754a"
 }
