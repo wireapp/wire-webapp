@@ -18,9 +18,11 @@
  */
 
 import 'jsdom-worker';
-import {CONV_TYPE, CALL_TYPE, STATE as CALL_STATE, REASON, Wcall} from '@wireapp/avs';
-import {amplify} from 'amplify';
 import ko, {Subscription} from 'knockout';
+
+import {CONV_TYPE, CALL_TYPE, STATE as CALL_STATE, REASON, Wcall} from '@wireapp/avs';
+
+import {amplify} from 'amplify';
 
 import {Call} from 'src/script/calling/Call';
 import {CallingRepository} from 'src/script/calling/CallingRepository';

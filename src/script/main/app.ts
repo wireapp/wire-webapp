@@ -20,9 +20,11 @@
 // Polyfill for "tsyringe" dependency injection
 import {Context} from '@wireapp/api-client/lib/auth';
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
+import {amplify} from 'amplify';
+
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {amplify} from 'amplify';
+
 import 'core-js/full/reflect';
 import Dexie from 'dexie';
 import ko from 'knockout';
@@ -106,6 +108,7 @@ import {ThemeViewModel} from '../view_model/ThemeViewModel';
 import {Warnings} from '../view_model/WarningsContainer';
 
 import './globals';
+
 import '../../style/default.less';
 
 export function doRedirect(signOutReason: SIGN_OUT_REASON) {

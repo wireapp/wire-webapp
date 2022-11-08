@@ -20,11 +20,12 @@
 import React, {useEffect, useMemo, useState} from 'react';
 
 import {css} from '@emotion/react';
+import {amplify} from 'amplify';
+import {container} from 'tsyringe';
+
 import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
 import {IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {amplify} from 'amplify';
-import {container} from 'tsyringe';
 
 import {Icon} from 'Components/Icon';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';
@@ -342,9 +343,9 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   {showSwitchMicrophone && !verticalBreakpoint && (
                     <DeviceToggleButton
                       styles={css`
-                        position: absolute;
                         bottom: -38px;
                         left: 50%;
+                        position: absolute;
                         transform: translateX(-50%);
                       `}
                       currentDevice={currentMicrophoneDevice}
@@ -382,9 +383,9 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                     {showSwitchCamera && !verticalBreakpoint && (
                       <DeviceToggleButton
                         styles={css`
-                          position: absolute;
                           bottom: -38px;
                           left: 50%;
+                          position: absolute;
                           transform: translateX(-50%);
                         `}
                         currentDevice={currentCameraDevice}

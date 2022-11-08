@@ -19,12 +19,13 @@
 
 import React from 'react';
 
-import {Runtime} from '@wireapp/commons';
-import {ArrowIcon, COLOR, Column, Columns, Container, ContainerXS, H1, IsMobile} from '@wireapp/react-ui-kit';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
+
+import {Runtime} from '@wireapp/commons';
+import {ArrowIcon, COLOR, Column, Columns, Container, ContainerXS, H1, IsMobile} from '@wireapp/react-ui-kit';
 
 import {Page} from './Page';
 

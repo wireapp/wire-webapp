@@ -17,10 +17,11 @@
  *
  */
 
-import {Button, Column, Columns, Container, H3, Modal, Text} from '@wireapp/react-ui-kit';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
+
+import {Button, Column, Columns, Container, H3, Modal, Text} from '@wireapp/react-ui-kit';
 
 import {Config} from '../../Config';
 import {appAlreadyOpenStrings} from '../../strings';

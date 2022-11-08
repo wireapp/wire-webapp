@@ -19,10 +19,11 @@
 
 import React, {useEffect} from 'react';
 
-import {ContainerXS, H1, H3, Muted} from '@wireapp/react-ui-kit';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
+
+import {ContainerXS, H1, H3, Muted} from '@wireapp/react-ui-kit';
 
 import {Page} from './Page';
 

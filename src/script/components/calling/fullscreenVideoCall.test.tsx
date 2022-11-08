@@ -18,8 +18,9 @@
  */
 
 import {render, waitFor, act} from '@testing-library/react';
-import * as uiKit from '@wireapp/react-ui-kit';
 import ko from 'knockout';
+
+import * as uiKit from '@wireapp/react-ui-kit';
 
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {Call} from 'src/script/calling/Call';

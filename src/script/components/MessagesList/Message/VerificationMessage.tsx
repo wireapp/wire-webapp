@@ -19,8 +19,9 @@
 
 import React, {useMemo} from 'react';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {VerifiedIcon} from 'Components/VerifiedIcon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';

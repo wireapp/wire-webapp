@@ -20,9 +20,10 @@
 import {FC, useCallback, useEffect, useMemo, useState} from 'react';
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import cx from 'classnames';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Icon} from 'Components/Icon';
 import {UserSearchableList} from 'Components/UserSearchableList';

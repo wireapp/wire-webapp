@@ -40,12 +40,13 @@ import * as MessageBuilder from '@wireapp/core/lib/conversation/message/MessageB
 import {OtrMessage} from '@wireapp/core/lib/conversation/message/OtrMessage';
 import {TextContentBuilder} from '@wireapp/core/lib/conversation/message/TextContentBuilder';
 import {isQualifiedUserClients, isUserClients} from '@wireapp/core/lib/util';
-import {Asset, Availability, Confirmation, GenericMessage} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
 import {partition} from 'underscore';
+
+import {Asset, Availability, Confirmation, GenericMessage} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Declension, joinNames, t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';

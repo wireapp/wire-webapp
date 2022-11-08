@@ -20,8 +20,9 @@
 import React from 'react';
 
 import {CSSObject} from '@emotion/react';
-import {Availability} from '@wireapp/protocol-messaging';
 import cx from 'classnames';
+
+import {Availability} from '@wireapp/protocol-messaging';
 
 import {CSS_SQUARE} from 'Util/CSSMixin';
 import {KEY} from 'Util/KeyboardUtil';

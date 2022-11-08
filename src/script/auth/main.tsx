@@ -20,6 +20,7 @@
 // Polyfill "Object.entries" & "Object.values"
 import 'core-js/full/object';
 import 'core-js/full/reflect';
+
 import React from 'react';
 
 import cookieStore from 'js-cookie';

@@ -19,8 +19,9 @@
 
 import React, {useEffect} from 'react';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {AvailabilityState} from 'Components/AvailabilityState';
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';

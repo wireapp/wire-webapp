@@ -23,9 +23,10 @@ import type {BackendEventType} from '@wireapp/api-client/lib/event/BackendEvent'
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {UserConnectionData} from '@wireapp/api-client/lib/user/data/';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';

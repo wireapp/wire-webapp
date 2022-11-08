@@ -20,8 +20,9 @@
 import React from 'react';
 
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';

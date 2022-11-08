@@ -18,9 +18,10 @@
  */
 
 import {AudioPreference, WebappProperties} from '@wireapp/api-client/lib/user/data/';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Logger, getLogger} from 'Util/Logger';
 

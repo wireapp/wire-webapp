@@ -19,10 +19,11 @@
 
 import {FC, useEffect, useLayoutEffect} from 'react';
 
-import {StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
+
+import {StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingContainer} from 'Components/calling/CallingOverlayContainer';
 import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationModal';

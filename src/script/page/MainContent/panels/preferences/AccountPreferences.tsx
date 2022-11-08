@@ -19,8 +19,9 @@
 
 import React, {useRef} from 'react';
 
-import {Runtime} from '@wireapp/commons';
 import {container} from 'tsyringe';
+
+import {Runtime} from '@wireapp/commons';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {useEnrichedFields} from 'Components/panel/EnrichedFields';

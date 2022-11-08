@@ -19,8 +19,9 @@
 
 import React from 'react';
 
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 import {container} from 'tsyringe';
+
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {t} from 'Util/LocalizerUtil';

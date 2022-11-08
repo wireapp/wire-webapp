@@ -22,8 +22,8 @@ import jQuery from 'jquery';
 import ko from 'knockout';
 
 import 'Components/icons';
-import '../Config';
 
+import '../Config';
 import '../page/AppMain';
 
 import 'Util/LocalizerUtil';

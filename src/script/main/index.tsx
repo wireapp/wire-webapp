@@ -18,10 +18,10 @@
  */
 
 import 'core-js/full/reflect';
-
 import {ClientType} from '@wireapp/api-client/lib/client/';
-import {Runtime} from '@wireapp/commons';
 import {createRoot} from 'react-dom/client';
+
+import {Runtime} from '@wireapp/commons';
 
 import {AppContainer} from 'Components/AppContainer/AppContainer';
 import {enableLogging} from 'Util/LoggerUtil';

@@ -18,6 +18,7 @@
  */
 
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
+
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import type {Conversation} from '../entity/Conversation';

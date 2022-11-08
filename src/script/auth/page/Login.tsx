@@ -21,6 +21,13 @@ import React, {useEffect, useRef, useState} from 'react';
 
 import {LoginData} from '@wireapp/api-client/lib/auth';
 import {ClientType} from '@wireapp/api-client/lib/client/index';
+import {StatusCodes} from 'http-status-codes';
+import {useIntl} from 'react-intl';
+import {connect} from 'react-redux';
+import {Navigate} from 'react-router';
+import {useNavigate} from 'react-router-dom';
+import {AnyAction, Dispatch} from 'redux';
+
 import {Runtime, UrlUtil} from '@wireapp/commons';
 import {
   ArrowIcon,
@@ -44,12 +51,6 @@ import {
   Text,
   TextLink,
 } from '@wireapp/react-ui-kit';
-import {StatusCodes} from 'http-status-codes';
-import {useIntl} from 'react-intl';
-import {connect} from 'react-redux';
-import {Navigate} from 'react-router';
-import {useNavigate} from 'react-router-dom';
-import {AnyAction, Dispatch} from 'redux';
 
 import {getLogger} from 'Util/Logger';
 
