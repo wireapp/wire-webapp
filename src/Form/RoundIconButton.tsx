@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,15 +17,16 @@
  *
  */
 
-/** @jsx jsx */
-import {CSSObject, jsx} from '@emotion/react';
-import React from 'react';
+import * as React from 'react';
+
+import {CSSObject} from '@emotion/react';
+
+import {ButtonProps, buttonStyle, filterButtonProps} from './Button';
 
 import {SVGIconProps} from '../Icon/SVGIcon';
 import {COLOR} from '../Identity';
 import {Theme} from '../Layout';
 import {childrenWithDefaultProps} from '../Misc/';
-import {ButtonProps, buttonStyle, filterButtonProps} from './Button';
 
 export interface RoundIconButtonProps<T = HTMLButtonElement> extends ButtonProps<T> {}
 

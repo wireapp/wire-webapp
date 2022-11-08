@@ -17,10 +17,10 @@
  *
  */
 
-/** @jsx jsx */
-import {CSSObject, jsx} from '@emotion/react';
-import {Property} from 'csstype';
-import React from 'react';
+import * as React from 'react';
+
+import {CSSObject} from '@emotion/react';
+import type {Property} from 'csstype';
 
 import {filterProps} from '../util';
 
@@ -50,3 +50,4 @@ export const filterFlexBoxProps = (props: FlexBoxProps) =>
 export const FlexBox: React.FC<FlexBoxProps> = React.forwardRef<HTMLDivElement, FlexBoxProps>((props, ref) => (
   <div ref={ref} css={flexBoxStyle(props)} {...filterFlexBoxProps(props)} />
 ));
+FlexBox.displayName = 'FlexBox';

@@ -17,12 +17,13 @@
  *
  */
 
-/** @jsx jsx */
-import {CSSObject, jsx} from '@emotion/react';
+import {CSSObject} from '@emotion/react';
+
+import {TextProps, filterTextProps, textStyle} from './Text';
+
 import {defaultTransition} from '../Identity/motions';
 import {Theme} from '../Layout';
 import {filterProps} from '../util';
-import {TextProps, filterTextProps, textStyle} from './Text';
 
 export enum LinkVariant {
   PRIMARY = 'primary',

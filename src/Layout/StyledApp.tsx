@@ -17,13 +17,14 @@
  *
  */
 
-/** @jsx jsx */
-import React from 'react';
-import {CSSObject, jsx} from '@emotion/react';
+import * as React from 'react';
+
+import {CSSObject} from '@emotion/react';
+
+import {THEME_ID, Theme, ThemeProvider, themes} from './Theme';
 
 import {GlobalStyle} from '../GlobalStyle';
 import {filterProps} from '../util';
-import {THEME_ID, Theme, ThemeProvider, themes} from './Theme';
 
 type StyledAppContainerProps =
   | {

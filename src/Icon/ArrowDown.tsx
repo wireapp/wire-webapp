@@ -17,7 +17,6 @@
  *
  */
 
-import React from 'react';
 import {SVGIcon, SVGIconProps} from './SVGIcon';
 
 export const ArrowDown = ({...props}: SVGIconProps) => (

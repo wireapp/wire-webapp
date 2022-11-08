@@ -17,13 +17,13 @@
  *
  */
 
-/** @jsx jsx */
-import {CSSObject, jsx} from '@emotion/react';
+import {CSSObject} from '@emotion/react';
 
-import {Theme} from '../Layout';
 import {LinkProps, linkStyle} from './Link';
 import {TextProps, filterTextProps, textStyle} from './Text';
+
 import {COLOR} from '../Identity';
+import {Theme} from '../Layout';
 
 export interface LabelProps<T = HTMLSpanElement> extends TextProps<T> {
   markInvalid?: boolean;

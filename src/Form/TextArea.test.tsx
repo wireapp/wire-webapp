@@ -17,9 +17,11 @@
  *
  */
 
-import React from 'react';
-import {matchComponent} from '../test/testUtil';
 import {TextArea} from './TextArea';
+
+import {matchComponent} from '../test/testUtil';
+
+/* eslint-disable jest/expect-expect */
 
 describe('"TextArea"', () => {
   it('renders', () => matchComponent(<TextArea>TextArea</TextArea>));

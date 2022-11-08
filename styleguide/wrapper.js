@@ -1,4 +1,3 @@
-import React from 'react';
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
 const Wrapper = ({children}) => {

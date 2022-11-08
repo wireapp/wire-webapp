@@ -18,21 +18,21 @@
  */
 
 export const BASE_LIGHT_COLOR: Record<string, string> = {
+  AMBER: '#a25915',
   BLUE: '#0667c8',
   GREEN: '#1d7833',
-  TURQUOISE: '#01718e',
   PURPLE: '#8944ab',
   RED: '#c20013',
-  AMBER: '#a25915',
+  TURQUOISE: '#01718e',
 };
 
 export const BASE_DARK_COLOR: Record<string, string> = {
+  AMBER: '#ffd426',
   BLUE: '#54a6ff',
   GREEN: '#30db5b',
   TURQUOISE: '#5de6ff',
   PURPLE: '#da8fff',
   RED: '#ff7770',
-  AMBER: '#ffd426',
 };
 
 const LIGHT_BLUE: Record<string, string> = {

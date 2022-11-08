@@ -17,9 +17,11 @@
  *
  */
 
-import React from 'react';
-import {matchComponent} from '../test/testUtil';
 import {Input} from './Input';
+
+import {matchComponent} from '../test/testUtil';
+
+/* eslint-disable jest/expect-expect */
 
 describe('"Input"', () => {
   it('renders', () => matchComponent(<Input />));

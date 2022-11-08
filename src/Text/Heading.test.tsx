@@ -17,13 +17,15 @@
  *
  */
 
-import React from 'react';
-import {THEME_ID} from '../Layout';
-import {matchComponent} from '../test/testUtil';
 import {Heading} from './Heading';
 
+import {THEME_ID} from '../Layout';
+import {matchComponent} from '../test/testUtil';
+
+/* eslint-disable jest/expect-expect */
+
 describe('"Heading"', () => {
-  it('renders H1', () => matchComponent(<Heading>H1</Heading>));
+  it('renders H1 as default', () => matchComponent(<Heading>H1</Heading>));
   it('renders H! (dark theme)', () => matchComponent(<Heading>H1</Heading>, THEME_ID.DARK));
   it('renders H1', () => matchComponent(<Heading level="1">H1</Heading>));
   it('renders H2', () => matchComponent(<Heading level="2">H2</Heading>));

@@ -17,13 +17,13 @@
  *
  */
 
-/** @jsx jsx */
-import {jsx} from '@emotion/react';
-import React, {useId} from 'react';
+import {useId} from 'react';
+import * as React from 'react';
+
+import {INPUT_CLASSNAME, InputProps} from './Input';
 
 import {Theme} from '../Layout';
 import {Text, TextProps, textStyle} from '../Text';
-import {INPUT_CLASSNAME, InputProps} from './Input';
 
 export interface StyledLabelProps<T = HTMLLabelElement> extends React.HTMLProps<T> {
   disabled?: boolean;
@@ -120,13 +120,10 @@ interface CheckboxProps<T = HTMLInputElement> extends InputProps<T> {
   outlineOffset?: string;
 }
 
-export const Checkbox: React.FC<CheckboxProps<HTMLInputElement>> = React.forwardRef<
-  HTMLInputElement,
-  CheckboxProps<HTMLInputElement>
->(
+export const Checkbox: React.FC<CheckboxProps> = React.forwardRef<HTMLInputElement, CheckboxProps>(
   (
     {
-      id = useId(),
+      id,
       children,
       style,
       disabled,
@@ -138,50 +135,54 @@ export const Checkbox: React.FC<CheckboxProps<HTMLInputElement>> = React.forward
       ...props
     },
     ref,
-  ) => (
-    <div
-      css={(theme: Theme) => ({
-        alignItems: 'center',
-        display: 'flex',
-        justifyContent: 'flex-start',
-        position: 'relative',
-        left: '-0.3rem',
-        [`.${INPUT_CLASSNAME}:focus-visible + label`]: {
-          outline: `1px solid ${theme.general.primaryColor}`,
-          outlineOffset: outlineOffset,
-        },
-        ...wrapperCSS,
-      })}
-      style={style}
-    >
-      <input
-        type="checkbox"
-        id={id}
-        style={{
-          height: '22px',
-          marginBottom: '0',
-          opacity: 0,
-          width: '22px',
-          cursor: disabled ? 'not-allowed' : 'pointer',
-        }}
-        disabled={disabled}
-        ref={ref}
-        className={INPUT_CLASSNAME}
-        {...props}
-      />
-
-      <StyledLabel
-        htmlFor={id}
-        disabled={disabled}
-        markInvalid={markInvalid}
-        aligncenter={aligncenter}
-        labelBeforeCheckbox={labelBeforeCheckbox}
+  ) => {
+    const inputId = useId();
+    return (
+      <div
+        css={(theme: Theme) => ({
+          alignItems: 'center',
+          display: 'flex',
+          justifyContent: 'flex-start',
+          position: 'relative',
+          left: '-0.3rem',
+          [`.${INPUT_CLASSNAME}:focus-visible + label`]: {
+            outline: `1px solid ${theme.general.primaryColor}`,
+            outlineOffset: outlineOffset,
+          },
+          ...wrapperCSS,
+        })}
+        style={style}
       >
-        {children}
-      </StyledLabel>
-    </div>
-  ),
+        <input
+          type="checkbox"
+          id={id ?? inputId}
+          style={{
+            height: '22px',
+            marginBottom: '0',
+            opacity: 0,
+            width: '22px',
+            cursor: disabled ? 'not-allowed' : 'pointer',
+          }}
+          disabled={disabled}
+          ref={ref}
+          className={INPUT_CLASSNAME}
+          {...props}
+        />
+
+        <StyledLabel
+          htmlFor={id}
+          disabled={disabled}
+          markInvalid={markInvalid}
+          aligncenter={aligncenter}
+          labelBeforeCheckbox={labelBeforeCheckbox}
+        >
+          {children}
+        </StyledLabel>
+      </div>
+    );
+  },
 );
+Checkbox.displayName = 'Checkbox';
 
 export type CheckboxLabelProps<T = HTMLSpanElement> = TextProps<T>;
 

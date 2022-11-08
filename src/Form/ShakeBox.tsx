@@ -17,9 +17,8 @@
  *
  */
 
-/** @jsx jsx */
-import {jsx} from '@emotion/react';
-import React, {useEffect, useImperativeHandle, useState} from 'react';
+import {useEffect, useImperativeHandle, useState} from 'react';
+import * as React from 'react';
 
 export interface ShakeBoxProps extends React.HTMLProps<HTMLDivElement> {
   amplitude?: number;
@@ -66,3 +65,4 @@ export const ShakeBox = React.forwardRef<ShakeBoxRef, ShakeBoxProps>(
     return <div css={{transform: `translateX(${offset}px)`}}>{children}</div>;
   },
 );
+ShakeBox.displayName = 'ShakeBox';

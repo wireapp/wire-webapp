@@ -17,11 +17,13 @@
  *
  */
 
-const {CSSTransition, TransitionGroup} = require('react-transition-group');
+import * as React from 'react';
+
 import {ClassNames} from '@emotion/react';
-import React from 'react';
 
 import {DURATION, EASE} from './motions';
+
+const {CSSTransition, TransitionGroup} = require('react-transition-group');
 
 type TransitionProps = Partial<any> & {
   children: React.ReactNode;

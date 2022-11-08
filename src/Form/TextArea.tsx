@@ -17,10 +17,10 @@
  *
  */
 
-/** @jsx jsx */
-import {CSSObject, jsx} from '@emotion/react';
-import {Property} from 'csstype';
-import React from 'react';
+import * as React from 'react';
+
+import {CSSObject} from '@emotion/react';
+import type {Property} from 'csstype';
 
 import {COLOR} from '../Identity';
 import {Theme} from '../Layout';
@@ -91,3 +91,4 @@ export const TextArea: React.FC<TextAreaProps<HTMLTextAreaElement>> = React.forw
     {...filterTextAreaProps(props)}
   />
 ));
+TextArea.displayName = 'TextArea';

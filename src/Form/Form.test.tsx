@@ -17,9 +17,11 @@
  *
  */
 
-import React from 'react';
-import {matchComponent} from '../test/testUtil';
 import {Form} from './Form';
+
+import {matchComponent} from '../test/testUtil';
+
+/* eslint-disable jest/expect-expect */
 
 describe('"Form"', () => {
   it('renders', () => matchComponent(<Form>Form</Form>));

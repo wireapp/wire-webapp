@@ -17,13 +17,12 @@
  *
  */
 
-/** @jsx jsx */
-import {jsx} from '@emotion/react';
-import React from 'react';
+import {Fragment} from 'react';
+
+import {InputProps} from './Input';
 
 import {COLOR} from '../Identity';
 import {Loading} from '../Misc';
-import {InputProps} from './Input';
 
 export interface SwitchProps<T = HTMLInputElement> extends InputProps<T> {
   activatedColor?: string;
@@ -61,7 +60,7 @@ export const Switch = ({
       width: '42px',
     }}
   >
-    <React.Fragment>
+    <Fragment>
       <input
         id={id}
         checked={checked}
@@ -144,6 +143,6 @@ export const Switch = ({
           />
         )}
       </label>
-    </React.Fragment>
+    </Fragment>
   </div>
 );

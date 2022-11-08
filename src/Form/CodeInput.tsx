@@ -17,14 +17,16 @@
  *
  */
 
-/** @jsx jsx */
-import {CSSObject, jsx} from '@emotion/react';
-import React, {useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
+import * as React from 'react';
 
+import {CSSObject} from '@emotion/react';
+
+import {InputProps, inputStyle} from './Input';
+
+import {COLOR_V2} from '../Identity';
 import {Theme} from '../Layout';
 import {noop} from '../util';
-import {InputProps, inputStyle} from './Input';
-import {COLOR_V2} from '../Identity';
 
 const CodeInputWrapper = (props: React.HTMLProps<HTMLDivElement>) => (
   <div
@@ -59,7 +61,7 @@ const DigitInput: React.FC<DigitInputProps<HTMLInputElement>> = React.forwardRef
   HTMLInputElement,
   DigitInputProps<HTMLInputElement>
 >((props, ref) => <input ref={ref} css={(theme: Theme) => digitInputStyle(theme, props)} {...props} type="tel" />);
-
+DigitInput.displayName = 'DigitInput';
 export interface CodeInputProps<T = HTMLInputElement> extends InputProps<T> {
   autoFocus?: boolean;
   digits?: number;
@@ -157,6 +159,7 @@ export const CodeInput = ({
     <CodeInputWrapper style={style}>
       {Array.from({length: digits}, (_, index) => (
         <DigitInput
+          // eslint-disable-next-line jsx-a11y/no-autofocus
           autoFocus={index === 0 && autoFocus}
           key={index}
           onPaste={event => handlePaste(index, event)}

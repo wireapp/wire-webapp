@@ -29,11 +29,11 @@ const useLongTouch = (element: HTMLElement | null, onLongTouch: () => void, touc
       return () => {};
     }
 
-    const onTouchStart = (event: TouchEvent) => {
+    const onTouchStart = () => {
       startTimeout();
     };
 
-    const onTouchEnd = (event: TouchEvent) => {
+    const onTouchEnd = () => {
       removeTimeout();
     };
 

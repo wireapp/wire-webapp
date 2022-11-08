@@ -17,9 +17,6 @@
  *
  */
 
-/** @jsx jsx */
-import {jsx} from '@emotion/react';
-
 import {SVGIcon, SVGIconProps} from './SVGIcon';
 
 export const MessageIcon = (props: SVGIconProps) => (

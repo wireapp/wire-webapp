@@ -17,10 +17,12 @@
  *
  */
 
-import React from 'react';
+import {ButtonLink} from './ButtonLink';
+
 import {THEME_ID} from '../Layout';
 import {matchComponent} from '../test/testUtil';
-import {ButtonLink} from './ButtonLink';
+
+/* eslint-disable jest/expect-expect */
 
 describe('"ButtonLink"', () => {
   it('renders', () => matchComponent(<ButtonLink>Submit</ButtonLink>));

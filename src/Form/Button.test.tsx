@@ -17,10 +17,12 @@
  *
  */
 
-import React from 'react';
+import {Button} from './Button';
+
 import {THEME_ID} from '../Layout';
 import {matchComponent} from '../test/testUtil';
-import {Button} from './Button';
+
+/* eslint-disable jest/expect-expect */
 
 describe('"Button"', () => {
   it('renders', () => matchComponent(<Button>Submit</Button>));
