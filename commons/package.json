@@ -36,5 +36,5 @@
     "test:coverage": "yarn test",
     "test:watch": "yarn jest --watch"
   },
-  "version": "5.0.0"
+  "version": "5.0.1"
 }
