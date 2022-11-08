@@ -19,10 +19,12 @@
 
 import nock from 'nock';
 
-import {HttpClient} from './HttpClient';
 import {BackendErrorLabel} from './BackendErrorLabel';
-import {BackendError, StatusCode} from '.';
+import {HttpClient} from './HttpClient';
+
 import {AccessTokenStore, AuthAPI} from '../auth';
+
+import {BackendError, StatusCode} from '.';
 
 describe('HttpClient', () => {
   const testConfig = {urls: {rest: 'https://test.zinfra.io', ws: '', name: 'test'}};
@@ -39,6 +41,7 @@ describe('HttpClient', () => {
   };
 
   describe('"_sendRequest"', () => {
+    // eslint-disable-next-line jest/expect-expect
     it('retries on 403 token expired error', async () => {
       nock(testConfig.urls.rest).get(AuthAPI.URL.ACCESS).once().reply(StatusCode.FORBIDDEN, {
         code: StatusCode.FORBIDDEN,
@@ -67,12 +70,15 @@ describe('HttpClient', () => {
       client.refreshAccessToken = () => {
         return Promise.reject(new Error('Should not refresh access token'));
       };
+      let backendError;
 
       try {
         await client._sendRequest({method: 'GET', baseURL: testConfig.urls.rest, url: AuthAPI.URL.ACCESS});
         throw new Error('Should not resolve');
       } catch (error) {
-        expect((error as BackendError).message).toBe('Authentication failed because the token is invalid.');
+        backendError = error;
+      } finally {
+        expect((backendError as BackendError).message).toBe('Authentication failed because the token is invalid.');
       }
     });
   });
@@ -89,12 +95,14 @@ describe('HttpClient', () => {
     client.refreshAccessToken = () => {
       return Promise.reject(new Error('Should not refresh access token'));
     };
-
+    let backendError;
     try {
       await client._sendRequest({method: 'GET', baseURL: testConfig.urls.rest, url: AuthAPI.URL.ACCESS});
       throw new Error('Should not resolve');
     } catch (error) {
-      expect((error as BackendError).message).toBe('Authentication failed because the cookie is missing.');
+      backendError = error;
+    } finally {
+      expect((backendError as BackendError).message).toBe('Authentication failed because the cookie is missing.');
     }
   });
 

@@ -19,8 +19,9 @@
 
 import {StatusCodes as StatusCode} from 'http-status-codes';
 
-import {BackendErrorLabel} from '../http/';
 import {SyntheticErrorLabel} from './BackendErrorLabel';
+
+import {BackendErrorLabel} from '../http/';
 
 export class BackendError extends Error {
   code?: StatusCode;

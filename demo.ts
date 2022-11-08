@@ -17,10 +17,12 @@
  *
  */
 
-import {FileEngine} from '@wireapp/store-engine-fs';
 import logdown from 'logdown';
+
 import path from 'path';
+
 import {CRUDEngine} from '@wireapp/store-engine';
+import {FileEngine} from '@wireapp/store-engine-fs';
 
 import {APIClient} from './src/APIClient';
 import {
@@ -33,8 +35,8 @@ import {
   LoginData,
 } from './src/auth';
 import {ClientType} from './src/client';
-import {WebSocketClient} from './src/tcp';
 import {Config} from './src/Config';
+import {WebSocketClient} from './src/tcp';
 
 require('dotenv').config();
 

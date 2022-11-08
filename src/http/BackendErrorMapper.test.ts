@@ -17,11 +17,13 @@
  *
  */
 
-import {StatusCode} from '.';
-import {ConversationIsUnknownError} from '../conversation/ConversationError';
-import {UserIsUnknownError} from '../user/UserError';
 import {BackendErrorLabel} from './BackendErrorLabel';
 import {BackendErrorMapper} from './BackendErrorMapper';
+
+import {ConversationIsUnknownError} from '../conversation/ConversationError';
+import {UserIsUnknownError} from '../user/UserError';
+
+import {StatusCode} from '.';
 
 describe('BackendErrorMapper', () => {
   describe('"map"', () => {

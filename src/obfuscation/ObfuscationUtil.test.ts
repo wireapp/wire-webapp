@@ -20,6 +20,7 @@
 import {Cookie as ToughCookie} from 'tough-cookie';
 
 import {ObfuscationUtil} from './ObfuscationUtil';
+
 import {AccessTokenData} from '../auth';
 
 describe('ObfuscationUtil', () => {
@@ -46,16 +47,14 @@ describe('ObfuscationUtil', () => {
   });
 
   it('obfuscates a cookie', () => {
-    if (cookie) {
-      const obfuscatedCookie = ObfuscationUtil.obfuscateCookie(cookie);
-      expect(cookie.value).not.toBe(obfuscatedCookie.value);
-    }
+    expect(cookie).toBeDefined();
+    const obfuscatedCookie = ObfuscationUtil.obfuscateCookie(cookie!);
+    expect(cookie!.value).not.toBe(obfuscatedCookie.value);
   });
 
   it(`doesn't obfuscate a cookie when disabled`, () => {
-    if (cookie) {
-      const obfuscatedCookie = ObfuscationUtil.obfuscateCookie(cookie, false);
-      expect(cookie.value).toBe(obfuscatedCookie.value);
-    }
+    expect(cookie).toBeDefined();
+    const obfuscatedCookie = ObfuscationUtil.obfuscateCookie(cookie!, false);
+    expect(cookie!.value).toBe(obfuscatedCookie.value);
   });
 });

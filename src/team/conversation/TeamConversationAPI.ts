@@ -19,9 +19,10 @@
 
 import {AxiosRequestConfig} from 'axios';
 
-import {HttpClient} from '../../http';
-import {ConversationRolesList} from '../../conversation/ConversationRole';
 import {TeamConversationList, TeamConversation} from './TeamConversation';
+
+import {ConversationRolesList} from '../../conversation/ConversationRole';
+import {HttpClient} from '../../http';
 
 export class TeamConversationAPI {
   constructor(private readonly client: HttpClient) {}

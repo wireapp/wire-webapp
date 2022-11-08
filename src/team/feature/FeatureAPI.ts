@@ -19,8 +19,6 @@
 
 import {AxiosRequestConfig} from 'axios';
 
-import {BackendError, BackendErrorLabel, HttpClient} from '../../http';
-import {InvalidAppLockTimeoutError} from './FeatureError';
 import {
   FeatureAppLock,
   FeatureVideoCalling,
@@ -33,7 +31,11 @@ import {
   FeatureSndFactorPassword,
   FeatureMLS,
 } from './Feature';
+import {InvalidAppLockTimeoutError} from './FeatureError';
 import {FeatureList} from './FeatureList';
+
+import {BackendError, BackendErrorLabel, HttpClient} from '../../http';
+
 import {FeatureConversationGuestLink, FeatureLockedError} from '.';
 
 export class FeatureAPI {

@@ -17,4 +17,6 @@
  *
  */
 
-export default window.WebSocket;
+const WebSocketBrowser = window.WebSocket;
+
+export {WebSocketBrowser};

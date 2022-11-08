@@ -19,11 +19,12 @@
 
 import {AxiosRequestConfig} from 'axios';
 
-import {TeamAPI} from '../team/TeamAPI';
-import {HttpClient} from '../../http';
 import {LegalHoldData} from './LegalHoldData';
 import {LegalHoldMemberData} from './LegalHoldMemberStatus';
 import {NewLegalHoldData} from './NewLegalHoldData';
+
+import {HttpClient} from '../../http';
+import {TeamAPI} from '../team/TeamAPI';
 
 export class LegalHoldAPI {
   constructor(private readonly client: HttpClient) {}

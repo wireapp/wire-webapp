@@ -20,7 +20,10 @@
 import axios, {AxiosRequestConfig} from 'axios';
 
 import {AssetRetentionPolicy} from './AssetRetentionPolicy';
-import {base64MD5FromBuffer, concatToBuffer} from '../shims/node/buffer';
+import {AssetUploadData} from './AssetUploadData';
+import {isValidToken, isValidUUID} from './AssetUtil';
+
+import {BackendFeatures} from '../APIClient';
 import {
   BackendError,
   handleProgressEvent,
@@ -29,11 +32,9 @@ import {
   RequestCancelable,
   SyntheticErrorLabel,
 } from '../http/';
-import {isValidToken, isValidUUID} from './AssetUtil';
-import {RequestCancellationError} from '../user';
+import {base64MD5FromBuffer, concatToBuffer} from '../shims/node/buffer';
 import {unsafeAlphanumeric} from '../shims/node/random';
-import {AssetUploadData} from './AssetUploadData';
-import {BackendFeatures} from '../APIClient';
+import {RequestCancellationError} from '../user';
 
 export interface CipherOptions {
   /** Set a custom algorithm for encryption */

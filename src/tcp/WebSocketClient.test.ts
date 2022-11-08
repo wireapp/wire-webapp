@@ -19,10 +19,11 @@
 
 /* eslint-disable dot-notation */
 
+import {WebSocketClient} from './WebSocketClient';
+
 import {InvalidTokenError} from '../auth/AuthenticationError';
 import {TEAM_EVENT} from '../event/';
 import {Notification} from '../notification';
-import {WebSocketClient} from './WebSocketClient';
 
 const accessTokenPayload = {
   access_token:
@@ -125,6 +126,7 @@ describe('WebSocketClient', () => {
   });
 
   describe('refreshAccessToken', () => {
+    // eslint-disable-next-line jest/expect-expect
     it('emits the correct message for invalid tokens', async () => {
       const websocketClient = new WebSocketClient('ws://url', invalidTokenHttpClient);
       const socket = websocketClient['socket'];

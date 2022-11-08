@@ -17,14 +17,15 @@
  *
  */
 
-import Axios from 'axios';
-import {AxiosRequestConfig} from 'axios';
+import Axios, {AxiosRequestConfig} from 'axios';
+
+import {LeadData} from './LeadData';
+import {TeamSizeData} from './TeamSizeData';
+import {UpdateTeamData} from './UpdateTeamData';
+
 import {NewTeamData, TeamChunkData, TeamData} from '../';
 import {BackendError, HttpClient, RequestCancelable, SyntheticErrorLabel} from '../../http/';
 import {RequestCancellationError} from '../../user';
-import {TeamSizeData} from './TeamSizeData';
-import {UpdateTeamData} from './UpdateTeamData';
-import {LeadData} from './LeadData';
 
 export class TeamAPI {
   constructor(private readonly client: HttpClient) {}

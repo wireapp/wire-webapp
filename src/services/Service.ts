@@ -17,11 +17,11 @@
  *
  */
 
-import {OtherMember, NewOTRMessage} from '../conversation';
-import {PublicClient} from '../client/PublicClient';
 import {PreKey} from '../auth/PreKey';
-import {UserAsset, User} from '../user';
 import {ClientType} from '../client';
+import {PublicClient} from '../client/PublicClient';
+import {OtherMember, NewOTRMessage} from '../conversation';
+import {UserAsset, User} from '../user';
 
 export interface NewService {
   /** The client ID for the service. */

@@ -20,9 +20,9 @@
 import {proteus as ProtobufOTR} from '@wireapp/protocol-messaging/web/otr';
 import {AxiosRequestConfig} from 'axios';
 
-import {ValidationError} from '../validation/';
 import {ClientMismatch, MessageSendingStatus, NewOTRMessage} from '../conversation/';
 import {HttpClient} from '../http/';
+import {ValidationError} from '../validation/';
 
 export class BroadcastAPI {
   constructor(private readonly client: HttpClient) {}

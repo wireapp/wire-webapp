@@ -19,11 +19,12 @@
 
 import {AxiosRequestConfig} from 'axios';
 
+import {ClientCapabilityData} from './ClientCapabilityData';
+import {ClientCapabilityRemovedError} from './ClientError';
+
 import {PreKeyBundle} from '../auth/';
 import {CreateClientPayload, RegisteredClient, UpdateClientPayload} from '../client/';
-import {ClientCapabilityRemovedError} from './ClientError';
 import {BackendError, BackendErrorLabel, HttpClient} from '../http/';
-import {ClientCapabilityData} from './ClientCapabilityData';
 
 type ClaimedKeyPackages = {
   key_packages: {

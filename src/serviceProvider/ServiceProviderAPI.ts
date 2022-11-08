@@ -19,12 +19,13 @@
 
 import {AxiosRequestConfig} from 'axios';
 
+import {LoginServiceProviderData} from './LoginServiceProviderData';
+import {NewServiceProvider} from './NewServiceProvider';
+import {RegisteredServiceProvider} from './RegisteredServiceProvider';
+import {UpdateServiceProviderData} from './UpdateServiceProviderData';
+
 import {HttpClient} from '../http';
 import {CompletePasswordReset} from '../user';
-import {LoginServiceProviderData} from './LoginServiceProviderData';
-import {RegisteredServiceProvider} from './RegisteredServiceProvider';
-import {NewServiceProvider} from './NewServiceProvider';
-import {UpdateServiceProviderData} from './UpdateServiceProviderData';
 
 export class ServiceProviderAPI {
   constructor(private readonly client: HttpClient) {}

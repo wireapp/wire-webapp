@@ -17,8 +17,9 @@
  *
  */
 
-import {InvoiceData, PaymentPlan} from './';
 import {PaymentPlanID} from './PaymentPlan';
+
+import {InvoiceData, PaymentPlan} from './';
 
 export enum PaymentStatus {
   ACTIVE = 'active',

@@ -17,10 +17,10 @@
  *
  */
 
+import {chunk} from '@wireapp/commons/lib/util/ArrayUtil';
 import {proteus as ProtobufOTR} from '@wireapp/protocol-messaging/web/otr';
 import axios, {AxiosRequestConfig} from 'axios';
 
-import {ValidationError} from '../../validation';
 import {
   ClientMismatch,
   Conversation,
@@ -37,6 +37,7 @@ import {
   QualifiedConversationIds,
   RemoteConversations,
 } from '..';
+import {BackendFeatures} from '../../APIClient';
 import {
   ConversationAccessUpdateEvent,
   ConversationCodeDeleteEvent,
@@ -49,6 +50,13 @@ import {
   ConversationRenameEvent,
 } from '../../event';
 import {BackendError, BackendErrorLabel, HttpClient} from '../../http';
+import {QualifiedId} from '../../user';
+import {ValidationError} from '../../validation';
+import {
+  ConversationFullError,
+  ConversationCodeNotFoundError,
+  ConversationLegalholdMissingConsentError,
+} from '../ConversationError';
 import {
   ConversationAccessUpdateData,
   ConversationAccessV2UpdateData,
@@ -60,14 +68,6 @@ import {
   ConversationReceiptModeUpdateData,
   ConversationTypingData,
 } from '../data';
-import {
-  ConversationFullError,
-  ConversationCodeNotFoundError,
-  ConversationLegalholdMissingConsentError,
-} from '../ConversationError';
-import {QualifiedId} from '../../user';
-import {BackendFeatures} from '../../APIClient';
-import {chunk} from '@wireapp/commons/lib/util/ArrayUtil';
 import {MlsEvent} from '../data/MlsEventData';
 
 export type PostMlsMessageResponse = {

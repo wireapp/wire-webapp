@@ -17,8 +17,9 @@
  *
  */
 
-import {QualifiedId} from '../user/QualifiedId';
 import {Conversation} from './Conversation';
+
+import {QualifiedId} from '../user/QualifiedId';
 
 export interface RemoteConversations {
   failed?: QualifiedId[];

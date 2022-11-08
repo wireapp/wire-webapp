@@ -18,9 +18,12 @@
  */
 
 import axios, {AxiosRequestConfig} from 'axios';
+
 import {ArrayUtil} from '@wireapp/commons';
 
-import {TeamAPI} from '../team/TeamAPI';
+import {MemberCSVResponse} from './MemberCSVResponse';
+import {UpdatedMemberData} from './UpdatedMemberData';
+
 import {
   BackendError,
   handleProgressEvent,
@@ -29,10 +32,9 @@ import {
   RequestCancelable,
   SyntheticErrorLabel,
 } from '../../http/';
-import {MemberData, Members} from '../member/';
 import {RequestCancellationError} from '../../user';
-import {MemberCSVResponse} from './MemberCSVResponse';
-import {UpdatedMemberData} from './UpdatedMemberData';
+import {MemberData, Members} from '../member/';
+import {TeamAPI} from '../team/TeamAPI';
 
 export class MemberAPI {
   // Maximum 1600 due to "413 Request Entity Too Large" response

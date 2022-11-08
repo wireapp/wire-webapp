@@ -17,9 +17,11 @@
  *
  */
 
-import {ConversationMembers, ConversationProtocol} from './';
-import {QualifiedId} from '../user';
 import {RECEIPT_MODE} from './data';
+
+import {QualifiedId} from '../user';
+
+import {ConversationMembers, ConversationProtocol} from './';
 
 export enum CONVERSATION_TYPE {
   REGULAR = 0,

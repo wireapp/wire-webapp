@@ -18,12 +18,13 @@
  */
 
 import {AxiosRequestConfig} from 'axios';
-import {BackendFeatures} from '../APIClient';
 
+import {ConnectionLegalholdMissingConsentError} from './ConnectionError';
+
+import {BackendFeatures} from '../APIClient';
 import {Connection, ConnectionRequest, ConnectionUpdate, UserConnectionList} from '../connection/';
 import {BackendError, BackendErrorLabel, HttpClient} from '../http/';
 import {QualifiedId} from '../user';
-import {ConnectionLegalholdMissingConsentError} from './ConnectionError';
 
 export class ConnectionAPI {
   constructor(private readonly client: HttpClient, private readonly backendFeatures: BackendFeatures) {}

@@ -17,4 +17,6 @@
  *
  */
 
-export default require('ws');
+const WebSocketNode = require('ws');
+
+export {WebSocketNode};

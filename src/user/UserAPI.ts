@@ -18,8 +18,18 @@
  */
 
 import Axios, {AxiosRequestConfig} from 'axios';
+
 import {ArrayUtil} from '@wireapp/commons';
 
+import {RichInfo} from './RichInfo';
+import {RequestCancellationError} from './UserError';
+import {QualifiedUserPreKeyBundleMap} from './UserPreKeyBundleMap';
+
+import {BackendFeatures} from '../APIClient';
+import {ClientPreKey, PreKeyBundle} from '../auth/';
+import {VerificationActionType} from '../auth/VerificationActionType';
+import {PublicClient, QualifiedPublicClients} from '../client/';
+import {UserClients, QualifiedUserClients} from '../conversation/';
 import {BackendError, HttpClient, RequestCancelable, SyntheticErrorLabel} from '../http/';
 import {
   Activate,
@@ -37,14 +47,6 @@ import {
   UserPreKeyBundleMap,
   VerifyDelete,
 } from '../user/';
-import {RequestCancellationError} from './UserError';
-import {ClientPreKey, PreKeyBundle} from '../auth/';
-import {PublicClient, QualifiedPublicClients} from '../client/';
-import {RichInfo} from './RichInfo';
-import {UserClients, QualifiedUserClients} from '../conversation/';
-import {QualifiedUserPreKeyBundleMap} from './UserPreKeyBundleMap';
-import {VerificationActionType} from '../auth/VerificationActionType';
-import {BackendFeatures} from '../APIClient';
 
 export class UserAPI {
   public static readonly DEFAULT_USERS_CHUNK_SIZE = 50;
