@@ -20,14 +20,15 @@
 // Polyfill for "tsyringe" dependency injection
 import {Context} from '@wireapp/api-client/lib/auth';
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
-import {Runtime} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import 'core-js/full/reflect';
 import Dexie from 'dexie';
 import ko from 'knockout';
 import platform from 'platform';
 import {container} from 'tsyringe';
+
+import {Runtime} from '@wireapp/commons';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {DebugUtil} from 'Util/DebugUtil';
 import {Environment} from 'Util/Environment';
@@ -38,9 +39,11 @@ import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {appendParameter} from 'Util/UrlUtil';
 import {arrayToBase64, checkIndexedDb, createRandomUuid, supportsMLS} from 'Util/util';
 
+import './globals';
 import {migrateToQualifiedSessionIds} from './sessionIdMigrator';
 import {SingleInstanceHandler} from './SingleInstanceHandler';
 
+import '../../style/default.less';
 import {AssetRepository} from '../assets/AssetRepository';
 import {AssetService} from '../assets/AssetService';
 import {AudioRepository} from '../audio/AudioRepository';
@@ -104,9 +107,6 @@ import {UserService} from '../user/UserService';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
 import {ThemeViewModel} from '../view_model/ThemeViewModel';
 import {Warnings} from '../view_model/WarningsContainer';
-
-import './globals';
-import '../../style/default.less';
 
 export function doRedirect(signOutReason: SIGN_OUT_REASON) {
   let url = `/auth/${location.search}`;
@@ -356,6 +356,7 @@ export class App {
    */
   async initApp(clientType: ClientType, onProgress: (progress: number, message?: string) => void) {
     // add body information
+    await this.core.useAPIVersion(this.config.SUPPORTED_API_VERSIONS, this.config.ENABLE_DEV_BACKEND_API);
     const osCssClass = Runtime.isMacOS() ? 'os-mac' : 'os-pc';
     const platformCssClass = Runtime.isDesktopApp() ? 'platform-electron' : 'platform-web';
     document.body.classList.add(osCssClass, platformCssClass);

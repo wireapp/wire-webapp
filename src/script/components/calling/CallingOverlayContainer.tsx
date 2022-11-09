@@ -19,8 +19,9 @@
 
 import React, {Fragment, useEffect} from 'react';
 
-import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 import {container} from 'tsyringe';
+
+import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 

@@ -17,10 +17,11 @@
  *
  */
 
-import type {APIClient} from '@wireapp/api-client';
 import {ClientType} from '@wireapp/api-client/lib/client/';
-import type {TypeUtil} from '@wireapp/commons';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+
+import type {APIClient} from '@wireapp/api-client';
+import type {TypeUtil} from '@wireapp/commons';
 
 import {BackendError} from './BackendError';
 import {AuthActionCreator} from './creator/';

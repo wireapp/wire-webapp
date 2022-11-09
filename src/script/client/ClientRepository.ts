@@ -20,13 +20,14 @@
 import {ClientCapability, ClientType, PublicClient, RegisteredClient} from '@wireapp/api-client/lib/client/';
 import {UserClientAddEvent, UserClientRemoveEvent, USER_EVENT} from '@wireapp/api-client/lib/event';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
-import {Runtime} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import ko from 'knockout';
 import murmurhash from 'murmurhash';
 import {container} from 'tsyringe';
+
+import {Runtime} from '@wireapp/commons';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';

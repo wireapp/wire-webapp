@@ -19,8 +19,9 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {ReactionType} from '@wireapp/core/lib/conversation/';
-import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import ko from 'knockout';
+
+import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {t} from 'Util/LocalizerUtil';
 import {getUserName} from 'Util/SanitizationUtil';

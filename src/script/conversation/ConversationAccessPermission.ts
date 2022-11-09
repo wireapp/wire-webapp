@@ -17,7 +17,6 @@
  *
  */
 
-/* eslint-disable sort-keys-fix/sort-keys-fix */
 import {ACCESS_ROLE_V2, CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conversation/';
 
 import {ACCESS_STATE, TEAM} from './AccessState';

@@ -19,13 +19,14 @@
 
 import React, {useEffect, useState} from 'react';
 
-import {UrlUtil} from '@wireapp/commons';
-import {Button, ButtonVariant, ContainerXS, ErrorMessage, Text} from '@wireapp/react-ui-kit';
 import {SVGIcon} from '@wireapp/react-ui-kit/lib/Icon/SVGIcon';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {Navigate, useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
+
+import {UrlUtil} from '@wireapp/commons';
+import {Button, ButtonVariant, ContainerXS, ErrorMessage, Text} from '@wireapp/react-ui-kit';
 
 import {Page} from './Page';
 

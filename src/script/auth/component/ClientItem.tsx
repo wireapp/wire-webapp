@@ -20,6 +20,8 @@
 import React, {useEffect, useState} from 'react';
 
 import {RegisteredClient} from '@wireapp/api-client/lib/client/index';
+import {useIntl} from 'react-intl';
+
 import {
   COLOR,
   ContainerXS,
@@ -33,7 +35,6 @@ import {
   Text,
   TrashIcon,
 } from '@wireapp/react-ui-kit';
-import {useIntl} from 'react-intl';
 
 import {t} from 'Util/LocalizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';

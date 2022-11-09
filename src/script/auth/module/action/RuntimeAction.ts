@@ -17,8 +17,9 @@
  *
  */
 
-import {Runtime} from '@wireapp/commons';
 import type {CookiesStatic} from 'js-cookie';
+
+import {Runtime} from '@wireapp/commons';
 
 import {RuntimeActionCreator} from './creator/';
 

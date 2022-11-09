@@ -17,8 +17,9 @@
  *
  */
 
-import {QualifiedUserId} from '@wireapp/protocol-messaging';
 import ko from 'knockout';
+
+import {QualifiedUserId} from '@wireapp/protocol-messaging';
 
 import {isQualifiedId} from 'Util/TypePredicateUtil';
 

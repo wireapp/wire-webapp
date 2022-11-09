@@ -20,6 +20,8 @@
 import React, {useRef, useState} from 'react';
 
 import {LoginData} from '@wireapp/api-client/lib/auth';
+import {useIntl} from 'react-intl';
+
 import {
   ArrowIcon,
   Input,
@@ -31,7 +33,6 @@ import {
   QUERY,
   useMatchMedia,
 } from '@wireapp/react-ui-kit';
-import {useIntl} from 'react-intl';
 
 import {COUNTRY_CODES, getCountryByCode, getCountryCode} from 'Util/CountryCodes';
 

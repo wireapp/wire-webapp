@@ -17,11 +17,12 @@
  *
  */
 
+import Dexie, {Transaction} from 'dexie';
+import {singleton} from 'tsyringe';
+
 import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
 import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
-import Dexie, {Transaction} from 'dexie';
-import {singleton} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {loadValue, storeValue} from 'Util/StorageUtil';

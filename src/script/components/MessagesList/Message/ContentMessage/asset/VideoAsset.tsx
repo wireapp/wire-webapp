@@ -19,9 +19,10 @@
 
 import React, {useCallback, useEffect, useState} from 'react';
 
-import {useTimeout} from '@wireapp/react-ui-kit';
 import cx from 'classnames';
 import {container} from 'tsyringe';
+
+import {useTimeout} from '@wireapp/react-ui-kit';
 
 import {RestrictedVideo} from 'Components/asset/RestrictedVideo';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
