@@ -47,6 +47,8 @@ describe('Conversations', () => {
     showConversation: jest.fn(),
     switchContent: jest.fn(),
     switchList: jest.fn(),
+    switchContent: jest.fn(),
+    showConversation: jest.fn(),
   };
 
   it('Opens preferences when clicked', () => {

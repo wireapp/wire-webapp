@@ -95,6 +95,7 @@ describe('Collection', () => {
         conversation={conversation}
         conversationRepository={mockConversationRepository as any}
         messageRepository={mockMessageRepository}
+        showConversation={jest.fn()}
       />,
     );
 
@@ -118,6 +119,7 @@ describe('Collection', () => {
         messageRepository={mockMessageRepository}
         conversation={conversation}
         conversationRepository={mockConversationRepository as any}
+        showConversation={jest.fn()}
       />,
     );
 
@@ -136,6 +138,7 @@ describe('Collection', () => {
         messageRepository={mockMessageRepository}
         conversation={conversation}
         conversationRepository={mockConversationRepository as any}
+        showConversation={jest.fn()}
       />,
     );
 
