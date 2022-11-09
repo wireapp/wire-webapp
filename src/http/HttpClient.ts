@@ -229,12 +229,13 @@ export class HttpClient extends EventEmitter {
     return this.accessTokenStore.updateToken(accessToken);
   }
 
-  public async postAccess(expiredAccessToken?: AccessTokenData): Promise<AccessTokenData> {
+  public async postAccess(expiredAccessToken?: AccessTokenData, clientId?: string): Promise<AccessTokenData> {
     const config: AxiosRequestConfig = {
       headers: {},
       method: 'post',
       url: `${AuthAPI.URL.ACCESS}`,
       withCredentials: true,
+      params: clientId && {client_id: clientId},
     };
 
     if (expiredAccessToken?.access_token && config?.headers) {
@@ -245,6 +246,17 @@ export class HttpClient extends EventEmitter {
 
     const response = await sendRequestWithCookie<AccessTokenData>(this, config);
     return response.data;
+  }
+
+  /**
+   * Will associate specified client id with session and return newly created access token.
+   *
+   * @param  {string} clientId - id of the client with which the new login session will be associated
+   */
+  public async associateClientWithSession(clientId: string): Promise<AccessTokenData> {
+    const storedToken = this.accessTokenStore.accessToken;
+    const newToken = await this.postAccess(storedToken, clientId);
+    return this.accessTokenStore.updateToken(newToken);
   }
 
   public async sendRequest<T>(
