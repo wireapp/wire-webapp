@@ -969,7 +969,7 @@ export class MessageRepository {
    */
   public async deleteMessage(conversation: Conversation, message: Message): Promise<void> {
     try {
-      const selfConversation = this.conversationState.self_conversation();
+      const selfConversation = this.conversationState.selfConversation();
       if (!selfConversation) {
         throw new Error('cannot delete message as selfConversation is not defined');
       }
@@ -997,7 +997,7 @@ export class MessageRepository {
    */
   public async updateClearedTimestamp(conversation: Conversation): Promise<void> {
     const timestamp = conversation.getLastKnownTimestamp(this.serverTimeHandler.toServerTimestamp());
-    const selfConversation = this.conversationState.self_conversation();
+    const selfConversation = this.conversationState.selfConversation();
     if (!selfConversation) {
       throw new Error('cannot clear conversation as selfConversation is not defined');
     }
@@ -1241,7 +1241,7 @@ export class MessageRepository {
    * @param conversation Conversation to be marked as read
    */
   public async markAsRead(conversation: Conversation) {
-    const selfConversation = this.conversationState.self_conversation();
+    const selfConversation = this.conversationState.selfConversation();
     if (!selfConversation) {
       throw new Error('cannot mark as read as selfConversation is not defined');
     }
@@ -1262,7 +1262,7 @@ export class MessageRepository {
    * @param countlyId Countly new ID
    */
   public async sendCountlySync(countlyId: string) {
-    const selfConversation = this.conversationState.self_conversation();
+    const selfConversation = this.conversationState.selfConversation();
     if (!selfConversation) {
       throw new Error('cannot mark as read as selfConversation is not defined');
     }

@@ -139,7 +139,7 @@ describe('ConversationRepository', () => {
         expect(
           _findConversation(
             self_conversation_et,
-            testFactory.conversation_repository['conversationState'].filtered_conversations,
+            testFactory.conversation_repository['conversationState'].filteredConversations,
           ),
         ).toBeUndefined();
       });
@@ -159,7 +159,7 @@ describe('ConversationRepository', () => {
         expect(
           _findConversation(
             blocked_conversation_et,
-            testFactory.conversation_repository['conversationState'].filtered_conversations,
+            testFactory.conversation_repository['conversationState'].filteredConversations,
           ),
         ).toBeUndefined();
       });
@@ -179,7 +179,7 @@ describe('ConversationRepository', () => {
         expect(
           _findConversation(
             cancelled_conversation_et,
-            testFactory.conversation_repository['conversationState'].filtered_conversations,
+            testFactory.conversation_repository['conversationState'].filteredConversations,
           ),
         ).toBeUndefined();
       });
@@ -199,7 +199,7 @@ describe('ConversationRepository', () => {
         expect(
           _findConversation(
             pending_conversation_et,
-            testFactory.conversation_repository['conversationState'].filtered_conversations,
+            testFactory.conversation_repository['conversationState'].filteredConversations,
           ),
         ).toBeUndefined();
       });
@@ -429,7 +429,7 @@ describe('ConversationRepository', () => {
         expect(
           _findConversation(
             _conversation,
-            testFactory.conversation_repository['conversationState'].filtered_conversations,
+            testFactory.conversation_repository['conversationState'].filteredConversations,
           ),
         ).toBeUndefined();
       });

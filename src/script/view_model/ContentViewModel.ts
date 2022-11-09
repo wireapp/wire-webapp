@@ -56,7 +56,7 @@ interface ShowConversationOptions {
 }
 
 interface ShowConversationOverload {
-  (conversation: Conversation, options: ShowConversationOptions): Promise<void>;
+  (conversation: Conversation | undefined, options: ShowConversationOptions): Promise<void>;
   (conversationId: string, options: ShowConversationOptions, domain: string | null): Promise<void>;
 }
 
@@ -93,7 +93,7 @@ export class ContentViewModel {
 
       const isStateRequests = contentState === ContentState.CONNECTION_REQUESTS;
       if (isStateRequests && !requests.length) {
-        this.showConversation(this.conversationRepository.getMostRecentConversation(), {});
+        this.showConversation(this.conversationState.getMostRecentConversation(), {});
       }
     });
 
@@ -102,7 +102,7 @@ export class ContentViewModel {
         this.conversationState.activeConversation()?.connection().status() ===
         ConnectionStatus.MISSING_LEGAL_HOLD_CONSENT
       ) {
-        this.showConversation(this.conversationRepository.getMostRecentConversation(), {});
+        this.showConversation(this.conversationState.getMostRecentConversation(), {});
       }
     });
 
@@ -154,7 +154,7 @@ export class ContentViewModel {
    * @param domain Domain name
    */
   readonly showConversation: ShowConversationOverload = async (
-    conversation: Conversation | string,
+    conversation: Conversation | string | undefined,
     options: ShowConversationOptions,
     domain: string | null = null,
   ) => {
