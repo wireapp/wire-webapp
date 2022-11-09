@@ -404,8 +404,7 @@ const InputBar = ({
       conversationRepository.sendTypingStop(conversationEntity);
       isTypingTimerIdRef.current = null;
     }, CONFIG.IS_TYPING_TIMEOUT);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inputValue]); // we want to send is typing based on changes to the current input value
+  }, [conversationEntity, conversationRepository, inputValue]); // we want to send is typing based on changes to the current input value
 
   const replyMessage = (messageEntity: ContentMessage): void => {
     if (messageEntity?.isReplyable() && messageEntity !== replyMessageEntity) {
@@ -907,7 +906,10 @@ const InputBar = ({
               user2: activeTypingUsers[1].name(),
             })}
           {activeTypingUsers.length > 2 &&
-            t('tooltipConversationInputMoreThanTwoUserTyping' as StringIdentifer, {user1: activeTypingUsers[0].name()})}
+            t('tooltipConversationInputMoreThanTwoUserTyping' as StringIdentifer, {
+              user1: activeTypingUsers[0].name(),
+              count: activeTypingUsers.length.toString(),
+            })}
         </div>
       )}
       {classifiedDomains && !isConnectionRequest && (
