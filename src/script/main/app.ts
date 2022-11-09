@@ -419,7 +419,7 @@ export class App {
 
       await teamRepository.initTeam();
 
-      const conversationEntities = await conversationRepository.getConversations();
+      const conversationEntities = await conversationRepository.loadConversations();
 
       if (supportsMLS()) {
         // We send external proposal to all the MLS conversations that are in an unknown state (not established nor pendingWelcome)
@@ -476,7 +476,6 @@ export class App {
       telemetry.addStatistic(AppInitStatisticsValue.NOTIFICATIONS, notificationsCount, 100);
 
       eventTrackerRepository.init(propertiesRepository.properties.settings.privacy.telemetry_sharing);
-      await conversationRepository.initializeConversations();
       onProgress(97.5, t('initUpdatedFromNotifications', this.config.BRAND_NAME));
 
       const clientEntities = await clientRepository.updateClientsForSelf();
@@ -512,8 +511,7 @@ export class App {
       if (error instanceof BaseError) {
         this._appInitFailure(error, isReload);
       }
-
-      return undefined;
+      throw error;
     }
   }
 

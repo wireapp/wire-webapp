@@ -193,7 +193,7 @@ export class ConversationVerificationStateHandler {
     userIds: QualifiedId[],
   ): {conversationEntity: Conversation; userIds: QualifiedId[]}[] {
     return this.conversationState
-      .filtered_conversations()
+      .filteredConversations()
       .map((conversationEntity: Conversation) => {
         if (!conversationEntity.removed_from_conversation()) {
           const userIdsInConversation = conversationEntity

@@ -123,7 +123,7 @@ export class ListViewModel {
       const hasConnectRequests = !!this.userState.connectRequests().length;
       const states: (string | Conversation)[] = hasConnectRequests ? [ContentState.CONNECTION_REQUESTS] : [];
 
-      return states.concat(this.conversationState.conversations_unarchived());
+      return states.concat(this.conversationState.unarchivedConversations());
     });
 
     this._initSubscriptions();
@@ -306,7 +306,7 @@ export class ListViewModel {
 
   readonly showTemporaryGuest = (): void => {
     this.switchList(ListState.TEMPORARY_GUEST);
-    const conversationEntity = this.conversationRepository.getMostRecentConversation();
+    const conversationEntity = this.conversationState.getMostRecentConversation();
     amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
   };
 
@@ -465,7 +465,7 @@ export class ListViewModel {
 
   readonly clickToUnarchive = (conversationEntity: Conversation): void => {
     this.conversationRepository.unarchiveConversation(conversationEntity, true, 'manual un-archive').then(() => {
-      if (!this.conversationState.conversations_archived().length) {
+      if (!this.conversationState.archivedConversations().length) {
         this.switchList(ListState.CONVERSATIONS);
       }
     });
