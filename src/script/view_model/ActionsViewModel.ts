@@ -40,7 +40,6 @@ import type {User} from '../entity/User';
 import {BackendClientError} from '../error/BackendClientError';
 import type {IntegrationRepository} from '../integration/IntegrationRepository';
 import type {ServiceEntity} from '../integration/ServiceEntity';
-import {useAppMainState} from '../page/state';
 import {UserState} from '../user/UserState';
 
 export class ActionsViewModel {
@@ -290,11 +289,7 @@ export class ActionsViewModel {
       return new Promise(() => {
         PrimaryModal.show(PrimaryModal.type.CONFIRM, {
           primaryAction: {
-            action: () => {
-              const {rightSidebar} = useAppMainState.getState();
-              rightSidebar.clearHistory();
-              return this.conversationRepository.deleteConversation(conversationEntity);
-            },
+            action: () => this.conversationRepository.deleteConversation(conversationEntity),
             text: t('modalConversationDeleteGroupAction'),
           },
           text: {

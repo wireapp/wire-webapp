@@ -52,7 +52,6 @@ import {ConversationRepository} from '../../../conversation/ConversationReposito
 import {User} from '../../../entity/User';
 import {isProtocolOption, ProtocolOption} from '../../../guards/Protocol';
 import {RootContext} from '../../../page/RootProvider';
-import {useAppMainState} from '../../../page/state';
 import {TeamState} from '../../../team/TeamState';
 import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {UserState} from '../../../user/UserState';
@@ -218,9 +217,6 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
         );
         setIsShown(false);
         amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
-
-        const {rightSidebar} = useAppMainState.getState();
-        rightSidebar.clearHistory();
       } catch (error) {
         setIsCreatingConversation(false);
         logger.error(error);

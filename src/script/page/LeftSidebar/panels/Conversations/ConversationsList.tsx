@@ -111,14 +111,7 @@ export const ConversationsList: React.FC<{
               index={index}
               dataUieName="item-conversation"
               conversation={conversation}
-              onClick={event => {
-                if (!isActiveConversation(conversation)) {
-                  const {rightSidebar} = useAppMainState.getState();
-                  rightSidebar.clearHistory();
-                }
-
-                createNavigate(generateConversationUrl(conversation.id, conversation.domain))(event);
-              }}
+              onClick={createNavigate(generateConversationUrl(conversation.id, conversation.domain))}
               isSelected={isActiveConversation}
               onJoinCall={answerCall}
               rightClick={openContextMenu}
