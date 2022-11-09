@@ -169,7 +169,7 @@ export class ConnectionRepository {
   public async cancelRequest(
     userEntity: User,
     hideConversation: boolean = false,
-    nextConversationEntity: Conversation,
+    nextConversationEntity?: Conversation,
   ): Promise<void> {
     await this.updateStatus(userEntity, ConnectionStatus.CANCELLED);
     if (hideConversation) {

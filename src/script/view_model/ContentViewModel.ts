@@ -164,7 +164,11 @@ export class ContentViewModel {
       openNotificationSettings = false,
     } = options;
 
+    const {rightSidebar} = useAppMainState.getState();
+    const {contentState, setContentState} = useAppState.getState();
+
     if (!conversation) {
+      rightSidebar.close();
       return this.switchContent(ContentState.CONNECTION_REQUESTS);
     }
 
@@ -174,6 +178,8 @@ export class ContentViewModel {
         : await this.conversationRepository.getConversationById({domain: domain || '', id: conversation});
 
       if (!conversationEntity) {
+        rightSidebar.close();
+
         throw new ConversationError(
           ConversationError.TYPE.CONVERSATION_NOT_FOUND,
           ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
@@ -181,13 +187,16 @@ export class ContentViewModel {
       }
 
       const isActiveConversation = this.conversationState.isActiveConversation(conversationEntity);
-      const {contentState, setContentState} = useAppState.getState();
+
+      if (!isActiveConversation) {
+        rightSidebar.close();
+      }
+
       const isConversationState = contentState === ContentState.CONVERSATION;
       const isOpenedConversation = conversationEntity && isActiveConversation && isConversationState;
 
       if (isOpenedConversation) {
         if (openNotificationSettings) {
-          const {rightSidebar} = useAppMainState.getState();
           rightSidebar.goTo(PanelState.NOTIFICATIONS, {entity: conversationEntity});
         }
         return;
@@ -217,7 +226,6 @@ export class ContentViewModel {
       this.previousConversation = this.conversationState.activeConversation();
 
       if (openNotificationSettings) {
-        const {rightSidebar} = useAppMainState.getState();
         rightSidebar.goTo(PanelState.NOTIFICATIONS, {entity: this.conversationState.activeConversation()});
       }
     } catch (error) {

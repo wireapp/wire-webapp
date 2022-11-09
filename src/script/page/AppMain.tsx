@@ -92,7 +92,7 @@ const AppMain: FC<AppMainProps> = ({app, mainView, selfUser}) => {
 
   const {isActivatedAccount} = useKoSubscribableChildren(userState, ['isActivatedAccount']);
 
-  const {history, entity: currentEntity, clearHistory, goTo} = useAppMainState(state => state.rightSidebar);
+  const {history, entity: currentEntity, close: closeRightSidebar, goTo} = useAppMainState(state => state.rightSidebar);
   const currentState = history.at(-1);
 
   const toggleRightSidebar = (panelState: PanelState, params: RightSidebarParams, compareEntityId = false) => {
@@ -105,7 +105,7 @@ const AppMain: FC<AppMainProps> = ({app, mainView, selfUser}) => {
       return;
     }
 
-    clearHistory();
+    closeRightSidebar();
   };
 
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly

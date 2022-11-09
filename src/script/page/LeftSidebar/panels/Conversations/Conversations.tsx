@@ -116,14 +116,14 @@ const Conversations: React.FC<ConversationsProps> = ({
   const [isConversationListFocus, focusConversationList] = useState(false);
 
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
+  const {close: closeRightSidebar} = useAppMainState(state => state.rightSidebar);
 
   const showLegalHold = isOnLegalHold || hasPendingLegalHold;
 
   const onClickPreferences = () => {
     setCurrentView(ViewType.LEFT_SIDEBAR);
     switchList(ListState.PREFERENCES);
-    const {rightSidebar} = useAppMainState.getState();
-    rightSidebar.clearHistory();
+    closeRightSidebar();
   };
 
   useEffect(() => {

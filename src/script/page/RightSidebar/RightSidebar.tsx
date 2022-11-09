@@ -119,13 +119,9 @@ const RightSidebar: FC<RightSidebarProps> = ({
   const messageEntity = currentEntity && isReadableMessage(currentEntity) ? currentEntity : null;
   const serviceEntity = currentEntity && isServiceEntity(currentEntity) ? currentEntity : null;
 
-  const goToRoot = () => {
-    rightSidebar.goToRoot(activeConversation);
-  };
+  const goToRoot = () => rightSidebar.goToRoot(activeConversation);
 
-  const closePanel = () => {
-    rightSidebar.clearHistory();
-  };
+  const closePanel = () => rightSidebar.close();
 
   const togglePanel = (newState: PanelState, entity: PanelEntity | null, addMode: boolean = false) => {
     setAnimatePanelToLeft(true);
