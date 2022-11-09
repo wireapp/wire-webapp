@@ -94,7 +94,10 @@ const getConversationActions = (
     {
       condition: isSingleUser && (userEntity?.isConnected() || userEntity?.isRequest()),
       item: {
-        click: () => actionsViewModel.blockUser(userEntity, true, nextConversationEntity),
+        click: () => {
+          actionsViewModel.blockUser(userEntity, true, nextConversationEntity);
+          closeRightPanel();
+        },
         icon: 'block-icon',
         identifier: 'do-block',
         label: t('conversationDetailsActionBlock'),
