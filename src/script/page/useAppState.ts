@@ -38,8 +38,6 @@
 
 import create from 'zustand';
 
-import {Message} from '../entity/message/Message';
-
 export enum ContentState {
   COLLECTION = 'ContentState.COLLECTION',
   COLLECTION_DETAILS = 'ContentState.COLLECTION_DETAILS',
@@ -65,8 +63,6 @@ export enum ListState {
 }
 
 type AppState = {
-  initialMessage?: Message;
-  setInitialMessage: (message: Message) => void;
   contentState: ContentState;
   setContentState: (contentState: ContentState) => void;
   listState: ListState;
@@ -79,18 +75,12 @@ type AppState = {
 
 const useAppState = create<AppState>((set, get) => ({
   contentState: ContentState.WATERMARK,
-  initialMessage: undefined,
   listState: ListState.CONVERSATIONS,
   previousContentState: null,
   setContentState: (contentState: ContentState) =>
     set(state => ({
       ...state,
       contentState,
-    })),
-  setInitialMessage: (message?: Message) =>
-    set(state => ({
-      ...state,
-      initialMessage: message,
     })),
   setListState: (listState: ListState) =>
     set(state => ({

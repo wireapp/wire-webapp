@@ -17,14 +17,16 @@
  *
  */
 
-import React, {useEffect} from 'react';
+import React, {LegacyRef, forwardRef, useEffect} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {CSSTransition, SwitchTransition} from 'react-transition-group';
 
+import {CONV_TYPE} from '@wireapp/avs';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {t} from 'Util/LocalizerUtil';
 
 import {Archive} from './panels/Archive';
@@ -41,9 +43,23 @@ import {ViewModelRepositories} from '../../view_model/MainViewModel';
 import {ShowConversationOptions} from '../AppMain';
 import {useAppState, ListState, ContentState} from '../useAppState';
 
-type LeftSidebarProps = {
+const ANIMATION_ENTER_TIMEOUT = 700;
+const ANIMATION_EXIT_TIMEOUT = 300;
+
+const Animated: React.FC<{children: React.ReactNode}> = ({children, ...rest}) => {
+  return (
+    <CSSTransition
+      classNames="fade-in-out"
+      timeout={{enter: ANIMATION_ENTER_TIMEOUT, exit: ANIMATION_EXIT_TIMEOUT}}
+      {...rest}
+    >
+      {children}
+    </CSSTransition>
+  );
+};
+
+interface LeftSidebarProps {
   actionsView: ActionsViewModel;
-  answerCall: (conversation: Conversation) => void;
   callView: CallingViewModel;
   selfUser: User;
   isActivatedAccount: boolean;
@@ -58,107 +74,132 @@ type LeftSidebarProps = {
   repositories: ViewModelRepositories;
   openContextMenu: (conversation: Conversation, event: MouseEvent | React.MouseEvent<Element, MouseEvent>) => void;
   isFederated: boolean;
-};
+}
 
-const Animated: React.FC<{children: React.ReactNode}> = ({children, ...rest}) => {
-  return (
-    <CSSTransition classNames="fade-in-out" timeout={{enter: 700, exit: 300}} {...rest}>
-      {children}
-    </CSSTransition>
-  );
-};
+const LeftSidebar = forwardRef(
+  (
+    {
+      actionsView,
+      openPreferencesAccount,
+      callView,
+      openContextMenu,
+      selfUser,
+      isActivatedAccount,
+      showConversation,
+      switchContent,
+      switchList,
+      repositories,
+      isFederated,
+    }: LeftSidebarProps,
+    ref: LegacyRef<HTMLDivElement>,
+  ) => {
+    const {listState} = useAppState();
 
-const LeftSidebar: React.FC<LeftSidebarProps> = ({
-  actionsView,
-  answerCall,
-  openPreferencesAccount,
-  callView,
-  openContextMenu,
-  selfUser,
-  isActivatedAccount,
-  showConversation,
-  switchContent,
-  switchList,
-  repositories,
-  isFederated,
-}) => {
-  const {listState} = useAppState();
+    const {
+      calling: callingRepository,
+      conversation: conversationRepository,
+      properties: propertiesRepository,
+    } = repositories;
 
-  const {conversation: conversationRepository, properties: propertiesRepository} = repositories;
+    const goHome = () =>
+      selfUser.isTemporaryGuest() ? switchList(ListState.TEMPORARY_GUEST) : switchList(ListState.CONVERSATIONS);
 
-  const goHome = () =>
-    selfUser.isTemporaryGuest() ? switchList(ListState.TEMPORARY_GUEST) : switchList(ListState.CONVERSATIONS);
+    const answerCall = (conversationEntity: Conversation): void => {
+      const call = callingRepository.findCall(conversationEntity.qualifiedId);
 
-  useEffect(() => {
-    amplify.subscribe(WebAppEvents.SHORTCUT.START, () => {
-      switchList(ListState.START_UI);
-    });
-  }, []);
+      if (!call) {
+        return;
+      }
 
-  return (
-    <div id="left-column" className={cx('left-column', {'left-column--light-theme': !isActivatedAccount})}>
-      <header>
-        <h1 className="visually-hidden">{t('accessibility.headings.sidebar')}</h1>
-      </header>
+      if (call.conversationType === CONV_TYPE.CONFERENCE && !callingRepository.supportsConferenceCalling) {
+        const acknowledgeModalOptions = {
+          text: {
+            message: `${t('modalConferenceCallNotSupportedMessage')} ${t(
+              'modalConferenceCallNotSupportedJoinMessage',
+            )}`,
+            title: t('modalConferenceCallNotSupportedHeadline'),
+          },
+        };
 
-      <SwitchTransition>
-        <Animated key={listState}>
-          <>
-            {listState === ListState.CONVERSATIONS && (
-              <Conversations
-                answerCall={answerCall}
-                callView={callView}
-                preferenceNotificationRepository={repositories.preferenceNotification}
-                conversationRepository={conversationRepository}
-                propertiesRepository={propertiesRepository}
-                switchList={switchList}
-                openContextMenu={openContextMenu}
-                switchContent={switchContent}
-                selfUser={selfUser}
-                showConversation={showConversation}
-              />
-            )}
+        PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, acknowledgeModalOptions);
+      } else {
+        callingRepository.answerCall(call);
+      }
+    };
 
-            {listState === ListState.PREFERENCES && (
-              <Preferences teamRepository={repositories.team} onClose={goHome} switchContent={switchContent} />
-            )}
+    useEffect(() => {
+      amplify.subscribe(WebAppEvents.SHORTCUT.START, () => {
+        switchList(ListState.START_UI);
+      });
+    }, []);
 
-            {listState === ListState.ARCHIVE && (
-              <Archive
-                answerCall={answerCall}
-                openContextMenu={openContextMenu}
-                conversationRepository={conversationRepository}
-                onClose={goHome}
-                showConversation={showConversation}
-              />
-            )}
+    return (
+      <div id="left-column" className={cx('left-column', {'left-column--light-theme': !isActivatedAccount})} ref={ref}>
+        <header>
+          <h1 className="visually-hidden">{t('accessibility.headings.sidebar')}</h1>
+        </header>
 
-            {listState === ListState.TEMPORARY_GUEST && (
-              <TemporaryGuestConversations
-                openPreferencesAccount={openPreferencesAccount}
-                callingViewModel={callView}
-                selfUser={selfUser}
-              />
-            )}
+        <SwitchTransition>
+          <Animated key={listState}>
+            <>
+              {listState === ListState.CONVERSATIONS && (
+                <Conversations
+                  answerCall={answerCall}
+                  callView={callView}
+                  preferenceNotificationRepository={repositories.preferenceNotification}
+                  conversationRepository={conversationRepository}
+                  propertiesRepository={propertiesRepository}
+                  switchList={switchList}
+                  openContextMenu={openContextMenu}
+                  switchContent={switchContent}
+                  selfUser={selfUser}
+                  showConversation={showConversation}
+                />
+              )}
 
-            {listState === ListState.START_UI && (
-              <StartUI
-                onClose={goHome}
-                conversationRepository={conversationRepository}
-                searchRepository={repositories.search}
-                teamRepository={repositories.team}
-                integrationRepository={repositories.integration}
-                actionsView={actionsView}
-                userRepository={repositories.user}
-                isFederated={isFederated}
-                showConversation={showConversation}
-              />
-            )}
-          </>
-        </Animated>
-      </SwitchTransition>
-    </div>
-  );
-};
+              {listState === ListState.PREFERENCES && (
+                <Preferences teamRepository={repositories.team} onClose={goHome} switchContent={switchContent} />
+              )}
+
+              {listState === ListState.ARCHIVE && (
+                <Archive
+                  answerCall={answerCall}
+                  openContextMenu={openContextMenu}
+                  conversationRepository={conversationRepository}
+                  onClose={goHome}
+                  showConversation={showConversation}
+                />
+              )}
+
+              {listState === ListState.TEMPORARY_GUEST && (
+                <TemporaryGuestConversations
+                  openPreferencesAccount={openPreferencesAccount}
+                  callingViewModel={callView}
+                  selfUser={selfUser}
+                />
+              )}
+
+              {listState === ListState.START_UI && (
+                <StartUI
+                  onClose={goHome}
+                  conversationRepository={conversationRepository}
+                  searchRepository={repositories.search}
+                  teamRepository={repositories.team}
+                  integrationRepository={repositories.integration}
+                  actionsView={actionsView}
+                  userRepository={repositories.user}
+                  isFederated={isFederated}
+                  showConversation={showConversation}
+                />
+              )}
+            </>
+          </Animated>
+        </SwitchTransition>
+      </div>
+    );
+  },
+);
+
+LeftSidebar.displayName = 'LeftSidebar';
 
 export {LeftSidebar};
