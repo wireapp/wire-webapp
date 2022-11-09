@@ -54,7 +54,7 @@ import {loadDraftState, saveDraftState} from 'Util/DraftStateUtil';
 import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/FileTypeUtil';
 import {isHittingUploadLimit} from 'Util/isHittingUploadLimit';
 import {insertAtCaret, isFunctionKey, KEY} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {StringIdentifer, t} from 'Util/LocalizerUtil';
 import {
   createMentionEntity,
   detectMentionEdgeDeletion,
@@ -90,6 +90,7 @@ import {UserState} from '../../user/UserState';
 const CONFIG = {
   ...Config.getConfig(),
   PING_TIMEOUT: TIME_IN_MILLIS.SECOND * 2,
+  IS_TYPING_TIMEOUT: TIME_IN_MILLIS.SECOND * 10,
 };
 
 const showWarningModal = (title: string, message: string): void => {
@@ -143,6 +144,7 @@ const InputBar = ({
     hasGlobalMessageTimer,
     removed_from_conversation: removedFromConversation,
     is1to1,
+    activeTypingUsers,
   } = useKoSubscribableChildren(conversationEntity, [
     'connection',
     'firstUserEntity',
@@ -152,6 +154,7 @@ const InputBar = ({
     'hasGlobalMessageTimer',
     'removed_from_conversation',
     'is1to1',
+    'activeTypingUsers',
   ]);
   const {availability} = useKoSubscribableChildren(firstUserEntity, ['availability']);
   const {isOutgoingRequest, isIncomingRequest} = useKoSubscribableChildren(connection, [
@@ -159,6 +162,7 @@ const InputBar = ({
     'isIncomingRequest',
   ]);
 
+  const isTypingTimerIdRef = useRef<NodeJS.Timeout | null>(null);
   const shadowInputRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -387,6 +391,22 @@ const InputBar = ({
     }
   }, [editMessageEntity]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  useEffect(() => {
+    if (inputValue.trim() === '') {
+      return;
+    }
+    if (isTypingTimerIdRef.current) {
+      clearTimeout(isTypingTimerIdRef.current);
+    } else {
+      conversationRepository.sendTypingStart(conversationEntity);
+    }
+    isTypingTimerIdRef.current = setTimeout(() => {
+      conversationRepository.sendTypingStop(conversationEntity);
+      isTypingTimerIdRef.current = null;
+    }, CONFIG.IS_TYPING_TIMEOUT);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inputValue]); // we want to send is typing based on changes to the current input value
+
   const replyMessage = (messageEntity: ContentMessage): void => {
     if (messageEntity?.isReplyable() && messageEntity !== replyMessageEntity) {
       cancelMessageReply();
@@ -536,6 +556,12 @@ const InputBar = ({
   };
 
   const onSend = (text: string): void | boolean => {
+    if (isTypingTimerIdRef.current) {
+      conversationRepository.sendTypingStop(conversationEntity);
+      clearTimeout(isTypingTimerIdRef.current);
+      isTypingTimerIdRef.current = null;
+    }
+
     if (pastedFile) {
       return sendPastedFile();
     }
@@ -861,6 +887,29 @@ const InputBar = ({
       id="conversation-input-bar"
       className={cx('conversation-input-bar', {'is-right-panel-open': isRightSidebarOpen})}
     >
+      {activeTypingUsers.length > 0 && (
+        <div className="conversation-input-bar-typing-users-container">
+          <div className="conversation-input-bar-typing-users-avatars-container">
+            {activeTypingUsers.slice(0, 3).map((user, index) => (
+              <Avatar
+                key={user.id}
+                className={cx('cursor-default', {'conversation-input-avatar-with-margin-left': index > 0})}
+                participant={user}
+                avatarSize={AVATAR_SIZE.X_SMALL}
+              />
+            ))}
+          </div>
+          {activeTypingUsers.length === 1 &&
+            t('tooltipConversationInputOneUserTyping' as StringIdentifer, {user1: activeTypingUsers[0].name()})}
+          {activeTypingUsers.length === 2 &&
+            t('tooltipConversationInputTwoUserTyping' as StringIdentifer, {
+              user1: activeTypingUsers[0].name(),
+              user2: activeTypingUsers[1].name(),
+            })}
+          {activeTypingUsers.length > 2 &&
+            t('tooltipConversationInputMoreThanTwoUserTyping' as StringIdentifer, {user1: activeTypingUsers[0].name()})}
+        </div>
+      )}
       {classifiedDomains && !isConnectionRequest && (
         <ClassifiedBar users={participatingUserEts} classifiedDomains={classifiedDomains} />
       )}

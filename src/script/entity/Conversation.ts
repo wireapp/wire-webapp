@@ -84,6 +84,7 @@ enum TIMESTAMP_TYPE {
 export class Conversation {
   private readonly teamState: TeamState;
   public readonly archivedState: ko.Observable<boolean>;
+  public readonly activeTypingUsers: ko.ObservableArray<User>;
   private readonly incomingMessages: ko.ObservableArray<Message | ContentMessage | MemberMessage>;
   private readonly isManaged: boolean;
   private readonly isTeam1to1: ko.PureComputed<boolean>;
@@ -197,7 +198,7 @@ export class Conversation {
     this.name = ko.observable();
     this.team_id = undefined;
     this.type = ko.observable();
-
+    this.activeTypingUsers = ko.observableArray();
     /**
      * If a conversation has the groupId property it means that it
      * is MLS protocol based as this property is for MLS conversations only.

@@ -19,7 +19,7 @@
 
 import {FC, HTMLProps, MouseEvent as ReactMouseEvent} from 'react';
 
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {ServiceAvatar} from './avatar/ServiceAvatar';
 import {TemporaryGuestAvatar} from './avatar/TemporaryGuestAvatar';
@@ -153,4 +153,3 @@ const Avatar: FC<AvatarProps> = ({
 };
 
 export {Avatar};
-registerReactComponent('participant-avatar', Avatar);

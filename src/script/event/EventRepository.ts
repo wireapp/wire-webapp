@@ -367,10 +367,6 @@ export class EventRepository {
       default: {
         return Promise.resolve(event as EventRecord);
       }
-      case EventValidation.IGNORED_TYPE: {
-        this.logger.info(`Ignored event type '${event.type}'`, logObject);
-        return Promise.resolve(event as EventRecord);
-      }
       case EventValidation.OUTDATED_TIMESTAMP: {
         this.logger.info(`Ignored outdated event type: '${event.type}'`, logObject);
         return Promise.resolve(event as EventRecord);
