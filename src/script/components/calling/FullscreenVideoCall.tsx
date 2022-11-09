@@ -17,20 +17,19 @@
  *
  */
 
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useMemo} from 'react';
 
 import {css} from '@emotion/react';
-import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
 import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
 import {IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Icon} from 'Components/Icon';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {KEY} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
 import {preventFocusOutside} from 'Util/util';
 
 import {ButtonGroup} from './ButtonGroup';
@@ -52,8 +51,8 @@ import type {Grid} from '../../calling/videoGridHandler';
 import type {Conversation} from '../../entity/Conversation';
 import {DeviceTypes, ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
 import type {Multitasking} from '../../notification/NotificationRepository';
+import {useAppState} from '../../page/useAppState';
 import {TeamState} from '../../team/TeamState';
-import {t} from '../../util/LocalizerUtil';
 import {CallViewTab, CallViewTabs} from '../../view_model/CallingViewModel';
 
 export interface FullscreenVideoCallProps {
@@ -152,12 +151,8 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   );
   const showSwitchMicrophone = availableMicrophones.length > 1;
 
-  const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
-  const updateUnreadCount = (unreadCount: number) => setHasUnreadMessages(unreadCount > 0);
-  useEffect(() => {
-    amplify.subscribe(WebAppEvents.LIFECYCLE.UNREAD_COUNT, updateUnreadCount);
-    return () => amplify.unsubscribe(WebAppEvents.LIFECYCLE.UNREAD_COUNT, updateUnreadCount);
-  }, []);
+  const {unreadMessagesCount} = useAppState();
+  const hasUnreadMessages = unreadMessagesCount > 0;
 
   const totalPages = callPages.length;
 
