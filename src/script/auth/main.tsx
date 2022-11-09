@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,12 +17,13 @@
  *
  */
 
-import React from 'react';
-
 // Polyfill "Object.entries" & "Object.values"
-
 import 'core-js/full/object';
 import 'core-js/full/reflect';
+
+// eslint-disable-next-line import/order
+import React from 'react';
+
 import cookieStore from 'js-cookie';
 import {createRoot} from 'react-dom/client';
 import {Provider, ConnectedComponent} from 'react-redux';
