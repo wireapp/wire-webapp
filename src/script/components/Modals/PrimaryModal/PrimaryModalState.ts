@@ -17,6 +17,7 @@
  *
  */
 
+import {isValid} from 'date-fns';
 import create from 'zustand';
 
 import {replaceLink, t} from 'Util/LocalizerUtil';
@@ -155,9 +156,10 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
       content.messageText = t('modalAccountNewDevicesMessage');
       const deviceList = (data as ClientNotificationData[])
         .map(device => {
-          const deviceTime = formatLocale(device.time || new Date(), 'PP, p');
+          const deviceTime = isValid(device.time) ? device.time : new Date();
+          const formattedDate = formatLocale(deviceTime, 'PP, p');
           const deviceModel = `${t('modalAccountNewDevicesFrom')} ${escape(device.model)}`;
-          return `<div>${deviceTime} - UTC</div><div>${deviceModel}</div>`;
+          return `<div>${formattedDate} - UTC</div><div>${deviceModel}</div>`;
         })
         .join('');
       content.messageHtml = `<div class="modal__content__device-list">${deviceList}</div>`;

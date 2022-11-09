@@ -20,10 +20,11 @@
 import {ClientType} from '@wireapp/api-client/lib/client';
 import {UserEvent, USER_EVENT} from '@wireapp/api-client/lib/event';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {groupBy} from 'underscore';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {loadValue, resetStoreValue, storeValue} from 'Util/StorageUtil';

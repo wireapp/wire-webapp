@@ -20,6 +20,11 @@
 import React, {useEffect, useState} from 'react';
 
 import type {RegisterData} from '@wireapp/api-client/lib/auth';
+import {FormattedMessage, useIntl} from 'react-intl';
+import {connect} from 'react-redux';
+import {Navigate} from 'react-router-dom';
+import {AnyAction, Dispatch} from 'redux';
+
 import {Runtime, UrlUtil} from '@wireapp/commons';
 import {
   ArrowIcon,
@@ -35,10 +40,6 @@ import {
   Small,
   Text,
 } from '@wireapp/react-ui-kit';
-import {FormattedMessage, useIntl} from 'react-intl';
-import {connect} from 'react-redux';
-import {Navigate} from 'react-router-dom';
-import {AnyAction, Dispatch} from 'redux';
 
 import {noop} from 'Util/util';
 

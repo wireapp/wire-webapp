@@ -18,8 +18,7 @@
  */
 
 import {amplify} from 'amplify';
-
-const jQuery = require('jquery');
+import jQuery from 'jquery';
 
 import '../event/Client';
 import '../message/MessageCategorization';
@@ -29,4 +28,5 @@ import '../storage/StorageSchemata';
 
 window.amplify = amplify;
 window.jQuery = jQuery;
+// eslint-disable-next-line id-length
 window.$ = jQuery;

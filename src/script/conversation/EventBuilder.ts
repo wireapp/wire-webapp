@@ -20,8 +20,9 @@
 import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
 import {ConversationOtrMessageAddEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
-import type {REASON as AVS_REASON} from '@wireapp/avs';
 import {ReactionType} from '@wireapp/core/lib/conversation';
+
+import type {REASON as AVS_REASON} from '@wireapp/avs';
 import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {createRandomUuid} from 'Util/util';

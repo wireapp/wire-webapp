@@ -19,6 +19,11 @@
 
 import React, {useEffect, useRef, useState} from 'react';
 
+import {useIntl} from 'react-intl';
+import {connect} from 'react-redux';
+import {useNavigate} from 'react-router-dom';
+import {AnyAction, Dispatch} from 'redux';
+
 import {
   ArrowIcon,
   COLOR,
@@ -36,10 +41,6 @@ import {
   Muted,
   RoundIconButton,
 } from '@wireapp/react-ui-kit';
-import {useIntl} from 'react-intl';
-import {connect} from 'react-redux';
-import {useNavigate} from 'react-router-dom';
-import {AnyAction, Dispatch} from 'redux';
 
 import {getLogger} from 'Util/Logger';
 

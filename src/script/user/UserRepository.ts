@@ -33,13 +33,14 @@ import {
   UserAsset as APIClientUserAsset,
   UserAssetType as APIClientUserAssetType,
 } from '@wireapp/api-client/lib/user';
-import type {AccentColor} from '@wireapp/commons';
-import {Availability} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
 import {flatten} from 'underscore';
+
+import type {AccentColor} from '@wireapp/commons';
+import {Availability} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {chunk, partition} from 'Util/ArrayUtil';

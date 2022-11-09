@@ -19,9 +19,10 @@
 
 import {FC, useEffect, useState} from 'react';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import cx from 'classnames';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {GifImage} from 'Components/Giphy/GifImage';
 import {Icon} from 'Components/Icon';

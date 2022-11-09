@@ -17,7 +17,6 @@
  *
  */
 
-import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
@@ -25,7 +24,6 @@ import {getLogger, Logger} from 'Util/Logger';
 
 import {ActionsViewModel} from './ActionsViewModel';
 import {CallingViewModel} from './CallingViewModel';
-import {FaviconViewModel} from './FaviconViewModel';
 import {ListViewModel} from './ListViewModel';
 
 import type {AssetRepository} from '../assets/AssetRepository';
@@ -85,7 +83,6 @@ export interface ViewModelRepositories {
 export class MainViewModel {
   actions: ActionsViewModel;
   calling: CallingViewModel;
-  favicon: FaviconViewModel;
   list: ListViewModel;
   logger: Logger;
   multitasking: Multitasking;
@@ -145,8 +142,6 @@ export class MainViewModel {
       this.multitasking,
     );
     this.list = new ListViewModel(this, repositories);
-
-    this.favicon = new FaviconViewModel(amplify);
 
     // Prevent Chrome (and Electron) from pushing the content out of the
     // viewport when using form elements (e.g. in the preferences)

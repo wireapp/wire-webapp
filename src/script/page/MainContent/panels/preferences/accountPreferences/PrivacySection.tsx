@@ -20,8 +20,9 @@
 import React from 'react';
 
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
-import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 import {container} from 'tsyringe';
+
+import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';

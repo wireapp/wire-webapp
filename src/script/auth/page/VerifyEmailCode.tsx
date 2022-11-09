@@ -19,11 +19,12 @@
 
 import React from 'react';
 
-import {CodeInput, ContainerXS, H1, Muted} from '@wireapp/react-ui-kit';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
+
+import {CodeInput, ContainerXS, H1, Muted} from '@wireapp/react-ui-kit';
 
 import {getLogger} from 'Util/Logger';
 

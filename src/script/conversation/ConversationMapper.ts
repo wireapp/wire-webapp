@@ -28,9 +28,10 @@ import {
   RemoteConversations,
 } from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import ko from 'knockout';
 import {isObject} from 'underscore';
+
+import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {matchQualifiedIds, QualifiedEntity} from 'Util/QualifiedId';
 

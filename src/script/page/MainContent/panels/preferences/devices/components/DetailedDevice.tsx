@@ -19,6 +19,8 @@
 
 import React from 'react';
 
+import {isValid} from 'date-fns';
+
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {t} from 'Util/LocalizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';
@@ -46,7 +48,7 @@ const DetailedDevice: React.FC<DeviceProps> = ({device, fingerprint}) => {
         </span>
       </p>
 
-      {device.time !== undefined && (
+      {device.time !== undefined && isValid(device.time) && (
         <div className="preferences-devices-activated">
           <p
             dangerouslySetInnerHTML={{

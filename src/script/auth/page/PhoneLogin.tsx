@@ -26,6 +26,11 @@ import {
   PasswordExistsError,
 } from '@wireapp/api-client/lib/auth';
 import {ClientType} from '@wireapp/api-client/lib/client/index';
+import {useIntl} from 'react-intl';
+import {connect} from 'react-redux';
+import {useNavigate} from 'react-router-dom';
+import {AnyAction, Dispatch} from 'redux';
+
 import {Runtime} from '@wireapp/commons';
 import {
   ArrowIcon,
@@ -40,10 +45,6 @@ import {
   H1,
   IsMobile,
 } from '@wireapp/react-ui-kit';
-import {useIntl} from 'react-intl';
-import {connect} from 'react-redux';
-import {useNavigate} from 'react-router-dom';
-import {AnyAction, Dispatch} from 'redux';
 
 import {Page} from './Page';
 

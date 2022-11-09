@@ -19,6 +19,9 @@
 
 import React from 'react';
 
+import {useIntl} from 'react-intl';
+import {Navigate} from 'react-router-dom';
+
 import {Runtime} from '@wireapp/commons';
 import {
   ArrowIcon,
@@ -34,8 +37,6 @@ import {
   TeamIcon,
   Text,
 } from '@wireapp/react-ui-kit';
-import {useIntl} from 'react-intl';
-import {Navigate} from 'react-router-dom';
 
 import {Page} from './Page';
 

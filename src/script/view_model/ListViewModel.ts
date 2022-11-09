@@ -17,11 +17,12 @@
  *
  */
 
-import {CONV_TYPE} from '@wireapp/avs';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
+
+import {CONV_TYPE} from '@wireapp/avs';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {isEscapeKey} from 'Util/KeyboardUtil';
@@ -92,7 +93,6 @@ export class ListViewModel {
     // State
     this.lastUpdate = ko.observable();
 
-    // done.
     this._initSubscriptions();
   }
 

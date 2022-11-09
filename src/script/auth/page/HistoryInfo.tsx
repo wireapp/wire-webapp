@@ -20,10 +20,11 @@
 import React from 'react';
 
 import {ClientType} from '@wireapp/api-client/lib/client';
-import {Button, ContainerXS, H1, Link, Paragraph} from '@wireapp/react-ui-kit';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {Navigate, useNavigate} from 'react-router-dom';
+
+import {Button, ContainerXS, H1, Link, Paragraph} from '@wireapp/react-ui-kit';
 
 import {KEY} from 'Util/KeyboardUtil';
 

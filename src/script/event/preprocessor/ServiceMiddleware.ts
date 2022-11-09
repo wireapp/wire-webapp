@@ -19,8 +19,9 @@
 
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
-import {QualifiedUserId} from '@wireapp/protocol-messaging';
 import {container} from 'tsyringe';
+
+import {QualifiedUserId} from '@wireapp/protocol-messaging';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';

@@ -18,9 +18,10 @@
  */
 
 import {render, waitFor} from '@testing-library/react';
-import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 import ko from 'knockout';
 import {act} from 'react-dom/test-utils';
+
+import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 
 import {Call} from 'src/script/calling/Call';
 import {CallingRepository} from 'src/script/calling/CallingRepository';

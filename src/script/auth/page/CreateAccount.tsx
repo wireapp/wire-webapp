@@ -19,9 +19,10 @@
 
 import React from 'react';
 
-import {ArrowIcon, COLOR, Column, Columns, Container, ContainerXS, H1, IsMobile} from '@wireapp/react-ui-kit';
 import {useIntl} from 'react-intl';
 import {useNavigate} from 'react-router-dom';
+
+import {ArrowIcon, COLOR, Column, Columns, Container, ContainerXS, H1, IsMobile} from '@wireapp/react-ui-kit';
 
 import {Page} from './Page';
 

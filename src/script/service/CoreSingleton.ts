@@ -18,8 +18,9 @@
  */
 
 import {ClientType} from '@wireapp/api-client/lib/client/';
-import {Account} from '@wireapp/core';
 import {container, singleton} from 'tsyringe';
+
+import {Account} from '@wireapp/core';
 
 import {isTemporaryClientAndNonPersistent, supportsCoreCryptoProteus, supportsMLS} from 'Util/util';
 

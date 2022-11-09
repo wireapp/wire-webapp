@@ -17,12 +17,11 @@
  *
  */
 
-import 'core-js/full/reflect';
-
 import {ClientType} from '@wireapp/api-client/lib/client/';
-import {Runtime} from '@wireapp/commons';
+import 'core-js/full/reflect';
 import {createRoot} from 'react-dom/client';
-import {container} from 'tsyringe';
+
+import {Runtime} from '@wireapp/commons';
 
 import {AppContainer} from 'Components/AppContainer/AppContainer';
 import {enableLogging} from 'Util/LoggerUtil';
@@ -33,13 +32,10 @@ import {doRedirect} from './app';
 
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {Config} from '../Config';
-import {APIClient} from '../service/APIClientSingleton';
 import {StorageKey} from '../storage';
 
 document.addEventListener('DOMContentLoaded', async () => {
-  const apiClient = container.resolve(APIClient);
   const config = Config.getConfig();
-  await apiClient.useVersion(config.SUPPORTED_API_VERSIONS);
 
   enableLogging(config.FEATURE.ENABLE_DEBUG);
   exposeWrapperGlobals();

@@ -17,11 +17,12 @@
  *
  */
 
-import type {APIClient} from '@wireapp/api-client';
-import type {Account} from '@wireapp/core';
 import type {CookiesStatic} from 'js-cookie';
 import {ActionCreatorsMapObject, AnyAction, Dispatch, bindActionCreators as bindActionCreatorsRedux} from 'redux';
 import type {ThunkAction as ReduxThunkAction, ThunkDispatch as ReduxThunkDispatch} from 'redux-thunk';
+
+import type {APIClient} from '@wireapp/api-client';
+import type {Account} from '@wireapp/core';
 
 import {AuthState, authReducer, initialAuthState} from './authReducer';
 import {ClientState, clientReducer, initialClientState} from './clientReducer';

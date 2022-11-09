@@ -19,11 +19,12 @@
 
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 
-import {ValidationUtil} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
+
+import {ValidationUtil} from '@wireapp/commons';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Icon} from 'Components/Icon';
 import {ModalComponent} from 'Components/ModalComponent';

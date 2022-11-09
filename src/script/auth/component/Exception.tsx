@@ -19,8 +19,9 @@
 
 import {Fragment} from 'react';
 
-import {ErrorMessage} from '@wireapp/react-ui-kit';
 import {FormattedMessage} from 'react-intl';
+
+import {ErrorMessage} from '@wireapp/react-ui-kit';
 
 import {Config} from '../../Config';
 import {errorHandlerStrings, validationErrorStrings} from '../../strings';

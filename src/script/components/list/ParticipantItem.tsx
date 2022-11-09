@@ -19,8 +19,9 @@
 
 import React, {ChangeEvent, useId, useState} from 'react';
 
-import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 import cx from 'classnames';
+
+import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 
 import {AvailabilityState} from 'Components/AvailabilityState';
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
