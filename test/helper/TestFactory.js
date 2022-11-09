@@ -20,10 +20,11 @@
 // @ts-check
 
 /* eslint no-undef: "off" */
+import 'core-js/full/reflect';
 
 // Polyfill for "tsyringe" dependency injection
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
-import 'core-js/full/reflect';
+
 import ko from 'knockout';
 import {container} from 'tsyringe';
 

@@ -22,6 +22,7 @@ import {FC, useCallback, useEffect, useMemo, useState} from 'react';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/';
 
 import {Icon} from 'Components/Icon';
+import {ConversationProtocolDetails} from 'Components/panel/ConversationProtocolDetails/ConversationProtocolDetails';
 import {PanelActions} from 'Components/panel/PanelActions';
 import {ServiceDetails} from 'Components/panel/ServiceDetails';
 import {ServiceList} from 'Components/ServiceList';
@@ -53,7 +54,6 @@ import {Shortcut} from '../../../ui/Shortcut';
 import {ShortcutType} from '../../../ui/ShortcutType';
 import {UserState} from '../../../user/UserState';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
-import {useAppMainState} from '../../state';
 import {PanelHeader} from '../PanelHeader';
 import {PanelEntity, PanelState} from '../RightSidebar';
 
@@ -199,8 +199,6 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
     return isService ? [service] : [];
   });
 
-  const {rightSidebar} = useAppMainState();
-
   const toggleMute = () => actionsViewModel.toggleMuteConversation(activeConversation);
 
   const openParticipantDevices = () => togglePanel(PanelState.PARTICIPANT_DEVICES, firstParticipant, false, 'left');
@@ -246,7 +244,6 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
     activeConversation,
     actionsViewModel,
     conversationRepository,
-    rightSidebar.clearHistory,
     teamRole,
     isServiceMode,
     isTeam,
@@ -409,6 +406,11 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
             <PanelActions items={conversationActions} />
           </>
         )}
+
+        <ConversationProtocolDetails
+          protocol={activeConversation.protocol}
+          cipherSuite={activeConversation.cipherSuite}
+        />
       </div>
     </div>
   );

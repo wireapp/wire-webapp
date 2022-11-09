@@ -89,7 +89,7 @@
   "accessibility.conversationStatusUnreadPing": "Verpasster Ping",
   "accessibility.conversationStatusUnreadReply": "Ungelesene Antwort",
   "accessibility.giphyModal.close": "Fenster 'GIF' schließen",
-  "accessibility.giphyModal.loading": "Gif laden",
+  "accessibility.giphyModal.loading": "Loading giphy",
   "accessibility.giphyModal.selectGif": "Gif auswählen",
   "accessibility.giphyModal.sendGif": "Gif senden",
   "accessibility.giphyModal.showGifs": "Alle Gifs öffnen",

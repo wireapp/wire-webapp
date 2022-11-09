@@ -17,9 +17,10 @@
  *
  */
 
-import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 import type {Dexie} from 'dexie';
 import {container} from 'tsyringe';
+
+import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 
 import {getLogger, Logger} from 'Util/Logger';
 

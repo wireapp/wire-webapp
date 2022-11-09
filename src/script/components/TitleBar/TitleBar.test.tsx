@@ -19,14 +19,16 @@
 
 import {fireEvent, render, waitFor} from '@testing-library/react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {Runtime} from '@wireapp/commons';
-import * as uiKit from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
+import {Runtime} from '@wireapp/commons';
+import * as uiKit from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {TitleBar} from 'Components/TitleBar';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {ContentState} from 'src/script/page/useAppState';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
 import {CallingRepository} from '../../calling/CallingRepository';
@@ -37,7 +39,6 @@ import {User} from '../../entity/User';
 import {PanelState} from '../../page/RightSidebar/RightSidebar';
 import {TeamState} from '../../team/TeamState';
 import {UserState} from '../../user/UserState';
-import {ContentState} from '../../view_model/ContentViewModel';
 import {ViewModelRepositories} from '../../view_model/MainViewModel';
 
 jest.mock('@wireapp/react-ui-kit', () => ({

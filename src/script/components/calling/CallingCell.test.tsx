@@ -18,9 +18,10 @@
  */
 
 import {render, waitFor} from '@testing-library/react';
-import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 import ko from 'knockout';
 import {act} from 'react-dom/test-utils';
+
+import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 
 import {Call} from 'src/script/calling/Call';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
@@ -32,7 +33,7 @@ import {TeamState} from 'src/script/team/TeamState';
 import {CallActions} from 'src/script/view_model/CallingViewModel';
 import {createRandomUuid} from 'Util/util';
 
-import {CallingCellProps, ConversationListCallingCell} from './ConversationListCallingCell';
+import {CallingCell, CallingCellProps} from './CallingCell';
 
 jest.mock('Components/utils/InViewport', () => ({
   InViewport: ({onVisible, children}: {onVisible: () => void; children: any}) => {
@@ -81,7 +82,7 @@ describe('ConversationListCallingCell', () => {
   it('displays an incoming ringing call', async () => {
     const props = await createProps();
     props.call.state(CALL_STATE.INCOMING);
-    const {container} = render(<ConversationListCallingCell {...props} />);
+    const {container} = render(<CallingCell {...props} />);
 
     const acceptButton = container.querySelector('[data-uie-name="do-call-controls-call-accept"]');
     const declineButton = container.querySelector('[data-uie-name="do-call-controls-call-decline"]');
@@ -94,7 +95,7 @@ describe('ConversationListCallingCell', () => {
     const props = await createProps();
     props.call.state(CALL_STATE.OUTGOING);
 
-    const {getByTestId} = render(<ConversationListCallingCell {...props} />);
+    const {getByTestId} = render(<CallingCell {...props} />);
 
     expect(getByTestId('call-label-outgoing')).not.toBeNull();
   });
@@ -103,7 +104,7 @@ describe('ConversationListCallingCell', () => {
     const props = await createProps();
     props.call.state(CALL_STATE.ANSWERED);
 
-    const {container} = render(<ConversationListCallingCell {...props} />);
+    const {container} = render(<CallingCell {...props} />);
 
     const connectingLabel = container.querySelector('[data-uie-name="call-label-connecting"]');
     expect(connectingLabel).not.toBeNull();
@@ -113,14 +114,14 @@ describe('ConversationListCallingCell', () => {
     const props = await createProps();
     props.call.state(CALL_STATE.MEDIA_ESTAB);
 
-    const {getByText, rerender, container} = render(<ConversationListCallingCell {...props} />);
+    const {getByText, rerender, container} = render(<CallingCell {...props} />);
 
     jest.useFakeTimers();
     const now = Date.now();
     jest.setSystemTime(now);
     act(() => {
       props.call.startedAt(now);
-      rerender(<ConversationListCallingCell {...props} />);
+      rerender(<CallingCell {...props} />);
     });
 
     await waitFor(() => getByText('00:00'));

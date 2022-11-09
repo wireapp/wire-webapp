@@ -17,19 +17,19 @@
  *
  */
 
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useMemo} from 'react';
 
 import {css} from '@emotion/react';
+import {container} from 'tsyringe';
+
 import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
 import {IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
-import {amplify} from 'amplify';
-import {container} from 'tsyringe';
 
 import {Icon} from 'Components/Icon';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {KEY} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
 import {preventFocusOutside} from 'Util/util';
 
 import {ButtonGroup} from './ButtonGroup';
@@ -51,8 +51,8 @@ import type {Grid} from '../../calling/videoGridHandler';
 import type {Conversation} from '../../entity/Conversation';
 import {DeviceTypes, ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
 import type {Multitasking} from '../../notification/NotificationRepository';
+import {useAppState} from '../../page/useAppState';
 import {TeamState} from '../../team/TeamState';
-import {t} from '../../util/LocalizerUtil';
 import {CallViewTab, CallViewTabs} from '../../view_model/CallingViewModel';
 
 export interface FullscreenVideoCallProps {
@@ -151,12 +151,8 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   );
   const showSwitchMicrophone = availableMicrophones.length > 1;
 
-  const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
-  const updateUnreadCount = (unreadCount: number) => setHasUnreadMessages(unreadCount > 0);
-  useEffect(() => {
-    amplify.subscribe(WebAppEvents.LIFECYCLE.UNREAD_COUNT, updateUnreadCount);
-    return () => amplify.unsubscribe(WebAppEvents.LIFECYCLE.UNREAD_COUNT, updateUnreadCount);
-  }, []);
+  const {unreadMessagesCount} = useAppState();
+  const hasUnreadMessages = unreadMessagesCount > 0;
 
   const totalPages = callPages.length;
 
@@ -188,13 +184,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
 
   return (
     <div id="video-calling" className="video-calling">
-      <div
-        id="video-title"
-        className="video-title"
-        css={{
-          ...(verticalBreakpoint && {height: '30px', lineHeight: '12px'}),
-        }}
-      >
+      <div id="video-title" className="video-title">
         {horizontalSmBreakpoint && (
           <IconButton
             variant={IconButtonVariant.SECONDARY}
@@ -237,13 +227,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
         )}
       </div>
 
-      <div
-        id="video-element-remote"
-        className="video-element-remote"
-        css={{
-          height: verticalBreakpoint ? 'calc(100% - 105px)' : 'calc(100% - 179px)',
-        }}
-      >
+      <div id="video-element-remote" className="video-element-remote">
         <GroupVideoGrid
           maximizedParticipant={maximizedParticipant}
           selfParticipant={selfParticipant}
@@ -305,13 +289,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
       )}
       {!isChoosingScreen && (
         <div id="video-controls" className="video-controls">
-          <ul
-            className="video-controls__wrapper"
-            css={{
-              ...(horizontalSmBreakpoint && {justifyContent: 'center'}),
-              padding: verticalBreakpoint ? '10px' : horizontalXsBreakpoint ? '32px 10px' : '32px 40px 0 40px',
-            }}
-          >
+          <ul className="video-controls__wrapper">
             {!horizontalSmBreakpoint && (
               <li className="video-controls__item__minimize">
                 <button
@@ -338,14 +316,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                 </button>
               </li>
             )}
-            <div
-              className="video-controls__centered-items"
-              css={{
-                display: 'flex',
-                justifyContent: horizontalXsBreakpoint ? 'space-around' : 'space-between',
-                ...(horizontalXsBreakpoint && {width: '100%'}),
-              }}
-            >
+            <div className="video-controls__centered-items">
               <li className="video-controls__item">
                 <button
                   className="video-controls__button"
@@ -367,9 +338,9 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                   {showSwitchMicrophone && !verticalBreakpoint && (
                     <DeviceToggleButton
                       styles={css`
-                        position: absolute;
                         bottom: -38px;
                         left: 50%;
+                        position: absolute;
                         transform: translateX(-50%);
                       `}
                       currentDevice={currentMicrophoneDevice}
@@ -407,9 +378,9 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                     {showSwitchCamera && !verticalBreakpoint && (
                       <DeviceToggleButton
                         styles={css`
-                          position: absolute;
                           bottom: -38px;
                           left: 50%;
+                          position: absolute;
                           transform: translateX(-50%);
                         `}
                         currentDevice={currentCameraDevice}

@@ -22,17 +22,11 @@ import jQuery from 'jquery';
 import ko from 'knockout';
 
 import 'Components/icons';
-import '../Config';
-
-import '../page/AppMain';
-
 import 'Util/LocalizerUtil';
 
+import '../Config';
 import '../localization/Localizer';
-import '../view_model/bindings/CommonBindings';
-import '../view_model/bindings/ConversationListBindings';
-import '../view_model/bindings/MessageListBindings';
-import '../view_model/bindings/VideoCallingBindings';
+import '../page/AppMain';
 import '../view_model/MainViewModel';
 
 window.amplify = amplify;

@@ -19,6 +19,13 @@
 
 import React, {useRef, useState} from 'react';
 
+import {amplify} from 'amplify';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {useIntl} from 'react-intl';
+import {connect} from 'react-redux';
+import {useParams} from 'react-router-dom';
+import {AnyAction, Dispatch} from 'redux';
+
 import {
   ArrowIcon,
   COLOR,
@@ -35,12 +42,6 @@ import {
   Text,
 } from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {amplify} from 'amplify';
-import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {useIntl} from 'react-intl';
-import {connect} from 'react-redux';
-import {useParams} from 'react-router-dom';
-import {AnyAction, Dispatch} from 'redux';
 
 import {getLogger} from 'Util/Logger';
 

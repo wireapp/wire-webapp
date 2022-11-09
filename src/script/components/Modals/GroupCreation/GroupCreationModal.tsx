@@ -21,11 +21,12 @@ import React, {useContext, useEffect, useMemo, useState} from 'react';
 
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/ConversationReceiptModeUpdateData';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
-import {Button, ButtonVariant, Select} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
+
+import {Button, ButtonVariant, Select} from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Icon} from 'Components/Icon';
 import {ModalComponent} from 'Components/ModalComponent';
@@ -51,7 +52,6 @@ import {ConversationRepository} from '../../../conversation/ConversationReposito
 import {User} from '../../../entity/User';
 import {isProtocolOption, ProtocolOption} from '../../../guards/Protocol';
 import {RootContext} from '../../../page/RootProvider';
-import {useAppMainState} from '../../../page/state';
 import {TeamState} from '../../../team/TeamState';
 import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {UserState} from '../../../user/UserState';
@@ -217,9 +217,6 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
         );
         setIsShown(false);
         amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
-
-        const {rightSidebar} = useAppMainState.getState();
-        rightSidebar.clearHistory();
       } catch (error) {
         setIsCreatingConversation(false);
         logger.error(error);

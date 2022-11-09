@@ -17,23 +17,23 @@
  *
  */
 
-import {initRouterBindings} from 'src/script/router/routerBindings';
+const fs = require('fs');
+const path = require('path');
+const archiver = require('archiver');
+const archive = archiver('zip');
 
-import {bindHtml} from '../../helper/knockoutHelpers';
+const ROOT_PATH = path.resolve(__dirname, '..');
+const SERVER_PATH = path.resolve(ROOT_PATH, 'server');
+const DIST_PATH = path.resolve(ROOT_PATH, 'server/dist');
+const S3_PATH = path.resolve(ROOT_PATH, 'server/dist/s3');
 
-describe('routerBindings', () => {
-  let mockRouter;
-  beforeEach(() => {
-    mockRouter = {navigate: () => {}};
-    initRouterBindings(mockRouter);
-    spyOn(mockRouter, 'navigate');
-  });
+archive.file(path.join(SERVER_PATH, 'package.json'), {name: 'package.json'});
+archive.file(path.join(ROOT_PATH, '.env.defaults'), {name: '.env.defaults'});
+archive.directory(DIST_PATH, false);
 
-  it('handles click and triggers router navigation', async () => {
-    const url = '/conversation/uuid';
-    const domElement = await bindHtml(`<a data-bind="link_to: '${url}'">click me</a>`);
-    domElement.querySelector('a').click();
+fs.mkdirSync(S3_PATH);
+const output = fs.createWriteStream(path.join(S3_PATH, 'ebs.zip'));
 
-    expect(mockRouter.navigate).toHaveBeenCalledWith(url);
-  });
-});
+archive.pipe(output);
+
+archive.finalize();

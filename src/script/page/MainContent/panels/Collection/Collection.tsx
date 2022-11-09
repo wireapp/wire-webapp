@@ -19,8 +19,9 @@
 
 import React, {useEffect, useState} from 'react';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Icon} from 'Components/Icon';
 import {showDetailViewModal} from 'Components/Modals/DetailViewModal';

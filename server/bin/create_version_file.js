@@ -17,22 +17,14 @@
  *
  */
 
-import ko from 'knockout';
+const path = require('path');
+const fs = require('fs-extra');
+const {format} = require('date-fns');
 
-// http://stackoverflow.com/questions/28762211/unable-to-mute-html5-video-tag-in-firefox
-ko.bindingHandlers.muteMediaElement = {
-  update(element: HTMLMediaElement, valueAccessor: ko.Observable<MediaStream>) {
-    if (valueAccessor()) {
-      element.muted = true;
-    }
-  },
-};
+const distFolder = 'dist';
 
-ko.bindingHandlers.sourceStream = {
-  update(element: HTMLMediaElement, valueAccessor: ko.Observable<MediaStream>) {
-    const stream = valueAccessor();
-    if (stream) {
-      element.srcObject = stream;
-    }
-  },
-};
+const version = format(new Date(), 'yyyy.MM.dd.HH.mm');
+
+console.log(`Version set to ${version}`);
+
+fs.outputFileSync(path.resolve(distFolder, 'version'), version);

@@ -20,11 +20,12 @@
 import React, {useEffect} from 'react';
 
 import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
-import {ContainerXS, Loading, StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 import {IntlProvider} from 'react-intl';
 import {connect} from 'react-redux';
 import {HashRouter as Router, Navigate, Route, Routes} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
+
+import {ContainerXS, Loading, StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/LocalizerUtil';
 

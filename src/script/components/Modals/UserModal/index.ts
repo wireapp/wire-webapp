@@ -18,3 +18,5 @@
  */
 
 export * from './UserModal';
+
+export {showUserModal} from './UserModal.state';

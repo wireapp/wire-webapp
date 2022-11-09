@@ -34,6 +34,12 @@
     background-color: #fff;
     transition: all 0.16s;
 
+    @media (max-width: calc(@conversation-list-width + @screen-sm)) {
+      .circle(@input-level-bullet-size-sm);
+    }
+    @media (max-width: calc(@screen-sm-min * 2)) {
+      .circle(@input-level-bullet-size);
+    }
     @media (max-width: @screen-sm) {
       .circle(@input-level-bullet-size-sm);
     }

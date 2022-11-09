@@ -21,6 +21,7 @@ import {FC} from 'react';
 
 import cx from 'classnames';
 
+import {itemStyle, symbolStyle, nameStyle} from './EmojiItem.styles';
 import {EmojiListItem} from './useEmoji';
 
 interface EmojiItemProps {
@@ -33,15 +34,14 @@ interface EmojiItemProps {
 const EmojiItem: FC<EmojiItemProps> = ({emoji, onClick, onMouseEnter, selectedEmoji = false}) => (
   <button
     type="button"
-    className={cx('button-reset-default emoji', {selected: selectedEmoji})}
-    css={{alignItems: 'flex-start', display: 'flex', flexDirection: 'column', width: '100%'}}
+    className={cx('button-reset-default', 'emoji', {selected: selectedEmoji})}
+    css={itemStyle}
     onMouseEnter={onMouseEnter}
     onClick={onClick}
     aria-label={emoji.name}
-    tabIndex={0}
   >
-    <span className="symbol">{emoji.icon}</span>
-    <span className="name">{emoji.name}</span>
+    <span css={symbolStyle}>{emoji.icon}</span>
+    <span css={nameStyle}>{emoji.name}</span>
   </button>
 );
 

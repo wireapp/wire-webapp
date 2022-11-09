@@ -19,14 +19,16 @@
 
 import React, {useEffect, useState} from 'react';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {AvailabilityState} from 'Components/AvailabilityState';
+import {CallingCell} from 'Components/calling/CallingCell';
 import {Icon} from 'Components/Icon';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
-import {ConversationListCallingCell} from 'Components/list/ConversationListCallingCell';
+import {ListState} from 'src/script/page/useAppState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isTabKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -49,7 +51,7 @@ import {AvailabilityContextMenu} from '../../../../ui/AvailabilityContextMenu';
 import {Shortcut} from '../../../../ui/Shortcut';
 import {ShortcutType} from '../../../../ui/ShortcutType';
 import {UserState} from '../../../../user/UserState';
-import {ListState, ListViewModel} from '../../../../view_model/ListViewModel';
+import {ListViewModel} from '../../../../view_model/ListViewModel';
 import {useAppMainState, ViewType} from '../../../state';
 import {ListWrapper} from '../ListWrapper';
 
@@ -114,14 +116,14 @@ const Conversations: React.FC<ConversationsProps> = ({
   const [isConversationListFocus, focusConversationList] = useState(false);
 
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
+  const {close: closeRightSidebar} = useAppMainState(state => state.rightSidebar);
 
   const showLegalHold = isOnLegalHold || hasPendingLegalHold;
 
   const onClickPreferences = () => {
     setCurrentView(ViewType.LEFT_SIDEBAR);
     switchList(ListState.PREFERENCES);
-    const {rightSidebar} = useAppMainState.getState();
-    rightSidebar.clearHistory();
+    closeRightSidebar();
   };
 
   useEffect(() => {
@@ -300,12 +302,13 @@ const Conversations: React.FC<ConversationsProps> = ({
         return (
           conversation && (
             <div className="calling-cell" key={conversation.id}>
-              <ConversationListCallingCell
+              <CallingCell
                 classifiedDomains={classifiedDomains}
                 call={call}
                 callActions={callingViewModel.callActions}
                 callingRepository={callingRepository}
                 conversation={conversation}
+                isFullUi
                 hasAccessToCamera={callingViewModel.hasAccessToCamera()}
                 isSelfVerified={selfUser.is_verified()}
                 multitasking={callingViewModel.multitasking}

@@ -20,6 +20,11 @@
 import React, {useEffect, useState} from 'react';
 
 import {ConsentType} from '@wireapp/api-client/lib/self/index';
+import {useIntl} from 'react-intl';
+import {connect} from 'react-redux';
+import {useNavigate} from 'react-router-dom';
+import {AnyAction, Dispatch} from 'redux';
+
 import {
   ArrowIcon,
   ContainerXS,
@@ -32,10 +37,6 @@ import {
   RoundIconButton,
   Text,
 } from '@wireapp/react-ui-kit';
-import {useIntl} from 'react-intl';
-import {connect} from 'react-redux';
-import {useNavigate} from 'react-router-dom';
-import {AnyAction, Dispatch} from 'redux';
 
 import {Page} from './Page';
 

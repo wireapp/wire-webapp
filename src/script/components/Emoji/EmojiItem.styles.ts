@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,25 +17,32 @@
  *
  */
 
-// https://github.com/gruntjs/grunt-contrib-copy
+import {CSSObject} from '@emotion/react';
 
-module.exports = {
-  dist_certificate: {
-    cwd: '<%= dir.server %>',
-    dest: '<%= dir.dist_ %>',
-    expand: true,
-    src: ['certificate/*'],
+export const symbolStyle: CSSObject = {
+  fontSize: '1.1em',
+  paddingRight: '12px',
+};
+
+export const nameStyle: CSSObject = {
+  '&::first-letter': {
+    textTransform: 'capitalize',
   },
-  dist_resource: {
-    cwd: '<%= dir.resource %>',
-    dest: '<%= dir.dist.static %>',
-    expand: true,
-    src: ['audio/**/*', 'image/**/*', 'font/**/*'],
+};
+
+export const itemStyle: CSSObject = {
+  '&.selected': {
+    backgroundColor: 'var(--foreground-fade-16)',
   },
-  dist_serviceworker: {
-    cwd: '<%= dir.src_ %>',
-    dest: '<%= dir.dist.static %>',
-    expand: true,
-    src: ['worker/*'],
+  '&:first-of-type': {
+    borderRadius: '4px 4px 0 0', // to match parent border-radius
   },
+  '&:last-of-type': {
+    borderRadius: '0 0 4px 4px', // to match parent border-radius
+  },
+  alignItems: 'flex-start',
+  display: 'flex',
+  flexDirection: 'row',
+  padding: '10px 12px',
+  width: '100%',
 };

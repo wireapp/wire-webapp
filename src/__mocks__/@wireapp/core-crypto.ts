@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,24 +17,13 @@
  *
  */
 
-module.exports = {
-  aws_deploy: {
-    command:
-      'aws elasticbeanstalk create-application-version --application-name Webapp --version-label <%= grunt.config("aws.deploy.options.version") %> --source-bundle S3Bucket="wire-webapp",S3Key="<%= grunt.config("aws.deploy.options.version") %>.zip" --auto-create-application',
-    options: {
-      stdout: true,
-    },
-  },
-  dist_bundle: {
-    command: 'yarn && yarn bundle:prod',
-    options: {
-      stdout: true,
-    },
-  },
-  less: {
-    command: 'yarn build:style',
-    options: {
-      stdout: true,
-    },
-  },
-};
+export interface CommitBundle {}
+export enum PublicGroupStateEncryptionType {
+  Plaintext = 1,
+  JweEncrypted = 2,
+}
+export enum RatchetTreeType {
+  Full = 1,
+  Delta = 2,
+  ByRef = 3,
+}

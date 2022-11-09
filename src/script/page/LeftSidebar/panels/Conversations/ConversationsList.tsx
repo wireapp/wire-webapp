@@ -39,10 +39,10 @@ import {ConversationRepository} from '../../../../conversation/ConversationRepos
 import {ConversationState} from '../../../../conversation/ConversationState';
 import {Conversation} from '../../../../entity/Conversation';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
-import {createNavigate, createNavigateKeyboard} from '../../../../router/routerBindings';
-import {ContentState} from '../../../../view_model/ContentViewModel';
+import {createNavigate} from '../../../../router/routerBindings';
 import {ListViewModel} from '../../../../view_model/ListViewModel';
 import {useAppMainState, ViewType} from '../../../state';
+import {ContentState, useAppState} from '../../../useAppState';
 
 export const ConversationsList: React.FC<{
   callState: CallState;
@@ -69,6 +69,8 @@ export const ConversationsList: React.FC<{
   handleFocus,
   handleArrowKeyDown,
 }) => {
+  const {contentState} = useAppState();
+
   const {joinableCalls} = useKoSubscribableChildren(callState, ['joinableCalls']);
 
   const isActiveConversation = (conversation: Conversation) => conversationState.isActiveConversation(conversation);
@@ -76,7 +78,6 @@ export const ConversationsList: React.FC<{
   const openContextMenu = (conversation: Conversation, event: MouseEvent | React.MouseEvent<Element, MouseEvent>) =>
     listViewModel.onContextMenu(conversation, event);
   const answerCall = (conversation: Conversation) => listViewModel.answerCall(conversation);
-  const {state: contentState} = useKoSubscribableChildren(listViewModel.contentViewModel, ['state']);
   const isShowingConnectionRequests = contentState === ContentState.CONNECTION_REQUESTS;
 
   const hasJoinableCall = (conversation: Conversation) => {
@@ -110,20 +111,7 @@ export const ConversationsList: React.FC<{
               index={index}
               dataUieName="item-conversation"
               conversation={conversation}
-              onClick={event => {
-                if (!isActiveConversation(conversation)) {
-                  const {rightSidebar} = useAppMainState.getState();
-                  rightSidebar.clearHistory();
-                }
-                if (event.type === 'keydown') {
-                  createNavigateKeyboard(
-                    generateConversationUrl(conversation.id, conversation.domain),
-                    true,
-                  )(event as unknown as React.KeyboardEvent);
-                } else {
-                  createNavigate(generateConversationUrl(conversation.id, conversation.domain))(event);
-                }
-              }}
+              onClick={createNavigate(generateConversationUrl(conversation.id, conversation.domain))}
               isSelected={isActiveConversation}
               onJoinCall={answerCall}
               rightClick={openContextMenu}

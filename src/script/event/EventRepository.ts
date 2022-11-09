@@ -18,14 +18,15 @@
  */
 
 import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/lib/event/';
-import {Account, ConnectionState, ProcessedEventPayload} from '@wireapp/core';
 import {PayloadBundleSource} from '@wireapp/core/lib/conversation';
 import {HandledEventPayload} from '@wireapp/core/lib/notification';
-import {Asset as ProtobufAsset, GenericMessage} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
+
+import {Account, ConnectionState, ProcessedEventPayload} from '@wireapp/core';
+import {Asset as ProtobufAsset, GenericMessage} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -60,7 +61,6 @@ export class EventRepository {
   previousHandlingState: NOTIFICATION_HANDLING_STATE | undefined;
   notificationsHandled: number;
   notificationsTotal: number;
-  lastNotificationId: ko.Observable<string | undefined>;
   lastEventDate: ko.Observable<string | undefined>;
   eventProcessMiddlewares: Function[];
 
@@ -110,7 +110,6 @@ export class EventRepository {
     this.notificationsHandled = 0;
     this.notificationsTotal = 0;
 
-    this.lastNotificationId = ko.observable();
     this.lastEventDate = ko.observable();
 
     this.eventProcessMiddlewares = [];
@@ -260,7 +259,7 @@ export class EventRepository {
     const shouldUpdatePersistedId = missedNotificationId !== notificationId;
     if (shouldUpdatePersistedId) {
       amplify.publish(WebAppEvents.CONVERSATION.MISSED_EVENTS);
-      this.notificationService.saveMissedIdToDb(this.lastNotificationId());
+      this.notificationService.saveMissedIdToDb(missedNotificationId);
     }
   };
 

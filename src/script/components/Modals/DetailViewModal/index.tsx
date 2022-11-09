@@ -19,9 +19,10 @@
 
 import {FC, KeyboardEvent as ReactKeyboardEvent, useEffect, useRef, useState} from 'react';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import cx from 'classnames';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';

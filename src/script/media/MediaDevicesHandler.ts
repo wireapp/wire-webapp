@@ -17,8 +17,9 @@
  *
  */
 
-import {Runtime} from '@wireapp/commons';
 import ko from 'knockout';
+
+import {Runtime} from '@wireapp/commons';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {loadValue, storeValue} from 'Util/StorageUtil';

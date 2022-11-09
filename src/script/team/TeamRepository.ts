@@ -31,11 +31,12 @@ import {TEAM_EVENT} from '@wireapp/api-client/lib/event/TeamEvent';
 import type {FeatureList} from '@wireapp/api-client/lib/team/feature/';
 import {FeatureStatus, FEATURE_KEY, SelfDeletingTimeout} from '@wireapp/api-client/lib/team/feature/';
 import type {TeamData} from '@wireapp/api-client/lib/team/team/TeamData';
+import {amplify} from 'amplify';
+import {container} from 'tsyringe';
+
 import {Runtime} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {amplify} from 'amplify';
-import {container} from 'tsyringe';
 
 import {Environment} from 'Util/Environment';
 import {replaceLink, t} from 'Util/LocalizerUtil';

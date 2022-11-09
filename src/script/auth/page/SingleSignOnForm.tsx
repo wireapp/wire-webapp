@@ -21,9 +21,14 @@ import React, {useEffect, useRef, useState} from 'react';
 
 import {ClientType} from '@wireapp/api-client/lib/client/index';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
-import {Runtime, UrlUtil} from '@wireapp/commons';
 import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
 import {isValidEmail, PATTERN} from '@wireapp/commons/lib/util/ValidationUtil';
+import {FormattedMessage, useIntl} from 'react-intl';
+import {connect} from 'react-redux';
+import {Navigate, useNavigate} from 'react-router-dom';
+import {AnyAction, Dispatch} from 'redux';
+
+import {Runtime, UrlUtil} from '@wireapp/commons';
 import {
   ArrowIcon,
   Checkbox,
@@ -36,10 +41,6 @@ import {
   Loading,
   RoundIconButton,
 } from '@wireapp/react-ui-kit';
-import {FormattedMessage, useIntl} from 'react-intl';
-import {connect} from 'react-redux';
-import {Navigate, useNavigate} from 'react-router-dom';
-import {AnyAction, Dispatch} from 'redux';
 
 import {Config} from '../../Config';
 import {loginStrings, logoutReasonStrings, ssoLoginStrings} from '../../strings';

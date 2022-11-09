@@ -17,12 +17,13 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
-import type {TypeUtil} from '@wireapp/commons';
-import {Account} from '@wireapp/core';
 import Cookies, {CookiesStatic} from 'js-cookie';
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
+
+import {APIClient} from '@wireapp/api-client';
+import type {TypeUtil} from '@wireapp/commons';
+import {Account} from '@wireapp/core';
 
 import {ActionRoot, actionRoot} from '../../module/action/';
 import type {RootState, ThunkDispatch} from '../../module/reducer';

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,10 +17,4 @@
  *
  */
 
-// https://github.com/jsoverson/grunt-open
-
-module.exports = {
-  ebs: {
-    path: '<%= grunt.config("aws.deploy.options.application_versions") %>',
-  },
-};
+export * from './AppLoader';

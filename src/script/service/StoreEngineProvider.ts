@@ -17,11 +17,12 @@
  *
  */
 
+import Dexie from 'dexie';
+
 import type {CRUDEngine} from '@wireapp/store-engine';
 import {MemoryEngine} from '@wireapp/store-engine';
 import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
-import Dexie from 'dexie';
 
 import {saveRandomEncryptionKey} from 'Util/ephemeralValueStore';
 
