@@ -17,8 +17,11 @@
  *
  */
 
-import {ClientType} from '@wireapp/api-client/lib/client/';
+// eslint-disable-next-line import/order
 import 'core-js/full/reflect';
+
+// eslint-disable-next-line import/order
+import {ClientType} from '@wireapp/api-client/lib/client/';
 import {createRoot} from 'react-dom/client';
 
 import {Runtime} from '@wireapp/commons';

@@ -18,10 +18,12 @@
  */
 
 // Polyfill "Object.entries" & "Object.values"
-import React from 'react';
-
 import 'core-js/full/object';
 import 'core-js/full/reflect';
+
+// eslint-disable-next-line import/order
+import React from 'react';
+
 import cookieStore from 'js-cookie';
 import {createRoot} from 'react-dom/client';
 import {Provider, ConnectedComponent} from 'react-redux';
@@ -72,7 +74,7 @@ function runApp(): void {
   render(Root);
   if (module.hot) {
     module.hot.accept('./page/Root', () => {
-      render(require('./page/Root').default);
+      render(require('./page/Root').Root);
     });
   }
 }

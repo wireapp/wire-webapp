@@ -18,10 +18,12 @@
  */
 
 // Polyfill for "tsyringe" dependency injection
+// eslint-disable-next-line import/order
+import 'core-js/full/reflect';
+
 import {Context} from '@wireapp/api-client/lib/auth';
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
 import {amplify} from 'amplify';
-import 'core-js/full/reflect';
 import Dexie from 'dexie';
 import ko from 'knockout';
 import platform from 'platform';
