@@ -774,8 +774,7 @@ export class App {
     const _logoutOnBackend = async () => {
       this.logger.info(`Logout triggered by '${signOutReason}': Disconnecting user from the backend.`);
       try {
-        await this.core.logout(clearData);
-        _logout();
+        await _logout();
       } catch (e) {
         _redirectToLogin();
       }
