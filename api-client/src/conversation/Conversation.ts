@@ -28,6 +28,7 @@ export enum CONVERSATION_TYPE {
   SELF = 1,
   ONE_TO_ONE = 2,
   CONNECT = 3,
+  GLOBAL_TEAM = 4,
 }
 
 export enum CONVERSATION_ACCESS_ROLE {
