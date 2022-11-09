@@ -90,7 +90,7 @@ import {UserState} from '../../user/UserState';
 const CONFIG = {
   ...Config.getConfig(),
   PING_TIMEOUT: TIME_IN_MILLIS.SECOND * 2,
-  IS_TYPING_TIMEOUT: TIME_IN_MILLIS.SECOND * 10,
+  IS_TYPING_TIMEOUT: TIME_IN_MILLIS.SECOND * 5,
 };
 
 const showWarningModal = (title: string, message: string): void => {
