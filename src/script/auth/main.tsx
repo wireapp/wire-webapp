@@ -17,8 +17,9 @@
  *
  */
 
-// Polyfill "Object.entries" & "Object.values"
 import React from 'react';
+
+// Polyfill "Object.entries" & "Object.values"
 
 import 'core-js/full/object';
 import 'core-js/full/reflect';
@@ -72,7 +73,7 @@ function runApp(): void {
   render(Root);
   if (module.hot) {
     module.hot.accept('./page/Root', () => {
-      render(require('./page/Root').default);
+      render(require('./page/Root').Root);
     });
   }
 }
