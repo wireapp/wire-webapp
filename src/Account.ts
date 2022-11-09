@@ -264,7 +264,7 @@ export class Account<T = any> extends EventEmitter {
   }
 
   /**
-   * Will init the core with an aleady existing client (both on backend and local)
+   * Will init the core with an already existing client (both on backend and local)
    * Will fail if local client cannot be found
    *
    * @param clientType The type of client the user is using (temporary or permanent)
@@ -295,7 +295,10 @@ export class Account<T = any> extends EventEmitter {
 
     // Assumption: client gets only initialized once
     if (initClient) {
-      await this.initClient({clientType});
+      const {localClient} = await this.initClient({clientType});
+
+      //call /access endpoint with client_id after client initialisation
+      await this.apiClient.transport.http.associateClientWithSession(localClient.id);
 
       if (this.cryptoProtocolConfig?.mls && this.backendFeatures.supportsMLS) {
         // initialize schedulers for pending mls proposals once client is initialized
@@ -340,7 +343,7 @@ export class Account<T = any> extends EventEmitter {
   /**
    * Will try to get the load the local client from local DB.
    * If clientInfo are provided, will also create the client on backend and DB
-   * If clientInfo are not provideo, the method will fail if local client cannot be found
+   * If clientInfo are not provided, the method will fail if local client cannot be found
    *
    * @param loginData User's credentials
    * @param clientInfo Will allow creating the client if the local client cannot be found (else will fail if local client is not found)
@@ -604,7 +607,7 @@ export class Account<T = any> extends EventEmitter {
     onNotificationStreamProgress?: ({done, total}: {done: number; total: number}) => void;
 
     /**
-     * called when the connection stateh with the backend has changed
+     * called when the connection state with the backend has changed
      */
     onConnectionStateChanged?: (state: ConnectionState) => void;
 
