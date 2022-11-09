@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [22.4.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@22.3.3...@wireapp/api-client@22.4.0) (2022-11-09)
+
+### Features
+
+* Add mls team group type in conversation types ([#4607](https://github.com/wireapp/wire-web-packages/issues/4607)) ([d0daa5e](https://github.com/wireapp/wire-web-packages/commit/d0daa5e2b90548b40968b39ee3b0bf144e64cd59))
+
 ## [22.3.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@22.3.2...@wireapp/api-client@22.3.3) (2022-11-08)
 
 **Note:** Version bump only for package @wireapp/api-client
