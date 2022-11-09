@@ -88,7 +88,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
 
   constructor(
     private readonly allConversations: ko.ObservableArray<Conversation>,
-    private readonly conversations: ko.ObservableArray<Conversation>,
+    private readonly conversations: ko.PureComputed<Conversation[]>,
     private readonly propertiesService: PropertiesService,
   ) {
     super();
