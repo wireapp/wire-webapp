@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [22.5.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@22.4.0...@wireapp/api-client@22.5.0) (2022-11-09)
+
+### Features
+
+* **core, api-client:** associate client id with login session [FS-1137] ([#4605](https://github.com/wireapp/wire-web-packages/issues/4605)) ([bc664f9](https://github.com/wireapp/wire-web-packages/commit/bc664f9a81f1f3de3e7d8509cd352897441d5bde))
+
 # [22.4.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@22.3.3...@wireapp/api-client@22.4.0) (2022-11-09)
 
 ### Features
