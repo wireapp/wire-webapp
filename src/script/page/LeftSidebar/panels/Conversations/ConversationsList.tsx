@@ -39,7 +39,7 @@ import {ConversationRepository} from '../../../../conversation/ConversationRepos
 import {ConversationState} from '../../../../conversation/ConversationState';
 import {Conversation} from '../../../../entity/Conversation';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
-import {createNavigate} from '../../../../router/routerBindings';
+import {createNavigate, createNavigateKeyboard} from '../../../../router/routerBindings';
 import {ContentState} from '../../../../view_model/ContentViewModel';
 import {ListViewModel} from '../../../../view_model/ListViewModel';
 import {useAppMainState, ViewType} from '../../../state';
@@ -115,8 +115,14 @@ export const ConversationsList: React.FC<{
                   const {rightSidebar} = useAppMainState.getState();
                   rightSidebar.clearHistory();
                 }
-
-                createNavigate(generateConversationUrl(conversation.id, conversation.domain))(event);
+                if (event.type === 'keydown') {
+                  createNavigateKeyboard(
+                    generateConversationUrl(conversation.id, conversation.domain),
+                    true,
+                  )(event as unknown as React.KeyboardEvent);
+                } else {
+                  createNavigate(generateConversationUrl(conversation.id, conversation.domain))(event);
+                }
               }}
               isSelected={isActiveConversation}
               onJoinCall={answerCall}

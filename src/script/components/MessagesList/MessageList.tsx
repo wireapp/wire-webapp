@@ -17,15 +17,7 @@
  *
  */
 
-import React, {
-  FC,
-  MouseEvent as ReactMouseEvent,
-  KeyboardEvent as ReactKeyboardEvent,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, {FC, useEffect, useLayoutEffect, useRef, useState} from 'react';
 
 import cx from 'classnames';
 
@@ -37,10 +29,12 @@ import {MemberMessage} from 'src/script/entity/message/MemberMessage';
 import {Message as MessageEntity} from 'src/script/entity/message/Message';
 import {Text} from 'src/script/entity/message/Text';
 import {User} from 'src/script/entity/User';
+import {useRoveFocus} from 'src/script/hooks/useRoveFocus';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {Message} from './Message';
+import {ElementType} from './Message/ContentMessage/asset/TextMessageRenderer';
 
 import {Conversation as ConversationEntity, Conversation} from '../../entity/Conversation';
 import {isMemberMessage, isContentMessage} from '../../guards/Message';
@@ -63,7 +57,11 @@ interface MessagesListParams {
     deleteMessageEveryone: (conversation: Conversation, message: MessageEntity) => void;
   };
   messageRepository: MessageRepository;
-  onClickMessage: (message: ContentMessage | Text, event: ReactMouseEvent | ReactKeyboardEvent<HTMLElement>) => void;
+  onClickMessage: (
+    message: ContentMessage | Text,
+    event: MouseEvent | KeyboardEvent,
+    elementType: ElementType,
+  ) => boolean;
   onLoading: (isLoading: boolean) => void;
   resetSession: (messageError: DecryptErrorMessage) => void;
   selfUser: User;
@@ -147,6 +145,7 @@ const MessagesList: FC<MessagesListParams> = ({
   const [focusedMessage, setFocusedMessage] = useState<string | undefined>(initialMessage?.id);
 
   const filteredMessages = filterDuplicatedMemberMessages(filterHiddenMessages(allMessages));
+  const filteredMessagesLength = filteredMessages.length;
 
   const [messagesContainer, setMessageContainer] = useState<HTMLDivElement | null>(null);
 
@@ -161,7 +160,7 @@ const MessagesList: FC<MessagesListParams> = ({
   };
 
   const verticallyCenterMessage = (): boolean => {
-    if (filteredMessages.length === 1) {
+    if (filteredMessagesLength === 1) {
       const [firstMessage] = filteredMessages;
       return firstMessage.isMember() && firstMessage.isConnection();
     }
@@ -180,7 +179,7 @@ const MessagesList: FC<MessagesListParams> = ({
       return;
     }
 
-    const lastMessage = filteredMessages[filteredMessages.length - 1];
+    const lastMessage = filteredMessages[filteredMessagesLength - 1];
     const previousScrollHeight = scrollHeight.current;
     const scrollBottomPosition = scrollingContainer.scrollTop + scrollingContainer.clientHeight;
     const shouldStickToBottom = previousScrollHeight - scrollBottomPosition < 100;
@@ -197,7 +196,7 @@ const MessagesList: FC<MessagesListParams> = ({
       scrollingContainer.scrollTop = scrollingContainer.scrollHeight - previousScrollHeight;
     } else if (shouldStickToBottom) {
       // We only want to animate the scroll if there are new messages in the list
-      const behavior = nbMessages.current !== filteredMessages.length ? 'smooth' : 'auto';
+      const behavior = nbMessages.current !== filteredMessagesLength ? 'smooth' : 'auto';
       // Simple content update, we just scroll to bottom if we are in the stick to bottom threshold
       scrollingContainer.scrollTo?.({behavior, top: scrollingContainer.scrollHeight});
     } else if (lastMessage && lastMessage.status() === StatusType.SENDING && lastMessage.user().id === selfUser.id) {
@@ -205,7 +204,7 @@ const MessagesList: FC<MessagesListParams> = ({
       scrollingContainer.scrollTo?.({behavior: 'smooth', top: scrollingContainer.scrollHeight});
     }
     scrollHeight.current = scrollingContainer.scrollHeight;
-    nbMessages.current = filteredMessages.length;
+    nbMessages.current = filteredMessagesLength;
   };
 
   // Listen to resizes of the the container element (if it's resized it means something has changed in the message list)
@@ -238,7 +237,7 @@ const MessagesList: FC<MessagesListParams> = ({
     if (messagesContainer) {
       updateScroll(messagesContainer);
     }
-  }, [messagesContainer, filteredMessages.length]);
+  }, [messagesContainer, filteredMessagesLength]);
 
   useEffect(() => {
     onLoading(true);
@@ -258,10 +257,12 @@ const MessagesList: FC<MessagesListParams> = ({
     }
   }, [loaded]);
 
+  const defaultFocus = -1;
+  const {currentFocus, handleKeyDown, setCurrentFocus} = useRoveFocus(filteredMessagesLength, defaultFocus);
+
   if (!loaded) {
     return null;
   }
-
   return (
     <div
       ref={element => {
@@ -327,6 +328,11 @@ const MessagesList: FC<MessagesListParams> = ({
               onLike={message => messageRepository.toggleLike(conversation, message)}
               selfId={selfUser.qualifiedId}
               shouldShowInvitePeople={shouldShowInvitePeople}
+              totalMessage={filteredMessagesLength}
+              index={index}
+              focusConversation={currentFocus === index}
+              handleFocus={setCurrentFocus}
+              handleArrowKeyDown={handleKeyDown}
             />
           );
         })}

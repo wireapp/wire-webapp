@@ -48,8 +48,8 @@ export class Router {
     this.parseRoute();
   }
 
-  navigate(path: string): Router {
-    window.history.replaceState(null, null, `#${path}`);
+  navigate(path: string, stateObj?: {}): Router {
+    this.setHistoryParam(path, stateObj);
     this.parseRoute();
     return this;
   }
@@ -59,5 +59,9 @@ export class Router {
       event.preventDefault();
       this.navigate(path);
     };
+  }
+
+  setHistoryParam(path: string, stateObj?: {}) {
+    window.history.replaceState(stateObj, '', `#${path}`);
   }
 }
