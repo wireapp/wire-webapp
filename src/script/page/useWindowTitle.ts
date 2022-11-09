@@ -92,6 +92,7 @@ export const useWindowTitle = () => {
       const unreadCount = connectionRequestsCount + unreadConversationsCount;
       let specificTitle = unreadCount > MIN_UNREAD_COUNT ? `(${unreadCount}) ` : '';
 
+      amplify.publish(WebAppEvents.LIFECYCLE.UNREAD_COUNT, unreadCount);
       updateFavicon(unreadCount);
 
       switch (contentState) {

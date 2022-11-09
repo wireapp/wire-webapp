@@ -492,6 +492,7 @@ export class App {
       telemetry.timeStep(AppInitTimingsStep.APP_LOADED);
 
       telemetry.report();
+      amplify.publish(WebAppEvents.LIFECYCLE.LOADED);
 
       telemetry.timeStep(AppInitTimingsStep.UPDATED_CONVERSATIONS);
       if (userRepository['userState'].isActivatedAccount()) {
