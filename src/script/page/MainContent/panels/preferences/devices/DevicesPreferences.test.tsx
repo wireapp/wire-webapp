@@ -49,6 +49,7 @@ describe('DevicesPreferences', () => {
     } as unknown as CryptographyRepository,
     removeDevice: jest.fn(),
     resetSession: jest.fn(),
+    switchPreviousContent: jest.fn(),
     userState: new UserState(),
     verifyDevice: jest.fn(),
   };

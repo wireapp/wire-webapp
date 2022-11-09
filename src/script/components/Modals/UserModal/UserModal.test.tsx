@@ -29,6 +29,18 @@ import {UserState} from 'src/script/user/UserState';
 import {UserModal, UserModalProps} from './UserModal';
 import {showUserModal} from './UserModal.state';
 
+import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
+
+const getDefaultProps = (getUserById: jest.Mock<Promise<User>>): UserModalProps => ({
+  actionsView: {} as ActionsViewModel,
+  core: {} as Core,
+  teamState: {} as TeamState,
+  userRepository: {
+    getUserById,
+  } as unknown as UserRepository,
+  userState: {} as UserState,
+});
+
 describe('UserModal', () => {
   it('correctly fetches user from user repository', async () => {
     jest.useFakeTimers();
@@ -36,16 +48,8 @@ describe('UserModal', () => {
       return new User('mock-id', 'test-domain.mock');
     });
 
-    const props: UserModalProps = {
-      core: {} as Core,
-      teamState: {} as TeamState,
-      userRepository: {
-        getUserById,
-      } as unknown as UserRepository,
-      userState: {} as UserState,
-    };
     showUserModal({domain: 'test-domain.mock', id: 'mock-id'});
-    render(<UserModal {...props} />);
+    render(<UserModal {...getDefaultProps(getUserById)} />);
 
     expect(getUserById).toHaveBeenCalledTimes(1);
   });
@@ -58,18 +62,8 @@ describe('UserModal', () => {
       return user;
     });
 
-    const props: UserModalProps = {
-      core: {} as Core,
-      teamState: {} as TeamState,
-      userRepository: {
-        getUserById,
-      } as unknown as UserRepository,
-      userState: {} as UserState,
-    };
-
     showUserModal({domain: 'test-domain.mock', id: 'mock-id'});
-
-    const {getByTestId} = render(<UserModal {...props} />);
+    const {getByTestId} = render(<UserModal {...getDefaultProps(getUserById)} />);
 
     expect(getUserById).toHaveBeenCalledTimes(1);
 

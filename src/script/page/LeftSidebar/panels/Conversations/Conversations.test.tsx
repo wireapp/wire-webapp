@@ -41,6 +41,8 @@ describe('Conversations', () => {
     propertiesRepository: {getPreference: jest.fn(), savePreference: jest.fn()} as any,
     selfUser: new User(),
     switchList: jest.fn(),
+    switchContent: jest.fn(),
+    showConversation: jest.fn(),
   };
 
   it('Opens preferences when clicked', () => {
