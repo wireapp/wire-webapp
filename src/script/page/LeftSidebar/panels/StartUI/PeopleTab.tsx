@@ -20,10 +20,11 @@
 import React, {useEffect, useRef, useState} from 'react';
 
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {partition} from 'underscore';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Icon} from 'Components/Icon';
 import {UserList, UserlistMode} from 'Components/UserList';
@@ -73,8 +74,8 @@ export const PeopleTab: React.FC<{
   userRepository: UserRepository;
   userState: UserState;
   showConversation: (
-    conversation: Conversation | string,
-    options: ShowConversationOptions,
+    conversation?: Conversation | string,
+    options?: ShowConversationOptions,
     domain?: string | null,
   ) => void;
 }> = ({
@@ -282,11 +283,7 @@ export const PeopleTab: React.FC<{
                   className="left-list-item-button"
                   type="button"
                   onClick={() =>
-                    conversationRepository.createGuestRoom().then(conversation => {
-                      if (conversation) {
-                        showConversation(conversation, {});
-                      }
-                    })
+                    conversationRepository.createGuestRoom().then(conversation => showConversation(conversation))
                   }
                   data-uie-name="do-create-guest-room"
                 >

@@ -26,10 +26,11 @@ import {
   useState,
 } from 'react';
 
-import {useMatchMedia} from '@wireapp/react-ui-kit';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 import {groupBy} from 'underscore';
+
+import {useMatchMedia} from '@wireapp/react-ui-kit';
 
 import {CallingCell} from 'Components/calling/CallingCell';
 import {Giphy} from 'Components/Giphy';

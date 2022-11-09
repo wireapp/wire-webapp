@@ -19,8 +19,9 @@
 
 import {FC, useEffect, useRef} from 'react';
 
-import {Button, ButtonVariant, IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
 import {container} from 'tsyringe';
+
+import {Button, ButtonVariant, IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';

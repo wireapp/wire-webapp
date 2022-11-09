@@ -29,9 +29,10 @@ import {
 import type {Notification} from '@wireapp/api-client/lib/notification/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {isQualifiedId} from '@wireapp/core/lib/util';
-import {util as ProteusUtil} from '@wireapp/proteus';
 import Dexie from 'dexie';
 import {container} from 'tsyringe';
+
+import {util as ProteusUtil} from '@wireapp/proteus';
 
 import {getLogger, Logger} from 'Util/Logger';
 

@@ -19,12 +19,13 @@
 
 import React, {useRef, useState} from 'react';
 
-import {ValidationUtil} from '@wireapp/commons';
-import {Button, ContainerXS, Form, H1, Input, Small} from '@wireapp/react-ui-kit';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {Navigate, useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
+
+import {ValidationUtil} from '@wireapp/commons';
+import {Button, ContainerXS, Form, H1, Input, Small} from '@wireapp/react-ui-kit';
 
 import {Page} from './Page';
 

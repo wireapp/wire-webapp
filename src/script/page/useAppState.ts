@@ -73,6 +73,8 @@ type AppState = {
   setListState: (listState: ListState) => void;
   previousContentState: ContentState | null;
   setPreviousContentState: (contentState: ContentState | null) => void;
+  unreadMessagesCount: number;
+  setUnreadMessagesCount: (unreadMessagesCount: number) => void;
 };
 
 const useAppState = create<AppState>((set, get) => ({
@@ -100,6 +102,12 @@ const useAppState = create<AppState>((set, get) => ({
       ...state,
       previousContentState: contentState,
     })),
+  setUnreadMessagesCount: (unreadMessagesCount: number) =>
+    set(state => ({
+      ...state,
+      unreadMessagesCount,
+    })),
+  unreadMessagesCount: 0,
 }));
 
 export {useAppState};

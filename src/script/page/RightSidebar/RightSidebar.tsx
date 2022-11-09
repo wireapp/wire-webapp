@@ -19,10 +19,11 @@
 
 import {cloneElement, FC, ReactNode, useEffect, useState} from 'react';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {CSSTransition, TransitionGroup} from 'react-transition-group';
 import {container} from 'tsyringe';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
@@ -119,13 +120,9 @@ const RightSidebar: FC<RightSidebarProps> = ({
   const messageEntity = currentEntity && isReadableMessage(currentEntity) ? currentEntity : null;
   const serviceEntity = currentEntity && isServiceEntity(currentEntity) ? currentEntity : null;
 
-  const goToRoot = () => {
-    rightSidebar.goToRoot(activeConversation);
-  };
+  const goToRoot = () => rightSidebar.goToRoot(activeConversation);
 
-  const closePanel = () => {
-    rightSidebar.clearHistory();
-  };
+  const closePanel = () => rightSidebar.close();
 
   const togglePanel = (newState: PanelState, entity: PanelEntity | null, addMode: boolean = false) => {
     setAnimatePanelToLeft(true);

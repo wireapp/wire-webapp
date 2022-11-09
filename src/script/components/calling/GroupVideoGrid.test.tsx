@@ -18,6 +18,7 @@
  */
 
 import {render, fireEvent} from '@testing-library/react';
+
 import {VIDEO_STATE} from '@wireapp/avs';
 
 import {GroupVideoGrid, GroupVideoGripProps} from './GroupVideoGrid';

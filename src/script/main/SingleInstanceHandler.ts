@@ -17,8 +17,9 @@
  *
  */
 
-import {Runtime} from '@wireapp/commons';
 import Cookies from 'js-cookie';
+
+import {Runtime} from '@wireapp/commons';
 
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 

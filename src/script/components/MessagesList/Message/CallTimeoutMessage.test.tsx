@@ -18,8 +18,9 @@
  */
 
 import {render} from '@testing-library/react';
-import {REASON} from '@wireapp/avs';
 import ko from 'knockout';
+
+import {REASON} from '@wireapp/avs';
 
 import {CallingTimeoutMessage as CallTimeoutMessageEntity} from 'src/script/entity/message/CallingTimeoutMessage';
 

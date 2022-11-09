@@ -18,9 +18,10 @@
  */
 
 import {USER_EVENT} from '@wireapp/api-client/lib/event/';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Notification, PreferenceNotificationRepository} from 'src/script/notification/PreferenceNotificationRepository';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';

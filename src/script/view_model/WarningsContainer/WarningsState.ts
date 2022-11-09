@@ -17,9 +17,10 @@
  *
  */
 
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import create from 'zustand';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {t} from 'Util/LocalizerUtil';

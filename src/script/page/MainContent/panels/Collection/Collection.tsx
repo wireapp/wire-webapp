@@ -19,8 +19,9 @@
 
 import React, {useEffect, useState} from 'react';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Icon} from 'Components/Icon';
 import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
@@ -43,7 +44,7 @@ import {ShowConversationOptions} from '../../../AppMain';
 interface CollectionDetailsProps {
   showConversation: (
     conversation: Conversation | string,
-    options: ShowConversationOptions,
+    options?: ShowConversationOptions,
     domain?: string | null,
   ) => void;
   conversation: Conversation;
@@ -198,7 +199,7 @@ const Collection: React.FC<CollectionDetailsProps> = ({
           <button
             className="content-titlebar-icon"
             data-uie-name="do-close-collection"
-            onClick={() => showConversation(conversation, {})}
+            onClick={() => showConversation(conversation)}
             aria-label={t('fullsearchCancelLabel')}
           >
             <Icon.Close />

@@ -19,10 +19,11 @@
 
 import React from 'react';
 
-import {Runtime} from '@wireapp/commons';
-import {Container, ContainerXS, H1, H2, H3, Loading, Logo, Text} from '@wireapp/react-ui-kit';
 import {MessageDescriptor, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
+
+import {Runtime} from '@wireapp/commons';
+import {Container, ContainerXS, H1, H2, H3, Loading, Logo, Text} from '@wireapp/react-ui-kit';
 
 import {WirelessContainer} from './WirelessContainer';
 

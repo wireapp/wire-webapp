@@ -17,7 +17,6 @@
  *
  */
 
-/* eslint-disable sort-keys-fix/sort-keys-fix */
 import {CSSObject} from '@emotion/react';
 
 export const getIconCSS = (fill?: string): CSSObject => ({

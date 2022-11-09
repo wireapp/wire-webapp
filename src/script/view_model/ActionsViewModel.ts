@@ -17,9 +17,10 @@
  *
  */
 
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal, removeCurrentModal, usePrimaryModalState} from 'Components/Modals/PrimaryModal';
 import {t} from 'Util/LocalizerUtil';
@@ -39,7 +40,6 @@ import type {User} from '../entity/User';
 import {BackendClientError} from '../error/BackendClientError';
 import type {IntegrationRepository} from '../integration/IntegrationRepository';
 import type {ServiceEntity} from '../integration/ServiceEntity';
-import {useAppMainState} from '../page/state';
 import {UserState} from '../user/UserState';
 
 export class ActionsViewModel {
@@ -289,11 +289,7 @@ export class ActionsViewModel {
       return new Promise(() => {
         PrimaryModal.show(PrimaryModal.type.CONFIRM, {
           primaryAction: {
-            action: () => {
-              const {rightSidebar} = useAppMainState.getState();
-              rightSidebar.clearHistory();
-              return this.conversationRepository.deleteConversation(conversationEntity);
-            },
+            action: () => this.conversationRepository.deleteConversation(conversationEntity),
             text: t('modalConversationDeleteGroupAction'),
           },
           text: {

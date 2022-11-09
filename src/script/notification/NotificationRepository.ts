@@ -19,12 +19,13 @@
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {NotificationPreference, WebappProperties} from '@wireapp/api-client/lib/user/data/';
-import {Runtime} from '@wireapp/commons';
-import {Availability} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
+
+import {Runtime} from '@wireapp/commons';
+import {Availability} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Declension, t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';

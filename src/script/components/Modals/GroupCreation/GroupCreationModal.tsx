@@ -21,11 +21,12 @@ import React, {useEffect, useMemo, useState} from 'react';
 
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/ConversationReceiptModeUpdateData';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
-import {Button, ButtonVariant, Select} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
+
+import {Button, ButtonVariant, Select} from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Icon} from 'Components/Icon';
 import {ModalComponent} from 'Components/ModalComponent';
@@ -52,7 +53,6 @@ import {Conversation} from '../../../entity/Conversation';
 import {User} from '../../../entity/User';
 import {isProtocolOption, ProtocolOption} from '../../../guards/Protocol';
 import {ShowConversationOptions} from '../../../page/AppMain';
-import {useAppMainState} from '../../../page/state';
 import {TeamState} from '../../../team/TeamState';
 import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {UserState} from '../../../user/UserState';
@@ -60,8 +60,8 @@ import {ViewModelRepositories} from '../../../view_model/MainViewModel';
 
 interface GroupCreationModalProps {
   showConversation: (
-    conversation: Conversation | string,
-    options: ShowConversationOptions,
+    conversation?: Conversation | string,
+    options?: ShowConversationOptions,
     domain?: string | null,
   ) => void;
   repositories: ViewModelRepositories;
@@ -88,8 +88,6 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
     isMLSEnabled: isMLSEnabledForTeam,
     isProtocolToggleEnabledForUser,
   } = useKoSubscribableChildren(teamState, ['isTeam', 'isMLSEnabled', 'isProtocolToggleEnabledForUser']);
-
-  const {clearHistory} = useAppMainState(state => state.rightSidebar);
 
   const isMLSFeatureEnabled = Config.getConfig().FEATURE.ENABLE_MLS;
 
@@ -216,12 +214,8 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
             receipt_mode: enableReadReceipts ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF,
           },
         );
-
-        if (conversationEntity) {
-          setIsShown(false);
-          showConversation(conversationEntity, {});
-          clearHistory();
-        }
+        setIsShown(false);
+        showConversation(conversationEntity);
       } catch (error) {
         setIsCreatingConversation(false);
         logger.error(error);

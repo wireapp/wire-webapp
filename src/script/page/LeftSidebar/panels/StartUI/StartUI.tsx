@@ -47,7 +47,6 @@ import {generatePermissionHelpers} from '../../../../user/UserPermission';
 import {UserState} from '../../../../user/UserState';
 import {ActionsViewModel} from '../../../../view_model/ActionsViewModel';
 import {ShowConversationOptions} from '../../../AppMain';
-import {useAppMainState} from '../../../state';
 import {ListWrapper} from '../ListWrapper';
 
 type StartUIProps = {
@@ -61,7 +60,7 @@ type StartUIProps = {
   teamRepository: TeamRepository;
   showConversation: (
     conversation: Conversation | string,
-    options: ShowConversationOptions,
+    options?: ShowConversationOptions,
     domain?: string | null,
   ) => void;
   teamState?: TeamState;
@@ -122,12 +121,6 @@ const StartUI: React.FC<StartUIProps> = ({
 
   const openContact = async (user: User) => {
     const conversationEntity = await actionsView.getOrCreate1to1Conversation(user);
-
-    if (!conversationState.isActiveConversation(conversationEntity)) {
-      const {rightSidebar} = useAppMainState.getState();
-      rightSidebar.clearHistory();
-    }
-
     actionsView.open1to1Conversation(conversationEntity);
   };
 

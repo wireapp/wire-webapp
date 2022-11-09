@@ -17,9 +17,10 @@
  *
  */
 
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Environment} from 'Util/Environment';
 import {getLogger, Logger} from 'Util/Logger';
