@@ -40,7 +40,7 @@ type AppMainState = {
     setCurrentView: (view: ViewType) => void;
   };
   rightSidebar: {
-    clearHistory: () => void;
+    close: () => void;
     entity: RightSidebarParams['entity'];
     goBack: (entity: RightSidebarParams['entity']) => void;
     goTo: (panel: PanelState, params: RightSidebarParams) => void;
@@ -59,7 +59,7 @@ const useAppMainState = create<AppMainState>((set, get) => ({
       set(state => ({...state, responsiveView: {...state.responsiveView, currentView: view}})),
   },
   rightSidebar: {
-    clearHistory: () =>
+    close: () =>
       set(state => ({
         ...state,
         rightSidebar: {

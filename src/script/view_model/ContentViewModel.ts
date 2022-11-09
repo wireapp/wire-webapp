@@ -168,7 +168,7 @@ export class ContentViewModel {
     const {contentState, setContentState} = useAppState.getState();
 
     if (!conversation) {
-      rightSidebar.clearHistory();
+      rightSidebar.close();
       return this.switchContent(ContentState.CONNECTION_REQUESTS);
     }
 
@@ -178,7 +178,7 @@ export class ContentViewModel {
         : await this.conversationRepository.getConversationById({domain: domain || '', id: conversation});
 
       if (!conversationEntity) {
-        rightSidebar.clearHistory();
+        rightSidebar.close();
 
         throw new ConversationError(
           ConversationError.TYPE.CONVERSATION_NOT_FOUND,
@@ -189,7 +189,7 @@ export class ContentViewModel {
       const isActiveConversation = this.conversationState.isActiveConversation(conversationEntity);
 
       if (!isActiveConversation) {
-        rightSidebar.clearHistory();
+        rightSidebar.close();
       }
 
       const isConversationState = contentState === ContentState.CONVERSATION;

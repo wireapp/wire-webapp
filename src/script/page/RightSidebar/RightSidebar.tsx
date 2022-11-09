@@ -121,7 +121,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
 
   const goToRoot = () => rightSidebar.goToRoot(activeConversation);
 
-  const closePanel = () => rightSidebar.clearHistory();
+  const closePanel = () => rightSidebar.close();
 
   const togglePanel = (newState: PanelState, entity: PanelEntity | null, addMode: boolean = false) => {
     setAnimatePanelToLeft(true);
