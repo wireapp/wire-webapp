@@ -20,11 +20,12 @@
 import {FC, useCallback, useEffect, useMemo} from 'react';
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
+import {amplify} from 'amplify';
+import {container} from 'tsyringe';
+
 import {Runtime} from '@wireapp/commons';
 import {StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {amplify} from 'amplify';
-import {container} from 'tsyringe';
 
 import {CallingContainer} from 'Components/calling/CallingOverlayContainer';
 import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationModal';
@@ -69,11 +70,6 @@ export interface ShowConversationOptions {
   openNotificationSettings?: boolean;
 }
 
-export interface ShowConversationOverload {
-  (conversation: Conversation, options: ShowConversationOptions): Promise<void>;
-  (conversationId: string, options: ShowConversationOptions, domain: string | null): Promise<void>;
-}
-
 export type RightSidebarParams = {
   entity: PanelEntity | null;
   showLikes?: boolean;
@@ -105,7 +101,7 @@ const AppMain: FC<AppMainProps> = ({app, mainView, selfUser}) => {
     listState,
   } = useAppState();
 
-  const {history, entity: currentEntity, clearHistory, goTo} = useAppMainState(state => state.rightSidebar);
+  const {history, entity: currentEntity, close: closeRightSidebar, goTo} = useAppMainState(state => state.rightSidebar);
   const {showRequestModal} = useLegalHoldModalState();
 
   const currentState = history.at(-1);
@@ -172,7 +168,7 @@ const AppMain: FC<AppMainProps> = ({app, mainView, selfUser}) => {
       return;
     }
 
-    clearHistory();
+    closeRightSidebar();
   };
 
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
@@ -263,7 +259,11 @@ const AppMain: FC<AppMainProps> = ({app, mainView, selfUser}) => {
    * @param domain Domain name
    */
   const showConversation = useCallback(
-    async (conversation: Conversation | string, options: ShowConversationOptions, domain: string | null = null) => {
+    async (
+      conversation?: Conversation | string,
+      options: ShowConversationOptions = {},
+      domain: string | null = null,
+    ) => {
       const {
         exposeMessage: exposeMessageEntity,
         openFirstSelfMention = false,
@@ -362,7 +362,7 @@ const AppMain: FC<AppMainProps> = ({app, mainView, selfUser}) => {
         .some(conversation => activeConversation && matchQualifiedIds(conversation, activeConversation));
 
       if (activeConversation && repoHasConversation && !activeConversation.is_archived()) {
-        return showConversation(activeConversation, {});
+        return showConversation(activeConversation);
       }
 
       return switchContent(ContentState.WATERMARK);
@@ -382,7 +382,7 @@ const AppMain: FC<AppMainProps> = ({app, mainView, selfUser}) => {
     }
 
     if (nextItem) {
-      showConversation(nextItem, {});
+      showConversation(nextItem);
     }
   };
 
@@ -510,9 +510,9 @@ const AppMain: FC<AppMainProps> = ({app, mainView, selfUser}) => {
 
     if (isTemporaryGuest) {
       mainView.list.showTemporaryGuest();
-      showConversation(conversationEntity, {});
+      showConversation(conversationEntity);
     } else if (conversationEntity) {
-      showConversation(conversationEntity, {});
+      showConversation(conversationEntity);
     } else if (connectRequests.length) {
       setContentState(ContentState.CONNECTION_REQUESTS);
     }
@@ -522,13 +522,13 @@ const AppMain: FC<AppMainProps> = ({app, mainView, selfUser}) => {
     const isStateRequests = contentState === ContentState.CONNECTION_REQUESTS;
 
     if (isStateRequests && !connectRequests.length) {
-      showConversation(conversationRepository.getMostRecentConversation(), {});
+      showConversation(conversationRepository.getMostRecentConversation());
     }
   }, [connectRequests, contentState, conversationRepository]);
 
   useEffect(() => {
     if (activeConversation?.connection().status() === ConnectionStatus.MISSING_LEGAL_HOLD_CONSENT) {
-      showConversation(conversationRepository.getMostRecentConversation(), {});
+      showConversation(conversationRepository.getMostRecentConversation());
     }
   }, [activeConversation, conversationRepository, showConversation]);
 

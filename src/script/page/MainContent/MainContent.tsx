@@ -80,7 +80,7 @@ interface MainContentProps {
   switchPreviousContent: () => void;
   showConversation: (
     conversation: Conversation | string,
-    options: ShowConversationOptions,
+    options?: ShowConversationOptions,
     domain?: string | null,
   ) => void;
   repositories: ViewModelRepositories;

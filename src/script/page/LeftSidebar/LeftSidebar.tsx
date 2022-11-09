@@ -46,7 +46,7 @@ type LeftSidebarProps = {
   isActivatedAccount: boolean;
   showConversation: (
     conversation: Conversation | string,
-    options: ShowConversationOptions,
+    options?: ShowConversationOptions,
     domain?: string | null,
   ) => void;
   switchContent: (contentState: ContentState) => void;

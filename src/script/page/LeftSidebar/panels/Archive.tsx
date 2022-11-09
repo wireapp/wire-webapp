@@ -42,7 +42,7 @@ type ArchiveProps = {
   onClose: () => void;
   showConversation: (
     conversation: Conversation | string,
-    options: ShowConversationOptions,
+    options?: ShowConversationOptions,
     domain?: string | null,
   ) => void;
 };
@@ -62,7 +62,7 @@ const Archive: React.FC<ArchiveProps> = ({
   const onClickConversation = async (conversation: Conversation) => {
     await conversationRepository.unarchiveConversation(conversation, true, 'opened conversation from archive');
     onClose();
-    showConversation(conversation, {});
+    showConversation(conversation);
   };
 
   useEffect(() => {

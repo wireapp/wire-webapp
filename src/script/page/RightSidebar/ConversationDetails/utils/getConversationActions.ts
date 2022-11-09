@@ -33,7 +33,6 @@ const getConversationActions = (
   conversationEntity: Conversation,
   actionsViewModel: ActionsViewModel,
   conversationRepository: ConversationRepository,
-  closeRightPanel: () => void,
   teamRole: UserPermission.ROLE,
   isServiceMode: boolean = false,
   isTeam: boolean = false,
@@ -64,10 +63,7 @@ const getConversationActions = (
     {
       condition: true,
       item: {
-        click: async () => {
-          await actionsViewModel.archiveConversation(conversationEntity);
-          closeRightPanel();
-        },
+        click: async () => actionsViewModel.archiveConversation(conversationEntity),
         icon: 'archive-icon',
         identifier: 'do-archive',
         label: t('conversationDetailsActionArchive'),
@@ -103,10 +99,7 @@ const getConversationActions = (
     {
       condition: conversationEntity.isLeavable() && roleRepository.canLeaveGroup(conversationEntity),
       item: {
-        click: async () => {
-          await actionsViewModel.leaveConversation(conversationEntity);
-          closeRightPanel();
-        },
+        click: async () => actionsViewModel.leaveConversation(conversationEntity),
         icon: 'leave-icon',
         identifier: 'do-leave',
         label: t('conversationDetailsActionLeave'),

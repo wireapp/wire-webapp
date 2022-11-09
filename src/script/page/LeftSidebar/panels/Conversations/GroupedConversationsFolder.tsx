@@ -32,7 +32,6 @@ import {GroupedConversationHeader} from './GroupedConversationHeader';
 import {useRoveFocus} from '../../../../hooks/useRoveFocus';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
 import {createNavigate} from '../../../../router/routerBindings';
-import {useAppMainState} from '../../../state';
 
 export interface GroupedConversationsFolderProps {
   expandedFolders: string[];
@@ -73,14 +72,7 @@ const GroupedConversationsFolder: React.FC<GroupedConversationsFolderProps> = ({
               isConversationListFocus
               handleFocus={setCurrentFocus}
               handleArrowKeyDown={handleKeyDown}
-              onClick={event => {
-                if (!isSelectedConversation(conversation)) {
-                  const {rightSidebar} = useAppMainState.getState();
-                  rightSidebar.clearHistory();
-                }
-
-                makeOnClick(conversation.id, conversation.domain)(event);
-              }}
+              onClick={makeOnClick(conversation.id, conversation.domain)}
               rightClick={(_, event) => listViewModel.onContextMenu(conversation, event)}
               conversation={conversation}
               showJoinButton={hasJoinableCall(conversation)}

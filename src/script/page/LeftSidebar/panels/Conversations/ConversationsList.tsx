@@ -59,7 +59,7 @@ interface ConversationsListProps {
   handleArrowKeyDown: (e: React.KeyboardEvent) => void;
   showConversation: (
     conversation: Conversation | string,
-    options: ShowConversationOptions,
+    options?: ShowConversationOptions,
     domain?: string | null,
   ) => void;
   switchContent: (contentState: ContentState) => void;
@@ -102,7 +102,6 @@ export const ConversationsList: React.FC<ConversationsListProps> = ({
   };
 
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
-  const {clearHistory} = useAppMainState(state => state.rightSidebar);
 
   const onConnectionRequestClick = () => {
     setCurrentView(ViewType.CENTRAL_COLUMN);
@@ -124,10 +123,6 @@ export const ConversationsList: React.FC<ConversationsListProps> = ({
               dataUieName="item-conversation"
               conversation={conversation}
               onClick={event => {
-                if (!isActiveConversation(conversation)) {
-                  clearHistory();
-                }
-
                 showConversation(conversation.id, {}, conversation.domain);
                 createNavigate(generateConversationUrl(conversation.id, conversation.domain))(event);
               }}

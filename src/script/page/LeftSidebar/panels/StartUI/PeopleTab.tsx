@@ -74,8 +74,8 @@ export const PeopleTab: React.FC<{
   userRepository: UserRepository;
   userState: UserState;
   showConversation: (
-    conversation: Conversation | string,
-    options: ShowConversationOptions,
+    conversation?: Conversation | string,
+    options?: ShowConversationOptions,
     domain?: string | null,
   ) => void;
 }> = ({
@@ -283,11 +283,7 @@ export const PeopleTab: React.FC<{
                   className="left-list-item-button"
                   type="button"
                   onClick={() =>
-                    conversationRepository.createGuestRoom().then(conversation => {
-                      if (conversation) {
-                        showConversation(conversation, {});
-                      }
-                    })
+                    conversationRepository.createGuestRoom().then(conversation => showConversation(conversation))
                   }
                   data-uie-name="do-create-guest-room"
                 >

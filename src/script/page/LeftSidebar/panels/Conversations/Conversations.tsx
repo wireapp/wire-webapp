@@ -69,7 +69,7 @@ type ConversationsProps = {
   switchContent: (contentState: ContentState) => void;
   showConversation: (
     conversation: Conversation | string,
-    options: ShowConversationOptions,
+    options?: ShowConversationOptions,
     domain?: string | null,
   ) => void;
   teamState?: TeamState;
@@ -126,14 +126,14 @@ const Conversations: React.FC<ConversationsProps> = ({
   const [isConversationListFocus, focusConversationList] = useState(false);
 
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
-  const {clearHistory} = useAppMainState(state => state.rightSidebar);
+  const {close: closeRightSidebar} = useAppMainState(state => state.rightSidebar);
 
   const showLegalHold = isOnLegalHold || hasPendingLegalHold;
 
   const onClickPreferences = () => {
     setCurrentView(ViewType.LEFT_SIDEBAR);
     switchList(ListState.PREFERENCES);
-    clearHistory();
+    closeRightSidebar();
   };
 
   useEffect(() => {
