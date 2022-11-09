@@ -17,9 +17,10 @@
  *
  */
 
-import {FC, useCallback, useEffect, useMemo} from 'react';
+import {FC, useCallback, useEffect, useMemo, useState} from 'react';
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
+import {CONV_TYPE} from '@wireapp/avs';
 import {Runtime} from '@wireapp/commons';
 import {StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -35,6 +36,7 @@ import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal
 import {showUserModal, UserModal} from 'Components/Modals/UserModal';
 import {iterateItem} from 'Util/ArrayUtil';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {isEscapeKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {isConversationEntity} from 'Util/TypePredicateUtil';
@@ -44,7 +46,7 @@ import {LeftSidebar} from './LeftSidebar';
 import {MainContent} from './MainContent';
 import {PanelEntity, PanelState, RightSidebar} from './RightSidebar';
 import {useAppMainState, ViewType} from './state';
-import {useAppState, ContentState, ListState} from './useAppState';
+import {ContentState, ListState, useAppState} from './useAppState';
 import {usePopNotification} from './usePopNotification';
 import {useWindowTitle} from './useWindowTitle';
 
@@ -58,6 +60,10 @@ import {App} from '../main/app';
 import {Router} from '../router/Router';
 import {initializeRouter} from '../router/routerBindings';
 import {TeamState} from '../team/TeamState';
+import {showContextMenu} from '../ui/ContextMenu';
+import {showLabelContextMenu} from '../ui/LabelContextMenu';
+import {Shortcut} from '../ui/Shortcut';
+import {ShortcutType} from '../ui/ShortcutType';
 import {showInitialModal} from '../user/AvailabilityModal';
 import {UserState} from '../user/UserState';
 import {MainViewModel} from '../view_model/MainViewModel';
@@ -67,11 +73,6 @@ export interface ShowConversationOptions {
   exposeMessage?: Message;
   openFirstSelfMention?: boolean;
   openNotificationSettings?: boolean;
-}
-
-export interface ShowConversationOverload {
-  (conversation: Conversation, options: ShowConversationOptions): Promise<void>;
-  (conversationId: string, options: ShowConversationOptions, domain: string | null): Promise<void>;
 }
 
 export type RightSidebarParams = {
@@ -95,6 +96,10 @@ const AppMain: FC<AppMainProps> = ({app, mainView, selfUser}) => {
     throw new Error('API Context has not been set');
   }
 
+  // It's not used in ViewModel, what do to with it?
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [lastUpdate, setLastUpdate] = useState<number>();
+
   const {
     contentState,
     setContentState,
@@ -103,6 +108,7 @@ const AppMain: FC<AppMainProps> = ({app, mainView, selfUser}) => {
     initialMessage,
     setInitialMessage,
     listState,
+    setListState,
   } = useAppState();
 
   const {history, entity: currentEntity, clearHistory, goTo} = useAppMainState(state => state.rightSidebar);
@@ -111,7 +117,7 @@ const AppMain: FC<AppMainProps> = ({app, mainView, selfUser}) => {
   const currentState = history.at(-1);
 
   const {repository: repositories} = app;
-  const {conversation: conversationRepository} = repositories;
+  const {conversation: conversationRepository, calling: callingRepository, team: teamRepository} = repositories;
 
   const conversationState = container.resolve(ConversationState);
   const teamState = container.resolve(TeamState);
@@ -121,10 +127,15 @@ const AppMain: FC<AppMainProps> = ({app, mainView, selfUser}) => {
     'accent_id',
     'availability',
   ]);
-  const {activeConversation, conversations_unarchived: unarchivedConversations} = useKoSubscribableChildren(
-    conversationState,
-    ['activeConversation', 'conversations_unarchived'],
-  );
+  const {
+    activeConversation,
+    conversations_archived: archivedConversations,
+    conversations_unarchived: unarchivedConversations,
+  } = useKoSubscribableChildren(conversationState, [
+    'activeConversation',
+    'conversations_archived',
+    'conversations_unarchived',
+  ]);
   const {isTeam: isProAccount, supportsLegalHold} = useKoSubscribableChildren(teamState, [
     'isTeam',
     'supportsLegalHold',
@@ -180,6 +191,46 @@ const AppMain: FC<AppMainProps> = ({app, mainView, selfUser}) => {
 
   const {currentView} = useAppMainState(state => state.responsiveView);
   const isLeftSidebarVisible = currentView == ViewType.LEFT_SIDEBAR;
+
+  const updateList = (newListState: ListState, respectLastState: boolean) => {
+    switch (newListState) {
+      case ListState.PREFERENCES:
+        setContentState(ContentState.PREFERENCES_ACCOUNT);
+        break;
+      default:
+        if (respectLastState) {
+          switchPreviousContent();
+        }
+    }
+  };
+
+  const showList = (newListState: ListState) => {
+    setListState(newListState);
+    setLastUpdate(Date.now());
+
+    document.addEventListener('keydown', onKeyDownListView);
+  };
+
+  const switchList = (newListState: ListState, respectLastState = true): void => {
+    const isStateChange = listState !== newListState;
+
+    if (isStateChange) {
+      hideList();
+      updateList(newListState, respectLastState);
+      showList(newListState);
+    }
+  };
+
+  const onKeyDownListView = (keyboardEvent: KeyboardEvent) => {
+    if (isEscapeKey(keyboardEvent)) {
+      const newState = isActivatedAccount ? ListState.CONVERSATIONS : ListState.TEMPORARY_GUEST;
+      switchList(newState);
+    }
+  };
+
+  const hideList = (): void => {
+    document.removeEventListener('keydown', onKeyDownListView);
+  };
 
   const releaseContent = (newContentState: ContentState) => {
     const isStateConversation = previousContentState === ContentState.CONVERSATION;
@@ -253,6 +304,11 @@ const AppMain: FC<AppMainProps> = ({app, mainView, selfUser}) => {
     conversationState.activeConversation(conversationEntity);
   };
 
+  const openConversations = () => {
+    const newState = isActivatedAccount ? ListState.CONVERSATIONS : ListState.TEMPORARY_GUEST;
+    switchList(newState, false);
+  };
+
   /**
    * Opens the specified conversation.
    *
@@ -264,6 +320,8 @@ const AppMain: FC<AppMainProps> = ({app, mainView, selfUser}) => {
    */
   const showConversation = useCallback(
     async (conversation: Conversation | string, options: ShowConversationOptions, domain: string | null = null) => {
+      openConversations();
+
       const {
         exposeMessage: exposeMessageEntity,
         openFirstSelfMention = false,
@@ -303,7 +361,7 @@ const AppMain: FC<AppMainProps> = ({app, mainView, selfUser}) => {
         releaseContent(contentState);
 
         setContentState(ContentState.CONVERSATION);
-        mainView.list.openConversations();
+        openConversations();
 
         if (!isActiveConversation) {
           conversationState.activeConversation(conversationEntity);
@@ -437,31 +495,218 @@ const AppMain: FC<AppMainProps> = ({app, mainView, selfUser}) => {
     }
   };
 
+  const answerCall = (conversationEntity: Conversation): void => {
+    const call = callingRepository.findCall(conversationEntity.qualifiedId);
+
+    if (!call) {
+      return;
+    }
+
+    if (call.conversationType === CONV_TYPE.CONFERENCE && !callingRepository.supportsConferenceCalling) {
+      const acknowledgeModalOptions = {
+        text: {
+          message: `${t('modalConferenceCallNotSupportedMessage')} ${t('modalConferenceCallNotSupportedJoinMessage')}`,
+          title: t('modalConferenceCallNotSupportedHeadline'),
+        },
+      };
+
+      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, acknowledgeModalOptions);
+    } else {
+      callingRepository.answerCall(call);
+    }
+  };
+
+  const openPreferencesAbout = () => {
+    switchList(ListState.PREFERENCES);
+    switchContent(ContentState.PREFERENCES_ABOUT);
+  };
+
+  const openPreferencesAccount = async () => {
+    await teamRepository.getTeam();
+    switchList(ListState.PREFERENCES);
+    switchContent(ContentState.PREFERENCES_ACCOUNT);
+  };
+
+  const openPreferencesAudioVideo = () => {
+    switchList(ListState.PREFERENCES);
+    switchContent(ContentState.PREFERENCES_AV);
+  };
+
+  const openPreferencesDevices = () => {
+    switchList(ListState.PREFERENCES);
+    switchContent(ContentState.PREFERENCES_DEVICES);
+  };
+
+  const openPreferencesOptions = () => {
+    switchList(ListState.PREFERENCES);
+    switchContent(ContentState.PREFERENCES_OPTIONS);
+  };
+
+  const openStartUI = () => {
+    switchList(ListState.START_UI);
+  };
+
+  const clickToOpenNotificationSettings = (conversationEntity = activeConversation) => {
+    if (conversationEntity) {
+      showConversation(conversationEntity, {openNotificationSettings: true});
+    }
+  };
+
+  const clickToUnarchive = (conversationEntity: Conversation): void => {
+    conversationRepository.unarchiveConversation(conversationEntity, true, 'manual un-archive').then(() => {
+      if (!archivedConversations.length) {
+        switchList(ListState.CONVERSATIONS);
+      }
+    });
+  };
+
+  const shouldHideConversation = (conversationEntity: Conversation): boolean => {
+    const isStateConversations = listState === ListState.CONVERSATIONS;
+    const isActiveConversation = conversationState.isActiveConversation(conversationEntity);
+
+    return isStateConversations && isActiveConversation;
+  };
+
+  const clickToCancelRequest = (conversationEntity: Conversation): void => {
+    const userEntity = conversationEntity.firstUserEntity();
+    const hideConversation = shouldHideConversation(conversationEntity);
+    const nextConversationEntity = conversationRepository.getNextConversation(conversationEntity);
+
+    mainView.actions.cancelConnectionRequest(userEntity, hideConversation, nextConversationEntity);
+  };
+
+  const clickToBlock = async (conversationEntity: Conversation): Promise<void> => {
+    const userEntity = conversationEntity.firstUserEntity();
+    const hideConversation = shouldHideConversation(conversationEntity);
+    const nextConversationEntity = conversationRepository.getNextConversation(conversationEntity);
+
+    await mainView.actions.blockUser(userEntity, hideConversation, nextConversationEntity);
+  };
+
+  const onContextMenu = (
+    conversationEntity: Conversation,
+    event: MouseEvent | React.MouseEvent<Element, MouseEvent>,
+  ) => {
+    const entries = [];
+
+    if (conversationEntity.isMutable()) {
+      const notificationsShortcut = Shortcut.getShortcutTooltip(ShortcutType.NOTIFICATIONS);
+
+      if (isProAccount) {
+        entries.push({
+          click: () => clickToOpenNotificationSettings(conversationEntity),
+          label: t('conversationsPopoverNotificationSettings'),
+          title: t('tooltipConversationsNotifications', notificationsShortcut),
+        });
+      } else {
+        const label = conversationEntity.showNotificationsNothing()
+          ? t('conversationsPopoverNotify')
+          : t('conversationsPopoverSilence');
+        const title = conversationEntity.showNotificationsNothing()
+          ? t('tooltipConversationsNotify', notificationsShortcut)
+          : t('tooltipConversationsSilence', notificationsShortcut);
+
+        entries.push({
+          click: () => clickToToggleMute(conversationEntity),
+          label,
+          title,
+        });
+      }
+    }
+
+    if (!conversationEntity.is_archived()) {
+      const {conversationLabelRepository} = conversationRepository;
+
+      if (!conversationLabelRepository.isFavorite(conversationEntity)) {
+        entries.push({
+          click: () => {
+            conversationLabelRepository.addConversationToFavorites(conversationEntity);
+          },
+          label: t('conversationPopoverFavorite'),
+        });
+      } else {
+        entries.push({
+          click: () => conversationLabelRepository.removeConversationFromFavorites(conversationEntity),
+          label: t('conversationPopoverUnfavorite'),
+        });
+      }
+
+      const customLabel = conversationLabelRepository.getConversationCustomLabel(conversationEntity);
+
+      if (customLabel) {
+        entries.push({
+          click: () => conversationLabelRepository.removeConversationFromLabel(customLabel, conversationEntity),
+          label: t('conversationsPopoverRemoveFrom', customLabel.name),
+        });
+      }
+
+      entries.push({
+        click: () => showLabelContextMenu(event, conversationEntity, conversationLabelRepository),
+        label: t('conversationsPopoverMoveTo'),
+      });
+    }
+
+    if (conversationEntity.is_archived()) {
+      entries.push({
+        click: () => clickToUnarchive(conversationEntity),
+        label: t('conversationsPopoverUnarchive'),
+      });
+    } else {
+      const shortcut = Shortcut.getShortcutTooltip(ShortcutType.ARCHIVE);
+
+      entries.push({
+        click: () => clickToArchive(conversationEntity),
+        label: t('conversationsPopoverArchive'),
+        title: t('tooltipConversationsArchive', shortcut),
+      });
+    }
+
+    if (conversationEntity.isRequest()) {
+      entries.push({
+        click: () => clickToCancelRequest(conversationEntity),
+        label: t('conversationsPopoverCancel'),
+      });
+    }
+
+    if (conversationEntity.isClearable()) {
+      entries.push({
+        click: () => clickToClear(conversationEntity),
+        label: t('conversationsPopoverClear'),
+      });
+    }
+
+    if (!conversationEntity.isGroup()) {
+      const userEntity = conversationEntity.firstUserEntity();
+      const canBlock = userEntity && (userEntity.isConnected() || userEntity.isRequest());
+
+      if (canBlock) {
+        entries.push({
+          click: () => clickToBlock(conversationEntity),
+          label: t('conversationsPopoverBlock'),
+        });
+      }
+    }
+
+    if (conversationEntity.isLeavable()) {
+      entries.push({
+        click: () => mainView.actions.leaveConversation(conversationEntity),
+        label: t('conversationsPopoverLeave'),
+      });
+    }
+
+    showContextMenu(event, entries, 'conversation-list-options-menu');
+  };
+
   const initializeAppRouter = () => {
     const router = new Router({
       '/conversation/:conversationId(/:domain)': (conversationId: string, domain: string = apiContext.domain ?? '') => {
         showConversation(conversationId, {}, domain);
       },
-      '/preferences/about': () => {
-        mainView.list.openPreferencesAbout();
-        switchContent(ContentState.PREFERENCES_ABOUT);
-      },
-      '/preferences/account': () => {
-        mainView.list.openPreferencesAccount();
-        switchContent(ContentState.PREFERENCES_ACCOUNT);
-      },
-      '/preferences/av': () => {
-        mainView.list.openPreferencesAudioVideo();
-        switchContent(ContentState.PREFERENCES_AV);
-      },
-      '/preferences/devices': () => {
-        mainView.list.openPreferencesDevices();
-        switchContent(ContentState.PREFERENCES_DEVICES);
-      },
-      '/preferences/options': () => {
-        mainView.list.openPreferencesOptions();
-        switchContent(ContentState.PREFERENCES_OPTIONS);
-      },
+      '/preferences/about': () => openPreferencesAbout(),
+      '/preferences/account': () => openPreferencesAccount(),
+      '/preferences/av': () => openPreferencesAudioVideo(),
+      '/preferences/devices': () => openPreferencesDevices(),
+      '/preferences/options': () => openPreferencesOptions(),
       '/user/:userId(/:domain)': (userId: string, domain: string = apiContext.domain ?? '') => {
         showUserModal({domain, id: userId}, () => router.navigate('/'));
       },
@@ -503,13 +748,18 @@ const AppMain: FC<AppMainProps> = ({app, mainView, selfUser}) => {
     showInitialModal(userAvailability);
 
     amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, showConversation);
+
+    amplify.subscribe(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT, openPreferencesAccount);
+    amplify.subscribe(WebAppEvents.PREFERENCES.MANAGE_DEVICES, openPreferencesDevices);
+    amplify.subscribe(WebAppEvents.PREFERENCES.SHOW_AV, openPreferencesAudioVideo);
+    amplify.subscribe(WebAppEvents.SEARCH.SHOW, openStartUI);
   }, []);
 
   useEffect(() => {
     const conversationEntity = repositories.conversation.getMostRecentConversation();
 
     if (isTemporaryGuest) {
-      mainView.list.showTemporaryGuest();
+      switchList(ListState.TEMPORARY_GUEST);
       showConversation(conversationEntity, {});
     } else if (conversationEntity) {
       showConversation(conversationEntity, {});
@@ -531,11 +781,6 @@ const AppMain: FC<AppMainProps> = ({app, mainView, selfUser}) => {
       showConversation(conversationRepository.getMostRecentConversation(), {});
     }
   }, [activeConversation, conversationRepository, showConversation]);
-
-  useEffect(() => {
-    // TODO: Will be moved in ListViewModel refactor
-    amplify.subscribe('SWITCH_PREVIOUS_CONTENT', switchPreviousContent);
-  }, [activeConversation, contentState, previousContentState]);
 
   useEffect(() => {
     if (supportsLegalHold) {
@@ -565,12 +810,18 @@ const AppMain: FC<AppMainProps> = ({app, mainView, selfUser}) => {
       <div id="app" className="app">
         {(!smBreakpoint || isLeftSidebarVisible) && (
           <LeftSidebar
-            listViewModel={mainView.list}
+            answerCall={answerCall}
+            actionsView={mainView.actions}
+            callView={mainView.calling}
             selfUser={selfUser}
             isActivatedAccount={isActivatedAccount}
             showConversation={showConversation}
             switchContent={switchContent}
+            switchList={switchList}
+            openContextMenu={onContextMenu}
+            openPreferencesAccount={openPreferencesAccount}
             repositories={repositories}
+            isFederated={mainView.isFederated}
           />
         )}
 

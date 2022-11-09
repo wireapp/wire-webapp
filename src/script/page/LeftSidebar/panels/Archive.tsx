@@ -31,14 +31,13 @@ import {ConversationRepository} from '../../../conversation/ConversationReposito
 import {ConversationState} from '../../../conversation/ConversationState';
 import {Conversation} from '../../../entity/Conversation';
 import {useRoveFocus} from '../../../hooks/useRoveFocus';
-import {ListViewModel} from '../../../view_model/ListViewModel';
 import {ShowConversationOptions} from '../../AppMain';
 
 type ArchiveProps = {
   answerCall: (conversation: Conversation) => void;
+  openContextMenu: (conversation: Conversation, event: MouseEvent | React.MouseEvent<Element, MouseEvent>) => void;
   conversationRepository: ConversationRepository;
   conversationState?: ConversationState;
-  listViewModel: ListViewModel;
   onClose: () => void;
   showConversation: (
     conversation: Conversation | string,
@@ -48,7 +47,7 @@ type ArchiveProps = {
 };
 
 const Archive: React.FC<ArchiveProps> = ({
-  listViewModel,
+  openContextMenu,
   conversationRepository,
   answerCall,
   onClose,
@@ -85,7 +84,7 @@ const Archive: React.FC<ArchiveProps> = ({
             handleArrowKeyDown={handleKeyDown}
             dataUieName="item-conversation-archived"
             onClick={() => onClickConversation(conversation)}
-            rightClick={listViewModel.onContextMenu}
+            rightClick={openContextMenu}
             conversation={conversation}
             onJoinCall={answerCall}
             showJoinButton={false}

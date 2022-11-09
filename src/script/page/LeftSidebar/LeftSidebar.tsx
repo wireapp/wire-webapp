@@ -34,22 +34,29 @@ import {TemporaryGuestConversations} from './panels/TemporatyGuestConversations'
 
 import {Conversation} from '../../entity/Conversation';
 import {User} from '../../entity/User';
-import {ListViewModel} from '../../view_model/ListViewModel';
+import {ActionsViewModel} from '../../view_model/ActionsViewModel';
+import {CallingViewModel} from '../../view_model/CallingViewModel';
 import {ViewModelRepositories} from '../../view_model/MainViewModel';
 import {ShowConversationOptions} from '../AppMain';
 import {useAppState, ListState, ContentState} from '../useAppState';
 
 type LeftSidebarProps = {
-  listViewModel: ListViewModel;
+  actionsView: ActionsViewModel;
+  answerCall: (conversation: Conversation) => void;
+  callView: CallingViewModel;
   selfUser: User;
   isActivatedAccount: boolean;
+  openPreferencesAccount: () => void;
   showConversation: (
     conversation: Conversation | string,
     options: ShowConversationOptions,
     domain?: string | null,
   ) => void;
   switchContent: (contentState: ContentState) => void;
+  switchList: (listState: ListState) => void;
   repositories: ViewModelRepositories;
+  openContextMenu: (conversation: Conversation, event: MouseEvent | React.MouseEvent<Element, MouseEvent>) => void;
+  isFederated: boolean;
 };
 
 const Animated: React.FC<{children: React.ReactNode}> = ({children, ...rest}) => {
@@ -61,27 +68,29 @@ const Animated: React.FC<{children: React.ReactNode}> = ({children, ...rest}) =>
 };
 
 const LeftSidebar: React.FC<LeftSidebarProps> = ({
-  listViewModel,
+  actionsView,
+  answerCall,
+  openPreferencesAccount,
+  callView,
+  openContextMenu,
   selfUser,
   isActivatedAccount,
   showConversation,
   switchContent,
+  switchList,
   repositories,
+  isFederated,
 }) => {
   const {listState} = useAppState();
 
   const {conversation: conversationRepository, properties: propertiesRepository} = repositories;
 
-  const switchList = (list: ListState) => listViewModel.switchList(list);
-
   const goHome = () =>
-    selfUser.isTemporaryGuest()
-      ? listViewModel.switchList(ListState.TEMPORARY_GUEST)
-      : listViewModel.switchList(ListState.CONVERSATIONS);
+    selfUser.isTemporaryGuest() ? switchList(ListState.TEMPORARY_GUEST) : switchList(ListState.CONVERSATIONS);
 
   useEffect(() => {
     amplify.subscribe(WebAppEvents.SHORTCUT.START, () => {
-      listViewModel.switchList(ListState.START_UI);
+      switchList(ListState.START_UI);
     });
   }, []);
 
@@ -96,11 +105,13 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
           <>
             {listState === ListState.CONVERSATIONS && (
               <Conversations
-                listViewModel={listViewModel}
+                answerCall={answerCall}
+                callView={callView}
                 preferenceNotificationRepository={repositories.preferenceNotification}
                 conversationRepository={conversationRepository}
                 propertiesRepository={propertiesRepository}
                 switchList={switchList}
+                openContextMenu={openContextMenu}
                 switchContent={switchContent}
                 selfUser={selfUser}
                 showConversation={showConversation}
@@ -113,9 +124,9 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
 
             {listState === ListState.ARCHIVE && (
               <Archive
-                answerCall={listViewModel.answerCall}
+                answerCall={answerCall}
+                openContextMenu={openContextMenu}
                 conversationRepository={conversationRepository}
-                listViewModel={listViewModel}
                 onClose={goHome}
                 showConversation={showConversation}
               />
@@ -123,8 +134,8 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
 
             {listState === ListState.TEMPORARY_GUEST && (
               <TemporaryGuestConversations
-                callingViewModel={listViewModel.callingViewModel}
-                listViewModel={listViewModel}
+                openPreferencesAccount={openPreferencesAccount}
+                callingViewModel={callView}
                 selfUser={selfUser}
               />
             )}
@@ -136,9 +147,9 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
                 searchRepository={repositories.search}
                 teamRepository={repositories.team}
                 integrationRepository={repositories.integration}
-                mainViewModel={listViewModel.mainViewModel}
+                actionsView={actionsView}
                 userRepository={repositories.user}
-                isFederated={listViewModel.isFederated}
+                isFederated={isFederated}
                 showConversation={showConversation}
               />
             )}

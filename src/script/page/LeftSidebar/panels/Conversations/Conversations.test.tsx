@@ -26,20 +26,26 @@ import {User} from 'src/script/entity/User';
 import {ListState} from 'src/script/page/useAppState';
 import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 
+import {CallingViewModel} from '../../../../view_model/CallingViewModel';
+
 import {Conversations} from './';
 
 describe('Conversations', () => {
   const defaultParams: React.ComponentProps<typeof Conversations> = {
+    answerCall: jest.fn(),
+    callView: {} as CallingViewModel,
     conversationRepository: {
       conversationLabelRepository: {
         addEventListener: jest.fn(),
         removeEventListener: jest.fn(),
       },
     } as any,
-    listViewModel: {} as any,
+    openContextMenu: jest.fn(),
     preferenceNotificationRepository: {notifications: ko.observable([])} as any,
     propertiesRepository: {getPreference: jest.fn(), savePreference: jest.fn()} as any,
     selfUser: new User(),
+    showConversation: jest.fn(),
+    switchContent: jest.fn(),
     switchList: jest.fn(),
   };
 

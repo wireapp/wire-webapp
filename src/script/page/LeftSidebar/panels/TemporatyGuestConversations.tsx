@@ -30,17 +30,16 @@ import {t} from 'Util/LocalizerUtil';
 import {Config} from '../../../Config';
 import {User} from '../../../entity/User';
 import {CallingViewModel} from '../../../view_model/CallingViewModel';
-import {ListViewModel} from '../../../view_model/ListViewModel';
 
 type TemporaryGuestConversations = {
+  openPreferencesAccount: () => void;
   callingViewModel: CallingViewModel;
-  listViewModel: ListViewModel;
   selfUser: User;
 };
 
 const TemporaryGuestConversations: React.FC<TemporaryGuestConversations> = ({
+  openPreferencesAccount,
   selfUser,
-  listViewModel,
   callingViewModel,
 }) => {
   const {expirationIsUrgent, expirationRemainingText} = useKoSubscribableChildren(selfUser, [
@@ -51,9 +50,6 @@ const TemporaryGuestConversations: React.FC<TemporaryGuestConversations> = ({
   const {activeCalls} = useKoSubscribableChildren(callingViewModel, ['activeCalls']);
   const isAccountCreationEnabled = Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION;
   const getConversationById = (conversationId: QualifiedId) => callingViewModel.getConversationById(conversationId);
-  const openPreferences = () => {
-    listViewModel.openPreferencesAccount();
-  };
 
   const createAccount = (): void => {
     PrimaryModal.show(PrimaryModal.type.CONFIRM, {
@@ -123,7 +119,7 @@ const TemporaryGuestConversations: React.FC<TemporaryGuestConversations> = ({
           title={t('tooltipConversationsPreferences')}
           className="temporary-guest__footer__preferences"
           data-uie-name="go-preferences"
-          onClick={openPreferences}
+          onClick={openPreferencesAccount}
         >
           <Icon.Settings />
         </button>

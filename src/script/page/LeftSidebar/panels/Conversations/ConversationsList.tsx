@@ -40,18 +40,17 @@ import {ConversationState} from '../../../../conversation/ConversationState';
 import {Conversation} from '../../../../entity/Conversation';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
 import {createNavigate} from '../../../../router/routerBindings';
-import {ListViewModel} from '../../../../view_model/ListViewModel';
 import {ShowConversationOptions} from '../../../AppMain';
 import {useAppMainState, ViewType} from '../../../state';
 import {ContentState, useAppState} from '../../../useAppState';
 
 interface ConversationsListProps {
+  answerCall: (conversation: Conversation) => void;
   callState: CallState;
   connectRequests: User[];
   conversationRepository: ConversationRepository;
   conversations: Conversation[];
   conversationState: ConversationState;
-  listViewModel: ListViewModel;
   viewStyle: ConverationViewStyle;
   currentFocus: number;
   isConversationListFocus: boolean;
@@ -63,11 +62,12 @@ interface ConversationsListProps {
     domain?: string | null,
   ) => void;
   switchContent: (contentState: ContentState) => void;
+  openContextMenu: (conversation: Conversation, event: MouseEvent | React.MouseEvent<Element, MouseEvent>) => void;
 }
 
 export const ConversationsList: React.FC<ConversationsListProps> = ({
+  answerCall,
   conversations,
-  listViewModel,
   viewStyle,
   connectRequests,
   conversationState,
@@ -79,6 +79,7 @@ export const ConversationsList: React.FC<ConversationsListProps> = ({
   handleArrowKeyDown,
   showConversation,
   switchContent,
+  openContextMenu,
 }) => {
   const {contentState} = useAppState();
 
@@ -86,9 +87,6 @@ export const ConversationsList: React.FC<ConversationsListProps> = ({
 
   const isActiveConversation = (conversation: Conversation) => conversationState.isActiveConversation(conversation);
 
-  const openContextMenu = (conversation: Conversation, event: MouseEvent | React.MouseEvent<Element, MouseEvent>) =>
-    listViewModel.onContextMenu(conversation, event);
-  const answerCall = (conversation: Conversation) => listViewModel.answerCall(conversation);
   const isShowingConnectionRequests = contentState === ContentState.CONNECTION_REQUESTS;
 
   const hasJoinableCall = (conversation: Conversation) => {
@@ -147,8 +145,8 @@ export const ConversationsList: React.FC<ConversationsListProps> = ({
           conversationState={conversationState}
           hasJoinableCall={hasJoinableCall}
           isSelectedConversation={isActiveConversation}
-          listViewModel={listViewModel}
           onJoinCall={answerCall}
+          openContextMenu={openContextMenu}
         />
       </li>
     );

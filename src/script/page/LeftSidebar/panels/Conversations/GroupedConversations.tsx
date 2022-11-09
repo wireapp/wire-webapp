@@ -22,7 +22,6 @@ import React, {useEffect, useState} from 'react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
-import {ListViewModel} from 'src/script/view_model/ListViewModel';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {GroupedConversationsFolder} from './GroupedConversationsFolder';
@@ -62,8 +61,8 @@ export interface GroupedConversationsProps {
   conversationState: ConversationState;
   hasJoinableCall: (conversationId: QualifiedId) => boolean;
   isSelectedConversation: (conversationEntity: Conversation) => boolean;
-  listViewModel: ListViewModel;
   onJoinCall: (conversationEntity: Conversation) => void;
+  openContextMenu: (conversation: Conversation, event: MouseEvent | React.MouseEvent<Element, MouseEvent>) => void;
 }
 
 const GroupedConversations: React.FC<GroupedConversationsProps> = ({
@@ -71,7 +70,7 @@ const GroupedConversations: React.FC<GroupedConversationsProps> = ({
   hasJoinableCall,
   isSelectedConversation,
   onJoinCall,
-  listViewModel,
+  openContextMenu,
   conversationState = container.resolve(ConversationState),
   callState = container.resolve(CallState),
 }) => {
@@ -110,10 +109,10 @@ const GroupedConversations: React.FC<GroupedConversationsProps> = ({
           folder={folder}
           toggle={toggleFolder}
           onJoinCall={onJoinCall}
-          listViewModel={listViewModel}
           expandedFolders={expandedFolders}
           hasJoinableCall={hasJoinableCall}
           isSelectedConversation={isSelectedConversation}
+          openContextMenu={openContextMenu}
         />
       ))}
     </ul>

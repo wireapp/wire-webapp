@@ -51,16 +51,17 @@ import {AvailabilityContextMenu} from '../../../../ui/AvailabilityContextMenu';
 import {Shortcut} from '../../../../ui/Shortcut';
 import {ShortcutType} from '../../../../ui/ShortcutType';
 import {UserState} from '../../../../user/UserState';
-import {ListViewModel} from '../../../../view_model/ListViewModel';
+import {CallingViewModel} from '../../../../view_model/CallingViewModel';
 import {ShowConversationOptions} from '../../../AppMain';
 import {useAppMainState, ViewType} from '../../../state';
 import {ListWrapper} from '../ListWrapper';
 
 type ConversationsProps = {
+  answerCall: (conversation: Conversation) => void;
+  callView: CallingViewModel;
   callState?: CallState;
   conversationRepository: ConversationRepository;
   conversationState?: ConversationState;
-  listViewModel: ListViewModel;
   preferenceNotificationRepository: PreferenceNotificationRepository;
   propertiesRepository: PropertiesRepository;
   selfUser: User;
@@ -73,6 +74,7 @@ type ConversationsProps = {
   ) => void;
   teamState?: TeamState;
   userState?: UserState;
+  openContextMenu: (conversation: Conversation, event: MouseEvent | React.MouseEvent<Element, MouseEvent>) => void;
 };
 
 export enum ConverationViewStyle {
@@ -81,10 +83,11 @@ export enum ConverationViewStyle {
 }
 
 const Conversations: React.FC<ConversationsProps> = ({
+  answerCall,
+  callView,
   propertiesRepository,
   conversationRepository,
   preferenceNotificationRepository,
-  listViewModel,
   showConversation,
   conversationState = container.resolve(ConversationState),
   teamState = container.resolve(TeamState),
@@ -93,6 +96,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   selfUser,
   switchList,
   switchContent,
+  openContextMenu,
 }) => {
   const {
     name: userName,
@@ -306,21 +310,21 @@ const Conversations: React.FC<ConversationsProps> = ({
     <>
       {activeCalls.map(call => {
         const conversation = conversationState.findConversation(call.conversationId);
-        const callingViewModel = listViewModel.callingViewModel;
-        const callingRepository = callingViewModel.callingRepository;
+        const callingRepository = callView.callingRepository;
+
         return (
           conversation && (
             <div className="calling-cell" key={conversation.id}>
               <CallingCell
                 classifiedDomains={classifiedDomains}
                 call={call}
-                callActions={callingViewModel.callActions}
+                callActions={callView.callActions}
                 callingRepository={callingRepository}
                 conversation={conversation}
                 isFullUi
-                hasAccessToCamera={callingViewModel.hasAccessToCamera()}
+                hasAccessToCamera={callView.hasAccessToCamera()}
                 isSelfVerified={selfUser.is_verified()}
-                multitasking={callingViewModel.multitasking}
+                multitasking={callView.multitasking}
               />
             </div>
           )
@@ -345,11 +349,11 @@ const Conversations: React.FC<ConversationsProps> = ({
         </>
       ) : (
         <ConversationsList
+          answerCall={answerCall}
           connectRequests={connectRequests}
           callState={callState}
           conversations={filterEstablishedConversations(conversations)}
           viewStyle={viewStyle}
-          listViewModel={listViewModel}
           conversationState={conversationState}
           conversationRepository={conversationRepository}
           handleFocus={setCurrentFocus}
@@ -358,6 +362,7 @@ const Conversations: React.FC<ConversationsProps> = ({
           handleArrowKeyDown={handleKeyDown}
           showConversation={showConversation}
           switchContent={switchContent}
+          openContextMenu={openContextMenu}
         />
       )}
     </ListWrapper>

@@ -24,7 +24,6 @@ import {css} from '@emotion/react';
 import {ConversationListCell} from 'Components/list/ConversationListCell';
 import type {ConversationLabel} from 'src/script/conversation/ConversationLabelRepository';
 import {Conversation} from 'src/script/entity/Conversation';
-import {ListViewModel} from 'src/script/view_model/ListViewModel';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {GroupedConversationHeader} from './GroupedConversationHeader';
@@ -39,19 +38,19 @@ export interface GroupedConversationsFolderProps {
   folder: ConversationLabel;
   hasJoinableCall: (conversation: Conversation) => boolean;
   isSelectedConversation: (conversationEntity: Conversation) => boolean;
-  listViewModel: ListViewModel;
   onJoinCall: (conversationEntity: Conversation) => void;
   toggle: (folderId: string) => void;
+  openContextMenu: (conversation: Conversation, event: MouseEvent | React.MouseEvent<Element, MouseEvent>) => void;
 }
 
 const GroupedConversationsFolder: React.FC<GroupedConversationsFolderProps> = ({
   folder,
   toggle,
   onJoinCall,
-  listViewModel,
   expandedFolders,
   hasJoinableCall,
   isSelectedConversation,
+  openContextMenu,
 }) => {
   const isExpanded: boolean = expandedFolders.includes(folder.id);
   const {conversations} = useKoSubscribableChildren(folder, ['conversations']);
@@ -81,7 +80,7 @@ const GroupedConversationsFolder: React.FC<GroupedConversationsFolderProps> = ({
 
                 makeOnClick(conversation.id, conversation.domain)(event);
               }}
-              rightClick={(_, event) => listViewModel.onContextMenu(conversation, event)}
+              rightClick={(_, event) => openContextMenu(conversation, event)}
               conversation={conversation}
               showJoinButton={hasJoinableCall(conversation)}
               isSelected={isSelectedConversation}

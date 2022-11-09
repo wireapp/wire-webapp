@@ -26,7 +26,6 @@ import {getLogger, Logger} from 'Util/Logger';
 import {ActionsViewModel} from './ActionsViewModel';
 import {CallingViewModel} from './CallingViewModel';
 import {FaviconViewModel} from './FaviconViewModel';
-import {ListViewModel} from './ListViewModel';
 
 import type {AssetRepository} from '../assets/AssetRepository';
 import type {AudioRepository} from '../audio/AudioRepository';
@@ -86,7 +85,6 @@ export class MainViewModel {
   actions: ActionsViewModel;
   calling: CallingViewModel;
   favicon: FaviconViewModel;
-  list: ListViewModel;
   logger: Logger;
   multitasking: Multitasking;
   selfUser: ko.Observable<User>;
@@ -144,7 +142,6 @@ export class MainViewModel {
       this.selfUser,
       this.multitasking,
     );
-    this.list = new ListViewModel(this, repositories);
 
     this.favicon = new FaviconViewModel(amplify);
 
