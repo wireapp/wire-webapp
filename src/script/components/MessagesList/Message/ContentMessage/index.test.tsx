@@ -46,6 +46,8 @@ describe('message', () => {
       contextMenu: {entries: ko.observable([])},
       conversation: new Conversation(),
       findMessage: jest.fn(),
+      focusConversation: true,
+      handleFocus: jest.fn(),
       isLastDeliveredMessage: false,
       message,
       onClickAvatar: jest.fn(),
@@ -61,6 +63,7 @@ describe('message', () => {
       onLike: jest.fn(),
       previousMessage: undefined,
       selfId: {domain: '', id: createRandomUuid()},
+      totalMessage: 1,
     };
   });
 

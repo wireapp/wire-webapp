@@ -17,14 +17,7 @@
  *
  */
 
-import {
-  FC,
-  Fragment,
-  KeyboardEvent as ReactKeyboardEvent,
-  MouseEvent as ReactMouseEvent,
-  useEffect,
-  useState,
-} from 'react';
+import {FC, Fragment, MouseEvent as ReactMouseEvent, useCallback, useEffect, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -36,14 +29,14 @@ import {Image} from 'Components/Image';
 import {Text} from 'src/script/entity/message/Text';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
-import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatDateNumeral, formatTimeShort, isBeforeToday} from 'Util/TimeUtil';
-import {useDisposableRef} from 'Util/useDisposableRef';
 
 import {AudioAsset} from './asset/AudioAsset';
 import {FileAsset} from './asset/FileAssetComponent';
 import {LocationAsset} from './asset/LocationAsset';
+import {RenderShowMsgBtn} from './asset/RenderShowMsgBtn';
+import {TextMessageRenderer, ElementType} from './asset/TextMessageRenderer';
 import {VideoAsset} from './asset/VideoAsset';
 
 import type {Conversation} from '../../../../entity/Conversation';
@@ -56,11 +49,12 @@ export interface QuoteProps {
   conversation: Conversation;
   findMessage: (conversation: Conversation, messageId: string) => Promise<ContentMessage | undefined>;
   focusMessage: (id: string) => void;
-  handleClickOnMessage: (message: Text, event: ReactMouseEvent | ReactKeyboardEvent<HTMLElement>) => void;
+  handleClickOnMessage: (message: Text, event: MouseEvent | KeyboardEvent, elementType: ElementType) => void;
   quote: QuoteEntity;
   selfId: QualifiedId;
   showDetail: (message: ContentMessage, event: ReactMouseEvent) => void;
   showUserDetails: (user: User) => void;
+  focusConversation: boolean;
 }
 
 const Quote: FC<QuoteProps> = ({
@@ -72,6 +66,7 @@ const Quote: FC<QuoteProps> = ({
   selfId,
   showDetail,
   showUserDetails,
+  focusConversation,
 }) => {
   const [quotedMessage, setQuotedMessage] = useState<ContentMessage>();
   const [error, setError] = useState<Error | string | undefined>(quote.error);
@@ -131,6 +126,7 @@ const Quote: FC<QuoteProps> = ({
             handleClickOnMessage={handleClickOnMessage}
             showDetail={showDetail}
             showUserDetails={showUserDetails}
+            focusConversation={focusConversation}
           />
         )
       )}
@@ -140,11 +136,12 @@ const Quote: FC<QuoteProps> = ({
 
 interface QuotedMessageProps {
   focusMessage: (id: string) => void;
-  handleClickOnMessage: (message: Text, event: ReactMouseEvent | ReactKeyboardEvent<HTMLElement>) => void;
+  handleClickOnMessage: (message: Text, event: MouseEvent | KeyboardEvent, elementType: ElementType) => void;
   quotedMessage: ContentMessage;
   selfId: QualifiedId;
   showDetail: (message: ContentMessage, event: ReactMouseEvent) => void;
   showUserDetails: (user: User) => void;
+  focusConversation: boolean;
 }
 
 const QuotedMessage: FC<QuotedMessageProps> = ({
@@ -154,6 +151,7 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
   handleClickOnMessage,
   showDetail,
   showUserDetails,
+  focusConversation,
 }) => {
   const {
     user: quotedUser,
@@ -170,24 +168,19 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
     'timestamp',
     'edited_timestamp',
   ]);
-  const [canShowMore, setCanShowMore] = useState(false);
   const [showFullText, setShowFullText] = useState(false);
-  const detectLongQuotes = useDisposableRef(
-    element => {
-      const preNode = element.querySelector('pre');
-      const width = Math.max(element.scrollWidth, preNode ? preNode.scrollWidth : 0);
-      const height = Math.max(element.scrollHeight, preNode ? preNode.scrollHeight : 0);
-      const isWider = width > element.clientWidth;
-      const isHigher = height > element.clientHeight;
-      setCanShowMore(isWider || isHigher);
-      return () => {};
-    },
-    [edited_timestamp],
-  );
+  const [canShowMore, setCanShowMore] = useState(false);
 
   useEffect(() => {
     setShowFullText(false);
   }, [quotedMessage]);
+
+  const handleMsgQuoteClick = useCallback(
+    (event: MouseEvent | KeyboardEvent, asset: Text, elementType: ElementType): void => {
+      handleClickOnMessage(asset, event, elementType);
+    },
+    [handleClickOnMessage],
+  );
 
   return (
     <>
@@ -197,6 +190,7 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
           className="button-reset-default"
           onClick={() => showUserDetails(quotedUser)}
           data-uie-name="label-name-quote"
+          tabIndex={focusConversation ? 0 : -1}
         >
           {headerSenderName}
         </button>
@@ -221,34 +215,26 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
 
           {asset.isText() && (
             <>
-              <div
-                role="button"
-                tabIndex={0}
-                className={cx('message-quote__text', {
+              <TextMessageRenderer
+                onClickMsg={handleMsgQuoteClick}
+                text={asset.render(selfId)}
+                msgClass={cx('message-quote__text', {
                   'message-quote__text--full': showFullText,
                   'message-quote__text--large': includesOnlyEmojis(asset.text),
                 })}
-                ref={detectLongQuotes}
-                onClick={event => handleClickOnMessage(asset, event)}
-                onKeyDown={event => handleKeyDown(event, () => handleClickOnMessage(asset, event))}
-                dangerouslySetInnerHTML={{__html: asset.render(selfId)}}
-                dir="auto"
+                isCurrentConversationFocused={focusConversation}
+                asset={asset}
                 data-uie-name="media-text-quote"
+                isQuoteMsg={true}
+                setCanShowMore={setCanShowMore}
+                edited_timestamp={edited_timestamp}
               />
               {canShowMore && (
-                <button
-                  type="button"
-                  className="button-reset-default message-quote__text__show-more"
-                  onClick={() => setShowFullText(!showFullText)}
-                  data-uie-name="do-show-more-quote"
-                >
-                  <span>{showFullText ? t('replyQuoteShowLess') : t('replyQuoteShowMore')}</span>
-                  <Icon.Disclose
-                    className={cx('disclose-icon', {
-                      'upside-down': showFullText,
-                    })}
-                  />
-                </button>
+                <RenderShowMsgBtn
+                  showFullText={showFullText}
+                  setShowFullText={setShowFullText}
+                  isCurrentConversationFocused={focusConversation}
+                />
               )}
             </>
           )}
@@ -286,6 +272,7 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
           }
         }}
         data-uie-name="label-timestamp-quote"
+        tabIndex={focusConversation ? 0 : -1}
       >
         {isBeforeToday(timestamp)
           ? t('replyQuoteTimeStampDate', formatDateNumeral(timestamp))

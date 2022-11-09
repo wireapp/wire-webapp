@@ -38,11 +38,13 @@ export class Asset {
   public key: string;
   public size: string;
   public type: string;
+  public text: string;
 
   constructor(id?: string) {
     this.id = id;
     this.key = '';
     this.type = '';
+    this.text = '';
   }
 
   isDownloadable(): boolean {
