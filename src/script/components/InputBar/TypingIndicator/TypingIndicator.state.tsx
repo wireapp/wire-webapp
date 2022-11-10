@@ -35,12 +35,16 @@ type TypingIndicatorState = {
 
 const useTypingIndicatorState = create<TypingIndicatorState>((set, get) => ({
   typingUsers: [],
-  addTypingUser: typingUser =>
+  addTypingUser: ({conversationId, user}) =>
     set(state => {
-      if (state.typingUsers.find(user => user.conversationId === typingUser.conversationId)) {
+      if (
+        state.typingUsers.find(
+          typingUser => typingUser.conversationId === conversationId && typingUser.user.id === user.id,
+        )
+      ) {
         return state;
       }
-      return {...state, typingUsers: [...state.typingUsers, typingUser]};
+      return {...state, typingUsers: [...state.typingUsers, {conversationId, user}]};
     }),
   removeTypingUser: ({conversationId, user: {id}}) =>
     set(state => {

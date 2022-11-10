@@ -24,7 +24,7 @@ import {StringIdentifer, t} from 'Util/LocalizerUtil';
 
 import {useTypingIndicatorState} from './TypingIndicator.state';
 
-interface TypingIndicatorProps {
+export interface TypingIndicatorProps {
   conversationId: string;
 }
 
