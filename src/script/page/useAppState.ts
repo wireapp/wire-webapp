@@ -68,7 +68,6 @@ type AppState = {
   listState: ListState;
   setListState: (listState: ListState) => void;
   previousContentState: ContentState | null;
-  setPreviousContentState: (contentState: ContentState | null) => void;
   unreadMessagesCount: number;
   setUnreadMessagesCount: (unreadMessagesCount: number) => void;
 };
@@ -77,20 +76,18 @@ const useAppState = create<AppState>((set, get) => ({
   contentState: ContentState.WATERMARK,
   listState: ListState.CONVERSATIONS,
   previousContentState: null,
-  setContentState: (contentState: ContentState) =>
+  setContentState: (contentState: ContentState) => {
+    const previousContentState = get().contentState;
     set(state => ({
       ...state,
       contentState,
-    })),
+      previousContentState,
+    }));
+  },
   setListState: (listState: ListState) =>
     set(state => ({
       ...state,
       listState,
-    })),
-  setPreviousContentState: (contentState: ContentState | null) =>
-    set(state => ({
-      ...state,
-      previousContentState: contentState,
     })),
   setUnreadMessagesCount: (unreadMessagesCount: number) =>
     set(state => ({

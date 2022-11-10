@@ -107,6 +107,13 @@ export class ConversationState {
   }
 
   /**
+   * returns true if the conversation should be visible to the user
+   * @param conversation the conversation to check visibility
+   */
+  isVisible(conversation: Conversation): boolean {
+    return this.visibleConversations().some(conv => matchQualifiedIds(conv.qualifiedId, conversation.qualifiedId));
+  }
+  /**
    * Get unarchived conversation with the most recent event.
    * @param allConversations Search all conversations
    * @returns Most recent conversation

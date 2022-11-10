@@ -28,7 +28,6 @@ import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHold
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
-import {matchQualifiedIds} from 'Util/QualifiedId';
 import {isConversationEntity} from 'Util/TypePredicateUtil';
 
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
@@ -141,14 +140,6 @@ export class ContentViewModel {
   }
 
   changeConversation = (conversationEntity: Conversation, messageEntity?: Message) => {
-    // Clean up old conversation
-    const conversation = this.conversationState.activeConversation();
-
-    if (conversation) {
-      conversation.release();
-    }
-
-    // Update new conversation
     this.initialMessage = messageEntity;
     this.conversationState.activeConversation(conversationEntity);
   };
@@ -211,8 +202,6 @@ export class ContentViewModel {
         return;
       }
 
-      this.releaseContent(contentState);
-
       setContentState(ContentState.CONVERSATION);
       this.mainViewModel.list.openConversations();
 
@@ -261,7 +250,6 @@ export class ContentViewModel {
     const isStateChange = newContentState !== contentState;
 
     if (isStateChange) {
-      this.releaseContent(newContentState);
       this.showContent(this.checkContentAvailability(newContentState));
     }
   };
@@ -276,11 +264,7 @@ export class ContentViewModel {
         this.switchContent(ContentState.CONNECTION_REQUESTS);
       }
 
-      const repoHasConversation = this.conversationState
-        .conversations()
-        .some(conversation => this.previousConversation && matchQualifiedIds(conversation, this.previousConversation));
-
-      if (this.previousConversation && repoHasConversation && !this.previousConversation.is_archived()) {
+      if (this.previousConversation && this.conversationState.isVisible(this.previousConversation)) {
         navigate(generateConversationUrl(this.previousConversation));
         return;
       }
@@ -298,23 +282,6 @@ export class ContentViewModel {
       }
     }
     return newState;
-  };
-
-  private readonly releaseContent = (newContentState: ContentState) => {
-    const {contentState, previousContentState, setPreviousContentState} = useAppState.getState();
-    setPreviousContentState(contentState);
-    const isStateConversation = previousContentState === ContentState.CONVERSATION;
-
-    if (isStateConversation) {
-      const collectionStates = [ContentState.COLLECTION];
-      const isCollectionState = collectionStates.includes(newContentState);
-
-      if (!isCollectionState) {
-        this.conversationState.activeConversation(null);
-      }
-
-      return this.conversationState.activeConversation()?.release();
-    }
   };
 
   private readonly showContent = (newContentState: ContentState) => {
