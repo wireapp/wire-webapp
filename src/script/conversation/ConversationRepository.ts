@@ -122,6 +122,8 @@ import {SuperType} from '../message/SuperType';
 import {SystemMessageType} from '../message/SystemMessageType';
 import {mlsConversationState} from '../mls/mlsConversationState';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
+import {generateConversationUrl} from '../router/routeGenerator';
+import {navigate} from '../router/Router';
 import {Core} from '../service/CoreSingleton';
 import type {EventRecord} from '../storage';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
@@ -832,7 +834,7 @@ export class ConversationRepository {
     }
     if (this.conversationState.isActiveConversation(conversationEntity)) {
       const nextConversation = this.getNextConversation(conversationEntity);
-      amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversation, {});
+      navigate(nextConversation ? generateConversationUrl(nextConversation) : '/');
     }
     if (!skipNotification) {
       const deletionMessage = new DeleteConversationMessage(conversationEntity);
@@ -1075,7 +1077,7 @@ export class ConversationRepository {
       );
       const knownConversation = this.conversationState.findConversation({domain: null, id: conversationId});
       if (knownConversation?.status() === ConversationStatus.CURRENT_MEMBER) {
-        amplify.publish(WebAppEvents.CONVERSATION.SHOW, knownConversation, {});
+        navigate(generateConversationUrl(knownConversation));
         return;
       }
       PrimaryModal.show(PrimaryModal.type.CONFIRM, {
@@ -1090,7 +1092,7 @@ export class ConversationRepository {
               if (response) {
                 await this.onMemberJoin(conversationEntity, response);
               }
-              amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
+              navigate(generateConversationUrl(conversationEntity));
             } catch (error) {
               switch (error.label) {
                 case BackendErrorLabel.ACCESS_DENIED:
@@ -1454,7 +1456,7 @@ export class ConversationRepository {
     }
 
     if (isActiveConversation) {
-      amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEntity, {});
+      navigate(generateConversationUrl(nextConversationEntity));
     }
   }
 
@@ -2594,7 +2596,7 @@ export class ConversationRepository {
     }
 
     if (isActiveConversation && (conversationEntity.is_archived() || conversationEntity.is_cleared())) {
-      amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEntity, {});
+      navigate(generateConversationUrl(nextConversationEntity));
     }
   }
 

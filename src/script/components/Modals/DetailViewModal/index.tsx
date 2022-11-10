@@ -24,6 +24,8 @@ import cx from 'classnames';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {generateConversationUrl} from 'src/script/router/routeGenerator';
+import {navigate} from 'src/script/router/Router';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {renderElement} from 'Util/renderElement';
@@ -90,7 +92,7 @@ const DetailViewModal: FC<DetailViewModalProps> = ({
   };
 
   const onReplyClick = (conversation: Conversation, message: ContentMessage) => {
-    amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversation, {});
+    navigate(generateConversationUrl(conversation));
     amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REPLY, message);
 
     onCloseClick();

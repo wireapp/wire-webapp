@@ -208,7 +208,7 @@ export class ListViewModel {
     }
 
     if (nextItem) {
-      amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextItem, {});
+      navigate(generateConversationUrl(nextItem));
     }
   };
 
@@ -307,7 +307,7 @@ export class ListViewModel {
   readonly showTemporaryGuest = (): void => {
     this.switchList(ListState.TEMPORARY_GUEST);
     const conversationEntity = this.conversationState.getMostRecentConversation();
-    amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
+    navigate(generateConversationUrl(conversationEntity));
   };
 
   readonly onContextMenu = (

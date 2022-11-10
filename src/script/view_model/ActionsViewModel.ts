@@ -17,10 +17,7 @@
  *
  */
 
-import {amplify} from 'amplify';
 import {container} from 'tsyringe';
-
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal, removeCurrentModal, usePrimaryModalState} from 'Components/Modals/PrimaryModal';
 import {t} from 'Util/LocalizerUtil';
@@ -40,6 +37,8 @@ import type {User} from '../entity/User';
 import {BackendClientError} from '../error/BackendClientError';
 import type {IntegrationRepository} from '../integration/IntegrationRepository';
 import type {ServiceEntity} from '../integration/ServiceEntity';
+import {generateConversationUrl} from '../router/routeGenerator';
+import {navigate} from '../router/Router';
 import {UserState} from '../user/UserState';
 
 export class ActionsViewModel {
@@ -343,7 +342,7 @@ export class ActionsViewModel {
       conversationEntity.cleared_timestamp(0);
     }
 
-    amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
+    navigate(generateConversationUrl(conversationEntity));
   };
 
   removeFromConversation = async (conversationEntity: Conversation, userEntity: User): Promise<void> => {

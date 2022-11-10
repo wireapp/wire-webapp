@@ -35,6 +35,8 @@ import {TextInput} from 'Components/TextInput';
 import {BaseToggle} from 'Components/toggle/BaseToggle';
 import {InfoToggle} from 'Components/toggle/InfoToggle';
 import {UserSearchableList} from 'Components/UserSearchableList';
+import {generateConversationUrl} from 'src/script/router/routeGenerator';
+import {navigate} from 'src/script/router/Router';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleEnterDown, offEscKey, onEscKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -216,7 +218,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
           },
         );
         setIsShown(false);
-        amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
+        navigate(generateConversationUrl(conversationEntity));
       } catch (error) {
         setIsCreatingConversation(false);
         logger.error(error);

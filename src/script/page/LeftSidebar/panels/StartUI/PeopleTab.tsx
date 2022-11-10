@@ -29,6 +29,8 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {Icon} from 'Components/Icon';
 import {UserList, UserlistMode} from 'Components/UserList';
 import {Conversation} from 'src/script/entity/Conversation';
+import {generateConversationUrl} from 'src/script/router/routeGenerator';
+import {navigate} from 'src/script/router/Router';
 import {UserRepository} from 'src/script/user/UserRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -277,7 +279,7 @@ export const PeopleTab: React.FC<{
                   type="button"
                   onClick={() =>
                     conversationRepository.createGuestRoom().then(conversation => {
-                      amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversation, {});
+                      navigate(generateConversationUrl(conversation));
                     })
                   }
                   data-uie-name="do-create-guest-room"

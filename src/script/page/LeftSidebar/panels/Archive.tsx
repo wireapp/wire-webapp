@@ -19,12 +19,11 @@
 
 import React, {useEffect} from 'react';
 
-import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {ConversationListCell} from 'Components/list/ConversationListCell';
+import {generateConversationUrl} from 'src/script/router/routeGenerator';
+import {navigate} from 'src/script/router/Router';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -58,7 +57,7 @@ const Archive: React.FC<ArchiveProps> = ({
   const onClickConversation = async (conversation: Conversation) => {
     await conversationRepository.unarchiveConversation(conversation, true, 'opened conversation from archive');
     onClose();
-    amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversation, {});
+    navigate(generateConversationUrl(conversation));
   };
 
   useEffect(() => {
