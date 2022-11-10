@@ -128,14 +128,17 @@ const AppMain: FC<AppMainProps> = ({
       const activeConversation = conversationState.activeConversation();
 
       if (repositories.user['userState'].isTemporaryGuest()) {
-        mainView.list.showTemporaryGuest();
-      } else if (!activeConversation) {
-        const mostRecentConversation = conversationState.getMostRecentConversation();
-        if (mostRecentConversation) {
-          navigate(generateConversationUrl(mostRecentConversation.qualifiedId));
-        } else if (repositories.user['userState'].connectRequests().length) {
-          amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentState.CONNECTION_REQUESTS);
-        }
+        return mainView.list.showTemporaryGuest();
+      }
+      if (activeConversation) {
+        // There is already an active conversation, keeping state as is
+        return;
+      }
+      const mostRecentConversation = conversationState.getMostRecentConversation();
+      if (mostRecentConversation) {
+        navigate(generateConversationUrl(mostRecentConversation.qualifiedId));
+      } else if (repositories.user['userState'].connectRequests().length) {
+        amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentState.CONNECTION_REQUESTS);
       }
     };
 
