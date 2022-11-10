@@ -40,7 +40,7 @@ export class ConversationState {
   /**
    * current conversation that is being viewed
    */
-  public readonly activeConversation = ko.observable<Conversation | null>(null);
+  public readonly activeConversation = ko.observable<Conversation | undefined>();
   /**
    * ordered list of conversations that are actives. This is basically the conversations we want to show to the user
    */
@@ -110,8 +110,11 @@ export class ConversationState {
    * returns true if the conversation should be visible to the user
    * @param conversation the conversation to check visibility
    */
-  isVisible(conversation: Conversation): boolean {
-    return this.visibleConversations().some(conv => matchQualifiedIds(conv.qualifiedId, conversation.qualifiedId));
+  isVisible(conversation?: Conversation): conversation is Conversation {
+    return (
+      !!conversation &&
+      this.visibleConversations().some(conv => matchQualifiedIds(conv.qualifiedId, conversation.qualifiedId))
+    );
   }
   /**
    * Get unarchived conversation with the most recent event.

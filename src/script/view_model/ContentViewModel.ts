@@ -72,7 +72,7 @@ export class ContentViewModel {
   logger: Logger;
   readonly isFederated?: boolean;
   mainViewModel: MainViewModel;
-  previousConversation: Conversation | null = null;
+  previousConversation: Conversation | undefined;
   userRepository: UserRepository;
   initialMessage?: Message;
 
@@ -224,7 +224,7 @@ export class ContentViewModel {
       this.previousConversation = this.conversationState.activeConversation();
 
       if (openNotificationSettings) {
-        rightSidebar.goTo(PanelState.NOTIFICATIONS, {entity: this.conversationState.activeConversation()});
+        rightSidebar.goTo(PanelState.NOTIFICATIONS, {entity: this.conversationState.activeConversation() ?? null});
       }
     } catch (error) {
       const isConversationNotFound = error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
@@ -264,7 +264,7 @@ export class ContentViewModel {
         this.switchContent(ContentState.CONNECTION_REQUESTS);
       }
 
-      if (this.previousConversation && this.conversationState.isVisible(this.previousConversation)) {
+      if (this.conversationState.isVisible(this.previousConversation)) {
         navigate(generateConversationUrl(this.previousConversation));
         return;
       }
