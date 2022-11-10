@@ -68,7 +68,7 @@ export class ConversationState {
     });
 
     this.archivedConversations = ko.pureComputed(() => {
-      return this.filteredConversations().filter(conversation => conversation.is_archived());
+      return this.sortedConversations().filter(conversation => conversation.is_archived());
     });
 
     this.filteredConversations = ko.pureComputed(() => {
