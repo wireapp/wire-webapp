@@ -59,11 +59,13 @@ export class ConversationState {
     );
 
     this.archivedConversations = ko.pureComputed(() => {
-      return this.conversations().filter(conversation => conversation.is_archived());
+      return this.filteredConversations().filter(conversation => conversation.is_archived());
     });
 
     this.unarchivedConversations = ko.pureComputed(() => {
-      return this.conversations().filter(conversation => !conversation.is_cleared() && !conversation.is_archived());
+      return this.filteredConversations().filter(
+        conversation => !conversation.is_cleared() && !conversation.is_archived(),
+      );
     });
 
     this.filteredConversations = ko.pureComputed(() => {
