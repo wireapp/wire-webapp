@@ -45,6 +45,8 @@ import '../page/MainContent';
 import {PanelState} from '../page/RightSidebar';
 import {useAppMainState} from '../page/state';
 import {ContentState, useAppState} from '../page/useAppState';
+import {generateConversationUrl} from '../router/routeGenerator';
+import {navigate} from '../router/Router';
 import {TeamState} from '../team/TeamState';
 import type {UserRepository} from '../user/UserRepository';
 import {UserState} from '../user/UserState';
@@ -88,12 +90,19 @@ export class ContentViewModel {
     this.isFederated = mainViewModel.isFederated;
     this.logger = getLogger('ContentViewModel');
 
+    const showMostRecentConversation = () => {
+      const mostRecentConversation = this.conversationState.getMostRecentConversation();
+      if (mostRecentConversation) {
+        navigate(generateConversationUrl(mostRecentConversation));
+      }
+    };
+
     this.userState.connectRequests.subscribe(requests => {
       const {contentState} = useAppState.getState();
 
       const isStateRequests = contentState === ContentState.CONNECTION_REQUESTS;
       if (isStateRequests && !requests.length) {
-        this.showConversation(this.conversationState.getMostRecentConversation(), {});
+        showMostRecentConversation();
       }
     });
 
@@ -102,7 +111,7 @@ export class ContentViewModel {
         this.conversationState.activeConversation()?.connection().status() ===
         ConnectionStatus.MISSING_LEGAL_HOLD_CONSENT
       ) {
-        this.showConversation(this.conversationState.getMostRecentConversation(), {});
+        showMostRecentConversation();
       }
     });
 
@@ -272,7 +281,7 @@ export class ContentViewModel {
         .some(conversation => this.previousConversation && matchQualifiedIds(conversation, this.previousConversation));
 
       if (this.previousConversation && repoHasConversation && !this.previousConversation.is_archived()) {
-        void this.showConversation(this.previousConversation, {});
+        navigate(generateConversationUrl(this.previousConversation));
         return;
       }
 

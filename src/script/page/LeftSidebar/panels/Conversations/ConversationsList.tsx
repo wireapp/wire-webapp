@@ -111,7 +111,7 @@ export const ConversationsList: React.FC<{
               index={index}
               dataUieName="item-conversation"
               conversation={conversation}
-              onClick={createNavigate(generateConversationUrl(conversation.id, conversation.domain))}
+              onClick={createNavigate(generateConversationUrl(conversation.qualifiedId))}
               isSelected={isActiveConversation}
               onJoinCall={answerCall}
               rightClick={openContextMenu}

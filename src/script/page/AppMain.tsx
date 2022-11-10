@@ -42,6 +42,7 @@ import {useAppMainState, ViewType} from './state';
 import {useAppState, ContentState} from './useAppState';
 import {useWindowTitle} from './useWindowTitle';
 
+import {ConversationState} from '../conversation/ConversationState';
 import {User} from '../entity/User';
 import {App} from '../main/app';
 import {
@@ -49,8 +50,8 @@ import {
   Notification,
   PreferenceNotificationRepository,
 } from '../notification/PreferenceNotificationRepository';
-import {Router} from '../router/Router';
-import {initializeRouter} from '../router/routerBindings';
+import {generateConversationUrl} from '../router/routeGenerator';
+import {configureRoutes, navigate} from '../router/Router';
 import {TeamState} from '../team/TeamState';
 import {showInitialModal} from '../user/AvailabilityModal';
 import {UserState} from '../user/UserState';
@@ -67,9 +68,15 @@ interface AppMainProps {
   app: App;
   selfUser: User;
   mainView: MainViewModel;
+  conversationState?: ConversationState;
 }
 
-const AppMain: FC<AppMainProps> = ({app, mainView, selfUser}) => {
+const AppMain: FC<AppMainProps> = ({
+  app,
+  mainView,
+  selfUser,
+  conversationState = container.resolve(ConversationState),
+}) => {
   const apiContext = app.getAPIContext();
 
   if (!apiContext) {
@@ -117,15 +124,35 @@ const AppMain: FC<AppMainProps> = ({app, mainView, selfUser}) => {
   const initializeApp = () => {
     repositories.notification.setContentViewModelStates(contentState, mainView.multitasking);
 
-    const conversationEntity = repositories.conversation.getMostRecentConversation();
+    const showMostRecentConversation = () => {
+      const activeConversation = conversationState.activeConversation();
 
-    if (repositories.user['userState'].isTemporaryGuest()) {
-      mainView.list.showTemporaryGuest();
-    } else if (conversationEntity) {
-      mainView.content.showConversation(conversationEntity, {});
-    } else if (repositories.user['userState'].connectRequests().length) {
-      amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentState.CONNECTION_REQUESTS);
-    }
+      if (repositories.user['userState'].isTemporaryGuest()) {
+        mainView.list.showTemporaryGuest();
+      } else if (!activeConversation) {
+        const mostRecentConversation = conversationState.getMostRecentConversation();
+        if (mostRecentConversation) {
+          navigate(generateConversationUrl(mostRecentConversation.qualifiedId));
+        } else if (repositories.user['userState'].connectRequests().length) {
+          amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentState.CONNECTION_REQUESTS);
+        }
+      }
+    };
+
+    configureRoutes({
+      '/': () => showMostRecentConversation,
+      '/conversation/:conversationId(/:domain)': (conversationId: string, domain: string = apiContext.domain ?? '') =>
+        mainView.content.showConversation(conversationId, {}, domain),
+      '/preferences/about': () => mainView.list.openPreferencesAbout(),
+      '/preferences/account': () => mainView.list.openPreferencesAccount(),
+      '/preferences/av': () => mainView.list.openPreferencesAudioVideo(),
+      '/preferences/devices': () => mainView.list.openPreferencesDevices(),
+      '/preferences/options': () => mainView.list.openPreferencesOptions(),
+      '/user/:userId(/:domain)': (userId: string, domain: string = apiContext.domain ?? '') => {
+        showMostRecentConversation();
+        showUserModal({domain, id: userId}, () => navigate('/'));
+      },
+    });
 
     const redirect = localStorage.getItem(App.LOCAL_STORAGE_LOGIN_REDIRECT_KEY);
 
@@ -141,22 +168,6 @@ const AppMain: FC<AppMainProps> = ({app, mainView, selfUser}) => {
       localStorage.removeItem(App.LOCAL_STORAGE_LOGIN_CONVERSATION_KEY);
       window.location.replace(`#/conversation/${conversation}${domain ? `/${domain}` : ''}`);
     }
-
-    const router = new Router({
-      '/conversation/:conversationId(/:domain)': (conversationId: string, domain: string = apiContext.domain ?? '') =>
-        mainView.content.showConversation(conversationId, {}, domain),
-      '/preferences/about': () => mainView.list.openPreferencesAbout(),
-      '/preferences/account': () => mainView.list.openPreferencesAccount(),
-      '/preferences/av': () => mainView.list.openPreferencesAudioVideo(),
-      '/preferences/devices': () => mainView.list.openPreferencesDevices(),
-      '/preferences/options': () => mainView.list.openPreferencesOptions(),
-      '/user/:userId(/:domain)': (userId: string, domain: string = apiContext.domain ?? '') => {
-        showUserModal({domain, id: userId}, () => router.navigate('/'));
-      },
-    });
-
-    initializeRouter(router);
-    container.registerInstance(Router, router);
 
     repositories.properties.checkPrivacyPermission().then(() => {
       window.setTimeout(() => repositories.notification.checkPermission(), App.CONFIG.NOTIFICATION_CHECK);

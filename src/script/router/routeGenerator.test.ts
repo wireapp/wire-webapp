@@ -30,7 +30,7 @@ describe('generateConversationUrl', () => {
     ];
 
     conversationIds.forEach(conversationId => {
-      const url = generateConversationUrl(conversationId, null);
+      const url = generateConversationUrl({id: conversationId, domain: ''});
 
       expect(url).toContain(conversationId);
       expect(url).toContain('/conversation');
