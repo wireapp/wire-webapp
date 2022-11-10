@@ -94,9 +94,9 @@ const Conversations: React.FC<ConversationsProps> = ({
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
-  const {archivedConversations, sortedConversations: conversations} = useKoSubscribableChildren(conversationState, [
+  const {archivedConversations, activeConversations: conversations} = useKoSubscribableChildren(conversationState, [
     'archivedConversations',
-    'sortedConversations',
+    'activeConversations',
   ]);
   const {notifications} = useKoSubscribableChildren(preferenceNotificationRepository, ['notifications']);
 

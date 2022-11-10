@@ -41,6 +41,7 @@ export class ConversationState {
    * current conversation that is being viewed
    */
   public readonly activeConversation = ko.observable<Conversation | null>(null);
+  public readonly activeConversations: ko.PureComputed<Conversation[]>;
   public readonly filteredConversations: ko.PureComputed<Conversation[]>;
   public readonly archivedConversations: ko.PureComputed<Conversation[]>;
   public readonly unarchivedConversations: ko.PureComputed<Conversation[]>;
@@ -57,6 +58,14 @@ export class ConversationState {
     this.selfConversation = ko.pureComputed(() =>
       this.conversations().find(conversation => conversation.type() === CONVERSATION_TYPE.SELF),
     );
+
+    this.activeConversations = ko.pureComputed(() => {
+      return this.sortedConversations().filter(conversation =>
+        this.unarchivedConversations().find(unarchivedConversation =>
+          matchQualifiedIds(unarchivedConversation.qualifiedId, conversation.qualifiedId),
+        ),
+      );
+    });
 
     this.archivedConversations = ko.pureComputed(() => {
       return this.filteredConversations().filter(conversation => conversation.is_archived());
