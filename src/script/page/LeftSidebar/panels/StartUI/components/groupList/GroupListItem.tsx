@@ -26,15 +26,14 @@ import {handleKeyDown} from 'Util/KeyboardUtil';
 
 import type {Conversation} from '../../../../../../entity/Conversation';
 import {generateConversationUrl} from '../../../../../../router/routeGenerator';
-import {Router} from '../../../../../../router/Router';
+import {navigate} from '../../../../../../router/Router';
 
 export interface GroupListItemProps {
   click: (group: Conversation) => void;
   group: Conversation;
-  router: Router;
 }
 
-const GroupListItem: React.FC<GroupListItemProps> = ({click, group, router}) => {
+const GroupListItem: React.FC<GroupListItemProps> = ({click, group}) => {
   const {
     display_name: displayName,
     participating_user_ets: participatingUserEts,
@@ -43,7 +42,7 @@ const GroupListItem: React.FC<GroupListItemProps> = ({click, group, router}) => 
 
   const onClick = () => {
     click(group);
-    router.navigate(generateConversationUrl(group.id, group.domain));
+    navigate(generateConversationUrl(group.qualifiedId));
   };
 
   return (

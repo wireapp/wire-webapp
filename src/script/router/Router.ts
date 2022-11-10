@@ -17,47 +17,30 @@
  *
  */
 
-import React from 'react';
-
 import switchPath from 'switch-path';
-import {singleton} from 'tsyringe';
 
 export type Routes = Record<string, ((x: any) => void) | null>;
 
-@singleton()
-export class Router {
-  private readonly parseRoute: () => any;
+const defaultRoute: Routes = {
+  // do nothing if url was not matched
+  '*': null,
+};
+let routes: Routes = {};
 
-  constructor(routeDefinitions: Routes) {
-    const defaultRoute: Routes = {
-      // do nothing if url was not matched
-      '*': null,
-    };
-    const routes = {...defaultRoute, ...routeDefinitions};
+function parseRoute() {
+  const currentPath = window.location.hash.replace('#', '') || '/';
 
-    this.parseRoute = () => {
-      const currentPath = window.location.hash.replace('#', '') || '/';
-
-      const {value} = switchPath(currentPath, routes);
-      return typeof value === 'function' ? value() : value;
-    };
-
-    window.addEventListener('hashchange', this.parseRoute);
-
-    // trigger an initial parsing of the current URL
-    this.parseRoute();
-  }
-
-  navigate(path: string): Router {
-    window.history.replaceState(null, null, `#${path}`);
-    this.parseRoute();
-    return this;
-  }
-
-  createLink(path: string): (event: React.MouseEvent) => void {
-    return (event: React.MouseEvent) => {
-      event.preventDefault();
-      this.navigate(path);
-    };
-  }
+  const {value} = switchPath(currentPath, routes);
+  return typeof value === 'function' ? value() : value;
 }
+
+export const configureRoutes = (routeDefinitions: Routes): void => {
+  routes = {...defaultRoute, ...routeDefinitions};
+  window.addEventListener('hashchange', parseRoute);
+  parseRoute();
+};
+
+export const navigate = (path: string) => {
+  window.history.replaceState(null, '', `#${path}`);
+  parseRoute();
+};
