@@ -45,6 +45,8 @@ import type {User} from '../entity/User';
 import {EventRepository} from '../event/EventRepository';
 import type {EventSource} from '../event/EventSource';
 import {SystemMessageType} from '../message/SystemMessageType';
+import {generateConversationUrl} from '../router/routeGenerator';
+import {navigate} from '../router/Router';
 import type {UserRepository} from '../user/UserRepository';
 
 export class ConnectionRepository {
@@ -154,7 +156,8 @@ export class ConnectionRepository {
   ): Promise<void> {
     await this.updateStatus(userEntity, ConnectionStatus.BLOCKED);
     if (hideConversation) {
-      navigate(generateConversationUrl(nextConversationEntity));
+      const url = nextConversationEntity ? generateConversationUrl(nextConversationEntity) : '/';
+      navigate(url);
     }
   }
 
@@ -173,7 +176,8 @@ export class ConnectionRepository {
   ): Promise<void> {
     await this.updateStatus(userEntity, ConnectionStatus.CANCELLED);
     if (hideConversation) {
-      navigate(generateConversationUrl(nextConversationEntity));
+      const url = nextConversationEntity ? generateConversationUrl(nextConversationEntity) : '/';
+      navigate(url);
     }
   }
 

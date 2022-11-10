@@ -18,70 +18,69 @@
  */
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
-import {ConnectionRepository} from 'src/script/connection/ConnectionRepository';
-import {ConnectionState} from 'src/script/connection/ConnectionState';
-import {Conversation} from 'src/script/entity/Conversation';
-import {User} from 'src/script/entity/User';
 import {createRandomUuid} from 'Util/util';
 
-import {TestFactory} from '../../helper/TestFactory';
+import {ConnectionEntity} from './ConnectionEntity';
+import {ConnectionRepository} from './ConnectionRepository';
+import {ConnectionService} from './ConnectionService';
+import {ConnectionState} from './ConnectionState';
+
+import {TestFactory} from '../../../test/helper/TestFactory';
+import {Conversation} from '../entity/Conversation';
+import {User} from '../entity/User';
+import {navigate} from '../router/Router';
+
+jest.mock('../router/Router', () => ({
+  navigate: jest.fn(),
+}));
 
 describe('ConnectionRepository', () => {
-  let server = undefined;
-  let connectionRepository = undefined;
+  let connectionRepository: ConnectionRepository;
   const testFactory = new TestFactory();
 
   beforeAll(() => testFactory.exposeConnectionActors());
 
   beforeEach(() => {
-    connectionRepository = testFactory.connection_repository;
-    server = sinon.fakeServer.create();
-    server.autoRespond = true;
+    connectionRepository = testFactory.connection_repository!;
   });
 
   afterEach(() => {
-    connectionRepository.connectionState.connectionEntities({});
-    server.restore();
+    connectionRepository['connectionState'].connectionEntities({});
   });
 
   describe('cancelRequest', () => {
-    let userEntity = undefined;
+    let userEntity: User;
 
     beforeEach(() => {
       const userId = createRandomUuid();
-      const connectionEntity = new ConnectionEntity(createRandomUuid());
-      connectionEntity.userId = userId;
+      const connectionEntity = new ConnectionEntity();
+      connectionEntity.userId = {id: userId, domain: ''};
 
       userEntity = new User(userId);
       userEntity.connection(connectionEntity);
 
       connectionRepository.addConnectionEntity(connectionEntity);
-      spyOn(connectionRepository, 'updateStatus').and.returnValue(Promise.resolve());
+      spyOn(connectionRepository as any, 'updateStatus').and.returnValue(Promise.resolve());
     });
 
     it('sets the connection status to cancelled', () => {
       return connectionRepository.cancelRequest(userEntity).then(() => {
-        expect(connectionRepository.updateStatus).toHaveBeenCalled();
+        expect(connectionRepository['updateStatus']).toHaveBeenCalled();
       });
     });
 
     it('switches the conversation if requested', () => {
-      const amplifySpy = jasmine.createSpy('conversation_show');
-      amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, amplifySpy);
-
-      return connectionRepository.cancelRequest(userEntity, new Conversation()).then(() => {
-        expect(connectionRepository.updateStatus).toHaveBeenCalled();
-        expect(amplifySpy).toHaveBeenCalled();
+      return connectionRepository.cancelRequest(userEntity, true, new Conversation()).then(() => {
+        expect(connectionRepository['updateStatus']).toHaveBeenCalled();
+        expect(navigate).toHaveBeenCalled();
       });
     });
   });
 
   describe('getConnectionByConversationId', () => {
-    let firstConnectionEntity = null;
-    let secondConnectionEntity = null;
+    let firstConnectionEntity: ConnectionEntity;
+    let secondConnectionEntity: ConnectionEntity;
 
     beforeEach(() => {
       firstConnectionEntity = new ConnectionEntity();
@@ -116,7 +115,7 @@ describe('ConnectionRepository', () => {
         to: '7025598b-ffac-4993-8a81-af3f35b7147f',
       };
 
-      const connectionServiceSpy = {
+      const connectionServiceSpy: Partial<ConnectionService> = {
         getConnections: jest.fn().mockImplementation(() => {
           // Return request and duplicate
           return Promise.resolve([connectionRequest, connectionRequest]);
@@ -128,7 +127,11 @@ describe('ConnectionRepository', () => {
       };
 
       const connectionState = new ConnectionState();
-      const connectionRepo = new ConnectionRepository(connectionServiceSpy, userRepoSpy, connectionState);
+      const connectionRepo = new ConnectionRepository(
+        connectionServiceSpy as ConnectionService,
+        userRepoSpy as any,
+        connectionState,
+      );
 
       await connectionRepo.getConnections();
 

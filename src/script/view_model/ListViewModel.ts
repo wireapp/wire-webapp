@@ -38,12 +38,14 @@ import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 import type {CallingRepository} from '../calling/CallingRepository';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationState} from '../conversation/ConversationState';
-import type {Conversation} from '../entity/Conversation';
+import {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
 import {PanelState} from '../page/RightSidebar';
 import {useAppMainState} from '../page/state';
 import {ContentState, ListState, useAppState} from '../page/useAppState';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
+import {generateConversationUrl} from '../router/routeGenerator';
+import {navigate} from '../router/Router';
 import {SearchRepository} from '../search/SearchRepository';
 import type {TeamRepository} from '../team/TeamRepository';
 import {TeamState} from '../team/TeamState';
@@ -207,7 +209,7 @@ export class ListViewModel {
       return this.contentViewModel.switchContent(ContentState.CONNECTION_REQUESTS);
     }
 
-    if (nextItem) {
+    if (nextItem && nextItem instanceof Conversation) {
       navigate(generateConversationUrl(nextItem));
     }
   };
@@ -307,7 +309,7 @@ export class ListViewModel {
   readonly showTemporaryGuest = (): void => {
     this.switchList(ListState.TEMPORARY_GUEST);
     const conversationEntity = this.conversationState.getMostRecentConversation();
-    navigate(generateConversationUrl(conversationEntity));
+    navigate(conversationEntity ? generateConversationUrl(conversationEntity) : '/');
   };
 
   readonly onContextMenu = (
