@@ -76,7 +76,7 @@ const GroupedConversations: React.FC<GroupedConversationsProps> = ({
   callState = container.resolve(CallState),
 }) => {
   const {conversationLabelRepository} = conversationRepository;
-  const {visibleConversations: conversations} = useKoSubscribableChildren(conversationState, ['activeConversations']);
+  const {visibleConversations: conversations} = useKoSubscribableChildren(conversationState, ['visibleConversations']);
 
   useKoSubscribableChildren(callState, ['activeCalls']);
 
