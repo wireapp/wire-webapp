@@ -143,7 +143,7 @@ const AppMain: FC<AppMainProps> = ({
     };
 
     configureRoutes({
-      '/': () => showMostRecentConversation,
+      '/': showMostRecentConversation,
       '/conversation/:conversationId(/:domain)': (conversationId: string, domain: string = apiContext.domain ?? '') =>
         mainView.content.showConversation(conversationId, {}, domain),
       '/preferences/about': () => mainView.list.openPreferencesAbout(),
