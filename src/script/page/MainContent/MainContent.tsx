@@ -24,7 +24,7 @@ import {CSSTransition, SwitchTransition} from 'react-transition-group';
 import {container} from 'tsyringe';
 
 import {ConnectRequests} from 'Components/ConnectRequests';
-import {ConversationList} from 'Components/Conversation';
+import {Conversation} from 'Components/Conversation';
 import {HistoryExport} from 'Components/HistoryExport';
 import {HistoryImport} from 'Components/HistoryImport';
 import {Icon} from 'Components/Icon';
@@ -206,7 +206,7 @@ const MainContent: FC<MainContentProps> = ({
             )}
 
             {contentState === ContentState.CONVERSATION && (
-              <ConversationList
+              <Conversation
                 initialMessage={initialMessage}
                 teamState={teamState}
                 userState={userState}
