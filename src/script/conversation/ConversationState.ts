@@ -47,7 +47,7 @@ export class ConversationState {
   public readonly selfConversation: ko.PureComputed<Conversation | undefined>;
   public readonly connectedUsers: ko.PureComputed<User[]>;
 
-  private readonly sortedConversations: ko.PureComputed<Conversation[]>;
+  public readonly sortedConversations: ko.PureComputed<Conversation[]>;
 
   constructor(
     private readonly userState = container.resolve(UserState),
