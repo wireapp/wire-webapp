@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [36.6.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@36.5.0...@wireapp/core@36.6.0) (2022-11-10)
+
+### Features
+
+* extract proteus sendProteusMessage ([#4608](https://github.com/wireapp/wire-web-packages/issues/4608)) ([7f9fe32](https://github.com/wireapp/wire-web-packages/commit/7f9fe326478203455fb1c843ac28461b48821c59))
+
 # [36.5.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@36.4.4...@wireapp/core@36.5.0) (2022-11-09)
 
 ### Features
