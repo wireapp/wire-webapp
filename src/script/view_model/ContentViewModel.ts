@@ -72,7 +72,7 @@ export class ContentViewModel {
   logger: Logger;
   readonly isFederated?: boolean;
   mainViewModel: MainViewModel;
-  previousConversation: Conversation | undefined;
+  previousConversation?: Conversation;
   userRepository: UserRepository;
   initialMessage?: Message;
 
