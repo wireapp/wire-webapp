@@ -17,15 +17,4 @@
  *
  */
 
-const baseConfig = require('../../jest.config.base');
-
-const { TextDecoder, TextEncoder } = require('util')
-
-module.exports = {
-  ...baseConfig,
-  testEnvironment: "node",
-  globals: {
-    TextDecoder,
-    TextEncoder,
-  },
-};
+export * from './ProteusService';

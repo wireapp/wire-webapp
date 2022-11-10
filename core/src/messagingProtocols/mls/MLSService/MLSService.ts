@@ -42,14 +42,15 @@ import {
 } from '@wireapp/core-crypto';
 
 import {toProtobufCommitBundle} from './commitBundleUtil';
+import {MLSServiceConfig, UploadCommitOptions} from './MLSService.types';
 import {keyMaterialUpdatesStore} from './stores/keyMaterialUpdatesStore';
 import {pendingProposalsStore} from './stores/pendingProposalsStore';
 
-import {QualifiedUsers} from '../../conversation';
-import {sendMessage} from '../../conversation/message/messageSender';
-import {parseFullQualifiedClientId} from '../../util/fullyQualifiedClientIdUtils';
-import {cancelRecurringTask, registerRecurringTask} from '../../util/RecurringTaskScheduler';
-import {TaskScheduler} from '../../util/TaskScheduler';
+import {QualifiedUsers} from '../../../conversation';
+import {sendMessage} from '../../../conversation/message/messageSender';
+import {parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUtils';
+import {cancelRecurringTask, registerRecurringTask} from '../../../util/RecurringTaskScheduler';
+import {TaskScheduler} from '../../../util/TaskScheduler';
 import {EventHandlerParams, EventHandlerResult, handleBackendEvent} from '../EventHandler';
 import {CommitPendingProposalsParams, HandlePendingProposalsParams, MLSCallbacks} from '../types';
 
@@ -59,22 +60,6 @@ export const optionalToUint8Array = (array: Uint8Array | []): Uint8Array => {
   return Array.isArray(array) ? Uint8Array.from(array) : array;
 };
 
-interface UploadCommitOptions {
-  /**
-   * If uploading the commit fails and we endup in a scenario where a retrial is possible, then this callback will be called to re-generate a new commit bundle
-   */
-  regenerateCommitBundle?: () => Promise<CommitBundle>;
-
-  /**
-   * Is the current commitBundle an external commit.
-   */
-  isExternalCommit?: boolean;
-}
-
-interface MLSServiceConfig {
-  keyingMaterialUpdateThreshold: number;
-  nbKeyPackages: number;
-}
 const defaultConfig: MLSServiceConfig = {
   keyingMaterialUpdateThreshold: 1000 * 60 * 60 * 24 * 30, //30 days
   nbKeyPackages: 100,
