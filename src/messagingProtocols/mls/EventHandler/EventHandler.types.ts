@@ -19,8 +19,8 @@
 
 import {BackendEvent} from '@wireapp/api-client/lib/event';
 
-import {PayloadBundleSource} from '../../conversation';
-import {HandledEventPayload} from '../../notification';
+import {PayloadBundleSource} from '../../../conversation';
+import {HandledEventPayload} from '../../../notification';
 import {MLSService} from '../MLSService/MLSService';
 
 export {BackendEvent, PayloadBundleSource};

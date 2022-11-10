@@ -17,4 +17,7 @@
  *
  */
 
-export * from './MLSService';
+export * from './PreKeyBundle';
+export * from '../../../../conversation/ConversationService/Utility/getConversationQualifiedMembers';
+export * from './UserIds';
+export * from './Recipients';

@@ -30,6 +30,8 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
+import {PayloadBundleState} from '..';
+
 export enum MessageTargetMode {
   NONE,
   USERS,
@@ -98,24 +100,6 @@ export type ProtocolParam = {
 export type SendCommonParams = ProtocolParam & {
   payload: GenericMessage;
 };
-export type SendProteusMessageParams = SendCommonParams &
-  MessageSendingOptions & {
-    conversationId: QualifiedId;
-
-    /**
-     * Can be either a QualifiedId[], string[], UserClients or QualfiedUserClients. The type has some effect on the behavior of the method. (Needed only for Proteus)
-     *    When given a QualifiedId[] or string[] the method will fetch the freshest list of devices for those users (since they are not given by the consumer). As a consequence no ClientMismatch error will trigger and we will ignore missing clients when sending
-     *    When given a QualifiedUserClients or UserClients the method will only send to the clients listed in the userIds. This could lead to ClientMismatch (since the given list of devices might not be the freshest one and new clients could have been created)
-     *    When given a QualifiedId[] or QualifiedUserClients the method will send the message through the federated API endpoint
-     *    When given a string[] or UserClients the method will send the message through the old API endpoint
-     */
-    userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients;
-    onClientMismatch?: (
-      status: ClientMismatch | MessageSendingStatus,
-      wasSent: boolean,
-    ) => void | boolean | Promise<boolean>;
-    protocol: ConversationProtocol.PROTEUS;
-  };
 
 export type SendMlsMessageParams = SendCommonParams & {
   /**
@@ -140,3 +124,12 @@ export type RemoveUsersParams = {
 };
 
 export type MLSReturnType = {events: MlsEvent[]; conversation: Conversation};
+
+export type SendResult = {
+  /** The id of the message sent */
+  id: string;
+  /** the ISO formatted date at which the message was received by the backend */
+  sentAt: string;
+  /** The sending state of the payload (has the payload been succesfully sent or canceled) */
+  state: PayloadBundleState;
+};

@@ -26,25 +26,18 @@ import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
 
 import {AvailabilityType, BroadcastService} from '../broadcast/';
 import {ConnectionService} from '../connection';
-import {ConversationService} from '../conversation';
+import {getPreKeyBundleMap} from '../messagingProtocols/proteus';
 import {isQualifiedIdArray} from '../util/TypePredicateUtil';
 
 export class UserService {
   private readonly apiClient: APIClient;
   private readonly broadcastService: BroadcastService;
   private readonly connectionService: ConnectionService;
-  private readonly conversationService: ConversationService;
 
-  constructor(
-    apiClient: APIClient,
-    broadcastService: BroadcastService,
-    conversationService: ConversationService,
-    connectionService: ConnectionService,
-  ) {
+  constructor(apiClient: APIClient, broadcastService: BroadcastService, connectionService: ConnectionService) {
     this.apiClient = apiClient;
     this.broadcastService = broadcastService;
     this.connectionService = connectionService;
-    this.conversationService = conversationService;
   }
 
   public getUser(userId: string | QualifiedId): Promise<User> {
@@ -83,9 +76,11 @@ export class UserService {
         userId: connection.to,
         conversationId: connection.conversation,
       };
-      return this.conversationService.getPreKeyBundleMap({id: mappedConnection.conversationId, domain: ''}, [
-        mappedConnection.userId,
-      ]);
+      return getPreKeyBundleMap({
+        apiClient: this.apiClient,
+        conversationId: {id: mappedConnection.conversationId, domain: ''},
+        userIds: [mappedConnection.userId],
+      });
     });
     const preKeyBundlesFromConnections = await Promise.all(preKeyBundlePromises);
 

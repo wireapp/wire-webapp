@@ -36,7 +36,7 @@ import {AssetContent} from '../conversation/content';
 import {ConversationMapper} from '../conversation/ConversationMapper';
 import {CoreError, NotificationError} from '../CoreError';
 import {CryptographyService, DecryptionError} from '../cryptography';
-import {MLSService} from '../mls';
+import {MLSService} from '../messagingProtocols/mls';
 import {UserMapper} from '../user/UserMapper';
 
 export type HandledEventPayload = {
