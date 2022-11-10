@@ -50,6 +50,7 @@ import {flatten} from 'underscore';
 import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {useTypingIndicatorState} from 'Components/InputBar/TypingIndicator/TypingIndicator.state';
 import {getNextItem} from 'Util/ArrayUtil';
 import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/FileTypeUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
@@ -2859,13 +2860,18 @@ export class ConversationRepository {
       return;
     }
 
+    const conversationId = conversationEntity.id;
+    const {addTypingUser, removeTypingUser} = useTypingIndicatorState.getState();
+    const typingUser = {conversationId, user: qualifiedUser};
+
     if (eventJson.data.status === CONVERSATION_TYPING.STARTED) {
-      conversationEntity.activeTypingUsers.push(qualifiedUser);
+      addTypingUser(typingUser);
     }
 
     if (eventJson.data.status === CONVERSATION_TYPING.STOPPED) {
-      conversationEntity.activeTypingUsers.remove(user => user.id === qualifiedUser.id);
+      removeTypingUser(typingUser);
     }
+
     return {conversationEntity};
   }
 

@@ -54,7 +54,7 @@ import {loadDraftState, saveDraftState} from 'Util/DraftStateUtil';
 import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/FileTypeUtil';
 import {isHittingUploadLimit} from 'Util/isHittingUploadLimit';
 import {insertAtCaret, isFunctionKey, KEY} from 'Util/KeyboardUtil';
-import {StringIdentifer, t} from 'Util/LocalizerUtil';
+import {t} from 'Util/LocalizerUtil';
 import {
   createMentionEntity,
   detectMentionEdgeDeletion,
@@ -67,6 +67,7 @@ import {formatBytes, getSelectionPosition} from 'Util/util';
 import {getRichTextInput} from './getRichTextInput';
 import {PastedFileControls} from './PastedFileControls';
 import {ReplyBar} from './ReplyBar';
+import {TypingIndicator} from './TypingIndicator/TypingIndicator';
 
 import {AssetRepository} from '../../assets/AssetRepository';
 import {Config} from '../../Config';
@@ -90,7 +91,7 @@ import {UserState} from '../../user/UserState';
 const CONFIG = {
   ...Config.getConfig(),
   PING_TIMEOUT: TIME_IN_MILLIS.SECOND * 2,
-  IS_TYPING_TIMEOUT: TIME_IN_MILLIS.SECOND * 5,
+  IS_TYPING_TIMEOUT: TIME_IN_MILLIS.SECOND * 10,
 };
 
 const showWarningModal = (title: string, message: string): void => {
@@ -144,7 +145,6 @@ const InputBar = ({
     hasGlobalMessageTimer,
     removed_from_conversation: removedFromConversation,
     is1to1,
-    activeTypingUsers,
   } = useKoSubscribableChildren(conversationEntity, [
     'connection',
     'firstUserEntity',
@@ -154,7 +154,6 @@ const InputBar = ({
     'hasGlobalMessageTimer',
     'removed_from_conversation',
     'is1to1',
-    'activeTypingUsers',
   ]);
   const {availability} = useKoSubscribableChildren(firstUserEntity, ['availability']);
   const {isOutgoingRequest, isIncomingRequest} = useKoSubscribableChildren(connection, [
@@ -886,32 +885,8 @@ const InputBar = ({
       id="conversation-input-bar"
       className={cx('conversation-input-bar', {'is-right-panel-open': isRightSidebarOpen})}
     >
-      {activeTypingUsers.length > 0 && (
-        <div className="conversation-input-bar-typing-users-container">
-          <div className="conversation-input-bar-typing-users-avatars-container">
-            {activeTypingUsers.slice(0, 3).map((user, index) => (
-              <Avatar
-                key={user.id}
-                className={cx('cursor-default', {'conversation-input-avatar-with-margin-left': index > 0})}
-                participant={user}
-                avatarSize={AVATAR_SIZE.X_SMALL}
-              />
-            ))}
-          </div>
-          {activeTypingUsers.length === 1 &&
-            t('tooltipConversationInputOneUserTyping' as StringIdentifer, {user1: activeTypingUsers[0].name()})}
-          {activeTypingUsers.length === 2 &&
-            t('tooltipConversationInputTwoUserTyping' as StringIdentifer, {
-              user1: activeTypingUsers[0].name(),
-              user2: activeTypingUsers[1].name(),
-            })}
-          {activeTypingUsers.length > 2 &&
-            t('tooltipConversationInputMoreThanTwoUserTyping' as StringIdentifer, {
-              user1: activeTypingUsers[0].name(),
-              count: activeTypingUsers.length.toString(),
-            })}
-        </div>
-      )}
+      <TypingIndicator conversationId={conversationEntity.id} />
+
       {classifiedDomains && !isConnectionRequest && (
         <ClassifiedBar users={participatingUserEts} classifiedDomains={classifiedDomains} />
       )}
