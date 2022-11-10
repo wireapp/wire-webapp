@@ -41,10 +41,12 @@ export class ConversationState {
    * current conversation that is being viewed
    */
   public readonly activeConversation = ko.observable<Conversation | null>(null);
-  public readonly activeConversations: ko.PureComputed<Conversation[]>;
+  /**
+   * ordered list of conversations that are actives. This is basically the conversations we want to show to the user
+   */
+  public readonly visibleConversations: ko.PureComputed<Conversation[]>;
   public readonly filteredConversations: ko.PureComputed<Conversation[]>;
   public readonly archivedConversations: ko.PureComputed<Conversation[]>;
-  public readonly unarchivedConversations: ko.PureComputed<Conversation[]>;
   public readonly selfConversation: ko.PureComputed<Conversation | undefined>;
   public readonly connectedUsers: ko.PureComputed<User[]>;
 
@@ -59,22 +61,14 @@ export class ConversationState {
       this.conversations().find(conversation => conversation.type() === CONVERSATION_TYPE.SELF),
     );
 
-    this.activeConversations = ko.pureComputed(() => {
-      return this.sortedConversations().filter(conversation =>
-        this.unarchivedConversations().find(unarchivedConversation =>
-          matchQualifiedIds(unarchivedConversation.qualifiedId, conversation.qualifiedId),
-        ),
+    this.visibleConversations = ko.pureComputed(() => {
+      return this.sortedConversations().filter(
+        conversation => !conversation.is_cleared() && !conversation.is_archived(),
       );
     });
 
     this.archivedConversations = ko.pureComputed(() => {
       return this.filteredConversations().filter(conversation => conversation.is_archived());
-    });
-
-    this.unarchivedConversations = ko.pureComputed(() => {
-      return this.filteredConversations().filter(
-        conversation => !conversation.is_cleared() && !conversation.is_archived(),
-      );
     });
 
     this.filteredConversations = ko.pureComputed(() => {
@@ -118,7 +112,7 @@ export class ConversationState {
    * @returns Most recent conversation
    */
   getMostRecentConversation(allConversations: boolean = false): Conversation | undefined {
-    const [conversationEntity] = allConversations ? this.sortedConversations() : this.unarchivedConversations();
+    const [conversationEntity] = allConversations ? this.sortedConversations() : this.visibleConversations();
     return conversationEntity;
   }
 

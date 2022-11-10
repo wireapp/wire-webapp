@@ -267,7 +267,7 @@ export class ConversationRepository {
 
     this.conversationLabelRepository = new ConversationLabelRepository(
       this.conversationState.conversations,
-      this.conversationState.unarchivedConversations,
+      this.conversationState.visibleConversations,
       propertyRepository.propertiesService,
     );
 
@@ -773,7 +773,7 @@ export class ConversationRepository {
    * Update users and events for all unarchived conversations.
    */
   private updateUnarchivedConversations() {
-    return this.updateConversations(this.conversationState.unarchivedConversations());
+    return this.updateConversations(this.conversationState.visibleConversations());
   }
 
   private async updateConversationFromBackend(conversationEntity: Conversation) {
@@ -949,7 +949,7 @@ export class ConversationRepository {
    * @returns Next conversation
    */
   getNextConversation(conversationEntity: Conversation) {
-    return getNextItem(this.conversationState.unarchivedConversations(), conversationEntity);
+    return getNextItem(this.conversationState.visibleConversations(), conversationEntity);
   }
 
   /**

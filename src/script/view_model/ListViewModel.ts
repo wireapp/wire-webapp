@@ -123,7 +123,7 @@ export class ListViewModel {
       const hasConnectRequests = !!this.userState.connectRequests().length;
       const states: (string | Conversation)[] = hasConnectRequests ? [ContentState.CONNECTION_REQUESTS] : [];
 
-      return states.concat(this.conversationState.unarchivedConversations());
+      return states.concat(this.conversationState.visibleConversations());
     });
 
     this._initSubscriptions();

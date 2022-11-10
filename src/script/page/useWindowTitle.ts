@@ -49,11 +49,11 @@ export const useWindowTitle = () => {
   const [updateWindowTitle, setUpdateWindowTitle] = useState(false);
 
   const {connectRequests: connectionRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
-  const {activeConversation, unarchivedConversations} = useKoSubscribableChildren(conversationState, [
+  const {activeConversation, visibleConversations} = useKoSubscribableChildren(conversationState, [
     'activeConversation',
-    'unarchivedConversations',
+    'visibleConversations',
   ]);
-  const unreadConversations = unarchivedConversations.filter(conversationEntity => conversationEntity.hasUnread());
+  const unreadConversations = visibleConversations.filter(conversationEntity => conversationEntity.hasUnread());
 
   const updateFavicon = useCallback(
     (unreadCount: number) => {
