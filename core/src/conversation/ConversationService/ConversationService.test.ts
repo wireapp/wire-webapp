@@ -115,7 +115,7 @@ describe('ConversationService', () => {
         MockedMessagingProtocols.getGenericMessageParams.mockResolvedValue({
           time: sentTime,
         } as unknown as MessagingProtocols.MessageParams);
-        mockedProteusService.sendProteusMessage = jest.fn().mockResolvedValue({sentAt: sentTime});
+        mockedProteusService.sendMessage = jest.fn().mockResolvedValue({sentAt: sentTime});
         const promise = conversationService.send({
           protocol: ConversationProtocol.PROTEUS,
           conversationId: {id: 'conv1', domain: ''},
