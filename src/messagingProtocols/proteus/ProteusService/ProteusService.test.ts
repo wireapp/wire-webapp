@@ -87,7 +87,7 @@ describe('sendGenericMessage', () => {
       };
 
       try {
-        await proteusService.sendProteusMessage(params);
+        await proteusService.sendMessage(params);
       } catch (error) {
         errorMessage = error.message;
       } finally {
@@ -102,7 +102,7 @@ describe('sendGenericMessage', () => {
         MockedRecipients.getRecipientsForConversation.mockResolvedValue({} as any);
 
         jest.spyOn(proteusService['messageService'], 'sendMessage').mockReturnValue(Promise.resolve({} as any));
-        await proteusService.sendProteusMessage({
+        await proteusService.sendMessage({
           protocol: ConversationProtocol.PROTEUS,
           payload: message,
           targetMode: MessageTargetMode.USERS,
@@ -131,7 +131,7 @@ describe('sendGenericMessage', () => {
         const proteusService = buildProteusService(true);
         MockedRecipients.getQualifiedRecipientsForConversation.mockResolvedValue({} as any);
         jest.spyOn(proteusService['messageService'], 'sendFederatedMessage').mockResolvedValue({} as any);
-        await proteusService.sendProteusMessage({
+        await proteusService.sendMessage({
           protocol: ConversationProtocol.PROTEUS,
           conversationId: {id: 'conv1', domain: 'domain1'},
           payload: message,
@@ -159,7 +159,7 @@ describe('sendGenericMessage', () => {
         const proteusService = buildProteusService(false);
         MockedRecipients.getRecipientsForConversation.mockReturnValue(Promise.resolve({} as any));
         jest.spyOn(proteusService['messageService'], 'sendMessage').mockReturnValue(Promise.resolve({} as any));
-        await proteusService.sendProteusMessage({
+        await proteusService.sendMessage({
           conversationId: {id: 'conv1', domain: ''},
           protocol: ConversationProtocol.PROTEUS,
           payload: message,
@@ -191,7 +191,7 @@ describe('sendGenericMessage', () => {
         jest
           .spyOn(proteusService['messageService'], 'sendFederatedMessage')
           .mockReturnValue(Promise.resolve({} as any));
-        await proteusService.sendProteusMessage({
+        await proteusService.sendMessage({
           protocol: ConversationProtocol.PROTEUS,
           conversationId: {id: 'conv1', domain: 'domain1'},
           payload: message,

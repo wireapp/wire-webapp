@@ -21,7 +21,7 @@
 import * as GenericMessageParams from './Utility/getGenericMessageParams';
 
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client';
-import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
+import {Conversation, ConversationProtocol, NewConversation} from '@wireapp/api-client/lib/conversation';
 
 import {APIClient} from '@wireapp/api-client';
 import {MemoryEngine} from '@wireapp/store-engine';
@@ -55,6 +55,9 @@ const buildProteusService = (federated: boolean = false) => {
       },
     }),
   );
+  jest
+    .spyOn(apiClient.api.conversation, 'postConversation')
+    .mockImplementation(data => Promise.resolve(data as Conversation));
 
   apiClient.context = {
     clientType: ClientType.NONE,
@@ -81,13 +84,39 @@ describe('sendGenericMessage', () => {
         .mockReturnValue(Promise.resolve({time: '', errored: true} as any));
 
       const message = buildTextMessage({text: 'test'});
-      const payloadBundle = await proteusService.sendProteusMessage({
+      const payloadBundle = await proteusService.sendMessage({
         payload: message,
         conversationId: {id: 'conv1', domain: ''},
         protocol: ConversationProtocol.PROTEUS,
       });
 
       expect(payloadBundle.state).toBe(PayloadBundleState.CANCELLED);
+    });
+  });
+});
+
+describe('createConversation', () => {
+  describe('calls the api with valid conversation data', () => {
+    const createConversationResult = {
+      name: 'test',
+      receipt_mode: null,
+      users: ['user1', 'user2'],
+    };
+    it('when a new conversation object is given', async () => {
+      const proteusService = buildProteusService();
+      const conversationData = createConversationResult as unknown as NewConversation;
+      const returnData = await proteusService.createConversation({conversationData});
+
+      expect(returnData).toStrictEqual(createConversationResult);
+    });
+
+    it('when a conversation string and userIds are given', async () => {
+      const proteusService = buildProteusService();
+      const otherUserIds = ['user1', 'user2'];
+      const conversationData = 'test';
+      const returnData = await proteusService.createConversation({conversationData, otherUserIds});
+
+      expect(returnData).toStrictEqual(createConversationResult);
     });
   });
 });

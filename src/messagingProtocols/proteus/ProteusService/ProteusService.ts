@@ -18,10 +18,20 @@
  */
 
 import {APIClient} from '@wireapp/api-client/lib/APIClient';
-import {ClientMismatch, MessageSendingStatus} from '@wireapp/api-client/lib/conversation';
+import {
+  ClientMismatch,
+  Conversation,
+  MessageSendingStatus,
+  NewConversation,
+} from '@wireapp/api-client/lib/conversation';
 import logdown from 'logdown';
 
-import {ProteusServiceConfig, SendProteusMessageParams} from './ProteusService.types';
+import {
+  AddUsersToProteusConversationParams,
+  CreateProteusConversationParams,
+  ProteusServiceConfig,
+  SendProteusMessageParams,
+} from './ProteusService.types';
 import {getGenericMessageParams} from './Utility/getGenericMessageParams';
 
 import {PayloadBundleState, SendResult} from '../../../conversation';
@@ -48,7 +58,34 @@ export class ProteusService {
     return !hasMissing && !hasDeleted && !hasRedundant && !hasFailed;
   }
 
-  public async sendProteusMessage({
+  public async createConversation({
+    conversationData,
+    otherUserIds,
+  }: CreateProteusConversationParams): Promise<Conversation> {
+    const isNewConversation = (conversationData: any): conversationData is NewConversation =>
+      conversationData && conversationData?.name && conversationData?.users;
+    let payload: NewConversation;
+
+    if (isNewConversation(conversationData)) {
+      payload = {...conversationData};
+    } else {
+      const users: string[] = otherUserIds ? (Array.isArray(otherUserIds) ? otherUserIds : [otherUserIds]) : [];
+      const payloadName = conversationData && typeof conversationData === 'string' ? conversationData : undefined;
+      payload = {
+        name: payloadName,
+        receipt_mode: null,
+        users,
+      };
+    }
+
+    return this.apiClient.api.conversation.postConversation(payload);
+  }
+
+  public async addUsersToConversation({conversationId, qualifiedUserIds}: AddUsersToProteusConversationParams) {
+    return this.apiClient.api.conversation.postMembers(conversationId, qualifiedUserIds);
+  }
+
+  public async sendMessage({
     userIds,
     sendAsProtobuf,
     conversationId,

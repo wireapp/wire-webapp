@@ -45,7 +45,10 @@ import {CryptographyService} from '../../cryptography/';
 import {decryptAsset} from '../../cryptography/AssetCryptography';
 import {MLSService, optionalToUint8Array} from '../../messagingProtocols/mls';
 import {getConversationQualifiedMembers, ProteusService} from '../../messagingProtocols/proteus';
-import {SendProteusMessageParams} from '../../messagingProtocols/proteus/ProteusService/ProteusService.types';
+import {
+  AddUsersToProteusConversationParams,
+  SendProteusMessageParams,
+} from '../../messagingProtocols/proteus/ProteusService/ProteusService.types';
 import {mapQualifiedUserClientIdsToFullyQualifiedClientIds} from '../../util/fullyQualifiedClientIdUtils';
 import {RemoteData} from '../content';
 import {sendMessage} from '../message/messageSender';
@@ -131,14 +134,6 @@ export class ConversationService {
 
   /**
    * Create a group conversation.
-   * @param  {string} name
-   * @param  {string|string[]} otherUserIds
-   * @deprecated
-   * @returns Promise
-   */
-  public createProteusConversation(name: string, otherUserIds: string | string[]): Promise<Conversation>;
-  /**
-   * Create a group conversation.
    *
    * @note Do not include yourself as the requestor
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/createGroupConversation
@@ -146,25 +141,12 @@ export class ConversationService {
    * @param conversationData Payload object for group creation
    * @returns Resolves when the conversation was created
    */
-  public createProteusConversation(conversationData: NewConversation): Promise<Conversation>;
-  public createProteusConversation(
+  public async createProteusConversation(conversationData: NewConversation): Promise<Conversation>;
+  public async createProteusConversation(
     conversationData: NewConversation | string,
     otherUserIds?: string | string[],
   ): Promise<Conversation> {
-    let payload: NewConversation;
-    if (typeof conversationData === 'string') {
-      const ids = typeof otherUserIds === 'string' ? [otherUserIds] : otherUserIds;
-
-      payload = {
-        name: conversationData,
-        receipt_mode: null,
-        users: ids ?? [],
-      };
-    } else {
-      payload = conversationData;
-    }
-
-    return this.apiClient.api.conversation.postConversation(payload);
+    return this.proteusService.createConversation({conversationData, otherUserIds});
   }
 
   public async getConversations(conversationId: string): Promise<Conversation>;
@@ -195,8 +177,8 @@ export class ConversationService {
     return (await request.response).buffer;
   }
 
-  public async addUsersToProteusConversation({conversationId, qualifiedUserIds}: Omit<AddUsersParams, 'groupId'>) {
-    return this.apiClient.api.conversation.postMembers(conversationId, qualifiedUserIds);
+  public async addUsersToProteusConversation(params: AddUsersToProteusConversationParams) {
+    return this.proteusService.addUsersToConversation(params);
   }
 
   public async removeUserFromConversation(
@@ -214,9 +196,7 @@ export class ConversationService {
     function isMLS(params: SendProteusMessageParams | SendMlsMessageParams): params is SendMlsMessageParams {
       return params.protocol === ConversationProtocol.MLS;
     }
-    return sendMessage(() =>
-      isMLS(params) ? this.sendMLSMessage(params) : this.proteusService.sendProteusMessage(params),
-    );
+    return sendMessage(() => (isMLS(params) ? this.sendMLSMessage(params) : this.proteusService.sendMessage(params)));
   }
 
   public sendTypingStart(conversationId: string): Promise<void> {
