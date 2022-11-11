@@ -31,6 +31,7 @@ type TypingIndicatorState = {
   addTypingUser: (user: TypingUser) => void;
   removeTypingUser: (user: TypingUser) => void;
   getTypingUsersInConversation: (conversationId: string) => User[];
+  clearTypingUsers: () => void;
 };
 
 const useTypingIndicatorState = create<TypingIndicatorState>((set, get) => ({
@@ -44,23 +45,19 @@ const useTypingIndicatorState = create<TypingIndicatorState>((set, get) => ({
       ) {
         return state;
       }
-      return {...state, typingUsers: [...state.typingUsers, {conversationId, user}]};
+      return {typingUsers: [...state.typingUsers, {conversationId, user}]};
     }),
   removeTypingUser: ({conversationId, user: {id}}) =>
-    set(state => {
-      return {
-        ...state,
-        typingUsers: [
-          ...state.typingUsers.filter(
-            typingUser => typingUser.conversationId !== conversationId && typingUser.user.id !== id,
-          ),
-        ],
-      };
-    }),
+    set(state => ({
+      typingUsers: state.typingUsers.filter(
+        typingUser => !(typingUser.conversationId === conversationId && typingUser.user.id === id),
+      ),
+    })),
   getTypingUsersInConversation: conversationId =>
     get()
       .typingUsers.filter(typingUser => typingUser.conversationId === conversationId)
       .map(typingUser => typingUser.user),
+  clearTypingUsers: () => set({typingUsers: []}),
 }));
 
 export {useTypingIndicatorState};

@@ -26,6 +26,13 @@ import {useTypingIndicatorState} from './TypingIndicator.state';
 import {User} from '../../../entity/User';
 
 describe('TypingIndicator', () => {
+  afterEach(() => {
+    act(() => {
+      const {clearTypingUsers} = useTypingIndicatorState.getState();
+      clearTypingUsers();
+    });
+  });
+
   it('does not render anything if there are no actively typing users', async () => {
     const props: TypingIndicatorProps = {
       conversationId: 'test-conversation-id',
@@ -70,5 +77,31 @@ describe('TypingIndicator', () => {
     });
 
     expect(container.querySelectorAll('[data-uie-name="element-avatar-user"]').length).toBe(3);
+  });
+
+  it('does render less users when a user stops typing', async () => {
+    const props: TypingIndicatorProps = {
+      conversationId: 'test-conversation-id',
+    };
+
+    const {container} = render(<TypingIndicator {...props} />);
+
+    expect(container.innerHTML).toEqual('');
+
+    const {addTypingUser, removeTypingUser} = useTypingIndicatorState.getState();
+
+    act(() => {
+      addTypingUser({conversationId: 'test-conversation-id', user: new User('test-id-1')});
+      addTypingUser({conversationId: 'test-conversation-id', user: new User('test-id-2')});
+      addTypingUser({conversationId: 'test-conversation-id', user: new User('test-id-3')});
+    });
+
+    expect(container.querySelectorAll('[data-uie-name="element-avatar-user"]').length).toBe(3);
+
+    act(() => {
+      removeTypingUser({conversationId: 'test-conversation-id', user: new User('test-id-3')});
+    });
+
+    expect(container.querySelectorAll('[data-uie-name="element-avatar-user"]').length).toBe(2);
   });
 });
