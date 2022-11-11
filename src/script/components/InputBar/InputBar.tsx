@@ -553,7 +553,7 @@ const InputBar = ({
     }
   };
 
-  const sendStopStyping = () => {
+  const sendStopTyping = () => {
     if (isTypingTimerIdRef.current) {
       conversationRepository.sendTypingStop(conversationEntity);
       clearTimeout(isTypingTimerIdRef.current);
@@ -562,7 +562,7 @@ const InputBar = ({
   };
 
   const onSend = (text: string): void | boolean => {
-    sendStopStyping();
+    sendStopTyping();
 
     if (pastedFile) {
       return sendPastedFile();
@@ -923,7 +923,7 @@ const InputBar = ({
                     onInput={updateMentions}
                     onChange={onChange}
                     onPaste={onPasteFiles}
-                    onBlur={sendStopStyping}
+                    onBlur={sendStopTyping}
                     value={inputValue}
                     placeholder={inputPlaceholder}
                     aria-label={inputPlaceholder}
