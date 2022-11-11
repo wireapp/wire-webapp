@@ -18,6 +18,7 @@
  */
 
 import {render} from '@testing-library/react';
+import {act} from 'react-dom/test-utils';
 
 import {TypingIndicator, TypingIndicatorProps} from './TypingIndicator';
 import {useTypingIndicatorState} from './TypingIndicator.state';
@@ -45,8 +46,28 @@ describe('TypingIndicator', () => {
     addTypingUser({conversationId: 'test-conversation-id', user: new User('test-id-1')});
     addTypingUser({conversationId: 'test-conversation-id', user: new User('test-id-2')});
     addTypingUser({conversationId: 'test-conversation-id', user: new User('test-id-3')});
-    console.info(useTypingIndicatorState.getState());
+
     const {container} = render(<TypingIndicator {...props} />);
+
+    expect(container.querySelectorAll('[data-uie-name="element-avatar-user"]').length).toBe(3);
+  });
+
+  it('does render new users when there start typing', async () => {
+    const props: TypingIndicatorProps = {
+      conversationId: 'test-conversation-id',
+    };
+
+    const {container} = render(<TypingIndicator {...props} />);
+
+    expect(container.innerHTML).toEqual('');
+
+    const {addTypingUser} = useTypingIndicatorState.getState();
+
+    act(() => {
+      addTypingUser({conversationId: 'test-conversation-id', user: new User('test-id-1')});
+      addTypingUser({conversationId: 'test-conversation-id', user: new User('test-id-2')});
+      addTypingUser({conversationId: 'test-conversation-id', user: new User('test-id-3')});
+    });
 
     expect(container.querySelectorAll('[data-uie-name="element-avatar-user"]').length).toBe(3);
   });
