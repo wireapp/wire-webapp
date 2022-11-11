@@ -2857,7 +2857,7 @@ export class ConversationRepository {
 
     if (!qualifiedUser) {
       this.logger.warn(`No sender user found for event of type ${eventJson.type}`);
-      return;
+      return {conversationEntity};
     }
 
     const conversationId = conversationEntity.id;
