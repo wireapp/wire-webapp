@@ -50,11 +50,9 @@ const useTypingIndicatorState = create<TypingIndicatorState>((set, get) => ({
     set(state => {
       return {
         ...state,
-        typingUsers: [
-          ...state.typingUsers.filter(
+        typingUsers: state.typingUsers.filter(
             typingUser => typingUser.conversationId !== conversationId && typingUser.user.id !== id,
           ),
-        ],
       };
     }),
   getTypingUsersInConversation: conversationId =>
