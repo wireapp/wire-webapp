@@ -67,6 +67,7 @@ import {formatBytes, getSelectionPosition} from 'Util/util';
 import {getRichTextInput} from './getRichTextInput';
 import {PastedFileControls} from './PastedFileControls';
 import {ReplyBar} from './ReplyBar';
+import {TypingIndicator} from './TypingIndicator/TypingIndicator';
 
 import {AssetRepository} from '../../assets/AssetRepository';
 import {Config} from '../../Config';
@@ -90,6 +91,7 @@ import {UserState} from '../../user/UserState';
 const CONFIG = {
   ...Config.getConfig(),
   PING_TIMEOUT: TIME_IN_MILLIS.SECOND * 2,
+  IS_TYPING_TIMEOUT: TIME_IN_MILLIS.SECOND * 10,
 };
 
 const showWarningModal = (title: string, message: string): void => {
@@ -159,6 +161,7 @@ const InputBar = ({
     'isIncomingRequest',
   ]);
 
+  const isTypingTimerIdRef = useRef<NodeJS.Timeout | null>(null);
   const shadowInputRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -387,6 +390,21 @@ const InputBar = ({
     }
   }, [editMessageEntity]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  useEffect(() => {
+    if (inputValue.trim() === '') {
+      return;
+    }
+    if (isTypingTimerIdRef.current) {
+      clearTimeout(isTypingTimerIdRef.current);
+    } else {
+      conversationRepository.sendTypingStart(conversationEntity);
+    }
+    isTypingTimerIdRef.current = setTimeout(() => {
+      conversationRepository.sendTypingStop(conversationEntity);
+      isTypingTimerIdRef.current = null;
+    }, CONFIG.IS_TYPING_TIMEOUT);
+  }, [conversationEntity, conversationRepository, inputValue]); // we want to send is typing based on changes to the current input value
+
   const replyMessage = (messageEntity: ContentMessage): void => {
     if (messageEntity?.isReplyable() && messageEntity !== replyMessageEntity) {
       cancelMessageReply();
@@ -535,7 +553,17 @@ const InputBar = ({
     }
   };
 
+  const sendStopTyping = () => {
+    if (isTypingTimerIdRef.current) {
+      conversationRepository.sendTypingStop(conversationEntity);
+      clearTimeout(isTypingTimerIdRef.current);
+      isTypingTimerIdRef.current = null;
+    }
+  };
+
   const onSend = (text: string): void | boolean => {
+    sendStopTyping();
+
     if (pastedFile) {
       return sendPastedFile();
     }
@@ -861,6 +889,8 @@ const InputBar = ({
       id="conversation-input-bar"
       className={cx('conversation-input-bar', {'is-right-panel-open': isRightSidebarOpen})}
     >
+      <TypingIndicator conversationId={conversationEntity.id} />
+
       {classifiedDomains && !isConnectionRequest && (
         <ClassifiedBar users={participatingUserEts} classifiedDomains={classifiedDomains} />
       )}
@@ -893,6 +923,7 @@ const InputBar = ({
                     onInput={updateMentions}
                     onChange={onChange}
                     onPaste={onPasteFiles}
+                    onBlur={sendStopTyping}
                     value={inputValue}
                     placeholder={inputPlaceholder}
                     aria-label={inputPlaceholder}

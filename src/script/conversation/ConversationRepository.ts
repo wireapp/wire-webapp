@@ -25,6 +25,7 @@ import {
   NewConversation,
 } from '@wireapp/api-client/lib/conversation/';
 import {ConversationReceiptModeUpdateData} from '@wireapp/api-client/lib/conversation/data/';
+import {CONVERSATION_TYPING} from '@wireapp/api-client/lib/conversation/data/ConversationTypingData';
 import {
   ConversationCreateEvent,
   ConversationEvent,
@@ -34,6 +35,7 @@ import {
   ConversationMessageTimerUpdateEvent,
   ConversationReceiptModeUpdateEvent,
   ConversationRenameEvent,
+  ConversationTypingEvent,
   CONVERSATION_EVENT,
 } from '@wireapp/api-client/lib/event';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
@@ -47,6 +49,7 @@ import {flatten} from 'underscore';
 import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {useTypingIndicatorState} from 'Components/InputBar/TypingIndicator';
 import {getNextItem} from 'Util/ArrayUtil';
 import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/FileTypeUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
@@ -1707,6 +1710,14 @@ export class ConversationRepository {
     this.logger.info(`Conversation '${conversationEntity.id}' unarchived by trigger '${trigger}'`);
   }
 
+  public async sendTypingStart(conversationEntity: Conversation) {
+    this.core.service!.conversation.sendTypingStart(conversationEntity.id);
+  }
+
+  public async sendTypingStop(conversationEntity: Conversation) {
+    this.core.service!.conversation.sendTypingStop(conversationEntity.id);
+  }
+
   private async toggleArchiveConversation(
     conversationEntity: Conversation,
     newState: boolean,
@@ -2155,6 +2166,9 @@ export class ConversationRepository {
 
       case CONVERSATION_EVENT.MEMBER_UPDATE:
         return this.onMemberUpdate(conversationEntity, eventJson);
+
+      case CONVERSATION_EVENT.TYPING:
+        return this.onTyping(conversationEntity, eventJson);
 
       case CONVERSATION_EVENT.RENAME:
         return this.onRename(conversationEntity, eventJson, eventSource === EventRepository.SOURCE.WEB_SOCKET);
@@ -2800,6 +2814,39 @@ export class ConversationRepository {
     const {messageEntity} = await this.addEventToConversation(conversationEntity, eventJson);
     ConversationMapper.updateProperties(conversationEntity, eventJson.data);
     return {conversationEntity, messageEntity};
+  }
+
+  /**
+   * A user started or stopped typing in a conversation.
+   *
+   * @param conversationEntity Conversation entity that will the user will be added to its active typing users
+   * @param eventJson JSON data of 'conversation.typing' event
+   * @returns Resolves when the event was handled
+   */
+  private async onTyping(conversationEntity: Conversation, eventJson: ConversationTypingEvent) {
+    const qualifiedUserId = eventJson.qualified_from || {domain: '', id: eventJson.from};
+    const qualifiedUser = conversationEntity
+      .participating_user_ets()
+      .find(user => matchQualifiedIds(user, qualifiedUserId));
+
+    if (!qualifiedUser) {
+      this.logger.warn(`No sender user found for event of type ${eventJson.type}`);
+      return {conversationEntity};
+    }
+
+    const conversationId = conversationEntity.id;
+    const {addTypingUser, removeTypingUser} = useTypingIndicatorState.getState();
+    const typingUser = {conversationId, user: qualifiedUser};
+
+    if (eventJson.data.status === CONVERSATION_TYPING.STARTED) {
+      addTypingUser(typingUser);
+    }
+
+    if (eventJson.data.status === CONVERSATION_TYPING.STOPPED) {
+      removeTypingUser(typingUser);
+    }
+
+    return {conversationEntity};
   }
 
   /**
