@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [37.0.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@36.6.0...@wireapp/core@37.0.0) (2022-11-11)
+
+### Features
+
+* extract mthods from ConversationService into ProteusService ([#4610](https://github.com/wireapp/wire-web-packages/issues/4610)) ([e0e7f1e](https://github.com/wireapp/wire-web-packages/commit/e0e7f1e54ceb1a7d5f849566d3f63c3cc4db2128))
+
+### BREAKING CHANGES
+
+* Removed deprecated overwrite of createProteusConversation
+
 # [36.6.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@36.5.0...@wireapp/core@36.6.0) (2022-11-10)
 
 ### Features
