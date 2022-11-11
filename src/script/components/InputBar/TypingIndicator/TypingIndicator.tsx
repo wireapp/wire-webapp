@@ -47,7 +47,7 @@ const TypingIndicator: FC<TypingIndicatorProps> = ({conversationId}) => {
 
   return (
     <div css={wrapperStyles}>
-      <div css={{display: 'flex', marginRight: '18px'}}>
+      <div css={{display: 'flex', marginRight: '15px'}}>
         {users.slice(0, 3).map((user, index) => (
           <Avatar
             key={user.id}
