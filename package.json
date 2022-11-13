@@ -70,7 +70,7 @@
     "@types/jest": "29.2.2",
     "@types/jquery": "^3",
     "@types/js-cookie": "3.0.2",
-    "@types/jsdom": "20.0.0",
+    "@types/jsdom": "20.0.1",
     "@types/keyboardjs": "2.5.0",
     "@types/libsodium-wrappers-sumo": "0.7.5",
     "@types/linkify-it": "3.0.2",
