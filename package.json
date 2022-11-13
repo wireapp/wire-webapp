@@ -156,7 +156,7 @@
     "redux-devtools-extension": "2.13.9",
     "redux-mock-store": "1.5.4",
     "simple-git": "3.14.1",
-    "sinon": "14.0.1",
+    "sinon": "14.0.2",
     "snabbdom": "3.5.1",
     "style-loader": "^3.3.1",
     "stylelint": "14.14.1",
