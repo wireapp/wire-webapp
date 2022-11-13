@@ -3309,7 +3309,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/jsdom@npm:20.0.0, @types/jsdom@npm:^20.0.0":
+"@types/jsdom@npm:20.0.1":
+  version: 20.0.1
+  resolution: "@types/jsdom@npm:20.0.1"
+  dependencies:
+    "@types/node": "*"
+    "@types/tough-cookie": "*"
+    parse5: ^7.0.0
+  checksum: d55402c5256ef451f93a6e3d3881f98339fe73a5ac2030588df056d6835df8367b5a857b48d27528289057e26dcdd3f502edc00cb877c79174cb3a4c7f2198c1
+  languageName: node
+  linkType: hard
+
+"@types/jsdom@npm:^20.0.0":
   version: 20.0.0
   resolution: "@types/jsdom@npm:20.0.0"
   dependencies:
@@ -16069,7 +16080,7 @@ __metadata:
     "@types/jest": 29.2.2
     "@types/jquery": ^3
     "@types/js-cookie": 3.0.2
-    "@types/jsdom": 20.0.0
+    "@types/jsdom": 20.0.1
     "@types/keyboardjs": 2.5.0
     "@types/libsodium-wrappers-sumo": 0.7.5
     "@types/linkify-it": 3.0.2
