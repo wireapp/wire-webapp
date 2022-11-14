@@ -35,6 +35,7 @@ import {TextInput} from 'Components/TextInput';
 import {BaseToggle} from 'Components/toggle/BaseToggle';
 import {InfoToggle} from 'Components/toggle/InfoToggle';
 import {UserSearchableList} from 'Components/UserSearchableList';
+import {ListState, useAppState} from 'src/script/page/useAppState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleEnterDown, offEscKey, onEscKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -216,7 +217,12 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
           },
         );
         setIsShown(false);
-        amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
+        if (conversationEntity) {
+          amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
+        } else {
+          // If an error occured, we go back the the conversations list
+          useAppState.getState().setListState(ListState.CONVERSATIONS);
+        }
       } catch (error) {
         setIsCreatingConversation(false);
         logger.error(error);
