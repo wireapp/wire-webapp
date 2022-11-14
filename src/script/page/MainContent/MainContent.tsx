@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, ReactNode, useContext, useState} from 'react';
+import {FC, ReactNode, useContext, useEffect, useState} from 'react';
 
 import cx from 'classnames';
 import {CSSTransition, SwitchTransition} from 'react-transition-group';
@@ -69,6 +69,14 @@ const MainContent: FC<MainContentProps> = ({
   const mainViewModel = useContext(RootContext);
 
   const {contentState} = useAppState();
+
+  useEffect(() => {
+    const stateWithConversation = [ContentState.WATERMARK, ContentState.COLLECTION, ContentState.CONVERSATION];
+    if (!stateWithConversation.includes(contentState) && conversationState.activeConversation()) {
+      // Reset active conversation for all states that do not require a loaded conversation
+      conversationState.activeConversation(undefined);
+    }
+  }, [contentState, conversationState]);
 
   if (!mainViewModel) {
     return null;

@@ -105,11 +105,6 @@ export const Conversation: FC<ConversationProps> = ({
   const smBreakpoint = useMatchMedia('max-width: 640px');
 
   useEffect(() => {
-    // Reset active conversation state when component is unmounted
-    return () => conversationState.activeConversation(undefined);
-  }, [conversationState]);
-
-  useEffect(() => {
     if (readMessagesBuffer.length) {
       const groupedMessagesTest = groupBy(
         readMessagesBuffer,
