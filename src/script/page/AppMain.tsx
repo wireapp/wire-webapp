@@ -45,11 +45,6 @@ import {useWindowTitle} from './useWindowTitle';
 import {ConversationState} from '../conversation/ConversationState';
 import {User} from '../entity/User';
 import {App} from '../main/app';
-import {
-  ClientNotificationData,
-  Notification,
-  PreferenceNotificationRepository,
-} from '../notification/PreferenceNotificationRepository';
 import {generateConversationUrl} from '../router/routeGenerator';
 import {configureRoutes, navigate} from '../router/Router';
 import {TeamState} from '../team/TeamState';
@@ -177,45 +172,6 @@ const AppMain: FC<AppMainProps> = ({
     });
   };
 
-  const popNotification = () => {
-    const showNotification = (type: string, aggregatedNotifications: Notification[]) => {
-      switch (type) {
-        case PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT: {
-          PrimaryModal.show(
-            PrimaryModal.type.ACCOUNT_NEW_DEVICES,
-            {
-              data: aggregatedNotifications.map(notification => notification.data) as ClientNotificationData[],
-              preventClose: true,
-              secondaryAction: {
-                action: () => {
-                  amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentState.PREFERENCES_DEVICES);
-                },
-              },
-            },
-            undefined,
-          );
-          break;
-        }
-
-        case PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.READ_RECEIPTS_CHANGED: {
-          PrimaryModal.show(
-            PrimaryModal.type.ACCOUNT_READ_RECEIPTS_CHANGED,
-            {
-              data: aggregatedNotifications.pop()?.data as boolean,
-              preventClose: true,
-            },
-            undefined,
-          );
-          break;
-        }
-      }
-    };
-
-    repositories.preferenceNotification
-      .getNotifications()
-      .forEach(({type, notification}) => showNotification(type, notification));
-  };
-
   useEffect(() => {
     PrimaryModal.init();
     showInitialModal(userAvailability);
@@ -226,12 +182,6 @@ const AppMain: FC<AppMainProps> = ({
   useLayoutEffect(() => {
     initializeApp();
   }, []);
-
-  useEffect(() => {
-    if (contentState === ContentState.PREFERENCES_ACCOUNT) {
-      popNotification();
-    }
-  }, [contentState]);
 
   return (
     <StyledApp
