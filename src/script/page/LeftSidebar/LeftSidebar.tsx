@@ -92,6 +92,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({listViewModel, selfUser, isAct
               <Preferences
                 contentViewModel={listViewModel.contentViewModel}
                 teamRepository={repositories.team}
+                preferenceNotificationRepository={repositories.preferenceNotification}
                 onClose={goHome}
               />
             )}
