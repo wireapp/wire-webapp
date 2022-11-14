@@ -509,7 +509,8 @@ export class App {
       return selfUser;
     } catch (error) {
       if (error instanceof BaseError) {
-        return this._appInitFailure(error, isReload);
+        this._appInitFailure(error, isReload);
+        return undefined;
       }
       throw error;
     }
