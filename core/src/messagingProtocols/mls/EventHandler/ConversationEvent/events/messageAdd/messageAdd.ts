@@ -23,8 +23,9 @@ import logdown from 'logdown';
 
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
+import {EventHandlerResult} from '../../../../../common.types';
 import {optionalToUint8Array} from '../../../../MLSService/MLSService';
-import {EventHandlerParams, EventHandlerResult} from '../../../EventHandler.types';
+import {EventHandlerParams} from '../../../EventHandler.types';
 
 const isMLSMessageAddEvent = (event: BackendEvent): event is ConversationMLSMessageAddEvent =>
   event.type === CONVERSATION_EVENT.MLS_MESSAGE_ADD;

@@ -18,12 +18,7 @@
  */
 
 import {APIClient} from '@wireapp/api-client/lib/APIClient';
-import {
-  ClientMismatch,
-  Conversation,
-  MessageSendingStatus,
-  NewConversation,
-} from '@wireapp/api-client/lib/conversation';
+import {Conversation, NewConversation} from '@wireapp/api-client/lib/conversation';
 import logdown from 'logdown';
 
 import {
@@ -32,11 +27,14 @@ import {
   ProteusServiceConfig,
   SendProteusMessageParams,
 } from './ProteusService.types';
+import {isClearFromMismatch} from './Utility';
 import {getGenericMessageParams} from './Utility/getGenericMessageParams';
 
 import {PayloadBundleState, SendResult} from '../../../conversation';
 import {MessageService} from '../../../conversation/message/MessageService';
 import {CryptographyService} from '../../../cryptography';
+import {EventHandlerResult} from '../../common.types';
+import {EventHandlerParams, handleBackendEvent} from '../EventHandler';
 
 export class ProteusService {
   private readonly messageService: MessageService;
@@ -50,12 +48,8 @@ export class ProteusService {
     this.messageService = new MessageService(this.apiClient, this.cryptographyService);
   }
 
-  private isClearFromMismatch(mismatch: ClientMismatch | MessageSendingStatus): boolean {
-    const hasMissing = Object.keys(mismatch.missing || {}).length > 0;
-    const hasDeleted = Object.keys(mismatch.deleted || {}).length > 0;
-    const hasRedundant = Object.keys(mismatch.redundant || {}).length > 0;
-    const hasFailed = Object.keys((mismatch as MessageSendingStatus).failed_to_send || {}).length > 0;
-    return !hasMissing && !hasDeleted && !hasRedundant && !hasFailed;
+  public async handleEvent(params: Omit<EventHandlerParams, 'cryptographyService'>): EventHandlerResult {
+    return handleBackendEvent({...params, cryptographyService: this.cryptographyService});
   }
 
   public async createConversation({
@@ -122,7 +116,7 @@ export class ProteusService {
         });
 
     if (!response.errored) {
-      if (!this.isClearFromMismatch(response)) {
+      if (!isClearFromMismatch(response)) {
         // We warn the consumer that there is a mismatch that did not prevent message sending
         await onClientMismatch?.(response, true);
       }

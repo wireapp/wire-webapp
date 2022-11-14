@@ -17,16 +17,26 @@
  *
  */
 
-import {BackendEvent} from '@wireapp/api-client/lib/event';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 
-import {PayloadBundleSource} from '../../../conversation';
-import {MLSService} from '../MLSService/MLSService';
+import {BackendEvent} from '../../../EventHandler.types';
 
-export {BackendEvent, PayloadBundleSource};
+import {isOtrMessageAddEvent} from '.';
 
-export type EventHandlerParams = {
-  mlsService: MLSService;
-  event: BackendEvent;
-  source: PayloadBundleSource;
-  dryRun?: boolean;
-};
+describe('MLS messageAdd eventHandler', () => {
+  describe('isMessageAdd', () => {
+    it('returns true for a messageAdd event', () => {
+      const event = {
+        type: CONVERSATION_EVENT.OTR_MESSAGE_ADD,
+      } as BackendEvent;
+      expect(isOtrMessageAddEvent(event)).toBe(true);
+    });
+
+    it('returns false for a non-messageAdd event', () => {
+      const event = {
+        type: CONVERSATION_EVENT.MEMBER_JOIN,
+      } as BackendEvent;
+      expect(isOtrMessageAddEvent(event)).toBe(false);
+    });
+  });
+});

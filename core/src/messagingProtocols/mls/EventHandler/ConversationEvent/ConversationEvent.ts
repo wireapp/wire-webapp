@@ -21,7 +21,8 @@ import logdown from 'logdown';
 
 import {isWelcomeMessageEvent, handleWelcomeMessage, isMLSMessageAddEvent, handleMLSMessageAdd} from './events';
 
-import {EventHandlerParams, EventHandlerResult} from '..';
+import {EventHandlerParams} from '..';
+import {EventHandlerResult} from '../../../common.types';
 
 const logger = logdown('@wireapp/core/EventHandler/ConversationEvent');
 

@@ -17,16 +17,16 @@
  *
  */
 
-import {BackendEvent} from '@wireapp/api-client/lib/event';
+import {isOtrMessageAddEvent, handleOtrMessageAdd} from './events';
 
-import {PayloadBundleSource} from '../../../conversation';
-import {MLSService} from '../MLSService/MLSService';
+import {EventHandlerParams} from '..';
+import {EventHandlerResult} from '../../../common.types';
 
-export {BackendEvent, PayloadBundleSource};
-
-export type EventHandlerParams = {
-  mlsService: MLSService;
-  event: BackendEvent;
-  source: PayloadBundleSource;
-  dryRun?: boolean;
+const handleConversationEvent = async (params: EventHandlerParams): EventHandlerResult => {
+  const {event} = params;
+  if (isOtrMessageAddEvent(event)) {
+    return handleOtrMessageAdd({...params, event});
+  }
 };
+
+export {handleConversationEvent};
