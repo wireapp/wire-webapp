@@ -44,7 +44,7 @@ type PreferencesProps = {
   contentViewModel: ContentViewModel;
   onClose: () => void;
   teamRepository: Pick<TeamRepository, 'getTeam'>;
-  preferenceNotificationRepository: PreferenceNotificationRepository;
+  preferenceNotificationRepository: Pick<PreferenceNotificationRepository, 'getNotifications'>;
 };
 
 const showNotification = (type: string, aggregatedNotifications: Notification[]) => {

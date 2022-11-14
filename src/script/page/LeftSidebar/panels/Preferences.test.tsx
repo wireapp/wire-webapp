@@ -30,6 +30,7 @@ describe('Preferences', () => {
     contentViewModel: {} as ContentViewModel,
     onClose: jest.fn(),
     teamRepository: {getTeam: jest.fn()},
+    preferenceNotificationRepository: {getNotifications: jest.fn()},
   };
 
   it('renders the right preferences items', () => {
