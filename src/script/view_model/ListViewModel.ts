@@ -263,13 +263,13 @@ export class ListViewModel {
     this.switchList(ListState.START_UI);
   };
 
-  readonly switchList = (newListState: ListState, respectLastState = true): void => {
+  readonly switchList = (newListState: ListState, loadPreviousContent = true): void => {
     const {listState} = useAppState.getState();
     const isStateChange = listState !== newListState;
 
     if (isStateChange) {
       this.hideList();
-      this.updateList(newListState, respectLastState);
+      this.updateList(newListState, loadPreviousContent);
       this.showList(newListState);
     }
   };
@@ -292,14 +292,14 @@ export class ListViewModel {
     document.addEventListener('keydown', this.onKeyDownListView);
   };
 
-  private readonly updateList = (newListState: ListState, respectLastState: boolean): void => {
+  private readonly updateList = (newListState: ListState, loadPreviousContent: boolean): void => {
     switch (newListState) {
       case ListState.PREFERENCES:
-        amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentState.PREFERENCES_ACCOUNT);
+        this.contentViewModel.switchContent(ContentState.PREFERENCES_ACCOUNT);
         break;
-      default:
-        if (respectLastState) {
-          this.contentViewModel.switchPreviousContent();
+      case ListState.CONVERSATIONS:
+        if (loadPreviousContent) {
+          this.contentViewModel.loadPreviousContent();
         }
     }
   };

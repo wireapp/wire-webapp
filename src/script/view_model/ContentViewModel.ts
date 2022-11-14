@@ -254,7 +254,7 @@ export class ContentViewModel {
     }
   };
 
-  readonly switchPreviousContent = (): void => {
+  readonly loadPreviousContent = (): void => {
     const {contentState, previousContentState} = useAppState.getState();
     const isStateChange = previousContentState !== contentState;
 
