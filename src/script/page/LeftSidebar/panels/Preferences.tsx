@@ -116,7 +116,11 @@ const Preferences: React.FC<PreferencesProps> = ({contentViewModel, teamReposito
 
   return (
     <ListWrapper id="preferences" header={t('preferencesHeadline')} onClose={onClose}>
-      <ul role="tablist" aria-label="Prefrences tabs" className="left-list-items no-scroll preferences-list-items">
+      <ul
+        role="tablist"
+        aria-label={t('tooltipPreferencesTabs')}
+        className="left-list-items no-scroll preferences-list-items"
+      >
         {items
           .filter(item => !item.hidden)
           .map(item => (

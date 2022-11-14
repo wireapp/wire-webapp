@@ -1192,6 +1192,7 @@
   "tooltipConversationsPreferences": "Open preferences",
   "tooltipConversationsSilence": "Mute ({{shortcut}})",
   "tooltipConversationsStart": "Start conversation ({{shortcut}})",
+  "tooltipPreferencesTabs": "Prefrences tabs",
   "tooltipPreferencesContactsMacos": "Share all your contacts from the macOS Contacts app",
   "tooltipPreferencesPassword": "Open another website to reset your password",
   "tooltipPreferencesPicture": "Change your picture…",
