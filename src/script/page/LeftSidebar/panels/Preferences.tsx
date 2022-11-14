@@ -45,7 +45,7 @@ const PreferenceItem: React.FC<{
   uieName: string;
 }> = ({onSelect, isSelected, label, uieName, IconComponent}) => {
   return (
-    <li className="left-list-item">
+    <li role="tab" aria-selected={isSelected} aria-controls={label} tabIndex={-1} className="left-list-item">
       <button
         type="button"
         className={`left-list-item-button ${isSelected ? 'left-list-item-button--active' : ''}`}
@@ -116,7 +116,7 @@ const Preferences: React.FC<PreferencesProps> = ({contentViewModel, teamReposito
 
   return (
     <ListWrapper id="preferences" header={t('preferencesHeadline')} onClose={onClose}>
-      <ul className="left-list-items no-scroll preferences-list-items">
+      <ul role="tablist" aria-label="Prefrences tabs" className="left-list-items no-scroll preferences-list-items">
         {items
           .filter(item => !item.hidden)
           .map(item => (

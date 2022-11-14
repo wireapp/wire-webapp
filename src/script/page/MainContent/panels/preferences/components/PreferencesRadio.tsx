@@ -46,6 +46,7 @@ const PreferencesRadio = <T extends string | number>({
         {options.map(({value, label, detailLabel}) => (
           <Fragment key={value}>
             <input
+              tabIndex={0}
               type="radio"
               id={id + value}
               name={name}

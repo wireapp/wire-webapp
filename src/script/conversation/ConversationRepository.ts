@@ -2843,7 +2843,8 @@ export class ConversationRepository {
     }
 
     if (eventJson.data.status === CONVERSATION_TYPING.STOPPED) {
-      removeTypingUser(typingUser);
+      console.info(removeTypingUser);
+      // (typingUser);
     }
 
     return {conversationEntity};

@@ -41,7 +41,7 @@ const animationStyles: CSSObject = {
   animationDirection: 'normal',
   animationIterationCount: 'infinite',
   animationTimingFunction: 'linear',
-  animationDuration: '1.2s',
+  animationDuration: '1.4s',
 };
 
 const dotStyles: CSSObject = {
@@ -60,27 +60,31 @@ const editIconKeyFrams = keyframes({
   '0%': {
     transform: 'translateX(0px) rotate(0deg)',
   },
-  '25%': {transform: 'translateX(5px) rotate(-5deg)'},
-  '50%': {transform: 'translateX(10px) rotate(5deg)'},
-  '75%': {transform: 'translateX(15px) rotate(-5deg)'},
+  '9%': {transform: 'translateX(5px) rotate(-5deg)'},
+  '34%': {transform: 'translateX(10px) rotate(5deg)'},
+  '59%': {transform: 'translateX(15px) rotate(-5deg)'},
+  '84%': {transform: 'translateX(25px) rotate(5deg)'},
   '100%': {transform: 'translateX(25px) rotate(5deg)'},
 });
 
 const dot1KeyFrames = keyframes({
   '0%': {opacity: 0},
-  '20%': {opacity: 0},
+  '4%': {opacity: 0},
+  '84%': {opacity: 1},
   '100%': {opacity: 1},
 });
 
 const dot2KeyFrames = keyframes({
   '0%': {opacity: 0},
-  '45%': {opacity: 0},
+  '29%': {opacity: 0},
+  '84%': {opacity: 1},
   '100%': {opacity: 1},
 });
 
 const dot3KeyFrames = keyframes({
   '0%': {opacity: 0},
-  '70%': {opacity: 0},
+  '54%': {opacity: 0},
+  '84%': {opacity: 1},
   '100%': {opacity: 1},
 });
 

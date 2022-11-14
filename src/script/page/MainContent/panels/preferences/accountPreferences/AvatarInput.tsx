@@ -43,7 +43,7 @@ const FILE_TYPES = ['image/bmp', 'image/jpeg', 'image/jpg', 'image/png', '.jpg-l
 const logger = getLogger('AvatarInput');
 
 const AvatarInput: React.FC<AvatarInputProps> = ({selfUser, isActivatedAccount, userRepository}) => {
-  const inputRef = React.useRef(null);
+  const inputRef = React.useRef<HTMLInputElement>(null);
 
   if (!isActivatedAccount) {
     return <Avatar participant={selfUser} avatarSize={AVATAR_SIZE.X_LARGE} />;
@@ -92,7 +92,7 @@ const AvatarInput: React.FC<AvatarInputProps> = ({selfUser, isActivatedAccount, 
   };
 
   const inputClick = () => {
-    inputRef.current.click();
+    inputRef.current?.click();
   };
 
   return (
@@ -121,13 +121,14 @@ const AvatarInput: React.FC<AvatarInputProps> = ({selfUser, isActivatedAccount, 
           tabIndex={-1}
           onFileChange={files => {
             const newUserPicture = files.item(0);
-
-            setPicture(newUserPicture).catch(error => {
-              const isInvalidUpdate = error.type === UserError.TYPE.INVALID_UPDATE;
-              if (!isInvalidUpdate) {
-                throw error;
-              }
-            });
+            if (newUserPicture) {
+              setPicture(newUserPicture).catch(error => {
+                const isInvalidUpdate = error.type === UserError.TYPE.INVALID_UPDATE;
+                if (!isInvalidUpdate) {
+                  throw error;
+                }
+              });
+            }
           }}
         />
         <span className="icon-camera" />
