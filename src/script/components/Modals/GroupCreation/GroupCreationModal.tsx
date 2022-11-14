@@ -220,7 +220,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
         if (conversationEntity) {
           amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
         } else {
-          // If an error occured, we go back the the conversations list
+          // If an error occured, we go back to the conversations list
           useAppState.getState().setListState(ListState.CONVERSATIONS);
         }
       } catch (error) {
