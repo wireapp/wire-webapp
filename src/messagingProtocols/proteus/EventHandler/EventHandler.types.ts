@@ -20,13 +20,13 @@
 import {BackendEvent} from '@wireapp/api-client/lib/event';
 
 import {PayloadBundleSource} from '../../../conversation';
-import {MLSService} from '../MLSService/MLSService';
+import {CryptographyService} from '../../../cryptography';
 
 export {BackendEvent, PayloadBundleSource};
 
 export type EventHandlerParams = {
-  mlsService: MLSService;
+  dryRun?: boolean;
   event: BackendEvent;
   source: PayloadBundleSource;
-  dryRun?: boolean;
+  cryptographyService: CryptographyService;
 };

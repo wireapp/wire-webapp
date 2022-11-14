@@ -439,12 +439,7 @@ export class Account<T = any> extends EventEmitter {
     const connectionService = new ConnectionService(this.apiClient);
     const giphyService = new GiphyService(this.apiClient);
     const linkPreviewService = new LinkPreviewService(assetService);
-    const notificationService = new NotificationService(
-      this.apiClient,
-      cryptographyService,
-      mlsService,
-      this.storeEngine,
-    );
+    const notificationService = new NotificationService(this.apiClient, mlsService, proteusService, this.storeEngine);
     const conversationService = new ConversationService(
       this.apiClient,
       cryptographyService,

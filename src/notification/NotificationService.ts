@@ -20,6 +20,7 @@
 import * as Events from '@wireapp/api-client/lib/event';
 import {Notification} from '@wireapp/api-client/lib/notification/';
 import {AbortHandler} from '@wireapp/api-client/lib/tcp';
+import {DecryptionError} from '@wireapp/cryptobox/src/error';
 import logdown from 'logdown';
 
 import {EventEmitter} from 'events';
@@ -35,15 +36,15 @@ import {PayloadBundle, PayloadBundleSource, PayloadBundleType} from '../conversa
 import {AssetContent} from '../conversation/content';
 import {ConversationMapper} from '../conversation/ConversationMapper';
 import {CoreError, NotificationError} from '../CoreError';
-import {CryptographyService, DecryptionError} from '../cryptography';
 import {MLSService} from '../messagingProtocols/mls';
+import {ProteusService} from '../messagingProtocols/proteus';
 import {UserMapper} from '../user/UserMapper';
 
 export type HandledEventPayload = {
   event: Events.BackendEvent;
   mappedEvent?: PayloadBundle;
   decryptedData?: GenericMessage;
-  decryptionError?: {code: number; message: string};
+  decryptionError?: DecryptionError;
 };
 
 enum TOPIC {
@@ -63,7 +64,6 @@ export interface NotificationService {
 export class NotificationService extends EventEmitter {
   private readonly apiClient: APIClient;
   private readonly backend: NotificationBackendRepository;
-  private readonly cryptographyService: CryptographyService;
   private readonly database: NotificationDatabaseRepository;
   private readonly logger = logdown('@wireapp/core/NotificationService', {
     logger: console,
@@ -73,13 +73,12 @@ export class NotificationService extends EventEmitter {
 
   constructor(
     apiClient: APIClient,
-    cryptographyService: CryptographyService,
     private readonly mlsService: MLSService,
+    private readonly proteusService: ProteusService,
     storeEngine: CRUDEngine,
   ) {
     super();
     this.apiClient = apiClient;
-    this.cryptographyService = cryptographyService;
     this.backend = new NotificationBackendRepository(this.apiClient);
     this.database = new NotificationDatabaseRepository(storeEngine);
   }
@@ -266,31 +265,22 @@ export class NotificationService extends EventEmitter {
     dryRun: boolean = false,
   ): Promise<HandledEventPayload | undefined> {
     // Handle MLS Events
-    const result = await this.mlsService.handleMLSEvent({event, source, dryRun});
-    if (result) {
-      return result;
+    const mlsResult = await this.mlsService.handleEvent({event, source, dryRun});
+    if (mlsResult) {
+      return mlsResult;
+    }
+
+    const proteusResult = await this.proteusService.handleEvent({
+      event,
+      source,
+      dryRun,
+    });
+    if (proteusResult) {
+      return proteusResult;
     }
 
     // Fallback to other events
     switch (event.type) {
-      // Encrypted Proteus events
-      case Events.CONVERSATION_EVENT.OTR_MESSAGE_ADD: {
-        if (dryRun) {
-          // In case of a dry run, we do not want to decrypt messages
-          // We just return the raw event to the caller
-          return {event};
-        }
-        try {
-          const decryptedData = await this.cryptographyService.decryptMessage(event);
-          return {
-            mappedEvent: this.cryptographyService.mapGenericMessage(event, decryptedData, source),
-            event,
-            decryptedData,
-          };
-        } catch (error) {
-          return {event, decryptionError: error as DecryptionError};
-        }
-      }
       // Meta events
       case Events.CONVERSATION_EVENT.MEMBER_JOIN:
         // As of today (07/07/2022) the backend sends `WELCOME` message to the user's own conversation (not the actual conversation that the welcome should be part of)

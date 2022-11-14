@@ -22,11 +22,11 @@ import {Notification} from '@wireapp/api-client/lib/notification';
 import {APIClient} from '@wireapp/api-client';
 import {MemoryEngine} from '@wireapp/store-engine';
 
-import {NotificationService} from './NotificationService';
-
 import {PayloadBundleSource} from '../conversation';
-import {CryptographyService} from '../cryptography';
-import {MLSService} from '../mls';
+import {MLSService} from '../messagingProtocols/mls';
+import {ProteusService} from '../messagingProtocols/proteus';
+
+import {NotificationService} from '.';
 
 const BASE_URL = 'mock-backend.wire.com';
 const MOCK_BACKEND = {
@@ -36,7 +36,7 @@ const MOCK_BACKEND = {
 };
 
 const mockedMLSService = {} as unknown as MLSService;
-const mockedCryptographyService = {} as unknown as CryptographyService;
+const mockedProteusService = {} as unknown as ProteusService;
 
 describe('NotificationService', () => {
   describe('handleEvent', () => {
@@ -48,8 +48,8 @@ describe('NotificationService', () => {
 
       const notificationService = new NotificationService(
         apiClient,
-        mockedCryptographyService,
         mockedMLSService,
+        mockedProteusService,
         storeEngine,
       );
 
@@ -86,8 +86,8 @@ describe('NotificationService', () => {
       const apiClient = new APIClient({urls: MOCK_BACKEND});
       const notificationService = new NotificationService(
         apiClient,
-        mockedCryptographyService,
         mockedMLSService,
+        mockedProteusService,
         storeEngine,
       );
 
@@ -119,8 +119,8 @@ describe('NotificationService', () => {
       const apiClient = new APIClient({urls: MOCK_BACKEND});
       const notificationService = new NotificationService(
         apiClient,
-        {} as unknown as CryptographyService,
         mockedMLSService,
+        mockedProteusService,
         storeEngine,
       );
 
@@ -151,8 +151,8 @@ describe('NotificationService', () => {
         const apiClient = new APIClient({urls: MOCK_BACKEND});
         const notificationService = new NotificationService(
           apiClient,
-          mockedCryptographyService,
           mockedMLSService,
+          mockedProteusService,
           storeEngine,
         );
         notificationService.on(NotificationService.TOPIC.NOTIFICATION_ERROR, notificationError => {

@@ -17,16 +17,6 @@
  *
  */
 
-import {BackendEvent} from '@wireapp/api-client/lib/event';
+import {HandledEventPayload} from '../notification';
 
-import {PayloadBundleSource} from '../../../conversation';
-import {MLSService} from '../MLSService/MLSService';
-
-export {BackendEvent, PayloadBundleSource};
-
-export type EventHandlerParams = {
-  mlsService: MLSService;
-  event: BackendEvent;
-  source: PayloadBundleSource;
-  dryRun?: boolean;
-};
+export type EventHandlerResult = Promise<HandledEventPayload | void>;

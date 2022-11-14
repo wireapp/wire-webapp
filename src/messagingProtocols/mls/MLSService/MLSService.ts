@@ -51,7 +51,8 @@ import {sendMessage} from '../../../conversation/message/messageSender';
 import {parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUtils';
 import {cancelRecurringTask, registerRecurringTask} from '../../../util/RecurringTaskScheduler';
 import {TaskScheduler} from '../../../util/TaskScheduler';
-import {EventHandlerParams, EventHandlerResult, handleBackendEvent} from '../EventHandler';
+import {EventHandlerResult} from '../../common.types';
+import {EventHandlerParams, handleBackendEvent} from '../EventHandler';
 import {CommitPendingProposalsParams, HandlePendingProposalsParams, MLSCallbacks} from '../types';
 
 //@todo: this function is temporary, we wait for the update from core-crypto side
@@ -383,7 +384,7 @@ export class MLSService {
     return this.coreCryptoClient.wipeConversation(conversationId);
   }
 
-  public async handleMLSEvent(params: Omit<EventHandlerParams, 'mlsService'>): EventHandlerResult {
+  public async handleEvent(params: Omit<EventHandlerParams, 'mlsService'>): EventHandlerResult {
     return handleBackendEvent({...params, mlsService: this});
   }
 
