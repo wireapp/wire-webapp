@@ -39,7 +39,7 @@ const PreferencesPage: FC<PreferencesPageProps> = ({title, children}) => {
 
   const root = useContext(RootContext);
 
-  const goHome = () => root?.content.switchPreviousContent();
+  const goHome = () => root?.content.loadPreviousContent();
 
   const containerRef = useCallback((element: HTMLDivElement | null) => {
     const nextElementToFocus = element?.querySelectorAll("[tabindex='0']")[0] as HTMLElement;
