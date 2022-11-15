@@ -52,8 +52,8 @@
   min-height: @conversation-input-line-height;
   max-height: @conversation-input-max-height;
   flex: 1 1;
-  margin-top: (@conversation-input-min-height - @conversation-input-line-height) / 2;
-  margin-bottom: (@conversation-input-min-height - @conversation-input-line-height) / 2;
+  margin-top: calc((@conversation-input-min-height - @conversation-input-line-height) / 2);
+  margin-bottom: calc((@conversation-input-min-height - @conversation-input-line-height) / 2);
   background-color: transparent;
   font-weight: inherit;
   line-height: @conversation-input-line-height;
@@ -136,6 +136,8 @@
 
 .controls-right-button {
   .button-icon-primary;
+
+  display: flex;
 
   @media (max-width: @screen-md-min) {
     width: 75px;

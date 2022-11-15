@@ -118,7 +118,7 @@ const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({
           </div>
         )
       ) : (
-        <span className={cx({disabled: isTimerDisabled})}>
+        <span className={cx({disabled: isTimerDisabled})} css={{display: 'flex'}}>
           <Icon.Timer data-uie-name="message-timer-icon" />
         </span>
       )}
