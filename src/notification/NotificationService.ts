@@ -20,7 +20,6 @@
 import * as Events from '@wireapp/api-client/lib/event';
 import {Notification} from '@wireapp/api-client/lib/notification/';
 import {AbortHandler} from '@wireapp/api-client/lib/tcp';
-import {DecryptionError} from '@wireapp/cryptobox/src/error';
 import logdown from 'logdown';
 
 import {EventEmitter} from 'events';
@@ -36,6 +35,7 @@ import {PayloadBundle, PayloadBundleSource, PayloadBundleType} from '../conversa
 import {AssetContent} from '../conversation/content';
 import {ConversationMapper} from '../conversation/ConversationMapper';
 import {CoreError, NotificationError} from '../CoreError';
+import {DecryptionError} from '../errors/DecryptionError';
 import {MLSService} from '../messagingProtocols/mls';
 import {ProteusService} from '../messagingProtocols/proteus';
 import {UserMapper} from '../user/UserMapper';

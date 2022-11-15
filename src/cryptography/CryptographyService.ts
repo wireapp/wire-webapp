@@ -33,18 +33,17 @@ import logdown from 'logdown';
 
 import {APIClient} from '@wireapp/api-client';
 import {Cryptobox, CryptoboxSession} from '@wireapp/cryptobox';
-import {errors as ProteusErrors, keys as ProteusKeys} from '@wireapp/proteus';
+import {keys as ProteusKeys} from '@wireapp/proteus';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 import {CRUDEngine} from '@wireapp/store-engine';
 
 import {CryptographyDatabaseRepository} from './CryptographyDatabaseRepository';
 import {GenericMessageMapper} from './GenericMessageMapper';
+import {generateDecryptionError} from './Utlility/generateDecryptionError';
 
 import {GenericMessageType, PayloadBundle, PayloadBundleSource} from '../conversation';
 import {SessionPayloadBundle} from '../cryptography/';
 import {isUserClients} from '../util';
-
-export type DecryptionError = {code: number; message: string};
 
 export type SessionId = {
   userId: string;
@@ -305,7 +304,7 @@ export class CryptographyService {
       const decryptedMessage = await this.decrypt(sessionId, cipherText);
       return GenericMessage.decode(decryptedMessage);
     } catch (error) {
-      throw this.generateDecryptionError(otrMessage, error as ProteusErrors.DecodeError);
+      throw generateDecryptionError(otrMessage, error, this.logger);
     }
   }
 
@@ -325,39 +324,5 @@ export class CryptographyService {
       return unwrappedMessage;
     }
     return GenericMessageMapper.mapGenericMessage(genericMessage, otrMessage, source);
-  }
-
-  private generateDecryptionError(
-    event: ConversationOtrMessageAddEvent,
-    error: ProteusErrors.DecryptError,
-  ): DecryptionError {
-    const errorCode = error.code ?? 999;
-    let message = 'Unknown decryption error';
-
-    const {data: eventData, from: remoteUserId, time: formattedTime} = event;
-    const remoteClientId = eventData.sender;
-
-    const isDuplicateMessage = error instanceof ProteusErrors.DecryptError.DuplicateMessage;
-    const isOutdatedMessage = error instanceof ProteusErrors.DecryptError.OutdatedMessage;
-    // We don't need to show these message errors to the user
-    if (isDuplicateMessage || isOutdatedMessage) {
-      message = `Message from user ID "${remoteUserId}" at "${formattedTime}" will not be handled because it is outdated or a duplicate.`;
-    }
-
-    const isInvalidMessage = error instanceof ProteusErrors.DecryptError.InvalidMessage;
-    const isInvalidSignature = error instanceof ProteusErrors.DecryptError.InvalidSignature;
-    const isRemoteIdentityChanged = error instanceof ProteusErrors.DecryptError.RemoteIdentityChanged;
-    // Session is broken, let's see what's really causing it...
-    if (isInvalidMessage || isInvalidSignature) {
-      message = `Session with user '${remoteUserId}' (${remoteClientId}) is broken.\nReset the session for possible fix.`;
-    } else if (isRemoteIdentityChanged) {
-      message = `Remote identity of client '${remoteClientId}' from user '${remoteUserId}' changed`;
-    }
-
-    this.logger.warn(
-      `Failed to decrypt event from client '${remoteClientId}' of user '${remoteUserId}' (${formattedTime}).\nError Code: '${errorCode}'\nError Message: ${error.message}`,
-      error,
-    );
-    return {code: errorCode, message};
   }
 }
