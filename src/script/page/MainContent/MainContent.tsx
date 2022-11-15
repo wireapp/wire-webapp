@@ -71,6 +71,7 @@ const MainContent: FC<MainContentProps> = ({
 
   const teamState = container.resolve(TeamState);
   const userState = container.resolve(UserState);
+  const {showRequestModal} = useLegalHoldModalState();
 
   const {contentState, isShowingConversation} = useAppState();
 
@@ -82,11 +83,11 @@ const MainContent: FC<MainContentProps> = ({
   }, [contentState, conversationState]);
 
   useEffect(() => {
+    // Show legal hold on mount when legal hold is enabled for team
     if (teamState.supportsLegalHold()) {
-      const {showRequestModal} = useLegalHoldModalState.getState();
       showRequestModal(true);
     }
-  }, [teamState]);
+  }, [teamState, showRequestModal]);
 
   if (!mainViewModel) {
     return null;
