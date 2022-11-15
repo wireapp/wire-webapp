@@ -18,8 +18,8 @@
  */
 
 import {BackendEvent, ConversationOtrMessageAddEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
-import {DecryptionError} from '@wireapp/cryptobox/src/error';
 
+import {DecryptionError} from '../../../../../../errors/DecryptionError';
 import {EventHandlerResult} from '../../../../../common.types';
 import {EventHandlerParams} from '../../../EventHandler.types';
 
