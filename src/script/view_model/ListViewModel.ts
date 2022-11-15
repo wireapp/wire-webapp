@@ -297,6 +297,7 @@ export class ListViewModel {
       case ListState.PREFERENCES:
         this.contentViewModel.switchContent(ContentState.PREFERENCES_ACCOUNT);
         break;
+      case ListState.TEMPORARY_GUEST:
       case ListState.CONVERSATIONS:
         if (loadPreviousContent) {
           this.contentViewModel.loadPreviousContent();
