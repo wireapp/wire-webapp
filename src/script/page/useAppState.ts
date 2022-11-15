@@ -70,7 +70,13 @@ type AppState = {
   previousContentState: ContentState | null;
   unreadMessagesCount: number;
   setUnreadMessagesCount: (unreadMessagesCount: number) => void;
+  /**
+   * returns true if the current active content could display a conversation
+   */
+  isShowingConversation: () => boolean;
 };
+
+const STATE_WITH_CONVERSATION = [ContentState.WATERMARK, ContentState.COLLECTION, ContentState.CONVERSATION];
 
 const useAppState = create<AppState>((set, get) => ({
   contentState: ContentState.WATERMARK,
@@ -83,6 +89,9 @@ const useAppState = create<AppState>((set, get) => ({
       contentState,
       previousContentState,
     }));
+  },
+  isShowingConversation() {
+    return STATE_WITH_CONVERSATION.includes(get().contentState);
   },
   setListState: (listState: ListState) =>
     set(state => ({

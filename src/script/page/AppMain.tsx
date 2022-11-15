@@ -120,6 +120,11 @@ const AppMain: FC<AppMainProps> = ({
     repositories.notification.setContentViewModelStates(contentState, mainView.multitasking);
 
     const showMostRecentConversation = () => {
+      const isShowingConversation = useAppState.getState().isShowingConversation();
+      if (!isShowingConversation) {
+        return;
+      }
+
       const activeConversation = conversationState.activeConversation();
 
       if (repositories.user['userState'].isTemporaryGuest()) {

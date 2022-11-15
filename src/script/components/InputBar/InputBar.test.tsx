@@ -92,7 +92,6 @@ describe('InputBar', () => {
   const pngFile = new File(['(⌐□_□)'], 'wire-example-image.png', {type: 'image/png'});
 
   it('has passed value', async () => {
-    console.info('conversationRepository', conversationRepository.sendTypingStart);
     const promise = Promise.resolve();
     const props = getDefaultProps();
     const {container} = render(withTheme(<InputBar {...props} />));
