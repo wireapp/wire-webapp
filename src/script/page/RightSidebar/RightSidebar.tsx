@@ -26,7 +26,7 @@ import {container} from 'tsyringe';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {focusableElements} from 'Util/util';
+import {focusableElementsSelector} from 'Util/util';
 
 import {AddParticipants} from './AddParticipants';
 import {ConversationDetails} from './ConversationDetails';
@@ -169,7 +169,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
 
   const containerRef = useCallback(
     (element: HTMLDivElement | null) => {
-      const nextElementToFocus = element?.querySelectorAll(focusableElements)[0] as HTMLElement | null;
+      const nextElementToFocus = element?.querySelectorAll(focusableElementsSelector)[0] as HTMLElement | null;
       if (nextElementToFocus) {
         nextElementToFocus.focus();
       }

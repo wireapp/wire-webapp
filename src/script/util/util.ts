@@ -346,7 +346,7 @@ export function throttle(callback: Function, wait: number, immediate = false) {
   };
 }
 
-export const focusableElements =
+export const focusableElementsSelector =
   'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 export const preventFocusOutside = (event: KeyboardEvent, parentId: string): void => {
@@ -355,7 +355,7 @@ export const preventFocusOutside = (event: KeyboardEvent, parentId: string): voi
   }
   event.preventDefault();
   const parent = document.getElementById(parentId);
-  const focusableContent = parent ? [...parent.querySelectorAll(focusableElements)] : [];
+  const focusableContent = parent ? [...parent.querySelectorAll(focusableElementsSelector)] : [];
   const focusedItemIndex = focusableContent.indexOf(document.activeElement);
   if (event.shiftKey && focusedItemIndex != 0) {
     (focusableContent[focusedItemIndex - 1] as HTMLElement)?.focus();
