@@ -140,8 +140,8 @@ const Message: React.FC<
 
   useEffect(() => {
     // Move element into view when it is focused
-    if (focusConversation && messageRef.current) {
-      messageRef.current.focus();
+    if (focusConversation) {
+      messageRef.current?.focus();
     }
   }, [focusConversation]);
 
