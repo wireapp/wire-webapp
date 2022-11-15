@@ -33,7 +33,7 @@ import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {GroupAvatar} from 'Components/avatar/GroupAvatar';
 import {Icon} from 'Components/Icon';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
-import {setHistoryParam} from 'src/script/router/routerBindings';
+import {setHistoryParam} from 'src/script/router/Router';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isKey, isOneOfKeys, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -173,8 +173,8 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
   }, [index, isActive, isFolder, isConversationListFocus, handleFocus]);
 
   useEffect(() => {
-    setHistoryParam(generateConversationUrl(conversation.id, conversation.domain));
-  }, [conversation.id, conversation.domain]);
+    setHistoryParam(generateConversationUrl(conversation.qualifiedId));
+  }, [conversation]);
 
   return (
     <li onContextMenu={openContextMenu}>
