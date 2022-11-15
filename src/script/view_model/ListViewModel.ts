@@ -60,7 +60,6 @@ export class ListViewModel {
 
   readonly isActivatedAccount: ko.PureComputed<boolean>;
   readonly lastUpdate: ko.Observable<number>;
-  readonly isFederated: boolean;
   readonly repositories: ViewModelRepositories;
 
   public readonly mainViewModel: MainViewModel;
@@ -76,13 +75,16 @@ export class ListViewModel {
   public readonly selfUser: ko.Observable<User>;
   private readonly visibleListItems: ko.PureComputed<(string | Conversation)[]>;
 
+  get isFederated() {
+    return this.mainViewModel.isFederated;
+  }
+
   constructor(mainViewModel: MainViewModel, repositories: ViewModelRepositories) {
     this.userState = container.resolve(UserState);
     this.teamState = container.resolve(TeamState);
     this.conversationState = container.resolve(ConversationState);
 
     this.mainViewModel = mainViewModel;
-    this.isFederated = mainViewModel.isFederated;
     this.repositories = repositories;
     this.conversationRepository = repositories.conversation;
     this.callingRepository = repositories.calling;
