@@ -64,7 +64,7 @@ export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
 
   useEffect(() => {
     if (!containerRef.current) {
-      return;
+      return undefined;
     }
     const emailLinks = containerRef.current && [...containerRef.current.querySelectorAll('[data-email-link]')];
     const linkTarget = containerRef.current && [...containerRef.current.querySelectorAll('a')];
