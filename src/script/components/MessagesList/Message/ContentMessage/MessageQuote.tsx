@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, Fragment, MouseEvent as ReactMouseEvent, useCallback, useEffect, useState} from 'react';
+import {FC, Fragment, MouseEvent as ReactMouseEvent, useEffect, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
@@ -160,7 +160,7 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
     headerSenderName,
     was_edited,
     timestamp,
-    edited_timestamp,
+    edited_timestamp: editedTimestamp,
   } = useKoSubscribableChildren(quotedMessage, [
     'user',
     'assets',
@@ -175,13 +175,6 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
   useEffect(() => {
     setShowFullText(false);
   }, [quotedMessage]);
-
-  const handleMsgQuoteClick = useCallback(
-    (event: MouseEvent | KeyboardEvent, asset: Text, elementType: ElementType): void => {
-      handleClickOnMessage(asset, event, elementType);
-    },
-    [handleClickOnMessage],
-  );
 
   return (
     <>
@@ -217,7 +210,7 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
           {asset.isText() && (
             <>
               <TextMessageRenderer
-                onClickMsg={handleMsgQuoteClick}
+                onMessageClick={handleClickOnMessage}
                 text={asset.render(selfId)}
                 msgClass={cx('message-quote__text', {
                   'message-quote__text--full': showFullText,

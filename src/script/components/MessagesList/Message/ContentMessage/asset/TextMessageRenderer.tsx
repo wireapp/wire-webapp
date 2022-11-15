@@ -26,7 +26,7 @@ import {useDisposableRef} from 'Util/useDisposableRef';
 export type ElementType = 'markdownLink' | 'email' | 'mention';
 
 interface TextMessageRendererProps {
-  onClickMsg: (event: MouseEvent | KeyboardEvent, asset: Text, elementType: ElementType) => void;
+  onMessageClick: (asset: Text, event: MouseEvent | KeyboardEvent, elementType: ElementType) => void;
   text: string;
   isCurrentConversationFocused: boolean;
   msgClass: string;
@@ -39,7 +39,7 @@ const events = ['click', 'keydown', 'auxclick'];
 
 export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
   text,
-  onClickMsg,
+  onMessageClick,
   msgClass,
   isCurrentConversationFocused,
   asset,
@@ -59,7 +59,7 @@ export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
       setCanShowMore?.(isWider || isHigher);
       return () => {};
     },
-    [edited_timestamp],
+    [editedTimestamp],
   );
 
   useEffect(() => {
@@ -68,7 +68,7 @@ export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
     }
     const emailLinks = containerRef.current && [...containerRef.current.querySelectorAll('[data-email-link]')];
     const linkTargets = containerRef.current && [...containerRef.current.querySelectorAll('a')];
-    const msgLinkTarget = containerRef.current && [...containerRef.current.querySelectorAll('[data-uie-name]')];
+    const msgLinkTargets = containerRef.current && [...containerRef.current.querySelectorAll('[data-uie-name]')];
     const hasMentions = asset && asset.mentions().length;
     const msgMention = hasMentions
       ? containerRef.current && [...containerRef.current.querySelectorAll('.message-mention')]
@@ -81,19 +81,19 @@ export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
       });
     }
 
-    if (linkTarget) {
-      linkTarget.forEach(link => {
+    if (linkTargets.length) {
+      linkTargets.forEach(link => {
         link.setAttribute('tabindex', isCurrentConversationFocused ? '0' : '-1');
       });
     }
 
-    if (msgLinkTarget) {
-      msgLinkTarget?.forEach(link => {
+    if (msgLinkTargets.length) {
+      msgLinkTargets.forEach(link => {
         link.setAttribute('tabindex', isCurrentConversationFocused ? '0' : '-1');
       });
     }
 
-    if (emailLinks) {
+    if (emailLinks.length) {
       emailLinks?.forEach(emailLink => {
         emailLink.setAttribute('tabindex', isCurrentConversationFocused ? '0' : '-1');
       });
@@ -101,7 +101,7 @@ export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
 
     const handleKeyEvent = (event: KeyboardEvent, elementType: ElementType) => {
       if (isCurrentConversationFocused) {
-        handleKeyDown(event, () => onClickMsg(event, asset, elementType));
+        handleKeyDown(event, () => onMessageClick(asset, event, elementType));
       }
     };
 
@@ -112,19 +112,19 @@ export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
             handleKeyEvent(event as KeyboardEvent, 'email');
             return;
           }
-          onClickMsg(event as MouseEvent, asset, 'email');
+          onMessageClick(asset, event as MouseEvent, 'email');
         });
       });
     });
 
-    linkTarget?.forEach(msgLink => {
+    linkTargets?.forEach(msgLink => {
       events.forEach(eventName => {
         msgLink.addEventListener(eventName, event => {
           if (eventName === 'keydown') {
             handleKeyEvent(event as KeyboardEvent, 'markdownLink');
             return;
           }
-          onClickMsg(event as MouseEvent, asset, 'markdownLink');
+          onMessageClick(asset, event as MouseEvent, 'markdownLink');
         });
       });
     });
@@ -136,7 +136,7 @@ export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
             handleKeyEvent(event as KeyboardEvent, 'mention');
             return;
           }
-          onClickMsg(event as MouseEvent, asset, 'mention');
+          onMessageClick(asset, event as MouseEvent, 'mention');
         });
       });
     });
@@ -145,15 +145,15 @@ export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
       emailLinks?.forEach(emailLink => {
         events.forEach(eventName => {
           emailLink.removeEventListener(eventName, event => {
-            onClickMsg(event as MouseEvent, asset, 'email');
+            onMessageClick(asset, event as MouseEvent, 'email');
           });
         });
       });
 
-      linkTarget?.forEach(msgLink => {
+      linkTargets?.forEach(msgLink => {
         events.forEach(eventName => {
           msgLink.removeEventListener(eventName, event => {
-            onClickMsg(event as MouseEvent, asset, 'markdownLink');
+            onMessageClick(asset, event as MouseEvent, 'markdownLink');
           });
         });
       });
@@ -161,12 +161,12 @@ export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
       msgMention?.forEach(mention => {
         events.forEach(eventName => {
           mention.removeEventListener(eventName, event => {
-            onClickMsg(event as MouseEvent, asset, 'mention');
+            onMessageClick(asset, event as MouseEvent, 'mention');
           });
         });
       });
     };
-  }, [onClickMsg, asset, isCurrentConversationFocused, containerRef]);
+  }, [onMessageClick, asset, isCurrentConversationFocused, containerRef]);
 
   return (
     <div

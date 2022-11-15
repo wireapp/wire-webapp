@@ -17,8 +17,6 @@
  *
  */
 
-import {useCallback} from 'react';
-
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {Asset} from 'src/script/entity/message/Asset';
@@ -36,7 +34,7 @@ import {ImageAsset} from './ImageAsset';
 import {LinkPreviewAsset} from './LinkPreviewAssetComponent';
 import {LocationAsset} from './LocationAsset';
 import {MessageButton} from './MessageButton';
-import {ElementType, TextMessageRenderer} from './TextMessageRenderer';
+import {TextMessageRenderer} from './TextMessageRenderer';
 import {VideoAsset} from './VideoAsset';
 
 import {MessageActions} from '../..';
@@ -64,19 +62,13 @@ const ContentAsset = ({
 }) => {
   const {isObfuscated, status} = useKoSubscribableChildren(message, ['isObfuscated', 'status']);
 
-  const handleMsgClick = useCallback(
-    (event: MouseEvent | KeyboardEvent, asset: Text, elementType: ElementType): void => {
-      onClickMessage(asset, event, elementType);
-    },
-    [onClickMessage],
-  );
   switch (asset.type) {
     case AssetType.TEXT:
       return (
         <>
           {(asset as Text).should_render_text() && (
             <TextMessageRenderer
-              onClickMsg={handleMsgClick}
+              onMessageClick={onClickMessage}
               text={(asset as Text).render(selfId, message.accent_color())}
               msgClass={`text ${includesOnlyEmojis(asset.text) ? 'text-large' : ''} ${
                 status === StatusType.SENDING ? 'text-foreground' : ''

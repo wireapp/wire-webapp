@@ -35,6 +35,7 @@ const mention = {
   type: PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID,
   userId: '1',
 };
+
 const asset: Text = {
   isAudio: jest.fn(),
   isButton: jest.fn(),
@@ -61,7 +62,7 @@ describe('TextMessageRenderer', () => {
     const {getByText} = render(
       <TextMessageRenderer
         text={txtMsg}
-        onClickMsg={onClickElement}
+        onMessageClick={onClickElement}
         isCurrentConversationFocused
         msgClass=""
         asset={asset}
@@ -83,7 +84,7 @@ describe('TextMessageRenderer', () => {
     const {getByTestId} = render(
       <TextMessageRenderer
         text={text}
-        onClickMsg={onClickElement}
+        onMessageClick={onClickElement}
         isCurrentConversationFocused
         msgClass=""
         asset={asset}
@@ -107,7 +108,7 @@ describe('TextMessageRenderer', () => {
     const {getByText} = render(
       <TextMessageRenderer
         text={text}
-        onClickMsg={onClickElement}
+        onMessageClick={onClickElement}
         isCurrentConversationFocused
         msgClass=""
         asset={asset}
@@ -133,7 +134,7 @@ describe('TextMessageRenderer', () => {
     const {getByText} = render(
       <TextMessageRenderer
         text={text}
-        onClickMsg={onClickElement}
+        onMessageClick={onClickElement}
         isCurrentConversationFocused={false}
         msgClass=""
         asset={asset}

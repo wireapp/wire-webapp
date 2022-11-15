@@ -251,15 +251,13 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
               {message.displayTimestampShort()}
             </MessageTime>
           )}
-          <div>
-            <ReadReceiptStatus
-              message={message}
-              is1to1Conversation={conversation.is1to1()}
-              isLastDeliveredMessage={isLastDeliveredMessage}
-              onClickReceipts={onClickReceipts}
-              focusConversation={focusConversation}
-            />
-          </div>
+          <ReadReceiptStatus
+            message={message}
+            is1to1Conversation={conversation.is1to1()}
+            isLastDeliveredMessage={isLastDeliveredMessage}
+            onClickReceipts={onClickReceipts}
+            focusConversation={focusConversation}
+          />
         </div>
       </div>
       {other_likes.length > 0 && (
