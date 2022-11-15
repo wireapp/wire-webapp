@@ -173,6 +173,7 @@ const InputBar = ({
   const [selectionStart, setSelectionStart] = useState<number>(0);
   const [selectionEnd, setSelectionEnd] = useState<number>(0);
   const [pingDisabled, setIsPingDisabled] = useState<boolean>(false);
+  const [isTyping, setIsTyping] = useState<boolean>(false);
   const [editedMention, setEditedMention] = useState<{startIndex: number; term: string} | undefined>(undefined);
 
   const {rightSidebar} = useAppMainState.getState();
@@ -391,20 +392,18 @@ const InputBar = ({
   }, [editMessageEntity]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (inputValue.trim() === '') {
-      return;
-    }
     if (isTypingTimerIdRef.current) {
       clearTimeout(isTypingTimerIdRef.current);
-    } else {
+    }
+    if (inputValue.trim() !== '') {
       conversationRepository.sendTypingStart(conversationEntity);
     }
     isTypingTimerIdRef.current = setTimeout(() => {
       conversationRepository.sendTypingStop(conversationEntity);
       isTypingTimerIdRef.current = null;
+      setIsTyping(false);
     }, CONFIG.IS_TYPING_TIMEOUT);
-  }, [conversationEntity, conversationRepository, inputValue]); // we want to send is typing based on changes to the current input value
-
+  }, [isTyping]); // we want to send is typing based on isTyping
   const replyMessage = (messageEntity: ContentMessage): void => {
     if (messageEntity?.isReplyable() && messageEntity !== replyMessageEntity) {
       cancelMessageReply();
@@ -498,6 +497,7 @@ const InputBar = ({
 
     const {value: currentValue} = event.currentTarget;
     setInputValue(currentValue);
+    setIsTyping(true);
     const currentValueLength = currentValue.length;
     const previousValueLength = inputValue.length;
     const difference = currentValueLength - previousValueLength;
