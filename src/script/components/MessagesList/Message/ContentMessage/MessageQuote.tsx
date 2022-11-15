@@ -228,7 +228,7 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
                 data-uie-name="media-text-quote"
                 isQuoteMsg
                 setCanShowMore={setCanShowMore}
-                edited_timestamp={edited_timestamp}
+                editedTimestamp={editedTimestamp}
               />
               {canShowMore && (
                 <RenderShowMsgBtn
