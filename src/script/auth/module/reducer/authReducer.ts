@@ -207,7 +207,7 @@ export function authReducer(state: AuthState = initialAuthState, action: AppActi
       return {...state, currentFlow: REGISTER_FLOW.TEAM};
     }
     case AUTH_ACTION.ENTER_PERSONAL_CREATION_FLOW: {
-      return {...state, currentFlow: REGISTER_FLOW.PERSONAL};
+      return {...state, currentFlow: REGISTER_FLOW.PERSONAL, account: {...initialAuthState.account}};
     }
     case AUTH_ACTION.ENTER_GENERIC_INVITATION_FLOW: {
       return {...state, currentFlow: REGISTER_FLOW.GENERIC_INVITATION};
