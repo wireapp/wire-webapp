@@ -28,6 +28,7 @@ import {Conversation} from 'Components/Conversation';
 import {HistoryExport} from 'Components/HistoryExport';
 import {HistoryImport} from 'Components/HistoryImport';
 import {Icon} from 'Components/Icon';
+import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {incomingCssClass, removeAnimationsClass} from 'Util/util';
@@ -68,6 +69,9 @@ const MainContent: FC<MainContentProps> = ({
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const mainViewModel = useContext(RootContext);
 
+  const teamState = container.resolve(TeamState);
+  const userState = container.resolve(UserState);
+
   const {contentState, isShowingConversation} = useAppState();
 
   useEffect(() => {
@@ -77,6 +81,13 @@ const MainContent: FC<MainContentProps> = ({
     }
   }, [contentState, conversationState]);
 
+  useEffect(() => {
+    if (teamState.supportsLegalHold()) {
+      const {showRequestModal} = useLegalHoldModalState.getState();
+      showRequestModal(true);
+    }
+  }, [teamState]);
+
   if (!mainViewModel) {
     return null;
   }
@@ -85,9 +96,6 @@ const MainContent: FC<MainContentProps> = ({
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
-
-  const teamState = container.resolve(TeamState);
-  const userState = container.resolve(UserState);
 
   const statesTitle: Partial<Record<ContentState, string>> = {
     [ContentState.CONNECTION_REQUESTS]: t('accessibility.headings.connectionRequests'),

@@ -24,7 +24,6 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
@@ -117,11 +116,6 @@ export class ContentViewModel {
     });
 
     this._initSubscriptions();
-
-    if (this.teamState.supportsLegalHold()) {
-      const {showRequestModal} = useLegalHoldModalState.getState();
-      showRequestModal(true);
-    }
   }
 
   private _initSubscriptions() {
