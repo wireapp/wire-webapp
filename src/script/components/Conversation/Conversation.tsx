@@ -61,7 +61,7 @@ import {ElementType} from '../MessagesList/Message/ContentMessage/asset/TextMess
 
 type ReadMessageBuffer = {conversation: ConversationEntity; message: Message};
 
-interface ConversationListProps {
+interface ConversationProps {
   readonly initialMessage?: Message;
   readonly teamState: TeamState;
   readonly userState: UserState;
@@ -69,7 +69,7 @@ interface ConversationListProps {
   isRightSidebarOpen?: boolean;
 }
 
-const ConversationList: FC<ConversationListProps> = ({
+export const Conversation: FC<ConversationProps> = ({
   initialMessage,
   teamState,
   userState,
@@ -460,5 +460,3 @@ const ConversationList: FC<ConversationListProps> = ({
     </div>
   );
 };
-
-export {ConversationList};

@@ -163,6 +163,7 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
 
           <PreferencesSection title={t('preferencesOptionsPopular')}>
             <Checkbox
+              tabIndex={0}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 saveOptionNewTheme(event.target.checked);
               }}
@@ -176,6 +177,7 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
 
             <div className="checkbox-margin">
               <Checkbox
+                tabIndex={0}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                   saveOptionEmojiPreference(event.target.checked);
                 }}
@@ -202,6 +204,7 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
 
             <div className="checkbox-margin">
               <Checkbox
+                tabIndex={0}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                   saveOptionSendPreviewsPreference(event.target.checked);
                 }}

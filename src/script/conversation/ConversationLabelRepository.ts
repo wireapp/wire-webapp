@@ -83,12 +83,12 @@ export const createLabelFavorites = (favorites: Conversation[] = []) =>
 
 export class ConversationLabelRepository extends TypedEventTarget<{type: 'conversation-favorited'}> {
   labels: ko.ObservableArray<ConversationLabel>;
-  allLabeledConversations: ko.Computed<Conversation[]>;
-  logger: Logger;
+  private allLabeledConversations: ko.Computed<Conversation[]>;
+  private logger: Logger;
 
   constructor(
     private readonly allConversations: ko.ObservableArray<Conversation>,
-    private readonly conversations: ko.ObservableArray<Conversation>,
+    private readonly conversations: ko.PureComputed<Conversation[]>,
     private readonly propertiesService: PropertiesService,
   ) {
     super();

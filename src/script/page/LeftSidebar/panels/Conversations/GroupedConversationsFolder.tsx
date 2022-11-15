@@ -54,8 +54,6 @@ const GroupedConversationsFolder: React.FC<GroupedConversationsFolderProps> = ({
 }) => {
   const isExpanded: boolean = expandedFolders.includes(folder.id);
   const {conversations} = useKoSubscribableChildren(folder, ['conversations']);
-  const makeOnClick = (conversationId: string, domain: string | null) =>
-    createNavigate(generateConversationUrl(conversationId, domain));
   const {currentFocus, handleKeyDown, setCurrentFocus} = useRoveFocus(conversations.length);
 
   return (
@@ -73,7 +71,7 @@ const GroupedConversationsFolder: React.FC<GroupedConversationsFolderProps> = ({
               handleFocus={setCurrentFocus}
               handleArrowKeyDown={handleKeyDown}
               onClick={(event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>) => {
-                makeOnClick(conversation.id, conversation.domain);
+                createNavigate(generateConversationUrl(conversation.qualifiedId));
               }}
               rightClick={(_, event) => listViewModel.onContextMenu(conversation, event)}
               conversation={conversation}

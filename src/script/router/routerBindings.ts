@@ -21,21 +21,15 @@ import React from 'react';
 
 import {KEY} from 'Util/KeyboardUtil';
 
-import type {Router} from './Router';
+import {navigate} from './Router';
 
 import {useAppMainState, ViewType} from '../page/state';
-
-let router: Router;
-
-export const initializeRouter = (routerInstance: Router) => {
-  router = routerInstance;
-};
 
 export const createNavigate =
   (link: string): React.MouseEventHandler =>
   (event: React.MouseEvent<Element, MouseEvent>) => {
     setResponsiveView();
-    router?.navigate(link);
+    navigate(link);
     event.preventDefault();
   };
 
@@ -46,7 +40,7 @@ export const createNavigateKeyboard =
       setResponsiveView();
     }
     if (event.key === KEY.ENTER || event.key === KEY.SPACE) {
-      router?.navigate(link, {eventKey: event.key});
+      navigate(link, {eventKey: event.key});
       event.preventDefault();
     }
   };
@@ -54,8 +48,4 @@ export const createNavigateKeyboard =
 export const setResponsiveView = () => {
   const {responsiveView} = useAppMainState.getState();
   responsiveView.setCurrentView(ViewType.CENTRAL_COLUMN);
-};
-
-export const setHistoryParam = (stateObj = {}, path = '') => {
-  router?.setHistoryParam(path, stateObj);
 };

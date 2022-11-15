@@ -129,6 +129,7 @@ export function doRedirect(signOutReason: SIGN_OUT_REASON) {
 export class App {
   static readonly LOCAL_STORAGE_LOGIN_REDIRECT_KEY = 'LOGIN_REDIRECT_KEY';
   static readonly LOCAL_STORAGE_LOGIN_CONVERSATION_KEY = 'LOGIN_CONVERSATION_KEY';
+  private isLoggingOut = false;
   logger: Logger;
   service: {
     asset: AssetService;
@@ -419,7 +420,7 @@ export class App {
 
       await teamRepository.initTeam();
 
-      const conversationEntities = await conversationRepository.getConversations();
+      const conversationEntities = await conversationRepository.loadConversations();
 
       if (supportsMLS()) {
         // We send external proposal to all the MLS conversations that are in an unknown state (not established nor pendingWelcome)
@@ -476,7 +477,6 @@ export class App {
       telemetry.addStatistic(AppInitStatisticsValue.NOTIFICATIONS, notificationsCount, 100);
 
       eventTrackerRepository.init(propertiesRepository.properties.settings.privacy.telemetry_sharing);
-      await conversationRepository.initializeConversations();
       onProgress(97.5, t('initUpdatedFromNotifications', this.config.BRAND_NAME));
 
       const clientEntities = await clientRepository.updateClientsForSelf();
@@ -511,9 +511,9 @@ export class App {
     } catch (error) {
       if (error instanceof BaseError) {
         this._appInitFailure(error, isReload);
+        return undefined;
       }
-
-      return undefined;
+      throw error;
     }
   }
 
@@ -712,6 +712,13 @@ export class App {
    * @param clearData Keep data in database
    */
   private readonly logout = (signOutReason: SIGN_OUT_REASON, clearData: boolean): Promise<void> | void => {
+    if (this.isLoggingOut) {
+      // Avoid triggering another logout flow if we currently are logging out.
+      // This could happen if we trigger the logout flow while the user token is already invalid.
+      // This will cause the api to fail and to trigger the `logout` event
+      return;
+    }
+    this.isLoggingOut = true;
     const _redirectToLogin = () => {
       amplify.publish(WebAppEvents.LIFECYCLE.SIGNED_OUT, clearData);
       this._redirectToLogin(signOutReason);

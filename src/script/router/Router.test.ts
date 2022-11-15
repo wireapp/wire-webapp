@@ -17,20 +17,21 @@
  *
  */
 
-import {Router} from 'src/script/router/Router';
+import {waitFor} from '@testing-library/react';
+
+import {configureRoutes, navigate} from './Router';
 
 describe('Router', () => {
   afterEach(() => {
     window.location.hash = '#';
   });
 
-  describe('constructor', () => {
+  describe('configureRoutes', () => {
     it('parse the current URL when instantiated', () => {
-      const routes = {'/conv': () => {}};
-      spyOn(routes, '/conv');
+      const routes = {'/conv': jest.fn()};
 
       window.location.hash = '#/conv';
-      new Router(routes);
+      configureRoutes(routes);
 
       expect(routes['/conv']).toHaveBeenCalled();
     });
@@ -38,46 +39,41 @@ describe('Router', () => {
 
   describe('navigate', () => {
     it('allows to navigate to specific url and call the associated handler', () => {
-      const handlers = {conversation: () => {}, user: () => {}};
+      const routes = {conversation: jest.fn(), user: jest.fn()};
 
-      spyOn(handlers, 'conversation');
-      spyOn(handlers, 'user');
-
-      const router = new Router({
-        '/conversation/:id': handlers.conversation,
-        '/user/:id': handlers.user,
+      configureRoutes({
+        '/conversation/:id': routes.conversation,
+        '/user/:id': routes.user,
       });
 
-      router.navigate('/nomatch');
+      navigate('/nomatch');
 
-      expect(handlers.conversation).not.toHaveBeenCalled();
-      expect(handlers.user).not.toHaveBeenCalled();
+      expect(routes.conversation).not.toHaveBeenCalled();
+      expect(routes.user).not.toHaveBeenCalled();
 
-      router.navigate('/conversation/uuid');
+      navigate('/conversation/uuid');
 
-      expect(handlers.conversation).toHaveBeenCalled();
-      expect(handlers.user).not.toHaveBeenCalled();
+      expect(routes.conversation).toHaveBeenCalled();
+      expect(routes.user).not.toHaveBeenCalled();
 
-      router.navigate('/user/uuid');
+      navigate('/user/uuid');
 
-      expect(handlers.user).toHaveBeenCalled();
+      expect(routes.user).toHaveBeenCalled();
     });
   });
 
   describe('hash change event listener', () => {
-    it('triggers routing when a hashchange event is triggered', done => {
-      const handlers = {conversation: () => {}};
-      spyOn(handlers, 'conversation');
+    it('triggers routing when a hashchange event is triggered', async () => {
+      const handlers = {conversation: jest.fn()};
 
-      new Router({'/conversation/:id': handlers.conversation});
+      configureRoutes({'/conversation/:id': handlers.conversation});
 
       expect(handlers.conversation).not.toHaveBeenCalled();
 
       window.location.hash = '#/conversation/uuid';
 
-      setTimeout(() => {
+      waitFor(() => {
         expect(handlers.conversation).toHaveBeenCalled();
-        done();
       });
     });
   });

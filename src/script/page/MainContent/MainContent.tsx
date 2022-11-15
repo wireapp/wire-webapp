@@ -17,14 +17,14 @@
  *
  */
 
-import {FC, ReactNode, useContext, useState} from 'react';
+import {FC, ReactNode, useContext, useEffect, useState} from 'react';
 
 import cx from 'classnames';
 import {CSSTransition, SwitchTransition} from 'react-transition-group';
 import {container} from 'tsyringe';
 
 import {ConnectRequests} from 'Components/ConnectRequests';
-import {ConversationList} from 'Components/Conversation';
+import {Conversation} from 'Components/Conversation';
 import {HistoryExport} from 'Components/HistoryExport';
 import {HistoryImport} from 'Components/HistoryImport';
 import {Icon} from 'Components/Icon';
@@ -68,7 +68,14 @@ const MainContent: FC<MainContentProps> = ({
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const mainViewModel = useContext(RootContext);
 
-  const {contentState} = useAppState();
+  const {contentState, isShowingConversation} = useAppState();
+
+  useEffect(() => {
+    if (!isShowingConversation() && conversationState.activeConversation()) {
+      // Reset active conversation for all states that do not require a loaded conversation
+      conversationState.activeConversation(undefined);
+    }
+  }, [contentState, conversationState]);
 
   if (!mainViewModel) {
     return null;
@@ -206,7 +213,7 @@ const MainContent: FC<MainContentProps> = ({
             )}
 
             {contentState === ContentState.CONVERSATION && (
-              <ConversationList
+              <Conversation
                 initialMessage={initialMessage}
                 teamState={teamState}
                 userState={userState}

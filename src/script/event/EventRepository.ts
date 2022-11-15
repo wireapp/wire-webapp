@@ -367,10 +367,6 @@ export class EventRepository {
       default: {
         return Promise.resolve(event as EventRecord);
       }
-      case EventValidation.IGNORED_TYPE: {
-        this.logger.info(`Ignored event type '${event.type}'`, logObject);
-        return Promise.resolve(event as EventRecord);
-      }
       case EventValidation.OUTDATED_TIMESTAMP: {
         this.logger.info(`Ignored outdated event type: '${event.type}'`, logObject);
         return Promise.resolve(event as EventRecord);
@@ -399,7 +395,7 @@ export class EventRepository {
         208, // Outated event decyption error (see https://github.com/wireapp/wire-web-core/blob/5c8c56097eadfa55e79856cd6745087f0fd12e24/packages/proteus/README.md#decryption-errors)
         209, // Duplicate event decryption error (see https://github.com/wireapp/wire-web-core/blob/5c8c56097eadfa55e79856cd6745087f0fd12e24/packages/proteus/README.md#decryption-errors)
       ];
-      if (ignoredCodes.includes(decryptionError.code)) {
+      if (decryptionError.code && ignoredCodes.includes(decryptionError.code)) {
         return undefined;
       }
       amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.E2EE.FAILED_MESSAGE_DECRYPTION, {

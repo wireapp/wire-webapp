@@ -113,9 +113,9 @@ export const ConversationsList: React.FC<{
               conversation={conversation}
               onClick={(event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>) => {
                 if ('key' in event) {
-                  createNavigateKeyboard(generateConversationUrl(conversation.id, conversation.domain), true)(event);
+                  createNavigateKeyboard(generateConversationUrl(conversation.qualifiedId), true)(event);
                 } else {
-                  createNavigate(generateConversationUrl(conversation.id, conversation.domain))(event);
+                  createNavigate(generateConversationUrl(conversation.qualifiedId))(event);
                 }
               }}
               isSelected={isActiveConversation}

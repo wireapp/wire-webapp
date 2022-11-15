@@ -19,24 +19,20 @@
 
 import React from 'react';
 
-import {container} from 'tsyringe';
-
 import {GroupListItem} from './groupList/GroupListItem';
 
 import type {Conversation} from '../../../../../entity/Conversation';
-import {Router} from '../../../../../router/Router';
 
 export interface GroupListProps {
   click: (group: Conversation) => void;
   groups: Conversation[];
-  router?: Router;
 }
 
-const GroupList: React.FC<GroupListProps> = ({click, groups, router = container.resolve(Router)}) => {
+const GroupList: React.FC<GroupListProps> = ({click, groups}) => {
   return (
     <div className="search-list search-list-lg">
       {groups.map(group => (
-        <GroupListItem click={click} group={group} key={group.id} router={router} />
+        <GroupListItem click={click} group={group} key={group.id} />
       ))}
     </div>
   );

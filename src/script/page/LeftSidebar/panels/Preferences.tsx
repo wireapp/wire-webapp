@@ -19,13 +19,22 @@
 
 import React, {useEffect} from 'react';
 
+import {amplify} from 'amplify';
+
 import {Runtime} from '@wireapp/commons';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Icon} from 'Components/Icon';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {t} from 'Util/LocalizerUtil';
 
 import {ListWrapper} from './ListWrapper';
 
+import {
+  ClientNotificationData,
+  Notification,
+  PreferenceNotificationRepository,
+} from '../../../notification/PreferenceNotificationRepository';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {ContentViewModel} from '../../../view_model/ContentViewModel';
 import {useAppMainState, ViewType} from '../../state';
@@ -35,7 +44,43 @@ type PreferencesProps = {
   contentViewModel: ContentViewModel;
   onClose: () => void;
   teamRepository: Pick<TeamRepository, 'getTeam'>;
+  preferenceNotificationRepository: Pick<PreferenceNotificationRepository, 'getNotifications'>;
 };
+
+const showNotification = (type: string, aggregatedNotifications: Notification[]) => {
+  switch (type) {
+    case PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT: {
+      PrimaryModal.show(
+        PrimaryModal.type.ACCOUNT_NEW_DEVICES,
+        {
+          data: aggregatedNotifications.map(notification => notification.data) as ClientNotificationData[],
+          preventClose: true,
+          secondaryAction: {
+            action: () => {
+              amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentState.PREFERENCES_DEVICES);
+            },
+          },
+        },
+        undefined,
+      );
+      break;
+    }
+
+    case PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.READ_RECEIPTS_CHANGED: {
+      PrimaryModal.show(
+        PrimaryModal.type.ACCOUNT_READ_RECEIPTS_CHANGED,
+        {
+          data: aggregatedNotifications.pop()?.data as boolean,
+          preventClose: true,
+        },
+        undefined,
+      );
+      break;
+    }
+  }
+};
+
+const NEW_DEVICE_NOTIFICATION_STATES = [ContentState.PREFERENCES_ACCOUNT, ContentState.PREFERENCES_DEVICES];
 
 const PreferenceItem: React.FC<{
   IconComponent: React.FC;
@@ -45,7 +90,7 @@ const PreferenceItem: React.FC<{
   uieName: string;
 }> = ({onSelect, isSelected, label, uieName, IconComponent}) => {
   return (
-    <li className="left-list-item">
+    <li role="tab" aria-selected={isSelected} aria-controls={label} tabIndex={-1} className="left-list-item">
       <button
         type="button"
         className={`left-list-item-button ${isSelected ? 'left-list-item-button--active' : ''}`}
@@ -61,13 +106,18 @@ const PreferenceItem: React.FC<{
   );
 };
 
-const Preferences: React.FC<PreferencesProps> = ({contentViewModel, teamRepository, onClose}) => {
+const Preferences: React.FC<PreferencesProps> = ({
+  contentViewModel,
+  teamRepository,
+  preferenceNotificationRepository,
+  onClose,
+}) => {
   const {contentState} = useAppState();
 
   useEffect(() => {
     // Update local team
     teamRepository.getTeam();
-  }, []);
+  }, [teamRepository]);
 
   const isDesktop = Runtime.isDesktopApp();
   const supportsCalling = Runtime.isSupportingLegacyCalling();
@@ -78,6 +128,14 @@ const Preferences: React.FC<PreferencesProps> = ({contentViewModel, teamReposito
     setCurrentView(ViewType.CENTRAL_COLUMN);
     contentViewModel.switchContent(item.id);
   };
+
+  useEffect(() => {
+    if (NEW_DEVICE_NOTIFICATION_STATES.includes(contentState)) {
+      preferenceNotificationRepository
+        .getNotifications()
+        .forEach(({type, notification}) => showNotification(type, notification));
+    }
+  }, [contentState, preferenceNotificationRepository]);
 
   const items = [
     {
@@ -116,7 +174,11 @@ const Preferences: React.FC<PreferencesProps> = ({contentViewModel, teamReposito
 
   return (
     <ListWrapper id="preferences" header={t('preferencesHeadline')} onClose={onClose}>
-      <ul className="left-list-items no-scroll preferences-list-items">
+      <ul
+        role="tablist"
+        aria-label={t('tooltipPreferencesTabs')}
+        className="left-list-items no-scroll preferences-list-items"
+      >
         {items
           .filter(item => !item.hidden)
           .map(item => (

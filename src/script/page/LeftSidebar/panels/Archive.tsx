@@ -51,8 +51,8 @@ const Archive: React.FC<ArchiveProps> = ({
   onClose,
   conversationState = container.resolve(ConversationState),
 }) => {
-  const {conversations_archived: conversations} = useKoSubscribableChildren(conversationState, [
-    'conversations_archived',
+  const {archivedConversations: conversations} = useKoSubscribableChildren(conversationState, [
+    'archivedConversations',
   ]);
 
   const onClickConversation = async (conversation: Conversation) => {

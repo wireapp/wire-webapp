@@ -123,7 +123,7 @@ export class ListViewModel {
       const hasConnectRequests = !!this.userState.connectRequests().length;
       const states: (string | Conversation)[] = hasConnectRequests ? [ContentState.CONNECTION_REQUESTS] : [];
 
-      return states.concat(this.conversationState.conversations_unarchived());
+      return states.concat(this.conversationState.visibleConversations());
     });
 
     this._initSubscriptions();
@@ -263,13 +263,13 @@ export class ListViewModel {
     this.switchList(ListState.START_UI);
   };
 
-  readonly switchList = (newListState: ListState, respectLastState = true): void => {
+  readonly switchList = (newListState: ListState, loadPreviousContent = true): void => {
     const {listState} = useAppState.getState();
     const isStateChange = listState !== newListState;
 
     if (isStateChange) {
       this.hideList();
-      this.updateList(newListState, respectLastState);
+      this.updateList(newListState, loadPreviousContent);
       this.showList(newListState);
     }
   };
@@ -292,21 +292,22 @@ export class ListViewModel {
     document.addEventListener('keydown', this.onKeyDownListView);
   };
 
-  private readonly updateList = (newListState: ListState, respectLastState: boolean): void => {
+  private readonly updateList = (newListState: ListState, loadPreviousContent: boolean): void => {
     switch (newListState) {
       case ListState.PREFERENCES:
-        amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentState.PREFERENCES_ACCOUNT);
+        this.contentViewModel.switchContent(ContentState.PREFERENCES_ACCOUNT);
         break;
-      default:
-        if (respectLastState) {
-          this.contentViewModel.switchPreviousContent();
+      case ListState.TEMPORARY_GUEST:
+      case ListState.CONVERSATIONS:
+        if (loadPreviousContent) {
+          this.contentViewModel.loadPreviousContent();
         }
     }
   };
 
   readonly showTemporaryGuest = (): void => {
     this.switchList(ListState.TEMPORARY_GUEST);
-    const conversationEntity = this.conversationRepository.getMostRecentConversation();
+    const conversationEntity = this.conversationState.getMostRecentConversation();
     amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
   };
 
@@ -465,7 +466,7 @@ export class ListViewModel {
 
   readonly clickToUnarchive = (conversationEntity: Conversation): void => {
     this.conversationRepository.unarchiveConversation(conversationEntity, true, 'manual un-archive').then(() => {
-      if (!this.conversationState.conversations_archived().length) {
+      if (!this.conversationState.archivedConversations().length) {
         this.switchList(ListState.CONVERSATIONS);
       }
     });

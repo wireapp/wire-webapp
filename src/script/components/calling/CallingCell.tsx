@@ -152,7 +152,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
   const videoGrid = useVideoGrid(call);
 
   const conversationParticipants = conversation && (selfUser ? userEts.concat(selfUser) : userEts);
-  const conversationUrl = generateConversationUrl(conversation.id, conversation.domain);
+  const conversationUrl = generateConversationUrl(conversation.qualifiedId);
   const selfParticipant = call?.getSelfParticipant();
 
   const {

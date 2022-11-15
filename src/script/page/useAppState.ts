@@ -68,29 +68,35 @@ type AppState = {
   listState: ListState;
   setListState: (listState: ListState) => void;
   previousContentState: ContentState | null;
-  setPreviousContentState: (contentState: ContentState | null) => void;
   unreadMessagesCount: number;
   setUnreadMessagesCount: (unreadMessagesCount: number) => void;
+  /**
+   * returns true if the current active content could display a conversation
+   */
+  isShowingConversation: () => boolean;
 };
+
+const STATE_WITH_CONVERSATION = [ContentState.WATERMARK, ContentState.COLLECTION, ContentState.CONVERSATION];
 
 const useAppState = create<AppState>((set, get) => ({
   contentState: ContentState.WATERMARK,
   listState: ListState.CONVERSATIONS,
   previousContentState: null,
-  setContentState: (contentState: ContentState) =>
+  setContentState: (contentState: ContentState) => {
+    const previousContentState = get().contentState;
     set(state => ({
       ...state,
       contentState,
-    })),
+      previousContentState,
+    }));
+  },
+  isShowingConversation() {
+    return STATE_WITH_CONVERSATION.includes(get().contentState);
+  },
   setListState: (listState: ListState) =>
     set(state => ({
       ...state,
       listState,
-    })),
-  setPreviousContentState: (contentState: ContentState | null) =>
-    set(state => ({
-      ...state,
-      previousContentState: contentState,
     })),
   setUnreadMessagesCount: (unreadMessagesCount: number) =>
     set(state => ({

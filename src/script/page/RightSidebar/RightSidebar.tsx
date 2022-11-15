@@ -17,7 +17,7 @@
  *
  */
 
-import {cloneElement, FC, ReactNode, useEffect, useState} from 'react';
+import {cloneElement, FC, ReactNode, useCallback, useEffect, useState} from 'react';
 
 import {amplify} from 'amplify';
 import {CSSTransition, TransitionGroup} from 'react-transition-group';
@@ -26,6 +26,7 @@ import {container} from 'tsyringe';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {focusableElementsSelector} from 'Util/util';
 
 import {AddParticipants} from './AddParticipants';
 import {ConversationDetails} from './ConversationDetails';
@@ -119,7 +120,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
   const messageEntity = currentEntity && isReadableMessage(currentEntity) ? currentEntity : null;
   const serviceEntity = currentEntity && isServiceEntity(currentEntity) ? currentEntity : null;
 
-  const goToRoot = () => rightSidebar.goToRoot(activeConversation);
+  const goToRoot = () => rightSidebar.goToRoot(activeConversation || null);
 
   const closePanel = () => rightSidebar.close();
 
@@ -129,7 +130,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
     setIsAddMode(addMode);
   };
 
-  const onBackClick = (entity: PanelEntity | null = activeConversation) => {
+  const onBackClick = (entity: PanelEntity | null = activeConversation || null) => {
     const previousHistory = rightSidebar.history.slice(0, -1);
     const hasPreviousHistory = !!previousHistory.length;
     setAnimatePanelToLeft(false);
@@ -166,6 +167,16 @@ const RightSidebar: FC<RightSidebarProps> = ({
     });
   }, []);
 
+  const containerRef = useCallback(
+    (element: HTMLDivElement | null) => {
+      const nextElementToFocus = element?.querySelectorAll(focusableElementsSelector)[0] as HTMLElement | null;
+      if (nextElementToFocus) {
+        nextElementToFocus.focus();
+      }
+    },
+    [currentState],
+  );
+
   if (!activeConversation) {
     return null;
   }
@@ -182,7 +193,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
       }
     >
       <Animated key={currentState}>
-        <>
+        <div ref={containerRef}>
           {currentState === PanelState.CONVERSATION_DETAILS && (
             <ConversationDetails
               onClose={closePanel}
@@ -311,7 +322,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
               onClose={closePanel}
             />
           )}
-        </>
+        </div>
       </Animated>
     </TransitionGroup>
   );

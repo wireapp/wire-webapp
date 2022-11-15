@@ -62,6 +62,7 @@ describe('ConversationRepository', () => {
   const testFactory = new TestFactory();
 
   let conversation_et: Conversation;
+  let selfConversation: Conversation;
   let self_user_et;
   let server: sinon.SinonFakeServer;
   let storage_service: StorageService;
@@ -86,16 +87,17 @@ describe('ConversationRepository', () => {
     return conversation;
   };
 
-  beforeEach(() => {
+  beforeEach(async () => {
     server = sinon.fakeServer.create();
     server.autoRespond = true;
 
-    return testFactory.exposeConversationActors().then((conversation_repository: ConversationRepository) => {
+    return testFactory.exposeConversationActors().then(async (conversation_repository: ConversationRepository) => {
       amplify.publish(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
       storage_service = conversation_repository['conversationService']['storageService'];
 
       spyOn(testFactory.event_repository, 'injectEvent').and.returnValue(Promise.resolve({}));
-      conversation_et = _generateConversation(CONVERSATION_TYPE.SELF);
+      conversation_et = _generateConversation(CONVERSATION_TYPE.REGULAR);
+      selfConversation = _generateConversation(CONVERSATION_TYPE.SELF);
       conversation_et.id = payload.conversations.knock.post.conversation;
 
       const ping_url = `${Config.getConfig().BACKEND_REST}/conversations/${conversation_et.id}/knock`;
@@ -114,6 +116,7 @@ describe('ConversationRepository', () => {
       const mark_as_read_url = `${Config.getConfig().BACKEND_REST}/conversations/${conversation_et.id}/self`;
       server.respondWith('PUT', mark_as_read_url, [HTTP_STATUS.OK, {}, '']);
 
+      await conversation_repository['saveConversation'](selfConversation);
       return conversation_repository['saveConversation'](conversation_et);
     });
   });
@@ -139,7 +142,7 @@ describe('ConversationRepository', () => {
         expect(
           _findConversation(
             self_conversation_et,
-            testFactory.conversation_repository['conversationState'].filtered_conversations,
+            testFactory.conversation_repository['conversationState'].filteredConversations,
           ),
         ).toBeUndefined();
       });
@@ -159,7 +162,7 @@ describe('ConversationRepository', () => {
         expect(
           _findConversation(
             blocked_conversation_et,
-            testFactory.conversation_repository['conversationState'].filtered_conversations,
+            testFactory.conversation_repository['conversationState'].filteredConversations,
           ),
         ).toBeUndefined();
       });
@@ -179,7 +182,7 @@ describe('ConversationRepository', () => {
         expect(
           _findConversation(
             cancelled_conversation_et,
-            testFactory.conversation_repository['conversationState'].filtered_conversations,
+            testFactory.conversation_repository['conversationState'].filteredConversations,
           ),
         ).toBeUndefined();
       });
@@ -199,7 +202,7 @@ describe('ConversationRepository', () => {
         expect(
           _findConversation(
             pending_conversation_et,
-            testFactory.conversation_repository['conversationState'].filtered_conversations,
+            testFactory.conversation_repository['conversationState'].filteredConversations,
           ),
         ).toBeUndefined();
       });
@@ -301,7 +304,7 @@ describe('ConversationRepository', () => {
 
       result = testFactory.conversation_repository.getGroupsByName('e', false);
 
-      expect(result.length).toBe(3);
+      expect(result.length).toBe(4);
 
       result = testFactory.conversation_repository.getGroupsByName('Rene', false);
 
@@ -429,7 +432,7 @@ describe('ConversationRepository', () => {
         expect(
           _findConversation(
             _conversation,
-            testFactory.conversation_repository['conversationState'].filtered_conversations,
+            testFactory.conversation_repository['conversationState'].filteredConversations,
           ),
         ).toBeUndefined();
       });
@@ -706,7 +709,7 @@ describe('ConversationRepository', () => {
     describe('conversation.member-join', () => {
       let memberJoinEvent: ConversationMemberJoinEvent;
 
-      beforeEach(() => {
+      beforeEach(async () => {
         spyOn(testFactory.conversation_repository as any, 'onMemberJoin').and.callThrough();
         spyOn(testFactory.conversation_repository, 'updateParticipatingUserEntities').and.callThrough();
         spyOn(testFactory.user_repository, 'getUsersById').and.returnValue(Promise.resolve([]));
@@ -904,14 +907,14 @@ describe('ConversationRepository', () => {
 
       it('should not hide message if sender is not self user', async () => {
         const messageHiddenEvent: MessageHiddenEvent = {
-          conversation: conversation_et.id,
+          conversation: selfConversation.id,
           data: {
             conversation_id: conversation_et.id,
             message_id: messageId,
           },
           from: createRandomUuid(),
           id: createRandomUuid(),
-          qualified_conversation: {domain: '', id: conversation_et.id},
+          qualified_conversation: selfConversation.qualifiedId,
           time: new Date().toISOString(),
           type: ClientEvent.CONVERSATION.MESSAGE_HIDDEN,
         };
@@ -932,14 +935,14 @@ describe('ConversationRepository', () => {
       it('should hide message if sender is self user', () => {
         spyOn(testFactory.event_service, 'deleteEvent');
         const messageHiddenEvent: MessageHiddenEvent = {
-          conversation: conversation_et.id,
+          conversation: selfConversation.id,
           data: {
             conversation_id: conversation_et.id,
             message_id: messageId,
           },
           from: selfUser.id,
           id: createRandomUuid(),
-          qualified_conversation: {domain: '', id: conversation_et.id},
+          qualified_conversation: selfConversation.qualifiedId,
           time: new Date().toISOString(),
           type: ClientEvent.CONVERSATION.MESSAGE_HIDDEN,
         };
@@ -954,7 +957,7 @@ describe('ConversationRepository', () => {
         });
       });
 
-      it('should not hide message if not send via self conversation', () => {
+      it('should not hide message if not send via self conversation', async () => {
         spyOn(testFactory.event_service, 'deleteEvent');
         const messageHiddenEvent: MessageHiddenEvent = {
           conversation: createRandomUuid(),
@@ -972,10 +975,12 @@ describe('ConversationRepository', () => {
         expect(conversation_et.getMessage(messageId)).toBeDefined();
         spyOn(testFactory.conversation_repository['userState'], 'self').and.returnValue(selfUser);
 
-        return testFactory.conversation_repository['onMessageHidden'](messageHiddenEvent).then(() => {
-          expect(testFactory.conversation_repository['onMessageHidden']).toHaveBeenCalled();
-          expect(testFactory.event_service.deleteEvent).toHaveBeenCalledTimes(1);
+        await expect(
+          testFactory.conversation_repository['handleConversationEvent'](messageHiddenEvent),
+        ).rejects.toMatchObject({
+          type: ConversationError.TYPE.WRONG_CONVERSATION,
         });
+        expect(testFactory.event_service.deleteEvent).not.toHaveBeenCalled();
       });
 
       it('syncs message deletion with the database', () => {
@@ -1119,12 +1124,12 @@ describe('ConversationRepository', () => {
     });
 
     it('should know all users participating in a conversation (including the self user)', () => {
-      const [, users] = testFactory.conversation_repository['conversationState'].conversations();
+      const [, , users] = testFactory.conversation_repository['conversationState'].conversations();
       return testFactory.conversation_repository
         .getAllUsersInConversation({domain: '', id: users.id})
         .then(user_ets => {
           expect(user_ets.length).toBe(3);
-          expect(testFactory.conversation_repository['conversationState'].conversations().length).toBe(4);
+          expect(testFactory.conversation_repository['conversationState'].conversations().length).toBe(5);
         });
     });
   });
@@ -1191,7 +1196,7 @@ describe('ConversationRepository', () => {
       testFactory.conversation_repository['saveConversation'](deletedGroup);
       await testFactory.conversation_repository.checkForDeletedConversations();
 
-      expect(testFactory.conversation_repository['conversationState'].conversations().length).toBe(2);
+      expect(testFactory.conversation_repository['conversationState'].conversations().length).toBe(3);
     });
   });
 

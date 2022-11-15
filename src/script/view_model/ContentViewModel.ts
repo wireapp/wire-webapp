@@ -28,7 +28,6 @@ import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHold
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
-import {matchQualifiedIds} from 'Util/QualifiedId';
 import {isConversationEntity} from 'Util/TypePredicateUtil';
 
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
@@ -45,6 +44,8 @@ import '../page/MainContent';
 import {PanelState} from '../page/RightSidebar';
 import {useAppMainState} from '../page/state';
 import {ContentState, useAppState} from '../page/useAppState';
+import {generateConversationUrl} from '../router/routeGenerator';
+import {navigate} from '../router/Router';
 import {TeamState} from '../team/TeamState';
 import type {UserRepository} from '../user/UserRepository';
 import {UserState} from '../user/UserState';
@@ -56,7 +57,7 @@ interface ShowConversationOptions {
 }
 
 interface ShowConversationOverload {
-  (conversation: Conversation, options: ShowConversationOptions): Promise<void>;
+  (conversation: Conversation | undefined, options: ShowConversationOptions): Promise<void>;
   (conversationId: string, options: ShowConversationOptions, domain: string | null): Promise<void>;
 }
 
@@ -71,7 +72,7 @@ export class ContentViewModel {
   logger: Logger;
   readonly isFederated?: boolean;
   mainViewModel: MainViewModel;
-  previousConversation: Conversation | null = null;
+  previousConversation?: Conversation;
   userRepository: UserRepository;
   initialMessage?: Message;
 
@@ -88,12 +89,19 @@ export class ContentViewModel {
     this.isFederated = mainViewModel.isFederated;
     this.logger = getLogger('ContentViewModel');
 
+    const showMostRecentConversation = () => {
+      const mostRecentConversation = this.conversationState.getMostRecentConversation();
+      if (mostRecentConversation) {
+        navigate(generateConversationUrl(mostRecentConversation));
+      }
+    };
+
     this.userState.connectRequests.subscribe(requests => {
       const {contentState} = useAppState.getState();
 
       const isStateRequests = contentState === ContentState.CONNECTION_REQUESTS;
       if (isStateRequests && !requests.length) {
-        this.showConversation(this.conversationRepository.getMostRecentConversation(), {});
+        showMostRecentConversation();
       }
     });
 
@@ -102,7 +110,7 @@ export class ContentViewModel {
         this.conversationState.activeConversation()?.connection().status() ===
         ConnectionStatus.MISSING_LEGAL_HOLD_CONSENT
       ) {
-        this.showConversation(this.conversationRepository.getMostRecentConversation(), {});
+        showMostRecentConversation();
       }
     });
 
@@ -132,14 +140,6 @@ export class ContentViewModel {
   }
 
   changeConversation = (conversationEntity: Conversation, messageEntity?: Message) => {
-    // Clean up old conversation
-    const conversation = this.conversationState.activeConversation();
-
-    if (conversation) {
-      conversation.release();
-    }
-
-    // Update new conversation
     this.initialMessage = messageEntity;
     this.conversationState.activeConversation(conversationEntity);
   };
@@ -154,7 +154,7 @@ export class ContentViewModel {
    * @param domain Domain name
    */
   readonly showConversation: ShowConversationOverload = async (
-    conversation: Conversation | string,
+    conversation: Conversation | string | undefined,
     options: ShowConversationOptions,
     domain: string | null = null,
   ) => {
@@ -202,8 +202,6 @@ export class ContentViewModel {
         return;
       }
 
-      this.releaseContent(contentState);
-
       setContentState(ContentState.CONVERSATION);
       this.mainViewModel.list.openConversations();
 
@@ -226,7 +224,7 @@ export class ContentViewModel {
       this.previousConversation = this.conversationState.activeConversation();
 
       if (openNotificationSettings) {
-        rightSidebar.goTo(PanelState.NOTIFICATIONS, {entity: this.conversationState.activeConversation()});
+        rightSidebar.goTo(PanelState.NOTIFICATIONS, {entity: this.conversationState.activeConversation() ?? null});
       }
     } catch (error) {
       const isConversationNotFound = error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
@@ -252,12 +250,11 @@ export class ContentViewModel {
     const isStateChange = newContentState !== contentState;
 
     if (isStateChange) {
-      this.releaseContent(newContentState);
       this.showContent(this.checkContentAvailability(newContentState));
     }
   };
 
-  readonly switchPreviousContent = (): void => {
+  readonly loadPreviousContent = (): void => {
     const {contentState, previousContentState} = useAppState.getState();
     const isStateChange = previousContentState !== contentState;
 
@@ -267,12 +264,8 @@ export class ContentViewModel {
         this.switchContent(ContentState.CONNECTION_REQUESTS);
       }
 
-      const repoHasConversation = this.conversationState
-        .conversations()
-        .some(conversation => this.previousConversation && matchQualifiedIds(conversation, this.previousConversation));
-
-      if (this.previousConversation && repoHasConversation && !this.previousConversation.is_archived()) {
-        void this.showConversation(this.previousConversation, {});
+      if (this.conversationState.isVisible(this.previousConversation)) {
+        navigate(generateConversationUrl(this.previousConversation));
         return;
       }
 
@@ -289,23 +282,6 @@ export class ContentViewModel {
       }
     }
     return newState;
-  };
-
-  private readonly releaseContent = (newContentState: ContentState) => {
-    const {contentState, previousContentState, setPreviousContentState} = useAppState.getState();
-    setPreviousContentState(contentState);
-    const isStateConversation = previousContentState === ContentState.CONVERSATION;
-
-    if (isStateConversation) {
-      const collectionStates = [ContentState.COLLECTION];
-      const isCollectionState = collectionStates.includes(newContentState);
-
-      if (!isCollectionState) {
-        this.conversationState.activeConversation(null);
-      }
-
-      return this.conversationState.activeConversation()?.release();
-    }
   };
 
   private readonly showContent = (newContentState: ContentState) => {
