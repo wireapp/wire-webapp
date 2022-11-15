@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import React, {MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent} from 'react';
 
 import {css} from '@emotion/react';
 
@@ -111,12 +111,9 @@ export const ConversationsList: React.FC<{
               index={index}
               dataUieName="item-conversation"
               conversation={conversation}
-              onClick={event => {
-                if (event.type === 'keydown') {
-                  createNavigateKeyboard(
-                    generateConversationUrl(conversation.id, conversation.domain),
-                    true,
-                  )(event as unknown as React.KeyboardEvent);
+              onClick={(event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>) => {
+                if ('key' in event) {
+                  createNavigateKeyboard(generateConversationUrl(conversation.id, conversation.domain), true)(event);
                 } else {
                   createNavigate(generateConversationUrl(conversation.id, conversation.domain))(event);
                 }

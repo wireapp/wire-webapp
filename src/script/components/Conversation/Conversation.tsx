@@ -191,9 +191,7 @@ const ConversationList: FC<ConversationListProps> = ({
     const href = (event.target as HTMLAnchorElement).href;
     PrimaryModal.show(PrimaryModal.type.CONFIRM, {
       primaryAction: {
-        action: () => {
-          safeWindowOpen(href);
-        },
+        action: () => safeWindowOpen(href),
         text: t('modalOpenLinkAction'),
       },
       text: {
@@ -224,12 +222,13 @@ const ConversationList: FC<ConversationListProps> = ({
     }
   };
 
+  const btnRightClick = 2;
   const handleClickOnMessage = (
     messageEntity: ContentMessage | Text,
     event: MouseEvent | KeyboardEvent,
     elementType: ElementType,
   ) => {
-    if (isMouseEvent(event) && event.button === 2) {
+    if (isMouseEvent(event) && event.button === btnRightClick) {
       // Default browser behavior on right click
       return true;
     }
@@ -239,7 +238,7 @@ const ConversationList: FC<ConversationListProps> = ({
         handleEmailClick(event);
         break;
       case 'mardownLink':
-        handleLinkClick(event);
+        handleMarkdownLinkClick(event);
         break;
       case 'mention':
         userMentionClick(event);

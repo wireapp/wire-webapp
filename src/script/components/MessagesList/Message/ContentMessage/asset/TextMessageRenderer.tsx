@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useRef} from 'react';
+import {useEffect, useRef, FC} from 'react';
 
 import {Text} from 'src/script/entity/message/Text';
 import {handleKeyDown} from 'Util/KeyboardUtil';
@@ -37,7 +37,7 @@ interface TextMessageRendererProps {
 }
 const events = ['click', 'keydown', 'auxclick'];
 
-export const TextMessageRenderer: React.FC<TextMessageRendererProps> = ({
+export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
   text,
   onClickMsg,
   msgClass,
@@ -63,6 +63,9 @@ export const TextMessageRenderer: React.FC<TextMessageRendererProps> = ({
   );
 
   useEffect(() => {
+    if (!containerRef.current) {
+      return;
+    }
     const emailLinks = containerRef.current && [...containerRef.current.querySelectorAll('[data-email-link]')];
     const linkTarget = containerRef.current && [...containerRef.current.querySelectorAll('a')];
     const msgLinkTarget = containerRef.current && [...containerRef.current.querySelectorAll('[data-uie-name]')];
@@ -102,43 +105,42 @@ export const TextMessageRenderer: React.FC<TextMessageRendererProps> = ({
       }
     };
 
-    if (containerRef.current) {
-      emailLinks?.forEach(emailLink => {
-        events.forEach(eventName => {
-          emailLink.addEventListener(eventName, event => {
-            if (eventName === 'keydown') {
-              handleKeyEvent(event as KeyboardEvent, 'email');
-              return;
-            }
-            onClickMsg(event as MouseEvent, asset, 'email');
-          });
+    emailLinks?.forEach(emailLink => {
+      events.forEach(eventName => {
+        emailLink.addEventListener(eventName, event => {
+          if (eventName === 'keydown') {
+            handleKeyEvent(event as KeyboardEvent, 'email');
+            return;
+          }
+          onClickMsg(event as MouseEvent, asset, 'email');
         });
       });
+    });
 
-      linkTarget?.forEach(msgLink => {
-        events.forEach(eventName => {
-          msgLink.addEventListener(eventName, event => {
-            if (eventName === 'keydown') {
-              handleKeyEvent(event as KeyboardEvent, 'mardownLink');
-              return;
-            }
-            onClickMsg(event as MouseEvent, asset, 'mardownLink');
-          });
+    linkTarget?.forEach(msgLink => {
+      events.forEach(eventName => {
+        msgLink.addEventListener(eventName, event => {
+          if (eventName === 'keydown') {
+            handleKeyEvent(event as KeyboardEvent, 'mardownLink');
+            return;
+          }
+          onClickMsg(event as MouseEvent, asset, 'mardownLink');
         });
       });
+    });
 
-      msgMention?.forEach(mention => {
-        events.forEach(eventName => {
-          mention.addEventListener(eventName, event => {
-            if (eventName === 'keydown') {
-              handleKeyEvent(event as KeyboardEvent, 'mention');
-              return;
-            }
-            onClickMsg(event as MouseEvent, asset, 'mention');
-          });
+    msgMention?.forEach(mention => {
+      events.forEach(eventName => {
+        mention.addEventListener(eventName, event => {
+          if (eventName === 'keydown') {
+            handleKeyEvent(event as KeyboardEvent, 'mention');
+            return;
+          }
+          onClickMsg(event as MouseEvent, asset, 'mention');
         });
       });
-    }
+    });
+
     return () => {
       emailLinks?.forEach(emailLink => {
         events.forEach(eventName => {

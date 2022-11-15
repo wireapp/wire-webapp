@@ -106,7 +106,6 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
     return !previousMessage.isContent() || previousMessage.user().id !== message.user().id;
   };
 
-  //console.log('focusConversation', focusConversation);
   const avatarSection = shouldShowAvatar() ? (
     <div className="message-header">
       <div className="message-header-icon">
@@ -227,7 +226,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
         )}
 
         <div className="message-body-actions">
-          {menuEntries.length && (
+          {menuEntries.length > 0 && (
             <button
               tabIndex={focusConversation ? 0 : -1}
               className="context-menu icon-more font-size-xs"

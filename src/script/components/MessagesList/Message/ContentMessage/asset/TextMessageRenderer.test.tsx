@@ -62,7 +62,7 @@ describe('TextMessageRenderer', () => {
       <TextMessageRenderer
         text={txtMsg}
         onClickMsg={onClickElement}
-        isCurrentConversationFocused={true}
+        isCurrentConversationFocused
         msgClass=""
         asset={asset}
       />,
@@ -84,7 +84,7 @@ describe('TextMessageRenderer', () => {
       <TextMessageRenderer
         text={text}
         onClickMsg={onClickElement}
-        isCurrentConversationFocused={true}
+        isCurrentConversationFocused
         msgClass=""
         asset={asset}
       />,
@@ -108,7 +108,7 @@ describe('TextMessageRenderer', () => {
       <TextMessageRenderer
         text={text}
         onClickMsg={onClickElement}
-        isCurrentConversationFocused={true}
+        isCurrentConversationFocused
         msgClass=""
         asset={asset}
       />,

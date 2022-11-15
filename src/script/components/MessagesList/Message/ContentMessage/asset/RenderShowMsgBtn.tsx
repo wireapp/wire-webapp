@@ -17,6 +17,8 @@
  *
  */
 
+import {FC} from 'react';
+
 import cx from 'classnames';
 
 import {Icon} from 'Components/Icon';
@@ -28,7 +30,7 @@ interface ShowMsgBtnProps {
   setShowFullText: (showMore: boolean) => void;
 }
 
-export const RenderShowMsgBtn: React.FC<ShowMsgBtnProps> = ({
+export const RenderShowMsgBtn: FC<ShowMsgBtnProps> = ({
   showFullText,
   isCurrentConversationFocused,
   setShowFullText,

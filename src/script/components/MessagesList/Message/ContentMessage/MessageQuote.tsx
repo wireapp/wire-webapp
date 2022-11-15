@@ -226,7 +226,7 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
                 isCurrentConversationFocused={focusConversation}
                 asset={asset}
                 data-uie-name="media-text-quote"
-                isQuoteMsg={true}
+                isQuoteMsg
                 setCanShowMore={setCanShowMore}
                 edited_timestamp={edited_timestamp}
               />
