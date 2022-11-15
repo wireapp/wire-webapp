@@ -44,7 +44,7 @@ export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
   isCurrentConversationFocused,
   asset,
   isQuoteMsg = false,
-  edited_timestamp,
+  editedTimestamp,
   setCanShowMore,
   ...props
 }) => {
