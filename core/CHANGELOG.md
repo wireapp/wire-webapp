@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [37.0.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@37.0.1...@wireapp/core@37.0.2) (2022-11-15)
+
+### Bug Fixes
+
+* streamline DecryptionError ([#4613](https://github.com/wireapp/wire-web-packages/issues/4613)) ([422285b](https://github.com/wireapp/wire-web-packages/commit/422285b5677e11086e09f5ccaf34e8c53c24e2c3))
+
 ## [37.0.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@37.0.0...@wireapp/core@37.0.1) (2022-11-14)
 
 **Note:** Version bump only for package @wireapp/core
