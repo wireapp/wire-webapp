@@ -82,7 +82,7 @@ export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
     }
 
     if (linkTarget) {
-      linkTarget?.forEach(link => {
+      linkTarget.forEach(link => {
         link.setAttribute('tabindex', isCurrentConversationFocused ? '0' : '-1');
       });
     }
