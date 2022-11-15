@@ -59,7 +59,6 @@ interface MainContentProps {
   isRightSidebarOpen?: boolean;
   conversationState?: ConversationState;
 }
-const STATE_WITH_CONVERSATION = [ContentState.WATERMARK, ContentState.COLLECTION, ContentState.CONVERSATION];
 
 const MainContent: FC<MainContentProps> = ({
   openRightSidebar,
@@ -69,10 +68,10 @@ const MainContent: FC<MainContentProps> = ({
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const mainViewModel = useContext(RootContext);
 
-  const {contentState} = useAppState();
+  const {contentState, isShowingConversation} = useAppState();
 
   useEffect(() => {
-    if (!STATE_WITH_CONVERSATION.includes(contentState) && conversationState.activeConversation()) {
+    if (!isShowingConversation() && conversationState.activeConversation()) {
       // Reset active conversation for all states that do not require a loaded conversation
       conversationState.activeConversation(undefined);
     }
