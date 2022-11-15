@@ -172,6 +172,8 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
     }
   }, [index, isActive, isFolder, isConversationListFocus, handleFocus]);
 
+  // on conversation/app load reset last message focus to ensure last message is focused
+  // only when user enters a new conversation using keyboard(press enter)
   useEffect(() => {
     setHistoryParam(generateConversationUrl(conversation.qualifiedId));
   }, [conversation]);
