@@ -70,11 +70,14 @@ export class ContentViewModel {
   messageRepository: MessageRepository;
   sidebarId: string;
   logger: Logger;
-  readonly isFederated?: boolean;
   mainViewModel: MainViewModel;
   previousConversation?: Conversation;
   userRepository: UserRepository;
   initialMessage?: Message;
+
+  get isFederated() {
+    return this.mainViewModel.isFederated;
+  }
 
   constructor(mainViewModel: MainViewModel, public repositories: ViewModelRepositories) {
     this.userState = container.resolve(UserState);
@@ -86,7 +89,6 @@ export class ContentViewModel {
     this.conversationRepository = repositories.conversation;
     this.userRepository = repositories.user;
     this.messageRepository = repositories.message;
-    this.isFederated = mainViewModel.isFederated;
     this.logger = getLogger('ContentViewModel');
 
     const showMostRecentConversation = () => {

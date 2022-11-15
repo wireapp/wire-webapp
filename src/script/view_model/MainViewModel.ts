@@ -90,10 +90,10 @@ export class MainViewModel {
   multitasking: Multitasking;
   selfUser: ko.Observable<User>;
   userRepository: UserRepository;
-  isFederated: boolean;
   messageEntity: Message | undefined;
   showLikes: boolean;
   highlightedUsers: User[];
+  private readonly core = container.resolve(Core);
   private readonly userState: UserState;
 
   static get CONFIG() {
@@ -105,12 +105,15 @@ export class MainViewModel {
     };
   }
 
+  get isFederated() {
+    return this.core.backendFeatures.isFederated;
+  }
+
   constructor(repositories: ViewModelRepositories) {
     this.userRepository = repositories.user;
     this.logger = getLogger('MainViewModel');
 
     this.userState = container.resolve(UserState);
-    this.isFederated = container.resolve(Core).backendFeatures.isFederated;
 
     this.multitasking = {
       isMinimized: ko.observable(true),
