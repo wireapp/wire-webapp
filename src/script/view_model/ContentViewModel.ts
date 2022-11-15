@@ -24,7 +24,6 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
@@ -46,7 +45,6 @@ import {useAppMainState} from '../page/state';
 import {ContentState, useAppState} from '../page/useAppState';
 import {generateConversationUrl} from '../router/routeGenerator';
 import {navigate} from '../router/Router';
-import {TeamState} from '../team/TeamState';
 import type {UserRepository} from '../user/UserRepository';
 import {UserState} from '../user/UserState';
 
@@ -63,7 +61,6 @@ interface ShowConversationOverload {
 
 export class ContentViewModel {
   private readonly userState: UserState;
-  private readonly teamState: TeamState;
   private readonly conversationState: ConversationState;
 
   conversationRepository: ConversationRepository;
@@ -81,7 +78,6 @@ export class ContentViewModel {
 
   constructor(mainViewModel: MainViewModel, public repositories: ViewModelRepositories) {
     this.userState = container.resolve(UserState);
-    this.teamState = container.resolve(TeamState);
     this.conversationState = container.resolve(ConversationState);
 
     this.sidebarId = 'left-column';
@@ -117,11 +113,6 @@ export class ContentViewModel {
     });
 
     this._initSubscriptions();
-
-    if (this.teamState.supportsLegalHold()) {
-      const {showRequestModal} = useLegalHoldModalState.getState();
-      showRequestModal(true);
-    }
   }
 
   private _initSubscriptions() {
