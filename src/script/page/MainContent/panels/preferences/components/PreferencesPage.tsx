@@ -42,7 +42,7 @@ const PreferencesPage: FC<PreferencesPageProps> = ({title, children}) => {
   const goHome = () => root?.content.loadPreviousContent();
 
   const containerRef = useCallback((element: HTMLDivElement | null) => {
-    const nextElementToFocus = element?.querySelectorAll("[tabindex='0']")[0] as HTMLElement;
+    const nextElementToFocus = element?.querySelector("[tabindex='0']") as HTMLElement | null;
     if (nextElementToFocus) {
       nextElementToFocus.focus();
     }
