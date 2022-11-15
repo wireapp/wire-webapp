@@ -89,9 +89,7 @@ export class ContentViewModel {
 
     const showMostRecentConversation = () => {
       const mostRecentConversation = this.conversationState.getMostRecentConversation();
-      if (mostRecentConversation) {
-        navigate(generateConversationUrl(mostRecentConversation));
-      }
+      this.showConversation(mostRecentConversation, {});
     };
 
     this.userState.connectRequests.subscribe(requests => {
