@@ -32,7 +32,7 @@ interface TextMessageRendererProps {
   msgClass: string;
   asset: Text;
   isQuoteMsg?: boolean;
-  edited_timestamp?: number;
+  editedTimestamp?: number;
   setCanShowMore?: (showMore: boolean) => void;
 }
 const events = ['click', 'keydown', 'auxclick'];
