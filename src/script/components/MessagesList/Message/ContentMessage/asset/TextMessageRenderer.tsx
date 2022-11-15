@@ -23,7 +23,7 @@ import {Text} from 'src/script/entity/message/Text';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {useDisposableRef} from 'Util/useDisposableRef';
 
-export type ElementType = 'mardownLink' | 'email' | 'mention';
+export type ElementType = 'markdownLink' | 'email' | 'mention';
 
 interface TextMessageRendererProps {
   onClickMsg: (event: MouseEvent | KeyboardEvent, asset: Text, elementType: ElementType) => void;
@@ -121,10 +121,10 @@ export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
       events.forEach(eventName => {
         msgLink.addEventListener(eventName, event => {
           if (eventName === 'keydown') {
-            handleKeyEvent(event as KeyboardEvent, 'mardownLink');
+            handleKeyEvent(event as KeyboardEvent, 'markdownLink');
             return;
           }
-          onClickMsg(event as MouseEvent, asset, 'mardownLink');
+          onClickMsg(event as MouseEvent, asset, 'markdownLink');
         });
       });
     });
@@ -153,7 +153,7 @@ export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
       linkTarget?.forEach(msgLink => {
         events.forEach(eventName => {
           msgLink.removeEventListener(eventName, event => {
-            onClickMsg(event as MouseEvent, asset, 'mardownLink');
+            onClickMsg(event as MouseEvent, asset, 'markdownLink');
           });
         });
       });

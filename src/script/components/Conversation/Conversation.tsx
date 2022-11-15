@@ -237,7 +237,7 @@ const ConversationList: FC<ConversationListProps> = ({
       case 'email':
         handleEmailClick(event);
         break;
-      case 'mardownLink':
+      case 'markdownLink':
         handleMarkdownLinkClick(event);
         break;
       case 'mention':
