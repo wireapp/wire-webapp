@@ -76,7 +76,7 @@ export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
 
     // set tabindex for each interactive element based on the element focus state
     if (msgMention) {
-      msgMention?.forEach(mention => {
+      msgMention.forEach(mention => {
         mention.setAttribute('tabindex', isCurrentConversationFocused ? '0' : '-1');
       });
     }
