@@ -19,9 +19,10 @@
 
 import React, {useEffect} from 'react';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ConversationListCell} from 'Components/list/ConversationListCell';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -50,8 +51,8 @@ const Archive: React.FC<ArchiveProps> = ({
   onClose,
   conversationState = container.resolve(ConversationState),
 }) => {
-  const {conversations_archived: conversations} = useKoSubscribableChildren(conversationState, [
-    'conversations_archived',
+  const {archivedConversations: conversations} = useKoSubscribableChildren(conversationState, [
+    'archivedConversations',
   ]);
 
   const onClickConversation = async (conversation: Conversation) => {

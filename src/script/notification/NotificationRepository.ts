@@ -19,12 +19,13 @@
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {NotificationPreference, WebappProperties} from '@wireapp/api-client/lib/user/data/';
-import {Runtime} from '@wireapp/commons';
-import {Availability} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
+
+import {Runtime} from '@wireapp/commons';
+import {Availability} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Declension, t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
@@ -56,11 +57,11 @@ import type {SystemMessage} from '../entity/message/SystemMessage';
 import type {User} from '../entity/User';
 import {SuperType} from '../message/SuperType';
 import {SystemMessageType} from '../message/SystemMessageType';
+import {ContentState, useAppState} from '../page/useAppState';
 import type {PermissionRepository} from '../permission/PermissionRepository';
 import {PermissionStatusState} from '../permission/PermissionStatusState';
 import {PermissionType} from '../permission/PermissionType';
 import {UserState} from '../user/UserState';
-import {ContentState} from '../view_model/ContentViewModel';
 import {Warnings} from '../view_model/WarningsContainer';
 
 export interface Multitasking {
@@ -69,7 +70,7 @@ export interface Multitasking {
 
 interface ContentViewModelState {
   multitasking: Multitasking;
-  state: () => string | false;
+  state: ContentState | null;
 }
 
 type NotificationData = {conversationId?: QualifiedId; messageId?: string; messageType: string};
@@ -135,7 +136,7 @@ export class NotificationRepository {
     this.permissionRepository = permissionRepository;
     this.contentViewModelState = {
       multitasking: {isMinimized: (() => false) as ko.Observable<boolean>},
-      state: () => false,
+      state: null,
     };
 
     this.logger = getLogger('NotificationRepository');
@@ -155,7 +156,7 @@ export class NotificationRepository {
     this.selfUser = this.userState.self;
   }
 
-  setContentViewModelStates(state: () => string, multitasking: {isMinimized: ko.Observable<boolean>}): void {
+  setContentViewModelStates(state: ContentState, multitasking: {isMinimized: ko.Observable<boolean>}): void {
     this.contentViewModelState = {multitasking, state};
   }
 
@@ -802,7 +803,8 @@ export class NotificationRepository {
     const inActiveConversation = conversationEntity
       ? this.conversationState.isActiveConversation(conversationEntity)
       : false;
-    const inConversationView = this.contentViewModelState.state() === ContentState.CONVERSATION;
+    const {contentState} = useAppState.getState();
+    const inConversationView = contentState === ContentState.CONVERSATION;
     const inMaximizedCall = !!this.callState.joinedCall() && !this.contentViewModelState.multitasking.isMinimized();
 
     const activeConversation = document.hasFocus() && inConversationView && inActiveConversation && !inMaximizedCall;

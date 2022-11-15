@@ -20,7 +20,8 @@
 import {FC, useEffect, useState} from 'react';
 
 import {Icon} from 'Components/Icon';
-import {LoadingBar} from 'Components/LoadingBar';
+import {LoadingBar} from 'Components/LoadingBar/LoadingBar';
+import {ContentState} from 'src/script/page/useAppState';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {formatDuration} from 'Util/TimeUtil';
@@ -31,7 +32,6 @@ import {BackupRepository} from '../../backup/BackupRepository';
 import {CancelError, DifferentAccountError, ImportError, IncompatibleBackupError} from '../../backup/Error';
 import {Config} from '../../Config';
 import {MotionDuration} from '../../motion/MotionDuration';
-import {ContentState} from '../../view_model/ContentViewModel';
 
 export enum HistoryImportState {
   DONE = 'HistoryImportState.STATE.DONE',

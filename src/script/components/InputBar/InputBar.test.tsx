@@ -40,17 +40,16 @@ import {TeamState} from '../../team/TeamState';
 import {UserState} from '../../user/UserState';
 
 const testFactory = new TestFactory();
-let conversationRepository: ConversationRepository;
+const conversationRepository = {
+  sendTypingStart: jest.fn(),
+  sendTypingStop: jest.fn(),
+} as unknown as ConversationRepository;
+
 let eventRepository: EventRepository;
 let searchRepository: SearchRepository;
 let storageRepository: StorageRepository;
 
 beforeAll(() => {
-  testFactory.exposeConversationActors().then(factory => {
-    conversationRepository = factory;
-    return conversationRepository;
-  });
-
   testFactory.exposeEventActors().then(factory => {
     eventRepository = factory;
     return eventRepository;

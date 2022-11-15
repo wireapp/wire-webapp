@@ -32,7 +32,6 @@ import {GroupedConversationHeader} from './GroupedConversationHeader';
 import {useRoveFocus} from '../../../../hooks/useRoveFocus';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
 import {createNavigate} from '../../../../router/routerBindings';
-import {useAppMainState} from '../../../state';
 
 export interface GroupedConversationsFolderProps {
   expandedFolders: string[];
@@ -55,8 +54,6 @@ const GroupedConversationsFolder: React.FC<GroupedConversationsFolderProps> = ({
 }) => {
   const isExpanded: boolean = expandedFolders.includes(folder.id);
   const {conversations} = useKoSubscribableChildren(folder, ['conversations']);
-  const makeOnClick = (conversationId: string, domain: string | null) =>
-    createNavigate(generateConversationUrl(conversationId, domain));
   const {currentFocus, handleKeyDown, setCurrentFocus} = useRoveFocus(conversations.length);
 
   return (
@@ -73,14 +70,7 @@ const GroupedConversationsFolder: React.FC<GroupedConversationsFolderProps> = ({
               isConversationListFocus
               handleFocus={setCurrentFocus}
               handleArrowKeyDown={handleKeyDown}
-              onClick={event => {
-                if (!isSelectedConversation(conversation)) {
-                  const {rightSidebar} = useAppMainState.getState();
-                  rightSidebar.clearHistory();
-                }
-
-                makeOnClick(conversation.id, conversation.domain)(event);
-              }}
+              onClick={createNavigate(generateConversationUrl(conversation.qualifiedId))}
               rightClick={(_, event) => listViewModel.onContextMenu(conversation, event)}
               conversation={conversation}
               showJoinButton={hasJoinableCall(conversation)}

@@ -19,10 +19,11 @@
 
 import React, {useEffect} from 'react';
 
-import {Runtime} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import cx from 'classnames';
+
+import {Runtime} from '@wireapp/commons';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Icon} from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';

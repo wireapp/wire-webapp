@@ -18,14 +18,15 @@
  */
 
 import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/lib/event/';
-import {Account, ConnectionState, ProcessedEventPayload} from '@wireapp/core';
 import {PayloadBundleSource} from '@wireapp/core/lib/conversation';
 import {HandledEventPayload} from '@wireapp/core/lib/notification';
-import {Asset as ProtobufAsset, GenericMessage} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
+
+import {Account, ConnectionState, ProcessedEventPayload} from '@wireapp/core';
+import {Asset as ProtobufAsset, GenericMessage} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -60,7 +61,6 @@ export class EventRepository {
   previousHandlingState: NOTIFICATION_HANDLING_STATE | undefined;
   notificationsHandled: number;
   notificationsTotal: number;
-  lastNotificationId: ko.Observable<string | undefined>;
   lastEventDate: ko.Observable<string | undefined>;
   eventProcessMiddlewares: Function[];
 
@@ -110,7 +110,6 @@ export class EventRepository {
     this.notificationsHandled = 0;
     this.notificationsTotal = 0;
 
-    this.lastNotificationId = ko.observable();
     this.lastEventDate = ko.observable();
 
     this.eventProcessMiddlewares = [];
@@ -260,7 +259,7 @@ export class EventRepository {
     const shouldUpdatePersistedId = missedNotificationId !== notificationId;
     if (shouldUpdatePersistedId) {
       amplify.publish(WebAppEvents.CONVERSATION.MISSED_EVENTS);
-      this.notificationService.saveMissedIdToDb(this.lastNotificationId());
+      this.notificationService.saveMissedIdToDb(missedNotificationId);
     }
   };
 
@@ -368,10 +367,6 @@ export class EventRepository {
       default: {
         return Promise.resolve(event as EventRecord);
       }
-      case EventValidation.IGNORED_TYPE: {
-        this.logger.info(`Ignored event type '${event.type}'`, logObject);
-        return Promise.resolve(event as EventRecord);
-      }
       case EventValidation.OUTDATED_TIMESTAMP: {
         this.logger.info(`Ignored outdated event type: '${event.type}'`, logObject);
         return Promise.resolve(event as EventRecord);
@@ -400,7 +395,7 @@ export class EventRepository {
         208, // Outated event decyption error (see https://github.com/wireapp/wire-web-core/blob/5c8c56097eadfa55e79856cd6745087f0fd12e24/packages/proteus/README.md#decryption-errors)
         209, // Duplicate event decryption error (see https://github.com/wireapp/wire-web-core/blob/5c8c56097eadfa55e79856cd6745087f0fd12e24/packages/proteus/README.md#decryption-errors)
       ];
-      if (ignoredCodes.includes(decryptionError.code)) {
+      if (decryptionError.code && ignoredCodes.includes(decryptionError.code)) {
         return undefined;
       }
       amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.E2EE.FAILED_MESSAGE_DECRYPTION, {

@@ -24,18 +24,7 @@
   </head>
 
   <body>
-    <app-container
-      id="wire-main"
-      class="off"
-      data-bind="css: mainClasses()"
-      params="root: $root"
-      data-uie-name="status-webapp"
-      data-uie-value="is-loading"
-    ></app-container>
-
-    <div id="loading-screen" class="loading-screen">
-      <loading-bar params="message: loadingMessage, progress: loadingProgress"></loading-bar>
-    </div>
+    <main id="wire-app"></main>
 
     <script src="./config.js?<%= VERSION %>"></script>
     <script src="./min/dexie.js?<%= VERSION %>"></script>

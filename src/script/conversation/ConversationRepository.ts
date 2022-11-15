@@ -25,6 +25,7 @@ import {
   NewConversation,
 } from '@wireapp/api-client/lib/conversation/';
 import {ConversationReceiptModeUpdateData} from '@wireapp/api-client/lib/conversation/data/';
+import {CONVERSATION_TYPING} from '@wireapp/api-client/lib/conversation/data/ConversationTypingData';
 import {
   ConversationCreateEvent,
   ConversationEvent,
@@ -34,19 +35,21 @@ import {
   ConversationMessageTimerUpdateEvent,
   ConversationReceiptModeUpdateEvent,
   ConversationRenameEvent,
+  ConversationTypingEvent,
   CONVERSATION_EVENT,
 } from '@wireapp/api-client/lib/event';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {MLSReturnType} from '@wireapp/core/lib/conversation';
-import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import ko from 'knockout';
 import {container} from 'tsyringe';
 import {flatten} from 'underscore';
 
+import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {useTypingIndicatorState} from 'Components/InputBar/TypingIndicator';
 import {getNextItem} from 'Util/ArrayUtil';
 import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/FileTypeUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
@@ -267,7 +270,7 @@ export class ConversationRepository {
 
     this.conversationLabelRepository = new ConversationLabelRepository(
       this.conversationState.conversations,
-      this.conversationState.conversations_unarchived,
+      this.conversationState.visibleConversations,
       propertyRepository.propertiesService,
     );
 
@@ -277,28 +280,6 @@ export class ConversationRepository {
 
   checkMessageTimer(messageEntity: ContentMessage): void {
     this.ephemeralHandler.checkMessageTimer(messageEntity, this.serverTimeHandler.getTimeOffset());
-  }
-
-  private initStateUpdates(): void {
-    ko.computed(() => {
-      const conversationsArchived: Conversation[] = [];
-      const conversationsCleared: Conversation[] = [];
-      const conversationsUnarchived: Conversation[] = [];
-
-      this.conversationState.sorted_conversations().forEach(conversationEntity => {
-        if (conversationEntity.is_cleared()) {
-          conversationsCleared.push(conversationEntity);
-        } else if (conversationEntity.is_archived()) {
-          conversationsArchived.push(conversationEntity);
-        } else {
-          conversationsUnarchived.push(conversationEntity);
-        }
-      });
-
-      this.conversationState.conversations_archived(conversationsArchived);
-      this.conversationState.conversations_cleared(conversationsCleared);
-      this.conversationState.conversations_unarchived(conversationsUnarchived);
-    });
   }
 
   private initSubscriptions(): void {
@@ -509,7 +490,11 @@ export class ConversationRepository {
     }
   }
 
-  public async getConversations(): Promise<Conversation[]> {
+  /**
+   * Will load all the conversations in memory
+   * @returns all the load conversations from backend merged with the locally stored conversations
+   */
+  public async loadConversations(): Promise<Conversation[]> {
     const remoteConversationsPromise = this.conversationService.getAllConversations().catch(error => {
       this.logger.error(`Failed to get all conversations from backend: ${error.message}`);
       return {found: []};
@@ -520,7 +505,7 @@ export class ConversationRepository {
       remoteConversationsPromise,
     ]);
     let conversationsData: any[];
-    if (!remoteConversations.found.length) {
+    if (!remoteConversations.found?.length) {
       conversationsData = localConversations;
     } else {
       const data = ConversationMapper.mergeConversation(localConversations, remoteConversations);
@@ -774,7 +759,7 @@ export class ConversationRepository {
   public async updateConversationsOnAppInit() {
     this.logger.info('Updating group participants');
     await this.updateUnarchivedConversations();
-    const updatePromises = this.conversationState.sorted_conversations().map(conversationEntity => {
+    const updatePromises = this.conversationState.filteredConversations().map(conversationEntity => {
       return this.updateParticipatingUserEntities(conversationEntity, true);
     });
     return Promise.all(updatePromises);
@@ -784,14 +769,14 @@ export class ConversationRepository {
    * Update users and events for archived conversations currently visible.
    */
   public updateArchivedConversations() {
-    this.updateConversations(this.conversationState.conversations_archived());
+    this.updateConversations(this.conversationState.archivedConversations());
   }
 
   /**
    * Update users and events for all unarchived conversations.
    */
   private updateUnarchivedConversations() {
-    return this.updateConversations(this.conversationState.conversations_unarchived());
+    return this.updateConversations(this.conversationState.visibleConversations());
   }
 
   private async updateConversationFromBackend(conversationEntity: Conversation) {
@@ -916,7 +901,7 @@ export class ConversationRepository {
    */
   getGroupsByName(query: string, isHandle: boolean) {
     return this.conversationState
-      .sorted_conversations()
+      .filteredConversations()
       .filter(conversationEntity => {
         if (!conversationEntity.isGroup()) {
           return false;
@@ -951,7 +936,7 @@ export class ConversationRepository {
    * @returns Timestamp value
    */
   private getLatestEventTimestamp(increment = false) {
-    const mostRecentConversation = this.getMostRecentConversation(true);
+    const mostRecentConversation = this.conversationState.getMostRecentConversation(true);
     if (mostRecentConversation) {
       const lastEventTimestamp = mostRecentConversation.last_event_timestamp();
       return lastEventTimestamp + (increment ? 1 : 0);
@@ -967,19 +952,14 @@ export class ConversationRepository {
    * @returns Next conversation
    */
   getNextConversation(conversationEntity: Conversation) {
-    return getNextItem(this.conversationState.conversations_unarchived(), conversationEntity);
+    return getNextItem(this.conversationState.visibleConversations(), conversationEntity);
   }
 
   /**
-   * Get unarchived conversation with the most recent event.
-   * @param allConversations Search all conversations
-   * @returns Most recent conversation
+   * @deprecated import the `ConversationState` wherever you need it and call `getMostRecentConversation` directly from there
    */
-  getMostRecentConversation(allConversations = false) {
-    const [conversationEntity] = allConversations
-      ? this.conversationState.sorted_conversations()
-      : this.conversationState.conversations_unarchived();
-    return conversationEntity;
+  public getMostRecentConversation() {
+    return this.conversationState.getMostRecentConversation();
   }
 
   /**
@@ -1069,10 +1049,6 @@ export class ConversationRepository {
 
       throw error;
     }
-  }
-
-  initializeConversations(): void {
-    this.initStateUpdates();
   }
 
   /**
@@ -1250,7 +1226,7 @@ export class ConversationRepository {
 
   private mapGuestStatusSelf() {
     this.conversationState
-      .filtered_conversations()
+      .filteredConversations()
       .forEach(conversationEntity => this._mapGuestStatusSelf(conversationEntity));
 
     if (this.teamState.isTeam()) {
@@ -1487,8 +1463,10 @@ export class ConversationRepository {
 
   async leaveGuestRoom(): Promise<void> {
     if (this.userState.self().isTemporaryGuest()) {
-      const conversationEntity = this.getMostRecentConversation(true);
-      await this.conversationService.deleteMembers(conversationEntity.qualifiedId, this.userState.self().qualifiedId);
+      const conversation = this.conversationState.getMostRecentConversation(true);
+      if (conversation) {
+        await this.conversationService.deleteMembers(conversation.qualifiedId, this.userState.self().qualifiedId);
+      }
     }
   }
 
@@ -1732,6 +1710,30 @@ export class ConversationRepository {
     this.logger.info(`Conversation '${conversationEntity.id}' unarchived by trigger '${trigger}'`);
   }
 
+  public async sendTypingStart(conversationEntity: Conversation) {
+    /*
+      Currently typing endpoint is not implemented on backend for federated environments
+      @todo: remove this condition when backend is ready and api-client in packages is updated to support domain in typing endpoint
+    */
+    const isFederated = this.core.backendFeatures?.isFederated;
+    if (isFederated) {
+      return;
+    }
+    this.core.service!.conversation.sendTypingStart(conversationEntity.id);
+  }
+
+  public async sendTypingStop(conversationEntity: Conversation) {
+    /*
+      Currently typing endpoint is not implemented on backend for federated environments
+      @todo: remove this condition when backend is ready and api-client in packages is updated to support domain in typing endpoint
+    */
+    const isFederated = this.core.backendFeatures?.isFederated;
+    if (isFederated) {
+      return;
+    }
+    this.core.service!.conversation.sendTypingStop(conversationEntity.id);
+  }
+
   private async toggleArchiveConversation(
     conversationEntity: Conversation,
     newState: boolean,
@@ -1963,7 +1965,7 @@ export class ConversationRepository {
       `Handling event '${type}' in conversation '${conversationId.id}/${conversationId.domain}' (Source: ${eventSource})`,
     );
 
-    const selfConversation = this.conversationState.self_conversation();
+    const selfConversation = this.conversationState.selfConversation();
     const inSelfConversation = selfConversation && matchQualifiedIds(conversationId, selfConversation.qualifiedId);
     if (inSelfConversation) {
       const typesInSelfConversation = [
@@ -2181,6 +2183,9 @@ export class ConversationRepository {
       case CONVERSATION_EVENT.MEMBER_UPDATE:
         return this.onMemberUpdate(conversationEntity, eventJson);
 
+      case CONVERSATION_EVENT.TYPING:
+        return this.onTyping(conversationEntity, eventJson);
+
       case CONVERSATION_EVENT.RENAME:
         return this.onRename(conversationEntity, eventJson, eventSource === EventRepository.SOURCE.WEB_SOCKET);
 
@@ -2314,7 +2319,7 @@ export class ConversationRepository {
    */
   private readonly onMissedEvents = (): void => {
     this.conversationState
-      .filtered_conversations()
+      .filteredConversations()
       .filter(conversationEntity => !conversationEntity.removed_from_conversation())
       .forEach(conversationEntity => {
         const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
@@ -2584,7 +2589,7 @@ export class ConversationRepository {
     }
 
     const isBackendEvent = eventData.otr_archived_ref || eventData.otr_muted_ref;
-    const selfConversation = this.conversationState.self_conversation();
+    const selfConversation = this.conversationState.selfConversation();
     const inSelfConversation = selfConversation && matchQualifiedIds(selfConversation, conversationId);
     if (!inSelfConversation && conversation && !isBackendEvent) {
       this.logger.warn(
@@ -2721,7 +2726,7 @@ export class ConversationRepository {
 
     try {
       const inSelfConversation =
-        !this.conversationState.self_conversation() || conversationId === this.conversationState.self_conversation().id;
+        !this.conversationState.selfConversation() || conversationId === this.conversationState.selfConversation()?.id;
       if (!inSelfConversation) {
         throw new ConversationError(
           ConversationError.TYPE.WRONG_CONVERSATION,
@@ -2825,6 +2830,39 @@ export class ConversationRepository {
     const {messageEntity} = await this.addEventToConversation(conversationEntity, eventJson);
     ConversationMapper.updateProperties(conversationEntity, eventJson.data);
     return {conversationEntity, messageEntity};
+  }
+
+  /**
+   * A user started or stopped typing in a conversation.
+   *
+   * @param conversationEntity Conversation entity that will the user will be added to its active typing users
+   * @param eventJson JSON data of 'conversation.typing' event
+   * @returns Resolves when the event was handled
+   */
+  private async onTyping(conversationEntity: Conversation, eventJson: ConversationTypingEvent) {
+    const qualifiedUserId = eventJson.qualified_from || {domain: '', id: eventJson.from};
+    const qualifiedUser = conversationEntity
+      .participating_user_ets()
+      .find(user => matchQualifiedIds(user, qualifiedUserId));
+
+    if (!qualifiedUser) {
+      this.logger.warn(`No sender user found for event of type ${eventJson.type}`);
+      return {conversationEntity};
+    }
+
+    const conversationId = conversationEntity.id;
+    const {addTypingUser, removeTypingUser} = useTypingIndicatorState.getState();
+    const typingUser = {conversationId, user: qualifiedUser};
+
+    if (eventJson.data.status === CONVERSATION_TYPING.STARTED) {
+      addTypingUser(typingUser);
+    }
+
+    if (eventJson.data.status === CONVERSATION_TYPING.STOPPED) {
+      removeTypingUser(typingUser);
+    }
+
+    return {conversationEntity};
   }
 
   /**

@@ -19,11 +19,13 @@
 
 import React, {useRef} from 'react';
 
-import {Runtime} from '@wireapp/commons';
 import {container} from 'tsyringe';
+
+import {Runtime} from '@wireapp/commons';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {useEnrichedFields} from 'Components/panel/EnrichedFields';
+import {ContentState} from 'src/script/page/useAppState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
@@ -55,7 +57,6 @@ import {TeamState} from '../../../../team/TeamState';
 import {RichProfileRepository} from '../../../../user/RichProfileRepository';
 import type {UserRepository} from '../../../../user/UserRepository';
 import {UserState} from '../../../../user/UserState';
-import {ContentState} from '../../../../view_model/ContentViewModel';
 import {AccentColorPicker} from '../../../AccentColorPicker';
 
 interface AccountPreferencesProps {

@@ -21,6 +21,15 @@ import type {CallConfigData} from '@wireapp/api-client/lib/account/CallConfigDat
 import type {QualifiedUserClients, UserClients} from '@wireapp/api-client/lib/conversation';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {WebappProperties} from '@wireapp/api-client/lib/user/data';
+import {PayloadBundleState} from '@wireapp/core/lib/conversation';
+import {flattenQualifiedUserClients, flattenUserClients} from '@wireapp/core/lib/conversation/message/UserClientsUtil';
+import {isQualifiedUserClients} from '@wireapp/core/lib/util';
+import {amplify} from 'amplify';
+import axios from 'axios';
+import ko from 'knockout';
+import {container} from 'tsyringe';
+import 'webrtc-adapter';
+
 import {
   CALL_TYPE,
   CONV_TYPE,
@@ -38,16 +47,7 @@ import {
   WcallMember,
 } from '@wireapp/avs';
 import {Runtime} from '@wireapp/commons';
-import {PayloadBundleState} from '@wireapp/core/lib/conversation';
-import {flattenQualifiedUserClients, flattenUserClients} from '@wireapp/core/lib/conversation/message/UserClientsUtil';
-import {isQualifiedUserClients} from '@wireapp/core/lib/util';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {amplify} from 'amplify';
-import axios from 'axios';
-import ko from 'knockout';
-import {container} from 'tsyringe';
-
-import 'webrtc-adapter';
 
 import {flatten} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';

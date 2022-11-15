@@ -27,13 +27,6 @@ export function validateEvent(
   source: EventSource,
   lastEventDate?: string,
 ): EventValidation {
-  const eventType = event.type;
-  const unhandledEvents: (CONVERSATION_EVENT | USER_EVENT)[] = [CONVERSATION_EVENT.TYPING];
-
-  if (unhandledEvents.includes(eventType)) {
-    return EventValidation.IGNORED_TYPE;
-  }
-
   const eventTime = event.time;
   const isFromNotificationStream = source === EventSource.NOTIFICATION_STREAM;
   const shouldCheckEventDate = !!eventTime && isFromNotificationStream && lastEventDate;

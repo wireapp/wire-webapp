@@ -28,12 +28,13 @@ import {
   useState,
 } from 'react';
 
-import {Availability} from '@wireapp/protocol-messaging';
-import {useMatchMedia} from '@wireapp/react-ui-kit';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
+
+import {Availability} from '@wireapp/protocol-messaging';
+import {useMatchMedia} from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {useEmoji} from 'Components/Emoji/useEmoji';
@@ -66,6 +67,7 @@ import {formatBytes, getSelectionPosition} from 'Util/util';
 import {getRichTextInput} from './getRichTextInput';
 import {PastedFileControls} from './PastedFileControls';
 import {ReplyBar} from './ReplyBar';
+import {TypingIndicator} from './TypingIndicator/TypingIndicator';
 
 import {AssetRepository} from '../../assets/AssetRepository';
 import {Config} from '../../Config';
@@ -89,6 +91,7 @@ import {UserState} from '../../user/UserState';
 const CONFIG = {
   ...Config.getConfig(),
   PING_TIMEOUT: TIME_IN_MILLIS.SECOND * 2,
+  IS_TYPING_TIMEOUT: TIME_IN_MILLIS.SECOND * 10,
 };
 
 const showWarningModal = (title: string, message: string): void => {
@@ -158,6 +161,7 @@ const InputBar = ({
     'isIncomingRequest',
   ]);
 
+  const isTypingTimerIdRef = useRef<NodeJS.Timeout | null>(null);
   const shadowInputRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -169,6 +173,7 @@ const InputBar = ({
   const [selectionStart, setSelectionStart] = useState<number>(0);
   const [selectionEnd, setSelectionEnd] = useState<number>(0);
   const [pingDisabled, setIsPingDisabled] = useState<boolean>(false);
+  const [isTyping, setIsTyping] = useState<boolean>(false);
   const [editedMention, setEditedMention] = useState<{startIndex: number; term: string} | undefined>(undefined);
 
   const {rightSidebar} = useAppMainState.getState();
@@ -386,6 +391,20 @@ const InputBar = ({
     }
   }, [editMessageEntity]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  useEffect(() => {
+    if (isTypingTimerIdRef.current) {
+      clearTimeout(isTypingTimerIdRef.current);
+    }
+    if (inputValue.trim() !== '') {
+      conversationRepository.sendTypingStart(conversationEntity);
+    }
+    isTypingTimerIdRef.current = setTimeout(() => {
+      conversationRepository.sendTypingStop(conversationEntity);
+      isTypingTimerIdRef.current = null;
+      setIsTyping(false);
+    }, CONFIG.IS_TYPING_TIMEOUT);
+  }, [isTyping]); // we want to send is typing based on isTyping
+
   const replyMessage = (messageEntity: ContentMessage): void => {
     if (messageEntity?.isReplyable() && messageEntity !== replyMessageEntity) {
       cancelMessageReply();
@@ -479,6 +498,7 @@ const InputBar = ({
 
     const {value: currentValue} = event.currentTarget;
     setInputValue(currentValue);
+    setIsTyping(true);
     const currentValueLength = currentValue.length;
     const previousValueLength = inputValue.length;
     const difference = currentValueLength - previousValueLength;
@@ -534,7 +554,18 @@ const InputBar = ({
     }
   };
 
+  const sendStopTyping = () => {
+    if (isTypingTimerIdRef.current) {
+      conversationRepository.sendTypingStop(conversationEntity);
+      clearTimeout(isTypingTimerIdRef.current);
+      isTypingTimerIdRef.current = null;
+      setIsTyping(false);
+    }
+  };
+
   const onSend = (text: string): void | boolean => {
+    sendStopTyping();
+
     if (pastedFile) {
       return sendPastedFile();
     }
@@ -860,6 +891,8 @@ const InputBar = ({
       id="conversation-input-bar"
       className={cx('conversation-input-bar', {'is-right-panel-open': isRightSidebarOpen})}
     >
+      <TypingIndicator conversationId={conversationEntity.id} />
+
       {classifiedDomains && !isConnectionRequest && (
         <ClassifiedBar users={participatingUserEts} classifiedDomains={classifiedDomains} />
       )}
@@ -892,6 +925,7 @@ const InputBar = ({
                     onInput={updateMentions}
                     onChange={onChange}
                     onPaste={onPasteFiles}
+                    onBlur={sendStopTyping}
                     value={inputValue}
                     placeholder={inputPlaceholder}
                     aria-label={inputPlaceholder}

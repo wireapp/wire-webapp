@@ -19,12 +19,12 @@
 
 import React, {useEffect} from 'react';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {CSSTransition, SwitchTransition} from 'react-transition-group';
 
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {t} from 'Util/LocalizerUtil';
 
 import {Archive} from './panels/Archive';
@@ -34,7 +34,8 @@ import {StartUI} from './panels/StartUI';
 import {TemporaryGuestConversations} from './panels/TemporatyGuestConversations';
 
 import {User} from '../../entity/User';
-import {ListState, ListViewModel} from '../../view_model/ListViewModel';
+import {ListViewModel} from '../../view_model/ListViewModel';
+import {useAppState, ListState} from '../useAppState';
 
 type LeftSidebarProps = {
   listViewModel: ListViewModel;
@@ -52,19 +53,18 @@ const Animated: React.FC<{children: React.ReactNode}> = ({children, ...rest}) =>
 const LeftSidebar: React.FC<LeftSidebarProps> = ({listViewModel, selfUser, isActivatedAccount}) => {
   const {conversationRepository, propertiesRepository} = listViewModel;
   const repositories = listViewModel.contentViewModel.repositories;
-
-  const {state} = useKoSubscribableChildren(listViewModel, ['state']);
+  const {listState} = useAppState();
 
   const switchList = (list: ListState) => listViewModel.switchList(list);
 
   const goHome = () =>
     selfUser.isTemporaryGuest()
-      ? listViewModel.switchList(ListViewModel.STATE.TEMPORARY_GUEST)
-      : listViewModel.switchList(ListViewModel.STATE.CONVERSATIONS);
+      ? listViewModel.switchList(ListState.TEMPORARY_GUEST)
+      : listViewModel.switchList(ListState.CONVERSATIONS);
 
   useEffect(() => {
     amplify.subscribe(WebAppEvents.SHORTCUT.START, () => {
-      listViewModel.switchList(ListViewModel.STATE.START_UI);
+      listViewModel.switchList(ListState.START_UI);
     });
   }, []);
 
@@ -75,9 +75,9 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({listViewModel, selfUser, isAct
       </header>
 
       <SwitchTransition>
-        <Animated key={state}>
+        <Animated key={listState}>
           <>
-            {state === ListState.CONVERSATIONS && (
+            {listState === ListState.CONVERSATIONS && (
               <Conversations
                 listViewModel={listViewModel}
                 preferenceNotificationRepository={repositories.preferenceNotification}
@@ -88,15 +88,16 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({listViewModel, selfUser, isAct
               />
             )}
 
-            {state === ListState.PREFERENCES && (
+            {listState === ListState.PREFERENCES && (
               <Preferences
                 contentViewModel={listViewModel.contentViewModel}
                 teamRepository={repositories.team}
+                preferenceNotificationRepository={repositories.preferenceNotification}
                 onClose={goHome}
               />
             )}
 
-            {state === ListState.ARCHIVE && (
+            {listState === ListState.ARCHIVE && (
               <Archive
                 answerCall={listViewModel.answerCall}
                 conversationRepository={conversationRepository}
@@ -105,7 +106,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({listViewModel, selfUser, isAct
               />
             )}
 
-            {state === ListState.TEMPORARY_GUEST && (
+            {listState === ListState.TEMPORARY_GUEST && (
               <TemporaryGuestConversations
                 callingViewModel={listViewModel.callingViewModel}
                 listViewModel={listViewModel}
@@ -113,7 +114,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({listViewModel, selfUser, isAct
               />
             )}
 
-            {state === ListState.START_UI && (
+            {listState === ListState.START_UI && (
               <StartUI
                 onClose={goHome}
                 conversationRepository={conversationRepository}

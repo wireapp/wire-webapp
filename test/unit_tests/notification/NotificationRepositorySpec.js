@@ -49,13 +49,13 @@ import {QuoteEntity} from 'src/script/message/QuoteEntity';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import {NotificationRepository} from 'src/script/notification/NotificationRepository';
 import {PermissionStatusState} from 'src/script/permission/PermissionStatusState';
-import {ContentState} from 'src/script/view_model/ContentViewModel';
 import {t} from 'Util/LocalizerUtil';
 import {truncate} from 'Util/StringUtil';
 import {createRandomUuid} from 'Util/util';
 
 import {entities, payload} from '../../api/payloads';
 import {TestFactory} from '../../helper/TestFactory';
+import {ContentState, useAppState} from 'src/script/page/useAppState';
 
 window.wire = window.wire || {};
 window.wire.app = window.wire.app || {};
@@ -111,7 +111,9 @@ describe('NotificationRepository', () => {
       spyOn(testFactory.notification_repository.assetRepository, 'generateAssetUrl').and.returnValue(
         Promise.resolve('/image/logo/notification.png'),
       );
-      contentViewModelState.state = ko.observable(ContentState.CONVERSATION);
+
+      const {setContentState} = useAppState.getState();
+      setContentState(ContentState.CONVERSATION);
       contentViewModelState.multitasking = {
         isMinimized: () => true,
       };

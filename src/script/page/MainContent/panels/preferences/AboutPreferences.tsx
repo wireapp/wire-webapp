@@ -19,8 +19,9 @@
 
 import React, {useMemo} from 'react';
 
-import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 import {container} from 'tsyringe';
+
+import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/LocalizerUtil';
 

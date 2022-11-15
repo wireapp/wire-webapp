@@ -17,9 +17,11 @@
  *
  */
 
-export const generateConversationUrl = (conversationId: string, domain: string | null): string => {
+import {QualifiedId} from '@wireapp/api-client/lib/user';
+
+export const generateConversationUrl = ({id, domain}: QualifiedId): string => {
   if (domain) {
-    return `/conversation/${conversationId}/${domain}`;
+    return `/conversation/${id}/${domain}`;
   }
-  return `/conversation/${conversationId}`;
+  return `/conversation/${id}`;
 };

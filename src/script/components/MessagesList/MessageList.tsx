@@ -250,6 +250,7 @@ const MessagesList: FC<MessagesListParams> = ({
         onLoading(false);
       }, 10);
     });
+    return () => conversation.release();
   }, [conversation, initialMessage]);
 
   useLayoutEffect(() => {

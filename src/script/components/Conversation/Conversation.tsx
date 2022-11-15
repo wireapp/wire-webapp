@@ -27,10 +27,11 @@ import {
   useState,
 } from 'react';
 
-import {useMatchMedia} from '@wireapp/react-ui-kit';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 import {groupBy} from 'underscore';
+
+import {useMatchMedia} from '@wireapp/react-ui-kit';
 
 import {CallingCell} from 'Components/calling/CallingCell';
 import {Giphy} from 'Components/Giphy';
@@ -67,7 +68,7 @@ import {UserState} from '../../user/UserState';
 
 type ReadMessageBuffer = {conversation: ConversationEntity; message: Message};
 
-interface ConversationListProps {
+interface ConversationProps {
   readonly initialMessage?: Message;
   readonly teamState: TeamState;
   readonly userState: UserState;
@@ -75,7 +76,7 @@ interface ConversationListProps {
   isRightSidebarOpen?: boolean;
 }
 
-const ConversationList: FC<ConversationListProps> = ({
+export const Conversation: FC<ConversationProps> = ({
   initialMessage,
   teamState,
   userState,
@@ -101,7 +102,7 @@ const ConversationList: FC<ConversationListProps> = ({
   const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
 
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
-  const smBreakpoint = useMatchMedia('max-width: 620px');
+  const smBreakpoint = useMatchMedia('max-width: 640px');
 
   useEffect(() => {
     if (readMessagesBuffer.length) {
@@ -457,5 +458,3 @@ const ConversationList: FC<ConversationListProps> = ({
     </div>
   );
 };
-
-export {ConversationList};

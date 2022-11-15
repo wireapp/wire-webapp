@@ -22,7 +22,6 @@ import {TeamState} from 'src/script/team/TeamState';
 import {UserState} from 'src/script/user/UserState';
 
 describe('TeamRepository', () => {
-  /* eslint sort-keys-fix/sort-keys-fix: "off" */
   const teams_data = {
     teams: [
       {
@@ -43,7 +42,6 @@ describe('TeamRepository', () => {
       {user: '74fa64dc-8318-4426-9935-82590ff8aa3e', permissions: 8},
     ],
   };
-  /* eslint sort-keys-fix/sort-keys-fix: "off" */
 
   describe('getTeam()', () => {
     it('returns the team entity', async () => {

@@ -18,8 +18,9 @@
  */
 
 import type {WebappProperties} from '@wireapp/api-client/lib/user/data/';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import type {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';

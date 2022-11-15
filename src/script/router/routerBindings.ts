@@ -19,37 +19,18 @@
 
 import React from 'react';
 
-import ko from 'knockout';
-
 import {KEY} from 'Util/KeyboardUtil';
 
-import type {Router} from './Router';
+import {navigate} from './Router';
 
 import {useAppMainState, ViewType} from '../page/state';
-
-let router: Router;
-
-export function initRouterBindings(routerInstance: Router): void {
-  router = routerInstance;
-  ko.bindingHandlers.link_to = {
-    init(element: Node, valueAccessor): void {
-      const navigate = (event: Event) => {
-        routerInstance.navigate(valueAccessor());
-        event.preventDefault();
-      };
-      element.addEventListener('click', navigate);
-
-      ko.utils.domNodeDisposal.addDisposeCallback(element, () => element.removeEventListener('click', navigate));
-    },
-  };
-}
 
 export const createNavigate =
   (link: string): React.MouseEventHandler =>
   (event: React.MouseEvent<Element, MouseEvent>) => {
     const {responsiveView} = useAppMainState.getState();
     responsiveView.setCurrentView(ViewType.CENTRAL_COLUMN);
-    router?.navigate(link);
+    navigate(link);
     event.preventDefault();
   };
 
@@ -57,7 +38,7 @@ export const createNavigateKeyboard =
   (link: string): React.KeyboardEventHandler =>
   (event: React.KeyboardEvent<Element>) => {
     if (event.key === KEY.ENTER || event.key === KEY.SPACE) {
-      router?.navigate(link);
+      navigate(link);
       event.preventDefault();
     }
   };

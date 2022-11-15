@@ -19,9 +19,10 @@
 
 import {act, render} from '@testing-library/react';
 import {FeatureStatus} from '@wireapp/api-client/lib/team/feature/';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {createRandomUuid} from 'Util/util';
 

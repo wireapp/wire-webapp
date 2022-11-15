@@ -58,7 +58,7 @@ module.exports = {
   },
   devtool: 'source-map',
   entry: {
-    app: path.resolve(srcScript, 'main/app.ts'),
+    app: path.resolve(srcScript, 'main/index.tsx'),
     auth: path.resolve(auth, 'main.tsx'),
   },
   externals: {

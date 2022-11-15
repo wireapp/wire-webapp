@@ -17,11 +17,12 @@
  *
  */
 
-import {UrlUtil, Runtime} from '@wireapp/commons';
 import {Decoder, Encoder} from 'bazinga64';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import type {ObservableArray} from 'knockout';
 import UUID from 'uuidjs';
+
+import {UrlUtil, Runtime} from '@wireapp/commons';
 
 import {isTabKey} from 'Util/KeyboardUtil';
 import {findMentionAtPosition} from 'Util/MentionUtil';
@@ -345,15 +346,16 @@ export function throttle(callback: Function, wait: number, immediate = false) {
   };
 }
 
+export const focusableElementsSelector =
+  'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 export const preventFocusOutside = (event: KeyboardEvent, parentId: string): void => {
   if (!isTabKey(event)) {
     return;
   }
   event.preventDefault();
-  const focusableElements =
-    'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
   const parent = document.getElementById(parentId);
-  const focusableContent = parent ? [...parent.querySelectorAll(focusableElements)] : [];
+  const focusableContent = parent ? [...parent.querySelectorAll(focusableElementsSelector)] : [];
   const focusedItemIndex = focusableContent.indexOf(document.activeElement);
   if (event.shiftKey && focusedItemIndex != 0) {
     (focusableContent[focusedItemIndex - 1] as HTMLElement)?.focus();

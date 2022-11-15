@@ -20,10 +20,11 @@
 import React from 'react';
 
 import {CSSObject} from '@emotion/serialize';
-import {Availability} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import cx from 'classnames';
+
+import {Availability} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Icon} from 'Components/Icon';
 import {CSS_SQUARE} from 'Util/CSSMixin';

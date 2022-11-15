@@ -19,6 +19,10 @@
 
 import React, {useState} from 'react';
 
+import {useIntl} from 'react-intl';
+import {connect} from 'react-redux';
+import {AnyAction, Dispatch} from 'redux';
+
 import {
   Button,
   COLOR,
@@ -35,9 +39,6 @@ import {
   Text,
   InputBlock,
 } from '@wireapp/react-ui-kit';
-import {useIntl} from 'react-intl';
-import {connect} from 'react-redux';
-import {AnyAction, Dispatch} from 'redux';
 
 import {Page} from './Page';
 

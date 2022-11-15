@@ -19,13 +19,16 @@
 
 import React, {useEffect, useState} from 'react';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Icon} from 'Components/Icon';
 import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import {generateConversationUrl} from 'src/script/router/routeGenerator';
+import {createNavigate} from 'src/script/router/routerBindings';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -191,7 +194,7 @@ const Collection: React.FC<CollectionDetailsProps> = ({
           <button
             className="content-titlebar-icon"
             data-uie-name="do-close-collection"
-            onClick={() => amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversation, {})}
+            onClick={createNavigate(generateConversationUrl(conversation))}
             aria-label={t('fullsearchCancelLabel')}
           >
             <Icon.Close />

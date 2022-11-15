@@ -17,8 +17,9 @@
  *
  */
 
-import {ErrorMessage} from '@wireapp/react-ui-kit';
 import {FormattedMessage} from 'react-intl';
+
+import {ErrorMessage} from '@wireapp/react-ui-kit';
 
 import {errorHandlerStrings, validationErrorStrings} from '../../strings';
 import {ValidationError} from '../module/action/ValidationError';

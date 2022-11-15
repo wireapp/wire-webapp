@@ -17,7 +17,6 @@
  *
  */
 
-import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
@@ -26,9 +25,7 @@ import {getLogger, Logger} from 'Util/Logger';
 import {ActionsViewModel} from './ActionsViewModel';
 import {CallingViewModel} from './CallingViewModel';
 import {ContentViewModel} from './ContentViewModel';
-import {FaviconViewModel} from './FaviconViewModel';
 import {ListViewModel} from './ListViewModel';
-import {WindowTitleViewModel} from './WindowTitleViewModel';
 
 import type {AssetRepository} from '../assets/AssetRepository';
 import type {AudioRepository} from '../audio/AudioRepository';
@@ -88,13 +85,10 @@ export class MainViewModel {
   actions: ActionsViewModel;
   calling: CallingViewModel;
   content: ContentViewModel;
-  favicon: FaviconViewModel;
   list: ListViewModel;
   logger: Logger;
-  mainClasses: ko.PureComputed<string | undefined>;
   multitasking: Multitasking;
   selfUser: ko.Observable<User>;
-  title: WindowTitleViewModel;
   userRepository: UserRepository;
   isFederated: boolean;
   messageEntity: Message | undefined;
@@ -151,17 +145,6 @@ export class MainViewModel {
     );
     this.content = new ContentViewModel(this, repositories);
     this.list = new ListViewModel(this, repositories);
-
-    this.title = new WindowTitleViewModel(this);
-    this.favicon = new FaviconViewModel(amplify);
-
-    this.mainClasses = ko.pureComputed(() => {
-      if (this.selfUser()) {
-        // deprecated - still used on input control hover
-        return `main-accent-color-${this.selfUser().accent_id()} show`;
-      }
-      return undefined;
-    });
 
     // Prevent Chrome (and Electron) from pushing the content out of the
     // viewport when using form elements (e.g. in the preferences)

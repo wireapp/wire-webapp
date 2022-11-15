@@ -18,9 +18,10 @@
  */
 
 import {USER_EVENT} from '@wireapp/api-client/lib/event/';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
@@ -82,12 +83,12 @@ export const createLabelFavorites = (favorites: Conversation[] = []) =>
 
 export class ConversationLabelRepository extends TypedEventTarget<{type: 'conversation-favorited'}> {
   labels: ko.ObservableArray<ConversationLabel>;
-  allLabeledConversations: ko.Computed<Conversation[]>;
-  logger: Logger;
+  private allLabeledConversations: ko.Computed<Conversation[]>;
+  private logger: Logger;
 
   constructor(
     private readonly allConversations: ko.ObservableArray<Conversation>,
-    private readonly conversations: ko.ObservableArray<Conversation>,
+    private readonly conversations: ko.PureComputed<Conversation[]>,
     private readonly propertiesService: PropertiesService,
   ) {
     super();

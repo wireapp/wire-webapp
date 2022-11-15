@@ -19,8 +19,9 @@
 
 import React from 'react';
 
-import {ContainerXS, H2, Text} from '@wireapp/react-ui-kit';
 import {FormattedMessage, useIntl} from 'react-intl';
+
+import {ContainerXS, H2, Text} from '@wireapp/react-ui-kit';
 
 import {Config} from '../../Config';
 import {conversationJoinStrings} from '../../strings';

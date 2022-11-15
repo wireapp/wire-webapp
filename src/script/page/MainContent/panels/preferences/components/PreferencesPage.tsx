@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useContext} from 'react';
+import {useContext, FC, useCallback} from 'react';
 
 import {IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
 
@@ -30,19 +30,31 @@ interface PreferencesPageProps {
   title: string;
 }
 
-const PreferencesPage: React.FC<PreferencesPageProps> = ({title, children}) => {
+const PreferencesPage: FC<PreferencesPageProps> = ({title, children}) => {
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
-  const smBreakpoint = useMatchMedia('max-width: 620px');
+  const smBreakpoint = useMatchMedia('max-width: 640px');
 
   const {currentView, setCurrentView} = useAppMainState(state => state.responsiveView);
   const isCentralColumn = currentView == ViewType.CENTRAL_COLUMN;
 
   const root = useContext(RootContext);
 
-  const goHome = () => root?.content.switchPreviousContent();
+  const goHome = () => root?.content.loadPreviousContent();
+
+  const containerRef = useCallback((element: HTMLDivElement | null) => {
+    const nextElementToFocus = element?.querySelector("[tabindex='0']") as HTMLElement | null;
+    if (nextElementToFocus) {
+      nextElementToFocus.focus();
+    }
+  }, []);
 
   return (
-    <div style={{display: 'flex', flexDirection: 'column', height: '100vh'}}>
+    <div
+      role="tabpanel"
+      ref={containerRef}
+      aria-labelledby={title}
+      style={{display: 'flex', flexDirection: 'column', height: '100vh'}}
+    >
       <div className="preferences-titlebar">
         {smBreakpoint && isCentralColumn && (
           <IconButton

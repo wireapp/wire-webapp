@@ -17,8 +17,9 @@
  *
  */
 
-import {LinkProps, linkStyle, Theme} from '@wireapp/react-ui-kit';
 import * as RouterDOM from 'react-router-dom';
+
+import {LinkProps, linkStyle, Theme} from '@wireapp/react-ui-kit';
 
 type RouterLinkProps = LinkProps & RouterDOM.LinkProps;
 

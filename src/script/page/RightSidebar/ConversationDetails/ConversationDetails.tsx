@@ -54,7 +54,6 @@ import {Shortcut} from '../../../ui/Shortcut';
 import {ShortcutType} from '../../../ui/ShortcutType';
 import {UserState} from '../../../user/UserState';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
-import {useAppMainState} from '../../state';
 import {PanelHeader} from '../PanelHeader';
 import {PanelEntity, PanelState} from '../RightSidebar';
 
@@ -200,8 +199,6 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
     return isService ? [service] : [];
   });
 
-  const {rightSidebar} = useAppMainState();
-
   const toggleMute = () => actionsViewModel.toggleMuteConversation(activeConversation);
 
   const openParticipantDevices = () => togglePanel(PanelState.PARTICIPANT_DEVICES, firstParticipant, false, 'left');
@@ -247,7 +244,6 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
     activeConversation,
     actionsViewModel,
     conversationRepository,
-    rightSidebar.clearHistory,
     teamRole,
     isServiceMode,
     isTeam,

@@ -18,9 +18,10 @@
  */
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
@@ -192,7 +193,7 @@ export class ConversationVerificationStateHandler {
     userIds: QualifiedId[],
   ): {conversationEntity: Conversation; userIds: QualifiedId[]}[] {
     return this.conversationState
-      .filtered_conversations()
+      .filteredConversations()
       .map((conversationEntity: Conversation) => {
         if (!conversationEntity.removed_from_conversation()) {
           const userIdsInConversation = conversationEntity

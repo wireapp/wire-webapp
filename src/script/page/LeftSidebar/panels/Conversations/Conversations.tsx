@@ -19,14 +19,16 @@
 
 import React, {useEffect, useState} from 'react';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {AvailabilityState} from 'Components/AvailabilityState';
 import {CallingCell} from 'Components/calling/CallingCell';
 import {Icon} from 'Components/Icon';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
+import {ListState} from 'src/script/page/useAppState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isTabKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -49,7 +51,7 @@ import {AvailabilityContextMenu} from '../../../../ui/AvailabilityContextMenu';
 import {Shortcut} from '../../../../ui/Shortcut';
 import {ShortcutType} from '../../../../ui/ShortcutType';
 import {UserState} from '../../../../user/UserState';
-import {ListState, ListViewModel} from '../../../../view_model/ListViewModel';
+import {ListViewModel} from '../../../../view_model/ListViewModel';
 import {useAppMainState, ViewType} from '../../../state';
 import {ListWrapper} from '../ListWrapper';
 
@@ -92,8 +94,10 @@ const Conversations: React.FC<ConversationsProps> = ({
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
-  const {conversations_archived: archivedConversations, conversations_unarchived: conversations} =
-    useKoSubscribableChildren(conversationState, ['conversations_archived', 'conversations_unarchived']);
+  const {archivedConversations, visibleConversations: conversations} = useKoSubscribableChildren(conversationState, [
+    'archivedConversations',
+    'visibleConversations',
+  ]);
   const {notifications} = useKoSubscribableChildren(preferenceNotificationRepository, ['notifications']);
 
   const {filterEstablishedConversations} = useMLSConversationState();
@@ -114,14 +118,14 @@ const Conversations: React.FC<ConversationsProps> = ({
   const [isConversationListFocus, focusConversationList] = useState(false);
 
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
+  const {close: closeRightSidebar} = useAppMainState(state => state.rightSidebar);
 
   const showLegalHold = isOnLegalHold || hasPendingLegalHold;
 
   const onClickPreferences = () => {
     setCurrentView(ViewType.LEFT_SIDEBAR);
     switchList(ListState.PREFERENCES);
-    const {rightSidebar} = useAppMainState.getState();
-    rightSidebar.clearHistory();
+    closeRightSidebar();
   };
 
   useEffect(() => {
