@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
@@ -27,6 +27,7 @@ import {ValidationUtil} from '@wireapp/commons';
 import {Button, Checkbox, CheckboxLabel, Form, Input, Small} from '@wireapp/react-ui-kit';
 
 import {KEY} from 'Util/KeyboardUtil';
+import {getLogger} from 'Util/Logger';
 
 import {Exception} from './Exception';
 
@@ -39,77 +40,89 @@ import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as AccentColor from '../util/AccentColor';
 
+const logger = getLogger('AccountForm');
+
 interface Props extends React.HTMLProps<HTMLFormElement> {
   beforeSubmit?: () => Promise<void>;
-  onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
+  onSubmit: () => void;
   submitText?: string;
 }
 
 const AccountFormComponent = ({account, ...props}: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
-  const [registrationData, setRegistrationData] = React.useState({
+
+  const [registrationData, setRegistrationData] = useState({
     accent_id: AccentColor.random().id,
-    email: account.email || '',
-    name: account.name || '',
-    password: account.password || '',
-    termsAccepted: account.termsAccepted || false,
+    email: '',
+    name: '',
+    password: '',
+    termsAccepted: false,
   });
 
-  const [validInputs, setValidInputs] = React.useState<Record<string, boolean>>({
+  const [validInputs, setValidInputs] = useState<Record<string, boolean>>({
     email: true,
     name: true,
     password: true,
     terms: true,
   });
 
-  const [validationErrors, setValidationErrors] = React.useState([]);
+  const [validationErrors, setValidationErrors] = useState<Error[]>([]);
 
   const inputs = {
-    email: React.useRef<HTMLInputElement>(),
-    name: React.useRef<HTMLInputElement>(),
-    password: React.useRef<HTMLInputElement>(),
-    terms: React.useRef<HTMLInputElement>(),
+    email: useRef<HTMLInputElement | null>(null),
+    name: useRef<HTMLInputElement | null>(null),
+    password: useRef<HTMLInputElement | null>(null),
+    terms: useRef<HTMLInputElement | null>(null),
   };
 
-  React.useEffect(() => {
-    setRegistrationData({
-      ...registrationData,
-      email: account.email,
-    });
-  }, [account.email]);
-
-  React.useEffect(() => {
-    setRegistrationData({
-      ...registrationData,
-      name: account.name,
-    });
-  }, [account.name]);
+  useEffect(() => {
+    setRegistrationData(prevState => ({
+      ...prevState,
+      email: account?.email || '',
+      name: account?.name || '',
+      password: account?.password || '',
+      termsAccepted: !!account?.termsAccepted,
+    }));
+  }, [account]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const errors: Error[] = [];
+    const errors: Error[] | ValidationError[] = [];
     const newValidInputs: Record<string, boolean> = {};
 
     Object.entries(inputs).forEach(([inputKey, currentInput]) => {
       const currentInputNode = currentInput.current;
-      if (!['password', 'terms'].includes(inputKey)) {
-        currentInputNode.value = currentInputNode.value.trim();
+      if (currentInputNode) {
+        if (!['password', 'terms'].includes(inputKey)) {
+          currentInputNode.value = currentInputNode.value.trim();
+        }
+
+        if (!currentInputNode.checkValidity()) {
+          const validationError = ValidationError.handleValidationState(
+            currentInputNode.name,
+            currentInputNode.validity,
+          );
+
+          if (validationError) {
+            errors.push(validationError);
+          }
+        }
+        newValidInputs[inputKey] = currentInputNode.validity.valid;
       }
-      if (!currentInputNode.checkValidity()) {
-        errors.push(ValidationError.handleValidationState(currentInputNode.name, currentInputNode.validity));
-      }
-      newValidInputs[inputKey] = currentInputNode.validity.valid;
     });
     setValidInputs(newValidInputs);
     setValidationErrors(errors);
+
     try {
       if (errors.length > 0) {
         throw errors[0];
       }
+
       await (props.beforeSubmit && props.beforeSubmit());
       await props.pushAccountRegistrationData({...registrationData});
       await props.doSendActivationCode(registrationData.email);
-      return props.onSubmit(event);
+
+      return props.onSubmit();
     } catch (error) {
       const label = (error as BackendError)?.label;
       if (label) {
@@ -118,14 +131,14 @@ const AccountFormComponent = ({account, ...props}: Props & ConnectedProps & Disp
           case BackendError.AUTH_ERRORS.DOMAIN_BLOCKED_FOR_REGISTRATION:
           case BackendError.AUTH_ERRORS.INVALID_EMAIL:
           case BackendError.AUTH_ERRORS.KEY_EXISTS: {
-            inputs.email.current.setCustomValidity(label);
+            inputs.email.current?.setCustomValidity(label);
             setValidInputs({...validInputs, email: false});
             break;
           }
           case BackendError.AUTH_ERRORS.INVALID_CREDENTIALS:
           case BackendError.GENERAL_ERRORS.UNAUTHORIZED: {
-            inputs.email.current.setCustomValidity(label);
-            inputs.password.current.setCustomValidity(label);
+            inputs.email.current?.setCustomValidity(label);
+            inputs.password.current?.setCustomValidity(label);
             setValidInputs({...validInputs, email: false, password: false});
             break;
           }
@@ -137,7 +150,7 @@ const AccountFormComponent = ({account, ...props}: Props & ConnectedProps & Disp
           }
         }
       } else {
-        console.error('Account registration error', error);
+        logger.error('Account registration error', error);
       }
     }
   };
@@ -148,7 +161,7 @@ const AccountFormComponent = ({account, ...props}: Props & ConnectedProps & Disp
           name="name"
           id="name"
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            inputs.name.current.setCustomValidity('');
+            inputs.name.current?.setCustomValidity('');
             setRegistrationData({...registrationData, name: event.target.value});
             setValidInputs({...validInputs, name: true});
           }}
@@ -159,7 +172,7 @@ const AccountFormComponent = ({account, ...props}: Props & ConnectedProps & Disp
           placeholder={_(accountFormStrings.namePlaceholder)}
           onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
             if (event.key === KEY.ENTER) {
-              inputs.email.current.focus();
+              inputs.email.current?.focus();
             }
           }}
           maxLength={64}
@@ -168,11 +181,12 @@ const AccountFormComponent = ({account, ...props}: Props & ConnectedProps & Disp
           required
           data-uie-name="enter-name"
         />
+
         <Input
           name="email"
           id="email"
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            inputs.email.current.setCustomValidity('');
+            inputs.email.current?.setCustomValidity('');
             setRegistrationData({...registrationData, email: event.target.value});
             setValidInputs({...validInputs, email: true});
           }}
@@ -187,7 +201,7 @@ const AccountFormComponent = ({account, ...props}: Props & ConnectedProps & Disp
           )}
           onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
             if (event.key === KEY.ENTER) {
-              inputs.password.current.focus();
+              inputs.password.current?.focus();
             }
           }}
           maxLength={128}
@@ -195,11 +209,12 @@ const AccountFormComponent = ({account, ...props}: Props & ConnectedProps & Disp
           required
           data-uie-name="enter-email"
         />
+
         <Input
           name="password"
           id="password"
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            inputs.password.current.setCustomValidity('');
+            inputs.password.current?.setCustomValidity('');
             setRegistrationData({...registrationData, password: event.target.value});
             setValidInputs({...validInputs, password: true});
           }}
@@ -213,6 +228,7 @@ const AccountFormComponent = ({account, ...props}: Props & ConnectedProps & Disp
           required
           data-uie-name="enter-password"
         />
+
         <Small
           style={{
             display: validationErrors.length ? 'none' : 'block',
@@ -223,12 +239,14 @@ const AccountFormComponent = ({account, ...props}: Props & ConnectedProps & Disp
         >
           {_(accountFormStrings.passwordHelp, {minPasswordLength: Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH})}
         </Small>
+
         <Exception errors={[props.authError, ...validationErrors]} />
       </div>
+
       <Checkbox
         ref={inputs.terms}
         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-          inputs.terms.current.setCustomValidity('');
+          inputs.terms.current?.setCustomValidity('');
           setRegistrationData({...registrationData, termsAccepted: event.target.checked});
           setValidInputs({...validInputs, terms: true});
         }}
@@ -298,6 +316,7 @@ const AccountFormComponent = ({account, ...props}: Props & ConnectedProps & Disp
           )}
         </CheckboxLabel>
       </Checkbox>
+
       <Button
         disabled={
           !(
