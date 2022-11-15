@@ -129,6 +129,7 @@ export function doRedirect(signOutReason: SIGN_OUT_REASON) {
 export class App {
   static readonly LOCAL_STORAGE_LOGIN_REDIRECT_KEY = 'LOGIN_REDIRECT_KEY';
   static readonly LOCAL_STORAGE_LOGIN_CONVERSATION_KEY = 'LOGIN_CONVERSATION_KEY';
+  private isLoggingOut = false;
   logger: Logger;
   service: {
     asset: AssetService;
@@ -711,6 +712,13 @@ export class App {
    * @param clearData Keep data in database
    */
   private readonly logout = (signOutReason: SIGN_OUT_REASON, clearData: boolean): Promise<void> | void => {
+    if (this.isLoggingOut) {
+      // Avoid triggering another logout flow if we currently are logging out.
+      // This could happen if we trigger the logout flow while the user token is already invalid.
+      // This will cause the api to fail and to trigger the `logout` event
+      return;
+    }
+    this.isLoggingOut = true;
     const _redirectToLogin = () => {
       amplify.publish(WebAppEvents.LIFECYCLE.SIGNED_OUT, clearData);
       this._redirectToLogin(signOutReason);
