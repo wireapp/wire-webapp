@@ -23,7 +23,7 @@ import {AudioPreference, NotificationPreference, WebappProperties} from '@wireap
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
+import {Checkbox, CheckboxLabel, RangeInput} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -43,6 +43,20 @@ interface OptionPreferencesProps {
   userState?: UserState;
 }
 
+export enum FontSizePreference {
+  XXS = '10px',
+  XS = '12px',
+  S = '14px',
+  M = '16px',
+  L = '18px',
+  XL = '20px',
+  XXL = '24px',
+  XXXL = '30px',
+  XXXXL = '36px',
+}
+
+const fontSizes = Object.values(FontSizePreference);
+
 const OptionPreferences: React.FC<OptionPreferencesProps> = ({
   propertiesRepository,
   userState = container.resolve(UserState),
@@ -51,11 +65,13 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
   const {
     properties: {settings},
   } = propertiesRepository;
+  const currentFontSizeIndex = fontSizes.indexOf(settings.interface.font_size);
   const [optionAudio, setOptionAudio] = useState<AudioPreference>(settings.sound.alerts);
   const [optionReplaceInlineEmoji, setOptionReplaceInlineEmoji] = useState<boolean>(settings.emoji.replace_inline);
   const [optionDarkMode, setOptionDarkMode] = useState<boolean>(settings.interface.theme === ThemeViewModelThemes.DARK);
   const [optionSendPreviews, setOptionSendPreviews] = useState<boolean>(settings.previews.send);
   const [optionNotifications, setOptionNotifications] = useState<NotificationPreference>(settings.notifications);
+  const [optionFontSize, setOptionFontSize] = useState<number>(currentFontSizeIndex);
 
   useEffect(() => {
     const updateProperties = ({settings}: WebappProperties): void => {
@@ -64,7 +80,9 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
       setOptionDarkMode(settings.interface.theme === ThemeViewModelThemes.DARK);
       setOptionSendPreviews(settings.previews.send);
       setOptionNotifications(settings.notifications);
+      setOptionFontSize(currentFontSizeIndex);
     };
+
     const updateDarkMode = (newDarkMode: boolean) => setOptionDarkMode(newDarkMode);
 
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.USE_DARK_MODE, updateDarkMode);
@@ -100,6 +118,15 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
     const newTheme = useDarkMode ? ThemeViewModelThemes.DARK : ThemeViewModelThemes.DEFAULT;
     propertiesRepository.savePreference(PROPERTIES_TYPE.INTERFACE.THEME, newTheme);
     setOptionDarkMode(useDarkMode);
+  };
+
+  const saveOptionFontSize = event => {
+    const index = event.target.value;
+    const fontSize = fontSizes[index];
+    const root = document.documentElement;
+    root.style.fontSize = fontSize;
+    propertiesRepository.savePreference(PROPERTIES_TYPE.INTERFACE.FONT_SIZE, fontSize);
+    setOptionFontSize(index);
   };
 
   return (
@@ -162,6 +189,17 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
           <hr className="preferences-separator" />
 
           <PreferencesSection title={t('preferencesOptionsPopular')}>
+            <RangeInput
+              css={{margin: '16px', width: '100%'}}
+              min={'0'}
+              max={'8'}
+              value={optionFontSize}
+              label={'font size'}
+              minValueLabel={'small'}
+              maxValueLabel={'big'}
+              step={'1'}
+              onChange={saveOptionFontSize}
+            ></RangeInput>
             <Checkbox
               tabIndex={0}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {

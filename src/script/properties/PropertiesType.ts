@@ -27,6 +27,7 @@ enum CALL {
 }
 
 enum INTERFACE {
+  FONT_SIZE = 'settings.interface.font_size',
   THEME = 'settings.interface.theme',
   VIEW_FOLDERS = 'settings.interface.view_folders',
 }
