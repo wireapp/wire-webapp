@@ -600,7 +600,8 @@ export class TeamRepository {
       return accumulator;
     }, this.teamState.memberInviters());
 
-    const supportsLegalHold = memberArray.some(member => member.hasOwnProperty('legalholdStatus'));
+    const supportsLegalHold =
+      this.teamState.supportsLegalHold() || memberArray.some(member => member.hasOwnProperty('legalholdStatus'));
     this.teamState.supportsLegalHold(supportsLegalHold);
     this.teamState.memberRoles(memberRoles);
     this.teamState.memberInviters(memberInvites);
