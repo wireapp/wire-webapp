@@ -187,7 +187,7 @@ const ConversationList: FC<ConversationListProps> = ({
     return false;
   };
 
-  const handleLinkClick = (event: Event) => {
+  const handleMarkdownLinkClick = (event: Event) => {
     const href = (event.target as HTMLAnchorElement).href;
     PrimaryModal.show(PrimaryModal.type.CONFIRM, {
       primaryAction: {
