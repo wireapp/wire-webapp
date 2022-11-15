@@ -404,6 +404,7 @@ const InputBar = ({
       setIsTyping(false);
     }, CONFIG.IS_TYPING_TIMEOUT);
   }, [isTyping]); // we want to send is typing based on isTyping
+
   const replyMessage = (messageEntity: ContentMessage): void => {
     if (messageEntity?.isReplyable() && messageEntity !== replyMessageEntity) {
       cancelMessageReply();
@@ -558,6 +559,7 @@ const InputBar = ({
       conversationRepository.sendTypingStop(conversationEntity);
       clearTimeout(isTypingTimerIdRef.current);
       isTypingTimerIdRef.current = null;
+      setIsTyping(false);
     }
   };
 
