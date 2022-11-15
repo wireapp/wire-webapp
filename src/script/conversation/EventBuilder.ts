@@ -21,6 +21,7 @@ import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
 import {ConversationOtrMessageAddEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {ReactionType} from '@wireapp/core/lib/conversation';
+import {DecryptionError} from '@wireapp/core/lib/errors/DecryptionError';
 
 import type {REASON as AVS_REASON} from '@wireapp/avs';
 import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
@@ -470,13 +471,13 @@ export const EventBuilder = {
     };
   },
 
-  buildUnableToDecrypt(event: EventRecord, decryptionError: {code: number; message: string}): ErrorEvent {
+  buildUnableToDecrypt(event: EventRecord, decryptionError: DecryptionError): ErrorEvent {
     const {qualified_conversation: conversationId, qualified_from, conversation, data: eventData, from, time} = event;
 
     return {
       ...buildQualifiedId(conversationId || conversation),
       error: `${decryptionError.message} (${eventData.sender})`,
-      error_code: decryptionError.code,
+      error_code: decryptionError.code ?? '',
       from,
       id: createRandomUuid(),
       qualified_from: qualified_from || {domain: '', id: from},
