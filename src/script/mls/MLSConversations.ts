@@ -98,7 +98,9 @@ async function registerUninitializedConversations(
     conversation => conversation.epoch === 0 && (isSelfConversation(conversation) || isTeamConversation(conversation)),
   );
 
-  uninitializedConversations.forEach(conversation => {
-    core.service?.mls.registerConversation(conversation.groupId, [selfUser]);
-  });
+  await Promise.all(
+    uninitializedConversations.map(conversation =>
+      core.service?.mls.registerConversation(conversation.groupId, [selfUser]),
+    ),
+  );
 }
