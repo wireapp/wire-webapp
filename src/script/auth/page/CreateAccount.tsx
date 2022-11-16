@@ -17,18 +17,22 @@
  *
  */
 
-import {ArrowIcon, COLOR, Column, Columns, Container, ContainerXS, H1, IsMobile} from '@wireapp/react-ui-kit';
 import React from 'react';
-import {useIntl} from 'react-intl';
-import {Config} from '../../../script/Config';
-import {useNavigate} from 'react-router-dom';
-import {createAccountStrings} from '../../strings';
-import AccountForm from '../component/AccountForm';
-import RouterLink from '../component/RouterLink';
-import {ROUTE} from '../route';
-import Page from './Page';
 
-interface Props extends React.HTMLProps<HTMLDivElement> {}
+import {useIntl} from 'react-intl';
+import {useNavigate} from 'react-router-dom';
+
+import {ArrowIcon, COLOR, Column, Columns, Container, ContainerXS, H1, IsMobile} from '@wireapp/react-ui-kit';
+
+import {Page} from './Page';
+
+import {Config} from '../../../script/Config';
+import {createAccountStrings} from '../../strings';
+import {AccountForm} from '../component/AccountForm';
+import {RouterLink} from '../component/RouterLink';
+import {ROUTE} from '../route';
+
+type Props = React.HTMLProps<HTMLDivElement>;
 
 const CreateAccount = ({}: Props) => {
   const {formatMessage: _} = useIntl();
@@ -72,8 +76,11 @@ const CreateAccount = ({}: Props) => {
           <Column />
         </Columns>
       </Container>
+      <IsMobile>
+        <div style={{minWidth: 48}} />
+      </IsMobile>
     </Page>
   );
 };
 
-export default CreateAccount;
+export {CreateAccount};

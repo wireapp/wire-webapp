@@ -17,37 +17,43 @@
  *
  */
 
-import Icon from 'Components/Icon';
 import React, {useEffect, useState} from 'react';
+
+import {amplify} from 'amplify';
 import {container} from 'tsyringe';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {AvailabilityState} from 'Components/AvailabilityState';
+import {CallingCell} from 'Components/calling/CallingCell';
+import {Icon} from 'Components/Icon';
+import {LegalHoldDot} from 'Components/LegalHoldDot';
+import {ListState} from 'src/script/page/useAppState';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {isTabKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {ListState, ListViewModel} from '../../../../view_model/ListViewModel';
-import ListWrapper from '../ListWrapper';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {User} from '../../../../entity/User';
+import {ConversationsList} from './ConversationsList';
+import {useFolderState} from './state';
+
+import {CallState} from '../../../../calling/CallState';
+import {DefaultLabelIds} from '../../../../conversation/ConversationLabelRepository';
+import {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import {ConversationState} from '../../../../conversation/ConversationState';
-import {Shortcut} from '../../../../ui/Shortcut';
-import {ShortcutType} from '../../../../ui/ShortcutType';
+import {User} from '../../../../entity/User';
+import {useRoveFocus} from '../../../../hooks/useRoveFocus';
+import {useMLSConversationState} from '../../../../mls/mlsConversationState';
+import {PreferenceNotificationRepository} from '../../../../notification/PreferenceNotificationRepository';
 import {PropertiesRepository} from '../../../../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../../../../properties/PropertiesType';
-import {CallState} from '../../../../calling/CallState';
-import {ConversationRepository} from '../../../../conversation/ConversationRepository';
-import {DefaultLabelIds} from '../../../../conversation/ConversationLabelRepository';
-import ConversationListCallingCell from 'Components/list/ConversationListCallingCell';
-import AvailabilityState from 'Components/AvailabilityState';
-import LegalHoldDot from 'Components/LegalHoldDot';
 import {TeamState} from '../../../../team/TeamState';
 import {AvailabilityContextMenu} from '../../../../ui/AvailabilityContextMenu';
+import {Shortcut} from '../../../../ui/Shortcut';
+import {ShortcutType} from '../../../../ui/ShortcutType';
 import {UserState} from '../../../../user/UserState';
-import {ConversationsList} from './ConversationsList';
-import {PreferenceNotificationRepository} from '../../../../notification/PreferenceNotificationRepository';
-import {useFolderState} from './state';
-import {WebAppEvents} from '@wireapp/webapp-events';
-import {amplify} from 'amplify';
-import useRoveFocus from '../../../../hooks/useRoveFocus';
-import {isTabKey} from 'Util/KeyboardUtil';
-import {useMLSConversationState} from '../../../../mls/mlsConversationState';
+import {ListViewModel} from '../../../../view_model/ListViewModel';
+import {useAppMainState, ViewType} from '../../../state';
+import {ListWrapper} from '../ListWrapper';
 
 type ConversationsProps = {
   callState?: CallState;
@@ -88,8 +94,10 @@ const Conversations: React.FC<ConversationsProps> = ({
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
-  const {conversations_archived: archivedConversations, conversations_unarchived: conversations} =
-    useKoSubscribableChildren(conversationState, ['conversations_archived', 'conversations_unarchived']);
+  const {archivedConversations, visibleConversations: conversations} = useKoSubscribableChildren(conversationState, [
+    'archivedConversations',
+    'visibleConversations',
+  ]);
   const {notifications} = useKoSubscribableChildren(preferenceNotificationRepository, ['notifications']);
 
   const {filterEstablishedConversations} = useMLSConversationState();
@@ -108,6 +116,17 @@ const Conversations: React.FC<ConversationsProps> = ({
 
   const {conversationLabelRepository} = conversationRepository;
   const [isConversationListFocus, focusConversationList] = useState(false);
+
+  const {setCurrentView} = useAppMainState(state => state.responsiveView);
+  const {close: closeRightSidebar} = useAppMainState(state => state.rightSidebar);
+
+  const showLegalHold = isOnLegalHold || hasPendingLegalHold;
+
+  const onClickPreferences = () => {
+    setCurrentView(ViewType.LEFT_SIDEBAR);
+    switchList(ListState.PREFERENCES);
+    closeRightSidebar();
+  };
 
   useEffect(() => {
     if (!activeConversation) {
@@ -146,7 +165,7 @@ const Conversations: React.FC<ConversationsProps> = ({
         type="button"
         className={`conversations-settings-button accent-text ${showBadge ? 'conversations-settings--badge' : ''}`}
         title={t('tooltipConversationsPreferences')}
-        onClick={() => switchList(ListState.PREFERENCES)}
+        onClick={onClickPreferences}
         data-uie-name="go-preferences"
       >
         <Icon.Settings />
@@ -157,6 +176,7 @@ const Conversations: React.FC<ConversationsProps> = ({
           <button
             type="button"
             className="left-list-header-availability"
+            css={{...(showLegalHold && {gridColumn: '2/3'})}}
             onClick={event => AvailabilityContextMenu.show(event.nativeEvent, 'left-list-availability-menu')}
             onBlur={event => {
               // on blur conversation list should get the focus
@@ -171,12 +191,12 @@ const Conversations: React.FC<ConversationsProps> = ({
             />
           </button>
 
-          {(isOnLegalHold || hasPendingLegalHold) && (
+          {showLegalHold && (
             <LegalHoldDot
               isPending={hasPendingLegalHold}
               dataUieName={hasPendingLegalHold ? 'status-legal-hold-pending' : 'status-legal-hold'}
-              legalHoldModal={listViewModel.contentViewModel.legalHoldModal}
               showText
+              isInteractive
             />
           )}
         </>
@@ -185,7 +205,6 @@ const Conversations: React.FC<ConversationsProps> = ({
           className="left-list-header-text"
           data-uie-name="status-name"
           role="presentation"
-          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
           tabIndex={0}
           onBlur={event => {
             // personal user won't see availability status menu, on blur of the user name
@@ -285,12 +304,13 @@ const Conversations: React.FC<ConversationsProps> = ({
         return (
           conversation && (
             <div className="calling-cell" key={conversation.id}>
-              <ConversationListCallingCell
+              <CallingCell
                 classifiedDomains={classifiedDomains}
                 call={call}
                 callActions={callingViewModel.callActions}
                 callingRepository={callingRepository}
                 conversation={conversation}
+                isFullUi
                 hasAccessToCamera={callingViewModel.hasAccessToCamera()}
                 isSelfVerified={selfUser.is_verified()}
                 multitasking={callingViewModel.multitasking}
@@ -335,4 +355,4 @@ const Conversations: React.FC<ConversationsProps> = ({
   );
 };
 
-export default Conversations;
+export {Conversations};

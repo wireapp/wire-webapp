@@ -17,15 +17,18 @@
  *
  */
 
-import type {APIClient} from '@wireapp/api-client';
-import {ClientType} from '@wireapp/api-client/src/client/';
-import type {TypeUtil} from '@wireapp/commons';
+import {ClientType} from '@wireapp/api-client/lib/client/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-import {mockStoreFactory} from '../../util/test/mockStoreFactory';
-import {actionRoot} from './';
+import type {APIClient} from '@wireapp/api-client';
+import type {TypeUtil} from '@wireapp/commons';
+
 import {BackendError} from './BackendError';
 import {AuthActionCreator} from './creator/';
+
+import {mockStoreFactory} from '../../util/test/mockStoreFactory';
+
+import {actionRoot} from './';
 
 describe('AuthAction', () => {
   it('authenticates a user successfully', async () => {

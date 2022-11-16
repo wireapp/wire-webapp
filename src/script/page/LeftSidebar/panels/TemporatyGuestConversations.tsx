@@ -19,18 +19,18 @@
 
 import React from 'react';
 
-import Icon from 'Components/Icon';
-import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
+
+import {CallingCell} from 'Components/calling/CallingCell';
+import {Icon} from 'Components/Icon';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import ConversationListCallingCell from 'Components/list/ConversationListCallingCell';
 import {t} from 'Util/LocalizerUtil';
-import {User} from '../../../entity/User';
-import {ListViewModel} from '../../../view_model/ListViewModel';
+
 import {Config} from '../../../Config';
-import {ModalsViewModel} from '../../../view_model/ModalsViewModel';
+import {User} from '../../../entity/User';
 import {CallingViewModel} from '../../../view_model/CallingViewModel';
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import {ListViewModel} from '../../../view_model/ListViewModel';
 
 type TemporaryGuestConversations = {
   callingViewModel: CallingViewModel;
@@ -56,7 +56,7 @@ const TemporaryGuestConversations: React.FC<TemporaryGuestConversations> = ({
   };
 
   const createAccount = (): void => {
-    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+    PrimaryModal.show(PrimaryModal.type.CONFIRM, {
       preventClose: true,
       primaryAction: {
         action: () => window.location.replace(`/auth/${location.search}`),
@@ -75,13 +75,14 @@ const TemporaryGuestConversations: React.FC<TemporaryGuestConversations> = ({
         const conversation = getConversationById(call.conversationId);
         return (
           <div key={call.conversationId.id} className="calling-cell">
-            <ConversationListCallingCell
+            <CallingCell
               data-uie-name="item-call"
               data-uie-uid={call.conversationId.id}
               data-uie-value={conversation.display_name()}
               call={call}
               conversation={conversation}
-              temporaryUserStyle={true}
+              temporaryUserStyle
+              isFullUi
               isSelfVerified={false}
               callActions={callingViewModel.callActions}
               callingRepository={callingViewModel.callingRepository}
@@ -131,4 +132,4 @@ const TemporaryGuestConversations: React.FC<TemporaryGuestConversations> = ({
   );
 };
 
-export default TemporaryGuestConversations;
+export {TemporaryGuestConversations};

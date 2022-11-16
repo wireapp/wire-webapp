@@ -19,13 +19,16 @@
 
 import fs from 'fs';
 import path from 'path';
+
+import {SVGProvider} from 'src/script/auth/util/SVGProvider';
+
 const parser = new DOMParser();
 const mockSVG = parser.parseFromString(
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M0 7v2h7v7h2V9h7V7H9V0H7v7z"/></svg>',
   'image/svg+xml',
 );
 
-const mockFileList = fs
+const mockFileList: SVGProvider = fs
   .readdirSync(path.resolve(__dirname, '../../../../../resource/image/icon'))
   .filter(file => file.endsWith('.svg'))
   .reduce((list, file: string) => {
@@ -33,4 +36,7 @@ const mockFileList = fs
     return Object.assign(list, {[iconName]: mockSVG});
   }, {});
 
-jest.mock('../../../auth/util/SVGProvider', () => mockFileList);
+jest.mock('../../../auth/util/SVGProvider', () => ({
+  getAllSVGs: jest.fn().mockImplementation(() => mockFileList),
+  getSVG: jest.fn().mockImplementation((iconName: string) => mockFileList[iconName]),
+}));

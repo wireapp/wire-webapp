@@ -17,44 +17,52 @@
  *
  */
 
-import React from 'react';
-import Image from 'Components/Image';
-import FileAssetComponent from 'Components/MessagesList/Message/ContentMessage/asset/FileAssetComponent';
-import AudioAsset from 'Components/MessagesList/Message/ContentMessage/asset/AudioAsset';
-import LinkPreviewAssetComponent from 'Components/MessagesList/Message/ContentMessage/asset/LinkPreviewAssetComponent';
+import {FC} from 'react';
+
+import {Image} from 'Components/Image';
+import {AudioAsset} from 'Components/MessagesList/Message/ContentMessage/asset/AudioAsset';
+import {FileAsset} from 'Components/MessagesList/Message/ContentMessage/asset/FileAssetComponent';
+import {LinkPreviewAsset} from 'Components/MessagesList/Message/ContentMessage/asset/LinkPreviewAssetComponent';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {MediumImage} from 'src/script/entity/message/MediumImage';
-import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+
 import {isOfCategory} from './utils';
 
-const CollectionItem: React.FC<{allMessages: ContentMessage[]; message: ContentMessage}> = ({message, allMessages}) => {
+interface CollectionItemProps {
+  allMessages: ContentMessage[];
+  message: ContentMessage;
+  onImageClick?: (message: ContentMessage) => void;
+}
+
+const CollectionItem: FC<CollectionItemProps> = ({message, onImageClick}) => {
   const {assets} = useKoSubscribableChildren(message, ['assets']);
   const firstAsset = assets[0];
   const {resource} = useKoSubscribableChildren(firstAsset as MediumImage, ['resource']);
+
   if (isOfCategory('images', message) && resource) {
     return (
       <Image
         className="collection-image"
         asset={resource}
         data-uie-name="image-asset"
-        click={() => {
-          amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, message, allMessages, 'collection');
-        }}
+        click={() => onImageClick?.(message)}
       />
     );
   }
   if (isOfCategory('links', message)) {
-    return <LinkPreviewAssetComponent message={message} header={true} />;
+    return <LinkPreviewAsset message={message} header={true} />;
   }
+
   if (isOfCategory('files', message)) {
-    return <FileAssetComponent message={message} hasHeader={true} />;
+    return <FileAsset message={message} hasHeader={true} />;
   }
+
   if (isOfCategory('audio', message)) {
     return <AudioAsset className="collection-file" message={message} hasHeader={true} />;
   }
+
   return null;
 };
 
-export default CollectionItem;
+export {CollectionItem};

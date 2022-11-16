@@ -52,9 +52,9 @@ export const videoControlInActiveStyles = css`
 `;
 
 export const videoControlDisabledStyles = css`
-  cursor: default;
   background-color: var(--disabled-call-button-bg);
   border: 1px solid var(--disabled-call-button-border);
+  cursor: default;
   svg {
     fill: var(--disabled-call-button-svg);
   }

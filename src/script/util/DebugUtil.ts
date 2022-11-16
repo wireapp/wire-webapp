@@ -17,45 +17,46 @@
  *
  */
 
+import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
+import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
 import {
-  CONVERSATION_EVENT,
-  USER_EVENT,
   BackendEvent,
   ConversationEvent,
   ConversationOtrMessageAddEvent,
-} from '@wireapp/api-client/src/event/';
-import type {QualifiedId} from '@wireapp/api-client/src/user';
-import type {Notification} from '@wireapp/api-client/src/notification/';
-import {MemberLeaveReason} from '@wireapp/api-client/src/conversation/data/';
-import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
-import {util as ProteusUtil} from '@wireapp/proteus';
+  CONVERSATION_EVENT,
+  USER_EVENT,
+} from '@wireapp/api-client/lib/event/';
+import type {Notification} from '@wireapp/api-client/lib/notification/';
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import {isQualifiedId} from '@wireapp/core/lib/util';
 import Dexie from 'dexie';
 import {container} from 'tsyringe';
 
+import {util as ProteusUtil} from '@wireapp/proteus';
+
 import {getLogger, Logger} from 'Util/Logger';
 
-import {checkVersion} from '../lifecycle/newVersionHandler';
 import {arrayToBase64, createRandomUuid, downloadFile} from './util';
-import {StorageSchemata} from '../storage/StorageSchemata';
-import {EventRepository} from '../event/EventRepository';
-import {ViewModelRepositories} from '../view_model/MainViewModel';
+
 import {CallingRepository} from '../calling/CallingRepository';
+import {CallState} from '../calling/CallState';
 import {ClientRepository} from '../client/ClientRepository';
-import {ConversationRepository} from '../conversation/ConversationRepository';
+import {ClientState} from '../client/ClientState';
 import {ConnectionRepository} from '../connection/ConnectionRepository';
+import {ConversationRepository} from '../conversation/ConversationRepository';
+import {ConversationState} from '../conversation/ConversationState';
+import type {MessageRepository} from '../conversation/MessageRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
-import {EventRecord, StorageRepository} from '../storage';
-import {UserRepository} from '../user/UserRepository';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
-import type {MessageRepository} from '../conversation/MessageRepository';
-import {ClientState} from '../client/ClientState';
-import {UserState} from '../user/UserState';
-import {ConversationState} from '../conversation/ConversationState';
-import {CallState} from '../calling/CallState';
+import {EventRepository} from '../event/EventRepository';
+import {checkVersion} from '../lifecycle/newVersionHandler';
 import {MessageCategory} from '../message/MessageCategory';
-import {isQualifiedId} from '@wireapp/core/src/main/util';
 import {Core} from '../service/CoreSingleton';
+import {EventRecord, StorageRepository, StorageSchemata} from '../storage';
+import {UserRepository} from '../user/UserRepository';
+import {UserState} from '../user/UserState';
+import {ViewModelRepositories} from '../view_model/MainViewModel';
 
 function downloadText(text: string, filename: string = 'default.txt'): number {
   const url = `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`;
@@ -73,10 +74,9 @@ export class DebugUtil {
   private readonly eventRepository: EventRepository;
   private readonly storageRepository: StorageRepository;
   private readonly messageRepository: MessageRepository;
+  public readonly $: JQueryStatic;
   /** Used by QA test automation. */
   public readonly userRepository: UserRepository;
-  /** Used by QA test automation. */
-  public readonly $: JQueryStatic;
   /** Used by QA test automation. */
   public readonly Dexie: typeof Dexie;
 

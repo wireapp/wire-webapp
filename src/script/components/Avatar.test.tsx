@@ -17,10 +17,12 @@
  *
  */
 
-import Avatar from './Avatar';
+import {fireEvent, render} from '@testing-library/react';
+
+import {Avatar} from './Avatar';
+
 import {User} from '../entity/User';
 import {ServiceEntity} from '../integration/ServiceEntity';
-import {render, fireEvent} from '@testing-library/react';
 
 describe('Avatar', () => {
   it('executes onClick with current participant', () => {

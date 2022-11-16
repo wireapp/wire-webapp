@@ -17,11 +17,12 @@
  *
  */
 
-import type {SSOSettings} from '@wireapp/api-client/src/account/SSOSettings';
-import type {LoginData, RegisterData} from '@wireapp/api-client/src/auth/';
+import type {SSOSettings} from '@wireapp/api-client/lib/account/SSOSettings';
+import type {LoginData, RegisterData} from '@wireapp/api-client/lib/auth/';
+
+import type {RegistrationDataState} from '../../reducer/authReducer';
 
 import type {AppAction} from '.';
-import type {RegistrationDataState} from '../../reducer/authReducer';
 
 export enum AUTH_ACTION {
   AUTH_RESET_ERROR = 'AUTH_RESET_ERROR',

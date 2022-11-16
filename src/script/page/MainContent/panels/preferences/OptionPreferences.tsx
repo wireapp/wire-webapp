@@ -18,22 +18,25 @@
  */
 
 import React, {useEffect, useState} from 'react';
+
+import {AudioPreference, NotificationPreference, WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
-import {AudioPreference, WebappProperties, NotificationPreference} from '@wireapp/api-client/src/user/data/';
-import {THEMES as ThemeViewModelThemes} from '../../../../view_model/ThemeViewModel';
+
+import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {PROPERTIES_TYPE} from '../../../../properties/PropertiesType';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
+import {PreferencesPage} from './components/PreferencesPage';
+import {PreferencesRadio} from './components/PreferencesRadio';
+import {PreferencesSection} from './components/PreferencesSection';
+
 import {PropertiesRepository} from '../../../../properties/PropertiesRepository';
+import {PROPERTIES_TYPE} from '../../../../properties/PropertiesType';
 import {UserState} from '../../../../user/UserState';
-import PreferencesSection from './components/PreferencesSection';
-import PreferencesRadio from './components/PreferencesRadio';
-import PreferencesPage from './components/PreferencesPage';
-import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
+import {THEMES as ThemeViewModelThemes} from '../../../../view_model/ThemeViewModel';
 
 interface OptionPreferencesProps {
   propertiesRepository: PropertiesRepository;
@@ -160,6 +163,7 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
 
           <PreferencesSection title={t('preferencesOptionsPopular')}>
             <Checkbox
+              tabIndex={0}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 saveOptionNewTheme(event.target.checked);
               }}
@@ -173,6 +177,7 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
 
             <div className="checkbox-margin">
               <Checkbox
+                tabIndex={0}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                   saveOptionEmojiPreference(event.target.checked);
                 }}
@@ -199,6 +204,7 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
 
             <div className="checkbox-margin">
               <Checkbox
+                tabIndex={0}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                   saveOptionSendPreviewsPreference(event.target.checked);
                 }}
@@ -221,4 +227,4 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
   );
 };
 
-export default OptionPreferences;
+export {OptionPreferences};

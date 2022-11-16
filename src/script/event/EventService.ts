@@ -19,21 +19,20 @@
 
 import type {Dexie} from 'dexie';
 import {container} from 'tsyringe';
+
 import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 
 import {getLogger, Logger} from 'Util/Logger';
 
-import {MessageCategory} from '../message/MessageCategory';
-import {categoryFromEvent} from '../message/MessageCategorization';
-
 import {AssetTransferState} from '../assets/AssetTransferState';
-import {StorageSchemata} from '../storage/StorageSchemata';
-
+import {AssetData} from '../cryptography/CryptographyMapper';
 import {BaseError, BASE_ERROR_TYPE} from '../error/BaseError';
 import {ConversationError} from '../error/ConversationError';
 import {StorageError} from '../error/StorageError';
+import {categoryFromEvent} from '../message/MessageCategorization';
+import {MessageCategory} from '../message/MessageCategory';
 import {StorageService, DatabaseListenerCallback, EventRecord} from '../storage';
-import {AssetData} from '../cryptography/CryptographyMapper';
+import {StorageSchemata} from '../storage/StorageSchemata';
 
 export type Includes = {includeFrom: boolean; includeTo: boolean};
 type DexieCollection = Dexie.Collection<any, any>;

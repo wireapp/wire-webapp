@@ -17,15 +17,19 @@
  *
  */
 
-import {singleton} from 'tsyringe';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
-import {Call} from './Call';
+import {singleton} from 'tsyringe';
+
 import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
-import {CallViewTab} from '../view_model/CallingViewModel';
+
+import {matchQualifiedIds} from 'Util/QualifiedId';
+
+import {Call} from './Call';
+
 import {Config} from '../Config';
 import type {ElectronDesktopCapturerSource} from '../media/MediaDevicesHandler';
-import {matchQualifiedIds} from 'Util/QualifiedId';
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import {CallViewTab} from '../view_model/CallingViewModel';
 
 export enum MuteState {
   NOT_MUTED,

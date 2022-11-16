@@ -20,10 +20,12 @@
 import ko from 'knockout';
 
 import {createRandomUuid} from 'Util/util';
-import {User} from '../entity/User';
-import {UserState} from '../user/UserState';
+
 import {MediaConstraintsHandler, ScreensharingMethods} from './MediaConstraintsHandler';
 import {CurrentAvailableDeviceId} from './MediaDevicesHandler';
+
+import {User} from '../entity/User';
+import {UserState} from '../user/UserState';
 
 describe('MediaConstraintsHandler', () => {
   const createAvailableDevices = (deviceId?: string): CurrentAvailableDeviceId => ({

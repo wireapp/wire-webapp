@@ -175,6 +175,15 @@
 @conversation-list-width: 320px;
 
 @right-width: 304px;
+@panel-content-min-height: 150px;
+
+body {
+  --preferences-width: 560px;
+
+  @media (max-width: @screen-lg-min) {
+    --preferences-width: 100%;
+  }
+}
 
 // ----------------------------------------------------------------------------
 // Left list
@@ -193,7 +202,13 @@
 
 @conversation-message-max-width: 640px;
 @conversation-message-sender-width: 56px;
-@conversation-message-timestamp-width: 170px;
+
+body {
+  --conversation-message-timestamp-width: 170px;
+  @media (max-width: @screen-md-min) {
+    --conversation-message-timestamp-width: 55px;
+  }
+}
 
 // ----------------------------------------------------------------------------
 // Conversation Input
@@ -273,9 +288,15 @@
 // ----------------------------------------------------------------------------
 // Media queries breakpoints
 // ----------------------------------------------------------------------------
+@screen-sm-min: 320px;
 @screen-sm: 480px;
 @screen-md-min: 768px;
-@screen-lg-min: 1312px;
+@screen-lg-min: 960px;
+
+@screen-height-sm: 420px;
+
+@call-ui-sm: 680px;
+@call-ui-xs: 500px;
 
 // So media queries don't overlap when required, provide a maximum
 @screen-sm-max: @screen-md-min - 1;

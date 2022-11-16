@@ -17,9 +17,12 @@
  *
  */
 
-import {Button, COLOR, Column, Columns, Container, H3, Link, Modal, Text} from '@wireapp/react-ui-kit';
 import React from 'react';
+
 import {FormattedMessage, useIntl} from 'react-intl';
+
+import {Button, COLOR, Column, Columns, Container, H3, Link, Modal, Text} from '@wireapp/react-ui-kit';
+
 import {Config} from '../../Config';
 import {acceptNewsModalStrings} from '../../strings';
 
@@ -72,4 +75,4 @@ const AcceptNewsModal = ({onConfirm, onDecline}: Props) => {
   );
 };
 
-export default AcceptNewsModal;
+export {AcceptNewsModal};

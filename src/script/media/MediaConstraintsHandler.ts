@@ -18,11 +18,13 @@
  */
 
 import {container} from 'tsyringe';
+
 import {Logger, getLogger} from 'Util/Logger';
 
-import {UserState} from '../user/UserState';
 import type {CurrentAvailableDeviceId} from './MediaDevicesHandler';
 import {VIDEO_QUALITY_MODE} from './VideoQualityMode';
+
+import {UserState} from '../user/UserState';
 
 interface Config {
   CONSTRAINTS: {

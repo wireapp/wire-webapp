@@ -17,11 +17,11 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
 import React from 'react';
-import {ConversationProtocol} from '@wireapp/api-client/src/conversation/NewConversation';
 
-import {registerReactComponent} from 'Util/ComponentUtil';
+import {CSSObject} from '@emotion/react';
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
+
 import {t} from 'Util/LocalizerUtil';
 
 export enum Ciphersuite {
@@ -81,14 +81,14 @@ const wrapperStyles: CSSObject = {
 
 const ConversationProtocolDetails: React.FC<ConversationProtocolDetailsProps> = ({protocol, cipherSuite}) => {
   return (
-    <>
+    <div>
       <div className="conversation-details__list-head">{t('conversationDetailsProtocolDetails')}</div>
       <div css={wrapperStyles}>
         <div css={titleStyles}>Protocol</div>
         <div css={subTitleStyles} data-uie-name="protocol-name">
-          {protocol}
+          {protocol.toUpperCase()}
         </div>
-        {protocol.toLocaleLowerCase() === ConversationProtocol.MLS && cipherSuite && (
+        {protocol === ConversationProtocol.MLS && cipherSuite && (
           <>
             <div css={titleStyles}>Cipher Suite</div>
             <div css={subTitleStyles} data-uie-name="cipher-suite">
@@ -97,10 +97,8 @@ const ConversationProtocolDetails: React.FC<ConversationProtocolDetailsProps> = 
           </>
         )}
       </div>
-    </>
+    </div>
   );
 };
 
-export default ConversationProtocolDetails;
-
-registerReactComponent('conversation-protocol-details', ConversationProtocolDetails);
+export {ConversationProtocolDetails};

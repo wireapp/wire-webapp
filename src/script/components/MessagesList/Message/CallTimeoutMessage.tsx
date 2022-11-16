@@ -18,13 +18,16 @@
  */
 
 import React from 'react';
-import Icon from 'Components/Icon';
-import {t} from 'Util/LocalizerUtil';
-import {CallingTimeoutMessage} from '../../../entity/message/CallingTimeoutMessage';
 
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import MessageTime from './MessageTime';
 import {REASON} from '@wireapp/avs';
+
+import {Icon} from 'Components/Icon';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
+
+import {MessageTime} from './MessageTime';
+
+import {CallingTimeoutMessage} from '../../../entity/message/CallingTimeoutMessage';
 
 export interface CallTimeoutMessageProps {
   message: CallingTimeoutMessage;
@@ -59,4 +62,4 @@ const CallTimeoutMessage: React.FC<CallTimeoutMessageProps> = ({message}) => {
   );
 };
 
-export default CallTimeoutMessage;
+export {CallTimeoutMessage};

@@ -17,27 +17,32 @@
  *
  */
 
-import {css} from '@emotion/react';
 import React from 'react';
-import {t} from 'Util/LocalizerUtil';
-import {ListViewModel} from '../../../../view_model/ListViewModel';
+
+import {css} from '@emotion/react';
+
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {GroupAvatar} from 'Components/avatar/GroupAvatar';
+import {ConversationListCell} from 'Components/list/ConversationListCell';
+import {Call} from 'src/script/calling/Call';
+import {User} from 'src/script/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {handleKeyDown} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
+import {matchQualifiedIds} from 'Util/QualifiedId';
+
+import {ConverationViewStyle} from './Conversations';
+import {GroupedConversations} from './GroupedConversations';
+
+import {CallState} from '../../../../calling/CallState';
+import {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import {ConversationState} from '../../../../conversation/ConversationState';
 import {Conversation} from '../../../../entity/Conversation';
-import ConversationListCell from 'Components/list/ConversationListCell';
-import GroupedConversations from './GroupedConversations';
-import {createNavigate} from '../../../../router/routerBindings';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
-import {CallState} from '../../../../calling/CallState';
-import {Call} from 'src/script/calling/Call';
-import {matchQualifiedIds} from 'Util/QualifiedId';
-import {ConversationRepository} from '../../../../conversation/ConversationRepository';
-import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
-import GroupAvatar from 'Components/avatar/GroupAvatar';
-import {ContentViewModel} from '../../../../view_model/ContentViewModel';
-import {ConverationViewStyle} from './Conversations';
-import {User} from 'src/script/entity/User';
-import {handleKeyDown} from 'Util/KeyboardUtil';
+import {createNavigate} from '../../../../router/routerBindings';
+import {ListViewModel} from '../../../../view_model/ListViewModel';
+import {useAppMainState, ViewType} from '../../../state';
+import {ContentState, useAppState} from '../../../useAppState';
 
 export const ConversationsList: React.FC<{
   callState: CallState;
@@ -64,6 +69,8 @@ export const ConversationsList: React.FC<{
   handleFocus,
   handleArrowKeyDown,
 }) => {
+  const {contentState} = useAppState();
+
   const {joinableCalls} = useKoSubscribableChildren(callState, ['joinableCalls']);
 
   const isActiveConversation = (conversation: Conversation) => conversationState.isActiveConversation(conversation);
@@ -71,8 +78,7 @@ export const ConversationsList: React.FC<{
   const openContextMenu = (conversation: Conversation, event: MouseEvent | React.MouseEvent<Element, MouseEvent>) =>
     listViewModel.onContextMenu(conversation, event);
   const answerCall = (conversation: Conversation) => listViewModel.answerCall(conversation);
-  const {state: contentState} = useKoSubscribableChildren(listViewModel.contentViewModel, ['state']);
-  const isShowingConnectionRequests = contentState === ContentViewModel.STATE.CONNECTION_REQUESTS;
+  const isShowingConnectionRequests = contentState === ContentState.CONNECTION_REQUESTS;
 
   const hasJoinableCall = (conversation: Conversation) => {
     const call = joinableCalls.find((callInstance: Call) =>
@@ -84,8 +90,11 @@ export const ConversationsList: React.FC<{
     return !conversation.removed_from_conversation();
   };
 
+  const {setCurrentView} = useAppMainState(state => state.responsiveView);
+
   const onConnectionRequestClick = () => {
-    listViewModel.contentViewModel.switchContent(ContentViewModel.STATE.CONNECTION_REQUESTS);
+    setCurrentView(ViewType.CENTRAL_COLUMN);
+    listViewModel.contentViewModel.switchContent(ContentState.CONNECTION_REQUESTS);
   };
 
   const conversationView =
@@ -102,7 +111,7 @@ export const ConversationsList: React.FC<{
               index={index}
               dataUieName="item-conversation"
               conversation={conversation}
-              onClick={createNavigate(generateConversationUrl(conversation.id, conversation.domain))}
+              onClick={createNavigate(generateConversationUrl(conversation.qualifiedId))}
               isSelected={isActiveConversation}
               onJoinCall={answerCall}
               rightClick={openContextMenu}

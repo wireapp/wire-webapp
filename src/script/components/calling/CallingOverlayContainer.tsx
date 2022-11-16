@@ -17,27 +17,28 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/src/user';
-import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 import React, {Fragment, useEffect} from 'react';
+
 import {container} from 'tsyringe';
 
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
+
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+
+import {ChooseScreen, Screen} from './ChooseScreen';
+import {FullscreenVideoCall} from './FullscreenVideoCall';
 
 import {Call} from '../../calling/Call';
 import {CallingRepository} from '../../calling/CallingRepository';
-import {MediaRepository} from '../../media/MediaRepository';
 import {CallState, MuteState} from '../../calling/CallState';
+import {LEAVE_CALL_REASON} from '../../calling/enum/LeaveCallReason';
 import {Participant} from '../../calling/Participant';
 import {useVideoGrid} from '../../calling/videoGridHandler';
 import {ConversationState} from '../../conversation/ConversationState';
-import {Conversation} from '../../entity/Conversation';
 import {ElectronDesktopCapturerSource} from '../../media/MediaDevicesHandler';
+import {MediaRepository} from '../../media/MediaRepository';
 import {Multitasking} from '../../notification/NotificationRepository';
 import {CallViewTab} from '../../view_model/CallingViewModel';
-import ChooseScreen, {Screen} from './ChooseScreen';
-import FullscreenVideoCall from './FullscreenVideoCall';
-import {LEAVE_CALL_REASON} from '../../calling/enum/LeaveCallReason';
 
 export interface CallingContainerProps {
   readonly callingRepository: CallingRepository;
@@ -69,12 +70,12 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     maximizedParticipant,
     state: currentCallState,
     muteState,
-  } = useKoSubscribableChildren(joinedCall, ['maximizedParticipant', 'state', 'muteState']);
+  } = useKoSubscribableChildren(joinedCall!, ['maximizedParticipant', 'state', 'muteState']);
 
   const isMuted = muteState !== MuteState.NOT_MUTED;
 
   useEffect(() => {
-    if (currentCallState === CALL_STATE.MEDIA_ESTAB && joinedCall.initialType === CALL_TYPE.VIDEO) {
+    if (currentCallState === CALL_STATE.MEDIA_ESTAB && joinedCall?.initialType === CALL_TYPE.VIDEO) {
       multitasking.isMinimized(false);
     }
     if (currentCallState === undefined) {
@@ -82,15 +83,11 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     }
   }, [currentCallState]);
 
-  const videoGrid = useVideoGrid(joinedCall);
+  const videoGrid = useVideoGrid(joinedCall!);
 
   const onCancelScreenSelection = () => {
     callState.selectableScreens([]);
     callState.selectableWindows([]);
-  };
-
-  const getConversationById = (conversationId: QualifiedId): Conversation => {
-    return conversationState.findConversation(conversationId);
   };
 
   const changePage = (newPage: number, call: Call) => {
@@ -165,6 +162,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
   };
 
   const conversation = joinedCall && conversationState.findConversation(joinedCall.conversationId);
+
   if (!joinedCall || !conversation || conversation.removed_from_conversation()) {
     return null;
   }
@@ -177,7 +175,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
           videoGrid={videoGrid}
           call={joinedCall}
           activeCallViewTab={activeCallViewTab}
-          conversation={getConversationById(joinedCall.conversationId)}
+          conversation={conversation}
           multitasking={multitasking}
           canShareScreen={callingRepository.supportsScreenSharing}
           maximizedParticipant={maximizedParticipant}
@@ -209,4 +207,4 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
   );
 };
 
-registerReactComponent('calling-overlay-container', CallingContainer);
+export {CallingContainer};

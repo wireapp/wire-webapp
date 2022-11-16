@@ -18,7 +18,6 @@
  */
 
 export enum EventValidation {
-  IGNORED_TYPE = 'IGNORED_TYPE',
   OUTDATED_TIMESTAMP = 'OUTDATED_TIMESTAMP',
   VALID = 'VALID',
 }

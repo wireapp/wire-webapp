@@ -17,26 +17,27 @@
  *
  */
 
-import React, {useState} from 'react';
+import React, {ChangeEvent, useId, useState} from 'react';
+
 import cx from 'classnames';
 
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
+import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
+
+import {AvailabilityState} from 'Components/AvailabilityState';
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {ParticipantMicOnIcon} from 'Components/calling/ParticipantMicOnIcon';
+import {Icon} from 'Components/Icon';
 import {UserlistMode} from 'Components/UserList';
+import {InViewport} from 'Components/utils/InViewport';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 import {noop, setContextMenuPosition} from 'Util/util';
 
+import {Participant} from '../../calling/Participant';
 import {User} from '../../entity/User';
 import {ServiceEntity} from '../../integration/ServiceEntity';
-
-import 'Components/AvailabilityState';
-import {Participant} from '../../calling/Participant';
-import AvailabilityState from 'Components/AvailabilityState';
-import ParticipantMicOnIcon from 'Components/calling/ParticipantMicOnIcon';
-import Icon from 'Components/Icon';
-import {KEY} from 'Util/KeyboardUtil';
-import InViewport from 'Components/utils/InViewport';
 
 export interface ParticipantItemProps<UserType> extends Omit<React.HTMLProps<HTMLDivElement>, 'onClick' | 'onKeyDown'> {
   badge?: boolean;
@@ -51,7 +52,7 @@ export interface ParticipantItemProps<UserType> extends Omit<React.HTMLProps<HTM
   mode?: UserlistMode;
   noInteraction?: boolean;
   noUnderline?: boolean;
-  onClick?: (user: UserType, event: MouseEvent) => void;
+  onClick?: (user: UserType, event: MouseEvent | ChangeEvent) => void;
   onKeyDown?: (user: UserType, event: KeyboardEvent) => void;
   participant: UserType;
   selfInTeam?: boolean;
@@ -77,12 +78,13 @@ const ParticipantItem = <UserType extends User | ServiceEntity>(
     noUnderline = false,
     participant,
     selfInTeam,
-    showArrow = false,
     showDropdown = false,
     onContextMenu = noop,
     onClick = noop,
     onKeyDown = noop,
   } = props;
+  const checkboxId = useId();
+
   const [isInViewport, setIsInViewport] = useState(false);
   const isUser = participant instanceof User && !participant.isService;
   const isService = participant instanceof ServiceEntity || participant.isService;
@@ -138,26 +140,9 @@ const ParticipantItem = <UserType extends User | ServiceEntity>(
     }
   };
 
-  return (
-    <div
-      className={cx('participant-item-wrapper', {
-        highlighted,
-        'no-interaction': noInteraction,
-        'no-underline': noUnderline,
-      })}
-      role="button"
-      tabIndex={0}
-      onContextMenu={onContextMenu}
-      onClick={noInteraction ? onContextMenu : event => onClick(participant, event.nativeEvent)}
-      onKeyDown={noInteraction ? handleContextKeyDown : event => onKeyDown(participant, event.nativeEvent)}
-      aria-label={t('accessibility.openConversation', participantName)}
-    >
-      <InViewport
-        className="participant-item"
-        data-uie-name={isUser ? 'item-user' : 'item-service'}
-        data-uie-value={participantName}
-        onVisible={() => setIsInViewport(true)}
-      >
+  const RenderParticipant = () => {
+    return (
+      <InViewport className="participant-item" onVisible={() => setIsInViewport(true)}>
         {isInViewport && (
           <>
             <div className="participant-item__image">
@@ -265,19 +250,62 @@ const ParticipantItem = <UserType extends User | ServiceEntity>(
                 )}
               </>
             )}
-
-            {canSelect && (
-              <div
-                className={cx('search-list-item-select icon-check', {selected: isSelected})}
-                data-uie-name="status-selected"
-              />
-            )}
-            {showArrow && <Icon.ChevronRight className="disclose-icon" />}
           </>
         )}
       </InViewport>
-    </div>
+    );
+  };
+
+  const dataUieValues = {
+    'data-uie-name': isUser ? 'item-user' : 'item-service',
+    'data-uie-value': participantName,
+  };
+
+  const commonClassName = cx('participant-item-wrapper', {
+    highlighted,
+    'no-interaction': noInteraction,
+    'no-underline': noUnderline,
+  });
+
+  return (
+    <>
+      {canSelect ? (
+        <div
+          onContextMenu={onContextMenu}
+          aria-label={t('accessibility.openConversation', participantName)}
+          className={commonClassName}
+        >
+          <Checkbox
+            checked={isSelected}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => onClick(participant, event)}
+            id={checkboxId}
+            labelBeforeCheckbox={true}
+            aligncenter={false}
+            outlineOffset="0"
+          >
+            <CheckboxLabel htmlFor={checkboxId}>
+              <div {...dataUieValues}>
+                <RenderParticipant />
+              </div>
+            </CheckboxLabel>
+          </Checkbox>
+        </div>
+      ) : (
+        <div
+          tabIndex={0}
+          role="button"
+          onContextMenu={onContextMenu}
+          onClick={noInteraction ? onContextMenu : event => onClick(participant, event.nativeEvent)}
+          onKeyDown={noInteraction ? handleContextKeyDown : event => onKeyDown(participant, event.nativeEvent)}
+          {...dataUieValues}
+          aria-label={t('accessibility.openConversation', participantName)}
+          className={commonClassName}
+        >
+          <RenderParticipant />
+        </div>
+      )}
+    </>
   );
 };
 
-export default ParticipantItem;
+export {ParticipantItem};

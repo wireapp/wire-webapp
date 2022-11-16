@@ -18,25 +18,27 @@
  */
 
 import React, {useEffect, useMemo, useState} from 'react';
-import {container} from 'tsyringe';
-import cx from 'classnames';
 
+import cx from 'classnames';
+import type {DexieError} from 'dexie';
+import {container} from 'tsyringe';
+
+import {Icon} from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 import type {Logger} from 'Util/Logger';
 
-import type {CryptographyRepository} from '../../cryptography/CryptographyRepository';
+import {DeviceCard} from './DeviceCard';
+
 import type {ClientEntity} from '../../client/ClientEntity';
-import type {User} from '../../entity/User';
-import {ConversationState} from '../../conversation/ConversationState';
-import DeviceCard from './DeviceCard';
-import DeviceId from '../DeviceId';
-import {MotionDuration} from '../../motion/MotionDuration';
 import type {ClientRepository} from '../../client/ClientRepository';
-import type {MessageRepository} from '../../conversation/MessageRepository';
-import type {DexieError} from 'dexie';
 import {Config} from '../../Config';
+import {ConversationState} from '../../conversation/ConversationState';
+import type {MessageRepository} from '../../conversation/MessageRepository';
+import type {CryptographyRepository} from '../../cryptography/CryptographyRepository';
+import type {User} from '../../entity/User';
+import {MotionDuration} from '../../motion/MotionDuration';
+import {DeviceId} from '../DeviceId';
 
 interface DeviceDetailsProps {
   clickToShowSelfFingerprint: () => void;
@@ -87,7 +89,7 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
 
   const clickToResetSession = () => {
     const _resetProgress = () => window.setTimeout(() => setIsResettingSession(false), MotionDuration.LONG);
-    const conversation = user.isMe ? conversationState.self_conversation() : conversationState.activeConversation();
+    const conversation = user.isMe ? conversationState.selfConversation() : conversationState.activeConversation();
     setIsResettingSession(true);
     if (conversation) {
       messageRepository
@@ -171,4 +173,4 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
   );
 };
 
-export default DeviceDetails;
+export {DeviceDetails};

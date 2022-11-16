@@ -82,4 +82,4 @@ const ChooseScreen: React.FC<ChooseScreenProps> = ({cancel, choose, screens = []
   );
 };
 
-export default ChooseScreen;
+export {ChooseScreen};

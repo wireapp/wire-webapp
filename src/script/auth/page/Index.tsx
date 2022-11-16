@@ -17,26 +17,30 @@
  *
  */
 
-import {UrlUtil} from '@wireapp/commons';
-import * as AuthSelector from '../module/selector/AuthSelector';
-import {Button, ButtonVariant, ContainerXS, ErrorMessage, Text} from '@wireapp/react-ui-kit';
 import React, {useEffect, useState} from 'react';
+
+import {SVGIcon} from '@wireapp/react-ui-kit/lib/Icon/SVGIcon';
 import {FormattedMessage, useIntl} from 'react-intl';
+import {connect} from 'react-redux';
 import {Navigate, useNavigate} from 'react-router-dom';
+import {AnyAction, Dispatch} from 'redux';
+
+import {UrlUtil} from '@wireapp/commons';
+import {Button, ButtonVariant, ContainerXS, ErrorMessage, Text} from '@wireapp/react-ui-kit';
+
+import {Page} from './Page';
+
 import {Config} from '../../Config';
 import '../../localization/Localizer';
 import {indexStrings, logoutReasonStrings} from '../../strings';
+import {bindActionCreators, RootState} from '../module/reducer';
+import * as AuthSelector from '../module/selector/AuthSelector';
 import {QUERY_KEY, ROUTE} from '../route';
-import Page from './Page';
-import {RootState, bindActionCreators} from '../module/reducer';
-import {AnyAction, Dispatch} from 'redux';
-import {connect} from 'react-redux';
-import SVGProvider from '../util/SVGProvider';
-import {SVGIcon} from '@wireapp/react-ui-kit/src/Icon/SVGIcon';
+import {getSVG} from '../util/SVGProvider';
 
-interface Props extends React.HTMLProps<HTMLDivElement> {}
+type Props = React.HTMLProps<HTMLDivElement>;
 
-const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
+const IndexComponent = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
   const navigate = useNavigate();
   const [logoutReason, setLogoutReason] = useState<string>();
@@ -70,7 +74,7 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
           style={{marginBottom: '80px'}}
           data-uie-name="ui-wire-logo"
         >
-          <g dangerouslySetInnerHTML={{__html: SVGProvider['logo-full-icon']?.documentElement?.innerHTML}} />
+          <g dangerouslySetInnerHTML={{__html: getSVG('logo-full-icon')?.documentElement?.innerHTML}} />
         </SVGIcon>
         <Text
           block
@@ -128,4 +132,6 @@ const mapStateToProps = (state: RootState) => ({
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
 const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => bindActionCreators({}, dispatch);
 
-export default connect(mapStateToProps, mapDispatchToProps)(Index);
+const Index = connect(mapStateToProps, mapDispatchToProps)(IndexComponent);
+
+export {Index};

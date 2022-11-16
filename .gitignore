@@ -2,7 +2,6 @@
 !/.idea/modules.xml
 .env
 .env.defaults
-.nyc_output
 .DS_Store
 .idea
 .vscode

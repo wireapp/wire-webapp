@@ -17,16 +17,17 @@
  *
  */
 
-import type {MemberData, TeamData} from '@wireapp/api-client/src/team/';
-import type {TeamUpdateData} from '@wireapp/api-client/src/team/data/';
-import type {PermissionsData} from '@wireapp/api-client/src/team/member/PermissionsData';
+import type {MemberData, TeamData} from '@wireapp/api-client/lib/team/';
+import type {TeamUpdateData} from '@wireapp/api-client/lib/team/data/';
+import type {PermissionsData} from '@wireapp/api-client/lib/team/member/PermissionsData';
 
 import {Logger, getLogger} from 'Util/Logger';
 
-import {roleFromTeamPermissions} from '../user/UserPermission';
 import {TeamEntity} from './TeamEntity';
 import {TeamMemberEntity} from './TeamMemberEntity';
+
 import type {User} from '../entity/User';
+import {roleFromTeamPermissions} from '../user/UserPermission';
 
 export class TeamMapper {
   private readonly logger: Logger;

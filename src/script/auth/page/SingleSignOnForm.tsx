@@ -17,11 +17,18 @@
  *
  */
 
-import {ClientType} from '@wireapp/api-client/src/client/index';
-import {BackendErrorLabel} from '@wireapp/api-client/src/http';
-import {UrlUtil} from '@wireapp/commons';
-import {pathWithParams} from '@wireapp/commons/src/main/util/UrlUtil';
-import {PATTERN, isValidEmail} from '@wireapp/commons/src/main/util/ValidationUtil';
+import React, {useEffect, useRef, useState} from 'react';
+
+import {ClientType} from '@wireapp/api-client/lib/client/index';
+import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
+import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
+import {isValidEmail, PATTERN} from '@wireapp/commons/lib/util/ValidationUtil';
+import {FormattedMessage, useIntl} from 'react-intl';
+import {connect} from 'react-redux';
+import {Navigate, useNavigate} from 'react-router-dom';
+import {AnyAction, Dispatch} from 'redux';
+
+import {Runtime, UrlUtil} from '@wireapp/commons';
 import {
   ArrowIcon,
   Checkbox,
@@ -31,24 +38,19 @@ import {
   Input,
   InputBlock,
   InputSubmitCombo,
-  RoundIconButton,
   Loading,
+  RoundIconButton,
 } from '@wireapp/react-ui-kit';
-import React, {useEffect, useRef, useState} from 'react';
-import {FormattedMessage, useIntl} from 'react-intl';
-import {connect} from 'react-redux';
-import {AnyAction, Dispatch} from 'redux';
-import {useNavigate, Navigate} from 'react-router-dom';
+
 import {Config} from '../../Config';
 import {loginStrings, logoutReasonStrings, ssoLoginStrings} from '../../strings';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {BackendError} from '../module/action/BackendError';
 import {ValidationError} from '../module/action/ValidationError';
-import {RootState, bindActionCreators} from '../module/reducer';
+import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import {QUERY_KEY, ROUTE} from '../route';
-import {Runtime} from '@wireapp/commons';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {getSearchParams} from '../util/urlUtil';
 
@@ -59,7 +61,7 @@ export interface SingleSignOnFormProps extends React.HTMLAttributes<HTMLDivEleme
 
 const SSO_CODE_PREFIX = 'wire-';
 const SSO_CODE_PREFIX_REGEX = '[wW][iI][rR][eE]-';
-const SingleSignOnForm = ({
+const SingleSignOnFormComponent = ({
   initialCode,
   isFetching,
   loginError,
@@ -343,4 +345,6 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(mapStateToProps, mapDispatchToProps)(SingleSignOnForm);
+const SingleSignOnForm = connect(mapStateToProps, mapDispatchToProps)(SingleSignOnFormComponent);
+
+export {SingleSignOnForm};

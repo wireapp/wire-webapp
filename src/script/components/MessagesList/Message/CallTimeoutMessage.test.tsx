@@ -17,11 +17,14 @@
  *
  */
 
-import ko from 'knockout';
-import {CallingTimeoutMessage as CallTimeoutMessageEntity} from 'src/script/entity/message/CallingTimeoutMessage';
-import CallTimeoutMessage from './CallTimeoutMessage';
-import {REASON} from '@wireapp/avs';
 import {render} from '@testing-library/react';
+import ko from 'knockout';
+
+import {REASON} from '@wireapp/avs';
+
+import {CallingTimeoutMessage as CallTimeoutMessageEntity} from 'src/script/entity/message/CallingTimeoutMessage';
+
+import {CallTimeoutMessage} from './CallTimeoutMessage';
 
 const createCallTimeoutMessage = (partialCallTimeoutMessage: Partial<CallTimeoutMessageEntity>) => {
   const callMessage: Partial<CallTimeoutMessageEntity> = {

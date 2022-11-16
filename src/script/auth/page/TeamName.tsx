@@ -17,6 +17,13 @@
  *
  */
 
+import React, {useEffect, useRef, useState} from 'react';
+
+import {useIntl} from 'react-intl';
+import {connect} from 'react-redux';
+import {useNavigate} from 'react-router-dom';
+import {AnyAction, Dispatch} from 'redux';
+
 import {
   ArrowIcon,
   COLOR,
@@ -34,15 +41,14 @@ import {
   Muted,
   RoundIconButton,
 } from '@wireapp/react-ui-kit';
-import React, {useEffect, useRef, useState} from 'react';
-import {useIntl} from 'react-intl';
-import {connect} from 'react-redux';
-import {AnyAction, Dispatch} from 'redux';
-import {useNavigate} from 'react-router-dom';
+
 import {getLogger} from 'Util/Logger';
+
+import {Page} from './Page';
+
 import {addLocaleToUrl} from '../../externalRoute';
 import {teamNameStrings} from '../../strings';
-import RouterLink from '../component/RouterLink';
+import {RouterLink} from '../component/RouterLink';
 import {EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {ValidationError} from '../module/action/ValidationError';
@@ -50,11 +56,10 @@ import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
-import Page from './Page';
 
-interface Props extends React.HTMLProps<HTMLDivElement> {}
+type Props = React.HTMLProps<HTMLDivElement>;
 
-const TeamName = ({
+const TeamNameComponent = ({
   teamName,
   enterTeamCreationFlow,
   resetInviteErrors,
@@ -66,9 +71,9 @@ const TeamName = ({
   const {formatMessage: _} = useIntl();
   const navigate = useNavigate();
   const [enteredTeamName, setEnteredTeamName] = useState(teamName || '');
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<ValidationError | null>(null);
   const [isValidTeamName, setIsValidTeamName] = useState(!!teamName);
-  const teamNameInput = useRef<HTMLInputElement>();
+  const teamNameInput = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     enterTeamCreationFlow();
@@ -81,7 +86,13 @@ const TeamName = ({
   };
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+
+    if (!teamNameInput.current) {
+      return;
+    }
+
     teamNameInput.current.value = teamNameInput.current.value.trim();
+
     if (!teamNameInput.current.checkValidity()) {
       setError(ValidationError.handleValidationState('name', teamNameInput.current.validity));
       setIsValidTeamName(false);
@@ -89,9 +100,9 @@ const TeamName = ({
       try {
         await pushAccountRegistrationData({
           team: {
-            creator: undefined,
-            icon: undefined,
-            id: undefined,
+            creator: '',
+            icon: '',
+            id: '',
             name: teamNameInput.current.value,
           },
         });
@@ -100,6 +111,7 @@ const TeamName = ({
         logger.error('Unable to push account data', error);
       }
     }
+
     teamNameInput.current.focus();
   };
 
@@ -198,4 +210,6 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(mapStateToProps, mapDispatchToProps)(TeamName);
+const TeamName = connect(mapStateToProps, mapDispatchToProps)(TeamNameComponent);
+
+export {TeamName};

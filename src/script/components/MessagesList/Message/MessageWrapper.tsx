@@ -17,29 +17,35 @@
  *
  */
 
+import React from 'react';
+
 import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
 import {container} from 'tsyringe';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {t} from 'Util/LocalizerUtil';
-import {ContextMenuEntry} from '../../../ui/ContextMenu';
-import {CompositeMessage} from '../../../entity/message/CompositeMessage';
-import {Conversation} from '../../../entity/Conversation';
+
+import {CallMessage} from './CallMessage';
+import {CallTimeoutMessage} from './CallTimeoutMessage';
+import {ContentMessageComponent} from './ContentMessage';
+import {DecryptErrorMessage} from './DecryptErrorMessage';
+import {DeleteMessage} from './DeleteMessage';
+import {FileTypeRestrictedMessage} from './FileTypeRestrictedMessage';
+import {LegalHoldMessage} from './LegalHoldMessage';
+import {MemberMessage} from './MemberMessage';
+import {MissedMessage} from './MissedMessage';
+import {PingMessage} from './PingMessage';
+import {SystemMessage} from './SystemMessage';
+import {VerificationMessage} from './VerificationMessage';
+
 import {AssetRepository} from '../../../assets/AssetRepository';
+import {Conversation} from '../../../entity/Conversation';
+import {CompositeMessage} from '../../../entity/message/CompositeMessage';
 import {TeamState} from '../../../team/TeamState';
-import VerificationMessage from './VerificationMessage';
-import CallMessage from './CallMessage';
-import CallTimeoutMessage from './CallTimeoutMessage';
-import MissedMessage from './MissedMessage';
-import FileTypeRestrictedMessage from './FileTypeRestrictedMessage';
-import DeleteMessage from './DeleteMessage';
-import DecryptionErrorMessage from './DecryptErrorMessage';
-import LegalHoldMessage from './LegalHoldMessage';
-import SystemMessage from './SystemMessage';
-import MemberMessage from './MemberMessage';
-import PingMessage from './PingMessage';
-import ContentMessageComponent from './ContentMessage';
-import React from 'react';
+import {ContextMenuEntry} from '../../../ui/ContextMenu';
+
 import {MessageParams} from './index';
 
 export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean}> = ({
@@ -175,10 +181,10 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean}> = ({
     );
   }
   if (message.isUnableToDecrypt()) {
-    return <DecryptionErrorMessage message={message} onClickResetSession={onClickResetSession} />;
+    return <DecryptErrorMessage message={message} onClickResetSession={onClickResetSession} />;
   }
   if (message.isLegalHold()) {
-    return <LegalHoldMessage message={message}></LegalHoldMessage>;
+    return <LegalHoldMessage message={message} />;
   }
   if (message.isVerification()) {
     return <VerificationMessage message={message} />;

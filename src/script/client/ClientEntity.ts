@@ -17,12 +17,14 @@
  *
  */
 
-import {ClientClassification, ClientType} from '@wireapp/api-client/src/client/';
+import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
 import ko from 'knockout';
+
 import {splitFingerprint} from 'Util/StringUtil';
 
-import {ClientRecord} from '../storage';
 import {ClientMapper} from './ClientMapper';
+
+import {ClientRecord} from '../storage';
 
 export class ClientEntity {
   static CONFIG = {

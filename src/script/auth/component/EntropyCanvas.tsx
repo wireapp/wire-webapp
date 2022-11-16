@@ -17,8 +17,10 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
 import {MouseEvent, useRef, useEffect, useState} from 'react';
+
+import {CSSObject} from '@emotion/react';
+
 import {usePausableInterval} from '../../hooks/usePausableInterval';
 import {EntropyData, EntropyFrame} from '../../util/Entropy';
 
@@ -128,4 +130,4 @@ const EntropyCanvas = (props: CanvasProps) => {
   );
 };
 
-export default EntropyCanvas;
+export {EntropyCanvas};

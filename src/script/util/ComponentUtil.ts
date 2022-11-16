@@ -17,9 +17,9 @@
  *
  */
 
+import {useEffect, useState} from 'react';
+
 import ko, {Unwrapped} from 'knockout';
-import React, {useEffect, useState} from 'react';
-import {createRoot} from 'react-dom/client';
 
 type Subscribables<T> = {
   [Key in keyof T]: T[Key] extends ko.Subscribable ? T[Key] : never;
@@ -68,41 +68,6 @@ const subscribeProperties = <C extends keyof Subscribables<P>, P extends Partial
     dispose: () => subscriptions.forEach(subscription => subscription?.dispose()),
   };
 };
-
-/**
- * Registers a react component against the ko world.
- *
- * @param name Name of the component to register. can be used a `<component-name>` directly in ko
- * @param component The React component to register
- */
-export function registerReactComponent<Props extends Record<string, any>>(
-  name: string,
-  component: React.FC<Props> | React.ComponentClass<Props>,
-) {
-  if (ko.components.isRegistered(name)) {
-    return;
-  }
-
-  ko.components.register(name, {
-    template: '<!-- -->', // We do not need any particular template as this is going to be replaced by react content
-    viewModel: {
-      createViewModel: (params: Subscribables<Props>, {element}: {element: HTMLElement}) => {
-        let state: Props = resolveObservables(params);
-        const root = createRoot(element);
-        const subscription = subscribeProperties(params, updates => {
-          state = {...state, ...updates};
-          root.render(React.createElement(component, state));
-        });
-        return {
-          dispose() {
-            root.unmount();
-            subscription.dispose();
-          },
-        };
-      },
-    },
-  });
-}
 
 export const useKoSubscribableChildren = <
   C extends keyof Subscribables<P>,

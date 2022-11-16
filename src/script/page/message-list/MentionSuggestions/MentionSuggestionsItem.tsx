@@ -18,14 +18,15 @@
  */
 
 import React, {forwardRef} from 'react';
+
 import cx from 'classnames';
 
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {Icon} from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import Icon from 'Components/Icon';
-import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
+import {handleKeyDown} from 'Util/KeyboardUtil';
 
 import {User} from '../../../entity/User';
-import {handleKeyDown} from 'Util/KeyboardUtil';
 
 type MentionSuggestionsItemProps = {
   isSelected: boolean;
@@ -34,7 +35,7 @@ type MentionSuggestionsItemProps = {
   suggestion: User;
 };
 
-const MentionSuggestionsItem: React.ForwardRefRenderFunction<HTMLDivElement, MentionSuggestionsItemProps> = (
+const MentionSuggestionsItemComponent: React.ForwardRefRenderFunction<HTMLDivElement, MentionSuggestionsItemProps> = (
   {suggestion, onSuggestionClick, onMouseEnter, isSelected},
   ref,
 ) => {
@@ -53,7 +54,7 @@ const MentionSuggestionsItem: React.ForwardRefRenderFunction<HTMLDivElement, Men
       role="button"
       tabIndex={0}
       onClick={onClick}
-      onKeyDown={e => handleKeyDown(e, onClick.bind(null, e))}
+      onKeyDown={e => handleKeyDown(e, () => onClick(e))}
       onMouseEnter={onMouseEnter}
       className={cx('mention-suggestion-list__item', {'mention-suggestion-list__item--highlighted': isSelected})}
       data-uie-name="item-mention-suggestion"
@@ -91,4 +92,6 @@ const MentionSuggestionsItem: React.ForwardRefRenderFunction<HTMLDivElement, Men
   );
 };
 
-export default forwardRef(MentionSuggestionsItem);
+const MentionSuggestionsItem = forwardRef(MentionSuggestionsItemComponent);
+
+export {MentionSuggestionsItem};

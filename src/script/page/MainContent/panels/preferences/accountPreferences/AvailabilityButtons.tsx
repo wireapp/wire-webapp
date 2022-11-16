@@ -18,15 +18,18 @@
  */
 
 import React from 'react';
+
+import {CSSObject} from '@emotion/serialize';
 import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
-import {Availability} from '@wireapp/protocol-messaging';
 import cx from 'classnames';
 
-import {t} from 'Util/LocalizerUtil';
-import Icon from 'Components/Icon';
+import {Availability} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {Icon} from 'Components/Icon';
 import {CSS_SQUARE} from 'Util/CSSMixin';
-import {CSSObject} from '@emotion/serialize';
+import {t} from 'Util/LocalizerUtil';
+
 import {ContextMenuEntry} from '../../../../../ui/ContextMenu';
 
 interface AvailabilityInputProps {
@@ -132,4 +135,4 @@ const AvailabilityButtons: React.FC<AvailabilityInputProps> = ({availability}) =
   );
 };
 
-export default AvailabilityButtons;
+export {AvailabilityButtons};

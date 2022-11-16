@@ -17,13 +17,17 @@
  *
  */
 
-import Icon from 'Components/Icon';
 import React from 'react';
-import {MessageTimerButton} from '../MessageTimerButton';
-import {t} from 'Util/LocalizerUtil';
+
+import {Icon} from 'Components/Icon';
 import {Conversation} from 'src/script/entity/Conversation';
+import {t} from 'Util/LocalizerUtil';
+
+import {GiphyButton} from './GiphyButton';
+
 import {AssetUploadButton} from '../AssetUploadButton';
 import {ImageUploadButton} from '../ImageUploadButton';
+import {MessageTimerButton} from '../MessageTimerButton';
 
 export type ControlButtonsProps = {
   input: string;
@@ -31,28 +35,28 @@ export type ControlButtonsProps = {
   disablePing?: boolean;
   disableFilesharing?: boolean;
   isEditing?: boolean;
+  isScaledDown?: boolean;
+  showGiphyButton?: boolean;
   onClickPing: () => void;
   onSelectFiles: (files: File[]) => void;
   onSelectImages: (files: File[]) => void;
   onCancelEditing: () => void;
-  onClickGif: () => void;
-};
-
-const config = {
-  GIPHY_TEXT_LENGTH: 256,
+  onGifClick: () => void;
 };
 
 const ControlButtons: React.FC<ControlButtonsProps> = ({
-  input,
   conversation,
   disablePing,
   disableFilesharing,
+  input,
   isEditing,
+  isScaledDown,
+  showGiphyButton,
   onClickPing,
   onSelectFiles,
   onSelectImages,
   onCancelEditing,
-  onClickGif,
+  onGifClick,
 }) => {
   const pingTooltip = t('tooltipConversationPing');
 
@@ -72,14 +76,16 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
     );
   }
 
-  if (input.length === 0) {
+  if (input.length === 0 || isScaledDown) {
+    const scaledDownClass = isScaledDown && 'controls-right-button_responsive';
+
     return (
       <>
         {!disableFilesharing && (
           <>
             <li>
               <button
-                className="controls-right-button buttons-group-button-left"
+                className={`controls-right-button buttons-group-button-left ${scaledDownClass}`}
                 type="button"
                 onClick={onClickPing}
                 disabled={disablePing}
@@ -108,26 +114,7 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
     );
   }
 
-  const showGiphyButton = input.length <= config.GIPHY_TEXT_LENGTH;
-
-  return (
-    <>
-      {showGiphyButton && !disableFilesharing && (
-        <li>
-          <button
-            type="button"
-            className="controls-right-button button-icon-large"
-            title={t('extensionsBubbleButtonGif')}
-            aria-label={t('extensionsBubbleButtonGif')}
-            onClick={onClickGif}
-            data-uie-name="do-giphy-popover"
-          >
-            <Icon.Gif />
-          </button>
-        </li>
-      )}
-    </>
-  );
+  return <>{showGiphyButton && !disableFilesharing && <GiphyButton onGifClick={onGifClick} />}</>;
 };
 
-export default ControlButtons;
+export {ControlButtons};

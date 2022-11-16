@@ -17,24 +17,24 @@
  *
  */
 
-import React, {Fragment, useState} from 'react';
+import React, {ChangeEvent, Fragment, useState} from 'react';
+
 import cx from 'classnames';
-
 import {container} from 'tsyringe';
-import {isEnterKey, isSpaceKey} from 'Util/KeyboardUtil';
 
+import {ParticipantItem} from 'Components/list/ParticipantItem';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {isEnterKey, isSpaceKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
+import {InViewport} from './utils/InViewport';
+
 import type {ConversationRepository} from '../conversation/ConversationRepository';
+import {ConversationState} from '../conversation/ConversationState';
 import type {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
-
-import {UserState} from '../user/UserState';
-import {ConversationState} from '../conversation/ConversationState';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import ParticipantItem from 'Components/list/ParticipantItem';
 import {TeamState} from '../team/TeamState';
-import InViewport from './utils/InViewport';
+import {UserState} from '../user/UserState';
 
 export enum UserlistMode {
   COMPACT = 'UserlistMode.COMPACT',
@@ -54,7 +54,8 @@ export interface UserListProps {
   mode?: UserlistMode;
   noSelfInteraction?: boolean;
   noUnderline?: boolean;
-  onClick?: (userEntity: User, event: MouseEvent | KeyboardEvent) => void;
+  showArrow?: boolean;
+  onClick?: (userEntity: User, event: MouseEvent | KeyboardEvent | ChangeEvent) => void;
   onSelectUser?: (user: User) => void;
   reducedUserCount?: number;
   selectedUsers?: User[];
@@ -80,6 +81,7 @@ const UserList: React.FC<UserListProps> = ({
   reducedUserCount = 5,
   showEmptyAdmin = false,
   noSelfInteraction = false,
+  showArrow = false,
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
   onSelectUser,
@@ -107,7 +109,7 @@ const UserList: React.FC<UserListProps> = ({
     return true;
   };
 
-  const onClickOrKeyPressed = (userEntity: User, event: MouseEvent | KeyboardEvent) => {
+  const onClickOrKeyPressed = (userEntity: User, event: MouseEvent | KeyboardEvent | ChangeEvent) => {
     onSelectUser?.(userEntity);
     onClick?.(userEntity, event);
   };
@@ -167,6 +169,7 @@ const UserList: React.FC<UserListProps> = ({
                       isSelfVerified={isSelfVerified}
                       onClick={onClickOrKeyPressed}
                       onKeyDown={onUserKeyPressed}
+                      showArrow={showArrow}
                     />
                   </li>
                 ))}
@@ -201,6 +204,7 @@ const UserList: React.FC<UserListProps> = ({
                     isSelfVerified={isSelfVerified}
                     onClick={onClickOrKeyPressed}
                     onKeyDown={onUserKeyPressed}
+                    showArrow={showArrow}
                   />
                 </li>
               ))}
@@ -229,6 +233,8 @@ const UserList: React.FC<UserListProps> = ({
             selfInTeam={selfInTeam}
             isSelfVerified={isSelfVerified}
             onClick={onClickOrKeyPressed}
+            onKeyDown={onUserKeyPressed}
+            showArrow={showArrow}
           />
         ))}
       </div>
@@ -249,4 +255,4 @@ const UserList: React.FC<UserListProps> = ({
   );
 };
 
-export default UserList;
+export {UserList};

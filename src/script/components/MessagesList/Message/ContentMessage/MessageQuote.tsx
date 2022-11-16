@@ -17,45 +17,54 @@
  *
  */
 
-import React from 'react';
-import cx from 'classnames';
+import {
+  FC,
+  Fragment,
+  KeyboardEvent as ReactKeyboardEvent,
+  MouseEvent as ReactMouseEvent,
+  useEffect,
+  useState,
+} from 'react';
+
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
+import cx from 'classnames';
+
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {isBeforeToday, formatDateNumeral, formatTimeShort} from 'Util/TimeUtil';
+import {Icon} from 'Components/Icon';
+import {Image} from 'Components/Image';
+import {Text} from 'src/script/entity/message/Text';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
+import {handleKeyDown} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
+import {formatDateNumeral, formatTimeShort, isBeforeToday} from 'Util/TimeUtil';
+import {useDisposableRef} from 'Util/useDisposableRef';
 
-import {QualifiedId} from '@wireapp/api-client/src/user';
-import {QuoteEntity} from '../../../../message/QuoteEntity';
-import {ConversationError} from '../../../../error/ConversationError';
+import {AudioAsset} from './asset/AudioAsset';
+import {FileAsset} from './asset/FileAssetComponent';
+import {LocationAsset} from './asset/LocationAsset';
+import {VideoAsset} from './asset/VideoAsset';
+
 import type {Conversation} from '../../../../entity/Conversation';
 import type {ContentMessage} from '../../../../entity/message/ContentMessage';
 import type {User} from '../../../../entity/User';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {useEffect, useState} from 'react';
-import Image from 'Components/Image';
-import Icon from 'Components/Icon';
-import {t} from 'Util/LocalizerUtil';
-import VideoAsset from './asset/VideoAsset';
-import AudioAsset from './asset/AudioAsset';
-import FileAssetComponent from './asset/FileAssetComponent';
-import LocationAsset from './asset/LocationAsset';
-import {Text} from 'src/script/entity/message/Text';
-import {handleKeyDown} from 'Util/KeyboardUtil';
-import {useDisposableRef} from 'Util/useDisposableRef';
+import {ConversationError} from '../../../../error/ConversationError';
+import {QuoteEntity} from '../../../../message/QuoteEntity';
 
 export interface QuoteProps {
   conversation: Conversation;
   findMessage: (conversation: Conversation, messageId: string) => Promise<ContentMessage | undefined>;
   focusMessage: (id: string) => void;
-  handleClickOnMessage: (message: Text, event: React.UIEvent) => void;
+  handleClickOnMessage: (message: Text, event: ReactMouseEvent | ReactKeyboardEvent<HTMLElement>) => void;
   quote: QuoteEntity;
   selfId: QualifiedId;
-  showDetail: (message: ContentMessage, event: React.MouseEvent) => void;
+  showDetail: (message: ContentMessage, event: ReactMouseEvent) => void;
   showUserDetails: (user: User) => void;
 }
 
-const Quote: React.FC<QuoteProps> = ({
+const Quote: FC<QuoteProps> = ({
   conversation,
   findMessage,
   focusMessage,
@@ -132,14 +141,14 @@ const Quote: React.FC<QuoteProps> = ({
 
 interface QuotedMessageProps {
   focusMessage: (id: string) => void;
-  handleClickOnMessage: (message: Text, event: React.UIEvent) => void;
+  handleClickOnMessage: (message: Text, event: ReactMouseEvent | ReactKeyboardEvent<HTMLElement>) => void;
   quotedMessage: ContentMessage;
   selfId: QualifiedId;
-  showDetail: (message: ContentMessage, event: React.MouseEvent) => void;
+  showDetail: (message: ContentMessage, event: ReactMouseEvent) => void;
   showUserDetails: (user: User) => void;
 }
 
-const QuotedMessage: React.FC<QuotedMessageProps> = ({
+const QuotedMessage: FC<QuotedMessageProps> = ({
   quotedMessage,
   focusMessage,
   selfId,
@@ -199,7 +208,7 @@ const QuotedMessage: React.FC<QuotedMessageProps> = ({
         )}
       </div>
       {quotedAssets.map((asset, index) => (
-        <React.Fragment key={index}>
+        <Fragment key={index}>
           {asset.isImage() && (
             <div data-uie-name="media-picture-quote">
               <Image
@@ -259,7 +268,7 @@ const QuotedMessage: React.FC<QuotedMessageProps> = ({
           )}
 
           {asset.isFile() && (
-            <FileAssetComponent
+            <FileAsset
               message={quotedMessage}
               // className="message-quote__file"
               data-uie-name="media-file-quote"
@@ -267,7 +276,7 @@ const QuotedMessage: React.FC<QuotedMessageProps> = ({
           )}
 
           {asset.isLocation() && <LocationAsset asset={asset} data-uie-name="media-location-quote" />}
-        </React.Fragment>
+        </Fragment>
       ))}
       <button
         type="button"
@@ -287,4 +296,4 @@ const QuotedMessage: React.FC<QuotedMessageProps> = ({
   );
 };
 
-export default Quote;
+export {Quote, QuotedMessage};

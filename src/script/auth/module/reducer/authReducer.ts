@@ -17,11 +17,11 @@
  *
  */
 
-import type {SSOSettings} from '@wireapp/api-client/src/account/SSOSettings';
-import type {LoginData} from '@wireapp/api-client/src/auth/';
-import {ClientType} from '@wireapp/api-client/src/client/';
-import type {TeamData} from '@wireapp/api-client/src/team/';
-import type {UserAsset} from '@wireapp/api-client/src/user/';
+import type {SSOSettings} from '@wireapp/api-client/lib/account/SSOSettings';
+import type {LoginData} from '@wireapp/api-client/lib/auth/';
+import {ClientType} from '@wireapp/api-client/lib/client/';
+import type {TeamData} from '@wireapp/api-client/lib/team/';
+import type {UserAsset} from '@wireapp/api-client/lib/user/';
 
 import {Config} from '../../../Config';
 import {AUTH_ACTION, AppActions, USER_ACTION} from '../action/creator/';
@@ -207,7 +207,7 @@ export function authReducer(state: AuthState = initialAuthState, action: AppActi
       return {...state, currentFlow: REGISTER_FLOW.TEAM};
     }
     case AUTH_ACTION.ENTER_PERSONAL_CREATION_FLOW: {
-      return {...state, currentFlow: REGISTER_FLOW.PERSONAL};
+      return {...state, currentFlow: REGISTER_FLOW.PERSONAL, account: {...initialAuthState.account}};
     }
     case AUTH_ACTION.ENTER_GENERIC_INVITATION_FLOW: {
       return {...state, currentFlow: REGISTER_FLOW.GENERIC_INVITATION};

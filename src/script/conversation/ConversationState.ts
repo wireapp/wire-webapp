@@ -17,44 +17,61 @@
  *
  */
 
-import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
-import {container, singleton} from 'tsyringe';
+import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
+import {container, singleton} from 'tsyringe';
 
+import {matchQualifiedIds} from 'Util/QualifiedId';
 import {sortGroupsByLastEvent} from 'Util/util';
 
 import {Conversation} from '../entity/Conversation';
-import {TeamState} from '../team/TeamState';
 import {User} from '../entity/User';
+import {TeamState} from '../team/TeamState';
 import {UserState} from '../user/UserState';
-import {QualifiedId} from '@wireapp/api-client/src/user';
-import {matchQualifiedIds} from 'Util/QualifiedId';
 
 @singleton()
 export class ConversationState {
-  public readonly conversations_cleared: ko.ObservableArray<Conversation>;
-  public readonly sorted_conversations: ko.PureComputed<Conversation[]>;
-  public readonly activeConversation: ko.Observable<Conversation | null>;
+  /**
+   * all the conversations available
+   */
+  public readonly conversations = ko.observableArray<Conversation>([]);
+  /**
+   * current conversation that is being viewed
+   */
+  public readonly activeConversation = ko.observable<Conversation | undefined>();
+  /**
+   * ordered list of conversations that are actives. This is basically the conversations we want to show to the user
+   */
+  public readonly visibleConversations: ko.PureComputed<Conversation[]>;
+  public readonly filteredConversations: ko.PureComputed<Conversation[]>;
+  public readonly archivedConversations: ko.PureComputed<Conversation[]>;
+  public readonly selfConversation: ko.PureComputed<Conversation | undefined>;
   public readonly connectedUsers: ko.PureComputed<User[]>;
-  public readonly conversations_archived: ko.ObservableArray<Conversation>;
-  public readonly conversations_unarchived: ko.ObservableArray<Conversation>;
-  public readonly conversations: ko.ObservableArray<Conversation>;
-  public readonly filtered_conversations: ko.PureComputed<Conversation[]>;
-  public readonly self_conversation: ko.PureComputed<Conversation | undefined>;
+
+  public readonly sortedConversations: ko.PureComputed<Conversation[]>;
 
   constructor(
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
   ) {
-    this.activeConversation = ko.observable(null);
-    this.conversations = ko.observableArray([]);
-    this.conversations_archived = ko.observableArray([]);
-    this.conversations_cleared = ko.observableArray([]);
-    this.conversations_unarchived = ko.observableArray([]);
-    this.sorted_conversations = ko.pureComputed(() => this.filtered_conversations().sort(sortGroupsByLastEvent));
-    this.self_conversation = ko.pureComputed(() => this.findConversation(this.userState.self()));
+    this.sortedConversations = ko.pureComputed(() => this.filteredConversations().sort(sortGroupsByLastEvent));
+    this.selfConversation = ko.pureComputed(() =>
+      this.conversations().find(conversation => conversation.type() === CONVERSATION_TYPE.SELF),
+    );
 
-    this.filtered_conversations = ko.pureComputed(() => {
+    this.visibleConversations = ko.pureComputed(() => {
+      return this.sortedConversations().filter(
+        conversation => !conversation.is_cleared() && !conversation.is_archived(),
+      );
+    });
+
+    this.archivedConversations = ko.pureComputed(() => {
+      return this.sortedConversations().filter(conversation => conversation.is_archived());
+    });
+
+    this.filteredConversations = ko.pureComputed(() => {
       return this.conversations().filter(conversationEntity => {
         const states_to_filter = [
           ConnectionStatus.MISSING_LEGAL_HOLD_CONSENT,
@@ -72,10 +89,10 @@ export class ConversationState {
     });
 
     this.connectedUsers = ko.pureComputed(() => {
-      const inviterId = this.teamState.memberInviters()[this.userState.self().id];
+      const inviterId = this.teamState.memberInviters()[this.userState.self()?.id];
       const inviter = inviterId ? this.userState.users().find(({id}) => id === inviterId) : null;
       const connectedUsers = inviter ? [inviter] : [];
-      const selfTeamId = this.userState.self().teamId;
+      const selfTeamId = this.userState.self()?.teamId;
       for (const conversation of this.conversations()) {
         for (const user of conversation.participating_user_ets()) {
           const isNotService = !user.isService;
@@ -87,6 +104,26 @@ export class ConversationState {
       }
       return connectedUsers;
     });
+  }
+
+  /**
+   * returns true if the conversation should be visible to the user
+   * @param conversation the conversation to check visibility
+   */
+  isVisible(conversation?: Conversation): conversation is Conversation {
+    return (
+      !!conversation &&
+      this.visibleConversations().some(conv => matchQualifiedIds(conv.qualifiedId, conversation.qualifiedId))
+    );
+  }
+  /**
+   * Get unarchived conversation with the most recent event.
+   * @param allConversations Search all conversations
+   * @returns Most recent conversation
+   */
+  getMostRecentConversation(allConversations: boolean = false): Conversation | undefined {
+    const [conversationEntity] = allConversations ? this.sortedConversations() : this.visibleConversations();
+    return conversationEntity;
   }
 
   /**

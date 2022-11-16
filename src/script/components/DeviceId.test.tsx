@@ -17,8 +17,9 @@
  *
  */
 
-import DeviceId from './DeviceId';
 import {render} from '@testing-library/react';
+
+import {DeviceId} from './DeviceId';
 
 describe('DeviceId', () => {
   it('can print device id', () => {

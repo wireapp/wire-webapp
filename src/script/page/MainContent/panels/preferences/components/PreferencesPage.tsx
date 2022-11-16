@@ -17,18 +17,63 @@
  *
  */
 
-import React from 'react';
-import {initFadingScrollbar} from '../../../../../ui/fadingScrollbar';
+import {useContext, FC, useCallback} from 'react';
+
+import {IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
+
+import {RootContext} from 'src/script/page/RootProvider';
+import {useAppMainState, ViewType} from 'src/script/page/state';
+import {initFadingScrollbar} from 'src/script/ui/fadingScrollbar';
 
 interface PreferencesPageProps {
   children: React.ReactNode;
   title: string;
 }
 
-const PreferencesPage: React.FC<PreferencesPageProps> = ({title, children}) => {
+const PreferencesPage: FC<PreferencesPageProps> = ({title, children}) => {
+  // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
+  const smBreakpoint = useMatchMedia('max-width: 640px');
+
+  const {currentView, setCurrentView} = useAppMainState(state => state.responsiveView);
+  const isCentralColumn = currentView == ViewType.CENTRAL_COLUMN;
+
+  const root = useContext(RootContext);
+
+  const goHome = () => root?.content.loadPreviousContent();
+
+  const containerRef = useCallback((element: HTMLDivElement | null) => {
+    const nextElementToFocus = element?.querySelector("[tabindex='0']") as HTMLElement | null;
+    if (nextElementToFocus) {
+      nextElementToFocus.focus();
+    }
+  }, []);
+
   return (
-    <div style={{display: 'flex', flexDirection: 'column', height: '100vh'}}>
-      <h2 className="preferences-titlebar">{title}</h2>
+    <div
+      role="tabpanel"
+      ref={containerRef}
+      aria-labelledby={title}
+      style={{display: 'flex', flexDirection: 'column', height: '100vh'}}
+    >
+      <div className="preferences-titlebar">
+        {smBreakpoint && isCentralColumn && (
+          <IconButton
+            variant={IconButtonVariant.SECONDARY}
+            className="conversation-title-bar-icon icon-back"
+            css={{marginBottom: 0}}
+            onClick={() => setCurrentView(ViewType.LEFT_SIDEBAR)}
+          />
+        )}
+        <h2 className="preferences-titlebar">{title}</h2>
+        {smBreakpoint && isCentralColumn && (
+          <IconButton
+            variant={IconButtonVariant.SECONDARY}
+            className="conversation-title-bar-icon icon-close"
+            css={{marginBottom: 0}}
+            onClick={goHome}
+          />
+        )}
+      </div>
       <div className="preferences-content" ref={initFadingScrollbar}>
         {children}
       </div>
@@ -36,4 +81,4 @@ const PreferencesPage: React.FC<PreferencesPageProps> = ({title, children}) => {
   );
 };
 
-export default PreferencesPage;
+export {PreferencesPage};

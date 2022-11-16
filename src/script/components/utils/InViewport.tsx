@@ -18,6 +18,7 @@
  */
 
 import React, {useEffect, useRef} from 'react';
+
 import {overlayedObserver} from '../../ui/overlayedObserver';
 import {viewportObserver} from '../../ui/viewportObserver';
 
@@ -87,4 +88,4 @@ const InViewport: React.FC<InViewportParams & React.HTMLProps<HTMLDivElement>> =
   );
 };
 
-export default InViewport;
+export {InViewport};

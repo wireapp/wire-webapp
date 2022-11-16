@@ -18,11 +18,14 @@
  */
 
 import React, {useEffect, useMemo, useState} from 'react';
-import {createRoot, Root} from 'react-dom/client';
+
 import cx from 'classnames';
-import Icon from 'Components/Icon';
-import {isEnterKey, isEscapeKey, isKey, isOneOfKeys, isSpaceKey, KEY} from 'Util/KeyboardUtil';
+import {createRoot, Root} from 'react-dom/client';
+
 import {Availability} from '@wireapp/protocol-messaging';
+
+import {Icon} from 'Components/Icon';
+import {isEnterKey, isEscapeKey, isKey, isOneOfKeys, isSpaceKey, KEY} from 'Util/KeyboardUtil';
 
 export interface ContextMenuEntry {
   availability?: Availability.Type;

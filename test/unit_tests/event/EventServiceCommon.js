@@ -17,14 +17,14 @@
  *
  */
 
-import {createRandomUuid} from 'Util/util';
-
-import {MessageCategory} from 'src/script/message/MessageCategory';
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
-import {StorageSchemata} from 'src/script/storage/StorageSchemata';
-import {TestFactory} from '../../helper/TestFactory';
 import {ConversationError} from 'src/script/error/ConversationError';
 import {StorageError} from 'src/script/error/StorageError';
+import {MessageCategory} from 'src/script/message/MessageCategory';
+import {StorageSchemata} from 'src/script/storage/StorageSchemata';
+import {createRandomUuid} from 'Util/util';
+
+import {TestFactory} from '../../helper/TestFactory';
 
 const testEventServiceClass = (testedServiceName, className) => {
   // eslint-disable-next-line jest/valid-title
@@ -38,7 +38,7 @@ const testEventServiceClass = (testedServiceName, className) => {
     beforeEach(() => testFactory.exposeEventActors());
 
     describe('loadEvent', () => {
-      /* eslint-disable sort-keys-fix/sort-keys-fix, quotes */
+      /* eslint-disable  quotes */
       const events = [
         {
           conversation: conversationId,
@@ -57,7 +57,7 @@ const testEventServiceClass = (testedServiceName, className) => {
           type: 'conversation.message-add',
         },
       ];
-      /* eslint-enable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
+      /* eslint-enable comma-spacing, key-spacing, quotes */
 
       beforeEach(() => {
         // feed database before each test
@@ -238,7 +238,7 @@ const testEventServiceClass = (testedServiceName, className) => {
     });
 
     describe('loadEventsWithCategory', () => {
-      /* eslint-disable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
+      /* eslint-disable comma-spacing, key-spacing,  quotes */
       const events = [
         {
           conversation: conversationId,
@@ -267,7 +267,7 @@ const testEventServiceClass = (testedServiceName, className) => {
           category: 128,
         },
       ];
-      /* eslint-enable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
+      /* eslint-enable comma-spacing, key-spacing,  quotes */
 
       beforeEach(() => {
         return Promise.all(events.map(event => testFactory.storage_service.save(eventStoreName, undefined, event)));
@@ -297,7 +297,6 @@ const testEventServiceClass = (testedServiceName, className) => {
     });
 
     describe('saveEvent', () => {
-      /* eslint-disable sort-keys-fix/sort-keys-fix */
       const newEvent = {
         conversation: conversationId,
         id: '4af67f76-09f9-4831-b3a4-9df877b8c29a',
@@ -305,7 +304,6 @@ const testEventServiceClass = (testedServiceName, className) => {
         time: '2016-08-04T13:27:58.993Z',
         type: 'conversation.message-add',
       };
-      /* eslint-enable sort-keys-fix/sort-keys-fix */
 
       it('save event in the database', () => {
         spyOn(testFactory.storage_service, 'save').and.callFake(event => Promise.resolve(event));
@@ -318,7 +316,6 @@ const testEventServiceClass = (testedServiceName, className) => {
     });
 
     describe('replaceEvent', () => {
-      /* eslint-disable sort-keys-fix/sort-keys-fix */
       const updatedEvent = {
         conversation: conversationId,
         id: '4af67f76-09f9-4831-b3a4-9df877b8c29a',
@@ -328,7 +325,6 @@ const testEventServiceClass = (testedServiceName, className) => {
         type: 'conversation.message-add',
         primary_key: 12,
       };
-      /* eslint-enable sort-keys-fix/sort-keys-fix */
 
       it('updates an event in the database', () => {
         spyOn(testFactory.storage_service, 'update').and.callFake(event => Promise.resolve(event));
@@ -340,7 +336,6 @@ const testEventServiceClass = (testedServiceName, className) => {
     });
 
     describe('updateEventAsUploadFailed', () => {
-      /* eslint-disable sort-keys-fix/sort-keys-fix */
       it("doesn't do anything if initial event is not found", () => {
         spyOn(testFactory.storage_service, 'load').and.returnValue(Promise.resolve(undefined));
         const updateSpy = spyOn(testFactory.storage_service, 'update');
@@ -572,7 +567,7 @@ const testEventServiceClass = (testedServiceName, className) => {
     });
 
     describe('updateEvent', () => {
-      /* eslint-disable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
+      /* eslint-disable comma-spacing, key-spacing,  quotes */
       const messageEntity = {
         conversation: conversationId,
         id: '4af67f76-09f9-4831-b3a4-9df877b8c29a',
@@ -581,7 +576,7 @@ const testEventServiceClass = (testedServiceName, className) => {
         data: {content: 'Second message', previews: []},
         type: 'conversation.message-add',
       };
-      /* eslint-enable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
+      /* eslint-enable comma-spacing, key-spacing,  quotes */
 
       it('updated event in the database', () => {
         spyOn(testFactory[testedServiceName], 'replaceEvent').and.returnValue(Promise.resolve());

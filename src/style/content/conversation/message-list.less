@@ -102,8 +102,9 @@
     }
 
     &.self-mention {
-      background-color: fade(@w-yellow, 48%);
-      color: var(--background);
+      padding: 3px 0 4px 0;
+      background-color: var(--accent-color-selection);
+      color: var(--main-color);
     }
 
     &:not(.self-mention) {
@@ -248,7 +249,7 @@
 }
 
 .message-header-line {
-  min-width: @conversation-message-timestamp-width;
+  min-width: var(--conversation-message-timestamp-width);
   height: 1px;
   flex: 1;
   border: none;
@@ -286,7 +287,7 @@
 
   &:not(.message-timestamp-day) {
     border: 0;
-    margin-right: @conversation-message-timestamp-width;
+    margin-right: var(--conversation-message-timestamp-width);
 
     .message-header-label {
       border-bottom: 1px dotted @separator-color;
@@ -313,7 +314,7 @@
 // MESSAGE - BODY
 .message-body {
   position: relative;
-  padding-right: @conversation-message-timestamp-width;
+  padding-right: var(--conversation-message-timestamp-width);
   padding-left: @conversation-message-sender-width;
   margin-top: -5px;
 
@@ -466,7 +467,7 @@
   width: 100%;
   flex-wrap: wrap;
   margin-top: 4px;
-  margin-right: @conversation-message-timestamp-width;
+  margin-right: var(--conversation-message-timestamp-width);
   margin-left: @conversation-message-sender-width;
 
   > *:not(:last-child) {
@@ -503,9 +504,14 @@
   top: 0;
   right: 0;
   display: flex;
-  width: @conversation-message-timestamp-width;
+  width: var(--conversation-message-timestamp-width);
   height: @line-height-lg;
   align-items: center;
+
+  @media (max-width: @screen-md-min) {
+    height: 45px;
+    flex-direction: column;
+  }
 
   // actions pill
   .action-pill-style() {
@@ -523,8 +529,11 @@
     .action-pill-style;
     .button-icon-secondary;
     .square(16px);
-    position: absolute;
-    left: 8px;
+
+    @media (min-width: @screen-md-min) {
+      position: absolute;
+      left: 8px;
+    }
 
     min-width: 0;
     min-height: 0;
@@ -552,11 +561,14 @@
   .message-status,
   .message-status-read {
     .action-pill-style;
-    position: absolute;
-    bottom: 3px;
     color: var(--gray-70);
     pointer-events: none;
     user-select: none;
+
+    @media (min-width: @screen-md-min) {
+      position: absolute;
+      bottom: 3px;
+    }
 
     .subline;
 
@@ -575,13 +587,16 @@
   }
 }
 
-.time {
-  left: 32px;
+@media (min-width: @screen-md-min) {
+  .time {
+    left: 32px;
+  }
 }
 .message-status,
 .message-status-read {
   left: 83px;
   &::before {
+    position: absolute;
     display: flex;
     width: 16px;
     align-items: center;

@@ -17,9 +17,9 @@
  *
  */
 
-import {ValidationUtil} from '@wireapp/commons';
+import {ValidationUtil, Runtime} from '@wireapp/commons';
+
 import {createRandomUuid} from 'Util/util';
-import {Runtime} from '@wireapp/commons';
 const env = window.wire.env;
 
 export const ACCENT_ID = {
@@ -118,7 +118,7 @@ export class Configuration {
   readonly ALLOWED_IMAGE_TYPES = ['image/bmp', 'image/gif', 'image/jpeg', 'image/jpg', 'image/png'];
 
   /** Which versions of the backend api do we support */
-  readonly SUPPORTED_API_VERSIONS = [2, 1, 0];
+  readonly SUPPORTED_API_VERSIONS = [3, 2, 1, 0];
 }
 
 let instance: Configuration;

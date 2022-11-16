@@ -17,19 +17,20 @@
  *
  */
 
+import {USER_EVENT} from '@wireapp/api-client/lib/event/';
 import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
-import {USER_EVENT} from '@wireapp/api-client/src/event/';
 import ko from 'knockout';
 
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {t} from 'Util/LocalizerUtil';
-import {Logger, getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
+import {TypedEventTarget} from 'Util/TypedEventTarget';
 import {createRandomUuid} from 'Util/util';
 
+import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import type {Conversation} from '../entity/Conversation';
 import type {PropertiesService} from '../properties/PropertiesService';
-import {ModalsViewModel} from '../view_model/ModalsViewModel';
-import {TypedEventTarget} from 'Util/TypedEventTarget';
 
 export enum LabelType {
   Custom = 0,
@@ -82,12 +83,12 @@ export const createLabelFavorites = (favorites: Conversation[] = []) =>
 
 export class ConversationLabelRepository extends TypedEventTarget<{type: 'conversation-favorited'}> {
   labels: ko.ObservableArray<ConversationLabel>;
-  allLabeledConversations: ko.Computed<Conversation[]>;
-  logger: Logger;
+  private allLabeledConversations: ko.Computed<Conversation[]>;
+  private logger: Logger;
 
   constructor(
     private readonly allConversations: ko.ObservableArray<Conversation>,
-    private readonly conversations: ko.ObservableArray<Conversation>,
+    private readonly conversations: ko.PureComputed<Conversation[]>,
     private readonly propertiesService: PropertiesService,
   ) {
     super();
@@ -259,7 +260,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
   };
 
   readonly addConversationToNewLabel = (conversation: Conversation) => {
-    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.INPUT, {
+    PrimaryModal.show(PrimaryModal.type.INPUT, {
       primaryAction: {
         action: (name: string) => {
           this.removeConversationFromAllLabels(conversation);

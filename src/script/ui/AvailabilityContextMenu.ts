@@ -18,12 +18,13 @@
  */
 
 import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {Availability} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {t} from 'Util/LocalizerUtil';
 
-import {showContextMenu, ContextMenuEntry} from './ContextMenu';
+import {ContextMenuEntry, showContextMenu} from './ContextMenu';
 
 export const AvailabilityContextMenu = {
   show: (event: MouseEvent, elementName: string): void => {

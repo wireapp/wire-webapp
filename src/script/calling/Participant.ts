@@ -17,12 +17,14 @@
  *
  */
 
-import {VIDEO_STATE} from '@wireapp/avs';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 
-import {User} from '../entity/User';
+import {VIDEO_STATE} from '@wireapp/avs';
+
 import {matchQualifiedIds} from 'Util/QualifiedId';
-import {QualifiedId} from '@wireapp/api-client/src/user';
+
+import {User} from '../entity/User';
 
 export type UserId = string;
 export type ClientId = string;

@@ -17,25 +17,26 @@
  *
  */
 
-import React, {useState, useEffect, useRef, useCallback} from 'react';
-import {ValidationUtil} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
-import {container} from 'tsyringe';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
+
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {container} from 'tsyringe';
 
+import {ValidationUtil} from '@wireapp/commons';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {Icon} from 'Components/Icon';
+import {ModalComponent} from 'Components/ModalComponent';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
+import {ClientRepository} from 'src/script/client/ClientRepository';
+import {ClientState} from 'src/script/client/ClientState';
+import {Config} from 'src/script/Config';
+import {AppLockRepository} from 'src/script/user/AppLockRepository';
+import {AppLockState} from 'src/script/user/AppLockState';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-
-import {ClientRepository} from '../../client/ClientRepository';
-import {Config} from '../../Config';
-import ModalComponent from 'Components/ModalComponent';
-import {SIGN_OUT_REASON} from '../../auth/SignOutReason';
-import {ClientState} from '../../client/ClientState';
-import {AppLockState} from '../../user/AppLockState';
-import {AppLockRepository} from '../../user/AppLockRepository';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {ModalsViewModel} from '../../view_model/ModalsViewModel';
-import Icon from 'Components/Icon';
 
 export enum APPLOCK_STATE {
   FORGOT = 'applock.forgot',
@@ -134,7 +135,7 @@ const AppLock: React.FC<AppLockProps> = ({
       showAppLock();
     } else if (appLockState.hasPassphrase()) {
       appLockRepository.removeCode();
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
         text: {
           closeBtnLabel: t('teamSettingsModalCloseBtn'),
           htmlMessage: t('featureConfigChangeModalApplock'),
@@ -553,6 +554,4 @@ const AppLock: React.FC<AppLockProps> = ({
   );
 };
 
-registerReactComponent('app-lock-container', AppLock);
-
-export default AppLock;
+export {AppLock};

@@ -17,18 +17,21 @@
  *
  */
 
-import React, {useState, useEffect, CSSProperties} from 'react';
-import {css} from '@emotion/react';
+import React, {CSSProperties, useEffect, useState} from 'react';
 
+import {css} from '@emotion/react';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
+
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {Icon} from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-import Icon from 'Components/Icon';
-import type {Grid} from '../../calling/videoGridHandler';
-import Video from './Video';
+
+import {GroupVideoGridTile} from './GroupVideoGridTile';
+import {Video} from './Video';
+
 import type {Participant} from '../../calling/Participant';
-import GroupVideoGridTile from './GroupVideoGridTile';
-import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import type {Grid} from '../../calling/videoGridHandler';
 
 export interface GroupVideoGripProps {
   grid: Grid;
@@ -58,12 +61,12 @@ const GroupVideoThumbnailWrapper: React.FC<{children?: React.ReactNode; minimize
     css={
       minimized
         ? css`
-            top: 8px;
-            right: 8px;
             bottom: unset;
-            width: 70px;
-            height: 40px;
             box-shadow: 0 0 0 1px var(--gray-90);
+            height: 40px;
+            right: 8px;
+            top: 8px;
+            width: 70px;
           `
         : undefined
     }
@@ -198,4 +201,4 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
   );
 };
 
-export default GroupVideoGrid;
+export {GroupVideoGrid};

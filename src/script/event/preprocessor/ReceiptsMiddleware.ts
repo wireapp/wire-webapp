@@ -17,15 +17,17 @@
  *
  */
 
+import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {container} from 'tsyringe';
-import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
+
 import {getLogger, Logger} from 'Util/Logger';
-import {StatusType} from '../../message/StatusType';
-import {ClientEvent} from '../Client';
+
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
-import type {EventService} from '../EventService';
+import {StatusType} from '../../message/StatusType';
 import type {EventRecord} from '../../storage/record/EventRecord';
 import {UserState} from '../../user/UserState';
+import {ClientEvent} from '../Client';
+import type {EventService} from '../EventService';
 
 export class ReceiptsMiddleware {
   private readonly eventService: EventService;

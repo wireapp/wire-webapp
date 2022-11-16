@@ -17,18 +17,18 @@
  *
  */
 
+import {fireEvent, waitFor} from '@testing-library/dom';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {act} from 'react-dom/test-utils';
+
+import {CheckPassword} from './CheckPassword';
+
 import {actionRoot} from '../module/action';
 import {BackendError} from '../module/action/BackendError';
 import {initialRootState} from '../module/reducer';
 import {ROUTE} from '../route';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
-import CheckPassword from './CheckPassword';
-import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {fireEvent, waitFor} from '@testing-library/dom';
-import {act} from 'react-dom/test-utils';
-
-jest.mock('../util/SVGProvider');
 
 describe('CheckPassword', () => {
   it('has disabled submit button as long as there is no input', () => {

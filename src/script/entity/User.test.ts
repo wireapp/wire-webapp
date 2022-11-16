@@ -17,9 +17,10 @@
  *
  */
 
-import {User} from './User';
-import {ACCENT_ID} from 'src/script/Config';
 import {ClientEntity} from 'src/script/client/ClientEntity';
+import {ACCENT_ID} from 'src/script/Config';
+
+import {User} from './User';
 
 describe('User', () => {
   describe('Initials', () => {

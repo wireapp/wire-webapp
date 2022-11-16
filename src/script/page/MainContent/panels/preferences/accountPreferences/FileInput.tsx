@@ -18,6 +18,7 @@
  */
 
 import React from 'react';
+
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 interface FileInputProps extends React.HTMLProps<HTMLInputElement> {
@@ -49,4 +50,4 @@ const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
 
 FileInput.displayName = 'FileInput';
 
-export default FileInput;
+export {FileInput};

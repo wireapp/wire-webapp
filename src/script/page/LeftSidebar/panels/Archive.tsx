@@ -20,17 +20,21 @@
 import React, {useEffect} from 'react';
 
 import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
-import {t} from 'Util/LocalizerUtil';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import ListWrapper from './ListWrapper';
-import ConversationListCell from 'Components/list/ConversationListCell';
-import {Conversation} from '../../../entity/Conversation';
-import {ListViewModel} from '../../../view_model/ListViewModel';
-import {ConversationState} from '../../../conversation/ConversationState';
 import {container} from 'tsyringe';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {ConversationListCell} from 'Components/list/ConversationListCell';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
+
+import {ListWrapper} from './ListWrapper';
+
 import {ConversationRepository} from '../../../conversation/ConversationRepository';
-import useRoveFocus from '../../../hooks/useRoveFocus';
+import {ConversationState} from '../../../conversation/ConversationState';
+import {Conversation} from '../../../entity/Conversation';
+import {useRoveFocus} from '../../../hooks/useRoveFocus';
+import {ListViewModel} from '../../../view_model/ListViewModel';
 
 type ArchiveProps = {
   answerCall: (conversation: Conversation) => void;
@@ -47,8 +51,8 @@ const Archive: React.FC<ArchiveProps> = ({
   onClose,
   conversationState = container.resolve(ConversationState),
 }) => {
-  const {conversations_archived: conversations} = useKoSubscribableChildren(conversationState, [
-    'conversations_archived',
+  const {archivedConversations: conversations} = useKoSubscribableChildren(conversationState, [
+    'archivedConversations',
   ]);
 
   const onClickConversation = async (conversation: Conversation) => {
@@ -88,4 +92,4 @@ const Archive: React.FC<ArchiveProps> = ({
   );
 };
 
-export default Archive;
+export {Archive};

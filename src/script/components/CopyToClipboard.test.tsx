@@ -17,8 +17,9 @@
  *
  */
 
-import CopyToClipboard from './CopyToClipboard';
 import {render, fireEvent} from '@testing-library/react';
+
+import {CopyToClipboard} from './CopyToClipboard';
 
 const selectionMock = window.getSelection() || ({} as Selection);
 selectionMock.removeAllRanges = jest.fn();

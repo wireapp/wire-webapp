@@ -64,7 +64,7 @@ jobs:
         if: |
           contains(env.TITLE || env.PR_LAST_COMMIT_MESSAGE, '[skip ci]') ||
           contains(env.TITLE || env.PR_LAST_COMMIT_MESSAGE, '[ci skip]')
-        uses: andymckay/cancel-action@0.2
+        uses: andymckay/cancel-action@0.3
 
       - name: Yarn cache
         uses: c-hive/gha-yarn-cache@v2.1.0

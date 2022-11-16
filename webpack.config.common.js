@@ -19,13 +19,34 @@
 
 const path = require('path');
 const webpack = require('webpack');
-const WorkboxPlugin = require('workbox-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
-const {ROOT_PATH, DIST_PATH, SRC_PATH} = require('./locations');
+const WorkboxPlugin = require('workbox-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+const DIST_PATH = path.resolve(__dirname, 'server/dist');
+const ROOT_PATH = path.resolve(__dirname);
+const SRC_PATH = path.resolve(__dirname, 'src');
 
 const dist = path.resolve(DIST_PATH, 'static');
 const auth = path.resolve(SRC_PATH, 'script/auth');
 const srcScript = path.resolve(SRC_PATH, 'script');
+
+const HOME_TEMPLATE_PATH = path.resolve(SRC_PATH, 'page/index.ejs');
+const AUTH_TEMPLATE_PATH = path.resolve(SRC_PATH, 'page/auth.ejs');
+
+const {
+  config: {SERVER: serverConfigs, CLIENT: clientConfigs},
+} = require(path.resolve(DIST_PATH, 'config.js'));
+
+const templateParameters = {
+  VERSION: clientConfigs.VERSION,
+  BRAND_NAME: clientConfigs.BRAND_NAME,
+  APP_BASE: serverConfigs.APP_BASE,
+  CHROME_ORIGIN_TRIAL_TOKEN: clientConfigs.CHROME_ORIGIN_TRIAL_TOKEN,
+  OPEN_GRAPH_TITLE: serverConfigs.OPEN_GRAPH.TITLE,
+  OPEN_GRAPH_DESCRIPTION: serverConfigs.OPEN_GRAPH.DESCRIPTION,
+  OPEN_GRAPH_IMAGE_URL: serverConfigs.OPEN_GRAPH.IMAGE_URL,
+};
 
 module.exports = {
   cache: {
@@ -37,7 +58,7 @@ module.exports = {
   },
   devtool: 'source-map',
   entry: {
-    app: path.resolve(srcScript, 'main/app.ts'),
+    app: path.resolve(srcScript, 'main/index.tsx'),
     auth: path.resolve(auth, 'main.tsx'),
   },
   externals: {
@@ -59,6 +80,27 @@ module.exports = {
           removeSVGTagAttrs: false,
         },
         test: /\.svg$/,
+      },
+      {
+        test: /\.less$/i,
+        use: [
+          'style-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              url: false,
+            },
+          },
+          {
+            loader: 'postcss-loader',
+            options: {
+              postcssOptions: {
+                plugins: [['autoprefixer'], [require('cssnano')()]],
+              },
+            },
+          },
+          {loader: 'less-loader'},
+        ],
       },
     ],
   },
@@ -111,9 +153,25 @@ module.exports = {
           from: '*.wasm',
           to: `${dist}/min/core-crypto.wasm`,
         },
+        // copying all static resources (audio, images, fonts...)
+        {from: 'resource', to: dist},
+        // copying worker files
+        {context: `${SRC_PATH}`, from: 'worker', to: `${dist}/worker`},
       ],
     }),
     new webpack.IgnorePlugin({resourceRegExp: /.*\.wasm/}),
+    // @todo: We should merge these when main & auth app are merged.
+    new HtmlWebpackPlugin({
+      inject: false,
+      template: HOME_TEMPLATE_PATH,
+      templateParameters,
+    }),
+    new HtmlWebpackPlugin({
+      inject: false,
+      filename: 'auth/index.html',
+      template: AUTH_TEMPLATE_PATH,
+      templateParameters,
+    }),
   ],
   resolve: {
     alias: {
@@ -121,6 +179,8 @@ module.exports = {
       I18n: path.resolve(SRC_PATH, 'i18n'),
       Resource: path.resolve(ROOT_PATH, 'resource'),
       Util: path.resolve(srcScript, 'util'),
+      src: path.resolve(ROOT_PATH, 'src'),
+      test: path.resolve(ROOT_PATH, 'test'),
     },
     extensions: ['.js', '.jsx', '.ts', '.tsx', '.svg'],
     fallback: {

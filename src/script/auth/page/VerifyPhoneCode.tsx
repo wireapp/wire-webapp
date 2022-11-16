@@ -17,29 +17,33 @@
  *
  */
 
-import {LoginData} from '@wireapp/api-client/src/auth';
-import {CodeInput, Column, Columns, ContainerXS, H1} from '@wireapp/react-ui-kit';
 import React, {useEffect, useState} from 'react';
+
+import {LoginData} from '@wireapp/api-client/lib/auth';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {AnyAction, Dispatch} from 'redux';
 import {useNavigate} from 'react-router-dom';
+import {AnyAction, Dispatch} from 'redux';
+
+import {CodeInput, Column, Columns, ContainerXS, H1} from '@wireapp/react-ui-kit';
+
+import {Page} from './Page';
+
 import {phoneLoginStrings} from '../../strings';
+import {LinkButton} from '../component/LinkButton';
+import {RouterLink} from '../component/RouterLink';
 import {actionRoot} from '../module/action';
 import {BackendError} from '../module/action/BackendError';
 import {LabeledError} from '../module/action/LabeledError';
 import {ValidationError} from '../module/action/ValidationError';
-import {RootState, bindActionCreators} from '../module/reducer';
+import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
 import {parseError} from '../util/errorUtil';
-import Page from './Page';
-import LinkButton from '../component/LinkButton';
-import RouterLink from '../component/RouterLink';
 
-interface Props extends React.HTMLProps<HTMLDivElement> {}
+type Props = React.HTMLProps<HTMLDivElement>;
 
-const VerifyPhoneCode = ({
+const VerifyPhoneCodeComponent = ({
   doLogin,
   resetAuthError,
   loginData,
@@ -112,6 +116,7 @@ const VerifyPhoneCode = ({
         centerText
         verticalCenter
         style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
+        css
       >
         <div>
           <H1 center>{_(phoneLoginStrings.verifyCodeDescription, {number: loginData.phone})}</H1>
@@ -153,4 +158,6 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(mapStateToProps, mapDispatchToProps)(VerifyPhoneCode);
+const VerifyPhoneCode = connect(mapStateToProps, mapDispatchToProps)(VerifyPhoneCodeComponent);
+
+export {VerifyPhoneCode};

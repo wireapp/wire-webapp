@@ -17,23 +17,25 @@
  *
  */
 
+import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {container} from 'tsyringe';
 
-import {Logger, getLogger} from 'Util/Logger';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {getLogger, Logger} from 'Util/Logger';
+import {matchQualifiedIds} from 'Util/QualifiedId';
+
+import {ConversationState} from './ConversationState';
 import {ConversationVerificationState} from './ConversationVerificationState';
-import {EventBuilder} from '../conversation/EventBuilder';
-import type {QualifiedId} from '@wireapp/api-client/src/user/';
-import {EventRecord} from '../storage';
-import {VerificationMessageType} from '../message/VerificationMessageType';
+
 import type {ClientEntity} from '../client/ClientEntity';
+import {EventBuilder} from '../conversation/EventBuilder';
 import type {Conversation} from '../entity/Conversation';
 import type {EventRepository} from '../event/EventRepository';
+import {VerificationMessageType} from '../message/VerificationMessageType';
+import {EventRecord} from '../storage';
 import {UserState} from '../user/UserState';
-import {ConversationState} from './ConversationState';
-import {matchQualifiedIds} from 'Util/QualifiedId';
 
 export class ConversationVerificationStateHandler {
   private readonly logger: Logger;
@@ -191,7 +193,7 @@ export class ConversationVerificationStateHandler {
     userIds: QualifiedId[],
   ): {conversationEntity: Conversation; userIds: QualifiedId[]}[] {
     return this.conversationState
-      .filtered_conversations()
+      .filteredConversations()
       .map((conversationEntity: Conversation) => {
         if (!conversationEntity.removed_from_conversation()) {
           const userIdsInConversation = conversationEntity

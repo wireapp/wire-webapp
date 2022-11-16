@@ -17,35 +17,39 @@
  *
  */
 
-import {ConversationProtocol} from '@wireapp/api-client/src/conversation/NewConversation';
-import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
+import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
+import {PayloadBundleState} from '@wireapp/core/lib/conversation';
+import {container} from 'tsyringe';
+
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
-import {createRandomUuid} from 'Util/util';
-import {Conversation} from 'src/script/entity/Conversation';
+
 import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
-import {User} from 'src/script/entity/User';
-import {Text} from 'src/script/entity/message/Text';
-import {Message} from 'src/script/entity/message/Message';
-import {ConversationError} from 'src/script/error/ConversationError';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
+import {Conversation} from 'src/script/entity/Conversation';
+import {Message} from 'src/script/entity/message/Message';
+import {Text} from 'src/script/entity/message/Text';
+import {User} from 'src/script/entity/User';
+import {ConversationError} from 'src/script/error/ConversationError';
+import {createRandomUuid} from 'Util/util';
+
 import {ConversationRepository} from './ConversationRepository';
+import {ConversationState} from './ConversationState';
+
+import {AssetRepository} from '../assets/AssetRepository';
+import {ClientEntity} from '../client/ClientEntity';
+import {ClientState} from '../client/ClientState';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
+import {ContentMessage} from '../entity/message/ContentMessage';
 import {EventRepository} from '../event/EventRepository';
+import {EventService} from '../event/EventService';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
+import {Core} from '../service/CoreSingleton';
+import {TeamState} from '../team/TeamState';
 import {ServerTimeHandler, serverTimeHandler} from '../time/serverTimeHandler';
 import {UserRepository} from '../user/UserRepository';
-import {AssetRepository} from '../assets/AssetRepository';
 import {UserState} from '../user/UserState';
-import {ClientState} from '../client/ClientState';
-import {EventService} from '../event/EventService';
-import {Core} from '../service/CoreSingleton';
-import {container} from 'tsyringe';
-import {ClientEntity} from '../client/ClientEntity';
-import {TeamState} from '../team/TeamState';
-import {ContentMessage} from '../entity/message/ContentMessage';
-import {PayloadBundleState} from '@wireapp/core/src/main/conversation';
-import {ConversationState} from './ConversationState';
 
 const selfUser = new User('selfid', '');
 selfUser.isMe = true;
@@ -76,7 +80,7 @@ async function buildMessageRepository(): Promise<[MessageRepository, MessageRepo
   clientState.currentClient(new ClientEntity(true, ''));
   const core = container.resolve(Core);
   await core.initServices({} as any);
-  /* eslint-disable sort-keys-fix/sort-keys-fix */
+
   const conversationState = new ConversationState(userState);
   const selfConversation = new Conversation(selfUser.id);
   selfConversation.selfUser(selfUser);
@@ -95,7 +99,7 @@ async function buildMessageRepository(): Promise<[MessageRepository, MessageRepo
     conversationState,
     core,
   };
-  /* eslint-disable sort-keys-fix/sort-keys-fix */
+
   const deps = Object.values(dependencies) as ConstructorParameters<typeof MessageRepository>;
   const messageRepository = new MessageRepository(...deps);
   jest.spyOn(messageRepository as any, 'updateMessageAsSent').mockReturnValue(undefined);

@@ -17,11 +17,14 @@
  *
  */
 
-import {ErrorMessage} from '@wireapp/react-ui-kit';
 import {Fragment} from 'react';
+
 import {FormattedMessage} from 'react-intl';
-import {errorHandlerStrings, validationErrorStrings} from '../../strings';
+
+import {ErrorMessage} from '@wireapp/react-ui-kit';
+
 import {Config} from '../../Config';
+import {errorHandlerStrings, validationErrorStrings} from '../../strings';
 
 interface ExceptionProps {
   errors: any[];
@@ -63,4 +66,4 @@ const Exception = ({errors = []}: ExceptionProps) => {
   );
 };
 
-export default Exception;
+export {Exception};

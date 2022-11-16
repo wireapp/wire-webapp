@@ -18,13 +18,16 @@
  */
 
 import React from 'react';
-import cx from 'classnames';
-import {Availability} from '@wireapp/protocol-messaging';
+
 import {CSSObject} from '@emotion/react';
+import cx from 'classnames';
+
+import {Availability} from '@wireapp/protocol-messaging';
 
 import {CSS_SQUARE} from 'Util/CSSMixin';
-import Icon from './Icon';
 import {KEY} from 'Util/KeyboardUtil';
+
+import {Icon} from './Icon';
 
 export interface AvailabilityStateProps {
   availability: Availability.Type;
@@ -170,4 +173,4 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
   return wrappedContent;
 };
 
-export default AvailabilityState;
+export {AvailabilityState};

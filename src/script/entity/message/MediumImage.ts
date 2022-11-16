@@ -18,11 +18,13 @@
  */
 
 import ko from 'knockout';
+
 import {getLogger} from 'Util/Logger';
+
+import {FileAsset} from './FileAsset';
 
 import type {AssetRemoteData} from '../../assets/AssetRemoteData';
 import {AssetType} from '../../assets/AssetType';
-import {FileAsset} from './FileAsset';
 
 export class MediumImage extends FileAsset {
   public readonly resource: ko.Observable<AssetRemoteData>;

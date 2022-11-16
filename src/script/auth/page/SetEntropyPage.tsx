@@ -18,18 +18,21 @@
  */
 
 import React from 'react';
-import Page from './Page';
-import EntropyContainer from './EntropyContainer';
-import {actionRoot as ROOT_ACTIONS} from '../module/action';
-import {ROUTE} from '../route';
-import {useNavigate} from 'react-router-dom';
+
 import {connect} from 'react-redux';
+import {useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
+
+import {EntropyContainer} from './EntropyContainer';
+import {Page} from './Page';
+
+import {actionRoot as ROOT_ACTIONS} from '../module/action';
 import {RootState, bindActionCreators} from '../module/reducer';
+import {ROUTE} from '../route';
 
-interface Props extends React.HTMLProps<HTMLDivElement> {}
+type Props = React.HTMLProps<HTMLDivElement>;
 
-const SetEntropyPage = ({pushEntropyData}: Props & ConnectedProps & DispatchProps) => {
+const SetEntropyPageComponent = ({pushEntropyData}: Props & ConnectedProps & DispatchProps) => {
   const navigate = useNavigate();
 
   const onSetEntropy = async (entropyData: Uint8Array): Promise<void> => {
@@ -60,4 +63,6 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(mapStateToProps, mapDispatchToProps)(SetEntropyPage);
+const SetEntropyPage = connect(mapStateToProps, mapDispatchToProps)(SetEntropyPageComponent);
+
+export {SetEntropyPage};

@@ -18,6 +18,7 @@
  */
 
 import React from 'react';
+
 import {CSSObject} from '@emotion/react';
 
 export interface PaginationProps {
@@ -82,9 +83,8 @@ const Pagination: React.FC<PaginationProps> = ({totalPages, currentPage, onChang
                   ? '1px solid var(--toggle-button-hover-bg)'
                   : '1px solid var(--toggle-button-unselected-hover-border)',
               },
-              /* eslint-disable sort-keys-fix/sort-keys-fix */
+
               '&:active': {
-                /* eslint-enable sort-keys-fix/sort-keys-fix */
                 backgroundColor: isCurrentPage ? 'var(--accent-color)' : 'var(--toggle-button-unselected-bg)',
                 border: '1px solid var(--accent-color)',
               },
@@ -98,4 +98,4 @@ const Pagination: React.FC<PaginationProps> = ({totalPages, currentPage, onChang
   );
 };
 
-export default Pagination;
+export {Pagination};

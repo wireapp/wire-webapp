@@ -17,18 +17,21 @@
  *
  */
 
+import {ClientType} from '@wireapp/api-client/lib/client';
+import {UserEvent, USER_EVENT} from '@wireapp/api-client/lib/event';
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {groupBy} from 'underscore';
-import {USER_EVENT, UserEvent} from '@wireapp/api-client/src/event';
-import type {QualifiedId} from '@wireapp/api-client/src/user';
-import {ClientType} from '@wireapp/api-client/src/client';
+
 import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {matchQualifiedIds} from 'Util/QualifiedId';
 import {loadValue, resetStoreValue, storeValue} from 'Util/StorageUtil';
+
 import type {ClientEntity} from '../client/ClientEntity';
 import type {User} from '../entity/User';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
-import {matchQualifiedIds} from 'Util/QualifiedId';
 
 export type ClientNotificationData = {
   domain?: string;

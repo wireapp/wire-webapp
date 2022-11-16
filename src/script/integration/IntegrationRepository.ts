@@ -17,30 +17,29 @@
  *
  */
 
+import type {ConversationMemberJoinEvent} from '@wireapp/api-client/lib/event/';
 import ko from 'knockout';
-import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
-import type {ConversationMemberJoinEvent} from '@wireapp/api-client/src/event/';
 import {container} from 'tsyringe';
 
 import {t} from 'Util/LocalizerUtil';
-import {Logger, getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 import {compareTransliteration, sortByPriority} from 'Util/StringUtil';
 
-import {ACCESS_STATE} from '../conversation/AccessState';
-import type {ConversationRepository} from '../conversation/ConversationRepository';
-import type {Conversation} from '../entity/Conversation';
-import type {User} from '../entity/User';
-import type {TeamRepository} from '../team/TeamRepository';
-import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {IntegrationMapper} from './IntegrationMapper';
 import type {IntegrationService} from './IntegrationService';
-import {ServiceEntity} from './ServiceEntity';
-import {ConversationError} from '../error/ConversationError';
 import {ProviderEntity} from './ProviderEntity';
-import {MemberLeaveEvent} from '../conversation/EventBuilder';
-import {TeamState} from '../team/TeamState';
+import {ServiceEntity} from './ServiceEntity';
+
+import {PrimaryModal} from '../components/Modals/PrimaryModal';
+import {ACCESS_STATE} from '../conversation/AccessState';
+import type {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationState} from '../conversation/ConversationState';
+import {MemberLeaveEvent} from '../conversation/EventBuilder';
+import type {Conversation} from '../entity/Conversation';
+import type {User} from '../entity/User';
+import {ConversationError} from '../error/ConversationError';
+import type {TeamRepository} from '../team/TeamRepository';
+import {TeamState} from '../team/TeamState';
 
 export class IntegrationRepository {
   private readonly logger: Logger;
@@ -76,14 +75,13 @@ export class IntegrationRepository {
    * Get provider name for entity.
    * @param entity Service or user to add provider name to
    */
-  async addProviderNameToParticipant(entity: ServiceEntity): Promise<ServiceEntity | ProviderEntity>;
-  async addProviderNameToParticipant(entity: User): Promise<User | ProviderEntity>;
   async addProviderNameToParticipant(entity: ServiceEntity | User): Promise<ServiceEntity | User | ProviderEntity> {
-    const shouldUpdateProviderName = !!entity.providerName() && !entity.providerName().trim();
-
-    if (shouldUpdateProviderName) {
+    if (entity.providerId) {
       const providerEntity = await this.getProviderById(entity.providerId);
-      entity.providerName(providerEntity.name);
+
+      if (providerEntity) {
+        entity.providerName(providerEntity.name);
+      }
     }
 
     return entity;
@@ -97,7 +95,13 @@ export class IntegrationRepository {
     if (entity instanceof ServiceEntity) {
       return entity;
     }
+
     const {providerId, serviceId} = entity;
+
+    if (!providerId || !serviceId) {
+      return undefined;
+    }
+
     return this.getServiceById(providerId, serviceId, entity.qualifiedId.domain);
   }
 
@@ -141,7 +145,7 @@ export class IntegrationRepository {
         ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
       );
     } catch (error) {
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
         text: {
           message: t('modalIntegrationUnavailableMessage'),
           title: t('modalIntegrationUnavailableHeadline'),

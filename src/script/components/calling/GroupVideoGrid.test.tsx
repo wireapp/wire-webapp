@@ -17,11 +17,14 @@
  *
  */
 
-import {VIDEO_STATE} from '@wireapp/avs';
 import {render, fireEvent} from '@testing-library/react';
-import GroupVideoGrid, {GroupVideoGripProps} from './GroupVideoGrid';
-import {User} from '../../entity/User';
+
+import {VIDEO_STATE} from '@wireapp/avs';
+
+import {GroupVideoGrid, GroupVideoGripProps} from './GroupVideoGrid';
+
 import {Participant} from '../../calling/Participant';
+import {User} from '../../entity/User';
 
 describe('GroupVideoGrid', () => {
   it('renders video grids', async () => {

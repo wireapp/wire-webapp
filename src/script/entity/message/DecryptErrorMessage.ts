@@ -17,14 +17,16 @@
  *
  */
 
-import {errors as ProteusErrors} from '@wireapp/proteus';
 import ko from 'knockout';
+
+import {errors as ProteusErrors} from '@wireapp/proteus';
 
 import {t} from 'Util/LocalizerUtil';
 
+import {Message} from './Message';
+
 import {URL_PATH, getWebsiteUrl} from '../../externalRoute';
 import {SuperType} from '../../message/SuperType';
-import {Message} from './Message';
 
 export class DecryptErrorMessage extends Message {
   public client_id: string;

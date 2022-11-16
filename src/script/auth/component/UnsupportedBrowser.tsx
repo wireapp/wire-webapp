@@ -17,16 +17,20 @@
  *
  */
 
-import {Container, ContainerXS, H1, H2, H3, Loading, Logo, Text} from '@wireapp/react-ui-kit';
 import React from 'react';
+
 import {MessageDescriptor, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
+
+import {Runtime} from '@wireapp/commons';
+import {Container, ContainerXS, H1, H2, H3, Loading, Logo, Text} from '@wireapp/react-ui-kit';
+
+import {WirelessContainer} from './WirelessContainer';
+
 import {Config} from '../../Config';
 import {unsupportedJoinStrings, unsupportedStrings} from '../../strings';
 import {RootState} from '../module/reducer';
 import * as RuntimeSelector from '../module/selector/RuntimeSelector';
-import {Runtime} from '@wireapp/commons';
-import WirelessContainer from './WirelessContainer';
 
 interface UnsupportedProps extends React.HTMLProps<HTMLDivElement> {
   headline: MessageDescriptor;
@@ -50,7 +54,7 @@ export interface UnsupportedBrowserProps extends React.HTMLProps<HTMLDivElement>
   isTemporaryGuest?: boolean;
 }
 
-export const UnsupportedBrowser = ({
+export const UnsupportedBrowserComponent = ({
   children,
   hasCookieSupport,
   hasIndexedDbSupport,
@@ -125,4 +129,6 @@ const mapStateToProps = (state: RootState) => ({
   isSupportedBrowser: RuntimeSelector.isSupportedBrowser(state),
 });
 
-export default connect(mapStateToProps)(UnsupportedBrowser);
+const UnsupportedBrowser = connect(mapStateToProps)(UnsupportedBrowserComponent);
+
+export {UnsupportedBrowser};

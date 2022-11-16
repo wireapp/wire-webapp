@@ -17,8 +17,8 @@
  *
  */
 
-import {renderMessage, getRenderedTextContent} from 'Util/messageRenderer';
 import {MentionEntity} from 'src/script/message/MentionEntity';
+import {renderMessage, getRenderedTextContent} from 'Util/messageRenderer';
 
 const escapeLink = link => link.replace(/&/g, '&amp;');
 
@@ -239,6 +239,18 @@ describe('renderMessage', () => {
 
     expect(renderMessage(punyLink)).toBe(
       `<a href="${punyLink}" target="_blank" rel="nofollow noopener noreferrer">${punyLink}</a>`,
+    );
+  });
+
+  it('conversts unicode links to punycode', () => {
+    expect(renderMessage('https://müller.de')).toBe(
+      // if this test fails because the rendering of the url was changed to no longer display unicode characters urlescaped,
+      // then the output should be the same as the second test, to make the user aware of the fact that it is a punycode url aka "url open info popup"
+      `<a href="https://xn--mller-kva.de" target="_blank" rel="nofollow noopener noreferrer">https://m%C3%BCller.de</a>`,
+    );
+
+    expect(renderMessage('[https://müller.de](https://müller.de)')).toBe(
+      `<a href="https://xn--mller-kva.de" target="_blank" rel="nofollow noopener noreferrer" data-md-link=\"true\" data-uie-name=\"markdown-link\">https://müller.de</a>`,
     );
   });
 

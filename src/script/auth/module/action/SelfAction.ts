@@ -17,14 +17,15 @@
  *
  */
 
-import type {ChangePassword, ConsentType, Self} from '@wireapp/api-client/src/self/';
+import type {ChangePassword, ConsentType, Self} from '@wireapp/api-client/lib/self/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {Environment} from 'Util/Environment';
 import {getLogger} from 'Util/Logger';
 
-import type {ThunkAction} from '../reducer';
 import {SelfActionCreator} from './creator/';
+
+import type {ThunkAction} from '../reducer';
 
 const logger = getLogger('SelfAction');
 

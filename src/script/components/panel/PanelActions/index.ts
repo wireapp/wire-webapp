@@ -18,4 +18,3 @@
  */
 
 export * from './PanelActions';
-export {default} from './PanelActions';

@@ -17,6 +17,15 @@
  *
  */
 
+import React, {useEffect, useState} from 'react';
+
+import type {RegisterData} from '@wireapp/api-client/lib/auth';
+import {FormattedMessage, useIntl} from 'react-intl';
+import {connect} from 'react-redux';
+import {Navigate} from 'react-router-dom';
+import {AnyAction, Dispatch} from 'redux';
+
+import {Runtime, UrlUtil} from '@wireapp/commons';
 import {
   ArrowIcon,
   Button,
@@ -31,38 +40,33 @@ import {
   Small,
   Text,
 } from '@wireapp/react-ui-kit';
-import React, {useEffect, useState} from 'react';
-import {FormattedMessage, useIntl} from 'react-intl';
-import {connect} from 'react-redux';
-import {Navigate} from 'react-router-dom';
-import {AnyAction, Dispatch} from 'redux';
+
 import {noop} from 'Util/util';
-import type {RegisterData} from '@wireapp/api-client/src/auth';
+
+import {EntropyContainer} from './EntropyContainer';
+
 import {Config} from '../../Config';
 import {conversationJoinStrings} from '../../strings';
-import AppAlreadyOpen from '../component/AppAlreadyOpen';
-import RouterLink from '../component/RouterLink';
-import UnsupportedBrowser from '../component/UnsupportedBrowser';
-import WirelessContainer from '../component/WirelessContainer';
+import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
+import {RouterLink} from '../component/RouterLink';
+import {UnsupportedBrowser} from '../component/UnsupportedBrowser';
+import {WirelessContainer} from '../component/WirelessContainer';
 import {EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {BackendError} from '../module/action/BackendError';
 import {ValidationError} from '../module/action/ValidationError';
-import {RootState, bindActionCreators} from '../module/reducer';
+import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as ConversationSelector from '../module/selector/ConversationSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import {QUERY_KEY, ROUTE} from '../route';
-import {Runtime} from '@wireapp/commons';
 import * as AccentColor from '../util/AccentColor';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import * as StringUtil from '../util/stringUtil';
-import {UrlUtil} from '@wireapp/commons';
-import EntropyContainer from './EntropyContainer';
 
-interface Props extends React.HTMLProps<HTMLDivElement> {}
+type Props = React.HTMLProps<HTMLDivElement>;
 
-const ConversationJoin = ({
+const ConversationJoinComponent = ({
   doCheckConversationCode,
   doJoinConversationByCode,
   doInit,
@@ -363,4 +367,6 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(mapStateToProps, mapDispatchToProps)(ConversationJoin);
+const ConversationJoin = connect(mapStateToProps, mapDispatchToProps)(ConversationJoinComponent);
+
+export {ConversationJoin};

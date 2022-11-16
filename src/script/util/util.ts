@@ -18,21 +18,23 @@
  */
 
 import {Decoder, Encoder} from 'bazinga64';
-import UUID from 'uuidjs';
-import {UrlUtil} from '@wireapp/commons';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {Runtime} from '@wireapp/commons';
 import type {ObservableArray} from 'knockout';
+import UUID from 'uuidjs';
+
+import {UrlUtil, Runtime} from '@wireapp/commons';
+
+import {isTabKey} from 'Util/KeyboardUtil';
+import {findMentionAtPosition} from 'Util/MentionUtil';
+
+import {loadValue} from './StorageUtil';
 
 import {QUERY_KEY} from '../auth/route';
 import {Config} from '../Config';
-import {StorageKey} from '../storage/StorageKey';
-import {loadValue} from './StorageUtil';
-import {AuthError} from '../error/AuthError';
 import type {Conversation} from '../entity/Conversation';
-import {isTabKey} from 'Util/KeyboardUtil';
-import {findMentionAtPosition} from 'Util/MentionUtil';
+import {AuthError} from '../error/AuthError';
 import {MentionEntity} from '../message/MentionEntity';
+import {StorageKey} from '../storage/StorageKey';
 
 export const isTemporaryClientAndNonPersistent = (persist: boolean): boolean => {
   if (persist === undefined) {
@@ -328,6 +330,7 @@ export function throttle(callback: Function, wait: number, immediate = false) {
   return function () {
     const callNow = immediate && initialCall;
     const next = () => {
+      // eslint-disable-next-line prefer-rest-params
       callback.apply(this, arguments);
       timeout = null;
     };
@@ -343,15 +346,16 @@ export function throttle(callback: Function, wait: number, immediate = false) {
   };
 }
 
+export const focusableElementsSelector =
+  'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 export const preventFocusOutside = (event: KeyboardEvent, parentId: string): void => {
   if (!isTabKey(event)) {
     return;
   }
   event.preventDefault();
-  const focusableElements =
-    'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
   const parent = document.getElementById(parentId);
-  const focusableContent = parent ? [...parent.querySelectorAll(focusableElements)] : [];
+  const focusableContent = parent ? [...parent.querySelectorAll(focusableElementsSelector)] : [];
   const focusedItemIndex = focusableContent.indexOf(document.activeElement);
   if (event.shiftKey && focusedItemIndex != 0) {
     (focusableContent[focusedItemIndex - 1] as HTMLElement)?.focus();
@@ -399,6 +403,22 @@ export const getSelectionPosition = (element: HTMLTextAreaElement, currentMentio
   return {newEnd, newStart};
 };
 
-// temporary hack that disables mls for old 'broken' desktop clients, see https://github.com/wireapp/wire-desktop/pull/6094
-export const supportsMLS = () =>
-  Config.getConfig().FEATURE.ENABLE_MLS && (!Runtime.isDesktopApp() || window.systemCrypto);
+const supportsSecretStorage = () => !Runtime.isDesktopApp() || !!window.systemCrypto;
+
+// disables mls for old 'broken' desktop clients, see https://github.com/wireapp/wire-desktop/pull/6094
+export const supportsMLS = () => Config.getConfig().FEATURE.ENABLE_MLS && supportsSecretStorage();
+
+export const supportsCoreCryptoProteus = () =>
+  Config.getConfig().FEATURE.ENABLE_PROTEUS_CORE_CRYPTO && supportsSecretStorage();
+
+export const incomingCssClass = 'content-animation-incoming-horizontal-left';
+
+export const removeAnimationsClass = (element: HTMLElement | null) => {
+  if (element) {
+    element.addEventListener('animationend', () => {
+      if (element.classList.contains(incomingCssClass)) {
+        element.classList.remove(incomingCssClass);
+      }
+    });
+  }
+};

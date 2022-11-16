@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2019 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,40 +17,39 @@
  *
  */
 
-import {CALL_TYPE, CONV_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
-import {Availability} from '@wireapp/protocol-messaging';
-import {amplify} from 'amplify';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {container} from 'tsyringe';
 
+import {CALL_TYPE, CONV_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
+import {Availability} from '@wireapp/protocol-messaging';
+
+import {ButtonGroupTab} from 'Components/calling/ButtonGroup';
 import 'Components/calling/ChooseScreen';
 import {replaceLink, t} from 'Util/LocalizerUtil';
+import {safeWindowOpen} from 'Util/SanitizationUtil';
 
+import type {AudioRepository} from '../audio/AudioRepository';
 import {AudioType} from '../audio/AudioType';
 import type {Call} from '../calling/Call';
 import {CallingRepository} from '../calling/CallingRepository';
+import {CallState} from '../calling/CallState';
+import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
+import {PrimaryModal} from '../components/Modals/PrimaryModal';
+import {Config} from '../Config';
+import {ConversationState} from '../conversation/ConversationState';
+import type {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
 import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import type {MediaStreamHandler} from '../media/MediaStreamHandler';
-import type {AudioRepository} from '../audio/AudioRepository';
-import type {Conversation} from '../entity/Conversation';
+import type {Multitasking} from '../notification/NotificationRepository';
 import type {PermissionRepository} from '../permission/PermissionRepository';
 import {PermissionStatusState} from '../permission/PermissionStatusState';
-import type {Multitasking} from '../notification/NotificationRepository';
-import type {TeamRepository} from '../team/TeamRepository';
-import {ModalsViewModel} from './ModalsViewModel';
-import {ConversationState} from '../conversation/ConversationState';
-import {CallState} from '../calling/CallState';
-import {ButtonGroupTab} from 'Components/calling/ButtonGroup';
-import {TeamState} from '../team/TeamState';
-import {Config} from '../Config';
-import {safeWindowOpen} from 'Util/SanitizationUtil';
-import {ROLE} from '../user/UserPermission';
-import {QualifiedId} from '@wireapp/api-client/src/user';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
-import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
+import type {TeamRepository} from '../team/TeamRepository';
+import {TeamState} from '../team/TeamState';
+import {ROLE} from '../user/UserPermission';
 
 export interface CallActions {
   answer: (call: Call) => void;
@@ -165,7 +164,7 @@ export class CallingViewModel {
     this.callActions = {
       answer: (call: Call) => {
         if (call.conversationType === CONV_TYPE.CONFERENCE && !this.callingRepository.supportsConferenceCalling) {
-          amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+          PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
             primaryAction: {
               action: () => {
                 this.callingRepository.rejectCall(call.conversationId);
@@ -261,7 +260,7 @@ export class CallingViewModel {
           'modal__text__read-more',
           'read-more-pricing',
         );
-        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+        PrimaryModal.show(PrimaryModal.type.CONFIRM, {
           primaryAction: {
             action: () => {
               safeWindowOpen(Config.getConfig().URL.TEAMS_BILLING);
@@ -278,7 +277,7 @@ export class CallingViewModel {
           },
         });
       } else {
-        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+        PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
           text: {
             htmlMessage: t('callingRestrictedConferenceCallTeamMemberModalDescription'),
             title: t('callingRestrictedConferenceCallTeamMemberModalTitle'),
@@ -286,7 +285,7 @@ export class CallingViewModel {
         });
       }
     } else {
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
         text: {
           htmlMessage: t('callingRestrictedConferenceCallPersonalModalDescription', {
             brandName: Config.getConfig().BRAND_NAME,

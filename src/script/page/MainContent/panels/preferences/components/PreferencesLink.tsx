@@ -31,4 +31,4 @@ const PreferencesLink: React.FC<PreferencesLinkProps> = ({href, uie, children}) 
   </a>
 );
 
-export default PreferencesLink;
+export {PreferencesLink};

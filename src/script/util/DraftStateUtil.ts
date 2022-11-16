@@ -19,12 +19,11 @@
 
 import {generateConversationInputStorageKey} from 'Util/util';
 
-import {StorageRepository} from '../storage';
 import {MessageRepository} from '../conversation/MessageRepository';
 import {Conversation} from '../entity/Conversation';
 import {ContentMessage} from '../entity/message/ContentMessage';
-import {isDraftMessageWithReplyId} from '../guards/Message';
 import {MentionEntity} from '../message/MentionEntity';
+import {StorageRepository} from '../storage';
 
 interface DraftMessage {
   mentions: MentionEntity[];
@@ -82,7 +81,7 @@ export const loadDraftState = async (
     text: storageValue.text,
   };
 
-  const replyMessageId = isDraftMessageWithReplyId(storageValue) ? storageValue.reply.messageId : undefined;
+  const replyMessageId = storageValue.reply.messageId;
 
   if (replyMessageId) {
     draftMessage.replyEntityPromise = messageRepository.getMessageInConversationById(
