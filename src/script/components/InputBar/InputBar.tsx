@@ -174,7 +174,6 @@ const InputBar = ({
   const [pingDisabled, setIsPingDisabled] = useState<boolean>(false);
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const isTouchedRef = useRef<boolean>(false);
-  const isTouched = isTouchedRef.current;
   const [editedMention, setEditedMention] = useState<{startIndex: number; term: string} | undefined>(undefined);
 
   const {rightSidebar} = useAppMainState.getState();
@@ -393,7 +392,7 @@ const InputBar = ({
   }, [editMessageEntity]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (!isTouched) {
+    if (!isTouchedRef.current) {
       return;
     }
     if (isTyping) {
@@ -404,7 +403,7 @@ const InputBar = ({
   }, [isTyping, conversationRepository, conversationEntity]);
 
   useEffect(() => {
-    if (!isTouched) {
+    if (!isTouchedRef.current) {
       return () => {};
     }
     let timerId: number;
