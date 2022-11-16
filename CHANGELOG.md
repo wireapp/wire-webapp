@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [22.6.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@22.5.0...@wireapp/api-client@22.6.0) (2022-11-16)
+
+### Features
+
+* add a user setting for font sizes [ACC-302] ([#4612](https://github.com/wireapp/wire-web-packages/issues/4612)) ([ab9a81d](https://github.com/wireapp/wire-web-packages/commit/ab9a81dd272b51dc28de920dd7bf254880582039))
+
 # [22.5.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@22.4.0...@wireapp/api-client@22.5.0) (2022-11-09)
 
 ### Features
