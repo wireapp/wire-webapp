@@ -161,7 +161,6 @@ const InputBar = ({
     'isIncomingRequest',
   ]);
 
-  const isTypingTimerIdRef = useRef<NodeJS.Timeout | null>(null);
   const shadowInputRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -392,18 +391,23 @@ const InputBar = ({
   }, [editMessageEntity]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (isTypingTimerIdRef.current) {
-      clearTimeout(isTypingTimerIdRef.current);
-    }
-    if (inputValue.trim() !== '') {
+    let timerId: NodeJS.Timeout;
+    if (isTyping) {
       conversationRepository.sendTypingStart(conversationEntity);
-    }
-    isTypingTimerIdRef.current = setTimeout(() => {
+      timerId = setTimeout(() => {
+        conversationRepository.sendTypingStop(conversationEntity);
+      }, CONFIG.IS_TYPING_TIMEOUT);
+    } else {
       conversationRepository.sendTypingStop(conversationEntity);
-      isTypingTimerIdRef.current = null;
-      setIsTyping(false);
-    }, CONFIG.IS_TYPING_TIMEOUT);
-  }, [isTyping]); // we want to send is typing based on isTyping
+    }
+    return () => {
+      clearTimeout(timerId);
+    };
+  }, [isTyping, inputValue]); // we want to send is typing based on isTyping & changes to input
+
+  useEffect(() => {
+    setIsTyping(false);
+  }, [conversationEntity]);
 
   const replyMessage = (messageEntity: ContentMessage): void => {
     if (messageEntity?.isReplyable() && messageEntity !== replyMessageEntity) {
@@ -498,7 +502,11 @@ const InputBar = ({
 
     const {value: currentValue} = event.currentTarget;
     setInputValue(currentValue);
-    setIsTyping(true);
+    if (currentValue.length > 0) {
+      setIsTyping(true);
+    } else {
+      setIsTyping(false);
+    }
     const currentValueLength = currentValue.length;
     const previousValueLength = inputValue.length;
     const difference = currentValueLength - previousValueLength;
@@ -554,17 +562,8 @@ const InputBar = ({
     }
   };
 
-  const sendStopTyping = () => {
-    if (isTypingTimerIdRef.current) {
-      conversationRepository.sendTypingStop(conversationEntity);
-      clearTimeout(isTypingTimerIdRef.current);
-      isTypingTimerIdRef.current = null;
-      setIsTyping(false);
-    }
-  };
-
   const onSend = (text: string): void | boolean => {
-    sendStopTyping();
+    setIsTyping(false);
 
     if (pastedFile) {
       return sendPastedFile();
@@ -925,7 +924,7 @@ const InputBar = ({
                     onInput={updateMentions}
                     onChange={onChange}
                     onPaste={onPasteFiles}
-                    onBlur={sendStopTyping}
+                    onBlur={() => setIsTyping(false)}
                     value={inputValue}
                     placeholder={inputPlaceholder}
                     aria-label={inputPlaceholder}
