@@ -24,14 +24,25 @@ import {arrayToBase64} from 'Util/util';
 import {mlsConversationState} from './mlsConversationState';
 
 import {ConversationRepository} from '../conversation/ConversationRepository';
+import {
+  isMLSConversation,
+  isSelfConversation,
+  isTeamConversation,
+  MLSConversation,
+} from '../conversation/ConversationSelectors';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
+
+type MLSConversationRepository = Pick<
+  ConversationRepository,
+  'findConversationByGroupId' | 'getConversationById' | 'conversationRoleRepository'
+>;
 
 export async function initMLSConversations(
   conversations: Conversation[],
   selfUser: User,
   core: Account,
-  conversationRepository: ConversationRepository,
+  conversationRepository: MLSConversationRepository,
 ): Promise<void> {
   core.configureMLSCallbacks({
     authorize: groupIdBytes => {
@@ -51,7 +62,7 @@ export async function initMLSConversations(
     userAuthorize: () => true,
   });
 
-  await createUninitializedConversations(conversations, core);
+  await registerUninitializedConversations(conversations, selfUser, core);
   await joinNewConversations(conversations, core);
 }
 
@@ -77,11 +88,17 @@ async function joinNewConversations(conversations: Conversation[], core: Account
  * @param conversations all the conversations the user is part of
  * @param core instance of the core
  */
-async function createUninitializedConversations(conversations: Conversation[], core: Account): Promise<void> {
-  /*
+async function registerUninitializedConversations(
+  conversations: Conversation[],
+  selfUser: User,
+  core: Account,
+): Promise<void> {
   const uninitializedConversations = conversations.filter(
-    conversation =>
-      (conversation.isUsingMLSProtocol && isSelfConversation(conversation)) || isTeamConversation(conversation),
+    (conversation): conversation is MLSConversation =>
+      isMLSConversation(conversation) && (isSelfConversation(conversation) || isTeamConversation(conversation)),
   );
-  */
+
+  uninitializedConversations.forEach(conversation => {
+    core.service?.mls.registerConversation(conversation.groupId, [selfUser]);
+  });
 }

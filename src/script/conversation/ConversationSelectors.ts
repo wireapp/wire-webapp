@@ -17,9 +17,15 @@
  *
  */
 
-import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
+import {CONVERSATION_TYPE, ConversationProtocol} from '@wireapp/api-client/lib/conversation/';
 
 import {Conversation} from '../entity/Conversation';
+
+export type MLSConversation = Conversation & {groupId: string};
+
+export function isMLSConversation(conversation: Conversation): conversation is MLSConversation {
+  return !!conversation.groupId && conversation.protocol === ConversationProtocol.MLS;
+}
 
 export function isSelfConversation(conversation: Conversation): boolean {
   return conversation.type() === CONVERSATION_TYPE.SELF;
