@@ -38,6 +38,7 @@ const createReadReceiptMessage = (partialReadReceiptStatus: Partial<MessageEntit
 describe('ReadReceiptStatus', () => {
   it('is not shown when message is not last delivered message', () => {
     const props = {
+      focusConversation: true,
       is1to1Conversation: false,
       isLastDeliveredMessage: false,
       message: createReadReceiptMessage({
@@ -53,6 +54,7 @@ describe('ReadReceiptStatus', () => {
 
   it('shows "delivered" when noone read the message', () => {
     const props = {
+      focusConversation: true,
       is1to1Conversation: false,
       isLastDeliveredMessage: true,
       message: createReadReceiptMessage({
@@ -69,6 +71,7 @@ describe('ReadReceiptStatus', () => {
 
   it('shows the read icon', () => {
     const props = {
+      focusConversation: true,
       is1to1Conversation: false,
       isLastDeliveredMessage: true,
       message: createReadReceiptMessage({
@@ -88,6 +91,7 @@ describe('ReadReceiptStatus', () => {
       const onClickReceiptsSpy = jest.fn();
       const readReceiptTime = new Date().toISOString();
       const props = {
+        focusConversation: true,
         is1to1Conversation: true,
         isLastDeliveredMessage: true,
         message: createReadReceiptMessage({
@@ -106,6 +110,7 @@ describe('ReadReceiptStatus', () => {
     it('shows timestamp instead of read count', () => {
       const readReceiptTime = new Date().toISOString();
       const props = {
+        focusConversation: true,
         is1to1Conversation: true,
         isLastDeliveredMessage: true,
         message: createReadReceiptMessage({
@@ -125,6 +130,7 @@ describe('ReadReceiptStatus', () => {
       const onClickReceiptsSpy = jest.fn();
       const readReceiptTime = new Date().toISOString();
       const props = {
+        focusConversation: true,
         is1to1Conversation: false,
         isLastDeliveredMessage: true,
         message: createReadReceiptMessage({
@@ -143,6 +149,7 @@ describe('ReadReceiptStatus', () => {
 
     it('shows read count', async () => {
       const props = {
+        focusConversation: true,
         is1to1Conversation: false,
         isLastDeliveredMessage: true,
         message: createReadReceiptMessage({

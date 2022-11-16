@@ -40,7 +40,11 @@ export const configureRoutes = (routeDefinitions: Routes): void => {
   parseRoute();
 };
 
-export const navigate = (path: string) => {
-  window.history.replaceState(null, '', `#${path}`);
+export const navigate = (path: string, stateObj?: {}) => {
+  setHistoryParam(path, stateObj);
   parseRoute();
+};
+
+export const setHistoryParam = (path: string, stateObj?: {}) => {
+  window.history.replaceState(stateObj, '', `#${path}`);
 };
