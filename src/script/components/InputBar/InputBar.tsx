@@ -403,7 +403,14 @@ const InputBar = ({
     return () => {
       window.clearTimeout(timerId);
     };
-  }, [isTyping, inputValue, conversationRepository, conversationEntity]); // we want to send is typing based on isTyping & changes to input
+    /*
+      we need inputValue as a dependency because every time a character is typed
+      we want to delay/postpone the timer,
+      basically adding more seconds to it's cancellation due time
+      so if the user is still typing they would
+      stay in the typing indicator
+    */
+  }, [isTyping, inputValue, conversationRepository, conversationEntity]);
 
   const replyMessage = (messageEntity: ContentMessage): void => {
     if (messageEntity?.isReplyable() && messageEntity !== replyMessageEntity) {
