@@ -173,7 +173,7 @@ const InputBar = ({
   const [selectionEnd, setSelectionEnd] = useState<number>(0);
   const [pingDisabled, setIsPingDisabled] = useState<boolean>(false);
   const [isTyping, setIsTyping] = useState<boolean>(false);
-  const [isTouched, setIsTouched] = useState<boolean>(false);
+  const isTouched = useRef<boolean>(false);
   const [editedMention, setEditedMention] = useState<{startIndex: number; term: string} | undefined>(undefined);
 
   const {rightSidebar} = useAppMainState.getState();
@@ -510,7 +510,7 @@ const InputBar = ({
     event.preventDefault();
 
     const {value: currentValue} = event.currentTarget;
-    setIsTouched(true);
+    isTouched.current = true;
     setInputValue(currentValue);
     const currentValueLength = currentValue.length;
     const previousValueLength = inputValue.length;
@@ -770,7 +770,7 @@ const InputBar = ({
   }, []);
 
   useEffect(() => {
-    setIsTouched(false);
+    isTouched.current = false;
     loadInitialStateForConversation();
   }, [conversationEntity]);
 
