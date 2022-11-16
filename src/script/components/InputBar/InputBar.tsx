@@ -161,7 +161,6 @@ const InputBar = ({
     'isIncomingRequest',
   ]);
 
-  const isTypingTimerIdRef = useRef<NodeJS.Timeout | null>(null);
   const shadowInputRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -392,18 +391,25 @@ const InputBar = ({
   }, [editMessageEntity]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (isTypingTimerIdRef.current) {
-      clearTimeout(isTypingTimerIdRef.current);
-    }
-    if (inputValue.trim() !== '') {
+    if (isTyping) {
       conversationRepository.sendTypingStart(conversationEntity);
-    }
-    isTypingTimerIdRef.current = setTimeout(() => {
+    } else {
       conversationRepository.sendTypingStop(conversationEntity);
-      isTypingTimerIdRef.current = null;
+    }
+  }, [isTyping, conversationRepository, conversationEntity]);
+
+  useEffect(() => {
+    let timerId: number;
+    if (inputValue.length > 0) {
+      setIsTyping(true);
+      timerId = window.setTimeout(() => setIsTyping(false), CONFIG.IS_TYPING_TIMEOUT);
+    } else {
       setIsTyping(false);
-    }, CONFIG.IS_TYPING_TIMEOUT);
-  }, [isTyping]); // we want to send is typing based on isTyping
+    }
+    return () => {
+      window.clearTimeout(timerId);
+    };
+  }, [inputValue]);
 
   const replyMessage = (messageEntity: ContentMessage): void => {
     if (messageEntity?.isReplyable() && messageEntity !== replyMessageEntity) {
@@ -498,7 +504,6 @@ const InputBar = ({
 
     const {value: currentValue} = event.currentTarget;
     setInputValue(currentValue);
-    setIsTyping(true);
     const currentValueLength = currentValue.length;
     const previousValueLength = inputValue.length;
     const difference = currentValueLength - previousValueLength;
@@ -554,18 +559,7 @@ const InputBar = ({
     }
   };
 
-  const sendStopTyping = () => {
-    if (isTypingTimerIdRef.current) {
-      conversationRepository.sendTypingStop(conversationEntity);
-      clearTimeout(isTypingTimerIdRef.current);
-      isTypingTimerIdRef.current = null;
-      setIsTyping(false);
-    }
-  };
-
   const onSend = (text: string): void | boolean => {
-    sendStopTyping();
-
     if (pastedFile) {
       return sendPastedFile();
     }
@@ -925,7 +919,7 @@ const InputBar = ({
                     onInput={updateMentions}
                     onChange={onChange}
                     onPaste={onPasteFiles}
-                    onBlur={sendStopTyping}
+                    onBlur={() => setIsTyping(false)}
                     value={inputValue}
                     placeholder={inputPlaceholder}
                     aria-label={inputPlaceholder}
