@@ -391,26 +391,25 @@ const InputBar = ({
   }, [editMessageEntity]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    let timerId: number;
     if (isTyping) {
       conversationRepository.sendTypingStart(conversationEntity);
-      timerId = window.setTimeout(() => {
-        conversationRepository.sendTypingStop(conversationEntity);
-      }, CONFIG.IS_TYPING_TIMEOUT);
     } else {
       conversationRepository.sendTypingStop(conversationEntity);
+    }
+  }, [isTyping, conversationRepository, conversationEntity]);
+
+  useEffect(() => {
+    let timerId: number;
+    if (inputValue.length > 0) {
+      setIsTyping(true);
+      timerId = window.setTimeout(() => setIsTyping(false), CONFIG.IS_TYPING_TIMEOUT);
+    } else {
+      setIsTyping(false);
     }
     return () => {
       window.clearTimeout(timerId);
     };
-    /*
-      we need inputValue as a dependency because every time a character is typed
-      we want to delay/postpone the timer,
-      basically adding more seconds to it's cancellation due time
-      so if the user is still typing they would
-      stay in the typing indicator
-    */
-  }, [isTyping, inputValue, conversationRepository, conversationEntity]);
+  }, [inputValue]);
 
   const replyMessage = (messageEntity: ContentMessage): void => {
     if (messageEntity?.isReplyable() && messageEntity !== replyMessageEntity) {
@@ -505,11 +504,6 @@ const InputBar = ({
 
     const {value: currentValue} = event.currentTarget;
     setInputValue(currentValue);
-    if (currentValue.length > 0) {
-      setIsTyping(true);
-    } else {
-      setIsTyping(false);
-    }
     const currentValueLength = currentValue.length;
     const previousValueLength = inputValue.length;
     const difference = currentValueLength - previousValueLength;
@@ -566,8 +560,6 @@ const InputBar = ({
   };
 
   const onSend = (text: string): void | boolean => {
-    setIsTyping(false);
-
     if (pastedFile) {
       return sendPastedFile();
     }
