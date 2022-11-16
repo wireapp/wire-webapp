@@ -95,7 +95,9 @@ async function registerUninitializedConversations(
 ): Promise<void> {
   const uninitializedConversations = conversations.filter(
     (conversation): conversation is MLSConversation =>
-      isMLSConversation(conversation) && (isSelfConversation(conversation) || isTeamConversation(conversation)),
+      isMLSConversation(conversation) &&
+      conversation.epoch === 0 &&
+      (isSelfConversation(conversation) || isTeamConversation(conversation)),
   );
 
   uninitializedConversations.forEach(conversation => {

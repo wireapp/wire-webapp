@@ -89,5 +89,27 @@ describe('MLSConversations', () => {
 
       expect(core.service!.mls.registerConversation).toHaveBeenCalledTimes(2);
     });
+
+    it('does not register self and team conversation that have epoch > 0', async () => {
+      const core = mockCore();
+      const nbProteusConversations = 5 + Math.ceil(Math.random() * 10);
+      const nbMLSConversations = 5 + Math.ceil(Math.random() * 10);
+
+      const proteusConversations = createConversations(nbProteusConversations, ConversationProtocol.PROTEUS);
+      const selfConversation = createConversation(ConversationProtocol.MLS);
+      selfConversation.epoch = 1;
+      selfConversation.type(CONVERSATION_TYPE.SELF);
+
+      const teamConversation = createConversation(ConversationProtocol.MLS);
+      teamConversation.epoch = 2;
+      teamConversation.type(CONVERSATION_TYPE.GLOBAL_TEAM);
+
+      const mlsConversations = createConversations(nbMLSConversations);
+      const conversations = [...proteusConversations, teamConversation, ...mlsConversations, selfConversation];
+
+      await initMLSConversations(conversations, new User(), core, {} as any);
+
+      expect(core.service!.mls.registerConversation).toHaveBeenCalledTimes(0);
+    });
   });
 });
