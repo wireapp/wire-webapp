@@ -79,6 +79,7 @@ export class PropertiesRepository {
           replace_inline: true,
         },
         interface: {
+          font_size: '',
           theme: 'default',
           view_folders: false,
         },
