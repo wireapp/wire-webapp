@@ -33,13 +33,6 @@ export async function initMLSConversations(
   core: Account,
   conversationRepository: ConversationRepository,
 ): Promise<void> {
-  // We send external proposal to all the MLS conversations that are in an unknown state (not established nor pendingWelcome)
-  await mlsConversationState.getState().sendExternalToPendingJoin(
-    conversations,
-    groupId => core.service!.conversation.isMLSConversationEstablished(groupId),
-    conversationId => core.service!.conversation.joinByExternalCommit(conversationId),
-  );
-
   core.configureMLSCallbacks({
     authorize: groupIdBytes => {
       const groupId = arrayToBase64(groupIdBytes);
@@ -57,4 +50,38 @@ export async function initMLSConversations(
     // This is enforced by backend, no need to implement this on the client side.
     userAuthorize: () => true,
   });
+
+  await createUninitializedConversations(conversations, core);
+  await joinNewConversations(conversations, core);
+}
+
+/**
+ * Will join all the conversation that the current user is part of but that are not joined by the current user's device
+ *
+ * @param conversations - all the conversations that the user is part of
+ * @param core - the instance of the core
+ */
+async function joinNewConversations(conversations: Conversation[], core: Account): Promise<void> {
+  // We send external proposal to all the MLS conversations that are in an unknown state (not established nor pendingWelcome)
+  await mlsConversationState.getState().sendExternalToPendingJoin(
+    conversations,
+    groupId => core.service!.conversation.isMLSConversationEstablished(groupId),
+    conversationId => core.service!.conversation.joinByExternalCommit(conversationId),
+  );
+}
+
+/**
+ * Will register special conversations agains the core.
+ * The self conversation and the team conversation as special conversation that are created by noone and, thus, need to be manually created by the first device that detects them
+ *
+ * @param conversations all the conversations the user is part of
+ * @param core instance of the core
+ */
+async function createUninitializedConversations(conversations: Conversation[], core: Account): Promise<void> {
+  /*
+  const uninitializedConversations = conversations.filter(
+    conversation =>
+      (conversation.isUsingMLSProtocol && isSelfConversation(conversation)) || isTeamConversation(conversation),
+  );
+  */
 }
