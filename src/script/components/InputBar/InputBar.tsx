@@ -404,7 +404,7 @@ const InputBar = ({
 
   useEffect(() => {
     if (!isTouched) {
-      return;
+      return () => {};
     }
     let timerId: number;
     if (inputValue.length > 0) {
