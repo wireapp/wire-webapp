@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.16.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.15.2...@wireapp/webapp-events@0.16.0) (2022-11-16)
+
+### Features
+
+* add a user setting for font sizes [ACC-302] ([#4612](https://github.com/wireapp/wire-web-packages/issues/4612)) ([ab9a81d](https://github.com/wireapp/wire-web-packages/commit/ab9a81dd272b51dc28de920dd7bf254880582039))
+
 ## [0.15.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.15.1...@wireapp/webapp-events@0.15.2) (2022-11-08)
 
 **Note:** Version bump only for package @wireapp/webapp-events
