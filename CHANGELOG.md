@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [37.1.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@37.0.4...@wireapp/core@37.1.0) (2022-11-16)
+
+### Features
+
+* Ability to register an already existing conversation into coreCrypto ([#4609](https://github.com/wireapp/wire-web-packages/issues/4609)) ([9fd5552](https://github.com/wireapp/wire-web-packages/commit/9fd555241d7ee244266d967b9f741705ef157992))
+
 ## [37.0.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@37.0.3...@wireapp/core@37.0.4) (2022-11-16)
 
 **Note:** Version bump only for package @wireapp/core
