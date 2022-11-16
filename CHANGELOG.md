@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [37.0.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@37.0.2...@wireapp/core@37.0.3) (2022-11-16)
+
+### Bug Fixes
+
+* Fix creating new proteus conversations ([#4615](https://github.com/wireapp/wire-web-packages/issues/4615)) ([59d6e1d](https://github.com/wireapp/wire-web-packages/commit/59d6e1d44153c8d2b9d1911b41ed5c563a56c8b9))
+
 ## [37.0.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@37.0.1...@wireapp/core@37.0.2) (2022-11-15)
 
 ### Bug Fixes
