@@ -47,6 +47,7 @@ function mockCore() {
     service: {mls: {registerConversation: jest.fn()}},
   } as unknown as Account;
 }
+
 describe('MLSConversations', () => {
   beforeEach(() => {
     jest.spyOn(mlsConversationState.getState(), 'sendExternalToPendingJoin').mockReturnValue(undefined);
@@ -64,7 +65,7 @@ describe('MLSConversations', () => {
       await initMLSConversations(conversations, new User(), new Account(), {} as any);
 
       expect(mlsConversationState.getState().sendExternalToPendingJoin).toHaveBeenCalledWith(
-        conversations,
+        mlsConversations,
         expect.any(Function),
         expect.any(Function),
       );
@@ -77,9 +78,11 @@ describe('MLSConversations', () => {
 
       const proteusConversations = createConversations(nbProteusConversations, ConversationProtocol.PROTEUS);
       const selfConversation = createConversation(ConversationProtocol.MLS);
+      selfConversation.epoch = 0;
       selfConversation.type(CONVERSATION_TYPE.SELF);
 
       const teamConversation = createConversation(ConversationProtocol.MLS);
+      teamConversation.epoch = 0;
       teamConversation.type(CONVERSATION_TYPE.GLOBAL_TEAM);
 
       const mlsConversations = createConversations(nbMLSConversations);

@@ -62,8 +62,9 @@ export async function initMLSConversations(
     userAuthorize: () => true,
   });
 
-  await registerUninitializedConversations(conversations, selfUser, core);
-  await joinNewConversations(conversations, core);
+  const mlsConversations = conversations.filter(isMLSConversation);
+  await registerUninitializedConversations(mlsConversations, selfUser, core);
+  await joinNewConversations(mlsConversations, core);
 }
 
 /**
@@ -72,7 +73,7 @@ export async function initMLSConversations(
  * @param conversations - all the conversations that the user is part of
  * @param core - the instance of the core
  */
-async function joinNewConversations(conversations: Conversation[], core: Account): Promise<void> {
+async function joinNewConversations(conversations: MLSConversation[], core: Account): Promise<void> {
   // We send external proposal to all the MLS conversations that are in an unknown state (not established nor pendingWelcome)
   await mlsConversationState.getState().sendExternalToPendingJoin(
     conversations,
@@ -89,15 +90,12 @@ async function joinNewConversations(conversations: Conversation[], core: Account
  * @param core instance of the core
  */
 async function registerUninitializedConversations(
-  conversations: Conversation[],
+  conversations: MLSConversation[],
   selfUser: User,
   core: Account,
 ): Promise<void> {
   const uninitializedConversations = conversations.filter(
-    (conversation): conversation is MLSConversation =>
-      isMLSConversation(conversation) &&
-      conversation.epoch === 0 &&
-      (isSelfConversation(conversation) || isTeamConversation(conversation)),
+    conversation => conversation.epoch === 0 && (isSelfConversation(conversation) || isTeamConversation(conversation)),
   );
 
   uninitializedConversations.forEach(conversation => {
