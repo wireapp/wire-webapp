@@ -56,20 +56,17 @@ export class ProteusService {
     conversationData,
     otherUserIds,
   }: CreateProteusConversationParams): Promise<Conversation> {
-    const isNewConversation = (conversationData: any): conversationData is NewConversation =>
-      conversationData && conversationData?.name && conversationData?.users;
     let payload: NewConversation;
+    if (typeof conversationData === 'string') {
+      const ids = typeof otherUserIds === 'string' ? [otherUserIds] : otherUserIds;
 
-    if (isNewConversation(conversationData)) {
-      payload = {...conversationData};
-    } else {
-      const users: string[] = otherUserIds ? (Array.isArray(otherUserIds) ? otherUserIds : [otherUserIds]) : [];
-      const payloadName = conversationData && typeof conversationData === 'string' ? conversationData : undefined;
       payload = {
-        name: payloadName,
+        name: conversationData,
         receipt_mode: null,
-        users,
+        users: ids ?? [],
       };
+    } else {
+      payload = conversationData;
     }
 
     return this.apiClient.api.conversation.postConversation(payload);
