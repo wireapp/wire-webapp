@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.0.7](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.0.6...@wireapp/react-ui-kit@9.0.7) (2022-11-16)
+
+### Bug Fixes
+
+* styleguidist rendering ([#4618](https://github.com/wireapp/wire-web-packages/issues/4618)) ([01be991](https://github.com/wireapp/wire-web-packages/commit/01be99170008d2d93a0f997b137cb8cbee4d9192))
+
 ## [9.0.6](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.0.5...@wireapp/react-ui-kit@9.0.6) (2022-11-08)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
