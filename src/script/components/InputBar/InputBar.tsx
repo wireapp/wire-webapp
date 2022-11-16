@@ -403,11 +403,7 @@ const InputBar = ({
     return () => {
       clearTimeout(timerId);
     };
-  }, [isTyping, inputValue]); // we want to send is typing based on isTyping & changes to input
-
-  useEffect(() => {
-    setIsTyping(false);
-  }, [conversationEntity]);
+  }, [isTyping, inputValue, conversationRepository, conversationEntity]); // we want to send is typing based on isTyping & changes to input
 
   const replyMessage = (messageEntity: ContentMessage): void => {
     if (messageEntity?.isReplyable() && messageEntity !== replyMessageEntity) {
