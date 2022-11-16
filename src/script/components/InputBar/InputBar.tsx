@@ -391,17 +391,17 @@ const InputBar = ({
   }, [editMessageEntity]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    let timerId: NodeJS.Timeout;
+    let timerId: number;
     if (isTyping) {
       conversationRepository.sendTypingStart(conversationEntity);
-      timerId = setTimeout(() => {
+      timerId = window.setTimeout(() => {
         conversationRepository.sendTypingStop(conversationEntity);
       }, CONFIG.IS_TYPING_TIMEOUT);
     } else {
       conversationRepository.sendTypingStop(conversationEntity);
     }
     return () => {
-      clearTimeout(timerId);
+      window.clearTimeout(timerId);
     };
   }, [isTyping, inputValue, conversationRepository, conversationEntity]); // we want to send is typing based on isTyping & changes to input
 
