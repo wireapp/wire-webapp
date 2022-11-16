@@ -186,6 +186,7 @@ export const WebAppEvents = {
         REPLACE_INLINE: 'wire.webapp.properties.update.emoji.replace_inline',
       },
       INTERFACE: {
+        FONT_SIZE: 'wire.webapp.properties.update.interface.font_size',
         THEME: 'wire.webapp.properties.update.interface.theme',
         USE_DARK_MODE: 'wire.webapp.properties.update.interface.use_dark_mode',
         VIEW_FOLDERS: 'wire.webapp.properties.update.interface.view_folders',
