@@ -53,7 +53,7 @@ export type SendProteusMessageParams = SendCommonParams &
   };
 
 export type CreateProteusConversationParams = {
-  conversationData?: NewConversation | string;
+  conversationData: NewConversation | string;
   otherUserIds?: string | string[];
 };
 
