@@ -173,7 +173,7 @@ const InputBar = ({
   const [selectionEnd, setSelectionEnd] = useState<number>(0);
   const [pingDisabled, setIsPingDisabled] = useState<boolean>(false);
   const [isTyping, setIsTyping] = useState<boolean>(false);
-  const isTouchedRef = useRef<boolean>(false);
+  const hasUserTyped = useRef<boolean>(false);
   const [editedMention, setEditedMention] = useState<{startIndex: number; term: string} | undefined>(undefined);
 
   const {rightSidebar} = useAppMainState.getState();
@@ -392,7 +392,7 @@ const InputBar = ({
   }, [editMessageEntity]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (!isTouchedRef.current) {
+    if (!hasUserTyped.current) {
       return;
     }
     if (isTyping) {
@@ -403,7 +403,7 @@ const InputBar = ({
   }, [isTyping, conversationRepository, conversationEntity]);
 
   useEffect(() => {
-    if (!isTouchedRef.current) {
+    if (!hasUserTyped.current) {
       return () => {};
     }
     let timerId: number;
@@ -510,7 +510,7 @@ const InputBar = ({
     event.preventDefault();
 
     const {value: currentValue} = event.currentTarget;
-    isTouchedRef.current = true;
+    hasUserTyped.current = true;
     setInputValue(currentValue);
     const currentValueLength = currentValue.length;
     const previousValueLength = inputValue.length;
@@ -770,7 +770,7 @@ const InputBar = ({
   }, []);
 
   useEffect(() => {
-    isTouchedRef.current = false;
+    hasUserTyped.current = false;
     loadInitialStateForConversation();
   }, [conversationEntity]);
 
