@@ -17,7 +17,7 @@
  *
  */
 
-import {cloneElement, FC, ReactNode, useCallback, useEffect, useState} from 'react';
+import {cloneElement, FC, ReactNode, useEffect, useState} from 'react';
 
 import {amplify} from 'amplify';
 import {CSSTransition, TransitionGroup} from 'react-transition-group';
@@ -167,15 +167,15 @@ const RightSidebar: FC<RightSidebarProps> = ({
     });
   }, []);
 
-  const containerRef = useCallback(
-    (element: HTMLDivElement | null) => {
-      const nextElementToFocus = element?.querySelectorAll(focusableElementsSelector)[0] as HTMLElement | null;
-      if (nextElementToFocus) {
-        nextElementToFocus.focus();
-      }
-    },
-    [currentState],
-  );
+  useEffect(() => {
+    const nextElementToFocus = document
+      .getElementById('right-column')
+      ?.querySelector(focusableElementsSelector) as HTMLElement | null;
+
+    if (nextElementToFocus) {
+      nextElementToFocus.focus();
+    }
+  }, [currentState]);
 
   if (!activeConversation) {
     return null;
@@ -193,7 +193,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
       }
     >
       <Animated key={currentState}>
-        <div ref={containerRef}>
+        <>
           {currentState === PanelState.CONVERSATION_DETAILS && (
             <ConversationDetails
               onClose={closePanel}
@@ -322,7 +322,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
               onClose={closePanel}
             />
           )}
-        </div>
+        </>
       </Animated>
     </TransitionGroup>
   );
