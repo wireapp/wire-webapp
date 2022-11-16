@@ -35,7 +35,7 @@ import {XOR} from '@wireapp/commons/lib/util/TypeUtil';
 import {Decoder} from 'bazinga64';
 
 import {APIClient} from '@wireapp/api-client';
-import {ConversationConfiguration, ExternalProposalType} from '@wireapp/core-crypto';
+import {ExternalProposalType} from '@wireapp/core-crypto';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {AddUsersParams, MLSReturnType, SendMlsMessageParams, SendResult} from './ConversationService.types';
@@ -257,7 +257,16 @@ export class ConversationService {
    *   ###############################################
    */
 
+  /**
+   * Will create a conversation on backend and register it to CoreCrypto once created
+   * @param conversationData
+   */
   public async createMLSConversation(conversationData: NewConversation): Promise<MLSReturnType> {
+    const {selfUserId, qualified_users: qualifiedUsers = []} = conversationData;
+    if (!selfUserId) {
+      throw new Error('You need to pass self user qualified id in order to create an MLS conversation');
+    }
+
     /**
      * @note For creating MLS conversations the users & qualified_users
      * field must be empty as backend is not aware which users
@@ -273,47 +282,16 @@ export class ConversationService {
       throw new Error('No group_id found in response which is required for creating MLS conversations.');
     }
 
-    const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
-    const {qualified_users: qualifiedUsers = [], selfUserId} = conversationData;
-    if (!selfUserId) {
-      throw new Error('You need to pass self user qualified id in order to create an MLS conversation');
-    }
-
-    const mlsKeys = (await this.apiClient.api.client.getPublicKeys()).removal;
-    const mlsKeyBytes = Object.values(mlsKeys).map((key: string) => Decoder.fromBase64(key).asBytes);
-    const config: ConversationConfiguration = {
-      externalSenders: mlsKeyBytes,
-      ciphersuite: 1, // TODO: Use the correct ciphersuite enum.
-    };
-
-    await this.mlsService.createConversation(groupIdBytes, config);
-
-    const coreCryptoKeyPackagesPayload = await this.mlsService.getKeyPackagesPayload([
-      {
-        id: selfUserId.id,
-        domain: selfUserId.domain,
-        /**
-         * we should skip fetching key packages for current self client,
-         * it's already added by the backend on the group creation time
-         */
-        skipOwn: conversationData.creator_client,
-      },
-      ...qualifiedUsers,
-    ]);
-
-    let response;
-    if (coreCryptoKeyPackagesPayload.length !== 0) {
-      response = await this.mlsService.addUsersToExistingConversation(groupIdBytes, coreCryptoKeyPackagesPayload);
-    }
-
-    // We schedule a key material renewal
-    this.mlsService.scheduleKeyMaterialRenewal(groupId);
+    const response = await this.mlsService.registerConversation(groupId, qualifiedUsers.concat(selfUserId), {
+      user: selfUserId,
+      client: conversationData.creator_client,
+    });
 
     // We fetch the fresh version of the conversation created on backend with the newly added users
-    const conversation = await this.getConversations(qualifiedId.id);
+    const conversation = await this.apiClient.api.conversation.getConversation(qualifiedId);
 
     return {
-      events: response?.events || [],
+      events: response?.events ?? [],
       conversation,
     };
   }
