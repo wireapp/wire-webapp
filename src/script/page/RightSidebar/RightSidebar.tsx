@@ -169,9 +169,9 @@ const RightSidebar: FC<RightSidebarProps> = ({
 
   const containerRef = useCallback(
     (element: HTMLDivElement | null) => {
-      const nextElementToFocus = element?.querySelectorAll(focusableElementsSelector)[0] as HTMLElement | null;
+      const nextElementToFocus = element?.querySelector(focusableElementsSelector) as HTMLElement | null;
       if (nextElementToFocus) {
-        nextElementToFocus.focus();
+        setTimeout(() => nextElementToFocus.focus(), 0);
       }
     },
     [currentState],
