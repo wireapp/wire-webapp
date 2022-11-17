@@ -1,0 +1,10 @@
+[build]
+    base = 'packages/react-ui-kit'
+    publish = 'styleguide'
+    command =  'yarn run build:styleguide'
+
+[build.environment]
+    NODE_VERSION = "16"
+    NETLIFY_USE_YARN = "true"
+    YARN_FLAGS = "--immutable"
+    NETLIFY_YARN_WORKSPACES = "true"
