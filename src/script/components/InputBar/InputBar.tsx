@@ -738,10 +738,8 @@ const InputBar = ({
 
   const sendGiphy = (gifUrl: string, tag: string): void => {
     generateQuote().then(quoteEntity => {
-      if (quoteEntity) {
-        messageRepository.sendGif(conversationEntity, gifUrl, tag, quoteEntity);
-        cancelMessageEditing(true, true);
-      }
+      messageRepository.sendGif(conversationEntity, gifUrl, tag, quoteEntity);
+      cancelMessageEditing(true, true);
     });
   };
 
