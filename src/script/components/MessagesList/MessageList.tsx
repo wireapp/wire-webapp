@@ -240,6 +240,7 @@ const MessagesList: FC<MessagesListParams> = ({
   }, [messagesContainer, filteredMessagesLength]);
 
   useEffect(() => {
+    // We need to reset the remembered scroll position when switching conversation in order to compute the correct position for the new conversation
     scrollHeight.current = 0;
   }, [conversation]);
 
