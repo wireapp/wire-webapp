@@ -240,6 +240,10 @@ const MessagesList: FC<MessagesListParams> = ({
   }, [messagesContainer, filteredMessagesLength]);
 
   useEffect(() => {
+    scrollHeight.current = 0;
+  }, [conversation]);
+
+  useEffect(() => {
     onLoading(true);
     setLoaded(false);
     conversationLastReadTimestamp.current = conversation.last_read_timestamp();
