@@ -67,7 +67,7 @@ export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
       return undefined;
     }
     const emailLinks = containerRef.current && [...containerRef.current.querySelectorAll('[data-email-link]')];
-    const linkTargets = containerRef.current && [...containerRef.current.querySelectorAll('a')];
+    const linkTargets = containerRef.current && [...containerRef.current.querySelectorAll('a[data-md-link]')];
     const msgLinkTargets = containerRef.current && [...containerRef.current.querySelectorAll('[data-uie-name]')];
     const hasMentions = asset && asset.mentions().length;
     const msgMention = hasMentions
@@ -105,64 +105,57 @@ export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
       }
     };
 
+    const handleClickEmail = (event: Event) => {
+      return event.type === 'keydown'
+        ? handleKeyEvent(event as KeyboardEvent, 'email')
+        : onMessageClick(asset, event as MouseEvent, 'email');
+    };
     emailLinks?.forEach(emailLink => {
       events.forEach(eventName => {
-        emailLink.addEventListener(eventName, event => {
-          if (eventName === 'keydown') {
-            handleKeyEvent(event as KeyboardEvent, 'email');
-            return;
-          }
-          onMessageClick(asset, event as MouseEvent, 'email');
-        });
+        emailLink.addEventListener(eventName, handleClickEmail);
       });
     });
+
+    const handleClickLink = (event: Event) => {
+      return event.type === 'keydown'
+        ? handleKeyEvent(event as KeyboardEvent, 'markdownLink')
+        : onMessageClick(asset, event as MouseEvent, 'markdownLink');
+    };
 
     linkTargets?.forEach(msgLink => {
       events.forEach(eventName => {
-        msgLink.addEventListener(eventName, event => {
-          if (eventName === 'keydown') {
-            handleKeyEvent(event as KeyboardEvent, 'markdownLink');
-            return;
-          }
-          onMessageClick(asset, event as MouseEvent, 'markdownLink');
-        });
+        msgLink.addEventListener(eventName, handleClickLink);
       });
     });
 
+    const handleClickMention = (event: Event) => {
+      return event.type === 'keydown'
+        ? handleKeyEvent(event as KeyboardEvent, 'mention')
+        : onMessageClick(asset, event as MouseEvent, 'mention');
+    };
+
     msgMention?.forEach(mention => {
       events.forEach(eventName => {
-        mention.addEventListener(eventName, event => {
-          if (eventName === 'keydown') {
-            handleKeyEvent(event as KeyboardEvent, 'mention');
-            return;
-          }
-          onMessageClick(asset, event as MouseEvent, 'mention');
-        });
+        mention.addEventListener(eventName, handleClickMention);
       });
     });
 
     return () => {
       emailLinks?.forEach(emailLink => {
         events.forEach(eventName => {
-          emailLink.removeEventListener(eventName, event => {
-            onMessageClick(asset, event as MouseEvent, 'email');
-          });
+          emailLink.removeEventListener(eventName, handleClickEmail);
         });
       });
 
       linkTargets?.forEach(msgLink => {
         events.forEach(eventName => {
-          msgLink.removeEventListener(eventName, event => {
-            onMessageClick(asset, event as MouseEvent, 'markdownLink');
-          });
+          msgLink.removeEventListener(eventName, handleClickLink);
         });
       });
 
       msgMention?.forEach(mention => {
         events.forEach(eventName => {
-          mention.removeEventListener(eventName, event => {
-            onMessageClick(asset, event as MouseEvent, 'mention');
-          });
+          mention.removeEventListener(eventName, handleClickMention);
         });
       });
     };
