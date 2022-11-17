@@ -39,6 +39,7 @@ describe('MessageFooterLike', () => {
     const message = createLikeMessage({});
 
     const props = {
+      focusConversation: true,
       is1to1Conversation: false,
       message,
       onClickLikes: jest.fn(),
@@ -54,6 +55,7 @@ describe('MessageFooterLike', () => {
 
   it('does open conversation details in group conversation when clicking on like names', async () => {
     const props = {
+      focusConversation: true,
       is1to1Conversation: false,
       message: createLikeMessage({
         is_liked: ko.pureComputed(() => true),
@@ -71,6 +73,7 @@ describe('MessageFooterLike', () => {
 
   it('does not open conversation details in 1:1 conversation when clicking on like names', async () => {
     const props = {
+      focusConversation: true,
       is1to1Conversation: true,
       message: createLikeMessage({
         is_liked: ko.pureComputed(() => true),

@@ -414,7 +414,7 @@ export class MessageRepository {
     conversationEntity: Conversation,
     url: string,
     tag: string | number | Record<string, string>,
-    quoteEntity: OutgoingQuote,
+    quoteEntity?: OutgoingQuote,
   ): Promise<void> {
     if (!tag) {
       tag = t('extensionsGiphyRandom');
