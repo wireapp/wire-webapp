@@ -759,11 +759,14 @@ const InputBar = ({
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.EDIT, editMessage);
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REPLY, replyMessage);
     amplify.subscribe(WebAppEvents.EXTENSIONS.GIPHY.SEND, sendGiphy);
-    amplify.subscribe(WebAppEvents.SEARCH.HIDE, () => window.requestAnimationFrame(() => textareaRef.current?.focus()));
     amplify.subscribe(WebAppEvents.SHORTCUT.PING, onPingClick);
 
     return () => {
       amplify.unsubscribeAll(WebAppEvents.SHORTCUT.PING);
+      amplify.unsubscribeAll(WebAppEvents.CONVERSATION.IMAGE.SEND);
+      amplify.unsubscribeAll(WebAppEvents.CONVERSATION.MESSAGE.EDIT);
+      amplify.unsubscribeAll(WebAppEvents.CONVERSATION.MESSAGE.REPLY);
+      amplify.unsubscribeAll(WebAppEvents.EXTENSIONS.GIPHY.SEND);
     };
   }, []);
 
