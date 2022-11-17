@@ -764,6 +764,10 @@ const InputBar = ({
 
     return () => {
       amplify.unsubscribeAll(WebAppEvents.SHORTCUT.PING);
+      amplify.unsubscribeAll(WebAppEvents.CONVERSATION.IMAGE.SEND);
+      amplify.unsubscribeAll(WebAppEvents.CONVERSATION.MESSAGE.EDIT);
+      amplify.unsubscribeAll(WebAppEvents.CONVERSATION.MESSAGE.REPLY);
+      amplify.unsubscribeAll(WebAppEvents.EXTENSIONS.GIPHY.SEND);
     };
   }, []);
 
