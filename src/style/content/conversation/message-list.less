@@ -596,12 +596,14 @@
 .message-status-read {
   left: 83px;
   &::before {
-    position: absolute;
-    display: flex;
-    width: 16px;
-    align-items: center;
-    justify-content: center;
-    content: '';
+    display: none;
+    @media (min-width: @screen-md-min) {
+      display: flex;
+      width: 16px;
+      align-items: center;
+      justify-content: center;
+      content: '';
+    }
   }
 }
 
