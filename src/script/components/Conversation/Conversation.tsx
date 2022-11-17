@@ -415,6 +415,7 @@ export const Conversation: FC<ConversationProps> = ({
           })}
 
           <MessagesList
+            key={activeConversation.id}
             conversation={activeConversation}
             selfUser={selfUser}
             initialMessage={initialMessage}
