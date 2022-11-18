@@ -78,7 +78,7 @@ const PanelHeader: FC<PanelHeaderProps> = ({
       )}
 
       <DragableClickWrapper onClick={onClose}>
-        <button className="icon-button" data-uie-name={closeUie} title={closeBtnTitle} onBlur={handleBlur}>
+        <button className="icon-button" data-uie-name={closeUie} title={closeBtnTitle}>
           <Icon.Close className="right-panel-close" />
         </button>
       </DragableClickWrapper>

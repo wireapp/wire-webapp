@@ -26,7 +26,6 @@ import {container} from 'tsyringe';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {focusableElementsSelector} from 'Util/util';
 
 import {AddParticipants} from './AddParticipants';
 import {ConversationDetails} from './ConversationDetails';
@@ -168,11 +167,14 @@ const RightSidebar: FC<RightSidebarProps> = ({
   }, []);
 
   const containerRef = useCallback(
-    (element: HTMLDivElement | null) => {
-      const nextElementToFocus = element?.querySelectorAll(focusableElementsSelector)[0] as HTMLElement | null;
-      if (nextElementToFocus) {
-        nextElementToFocus.focus();
-      }
+    (element: TransitionGroup) => {
+      // console.log('[RightSidebar.tsx] przemvs element', {element});
+      // element.props.children?.focus();
+      // element?.focus();
+      // const nextElementToFocus = element?.querySelectorAll(focusableElementsSelector)[0] as HTMLElement | null;
+      // if (nextElementToFocus) {
+      // nextElementToFocus.focus();
+      // }
     },
     [currentState],
   );
@@ -185,6 +187,8 @@ const RightSidebar: FC<RightSidebarProps> = ({
     <TransitionGroup
       id="right-column"
       className="right-column"
+      component="aside"
+      ref={containerRef}
       childFactory={child =>
         cloneElement(child, {
           classNames: animatePanelToLeft ? 'right-to-left' : 'left-to-right',
@@ -193,7 +197,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
       }
     >
       <Animated key={currentState}>
-        <div ref={containerRef} css={{height: '100%'}}>
+        <>
           {currentState === PanelState.CONVERSATION_DETAILS && (
             <ConversationDetails
               onClose={closePanel}
@@ -322,7 +326,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
               onClose={closePanel}
             />
           )}
-        </div>
+        </>
       </Animated>
     </TransitionGroup>
   );
