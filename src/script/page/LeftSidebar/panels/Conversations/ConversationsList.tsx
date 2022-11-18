@@ -17,7 +17,7 @@
  *
  */
 
-import React, {MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent} from 'react';
+import React from 'react';
 
 import {css} from '@emotion/react';
 
@@ -39,7 +39,7 @@ import {ConversationRepository} from '../../../../conversation/ConversationRepos
 import {ConversationState} from '../../../../conversation/ConversationState';
 import {Conversation} from '../../../../entity/Conversation';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
-import {createNavigate, createNavigateKeyboard} from '../../../../router/routerBindings';
+import {createNavigate} from '../../../../router/routerBindings';
 import {ListViewModel} from '../../../../view_model/ListViewModel';
 import {useAppMainState, ViewType} from '../../../state';
 import {ContentState, useAppState} from '../../../useAppState';
@@ -111,13 +111,7 @@ export const ConversationsList: React.FC<{
               index={index}
               dataUieName="item-conversation"
               conversation={conversation}
-              onClick={(event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>) => {
-                if ('key' in event) {
-                  createNavigateKeyboard(generateConversationUrl(conversation.qualifiedId), true)(event);
-                } else {
-                  createNavigate(generateConversationUrl(conversation.qualifiedId))(event);
-                }
-              }}
+              onClick={createNavigate(generateConversationUrl(conversation.qualifiedId))}
               isSelected={isActiveConversation}
               onJoinCall={answerCall}
               rightClick={openContextMenu}

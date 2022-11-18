@@ -26,19 +26,17 @@ import {isKey, isTabKey, KEY} from 'Util/KeyboardUtil';
 
 function useRoveFocus(size: number, defaultFocus = 0) {
   const [currentFocus, setCurrentFocus] = useState(defaultFocus);
-  const firstItem = 0;
-  const interval = 1;
 
   const handleKeyDown = useCallback(
     (e: ReactKeyboardEvent | KeyboardEvent) => {
       if (isKey(e, KEY.ARROW_DOWN)) {
         e.preventDefault();
-        setCurrentFocus(currentFocus === --size ? firstItem : currentFocus + interval);
+        setCurrentFocus(currentFocus === size - 1 ? 0 : currentFocus + 1);
       } else if (isKey(e, KEY.ARROW_UP)) {
         e.preventDefault();
-        setCurrentFocus(currentFocus === firstItem ? --size : currentFocus - interval);
+        setCurrentFocus(currentFocus === 0 ? size - 1 : currentFocus - 1);
       } else if (isTabKey(e)) {
-        setCurrentFocus(firstItem);
+        setCurrentFocus(0);
       }
     },
     [size, currentFocus, setCurrentFocus],

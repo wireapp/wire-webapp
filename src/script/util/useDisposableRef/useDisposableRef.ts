@@ -26,14 +26,13 @@ import {useLayoutEffect, useRef} from 'react';
  * @param dependencies List of dependencies that should re trigger the initFunction
  */
 export function useDisposableRef(init: (element: HTMLElement) => () => void, dependencies?: unknown[]) {
-  const elementRef = useRef<HTMLDivElement | null>(null!);
+  const elementRef = useRef<HTMLElement | null>(null!);
 
   useLayoutEffect(() => {
     return elementRef.current ? init(elementRef.current) : () => {};
   }, dependencies);
 
-  return (element: HTMLDivElement | null) => {
+  return (element: HTMLElement | null) => {
     elementRef.current = element;
-    return elementRef.current;
   };
 }
