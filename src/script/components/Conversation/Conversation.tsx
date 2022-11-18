@@ -17,7 +17,15 @@
  *
  */
 
-import {FC, UIEvent, useContext, useEffect, useState} from 'react';
+import {
+  FC,
+  MouseEvent as ReactMouseEvent,
+  KeyboardEvent as ReactKeyboardEvent,
+  UIEvent,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -57,7 +65,6 @@ import {PanelState} from '../../page/RightSidebar';
 import {RootContext} from '../../page/RootProvider';
 import {TeamState} from '../../team/TeamState';
 import {UserState} from '../../user/UserState';
-import {ElementType} from '../MessagesList/Message/ContentMessage/asset/TextMessageRenderer';
 
 type ReadMessageBuffer = {conversation: ConversationEntity; message: Message};
 
@@ -181,32 +188,47 @@ export const Conversation: FC<ConversationProps> = ({
     }
   };
 
-  const handleEmailClick = (event: Event) => {
-    safeMailOpen((event.target as HTMLAnchorElement).href);
-    event.preventDefault();
-    return false;
-  };
+  const handleClickOnMessage = (
+    messageEntity: ContentMessage | Text,
+    event: ReactMouseEvent | ReactKeyboardEvent<HTMLElement>,
+  ) => {
+    if (isMouseEvent(event) && event.button === 2) {
+      // Default browser behavior on right click
+      return true;
+    }
 
-  const handleMarkdownLinkClick = (event: Event) => {
-    const href = (event.target as HTMLAnchorElement).href;
-    PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-      primaryAction: {
-        action: () => safeWindowOpen(href),
-        text: t('modalOpenLinkAction'),
-      },
-      text: {
-        message: t('modalOpenLinkMessage', href, {}, true),
-        title: t('modalOpenLinkTitle'),
-      },
-    });
-    event.preventDefault();
-    return false;
-  };
+    const emailTarget = (event.target as HTMLElement).closest<HTMLAnchorElement>('[data-email-link]');
+    if (emailTarget) {
+      safeMailOpen(emailTarget.href);
+      event.preventDefault();
+      return false;
+    }
 
-  const userMentionClick = (event: Event) => {
-    const target = event.currentTarget as HTMLElement;
-    const userId = target?.dataset.userId;
-    const domain = target?.dataset.userDomain;
+    const linkTarget = (event.target as HTMLElement).closest<HTMLAnchorElement>('[data-md-link]');
+    if (linkTarget) {
+      const href = linkTarget.href;
+      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+        primaryAction: {
+          action: () => {
+            safeWindowOpen(href);
+          },
+          text: t('modalOpenLinkAction'),
+        },
+        text: {
+          message: t('modalOpenLinkMessage', href, {}, true),
+          title: t('modalOpenLinkTitle'),
+        },
+      });
+      event.preventDefault();
+      return false;
+    }
+
+    const hasMentions = messageEntity instanceof Text && messageEntity.mentions().length;
+    const mentionElement = hasMentions
+      ? (event.target as HTMLElement).closest<HTMLSpanElement>('.message-mention')
+      : undefined;
+    const userId = mentionElement?.dataset.userId;
+    const domain = mentionElement?.dataset.userDomain;
 
     if (userId) {
       (async () => {
@@ -219,30 +241,6 @@ export const Conversation: FC<ConversationProps> = ({
           }
         }
       })();
-    }
-  };
-
-  const btnRightClick = 2;
-  const handleClickOnMessage = (
-    messageEntity: ContentMessage | Text,
-    event: MouseEvent | KeyboardEvent,
-    elementType: ElementType,
-  ) => {
-    if (isMouseEvent(event) && event.button === btnRightClick) {
-      // Default browser behavior on right click
-      return true;
-    }
-
-    switch (elementType) {
-      case 'email':
-        handleEmailClick(event);
-        break;
-      case 'markdownLink':
-        handleMarkdownLinkClick(event);
-        break;
-      case 'mention':
-        userMentionClick(event);
-        break;
     }
 
     // need to return `true` because knockout will prevent default if we return anything else (including undefined)

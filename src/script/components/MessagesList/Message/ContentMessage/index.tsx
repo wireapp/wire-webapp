@@ -28,8 +28,7 @@ import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {Message} from 'src/script/entity/message/Message';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {getMessageAriaLabel} from 'Util/conversationMessages';
-import {isTabKey, KEY} from 'Util/KeyboardUtil';
+import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {setContextMenuPosition} from 'Util/util';
 
@@ -51,15 +50,12 @@ export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetS
   findMessage: (conversation: Conversation, messageId: string) => Promise<ContentMessage | undefined>;
   focusMessage?: () => void;
   hasMarker?: boolean;
-  focusConversation: boolean;
   isLastDeliveredMessage: boolean;
   message: ContentMessage;
   onClickButton: (message: CompositeMessage, buttonId: string) => void;
   previousMessage?: Message;
   quotedMessage?: ContentMessage;
   selfId: QualifiedId;
-  handleFocus: (index: number) => void;
-  totalMessage: number;
 }
 
 const ContentMessageComponent: React.FC<ContentMessageProps> = ({
@@ -68,7 +64,6 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   findMessage,
   selfId,
   hasMarker,
-  focusConversation,
   isLastDeliveredMessage,
   contextMenu,
   previousMessage,
@@ -80,8 +75,6 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   onClickLikes,
   onClickButton,
   onLike,
-  handleFocus,
-  totalMessage,
 }) => {
   const {entries: menuEntries} = useKoSubscribableChildren(contextMenu, ['entries']);
   const {headerSenderName, timestamp, ephemeral_caption, ephemeral_status, assets, other_likes, was_edited} =
@@ -110,13 +103,13 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
     <div className="message-header">
       <div className="message-header-icon">
         <Avatar
-          tabIndex={focusConversation ? 0 : -1}
+          tabIndex={0}
           participant={message.user()}
           onAvatarClick={onClickAvatar}
           avatarSize={AVATAR_SIZE.X_SMALL}
         />
       </div>
-      <div className="message-header-label" role="button">
+      <div className="message-header-label">
         <span className={`message-header-label-sender ${message.accent_color()}`} data-uie-name="sender-name">
           {headerSenderName}
         </span>
@@ -164,22 +157,10 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
       const newEvent = setContextMenuPosition(event);
       showContextMenu(newEvent, menuEntries, 'message-options-menu');
     }
-
-    // context menu is the last tabbale element of a message, next tab press should
-    // focus on the message input bar
-    if (isTabKey(event)) {
-      handleFocus(totalMessage - 1);
-    }
   };
 
-  const [messageAriaLabel] = getMessageAriaLabel({
-    assets,
-    displayTimestampShort: message.displayTimestampShort(),
-    headerSenderName,
-  });
-
   return (
-    <div aria-label={messageAriaLabel}>
+    <>
       {avatarSection}
       {message.quote() && (
         <Quote
@@ -191,7 +172,6 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
           focusMessage={onClickTimestamp}
           handleClickOnMessage={onClickMessage}
           showUserDetails={onClickAvatar}
-          focusConversation={focusConversation}
         />
       )}
       <div className="message-body" title={ephemeral_caption}>
@@ -210,7 +190,6 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             onClickButton={onClickButton}
             onClickImage={onClickImage}
             onClickMessage={onClickMessage}
-            focusConversation={focusConversation}
           />
         ))}
 
@@ -220,7 +199,6 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
               className="message-body-like-icon like-button message-show-on-hover"
               message={message}
               onLike={onLike}
-              focusConversation={focusConversation}
             />
           </div>
         )}
@@ -228,7 +206,6 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
         <div className="message-body-actions">
           {menuEntries.length > 0 && (
             <button
-              tabIndex={focusConversation ? 0 : -1}
               className="context-menu icon-more font-size-xs"
               aria-label={t('accessibility.conversationContextMenuOpenLabel')}
               onKeyDown={handleContextKeyDown}
@@ -256,22 +233,18 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             is1to1Conversation={conversation.is1to1()}
             isLastDeliveredMessage={isLastDeliveredMessage}
             onClickReceipts={onClickReceipts}
-            focusConversation={focusConversation}
           />
         </div>
       </div>
       {other_likes.length > 0 && (
-        <div>
-          <MessageFooterLike
-            message={message}
-            is1to1Conversation={conversation.is1to1()}
-            onLike={onLike}
-            onClickLikes={onClickLikes}
-            focusConversation={focusConversation}
-          />
-        </div>
+        <MessageFooterLike
+          message={message}
+          is1to1Conversation={conversation.is1to1()}
+          onLike={onLike}
+          onClickLikes={onClickLikes}
+        />
       )}
-    </div>
+    </>
   );
 };
 
