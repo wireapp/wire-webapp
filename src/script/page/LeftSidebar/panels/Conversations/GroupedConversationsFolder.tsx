@@ -17,7 +17,7 @@
  *
  */
 
-import React, {MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent} from 'react';
+import React from 'react';
 
 import {css} from '@emotion/react';
 
@@ -70,9 +70,7 @@ const GroupedConversationsFolder: React.FC<GroupedConversationsFolderProps> = ({
               isConversationListFocus
               handleFocus={setCurrentFocus}
               handleArrowKeyDown={handleKeyDown}
-              onClick={(event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>) => {
-                createNavigate(generateConversationUrl(conversation.qualifiedId));
-              }}
+              onClick={createNavigate(generateConversationUrl(conversation.qualifiedId))}
               rightClick={(_, event) => listViewModel.onContextMenu(conversation, event)}
               conversation={conversation}
               showJoinButton={hasJoinableCall(conversation)}

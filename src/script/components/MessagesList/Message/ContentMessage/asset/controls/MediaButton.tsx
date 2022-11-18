@@ -22,7 +22,6 @@ import React, {useEffect, useState} from 'react';
 import cx from 'classnames';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
 import {noop} from 'Util/util';
 
 import {AssetTransferState} from '../../../../../../assets/AssetTransferState';
@@ -84,7 +83,6 @@ const MediaButton: React.FC<MediaButtonProps> = ({
           className="button-reset-default media-button media-button-play icon-play"
           onClick={play}
           data-uie-name="do-play-media"
-          aria-label={t('mediaBtnPlay')}
         />
       )}
       {isUploaded && isPlaying && (
@@ -93,7 +91,6 @@ const MediaButton: React.FC<MediaButtonProps> = ({
           className="button-reset-default media-button media-button-pause icon-pause"
           onClick={pause}
           data-uie-name="do-pause-media"
-          aria-label={t('mediaBtnPause')}
         />
       )}
       {isDownloading && (
