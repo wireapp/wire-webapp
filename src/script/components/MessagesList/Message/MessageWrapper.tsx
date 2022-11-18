@@ -48,12 +48,11 @@ import {ContextMenuEntry} from '../../../ui/ContextMenu';
 
 import {MessageParams} from './index';
 
-export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; focusConversation: boolean}> = ({
+export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean}> = ({
   message,
   conversation,
   selfId,
   hasMarker,
-  focusConversation,
   isSelfTemporaryGuest,
   isLastDeliveredMessage,
   shouldShowInvitePeople,
@@ -73,8 +72,6 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; focus
   messageRepository,
   messageActions,
   teamState = container.resolve(TeamState),
-  handleFocus,
-  totalMessage,
 }) => {
   const findMessage = (conversation: Conversation, messageId: string) => {
     return messageRepository.getMessageInConversationById(conversation, messageId, true, true);
@@ -180,9 +177,6 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; focus
         onClickInvitePeople={onClickInvitePeople}
         onClickParticipants={onClickParticipants}
         onClickReceipts={onClickReceipts}
-        focusConversation={focusConversation}
-        handleFocus={handleFocus}
-        totalMessage={totalMessage}
       />
     );
   }
@@ -228,7 +222,6 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; focus
         is1to1Conversation={conversation.is1to1()}
         isLastDeliveredMessage={isLastDeliveredMessage}
         onClickReceipts={onClickReceipts}
-        focusConversation={focusConversation}
       />
     );
   }

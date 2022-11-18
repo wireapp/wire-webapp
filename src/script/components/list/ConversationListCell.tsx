@@ -17,14 +17,7 @@
  *
  */
 
-import React, {
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  MouseEvent as ReactMouseEvent,
-  KeyboardEvent as ReactKeyBoardEvent,
-} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 
 import cx from 'classnames';
 
@@ -32,8 +25,6 @@ import {AvailabilityState} from 'Components/AvailabilityState';
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {GroupAvatar} from 'Components/avatar/GroupAvatar';
 import {Icon} from 'Components/Icon';
-import {generateConversationUrl} from 'src/script/router/routeGenerator';
-import {setHistoryParam} from 'src/script/router/Router';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isKey, isOneOfKeys, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -48,7 +39,7 @@ export interface ConversationListCellProps {
   conversation: Conversation;
   dataUieName: string;
   isSelected?: (conversation: Conversation) => boolean;
-  onClick: (event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>) => void;
+  onClick: React.MouseEventHandler<Element>;
   onJoinCall: (conversation: Conversation, mediaType: MediaType) => void;
   rightClick: (conversation: Conversation, event: MouseEvent | React.MouseEvent<Element, MouseEvent>) => void;
   showJoinButton: boolean;
@@ -124,7 +115,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
 
   const handleDivKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key === KEY.SPACE || event.key === KEY.ENTER) {
-      onClick(event);
+      onClick(event as unknown as React.MouseEvent<Element, MouseEvent>);
     } else if (isKey(event, KEY.ARROW_RIGHT)) {
       setContextMenuFocus(true);
     } else {
@@ -171,12 +162,6 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
       handleFocus(index);
     }
   }, [index, isActive, isFolder, isConversationListFocus, handleFocus]);
-
-  // on conversation/app load reset last message focus to ensure last message is focused
-  // only when user enters a new conversation using keyboard(press enter)
-  useEffect(() => {
-    setHistoryParam(generateConversationUrl(conversation.qualifiedId));
-  }, [conversation]);
 
   return (
     <li onContextMenu={openContextMenu}>

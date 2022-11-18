@@ -17,11 +17,8 @@
  *
  */
 
-import {Asset} from 'src/script/entity/message/Asset';
-import type {FileAsset as FileAssetType} from 'src/script/entity/message/FileAsset';
 import {isSameDay, differenceInMinutes} from 'Util/TimeUtil';
 
-import {AssetType} from '../assets/AssetType';
 import {Message} from '../entity/message/Message';
 
 export enum MessageMarkerType {
@@ -70,38 +67,4 @@ export function getMessageMarkerType(
   }
 
   return MessageMarkerType.NONE;
-}
-
-interface MessageDataType {
-  headerSenderName: string;
-  displayTimestampShort: string;
-  assets: Asset[];
-}
-/**
- * Return a string that should be announced for screen reader users.
- * Screen reader aria-label would help user understand the message based on type
- *
- * @param headerSenderName The message sender name
- * @param message The message we want to render
- * @param assets The message meta data
- */
-export function getMessageAriaLabel({headerSenderName, displayTimestampShort, assets}: MessageDataType): string[] {
-  return assets.map((asset: Asset) => {
-    switch (asset.type) {
-      case AssetType.FILE:
-        if ((asset as FileAssetType).isFile()) {
-          return `${headerSenderName}. At ${displayTimestampShort}. with file attachment, ${asset.file_name} `;
-        }
-        if ((asset as FileAssetType).isAudio()) {
-          return `${headerSenderName}. At ${displayTimestampShort}. with audio, ${asset.file_name} `;
-        }
-        if ((asset as FileAssetType).isVideo()) {
-          return `${headerSenderName}. At ${displayTimestampShort}. with video, ${asset.file_name} `;
-        }
-      case AssetType.IMAGE:
-        return `${headerSenderName}. At ${displayTimestampShort}. with image, ${asset.file_name} `;
-      default:
-        return `${headerSenderName}. ${asset.text} At ${displayTimestampShort}.`;
-    }
-  });
 }
