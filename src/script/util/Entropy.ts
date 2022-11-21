@@ -89,9 +89,13 @@ export class EntropyData {
     return Math.min(entropy * entropyData.length, deltaEntropy * deltaValues.length);
   }
 
-  addFrame(value: EntropyFrame): void {
+  addFrame(value: EntropyFrame, duplicateCheck = true): void {
+    value.x &= 0xff;
+    value.y &= 0xff;
+    value.t &= 0xff;
     // skip duplicate entries
     if (
+      duplicateCheck &&
       this.frames.length > 0 &&
       this.frames[this.frames.length - 1].x === value.x &&
       this.frames[this.frames.length - 1].y === value.y
