@@ -23,7 +23,7 @@ import {randomUUID} from 'crypto';
 
 import {Account} from '@wireapp/core';
 
-import {initMLSConversations} from './MLSConversations';
+import {initMLSConversations, registerUninitializedConversations} from './MLSConversations';
 import {mlsConversationState} from './mlsConversationState';
 
 import {Conversation} from '../entity/Conversation';
@@ -88,7 +88,7 @@ describe('MLSConversations', () => {
       const mlsConversations = createConversations(nbMLSConversations);
       const conversations = [...proteusConversations, teamConversation, ...mlsConversations, selfConversation];
 
-      await initMLSConversations(conversations, new User(), core, {} as any);
+      await registerUninitializedConversations(conversations, new User(), 'client-1', core);
 
       expect(core.service!.mls.registerConversation).toHaveBeenCalledTimes(2);
     });
