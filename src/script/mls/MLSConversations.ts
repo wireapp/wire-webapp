@@ -63,7 +63,6 @@ export async function initMLSConversations(
   });
 
   const mlsConversations = conversations.filter(isMLSConversation);
-  await registerUninitializedConversations(mlsConversations, selfUser, core);
   await joinNewConversations(mlsConversations, core);
 }
 
@@ -89,18 +88,25 @@ async function joinNewConversations(conversations: MLSConversation[], core: Acco
  * @param conversations all the conversations the user is part of
  * @param core instance of the core
  */
-async function registerUninitializedConversations(
-  conversations: MLSConversation[],
+export async function registerUninitializedConversations(
+  conversations: Conversation[],
   selfUser: User,
+  selfClientId: string,
   core: Account,
 ): Promise<void> {
   const uninitializedConversations = conversations.filter(
-    conversation => conversation.epoch === 0 && (isSelfConversation(conversation) || isTeamConversation(conversation)),
+    (conversation): conversation is MLSConversation =>
+      isMLSConversation(conversation) &&
+      conversation.epoch === 0 &&
+      (isSelfConversation(conversation) || isTeamConversation(conversation)),
   );
 
   await Promise.all(
     uninitializedConversations.map(conversation =>
-      core.service?.mls.registerConversation(conversation.groupId, [selfUser]),
+      core.service?.mls.registerConversation(conversation.groupId, [selfUser.qualifiedId], {
+        user: selfUser,
+        client: selfClientId,
+      }),
     ),
   );
 }
