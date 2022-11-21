@@ -259,9 +259,9 @@ export class MLSService {
       ciphersuite: 1, // TODO: Use the correct ciphersuite enum.
     };
 
-    this.coreCryptoClient.createConversation(groupIdBytes, configuration);
+    await this.coreCryptoClient.createConversation(groupIdBytes, configuration);
 
-    const coreCryptoKeyPackagesPayload = await this.getKeyPackagesPayload(
+    const keyPackages = await this.getKeyPackagesPayload(
       users.map(user => {
         if (user.id === creator?.user.id) {
           /**
@@ -274,10 +274,11 @@ export class MLSService {
       }),
     );
 
-    let response;
-    if (coreCryptoKeyPackagesPayload.length !== 0) {
-      response = await this.addUsersToExistingConversation(groupIdBytes, coreCryptoKeyPackagesPayload);
-    }
+    const response =
+      keyPackages.length > 0
+        ? await this.addUsersToExistingConversation(groupIdBytes, keyPackages)
+        : // If there are no clients to add, just update the keying material
+          await this.processCommitAction(groupIdBytes, () => this.coreCryptoClient.updateKeyingMaterial(groupIdBytes));
 
     // We schedule a key material renewal
     this.scheduleKeyMaterialRenewal(groupId);
