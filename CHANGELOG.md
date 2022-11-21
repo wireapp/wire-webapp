@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [37.1.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@37.1.0...@wireapp/core@37.1.1) (2022-11-21)
+
+### Bug Fixes
+
+* Handle case of empty list of users added to a conversation ([#4629](https://github.com/wireapp/wire-web-packages/issues/4629)) ([c64503b](https://github.com/wireapp/wire-web-packages/commit/c64503b784685e5826fd1aa2136170d99b5e32cb))
+
 # [37.1.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@37.0.4...@wireapp/core@37.1.0) (2022-11-16)
 
 ### Features
