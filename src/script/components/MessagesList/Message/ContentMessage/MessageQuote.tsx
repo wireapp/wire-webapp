@@ -187,9 +187,8 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
             <div data-uie-name="media-picture-quote">
               <Image
                 className="message-quote__image"
-                asset={asset.resource()}
-                aspectRatio={asset.ratio}
-                click={(asset, event) => showDetail(quotedMessage, event)}
+                image={asset}
+                onClick={(asset, event) => showDetail(quotedMessage, event)}
               />
             </div>
           )}

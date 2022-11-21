@@ -25,75 +25,89 @@ import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {RestrictedImage} from './asset/RestrictedImage';
+import {useAssetTransfer} from './MessagesList/Message/ContentMessage/asset/AbstractAssetTransferStateTracker';
 import {InViewport} from './utils/InViewport';
 
 import {AssetRemoteData} from '../assets/AssetRemoteData';
-import {AssetRepository} from '../assets/AssetRepository';
+import {Config} from '../Config';
+import {MediumImage} from '../entity/message/MediumImage';
 import {TeamState} from '../team/TeamState';
 
-export interface ImageProps extends React.HTMLProps<HTMLDivElement> {
-  aspectRatio?: number;
-  width?: string;
-  asset: AssetRemoteData;
-  assetRepository?: AssetRepository;
-  click?: (asset: AssetRemoteData, event: React.MouseEvent) => void;
+export interface ImageProps extends Omit<React.HTMLProps<HTMLDivElement>, 'onClick'> {
+  image: MediumImage;
+  onClick?: (asset: AssetRemoteData, event: React.MouseEvent) => void;
+  alt?: string;
   isQuote?: boolean;
   teamState?: TeamState;
 }
 
-const Image: React.FC<ImageProps> = ({
-  asset,
-  click,
+export const Image: React.FC<ImageProps> = ({
+  image,
+  onClick,
   className,
   isQuote = false,
-  assetRepository = container.resolve(AssetRepository),
   teamState = container.resolve(TeamState),
-  aspectRatio,
-  width,
+  alt,
   ...props
 }) => {
   const [isInViewport, setIsInViewport] = useState(false);
 
-  const [assetIsLoading, setAssetIsLoading] = useState<boolean>(false);
   const [assetSrc, setAssetSrc] = useState<string>();
+  const {resource} = useKoSubscribableChildren(image, ['resource']);
+
+  const {loadAsset} = useAssetTransfer();
 
   const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
 
-  const onClick = (event: React.MouseEvent) => {
-    if (!assetIsLoading && typeof click === 'function') {
-      click(asset, event);
-    }
+  const handleClick = (event: React.MouseEvent) => {
+    onClick?.(resource, event);
   };
 
   useEffect(() => {
-    if (isInViewport && isFileSharingReceivingEnabled) {
-      setAssetIsLoading(true);
-      assetRepository.load(asset).then(blob => {
-        if (blob) {
-          setAssetSrc(window.URL.createObjectURL(blob));
+    if (!assetSrc && isInViewport && isFileSharingReceivingEnabled) {
+      let isWaiting = true;
+      (async () => {
+        try {
+          const blob = (await loadAsset(resource)) as Blob;
+          const allowedImageTypes = [
+            'application/octet-stream', // Octet-stream is required to paste images from clipboard
+            ...Config.getConfig().ALLOWED_IMAGE_TYPES,
+          ];
+          if (allowedImageTypes.includes(blob.type)) {
+            if (isWaiting) {
+              setAssetSrc(window.URL.createObjectURL(blob));
+            }
+          } else {
+            throw new Error(`Unsupported image type "${blob.type}".`);
+          }
+        } catch (error) {
+          console.error(error);
         }
-        setAssetIsLoading(false);
-      });
-    }
-    return () => {
-      if (assetSrc) {
-        window.URL.revokeObjectURL(assetSrc);
-      }
-    };
-  }, [asset, assetRepository, isFileSharingReceivingEnabled, isInViewport]);
+      })();
 
-  const style = aspectRatio ? {aspectRatio: `${aspectRatio}`, maxWidth: '100%', width} : undefined;
-  return !isFileSharingReceivingEnabled ? (
-    <RestrictedImage className={className} showMessage={!isQuote} isSmall={isQuote} />
-  ) : (
+      return () => {
+        if (assetSrc) {
+          window.URL.revokeObjectURL(assetSrc);
+        }
+        isWaiting = false;
+      };
+      return undefined;
+    }
+  }, [isInViewport, resource, isFileSharingReceivingEnabled, assetSrc, loadAsset]);
+
+  const style = {aspectRatio: `${image.ratio}`, maxWidth: '100%', width: image.width};
+
+  if (!isFileSharingReceivingEnabled) {
+    return <RestrictedImage className={className} showMessage={!isQuote} isSmall={isQuote} />;
+  }
+
+  return (
     <InViewport onVisible={() => setIsInViewport(true)} className={cx('image-wrapper', className)} {...props}>
       {assetSrc ? (
-        <img style={style} onClick={onClick} src={assetSrc} role="presentation" alt="" />
+        <img style={style} onClick={handleClick} src={assetSrc} role="presentation" alt={alt} />
       ) : (
-        <div style={style} className={cx({'loading-dots': assetIsLoading})}></div>
+        <div style={style} className={cx('loading-dots')}></div>
       )}
     </InViewport>
   );
 };
-
-export {Image};

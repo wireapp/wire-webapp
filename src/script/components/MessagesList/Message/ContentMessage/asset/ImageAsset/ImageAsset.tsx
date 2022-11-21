@@ -17,26 +17,22 @@
  *
  */
 
-import React, {useEffect, useRef, useState} from 'react';
+import React from 'react';
 
 import {CSSObject} from '@emotion/react';
-import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {RestrictedImage} from 'Components/asset/RestrictedImage';
 import {Icon} from 'Components/Icon';
-import {InViewport} from 'Components/utils/InViewport';
+import {Image} from 'Components/Image';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {Config} from '../../../../../../Config';
 import {ContentMessage} from '../../../../../../entity/message/ContentMessage';
 import {MediumImage} from '../../../../../../entity/message/MediumImage';
 import {TeamState} from '../../../../../../team/TeamState';
-import {useMessageFocusedTabIndex} from '../../../util';
 import {AssetLoader} from '../AssetLoader';
-import {AssetUrl, useAssetTransfer} from '../useAssetTransfer';
+import {useAssetTransfer} from '../useAssetTransfer';
 
 export interface ImageAssetProps {
   asset: MediumImage;
@@ -48,53 +44,10 @@ export interface ImageAssetProps {
 
 const MAX_ASSET_WIDTH = 800;
 
-export const ImageAsset = ({
-  asset,
-  message,
-  onClick,
-  teamState = container.resolve(TeamState),
-  isFocusable = true,
-}: ImageAssetProps) => {
-  const [imageUrl, setImageUrl] = useState<AssetUrl>();
-  const {resource} = useKoSubscribableChildren(asset, ['resource']);
+export const ImageAsset = ({asset, message, onClick, teamState = container.resolve(TeamState)}: ImageAssetProps) => {
   const {isObfuscated, visible} = useKoSubscribableChildren(message, ['isObfuscated', 'visible']);
+  const {isUploading, uploadProgress, cancelUpload} = useAssetTransfer(message);
   const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
-  const [isInViewport, setIsInViewport] = useState(false);
-  const {isUploading, uploadProgress, cancelUpload, getAssetUrl} = useAssetTransfer(message);
-  const messageFocusedTabIndex = useMessageFocusedTabIndex(isFocusable);
-
-  /** keeps track of whether the component is mounted or not to avoid setting the image url in case it's not */
-  const isUnmounted = useRef(false);
-
-  useEffect(() => {
-    if (!imageUrl && isInViewport && resource && isFileSharingReceivingEnabled) {
-      (async () => {
-        try {
-          const allowedImageTypes = [
-            'application/octet-stream', // Octet-stream is required to paste images from clipboard
-            ...Config.getConfig().ALLOWED_IMAGE_TYPES,
-          ];
-          const url = await getAssetUrl(resource, allowedImageTypes);
-          if (isUnmounted.current) {
-            // Avoid re-rendering a component that is umounted
-            return;
-          }
-          setImageUrl(url);
-        } catch (error) {
-          console.error(error);
-        }
-      })();
-    }
-  }, [imageUrl, isInViewport, resource, isFileSharingReceivingEnabled, getAssetUrl]);
-
-  useEffect(() => {
-    return () => {
-      isUnmounted.current = true;
-      imageUrl?.dispose();
-    };
-  }, []);
-
-  const dummyImageUrl = `data:image/svg+xml;utf8,<svg aria-hidden="true" xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1' width='${asset.width}' height='${asset.height}'></svg>`;
 
   const imageAltText = t('accessibility.conversationAssetImageAlt', {
     messageDate: `${message.displayTimestampShort()}`,
@@ -127,47 +80,29 @@ export const ImageAsset = ({
 
   return (
     <div data-uie-name="image-asset" css={imageContainerStyle}>
-      {isFileSharingReceivingEnabled ? (
-        <InViewport
-          css={imageAsset}
-          className={cx('image-asset', {
-            'bg-color-ephemeral': isObfuscated,
-            'image-asset--no-image': !isObfuscated && !imageUrl,
-            'loading-dots': !isUploading && !resource && !isObfuscated,
-          })}
-          data-uie-visible={visible && !isObfuscated}
-          data-uie-status={imageUrl ? 'loaded' : 'loading'}
-          onClick={event => onClick(message, event)}
-          onKeyDown={event => handleKeyDown(event, () => onClick(message, event))}
-          tabIndex={messageFocusedTabIndex}
-          role="button"
-          data-uie-name="go-image-detail"
-          aria-label={imageAltText}
-          onVisible={() => setIsInViewport(true)}
-        >
-          {isUploading && (
-            <div className="asset-loader">
-              <AssetLoader loadProgress={uploadProgress} onCancel={cancelUpload} />
-            </div>
-          )}
-
-          {isObfuscated && (
-            <div className="image-icon flex-center full-screen">
-              <Icon.Image />
-            </div>
-          )}
-
-          <img
-            css={imageStyle}
-            data-uie-name="image-asset-img"
-            className={cx({'image-ephemeral': isObfuscated})}
-            src={imageUrl?.url || dummyImageUrl}
-            alt={imageAltText}
-          />
-        </InViewport>
-      ) : (
-        <RestrictedImage />
+      {isUploading && (
+        <div className="asset-loader">
+          <AssetLoader loadProgress={uploadProgress} onCancel={cancelUpload} />
+        </div>
       )}
+
+      {isObfuscated && (
+        <div className="image-icon flex-center full-screen">
+          <Icon.Image />
+        </div>
+      )}
+
+      <Image
+        image={asset}
+        alt={imageAltText}
+        data-uie-visible={visible && !isObfuscated}
+        onClick={event => onClick(message, event)}
+        onKeyDown={event => handleKeyDown(event, onClick.bind(null, message, event))}
+        tabIndex={0}
+        role="button"
+        data-uie-name="go-image-detail"
+        aria-label={imageAltText}
+      />
     </div>
   );
 };

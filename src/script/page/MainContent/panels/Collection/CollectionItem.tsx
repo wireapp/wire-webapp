@@ -40,11 +40,11 @@ const CollectionItem: FC<CollectionItemProps> = ({message, onImageClick}) => {
   const firstAsset = assets[0];
   const {resource} = useKoSubscribableChildren(firstAsset as MediumImage, ['resource']);
 
-  if (isOfCategory('images', message) && resource) {
+  if (isOfCategory('images', message) && firstAsset.isImage() && resource) {
     return (
       <Image
         className="collection-image"
-        asset={resource}
+        image={firstAsset}
         data-uie-name="image-asset"
         click={() => onImageClick?.(message)}
       />
