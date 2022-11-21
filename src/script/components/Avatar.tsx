@@ -154,7 +154,7 @@ const Avatar: FC<AvatarProps> = ({
       avatarSize={avatarSize}
       noBadge={noBadge}
       noFilter={noFilter}
-      handleAvatarInteraction={handleAvatarInteraction}
+      onAvatarInteraction={handleAvatarInteraction}
       participant={participant}
       state={avatarState}
       {...props}
