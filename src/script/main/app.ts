@@ -39,7 +39,7 @@ import {getLogger, Logger} from 'Util/Logger';
 import {includesString} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {appendParameter} from 'Util/UrlUtil';
-import {arrayToBase64, checkIndexedDb, createRandomUuid, supportsMLS} from 'Util/util';
+import {checkIndexedDb, createRandomUuid, supportsMLS} from 'Util/util';
 
 import './globals';
 import {migrateToQualifiedSessionIds} from './sessionIdMigrator';
@@ -83,7 +83,7 @@ import {IntegrationRepository} from '../integration/IntegrationRepository';
 import {IntegrationService} from '../integration/IntegrationService';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {MediaRepository} from '../media/MediaRepository';
-import {mlsConversationState} from '../mls/mlsConversationState';
+import {initMLSConversations} from '../mls';
 import {NotificationRepository} from '../notification/NotificationRepository';
 import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
 import {PermissionRepository} from '../permission/PermissionRepository';
@@ -423,30 +423,7 @@ export class App {
       const conversationEntities = await conversationRepository.loadConversations();
 
       if (supportsMLS()) {
-        // We send external proposal to all the MLS conversations that are in an unknown state (not established nor pendingWelcome)
-        await mlsConversationState.getState().sendExternalToPendingJoin(
-          conversationEntities,
-          groupId => this.core.service!.conversation.isMLSConversationEstablished(groupId),
-          conversationId => this.core.service!.conversation.joinByExternalCommit(conversationId),
-        );
-
-        this.core.configureMLSCallbacks({
-          authorize: groupIdBytes => {
-            const groupId = arrayToBase64(groupIdBytes);
-            const conversation = conversationRepository.findConversationByGroupId(groupId);
-            if (!conversation) {
-              // If the conversation is not found, it means it's being created by the self user, thus they have admin rights
-              return true;
-            }
-            return conversationRepository.conversationRoleRepository.isUserGroupAdmin(conversation, selfUser);
-          },
-          groupIdFromConversationId: async conversationId => {
-            const conversation = await conversationRepository.getConversationById(conversationId);
-            return conversation?.groupId;
-          },
-          // This is enforced by backend, no need to implement this on the client side.
-          userAuthorize: () => true,
-        });
+        await initMLSConversations(conversationEntities, selfUser, this.core, this.repository.conversation);
       }
 
       const connectionEntities = await connectionRepository.getConnections();

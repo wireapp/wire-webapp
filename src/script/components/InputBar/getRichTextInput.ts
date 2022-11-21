@@ -17,6 +17,8 @@
  *
  */
 
+import {escape} from 'underscore';
+
 import {MentionEntity} from '../../message/MentionEntity';
 
 const mentionAttributes = ' class="input-mention" data-uie-name="item-input-mention"';
@@ -47,7 +49,7 @@ const getRichTextInput = (currentMentions: MentionEntity[], inputValue: string) 
 
   return pieces
     .map((piece, index) => {
-      const textPiece = piece.replace(/[\r\n]/g, '<br>');
+      const textPiece = escape(piece).replace(/[\r\n]/g, '<br>');
 
       return `<span${index % 2 ? mentionAttributes : ''}>${textPiece}</span>`;
     })

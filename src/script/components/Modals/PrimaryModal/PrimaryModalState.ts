@@ -156,7 +156,8 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
       content.messageText = t('modalAccountNewDevicesMessage');
       const deviceList = (data as ClientNotificationData[])
         .map(device => {
-          const deviceTime = isValid(device.time) ? device.time : new Date();
+          const deviceDate = new Date(device.time);
+          const deviceTime = isValid(deviceDate) ? new Date(deviceDate) : new Date();
           const formattedDate = formatLocale(deviceTime, 'PP, p');
           const deviceModel = `${t('modalAccountNewDevicesFrom')} ${escape(device.model)}`;
           return `<div>${formattedDate} - UTC</div><div>${deviceModel}</div>`;

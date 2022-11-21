@@ -378,6 +378,7 @@ export const Conversation: FC<ConversationProps> = ({
       id="conversation"
       className={cx('conversation', {[incomingCssClass]: isConversationLoaded, loading: !isConversationLoaded})}
       ref={removeAnimationsClass}
+      key={activeConversation?.id}
     >
       {activeConversation && (
         <>

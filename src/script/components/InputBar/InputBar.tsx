@@ -161,7 +161,6 @@ const InputBar = ({
     'isIncomingRequest',
   ]);
 
-  const isTypingTimerIdRef = useRef<NodeJS.Timeout | null>(null);
   const shadowInputRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -174,6 +173,7 @@ const InputBar = ({
   const [selectionEnd, setSelectionEnd] = useState<number>(0);
   const [pingDisabled, setIsPingDisabled] = useState<boolean>(false);
   const [isTyping, setIsTyping] = useState<boolean>(false);
+  const hasUserTyped = useRef<boolean>(false);
   const [editedMention, setEditedMention] = useState<{startIndex: number; term: string} | undefined>(undefined);
 
   const {rightSidebar} = useAppMainState.getState();
@@ -392,18 +392,31 @@ const InputBar = ({
   }, [editMessageEntity]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (isTypingTimerIdRef.current) {
-      clearTimeout(isTypingTimerIdRef.current);
+    if (!hasUserTyped.current) {
+      return;
     }
-    if (inputValue.trim() !== '') {
+    if (isTyping) {
       conversationRepository.sendTypingStart(conversationEntity);
-    }
-    isTypingTimerIdRef.current = setTimeout(() => {
+    } else {
       conversationRepository.sendTypingStop(conversationEntity);
-      isTypingTimerIdRef.current = null;
+    }
+  }, [isTyping, conversationRepository, conversationEntity]);
+
+  useEffect(() => {
+    if (!hasUserTyped.current) {
+      return () => {};
+    }
+    let timerId: number;
+    if (inputValue.length > 0) {
+      setIsTyping(true);
+      timerId = window.setTimeout(() => setIsTyping(false), CONFIG.IS_TYPING_TIMEOUT);
+    } else {
       setIsTyping(false);
-    }, CONFIG.IS_TYPING_TIMEOUT);
-  }, [isTyping]); // we want to send is typing based on isTyping
+    }
+    return () => {
+      window.clearTimeout(timerId);
+    };
+  }, [inputValue]);
 
   const replyMessage = (messageEntity: ContentMessage): void => {
     if (messageEntity?.isReplyable() && messageEntity !== replyMessageEntity) {
@@ -497,8 +510,8 @@ const InputBar = ({
     event.preventDefault();
 
     const {value: currentValue} = event.currentTarget;
+    hasUserTyped.current = true;
     setInputValue(currentValue);
-    setIsTyping(true);
     const currentValueLength = currentValue.length;
     const previousValueLength = inputValue.length;
     const difference = currentValueLength - previousValueLength;
@@ -554,18 +567,7 @@ const InputBar = ({
     }
   };
 
-  const sendStopTyping = () => {
-    if (isTypingTimerIdRef.current) {
-      conversationRepository.sendTypingStop(conversationEntity);
-      clearTimeout(isTypingTimerIdRef.current);
-      isTypingTimerIdRef.current = null;
-      setIsTyping(false);
-    }
-  };
-
   const onSend = (text: string): void | boolean => {
-    sendStopTyping();
-
     if (pastedFile) {
       return sendPastedFile();
     }
@@ -736,10 +738,8 @@ const InputBar = ({
 
   const sendGiphy = (gifUrl: string, tag: string): void => {
     generateQuote().then(quoteEntity => {
-      if (quoteEntity) {
-        messageRepository.sendGif(conversationEntity, gifUrl, tag, quoteEntity);
-        cancelMessageEditing(true, true);
-      }
+      messageRepository.sendGif(conversationEntity, gifUrl, tag, quoteEntity);
+      cancelMessageEditing(true, true);
     });
   };
 
@@ -759,15 +759,19 @@ const InputBar = ({
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.EDIT, editMessage);
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REPLY, replyMessage);
     amplify.subscribe(WebAppEvents.EXTENSIONS.GIPHY.SEND, sendGiphy);
-    amplify.subscribe(WebAppEvents.SEARCH.HIDE, () => window.requestAnimationFrame(() => textareaRef.current?.focus()));
     amplify.subscribe(WebAppEvents.SHORTCUT.PING, onPingClick);
 
     return () => {
       amplify.unsubscribeAll(WebAppEvents.SHORTCUT.PING);
+      amplify.unsubscribeAll(WebAppEvents.CONVERSATION.IMAGE.SEND);
+      amplify.unsubscribeAll(WebAppEvents.CONVERSATION.MESSAGE.EDIT);
+      amplify.unsubscribeAll(WebAppEvents.CONVERSATION.MESSAGE.REPLY);
+      amplify.unsubscribeAll(WebAppEvents.EXTENSIONS.GIPHY.SEND);
     };
   }, []);
 
   useEffect(() => {
+    hasUserTyped.current = false;
     loadInitialStateForConversation();
   }, [conversationEntity]);
 
@@ -925,7 +929,7 @@ const InputBar = ({
                     onInput={updateMentions}
                     onChange={onChange}
                     onPaste={onPasteFiles}
-                    onBlur={sendStopTyping}
+                    onBlur={() => setIsTyping(false)}
                     value={inputValue}
                     placeholder={inputPlaceholder}
                     aria-label={inputPlaceholder}
