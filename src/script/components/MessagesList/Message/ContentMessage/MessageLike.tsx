@@ -29,9 +29,10 @@ export interface MessageLikeProps {
   className?: string;
   message: ContentMessage;
   onLike: (message: ContentMessage, button?: boolean) => void;
+  focusConversation: boolean;
 }
 
-const MessageLike: React.FC<MessageLikeProps> = ({message, onLike, className}) => {
+const MessageLike: React.FC<MessageLikeProps> = ({message, onLike, className, focusConversation}) => {
   const {is_liked: isLiked} = useKoSubscribableChildren(message, ['is_liked']);
 
   return (
@@ -47,6 +48,7 @@ const MessageLike: React.FC<MessageLikeProps> = ({message, onLike, className}) =
       aria-label={t(isLiked ? 'accessibility.messages.liked' : 'accessibility.messages.like')}
       onClick={() => onLike(message)}
       type="button"
+      tabIndex={focusConversation ? 0 : -1}
     >
       <span className="icon-like-small"></span>
       <span className="icon-liked-small"></span>

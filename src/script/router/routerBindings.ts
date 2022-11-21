@@ -28,17 +28,24 @@ import {useAppMainState, ViewType} from '../page/state';
 export const createNavigate =
   (link: string): React.MouseEventHandler =>
   (event: React.MouseEvent<Element, MouseEvent>) => {
-    const {responsiveView} = useAppMainState.getState();
-    responsiveView.setCurrentView(ViewType.CENTRAL_COLUMN);
+    setResponsiveView();
     navigate(link);
     event.preventDefault();
   };
 
 export const createNavigateKeyboard =
-  (link: string): React.KeyboardEventHandler =>
+  (link: string, setIsResponsive = false): React.KeyboardEventHandler =>
   (event: React.KeyboardEvent<Element>) => {
+    if (setIsResponsive) {
+      setResponsiveView();
+    }
     if (event.key === KEY.ENTER || event.key === KEY.SPACE) {
-      navigate(link);
+      navigate(link, {eventKey: event.key});
       event.preventDefault();
     }
   };
+
+export const setResponsiveView = () => {
+  const {responsiveView} = useAppMainState.getState();
+  responsiveView.setCurrentView(ViewType.CENTRAL_COLUMN);
+};
