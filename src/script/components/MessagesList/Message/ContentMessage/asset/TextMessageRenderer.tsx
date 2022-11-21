@@ -70,7 +70,7 @@ export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
     const markdownLinkTargets = [...containerRef.current.querySelectorAll('[data-md-link]')];
     const hasMentions = asset && asset.mentions().length;
     const msgMention = hasMentions
-      ? containerRef.current && [...containerRef.current.querySelectorAll('.message-mention')]
+      ? [...containerRef.current.querySelectorAll('.message-mention')]
       : [];
 
     const handleKeyEvent = (event: KeyboardEvent, elementType: ElementType) => {
