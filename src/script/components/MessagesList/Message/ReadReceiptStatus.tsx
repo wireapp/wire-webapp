@@ -32,6 +32,7 @@ export interface ReadReceiptStatusProps {
   isLastDeliveredMessage: boolean;
   message: Message;
   onClickReceipts?: (message: Message) => void;
+  focusConversation: boolean;
 }
 
 const ReadReceiptStatus: React.FC<ReadReceiptStatusProps> = ({
@@ -39,6 +40,7 @@ const ReadReceiptStatus: React.FC<ReadReceiptStatusProps> = ({
   onClickReceipts,
   is1to1Conversation,
   isLastDeliveredMessage,
+  focusConversation,
 }) => {
   const [readReceiptText, setReadReceiptText] = useState('');
   const [readReceiptTooltip, setReadReceiptTooltip] = useState('');
@@ -70,6 +72,7 @@ const ReadReceiptStatus: React.FC<ReadReceiptStatusProps> = ({
       {showEyeIndicator && (
         <button
           type="button"
+          tabIndex={focusConversation ? 0 : -1}
           className={cx('button-reset-default', 'message-status-read', {
             'message-status-read--clickable': !is1to1Conversation,
             'message-status-read--visible': isLastDeliveredMessage,

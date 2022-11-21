@@ -32,9 +32,16 @@ export interface MessageFooterLikeProps {
   message: ContentMessage;
   onClickLikes: (message: Message) => void;
   onLike: (message: ContentMessage, button?: boolean) => void;
+  focusConversation: boolean;
 }
 
-const MessageFooterLike: React.FC<MessageFooterLikeProps> = ({message, is1to1Conversation, onLike, onClickLikes}) => {
+const MessageFooterLike: React.FC<MessageFooterLikeProps> = ({
+  message,
+  is1to1Conversation,
+  onLike,
+  onClickLikes,
+  focusConversation,
+}) => {
   const {like_caption: likeCaption, reactions_user_ids: reactionsUserIds} = useKoSubscribableChildren(message, [
     'is_liked',
     'like_caption',
@@ -44,7 +51,7 @@ const MessageFooterLike: React.FC<MessageFooterLikeProps> = ({message, is1to1Con
   return (
     <div className="message-footer">
       <div className="message-footer-icon">
-        <MessageLike className="like-button" message={message} onLike={onLike} />
+        <MessageLike className="like-button" message={message} onLike={onLike} focusConversation={focusConversation} />
       </div>
       <button
         type="button"
@@ -52,6 +59,7 @@ const MessageFooterLike: React.FC<MessageFooterLikeProps> = ({message, is1to1Con
           'cursor-pointer': !is1to1Conversation,
         })}
         onClick={is1to1Conversation ? undefined : () => onClickLikes(message)}
+        tabIndex={focusConversation ? 0 : -1}
       >
         <span className="message-footer-text" data-uie-name="message-liked-names" data-uie-value={reactionsUserIds}>
           {likeCaption}

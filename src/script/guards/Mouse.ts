@@ -17,7 +17,4 @@
  *
  */
 
-import {MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyboardEvent} from 'react';
-
-export const isMouseEvent = (event: ReactMouseEvent | ReactKeyboardEvent): event is ReactMouseEvent =>
-  event.type === 'click';
+export const isMouseEvent = (event: MouseEvent | KeyboardEvent): event is MouseEvent => event.type === 'click';

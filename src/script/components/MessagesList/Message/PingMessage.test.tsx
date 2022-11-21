@@ -43,6 +43,7 @@ describe('PingMessage', () => {
     const sender = 'sender';
 
     const props = {
+      focusConversation: true,
       is1to1Conversation: false,
       isLastDeliveredMessage: false,
       message: createPingMessage({
