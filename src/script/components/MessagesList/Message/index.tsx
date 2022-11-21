@@ -27,6 +27,7 @@ import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getMessageMarkerType, MessageMarkerType} from 'Util/conversationMessages';
 import {isTabKey} from 'Util/KeyboardUtil';
+import {getAllFocusableElements, setElementTabIndex} from 'Util/util';
 
 import {ElementType} from './ContentMessage/asset/TextMessageRenderer';
 import {MessageTime} from './MessageTime';
@@ -97,6 +98,7 @@ const Message: React.FC<
     focusConversation,
     handleFocus,
     handleArrowKeyDown,
+    index,
   } = props;
   const messageElementRef = useRef<HTMLDivElement>(null);
   const messageRef = useRef<HTMLDivElement>(null);
@@ -115,6 +117,9 @@ const Message: React.FC<
     }
     if (isMarked) {
       scrollTo?.({center: true, element: messageElementRef.current});
+
+      // for reply message, focus on the original message when original message link is clicked for keyboard users
+      handleFocus(index);
     } else if (markerType === MessageMarkerType.UNREAD) {
       scrollTo?.({element: messageElementRef.current}, true);
     }
@@ -143,7 +148,12 @@ const Message: React.FC<
     if (focusConversation) {
       messageRef.current?.focus();
     }
-  }, [focusConversation]);
+
+    if (messageRef.current) {
+      const interactiveMsgElements = getAllFocusableElements(messageRef.current);
+      setElementTabIndex(interactiveMsgElements, focusConversation);
+    }
+  }, [focusConversation, message]);
 
   const getTimestampClass = (): string => {
     const classes = {
