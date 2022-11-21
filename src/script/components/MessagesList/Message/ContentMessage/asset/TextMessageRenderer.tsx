@@ -66,7 +66,7 @@ export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
     if (!containerRef.current) {
       return undefined;
     }
-    const emailLinks = containerRef.current && [...containerRef.current.querySelectorAll('[data-email-link]')];
+    const emailLinks =  [...containerRef.current.querySelectorAll('[data-email-link]')];
     const markdownLinkTargets = [...containerRef.current.querySelectorAll('[data-md-link]')];
     const hasMentions = asset && asset.mentions().length;
     const msgMention = hasMentions
