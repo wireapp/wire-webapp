@@ -18,11 +18,11 @@
  */
 
 import {fireEvent, render} from '@testing-library/react';
-import ko from 'knockout';
 
 import {PROTO_MESSAGE_TYPE} from 'src/script/cryptography/ProtoMessageType';
 import {LinkPreview} from 'src/script/entity/message/LinkPreview';
-import type {Text} from 'src/script/entity/message/Text';
+import {Text} from 'src/script/entity/message/Text';
+import {createRandomUuid} from 'Util/util';
 
 import {TextMessageRenderer} from './TextMessageRenderer';
 
@@ -36,25 +36,10 @@ const mention = {
   userId: '1',
 };
 
-const asset: Text = {
-  isAudio: jest.fn(),
-  isButton: jest.fn(),
-  isDownloadable: jest.fn(),
-  isFile: jest.fn(),
-  isImage: jest.fn(),
-  isLocation: jest.fn(),
-  isText: jest.fn(),
-  isUserMentioned: jest.fn(),
-  isVideo: jest.fn(),
-  key: '1234',
-  mentions: ko.observableArray([new MentionEntity(mention.startIndex, mention.length, mention.userId, mention.domain)]),
-  previews: ko.observableArray([new LinkPreview()]),
-  render: jest.fn(),
-  should_render_text: ko.pureComputed(jest.fn()),
-  size: '',
-  text: 'this is a default txt message',
-  type: 'text',
-};
+const textAsset = new Text(createRandomUuid());
+textAsset.mentions([new MentionEntity(mention.startIndex, mention.length, mention.userId, mention.domain)]);
+textAsset.previews([new LinkPreview()]);
+
 describe('TextMessageRenderer', () => {
   it('renders a text message', () => {
     const onClickElement = jest.fn();
@@ -65,7 +50,7 @@ describe('TextMessageRenderer', () => {
         onMessageClick={onClickElement}
         isCurrentConversationFocused
         msgClass=""
-        asset={asset}
+        asset={textAsset}
       />,
     );
     const txtMsgElement = getByText(txtMsg);
@@ -87,7 +72,7 @@ describe('TextMessageRenderer', () => {
         onMessageClick={onClickElement}
         isCurrentConversationFocused
         msgClass=""
-        asset={asset}
+        asset={textAsset}
       />,
     );
     const mention = getByTestId('label-other-mention');
@@ -103,7 +88,7 @@ describe('TextMessageRenderer', () => {
 
     const linkTxt = 'this is a link';
     const text = `<a href="https://link.com" target="_blank" rel="nofollow noopener noreferrer" data-md-link="true" data-uie-name="markdown-link">${linkTxt}</a>`;
-    asset.text = linkTxt;
+    textAsset.text = linkTxt;
 
     const {getByText} = render(
       <TextMessageRenderer
@@ -111,7 +96,7 @@ describe('TextMessageRenderer', () => {
         onMessageClick={onClickElement}
         isCurrentConversationFocused
         msgClass=""
-        asset={asset}
+        asset={textAsset}
       />,
     );
     const linkElem = getByText(linkTxt);
@@ -129,7 +114,7 @@ describe('TextMessageRenderer', () => {
 
     const linkTxt = 'this is a link';
     const text = `<a href="https://link.com" target="_blank" rel="nofollow noopener noreferrer" data-md-link="true" data-uie-name="markdown-link">${linkTxt}</a>`;
-    asset.text = linkTxt;
+    textAsset.text = linkTxt;
 
     const {getByText} = render(
       <TextMessageRenderer
@@ -137,7 +122,7 @@ describe('TextMessageRenderer', () => {
         onMessageClick={onClickElement}
         isCurrentConversationFocused={false}
         msgClass=""
-        asset={asset}
+        asset={textAsset}
       />,
     );
     const linkElem = getByText(linkTxt);

@@ -17,9 +17,10 @@
  *
  */
 
-import {FC, HTMLProps, MouseEvent as ReactMouseEvent} from 'react';
+import {FC, HTMLProps, MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent} from 'react';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {handleKeyDown} from 'Util/KeyboardUtil';
 
 import {ServiceAvatar} from './avatar/ServiceAvatar';
 import {TemporaryGuestAvatar} from './avatar/TemporaryGuestAvatar';
@@ -86,9 +87,16 @@ const Avatar: FC<AvatarProps> = ({
   participant,
   ...props
 }) => {
-  const clickHandler = (event: ReactMouseEvent<HTMLDivElement, MouseEvent>) => {
-    if (event.currentTarget.parentNode) {
-      onAvatarClick?.(participant, event.currentTarget.parentNode);
+  const handleAvatarInteraction = (
+    event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>,
+  ) => {
+    const parentNode = event.currentTarget.parentNode;
+    if (parentNode) {
+      if ('key' in event) {
+        handleKeyDown(event, () => onAvatarClick?.(participant, parentNode));
+        return;
+      }
+      onAvatarClick?.(participant, parentNode);
     }
   };
 
@@ -131,7 +139,7 @@ const Avatar: FC<AvatarProps> = ({
       <TemporaryGuestAvatar
         avatarSize={avatarSize}
         noBadge={noBadge}
-        onClick={clickHandler}
+        onClick={handleAvatarInteraction}
         participant={participant}
         state={avatarState}
         {...props}
@@ -144,7 +152,7 @@ const Avatar: FC<AvatarProps> = ({
       avatarSize={avatarSize}
       noBadge={noBadge}
       noFilter={noFilter}
-      onClick={clickHandler}
+      handleAvatarInteraction={handleAvatarInteraction}
       participant={participant}
       state={avatarState}
       {...props}

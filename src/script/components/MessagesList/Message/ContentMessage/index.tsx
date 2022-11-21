@@ -29,7 +29,7 @@ import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {Message} from 'src/script/entity/message/Message';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getMessageAriaLabel} from 'Util/conversationMessages';
-import {isTabKey, KEY} from 'Util/KeyboardUtil';
+import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {setContextMenuPosition} from 'Util/util';
 
@@ -163,12 +163,6 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
     if ([KEY.SPACE, KEY.ENTER].includes(event.key)) {
       const newEvent = setContextMenuPosition(event);
       showContextMenu(newEvent, menuEntries, 'message-options-menu');
-    }
-
-    // context menu is the last tabbale element of a message, next tab press should
-    // focus on the message input bar
-    if (isTabKey(event)) {
-      handleFocus(totalMessage - 1);
     }
   };
 

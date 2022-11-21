@@ -67,37 +67,11 @@ export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
       return undefined;
     }
     const emailLinks = containerRef.current && [...containerRef.current.querySelectorAll('[data-email-link]')];
-    const linkTargets = containerRef.current && [...containerRef.current.querySelectorAll('a[data-md-link]')];
-    const msgLinkTargets = containerRef.current && [...containerRef.current.querySelectorAll('[data-uie-name]')];
+    const markdownLinkTargets = containerRef.current && [...containerRef.current.querySelectorAll('[data-md-link]')];
     const hasMentions = asset && asset.mentions().length;
     const msgMention = hasMentions
       ? containerRef.current && [...containerRef.current.querySelectorAll('.message-mention')]
-      : null;
-
-    // set tabindex for each interactive element based on the element focus state
-    if (msgMention) {
-      msgMention.forEach(mention => {
-        mention.setAttribute('tabindex', isCurrentConversationFocused ? '0' : '-1');
-      });
-    }
-
-    if (linkTargets.length) {
-      linkTargets.forEach(link => {
-        link.setAttribute('tabindex', isCurrentConversationFocused ? '0' : '-1');
-      });
-    }
-
-    if (msgLinkTargets.length) {
-      msgLinkTargets.forEach(link => {
-        link.setAttribute('tabindex', isCurrentConversationFocused ? '0' : '-1');
-      });
-    }
-
-    if (emailLinks.length) {
-      emailLinks?.forEach(emailLink => {
-        emailLink.setAttribute('tabindex', isCurrentConversationFocused ? '0' : '-1');
-      });
-    }
+      : [];
 
     const handleKeyEvent = (event: KeyboardEvent, elementType: ElementType) => {
       if (isCurrentConversationFocused) {
@@ -105,59 +79,38 @@ export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
       }
     };
 
-    const handleClickEmail = (event: Event) => {
-      return event.type === 'keydown'
-        ? handleKeyEvent(event as KeyboardEvent, 'email')
-        : onMessageClick(asset, event as MouseEvent, 'email');
-    };
-    emailLinks?.forEach(emailLink => {
-      events.forEach(eventName => {
-        emailLink.addEventListener(eventName, handleClickEmail);
+    function addEventListener(elements: Element[], elementType: ElementType) {
+      elements?.forEach(element => {
+        events.forEach(eventName => {
+          element.addEventListener(eventName, event => {
+            if (eventName === 'keydown') {
+              handleKeyEvent(event as KeyboardEvent, elementType);
+              return;
+            }
+            onMessageClick(asset, event as MouseEvent, elementType);
+          });
+        });
       });
-    });
+    }
 
-    const handleClickLink = (event: Event) => {
-      return event.type === 'keydown'
-        ? handleKeyEvent(event as KeyboardEvent, 'markdownLink')
-        : onMessageClick(asset, event as MouseEvent, 'markdownLink');
-    };
-
-    linkTargets?.forEach(msgLink => {
-      events.forEach(eventName => {
-        msgLink.addEventListener(eventName, handleClickLink);
+    function removeEventListener(elements: Element[], elementType: ElementType) {
+      elements?.forEach(element => {
+        events.forEach(eventName => {
+          element.removeEventListener(eventName, event => {
+            onMessageClick(asset, event as MouseEvent, elementType);
+          });
+        });
       });
-    });
+    }
 
-    const handleClickMention = (event: Event) => {
-      return event.type === 'keydown'
-        ? handleKeyEvent(event as KeyboardEvent, 'mention')
-        : onMessageClick(asset, event as MouseEvent, 'mention');
-    };
-
-    msgMention?.forEach(mention => {
-      events.forEach(eventName => {
-        mention.addEventListener(eventName, handleClickMention);
-      });
-    });
+    addEventListener(emailLinks, 'email');
+    addEventListener(markdownLinkTargets, 'markdownLink');
+    addEventListener(msgMention, 'mention');
 
     return () => {
-      emailLinks?.forEach(emailLink => {
-        events.forEach(eventName => {
-          emailLink.removeEventListener(eventName, handleClickEmail);
-        });
-      });
-
-      linkTargets?.forEach(msgLink => {
-        events.forEach(eventName => {
-          msgLink.removeEventListener(eventName, handleClickLink);
-        });
-      });
-
-      msgMention?.forEach(mention => {
-        events.forEach(eventName => {
-          mention.removeEventListener(eventName, handleClickMention);
-        });
-      });
+      removeEventListener(emailLinks, 'email');
+      removeEventListener(markdownLinkTargets, 'markdownLink');
+      removeEventListener(msgMention, 'mention');
     };
   }, [onMessageClick, asset, isCurrentConversationFocused, containerRef]);
 
