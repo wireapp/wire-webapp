@@ -20,7 +20,7 @@
 export interface EntropyFrame {
   x: number;
   y: number;
-  t?: number;
+  t: number;
 }
 
 /**
@@ -74,7 +74,7 @@ export class EntropyData {
       this.frames.reduce((acc: number[], val: EntropyFrame) => {
         acc.push(val.x);
         acc.push(val.y);
-        acc.push(val.t || 0);
+        acc.push(val.t);
         return acc;
       }, []),
     );
