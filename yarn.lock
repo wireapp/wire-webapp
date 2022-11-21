@@ -4365,9 +4365,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/react-ui-kit@npm:9.0.12":
-  version: 9.0.12
-  resolution: "@wireapp/react-ui-kit@npm:9.0.12"
+"@wireapp/react-ui-kit@file:.yalc/@wireapp/react-ui-kit::locator=wire-webapp%40workspace%3A.":
+  version: 9.0.6
+  resolution: "@wireapp/react-ui-kit@file:.yalc/@wireapp/react-ui-kit#.yalc/@wireapp/react-ui-kit::hash=5aef06&locator=wire-webapp%40workspace%3A."
   dependencies:
     "@types/color": 3.0.3
     color: 4.2.3
@@ -4382,7 +4382,7 @@ __metadata:
   peerDependenciesMeta:
     "@types/react":
       optional: true
-  checksum: 37bf430631892dea613fa94f2e8f887fe55b72e6eb31e6b51bfa3c6f5c10390aa519b15dc02c4604f8d2c2c3d5edbb7ad049cc98af65f11f59054a3156c54b87
+  checksum: 9351f0c8a27f8e4cc7d255d66d017800f82012c264f77ff19f2ef3ddb7bc7e9a6398913aa2036e7fac2eef3665802c95ffcb10d9df21d36b21c0ce3a8ef55d47
   languageName: node
   linkType: hard
 
@@ -4416,6 +4416,13 @@ __metadata:
   dependencies:
     "@types/node": ~14
   checksum: bfe5e4522127eb0edcceabdc5c8e2dafc33a8dfa2a984364e1057e5a4784ea1a0e43c1ad760f9d49f40ab9e72db33b2fa24a073e76c53417b14f291c69f0906e
+  languageName: node
+  linkType: hard
+
+"@wireapp/store-engine@npm:^5.0.3":
+  version: 5.0.3
+  resolution: "@wireapp/store-engine@npm:5.0.3"
+  checksum: 3e2bff6c318911f3f75298a4a60b1ca4b83bc90d71bdc3bd1f41ffa75ece47ed70316612f7847e9c2436981fb8d8cf6f31cb31540f4319b481b537a69f42dce8
   languageName: node
   linkType: hard
 
@@ -16522,7 +16529,7 @@ __metadata:
     "@wireapp/core": 37.2.0
     "@wireapp/eslint-config": 2.1.0
     "@wireapp/prettier-config": 0.5.2
-    "@wireapp/react-ui-kit": 9.0.12
+    "@wireapp/react-ui-kit": "file:.yalc/@wireapp/react-ui-kit"
     "@wireapp/store-engine": ^5.0.3
     "@wireapp/store-engine-dexie": 2.0.3
     "@wireapp/store-engine-sqleet": 1.8.9

@@ -51,8 +51,8 @@ export enum FontSizePreference {
   L = '18px',
   XL = '20px',
   XXL = '24px',
-  XXXL = '30px',
-  XXXXL = '36px',
+  //XXXL = '30px',
+  //XXXXL = '36px',
 }
 
 const fontSizes = Object.values(FontSizePreference);
@@ -192,7 +192,7 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
             <RangeInput
               css={{margin: '16px', width: '100%'}}
               min={'0'}
-              max={'8'}
+              max={'6'}
               value={optionFontSize}
               label={'font size'}
               minValueLabel={'small'}
