@@ -113,7 +113,9 @@ const Avatar: FC<AvatarProps> = ({
     ]);
 
   if (isServiceEntity(participant)) {
-    return <ServiceAvatar avatarSize={avatarSize} participant={participant} onClick={clickHandler} {...props} />;
+    return (
+      <ServiceAvatar avatarSize={avatarSize} participant={participant} onClick={handleAvatarInteraction} {...props} />
+    );
   }
 
   const isMe = participant?.isMe;
