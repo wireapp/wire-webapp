@@ -79,16 +79,16 @@ export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
       }
     };
 
+    const handleMsgEvent = (event: Event) => {
+      return event.type === 'keydown'
+        ? handleKeyEvent(event as KeyboardEvent, 'mention')
+        : onMessageClick(asset, event as MouseEvent, 'mention');
+    };
+
     function addEventListener(elements: Element[], elementType: ElementType) {
       elements?.forEach(element => {
         events.forEach(eventName => {
-          element.addEventListener(eventName, event => {
-            if (eventName === 'keydown') {
-              handleKeyEvent(event as KeyboardEvent, elementType);
-              return;
-            }
-            onMessageClick(asset, event as MouseEvent, elementType);
-          });
+          element.addEventListener(eventName, handleMsgEvent);
         });
       });
     }
@@ -96,9 +96,7 @@ export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
     function removeEventListener(elements: Element[], elementType: ElementType) {
       elements?.forEach(element => {
         events.forEach(eventName => {
-          element.removeEventListener(eventName, event => {
-            onMessageClick(asset, event as MouseEvent, elementType);
-          });
+          element.removeEventListener(eventName, handleMsgEvent);
         });
       });
     }
