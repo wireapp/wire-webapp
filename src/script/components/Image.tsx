@@ -32,7 +32,7 @@ import {AssetRepository} from '../assets/AssetRepository';
 import {TeamState} from '../team/TeamState';
 
 export interface ImageProps extends React.HTMLProps<HTMLDivElement> {
-  aspectRatio?: string;
+  aspectRatio?: number;
   width?: string;
   asset: AssetRemoteData;
   assetRepository?: AssetRepository;
@@ -82,7 +82,7 @@ const Image: React.FC<ImageProps> = ({
     };
   }, [asset, assetRepository, assetSrc, isFileSharingReceivingEnabled, isInViewport]);
 
-  const style = aspectRatio ? {aspectRatio: aspectRatio, maxWidth: '100%', width} : undefined;
+  const style = aspectRatio ? {aspectRatio: `${aspectRatio}`, maxWidth: '100%', width} : undefined;
   return !isFileSharingReceivingEnabled ? (
     <RestrictedImage className={className} showMessage={!isQuote} isSmall={isQuote} />
   ) : (

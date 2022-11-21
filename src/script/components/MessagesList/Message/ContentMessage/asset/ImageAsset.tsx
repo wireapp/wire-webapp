@@ -88,10 +88,7 @@ const ImageAsset: React.FC<ImageAssetProps> = ({asset, message, onClick, teamSta
   });
 
   return (
-    <div
-      data-uie-name="image-asset"
-      style={{aspectRatio: asset.ratio.toString(), maxWidth: '100%', width: asset.width}}
-    >
+    <div data-uie-name="image-asset" style={{aspectRatio: `${asset.ratio}`, maxWidth: '100%', width: asset.width}}>
       {isFileSharingReceivingEnabled ? (
         <InViewport
           className={cx('image-asset', {
