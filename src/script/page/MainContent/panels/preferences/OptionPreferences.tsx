@@ -51,9 +51,19 @@ export enum FontSizePreference {
   L = '18px',
   XL = '20px',
   XXL = '24px',
-  //XXXL = '30px',
-  //XXXXL = '36px',
+  // XXXL = '30px',
+  // XXXXL = '36px',
 }
+
+// const dataListOptions = [
+//   {value: 10, label: '10px', heading: 'Small'},
+//   {value: 12, label: '12px'},
+//   {value: 14, label: '14px'},
+//   {value: 16, label: '16px', heading: 'Default'},
+//   {value: 18, label: '18px'},
+//   {value: 20, label: '20px'},
+//   {value: 24, label: '24px', heading: 'Large'},
+// ];
 
 const fontSizes = Object.values(FontSizePreference);
 
@@ -200,6 +210,16 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
               step={'1'}
               onChange={saveOptionFontSize}
             ></RangeInput>
+            {/* <IndicatorRangeInput
+              css={{margin: '16px', width: '100%'}}p
+              min={'0'}
+              max={'6'}
+              value={optionFontSize}
+              label={'font size'}
+              step={'1'}
+              onChange={saveOptionFontSize}
+              dataListOptions={dataListOptions}
+            ></IndicatorRangeInput> */}
             <Checkbox
               tabIndex={0}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
