@@ -137,6 +137,7 @@ export const Checkbox: React.FC<CheckboxProps> = React.forwardRef<HTMLInputEleme
     ref,
   ) => {
     const inputId = useId();
+
     return (
       <div
         css={(theme: Theme) => ({
@@ -170,7 +171,7 @@ export const Checkbox: React.FC<CheckboxProps> = React.forwardRef<HTMLInputEleme
         />
 
         <StyledLabel
-          htmlFor={id}
+          htmlFor={id ?? inputId}
           disabled={disabled}
           markInvalid={markInvalid}
           aligncenter={aligncenter}
