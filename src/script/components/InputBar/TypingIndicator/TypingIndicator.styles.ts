@@ -22,18 +22,19 @@ import {css, CSSObject, keyframes} from '@emotion/react';
 export const wrapperStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
-  marginBottom: '12px',
-  marginLeft: '18px',
+  marginBottom: 5,
+  marginLeft: 18,
   color: 'var(--text-input-placeholder)',
-  fontSize: '14px',
+  fontSize: 11,
   fontWeight: 500,
 };
 
 export const indicatorAnimationWrapperStyles: CSSObject = {
   width: 38,
   height: 16,
-  marginLeft: 4,
+  marginLeft: 2,
   position: 'relative',
+  bottom: 3,
 };
 
 const animationStyles: CSSObject = {
@@ -47,8 +48,8 @@ const animationStyles: CSSObject = {
 const dotStyles: CSSObject = {
   ...animationStyles,
   position: 'absolute',
-  width: 4,
-  height: 4,
+  width: 2,
+  height: 2,
   backgroundColor: 'var(--text-input-placeholder)',
   borderRadius: '100%',
   bottom: 0,
@@ -60,11 +61,11 @@ const editIconKeyFrams = keyframes({
   '0%': {
     transform: 'translateX(0px) rotate(0deg)',
   },
-  '9%': {transform: 'translateX(5px) rotate(-5deg)'},
-  '34%': {transform: 'translateX(10px) rotate(5deg)'},
-  '59%': {transform: 'translateX(15px) rotate(-5deg)'},
-  '84%': {transform: 'translateX(25px) rotate(5deg)'},
-  '100%': {transform: 'translateX(25px) rotate(5deg)'},
+  '9%': {transform: 'translateX(2px) rotate(-5deg)'},
+  '34%': {transform: 'translateX(5px) rotate(5deg)'},
+  '59%': {transform: 'translateX(7px) rotate(-5deg)'},
+  '84%': {transform: 'translateX(12px) rotate(5deg)'},
+  '100%': {transform: 'translateX(12px) rotate(5deg)'},
 });
 
 const dot1KeyFrames = keyframes({
@@ -92,8 +93,8 @@ export const editIconStyles = css`
   animation: ${editIconKeyFrams};
   bottom: 0;
   fill: var(--text-input-placeholder);
-  position: absolute;
   ${animationStyles}
+  position: absolute;
 `;
 
 export const dotOneStyles = css`
@@ -104,12 +105,17 @@ export const dotOneStyles = css`
 
 export const dotTwoStyles = css`
   animation: ${dot2KeyFrames};
-  left: 8px;
+  left: 4px;
   ${dotStyles};
 `;
 
 export const dotThreeStyles = css`
   animation: ${dot3KeyFrames};
-  left: 16px;
+  left: 8px;
   ${dotStyles};
+`;
+
+export const indicatorTitleStyles = css`
+  position: relative;
+  top: 1px;
 `;
