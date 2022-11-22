@@ -37,6 +37,7 @@ import {
 } from '../../../notification/PreferenceNotificationRepository';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {ContentViewModel} from '../../../view_model/ContentViewModel';
+import {ANIMATED_PAGE_TRANSITION_DURATION} from '../../MainContent';
 import {useAppMainState, ViewType} from '../../state';
 import {ContentState, useAppState} from '../../useAppState';
 
@@ -127,6 +128,15 @@ const Preferences: React.FC<PreferencesProps> = ({
   const onClickSelect = (item: typeof items[number]) => {
     setCurrentView(ViewType.CENTRAL_COLUMN);
     contentViewModel.switchContent(item.id);
+
+    setTimeout(() => {
+      const nextElementToFocus = document
+        ?.getElementById('center-column')
+        ?.querySelector("[tabindex='0']") as HTMLElement | null;
+      if (nextElementToFocus) {
+        nextElementToFocus.focus();
+      }
+    }, ANIMATED_PAGE_TRANSITION_DURATION + 1);
   };
 
   useEffect(() => {

@@ -49,8 +49,10 @@ import {PanelState} from '../RightSidebar';
 import {RootContext} from '../RootProvider';
 import {ContentState, useAppState} from '../useAppState';
 
+export const ANIMATED_PAGE_TRANSITION_DURATION = 500;
+
 const Animated: FC<{children: ReactNode}> = ({children, ...rest}) => (
-  <CSSTransition classNames="slide-in-left" timeout={{enter: 500}} {...rest}>
+  <CSSTransition classNames="slide-in-left" timeout={{enter: ANIMATED_PAGE_TRANSITION_DURATION}} {...rest}>
     {children}
   </CSSTransition>
 );
