@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [22.7.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@22.6.1...@wireapp/api-client@22.7.0) (2022-11-22)
+
+### Features
+
+* paginated member api ([#4620](https://github.com/wireapp/wire-web-packages/issues/4620)) ([0f66119](https://github.com/wireapp/wire-web-packages/commit/0f6611937655d6071ea6efa75907e1e5863d5918))
+
 ## [22.6.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@22.6.0...@wireapp/api-client@22.6.1) (2022-11-21)
 
 **Note:** Version bump only for package @wireapp/api-client
