@@ -38,6 +38,7 @@ export interface MediaButtonProps {
   play: () => void;
   transferState: AssetTransferState;
   uploadProgress: number;
+  isCurrentConversationFocused?: boolean;
 }
 
 const MediaButton: React.FC<MediaButtonProps> = ({
@@ -49,6 +50,7 @@ const MediaButton: React.FC<MediaButtonProps> = ({
   play,
   pause = noop,
   cancel = noop,
+  isCurrentConversationFocused = true,
 }) => {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const onPlay = () => setIsPlaying(true);
@@ -85,6 +87,7 @@ const MediaButton: React.FC<MediaButtonProps> = ({
           onClick={play}
           data-uie-name="do-play-media"
           aria-label={t('mediaBtnPlay')}
+          tabIndex={isCurrentConversationFocused ? 0 : -1}
         />
       )}
       {isUploaded && isPlaying && (
@@ -94,6 +97,7 @@ const MediaButton: React.FC<MediaButtonProps> = ({
           onClick={pause}
           data-uie-name="do-pause-media"
           aria-label={t('mediaBtnPause')}
+          tabIndex={isCurrentConversationFocused ? 0 : -1}
         />
       )}
       {isDownloading && (

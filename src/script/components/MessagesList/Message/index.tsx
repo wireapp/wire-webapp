@@ -28,7 +28,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getMessageMarkerType, MessageMarkerType} from 'Util/conversationMessages';
 import {isTabKey} from 'Util/KeyboardUtil';
 
-import {ElementType} from './ContentMessage/asset/TextMessageRenderer';
+import {ElementType, MessageDetails} from './ContentMessage/asset/TextMessageRenderer';
 import {MessageTime} from './MessageTime';
 import {MessageWrapper} from './MessageWrapper';
 
@@ -49,7 +49,12 @@ export interface MessageActions {
   onClickImage: (message: ContentMessage, event: React.UIEvent) => void;
   onClickInvitePeople: () => void;
   onClickLikes: (message: BaseMessage) => void;
-  onClickMessage: (message: ContentMessage | Text, event: MouseEvent | KeyboardEvent, elementType: ElementType) => void;
+  onClickMessage: (
+    asset: Text,
+    event: MouseEvent | KeyboardEvent,
+    elementType: ElementType,
+    messageDetails: MessageDetails,
+  ) => void;
   onClickParticipants: (participants: User[]) => void;
   onClickReceipts: (message: BaseMessage) => void;
   onClickResetSession: (messageError: DecryptErrorMessage) => void;
@@ -97,6 +102,7 @@ const Message: React.FC<
     focusConversation,
     handleFocus,
     handleArrowKeyDown,
+    index,
   } = props;
   const messageElementRef = useRef<HTMLDivElement>(null);
   const messageRef = useRef<HTMLDivElement>(null);
@@ -115,6 +121,9 @@ const Message: React.FC<
     }
     if (isMarked) {
       scrollTo?.({center: true, element: messageElementRef.current});
+
+      // for reply message, focus on the original message when original message link is clicked for keyboard users
+      handleFocus(index);
     } else if (markerType === MessageMarkerType.UNREAD) {
       scrollTo?.({element: messageElementRef.current}, true);
     }
@@ -143,7 +152,7 @@ const Message: React.FC<
     if (focusConversation) {
       messageRef.current?.focus();
     }
-  }, [focusConversation]);
+  }, [focusConversation, message]);
 
   const getTimestampClass = (): string => {
     const classes = {

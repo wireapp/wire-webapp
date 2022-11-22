@@ -57,7 +57,7 @@ import {PanelState} from '../../page/RightSidebar';
 import {RootContext} from '../../page/RootProvider';
 import {TeamState} from '../../team/TeamState';
 import {UserState} from '../../user/UserState';
-import {ElementType} from '../MessagesList/Message/ContentMessage/asset/TextMessageRenderer';
+import {ElementType, MessageDetails} from '../MessagesList/Message/ContentMessage/asset/TextMessageRenderer';
 
 type ReadMessageBuffer = {conversation: ConversationEntity; message: Message};
 
@@ -181,14 +181,14 @@ export const Conversation: FC<ConversationProps> = ({
     }
   };
 
-  const handleEmailClick = (event: Event) => {
-    safeMailOpen((event.target as HTMLAnchorElement).href);
+  const handleEmailClick = (event: Event, messageDetails: MessageDetails) => {
+    safeMailOpen(messageDetails.href!);
     event.preventDefault();
     return false;
   };
 
-  const handleMarkdownLinkClick = (event: Event) => {
-    const href = (event.target as HTMLAnchorElement).href;
+  const handleMarkdownLinkClick = (event: Event, messageDetails: MessageDetails) => {
+    const href = messageDetails.href!;
     PrimaryModal.show(PrimaryModal.type.CONFIRM, {
       primaryAction: {
         action: () => safeWindowOpen(href),
@@ -203,10 +203,9 @@ export const Conversation: FC<ConversationProps> = ({
     return false;
   };
 
-  const userMentionClick = (event: Event) => {
-    const target = event.currentTarget as HTMLElement;
-    const userId = target?.dataset.userId;
-    const domain = target?.dataset.userDomain;
+  const userMentionClick = (messageDetails: MessageDetails) => {
+    const userId = messageDetails.userId;
+    const domain = messageDetails.userDomain;
 
     if (userId) {
       (async () => {
@@ -227,6 +226,11 @@ export const Conversation: FC<ConversationProps> = ({
     messageEntity: ContentMessage | Text,
     event: MouseEvent | KeyboardEvent,
     elementType: ElementType,
+    messageDetails: {
+      href: '';
+      userId: '';
+      userDomain: '';
+    },
   ) => {
     if (isMouseEvent(event) && event.button === btnRightClick) {
       // Default browser behavior on right click
@@ -235,13 +239,13 @@ export const Conversation: FC<ConversationProps> = ({
 
     switch (elementType) {
       case 'email':
-        handleEmailClick(event);
+        handleEmailClick(event, messageDetails);
         break;
       case 'markdownLink':
-        handleMarkdownLinkClick(event);
+        handleMarkdownLinkClick(event, messageDetails);
         break;
       case 'mention':
-        userMentionClick(event);
+        userMentionClick(messageDetails);
         break;
     }
 

@@ -78,15 +78,15 @@ export const renderMessage = (message: string, selfId: QualifiedId | null, menti
   const renderMention = (mentionData: MentionText) => {
     const elementClasses = mentionData.isSelfMentioned ? ' self-mention' : '';
     let elementAttributes = mentionData.isSelfMentioned
-      ? ' data-uie-name="label-self-mention"'
-      : ` data-uie-name="label-other-mention" data-user-id="${escape(mentionData.userId)}"`;
+      ? ' data-uie-name="label-self-mention" role="button"'
+      : ` data-uie-name="label-other-mention" data-user-id="${escape(mentionData.userId)}" role="button"`;
     if (!mentionData.isSelfMentioned && mentionData.domain) {
       elementAttributes += ` data-user-domain="${escape(mentionData.domain)}"`;
     }
 
     const mentionText = mentionData.text.replace(/^@/, '');
     const content = `<span class="mention-at-sign">@</span>${escape(mentionText)}`;
-    return `<span class="message-mention${elementClasses}"${elementAttributes}>${content}</span>`;
+    return `<div class="message-mention${elementClasses}"${elementAttributes}>${content}</div>`;
   };
 
   const mentionTexts: Record<string, MentionText> = {};

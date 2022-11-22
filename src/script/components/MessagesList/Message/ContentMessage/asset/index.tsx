@@ -18,6 +18,7 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import cx from 'classnames';
 
 import {Asset} from 'src/script/entity/message/Asset';
 import type {FileAsset as FileAssetType} from 'src/script/entity/message/FileAsset';
@@ -70,9 +71,11 @@ const ContentAsset = ({
             <TextMessageRenderer
               onMessageClick={onClickMessage}
               text={(asset as Text).render(selfId, message.accent_color())}
-              msgClass={`text ${includesOnlyEmojis(asset.text) ? 'text-large' : ''} ${
-                status === StatusType.SENDING ? 'text-foreground' : ''
-              } ${isObfuscated ? 'ephemeral-message-obfuscated' : ''}`}
+              msgClass={cx('text', {
+                'text-foreground': status === StatusType.SENDING,
+                'text-large': includesOnlyEmojis(asset.text),
+                'ephemeral-message-obfuscated': isObfuscated,
+              })}
               isCurrentConversationFocused={focusConversation}
               asset={asset as Text}
             />
@@ -88,7 +91,7 @@ const ContentAsset = ({
       if ((asset as FileAssetType).isFile()) {
         return (
           <div className={`message-asset ${isObfuscated ? 'ephemeral-asset-expired icon-file' : ''}`}>
-            <FileAsset message={message} />
+            <FileAsset message={message} isCurrentConversationFocused={focusConversation} />
           </div>
         );
       }
@@ -96,7 +99,7 @@ const ContentAsset = ({
       if ((asset as FileAssetType).isAudio()) {
         return (
           <div className={`message-asset ${isObfuscated ? 'ephemeral-asset-expired' : ''}`}>
-            <AudioAsset message={message} />
+            <AudioAsset message={message} isCurrentConversationFocused={focusConversation} />
           </div>
         );
       }
@@ -104,7 +107,7 @@ const ContentAsset = ({
       if ((asset as FileAssetType).isVideo()) {
         return (
           <div className={`message-asset ${isObfuscated ? 'ephemeral-asset-expired icon-movie' : ''}`}>
-            <VideoAsset message={message} />
+            <VideoAsset message={message} isCurrentConversationFocused={focusConversation} />
           </div>
         );
       }
