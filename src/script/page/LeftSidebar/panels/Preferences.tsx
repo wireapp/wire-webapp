@@ -130,9 +130,8 @@ const Preferences: React.FC<PreferencesProps> = ({
     contentViewModel.switchContent(item.id);
 
     setTimeout(() => {
-      const nextElementToFocus = document
-        ?.getElementById('center-column')
-        ?.querySelector("[tabindex='0']") as HTMLElement | null;
+      const centerColumn = document.getElementById('center-column');
+      const nextElementToFocus = centerColumn?.querySelector("[tabindex='0']") as HTMLElement | null;
       if (nextElementToFocus) {
         nextElementToFocus.focus();
       }
