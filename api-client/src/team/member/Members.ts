@@ -22,4 +22,5 @@ import {MemberData} from './MemberData';
 export interface Members {
   hasMore: boolean;
   members: MemberData[];
+  pagingState?: string;
 }
