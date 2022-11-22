@@ -27,7 +27,6 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Icon} from 'Components/Icon';
 import {Image} from 'Components/Image';
-import {Text} from 'src/script/entity/message/Text';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -37,9 +36,10 @@ import {AudioAsset} from './asset/AudioAsset';
 import {FileAsset} from './asset/FileAssetComponent';
 import {LocationAsset} from './asset/LocationAsset';
 import {RenderShowMsgBtn} from './asset/RenderShowMsgBtn';
-import {TextMessageRenderer, ElementType} from './asset/TextMessageRenderer';
+import {TextMessageRenderer} from './asset/TextMessageRenderer';
 import {VideoAsset} from './asset/VideoAsset';
 
+import {MessageActions} from '..';
 import type {Conversation} from '../../../../entity/Conversation';
 import type {ContentMessage} from '../../../../entity/message/ContentMessage';
 import type {User} from '../../../../entity/User';
@@ -50,7 +50,7 @@ export interface QuoteProps {
   conversation: Conversation;
   findMessage: (conversation: Conversation, messageId: string) => Promise<ContentMessage | undefined>;
   focusMessage: (id: string) => void;
-  handleClickOnMessage: (message: Text, event: MouseEvent | KeyboardEvent, elementType: ElementType) => void;
+  handleClickOnMessage: MessageActions['onClickMessage'];
   quote: QuoteEntity;
   selfId: QualifiedId;
   showDetail: (message: ContentMessage, event: ReactMouseEvent) => void;
@@ -137,7 +137,7 @@ const Quote: FC<QuoteProps> = ({
 
 interface QuotedMessageProps {
   focusMessage: (id: string) => void;
-  handleClickOnMessage: (message: Text, event: MouseEvent | KeyboardEvent, elementType: ElementType) => void;
+  handleClickOnMessage: MessageActions['onClickMessage'];
   quotedMessage: ContentMessage;
   selfId: QualifiedId;
   showDetail: (message: ContentMessage, event: ReactMouseEvent) => void;
@@ -239,11 +239,17 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
               message={quotedMessage}
               // className="message-quote__video"
               data-uie-name="media-video-quote"
+              isCurrentConversationFocused={focusConversation}
             />
           )}
 
           {asset.isAudio() && (
-            <AudioAsset message={quotedMessage} className="message-quote__audio" data-uie-name="media-audio-quote" />
+            <AudioAsset
+              message={quotedMessage}
+              className="message-quote__audio"
+              data-uie-name="media-audio-quote"
+              isCurrentConversationFocused={focusConversation}
+            />
           )}
 
           {asset.isFile() && (
@@ -251,6 +257,7 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
               message={quotedMessage}
               // className="message-quote__file"
               data-uie-name="media-file-quote"
+              isCurrentConversationFocused={focusConversation}
             />
           )}
 

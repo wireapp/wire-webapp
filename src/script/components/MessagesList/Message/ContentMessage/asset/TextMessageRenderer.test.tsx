@@ -65,7 +65,7 @@ describe('TextMessageRenderer', () => {
 
   it('renders and trigger click/keydown event of mention message correcly', () => {
     const onClickElement = jest.fn();
-    const text = `<span class="message-mention" data-uie-name="label-other-mention" data-user-id="1fc1e32d-084b-49be-a392-85377f7208f3" data-user-domain="staging.zinfra.io"><span class="mention-at-sign">@</span>jj</span> yes it is`;
+    const text = `<div class="message-mention" role="buttton" data-uie-name="label-other-mention" data-user-id="1fc1e32d-084b-49be-a392-85377f7208f3" data-user-domain="staging.zinfra.io"><span class="mention-at-sign">@</span>jj</div> yes it is`;
     const {getByTestId} = render(
       <TextMessageRenderer
         text={text}

@@ -39,7 +39,7 @@ export interface UserAvatarProps extends React.HTMLProps<HTMLDivElement> {
   avatarAlt?: string;
   noBadge?: boolean;
   noFilter?: boolean;
-  handleAvatarInteraction?: (
+  onAvatarInteraction?: (
     event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>,
   ) => void;
   participant: User;
@@ -59,7 +59,7 @@ const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
   noBadge,
   noFilter,
   state,
-  handleAvatarInteraction,
+  onAvatarInteraction,
   ...props
 }) => {
   const isImageGrey = !noFilter && [STATE.BLOCKED, STATE.IGNORED, STATE.PENDING, STATE.UNKNOWN].includes(state);
@@ -86,8 +86,8 @@ const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
       data-uie-name="element-avatar-user"
       data-uie-value={participant.id}
       data-uie-status={state}
-      onClick={handleAvatarInteraction}
-      onKeyDown={handleAvatarInteraction}
+      onClick={onAvatarInteraction}
+      onKeyDown={onAvatarInteraction}
       title={name}
       {...props}
     >

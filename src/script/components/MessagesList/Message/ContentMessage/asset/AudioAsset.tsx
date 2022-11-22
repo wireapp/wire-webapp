@@ -56,7 +56,7 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
   className,
   hasHeader = false,
   teamState = container.resolve(TeamState),
-  isCurrentConversationFocused,
+  isCurrentConversationFocused = true,
 }) => {
   const asset = message.getFirstAsset() as FileAsset;
   const [audioElement, setAudioElement] = useEffectRef<HTMLAudioElement>();

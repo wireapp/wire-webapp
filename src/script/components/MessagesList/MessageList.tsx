@@ -27,14 +27,12 @@ import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {DecryptErrorMessage} from 'src/script/entity/message/DecryptErrorMessage';
 import {MemberMessage} from 'src/script/entity/message/MemberMessage';
 import {Message as MessageEntity} from 'src/script/entity/message/Message';
-import {Text} from 'src/script/entity/message/Text';
 import {User} from 'src/script/entity/User';
 import {useRoveFocus} from 'src/script/hooks/useRoveFocus';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
-import {Message} from './Message';
-import {ElementType} from './Message/ContentMessage/asset/TextMessageRenderer';
+import {Message, MessageActions} from './Message';
 
 import {Conversation as ConversationEntity, Conversation} from '../../entity/Conversation';
 import {isMemberMessage, isContentMessage} from '../../guards/Message';
@@ -57,11 +55,7 @@ interface MessagesListParams {
     deleteMessageEveryone: (conversation: Conversation, message: MessageEntity) => void;
   };
   messageRepository: MessageRepository;
-  onClickMessage: (
-    message: ContentMessage | Text,
-    event: MouseEvent | KeyboardEvent,
-    elementType: ElementType,
-  ) => boolean;
+  onClickMessage: MessageActions['onClickMessage'];
   onLoading: (isLoading: boolean) => void;
   resetSession: (messageError: DecryptErrorMessage) => void;
   selfUser: User;

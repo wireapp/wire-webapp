@@ -422,35 +422,3 @@ export const removeAnimationsClass = (element: HTMLElement | null) => {
     });
   }
 };
-
-/**
- * Returns back a NodeList of focusable elements
- * that exist within the passed parent HTMLElement, or
- * an empty array if no parent passed.
- *
- * @param {HTMLElement} parent HTML element
- * @returns {(NodeList|Array)} The focusable elements that we can find
- */
-export const getAllFocusableElements = (parent: Element): NodeListOf<HTMLElement> | [] => {
-  if (!parent) {
-    console.warn('You need to pass a parent HTMLElement');
-    return []; // Return array so length queries will work
-  }
-
-  return parent.querySelectorAll(
-    'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"]):not([disabled]), details:not([disabled]), summary:not(:disabled)',
-  );
-};
-
-/**
- * Set tabindex for each interactive element based on the element's current focus
- * @param elements list of elements
- * @param isCurrentConversationFocused current message focus state
- */
-export const setElementTabIndex = (elements: NodeListOf<HTMLElement> | [], isCurrentConversationFocused: boolean) => {
-  if (elements.length) {
-    elements.forEach(element => {
-      element.setAttribute('tabindex', isCurrentConversationFocused ? '0' : '-1');
-    });
-  }
-};

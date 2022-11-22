@@ -53,7 +53,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
   isQuote,
   teamState = container.resolve(TeamState),
   assetRepository = container.resolve(AssetRepository),
-  isCurrentConversationFocused,
+  isCurrentConversationFocused = true,
 }) => {
   const asset = message.getFirstAsset() as FileAsset;
   const {isObfuscated} = useKoSubscribableChildren(message, ['isObfuscated']);

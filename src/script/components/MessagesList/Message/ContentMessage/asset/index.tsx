@@ -91,7 +91,7 @@ const ContentAsset = ({
       if ((asset as FileAssetType).isFile()) {
         return (
           <div className={`message-asset ${isObfuscated ? 'ephemeral-asset-expired icon-file' : ''}`}>
-            <FileAsset message={message} />
+            <FileAsset message={message} isCurrentConversationFocused={focusConversation} />
           </div>
         );
       }

@@ -20,13 +20,19 @@
 import {useEffect, useRef, FC} from 'react';
 
 import {Text} from 'src/script/entity/message/Text';
+import {getAllFocusableElements, setElementsTabIndex} from 'Util/focusUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {useDisposableRef} from 'Util/useDisposableRef';
 
 export type ElementType = 'markdownLink' | 'email' | 'mention';
 
 interface TextMessageRendererProps {
-  onMessageClick: (asset: Text, event: MouseEvent | KeyboardEvent, elementType: ElementType) => void;
+  onMessageClick: (
+    asset: Text,
+    event: MouseEvent | KeyboardEvent,
+    elementType: ElementType,
+    messageDetails: MessageDetails,
+  ) => void;
   text: string;
   isCurrentConversationFocused: boolean;
   msgClass: string;
@@ -36,6 +42,11 @@ interface TextMessageRendererProps {
   setCanShowMore?: (showMore: boolean) => void;
 }
 const events = ['click', 'keydown', 'auxclick'];
+export interface MessageDetails {
+  href?: string;
+  userId?: string;
+  userDomain?: string;
+}
 
 export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
   text,
@@ -66,26 +77,58 @@ export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
     if (!containerRef.current) {
       return undefined;
     }
-    const emailLinks =  [...containerRef.current.querySelectorAll('[data-email-link]')];
+
+    const interactiveMsgElements = getAllFocusableElements(containerRef.current);
+    setElementsTabIndex(interactiveMsgElements, isCurrentConversationFocused);
+
+    const emailLinks = [...containerRef.current.querySelectorAll('[data-email-link]')];
     const markdownLinkTargets = [...containerRef.current.querySelectorAll('[data-md-link]')];
     const hasMentions = asset && asset.mentions().length;
-    const msgMention = hasMentions
-      ? [...containerRef.current.querySelectorAll('.message-mention')]
-      : [];
+    const msgMentions = hasMentions ? [...containerRef.current.querySelectorAll('.message-mention')] : [];
 
-    const handleKeyEvent = (event: KeyboardEvent, elementType: ElementType) => {
+    const handleKeyEvent = (event: KeyboardEvent, elementType: ElementType, messageDetails: MessageDetails) => {
       if (isCurrentConversationFocused) {
-        handleKeyDown(event, () => onMessageClick(asset, event, elementType));
+        handleKeyDown(event, () => onMessageClick(asset, event, elementType, messageDetails));
       }
     };
 
     const handleMsgEvent = (event: Event) => {
-      return event.type === 'keydown'
-        ? handleKeyEvent(event as KeyboardEvent, 'mention')
-        : onMessageClick(asset, event as MouseEvent, 'mention');
+      const currentTarget = event.currentTarget as HTMLElement;
+      const markdownLinkTarget = currentTarget?.dataset.mdLink;
+      const emailLink = currentTarget?.dataset.emailLink;
+      const msgMention = currentTarget?.dataset.userId;
+
+      if (emailLink) {
+        const href = (event.target as HTMLAnchorElement).href;
+        const emailDetails = {
+          href: href,
+        };
+
+        return event.type === 'keydown'
+          ? handleKeyEvent(event as KeyboardEvent, 'email', emailDetails)
+          : onMessageClick(asset, event as MouseEvent, 'email', emailDetails);
+      } else if (markdownLinkTarget) {
+        const href = (event.target as HTMLAnchorElement).href;
+        const markdownLinkDetails = {
+          href: href,
+        };
+
+        return event.type === 'keydown'
+          ? handleKeyEvent(event as KeyboardEvent, 'markdownLink', markdownLinkDetails)
+          : onMessageClick(asset, event as MouseEvent, 'markdownLink', markdownLinkDetails);
+      } else if (msgMention) {
+        const mentionMsgDetails = {
+          userId: currentTarget?.dataset.userId,
+          userDomain: currentTarget?.dataset.userDomain,
+        };
+
+        return event.type === 'keydown'
+          ? handleKeyEvent(event as KeyboardEvent, 'mention', mentionMsgDetails)
+          : onMessageClick(asset, event as MouseEvent, 'mention', mentionMsgDetails);
+      }
     };
 
-    function addEventListener(elements: Element[], elementType: ElementType) {
+    function addEventListener(elements: Element[]) {
       elements?.forEach(element => {
         events.forEach(eventName => {
           element.addEventListener(eventName, handleMsgEvent);
@@ -93,7 +136,7 @@ export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
       });
     }
 
-    function removeEventListener(elements: Element[], elementType: ElementType) {
+    function removeEventListener(elements: Element[]) {
       elements?.forEach(element => {
         events.forEach(eventName => {
           element.removeEventListener(eventName, handleMsgEvent);
@@ -101,16 +144,16 @@ export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
       });
     }
 
-    addEventListener(emailLinks, 'email');
-    addEventListener(markdownLinkTargets, 'markdownLink');
-    addEventListener(msgMention, 'mention');
+    addEventListener(emailLinks);
+    addEventListener(markdownLinkTargets);
+    addEventListener(msgMentions);
 
     return () => {
-      removeEventListener(emailLinks, 'email');
-      removeEventListener(markdownLinkTargets, 'markdownLink');
-      removeEventListener(msgMention, 'mention');
+      removeEventListener(emailLinks);
+      removeEventListener(markdownLinkTargets);
+      removeEventListener(msgMentions);
     };
-  }, [onMessageClick, asset, isCurrentConversationFocused, containerRef]);
+  }, [onMessageClick, asset, isCurrentConversationFocused]);
 
   return (
     <div

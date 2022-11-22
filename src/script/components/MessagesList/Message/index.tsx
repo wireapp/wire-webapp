@@ -27,9 +27,8 @@ import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getMessageMarkerType, MessageMarkerType} from 'Util/conversationMessages';
 import {isTabKey} from 'Util/KeyboardUtil';
-import {getAllFocusableElements, setElementTabIndex} from 'Util/util';
 
-import {ElementType} from './ContentMessage/asset/TextMessageRenderer';
+import {ElementType, MessageDetails} from './ContentMessage/asset/TextMessageRenderer';
 import {MessageTime} from './MessageTime';
 import {MessageWrapper} from './MessageWrapper';
 
@@ -50,7 +49,12 @@ export interface MessageActions {
   onClickImage: (message: ContentMessage, event: React.UIEvent) => void;
   onClickInvitePeople: () => void;
   onClickLikes: (message: BaseMessage) => void;
-  onClickMessage: (message: ContentMessage | Text, event: MouseEvent | KeyboardEvent, elementType: ElementType) => void;
+  onClickMessage: (
+    asset: Text,
+    event: MouseEvent | KeyboardEvent,
+    elementType: ElementType,
+    messageDetails: MessageDetails,
+  ) => void;
   onClickParticipants: (participants: User[]) => void;
   onClickReceipts: (message: BaseMessage) => void;
   onClickResetSession: (messageError: DecryptErrorMessage) => void;
@@ -147,11 +151,6 @@ const Message: React.FC<
     // Move element into view when it is focused
     if (focusConversation) {
       messageRef.current?.focus();
-    }
-
-    if (messageRef.current) {
-      const interactiveMsgElements = getAllFocusableElements(messageRef.current);
-      setElementTabIndex(interactiveMsgElements, focusConversation);
     }
   }, [focusConversation, message]);
 
