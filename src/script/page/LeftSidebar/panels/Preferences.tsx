@@ -132,9 +132,7 @@ const Preferences: React.FC<PreferencesProps> = ({
     setTimeout(() => {
       const centerColumn = document.getElementById('center-column');
       const nextElementToFocus = centerColumn?.querySelector("[tabindex='0']") as HTMLElement | null;
-      if (nextElementToFocus) {
-        nextElementToFocus.focus();
-      }
+      nextElementToFocus?.focus();
     }, ANIMATED_PAGE_TRANSITION_DURATION + 1);
   };
 
