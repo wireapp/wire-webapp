@@ -88,7 +88,7 @@ const ImageAsset: React.FC<ImageAssetProps> = ({asset, message, onClick, teamSta
     username: `${message.user().name()}`,
   });
 
-  const style: CSSObject = {
+  const imageContainerStyle: CSSObject = {
     aspectRatio: `${asset.ratio}`,
     maxWidth: '100%',
     width: asset.width,
@@ -97,7 +97,7 @@ const ImageAsset: React.FC<ImageAssetProps> = ({asset, message, onClick, teamSta
   };
 
   return (
-    <div data-uie-name="image-asset" css={style}>
+    <div data-uie-name="image-asset" css={imageContainerStyle}>
       {isFileSharingReceivingEnabled ? (
         <InViewport
           className={cx('image-asset', {
