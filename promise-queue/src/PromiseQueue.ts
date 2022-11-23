@@ -95,6 +95,10 @@ export class PromiseQueue {
       });
   }
 
+  hasRunningTasks(): boolean {
+    return this.runningTasks > 0;
+  }
+
   /**
    * Get the number of queued functions.
    * @returns Number of queued functions

@@ -19,6 +19,18 @@
 
 import {PromiseQueue} from './PromiseQueue';
 
+class Deferred<T = undefined> {
+  public resolve: (value: T) => void;
+  public reject: () => void;
+  public promise: Promise<T>;
+  constructor() {
+    this.promise = new Promise((resolve, reject) => {
+      this.resolve = resolve;
+      this.reject = reject;
+    });
+  }
+}
+
 describe('PromiseQueue', () => {
   describe('push', () => {
     it('processes promises', async () => {
@@ -80,6 +92,24 @@ describe('PromiseQueue', () => {
       });
 
       jest.advanceTimersByTime(120);
+      jest.useRealTimers();
+    });
+  });
+
+  describe('hasRunningTasks', () => {
+    it('returns true if a task is running', async () => {
+      const queue = new PromiseQueue({name: 'testqueue', timeout: 100});
+      expect(queue.hasRunningTasks()).toBe(false);
+      const promise = new Deferred();
+      const done = queue.push(() => promise.promise);
+
+      expect(queue.hasRunningTasks()).toBe(true);
+
+      promise.resolve(undefined);
+      await done;
+      await new Promise(res => setTimeout(res));
+      expect(queue.hasRunningTasks()).toBe(false);
+      expect(queue.getLength()).toBe(0);
     });
   });
 });
