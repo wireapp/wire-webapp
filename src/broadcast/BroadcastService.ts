@@ -28,6 +28,7 @@ import {UserPreKeyBundleMap} from '@wireapp/api-client/lib/user/';
 import {APIClient} from '@wireapp/api-client';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
+import {sendMessage} from '../conversation/message/messageSender';
 import {MessageService} from '../conversation/message/MessageService';
 import {flattenQualifiedUserClients} from '../conversation/message/UserClientsUtil';
 import {CryptographyService} from '../cryptography/';
@@ -83,15 +84,19 @@ export class BroadcastService {
     onClientMismatch?: (mismatch: ClientMismatch | MessageSendingStatus) => void | boolean | Promise<boolean>,
   ) {
     const plainTextArray = GenericMessage.encode(genericMessage).finish();
-    return isQualifiedUserClients(recipients)
-      ? this.messageService.sendFederatedMessage(this.apiClient.validatedClientId, recipients, plainTextArray, {
-          reportMissing: flattenQualifiedUserClients(recipients).map(({userId}) => userId),
-          onClientMismatch,
-        })
-      : this.messageService.sendMessage(this.apiClient.validatedClientId, recipients, plainTextArray, {
-          sendAsProtobuf,
-          reportMissing: Object.keys(recipients),
-          onClientMismatch,
-        });
+    const send = (): Promise<MessageSendingStatus | ClientMismatch> => {
+      return isQualifiedUserClients(recipients)
+        ? this.messageService.sendFederatedMessage(this.apiClient.validatedClientId, recipients, plainTextArray, {
+            reportMissing: flattenQualifiedUserClients(recipients).map(({userId}) => userId),
+            onClientMismatch,
+          })
+        : this.messageService.sendMessage(this.apiClient.validatedClientId, recipients, plainTextArray, {
+            sendAsProtobuf,
+            reportMissing: Object.keys(recipients),
+            onClientMismatch,
+          });
+    };
+
+    return sendMessage(send);
   }
 }
