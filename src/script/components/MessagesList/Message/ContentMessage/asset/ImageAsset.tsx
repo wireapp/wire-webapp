@@ -19,6 +19,7 @@
 
 import React, {useEffect, useState} from 'react';
 
+import {CSSObject} from '@emotion/react';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
@@ -87,8 +88,16 @@ const ImageAsset: React.FC<ImageAssetProps> = ({asset, message, onClick, teamSta
     username: `${message.user().name()}`,
   });
 
+  const imageContainerStyle: CSSObject = {
+    aspectRatio: `${asset.ratio}`,
+    maxWidth: '100%',
+    width: asset.width,
+    maxHeight: '80vh',
+    height: asset.height,
+  };
+
   return (
-    <div data-uie-name="image-asset">
+    <div data-uie-name="image-asset" css={imageContainerStyle}>
       {isFileSharingReceivingEnabled ? (
         <InViewport
           className={cx('image-asset', {
@@ -120,7 +129,6 @@ const ImageAsset: React.FC<ImageAssetProps> = ({asset, message, onClick, teamSta
           <img
             data-uie-name="image-asset-img"
             className={cx('image-element', {'image-ephemeral': isObfuscated})}
-            style={!imageUrl ? {aspectRatio: asset.ratio.toString(), width: '100%'} : undefined}
             src={imageUrl || dummyImageUrl}
             alt={imageAltText}
           />

@@ -17,7 +17,7 @@
  *
  */
 
-import {useContext, FC, useCallback} from 'react';
+import {useContext, FC} from 'react';
 
 import {IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
 
@@ -41,20 +41,8 @@ const PreferencesPage: FC<PreferencesPageProps> = ({title, children}) => {
 
   const goHome = () => root?.content.loadPreviousContent();
 
-  const containerRef = useCallback((element: HTMLDivElement | null) => {
-    const nextElementToFocus = element?.querySelector("[tabindex='0']") as HTMLElement | null;
-    if (nextElementToFocus) {
-      nextElementToFocus.focus();
-    }
-  }, []);
-
   return (
-    <div
-      role="tabpanel"
-      ref={containerRef}
-      aria-labelledby={title}
-      style={{display: 'flex', flexDirection: 'column', height: '100vh'}}
-    >
+    <div role="tabpanel" aria-labelledby={title} style={{display: 'flex', flexDirection: 'column', height: '100vh'}}>
       <div className="preferences-titlebar">
         {smBreakpoint && isCentralColumn && (
           <IconButton

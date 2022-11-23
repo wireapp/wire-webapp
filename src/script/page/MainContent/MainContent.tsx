@@ -28,6 +28,7 @@ import {Conversation} from 'Components/Conversation';
 import {HistoryExport} from 'Components/HistoryExport';
 import {HistoryImport} from 'Components/HistoryImport';
 import {Icon} from 'Components/Icon';
+import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {incomingCssClass, removeAnimationsClass} from 'Util/util';
@@ -48,8 +49,10 @@ import {PanelState} from '../RightSidebar';
 import {RootContext} from '../RootProvider';
 import {ContentState, useAppState} from '../useAppState';
 
+export const ANIMATED_PAGE_TRANSITION_DURATION = 500;
+
 const Animated: FC<{children: ReactNode}> = ({children, ...rest}) => (
-  <CSSTransition classNames="slide-in-left" timeout={{enter: 500}} {...rest}>
+  <CSSTransition classNames="slide-in-left" timeout={{enter: ANIMATED_PAGE_TRANSITION_DURATION}} {...rest}>
     {children}
   </CSSTransition>
 );
@@ -68,6 +71,10 @@ const MainContent: FC<MainContentProps> = ({
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const mainViewModel = useContext(RootContext);
 
+  const teamState = container.resolve(TeamState);
+  const userState = container.resolve(UserState);
+  const {showRequestModal} = useLegalHoldModalState();
+
   const {contentState, isShowingConversation} = useAppState();
 
   useEffect(() => {
@@ -77,6 +84,13 @@ const MainContent: FC<MainContentProps> = ({
     }
   }, [contentState, conversationState]);
 
+  useEffect(() => {
+    // Show legal hold on mount when legal hold is enabled for team
+    if (teamState.supportsLegalHold()) {
+      showRequestModal(true);
+    }
+  }, [teamState, showRequestModal]);
+
   if (!mainViewModel) {
     return null;
   }
@@ -85,9 +99,6 @@ const MainContent: FC<MainContentProps> = ({
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
-
-  const teamState = container.resolve(TeamState);
-  const userState = container.resolve(UserState);
 
   const statesTitle: Partial<Record<ContentState, string>> = {
     [ContentState.CONNECTION_REQUESTS]: t('accessibility.headings.connectionRequests'),

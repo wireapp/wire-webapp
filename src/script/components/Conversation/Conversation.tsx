@@ -17,15 +17,7 @@
  *
  */
 
-import {
-  FC,
-  MouseEvent as ReactMouseEvent,
-  KeyboardEvent as ReactKeyboardEvent,
-  UIEvent,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import {FC, UIEvent, useContext, useEffect, useState} from 'react';
 
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -65,6 +57,7 @@ import {PanelState} from '../../page/RightSidebar';
 import {RootContext} from '../../page/RootProvider';
 import {TeamState} from '../../team/TeamState';
 import {UserState} from '../../user/UserState';
+import {ElementType, MessageDetails} from '../MessagesList/Message/ContentMessage/asset/TextMessageRenderer';
 
 type ReadMessageBuffer = {conversation: ConversationEntity; message: Message};
 
@@ -188,47 +181,31 @@ export const Conversation: FC<ConversationProps> = ({
     }
   };
 
-  const handleClickOnMessage = (
-    messageEntity: ContentMessage | Text,
-    event: ReactMouseEvent | ReactKeyboardEvent<HTMLElement>,
-  ) => {
-    if (isMouseEvent(event) && event.button === 2) {
-      // Default browser behavior on right click
-      return true;
-    }
+  const handleEmailClick = (event: Event, messageDetails: MessageDetails) => {
+    safeMailOpen(messageDetails.href!);
+    event.preventDefault();
+    return false;
+  };
 
-    const emailTarget = (event.target as HTMLElement).closest<HTMLAnchorElement>('[data-email-link]');
-    if (emailTarget) {
-      safeMailOpen(emailTarget.href);
-      event.preventDefault();
-      return false;
-    }
+  const handleMarkdownLinkClick = (event: Event, messageDetails: MessageDetails) => {
+    const href = messageDetails.href!;
+    PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+      primaryAction: {
+        action: () => safeWindowOpen(href),
+        text: t('modalOpenLinkAction'),
+      },
+      text: {
+        message: t('modalOpenLinkMessage', href, {}, true),
+        title: t('modalOpenLinkTitle'),
+      },
+    });
+    event.preventDefault();
+    return false;
+  };
 
-    const linkTarget = (event.target as HTMLElement).closest<HTMLAnchorElement>('[data-md-link]');
-    if (linkTarget) {
-      const href = linkTarget.href;
-      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-        primaryAction: {
-          action: () => {
-            safeWindowOpen(href);
-          },
-          text: t('modalOpenLinkAction'),
-        },
-        text: {
-          message: t('modalOpenLinkMessage', href, {}, true),
-          title: t('modalOpenLinkTitle'),
-        },
-      });
-      event.preventDefault();
-      return false;
-    }
-
-    const hasMentions = messageEntity instanceof Text && messageEntity.mentions().length;
-    const mentionElement = hasMentions
-      ? (event.target as HTMLElement).closest<HTMLSpanElement>('.message-mention')
-      : undefined;
-    const userId = mentionElement?.dataset.userId;
-    const domain = mentionElement?.dataset.userDomain;
+  const userMentionClick = (messageDetails: MessageDetails) => {
+    const userId = messageDetails.userId;
+    const domain = messageDetails.userDomain;
 
     if (userId) {
       (async () => {
@@ -241,6 +218,35 @@ export const Conversation: FC<ConversationProps> = ({
           }
         }
       })();
+    }
+  };
+
+  const btnRightClick = 2;
+  const handleClickOnMessage = (
+    messageEntity: ContentMessage | Text,
+    event: MouseEvent | KeyboardEvent,
+    elementType: ElementType,
+    messageDetails: {
+      href: '';
+      userId: '';
+      userDomain: '';
+    },
+  ) => {
+    if (isMouseEvent(event) && event.button === btnRightClick) {
+      // Default browser behavior on right click
+      return true;
+    }
+
+    switch (elementType) {
+      case 'email':
+        handleEmailClick(event, messageDetails);
+        break;
+      case 'markdownLink':
+        handleMarkdownLinkClick(event, messageDetails);
+        break;
+      case 'mention':
+        userMentionClick(messageDetails);
+        break;
     }
 
     // need to return `true` because knockout will prevent default if we return anything else (including undefined)
@@ -376,6 +382,7 @@ export const Conversation: FC<ConversationProps> = ({
       id="conversation"
       className={cx('conversation', {[incomingCssClass]: isConversationLoaded, loading: !isConversationLoaded})}
       ref={removeAnimationsClass}
+      key={activeConversation?.id}
     >
       {activeConversation && (
         <>

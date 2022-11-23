@@ -94,6 +94,7 @@
   }
 
   .message-mention {
+    display: inline-block;
     color: var(--accent-color);
     .text-medium;
 
@@ -309,6 +310,14 @@
   time[data-timestamp-type='day'] {
     display: block;
   }
+}
+
+.message-wrapper {
+  outline-offset: -0.1rem;
+}
+
+.message-mention {
+  outline-offset: 0.4rem;
 }
 
 // MESSAGE - BODY
@@ -596,12 +605,14 @@
 .message-status-read {
   left: 83px;
   &::before {
-    position: absolute;
-    display: flex;
-    width: 16px;
-    align-items: center;
-    justify-content: center;
-    content: '';
+    display: none;
+    @media (min-width: @screen-md-min) {
+      display: flex;
+      width: 16px;
+      align-items: center;
+      justify-content: center;
+      content: '';
+    }
   }
 }
 

@@ -193,7 +193,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
       }
     >
       <Animated key={currentState}>
-        <div ref={containerRef}>
+        <div ref={containerRef} css={{height: '100%'}}>
           {currentState === PanelState.CONVERSATION_DETAILS && (
             <ConversationDetails
               onClose={closePanel}

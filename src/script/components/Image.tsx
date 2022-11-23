@@ -33,6 +33,7 @@ import {TeamState} from '../team/TeamState';
 
 export interface ImageProps extends React.HTMLProps<HTMLDivElement> {
   aspectRatio?: number;
+  width?: string;
   asset: AssetRemoteData;
   assetRepository?: AssetRepository;
   click?: (asset: AssetRemoteData, event: React.MouseEvent) => void;
@@ -48,6 +49,7 @@ const Image: React.FC<ImageProps> = ({
   assetRepository = container.resolve(AssetRepository),
   teamState = container.resolve(TeamState),
   aspectRatio,
+  width,
   ...props
 }) => {
   const [isInViewport, setIsInViewport] = useState(false);
@@ -78,9 +80,9 @@ const Image: React.FC<ImageProps> = ({
         window.URL.revokeObjectURL(assetSrc);
       }
     };
-  }, [isInViewport]);
+  }, [asset, assetRepository, isFileSharingReceivingEnabled, isInViewport]);
 
-  const style = aspectRatio ? {aspectRatio: aspectRatio.toString(), width: '100%'} : undefined;
+  const style = aspectRatio ? {aspectRatio: `${aspectRatio}`, maxWidth: '100%', width} : undefined;
   return !isFileSharingReceivingEnabled ? (
     <RestrictedImage className={className} showMessage={!isQuote} isSmall={isQuote} />
   ) : (

@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import React, {MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent} from 'react';
 
 import {css} from '@emotion/react';
 
@@ -31,7 +31,7 @@ import {GroupedConversationHeader} from './GroupedConversationHeader';
 
 import {useRoveFocus} from '../../../../hooks/useRoveFocus';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
-import {createNavigate} from '../../../../router/routerBindings';
+import {createNavigate, createNavigateKeyboard} from '../../../../router/routerBindings';
 
 export interface GroupedConversationsFolderProps {
   expandedFolders: string[];
@@ -70,7 +70,13 @@ const GroupedConversationsFolder: React.FC<GroupedConversationsFolderProps> = ({
               isConversationListFocus
               handleFocus={setCurrentFocus}
               handleArrowKeyDown={handleKeyDown}
-              onClick={createNavigate(generateConversationUrl(conversation.qualifiedId))}
+              onClick={(event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>) => {
+                if ('key' in event) {
+                  createNavigateKeyboard(generateConversationUrl(conversation.qualifiedId), true)(event);
+                } else {
+                  createNavigate(generateConversationUrl(conversation.qualifiedId))(event);
+                }
+              }}
               rightClick={(_, event) => listViewModel.onContextMenu(conversation, event)}
               conversation={conversation}
               showJoinButton={hasJoinableCall(conversation)}

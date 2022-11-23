@@ -17,12 +17,7 @@
  *
  */
 
-import React, {
-  KeyboardEvent as ReactKeyboardEvent,
-  MouseEvent as ReactMouseEvent,
-  useLayoutEffect,
-  useRef,
-} from 'react';
+import React, {useLayoutEffect, useRef, useEffect} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
@@ -31,7 +26,9 @@ import {InViewport} from 'Components/utils/InViewport';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getMessageMarkerType, MessageMarkerType} from 'Util/conversationMessages';
+import {isTabKey} from 'Util/KeyboardUtil';
 
+import {ElementType, MessageDetails} from './ContentMessage/asset/TextMessageRenderer';
 import {MessageTime} from './MessageTime';
 import {MessageWrapper} from './MessageWrapper';
 
@@ -52,7 +49,12 @@ export interface MessageActions {
   onClickImage: (message: ContentMessage, event: React.UIEvent) => void;
   onClickInvitePeople: () => void;
   onClickLikes: (message: BaseMessage) => void;
-  onClickMessage: (message: ContentMessage | Text, event: ReactMouseEvent | ReactKeyboardEvent<HTMLElement>) => void;
+  onClickMessage: (
+    asset: Text,
+    event: MouseEvent | KeyboardEvent,
+    elementType: ElementType,
+    messageDetails: MessageDetails,
+  ) => void;
   onClickParticipants: (participants: User[]) => void;
   onClickReceipts: (message: BaseMessage) => void;
   onClickResetSession: (messageError: DecryptErrorMessage) => void;
@@ -79,13 +81,31 @@ export interface MessageParams extends MessageActions {
   selfId: QualifiedId;
   shouldShowInvitePeople: boolean;
   teamState?: TeamState;
+  totalMessage: number;
+  index: number;
+  focusConversation: boolean;
+  handleFocus: (index: number) => void;
+  handleArrowKeyDown: (e: React.KeyboardEvent) => void;
 }
 
 const Message: React.FC<
   MessageParams & {scrollTo?: (elm: {center?: boolean; element: HTMLElement}, isUnread?: boolean) => void}
 > = props => {
-  const {message, previousMessage, isMarked, lastReadTimestamp, onVisible, scrollTo} = props;
+  const {
+    message,
+    previousMessage,
+    isMarked,
+    lastReadTimestamp,
+    onVisible,
+    scrollTo,
+    totalMessage,
+    focusConversation,
+    handleFocus,
+    handleArrowKeyDown,
+    index,
+  } = props;
   const messageElementRef = useRef<HTMLDivElement>(null);
+  const messageRef = useRef<HTMLDivElement>(null);
   const {status, ephemeral_expires, timestamp} = useKoSubscribableChildren(message, [
     'status',
     'ephemeral_expires',
@@ -101,10 +121,38 @@ const Message: React.FC<
     }
     if (isMarked) {
       scrollTo?.({center: true, element: messageElementRef.current});
+
+      // for reply message, focus on the original message when original message link is clicked for keyboard users
+      handleFocus(index);
     } else if (markerType === MessageMarkerType.UNREAD) {
       scrollTo?.({element: messageElementRef.current}, true);
     }
   }, [isMarked, messageElementRef]);
+
+  const handleDivKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (isTabKey(event)) {
+      // don't call arrow key down for tab key
+      return;
+    }
+    handleArrowKeyDown(event);
+  };
+
+  // when a new conversation is opened using keyboard(enter), focus on the last message
+  useEffect(() => {
+    if (!messageRef.current) {
+      return;
+    }
+    if (history.state?.eventKey === 'Enter') {
+      handleFocus(totalMessage - 1);
+    }
+  }, [totalMessage]);
+
+  useEffect(() => {
+    // Move element into view when it is focused
+    if (focusConversation) {
+      messageRef.current?.focus();
+    }
+  }, [focusConversation, message]);
 
   const getTimestampClass = (): string => {
     const classes = {
@@ -116,7 +164,13 @@ const Message: React.FC<
     return classes[markerType];
   };
 
-  const content = <MessageWrapper {...props} hasMarker={markerType !== MessageMarkerType.NONE} />;
+  const content = (
+    <MessageWrapper
+      {...props}
+      hasMarker={markerType !== MessageMarkerType.NONE}
+      focusConversation={focusConversation}
+    />
+  );
   const wrappedContent = onVisible ? (
     <InViewport requireFullyInView allowBiggerThanViewport checkOverlay onVisible={onVisible}>
       {content}
@@ -133,6 +187,7 @@ const Message: React.FC<
       data-uie-expired-status={ephemeral_expires}
       data-uie-send-status={status}
       data-uie-name="item-message"
+      role="list"
     >
       <div className={cx('message-header message-timestamp', getTimestampClass())}>
         <div className="message-header-icon">
@@ -147,7 +202,16 @@ const Message: React.FC<
           </MessageTime>
         </div>
       </div>
-      {wrappedContent}
+      {/*eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions*/}
+      <div
+        tabIndex={focusConversation ? 0 : -1}
+        ref={messageRef}
+        role="listitem"
+        onKeyDown={handleDivKeyDown}
+        className="message-wrapper"
+      >
+        {wrappedContent}
+      </div>
     </div>
   );
 };
