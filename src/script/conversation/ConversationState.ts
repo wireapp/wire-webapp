@@ -121,6 +121,7 @@ export class ConversationState {
       this.visibleConversations().some(conv => matchQualifiedIds(conv.qualifiedId, conversation.qualifiedId))
     );
   }
+
   /**
    * Get unarchived conversation with the most recent event.
    * @param allConversations Search all conversations
@@ -142,6 +143,14 @@ export class ConversationState {
       : this.conversations().find(conversation => {
           return matchQualifiedIds(conversation, conversationId);
         });
+  }
+
+  isSelfConversation(conversationId: QualifiedId): boolean {
+    const selfConversationIds: QualifiedId[] = [this.selfConversation(), this.selfMLSConversation()]
+      .filter((conversation): conversation is Conversation => !!conversation)
+      .map(conversation => conversation.qualifiedId);
+
+    return selfConversationIds.some(selfConversation => matchQualifiedIds(selfConversation, conversationId));
   }
 
   findConversationByGroupId(groupId: string): Conversation | undefined {
