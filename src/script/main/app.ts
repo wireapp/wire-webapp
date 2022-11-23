@@ -83,7 +83,7 @@ import {IntegrationRepository} from '../integration/IntegrationRepository';
 import {IntegrationService} from '../integration/IntegrationService';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {MediaRepository} from '../media/MediaRepository';
-import {initMLSConversations} from '../mls';
+import {initMLSConversations, registerUninitializedConversations} from '../mls';
 import {NotificationRepository} from '../notification/NotificationRepository';
 import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
 import {PermissionRepository} from '../permission/PermissionRepository';
@@ -449,6 +449,11 @@ export class App {
         onProgress(25 + 50 * (done / total), `${baseMessage}${extraInfo}`);
       });
       const notificationsCount = eventRepository.notificationsTotal;
+
+      if (supportsMLS()) {
+        // Once all the messages have been processed and the message sending queue freed we can now add the potential `self` and `team` conversations
+        await registerUninitializedConversations(conversationEntities, selfUser, clientEntity().id, this.core);
+      }
 
       telemetry.timeStep(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
       telemetry.addStatistic(AppInitStatisticsValue.NOTIFICATIONS, notificationsCount, 100);

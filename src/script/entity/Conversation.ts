@@ -140,6 +140,7 @@ export class Conversation {
   public readonly isLeavable: ko.PureComputed<boolean>;
   public readonly isMutable: ko.PureComputed<boolean>;
   public readonly isRequest: ko.PureComputed<boolean>;
+  /** @deprecated use isSelfConversation from conversationSelectors */
   public readonly isSelf: ko.PureComputed<boolean>;
   public readonly isTeamOnly: ko.PureComputed<boolean>;
   public readonly last_event_timestamp: ko.Observable<number>;

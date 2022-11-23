@@ -18,13 +18,14 @@
  */
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
 
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {sortGroupsByLastEvent} from 'Util/util';
+
+import {isMLSConversation, isSelfConversation} from './ConversationSelectors';
 
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
@@ -48,6 +49,7 @@ export class ConversationState {
   public readonly filteredConversations: ko.PureComputed<Conversation[]>;
   public readonly archivedConversations: ko.PureComputed<Conversation[]>;
   public readonly selfConversation: ko.PureComputed<Conversation | undefined>;
+  public readonly selfMLSConversation: ko.PureComputed<Conversation | undefined>;
   public readonly connectedUsers: ko.PureComputed<User[]>;
 
   public readonly sortedConversations: ko.PureComputed<Conversation[]>;
@@ -58,7 +60,10 @@ export class ConversationState {
   ) {
     this.sortedConversations = ko.pureComputed(() => this.filteredConversations().sort(sortGroupsByLastEvent));
     this.selfConversation = ko.pureComputed(() =>
-      this.conversations().find(conversation => conversation.type() === CONVERSATION_TYPE.SELF),
+      this.conversations().find(conversation => !isMLSConversation(conversation) && isSelfConversation(conversation)),
+    );
+    this.selfMLSConversation = ko.pureComputed(() =>
+      this.conversations().find(conversation => isMLSConversation(conversation) && isSelfConversation(conversation)),
     );
 
     this.visibleConversations = ko.pureComputed(() => {
