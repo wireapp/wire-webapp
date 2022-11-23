@@ -29,16 +29,24 @@ import {mlsConversationState} from './mlsConversationState';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 
-function createConversation(protocol: ConversationProtocol) {
+function createConversation(protocol: ConversationProtocol, type?: CONVERSATION_TYPE) {
   const conversation = new Conversation(randomUUID(), '', protocol);
   if (protocol === ConversationProtocol.MLS) {
     conversation.groupId = `groupid-${randomUUID()}`;
+    conversation.epoch = 0;
+  }
+  if (type) {
+    conversation.type(type);
   }
   return conversation;
 }
 
-function createConversations(nbConversations: number, protocol: ConversationProtocol = ConversationProtocol.MLS) {
-  return Array.from(new Array(nbConversations)).map(() => createConversation(protocol));
+function createConversations(
+  nbConversations: number,
+  protocol: ConversationProtocol = ConversationProtocol.MLS,
+  type?: CONVERSATION_TYPE,
+) {
+  return Array.from(new Array(nbConversations)).map(() => createConversation(protocol, type));
 }
 
 function mockCore() {
@@ -77,13 +85,9 @@ describe('MLSConversations', () => {
       const nbMLSConversations = 5 + Math.ceil(Math.random() * 10);
 
       const proteusConversations = createConversations(nbProteusConversations, ConversationProtocol.PROTEUS);
-      const selfConversation = createConversation(ConversationProtocol.MLS);
-      selfConversation.epoch = 0;
-      selfConversation.type(CONVERSATION_TYPE.SELF);
+      const selfConversation = createConversation(ConversationProtocol.MLS, CONVERSATION_TYPE.SELF);
 
-      const teamConversation = createConversation(ConversationProtocol.MLS);
-      teamConversation.epoch = 0;
-      teamConversation.type(CONVERSATION_TYPE.GLOBAL_TEAM);
+      const teamConversation = createConversation(ConversationProtocol.MLS, CONVERSATION_TYPE.GLOBAL_TEAM);
 
       const mlsConversations = createConversations(nbMLSConversations);
       const conversations = [...proteusConversations, teamConversation, ...mlsConversations, selfConversation];
