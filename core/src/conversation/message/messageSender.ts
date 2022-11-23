@@ -29,6 +29,10 @@ export function getQueueLength(): number {
   return sendingQueue.getLength();
 }
 
+export function isSendingMessage(): boolean {
+  return sendingQueue.hasRunningTasks();
+}
+
 export function resumeMessageSending(): void {
   sendingQueue.pause(false);
 }
