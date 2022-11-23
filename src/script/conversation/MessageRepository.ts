@@ -55,7 +55,7 @@ import {roundLogarithmic} from 'Util/NumberUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {createRandomUuid, loadUrlBlob, supportsMLS} from 'Util/util';
+import {createRandomUuid, loadUrlBlob} from 'Util/util';
 
 import {findDeletedClients} from './ClientMismatchUtil';
 import {ConversationRepository} from './ConversationRepository';
@@ -969,7 +969,7 @@ export class MessageRepository {
    */
   public async deleteMessage(conversation: Conversation, message: Message): Promise<void> {
     try {
-      const selfConversation = this.conversationState.getSelfConversation(supportsMLS());
+      const selfConversation = this.conversationState.getSelfConversation();
       const payload = MessageBuilder.buildHideMessage({
         conversationId: conversation.id,
         messageId: message.id,
@@ -994,7 +994,7 @@ export class MessageRepository {
    */
   public async updateClearedTimestamp(conversation: Conversation): Promise<void> {
     const timestamp = conversation.getLastKnownTimestamp(this.serverTimeHandler.toServerTimestamp());
-    const selfConversation = this.conversationState.getSelfConversation(supportsMLS());
+    const selfConversation = this.conversationState.getSelfConversation();
     if (timestamp && conversation.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.CLEARED)) {
       const payload = MessageBuilder.buildClearedMessage(conversation.qualifiedId);
       await this.sendAndInjectMessage(payload, selfConversation, {skipInjection: true});
@@ -1235,7 +1235,7 @@ export class MessageRepository {
    * @param conversation Conversation to be marked as read
    */
   public async markAsRead(conversation: Conversation) {
-    const selfConversation = this.conversationState.getSelfConversation(supportsMLS());
+    const selfConversation = this.conversationState.getSelfConversation();
     const timestamp = conversation.last_read_timestamp();
     const payload = MessageBuilder.buildLastReadMessage(conversation.qualifiedId, timestamp);
     await this.sendAndInjectMessage(payload, selfConversation, {skipInjection: true});
@@ -1253,7 +1253,7 @@ export class MessageRepository {
    * @param countlyId Countly new ID
    */
   public async sendCountlySync(countlyId: string) {
-    const selfConversation = this.conversationState.getSelfConversation(supportsMLS());
+    const selfConversation = this.conversationState.getSelfConversation();
     const payload = MessageBuilder.buildDataTransferMessage(countlyId);
     await this.sendAndInjectMessage(payload, selfConversation, {skipInjection: true});
     this.logger.info(`Sent countly sync message with ID ${countlyId}`);
