@@ -103,7 +103,7 @@ export const Switch = ({
               display: 'block',
               float: 'left',
               height: '25px',
-              lineHeight: '25px',
+              lineHeight: '1.5625rem',
               padding: 0,
               width: '50%',
             },

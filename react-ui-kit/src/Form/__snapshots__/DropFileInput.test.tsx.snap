@@ -20,7 +20,7 @@ exports[`"DropFileInput" matches snapshot 1`] = `
   text-align: center;
   background-color: #fff;
   font-weight: 400;
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 13px;
   color: #696c6e;
 }
@@ -93,8 +93,8 @@ exports[`"DropFileInput" matches snapshot 1`] = `
 .emotion-10 {
   margin-top: 12px;
   font-weight: 400;
-  font-size: 10px;
-  line-height: 13px;
+  font-size: 0.625rem;
+  line-height: 0.8125rem;
   color: #696c6e;
   white-space: pre-line;
 }

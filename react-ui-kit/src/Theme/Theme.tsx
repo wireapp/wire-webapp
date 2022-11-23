@@ -21,6 +21,8 @@ import * as React from 'react';
 
 import {ThemeProvider as EmotionThemeProvider, Theme as ETheme} from '@emotion/react';
 
+import {fontSizes} from './Sizes';
+
 import {COLOR} from '../Identity/colors';
 import {COLOR_V2, BASE_DARK_COLOR, BASE_LIGHT_COLOR} from '../Identity/colors-v2';
 
@@ -31,6 +33,14 @@ export enum THEME_ID {
 }
 
 export interface Theme extends ETheme {
+  fontSizes: {
+    extraSmall: string;
+    small: string;
+    medium: string;
+    base: string;
+    large: string;
+    extraLarge: string;
+  };
   Button?: {
     primaryBg: String;
     primaryHoverBg: String;
@@ -98,6 +108,7 @@ export interface Theme extends ETheme {
 
 export const themes: {[themeId in THEME_ID]: Theme} = {
   [THEME_ID.DEFAULT]: {
+    fontSizes,
     Button: {
       primaryBg: 'var(--accent-color)',
       primaryHoverBg: 'var(--button-primary-hover)',
@@ -163,6 +174,7 @@ export const themes: {[themeId in THEME_ID]: Theme} = {
     },
   },
   [THEME_ID.LIGHT]: {
+    fontSizes,
     Button: {
       primaryBg: 'var(--accent-color)',
       primaryHoverBg: 'var(--button-primary-hover)',
@@ -228,6 +240,7 @@ export const themes: {[themeId in THEME_ID]: Theme} = {
     },
   },
   [THEME_ID.DARK]: {
+    fontSizes,
     Button: {
       primaryBg: 'var(--accent-color)',
       primaryHoverBg: 'var(--button-primary-hover)',

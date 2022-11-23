@@ -31,7 +31,7 @@ export interface LabelProps<T = HTMLSpanElement> extends TextProps<T> {
 
 const labelStyle: <T>(theme: Theme, props: LabelProps<T>) => CSSObject = (
   theme,
-  {markInvalid, bold = false, color = theme.general.color, fontSize = '12px', ...props},
+  {markInvalid, bold = false, color = theme.general.color, fontSize = theme.fontSizes.small, ...props},
 ) => ({
   ...textStyle(theme, {bold, color, fontSize, ...props}),
   '&:focus-within': {
@@ -47,7 +47,10 @@ export const Label = (props: LabelProps) => (
 
 export type LabelLinkProps<T = HTMLAnchorElement> = LinkProps<T>;
 
-const labelLinkStyle: <T>(theme, props: LabelLinkProps<T>) => CSSObject = (theme, {fontSize = '12px', ...props}) => ({
+const labelLinkStyle: <T>(theme, props: LabelLinkProps<T>) => CSSObject = (
+  theme,
+  {fontSize = theme.fontSizes.small, ...props},
+) => ({
   ...linkStyle(theme, {fontSize, ...props}),
 });
 

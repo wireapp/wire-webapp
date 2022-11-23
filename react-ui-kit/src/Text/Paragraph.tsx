@@ -43,13 +43,13 @@ export type LeadProps<T = HTMLParagraphElement> = TextProps<T>;
 
 export const leadStyle: <T>(theme: Theme, props: LeadProps<T>) => CSSObject = (
   theme,
-  {block = true, center = true, fontSize = '24px', ...props},
+  {block = true, center = true, fontSize = theme.fontSizes.extraLarge, ...props},
 ) => ({
   ...textStyle(theme, {block, center, fontSize, ...props}),
   marginBottom: '56px',
   marginTop: 0,
   [media[QueryKeys.MOBILE]]: {
-    fontSize: '20px',
+    fontSize: '1.125rem',
   },
 });
 

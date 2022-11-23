@@ -20,8 +20,8 @@
 import {Global, CSSObject, css, withTheme} from '@emotion/react';
 import emotionNormalize from 'emotion-normalize';
 
-import {GlobalCssVariables} from './GlobalCssVariables';
 import {Theme} from './Layout';
+import {GlobalCssVariables} from './Theme/GlobalCssVariables';
 
 const getGlobalStyles: (theme: Theme) => CSSObject = (theme: Theme) => ({
   '*': {
@@ -50,6 +50,7 @@ const getGlobalStyles: (theme: Theme) => CSSObject = (theme: Theme) => ({
   html: {
     background: theme.general.backgroundColor,
     transition: 'background 0.15s',
+    fontSize: '16px',
   },
   p: {
     marginTop: 0,

@@ -21,9 +21,8 @@ import * as React from 'react';
 
 import {CSSObject} from '@emotion/react';
 
-import {THEME_ID, Theme, ThemeProvider, themes} from './Theme';
-
 import {GlobalStyle} from '../GlobalStyle';
+import {THEME_ID, Theme, ThemeProvider, themes} from '../Theme/Theme';
 import {filterProps} from '../util';
 
 type StyledAppContainerProps =

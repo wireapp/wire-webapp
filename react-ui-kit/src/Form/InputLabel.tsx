@@ -33,16 +33,22 @@ const InputLabel: FC<InputLabelProps> = ({htmlFor, markInvalid, isRequired, chil
   <label
     htmlFor={htmlFor}
     css={(theme: Theme) => ({
-      fontSize: '14px',
+      fontSize: theme.fontSizes.medium,
       fontWeight: 400,
-      lineHeight: '16px',
+      lineHeight: '1rem',
       color: markInvalid ? COLOR_V2.RED_LIGHT_500 : theme.Input.labelColor,
     })}
     {...props}
   >
     {children}
 
-    {isRequired && <span css={{fontSize: '16px', marginLeft: '4px', color: COLOR_V2.RED_LIGHT_500}}>*</span>}
+    {isRequired && (
+      <span
+        css={(theme: Theme) => ({fontSize: theme.fontSizes.base, marginLeft: '4px', color: COLOR_V2.RED_LIGHT_500})}
+      >
+        *
+      </span>
+    )}
   </label>
 );
 

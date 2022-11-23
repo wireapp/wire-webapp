@@ -27,7 +27,7 @@ import {MenuSubLink} from './MenuSubLink';
 import {COLOR, Opacity, Slide, YAxisMovement} from '../../Identity';
 import {DURATION} from '../../Identity/motions';
 import {QUERY} from '../../mediaQueries';
-import {Theme} from '../Theme';
+import {Theme} from '../../Theme/Theme';
 
 export type DesktopStyledHeaderSubMenuProps<T = HTMLDivElement> = React.HTMLProps<T>;
 
