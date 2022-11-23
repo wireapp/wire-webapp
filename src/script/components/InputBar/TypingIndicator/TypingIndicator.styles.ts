@@ -22,11 +22,17 @@ import {css, CSSObject, keyframes} from '@emotion/react';
 export const wrapperStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
-  marginBottom: 5,
-  marginLeft: 18,
+  marginLeft: 15,
   color: 'var(--text-input-placeholder)',
   fontSize: 11,
   fontWeight: 500,
+  paddingTop: 2,
+  backgroundColor: 'var(--app-bg)',
+  padding: 5,
+  position: 'absolute',
+  bottom: 56,
+  borderTopLeftRadius: 4,
+  borderTopRightRadius: 4,
 };
 
 export const indicatorAnimationWrapperStyles: CSSObject = {
@@ -116,6 +122,7 @@ export const dotThreeStyles = css`
 `;
 
 export const indicatorTitleStyles = css`
+  height: 16px;
   position: relative;
   top: 1px;
 `;
