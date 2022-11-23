@@ -35,7 +35,6 @@ import {PROPERTIES_TYPE} from './PropertiesType';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
 import type {User} from '../entity/User';
-import {FontSizePreference} from '../page/MainContent/panels/preferences/OptionPreferences';
 import type {SelfService} from '../self/SelfService';
 import {ConsentValue} from '../user/ConsentValue';
 
@@ -80,7 +79,6 @@ export class PropertiesRepository {
           replace_inline: true,
         },
         interface: {
-          font_size: FontSizePreference.M,
           theme: 'default',
           view_folders: false,
         },
@@ -296,9 +294,6 @@ export class PropertiesRepository {
 
   private publishPropertyUpdate(propertiesType: string, updatedPreference: any): void {
     switch (propertiesType) {
-      case PROPERTIES_TYPE.INTERFACE.FONT_SIZE:
-        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.FONT_SIZE, updatedPreference);
-        break;
       case PROPERTIES_TYPE.INTERFACE.THEME:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, updatedPreference);
         break;

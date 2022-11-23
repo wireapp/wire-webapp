@@ -28,6 +28,18 @@ export enum ViewType {
   LEFT_SIDEBAR = 1,
 }
 
+export enum RootFontSize {
+  XXS = '10px',
+  XS = '12px',
+  S = '14px',
+  M = '16px',
+  L = '18px',
+  XL = '20px',
+  XXL = '24px',
+  // XXXL = '30px',
+  // XXXXL = '36px',
+}
+
 type RightSidebarParams = {
   entity: PanelEntity | null;
   showLikes?: boolean;
@@ -49,6 +61,10 @@ type AppMainState = {
     history: PanelState[];
     showLikes: RightSidebarParams['showLikes'];
     updateEntity: (entity: RightSidebarParams['entity']) => void;
+  };
+  rootFontSize: {
+    currentRootFontSize: RootFontSize;
+    setCurrentRootFontSize: (rootFontSize: RootFontSize) => void;
   };
 };
 
@@ -105,6 +121,11 @@ const useAppMainState = create<AppMainState>((set, get) => ({
     showLikes: false,
     updateEntity: (entity: RightSidebarParams['entity']) =>
       set(state => ({...state, rightSidebar: {...state.rightSidebar, entity}})),
+  },
+  rootFontSize: {
+    currentRootFontSize: RootFontSize.M,
+    setCurrentRootFontSize: (rootFontSize: RootFontSize) =>
+      set(state => ({...state, rootFontSize: {...state.rootFontSize, currentRootFontSize: rootFontSize}})),
   },
 }));
 

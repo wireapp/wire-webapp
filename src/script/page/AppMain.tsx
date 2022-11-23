@@ -184,6 +184,13 @@ const AppMain: FC<AppMainProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const {currentRootFontSize} = useAppMainState(state => state.rootFontSize);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    root.style.fontSize = currentRootFontSize;
+  }, [currentRootFontSize]);
+
   useLayoutEffect(() => {
     initializeApp();
   }, []);

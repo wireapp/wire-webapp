@@ -26,6 +26,7 @@ import {container} from 'tsyringe';
 import {Checkbox, CheckboxLabel, RangeInput} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {RootFontSize, useAppMainState} from 'src/script/page/state';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -37,22 +38,9 @@ import {PropertiesRepository} from '../../../../properties/PropertiesRepository'
 import {PROPERTIES_TYPE} from '../../../../properties/PropertiesType';
 import {UserState} from '../../../../user/UserState';
 import {THEMES as ThemeViewModelThemes} from '../../../../view_model/ThemeViewModel';
-
 interface OptionPreferencesProps {
   propertiesRepository: PropertiesRepository;
   userState?: UserState;
-}
-
-export enum FontSizePreference {
-  XXS = '10px',
-  XS = '12px',
-  S = '14px',
-  M = '16px',
-  L = '18px',
-  XL = '20px',
-  XXL = '24px',
-  // XXXL = '30px',
-  // XXXXL = '36px',
 }
 
 // const dataListOptions = [
@@ -65,7 +53,7 @@ export enum FontSizePreference {
 //   {value: 24, label: '24px', heading: 'Large'},
 // ];
 
-const fontSizes = Object.values(FontSizePreference);
+const fontSizes = Object.values(RootFontSize);
 
 const OptionPreferences: React.FC<OptionPreferencesProps> = ({
   propertiesRepository,
@@ -75,13 +63,11 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
   const {
     properties: {settings},
   } = propertiesRepository;
-  const currentFontSizeIndex = fontSizes.indexOf(settings.interface.font_size);
   const [optionAudio, setOptionAudio] = useState<AudioPreference>(settings.sound.alerts);
   const [optionReplaceInlineEmoji, setOptionReplaceInlineEmoji] = useState<boolean>(settings.emoji.replace_inline);
   const [optionDarkMode, setOptionDarkMode] = useState<boolean>(settings.interface.theme === ThemeViewModelThemes.DARK);
   const [optionSendPreviews, setOptionSendPreviews] = useState<boolean>(settings.previews.send);
   const [optionNotifications, setOptionNotifications] = useState<NotificationPreference>(settings.notifications);
-  const [optionFontSize, setOptionFontSize] = useState<number>(currentFontSizeIndex);
 
   useEffect(() => {
     const updateProperties = ({settings}: WebappProperties): void => {
@@ -90,7 +76,6 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
       setOptionDarkMode(settings.interface.theme === ThemeViewModelThemes.DARK);
       setOptionSendPreviews(settings.previews.send);
       setOptionNotifications(settings.notifications);
-      setOptionFontSize(currentFontSizeIndex);
     };
 
     const updateDarkMode = (newDarkMode: boolean) => setOptionDarkMode(newDarkMode);
@@ -103,6 +88,10 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
       amplify.unsubscribe(WebAppEvents.PROPERTIES.UPDATED, updateProperties);
     };
   }, []);
+
+  const {currentRootFontSize, setCurrentRootFontSize} = useAppMainState(state => state.rootFontSize);
+
+  const sliderValue = fontSizes.indexOf(currentRootFontSize);
 
   const saveOptionAudioPreference = (audioPreference: AudioPreference) => {
     propertiesRepository.savePreference(PROPERTIES_TYPE.SOUND_ALERTS, audioPreference);
@@ -130,13 +119,10 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
     setOptionDarkMode(useDarkMode);
   };
 
-  const saveOptionFontSize = event => {
+  const saveOptionFontSize = (event: React.FormEvent<HTMLInputElement>) => {
     const index = event.target.value;
     const fontSize = fontSizes[index];
-    const root = document.documentElement;
-    root.style.fontSize = fontSize;
-    propertiesRepository.savePreference(PROPERTIES_TYPE.INTERFACE.FONT_SIZE, fontSize);
-    setOptionFontSize(index);
+    setCurrentRootFontSize(fontSize);
   };
 
   return (
@@ -203,7 +189,7 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
               css={{margin: '16px', width: '100%'}}
               min={'0'}
               max={'6'}
-              value={optionFontSize}
+              value={sliderValue}
               label={'font size'}
               minValueLabel={'small'}
               maxValueLabel={'big'}
