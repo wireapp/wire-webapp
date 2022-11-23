@@ -51,7 +51,7 @@ import {
 } from '../../messagingProtocols/proteus/ProteusService/ProteusService.types';
 import {mapQualifiedUserClientIdsToFullyQualifiedClientIds} from '../../util/fullyQualifiedClientIdUtils';
 import {RemoteData} from '../content';
-import {sendMessage} from '../message/messageSender';
+import {isSendingMessage, sendMessage} from '../message/messageSender';
 import {MessageService} from '../message/MessageService';
 
 export class ConversationService {
@@ -205,6 +205,13 @@ export class ConversationService {
 
   public sendTypingStop(conversationId: string): Promise<void> {
     return this.apiClient.api.conversation.postTyping(conversationId, {status: CONVERSATION_TYPING.STOPPED});
+  }
+
+  /**
+   * returns the number of messages that are in the queue expecting to be sent
+   */
+  isSendingMessage(): boolean {
+    return isSendingMessage();
   }
 
   public setConversationMutedStatus(
