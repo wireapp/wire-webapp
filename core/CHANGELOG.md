@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [37.2.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@37.1.2...@wireapp/core@37.2.0) (2022-11-23)
+
+### Bug Fixes
+
+* **core:** Send broadcast message through the sending queue ([2065dcc](https://github.com/wireapp/wire-web-packages/commit/2065dcc9619032d95c8690d7ac37759d62ddd800))
+
+### Features
+
+* **core:** Expose whether a message is being sent ([ca70c99](https://github.com/wireapp/wire-web-packages/commit/ca70c992bfa01a085a25bb249adf1e9be9de1873))
+
 ## [37.1.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@37.1.1...@wireapp/core@37.1.2) (2022-11-22)
 
 **Note:** Version bump only for package @wireapp/core

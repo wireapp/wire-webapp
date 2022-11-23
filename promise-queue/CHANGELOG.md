@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.1.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/promise-queue@2.0.3...@wireapp/promise-queue@2.1.0) (2022-11-23)
+
+### Features
+
+* **promise-queue:** Expose whether a task is running to the consumer ([c6cae61](https://github.com/wireapp/wire-web-packages/commit/c6cae618acae31c0db109a74064e3a5c183694a1))
+
 ## [2.0.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/promise-queue@2.0.2...@wireapp/promise-queue@2.0.3) (2022-11-08)
 
 **Note:** Version bump only for package @wireapp/promise-queue
