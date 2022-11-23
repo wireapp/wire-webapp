@@ -1965,8 +1965,7 @@ export class ConversationRepository {
       `Handling event '${type}' in conversation '${conversationId.id}/${conversationId.domain}' (Source: ${eventSource})`,
     );
 
-    const selfConversation = this.conversationState.selfConversation();
-    const inSelfConversation = selfConversation && matchQualifiedIds(conversationId, selfConversation.qualifiedId);
+    const inSelfConversation = this.conversationState.isSelfConversation(conversationId);
     if (inSelfConversation) {
       const typesInSelfConversation = [
         CONVERSATION_EVENT.MEMBER_UPDATE,
@@ -2589,8 +2588,7 @@ export class ConversationRepository {
     }
 
     const isBackendEvent = eventData.otr_archived_ref || eventData.otr_muted_ref;
-    const selfConversation = this.conversationState.selfConversation();
-    const inSelfConversation = selfConversation && matchQualifiedIds(selfConversation, conversationId);
+    const inSelfConversation = this.conversationState.isSelfConversation(conversationId);
     if (!inSelfConversation && conversation && !isBackendEvent) {
       this.logger.warn(
         `A conversation update message was not sent in the selfConversation. Skipping conversation update`,
@@ -2722,11 +2720,11 @@ export class ConversationRepository {
    * @returns Resolves when the event was handled
    */
   private async onMessageHidden(eventJson: MessageHiddenEvent) {
-    const {conversation: conversationId, data: eventData, from} = eventJson;
+    const {conversation, qualified_conversation, data: eventData, from} = eventJson;
 
+    const conversationId = qualified_conversation || {id: conversation, domain: ''};
     try {
-      const inSelfConversation =
-        !this.conversationState.selfConversation() || conversationId === this.conversationState.selfConversation()?.id;
+      const inSelfConversation = this.conversationState.isSelfConversation(conversationId);
       if (!inSelfConversation) {
         throw new ConversationError(
           ConversationError.TYPE.WRONG_CONVERSATION,
