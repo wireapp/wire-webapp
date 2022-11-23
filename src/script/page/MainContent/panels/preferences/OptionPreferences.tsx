@@ -119,8 +119,8 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
     setOptionDarkMode(useDarkMode);
   };
 
-  const saveOptionFontSize = (event: React.FormEvent<HTMLInputElement>) => {
-    const index = event.target.value;
+  const saveOptionFontSize = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const index = parseInt(event.target.value);
     const fontSize = fontSizes[index];
     setCurrentRootFontSize(fontSize);
   };
