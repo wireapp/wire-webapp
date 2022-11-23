@@ -172,6 +172,10 @@ export class DebugUtil {
     };
   }
 
+  isSendingMessage(): boolean {
+    return this.core.service!.conversation.isSendingMessage();
+  }
+
   async getLastMessagesFromDatabase(
     amount = 10,
     conversationId = this.conversationState.activeConversation().id,
