@@ -44,12 +44,36 @@ function createConversation(protocol?: ConversationProtocol, type?: CONVERSATION
 }
 
 describe('ConversationState', () => {
+  const selfProteusConversation = createConversation(ConversationProtocol.PROTEUS, CONVERSATION_TYPE.SELF);
+  const selfMLSConversation = createConversation(ConversationProtocol.MLS, CONVERSATION_TYPE.SELF);
+  const regularConversation = createConversation();
+
+  describe('getSelfConversation', () => {
+    it('throws if no self conversation are set', () => {
+      const conversationState = createConversationState();
+      expect(() => conversationState.getSelfConversation()).toThrow('proteus');
+      expect(() => conversationState.getSelfConversation(true)).toThrow('MLS');
+    });
+
+    it('finds the MLS and proteus self conversations', () => {
+      const conversationState = createConversationState();
+      conversationState.conversations([selfProteusConversation, selfMLSConversation, regularConversation]);
+      expect(conversationState.getSelfConversation()).toBe(selfProteusConversation);
+      expect(conversationState.getSelfConversation(true)).toBe(selfMLSConversation);
+    });
+  });
+
   describe('isSelfConversation', () => {
+    it('returns false if not self conversations are set', () => {
+      const conversationState = createConversationState();
+      expect(conversationState.isSelfConversation(regularConversation.qualifiedId)).toBeFalsy();
+      expect(conversationState.isSelfConversation(selfMLSConversation.qualifiedId)).toBeFalsy();
+      expect(conversationState.isSelfConversation(selfProteusConversation.qualifiedId)).toBeFalsy();
+    });
+
     it('detects self proteus and mls conversations', () => {
       const conversationState = createConversationState();
-      const selfProteusConversation = createConversation(ConversationProtocol.PROTEUS, CONVERSATION_TYPE.SELF);
-      const selfMLSConversation = createConversation(ConversationProtocol.MLS, CONVERSATION_TYPE.SELF);
-      const regularConversation = createConversation();
+
       const conversations = [
         createConversation(ConversationProtocol.MLS),
         regularConversation,
@@ -58,9 +82,6 @@ describe('ConversationState', () => {
       ];
 
       conversationState.conversations(conversations);
-
-      expect(conversationState.selfConversation()).toBe(selfProteusConversation);
-      expect(conversationState.selfMLSConversation()).toBe(selfMLSConversation);
 
       expect(conversationState.isSelfConversation(regularConversation.qualifiedId)).toBeFalsy();
       expect(conversationState.isSelfConversation(selfMLSConversation.qualifiedId)).toBeTruthy();

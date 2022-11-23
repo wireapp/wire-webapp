@@ -48,8 +48,8 @@ export class ConversationState {
   public readonly visibleConversations: ko.PureComputed<Conversation[]>;
   public readonly filteredConversations: ko.PureComputed<Conversation[]>;
   public readonly archivedConversations: ko.PureComputed<Conversation[]>;
-  public readonly selfConversation: ko.PureComputed<Conversation | undefined>;
-  public readonly selfMLSConversation: ko.PureComputed<Conversation | undefined>;
+  private readonly selfProteusConversation: ko.PureComputed<Conversation | undefined>;
+  private readonly selfMLSConversation: ko.PureComputed<Conversation | undefined>;
   public readonly connectedUsers: ko.PureComputed<User[]>;
 
   public readonly sortedConversations: ko.PureComputed<Conversation[]>;
@@ -59,7 +59,7 @@ export class ConversationState {
     private readonly teamState = container.resolve(TeamState),
   ) {
     this.sortedConversations = ko.pureComputed(() => this.filteredConversations().sort(sortGroupsByLastEvent));
-    this.selfConversation = ko.pureComputed(() =>
+    this.selfProteusConversation = ko.pureComputed(() =>
       this.conversations().find(conversation => !isMLSConversation(conversation) && isSelfConversation(conversation)),
     );
     this.selfMLSConversation = ko.pureComputed(() =>
@@ -111,6 +111,22 @@ export class ConversationState {
     });
   }
 
+  getSelfConversation(useMLS: boolean = false): Conversation {
+    if (!useMLS) {
+      const proteusConversation = this.selfProteusConversation();
+      if (!proteusConversation) {
+        throw new Error('No proteus self conversation');
+      }
+      return proteusConversation;
+    }
+
+    const mlsConversation = this.selfMLSConversation();
+    if (!mlsConversation) {
+      throw new Error('No MLS self conversation');
+    }
+    return mlsConversation;
+  }
+
   /**
    * returns true if the conversation should be visible to the user
    * @param conversation the conversation to check visibility
@@ -146,7 +162,7 @@ export class ConversationState {
   }
 
   isSelfConversation(conversationId: QualifiedId): boolean {
-    const selfConversationIds: QualifiedId[] = [this.selfConversation(), this.selfMLSConversation()]
+    const selfConversationIds: QualifiedId[] = [this.selfProteusConversation(), this.selfMLSConversation()]
       .filter((conversation): conversation is Conversation => !!conversation)
       .map(conversation => conversation.qualifiedId);
 

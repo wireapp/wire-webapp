@@ -27,6 +27,7 @@ import {Icon} from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import type {Logger} from 'Util/Logger';
+import {supportsMLS} from 'Util/util';
 
 import {DeviceCard} from './DeviceCard';
 
@@ -89,7 +90,9 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
 
   const clickToResetSession = () => {
     const _resetProgress = () => window.setTimeout(() => setIsResettingSession(false), MotionDuration.LONG);
-    const conversation = user.isMe ? conversationState.selfConversation() : conversationState.activeConversation();
+    const conversation = user.isMe
+      ? conversationState.getSelfConversation(supportsMLS())
+      : conversationState.activeConversation();
     setIsResettingSession(true);
     if (conversation) {
       messageRepository
