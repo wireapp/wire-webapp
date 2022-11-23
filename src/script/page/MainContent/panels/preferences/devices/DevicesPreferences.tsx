@@ -153,7 +153,7 @@ const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
         }}
         onClose={() => setSelectedDevice(undefined)}
         onVerify={(device, verified) => verifyDevice(self.qualifiedId, device, verified)}
-        onResetSession={device => resetSession(self.qualifiedId, device, conversationState.selfConversation())}
+        onResetSession={device => resetSession(self.qualifiedId, device, conversationState.getSelfConversation())}
       />
     );
   }
