@@ -101,9 +101,9 @@ export const customStyles = (theme: Theme, markInvalid = false) => ({
     color: theme.general.color,
     padding: '10px 18px',
     cursor: isDisabled ? 'not-allowed' : 'pointer',
-    fontSize: '16px',
+    fontSize: theme.fontSizes.base,
     fontWeight: 300,
-    lineHeight: '24px',
+    lineHeight: '1.5rem',
     ...(isSelected &&
       !isDisabled &&
       !isMulti && {

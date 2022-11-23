@@ -13,7 +13,7 @@ exports[`"ButtonLink" renders (dark theme) 1`] = `
   display: -webkit-inline-flex!important;
   display: -ms-inline-flexbox!important;
   display: inline-flex!important;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 600;
   overflow: hidden;
   text-align: center;
@@ -86,7 +86,7 @@ exports[`"ButtonLink" renders 1`] = `
   display: -webkit-inline-flex!important;
   display: -ms-inline-flexbox!important;
   display: inline-flex!important;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 600;
   overflow: hidden;
   text-align: center;
@@ -185,7 +185,7 @@ exports[`"ButtonLink" renders in loading state 1`] = `
   display: -webkit-inline-flex!important;
   display: -ms-inline-flexbox!important;
   display: inline-flex!important;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 600;
   overflow: hidden;
   text-align: center;

@@ -53,7 +53,7 @@ export const buttonStyle: <T>(theme: Theme, props: ButtonProps<T>) => CSSObject 
     bold = true,
     center = true,
     color = COLOR.WHITE,
-    fontSize = '16px',
+    fontSize = theme.fontSizes.base,
     noWrap = true,
     textTransform = 'none',
     truncate = true,
@@ -137,9 +137,9 @@ export const buttonStyle: <T>(theme: Theme, props: ButtonProps<T>) => CSSObject 
     border: disabled ? `1px solid ${theme.Button.tertiaryDisabledBorder}` : `1px solid ${theme.Button.tertiaryBorder}`,
     borderRadius: '12px',
     color: disabled ? theme.Input.placeholderColor : theme.general.color,
-    fontSize: '14px',
+    fontSize: theme.fontSizes.medium,
     fontWeight: 700,
-    lineHeight: '24px',
+    lineHeight: '1.5rem',
     padding: '4px 8px',
     '& > svg > path': {
       fill: disabled ? theme.Input.placeholderColor : theme.general.color,
@@ -164,7 +164,7 @@ export const buttonStyle: <T>(theme: Theme, props: ButtonProps<T>) => CSSObject 
   ...(variant === ButtonVariant.QUATERNARY && {
     backgroundColor: backgroundColor || (disabled ? COLOR_V2.GRAY_50 : COLOR_V2.GREEN),
     color: disabled ? COLOR_V2.GRAY_80 : COLOR_V2.WHITE,
-    lineHeight: '24px',
+    lineHeight: '1.5rem',
     ...(!disabled && {
       '&:hover, &:focus': {
         backgroundColor: COLOR_V2.GREEN_LIGHT_600,

@@ -57,7 +57,7 @@ exports[`"Switch" renders (dark theme) 1`] = `
   display: block;
   float: left;
   height: 25px;
-  line-height: 25px;
+  line-height: 1.5625rem;
   padding: 0;
   width: 50%;
 }
@@ -163,7 +163,7 @@ exports[`"Switch" renders checked 1`] = `
   display: block;
   float: left;
   height: 25px;
-  line-height: 25px;
+  line-height: 1.5625rem;
   padding: 0;
   width: 50%;
 }
@@ -268,7 +268,7 @@ exports[`"Switch" renders disabled 1`] = `
   display: block;
   float: left;
   height: 25px;
-  line-height: 25px;
+  line-height: 1.5625rem;
   padding: 0;
   width: 50%;
 }
@@ -376,7 +376,7 @@ exports[`"Switch" renders unchecked 1`] = `
   display: block;
   float: left;
   height: 25px;
-  line-height: 25px;
+  line-height: 1.5625rem;
   padding: 0;
   width: 50%;
 }

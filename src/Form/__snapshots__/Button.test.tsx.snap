@@ -13,7 +13,7 @@ exports[`"Button" renders (dark theme) 1`] = `
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 600;
   overflow: hidden;
   text-align: center;
@@ -86,7 +86,7 @@ exports[`"Button" renders 1`] = `
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 600;
   overflow: hidden;
   text-align: center;
@@ -159,7 +159,7 @@ exports[`"Button" renders as block 1`] = `
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 600;
   overflow: hidden;
   text-align: center;
@@ -258,7 +258,7 @@ exports[`"Button" renders in loading state 1`] = `
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 600;
   overflow: hidden;
   text-align: center;
@@ -366,7 +366,7 @@ exports[`"Button" renders when disabled 1`] = `
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 600;
   overflow: hidden;
   text-align: center;

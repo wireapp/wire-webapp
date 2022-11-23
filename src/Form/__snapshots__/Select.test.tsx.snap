@@ -25,7 +25,7 @@ exports[`"Select" renders 1`] = `
   color: rgb(29, 30, 31);
   font-weight: 300;
   height: auto;
-  line-height: 24px;
+  line-height: 1.5rem;
   outline: none;
   padding: 0;
   width: 100%;
@@ -36,20 +36,20 @@ exports[`"Select" renders 1`] = `
 
 .emotion-2>div::-moz-placeholder {
   color: rgb(80, 82, 84);
-  font-size: 16px;
+  font-size: 1rem;
   text-transform: none;
   opacity: 1;
 }
 
 .emotion-2>div::-ms-input-placeholder {
   color: rgb(80, 82, 84);
-  font-size: 16px;
+  font-size: 1rem;
   text-transform: none;
 }
 
 .emotion-2>div::-webkit-input-placeholder {
   color: rgb(80, 82, 84);
-  font-size: 16px;
+  font-size: 1rem;
   text-transform: none;
 }
 
@@ -315,7 +315,7 @@ exports[`"Select" renders as disabled 1`] = `
   color: #676b71;
   font-weight: 300;
   height: auto;
-  line-height: 24px;
+  line-height: 1.5rem;
   outline: none;
   padding: 0;
   width: 100%;
@@ -326,20 +326,20 @@ exports[`"Select" renders as disabled 1`] = `
 
 .emotion-2>div::-moz-placeholder {
   color: rgb(80, 82, 84);
-  font-size: 16px;
+  font-size: 1rem;
   text-transform: none;
   opacity: 1;
 }
 
 .emotion-2>div::-ms-input-placeholder {
   color: rgb(80, 82, 84);
-  font-size: 16px;
+  font-size: 1rem;
   text-transform: none;
 }
 
 .emotion-2>div::-webkit-input-placeholder {
   color: rgb(80, 82, 84);
-  font-size: 16px;
+  font-size: 1rem;
   text-transform: none;
 }
 
@@ -600,7 +600,7 @@ exports[`"Select" renders as invalid 1`] = `
   color: rgb(29, 30, 31);
   font-weight: 300;
   height: auto;
-  line-height: 24px;
+  line-height: 1.5rem;
   outline: none;
   padding: 0;
   width: 100%;
@@ -611,20 +611,20 @@ exports[`"Select" renders as invalid 1`] = `
 
 .emotion-2>div::-moz-placeholder {
   color: rgb(80, 82, 84);
-  font-size: 16px;
+  font-size: 1rem;
   text-transform: none;
   opacity: 1;
 }
 
 .emotion-2>div::-ms-input-placeholder {
   color: rgb(80, 82, 84);
-  font-size: 16px;
+  font-size: 1rem;
   text-transform: none;
 }
 
 .emotion-2>div::-webkit-input-placeholder {
   color: rgb(80, 82, 84);
-  font-size: 16px;
+  font-size: 1rem;
   text-transform: none;
 }
 

@@ -28,7 +28,7 @@ export type TitleProps<T = HTMLDivElement> = TextProps<T>;
 
 const titleStyle: <T>(theme: Theme, props: TitleProps<T>) => CSSObject = (
   theme,
-  {block = true, center = true, fontSize = '32px', color = COLOR.GRAY, bold = true, ...props},
+  {block = true, center = true, fontSize = ' 2rem', color = COLOR.GRAY, bold = true, ...props},
 ) => ({
   ...textStyle(theme, {block, bold, center, color, fontSize, ...props}),
   marginBottom: '8px',

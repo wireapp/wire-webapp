@@ -10,7 +10,7 @@ exports[`"InputLabel" renders (dark theme) 1`] = `
 .emotion-1 {
   color: initial;
   display: inline;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 300;
   text-align: left;
   text-transform: none;
@@ -42,7 +42,7 @@ exports[`"InputLabel" renders 1`] = `
 .emotion-1 {
   color: initial;
   display: inline;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 300;
   text-align: left;
   text-transform: none;
@@ -74,7 +74,7 @@ exports[`"LabelLink" renders (dark theme) 1`] = `
 .emotion-1 {
   color: #fff;
   display: inline;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 600;
   text-align: left;
   text-transform: uppercase;
@@ -117,7 +117,7 @@ exports[`"LabelLink" renders 1`] = `
 .emotion-1 {
   color: rgb(29, 30, 31);
   display: inline;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 600;
   text-align: left;
   text-transform: uppercase;

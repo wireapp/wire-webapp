@@ -10,7 +10,7 @@ exports[`"Lead" renders (dark theme) 1`] = `
 .emotion-1 {
   color: #fff;
   display: block;
-  font-size: 24px;
+  font-size: 1.5rem;
   font-weight: 300;
   text-align: center;
   text-transform: none;
@@ -20,7 +20,7 @@ exports[`"Lead" renders (dark theme) 1`] = `
 
 @media (max-width: 639px) {
   .emotion-1 {
-    font-size: 20px;
+    font-size: 1.125rem;
   }
 }
 
@@ -45,7 +45,7 @@ exports[`"Lead" renders 1`] = `
 .emotion-1 {
   color: rgb(29, 30, 31);
   display: block;
-  font-size: 24px;
+  font-size: 1.5rem;
   font-weight: 300;
   text-align: center;
   text-transform: none;
@@ -55,7 +55,7 @@ exports[`"Lead" renders 1`] = `
 
 @media (max-width: 639px) {
   .emotion-1 {
-    font-size: 20px;
+    font-size: 1.125rem;
   }
 }
 
@@ -80,7 +80,7 @@ exports[`"Paragraph" renders (dark theme) 1`] = `
 .emotion-1 {
   color: #fff;
   display: block;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 300;
   text-align: left;
   text-transform: none;
@@ -109,7 +109,7 @@ exports[`"Paragraph" renders 1`] = `
 .emotion-1 {
   color: rgb(29, 30, 31);
   display: block;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 300;
   text-align: left;
   text-transform: none;

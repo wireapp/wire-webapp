@@ -8,9 +8,9 @@ exports[`"RangeInput" matches snapshot 1`] = `
 }
 
 .emotion-3 {
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 400;
-  line-height: 16px;
+  line-height: 1rem;
   color: #54585f;
 }
 
@@ -22,7 +22,7 @@ exports[`"RangeInput" matches snapshot 1`] = `
 .emotion-5 {
   pointer-events: none;
   bottom: 100%;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 300;
   position: absolute;
   left: 4px;
@@ -31,7 +31,7 @@ exports[`"RangeInput" matches snapshot 1`] = `
 .emotion-6 {
   pointer-events: none;
   bottom: 100%;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 300;
   position: absolute;
   right: 4px;

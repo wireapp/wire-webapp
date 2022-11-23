@@ -15,7 +15,7 @@ exports[`"TextArea" renders 1`] = `
   caret-color: #0772de;
   color: rgb(29, 30, 31);
   font-weight: 300;
-  line-height: 24px;
+  line-height: 1.5rem;
   margin: 0 0 16px;
   outline: none;
   padding: 16px 16px;
@@ -25,20 +25,20 @@ exports[`"TextArea" renders 1`] = `
 
 .emotion-1::-moz-placeholder {
   color: rgb(80, 82, 84);
-  font-size: 16px;
+  font-size: 1rem;
   text-transform: none;
   opacity: 1;
 }
 
 .emotion-1::-ms-input-placeholder {
   color: rgb(80, 82, 84);
-  font-size: 16px;
+  font-size: 1rem;
   text-transform: none;
 }
 
 .emotion-1::-webkit-input-placeholder {
   color: rgb(80, 82, 84);
-  font-size: 16px;
+  font-size: 1rem;
   text-transform: none;
 }
 
@@ -76,7 +76,7 @@ exports[`"TextArea" renders as disabled 1`] = `
   caret-color: #0772de;
   color: rgb(29, 30, 31);
   font-weight: 300;
-  line-height: 24px;
+  line-height: 1.5rem;
   margin: 0 0 16px;
   outline: none;
   padding: 16px 16px;
@@ -86,20 +86,20 @@ exports[`"TextArea" renders as disabled 1`] = `
 
 .emotion-1::-moz-placeholder {
   color: rgb(80, 82, 84);
-  font-size: 16px;
+  font-size: 1rem;
   text-transform: none;
   opacity: 1;
 }
 
 .emotion-1::-ms-input-placeholder {
   color: rgb(80, 82, 84);
-  font-size: 16px;
+  font-size: 1rem;
   text-transform: none;
 }
 
 .emotion-1::-webkit-input-placeholder {
   color: rgb(80, 82, 84);
-  font-size: 16px;
+  font-size: 1rem;
   text-transform: none;
 }
 
@@ -138,7 +138,7 @@ exports[`"TextArea" renders as invalid 1`] = `
   caret-color: #0772de;
   color: rgb(29, 30, 31);
   font-weight: 300;
-  line-height: 24px;
+  line-height: 1.5rem;
   margin: 0 0 16px;
   outline: none;
   padding: 16px 16px;
@@ -148,20 +148,20 @@ exports[`"TextArea" renders as invalid 1`] = `
 
 .emotion-1::-moz-placeholder {
   color: rgb(80, 82, 84);
-  font-size: 16px;
+  font-size: 1rem;
   text-transform: none;
   opacity: 1;
 }
 
 .emotion-1::-ms-input-placeholder {
   color: rgb(80, 82, 84);
-  font-size: 16px;
+  font-size: 1rem;
   text-transform: none;
 }
 
 .emotion-1::-webkit-input-placeholder {
   color: rgb(80, 82, 84);
-  font-size: 16px;
+  font-size: 1rem;
   text-transform: none;
 }
 
@@ -195,7 +195,7 @@ exports[`"TextArea" renders with placeholderTextTransform 1`] = `
   caret-color: #0772de;
   color: rgb(29, 30, 31);
   font-weight: 300;
-  line-height: 24px;
+  line-height: 1.5rem;
   margin: 0 0 16px;
   outline: none;
   padding: 16px 16px;
@@ -205,20 +205,20 @@ exports[`"TextArea" renders with placeholderTextTransform 1`] = `
 
 .emotion-1::-moz-placeholder {
   color: rgb(80, 82, 84);
-  font-size: 16px;
+  font-size: 1rem;
   text-transform: uppercase;
   opacity: 1;
 }
 
 .emotion-1::-ms-input-placeholder {
   color: rgb(80, 82, 84);
-  font-size: 16px;
+  font-size: 1rem;
   text-transform: uppercase;
 }
 
 .emotion-1::-webkit-input-placeholder {
   color: rgb(80, 82, 84);
-  font-size: 16px;
+  font-size: 1rem;
   text-transform: uppercase;
 }
 

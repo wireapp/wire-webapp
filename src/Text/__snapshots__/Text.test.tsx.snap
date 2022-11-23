@@ -10,7 +10,7 @@ exports[`"Text" renders (dark theme) 1`] = `
 .emotion-1 {
   color: #fff;
   display: inline;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 300;
   text-align: left;
   text-transform: none;
@@ -37,7 +37,7 @@ exports[`"Text" renders 1`] = `
 .emotion-1 {
   color: rgb(29, 30, 31);
   display: inline;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 300;
   text-align: left;
   text-transform: none;
@@ -64,7 +64,7 @@ exports[`"Text" renders as block 1`] = `
 .emotion-1 {
   color: rgb(29, 30, 31);
   display: block;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 300;
   text-align: left;
   text-transform: none;
@@ -91,7 +91,7 @@ exports[`"Text" renders bold 1`] = `
 .emotion-1 {
   color: rgb(29, 30, 31);
   display: inline;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 600;
   text-align: left;
   text-transform: none;
@@ -118,7 +118,7 @@ exports[`"Text" renders centered 1`] = `
 .emotion-1 {
   color: rgb(29, 30, 31);
   display: inline;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 300;
   text-align: center;
   text-transform: none;
@@ -145,7 +145,7 @@ exports[`"Text" renders light 1`] = `
 .emotion-1 {
   color: rgb(29, 30, 31);
   display: inline;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 200;
   text-align: left;
   text-transform: none;
@@ -172,7 +172,7 @@ exports[`"Text" renders muted 1`] = `
 .emotion-1 {
   color: #696c6e;
   display: inline;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 300;
   text-align: left;
   text-transform: none;
@@ -199,7 +199,7 @@ exports[`"Text" renders no wrap 1`] = `
 .emotion-1 {
   color: rgb(29, 30, 31);
   display: inline;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 300;
   text-align: left;
   text-transform: none;
@@ -227,7 +227,7 @@ exports[`"Text" renders with color 1`] = `
 .emotion-1 {
   color: #0772de;
   display: inline;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 300;
   text-align: left;
   text-transform: none;
@@ -281,7 +281,7 @@ exports[`"Text" renders with textTransform 1`] = `
 .emotion-1 {
   color: rgb(29, 30, 31);
   display: inline;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 300;
   text-align: left;
   text-transform: uppercase;
@@ -308,7 +308,7 @@ exports[`"Text" renders with truncation 1`] = `
 .emotion-1 {
   color: rgb(29, 30, 31);
   display: inline;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 300;
   text-align: left;
   text-transform: uppercase;
@@ -335,7 +335,7 @@ exports[`Utility components renders Bold 1`] = `
 .emotion-1 {
   color: rgb(29, 30, 31);
   display: inline;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 600;
   text-align: left;
   text-transform: none;
@@ -389,7 +389,7 @@ exports[`Utility components renders Muted 1`] = `
 .emotion-1 {
   color: #696c6e;
   display: inline;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 300;
   text-align: left;
   text-transform: none;
@@ -443,7 +443,7 @@ exports[`Utility components renders Uppercase 1`] = `
 .emotion-1 {
   color: rgb(29, 30, 31);
   display: inline;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 300;
   text-align: left;
   text-transform: uppercase;

@@ -10,7 +10,7 @@ exports[`"TextLink" renders (dark theme) 1`] = `
 .emotion-1 {
   color: #0667c8;
   display: inline;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 300;
   text-align: left;
   text-transform: none;
@@ -54,7 +54,7 @@ exports[`"TextLink" renders 1`] = `
 .emotion-1 {
   color: #0667c8;
   display: inline;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 300;
   text-align: left;
   text-transform: none;

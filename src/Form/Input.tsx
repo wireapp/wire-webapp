@@ -45,7 +45,7 @@ export const inputStyle: <T>(theme: Theme, props: InputProps<T>, hasError?: bool
 ) => {
   const placeholderStyle = {
     color: theme.Input.placeholderColor,
-    fontSize: '16px',
+    fontSize: theme.fontSizes.base,
     textTransform: placeholderTextTransform,
   };
 
@@ -79,7 +79,7 @@ export const inputStyle: <T>(theme: Theme, props: InputProps<T>, hasError?: bool
     color: theme.general.color,
     fontWeight: 300,
     height: '48px',
-    lineHeight: '24px',
+    lineHeight: '1.5rem',
     outline: 'none',
     padding: '0 16px',
     width: '100%',
@@ -160,7 +160,7 @@ export const Input: React.FC<InputProps<HTMLInputElement>> = React.forwardRef<
       {!hasError && helperText && (
         <p
           css={(theme: Theme) => ({
-            fontSize: '12px',
+            fontSize: theme.fontSizes.small,
             fontWeight: 400,
             color: theme.Input.placeholderColor,
             marginTop: 8,

@@ -57,10 +57,10 @@ const StyledLabel = ({
           transform: 'translateY(-50%)',
           ...(labelBeforeCheckbox
             ? {
-                right: '0.75rem',
+                right: theme.fontSizes.small,
               }
             : {
-                left: '0.25rem',
+                left: '4px',
               }),
         },
         ...(!disabled && {
@@ -85,7 +85,7 @@ const StyledLabel = ({
           display: 'inline-block',
           width: '22px',
           height: '22px',
-          lineHeight: 1.4,
+          lineHeight: '1.4rem',
           margin: '0 8px 0 0px',
           color: theme.general.color,
         },
@@ -97,7 +97,7 @@ const StyledLabel = ({
         position: 'relative',
         margin: '0 0 0 -16px',
         width: aligncenter ? 'auto' : '100%',
-        lineHeight: 1.4,
+        lineHeight: '1.4rem',
         display: 'flex',
         opacity: disabled ? 0.56 : 1,
         cursor: disabled ? 'not-allowed' : 'pointer',
