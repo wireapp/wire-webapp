@@ -30,6 +30,7 @@ import {
   dotTwoStyles,
   editIconStyles,
   indicatorAnimationWrapperStyles,
+  indicatorTitleStyles,
   wrapperStyles,
 } from './TypingIndicator.styles';
 
@@ -47,18 +48,18 @@ const TypingIndicator: FC<TypingIndicatorProps> = ({conversationId}) => {
 
   return (
     <div css={wrapperStyles} data-uie-name="typing-indicator">
-      <div css={{display: 'flex', marginRight: '15px'}}>
+      <div css={{display: 'flex', marginRight: 8}}>
         {users.slice(0, 3).map((user, index) => (
           <Avatar
             key={user.id}
             className="cursor-default"
             style={index > 0 ? {marginLeft: -15} : {}}
             participant={user}
-            avatarSize={AVATAR_SIZE.X_SMALL}
+            avatarSize={AVATAR_SIZE.XXX_SMALL}
           />
         ))}
       </div>
-      <span data-uie-name="typing-indicator-title">
+      <span css={indicatorTitleStyles} data-uie-name="typing-indicator-title">
         {usersCount === 1 && t('tooltipConversationInputOneUserTyping' as StringIdentifer, {user1: users[0].name()})}
         {usersCount === 2 &&
           t('tooltipConversationInputTwoUserTyping' as StringIdentifer, {
@@ -75,7 +76,7 @@ const TypingIndicator: FC<TypingIndicatorProps> = ({conversationId}) => {
         <div css={dotOneStyles} />
         <div css={dotTwoStyles} />
         <div css={dotThreeStyles} />
-        <Icon.Edit css={editIconStyles} />
+        <Icon.Edit width={10} height={10} css={editIconStyles} />
       </div>
     </div>
   );
