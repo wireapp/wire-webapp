@@ -17,7 +17,7 @@
  *
  */
 
-import * as Events from '@wireapp/api-client/lib/event/';
+import {USER_EVENT} from '@wireapp/api-client/lib/event/';
 import {ConnectionState, HttpClient} from '@wireapp/api-client/lib/http/';
 import {PayloadBundle, PayloadBundleType} from '@wireapp/core/lib/conversation/';
 import type {UserUpdateMessage} from '@wireapp/core/lib/conversation/message/UserMessage';
@@ -47,7 +47,7 @@ export class WebSocketAction {
           let data: PayloadBundle | void;
           try {
             switch (event.type) {
-              case Events.USER_EVENT.UPDATE: {
+              case USER_EVENT.UPDATE: {
                 data = UserMapper.mapUserEvent(event, apiClient.context!.userId, source);
               }
               // Note: We do not want to update the last message timestamp

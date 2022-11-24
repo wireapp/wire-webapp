@@ -25,7 +25,7 @@ import {
   UserClients,
 } from '@wireapp/api-client/lib/conversation';
 import {QualifiedId, RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/lib/user';
-import {MessageTargetMode, PayloadBundleState, ReactionType} from '@wireapp/core/lib/conversation';
+import {MessageSendingState, MessageTargetMode, ReactionType} from '@wireapp/core/lib/conversation';
 import {
   AudioMetaData,
   EditedTextContent,
@@ -336,7 +336,7 @@ export class MessageRepository {
       quote: quoteEntity,
     };
     const {state} = await this.sendText(textPayload);
-    if (state !== PayloadBundleState.CANCELLED) {
+    if (state !== MessageSendingState.CANCELLED) {
       await this.handleLinkPreview(textPayload);
     }
   }
@@ -375,7 +375,7 @@ export class MessageRepository {
       originalMessageId: originalMessage.id,
     };
     const {state} = await this.sendEdit(messagePayload);
-    if (state !== PayloadBundleState.CANCELLED) {
+    if (state !== MessageSendingState.CANCELLED) {
       await this.handleLinkPreview(messagePayload);
     }
   }
@@ -472,7 +472,7 @@ export class MessageRepository {
   ): Promise<EventRecord | void> {
     const uploadStarted = Date.now();
     const {id, state} = await this.sendAssetMetadata(conversation, file, asImage);
-    if (state === PayloadBundleState.CANCELLED) {
+    if (state === MessageSendingState.CANCELLED) {
       throw new ConversationError(
         ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION,
         ConversationError.MESSAGE.DEGRADED_CONVERSATION_CANCELLATION,
@@ -754,12 +754,12 @@ export class MessageRepository {
 
     const shouldProceedSending = await injectOptimisticEvent();
     if (shouldProceedSending === false) {
-      return {id: payload.messageId, state: PayloadBundleState.CANCELLED};
+      return {id: payload.messageId, state: MessageSendingState.CANCELLED};
     }
 
     const result = await this.conversationService.send(sendOptions);
 
-    if (result.state === PayloadBundleState.OUTGOING_SENT) {
+    if (result.state === MessageSendingState.OUTGOING_SENT) {
       handleSuccess(result.sentAt);
     }
     return result;
@@ -875,7 +875,7 @@ export class MessageRepository {
       targetMode: MessageTargetMode.USERS,
     };
     const {state} = await this.sendAndInjectMessage(confirmationMessage, conversationEntity, sendingOptions);
-    if (state === PayloadBundleState.CANCELLED) {
+    if (state === MessageSendingState.CANCELLED) {
       this.sendAndInjectMessage(confirmationMessage, conversationEntity, {
         ...sendingOptions,
         // If the message was auto cancelled because of a mismatch, we will force sending the message only to the clients we know of (ignoring unverified clients)
