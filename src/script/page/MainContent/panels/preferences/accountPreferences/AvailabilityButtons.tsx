@@ -45,7 +45,7 @@ const iconStyles: CSSObject = {
 };
 
 const headerStyles: CSSObject = {
-  lineHeight: '14px',
+  lineHeight: '0.875rem',
   margin: '37px 0 6px',
   padding: 0,
 };

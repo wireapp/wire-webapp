@@ -52,8 +52,8 @@
   min-height: @conversation-input-line-height;
   max-height: @conversation-input-max-height;
   flex: 1 1;
-  margin-top: (@conversation-input-min-height - @conversation-input-line-height) / 2;
-  margin-bottom: (@conversation-input-min-height - @conversation-input-line-height) / 2;
+  margin-top: calc((@conversation-input-min-height - @conversation-input-line-height) / 2);
+  margin-bottom: calc((@conversation-input-min-height - @conversation-input-line-height) / 2);
   background-color: transparent;
   font-weight: inherit;
   line-height: @conversation-input-line-height;
@@ -137,6 +137,8 @@
 .controls-right-button {
   .button-icon-primary;
 
+  display: flex;
+
   @media (max-width: @screen-md-min) {
     width: 75px;
     margin-bottom: 5px;
@@ -164,7 +166,7 @@
     color: var(--white);
 
     > svg {
-      margin-left: 0.3em;
+      margin-left: 4px;
     }
 
     > * {
@@ -277,7 +279,7 @@
   border-radius: 8px;
   background-color: var(--modal-bg);
   box-shadow: 0 8px 30px 0 rgba(0, 0, 0, 0.08);
-  font-size: 12px;
+  font-size: @font-size-small;
   font-weight: @font-weight-regular;
   line-height: @line-height-xl;
 }
@@ -319,7 +321,7 @@
   &__sender-name {
     display: flex;
     align-items: center;
-    font-size: 12px;
+    font-size: @font-size-small;
     font-weight: @font-weight-bold;
 
     .edit-icon {
@@ -337,14 +339,14 @@
     overflow: hidden;
     max-width: @conversation-message-max-width;
     margin-top: 4px;
-    font-size: 14px;
+    font-size: @font-size-medium;
     font-weight: @font-weight-light;
     text-overflow: ellipsis;
     white-space: nowrap;
 
     &__text {
       height: 17px;
-      line-height: 17px;
+      line-height: 1.0625rem;
 
       pre {
         margin: 0;
@@ -379,7 +381,7 @@
     }
 
     & + span {
-      font-size: 11px;
+      font-size: @font-size-xsmall;
       text-transform: uppercase;
     }
   }
