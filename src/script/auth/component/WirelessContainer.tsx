@@ -59,7 +59,7 @@ const WirelessContainer: React.FC<Props> = ({showCookiePolicyBanner, onCookiePol
             <Link
               onClick={(event: React.MouseEvent<HTMLAnchorElement>) => onCookiePolicyBannerClose?.(event)}
               href={Config.getConfig().URL.PRIVACY_POLICY}
-              style={{fontSize: '16px'}}
+              style={{fontSize: '1rem'}}
               target="_blank"
               textTransform="none"
               bold={false}

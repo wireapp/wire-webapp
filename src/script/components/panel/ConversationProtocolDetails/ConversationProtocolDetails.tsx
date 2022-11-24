@@ -61,13 +61,13 @@ export interface ConversationProtocolDetailsProps {
 }
 
 const titleStyles: CSSObject = {
-  fontSize: 14,
+  fontSize: '0.875rem',
   fontWeight: 400,
 };
 
 const subTitleStyles: CSSObject = {
   color: 'var(--gray-70)',
-  fontSize: 12,
+  fontSize: '0.75rem',
   fontWeight: 400,
   marginBottom: 16,
   wordBreak: 'break-all',

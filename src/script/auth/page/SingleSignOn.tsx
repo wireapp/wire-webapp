@@ -214,7 +214,7 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
               <Logo height={24} color={COLOR.WHITE} />
             </div>
             <Text
-              style={{fontSize: '14px', fontWeight: 400, marginTop: '32px'}}
+              style={{fontSize: '0.875rem', fontWeight: 400, marginTop: '32px'}}
               color={COLOR.WHITE}
               data-uie-name="status-overlay-description"
             >
@@ -225,7 +225,7 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
               center
               style={{
                 color: COLOR.WHITE,
-                fontSize: '14px',
+                fontSize: '0.875rem',
                 fontWeight: 600,
                 marginTop: '24px',
                 textDecoration: 'underline',

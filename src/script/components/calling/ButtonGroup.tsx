@@ -66,7 +66,7 @@ const buttonGroupItemStyles: CSSObject = {
   backgroundColor: 'var(--app-bg-secondary)',
   color: 'var(--main-color)',
   cursor: 'pointer',
-  fontSize: 11,
+  fontSize: '0.6875rem',
   fontWeight: 500,
   padding: '10px 12px',
 };

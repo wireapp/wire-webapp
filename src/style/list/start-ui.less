@@ -152,13 +152,13 @@ body.theme-dark {
   flex-shrink: 0;
   padding: 0;
   margin: 0;
-  font-size: 14px;
+  font-size: @font-size-medium;
   font-weight: @font-weight-regular;
 
   .left-list-item {
     height: 56px;
     min-height: 56px;
-    line-height: 56px;
+    line-height: 3.5rem;
   }
 
   .left-column {
@@ -191,7 +191,7 @@ body.theme-dark {
   .text-light;
   margin-top: 72px;
   margin-bottom: 16px;
-  line-height: 24px;
+  line-height: @line-height-lg;
   text-align: center;
   white-space: pre;
 
@@ -212,7 +212,7 @@ body.theme-dark {
 
   &__text {
     padding: 8px 40px;
-    font-size: 16px;
+    font-size: @font-size-base;
     font-weight: @font-weight-bold;
     text-align: center;
   }
@@ -251,7 +251,7 @@ body.theme-dark .start-ui-list-header {
   background-color: var(--accent-color);
   color: var(--white);
   cursor: pointer;
-  line-height: 24px;
+  line-height: @line-height-lg;
 }
 
 .start-ui-import-icon {
@@ -309,7 +309,7 @@ body.theme-dark .start-ui-list-header {
   &__info {
     max-width: 200px;
     margin-top: 16px;
-    font-size: 12px;
+    font-size: @font-size-small;
     font-weight: 600;
     text-align: center;
   }
@@ -322,7 +322,7 @@ body.theme-dark .start-ui-list-header {
     margin-top: 16px;
     background-color: rgba(255, 255, 255, 0.24);
     cursor: pointer;
-    font-size: 14px;
+    font-size: @font-size-medium;
     font-weight: 600;
 
     &--alternate {
@@ -349,7 +349,7 @@ body.theme-dark .start-ui-list-header {
 
   &__text {
     margin-top: 24px;
-    font-size: 12px;
+    font-size: @font-size-small;
     font-weight: @font-weight-bold;
     text-align: center;
     white-space: pre;
@@ -367,7 +367,7 @@ body.theme-dark .start-ui-list-header {
       border: none;
       border-radius: 4px;
       background-color: rgba(186, 200, 209, 0.24);
-      font-size: 14px;
+      font-size: @font-size-medium;
       font-weight: @font-weight-bold;
 
       & + button {
@@ -390,7 +390,7 @@ body.theme-dark .start-ui-list-header {
   &__text,
   &__link {
     color: #9fa1a2;
-    font-size: 12px;
+    font-size: @font-size-small;
   }
 
   &__link {

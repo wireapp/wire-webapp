@@ -99,7 +99,7 @@
     .text-medium;
 
     .mention-at-sign {
-      font-size: 14px;
+      font-size: @font-size-medium;
     }
 
     &.self-mention {
@@ -176,7 +176,7 @@
   min-width: 0; // fixes ellipsis not working with flexbox (FF)
   flex: 1;
   align-items: center;
-  font-size: 12px;
+  font-size: @font-size-small;
   font-weight: @font-weight-regular;
   white-space: normal;
 
@@ -223,7 +223,7 @@
 
 .message-header-label-icon {
   margin-left: 8px;
-  font-size: 8px;
+  font-size: @font-size-xxs;
 }
 
 .message-header-icon-guest,
@@ -264,7 +264,7 @@
   padding-top: 8px; // TODO margin top is not working because of collapsing margins
   border-bottom: 1px solid @separator-color;
   margin-bottom: 16px;
-  line-height: 40px;
+  line-height: 2.5rem;
   user-select: none;
 
   .message-header-icon {
@@ -348,7 +348,7 @@
 
   .text-large {
     font-size: 40px;
-    line-height: 40px;
+    line-height: 2.5rem;
   }
 
   .iframe-container {
@@ -440,7 +440,7 @@
 
 .message-footer-text {
   color: var(--gray-70);
-  font-size: 11px;
+  font-size: @font-size-xsmall;
 
   body.theme-dark & {
     color: var(--gray-60);
@@ -623,7 +623,7 @@
 
 .message-services-warning {
   color: @w-red;
-  font-size: 12px;
+  font-size: @font-size-small;
   font-weight: @font-weight-regular;
 }
 
@@ -645,7 +645,7 @@
   margin: 0;
   font-size: @font-size-lg;
   font-weight: normal;
-  line-height: 42px;
+  line-height: 2.625rem;
   text-align: center;
   word-break: break-all;
 }
@@ -677,7 +677,7 @@
 .message-member-footer {
   padding-top: 16px;
   margin-left: 72px;
-  font-size: 12px;
+  font-size: @font-size-small;
   font-weight: @font-weight-regular;
 }
 
@@ -696,21 +696,21 @@
   margin-top: 16px;
   background-color: @separator-color;
   cursor: pointer;
-  font-size: 14px;
+  font-size: @font-size-medium;
   font-weight: @font-weight-bold;
-  line-height: 16px;
+  line-height: @line-height-sm;
 }
 
 .message-member-footer-message {
   font-weight: @font-weight-regular;
-  line-height: 16px;
+  line-height: @line-height-sm;
 }
 
 .message-member-footer-description {
   margin-top: 8px;
   color: var(--background-fade-40);
   font-weight: @font-weight-regular;
-  line-height: 16px;
+  line-height: @line-height-sm;
 }
 
 // PING MESSAGE
@@ -820,7 +820,7 @@
 
 .message-header-decrypt-reset-session-action {
   height: 12px;
-  font-size: 11px;
+  font-size: @font-size-xsmall;
 }
 
 .message-header-decrypt-reset-session-spinner {

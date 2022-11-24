@@ -33,7 +33,7 @@ export interface AccentColorPickerProps {
 }
 
 const headerStyles: CSSObject = {
-  lineHeight: '14px',
+  lineHeight: '0.875rem',
   margin: '20px 0 6px',
   padding: 0,
   textAlign: 'center',
@@ -129,7 +129,7 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
                   <span />
                   <span
                     style={{
-                      fontSize: '11px',
+                      fontSize: '0.6875rem',
                       marginTop: '14px',
                     }}
                   >
