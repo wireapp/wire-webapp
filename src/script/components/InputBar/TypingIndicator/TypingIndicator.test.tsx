@@ -50,9 +50,9 @@ describe('TypingIndicator', () => {
 
     const {addTypingUser} = useTypingIndicatorState.getState();
 
-    addTypingUser({conversationId: 'test-conversation-id', user: new User('test-id-1')});
-    addTypingUser({conversationId: 'test-conversation-id', user: new User('test-id-2')});
-    addTypingUser({conversationId: 'test-conversation-id', user: new User('test-id-3')});
+    addTypingUser({conversationId: 'test-conversation-id', user: new User('test-id-1'), timerId: 0});
+    addTypingUser({conversationId: 'test-conversation-id', user: new User('test-id-2'), timerId: 0});
+    addTypingUser({conversationId: 'test-conversation-id', user: new User('test-id-3'), timerId: 0});
 
     const {container} = render(<TypingIndicator {...props} />);
 
@@ -71,9 +71,9 @@ describe('TypingIndicator', () => {
     const {addTypingUser} = useTypingIndicatorState.getState();
 
     act(() => {
-      addTypingUser({conversationId: 'test-conversation-id', user: new User('test-id-1')});
-      addTypingUser({conversationId: 'test-conversation-id', user: new User('test-id-2')});
-      addTypingUser({conversationId: 'test-conversation-id', user: new User('test-id-3')});
+      addTypingUser({conversationId: 'test-conversation-id', user: new User('test-id-1'), timerId: 0});
+      addTypingUser({conversationId: 'test-conversation-id', user: new User('test-id-2'), timerId: 0});
+      addTypingUser({conversationId: 'test-conversation-id', user: new User('test-id-3'), timerId: 0});
     });
 
     expect(container.querySelectorAll('[data-uie-name="element-avatar-user"]').length).toBe(3);
@@ -91,15 +91,15 @@ describe('TypingIndicator', () => {
     const {addTypingUser, removeTypingUser} = useTypingIndicatorState.getState();
 
     act(() => {
-      addTypingUser({conversationId: 'test-conversation-id', user: new User('test-id-1')});
-      addTypingUser({conversationId: 'test-conversation-id', user: new User('test-id-2')});
-      addTypingUser({conversationId: 'test-conversation-id', user: new User('test-id-3')});
+      addTypingUser({conversationId: 'test-conversation-id', user: new User('test-id-1'), timerId: 0});
+      addTypingUser({conversationId: 'test-conversation-id', user: new User('test-id-2'), timerId: 0});
+      addTypingUser({conversationId: 'test-conversation-id', user: new User('test-id-3'), timerId: 0});
     });
 
     expect(container.querySelectorAll('[data-uie-name="element-avatar-user"]').length).toBe(3);
 
     act(() => {
-      removeTypingUser({conversationId: 'test-conversation-id', user: new User('test-id-3')});
+      removeTypingUser(new User('test-id-3'), 'test-conversation-id');
     });
 
     expect(container.querySelectorAll('[data-uie-name="element-avatar-user"]').length).toBe(2);
