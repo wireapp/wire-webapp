@@ -22,7 +22,7 @@ import {MouseEvent, useRef, useEffect, useState} from 'react';
 import {CSSObject} from '@emotion/react';
 
 import {usePausableInterval} from '../../hooks/usePausableInterval';
-import {EntropyData, EntropyFrame} from '../../util/Entropy';
+import {EntropyData} from '../../util/Entropy';
 
 interface CanvasProps {
   css?: CSSObject;
@@ -38,13 +38,18 @@ interface CanvasProps {
   minEntropyBits: number;
 }
 
+type Point = {
+  x: number;
+  y: number;
+};
+
 const EntropyCanvas = (props: CanvasProps) => {
   const {sizeX, sizeY, onProgress, css, minEntropyBits, minFrames, ...rest} = props;
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [percent, setPercent] = useState(0);
   const [entropy] = useState<EntropyData>(new EntropyData());
-  const [previousPoint, setPreviousPoint] = useState<EntropyFrame | null>(null);
-  const [lastPoint, setLastPoint] = useState<EntropyFrame | null>(null);
+  const [previousPoint, setPreviousPoint] = useState<Point | null>(null);
+  const [lastPoint, setLastPoint] = useState<Point | null>(null);
 
   const {clearInterval, startInterval, pauseInterval} = usePausableInterval(() => {
     setPercent(Math.floor(100 * Math.min(entropy.entropyBits / minEntropyBits, entropy.length / minFrames)));
@@ -95,10 +100,9 @@ const EntropyCanvas = (props: CanvasProps) => {
   const onMouseMove = (event: MouseEvent<HTMLCanvasElement>) => {
     startInterval();
     const boundingRect = event.currentTarget?.getBoundingClientRect();
-    const drawPoint: EntropyFrame = {
+    const drawPoint: Point = {
       x: event.clientX - boundingRect.x,
       y: event.clientY - boundingRect.y,
-      t: 0,
     };
     entropy.addFrame({
       t: Date.now(),
