@@ -17,16 +17,15 @@
  *
  */
 
-import * as React from 'react';
+import {FC, forwardRef, HTMLProps} from 'react';
 
 import {CSSObject} from '@emotion/react';
 
 import {GUTTER, WIDTH} from './sizes';
 
 import {QueryKeys, media} from '../mediaQueries';
-import {filterProps} from '../util';
 
-export interface ContainerProps<T = HTMLDivElement> extends React.HTMLProps<T> {
+export interface ContainerProps extends HTMLProps<HTMLDivElement> {
   centerText?: boolean;
   level?: keyof Level;
   verticalCenter?: boolean;
@@ -48,7 +47,7 @@ const LEVEL: Level = {
   xxs: WIDTH.TINY,
 };
 
-const containerStyle: <T>(props: ContainerProps<T>) => CSSObject = ({
+const containerStyle: (props: ContainerProps) => CSSObject = ({
   centerText = false,
   level = undefined,
   verticalCenter = false,
@@ -66,36 +65,34 @@ const containerStyle: <T>(props: ContainerProps<T>) => CSSObject = ({
       },
 });
 
-const filterContainerProps = (props: ContainerProps) => filterProps(props, ['centerText', 'level', 'verticalCenter']);
-
-export const Container: React.FC<ContainerProps> = React.forwardRef<HTMLDivElement, ContainerProps>((props, ref) => (
-  <div ref={ref} css={containerStyle(props)} {...filterContainerProps(props)} />
-));
+export const Container: FC<ContainerProps> = ({centerText, level, verticalCenter, ...props}, ref) => (
+  <div ref={ref} css={containerStyle({centerText, level, verticalCenter})} {...props} />
+);
 Container.displayName = 'Container';
 
 export type LevelContainerProps = Omit<ContainerProps, 'level'>;
 
-export const ContainerLG = React.forwardRef<HTMLDivElement, LevelContainerProps>((props, ref) => (
+export const ContainerLG: FC<ContainerProps> = forwardRef((props, ref) => (
   <Container ref={ref} level={'lg'} {...props} />
 ));
 ContainerLG.displayName = 'ContainerLG';
 
-export const ContainerMD = React.forwardRef<HTMLDivElement, LevelContainerProps>((props, ref) => (
+export const ContainerMD: FC<ContainerProps> = forwardRef<HTMLDivElement, LevelContainerProps>((props, ref) => (
   <Container ref={ref} level={'md'} {...props} />
 ));
 ContainerMD.displayName = 'ContainerMD';
 
-export const ContainerSM = React.forwardRef<HTMLDivElement, LevelContainerProps>((props, ref) => (
+export const ContainerSM: FC<ContainerProps> = forwardRef<HTMLDivElement, LevelContainerProps>((props, ref) => (
   <Container ref={ref} level={'sm'} {...props} />
 ));
 ContainerSM.displayName = 'ContainerSM';
 
-export const ContainerXS = React.forwardRef<HTMLDivElement, LevelContainerProps>((props, ref) => (
+export const ContainerXS: FC<ContainerProps> = forwardRef<HTMLDivElement, LevelContainerProps>((props, ref) => (
   <Container ref={ref} level={'xs'} {...props} />
 ));
 ContainerXS.displayName = 'ContainerXS';
 
-export const ContainerXXS = React.forwardRef<HTMLDivElement, LevelContainerProps>((props, ref) => (
+export const ContainerXXS: FC<ContainerProps> = forwardRef<HTMLDivElement, LevelContainerProps>((props, ref) => (
   <Container ref={ref} level={'xxs'} {...props} />
 ));
 ContainerXXS.displayName = 'ContainerXXS';

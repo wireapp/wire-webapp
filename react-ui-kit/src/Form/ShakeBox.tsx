@@ -20,11 +20,12 @@
 import {useEffect, useImperativeHandle, useState} from 'react';
 import * as React from 'react';
 
-export interface ShakeBoxProps extends React.HTMLProps<HTMLDivElement> {
+export interface ShakeBoxProps {
   amplitude?: number;
   damping?: number;
   speed?: number;
   threshold?: number;
+  children?: React.ReactNode;
 }
 
 export interface ShakeBoxRef {

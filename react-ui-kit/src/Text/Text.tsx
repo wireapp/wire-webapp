@@ -80,32 +80,32 @@ export const textStyle: <T>(theme: Theme, props: TextProps<T>) => CSSObject = (
   whiteSpace: noWrap ? 'nowrap' : undefined,
 });
 
-export const Text = React.forwardRef<HTMLSpanElement, TextProps<HTMLSpanElement>>((props, ref) => (
+export const Text: React.FC<TextProps> = React.forwardRef<HTMLSpanElement, TextProps<HTMLSpanElement>>((props, ref) => (
   <span ref={ref} css={(theme: Theme) => textStyle(theme, props)} {...filterTextProps(props)} />
 ));
 Text.displayName = 'Text';
 
-export const Bold = React.forwardRef<HTMLSpanElement, TextProps<HTMLSpanElement>>((props, ref) => (
+export const Bold: React.FC<TextProps> = React.forwardRef<HTMLSpanElement, TextProps<HTMLSpanElement>>((props, ref) => (
   <Text ref={ref} bold {...props} />
 ));
 Bold.displayName = 'Bold';
 
-export const Small = React.forwardRef<HTMLSpanElement, TextProps<HTMLSpanElement>>((props, ref) => (
-  <Text ref={ref} fontSize={'12px'} {...props} />
-));
+export const Small: React.FC<TextProps> = React.forwardRef<HTMLSpanElement, TextProps<HTMLSpanElement>>(
+  (props, ref) => <Text ref={ref} fontSize={'12px'} {...props} />,
+);
 Small.displayName = 'Small';
 
-export const Muted = React.forwardRef<HTMLSpanElement, TextProps<HTMLSpanElement>>((props, ref) => (
-  <Text ref={ref} muted {...props} />
-));
+export const Muted: React.FC<TextProps> = React.forwardRef<HTMLSpanElement, TextProps<HTMLSpanElement>>(
+  (props, ref) => <Text ref={ref} muted {...props} />,
+);
 Muted.displayName = 'Muted';
 
-export const Uppercase = React.forwardRef<HTMLSpanElement, TextProps<HTMLSpanElement>>((props, ref) => (
-  <Text ref={ref} textTransform={'uppercase'} {...props} />
-));
+export const Uppercase: React.FC<TextProps> = React.forwardRef<HTMLSpanElement, TextProps<HTMLSpanElement>>(
+  (props, ref) => <Text ref={ref} textTransform={'uppercase'} {...props} />,
+);
 Uppercase.displayName = 'Uppercase';
 
-export const Large = React.forwardRef<HTMLSpanElement, TextProps<HTMLSpanElement>>((props, ref) => (
-  <Text ref={ref} fontSize={'48px'} light {...props} />
-));
+export const Large: React.FC<TextProps> = React.forwardRef<HTMLSpanElement, TextProps<HTMLSpanElement>>(
+  (props, ref) => <Text ref={ref} fontSize={'48px'} light {...props} />,
+);
 Large.displayName = 'Large';
