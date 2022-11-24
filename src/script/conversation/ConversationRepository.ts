@@ -49,7 +49,7 @@ import {flatten} from 'underscore';
 import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {IS_TYPING_TIMEOUT, useTypingIndicatorState} from 'Components/InputBar/TypingIndicator';
+import {TYPING_TIMEOUT, useTypingIndicatorState} from 'Components/InputBar/TypingIndicator';
 import {getNextItem} from 'Util/ArrayUtil';
 import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/FileTypeUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
@@ -2859,7 +2859,7 @@ export class ConversationRepository {
     if (eventJson.data.status === CONVERSATION_TYPING.STARTED) {
       const timerId = window.setTimeout(() => {
         removeTypingUser(qualifiedUser, conversationId);
-      }, IS_TYPING_TIMEOUT * 6); // 10000 * 6 => 1 minute
+      }, TYPING_TIMEOUT * 6); // 10000 * 6 => 1 minute
 
       const typingUser = {conversationId, user: qualifiedUser, timerId};
 

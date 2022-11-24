@@ -23,4 +23,4 @@ export * from './TypingIndicator';
 
 export {useTypingIndicatorState} from './TypingIndicator.state';
 
-export const IS_TYPING_TIMEOUT = TIME_IN_MILLIS.SECOND * 10;
+export const TYPING_TIMEOUT = TIME_IN_MILLIS.SECOND * 10;

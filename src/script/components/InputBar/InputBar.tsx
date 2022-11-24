@@ -67,7 +67,7 @@ import {formatBytes, getSelectionPosition} from 'Util/util';
 import {getRichTextInput} from './getRichTextInput';
 import {PastedFileControls} from './PastedFileControls';
 import {ReplyBar} from './ReplyBar';
-import {IS_TYPING_TIMEOUT} from './TypingIndicator';
+import {TYPING_TIMEOUT} from './TypingIndicator';
 import {TypingIndicator} from './TypingIndicator/TypingIndicator';
 
 import {AssetRepository} from '../../assets/AssetRepository';
@@ -409,7 +409,7 @@ const InputBar = ({
     let timerId: number;
     if (inputValue.length > 0) {
       setIsTyping(true);
-      timerId = window.setTimeout(() => setIsTyping(false), IS_TYPING_TIMEOUT);
+      timerId = window.setTimeout(() => setIsTyping(false), TYPING_TIMEOUT);
     } else {
       setIsTyping(false);
     }
