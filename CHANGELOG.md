@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.0.11](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.0.10...@wireapp/react-ui-kit@9.0.11) (2022-11-24)
+
+### Bug Fixes
+
+* Address type mismatch for fowarded ref components ([#4637](https://github.com/wireapp/wire-web-packages/issues/4637)) ([fd0988c](https://github.com/wireapp/wire-web-packages/commit/fd0988cba5b69cb6a0a11ed31042865c1835cf6e))
+
 ## [9.0.10](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.0.9...@wireapp/react-ui-kit@9.0.10) (2022-11-23)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
