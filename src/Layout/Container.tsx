@@ -65,8 +65,10 @@ const containerStyle: (props: ContainerProps) => CSSObject = ({
       },
 });
 
-export const Container: FC<ContainerProps> = ({centerText, level, verticalCenter, ...props}, ref) => (
-  <div ref={ref} css={containerStyle({centerText, level, verticalCenter})} {...props} />
+export const Container: FC<ContainerProps> = forwardRef<HTMLDivElement, ContainerProps>(
+  ({centerText, level, verticalCenter, ...props}, ref) => (
+    <div ref={ref} css={containerStyle({centerText, level, verticalCenter})} {...props} />
+  ),
 );
 Container.displayName = 'Container';
 
