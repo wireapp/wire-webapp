@@ -28,7 +28,7 @@ import {MemoryEngine} from '@wireapp/store-engine';
 
 import {ProteusService} from './ProteusService';
 
-import {PayloadBundleState} from '../../../conversation';
+import {MessageSendingState} from '../../../conversation';
 import {buildTextMessage} from '../../../conversation/message/MessageBuilder';
 import {CryptographyService} from '../../../cryptography';
 import {getUUID} from '../../../test/PayloadHelper';
@@ -90,7 +90,7 @@ describe('sendGenericMessage', () => {
         protocol: ConversationProtocol.PROTEUS,
       });
 
-      expect(payloadBundle.state).toBe(PayloadBundleState.CANCELLED);
+      expect(payloadBundle.state).toBe(MessageSendingState.CANCELLED);
     });
   });
 });

@@ -30,7 +30,7 @@ import {
 import {isClearFromMismatch} from './Utility';
 import {getGenericMessageParams} from './Utility/getGenericMessageParams';
 
-import {PayloadBundleState, SendResult} from '../../../conversation';
+import {MessageSendingState, SendResult} from '../../../conversation';
 import {MessageService} from '../../../conversation/message/MessageService';
 import {CryptographyService} from '../../../cryptography';
 import {EventHandlerResult} from '../../common.types';
@@ -123,7 +123,7 @@ export class ProteusService {
     return {
       id: payload.messageId,
       sentAt: response.time,
-      state: response.errored ? PayloadBundleState.CANCELLED : PayloadBundleState.OUTGOING_SENT,
+      state: response.errored ? MessageSendingState.CANCELLED : MessageSendingState.OUTGOING_SENT,
     };
   }
 }

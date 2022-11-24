@@ -20,13 +20,7 @@
 import {ConversationOtrMessageAddEvent} from '@wireapp/api-client/lib/event/';
 import logdown from 'logdown';
 
-import {
-  GenericMessageType,
-  PayloadBundle,
-  PayloadBundleSource,
-  PayloadBundleState,
-  PayloadBundleType,
-} from '../conversation';
+import {GenericMessageType, MessageSendingState, PayloadBundle, PayloadBundleType} from '../conversation';
 import {
   AssetContent,
   ClearedContent,
@@ -39,7 +33,7 @@ import {
   ReactionContent,
   TextContent,
 } from '../conversation/content';
-
+import {NotificationSource} from '../notification';
 export class GenericMessageMapper {
   private static readonly logger = logdown('@wireapp/core/GenericMessageMapper', {
     logger: console,
@@ -51,7 +45,7 @@ export class GenericMessageMapper {
   public static mapGenericMessage(
     genericMessage: any,
     event: ConversationOtrMessageAddEvent,
-    source: PayloadBundleSource,
+    source: NotificationSource,
   ): PayloadBundle {
     const baseMessage: Omit<PayloadBundle, 'content' | 'type'> = {
       conversation: event.conversation,
@@ -59,7 +53,7 @@ export class GenericMessageMapper {
       qualifiedFrom: event.qualified_from,
       fromClientId: event.data.sender,
       from: event.from,
-      state: PayloadBundleState.INCOMING,
+      state: MessageSendingState.INCOMING,
       timestamp: new Date(event.time).getTime(),
       id: genericMessage.messageId,
       messageTimer: 0,

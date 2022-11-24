@@ -21,23 +21,12 @@ import {ConversationEventData, TeamEventData, UserEventData} from '@wireapp/api-
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {Message} from './Message';
+import {MessageSendingState} from './Message.types';
 
+import {NotificationSource} from '../../notification';
 import {ConversationContent} from '../content';
 
 export type PayloadBundleContent = ConversationContent | ConversationEventData | TeamEventData | UserEventData;
-
-export enum PayloadBundleSource {
-  LOCAL = 'PayloadBundleSource.LOCAL',
-  NOTIFICATION_STREAM = 'PayloadBundleSource.NOTIFICATION_STREAM',
-  WEBSOCKET = 'PayloadBundleSource.WEBSOCKET',
-}
-
-export enum PayloadBundleState {
-  INCOMING = 'PayloadBundleState.INCOMING',
-  OUTGOING_SENT = 'PayloadBundleState.OUTGOING_SENT',
-  OUTGOING_UNSENT = 'PayloadBundleState.OUTGOING_UNSENT',
-  CANCELLED = 'PayloadBundleState.CANCELLED',
-}
 
 export interface BasePayloadBundle {
   content: PayloadBundleContent;
@@ -48,8 +37,8 @@ export interface BasePayloadBundle {
   fromClientId?: string;
   id: string;
   messageTimer?: number;
-  source: PayloadBundleSource;
-  state: PayloadBundleState;
+  source: NotificationSource;
+  state: MessageSendingState;
   timestamp: number;
   type: PayloadBundleType;
 }

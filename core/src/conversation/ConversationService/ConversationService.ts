@@ -40,7 +40,7 @@ import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {AddUsersParams, MLSReturnType, SendMlsMessageParams, SendResult} from './ConversationService.types';
 
-import {MessageTimer, PayloadBundleState, RemoveUsersParams} from '../../conversation/';
+import {MessageTimer, MessageSendingState, RemoveUsersParams} from '../../conversation/';
 import {CryptographyService} from '../../cryptography/';
 import {decryptAsset} from '../../cryptography/AssetCryptography';
 import {MLSService, optionalToUint8Array} from '../../messagingProtocols/mls';
@@ -320,7 +320,7 @@ export class ConversationService {
     return {
       id: payload.messageId,
       sentAt,
-      state: sentAt ? PayloadBundleState.OUTGOING_SENT : PayloadBundleState.CANCELLED,
+      state: sentAt ? MessageSendingState.OUTGOING_SENT : MessageSendingState.CANCELLED,
     };
   }
 

@@ -259,7 +259,6 @@ export class MessageService {
   private async generateExternalPayload(plainText: Uint8Array): Promise<{text: Uint8Array; cipherText: Uint8Array}> {
     const asset = await encryptAsset({plainText});
     const {cipherText, keyBytes, sha256} = asset;
-    const messageId = createId();
 
     const externalMessage = {
       otrKey: new Uint8Array(keyBytes),
@@ -268,7 +267,7 @@ export class MessageService {
 
     const genericMessage = GenericMessage.create({
       [GenericMessageType.EXTERNAL]: externalMessage,
-      messageId,
+      messageId: createId(),
     });
 
     return {text: GenericMessage.encode(genericMessage).finish(), cipherText};

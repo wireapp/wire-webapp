@@ -34,7 +34,9 @@ import {
 
 import {ConversationMapper} from './ConversationMapper';
 
-import {PayloadBundle, PayloadBundleSource, PayloadBundleState, PayloadBundleType} from '../message/PayloadBundle';
+import {NotificationSource} from '../../notification';
+import {MessageSendingState} from '../message';
+import {PayloadBundle, PayloadBundleType} from '../message/PayloadBundle';
 
 describe('ConversationMapper', () => {
   describe('"mapConversationEvent"', () => {
@@ -51,7 +53,7 @@ describe('ConversationMapper', () => {
 
       const incomingEvent = ConversationMapper.mapConversationEvent(
         event,
-        PayloadBundleSource.WEBSOCKET,
+        NotificationSource.WEBSOCKET,
       ) as PayloadBundle & {
         content: ConversationMessageTimerUpdateData;
       };
@@ -61,7 +63,7 @@ describe('ConversationMapper', () => {
       expect(incomingEvent.from).toBe(event.from);
       expect(typeof incomingEvent.id).toBe('string');
       expect(incomingEvent.messageTimer).toBe(0);
-      expect(incomingEvent.state).toBe(PayloadBundleState.INCOMING);
+      expect(incomingEvent.state).toBe(MessageSendingState.INCOMING);
       expect(incomingEvent.timestamp).toBe(new Date(event.time).getTime());
       expect(incomingEvent.type).toBe(PayloadBundleType.TIMER_UPDATE);
     });
@@ -83,7 +85,7 @@ describe('ConversationMapper', () => {
 
       const incomingEvent = ConversationMapper.mapConversationEvent(
         event,
-        PayloadBundleSource.WEBSOCKET,
+        NotificationSource.WEBSOCKET,
       ) as PayloadBundle & {
         content: ConversationMemberJoinData;
       };
@@ -93,7 +95,7 @@ describe('ConversationMapper', () => {
       expect(incomingEvent.from).toBe(event.from);
       expect(typeof incomingEvent.id).toBe('string');
       expect(incomingEvent.messageTimer).toBe(0);
-      expect(incomingEvent.state).toBe(PayloadBundleState.INCOMING);
+      expect(incomingEvent.state).toBe(MessageSendingState.INCOMING);
       expect(incomingEvent.timestamp).toBe(new Date(event.time).getTime());
       expect(incomingEvent.type).toBe(PayloadBundleType.MEMBER_JOIN);
     });
@@ -111,7 +113,7 @@ describe('ConversationMapper', () => {
 
       const incomingEvent = ConversationMapper.mapConversationEvent(
         event,
-        PayloadBundleSource.WEBSOCKET,
+        NotificationSource.WEBSOCKET,
       ) as PayloadBundle & {
         content: ConversationRenameData;
       };
@@ -121,7 +123,7 @@ describe('ConversationMapper', () => {
       expect(incomingEvent.from).toBe(event.from);
       expect(typeof incomingEvent.id).toBe('string');
       expect(incomingEvent.messageTimer).toBe(0);
-      expect(incomingEvent.state).toBe(PayloadBundleState.INCOMING);
+      expect(incomingEvent.state).toBe(MessageSendingState.INCOMING);
       expect(incomingEvent.timestamp).toBe(new Date(event.time).getTime());
       expect(incomingEvent.type).toBe(PayloadBundleType.CONVERSATION_RENAME);
     });
@@ -137,7 +139,7 @@ describe('ConversationMapper', () => {
 
       const incomingEvent = ConversationMapper.mapConversationEvent(
         event,
-        PayloadBundleSource.WEBSOCKET,
+        NotificationSource.WEBSOCKET,
       ) as PayloadBundle & {
         content: ConversationTypingData;
       };
@@ -147,7 +149,7 @@ describe('ConversationMapper', () => {
       expect(incomingEvent.from).toBe(event.from);
       expect(typeof incomingEvent.id).toBe('string');
       expect(incomingEvent.messageTimer).toBe(0);
-      expect(incomingEvent.state).toBe(PayloadBundleState.INCOMING);
+      expect(incomingEvent.state).toBe(MessageSendingState.INCOMING);
       expect(incomingEvent.timestamp).toBe(new Date(event.time).getTime());
       expect(incomingEvent.type).toBe(PayloadBundleType.TYPING);
     });

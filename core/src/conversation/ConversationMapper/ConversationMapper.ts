@@ -19,11 +19,12 @@
 
 import {CONVERSATION_EVENT, ConversationEvent} from '@wireapp/api-client/lib/event';
 
+import {NotificationSource} from '../../notification';
+import {MessageSendingState} from '../message';
 import {createId} from '../message/MessageBuilder';
-import {PayloadBundle, PayloadBundleSource, PayloadBundleState, PayloadBundleType} from '../message/PayloadBundle';
-
+import {PayloadBundle, PayloadBundleType} from '../message/PayloadBundle';
 export class ConversationMapper {
-  public static mapConversationEvent(event: ConversationEvent, source: PayloadBundleSource): PayloadBundle {
+  public static mapConversationEvent(event: ConversationEvent, source: NotificationSource): PayloadBundle {
     return {
       content: event.data,
       conversation: event.conversation,
@@ -33,7 +34,7 @@ export class ConversationMapper {
       id: createId(),
       messageTimer: 0,
       source,
-      state: PayloadBundleState.INCOMING,
+      state: MessageSendingState.INCOMING,
       timestamp: new Date(event.time).getTime(),
       type: this.mapConversationEventType(event.type),
     };

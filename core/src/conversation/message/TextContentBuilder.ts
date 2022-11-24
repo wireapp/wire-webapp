@@ -17,9 +17,6 @@
  *
  */
 
-import {QuotableMessage} from './OtrMessage';
-
-import {MessageHashService} from '../../cryptography';
 import {
   EditedTextContent,
   LegalHoldStatus,
@@ -56,22 +53,9 @@ export class TextContentBuilder<T extends TextContent | EditedTextContent> {
     return this;
   }
 
-  withQuote(quote?: QuotableMessage | QuoteContent) {
+  withQuote(quote?: QuoteContent) {
     if (quote) {
-      if ((quote as QuoteContent).quotedMessageId) {
-        this.content.quote = quote as QuoteContent;
-      } else {
-        const messageHashService = new MessageHashService(
-          (quote as QuotableMessage).content,
-          (quote as QuotableMessage).timestamp,
-        );
-        const messageHashBuffer = messageHashService.getHash();
-
-        this.content.quote = {
-          quotedMessageId: (quote as QuotableMessage).id,
-          quotedMessageSha256: new Uint8Array(messageHashBuffer),
-        };
-      }
+      this.content.quote = quote as QuoteContent;
     }
 
     return this;

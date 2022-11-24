@@ -24,7 +24,7 @@ import {APIClient} from '@wireapp/api-client';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 import {MemoryEngine} from '@wireapp/store-engine';
 
-import {ConversationService, PayloadBundleState} from '..';
+import {ConversationService, MessageSendingState} from '..';
 import {CryptographyService} from '../../cryptography';
 import {MLSService} from '../../messagingProtocols/mls';
 import * as MessagingProtocols from '../../messagingProtocols/proteus';
@@ -149,7 +149,7 @@ describe('ConversationService', () => {
         });
 
         const result = await promise;
-        expect(result.state).toBe(PayloadBundleState.OUTGOING_SENT);
+        expect(result.state).toBe(MessageSendingState.OUTGOING_SENT);
       });
     });
   });

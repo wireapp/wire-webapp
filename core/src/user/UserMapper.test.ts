@@ -23,8 +23,10 @@ import {UserConnectionData} from '@wireapp/api-client/lib/user/data';
 
 import {UserMapper} from './UserMapper';
 
-import {PayloadBundleSource, PayloadBundleState, PayloadBundleType} from '../conversation';
+import {MessageSendingState} from '../conversation';
+import {PayloadBundleType} from '../conversation/message/PayloadBundle';
 import {UserConnectionMessage} from '../conversation/message/UserMessage';
+import {NotificationSource} from '../notification';
 
 describe('UserMapper', () => {
   describe('"mapUserEvent"', () => {
@@ -48,7 +50,7 @@ describe('UserMapper', () => {
       const incomingEvent = UserMapper.mapUserEvent(
         event,
         selfUserId,
-        PayloadBundleSource.WEBSOCKET,
+        NotificationSource.WEBSOCKET,
       ) as UserConnectionMessage;
 
       expect(incomingEvent.content).toEqual({connection: event.connection, user: event.user} as UserConnectionData);
@@ -56,7 +58,7 @@ describe('UserMapper', () => {
       expect(incomingEvent.from).toBe(event.connection.from);
       expect(typeof incomingEvent.id).toBe('string');
       expect(incomingEvent.messageTimer).toBe(0);
-      expect(incomingEvent.state).toBe(PayloadBundleState.INCOMING);
+      expect(incomingEvent.state).toBe(MessageSendingState.INCOMING);
       expect(incomingEvent.timestamp).toBe(new Date(event.connection.last_update).getTime());
       expect(incomingEvent.type).toBe(PayloadBundleType.CONNECTION_REQUEST);
     });

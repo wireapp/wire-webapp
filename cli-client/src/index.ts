@@ -19,8 +19,8 @@
 
 import {ClientType, RegisteredClient} from '@wireapp/api-client/lib/client/';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
-import {PayloadBundleType} from '@wireapp/core/lib/conversation/';
 import {buildTextMessage} from '@wireapp/core/lib/conversation/message/MessageBuilder';
 import axios from 'axios';
 import {program as commander} from 'commander';
@@ -33,7 +33,6 @@ import path from 'path';
 import {APIClient} from '@wireapp/api-client';
 import {Account} from '@wireapp/core';
 import {FileEngine} from '@wireapp/store-engine-fs';
-
 dotenv.config();
 
 const {
@@ -77,16 +76,18 @@ const storeEngineProvider = async (storeName: string) => {
 const apiClient = new APIClient({urls: APIClient.BACKEND.PRODUCTION});
 const account = new Account(apiClient, {createStore: storeEngineProvider});
 
-account.on(PayloadBundleType.TEXT, textMessage => {
-  console.info(
-    `Received message from user ID "${textMessage.from}" in conversation ID "${textMessage.conversation}": ${textMessage.content}`,
-  );
-});
-
 (async () => {
   try {
     await account.login(loginData);
-    await account.listen();
+    await account.listen({
+      onEvent: ({event, decryptedData}) => {
+        if (decryptedData && event.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD) {
+          console.info(
+            `Received message from user ID "${event.from}" in conversation ID "${event.conversation}": ${decryptedData}`,
+          );
+        }
+      },
+    });
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const data = error.response?.data;

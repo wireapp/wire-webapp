@@ -19,13 +19,13 @@
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
 import {QualifiedId, User, UserPreKeyBundleMap} from '@wireapp/api-client/lib/user/';
-import {genV4} from 'uuidjs';
 
 import {APIClient} from '@wireapp/api-client';
 import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
 
 import {AvailabilityType, BroadcastService} from '../broadcast/';
 import {ConnectionService} from '../connection';
+import {createId} from '../conversation/message/MessageBuilder';
 import {getPreKeyBundleMap} from '../messagingProtocols/proteus';
 import {isQualifiedIdArray} from '../util/TypePredicateUtil';
 
@@ -97,7 +97,7 @@ export class UserService {
 
     const genericMessage = GenericMessage.create({
       availability: new Availability({type}),
-      messageId: genV4().toString(),
+      messageId: createId(),
     });
 
     // Broadcast availability status to your team members & external 1:1 connections

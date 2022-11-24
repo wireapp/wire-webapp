@@ -74,10 +74,6 @@ const handleMLSMessageAdd = async ({mlsService, event, logger}: HandleMLSMessage
     return;
   }
   const decryptedData = GenericMessage.decode(message);
-  /**
-   * @todo Find a proper solution to add mappedEvent to this return
-   * otherwise event.data will be base64 raw data of the received event
-   */
   return {
     event,
     decryptedData,

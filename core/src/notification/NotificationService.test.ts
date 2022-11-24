@@ -22,11 +22,10 @@ import {Notification} from '@wireapp/api-client/lib/notification';
 import {APIClient} from '@wireapp/api-client';
 import {MemoryEngine} from '@wireapp/store-engine';
 
-import {PayloadBundleSource} from '../conversation';
 import {MLSService} from '../messagingProtocols/mls';
 import {ProteusService} from '../messagingProtocols/proteus';
 
-import {NotificationService} from '.';
+import {NotificationService, NotificationSource} from '.';
 
 const BASE_URL = 'mock-backend.wire.com';
 const MOCK_BACKEND = {
@@ -70,7 +69,7 @@ describe('NotificationService', () => {
 
       const handledNotifications = notificationService.handleNotification(
         notification,
-        PayloadBundleSource.NOTIFICATION_STREAM,
+        NotificationSource.NOTIFICATION_STREAM,
       );
       await handledNotifications.next();
 
@@ -103,7 +102,7 @@ describe('NotificationService', () => {
 
       const handledNotifications = notificationService.handleNotification(
         notification,
-        PayloadBundleSource.NOTIFICATION_STREAM,
+        NotificationSource.NOTIFICATION_STREAM,
       );
 
       await handledNotifications.next();
@@ -136,7 +135,7 @@ describe('NotificationService', () => {
 
       const handledNotifications = notificationService.handleNotification(
         notification,
-        PayloadBundleSource.NOTIFICATION_STREAM,
+        NotificationSource.NOTIFICATION_STREAM,
       );
       await handledNotifications.next();
 
@@ -173,7 +172,7 @@ describe('NotificationService', () => {
 
         const handledNotifications = notificationService.handleNotification(
           notification,
-          PayloadBundleSource.NOTIFICATION_STREAM,
+          NotificationSource.NOTIFICATION_STREAM,
         );
         await handledNotifications.next();
       });

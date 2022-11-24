@@ -17,16 +17,4 @@
  *
  */
 
-import {BackendEvent} from '@wireapp/api-client/lib/event';
-
-import {NotificationSource} from '../../../notification';
-import {MLSService} from '../MLSService/MLSService';
-
-export {BackendEvent};
-
-export type EventHandlerParams = {
-  mlsService: MLSService;
-  event: BackendEvent;
-  source: NotificationSource;
-  dryRun?: boolean;
-};
+export * from './Message.types';

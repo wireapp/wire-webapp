@@ -26,14 +26,15 @@ import {
   UserUpdateEvent,
 } from '@wireapp/api-client/lib/event';
 
-import {PayloadBundle, PayloadBundleSource, PayloadBundleState, PayloadBundleType} from '../conversation';
+import {MessageSendingState, PayloadBundle, PayloadBundleType} from '../conversation';
 import {createId} from '../conversation/message/MessageBuilder';
+import {NotificationSource} from '../notification';
 
 export class UserMapper {
   public static mapUserEvent(
     event: UserEvent,
     selfUserId: string,
-    source: PayloadBundleSource,
+    source: NotificationSource,
   ): PayloadBundle | undefined {
     switch (event.type) {
       case USER_EVENT.CONNECTION: {
@@ -45,7 +46,7 @@ export class UserMapper {
           id: createId(),
           messageTimer: 0,
           source,
-          state: PayloadBundleState.INCOMING,
+          state: MessageSendingState.INCOMING,
           timestamp: new Date(connection.last_update).getTime(),
           type: PayloadBundleType.CONNECTION_REQUEST,
         };
@@ -59,7 +60,7 @@ export class UserMapper {
           id: createId(),
           messageTimer: 0,
           source,
-          state: PayloadBundleState.INCOMING,
+          state: MessageSendingState.INCOMING,
           timestamp: new Date().getTime(),
           type: PayloadBundleType.CLIENT_ADD,
         };
@@ -72,7 +73,7 @@ export class UserMapper {
           from: selfUserId,
           id: createId(),
           source,
-          state: PayloadBundleState.INCOMING,
+          state: MessageSendingState.INCOMING,
           timestamp: new Date().getTime(),
           type: PayloadBundleType.USER_UPDATE,
         };
@@ -86,7 +87,7 @@ export class UserMapper {
           id: createId(),
           messageTimer: 0,
           source,
-          state: PayloadBundleState.INCOMING,
+          state: MessageSendingState.INCOMING,
           timestamp: new Date().getTime(),
           type: PayloadBundleType.CLIENT_REMOVE,
         };

@@ -17,16 +17,8 @@
  *
  */
 
-import {BackendEvent} from '@wireapp/api-client/lib/event';
-
-import {NotificationSource} from '../../../notification';
-import {MLSService} from '../MLSService/MLSService';
-
-export {BackendEvent};
-
-export type EventHandlerParams = {
-  mlsService: MLSService;
-  event: BackendEvent;
-  source: NotificationSource;
-  dryRun?: boolean;
-};
+export enum NotificationSource {
+  LOCAL = 'LOCAL',
+  NOTIFICATION_STREAM = 'NOTIFICATION_STREAM',
+  WEBSOCKET = 'WEBSOCKET',
+}
