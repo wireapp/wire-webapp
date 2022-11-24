@@ -23,9 +23,10 @@ import {AudioPreference, NotificationPreference, WebappProperties} from '@wireap
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
+import {Checkbox, CheckboxLabel, RangeInput} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {RootFontSize, useAppMainState} from 'src/script/page/state';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -37,11 +38,22 @@ import {PropertiesRepository} from '../../../../properties/PropertiesRepository'
 import {PROPERTIES_TYPE} from '../../../../properties/PropertiesType';
 import {UserState} from '../../../../user/UserState';
 import {THEMES as ThemeViewModelThemes} from '../../../../view_model/ThemeViewModel';
-
 interface OptionPreferencesProps {
   propertiesRepository: PropertiesRepository;
   userState?: UserState;
 }
+
+// const dataListOptions = [
+//   {value: 10, label: '10px', heading: 'Small'},
+//   {value: 12, label: '12px'},
+//   {value: 14, label: '14px'},
+//   {value: 16, label: '16px', heading: 'Default'},
+//   {value: 18, label: '18px'},
+//   {value: 20, label: '20px'},
+//   {value: 24, label: '24px', heading: 'Large'},
+// ];
+
+const fontSizes = Object.values(RootFontSize);
 
 const OptionPreferences: React.FC<OptionPreferencesProps> = ({
   propertiesRepository,
@@ -65,6 +77,7 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
       setOptionSendPreviews(settings.previews.send);
       setOptionNotifications(settings.notifications);
     };
+
     const updateDarkMode = (newDarkMode: boolean) => setOptionDarkMode(newDarkMode);
 
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.USE_DARK_MODE, updateDarkMode);
@@ -75,6 +88,10 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
       amplify.unsubscribe(WebAppEvents.PROPERTIES.UPDATED, updateProperties);
     };
   }, []);
+
+  const {currentRootFontSize, setCurrentRootFontSize} = useAppMainState(state => state.rootFontSize);
+
+  const sliderValue = fontSizes.indexOf(currentRootFontSize);
 
   const saveOptionAudioPreference = (audioPreference: AudioPreference) => {
     propertiesRepository.savePreference(PROPERTIES_TYPE.SOUND_ALERTS, audioPreference);
@@ -100,6 +117,12 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
     const newTheme = useDarkMode ? ThemeViewModelThemes.DARK : ThemeViewModelThemes.DEFAULT;
     propertiesRepository.savePreference(PROPERTIES_TYPE.INTERFACE.THEME, newTheme);
     setOptionDarkMode(useDarkMode);
+  };
+
+  const saveOptionFontSize = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const index = parseInt(event.target.value);
+    const fontSize = fontSizes[index];
+    setCurrentRootFontSize(fontSize);
   };
 
   return (
@@ -162,6 +185,27 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
           <hr className="preferences-separator" />
 
           <PreferencesSection title={t('preferencesOptionsPopular')}>
+            <RangeInput
+              css={{margin: '16px', width: '100%'}}
+              min={'0'}
+              max={'6'}
+              value={sliderValue}
+              label={'font size'}
+              minValueLabel={'small'}
+              maxValueLabel={'big'}
+              step={'1'}
+              onChange={saveOptionFontSize}
+            ></RangeInput>
+            {/* <IndicatorRangeInput
+              css={{margin: '16px', width: '100%'}}p
+              min={'0'}
+              max={'6'}
+              value={optionFontSize}
+              label={'font size'}
+              step={'1'}
+              onChange={saveOptionFontSize}
+              dataListOptions={dataListOptions}
+            ></IndicatorRangeInput> */}
             <Checkbox
               tabIndex={0}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
