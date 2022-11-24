@@ -128,11 +128,13 @@ describe('Entropy', () => {
       expect(calculateDeltaValues(input, dimension)).toStrictEqual(output);
     });
 
+    // @SF.CSPRNG @TSFI.UserInterface @S0.1 @S0.3
     it('returns zero for empty entropyData', () => {
       expect(new EntropyData().entropyBits).toEqual(0);
     });
 
-    it('makes sense with no movement', () => {
+    // @SF.CSPRNG @TSFI.UserInterface @S0.1 @S0.3
+    it('makes sense when input data contains no movement (only x, y no t)', () => {
       const data = new EntropyData();
       [...Array(300)].forEach((_, i) => {
         data.addFrame({t: 0, x: 0, y: 0});
@@ -140,7 +142,8 @@ describe('Entropy', () => {
       expect(data.entropyBits).toBe(0);
     });
 
-    it('makes sense with single toggle', () => {
+    // @SF.CSPRNG @TSFI.UserInterface @S0.1 @S0.3
+    it('makes sense with input data being only a simple toggle (only x, y no t)', () => {
       const data = new EntropyData();
       [...Array(150)].forEach((_, i) => {
         data.addFrame({t: 0, x: 0, y: 0});
@@ -150,7 +153,8 @@ describe('Entropy', () => {
       expect(data.entropyData.length).toBe(900);
     });
 
-    it('makes sense with single jump', () => {
+    // @SF.CSPRNG @TSFI.UserInterface @S0.1 @S0.3
+    it('makes sense with input data being a simple big jump (only x, y no t)', () => {
       const data = new EntropyData();
       [...Array(150)].forEach((_, i) => {
         data.addFrame({t: 0, x: 0, y: 0});
@@ -160,7 +164,8 @@ describe('Entropy', () => {
       expect(data.entropyData.length).toBe(900);
     });
 
-    it('makes sense with a linear growth', () => {
+    // @SF.CSPRNG @TSFI.UserInterface @S0.1 @S0.3
+    it('makes sense with with inputdata being a simple linear movement (only x, y no t)', () => {
       const data = new EntropyData();
       [...Array(3)].forEach((_, i) => {
         [...Array(100)].forEach((_, j) => {
@@ -171,7 +176,8 @@ describe('Entropy', () => {
       expect(data.entropyData.length).toBe(900);
     });
 
-    it('makes sense with a square', () => {
+    // @SF.CSPRNG @TSFI.UserInterface @S0.1 @S0.3
+    it('makes sense with input data building a simple square from 4 points (only x, y no t)', () => {
       const data = new EntropyData();
       [...Array(75)].forEach((_, i) => {
         data.addFrame({t: 0, x: 0, y: 0});
@@ -183,7 +189,8 @@ describe('Entropy', () => {
       expect(data.entropyData.length).toBe(900);
     });
 
-    it('makes sense with a high resolution square', () => {
+    // @SF.CSPRNG @TSFI.UserInterface @S0.1 @S0.3
+    it('makes sense with input data building a simple square from 20 points (only x, y no t)', () => {
       const data = new EntropyData();
       [...Array(15)].forEach((_, i) => {
         data.addFrame({t: 0, x: 0, y: 0});
@@ -211,7 +218,8 @@ describe('Entropy', () => {
       expect(data.entropyData.length).toBe(900);
     });
 
-    it('makes sense with a circle', () => {
+    // @SF.CSPRNG @TSFI.UserInterface @S0.1 @S0.3
+    it('makes sense with input data building a circle from 300 points (only x, y no t)', () => {
       const data = new EntropyData();
       [...Array(300)].forEach((_, i) => {
         data.addFrame({t: 0, x: 128 + 64 * Math.cos((i / 150) * Math.PI), y: 128 + 64 * Math.sin((i / 150) * Math.PI)});
@@ -224,10 +232,12 @@ describe('Entropy', () => {
       const randGen = seedrandom('Seed This test!');
       const randomdata = new Uint8Array([...Array(900)].map(_ => randGen.int32()));
 
-      it('random data has 900 bytes', () => {
+      it('random data has exactly 900 bytes', () => {
         expect(randomdata.length).toBe(900);
       });
-      it('all random data', () => {
+
+      // @SF.CSPRNG @TSFI.UserInterface @S0.1 @S0.3
+      it('makes sense with random data in x, y and t', () => {
         const data = new EntropyData();
 
         [...Array(300)].forEach((_, i) => {
@@ -236,20 +246,29 @@ describe('Entropy', () => {
         expect(data.entropyData.length).toBe(900);
         expect(data.entropyBits / data.entropyData.length).toBe(6.907510027868656);
       });
-      it('only one field with random data', () => {
+
+      // @SF.CSPRNG @TSFI.UserInterface @S0.1 @S0.3
+      it('makes sense with random data only provided in x or y or t', () => {
         const data = new EntropyData();
         const data2 = new EntropyData();
+        const data3 = new EntropyData();
 
         [...Array(300)].forEach((_, i) => {
           data.addFrame({t: 0, x: randomdata[i * 3], y: 0});
           data2.addFrame({t: 0, x: 0, y: randomdata[i * 3]});
+          data3.addFrame({t: randomdata[i * 3], x: 0, y: 0}, false);
         });
         expect(data.entropyData.length).toBe(900);
         expect(data2.entropyData.length).toBe(900);
-        expect(data.entropyBits / data.entropyData.length).toBe(3.085568609878797);
-        expect(data2.entropyBits / data2.entropyData.length).toBe(3.085568609878797);
+        expect(data3.entropyData.length).toBe(900);
+        const expected = 3.085568609878797;
+        expect(data.entropyBits / data.entropyData.length).toBe(expected);
+        expect(data2.entropyBits / data2.entropyData.length).toBe(expected);
+        expect(data3.entropyBits / data3.entropyData.length).toBe(expected);
       });
-      it('only two fields with random data', () => {
+
+      // @SF.CSPRNG @TSFI.UserInterface @S0.1 @S0.3
+      it('makes sense with random data in x, y while t is set to 0', () => {
         const data = new EntropyData();
 
         [...Array(300)].forEach((_, i) => {
