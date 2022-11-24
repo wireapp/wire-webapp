@@ -67,6 +67,7 @@ import {formatBytes, getSelectionPosition} from 'Util/util';
 import {getRichTextInput} from './getRichTextInput';
 import {PastedFileControls} from './PastedFileControls';
 import {ReplyBar} from './ReplyBar';
+import {IS_TYPING_TIMEOUT} from './TypingIndicator';
 import {TypingIndicator} from './TypingIndicator/TypingIndicator';
 
 import {AssetRepository} from '../../assets/AssetRepository';
@@ -91,7 +92,6 @@ import {UserState} from '../../user/UserState';
 const CONFIG = {
   ...Config.getConfig(),
   PING_TIMEOUT: TIME_IN_MILLIS.SECOND * 2,
-  IS_TYPING_TIMEOUT: TIME_IN_MILLIS.SECOND * 10,
 };
 
 const showWarningModal = (title: string, message: string): void => {
@@ -409,7 +409,7 @@ const InputBar = ({
     let timerId: number;
     if (inputValue.length > 0) {
       setIsTyping(true);
-      timerId = window.setTimeout(() => setIsTyping(false), CONFIG.IS_TYPING_TIMEOUT);
+      timerId = window.setTimeout(() => setIsTyping(false), IS_TYPING_TIMEOUT);
     } else {
       setIsTyping(false);
     }

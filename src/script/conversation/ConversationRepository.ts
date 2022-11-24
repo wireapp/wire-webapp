@@ -49,7 +49,7 @@ import {flatten} from 'underscore';
 import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {useTypingIndicatorState} from 'Components/InputBar/TypingIndicator';
+import {IS_TYPING_TIMEOUT, useTypingIndicatorState} from 'Components/InputBar/TypingIndicator';
 import {getNextItem} from 'Util/ArrayUtil';
 import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/FileTypeUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
@@ -2849,15 +2849,25 @@ export class ConversationRepository {
     }
 
     const conversationId = conversationEntity.id;
-    const {addTypingUser, removeTypingUser} = useTypingIndicatorState.getState();
-    const typingUser = {conversationId, user: qualifiedUser};
+    const {addTypingUser, getTypingUser, removeTypingUser} = useTypingIndicatorState.getState();
+
+    const oldUser = getTypingUser(qualifiedUser, conversationId);
+    if (oldUser) {
+      window.clearTimeout(oldUser.timerId);
+    }
 
     if (eventJson.data.status === CONVERSATION_TYPING.STARTED) {
+      const timerId = window.setTimeout(() => {
+        removeTypingUser(qualifiedUser, conversationId);
+      }, IS_TYPING_TIMEOUT * 6); // 10000 * 6 => 1 minute
+
+      const typingUser = {conversationId, user: qualifiedUser, timerId};
+
       addTypingUser(typingUser);
     }
 
     if (eventJson.data.status === CONVERSATION_TYPING.STOPPED) {
-      removeTypingUser(typingUser);
+      removeTypingUser(qualifiedUser, conversationId);
     }
 
     return {conversationEntity};
