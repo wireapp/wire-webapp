@@ -32,7 +32,6 @@ type HandleOtrMessageAddParams = Omit<EventHandlerParams, 'event'> & {
 const handleOtrMessageAdd = async ({
   cryptographyService,
   event,
-  source,
   dryRun = false,
 }: HandleOtrMessageAddParams): EventHandlerResult => {
   if (dryRun) {
@@ -43,7 +42,6 @@ const handleOtrMessageAdd = async ({
   try {
     const decryptedData = await cryptographyService.decryptMessage(event);
     return {
-      mappedEvent: cryptographyService.mapGenericMessage(event, decryptedData, source),
       event,
       decryptedData,
     };

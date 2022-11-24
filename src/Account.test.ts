@@ -20,7 +20,7 @@
 import {AuthAPI} from '@wireapp/api-client/lib/auth';
 import {ClientAPI, ClientType, RegisteredClient} from '@wireapp/api-client/lib/client';
 import {ConversationAPI} from '@wireapp/api-client/lib/conversation';
-import {BackendEvent} from '@wireapp/api-client/lib/event';
+import {BackendEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {NotificationAPI} from '@wireapp/api-client/lib/notification';
 import {Self, SelfAPI} from '@wireapp/api-client/lib/self';
@@ -29,14 +29,14 @@ import {ReconnectingWebsocket} from '@wireapp/api-client/lib/tcp/ReconnectingWeb
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {WS} from 'jest-websocket-mock';
 import nock, {cleanAll} from 'nock';
+import {genV4} from 'uuidjs';
 
 import {APIClient} from '@wireapp/api-client';
 import {AccentColor, ValidationUtil} from '@wireapp/commons';
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
 
 import {Account, ConnectionState} from './Account';
-import {PayloadBundleSource, PayloadBundleType} from './conversation';
-import * as MessageBuilder from './conversation/message/MessageBuilder';
+import {NotificationSource} from './notification';
 
 const BASE_URL = 'mock-backend.wire.com';
 const MOCK_BACKEND = {
@@ -159,25 +159,6 @@ describe('Account', () => {
     cleanAll();
   });
 
-  describe('"createText"', () => {
-    it('creates a text payload', async () => {
-      const {account} = await createAccount();
-
-      await account.login({
-        clientType: ClientType.TEMPORARY,
-        email: 'hello@example.com',
-        password: 'my-secret',
-      });
-
-      expect(account['apiClient'].context!.userId).toBeDefined();
-
-      const text = 'FIFA World Cup';
-      const date = new Date(0);
-      jest.spyOn(Date, 'now').mockImplementation(() => date.getTime());
-      MessageBuilder.buildTextMessage({text});
-    });
-  });
-
   describe('"init"', () => {
     it('initializes the Protocol buffers', async () => {
       const account = new Account();
@@ -248,12 +229,12 @@ describe('Account', () => {
 
       jest.spyOn(apiClient, 'connect').mockImplementation();
       jest.spyOn(account.service!.notification as any, 'handleEvent').mockReturnValue({
-        mappedEvent: {type: PayloadBundleType.TEXT},
+        event: {type: CONVERSATION_EVENT.OTR_MESSAGE_ADD},
       });
 
       const kill = await account.listen({
-        onEvent: ({mappedEvent}) => {
-          expect(mappedEvent?.type).toBe(PayloadBundleType.TEXT);
+        onEvent: ({event}) => {
+          expect(event.type).toBe(CONVERSATION_EVENT.OTR_MESSAGE_ADD);
           resolve();
         },
       });
@@ -269,7 +250,7 @@ describe('Account', () => {
 
     const mockNotifications = (size: number) => {
       const notifications = Array.from(new Array(size)).map(i => ({
-        id: MessageBuilder.createId(),
+        id: genV4().toString(),
         payload: [{}] as BackendEvent[],
       }));
       jest.spyOn(dependencies.apiClient.api.notification, 'getAllNotifications').mockResolvedValue({notifications});
@@ -346,7 +327,7 @@ describe('Account', () => {
             onConnectionStateChanged: callWhen(ConnectionState.LIVE, () => {
               expect(onNotificationStreamProgress).toHaveBeenCalledTimes(nbNotifications);
               expect(onEvent).toHaveBeenCalledTimes(nbNotifications);
-              expect(onEvent).toHaveBeenCalledWith(expect.any(Object), PayloadBundleSource.NOTIFICATION_STREAM);
+              expect(onEvent).toHaveBeenCalledWith(expect.any(Object), NotificationSource.NOTIFICATION_STREAM);
               disconnect();
               resolve();
             }),
@@ -366,14 +347,14 @@ describe('Account', () => {
             onConnectionStateChanged: callWhen(ConnectionState.LIVE, async () => {
               expect(onNotificationStreamProgress).toHaveBeenCalledTimes(nbNotifications);
               expect(onEvent).toHaveBeenCalledTimes(nbNotifications);
-              expect(onEvent).toHaveBeenCalledWith(expect.any(Object), PayloadBundleSource.NOTIFICATION_STREAM);
-              expect(onEvent).not.toHaveBeenCalledWith(expect.any(Object), PayloadBundleSource.WEBSOCKET);
+              expect(onEvent).toHaveBeenCalledWith(expect.any(Object), NotificationSource.NOTIFICATION_STREAM);
+              expect(onEvent).not.toHaveBeenCalledWith(expect.any(Object), NotificationSource.WEBSOCKET);
 
               onEvent.mockReset();
-              server.send(JSON.stringify({id: MessageBuilder.createId(), payload: [{}]}));
+              server.send(JSON.stringify({id: genV4().toString(), payload: [{}]}));
               await waitFor(() => expect(onEvent).toHaveBeenCalledTimes(1));
-              expect(onEvent).not.toHaveBeenCalledWith(expect.any(Object), PayloadBundleSource.NOTIFICATION_STREAM);
-              expect(onEvent).toHaveBeenCalledWith(expect.any(Object), PayloadBundleSource.WEBSOCKET);
+              expect(onEvent).not.toHaveBeenCalledWith(expect.any(Object), NotificationSource.NOTIFICATION_STREAM);
+              expect(onEvent).toHaveBeenCalledWith(expect.any(Object), NotificationSource.WEBSOCKET);
               disconnect();
               resolve();
             }),
@@ -395,18 +376,18 @@ describe('Account', () => {
                 case ConnectionState.PROCESSING_NOTIFICATIONS:
                   // sending a message as soon as the notificaiton stream starts to process
                   // This message should only be forwarded once the notification stream is fully processed
-                  server.send(JSON.stringify({id: MessageBuilder.createId(), payload: [{}]}));
+                  server.send(JSON.stringify({id: genV4().toString(), payload: [{}]}));
                   break;
                 case ConnectionState.LIVE:
                   expect(onNotificationStreamProgress).toHaveBeenCalledTimes(nbNotifications);
                   expect(onEvent).toHaveBeenCalledTimes(nbNotifications);
-                  expect(onEvent).toHaveBeenCalledWith(expect.any(Object), PayloadBundleSource.NOTIFICATION_STREAM);
-                  expect(onEvent).not.toHaveBeenCalledWith(expect.any(Object), PayloadBundleSource.WEBSOCKET);
+                  expect(onEvent).toHaveBeenCalledWith(expect.any(Object), NotificationSource.NOTIFICATION_STREAM);
+                  expect(onEvent).not.toHaveBeenCalledWith(expect.any(Object), NotificationSource.WEBSOCKET);
 
                   onEvent.mockReset();
                   await waitFor(() => expect(onEvent).toHaveBeenCalledTimes(1));
-                  expect(onEvent).not.toHaveBeenCalledWith(expect.any(Object), PayloadBundleSource.NOTIFICATION_STREAM);
-                  expect(onEvent).toHaveBeenCalledWith(expect.any(Object), PayloadBundleSource.WEBSOCKET);
+                  expect(onEvent).not.toHaveBeenCalledWith(expect.any(Object), NotificationSource.NOTIFICATION_STREAM);
+                  expect(onEvent).toHaveBeenCalledWith(expect.any(Object), NotificationSource.WEBSOCKET);
                   disconnect();
                   resolve();
               }
@@ -433,7 +414,7 @@ describe('Account', () => {
                 case ConnectionState.PROCESSING_NOTIFICATIONS:
                   // sending a message as soon as the notificaiton stream starts to process
                   // This message should only be forwarded once the notification stream is fully processed
-                  server.send(JSON.stringify({id: MessageBuilder.createId(), payload: [{}]}));
+                  server.send(JSON.stringify({id: genV4().toString(), payload: [{}]}));
                   break;
                 case ConnectionState.LIVE:
                   reject(new Error());
@@ -441,10 +422,10 @@ describe('Account', () => {
                 case ConnectionState.CLOSED:
                   expect(onNotificationStreamProgress).toHaveBeenCalledTimes(2);
                   expect(onEvent).toHaveBeenCalledTimes(2);
-                  expect(onEvent).toHaveBeenCalledWith(expect.any(Object), PayloadBundleSource.NOTIFICATION_STREAM);
+                  expect(onEvent).toHaveBeenCalledWith(expect.any(Object), NotificationSource.NOTIFICATION_STREAM);
                   expect(dependencies.account.service!.notification.handleNotification).not.toHaveBeenCalledWith(
                     expect.any(Object),
-                    PayloadBundleSource.WEBSOCKET,
+                    NotificationSource.WEBSOCKET,
                   );
 
                   resolve();
@@ -475,7 +456,7 @@ describe('Account', () => {
                 try {
                   expect(onNotificationStreamProgress).toHaveBeenCalledTimes(1);
                   expect(onEvent).toHaveBeenCalledTimes(2);
-                  expect(onEvent).toHaveBeenCalledWith(expect.any(Object), PayloadBundleSource.NOTIFICATION_STREAM);
+                  expect(onEvent).toHaveBeenCalledWith(expect.any(Object), NotificationSource.NOTIFICATION_STREAM);
                 } catch (error) {
                   throw error;
                 }

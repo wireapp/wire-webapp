@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2022 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,4 +17,9 @@
  *
  */
 
-export * from './ConversationMapper';
+export enum MessageSendingState {
+  INCOMING = 'INCOMING',
+  OUTGOING_SENT = 'OUTGOING_SENT',
+  OUTGOING_UNSENT = 'OUTGOING_UNSENT',
+  CANCELLED = 'CANCELLED',
+}

@@ -38,10 +38,8 @@ import {GenericMessage} from '@wireapp/protocol-messaging';
 import {CRUDEngine} from '@wireapp/store-engine';
 
 import {CryptographyDatabaseRepository} from './CryptographyDatabaseRepository';
-import {GenericMessageMapper} from './GenericMessageMapper';
 import {generateDecryptionError} from './Utlility/generateDecryptionError';
 
-import {GenericMessageType, PayloadBundle, PayloadBundleSource} from '../conversation';
 import {SessionPayloadBundle} from '../cryptography/';
 import {isUserClients} from '../util';
 
@@ -306,23 +304,5 @@ export class CryptographyService {
     } catch (error) {
       throw generateDecryptionError(otrMessage, error, this.logger);
     }
-  }
-
-  public mapGenericMessage(
-    otrMessage: ConversationOtrMessageAddEvent,
-    genericMessage: GenericMessage,
-    source: PayloadBundleSource,
-  ): PayloadBundle {
-    if (genericMessage.content === GenericMessageType.EPHEMERAL) {
-      const unwrappedMessage = GenericMessageMapper.mapGenericMessage(genericMessage.ephemeral, otrMessage, source);
-      unwrappedMessage.id = genericMessage.messageId;
-      if (genericMessage.ephemeral) {
-        const expireAfterMillis = genericMessage.ephemeral.expireAfterMillis;
-        unwrappedMessage.messageTimer =
-          typeof expireAfterMillis === 'number' ? expireAfterMillis : expireAfterMillis.toNumber();
-      }
-      return unwrappedMessage;
-    }
-    return GenericMessageMapper.mapGenericMessage(genericMessage, otrMessage, source);
   }
 }

@@ -17,7 +17,7 @@
  *
  */
 
-import * as Events from '@wireapp/api-client/lib/event';
+import {BackendEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 import {Notification} from '@wireapp/api-client/lib/notification/';
 import {AbortHandler} from '@wireapp/api-client/lib/tcp';
 import logdown from 'logdown';
@@ -30,19 +30,15 @@ import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
 
 import {NotificationBackendRepository} from './NotificationBackendRepository';
 import {NotificationDatabaseRepository} from './NotificationDatabaseRepository';
+import {NotificationSource} from './Notifications.types';
 
-import {PayloadBundle, PayloadBundleSource, PayloadBundleType} from '../conversation';
-import {AssetContent} from '../conversation/content';
-import {ConversationMapper} from '../conversation/ConversationMapper';
 import {CoreError, NotificationError} from '../CoreError';
 import {DecryptionError} from '../errors/DecryptionError';
 import {MLSService} from '../messagingProtocols/mls';
 import {ProteusService} from '../messagingProtocols/proteus';
-import {UserMapper} from '../user/UserMapper';
 
 export type HandledEventPayload = {
-  event: Events.BackendEvent;
-  mappedEvent?: PayloadBundle;
+  event: BackendEvent;
   decryptedData?: GenericMessage;
   decryptionError?: DecryptionError;
 };
@@ -53,7 +49,7 @@ enum TOPIC {
 
 export type NotificationHandler = (
   notification: Notification,
-  source: PayloadBundleSource,
+  source: NotificationSource,
   progress: {done: number; total: number},
 ) => Promise<void>;
 
@@ -101,7 +97,7 @@ export class NotificationService extends EventEmitter {
     return !!notificationEvents.length;
   }
 
-  public getNotificationEventList(): Promise<Events.BackendEvent[]> {
+  public getNotificationEventList(): Promise<BackendEvent[]> {
     return this.database.getNotificationEventList();
   }
 
@@ -157,7 +153,7 @@ export class NotificationService extends EventEmitter {
         return results;
       }
       try {
-        await notificationHandler(notification, PayloadBundleSource.NOTIFICATION_STREAM, {
+        await notificationHandler(notification, NotificationSource.NOTIFICATION_STREAM, {
           done: index + 1,
           total: notifications.length,
         });
@@ -179,8 +175,8 @@ export class NotificationService extends EventEmitter {
    * @param source
    * @param lastEventDate?
    */
-  private isOutdatedEvent(event: {time: string}, source: PayloadBundleSource, lastEventDate?: Date) {
-    const isFromNotificationStream = source === PayloadBundleSource.NOTIFICATION_STREAM;
+  private isOutdatedEvent(event: {time: string}, source: NotificationSource, lastEventDate?: Date) {
+    const isFromNotificationStream = source === NotificationSource.NOTIFICATION_STREAM;
     const shouldCheckEventDate = !!event.time && isFromNotificationStream && lastEventDate;
 
     if (shouldCheckEventDate) {
@@ -193,7 +189,7 @@ export class NotificationService extends EventEmitter {
 
   public async *handleNotification(
     notification: Notification,
-    source: PayloadBundleSource,
+    source: NotificationSource,
     dryRun: boolean = false,
   ): AsyncGenerator<HandledEventPayload> {
     for (const event of notification.payload) {
@@ -209,10 +205,7 @@ export class NotificationService extends EventEmitter {
       try {
         const data = await this.handleEvent(event, source, dryRun);
         if (typeof data !== 'undefined') {
-          yield {
-            ...data,
-            mappedEvent: data.mappedEvent ? this.cleanupPayloadBundle(data.mappedEvent) : undefined,
-          };
+          yield data;
         }
       } catch (error) {
         this.logger.error(
@@ -233,25 +226,6 @@ export class NotificationService extends EventEmitter {
     }
   }
 
-  private cleanupPayloadBundle(payload: PayloadBundle): PayloadBundle {
-    switch (payload.type) {
-      case PayloadBundleType.ASSET: {
-        const assetContent = payload.content as AssetContent;
-        const isMetaData = !!assetContent?.original && !assetContent?.uploaded;
-        const isAbort = !!assetContent.abortReason || (!assetContent.original && !assetContent.uploaded);
-
-        if (isMetaData) {
-          payload.type = PayloadBundleType.ASSET_META;
-        } else if (isAbort) {
-          payload.type = PayloadBundleType.ASSET_ABORT;
-        }
-        return payload;
-      }
-      default:
-        return payload;
-    }
-  }
-
   /**
    * Will process one event
    * @param event The backend event to process
@@ -260,8 +234,8 @@ export class NotificationService extends EventEmitter {
    * @return the decrypted payload and the raw event. Returns `undefined` when the payload is a coreCrypto-only system message
    */
   private async handleEvent(
-    event: Events.BackendEvent,
-    source: PayloadBundleSource,
+    event: BackendEvent,
+    source: NotificationSource,
     dryRun: boolean = false,
   ): Promise<HandledEventPayload | undefined> {
     // Handle MLS Events
@@ -282,7 +256,7 @@ export class NotificationService extends EventEmitter {
     // Fallback to other events
     switch (event.type) {
       // Meta events
-      case Events.CONVERSATION_EVENT.MEMBER_JOIN:
+      case CONVERSATION_EVENT.MEMBER_JOIN:
         // As of today (07/07/2022) the backend sends `WELCOME` message to the user's own conversation (not the actual conversation that the welcome should be part of)
         // So in order to map conversation Ids and groupId together, we need to first fetch the conversation and get the groupId linked to it.
         const conversation = await this.apiClient.api.conversation.getConversation(
@@ -291,21 +265,6 @@ export class NotificationService extends EventEmitter {
         if (!conversation) {
           throw new Error('no conv');
         }
-
-      case Events.CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE:
-      case Events.CONVERSATION_EVENT.RENAME:
-      case Events.CONVERSATION_EVENT.TYPING: {
-        const {conversation, from} = event;
-        const metaEvent = {...event, conversation, from};
-        return {mappedEvent: ConversationMapper.mapConversationEvent(metaEvent, source), event};
-      }
-      // User events
-      case Events.USER_EVENT.CONNECTION:
-      case Events.USER_EVENT.CLIENT_ADD:
-      case Events.USER_EVENT.UPDATE:
-      case Events.USER_EVENT.CLIENT_REMOVE: {
-        return {mappedEvent: UserMapper.mapUserEvent(event, this.apiClient.context!.userId, source), event};
-      }
     }
     return {event};
   }

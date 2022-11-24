@@ -28,6 +28,7 @@ import {
 } from '@wireapp/api-client/lib/auth';
 import {ClientClassification, ClientType, RegisteredClient} from '@wireapp/api-client/lib/client/';
 import * as Events from '@wireapp/api-client/lib/event';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 import {Notification} from '@wireapp/api-client/lib/notification/';
 import {AbortHandler, WebSocketClient} from '@wireapp/api-client/lib/tcp/';
 import {WEBSOCKET_STATE} from '@wireapp/api-client/lib/tcp/ReconnectingWebsocket';
@@ -48,10 +49,8 @@ import {LoginSanitizer} from './auth/';
 import {BroadcastService} from './broadcast/';
 import {ClientInfo, ClientService} from './client/';
 import {ConnectionService} from './connection/';
-import {AssetService, ConversationService, PayloadBundleSource, PayloadBundleType} from './conversation/';
+import {AssetService, ConversationService} from './conversation/';
 import {getQueueLength, resumeMessageSending} from './conversation/message/messageSender';
-import * as OtrMessage from './conversation/message/OtrMessage';
-import * as UserMessage from './conversation/message/UserMessage';
 import {CoreError} from './CoreError';
 import {CryptographyService, SessionId} from './cryptography/';
 import {GiphyService} from './giphy/';
@@ -59,7 +58,7 @@ import {LinkPreviewService} from './linkPreview';
 import {MLSService} from './messagingProtocols/mls';
 import {MLSCallbacks, CryptoProtocolConfig} from './messagingProtocols/mls/types';
 import {ProteusService} from './messagingProtocols/proteus';
-import {HandledEventPayload, NotificationService} from './notification/';
+import {HandledEventPayload, NotificationService, NotificationSource} from './notification/';
 import {SelfService} from './self/';
 import {TeamService} from './team/';
 import {UserService} from './user/';
@@ -83,40 +82,6 @@ export enum ConnectionState {
 }
 
 export interface Account {
-  on(
-    event: PayloadBundleType.ASSET,
-    listener: (payload: OtrMessage.FileAssetMessage | OtrMessage.ImageAssetMessage) => void,
-  ): this;
-  on(event: PayloadBundleType.BUTTON_ACTION, listener: (payload: OtrMessage.ButtonActionMessage) => void): this;
-  on(event: PayloadBundleType.ASSET_ABORT, listener: (payload: OtrMessage.FileAssetAbortMessage) => void): this;
-  on(event: PayloadBundleType.ASSET_IMAGE, listener: (payload: OtrMessage.ImageAssetMessage) => void): this;
-  on(event: PayloadBundleType.ASSET_META, listener: (payload: OtrMessage.FileAssetMetaDataMessage) => void): this;
-  on(event: PayloadBundleType.CALL, listener: (payload: OtrMessage.CallMessage) => void): this;
-  on(event: PayloadBundleType.CLIENT_ACTION, listener: (payload: OtrMessage.ResetSessionMessage) => void): this;
-  on(event: PayloadBundleType.CLIENT_ADD, listener: (payload: UserMessage.UserClientAddMessage) => void): this;
-  on(event: PayloadBundleType.CLIENT_REMOVE, listener: (payload: UserMessage.UserClientRemoveMessage) => void): this;
-  on(event: PayloadBundleType.CONFIRMATION, listener: (payload: OtrMessage.ConfirmationMessage) => void): this;
-  on(event: PayloadBundleType.CONNECTION_REQUEST, listener: (payload: UserMessage.UserConnectionMessage) => void): this;
-  on(event: PayloadBundleType.USER_UPDATE, listener: (payload: UserMessage.UserUpdateMessage) => void): this;
-  on(
-    event: PayloadBundleType.CONVERSATION_CLEAR,
-    listener: (payload: OtrMessage.ClearConversationMessage) => void,
-  ): this;
-  on(event: PayloadBundleType.CONVERSATION_RENAME, listener: (payload: Events.ConversationRenameEvent) => void): this;
-  on(event: PayloadBundleType.LOCATION, listener: (payload: OtrMessage.LocationMessage) => void): this;
-  on(event: PayloadBundleType.MEMBER_JOIN, listener: (payload: Events.TeamMemberJoinEvent) => void): this;
-  on(event: PayloadBundleType.MESSAGE_DELETE, listener: (payload: OtrMessage.DeleteMessage) => void): this;
-  on(event: PayloadBundleType.MESSAGE_EDIT, listener: (payload: OtrMessage.EditedTextMessage) => void): this;
-  on(event: PayloadBundleType.MESSAGE_HIDE, listener: (payload: OtrMessage.HideMessage) => void): this;
-  on(event: PayloadBundleType.PING, listener: (payload: OtrMessage.PingMessage) => void): this;
-  on(event: PayloadBundleType.REACTION, listener: (payload: OtrMessage.ReactionMessage) => void): this;
-  on(event: PayloadBundleType.TEXT, listener: (payload: OtrMessage.TextMessage) => void): this;
-  on(
-    event: PayloadBundleType.TIMER_UPDATE,
-    listener: (payload: Events.ConversationMessageTimerUpdateEvent) => void,
-  ): this;
-  on(event: PayloadBundleType.TYPING, listener: (payload: Events.ConversationTypingEvent) => void): this;
-  on(event: PayloadBundleType.UNKNOWN, listener: (payload: any) => void): this;
   on(event: TOPIC.ERROR, listener: (payload: CoreError) => void): this;
 }
 
@@ -600,7 +565,7 @@ export class Account<T = any> extends EventEmitter {
      * @param payload the payload of the event. Contains the raw event received and the decrypted data (if event was encrypted)
      * @param source where the message comes from (either websocket or notification stream)
      */
-    onEvent?: (payload: HandledEventPayload, source: PayloadBundleSource) => void;
+    onEvent?: (payload: HandledEventPayload, source: NotificationSource) => void;
 
     /**
      * During the notification stream processing, this function will be called whenever a new notification has been processed
@@ -630,26 +595,23 @@ export class Account<T = any> extends EventEmitter {
       throw new Error('Context is not set - please login first');
     }
 
-    const handleEvent = async (payload: HandledEventPayload, source: PayloadBundleSource) => {
-      const {mappedEvent} = payload;
-      switch (mappedEvent?.type) {
-        case PayloadBundleType.TIMER_UPDATE: {
+    const handleEvent = async (payload: HandledEventPayload, source: NotificationSource) => {
+      const {event} = payload;
+      switch (event?.type) {
+        case CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE: {
           const {
             data: {message_timer},
             conversation,
-          } = payload.event as Events.ConversationMessageTimerUpdateEvent;
+          } = event as Events.ConversationMessageTimerUpdateEvent;
           const expireAfterMillis = Number(message_timer);
           this.service!.conversation.messageTimer.setConversationLevelTimer(conversation, expireAfterMillis);
           break;
         }
       }
       onEvent(payload, source);
-      if (mappedEvent) {
-        this.emit(mappedEvent.type, payload.mappedEvent);
-      }
     };
 
-    const handleNotification = async (notification: Notification, source: PayloadBundleSource): Promise<void> => {
+    const handleNotification = async (notification: Notification, source: NotificationSource): Promise<void> => {
       try {
         const messages = this.service!.notification.handleNotification(notification, source, dryRun);
         for await (const message of messages) {
@@ -662,7 +624,7 @@ export class Account<T = any> extends EventEmitter {
 
     this.apiClient.transport.ws.removeAllListeners(WebSocketClient.TOPIC.ON_MESSAGE);
     this.apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_MESSAGE, notification =>
-      handleNotification(notification, PayloadBundleSource.WEBSOCKET),
+      handleNotification(notification, NotificationSource.WEBSOCKET),
     );
     this.apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_STATE_CHANGE, wsState => {
       const mapping: Partial<Record<WEBSOCKET_STATE, ConnectionState>> = {

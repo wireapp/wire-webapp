@@ -30,7 +30,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
-import {PayloadBundleState} from '..';
+import {MessageSendingState} from '..';
 
 export enum MessageTargetMode {
   NONE,
@@ -131,5 +131,5 @@ export type SendResult = {
   /** the ISO formatted date at which the message was received by the backend */
   sentAt: string;
   /** The sending state of the payload (has the payload been succesfully sent or canceled) */
-  state: PayloadBundleState;
+  state: MessageSendingState;
 };

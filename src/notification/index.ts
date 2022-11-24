@@ -18,3 +18,4 @@
  */
 
 export * from './NotificationService';
+export * from './Notifications.types';

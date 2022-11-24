@@ -21,8 +21,8 @@ import {BackendEvent, ConversationMLSWelcomeEvent, CONVERSATION_EVENT} from '@wi
 
 import {handleWelcomeMessage, isWelcomeMessageEvent} from './welcomeMessage';
 
-import {PayloadBundleSource} from '../../..';
 import {MLSService} from '../../../..';
+import {NotificationSource} from '../../../../../../notification';
 
 jest.mock('bazinga64', () => ({
   ...jest.requireActual('bazinga64'),
@@ -42,7 +42,7 @@ const mockParams = {
   event: {
     type: CONVERSATION_EVENT.MLS_WELCOME_MESSAGE,
   } as ConversationMLSWelcomeEvent,
-  source: {} as PayloadBundleSource,
+  source: {} as NotificationSource,
   mlsService: {
     processWelcomeMessage: jest.fn().mockResolvedValue('conversationId'),
   } as unknown as MLSService,
