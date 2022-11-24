@@ -21,7 +21,7 @@ import type {CallConfigData} from '@wireapp/api-client/lib/account/CallConfigDat
 import type {QualifiedUserClients, UserClients} from '@wireapp/api-client/lib/conversation';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {WebappProperties} from '@wireapp/api-client/lib/user/data';
-import {PayloadBundleState} from '@wireapp/core/lib/conversation';
+import {MessageSendingState} from '@wireapp/core/lib/conversation';
 import {flattenQualifiedUserClients, flattenUserClients} from '@wireapp/core/lib/conversation/message/UserClientsUtil';
 import {isQualifiedUserClients} from '@wireapp/core/lib/util';
 import {amplify} from 'amplify';
@@ -1117,7 +1117,7 @@ export class CallingRepository {
     }
 
     const message = await this.messageRepository.sendCallingMessage(conversation, content, options);
-    if (message.state === PayloadBundleState.CANCELLED) {
+    if (message.state === MessageSendingState.CANCELLED) {
       // If the user has cancelled message sending because of a degradation warning, we abort the call
       this.abortCall(
         conversationId,

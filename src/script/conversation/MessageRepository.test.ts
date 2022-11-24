@@ -20,7 +20,7 @@
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
-import {PayloadBundleState} from '@wireapp/core/lib/conversation';
+import {MessageSendingState} from '@wireapp/core/lib/conversation';
 import {container} from 'tsyringe';
 
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
@@ -128,7 +128,7 @@ describe('MessageRepository', () => {
   const successPayload = {
     sentAt: new Date().toISOString(),
     id: createRandomUuid(),
-    state: PayloadBundleState.OUTGOING_SENT,
+    state: MessageSendingState.OUTGOING_SENT,
   };
 
   describe('sendPing', () => {
@@ -207,7 +207,7 @@ describe('MessageRepository', () => {
       conversation.addMessage(msgToDelete);
       const [messageRepository, {core}] = await buildMessageRepository();
       spyOn(core.service!.conversation, 'send').and.returnValue(
-        Promise.resolve({state: PayloadBundleState.OUTGOING_SENT, sentAt: new Date().toISOString()}),
+        Promise.resolve({state: MessageSendingState.OUTGOING_SENT, sentAt: new Date().toISOString()}),
       );
 
       await expect(messageRepository.deleteMessageForEveryone(conversation, msgToDelete)).rejects.toMatchObject({
