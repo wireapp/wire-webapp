@@ -48,6 +48,7 @@ export class ConversationState {
   public readonly filteredConversations: ko.PureComputed<Conversation[]>;
   public readonly archivedConversations: ko.PureComputed<Conversation[]>;
   public readonly selfConversation: ko.PureComputed<Conversation | undefined>;
+  public readonly unreadConversations: ko.PureComputed<Conversation[]>;
   public readonly connectedUsers: ko.PureComputed<User[]>;
 
   public readonly sortedConversations: ko.PureComputed<Conversation[]>;
@@ -65,6 +66,9 @@ export class ConversationState {
       return this.sortedConversations().filter(
         conversation => !conversation.is_cleared() && !conversation.is_archived(),
       );
+    });
+    this.unreadConversations = ko.pureComputed(() => {
+      return this.visibleConversations().filter(conversationEntity => conversationEntity.hasUnread());
     });
 
     this.archivedConversations = ko.pureComputed(() => {
