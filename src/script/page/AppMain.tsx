@@ -36,7 +36,6 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {AppLock} from './AppLock';
 import {LeftSidebar} from './LeftSidebar';
 import {MainContent} from './MainContent';
-import {useFontSizeState} from './MainContent/panels/preferences/useFontSizePreferenceState';
 import {PanelEntity, PanelState, RightSidebar} from './RightSidebar';
 import {RootProvider} from './RootProvider';
 import {useAppMainState, ViewType} from './state';
@@ -45,6 +44,7 @@ import {useWindowTitle} from './useWindowTitle';
 
 import {ConversationState} from '../conversation/ConversationState';
 import {User} from '../entity/User';
+import {useInitializeRootFontSize} from '../hooks/useRootFontSize';
 import {App} from '../main/app';
 import {generateConversationUrl} from '../router/routeGenerator';
 import {configureRoutes, navigate} from '../router/Router';
@@ -74,6 +74,19 @@ const AppMain: FC<AppMainProps> = ({
   conversationState = container.resolve(ConversationState),
 }) => {
   const apiContext = app.getAPIContext();
+
+  useInitializeRootFontSize();
+
+  useEffect(() => {
+    PrimaryModal.init();
+    showInitialModal(userAvailability);
+    // userAvailability not needed for dependency
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useLayoutEffect(() => {
+    initializeApp();
+  }, []);
 
   if (!apiContext) {
     throw new Error('API Context has not been set');
@@ -177,24 +190,6 @@ const AppMain: FC<AppMainProps> = ({
       window.setTimeout(() => repositories.notification.checkPermission(), App.CONFIG.NOTIFICATION_CHECK);
     });
   };
-
-  useEffect(() => {
-    PrimaryModal.init();
-    showInitialModal(userAvailability);
-    // userAvailability not needed for dependency
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const {currentRootFontSize} = useFontSizeState(state => state.rootFontSize);
-
-  useEffect(() => {
-    const root = document.documentElement;
-    root.style.fontSize = currentRootFontSize;
-  }, [currentRootFontSize]);
-
-  useLayoutEffect(() => {
-    initializeApp();
-  }, []);
 
   return (
     <StyledApp
