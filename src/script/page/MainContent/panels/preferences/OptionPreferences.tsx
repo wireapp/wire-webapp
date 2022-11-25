@@ -26,7 +26,6 @@ import {container} from 'tsyringe';
 import {Checkbox, CheckboxLabel, RangeInput} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {RootFontSize, useAppMainState} from 'src/script/page/state';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -34,6 +33,7 @@ import {PreferencesPage} from './components/PreferencesPage';
 import {PreferencesRadio} from './components/PreferencesRadio';
 import {PreferencesSection} from './components/PreferencesSection';
 
+import {RootFontSize, useRootFontSize} from '../../../../hooks/useRootFontSize';
 import {PropertiesRepository} from '../../../../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../../../../properties/PropertiesType';
 import {UserState} from '../../../../user/UserState';
@@ -68,6 +68,7 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
   const [optionDarkMode, setOptionDarkMode] = useState<boolean>(settings.interface.theme === ThemeViewModelThemes.DARK);
   const [optionSendPreviews, setOptionSendPreviews] = useState<boolean>(settings.previews.send);
   const [optionNotifications, setOptionNotifications] = useState<NotificationPreference>(settings.notifications);
+  const [currentRootFontSize, setCurrentRootFontSize] = useRootFontSize();
 
   useEffect(() => {
     const updateProperties = ({settings}: WebappProperties): void => {
@@ -88,8 +89,6 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
       amplify.unsubscribe(WebAppEvents.PROPERTIES.UPDATED, updateProperties);
     };
   }, []);
-
-  const {currentRootFontSize, setCurrentRootFontSize} = useAppMainState(state => state.rootFontSize);
 
   const sliderValue = fontSizes.indexOf(currentRootFontSize);
 
