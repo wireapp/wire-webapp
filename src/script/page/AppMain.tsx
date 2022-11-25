@@ -36,6 +36,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {AppLock} from './AppLock';
 import {LeftSidebar} from './LeftSidebar';
 import {MainContent} from './MainContent';
+import {useFontSizeState} from './MainContent/panels/preferences/useFontSizePreferenceState';
 import {PanelEntity, PanelState, RightSidebar} from './RightSidebar';
 import {RootProvider} from './RootProvider';
 import {useAppMainState, ViewType} from './state';
@@ -184,7 +185,7 @@ const AppMain: FC<AppMainProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const {currentRootFontSize} = useAppMainState(state => state.rootFontSize);
+  const {currentRootFontSize} = useFontSizeState(state => state.rootFontSize);
 
   useEffect(() => {
     const root = document.documentElement;
