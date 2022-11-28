@@ -43,14 +43,14 @@ interface OptionPreferencesProps {
   userState?: UserState;
 }
 
-const dataListOptions = [
-  {value: 10, label: '10px', heading: 'Small'},
-  {value: 12, label: '12px'},
-  {value: 14, label: '14px'},
-  {value: 16, label: '16px', heading: 'Default'},
-  {value: 18, label: '18px'},
-  {value: 20, label: '20px'},
-  {value: 24, label: '24px', heading: 'Large'},
+const fontSliderOptions = [
+  {value: 0, label: RootFontSize.XXS, heading: 'Small'},
+  {value: 1, label: RootFontSize.XS},
+  {value: 2, label: RootFontSize.S},
+  {value: 3, label: RootFontSize.M, heading: 'Default'},
+  {value: 4, label: RootFontSize.L},
+  {value: 5, label: RootFontSize.XL},
+  {value: 6, label: RootFontSize.XXL, heading: 'Large'},
 ];
 
 const fontSizes = Object.values(RootFontSize);
@@ -184,15 +184,14 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
           <hr className="preferences-separator" />
 
           <PreferencesSection title={t('preferencesOptionsAppearance')}>
-            <IndicatorRangeInput
-              min={'0'}
-              max={'6'}
-              value={sliderValue}
-              label={t('preferencesOptionsAppearanceTextSize')}
-              step={'1'}
-              onChange={saveOptionFontSize}
-              dataListOptions={dataListOptions}
-            ></IndicatorRangeInput>
+            <div css={{marginBottom: '1.5rem', width: '100%'}}>
+              <IndicatorRangeInput
+                value={sliderValue}
+                label={t('preferencesOptionsAppearanceTextSize')}
+                onChange={saveOptionFontSize}
+                dataListOptions={fontSliderOptions}
+              />
+            </div>
             <Checkbox
               tabIndex={0}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
