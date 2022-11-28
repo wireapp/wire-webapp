@@ -42,23 +42,23 @@ export interface Theme extends ETheme {
     extraLarge: string;
   };
   Button?: {
-    primaryBg: String;
-    primaryHoverBg: String;
-    primaryActiveBg: String;
-    primaryActiveBorder: String;
-    primaryFocusBorder: String;
-    primaryDisabledBg: String;
-    primaryDisabledText: String;
-    secondaryActiveBg: String;
-    secondaryActiveBorder: String;
-    secondaryHoverBorder: String;
-    tertiaryBg: String;
-    tertiaryBorder: String;
-    tertiaryHoverBg: String;
-    tertiaryHoverBorder: String;
-    tertiarydisabledBg: String;
-    tertiaryDisabledBorder: String;
-    tertiaryActiveBg: String;
+    primaryBg: string;
+    primaryHoverBg: string;
+    primaryActiveBg: string;
+    primaryActiveBorder: string;
+    primaryFocusBorder: string;
+    primaryDisabledBg: string;
+    primaryDisabledText: string;
+    secondaryActiveBg: string;
+    secondaryActiveBorder: string;
+    secondaryHoverBorder: string;
+    tertiaryBg: string;
+    tertiaryBorder: string;
+    tertiaryHoverBg: string;
+    tertiaryHoverBorder: string;
+    tertiarydisabledBg: string;
+    tertiaryDisabledBorder: string;
+    tertiaryActiveBg: string;
   };
   IconButton: {
     activePrimaryBgColor: string;
@@ -84,9 +84,9 @@ export interface Theme extends ETheme {
   general: {
     backgroundColor: string;
     color: string;
-    contrastColor: String;
+    contrastColor: string;
     dangerColor: string;
-    focusColor: String;
+    focusColor: string;
     primaryColor: string;
   };
   Input: {
@@ -102,7 +102,7 @@ export interface Theme extends ETheme {
     borderColor: string;
     focusedDescriptionColor: string;
     optionHoverBg: string;
-    selectedActiveBg: String;
+    selectedActiveBg: string;
   };
 }
 

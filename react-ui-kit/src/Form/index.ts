@@ -24,6 +24,7 @@ export * from './CodeInput';
 export * from './DropFileInput';
 export * from './ErrorMessage';
 export * from './Form';
+export * from './IndicatorRangeInput';
 export * from './Input';
 export * from './InputBlock';
 export * from './InputSubmitCombo';
