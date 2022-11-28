@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.1.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.0.12...@wireapp/react-ui-kit@9.1.0) (2022-11-28)
+
+### Features
+
+* **react-ui-kit:** Prepare Indicator Range Input ([#4630](https://github.com/wireapp/wire-web-packages/issues/4630)) ([0aa1e6b](https://github.com/wireapp/wire-web-packages/commit/0aa1e6b407ba904a2a46e96251386e9286cc94b6)), closes [#4641](https://github.com/wireapp/wire-web-packages/issues/4641)
+
 ## [9.0.12](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.0.11...@wireapp/react-ui-kit@9.0.12) (2022-11-24)
 
 ### Bug Fixes
