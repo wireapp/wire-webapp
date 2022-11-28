@@ -80,7 +80,8 @@ const useAppMainState = create<AppMainState>((set, get) => ({
     goTo: (panel: PanelState, params: RightSidebarParams) => {
       return set(state => {
         const {rightSidebar} = state;
-        const previousState = rightSidebar.history.at(-1);
+        const lastItem = rightSidebar.history.length - 1;
+        const previousState = rightSidebar.history[lastItem];
         const replacedNewState = previousState === panel ? rightSidebar.history.slice(0, -1) : rightSidebar.history;
 
         return {
