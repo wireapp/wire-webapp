@@ -177,7 +177,8 @@ const InputBar = ({
   const [editedMention, setEditedMention] = useState<{startIndex: number; term: string} | undefined>(undefined);
 
   const {rightSidebar} = useAppMainState.getState();
-  const currentState = rightSidebar.history.at(-1);
+  const lastItem = rightSidebar.history.length - 1;
+  const currentState = rightSidebar.history[lastItem];
   const isRightSidebarOpen = !!currentState;
 
   const availabilityIsNone = availability === Availability.Type.NONE;
