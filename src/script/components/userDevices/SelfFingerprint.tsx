@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useMemo} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
@@ -45,17 +45,18 @@ const SelfFingerprint: React.FC<SelfFingerprintProps> = ({
   noPadding,
   clientState = container.resolve(ClientState),
 }) => {
-  const fingerprintLocal = useMemo<string>(
-    () => cryptographyRepository.getLocalFingerprint(),
-    [cryptographyRepository],
-  );
+  const [localFingerprint, setLocalFingerprint] = useState<string>('');
+  useEffect(() => {
+    cryptographyRepository.getLocalFingerprint().then(fingerprint => setLocalFingerprint(fingerprint));
+  }, [cryptographyRepository]);
+
   const {currentClient} = useKoSubscribableChildren(clientState, ['currentClient']);
 
   return (
     <div className={cx('participant-devices__header', {'participant-devices__header--padding': !noPadding})}>
       <DeviceCard device={currentClient} />
       <div className="participant-devices__fingerprint">
-        <DeviceId deviceId={fingerprintLocal} />
+        <DeviceId deviceId={localFingerprint} />
       </div>
       <div>
         <button

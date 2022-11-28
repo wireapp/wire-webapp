@@ -27,8 +27,6 @@ import {
   USER_EVENT,
 } from '@wireapp/api-client/lib/event/';
 import type {Notification} from '@wireapp/api-client/lib/notification/';
-import type {QualifiedId} from '@wireapp/api-client/lib/user';
-import {isQualifiedId} from '@wireapp/core/lib/util';
 import Dexie from 'dexie';
 import {container} from 'tsyringe';
 
@@ -36,7 +34,7 @@ import {util as ProteusUtil} from '@wireapp/proteus';
 
 import {getLogger, Logger} from 'Util/Logger';
 
-import {arrayToBase64, createRandomUuid, downloadFile} from './util';
+import {createRandomUuid} from './util';
 
 import {CallingRepository} from '../calling/CallingRepository';
 import {CallState} from '../calling/CallState';
@@ -53,15 +51,10 @@ import {EventRepository} from '../event/EventRepository';
 import {checkVersion} from '../lifecycle/newVersionHandler';
 import {MessageCategory} from '../message/MessageCategory';
 import {Core} from '../service/CoreSingleton';
-import {EventRecord, StorageRepository, StorageSchemata} from '../storage';
+import {EventRecord, StorageRepository} from '../storage';
 import {UserRepository} from '../user/UserRepository';
 import {UserState} from '../user/UserState';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
-
-function downloadText(text: string, filename: string = 'default.txt'): number {
-  const url = `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`;
-  return downloadFile(url, filename);
-}
 
 export class DebugUtil {
   private readonly logger: Logger;
@@ -111,11 +104,12 @@ export class DebugUtil {
     return Promise.all(blockUsers);
   }
 
-  /** Used by QA test automation. */
+  /** FIXME restore this functionnality for CoreCrypto
+   * Used by QA test automation.
   async breakSession(userId: string | QualifiedId, clientId: string): Promise<void> {
     const qualifiedId = isQualifiedId(userId) ? userId : {domain: '', id: userId};
     const sessionId = this.core.service!.cryptography.constructSessionId(qualifiedId, clientId);
-    const cryptobox = this.cryptographyRepository.cryptographyService.cryptobox;
+    const cryptobox = this.cryptographyRepository.proteusService.cryptobox;
     const cryptoboxSession = await cryptobox.session_load(sessionId);
     cryptoboxSession.session.session_states = {};
 
@@ -131,7 +125,7 @@ export class DebugUtil {
     const sessionStoreName = StorageSchemata.OBJECT_STORE.SESSIONS;
     await this.storageRepository.storageService.update(sessionStoreName, sessionId, record);
     this.logger.log(`Corrupted Session ID '${sessionId}'`);
-  }
+  } */
 
   /** Used by QA test automation. */
   triggerVersionCheck(baseVersion: string): Promise<string | void> {
@@ -249,14 +243,20 @@ export class DebugUtil {
     return debugInformation;
   }
 
+  /* FIXME restore breaking session for coreCrypto
   async exportCryptobox(): Promise<void> {
+    function downloadText(text: string, filename: string = 'default.txt'): number {
+      const url = `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`;
+      return downloadFile(url, filename);
+    }
+
     const clientId = this.clientState.currentClient().id;
     const userId = this.userState.self().id;
     const fileName = `cryptobox-${userId}-${clientId}.json`;
-    const cryptobox = await this.cryptographyRepository.cryptographyService.cryptobox.serialize();
+    const cryptobox = await this.cryptographyRepository.proteusService.cryptobox.serialize();
     downloadText(JSON.stringify(cryptobox), fileName);
   }
-
+*/
   /** Used by QA test automation. */
   isLibsodiumUsingWASM(): Promise<boolean> {
     return ProteusUtil.WASMUtil.isUsingWASM();
