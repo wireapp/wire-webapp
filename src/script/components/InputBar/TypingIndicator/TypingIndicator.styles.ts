@@ -30,7 +30,7 @@ export const wrapperStyles: CSSObject = {
   backgroundColor: 'var(--app-bg)',
   padding: 5,
   position: 'absolute',
-  bottom: 56,
+  top: -26,
   borderTopLeftRadius: 4,
   borderTopRightRadius: 4,
 };
