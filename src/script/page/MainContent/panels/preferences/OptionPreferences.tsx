@@ -183,12 +183,12 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
 
           <hr className="preferences-separator" />
 
-          <PreferencesSection title={t('preferencesOptionsPopular')}>
+          <PreferencesSection title={t('preferencesOptionsAppearance')}>
             <IndicatorRangeInput
               min={'0'}
               max={'6'}
               value={sliderValue}
-              label={'font size'}
+              label={t('preferencesOptionsAppearanceTextSize')}
               step={'1'}
               onChange={saveOptionFontSize}
               dataListOptions={dataListOptions}
