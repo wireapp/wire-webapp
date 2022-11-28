@@ -23,7 +23,7 @@ import {AudioPreference, NotificationPreference, WebappProperties} from '@wireap
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import {Checkbox, CheckboxLabel, RangeInput} from '@wireapp/react-ui-kit';
+import {Checkbox, CheckboxLabel, IndicatorRangeInput} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -43,15 +43,15 @@ interface OptionPreferencesProps {
   userState?: UserState;
 }
 
-// const dataListOptions = [
-//   {value: 10, label: '10px', heading: 'Small'},
-//   {value: 12, label: '12px'},
-//   {value: 14, label: '14px'},
-//   {value: 16, label: '16px', heading: 'Default'},
-//   {value: 18, label: '18px'},
-//   {value: 20, label: '20px'},
-//   {value: 24, label: '24px', heading: 'Large'},
-// ];
+const fontSliderOptions = [
+  {value: 0, label: RootFontSize.XXS, heading: 'Small'},
+  {value: 1, label: RootFontSize.XS},
+  {value: 2, label: RootFontSize.S},
+  {value: 3, label: RootFontSize.M, heading: 'Default'},
+  {value: 4, label: RootFontSize.L},
+  {value: 5, label: RootFontSize.XL},
+  {value: 6, label: RootFontSize.XXL, heading: 'Large'},
+];
 
 const fontSizes = Object.values(RootFontSize);
 
@@ -183,28 +183,15 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
 
           <hr className="preferences-separator" />
 
-          <PreferencesSection title={t('preferencesOptionsPopular')}>
-            <RangeInput
-              css={{margin: '16px', width: '100%'}}
-              min={'0'}
-              max={'6'}
-              value={sliderValue}
-              label={'font size'}
-              minValueLabel={'small'}
-              maxValueLabel={'big'}
-              step={'1'}
-              onChange={saveOptionFontSize}
-            ></RangeInput>
-            {/* <IndicatorRangeInput
-              css={{margin: '16px', width: '100%'}}p
-              min={'0'}
-              max={'6'}
-              value={optionFontSize}
-              label={'font size'}
-              step={'1'}
-              onChange={saveOptionFontSize}
-              dataListOptions={dataListOptions}
-            ></IndicatorRangeInput> */}
+          <PreferencesSection title={t('preferencesOptionsAppearance')}>
+            <div css={{marginBottom: '1.5rem', width: '100%'}}>
+              <IndicatorRangeInput
+                value={sliderValue}
+                label={t('preferencesOptionsAppearanceTextSize')}
+                onChange={saveOptionFontSize}
+                dataListOptions={fontSliderOptions}
+              />
+            </div>
             <Checkbox
               tabIndex={0}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
