@@ -93,7 +93,6 @@ const ImageAsset: React.FC<ImageAssetProps> = ({asset, message, onClick, teamSta
     maxWidth: '100%',
     width: asset.width,
     maxHeight: '80vh',
-    height: asset.height,
   };
 
   return (
