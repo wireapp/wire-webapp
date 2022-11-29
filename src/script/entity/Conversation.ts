@@ -54,6 +54,7 @@ import {Config} from '../Config';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
 import {ACCESS_STATE} from '../conversation/AccessState';
 import {ConversationRepository} from '../conversation/ConversationRepository';
+import {isSelfConversation} from '../conversation/ConversationSelectors';
 import {ConversationStatus} from '../conversation/ConversationStatus';
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
 import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
@@ -345,7 +346,7 @@ export class Conversation {
     this.blockLegalHoldMessage = false;
 
     this.legalHoldStatus.subscribe(legalHoldStatus => {
-      if (!this.blockLegalHoldMessage && this.hasInitializedUsers()) {
+      if (!this.blockLegalHoldMessage && !isSelfConversation(this) && this.hasInitializedUsers()) {
         amplify.publish(WebAppEvents.CONVERSATION.INJECT_LEGAL_HOLD_MESSAGE, {
           conversationEntity: this,
           legalHoldStatus,

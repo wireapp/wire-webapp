@@ -89,7 +89,10 @@ export class ConversationState {
           ConnectionStatus.PENDING,
         ];
 
-        if (conversationEntity.isSelf() || states_to_filter.includes(conversationEntity.connection().status())) {
+        if (
+          isSelfConversation(conversationEntity) ||
+          states_to_filter.includes(conversationEntity.connection().status())
+        ) {
           return false;
         }
 
