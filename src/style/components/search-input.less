@@ -97,6 +97,11 @@
     color: var(--gray-70);
   }
 
+  &:placeholder-shown {
+    .ellipsis-nowrap;
+    font-size: 16px;
+  }
+
   // hack for chrome to fix line height issue
   &::-webkit-input-placeholder {
     transform: translateY(-1px);

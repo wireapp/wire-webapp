@@ -46,11 +46,13 @@ const ConversationDetailsOption: FC<ConversationDetailsOptionProps> = ({
       <span className="panel__action-item__icon">{icon}</span>
 
       <span className="panel__action-item__summary">
-        <span className="panel__action-item__text">{title}</span>
-
-        <span className="panel__action-item__status" data-uie-name={statusUieName}>
-          {statusText}
+        <span className="panel__action-item__text">
+          <p>{title}</p>
         </span>
+
+        <p className="panel__action-item__status" data-uie-name={statusUieName}>
+          {statusText}
+        </p>
       </span>
 
       <Icon.ChevronRight className="chevron-right-icon" />
