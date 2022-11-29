@@ -347,13 +347,14 @@
     }
 
     &__text {
+      .ellipsis-nowrap;
       display: flex;
-      overflow: hidden;
       flex-grow: 1;
       align-items: center;
-      text-overflow: ellipsis;
-      white-space: nowrap;
       .text-medium;
+      & > p {
+        .ellipsis-nowrap;
+      }
     }
 
     &__status {
@@ -367,12 +368,12 @@
     }
 
     &__summary {
-      display: flex;
       overflow: hidden;
       flex-direction: column;
       flex-grow: 1;
       align-items: flex-start;
       justify-content: center;
+      text-align: left;
     }
 
     .service-icon {
