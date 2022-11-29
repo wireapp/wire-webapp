@@ -273,7 +273,7 @@ export class MediaDevicesHandler {
        * https://www.electronjs.org/docs/latest/breaking-changes#removed-desktopcapturergetsources-in-the-renderer
        */
       if (window.desktopCapturer?.getDesktopSources) {
-        return window.desktopCapturer?.getDesktopSources(options);
+        return window.desktopCapturer.getDesktopSources(options);
       }
       if (window.desktopCapturer?.getSources.constructor.name === 'AsyncFunction') {
         // Electron > 4
