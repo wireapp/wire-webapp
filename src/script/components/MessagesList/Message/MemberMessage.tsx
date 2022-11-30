@@ -121,7 +121,6 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
               </div>
               <div ref={initShowMore} className="message-header-label">
                 <span className="message-header-caption" dangerouslySetInnerHTML={{__html: htmlCaption}} />
-                <hr className="message-header-line" />
               </div>
               {isMemberChange && (
                 <div className="message-body-actions">
@@ -165,7 +164,6 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
               </div>
               <div className="message-header-label">
                 <span className="ellipsis">{t('conversationCreateReceiptsEnabled')}</span>
-                <hr className="message-header-line" />
               </div>
             </div>
           )}
