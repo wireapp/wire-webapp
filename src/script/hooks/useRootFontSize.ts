@@ -31,8 +31,6 @@ export enum RootFontSize {
   L = '18px',
   XL = '20px',
   XXL = '24px',
-  // XXXL = '30px',
-  // XXXXL = '36px',
 }
 
 function setFontSizeToRoot(currentRootFontSize: RootFontSize) {
