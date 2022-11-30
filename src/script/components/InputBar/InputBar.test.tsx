@@ -85,6 +85,7 @@ const getDefaultProps = () => ({
   userState: {
     self: () => new User('id'),
   } as UserState,
+  onShiftTab: jest.fn(),
 });
 
 describe('InputBar', () => {

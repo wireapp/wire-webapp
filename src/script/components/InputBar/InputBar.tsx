@@ -53,7 +53,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {loadDraftState, saveDraftState} from 'Util/DraftStateUtil';
 import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/FileTypeUtil';
 import {isHittingUploadLimit} from 'Util/isHittingUploadLimit';
-import {insertAtCaret, isFunctionKey, KEY} from 'Util/KeyboardUtil';
+import {insertAtCaret, isFunctionKey, isTabKey, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {
   createMentionEntity,
@@ -115,6 +115,7 @@ interface InputBarProps {
   readonly storageRepository: StorageRepository;
   readonly teamState: TeamState;
   readonly userState: UserState;
+  onShiftTab: () => void;
 }
 
 const InputBar = ({
@@ -129,6 +130,7 @@ const InputBar = ({
   storageRepository,
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
+  onShiftTab,
 }: InputBarProps) => {
   const {classifiedDomains, isSelfDeletingMessagesEnabled, isFileSharingSendingEnabled} = useKoSubscribableChildren(
     teamState,
@@ -451,7 +453,10 @@ const InputBar = ({
 
   const onTextAreaKeyDown = (keyboardEvent: ReactKeyboardEvent<HTMLTextAreaElement>): void | boolean => {
     const inputHandledByEmoji = !editedMention && emojiKeyDown(keyboardEvent);
-
+    // shift+tab from message input bar set last focused message's elements non focusable
+    if (keyboardEvent.shiftKey && isTabKey(keyboardEvent)) {
+      onShiftTab();
+    }
     if (!inputHandledByEmoji) {
       switch (keyboardEvent.key) {
         case KEY.ARROW_UP: {

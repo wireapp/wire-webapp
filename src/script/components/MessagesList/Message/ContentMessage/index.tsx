@@ -60,6 +60,7 @@ export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetS
   selfId: QualifiedId;
   handleFocus: (index: number) => void;
   totalMessage: number;
+  isMsgElementsFocusable: boolean;
 }
 
 const ContentMessageComponent: React.FC<ContentMessageProps> = ({
@@ -82,6 +83,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   onLike,
   handleFocus,
   totalMessage,
+  isMsgElementsFocusable,
 }) => {
   const {entries: menuEntries} = useKoSubscribableChildren(contextMenu, ['entries']);
   const {headerSenderName, timestamp, ephemeral_caption, ephemeral_status, assets, other_likes, was_edited} =
@@ -106,17 +108,19 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
     return !previousMessage.isContent() || previousMessage.user().id !== message.user().id;
   };
 
+  // check if current message is focused and its elements focusable
+  const msgFocusState = isMsgElementsFocusable && focusConversation;
   const avatarSection = shouldShowAvatar() ? (
     <div className="message-header">
       <div className="message-header-icon">
         <Avatar
-          tabIndex={focusConversation ? 0 : -1}
+          tabIndex={msgFocusState ? 0 : -1}
           participant={message.user()}
           onAvatarClick={onClickAvatar}
           avatarSize={AVATAR_SIZE.X_SMALL}
         />
       </div>
-      <div className="message-header-label" role="button">
+      <div className="message-header-label">
         <span className={`message-header-label-sender ${message.accent_color()}`} data-uie-name="sender-name">
           {headerSenderName}
         </span>
@@ -185,7 +189,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
           focusMessage={onClickTimestamp}
           handleClickOnMessage={onClickMessage}
           showUserDetails={onClickAvatar}
-          focusConversation={focusConversation}
+          focusConversation={msgFocusState}
         />
       )}
       <div className="message-body" title={ephemeral_caption}>
@@ -204,7 +208,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             onClickButton={onClickButton}
             onClickImage={onClickImage}
             onClickMessage={onClickMessage}
-            focusConversation={focusConversation}
+            focusConversation={msgFocusState}
           />
         ))}
 
@@ -214,7 +218,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
               className="message-body-like-icon like-button message-show-on-hover"
               message={message}
               onLike={onLike}
-              focusConversation={focusConversation}
+              focusConversation={msgFocusState}
             />
           </div>
         )}
@@ -222,7 +226,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
         <div className="message-body-actions">
           {menuEntries.length > 0 && (
             <button
-              tabIndex={focusConversation ? 0 : -1}
+              tabIndex={msgFocusState ? 0 : -1}
               className="context-menu icon-more font-size-xs"
               aria-label={t('accessibility.conversationContextMenuOpenLabel')}
               onKeyDown={handleContextKeyDown}
@@ -250,7 +254,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             is1to1Conversation={conversation.is1to1()}
             isLastDeliveredMessage={isLastDeliveredMessage}
             onClickReceipts={onClickReceipts}
-            focusConversation={focusConversation}
+            focusConversation={msgFocusState}
           />
         </div>
       </div>
@@ -261,7 +265,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             is1to1Conversation={conversation.is1to1()}
             onLike={onLike}
             onClickLikes={onClickLikes}
-            focusConversation={focusConversation}
+            focusConversation={msgFocusState}
           />
         </div>
       )}
