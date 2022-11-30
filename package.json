@@ -8,7 +8,7 @@
     "@wireapp/react-ui-kit": "9.0.12",
     "@wireapp/store-engine-dexie": "2.0.3",
     "@wireapp/store-engine-sqleet": "1.8.9",
-    "@wireapp/webapp-events": "0.15.2",
+    "@wireapp/webapp-events": "0.16.0",
     "amplify": "https://github.com/wireapp/amplify#head=master",
     "classnames": "2.3.2",
     "copy-webpack-plugin": "11.0.0",
