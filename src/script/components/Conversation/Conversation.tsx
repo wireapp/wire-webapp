@@ -93,6 +93,7 @@ export const Conversation: FC<ConversationProps> = ({
   const {is1to1, isRequest} = useKoSubscribableChildren(activeConversation!, ['is1to1', 'isRequest']);
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
   const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
+  const [isMsgElementsFocusable, setMsgElementsFocusable] = useState(true);
 
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
   const smBreakpoint = useMatchMedia('max-width: 640px');
@@ -226,10 +227,10 @@ export const Conversation: FC<ConversationProps> = ({
     messageEntity: ContentMessage | Text,
     event: MouseEvent | KeyboardEvent,
     elementType: ElementType,
-    messageDetails: {
-      href: '';
-      userId: '';
-      userDomain: '';
+    messageDetails: MessageDetails = {
+      href: '',
+      userId: '',
+      userDomain: '',
     },
   ) => {
     if (isMouseEvent(event) && event.button === btnRightClick) {
@@ -437,6 +438,8 @@ export const Conversation: FC<ConversationProps> = ({
             onLoading={loading => setIsConversationLoaded(!loading)}
             getVisibleCallback={getInViewportCallback}
             isLastReceivedMessage={isLastReceivedMessage}
+            isMsgElementsFocusable={isMsgElementsFocusable}
+            setMsgElementsFocusable={setMsgElementsFocusable}
           />
 
           <InputBar
@@ -451,6 +454,9 @@ export const Conversation: FC<ConversationProps> = ({
             storageRepository={repositories.storage}
             teamState={teamState}
             userState={userState}
+            onShiftTab={() => {
+              setMsgElementsFocusable(false);
+            }}
           />
 
           <div className="conversation-loading">

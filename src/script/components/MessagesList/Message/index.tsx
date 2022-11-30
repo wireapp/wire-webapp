@@ -86,6 +86,8 @@ export interface MessageParams extends MessageActions {
   focusConversation: boolean;
   handleFocus: (index: number) => void;
   handleArrowKeyDown: (e: React.KeyboardEvent) => void;
+  isMsgElementsFocusable: boolean;
+  setMsgElementsFocusable: (isMsgElementsFocusable: boolean) => void;
 }
 
 const Message: React.FC<
@@ -103,6 +105,8 @@ const Message: React.FC<
     handleFocus,
     handleArrowKeyDown,
     index,
+    isMsgElementsFocusable,
+    setMsgElementsFocusable,
   } = props;
   const messageElementRef = useRef<HTMLDivElement>(null);
   const messageRef = useRef<HTMLDivElement>(null);
@@ -130,6 +134,13 @@ const Message: React.FC<
   }, [isMarked, messageElementRef]);
 
   const handleDivKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    // when a message is focused set its elements focusable
+    if (!event.shiftKey && isTabKey(event)) {
+      if (!messageRef.current) {
+        return;
+      }
+      setMsgElementsFocusable(true);
+    }
     if (isTabKey(event)) {
       // don't call arrow key down for tab key
       return;
@@ -169,6 +180,7 @@ const Message: React.FC<
       {...props}
       hasMarker={markerType !== MessageMarkerType.NONE}
       focusConversation={focusConversation}
+      isMsgElementsFocusable={isMsgElementsFocusable}
     />
   );
   const wrappedContent = onVisible ? (
