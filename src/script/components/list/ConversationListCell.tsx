@@ -202,7 +202,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
           <span
             id={contextMenuKeyboardShortcut}
             aria-label={t('accessibility.conversationOptionsMenuAccessKey')}
-          ></span>
+          />
           <div
             className={cx('conversation-list-cell-left', {
               'conversation-list-cell-left-opaque': removedFromConversation || users.length === 0,
