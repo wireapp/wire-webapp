@@ -53,7 +53,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {loadDraftState, saveDraftState} from 'Util/DraftStateUtil';
 import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/FileTypeUtil';
 import {isHittingUploadLimit} from 'Util/isHittingUploadLimit';
-import {insertAtCaret, isFunctionKey, KEY} from 'Util/KeyboardUtil';
+import {insertAtCaret, isFunctionKey, isTabKey, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {
   createMentionEntity,
@@ -67,6 +67,7 @@ import {formatBytes, getSelectionPosition} from 'Util/util';
 import {getRichTextInput} from './getRichTextInput';
 import {PastedFileControls} from './PastedFileControls';
 import {ReplyBar} from './ReplyBar';
+import {TYPING_TIMEOUT} from './TypingIndicator';
 import {TypingIndicator} from './TypingIndicator/TypingIndicator';
 
 import {AssetRepository} from '../../assets/AssetRepository';
@@ -91,7 +92,6 @@ import {UserState} from '../../user/UserState';
 const CONFIG = {
   ...Config.getConfig(),
   PING_TIMEOUT: TIME_IN_MILLIS.SECOND * 2,
-  IS_TYPING_TIMEOUT: TIME_IN_MILLIS.SECOND * 10,
 };
 
 const showWarningModal = (title: string, message: string): void => {
@@ -115,6 +115,7 @@ interface InputBarProps {
   readonly storageRepository: StorageRepository;
   readonly teamState: TeamState;
   readonly userState: UserState;
+  onShiftTab: () => void;
 }
 
 const InputBar = ({
@@ -129,6 +130,7 @@ const InputBar = ({
   storageRepository,
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
+  onShiftTab,
 }: InputBarProps) => {
   const {classifiedDomains, isSelfDeletingMessagesEnabled, isFileSharingSendingEnabled} = useKoSubscribableChildren(
     teamState,
@@ -177,7 +179,8 @@ const InputBar = ({
   const [editedMention, setEditedMention] = useState<{startIndex: number; term: string} | undefined>(undefined);
 
   const {rightSidebar} = useAppMainState.getState();
-  const currentState = rightSidebar.history.at(-1);
+  const lastItem = rightSidebar.history.length - 1;
+  const currentState = rightSidebar.history[lastItem];
   const isRightSidebarOpen = !!currentState;
 
   const availabilityIsNone = availability === Availability.Type.NONE;
@@ -409,7 +412,7 @@ const InputBar = ({
     let timerId: number;
     if (inputValue.length > 0) {
       setIsTyping(true);
-      timerId = window.setTimeout(() => setIsTyping(false), CONFIG.IS_TYPING_TIMEOUT);
+      timerId = window.setTimeout(() => setIsTyping(false), TYPING_TIMEOUT);
     } else {
       setIsTyping(false);
     }
@@ -450,7 +453,10 @@ const InputBar = ({
 
   const onTextAreaKeyDown = (keyboardEvent: ReactKeyboardEvent<HTMLTextAreaElement>): void | boolean => {
     const inputHandledByEmoji = !editedMention && emojiKeyDown(keyboardEvent);
-
+    // shift+tab from message input bar set last focused message's elements non focusable
+    if (keyboardEvent.shiftKey && isTabKey(keyboardEvent)) {
+      onShiftTab();
+    }
     if (!inputHandledByEmoji) {
       switch (keyboardEvent.key) {
         case KEY.ARROW_UP: {

@@ -75,6 +75,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; focus
   teamState = container.resolve(TeamState),
   handleFocus,
   totalMessage,
+  isMsgElementsFocusable,
 }) => {
   const findMessage = (conversation: Conversation, messageId: string) => {
     return messageRepository.getMessageInConversationById(conversation, messageId, true, true);
@@ -183,6 +184,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; focus
         focusConversation={focusConversation}
         handleFocus={handleFocus}
         totalMessage={totalMessage}
+        isMsgElementsFocusable={isMsgElementsFocusable}
       />
     );
   }

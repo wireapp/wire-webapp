@@ -101,6 +101,12 @@
     flex-grow: 1;
     border-bottom: 1px solid transparent;
     margin: 0 10px -1px;
+    transition: background-color 0.15s ease-in-out;
+
+    &:hover {
+      border-bottom: 1px solid var(--gray-50);
+      background-color: @white;
+    }
 
     &.active {
       border-bottom-color: var(--black);
@@ -137,6 +143,11 @@ body.theme-dark {
     border-bottom-color: var(--gray-70);
 
     .start-ui-list-tab {
+      &:hover {
+        border-bottom: 1px solid var(--gray-70);
+        background: @black;
+      }
+
       &.active {
         border-bottom-color: var(--white);
       }

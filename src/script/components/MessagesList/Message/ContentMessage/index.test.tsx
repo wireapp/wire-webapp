@@ -64,6 +64,7 @@ describe('message', () => {
       previousMessage: undefined,
       selfId: {domain: '', id: createRandomUuid()},
       totalMessage: 1,
+      isMsgElementsFocusable: true,
     };
   });
 

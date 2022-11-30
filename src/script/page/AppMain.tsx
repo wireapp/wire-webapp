@@ -109,7 +109,7 @@ const AppMain: FC<AppMainProps> = ({
   const {isActivatedAccount} = useKoSubscribableChildren(userState, ['isActivatedAccount']);
 
   const {history, entity: currentEntity, close: closeRightSidebar, goTo} = useAppMainState(state => state.rightSidebar);
-  const currentState = history.at(-1);
+  const currentState = history[history.length - 1];
 
   const toggleRightSidebar = (panelState: PanelState, params: RightSidebarParams, compareEntityId = false) => {
     const isDifferentState = currentState !== panelState;

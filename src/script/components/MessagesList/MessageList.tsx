@@ -64,6 +64,8 @@ interface MessagesListParams {
   showParticipants: (users: User[]) => void;
   showUserDetails: (user: User | ServiceEntity) => void;
   isLastReceivedMessage: (messageEntity: MessageEntity, conversationEntity: ConversationEntity) => boolean;
+  isMsgElementsFocusable: boolean;
+  setMsgElementsFocusable: (isMsgElementsFocusable: boolean) => void;
 }
 
 const filterDuplicatedMemberMessages = (messages: MessageEntity[]) => {
@@ -113,6 +115,8 @@ const MessagesList: FC<MessagesListParams> = ({
   messageActions,
   onLoading,
   isLastReceivedMessage,
+  isMsgElementsFocusable,
+  setMsgElementsFocusable,
 }) => {
   const {
     messages: allMessages,
@@ -328,6 +332,8 @@ const MessagesList: FC<MessagesListParams> = ({
               focusConversation={currentFocus === index}
               handleFocus={setCurrentFocus}
               handleArrowKeyDown={handleKeyDown}
+              isMsgElementsFocusable={isMsgElementsFocusable}
+              setMsgElementsFocusable={setMsgElementsFocusable}
             />
           );
         })}

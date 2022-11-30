@@ -18,8 +18,7 @@
  */
 
 import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/lib/event/';
-import {PayloadBundleSource} from '@wireapp/core/lib/conversation';
-import {HandledEventPayload} from '@wireapp/core/lib/notification';
+import {NotificationSource, HandledEventPayload} from '@wireapp/core/lib/notification';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
@@ -158,7 +157,7 @@ export class EventRepository {
     }
   };
 
-  private readonly handleIncomingEvent = async (payload: HandledEventPayload, source: PayloadBundleSource) => {
+  private readonly handleIncomingEvent = async (payload: HandledEventPayload, source: NotificationSource) => {
     try {
       await this.handleEvent({...payload, event: payload.event as EventRecord}, source);
     } catch (error) {

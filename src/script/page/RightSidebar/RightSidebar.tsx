@@ -113,7 +113,8 @@ const RightSidebar: FC<RightSidebarProps> = ({
   const [animatePanelToLeft, setAnimatePanelToLeft] = useState<boolean>(true);
 
   const {rightSidebar} = useAppMainState.getState();
-  const currentState = rightSidebar.history.at(-1);
+  const lastItem = rightSidebar.history.length - 1;
+  const currentState = rightSidebar.history[lastItem];
 
   const userEntity = currentEntity && isUserEntity(currentEntity) ? currentEntity : null;
   const userServiceEntity = currentEntity && isUserServiceEntity(currentEntity) ? currentEntity : null;

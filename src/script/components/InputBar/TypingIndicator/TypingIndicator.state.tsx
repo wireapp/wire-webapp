@@ -24,19 +24,21 @@ import {User} from '../../../entity/User';
 type TypingUser = {
   conversationId: string;
   user: User;
+  timerId: number;
 };
 
 type TypingIndicatorState = {
   typingUsers: TypingUser[];
   addTypingUser: (user: TypingUser) => void;
-  removeTypingUser: (user: TypingUser) => void;
+  removeTypingUser: (user: User, conversationId: string) => void;
   getTypingUsersInConversation: (conversationId: string) => User[];
   clearTypingUsers: () => void;
+  getTypingUser: (user: User, conversationId: string) => TypingUser | undefined;
 };
 
 const useTypingIndicatorState = create<TypingIndicatorState>((set, get) => ({
   typingUsers: [],
-  addTypingUser: ({conversationId, user}) =>
+  addTypingUser: ({conversationId, user, timerId}) =>
     set(state => {
       if (
         state.typingUsers.find(
@@ -45,12 +47,16 @@ const useTypingIndicatorState = create<TypingIndicatorState>((set, get) => ({
       ) {
         return state;
       }
-      return {typingUsers: [...state.typingUsers, {conversationId, user}]};
+      return {typingUsers: [...state.typingUsers, {conversationId, user, timerId}]};
     }),
-  removeTypingUser: ({conversationId, user: {id}}) =>
+  getTypingUser: (user, conversationId) =>
+    get().typingUsers.find(
+      typingUser => typingUser.conversationId === conversationId && typingUser.user.id === user.id,
+    ),
+  removeTypingUser: (user, conversationId) =>
     set(state => ({
       typingUsers: state.typingUsers.filter(
-        typingUser => !(typingUser.conversationId === conversationId && typingUser.user.id === id),
+        typingUser => !(typingUser.conversationId === conversationId && typingUser.user.id === user.id),
       ),
     })),
   getTypingUsersInConversation: conversationId =>
