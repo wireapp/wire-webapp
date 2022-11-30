@@ -7775,12 +7775,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fake-indexeddb@npm:4.0.0":
-  version: 4.0.0
-  resolution: "fake-indexeddb@npm:4.0.0"
+"fake-indexeddb@npm:4.0.1":
+  version: 4.0.1
+  resolution: "fake-indexeddb@npm:4.0.1"
   dependencies:
     realistic-structured-clone: ^3.0.0
-  checksum: 6f61d5ed77915cbb4b5c22f030f7017318edc84dbde0b24bd4e82fb4c311f30d02f890cb144aee6e7f296a917f3393ae3d989a28af6a304a3c2b2471ca7de151
+  checksum: dd1c82111e3b97c262a647a29dc012209f8c3bed0fbe7ae9630927772842fe8d3276794ff196d0021a5e60563a25a4323eca622a6a7bc6575b62e074328a0c90
   languageName: node
   linkType: hard
 
@@ -16589,7 +16589,7 @@ __metadata:
     eslint-plugin-testing-library: ^5.9.1
     eslint-plugin-typescript-sort-keys: 2.1.0
     eslint-plugin-unused-imports: ^2.0.0
-    fake-indexeddb: 4.0.0
+    fake-indexeddb: 4.0.1
     generate-changelog: 1.8.0
     highlight.js: 11.6.0
     html-webpack-plugin: ^5.5.0
