@@ -21,7 +21,7 @@ import {FC, useMemo, useState} from 'react';
 
 import cx from 'classnames';
 
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
+import {Button} from '@wireapp/react-ui-kit';
 
 import {Icon} from 'Components/Icon';
 import {SearchInput} from 'Components/SearchInput';
@@ -310,14 +310,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
 
         {isAddPeopleState && (
           <div className="add-participants__footer">
-            <Button
-              type="button"
-              disabled={!enabledAddAction}
-              onClick={onAddParticipants}
-              data-uie-name="do-create"
-              variant={ButtonVariant.PRIMARY}
-              role="button"
-            >
+            <Button disabled={!enabledAddAction} onClick={onAddParticipants} data-uie-name="do-create">
               {t('addParticipantsConfirmLabel')}
             </Button>
           </div>
