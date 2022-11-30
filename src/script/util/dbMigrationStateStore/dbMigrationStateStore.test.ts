@@ -19,29 +19,18 @@
 
 import {dbMigrationStateStore} from './dbMigrationStateStore';
 
-const mockStoreName = 'mockStoreName';
-const mockStoreName2 = 'mockStoreName2';
-
 describe('dbMigrationStateStore', () => {
-  it('adds and retrieves state from the store', () => {
-    expect(dbMigrationStateStore.getDBMigrationState()).toEqual(undefined);
-    dbMigrationStateStore.setDBMigrationState({storeName: mockStoreName});
-    expect(dbMigrationStateStore.getDBMigrationState()).toEqual({storeName: mockStoreName});
-  });
-
-  it('updates state entry', () => {
-    dbMigrationStateStore.setDBMigrationState({storeName: mockStoreName});
-    expect(dbMigrationStateStore.getDBMigrationState()).toEqual({storeName: mockStoreName});
-
-    dbMigrationStateStore.setDBMigrationState({storeName: mockStoreName2});
-    expect(dbMigrationStateStore.getDBMigrationState()).toEqual({storeName: mockStoreName2});
+  it('adds and retrieves value from the store', () => {
+    expect(dbMigrationStateStore.isCoreDBMigrationNeeded()).toEqual(false);
+    dbMigrationStateStore.setNeedsCoreDBMigration();
+    expect(dbMigrationStateStore.isCoreDBMigrationNeeded()).toEqual(true);
   });
 
   it('deletes state from the store', () => {
-    dbMigrationStateStore.setDBMigrationState({storeName: mockStoreName});
-    expect(dbMigrationStateStore.getDBMigrationState()).toEqual({storeName: mockStoreName});
+    dbMigrationStateStore.setNeedsCoreDBMigration();
+    expect(dbMigrationStateStore.isCoreDBMigrationNeeded()).toEqual(true);
 
-    dbMigrationStateStore.deleteDBMigrationState();
-    expect(dbMigrationStateStore.getDBMigrationState()).toEqual(undefined);
+    dbMigrationStateStore.markCoreDBMigrationDone();
+    expect(dbMigrationStateStore.isCoreDBMigrationNeeded()).toEqual(false);
   });
 });

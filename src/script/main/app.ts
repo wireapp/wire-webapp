@@ -402,18 +402,7 @@ export class App {
       }
       const selfUser = await this.initiateSelfUser();
 
-      const dbMigrationState = dbMigrationStateStore.getDBMigrationState();
-      if (dbMigrationState) {
-        const {storeName} = dbMigrationState;
-        try {
-          this.logger.log(`Migrating data from cryptobox store (${storeName}) to corecrypto.`);
-          await this.core.proteusCryptoboxMigrate(storeName);
-          this.logger.log(`Successfully migrated from cryptobox store (${storeName}) to corecrypto.`);
-          dbMigrationStateStore.deleteDBMigrationState();
-        } catch (error) {
-          this.logger.error('Client was not able to perform DB migration:', error);
-        }
-      }
+      await this.triggerDatabaseMigration();
 
       if (this.apiClient.backendFeatures.isFederated && this.repository.storage.storageService.db && context.domain) {
         // Migrate all existing session to fully qualified ids (if need be)
@@ -620,6 +609,33 @@ export class App {
     await this.repository.properties.init(userEntity);
 
     return userEntity;
+  }
+
+  /**
+   * Trigger database migration if needed.
+   */
+  private async triggerDatabaseMigration() {
+    const isMigrationNeeded = dbMigrationStateStore.isCoreDBMigrationNeeded();
+    if (!isMigrationNeeded) {
+      return;
+    }
+
+    const storeName = this.service.storage.dbName;
+    if (!storeName) {
+      this.logger.error('Client was not able to perform DB migration storage was not initialised');
+      return;
+    }
+
+    this.logger.log(`Migrating data from cryptobox store (${storeName}) to corecrypto.`);
+
+    try {
+      await this.core.proteusCryptoboxMigrate(storeName);
+      this.logger.log(`Successfully migrated from cryptobox store (${storeName}) to corecrypto.`);
+
+      dbMigrationStateStore.markCoreDBMigrationDone();
+    } catch (error) {
+      this.logger.error('Client was not able to perform DB migration:', error);
+    }
   }
 
   /**

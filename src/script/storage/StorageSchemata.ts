@@ -417,9 +417,7 @@ export class StorageSchemata {
       },
       {
         schema: {},
-        upgrade: transaction => {
-          dbMigrationStateStore.setDBMigrationState({storeName: transaction.db.name});
-        },
+        upgrade: dbMigrationStateStore.setNeedsCoreDBMigration,
         version: 20,
       },
     ];

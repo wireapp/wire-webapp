@@ -19,28 +19,24 @@
 
 export const storageKey = 'dbMigrationState';
 
-export interface DBMigrationState {
-  storeName: string;
-}
-
-const getDBMigrationState = (): DBMigrationState | undefined => {
+const isCoreDBMigrationNeeded = (): boolean => {
   const storedState = localStorage.getItem(storageKey);
   if (!storedState) {
-    return undefined;
+    return false;
   }
   return JSON.parse(storedState);
 };
 
-const setDBMigrationState = (state: DBMigrationState) => {
-  localStorage.setItem(storageKey, JSON.stringify(state));
+const setNeedsCoreDBMigration = () => {
+  localStorage.setItem(storageKey, JSON.stringify(true));
 };
 
-const deleteDBMigrationState = () => {
+const markCoreDBMigrationDone = () => {
   localStorage.removeItem(storageKey);
 };
 
 export const dbMigrationStateStore = {
-  deleteDBMigrationState,
-  getDBMigrationState,
-  setDBMigrationState,
+  isCoreDBMigrationNeeded,
+  setNeedsCoreDBMigration,
+  markCoreDBMigrationDone,
 };
