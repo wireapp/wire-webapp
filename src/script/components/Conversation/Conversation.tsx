@@ -454,9 +454,7 @@ export const Conversation: FC<ConversationProps> = ({
             storageRepository={repositories.storage}
             teamState={teamState}
             userState={userState}
-            onShiftTab={() => {
-              setMsgElementsFocusable(false);
-            }}
+            onShiftTab={() => setMsgElementsFocusable(false)}
           />
 
           <div className="conversation-loading">
