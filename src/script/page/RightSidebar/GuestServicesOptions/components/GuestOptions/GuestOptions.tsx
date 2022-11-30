@@ -235,8 +235,6 @@ const GuestOptions: FC<GuestOptionsProps> = ({
                   <Button
                     disabled={isRequestOngoing}
                     variant={ButtonVariant.TERTIARY}
-                    type="button"
-                    role="button"
                     onClick={requestAccessCode}
                     data-uie-name="do-create-link"
                   >
