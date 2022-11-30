@@ -22,11 +22,16 @@ const handleChange = e => {
   setFontValue(+e.target.value);
 };
 
+const handleOptionClick = value => {
+  setFontValue(value);
+};
+
 <>
   <div>
     <IndicatorRangeInput
       label="Font size"
       onChange={handleChange}
+      onOptionClick={handleOptionClick}
       value={fontValue}
       min={0}
       step={1}
