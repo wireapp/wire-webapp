@@ -14547,9 +14547,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sinon@npm:14.0.2":
-  version: 14.0.2
-  resolution: "sinon@npm:14.0.2"
+"sinon@npm:15.0.0":
+  version: 15.0.0
+  resolution: "sinon@npm:15.0.0"
   dependencies:
     "@sinonjs/commons": ^2.0.0
     "@sinonjs/fake-timers": ^9.1.2
@@ -14557,7 +14557,7 @@ __metadata:
     diff: ^5.0.0
     nise: ^5.1.2
     supports-color: ^7.2.0
-  checksum: de7730cd7785a457e42f9a93e955780c870296036a13816e3c0c5648360afae82fdc748e36c854cf26fb8abd117855a7211aee49265c334fa61439aae17a1b72
+  checksum: 97febf6c6cad6070e33650be15bd0e8eba3a7d7af0465f1f97edcf3f249b23f72d9e7442f377a5b5d891fa929ef5f1b77d1ff7a07b7ee7013b6b7359e4b2026c
   languageName: node
   linkType: hard
 
@@ -16640,7 +16640,7 @@ __metadata:
     redux-thunk: 2.4.2
     seedrandom: ^3.0.5
     simple-git: 3.14.1
-    sinon: 14.0.2
+    sinon: 15.0.0
     snabbdom: 3.5.1
     speakingurl: 14.0.1
     style-loader: ^3.3.1
