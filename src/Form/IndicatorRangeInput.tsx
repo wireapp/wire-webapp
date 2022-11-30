@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, forwardRef, useMemo} from 'react';
+import {FC, HTMLProps, PropsWithRef, forwardRef, useMemo} from 'react';
 
 import {CSSObject} from '@emotion/react';
 
@@ -25,7 +25,6 @@ import {containerStyles, dataListOption, headingStyle, rangeStyles} from './Indi
 import {InputLabel} from './InputLabel';
 
 import {Theme} from '../Layout';
-import {TextProps} from '../Text';
 
 type DataListOptions = {
   value: number;
@@ -33,9 +32,10 @@ type DataListOptions = {
   heading?: string;
 };
 
-export interface IndicatorRangeInputProps<T = HTMLInputElement> extends TextProps<T> {
+export interface IndicatorRangeInputProps<T = HTMLInputElement> extends PropsWithRef<HTMLProps<T>> {
   label?: string;
   wrapperCSS?: CSSObject;
+  onOptionClick?: (value: number) => void;
   dataListOptions: DataListOptions[];
 }
 
@@ -51,8 +51,9 @@ export const IndicatorRangeInput: FC<IndicatorRangeInputProps> = forwardRef<
       max = '100',
       value = '0',
       onChange,
+      onOptionClick,
       wrapperCSS,
-      dataListOptions,
+      dataListOptions = [],
       ...inputProps
     },
     ref,
@@ -76,6 +77,10 @@ export const IndicatorRangeInput: FC<IndicatorRangeInputProps> = forwardRef<
       return `${((valueNum - minNum) * 100) / (maxNum - minNum)}% 100%`;
     }, [isCustomSlider, valueNum, minNum, maxNum, listLength]);
 
+    const valueText = dataListOptions[valueNum]?.heading
+      ? `${dataListOptions[valueNum].label} (${dataListOptions[valueNum].heading})`
+      : dataListOptions[valueNum].label;
+
     return (
       <div css={{wrapperCSS, width: '100%'}}>
         {label && <InputLabel htmlFor={id}>{label}</InputLabel>}
@@ -83,8 +88,16 @@ export const IndicatorRangeInput: FC<IndicatorRangeInputProps> = forwardRef<
         <div css={containerStyles}>
           {isCustomSlider && (
             <div css={{position: 'relative', display: 'flex', marginBottom: '20px'}}>
-              {dataListOptions.map(dataListOption => (
-                <div key={dataListOption.value} css={(theme: Theme) => headingStyle(listLength, theme)}>
+              {dataListOptions.map((dataListOption, index) => (
+                <div
+                  key={dataListOption.value}
+                  css={(theme: Theme) => headingStyle(listLength, theme)}
+                  onClick={() => {
+                    if (dataListOption?.heading) {
+                      onOptionClick(index);
+                    }
+                  }}
+                >
                   {dataListOption?.heading}
                 </div>
               ))}
@@ -102,13 +115,21 @@ export const IndicatorRangeInput: FC<IndicatorRangeInputProps> = forwardRef<
             onChange={onChange}
             type="range"
             list="tickMarks"
+            {...(isCustomSlider && {
+              'aria-valuetext': valueText,
+            })}
             {...inputProps}
           />
 
           {isCustomSlider && (
             <datalist id="tickMarks" css={(theme: Theme) => dataListOption(listLength, theme)}>
               {dataListOptions.map((dataListOption, index) => (
-                <option key={index} value={dataListOption.value} label={dataListOption.label} />
+                <option
+                  key={index}
+                  value={dataListOption.value}
+                  label={dataListOption.label}
+                  onClick={() => onOptionClick(index)}
+                />
               ))}
             </datalist>
           )}
