@@ -21,6 +21,8 @@ import {useEffect, useState} from 'react';
 
 import useLocalStorage from 'beautiful-react-hooks/useLocalStorage';
 
+import {ROOT_FONT_SIZE_KEY} from '../storage';
+
 export enum RootFontSize {
   XXS = '10px',
   XS = '12px',
@@ -29,8 +31,6 @@ export enum RootFontSize {
   L = '18px',
   XL = '20px',
   XXL = '24px',
-  // XXXL = '30px',
-  // XXXXL = '36px',
 }
 
 function setFontSizeToRoot(currentRootFontSize: RootFontSize) {
@@ -41,7 +41,7 @@ function setFontSizeToRoot(currentRootFontSize: RootFontSize) {
 export const useRootFontSize = (
   rootFontSize: RootFontSize = RootFontSize.M,
 ): [RootFontSize, React.Dispatch<React.SetStateAction<RootFontSize>>] => {
-  const [storedRootFontSize, setStoredRootFontSize] = useLocalStorage<RootFontSize>('root-font-size', rootFontSize);
+  const [storedRootFontSize, setStoredRootFontSize] = useLocalStorage<RootFontSize>(ROOT_FONT_SIZE_KEY, rootFontSize);
   const [currentRootFontSize, setCurrentRootFontSize] = useState<RootFontSize>(storedRootFontSize);
 
   useEffect(() => {
@@ -53,7 +53,7 @@ export const useRootFontSize = (
 };
 
 export const useInitializeRootFontSize = () => {
-  const [storedRootFontSize] = useLocalStorage<RootFontSize>('root-font-size', RootFontSize.M);
+  const [storedRootFontSize] = useLocalStorage<RootFontSize>(ROOT_FONT_SIZE_KEY, RootFontSize.M);
   useEffect(() => {
     setFontSizeToRoot(storedRootFontSize);
   }, []);

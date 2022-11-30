@@ -69,6 +69,7 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
   const [optionSendPreviews, setOptionSendPreviews] = useState<boolean>(settings.previews.send);
   const [optionNotifications, setOptionNotifications] = useState<NotificationPreference>(settings.notifications);
   const [currentRootFontSize, setCurrentRootFontSize] = useRootFontSize();
+  const [sliderValue, setSliderValue] = useState<number>(fontSizes.indexOf(currentRootFontSize));
 
   useEffect(() => {
     const updateProperties = ({settings}: WebappProperties): void => {
@@ -89,8 +90,6 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
       amplify.unsubscribe(WebAppEvents.PROPERTIES.UPDATED, updateProperties);
     };
   }, []);
-
-  const sliderValue = fontSizes.indexOf(currentRootFontSize);
 
   const saveOptionAudioPreference = (audioPreference: AudioPreference) => {
     propertiesRepository.savePreference(PROPERTIES_TYPE.SOUND_ALERTS, audioPreference);
@@ -121,6 +120,13 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
   const saveOptionFontSize = (event: React.ChangeEvent<HTMLInputElement>) => {
     const index = parseInt(event.target.value);
     const fontSize = fontSizes[index];
+    setSliderValue(index);
+    setCurrentRootFontSize(fontSize);
+  };
+
+  const handleOptionClick = (value: number) => {
+    const fontSize = fontSizes[value];
+    setSliderValue(value);
     setCurrentRootFontSize(fontSize);
   };
 
@@ -180,18 +186,22 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
               ]}
             />
           </PreferencesSection>
+        </>
+      )}
+      <hr className="preferences-separator" />
 
-          <hr className="preferences-separator" />
-
-          <PreferencesSection title={t('preferencesOptionsAppearance')}>
-            <div css={{marginBottom: '1.5rem', width: '100%'}}>
-              <IndicatorRangeInput
-                value={sliderValue}
-                label={t('preferencesOptionsAppearanceTextSize')}
-                onChange={saveOptionFontSize}
-                dataListOptions={fontSliderOptions}
-              />
-            </div>
+      <PreferencesSection title={t('preferencesOptionsAppearance')}>
+        <div css={{marginBottom: '1.5rem', width: '100%'}}>
+          <IndicatorRangeInput
+            value={sliderValue}
+            label={t('preferencesOptionsAppearanceTextSize')}
+            onChange={saveOptionFontSize}
+            onOptionClick={handleOptionClick}
+            dataListOptions={fontSliderOptions}
+          />
+        </div>
+        {isActivatedAccount && (
+          <>
             <Checkbox
               tabIndex={0}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -250,9 +260,9 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
                 {t('preferencesOptionsPreviewsSendDetail')}
               </div>
             </div>
-          </PreferencesSection>
-        </>
-      )}
+          </>
+        )}
+      </PreferencesSection>
     </PreferencesPage>
   );
 };
