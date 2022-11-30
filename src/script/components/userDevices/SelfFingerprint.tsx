@@ -47,7 +47,7 @@ const SelfFingerprint: React.FC<SelfFingerprintProps> = ({
 }) => {
   const [localFingerprint, setLocalFingerprint] = useState<string>('');
   useEffect(() => {
-    cryptographyRepository.getLocalFingerprint().then(fingerprint => setLocalFingerprint(fingerprint));
+    cryptographyRepository.getLocalFingerprint().then(setLocalFingerprint);
   }, [cryptographyRepository]);
 
   const {currentClient} = useKoSubscribableChildren(clientState, ['currentClient']);
