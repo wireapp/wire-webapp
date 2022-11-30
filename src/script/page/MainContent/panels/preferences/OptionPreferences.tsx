@@ -180,18 +180,21 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
               ]}
             />
           </PreferencesSection>
+        </>
+      )}
+      <hr className="preferences-separator" />
 
-          <hr className="preferences-separator" />
-
-          <PreferencesSection title={t('preferencesOptionsAppearance')}>
-            <div css={{marginBottom: '1.5rem', width: '100%'}}>
-              <IndicatorRangeInput
-                value={sliderValue}
-                label={t('preferencesOptionsAppearanceTextSize')}
-                onChange={saveOptionFontSize}
-                dataListOptions={fontSliderOptions}
-              />
-            </div>
+      <PreferencesSection title={t('preferencesOptionsAppearance')}>
+        <div css={{marginBottom: '1.5rem', width: '100%'}}>
+          <IndicatorRangeInput
+            value={sliderValue}
+            label={t('preferencesOptionsAppearanceTextSize')}
+            onChange={saveOptionFontSize}
+            dataListOptions={fontSliderOptions}
+          />
+        </div>
+        {isActivatedAccount && (
+          <>
             <Checkbox
               tabIndex={0}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -250,9 +253,9 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
                 {t('preferencesOptionsPreviewsSendDetail')}
               </div>
             </div>
-          </PreferencesSection>
-        </>
-      )}
+          </>
+        )}
+      </PreferencesSection>
     </PreferencesPage>
   );
 };
