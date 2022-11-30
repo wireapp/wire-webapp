@@ -21,6 +21,8 @@ import {FC, useMemo, useState} from 'react';
 
 import cx from 'classnames';
 
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
+
 import {Icon} from 'Components/Icon';
 import {SearchInput} from 'Components/SearchInput';
 import {ServiceList} from 'Components/ServiceList';
@@ -282,16 +284,17 @@ const AddParticipants: FC<AddParticipantsProps> = ({
                         {t('addParticipantsNoServicesManager')}
                       </div>
 
-                      <div
-                        role="button"
+                      <Button
+                        variant={ButtonVariant.TERTIARY}
+                        type="button"
                         tabIndex={0}
-                        className="search__no-services__manage-button search__no-services__manage-button--alternate"
                         onClick={openManageServices}
                         onKeyDown={event => handleKeyDown(event, openManageServices)}
                         data-uie-name="go-enable-services"
+                        style={{marginTop: '1em'}}
                       >
                         {t('addParticipantsManageServicesNoResults')}
-                      </div>
+                      </Button>
                     </>
                   )}
 
