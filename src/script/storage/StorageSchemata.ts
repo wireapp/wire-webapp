@@ -19,6 +19,7 @@
 
 import type {Dexie, Transaction} from 'dexie';
 
+import {dbMigrationStateStore} from 'Util/dbMigrationStateStore/dbMigrationStateStore';
 import {base64ToArray} from 'Util/util';
 
 import {categoryFromEvent} from '../message/MessageCategorization';
@@ -413,6 +414,13 @@ export class StorageSchemata {
       {
         schema: {},
         version: 19,
+      },
+      {
+        schema: {},
+        upgrade: transaction => {
+          dbMigrationStateStore.setDBMigrationState({storeName: transaction.db.name});
+        },
+        version: 20,
       },
     ];
   }
