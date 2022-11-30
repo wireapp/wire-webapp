@@ -3682,6 +3682,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/seedrandom@npm:^3":
+  version: 3.0.2
+  resolution: "@types/seedrandom@npm:3.0.2"
+  checksum: 02e585601cb9764cb0eb3f92b384512f8e171422acea3d5a801a41a8a06d475b60ae520eba469bcedf0ed8ad650415919cf30a9cd6bc57090613e61bedc071ed
+  languageName: node
+  linkType: hard
+
 "@types/semver@npm:^7.3.12":
   version: 7.3.12
   resolution: "@types/semver@npm:7.3.12"
@@ -14393,6 +14400,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"seedrandom@npm:^3.0.5":
+  version: 3.0.5
+  resolution: "seedrandom@npm:3.0.5"
+  checksum: 728b56bc3bc1b9ddeabd381e449b51cb31bdc0aa86e27fcd0190cea8c44613d5bcb2f6bb63ed79f78180cbe791c20b8ec31a9627f7b7fc7f476fd2bdb7e2da9f
+  languageName: node
+  linkType: hard
+
 "semver@npm:2 || 3 || 4 || 5, semver@npm:^5.6.0":
   version: 5.7.1
   resolution: "semver@npm:5.7.1"
@@ -16516,6 +16530,7 @@ __metadata:
     "@types/react-redux": 7.1.24
     "@types/react-transition-group": 4.4.5
     "@types/redux-mock-store": 1.0.3
+    "@types/seedrandom": ^3
     "@types/sinon": 10.0.13
     "@types/speakingurl": 13.0.3
     "@types/uint32": 0.2.0
@@ -16623,6 +16638,7 @@ __metadata:
     redux-logdown: 1.0.4
     redux-mock-store: 1.5.4
     redux-thunk: 2.4.2
+    seedrandom: ^3.0.5
     simple-git: 3.14.1
     sinon: 14.0.2
     snabbdom: 3.5.1
