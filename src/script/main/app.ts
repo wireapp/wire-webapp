@@ -396,15 +396,24 @@ export class App {
             const newClient = {class: ClientClassification.UNKNOWN, id: clientId};
             userRepository.addClientToUser(qualifiedId, newClient, true);
           },
-          dbMigrationHooks: {
-            getState: dbMigrationStateStore.getDBMigrationState,
-            onSuccess: dbMigrationStateStore.deleteDBMigrationState,
-          },
         });
       } catch (error) {
         throw new ClientError(CLIENT_ERROR_TYPE.NO_VALID_CLIENT, 'Client has been deleted on backend');
       }
       const selfUser = await this.initiateSelfUser();
+
+      const dbMigrationState = dbMigrationStateStore.getDBMigrationState();
+      if (dbMigrationState) {
+        const {storeName} = dbMigrationState;
+        try {
+          this.logger.log(`Migrating data from cryptobox store (${storeName}) to corecrypto.`);
+          await this.core.proteusCryptoboxMigrate(storeName);
+          this.logger.log(`Successfully migrated from cryptobox store (${storeName}) to corecrypto.`);
+          dbMigrationStateStore.deleteDBMigrationState();
+        } catch (error) {
+          this.logger.error('Client was not able to perform DB migration:', error);
+        }
+      }
 
       if (this.apiClient.backendFeatures.isFederated && this.repository.storage.storageService.db && context.domain) {
         // Migrate all existing session to fully qualified ids (if need be)
