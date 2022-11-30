@@ -311,15 +311,9 @@ const AddParticipants: FC<AddParticipantsProps> = ({
 
         {isAddPeopleState && (
           <div className="add-participants__footer">
-            <button
-              type="button"
-              className="button button-full"
-              disabled={!enabledAddAction}
-              onClick={onAddParticipants}
-              data-uie-name="do-create"
-            >
-              <span>{t('addParticipantsConfirmLabel')}</span>
-            </button>
+            <Button type="button" disabled={!enabledAddAction} onClick={onAddParticipants} data-uie-name="do-create">
+              {t('addParticipantsConfirmLabel')}
+            </Button>
           </div>
         )}
       </div>
