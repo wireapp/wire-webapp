@@ -243,20 +243,6 @@ export class DebugUtil {
     return debugInformation;
   }
 
-  /* FIXME restore breaking session for coreCrypto
-  async exportCryptobox(): Promise<void> {
-    function downloadText(text: string, filename: string = 'default.txt'): number {
-      const url = `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`;
-      return downloadFile(url, filename);
-    }
-
-    const clientId = this.clientState.currentClient().id;
-    const userId = this.userState.self().id;
-    const fileName = `cryptobox-${userId}-${clientId}.json`;
-    const cryptobox = await this.cryptographyRepository.proteusService.cryptobox.serialize();
-    downloadText(JSON.stringify(cryptobox), fileName);
-  }
-*/
   /** Used by QA test automation. */
   isLibsodiumUsingWASM(): Promise<boolean> {
     return ProteusUtil.WASMUtil.isUsingWASM();
