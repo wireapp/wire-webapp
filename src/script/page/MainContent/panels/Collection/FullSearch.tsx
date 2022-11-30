@@ -19,6 +19,8 @@
 
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 
+import {CloseIcon, Input, InputSubmitCombo, SearchIcon} from '@wireapp/react-ui-kit';
+
 import {t} from 'Util/LocalizerUtil';
 import {isScrolledBottom} from 'Util/scroll-helpers';
 import {useEffectRef} from 'Util/useEffectRef';
@@ -43,8 +45,8 @@ const FullSearch: React.FC<FullSearchProps> = ({searchProvider, click = noop, ch
   const MAX_TEXT_LENGTH = 60;
   const MAX_OFFSET_INDEX = 30;
 
-  const [input, setInput] = useState('');
-  const inputRef = useRef<HTMLInputElement>();
+  const [searchValue, setSearchValue] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
   const [messages, setMessages] = useState<ContentMessage[]>([]);
   const [messageCount, setMessageCount] = useState(0);
   const [hasNoResults, setHasNoResults] = useState(false);
@@ -52,7 +54,7 @@ const FullSearch: React.FC<FullSearchProps> = ({searchProvider, click = noop, ch
 
   useDebounce(
     async () => {
-      const trimmedInput = input.trim();
+      const trimmedInput = searchValue.trim();
       change(trimmedInput);
       if (trimmedInput.length < 2) {
         setMessages([]);
@@ -68,7 +70,7 @@ const FullSearch: React.FC<FullSearchProps> = ({searchProvider, click = noop, ch
       }
     },
     100,
-    [input],
+    [searchValue],
   );
 
   useEffect(() => {
@@ -92,13 +94,13 @@ const FullSearch: React.FC<FullSearchProps> = ({searchProvider, click = noop, ch
   }, []);
 
   const formatSearchResult = useMemo(() => {
-    const regex = getSearchRegex(input);
+    const regex = getSearchRegex(searchValue);
 
     return (text: string) => {
       const matches = [...text.matchAll(regex)];
       const firstIndex = matches[0]?.index;
       let firstPart = text.substring(0, firstIndex ?? text.length);
-      if (firstIndex > MAX_OFFSET_INDEX && text.length > MAX_TEXT_LENGTH) {
+      if (firstIndex && firstIndex > MAX_OFFSET_INDEX && text.length > MAX_TEXT_LENGTH) {
         let splitOffset = firstIndex - 1;
         const firstSpace = firstPart.indexOf(' ', splitOffset - PRE_MARKED_OFFSET);
         splitOffset = firstSpace > -1 ? firstSpace : splitOffset;
@@ -108,37 +110,38 @@ const FullSearch: React.FC<FullSearchProps> = ({searchProvider, click = noop, ch
         (acc, match, i) => [
           ...acc,
           match[0],
-          text.substring(match.index + match[0].length, matches[i + 1]?.index ?? text.length),
+          text.substring((match.index ?? 0) + match[0].length, matches[i + 1]?.index ?? text.length),
         ],
         [firstPart],
       );
 
       return {matches: matches.length, parts};
     };
-  }, [input]);
+  }, [searchValue]);
 
   return (
     <div className="full-search" ref={setElement}>
-      <header className="full-search__header">
-        <span className="full-search__header__icon icon-search" />
-        <div className="full-search__header__input">
-          <input
+      <header>
+        <InputSubmitCombo css={{padding: '0 16px', margin: '0 0 20px 20px'}}>
+          <SearchIcon />
+          <Input
+            wrapperCSS={{marginBottom: 0, width: '100%', '> div': {width: '100%'}}}
             type="text"
-            value={input}
+            value={searchValue}
             ref={inputRef}
             placeholder={t('fullsearchPlaceholder')}
-            onChange={event => setInput(event.target.value)}
+            onChange={event => setSearchValue(event.currentTarget.value)}
             data-uie-name="full-search-header-input"
           />
-          {input && (
-            <button
-              className="button-icon icon-dismiss"
-              onClick={() => setInput('')}
+          {searchValue && (
+            <CloseIcon
+              css={{cursor: 'pointer'}}
               data-uie-name="full-search-dismiss"
               aria-label={t('fullsearchCancelCloseBtn')}
+              onClick={() => setSearchValue('')}
             />
           )}
-        </div>
+        </InputSubmitCombo>
       </header>
       {hasNoResults && (
         <p className="full-search__no-result" data-uie-name="full-search-no-results">

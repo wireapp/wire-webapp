@@ -25,20 +25,16 @@
   display: flex;
   overflow: hidden;
   min-height: 64px;
+
+  border-radius: 12px;
   background-color: var(--foreground-fade-8);
 
   & + & {
     margin-top: 1px;
   }
 
-  &:last-of-type {
-    border-bottom-left-radius: @border-radius;
-    border-bottom-right-radius: @border-radius;
-  }
-
   &:first-of-type {
-    border-top-left-radius: @border-radius;
-    border-top-right-radius: @border-radius;
+    margin-bottom: 4px;
   }
 }
 
