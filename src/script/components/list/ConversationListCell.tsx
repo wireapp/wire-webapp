@@ -108,6 +108,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
   const contextMenuRef = useRef<HTMLButtonElement>(null);
   const [focusContextMenu, setContextMenuFocus] = useState(false);
   const [isContextMenuOpen, setContextMenuOpen] = useState(false);
+  const contextMenuKeyboardShortcut = `keyboard-shortcut-${conversation.id}`;
 
   const openContextMenu = (event: MouseEvent | React.MouseEvent<Element, MouseEvent>) => {
     event.stopPropagation();
@@ -196,8 +197,12 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
           data-uie-name="go-open-conversation"
           tabIndex={focusConversation ? 0 : -1}
           aria-label={t('accessibility.openConversation', displayName)}
-          title={t('accessibility.conversationOptionsMenuAccessKey')}
+          aria-describedby={contextMenuKeyboardShortcut}
         >
+          <span
+            id={contextMenuKeyboardShortcut}
+            aria-label={t('accessibility.conversationOptionsMenuAccessKey')}
+          ></span>
           <div
             className={cx('conversation-list-cell-left', {
               'conversation-list-cell-left-opaque': removedFromConversation || users.length === 0,
