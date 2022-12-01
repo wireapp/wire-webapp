@@ -780,21 +780,16 @@ export class MessageRepository {
     }
   }
 
-  async resetSession(userId: QualifiedId, client_id: string, conversation: Conversation): Promise<void> {
-    this.logger.info(`Resetting session with client '${client_id}' of user '${userId.id}'.`);
+  async resetSession(userId: QualifiedId, clientId: string, conversation: Conversation): Promise<void> {
+    this.logger.info(`Resetting session with client '${clientId}' of user '${userId.id}'.`);
 
     try {
       // We delete the stored session so that it can be recreated later on
-      const session_id = await this.cryptography_repository.deleteSession(userId, client_id);
-      if (session_id) {
-        this.logger.info(`Deleted session with client '${client_id}' of user '${userId.id}'.`);
-      } else {
-        this.logger.warn('No local session found to delete.');
-      }
-      return await this.sendSessionReset(userId, client_id, conversation);
+      await this.cryptography_repository.deleteSession(userId, clientId);
+      return await this.sendSessionReset(userId, clientId, conversation);
     } catch (error) {
       const message = error instanceof Error ? error.message : error;
-      const logMessage = `Failed to reset session for client '${client_id}' of user '${userId.id}': ${message}`;
+      const logMessage = `Failed to reset session for client '${clientId}' of user '${userId.id}': ${message}`;
       this.logger.warn(logMessage, error);
       throw error;
     }
