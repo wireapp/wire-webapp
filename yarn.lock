@@ -12881,17 +12881,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss-loader@npm:^7.0.1":
-  version: 7.0.1
-  resolution: "postcss-loader@npm:7.0.1"
+"postcss-loader@npm:^7.0.2":
+  version: 7.0.2
+  resolution: "postcss-loader@npm:7.0.2"
   dependencies:
     cosmiconfig: ^7.0.0
     klona: ^2.0.5
-    semver: ^7.3.7
+    semver: ^7.3.8
   peerDependencies:
     postcss: ^7.0.0 || ^8.0.1
     webpack: ^5.0.0
-  checksum: 2a3cbcaaade598d4919824d384ae34ffbfc14a9c8db6cc3b154582356f4f44a1c9af9e731b81cf1947b089accf7d0ab7a0c51c717946985f89aa1708d2b4304d
+  checksum: 2d251537d482eb751f812c96c8b515f46d7c9905cad7afab33f0f34872670619b7440cefc9e2babbf89fb11b4708850d522d79fa5ff788227587645e78f16638
   languageName: node
   linkType: hard
 
@@ -16751,7 +16751,7 @@ __metadata:
     postcss: 8.4.19
     postcss-import: ^15.0.0
     postcss-less: 6.0.0
-    postcss-loader: ^7.0.1
+    postcss-loader: ^7.0.2
     postcss-preset-env: ^7.8.2
     postcss-scss: 4.0.6
     prettier: ^2.8.0
