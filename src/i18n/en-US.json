@@ -258,7 +258,7 @@
   "clientManager.headline": "Remove a device",
   "clientManager.logout": "Cancel process",
   "clientManager.subhead": "Remove one of your other devices to start using {brandName} on this one.",
-  "collectionSectionAudio": "Audio messages",
+  "collectionSectionAudio": "Audio",
   "collectionSectionFiles": "Files",
   "collectionSectionImages": "Pictures",
   "collectionSectionLinks": "Links",

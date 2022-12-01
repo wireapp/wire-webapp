@@ -18,8 +18,9 @@
  */
 
 // Variables
-@image-size: 104px;
+@image-size: 110px;
 @image-items-per-row: 6;
+@collection-images-padding: 3px;
 
 @max-section-width: 696px;
 
@@ -86,13 +87,18 @@
   width: @image-size * @image-items-per-row;
   flex-wrap: wrap;
   border-radius: 4px;
-  margin-left: @conversation-message-sender-width;
+  margin-left: @conversation-message-sender-width - @collection-images-padding;
 }
 
 .collection-image {
   .square(@image-size);
+  padding: @collection-images-padding;
+  border-radius: 6px;
+  background-color: transparent;
 
-  outline: 1px solid var(--foreground-fade-24);
+  img {
+    border-radius: 6px;
+  }
 }
 
 // Files
