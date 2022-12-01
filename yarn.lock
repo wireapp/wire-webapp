@@ -3506,10 +3506,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/libsodium-wrappers@npm:*":
-  version: 0.7.9
-  resolution: "@types/libsodium-wrappers@npm:0.7.9"
-  checksum: 5ddf61b8047e38f00c1509369ad868a724235a67940971cc671b070ab9d6b2e6872407253be1163b174f742ecbb0986fda7b91aa0b7069437359b4671bfc529b
+"@types/libsodium-wrappers@npm:*, @types/libsodium-wrappers@npm:^0":
+  version: 0.7.10
+  resolution: "@types/libsodium-wrappers@npm:0.7.10"
+  checksum: 717054ebcb5fa553e378144b8d564bed8b691905c0d4e90b95c64d77ba24ec9fe798cb2c58cd61dad545ceacb1f05ab69b5597217f9829f2da7a23f0688d11d0
   languageName: node
   linkType: hard
 
@@ -3566,9 +3566,9 @@ __metadata:
   linkType: hard
 
 "@types/node@npm:~14":
-  version: 14.18.21
-  resolution: "@types/node@npm:14.18.21"
-  checksum: 4ed35b76609647a4e36a194702e31cdda9ed42174ddaf7937bc5498984e98a99e8a42ea895ea17dd9c5ec18080112c29ab670c34f90eb9f7a4703b85b31e34fa
+  version: 14.18.34
+  resolution: "@types/node@npm:14.18.34"
+  checksum: 25ac3b456a0b7b82c76b37276ec86845849e8276fc81d1470a87227c105c619e299aa7165b6148aa11a4ea156b1452f6d3327935f3e7dc0067ff54dde0e3d4e0
   languageName: node
   linkType: hard
 
@@ -4304,7 +4304,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/lru-cache@npm:3.8.1":
+"@wireapp/lru-cache@npm:3.8.1, @wireapp/lru-cache@npm:^3.8.1":
   version: 3.8.1
   resolution: "@wireapp/lru-cache@npm:3.8.1"
   checksum: 901ae35ac6a2370ef52eeea08217f23ff7cc1db3f5e82199324d88dc8128d68e01f6b06928df9eb2ae03a6cc97587c2f501cec6aa61665a60a7d8cf415f1b21a
@@ -10806,9 +10806,9 @@ __metadata:
   linkType: hard
 
 "libsodium-sumo@npm:^0.7.0":
-  version: 0.7.9
-  resolution: "libsodium-sumo@npm:0.7.9"
-  checksum: de4f8358a978184f2957703a3ce59e0f333ea892bd3e68a667029ffcb2e33fef1aa78aabb9512ab5ae7d1df0a7e1d56f129cdf5312b4f5d99ff6c218dcb0e4f0
+  version: 0.7.10
+  resolution: "libsodium-sumo@npm:0.7.10"
+  checksum: 67ed75fa15559bad7cca5cdc2d5eb20725281be38a08814f7e39af8ea0c0d83ed2211e534f7b47460b6a48a1f7bb5c31759e4bc5cc79fb74292ffea8f90ee741
   languageName: node
   linkType: hard
 
@@ -10818,6 +10818,22 @@ __metadata:
   dependencies:
     libsodium-sumo: ^0.7.0
   checksum: 0b2af1f23455e1b3ecc2f721278e8b41b027e9f748f2675285e9771eeb2de062cd6b51688bb52ece14a53b4f5a51019972d9ceac1889c0381ef076a316201627
+  languageName: node
+  linkType: hard
+
+"libsodium-wrappers@npm:^0.7.10":
+  version: 0.7.10
+  resolution: "libsodium-wrappers@npm:0.7.10"
+  dependencies:
+    libsodium: ^0.7.0
+  checksum: 294ac098895a15f99e65431c62478f149e9e5cbbcd1fa1b41e832b65e0ead63856cc964b3b7c14447a48701e3334661dea9223442834ae7dd0d34285991616cd
+  languageName: node
+  linkType: hard
+
+"libsodium@npm:^0.7.0":
+  version: 0.7.10
+  resolution: "libsodium@npm:0.7.10"
+  checksum: 243794a0b3b753fafb304a82e9ff777eaccf11785bde6965e7f25171fd2fb35da302a89f009a91c1e922817d37724f7afc86592b128b2b58ed657d7fbe5259e6
   languageName: node
   linkType: hard
 
@@ -16504,7 +16520,7 @@ __metadata:
     "@types/js-cookie": 3.0.2
     "@types/jsdom": 20.0.1
     "@types/keyboardjs": 2.5.0
-    "@types/libsodium-wrappers-sumo": 0.7.5
+    "@types/libsodium-wrappers": ^0
     "@types/linkify-it": 3.0.2
     "@types/markdown-it": 12.2.3
     "@types/node": ^18.11.9
@@ -16528,6 +16544,7 @@ __metadata:
     "@wireapp/copy-config": 2.0.3
     "@wireapp/core": 37.2.1
     "@wireapp/eslint-config": 2.1.0
+    "@wireapp/lru-cache": ^3.8.1
     "@wireapp/prettier-config": 0.5.2
     "@wireapp/react-ui-kit": 9.0.12
     "@wireapp/store-engine": ^5.0.3
@@ -16594,6 +16611,7 @@ __metadata:
     knockout: 3.5.1
     less: 3.13.1
     less-loader: ^11.1.0
+    libsodium-wrappers: ^0.7.10
     linkify-it: 4.0.1
     lint-staged: 13.0.3
     long: 5.2.1
