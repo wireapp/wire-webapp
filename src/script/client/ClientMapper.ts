@@ -42,7 +42,7 @@ export class ClientMapper {
   static mapClient(
     clientPayload: ClientRecord | PublicClient | RegisteredClient,
     isSelfClient: boolean,
-    domain: string | null = null,
+    domain: string = '',
   ): ClientEntity {
     const clientEntity = new ClientEntity(isSelfClient, domain);
 

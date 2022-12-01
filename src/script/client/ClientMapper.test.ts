@@ -101,6 +101,7 @@ describe('ClientMapper', () => {
       const clientPayload: ClientRecord = {
         class: ClientClassification.DESKTOP,
         id: '66d0515a23a0ef25',
+        domain: '',
         meta: {
           is_verified: true,
         },

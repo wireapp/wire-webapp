@@ -41,7 +41,6 @@ describe('AssetRepository', () => {
 
   beforeEach(async () => {
     core = container.resolve(Core);
-    await core.initServices({} as any);
     const mockedAPIClient = {
       asset: {
         api: {
