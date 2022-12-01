@@ -5402,6 +5402,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"beautiful-react-hooks@npm:^3.11.2":
+  version: 3.11.2
+  resolution: "beautiful-react-hooks@npm:3.11.2"
+  dependencies:
+    lodash.debounce: ^4.0.8
+    lodash.throttle: ^4.1.1
+  peerDependencies:
+    react: ">=16.0.0"
+    react-dom: ">=16.0.0"
+    react-router-dom: ">=5.0.0"
+    rxjs: ">=7.0.0"
+  checksum: f71e0ca29e549c3733f43c7adc60509f56412c5a2c169e944f50f84b1478a6e941701b54849fe58d45de92d15ab47d048a9684cb4cae33755d594a8cd2a27189
+  languageName: node
+  linkType: hard
+
 "big.js@npm:^5.2.2":
   version: 5.2.2
   resolution: "big.js@npm:5.2.2"
@@ -11092,6 +11107,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lodash.throttle@npm:^4.1.1":
+  version: 4.1.1
+  resolution: "lodash.throttle@npm:4.1.1"
+  checksum: 129c0a28cee48b348aef146f638ef8a8b197944d4e9ec26c1890c19d9bf5a5690fe11b655c77a4551268819b32d27f4206343e30c78961f60b561b8608c8c805
+  languageName: node
+  linkType: hard
+
 "lodash.truncate@npm:^4.4.2":
   version: 4.4.2
   resolution: "lodash.truncate@npm:4.4.2"
@@ -16654,6 +16676,7 @@ __metadata:
     archiver: ^5.3.1
     autoprefixer: ^10.4.13
     babel-loader: 9.1.0
+    beautiful-react-hooks: ^3.11.2
     caniuse-lite: ^1.0.30001431
     classnames: 2.3.2
     copy-webpack-plugin: 11.0.0

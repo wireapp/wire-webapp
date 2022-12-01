@@ -57,7 +57,6 @@ const DecryptErrorMessage: React.FC<DecryptErrorMessageProps> = ({message, onCli
           >
             {t('conversationUnableToDecryptLink')}
           </a>
-          <hr className="message-header-line" />
         </div>
       </div>
       <div className="message-body message-body-decrypt-error">

@@ -54,7 +54,6 @@ const SystemMessage: React.FC<SystemMessageProps> = ({message}) => {
             <span className="message-header-sender-name">{unsafeSenderName}</span>
             <span className="ellipsis">{caption}</span>
           </span>
-          <hr className="message-header-line" />
         </div>
         <div className="message-body-actions">
           <MessageTime timestamp={timestamp} data-uie-uid={message.id} data-uie-name="item-message-call-timestamp" />

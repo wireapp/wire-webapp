@@ -57,8 +57,10 @@ const CallMessage: React.FC<CallMessageProps> = ({message}) => {
         data-uie-name="element-message-call"
         data-uie-value={isCompleted ? 'completed' : 'not_completed'}
       >
-        <span className="message-header-sender-name">{unsafeSenderName}</span>
-        <span className="ellipsis">{caption}</span>
+        <p>
+          <span className="message-header-sender-name">{unsafeSenderName}</span>
+          <span>{caption}</span>
+        </p>
       </div>
       <div className="message-body-actions">
         <MessageTime timestamp={timestamp} data-uie-uid={message.id} data-uie-name="item-message-call-timestamp" />

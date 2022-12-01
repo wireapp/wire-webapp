@@ -40,3 +40,5 @@ export const StorageKey = {
     SUGGESTED_SEARCH_ETS: 'z.storage.StorageKey.SEARCH.SUGGESTED_SEARCH_ETS',
   },
 };
+
+export const ROOT_FONT_SIZE_KEY = 'root-font-size';

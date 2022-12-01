@@ -114,7 +114,6 @@ const VerificationMessage: React.FC<VerificationMessageProps> = ({message}) => {
             </button>
           </>
         )}
-        <hr className="message-header-line" />
       </div>
     </div>
   );
