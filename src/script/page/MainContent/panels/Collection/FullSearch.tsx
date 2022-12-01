@@ -122,7 +122,7 @@ const FullSearch: React.FC<FullSearchProps> = ({searchProvider, click = noop, ch
   return (
     <div className="full-search" ref={setElement}>
       <header>
-        <InputSubmitCombo css={{padding: '0 16px', margin: '0 0 20px 20px'}}>
+        <InputSubmitCombo css={{padding: '0 16px', marginBottom: '20px'}}>
           <SearchIcon />
           <Input
             wrapperCSS={{marginBottom: 0, width: '100%', '> div': {width: '100%'}}}

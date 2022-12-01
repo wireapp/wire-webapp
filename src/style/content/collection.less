@@ -27,8 +27,7 @@
 .collection-list {
   display: flex;
   flex-direction: column;
-  padding-top: 24px;
-  padding-bottom: 64px;
+  padding: 24px 20px 64px;
 }
 
 // Sections
@@ -63,7 +62,7 @@
 }
 
 .collection-header-icon {
-  width: @conversation-message-sender-width;
+  width: 30px;
   color: var(--foreground);
   fill: var(--foreground);
   text-align: center;
@@ -84,10 +83,9 @@
 // Images
 .collection-images {
   display: flex;
-  width: @image-size * @image-items-per-row;
+  max-width: (@image-size + @collection-images-padding) * @image-items-per-row;
   flex-wrap: wrap;
   border-radius: 4px;
-  margin-left: @conversation-message-sender-width - @collection-images-padding;
 }
 
 .collection-image {
