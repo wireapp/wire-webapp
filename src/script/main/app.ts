@@ -95,7 +95,7 @@ import {SearchService} from '../search/SearchService';
 import {SelfService} from '../self/SelfService';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
-import {StorageKey, StorageRepository, StorageService} from '../storage';
+import {StorageKey, StorageRepository, StorageSchemata, StorageService} from '../storage';
 import {TeamRepository} from '../team/TeamRepository';
 import {TeamService} from '../team/TeamService';
 import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';
@@ -631,6 +631,18 @@ export class App {
     try {
       await this.core.proteusCryptoboxMigrate(storeName);
       this.logger.log(`Successfully migrated from cryptobox store (${storeName}) to corecrypto.`);
+
+      // We can clear 3 stores (keys - local identity, prekeys and sessions) from wire db.
+      // They will be stored in corecrypto database now.
+      const storesToRemove = [
+        StorageSchemata.OBJECT_STORE.KEYS,
+        StorageSchemata.OBJECT_STORE.PRE_KEYS,
+        StorageSchemata.OBJECT_STORE.SESSIONS,
+      ];
+
+      for (const storeName of storesToRemove) {
+        await this.service.storage.deleteStore(storeName);
+      }
 
       dbMigrationStateStore.markCoreDBMigrationDone();
     } catch (error) {
