@@ -622,7 +622,7 @@ export class App {
 
     const storeName = this.service.storage.dbName;
     if (!storeName) {
-      this.logger.error('Client was not able to perform DB migration storage was not initialised');
+      this.logger.error('Client was not able to perform DB migration: storage was not initialised yet.');
       return;
     }
 
