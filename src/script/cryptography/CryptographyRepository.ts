@@ -73,9 +73,7 @@ export class CryptographyRepository {
     return this.proteusService.getRemoteFingerprint(userId, clientId, prekey);
   }
 
-  async deleteSession(userId: QualifiedId, clientId: string): Promise<string> {
-    const sessionId = this.proteusService.constructSessionId(userId, clientId);
-    await this.proteusService.deleteSession(sessionId);
-    return sessionId;
+  deleteSession(userId: QualifiedId, clientId: string): Promise<void> {
+    return this.proteusService.deleteSession(userId, clientId);
   }
 }

@@ -23,6 +23,7 @@ import 'core-js/full/reflect';
 
 import {Context} from '@wireapp/api-client/lib/auth';
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
+import {EVENTS as CoreEvents} from '@wireapp/core/lib/Account';
 import {amplify} from 'amplify';
 import Dexie from 'dexie';
 import ko from 'knockout';
@@ -390,16 +391,16 @@ export class App {
 
       let context: Context;
       try {
-        context = await this.core.init(clientType, {
-          onNewClient({userId, clientId, domain}) {
-            const qualifiedId = {domain: domain ?? '', id: userId};
-            const newClient = {class: ClientClassification.UNKNOWN, id: clientId};
-            userRepository.addClientToUser(qualifiedId, newClient, true);
-          },
-        });
+        context = await this.core.init(clientType);
       } catch (error) {
         throw new ClientError(CLIENT_ERROR_TYPE.NO_VALID_CLIENT, 'Client has been deleted on backend');
       }
+
+      this.core.on(CoreEvents.NEW_SESSION, ({userId, clientId}) => {
+        const newClient = {class: ClientClassification.UNKNOWN, id: clientId};
+        userRepository.addClientToUser(userId, newClient, true);
+      });
+
       const selfUser = await this.initiateSelfUser();
 
       await this.triggerDatabaseMigration();
