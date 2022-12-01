@@ -22,15 +22,15 @@ import ko from 'knockout';
 import {act} from 'react-dom/test-utils';
 
 import {DecryptErrorMessage as DecryptErrorMessageEntity} from 'src/script/entity/message/DecryptErrorMessage';
+import {User} from 'src/script/entity/User';
 
 import {DecryptErrorMessage} from './DecryptErrorMessage';
 
 const createDecryptErrorMessage = (partialDecryptErrorMessage: Partial<DecryptErrorMessageEntity>) => {
   const decryptErrorMessage: Partial<DecryptErrorMessageEntity> = {
-    htmlCaption: ko.pureComputed(() => ''),
+    user: ko.observable(new User()),
     is_recoverable: ko.pureComputed(() => false),
     is_resetting_session: ko.observable(false),
-    link: ko.pureComputed(() => ''),
     ...partialDecryptErrorMessage,
   };
   return decryptErrorMessage as DecryptErrorMessageEntity;

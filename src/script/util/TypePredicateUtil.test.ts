@@ -22,7 +22,7 @@ import type {AxiosError} from 'axios';
 
 import {isAxiosError, isBackendError, isQualifiedUserClientEntityMap} from 'Util/TypePredicateUtil';
 
-import {QualifiedUserClientEntityMap, UserClientEntityMap} from '../client/ClientRepository';
+import {QualifiedUserClientEntityMap, UserClientEntityMap} from '../client';
 
 describe('TypePredicateUtil', () => {
   describe('isAxiosError', () => {

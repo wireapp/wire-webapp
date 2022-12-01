@@ -30,7 +30,7 @@ import {Icon} from 'Components/Icon';
 import {ModalComponent} from 'Components/ModalComponent';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
-import {ClientRepository} from 'src/script/client/ClientRepository';
+import {ClientRepository} from 'src/script/client';
 import {ClientState} from 'src/script/client/ClientState';
 import {Config} from 'src/script/Config';
 import {AppLockRepository} from 'src/script/user/AppLockRepository';

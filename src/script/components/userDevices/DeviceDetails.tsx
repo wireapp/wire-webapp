@@ -30,8 +30,7 @@ import type {Logger} from 'Util/Logger';
 
 import {DeviceCard} from './DeviceCard';
 
-import type {ClientEntity} from '../../client/ClientEntity';
-import type {ClientRepository} from '../../client/ClientRepository';
+import type {ClientRepository, ClientEntity} from '../../client';
 import {Config} from '../../Config';
 import {ConversationState} from '../../conversation/ConversationState';
 import type {MessageRepository} from '../../conversation/MessageRepository';

@@ -17,11 +17,13 @@
  *
  */
 
-import {ClientType} from '@wireapp/api-client/lib/client/';
+import {ClientType, ClientClassification} from '@wireapp/api-client/lib/client/';
 
-import {ClientMapper} from 'src/script/client/ClientMapper';
+import {entities, payload} from 'test/api/payloads';
 
-import {entities, payload} from '../../api/payloads';
+import {ClientMapper} from './ClientMapper';
+
+import {ClientRecord} from '../storage';
 
 describe('ClientMapper', () => {
   describe('mapClient', () => {
@@ -35,9 +37,9 @@ describe('ClientMapper', () => {
       expect(clientEntity.cookie).toBe(clientPayload.cookie);
       expect(clientEntity.id).toBe(clientPayload.id);
       expect(clientEntity.label).toBe(clientPayload.label);
-      expect(clientEntity.location.lat).toBe(clientPayload.location.lat);
-      expect(clientEntity.location.lon).toBe(clientPayload.location.lon);
-      expect(clientEntity.meta.isVerified()).toBe(false);
+      expect(clientEntity.location?.lat).toBe(clientPayload.location.lat);
+      expect(clientEntity.location?.lon).toBe(clientPayload.location.lon);
+      expect(clientEntity.meta.isVerified?.()).toBe(false);
       expect(clientEntity.model).toBe(clientPayload.model);
       expect(clientEntity.time).toBe(clientPayload.time);
       expect(clientEntity.type).toBe(ClientType.PERMANENT);
@@ -55,9 +57,9 @@ describe('ClientMapper', () => {
       expect(clientEntity.cookie).toBe(clientPayload.cookie);
       expect(clientEntity.id).toBe(clientPayload.id);
       expect(clientEntity.label).toBe(clientPayload.label);
-      expect(clientEntity.location.lat).toBe(clientPayload.location.lat);
-      expect(clientEntity.location.lon).toBe(clientPayload.location.lon);
-      expect(clientEntity.meta.isVerified()).toBe(false);
+      expect(clientEntity.location?.lat).toBe(clientPayload.location.lat);
+      expect(clientEntity.location?.lon).toBe(clientPayload.location.lon);
+      expect(clientEntity.meta.isVerified?.()).toBe(false);
       expect(clientEntity.model).toBe(clientPayload.model);
       expect(clientEntity.time).toBe(clientPayload.time);
       expect(clientEntity.type).toBe(ClientType.TEMPORARY);
@@ -72,14 +74,14 @@ describe('ClientMapper', () => {
 
       expect(clientEntity.id).toBe(clientPayload.id);
       expect(clientEntity.class).toBe(clientPayload.class);
-      expect(clientEntity.meta.isVerified()).toBe(false);
+      expect(clientEntity.meta.isVerified?.()).toBe(false);
       expect(clientEntity.isPermanent()).toBe(false);
       expect(clientEntity.isTemporary()).toBe(false);
     });
 
     it('can map a remote client payload from our local database', () => {
-      const clientPayload = {
-        class: 'desktop',
+      const clientPayload: ClientRecord = {
+        class: ClientClassification.DESKTOP,
         id: '66d0515a23a0ef25',
         meta: {
           is_verified: true,
@@ -90,14 +92,14 @@ describe('ClientMapper', () => {
 
       expect(clientEntity.id).toBe(clientPayload.id);
       expect(clientEntity.class).toBe(clientPayload.class);
-      expect(clientEntity.meta.isVerified()).toBe(true);
+      expect(clientEntity.meta.isVerified?.()).toBe(true);
       expect(clientEntity.isPermanent()).toBe(false);
       expect(clientEntity.isTemporary()).toBe(false);
     });
 
     it('can serialize a remote client payload to store it in our local database', () => {
-      const clientPayload = {
-        class: 'desktop',
+      const clientPayload: ClientRecord = {
+        class: ClientClassification.DESKTOP,
         id: '66d0515a23a0ef25',
         meta: {
           is_verified: true,
@@ -137,9 +139,9 @@ describe('ClientMapper', () => {
       expect(clientEntity.cookie).toBe(clientPayload.cookie);
       expect(clientEntity.id).toBe(clientPayload.id);
       expect(clientEntity.label).toBe(clientPayload.label);
-      expect(clientEntity.location.lat).toBe(clientPayload.location.lat);
-      expect(clientEntity.location.lon).toBe(clientPayload.location.lon);
-      expect(clientEntity.meta.isVerified()).toBe(false);
+      expect(clientEntity.location?.lat).toBe(clientPayload.location.lat);
+      expect(clientEntity.location?.lon).toBe(clientPayload.location.lon);
+      expect(clientEntity.meta.isVerified?.()).toBe(false);
       expect(clientEntity.model).toBe(clientPayload.model);
       expect(clientEntity.time).toBe(clientPayload.time);
       expect(clientEntity.type).toBe(ClientType.PERMANENT);
@@ -159,9 +161,9 @@ describe('ClientMapper', () => {
       expect(clientEntity.cookie).toBe(clientPayload.cookie);
       expect(clientEntity.id).toBe(clientPayload.id);
       expect(clientEntity.label).toBe(clientPayload.label);
-      expect(clientEntity.location.lat).toBe(clientPayload.location.lat);
-      expect(clientEntity.location.lon).toBe(clientPayload.location.lon);
-      expect(clientEntity.meta.isVerified()).toBe(false);
+      expect(clientEntity.location?.lat).toBe(clientPayload.location.lat);
+      expect(clientEntity.location?.lon).toBe(clientPayload.location.lon);
+      expect(clientEntity.meta.isVerified?.()).toBe(false);
       expect(clientEntity.model).toBe(clientPayload.model);
       expect(clientEntity.time).toBe(clientPayload.time);
       expect(clientEntity.type).toBe(ClientType.PERMANENT);

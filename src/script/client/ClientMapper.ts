@@ -20,6 +20,7 @@
 import type {PublicClient, RegisteredClient} from '@wireapp/api-client/lib/client';
 
 import {ClientEntity} from './ClientEntity';
+import {parseClientId} from './ClientIdUtil';
 
 import {ClientRecord} from '../storage';
 import {isClientRecord} from '../util/TypePredicateUtil';
@@ -41,7 +42,7 @@ export class ClientMapper {
   static mapClient(
     clientPayload: ClientRecord | PublicClient | RegisteredClient,
     isSelfClient: boolean,
-    domain: string | null,
+    domain: string | null = null,
   ): ClientEntity {
     const clientEntity = new ClientEntity(isSelfClient, domain);
 
@@ -54,7 +55,7 @@ export class ClientMapper {
     }
 
     if (isClientRecord(clientPayload)) {
-      const {userId} = ClientEntity.dismantleUserClientId(clientPayload.meta.primary_key);
+      const {userId} = parseClientId(clientPayload.meta.primary_key);
 
       clientEntity.meta.isVerified(clientPayload.meta.is_verified);
       clientEntity.meta.primaryKey = clientPayload.meta.primary_key;
@@ -74,7 +75,7 @@ export class ClientMapper {
   static mapClients(
     clientRecords: ClientRecord[] | PublicClient[] | RegisteredClient[],
     isSelfClient: boolean,
-    domain: string | null,
+    domain: string | null = null,
   ): ClientEntity[] {
     return clientRecords.map(clientRecord => ClientMapper.mapClient(clientRecord, isSelfClient, domain));
   }
@@ -86,7 +87,7 @@ export class ClientMapper {
    * @param updatePayload JSON possibly containing updates
    * @returns Contains the client and whether there was a change
    */
-  static updateClient<T extends ClientRecord>(
+  static updateClient<T extends ClientRecord | ClientEntity>(
     clientData: T,
     updatePayload: Partial<T>,
   ): {client: T; wasUpdated: boolean} {

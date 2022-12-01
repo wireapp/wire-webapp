@@ -28,14 +28,14 @@ import {createRandomUuid} from 'Util/util';
 
 import {AppLock, APPLOCK_STATE} from './AppLock';
 
-import type {ClientRepository} from '../../client/ClientRepository';
+import type {ClientRepository} from '../../client';
 import {TeamState} from '../../team/TeamState';
 import {AppLockRepository} from '../../user/AppLockRepository';
 import {AppLockState} from '../../user/AppLockState';
 import {UserState} from '../../user/UserState';
 
 // https://github.com/jedisct1/libsodium.js/issues/235
-jest.mock('libsodium-wrappers-sumo', () => ({
+jest.mock('libsodium-wrappers', () => ({
   crypto_pwhash_str: (value: string) => value,
   crypto_pwhash_str_verify: (value1: string, value2: string) => value1 === value2,
   ready: Promise.resolve,
