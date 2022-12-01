@@ -92,7 +92,7 @@
     "@types/underscore": "1.11.4",
     "@types/webpack-env": "1.18.0",
     "@typescript-eslint/eslint-plugin": "^5.45.0",
-    "@typescript-eslint/parser": "^5.42.1",
+    "@typescript-eslint/parser": "^5.45.0",
     "@wireapp/copy-config": "2.0.3",
     "@wireapp/eslint-config": "2.1.0",
     "@wireapp/prettier-config": "0.5.2",
