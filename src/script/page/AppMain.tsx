@@ -77,17 +77,6 @@ const AppMain: FC<AppMainProps> = ({
 
   useInitializeRootFontSize();
 
-  useEffect(() => {
-    PrimaryModal.init();
-    showInitialModal(userAvailability);
-    // userAvailability not needed for dependency
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useLayoutEffect(() => {
-    initializeApp();
-  }, []);
-
   if (!apiContext) {
     throw new Error('API Context has not been set');
   }
@@ -190,6 +179,17 @@ const AppMain: FC<AppMainProps> = ({
       window.setTimeout(() => repositories.notification.checkPermission(), App.CONFIG.NOTIFICATION_CHECK);
     });
   };
+
+  useEffect(() => {
+    PrimaryModal.init();
+    showInitialModal(userAvailability);
+    // userAvailability not needed for dependency
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useLayoutEffect(() => {
+    initializeApp();
+  }, []);
 
   return (
     <StyledApp
