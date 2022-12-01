@@ -118,7 +118,7 @@
     "eslint-plugin-header": "^3.1.1",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-jest": "^27.1.6",
-    "eslint-plugin-jest-dom": "^4.0.2",
+    "eslint-plugin-jest-dom": "^4.0.3",
     "eslint-plugin-jsdoc": "^39.6.4",
     "eslint-plugin-jsx-a11y": "^6.6.1",
     "eslint-plugin-no-unsanitized": "^4.0.2",
