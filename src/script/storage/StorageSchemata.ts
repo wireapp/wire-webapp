@@ -19,6 +19,7 @@
 
 import type {Dexie, Transaction} from 'dexie';
 
+import {dbMigrationStateStore} from 'Util/dbMigrationStateStore/dbMigrationStateStore';
 import {base64ToArray} from 'Util/util';
 
 import {categoryFromEvent} from '../message/MessageCategorization';
@@ -414,6 +415,16 @@ export class StorageSchemata {
         schema: {},
         version: 19,
       },
+      {
+        schema: {},
+        upgrade: dbMigrationStateStore.setNeedsCoreDBMigration,
+        version: 20,
+      },
+
+      //TODO:
+      // When defining new upgrade (v21) we should delete those 3 tables:
+      // - StorageSchemata.OBJECT_STORE.KEYS, StorageSchemata.OBJECT_STORE.PRE_KEYS, StorageSchemata.OBJECT_STORE.SESSIONS
+      // (only when they're empty - that would mean the data was successfully migrated to corecrypto)
     ];
   }
 }
