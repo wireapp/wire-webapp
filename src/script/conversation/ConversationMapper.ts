@@ -69,7 +69,8 @@ export interface SelfStatusUpdateDatabaseData {
 export type ConversationDatabaseData = ConversationRecord &
   Partial<ConversationBackendData> & {
     accessModes?: CONVERSATION_ACCESS[];
-    accessRole?: CONVERSATION_ACCESS_ROLE;
+    //CONVERSATION_ACCESS_ROLE for api <= v2, ACCESS_ROLE_V2[] since api v3
+    accessRole?: CONVERSATION_ACCESS_ROLE | ACCESS_ROLE_V2[];
     accessRoleV2?: ACCESS_ROLE_V2[];
     roles: {[userId: string]: DefaultConversationRoleName | string};
     status: ConversationStatus;
@@ -267,7 +268,9 @@ export class ConversationMapper {
     if (accessModes && (accessRole || accessRoleV2)) {
       conversationEntity.accessModes = accessModes;
       conversationEntity.accessRole = accessRoleV2 || accessRole;
-      ConversationMapper.mapAccessState(conversationEntity, accessModes, accessRole, accessRoleV2);
+
+      const actualAccessRole = this.accessRoleToAccessRoleV2(accessRoleV2 ?? accessRole);
+      ConversationMapper.mapAccessStateV3(conversationEntity, actualAccessRole);
     }
 
     conversationEntity.receiptMode(conversationData.receipt_mode);
@@ -435,49 +438,27 @@ export class ConversationMapper {
   static mapAccessState(
     conversationEntity: Conversation,
     accessModes: CONVERSATION_ACCESS[],
-    accessRole?: CONVERSATION_ACCESS_ROLE,
-    accessRoleV2: ACCESS_ROLE_V2[] = [],
+    accessRole: CONVERSATION_ACCESS_ROLE | ACCESS_ROLE_V2[],
+    accessRoleV2?: ACCESS_ROLE_V2[],
   ): typeof ACCESS_STATE {
     if (conversationEntity.team_id) {
       if (conversationEntity.is1to1()) {
         return conversationEntity.accessState(ACCESS_STATE.TEAM.ONE2ONE);
       }
 
-      if (accessRoleV2.includes(ACCESS_ROLE_V2.TEAM_MEMBER)) {
-        if (accessRoleV2.includes(ACCESS_ROLE_V2.GUEST) || accessRoleV2.includes(ACCESS_ROLE_V2.NON_TEAM_MEMBER)) {
-          if (accessRoleV2.includes(ACCESS_ROLE_V2.SERVICE)) {
-            return conversationEntity.accessState(ACCESS_STATE.TEAM.GUESTS_SERVICES);
-          }
-          return conversationEntity.accessState(ACCESS_STATE.TEAM.GUEST_ROOM);
-        } else if (accessRoleV2.includes(ACCESS_ROLE_V2.SERVICE)) {
-          return conversationEntity.accessState(ACCESS_STATE.TEAM.SERVICES);
-        }
-        return conversationEntity.accessState(ACCESS_STATE.TEAM.TEAM_ONLY);
+      //api <= v2/v3
+      //this is important to check this one first (backwards compatibility)
+      if (Array.isArray(accessRoleV2)) {
+        return this.mapAccessStateV2(conversationEntity, accessRoleV2);
       }
 
-      const isTeamRole = accessRole === CONVERSATION_ACCESS_ROLE.TEAM;
-
-      const includesInviteMode = accessModes.includes(CONVERSATION_ACCESS.INVITE);
-      const isInviteModeOnly = includesInviteMode && accessModes.length === 1;
-
-      const isTeamOnlyMode = isTeamRole && isInviteModeOnly;
-      if (isTeamOnlyMode) {
-        return conversationEntity.accessState(ACCESS_STATE.TEAM.TEAM_ONLY);
+      //api v3
+      if (Array.isArray(accessRole)) {
+        return this.mapAccessStateV2(conversationEntity, accessRole);
       }
 
-      const isVerifiedRole = accessRole === CONVERSATION_ACCESS_ROLE.ACTIVATED;
-      if (isVerifiedRole) {
-        return conversationEntity.accessState(ACCESS_STATE.TEAM.GUEST_ROOM);
-      }
-      const isNonVerifiedRole = accessRole === CONVERSATION_ACCESS_ROLE.NON_ACTIVATED;
-
-      const includesCodeMode = accessModes.includes(CONVERSATION_ACCESS.CODE);
-      const isExpectedModes = includesCodeMode && includesInviteMode && accessModes.length === 2;
-
-      const isGuestRoomMode = isNonVerifiedRole && isExpectedModes;
-      return isGuestRoomMode
-        ? conversationEntity.accessState(ACCESS_STATE.TEAM.GUESTS_SERVICES)
-        : conversationEntity.accessState(ACCESS_STATE.TEAM.LEGACY);
+      //api <= v2 legacy
+      return this.mapLegacyAccessState(conversationEntity, accessModes, accessRole);
     }
 
     if (conversationEntity.isSelf()) {
@@ -488,5 +469,49 @@ export class ConversationMapper {
       ? ACCESS_STATE.PERSONAL.GROUP
       : ACCESS_STATE.PERSONAL.ONE2ONE;
     return conversationEntity.accessState(personalAccessState);
+  }
+
+  private static mapAccessStateV2(conversationEntity: Conversation, accessRole: ACCESS_ROLE_V2[]) {
+    if (accessRole.includes(ACCESS_ROLE_V2.TEAM_MEMBER)) {
+      if (accessRole.includes(ACCESS_ROLE_V2.GUEST) || accessRole.includes(ACCESS_ROLE_V2.NON_TEAM_MEMBER)) {
+        if (accessRole.includes(ACCESS_ROLE_V2.SERVICE)) {
+          return conversationEntity.accessState(ACCESS_STATE.TEAM.GUESTS_SERVICES);
+        }
+        return conversationEntity.accessState(ACCESS_STATE.TEAM.GUEST_ROOM);
+      } else if (accessRole.includes(ACCESS_ROLE_V2.SERVICE)) {
+        return conversationEntity.accessState(ACCESS_STATE.TEAM.SERVICES);
+      }
+      return conversationEntity.accessState(ACCESS_STATE.TEAM.TEAM_ONLY);
+    }
+  }
+
+  private static mapLegacyAccessState(
+    conversationEntity: Conversation,
+    accessModes: CONVERSATION_ACCESS[],
+    accessRole: CONVERSATION_ACCESS_ROLE,
+  ) {
+    const isTeamRole = accessRole === CONVERSATION_ACCESS_ROLE.TEAM;
+
+    const includesInviteMode = accessModes.includes(CONVERSATION_ACCESS.INVITE);
+    const isInviteModeOnly = includesInviteMode && accessModes.length === 1;
+
+    const isTeamOnlyMode = isTeamRole && isInviteModeOnly;
+    if (isTeamOnlyMode) {
+      return conversationEntity.accessState(ACCESS_STATE.TEAM.TEAM_ONLY);
+    }
+
+    const isVerifiedRole = accessRole === CONVERSATION_ACCESS_ROLE.ACTIVATED;
+    if (isVerifiedRole) {
+      return conversationEntity.accessState(ACCESS_STATE.TEAM.GUEST_ROOM);
+    }
+    const isNonVerifiedRole = accessRole === CONVERSATION_ACCESS_ROLE.NON_ACTIVATED;
+
+    const includesCodeMode = accessModes.includes(CONVERSATION_ACCESS.CODE);
+    const isExpectedModes = includesCodeMode && includesInviteMode && accessModes.length === 2;
+
+    const isGuestRoomMode = isNonVerifiedRole && isExpectedModes;
+    return isGuestRoomMode
+      ? conversationEntity.accessState(ACCESS_STATE.TEAM.GUESTS_SERVICES)
+      : conversationEntity.accessState(ACCESS_STATE.TEAM.LEGACY);
   }
 }
