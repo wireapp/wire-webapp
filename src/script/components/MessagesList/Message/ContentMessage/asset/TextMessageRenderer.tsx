@@ -156,7 +156,7 @@ export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
   }, [onMessageClick, asset, isCurrentConversationFocused]);
 
   return (
-    <div
+    <p
       ref={element => {
         if (isQuoteMsg) {
           containerRef.current = detectLongQuotes(element);
