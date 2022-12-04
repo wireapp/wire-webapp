@@ -162,7 +162,7 @@
     "sinon": "15.0.0",
     "snabbdom": "3.5.1",
     "style-loader": "^3.3.1",
-    "stylelint": "14.15.0",
+    "stylelint": "14.16.0",
     "stylelint-config-idiomatic-order": "9.0.0",
     "stylelint-config-prettier": "9.0.4",
     "svg-inline-loader": "0.8.2",
