@@ -18,7 +18,7 @@
     "@wireapp/promise-queue": "workspace:^",
     "@wireapp/protocol-messaging": "1.42.0",
     "@wireapp/store-engine-dexie": "workspace:^",
-    "axios": "1.1.2",
+    "axios": "1.2.0",
     "bazinga64": "6.0.3",
     "hash.js": "1.1.7",
     "http-status-codes": "2.2.0",
