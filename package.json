@@ -109,7 +109,7 @@
     "dexie": "^3.2.2",
     "dotenv": "16.0.3",
     "dpdm": "3.10.0",
-    "eslint": "^8.28.0",
+    "eslint": "^8.29.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-import-resolver-alias": "^1.1.2",
     "eslint-import-resolver-typescript": "^3.5.2",
