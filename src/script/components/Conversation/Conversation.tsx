@@ -48,7 +48,7 @@ import {Message} from '../../entity/message/Message';
 import {Text} from '../../entity/message/Text';
 import {User} from '../../entity/User';
 import {UserError} from '../../error/UserError';
-import {isMouseEvent} from '../../guards/Mouse';
+import {isMouseRightClickEvent, isAuxRightClickEvent} from '../../guards/Mouse';
 import {isServiceEntity} from '../../guards/Service';
 import {ServiceEntity} from '../../integration/ServiceEntity';
 import {MotionDuration} from '../../motion/MotionDuration';
@@ -188,7 +188,11 @@ export const Conversation: FC<ConversationProps> = ({
     return false;
   };
 
-  const handleMarkdownLinkClick = (event: Event, messageDetails: MessageDetails) => {
+  const handleMarkdownLinkClick = (event: MouseEvent | KeyboardEvent, messageDetails: MessageDetails) => {
+    if (isAuxRightClickEvent(event)) {
+      // Default browser behavior on right click
+      return true;
+    }
     const href = messageDetails.href!;
     PrimaryModal.show(PrimaryModal.type.CONFIRM, {
       primaryAction: {
@@ -222,7 +226,6 @@ export const Conversation: FC<ConversationProps> = ({
     }
   };
 
-  const btnRightClick = 2;
   const handleClickOnMessage = (
     messageEntity: ContentMessage | Text,
     event: MouseEvent | KeyboardEvent,
@@ -233,7 +236,7 @@ export const Conversation: FC<ConversationProps> = ({
       userDomain: '',
     },
   ) => {
-    if (isMouseEvent(event) && event.button === btnRightClick) {
+    if (isMouseRightClickEvent(event)) {
       // Default browser behavior on right click
       return true;
     }

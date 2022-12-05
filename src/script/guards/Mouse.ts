@@ -17,4 +17,12 @@
  *
  */
 
+const secondaryBtnRightClick = 2;
 export const isMouseEvent = (event: MouseEvent | KeyboardEvent): event is MouseEvent => event.type === 'click';
+export const isAuxClickEvent = (event: MouseEvent | KeyboardEvent): event is MouseEvent => event.type === 'auxclick';
+
+export const isMouseRightClickEvent = (event: MouseEvent | KeyboardEvent): event is MouseEvent =>
+  isMouseEvent(event) && event.button === secondaryBtnRightClick;
+
+export const isAuxRightClickEvent = (event: MouseEvent | KeyboardEvent): event is MouseEvent =>
+  isAuxClickEvent(event) && event.button === secondaryBtnRightClick;
