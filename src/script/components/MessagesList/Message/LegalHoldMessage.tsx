@@ -49,7 +49,7 @@ const LegalHoldMessage: React.FC<LegalHoldMessageProps> = ({
       <div className="message-header-label">
         {message.isActivationMessage ? (
           <>
-            <span data-uie-name="status-legalhold-activated">{t('legalHoldActivated')}</span>
+            <p data-uie-name="status-legalhold-activated">{t('legalHoldActivated')}</p>
 
             <button
               type="button"
@@ -60,9 +60,9 @@ const LegalHoldMessage: React.FC<LegalHoldMessageProps> = ({
             </button>
           </>
         ) : (
-          <span className="message-header-label" data-uie-name="status-legalhold-deactivated">
+          <p className="message-header-label" data-uie-name="status-legalhold-deactivated">
             {t('legalHoldDeactivated')}
-          </span>
+          </p>
         )}
       </div>
     </div>
