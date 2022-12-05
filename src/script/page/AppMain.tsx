@@ -145,6 +145,14 @@ const AppMain: FC<AppMainProps> = ({
       }
     };
 
+    // on app load reset last message focus to ensure last message is focused
+    // only when user enters a new conversation using keyboard(press enter)
+    const historyState = window.history.state;
+    if (historyState && !!historyState.eventKey) {
+      historyState.eventKey = '';
+      window.history.replaceState(historyState, '', window.location.hash);
+    }
+
     configureRoutes({
       '/': showMostRecentConversation,
       '/conversation/:conversationId(/:domain)': (conversationId: string, domain: string = apiContext.domain ?? '') =>
