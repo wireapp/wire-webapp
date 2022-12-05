@@ -445,19 +445,26 @@ export class ConversationMapper {
         return conversationEntity.accessState(ACCESS_STATE.TEAM.ONE2ONE);
       }
 
+      let accessState: ACCESS_STATE | undefined;
+
       //api <= v2/v3
       //this is important to check this one first (backwards compatibility)
       if (Array.isArray(accessRoleV2)) {
-        return this.mapAccessStateV2(conversationEntity, accessRoleV2);
+        accessState = this.mapAccessStateV2(accessRoleV2);
+
+        //api v3
+      } else if (Array.isArray(accessRole)) {
+        accessState = this.mapAccessStateV2(accessRole);
       }
 
-      //api v3
-      if (Array.isArray(accessRole)) {
-        return this.mapAccessStateV2(conversationEntity, accessRole);
+      if (accessState) {
+        return conversationEntity.accessState(accessState);
       }
 
       //api <= v2 legacy
-      return this.mapLegacyAccessState(conversationEntity, accessModes, accessRole);
+      if (!Array.isArray(accessRole)) {
+        return conversationEntity.accessState(this.mapLegacyAccessState(accessModes, accessRole));
+      }
     }
 
     if (conversationEntity.isSelf()) {
@@ -470,25 +477,26 @@ export class ConversationMapper {
     return conversationEntity.accessState(personalAccessState);
   }
 
-  private static mapAccessStateV2(conversationEntity: Conversation, accessRole: ACCESS_ROLE_V2[]) {
-    if (accessRole.includes(ACCESS_ROLE_V2.TEAM_MEMBER)) {
-      if (accessRole.includes(ACCESS_ROLE_V2.GUEST) || accessRole.includes(ACCESS_ROLE_V2.NON_TEAM_MEMBER)) {
-        if (accessRole.includes(ACCESS_ROLE_V2.SERVICE)) {
-          return conversationEntity.accessState(ACCESS_STATE.TEAM.GUESTS_SERVICES);
-        }
-        return conversationEntity.accessState(ACCESS_STATE.TEAM.GUEST_ROOM);
-      } else if (accessRole.includes(ACCESS_ROLE_V2.SERVICE)) {
-        return conversationEntity.accessState(ACCESS_STATE.TEAM.SERVICES);
-      }
-      return conversationEntity.accessState(ACCESS_STATE.TEAM.TEAM_ONLY);
+  private static mapAccessStateV2(accessRole: ACCESS_ROLE_V2[]) {
+    if (!accessRole.includes(ACCESS_ROLE_V2.TEAM_MEMBER)) {
+      return undefined;
     }
+
+    if (accessRole.includes(ACCESS_ROLE_V2.GUEST) || accessRole.includes(ACCESS_ROLE_V2.NON_TEAM_MEMBER)) {
+      if (accessRole.includes(ACCESS_ROLE_V2.SERVICE)) {
+        return ACCESS_STATE.TEAM.GUESTS_SERVICES;
+      }
+      return ACCESS_STATE.TEAM.GUEST_ROOM;
+    } else if (accessRole.includes(ACCESS_ROLE_V2.SERVICE)) {
+      return ACCESS_STATE.TEAM.SERVICES;
+    }
+    return ACCESS_STATE.TEAM.TEAM_ONLY;
   }
 
   private static mapLegacyAccessState(
-    conversationEntity: Conversation,
     accessModes: CONVERSATION_ACCESS[],
     accessRole: CONVERSATION_ACCESS_ROLE,
-  ) {
+  ): ACCESS_STATE {
     const isTeamRole = accessRole === CONVERSATION_ACCESS_ROLE.TEAM;
 
     const includesInviteMode = accessModes.includes(CONVERSATION_ACCESS.INVITE);
@@ -496,12 +504,12 @@ export class ConversationMapper {
 
     const isTeamOnlyMode = isTeamRole && isInviteModeOnly;
     if (isTeamOnlyMode) {
-      return conversationEntity.accessState(ACCESS_STATE.TEAM.TEAM_ONLY);
+      return ACCESS_STATE.TEAM.TEAM_ONLY;
     }
 
     const isVerifiedRole = accessRole === CONVERSATION_ACCESS_ROLE.ACTIVATED;
     if (isVerifiedRole) {
-      return conversationEntity.accessState(ACCESS_STATE.TEAM.GUEST_ROOM);
+      return ACCESS_STATE.TEAM.GUEST_ROOM;
     }
     const isNonVerifiedRole = accessRole === CONVERSATION_ACCESS_ROLE.NON_ACTIVATED;
 
@@ -509,8 +517,6 @@ export class ConversationMapper {
     const isExpectedModes = includesCodeMode && includesInviteMode && accessModes.length === 2;
 
     const isGuestRoomMode = isNonVerifiedRole && isExpectedModes;
-    return isGuestRoomMode
-      ? conversationEntity.accessState(ACCESS_STATE.TEAM.GUESTS_SERVICES)
-      : conversationEntity.accessState(ACCESS_STATE.TEAM.LEGACY);
+    return isGuestRoomMode ? ACCESS_STATE.TEAM.GUESTS_SERVICES : ACCESS_STATE.TEAM.LEGACY;
   }
 }
