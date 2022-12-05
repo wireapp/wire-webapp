@@ -118,20 +118,23 @@ export class ConversationState {
     });
   }
 
-  getSelfConversation(useMLS: boolean = false): Conversation {
-    if (!useMLS) {
-      const proteusConversation = this.selfProteusConversation();
-      if (!proteusConversation) {
-        throw new Error('No proteus self conversation');
-      }
-      return proteusConversation;
-    }
+  /**
+   * Returns all the selfConversations available (proteus and MLS)
+   * The MLS conversation can be manually filtered (in case MLS is not supported)
+   * @param includeMLS will filter out the MLS self conversation if false
+   */
+  getSelfConversations(includeMLS: boolean): Conversation[] {
+    const baseConversations = [this.selfProteusConversation()];
+    const selfConversations = includeMLS ? baseConversations.concat(this.selfMLSConversation()) : baseConversations;
+    return selfConversations.filter((conversation): conversation is Conversation => !!conversation);
+  }
 
-    const mlsConversation = this.selfMLSConversation();
-    if (!mlsConversation) {
-      throw new Error('No MLS self conversation');
+  getSelfProteusConversation(): Conversation {
+    const proteusConversation = this.selfProteusConversation();
+    if (!proteusConversation) {
+      throw new Error('No proteus self conversation');
     }
-    return mlsConversation;
+    return proteusConversation;
   }
 
   /**
