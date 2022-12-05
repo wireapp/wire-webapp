@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2020 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,8 +18,9 @@
  */
 
 module.exports = {
-  moduleDirectories: ['node_modules', __dirname],
-  testEnvironment: 'node',
-  testPathIgnorePatterns: ['<rootDir>/dist'],
-  testRegex: '(test|Spec)\\.[tj]sx?$',
+  env: {
+    test: {
+      presets: ['@babel/preset-typescript', ['@babel/preset-env', {modules: 'commonjs'}]],
+    },
+  },
 };
