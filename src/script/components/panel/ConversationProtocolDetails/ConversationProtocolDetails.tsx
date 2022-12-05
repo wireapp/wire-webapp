@@ -85,15 +85,15 @@ const ConversationProtocolDetails: React.FC<ConversationProtocolDetailsProps> = 
       <div className="conversation-details__list-head">{t('conversationDetailsProtocolDetails')}</div>
       <div css={wrapperStyles}>
         <div css={titleStyles}>Protocol</div>
-        <div css={subTitleStyles} data-uie-name="protocol-name">
+        <p css={subTitleStyles} data-uie-name="protocol-name">
           {protocol.toUpperCase()}
-        </div>
+        </p>
         {protocol === ConversationProtocol.MLS && cipherSuite && (
           <>
             <div css={titleStyles}>Cipher Suite</div>
-            <div css={subTitleStyles} data-uie-name="cipher-suite">
+            <p css={subTitleStyles} data-uie-name="cipher-suite">
               {Ciphersuite[cipherSuite]}
-            </div>
+            </p>
           </>
         )}
       </div>

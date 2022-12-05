@@ -70,9 +70,9 @@ const Notifications: FC<NotificationsProps> = ({activeConversation, onGoBack, on
           />
         </fieldset>
 
-        <div className="panel__info-text notification-settings__disclaimer" tabIndex={0}>
+        <p className="panel__info-text notification-settings__disclaimer" tabIndex={0}>
           {t('notificationSettingsDisclaimer')}
-        </div>
+        </p>
       </div>
     </div>
   );
