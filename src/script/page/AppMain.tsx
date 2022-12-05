@@ -145,7 +145,7 @@ const AppMain: FC<AppMainProps> = ({
       }
     };
 
-    // on conversation/app load reset last message focus to ensure last message is focused
+    // on app load reset last message focus to ensure last message is focused
     // only when user enters a new conversation using keyboard(press enter)
     const historyState = window.history.state;
     if (historyState && !!historyState.eventKey) {
