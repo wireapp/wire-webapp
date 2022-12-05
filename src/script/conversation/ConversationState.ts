@@ -118,20 +118,18 @@ export class ConversationState {
     });
   }
 
-  getSelfConversation(useMLS: boolean = false): Conversation {
-    if (!useMLS) {
-      const proteusConversation = this.selfProteusConversation();
-      if (!proteusConversation) {
-        throw new Error('No proteus self conversation');
-      }
-      return proteusConversation;
-    }
+  getSelfConversations(): Conversation[] {
+    return [this.selfMLSConversation(), this.selfProteusConversation()].filter(
+      (conversation): conversation is Conversation => !!conversation,
+    );
+  }
 
-    const mlsConversation = this.selfMLSConversation();
-    if (!mlsConversation) {
-      throw new Error('No MLS self conversation');
+  getSelfProteusConversation(): Conversation {
+    const proteusConversation = this.selfProteusConversation();
+    if (!proteusConversation) {
+      throw new Error('No proteus self conversation');
     }
-    return mlsConversation;
+    return proteusConversation;
   }
 
   /**
