@@ -112,7 +112,7 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
       >
         {t('participantDevicesDetailShowMyDevice')}
       </button>
-      <div
+      <p
         className="panel__info-text"
         dangerouslySetInnerHTML={{
           __html: user ? t('participantDevicesDetailHeadline', {user: userName}) : '',

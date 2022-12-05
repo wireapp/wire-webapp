@@ -110,7 +110,7 @@ const TimedMessages: FC<TimedMessagesPanelProps> = ({activeConversation, onClose
           </label>
         ))}
 
-        <div className="panel__info-text timed-messages__disclaimer">{t('timedMessageDisclaimer')}</div>
+        <p className="panel__info-text timed-messages__disclaimer">{t('timedMessageDisclaimer')}</p>
       </div>
     </div>
   );

@@ -48,9 +48,12 @@ const ServiceDetails: React.FC<ServiceDetailsProps> = ({service}) => {
         data-uie-name="status-profile-picture"
       />
 
-      <div className="panel-participant__service-description" data-uie-name="status-service-description">
+      <p
+        className="panel-participant__service-description panel__info-text--margin"
+        data-uie-name="status-service-description"
+      >
         {service.description}
-      </div>
+      </p>
     </div>
   );
 };

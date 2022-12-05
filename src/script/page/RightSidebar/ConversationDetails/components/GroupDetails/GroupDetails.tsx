@@ -73,12 +73,12 @@ const GroupDetails: FC<GroupDetailsProps> = ({
       </div>
 
       {isTeam && (
-        <div
+        <p
           className="panel__info-text conversation-details__group-size-info"
           data-uie-name="status-group-size-info-conversation-details"
         >
           {t('groupSizeInfo', ConversationRepository.CONFIG.GROUP.MAX_SIZE)}
-        </div>
+        </p>
       )}
     </>
   );
