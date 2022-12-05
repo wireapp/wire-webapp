@@ -379,7 +379,7 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
 
             {!!serviceParticipants.length && (
               <div className="conversation-details__participants">
-                <div className="conversation-details__list-head">{t('conversationDetailsServices')}</div>
+                <h5 className="conversation-details__list-head">{t('conversationDetailsServices')}</h5>
 
                 <ServiceList
                   services={serviceParticipants}

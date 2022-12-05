@@ -71,7 +71,7 @@ const ConversationDetailsOptions: FC<ConversationDetailsOptionsProps> = ({
 
   return (
     <>
-      <div className="conversation-details__list-head">{t('conversationDetailsOptions')}</div>
+      <h5 className="conversation-details__list-head">{t('conversationDetailsOptions')}</h5>
 
       <ul>
         {showOptionNotificationsGroup && (

@@ -148,9 +148,10 @@ const UserList: React.FC<UserListProps> = ({
       <>
         {(admins.length > 0 || showEmptyAdmin) && (
           <Fragment>
-            <div className="user-list__header" data-uie-name="label-conversation-admins">
+            <h5 className="user-list__header" data-uie-name="label-conversation-admins">
               {t('searchListAdmins', adminCount)}
-            </div>
+            </h5>
+
             {admins.length > 0 && (
               <ul className={cx('search-list', cssClasses)} data-uie-name="list-admins">
                 {admins.slice(0, maxShownUsers).map(user => (
@@ -182,11 +183,13 @@ const UserList: React.FC<UserListProps> = ({
             )}
           </Fragment>
         )}
+
         {members.length > 0 && maxShownUsers > admins.length && (
           <Fragment>
-            <div className="user-list__header" data-uie-name="label-conversation-members">
+            <h5 className="user-list__header" data-uie-name="label-conversation-members">
               {t('searchListMembers', memberCount)}
-            </div>
+            </h5>
+
             <ul className={cx('search-list', cssClasses)} data-uie-name="list-members">
               {members.slice(0, maxShownUsers - admins.length).map(user => (
                 <li key={user.id}>

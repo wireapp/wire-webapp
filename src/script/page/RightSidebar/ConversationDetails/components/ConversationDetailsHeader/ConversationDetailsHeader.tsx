@@ -110,7 +110,7 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
       {isActiveGroupParticipant ? (
         <>
           {!isEditingName ? (
-            <div
+            <h4
               className="conversation-details__name"
               title={t('tooltipConversationDetailsRename')}
               data-uie-name="status-name"
@@ -121,7 +121,7 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
               {displayName && <div className="conversation-details__name">{displayName}</div>}
 
               {canRenameGroup && <Icon.Edit className="conversation-details__name__edit-icon" />}
-            </div>
+            </h4>
           ) : (
             <textarea
               ref={textAreaRef}

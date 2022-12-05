@@ -89,7 +89,7 @@ const ListWrapper: React.FC<LeftListWrapperProps> = ({
 
   return (
     <div id={id} className={`left-list-${id} ${id}`} css={style}>
-      <section className={`left-list-header left-list-header-${id}`}>
+      <header className={`left-list-header left-list-header-${id}`}>
         {headerElement ? (
           headerElement
         ) : (
@@ -108,7 +108,7 @@ const ListWrapper: React.FC<LeftListWrapperProps> = ({
             </button>
           </>
         )}
-      </section>
+      </header>
       {before ?? null}
       <div
         role="list"

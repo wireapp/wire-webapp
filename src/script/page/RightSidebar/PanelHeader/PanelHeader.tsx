@@ -72,9 +72,9 @@ const PanelHeader: FC<PanelHeaderProps> = ({
       )}
 
       {title && (
-        <h3 className="panel__header__title" tabIndex={0} data-uie-name={titleDataUieName}>
+        <h4 className="panel__header__title" tabIndex={0} data-uie-name={titleDataUieName}>
           {title}
-        </h3>
+        </h4>
       )}
 
       <DragableClickWrapper onClick={onClose}>

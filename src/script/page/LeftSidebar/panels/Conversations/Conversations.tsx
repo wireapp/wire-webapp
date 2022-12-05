@@ -68,7 +68,7 @@ type ConversationsProps = {
   userState?: UserState;
 };
 
-export enum ConverationViewStyle {
+export enum ConversationViewStyle {
   RECENT,
   FOLDER,
 }
@@ -104,10 +104,10 @@ const Conversations: React.FC<ConversationsProps> = ({
 
   const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
   const initialViewStyle = propertiesRepository.getPreference(PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS)
-    ? ConverationViewStyle.FOLDER
-    : ConverationViewStyle.RECENT;
+    ? ConversationViewStyle.FOLDER
+    : ConversationViewStyle.RECENT;
 
-  const [viewStyle, setViewStyle] = useState<ConverationViewStyle>(initialViewStyle);
+  const [viewStyle, setViewStyle] = useState<ConversationViewStyle>(initialViewStyle);
   const showBadge = notifications.length > 0;
 
   const hasNoConversations = conversations.length + connectRequests.length === 0;
@@ -155,7 +155,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   useEffect(() => {
     propertiesRepository.savePreference(
       PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS,
-      viewStyle === ConverationViewStyle.FOLDER,
+      viewStyle === ConversationViewStyle.FOLDER,
     );
   }, [viewStyle]);
 
@@ -219,7 +219,9 @@ const Conversations: React.FC<ConversationsProps> = ({
   );
 
   const footer = (
-    <section className="conversations-footer">
+    <nav className="conversations-footer">
+      <h2 className="visually-hidden">{t('accessibility.headings.sidebar')}</h2>
+
       <div role="tablist" aria-owns="tab-1 tab-2 tab-3">
         <ul className="conversations-footer-list">
           <li className="conversations-footer-list-item">
@@ -238,7 +240,8 @@ const Conversations: React.FC<ConversationsProps> = ({
               data-uie-name="go-people"
             >
               <Icon.People />
-              {t('conversationFooterContacts')}
+
+              <h3 className="conversations-footer-btn--text">{t('conversationFooterContacts')}</h3>
             </button>
           </li>
 
@@ -247,35 +250,37 @@ const Conversations: React.FC<ConversationsProps> = ({
               id="tab-2"
               type="button"
               role="tab"
-              className={`conversations-footer-btn ${viewStyle === ConverationViewStyle.RECENT ? 'active' : ''}`}
-              onClick={() => {
-                setViewStyle(ConverationViewStyle.RECENT);
-              }}
+              className={`conversations-footer-btn ${viewStyle === ConversationViewStyle.RECENT ? 'active' : ''}`}
+              onClick={() => setViewStyle(ConversationViewStyle.RECENT)}
               title={t('conversationViewTooltip')}
               data-uie-name="go-recent-view"
-              data-uie-status={viewStyle === ConverationViewStyle.RECENT ? 'active' : 'inactive'}
-              aria-selected={viewStyle === ConverationViewStyle.RECENT}
+              data-uie-status={viewStyle === ConversationViewStyle.RECENT ? 'active' : 'inactive'}
+              aria-selected={viewStyle === ConversationViewStyle.RECENT}
             >
               <Icon.ConversationsRecent />
-              {t('conversationViewTooltip')}
+
+              <h3 className="conversations-footer-btn--text">{t('conversationViewTooltip')}</h3>
             </button>
           </li>
+
           <li className="conversations-footer-list-item">
             <button
               id="tab-3"
               type="button"
               role="tab"
-              className={`conversations-footer-btn ${viewStyle === ConverationViewStyle.FOLDER ? 'active' : ''}`}
-              onClick={() => setViewStyle(ConverationViewStyle.FOLDER)}
+              className={`conversations-footer-btn ${viewStyle === ConversationViewStyle.FOLDER ? 'active' : ''}`}
+              onClick={() => setViewStyle(ConversationViewStyle.FOLDER)}
               title={t('folderViewTooltip')}
               data-uie-name="go-folder-view"
-              data-uie-status={viewStyle === ConverationViewStyle.FOLDER ? 'active' : 'inactive'}
-              aria-selected={viewStyle === ConverationViewStyle.FOLDER}
+              data-uie-status={viewStyle === ConversationViewStyle.FOLDER ? 'active' : 'inactive'}
+              aria-selected={viewStyle === ConversationViewStyle.FOLDER}
             >
               <Icon.ConversationsFolder />
-              {t('folderViewTooltip')}
+
+              <h3 className="conversations-footer-btn--text">{t('folderViewTooltip')}</h3>
             </button>
           </li>
+
           {archivedConversations.length > 0 && (
             <li className="conversations-footer-list-item">
               <button
@@ -286,13 +291,14 @@ const Conversations: React.FC<ConversationsProps> = ({
                 title={t('tooltipConversationsArchived', archivedConversations.length)}
               >
                 <Icon.Archive />
-                {t('conversationFooterArchive')}
+
+                <h3 className="conversations-footer-btn--text">{t('conversationFooterArchive')}</h3>
               </button>
             </li>
           )}
         </ul>
       </div>
-    </section>
+    </nav>
   );
 
   const callingView = (

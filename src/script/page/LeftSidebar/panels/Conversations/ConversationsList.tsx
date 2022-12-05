@@ -31,7 +31,7 @@ import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
-import {ConverationViewStyle} from './Conversations';
+import {ConversationViewStyle} from './Conversations';
 import {GroupedConversations} from './GroupedConversations';
 
 import {CallState} from '../../../../calling/CallState';
@@ -51,7 +51,7 @@ export const ConversationsList: React.FC<{
   conversations: Conversation[];
   conversationState: ConversationState;
   listViewModel: ListViewModel;
-  viewStyle: ConverationViewStyle;
+  viewStyle: ConversationViewStyle;
   currentFocus: number;
   isConversationListFocus: boolean;
   handleFocus: (index: number) => void;
@@ -98,7 +98,7 @@ export const ConversationsList: React.FC<{
   };
 
   const conversationView =
-    viewStyle === ConverationViewStyle.RECENT ? (
+    viewStyle === ConversationViewStyle.RECENT ? (
       <>
         {conversations.map((conversation, index) => {
           return (
@@ -140,7 +140,8 @@ export const ConversationsList: React.FC<{
       </li>
     );
 
-  const uieName = viewStyle === ConverationViewStyle.FOLDER ? 'folder-view' : 'recent-view';
+  const isFolderView = viewStyle === ConversationViewStyle.FOLDER;
+  const uieName = isFolderView ? 'folder-view' : 'recent-view';
 
   const connectionText =
     connectRequests.length > 1
@@ -186,9 +187,13 @@ export const ConversationsList: React.FC<{
       </li>
     );
   return (
-    <ul css={css({margin: 0, paddingLeft: 0})} data-uie-name={uieName}>
-      {connectionRequests}
-      {conversationView}
-    </ul>
+    <>
+      {isFolderView && <h2 className="visually-hidden">{t('folderViewTooltip')}</h2>}
+
+      <ul css={css({margin: 0, paddingLeft: 0})} data-uie-name={uieName}>
+        {connectionRequests}
+        {conversationView}
+      </ul>
+    </>
   );
 };

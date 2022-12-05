@@ -262,36 +262,38 @@ const CallingCell: React.FC<CallingCellProps> = ({
                   )}
                 </div>
               )}
-              <div
+
+              <h2
                 className={cx('conversation-list-cell-center ', {
                   'conversation-list-cell-center-no-left': temporaryUserStyle,
                 })}
               >
-                <p className="conversation-list-cell-name">{conversationName}</p>
+                <span className="conversation-list-cell-name">{conversationName}</span>
 
                 {currentCallStatus && (
-                  <p className="conversation-list-cell-description" data-uie-name={currentCallStatus.dataUieName}>
+                  <span className="conversation-list-cell-description" data-uie-name={currentCallStatus.dataUieName}>
                     {currentCallStatus.text}
-                  </p>
+                  </span>
                 )}
 
                 {isOngoing && startedAt && (
                   <div className="conversation-list-info-wrapper">
-                    <p
+                    <span
                       className="conversation-list-cell-description"
                       data-uie-name="call-duration"
                       aria-label={t('callDurationLabel')}
                     >
                       <Duration {...{startedAt}} />
-                    </p>
+                    </span>
+
                     {isCbrEnabled && (
-                      <p className="conversation-list-cell-description" data-uie-name="call-cbr">
+                      <span className="conversation-list-cell-description" data-uie-name="call-cbr">
                         {t('callStateCbr')}
-                      </p>
+                      </span>
                     )}
                   </div>
                 )}
-              </div>
+              </h2>
             </div>
 
             <div className="conversation-list-cell-right">

@@ -25,8 +25,6 @@ import {CSSTransition, SwitchTransition} from 'react-transition-group';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {t} from 'Util/LocalizerUtil';
-
 import {Archive} from './panels/Archive';
 import {Conversations} from './panels/Conversations';
 import {Preferences} from './panels/Preferences';
@@ -70,10 +68,6 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({listViewModel, selfUser, isAct
 
   return (
     <div id="left-column" className={cx('left-column', {'left-column--light-theme': !isActivatedAccount})}>
-      <header>
-        <h1 className="visually-hidden">{t('accessibility.headings.sidebar')}</h1>
-      </header>
-
       <SwitchTransition>
         <Animated key={listState}>
           <>

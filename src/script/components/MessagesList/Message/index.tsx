@@ -115,8 +115,8 @@ const Message: React.FC<
     'ephemeral_expires',
     'timestamp',
   ]);
-  const timeago = useRelativeTimestamp(message.timestamp());
-  const timeagoDay = useRelativeTimestamp(message.timestamp(), true);
+  const timeAgo = useRelativeTimestamp(message.timestamp());
+  const timeAgoDay = useRelativeTimestamp(message.timestamp(), true);
   const markerType = getMessageMarkerType(message, lastReadTimestamp, previousMessage);
 
   useLayoutEffect(() => {
@@ -183,6 +183,7 @@ const Message: React.FC<
       isMsgElementsFocusable={isMsgElementsFocusable}
     />
   );
+
   const wrappedContent = onVisible ? (
     <InViewport requireFullyInView allowBiggerThanViewport checkOverlay onVisible={onVisible}>
       {content}
@@ -190,6 +191,7 @@ const Message: React.FC<
   ) : (
     content
   );
+
   return (
     <div
       className={cx('message', {'message-marked': isMarked})}
@@ -205,15 +207,18 @@ const Message: React.FC<
         <div className="message-header-icon">
           <span className="message-unread-dot"></span>
         </div>
-        <div className="message-header-label">
+
+        <h4 className="message-header-label">
           <MessageTime timestamp={timestamp} className="label-xs" data-timestamp-type="normal">
-            {timeago}
+            {timeAgo}
           </MessageTime>
+
           <MessageTime timestamp={timestamp} data-timestamp-type="day" className="label-bold-xs">
-            {timeagoDay}
+            {timeAgoDay}
           </MessageTime>
-        </div>
+        </h4>
       </div>
+
       {/*eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions*/}
       <div
         tabIndex={focusConversation ? 0 : -1}

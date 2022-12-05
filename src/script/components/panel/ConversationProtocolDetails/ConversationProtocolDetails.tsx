@@ -79,26 +79,27 @@ const wrapperStyles: CSSObject = {
   paddingTop: 4,
 };
 
-const ConversationProtocolDetails: React.FC<ConversationProtocolDetailsProps> = ({protocol, cipherSuite}) => {
-  return (
-    <div>
-      <div className="conversation-details__list-head">{t('conversationDetailsProtocolDetails')}</div>
-      <div css={wrapperStyles}>
-        <div css={titleStyles}>Protocol</div>
-        <div css={subTitleStyles} data-uie-name="protocol-name">
-          {protocol.toUpperCase()}
-        </div>
-        {protocol === ConversationProtocol.MLS && cipherSuite && (
-          <>
-            <div css={titleStyles}>Cipher Suite</div>
-            <div css={subTitleStyles} data-uie-name="cipher-suite">
-              {Ciphersuite[cipherSuite]}
-            </div>
-          </>
-        )}
+const ConversationProtocolDetails: React.FC<ConversationProtocolDetailsProps> = ({protocol, cipherSuite}) => (
+  <div>
+    <h5 className="conversation-details__list-head">{t('conversationDetailsProtocolDetails')}</h5>
+
+    <div css={wrapperStyles}>
+      <div css={titleStyles}>Protocol</div>
+
+      <div css={subTitleStyles} data-uie-name="protocol-name">
+        {protocol.toUpperCase()}
       </div>
+
+      {protocol === ConversationProtocol.MLS && cipherSuite && (
+        <>
+          <div css={titleStyles}>Cipher Suite</div>
+          <div css={subTitleStyles} data-uie-name="cipher-suite">
+            {Ciphersuite[cipherSuite]}
+          </div>
+        </>
+      )}
     </div>
-  );
-};
+  </div>
+);
 
 export {ConversationProtocolDetails};
