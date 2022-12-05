@@ -269,8 +269,7 @@ export class ConversationMapper {
       conversationEntity.accessModes = accessModes;
       conversationEntity.accessRole = accessRoleV2 || accessRole;
 
-      const actualAccessRole = this.accessRoleToAccessRoleV2(accessRoleV2 ?? accessRole);
-      ConversationMapper.mapAccessStateV3(conversationEntity, actualAccessRole);
+      ConversationMapper.mapAccessState(conversationEntity, accessModes, accessRole, accessRoleV2);
     }
 
     conversationEntity.receiptMode(conversationData.receipt_mode);
