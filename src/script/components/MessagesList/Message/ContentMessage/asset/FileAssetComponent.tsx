@@ -124,9 +124,9 @@ const FileAsset: React.FC<FileAssetProps> = ({
               )}
 
               <div className="file__desc">
-                <div className="label-bold-xs ellipsis" data-uie-name="file-name">
+                <p className="label-bold-xs ellipsis" data-uie-name="file-name">
                   {fileName}
-                </div>
+                </p>
                 <ul className="file__desc__meta label-xs text-foreground">
                   <li className="label-nocase-xs" data-uie-name="file-size">
                     {formattedFileSize}

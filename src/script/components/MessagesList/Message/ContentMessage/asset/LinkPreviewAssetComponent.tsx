@@ -63,7 +63,7 @@ const LinkPreviewAsset: React.FC<LinkPreviewAssetProps> = ({header = false, mess
         <div className="link-preview-image-placeholder icon-link bg-color-ephemeral text-white" />
       </div>
       <div className="link-preview-info">
-        <div
+        <p
           className={cx(
             'link-preview-info-title',
             'ephemeral-message-obfuscated',
@@ -71,8 +71,8 @@ const LinkPreviewAsset: React.FC<LinkPreviewAssetProps> = ({header = false, mess
           )}
         >
           {preview?.title}
-        </div>
-        <div className="link-preview-info-link ephemeral-message-obfuscated ellipsis">{preview?.url}</div>
+        </p>
+        <p className="link-preview-info-link ephemeral-message-obfuscated ellipsis">{preview?.url}</p>
       </div>
     </div>
   ) : (
@@ -94,7 +94,7 @@ const LinkPreviewAsset: React.FC<LinkPreviewAssetProps> = ({header = false, mess
         {header && <AssetHeader className="link-preview-info-header" message={message} />}
         {preview && (
           <>
-            <div
+            <p
               className={cx(
                 'link-preview-info-title',
                 `link-preview-info-title-${header ? 'singleline' : 'multiline'}`,
@@ -102,24 +102,24 @@ const LinkPreviewAsset: React.FC<LinkPreviewAssetProps> = ({header = false, mess
               data-uie-name="link-preview-title"
             >
               {preview.title}
-            </div>
+            </p>
             {isTweet ? (
               <div
                 className="link-preview-info-link text-foreground"
                 title={preview.url}
                 data-uie-name="link-preview-tweet-author"
               >
-                <span className="font-weight-bold link-preview-info-title-singleline">{author}</span>
-                <span>{t('conversationTweetAuthor')}</span>
+                <p className="font-weight-bold link-preview-info-title-singleline">{author}</p>
+                <p>{t('conversationTweetAuthor')}</p>
               </div>
             ) : (
-              <div
+              <p
                 className="link-preview-info-link text-foreground ellipsis"
                 title={preview.url}
                 data-uie-name="link-preview-url"
               >
                 {cleanURL(preview.url)}
-              </div>
+              </p>
             )}
           </>
         )}

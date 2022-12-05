@@ -55,9 +55,9 @@ const CallTimeoutMessage: React.FC<CallTimeoutMessageProps> = ({message}) => {
           <b>{reason === REASON.NOONE_JOINED ? t('callNoOneJoined') : t('callEveryOneLeft')}</b>
         </p>
       </div>
-      <div className="message-body-actions">
+      <p className="message-body-actions">
         <MessageTime timestamp={timestamp} data-uie-uid={message.id} data-uie-name="item-message-call-timestamp" />
-      </div>
+      </p>
     </div>
   );
 };
