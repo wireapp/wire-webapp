@@ -18,7 +18,7 @@
  */
 
 import {ConversationCode} from '@wireapp/api-client/lib/conversation/';
-import {ConversationAccessUpdateData, ConversationAccessV2UpdateData} from '@wireapp/api-client/lib/conversation/data/';
+import {ConversationAccessUpdateData} from '@wireapp/api-client/lib/conversation/data/';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
@@ -124,7 +124,7 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
 
   private _mapConversationAccessState(
     conversationEntity: Conversation,
-    eventJson: ConversationEvent<Partial<ConversationAccessV2UpdateData & ConversationAccessUpdateData>>,
+    eventJson: ConversationEvent<ConversationAccessUpdateData>,
   ): void {
     const {access: accessModes, ...roles} = eventJson.data;
     ConversationMapper.mapAccessState(conversationEntity, accessModes, roles?.access_role, roles?.access_role_v2);
