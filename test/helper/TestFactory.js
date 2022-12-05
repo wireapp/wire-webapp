@@ -293,7 +293,6 @@ export class TestFactory {
       clientState,
     );
     const core = container.resolve(Core);
-    core.initServices({clientType: ClientType.NONE, userId: 'userID'});
     this.conversation_repository = new ConversationRepository(
       this.conversation_service,
       this.message_repository,

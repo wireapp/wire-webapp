@@ -34,7 +34,7 @@ import {t} from 'Util/LocalizerUtil';
 
 import {useLegalHoldModalState} from './LegalHoldModal.state';
 
-import {ClientRepository} from '../../../client/ClientRepository';
+import {ClientRepository} from '../../../client';
 import {ConversationRepository} from '../../../conversation/ConversationRepository';
 import {MessageRepository} from '../../../conversation/MessageRepository';
 import {CryptographyRepository} from '../../../cryptography/CryptographyRepository';

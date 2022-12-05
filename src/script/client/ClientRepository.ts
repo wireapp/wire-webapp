@@ -35,6 +35,7 @@ import {matchQualifiedIds} from 'Util/QualifiedId';
 import {loadValue} from 'Util/StorageUtil';
 
 import {ClientEntity} from './ClientEntity';
+import {constructClientId, parseClientId} from './ClientIdUtil';
 import {ClientMapper} from './ClientMapper';
 import type {ClientService} from './ClientService';
 import {ClientState} from './ClientState';
@@ -92,7 +93,7 @@ export class ClientRepository {
   //##############################################################################
 
   private deleteClientFromDb(userId: QualifiedId, clientId: string): Promise<string> {
-    return this.clientService.deleteClientFromDb(this.core.service!.cryptography.constructSessionId(userId, clientId));
+    return this.clientService.deleteClientFromDb(constructClientId(userId, clientId));
   }
 
   /**
@@ -114,7 +115,7 @@ export class ClientRepository {
       const skippedUserIds = [this.selfUser().id, ClientRepository.PRIMARY_KEY_CURRENT_CLIENT];
 
       for (const clientRecord of clientRecords) {
-        const {userId} = ClientEntity.dismantleUserClientId(clientRecord.meta.primary_key);
+        const {userId} = parseClientId(clientRecord.meta.primary_key);
         if (userId && !skippedUserIds.includes(userId)) {
           recipients[userId] ||= [];
           recipients[userId].push(ClientMapper.mapClient(clientRecord, false, clientRecord.domain));
@@ -173,7 +174,7 @@ export class ClientRepository {
    * @returns Resolves with the record stored in database
    */
   saveClientInDb(userId: QualifiedId, clientPayload: ClientRecord): Promise<ClientRecord> {
-    const primaryKey = this.core.service!.cryptography.constructSessionId(userId, clientPayload.id);
+    const primaryKey = constructClientId(userId, clientPayload.id);
     return this.clientService.saveClientInDb(primaryKey, clientPayload);
   }
 
@@ -187,7 +188,7 @@ export class ClientRepository {
    * @returns Number of updated records
    */
   private updateClientInDb(userId: QualifiedId, clientId: string, changes: Partial<ClientRecord>): Promise<number> {
-    const primaryKey = this.core.service!.cryptography.constructSessionId(userId, clientId);
+    const primaryKey = constructClientId(userId, clientId);
     // Preserve primary key on update
     changes.meta.primary_key = primaryKey;
     return this.clientService.updateClientInDb(primaryKey, changes);
@@ -220,7 +221,7 @@ export class ClientRepository {
       domain: this.core.backendFeatures.federationEndpoints ? userId.domain : undefined,
       meta: {
         is_verified: false,
-        primary_key: this.core.service!.cryptography.constructSessionId(userId, clientPayload.id),
+        primary_key: constructClientId(userId, clientPayload.id),
       },
     };
     return this.saveClientInDb(userId, clientRecord);
@@ -373,7 +374,7 @@ export class ClientRepository {
   private async getClientByUserIdFromDb(userQualifiedId: QualifiedId): Promise<ClientRecord[]> {
     const clients = await this.clientService.loadAllClientsFromDb();
     return clients.filter(client => {
-      const {userId, domain} = ClientEntity.dismantleUserClientId(client.meta.primary_key);
+      const {userId, domain} = parseClientId(client.meta.primary_key);
       return matchQualifiedIds({domain, id: userId}, userQualifiedId);
     });
   }

@@ -31,7 +31,7 @@ import type {AssetRepository} from '../assets/AssetRepository';
 import type {AudioRepository} from '../audio/AudioRepository';
 import type {BackupRepository} from '../backup/BackupRepository';
 import type {CallingRepository} from '../calling/CallingRepository';
-import type {ClientRepository} from '../client/ClientRepository';
+import type {ClientRepository} from '../client';
 import type {ConnectionRepository} from '../connection/ConnectionRepository';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import type {MessageRepository} from '../conversation/MessageRepository';

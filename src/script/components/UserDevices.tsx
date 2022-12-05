@@ -31,8 +31,7 @@ import {DeviceList} from './userDevices/DeviceList';
 import {NoDevicesFound} from './userDevices/NoDevicesFound';
 import {SelfFingerprint} from './userDevices/SelfFingerprint';
 
-import {ClientEntity} from '../client/ClientEntity';
-import {ClientRepository} from '../client/ClientRepository';
+import {ClientRepository, ClientEntity} from '../client';
 import {ConversationState} from '../conversation/ConversationState';
 import {MessageRepository} from '../conversation/MessageRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';

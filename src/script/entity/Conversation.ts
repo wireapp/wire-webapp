@@ -49,7 +49,7 @@ import type {SystemMessage} from './message/SystemMessage';
 import type {User} from './User';
 
 import type {Call} from '../calling/Call';
-import {ClientRepository} from '../client/ClientRepository';
+import {ClientRepository} from '../client';
 import {Config} from '../Config';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
 import {ACCESS_STATE} from '../conversation/AccessState';

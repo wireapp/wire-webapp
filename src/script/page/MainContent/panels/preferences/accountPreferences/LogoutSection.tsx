@@ -23,7 +23,7 @@ import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/LocalizerUtil';
 
-import type {ClientRepository} from '../../../../../client/ClientRepository';
+import type {ClientRepository} from '../../../../../client';
 
 interface LogoutSectionProps {
   clientRepository: ClientRepository;

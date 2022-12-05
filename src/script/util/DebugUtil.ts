@@ -30,21 +30,18 @@ import type {Notification} from '@wireapp/api-client/lib/notification/';
 import Dexie from 'dexie';
 import {container} from 'tsyringe';
 
-import {util as ProteusUtil} from '@wireapp/proteus';
-
 import {getLogger, Logger} from 'Util/Logger';
 
 import {createRandomUuid} from './util';
 
 import {CallingRepository} from '../calling/CallingRepository';
 import {CallState} from '../calling/CallState';
-import {ClientRepository} from '../client/ClientRepository';
+import {ClientRepository} from '../client';
 import {ClientState} from '../client/ClientState';
 import {ConnectionRepository} from '../connection/ConnectionRepository';
 import {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationState} from '../conversation/ConversationState';
 import type {MessageRepository} from '../conversation/MessageRepository';
-import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {EventRepository} from '../event/EventRepository';
@@ -63,7 +60,6 @@ export class DebugUtil {
   private readonly connectionRepository: ConnectionRepository;
   /** Used by QA test automation. */
   public readonly conversationRepository: ConversationRepository;
-  private readonly cryptographyRepository: CryptographyRepository;
   private readonly eventRepository: EventRepository;
   private readonly storageRepository: StorageRepository;
   private readonly messageRepository: MessageRepository;
@@ -84,12 +80,11 @@ export class DebugUtil {
     this.$ = $;
     this.Dexie = Dexie;
 
-    const {calling, client, connection, conversation, cryptography, event, user, storage, message} = repositories;
+    const {calling, client, connection, conversation, event, user, storage, message} = repositories;
     this.callingRepository = calling;
     this.clientRepository = client;
     this.conversationRepository = conversation;
     this.connectionRepository = connection;
-    this.cryptographyRepository = cryptography;
     this.eventRepository = event;
     this.storageRepository = storage;
     this.userRepository = user;
@@ -241,11 +236,6 @@ export class DebugUtil {
     this.logger.warn(`From: ${debugInformation.user.name()}`, debugInformation.user);
 
     return debugInformation;
-  }
-
-  /** Used by QA test automation. */
-  isLibsodiumUsingWASM(): Promise<boolean> {
-    return ProteusUtil.WASMUtil.isUsingWASM();
   }
 
   /** Used by QA test automation. */

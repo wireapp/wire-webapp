@@ -49,13 +49,6 @@ function createConversations(
   return Array.from(new Array(nbConversations)).map(() => createConversation(protocol, type));
 }
 
-function mockCore() {
-  return {
-    configureMLSCallbacks: jest.fn(),
-    service: {mls: {registerConversation: jest.fn()}},
-  } as unknown as Account;
-}
-
 describe('MLSConversations', () => {
   beforeEach(() => {
     jest.spyOn(mlsConversationState.getState(), 'sendExternalToPendingJoin').mockReturnValue(undefined);
@@ -80,7 +73,7 @@ describe('MLSConversations', () => {
     });
 
     it('register all uninitiated conversations', async () => {
-      const core = mockCore();
+      const core = new Account();
       const nbProteusConversations = 5 + Math.ceil(Math.random() * 10);
       const nbMLSConversations = 5 + Math.ceil(Math.random() * 10);
 
@@ -98,7 +91,7 @@ describe('MLSConversations', () => {
     });
 
     it('does not register self and team conversation that have epoch > 0', async () => {
-      const core = mockCore();
+      const core = new Account();
       const nbProteusConversations = 5 + Math.ceil(Math.random() * 10);
       const nbMLSConversations = 5 + Math.ceil(Math.random() * 10);
 
