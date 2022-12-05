@@ -55,7 +55,7 @@ import {roundLogarithmic} from 'Util/NumberUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {createRandomUuid, loadUrlBlob} from 'Util/util';
+import {createRandomUuid, loadUrlBlob, supportsMLS} from 'Util/util';
 
 import {findDeletedClients} from './ClientMismatchUtil';
 import {ConversationRepository} from './ConversationRepository';
@@ -987,7 +987,7 @@ export class MessageRepository {
   }
 
   private async sendToSelfConversations(payload: GenericMessage) {
-    const selfConversations = this.conversationState.getSelfConversations();
+    const selfConversations = this.conversationState.getSelfConversations(supportsMLS());
     await Promise.all(
       selfConversations.map(selfConversation =>
         this.sendAndInjectMessage(payload, selfConversation, {

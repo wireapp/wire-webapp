@@ -118,10 +118,15 @@ export class ConversationState {
     });
   }
 
-  getSelfConversations(): Conversation[] {
-    return [this.selfMLSConversation(), this.selfProteusConversation()].filter(
-      (conversation): conversation is Conversation => !!conversation,
-    );
+  /**
+   * Returns all the selfConversations available (proteus and MLS)
+   * The MLS conversation can be manually filtered (in case MLS is not supported)
+   * @param includeMLS will filter out the MLS self conversation if false
+   */
+  getSelfConversations(includeMLS: boolean): Conversation[] {
+    const baseConversations = [this.selfProteusConversation()];
+    const selfConversations = includeMLS ? baseConversations.concat(this.selfMLSConversation()) : baseConversations;
+    return selfConversations.filter((conversation): conversation is Conversation => !!conversation);
   }
 
   getSelfProteusConversation(): Conversation {

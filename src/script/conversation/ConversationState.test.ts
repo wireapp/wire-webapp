@@ -64,26 +64,32 @@ describe('ConversationState', () => {
   describe('getSelfConversations', () => {
     it('returns empty array if there are no self conversations', () => {
       const conversationState = createConversationState();
-      expect(conversationState.getSelfConversations()).toEqual([]);
+      expect(conversationState.getSelfConversations(true)).toEqual([]);
       conversationState.conversations([selfProteusConversation, selfMLSConversation, regularConversation]);
     });
 
     it('returns only proteus self conversation', () => {
       const conversationState = createConversationState();
       conversationState.conversations([selfProteusConversation, regularConversation]);
-      expect(conversationState.getSelfConversations()).toEqual([selfProteusConversation]);
+      expect(conversationState.getSelfConversations(true)).toEqual([selfProteusConversation]);
     });
 
     it('returns only mls self conversation', () => {
       const conversationState = createConversationState();
       conversationState.conversations([selfMLSConversation, regularConversation]);
-      expect(conversationState.getSelfConversations()).toEqual([selfMLSConversation]);
+      expect(conversationState.getSelfConversations(true)).toEqual([selfMLSConversation]);
     });
 
     it('returns both the self MLS and proteus conversations', () => {
       const conversationState = createConversationState();
       conversationState.conversations([selfProteusConversation, selfMLSConversation, regularConversation]);
-      expect(conversationState.getSelfConversations()).toEqual([selfMLSConversation, selfProteusConversation]);
+      expect(conversationState.getSelfConversations(true)).toEqual([selfProteusConversation, selfMLSConversation]);
+    });
+
+    it('filters out mls conversation if not supported', () => {
+      const conversationState = createConversationState();
+      conversationState.conversations([selfProteusConversation, selfMLSConversation, regularConversation]);
+      expect(conversationState.getSelfConversations(false)).toEqual([selfProteusConversation]);
     });
   });
 
