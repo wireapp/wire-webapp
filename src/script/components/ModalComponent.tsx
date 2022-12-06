@@ -153,9 +153,9 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
       className={className}
       {...rest}
     >
-      {showLoading && <Icon.Loading width="48" height="48" css={{path: {fill: 'var(--modal-bg)'}}} />}
-
-      {!showLoading && !displayNone && (
+      {showLoading ? (
+        <Icon.Loading width="48" height="48" css={{path: {fill: 'var(--modal-bg)'}}} />
+      ) : (
         <div
           id={trapId}
           onClick={event => event.stopPropagation()}
