@@ -18,9 +18,9 @@
  */
 
 import {
-  ACCESS_ROLE_V2,
-  CONVERSATION_ACCESS,
   CONVERSATION_ACCESS_ROLE,
+  CONVERSATION_ACCESS,
+  CONVERSATION_LEGACY_ACCESS_ROLE,
   CONVERSATION_TYPE,
   DefaultConversationRoleName,
 } from '@wireapp/api-client/lib/conversation';
@@ -34,7 +34,7 @@ import {ConversationStatus} from '../../conversation/ConversationStatus';
 import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
 
 export interface ConversationRecord {
-  access_role: CONVERSATION_ACCESS_ROLE | ACCESS_ROLE_V2[];
+  access_role: CONVERSATION_LEGACY_ACCESS_ROLE | CONVERSATION_ACCESS_ROLE[];
   access: CONVERSATION_ACCESS[];
   archived_state: boolean;
   archived_timestamp: number;
