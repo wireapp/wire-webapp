@@ -62,33 +62,37 @@ const InviteModal: React.FC<InviteModalProps> = ({userState, onClose}) => {
   };
 
   return (
-    <div className="invite-modal">
-      <ModalComponent isShown onBgClick={onClose} onClosed={onClose} data-uie-name="modal-invite">
-        <div className="modal__header">
-          <h2 className="modal__header__title" data-uie-name="status-modal-title">
-            {t('inviteHeadline', brandName)}
-          </h2>
+    <ModalComponent
+      isShown
+      onBgClick={onClose}
+      onClosed={onClose}
+      data-uie-name="modal-invite"
+      className="invite-modal"
+    >
+      <div className="modal__header">
+        <h2 className="modal__header__title" data-uie-name="status-modal-title">
+          {t('inviteHeadline', brandName)}
+        </h2>
 
-          <button type="button" className="modal__header__button" onClick={onClose} data-uie-name="do-close">
-            <Icon.Close />
-          </button>
-        </div>
+        <button type="button" className="modal__header__button" onClick={onClose} data-uie-name="do-close">
+          <Icon.Close />
+        </button>
+      </div>
 
-        <div className="modal__body invite-modal__body">
-          <textarea
-            defaultValue={inviteMessage}
-            onClick={onClick}
-            onFocus={onFocus}
-            onBlur={onBlur}
-            className="modal__input reset-textarea invite-modal__message"
-            dir="auto"
-            data-uie-name="invite-modal-message"
-          />
+      <div className="modal__body invite-modal__body">
+        <textarea
+          defaultValue={inviteMessage}
+          onClick={onClick}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          className="modal__input reset-textarea invite-modal__message"
+          dir="auto"
+          data-uie-name="invite-modal-message"
+        />
 
-          <div className="modal__info invite-modal__info">{inviteHint}</div>
-        </div>
-      </ModalComponent>
-    </div>
+        <div className="modal__info invite-modal__info">{inviteHint}</div>
+      </div>
+    </ModalComponent>
   );
 };
 

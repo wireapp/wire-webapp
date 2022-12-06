@@ -143,60 +143,59 @@ const UserModal: React.FC<UserModalProps> = ({
   }, [userId?.id, userId?.domain]);
 
   return (
-    <div className="user-modal">
-      <ModalComponent
-        isShown={isShown}
-        onBgClick={hide}
-        onClosed={onModalClosed}
-        data-uie-name={user ? 'modal-user-profile' : userNotFound ? 'modal-cannot-open-profile' : ''}
-      >
-        <div className="modal__header">
-          {userNotFound && (
-            <h2 className="modal__header__title" data-uie-name="status-modal-title">
-              {t('userNotFoundTitle', brandName)}
-            </h2>
-          )}
+    <ModalComponent
+      isShown={isShown}
+      onBgClick={hide}
+      onClosed={onModalClosed}
+      className="user-modal"
+      data-uie-name={user ? 'modal-user-profile' : userNotFound ? 'modal-cannot-open-profile' : ''}
+    >
+      <div className="modal__header">
+        {userNotFound && (
+          <h2 className="modal__header__title" data-uie-name="status-modal-title">
+            {t('userNotFoundTitle', brandName)}
+          </h2>
+        )}
 
-          <Icon.Close className="modal__header__button" onClick={hide} data-uie-name="do-close" />
-        </div>
+        <Icon.Close className="modal__header__button" onClick={hide} data-uie-name="do-close" />
+      </div>
 
-        <div className={cx('modal__body user-modal__wrapper', {'user-modal__wrapper--max': !user && !userNotFound})}>
-          {user && (
-            <>
-              <UserDetails participant={user} isSelfVerified={isSelfVerified} classifiedDomains={classifiedDomains} />
+      <div className={cx('modal__body user-modal__wrapper', {'user-modal__wrapper--max': !user && !userNotFound})}>
+        {user && (
+          <>
+            <UserDetails participant={user} isSelfVerified={isSelfVerified} classifiedDomains={classifiedDomains} />
 
-              <EnrichedFields user={user} showDomain={isFederated} />
+            <EnrichedFields user={user} showDomain={isFederated} />
 
-              <UserModalUserActionsSection
-                user={user}
-                onAction={hide}
-                isSelfActivated={isActivatedAccount}
-                selfUser={self}
-              />
-            </>
-          )}
-          {isShown && !user && !userNotFound && (
-            <div className="loading-wrapper">
-              <Icon.Loading aria-hidden="true" />
+            <UserModalUserActionsSection
+              user={user}
+              onAction={hide}
+              isSelfActivated={isActivatedAccount}
+              selfUser={self}
+            />
+          </>
+        )}
+        {isShown && !user && !userNotFound && (
+          <div className="loading-wrapper">
+            <Icon.Loading aria-hidden="true" />
+          </div>
+        )}
+
+        {userNotFound && (
+          <>
+            <div className="modal__message" data-uie-name="status-modal-text">
+              {t('userNotFoundMessage', brandName)}
             </div>
-          )}
 
-          {userNotFound && (
-            <>
-              <div className="modal__message" data-uie-name="status-modal-text">
-                {t('userNotFoundMessage', brandName)}
-              </div>
-
-              <div className="modal__buttons">
-                <button className="modal__button modal__button--confirm" data-uie-name="do-ok" onClick={hide}>
-                  {t('modalAcknowledgeAction')}
-                </button>
-              </div>
-            </>
-          )}
-        </div>
-      </ModalComponent>
-    </div>
+            <div className="modal__buttons">
+              <button className="modal__button modal__button--confirm" data-uie-name="do-ok" onClick={hide}>
+                {t('modalAcknowledgeAction')}
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </ModalComponent>
   );
 };
 

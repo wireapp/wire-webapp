@@ -69,9 +69,9 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({listViewModel, selfUser, isAct
   }, []);
 
   return (
-    <div id="left-column" className={cx('left-column', {'left-column--light-theme': !isActivatedAccount})}>
+    <aside id="left-column" className={cx('left-column', {'left-column--light-theme': !isActivatedAccount})}>
       <header>
-        <h1 className="visually-hidden">{t('accessibility.headings.sidebar')}</h1>
+        <h2 className="visually-hidden">{t('accessibility.headings.sidebar')}</h2>
       </header>
 
       <SwitchTransition>
@@ -129,7 +129,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({listViewModel, selfUser, isAct
           </>
         </Animated>
       </SwitchTransition>
-    </div>
+    </aside>
   );
 };
 
