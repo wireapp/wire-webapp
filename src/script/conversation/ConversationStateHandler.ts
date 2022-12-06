@@ -67,7 +67,11 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
               conversationEntity.accessCode(undefined);
               await this.revokeAccessCode(conversationEntity);
             }
-            await this.conversationService.putConversationAccess(conversationEntity.id, accessModes, accessRole);
+
+            const {domain, id} = conversationEntity;
+            const conversationId = domain ? {id, domain} : id;
+
+            await this.conversationService.putConversationAccess(conversationId, accessModes, accessRole);
 
             conversationEntity.accessState(accessState);
           } catch (e) {

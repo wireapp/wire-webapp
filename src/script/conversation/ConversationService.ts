@@ -220,7 +220,7 @@ export class ConversationService {
    * @returns Resolves with the server response
    */
   putConversationAccess(
-    conversationId: string,
+    conversationId: QualifiedId | string,
     accessModes: CONVERSATION_ACCESS[],
     accessRole: CONVERSATION_ACCESS_ROLE[],
   ): Promise<ConversationEvent> {
