@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [22.8.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@22.7.0...@wireapp/api-client@22.8.0) (2022-12-06)
+
+### Features
+
+* **api-client:** api v3 change access_role type definition [FS-1192] ([#4682](https://github.com/wireapp/wire-web-packages/issues/4682)) ([638643c](https://github.com/wireapp/wire-web-packages/commit/638643c25813eaab495df03dd9f9d138deb74275))
+
 # [22.7.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@22.6.1...@wireapp/api-client@22.7.0) (2022-11-22)
 
 ### Features
