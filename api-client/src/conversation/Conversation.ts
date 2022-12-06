@@ -31,14 +31,14 @@ export enum CONVERSATION_TYPE {
   GLOBAL_TEAM = 4,
 }
 
-export enum CONVERSATION_ACCESS_ROLE {
+export enum CONVERSATION_LEGACY_ACCESS_ROLE {
   ACTIVATED = 'activated',
   NON_ACTIVATED = 'non_activated',
   PRIVATE = 'private',
   TEAM = 'team',
 }
 
-export enum ACCESS_ROLE_V2 {
+export enum CONVERSATION_ACCESS_ROLE {
   TEAM_MEMBER = 'team_member',
   SERVICE = 'service',
   NON_TEAM_MEMBER = 'non_team_member',
@@ -65,9 +65,10 @@ export interface Conversation {
   access: CONVERSATION_ACCESS[];
 
   /** How users can join conversations */
-  /** @deprecated Use access_role_v2 instead */
-  access_role: CONVERSATION_ACCESS_ROLE;
-  access_role_v2: ACCESS_ROLE_V2[];
+  //CONVERSATION_ACCESS_ROLE for api <= v2, ACCESS_ROLE_V2[] since api v3
+  access_role: CONVERSATION_LEGACY_ACCESS_ROLE | CONVERSATION_ACCESS_ROLE[];
+  /** @deprecated Use access_role instead */
+  access_role_v2?: CONVERSATION_ACCESS_ROLE[];
   name?: string;
   last_event?: string;
   last_event_time?: string;
