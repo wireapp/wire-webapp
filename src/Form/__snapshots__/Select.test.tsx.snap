@@ -120,17 +120,17 @@ exports[`"Select" renders 1`] = `
   -webkit-flex-wrap: wrap;
   -ms-flex-wrap: wrap;
   flex-wrap: wrap;
-  padding: 0;
   -webkit-overflow-scrolling: touch;
   position: relative;
   overflow: hidden;
+  padding: 0;
   box-sizing: border-box;
   width: 100%;
 }
 
 .emotion-7 {
-  color: hsl(0, 0%, 50%);
   grid-area: 1/1/2/3;
+  color: hsl(0, 0%, 50%);
   margin-left: 2px;
   margin-right: 2px;
   box-sizing: border-box;
@@ -178,14 +178,14 @@ exports[`"Select" renders 1`] = `
 }
 
 .emotion-11 {
-  color: hsl(0, 0%, 80%);
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  padding: 8px;
   -webkit-transition: color 150ms;
   transition: color 150ms;
+  color: hsl(0, 0%, 80%);
+  padding: 8px;
   box-sizing: border-box;
 }
 
@@ -401,17 +401,17 @@ exports[`"Select" renders as disabled 1`] = `
   -webkit-flex-wrap: wrap;
   -ms-flex-wrap: wrap;
   flex-wrap: wrap;
-  padding: 0;
   -webkit-overflow-scrolling: touch;
   position: relative;
   overflow: hidden;
+  padding: 0;
   box-sizing: border-box;
   width: 100%;
 }
 
 .emotion-7 {
-  color: hsl(0, 0%, 50%);
   grid-area: 1/1/2/3;
+  color: hsl(0, 0%, 50%);
   margin-left: 2px;
   margin-right: 2px;
   box-sizing: border-box;
@@ -459,14 +459,14 @@ exports[`"Select" renders as disabled 1`] = `
 }
 
 .emotion-11 {
-  color: hsl(0, 0%, 80%);
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  padding: 8px;
   -webkit-transition: color 150ms;
   transition: color 150ms;
+  color: hsl(0, 0%, 80%);
+  padding: 8px;
   box-sizing: border-box;
 }
 
@@ -691,17 +691,17 @@ exports[`"Select" renders as invalid 1`] = `
   -webkit-flex-wrap: wrap;
   -ms-flex-wrap: wrap;
   flex-wrap: wrap;
-  padding: 0;
   -webkit-overflow-scrolling: touch;
   position: relative;
   overflow: hidden;
+  padding: 0;
   box-sizing: border-box;
   width: 100%;
 }
 
 .emotion-7 {
-  color: hsl(0, 0%, 50%);
   grid-area: 1/1/2/3;
+  color: hsl(0, 0%, 50%);
   margin-left: 2px;
   margin-right: 2px;
   box-sizing: border-box;
@@ -749,14 +749,14 @@ exports[`"Select" renders as invalid 1`] = `
 }
 
 .emotion-11 {
-  color: hsl(0, 0%, 80%);
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  padding: 8px;
   -webkit-transition: color 150ms;
   transition: color 150ms;
+  color: hsl(0, 0%, 80%);
+  padding: 8px;
   box-sizing: border-box;
 }
 
