@@ -153,9 +153,9 @@ describe('NotificationRepository', () => {
           expect(testFactory.notification_repository.showNotification).toHaveBeenCalledTimes(1);
 
           const trigger = testFactory.notification_repository.createTrigger(message_et, null, conversation_et);
-          notification_content.options.body = z.string.notificationObfuscated;
+          notification_content.options.body = t('notificationObfuscated');
           notification_content.options.data.messageType = _message.type;
-          notification_content.title = z.string.notificationObfuscatedTitle;
+          notification_content.title = t('notificationObfuscatedTitle');
           notification_content.trigger = trigger;
 
           const [firstResultArgs] = testFactory.notification_repository.showNotification.calls.first().args;
@@ -176,11 +176,11 @@ describe('NotificationRepository', () => {
             const titleLength = NotificationRepository.CONFIG.TITLE_LENGTH;
             const titleText = `${message_et.user().name()} in ${conversation_et.display_name()}`;
 
-            notification_content.options.body = z.string.notificationObfuscated;
+            notification_content.options.body = t('notificationObfuscated');
             notification_content.title = truncate(titleText, titleLength, false);
           } else {
-            notification_content.options.body = z.string.notificationObfuscated;
-            notification_content.title = z.string.notificationObfuscatedTitle;
+            notification_content.options.body = t('notificationObfuscated');
+            notification_content.title = t('notificationObfuscatedTitle');
           }
           notification_content.options.data.messageType = _message.type;
 
@@ -372,7 +372,7 @@ describe('NotificationRepository', () => {
 
   describe('shows a well-formed call notification', () => {
     describe('for an incoming call', () => {
-      const expected_body = z.string.notificationVoiceChannelActivate;
+      const expected_body = t('notificationVoiceChannelActivate');
 
       beforeEach(() => {
         message_et = new CallMessage();
@@ -391,7 +391,7 @@ describe('NotificationRepository', () => {
     });
 
     describe('for a missed call', () => {
-      const expected_body = z.string.notificationVoiceChannelDeactivate;
+      const expected_body = t('notificationVoiceChannelDeactivate');
 
       beforeEach(() => {
         message_et = new CallMessage();
@@ -451,7 +451,7 @@ describe('NotificationRepository', () => {
     describe('for a picture', () => {
       beforeEach(() => {
         message_et.assets.push(new MediumImage());
-        expected_body = z.string.notificationAssetAdd;
+        expected_body = t('notificationAssetAdd');
       });
 
       it('in a 1:1 conversation', () => {
@@ -479,7 +479,7 @@ describe('NotificationRepository', () => {
     describe('for a location', () => {
       beforeEach(() => {
         message_et.assets.push(new Location());
-        expected_body = z.string.notificationSharedLocation;
+        expected_body = t('notificationSharedLocation');
       });
 
       it('in a 1:1 conversation', () => {
@@ -685,7 +685,7 @@ describe('NotificationRepository', () => {
       connectionEntity.status = 'pending';
       message_et.memberMessageType = SystemMessageType.CONNECTION_REQUEST;
 
-      const expected_body = z.string.notificationConnectionRequest;
+      const expected_body = t('notificationConnectionRequest');
       expect(expected_body).toBeDefined();
       return verifyNotificationSystem(conversation_et, message_et, expected_body, expected_title);
     });
@@ -693,7 +693,7 @@ describe('NotificationRepository', () => {
     it('if your connection request was accepted', () => {
       message_et.memberMessageType = SystemMessageType.CONNECTION_ACCEPTED;
 
-      const expected_body = z.string.notificationConnectionAccepted;
+      const expected_body = t('notificationConnectionAccepted');
       expect(expected_body).toBeDefined();
       return verifyNotificationSystem(conversation_et, message_et, expected_body, expected_title);
     });
@@ -701,14 +701,14 @@ describe('NotificationRepository', () => {
     it('if you are automatically connected', () => {
       message_et.memberMessageType = SystemMessageType.CONNECTION_CONNECTED;
 
-      const expected_body = z.string.notificationConnectionConnected;
+      const expected_body = t('notificationConnectionConnected');
       expect(expected_body).toBeDefined();
       return verifyNotificationSystem(conversation_et, message_et, expected_body, expected_title);
     });
   });
 
   describe('shows a well-formed ping notification', () => {
-    const expected_body = z.string.notificationPing;
+    const expected_body = t('notificationPing');
 
     beforeAll(() => {
       user_et = testFactory.user_repository.userMapper.mapUserFromJson(payload.users.get.one[0]);

@@ -508,7 +508,7 @@ describe('Conversation', () => {
     it('displays "Empty Conversation" if no other participants are in the conversation', () => {
       conversation_et.type(CONVERSATION_TYPE.REGULAR);
 
-      expect(conversation_et.display_name()).toBe(window.z.string.conversationsEmptyConversation);
+      expect(conversation_et.display_name()).toBe('Group conversation');
     });
 
     it('displays a fallback if no user name has been set for a group conversation', () => {

@@ -17,16 +17,13 @@
  *
  */
 
-import {User} from 'src/script/entity/User';
-import 'src/script/localization/Localizer';
-import {escapeRegex, getSelfName, getUserName, safeWindowOpen} from 'src/script/util/SanitizationUtil';
-import {Declension, LocalizerUtil, setStrings} from 'Util/LocalizerUtil';
+import {Declension, LocalizerUtil, t} from 'Util/LocalizerUtil';
+
+import {escapeRegex, getSelfName, getUserName, safeWindowOpen} from './SanitizationUtil';
+
+import {User} from '../entity/User';
 
 describe('SanitizationUtil', () => {
-  beforeEach(() => {
-    setStrings({en: z.string});
-  });
-
   describe('escapeRegex', () => {
     it('will return escaped regex strings', () => {
       const escapedRegex = escapeRegex(':)');
@@ -48,7 +45,7 @@ describe('SanitizationUtil', () => {
       userEntity.isMe = true;
       const escapedSelfName = getUserName(userEntity);
 
-      expect(escapedSelfName).toEqual('you');
+      expect(escapedSelfName).toEqual(t('conversationYouNominative'));
     });
   });
 
@@ -57,15 +54,15 @@ describe('SanitizationUtil', () => {
       // eslint-disable-line
       const escapedNominativeName = getSelfName(Declension.NOMINATIVE);
 
-      expect(escapedNominativeName).toEqual('you');
+      expect(escapedNominativeName).toEqual(t('conversationYouNominative'));
 
       const unescapedNominativeName = getSelfName(Declension.NOMINATIVE, true);
 
-      expect(unescapedNominativeName).toEqual('you');
+      expect(unescapedNominativeName).toEqual(t('conversationYouNominative'));
 
       const escapedDativeName = getSelfName(Declension.DATIVE);
 
-      expect(escapedDativeName).toEqual('you');
+      expect(escapedDativeName).toEqual(t('conversationYouDative'));
 
       spyOn(LocalizerUtil, 'translate').and.returnValue('<script>you</script>');
       const escapedAccusativeName = getSelfName(Declension.DATIVE);
@@ -84,7 +81,7 @@ describe('SanitizationUtil', () => {
         focus: jest.fn(),
         opener: 'remove me',
       };
-      jest.spyOn(window, 'open').mockImplementation(() => mockedWindow);
+      jest.spyOn(window, 'open').mockImplementation(() => mockedWindow as any);
       const newWindow = safeWindowOpen('https://wire.com/');
 
       expect(newWindow.opener).toBeNull();
