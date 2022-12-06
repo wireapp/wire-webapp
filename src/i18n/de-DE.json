@@ -266,7 +266,7 @@
   "connectionRequestConnect": "Kontakt hinzufügen",
   "connectionRequestIgnore": "Ignorieren",
   "conversationAssetDownloading": "Herunterladen…",
-  "conversationAssetFailedDecryptDownloading": "DOWNLOAD FAILED (File could not be decrypted)",
+  "conversationAssetFailedDecryptDownloading": "DOWNLOAD FEHLGESCHLADEN (Datei konnte nicht entschlüsselt werden)",
   "conversationAssetFailedHashDownloading": "DOWNLOAD FAILED (HASH DOES NOT MATCH)",
   "conversationAssetRestrictedAudioMessageHeadline": "Audionachricht",
   "conversationAssetUploadFailed": "Hochladen fehlgeschlagen",
