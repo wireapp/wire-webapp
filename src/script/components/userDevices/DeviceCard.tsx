@@ -80,12 +80,12 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
         <div className="label-xs">
           <span className="device-card__model">{name}</span>
         </div>
-        <div className="text-background label-xs">
+        <p className="text-background label-xs">
           <span>{t('preferencesDevicesId')}</span>
           <span data-uie-name="device-id">
             <DeviceId deviceId={id} />
           </span>
-        </div>
+        </p>
       </div>
       {showVerified && <VerifiedIcon isVerified={!!isVerified && isVerified()} />}
       {clickable && <Icon.ChevronRight className="disclose-icon" data-uie-name="disclose-icon" />}

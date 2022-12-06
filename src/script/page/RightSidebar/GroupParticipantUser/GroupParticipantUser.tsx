@@ -201,9 +201,9 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
               </div>
             </div>
 
-            <div className="panel__info-text panel__item-offset" css={{padding: '16px'}} tabIndex={0}>
+            <p className="panel__info-text panel__item-offset" css={{padding: '16px'}} tabIndex={0}>
               {t('conversationDetailsGroupAdminInfo')}
-            </div>
+            </p>
           </>
         )}
 

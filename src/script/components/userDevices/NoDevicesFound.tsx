@@ -38,14 +38,14 @@ const NoDevicesFound: React.FC<NoDevicesFoundProps> = ({user, noPadding}) => {
 
   return (
     <div className={cx('participant-devices__header', {'participant-devices__header--padding': !noPadding})}>
-      <div className="participant-devices__text-block panel__info-text" data-uie-name="status-devices-headline">
+      <p className="participant-devices__text-block panel__info-text" data-uie-name="status-devices-headline">
         {user
           ? t('participantDevicesOutdatedClientMessage', {
               brandName: Config.getConfig().BRAND_NAME,
               user: userName,
             })
           : ''}
-      </div>
+      </p>
       <a
         className="participant-devices__link accent-text"
         href={getPrivacyPolicyUrl()}
