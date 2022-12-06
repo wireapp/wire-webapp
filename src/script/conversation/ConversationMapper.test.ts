@@ -18,10 +18,10 @@
  */
 
 import {
-  ACCESS_ROLE_V2,
+  CONVERSATION_ACCESS_ROLE,
   Conversation as ConversationBackendData,
   CONVERSATION_ACCESS,
-  CONVERSATION_ACCESS_ROLE,
+  CONVERSATION_LEGACY_ACCESS_ROLE,
   CONVERSATION_TYPE,
   Member as MemberBackendData,
   OtherMember as OtherMemberBackendData,
@@ -345,7 +345,7 @@ describe('ConversationMapper', () => {
 
       const remoteData: Partial<ConversationDatabaseData> = {
         access: [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE],
-        access_role: CONVERSATION_ACCESS_ROLE.NON_ACTIVATED,
+        access_role: CONVERSATION_LEGACY_ACCESS_ROLE.NON_ACTIVATED,
         creator: conversationCreatorId,
         id: conversationId,
         last_event_timestamp: new Date('1970-01-01T00:00:00.000Z').getTime(),
@@ -631,14 +631,18 @@ describe('ConversationMapper', () => {
       const accessModes = [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE];
       // ACCESS_STATE.TEAM.GUESTS_SERVICES
       const accessRole = [
-        ACCESS_ROLE_V2.GUEST,
-        ACCESS_ROLE_V2.NON_TEAM_MEMBER,
-        ACCESS_ROLE_V2.TEAM_MEMBER,
-        ACCESS_ROLE_V2.SERVICE,
+        CONVERSATION_ACCESS_ROLE.GUEST,
+        CONVERSATION_ACCESS_ROLE.NON_TEAM_MEMBER,
+        CONVERSATION_ACCESS_ROLE.TEAM_MEMBER,
+        CONVERSATION_ACCESS_ROLE.SERVICE,
       ];
 
       // ACCESS_STATE.TEAM.GUEST_ROOM
-      const accessRoleV2 = [ACCESS_ROLE_V2.GUEST, ACCESS_ROLE_V2.NON_TEAM_MEMBER, ACCESS_ROLE_V2.TEAM_MEMBER];
+      const accessRoleV2 = [
+        CONVERSATION_ACCESS_ROLE.GUEST,
+        CONVERSATION_ACCESS_ROLE.NON_TEAM_MEMBER,
+        CONVERSATION_ACCESS_ROLE.TEAM_MEMBER,
+      ];
 
       const conversationEntity = new Conversation('conversation-id', 'domain');
       conversationEntity.team_id = 'team_id';
@@ -651,13 +655,13 @@ describe('ConversationMapper', () => {
       const accessModes = [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE];
       // ACCESS_STATE.TEAM.GUESTS_SERVICES
       const accessRole = [
-        ACCESS_ROLE_V2.GUEST,
-        ACCESS_ROLE_V2.NON_TEAM_MEMBER,
-        ACCESS_ROLE_V2.TEAM_MEMBER,
-        ACCESS_ROLE_V2.SERVICE,
+        CONVERSATION_ACCESS_ROLE.GUEST,
+        CONVERSATION_ACCESS_ROLE.NON_TEAM_MEMBER,
+        CONVERSATION_ACCESS_ROLE.TEAM_MEMBER,
+        CONVERSATION_ACCESS_ROLE.SERVICE,
       ];
 
-      const accessRoleV2 = undefined;
+      const accessRoleV2: undefined = undefined;
 
       const conversationEntity = new Conversation();
       conversationEntity.team_id = 'team_id';
@@ -669,54 +673,54 @@ describe('ConversationMapper', () => {
     describe('maps roles properly for legacy api < v3', () => {
       const mockRightsLegacy: [
         ACCESS_STATE,
-        {accessRole: CONVERSATION_ACCESS_ROLE; accessModes: CONVERSATION_ACCESS[]},
+        {accessRole: CONVERSATION_LEGACY_ACCESS_ROLE; accessModes: CONVERSATION_ACCESS[]},
       ][] = [
         [
           ACCESS_STATE.TEAM.TEAM_ONLY,
           {
-            accessRole: CONVERSATION_ACCESS_ROLE.TEAM,
+            accessRole: CONVERSATION_LEGACY_ACCESS_ROLE.TEAM,
             accessModes: [CONVERSATION_ACCESS.INVITE],
           },
         ],
         [
           ACCESS_STATE.TEAM.GUEST_ROOM,
           {
-            accessRole: CONVERSATION_ACCESS_ROLE.ACTIVATED,
+            accessRole: CONVERSATION_LEGACY_ACCESS_ROLE.ACTIVATED,
             accessModes: [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE],
           },
         ],
         [
           ACCESS_STATE.TEAM.GUESTS_SERVICES,
           {
-            accessRole: CONVERSATION_ACCESS_ROLE.NON_ACTIVATED,
+            accessRole: CONVERSATION_LEGACY_ACCESS_ROLE.NON_ACTIVATED,
             accessModes: [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE],
           },
         ],
         [
           ACCESS_STATE.TEAM.LEGACY,
           {
-            accessRole: CONVERSATION_ACCESS_ROLE.NON_ACTIVATED,
+            accessRole: CONVERSATION_LEGACY_ACCESS_ROLE.NON_ACTIVATED,
             accessModes: [CONVERSATION_ACCESS.INVITE],
           },
         ],
         [
           ACCESS_STATE.TEAM.LEGACY,
           {
-            accessRole: CONVERSATION_ACCESS_ROLE.NON_ACTIVATED,
+            accessRole: CONVERSATION_LEGACY_ACCESS_ROLE.NON_ACTIVATED,
             accessModes: [CONVERSATION_ACCESS.CODE],
           },
         ],
         [
           ACCESS_STATE.TEAM.LEGACY,
           {
-            accessRole: CONVERSATION_ACCESS_ROLE.TEAM,
+            accessRole: CONVERSATION_LEGACY_ACCESS_ROLE.TEAM,
             accessModes: [CONVERSATION_ACCESS.CODE],
           },
         ],
         [
           ACCESS_STATE.TEAM.LEGACY,
           {
-            accessRole: CONVERSATION_ACCESS_ROLE.TEAM,
+            accessRole: CONVERSATION_LEGACY_ACCESS_ROLE.TEAM,
             accessModes: [CONVERSATION_ACCESS.CODE, CONVERSATION_ACCESS.INVITE],
           },
         ],
@@ -735,24 +739,28 @@ describe('ConversationMapper', () => {
       const mockRightsV3 = {
         [ACCESS_STATE.TEAM.GUESTS_SERVICES]: {
           accessRole: [
-            ACCESS_ROLE_V2.GUEST,
-            ACCESS_ROLE_V2.NON_TEAM_MEMBER,
-            ACCESS_ROLE_V2.TEAM_MEMBER,
-            ACCESS_ROLE_V2.SERVICE,
+            CONVERSATION_ACCESS_ROLE.GUEST,
+            CONVERSATION_ACCESS_ROLE.NON_TEAM_MEMBER,
+            CONVERSATION_ACCESS_ROLE.TEAM_MEMBER,
+            CONVERSATION_ACCESS_ROLE.SERVICE,
           ],
           accessModes: [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE],
         },
         [ACCESS_STATE.TEAM.GUEST_ROOM]: {
-          accessRole: [ACCESS_ROLE_V2.GUEST, ACCESS_ROLE_V2.NON_TEAM_MEMBER, ACCESS_ROLE_V2.TEAM_MEMBER],
+          accessRole: [
+            CONVERSATION_ACCESS_ROLE.GUEST,
+            CONVERSATION_ACCESS_ROLE.NON_TEAM_MEMBER,
+            CONVERSATION_ACCESS_ROLE.TEAM_MEMBER,
+          ],
           accessModes: [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE],
         },
         [ACCESS_STATE.TEAM.SERVICES]: {
           accessModes: [CONVERSATION_ACCESS.INVITE],
-          accessRole: [ACCESS_ROLE_V2.TEAM_MEMBER, ACCESS_ROLE_V2.SERVICE],
+          accessRole: [CONVERSATION_ACCESS_ROLE.TEAM_MEMBER, CONVERSATION_ACCESS_ROLE.SERVICE],
         },
         [ACCESS_STATE.TEAM.TEAM_ONLY]: {
           accessModes: [CONVERSATION_ACCESS.INVITE],
-          accessRole: [ACCESS_ROLE_V2.TEAM_MEMBER],
+          accessRole: [CONVERSATION_ACCESS_ROLE.TEAM_MEMBER],
         },
       };
 

@@ -18,11 +18,11 @@
  */
 
 import {
-  ACCESS_ROLE_V2,
+  CONVERSATION_ACCESS_ROLE,
   Conversation as ConversationBackendData,
   ConversationCode,
   CONVERSATION_ACCESS,
-  CONVERSATION_ACCESS_ROLE,
+  CONVERSATION_LEGACY_ACCESS_ROLE,
   CONVERSATION_TYPE,
   DefaultConversationRoleName,
   RemoteConversations,
@@ -69,9 +69,9 @@ export interface SelfStatusUpdateDatabaseData {
 export type ConversationDatabaseData = ConversationRecord &
   Partial<ConversationBackendData> & {
     accessModes?: CONVERSATION_ACCESS[];
-    //CONVERSATION_ACCESS_ROLE for api <= v2, ACCESS_ROLE_V2[] since api v3
-    accessRole?: CONVERSATION_ACCESS_ROLE | ACCESS_ROLE_V2[];
-    accessRoleV2?: ACCESS_ROLE_V2[];
+    //CONVERSATION_LEGACY_ACCESS_ROLE for api <= v2, CONVERSATION_ACCESS_ROLE[] since api v3
+    accessRole?: CONVERSATION_LEGACY_ACCESS_ROLE | CONVERSATION_ACCESS_ROLE[];
+    accessRoleV2?: CONVERSATION_ACCESS_ROLE[];
     roles: {[userId: string]: DefaultConversationRoleName | string};
     status: ConversationStatus;
     team_id: string;
@@ -437,8 +437,8 @@ export class ConversationMapper {
   static mapAccessState(
     conversationEntity: Conversation,
     accessModes: CONVERSATION_ACCESS[],
-    accessRole: CONVERSATION_ACCESS_ROLE | ACCESS_ROLE_V2[],
-    accessRoleV2?: ACCESS_ROLE_V2[],
+    accessRole: CONVERSATION_LEGACY_ACCESS_ROLE | CONVERSATION_ACCESS_ROLE[],
+    accessRoleV2?: CONVERSATION_ACCESS_ROLE[],
   ): typeof ACCESS_STATE {
     if (conversationEntity.team_id) {
       if (conversationEntity.is1to1()) {
@@ -478,17 +478,20 @@ export class ConversationMapper {
     return conversationEntity.accessState(personalAccessState);
   }
 
-  private static mapAccessStateV2(accessRole: ACCESS_ROLE_V2[]) {
-    if (!accessRole.includes(ACCESS_ROLE_V2.TEAM_MEMBER)) {
+  private static mapAccessStateV2(accessRole: CONVERSATION_ACCESS_ROLE[]) {
+    if (!accessRole.includes(CONVERSATION_ACCESS_ROLE.TEAM_MEMBER)) {
       return undefined;
     }
 
-    if (accessRole.includes(ACCESS_ROLE_V2.GUEST) || accessRole.includes(ACCESS_ROLE_V2.NON_TEAM_MEMBER)) {
-      if (accessRole.includes(ACCESS_ROLE_V2.SERVICE)) {
+    if (
+      accessRole.includes(CONVERSATION_ACCESS_ROLE.GUEST) ||
+      accessRole.includes(CONVERSATION_ACCESS_ROLE.NON_TEAM_MEMBER)
+    ) {
+      if (accessRole.includes(CONVERSATION_ACCESS_ROLE.SERVICE)) {
         return ACCESS_STATE.TEAM.GUESTS_SERVICES;
       }
       return ACCESS_STATE.TEAM.GUEST_ROOM;
-    } else if (accessRole.includes(ACCESS_ROLE_V2.SERVICE)) {
+    } else if (accessRole.includes(CONVERSATION_ACCESS_ROLE.SERVICE)) {
       return ACCESS_STATE.TEAM.SERVICES;
     }
     return ACCESS_STATE.TEAM.TEAM_ONLY;
@@ -496,9 +499,9 @@ export class ConversationMapper {
 
   private static mapLegacyAccessState(
     accessModes: CONVERSATION_ACCESS[],
-    accessRole: CONVERSATION_ACCESS_ROLE,
+    accessRole: CONVERSATION_LEGACY_ACCESS_ROLE,
   ): ACCESS_STATE {
-    const isTeamRole = accessRole === CONVERSATION_ACCESS_ROLE.TEAM;
+    const isTeamRole = accessRole === CONVERSATION_LEGACY_ACCESS_ROLE.TEAM;
 
     const includesInviteMode = accessModes.includes(CONVERSATION_ACCESS.INVITE);
     const isInviteModeOnly = includesInviteMode && accessModes.length === 1;
@@ -508,11 +511,11 @@ export class ConversationMapper {
       return ACCESS_STATE.TEAM.TEAM_ONLY;
     }
 
-    const isVerifiedRole = accessRole === CONVERSATION_ACCESS_ROLE.ACTIVATED;
+    const isVerifiedRole = accessRole === CONVERSATION_LEGACY_ACCESS_ROLE.ACTIVATED;
     if (isVerifiedRole) {
       return ACCESS_STATE.TEAM.GUEST_ROOM;
     }
-    const isNonVerifiedRole = accessRole === CONVERSATION_ACCESS_ROLE.NON_ACTIVATED;
+    const isNonVerifiedRole = accessRole === CONVERSATION_LEGACY_ACCESS_ROLE.NON_ACTIVATED;
 
     const includesCodeMode = accessModes.includes(CONVERSATION_ACCESS.CODE);
     const isExpectedModes = includesCodeMode && includesInviteMode && accessModes.length === 2;
