@@ -176,6 +176,7 @@
   min-width: 0; // fixes ellipsis not working with flexbox (FF)
   flex: 1;
   align-items: center;
+  padding-right: var(--conversation-message-timestamp-width);
   font-size: @font-size-small;
   font-weight: @font-weight-regular;
   white-space: normal;
@@ -249,15 +250,6 @@
   height: 16px;
 }
 
-.message-header-line {
-  min-width: var(--conversation-message-timestamp-width);
-  height: 1px;
-  flex: 1;
-  border: none;
-  margin-left: 16px;
-  background: @separator-color;
-}
-
 // MESSAGE - TIMESTAMP
 .message-timestamp {
   height: 48px;
@@ -288,7 +280,6 @@
 
   &:not(.message-timestamp-day) {
     border: 0;
-    margin-right: var(--conversation-message-timestamp-width);
 
     .message-header-label {
       border-bottom: 1px dotted @separator-color;
@@ -514,7 +505,7 @@
   right: 0;
   display: flex;
   width: var(--conversation-message-timestamp-width);
-  height: @line-height-lg;
+  height: 24px;
   align-items: center;
 
   @media (max-width: @screen-md-min) {
@@ -576,6 +567,7 @@
   .message-status-read {
     .action-pill-style;
     color: var(--gray-70);
+    font-size: 12px !important;
     pointer-events: none;
     user-select: none;
 
@@ -619,11 +611,6 @@
       content: '';
     }
   }
-}
-
-.message-body-actions-large {
-  position: relative;
-  width: 160px;
 }
 
 .message-services-warning {

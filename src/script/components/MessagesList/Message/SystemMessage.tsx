@@ -49,13 +49,12 @@ const SystemMessage: React.FC<SystemMessageProps> = ({message}) => {
           {message.system_message_type === SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE && <Icon.Timer />}
           {message.system_message_type === SystemMessageType.CONVERSATION_RECEIPT_MODE_UPDATE && <Icon.Read />}
         </div>
-        <div className="message-header-label">
+        <p className="message-header-label">
           <span className="message-header-label__multiline">
             <span className="message-header-sender-name">{unsafeSenderName}</span>
             <span className="ellipsis">{caption}</span>
           </span>
-          <hr className="message-header-line" />
-        </div>
+        </p>
         <div className="message-body-actions">
           <MessageTime timestamp={timestamp} data-uie-uid={message.id} data-uie-name="item-message-call-timestamp" />
         </div>

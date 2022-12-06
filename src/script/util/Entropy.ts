@@ -20,7 +20,7 @@
 export interface EntropyFrame {
   x: number;
   y: number;
-  t?: number;
+  t: number;
 }
 
 /**
@@ -74,7 +74,7 @@ export class EntropyData {
       this.frames.reduce((acc: number[], val: EntropyFrame) => {
         acc.push(val.x);
         acc.push(val.y);
-        acc.push(val.t || 0);
+        acc.push(val.t);
         return acc;
       }, []),
     );
@@ -83,15 +83,27 @@ export class EntropyData {
   get entropyBits(): number {
     const entropyData = this.entropyData;
     const entropy = shannonEntropy(entropyData);
-    const deltaValues = calculateDeltaValues(entropyData, ~~(entropyData.length / this.frames.length));
+    const valuesPerFrame = ~~(entropyData.length / this.frames.length);
+    // 1st derivation
+    const deltaValues = calculateDeltaValues(entropyData, valuesPerFrame);
     const deltaEntropy = shannonEntropy(deltaValues);
+    // 2nd derivation
+    const delta2Values = calculateDeltaValues(deltaValues, valuesPerFrame);
+    const delta2Entropy = shannonEntropy(delta2Values);
+    // 3rd derivation
+    const delta3Values = calculateDeltaValues(delta2Values, valuesPerFrame);
+    const delta3Entropy = shannonEntropy(delta3Values);
 
-    return Math.min(entropy * entropyData.length, deltaEntropy * deltaValues.length);
+    return Math.min(entropy, deltaEntropy, delta2Entropy, delta3Entropy) * entropyData.length;
   }
 
-  addFrame(value: EntropyFrame): void {
+  addFrame(value: EntropyFrame, duplicateCheck = true): void {
+    value.x &= 0xff;
+    value.y &= 0xff;
+    value.t &= 0xff;
     // skip duplicate entries
     if (
+      duplicateCheck &&
       this.frames.length > 0 &&
       this.frames[this.frames.length - 1].x === value.x &&
       this.frames[this.frames.length - 1].y === value.y

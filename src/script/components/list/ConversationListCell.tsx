@@ -32,8 +32,6 @@ import {AvailabilityState} from 'Components/AvailabilityState';
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {GroupAvatar} from 'Components/avatar/GroupAvatar';
 import {Icon} from 'Components/Icon';
-import {generateConversationUrl} from 'src/script/router/routeGenerator';
-import {setHistoryParam} from 'src/script/router/Router';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isKey, isOneOfKeys, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -108,6 +106,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
   const contextMenuRef = useRef<HTMLButtonElement>(null);
   const [focusContextMenu, setContextMenuFocus] = useState(false);
   const [isContextMenuOpen, setContextMenuOpen] = useState(false);
+  const contextMenuKeyboardShortcut = `keyboard-shortcut-${conversation.id}`;
 
   const openContextMenu = (event: MouseEvent | React.MouseEvent<Element, MouseEvent>) => {
     event.stopPropagation();
@@ -172,12 +171,6 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
     }
   }, [index, isActive, isFolder, isConversationListFocus, handleFocus]);
 
-  // on conversation/app load reset last message focus to ensure last message is focused
-  // only when user enters a new conversation using keyboard(press enter)
-  useEffect(() => {
-    setHistoryParam(generateConversationUrl(conversation.qualifiedId));
-  }, [conversation]);
-
   return (
     <li onContextMenu={openContextMenu}>
       <div
@@ -196,8 +189,9 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
           data-uie-name="go-open-conversation"
           tabIndex={focusConversation ? 0 : -1}
           aria-label={t('accessibility.openConversation', displayName)}
-          title={t('accessibility.conversationOptionsMenuAccessKey')}
+          aria-describedby={contextMenuKeyboardShortcut}
         >
+          <span id={contextMenuKeyboardShortcut} aria-label={t('accessibility.conversationOptionsMenuAccessKey')} />
           <div
             className={cx('conversation-list-cell-left', {
               'conversation-list-cell-left-opaque': removedFromConversation || users.length === 0,

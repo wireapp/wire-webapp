@@ -48,18 +48,48 @@ describe('ConversationState', () => {
   const selfMLSConversation = createConversation(ConversationProtocol.MLS, CONVERSATION_TYPE.SELF);
   const regularConversation = createConversation();
 
-  describe('getSelfConversation', () => {
+  describe('getSelfProteusConversation', () => {
     it('throws if no self conversation are set', () => {
       const conversationState = createConversationState();
-      expect(() => conversationState.getSelfConversation()).toThrow('proteus');
-      expect(() => conversationState.getSelfConversation(true)).toThrow('MLS');
+      expect(() => conversationState.getSelfProteusConversation()).toThrow('proteus');
     });
 
     it('finds the MLS and proteus self conversations', () => {
       const conversationState = createConversationState();
       conversationState.conversations([selfProteusConversation, selfMLSConversation, regularConversation]);
-      expect(conversationState.getSelfConversation()).toBe(selfProteusConversation);
-      expect(conversationState.getSelfConversation(true)).toBe(selfMLSConversation);
+      expect(conversationState.getSelfProteusConversation()).toBe(selfProteusConversation);
+    });
+  });
+
+  describe('getSelfConversations', () => {
+    it('returns empty array if there are no self conversations', () => {
+      const conversationState = createConversationState();
+      expect(conversationState.getSelfConversations(true)).toEqual([]);
+      conversationState.conversations([selfProteusConversation, selfMLSConversation, regularConversation]);
+    });
+
+    it('returns only proteus self conversation', () => {
+      const conversationState = createConversationState();
+      conversationState.conversations([selfProteusConversation, regularConversation]);
+      expect(conversationState.getSelfConversations(true)).toEqual([selfProteusConversation]);
+    });
+
+    it('returns only mls self conversation', () => {
+      const conversationState = createConversationState();
+      conversationState.conversations([selfMLSConversation, regularConversation]);
+      expect(conversationState.getSelfConversations(true)).toEqual([selfMLSConversation]);
+    });
+
+    it('returns both the self MLS and proteus conversations', () => {
+      const conversationState = createConversationState();
+      conversationState.conversations([selfProteusConversation, selfMLSConversation, regularConversation]);
+      expect(conversationState.getSelfConversations(true)).toEqual([selfProteusConversation, selfMLSConversation]);
+    });
+
+    it('filters out mls conversation if not supported', () => {
+      const conversationState = createConversationState();
+      conversationState.conversations([selfProteusConversation, selfMLSConversation, regularConversation]);
+      expect(conversationState.getSelfConversations(false)).toEqual([selfProteusConversation]);
     });
   });
 

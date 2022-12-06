@@ -20,6 +20,7 @@
 import {fireEvent, render, waitFor, act} from '@testing-library/react';
 import {container} from 'tsyringe';
 
+import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {Conversation} from 'src/script/entity/Conversation';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {FileAsset} from 'src/script/entity/message/FileAsset';
@@ -90,12 +91,14 @@ describe('Collection', () => {
 
   it('displays all image assets', async () => {
     const {getAllByText, getByText, queryByText} = render(
-      <Collection
-        assetRepository={mockAssetRepository}
-        conversation={conversation}
-        conversationRepository={mockConversationRepository as any}
-        messageRepository={mockMessageRepository}
-      />,
+      withTheme(
+        <Collection
+          assetRepository={mockAssetRepository}
+          conversation={conversation}
+          conversationRepository={mockConversationRepository as any}
+          messageRepository={mockMessageRepository}
+        />,
+      ),
     );
 
     await waitFor(() => getAllByText('CollectionItem'));
@@ -113,12 +116,14 @@ describe('Collection', () => {
     mockConversationRepository.getEventsForCategory.mockResolvedValueOnce(imageMessages);
 
     const {getAllByText, getByText} = render(
-      <Collection
-        assetRepository={mockAssetRepository}
-        messageRepository={mockMessageRepository}
-        conversation={conversation}
-        conversationRepository={mockConversationRepository as any}
-      />,
+      withTheme(
+        <Collection
+          assetRepository={mockAssetRepository}
+          messageRepository={mockMessageRepository}
+          conversation={conversation}
+          conversationRepository={mockConversationRepository as any}
+        />,
+      ),
     );
 
     await waitFor(() => getAllByText('CollectionItem'));
@@ -131,12 +136,14 @@ describe('Collection', () => {
   it('should display search results when term is typed', async () => {
     jest.useFakeTimers();
     const {getAllByText, queryByText, getByTestId} = render(
-      <Collection
-        assetRepository={mockAssetRepository}
-        messageRepository={mockMessageRepository}
-        conversation={conversation}
-        conversationRepository={mockConversationRepository as any}
-      />,
+      withTheme(
+        <Collection
+          assetRepository={mockAssetRepository}
+          messageRepository={mockMessageRepository}
+          conversation={conversation}
+          conversationRepository={mockConversationRepository as any}
+        />,
+      ),
     );
 
     await waitFor(() => getAllByText('CollectionItem'));
