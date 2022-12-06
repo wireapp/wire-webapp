@@ -18,6 +18,7 @@
  */
 
 import {CONVERSATION_EVENT, ConversationEvent} from '@wireapp/api-client/lib/event/';
+import {container} from 'tsyringe';
 
 import {LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
@@ -63,6 +64,7 @@ import {MentionEntity} from '../message/MentionEntity';
 import {QuoteEntity} from '../message/QuoteEntity';
 import {StatusType} from '../message/StatusType';
 import {SystemMessageType} from '../message/SystemMessageType';
+import {APIClient} from '../service/APIClientSingleton';
 import type {EventRecord} from '../storage';
 
 // Event Mapper to convert all server side JSON events into core entities.
@@ -71,7 +73,7 @@ export class EventMapper {
   /**
    * Construct a new Event Mapper.
    */
-  constructor() {
+  constructor(private readonly fallbackDomain = container.resolve(APIClient).context?.domain) {
     this.logger = getLogger('EventMapper');
   }
 
@@ -156,7 +158,7 @@ export class EventMapper {
       const {
         preview_id,
         preview_key,
-        preview_domain = qualified_conversation?.domain,
+        preview_domain = qualified_conversation?.domain || this.fallbackDomain,
         preview_otr_key,
         preview_sha256,
         preview_token,
