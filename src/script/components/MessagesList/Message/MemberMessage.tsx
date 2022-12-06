@@ -19,6 +19,8 @@
 
 import React from 'react';
 
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
+
 import {Icon} from 'Components/Icon';
 import {User} from 'src/script/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -138,19 +140,23 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
               {t('conversationServicesWarning')}
             </p>
           )}
+
           {isGroupCreation && shouldShowInvitePeople && (
             <div className="message-member-footer">
               <p>{t('guestRoomConversationHead')}</p>
-              <button
+
+              <Button
+                variant={ButtonVariant.TERTIARY}
                 type="button"
                 onClick={onClickInvitePeople}
-                className="button-reset-default message-member-footer-button"
                 data-uie-name="do-invite-people"
+                style={{marginTop: '1em'}}
               >
                 {t('guestRoomConversationButton')}
-              </button>
+              </Button>
             </div>
           )}
+
           {isGroupCreation && isSelfTemporaryGuest && (
             <div className="message-member-footer">
               <p className="message-member-footer-message">{t('temporaryGuestJoinMessage')}</p>
