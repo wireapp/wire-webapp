@@ -474,6 +474,7 @@ export class ConversationMapper {
     const personalAccessState = conversationEntity.isGroup()
       ? ACCESS_STATE.PERSONAL.GROUP
       : ACCESS_STATE.PERSONAL.ONE2ONE;
+
     return conversationEntity.accessState(personalAccessState);
   }
 
@@ -517,6 +518,7 @@ export class ConversationMapper {
     const isExpectedModes = includesCodeMode && includesInviteMode && accessModes.length === 2;
 
     const isGuestRoomMode = isNonVerifiedRole && isExpectedModes;
+
     return isGuestRoomMode ? ACCESS_STATE.TEAM.GUESTS_SERVICES : ACCESS_STATE.TEAM.LEGACY;
   }
 }
