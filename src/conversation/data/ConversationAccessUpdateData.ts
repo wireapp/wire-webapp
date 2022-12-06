@@ -17,15 +17,20 @@
  *
  */
 
-import {ACCESS_ROLE_V2, CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE} from '../Conversation';
+import {CONVERSATION_ACCESS, CONVERSATION_LEGACY_ACCESS_ROLE, CONVERSATION_ACCESS_ROLE} from '../Conversation';
 
 /**@deprecated */
-export interface ConversationAccessUpdateData {
-  access: CONVERSATION_ACCESS[];
-  access_role: CONVERSATION_ACCESS_ROLE;
-}
-
 export interface ConversationAccessV2UpdateData {
   access: CONVERSATION_ACCESS[];
-  access_role_v2: ACCESS_ROLE_V2[];
+  access_role: CONVERSATION_LEGACY_ACCESS_ROLE;
+  access_role_v2?: CONVERSATION_ACCESS_ROLE[];
 }
+
+export interface ConversationAccessV3UpdateData {
+  access: CONVERSATION_ACCESS[];
+  access_role: CONVERSATION_LEGACY_ACCESS_ROLE | CONVERSATION_ACCESS_ROLE[];
+  /** @deprecated Use access_role instead */
+  access_role_v2?: CONVERSATION_ACCESS_ROLE[];
+}
+
+export type ConversationAccessUpdateData = ConversationAccessV2UpdateData | ConversationAccessV3UpdateData;

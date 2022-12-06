@@ -59,7 +59,6 @@ import {
 } from '../ConversationError';
 import {
   ConversationAccessUpdateData,
-  ConversationAccessV2UpdateData,
   ConversationJoinData,
   ConversationMemberUpdateData,
   ConversationMessageTimerUpdateData,
@@ -892,7 +891,7 @@ export class ConversationAPI {
    */
   public async putAccess(
     conversationId: string,
-    accessData: ConversationAccessUpdateData | ConversationAccessV2UpdateData,
+    accessData: ConversationAccessUpdateData,
   ): Promise<ConversationAccessUpdateEvent> {
     const config: AxiosRequestConfig = {
       data: accessData,
