@@ -511,16 +511,16 @@ export class ConversationMapper {
       return ACCESS_STATE.TEAM.TEAM_ONLY;
     }
 
-    const isVerifiedRole = accessRole === CONVERSATION_LEGACY_ACCESS_ROLE.ACTIVATED;
-    if (isVerifiedRole) {
+    const isActivatedRole = accessRole === CONVERSATION_LEGACY_ACCESS_ROLE.ACTIVATED;
+    if (isActivatedRole) {
       return ACCESS_STATE.TEAM.GUEST_ROOM;
     }
-    const isNonVerifiedRole = accessRole === CONVERSATION_LEGACY_ACCESS_ROLE.NON_ACTIVATED;
+    const isNonActivatedRole = accessRole === CONVERSATION_LEGACY_ACCESS_ROLE.NON_ACTIVATED;
 
     const includesCodeMode = accessModes.includes(CONVERSATION_ACCESS.CODE);
     const isExpectedModes = includesCodeMode && includesInviteMode && accessModes.length === 2;
 
-    const isGuestRoomMode = isNonVerifiedRole && isExpectedModes;
+    const isGuestRoomMode = isNonActivatedRole && isExpectedModes;
 
     return isGuestRoomMode ? ACCESS_STATE.TEAM.GUESTS_SERVICES : ACCESS_STATE.TEAM.LEGACY;
   }
