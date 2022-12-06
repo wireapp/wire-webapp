@@ -25,7 +25,6 @@ import {Context} from '@wireapp/api-client/lib/auth';
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
 import {amplify} from 'amplify';
 import Dexie from 'dexie';
-import ko from 'knockout';
 import platform from 'platform';
 import {container} from 'tsyringe';
 
@@ -41,7 +40,6 @@ import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {appendParameter} from 'Util/UrlUtil';
 import {checkIndexedDb, createRandomUuid, supportsMLS} from 'Util/util';
 
-import './globals';
 import {migrateToQualifiedSessionIds} from './sessionIdMigrator';
 import {SingleInstanceHandler} from './SingleInstanceHandler';
 
@@ -103,7 +101,6 @@ import {AppInitTimingsStep} from '../telemetry/app_init/AppInitTimingsStep';
 import {serverTimeHandler} from '../time/serverTimeHandler';
 import {EventTrackingRepository} from '../tracking/EventTrackingRepository';
 import {WindowHandler} from '../ui/WindowHandler';
-import * as UserPermission from '../user/UserPermission';
 import {UserRepository} from '../user/UserRepository';
 import {UserService} from '../user/UserService';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
@@ -190,8 +187,6 @@ export class App {
         this.util = {debug: this.debug}; // Alias for QA
       });
     }
-
-    this._publishGlobals();
 
     const onExtraInstanceStarted = () => this._redirectToLogin(SIGN_OUT_REASON.MULTIPLE_TABS);
     this.singleInstanceHandler = new SingleInstanceHandler(onExtraInstanceStarted);
@@ -830,17 +825,5 @@ export class App {
     }
 
     doRedirect(signOutReason);
-  }
-
-  //##############################################################################
-  // Debugging
-  //##############################################################################
-
-  private _publishGlobals() {
-    window.z.userPermission = ko.observable({});
-    ko.pureComputed(() => {
-      const selfUser = this.repository.user['userState'].self();
-      return selfUser && selfUser.teamRole();
-    }).subscribe(role => window.z.userPermission(UserPermission.generatePermissionHelpers(role)));
   }
 }
