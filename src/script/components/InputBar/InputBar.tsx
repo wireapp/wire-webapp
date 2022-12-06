@@ -163,6 +163,7 @@ const InputBar = ({
     'isIncomingRequest',
   ]);
 
+  const {typingIndicatorMode} = useKoSubscribableChildren(propertiesRepository, ['typingIndicatorMode']);
   const shadowInputRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -398,12 +399,12 @@ const InputBar = ({
     if (!hasUserTyped.current) {
       return;
     }
-    if (isTyping) {
+    if (isTyping && typingIndicatorMode) {
       conversationRepository.sendTypingStart(conversationEntity);
     } else {
       conversationRepository.sendTypingStop(conversationEntity);
     }
-  }, [isTyping, conversationRepository, conversationEntity]);
+  }, [isTyping, conversationRepository, conversationEntity, typingIndicatorMode]);
 
   useEffect(() => {
     if (!hasUserTyped.current) {
@@ -901,7 +902,7 @@ const InputBar = ({
       id="conversation-input-bar"
       className={cx('conversation-input-bar', {'is-right-panel-open': isRightSidebarOpen})}
     >
-      <TypingIndicator conversationId={conversationEntity.id} />
+      {!!typingIndicatorMode && <TypingIndicator conversationId={conversationEntity.id} />}
 
       {classifiedDomains && !isConnectionRequest && (
         <ClassifiedBar users={participatingUserEts} classifiedDomains={classifiedDomains} />

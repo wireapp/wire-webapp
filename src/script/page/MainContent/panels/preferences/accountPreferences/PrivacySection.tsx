@@ -31,6 +31,7 @@ import {formatDurationCaption} from 'Util/TimeUtil';
 import {PropertiesRepository} from '../../../../../properties/PropertiesRepository';
 import {AppLockRepository} from '../../../../../user/AppLockRepository';
 import {AppLockState} from '../../../../../user/AppLockState';
+import {CONVERSATION_TYPING_MODE} from '../../../../../user/TypingIndicatorMode';
 import {PreferencesSection} from '../components/PreferencesSection';
 
 interface PrivacySectionProps {
@@ -53,6 +54,7 @@ const PrivacySection: React.FC<PrivacySectionProps> = ({
     ]);
 
   const {receiptMode} = useKoSubscribableChildren(propertiesRepository, ['receiptMode']);
+  const {typingIndicatorMode} = useKoSubscribableChildren(propertiesRepository, ['typingIndicatorMode']);
 
   return (
     <PreferencesSection hasSeparator className="preferences-section-privacy" title={t('preferencesAccountPrivacy')}>
@@ -74,6 +76,26 @@ const PrivacySection: React.FC<PrivacySectionProps> = ({
         </Checkbox>
         <p className="preferences-detail preferences-detail-intended">{t('preferencesAccountReadReceiptsDetail')}</p>
       </>
+      <div className="checkbox-margin">
+        <Checkbox
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            const isChecked = event.target.checked;
+            propertiesRepository.updateProperty(
+              PropertiesRepository.CONFIG.WIRE_TYPING_MODE.key,
+              isChecked ? CONVERSATION_TYPING_MODE.ON : CONVERSATION_TYPING_MODE.OFF,
+            );
+          }}
+          checked={typingIndicatorMode === CONVERSATION_TYPING_MODE.ON}
+          data-uie-name="status-preference-typing-indicator"
+        >
+          <CheckboxLabel htmlFor="status-preference-typing-indicator">
+            {t('preferencesAccountTypingIndicatorCheckbox')}
+          </CheckboxLabel>
+        </Checkbox>
+        <p className="preferences-detail preferences-detail-intended">
+          {t('preferencesAccountTypingIndicatorsDetail')}
+        </p>
+      </div>
       {isAppLockAvailable && (
         <div className="checkbox-margin">
           <Checkbox
