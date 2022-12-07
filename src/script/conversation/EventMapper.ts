@@ -77,6 +77,10 @@ export class EventMapper {
     this.logger = getLogger('EventMapper');
   }
 
+  private get fallbackDomain() {
+    return this.apiClient.context?.domain;
+  }
+
   /**
    * Convert multiple JSON events into message entities.
    *
@@ -158,7 +162,7 @@ export class EventMapper {
       const {
         preview_id,
         preview_key,
-        preview_domain = qualified_conversation?.domain || this.apiClient.context?.domain,
+        preview_domain = qualified_conversation?.domain || this.fallbackDomain,
         preview_otr_key,
         preview_sha256,
         preview_token,
@@ -743,7 +747,7 @@ export class EventMapper {
     const {
       preview_id,
       preview_key,
-      preview_domain = qualified_conversation?.domain || this.apiClient.context?.domain,
+      preview_domain = qualified_conversation?.domain || this.fallbackDomain,
       preview_otr_key,
       preview_sha256,
       preview_token,
@@ -779,13 +783,7 @@ export class EventMapper {
       assetEntity.height = `${info.height}px`;
     }
 
-    const {
-      key,
-      otr_key,
-      sha256,
-      token,
-      domain = qualified_conversation?.domain || this.apiClient.context?.domain,
-    } = eventData;
+    const {key, otr_key, sha256, token, domain = qualified_conversation?.domain || this.fallbackDomain} = eventData;
 
     if (!otr_key || !sha256) {
       return assetEntity;
@@ -826,7 +824,7 @@ export class EventMapper {
 
           const remoteData = AssetRemoteData.v3(
             assetKey,
-            assetDomain || this.apiClient.context?.domain,
+            assetDomain || this.fallbackDomain,
             otrKey,
             sha256,
             assetToken,
