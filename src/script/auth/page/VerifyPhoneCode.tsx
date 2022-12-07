@@ -20,6 +20,7 @@
 import React, {useEffect, useState} from 'react';
 
 import {LoginData} from '@wireapp/api-client/lib/auth';
+import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
@@ -33,7 +34,6 @@ import {phoneLoginStrings} from '../../strings';
 import {LinkButton} from '../component/LinkButton';
 import {RouterLink} from '../component/RouterLink';
 import {actionRoot} from '../module/action';
-import {BackendError} from '../module/action/BackendError';
 import {LabeledError} from '../module/action/LabeledError';
 import {ValidationError} from '../module/action/ValidationError';
 import {bindActionCreators, RootState} from '../module/reducer';
@@ -67,7 +67,7 @@ const VerifyPhoneCodeComponent = ({
         setError(error);
       } else if (error.hasOwnProperty('label')) {
         switch (error.label) {
-          case BackendError.LABEL.PASSWORD_EXISTS: {
+          case BackendErrorLabel.PASSWORD_EXISTS: {
             return navigate(ROUTE.CHECK_PASSWORD);
           }
           default: {
@@ -93,13 +93,13 @@ const VerifyPhoneCodeComponent = ({
       }
 
       switch (error.label) {
-        case BackendError.LABEL.TOO_MANY_CLIENTS: {
+        case BackendErrorLabel.TOO_MANY_CLIENTS: {
           resetAuthError();
           return navigate(ROUTE.CLIENTS);
         }
-        case BackendError.LABEL.INVALID_CREDENTIALS:
+        case BackendErrorLabel.INVALID_CREDENTIALS:
         case LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE:
-        case BackendError.LABEL.BAD_REQUEST: {
+        case BackendErrorLabel.BAD_REQUEST: {
           setError(error);
           return;
         }
@@ -144,7 +144,6 @@ type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
   isFetching: AuthSelector.isFetching(state),
   loginData: AuthSelector.getLoginData(state),
-  loginError: AuthSelector.getError(state),
 });
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;

@@ -17,19 +17,11 @@
  *
  */
 
-import ko from 'knockout';
 import {singleton} from 'tsyringe';
 
 import {ClientEntity} from './ClientEntity';
 
 @singleton()
 export class ClientState {
-  clients: ko.PureComputed<ClientEntity[]>;
-  currentClient: ko.Observable<ClientEntity>;
-  isTemporaryClient: ko.PureComputed<boolean>;
-
-  constructor() {
-    this.currentClient = ko.observable();
-    this.isTemporaryClient = ko.pureComputed(() => this.currentClient()?.isTemporary());
-  }
+  currentClient: ClientEntity | undefined;
 }

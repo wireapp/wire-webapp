@@ -20,12 +20,14 @@
 import {FC, useEffect, useLayoutEffect} from 'react';
 
 import {amplify} from 'amplify';
+import {ErrorBoundary} from 'react-error-boundary';
 import {container} from 'tsyringe';
 
 import {StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingContainer} from 'Components/calling/CallingOverlayContainer';
+import {ErrorFallback} from 'Components/ErrorFallback';
 import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationModal';
 import {LegalHoldModal} from 'Components/Modals/LegalHoldModal/LegalHoldModal';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -34,18 +36,21 @@ import {showUserModal, UserModal} from 'Components/Modals/UserModal';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {AppLock} from './AppLock';
+import {FeatureConfigChangeHandler} from './components/FeatureConfigChange/FeatureConfigChangeHandler/FeatureConfigChangeHandler';
+import {FeatureConfigChangeNotifier} from './components/FeatureConfigChange/FeatureConfigChangeNotifier';
+import {WindowTitleUpdater} from './components/WindowTitleUpdater';
 import {LeftSidebar} from './LeftSidebar';
 import {MainContent} from './MainContent';
 import {PanelEntity, PanelState, RightSidebar} from './RightSidebar';
 import {RootProvider} from './RootProvider';
 import {useAppMainState, ViewType} from './state';
 import {useAppState, ContentState} from './useAppState';
-import {useWindowTitle} from './useWindowTitle';
 
 import {ConversationState} from '../conversation/ConversationState';
 import {User} from '../entity/User';
 import {useInitializeRootFontSize} from '../hooks/useRootFontSize';
 import {App} from '../main/app';
+import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';
 import {generateConversationUrl} from '../router/routeGenerator';
 import {configureRoutes, navigate} from '../router/Router';
 import {TeamState} from '../team/TeamState';
@@ -56,7 +61,7 @@ import {WarningsContainer} from '../view_model/WarningsContainer/WarningsContain
 
 export type RightSidebarParams = {
   entity: PanelEntity | null;
-  showLikes?: boolean;
+  showReactions?: boolean;
   highlighted?: User[];
 };
 
@@ -81,23 +86,26 @@ const AppMain: FC<AppMainProps> = ({
     throw new Error('API Context has not been set');
   }
 
-  const {contentState} = useAppState();
+  const contentState = useAppState(state => state.contentState);
 
   const {repository: repositories} = app;
 
-  const {accent_id, availability: userAvailability} = useKoSubscribableChildren(selfUser, [
-    'accent_id',
-    'availability',
-  ]);
+  const {
+    accent_id,
+    availability: userAvailability,
+    isActivatedAccount,
+  } = useKoSubscribableChildren(selfUser, ['accent_id', 'availability', 'isActivatedAccount']);
 
   const teamState = container.resolve(TeamState);
   const userState = container.resolve(UserState);
 
-  useWindowTitle();
-
-  const {isActivatedAccount} = useKoSubscribableChildren(userState, ['isActivatedAccount']);
-
-  const {history, entity: currentEntity, close: closeRightSidebar, goTo} = useAppMainState(state => state.rightSidebar);
+  const {
+    history,
+    entity: currentEntity,
+    close: closeRightSidebar,
+    lastViewedMessageDetailsEntity,
+    goTo,
+  } = useAppMainState(state => state.rightSidebar);
   const currentState = history[history.length - 1];
 
   const toggleRightSidebar = (panelState: PanelState, params: RightSidebarParams, compareEntityId = false) => {
@@ -106,11 +114,9 @@ const AppMain: FC<AppMainProps> = ({
 
     if (isDifferentId || isDifferentState) {
       goTo(panelState, params);
-
-      return;
+    } else {
+      closeRightSidebar();
     }
-
-    closeRightSidebar();
   };
 
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
@@ -119,7 +125,7 @@ const AppMain: FC<AppMainProps> = ({
   const {currentView} = useAppMainState(state => state.responsiveView);
   const isLeftSidebarVisible = currentView == ViewType.LEFT_SIDEBAR;
 
-  const initializeApp = () => {
+  const initializeApp = async () => {
     repositories.notification.setContentViewModelStates(contentState, mainView.multitasking);
 
     const showMostRecentConversation = () => {
@@ -130,7 +136,7 @@ const AppMain: FC<AppMainProps> = ({
 
       const activeConversation = conversationState.activeConversation();
 
-      if (repositories.user['userState'].isTemporaryGuest()) {
+      if (selfUser.isTemporaryGuest()) {
         return mainView.list.showTemporaryGuest();
       }
       if (activeConversation) {
@@ -186,6 +192,14 @@ const AppMain: FC<AppMainProps> = ({
     repositories.properties.checkPrivacyPermission().then(() => {
       window.setTimeout(() => repositories.notification.checkPermission(), App.CONFIG.NOTIFICATION_CHECK);
     });
+
+    //after app is loaded, check mls migration configuration and start migration if needed
+    await initialiseMLSMigrationFlow({
+      selfUser,
+      conversationHandler: repositories.conversation,
+      getTeamMLSMigrationStatus: repositories.team.getTeamMLSMigrationStatus,
+      refreshAllKnownUsers: repositories.user.refreshAllKnownUsers,
+    });
   };
 
   useEffect(() => {
@@ -208,31 +222,41 @@ const AppMain: FC<AppMainProps> = ({
       data-uie-name="status-webapp"
       data-uie-value="is-loaded"
     >
+      <WindowTitleUpdater />
       <RootProvider value={mainView}>
-        <>
+        <ErrorBoundary FallbackComponent={ErrorFallback}>
           <div id="app" className="app">
             {(!smBreakpoint || isLeftSidebarVisible) && (
               <LeftSidebar listViewModel={mainView.list} selfUser={selfUser} isActivatedAccount={isActivatedAccount} />
             )}
 
             {(!smBreakpoint || !isLeftSidebarVisible) && (
-              <MainContent isRightSidebarOpen={!!currentState} openRightSidebar={toggleRightSidebar} />
+              <MainContent
+                selfUser={selfUser}
+                isRightSidebarOpen={!!currentState}
+                openRightSidebar={toggleRightSidebar}
+                reloadApp={app.refresh}
+              />
             )}
 
             {currentState && (
               <RightSidebar
+                lastViewedMessageDetailsEntity={lastViewedMessageDetailsEntity}
                 currentEntity={currentEntity}
                 repositories={repositories}
                 actionsViewModel={mainView.actions}
                 isFederated={mainView.isFederated}
                 teamState={teamState}
+                selfUser={selfUser}
                 userState={userState}
               />
             )}
           </div>
 
           <AppLock clientRepository={repositories.client} />
-          <WarningsContainer />
+          <WarningsContainer onRefresh={app.refresh} />
+          <FeatureConfigChangeNotifier selfUserId={selfUser.id} teamState={teamState} />
+          <FeatureConfigChangeHandler teamState={teamState} />
 
           <CallingContainer
             multitasking={mainView.multitasking}
@@ -241,7 +265,7 @@ const AppMain: FC<AppMainProps> = ({
           />
 
           <LegalHoldModal
-            userState={userState}
+            selfUser={selfUser}
             conversationRepository={repositories.conversation}
             searchRepository={repositories.search}
             teamRepository={repositories.team}
@@ -251,10 +275,10 @@ const AppMain: FC<AppMainProps> = ({
           />
 
           {/*The order of these elements matter to show proper modals stack upon each other*/}
-          <UserModal userRepository={repositories.user} />
+          <UserModal selfUser={selfUser} userRepository={repositories.user} />
           <PrimaryModalComponent />
           <GroupCreationModal userState={userState} teamState={teamState} />
-        </>
+        </ErrorBoundary>
       </RootProvider>
     </StyledApp>
   );

@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect} from 'react';
+import {FC, ReactNode, useEffect} from 'react';
 
 import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
 import {IntlProvider} from 'react-intl';
@@ -40,6 +40,7 @@ import {HistoryInfo} from './HistoryInfo';
 import {Index} from './Index';
 import {InitialInvite} from './InitialInvite';
 import {Login} from './Login';
+import {OAuthPermissions} from './OAuthPermissions';
 import {PhoneLogin} from './PhoneLogin';
 import {SetAccountType} from './SetAccountType';
 import {SetEmail} from './SetEmail';
@@ -57,26 +58,23 @@ import {mapLanguage, normalizeLanguage} from '../localeConfig';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
-import * as CookieSelector from '../module/selector/CookieSelector';
 import * as LanguageSelector from '../module/selector/LanguageSelector';
 import {ROUTE} from '../route';
+import {getOAuthQueryString} from '../util/oauthUtil';
 
 interface RootProps {}
 
-const Title: React.FC<{title: string; children: React.ReactNode}> = ({title, children}) => {
+const Title: FC<{title: string; children: ReactNode}> = ({title, children}) => {
   useEffect(() => {
     document.title = title;
   }, [title]);
   return <>{children}</>;
 };
 
-const RootComponent: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
+const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
   isAuthenticated,
   language,
   isFetchingSSOSettings,
-  startPolling,
-  safelyRemoveCookie,
-  stopPolling,
   doGetSSOSettings,
 }) => {
   useEffect(() => {
@@ -97,14 +95,6 @@ const RootComponent: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
   }, []);
 
   useEffect(() => {
-    startPolling();
-    window.onbeforeunload = () => {
-      safelyRemoveCookie(CookieSelector.COOKIE_NAME_APP_OPENED, Config.getConfig().APP_INSTANCE_ID);
-      stopPolling();
-    };
-  }, []);
-
-  useEffect(() => {
     doGetSSOSettings();
   }, []);
 
@@ -117,7 +107,20 @@ const RootComponent: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
     return null;
   };
 
-  const isAuthenticatedCheck = (page: any): any => (page ? (isAuthenticated ? page : navigate('/auth')) : null);
+  const isAuthenticatedCheck = (page: ReactNode): ReactNode =>
+    page ? (isAuthenticated ? page : navigate('/auth')) : null;
+
+  const isOAuthCheck = (page: ReactNode): ReactNode => {
+    if (page) {
+      if (isAuthenticated) {
+        return page;
+      }
+
+      const queryString = getOAuthQueryString(window.location);
+      return queryString ? <Navigate to={`${ROUTE.LOGIN}/${queryString}`} /> : <Navigate to={ROUTE.LOGIN} />;
+    }
+    return null;
+  };
 
   const ProtectedHistoryInfo = () => isAuthenticatedCheck(<HistoryInfo />);
   const ProtectedInitialInvite = () => isAuthenticatedCheck(<InitialInvite />);
@@ -126,6 +129,14 @@ const RootComponent: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
   const ProtectedSetHandle = () => isAuthenticatedCheck(<SetHandle />);
   const ProtectedSetEmail = () => isAuthenticatedCheck(<SetEmail />);
   const ProtectedSetPassword = () => isAuthenticatedCheck(<SetPassword />);
+  const ProtectedOAuthPermissions = () => isOAuthCheck(<OAuthPermissions />);
+
+  // Send user back to index page after e2ei oauth redirect
+  // This is needed because the oauth redirect is only done by logged in users
+  // and the user would otherwise be stuck on login page without getting logged in
+  if (window.location.hash.includes(ROUTE.E2EI_OAUTH_REDIRECT)) {
+    navigate(ROUTE.INDEX);
+  }
 
   const brandName = Config.getConfig().BRAND_NAME;
   return (
@@ -155,6 +166,7 @@ const RootComponent: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
               )}
               <Route path={ROUTE.HISTORY_INFO} element={<ProtectedHistoryInfo />} />
               <Route path={ROUTE.INITIAL_INVITE} element={<ProtectedInitialInvite />} />
+              <Route path={`${ROUTE.AUTHORIZE}`} element={<ProtectedOAuthPermissions />} />
               <Route
                 path={`${ROUTE.LOGIN}/*`}
                 element={
@@ -173,7 +185,14 @@ const RootComponent: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
                 }
               />
               <Route path={ROUTE.SET_EMAIL} element={<ProtectedSetEmail />} />
-              <Route path={ROUTE.SET_HANDLE} element={<ProtectedSetHandle />} />
+              <Route
+                path={ROUTE.SET_HANDLE}
+                element={
+                  <Title title={`${t('authSetUsername')} . ${brandName}`}>
+                    <ProtectedSetHandle />
+                  </Title>
+                }
+              />
               <Route
                 path={ROUTE.SET_PASSWORD}
                 element={
@@ -236,9 +255,6 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
   bindActionCreators(
     {
       doGetSSOSettings: ROOT_ACTIONS.authAction.doGetSSOSettings,
-      safelyRemoveCookie: ROOT_ACTIONS.cookieAction.safelyRemoveCookie,
-      startPolling: ROOT_ACTIONS.cookieAction.startPolling,
-      stopPolling: ROOT_ACTIONS.cookieAction.stopPolling,
     },
     dispatch,
   );

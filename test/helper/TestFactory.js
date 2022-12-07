@@ -30,8 +30,6 @@ import {container} from 'tsyringe';
 
 import {AssetRepository} from 'src/script/assets/AssetRepository';
 import {AssetService} from 'src/script/assets/AssetService';
-import {BackupRepository} from 'src/script/backup/BackupRepository';
-import {BackupService} from 'src/script/backup/BackupService';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {ClientRepository} from 'src/script/client/ClientRepository';
@@ -47,15 +45,12 @@ import {CryptographyRepository} from 'src/script/cryptography/CryptographyReposi
 import {User} from 'src/script/entity/User';
 import {EventRepository} from 'src/script/event/EventRepository';
 import {EventService} from 'src/script/event/EventService';
-import {EventServiceNoCompound} from 'src/script/event/EventServiceNoCompound';
 import {NotificationService} from 'src/script/event/NotificationService';
 import {MediaRepository} from 'src/script/media/MediaRepository';
-import {NotificationRepository} from 'src/script/notification/NotificationRepository';
 import {PermissionRepository} from 'src/script/permission/PermissionRepository';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {PropertiesService} from 'src/script/properties/PropertiesService';
 import {SearchRepository} from 'src/script/search/SearchRepository';
-import {SearchService} from 'src/script/search/SearchService';
 import {SelfService} from 'src/script/self/SelfService';
 import {Core} from 'src/script/service/CoreSingleton';
 import {createStorageEngine, DatabaseTypes} from 'src/script/service/StoreEngineProvider';
@@ -71,6 +66,8 @@ import {UserService} from 'src/script/user/UserService';
 import {UserState} from 'src/script/user/UserState';
 
 import {entities} from '../api/payloads';
+import {SelfRepository} from 'src/script/self/SelfRepository';
+import {AudioRepository} from 'src/script/audio/AudioRepository';
 
 export class TestFactory {
   constructor() {
@@ -93,25 +90,6 @@ export class TestFactory {
   }
 
   /**
-   * @returns {Promise<BackupRepository>} The backup repository.
-   */
-  async exposeBackupActors() {
-    await this.exposeStorageActors();
-    await this.exposeConversationActors();
-    this.backup_service = new BackupService(this.storage_service);
-
-    this.backup_repository = new BackupRepository(
-      this.backup_service,
-      this.conversation_repository,
-      this.client_repository['clientState'],
-      this.user_repository['userState'],
-      this.connection_repository['connectionState'],
-    );
-
-    return this.backup_repository;
-  }
-
-  /**
    * @returns {Promise<CryptographyRepository>} The cryptography repository.
    */
   async exposeCryptographyActors() {
@@ -128,27 +106,9 @@ export class TestFactory {
    */
   async exposeClientActors() {
     await this.exposeCryptographyActors();
-    const clientEntity = new ClientEntity(false, null);
-    clientEntity.address = '192.168.0.1';
-    clientEntity.class = ClientClassification.DESKTOP;
-    clientEntity.id = '60aee26b7f55a99f';
-
-    const user = new User(entities.user.john_doe.id, null);
-    user.devices.push(clientEntity);
-    user.email(entities.user.john_doe.email);
-    user.isMe = true;
-    user.locale = entities.user.john_doe.locale;
-    user.name(entities.user.john_doe.name);
-    user.phone(entities.user.john_doe.phone);
 
     this.client_service = new ClientService(this.storage_service);
-    this.client_repository = new ClientRepository(
-      this.client_service,
-      this.cryptography_repository,
-      this.storage_repository,
-      new ClientState(),
-    );
-    this.client_repository.init(user);
+    this.client_repository = new ClientRepository(this.client_service, this.cryptography_repository, new ClientState());
 
     const currentClient = new ClientEntity(false, null);
     currentClient.address = '62.96.148.44';
@@ -156,13 +116,12 @@ export class TestFactory {
     currentClient.cookie = 'webapp@2153234453@temporary@1470926647664';
     currentClient.id = '132b3653b33f851f';
     currentClient.label = 'Windows 10';
-    currentClient.location = {lat: 52.5233, lon: 13.4138};
     currentClient.meta = {isVerified: ko.observable(true), primaryKey: 'local_identity'};
     currentClient.model = 'Chrome (Temporary)';
     currentClient.time = '2016-10-07T16:01:42.133Z';
     currentClient.type = ClientType.TEMPORARY;
 
-    this.client_repository['clientState'].currentClient(currentClient);
+    this.client_repository['clientState'].currentClient = currentClient;
 
     return this.client_repository;
   }
@@ -174,7 +133,6 @@ export class TestFactory {
     await this.exposeUserActors();
 
     this.event_service = new EventService(this.storage_service);
-    this.event_service_no_compound = new EventServiceNoCompound(this.storage_service);
     this.notification_service = new NotificationService(this.storage_service);
     this.conversation_service = new ConversationService(this.event_service);
 
@@ -184,7 +142,6 @@ export class TestFactory {
       serverTimeHandler,
       this.user_repository['userState'],
     );
-    this.event_repository.currentClient = this.client_repository['clientState'].currentClient;
 
     return this.event_repository;
   }
@@ -200,6 +157,12 @@ export class TestFactory {
     this.user_service = new UserService(this.storage_service);
     this.propertyRepository = new PropertiesRepository(new PropertiesService(), new SelfService());
 
+    const userState = new UserState();
+    const selfUser = new User('self-id');
+    selfUser.isMe = true;
+    userState.self(selfUser);
+    userState.users([selfUser]);
+
     this.user_repository = new UserRepository(
       this.user_service,
       this.assetRepository,
@@ -207,10 +170,8 @@ export class TestFactory {
       this.client_repository,
       serverTimeHandler,
       this.propertyRepository,
-      new UserState(),
+      userState,
     );
-
-    this.user_repository['userState'].self(this.client_repository.selfUser());
 
     return this.user_repository;
   }
@@ -232,8 +193,7 @@ export class TestFactory {
    */
   async exposeSearchActors() {
     await this.exposeUserActors();
-    this.search_service = new SearchService();
-    this.search_repository = new SearchRepository(this.search_service, this.user_repository);
+    this.search_repository = new SearchRepository(this.user_repository);
 
     return this.search_repository;
   }
@@ -246,13 +206,32 @@ export class TestFactory {
     this.team_service = new TeamService();
     this.team_service.getAllTeamFeatures = async () => ({});
     this.team_repository = new TeamRepository(
-      this.team_service,
       this.user_repository,
       this.assetRepository,
+      this.team_service,
       this.user_repository['userState'],
       new TeamState(this.user_repository['userState']),
     );
     return this.team_repository;
+  }
+
+  /**
+   * @returns {Promise<SelfRepository>} The self repository.
+   */
+  async exposeSelfActors() {
+    await this.exposeUserActors();
+    await this.exposeTeamActors();
+    await this.exposeClientActors();
+
+    this.self_repository = new SelfRepository(
+      new SelfService(),
+      this.user_repository,
+      this.team_repository,
+      this.client_repository,
+      this.user_repository['userState'],
+    );
+
+    return this.self_repository;
   }
 
   /**
@@ -262,6 +241,7 @@ export class TestFactory {
     await this.exposeConnectionActors();
     await this.exposeTeamActors();
     await this.exposeEventActors();
+    await this.exposeSelfActors();
 
     this.conversation_service = new ConversationService(this.event_service);
 
@@ -278,7 +258,7 @@ export class TestFactory {
     clientEntity.class = ClientClassification.DESKTOP;
     clientEntity.id = '60aee26b7f55a99f';
     const clientState = new ClientState();
-    clientState.currentClient(clientEntity);
+    clientState.currentClient = clientEntity;
 
     this.message_repository = new MessageRepository(
       () => this.conversation_repository,
@@ -288,12 +268,11 @@ export class TestFactory {
       serverTimeHandler,
       this.user_repository,
       this.assetRepository,
+      new AudioRepository(),
       this.user_repository['userState'],
-      this.team_repository['teamState'],
       clientState,
     );
     const core = container.resolve(Core);
-    core.initServices({clientType: ClientType.NONE, userId: 'userID'});
     this.conversation_repository = new ConversationRepository(
       this.conversation_service,
       this.message_repository,
@@ -301,11 +280,14 @@ export class TestFactory {
       this.event_repository,
       this.team_repository,
       this.user_repository,
+      this.self_repository,
       this.propertyRepository,
+      this.calling_repository,
       serverTimeHandler,
       this.user_repository['userState'],
       this.team_repository['teamState'],
       conversationState,
+      this.connection_repository['connectionState'],
       core,
     );
 
@@ -329,24 +311,6 @@ export class TestFactory {
     );
 
     return this.calling_repository;
-  }
-
-  /**
-   * @returns {Promise<NotificationRepository>} The repository for system notifications.
-   */
-  async exposeNotificationActors() {
-    await this.exposeConversationActors();
-    await this.exposeCallingActors();
-
-    this.notification_repository = new NotificationRepository(
-      this.conversation_repository,
-      new PermissionRepository(),
-      this.user_repository['userState'],
-      this.conversation_repository['conversationState'],
-      this.calling_repository['callState'],
-    );
-
-    return this.notification_repository;
   }
 
   /**

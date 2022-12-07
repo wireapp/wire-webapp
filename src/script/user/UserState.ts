@@ -27,24 +27,14 @@ import {User} from '../entity/User';
 
 @singleton()
 export class UserState {
-  public directlyConnectedUsers: ko.PureComputed<User[]>;
-  public isTeam: ko.Observable<boolean> | ko.PureComputed<boolean>;
+  public readonly self = ko.observable<User | undefined>();
+  /** All the users we know of (connected users, conversation users, team members, users we have searched for...) */
+  public readonly users = ko.observableArray<User>([]);
   /** All the users that are directly connect to the self user (do not include users that are connected through conversations) */
   public readonly connectedUsers: ko.PureComputed<User[]>;
-  public readonly users: ko.ObservableArray<User>;
-  public teamMembers: ko.PureComputed<User[]>;
-  /** Note: this does not include the self user */
-  public teamUsers: ko.PureComputed<User[]>;
   public readonly connectRequests: ko.PureComputed<User[]>;
-  public readonly isActivatedAccount: ko.PureComputed<boolean>;
-  public readonly isTemporaryGuest: ko.PureComputed<boolean>;
-  public readonly numberOfContacts: ko.PureComputed<number>;
-  public readonly self: ko.Observable<User>;
 
   constructor() {
-    this.self = ko.observable();
-    this.users = ko.observableArray([]);
-
     this.connectRequests = ko
       .pureComputed(() => this.users().filter(userEntity => userEntity.isIncomingRequest()))
       .extend({rateLimit: 50});
@@ -56,19 +46,5 @@ export class UserState {
           .sort(sortUsersByPriority);
       })
       .extend({rateLimit: TIME_IN_MILLIS.SECOND});
-
-    this.isActivatedAccount = ko.pureComputed(() => !this.self()?.isTemporaryGuest());
-    this.isTemporaryGuest = ko.pureComputed(() => this.self()?.isTemporaryGuest());
-
-    this.isTeam = ko.observable();
-    this.teamMembers = ko.pureComputed((): User[] => []);
-    this.teamUsers = ko.pureComputed((): User[] => []);
-
-    this.directlyConnectedUsers = ko.pureComputed((): User[] => []);
-
-    this.numberOfContacts = ko.pureComputed(() => {
-      const contacts = this.isTeam() ? this.teamUsers() : this.connectedUsers();
-      return contacts.filter(userEntity => !userEntity.isService).length;
-    });
   }
 }

@@ -17,32 +17,10 @@
  *
  */
 
-import {escape} from 'underscore';
-
-import {Declension, t} from 'Util/LocalizerUtil';
-import {prependProtocol} from 'Util/UrlUtil';
-import {isValidEmail} from 'Util/ValidationUtil';
-
-import type {User} from '../entity/User';
+import {prependProtocol} from './UrlUtil';
+import {isValidEmail} from './ValidationUtil';
 
 export const escapeRegex = (string: string): string => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
-export const getSelfName = (declension = Declension.NOMINATIVE, bypassSanitization = false) => {
-  const selfNameDeclensions = {
-    [Declension.NOMINATIVE]: t('conversationYouNominative'),
-    [Declension.DATIVE]: t('conversationYouDative'),
-    [Declension.ACCUSATIVE]: t('conversationYouAccusative'),
-  };
-  const selfName = selfNameDeclensions[declension];
-  return bypassSanitization ? selfName : escape(selfName);
-};
-
-export const getUserName = (userEntity: User, declension: string, bypassSanitization: boolean = false): string => {
-  if (userEntity.isMe) {
-    return getSelfName(declension, bypassSanitization);
-  }
-  return bypassSanitization ? userEntity.name() : escape(userEntity.name());
-};
 
 /**
  * Opens a new browser tab (target="_blank") with a given URL in a safe environment.

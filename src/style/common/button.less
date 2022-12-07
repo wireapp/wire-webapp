@@ -322,7 +322,9 @@
   padding: 10px;
   border: 1px solid transparent;
   border-radius: 16px;
-  transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+  transition:
+    background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out;
 }
 
 .button-text-primary {
@@ -443,7 +445,9 @@
   padding: 0;
   border: 1px solid transparent;
   border-radius: 12px;
-  transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+  transition:
+    background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out;
 
   svg {
     path {
@@ -489,7 +493,7 @@
 
     body.theme-dark & {
       border: 1px solid var(--accent-color-600);
-      background-color: var(--accent-color-700);
+      background-color: var(--accent-color-800);
       color: var(--white);
     }
   }
@@ -521,7 +525,9 @@
   }
 
   &:focus-visible {
-    outline: 1px solid var(--accent-color-300);
+    .focus-outline;
+    .focus-offset;
+    outline-offset: -0.2rem;
   }
 
   body.theme-dark & {
@@ -531,10 +537,6 @@
     &:focus-visible,
     &.active {
       color: var(--accent-color-500);
-    }
-
-    &:focus-visible {
-      outline: 1px solid var(--accent-color-600);
     }
   }
 

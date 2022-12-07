@@ -90,7 +90,13 @@
 // ----------------------------------------------------------------------------
 @ars-font-path: '../font/';
 
-@font-family-base: emoji, BlinkMacSystemFont, -apple-system, Helvetica Neue, Arial, sans-serif;
+@font-family-base:
+  emoji,
+  BlinkMacSystemFont,
+  -apple-system,
+  Helvetica Neue,
+  Arial,
+  sans-serif;
 @font-family-ephemeral: Redacted Script;
 
 @font-size-xxs: 0.5rem;
@@ -108,18 +114,40 @@
 @font-size-large: 1.25rem;
 @font-size-xlarge: 1.5rem;
 
-@line-height-xs: 0.6875rem;
-@line-height-sm: 1rem;
-@line-height-md: 1.25rem;
-@line-height-lg: 1.5rem;
-@line-height-xl: 2rem;
-@line-height-xxl: 4rem;
+body {
+  --line-height-xs: 0.6875rem;
+  --line-height-sm: 1rem;
+  --line-height-md: 1.25rem;
+  --line-height-lg: 1.5rem;
+  --line-height-xl: 2rem;
+  --line-height-xxl: 4rem;
 
-@font-weight-bold: 700;
-@font-weight-semibold: 600;
-@font-weight-medium: 500;
-@font-weight-regular: 400; // font-weight-xs should this this
-@font-weight-light: 300;
+  --font-size-xsmall: 0.6875rem;
+  --font-size-small: 0.75rem;
+  --font-size-medium: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-large: 1.25rem;
+  --font-size-xlarge: 1.5rem;
+
+  --font-weight-bold: 700;
+  --font-weight-semibold: 600;
+  --font-weight-medium: 500;
+  --font-weight-regular: 400; // font-weight-xs should this this
+  --font-weight-light: 300;
+}
+
+@line-height-xs: var(--line-height-xs);
+@line-height-sm: var(--line-height-sm);
+@line-height-md: var(--line-height-md);
+@line-height-lg: var(--line-height-lg);
+@line-height-xl: var(--line-height-xl);
+@line-height-xxl: var(--line-height-xxl);
+
+@font-weight-bold: var(--font-weight-bold);
+@font-weight-semibold: var(--font-weight-semibold);
+@font-weight-medium: var(--font-weight-medium);
+@font-weight-regular: var(--font-weight-regular);
+@font-weight-light: var(--font-weight-light);
 
 // ----------------------------------------------------------------------------
 // Icons
@@ -127,6 +155,12 @@
 @icon-size-sm: 16px;
 @icon-size-md: 32px;
 @icon-size-lg: 56px;
+
+body {
+  --icon-size-sm: 1rem;
+  --icon-size-md: 2rem;
+  --icon-size-lg: 3.5rem;
+}
 
 // ----------------------------------------------------------------------------
 // Dot sizes
@@ -160,13 +194,6 @@
 @button-round-size-xl: 72px;
 
 // ----------------------------------------------------------------------------
-// Radios
-// ----------------------------------------------------------------------------
-@radio-size: 22px;
-@radio-border-width: 2px;
-@radio-selected-border-width: 6px;
-
-// ----------------------------------------------------------------------------
 // Framework
 // ----------------------------------------------------------------------------
 @teams-width: 78px;
@@ -188,12 +215,20 @@ body {
 // ----------------------------------------------------------------------------
 // Left list
 // ----------------------------------------------------------------------------
+body {
+  --left-list-header-height: 45px;
+  --left-list-item-height: 48px;
+  --left-list-item-left-width: 60px;
+  --left-list-item-right-width: 56px;
+  --left-list-controls-width: 104px;
+}
+
 @left-list-width: @conversation-list-width;
-@left-list-header-height: 45px;
-@left-list-item-height: 48px;
-@left-list-item-left-width: 60px;
-@left-list-item-right-width: 56px;
-@left-list-controls-width: 104px;
+@left-list-header-height: var(--left-list-header-height);
+@left-list-item-height: var(--left-list-item-height);
+@left-list-item-left-width: var(--left-list-item-left-width);
+@left-list-item-right-width: var(--left-list-item-right-width);
+@left-list-controls-width: var(--left-list-controls-width);
 
 // ----------------------------------------------------------------------------
 // Conversation
@@ -204,9 +239,11 @@ body {
 @conversation-message-sender-width: 56px;
 
 body {
-  --conversation-message-timestamp-width: 170px;
+  --conversation-message-sender-width: @conversation-message-sender-width;
+
+  --conversation-message-timestamp-width: 140px;
   @media (max-width: @screen-md-min) {
-    --conversation-message-timestamp-width: 55px;
+    --conversation-message-timestamp-width: 60px;
   }
 }
 
@@ -251,13 +288,22 @@ body {
 // ----------------------------------------------------------------------------
 // Avatar
 // ---------------------------------------------------------------------------
+body {
+  --avatar-diameter-s: 28px;
+  --avatar-diameter-m: 40px;
+  --font-weight-semibold: 600;
+  --font-weight-medium: 500;
+  --font-weight-regular: 400; // font-weight-xs should this this
+  --font-weight-light: 300;
+}
+
 @avatar-diameter-xl: 200px;
 @avatar-initials-xl: @font-size-xl;
 
 @avatar-diameter-l: 72px;
 @avatar-initials-l: @font-size-lg;
 
-@avatar-diameter-m: 40px;
+@avatar-diameter-m: var(--avatar-diameter-m);
 @avatar-initials-m: @font-size-sm;
 
 @avatar-diameter-s: 28px;
@@ -318,16 +364,28 @@ body {
 @animation-timing-slow: 0.55s;
 @animation-timing-slower: 0.7s;
 
+body {
+  --ease-in-quad: cubic-bezier(0.165, 0.84, 0.44, 1);
+  --ease-in-cubic: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+  --ease-in-expo: cubic-bezier(0.6, 0.04, 0.98, 0.335);
+  --ease-in-quart: cubic-bezier(0.895, 0.03, 0.685, 0.22);
+  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-out-quart: cubic-bezier(0.165, 0.84, 0.44, 1);
+  --ease-out-back: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --ease-in-out-expo: cubic-bezier(1, 0, 0, 1);
+  --ease-in-out-quart: cubic-bezier(0.77, 0, 0.175, 1);
+}
+
 // easing functions
-@ease-in-quad: cubic-bezier(0.55, 0.085, 0.68, 0.53);
-@ease-in-cubic: cubic-bezier(0.55, 0.055, 0.675, 0.19);
-@ease-in-expo: cubic-bezier(0.6, 0.04, 0.98, 0.335);
-@ease-in-quart: cubic-bezier(0.895, 0.03, 0.685, 0.22);
-@ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
-@ease-out-quart: cubic-bezier(0.165, 0.84, 0.44, 1);
-@ease-out-back: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-@ease-in-out-expo: cubic-bezier(1, 0, 0, 1);
-@ease-in-out-quart: cubic-bezier(0.77, 0, 0.175, 1);
+@ease-in-quad: var(--ease-in-quad);
+@ease-in-cubic: var(--ease-in-cubic);
+@ease-in-expo: var(--ease-in-expo);
+@ease-in-quart: var(--ease-in-quart);
+@ease-out-expo: var(--ease-out-expo);
+@ease-out-quart: var(--ease-out-quart);
+@ease-out-back: var(--ease-out-back);
+@ease-in-out-expo: var(--ease-in-out-expo);
+@ease-in-out-quart: var(--ease-in-out-quart);
 
 // Start UI
 @start-ui-search-bar-offset: 88px;

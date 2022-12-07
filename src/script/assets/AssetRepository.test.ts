@@ -20,7 +20,7 @@
 import {AssetUploadData} from '@wireapp/api-client/lib/asset/';
 import {container} from 'tsyringe';
 
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 import {ValidationUtilError} from 'Util/ValidationUtil';
 
 import {encryptAesAsset} from './AssetCrypto';
@@ -34,14 +34,13 @@ import {Core} from '../service/CoreSingleton';
 
 describe('AssetRepository', () => {
   let assetRepository: AssetRepository;
-  const messageId = createRandomUuid();
+  const messageId = createUuid();
   const file = new Blob();
   const options = {} as AssetUploadOptions;
   let core: Core;
 
   beforeEach(async () => {
     core = container.resolve(Core);
-    await core.initServices({} as any);
     const mockedAPIClient = {
       asset: {
         api: {
@@ -64,8 +63,8 @@ describe('AssetRepository', () => {
     const video_type = 'video/mp4';
 
     beforeEach(() => {
-      const conversation_id = createRandomUuid();
-      const asset_id = createRandomUuid();
+      const conversation_id = createUuid();
+      const asset_id = createUuid();
       remote_data = AssetRemoteData.v1(conversation_id, asset_id);
       spyOn(assetRepository as any, 'loadBuffer').and.returnValue(
         Promise.resolve({buffer: video_bytes.buffer, mimeType: video_type}),
@@ -85,8 +84,8 @@ describe('AssetRepository', () => {
 
     beforeEach(async () => {
       const {cipherText, keyBytes, sha256} = await encryptAesAsset(video_bytes);
-      const conversation_id = createRandomUuid();
-      const asset_id = createRandomUuid();
+      const conversation_id = createUuid();
+      const asset_id = createUuid();
       remote_data = AssetRemoteData.v2(conversation_id, asset_id, new Uint8Array(keyBytes), new Uint8Array(sha256));
       spyOn(assetRepository as any, 'loadBuffer').and.returnValue(
         Promise.resolve({buffer: cipherText, mimeType: video_type}),

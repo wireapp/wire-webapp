@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useMemo} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
@@ -25,14 +25,14 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
+import {splitFingerprint} from 'Util/StringUtil';
 
 import {DeviceCard} from './DeviceCard';
 
 import {ClientState} from '../../client/ClientState';
 import type {CryptographyRepository} from '../../cryptography/CryptographyRepository';
-import {DeviceId} from '../DeviceId';
+import {FormattedId} from '../../page/MainContent/panels/preferences/DevicesPreferences/components/FormattedId';
 
 interface SelfFingerprintProps {
   clientState?: ClientState;
@@ -40,23 +40,25 @@ interface SelfFingerprintProps {
   noPadding: boolean;
 }
 
-const SelfFingerprint: React.FC<SelfFingerprintProps> = ({
+export const SelfFingerprint: React.FC<SelfFingerprintProps> = ({
   cryptographyRepository,
   noPadding,
   clientState = container.resolve(ClientState),
 }) => {
-  const fingerprintLocal = useMemo<string>(
-    () => cryptographyRepository.getLocalFingerprint(),
-    [cryptographyRepository],
-  );
-  const {currentClient} = useKoSubscribableChildren(clientState, ['currentClient']);
+  const [localFingerprint, setLocalFingerprint] = useState<string>('');
+  useEffect(() => {
+    cryptographyRepository.getLocalFingerprint().then(setLocalFingerprint);
+  }, [cryptographyRepository]);
+
+  const currentClient = clientState.currentClient;
 
   return (
     <div className={cx('participant-devices__header', {'participant-devices__header--padding': !noPadding})}>
-      <DeviceCard device={currentClient} />
+      {currentClient && <DeviceCard device={currentClient} />}
       <div className="participant-devices__fingerprint">
-        <DeviceId deviceId={fingerprintLocal} />
+        <FormattedId idSlices={splitFingerprint(localFingerprint)} smallPadding />
       </div>
+
       <div>
         <button
           type="button"
@@ -69,5 +71,3 @@ const SelfFingerprint: React.FC<SelfFingerprintProps> = ({
     </div>
   );
 };
-
-export {SelfFingerprint};

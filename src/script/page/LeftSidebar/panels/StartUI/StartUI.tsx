@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -32,7 +32,6 @@ import {IntegrationRepository} from 'src/script/integration/IntegrationRepositor
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {UserRepository} from 'src/script/user/UserRepository';
 import {MainViewModel} from 'src/script/view_model/MainViewModel';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {PeopleTab, SearchResultsData} from './PeopleTab';
@@ -57,6 +56,7 @@ type StartUIProps = {
   onClose: () => void;
   searchRepository: SearchRepository;
   teamRepository: TeamRepository;
+  selfUser: User;
   teamState?: TeamState;
   userRepository: UserRepository;
   userState?: UserState;
@@ -79,9 +79,9 @@ const StartUI: React.FC<StartUIProps> = ({
   mainViewModel,
   userRepository,
   isFederated,
+  selfUser,
 }) => {
   const brandName = Config.getConfig().BRAND_NAME;
-  const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
   const {
     canInviteTeamMembers,
     canSearchUnconnectedUsers,
@@ -90,6 +90,10 @@ const StartUI: React.FC<StartUIProps> = ({
     canCreateGuestRoom,
     canCreateGroupConversation,
   } = generatePermissionHelpers(selfUser.teamRole());
+
+  useEffect(() => {
+    void conversationRepository.loadMissingConversations();
+  }, [conversationRepository]);
 
   const actions = mainViewModel.actions;
   const isTeam = teamState.isTeam();
@@ -100,31 +104,29 @@ const StartUI: React.FC<StartUIProps> = ({
 
   const peopleSearchResults = useRef<SearchResultsData | undefined>(undefined);
 
-  const openFirstConversation = (): void => {
+  const openFirstConversation = async (): Promise<void> => {
     if (peopleSearchResults.current) {
       const {contacts, groups} = peopleSearchResults.current;
       if (contacts.length > 0) {
-        openContact(contacts[0]);
-        return;
+        return openContact(contacts[0]);
       }
       if (groups.length > 0) {
-        openConversation(groups[0]);
+        return openConversation(groups[0]);
       }
     }
   };
 
   const openContact = async (user: User) => {
     const conversationEntity = await actions.getOrCreate1to1Conversation(user);
-    actions.open1to1Conversation(conversationEntity);
+    return actions.open1to1Conversation(conversationEntity);
   };
 
   const openOther = (user: User) => {
     if (user.isOutgoingRequest()) {
-      openContact(user);
-      return;
+      return openContact(user);
     }
 
-    showUserModal({domain: user.domain, id: user.id});
+    return showUserModal({domain: user.domain, id: user.id});
   };
 
   const openService = (service: ServiceEntity) => {
@@ -135,10 +137,11 @@ const StartUI: React.FC<StartUIProps> = ({
     });
   };
 
-  const openInviteModal = () => showInviteModal({userState});
+  const openInviteModal = () => showInviteModal({selfUser});
 
-  const openConversation = (conversation: Conversation): Promise<void> => {
-    return actions.openGroupConversation(conversation).then(close);
+  const openConversation = async (conversation: Conversation): Promise<void> => {
+    await actions.openGroupConversation(conversation);
+    onClose();
   };
 
   const before = (
@@ -146,10 +149,10 @@ const StartUI: React.FC<StartUIProps> = ({
       <div className="start-ui-header-user-input" data-uie-name="enter-search">
         <SearchInput
           input={searchQuery}
-          placeholder={isFederated ? t('searchPlaceholderFederation') : t('searchPlaceholder')}
+          placeholder={t('searchPeoplePlaceholder')}
           selectedUsers={[]}
           setInput={setSearchQuery}
-          enter={openFirstConversation}
+          onEnter={openFirstConversation}
           forceDark
         />
       </div>
@@ -184,26 +187,31 @@ const StartUI: React.FC<StartUIProps> = ({
 
   const content =
     activeTab === Tabs.PEOPLE ? (
-      <PeopleTab
-        searchQuery={searchQuery}
-        isTeam={isTeam}
-        isFederated={isFederated}
-        teamRepository={teamRepository}
-        teamState={teamState}
-        userState={userState}
-        canSearchUnconnectedUsers={canSearchUnconnectedUsers()}
-        conversationState={conversationState}
-        searchRepository={searchRepository}
-        conversationRepository={conversationRepository}
-        canInviteTeamMembers={canInviteTeamMembers()}
-        canCreateGroupConversation={canCreateGroupConversation()}
-        canCreateGuestRoom={canCreateGuestRoom()}
-        userRepository={userRepository}
-        onClickContact={openContact}
-        onClickConversation={openConversation}
-        onClickUser={openOther}
-        onSearchResults={searchResult => (peopleSearchResults.current = searchResult)}
-      />
+      <>
+        <h2 className="visually-hidden">{t('conversationFooterContacts')}</h2>
+
+        <PeopleTab
+          searchQuery={searchQuery}
+          isTeam={isTeam}
+          isFederated={isFederated}
+          teamRepository={teamRepository}
+          teamState={teamState}
+          selfUser={selfUser}
+          userState={userState}
+          canSearchUnconnectedUsers={canSearchUnconnectedUsers()}
+          conversationState={conversationState}
+          searchRepository={searchRepository}
+          conversationRepository={conversationRepository}
+          canInviteTeamMembers={canInviteTeamMembers()}
+          canCreateGroupConversation={canCreateGroupConversation()}
+          canCreateGuestRoom={canCreateGuestRoom()}
+          userRepository={userRepository}
+          onClickContact={openContact}
+          onClickConversation={openConversation}
+          onClickUser={openOther}
+          onSearchResults={searchResult => (peopleSearchResults.current = searchResult)}
+        />
+      </>
     ) : (
       <ServicesTab
         searchQuery={searchQuery}
@@ -222,7 +230,7 @@ const StartUI: React.FC<StartUIProps> = ({
 
   return (
     <ListWrapper
-      id={'start-ui'}
+      id="start-ui"
       header={teamName}
       headerUieName="status-team-name-search"
       onClose={onClose}

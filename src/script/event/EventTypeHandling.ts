@@ -17,9 +17,15 @@
  *
  */
 
-import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
+import {CONVERSATION_EVENT, ConversationEvent} from '@wireapp/api-client/lib/event';
 
 import {ClientEvent} from './Client';
+
+import {ClientConversationEvent} from '../conversation/EventBuilder';
+
+export function eventShouldBeStored(event: {type: any}): event is ClientConversationEvent | ConversationEvent {
+  return EventTypeHandling.STORE.includes(event.type);
+}
 
 export const EventTypeHandling = {
   CONFIRM: [
@@ -35,6 +41,8 @@ export const EventTypeHandling = {
     CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE,
     CONVERSATION_EVENT.RECEIPT_MODE_UPDATE,
     CONVERSATION_EVENT.RENAME,
+    CONVERSATION_EVENT.PROTOCOL_UPDATE,
+    ClientEvent.CONVERSATION.FEDERATION_STOP,
     ClientEvent.CONVERSATION.ASSET_ADD,
     ClientEvent.CONVERSATION.COMPOSITE_MESSAGE_ADD,
     ClientEvent.CONVERSATION.DELETE_EVERYWHERE,
@@ -42,14 +50,20 @@ export const EventTypeHandling = {
     ClientEvent.CONVERSATION.INCOMING_MESSAGE_TOO_BIG,
     ClientEvent.CONVERSATION.KNOCK,
     ClientEvent.CONVERSATION.CALL_TIME_OUT,
+    ClientEvent.CONVERSATION.FAILED_TO_ADD_USERS,
     ClientEvent.CONVERSATION.LEGAL_HOLD_UPDATE,
     ClientEvent.CONVERSATION.LOCATION,
     ClientEvent.CONVERSATION.MESSAGE_ADD,
+    ClientEvent.CONVERSATION.REACTION,
     ClientEvent.CONVERSATION.MISSED_MESSAGES,
+    ClientEvent.CONVERSATION.JOINED_AFTER_MLS_MIGRATION,
+    ClientEvent.CONVERSATION.MLS_MIGRATION_ONGOING_CALL,
+    ClientEvent.CONVERSATION.MLS_CONVERSATION_RECOVERED,
     ClientEvent.CONVERSATION.ONE2ONE_CREATION,
     ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE,
     ClientEvent.CONVERSATION.UNABLE_TO_DECRYPT,
     ClientEvent.CONVERSATION.VERIFICATION,
+    ClientEvent.CONVERSATION.E2EI_VERIFICATION,
     ClientEvent.CONVERSATION.VOICE_CHANNEL_ACTIVATE,
     ClientEvent.CONVERSATION.VOICE_CHANNEL_DEACTIVATE,
   ],

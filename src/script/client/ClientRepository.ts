@@ -35,9 +35,11 @@ import {matchQualifiedIds} from 'Util/QualifiedId';
 import {loadValue} from 'Util/StorageUtil';
 
 import {ClientEntity} from './ClientEntity';
+import {constructClientId, parseClientId} from './ClientIdUtil';
 import {ClientMapper} from './ClientMapper';
 import type {ClientService} from './ClientService';
 import {ClientState} from './ClientState';
+import {isClientMLSCapable, wasClientActiveWithinLast4Weeks} from './ClientUtils';
 
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
@@ -45,7 +47,7 @@ import type {CryptographyRepository} from '../cryptography/CryptographyRepositor
 import type {User} from '../entity/User';
 import {ClientError} from '../error/ClientError';
 import {Core} from '../service/CoreSingleton';
-import {ClientRecord, StorageRepository} from '../storage';
+import {ClientRecord} from '../storage';
 import {StorageKey} from '../storage/StorageKey';
 
 export type UserClientEntityMap = {[userId: string]: ClientEntity[]};
@@ -68,7 +70,6 @@ export class ClientRepository {
   constructor(
     public readonly clientService: ClientService,
     public readonly cryptographyRepository: CryptographyRepository,
-    private readonly storageRepository: StorageRepository,
     private readonly clientState = container.resolve(ClientState),
     private readonly core = container.resolve(Core),
   ) {
@@ -76,15 +77,12 @@ export class ClientRepository {
     this.selfUser = ko.observable(undefined);
     this.logger = getLogger('ClientRepository');
 
-    this.clientState.clients = ko.pureComputed(() => (this.selfUser() ? this.selfUser().devices() : []));
-
     amplify.subscribe(WebAppEvents.LIFECYCLE.ASK_TO_CLEAR_DATA, this.logoutClient);
     amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent);
   }
 
   init(selfUser: User): void {
     this.selfUser(selfUser);
-    this.logger.info(`Initialized repository with user ID '${this.selfUser().id}'`);
   }
 
   //##############################################################################
@@ -92,7 +90,7 @@ export class ClientRepository {
   //##############################################################################
 
   private deleteClientFromDb(userId: QualifiedId, clientId: string): Promise<string> {
-    return this.clientService.deleteClientFromDb(this.core.service!.cryptography.constructSessionId(userId, clientId));
+    return this.clientService.deleteClientFromDb(constructClientId(userId, clientId));
   }
 
   /**
@@ -114,7 +112,7 @@ export class ClientRepository {
       const skippedUserIds = [this.selfUser().id, ClientRepository.PRIMARY_KEY_CURRENT_CLIENT];
 
       for (const clientRecord of clientRecords) {
-        const {userId} = ClientEntity.dismantleUserClientId(clientRecord.meta.primary_key);
+        const {userId} = parseClientId(clientRecord.meta.primary_key);
         if (userId && !skippedUserIds.includes(userId)) {
           recipients[userId] ||= [];
           recipients[userId].push(ClientMapper.mapClient(clientRecord, false, clientRecord.domain));
@@ -134,7 +132,7 @@ export class ClientRepository {
       const status = error.response?.status;
       const clientNotFoundBackend = status === HTTP_STATUS.NOT_FOUND;
       if (clientNotFoundBackend) {
-        this.logger.warn(`Local client '${clientId}' no longer exists on the backend`, error);
+        this.logger.warn(`Local client no longer exists on the backend`, error);
         throw new ClientError(ClientError.TYPE.NO_VALID_CLIENT, ClientError.MESSAGE.NO_VALID_CLIENT);
       }
 
@@ -154,14 +152,13 @@ export class ClientRepository {
       })
       .then(clientRecord => {
         if (typeof clientRecord === 'string') {
-          this.logger.info('No local client found in database');
+          this.logger.warn('No local client found in database');
           throw new ClientError(ClientError.TYPE.NO_VALID_CLIENT, ClientError.MESSAGE.NO_VALID_CLIENT);
         }
 
         const currentClient = ClientMapper.mapClient(clientRecord, true, clientRecord.domain);
-        this.clientState.currentClient(currentClient);
-        this.logger.info(`Loaded local client '${currentClient.id}'`, this.clientState.currentClient());
-        return this.clientState.currentClient();
+        this.clientState.currentClient = currentClient;
+        return this.clientState.currentClient;
       });
   }
 
@@ -173,7 +170,7 @@ export class ClientRepository {
    * @returns Resolves with the record stored in database
    */
   saveClientInDb(userId: QualifiedId, clientPayload: ClientRecord): Promise<ClientRecord> {
-    const primaryKey = this.core.service!.cryptography.constructSessionId(userId, clientPayload.id);
+    const primaryKey = constructClientId(userId, clientPayload.id);
     return this.clientService.saveClientInDb(primaryKey, clientPayload);
   }
 
@@ -186,8 +183,7 @@ export class ClientRepository {
    * @param changes New values which should be updated on the client
    * @returns Number of updated records
    */
-  private updateClientInDb(userId: QualifiedId, clientId: string, changes: Partial<ClientRecord>): Promise<number> {
-    const primaryKey = this.core.service!.cryptography.constructSessionId(userId, clientId);
+  private updateClientInDb(primaryKey: string, changes: Partial<ClientRecord>): Promise<number> {
     // Preserve primary key on update
     changes.meta.primary_key = primaryKey;
     return this.clientService.updateClientInDb(primaryKey, changes);
@@ -202,7 +198,8 @@ export class ClientRepository {
    * @returns Resolves when the verification state has been updated
    */
   async verifyClient(userId: QualifiedId, clientEntity: ClientEntity, isVerified: boolean): Promise<void> {
-    await this.updateClientInDb(userId, clientEntity.id, {meta: {is_verified: isVerified}});
+    const primaryKey = clientEntity.meta.primaryKey ?? constructClientId(userId, clientEntity.id);
+    await this.updateClientInDb(primaryKey, {meta: {is_verified: isVerified}});
     clientEntity.meta.isVerified(isVerified);
     amplify.publish(WebAppEvents.CLIENT.VERIFICATION_STATE_CHANGED, userId, clientEntity, isVerified);
   }
@@ -217,10 +214,11 @@ export class ClientRepository {
   private updateClientSchemaInDb(userId: QualifiedId, clientPayload: PublicClient): Promise<ClientRecord> {
     const clientRecord: ClientRecord = {
       ...clientPayload,
-      domain: this.core.backendFeatures.federationEndpoints ? userId.domain : undefined,
+      domain: userId.domain,
       meta: {
         is_verified: false,
-        primary_key: this.core.service!.cryptography.constructSessionId(userId, clientPayload.id),
+        is_mls_verified: false,
+        primary_key: constructClientId(userId, clientPayload.id),
       },
     };
     return this.saveClientInDb(userId, clientRecord);
@@ -245,14 +243,16 @@ export class ClientRepository {
    * Get and validate the local client.
    * @returns Resolves with an observable containing the client if valid
    */
-  async getValidLocalClient(): Promise<ko.Observable<ClientEntity>> {
+  async getValidLocalClient(): Promise<ClientEntity> {
     try {
       const clientEntity = await this.getCurrentClientFromDb();
-      const clientPayload = await this.getClientByIdFromBackend(clientEntity.id);
-      this.logger.info(`Client with ID '${clientPayload.id}' (${clientPayload.type}) validated on backend`);
+      await this.getClientByIdFromBackend(clientEntity.id);
       const currentClient = this.clientState.currentClient;
 
-      await this.clientService.putClientCapabilities(currentClient().id, {
+      if (!currentClient) {
+        throw new ClientError(ClientError.TYPE.CLIENT_NOT_SET, ClientError.MESSAGE.CLIENT_NOT_SET);
+      }
+      await this.clientService.putClientCapabilities(currentClient.id, {
         capabilities: [ClientCapability.LEGAL_HOLD_IMPLICIT_CONSENT],
       });
 
@@ -271,9 +271,9 @@ export class ClientRepository {
    * Load current client type from amplify store.
    * @returns Type of current client
    */
-  private loadCurrentClientType(): ClientType.PERMANENT | ClientType.TEMPORARY {
-    if (this.clientState.currentClient()) {
-      return this.clientState.currentClient().type;
+  private loadCurrentClientType(): ClientType.PERMANENT | ClientType.TEMPORARY | undefined {
+    if (this.clientState.currentClient) {
+      return this.clientState.currentClient.type;
     }
     const isPermanent = loadValue(StorageKey.AUTH.PERSIST);
     const type = isPermanent ? ClientType.PERMANENT : ClientType.TEMPORARY;
@@ -296,19 +296,12 @@ export class ClientRepository {
     await this.core.service!.client.deleteClient(clientId, password);
     selfUser.removeClient(clientId);
     amplify.publish(WebAppEvents.USER.CLIENT_REMOVED, selfUser.qualifiedId, clientId);
-    return this.clientState.clients();
-  }
-
-  removeLocalClient(): void {
-    this.storageRepository.deleteCryptographyStores().then(() => {
-      const shouldClearData = this.clientState.currentClient().isTemporary();
-      amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.CLIENT_REMOVED, shouldClearData);
-    });
+    return selfUser.devices();
   }
 
   logoutClient = async (): Promise<void> => {
-    if (this.clientState.currentClient()) {
-      if (this.clientState.isTemporaryClient()) {
+    if (this.clientState.currentClient) {
+      if (this.clientState.currentClient.isTemporary()) {
         await this.deleteLocalTemporaryClient();
         amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, true);
       } else {
@@ -360,7 +353,7 @@ export class ClientRepository {
             const isSelfClient = matchQualifiedIds({domain, id: userId}, this.selfUser().qualifiedId);
             clientEntityMap[domain] ||= {};
             clientEntityMap[domain][userId] = updateClients
-              ? await this.updateClientsOfUserById({domain, id: userId}, clients, true)
+              ? await this.updateUserClients({domain, id: userId}, clients, true)
               : ClientMapper.mapClients(clients, isSelfClient, domain);
           }),
         ),
@@ -373,7 +366,7 @@ export class ClientRepository {
   private async getClientByUserIdFromDb(userQualifiedId: QualifiedId): Promise<ClientRecord[]> {
     const clients = await this.clientService.loadAllClientsFromDb();
     return clients.filter(client => {
-      const {userId, domain} = ClientEntity.dismantleUserClientId(client.meta.primary_key);
+      const {userId, domain} = parseClientId(client.meta.primary_key);
       return matchQualifiedIds({domain, id: userId}, userQualifiedId);
     });
   }
@@ -383,7 +376,6 @@ export class ClientRepository {
    * @returns Resolves with all locally known clients except the current one
    */
   async getClientsForSelf(): Promise<ClientEntity[]> {
-    this.logger.info('Retrieving all clients of the self user from database');
     const {domain, id} = this.selfUser();
     const clientRecords = await this.getClientByUserIdFromDb({domain, id});
     const clientEntities = ClientMapper.mapClients(clientRecords, true, domain);
@@ -396,10 +388,10 @@ export class ClientRepository {
    * @returns Type of current client is permanent
    */
   isCurrentClientPermanent(): boolean {
-    if (!this.clientState.currentClient()) {
+    if (!this.clientState.currentClient) {
       throw new ClientError(ClientError.TYPE.CLIENT_NOT_SET, ClientError.MESSAGE.CLIENT_NOT_SET);
     }
-    return Runtime.isDesktopApp() || this.clientState.currentClient().isPermanent();
+    return Runtime.isDesktopApp() || this.clientState.currentClient.isPermanent();
   }
 
   /**
@@ -407,9 +399,16 @@ export class ClientRepository {
    * @returns Resolves when the clients have been updated
    */
   async updateClientsForSelf(): Promise<ClientEntity[]> {
-    const clientsData = await this.clientService.getClients();
+    const clientsData = await this.getAllSelfClients();
     const {domain, id} = this.selfUser();
-    return this.updateClientsOfUserById({domain, id}, clientsData, false);
+    return this.updateUserClients({domain, id}, clientsData, false);
+  }
+
+  /**
+   * Fetches metadata of all the self user's clients.
+   */
+  public async getAllSelfClients(): Promise<RegisteredClient[]> {
+    return this.clientService.getClients();
   }
 
   /**
@@ -422,7 +421,7 @@ export class ClientRepository {
    * @param publish Change clients using amplify
    * @returns Resolves with the entities once clients have been updated
    */
-  private updateClientsOfUserById(
+  private async updateUserClients(
     userId: QualifiedId,
     clientsData: RegisteredClient[] | PublicClient[],
     publish: boolean = true,
@@ -437,7 +436,7 @@ export class ClientRepository {
 
     // Find clients in database
     return this.getClientByUserIdFromDb(userId)
-      .then(clientsFromDatabase => {
+      .then(async clientsFromDatabase => {
         const promises = [];
 
         for (const databaseClient of clientsFromDatabase) {
@@ -447,21 +446,21 @@ export class ClientRepository {
           if (backendClient) {
             const {client, wasUpdated} = ClientMapper.updateClient(databaseClient, {
               ...backendClient,
-              domain: this.core.backendFeatures.federationEndpoints ? userId.domain : undefined,
+              domain: userId.domain,
             });
 
             delete clientsFromBackend[clientId];
 
-            if (this.clientState.currentClient() && this.isCurrentClient(userId, clientId)) {
-              this.logger.warn(`Removing duplicate self client '${clientId}' locally`);
-              this.removeClient(userId, clientId);
+            if (this.clientState.currentClient && this.isCurrentClient(userId, clientId)) {
+              this.logger.warn(`Removing duplicate local self client`);
+              await this.removeClient(userId, clientId);
             }
 
             // Locally known client changed on backend
             if (wasUpdated) {
               // Clear the previous client in DB (in case the domain changes the primary key will also change, thus invalidating the previous client)
-              this.clientService.deleteClientFromDb(client.meta.primary_key);
-              this.logger.info(`Updating client '${clientId}' of user '${userId}' locally`);
+              await this.clientService.deleteClientFromDb(client.meta.primary_key);
+              this.logger.info(`Updating local client`);
               promises.push(this.saveClientInDb(userId, client));
               continue;
             }
@@ -472,19 +471,19 @@ export class ClientRepository {
           }
 
           // Locally known client deleted on backend
-          this.logger.warn(`Removing client '${clientId}' of user '${userId}' locally`);
-          this.removeClient(userId, clientId);
+          this.logger.warn(`Removing local client`);
+          await this.removeClient(userId, clientId);
         }
 
         for (const clientId in clientsFromBackend) {
           const clientPayload = clientsFromBackend[clientId];
 
-          if (this.clientState.currentClient() && this.isCurrentClient(userId, clientId)) {
+          if (this.clientState.currentClient && this.isCurrentClient(userId, clientId)) {
             continue;
           }
 
           // Locally unknown client new on backend
-          this.logger.info(`New client '${clientId}' of user '${userId}' will be stored locally`);
+          this.logger.debug(`New client will be stored locally`);
           if (matchQualifiedIds(this.selfUser(), userId)) {
             this.onClientAdd({client: clientPayload as RegisteredClient});
           }
@@ -514,7 +513,7 @@ export class ClientRepository {
    * @returns Is the client the current local client
    */
   private isCurrentClient(userId: QualifiedId, clientId: string): boolean {
-    if (!this.clientState.currentClient()) {
+    if (!this.clientState.currentClient) {
       throw new ClientError(ClientError.TYPE.CLIENT_NOT_SET, ClientError.MESSAGE.CLIENT_NOT_SET);
     }
     if (!userId) {
@@ -523,7 +522,7 @@ export class ClientRepository {
     if (!clientId) {
       throw new ClientError(ClientError.TYPE.NO_CLIENT_ID, ClientError.MESSAGE.NO_CLIENT_ID);
     }
-    return matchQualifiedIds(userId, this.selfUser()) && clientId === this.clientState.currentClient().id;
+    return matchQualifiedIds(userId, this.selfUser()) && clientId === this.clientState.currentClient.id;
   }
 
   //##############################################################################
@@ -550,7 +549,7 @@ export class ClientRepository {
    * @param eventJson JSON data of 'user.client-add' event
    */
   private onClientAdd(eventJson: Pick<UserClientAddEvent, 'client'>): void {
-    this.logger.info('Client of self user added', eventJson);
+    this.logger.debug('Client of self user added');
     amplify.publish(WebAppEvents.CLIENT.ADD, this.selfUser().qualifiedId, eventJson.client, true);
   }
 
@@ -565,9 +564,11 @@ export class ClientRepository {
       return;
     }
 
-    const isCurrentClient = clientId === this.clientState.currentClient().id;
+    const isCurrentClient = clientId === this.clientState.currentClient.id;
     if (isCurrentClient) {
-      return this.removeLocalClient();
+      // If the current client has been removed, we need to sign out
+      amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.CLIENT_REMOVED, true);
+      return;
     }
     const localClients = await this.getClientsForSelf();
     const removedClient = localClients.find(client => client.id === clientId);
@@ -584,5 +585,12 @@ export class ClientRepository {
       );
     }
     amplify.publish(WebAppEvents.CLIENT.REMOVE, this.selfUser().qualifiedId, clientId);
+  }
+
+  public async haveAllActiveSelfClientsRegisteredMLSDevice(): Promise<boolean> {
+    const selfClients = await this.getAllSelfClients();
+    //we consider client active if it was active within last 4 weeks
+    const activeClients = selfClients.filter(wasClientActiveWithinLast4Weeks);
+    return activeClients.every(isClientMLSCapable);
   }
 }

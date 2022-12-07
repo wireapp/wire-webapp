@@ -34,18 +34,15 @@ const srcScript = path.resolve(SRC_PATH, 'script');
 const HOME_TEMPLATE_PATH = path.resolve(SRC_PATH, 'page/index.ejs');
 const AUTH_TEMPLATE_PATH = path.resolve(SRC_PATH, 'page/auth.ejs');
 
-const {
-  config: {SERVER: serverConfigs, CLIENT: clientConfigs},
-} = require(path.resolve(DIST_PATH, 'config.js'));
+const {clientConfig, serverConfig} = require(path.resolve(DIST_PATH, 'config/index.js'));
 
 const templateParameters = {
-  VERSION: clientConfigs.VERSION,
-  BRAND_NAME: clientConfigs.BRAND_NAME,
-  APP_BASE: serverConfigs.APP_BASE,
-  CHROME_ORIGIN_TRIAL_TOKEN: clientConfigs.CHROME_ORIGIN_TRIAL_TOKEN,
-  OPEN_GRAPH_TITLE: serverConfigs.OPEN_GRAPH.TITLE,
-  OPEN_GRAPH_DESCRIPTION: serverConfigs.OPEN_GRAPH.DESCRIPTION,
-  OPEN_GRAPH_IMAGE_URL: serverConfigs.OPEN_GRAPH.IMAGE_URL,
+  VERSION: clientConfig.VERSION,
+  BRAND_NAME: clientConfig.BRAND_NAME,
+  APP_BASE: clientConfig.APP_BASE,
+  OPEN_GRAPH_TITLE: serverConfig.OPEN_GRAPH.TITLE,
+  OPEN_GRAPH_DESCRIPTION: serverConfig.OPEN_GRAPH.DESCRIPTION,
+  OPEN_GRAPH_IMAGE_URL: serverConfig.OPEN_GRAPH.IMAGE_URL,
 };
 
 module.exports = {
@@ -149,14 +146,12 @@ module.exports = {
     new CopyPlugin({
       patterns: [
         {
-          context: 'node_modules/@wireapp/core-crypto/platforms/web/assets',
+          context: 'node_modules/@wireapp/core-crypto/platforms/web',
           from: '*.wasm',
           to: `${dist}/min/core-crypto.wasm`,
         },
         // copying all static resources (audio, images, fonts...)
         {from: 'resource', to: dist},
-        // copying worker files
-        {context: `${SRC_PATH}`, from: 'worker', to: `${dist}/worker`},
       ],
     }),
     new webpack.IgnorePlugin({resourceRegExp: /.*\.wasm/}),

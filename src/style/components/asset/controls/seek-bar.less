@@ -89,5 +89,11 @@ seek-bar {
     &::-moz-focus-outer {
       border: 0;
     } // remove dotted outline
+
+    &:focus-visible {
+      .focus-outline;
+      .focus-offset;
+      .focus-border-radius;
+    }
   }
 }

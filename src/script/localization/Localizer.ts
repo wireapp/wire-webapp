@@ -47,8 +47,6 @@ import {getParameter} from 'Util/UrlUtil';
 import {URLParameter} from '../auth/URLParameter';
 import {StorageKey} from '../storage/StorageKey';
 
-window.z = window.z || {};
-
 const strings = {
   cs,
   da,
@@ -74,10 +72,9 @@ const strings = {
   uk,
 };
 
-window.z.string = strings;
 setStrings(strings);
 
-(function setAppLocale() {
+export function setAppLocale() {
   const queryParam = getParameter(URLParameter.LOCALE);
   const currentBrowserLocale = navigator.language.slice(0, 2) as LocaleType;
 
@@ -91,8 +88,4 @@ setStrings(strings);
   setDateLocale(locale);
 
   document.getElementsByTagName('html')[0].setAttribute('lang', locale);
-
-  if (window.z.string[locale]) {
-    window.z.string = {...window.z.string, ...window.z.string[DEFAULT_LOCALE], ...window.z.string[locale]};
-  }
-})();
+}

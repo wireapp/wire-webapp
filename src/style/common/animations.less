@@ -21,7 +21,9 @@
   opacity: 1;
   pointer-events: auto;
   transform: translateY(0);
-  transition: visibility 0s, all @animation-timing-slow @ease-out-expo @animation-timing-fast;
+  transition:
+    visibility 0s,
+    all @animation-timing-slow @ease-out-expo @animation-timing-fast;
   visibility: visible;
 }
 
@@ -188,5 +190,15 @@
   .panel__footer {
     transform: translateX(@panel-width);
     transition: transform @animation-timing-fast @ease-out-quart;
+  }
+}
+
+@keyframes fadeInUserHighlighting {
+  0%,
+  50% {
+    background-color: var(--background-fade-0);
+  }
+  100% {
+    background-color: var(--background-fade-8);
   }
 }

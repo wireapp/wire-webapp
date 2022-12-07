@@ -18,15 +18,18 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {CALL_TYPE, CONV_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
+import {CALL_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {Availability} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ButtonGroupTab} from 'Components/calling/ButtonGroup';
 import 'Components/calling/ChooseScreen';
 import {replaceLink, t} from 'Util/LocalizerUtil';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 
 import type {AudioRepository} from '../audio/AudioRepository';
@@ -38,6 +41,8 @@ import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
 import {ConversationState} from '../conversation/ConversationState';
+import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
+import {isE2EIEnabled} from '../E2EIdentity';
 import type {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
 import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../media/MediaDevicesHandler';
@@ -52,14 +57,14 @@ import {TeamState} from '../team/TeamState';
 import {ROLE} from '../user/UserPermission';
 
 export interface CallActions {
-  answer: (call: Call) => void;
+  answer: (call: Call) => Promise<void>;
   changePage: (newPage: number, call: Call) => void;
   leave: (call: Call) => void;
   reject: (call: Call) => void;
-  startAudio: (conversationEntity: Conversation) => void;
-  startVideo: (conversationEntity: Conversation) => void;
-  switchCameraInput: (call: Call, deviceId: string) => void;
-  switchScreenInput: (call: Call, deviceId: string) => void;
+  startAudio: (conversationEntity: Conversation) => Promise<void>;
+  startVideo: (conversationEntity: Conversation) => Promise<void>;
+  switchCameraInput: (deviceId: string) => void;
+  switchScreenInput: (deviceId: string) => void;
   toggleCamera: (call: Call) => void;
   toggleMute: (call: Call, muteState: boolean) => void;
   toggleScreenshare: (call: Call) => void;
@@ -80,12 +85,12 @@ declare global {
     setSinkId?: (sinkId: string) => Promise<void>;
   }
 }
+const MAX_USERS_TO_CALL_WITHOUT_CONFIRM = Config.getConfig().FEATURE.MAX_USERS_TO_PING_WITHOUT_ALERT;
 
 export class CallingViewModel {
   readonly activeCalls: ko.PureComputed<Call[]>;
   readonly callActions: CallActions;
   readonly isSelfVerified: ko.Computed<boolean>;
-  readonly activeCallViewTab: ko.Observable<string>;
 
   constructor(
     readonly callingRepository: CallingRepository,
@@ -113,6 +118,23 @@ export class CallingViewModel {
       }),
     );
 
+    const toggleState = async (withVideo: boolean): Promise<void> => {
+      const conversation = this.conversationState.activeConversation();
+      if (conversation) {
+        const isActiveCall = this.callingRepository.findCall(conversation.qualifiedId);
+        const callType = withVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
+
+        if (isActiveCall) {
+          this.callingRepository.leaveCall(conversation.qualifiedId, LEAVE_CALL_REASON.ELECTRON_TRAY_MENU_MESSAGE);
+          return;
+        }
+
+        await handleCallAction(conversation, callType);
+      }
+    };
+
+    amplify.subscribe(WebAppEvents.CALL.STATE.TOGGLE, toggleState); // This event needs to be kept, it is sent by the wrapper
+
     const ring = (call: Call): void => {
       const sounds: Partial<Record<CALL_STATE, AudioType>> = {
         [CALL_STATE.INCOMING]: AudioType.INCOMING_CALL,
@@ -136,14 +158,36 @@ export class CallingViewModel {
       });
     };
 
-    const startCall = (conversationEntity: Conversation, callType: CALL_TYPE): void => {
-      const convType = conversationEntity.isGroup() ? CONV_TYPE.GROUP : CONV_TYPE.ONEONONE;
-      this.callingRepository.startCall(conversationEntity.qualifiedId, convType, callType).then(call => {
-        if (!call) {
-          return;
-        }
-        ring(call);
+    const startCall = async (conversation: Conversation, callType: CALL_TYPE): Promise<void> => {
+      const canStart = await this.canInitiateCall(conversation.qualifiedId, {
+        action: t('modalCallSecondOutgoingAction'),
+        message: t('modalCallSecondOutgoingMessage'),
+        title: t('modalCallSecondOutgoingHeadline'),
       });
+
+      if (!canStart) {
+        return;
+      }
+
+      const call = await this.callingRepository.startCall(conversation, callType);
+      if (!call) {
+        return;
+      }
+
+      ring(call);
+    };
+
+    const answerCall = async (call: Call) => {
+      const canAnswer = await this.canInitiateCall(call.conversationId, {
+        action: t('modalCallSecondIncomingAction'),
+        message: t('modalCallSecondIncomingMessage'),
+        title: t('modalCallSecondIncomingHeadline'),
+      });
+      if (!canAnswer) {
+        return;
+      }
+
+      await this.callingRepository.answerCall(call);
     };
 
     const hasSoundlessCallsEnabled = (): boolean => {
@@ -154,16 +198,77 @@ export class CallingViewModel {
       return !!this.callState.joinedCall();
     };
 
-    this.callingRepository.onIncomingCall((call: Call) => {
+    this.callingRepository.onIncomingCall(async (call: Call) => {
       const shouldRing = this.selfUser().availability() !== Availability.Type.AWAY;
       if (shouldRing && (!hasSoundlessCallsEnabled() || !hasJoinedCall())) {
         ring(call);
       }
     });
 
+    const showE2EICallModal = (conversationEntity: Conversation, callType: CALL_TYPE) => {
+      const memberCount = conversationEntity.participating_user_ets().length;
+
+      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+        primaryAction: {
+          action: async () => {
+            conversationEntity.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
+
+            if (memberCount > MAX_USERS_TO_CALL_WITHOUT_CONFIRM) {
+              showMaxUsersToCallModalWithoutConfirm(conversationEntity, callType);
+            } else {
+              await startCall(conversationEntity, callType);
+            }
+          },
+          text: t('conversation.E2EICallAnyway'),
+        },
+        secondaryAction: {
+          action: () => {},
+          text: t('conversation.E2EICancel'),
+        },
+        text: {
+          message: t('conversation.E2EIDegradedInitiateCall'),
+          title: t('conversation.E2EIConversationNoLongerVerified'),
+        },
+      });
+    };
+
+    const showMaxUsersToCallModalWithoutConfirm = (conversationEntity: Conversation, callType: CALL_TYPE) => {
+      const memberCount = conversationEntity.participating_user_ets().length;
+
+      PrimaryModal.show(PrimaryModal.type.WITHOUT_TITLE, {
+        preventClose: true,
+        primaryAction: {
+          action: async () => await startCall(conversationEntity, callType),
+          text: t('groupCallModalPrimaryBtnName'),
+        },
+        secondaryAction: {
+          text: t('modalConfirmSecondary'),
+        },
+        text: {
+          htmlMessage: `<div class="modal-description">
+            ${t('groupCallConfirmationModalTitle', memberCount)}
+          </div>`,
+          closeBtnLabel: t('groupCallModalCloseBtnLabel'),
+        },
+      });
+    };
+
+    const handleCallAction = async (conversationEntity: Conversation, callType: CALL_TYPE): Promise<void> => {
+      const memberCount = conversationEntity.participating_user_ets().length;
+      const isE2EIDegraded = conversationEntity.mlsVerificationState() === ConversationVerificationState.DEGRADED;
+
+      if (isE2EIEnabled() && isE2EIDegraded) {
+        showE2EICallModal(conversationEntity, callType);
+      } else if (memberCount > MAX_USERS_TO_CALL_WITHOUT_CONFIRM) {
+        showMaxUsersToCallModalWithoutConfirm(conversationEntity, callType);
+      } else {
+        await startCall(conversationEntity, callType);
+      }
+    };
+
     this.callActions = {
-      answer: (call: Call) => {
-        if (call.conversationType === CONV_TYPE.CONFERENCE && !this.callingRepository.supportsConferenceCalling) {
+      answer: async (call: Call) => {
+        if (call.isConference && !this.callingRepository.supportsConferenceCalling) {
           PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
             primaryAction: {
               action: () => {
@@ -178,11 +283,11 @@ export class CallingViewModel {
             },
           });
         } else {
-          this.callingRepository.answerCall(call);
+          return answerCall(call);
         }
       },
       changePage: (newPage, call) => {
-        this.callingRepository.changeCallPage(newPage, call);
+        this.callingRepository.changeCallPage(call, newPage);
       },
       leave: (call: Call) => {
         this.callingRepository.leaveCall(call.conversationId, LEAVE_CALL_REASON.MANUAL_LEAVE_BY_UI_CLICK);
@@ -191,26 +296,26 @@ export class CallingViewModel {
       reject: (call: Call) => {
         this.callingRepository.rejectCall(call.conversationId);
       },
-      startAudio: (conversationEntity: Conversation): void => {
+      startAudio: async (conversationEntity: Conversation) => {
         if (conversationEntity.isGroup() && !this.teamState.isConferenceCallingEnabled()) {
           this.showRestrictedConferenceCallingModal();
         } else {
-          startCall(conversationEntity, CALL_TYPE.NORMAL);
+          await handleCallAction(conversationEntity, CALL_TYPE.NORMAL);
         }
       },
-      startVideo: (conversationEntity: Conversation): void => {
+      startVideo: async (conversationEntity: Conversation) => {
         if (conversationEntity.isGroup() && !this.teamState.isConferenceCallingEnabled()) {
           this.showRestrictedConferenceCallingModal();
         } else {
-          startCall(conversationEntity, CALL_TYPE.VIDEO);
+          await handleCallAction(conversationEntity, CALL_TYPE.VIDEO);
         }
       },
-      switchCameraInput: (call: Call, deviceId: string) => {
-        this.mediaDevicesHandler.currentDeviceId.videoInput(deviceId);
+      switchCameraInput: (deviceId: string) => {
+        this.mediaDevicesHandler.currentDeviceId.videoinput(deviceId);
         this.callingRepository.refreshVideoInput();
       },
-      switchScreenInput: (call: Call, deviceId: string) => {
-        this.mediaDevicesHandler.currentDeviceId.screenInput(deviceId);
+      switchScreenInput: (deviceId: string) => {
+        this.mediaDevicesHandler.currentDeviceId.screeninput(deviceId);
       },
       toggleCamera: (call: Call) => {
         this.callingRepository.toggleCamera(call);
@@ -225,7 +330,7 @@ export class CallingViewModel {
         const showScreenSelection = (): Promise<void> => {
           return new Promise(resolve => {
             this.callingRepository.onChooseScreen = (deviceId: string): void => {
-              this.mediaDevicesHandler.currentDeviceId.screenInput(deviceId);
+              this.mediaDevicesHandler.currentDeviceId.screeninput(deviceId);
               this.callState.selectableScreens([]);
               this.callState.selectableWindows([]);
               resolve();
@@ -252,8 +357,62 @@ export class CallingViewModel {
     };
   }
 
+  /**
+   * Will reject or leave the call depending on the state of the call.
+   * @param activeCall - the call to gracefully tear down
+   */
+  private async gracefullyTeardownCall(activeCall: Call): Promise<void> {
+    if (activeCall.state() === CALL_STATE.INCOMING) {
+      this.callingRepository.rejectCall(activeCall.conversationId);
+    } else {
+      this.callingRepository.leaveCall(activeCall.conversationId, LEAVE_CALL_REASON.MANUAL_LEAVE_TO_JOIN_ANOTHER_CALL);
+    }
+    // We want to wait a bit to be sure the call have been tear down properly
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  }
+
+  /**
+   * Will make sure everything is ready for a call to start/be joined in the given conversation.
+   * If there is another ongoing call, the user will be asked to first leave that other call before starting a new call.
+   *
+   * @param conversationId - the conversation in which the call should be started/joined
+   * @param warningStrings - the strings to display in case there is already an active call
+   * @returns true if the call can be started, false otherwise
+   */
+  private canInitiateCall(
+    conversationId: QualifiedId,
+    warningStrings: {action: string; message: string; title: string},
+  ): Promise<boolean> {
+    const idleCallStates = [CALL_STATE.INCOMING, CALL_STATE.NONE, CALL_STATE.UNKNOWN];
+    const otherActiveCall = this.callState
+      .calls()
+      .find(call => !matchQualifiedIds(call.conversationId, conversationId) && !idleCallStates.includes(call.state()));
+    if (!otherActiveCall) {
+      return Promise.resolve(true);
+    }
+
+    return new Promise(resolve => {
+      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+        primaryAction: {
+          action: async () => {
+            await this.gracefullyTeardownCall(otherActiveCall);
+            resolve(true);
+          },
+          text: warningStrings.action,
+        },
+        secondaryAction: {
+          action: () => resolve(false),
+        },
+        text: {
+          message: warningStrings.message,
+          title: warningStrings.title,
+        },
+      });
+    });
+  }
+
   private showRestrictedConferenceCallingModal() {
-    if (this.selfUser().inTeam()) {
+    if (this.teamState.isInTeam(this.selfUser())) {
       if (this.selfUser().teamRole() === ROLE.OWNER) {
         const replaceEnterprise = replaceLink(
           Config.getConfig().URL.PRICING,
@@ -316,7 +475,7 @@ export class CallingViewModel {
     return call.state() === CALL_STATE.MEDIA_ESTAB;
   }
 
-  getConversationById(conversationId: QualifiedId): Conversation {
+  getConversationById(conversationId: QualifiedId): Conversation | undefined {
     return this.conversationState.findConversation(conversationId);
   }
 

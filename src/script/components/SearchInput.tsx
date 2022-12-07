@@ -19,6 +19,8 @@
 
 import React, {useEffect, useLayoutEffect, useRef} from 'react';
 
+import cx from 'classnames';
+
 import {isRemovalAction, isEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -27,8 +29,8 @@ import {Icon} from './Icon';
 import type {User} from '../entity/User';
 import {MAX_HANDLE_LENGTH} from '../user/UserHandleGenerator';
 
-export interface SearchInputProps {
-  enter?: () => void | Promise<void>;
+interface SearchInputProps {
+  onEnter?: (event: React.KeyboardEvent<HTMLInputElement>) => void | Promise<void>;
   /** Will force the component to have a dark theme and not follow user's theme */
   forceDark?: boolean;
   input: string;
@@ -38,8 +40,8 @@ export interface SearchInputProps {
   setSelectedUsers?: (users: User[]) => void;
 }
 
-const SearchInput: React.FC<SearchInputProps> = ({
-  enter: onEnter,
+export const SearchInput: React.FC<SearchInputProps> = ({
+  onEnter,
   input,
   selectedUsers = [],
   setSelectedUsers = () => {},
@@ -75,8 +77,9 @@ const SearchInput: React.FC<SearchInputProps> = ({
       <div className="search-inner-wrap">
         <div className="search-inner" ref={innerElement}>
           <div className="search-icon icon-search" />
+
           <input
-            className="search-input"
+            className={cx('search-input', {'search-input-padding': !!input})}
             data-uie-name="enter-users"
             maxLength={MAX_HANDLE_LENGTH}
             onChange={event => setInput(event.target.value)}
@@ -85,7 +88,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
                 setSelectedUsers(selectedUsers.slice(0, -1));
               } else if (isEnterKey(event.nativeEvent)) {
                 event.preventDefault();
-                onEnter?.();
+                onEnter?.(event);
               }
               return true;
             }}
@@ -97,6 +100,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
             value={input}
             aria-label={placeholder}
           />
+
           {input && (
             <button
               className="search-input-cancel"
@@ -107,16 +111,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
             </button>
           )}
         </div>
-        <div className="search-input-selected">
-          {selectedUsers.map(({name, id}) => (
-            <span key={id} data-uie-name="item-selected">
-              {name()}
-            </span>
-          ))}
-        </div>
       </div>
     </form>
   );
 };
-
-export {SearchInput};

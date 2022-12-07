@@ -19,11 +19,10 @@
 
 import {render, waitFor} from '@testing-library/react';
 import type {RichInfo} from '@wireapp/api-client/lib/user/';
-import {act} from 'react-dom/test-utils';
 
 import {User} from 'src/script/entity/User';
 import {RichProfileRepository} from 'src/script/user/RichProfileRepository';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {EnrichedFields} from './EnrichedFields';
 
@@ -45,35 +44,27 @@ const createRichProfileRepository = () => {
 describe('EnrichedFields', () => {
   it('displays all the given fields', async () => {
     const richProfileRepository = createRichProfileRepository();
-    const user = new User(createRandomUuid(), '');
+    const user = new User(createUuid(), '');
 
     const props = {richProfileRepository, user};
 
     const {getAllByTestId} = render(<EnrichedFields {...props} />);
 
-    await act(() =>
-      waitFor(() => {
-        expect(richProfileRepository.getUserRichProfile).toHaveBeenCalled();
-      }),
-    );
+    await waitFor(() => getAllByTestId('item-enriched-key'));
 
-    expect(getAllByTestId('item-enriched-key')).toHaveLength(2);
+    expect(getAllByTestId('item-enriched-key')).toHaveLength(richInfo.fields!.length);
   });
 
   it('displays the email if set on user', async () => {
     const richProfileRepository = createRichProfileRepository();
-    const user = new User(createRandomUuid(), '');
+    const user = new User(createUuid(), '');
     user.email('user@inter.net');
 
     const props = {richProfileRepository, user};
 
     const {getAllByTestId} = render(<EnrichedFields {...props} />);
 
-    await act(() =>
-      waitFor(() => {
-        expect(richProfileRepository.getUserRichProfile).toHaveBeenCalled();
-      }),
-    );
+    await waitFor(() => getAllByTestId('item-enriched-key'));
 
     expect(getAllByTestId('item-enriched-key')).toHaveLength(3);
   });
@@ -81,17 +72,13 @@ describe('EnrichedFields', () => {
   it('displays the domain of a user when the federation feature flag is turned on', async () => {
     const richProfileRepository = createRichProfileRepository();
     const domain = 'wire.com';
-    const user = new User(createRandomUuid(), domain);
+    const user = new User(createUuid(), domain);
 
     const props = {richProfileRepository, showDomain: true, user};
 
-    const {container} = render(<EnrichedFields {...props} />);
+    const {container, getAllByTestId} = render(<EnrichedFields {...props} />);
 
-    await act(() =>
-      waitFor(() => {
-        expect(richProfileRepository.getUserRichProfile).toHaveBeenCalled();
-      }),
-    );
+    await waitFor(() => getAllByTestId('item-enriched-key'));
 
     const itemEnrichedValues = container.querySelectorAll(
       `[data-uie-name="item-enriched-value"][data-uie-value="${domain}"]`,
@@ -103,17 +90,13 @@ describe('EnrichedFields', () => {
   it('does NOT display the domain of a user when the federation feature flag is turned off', async () => {
     const richProfileRepository = createRichProfileRepository();
     const domain = 'wire.com';
-    const user = new User(createRandomUuid(), domain);
+    const user = new User(createUuid(), domain);
 
     const props = {richProfileRepository, user};
 
-    const {container} = render(<EnrichedFields {...props} />);
+    const {container, getAllByTestId} = render(<EnrichedFields {...props} />);
 
-    await act(() =>
-      waitFor(() => {
-        expect(richProfileRepository.getUserRichProfile).toHaveBeenCalled();
-      }),
-    );
+    await waitFor(() => getAllByTestId('item-enriched-key'));
 
     const itemEnrichedValues = container.querySelectorAll(
       `[data-uie-name="item-enriched-value"][data-uie-value="${domain}"]`,
@@ -124,18 +107,14 @@ describe('EnrichedFields', () => {
 
   it('calls the `onFieldsLoaded` function when fields are loaded', async () => {
     const richProfileRepository = createRichProfileRepository();
-    const user = new User(createRandomUuid(), '');
+    const user = new User(createUuid(), '');
     const onFieldsLoaded = jest.fn();
 
     const props = {onFieldsLoaded, richProfileRepository, user};
 
-    render(<EnrichedFields {...props} />);
+    const {getAllByTestId} = render(<EnrichedFields {...props} />);
 
-    await act(() =>
-      waitFor(() => {
-        expect(richProfileRepository.getUserRichProfile).toHaveBeenCalled();
-      }),
-    );
+    await waitFor(() => getAllByTestId('item-enriched-key'));
 
     expect(onFieldsLoaded).toHaveBeenCalledWith(richInfo.fields);
   });

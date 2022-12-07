@@ -17,8 +17,6 @@
  *
  */
 
-import React, {MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent} from 'react';
-
 import {css} from '@emotion/react';
 
 import {ConversationListCell} from 'Components/list/ConversationListCell';
@@ -26,10 +24,11 @@ import type {ConversationLabel} from 'src/script/conversation/ConversationLabelR
 import {Conversation} from 'src/script/entity/Conversation';
 import {ListViewModel} from 'src/script/view_model/ListViewModel';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {isKeyboardEvent} from 'Util/KeyboardUtil';
 
 import {GroupedConversationHeader} from './GroupedConversationHeader';
 
-import {useRoveFocus} from '../../../../hooks/useRoveFocus';
+import {useConversationFocus} from '../../../../hooks/useConversationFocus';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from '../../../../router/routerBindings';
 
@@ -43,7 +42,7 @@ export interface GroupedConversationsFolderProps {
   toggle: (folderId: string) => void;
 }
 
-const GroupedConversationsFolder: React.FC<GroupedConversationsFolderProps> = ({
+const GroupedConversationsFolder = ({
   folder,
   toggle,
   onJoinCall,
@@ -51,10 +50,10 @@ const GroupedConversationsFolder: React.FC<GroupedConversationsFolderProps> = ({
   expandedFolders,
   hasJoinableCall,
   isSelectedConversation,
-}) => {
+}: GroupedConversationsFolderProps) => {
   const isExpanded: boolean = expandedFolders.includes(folder.id);
   const {conversations} = useKoSubscribableChildren(folder, ['conversations']);
-  const {currentFocus, handleKeyDown, setCurrentFocus} = useRoveFocus(conversations.length);
+  const {currentFocus, handleKeyDown, resetConversationFocus} = useConversationFocus(conversations);
 
   return (
     <li className="conversation-folder" data-uie-name="conversation-folder" data-uie-value={folder.name}>
@@ -64,14 +63,12 @@ const GroupedConversationsFolder: React.FC<GroupedConversationsFolderProps> = ({
           conversations.map((conversation, index) => (
             <ConversationListCell
               dataUieName="item-conversation"
+              isFocused={currentFocus === conversation.id}
               key={conversation.id}
-              index={index}
-              focusConversation={currentFocus === index}
-              isConversationListFocus
-              handleFocus={setCurrentFocus}
-              handleArrowKeyDown={handleKeyDown}
-              onClick={(event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>) => {
-                if ('key' in event) {
+              handleArrowKeyDown={handleKeyDown(index)}
+              resetConversationFocus={resetConversationFocus}
+              onClick={event => {
+                if (isKeyboardEvent(event)) {
                   createNavigateKeyboard(generateConversationUrl(conversation.qualifiedId), true)(event);
                 } else {
                   createNavigate(generateConversationUrl(conversation.qualifiedId))(event);
@@ -82,7 +79,6 @@ const GroupedConversationsFolder: React.FC<GroupedConversationsFolderProps> = ({
               showJoinButton={hasJoinableCall(conversation)}
               isSelected={isSelectedConversation}
               onJoinCall={onJoinCall}
-              isFolder={true}
             />
           ))}
       </ul>

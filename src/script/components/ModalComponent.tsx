@@ -20,6 +20,7 @@
 import React, {useEffect, useId, useRef, useState, useCallback} from 'react';
 
 import {CSSObject} from '@emotion/react';
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {noop, preventFocusOutside} from 'Util/util';
 
@@ -68,10 +69,8 @@ const ModalContentStyles: CSSObject = {
   flexDirection: 'column',
   fontSize: '0.875rem',
   margin: 'auto',
-  maxHeight: 615,
+  maxHeight: '90vh',
   overflow: 'hidden',
-  overflowY: 'hidden',
-  padding: 16,
   position: 'relative',
   transform: 'scale(0.8)',
   transition: 'transform 0.35s cubic-bezier(0.165, 0.84, 0.44, 1)',
@@ -150,6 +149,7 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
       id={id}
       css={hasVisibleClass ? ModalOverlayVisibleStyles : ModalOverlayStyles}
       style={{display: displayNone ? 'none' : 'flex'}}
+      tabIndex={TabIndex.FOCUSABLE}
       className={className}
       {...rest}
     >
@@ -160,7 +160,7 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
           id={trapId}
           onClick={event => event.stopPropagation()}
           role="button"
-          tabIndex={-1}
+          tabIndex={TabIndex.UNFOCUSABLE}
           onKeyDown={noop}
           css={{...(hasVisibleClass ? ModalContentVisibleStyles : ModalContentStyles), ...wrapperCSS}}
         >

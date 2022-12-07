@@ -21,9 +21,11 @@
 export enum SuperType {
   CALL = 'call',
   CALL_TIME_OUT = 'call-time-out',
+  FAILED_TO_ADD_USERS = 'failed-to-add-users',
   CONTENT = 'normal',
   DELETE = 'delete',
   DEVICE = 'device',
+  FEDERATION_STOP = 'federation-stop',
   FILE_TYPE_RESTRICTED = 'file-type-restricted',
   LEGALHOLD = 'legal-hold',
   LOCATION = 'location',
@@ -35,4 +37,5 @@ export enum SuperType {
   SYSTEM = 'system',
   UNABLE_TO_DECRYPT = 'unable-to-decrypt',
   VERIFICATION = 'verification',
+  E2EI_VERIFICATION = 'e2e-verification',
 }

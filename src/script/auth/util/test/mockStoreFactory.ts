@@ -17,7 +17,6 @@
  *
  */
 
-import Cookies, {CookiesStatic} from 'js-cookie';
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 
@@ -31,7 +30,6 @@ import type {RootState, ThunkDispatch} from '../../module/reducer';
 export interface MockStoreParameters {
   actions?: TypeUtil.RecursivePartial<ActionRoot>;
   apiClient?: TypeUtil.RecursivePartial<APIClient>;
-  cookieStore?: CookiesStatic<string>;
   core?: TypeUtil.RecursivePartial<Account>;
   getConfig?: () => any;
   localStorage?: Storage;
@@ -41,7 +39,6 @@ const defaultActions = actionRoot;
 const defaultClient = new APIClient({urls: APIClient.BACKEND.STAGING});
 const defaultCore = new Account(defaultClient);
 const defaultLocalStorage = window.localStorage;
-const defaultCookieStore = Cookies;
 const defaultGetConfig = () => ({
   APP_INSTANCE_ID: 'app-id',
   FEATURE: {
@@ -51,7 +48,6 @@ const defaultGetConfig = () => ({
     ENABLE_DEBUG: true,
     ENABLE_PHONE_LOGIN: true,
     ENABLE_SSO: true,
-    PERSIST_TEMPORARY_CLIENTS: true,
   },
 });
 
@@ -59,13 +55,12 @@ export const mockStoreFactory = (
   parameters: MockStoreParameters = {
     actions: defaultActions,
     apiClient: defaultClient,
-    cookieStore: defaultCookieStore,
     core: defaultCore,
     getConfig: defaultGetConfig,
     localStorage: defaultLocalStorage,
   },
 ) => {
-  const {actions, apiClient, cookieStore, core, getConfig, localStorage} = parameters;
+  const {actions, apiClient, core, getConfig, localStorage} = parameters;
   if (core) {
     (core as any).apiClient = apiClient;
   }
@@ -73,7 +68,6 @@ export const mockStoreFactory = (
     thunk.withExtraArgument({
       actions,
       apiClient,
-      cookieStore,
       core,
       getConfig: getConfig || defaultGetConfig,
       localStorage,

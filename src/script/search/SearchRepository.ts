@@ -17,100 +17,91 @@
  *
  */
 
-import type {QualifiedId} from '@wireapp/api-client/lib/user/';
+import type {QualifiedId, SearchResult} from '@wireapp/api-client/lib/user/';
 import {container} from 'tsyringe';
 
 import {EMOJI_RANGES} from 'Util/EmojiUtil';
-import {getLogger, Logger} from 'Util/Logger';
-import {computeTransliteration, sortByPriority, startsWith, transliterationIndex} from 'Util/StringUtil';
-
-import type {SearchService} from './SearchService';
+import {
+  computeTransliteration,
+  replaceAccents,
+  sortByPriority,
+  startsWith,
+  transliterationIndex,
+} from 'Util/StringUtil';
 
 import type {User} from '../entity/User';
+import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
 import {validateHandle} from '../user/UserHandleGenerator';
 import type {UserRepository} from '../user/UserRepository';
 
+const CONFIG = {
+  MAX_DIRECTORY_RESULTS: 30,
+  MAX_SEARCH_RESULTS: 10,
+  SEARCHABLE_FIELDS: {
+    NAME: 'name',
+    USERNAME: 'username',
+  },
+} as const;
+
 export class SearchRepository {
-  logger: Logger;
-  private readonly searchService: SearchService;
-  private readonly userRepository: UserRepository;
-
-  static get CONFIG() {
-    return {
-      MAX_DIRECTORY_RESULTS: 30,
-      MAX_SEARCH_RESULTS: 10,
-      SEARCHABLE_FIELDS: {
-        NAME: 'name',
-        USERNAME: 'username',
-      },
-    };
-  }
-
-  /**
-   * Trim and remove @.
-   * @param query Search string
-   * @returns Normalized search query
-   */
-  static normalizeQuery(query: string): string {
-    if (typeof query !== 'string') {
-      return '';
-    }
-    return query.trim().replace(/^[@]/, '').toLowerCase();
-  }
-
   /**
    * @param searchService SearchService
    * @param userRepository Repository for all user interactions
    */
   constructor(
-    searchService: SearchService,
-    userRepository: UserRepository,
+    private readonly userRepository: UserRepository,
     private readonly core = container.resolve(Core),
-  ) {
-    this.searchService = searchService;
-    this.userRepository = userRepository;
-    this.logger = getLogger('SearchRepository');
-  }
+    private readonly apiClient = container.resolve(APIClient),
+  ) {}
 
   /**
    * Search for a user in the given user list and given a search term.
    * Doesn't sort the results and keep the initial order of the given user list.
    *
-   * @param term the search term
-   * @param userEntities entities to match the search term against
-   * @param properties list of properties that will be matched against the search term
-   *    the order of the properties in the array indicates the priorities by which results will be sorted
+   * @param query the search term
+   * @param users entities to match the search term against
    * @returns the filtered list of users
    */
-  searchUserInSet(
-    term: string,
-    userEntities: User[],
-    properties = [SearchRepository.CONFIG.SEARCHABLE_FIELDS.NAME, SearchRepository.CONFIG.SEARCHABLE_FIELDS.USERNAME],
-  ): User[] {
-    if (term === '') {
-      return userEntities;
+  searchUserInSet(term: string, users: User[]): User[] {
+    const {isHandleQuery, query: domainQuery} = this.normalizeQuery(term);
+    if (domainQuery === '') {
+      return users;
     }
-    const excludedEmojis = Array.from(term).reduce<Record<string, string>>((emojis, char) => {
+    // If the user typed a domain, we will just ignore it when searching for the user locally
+    const [query] = domainQuery.split('@');
+    const properties = isHandleQuery
+      ? [CONFIG.SEARCHABLE_FIELDS.USERNAME]
+      : [CONFIG.SEARCHABLE_FIELDS.NAME, CONFIG.SEARCHABLE_FIELDS.USERNAME];
+
+    const excludedEmojis = Array.from(query).reduce<Record<string, string>>((emojis, char) => {
       const isEmoji = EMOJI_RANGES.includes(char);
       if (isEmoji) {
         emojis[char] = char;
       }
       return emojis;
     }, {});
-    const termSlug = computeTransliteration(term, excludedEmojis);
-    const weightedResults = userEntities.reduce((results, userEntity) => {
-      const values = properties
+
+    const termSlug = computeTransliteration(query, excludedEmojis);
+    const weightedResults = users.reduce<{user: User; weight: number}[]>((results, userEntity) => {
+      /*
+        given user of name Bardia and username of bardia_wire this mapping
+        will get name & username properties and return an array value like ['Bardia', 'bardia_wire']
+      */
+      const values: string[] = properties
         .slice()
         .reverse()
-        .map((property: keyof User) =>
-          typeof userEntity[property] === 'function' ? (userEntity[property] as Function)() : userEntity[property],
-        );
+        .map(prop => {
+          const property = prop as keyof User;
+          return typeof userEntity[property] === 'function'
+            ? (userEntity[property] as Function)()
+            : userEntity[property];
+        });
 
       const uniqueValues = Array.from(new Set(values));
       const matchWeight = uniqueValues.reduce((weight, value, index) => {
         const propertyWeight = 10 * index + 1;
-        const propertyMatchWeight = this.matches(term, termSlug, excludedEmojis, value);
+        const propertyMatchWeight = this.matches(query, termSlug, excludedEmojis, value);
         return weight + propertyMatchWeight * propertyWeight;
       }, 0);
 
@@ -127,14 +118,29 @@ export class SearchRepository {
       .map(result => result.user);
   }
 
-  private matches(term: string, termSlug: string, excludedChars?: Record<string, string>, value?: string): number {
+  /**
+   * Trim and remove @.
+   * @param query Search string
+   * @returns Normalized search query
+   */
+  public normalizeQuery(query: string): {isHandleQuery: boolean; query: string} {
+    const normalizeQuery = query.trim().replace(/^[@]/, '').toLowerCase();
+    return {
+      isHandleQuery: query.startsWith('@') && validateHandle(normalizeQuery),
+      query: normalizeQuery,
+    };
+  }
+
+  private matches(term: string, termSlug: string, excludedChars?: Record<string, string>, value: string = ''): number {
     const isStrictMatch = (value || '').toLowerCase().startsWith(term.toLowerCase());
     if (isStrictMatch) {
       // if the pattern matches the raw text, give the maximum value to the match
       return 100;
     }
     const nameSlug = computeTransliteration(value, excludedChars);
-    const nameIndex = transliterationIndex(nameSlug, termSlug);
+    const nameIndexWithSlug = transliterationIndex(nameSlug, termSlug);
+    const nameIndexReplacedAccents = transliterationIndex(replaceAccents(value).toLowerCase(), term.toLowerCase());
+    const nameIndex = Math.max(nameIndexWithSlug, nameIndexReplacedAccents);
     const isStrictTransliteratedMatch = nameIndex === 0;
     if (isStrictTransliteratedMatch) {
       // give a little less points if the pattern strictly matches the transliterated string
@@ -162,6 +168,11 @@ export class SearchRepository {
     }, 0);
   }
 
+  private async getContacts(query: string, numberOfRequestedUser: number, domain?: string): Promise<SearchResult> {
+    const request = await this.apiClient.api.user.getSearchContacts(query, numberOfRequestedUser, domain);
+    return request.response;
+  }
+
   /**
    * Search for users on the backend by name.
    * @note We skip a few results as connection changes need a while to reflect on the backend.
@@ -171,35 +182,28 @@ export class SearchRepository {
    * @param maxResults Maximum number of results
    * @returns Resolves with the search results
    */
-  async searchByName(
-    query: string,
-    isHandle?: boolean,
-    maxResults = SearchRepository.CONFIG.MAX_SEARCH_RESULTS,
-  ): Promise<User[]> {
-    const [rawName, rawDomain] = this.core.backendFeatures.isFederated ? query.replace(/^@/, '').split('@') : [query];
+  async searchByName(term: string, maxResults = CONFIG.MAX_SEARCH_RESULTS): Promise<User[]> {
+    const {query, isHandleQuery} = this.normalizeQuery(term);
+    const [rawName, rawDomain] = this.core.backendFeatures.isFederated ? query.split('@') : [query];
     const [name, domain] = validateHandle(rawName, rawDomain) ? [rawName, rawDomain] : [query];
 
-    const matchedUserIdsFromDirectorySearch: QualifiedId[] = await this.searchService
-      .getContacts(name, SearchRepository.CONFIG.MAX_DIRECTORY_RESULTS, domain)
-      .then(({documents}) => documents.map(match => ({domain: match.qualified_id?.domain || '', id: match.id})));
+    const userIds: QualifiedId[] = await this.getContacts(name, CONFIG.MAX_DIRECTORY_RESULTS, domain).then(
+      ({documents}) => documents.map(match => ({domain: match.qualified_id?.domain || '', id: match.id})),
+    );
 
-    const userIds: QualifiedId[] = [...matchedUserIdsFromDirectorySearch];
-    const userEntities = await this.userRepository.getUsersById(userIds);
+    const users = await this.userRepository.getUsersById(userIds);
 
-    return Promise.resolve(userEntities)
-      .then(userEntities => userEntities.filter(userEntity => !userEntity.isMe))
-      .then(userEntities => {
-        if (isHandle) {
-          userEntities = userEntities.filter(userEntity => startsWith(userEntity.username(), query));
-        }
-
-        return userEntities
-          .sort((userA, userB) => {
-            return isHandle
-              ? sortByPriority(userA.username(), userB.username(), query)
-              : sortByPriority(userA.name(), userB.name(), query);
-          })
-          .slice(0, maxResults);
-      });
+    return (
+      users
+        // Filter out selfUser
+        .filter(user => !user.isMe)
+        .filter(user => !isHandleQuery || startsWith(user.username(), query))
+        .sort((userA, userB) => {
+          return isHandleQuery
+            ? sortByPriority(userA.username(), userB.username(), query)
+            : sortByPriority(userA.name(), userB.name(), query);
+        })
+        .slice(0, maxResults)
+    );
   }
 }

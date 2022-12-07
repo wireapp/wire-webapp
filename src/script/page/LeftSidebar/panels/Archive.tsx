@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect} from 'react';
+import {useEffect} from 'react';
 
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
@@ -33,7 +33,7 @@ import {ListWrapper} from './ListWrapper';
 import {ConversationRepository} from '../../../conversation/ConversationRepository';
 import {ConversationState} from '../../../conversation/ConversationState';
 import {Conversation} from '../../../entity/Conversation';
-import {useRoveFocus} from '../../../hooks/useRoveFocus';
+import {useConversationFocus} from '../../../hooks/useConversationFocus';
 import {ListViewModel} from '../../../view_model/ListViewModel';
 
 type ArchiveProps = {
@@ -44,20 +44,18 @@ type ArchiveProps = {
   onClose: () => void;
 };
 
-const Archive: React.FC<ArchiveProps> = ({
+const Archive = ({
   listViewModel,
   conversationRepository,
   answerCall,
   onClose,
   conversationState = container.resolve(ConversationState),
-}) => {
+}: ArchiveProps) => {
   const {archivedConversations: conversations} = useKoSubscribableChildren(conversationState, [
     'archivedConversations',
   ]);
 
   const onClickConversation = async (conversation: Conversation) => {
-    await conversationRepository.unarchiveConversation(conversation, true, 'opened conversation from archive');
-    onClose();
     amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversation, {});
   };
 
@@ -66,25 +64,27 @@ const Archive: React.FC<ArchiveProps> = ({
     conversationRepository.updateArchivedConversations();
   }, []);
 
-  const {currentFocus, handleKeyDown, setCurrentFocus} = useRoveFocus(conversations.length);
+  const {currentFocus, handleKeyDown, resetConversationFocus} = useConversationFocus(conversations);
 
+  const isActiveConversation = (conversation: Conversation) => conversationState.isActiveConversation(conversation);
   return (
     <ListWrapper id="archive" header={t('archiveHeader')} onClose={onClose}>
+      <h2 className="visually-hidden">{t('archiveHeader')}</h2>
+
       <ul className="left-list-items no-scroll">
         {conversations.map((conversation, index) => (
           <ConversationListCell
+            isFocused={currentFocus === conversation.id}
+            resetConversationFocus={resetConversationFocus}
             key={conversation.id}
-            index={index}
-            focusConversation={currentFocus === index}
-            isConversationListFocus
-            handleFocus={setCurrentFocus}
-            handleArrowKeyDown={handleKeyDown}
+            handleArrowKeyDown={handleKeyDown(index)}
             dataUieName="item-conversation-archived"
             onClick={() => onClickConversation(conversation)}
             rightClick={listViewModel.onContextMenu}
             conversation={conversation}
             onJoinCall={answerCall}
             showJoinButton={false}
+            isSelected={isActiveConversation}
           />
         ))}
       </ul>

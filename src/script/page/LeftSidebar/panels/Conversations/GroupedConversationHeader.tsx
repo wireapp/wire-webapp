@@ -35,10 +35,12 @@ export interface GroupedConversationHeaderProps {
 const GroupedConversationHeader: React.FC<GroupedConversationHeaderProps> = ({onClick, conversationLabel, isOpen}) => {
   const {conversations} = useKoSubscribableChildren(conversationLabel, ['conversations']);
   const [badge, setBadge] = useState(0);
+
   useEffect(() => {
     const updateBadge = () => setBadge(conversations.filter(conversation => conversation.hasUnread()).length);
     const unreadSubscriptions = conversations?.map(c => c.hasUnread.subscribe(updateBadge));
     updateBadge();
+
     return () => unreadSubscriptions?.forEach(s => s.dispose());
   }, [conversations?.length]);
 
@@ -55,7 +57,9 @@ const GroupedConversationHeader: React.FC<GroupedConversationHeaderProps> = ({on
       <span className="disclose-icon">
         <Icon.Disclose />
       </span>
+
       <h3 className="conversation-folder__head__name">{conversationLabel.name}</h3>
+
       {badge > 0 && (
         <span className="cell-badge-dark conversation-folder__head__badge" data-uie-name="conversation-folder-badge">
           {badge}

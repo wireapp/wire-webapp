@@ -35,7 +35,6 @@ import {formatDateNumeral, formatTimeShort, isBeforeToday} from 'Util/TimeUtil';
 import {AudioAsset} from './asset/AudioAsset';
 import {FileAsset} from './asset/FileAssetComponent';
 import {LocationAsset} from './asset/LocationAsset';
-import {RenderShowMsgBtn} from './asset/RenderShowMsgBtn';
 import {TextMessageRenderer} from './asset/TextMessageRenderer';
 import {VideoAsset} from './asset/VideoAsset';
 
@@ -45,6 +44,7 @@ import type {ContentMessage} from '../../../../entity/message/ContentMessage';
 import type {User} from '../../../../entity/User';
 import {ConversationError} from '../../../../error/ConversationError';
 import {QuoteEntity} from '../../../../message/QuoteEntity';
+import {useMessageFocusedTabIndex} from '../util';
 
 export interface QuoteProps {
   conversation: Conversation;
@@ -55,10 +55,10 @@ export interface QuoteProps {
   selfId: QualifiedId;
   showDetail: (message: ContentMessage, event: ReactMouseEvent) => void;
   showUserDetails: (user: User) => void;
-  focusConversation: boolean;
+  isMessageFocused: boolean;
 }
 
-const Quote: FC<QuoteProps> = ({
+export const Quote: FC<QuoteProps> = ({
   conversation,
   findMessage,
   focusMessage,
@@ -67,7 +67,7 @@ const Quote: FC<QuoteProps> = ({
   selfId,
   showDetail,
   showUserDetails,
-  focusConversation,
+  isMessageFocused,
 }) => {
   const [quotedMessage, setQuotedMessage] = useState<ContentMessage>();
   const [error, setError] = useState<Error | string | undefined>(quote.error);
@@ -127,7 +127,7 @@ const Quote: FC<QuoteProps> = ({
             handleClickOnMessage={handleClickOnMessage}
             showDetail={showDetail}
             showUserDetails={showUserDetails}
-            focusConversation={focusConversation}
+            isMessageFocused={isMessageFocused}
           />
         )
       )}
@@ -142,7 +142,7 @@ interface QuotedMessageProps {
   selfId: QualifiedId;
   showDetail: (message: ContentMessage, event: ReactMouseEvent) => void;
   showUserDetails: (user: User) => void;
-  focusConversation: boolean;
+  isMessageFocused: boolean;
 }
 
 const QuotedMessage: FC<QuotedMessageProps> = ({
@@ -152,41 +152,28 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
   handleClickOnMessage,
   showDetail,
   showUserDetails,
-  focusConversation,
+  isMessageFocused,
 }) => {
   const {
     user: quotedUser,
     assets: quotedAssets,
-    headerSenderName,
+    senderName,
     was_edited,
     timestamp,
-    edited_timestamp: editedTimestamp,
-  } = useKoSubscribableChildren(quotedMessage, [
-    'user',
-    'assets',
-    'headerSenderName',
-    'was_edited',
-    'timestamp',
-    'edited_timestamp',
-  ]);
-  const [showFullText, setShowFullText] = useState(false);
-  const [canShowMore, setCanShowMore] = useState(false);
-
-  useEffect(() => {
-    setShowFullText(false);
-  }, [quotedMessage]);
+  } = useKoSubscribableChildren(quotedMessage, ['user', 'assets', 'senderName', 'was_edited', 'timestamp']);
+  const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
 
   return (
     <>
       <div className="message-quote__sender">
         <button
           type="button"
-          className="button-reset-default"
+          className="button-reset-default text-left"
           onClick={() => showUserDetails(quotedUser)}
           data-uie-name="label-name-quote"
-          tabIndex={focusConversation ? 0 : -1}
+          tabIndex={messageFocusedTabIndex}
         >
-          {headerSenderName}
+          {senderName}
         </button>
         {was_edited && (
           <span data-uie-name="message-edited-quote" title={quotedMessage.displayEditedTimestamp()}>
@@ -208,29 +195,16 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
           )}
 
           {asset.isText() && (
-            <>
-              <TextMessageRenderer
-                onMessageClick={handleClickOnMessage}
-                text={asset.render(selfId)}
-                msgClass={cx('message-quote__text', {
-                  'message-quote__text--full': showFullText,
-                  'message-quote__text--large': includesOnlyEmojis(asset.text),
-                })}
-                isCurrentConversationFocused={focusConversation}
-                asset={asset}
-                data-uie-name="media-text-quote"
-                isQuoteMsg
-                setCanShowMore={setCanShowMore}
-                editedTimestamp={editedTimestamp}
-              />
-              {canShowMore && (
-                <RenderShowMsgBtn
-                  showFullText={showFullText}
-                  setShowFullText={setShowFullText}
-                  isCurrentConversationFocused={focusConversation}
-                />
-              )}
-            </>
+            <TextMessageRenderer
+              onMessageClick={handleClickOnMessage}
+              text={asset.render(selfId)}
+              className={cx('message-quote__text', {
+                'message-quote__text--large': includesOnlyEmojis(asset.text),
+              })}
+              isFocusable={isMessageFocused}
+              data-uie-name="media-text-quote"
+              collapse
+            />
           )}
 
           {asset.isVideo() && (
@@ -239,7 +213,7 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
               message={quotedMessage}
               // className="message-quote__video"
               data-uie-name="media-video-quote"
-              isCurrentConversationFocused={focusConversation}
+              isFocusable={isMessageFocused}
             />
           )}
 
@@ -248,7 +222,7 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
               message={quotedMessage}
               className="message-quote__audio"
               data-uie-name="media-audio-quote"
-              isCurrentConversationFocused={focusConversation}
+              isFocusable={isMessageFocused}
             />
           )}
 
@@ -257,7 +231,7 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
               message={quotedMessage}
               // className="message-quote__file"
               data-uie-name="media-file-quote"
-              isCurrentConversationFocused={focusConversation}
+              isFocusable={isMessageFocused}
             />
           )}
 
@@ -273,7 +247,7 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
           }
         }}
         data-uie-name="label-timestamp-quote"
-        tabIndex={focusConversation ? 0 : -1}
+        tabIndex={messageFocusedTabIndex}
       >
         {isBeforeToday(timestamp)
           ? t('replyQuoteTimeStampDate', formatDateNumeral(timestamp))
@@ -282,5 +256,3 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
     </>
   );
 };
-
-export {Quote, QuotedMessage};

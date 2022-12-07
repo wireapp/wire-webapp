@@ -19,23 +19,11 @@
 
 import type {MemberData, TeamData} from '@wireapp/api-client/lib/team/';
 import type {TeamUpdateData} from '@wireapp/api-client/lib/team/data/';
-import type {PermissionsData} from '@wireapp/api-client/lib/team/member/PermissionsData';
-
-import {Logger, getLogger} from 'Util/Logger';
 
 import {TeamEntity} from './TeamEntity';
 import {TeamMemberEntity} from './TeamMemberEntity';
 
-import type {User} from '../entity/User';
-import {roleFromTeamPermissions} from '../user/UserPermission';
-
 export class TeamMapper {
-  private readonly logger: Logger;
-
-  constructor() {
-    this.logger = getLogger('TeamMapper');
-  }
-
   mapTeamFromObject(data: TeamData, teamEntity?: TeamEntity): TeamEntity {
     return this.updateTeamFromObject(data, teamEntity);
   }
@@ -70,44 +58,23 @@ export class TeamMapper {
     }
   }
 
-  mapMemberFromArray(membersData: MemberData[]): TeamMemberEntity[] {
-    return membersData.map(data => this.updateMemberFromObject(data));
+  mapMembers(membersData: MemberData[]): TeamMemberEntity[] {
+    return membersData.map(data => this.mapMember(data));
   }
 
-  mapMemberFromObject(data: MemberData): TeamMemberEntity {
-    return this.updateMemberFromObject(data);
-  }
-
-  mapRole(userEntity: User, permissions?: PermissionsData): void {
+  mapMember(data: MemberData): TeamMemberEntity {
+    const {created_by, permissions, user = '', legalhold_status} = data;
+    const member = new TeamMemberEntity(user);
+    if (created_by) {
+      member.invitedBy = created_by;
+    }
     if (permissions) {
-      const teamRole = roleFromTeamPermissions(permissions);
-      this.logger.info(
-        `Identified user '${userEntity.id}' of team '${userEntity.teamId}' as '${teamRole}'`,
-        permissions,
-      );
-      userEntity.teamRole(teamRole);
+      member.permissions = permissions;
     }
-  }
-
-  updateMemberFromObject(): void;
-  updateMemberFromObject(memberData: MemberData, memberEntity?: TeamMemberEntity): TeamMemberEntity;
-  updateMemberFromObject(memberData?: MemberData, memberEntity = new TeamMemberEntity()): TeamMemberEntity | void {
-    if (memberData) {
-      const {created_by, permissions, user, legalhold_status} = memberData;
-      if (created_by) {
-        memberEntity.invitedBy = created_by;
-      }
-      if (permissions) {
-        memberEntity.permissions = permissions;
-      }
-      if (legalhold_status) {
-        memberEntity.legalholdStatus = legalhold_status;
-      }
-      if (user) {
-        memberEntity.userId = user;
-      }
-
-      return memberEntity;
+    if (legalhold_status) {
+      member.legalholdStatus = legalhold_status;
     }
+
+    return member;
   }
 }

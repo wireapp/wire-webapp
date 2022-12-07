@@ -26,9 +26,9 @@ export interface Action {
 }
 
 export interface Text {
-  htmlMessage?: string;
+  htmlMessage?: React.ReactNode;
   input?: string;
-  message?: string;
+  message?: React.ReactNode;
   option?: string;
   title?: string;
   closeBtnLabel?: string;
@@ -37,6 +37,8 @@ export interface Text {
 export interface ModalOptions {
   close?: () => void;
   closeOnConfirm?: boolean;
+  /** Set to `true` to add a password copy to clipboard button */
+  copyPassword?: boolean;
   /** Content needed for visualization on modal */
   data?: ClientNotificationData[] | boolean;
   hideSecondary?: boolean;
@@ -46,8 +48,9 @@ export interface ModalOptions {
   primaryAction?: Action;
   /** Called when secondary action in modal is triggered */
   secondaryAction?: Action[] | Action;
-  showClose?: boolean;
+  hideCloseBtn?: boolean;
   text?: Text;
+  passwordOptional?: boolean;
 }
 
 export enum PrimaryModalType {
@@ -59,23 +62,30 @@ export enum PrimaryModalType {
   MULTI_ACTIONS = 'modal-multi-actions',
   OPTION = 'modal-template-option',
   PASSWORD = 'modal-template-password',
+  GUEST_LINK_PASSWORD = 'modal-template-guest-link-password',
+  JOIN_GUEST_LINK_PASSWORD = 'modal-template-join-guest-link-password',
+  PASSWORD_ADVANCED_SECURITY = 'modal-template-password-advance',
   SESSION_RESET = 'modal-session-reset',
+  WITHOUT_TITLE = 'modal-without-title',
+  LOADING = 'modal-loading',
 }
 
 export interface ModalContent {
   checkboxLabel: string;
+  closeBtnTitle?: string;
   closeFn: () => void;
   closeOnConfirm?: boolean;
-  currentType: string;
+  copyPassword?: boolean;
+  currentType: string | PrimaryModalType;
   inputPlaceholder: string;
-  messageHtml: string;
-  messageText: string;
+  message: React.ReactNode;
   modalUie: string;
   onBgClick: () => void;
   primaryAction: Action | null;
   secondaryAction: Action[] | Action | null;
   titleText: string;
-  closeBtnTitle?: string;
+  hideCloseBtn?: boolean;
+  passwordOptional?: boolean;
 }
 
 export type ModalItem = {id: string; options: ModalOptions; type: PrimaryModalType};

@@ -123,11 +123,11 @@ const UsernameInput: React.FC<UsernameInputProps> = ({username, domain, userRepo
         isDone={usernameInputDone.isDone}
         onValueChange={changeUsername}
         maxLength={256 - (domain?.length ?? 0)}
-        allowedChars="0-9a-zA-Z_"
+        allowedChars="0-9a-zA-Z_.-"
         fieldName="username"
       />
       {canEditProfile && (
-        <div
+        <p
           className={cx('font-size-xs', {
             'preferences-account-username-error': errorState,
             'text-foreground': !errorState,
@@ -142,7 +142,7 @@ const UsernameInput: React.FC<UsernameInputProps> = ({username, domain, userRepo
               {!errorState && t('preferencesAccountUsernameHint')}
             </>
           )}
-        </div>
+        </p>
       )}
     </div>
   );

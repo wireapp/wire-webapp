@@ -17,7 +17,7 @@
  *
  */
 
-export interface QualifiedEntity {
+interface QualifiedEntity {
   [index: string]: any;
   domain: string | null;
   id: string;

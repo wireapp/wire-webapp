@@ -18,12 +18,12 @@
  */
 
 import type {
-  ACCESS_ROLE_V2,
-  ClientMismatch,
+  CONVERSATION_ACCESS_ROLE,
   Conversation as BackendConversation,
   ConversationCode,
   CONVERSATION_ACCESS,
-  NewOTRMessage,
+  RemoteConversations,
+  ConversationProtocol,
 } from '@wireapp/api-client/lib/conversation';
 import type {
   ConversationJoinData,
@@ -31,6 +31,7 @@ import type {
   ConversationOtherMemberUpdateData,
   ConversationReceiptModeUpdateData,
 } from '@wireapp/api-client/lib/conversation/data';
+import {ConversationProtocolUpdateEvent} from '@wireapp/api-client/lib/event';
 import type {
   ConversationCodeDeleteEvent,
   ConversationCodeUpdateEvent,
@@ -46,11 +47,14 @@ import {container} from 'tsyringe';
 
 import {getLogger, Logger} from 'Util/Logger';
 
+import {MLSCapableConversation} from './ConversationSelectors';
+
 import type {Conversation as ConversationEntity} from '../entity/Conversation';
 import type {EventService} from '../event/EventService';
 import {MessageCategory} from '../message/MessageCategory';
 import {search as fullTextSearch} from '../search/FullTextSearch';
 import {APIClient} from '../service/APIClientSingleton';
+import {Core} from '../service/CoreSingleton';
 import {StorageService} from '../storage';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {StorageSchemata} from '../storage/StorageSchemata';
@@ -63,9 +67,20 @@ export class ConversationService {
     eventService: EventService,
     private readonly storageService = container.resolve(StorageService),
     private readonly apiClient = container.resolve(APIClient),
+    private readonly core = container.resolve(Core),
   ) {
     this.eventService = eventService;
     this.logger = getLogger('ConversationService');
+  }
+
+  private get coreConversationService() {
+    const conversationService = this.core.service?.conversation;
+
+    if (!conversationService) {
+      throw new Error('Conversation service not available');
+    }
+
+    return conversationService;
   }
 
   //##############################################################################
@@ -77,7 +92,7 @@ export class ConversationService {
    * @returns Resolves with the conversation information
    */
   async getAllConversations() {
-    return this.apiClient.api.conversation.getConversationList();
+    return this.coreConversationService.getConversations();
   }
 
   /**
@@ -86,6 +101,22 @@ export class ConversationService {
    */
   getConversationById({id, domain}: QualifiedId): Promise<BackendConversation> {
     return this.apiClient.api.conversation.getConversation({domain, id});
+  }
+
+  public async blacklistConversation(conversationId: QualifiedId): Promise<void> {
+    await this.coreConversationService.blacklistConversation(conversationId);
+  }
+
+  public async removeConversationFromBlacklist(conversationId: QualifiedId): Promise<void> {
+    await this.coreConversationService.removeConversationFromBlacklist(conversationId);
+  }
+
+  /**
+   * Get conversations for a list of conversation IDs.
+   * @see https://staging-nginz-https.zinfra.io/v4/api/swagger-ui/#/default/post_conversations_list
+   */
+  getConversationByIds(conversations: QualifiedId[]): Promise<RemoteConversations> {
+    return this.apiClient.api.conversation.getConversationsByQualifiedIds(conversations);
   }
 
   /**
@@ -104,6 +135,22 @@ export class ConversationService {
   }
 
   /**
+   * Update the conversation protocol.
+   *
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/updateConversation
+   *
+   * @param conversationId ID of conversation to rename
+   * @param protocol new protocol of the conversation
+   * @returns Resolves with the server response
+   */
+  updateConversationProtocol(
+    conversationId: QualifiedId,
+    protocol: ConversationProtocol.MIXED | ConversationProtocol.MLS,
+  ): Promise<ConversationProtocolUpdateEvent | null> {
+    return this.apiClient.api.conversation.putConversationProtocol(conversationId, protocol);
+  }
+
+  /**
    * Update the conversation message timer value.
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/updateConversationMessageTimer
@@ -113,7 +160,7 @@ export class ConversationService {
    * @returns Resolves with the server response
    */
   updateConversationMessageTimer(
-    conversationId: string,
+    conversationId: QualifiedId,
     message_timer: number,
   ): Promise<ConversationMessageTimerUpdateEvent> {
     return this.apiClient.api.conversation.putConversationMessageTimer(conversationId, {message_timer});
@@ -129,7 +176,7 @@ export class ConversationService {
    * @returns Resolves with the server response
    */
   updateConversationReceiptMode(
-    conversationId: string,
+    conversationId: QualifiedId,
     receiptMode: ConversationReceiptModeUpdateData,
   ): Promise<ConversationReceiptModeUpdateEvent> {
     return this.apiClient.api.conversation.putConversationReceiptMode(conversationId, receiptMode);
@@ -144,7 +191,7 @@ export class ConversationService {
    * @param payload Updated properties
    * @returns Resolves with the server response
    */
-  updateMemberProperties(conversationId: string, payload: Partial<ConversationMemberUpdateData>): Promise<void> {
+  updateMemberProperties(conversationId: QualifiedId, payload: Partial<ConversationMemberUpdateData>): Promise<void> {
     return this.apiClient.api.conversation.putMembershipProperties(conversationId, payload);
   }
 
@@ -181,8 +228,8 @@ export class ConversationService {
    * @param conversationId ID of conversation to request access code for
    * @returns Resolves with the server response
    */
-  postConversationCode(conversationId: string): Promise<ConversationCodeUpdateEvent> {
-    return this.apiClient.api.conversation.postConversationCodeRequest(conversationId);
+  postConversationCode(conversationId: string, password?: string): Promise<ConversationCodeUpdateEvent> {
+    return this.apiClient.api.conversation.postConversationCodeRequest(conversationId, password);
   }
 
   /**
@@ -193,8 +240,8 @@ export class ConversationService {
    * @param code Conversation access code
    * @returns Resolves with the server response
    */
-  postConversationJoin(key: string, code: string): Promise<ConversationMemberJoinEvent> {
-    return this.apiClient.api.conversation.postJoinByCode({code, key});
+  postConversationJoin(key: string, code: string, password?: string): Promise<ConversationMemberJoinEvent> {
+    return this.apiClient.api.conversation.postJoinByCode({code, key, password});
   }
 
   /**
@@ -220,13 +267,15 @@ export class ConversationService {
    * @returns Resolves with the server response
    */
   putConversationAccess(
-    conversationId: string,
+    conversationId: QualifiedId,
     accessModes: CONVERSATION_ACCESS[],
-    accessRole: ACCESS_ROLE_V2[],
+    accessRole: CONVERSATION_ACCESS_ROLE[],
   ): Promise<ConversationEvent> {
+    const accessRoleField = this.apiClient.backendFeatures.version >= 3 ? 'access_role' : 'access_role_v2';
+
     return this.apiClient.api.conversation.putAccess(conversationId, {
       access: accessModes,
-      access_role_v2: accessRole,
+      [accessRoleField]: accessRole,
     });
   }
 
@@ -278,43 +327,6 @@ export class ConversationService {
     return this.apiClient.api.conversation.postBot(conversationId, providerId, serviceId);
   }
 
-  /**
-   * Post an encrypted message to a conversation.
-   *
-   * @note If "recipients" are not specified you will receive a list of all missing OTR recipients (user-client-map).
-   * @note Options for the precondition check on missing clients are:
-   * - `false` - all clients
-   * - `Array<string>` - only clients of listed users
-   * - `true` - force sending
-   *
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/postOtrMessage
-   * @example How to send "recipients" payload
-   * "recipients": {
-   *   "<user-id>": {
-   *     "<client-id>": "<base64-encoded-encrypted-content>"
-   *   }
-   * }
-   *
-   * @param conversationId ID of conversation to send message in
-   * @param payload Payload to be posted
-   * @returns Promise that resolves when the message was sent
-   */
-  postEncryptedMessage(
-    conversationId: QualifiedId,
-    payload: NewOTRMessage<string>,
-    preconditionOption?: boolean | string[],
-  ): Promise<ClientMismatch> {
-    const reportMissing = Array.isArray(preconditionOption) ? preconditionOption : undefined;
-    const ignoreMissing = preconditionOption === true ? true : undefined;
-
-    if (reportMissing) {
-      payload.report_missing = reportMissing;
-    }
-
-    // TODO(federation): add domain in the postOTRMessage (?)
-    return this.apiClient.api.conversation.postOTRMessage(payload.sender, conversationId.id, payload, ignoreMissing);
-  }
-
   //##############################################################################
   // Database interactions
   //##############################################################################
@@ -323,10 +335,8 @@ export class ConversationService {
    * Deletes a conversation entity from the local database.
    * @returns Resolves when the entity was deleted
    */
-  async deleteConversationFromDb({id, domain}: QualifiedId): Promise<string> {
-    const key = domain ? `${id}@${domain}` : id;
-    const primaryKey = await this.storageService.delete(StorageSchemata.OBJECT_STORE.CONVERSATIONS, key);
-    return primaryKey;
+  async deleteConversationFromDb(conversationId: string): Promise<string> {
+    return this.storageService.delete(StorageSchemata.OBJECT_STORE.CONVERSATIONS, conversationId);
   }
 
   loadConversation<T>(conversationId: string): Promise<T | undefined> {
@@ -403,8 +413,8 @@ export class ConversationService {
 
     return this.storageService
       .save(StorageSchemata.OBJECT_STORE.CONVERSATIONS, conversation_et.id, conversationData)
-      .then(primary_key => {
-        this.logger.info(`State of conversation '${primary_key}' was stored`, conversationData);
+      .then(() => {
+        this.logger.info(`State of conversation '${conversation_et.id}' was stored`);
         return conversation_et;
       });
   }
@@ -424,5 +434,57 @@ export class ConversationService {
     return events
       .filter(record => record.ephemeral_expires !== true)
       .filter(({data: event_data}: any) => fullTextSearch(event_data.content, query));
+  }
+
+  /**
+   * Wipes MLS conversation in corecrypto and deletes the conversation state.
+   * @param mlsConversation mls conversation
+   */
+  async wipeMLSCapableConversation(conversation: MLSCapableConversation) {
+    const {groupId} = conversation;
+    await this.coreConversationService.wipeMLSConversation(groupId);
+  }
+
+  public addMLSConversationRecoveredListener(onRecovered: (conversationId: QualifiedId) => void) {
+    this.coreConversationService.on('MLSConversationRecovered', ({conversationId}) => onRecovered(conversationId));
+  }
+
+  /**
+   * Will try to register mls group by sending an empty commit to establish it.
+   * After group was successfully established, it will try to add other users to the group.
+   *
+   * @param groupId - id of the MLS group
+   * @param conversationId - id of the conversation
+   * @param selfUserId - id of the self user
+   * @param qualifiedUsers - list of qualified users to add to the group (should not include the self user)
+   */
+  public readonly tryEstablishingMLSGroup = (params: {
+    groupId: string;
+    conversationId: QualifiedId;
+    selfUserId: QualifiedId;
+    qualifiedUsers: QualifiedId[];
+  }) => {
+    return this.coreConversationService.tryEstablishingMLSGroup(params);
+  };
+
+  /**
+   * Checks if MLS conversation exists locally.
+   * @param groupId id of the MLS group
+   */
+  async mlsGroupExistsLocally(groupId: string): Promise<boolean> {
+    return this.coreConversationService.mlsGroupExistsLocally(groupId);
+  }
+
+  /**
+   * Will check if mls group is established locally.
+   * Group is established after the first commit was sent in the group and epoch number is at least 1.
+   * @param groupId groupId of the conversation
+   */
+  async isMLSGroupEstablishedLocally(groupId: string): Promise<boolean> {
+    return this.coreConversationService.isMLSGroupEstablishedLocally(groupId);
+  }
+
+  async getMLS1to1Conversation(userId: QualifiedId) {
+    return this.coreConversationService.getMLS1to1Conversation(userId);
   }
 }

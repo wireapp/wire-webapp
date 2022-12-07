@@ -17,72 +17,154 @@
  *
  */
 
-import {FC} from 'react';
+import {FC, useCallback, useRef, useState} from 'react';
 
-import {Icon} from 'Components/Icon';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {ReactionType} from '@wireapp/core/lib/conversation';
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+
+import {DownloadButton} from 'Components/MessagesList/Message/ContentMessage/MessageActions/DownloadButton';
+import {useMessageActionsState} from 'Components/MessagesList/Message/ContentMessage/MessageActions/MessageActions.state';
+import {
+  getActionsMenuCSS,
+  getIconCSS,
+  messageActionsMenuButton,
+} from 'Components/MessagesList/Message/ContentMessage/MessageActions/MessageActions.styles';
+import {MessageReactions} from 'Components/MessagesList/Message/ContentMessage/MessageActions/MessageReactions/MessageReactions';
+import {ReplyButton} from 'Components/MessagesList/Message/ContentMessage/MessageActions/ReplyButton';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {isTabKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
+import {MessageRepository} from '../../../conversation/MessageRepository';
 import {Conversation} from '../../../entity/Conversation';
 import {ContentMessage} from '../../../entity/message/ContentMessage';
 
 interface DetailViewModalFooterProps {
   messageEntity: ContentMessage;
   conversationEntity: Conversation;
-  onLikeClick: (conversation: Conversation, message: ContentMessage) => void;
   onReplyClick: (conversation: Conversation, message: ContentMessage) => void;
   onDownloadClick: (message: ContentMessage) => void;
+  messageRepository: MessageRepository;
+  selfId: QualifiedId;
 }
+
+const MESSAGE_REPLY_ID = 'do-reply-fullscreen-picture';
+const MESSAGE_DOWNLOAD_ID = 'do-download-fullscreen-picture';
 
 const DetailViewModalFooter: FC<DetailViewModalFooterProps> = ({
   messageEntity,
   conversationEntity,
-  onLikeClick,
   onReplyClick,
   onDownloadClick,
+  messageRepository,
+  selfId,
 }) => {
-  const {is_liked: isLiked} = useKoSubscribableChildren(messageEntity, ['is_liked']);
   const {removed_from_conversation: isRemovedFromConversation} = useKoSubscribableChildren(conversationEntity, [
     'removed_from_conversation',
   ]);
+  const [currentMsgActionName, setCurrentMsgAction] = useState('');
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const isMsgReactable = messageEntity.isReactable();
+  const handleReactionClick = (reaction: ReactionType): void => {
+    if (!messageEntity.isContent()) {
+      return;
+    }
+    return void messageRepository.toggleReaction(conversationEntity, messageEntity, reaction, selfId);
+  };
+  const {handleMenuOpen} = useMessageActionsState();
+  const resetActionMenuStates = useCallback(() => {
+    setCurrentMsgAction('');
+    handleMenuOpen(false);
+  }, [handleMenuOpen]);
+
+  const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (isTabKey(event)) {
+      setCurrentMsgAction('');
+    }
+  }, []);
+
+  const toggleActiveMenu = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement> | React.KeyboardEvent<HTMLButtonElement>) => {
+      const selectedMsgActionName = event.currentTarget.dataset.uieName;
+      handleMenuOpen(false);
+      if (currentMsgActionName === selectedMsgActionName) {
+        // reset on double click
+        setCurrentMsgAction('');
+      } else if (selectedMsgActionName) {
+        setCurrentMsgAction(selectedMsgActionName);
+      }
+    },
+    [currentMsgActionName, handleMenuOpen],
+  );
+
+  const handleMessageReply = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      toggleActiveMenu(event);
+      onReplyClick(conversationEntity, messageEntity);
+    },
+    [conversationEntity, messageEntity, onReplyClick, toggleActiveMenu],
+  );
+
+  const handleAssetDownload = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      toggleActiveMenu(event);
+      onDownloadClick(messageEntity);
+    },
+    [messageEntity, onDownloadClick, toggleActiveMenu],
+  );
 
   return (
     <footer className="detail-view-footer">
-      {messageEntity.isReactable() && !isRemovedFromConversation && (
-        <button
-          type="button"
-          className="detail-view-action-button"
-          onClick={() => onLikeClick(conversationEntity, messageEntity)}
-          data-uie-name="do-like-fullscreen-picture"
-        >
-          <span className={isLiked ? 'icon-liked text-red' : 'icon-like'}></span>
-          <span>{t('conversationContextMenuLike')}</span>
-        </button>
+      {isMsgReactable && !isRemovedFromConversation && (
+        <div ref={wrapperRef} style={{display: 'flex'}}>
+          <MessageReactions
+            messageFocusedTabIndex={TabIndex.FOCUSABLE}
+            currentMsgActionName={currentMsgActionName}
+            handleCurrentMsgAction={setCurrentMsgAction}
+            resetActionMenuStates={resetActionMenuStates}
+            wrapperRef={wrapperRef}
+            handleReactionClick={handleReactionClick}
+            toggleActiveMenu={toggleActiveMenu}
+            handleKeyDown={handleKeyDown}
+          />
+          {messageEntity.isReplyable() && !isRemovedFromConversation && (
+            <ReplyButton
+              actionId={MESSAGE_REPLY_ID}
+              currentMsgActionName={currentMsgActionName}
+              messageFocusedTabIndex={TabIndex.FOCUSABLE}
+              onReplyClick={handleMessageReply}
+              onKeyPress={handleKeyDown}
+            />
+          )}
+          {messageEntity.isDownloadable() && (
+            <DownloadButton
+              actionId={MESSAGE_DOWNLOAD_ID}
+              messageFocusedTabIndex={TabIndex.FOCUSABLE}
+              onDownloadClick={handleAssetDownload}
+              onKeyPress={handleKeyDown}
+              css={{
+                ...messageActionsMenuButton(),
+                ...getIconCSS,
+                ...getActionsMenuCSS(currentMsgActionName === MESSAGE_DOWNLOAD_ID),
+              }}
+            >
+              <span className="icon-download" />
+            </DownloadButton>
+          )}
+        </div>
       )}
-
-      {messageEntity.isReplyable() && !isRemovedFromConversation && (
-        <button
-          type="button"
+      {messageEntity.isDownloadable() && !isMsgReactable && (
+        <DownloadButton
+          actionId={MESSAGE_DOWNLOAD_ID}
+          messageFocusedTabIndex={TabIndex.FOCUSABLE}
+          onDownloadClick={handleAssetDownload}
+          onKeyPress={handleKeyDown}
           className="detail-view-action-button"
-          onClick={() => onReplyClick(conversationEntity, messageEntity)}
-          data-uie-name="do-reply-fullscreen-picture"
-        >
-          <Icon.Reply />
-
-          <span>{t('conversationContextMenuReply')}</span>
-        </button>
-      )}
-
-      {messageEntity.isDownloadable() && (
-        <button
-          type="button"
-          className="detail-view-action-button"
-          onClick={() => onDownloadClick(messageEntity)}
-          data-uie-name="do-download-fullscreen-picture"
         >
           <span className="icon-download" />
           <span>{t('conversationContextMenuDownload')}</span>
-        </button>
+        </DownloadButton>
       )}
     </footer>
   );

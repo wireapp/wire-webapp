@@ -17,30 +17,9 @@
  *
  */
 
-import {NotificationActionCreator} from './creator/';
-
 import type {ThunkAction} from '../reducer';
 
 export class NotificationAction {
-  checkHistory = (): ThunkAction => {
-    return async (dispatch, getState, {core}) => {
-      dispatch(NotificationActionCreator.startCheckHistory());
-      try {
-        const hasHistory = await core.service.notification.hasHistory();
-        dispatch(NotificationActionCreator.successfulCheckHistory(hasHistory));
-      } catch (error) {
-        dispatch(NotificationActionCreator.failedCheckHistory(error));
-        throw error;
-      }
-    };
-  };
-
-  resetHistoryCheck = (): ThunkAction => {
-    return async dispatch => {
-      dispatch(NotificationActionCreator.resetHistoryCheck());
-    };
-  };
-
   setLastEventDate = (lastEventDate: Date): ThunkAction => {
     return async (dispatch, getState, {core}) => {
       await core.service.notification.setLastEventDate(lastEventDate);

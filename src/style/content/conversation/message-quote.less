@@ -1,16 +1,27 @@
 .message-quote {
   position: relative;
+  max-width: calc(
+    @conversation-max-width - var(--conversation-message-timestamp-width) - @conversation-message-sender-width - 16px
+  );
   padding-right: var(--conversation-message-timestamp-width);
-  padding-left: @conversation-message-sender-width + 16;
+  padding-left: 16px;
   margin-bottom: 10px;
   font-size: @font-size-medium;
   line-height: 1.5em;
+
+  button {
+    &:focus-visible {
+      .focus-outline;
+      .focus-border-radius;
+      .focus-offset;
+    }
+  }
 
   &::before {
     position: absolute;
     top: 0;
     bottom: 0;
-    left: @conversation-message-sender-width;
+    left: 0;
     display: block;
     width: 4px;
     height: 100%;
@@ -116,5 +127,9 @@
 
   .video-asset {
     background-color: transparent;
+  }
+
+  .message-mention {
+    font-size: @font-size-medium;
   }
 }

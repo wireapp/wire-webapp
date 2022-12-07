@@ -17,8 +17,9 @@
  *
  */
 
-import React, {useMemo, useEffect, useCallback} from 'react';
+import React, {useMemo, useEffect, useCallback, useRef} from 'react';
 
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -26,8 +27,11 @@ import {container} from 'tsyringe';
 import {IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {Icon} from 'Components/Icon';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
+import {ConversationVerificationBadges} from 'Components/VerificationBadge';
+import {User} from 'src/script/entity/User';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {ContentState} from 'src/script/page/useAppState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -38,14 +42,12 @@ import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {CallState} from '../../calling/CallState';
 import {ConversationFilter} from '../../conversation/ConversationFilter';
-import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
 import {Conversation} from '../../entity/Conversation';
 import {RightSidebarParams} from '../../page/AppMain';
 import {PanelState} from '../../page/RightSidebar/RightSidebar';
 import {TeamState} from '../../team/TeamState';
 import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
-import {UserState} from '../../user/UserState';
 import {CallActions} from '../../view_model/CallingViewModel';
 import {ViewModelRepositories} from '../../view_model/MainViewModel';
 
@@ -54,21 +56,23 @@ export interface TitleBarProps {
   conversation: Conversation;
   openRightSidebar: (panelState: PanelState, params: RightSidebarParams, compareEntityId?: boolean) => void;
   repositories: ViewModelRepositories;
-  userState: UserState;
+  selfUser: User;
   teamState: TeamState;
   isRightSidebarOpen?: boolean;
   callState?: CallState;
+  isReadOnlyConversation?: boolean;
 }
 
 export const TitleBar: React.FC<TitleBarProps> = ({
   repositories,
   conversation,
   callActions,
+  selfUser,
   openRightSidebar,
   isRightSidebarOpen = false,
-  userState = container.resolve(UserState),
   callState = container.resolve(CallState),
   teamState = container.resolve(TeamState),
+  isReadOnlyConversation = false,
 }) => {
   const {calling: callingRepository} = repositories;
   const {
@@ -83,7 +87,6 @@ export const TitleBar: React.FC<TitleBarProps> = ({
     firstUserEntity,
     hasLegalHold,
     display_name: displayName,
-    verification_state: verificationState,
   } = useKoSubscribableChildren(conversation, [
     'is1to1',
     'isRequest',
@@ -96,12 +99,13 @@ export const TitleBar: React.FC<TitleBarProps> = ({
     'firstUserEntity',
     'hasLegalHold',
     'display_name',
-    'verification_state',
   ]);
 
-  const {isActivatedAccount} = useKoSubscribableChildren(userState, ['isActivatedAccount']);
-  const {joinedCall} = useKoSubscribableChildren(callState, ['joinedCall']);
+  const {isActivatedAccount} = useKoSubscribableChildren(selfUser, ['isActivatedAccount']);
+  const {joinedCall, activeCalls} = useKoSubscribableChildren(callState, ['joinedCall', 'activeCalls']);
   const {isVideoCallingEnabled} = useKoSubscribableChildren(teamState, ['isVideoCallingEnabled']);
+
+  const currentFocusedElementRef = useRef<HTMLButtonElement | null>(null);
 
   const badgeLabelCopy = useMemo(() => {
     if (is1to1 && isRequest) {
@@ -140,9 +144,14 @@ export const TitleBar: React.FC<TitleBarProps> = ({
   const mdBreakpoint = useMatchMedia('max-width: 768px');
   const smBreakpoint = useMatchMedia('max-width: 640px');
 
+  const {close: closeRightSidebar} = useAppMainState(state => state.rightSidebar);
+
   const {setCurrentView: setView} = useAppMainState(state => state.responsiveView);
 
-  const setLeftSidebar = () => setView(ViewType.LEFT_SIDEBAR);
+  const setLeftSidebar = () => {
+    setView(ViewType.LEFT_SIDEBAR);
+    closeRightSidebar();
+  };
 
   const showDetails = useCallback(
     (addParticipants: boolean): void => {
@@ -190,8 +199,21 @@ export const TitleBar: React.FC<TitleBarProps> = ({
 
   const onClickStartAudio = () => {
     callActions.startAudio(conversation);
-    setLeftSidebar();
+    showStartedCallAlert(isGroup);
+
+    if (smBreakpoint) {
+      setLeftSidebar();
+    }
   };
+
+  useEffect(() => {
+    if (!activeCalls.length && currentFocusedElementRef.current) {
+      currentFocusedElementRef.current.focus();
+      currentFocusedElementRef.current = null;
+    }
+  }, [activeCalls.length]);
+
+  const {showStartedCallAlert} = useCallAlertState();
 
   return (
     <ul
@@ -228,10 +250,10 @@ export const TitleBar: React.FC<TitleBarProps> = ({
           onClick={onClickDetails}
           title={peopleTooltip}
           aria-label={peopleTooltip}
-          onKeyDown={e => handleKeyDown(e, onClickDetails)}
+          onKeyDown={event => handleKeyDown(event, onClickDetails)}
           data-placement="bottom"
           role="button"
-          tabIndex={0}
+          tabIndex={TabIndex.FOCUSABLE}
           data-uie-name="do-participants"
         >
           <div className="conversation-title-bar-name-label--wrapper">
@@ -244,16 +266,11 @@ export const TitleBar: React.FC<TitleBarProps> = ({
               />
             )}
 
-            {verificationState === ConversationVerificationState.VERIFIED && (
-              <Icon.Verified
-                data-uie-name="conversation-title-bar-verified-icon"
-                className="conversation-title-bar-name--verified"
-              />
-            )}
-
-            <h2 className="conversation-title-bar-name-label" data-uie-name="status-conversation-title-bar-label">
+            <span className="conversation-title-bar-name-label" data-uie-name="status-conversation-title-bar-label">
               {displayName}
-            </h2>
+            </span>
+
+            <ConversationVerificationBadges conversation={conversation} />
           </div>
 
           {conversationSubtitle && <div className="conversation-title-bar-name--subtitle">{conversationSubtitle}</div>}
@@ -269,8 +286,13 @@ export const TitleBar: React.FC<TitleBarProps> = ({
                 className="conversation-title-bar-icon"
                 title={t('tooltipConversationVideoCall')}
                 aria-label={t('tooltipConversationVideoCall')}
-                onClick={() => callActions.startVideo(conversation)}
+                onClick={event => {
+                  currentFocusedElementRef.current = event.target as HTMLButtonElement;
+                  callActions.startVideo(conversation);
+                  showStartedCallAlert(isGroup, true);
+                }}
                 data-uie-name="do-video-call"
+                disabled={isReadOnlyConversation}
               >
                 <Icon.Camera />
               </button>
@@ -281,8 +303,13 @@ export const TitleBar: React.FC<TitleBarProps> = ({
               className="conversation-title-bar-icon"
               title={t('tooltipConversationCall')}
               aria-label={t('tooltipConversationCall')}
-              onClick={() => callActions.startAudio(conversation)}
+              onClick={event => {
+                currentFocusedElementRef.current = event.target as HTMLButtonElement;
+                callActions.startAudio(conversation);
+                showStartedCallAlert(isGroup);
+              }}
               data-uie-name="do-call"
+              disabled={isReadOnlyConversation}
             >
               <Icon.Pickup />
             </button>
@@ -301,16 +328,18 @@ export const TitleBar: React.FC<TitleBarProps> = ({
             >
               <span className="visually-hidden">{t('tooltipConversationSearch')}</span>
             </IconButton>
-
-            <IconButton
-              title={t('tooltipConversationCall')}
-              aria-label={t('tooltipConversationCall')}
-              css={{marginBottom: 0}}
-              onClick={onClickStartAudio}
-              data-uie-name="do-call"
-            >
-              <Icon.Pickup />
-            </IconButton>
+            {showCallControls && (
+              <IconButton
+                title={t('tooltipConversationCall')}
+                aria-label={t('tooltipConversationCall')}
+                css={{marginBottom: 0}}
+                onClick={onClickStartAudio}
+                data-uie-name="do-call"
+                disabled={isReadOnlyConversation}
+              >
+                <Icon.Pickup />
+              </IconButton>
+            )}
           </>
         ) : (
           <button

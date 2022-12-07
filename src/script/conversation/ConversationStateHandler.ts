@@ -18,7 +18,7 @@
  */
 
 import {ConversationCode} from '@wireapp/api-client/lib/conversation/';
-import {ConversationAccessUpdateData, ConversationAccessV2UpdateData} from '@wireapp/api-client/lib/conversation/data/';
+import {ConversationAccessUpdateData} from '@wireapp/api-client/lib/conversation/data/';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
@@ -67,7 +67,11 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
               conversationEntity.accessCode(undefined);
               await this.revokeAccessCode(conversationEntity);
             }
-            await this.conversationService.putConversationAccess(conversationEntity.id, accessModes, accessRole);
+
+            const {domain, id} = conversationEntity;
+            const conversationId = {id, domain};
+
+            await this.conversationService.putConversationAccess(conversationId, accessModes, accessRole);
 
             conversationEntity.accessState(accessState);
           } catch (e) {
@@ -101,9 +105,9 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
     }
   }
 
-  async requestAccessCode(conversationEntity: Conversation): Promise<void> {
+  async requestAccessCode(conversationEntity: Conversation, password?: string): Promise<void> {
     try {
-      const response = await this.conversationService.postConversationCode(conversationEntity.id);
+      const response = await this.conversationService.postConversationCode(conversationEntity.id, password);
       const accessCode = response && response.data;
       if (accessCode) {
         ConversationMapper.mapAccessCode(conversationEntity, accessCode);
@@ -124,7 +128,7 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
 
   private _mapConversationAccessState(
     conversationEntity: Conversation,
-    eventJson: ConversationEvent<Partial<ConversationAccessV2UpdateData & ConversationAccessUpdateData>>,
+    eventJson: ConversationEvent<CONVERSATION_EVENT.ACCESS_UPDATE, ConversationAccessUpdateData>,
   ): void {
     const {access: accessModes, ...roles} = eventJson.data;
     ConversationMapper.mapAccessState(conversationEntity, accessModes, roles?.access_role, roles?.access_role_v2);
@@ -136,7 +140,7 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
 
   private _updateConversationAccessCode(
     conversationEntity: Conversation,
-    eventJson: ConversationEvent<ConversationCode>,
+    eventJson: ConversationEvent<CONVERSATION_EVENT.CODE_UPDATE, ConversationCode>,
   ): void {
     ConversationMapper.mapAccessCode(conversationEntity, eventJson.data);
   }

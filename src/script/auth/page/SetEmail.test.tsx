@@ -17,7 +17,8 @@
  *
  */
 
-import {fireEvent, waitFor} from '@testing-library/react';
+import {act, fireEvent, waitFor} from '@testing-library/react';
+import * as ReactRouter from 'react-router';
 
 import {SetEmail} from './SetEmail';
 
@@ -26,6 +27,7 @@ import {ValidationError} from '../module/action/ValidationError';
 import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
+
 jest.mock('../util/SVGProvider');
 
 const emailInputId = 'enter-email';
@@ -33,7 +35,7 @@ const verifyButtonId = 'do-verify-email';
 const errorMessageId = 'error-message';
 
 describe('SetEmail', () => {
-  it('has disabled submit button as long as there is no input', () => {
+  it('has disabled submit button as long as there is no input', async () => {
     const {getByTestId} = mountComponent(
       <SetEmail />,
       mockStoreFactory()({
@@ -46,6 +48,7 @@ describe('SetEmail', () => {
       }),
     );
 
+    await waitFor(() => getByTestId(emailInputId));
     const emailInput = getByTestId(emailInputId);
     const verifyButton = getByTestId(verifyButtonId) as HTMLButtonElement;
 
@@ -68,6 +71,7 @@ describe('SetEmail', () => {
       }),
     );
 
+    await waitFor(() => getByTestId(emailInputId));
     const emailInput = getByTestId(emailInputId);
 
     fireEvent.change(emailInput, {target: {value: 'e'}});
@@ -80,8 +84,9 @@ describe('SetEmail', () => {
     });
   });
 
-  it('trims the email', () => {
+  it('trims the email', async () => {
     spyOn(actionRoot.selfAction, 'doSetEmail').and.returnValue(() => Promise.resolve());
+    jest.spyOn(ReactRouter, 'useNavigate').mockReturnValue(jest.fn());
 
     const email = 'e@e.com';
 
@@ -97,11 +102,15 @@ describe('SetEmail', () => {
       }),
     );
 
+    await waitFor(() => getByTestId(emailInputId));
     const emailInput = getByTestId(emailInputId);
     const verifyButton = getByTestId(verifyButtonId) as HTMLButtonElement;
 
-    fireEvent.change(emailInput, {target: {value: ` ${email} `}});
-    fireEvent.click(verifyButton);
+    act(() => {
+      fireEvent.change(emailInput, {target: {value: ` ${email} `}});
+
+      fireEvent.click(verifyButton);
+    });
 
     expect(actionRoot.selfAction.doSetEmail).toHaveBeenCalledWith(email);
   });

@@ -1,11 +1,10 @@
-import fs from 'fs-extra';
 import Changelog from 'generate-changelog';
-import path from 'path';
 import simpleGit from 'simple-git';
 import * as pkg from '../package.json';
 
 const args = process.argv.slice(2);
-const branchName = args[0];
+const releaseType = args[0];
+const until = args[1];
 
 /**
  * This script generates a nicely-formatted changelog based on commit messages. By default it includes all commits between the current and the previous production release (indicated by their "-production" Git tag suffix).
@@ -21,16 +20,13 @@ const branchName = args[0];
  */
 void (async () => {
   const tags = await simpleGit().tags({'--list': null});
-  const outputPath = path.join(__dirname, '../CHANGELOG.md');
-  const productionTags = tags.all.filter(tag => tag.includes('-production.'));
+  const productionTags = tags.all.filter(tag => tag.includes(`-${releaseType}.`));
 
   const newProductionTag = productionTags.sort().reverse()[0];
   const lastProductionTag = productionTags.sort().reverse()[1];
 
-  const from = branchName ? newProductionTag : lastProductionTag;
-  const to = branchName ? branchName : newProductionTag;
-
-  console.info(`Generating changelog with commits from "${from}" to "${to}".`);
+  const from = until ? newProductionTag : lastProductionTag;
+  const to = until ? until : newProductionTag;
 
   try {
     const changelog = await Changelog.generate({
@@ -38,8 +34,7 @@ void (async () => {
       repoUrl: pkg.repository.url.replace('.git', ''),
       tag: `${from}...${to}`,
     });
-    fs.outputFileSync(outputPath, changelog, 'utf8');
-    console.info(`Wrote file to: ${outputPath}`);
+    console.log(changelog);
   } catch (error: any) {
     console.warn(`Could not generate changelog from "${from}" to "${to}": ${error.message}`, error);
   }

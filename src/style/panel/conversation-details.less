@@ -32,6 +32,10 @@
 
   &__header {
     padding: 0 16px;
+
+    .conversation-badges {
+      margin-top: 6px;
+    }
   }
 
   &__flex-row {
@@ -54,6 +58,7 @@
     .heading-h2;
 
     display: flex;
+    align-items: center;
     padding: 0;
     border: none;
     word-break: break-word;
@@ -69,10 +74,18 @@
     }
 
     &__edit-icon {
-      flex-grow: 1;
-      margin-left: 11px;
+      display: flex;
+      align-items: center;
+      padding: 4px;
+      border: none;
+      margin-left: 7px;
+      background: transparent;
       opacity: 0;
       transition: opacity @animation-timing-faster @ease-in-quart;
+
+      &:focus {
+        opacity: 1;
+      }
 
       svg {
         width: 12px;

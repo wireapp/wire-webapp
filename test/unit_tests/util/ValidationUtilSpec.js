@@ -17,11 +17,10 @@
  *
  */
 
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 import {
   isBearerToken,
   isUUID,
-  isBase64,
   isValidApiPath,
   isTweetUrl,
   legacyAsset,
@@ -33,8 +32,8 @@ import {
 describe('ValidationUtil', () => {
   describe('"asset.legacy"', () => {
     it('detects a valid asset below v3', () => {
-      const assetId = createRandomUuid();
-      const conversationId = createRandomUuid();
+      const assetId = createUuid();
+      const conversationId = createUuid();
 
       const actual = legacyAsset(assetId, conversationId);
 
@@ -42,7 +41,7 @@ describe('ValidationUtil', () => {
     });
 
     it('detects an invalid asset below v3', async () => {
-      const assetId = createRandomUuid();
+      const assetId = createUuid();
       const conversationId = 'e13f9940-819c-477b-9391-b04234ae84af"*';
       expect(() => {
         legacyAsset(assetId, conversationId);
@@ -52,7 +51,7 @@ describe('ValidationUtil', () => {
 
   describe('"asset.v3"', () => {
     it('detects a valid v3 asset (assetKey only)', () => {
-      const assetKey = `3-1-${createRandomUuid()}`;
+      const assetKey = `3-1-${createUuid()}`;
 
       const actual = assetV3(assetKey);
 
@@ -60,7 +59,7 @@ describe('ValidationUtil', () => {
     });
 
     it('detects a valid v3 asset (assetKey & assetToken)', () => {
-      const assetKey = `3-1-${createRandomUuid()}`;
+      const assetKey = `3-1-${createUuid()}`;
       const assetToken = 'aV0TGxF3ugpawm3wAYPmew==';
 
       const actual = assetV3(assetKey, assetToken);
@@ -69,7 +68,7 @@ describe('ValidationUtil', () => {
     });
 
     it('detects an invalid v3 asset (assetKey)', async () => {
-      const assetKey = `3-6-${createRandomUuid()}`;
+      const assetKey = `3-6-${createUuid()}`;
 
       expect(() => {
         assetV3(assetKey);
@@ -77,7 +76,7 @@ describe('ValidationUtil', () => {
     });
 
     it('detects an invalid v3 asset (assetToken)', async () => {
-      const assetKey = `3-1-${createRandomUuid()}`;
+      const assetKey = `3-1-${createUuid()}`;
       const assetToken = 'a3wAY4%$@#$@%)!@-pOe==';
 
       expect(() => {
@@ -101,22 +100,6 @@ describe('ValidationUtil', () => {
     });
   });
 
-  describe('"isBase64"', () => {
-    it('detects a correct Base64-encoded string', () => {
-      const encoded = 'SGVsbG8gV29ybGQh';
-      const actual = isBase64(encoded);
-
-      expect(actual).toBe(true);
-    });
-
-    it('detects an incorrect Base64-encoded string', () => {
-      const encoded = 'SGVsbG8gV29ybGQh==';
-      const actual = isBase64(encoded);
-
-      expect(actual).toBe(false);
-    });
-  });
-
   describe('"isBearerToken"', () => {
     it('detects a correct Bearer Token', () => {
       const token = 'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==';
@@ -135,7 +118,7 @@ describe('ValidationUtil', () => {
 
   describe('"isUUID"', () => {
     it('detects a correct UUID', () => {
-      const uuid = createRandomUuid();
+      const uuid = createUuid();
       const actual = isUUID(uuid);
 
       expect(actual).toBe(true);

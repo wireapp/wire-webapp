@@ -24,7 +24,7 @@
 }
 
 * {
-  --scrollbar-color: fade(#000, 50%);
+  --scrollbar-color: @gray-60;
   @scrollbar-size: 7px;
   scrollbar-color: var(--scrollbar-color) transparent;
   scrollbar-width: thin;
@@ -40,7 +40,6 @@
   &::-webkit-scrollbar-thumb {
     border-radius: @scrollbar-size;
     background-color: var(--scrollbar-color);
-    box-shadow: 0 0 1px #fff;
     transition: background-color 1s;
   }
 }
@@ -49,7 +48,7 @@ body {
   color: var(--main-color);
   font-family: @font-family-base;
   font-size: @font-size-sm;
-  font-weight: 300;
+  font-weight: @font-weight-regular;
   overflow-x: hidden;
   overflow-y: hidden !important;
   text-rendering: optimizeLegibility;
@@ -70,6 +69,12 @@ body {
     .focus-outline;
     .focus-border-radius;
   }
+}
+
+input[type='radio']:focus-visible + label {
+  .focus-outline;
+  .focus-offset;
+  .focus-border-radius;
 }
 
 a {

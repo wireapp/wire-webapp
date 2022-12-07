@@ -43,12 +43,12 @@ export const getAllFocusableElements = (
 /**
  * Set tabindex for each interactive element based on the element's current focus
  * @param elements list of elements
- * @param isCurrentConversationFocused current message focus state
+ * @param isFocusable current message focus state
  */
-export const setElementsTabIndex = (elements: NodeListOf<HTMLElement> | [], isCurrentConversationFocused: boolean) => {
+export const setElementsTabIndex = (elements: NodeListOf<HTMLElement> | [], isFocusable: boolean) => {
   if (elements.length) {
     elements.forEach(element => {
-      setElementTabIndex(element, isCurrentConversationFocused);
+      setElementTabIndex(element, isFocusable);
     });
   }
 };
@@ -56,8 +56,8 @@ export const setElementsTabIndex = (elements: NodeListOf<HTMLElement> | [], isCu
 /**
  * Set tabindex for a single element based on the element's current focus
  * @param element an element
- * @param isCurrentConversationFocused current message focus state
+ * @param isFocusable current message focus state
  */
-export const setElementTabIndex = (element: Element, isCurrentConversationFocused: boolean) => {
-  element.setAttribute('tabindex', isCurrentConversationFocused ? '0' : '-1');
+const setElementTabIndex = (element: Element, isFocusable: boolean) => {
+  element.setAttribute('tabindex', isFocusable ? '0' : '-1');
 };

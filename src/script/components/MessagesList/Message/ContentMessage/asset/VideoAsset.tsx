@@ -19,6 +19,7 @@
 
 import React, {useCallback, useEffect, useState} from 'react';
 
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
@@ -45,7 +46,7 @@ interface VideoAssetProps {
   isQuote?: boolean;
   message: ContentMessage;
   teamState?: TeamState;
-  isCurrentConversationFocused?: boolean;
+  isFocusable?: boolean;
 }
 
 const VideoAsset: React.FC<VideoAssetProps> = ({
@@ -53,7 +54,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
   isQuote,
   teamState = container.resolve(TeamState),
   assetRepository = container.resolve(AssetRepository),
-  isCurrentConversationFocused = true,
+  isFocusable = true,
 }) => {
   const asset = message.getFirstAsset() as FileAsset;
   const {isObfuscated} = useKoSubscribableChildren(message, ['isObfuscated']);
@@ -169,6 +170,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
               onLoadedMetadata={syncVideoTimeRest}
               className={cx({hidden: isUploading})}
               style={{backgroundColor: videoPreview ? '#000' : ''}}
+              tabIndex={TabIndex.UNFOCUSABLE}
             />
             {videoPlaybackError ? (
               <div className="video-asset__playback-error label-xs">{t('conversationPlaybackError')}</div>
@@ -192,7 +194,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
                         cancel={() => (isUploading ? cancelUpload() : asset.cancelDownload())}
                         transferState={transferState}
                         uploadProgress={uploadProgress}
-                        isCurrentConversationFocused={isCurrentConversationFocused}
+                        isFocusable={isFocusable}
                       />
                     </div>
 
@@ -202,6 +204,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
                           className="video-asset__controls__bottom__seekbar"
                           data-uie-name="status-video-seekbar"
                           mediaElement={videoElement}
+                          isFocusable={isFocusable}
                         />
                         <span
                           className="video-asset__controls__bottom__time label-xs"

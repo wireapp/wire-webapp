@@ -27,7 +27,6 @@ import {matchQualifiedIds} from 'Util/QualifiedId';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {MuteState} from './CallState';
-import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import type {ClientId, Participant} from './Participant';
 
 import {Config} from '../Config';
@@ -54,12 +53,14 @@ export class Call {
   public readonly isCbrEnabled: ko.Observable<boolean> = ko.observable(
     Config.getConfig().FEATURE.ENFORCE_CONSTANT_BITRATE,
   );
+  public readonly isConference: boolean;
+  public readonly isGroupOrConference: boolean;
   public readonly activeSpeakers: ko.ObservableArray<Participant> = ko.observableArray([]);
   public blockMessages: boolean = false;
-  public type?: CALL_MESSAGE_TYPE;
   public currentPage: ko.Observable<number> = ko.observable(0);
   public pages: ko.ObservableArray<Participant[]> = ko.observableArray();
   readonly maximizedParticipant: ko.Observable<Participant | null>;
+  public readonly isActive: ko.PureComputed<boolean>;
 
   private readonly audios: Record<string, {audioElement: HTMLAudioElement; stream: MediaStream}> = {};
   /**
@@ -88,13 +89,18 @@ export class Call {
     this.initialType = callType;
     this.selfClientId = selfParticipant?.clientId;
     this.participants = ko.observableArray([selfParticipant]);
-    this.activeAudioOutput = this.mediaDevicesHandler.currentAvailableDeviceId.audioOutput();
-    this.mediaDevicesHandler.currentAvailableDeviceId.audioOutput.subscribe((newActiveAudioOutput: string) => {
+    this.activeAudioOutput = this.mediaDevicesHandler.currentAvailableDeviceId.audiooutput();
+    this.mediaDevicesHandler.currentAvailableDeviceId.audiooutput.subscribe((newActiveAudioOutput: string) => {
       this.activeAudioOutput = newActiveAudioOutput;
       this.updateAudioStreamsSink();
     });
     this.maximizedParticipant = ko.observable(null);
     this.muteState(isMuted ? MuteState.SELF_MUTED : MuteState.NOT_MUTED);
+    this.isConference = [CONV_TYPE.CONFERENCE, CONV_TYPE.CONFERENCE_MLS].includes(this.conversationType);
+    this.isGroupOrConference = this.isConference || this.conversationType === CONV_TYPE.GROUP;
+    this.isActive = ko.pureComputed(() =>
+      [CALL_STATE.OUTGOING, CALL_STATE.ANSWERED, CALL_STATE.MEDIA_ESTAB].includes(this.state()),
+    );
   }
 
   get hasWorkingAudioInput(): boolean {
@@ -206,12 +212,6 @@ export class Call {
 
   getRemoteParticipants(): Participant[] {
     return this.participants().filter(({user, clientId}) => !user.isMe || this.selfClientId !== clientId);
-  }
-
-  removeParticipant(participant: Participant): void {
-    this.participants.remove(participant);
-    this.activeSpeakers.remove(participant);
-    this.updatePages();
   }
 
   updatePages() {

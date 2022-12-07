@@ -23,22 +23,42 @@ import {Icon} from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
 interface ConversationDetailsBottomActionsProps {
+  isDeviceActionEnabled: boolean;
+  showDevices: () => void;
   showNotifications: () => void;
   showOptionNotifications1To1?: boolean;
-  isSingleUserMode?: boolean;
-  hasReceiptsEnabled?: boolean;
   notificationStatusText?: string;
 }
 
 const ConversationDetailsBottomActions: FC<ConversationDetailsBottomActionsProps> = ({
+  isDeviceActionEnabled = false,
+  showDevices,
   showNotifications,
   showOptionNotifications1To1 = false,
-  isSingleUserMode = false,
-  hasReceiptsEnabled = false,
   notificationStatusText = '',
 }) => {
+  const renderConversationDetailsActions = showOptionNotifications1To1 || isDeviceActionEnabled;
+
+  if (!renderConversationDetailsActions) {
+    return null;
+  }
+
   return (
     <ul className="conversation-details__bottom-actions">
+      {isDeviceActionEnabled && (
+        <li className="conversation-details__devices">
+          <button className="panel__action-item" onClick={showDevices} data-uie-name="go-devices" type="button">
+            <span className="panel__action-item__icon">
+              <Icon.Devices />
+            </span>
+
+            <span className="panel__action-item__text">{t('conversationDetailsActionDevices')}</span>
+
+            <Icon.ChevronRight className="chevron-right-icon" />
+          </button>
+        </li>
+      )}
+
       {showOptionNotifications1To1 && (
         <li className="conversation-details__notifications">
           <button
@@ -60,22 +80,6 @@ const ConversationDetailsBottomActions: FC<ConversationDetailsBottomActionsProps
 
             <Icon.ChevronRight className="chevron-right-icon" />
           </button>
-        </li>
-      )}
-
-      {isSingleUserMode && (
-        <li className="conversation-details__read-receipts" data-uie-name="label-1to1-read-receipts">
-          <p className="panel__info-text panel__info-text--head panel__info-text--margin-bottom">
-            {hasReceiptsEnabled
-              ? t('conversationDetails1to1ReceiptsHeadEnabled')
-              : t('conversationDetails1to1ReceiptsHeadDisabled')}
-          </p>
-
-          <p className="panel__info-text panel__info-text--margin-bottom">
-            {t('conversationDetails1to1ReceiptsFirst')}
-          </p>
-
-          <p className="panel__info-text panel__info-text--margin">{t('conversationDetails1to1ReceiptsSecond')}</p>
         </li>
       )}
     </ul>

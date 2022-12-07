@@ -21,8 +21,8 @@ import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
 import {MessageSendingState} from '@wireapp/core/lib/conversation';
-import {container} from 'tsyringe';
 
+import {Account} from '@wireapp/core';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
@@ -32,20 +32,23 @@ import {Message} from 'src/script/entity/message/Message';
 import {Text} from 'src/script/entity/message/Text';
 import {User} from 'src/script/entity/User';
 import {ConversationError} from 'src/script/error/ConversationError';
-import {createRandomUuid} from 'Util/util';
+import {generateQualifiedId} from 'test/helper/UserGenerator';
+import {createUuid} from 'Util/uuid';
 
 import {ConversationRepository} from './ConversationRepository';
 import {ConversationState} from './ConversationState';
 
 import {AssetRepository} from '../assets/AssetRepository';
+import {AudioRepository} from '../audio/AudioRepository';
 import {ClientEntity} from '../client/ClientEntity';
 import {ClientState} from '../client/ClientState';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {ContentMessage} from '../entity/message/ContentMessage';
 import {EventRepository} from '../event/EventRepository';
 import {EventService} from '../event/EventService';
+import {StatusType} from '../message/StatusType';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
-import {Core} from '../service/CoreSingleton';
+import {ReactionMap} from '../storage';
 import {TeamState} from '../team/TeamState';
 import {ServerTimeHandler, serverTimeHandler} from '../time/serverTimeHandler';
 import {UserRepository} from '../user/UserRepository';
@@ -63,7 +66,7 @@ type MessageRepositoryDependencies = {
   assetRepository: AssetRepository;
   clientState: ClientState;
   conversationRepository: () => ConversationRepository;
-  core: Core;
+  core: Account;
   cryptographyRepository: CryptographyRepository;
   eventRepository: EventRepository;
   propertiesRepository: PropertiesRepository;
@@ -77,26 +80,31 @@ async function buildMessageRepository(): Promise<[MessageRepository, MessageRepo
   const userState = new UserState();
   userState.self(selfUser);
   const clientState = new ClientState();
-  clientState.currentClient(new ClientEntity(true, ''));
-  const core = container.resolve(Core);
-  await core.initServices({} as any);
+  clientState.currentClient = new ClientEntity(true, '');
+  const core = new Account();
+
+  const teamState = new TeamState();
 
   const conversationState = new ConversationState(userState);
   const selfConversation = new Conversation(selfUser.id);
   selfConversation.selfUser(selfUser);
   conversationState.conversations([selfConversation]);
   const dependencies = {
-    conversationRepository: () => ({} as ConversationRepository),
+    conversationRepository: () => ({}) as ConversationRepository,
     cryptographyRepository: new CryptographyRepository({} as any),
     eventRepository: new EventRepository(new EventService({} as any), {} as any, {} as any, {} as any),
     propertiesRepository: new PropertiesRepository({} as any, {} as any),
     serverTimeHandler: serverTimeHandler,
-    userRepository: {} as UserRepository,
+    userRepository: {
+      findUserById: jest.fn(),
+      assignAllClients: jest.fn().mockResolvedValue(true),
+    } as unknown as UserRepository,
     assetRepository: {} as AssetRepository,
+    audioRepository: new AudioRepository(),
     userState,
-    teamState: new TeamState(),
     clientState,
     conversationState,
+    teamState,
     core,
   };
 
@@ -111,7 +119,7 @@ describe('MessageRepository', () => {
     conversation_type = CONVERSATION_TYPE.REGULAR,
     connection_status = ConnectionStatus.ACCEPTED,
   ) => {
-    const conversation = new Conversation(createRandomUuid());
+    const conversation = new Conversation(createUuid());
     conversation.type(conversation_type);
 
     const connectionEntity = new ConnectionEntity();
@@ -127,7 +135,7 @@ describe('MessageRepository', () => {
 
   const successPayload = {
     sentAt: new Date().toISOString(),
-    id: createRandomUuid(),
+    id: createUuid(),
     state: MessageSendingState.OUTGOING_SENT,
   };
 
@@ -156,8 +164,8 @@ describe('MessageRepository', () => {
       jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
       jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
 
-      const originalMessage = new ContentMessage(createRandomUuid());
-      originalMessage.assets.push(new Text(createRandomUuid(), 'old text'));
+      const originalMessage = new ContentMessage(createUuid());
+      originalMessage.assets.push(new Text(createUuid(), 'old text'));
       const conversation = generateConversation();
       conversation.addMessage(originalMessage);
 
@@ -202,7 +210,7 @@ describe('MessageRepository', () => {
       const conversation = generateConversation(CONVERSATION_TYPE.REGULAR);
       const sender = new User('', '');
       sender.isMe = false;
-      const msgToDelete = new Message(createRandomUuid());
+      const msgToDelete = new Message(createUuid());
       msgToDelete.user(sender);
       conversation.addMessage(msgToDelete);
       const [messageRepository, {core}] = await buildMessageRepository();
@@ -220,7 +228,7 @@ describe('MessageRepository', () => {
       const conversation = generateConversation(CONVERSATION_TYPE.REGULAR);
       conversation.participating_user_ets.push(new User('user1'));
 
-      const messageToDelete = new Message(createRandomUuid());
+      const messageToDelete = new Message(createUuid());
       messageToDelete.user(selfUser);
       conversation.addMessage(messageToDelete);
 
@@ -232,9 +240,28 @@ describe('MessageRepository', () => {
       expect(core.service!.conversation.send).toHaveBeenCalledWith(
         expect.objectContaining({
           payload: expect.objectContaining({deleted: {messageId: messageToDelete.id}}),
-          userIds: {selfid: [], user1: []},
+          userIds: {'': {selfid: [], user1: []}},
         }),
       );
+    });
+
+    it('should send delete and deletes message for own pending/gray messages', async () => {
+      const conversation = generateConversation(CONVERSATION_TYPE.REGULAR);
+      conversation.participating_user_ets.push(new User('user1'));
+
+      const messageToDelete = new Message(createUuid());
+      messageToDelete.user(selfUser);
+      messageToDelete.status(StatusType.SENDING);
+      conversation.addMessage(messageToDelete);
+
+      const [messageRepository, {core, eventRepository}] = await buildMessageRepository();
+      jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
+      spyOn(eventRepository.eventService, 'deleteEvent').and.returnValue(Promise.resolve());
+      spyOn(messageRepository, 'deleteMessageById');
+
+      await messageRepository.deleteMessageForEveryone(conversation, messageToDelete);
+
+      expect(messageRepository.deleteMessageById).toHaveBeenCalledWith(conversation, messageToDelete.id);
     });
   });
 
@@ -242,6 +269,7 @@ describe('MessageRepository', () => {
     it('resets the session with another device', async () => {
       const [messageRepository, {cryptographyRepository, core}] = await buildMessageRepository();
       jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
+      jest.spyOn(cryptographyRepository, 'getRemoteFingerprint').mockResolvedValue('first');
       spyOn(cryptographyRepository, 'deleteSession');
       const conversation = generateConversation();
 
@@ -250,6 +278,90 @@ describe('MessageRepository', () => {
       await messageRepository.resetSession(userId, clientId, conversation);
       expect(cryptographyRepository.deleteSession).toHaveBeenCalledWith(userId, clientId);
       expect(core.service!.conversation.send).toHaveBeenCalled();
+    });
+
+    it('unverifies device if fingerprint has changed', async () => {
+      const [messageRepository, {cryptographyRepository, userRepository, core}] = await buildMessageRepository();
+      const user = new User();
+      const clientId = 'client1';
+
+      const device = new ClientEntity(false, 'domain', clientId);
+      device.meta.isVerified(true);
+      user.devices([device]);
+
+      jest.spyOn(userRepository, 'findUserById').mockReturnValue(user);
+
+      jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
+      jest
+        .spyOn(cryptographyRepository, 'getRemoteFingerprint')
+        .mockResolvedValueOnce('first')
+        .mockResolvedValue('second');
+
+      spyOn(cryptographyRepository, 'deleteSession');
+      const conversation = generateConversation();
+
+      const userId = {domain: 'domain1', id: 'user1'};
+      expect(device.meta.isVerified()).toBe(true);
+      await messageRepository.resetSession(userId, clientId, conversation);
+      expect(device.meta.isVerified()).toBe(false);
+      expect(cryptographyRepository.deleteSession).toHaveBeenCalledWith(userId, clientId);
+      expect(core.service!.conversation.send).toHaveBeenCalled();
+    });
+  });
+
+  describe('updateUserReactions', () => {
+    it("should add reaction if it doesn't exist", async () => {
+      const [messageRepository] = await buildMessageRepository();
+      const userId = generateQualifiedId();
+      const reactions: ReactionMap = [
+        ['like', [userId]],
+        ['love', [userId]],
+        ['sad', [{id: 'user2', domain: ''}]],
+        ['happy', [{id: 'user2', domain: ''}]],
+      ];
+      const reaction = 'cry';
+      const expectedReactions = 'like,love,cry';
+      const result = messageRepository.updateUserReactions(reactions, userId, reaction);
+      expect(result).toEqual(expectedReactions);
+    });
+
+    it('should set the reaction for the user for the first time', async () => {
+      const [messageRepository] = await buildMessageRepository();
+      const userId = generateQualifiedId();
+      const reactions: ReactionMap = [
+        ['sad', [{id: 'user2', domain: ''}]],
+        ['happy', [{id: 'user2', domain: ''}]],
+      ];
+      const reaction = 'like';
+      const expectedReactions = 'like';
+      const result = messageRepository.updateUserReactions(reactions, userId, reaction);
+      expect(result).toEqual(expectedReactions);
+    });
+
+    it('should delete reaction if it exists', async () => {
+      const [messageRepository] = await buildMessageRepository();
+      const userId = generateQualifiedId();
+      const reactions: ReactionMap = [
+        ['like', [userId]],
+        ['love', [userId]],
+        ['haha', [userId]],
+        ['sad', [{id: 'user2', domain: ''}]],
+        ['happy', [{id: 'user2', domain: ''}]],
+      ];
+      const reaction = 'haha';
+      const expectedReactions = 'like,love';
+      const result = messageRepository.updateUserReactions(reactions, userId, reaction);
+      expect(result).toEqual(expectedReactions);
+    });
+
+    it('should return an empty string if no reactions for a user', async () => {
+      const [messageRepository] = await buildMessageRepository();
+      const userId = generateQualifiedId();
+      const reactions: ReactionMap = [['like', [userId]]];
+      const reaction = 'like';
+      const expectedReactions = '';
+      const result = messageRepository.updateUserReactions(reactions, userId, reaction);
+      expect(result).toEqual(expectedReactions);
     });
   });
 });

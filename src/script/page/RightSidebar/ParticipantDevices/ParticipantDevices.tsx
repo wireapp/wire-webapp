@@ -19,26 +19,29 @@
 
 import {FC} from 'react';
 
+import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {UserDevices, UserDevicesState, useUserDevicesHistory} from 'Components/UserDevices';
 import {t} from 'Util/LocalizerUtil';
 
 import type {User} from '../../../entity/User';
-import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';
 import {PanelHeader} from '../PanelHeader';
 
 interface ParticipantDevicesProps {
   onClose: () => void;
   onGoBack: (userEntity: User) => void;
+  groupId?: string;
   repositories: ViewModelRepositories;
   user: User;
 }
 
-const ParticipantDevices: FC<ParticipantDevicesProps> = ({repositories, onClose, onGoBack, user}) => {
+const ParticipantDevices: FC<ParticipantDevicesProps> = ({repositories, onClose, onGoBack, groupId, user}) => {
   const history = useUserDevicesHistory();
 
   return (
     <div id="participant-devices" className="panel__page participant-devices">
+      <h2 className="visually-hidden">{t('conversationDetailsActionDevices')}</h2>
+
       <PanelHeader
         onGoBack={() => {
           if (history.current.state === UserDevicesState.DEVICE_LIST) {
@@ -53,8 +56,9 @@ const ParticipantDevices: FC<ParticipantDevicesProps> = ({repositories, onClose,
         goBackUie="go-back-participant-devices"
       />
 
-      <div className="panel__content" ref={initFadingScrollbar}>
+      <FadingScrollbar className="panel__content">
         <UserDevices
+          groupId={groupId}
           clientRepository={repositories.client}
           cryptographyRepository={repositories.cryptography}
           messageRepository={repositories.message}
@@ -62,7 +66,7 @@ const ParticipantDevices: FC<ParticipantDevicesProps> = ({repositories, onClose,
           goTo={history.goTo}
           user={user}
         />
-      </div>
+      </FadingScrollbar>
     </div>
   );
 };

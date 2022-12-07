@@ -47,7 +47,7 @@ describe('fullscreenVideoCall', () => {
     selfUser.isMe = true;
     const call = new Call({domain: '', id: ''}, {domain: '', id: ''}, 0, new Participant(selfUser, ''), 0, {
       currentAvailableDeviceId: {
-        audioOutput: ko.pureComputed(() => 'test'),
+        audiooutput: ko.pureComputed(() => 'test'),
       },
     } as MediaDevicesHandler);
     const props: Partial<FullscreenVideoCallProps> = {
@@ -58,14 +58,15 @@ describe('fullscreenVideoCall', () => {
       isMuted: false,
       mediaDevicesHandler: {
         availableDevices: {
-          audioInput: ko.observableArray(),
-          videoInput: ko.observableArray(),
+          audioinput: ko.observableArray(),
+          videoinput: ko.observableArray(),
+          audiooutput: ko.observableArray(),
         },
         currentDeviceId: {
-          audioInput: ko.observable(''),
-          audioOutput: ko.observable(''),
-          screenInput: ko.observable(''),
-          videoInput: ko.observable(''),
+          audioinput: ko.observable(''),
+          audiooutput: ko.observable(''),
+          screeninput: ko.observable(''),
+          videoinput: ko.observable(''),
         },
       } as MediaDevicesHandler,
       multitasking: {isMinimized: ko.observable(false)},

@@ -25,7 +25,14 @@ import {container, singleton} from 'tsyringe';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {sortGroupsByLastEvent} from 'Util/util';
 
-import {isMLSConversation, isSelfConversation} from './ConversationSelectors';
+import {
+  MLSConversation,
+  ProteusConversation,
+  isMLS1to1ConversationWithUser,
+  isMLSConversation,
+  isProteus1to1ConversationWithUser,
+  isSelfConversation,
+} from './ConversationSelectors';
 
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
@@ -48,12 +55,19 @@ export class ConversationState {
   public readonly visibleConversations: ko.PureComputed<Conversation[]>;
   public readonly filteredConversations: ko.PureComputed<Conversation[]>;
   public readonly archivedConversations: ko.PureComputed<Conversation[]>;
-  private readonly selfProteusConversation: ko.PureComputed<Conversation | undefined>;
-  private readonly selfMLSConversation: ko.PureComputed<Conversation | undefined>;
+  public readonly selfProteusConversation: ko.PureComputed<Conversation | undefined>;
+  public readonly selfMLSConversation: ko.PureComputed<MLSConversation | undefined>;
   public readonly unreadConversations: ko.PureComputed<Conversation[]>;
+  /**
+   * All the users that are connected to the selfUser through a conversation. Those users are not necessarily **directly** connected to the selfUser (through a connection request)
+   */
   public readonly connectedUsers: ko.PureComputed<User[]>;
 
   public readonly sortedConversations: ko.PureComputed<Conversation[]>;
+  /**
+   * conversations that could not be loaded because their back-end is currently offline
+   */
+  public missingConversations: QualifiedId[] = [];
 
   constructor(
     private readonly userState = container.resolve(UserState),
@@ -64,12 +78,20 @@ export class ConversationState {
       this.conversations().find(conversation => !isMLSConversation(conversation) && isSelfConversation(conversation)),
     );
     this.selfMLSConversation = ko.pureComputed(() =>
-      this.conversations().find(conversation => isMLSConversation(conversation) && isSelfConversation(conversation)),
+      this.conversations().find(
+        (conversation): conversation is MLSConversation =>
+          isMLSConversation(conversation) && isSelfConversation(conversation),
+      ),
     );
 
     this.visibleConversations = ko.pureComputed(() => {
       return this.sortedConversations().filter(
-        conversation => !conversation.is_cleared() && !conversation.is_archived(),
+        conversation =>
+          !conversation.is_archived() &&
+          // We filter out 1 on 1 conversation with unavailable users that don't have messages
+          (!conversation.is1to1() ||
+            conversation.hasContentMessages() ||
+            conversation.firstUserEntity()?.isAvailable()),
       );
     });
     this.unreadConversations = ko.pureComputed(() => {
@@ -89,14 +111,9 @@ export class ConversationState {
           ConnectionStatus.PENDING,
         ];
 
-        if (
-          isSelfConversation(conversationEntity) ||
-          states_to_filter.includes(conversationEntity.connection().status())
-        ) {
-          return false;
-        }
-
-        return !(conversationEntity.is_cleared() && conversationEntity.removed_from_conversation());
+        return !(
+          isSelfConversation(conversationEntity) || states_to_filter.includes(conversationEntity.connection().status())
+        );
       });
     });
 
@@ -137,6 +154,14 @@ export class ConversationState {
     return proteusConversation;
   }
 
+  getSelfMLSConversation(): MLSConversation {
+    const mlsConversation = this.selfMLSConversation();
+    if (!mlsConversation) {
+      throw new Error('No MLS self conversation');
+    }
+    return mlsConversation;
+  }
+
   /**
    * returns true if the conversation should be visible to the user
    * @param conversation the conversation to check visibility
@@ -169,6 +194,35 @@ export class ConversationState {
       : this.conversations().find(conversation => {
           return matchQualifiedIds(conversation, conversationId);
         });
+  }
+
+  /**
+   * Indicates whether the selfUser has a conversation (1:1 or group conversation) with this other user
+   * @param user the user to check
+   */
+  hasConversationWith(user: User) {
+    return this.connectedUsers().some(connectedUser => matchQualifiedIds(connectedUser.qualifiedId, user.qualifiedId));
+  }
+
+  /**
+   * Find a local 1:1 proteus conversation with a user.
+   * Because of team-owned 1:1 conversations work (they are really group conversations),
+   * it's possible that there is more that one proteus 1:1 team conversation with the same user.
+   * @returns ProteusConversation if locally available, otherwise null
+   */
+  findProteus1to1Conversations(userId: QualifiedId): ProteusConversation[] | null {
+    const foundConversations = this.conversations().filter(isProteus1to1ConversationWithUser(userId));
+
+    return foundConversations.length > 0 ? foundConversations : null;
+  }
+
+  /**
+   * Find a local 1:1 mls conversation with a user.
+   * @returns Conversation if locally available, otherwise null
+   */
+  findMLS1to1Conversation(userId: QualifiedId): MLSConversation | null {
+    const mlsConversation = this.conversations().find(isMLS1to1ConversationWithUser(userId));
+    return mlsConversation || null;
   }
 
   isSelfConversation(conversationId: QualifiedId): boolean {

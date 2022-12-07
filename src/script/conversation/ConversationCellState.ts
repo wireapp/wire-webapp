@@ -30,6 +30,7 @@ import type {MemberMessage} from '../entity/message/MemberMessage';
 import type {SystemMessage} from '../entity/message/SystemMessage';
 import type {Text} from '../entity/message/Text';
 import {ConversationError} from '../error/ConversationError';
+import {E2EIVerificationMessageType} from '../message/E2EIVerificationMessageType';
 
 enum ACTIVITY_TYPE {
   CALL = 'ConversationCellState.ACTIVITY_TYPE.CALL',
@@ -188,7 +189,7 @@ const _getStateDefault = {
 
 const _getStateGroupActivity = {
   description: (conversationEntity: Conversation): string => {
-    const lastMessageEntity = conversationEntity.getLastMessage();
+    const lastMessageEntity = conversationEntity.getNewestMessage();
 
     if (lastMessageEntity.isMember()) {
       const userCount = (lastMessageEntity as MemberMessage).userEntities().length;
@@ -248,17 +249,12 @@ const _getStateGroupActivity = {
     return '';
   },
   icon: (conversationEntity: Conversation): ConversationStatusIcon | void => {
-    const lastMessageEntity = conversationEntity.getLastMessage();
-    const isMemberRemoval = lastMessageEntity.isMember() && (lastMessageEntity as MemberMessage).isMemberRemoval();
-
-    if (isMemberRemoval) {
-      return conversationEntity.showNotificationsEverything()
-        ? ConversationStatusIcon.UNREAD_MESSAGES
-        : ConversationStatusIcon.MUTED;
-    }
+    return conversationEntity.showNotificationsEverything()
+      ? ConversationStatusIcon.UNREAD_MESSAGES
+      : ConversationStatusIcon.MUTED;
   },
   match: (conversationEntity: Conversation) => {
-    const lastMessageEntity = conversationEntity.getLastMessage();
+    const lastMessageEntity = conversationEntity.getNewestMessage();
     const isExpectedType = lastMessageEntity ? lastMessageEntity.isMember() || lastMessageEntity.isSystem() : false;
     const unreadEvents = conversationEntity.unreadState().allEvents;
 
@@ -291,7 +287,7 @@ const _getStateMuted = {
 
 const _getStateRemoved = {
   description: (conversationEntity: Conversation) => {
-    const lastMessageEntity = conversationEntity.getLastMessage();
+    const lastMessageEntity = conversationEntity.getNewestMessage();
     const selfUserId = conversationEntity.selfUser().id;
 
     const isMemberRemoval = lastMessageEntity && lastMessageEntity.isMember() && lastMessageEntity.isMemberRemoval();
@@ -307,7 +303,7 @@ const _getStateRemoved = {
 
     return '';
   },
-  icon: () => ConversationStatusIcon.NONE,
+  icon: () => ConversationStatusIcon.UNREAD_MESSAGES,
   match: (conversationEntity: Conversation) => conversationEntity.removed_from_conversation(),
 };
 
@@ -339,6 +335,13 @@ const _getStateUnreadMessage = {
         string = t('notificationSharedLocation');
       } else if (messageEntity.hasAssetImage()) {
         string = t('notificationAssetAdd');
+      } else if (messageEntity.isE2EIVerification()) {
+        string =
+          messageEntity.messageType === E2EIVerificationMessageType.VERIFIED
+            ? t('conversation.AllE2EIDevicesVerifiedShort')
+            : t('conversation.E2EIVerificationDegraded');
+      } else if (messageEntity.isVerification()) {
+        string = t('conversation.AllDevicesVerified');
       }
 
       if (!!string) {
@@ -352,7 +355,9 @@ const _getStateUnreadMessage = {
         const stateText: string = hasString
           ? (string as string)
           : getRenderedTextContent((messageEntity.getFirstAsset() as Text).text);
-        return conversationEntity.isGroup() ? `${messageEntity.unsafeSenderName()}: ${stateText}` : stateText;
+        return conversationEntity.isGroup() && !messageEntity.isE2EIVerification()
+          ? `${messageEntity.unsafeSenderName()}: ${stateText}`
+          : stateText;
       }
     }
     return '';
@@ -373,7 +378,7 @@ const _getStateUserName = {
     }
   },
   match: (conversationEntity: Conversation): boolean => {
-    const lastMessageEntity = conversationEntity.getLastMessage();
+    const lastMessageEntity = conversationEntity.getNewestMessage();
     const isMemberJoin =
       lastMessageEntity && lastMessageEntity.isMember() && (lastMessageEntity as MemberMessage).isMemberJoin();
     const isEmpty1to1Conversation = conversationEntity.is1to1() && isMemberJoin;
@@ -393,6 +398,7 @@ export const generateCellState = (
     _getStateUnreadMessage,
     _getStateUserName,
   ];
+
   const matchingState = states.find(state => state.match(conversationEntity)) || _getStateDefault;
 
   return {

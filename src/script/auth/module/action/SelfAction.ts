@@ -24,6 +24,7 @@ import {Environment} from 'Util/Environment';
 import {getLogger} from 'Util/Logger';
 
 import {SelfActionCreator} from './creator/';
+import {WebSocketAction} from './WebSocketAction';
 
 import type {ThunkAction} from '../reducer';
 
@@ -117,6 +118,8 @@ export class SelfAction {
       try {
         await apiClient.api.auth.putEmail({email});
         dispatch(SelfActionCreator.successfulSetSelfEmail(email));
+        // we listen to the websocket after setting the email address. This way we will be warned when the user validates his email
+        dispatch(WebSocketAction.listen());
       } catch (error) {
         dispatch(SelfActionCreator.failedSetSelfEmail(error));
         throw error;

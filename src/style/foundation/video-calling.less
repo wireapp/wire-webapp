@@ -44,14 +44,14 @@
 }
 
 .video-element-remote {
-  height: calc(100% - 179px);
+  display: flex;
+  height: calc(100% - 115px);
+  flex-direction: column;
+  padding: 0 4px 0 4px;
   // fade in animation
   animation: video-fade-in @animation-timing-slower @ease-out-quart forwards;
+  background-color: var(--app-bg-secondary);
   opacity: 0;
-
-  @media (max-height: @screen-height-sm) {
-    height: calc(100% - 105px);
-  }
 }
 
 .video-element-remote-participant {
@@ -70,15 +70,9 @@
 
 .video-title {
   display: flex;
-  height: 45px;
-  align-items: center;
-  justify-content: space-around;
+  align-items: baseline;
+  justify-content: center;
   background-color: var(--sidebar-bg);
-
-  @media (max-height: @screen-height-sm) {
-    height: 30px;
-    line-height: 0.8rem;
-  }
 
   &__info-bar {
     .label-small-medium;
@@ -89,12 +83,23 @@
   }
 }
 
-.video-remote-name {
-  .heading-h3;
+.pagination-wrapper {
   display: flex;
-  overflow: hidden;
+  width: 100%;
+  justify-content: center;
+  background-color: var(--app-bg-secondary);
+}
+
+.video-remote-name {
+  display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.video-remote-title {
+  .heading-h3;
+  overflow: hidden;
+  margin: 0;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -104,6 +109,10 @@
   height: 100%;
   background-color: var(--app-bg-secondary);
   transition: opacity 0.25s ease-in-out;
+
+  &__item {
+    position: relative;
+  }
 
   &__centered-items {
     display: flex;
@@ -130,19 +139,11 @@
     display: flex;
     width: 100%;
     justify-content: space-between;
-    padding: 32px 40px 0 40px;
+    padding: 10px 40px 0 40px;
     margin: 0;
 
     @media (max-width: @call-ui-sm) {
       justify-content: center;
-    }
-
-    @media (max-width: @call-ui-xs) {
-      padding: 32px 10px;
-    }
-
-    @media (max-height: @screen-height-sm) {
-      padding: 10px;
     }
   }
 
@@ -155,18 +156,17 @@
     .button-reset-default;
     position: relative;
     display: flex;
-    width: 56px;
-    height: 56px;
+    width: 68px;
+    height: 40px;
     align-items: center;
     justify-content: center;
-    border-radius: 32px;
+    border-radius: 24px;
     margin: 0 10px;
     cursor: pointer;
     line-height: 0;
 
-    @media (max-height: @screen-height-sm) {
-      width: 40px;
-      height: 40px;
+    @media (max-width: @call-ui-xs) {
+      margin: 0 5px;
     }
 
     &__label {
@@ -214,5 +214,19 @@
 }
 
 .device-toggle-button {
-  margin-left: 72px;
+  .button-reset-default;
+  position: absolute;
+  top: -5px;
+  left: 60px;
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--inactive-call-button-border);
+  border-radius: 50%;
+  margin-bottom: 30px;
+  background-color: var(--inactive-call-button-bg);
+  cursor: pointer;
+  line-height: 0;
+  > svg {
+    fill: var(--main-color);
+  }
 }

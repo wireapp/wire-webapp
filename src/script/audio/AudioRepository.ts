@@ -19,18 +19,18 @@
 
 import {AudioPreference, WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
-import {container} from 'tsyringe';
+import ko from 'knockout';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Logger, getLogger} from 'Util/Logger';
 
 import {AudioPlayingType} from './AudioPlayingType';
-import {AudioState} from './AudioState';
 import {AudioType} from './AudioType';
 
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
-import {DeviceTypes, MediaDevicesHandler} from '../media/MediaDevicesHandler';
+import {MediaDevicesHandler} from '../media/MediaDevicesHandler';
+import {MediaDeviceType} from '../media/MediaDeviceType';
 
 enum AUDIO_PLAY_PERMISSION {
   ALLOWED = 0,
@@ -41,14 +41,12 @@ enum AUDIO_PLAY_PERMISSION {
 export class AudioRepository {
   private readonly logger: Logger;
   private readonly audioElements: Record<string, HTMLAudioElement>;
+  private readonly audioPreference = ko.observable(AudioPreference.ALL);
   private muted: boolean;
 
-  constructor(
-    private readonly devicesHandler: MediaDevicesHandler,
-    private readonly audioState = container.resolve(AudioState),
-  ) {
+  constructor(private readonly devicesHandler?: MediaDevicesHandler) {
     this.logger = getLogger('AudioRepository');
-    this.audioState.audioPreference.subscribe(audioPreference => {
+    this.audioPreference.subscribe(audioPreference => {
       if (audioPreference === AudioPreference.NONE) {
         this.stopAll();
       }
@@ -63,12 +61,12 @@ export class AudioRepository {
       return AUDIO_PLAY_PERMISSION.DISALLOWED_BY_MUTE_STATE;
     }
 
-    const preferenceIsNone = this.audioState.audioPreference() === AudioPreference.NONE;
+    const preferenceIsNone = this.audioPreference() === AudioPreference.NONE;
     if (preferenceIsNone && !AudioPlayingType.NONE.includes(audioId)) {
       return AUDIO_PLAY_PERMISSION.DISALLOWED_BY_PREFERENCES;
     }
 
-    const preferenceIsSome = this.audioState.audioPreference() === AudioPreference.SOME;
+    const preferenceIsSome = this.audioPreference() === AudioPreference.SOME;
     if (preferenceIsSome && !AudioPlayingType.SOME.includes(audioId)) {
       return AUDIO_PLAY_PERMISSION.DISALLOWED_BY_PREFERENCES;
     }
@@ -76,30 +74,24 @@ export class AudioRepository {
     return AUDIO_PLAY_PERMISSION.ALLOWED;
   }
 
-  private createAudioElement(sourcePath: string, preload: boolean): HTMLAudioElement {
+  private createAudioElement(sourcePath: string): HTMLAudioElement {
     const audioElement = new Audio();
-    audioElement.preload = preload ? 'auto' : 'none';
-    if (preload) {
-      audioElement.load();
-    }
+    audioElement.preload = 'auto';
+    // preload element
+    audioElement.load();
     audioElement.src = sourcePath;
     return audioElement;
   }
 
   private updateSinkIds() {
-    const currentOutputDevice = this.devicesHandler?.currentDeviceId[DeviceTypes.AUDIO_OUTPUT]();
+    const currentOutputDevice = this.devicesHandler?.currentDeviceId[MediaDeviceType.AUDIO_OUTPUT]();
     if (!currentOutputDevice) {
       return;
     }
     Object.values(this.audioElements).forEach(element => {
-      element
-        .setSinkId(currentOutputDevice)
-        .then(() => {
-          this.logger.info(`Updated audio element output to: ${currentOutputDevice}`);
-        })
-        .catch(error => {
-          this.logger.warn(error);
-        });
+      element.setSinkId?.(currentOutputDevice).catch(error => {
+        this.logger.warn(error);
+      });
     });
   }
 
@@ -107,21 +99,14 @@ export class AudioRepository {
     return this.audioElements[audioId];
   }
 
-  private initSounds(preload: boolean): void {
+  private initSounds(): void {
     Object.values(AudioType).forEach(audioId => {
-      this.audioElements[audioId] = this.createAudioElement(`./audio/${audioId}.mp3`, preload);
+      this.audioElements[audioId] = this.createAudioElement(`./audio/${audioId}.mp3`);
     });
-
-    this.logger.info(`Sounds initialized (preload: '${preload}')`);
   }
 
   private stopAll(): void {
     Object.keys(this.audioElements).forEach((audioId: AudioType) => this.stop(audioId));
-  }
-
-  private subscribeToAudioEvents(): void {
-    amplify.subscribe(WebAppEvents.AUDIO.PLAY, this.play);
-    amplify.subscribe(WebAppEvents.AUDIO.STOP, this.stop);
   }
 
   private subscribeToEvents(): void {
@@ -136,10 +121,9 @@ export class AudioRepository {
     }
   }
 
-  init(preload: boolean = false): void {
-    this.initSounds(preload);
+  init(): void {
+    this.initSounds();
     this.updateSinkIds();
-    this.subscribeToAudioEvents();
   }
 
   loop(audioId: AudioType): Promise<void> {
@@ -161,7 +145,7 @@ export class AudioRepository {
     return audioElement.play();
   }
 
-  play = async (audioId: AudioType, playInLoop: boolean = false): Promise<void> => {
+  async play(audioId: AudioType, playInLoop: boolean = false): Promise<void> {
     this.updateSinkIds();
     const audioElement = this.getSoundById(audioId);
     if (!audioElement) {
@@ -173,7 +157,7 @@ export class AudioRepository {
       case AUDIO_PLAY_PERMISSION.ALLOWED:
         try {
           await this.playAudio(audioElement, playInLoop);
-          this.logger.info(`Playing sound '${audioId}' (loop: '${playInLoop}')`);
+          this.logger.log(`Playing sound '${audioId}' (loop: '${playInLoop}')`);
         } catch (error) {
           this.logger.error(`Failed to play sound '${audioId}': ${error.message}`);
           throw error;
@@ -187,10 +171,10 @@ export class AudioRepository {
         this.logger.debug(`Playing '${audioId}' was disallowed because of user's preferences`);
         break;
     }
-  };
+  }
 
   readonly setAudioPreference = (audioPreference: AudioPreference): void => {
-    this.audioState.audioPreference(audioPreference);
+    this.audioPreference(audioPreference);
   };
 
   readonly setMutedState = (handlingNotifications: NOTIFICATION_HANDLING_STATE): void => {
@@ -203,14 +187,15 @@ export class AudioRepository {
     }
   };
 
-  readonly stop = (audioId: AudioType): void => {
+  stop(audioId: AudioType): void {
     const audioElement = this.getSoundById(audioId);
     if (!audioElement?.paused) {
-      this.logger.info(`Stopping sound '${audioId}'`);
+      // This log is used by QA
+      this.logger.log(`Stopping sound '${audioId}'`);
       audioElement.pause();
       audioElement.load();
     }
-  };
+  }
 
   readonly updatedProperties = (properties: WebappProperties): void => {
     this.setAudioPreference(properties.settings.sound.alerts);

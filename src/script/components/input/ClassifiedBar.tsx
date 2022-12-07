@@ -20,12 +20,21 @@
 import React from 'react';
 
 import {CSSObject} from '@emotion/react';
+import cx from 'classnames';
 
+import {Icon} from 'Components/Icon';
+import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-function isClassified(users: User[], classifiedDomains: string[]): boolean {
-  if (users.some(user => !classifiedDomains.includes(user.domain))) {
+function isClassified(users: User[], classifiedDomains: string[], conversationDomain?: string): boolean {
+  // if a conversation is hosted on an unclassified domain it is not considered classified
+  if (conversationDomain && !classifiedDomains.includes(conversationDomain)) {
+    return false;
+  }
+  // if a conversation has any temporary guests then it is not considered classified
+  if (users.some(user => !classifiedDomains.includes(user.domain) || user.isTemporaryGuest())) {
     return false;
   }
   return true;
@@ -34,37 +43,46 @@ function isClassified(users: User[], classifiedDomains: string[]): boolean {
 interface ClassifiedBarProps {
   classifiedDomains?: string[];
   style?: CSSObject;
+  conversationDomain?: string;
+}
+
+interface UserClassifiedBarProps extends ClassifiedBarProps {
   users: User[];
 }
 
-const barStyle = (highContrast: boolean): CSSObject => ({
-  alignItems: 'center',
-  backgroundColor: `var(--${highContrast ? 'background' : 'app-bg-secondary'})`,
-  borderColor: 'var(--foreground-fade-40)',
-  borderStyle: highContrast ? 'none' : 'solid',
-  borderWidth: '1px 0',
-  color: `var(--${highContrast ? 'app-bg' : 'background'})`,
-  display: 'flex',
-  fontSize: '0.6875rem',
-  fontWeight: 600,
-  height: '16px',
-  justifyContent: 'center',
-  textTransform: 'uppercase',
-  width: '100%',
-});
-
-const ClassifiedBar: React.FC<ClassifiedBarProps> = ({users, classifiedDomains, style}) => {
+export const UserClassifiedBar: React.FC<UserClassifiedBarProps> = ({
+  users,
+  conversationDomain,
+  classifiedDomains,
+  style,
+}) => {
   if (typeof classifiedDomains === 'undefined') {
     return null;
   }
-  const classified = isClassified(users, classifiedDomains);
+
+  const classified = isClassified(users, classifiedDomains, conversationDomain);
   const text = classified ? t('conversationClassified') : t('conversationNotClassified');
-  const highContrast = !classified;
+
   return (
-    <div data-uie-name="classified-label" css={{...barStyle(highContrast), ...style}}>
+    <div
+      className={cx('classified-bar', {green: classified, red: !classified})}
+      data-uie-name="classified-label"
+      css={{...style}}
+    >
+      {classified ? <Icon.Check /> : <Icon.Info />}
       {text}
     </div>
   );
 };
 
-export {ClassifiedBar};
+interface ConversationClassifiedBarProps extends ClassifiedBarProps {
+  conversation: Conversation;
+}
+
+export const ConversationClassifiedBar: React.FC<ConversationClassifiedBarProps> = ({
+  conversation,
+  ...classifiedBarProps
+}) => {
+  const {allUserEntities: users} = useKoSubscribableChildren(conversation, ['allUserEntities']);
+  return <UserClassifiedBar users={users} conversationDomain={conversation.domain} {...classifiedBarProps} />;
+};

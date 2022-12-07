@@ -19,6 +19,7 @@
 
 import {FC, useMemo, useState} from 'react';
 
+import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {SearchInput} from 'Components/SearchInput';
 import {UserSearchableList} from 'Components/UserSearchableList';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -31,7 +32,6 @@ import {User} from '../../../entity/User';
 import {isServiceEntity} from '../../../guards/Service';
 import {SearchRepository} from '../../../search/SearchRepository';
 import {TeamRepository} from '../../../team/TeamRepository';
-import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {PanelHeader} from '../PanelHeader';
 import {PanelEntity, PanelState} from '../RightSidebar';
 
@@ -57,7 +57,6 @@ const ConversationParticipants: FC<ConversationParticipantsProps> = ({
   highlightedUsers,
 }) => {
   const [searchInput, setSearchInput] = useState<string>('');
-
   const {
     participating_user_ets: participatingUserEts,
     removed_from_conversation: removedFromConversation,
@@ -100,7 +99,7 @@ const ConversationParticipants: FC<ConversationParticipantsProps> = ({
           forceDark
         />
 
-        <div className="conversation-participants__list panel__content" ref={initFadingScrollbar}>
+        <FadingScrollbar className="conversation-participants__list panel__content">
           <UserSearchableList
             dataUieName="list-conversation-participants"
             users={participants}
@@ -113,9 +112,10 @@ const ConversationParticipants: FC<ConversationParticipantsProps> = ({
             conversationRepository={conversationRepository}
             conversation={activeConversation}
             selfFirst={false}
+            selfUser={selfUser}
             noSelfInteraction
           />
-        </div>
+        </FadingScrollbar>
       </div>
     </div>
   );

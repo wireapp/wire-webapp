@@ -38,13 +38,12 @@ const createReadReceiptMessage = (partialReadReceiptStatus: Partial<MessageEntit
 describe('ReadReceiptStatus', () => {
   it('is not shown when message is not last delivered message', () => {
     const props = {
-      focusConversation: true,
+      isMessageFocused: true,
       is1to1Conversation: false,
       isLastDeliveredMessage: false,
       message: createReadReceiptMessage({
         readReceipts: ko.observableArray([] as ReadReceipt[]),
       }),
-      onClickReceipts: jest.fn(),
     };
 
     const {queryByTestId} = render(<ReadReceiptStatus {...props} />);
@@ -54,13 +53,12 @@ describe('ReadReceiptStatus', () => {
 
   it('shows "delivered" when noone read the message', () => {
     const props = {
-      focusConversation: true,
+      isMessageFocused: true,
       is1to1Conversation: false,
       isLastDeliveredMessage: true,
       message: createReadReceiptMessage({
         readReceipts: ko.observableArray([] as ReadReceipt[]),
       }),
-      onClickReceipts: jest.fn(),
     };
 
     const {queryByTestId} = render(<ReadReceiptStatus {...props} />);
@@ -71,13 +69,12 @@ describe('ReadReceiptStatus', () => {
 
   it('shows the read icon', () => {
     const props = {
-      focusConversation: true,
+      isMessageFocused: true,
       is1to1Conversation: false,
       isLastDeliveredMessage: true,
       message: createReadReceiptMessage({
         readReceipts: ko.observableArray([{} as ReadReceipt]),
       }),
-      onClickReceipts: jest.fn(),
     };
 
     const {queryByTestId} = render(<ReadReceiptStatus {...props} />);
@@ -88,29 +85,29 @@ describe('ReadReceiptStatus', () => {
 
   describe('1to1 conversation', () => {
     it('has no click handler', () => {
-      const onClickReceiptsSpy = jest.fn();
+      const onClickDetailsSpy = jest.fn();
       const readReceiptTime = new Date().toISOString();
       const props = {
-        focusConversation: true,
+        isMessageFocused: true,
         is1to1Conversation: true,
         isLastDeliveredMessage: true,
         message: createReadReceiptMessage({
           readReceipts: ko.observableArray([{time: readReceiptTime} as ReadReceipt]),
         }),
-        onClickReceipts: onClickReceiptsSpy,
+        onClickDetails: onClickDetailsSpy,
       };
 
       const {getByTestId} = render(<ReadReceiptStatus {...props} />);
 
       const readReceiptStatus = getByTestId('status-message-read-receipts');
       fireEvent.click(readReceiptStatus);
-      expect(onClickReceiptsSpy).toHaveBeenCalledTimes(0);
+      expect(onClickDetailsSpy).toHaveBeenCalledTimes(0);
     });
 
     it('shows timestamp instead of read count', () => {
       const readReceiptTime = new Date().toISOString();
       const props = {
-        focusConversation: true,
+        isMessageFocused: true,
         is1to1Conversation: true,
         isLastDeliveredMessage: true,
         message: createReadReceiptMessage({
@@ -126,36 +123,14 @@ describe('ReadReceiptStatus', () => {
   });
 
   describe('group conversation', () => {
-    it('has a click handler', () => {
-      const onClickReceiptsSpy = jest.fn();
-      const readReceiptTime = new Date().toISOString();
-      const props = {
-        focusConversation: true,
-        is1to1Conversation: false,
-        isLastDeliveredMessage: true,
-        message: createReadReceiptMessage({
-          readReceipts: ko.observableArray([{time: readReceiptTime} as ReadReceipt]),
-        }),
-        onClickReceipts: onClickReceiptsSpy,
-      };
-
-      const {getByTestId} = render(<ReadReceiptStatus {...props} />);
-
-      const readReceiptStatus = getByTestId('status-message-read-receipts');
-
-      fireEvent.click(readReceiptStatus);
-      expect(onClickReceiptsSpy).toHaveBeenCalledTimes(1);
-    });
-
     it('shows read count', async () => {
       const props = {
-        focusConversation: true,
+        isMessageFocused: true,
         is1to1Conversation: false,
         isLastDeliveredMessage: true,
         message: createReadReceiptMessage({
           readReceipts: ko.observableArray([{} as ReadReceipt, {} as ReadReceipt]),
         }),
-        onClickReceipts: jest.fn(),
       };
 
       const {getByText, queryByTestId} = render(<ReadReceiptStatus {...props} />);

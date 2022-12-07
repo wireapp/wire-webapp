@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, ReactNode, createContext} from 'react';
+import {FC, ReactNode, createContext, useContext} from 'react';
 
 import {MainViewModel} from '../view_model/MainViewModel';
 
@@ -28,8 +28,15 @@ interface RootProviderProps {
   value: MainViewModel;
 }
 
-const RootProvider: FC<RootProviderProps> = ({children, value}) => {
+export const RootProvider: FC<RootProviderProps> = ({children, value}) => {
   return <RootContext.Provider value={value}>{children}</RootContext.Provider>;
 };
 
-export {RootProvider};
+export const useMainViewModel = () => {
+  const context = useContext(RootContext);
+  if (!context) {
+    throw new Error('MainViewModel was not initialised');
+  }
+
+  return context;
+};

@@ -37,35 +37,58 @@ interface LoginFormProps {
 
 const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
   const {formatMessage: _} = useIntl();
-  const emailInput = useRef<HTMLInputElement>();
-  const passwordInput = useRef<HTMLInputElement>();
+  const emailInput = useRef<HTMLInputElement>(null);
+  const passwordInput = useRef<HTMLInputElement>(null);
+
   const [validEmailInput, setValidEmailInput] = useState(true);
   const [validPasswordInput, setValidPasswordInput] = useState(true);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleSubmit = (event: React.FormEvent): void => {
     event.preventDefault();
     if (isFetching) {
-      return undefined;
+      return;
     }
+
+    if (!emailInput.current || !passwordInput.current) {
+      return;
+    }
+
     emailInput.current.value = emailInput.current.value.trim();
     const validationErrors: Error[] = [];
 
-    if (!emailInput.current.checkValidity()) {
-      validationErrors.push(
-        ValidationError.handleValidationState(emailInput.current.name, emailInput.current.validity),
+    const isEmailValid = emailInput.current.checkValidity();
+    if (!isEmailValid) {
+      const emailValidationError = ValidationError.handleValidationState(
+        emailInput.current.name,
+        emailInput.current.validity,
       );
+      if (emailValidationError) {
+        validationErrors.push(emailValidationError);
+      }
     }
+
     setValidEmailInput(emailInput.current.validity.valid);
-    if (!passwordInput.current.checkValidity()) {
-      validationErrors.push(
-        ValidationError.handleValidationState(passwordInput.current.name, passwordInput.current.validity),
+
+    const isPasswordValid = passwordInput.current.checkValidity();
+
+    if (!isPasswordValid) {
+      const passwordValidationError = ValidationError.handleValidationState(
+        passwordInput.current.name,
+        passwordInput.current.validity,
       );
+      if (passwordValidationError) {
+        validationErrors.push(passwordValidationError);
+      }
     }
+
     const loginData: Partial<LoginData> = {password};
     setValidPasswordInput(passwordInput.current.validity.valid);
+
     const localEmail = email.trim();
+
     if (isValidEmail(localEmail)) {
       loginData.email = localEmail;
     } else if (isValidUsername(localEmail.toLowerCase())) {

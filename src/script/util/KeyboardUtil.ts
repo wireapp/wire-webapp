@@ -17,7 +17,7 @@
  *
  */
 
-import type {KeyboardEvent as ReactKeyboardEvent} from 'react';
+import type {KeyboardEvent as ReactKeyboardEvent, SyntheticEvent as ReactEvent} from 'react';
 
 import {Runtime} from '@wireapp/commons';
 
@@ -54,6 +54,10 @@ export const isKey = (keyboardEvent?: KeyboardEvent | ReactKeyboardEvent, expect
   return eventKey === expectedKey.toLowerCase();
 };
 
+export const isKeyboardEvent = (event: Event | ReactEvent): event is KeyboardEvent | ReactKeyboardEvent => {
+  return 'key' in event;
+};
+
 export const isTabKey = (keyboardEvent: KeyboardEvent | ReactKeyboardEvent): boolean => isKey(keyboardEvent, KEY.TAB);
 
 export const isEnterKey = (keyboardEvent: KeyboardEvent | ReactKeyboardEvent): boolean =>
@@ -61,7 +65,8 @@ export const isEnterKey = (keyboardEvent: KeyboardEvent | ReactKeyboardEvent): b
 
 export const isSpaceKey = (keyboardEvent: KeyboardEvent): boolean => isKey(keyboardEvent, KEY.SPACE);
 
-export const isEscapeKey = (keyboardEvent: KeyboardEvent): boolean => isKey(keyboardEvent, KEY.ESC);
+export const isEscapeKey = (keyboardEvent: KeyboardEvent | ReactKeyboardEvent): boolean =>
+  isKey(keyboardEvent, KEY.ESC);
 
 export const isFunctionKey = (keyboardEvent: KeyboardEvent | ReactKeyboardEvent): boolean =>
   keyboardEvent.altKey || keyboardEvent.ctrlKey || keyboardEvent.metaKey || keyboardEvent.shiftKey;
@@ -75,49 +80,6 @@ export const isPasteAction = (keyboardEvent: KeyboardEvent): boolean =>
 
 export const isRemovalAction = (key: string): boolean => [KEY.BACKSPACE, KEY.DELETE].includes(key);
 
-export const insertAtCaret = (areaId: string, text: string) => {
-  // http://stackoverflow.com/a/1064139
-  const textArea = document.getElementById(areaId) as HTMLTextAreaElement;
-  if (!textArea) {
-    return;
-  }
-
-  const scrollPos = textArea.scrollTop;
-  let strPos = 0;
-  const br =
-    textArea.selectionStart || textArea.selectionStart === 0 ? 'ff' : (document as any).selection ? 'ie' : false;
-
-  if (br === 'ie') {
-    textArea.focus();
-    const range = (document as any).selection.createRange();
-    range.moveStart('character', -textArea.value.length);
-    strPos = range.text.length;
-  } else if (br === 'ff') {
-    strPos = textArea.selectionStart;
-  }
-
-  const front = textArea.value.substring(0, strPos);
-  const back = textArea.value.substring(strPos, textArea.value.length);
-
-  textArea.value = `${front}${text}${back}`;
-  strPos = strPos + text.length;
-
-  if (br === 'ie') {
-    textArea.focus();
-    const ieRange = (document as any).selection.createRange();
-    ieRange.moveStart('character', -textArea.value.length);
-    ieRange.moveStart('character', strPos);
-    ieRange.moveEnd('character', 0);
-    ieRange.select();
-  } else if (br === 'ff') {
-    textArea.selectionStart = strPos;
-    textArea.selectionEnd = strPos;
-    textArea.focus();
-  }
-
-  textArea.scrollTop = scrollPos;
-};
-
 type KeyboardHandler = (event: KeyboardEvent) => void;
 
 const escKeyHandlers: KeyboardHandler[] = [];
@@ -125,8 +87,6 @@ const escKeyHandlers: KeyboardHandler[] = [];
 document.addEventListener('keydown', event => {
   if (event.key === 'Escape') {
     escKeyHandlers.forEach(handler => handler(event));
-  } else if (isMetaKey(event) && event.shiftKey && (isKey(event, '1') || isKey(event, '!'))) {
-    handleDebugKey();
   }
 });
 
@@ -140,8 +100,8 @@ export const offEscKey = (handler: KeyboardHandler) => {
 };
 
 export const handleKeyDown = (
-  event: React.KeyboardEvent<HTMLElement> | KeyboardEvent,
-  callback: (event?: React.KeyboardEvent<HTMLElement> | KeyboardEvent) => void,
+  event: React.KeyboardEvent<Element> | KeyboardEvent,
+  callback: (event?: React.KeyboardEvent<Element> | KeyboardEvent) => void,
 ) => {
   if (event.key === KEY.ENTER || event.key === KEY.SPACE) {
     callback(event);
@@ -154,30 +114,4 @@ export const handleEnterDown = (event: React.KeyboardEvent<HTMLElement> | Keyboa
     callback();
   }
   return true;
-};
-
-const handleDebugKey = () => {
-  const removeDebugInfo = (els: NodeListOf<HTMLElement>) => els.forEach(el => el.parentNode?.removeChild(el));
-
-  const addDebugInfo = (els: NodeListOf<HTMLElement>) =>
-    els.forEach(el => {
-      const debugInfo = document.createElement('div');
-      debugInfo.classList.add('debug-info');
-      if (el.dataset.uieUid) {
-        debugInfo.textContent = el.dataset.uieUid;
-      }
-      el.appendChild(debugInfo);
-    });
-
-  const debugInfos = document.querySelectorAll<HTMLElement>('.debug-info');
-  const isShowingDebugInfo = debugInfos.length > 0;
-
-  if (isShowingDebugInfo) {
-    removeDebugInfo(debugInfos);
-  } else {
-    const debugElements = document.querySelectorAll<HTMLElement>(
-      '.message[data-uie-uid], .conversation-list-cell[data-uie-uid]',
-    );
-    addDebugInfo(debugElements);
-  }
 };

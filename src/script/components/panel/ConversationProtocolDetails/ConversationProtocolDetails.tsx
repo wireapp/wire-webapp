@@ -21,39 +21,9 @@ import React from 'react';
 
 import {CSSObject} from '@emotion/react';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
+import {Ciphersuite} from '@wireapp/core/lib/messagingProtocols/mls';
 
 import {t} from 'Util/LocalizerUtil';
-
-export enum Ciphersuite {
-  /**
-   * DH KEM x25519 | AES-GCM 128 | SHA2-256 | Ed25519
-   */
-  MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519,
-  /**
-   * DH KEM P256 | AES-GCM 128 | SHA2-256 | EcDSA P256
-   */
-  MLS_128_DHKEMP256_AES128GCM_SHA256_P256,
-  /**
-   * DH KEM x25519 | Chacha20Poly1305 | SHA2-256 | Ed25519
-   */
-  MLS_128_DHKEMX25519_CHACHA20POLY1305_SHA256_Ed25519,
-  /**
-   * DH KEM x448 | AES-GCM 256 | SHA2-512 | Ed448
-   */
-  MLS_256_DHKEMX448_AES256GCM_SHA512_Ed448,
-  /**
-   * DH KEM P521 | AES-GCM 256 | SHA2-512 | EcDSA P521
-   */
-  MLS_256_DHKEMP521_AES256GCM_SHA512_P521,
-  /**
-   * DH KEM x448 | Chacha20Poly1305 | SHA2-512 | Ed448
-   */
-  MLS_256_DHKEMX448_CHACHA20POLY1305_SHA512_Ed448,
-  /**
-   * DH KEM P384 | AES-GCM 256 | SHA2-384 | EcDSA P384
-   */
-  MLS_256_DHKEMP384_AES256GCM_SHA384_P384,
-}
 
 export interface ConversationProtocolDetailsProps {
   protocol: ConversationProtocol;
@@ -79,26 +49,27 @@ const wrapperStyles: CSSObject = {
   paddingTop: 4,
 };
 
-const ConversationProtocolDetails: React.FC<ConversationProtocolDetailsProps> = ({protocol, cipherSuite}) => {
-  return (
-    <div>
-      <div className="conversation-details__list-head">{t('conversationDetailsProtocolDetails')}</div>
-      <div css={wrapperStyles}>
-        <div css={titleStyles}>Protocol</div>
-        <p css={subTitleStyles} data-uie-name="protocol-name">
-          {protocol.toUpperCase()}
-        </p>
-        {protocol === ConversationProtocol.MLS && cipherSuite && (
-          <>
-            <div css={titleStyles}>Cipher Suite</div>
-            <p css={subTitleStyles} data-uie-name="cipher-suite">
-              {Ciphersuite[cipherSuite]}
-            </p>
-          </>
-        )}
-      </div>
+const ConversationProtocolDetails: React.FC<ConversationProtocolDetailsProps> = ({protocol, cipherSuite}) => (
+  <div>
+    <h3 className="conversation-details__list-head">{t('conversationDetailsProtocolDetails')}</h3>
+
+    <div css={wrapperStyles}>
+      <div css={titleStyles}>Protocol</div>
+
+      <p css={subTitleStyles} data-uie-name="protocol-name">
+        {protocol.toUpperCase()}
+      </p>
+
+      {protocol === ConversationProtocol.MLS && cipherSuite && (
+        <>
+          <div css={titleStyles}>Cipher Suite</div>
+          <p css={subTitleStyles} data-uie-name="cipher-suite">
+            {Ciphersuite[cipherSuite]}
+          </p>
+        </>
+      )}
     </div>
-  );
-};
+  </div>
+);
 
 export {ConversationProtocolDetails};

@@ -19,6 +19,7 @@
 
 import React, {useEffect} from 'react';
 
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {amplify} from 'amplify';
 
 import {Runtime} from '@wireapp/commons';
@@ -91,7 +92,13 @@ const PreferenceItem: React.FC<{
   uieName: string;
 }> = ({onSelect, isSelected, label, uieName, IconComponent}) => {
   return (
-    <li role="tab" aria-selected={isSelected} aria-controls={label} tabIndex={-1} className="left-list-item">
+    <li
+      role="tab"
+      aria-selected={isSelected}
+      aria-controls={label}
+      tabIndex={TabIndex.UNFOCUSABLE}
+      className="left-list-item"
+    >
       <button
         type="button"
         className={`left-list-item-button ${isSelected ? 'left-list-item-button--active' : ''}`}
@@ -113,7 +120,7 @@ const Preferences: React.FC<PreferencesProps> = ({
   preferenceNotificationRepository,
   onClose,
 }) => {
-  const {contentState} = useAppState();
+  const contentState = useAppState(state => state.contentState);
 
   useEffect(() => {
     // Update local team
@@ -125,7 +132,7 @@ const Preferences: React.FC<PreferencesProps> = ({
 
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
 
-  const onClickSelect = (item: typeof items[number]) => {
+  const onClickSelect = (item: (typeof items)[number]) => {
     setCurrentView(ViewType.CENTRAL_COLUMN);
     contentViewModel.switchContent(item.id);
 

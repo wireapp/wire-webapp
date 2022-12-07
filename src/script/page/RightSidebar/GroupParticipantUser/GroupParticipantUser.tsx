@@ -20,10 +20,12 @@
 import {FC, useEffect} from 'react';
 
 import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/lib/conversation/';
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
 import {EnrichedFields} from 'Components/panel/EnrichedFields';
 import {UserActions, Actions} from 'Components/panel/UserActions';
@@ -34,14 +36,12 @@ import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {ConversationRoleRepository} from '../../../conversation/ConversationRoleRepository';
-import {MemberLeaveEvent} from '../../../conversation/EventBuilder';
+import {MemberLeaveEvent, TeamMemberLeaveEvent} from '../../../conversation/EventBuilder';
 import {Conversation} from '../../../entity/Conversation';
 import {User} from '../../../entity/User';
 import {ClientEvent} from '../../../event/Client';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {TeamState} from '../../../team/TeamState';
-import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
-import {UserState} from '../../../user/UserState';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {PanelHeader} from '../PanelHeader';
 import {PanelEntity} from '../RightSidebar';
@@ -57,7 +57,7 @@ interface GroupParticipantUserProps {
   conversationRoleRepository: ConversationRoleRepository;
   teamRepository: TeamRepository;
   teamState: TeamState;
-  userState: UserState;
+  selfUser: User;
   isFederated?: boolean;
 }
 
@@ -72,18 +72,17 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
   conversationRoleRepository,
   teamRepository,
   teamState,
-  userState,
+  selfUser,
   isFederated = false,
 }) => {
   const {isGroup, roles} = useKoSubscribableChildren(activeConversation, ['isGroup', 'roles']);
-  const {isTemporaryGuest} = useKoSubscribableChildren(currentUser, ['isTemporaryGuest']);
+  const {isTemporaryGuest, isAvailable} = useKoSubscribableChildren(currentUser, ['isTemporaryGuest', 'isAvailable']);
   const {classifiedDomains, isTeam, team} = useKoSubscribableChildren(teamState, [
     'classifiedDomains',
     'isTeam',
     'team',
   ]);
-  const {isActivatedAccount, self: selfUser} = useKoSubscribableChildren(userState, ['isActivatedAccount', 'self']);
-  const {is_verified: isSelfVerified} = useKoSubscribableChildren(selfUser, ['is_verified']);
+  const {isActivatedAccount} = useKoSubscribableChildren(selfUser, ['isActivatedAccount']);
 
   const canChangeRole =
     conversationRoleRepository.canChangeParticipantRoles(activeConversation) && !currentUser.isMe && !isTemporaryGuest;
@@ -108,7 +107,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
     }
   };
 
-  const checkMemberLeave = ({type, data}: MemberLeaveEvent) => {
+  const checkMemberLeave = ({type, data}: MemberLeaveEvent | TeamMemberLeaveEvent) => {
     if (type === ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE && data.user_ids.includes(currentUser.id)) {
       goToRoot();
     }
@@ -145,16 +144,16 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
         onClose={onClose}
       />
 
-      <div className="panel__content" ref={initFadingScrollbar}>
+      <FadingScrollbar className="panel__content">
         <UserDetails
+          groupId={activeConversation?.groupId}
           participant={currentUser}
           badge={teamRepository.getRoleBadge(currentUser.id)}
           isGroupAdmin={isAdmin}
-          isSelfVerified={isSelfVerified}
           classifiedDomains={classifiedDomains}
         />
 
-        {!currentUser.isMe && (
+        {!currentUser.isMe && isAvailable && (
           <div className="conversation-details__devices">
             <button
               className="panel__action-item"
@@ -174,11 +173,11 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
           </div>
         )}
 
-        {canChangeRole && (
+        {canChangeRole && isAvailable && (
           <>
             <div className="conversation-details__admin">
               <div
-                tabIndex={0}
+                tabIndex={TabIndex.FOCUSABLE}
                 role="button"
                 className="panel__action-item modal-style panel__action-button"
                 data-uie-name="toggle-admin"
@@ -201,7 +200,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
               </div>
             </div>
 
-            <p className="panel__info-text panel__item-offset" css={{padding: '16px'}} tabIndex={0}>
+            <p className="panel__info-text panel__item-offset" css={{padding: '16px'}} tabIndex={TabIndex.FOCUSABLE}>
               {t('conversationDetailsGroupAdminInfo')}
             </p>
           </>
@@ -218,7 +217,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
           conversationRoleRepository={conversationRoleRepository}
           selfUser={selfUser}
         />
-      </div>
+      </FadingScrollbar>
     </div>
   );
 };

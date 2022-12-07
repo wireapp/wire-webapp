@@ -17,7 +17,12 @@
  *
  */
 
-import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
+import {
+  ConversationOtrMessageAddEvent,
+  ConversationMLSMessageAddEvent,
+  CONVERSATION_EVENT,
+} from '@wireapp/api-client/lib/event';
+import {GenericMessageType} from '@wireapp/core/lib/conversation';
 
 import {
   Asset,
@@ -32,7 +37,6 @@ import {
   GenericMessage,
   IAsset,
   IImageAsset,
-  ImageAsset,
   LastRead,
   LegalHoldStatus,
   LinkPreview,
@@ -48,17 +52,16 @@ import {
 
 import {getLogger, Logger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {base64ToArray, arrayToBase64, createRandomUuid} from 'Util/util';
+import {base64ToArray, arrayToBase64} from 'Util/util';
 
 import {decryptAesAsset} from '../assets/AssetCrypto';
 import {AssetTransferState} from '../assets/AssetTransferState';
 import {ConversationEphemeralHandler} from '../conversation/ConversationEphemeralHandler';
-import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
+import {MessageAddEvent} from '../conversation/EventBuilder';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {CryptographyError} from '../error/CryptographyError';
 import {ClientEvent, CONVERSATION} from '../event/Client';
 import {StatusType} from '../message/StatusType';
-import {EventRecord} from '../storage';
 
 export interface MappedText {
   data: {content: string; mentions: string[]; previews: string[]; quote?: string; replacing_message_id?: string};
@@ -100,7 +103,8 @@ export interface AssetData {
   status?: AssetTransferState;
   token?: string;
 }
-type ConversationEvent = Omit<EventRecord, 'id'>;
+
+type EncryptedEvent = ConversationOtrMessageAddEvent | ConversationMLSMessageAddEvent | MessageAddEvent;
 
 export class CryptographyMapper {
   private readonly logger: Logger;
@@ -122,7 +126,7 @@ export class CryptographyMapper {
    * @param event Event of `CONVERSATION_EVENT.OTR-ASSET-ADD` or `CONVERSATION_EVENT.OTR-MESSAGE-ADD`
    * @returns Resolves with the mapped event
    */
-  async mapGenericMessage(genericMessage: GenericMessage, event: ConversationEvent) {
+  async mapGenericMessage(genericMessage: GenericMessage, event: EncryptedEvent) {
     if (!genericMessage) {
       throw new CryptographyError(
         CryptographyError.TYPE.NO_GENERIC_MESSAGE,
@@ -137,104 +141,98 @@ export class CryptographyMapper {
     return this._mapGenericMessage(genericMessage, event);
   }
 
-  async _mapGenericMessage(genericMessage: GenericMessage, event: ConversationEvent) {
+  private _mapGenericMessage(genericMessage: GenericMessage, event: EncryptedEvent) {
     let specificContent;
 
     switch (genericMessage.content) {
-      case GENERIC_MESSAGE_TYPE.ASSET: {
+      case GenericMessageType.ASSET: {
         const mappedAsset = this._mapAsset(genericMessage.asset as Asset);
         specificContent = addMetadata(mappedAsset, genericMessage.asset);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.AVAILABILITY: {
+      case GenericMessageType.AVAILABILITY: {
         specificContent = this._mapAvailability(genericMessage.availability as Availability);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.CALLING: {
-        specificContent = this._mapCalling(genericMessage.calling as Calling, event.data);
+      case GenericMessageType.CALLING: {
+        specificContent = this._mapCalling(genericMessage.calling as Calling, event);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.CLEARED: {
+      case GenericMessageType.CLEARED: {
         specificContent = this._mapCleared(genericMessage.cleared as Cleared);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.CONFIRMATION: {
+      case GenericMessageType.CONFIRMATION: {
         specificContent = this._mapConfirmation(genericMessage.confirmation as Confirmation);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.DELETED: {
+      case GenericMessageType.DELETED: {
         specificContent = this._mapDeleted(genericMessage.deleted as MessageDelete);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.EDITED: {
-        specificContent = await this._mapEdited(genericMessage.edited as MessageEdit);
+      case GenericMessageType.EDITED: {
+        specificContent = this._mapEdited(genericMessage.edited as MessageEdit);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.EPHEMERAL: {
-        specificContent = await this._mapEphemeral(genericMessage, event);
+      case GenericMessageType.EPHEMERAL: {
+        specificContent = this._mapEphemeral(genericMessage, event);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.HIDDEN: {
+      case GenericMessageType.HIDDEN: {
         specificContent = this._mapHidden(genericMessage.hidden as MessageHide);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.IMAGE: {
-        const mappedImage = this._mapImage(genericMessage.image as ImageAsset, event.data.id);
-        specificContent = addMetadata(mappedImage, genericMessage.image);
-        break;
-      }
-
-      case GENERIC_MESSAGE_TYPE.KNOCK: {
+      case GenericMessageType.KNOCK: {
         const mappedKnock = this._mapKnock();
         specificContent = addMetadata(mappedKnock, genericMessage.knock);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.LAST_READ: {
+      case GenericMessageType.LAST_READ: {
         specificContent = this._mapLastRead(genericMessage.lastRead as LastRead);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.LOCATION: {
+      case GenericMessageType.LOCATION: {
         const mappedLocation = this._mapLocation(genericMessage.location as Location);
         specificContent = addMetadata(mappedLocation, genericMessage.location);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.REACTION: {
+      case GenericMessageType.REACTION: {
         specificContent = this._mapReaction(genericMessage.reaction as Reaction);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.TEXT: {
+      case GenericMessageType.TEXT: {
         const mappedText = this._mapText(genericMessage.text as Text);
         specificContent = addMetadata(mappedText, genericMessage.text);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.COMPOSITE_MESSAGE: {
-        const mappedComposite = await this._mapComposite(genericMessage.composite as Composite);
+      case GenericMessageType.COMPOSITE: {
+        const mappedComposite = this._mapComposite(genericMessage.composite as Composite);
         specificContent = addMetadata(mappedComposite, genericMessage.composite);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.BUTTON_ACTION_CONFIRMATION: {
+      case GenericMessageType.BUTTON_ACTION_CONFIRMATION: {
         specificContent = this._mapButtonActionConfirmation(
           genericMessage.buttonActionConfirmation as ButtonActionConfirmation,
         );
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.DATA_TRANSFER: {
+      case GenericMessageType.DATA_TRANSFER: {
         specificContent = this._mapDataTransfer(genericMessage.dataTransfer as DataTransfer);
         break;
       }
@@ -242,57 +240,55 @@ export class CryptographyMapper {
       default: {
         const logMessage = `Skipped event '${genericMessage.messageId}' of unhandled type '${genericMessage.content}'`;
         this.logger.debug(logMessage, {event, generic_message: genericMessage});
-        throw new CryptographyError(CryptographyError.TYPE.UNHANDLED_TYPE, logMessage);
+        return undefined;
       }
     }
 
-    const {conversation, qualified_conversation, from, qualified_from, senderClientId} = event;
+    const {conversation, qualified_conversation, from, qualified_from} = event;
     const genericContent = {
       conversation,
       from,
-      from_client_id: event.data.sender,
+      from_client_id: event.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD ? event.data.sender : undefined,
       id: genericMessage.messageId,
       qualified_conversation,
       qualified_from,
-      senderClientId,
-      status: event.status,
+      status: 'status' in event ? event.status : undefined,
       time: event.time,
     };
 
     return {...genericContent, ...specificContent};
   }
 
-  async _mapComposite(composite: Composite) {
-    const items = await Promise.all(
-      composite.items.map(async item => {
-        if ((item as Composite.Item).content !== GENERIC_MESSAGE_TYPE.TEXT) {
-          return item;
-        }
+  private _mapComposite(composite: Composite) {
+    const items = composite.items.map(item => {
+      if ((item as Composite.Item).content !== GenericMessageType.TEXT) {
+        return item;
+      }
 
-        const {mentions: protoMentions, content} = item.text;
+      const {mentions: protoMentions, content} = item.text;
 
-        if (protoMentions && protoMentions.length > CryptographyMapper.CONFIG.MAX_MENTIONS_PER_MESSAGE) {
-          this.logger.warn(`Message contains '${protoMentions.length}' mentions exceeding limit`, item.text);
-          protoMentions.length = CryptographyMapper.CONFIG.MAX_MENTIONS_PER_MESSAGE;
-        }
+      if (protoMentions && protoMentions.length > CryptographyMapper.CONFIG.MAX_MENTIONS_PER_MESSAGE) {
+        this.logger.warn(`Message contains '${protoMentions.length}' mentions exceeding limit`);
+        protoMentions.length = CryptographyMapper.CONFIG.MAX_MENTIONS_PER_MESSAGE;
+      }
 
-        const mentions = protoMentions.map(protoMention => arrayToBase64(Mention.encode(protoMention).finish()));
+      const mentions = protoMentions.map(protoMention => arrayToBase64(Mention.encode(protoMention).finish()));
 
-        return {
-          text: {
-            content,
-            mentions,
-          },
-        };
-      }),
-    );
+      return {
+        text: {
+          content,
+          mentions,
+        },
+      };
+    });
+
     return {
       data: {items},
       type: ClientEvent.CONVERSATION.COMPOSITE_MESSAGE_ADD,
     };
   }
 
-  _mapButtonActionConfirmation(buttonActionConfirmation: ButtonActionConfirmation) {
+  private _mapButtonActionConfirmation(buttonActionConfirmation: ButtonActionConfirmation) {
     return {
       data: {
         buttonId: buttonActionConfirmation.buttonId,
@@ -302,7 +298,7 @@ export class CryptographyMapper {
     };
   }
 
-  _mapAsset(asset: Asset) {
+  private _mapAsset(asset: Asset) {
     const {original, preview, uploaded, notUploaded} = asset;
     let data: AssetData;
 
@@ -358,7 +354,7 @@ export class CryptographyMapper {
     return {data, type: ClientEvent.CONVERSATION.ASSET_ADD};
   }
 
-  _mapAssetMetaData(original: Asset.IOriginal): MappedAssetMetaData | undefined {
+  private _mapAssetMetaData(original: Asset.IOriginal): MappedAssetMetaData | undefined {
     const audioData = original.audio;
     if (audioData) {
       const loudnessArray = audioData.normalizedLoudness || new ArrayBuffer(0);
@@ -374,7 +370,7 @@ export class CryptographyMapper {
     return undefined;
   }
 
-  _mapAvailability(availability: Availability) {
+  private _mapAvailability(availability: Availability) {
     const knownAvailabilityTypes = [
       Availability.Type.NONE,
       Availability.Type.AVAILABLE,
@@ -395,15 +391,17 @@ export class CryptographyMapper {
     };
   }
 
-  _mapCalling(calling: Calling, eventData: ConversationEvent & {sender: string}) {
+  private _mapCalling(calling: Calling, event: EncryptedEvent) {
     return {
       content: JSON.parse(calling.content),
-      sender: eventData.sender,
+      targetConversation: calling.qualifiedConversationId,
+      sender: event.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD ? event.data.sender : undefined,
+      senderClientId: event.type === CONVERSATION_EVENT.MLS_MESSAGE_ADD ? event.senderClientId : undefined,
       type: ClientEvent.CALL.E_CALL,
     };
   }
 
-  _mapCleared(cleared: Cleared) {
+  private _mapCleared(cleared: Cleared) {
     return {
       data: {
         cleared_timestamp: cleared.clearedTimestamp.toString(),
@@ -413,7 +411,7 @@ export class CryptographyMapper {
     };
   }
 
-  _mapConfirmation(confirmation: Confirmation) {
+  private _mapConfirmation(confirmation: Confirmation) {
     return {
       data: {
         message_id: confirmation.firstMessageId,
@@ -434,7 +432,7 @@ export class CryptographyMapper {
     };
   }
 
-  _mapDeleted(deleted: MessageDelete) {
+  private _mapDeleted(deleted: MessageDelete) {
     return {
       data: {
         message_id: deleted.messageId,
@@ -443,20 +441,17 @@ export class CryptographyMapper {
     };
   }
 
-  async _mapEdited(edited: MessageEdit) {
+  private _mapEdited(edited: MessageEdit) {
     const mappedMessage = this._mapText(edited.text as Text);
     mappedMessage.data.replacing_message_id = edited.replacingMessageId;
     return mappedMessage;
   }
 
-  async _mapEphemeral(genericMessage: GenericMessage, event: ConversationEvent) {
+  private _mapEphemeral(genericMessage: GenericMessage, event: EncryptedEvent) {
     const messageTimer = genericMessage.ephemeral[PROTO_MESSAGE_TYPE.EPHEMERAL_EXPIRATION];
     (genericMessage.ephemeral as unknown as GenericMessage).messageId = genericMessage.messageId;
 
-    const embeddedMessage: any = await this._mapGenericMessage(
-      genericMessage.ephemeral as unknown as GenericMessage,
-      event,
-    );
+    const embeddedMessage: any = this._mapGenericMessage(genericMessage.ephemeral as unknown as GenericMessage, event);
     embeddedMessage.ephemeral_expires = ConversationEphemeralHandler.validateTimer(messageTimer as number);
 
     return embeddedMessage;
@@ -470,11 +465,12 @@ export class CryptographyMapper {
    * @param event Backend event of type 'conversation.otr-message-add'
    * @returns Resolves with generic message
    */
-  async _unwrapExternal(external: External, event: ConversationEvent) {
+  async _unwrapExternal(external: External, event: EncryptedEvent) {
     const {otrKey, sha256} = external;
     try {
-      const eventData = event.data;
-      if (!eventData.data || !otrKey || !sha256) {
+      // Only OTR proteus messages can be sent as external, MLS message should throw an error at this point
+      const eventData = event.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD ? event.data : undefined;
+      if (!eventData?.data || !otrKey || !sha256) {
         throw new Error('Not all expected properties defined');
       }
       const cipherTextArray = base64ToArray(eventData.data);
@@ -489,7 +485,7 @@ export class CryptographyMapper {
     }
   }
 
-  _mapHidden(hidden: MessageHide) {
+  private _mapHidden(hidden: MessageHide) {
     return {
       data: {
         conversation_id: hidden.conversationId,
@@ -499,45 +495,14 @@ export class CryptographyMapper {
     };
   }
 
-  _mapImage(image: ImageAsset, eventId: string) {
-    const isMediumImage = image.tag === 'medium';
-    if (isMediumImage) {
-      return this._mapImageMedium(image, eventId);
-    }
-
-    this.logger.info(`Skipped event '${eventId}': ${CryptographyError.MESSAGE.IGNORED_PREVIEW}`);
-    throw new CryptographyError(CryptographyError.TYPE.IGNORED_PREVIEW, CryptographyError.MESSAGE.IGNORED_PREVIEW);
-  }
-
-  _mapImageMedium(image: ImageAsset, eventId: string) {
-    // set ID even if asset id is missing
-    eventId = eventId || createRandomUuid();
-
-    return {
-      data: {
-        content_length: image.size,
-        content_type: image.mimeType,
-        id: eventId,
-        info: {
-          height: image.height,
-          tag: image.tag,
-          width: image.width,
-        },
-        otr_key: new Uint8Array(image.otrKey ? image.otrKey : []),
-        sha256: new Uint8Array(image.sha256 ? image.sha256 : []),
-      },
-      type: ClientEvent.CONVERSATION.ASSET_ADD,
-    };
-  }
-
-  _mapKnock() {
+  private _mapKnock() {
     return {
       data: {},
       type: ClientEvent.CONVERSATION.KNOCK,
     };
   }
 
-  _mapLastRead(lastRead: LastRead) {
+  private _mapLastRead(lastRead: LastRead) {
     return {
       data: {
         conversationId: lastRead.conversationId,
@@ -547,7 +512,7 @@ export class CryptographyMapper {
     };
   }
 
-  _mapDataTransfer(dataTransfer: DataTransfer) {
+  private _mapDataTransfer(dataTransfer: DataTransfer) {
     return {
       data: {
         trackingIdentifier: dataTransfer.trackingIdentifier.identifier,
@@ -556,7 +521,7 @@ export class CryptographyMapper {
     };
   }
 
-  _mapLocation(location: Location) {
+  private _mapLocation(location: Location) {
     return {
       data: {
         location: {
@@ -570,7 +535,7 @@ export class CryptographyMapper {
     };
   }
 
-  _mapReaction(reaction: Reaction) {
+  private _mapReaction(reaction: Reaction) {
     return {
       data: {
         message_id: reaction.messageId,
@@ -580,13 +545,13 @@ export class CryptographyMapper {
     };
   }
 
-  _mapText(text: Text): MappedText {
+  private _mapText(text: Text): MappedText {
     const {mentions: protoMentions, quote: protoQuote} = text;
 
     const protoLinkPreviews = text[PROTO_MESSAGE_TYPE.LINK_PREVIEWS];
 
     if (protoMentions && protoMentions.length > CryptographyMapper.CONFIG.MAX_MENTIONS_PER_MESSAGE) {
-      this.logger.warn(`Message contains '${protoMentions.length}' mentions exceeding limit`, text);
+      this.logger.warn(`Message contains '${protoMentions.length}' mentions exceeding limit`);
       protoMentions.length = CryptographyMapper.CONFIG.MAX_MENTIONS_PER_MESSAGE;
     }
 

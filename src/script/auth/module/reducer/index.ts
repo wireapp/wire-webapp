@@ -17,7 +17,6 @@
  *
  */
 
-import type {CookiesStatic} from 'js-cookie';
 import {ActionCreatorsMapObject, AnyAction, Dispatch, bindActionCreators as bindActionCreatorsRedux} from 'redux';
 import type {ThunkAction as ReduxThunkAction, ThunkDispatch as ReduxThunkDispatch} from 'redux-thunk';
 
@@ -27,7 +26,6 @@ import type {Account} from '@wireapp/core';
 import {AuthState, authReducer, initialAuthState} from './authReducer';
 import {ClientState, clientReducer, initialClientState} from './clientReducer';
 import {ConversationState, conversationReducer, initialConversationState} from './conversationReducer';
-import {CookieState, cookieReducer, initialCookieState} from './cookieReducer';
 import {InvitationState, initialInvitationState, invitationReducer} from './inviteReducer';
 import {LanguageState, initialLanguageState, languageReducer} from './languageReducer';
 import {RuntimeState, initialRuntimeState, runtimeReducer} from './runtimeReducer';
@@ -39,7 +37,6 @@ import type {ActionRoot} from '../action';
 export type Api = {
   actions: ActionRoot;
   apiClient: APIClient;
-  cookieStore: CookiesStatic;
   core: Account;
   getConfig: () => Configuration;
   localStorage: Storage;
@@ -49,7 +46,6 @@ export interface RootState {
   authState: AuthState;
   clientState: ClientState;
   conversationState: ConversationState;
-  cookieState: CookieState;
   inviteState: InvitationState;
   languageState: LanguageState;
   runtimeState: RuntimeState;
@@ -60,7 +56,6 @@ export const initialRootState: RootState = {
   authState: initialAuthState,
   clientState: initialClientState,
   conversationState: initialConversationState,
-  cookieState: initialCookieState,
   inviteState: initialInvitationState,
   languageState: initialLanguageState,
   runtimeState: initialRuntimeState,
@@ -85,7 +80,6 @@ export const reducers = {
   authState: authReducer,
   clientState: clientReducer,
   conversationState: conversationReducer,
-  cookieState: cookieReducer,
   inviteState: invitationReducer,
   languageState: languageReducer,
   runtimeState: runtimeReducer,

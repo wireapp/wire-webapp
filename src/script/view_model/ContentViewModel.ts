@@ -44,7 +44,7 @@ import {PanelState} from '../page/RightSidebar';
 import {useAppMainState} from '../page/state';
 import {ContentState, useAppState} from '../page/useAppState';
 import {generateConversationUrl} from '../router/routeGenerator';
-import {navigate} from '../router/Router';
+import {navigate, setHistoryParam} from '../router/Router';
 import type {UserRepository} from '../user/UserRepository';
 import {UserState} from '../user/UserState';
 
@@ -76,7 +76,10 @@ export class ContentViewModel {
     return this.mainViewModel.isFederated;
   }
 
-  constructor(mainViewModel: MainViewModel, public repositories: ViewModelRepositories) {
+  constructor(
+    mainViewModel: MainViewModel,
+    public repositories: ViewModelRepositories,
+  ) {
     this.userState = container.resolve(UserState);
     this.conversationState = container.resolve(ConversationState);
 
@@ -130,10 +133,95 @@ export class ContentViewModel {
     }
   }
 
-  changeConversation = (conversationEntity: Conversation, messageEntity?: Message) => {
+  private changeConversation(conversationEntity: Conversation, messageEntity?: Message): void {
     this.initialMessage = messageEntity;
     this.conversationState.activeConversation(conversationEntity);
+  }
+
+  private readonly getConversationEntity = async (
+    conversation: Conversation | string,
+    domain: string | null = null,
+  ): Promise<Conversation> => {
+    const conversationEntity = isConversationEntity(conversation)
+      ? conversation
+      : await this.conversationRepository.getConversationById({domain: domain || '', id: conversation});
+
+    if (!conversationEntity.is1to1()) {
+      return conversationEntity;
+    }
+
+    return this.conversationRepository.init1to1Conversation(conversationEntity, true);
   };
+
+  private closeRightSidebar(): void {
+    const {rightSidebar} = useAppMainState.getState();
+    rightSidebar.close();
+  }
+
+  private handleMissingConversation(): void {
+    this.closeRightSidebar();
+    return this.switchContent(ContentState.CONNECTION_REQUESTS);
+  }
+
+  private isConversationOpen(conversationEntity: Conversation, isActiveConversation: boolean): boolean {
+    const {contentState} = useAppState.getState();
+    const isConversationState = contentState === ContentState.CONVERSATION;
+    return conversationEntity && isActiveConversation && isConversationState;
+  }
+
+  private switchToNotificationSettingsIfApplicable(
+    openNotificationSettings: boolean,
+    conversationEntity: Conversation,
+  ): void {
+    if (openNotificationSettings) {
+      const {rightSidebar} = useAppMainState.getState();
+      rightSidebar.goTo(PanelState.NOTIFICATIONS, {entity: conversationEntity});
+    }
+  }
+
+  private handleConversationState(
+    isOpenedConversation: boolean,
+    openNotificationSettings: boolean,
+    conversationEntity: Conversation,
+  ): void {
+    const {setContentState} = useAppState.getState();
+    if (isOpenedConversation) {
+      this.switchToNotificationSettingsIfApplicable(openNotificationSettings, conversationEntity);
+      return;
+    }
+    setContentState(ContentState.CONVERSATION);
+
+    this.mainViewModel.list.openConversations(conversationEntity.archivedState());
+  }
+  private showAndNavigate(conversationEntity: Conversation, openNotificationSettings: boolean): void {
+    const {rightSidebar} = useAppMainState.getState();
+    this.showContent(ContentState.CONVERSATION);
+    this.previousConversation = this.conversationState.activeConversation();
+    setHistoryParam(
+      generateConversationUrl({id: conversationEntity?.id ?? '', domain: conversationEntity?.domain ?? ''}),
+      history.state,
+    );
+    if (openNotificationSettings) {
+      rightSidebar.goTo(PanelState.NOTIFICATIONS, {entity: this.conversationState.activeConversation() ?? null});
+    }
+  }
+
+  private showConversationNotFoundErrorModal(): void {
+    PrimaryModal.show(
+      PrimaryModal.type.ACKNOWLEDGE,
+      {
+        text: {
+          message: t('conversationNotFoundMessage'),
+          title: t('conversationNotFoundTitle', Config.getConfig().BRAND_NAME),
+        },
+      },
+      undefined,
+    );
+  }
+
+  private isConversationNotFoundError(error: any): boolean {
+    return error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
+  }
 
   /**
    * Opens the specified conversation.
@@ -155,22 +243,15 @@ export class ContentViewModel {
       openNotificationSettings = false,
     } = options;
 
-    const {rightSidebar} = useAppMainState.getState();
-    const {contentState, setContentState} = useAppState.getState();
-
     if (!conversation) {
-      rightSidebar.close();
-      return this.switchContent(ContentState.CONNECTION_REQUESTS);
+      return this.handleMissingConversation();
     }
 
     try {
-      const conversationEntity = isConversationEntity(conversation)
-        ? conversation
-        : await this.conversationRepository.getConversationById({domain: domain || '', id: conversation});
+      const conversationEntity = await this.getConversationEntity(conversation, domain);
 
       if (!conversationEntity) {
-        rightSidebar.close();
-
+        this.closeRightSidebar();
         throw new ConversationError(
           ConversationError.TYPE.CONVERSATION_NOT_FOUND,
           ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
@@ -180,56 +261,22 @@ export class ContentViewModel {
       const isActiveConversation = this.conversationState.isActiveConversation(conversationEntity);
 
       if (!isActiveConversation) {
-        rightSidebar.close();
+        this.closeRightSidebar();
       }
 
-      const isConversationState = contentState === ContentState.CONVERSATION;
-      const isOpenedConversation = conversationEntity && isActiveConversation && isConversationState;
+      const isOpenedConversation = this.isConversationOpen(conversationEntity, isActiveConversation);
 
-      if (isOpenedConversation) {
-        if (openNotificationSettings) {
-          rightSidebar.goTo(PanelState.NOTIFICATIONS, {entity: conversationEntity});
-        }
-        return;
-      }
-
-      setContentState(ContentState.CONVERSATION);
-      this.mainViewModel.list.openConversations();
-
+      this.handleConversationState(isOpenedConversation, openNotificationSettings, conversationEntity);
       if (!isActiveConversation) {
         this.conversationState.activeConversation(conversationEntity);
       }
 
       const messageEntity = openFirstSelfMention ? conversationEntity.getFirstUnreadSelfMention() : exposeMessageEntity;
-
-      if (conversationEntity.is_cleared()) {
-        conversationEntity.cleared_timestamp(0);
-      }
-
-      if (conversationEntity.is_archived()) {
-        await this.conversationRepository.unarchiveConversation(conversationEntity);
-      }
-
       this.changeConversation(conversationEntity, messageEntity);
-      this.showContent(ContentState.CONVERSATION);
-      this.previousConversation = this.conversationState.activeConversation();
-
-      if (openNotificationSettings) {
-        rightSidebar.goTo(PanelState.NOTIFICATIONS, {entity: this.conversationState.activeConversation() ?? null});
-      }
-    } catch (error) {
-      const isConversationNotFound = error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
-      if (isConversationNotFound) {
-        PrimaryModal.show(
-          PrimaryModal.type.ACKNOWLEDGE,
-          {
-            text: {
-              message: t('conversationNotFoundMessage'),
-              title: t('conversationNotFoundTitle', Config.getConfig().BRAND_NAME),
-            },
-          },
-          undefined,
-        );
+      this.showAndNavigate(conversationEntity, openNotificationSettings);
+    } catch (error: any) {
+      if (this.isConversationNotFoundError(error)) {
+        this.showConversationNotFoundErrorModal();
       } else {
         throw error;
       }

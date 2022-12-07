@@ -20,8 +20,6 @@
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {getLogger, Logger} from 'Util/Logger';
-
 import {ActionsViewModel} from './ActionsViewModel';
 import {CallingViewModel} from './CallingViewModel';
 import {ContentViewModel} from './ContentViewModel';
@@ -31,13 +29,11 @@ import type {AssetRepository} from '../assets/AssetRepository';
 import type {AudioRepository} from '../audio/AudioRepository';
 import type {BackupRepository} from '../backup/BackupRepository';
 import type {CallingRepository} from '../calling/CallingRepository';
-import type {ClientRepository} from '../client/ClientRepository';
+import type {ClientRepository} from '../client';
 import type {ConnectionRepository} from '../connection/ConnectionRepository';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import type {MessageRepository} from '../conversation/MessageRepository';
 import type {CryptographyRepository} from '../cryptography/CryptographyRepository';
-import {Message} from '../entity/message/Message';
-import type {User} from '../entity/User';
 import type {EventRepository} from '../event/EventRepository';
 import type {GiphyRepository} from '../extension/GiphyRepository';
 import type {IntegrationRepository} from '../integration/IntegrationRepository';
@@ -47,6 +43,7 @@ import type {PreferenceNotificationRepository} from '../notification/PreferenceN
 import type {PermissionRepository} from '../permission/PermissionRepository';
 import type {PropertiesRepository} from '../properties/PropertiesRepository';
 import type {SearchRepository} from '../search/SearchRepository';
+import type {SelfRepository} from '../self/SelfRepository';
 import {Core} from '../service/CoreSingleton';
 import type {StorageRepository} from '../storage';
 import type {TeamRepository} from '../team/TeamRepository';
@@ -79,6 +76,7 @@ export interface ViewModelRepositories {
   storage: StorageRepository;
   team: TeamRepository;
   user: UserRepository;
+  self: SelfRepository;
 }
 
 export class MainViewModel {
@@ -86,15 +84,8 @@ export class MainViewModel {
   calling: CallingViewModel;
   content: ContentViewModel;
   list: ListViewModel;
-  logger: Logger;
   multitasking: Multitasking;
-  selfUser: ko.Observable<User>;
-  userRepository: UserRepository;
-  messageEntity: Message | undefined;
-  showLikes: boolean;
-  highlightedUsers: User[];
   private readonly core = container.resolve(Core);
-  private readonly userState: UserState;
 
   static get CONFIG() {
     return {
@@ -110,29 +101,20 @@ export class MainViewModel {
   }
 
   constructor(repositories: ViewModelRepositories) {
-    this.userRepository = repositories.user;
-    this.logger = getLogger('MainViewModel');
-
-    this.userState = container.resolve(UserState);
+    const userState = container.resolve(UserState);
 
     this.multitasking = {
       isMinimized: ko.observable(true),
     };
 
-    this.selfUser = this.userState.self;
-
-    this.messageEntity = undefined;
-    this.showLikes = false;
-
-    this.highlightedUsers = [];
-
     this.actions = new ActionsViewModel(
-      this,
-      repositories.client,
+      repositories.self,
       repositories.connection,
       repositories.conversation,
       repositories.integration,
       repositories.message,
+      userState,
+      this,
     );
 
     this.calling = new CallingViewModel(
@@ -143,14 +125,10 @@ export class MainViewModel {
       repositories.permission,
       repositories.team,
       repositories.properties,
-      this.selfUser,
+      userState.self,
       this.multitasking,
     );
     this.content = new ContentViewModel(this, repositories);
     this.list = new ListViewModel(this, repositories);
-
-    // Prevent Chrome (and Electron) from pushing the content out of the
-    // viewport when using form elements (e.g. in the preferences)
-    document.addEventListener('scroll', () => window.scrollTo(0, 0));
   }
 }

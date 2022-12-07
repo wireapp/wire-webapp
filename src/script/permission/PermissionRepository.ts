@@ -64,11 +64,11 @@ export class PermissionRepository {
       return navigator.permissions
         .query({name: permissionType as any})
         .then(permissionStatus => {
-          this.logger.log(`Permission state for '${permissionType}' is '${permissionStatus.state}'`);
+          this.logger.debug(`Permission state for '${permissionType}' is '${permissionStatus.state}'`);
           setPermissionState(permissionStatus.state as PermissionStatusState);
 
           permissionStatus.onchange = () => {
-            this.logger.log(`Permission state for '${permissionType}' changed to '${permissionStatus.state}'`);
+            this.logger.debug(`Permission state for '${permissionType}' changed to '${permissionStatus.state}'`);
             setPermissionState(permissionStatus.state as PermissionStatusState);
           };
 

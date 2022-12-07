@@ -151,13 +151,6 @@
   .modal-option {
     padding-right: 32px;
     margin-bottom: 20px;
-
-    .modal-checkbox {
-      margin-right: 4px;
-      & input {
-        .checkbox;
-      }
-    }
   }
 
   .modal-button-close {
@@ -191,7 +184,7 @@
     margin: 16px auto 0;
     text-align: center;
 
-    .button {
+    button {
       width: 210px;
     }
   }
@@ -278,7 +271,7 @@
       margin-bottom: 16px;
       line-height: @line-height-sm;
 
-      & div:nth-child(even) {
+      & div:nth-of-type(even) {
         margin-bottom: 16px;
       }
     }
@@ -289,13 +282,16 @@
   }
 
   &__header {
-    position: relative;
-    min-height: 24px;
-    padding-top: 12px;
+    position: sticky;
+    top: 0;
+    min-height: 32px;
+    padding: 32px 32px 0 32px;
     margin-bottom: 20px;
+    background-color: var(--modal-bg);
     color: var(--main-color);
     fill: var(--main-color);
     text-align: center;
+    white-space: pre-line;
 
     &__title {
       margin: 0;
@@ -308,8 +304,8 @@
     &__button {
       .button-reset-default;
       position: absolute;
-      top: -6px;
-      right: -5px;
+      top: 16px;
+      right: 16px;
 
       display: flex;
       width: 16px;
@@ -337,7 +333,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding-top: 0;
+      padding: 16px 16px;
 
       .modal__header {
         &__button {
@@ -350,16 +346,23 @@
   }
 
   &__body {
-    overflow: visible;
+    overflow: auto;
+    padding: 0 16px;
   }
 
   &__buttons {
+    position: sticky;
+    right: 0;
+    bottom: 0;
+    left: 0;
     display: flex;
     justify-content: flex-end;
-    margin-top: 20px;
+    padding: 20px;
+    background-color: var(--modal-bg);
     --button-color: var(--accent-color);
 
     &--column {
+      position: relative;
       flex-direction: column;
     }
   }

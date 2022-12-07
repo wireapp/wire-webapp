@@ -31,12 +31,11 @@ import {DeviceList} from './userDevices/DeviceList';
 import {NoDevicesFound} from './userDevices/NoDevicesFound';
 import {SelfFingerprint} from './userDevices/SelfFingerprint';
 
-import {ClientEntity} from '../client/ClientEntity';
-import {ClientRepository} from '../client/ClientRepository';
-import {ConversationState} from '../conversation/ConversationState';
+import {ClientRepository, ClientEntity} from '../client';
 import {MessageRepository} from '../conversation/MessageRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {User} from '../entity/User';
+import {useUserIdentity} from '../hooks/useDeviceIdentities';
 
 enum FIND_MODE {
   FOUND = 'UserDevices.MODE.FOUND',
@@ -71,7 +70,7 @@ export const useUserDevicesHistory = () => {
   };
 };
 
-export const sortUserDevices = (devices: ClientEntity[]): ClientEntity[] => {
+const sortUserDevices = (devices: ClientEntity[]): ClientEntity[] => {
   const [legalholdDevices, otherDevices] = partition(
     devices,
     device => device.class === ClientClassification.LEGAL_HOLD,
@@ -81,13 +80,13 @@ export const sortUserDevices = (devices: ClientEntity[]): ClientEntity[] => {
 
 interface UserDevicesProps {
   clientRepository: ClientRepository;
-  conversationState?: ConversationState;
   cryptographyRepository: CryptographyRepository;
   current: UserDevicesHistoryEntry;
   goTo: (state: UserDevicesState, headline: string) => void;
   messageRepository: MessageRepository;
   noPadding?: boolean;
   user: User;
+  groupId?: string;
 }
 
 const UserDevices: React.FC<UserDevicesProps> = ({
@@ -98,8 +97,10 @@ const UserDevices: React.FC<UserDevicesProps> = ({
   goTo,
   messageRepository,
   cryptographyRepository,
+  groupId,
 }) => {
   const [selectedClient, setSelectedClient] = useState<ClientEntity>();
+  const {getDeviceIdentity} = useUserIdentity(user.qualifiedId, groupId);
   const [deviceMode, setDeviceMode] = useState(FIND_MODE.REQUESTING);
   const [clients, setClients] = useState<ClientEntity[]>([]);
   const logger = useMemo(() => getLogger('UserDevicesComponent'), []);
@@ -137,21 +138,22 @@ const UserDevices: React.FC<UserDevicesProps> = ({
   return (
     <div>
       {showDeviceList && deviceMode === FIND_MODE.FOUND && (
-        <DeviceList {...{clickOnDevice, clients, noPadding, user}} />
+        <DeviceList {...{getDeviceIdentity, clickOnDevice, clients, noPadding, user}} />
       )}
 
       {showDeviceList && deviceMode === FIND_MODE.NOT_FOUND && <NoDevicesFound {...{noPadding, user}} />}
 
-      {current.state === UserDevicesState.DEVICE_DETAILS && (
+      {current.state === UserDevicesState.DEVICE_DETAILS && selectedClient && (
         <DeviceDetails
           {...{
+            getDeviceIdentity,
             clickToShowSelfFingerprint,
             clientRepository,
             cryptographyRepository,
             logger,
             messageRepository,
             noPadding,
-            selectedClient,
+            device: selectedClient,
             user,
           }}
         />

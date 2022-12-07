@@ -17,63 +17,26 @@
  *
  */
 
-import ko from 'knockout';
-
-import {errors as ProteusErrors} from '@wireapp/proteus';
-
-import {t} from 'Util/LocalizerUtil';
+import {ProteusErrors} from '@wireapp/core/lib/messagingProtocols/proteus';
 
 import {Message} from './Message';
 
-import {URL_PATH, getWebsiteUrl} from '../../externalRoute';
 import {SuperType} from '../../message/SuperType';
 
 export class DecryptErrorMessage extends Message {
-  public client_id: string;
-  public error_code: number;
-  public domain?: string;
-  private readonly is_remote_identity_changed: ko.PureComputed<boolean>;
-  public readonly htmlCaption: ko.PureComputed<string>;
-  public readonly is_recoverable: ko.PureComputed<boolean>;
-  public readonly is_resetting_session: ko.Observable<boolean>;
-  public readonly link: ko.PureComputed<string>;
-
-  static get REMOTE_IDENTITY_CHANGED_ERROR() {
-    return ProteusErrors.DecryptError.CODE.CASE_204.toString();
-  }
-
-  constructor() {
+  constructor(
+    public readonly clientId: string,
+    public readonly code: number,
+  ) {
     super();
     this.super_type = SuperType.UNABLE_TO_DECRYPT;
+  }
 
-    this.error_code = 0;
-    this.client_id = '';
+  get isRecoverable(): boolean {
+    return !this.isIdentityChanged && this.code >= 200 && this.code < 300;
+  }
 
-    // TODO: Replace this with React Intl interpolation once we can use it in the whole project
-    // see https://formatjs.io/docs/react-intl/components/#rich-text-formatting
-    this.htmlCaption = ko.pureComputed(() => {
-      const userName = this.user().name();
-      const replaceHighlight = {
-        '/highlight': '</span>',
-        highlight: '<span class="label-bold-xs">',
-      };
-
-      return this.is_remote_identity_changed()
-        ? t('conversationUnableToDecrypt2', userName, replaceHighlight)
-        : t('conversationUnableToDecrypt1', userName, replaceHighlight);
-    });
-
-    this.link = ko.pureComputed(() => {
-      const path = this.is_remote_identity_changed() ? URL_PATH.DECRYPT_ERROR_2 : URL_PATH.DECRYPT_ERROR_1;
-      return getWebsiteUrl(path);
-    });
-
-    this.is_recoverable = ko.pureComputed(() => {
-      return this.error_code.toString().startsWith('2') && !this.is_remote_identity_changed();
-    });
-    this.is_remote_identity_changed = ko.pureComputed(() => {
-      return this.error_code.toString() === DecryptErrorMessage.REMOTE_IDENTITY_CHANGED_ERROR;
-    });
-    this.is_resetting_session = ko.observable(false);
+  get isIdentityChanged(): boolean {
+    return this.code === ProteusErrors.RemoteIdentityChanged;
   }
 }

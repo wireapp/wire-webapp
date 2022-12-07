@@ -17,7 +17,7 @@
  *
  */
 
-import type {CookiesStatic} from 'js-cookie';
+import Cookies from 'js-cookie';
 
 import {Runtime} from '@wireapp/commons';
 
@@ -25,20 +25,30 @@ import {RuntimeActionCreator} from './creator/';
 
 import * as RuntimeSelector from '../../module/selector/RuntimeSelector';
 import {QUERY_KEY} from '../../route';
-import {hasURLParameter} from '../../util/urlUtil';
 import type {ThunkAction} from '../reducer';
+
+const androidBrowser = 'android browser';
+const chromeMobile = 'chrome mobile';
+const outlookBrowser = 'unknown';
 
 export class RuntimeAction {
   checkSupportedBrowser = (): ThunkAction<void> => {
     return (dispatch, getState, {getConfig}) => {
-      const isPwaSupportedBrowser = () => {
-        return Runtime.isMobileOS() || Runtime.isSafari();
+      const isMobileSupportedBrowser = () => {
+        return (
+          Runtime.isMobileOS() &&
+          (Runtime.isSafari() ||
+            Runtime.isChrome() ||
+            [androidBrowser, chromeMobile].includes(Runtime.getBrowserName()))
+        );
       };
-      const pwaAware = hasURLParameter(QUERY_KEY.PWA_AWARE);
-      const isPwaEnabled = getConfig().URL.MOBILE_BASE && pwaAware && isPwaSupportedBrowser();
+      const isOutlookApp = () => {
+        return Runtime.getBrowserName() === outlookBrowser;
+      };
+      const isAuthorizationFlow = () => location?.hash?.includes(QUERY_KEY.SCOPE) ?? false;
       if (
         (!RuntimeSelector.hasToUseDesktopApplication(getState()) && Runtime.isWebappSupportedBrowser()) ||
-        isPwaEnabled
+        ((isMobileSupportedBrowser() || isOutlookApp()) && isAuthorizationFlow())
       ) {
         dispatch(RuntimeActionCreator.confirmSupportedBrowser());
       }
@@ -58,10 +68,10 @@ export class RuntimeAction {
   };
 
   checkCookieSupport = (): ThunkAction<void> => {
-    return async (dispatch, getState, {actions: {runtimeAction}, cookieStore}) => {
+    return async (dispatch, getState, {actions: {runtimeAction}}) => {
       dispatch(RuntimeActionCreator.startCheckCookie());
       try {
-        await runtimeAction.hasCookieSupport(cookieStore);
+        await runtimeAction.hasCookieSupport();
         dispatch(RuntimeActionCreator.finishCheckCookie(true));
       } catch (error) {
         dispatch(RuntimeActionCreator.finishCheckCookie(false));
@@ -69,7 +79,7 @@ export class RuntimeAction {
     };
   };
 
-  hasCookieSupport = (cookieStore: CookiesStatic): Promise<void> => {
+  hasCookieSupport = (): Promise<void> => {
     const cookieName = 'cookie_supported';
 
     return new Promise((resolve, reject) => {
@@ -79,9 +89,9 @@ export class RuntimeAction {
         case false:
           return reject(new Error());
         default:
-          cookieStore.set(cookieName, 'yes');
-          if (cookieStore.get(cookieName)) {
-            cookieStore.remove(cookieName);
+          Cookies.set(cookieName, 'yes');
+          if (Cookies.get(cookieName)) {
+            Cookies.remove(cookieName);
             return resolve();
           }
           return reject(new Error());

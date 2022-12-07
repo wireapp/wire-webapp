@@ -27,10 +27,9 @@ import {Runtime} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Declension, t} from 'Util/LocalizerUtil';
+import {Declension, t, getUserName} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {getRenderedTextContent} from 'Util/messageRenderer';
-import {getUserName} from 'Util/SanitizationUtil';
 import {truncate} from 'Util/StringUtil';
 import {formatDuration, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {ValidationUtilError} from 'Util/ValidationUtil';
@@ -38,6 +37,7 @@ import {ValidationUtilError} from 'Util/ValidationUtil';
 import {PermissionState} from './PermissionState';
 
 import {AssetRepository} from '../assets/AssetRepository';
+import {AudioRepository} from '../audio/AudioRepository';
 import {AudioType} from '../audio/AudioType';
 import {CallState} from '../calling/CallState';
 import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
@@ -102,7 +102,6 @@ export class NotificationRepository {
   private readonly notificationsPreference: ko.Observable<NotificationPreference>;
   private readonly permissionRepository: PermissionRepository;
   private readonly permissionState: ko.Observable<PermissionState | PermissionStatusState | NotificationPermission>;
-  private readonly selfUser: ko.Observable<User>;
   private readonly assetRepository: AssetRepository;
 
   static get CONFIG() {
@@ -110,12 +109,13 @@ export class NotificationRepository {
       BODY_LENGTH: 80,
       ICON_URL: '/image/logo/notification.png',
       TIMEOUT: TIME_IN_MILLIS.SECOND * 5,
-      TITLE_LENGTH: 38,
+      TITLE_LENGTH: 17,
+      TITLE_MAX_LENGTH: 38,
     };
   }
 
   static get EVENTS_TO_NOTIFY(): SuperType[] {
-    return [SuperType.CALL, SuperType.CONTENT, SuperType.MEMBER, SuperType.PING, SuperType.REACTION, SuperType.SYSTEM];
+    return [SuperType.CALL, SuperType.CONTENT, SuperType.MEMBER, SuperType.PING, SuperType.SYSTEM];
   }
 
   /**
@@ -127,6 +127,7 @@ export class NotificationRepository {
   constructor(
     conversationRepository: ConversationRepository,
     permissionRepository: PermissionRepository,
+    private readonly audioRepository: AudioRepository,
     private readonly userState = container.resolve(UserState),
     private readonly conversationState = container.resolve(ConversationState),
     private readonly callState = container.resolve(CallState),
@@ -153,7 +154,6 @@ export class NotificationRepository {
     });
 
     this.permissionState = this.permissionRepository.permissionState[PermissionType.NOTIFICATIONS];
-    this.selfUser = this.userState.self;
   }
 
   setContentViewModelStates(state: ContentState, multitasking: {isMinimized: ko.Observable<boolean>}): void {
@@ -202,7 +202,7 @@ export class NotificationRepository {
       notification.close();
       if (notification.data) {
         const {conversationId, messageId} = notification.data;
-        this.logger.info(`Notification for '${messageId}' in '${conversationId?.id}' closed on unload.`, notification);
+        this.logger.info(`Notification for '${messageId}' in '${conversationId?.id}' closed on unload.`);
       }
     });
   }
@@ -212,19 +212,20 @@ export class NotificationRepository {
    * @returns Resolves when notification has been handled
    */
   readonly notify = (
-    messageEntity: ContentMessage,
-    connectionEntity: ConnectionEntity,
-    conversationEntity: Conversation,
+    messageEntity: Message,
+    connectionEntity?: ConnectionEntity,
+    conversationEntity?: Conversation,
   ): Promise<void> => {
-    const isUserAway = this.selfUser().availability() === Availability.Type.AWAY;
+    const isUserAway = this.userState.self().availability() === Availability.Type.AWAY;
     const isComposite = messageEntity.isComposite();
 
     if (isUserAway && !isComposite) {
       return Promise.resolve();
     }
 
-    const isUserBusy = this.selfUser().availability() === Availability.Type.BUSY;
-    const isSelfMentionOrReply = messageEntity.isContent() && messageEntity.isUserTargeted(this.selfUser().qualifiedId);
+    const isUserBusy = this.userState.self().availability() === Availability.Type.BUSY;
+    const isSelfMentionOrReply =
+      messageEntity.isContent() && messageEntity.isUserTargeted(this.userState.self().qualifiedId);
     const isCallMessage = messageEntity.super_type === SuperType.CALL;
 
     if (isUserBusy && !isSelfMentionOrReply && !isCallMessage && !isComposite) {
@@ -235,7 +236,7 @@ export class NotificationRepository {
       ? NotificationRepository.shouldNotifyInConversation(
           conversationEntity,
           messageEntity,
-          this.selfUser().qualifiedId,
+          this.userState.self().qualifiedId,
         )
       : true;
 
@@ -259,7 +260,9 @@ export class NotificationRepository {
             const messageInfo = messageId
               ? `message '${messageId}' of type '${messageType}'`
               : `'${messageType}' message`;
-            this.logger.info(`Removed read notification for ${messageInfo} in '${conversationId}'.`);
+            this.logger.info(
+              `Removed read notification for ${messageInfo} in '${conversationId?.id || conversationId}'.`,
+            );
           }
         });
       }
@@ -310,9 +313,9 @@ export class NotificationRepository {
         if (assetEntity.isText()) {
           let notificationText;
 
-          if (assetEntity.isUserMentioned(this.selfUser().qualifiedId)) {
+          if (assetEntity.isUserMentioned(this.userState.self().qualifiedId)) {
             notificationText = t('notificationMention', assetEntity.text, {}, true);
-          } else if (messageEntity.isUserQuoted(this.selfUser().id)) {
+          } else if (messageEntity.isUserQuoted(this.userState.self().id)) {
             notificationText = t('notificationReply', assetEntity.text, {}, true);
           } else {
             notificationText = getRenderedTextContent(assetEntity.text);
@@ -426,15 +429,15 @@ export class NotificationRepository {
    * @param messageEntity Message to obfuscate body for
    * @returns Notification message body
    */
-  private createBodyObfuscated(messageEntity: ContentMessage): string {
+  private createBodyObfuscated(messageEntity: Message): string {
     if (messageEntity.isContent()) {
-      const isSelfMentioned = messageEntity.isUserMentioned(this.selfUser().qualifiedId);
+      const isSelfMentioned = messageEntity.isUserMentioned(this.userState.self().qualifiedId);
 
       if (isSelfMentioned) {
         return t('notificationObfuscatedMention');
       }
 
-      const isSelfQuoted = messageEntity.isUserQuoted(this.selfUser().id);
+      const isSelfQuoted = messageEntity.isUserQuoted(this.userState.self().id);
 
       if (isSelfQuoted) {
         return t('notificationObfuscatedReply');
@@ -494,7 +497,7 @@ export class NotificationRepository {
         return createBodyMessageTimerUpdate();
       }
       case SystemMessageType.CONVERSATION_DELETE: {
-        return (messageEntity as DeleteConversationMessage).caption();
+        return (messageEntity as DeleteConversationMessage).caption;
       }
     }
   }
@@ -505,9 +508,9 @@ export class NotificationRepository {
    * @returns Resolves with the notification content
    */
   private createNotificationContent(
-    messageEntity: ContentMessage,
-    connectionEntity: ConnectionEntity,
-    conversationEntity: Conversation,
+    messageEntity: Message,
+    connectionEntity?: ConnectionEntity,
+    conversationEntity?: Conversation,
   ): Promise<NotificationContent | undefined> {
     const body = this.createOptionsBody(messageEntity, conversationEntity);
     if (!body) {
@@ -540,7 +543,7 @@ export class NotificationRepository {
    */
   private createOptionsBody(
     messageEntity: Message | CallMessage | ContentMessage | MemberMessage,
-    conversationEntity: Conversation,
+    conversationEntity?: Conversation,
   ): string | void {
     switch (messageEntity.super_type) {
       case SuperType.CALL:
@@ -565,8 +568,8 @@ export class NotificationRepository {
    */
   private createOptionsData(
     messageEntity: Message,
-    connectionEntity: ConnectionEntity,
-    conversationEntity: Conversation,
+    connectionEntity?: ConnectionEntity,
+    conversationEntity?: Conversation,
   ): NotificationContent['options']['data'] {
     const {id: messageId, type: messageType} = messageEntity;
 
@@ -611,6 +614,16 @@ export class NotificationRepository {
   }
 
   /**
+   Calculate the length of the opposite title section string and return the extra length
+  */
+  private calculatedTitleLength = (sectionString: string) => {
+    const maxSectionLength = NotificationRepository.CONFIG.TITLE_LENGTH;
+    const length = maxSectionLength - sectionString.length + maxSectionLength;
+
+    return length > maxSectionLength ? length : maxSectionLength;
+  };
+
+  /**
    * Creates the notification title.
    *
    * @param Notification message title
@@ -619,14 +632,22 @@ export class NotificationRepository {
     const conversationName = conversationEntity && conversationEntity.display_name();
     const userEntity = messageEntity.user();
 
+    const truncatedConversationName = truncate(
+      conversationName ?? '',
+      this.calculatedTitleLength(userEntity.name()),
+      false,
+    );
+
+    const truncatedName = truncate(userEntity.name(), this.calculatedTitleLength(conversationName ?? ''), false);
+
     let title;
     if (conversationName) {
       title = conversationEntity.isGroup()
-        ? t('notificationTitleGroup', {conversation: conversationName, user: userEntity.name()}, {}, true)
+        ? t('notificationTitleGroup', {conversation: truncatedConversationName, user: truncatedName}, {}, true)
         : conversationName;
     }
 
-    return truncate(title || userEntity.name(), NotificationRepository.CONFIG.TITLE_LENGTH, false);
+    return truncate(title ?? truncatedName, NotificationRepository.CONFIG.TITLE_MAX_LENGTH, false);
   }
 
   /**
@@ -636,7 +657,7 @@ export class NotificationRepository {
    */
   private createTitleObfuscated(): string {
     const obfuscatedTitle = t('notificationObfuscatedTitle');
-    return truncate(obfuscatedTitle, NotificationRepository.CONFIG.TITLE_LENGTH, false);
+    return truncate(obfuscatedTitle, NotificationRepository.CONFIG.TITLE_MAX_LENGTH, false);
   }
 
   /**
@@ -645,14 +666,14 @@ export class NotificationRepository {
    * @returns Function to be called when notification is clicked
    */
   private createTrigger(
-    messageEntity: ContentMessage | MemberMessage,
+    messageEntity: Message,
     connectionEntity?: ConnectionEntity,
     conversationEntity?: Conversation,
   ): () => void {
     const conversationId = this.getConversationId(connectionEntity, conversationEntity);
 
     const containsSelfMention =
-      messageEntity.isContent() && (messageEntity as ContentMessage).isUserMentioned(this.selfUser().qualifiedId);
+      messageEntity.isContent() && (messageEntity as ContentMessage).isUserMentioned(this.userState.self().qualifiedId);
     if (containsSelfMention) {
       const showOptions = {exposeMessage: messageEntity, openFirstSelfMention: true};
       return () => amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, showOptions);
@@ -714,9 +735,9 @@ export class NotificationRepository {
    * @returns Resolves when notification was handled
    */
   private async notifyBanner(
-    messageEntity: ContentMessage,
-    connectionEntity: ConnectionEntity,
-    conversationEntity: Conversation,
+    messageEntity: Message,
+    connectionEntity?: ConnectionEntity,
+    conversationEntity?: Conversation,
   ): Promise<void> {
     if (!this.shouldShowNotification(messageEntity, conversationEntity)) {
       return;
@@ -747,12 +768,12 @@ export class NotificationRepository {
     if (shouldPlaySound) {
       switch (messageEntity.super_type) {
         case SuperType.CONTENT: {
-          amplify.publish(WebAppEvents.AUDIO.PLAY, AudioType.NEW_MESSAGE);
+          void this.audioRepository.play(AudioType.NEW_MESSAGE);
           break;
         }
 
         case SuperType.PING: {
-          amplify.publish(WebAppEvents.AUDIO.PLAY, AudioType.INCOMING_PING);
+          void this.audioRepository.play(AudioType.INCOMING_PING);
           break;
         }
       }
@@ -857,30 +878,35 @@ export class NotificationRepository {
       this.contentViewModelState.multitasking.isMinimized(true);
       notificationContent.trigger();
 
-      this.logger.info(`Notification for ${messageInfo} in '${conversationId}' closed by click.`);
+      this.logger.info(`Notification for ${messageInfo} in '${conversationId?.id || conversationId}' closed by click.`);
       notification.close();
     };
 
     notification.onclose = () => {
       window.clearTimeout(timeoutTriggerId);
       this.notifications.splice(this.notifications.indexOf(notification), 1);
-      this.logger.info(`Removed notification for ${messageInfo} in '${conversationId}' locally.`);
+      this.logger.info(`Removed notification for ${messageInfo} in '${conversationId?.id || conversationId}' locally.`);
     };
 
     notification.onerror = error => {
-      this.logger.error(`Notification for ${messageInfo} in '${conversationId}' closed by error.`, error);
+      this.logger.error(
+        `Notification for ${messageInfo} in '${conversationId?.id || conversationId}' closed by error.`,
+        error,
+      );
       notification.close();
     };
 
     notification.onshow = () => {
       timeoutTriggerId = window.setTimeout(() => {
-        this.logger.info(`Notification for ${messageInfo} in '${conversationId}' closed by timeout.`);
+        this.logger.info(
+          `Notification for ${messageInfo} in '${conversationId?.id || conversationId}' closed by timeout.`,
+        );
         notification.close();
       }, notificationContent.timeout);
     };
 
     this.notifications.push(notification);
-    this.logger.info(`Added notification for ${messageInfo} in '${conversationId}' to queue.`);
+    this.logger.info(`Added notification for ${messageInfo} in '${conversationId?.id || conversationId}' to queue.`);
   }
 
   /**
@@ -893,7 +919,7 @@ export class NotificationRepository {
    */
   static shouldNotifyInConversation(
     conversationEntity: Conversation,
-    messageEntity: ContentMessage,
+    messageEntity: Message,
     userId: QualifiedId,
   ): boolean {
     if (messageEntity.isComposite()) {

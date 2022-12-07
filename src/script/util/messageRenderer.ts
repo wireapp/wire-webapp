@@ -20,7 +20,7 @@
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import hljs from 'highlight.js';
 import MarkdownIt from 'markdown-it';
-import type Token from 'markdown-it/lib/token';
+import {escapeHtml} from 'markdown-it/lib/common/utils';
 import {escape} from 'underscore';
 
 import {replaceInRange} from './StringUtil';
@@ -46,48 +46,62 @@ const markdownit = new MarkdownIt('zero', {
   linkify: true,
 }).enable(['autolink', 'backticks', 'code', 'emphasis', 'escape', 'fence', 'heading', 'link', 'linkify', 'newline']);
 
-const originalFenceRule = markdownit.renderer.rules.fence;
-
-markdownit.renderer.rules.fence = (tokens, idx, options, env, self) => {
-  const highlighted = originalFenceRule(tokens, idx, options, env, self);
-  tokens[idx].map[1] += 1;
-  return highlighted.replace(/\n$/, '');
-};
+const originalFenceRule = markdownit.renderer.rules.fence!;
 
 markdownit.renderer.rules.heading_open = () => '<div class="md-heading">';
 markdownit.renderer.rules.heading_close = () => '</div>';
+const originalNormalizeLink = markdownit.normalizeLink!;
+
+const isValidUrl = (url: string): boolean => {
+  // only allow urls to wire://, https://, http:// and mailto:
+  return !!url.match(/^(wire:\/\/|https?:\/\/|mailto:)/i);
+};
+markdownit.validateLink = isValidUrl;
+markdownit.normalizeLink = (url: string): string => {
+  url = originalNormalizeLink(url);
+  if (isValidUrl(url)) {
+    return url;
+  }
+  // prepend "https://" if url does not begin with a protocol or vbscript:, javascript:, file:, data:
+  if (!url.match(/^(.*:\/\/|(vbscript|javascript|file|data):)/i)) {
+    return `https://${url}`;
+  }
+  return url;
+};
 
 markdownit.renderer.rules.softbreak = () => '<br>';
 markdownit.renderer.rules.hardbreak = () => '<br>';
 markdownit.renderer.rules.paragraph_open = (tokens, idx) => {
-  const [position] = tokens[idx].map;
+  const [position] = tokens[idx].map || [0, 0];
+
   const previousWithMap = tokens
     .slice(0, idx)
     .reverse()
     .find(({map}) => map?.length);
-  const previousPosition = previousWithMap ? previousWithMap.map[1] - 1 : 0;
+  const previousPosition = previousWithMap ? (previousWithMap.map || [0, 0])[1] - 1 : 0;
   const count = position - previousPosition;
   return '<br>'.repeat(Math.max(count, 0));
 };
 markdownit.renderer.rules.paragraph_close = () => '';
 
+const renderMention = (mentionData: MentionText) => {
+  const elementClasses = mentionData.isSelfMentioned ? ' self-mention' : '';
+  let elementAttributes = mentionData.isSelfMentioned
+    ? ' data-uie-name="label-self-mention" role="button"'
+    : ` data-uie-name="label-other-mention" data-user-id="${escape(mentionData.userId)}" role="button"`;
+  if (!mentionData.isSelfMentioned && mentionData.domain) {
+    elementAttributes += ` data-user-domain="${escape(mentionData.domain)}"`;
+  }
+
+  const mentionText = mentionData.text.replace(/^@/, '');
+  const content = `<span class="mention-at-sign">@</span>${escape(mentionText)}`;
+  return `<span class="message-mention${elementClasses}"${elementAttributes}>${content}</span>`;
+};
+
 markdownit.normalizeLinkText = text => text;
 
-export const renderMessage = (message: string, selfId: QualifiedId | null, mentionEntities: MentionEntity[] = []) => {
+export const renderMessage = (message: string, selfId?: QualifiedId, mentionEntities: MentionEntity[] = []) => {
   const createMentionHash = (mention: MentionEntity) => `@@${window.btoa(JSON.stringify(mention)).replace(/=/g, '')}`;
-  const renderMention = (mentionData: MentionText) => {
-    const elementClasses = mentionData.isSelfMentioned ? ' self-mention' : '';
-    let elementAttributes = mentionData.isSelfMentioned
-      ? ' data-uie-name="label-self-mention" role="button"'
-      : ` data-uie-name="label-other-mention" data-user-id="${escape(mentionData.userId)}" role="button"`;
-    if (!mentionData.isSelfMentioned && mentionData.domain) {
-      elementAttributes += ` data-user-domain="${escape(mentionData.domain)}"`;
-    }
-
-    const mentionText = mentionData.text.replace(/^@/, '');
-    const content = `<span class="mention-at-sign">@</span>${escape(mentionText)}`;
-    return `<div class="message-mention${elementClasses}"${elementAttributes}>${content}</div>`;
-  };
 
   const mentionTexts: Record<string, MentionText> = {};
 
@@ -107,6 +121,38 @@ export const renderMessage = (message: string, selfId: QualifiedId | null, menti
       return replaceInRange(strippedText, mentionKey, mention.startIndex, mention.startIndex + mention.length);
     }, message);
 
+  const removeMentionsHashes = (hashedText: string): string => {
+    return Object.entries(mentionTexts).reduce(
+      (text, [mentionHash, mention]) => text.replace(mentionHash, () => mention.text),
+      hashedText,
+    );
+  };
+
+  const renderMentions = (inputText: string): string => {
+    const replacedText = Object.keys(mentionTexts).reduce((text, mentionHash) => {
+      const mentionMarkup = renderMention(mentionTexts[mentionHash]);
+      return text.replace(mentionHash, () => mentionMarkup);
+    }, inputText);
+    return replacedText;
+  };
+
+  markdownit.renderer.rules.text = (tokens, idx) => {
+    const escapedText = escapeHtml(tokens[idx].content);
+
+    return renderMentions(escapedText);
+  };
+
+  markdownit.renderer.rules.fence = (tokens, idx, options, env, self) => {
+    const token = tokens[idx];
+    token.info = removeMentionsHashes(token.info);
+    const highlighted = originalFenceRule(tokens, idx, options, env, self);
+    (tokens[idx].map ?? [0, 0])[1] += 1;
+
+    const replacedText = renderMentions(highlighted);
+
+    return replacedText.replace(/\n$/, '');
+  };
+
   markdownit.set({
     highlight: function (code, lang): string {
       const containsMentions = mentionEntities.some(mention => {
@@ -118,31 +164,26 @@ export const renderMessage = (message: string, selfId: QualifiedId | null, menti
         // highlighting will be wrong anyway because this is not valid code
         return escape(code);
       }
-      return hljs.highlightAuto(code, lang && [lang]).value;
+      return hljs.highlightAuto(code, lang ? [lang] : undefined).value;
     },
   });
 
   markdownit.renderer.rules.link_open = (tokens, idx, options, env, self) => {
-    const cleanString = (hashedString: string) =>
-      escape(
-        Object.entries(mentionTexts).reduce(
-          (text, [mentionHash, mention]) => text.replace(mentionHash, () => mention.text),
-          hashedString,
-        ),
-      );
+    const cleanString = (hashedString: string) => escape(removeMentionsHashes(hashedString));
     const link = tokens[idx];
-    const href = link.attrGet('href');
+    const href = removeMentionsHashes(link.attrGet('href') ?? '');
     const isEmail = href.startsWith('mailto:');
     const isWireDeepLink = href.toLowerCase().startsWith('wire://');
     const nextToken = tokens[idx + 1];
     const text = nextToken?.type === 'text' ? nextToken.content : '';
+    const closeToken = tokens.slice(idx).find(token => token.type === 'link_close');
 
-    if (!href || !text.trim()) {
-      nextToken.content = '';
-      const closeToken = tokens.slice(idx).find(token => token.type === 'link_close');
-      closeToken.type = 'text';
-      closeToken.content = '';
-      return `[${cleanString(text)}](${cleanString(href)})`;
+    if (href == '' || closeToken == nextToken || (!text.trim() && closeToken == tokens[idx + 2])) {
+      if (closeToken) {
+        closeToken.type = 'text';
+        closeToken.content = `](${cleanString(href)})`;
+      }
+      return '['; //'${cleanString(text)}`;
     }
     if (isEmail) {
       link.attrPush(['data-email-link', 'true']);
@@ -150,14 +191,11 @@ export const renderMessage = (message: string, selfId: QualifiedId | null, menti
       link.attrPush(['target', '_blank']);
       link.attrPush(['rel', 'nofollow noopener noreferrer']);
     }
+    link.attrSet('href', href);
     if (!isWireDeepLink && !['autolink', 'linkify'].includes(link.markup)) {
       const title = link.attrGet('title');
       if (title) {
-        link.attrSet('title', title);
-      }
-      link.attrSet('href', href);
-      if (nextToken?.type === 'text') {
-        nextToken.content = text;
+        link.attrSet('title', removeMentionsHashes(title));
       }
       link.attrPush(['data-md-link', 'true']);
       link.attrPush(['data-uie-name', 'markdown-link']);
@@ -166,34 +204,21 @@ export const renderMessage = (message: string, selfId: QualifiedId | null, menti
       link.attrPush(['data-uie-name', 'wire-deep-link']);
     }
     if (link.markup === 'linkify') {
-      nextToken.content = encodeURI(nextToken.content);
+      const displayedLink = removeMentionsHashes(nextToken.content);
+      if (!href.endsWith(`://${displayedLink}`) && href != displayedLink && href != `mailto:${displayedLink}`) {
+        link.attrPush(['data-md-link', 'true']);
+        link.attrPush(['data-uie-name', 'markdown-link']);
+      }
     }
     return self.renderToken(tokens, idx, options);
   };
-  const originalTokens = markdownit.parse(mentionlessText, {});
-  const modifiedLinksTokens = markdownit.parse(mentionlessText, {});
-  const fixCodeTokens = (modifiedTokens: Token[], originalTokens: Token[]) =>
-    modifiedTokens.map((modifiedToken, index) => {
-      const originalToken = originalTokens[index];
-      if (modifiedToken.tag === 'code') {
-        return originalToken;
-      }
-      if (modifiedToken.children) {
-        modifiedToken.children = fixCodeTokens(modifiedToken.children, originalToken.children);
-      }
-      return modifiedToken;
-    });
-  const fixedTokens = fixCodeTokens(modifiedLinksTokens, originalTokens);
-  mentionlessText = markdownit.renderer.render(fixedTokens, (markdownit as MarkdownItWithOptions).options, {});
+
+  const tokens = markdownit.parse(mentionlessText, {});
+  mentionlessText = markdownit.renderer.render(tokens, (markdownit as MarkdownItWithOptions).options, {});
   // Remove <br> and \n if it is the last thing in a message
   mentionlessText = mentionlessText.replace(/(<br>|\n)*$/, '');
 
-  const parsedText = Object.keys(mentionTexts).reduce((text, mentionHash) => {
-    const mentionMarkup = renderMention(mentionTexts[mentionHash]);
-
-    return text.replace(mentionHash, () => mentionMarkup);
-  }, mentionlessText);
-  return parsedText;
+  return mentionlessText;
 };
 
 export const getRenderedTextContent = (text: string): string => {

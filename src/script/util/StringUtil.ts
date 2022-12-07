@@ -50,9 +50,13 @@ export const getRandomChar = (): string => {
 };
 
 export const obfuscate = (text: string): string => {
-  /* cspell:disable-next-line */
-  const alphabet = Array.from('abcdefghijklmnopqrstuvwxyz');
-  return Array.from(text, char => (/\s/.test(char) ? char : randomElement(alphabet))).join('');
+  const alphabet = Array.from('abcdefghijklmnopqrstuvwxyz ');
+
+  const obfuscatedText = Array.from({length: text.length + Math.floor((1 + Math.random()) * 10)}, () =>
+    randomElement(alphabet),
+  ).join('');
+
+  return obfuscatedText;
 };
 
 /**
@@ -161,3 +165,117 @@ export const fixWebsocketString = (originalString: string): string => {
   const decoder = new TextDecoder();
   return decoder.decode(charArray);
 };
+
+const accentsMap: Record<string, string> = {
+  ä: 'a',
+  á: 'a',
+  à: 'a',
+  ã: 'a',
+  â: 'a',
+  À: 'a',
+  Á: 'a',
+  Ã: 'a',
+  Â: 'a',
+  ë: 'e',
+  é: 'e',
+  è: 'e',
+  ê: 'e',
+  É: 'e',
+  È: 'e',
+  Ê: 'e',
+  ï: 'i',
+  í: 'i',
+  ì: 'i',
+  î: 'i',
+  Í: 'i',
+  Ì: 'i',
+  Î: 'i',
+  ö: 'o',
+  ó: 'o',
+  ò: 'o',
+  ô: 'o',
+  õ: 'o',
+  Ó: 'o',
+  Ò: 'o',
+  Ô: 'o',
+  Õ: 'o',
+  ú: 'u',
+  ù: 'u',
+  û: 'u',
+  ü: 'u',
+  Ú: 'u',
+  Ù: 'u',
+  Û: 'u',
+  Ü: 'u',
+  ç: 'c',
+  Ç: 'c',
+  ñ: 'n',
+  Ñ: 'n',
+};
+
+/**
+ * @param text The string to replace accents its charachters
+ * @returns new string with replaced accents charachters
+ */
+export const replaceAccents = (text: string) => getSlug(text, {custom: accentsMap, uric: true});
+
+/**
+ * generate a random password
+ * @param passwordLength the desired length of the password
+ * @returns the newly generated password
+ */
+export const generateRandomPassword = (passwordLength: number = 8): string => {
+  // Define strings containing all possible lowercase letters, uppercase letters, numbers, and special characters
+  const lowercaseChars = 'abcdefghijklmnopqrstuvwxyz';
+  const uppercaseChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const numericChars = '0123456789';
+  const specialChars = '!@#$%^&*()_+-={}[];\',.?/~`|:"<>';
+
+  // Concatenate all possible characters into a single string
+  const allChars = lowercaseChars + uppercaseChars + numericChars + specialChars;
+
+  // Calculate the number of characters to add to the password to meet the minimum requirements
+  const minRequiredChars = 4;
+  const additionalChars = Math.max(0, passwordLength - minRequiredChars);
+
+  // Add one random lowercase letter, one random uppercase letter, one random number, and one random special character to the password
+  let password = '';
+  password += lowercaseChars[Math.floor(Math.random() * lowercaseChars.length)];
+  password += uppercaseChars[Math.floor(Math.random() * uppercaseChars.length)];
+  password += numericChars[Math.floor(Math.random() * numericChars.length)];
+  password += specialChars[Math.floor(Math.random() * specialChars.length)];
+
+  // Add additional random characters to the password using all possible characters
+  for (let i = 0; i < additionalChars; i++) {
+    password += allChars[Math.floor(Math.random() * allChars.length)];
+  }
+
+  // Shuffle the characters of the password randomly to make it more secure
+  password = password
+    .split('')
+    .sort(() => Math.random() - 0.5)
+    .join('');
+
+  // Truncate the password to the desired length if necessary
+  password = password.slice(0, passwordLength);
+
+  // Return the resulting password as a string
+  return password;
+};
+
+/**
+ * Checks if a given password meets the specified conditions.
+ * The password must:
+ * - Have at least one uppercase letter
+ * - Have at least one lowercase letter
+ * - Have at least one number
+ * - Have at least one symbol
+ * - Have a minimum length of 8 characters
+ *
+ * @param {string} password - The password to be checked.
+ * @returns {boolean} True if the password meets all conditions, false otherwise.
+ */
+export function isValidPassword(password: string): boolean {
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$/;
+  return passwordRegex.test(password);
+}

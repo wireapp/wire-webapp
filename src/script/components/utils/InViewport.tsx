@@ -19,8 +19,8 @@
 
 import React, {useEffect, useRef} from 'react';
 
-import {overlayedObserver} from '../../ui/overlayedObserver';
-import {viewportObserver} from '../../ui/viewportObserver';
+import {overlayedObserver} from 'Util/DOM/overlayedObserver';
+import {viewportObserver} from 'Util/DOM/viewportObserver';
 
 interface InViewportParams {
   onVisible: () => void;
@@ -68,7 +68,6 @@ const InViewport: React.FC<InViewportParams & React.HTMLProps<HTMLDivElement>> =
         inViewport = isInViewport;
         triggerCallbackIfVisible();
       },
-      element.parentElement || undefined,
       requireFullyInView,
       allowBiggerThanViewport,
     );

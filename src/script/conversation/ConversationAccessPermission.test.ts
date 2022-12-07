@@ -17,7 +17,7 @@
  *
  */
 
-import {CONVERSATION_ACCESS, ACCESS_ROLE_V2} from '@wireapp/api-client/lib/conversation/';
+import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE} from '@wireapp/api-client/lib/conversation/';
 
 import {ACCESS_STATE, TEAM} from './AccessState';
 import {
@@ -66,7 +66,7 @@ describe('ConversationAccessPermissions', () => {
   describe('teamPermissionsForAccessState', () => {
     it.each(mockAccessTeam)('should return the features for %s', (accessState, results) => {
       expect(
-        teamPermissionsForAccessState(accessState as typeof ACCESS_STATE.TEAM[keyof typeof ACCESS_STATE.TEAM]),
+        teamPermissionsForAccessState(accessState as (typeof ACCESS_STATE.TEAM)[keyof typeof ACCESS_STATE.TEAM]),
       ).toBe(results);
     });
 
@@ -134,25 +134,29 @@ describe('ConversationAccessPermissions', () => {
     const mockRights = {
       GUESTS_SERVICES: {
         accessRole: [
-          ACCESS_ROLE_V2.GUEST,
-          ACCESS_ROLE_V2.NON_TEAM_MEMBER,
-          ACCESS_ROLE_V2.TEAM_MEMBER,
-          ACCESS_ROLE_V2.SERVICE,
+          CONVERSATION_ACCESS_ROLE.GUEST,
+          CONVERSATION_ACCESS_ROLE.NON_TEAM_MEMBER,
+          CONVERSATION_ACCESS_ROLE.TEAM_MEMBER,
+          CONVERSATION_ACCESS_ROLE.SERVICE,
         ],
         accessModes: [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE],
       },
       GUEST_ROOM: {
-        accessRole: [ACCESS_ROLE_V2.GUEST, ACCESS_ROLE_V2.NON_TEAM_MEMBER, ACCESS_ROLE_V2.TEAM_MEMBER],
+        accessRole: [
+          CONVERSATION_ACCESS_ROLE.GUEST,
+          CONVERSATION_ACCESS_ROLE.NON_TEAM_MEMBER,
+          CONVERSATION_ACCESS_ROLE.TEAM_MEMBER,
+        ],
         accessModes: [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE],
       },
       SERVICES: {
         accessModes: [CONVERSATION_ACCESS.INVITE],
-        accessRole: [ACCESS_ROLE_V2.TEAM_MEMBER, ACCESS_ROLE_V2.SERVICE],
+        accessRole: [CONVERSATION_ACCESS_ROLE.TEAM_MEMBER, CONVERSATION_ACCESS_ROLE.SERVICE],
       },
-      TEAM_ONLY: {accessModes: [CONVERSATION_ACCESS.INVITE], accessRole: [ACCESS_ROLE_V2.TEAM_MEMBER]},
+      TEAM_ONLY: {accessModes: [CONVERSATION_ACCESS.INVITE], accessRole: [CONVERSATION_ACCESS_ROLE.TEAM_MEMBER]},
       LEGACY: {accessModes: [], accessRole: []} as UpdatedAccessRights,
       GUEST_FEATURES: {
-        accessRole: [ACCESS_ROLE_V2.GUEST, ACCESS_ROLE_V2.NON_TEAM_MEMBER],
+        accessRole: [CONVERSATION_ACCESS_ROLE.GUEST, CONVERSATION_ACCESS_ROLE.NON_TEAM_MEMBER],
         accessModes: [CONVERSATION_ACCESS.CODE],
       },
       ONE2ONE: {accessModes: [], accessRole: []} as UpdatedAccessRights,

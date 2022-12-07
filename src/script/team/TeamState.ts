@@ -25,6 +25,7 @@ import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {TeamEntity} from './TeamEntity';
 
+import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {ROLE} from '../user/UserPermission';
 import {UserState} from '../user/UserState';
@@ -32,11 +33,11 @@ import {UserState} from '../user/UserState';
 @singleton()
 export class TeamState {
   public readonly isTeamDeleted: ko.Observable<boolean>;
-  public readonly memberInviters: ko.Observable<any>;
-  public readonly memberRoles: ko.Observable<any>;
+  public readonly memberInviters: ko.Observable<Record<string, string>>;
+  public readonly memberRoles: ko.Observable<Record<string, ROLE>>;
   public readonly supportsLegalHold: ko.Observable<boolean>;
   public readonly teamName: ko.PureComputed<string>;
-  public readonly teamFeatures: ko.Observable<FeatureList>;
+  public readonly teamFeatures: ko.Observable<FeatureList | undefined>;
   public readonly classifiedDomains: ko.PureComputed<string[] | undefined>;
   public readonly isConferenceCallingEnabled: ko.PureComputed<boolean>;
   public readonly isFileSharingSendingEnabled: ko.PureComputed<boolean>;
@@ -48,31 +49,28 @@ export class TeamState {
   public readonly isSelfDeletingMessagesEnabled: ko.PureComputed<boolean>;
   public readonly isSelfDeletingMessagesEnforced: ko.PureComputed<boolean>;
   public readonly getEnforcedSelfDeletingMessagesTimeout: ko.PureComputed<SelfDeletingTimeout>;
-  public readonly isAppLockEnabled: ko.PureComputed<boolean>;
-  public readonly isAppLockEnforced: ko.PureComputed<boolean>;
-  public readonly appLockInactivityTimeoutSecs: ko.PureComputed<number>;
+  /** all the members of the team */
   readonly teamMembers: ko.PureComputed<User[]>;
+  /** all the members of the team + the users the selfUser is connected with */
   readonly teamUsers: ko.PureComputed<User[]>;
   readonly isTeam: ko.PureComputed<boolean>;
-  readonly team: ko.Observable<TeamEntity>;
+  readonly team = ko.observable(new TeamEntity());
   readonly teamDomain: ko.PureComputed<string>;
   readonly teamSize: ko.PureComputed<number>;
 
   constructor(private readonly userState = container.resolve(UserState)) {
-    this.team = ko.observable();
-
     this.isTeam = ko.pureComputed(() => !!this.team()?.id);
     this.isTeamDeleted = ko.observable(false);
 
     /** Note: this does not include the self user */
-    this.teamMembers = ko.pureComputed(() => (this.isTeam() ? this.team().members() : []));
+    this.teamMembers = ko.pureComputed(() => this.userState.users().filter(user => !user.isMe && this.isInTeam(user)));
     this.memberRoles = ko.observable({});
     this.memberInviters = ko.observable({});
     this.teamFeatures = ko.observable();
 
     this.teamDomain = ko.pureComputed(() => userState.self().domain);
     this.teamName = ko.pureComputed(() => (this.isTeam() ? this.team().name() : this.userState.self().name()));
-    this.teamSize = ko.pureComputed(() => (this.isTeam() ? this.teamMembers().length + 1 : 0));
+    this.teamSize = ko.pureComputed(() => this.teamMembers().length + 1);
     this.teamUsers = ko.pureComputed(() => {
       return this.teamMembers()
         .concat(this.userState.connectedUsers())
@@ -81,10 +79,6 @@ export class TeamState {
     });
 
     this.supportsLegalHold = ko.observable(false);
-
-    this.userState.isTeam = this.isTeam;
-    this.userState.teamMembers = this.teamMembers;
-    this.userState.teamUsers = this.teamUsers;
 
     this.isFileSharingSendingEnabled = ko.pureComputed(() => {
       const status = this.teamFeatures()?.fileSharing?.status;
@@ -126,17 +120,17 @@ export class TeamState {
     this.isConferenceCallingEnabled = ko.pureComputed(
       () => this.teamFeatures()?.conferenceCalling?.status === FeatureStatus.ENABLED,
     );
-    this.isAppLockEnabled = ko.pureComputed(() => this.teamFeatures()?.appLock?.status === FeatureStatus.ENABLED);
-    this.isAppLockEnforced = ko.pureComputed(() => this.teamFeatures()?.appLock?.config?.enforceAppLock);
-    this.appLockInactivityTimeoutSecs = ko.pureComputed(
-      () => this.teamFeatures()?.appLock?.config?.inactivityTimeoutSecs,
-    );
     this.isGuestLinkEnabled = ko.pureComputed(
       () => this.teamFeatures()?.conversationGuestLinks?.status === FeatureStatus.ENABLED,
     );
   }
 
-  readonly isExternal = (userId: string): boolean => {
+  isInTeam(entity: User | Conversation): boolean {
+    const team = this.team();
+    return !!team.id && entity.domain === this.teamDomain() && entity.teamId === team.id;
+  }
+
+  isExternal(userId: string): boolean {
     return this.memberRoles()[userId] === ROLE.PARTNER;
-  };
+  }
 }

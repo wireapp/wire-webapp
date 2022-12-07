@@ -18,13 +18,11 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import type {ReactionType} from '@wireapp/core/lib/conversation/';
 import ko from 'knockout';
 
 import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
-import {t} from 'Util/LocalizerUtil';
-import {getUserName} from 'Util/SanitizationUtil';
+import {t, getUserName} from 'Util/LocalizerUtil';
 import {formatDateNumeral, formatDurationCaption, formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {CallingTimeoutMessage} from './CallingTimeoutMessage';
@@ -32,13 +30,16 @@ import type {CallMessage} from './CallMessage';
 import type {CompositeMessage} from './CompositeMessage';
 import type {ContentMessage} from './ContentMessage';
 import type {DecryptErrorMessage} from './DecryptErrorMessage';
-import {DeleteMessage} from './DeleteMessage';
+import type {DeleteMessage} from './DeleteMessage';
+import {E2EIVerificationMessage} from './E2EIVerificationMessage';
+import type {FailedToAddUsersMessage} from './FailedToAddUsersMessage';
+import type {FederationStopMessage} from './FederationStopMessage';
 import type {FileAsset} from './FileAsset';
-import {FileTypeRestrictedMessage} from './FileTypeRestrictedMessage';
+import type {FileTypeRestrictedMessage} from './FileTypeRestrictedMessage';
 import type {LegalHoldMessage} from './LegalHoldMessage';
 import type {LinkPreview} from './LinkPreview';
 import type {MemberMessage} from './MemberMessage';
-import {MissedMessage} from './MissedMessage';
+import type {MissedMessage} from './MissedMessage';
 import type {PingMessage} from './PingMessage';
 import type {SystemMessage} from './SystemMessage';
 import type {VerificationMessage} from './VerificationMessage';
@@ -63,7 +64,6 @@ export class Message {
   public fromClientId: string;
   public id: string;
   public primary_key?: string;
-  public reaction: ReactionType;
   public readonly accent_color: ko.PureComputed<string>;
   public readonly ephemeral_caption: ko.PureComputed<string>;
   public readonly ephemeral_expires: ko.Observable<boolean | number | string>;
@@ -71,7 +71,7 @@ export class Message {
   public readonly ephemeral_started: ko.Observable<number>;
   public readonly ephemeral_status: ko.Computed<EphemeralStatusType>;
   public expectsReadConfirmation: boolean;
-  public readonly headerSenderName: ko.PureComputed<string>;
+  public readonly senderName: ko.PureComputed<string>;
   public readonly isObfuscated: ko.PureComputed<boolean>;
   public legalHoldStatus?: LegalHoldStatus;
   public readonly status: ko.Observable<StatusType>;
@@ -85,15 +85,6 @@ export class Message {
   public type: string;
   public version: number;
 
-  /**
-   * Sort messages by timestamp
-   * @param message_ets Message entities
-   * @returns Sorted message entities
-   */
-  static sortByTimestamp(message_ets: Message[]): Message[] {
-    return message_ets.sort((m1, m2) => m1.timestamp() - m2.timestamp());
-  }
-
   constructor(id: string = '0', super_type?: SuperType) {
     this.id = id;
     this.super_type = super_type;
@@ -105,17 +96,18 @@ export class Message {
     this.ephemeral_expires = ko.observable(false);
     this.ephemeral_started = ko.observable(0);
     this.ephemeral_status = ko.computed(() => {
-      const isExpired = this.ephemeral_expires() === true;
+      const expires = this.ephemeral_expires();
+      const isExpired = expires === true;
       if (isExpired) {
         return EphemeralStatusType.TIMED_OUT;
       }
 
-      if (typeof this.ephemeral_expires() === 'number') {
+      if (typeof expires === 'number') {
         return EphemeralStatusType.INACTIVE;
       }
 
-      if (typeof this.ephemeral_expires() === 'string') {
-        const isExpiring = Date.now() >= this.ephemeral_expires();
+      if (typeof expires === 'string') {
+        const isExpiring = Date.now() >= parseInt(expires, 10);
         return isExpiring ? EphemeralStatusType.TIMED_OUT : EphemeralStatusType.ACTIVE;
       }
 
@@ -150,7 +142,7 @@ export class Message {
     this.category = undefined;
 
     this.unsafeSenderName = ko.pureComputed(() => getUserName(this.user(), undefined, true));
-    this.headerSenderName = ko.pureComputed(() => {
+    this.senderName = ko.pureComputed(() => {
       return this.user().name();
     });
 
@@ -171,22 +163,12 @@ export class Message {
     return formatDateNumeral(date);
   };
 
-  readonly equals = (messageEntity?: Message) => (messageEntity && this.id ? this.id === messageEntity.id : false);
-
   /**
    * Check if message contains an asset of type file.
    * @returns Message contains any file type asset
    */
   hasAsset(): boolean {
     return this.isContent() ? this.assets().some(assetEntity => assetEntity.type === AssetType.FILE) : false;
-  }
-
-  /**
-   * Check if message contains a file asset.
-   * @returns Message contains a file
-   */
-  hasAssetFile(): boolean {
-    return this.isContent() ? this.assets().some(assetEntity => assetEntity.isFile()) : false;
   }
 
   /**
@@ -238,7 +220,7 @@ export class Message {
    * @returns `true`, if message is deletable, `false` otherwise.
    */
   isDeletable(): boolean {
-    return !this.hasUnavailableAsset(false) && !this.isComposite() && this.status() !== StatusType.SENDING;
+    return !this.hasUnavailableAsset(false) && !this.isComposite();
   }
 
   /**
@@ -319,6 +301,10 @@ export class Message {
     return this.super_type === SuperType.CALL_TIME_OUT;
   }
 
+  isFailedToAddUsersMessage(): this is FailedToAddUsersMessage {
+    return this.super_type === SuperType.FAILED_TO_ADD_USERS;
+  }
+
   /**
    * Check if message is an undecryptable message.
    * @returns Is message unable to decrypt
@@ -333,6 +319,18 @@ export class Message {
    */
   isVerification(): this is VerificationMessage {
     return this.super_type === SuperType.VERIFICATION;
+  }
+
+  /**
+   * Check if message is a E2E Identity Verification message.
+   * @returns Is message of type E2E Identity Verification
+   */
+  isE2EIVerification(): this is E2EIVerificationMessage {
+    return this.super_type === SuperType.E2EI_VERIFICATION;
+  }
+
+  isFederationStop(): this is FederationStopMessage {
+    return this.super_type === SuperType.FEDERATION_STOP;
   }
 
   isLegalHold(): this is LegalHoldMessage {
@@ -352,7 +350,7 @@ export class Message {
    * Check if message can be edited.
    * @returns `true`, if message can be edited, `false` otherwise.
    */
-  isEditable(): boolean {
+  isEditable(): this is ContentMessage {
     return this.hasAssetText() && this.user().isMe && !this.isEphemeral();
   }
 
@@ -433,20 +431,4 @@ export class Message {
     this.ephemeral_remaining(remainingTime);
     this.messageTimerStarted = true;
   };
-
-  /**
-   * Update the status of a message.
-   * @param updated_status New status of message
-   * @returns Returns the new status on a successful update, `false` otherwise
-   */
-  updateStatus(updated_status: StatusType): StatusType | false {
-    if (this.status() >= StatusType.SENT) {
-      if (updated_status > this.status()) {
-        return this.status(updated_status);
-      }
-    } else if (this.status() !== updated_status) {
-      return this.status(updated_status);
-    }
-    return false;
-  }
 }

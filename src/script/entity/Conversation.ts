@@ -18,10 +18,11 @@
  */
 
 import {
-  ACCESS_ROLE_V2,
-  CONVERSATION_ACCESS,
   CONVERSATION_ACCESS_ROLE,
+  CONVERSATION_ACCESS,
+  CONVERSATION_LEGACY_ACCESS_ROLE,
   CONVERSATION_TYPE,
+  DefaultConversationRoleName,
 } from '@wireapp/api-client/lib/conversation/';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
@@ -31,7 +32,7 @@ import ko from 'knockout';
 import {container} from 'tsyringe';
 import {Cancelable, debounce} from 'underscore';
 
-import {Availability, LegalHoldStatus} from '@wireapp/protocol-messaging';
+import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
@@ -42,23 +43,23 @@ import {truncate} from 'Util/StringUtil';
 
 import {CallMessage} from './message/CallMessage';
 import type {ContentMessage} from './message/ContentMessage';
-import type {MemberMessage} from './message/MemberMessage';
 import type {Message} from './message/Message';
 import {PingMessage} from './message/PingMessage';
-import type {SystemMessage} from './message/SystemMessage';
+import {SystemMessage} from './message/SystemMessage';
 import type {User} from './User';
 
 import type {Call} from '../calling/Call';
-import {ClientRepository} from '../client/ClientRepository';
+import {ClientRepository} from '../client';
 import {Config} from '../Config';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
 import {ACCESS_STATE} from '../conversation/AccessState';
-import {ConversationRepository} from '../conversation/ConversationRepository';
+import {ConversationRepository, CONVERSATION_READONLY_STATE} from '../conversation/ConversationRepository';
 import {isSelfConversation} from '../conversation/ConversationSelectors';
 import {ConversationStatus} from '../conversation/ConversationStatus';
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
 import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
 import {ConversationError} from '../error/ConversationError';
+import {isContentMessage, isDeleteMessage} from '../guards/Message';
 import {StatusType} from '../message/StatusType';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {TeamState} from '../team/TeamState';
@@ -71,6 +72,7 @@ interface UnreadState {
   pings: PingMessage[];
   selfMentions: ContentMessage[];
   selfReplies: ContentMessage[];
+  systemMessages: SystemMessage[];
 }
 
 enum TIMESTAMP_TYPE {
@@ -85,22 +87,21 @@ enum TIMESTAMP_TYPE {
 export class Conversation {
   private readonly teamState: TeamState;
   public readonly archivedState: ko.Observable<boolean>;
-  private readonly incomingMessages: ko.ObservableArray<Message | ContentMessage | MemberMessage>;
-  private readonly isManaged: boolean;
-  private readonly isTeam1to1: ko.PureComputed<boolean>;
+  public readonly readOnlyState: ko.Observable<CONVERSATION_READONLY_STATE | null>;
+  private readonly incomingMessages: ko.ObservableArray<Message>;
+  public readonly isTeam1to1: ko.PureComputed<boolean>;
   public readonly last_server_timestamp: ko.Observable<number>;
   private readonly logger: Logger;
   public readonly mutedState: ko.Observable<number>;
-  private readonly mutedTimestamp: ko.Observable<number>;
+  public readonly mutedTimestamp: ko.Observable<number>;
   private readonly publishPersistState: (() => void) & Cancelable;
   private shouldPersistStateChanges: boolean;
   public blockLegalHoldMessage: boolean;
   public hasCreationMessage: boolean;
-  public needsLegalHoldApproval: boolean = false;
   public readonly accessCode: ko.Observable<string>;
+  public readonly accessCodeHasPassword: ko.Observable<boolean | undefined>;
   public readonly accessState: ko.Observable<ACCESS_STATE>;
   public readonly archivedTimestamp: ko.Observable<number>;
-  public readonly availabilityOfUser: ko.PureComputed<Availability.Type>;
   public readonly call: ko.Observable<Call | null>;
   public readonly cleared_timestamp: ko.Observable<number>;
   public readonly connection: ko.Observable<ConnectionEntity>;
@@ -109,11 +110,12 @@ export class Conversation {
   public groupId?: string;
   public epoch: number = -1;
   public cipherSuite: number = 1;
-  public readonly isUsingMLSProtocol: boolean;
+  // Initial protocol is a protocol that was known by a webapp before any protocol update happened. For newly created conversations it is the same as protocol.
+  public initialProtocol: ConversationProtocol = this.protocol;
   public readonly display_name: ko.PureComputed<string>;
-  public readonly firstUserEntity: ko.PureComputed<User>;
-  public readonly enforcedTeamMessageTimer: ko.PureComputed<number>;
+  public readonly firstUserEntity: ko.PureComputed<User | undefined>;
   public readonly globalMessageTimer: ko.Observable<number | null>;
+  public readonly hasContentMessages: ko.Observable<boolean>;
   public readonly hasAdditionalMessages: ko.Observable<boolean>;
   public readonly hasGlobalMessageTimer: ko.PureComputed<boolean>;
   public readonly hasGuest: ko.PureComputed<boolean>;
@@ -148,14 +150,15 @@ export class Conversation {
   public readonly last_read_timestamp: ko.Observable<number>;
   public readonly legalHoldStatus: ko.Observable<LegalHoldStatus>;
   public readonly localMessageTimer: ko.Observable<number>;
-  public readonly messages_unordered: ko.ObservableArray<Message | ContentMessage | MemberMessage>;
-  public readonly messages_visible: ko.PureComputed<(Message | ContentMessage | MemberMessage)[]>;
-  public readonly messages: ko.PureComputed<(Message | ContentMessage | MemberMessage)[]>;
+  public readonly messages_unordered: ko.ObservableArray<Message>;
+  public readonly messages_visible: ko.PureComputed<Message[]>;
+  public readonly messages: ko.PureComputed<Message[]>;
   public readonly messageTimer: ko.PureComputed<number>;
   public readonly name: ko.Observable<string>;
   public readonly notificationState: ko.PureComputed<number>;
   public readonly participating_user_ets: ko.ObservableArray<User>;
   public readonly participating_user_ids: ko.ObservableArray<QualifiedId>;
+  public readonly allUserEntities: ko.PureComputed<User[]>;
   public readonly receiptMode: ko.Observable<RECEIPT_MODE>;
   public readonly removed_from_conversation: ko.PureComputed<boolean>;
   public readonly roles: ko.Observable<Record<string, string>>;
@@ -165,15 +168,16 @@ export class Conversation {
   public readonly showNotificationsMentionsAndReplies: ko.PureComputed<boolean>;
   public readonly showNotificationsNothing: ko.PureComputed<boolean>;
   public status: ko.Observable<ConversationStatus>;
-  public team_id: string;
+  public teamId: string;
   public readonly type: ko.Observable<CONVERSATION_TYPE>;
   public readonly unreadState: ko.PureComputed<UnreadState>;
-  public readonly verification_state: ko.Observable<ConversationVerificationState>;
+  public readonly verification_state = ko.observable(ConversationVerificationState.UNVERIFIED);
+  public readonly mlsVerificationState = ko.observable(ConversationVerificationState.UNVERIFIED);
   public readonly withAllTeamMembers: ko.Observable<boolean>;
   public readonly hasExternal: ko.PureComputed<boolean>;
   public readonly hasFederatedUsers: ko.PureComputed<boolean>;
   public accessModes?: CONVERSATION_ACCESS[];
-  public accessRole?: CONVERSATION_ACCESS_ROLE | ACCESS_ROLE_V2[];
+  public accessRole?: CONVERSATION_LEGACY_ACCESS_ROLE | CONVERSATION_ACCESS_ROLE[];
   public domain: string;
 
   static get TIMESTAMP_TYPE(): typeof TIMESTAMP_TYPE {
@@ -195,38 +199,35 @@ export class Conversation {
 
     this.accessState = ko.observable();
     this.accessCode = ko.observable();
+    this.accessCodeHasPassword = ko.observable();
     this.creator = undefined;
     this.name = ko.observable();
-    this.team_id = undefined;
+    this.teamId = undefined;
     this.type = ko.observable();
-
-    /**
-     * If a conversation has the groupId property it means that it
-     * is MLS protocol based as this property is for MLS conversations only.
-     * @returns boolean
-     */
-    this.isUsingMLSProtocol = protocol === ConversationProtocol.MLS;
 
     this.is_loaded = ko.observable(false);
     this.is_pending = ko.observable(false);
 
     this.participating_user_ets = ko.observableArray([]); // Does not include self user
     this.participating_user_ids = ko.observableArray([]); // Does not include self user
+    this.allUserEntities = ko.pureComputed(() => {
+      const selfUser = this.selfUser();
+      const selfUserArray = selfUser ? [selfUser] : [];
+      return selfUserArray.concat(this.participating_user_ets());
+    });
     this.selfUser = ko.observable();
     this.roles = ko.observable({});
 
     this.hasCreationMessage = false;
 
     this.firstUserEntity = ko.pureComputed(() => this.participating_user_ets()[0]);
-    this.availabilityOfUser = ko.pureComputed(() => this.firstUserEntity()?.availability());
 
     this.isGuest = ko.observable(false);
-    this.isManaged = false;
 
     this.inTeam = ko.pureComputed(() => {
-      const isSameTeam = this.selfUser()?.teamId === this.team_id;
+      const isSameTeam = this.selfUser()?.teamId === this.teamId;
       const isSameDomain = this.domain === this.selfUser()?.domain;
-      return !!this.team_id && isSameTeam && !this.isGuest() && isSameDomain;
+      return !!this.teamId && isSameTeam && !this.isGuest() && isSameDomain;
     });
     this.isGuestRoom = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.GUEST_ROOM);
     this.isGuestAndServicesRoom = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.GUESTS_SERVICES);
@@ -237,7 +238,7 @@ export class Conversation {
     this.isTeam1to1 = ko.pureComputed(() => {
       const isGroupConversation = this.type() === CONVERSATION_TYPE.REGULAR;
       const hasOneParticipant = this.participating_user_ids().length === 1;
-      return isGroupConversation && hasOneParticipant && this.team_id && !this.name();
+      return isGroupConversation && hasOneParticipant && this.teamId && !this.name();
     });
     this.isGroup = ko.pureComputed(() => {
       const isGroupConversation = this.type() === CONVERSATION_TYPE.REGULAR;
@@ -247,16 +248,19 @@ export class Conversation {
       const is1to1Conversation = this.type() === CONVERSATION_TYPE.ONE_TO_ONE;
       return is1to1Conversation || this.isTeam1to1();
     });
-    this.isRequest = ko.pureComputed(() => this.type() === CONVERSATION_TYPE.CONNECT);
+    this.isRequest = ko.pureComputed(
+      () =>
+        this.type() === CONVERSATION_TYPE.CONNECT || (this.is1to1() && this.participating_user_ets()[0]?.isRequest()),
+    );
     this.isSelf = ko.pureComputed(() => this.type() === CONVERSATION_TYPE.SELF);
 
     this.hasDirectGuest = ko.pureComputed(() => {
       const hasGuestUser = this.participating_user_ets().some(userEntity => userEntity.isDirectGuest());
-      return hasGuestUser && this.isGroup() && this.selfUser()?.inTeam();
+      return hasGuestUser && this.isGroup();
     });
     this.hasGuest = ko.pureComputed(() => {
       const hasGuestUser = this.participating_user_ets().some(userEntity => userEntity.isGuest());
-      return hasGuestUser && this.isGroup() && this.selfUser()?.inTeam();
+      return hasGuestUser && this.isGroup();
     });
     this.hasService = ko.pureComputed(() => this.participating_user_ets().some(userEntity => userEntity.isService));
     this.hasExternal = ko.pureComputed(() => this.participating_user_ets().some(userEntity => userEntity.isExternal()));
@@ -279,7 +283,6 @@ export class Conversation {
     // E2EE conversation states
     this.archivedState = ko.observable(false).extend({notify: 'always'});
     this.mutedState = ko.observable(NOTIFICATION_STATE.EVERYTHING);
-    this.verification_state = ko.observable(ConversationVerificationState.UNVERIFIED);
 
     this.archivedTimestamp = ko.observable(0);
     this.cleared_timestamp = ko.observable(0);
@@ -289,6 +292,8 @@ export class Conversation {
     this.mutedTimestamp = ko.observable(0);
 
     this.call = ko.observable(null);
+
+    this.readOnlyState = ko.observable<CONVERSATION_READONLY_STATE | null>(null);
 
     // Conversation states for view
     this.notificationState = ko.pureComputed(() => {
@@ -300,13 +305,13 @@ export class Conversation {
       const knownNotificationStates = Object.values(NOTIFICATION_STATE);
       if (knownNotificationStates.includes(mutedState)) {
         const isStateMentionsAndReplies = mutedState === NOTIFICATION_STATE.MENTIONS_AND_REPLIES;
-        const isInvalidState = isStateMentionsAndReplies && !this.selfUser().inTeam();
+        const isInvalidState = isStateMentionsAndReplies && !this.selfUser()?.teamId;
 
         return isInvalidState ? NOTIFICATION_STATE.NOTHING : mutedState;
       }
 
       if (typeof mutedState === 'boolean') {
-        const migratedMutedState = this.selfUser().inTeam()
+        const migratedMutedState = !!this.selfUser()?.teamId
           ? NOTIFICATION_STATE.MENTIONS_AND_REPLIES
           : NOTIFICATION_STATE.NOTHING;
         return this.mutedState() ? migratedMutedState : NOTIFICATION_STATE.EVERYTHING;
@@ -322,14 +327,14 @@ export class Conversation {
         return undefined;
       }
 
-      return this.allUserEntities.every(userEntity => userEntity.is_verified());
+      return this.allUserEntities().every(userEntity => userEntity.is_verified());
     });
 
     this.legalHoldStatus = ko.observable(LegalHoldStatus.DISABLED);
 
     this.hasLegalHold = ko.computed(() => {
       const isInitialized = this.hasInitializedUsers();
-      const hasLegalHold = isInitialized && this.allUserEntities.some(userEntity => userEntity.isOnLegalHold());
+      const hasLegalHold = isInitialized && this.allUserEntities().some(userEntity => userEntity.isOnLegalHold());
 
       if (isInitialized) {
         this.legalHoldStatus(hasLegalHold ? LegalHoldStatus.ENABLED : LegalHoldStatus.DISABLED);
@@ -414,6 +419,11 @@ export class Conversation {
 
     this.hasAdditionalMessages = ko.observable(true);
 
+    // Since we release messages from memory when the conversation is not active, we use an observable to keep track of conversations with messages
+    this.hasContentMessages = ko.observable(
+      [...this.messages(), ...this.incomingMessages()].some(message => message.isContent()),
+    );
+
     this.messages_visible = ko
       .pureComputed(() => (!this.id ? [] : this.messages().filter(messageEntity => messageEntity.visible())))
       .extend({trackArrayChanges: true});
@@ -428,8 +438,10 @@ export class Conversation {
         pings: [],
         selfMentions: [],
         selfReplies: [],
+        systemMessages: [],
       };
       const messages = [...this.messages(), ...this.incomingMessages()];
+
       for (let index = messages.length - 1; index >= 0; index--) {
         const messageEntity = messages[index];
         if (messageEntity.visible()) {
@@ -448,7 +460,9 @@ export class Conversation {
           const isSelfQuoted =
             isMessage && this.selfUser() && (messageEntity as ContentMessage).isUserQuoted(this.selfUser().id);
 
-          if (isMissedCall || isPing || isMessage) {
+          const isE2EIVerification = messageEntity.isE2EIVerification();
+
+          if (isMissedCall || isPing || isMessage || isE2EIVerification) {
             unreadState.allMessages.push(messageEntity as ContentMessage);
           }
 
@@ -496,19 +510,19 @@ export class Conversation {
      *
      * - Name of the other participant
      * - Name of the other user of the associated connection
-     * - "..." if neither of those has been attached yet
+     * - "Name not available" if neither of those has been attached yet
      *
      * 'Group Conversation':
      * - Conversation name received from backend
      * - If unnamed, we will create a name from the participant names
      * - Join the user's first names to a comma separated list or uses the user's first name if only one user participating
-     * - "..." if the user entities have not yet been attached yet
+     * - "..." if the user entities have not yet been attached
      */
     this.display_name = ko.pureComputed(() => {
       if (this.isRequest() || this.is1to1()) {
         const [userEntity] = this.participating_user_ets();
         const userName = userEntity?.name();
-        return userName || '…';
+        return userName || t('unavailableUser');
       }
 
       if (this.isGroup()) {
@@ -557,6 +571,7 @@ export class Conversation {
   private _initSubscriptions() {
     [
       this.archivedState,
+      this.readOnlyState,
       this.archivedTimestamp,
       this.cleared_timestamp,
       this.messageTimer,
@@ -572,11 +587,8 @@ export class Conversation {
       this.status,
       this.type,
       this.verification_state,
+      this.mlsVerificationState,
     ].forEach(property => (property as ko.Observable).subscribe(this.persistState));
-  }
-
-  get allUserEntities() {
-    return [this.selfUser()].concat(this.participating_user_ets());
   }
 
   readonly persistState = (): void => {
@@ -598,6 +610,10 @@ export class Conversation {
       this.is_loaded(false);
       this.hasAdditionalMessages(true);
     }
+  }
+
+  public isAdmin(userId: QualifiedId) {
+    return this.roles()[userId.id] === DefaultConversationRoleName.WIRE_ADMIN;
   }
 
   /**
@@ -668,20 +684,26 @@ export class Conversation {
    * @param messageEntity Message entity to be added to the conversation.
    * @returns If a message was replaced in the conversation
    */
-  addMessage(messageEntity: Message | ContentMessage | MemberMessage): boolean | void {
+  addMessage(messageEntity: Message): boolean | void {
     if (messageEntity) {
       const messageWithLinkPreview = () => this._findDuplicate(messageEntity.id, messageEntity.from);
       const editedMessage = () =>
         this._findDuplicate((messageEntity as ContentMessage).replacing_message_id, messageEntity.from);
       const alreadyAdded = messageWithLinkPreview() || editedMessage();
+
+      if (messageEntity.isContent()) {
+        this.hasContentMessages(true);
+      }
       if (alreadyAdded) {
         return false;
       }
-      if (this.isShowingLastReceivedMessage()) {
+      if (this.hasLastReceivedMessageLoaded()) {
         this.updateTimestamps(messageEntity);
         this.incomingMessages.remove(({id}) => messageEntity.id === id);
+        // If the last received message is currently in memory, we can add this message to the displayed messages
         this.messages_unordered.push(messageEntity);
       } else {
+        // If the conversation is not loaded, we will add this message to the incoming messages (but not to the messages displayed)
         this.incomingMessages.push(messageEntity);
       }
       amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.ADDED, messageEntity);
@@ -802,38 +824,6 @@ export class Conversation {
     this.messages_unordered.removeAll();
   }
 
-  shouldUnarchive(): boolean {
-    if (!this.archivedState() || this.showNotificationsNothing()) {
-      return false;
-    }
-
-    const isNewerMessage = (messageEntity: Message) => messageEntity.timestamp() > this.archivedTimestamp();
-
-    const {allEvents, allMessages, selfMentions, selfReplies} = this.unreadState();
-    if (this.showNotificationsMentionsAndReplies()) {
-      const mentionsAndReplies = selfMentions.concat(selfReplies);
-      return mentionsAndReplies.some(isNewerMessage);
-    }
-
-    const hasNewMessage = allMessages.some(isNewerMessage);
-    if (hasNewMessage) {
-      return true;
-    }
-
-    return allEvents.some(messageEntity => {
-      if (!isNewerMessage(messageEntity)) {
-        return false;
-      }
-
-      const isCallActivation = messageEntity.isCall() && messageEntity.isActivation();
-      const isMemberJoin = messageEntity.isMember() && (messageEntity as MemberMessage).isMemberJoin();
-      const wasSelfUserAdded =
-        isMemberJoin && (messageEntity as MemberMessage).isUserAffected(this.selfUser().qualifiedId);
-
-      return isCallActivation || wasSelfUserAdded;
-    });
-  }
-
   /**
    * Checks for message duplicates.
    *
@@ -844,8 +834,7 @@ export class Conversation {
     if (messageEntity) {
       const existingMessageEntity = this._findDuplicate(messageEntity.id, messageEntity.from);
       if (existingMessageEntity) {
-        const logData = {additionalMessage: messageEntity, existingMessage: existingMessageEntity};
-        this.logger.warn(`Filtered message '${messageEntity.id}' as duplicate in view`, logData);
+        this.logger.warn(`Filtered message '${messageEntity.id}' as duplicate in view`);
         return undefined;
       }
       return messageEntity;
@@ -854,8 +843,8 @@ export class Conversation {
   }
 
   private _findDuplicate(): undefined;
-  private _findDuplicate(messageId: string, from: string): Message | ContentMessage | MemberMessage;
-  private _findDuplicate(messageId?: string, from?: string): Message | ContentMessage | MemberMessage | undefined {
+  private _findDuplicate(messageId: string, from: string): Message;
+  private _findDuplicate(messageId?: string, from?: string): Message | undefined {
     if (messageId) {
       return this.messages_unordered().find(messageEntity => {
         const sameId = messageEntity.id === messageId;
@@ -882,14 +871,14 @@ export class Conversation {
    * @param message_et Message to be added to conversation
    * @param forceUpdate set the timestamp regardless of previous timestamp value (no checks)
    */
-  updateTimestamps(
-    message_et?: Message | ContentMessage | MemberMessage | SystemMessage,
-    forceUpdate: boolean = false,
-  ): void {
+  updateTimestamps(message_et?: Message, forceUpdate: boolean = false): void {
     if (message_et) {
       const timestamp = message_et.timestamp();
       if (timestamp <= this.last_server_timestamp()) {
-        if (message_et.timestamp_affects_order()) {
+        // Some message do not bubble the conversation up in the conversation list (call messages for example or some system messages).
+        // Those should not update the conversation timestamp.
+        // This is ignored if the `forceUpdate` flag is set.
+        if (message_et.timestamp_affects_order() || forceUpdate) {
           this.setTimestamp(timestamp, TIMESTAMP_TYPE.LAST_EVENT, forceUpdate);
 
           const from_self = message_et.user()?.isMe;
@@ -901,41 +890,28 @@ export class Conversation {
     }
   }
 
-  getAllMessages(): (Message | ContentMessage | MemberMessage | SystemMessage)[] {
-    return this.messages();
-  }
-
   /**
-   * Get the first message of the conversation.
+   * Get the oldest loaded message of the conversation.
    */
-  getFirstMessage(): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
-    return this.messages()[0];
+  getOldestMessage(): Message | undefined {
+    return this.messages().find(
+      message =>
+        // Deleted message should be ignored since they might have a timestamp in the past (the timestamp of a delete message is the timestamp of the message that was deleted)
+        !isDeleteMessage(message),
+    );
   }
 
   /**
    * Get the last message of the conversation.
    */
-  getLastMessage(): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
+  getNewestMessage(): Message | undefined {
     return this.messages()[this.messages().length - 1];
-  }
-
-  /**
-   * Get the message before a given message.
-   * @param message_et Message to look up from
-   */
-  getPreviousMessage(message_et: Message): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
-    const messages_visible = this.messages_visible();
-    const message_index = messages_visible.indexOf(message_et);
-    if (message_index > 0) {
-      return messages_visible[message_index - 1];
-    }
-    return undefined;
   }
 
   /**
    * Get the last text message that was added by self user.
    */
-  getLastEditableMessage(): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
+  getLastEditableMessage(): ContentMessage | undefined {
     const messages = this.messages();
     for (let index = messages.length - 1; index >= 0; index--) {
       const message_et = messages[index];
@@ -949,12 +925,12 @@ export class Conversation {
   /**
    * Get the last delivered message.
    */
-  getLastDeliveredMessage(): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
+  private getLastDeliveredMessage(): Message | undefined {
     return this.messages()
       .slice()
       .reverse()
       .find(messageEntity => {
-        const isDelivered = messageEntity.status() >= StatusType.DELIVERED;
+        const isDelivered = [StatusType.DELIVERED, StatusType.SEEN].includes(messageEntity.status());
         return isDelivered && messageEntity.user().isMe;
       });
   }
@@ -965,8 +941,19 @@ export class Conversation {
    *
    * @param messageId ID of message to be retrieved
    */
-  getMessage(messageId: string): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
+  getMessage(messageId: string): Message | undefined {
     return this.messages().find(messageEntity => messageEntity.id === messageId);
+  }
+  /**
+   * Get a message by its replacing message id. Useful if the message in question is an edit and has replaced the original message.
+   * Only lookup in the loaded message list which is a limited view of all the messages in DB.
+   *
+   * @param messageId ID of message to be retrieved
+   */
+  getMessageByReplacementId(messageId: string): Message | undefined {
+    return this.messages().find(
+      messageEntity => isContentMessage(messageEntity) && messageEntity.replacing_message_id === messageId,
+    );
   }
 
   updateGuests(): void {
@@ -987,6 +974,10 @@ export class Conversation {
     return userEntities.filter(userEntity => !userEntity.is_verified());
   }
 
+  getAllUserEntities(): User[] {
+    return this.participating_user_ets();
+  }
+
   supportsVideoCall(sftEnabled: boolean): boolean {
     if (sftEnabled) {
       return true;
@@ -996,8 +987,9 @@ export class Conversation {
     return participantCount <= config.MAX_VIDEO_PARTICIPANTS;
   }
 
-  readonly isShowingLastReceivedMessage = (): boolean => {
-    return this.getLastMessage()?.timestamp() ? this.getLastMessage().timestamp() >= this.last_event_timestamp() : true;
+  readonly hasLastReceivedMessageLoaded = (): boolean => {
+    const newestMessage = this.getNewestMessage();
+    return newestMessage?.timestamp() ? newestMessage.timestamp() >= this.last_event_timestamp() : true;
   };
 
   serialize(): ConversationRecord {
@@ -1005,6 +997,7 @@ export class Conversation {
       access: this.accessModes,
       access_role: this.accessRole,
       archived_state: this.archivedState(),
+      readonly_state: this.readOnlyState(),
       archived_timestamp: this.archivedTimestamp(),
       cipher_suite: this.cipherSuite,
       cleared_timestamp: this.cleared_timestamp(),
@@ -1014,9 +1007,9 @@ export class Conversation {
       epoch: this.epoch,
       global_message_timer: this.globalMessageTimer(),
       group_id: this.groupId,
+      initial_protocol: this.initialProtocol,
       id: this.id,
       is_guest: this.isGuest(),
-      is_managed: this.isManaged,
       last_event_timestamp: this.last_event_timestamp(),
       last_read_timestamp: this.last_read_timestamp(),
       last_server_timestamp: this.last_server_timestamp(),
@@ -1030,9 +1023,10 @@ export class Conversation {
       receipt_mode: this.receiptMode(),
       roles: this.roles(),
       status: this.status(),
-      team_id: this.team_id,
+      team_id: this.teamId,
       type: this.type(),
       verification_state: this.verification_state(),
+      mlsVerificationState: this.mlsVerificationState(),
     };
   }
 }

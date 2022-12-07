@@ -19,18 +19,19 @@
 
 import {FC, useMemo, useState} from 'react';
 
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 
-import {Button} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
+import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
 import {SearchInput} from 'Components/SearchInput';
-import {ServiceList} from 'Components/ServiceList';
+import {ServiceList} from 'Components/ServiceList/ServiceList';
 import {UserSearchableList} from 'Components/UserSearchableList';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
-import {matchQualifiedIds} from 'Util/QualifiedId';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
@@ -43,7 +44,6 @@ import {ServiceEntity} from '../../../integration/ServiceEntity';
 import {SearchRepository} from '../../../search/SearchRepository';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {TeamState} from '../../../team/TeamState';
-import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {generatePermissionHelpers} from '../../../user/UserPermission';
 import {UserState} from '../../../user/UserState';
 import {PanelHeader} from '../PanelHeader';
@@ -68,6 +68,7 @@ interface AddParticipantsProps {
   teamRepository: TeamRepository;
   teamState: TeamState;
   userState: UserState;
+  selfUser: User;
 }
 const AddParticipants: FC<AddParticipantsProps> = ({
   activeConversation,
@@ -80,6 +81,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
   teamRepository,
   teamState,
   userState,
+  selfUser,
 }) => {
   const {
     firstUserEntity,
@@ -99,7 +101,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
     'participating_user_ids',
   ]);
   const {isTeam, teamMembers, teamUsers} = useKoSubscribableChildren(teamState, ['isTeam', 'teamMembers', 'teamUsers']);
-  const {connectedUsers, self: selfUser} = useKoSubscribableChildren(userState, ['connectedUsers', 'self']);
+  const {connectedUsers} = useKoSubscribableChildren(userState, ['connectedUsers']);
   const {teamRole} = useKoSubscribableChildren(selfUser, ['teamRole']);
   const {services} = useKoSubscribableChildren(integrationRepository, ['services']);
 
@@ -114,17 +116,12 @@ const AddParticipants: FC<AddParticipantsProps> = ({
 
   const [isInitialServiceSearch, setIsInitialServiceSearch] = useState<boolean>(true);
   const contacts = useMemo(() => {
-    let users: User[] = [];
-
     if (isTeam) {
       const isTeamOrServices = isTeamOnly || isServicesRoom;
-      users = isTeamOrServices ? teamMembers.sort(sortUsersByPriority) : teamUsers;
-    } else {
-      users = connectedUsers;
+      return isTeamOrServices ? teamMembers.sort(sortUsersByPriority) : teamUsers;
     }
-
-    return users.filter(userEntity => !participatingUserIds.find(userId => matchQualifiedIds(userEntity, userId)));
-  }, [connectedUsers, isServicesRoom, isTeam, isTeamOnly, participatingUserIds, teamMembers, teamUsers]);
+    return connectedUsers;
+  }, [connectedUsers, isServicesRoom, isTeam, isTeamOnly, teamMembers, teamUsers]);
 
   const enabledAddAction = selectedContacts.length > ENABLE_ADD_ACTIONS_LENGTH;
 
@@ -176,10 +173,11 @@ const AddParticipants: FC<AddParticipantsProps> = ({
   };
 
   const onSearchInput = async (value: string) => {
+    setSearchInput(value);
+
     if (isAddServiceState) {
       await searchServices(value);
     }
-    setSearchInput(value);
   };
 
   return (
@@ -206,7 +204,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
           <div className="panel__tabs">
             <div
               role="button"
-              tabIndex={0}
+              tabIndex={TabIndex.FOCUSABLE}
               className={cx('panel__tab', {'panel__tab--active': isAddPeopleState})}
               onClick={onAddPeople}
               onKeyDown={event => handleKeyDown(event, onAddPeople)}
@@ -217,7 +215,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
 
             <div
               role="button"
-              tabIndex={0}
+              tabIndex={TabIndex.FOCUSABLE}
               className={cx('panel__tab', {'panel__tab--active': isAddServiceState})}
               onClick={onAddServices}
               onKeyDown={event => handleKeyDown(event, onAddServices)}
@@ -228,7 +226,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
           </div>
         )}
 
-        <div className="add-participants__list panel__content" ref={initFadingScrollbar}>
+        <FadingScrollbar className="add-participants__list panel__content">
           {isAddPeopleState && (
             <UserSearchableList
               users={contacts}
@@ -238,6 +236,10 @@ const AddParticipants: FC<AddParticipantsProps> = ({
               searchRepository={searchRepository}
               teamRepository={teamRepository}
               conversationRepository={conversationRepository}
+              excludeUsers={participatingUserIds}
+              selfUser={selfUser}
+              isSelectable
+              allowRemoteSearch
             />
           )}
 
@@ -249,7 +251,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
                     <ul className="panel-manage-services left-list-items">
                       <li
                         role="presentation"
-                        tabIndex={0}
+                        tabIndex={TabIndex.FOCUSABLE}
                         className="left-list-item left-list-item-clickable"
                         onClick={openManageServices}
                         onKeyDown={event => handleKeyDown(event, openManageServices)}
@@ -264,13 +266,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
                     </ul>
                   )}
 
-                  <ServiceList
-                    services={services}
-                    click={onServiceSelect}
-                    arrow
-                    noUnderline
-                    isSearching={isSearching}
-                  />
+                  <ServiceList services={services} onServiceClick={onServiceSelect} isSearching={isSearching} />
                 </>
               )}
 
@@ -284,16 +280,17 @@ const AddParticipants: FC<AddParticipantsProps> = ({
                         {t('addParticipantsNoServicesManager')}
                       </div>
 
-                      <div
-                        role="button"
-                        tabIndex={0}
-                        className="search__no-services__manage-button search__no-services__manage-button--alternate"
+                      <Button
+                        variant={ButtonVariant.TERTIARY}
+                        type="button"
+                        tabIndex={TabIndex.FOCUSABLE}
                         onClick={openManageServices}
                         onKeyDown={event => handleKeyDown(event, openManageServices)}
                         data-uie-name="go-enable-services"
+                        style={{marginTop: '1em'}}
                       >
                         {t('addParticipantsManageServicesNoResults')}
-                      </div>
+                      </Button>
                     </>
                   )}
 
@@ -306,11 +303,11 @@ const AddParticipants: FC<AddParticipantsProps> = ({
               )}
             </>
           )}
-        </div>
+        </FadingScrollbar>
 
         {isAddPeopleState && (
           <div className="add-participants__footer">
-            <Button disabled={!enabledAddAction} onClick={onAddParticipants} data-uie-name="do-create">
+            <Button type="button" disabled={!enabledAddAction} onClick={onAddParticipants} data-uie-name="do-create">
               {t('addParticipantsConfirmLabel')}
             </Button>
           </div>

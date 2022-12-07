@@ -17,37 +17,31 @@
  *
  */
 
-import {FC, useCallback, useEffect, useMemo, useState} from 'react';
+import {FC, useMemo, useState} from 'react';
 
-import type {QualifiedId} from '@wireapp/api-client/lib/user/';
-import {amplify} from 'amplify';
 import cx from 'classnames';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-
+import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
-import {UserSearchableList} from 'Components/UserSearchableList';
+import {UserList} from 'Components/UserList';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatLocale} from 'Util/TimeUtil';
 
+import {UsersReactions} from './UserReactions';
+
 import {ConversationRepository} from '../../../conversation/ConversationRepository';
 import {Conversation} from '../../../entity/Conversation';
 import {ContentMessage} from '../../../entity/message/ContentMessage';
-import {Message} from '../../../entity/message/Message';
 import {User} from '../../../entity/User';
-import {isContentMessage} from '../../../guards/Message';
 import {SuperType} from '../../../message/SuperType';
-import {SearchRepository} from '../../../search/SearchRepository';
-import {UserReactionMap} from '../../../storage';
-import {TeamRepository} from '../../../team/TeamRepository';
-import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {UserRepository} from '../../../user/UserRepository';
 import {PanelHeader} from '../PanelHeader';
+import {PanelEntity, PanelState} from '../RightSidebar';
 
 const MESSAGE_STATES = {
-  LIKES: 'likes',
-  NO_LIKES: 'no-likes',
+  REACTIONS: 'reactions',
+  NO_REACTIONS: 'no-reactions',
   NO_RECEIPTS: 'no-receipts',
   RECEIPTS: 'receipts',
   RECEIPTS_OFF: 'receipts-off',
@@ -65,29 +59,23 @@ interface MessageDetailsProps {
   onClose: () => void;
   conversationRepository: ConversationRepository;
   messageEntity: ContentMessage;
-  teamRepository: TeamRepository;
-  searchRepository: SearchRepository;
   userRepository: UserRepository;
-  showLikes?: boolean;
-  updateEntity: (message: Message) => void;
+  showReactions?: boolean;
+  selfUser: User;
+  togglePanel: (state: PanelState, entity: PanelEntity, addMode?: boolean) => void;
 }
 
 const MessageDetails: FC<MessageDetailsProps> = ({
   activeConversation,
   conversationRepository,
   messageEntity,
-  teamRepository,
-  searchRepository,
-  showLikes = false,
+  showReactions = false,
   userRepository,
+  selfUser,
   onClose,
-  updateEntity,
+  togglePanel,
 }) => {
-  const [receiptUsers, setReceiptUsers] = useState<User[]>([]);
-  const [likeUsers, setLikeUsers] = useState<User[]>([]);
-  const [messageId, setMessageId] = useState<string>(messageEntity.id);
-
-  const [isReceiptsOpen, setIsReceiptsOpen] = useState<boolean>(!showLikes);
+  const [isReceiptsOpen, setIsReceiptsOpen] = useState<boolean>(!showReactions);
 
   const {
     timestamp,
@@ -96,11 +84,16 @@ const MessageDetails: FC<MessageDetailsProps> = ({
     readReceipts,
     edited_timestamp: editedTimestamp,
   } = useKoSubscribableChildren(messageEntity, ['timestamp', 'user', 'reactions', 'readReceipts', 'edited_timestamp']);
+  const totalNbReactions = reactions.reduce((acc, [, users]) => acc + users.length, 0);
 
-  const teamId = activeConversation.team_id;
+  const teamId = activeConversation.teamId;
   const supportsReceipts = messageSender.isMe && teamId;
 
-  const supportsLikes = useMemo(() => {
+  const receiptUsers = userRepository
+    .findUsersByIds(readReceipts.map(({userId, domain}) => ({domain: domain || '', id: userId})))
+    .sort(sortUsers);
+
+  const supportsReactions = useMemo(() => {
     const isPing = messageEntity.super_type === SuperType.PING;
     const isEphemeral = messageEntity?.isEphemeral();
 
@@ -116,23 +109,10 @@ const MessageDetails: FC<MessageDetailsProps> = ({
       return receiptUsers.length ? MESSAGE_STATES.RECEIPTS : MESSAGE_STATES.NO_RECEIPTS;
     }
 
-    return likeUsers.length ? MESSAGE_STATES.LIKES : MESSAGE_STATES.NO_LIKES;
-  }, [supportsReceipts, isReceiptsOpen, messageEntity, receiptUsers, likeUsers]);
-
-  const getLikes = useCallback(async (reactions: UserReactionMap) => {
-    const currentLikes = Object.keys(reactions);
-    const usersLikes = await userRepository.getUsersById(currentLikes.map(likeId => ({domain: '', id: likeId})));
-    const sortedUsersLikes = usersLikes.sort(sortUsers);
-
-    setLikeUsers(sortedUsersLikes);
-  }, []);
+    return reactions.length > 0 ? MESSAGE_STATES.REACTIONS : MESSAGE_STATES.NO_REACTIONS;
+  }, [supportsReceipts, isReceiptsOpen, reactions.length, messageEntity.expectsReadConfirmation, receiptUsers.length]);
 
   const receiptTimes = useMemo(() => {
-    const userIds: QualifiedId[] = readReceipts.map(({userId, domain}) => ({domain: domain || '', id: userId}));
-    userRepository.getUsersById(userIds).then((users: User[]) => {
-      setReceiptUsers(users.sort(sortUsers));
-    });
-
     return readReceipts.reduce<Record<string, string>>((times, {userId, time}) => {
       times[userId] = formatTime(time);
       return times;
@@ -145,49 +125,29 @@ const MessageDetails: FC<MessageDetailsProps> = ({
     'messageDetailsTitleReceipts',
     messageEntity?.expectsReadConfirmation ? formatUserCount(receiptUsers) : '',
   );
-  const likesTitle = t('messageDetailsTitleLikes', formatUserCount(likeUsers));
+  const reactionsTitle = t('messageDetailsTitleReactions', totalNbReactions > 0 ? ` (${totalNbReactions})` : '');
 
   const panelTitle = useMemo(() => {
     if (!supportsReceipts) {
-      return likesTitle;
+      return reactionsTitle;
     }
 
-    if (!supportsLikes) {
+    if (!supportsReactions) {
       return receiptsTitle;
     }
 
     return t('messageDetailsTitle');
-  }, [supportsReceipts, supportsLikes, likesTitle, receiptsTitle]);
+  }, [supportsReceipts, supportsReactions, reactionsTitle, receiptsTitle]);
 
-  const showTabs = supportsReceipts && supportsLikes;
+  const showTabs = supportsReceipts && supportsReactions;
 
   const editedFooter = editedTimestamp ? formatTime(editedTimestamp) : '';
 
   const onReceipts = () => setIsReceiptsOpen(true);
 
-  const onLikes = () => setIsReceiptsOpen(false);
+  const onReactions = () => setIsReceiptsOpen(false);
 
-  useEffect(() => {
-    if (supportsLikes && reactions) {
-      getLikes(reactions);
-    }
-  }, [getLikes, supportsLikes, reactions]);
-
-  useEffect(() => {
-    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, (oldId: string, updatedMessageEntity: Message) => {
-      // listen for any changes to local message entities.
-      // if the id of the message being viewed has changed, we store the new ID.
-      if (oldId === messageId) {
-        updateEntity(updatedMessageEntity);
-        setMessageId(updatedMessageEntity.id);
-
-        if (supportsLikes && isContentMessage(updatedMessageEntity)) {
-          const messageReactions = updatedMessageEntity.reactions();
-          getLikes(messageReactions);
-        }
-      }
-    });
-  }, [messageId, supportsLikes]);
+  const onParticipantClick = (userEntity: User) => togglePanel(PanelState.GROUP_PARTICIPANT_USER, userEntity);
 
   return (
     <div id="message-details" className="panel__page message-details">
@@ -201,77 +161,76 @@ const MessageDetails: FC<MessageDetailsProps> = ({
       {showTabs && (
         <div className="panel__tabs">
           <button
+            className={cx('panel__tab button-reset-default', {'panel__tab--active': !isReceiptsOpen})}
+            onClick={onReactions}
+            data-uie-name="message-details-reaction-tab"
+          >
+            {reactionsTitle}
+          </button>
+          <button
             className={cx('panel__tab button-reset-default', {'panel__tab--active': isReceiptsOpen})}
             onClick={onReceipts}
             data-uie-name="message-details-read-tab"
           >
             {receiptsTitle}
           </button>
-          <button
-            className={cx('panel__tab button-reset-default', {'panel__tab--active': !isReceiptsOpen})}
-            onClick={onLikes}
-            data-uie-name="message-details-like-tab"
-          >
-            {likesTitle}
-          </button>
         </div>
       )}
 
-      <div className="panel__content" ref={initFadingScrollbar} style={{flexGrow: 1}}>
+      <FadingScrollbar className="panel__content" style={{flexGrow: 1}}>
         {messageState === MESSAGE_STATES.RECEIPTS && (
-          <UserSearchableList
-            dataUieName="read-list"
-            users={receiptUsers}
-            infos={receiptTimes}
-            noUnderline
-            conversationRepository={conversationRepository}
-            searchRepository={searchRepository}
-            teamRepository={teamRepository}
-          />
+          <div data-uie-name="read-list">
+            <UserList
+              selfUser={selfUser}
+              users={receiptUsers}
+              infos={receiptTimes}
+              noUnderline
+              conversationRepository={conversationRepository}
+              onClick={onParticipantClick}
+            />
+          </div>
         )}
 
-        {messageState === MESSAGE_STATES.LIKES && (
-          <UserSearchableList
-            dataUieName="like-list"
-            users={likeUsers}
-            noUnderline
-            conversationRepository={conversationRepository}
-            searchRepository={searchRepository}
-            teamRepository={teamRepository}
+        {messageState === MESSAGE_STATES.REACTIONS && (
+          <UsersReactions
+            reactions={reactions}
+            selfUser={selfUser}
+            findUsers={ids => userRepository.findUsersByIds(ids)}
+            onParticipantClick={onParticipantClick}
           />
         )}
 
         {messageState === MESSAGE_STATES.NO_RECEIPTS && (
           <div className="message-details__empty" data-uie-name="message-details-no-receipts-placeholder">
             <Icon.Read className="message-details__empty__icon" />
-            <div className="message-details__empty__text">{t('messageDetailsNoReceipts')}</div>
+            <p className="message-details__empty__text">{t('messageDetailsNoReceipts')}</p>
           </div>
         )}
 
-        {messageState === MESSAGE_STATES.NO_LIKES && (
-          <div className="message-details__empty" data-uie-name="message-details-no-likes-placeholder">
+        {messageState === MESSAGE_STATES.NO_REACTIONS && (
+          <div className="message-details__empty" data-uie-name="message-details-no-reactions-placeholder">
             <Icon.Like className="message-details__empty__icon" />
-            <div className="message-details__empty__text">{t('messageDetailsNoLikes')}</div>
+            <p className="message-details__empty__text">{t('messageDetailsNoReactions')}</p>
           </div>
         )}
 
         {messageState === MESSAGE_STATES.RECEIPTS_OFF && (
           <div className="message-details__empty" data-uie-name="message-details-receipts-off-placeholder">
             <Icon.Read className="message-details__empty__icon" />
-            <div className="message-details__empty__text">{t('messageDetailsReceiptsOff')}</div>
+            <p className="message-details__empty__text">{t('messageDetailsReceiptsOff')}</p>
           </div>
         )}
-      </div>
+      </FadingScrollbar>
 
       <div className="panel__footer">
-        <div className="panel__footer__info" data-uie-name="status-message-details-sent">
+        <p className="panel__footer__info" data-uie-name="status-message-details-sent">
           {t('messageDetailsSent', sentFooter)}
-        </div>
+        </p>
 
         {editedFooter && (
-          <div className="panel__footer__info" data-uie-name="status-message-details-edited">
+          <p className="panel__footer__info" data-uie-name="status-message-details-edited">
             {t('messageDetailsEdited', editedFooter)}
-          </div>
+          </p>
         )}
       </div>
     </div>

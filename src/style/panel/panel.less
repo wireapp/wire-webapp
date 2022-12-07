@@ -136,14 +136,15 @@
   }
 
   &__info-text {
-    .subline;
+    > .participant-devices__link {
+      display: block;
+    }
+
     &:focus-visible {
       .focus-outline;
       .focus-offset;
       .focus-border-radius;
     }
-
-    color: var(--gray-90);
 
     body.theme-dark & {
       color: var(--gray-50);
@@ -158,6 +159,7 @@
     }
 
     &--head {
+      display: block;
       font-weight: @font-weight-bold;
       text-transform: uppercase;
     }
@@ -193,77 +195,6 @@
     svg {
       path {
         fill: currentColor;
-      }
-    }
-
-    &__option {
-      min-height: auto;
-      flex-shrink: 0;
-
-      &:not(:last-of-type) {
-        margin-bottom: 25px;
-      }
-
-      body.theme-dark & {
-        input {
-          & + span {
-            &::before {
-              border: @radio-border-width solid var(--gray-60);
-              background-color: var(--gray-90);
-            }
-          }
-
-          &:checked + span::before {
-            border: @radio-selected-border-width solid var(--accent-color-500);
-            background-color: var(--gray-90);
-          }
-
-          &:hover + span::before {
-            border-color: var(--accent-color-500);
-          }
-        }
-      }
-
-      input {
-        display: none;
-
-        & + span {
-          display: flex;
-          align-items: center;
-          .text-light;
-
-          &::before {
-            display: inline-block;
-            width: @radio-size;
-            height: @radio-size;
-            box-sizing: border-box;
-            border: @radio-border-width solid var(--gray-80);
-            border-radius: 50%;
-            margin-right: 16px;
-            background-color: var(--white);
-            content: '';
-            cursor: pointer;
-            transition: all 0.15s;
-          }
-        }
-
-        &:checked + span::before {
-          border: @radio-selected-border-width solid var(--accent-color-500);
-          background-color: var(--white);
-        }
-
-        &:hover + span::before {
-          border-color: var(--accent-color-500);
-        }
-
-        &:disabled {
-          color: var(--foreground);
-          cursor: default;
-
-          & + span::before {
-            display: none;
-          }
-        }
       }
     }
 

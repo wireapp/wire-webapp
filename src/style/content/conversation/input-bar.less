@@ -32,15 +32,22 @@
     padding-right: 8px;
     background-color: var(--input-bar-bg);
 
-    &--editing {
+    &--editing,
+    &--editing .editor-container {
       background-color: var(--text-input-editing);
       transition: background-color @animation-timing-faster @ease-in-quad;
     }
   }
 }
 
-.conversation-input-bar-text,
-.shadow-input {
+.conversation-input-bar-text-placeholder::before {
+  padding-left: 8px;
+  color: var(--text-input-placeholder);
+  content: attr(data-placeholder);
+  .label-xs;
+}
+
+.conversation-input-bar-text {
   .accent-selection;
   .reset-textarea;
 
@@ -48,7 +55,7 @@
   max-width: calc(
     @conversation-max-width - @conversation-message-sender-width - var(--conversation-message-timestamp-width)
   );
-  height: @conversation-input-line-height;
+  height: auto;
   min-height: @conversation-input-line-height;
   max-height: @conversation-input-max-height;
   flex: 1 1;
@@ -61,6 +68,10 @@
   overflow-y: auto;
   text-rendering: optimizeLegibility;
 
+  .input-mention {
+    color: var(--accent-color);
+  }
+
   &::placeholder {
     .label-xs;
 
@@ -72,21 +83,9 @@
     }
   }
 
+  &--accent,
   &--accent::placeholder {
-    color: var(--accent-color);
-  }
-}
-
-@supports (caret-color: #000) {
-  .conversation-input-bar-text {
-    caret-color: var(--accent-color);
-    color: transparent;
-  }
-}
-
-@supports not (caret-color: #000) {
-  .conversation-input-bar-text {
-    -webkit-text-fill-color: transparent;
+    color: var(--accent-color) !important;
   }
 }
 
@@ -103,21 +102,6 @@
   width: 100%;
   flex: 1 1;
   align-items: center;
-
-  .shadow-input {
-    position: absolute;
-    top: 0;
-    right: 0;
-    left: 0;
-    height: auto;
-    overflow-wrap: break-word;
-    pointer-events: none;
-    white-space: pre-wrap;
-
-    .input-mention {
-      color: var(--accent-color);
-    }
-  }
 }
 
 .controls-right {
@@ -325,13 +309,10 @@
     font-weight: @font-weight-bold;
 
     .edit-icon {
+      width: 8px;
+      height: 8px;
       margin-left: 4px;
-
-      svg {
-        width: 8px;
-        height: 8px;
-        fill: var(--background-fade-40);
-      }
+      fill: var(--background-fade-40);
     }
   }
 
@@ -340,7 +321,7 @@
     max-width: @conversation-message-max-width;
     margin-top: 4px;
     font-size: @font-size-medium;
-    font-weight: @font-weight-light;
+    font-weight: @font-weight-regular;
     text-overflow: ellipsis;
     white-space: nowrap;
 

@@ -22,13 +22,13 @@ import 'core-js/full/object';
 import 'core-js/full/reflect';
 
 // eslint-disable-next-line import/order
-import React from 'react';
+import {FC} from 'react';
 
-import cookieStore from 'js-cookie';
 import {createRoot} from 'react-dom/client';
-import {Provider, ConnectedComponent} from 'react-redux';
+import {Provider} from 'react-redux';
 import {container} from 'tsyringe';
 
+import {initializeDataDog} from 'Util/DataDog';
 import {enableLogging} from 'Util/LoggerUtil';
 import {exposeWrapperGlobals} from 'Util/wrapper';
 
@@ -43,6 +43,8 @@ import {Core} from '../service/CoreSingleton';
 
 exposeWrapperGlobals();
 
+const mainId = 'main';
+
 const apiClient = container.resolve(APIClient);
 const core = container.resolve(Core);
 
@@ -54,23 +56,30 @@ try {
 const store = configureStore({
   actions: actionRoot,
   apiClient,
-  cookieStore,
   core,
   getConfig: Config.getConfig,
   localStorage,
 });
 
-const Wrapper = (Component: ConnectedComponent<React.FunctionComponent, any>): JSX.Element => (
-  <Provider store={store}>
-    <Component />
-  </Provider>
-);
-
-const render = (Component: ConnectedComponent<React.FunctionComponent, any>): void => {
-  createRoot(document.getElementById('main')).render(Wrapper(Component));
+const render = (Component: FC): void => {
+  const container = document.getElementById(mainId);
+  if (!container) {
+    throw new Error(`No container '${mainId}' found to render application`);
+  }
+  createRoot(container).render(
+    <Provider store={store}>
+      <Component />
+    </Provider>,
+  );
 };
 
-function runApp(): void {
+const config = Config.getConfig();
+
+async function runApp() {
+  const [min, max] = config.SUPPORTED_API_RANGE;
+  const {domain} = await core.useAPIVersion(min, max, config.ENABLE_DEV_BACKEND_API);
+  await initializeDataDog(config, {domain: domain});
+
   render(Root);
   if (module.hot) {
     module.hot.accept('./page/Root', () => {
@@ -79,5 +88,5 @@ function runApp(): void {
   }
 }
 
-enableLogging(Config.getConfig().FEATURE.ENABLE_DEBUG);
+enableLogging(config);
 runApp();

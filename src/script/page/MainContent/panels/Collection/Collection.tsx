@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 
 import {amplify} from 'amplify';
 
@@ -40,6 +40,7 @@ import {Category, isOfCategory} from './utils';
 import {AssetRepository} from '../../../../assets/AssetRepository';
 import {MessageRepository} from '../../../../conversation/MessageRepository';
 import {Conversation} from '../../../../entity/Conversation';
+import {User} from '../../../../entity/User';
 import {MessageCategory} from '../../../../message/MessageCategory';
 
 interface CollectionDetailsProps {
@@ -47,6 +48,7 @@ interface CollectionDetailsProps {
   conversationRepository: ConversationRepository;
   assetRepository: AssetRepository;
   messageRepository: MessageRepository;
+  selfUser: User;
 }
 
 type Categories = Record<Category, ContentMessage[]>;
@@ -78,12 +80,13 @@ function splitIntoCategories(messages: ContentMessage[]): Categories {
   );
 }
 
-const Collection: React.FC<CollectionDetailsProps> = ({
+const Collection = ({
   conversation,
   conversationRepository,
   assetRepository,
   messageRepository,
-}) => {
+  selfUser,
+}: CollectionDetailsProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const {display_name} = useKoSubscribableChildren(conversation, ['display_name']);
   const [messages, setMessages] = useState<ContentMessage[]>([]);
@@ -131,6 +134,7 @@ const Collection: React.FC<CollectionDetailsProps> = ({
       conversationRepository,
       currentMessageEntity: message,
       messageRepository,
+      selfUser,
     });
   };
 
@@ -182,7 +186,7 @@ const Collection: React.FC<CollectionDetailsProps> = ({
         onSelect={() => setDetailCategory('files')}
         label={t('collectionSectionFiles')}
       >
-        <span className={`collection-header-icon icon-link`}></span>
+        <span className={`collection-header-icon icon-file`}></span>
       </CollectionSection>
     </>
   );

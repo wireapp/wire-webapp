@@ -17,23 +17,16 @@
  *
  */
 
-import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/lib/event/';
+import {BackendEvent, CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/lib/event/';
 
-import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
-
-import {AssetTransferState} from 'src/script/assets/AssetTransferState';
-import {EventError} from 'src/script/error/EventError';
 import {ClientEvent} from 'src/script/event/Client';
 import {EventRepository} from 'src/script/event/EventRepository';
 import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
-import {createRandomUuid} from 'Util/util';
 
-import {EventService} from './EventService';
 import {EventSource} from './EventSource';
 
 import {TestFactory} from '../../../test/helper/TestFactory';
-import {StatusType} from '../message/StatusType';
-import {EventRecord} from '../storage';
+import {ClientConversationEvent} from '../conversation/EventBuilder';
 
 const testFactory = new TestFactory();
 
@@ -44,95 +37,43 @@ describe('EventRepository', () => {
     return testFactory.exposeEventActors();
   });
 
-  describe('getCommonMessageUpdates', () => {
-    /** @see https://wearezeta.atlassian.net/browse/SQCORE-732 */
-    it('does not overwrite the seen status if a message gets edited', () => {
-      const originalEvent = {
-        category: 16,
-        conversation: 'a7f1187e-9396-44c9-8242-db9d3051dc89',
-        data: {
-          content: 'Original Text Which Has Been Seen By Someone Else',
-          expects_read_confirmation: true,
-          legal_hold_status: 1,
-          mentions: [],
-          previews: [],
-        },
-        from: '24de8432-03ba-439f-88f8-95bdc68b7bdd',
-        from_client_id: '79618bbe93e6821c',
-        id: 'c6269e58-fa82-4f6e-8264-263e09154871',
-        primary_key: '17',
-        read_receipts: [
-          {
-            time: '2021-06-10T19:47:19.570Z',
-            userId: 'b661e27f-24c6-4c52-a425-87a7b7f3df61',
-          },
-        ],
-        status: StatusType.SEEN,
-        time: '2021-06-10T19:47:16.071Z',
-        type: 'conversation.message-add',
-      } as EventRecord;
-
-      const editedEvent = {
-        conversation: 'a7f1187e-9396-44c9-8242-db9d3051dc89',
-        data: {
-          content: 'Edited Text Which Replaces The Original Text',
-          expects_read_confirmation: true,
-          mentions: [],
-          previews: [],
-          replacing_message_id: 'c6269e58-fa82-4f6e-8264-263e09154871',
-        },
-        from: '24de8432-03ba-439f-88f8-95bdc68b7bdd',
-        from_client_id: '79618bbe93e6821c',
-        id: 'caff044b-cb9c-47c6-833a-d4b76c678bcd',
-        status: StatusType.SENT,
-        time: '2021-06-10T19:47:23.706Z',
-        type: 'conversation.message-add',
-      } as EventRecord;
-
-      const updatedEvent = EventRepository['getCommonMessageUpdates'](originalEvent, editedEvent);
-      expect(updatedEvent.data.content).toBe('Edited Text Which Replaces The Original Text');
-      expect(updatedEvent.status).toBe(StatusType.SEEN);
-      expect(Object.keys(updatedEvent.read_receipts).length).toBe(1);
-    });
-  });
-
   describe('handleEvent', () => {
     beforeEach(() => {
-      testFactory.event_repository.notificationHandlingState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
-      jest
-        .spyOn(testFactory.event_service, 'saveEvent')
-        .mockReturnValue(Promise.resolve({data: 'dummy content'} as EventRecord));
-      spyOn<any>(testFactory.event_repository, 'distributeEvent');
+      testFactory.event_repository!.notificationHandlingState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+      spyOn<any>(testFactory.event_repository!, 'distributeEvent');
     });
 
     it('should not save but distribute "user.*" events', () => {
-      return testFactory.event_repository['handleEvent'](
-        {event: {type: USER_EVENT.UPDATE} as EventRecord},
-        EventSource.NOTIFICATION_STREAM,
-      ).then(() => {
-        expect(testFactory.event_service.saveEvent).not.toHaveBeenCalled();
-        expect(testFactory.event_repository['distributeEvent']).toHaveBeenCalled();
-      });
+      return testFactory
+        .event_repository!['handleEvent'](
+          {event: {type: USER_EVENT.UPDATE, user: {id: ''}}},
+          EventSource.NOTIFICATION_STREAM,
+        )
+        .then(() => {
+          expect(testFactory.event_repository!['distributeEvent']).toHaveBeenCalled();
+        });
     });
 
     it('should not save but distribute "call.*" events', () => {
-      return testFactory.event_repository['handleEvent'](
-        {event: {type: ClientEvent.CALL.E_CALL} as EventRecord},
-        EventSource.NOTIFICATION_STREAM,
-      ).then(() => {
-        expect(testFactory.event_service.saveEvent).not.toHaveBeenCalled();
-        expect(testFactory.event_repository['distributeEvent']).toHaveBeenCalled();
-      });
+      return testFactory
+        .event_repository!['handleEvent'](
+          {event: {type: ClientEvent.CALL.E_CALL} as any},
+          EventSource.NOTIFICATION_STREAM,
+        )
+        .then(() => {
+          expect(testFactory.event_repository!['distributeEvent']).toHaveBeenCalled();
+        });
     });
 
     it('should not save but distribute "conversation.create" events', () => {
-      return testFactory.event_repository['handleEvent'](
-        {event: {type: CONVERSATION_EVENT.CREATE} as EventRecord},
-        EventSource.NOTIFICATION_STREAM,
-      ).then(() => {
-        expect(testFactory.event_service.saveEvent).not.toHaveBeenCalled();
-        expect(testFactory.event_repository['distributeEvent']).toHaveBeenCalled();
-      });
+      return testFactory
+        .event_repository!['handleEvent'](
+          {event: {type: CONVERSATION_EVENT.CREATE} as any},
+          EventSource.NOTIFICATION_STREAM,
+        )
+        .then(() => {
+          expect(testFactory.event_repository!['distributeEvent']).toHaveBeenCalled();
+        });
     });
 
     it('accepts "conversation.rename" events', () => {
@@ -143,11 +84,10 @@ describe('EventRepository', () => {
         id: '7.800122000b2f7cca',
         time: '2016-08-09T11:57:37.498Z',
         type: 'conversation.rename',
-      } as EventRecord;
+      } as BackendEvent;
 
-      return testFactory.event_repository['handleEvent']({event}, EventSource.NOTIFICATION_STREAM).then(() => {
-        expect(testFactory.event_service.saveEvent).toHaveBeenCalled();
-        expect(testFactory.event_repository['distributeEvent']).toHaveBeenCalled();
+      return testFactory.event_repository!['handleEvent']({event}, EventSource.NOTIFICATION_STREAM).then(() => {
+        expect(testFactory.event_repository!['distributeEvent']).toHaveBeenCalled();
       });
     });
 
@@ -159,51 +99,45 @@ describe('EventRepository', () => {
         id: '8.800122000b2f7d20',
         time: '2016-08-09T12:01:14.688Z',
         type: 'conversation.member-join',
-      } as EventRecord;
+      } as BackendEvent;
 
-      return testFactory.event_repository['handleEvent']({event}, EventSource.NOTIFICATION_STREAM).then(() => {
-        expect(testFactory.event_service.saveEvent).toHaveBeenCalled();
-        expect(testFactory.event_repository['distributeEvent']).toHaveBeenCalled();
+      return testFactory.event_repository!['handleEvent']({event}, EventSource.NOTIFICATION_STREAM).then(() => {
+        expect(testFactory.event_repository!['distributeEvent']).toHaveBeenCalled();
       });
     });
 
     it('accepts "conversation.member-leave" events', () => {
       const event = {
         conversation: '64dcb45f-bf8d-4eac-a263-649a60d69305',
-        data: {user_ids: ['e47bfafa-03dc-43ed-aadb-ad6c4d9f3d86']},
+        data: {user_ids: ['e47bfafa-03dc-43ed-aadb-ad6c4d9f3d86'], qualified_user_ids: []},
         from: '532af01e-1e24-4366-aacf-33b67d4ee376',
         id: '9.800122000b3d69bc',
         time: '2016-08-09T12:01:56.363Z',
         type: 'conversation.member-leave',
-      } as EventRecord;
+      } as BackendEvent;
 
-      return testFactory.event_repository['handleEvent']({event}, EventSource.NOTIFICATION_STREAM).then(() => {
-        expect(testFactory.event_service.saveEvent).toHaveBeenCalled();
-        expect(testFactory.event_repository['distributeEvent']).toHaveBeenCalled();
+      return testFactory.event_repository!['handleEvent']({event}, EventSource.NOTIFICATION_STREAM).then(() => {
+        expect(testFactory.event_repository!['distributeEvent']).toHaveBeenCalled();
       });
     });
 
     it('accepts "conversation.voice-channel-deactivate" (missed call) events', async () => {
-      const eventServiceSpy = {
-        loadEvent: jest.fn().mockImplementation(() => Promise.resolve()),
-        saveEvent: jest.fn().mockImplementation(() => Promise.resolve({data: 'dummy content'})),
-      } as unknown as EventService;
       const fakeProp: any = undefined;
-      const eventRepo = new EventRepository(eventServiceSpy, fakeProp, fakeProp, fakeProp);
+      const eventRepo = new EventRepository({} as any, fakeProp, fakeProp, fakeProp);
       eventRepo.notificationHandlingState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
       jest.spyOn<any, any>(eventRepo, 'distributeEvent').mockImplementation(() => {});
 
       const event = {
         conversation: '64dcb45f-bf8d-4eac-a263-649a60d69305',
-        data: {reason: 'missed'},
+        data: {reason: 'missed', duration: 0},
         from: '0410795a-58dc-40d8-b216-cbc2360be21a',
         id: '16.800122000b3d4ade',
         time: '2016-08-09T12:09:28.294Z',
         type: 'conversation.voice-channel-deactivate',
-      } as EventRecord;
+      } as any;
+
       await eventRepo['handleEvent']({event}, EventSource.NOTIFICATION_STREAM);
 
-      expect(eventServiceSpy.saveEvent).toHaveBeenCalled();
       expect(eventRepo['distributeEvent']).toHaveBeenCalled();
     });
 
@@ -211,388 +145,16 @@ describe('EventRepository', () => {
       const event = {
         conversation: '7f0939c8-dbd9-48f5-839e-b0ebcfffec8c',
         error: 'Offset is outside the bounds of the DataView (17cd13b4b2a3a98)',
-        errorCode: '1778 (17cd13b4b2a3a98)',
+        error_code: '1778 (17cd13b4b2a3a98)',
         from: '532af01e-1e24-4366-aacf-33b67d4ee376',
         id: 'f518d6ff-19d3-48a0-b0c1-cc71c6e81136',
         time: '2016-08-09T12:58:49.485Z',
         type: 'conversation.unable-to-decrypt',
-      } as unknown as EventRecord;
+      } as ClientConversationEvent;
 
-      return testFactory.event_repository['handleEvent']({event}, EventSource.NOTIFICATION_STREAM).then(() => {
-        expect(testFactory.event_service.saveEvent).toHaveBeenCalled();
-        expect(testFactory.event_repository['distributeEvent']).toHaveBeenCalled();
+      return testFactory.event_repository.injectEvent(event).then(() => {
+        expect(testFactory.event_repository!['distributeEvent']).toHaveBeenCalled();
       });
-    });
-  });
-
-  describe('processEvent', () => {
-    let event: EventRecord;
-    let previously_stored_event: EventRecord;
-
-    beforeEach(() => {
-      event = {
-        conversation: createRandomUuid(),
-        data: {
-          content: 'Lorem Ipsum',
-          previews: [],
-        },
-        from: createRandomUuid(),
-        id: createRandomUuid(),
-        time: new Date().toISOString(),
-        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
-      } as EventRecord;
-
-      jest
-        .spyOn(testFactory.event_service, 'saveEvent')
-        .mockImplementation(saved_event => Promise.resolve(saved_event));
-    });
-
-    it('saves an event with a previously not used ID', () => {
-      jest.spyOn(testFactory.event_service, 'loadEvent').mockClear();
-
-      return testFactory.event_repository['processEvent'](event, EventSource.NOTIFICATION_STREAM).then(() => {
-        expect(testFactory.event_service.saveEvent).toHaveBeenCalled();
-      });
-    });
-
-    it('ignores an event with an ID previously used by another user', () => {
-      previously_stored_event = JSON.parse(JSON.stringify(event));
-      previously_stored_event.from = createRandomUuid();
-      jest
-        .spyOn(testFactory.event_service, 'loadEvent')
-        .mockImplementation(() => Promise.resolve(previously_stored_event));
-
-      return testFactory.event_repository['processEvent'](event, EventSource.NOTIFICATION_STREAM)
-        .then(() => fail('Method should have thrown an error'))
-        .catch(error => {
-          expect(error).toEqual(jasmine.any(EventError));
-          expect(error.type).toBe(EventError.TYPE.VALIDATION_FAILED);
-          expect(testFactory.event_service.saveEvent).not.toHaveBeenCalled();
-        });
-    });
-
-    it('ignores a non-"text message" with an ID previously used by the same user', () => {
-      event.type = ClientEvent.CALL.E_CALL;
-      previously_stored_event = JSON.parse(JSON.stringify(event));
-      jest
-        .spyOn(testFactory.event_service, 'loadEvent')
-        .mockImplementation(() => Promise.resolve(previously_stored_event));
-
-      return testFactory.event_repository['handleEventSaving'](event)
-        .then(() => fail('Method should have thrown an error'))
-        .catch(error => {
-          expect(error).toEqual(jasmine.any(EventError));
-          expect(error.type).toBe(EventError.TYPE.VALIDATION_FAILED);
-          expect(testFactory.event_service.saveEvent).not.toHaveBeenCalled();
-        });
-    });
-
-    it('ignores a plain text message with an ID previously used by the same user for a non-"text message"', () => {
-      previously_stored_event = JSON.parse(JSON.stringify(event));
-      previously_stored_event.type = ClientEvent.CALL.E_CALL;
-      jest
-        .spyOn(testFactory.event_service, 'loadEvent')
-        .mockImplementation(() => Promise.resolve(previously_stored_event));
-
-      return testFactory.event_repository['processEvent'](event, EventSource.NOTIFICATION_STREAM)
-        .then(() => fail('Method should have thrown an error'))
-        .catch(error => {
-          expect(error).toEqual(jasmine.any(EventError));
-          expect(error.type).toBe(EventError.TYPE.VALIDATION_FAILED);
-          expect(testFactory.event_service.saveEvent).not.toHaveBeenCalled();
-        });
-    });
-
-    it('ignores a plain text message with an ID previously used by the same user', () => {
-      previously_stored_event = JSON.parse(JSON.stringify(event));
-      jest
-        .spyOn(testFactory.event_service, 'loadEvent')
-        .mockImplementation(() => Promise.resolve(previously_stored_event));
-
-      return testFactory.event_repository['processEvent'](event, EventSource.NOTIFICATION_STREAM)
-        .then(() => fail('Method should have thrown an error'))
-        .catch(error => {
-          expect(error).toEqual(jasmine.any(EventError));
-          expect(error.type).toBe(EventError.TYPE.VALIDATION_FAILED);
-          expect(testFactory.event_service.saveEvent).not.toHaveBeenCalled();
-        });
-    });
-
-    it('ignores a text message with link preview with an ID previously used by the same user for a text message with link preview', () => {
-      event.data.previews.push(1);
-      previously_stored_event = JSON.parse(JSON.stringify(event));
-      jest
-        .spyOn(testFactory.event_service, 'loadEvent')
-        .mockImplementation(() => Promise.resolve(previously_stored_event));
-
-      return testFactory.event_repository['processEvent'](event, EventSource.NOTIFICATION_STREAM)
-        .then(() => fail('Method should have thrown an error'))
-        .catch(error => {
-          expect(error).toEqual(jasmine.any(EventError));
-          expect(error.type).toBe(EventError.TYPE.VALIDATION_FAILED);
-          expect(testFactory.event_service.saveEvent).not.toHaveBeenCalled();
-        });
-    });
-
-    it('ignores a text message with link preview with an ID previously used by the same user for a text message different content', () => {
-      previously_stored_event = JSON.parse(JSON.stringify(event));
-      jest
-        .spyOn(testFactory.event_service, 'loadEvent')
-        .mockImplementation(() => Promise.resolve(previously_stored_event));
-
-      event.data.previews.push(1);
-      event.data.content = 'Ipsum loren';
-
-      return testFactory.event_repository['processEvent'](event, EventSource.NOTIFICATION_STREAM)
-        .then(() => fail('Method should have thrown an error'))
-        .catch(error => {
-          expect(error).toEqual(jasmine.any(EventError));
-          expect(error.type).toBe(EventError.TYPE.VALIDATION_FAILED);
-          expect(testFactory.event_service.saveEvent).not.toHaveBeenCalled();
-        });
-    });
-
-    it('saves a text message with link preview with an ID previously used by the same user for a plain text message', () => {
-      previously_stored_event = JSON.parse(JSON.stringify(event));
-      jest.spyOn(testFactory.event_service, 'loadEvent').mockImplementation(async () => previously_stored_event);
-      jest
-        .spyOn(testFactory.event_service, 'replaceEvent')
-        .mockImplementation(() => Promise.resolve(previously_stored_event));
-
-      const initial_time = event.time;
-      const changed_time = new Date(new Date(event.time).getTime() + 60 * 1000).toISOString();
-      event.data.previews.push(1);
-      event.time = changed_time;
-
-      return testFactory.event_repository['processEvent'](event, EventSource.NOTIFICATION_STREAM).then(saved_event => {
-        expect(saved_event.time).toEqual(initial_time);
-        expect(saved_event.time).not.toEqual(changed_time);
-        expect(saved_event.primary_key).toEqual(previously_stored_event.primary_key);
-        expect(testFactory.event_service.replaceEvent).toHaveBeenCalled();
-      });
-    });
-
-    it('ignores edit message with missing associated original message', () => {
-      const linkPreviewEvent = JSON.parse(JSON.stringify(event));
-      jest.spyOn(testFactory.event_service, 'loadEvent').mockImplementation(() => Promise.resolve({} as EventRecord));
-      jest
-        .spyOn(testFactory.event_service, 'replaceEvent')
-        .mockImplementation(() => Promise.resolve({} as EventRecord));
-
-      linkPreviewEvent.data.replacing_message_id = 'initial_message_id';
-
-      return testFactory.event_repository['handleEventSaving'](linkPreviewEvent)
-        .then(() => fail('Should have thrown an error'))
-        .catch(() => {
-          expect(testFactory.event_service.replaceEvent).not.toHaveBeenCalled();
-          expect(testFactory.event_service.saveEvent).not.toHaveBeenCalled();
-        });
-    });
-
-    it('updates edited messages when link preview arrives', () => {
-      const replacingId = 'old-replaced-message-id';
-      const storedEvent = {
-        ...event,
-        data: {...event.data, replacing_message_id: replacingId},
-      } as EventRecord;
-      const linkPreviewEvent = {...event};
-      jest
-        .spyOn(testFactory.event_service, 'loadEvent')
-        .mockImplementation((conversationId: string, messageId: string) => {
-          return messageId === replacingId ? Promise.resolve(undefined) : Promise.resolve(storedEvent);
-        });
-      jest
-        .spyOn(testFactory.event_service, 'replaceEvent')
-        .mockImplementation((ev: EventRecord) => Promise.resolve(ev));
-
-      linkPreviewEvent.data.replacing_message_id = replacingId;
-      linkPreviewEvent.data.previews = ['preview'];
-
-      return testFactory.event_repository['handleEventSaving'](linkPreviewEvent).then((updatedEvent: EventRecord) => {
-        expect(testFactory.event_service.replaceEvent).toHaveBeenCalled();
-        expect(testFactory.event_service.saveEvent).not.toHaveBeenCalled();
-        expect(updatedEvent.data.previews[0]).toEqual('preview');
-      });
-    });
-
-    it('updates edited messages', () => {
-      const originalMessage = JSON.parse(JSON.stringify(event));
-      originalMessage.reactions = ['user-id'];
-      jest
-        .spyOn(testFactory.event_service, 'loadEvent')
-        .mockImplementation(() => Promise.resolve(originalMessage as EventRecord));
-      jest
-        .spyOn(testFactory.event_service, 'replaceEvent')
-        .mockImplementation((updates: EventRecord) => Promise.resolve(updates));
-
-      const initial_time = event.time;
-      const changed_time = new Date(new Date(event.time).getTime() + 60 * 1000).toISOString();
-      originalMessage.primary_key = 12;
-      event.id = createRandomUuid();
-      event.data.content = 'new content';
-      event.data.replacing_message_id = originalMessage.id;
-      event.time = changed_time;
-
-      return testFactory.event_repository['handleEventSaving'](event).then((updatedEvent: EventRecord) => {
-        expect(updatedEvent.time).toEqual(initial_time);
-        expect(updatedEvent.time).not.toEqual(changed_time);
-        expect(updatedEvent.data.content).toEqual('new content');
-        expect(updatedEvent.primary_key).toEqual(originalMessage.primary_key);
-        expect(Object.keys(updatedEvent.reactions).length).toEqual(0);
-        expect(testFactory.event_service.replaceEvent).toHaveBeenCalled();
-      });
-    });
-
-    it('updates link preview when edited', () => {
-      const replacingId = 'replaced-message-id';
-      const storedEvent = {
-        ...event,
-        data: {...event.data, previews: ['preview']},
-      };
-      const editEvent = {...event};
-      jest.spyOn(testFactory.event_service, 'loadEvent').mockImplementation(() => Promise.resolve(storedEvent));
-      jest
-        .spyOn(testFactory.event_service, 'replaceEvent')
-        .mockImplementation((ev: EventRecord) => Promise.resolve(ev));
-
-      editEvent.data.replacing_message_id = replacingId;
-
-      return testFactory.event_repository['handleEventSaving'](editEvent).then((updatedEvent: EventRecord) => {
-        expect(testFactory.event_service.replaceEvent).toHaveBeenCalled();
-        expect(testFactory.event_service.saveEvent).not.toHaveBeenCalled();
-        expect(updatedEvent.data.previews.length).toEqual(0);
-      });
-    });
-
-    it('saves a conversation.asset-add event', () => {
-      const assetAddEvent = {...event, type: ClientEvent.CONVERSATION.ASSET_ADD};
-
-      jest.spyOn(testFactory.event_service, 'loadEvent').mockClear();
-
-      return testFactory.event_repository['processEvent'](assetAddEvent, EventSource.NOTIFICATION_STREAM).then(
-        updatedEvent => {
-          expect(updatedEvent.type).toEqual(ClientEvent.CONVERSATION.ASSET_ADD);
-          expect(testFactory.event_service.saveEvent).toHaveBeenCalled();
-        },
-      );
-    });
-
-    it('deletes cancelled conversation.asset-add event', async () => {
-      const fromIds = [
-        // cancel from an other user
-        createRandomUuid(),
-        // cancel from the self user
-        testFactory.user_repository['userState'].self().id,
-      ];
-
-      const loadEventSpy = jest.spyOn(testFactory.event_service, 'loadEvent');
-      const deleteEventSpy = jest.spyOn(testFactory.event_service, 'deleteEvent');
-      for (const fromId of fromIds) {
-        const assetAddEvent = {...event, from: fromId, type: ClientEvent.CONVERSATION.ASSET_ADD};
-        const assetCancelEvent = {
-          ...assetAddEvent,
-          data: {reason: ProtobufAsset.NotUploaded.CANCELLED, status: AssetTransferState.UPLOAD_FAILED},
-          time: '2017-09-06T09:43:36.528Z',
-        };
-
-        loadEventSpy.mockImplementation(() => Promise.resolve(assetAddEvent));
-        deleteEventSpy.mockImplementation(() => Promise.resolve(1));
-
-        const savedEvent = await testFactory.event_repository['processEvent'](
-          assetCancelEvent,
-          EventSource.NOTIFICATION_STREAM,
-        );
-        expect(savedEvent.type).toEqual(ClientEvent.CONVERSATION.ASSET_ADD);
-        expect(testFactory.event_service.deleteEvent).toHaveBeenCalled();
-      }
-    });
-
-    it('deletes other user failed upload for conversation.asset-add event', () => {
-      const assetAddEvent = {...event, type: ClientEvent.CONVERSATION.ASSET_ADD};
-      const assetUploadFailedEvent = {
-        ...assetAddEvent,
-        data: {reason: ProtobufAsset.NotUploaded.FAILED, status: AssetTransferState.UPLOAD_FAILED},
-        time: '2017-09-06T09:43:36.528Z',
-      };
-
-      jest.spyOn(testFactory.event_service, 'loadEvent').mockImplementation(() => Promise.resolve(assetAddEvent));
-      jest.spyOn(testFactory.event_service, 'deleteEvent').mockImplementation(() => Promise.resolve(1));
-
-      return testFactory.event_repository['processEvent'](assetUploadFailedEvent, EventSource.NOTIFICATION_STREAM).then(
-        savedEvent => {
-          expect(savedEvent.type).toEqual(ClientEvent.CONVERSATION.ASSET_ADD);
-          expect(testFactory.event_service.deleteEvent).toHaveBeenCalled();
-        },
-      );
-    });
-
-    it('updates self failed upload for conversation.asset-add event', async () => {
-      const assetAddEvent: EventRecord = {...event, type: ClientEvent.CONVERSATION.ASSET_ADD};
-      const assetUploadFailedEvent: EventRecord = {
-        ...assetAddEvent,
-        data: {reason: ProtobufAsset.NotUploaded.FAILED, status: AssetTransferState.UPLOAD_FAILED},
-        time: '2017-09-06T09:43:36.528Z',
-      };
-
-      jest
-        .spyOn(testFactory.event_repository['userState'], 'self')
-        .mockImplementation(() => ({id: assetAddEvent.from}));
-      jest.spyOn(testFactory.event_service, 'loadEvent').mockImplementation(() => Promise.resolve(assetAddEvent));
-      jest
-        .spyOn(testFactory.event_service, 'updateEventAsUploadFailed')
-        .mockImplementation(() => Promise.resolve(assetUploadFailedEvent));
-
-      const savedEvent = await testFactory.event_repository['processEvent'](
-        assetUploadFailedEvent,
-        EventSource.NOTIFICATION_STREAM,
-      );
-      expect(savedEvent.type).toEqual(ClientEvent.CONVERSATION.ASSET_ADD);
-      expect(testFactory.event_service.updateEventAsUploadFailed).toHaveBeenCalled();
-    });
-
-    it('handles conversation.asset-add state update event', () => {
-      const initialAssetEvent = {...event, type: ClientEvent.CONVERSATION.ASSET_ADD};
-
-      const updateStatusEvent = {
-        ...initialAssetEvent,
-        data: {status: AssetTransferState.UPLOADED},
-        time: '2017-09-06T09:43:36.528Z',
-      };
-
-      jest
-        .spyOn(testFactory.event_service, 'replaceEvent')
-        .mockImplementation(eventToUpdate => Promise.resolve(eventToUpdate));
-      jest.spyOn(testFactory.event_service, 'loadEvent').mockImplementation(() => Promise.resolve(initialAssetEvent));
-
-      return testFactory.event_repository['processEvent'](updateStatusEvent, EventSource.NOTIFICATION_STREAM).then(
-        updatedEvent => {
-          expect(updatedEvent.type).toEqual(ClientEvent.CONVERSATION.ASSET_ADD);
-          expect(updatedEvent.data.status).toEqual(updateStatusEvent.data.status);
-          expect(testFactory.event_service.replaceEvent).toHaveBeenCalled();
-        },
-      );
-    });
-
-    it('updates video when preview is received', () => {
-      const initialAssetEvent = {...event, type: ClientEvent.CONVERSATION.ASSET_ADD};
-
-      const AssetPreviewEvent = {
-        ...initialAssetEvent,
-        data: {status: AssetTransferState.UPLOADED},
-        time: '2017-09-06T09:43:36.528Z',
-      };
-
-      jest
-        .spyOn(testFactory.event_service, 'replaceEvent')
-        .mockImplementation(eventToUpdate => Promise.resolve(eventToUpdate));
-      jest.spyOn(testFactory.event_service, 'loadEvent').mockImplementation(() => Promise.resolve(initialAssetEvent));
-
-      return testFactory.event_repository['processEvent'](AssetPreviewEvent, EventSource.NOTIFICATION_STREAM).then(
-        (updatedEvent: EventRecord) => {
-          expect(updatedEvent.type).toEqual(ClientEvent.CONVERSATION.ASSET_ADD);
-          expect(testFactory.event_service.replaceEvent).toHaveBeenCalled();
-        },
-      );
     });
   });
 });

@@ -20,9 +20,8 @@
 /**
  * Gives back the browser's instance of localstorage if present.
  * Will prevent failing if localStorage is not accessible because cookies are disabled
- * @returns {any}
  */
-export function getStorage() {
+export function getStorage(): Storage | undefined {
   try {
     /**
      * If users disable cookies in their browsers, they won't have access to the localStorage API.
@@ -34,4 +33,18 @@ export function getStorage() {
   } catch (error) {
     return undefined;
   }
+}
+
+/**
+ * Clears all keys starting with the given prefix from the given storage
+ * Supports storages with the web storage API (localStorage, sessionStorage)
+ * @param prefix string
+ * @param storage Storage
+ */
+export function clearKeysStartingWith(prefix: string, storage: Storage): void {
+  Object.keys(storage)
+    .filter(item => item.startsWith(prefix))
+    .forEach(item => {
+      storage.removeItem(item);
+    });
 }

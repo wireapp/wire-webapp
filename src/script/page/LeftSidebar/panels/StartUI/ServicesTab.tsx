@@ -19,8 +19,10 @@
 
 import React, {useState} from 'react';
 
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
+
 import {Icon} from 'Components/Icon';
-import {ServiceList} from 'Components/ServiceList';
+import {ServiceList} from 'Components/ServiceList/ServiceList';
 import {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {t} from 'Util/LocalizerUtil';
@@ -73,7 +75,8 @@ export const ServicesTab: React.FC<{
               </li>
             </ul>
           )}
-          <ServiceList arrow click={onClickService} noUnderline services={services} />
+
+          <ServiceList onServiceClick={onClickService} services={services} />
         </>
       )}
       {services.length === 0 && !isInitial && (
@@ -81,19 +84,22 @@ export const ServicesTab: React.FC<{
           <span className="search__no-services__icon">
             <Icon.Service />
           </span>
+
           {canManageServices && manageServicesUrl ? (
             <>
               <div className="search__no-services__info" data-uie-name="label-no-services-enabled-manager">
                 {t('searchNoServicesManager')}
               </div>
-              <button
-                className="search__no-services__manage-button"
+
+              <Button
+                variant={ButtonVariant.TERTIARY}
                 type="button"
                 onClick={openManageServices}
                 data-uie-name="go-enable-services"
+                style={{marginTop: '1em'}}
               >
                 {t('searchManageServicesNoResults')}
-              </button>
+              </Button>
             </>
           ) : (
             <div className="search__no-services__info" data-uie-name="label-no-services-enabled">

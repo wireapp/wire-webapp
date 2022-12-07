@@ -20,6 +20,8 @@
 import React from 'react';
 
 import {render} from '@testing-library/react';
+import type {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {RecursivePartial} from '@wireapp/commons/lib/util/TypeUtil';
 import {IntlProvider} from 'react-intl';
 import {Provider} from 'react-redux';
@@ -30,18 +32,21 @@ import {ThunkDispatch} from 'redux-thunk';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
+import {User} from 'src/script/entity/User';
+import {createUuid} from 'Util/uuid';
+
 import {Api, RootState} from '../../module/reducer';
 
-export const withStore = (
+const withStore = (
   children: React.ReactNode,
   store: MockStoreEnhanced<RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
 ) => <Provider store={store}>{children}</Provider>;
 
+const withRouter = (component: React.ReactNode) => <Router>{component}</Router>;
+
 export const withIntl = (component: React.ReactNode) => <IntlProvider locale="en">{component}</IntlProvider>;
 
 export const withTheme = (component: React.ReactNode) => <StyledApp themeId={THEME_ID.DEFAULT}>{component}</StyledApp>;
-
-export const withRouter = (component: React.ReactNode) => <Router>{component}</Router>;
 
 const wrapComponent = (
   component: React.ReactNode,
@@ -52,3 +57,31 @@ export const mountComponent = (
   component: React.ReactNode,
   store: MockStoreEnhanced<RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
 ) => render(wrapComponent(component, store));
+
+export function generateUsers(nbUsers: number, domain: string) {
+  const users: User[] = [];
+  for (let i = 0; i < nbUsers; i++) {
+    const user = new User(createUuid(), domain);
+    user.name(`User ${i}`);
+    users.push(user);
+  }
+  return users;
+}
+
+export function generateUserClients(users: User[]): QualifiedUserClients {
+  const userClients: QualifiedUserClients = {};
+  users.forEach(user => {
+    const domainUsers = userClients[user.qualifiedId.domain] || {};
+    domainUsers[user.qualifiedId.id] = [];
+    userClients[user.qualifiedId.domain] = domainUsers;
+  });
+  return userClients;
+}
+
+export function generateQualifiedIds(nbUsers: number, domain: string) {
+  const users: QualifiedId[] = [];
+  for (let i = 0; i < nbUsers; i++) {
+    users.push({id: createUuid(), domain});
+  }
+  return users;
+}

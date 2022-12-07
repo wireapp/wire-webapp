@@ -24,14 +24,14 @@ import {act, render, waitFor} from '@testing-library/react';
 import {Conversation} from 'src/script/entity/Conversation';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {User} from 'src/script/entity/User';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {Text} from '../../entity/message/Text';
 
 import {MessagesList} from './';
 
 const getDefaultParams = (): React.ComponentProps<typeof MessagesList> => {
-  const conversation = new Conversation(createRandomUuid());
+  const conversation = new Conversation(createUuid());
 
   return {
     cancelConnectionRequest: jest.fn(),
@@ -54,7 +54,6 @@ const getDefaultParams = (): React.ComponentProps<typeof MessagesList> => {
     messageRepository: {
       getMessageInConversationById: jest.fn(),
       sendButtonAction: jest.fn(),
-      toggleLike: jest.fn(),
     } as any,
     onClickMessage: jest.fn(),
     onLoading: jest.fn(),
@@ -66,12 +65,13 @@ const getDefaultParams = (): React.ComponentProps<typeof MessagesList> => {
     showUserDetails: jest.fn(),
     isMsgElementsFocusable: true,
     setMsgElementsFocusable: jest.fn(),
+    showMessageReactions: jest.fn(),
   };
 };
 
 const createTextMessage = (text: string) => {
-  const message = new ContentMessage(createRandomUuid());
-  const textAsset = new Text(createRandomUuid(), text);
+  const message = new ContentMessage(createUuid());
+  const textAsset = new Text(createUuid(), text);
   message.assets.push(textAsset);
   return message;
 };
@@ -92,11 +92,11 @@ describe('MessagesList', () => {
     params.conversation.addMessage(createTextMessage('first'));
 
     const {getByText} = render(<MessagesList {...params} />);
-    await waitFor(() => getByText('first'));
+    expect(await waitFor(() => getByText('first'))).not.toBe(null);
 
     act(() => {
       params.conversation.addMessage(createTextMessage('second'));
     });
-    await waitFor(() => getByText('second'));
+    expect(await waitFor(() => getByText('second'))).not.toBe(null);
   });
 });

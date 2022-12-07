@@ -19,11 +19,13 @@
 
 import React from 'react';
 
-import {Link, LinkVariant} from '@wireapp/react-ui-kit';
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/LocalizerUtil';
 
-import type {ClientRepository} from '../../../../../client/ClientRepository';
+import type {ClientRepository} from '../../../../../client';
 
 interface LogoutSectionProps {
   clientRepository: ClientRepository;
@@ -31,15 +33,15 @@ interface LogoutSectionProps {
 
 const LogoutSection: React.FC<LogoutSectionProps> = ({clientRepository}) => (
   <section className="preferences-section">
-    <Link
-      tabIndex={0}
-      variant={LinkVariant.PRIMARY}
+    <Button
+      tabIndex={TabIndex.FOCUSABLE}
+      type="button"
       onClick={() => clientRepository.logoutClient()}
       data-uie-name="do-logout"
-      type="button"
+      variant={ButtonVariant.TERTIARY}
     >
       {t('preferencesAccountLogOut')}
-    </Link>
+    </Button>
   </section>
 );
 

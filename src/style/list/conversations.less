@@ -30,7 +30,7 @@
   height: @conversation-input-min-height;
   align-items: center;
   justify-content: space-between;
-  padding-left: 0;
+  padding: 2px 0;
   border-top: 1px solid var(--sidebar-border-color);
   margin: 0;
   color: #fff;
@@ -51,20 +51,20 @@
 
 .conversations-footer-btn {
   .button-reset-default;
-  .label-small-medium;
   display: flex;
   width: 100%;
   height: 100%;
+  flex: 1;
   flex-direction: column;
   align-items: center;
-  padding: 8px;
+  justify-content: center;
   border-radius: 6px;
-  color: var(--main-color);
-  font-size: 11px;
-  text-transform: capitalize;
 
-  svg {
-    margin-bottom: 4px;
+  &--text {
+    .label-small-medium;
+    color: var(--gray-90);
+    font-size: 11px;
+    text-transform: capitalize;
   }
 
   .button-states();
@@ -76,21 +76,62 @@
 
   body.theme-dark & {
     &.active {
-      .button-active();
-      color: var(--black);
-
-      svg {
-        fill: var(--black);
-      }
+      background-color: var(--gray-95);
+    }
+    .conversations-footer-btn--text {
+      color: var(--gray-50);
     }
   }
 
   &.active {
-    .button-active();
-    color: var(--white);
+    background-color: var(--gray-10);
+    color: var(--accent-color-500);
 
-    svg {
-      fill: var(--white);
+    .conversations-footer-btn--text {
+      color: var(--accent-color-500) !important;
+    }
+  }
+}
+
+.conversations-footer-btn {
+  svg {
+    margin-bottom: 4px;
+  }
+
+  .people-outline path {
+    body.theme-dark & {
+      fill: var(--gray-50);
+    }
+  }
+
+  .conversations-outline,
+  .folders-outline {
+    fill: transparent;
+    body.theme-dark & path {
+      stroke: var(--gray-50);
+    }
+
+    &.active path {
+      fill: var(--accent-color-500) !important;
+      stroke: var(--accent-color-500) !important;
+    }
+  }
+
+  .conversations-outline.active {
+    path:last-child {
+      stroke: var(--gray-10) !important;
+    }
+    body.theme-dark & path:last-child {
+      stroke: var(--gray-95) !important;
+    }
+  }
+
+  .archive-outline {
+    fill: transparent;
+
+    body.theme-dark & path,
+    body.theme-dark & rect {
+      stroke: var(--gray-50);
     }
   }
 }
@@ -140,7 +181,6 @@
   .flex-center;
   .label-xs;
   .text-center;
-  .text-white;
 
   flex-direction: column;
 }

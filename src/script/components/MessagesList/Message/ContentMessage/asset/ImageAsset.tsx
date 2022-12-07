@@ -37,21 +37,30 @@ import {Config} from '../../../../../Config';
 import {ContentMessage} from '../../../../../entity/message/ContentMessage';
 import {MediumImage} from '../../../../../entity/message/MediumImage';
 import {TeamState} from '../../../../../team/TeamState';
+import {useMessageFocusedTabIndex} from '../../util';
 
 export interface ImageAssetProps {
   asset: MediumImage;
   message: ContentMessage;
   onClick: (message: ContentMessage, event: React.MouseEvent | React.KeyboardEvent) => void;
   teamState?: TeamState;
+  isFocusable?: boolean;
 }
 
-const ImageAsset: React.FC<ImageAssetProps> = ({asset, message, onClick, teamState = container.resolve(TeamState)}) => {
+const ImageAsset: React.FC<ImageAssetProps> = ({
+  asset,
+  message,
+  onClick,
+  teamState = container.resolve(TeamState),
+  isFocusable = true,
+}) => {
   const [imageUrl, setImageUrl] = useState<string>();
   const {resource} = useKoSubscribableChildren(asset, ['resource']);
   const {isObfuscated, visible} = useKoSubscribableChildren(message, ['isObfuscated', 'visible']);
   const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
   const [isInViewport, setIsInViewport] = useState(false);
   const {isUploading, uploadProgress, cancelUpload, loadAsset} = useAssetTransfer(message);
+  const messageFocusedTabIndex = useMessageFocusedTabIndex(isFocusable);
 
   useEffect(() => {
     if (!imageUrl && isInViewport && resource && isFileSharingReceivingEnabled) {
@@ -89,7 +98,7 @@ const ImageAsset: React.FC<ImageAssetProps> = ({asset, message, onClick, teamSta
   });
 
   const imageContainerStyle: CSSObject = {
-    aspectRatio: `${asset.ratio}`,
+    aspectRatio: isFileSharingReceivingEnabled ? `${asset.ratio}` : undefined,
     maxWidth: '100%',
     width: asset.width,
     maxHeight: '80vh',
@@ -107,8 +116,8 @@ const ImageAsset: React.FC<ImageAssetProps> = ({asset, message, onClick, teamSta
           data-uie-visible={visible && !isObfuscated}
           data-uie-status={imageUrl ? 'loaded' : 'loading'}
           onClick={event => onClick(message, event)}
-          onKeyDown={event => handleKeyDown(event, onClick.bind(null, message, event))}
-          tabIndex={0}
+          onKeyDown={event => handleKeyDown(event, () => onClick(message, event))}
+          tabIndex={messageFocusedTabIndex}
           role="button"
           data-uie-name="go-image-detail"
           aria-label={imageAltText}

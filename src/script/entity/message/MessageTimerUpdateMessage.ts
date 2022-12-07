@@ -18,7 +18,6 @@
  */
 
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
-import ko from 'knockout';
 
 import {t} from 'Util/LocalizerUtil';
 import {formatDuration} from 'Util/TimeUtil';
@@ -31,7 +30,7 @@ import {SystemMessageType} from '../../message/SystemMessageType';
 export class MessageTimerUpdateMessage extends SystemMessage {
   public readonly message_timer: number;
 
-  constructor(messageTimer: number) {
+  constructor(messageTimer: number | null) {
     super();
 
     this.type = CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE;
@@ -39,15 +38,15 @@ export class MessageTimerUpdateMessage extends SystemMessage {
 
     this.message_timer = ConversationEphemeralHandler.validateTimer(messageTimer);
 
-    this.caption = ko.pureComputed(() => {
-      if (this.message_timer) {
-        const timeString = formatDuration(this.message_timer).text;
-        return this.user().isMe
-          ? t('conversationUpdatedTimerYou', timeString)
-          : t('conversationUpdatedTimer', timeString);
-      }
-
-      return this.user().isMe ? t('conversationResetTimerYou') : t('conversationResetTimer');
-    });
+    this.caption = getCaption(this.message_timer, this.user().isMe);
   }
 }
+
+const getCaption = (messageTimer: number, isSelfUser: boolean) => {
+  if (messageTimer) {
+    const timeString = formatDuration(messageTimer).text;
+    return isSelfUser ? t('conversationUpdatedTimerYou', timeString) : t('conversationUpdatedTimer', timeString);
+  }
+
+  return isSelfUser ? t('conversationResetTimerYou') : t('conversationResetTimer');
+};

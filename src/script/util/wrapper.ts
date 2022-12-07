@@ -17,6 +17,8 @@
  *
  */
 
+import {amplify} from 'amplify';
+
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -26,6 +28,7 @@ import {ROLE} from '../user/UserPermission';
 
 export function exposeWrapperGlobals(): void {
   if (Runtime.isDesktopApp()) {
+    window.amplify = amplify;
     window.z ||= {};
 
     window.z.event ||= {};

@@ -19,6 +19,8 @@
 
 import {fireEvent, waitFor} from '@testing-library/react';
 import {ClientType} from '@wireapp/api-client/lib/client';
+import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http/';
+import {StatusCodes} from 'http-status-codes';
 
 import {TypeUtil} from '@wireapp/commons';
 
@@ -26,7 +28,6 @@ import {Login} from './Login';
 
 import {Config, Configuration} from '../../Config';
 import {actionRoot} from '../module/action';
-import {BackendError} from '../module/action/BackendError';
 import {initialRootState} from '../module/reducer';
 import {ROUTE} from '../route';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
@@ -79,7 +80,7 @@ describe('Login', () => {
     const password = 'password';
 
     spyOn(actionRoot.authAction, 'doLogin').and.returnValue(() =>
-      Promise.reject({label: BackendError.LABEL.TOO_MANY_CLIENTS}),
+      Promise.reject(new BackendError('Too many clients', BackendErrorLabel.TOO_MANY_CLIENTS, StatusCodes.NOT_FOUND)),
     );
 
     const {getByTestId} = mountComponent(

@@ -17,27 +17,36 @@
  *
  */
 
-import {FC, UIEvent, useContext, useEffect, useState} from 'react';
+import {UIEvent, useCallback, useState} from 'react';
 
 import cx from 'classnames';
 import {container} from 'tsyringe';
-import {groupBy} from 'underscore';
 
 import {useMatchMedia} from '@wireapp/react-ui-kit';
 
 import {CallingCell} from 'Components/calling/CallingCell';
+import {DropFileArea} from 'Components/DropFileArea';
 import {Giphy} from 'Components/Giphy';
 import {InputBar} from 'Components/InputBar';
 import {MessagesList} from 'Components/MessagesList';
 import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
 import {TitleBar} from 'Components/TitleBar';
 import {CallState} from 'src/script/calling/CallState';
+import {Config} from 'src/script/Config';
+import {CONVERSATION_READONLY_STATE} from 'src/script/conversation/ConversationRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/FileTypeUtil';
+import {isHittingUploadLimit} from 'Util/isHittingUploadLimit';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {safeMailOpen, safeWindowOpen} from 'Util/SanitizationUtil';
-import {incomingCssClass, removeAnimationsClass} from 'Util/util';
+import {formatBytes, incomingCssClass, removeAnimationsClass} from 'Util/util';
+
+import {useReadReceiptSender} from './hooks/useReadReceipt';
+import {ReadOnlyConversationMessage} from './ReadOnlyConversationMessage';
+import {checkFileSharingPermission} from './utils/checkFileSharingPermission';
 
 import {ConversationState} from '../../conversation/ConversationState';
 import {Conversation as ConversationEntity} from '../../entity/Conversation';
@@ -45,7 +54,6 @@ import {ContentMessage} from '../../entity/message/ContentMessage';
 import {DecryptErrorMessage} from '../../entity/message/DecryptErrorMessage';
 import {MemberMessage} from '../../entity/message/MemberMessage';
 import {Message} from '../../entity/message/Message';
-import {Text} from '../../entity/message/Text';
 import {User} from '../../entity/User';
 import {UserError} from '../../error/UserError';
 import {isMouseRightClickEvent, isAuxRightClickEvent} from '../../guards/Mouse';
@@ -54,77 +62,162 @@ import {ServiceEntity} from '../../integration/ServiceEntity';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {RightSidebarParams} from '../../page/AppMain';
 import {PanelState} from '../../page/RightSidebar';
-import {RootContext} from '../../page/RootProvider';
+import {useMainViewModel} from '../../page/RootProvider';
 import {TeamState} from '../../team/TeamState';
-import {UserState} from '../../user/UserState';
 import {ElementType, MessageDetails} from '../MessagesList/Message/ContentMessage/asset/TextMessageRenderer';
-
-type ReadMessageBuffer = {conversation: ConversationEntity; message: Message};
 
 interface ConversationProps {
   readonly initialMessage?: Message;
   readonly teamState: TeamState;
-  readonly userState: UserState;
+  selfUser: User;
   openRightSidebar: (panelState: PanelState, params: RightSidebarParams, compareEntityId?: boolean) => void;
   isRightSidebarOpen?: boolean;
+  reloadApp: () => void;
 }
 
-export const Conversation: FC<ConversationProps> = ({
+const CONFIG = Config.getConfig();
+
+export const Conversation = ({
   initialMessage,
   teamState,
-  userState,
+  selfUser,
   openRightSidebar,
   isRightSidebarOpen = false,
-}) => {
+  reloadApp,
+}: ConversationProps) => {
   const messageListLogger = getLogger('ConversationList');
 
-  const mainViewModel = useContext(RootContext);
+  const mainViewModel = useMainViewModel();
+  const {content: contentViewModel} = mainViewModel;
+  const {conversationRepository, repositories} = contentViewModel;
 
   const [isConversationLoaded, setIsConversationLoaded] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>('');
   const [isGiphyModalOpen, setIsGiphyModalOpen] = useState<boolean>(false);
 
-  const [readMessagesBuffer, setReadMessagesBuffer] = useState<ReadMessageBuffer[]>([]);
-
   const conversationState = container.resolve(ConversationState);
   const callState = container.resolve(CallState);
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
-  const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
-  const {is1to1, isRequest} = useKoSubscribableChildren(activeConversation!, ['is1to1', 'isRequest']);
-  const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
+  const {classifiedDomains} = useKoSubscribableChildren(teamState, [
+    'classifiedDomains',
+    'isFileSharingSendingEnabled',
+  ]);
+
+  const {
+    is1to1,
+    isRequest,
+    readOnlyState,
+    display_name: displayName,
+  } = useKoSubscribableChildren(activeConversation!, ['is1to1', 'isRequest', 'display_name', 'readOnlyState']);
+
+  const showReadOnlyConversationMessage =
+    readOnlyState !== null &&
+    [
+      CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_OTHER_UNSUPPORTED_MLS,
+      CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_SELF_UNSUPPORTED_MLS,
+    ].includes(readOnlyState);
+
+  const inTeam = teamState.isInTeam(selfUser);
+
   const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
   const [isMsgElementsFocusable, setMsgElementsFocusable] = useState(true);
 
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
   const smBreakpoint = useMatchMedia('max-width: 640px');
 
-  useEffect(() => {
-    if (readMessagesBuffer.length) {
-      const groupedMessagesTest = groupBy(
-        readMessagesBuffer,
-        ({conversation, message}) => conversation.id + message.from,
-      );
+  const {addReadReceiptToBatch} = useReadReceiptSender(repositories.message);
 
-      Object.values(groupedMessagesTest).forEach(readMessagesBatch => {
-        const poppedMessage = readMessagesBatch.pop();
+  const uploadImages = useCallback(
+    (images: File[]) => {
+      if (!activeConversation || isHittingUploadLimit(images, repositories.asset)) {
+        return;
+      }
 
-        if (poppedMessage) {
-          const {conversation, message: firstMessage} = poppedMessage;
-          const otherMessages = readMessagesBatch.map(({message}) => message);
-          repositories.message.sendReadReceipt(conversation, firstMessage, otherMessages);
+      for (const image of Array.from(images)) {
+        const isImageTooLarge = image.size > CONFIG.MAXIMUM_IMAGE_FILE_SIZE;
+
+        if (isImageTooLarge) {
+          const isGif = image.type === 'image/gif';
+          const bytesMultiplier = 1024;
+          const maxSize = CONFIG.MAXIMUM_IMAGE_FILE_SIZE / bytesMultiplier / bytesMultiplier;
+
+          return showWarningModal(
+            t(isGif ? 'modalGifTooLargeHeadline' : 'modalPictureTooLargeHeadline'),
+            t(isGif ? 'modalGifTooLargeMessage' : 'modalPictureTooLargeMessage', maxSize),
+          );
         }
-      });
+      }
 
-      setReadMessagesBuffer([]);
-    }
-  }, [readMessagesBuffer.length]);
+      repositories.message.uploadImages(activeConversation, images);
+    },
+    [activeConversation, repositories.asset, repositories.message],
+  );
 
-  if (!mainViewModel) {
-    return null;
-  }
+  const uploadFiles = useCallback(
+    (files: File[]) => {
+      if (!activeConversation) {
+        return;
+      }
 
-  const {content: contentViewModel} = mainViewModel;
-  const {conversationRepository, repositories} = contentViewModel;
+      const fileArray = Array.from(files);
+
+      if (!allowsAllFiles()) {
+        for (const file of fileArray) {
+          if (!hasAllowedExtension(file.name)) {
+            conversationRepository.injectFileTypeRestrictedMessage(
+              activeConversation,
+              selfUser,
+              false,
+              getFileExtensionOrName(file.name),
+            );
+
+            return;
+          }
+        }
+      }
+
+      const uploadLimit = inTeam ? CONFIG.MAXIMUM_ASSET_FILE_SIZE_TEAM : CONFIG.MAXIMUM_ASSET_FILE_SIZE_PERSONAL;
+
+      if (!isHittingUploadLimit(files, repositories.asset)) {
+        for (const file of fileArray) {
+          const isFileTooLarge = file.size > uploadLimit;
+
+          if (isFileTooLarge) {
+            const fileSize = formatBytes(uploadLimit);
+            showWarningModal(t('modalAssetTooLargeHeadline'), t('modalAssetTooLargeMessage', fileSize));
+
+            return;
+          }
+        }
+
+        repositories.message.uploadFiles(activeConversation, files);
+      }
+    },
+    [activeConversation, conversationRepository, inTeam, repositories.asset, repositories.message, selfUser],
+  );
+
+  const uploadDroppedFiles = useCallback(
+    (droppedFiles: File[]) => {
+      const images: File[] = [];
+      const files: File[] = [];
+
+      if (!isHittingUploadLimit(droppedFiles, repositories.asset)) {
+        Array.from(droppedFiles).forEach(file => {
+          const isSupportedImage = (CONFIG.ALLOWED_IMAGE_TYPES as ReadonlyArray<string>).includes(file.type);
+
+          if (isSupportedImage) {
+            images.push(file);
+          } else {
+            files.push(file);
+          }
+        });
+
+        uploadImages(images);
+        uploadFiles(files);
+      }
+    },
+    [repositories.asset, uploadFiles, uploadImages],
+  );
 
   const openGiphy = (text: string) => {
     setInputValue(text);
@@ -176,10 +269,14 @@ export const Conversation: FC<ConversationProps> = ({
     }
   };
 
-  const showMessageDetails = (message: Message, showLikes = false) => {
+  const showMessageDetails = (message: Message, showReactions = false) => {
     if (!is1to1) {
-      openRightSidebar(PanelState.MESSAGE_DETAILS, {entity: message, showLikes});
+      openRightSidebar(PanelState.MESSAGE_DETAILS, {entity: message, showReactions}, true);
     }
+  };
+
+  const showMessageReactions = (message: Message, showReactions = true) => {
+    openRightSidebar(PanelState.MESSAGE_DETAILS, {entity: message, showReactions}, true);
   };
 
   const handleEmailClick = (event: Event, messageDetails: MessageDetails) => {
@@ -227,7 +324,6 @@ export const Conversation: FC<ConversationProps> = ({
   };
 
   const handleClickOnMessage = (
-    messageEntity: ContentMessage | Text,
     event: MouseEvent | KeyboardEvent,
     elementType: ElementType,
     messageDetails: MessageDetails = {
@@ -267,24 +363,22 @@ export const Conversation: FC<ConversationProps> = ({
       conversationRepository: repositories.conversation,
       currentMessageEntity: messageEntity,
       messageRepository: repositories.message,
+      selfUser,
     });
   };
 
   const onSessionResetClick = async (messageEntity: DecryptErrorMessage): Promise<void> => {
     const resetProgress = () => {
       setTimeout(() => {
-        messageEntity.is_resetting_session(false);
         PrimaryModal.show(PrimaryModal.type.SESSION_RESET, {});
       }, MotionDuration.LONG);
     };
-
-    messageEntity.is_resetting_session(true);
 
     try {
       if (messageEntity.fromDomain && activeConversation) {
         await repositories.message.resetSession(
           {domain: messageEntity.fromDomain, id: messageEntity.from},
-          messageEntity.client_id,
+          messageEntity.clientId,
           activeConversation,
         );
         resetProgress();
@@ -324,11 +418,6 @@ export const Conversation: FC<ConversationProps> = ({
       }
     }
 
-    const sendReadReceipt = () => {
-      // add the message in the buffer of read messages (actual read receipt will be sent in the next batch)
-      setReadMessagesBuffer(prevState => [...prevState, {conversation: conversationEntity, message: messageEntity}]);
-    };
-
     const updateLastRead = () => {
       conversationEntity.setTimestamp(messageEntity.timestamp(), ConversationEntity.TIMESTAMP_TYPE.LAST_READ);
     };
@@ -366,7 +455,7 @@ export const Conversation: FC<ConversationProps> = ({
     if (isUnreadMessage && isNotOwnMessage) {
       callbacks.push(updateLastRead);
       if (shouldSendReadReceipt) {
-        callbacks.push(sendReadReceipt);
+        callbacks.push(() => addReadReceiptToBatch(conversationEntity, messageEntity));
       }
     }
 
@@ -382,7 +471,8 @@ export const Conversation: FC<ConversationProps> = ({
   };
 
   return (
-    <div
+    <DropFileArea
+      onFileDropped={checkFileSharingPermission(uploadDroppedFiles)}
       id="conversation"
       className={cx('conversation', {[incomingCssClass]: isConversationLoaded, loading: !isConversationLoaded})}
       ref={removeAnimationsClass}
@@ -393,11 +483,12 @@ export const Conversation: FC<ConversationProps> = ({
           <TitleBar
             repositories={repositories}
             conversation={activeConversation}
-            userState={userState}
+            selfUser={selfUser}
             teamState={teamState}
             callActions={mainViewModel.calling.callActions}
             openRightSidebar={openRightSidebar}
             isRightSidebarOpen={isRightSidebarOpen}
+            isReadOnlyConversation={showReadOnlyConversationMessage}
           />
 
           {activeCalls.map(call => {
@@ -434,6 +525,7 @@ export const Conversation: FC<ConversationProps> = ({
             cancelConnectionRequest={clickOnCancelRequest}
             showUserDetails={showUserDetails}
             showMessageDetails={showMessageDetails}
+            showMessageReactions={showMessageReactions}
             showParticipants={showParticipants}
             showImageDetails={showDetail}
             resetSession={onSessionResetClick}
@@ -445,20 +537,32 @@ export const Conversation: FC<ConversationProps> = ({
             setMsgElementsFocusable={setMsgElementsFocusable}
           />
 
-          <InputBar
-            conversationEntity={activeConversation}
-            assetRepository={repositories.asset}
-            conversationRepository={repositories.conversation}
-            eventRepository={repositories.event}
-            messageRepository={repositories.message}
-            openGiphy={openGiphy}
-            propertiesRepository={repositories.properties}
-            searchRepository={repositories.search}
-            storageRepository={repositories.storage}
-            teamState={teamState}
-            userState={userState}
-            onShiftTab={() => setMsgElementsFocusable(false)}
-          />
+          {isConversationLoaded &&
+            (showReadOnlyConversationMessage ? (
+              <ReadOnlyConversationMessage
+                state={readOnlyState}
+                handleMLSUpdate={reloadApp}
+                displayName={displayName}
+              />
+            ) : (
+              <InputBar
+                key={activeConversation?.id}
+                conversation={activeConversation}
+                conversationRepository={repositories.conversation}
+                eventRepository={repositories.event}
+                messageRepository={repositories.message}
+                openGiphy={openGiphy}
+                propertiesRepository={repositories.properties}
+                searchRepository={repositories.search}
+                storageRepository={repositories.storage}
+                teamState={teamState}
+                selfUser={selfUser}
+                onShiftTab={() => setMsgElementsFocusable(false)}
+                uploadDroppedFiles={uploadDroppedFiles}
+                uploadImages={uploadImages}
+                uploadFiles={uploadFiles}
+              />
+            ))}
 
           <div className="conversation-loading">
             <div className="icon-spinner spin accent-text"></div>
@@ -469,6 +573,6 @@ export const Conversation: FC<ConversationProps> = ({
       {isGiphyModalOpen && inputValue && (
         <Giphy giphyRepository={repositories.giphy} inputValue={inputValue} onClose={closeGiphy} />
       )}
-    </div>
+    </DropFileArea>
   );
 };

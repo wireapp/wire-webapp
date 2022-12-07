@@ -23,15 +23,15 @@ import 'core-js/full/reflect';
 
 import {Context} from '@wireapp/api-client/lib/auth';
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
+import {EVENTS as CoreEvents} from '@wireapp/core/lib/Account';
 import {amplify} from 'amplify';
-import Dexie from 'dexie';
-import ko from 'knockout';
 import platform from 'platform';
 import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {initializeDataDog} from 'Util/DataDog';
 import {DebugUtil} from 'Util/DebugUtil';
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
@@ -39,11 +39,7 @@ import {getLogger, Logger} from 'Util/Logger';
 import {includesString} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {appendParameter} from 'Util/UrlUtil';
-import {checkIndexedDb, createRandomUuid, supportsMLS} from 'Util/util';
-
-import './globals';
-import {migrateToQualifiedSessionIds} from './sessionIdMigrator';
-import {SingleInstanceHandler} from './SingleInstanceHandler';
+import {checkIndexedDb, supportsMLS} from 'Util/util';
 
 import '../../style/default.less';
 import {AssetRepository} from '../assets/AssetRepository';
@@ -55,27 +51,33 @@ import {BackupRepository} from '../backup/BackupRepository';
 import {BackupService} from '../backup/BackupService';
 import {CacheRepository} from '../cache/CacheRepository';
 import {CallingRepository} from '../calling/CallingRepository';
-import {ClientRepository} from '../client/ClientRepository';
-import {ClientService} from '../client/ClientService';
+import {ClientRepository, ClientService} from '../client';
 import {Configuration} from '../Config';
 import {ConnectionRepository} from '../connection/ConnectionRepository';
 import {ConnectionService} from '../connection/ConnectionService';
 import {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationService} from '../conversation/ConversationService';
+import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
+import {registerMLSConversationVerificationStateHandler} from '../conversation/ConversationVerificationStateHandler';
+import {OnConversationE2EIVerificationStateChange} from '../conversation/ConversationVerificationStateHandler/shared';
+import {EventBuilder} from '../conversation/EventBuilder';
 import {MessageRepository} from '../conversation/MessageRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
-import {AccessTokenError, ACCESS_TOKEN_ERROR_TYPE} from '../error/AccessTokenError';
+import {User} from '../entity/User';
+import {AccessTokenError} from '../error/AccessTokenError';
 import {AuthError} from '../error/AuthError';
 import {BaseError} from '../error/BaseError';
 import {ClientError, CLIENT_ERROR_TYPE} from '../error/ClientError';
 import {TeamError} from '../error/TeamError';
 import {EventRepository} from '../event/EventRepository';
 import {EventService} from '../event/EventService';
-import {EventServiceNoCompound} from '../event/EventServiceNoCompound';
 import {NotificationService} from '../event/NotificationService';
-import {QuotedMessageMiddleware} from '../event/preprocessor/QuotedMessageMiddleware';
+import {EventStorageMiddleware} from '../event/preprocessor/EventStorageMiddleware';
+import {QuotedMessageMiddleware} from '../event/preprocessor/QuoteDecoderMiddleware';
 import {ReceiptsMiddleware} from '../event/preprocessor/ReceiptsMiddleware';
+import {RepliesUpdaterMiddleware} from '../event/preprocessor/RepliesUpdaterMiddleware';
 import {ServiceMiddleware} from '../event/preprocessor/ServiceMiddleware';
+import {FederationEventProcessor} from '../event/processor/FederationEventProcessor';
 import {GiphyRepository} from '../extension/GiphyRepository';
 import {GiphyService} from '../extension/GiphyService';
 import {getWebsiteUrl} from '../externalRoute';
@@ -83,31 +85,29 @@ import {IntegrationRepository} from '../integration/IntegrationRepository';
 import {IntegrationService} from '../integration/IntegrationService';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {MediaRepository} from '../media/MediaRepository';
-import {initMLSConversations, registerUninitializedConversations} from '../mls';
+import {initMLSConversations, registerUninitializedSelfAndTeamConversations} from '../mls';
+import {joinConversationsAfterMigrationFinalisation} from '../mls/MLSMigration/migrationFinaliser';
 import {NotificationRepository} from '../notification/NotificationRepository';
 import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
 import {PermissionRepository} from '../permission/PermissionRepository';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PropertiesService} from '../properties/PropertiesService';
 import {SearchRepository} from '../search/SearchRepository';
-import {SearchService} from '../search/SearchService';
+import {SelfRepository} from '../self/SelfRepository';
 import {SelfService} from '../self/SelfService';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
 import {StorageKey, StorageRepository, StorageService} from '../storage';
 import {TeamRepository} from '../team/TeamRepository';
-import {TeamService} from '../team/TeamService';
 import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';
 import {AppInitTelemetry} from '../telemetry/app_init/AppInitTelemetry';
 import {AppInitTimingsStep} from '../telemetry/app_init/AppInitTimingsStep';
 import {serverTimeHandler} from '../time/serverTimeHandler';
 import {EventTrackingRepository} from '../tracking/EventTrackingRepository';
 import {WindowHandler} from '../ui/WindowHandler';
-import * as UserPermission from '../user/UserPermission';
 import {UserRepository} from '../user/UserRepository';
 import {UserService} from '../user/UserService';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
-import {ThemeViewModel} from '../view_model/ThemeViewModel';
 import {Warnings} from '../view_model/WarningsContainer';
 
 export function doRedirect(signOutReason: SIGN_OUT_REASON) {
@@ -122,7 +122,6 @@ export function doRedirect(signOutReason: SIGN_OUT_REASON) {
     url = appendParameter(url, `${URLParameter.REASON}=${signOutReason}`);
   }
 
-  Dexie.delete('/sqleet');
   window.location.replace(url);
 }
 
@@ -134,7 +133,7 @@ export class App {
   service: {
     asset: AssetService;
     conversation: ConversationService;
-    event: EventService | EventServiceNoCompound;
+    event: EventService;
     integration: IntegrationService;
     notification: NotificationService;
     storage: StorageService;
@@ -142,7 +141,6 @@ export class App {
   repository: ViewModelRepositories = {} as ViewModelRepositories;
   debug?: DebugUtil;
   util?: {debug: DebugUtil};
-  singleInstanceHandler: SingleInstanceHandler;
 
   static get CONFIG() {
     return {
@@ -191,11 +189,6 @@ export class App {
       });
     }
 
-    this._publishGlobals();
-
-    const onExtraInstanceStarted = () => this._redirectToLogin(SIGN_OUT_REASON.MULTIPLE_TABS);
-    this.singleInstanceHandler = new SingleInstanceHandler(onExtraInstanceStarted);
-
     this._subscribeToEvents();
     this.initServiceWorker();
   }
@@ -220,7 +213,7 @@ export class App {
     repositories.storage = new StorageRepository();
 
     repositories.cryptography = new CryptographyRepository();
-    repositories.client = new ClientRepository(new ClientService(), repositories.cryptography, repositories.storage);
+    repositories.client = new ClientRepository(new ClientService(), repositories.cryptography);
     repositories.media = new MediaRepository(new PermissionRepository());
     repositories.audio = new AudioRepository(repositories.media.devicesHandler);
 
@@ -234,8 +227,8 @@ export class App {
     );
     repositories.connection = new ConnectionRepository(new ConnectionService(), repositories.user);
     repositories.event = new EventRepository(this.service.event, this.service.notification, serverTimeHandler);
-    repositories.search = new SearchRepository(new SearchService(), repositories.user);
-    repositories.team = new TeamRepository(new TeamService(), repositories.user, repositories.asset);
+    repositories.search = new SearchRepository(repositories.user);
+    repositories.team = new TeamRepository(repositories.user, repositories.asset);
 
     repositories.message = new MessageRepository(
       /*
@@ -250,32 +243,9 @@ export class App {
       serverTimeHandler,
       repositories.user,
       repositories.asset,
+      repositories.audio,
     );
 
-    repositories.conversation = new ConversationRepository(
-      this.service.conversation,
-      repositories.message,
-      repositories.connection,
-      repositories.event,
-      repositories.team,
-      repositories.user,
-      repositories.properties,
-      serverTimeHandler,
-    );
-
-    repositories.eventTracker = new EventTrackingRepository(repositories.message);
-
-    const serviceMiddleware = new ServiceMiddleware(repositories.conversation, repositories.user);
-    const quotedMessageMiddleware = new QuotedMessageMiddleware(this.service.event);
-
-    const readReceiptMiddleware = new ReceiptsMiddleware(this.service.event, repositories.conversation);
-
-    repositories.event.setEventProcessMiddlewares([
-      serviceMiddleware.processEvent.bind(serviceMiddleware),
-      quotedMessageMiddleware.processEvent.bind(quotedMessageMiddleware),
-      readReceiptMiddleware.processEvent.bind(readReceiptMiddleware),
-    ]);
-    repositories.backup = new BackupRepository(new BackupService(), repositories.conversation);
     repositories.calling = new CallingRepository(
       repositories.message,
       repositories.event,
@@ -284,16 +254,39 @@ export class App {
       repositories.media.devicesHandler,
       serverTimeHandler,
     );
+
+    repositories.self = new SelfRepository(selfService, repositories.user, repositories.team, repositories.client);
+
+    repositories.conversation = new ConversationRepository(
+      this.service.conversation,
+      repositories.message,
+      repositories.connection,
+      repositories.event,
+      repositories.team,
+      repositories.user,
+      repositories.self,
+      repositories.properties,
+      repositories.calling,
+      serverTimeHandler,
+    );
+
+    repositories.eventTracker = new EventTrackingRepository(repositories.message);
+
+    repositories.backup = new BackupRepository(new BackupService(), repositories.conversation);
+
     repositories.integration = new IntegrationRepository(
       this.service.integration,
       repositories.conversation,
       repositories.team,
     );
     repositories.permission = new PermissionRepository();
-    repositories.notification = new NotificationRepository(repositories.conversation, repositories.permission);
+    repositories.notification = new NotificationRepository(
+      repositories.conversation,
+      repositories.permission,
+      repositories.audio,
+    );
     repositories.preferenceNotification = new PreferenceNotificationRepository(repositories.user['userState'].self);
 
-    repositories.conversation.leaveCall = repositories.calling.leaveCall;
     return repositories;
   }
 
@@ -305,7 +298,7 @@ export class App {
   private _setupServices() {
     container.registerInstance(StorageService, new StorageService());
     const storageService = container.resolve(StorageService);
-    const eventService = Runtime.isEdge() ? new EventServiceNoCompound() : new EventService();
+    const eventService = new EventService();
 
     return {
       asset: container.resolve(AssetService),
@@ -325,21 +318,7 @@ export class App {
    * Subscribe to amplify events.
    */
   private _subscribeToEvents() {
-    amplify.subscribe(WebAppEvents.LIFECYCLE.REFRESH, this.refresh);
     amplify.subscribe(WebAppEvents.LIFECYCLE.SIGN_OUT, this.logout);
-    amplify.subscribe(WebAppEvents.CONNECTION.ACCESS_TOKEN.RENEW, async (source: string) => {
-      this.logger.info(`Access token refresh triggered by "${source}"...`);
-      try {
-        await this.apiClient.transport.http.refreshAccessToken();
-        amplify.publish(WebAppEvents.CONNECTION.ACCESS_TOKEN.RENEWED);
-        this.logger.info(`Refreshed access token.`);
-      } catch (error) {
-        if (error instanceof BaseError) {
-          this.logger.warn(`Logging out user because access token cannot be refreshed: ${error.message}`, error);
-        }
-        this.logout(SIGN_OUT_REASON.NOT_SIGNED_IN, false);
-      }
-    });
   }
 
   //##############################################################################
@@ -359,14 +338,14 @@ export class App {
    */
   async initApp(clientType: ClientType, onProgress: (progress: number, message?: string) => void) {
     // add body information
-    await this.core.useAPIVersion(this.config.SUPPORTED_API_VERSIONS, this.config.ENABLE_DEV_BACKEND_API);
+    const startTime = Date.now();
+    const [apiVersionMin, apiVersionMax] = this.config.SUPPORTED_API_RANGE;
+    await this.core.useAPIVersion(apiVersionMin, apiVersionMax, this.config.ENABLE_DEV_BACKEND_API);
+
     const osCssClass = Runtime.isMacOS() ? 'os-mac' : 'os-pc';
     const platformCssClass = Runtime.isDesktopApp() ? 'platform-electron' : 'platform-web';
     document.body.classList.add(osCssClass, platformCssClass);
 
-    const isReload = this._isReload();
-    this.logger.debug(`App init starts (isReload: '${isReload}')`);
-    new ThemeViewModel(this.repository.properties);
     const telemetry = new AppInitTelemetry();
 
     try {
@@ -381,82 +360,127 @@ export class App {
         properties: propertiesRepository,
         team: teamRepository,
         user: userRepository,
+        self: selfRepository,
       } = this.repository;
       await checkIndexedDb();
-      this._registerSingleInstance();
       onProgress(2.5);
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
 
-      let context: Context;
       try {
-        context = await this.core.init(clientType, {
-          onNewClient({userId, clientId, domain}) {
-            const qualifiedId = {domain: domain ?? '', id: userId};
-            const newClient = {class: ClientClassification.UNKNOWN, id: clientId};
-            userRepository.addClientToUser(qualifiedId, newClient, true);
-          },
-        });
+        await this.core.init(clientType);
       } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : error;
+        this.logger.error(`Error when initializing core: "${errorMessage}"`, error);
+        throw new AccessTokenError(AccessTokenError.TYPE.REQUEST_FORBIDDEN, 'Session has expired');
+      }
+      const localClient = await this.core.initClient();
+      if (!localClient) {
         throw new ClientError(CLIENT_ERROR_TYPE.NO_VALID_CLIENT, 'Client has been deleted on backend');
       }
 
+      this.core.on(CoreEvents.NEW_SESSION, ({userId, clientId}) => {
+        const newClient = {class: ClientClassification.UNKNOWN, id: clientId};
+        userRepository.addClientToUser(userId, newClient, true);
+      });
+
       const selfUser = await this.initiateSelfUser();
 
-      if (this.apiClient.backendFeatures.isFederated && this.repository.storage.storageService.db && context.domain) {
-        // Migrate all existing session to fully qualified ids (if need be)
-        await migrateToQualifiedSessionIds(this.repository.storage.storageService.db.sessions, context.domain);
-      }
+      this.core.configureCoreCallbacks({
+        groupIdFromConversationId: async conversationId => {
+          const conversation = await conversationRepository.getConversationById(conversationId);
+          return conversation?.groupId;
+        },
+      });
+
+      await initializeDataDog(this.config, selfUser.qualifiedId);
+
+      // Setup all event middleware
+      const eventStorageMiddleware = new EventStorageMiddleware(this.service.event, selfUser);
+      const serviceMiddleware = new ServiceMiddleware(conversationRepository, userRepository, selfUser);
+      const quotedMessageMiddleware = new QuotedMessageMiddleware(this.service.event);
+      const readReceiptMiddleware = new ReceiptsMiddleware(this.service.event, conversationRepository, selfUser);
+      const repliesUpdaterMiddleware = new RepliesUpdaterMiddleware(this.service.event);
+
+      eventRepository.setEventProcessMiddlewares([
+        serviceMiddleware,
+        readReceiptMiddleware,
+        quotedMessageMiddleware,
+        eventStorageMiddleware,
+        repliesUpdaterMiddleware,
+      ]);
+      // Setup all the event processors
+      const federationEventProcessor = new FederationEventProcessor(eventRepository, serverTimeHandler, selfUser);
+      eventRepository.setEventProcessors([federationEventProcessor]);
 
       onProgress(5, t('initReceivedSelfUser', selfUser.name()));
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_SELF_USER);
-      const clientEntity = await this._initiateSelfUserClients();
-      callingRepository.initAvs(selfUser, clientEntity().id);
+      const clientEntity = await this._initiateSelfUserClients(selfUser, clientRepository);
+      callingRepository.initAvs(selfUser, clientEntity.id);
       onProgress(7.5, t('initValidatedClient'));
       telemetry.timeStep(AppInitTimingsStep.VALIDATED_CLIENT);
-      telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity().type ?? clientType);
+      telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type ?? clientType);
 
       onProgress(10);
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
-      await teamRepository.initTeam();
+      const teamMembers = await teamRepository.initTeam(selfUser.teamId);
+      telemetry.timeStep(AppInitTimingsStep.RECEIVED_USER_DATA);
 
-      const conversationEntities = await conversationRepository.loadConversations();
+      const connections = await connectionRepository.getConnections();
+      telemetry.addStatistic(AppInitStatisticsValue.CONNECTIONS, connections.length, 50);
+
+      const conversations = await conversationRepository.loadConversations();
+
+      await userRepository.loadUsers(selfUser, connections, conversations, teamMembers);
 
       if (supportsMLS()) {
-        await initMLSConversations(conversationEntities, selfUser, this.core, this.repository.conversation);
+        //if mls is supported, we need to initialize the callbacks (they are used when decrypting messages)
+        conversationRepository.initMLSConversationRecoveredListener();
+        registerMLSConversationVerificationStateHandler(this.updateConversationE2EIVerificationState);
       }
 
-      const connectionEntities = await connectionRepository.getConnections();
       onProgress(25, t('initReceivedUserData'));
-      telemetry.timeStep(AppInitTimingsStep.RECEIVED_USER_DATA);
-      telemetry.addStatistic(AppInitStatisticsValue.CONVERSATIONS, conversationEntities.length, 50);
-      telemetry.addStatistic(AppInitStatisticsValue.CONNECTIONS, connectionEntities.length, 50);
-      if (connectionEntities.length) {
-        await Promise.allSettled(conversationRepository.mapConnections(connectionEntities));
-      }
-      this._subscribeToUnloadEvents();
+      telemetry.addStatistic(AppInitStatisticsValue.CONVERSATIONS, conversations.length, 50);
+      this._subscribeToUnloadEvents(selfUser);
 
       await conversationRepository.conversationRoleRepository.loadTeamRoles();
 
-      await userRepository.loadUsers();
-
+      let totalNotifications = 0;
       await eventRepository.connectWebSocket(this.core, ({done, total}) => {
         const baseMessage = t('initDecryption');
         const extraInfo = this.config.FEATURE.SHOW_LOADING_INFORMATION
           ? ` ${t('initProgress', {number1: done.toString(), number2: total.toString()})}`
           : '';
 
+        totalNotifications = total;
         onProgress(25 + 50 * (done / total), `${baseMessage}${extraInfo}`);
       });
-      const notificationsCount = eventRepository.notificationsTotal;
+
+      await conversationRepository.init1To1Conversations(connections, conversations);
 
       if (supportsMLS()) {
-        // Once all the messages have been processed and the message sending queue freed we can now add the potential `self` and `team` conversations
-        await registerUninitializedConversations(conversationEntities, selfUser, clientEntity().id, this.core);
+        //add the potential `self` and `team` conversations
+        await registerUninitializedSelfAndTeamConversations(conversations, selfUser, clientEntity.id, this.core);
+
+        //join all the mls groups that are known by the user but were migrated to mls
+        await joinConversationsAfterMigrationFinalisation({
+          conversations,
+          core: this.core,
+          onSuccess: conversationRepository.injectJoinedAfterMigrationFinalisationMessage,
+          onError: ({id}, error) =>
+            this.logger.error(`Failed when joining a migrated mls conversation with id ${id}, error: `, error),
+        });
+
+        //join all the mls groups we're member of and have not yet joined (eg. we were not send welcome message)
+        await initMLSConversations(conversations, {
+          core: this.core,
+          onError: ({id}, error) =>
+            this.logger.error(`Failed when initialising mls conversation with id ${id}, error: `, error),
+        });
       }
 
       telemetry.timeStep(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
-      telemetry.addStatistic(AppInitStatisticsValue.NOTIFICATIONS, notificationsCount, 100);
+      telemetry.addStatistic(AppInitStatisticsValue.NOTIFICATIONS, totalNotifications, 100);
 
       eventTrackerRepository.init(propertiesRepository.properties.settings.privacy.telemetry_sharing);
       onProgress(97.5, t('initUpdatedFromNotifications', this.config.BRAND_NAME));
@@ -468,31 +492,32 @@ export class App {
       telemetry.addStatistic(AppInitStatisticsValue.CLIENTS, clientEntities.length);
       telemetry.timeStep(AppInitTimingsStep.APP_PRE_LOADED);
 
-      userRepository['userState'].self().devices(clientEntities);
-      this.logger.info('App pre-loading completed');
+      selfUser.devices(clientEntities);
+
       this._handleUrlParams();
       await conversationRepository.updateConversationsOnAppInit();
       await conversationRepository.conversationLabelRepository.loadLabels();
 
-      telemetry.timeStep(AppInitTimingsStep.APP_LOADED);
+      await selfRepository.initialisePeriodicSelfSupportedProtocolsCheck();
 
-      telemetry.report();
       amplify.publish(WebAppEvents.LIFECYCLE.LOADED);
 
       telemetry.timeStep(AppInitTimingsStep.UPDATED_CONVERSATIONS);
-      if (userRepository['userState'].isActivatedAccount()) {
+      if (selfUser.isActivatedAccount()) {
         // start regularly polling the server to check if there is a new version of Wire
         startNewVersionPolling(Environment.version(false), this.update);
       }
-      audioRepository.init(true);
-      conversationRepository.cleanupConversations();
+      audioRepository.init();
+      await conversationRepository.cleanupEphemeralMessages();
       callingRepository.setReady();
-      this.logger.info('App fully loaded');
+      telemetry.timeStep(AppInitTimingsStep.APP_LOADED);
+
+      this.logger.info(`App loaded in ${Date.now() - startTime}ms`);
 
       return selfUser;
     } catch (error) {
       if (error instanceof BaseError) {
-        this._appInitFailure(error, isReload);
+        await this._appInitFailure(error);
         return undefined;
       }
       throw error;
@@ -502,74 +527,55 @@ export class App {
   /**
    * Initialize ServiceWorker if supported.
    */
-  private initServiceWorker(): void {
+  private async initServiceWorker() {
     if (navigator.serviceWorker) {
-      navigator.serviceWorker
+      await navigator.serviceWorker
         .register(`/sw.js?${Environment.version(false)}`)
-        .then(({scope}) => this.logger.info(`ServiceWorker registration successful with scope: ${scope}`));
+        .then(({scope}) => this.logger.debug(`ServiceWorker registration successful with scope: ${scope}`));
     }
   }
 
-  private _appInitFailure(error: BaseError, isReload: boolean) {
+  private _appInitFailure(error: BaseError) {
+    const {message, type} = error;
     let logMessage = `Could not initialize app version '${Environment.version(false)}'`;
 
     if (Runtime.isDesktopApp()) {
       logMessage += ` - Electron '${platform.os?.family}' '${Environment.version()}'`;
     }
 
-    this.logger.warn(`${logMessage}: ${error.message}`, {error});
+    this.logger.warn(`${logMessage}: ${message}`, {error});
 
-    const {message, type} = error;
     const isAuthError = error instanceof AuthError;
     if (isAuthError) {
       const isTypeMultipleTabs = type === AuthError.TYPE.MULTIPLE_TABS;
       const signOutReason = isTypeMultipleTabs ? SIGN_OUT_REASON.MULTIPLE_TABS : SIGN_OUT_REASON.INDEXED_DB;
-      return this._redirectToLogin(signOutReason);
-    }
-
-    this.logger.debug(
-      `App reload: '${isReload}', Document referrer: '${document.referrer}', Location: '${window.location.href}'`,
-    );
-    if (isReload) {
-      const isSessionExpired = [AccessTokenError.TYPE.REQUEST_FORBIDDEN, AccessTokenError.TYPE.NOT_FOUND_IN_CACHE];
-
-      if (isSessionExpired.includes(type as ACCESS_TOKEN_ERROR_TYPE)) {
-        this.logger.warn(`Session expired on page reload: ${message}`, error);
-        return this._redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED);
-      }
-
-      const isAccessTokenError = error instanceof AccessTokenError;
-      const isInvalidClient = type === ClientError.TYPE.NO_VALID_CLIENT;
-
-      if (isInvalidClient) {
-        return this._redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED);
-      }
-
-      if (isAccessTokenError) {
-        this.logger.warn('Connectivity issues. Trigger reload.', error);
-        return window.location.reload();
-      }
+      return this.redirectToLogin(signOutReason);
     }
 
     if (navigator.onLine === true) {
+      const isReload = this._isReload();
       switch (type) {
         case CLIENT_ERROR_TYPE.NO_VALID_CLIENT: {
-          this.logger.warn(`Redirecting to login: ${error.message}`, error);
-          return this._redirectToLogin(SIGN_OUT_REASON.CLIENT_REMOVED);
+          this.logger.warn(`Redirecting to login: ${message}`, error);
+          return isReload
+            ? this.redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED)
+            : this.redirectToLogin(SIGN_OUT_REASON.CLIENT_REMOVED);
         }
         case AccessTokenError.TYPE.NOT_FOUND_IN_CACHE:
         case AccessTokenError.TYPE.RETRIES_EXCEEDED:
         case AccessTokenError.TYPE.REQUEST_FORBIDDEN: {
-          this.logger.warn(`Redirecting to login: ${error.message}`, error);
-          return this._redirectToLogin(SIGN_OUT_REASON.NOT_SIGNED_IN);
+          this.logger.warn(`Redirecting to login: ${message}`, error);
+          return isReload
+            ? this.redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED)
+            : this.redirectToLogin(SIGN_OUT_REASON.NOT_SIGNED_IN);
         }
         case TeamError.TYPE.NO_APP_CONFIG: {
-          this.logger.warn(`Logging out user: ${error.message}`, error);
-          return this._redirectToLogin(SIGN_OUT_REASON.NO_APP_CONFIG);
+          this.logger.warn(`Logging out user: ${message}`, error);
+          return this.redirectToLogin(SIGN_OUT_REASON.NO_APP_CONFIG);
         }
 
         default: {
-          this.logger.error(`Caused by: ${(error ? error.message : undefined) || error}`, error);
+          this.logger.error(`Caused by: ${message || error}`, error);
 
           const isAccessTokenError = error instanceof AccessTokenError;
           if (isAccessTokenError) {
@@ -602,7 +608,7 @@ export class App {
       }
     }
 
-    await container.resolve(StorageService).init(this.core.storage);
+    container.resolve(StorageService).init(this.core.storage);
     this.repository.client.init(userEntity);
     await this.repository.properties.init(userEntity);
 
@@ -613,14 +619,11 @@ export class App {
    * Initiate the current client of the self user.
    * @returns Resolves with the local client entity
    */
-  private _initiateSelfUserClients() {
-    return this.repository.client
-      .getValidLocalClient()
-      .then(clientObservable => {
-        this.repository.event.currentClient = clientObservable;
-        return this.repository.client.getClientsForSelf();
-      })
-      .then(() => this.repository.client['clientState'].currentClient);
+  private async _initiateSelfUserClients(selfUser: User, clientRepository: ClientRepository) {
+    // Add the local client to the user
+    selfUser.localClient = await clientRepository.getValidLocalClient();
+    await this.repository.client.getClientsForSelf();
+    return selfUser.localClient;
   }
 
   /**
@@ -638,42 +641,17 @@ export class App {
     return window.performance.navigation.type === NAVIGATION_TYPE_RELOAD;
   }
 
-  //##############################################################################
-  // Multiple tabs check
-  //##############################################################################
-
-  /**
-   * Check that this is the single instance tab of the app.
-   * @returns Resolves when page is the first tab
-   */
-  private _registerSingleInstance(): void {
-    const instanceId = createRandomUuid();
-
-    if (this.singleInstanceHandler.registerInstance(instanceId)) {
-      return this._registerSingleInstanceCleaning();
-    }
-    throw new AuthError(AuthError.TYPE.MULTIPLE_TABS, AuthError.MESSAGE.MULTIPLE_TABS);
-  }
-
-  private _registerSingleInstanceCleaning() {
-    window.addEventListener('beforeunload', () => this.singleInstanceHandler.deregisterInstance());
-  }
-
   /**
    * Subscribe to 'beforeunload' to stop calls and disconnect the WebSocket.
    */
-  private _subscribeToUnloadEvents(): void {
+  private _subscribeToUnloadEvents(selfUser: User): void {
     window.addEventListener('unload', () => {
       this.logger.info("'window.onunload' was triggered, so we will disconnect from the backend.");
       this.repository.event.disconnectWebSocket();
       this.repository.calling.destroy();
 
-      if (this.repository.user['userState'].isActivatedAccount()) {
-        if (this.service.storage.isTemporaryAndNonPersistent) {
-          this.logout(SIGN_OUT_REASON.CLIENT_REMOVED, true);
-        } else {
-          this.repository.storage.terminate('window.onunload');
-        }
+      if (selfUser.isActivatedAccount()) {
+        this.repository.storage.terminate('window.onunload');
       } else {
         this.repository.conversation.leaveGuestRoom();
         this.repository.storage.deleteDatabase();
@@ -703,7 +681,7 @@ export class App {
     this.isLoggingOut = true;
     const _redirectToLogin = () => {
       amplify.publish(WebAppEvents.LIFECYCLE.SIGNED_OUT, clearData);
-      this._redirectToLogin(signOutReason);
+      this.redirectToLogin(signOutReason);
     };
 
     const _logout = async () => {
@@ -743,13 +721,18 @@ export class App {
 
         const keepConversationInput = signOutReason === SIGN_OUT_REASON.SESSION_EXPIRED;
         const deletedKeys = CacheRepository.clearLocalStorage(keepConversationInput, keysToKeep);
-        this.logger.info(`Deleted "${deletedKeys.length}" keys from localStorage.`, deletedKeys);
+        this.logger.debug(`Deleted "${deletedKeys.length}" keys from localStorage.`, deletedKeys);
+      }
+      const shouldWipeIdentity = clearData || signOutReason === SIGN_OUT_REASON.CLIENT_REMOVED;
+
+      if (shouldWipeIdentity) {
+        localStorage.clear();
       }
 
+      await this.core.logout(shouldWipeIdentity);
       if (clearData) {
         // Info: This async call cannot be awaited in an "beforeunload" scenario, so we call it without waiting for it in order to delete the CacheStorage in the background.
         CacheRepository.clearCacheStorage();
-        localStorage.clear();
 
         try {
           await this.repository.storage.deleteDatabase();
@@ -758,7 +741,6 @@ export class App {
         }
       }
 
-      await this.core.logout(clearData);
       return _redirectToLogin();
     };
 
@@ -793,7 +775,7 @@ export class App {
   /**
    * Refresh the web app or desktop wrapper
    */
-  private readonly refresh = (): void => {
+  readonly refresh = (): void => {
     this.logger.info('Refresh to update started');
     if (Runtime.isDesktopApp()) {
       // if we are in a desktop env, we just warn the wrapper that we need to reload. It then decide what should be done
@@ -816,10 +798,10 @@ export class App {
    * Redirect to the login page after internet connectivity has been verified.
    * @param signOutReason Redirect triggered by session expiration
    */
-  private _redirectToLogin(signOutReason: SIGN_OUT_REASON): void {
+  redirectToLogin(signOutReason: SIGN_OUT_REASON): void {
     this.logger.info(`Redirecting to login after connectivity verification. Reason: ${signOutReason}`);
     const isTemporaryGuestReason = App.CONFIG.SIGN_OUT_REASONS.TEMPORARY_GUEST.includes(signOutReason);
-    const isLeavingGuestRoom = isTemporaryGuestReason && this.repository.user['userState'].isTemporaryGuest();
+    const isLeavingGuestRoom = isTemporaryGuestReason && this.repository.user['userState'].self()?.isTemporaryGuest();
 
     if (isLeavingGuestRoom) {
       const websiteUrl = getWebsiteUrl();
@@ -832,15 +814,27 @@ export class App {
     doRedirect(signOutReason);
   }
 
-  //##############################################################################
-  // Debugging
-  //##############################################################################
-
-  private _publishGlobals() {
-    window.z.userPermission = ko.observable({});
-    ko.pureComputed(() => {
-      const selfUser = this.repository.user['userState'].self();
-      return selfUser && selfUser.teamRole();
-    }).subscribe(role => window.z.userPermission(UserPermission.generatePermissionHelpers(role)));
-  }
+  private updateConversationE2EIVerificationState: OnConversationE2EIVerificationStateChange = async ({
+    conversationEntity,
+    conversationVerificationState,
+    verificationMessageType,
+    userIds,
+  }) => {
+    switch (conversationVerificationState) {
+      case ConversationVerificationState.VERIFIED:
+        const allVerifiedEvent = EventBuilder.buildAllE2EIVerified(conversationEntity);
+        await this.repository.event.injectEvent(allVerifiedEvent);
+        break;
+      case ConversationVerificationState.DEGRADED:
+        if (verificationMessageType) {
+          const degradedEvent = EventBuilder.buildE2EIDegraded(conversationEntity, verificationMessageType, userIds);
+          await this.repository.event.injectEvent(degradedEvent);
+        } else {
+          this.logger.error('updateConversationE2EIVerificationState: Missing verificationMessageType while degrading');
+        }
+        break;
+      default:
+        break;
+    }
+  };
 }

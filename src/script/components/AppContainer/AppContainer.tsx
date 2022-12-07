@@ -17,12 +17,19 @@
  *
  */
 
-import {FC} from 'react';
+import {FC, useEffect} from 'react';
 
 import {ClientType} from '@wireapp/api-client/lib/client/';
 import {container} from 'tsyringe';
 
+import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
+import {useSingleInstance} from 'src/script/hooks/useSingleInstance';
+import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
+
+import {useTheme} from './hooks/useTheme';
+
 import {Configuration} from '../../Config';
+import {setAppLocale} from '../../localization/Localizer';
 import {App} from '../../main/app';
 import {AppMain} from '../../page/AppMain';
 import {APIClient} from '../../service/APIClientSingleton';
@@ -36,10 +43,36 @@ interface AppProps {
 }
 
 export const AppContainer: FC<AppProps> = ({config, clientType}) => {
+  setAppLocale();
   const app = new App(container.resolve(Core), container.resolve(APIClient), config);
   // Publishing application on the global scope for debug and testing purposes.
   window.wire.app = app;
   const mainView = new MainViewModel(app.repository);
+  useTheme(() => app.repository.properties.getPreference(PROPERTIES_TYPE.INTERFACE.THEME));
+
+  const {hasOtherInstance, registerInstance} = useSingleInstance();
+
+  useEffect(() => {
+    if (hasOtherInstance) {
+      return;
+    }
+    const killInstance = registerInstance();
+    window.addEventListener('beforeunload', killInstance);
+  }, []);
+
+  useEffect(() => {
+    // Prevent Chrome (and Electron) from pushing the content out of the
+    // viewport when using form elements (e.g. in the preferences)
+    const resetWindowScroll = () => window.scrollTo(0, 0);
+    document.addEventListener('scroll', resetWindowScroll);
+
+    return () => document.removeEventListener('scroll', resetWindowScroll);
+  }, []);
+
+  if (hasOtherInstance) {
+    app.redirectToLogin(SIGN_OUT_REASON.MULTIPLE_TABS);
+    return null;
+  }
 
   return (
     <AppLoader init={onProgress => app.initApp(clientType, onProgress)}>

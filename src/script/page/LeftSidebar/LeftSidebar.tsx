@@ -25,8 +25,6 @@ import {CSSTransition, SwitchTransition} from 'react-transition-group';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {t} from 'Util/LocalizerUtil';
-
 import {Archive} from './panels/Archive';
 import {Conversations} from './panels/Conversations';
 import {Preferences} from './panels/Preferences';
@@ -53,27 +51,19 @@ const Animated: React.FC<{children: React.ReactNode}> = ({children, ...rest}) =>
 const LeftSidebar: React.FC<LeftSidebarProps> = ({listViewModel, selfUser, isActivatedAccount}) => {
   const {conversationRepository, propertiesRepository} = listViewModel;
   const repositories = listViewModel.contentViewModel.repositories;
-  const {listState} = useAppState();
+  const listState = useAppState(state => state.listState);
 
   const switchList = (list: ListState) => listViewModel.switchList(list);
 
   const goHome = () =>
-    selfUser.isTemporaryGuest()
-      ? listViewModel.switchList(ListState.TEMPORARY_GUEST)
-      : listViewModel.switchList(ListState.CONVERSATIONS);
+    selfUser.isTemporaryGuest() ? switchList(ListState.TEMPORARY_GUEST) : switchList(ListState.CONVERSATIONS);
 
   useEffect(() => {
-    amplify.subscribe(WebAppEvents.SHORTCUT.START, () => {
-      listViewModel.switchList(ListState.START_UI);
-    });
+    amplify.subscribe(WebAppEvents.SHORTCUT.START, () => switchList(ListState.START_UI));
   }, []);
 
   return (
     <aside id="left-column" className={cx('left-column', {'left-column--light-theme': !isActivatedAccount})}>
-      <header>
-        <h2 className="visually-hidden">{t('accessibility.headings.sidebar')}</h2>
-      </header>
-
       <SwitchTransition>
         <Animated key={listState}>
           <>
@@ -124,6 +114,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({listViewModel, selfUser, isAct
                 mainViewModel={listViewModel.mainViewModel}
                 userRepository={repositories.user}
                 isFederated={listViewModel.isFederated}
+                selfUser={selfUser}
               />
             )}
           </>

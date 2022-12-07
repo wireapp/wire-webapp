@@ -22,25 +22,19 @@ updates:
     open-pull-requests-limit: 99
     labels:
       - 'type: chore 🧹'
+    groups:
+      eslint:
+        patterns:
+          - '*eslint*'
+      lexial:
+        patterns:
+          - '*lexical*'
+      datadog:
+        patterns:
+          - '*@datadog*'
+
     ignore:
-      - dependency-name: core-js
-        versions:
-          - '>= 3.a'
-      - dependency-name: webrtc-adapter
-        versions:
-          - '>= 7.a'
-      - dependency-name: 'less'
-        versions:
-          - '>= 4'
-      - dependency-name: 'husky'
-        versions:
-          - '>= 5.a'
-      - dependency-name: 'tsyringe'
-        versions:
-          - '> 4.3.0'
       - dependency-name: '@wireapp/avs'
-      - dependency-name: 'autoprefixer'
-      - dependency-name: 'cssnano'
 
   # Server dependencies
   - package-ecosystem: npm

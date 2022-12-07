@@ -17,31 +17,33 @@
  *
  */
 
-import type {ConversationRolesList} from '@wireapp/api-client/lib/conversation/ConversationRole';
+import {ConversationRolesList, ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import type {
   TeamConversationDeleteEvent,
   TeamDeleteEvent,
   TeamEvent,
+  TeamFeatureConfigurationUpdateEvent,
   TeamMemberJoinEvent,
   TeamMemberLeaveEvent,
   TeamMemberUpdateEvent,
   TeamUpdateEvent,
 } from '@wireapp/api-client/lib/event';
 import {TEAM_EVENT} from '@wireapp/api-client/lib/event/TeamEvent';
-import type {FeatureList} from '@wireapp/api-client/lib/team/feature/';
-import {FeatureStatus, FEATURE_KEY, SelfDeletingTimeout} from '@wireapp/api-client/lib/team/feature/';
+import {FeatureStatus, FeatureList} from '@wireapp/api-client/lib/team/feature/';
+import type {PermissionsData} from '@wireapp/api-client/lib/team/member/PermissionsData';
 import type {TeamData} from '@wireapp/api-client/lib/team/team/TeamData';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import {Runtime} from '@wireapp/commons';
+import {Runtime, TypedEventEmitter} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Environment} from 'Util/Environment';
-import {replaceLink, t} from 'Util/LocalizerUtil';
+import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
-import {formatDuration, TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {loadDataUrl} from 'Util/util';
 
 import {TeamEntity} from './TeamEntity';
@@ -52,13 +54,12 @@ import {TeamState} from './TeamState';
 
 import {AssetRepository} from '../assets/AssetRepository';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
-import {PrimaryModal} from '../components/Modals/PrimaryModal';
-import {Config} from '../Config';
 import {User} from '../entity/User';
 import {EventSource} from '../event/EventSource';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {IntegrationMapper} from '../integration/IntegrationMapper';
 import {ServiceEntity} from '../integration/ServiceEntity';
+import {MLSMigrationStatus, getMLSMigrationStatus} from '../mls/MLSMigration/migrationStatus';
 import {ROLE, ROLE as TEAM_ROLE, roleFromTeamPermissions} from '../user/UserPermission';
 import {UserRepository} from '../user/UserRepository';
 import {UserState} from '../user/UserState';
@@ -73,73 +74,91 @@ export interface AccountInfo {
   userID: string;
 }
 
-export class TeamRepository {
-  private static readonly LOCAL_STORAGE_FEATURE_CONFIG_KEY = 'FEATURE_CONFIG_KEY';
+type Events = {
+  featureUpdated: {
+    prevFeatureList?: FeatureList;
+    event: TeamFeatureConfigurationUpdateEvent;
+  };
+  teamRefreshed: void;
+};
+
+export class TeamRepository extends TypedEventEmitter<Events> {
   private readonly logger: Logger;
-  readonly teamService: TeamService;
   private readonly teamMapper: TeamMapper;
   private readonly userRepository: UserRepository;
   private readonly assetRepository: AssetRepository;
 
   constructor(
-    teamService: TeamService,
     userRepository: UserRepository,
     assetRepository: AssetRepository,
+    readonly teamService: TeamService = new TeamService(),
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
   ) {
+    super();
     this.logger = getLogger('TeamRepository');
 
     this.teamMapper = new TeamMapper();
-    this.teamService = teamService;
     this.assetRepository = assetRepository;
     this.userRepository = userRepository;
 
     this.userRepository.getTeamMembersFromUsers = this.getTeamMembersFromUsers;
-    this.teamState.teamMembers.subscribe(() => this.userRepository.mapGuestStatus());
-
-    this.isSelfConnectedTo = userId => {
-      return (
-        this.teamState.memberRoles()[userId] !== ROLE.PARTNER ||
-        this.teamState.memberInviters()[userId] === this.userState.self().id
-      );
-    };
 
     amplify.subscribe(WebAppEvents.TEAM.EVENT_FROM_BACKEND, this.onTeamEvent);
-    amplify.subscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, this.onNotificationHandlingStateChange);
+    amplify.subscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, this.updateTeamConfig);
     amplify.subscribe(WebAppEvents.TEAM.UPDATE_INFO, this.sendAccountInfo.bind(this));
   }
 
-  readonly getRoleBadge = (userId: string): string => {
+  getRoleBadge(userId: string): string {
     return this.teamState.isExternal(userId) ? t('rolePartner') : '';
-  };
+  }
 
-  readonly isSelfConnectedTo = (userId: string): boolean => {
+  isSelfConnectedTo(userId: string): boolean {
     return (
       this.teamState.memberRoles()[userId] !== ROLE.PARTNER ||
       this.teamState.memberInviters()[userId] === this.userState.self().id
     );
-  };
-
-  initTeam = async (): Promise<void> => {
-    const team = await this.getTeam();
-    if (this.userState.self().teamId) {
-      await this.updateTeamMembers(team);
-    }
-    this.updateFeatureConfig();
-    this.scheduleTeamRefresh();
-  };
-
-  async updateFeatureConfig() {
-    this.teamState.teamFeatures(await this.teamService.getAllTeamFeatures());
-    return this.teamState.teamFeatures();
   }
 
-  readonly scheduleTeamRefresh = (): void => {
+  async initTeam(teamId?: string): Promise<QualifiedId[]> {
+    const team = await this.getTeam();
+    // get the fresh feature config from backend
+    await this.updateFeatureConfig();
+    if (!teamId) {
+      return [];
+    }
+    this.teamState.teamMembers.subscribe(members => {
+      // Subscribe to team members change and update the user role and guest status
+      this.userRepository.mapGuestStatus(members);
+      const roles = this.teamState.memberRoles();
+      members.forEach(user => {
+        if (roles[user.id]) {
+          user.teamRole(roles[user.id]);
+        }
+      });
+    });
+    const members = await this.loadTeamMembers(team);
+    this.scheduleTeamRefresh();
+    return members;
+  }
+
+  private async updateFeatureConfig(): Promise<{newFeatureList: FeatureList; prevFeatureList?: FeatureList}> {
+    const prevFeatureList = this.teamState.teamFeatures();
+    const newFeatureList = await this.teamService.getAllTeamFeatures();
+    this.teamState.teamFeatures(newFeatureList);
+
+    return {
+      newFeatureList,
+      prevFeatureList,
+    };
+  }
+
+  private readonly scheduleTeamRefresh = (): void => {
     window.setInterval(async () => {
       try {
         await this.getTeam();
         await this.updateFeatureConfig();
+        this.emit('teamRefreshed');
       } catch (error) {
         this.logger.error(error);
       }
@@ -147,13 +166,13 @@ export class TeamRepository {
   };
 
   async getTeam(): Promise<TeamEntity> {
-    const selfTeamId = this.userState.self().teamId;
-    const teamData = !!selfTeamId && (await this.getTeamById(selfTeamId));
+    const teamId = this.userState.self().teamId;
+    const teamData = !!teamId && (await this.getTeamById(teamId));
 
     const teamEntity = teamData ? this.teamMapper.mapTeamFromObject(teamData, this.teamState.team()) : new TeamEntity();
     this.teamState.team(teamEntity);
-    if (selfTeamId) {
-      await this.getSelfMember(selfTeamId);
+    if (teamId) {
+      await this.getSelfMember(teamId);
     }
     // doesn't need to be awaited because it publishes the account info over amplify.
     this.sendAccountInfo();
@@ -162,27 +181,28 @@ export class TeamRepository {
 
   async getTeamMember(teamId: string, userId: string): Promise<TeamMemberEntity> {
     const memberResponse = await this.teamService.getTeamMember(teamId, userId);
-    return this.teamMapper.mapMemberFromObject(memberResponse);
+    return this.teamMapper.mapMember(memberResponse);
   }
 
   async getSelfMember(teamId: string): Promise<TeamMemberEntity> {
     const memberEntity = await this.getTeamMember(teamId, this.userState.self().id);
-    this.teamMapper.mapRole(this.userState.self(), memberEntity.permissions);
+    this.updateUserRole(this.userState.self(), memberEntity.permissions);
     return memberEntity;
   }
 
-  async getAllTeamMembers(teamId: string): Promise<TeamMemberEntity[] | void> {
+  private async getAllTeamMembers(teamId: string): Promise<TeamMemberEntity[]> {
     const {members, hasMore} = await this.teamService.getAllTeamMembers(teamId);
     if (!hasMore && members.length) {
-      return this.teamMapper.mapMemberFromArray(members);
+      return this.teamMapper.mapMembers(members);
     }
+    return [];
   }
 
   async conversationHasGuestLinkEnabled(conversationId: string): Promise<boolean> {
     return this.teamService.conversationHasGuestLink(conversationId);
   }
 
-  getTeamMembersFromUsers = async (users: User[]): Promise<void> => {
+  private getTeamMembersFromUsers = async (users: User[]): Promise<void> => {
     const selfTeamId = this.userState.self().teamId;
     if (!selfTeamId) {
       return;
@@ -215,11 +235,15 @@ export class TeamRepository {
     return IntegrationMapper.mapServicesFromArray(servicesData, domain);
   }
 
-  readonly onTeamEvent = (eventJson: any, source: EventSource): void => {
+  readonly onTeamEvent = async (eventJson: any, source: EventSource): Promise<void> => {
+    if (this.teamState.isTeamDeleted()) {
+      // We don't want to handle any events after the team has been deleted
+      return;
+    }
+
     const type = eventJson.type;
 
-    const logObject = {eventJson: JSON.stringify(eventJson), eventObject: eventJson};
-    this.logger.info(`»» Team Event: '${type}' (Source: ${source})`, logObject);
+    this.logger.info(`Team Event: '${type}' (Source: ${source})`);
 
     switch (type) {
       case TEAM_EVENT.CONVERSATION_DELETE: {
@@ -239,7 +263,7 @@ export class TeamRepository {
         break;
       }
       case TEAM_EVENT.MEMBER_UPDATE: {
-        this.onMemberUpdate(eventJson);
+        await this.onMemberUpdate(eventJson);
         break;
       }
       case TEAM_EVENT.UPDATE: {
@@ -247,7 +271,7 @@ export class TeamRepository {
         break;
       }
       case TEAM_EVENT.FEATURE_CONFIG_UPDATE: {
-        this.onFeatureConfigUpdate(eventJson, source);
+        await this.onFeatureConfigUpdate(eventJson, source);
         break;
       }
       case TEAM_EVENT.CONVERSATION_CREATE:
@@ -293,7 +317,7 @@ export class TeamRepository {
         accountInfo.availability = this.userState.self().availability();
       }
 
-      this.logger.info('Publishing account info', accountInfo);
+      this.logger.log('Publishing account info', accountInfo);
       amplify.publish(WebAppEvents.TEAM.INFO, accountInfo);
       return accountInfo;
     }
@@ -306,7 +330,7 @@ export class TeamRepository {
     }
 
     const members = await this.teamService.getTeamMembersByIds(teamId, memberIds);
-    const mappedMembers = this.teamMapper.mapMemberFromArray(members);
+    const mappedMembers = this.teamMapper.mapMembers(members);
     const selfId = this.userState.self().id;
     memberIds = mappedMembers.map(member => member.userId).filter(id => id !== selfId);
 
@@ -314,42 +338,19 @@ export class TeamRepository {
       this.teamState.memberRoles({});
       this.teamState.memberInviters({});
     }
-    const userEntities = await this.userRepository.getUsersById(
-      memberIds.map(memberId => ({domain: this.teamState.teamDomain(), id: memberId})),
-    );
 
-    if (append) {
-      const knownUserIds = teamEntity.members().map(({id}) => id);
-      const newUserEntities = userEntities.filter(({id}) => !knownUserIds.includes(id));
-      teamEntity.members.push(...newUserEntities);
-    } else {
-      teamEntity.members(userEntities);
-    }
-    this.updateMemberRoles(teamEntity, mappedMembers);
+    this.updateMemberRoles(mappedMembers);
   }
 
-  async updateTeamMembers(teamEntity: TeamEntity): Promise<void> {
+  private async loadTeamMembers(teamEntity: TeamEntity): Promise<QualifiedId[]> {
     const teamMembers = await this.getAllTeamMembers(teamEntity.id);
-    if (teamMembers) {
-      this.teamState.memberRoles({});
-      this.teamState.memberInviters({});
+    this.teamState.memberRoles({});
+    this.teamState.memberInviters({});
 
-      const memberIds = teamMembers
-        .filter(({userId}) => userId !== this.userState.self().id)
-        .map(memberEntity => ({domain: this.teamState.teamDomain(), id: memberEntity.userId}));
-
-      const userEntities = await this.userRepository.getUsersById(memberIds);
-      teamEntity.members(userEntities);
-      this.updateMemberRoles(teamEntity, teamMembers);
-    }
-  }
-
-  private addUserToTeam(userEntity: User): void {
-    const members = this.teamState.team().members;
-
-    if (!members().find(member => member.id === userEntity.id)) {
-      members.push(userEntity);
-    }
+    this.updateMemberRoles(teamMembers);
+    return teamMembers
+      .filter(({userId}) => userId !== this.userState.self().id)
+      .map(memberEntity => ({domain: this.teamState.teamDomain() ?? '', id: memberEntity.userId}));
   }
 
   private getTeamById(teamId: string): Promise<TeamData> {
@@ -373,7 +374,7 @@ export class TeamRepository {
     amplify.publish(WebAppEvents.CONVERSATION.DELETE, {domain: '', id: conversationId});
   }
 
-  private _onMemberJoin(eventJson: TeamMemberJoinEvent): void {
+  private async _onMemberJoin(eventJson: TeamMemberJoinEvent) {
     const {
       data: {user: userId},
       team: teamId,
@@ -382,166 +383,33 @@ export class TeamRepository {
     const isOtherUser = this.userState.self().id !== userId;
 
     if (isLocalTeam && isOtherUser) {
-      this.userRepository
-        .getUserById({domain: this.userState.self().domain, id: userId})
-        .then(userEntity => this.addUserToTeam(userEntity));
-      this.getTeamMember(teamId, userId).then(member => this.updateMemberRoles(this.teamState.team(), member));
+      await this.userRepository.getUserById({domain: this.userState.self().domain, id: userId});
+      const member = await this.getTeamMember(teamId, userId);
+      this.updateMemberRoles([member]);
     }
   }
 
-  private readonly onNotificationHandlingStateChange = async (
-    handlingNotifications: NOTIFICATION_HANDLING_STATE,
-  ): Promise<void> => {
+  private readonly updateTeamConfig = async (handlingNotifications: NOTIFICATION_HANDLING_STATE): Promise<void> => {
     const shouldFetchConfig = handlingNotifications === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
     if (shouldFetchConfig) {
-      const featureConfigList = await this.updateFeatureConfig();
-      this.handleConfigUpdate(featureConfigList);
+      await this.updateFeatureConfig();
     }
   };
 
   private readonly onFeatureConfigUpdate = async (
-    eventJson: TeamEvent & {name: FEATURE_KEY},
+    event: TeamFeatureConfigurationUpdateEvent,
     source: EventSource,
   ): Promise<void> => {
     if (source !== EventSource.WEBSOCKET) {
       // Ignore notification stream events
       return;
     }
-    const featureConfigList = await this.updateFeatureConfig();
-    this.handleConfigUpdate(featureConfigList);
+
+    // When we receive a `feature-config.update` event, we will refetch the entire feature config
+    const {prevFeatureList} = await this.updateFeatureConfig();
+    this.emit('featureUpdated', {event, prevFeatureList});
   };
-
-  private readonly handleConfigUpdate = (featureConfigList: FeatureList) => {
-    const previousConfig = this.loadPreviousFeatureConfig();
-
-    if (previousConfig) {
-      this.handleAudioVideoFeatureChange(previousConfig, featureConfigList);
-      this.handleFileSharingFeatureChange(previousConfig, featureConfigList);
-      this.handleSelfDeletingMessagesFeatureChange(previousConfig, featureConfigList);
-      this.handleConferenceCallingFeatureChange(previousConfig, featureConfigList);
-      this.handleGuestLinkFeatureChange(previousConfig, featureConfigList);
-    }
-    this.saveFeatureConfig(featureConfigList);
-  };
-
-  private readonly handleFileSharingFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
-    const hasFileSharingChanged = previousConfig?.fileSharing?.status !== newConfig?.fileSharing?.status;
-    const hasChangedToEnabled = newConfig?.fileSharing?.status === FeatureStatus.ENABLED;
-
-    if (hasFileSharingChanged) {
-      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-        text: {
-          htmlMessage: hasChangedToEnabled
-            ? t('featureConfigChangeModalFileSharingDescriptionItemFileSharingEnabled')
-            : t('featureConfigChangeModalFileSharingDescriptionItemFileSharingDisabled'),
-          title: t('featureConfigChangeModalFileSharingHeadline', {brandName: Config.getConfig().BRAND_NAME}),
-        },
-      });
-    }
-  };
-
-  private readonly handleGuestLinkFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
-    const hasGuestLinkChanged =
-      previousConfig?.conversationGuestLinks?.status !== newConfig?.conversationGuestLinks?.status;
-    const hasGuestLinkChangedToEnabled = newConfig?.conversationGuestLinks?.status === FeatureStatus.ENABLED;
-
-    if (hasGuestLinkChanged) {
-      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-        text: {
-          htmlMessage: hasGuestLinkChangedToEnabled
-            ? t('featureConfigChangeModalConversationGuestLinksDescriptionItemConversationGuestLinksEnabled')
-            : t('featureConfigChangeModalConversationGuestLinksDescriptionItemConversationGuestLinksDisabled'),
-          title: t('featureConfigChangeModalConversationGuestLinksHeadline'),
-        },
-      });
-    }
-  };
-
-  private readonly handleSelfDeletingMessagesFeatureChange = (
-    {selfDeletingMessages: previousState}: FeatureList,
-    {selfDeletingMessages: newState}: FeatureList,
-  ) => {
-    const previousTimeout = previousState?.config?.enforcedTimeoutSeconds * 1000;
-    const newTimeout = newState?.config?.enforcedTimeoutSeconds * 1000;
-    const previousStatus = previousState?.status;
-    const newStatus = newState?.status;
-
-    const hasTimeoutChanged = previousTimeout !== newTimeout;
-    const isEnforced = newTimeout > SelfDeletingTimeout.OFF;
-    const hasStatusChanged = previousStatus !== newStatus;
-    const hasFeatureChanged = hasStatusChanged || hasTimeoutChanged;
-    const isFeatureEnabled = newStatus === FeatureStatus.ENABLED;
-
-    if (hasFeatureChanged) {
-      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-        text: {
-          htmlMessage: isFeatureEnabled
-            ? isEnforced
-              ? t('featureConfigChangeModalSelfDeletingMessagesDescriptionItemEnforced', {
-                  timeout: formatDuration(newTimeout).text,
-                })
-              : t('featureConfigChangeModalSelfDeletingMessagesDescriptionItemEnabled')
-            : t('featureConfigChangeModalSelfDeletingMessagesDescriptionItemDisabled'),
-          title: t('featureConfigChangeModalSelfDeletingMessagesHeadline', {brandName: Config.getConfig().BRAND_NAME}),
-        },
-      });
-    }
-  };
-
-  private readonly handleAudioVideoFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
-    const hasVideoCallingChanged = previousConfig?.videoCalling?.status !== newConfig?.videoCalling?.status;
-    const hasChangedToEnabled = newConfig?.videoCalling?.status === FeatureStatus.ENABLED;
-
-    if (hasVideoCallingChanged) {
-      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-        text: {
-          htmlMessage: hasChangedToEnabled
-            ? t('featureConfigChangeModalAudioVideoDescriptionItemCameraEnabled')
-            : t('featureConfigChangeModalAudioVideoDescriptionItemCameraDisabled'),
-          title: t('featureConfigChangeModalAudioVideoHeadline', {brandName: Config.getConfig().BRAND_NAME}),
-        },
-      });
-    }
-  };
-
-  private readonly handleConferenceCallingFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
-    if (previousConfig?.conferenceCalling?.status !== newConfig?.conferenceCalling?.status) {
-      const hasChangedToEnabled = newConfig?.conferenceCalling?.status === FeatureStatus.ENABLED;
-      if (hasChangedToEnabled) {
-        const replaceEnterprise = replaceLink(
-          Config.getConfig().URL.PRICING,
-          'modal__text__read-more',
-          'read-more-pricing',
-        );
-        PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-          text: {
-            htmlMessage: t(
-              'featureConfigChangeModalConferenceCallingEnabled',
-              {brandName: Config.getConfig().BRAND_NAME},
-              replaceEnterprise,
-            ),
-            title: t('featureConfigChangeModalConferenceCallingTitle', {brandName: Config.getConfig().BRAND_NAME}),
-          },
-        });
-      }
-    }
-  };
-
-  private readonly loadPreviousFeatureConfig = (): FeatureList | void => {
-    const featureConfigs: {[selfId: string]: FeatureList} = JSON.parse(
-      window.localStorage.getItem(TeamRepository.LOCAL_STORAGE_FEATURE_CONFIG_KEY),
-    );
-    if (featureConfigs && featureConfigs[this.userState.self().id]) {
-      return featureConfigs[this.userState.self().id];
-    }
-  };
-
-  private readonly saveFeatureConfig = (featureConfigList: FeatureList): void =>
-    window.localStorage.setItem(
-      TeamRepository.LOCAL_STORAGE_FEATURE_CONFIG_KEY,
-      JSON.stringify({[this.userState.self().id]: featureConfigList}),
-    );
 
   private onMemberLeave(eventJson: TeamMemberLeaveEvent): void {
     const {
@@ -557,7 +425,6 @@ export class TeamRepository {
         return this.onDelete(eventJson);
       }
 
-      this.teamState.team().members.remove(member => member.id === userId);
       amplify.publish(WebAppEvents.TEAM.MEMBER_LEAVE, teamId, {domain: '', id: userId}, new Date(time).toISOString());
     }
   }
@@ -568,40 +435,41 @@ export class TeamRepository {
       team: teamId,
     } = eventJson;
     const isLocalTeam = this.teamState.team().id === teamId;
+    if (!isLocalTeam) {
+      return;
+    }
+
     const isSelfUser = this.userState.self().id === userId;
 
-    if (isLocalTeam && isSelfUser) {
+    if (isSelfUser) {
       const memberEntity = permissions ? {permissions} : await this.getTeamMember(teamId, userId);
-      this.teamMapper.mapRole(this.userState.self(), memberEntity.permissions);
+      this.updateUserRole(this.userState.self(), memberEntity.permissions);
       await this.sendAccountInfo();
-    }
-    if (isLocalTeam && !isSelfUser) {
+    } else {
       const member = await this.getTeamMember(teamId, userId);
-      this.updateMemberRoles(this.teamState.team(), member);
+      this.updateMemberRoles([member]);
     }
   }
 
-  private updateMemberRoles(team: TeamEntity, memberEntities: TeamMemberEntity | TeamMemberEntity[] = []): void {
-    const memberArray = [].concat(memberEntities);
-    memberArray.forEach(member => {
-      const user = team.members().find(({id}) => member.userId === id);
-      if (user) {
-        this.teamMapper.mapRole(user, member.permissions);
-      }
-    });
+  private updateUserRole(user: User, permissions: PermissionsData): void {
+    user.teamRole(roleFromTeamPermissions(permissions));
+  }
 
-    const memberRoles = memberArray.reduce((accumulator, member) => {
+  private updateMemberRoles(members: TeamMemberEntity[] = []): void {
+    const memberRoles = members.reduce((accumulator, member) => {
       accumulator[member.userId] = member.permissions ? roleFromTeamPermissions(member.permissions) : ROLE.INVALID;
       return accumulator;
     }, this.teamState.memberRoles());
 
-    const memberInvites = memberArray.reduce((accumulator, member) => {
-      accumulator[member.userId] = member.invitedBy;
+    const memberInvites = members.reduce((accumulator, member) => {
+      if (member.invitedBy) {
+        accumulator[member.userId] = member.invitedBy;
+      }
       return accumulator;
     }, this.teamState.memberInviters());
 
     const supportsLegalHold =
-      this.teamState.supportsLegalHold() || memberArray.some(member => member.hasOwnProperty('legalholdStatus'));
+      this.teamState.supportsLegalHold() || members.some(member => member.hasOwnProperty('legalholdStatus'));
     this.teamState.supportsLegalHold(supportsLegalHold);
     this.teamState.memberRoles(memberRoles);
     this.teamState.memberInviters(memberInvites);
@@ -619,4 +487,26 @@ export class TeamRepository {
       this.sendAccountInfo();
     }
   }
+
+  public getTeamSupportedProtocols(): ConversationProtocol[] {
+    const mlsFeature = this.teamState.teamFeatures()?.mls;
+
+    if (!mlsFeature || mlsFeature.status === FeatureStatus.DISABLED) {
+      return [ConversationProtocol.PROTEUS];
+    }
+
+    const teamSupportedProtocols = mlsFeature.config.supportedProtocols;
+
+    // For old teams (created on some older backend versions) supportedProtocols field might not exist or be empty,
+    // we fallback to proteus in this case.
+    return teamSupportedProtocols && teamSupportedProtocols.length > 0
+      ? teamSupportedProtocols
+      : [ConversationProtocol.PROTEUS];
+  }
+
+  public readonly getTeamMLSMigrationStatus = (): MLSMigrationStatus => {
+    const mlsMigrationFeature = this.teamState.teamFeatures()?.mlsMigration;
+
+    return getMLSMigrationStatus(mlsMigrationFeature);
+  };
 }

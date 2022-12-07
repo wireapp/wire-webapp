@@ -21,7 +21,7 @@ import {render, waitFor} from '@testing-library/react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {Conversation} from 'src/script/entity/Conversation';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {MessageDetails} from './MessageDetails';
 
@@ -49,46 +49,49 @@ beforeAll(() => {
   });
 });
 
-const getDefaultParams = (showLikes: boolean = false) => {
+const getDefaultParams = (showReactions: boolean = false) => {
   return {
     conversationRepository,
     onClose: jest.fn(),
     searchRepository,
-    showLikes,
+    showReactions,
     teamRepository: {
       conversationHasGuestLinkEnabled: async (conversationId: string) => true,
-    } as TeamRepository,
+      isSelfConnectedTo: () => false,
+    } as unknown as TeamRepository,
     updateEntity: jest.fn(),
   };
 };
 
 describe('MessageDetails', () => {
-  it('renders no likes view', async () => {
+  it('renders no reactions view', async () => {
     const conversation = new Conversation();
-    conversation.team_id = 'mock-team-id';
+    conversation.teamId = 'mock-team-id';
 
     const timestamp = new Date('2022-01-21T15:08:14.225Z').getTime();
     const userName = 'Jan Kowalski';
 
-    const user = new User(createRandomUuid());
+    const user = new User(createUuid());
     user.name(userName);
 
-    const message = new ContentMessage(createRandomUuid());
+    const message = new ContentMessage(createUuid());
     message.timestamp(timestamp);
     message.user(user);
 
-    const getUsersById = jest.fn(async (qid: QualifiedId) => {
-      return [new User('mock-id', 'test-domain.mock')];
+    const findUsersByIds = jest.fn((ids: QualifiedId[]) => {
+      return ids.map(id => new User(id.id, 'test-domain.mock'));
     });
 
     const userRepository = {
-      getUsersById,
+      findUsersByIds,
     } as unknown as UserRepository;
 
     const defaultProps = getDefaultParams();
     const {getByText} = render(
       <MessageDetails
         {...defaultProps}
+        selfUser={new User()}
+        togglePanel={() => undefined}
         activeConversation={conversation}
         messageEntity={message}
         userRepository={userRepository}
@@ -96,9 +99,9 @@ describe('MessageDetails', () => {
     );
 
     await waitFor(() => {
-      getByText('messageDetailsNoLikes');
+      getByText('messageDetailsNoReactions');
     });
 
-    expect(getByText('messageDetailsNoLikes')).not.toBeNull();
+    expect(getByText('messageDetailsNoReactions')).not.toBeNull();
   });
 });

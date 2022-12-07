@@ -21,11 +21,10 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {CONV_TYPE} from '@wireapp/avs';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal, usePrimaryModalState} from 'Components/Modals/PrimaryModal';
 import {iterateItem} from 'Util/ArrayUtil';
 import {isEscapeKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -72,7 +71,7 @@ export class ListViewModel {
   public readonly contentViewModel: ContentViewModel;
   public readonly callingViewModel: CallingViewModel;
   private readonly isProAccount: ko.PureComputed<boolean>;
-  public readonly selfUser: ko.Observable<User>;
+  public readonly selfUser: ko.Subscribable<User>;
   private readonly visibleListItems: ko.PureComputed<(string | Conversation)[]>;
 
   get isFederated() {
@@ -96,9 +95,9 @@ export class ListViewModel {
     this.contentViewModel = mainViewModel.content;
     this.callingViewModel = mainViewModel.calling;
 
-    this.isActivatedAccount = this.userState.isActivatedAccount;
     this.isProAccount = this.teamState.isTeam;
     this.selfUser = this.userState.self;
+    this.isActivatedAccount = ko.pureComputed(() => this.selfUser()?.isActivatedAccount());
 
     // State
     this.lastUpdate = ko.observable();
@@ -132,7 +131,9 @@ export class ListViewModel {
   }
 
   private readonly _initSubscriptions = () => {
-    amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, this.openConversations);
+    amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, (conversation?: Conversation) => {
+      this.openConversations(conversation?.archivedState());
+    });
     amplify.subscribe(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT, this.openPreferencesAccount);
     amplify.subscribe(WebAppEvents.PREFERENCES.MANAGE_DEVICES, this.openPreferencesDevices);
     amplify.subscribe(WebAppEvents.PREFERENCES.SHOW_AV, this.openPreferencesAudioVideo);
@@ -152,7 +153,7 @@ export class ListViewModel {
       return;
     }
 
-    if (call.conversationType === CONV_TYPE.CONFERENCE && !this.callingRepository.supportsConferenceCalling) {
+    if (call.isConference && !this.callingRepository.supportsConferenceCalling) {
       PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
         text: {
           message: `${t('modalConferenceCallNotSupportedMessage')} ${t('modalConferenceCallNotSupportedJoinMessage')}`,
@@ -160,7 +161,7 @@ export class ListViewModel {
         },
       });
     } else {
-      this.callingRepository.answerCall(call);
+      this.callingViewModel.callActions.answer(call);
     }
   };
 
@@ -182,7 +183,10 @@ export class ListViewModel {
   };
 
   onKeyDownListView = (keyboardEvent: KeyboardEvent) => {
-    if (isEscapeKey(keyboardEvent)) {
+    const {currentModalId} = usePrimaryModalState.getState();
+    // don't switch view for primary modal(ex: preferences->set status->modal opened)
+    // when user press escape, only close the modal and stay within the preference screen
+    if (isEscapeKey(keyboardEvent) && currentModalId === null) {
       const newState = this.isActivatedAccount() ? ListState.CONVERSATIONS : ListState.TEMPORARY_GUEST;
       this.switchList(newState);
     }
@@ -276,8 +280,12 @@ export class ListViewModel {
     }
   };
 
-  readonly openConversations = (): void => {
-    const newState = this.isActivatedAccount() ? ListState.CONVERSATIONS : ListState.TEMPORARY_GUEST;
+  readonly openConversations = (archive = false): void => {
+    const newState = this.isActivatedAccount()
+      ? archive
+        ? ListState.ARCHIVE
+        : ListState.CONVERSATIONS
+      : ListState.TEMPORARY_GUEST;
     this.switchList(newState, false);
   };
 

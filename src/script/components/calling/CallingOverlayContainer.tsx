@@ -23,6 +23,7 @@ import {container} from 'tsyringe';
 
 import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 
+import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {ChooseScreen, Screen} from './ChooseScreen';
@@ -90,14 +91,15 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     callState.selectableWindows([]);
   };
 
-  const changePage = (newPage: number, call: Call) => {
-    callingRepository.changeCallPage(newPage, call);
-  };
+  const changePage = (newPage: number, call: Call) => callingRepository.changeCallPage(call, newPage);
+
+  const {clearShowAlert} = useCallAlertState();
 
   const leave = (call: Call) => {
     callingRepository.leaveCall(call.conversationId, LEAVE_CALL_REASON.MANUAL_LEAVE_BY_UI_CLICK);
     callState.activeCallViewTab(CallViewTab.ALL);
     call.maximizedParticipant(null);
+    clearShowAlert();
   };
 
   const setMaximizedParticipant = (call: Call, participant: Participant | null) => {
@@ -106,28 +108,28 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
 
   const setActiveCallViewTab = (tab: string) => {
     callState.activeCallViewTab(tab);
-    if (tab === CallViewTab.ALL) {
-      callingRepository.requestCurrentPageVideoStreams();
+    if (tab === CallViewTab.ALL && joinedCall) {
+      callingRepository.requestCurrentPageVideoStreams(joinedCall);
     }
   };
 
-  const switchCameraInput = (call: Call, deviceId: string) => {
-    mediaDevicesHandler.currentDeviceId.videoInput(deviceId);
+  const switchCameraInput = (deviceId: string) => {
+    mediaDevicesHandler.currentDeviceId.videoinput(deviceId);
     callingRepository.refreshVideoInput();
   };
 
-  const switchMicrophoneInput = (call: Call, deviceId: string) => {
-    mediaDevicesHandler.currentDeviceId.audioInput(deviceId);
+  const switchMicrophoneInput = (deviceId: string) => {
+    mediaDevicesHandler.currentDeviceId.audioinput(deviceId);
     callingRepository.refreshAudioInput();
   };
 
-  const toggleCamera = (call: Call) => {
-    callingRepository.toggleCamera(call);
+  const switchSpeakerOutput = (deviceId: string) => {
+    mediaDevicesHandler.currentDeviceId.audiooutput(deviceId);
   };
 
-  const toggleMute = (call: Call, muteState: boolean) => {
-    callingRepository.muteCall(call, muteState);
-  };
+  const toggleCamera = (call: Call) => callingRepository.toggleCamera(call);
+
+  const toggleMute = (call: Call, muteState: boolean) => callingRepository.muteCall(call, muteState);
 
   const toggleScreenshare = async (call: Call): Promise<void> => {
     if (call.getSelfParticipant().sharesScreen()) {
@@ -136,7 +138,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     const showScreenSelection = (): Promise<void> => {
       return new Promise(resolve => {
         callingRepository.onChooseScreen = (deviceId: string): void => {
-          mediaDevicesHandler.currentDeviceId.screenInput(deviceId);
+          mediaDevicesHandler.currentDeviceId.screeninput(deviceId);
           callState.selectableScreens([]);
           callState.selectableWindows([]);
           resolve();
@@ -185,6 +187,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
           isChoosingScreen={isChoosingScreen}
           switchCameraInput={switchCameraInput}
           switchMicrophoneInput={switchMicrophoneInput}
+          switchSpeakerOutput={switchSpeakerOutput}
           setMaximizedParticipant={setMaximizedParticipant}
           setActiveCallViewTab={setActiveCallViewTab}
           toggleMute={toggleMute}

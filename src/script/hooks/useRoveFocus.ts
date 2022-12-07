@@ -24,24 +24,33 @@ import type {KeyboardEvent as ReactKeyboardEvent} from 'react';
 
 import {isKey, isTabKey, KEY} from 'Util/KeyboardUtil';
 
-function useRoveFocus(size: number, defaultFocus = 0) {
+function useRoveFocus(size: number, defaultFocus = 0, infinite = true) {
   const [currentFocus, setCurrentFocus] = useState(defaultFocus);
   const firstItem = 0;
   const interval = 1;
+  const lastItem = size - 1;
 
   const handleKeyDown = useCallback(
-    (e: ReactKeyboardEvent | KeyboardEvent) => {
-      if (isKey(e, KEY.ARROW_DOWN)) {
-        e.preventDefault();
-        setCurrentFocus(currentFocus === --size ? firstItem : currentFocus + interval);
-      } else if (isKey(e, KEY.ARROW_UP)) {
-        e.preventDefault();
-        setCurrentFocus(currentFocus === firstItem ? --size : currentFocus - interval);
-      } else if (isTabKey(e)) {
+    (event: ReactKeyboardEvent | KeyboardEvent) => {
+      if (isKey(event, KEY.ARROW_DOWN)) {
+        event.preventDefault();
+        if (infinite) {
+          setCurrentFocus(currentFocus === lastItem ? firstItem : currentFocus + interval);
+        } else if (currentFocus !== lastItem) {
+          setCurrentFocus(currentFocus + interval);
+        }
+      } else if (isKey(event, KEY.ARROW_UP)) {
+        event.preventDefault();
+        if (infinite) {
+          setCurrentFocus(currentFocus === firstItem ? lastItem : currentFocus - interval);
+        } else if (currentFocus !== firstItem) {
+          setCurrentFocus(currentFocus - interval);
+        }
+      } else if (isTabKey(event)) {
         setCurrentFocus(firstItem);
       }
     },
-    [size, currentFocus, setCurrentFocus],
+    [currentFocus, setCurrentFocus, infinite, lastItem],
   );
   return {currentFocus, handleKeyDown, setCurrentFocus};
 }

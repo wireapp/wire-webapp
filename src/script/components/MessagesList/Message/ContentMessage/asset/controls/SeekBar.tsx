@@ -21,6 +21,7 @@ import React, {CSSProperties, useEffect, useState} from 'react';
 
 import cx from 'classnames';
 
+import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
 import {clamp} from 'Util/NumberUtil';
 
 export interface SeekBarProps extends React.HTMLProps<HTMLDivElement> {
@@ -28,6 +29,7 @@ export interface SeekBarProps extends React.HTMLProps<HTMLDivElement> {
   ['data-uie-name']?: string;
   disabled?: boolean;
   mediaElement: HTMLMediaElement;
+  isFocusable?: boolean;
 }
 
 export interface SeekBarCSS extends CSSProperties {
@@ -40,10 +42,12 @@ const SeekBar: React.FC<SeekBarProps> = ({
   mediaElement,
   className,
   'data-uie-name': dataUieName,
+  isFocusable = true,
 }: SeekBarProps) => {
   const [isSeekBarMouseOver, setIsSeekBarMouseOver] = useState<boolean>(false);
   const [isSeekBarThumbDragged, setIsSeekBarThumbDragged] = useState<boolean>(false);
   const [progress, setProgress] = useState<number>(0);
+  const messageFocusedTabIndex = useMessageFocusedTabIndex(isFocusable);
 
   useEffect(() => {
     const onTimeUpdate = () => {
@@ -98,6 +102,7 @@ const SeekBar: React.FC<SeekBarProps> = ({
         }
         type="range"
         value={isNaN(progress) ? 0 : progress}
+        tabIndex={messageFocusedTabIndex}
       />
     </div>
   );

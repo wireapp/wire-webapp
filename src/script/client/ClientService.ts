@@ -17,17 +17,9 @@
  *
  */
 
-import type {
-  CreateClientPayload,
-  RegisteredClient,
-  QualifiedUserClientMap,
-  ClientCapabilityData,
-  PublicClient,
-} from '@wireapp/api-client/lib/client';
+import type {RegisteredClient, QualifiedUserClientMap, ClientCapabilityData} from '@wireapp/api-client/lib/client';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
-
-import {Logger, getLogger} from 'Util/Logger';
 
 import {APIClient} from '../service/APIClientSingleton';
 import type {ClientRecord} from '../storage';
@@ -35,23 +27,12 @@ import {StorageService} from '../storage';
 import {StorageSchemata} from '../storage/StorageSchemata';
 
 export class ClientService {
-  private readonly logger: Logger;
   private readonly CLIENT_STORE_NAME: string;
-
-  static get URL_CLIENTS(): string {
-    return '/clients';
-  }
-
-  static get URL_USERS(): string {
-    return '/users';
-  }
 
   constructor(
     private readonly storageService = container.resolve(StorageService),
     private readonly apiClient = container.resolve(APIClient),
   ) {
-    this.logger = getLogger('ClientService');
-
     this.CLIENT_STORE_NAME = StorageSchemata.OBJECT_STORE.CLIENTS;
   }
 
@@ -107,24 +88,8 @@ export class ClientService {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getClients
    */
   async getClientsByUserIds(userIds: QualifiedId[]): Promise<QualifiedUserClientMap> {
-    if (!this.apiClient.backendFeatures.federationEndpoints) {
-      const clientsMap: {[userId: string]: PublicClient[]} = {};
-      for (const {id} of userIds) {
-        clientsMap[id] = await this.apiClient.api.user.getClients(id);
-      }
-      return {'': clientsMap};
-    }
     const listedClients = await this.apiClient.api.user.postListClients({qualified_users: userIds});
     return listedClients.qualified_user_map;
-  }
-
-  /**
-   * Register a new client.
-   * @param newClient Client payload
-   * @returns Resolves with the registered client information
-   */
-  postClients(newClient: CreateClientPayload): Promise<RegisteredClient> {
-    return this.apiClient.api.client.postClient(newClient);
   }
 
   //##############################################################################
@@ -167,11 +132,9 @@ export class ClientService {
     }
 
     if (clientRecord === undefined) {
-      this.logger.info(`Client with primary key '${primaryKey}' not found in database`);
       return primaryKey;
     }
 
-    this.logger.info(`Loaded client record from database '${primaryKey}'`, clientRecord);
     return clientRecord;
   }
 
@@ -190,7 +153,6 @@ export class ClientService {
     clientPayload.meta.primary_key = primaryKey;
 
     return this.storageService.save(this.CLIENT_STORE_NAME, primaryKey, clientPayload).then(() => {
-      this.logger.info(`Client '${clientPayload.id}' stored with primary key '${primaryKey}'`, clientPayload);
       return clientPayload;
     });
   }

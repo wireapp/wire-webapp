@@ -29,7 +29,9 @@
   border-radius: 4px;
   margin: 0;
   background-color: var(--modal-bg);
-  box-shadow: 0 0 1px 0 fade(#000, 8%), 0 8px 24px 0 fade(#000, 16%);
+  box-shadow:
+    0 0 1px 0 fade(#000, 8%),
+    0 8px 24px 0 fade(#000, 16%);
   font-size: @font-size-small;
   font-weight: @font-weight-regular;
   line-height: @line-height-xl;
@@ -50,8 +52,9 @@
     }
 
     &:hover,
-    &.selected {
+    & > :focus-visible {
       background-color: var(--foreground-fade-16);
+      outline: none;
     }
 
     &--disabled {

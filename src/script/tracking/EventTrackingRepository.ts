@@ -18,6 +18,7 @@
  */
 
 import {amplify} from 'amplify';
+import Countly from 'countly-sdk-web';
 import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -28,7 +29,7 @@ import {roundLogarithmic} from 'Util/NumberUtil';
 import {loadValue, storeValue, resetStoreValue} from 'Util/StorageUtil';
 import {includesString} from 'Util/StringUtil';
 import {getParameter} from 'Util/UrlUtil';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {EventName} from './EventName';
 import {getPlatform} from './Helpers';
@@ -39,10 +40,9 @@ import {URLParameter} from '../auth/URLParameter';
 import {Config} from '../Config';
 import type {ContributedSegmentations, MessageRepository} from '../conversation/MessageRepository';
 import {ClientEvent} from '../event/Client';
+import {TeamState} from '../team/TeamState';
 import {ROLE as TEAM_ROLE} from '../user/UserPermission';
 import {UserState} from '../user/UserState';
-
-const Countly = require('countly-sdk-web');
 
 export class EventTrackingRepository {
   private isProductReportingActivated: boolean;
@@ -68,6 +68,7 @@ export class EventTrackingRepository {
   constructor(
     private readonly messageRepository: MessageRepository,
     private readonly userState = container.resolve(UserState),
+    private readonly teamState = container.resolve(TeamState),
   ) {
     this.logger = getLogger('EventTrackingRepository');
 
@@ -78,7 +79,7 @@ export class EventTrackingRepository {
 
   readonly onUserEvent = (eventJson: any, source: EventSource) => {
     const type = eventJson.type;
-    if (type === ClientEvent.USER.DATA_TRANSFER && this.userState.isTeam()) {
+    if (type === ClientEvent.USER.DATA_TRANSFER && this.teamState.isTeam()) {
       this.migrateDeviceId(eventJson.data.trackingIdentifier);
     }
   };
@@ -98,7 +99,7 @@ export class EventTrackingRepository {
         this.stopProductReporting();
       }
     } catch (error) {
-      this.logger.info(`Failed to send new countly tracking id to other devices ${error}`);
+      this.logger.warn(`Failed to send new countly tracking id to other devices ${error}`);
       storeValue(EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_FAILED_TO_MIGRATE_DEVICE_ID, newId);
     }
   };
@@ -119,7 +120,7 @@ export class EventTrackingRepository {
         this.messageRepository.sendCountlySync(this.countlyDeviceId);
         resetStoreValue(EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_UNSYNCED_DEVICE_ID_LOCAL_STORAGE_KEY);
       } catch (error) {
-        this.logger.info(`Failed to send new countly tracking id to other devices ${error}`);
+        this.logger.warn(`Failed to send new countly tracking id to other devices ${error}`);
       }
     }
 
@@ -146,7 +147,7 @@ export class EventTrackingRepository {
         }
       }
     } else {
-      this.countlyDeviceId = createRandomUuid();
+      this.countlyDeviceId = createUuid();
       storeValue(
         EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_DEVICE_ID_LOCAL_STORAGE_KEY,
         this.countlyDeviceId,
@@ -154,12 +155,12 @@ export class EventTrackingRepository {
       try {
         this.messageRepository.sendCountlySync(this.countlyDeviceId);
       } catch (error) {
-        this.logger.info(`Failed to send new countly tracking id to other devices ${error}`);
+        this.logger.warn(`Failed to send new countly tracking id to other devices ${error}`);
         storeValue(EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_UNSYNCED_DEVICE_ID_LOCAL_STORAGE_KEY, true);
       }
     }
 
-    const isTeam = this.userState.isTeam();
+    const isTeam = this.teamState.isTeam();
     if (!isTeam) {
       return; // Countly should not be enabled for non-team users
     }
@@ -262,10 +263,12 @@ export class EventTrackingRepository {
 
   private trackProductReportingEvent(eventName: string, customSegmentations?: ContributedSegmentations): void {
     if (this.isProductReportingActivated === true) {
+      const contacts = this.teamState.isTeam() ? this.teamState.teamUsers() : this.userState.connectedUsers();
+      const nbContacts = contacts.filter(userEntity => !userEntity.isService).length;
       const userData = {
-        [UserData.IS_TEAM]: this.userState.isTeam(),
-        [UserData.CONTACTS]: roundLogarithmic(this.userState.numberOfContacts(), 6),
-        [UserData.TEAM_SIZE]: roundLogarithmic(this.userState.teamMembers().length, 6),
+        [UserData.IS_TEAM]: this.teamState.isTeam(),
+        [UserData.CONTACTS]: roundLogarithmic(nbContacts, 6),
+        [UserData.TEAM_SIZE]: roundLogarithmic(this.teamState.teamMembers().length, 6),
         [UserData.TEAM_ID]: this.userState.self().teamId,
         [UserData.USER_TYPE]: this.getUserType(),
       };
@@ -288,8 +291,8 @@ export class EventTrackingRepository {
       });
 
       // NOTE: This log is required by QA
-      this.logger.info(`Reporting custom data for product event ${eventName}@${JSON.stringify(userData)}`);
-      this.logger.info(`Reporting product event ${eventName}@${JSON.stringify(segmentation)}`);
+      this.logger.log(`Reporting custom data for product event ${eventName}@${JSON.stringify(userData)}`);
+      this.logger.log(`Reporting product event ${eventName}@${JSON.stringify(segmentation)}`);
     }
   }
 

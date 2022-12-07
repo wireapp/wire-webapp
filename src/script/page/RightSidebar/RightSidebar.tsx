@@ -26,7 +26,6 @@ import {container} from 'tsyringe';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {focusableElementsSelector} from 'Util/util';
 
 import {AddParticipants} from './AddParticipants';
 import {ConversationDetails} from './ConversationDetails';
@@ -47,6 +46,7 @@ import {isReadableMessage} from '../../guards/Message';
 import {isUserEntity, isUserServiceEntity} from '../../guards/Panel';
 import {isServiceEntity} from '../../guards/Service';
 import {ServiceEntity} from '../../integration/ServiceEntity';
+import {Core} from '../../service/CoreSingleton';
 import {TeamState} from '../../team/TeamState';
 import {UserState} from '../../user/UserState';
 import {ActionsViewModel} from '../../view_model/ActionsViewModel';
@@ -86,7 +86,10 @@ interface RightSidebarProps {
   repositories: ViewModelRepositories;
   teamState: TeamState;
   userState: UserState;
+  selfUser: User;
   isFederated: boolean;
+  lastViewedMessageDetailsEntity: Message | null;
+  core?: Core;
 }
 
 const RightSidebar: FC<RightSidebarProps> = ({
@@ -95,7 +98,10 @@ const RightSidebar: FC<RightSidebarProps> = ({
   repositories,
   teamState,
   userState,
+  selfUser,
   isFederated,
+  lastViewedMessageDetailsEntity,
+  core = container.resolve(Core),
 }) => {
   const {
     conversation: conversationRepository,
@@ -106,7 +112,6 @@ const RightSidebar: FC<RightSidebarProps> = ({
   } = repositories;
   const {conversationRoleRepository} = conversationRepository;
   const conversationState = container.resolve(ConversationState);
-
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
 
   const [isAddMode, setIsAddMode] = useState<boolean>(false);
@@ -135,6 +140,12 @@ const RightSidebar: FC<RightSidebarProps> = ({
     const previousHistory = rightSidebar.history.slice(0, -1);
     const hasPreviousHistory = !!previousHistory.length;
     setAnimatePanelToLeft(false);
+
+    if (hasPreviousHistory && previousHistory.length === 1 && previousHistory[0] === PanelState.MESSAGE_DETAILS) {
+      rightSidebar.goBack(lastViewedMessageDetailsEntity);
+
+      return;
+    }
 
     if (hasPreviousHistory) {
       rightSidebar.goBack(entity);
@@ -168,15 +179,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
     });
   }, []);
 
-  const containerRef = useCallback(
-    (element: HTMLDivElement | null) => {
-      const nextElementToFocus = element?.querySelectorAll(focusableElementsSelector)[0] as HTMLElement | null;
-      if (nextElementToFocus) {
-        nextElementToFocus.focus();
-      }
-    },
-    [currentState],
-  );
+  const containerRef = useCallback((element: HTMLDivElement | null) => element?.focus(), [currentState]);
 
   if (!activeConversation) {
     return null;
@@ -185,6 +188,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
   return (
     <TransitionGroup
       id="right-column"
+      component="aside"
       className="right-column"
       childFactory={child =>
         cloneElement(child, {
@@ -194,19 +198,19 @@ const RightSidebar: FC<RightSidebarProps> = ({
       }
     >
       <Animated key={currentState}>
-        <div ref={containerRef} css={{height: '100%'}}>
+        <>
           {currentState === PanelState.CONVERSATION_DETAILS && (
             <ConversationDetails
+              ref={containerRef}
               onClose={closePanel}
               togglePanel={togglePanel}
               activeConversation={activeConversation}
               actionsViewModel={actionsViewModel}
               conversationRepository={conversationRepository}
               integrationRepository={integrationRepository}
-              searchRepository={searchRepository}
               teamRepository={teamRepository}
               teamState={teamState}
-              userState={userState}
+              selfUser={selfUser}
               isFederated={isFederated}
             />
           )}
@@ -223,7 +227,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
               conversationRoleRepository={conversationRoleRepository}
               teamRepository={teamRepository}
               teamState={teamState}
-              userState={userState}
+              selfUser={selfUser}
               isFederated={isFederated}
             />
           )}
@@ -239,6 +243,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
 
           {currentState === PanelState.PARTICIPANT_DEVICES && userEntity && (
             <ParticipantDevices
+              groupId={activeConversation.groupId}
               repositories={repositories}
               onClose={closePanel}
               onGoBack={onBackClick}
@@ -248,6 +253,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
 
           {currentState === PanelState.TIMED_MESSAGES && (
             <TimedMessages
+              teamState={teamState}
               activeConversation={activeConversation}
               repositories={repositories}
               onClose={closePanel}
@@ -257,6 +263,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
 
           {(currentState === PanelState.GUEST_OPTIONS || currentState === PanelState.SERVICES_OPTIONS) && (
             <GuestServicesOptions
+              isPasswordSupported={false} // TODO: change to "core?.backendFeatures.supportsGuestLinksWithPassword" when other clients implement passwords
               isGuest={currentState === PanelState.GUEST_OPTIONS}
               activeConversation={activeConversation}
               conversationRepository={conversationRepository}
@@ -272,12 +279,13 @@ const RightSidebar: FC<RightSidebarProps> = ({
               activeConversation={activeConversation}
               actionsViewModel={actionsViewModel}
               integrationRepository={integrationRepository}
+              enableRemove={conversationRoleRepository.canRemoveParticipants(activeConversation)}
               goToRoot={goToRoot}
               onBack={onBackClick}
               onClose={closePanel}
               serviceEntity={serviceEntity}
               userEntity={userServiceEntity}
-              userState={userState}
+              selfUser={selfUser}
               isAddMode={isAddMode}
             />
           )}
@@ -294,20 +302,20 @@ const RightSidebar: FC<RightSidebarProps> = ({
               teamRepository={teamRepository}
               teamState={teamState}
               userState={userState}
+              selfUser={selfUser}
             />
           )}
 
           {currentState === PanelState.MESSAGE_DETAILS && messageEntity && (
             <MessageDetails
               activeConversation={activeConversation}
+              selfUser={selfUser}
               conversationRepository={conversationRepository}
               messageEntity={messageEntity}
-              updateEntity={rightSidebar.updateEntity}
-              teamRepository={teamRepository}
-              searchRepository={searchRepository}
-              showLikes={rightSidebar.showLikes}
+              showReactions={rightSidebar.showReactions}
               userRepository={userRepository}
               onClose={closePanel}
+              togglePanel={togglePanel}
             />
           )}
 
@@ -323,7 +331,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
               onClose={closePanel}
             />
           )}
-        </div>
+        </>
       </Animated>
     </TransitionGroup>
   );

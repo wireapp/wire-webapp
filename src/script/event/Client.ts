@@ -25,6 +25,7 @@ export enum CONVERSATION {
   ASSET_ADD = 'conversation.asset-add',
   BUTTON_ACTION_CONFIRMATION = 'conversation.button-action-confirmation',
   CALL_TIME_OUT = 'conversation.call-time-out',
+  FAILED_TO_ADD_USERS = 'conversation.failed-to-add-users',
   COMPOSITE_MESSAGE_ADD = 'conversation.composite-message-add',
   CONFIRMATION = 'conversation.confirmation',
   DELETE_EVERYWHERE = 'conversation.delete-everywhere',
@@ -38,13 +39,18 @@ export enum CONVERSATION {
   MESSAGE_DELETE = 'conversation.message-delete',
   MESSAGE_HIDDEN = 'conversation.message-hidden',
   MISSED_MESSAGES = 'conversation.missed-messages',
+  JOINED_AFTER_MLS_MIGRATION = 'conversation.joined-after-mls-migration',
+  MLS_MIGRATION_ONGOING_CALL = 'conversation.mls-migration-ongoing-call',
+  MLS_CONVERSATION_RECOVERED = 'conversation.mls-conversation-recovered',
   ONE2ONE_CREATION = 'conversation.one2one-creation',
   REACTION = 'conversation.reaction',
   TEAM_MEMBER_LEAVE = 'conversation.team-member-leave',
   UNABLE_TO_DECRYPT = 'conversation.unable-to-decrypt',
   VERIFICATION = 'conversation.verification',
+  FEDERATION_STOP = 'conversation.federation-stop',
   VOICE_CHANNEL_ACTIVATE = 'conversation.voice-channel-activate',
   VOICE_CHANNEL_DEACTIVATE = 'conversation.voice-channel-deactivate',
+  E2EI_VERIFICATION = 'conversation.e2ei-verification',
 }
 
 export enum USER {

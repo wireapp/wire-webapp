@@ -17,14 +17,13 @@
  *
  */
 
+import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {KeyPackageClaimUser} from '@wireapp/core/lib/conversation';
+
 import {Account} from '@wireapp/core';
 
-import {arrayToBase64} from 'Util/util';
-
-import {mlsConversationState} from './mlsConversationState';
-
-import {ConversationRepository} from '../conversation/ConversationRepository';
 import {
+  isMLSCapableConversation,
   isMLSConversation,
   isSelfConversation,
   isTeamConversation,
@@ -33,67 +32,74 @@ import {
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 
-type MLSConversationRepository = Pick<
-  ConversationRepository,
-  'findConversationByGroupId' | 'getConversationById' | 'conversationRoleRepository'
->;
-
-export async function initMLSConversations(
-  conversations: Conversation[],
-  selfUser: User,
-  core: Account,
-  conversationRepository: MLSConversationRepository,
-): Promise<void> {
-  core.configureMLSCallbacks({
-    authorize: groupIdBytes => {
-      const groupId = arrayToBase64(groupIdBytes);
-      const conversation = conversationRepository.findConversationByGroupId(groupId);
-      if (!conversation) {
-        // If the conversation is not found, it means it's being created by the self user, thus they have admin rights
-        return true;
-      }
-      return conversationRepository.conversationRoleRepository.isUserGroupAdmin(conversation, selfUser);
-    },
-    groupIdFromConversationId: async conversationId => {
-      const conversation = await conversationRepository.getConversationById(conversationId);
-      return conversation?.groupId;
-    },
-    // This is enforced by backend, no need to implement this on the client side.
-    userAuthorize: () => true,
-  });
-
-  const mlsConversations = conversations.filter(isMLSConversation);
-  await joinNewConversations(mlsConversations, core);
-}
-
 /**
- * Will join all the conversation that the current user is part of but that are not joined by the current user's device
+ * Will initialize all the MLS conversations that the user is member of but that are not yet locally established.
  *
  * @param conversations - all the conversations that the user is part of
  * @param core - the instance of the core
  */
-async function joinNewConversations(conversations: MLSConversation[], core: Account): Promise<void> {
-  // We send external proposal to all the MLS conversations that are in an unknown state (not established nor pendingWelcome)
-  await mlsConversationState.getState().sendExternalToPendingJoin(
-    conversations,
-    groupId => core.service!.conversation.isMLSConversationEstablished(groupId),
-    conversationId => core.service!.conversation.joinByExternalCommit(conversationId),
-  );
+export async function initMLSConversations(
+  conversations: Conversation[],
+  {
+    core,
+    onSuccessfulJoin,
+    onError,
+  }: {
+    core: Account;
+    onSuccessfulJoin?: (conversation: Conversation) => void;
+    onError?: (conversation: Conversation, error: unknown) => void;
+  },
+): Promise<void> {
+  const {mls: mlsService, conversation: conversationService} = core.service || {};
+  if (!mlsService || !conversationService) {
+    throw new Error('MLS or Conversation service is not available!');
+  }
+
+  const mlsConversations = conversations.filter(isMLSCapableConversation);
+
+  for (const mlsConversation of mlsConversations) {
+    try {
+      const {groupId, qualifiedId} = mlsConversation;
+
+      const doesMLSGroupExist = await conversationService.mlsGroupExistsLocally(groupId);
+
+      //if group is already established, we just schedule periodic key material updates
+      if (doesMLSGroupExist) {
+        await mlsService.scheduleKeyMaterialRenewal(groupId);
+        continue;
+      }
+
+      //otherwise we should try joining via external commit
+      await conversationService.joinByExternalCommit(qualifiedId);
+
+      if (onSuccessfulJoin) {
+        return onSuccessfulJoin(mlsConversation);
+      }
+    } catch (error) {
+      return onError?.(mlsConversation, error);
+    }
+  }
 }
 
 /**
- * Will register special conversations agains the core.
- * The self conversation and the team conversation as special conversation that are created by noone and, thus, need to be manually created by the first device that detects them
+ * Will register self and team MLS conversations.
+ * The self conversation and the team conversation are special conversations created by noone and, thus, need to be manually created by the first device that detects them
  *
  * @param conversations all the conversations the user is part of
  * @param core instance of the core
  */
-export async function registerUninitializedConversations(
+export async function registerUninitializedSelfAndTeamConversations(
   conversations: Conversation[],
   selfUser: User,
   selfClientId: string,
   core: Account,
 ): Promise<void> {
+  const mlsService = core.service?.mls;
+
+  if (!mlsService) {
+    throw new Error('MLS service not available');
+  }
+
   const uninitializedConversations = conversations.filter(
     (conversation): conversation is MLSConversation =>
       isMLSConversation(conversation) &&
@@ -103,10 +109,42 @@ export async function registerUninitializedConversations(
 
   await Promise.all(
     uninitializedConversations.map(conversation =>
-      core.service?.mls.registerConversation(conversation.groupId, [selfUser.qualifiedId], {
+      mlsService.registerConversation(conversation.groupId, [selfUser.qualifiedId], {
         user: selfUser,
         client: selfClientId,
       }),
     ),
   );
+}
+
+/**
+ * Will add all other user's self clients to the mls group.
+ *
+ * @param conversation id of the conversation
+ * @param selfUserId id of the self user who's clients should be added
+ * @param selfClientId id of the current client (that should be skipped)
+ * @param core instance of the core
+ */
+export async function addOtherSelfClientsToMLSConversation(
+  conversation: Conversation,
+  selfUserId: QualifiedId,
+  selfClientId: string,
+  core: Account,
+) {
+  const {groupId, qualifiedId} = conversation;
+
+  if (!groupId) {
+    throw new Error(`No group id found for MLS conversation ${conversation.id}`);
+  }
+
+  const selfQualifiedUser: KeyPackageClaimUser = {
+    ...selfUserId,
+    skipOwnClientId: selfClientId,
+  };
+
+  await core.service?.conversation.addUsersToMLSConversation({
+    conversationId: qualifiedId,
+    groupId,
+    qualifiedUsers: [selfQualifiedUser],
+  });
 }

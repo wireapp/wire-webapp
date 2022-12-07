@@ -19,6 +19,7 @@
 
 import React from 'react';
 
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
@@ -79,7 +80,7 @@ const AccountSecuritySection: React.FC<AccountSecuritySectionProps> = ({
     <PreferencesSection hasSeparator className="preferences-section-account-security">
       {manageTeamUrl && hasAccessToFeature(FEATURES.MANAGE_TEAM, teamRole) && (
         <Link
-          tabIndex={0}
+          tabIndex={TabIndex.FOCUSABLE}
           variant={LinkVariant.PRIMARY}
           onClick={() => safeWindowOpen(manageTeamUrl)}
           data-uie-name="do-manage-team"
@@ -96,7 +97,7 @@ const AccountSecuritySection: React.FC<AccountSecuritySectionProps> = ({
       )}
       {isAppLockActivated && (
         <Link
-          tabIndex={0}
+          tabIndex={TabIndex.FOCUSABLE}
           variant={LinkVariant.PRIMARY}
           onClick={() => amplify.publish(WebAppEvents.PREFERENCES.CHANGE_APP_LOCK_PASSPHRASE)}
           data-uie-name="do-reset-app-lock"
@@ -107,8 +108,9 @@ const AccountSecuritySection: React.FC<AccountSecuritySectionProps> = ({
       )}
       {!selfUser?.isNoPasswordSSO && (
         <Link
-          tabIndex={0}
+          tabIndex={TabIndex.FOCUSABLE}
           variant={LinkVariant.PRIMARY}
+          href="#"
           onClick={() => safeWindowOpen(getAccountPagesUrl(URL_PATH.PASSWORD_RESET))}
           title={t('tooltipPreferencesPassword')}
           data-uie-name="do-reset-password"
@@ -120,7 +122,7 @@ const AccountSecuritySection: React.FC<AccountSecuritySectionProps> = ({
 
       {!isTeam && (
         <Link
-          tabIndex={0}
+          tabIndex={TabIndex.FOCUSABLE}
           variant={LinkVariant.PRIMARY}
           onClick={onClickDeleteAccount}
           data-uie-name="go-delete-account"

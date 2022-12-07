@@ -153,7 +153,6 @@ const CheckPasswordComponent = ({
                   formNoValidate
                   onClick={handleLogin}
                   disabled={isFetching || !password}
-                  showLoading={isFetching}
                   data-uie-name="do-sign-in"
                 >
                   <ArrowIcon />

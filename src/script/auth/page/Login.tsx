@@ -21,6 +21,7 @@ import React, {useEffect, useRef, useState} from 'react';
 
 import {LoginData} from '@wireapp/api-client/lib/auth';
 import {ClientType} from '@wireapp/api-client/lib/client/index';
+import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
 import {StatusCodes} from 'http-status-codes';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
@@ -31,6 +32,7 @@ import {AnyAction, Dispatch} from 'redux';
 import {Runtime, UrlUtil} from '@wireapp/commons';
 import {
   ArrowIcon,
+  Button,
   Checkbox,
   CheckboxLabel,
   CodeInput,
@@ -39,9 +41,10 @@ import {
   Columns,
   Container,
   ContainerXS,
+  FlexBox,
   Form,
-  H1,
   H2,
+  Heading,
   IsMobile,
   Label,
   Link,
@@ -53,6 +56,7 @@ import {
 } from '@wireapp/react-ui-kit';
 
 import {getLogger} from 'Util/Logger';
+import {isBackendError} from 'Util/TypePredicateUtil';
 
 import {EntropyContainer} from './EntropyContainer';
 import {Page} from './Page';
@@ -60,29 +64,35 @@ import {Page} from './Page';
 import {Config} from '../../Config';
 import {loginStrings, verifyStrings} from '../../strings';
 import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
+import {JoinGuestLinkPasswordModal} from '../component/JoinGuestLinkPasswordModal';
 import {LoginForm} from '../component/LoginForm';
 import {RouterLink} from '../component/RouterLink';
 import {EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot} from '../module/action/';
-import {BackendError} from '../module/action/BackendError';
 import {LabeledError} from '../module/action/LabeledError';
 import {ValidationError} from '../module/action/ValidationError';
 import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
+import * as ConversationSelector from '../module/selector/ConversationSelector';
 import {QUERY_KEY, ROUTE} from '../route';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
+import {getOAuthQueryString} from '../util/oauthUtil';
 
-type Props = React.HTMLProps<HTMLDivElement>;
+type Props = React.HTMLProps<HTMLDivElement> & {
+  embedded?: boolean;
+};
 
 const LoginComponent = ({
-  loginError,
+  authError,
   resetAuthError,
   doCheckConversationCode,
+  doGetConversationInfoByCode,
   doInit,
   doSetLocalStorage,
   doInitializeClient,
   doLoginAndJoin,
   doLogin,
+  conversationError,
   pushEntropyData,
   doSendTwoFactorCode,
   isFetching,
@@ -90,24 +100,32 @@ const LoginComponent = ({
   loginData,
   defaultSSOCode,
   isSendingTwoFactorCode,
+  conversationInfo,
+  conversationInfoFetching,
+  embedded,
 }: Props & ConnectedProps & DispatchProps) => {
   const logger = getLogger('Login');
   const {formatMessage: _} = useIntl();
   const navigate = useNavigate();
   const [conversationCode, setConversationCode] = useState<string | null>(null);
   const [conversationKey, setConversationKey] = useState<string | null>(null);
-
+  const [conversationSubmitData, setConversationSubmitData] = useState<Partial<LoginData> | null>(null);
+  const [isLinkPasswordModalOpen, setIsLinkPasswordModalOpen] = useState<boolean>(false);
   const [isValidLink, setIsValidLink] = useState(true);
-  const [validationErrors, setValidationErrors] = useState([]);
+  const [validationErrors, setValidationErrors] = useState<Error[]>([]);
 
   const [twoFactorSubmitError, setTwoFactorSubmitError] = useState<string | Error>('');
   const [twoFactorLoginData, setTwoFactorLoginData] = useState<LoginData>();
+  const [verificationCode, setVerificationCode] = useState('');
+  const [twoFactorSubmitFailedOnce, setTwoFactorSubmitFailedOnce] = useState(false);
+
+  const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE, window.location.hash);
 
   const [showEntropyForm, setShowEntropyForm] = useState(false);
   const isEntropyRequired = Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY;
-
   const onEntropyGenerated = useRef<((entropy: Uint8Array) => void) | undefined>();
   const entropy = useRef<Uint8Array | undefined>();
+
   const getEntropy = isEntropyRequired
     ? () => {
         // This is somewhat hacky. When the login action detects a new device and that entropy is required, then we give back a promise to the login action.
@@ -135,7 +153,7 @@ const LoginComponent = ({
     if (defaultSSOCode) {
       navigate(`${ROUTE.SSO}/${defaultSSOCode}`);
     }
-  }, [defaultSSOCode]);
+  }, [defaultSSOCode, navigate]);
 
   useEffect(() => {
     const queryConversationCode = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE) || null;
@@ -150,13 +168,19 @@ const LoginComponent = ({
         logger.warn('Invalid conversation code', error);
         setIsValidLink(false);
       });
+      doGetConversationInfoByCode(queryConversationKey, queryConversationCode).catch(error => {
+        logger.warn('Failed to fetch conversation info', error);
+        setIsValidLink(false);
+      });
     }
   }, []);
 
   useEffect(() => {
     resetAuthError();
     const isImmediateLogin = UrlUtil.hasURLParameter(QUERY_KEY.IMMEDIATE_LOGIN);
-    if (isImmediateLogin) {
+    const is2FAEntropy = UrlUtil.hasURLParameter(QUERY_KEY.TWO_FACTOR) && isEntropyRequired;
+
+    if ((isImmediateLogin && !is2FAEntropy) || isOauth) {
       immediateLogin();
     }
     return () => {
@@ -169,14 +193,35 @@ const LoginComponent = ({
       await doInit({isImmediateLogin: true, shouldValidateLocalClient: false});
       const entropyData = await getEntropy?.();
       await doInitializeClient(ClientType.PERMANENT, undefined, undefined, entropyData);
+
+      if (isOauth) {
+        const queryString = getOAuthQueryString(window.location);
+        return navigate(`${ROUTE.AUTHORIZE}/${queryString}`);
+      }
       return navigate(ROUTE.HISTORY_INFO);
     } catch (error) {
       logger.error('Unable to login immediately', error);
+      setShowEntropyForm(false);
     }
   };
 
-  const handleSubmit = async (formLoginData: Partial<LoginData>, validationErrors: Error[] = []) => {
+  const handleSubmit = async (
+    formLoginData: Partial<LoginData>,
+    validationErrors: Error[] = [],
+    conversationPassword?: string,
+  ) => {
     setValidationErrors(validationErrors);
+
+    if (
+      !isLinkPasswordModalOpen &&
+      (!!conversationInfo?.has_password ||
+        (!!conversationError && conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD))
+    ) {
+      setConversationSubmitData(formLoginData);
+      setIsLinkPasswordModalOpen(true);
+      return;
+    }
+
     try {
       const login: LoginData = {...formLoginData, clientType: loginData.clientType};
       if (validationErrors.length) {
@@ -185,49 +230,74 @@ const LoginComponent = ({
 
       const hasKeyAndCode = conversationKey && conversationCode;
       if (hasKeyAndCode) {
-        await doLoginAndJoin(login, conversationKey, conversationCode, undefined, getEntropy);
+        try {
+          await doLoginAndJoin(login, conversationKey, conversationCode, undefined, getEntropy, conversationPassword);
+        } catch (error) {
+          if (isBackendError(error) && error.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD) {
+            setConversationSubmitData(formLoginData);
+            setIsLinkPasswordModalOpen(true);
+            return;
+          }
+          throw error;
+        }
       } else {
         await doLogin(login, getEntropy);
       }
 
+      if (isOauth) {
+        const queryString = getOAuthQueryString(window.location);
+
+        return navigate(`${ROUTE.AUTHORIZE}/${queryString}`);
+      }
       return navigate(ROUTE.HISTORY_INFO);
     } catch (error) {
-      if ((error as BackendError).label) {
-        const backendError = error as BackendError;
-        switch (backendError.label) {
-          case BackendError.LABEL.TOO_MANY_CLIENTS: {
-            resetAuthError();
+      if (isBackendError(error)) {
+        switch (error.label) {
+          case BackendErrorLabel.INVALID_CONVERSATION_PASSWORD: {
+            setConversationSubmitData(formLoginData);
+            setIsLinkPasswordModalOpen(true);
+            break;
+          }
+          case BackendErrorLabel.TOO_MANY_CLIENTS: {
+            await resetAuthError();
             if (formLoginData?.verificationCode) {
-              doSetLocalStorage(QUERY_KEY.CONVERSATION_CODE, formLoginData.verificationCode);
+              await doSetLocalStorage(QUERY_KEY.CONVERSATION_CODE, formLoginData.verificationCode);
             }
             if (entropy.current) {
-              pushEntropyData(entropy.current);
+              await pushEntropyData(entropy.current);
             }
             navigate(ROUTE.CLIENTS);
             break;
           }
-          case BackendError.LABEL.CODE_AUTHENTICATION_REQUIRED: {
+
+          case BackendErrorLabel.CODE_AUTHENTICATION_REQUIRED: {
+            await resetAuthError();
             const login: LoginData = {...formLoginData, clientType: loginData.clientType};
-            setTwoFactorLoginData(login);
-            doSendTwoFactorCode(login.email);
-            doSetLocalStorage(QUERY_KEY.JOIN_EXPIRES, Date.now() + 1000 * 60 * 10);
+            if (login.email || login.handle) {
+              await doSendTwoFactorCode(login.email || login.handle || '');
+              setTwoFactorLoginData(login);
+              await doSetLocalStorage(QUERY_KEY.JOIN_EXPIRES, Date.now() + 1000 * 60 * 10);
+            }
             break;
           }
-          case BackendError.LABEL.CODE_AUTHENTICATION_FAILED: {
+
+          case BackendErrorLabel.CODE_AUTHENTICATION_FAILED: {
             setTwoFactorSubmitError(error);
+            setTwoFactorSubmitFailedOnce(true);
             break;
           }
-          case BackendError.LABEL.INVALID_CREDENTIALS:
-          case BackendError.LABEL.SUSPENDED:
+          case BackendErrorLabel.INVALID_CREDENTIALS:
+          case BackendErrorLabel.ACCOUNT_SUSPENDED:
           case LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE: {
             break;
           }
           default: {
+            const backendError = error;
             const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
               backendError.label.endsWith(errorType),
             );
             if (!isValidationError) {
-              throw backendError;
+              throw error;
             }
           }
         }
@@ -239,17 +309,24 @@ const LoginComponent = ({
 
   const resendTwoFactorCode = async () => {
     try {
-      await doSendTwoFactorCode(twoFactorLoginData.email);
+      const email = twoFactorLoginData?.email;
+      if (email) {
+        await doSendTwoFactorCode(email);
+      }
     } catch (error) {
       setTwoFactorSubmitError(
-        new BackendError({code: StatusCodes.TOO_MANY_REQUESTS, label: BackendError.GENERAL_ERRORS.TOO_MANY_REQUESTS}),
+        new BackendError('', SyntheticErrorLabel.TOO_MANY_REQUESTS, StatusCodes.TOO_MANY_REQUESTS),
       );
     }
   };
 
-  const submitTwoFactorLogin = (code: string) => {
+  const submitTwoFactorLogin = (code?: string) => {
+    setVerificationCode(code ?? '');
     setTwoFactorSubmitError('');
-    handleSubmit({...twoFactorLoginData, verificationCode: code}, []);
+    // Do not auto submit if already failed once
+    if (!twoFactorSubmitFailedOnce) {
+      void handleSubmit({...twoFactorLoginData, verificationCode: code}, []);
+    }
   };
 
   const storeEntropy = async (entropyData: Uint8Array) => {
@@ -262,35 +339,59 @@ const LoginComponent = ({
     </RouterLink>
   );
 
+  const submitJoinCodeWithPassword = async (password: string) => {
+    if (!conversationSubmitData) {
+      setIsLinkPasswordModalOpen(false);
+      return;
+    }
+    await handleSubmit(conversationSubmitData, [], password);
+  };
+
   return (
     <Page>
-      {(Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ||
-        Config.getConfig().FEATURE.ENABLE_SSO ||
-        Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION) && (
-        <IsMobile>
-          <div style={{margin: 16}}>{backArrow}</div>
-        </IsMobile>
-      )}
+      {!embedded &&
+        (Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ||
+          Config.getConfig().FEATURE.ENABLE_SSO ||
+          Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION) && (
+          <IsMobile>
+            <div style={{margin: 16}}>{backArrow}</div>
+          </IsMobile>
+        )}
       {isEntropyRequired && showEntropyForm ? (
         <EntropyContainer onSetEntropy={storeEntropy} />
       ) : (
         <Container centerText verticalCenter style={{width: '100%'}}>
           {!isValidLink && <Navigate to={ROUTE.CONVERSATION_JOIN_INVALID} replace />}
-          <AppAlreadyOpen />
+          {!embedded && <AppAlreadyOpen />}
+          {isLinkPasswordModalOpen && (
+            <JoinGuestLinkPasswordModal
+              onClose={() => {
+                setIsLinkPasswordModalOpen(false);
+                void resetAuthError();
+                setValidationErrors([]);
+              }}
+              error={conversationError}
+              conversationName={conversationInfo?.name}
+              isLoading={isFetching || conversationInfoFetching}
+              onSubmitPassword={submitJoinCodeWithPassword}
+            />
+          )}
           <Columns>
-            <IsMobile not>
-              <Column style={{display: 'flex'}}>
-                {(Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ||
-                  Config.getConfig().FEATURE.ENABLE_SSO ||
-                  Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION) && (
-                  <div style={{margin: 'auto'}}>{backArrow}</div>
-                )}
-              </Column>
-            </IsMobile>
+            {!embedded && (
+              <IsMobile not>
+                <Column style={{display: 'flex'}}>
+                  {(Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ||
+                    Config.getConfig().FEATURE.ENABLE_SSO ||
+                    Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION) && (
+                    <div style={{margin: 'auto'}}>{backArrow}</div>
+                  )}
+                </Column>
+              </IsMobile>
+            )}
             <Column style={{flexBasis: 384, flexGrow: 0, padding: 0}}>
               <ContainerXS
                 centerText
-                style={{display: 'flex', flexDirection: 'column', height: 428, justifyContent: 'space-between'}}
+                style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-between'}}
               >
                 {twoFactorLoginData ? (
                   <div>
@@ -300,10 +401,10 @@ const LoginComponent = ({
                     </Text>
                     <Label markInvalid={!!twoFactorSubmitError}>
                       <CodeInput
+                        disabled={isFetching}
                         style={{marginTop: 60}}
                         onCodeComplete={submitTwoFactorLogin}
                         data-uie-name="enter-code"
-                        markInvalid={!!twoFactorSubmitError}
                       />
                     </Label>
                     <div style={{display: 'flex', justifyContent: 'center', marginTop: 10}}>
@@ -318,25 +419,37 @@ const LoginComponent = ({
                         </TextLink>
                       )}
                     </div>
+                    <FlexBox justify="center">
+                      <Button
+                        disabled={!!twoFactorSubmitError || isFetching}
+                        type="submit"
+                        css={{marginTop: 65}}
+                        onClick={() => handleSubmit({...twoFactorLoginData, verificationCode}, [])}
+                      >
+                        {_({id: 'login.submitTwoFactorButton'})}
+                      </Button>
+                    </FlexBox>
                   </div>
                 ) : (
                   <>
                     <div>
-                      <H1 center>{_(loginStrings.headline)}</H1>
+                      <Heading level={embedded ? '2' : '1'} center>
+                        {_(loginStrings.headline)}
+                      </Heading>
                       <Muted>{_(loginStrings.subhead)}</Muted>
                       <Form style={{marginTop: 30}} data-uie-name="login">
                         <LoginForm isFetching={isFetching} onSubmit={handleSubmit} />
                         {validationErrors.length ? (
                           parseValidationErrors(validationErrors)
-                        ) : loginError ? (
-                          parseError(loginError)
+                        ) : authError ? (
+                          parseError(authError)
                         ) : (
                           <div style={{marginTop: '4px'}}>&nbsp;</div>
                         )}
                         {!Runtime.isDesktopApp() && (
                           <Checkbox
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                              pushLoginData({
+                              void pushLoginData({
                                 clientType: event.target.checked ? ClientType.TEMPORARY : ClientType.PERMANENT,
                               });
                             }}
@@ -361,7 +474,7 @@ const LoginComponent = ({
                     >
                       {_(loginStrings.forgotPassword)}
                     </Link>
-                    {Config.getConfig().FEATURE.ENABLE_PHONE_LOGIN && (
+                    {!embedded && Config.getConfig().FEATURE.ENABLE_PHONE_LOGIN && (
                       <RouterLink
                         variant={LinkVariant.PRIMARY}
                         style={{paddingTop: '12px', textAlign: 'center'}}
@@ -375,7 +488,7 @@ const LoginComponent = ({
                 )}
               </ContainerXS>
             </Column>
-            <Column />
+            {!embedded && <Column />}
           </Columns>
         </Container>
       )}
@@ -390,9 +503,12 @@ type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
   defaultSSOCode: AuthSelector.getDefaultSSOCode(state),
   isFetching: AuthSelector.isFetching(state),
+  conversationError: ConversationSelector.getError(state),
   isSendingTwoFactorCode: AuthSelector.isSendingTwoFactorCode(state),
   loginData: AuthSelector.getLoginData(state),
-  loginError: AuthSelector.getError(state),
+  authError: AuthSelector.getError(state),
+  conversationInfo: ConversationSelector.conversationInfo(state),
+  conversationInfoFetching: ConversationSelector.conversationInfoFetching(state),
 });
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
@@ -409,6 +525,7 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
       pushEntropyData: actionRoot.authAction.pushEntropyData,
       pushLoginData: actionRoot.authAction.pushLoginData,
       resetAuthError: actionRoot.authAction.resetAuthError,
+      doGetConversationInfoByCode: actionRoot.conversationAction.doGetConversationInfoByCode,
     },
     dispatch,
   );

@@ -33,6 +33,12 @@ import type {Message} from '../../../../entity/message/Message';
 import {useDebounce} from '../../../../hooks/useDebounce';
 import {getSearchRegex} from '../../../../search/FullTextSearch';
 
+const MAX_VISIBLE_MESSAGES = 30;
+const PRE_MARKED_OFFSET = 20;
+const MAX_TEXT_LENGTH = 60;
+const MAX_OFFSET_INDEX = 30;
+const DEBOUNCE_TIME = 100;
+
 export interface FullSearchProps {
   change?: (query: string) => void;
   click?: (messageEntity: Message) => void;
@@ -40,11 +46,6 @@ export interface FullSearchProps {
 }
 
 const FullSearch: React.FC<FullSearchProps> = ({searchProvider, click = noop, change = noop}) => {
-  const MAX_VISIBLE_MESSAGES = 30;
-  const PRE_MARKED_OFFSET = 20;
-  const MAX_TEXT_LENGTH = 60;
-  const MAX_OFFSET_INDEX = 30;
-
   const [searchValue, setSearchValue] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
   const [messages, setMessages] = useState<ContentMessage[]>([]);
@@ -69,7 +70,7 @@ const FullSearch: React.FC<FullSearchProps> = ({searchProvider, click = noop, ch
         setMessageCount(MAX_VISIBLE_MESSAGES);
       }
     },
-    100,
+    DEBOUNCE_TIME,
     [searchValue],
   );
 
@@ -124,15 +125,18 @@ const FullSearch: React.FC<FullSearchProps> = ({searchProvider, click = noop, ch
       <header>
         <InputSubmitCombo css={{padding: '0 16px', marginBottom: '20px'}}>
           <SearchIcon />
+
           <Input
             wrapperCSS={{marginBottom: 0, width: '100%', '> div': {width: '100%'}}}
             type="text"
             value={searchValue}
             ref={inputRef}
+            aria-label={t('fullsearchPlaceholder')}
             placeholder={t('fullsearchPlaceholder')}
             onChange={event => setSearchValue(event.currentTarget.value)}
             data-uie-name="full-search-header-input"
           />
+
           {searchValue && (
             <CloseIcon
               css={{cursor: 'pointer'}}
@@ -143,11 +147,13 @@ const FullSearch: React.FC<FullSearchProps> = ({searchProvider, click = noop, ch
           )}
         </InputSubmitCombo>
       </header>
+
       {hasNoResults && (
         <p className="full-search__no-result" data-uie-name="full-search-no-results">
           {t('fullsearchNoResults')}
         </p>
       )}
+
       <div className="full-search__list" data-uie-name="full-search-list">
         {messages.slice(0, messageCount).map(message => (
           <FullSearchItem

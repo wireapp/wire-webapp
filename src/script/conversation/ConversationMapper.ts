@@ -18,25 +18,23 @@
  */
 
 import {
-  ACCESS_ROLE_V2,
+  CONVERSATION_ACCESS_ROLE,
   Conversation as ConversationBackendData,
   ConversationCode,
   CONVERSATION_ACCESS,
-  CONVERSATION_ACCESS_ROLE,
+  CONVERSATION_LEGACY_ACCESS_ROLE,
   CONVERSATION_TYPE,
   DefaultConversationRoleName,
   RemoteConversations,
 } from '@wireapp/api-client/lib/conversation';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 import {isObject} from 'underscore';
 
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
-import {matchQualifiedIds, QualifiedEntity} from 'Util/QualifiedId';
-
 import {ACCESS_STATE} from './AccessState';
 import {ConversationStatus} from './ConversationStatus';
+import {ConversationVerificationState} from './ConversationVerificationState';
 
 import {Conversation} from '../entity/Conversation';
 import {BaseError, BASE_ERROR_TYPE} from '../error/BaseError';
@@ -63,15 +61,18 @@ export interface SelfStatusUpdateDatabaseData {
   otr_muted_status: number;
   receipt_mode: number;
   status: number;
-  verification_state: number;
+  verification_state: ConversationVerificationState;
+  mlsVerificationState: ConversationVerificationState;
 }
 
+type Roles = {[userId: string]: DefaultConversationRoleName | string};
 export type ConversationDatabaseData = ConversationRecord &
   Partial<ConversationBackendData> & {
     accessModes?: CONVERSATION_ACCESS[];
-    accessRole?: CONVERSATION_ACCESS_ROLE;
-    accessRoleV2?: ACCESS_ROLE_V2[];
-    roles: {[userId: string]: DefaultConversationRoleName | string};
+    //CONVERSATION_LEGACY_ACCESS_ROLE for api <= v2, CONVERSATION_ACCESS_ROLE[] since api v3
+    accessRole?: CONVERSATION_LEGACY_ACCESS_ROLE | CONVERSATION_ACCESS_ROLE[];
+    accessRoleV2?: CONVERSATION_ACCESS_ROLE[];
+    roles: Roles;
     status: ConversationStatus;
     team_id: string;
   };
@@ -131,6 +132,7 @@ export class ConversationMapper {
       receipt_mode,
       status,
       verification_state,
+      mlsVerificationState,
     } = selfState;
 
     if (archived_timestamp) {
@@ -179,6 +181,10 @@ export class ConversationMapper {
       conversationEntity.verification_state(verification_state);
     }
 
+    if (mlsVerificationState !== undefined) {
+      conversationEntity.mlsVerificationState(mlsVerificationState);
+    }
+
     if (legal_hold_status) {
       conversationEntity.legalHoldStatus(legal_hold_status);
     }
@@ -205,6 +211,24 @@ export class ConversationMapper {
     return conversationEntity;
   }
 
+  private static computeRoles(conversationData: ConversationBackendData | ConversationDatabaseData): Roles {
+    if ('roles' in conversationData && conversationData.roles) {
+      return conversationData.roles;
+    }
+    const {members} = conversationData;
+
+    const allMembers = [...(members?.others ?? []), members?.self];
+    return allMembers.reduce<Record<string, string>>((roles, member) => {
+      if (!member || !member.conversation_role) {
+        return roles;
+      }
+      return {
+        ...roles,
+        [member.id]: member.conversation_role,
+      };
+    }, {});
+  }
+
   private static createConversationEntity(
     conversationData: ConversationDatabaseData,
     initialTimestamp?: number,
@@ -216,18 +240,31 @@ export class ConversationMapper {
       throw new ConversationError(BASE_ERROR_TYPE.INVALID_PARAMETER, BaseError.MESSAGE.INVALID_PARAMETER);
     }
 
-    const {creator, id, members, name, others, qualified_others, type, group_id, epoch, protocol, cipher_suite} =
-      conversationData;
+    const {
+      creator,
+      id,
+      members,
+      name,
+      others,
+      qualified_others,
+      type,
+      group_id,
+      epoch,
+      protocol,
+      cipher_suite,
+      initial_protocol,
+    } = conversationData;
 
     let conversationEntity = new Conversation(
       id,
       conversationData.domain || conversationData.qualified_id?.domain,
       protocol,
     );
-    conversationEntity.roles(conversationData.roles || {});
+    conversationEntity.roles(this.computeRoles(conversationData));
 
     conversationEntity.creator = creator;
     conversationEntity.groupId = group_id;
+    conversationEntity.initialProtocol = initial_protocol || protocol;
     conversationEntity.epoch = epoch ?? -1;
     conversationEntity.cipherSuite = cipher_suite;
     conversationEntity.type(type);
@@ -253,7 +290,7 @@ export class ConversationMapper {
     // Team ID from database or backend payload
     const teamId = conversationData.team_id || conversationData.team;
     if (teamId) {
-      conversationEntity.team_id = teamId;
+      conversationEntity.teamId = teamId;
     }
 
     if (conversationData.is_guest) {
@@ -267,6 +304,7 @@ export class ConversationMapper {
     if (accessModes && (accessRole || accessRoleV2)) {
       conversationEntity.accessModes = accessModes;
       conversationEntity.accessRole = accessRoleV2 || accessRole;
+
       ConversationMapper.mapAccessState(conversationEntity, accessModes, accessRole, accessRoleV2);
     }
 
@@ -275,209 +313,217 @@ export class ConversationMapper {
     return conversationEntity;
   }
 
-  static mergeConversation(
+  /**
+   * Will merge the locally stored conversations with the new conversations fetched from the backend.
+   * @param localConversations locally stored conversations
+   * @param remoteConversations new conversations fetched from backend
+   * @returns the new conversations from backend merged with the locally stored conversations
+   */
+  static mergeConversations(
     localConversations: ConversationDatabaseData[],
     remoteConversations: RemoteConversations,
   ): ConversationDatabaseData[] {
-    localConversations = localConversations.filter(conversationData => conversationData);
+    const foundRemoteConversations = remoteConversations.found;
 
-    const failedConversations = (remoteConversations.failed ?? []).reduce(
-      (prev: ConversationDatabaseData[], curr: QualifiedId) => {
-        const convo = localConversations.find(conversationId => matchQualifiedIds(conversationId, curr));
-        return convo ? [...prev, convo] : prev;
-      },
-      [],
-    );
+    if (!foundRemoteConversations) {
+      return localConversations;
+    }
 
-    const localArchives = localConversations.filter(
-      conversationData =>
-        conversationData.archived_state &&
-        remoteConversations.found?.findIndex(remote => remote.qualified_id.id === conversationData.id) === -1,
-    );
+    const conversationsMap = new Map<string, ConversationDatabaseData>();
 
-    const foundRemoteConversations = remoteConversations.found.map(
-      (remoteConversationData: ConversationBackendData, index: number) => {
-        const remoteConversationId: QualifiedEntity = remoteConversationData.qualified_id || {
-          domain: '',
-          id: remoteConversationData.id,
-        };
-        const localConversationData =
-          localConversations.find(conversationId => matchQualifiedIds(conversationId, remoteConversationId)) ||
-          (remoteConversationId as ConversationDatabaseData);
+    for (const localConversation of localConversations) {
+      const conversationId = localConversation.qualified_id?.id || localConversation.id;
+      conversationsMap.set(conversationId, localConversation);
+    }
 
-        const {
-          access,
-          access_role,
-          access_role_v2,
-          creator,
-          members,
-          message_timer,
-          qualified_id,
-          receipt_mode,
-          name,
-          team,
-          type,
-          group_id,
-          epoch,
-          cipher_suite,
-          protocol,
-        } = remoteConversationData;
-        const {others: othersStates, self: selfState} = members;
+    for (let i = 0; i < foundRemoteConversations.length; i++) {
+      const remoteConversation = foundRemoteConversations[i];
+      const conversationId = remoteConversation.qualified_id?.id || remoteConversation.id;
+      const localConversation = conversationsMap.get(conversationId);
 
-        const updates: Partial<ConversationDatabaseData> = {
-          accessModes: access,
-          accessRole: access_role,
-          accessRoleV2: access_role_v2,
-          cipher_suite,
-          creator,
-          domain: qualified_id?.domain,
-          group_id,
-          message_timer,
-          name,
-          protocol,
-          receipt_mode,
-          roles: {},
-          status: (selfState as any).status,
-          team_id: team,
-          type,
-        };
+      if (localConversation) {
+        conversationsMap.set(conversationId, this.mergeSingleConversation(localConversation, remoteConversation, i));
+        continue;
+      }
 
-        const qualified_others = othersStates
-          ?.filter(other => !!other.qualified_id)
-          .map(({qualified_id}) => qualified_id);
+      const localConversationData = (remoteConversation.qualified_id || {
+        id: conversationId,
+        domain: '',
+      }) as ConversationDatabaseData;
 
-        if (qualified_others.length) {
-          updates.qualified_others = qualified_others;
-        }
+      conversationsMap.set(conversationId, this.mergeSingleConversation(localConversationData, remoteConversation, i));
+    }
 
-        if (typeof epoch === 'number') {
-          updates.epoch = epoch;
-        }
+    return Array.from(conversationsMap.values());
+  }
 
-        // Add roles for self
-        if (selfState.conversation_role && !(selfState.id in updates.roles)) {
-          updates.roles[selfState.id] = selfState.conversation_role;
-        }
+  /**
+   * Merge a remote conversation payload with a locally stored conversation
+   *
+   * @param localConversationData Local conversation data from the store
+   * @param remoteConversationData Remote conversation data from backend
+   * @param lastEventTimestampFallback Fallback timestamp to use if no last event timestamp is available
+   * @returns Merged conversation data in the format of the local store
+   */
+  static mergeSingleConversation(
+    localConversationData: ConversationDatabaseData,
+    remoteConversationData: ConversationBackendData,
+    lastEventTimestampFallback?: number,
+  ): ConversationDatabaseData {
+    const {
+      access,
+      access_role,
+      access_role_v2,
+      creator,
+      members,
+      message_timer,
+      qualified_id,
+      receipt_mode,
+      name,
+      team,
+      type,
+      group_id,
+      epoch,
+      cipher_suite,
+      protocol,
+    } = remoteConversationData;
+    const {others: othersStates, self: selfState} = members;
 
-        // Add roles for others
-        othersStates.map(other => {
-          if (other.conversation_role && !(other.conversation_role in updates.roles)) {
-            updates.roles[other.id] = other.conversation_role;
-          }
-        });
+    const updates: Partial<ConversationDatabaseData> = {
+      accessModes: access,
+      accessRole: access_role,
+      accessRoleV2: access_role_v2,
+      cipher_suite,
+      creator,
+      domain: qualified_id?.domain,
+      group_id,
+      message_timer,
+      name,
+      protocol,
+      receipt_mode,
+      roles: {},
+      status: (selfState as any).status,
+      team_id: team,
+      type,
+    };
 
-        if (typeof localConversationData.receipt_mode === 'number') {
-          updates.receipt_mode = localConversationData.receipt_mode;
-        }
+    const qualified_others = othersStates?.filter(other => !!other.qualified_id).map(({qualified_id}) => qualified_id);
 
-        const mergedConversation: ConversationDatabaseData = {...localConversationData, ...updates};
+    if (qualified_others.length) {
+      updates.qualified_others = qualified_others;
+    }
 
-        const isGroup = type === CONVERSATION_TYPE.REGULAR;
-        const noOthers = !mergedConversation.others || !mergedConversation.others.length;
-        if (isGroup || noOthers) {
-          mergedConversation.others = othersStates
-            .filter(otherState => (otherState.status as number) === (ConversationStatus.CURRENT_MEMBER as number))
-            .map(otherState => otherState.id);
-        }
+    if (typeof epoch === 'number') {
+      updates.epoch = epoch;
+    }
 
-        // This should ensure a proper order
-        if (!mergedConversation.last_event_timestamp) {
-          mergedConversation.last_event_timestamp = index + 1;
-        }
+    // Add roles for self
+    if (selfState.conversation_role && !(selfState.id in updates.roles)) {
+      updates.roles[selfState.id] = selfState.conversation_role;
+    }
 
-        // Set initially or correct server timestamp
-        const wrongServerTimestamp = mergedConversation.last_server_timestamp < mergedConversation.last_event_timestamp;
-        if (!mergedConversation.last_server_timestamp || wrongServerTimestamp) {
-          mergedConversation.last_server_timestamp = mergedConversation.last_event_timestamp;
-        }
+    // Add roles for others
+    othersStates.map(other => {
+      if (other.conversation_role && !(other.conversation_role in updates.roles)) {
+        updates.roles[other.id] = other.conversation_role;
+      }
+    });
 
-        const isRemoteTimestampNewer = (localTimestamp: number | undefined, remoteTimestamp: number): boolean => {
-          return localTimestamp !== undefined && remoteTimestamp > localTimestamp;
-        };
+    if (typeof localConversationData.receipt_mode === 'number') {
+      updates.receipt_mode = localConversationData.receipt_mode;
+    }
 
-        // Some archived timestamp were not properly stored in the database.
-        // To fix this we check if the remote one is newer and update our local timestamp.
-        const {archived_state: archivedState, archived_timestamp: archivedTimestamp} = localConversationData;
-        const remoteArchivedTimestamp = new Date(selfState.otr_archived_ref).getTime();
-        const isRemoteArchivedTimestampNewer = isRemoteTimestampNewer(archivedTimestamp, remoteArchivedTimestamp);
+    const mergedConversation: ConversationDatabaseData = {...localConversationData, ...updates};
 
-        if (isRemoteArchivedTimestampNewer || archivedState === undefined) {
-          mergedConversation.archived_state = selfState.otr_archived;
-          mergedConversation.archived_timestamp = remoteArchivedTimestamp;
-        }
+    const isGroup = type === CONVERSATION_TYPE.REGULAR;
+    const noOthers = !mergedConversation.others || !mergedConversation.others.length;
+    if (isGroup || noOthers) {
+      mergedConversation.others = othersStates
+        .filter(otherState => (otherState.status as number) === (ConversationStatus.CURRENT_MEMBER as number))
+        .map(otherState => otherState.id);
+    }
 
-        const {muted_state: mutedState, muted_timestamp: mutedTimestamp} = localConversationData;
-        const remoteMutedTimestamp = new Date(selfState.otr_muted_ref).getTime();
-        const isRemoteMutedTimestampNewer = isRemoteTimestampNewer(mutedTimestamp, remoteMutedTimestamp);
+    // This should ensure a proper order
+    if (!mergedConversation.last_event_timestamp && lastEventTimestampFallback !== undefined) {
+      mergedConversation.last_event_timestamp = lastEventTimestampFallback + 1;
+    }
 
-        if (isRemoteMutedTimestampNewer || mutedState === undefined) {
-          const remoteMutedState = selfState.otr_muted_status;
-          mergedConversation.muted_state = remoteMutedState;
-          mergedConversation.muted_timestamp = remoteMutedTimestamp;
-        }
+    // Set initially or correct server timestamp
+    const wrongServerTimestamp = mergedConversation.last_server_timestamp < mergedConversation.last_event_timestamp;
+    if (!mergedConversation.last_server_timestamp || wrongServerTimestamp) {
+      mergedConversation.last_server_timestamp = mergedConversation.last_event_timestamp;
+    }
 
-        return mergedConversation;
-      },
-    );
-    return [...foundRemoteConversations, ...failedConversations, ...localArchives];
+    const isRemoteTimestampNewer = (localTimestamp: number | undefined, remoteTimestamp: number): boolean => {
+      return localTimestamp !== undefined && remoteTimestamp > localTimestamp;
+    };
+
+    // Some archived timestamp were not properly stored in the database.
+    // To fix this we check if the remote one is newer and update our local timestamp.
+    const {archived_state: archivedState, archived_timestamp: archivedTimestamp} = localConversationData;
+    const remoteArchivedTimestamp = new Date(selfState.otr_archived_ref).getTime();
+    const isRemoteArchivedTimestampNewer = isRemoteTimestampNewer(archivedTimestamp, remoteArchivedTimestamp);
+
+    if (isRemoteArchivedTimestampNewer || archivedState === undefined) {
+      mergedConversation.archived_state = selfState.otr_archived;
+      mergedConversation.archived_timestamp = remoteArchivedTimestamp;
+    }
+
+    const {muted_state: mutedState, muted_timestamp: mutedTimestamp} = localConversationData;
+    const remoteMutedTimestamp = new Date(selfState.otr_muted_ref).getTime();
+    const isRemoteMutedTimestampNewer = isRemoteTimestampNewer(mutedTimestamp, remoteMutedTimestamp);
+
+    if (isRemoteMutedTimestampNewer || mutedState === undefined) {
+      const remoteMutedState = selfState.otr_muted_status;
+      mergedConversation.muted_state = remoteMutedState;
+      mergedConversation.muted_timestamp = remoteMutedTimestamp;
+    }
+
+    return mergedConversation;
   }
 
   static mapAccessCode(conversation: Conversation, accessCode: ConversationCode): void {
-    const isTeamConversation = conversation && conversation.team_id;
+    const isTeamConversation = conversation && conversation.teamId;
 
     if (accessCode.uri && isTeamConversation) {
       const baseUrl = `${window.wire.env.URL.ACCOUNT_BASE}/conversation-join/?key=${accessCode.key}&code=${accessCode.code}`;
       const accessCodeUrl = conversation.domain ? `${baseUrl}&domain=${conversation.domain}` : baseUrl;
       conversation.accessCode(accessCodeUrl);
+      conversation.accessCodeHasPassword(accessCode.has_password);
     }
   }
 
   static mapAccessState(
     conversationEntity: Conversation,
     accessModes: CONVERSATION_ACCESS[],
-    accessRole?: CONVERSATION_ACCESS_ROLE,
-    accessRoleV2: ACCESS_ROLE_V2[] = [],
+    accessRole: CONVERSATION_LEGACY_ACCESS_ROLE | CONVERSATION_ACCESS_ROLE[],
+    accessRoleV2?: CONVERSATION_ACCESS_ROLE[],
   ): typeof ACCESS_STATE {
-    if (conversationEntity.team_id) {
+    if (conversationEntity.teamId) {
       if (conversationEntity.is1to1()) {
         return conversationEntity.accessState(ACCESS_STATE.TEAM.ONE2ONE);
       }
 
-      if (accessRoleV2.includes(ACCESS_ROLE_V2.TEAM_MEMBER)) {
-        if (accessRoleV2.includes(ACCESS_ROLE_V2.GUEST) || accessRoleV2.includes(ACCESS_ROLE_V2.NON_TEAM_MEMBER)) {
-          if (accessRoleV2.includes(ACCESS_ROLE_V2.SERVICE)) {
-            return conversationEntity.accessState(ACCESS_STATE.TEAM.GUESTS_SERVICES);
-          }
-          return conversationEntity.accessState(ACCESS_STATE.TEAM.GUEST_ROOM);
-        } else if (accessRoleV2.includes(ACCESS_ROLE_V2.SERVICE)) {
-          return conversationEntity.accessState(ACCESS_STATE.TEAM.SERVICES);
-        }
-        return conversationEntity.accessState(ACCESS_STATE.TEAM.TEAM_ONLY);
+      let accessState: ACCESS_STATE | undefined;
+
+      //api <= v2/v3
+      //this is important to check this one first (backwards compatibility)
+      if (Array.isArray(accessRoleV2)) {
+        accessState = this.mapAccessStateV2(accessRoleV2);
+
+        //api v3
+      } else if (Array.isArray(accessRole)) {
+        accessState = this.mapAccessStateV2(accessRole);
       }
 
-      const isTeamRole = accessRole === CONVERSATION_ACCESS_ROLE.TEAM;
-
-      const includesInviteMode = accessModes.includes(CONVERSATION_ACCESS.INVITE);
-      const isInviteModeOnly = includesInviteMode && accessModes.length === 1;
-
-      const isTeamOnlyMode = isTeamRole && isInviteModeOnly;
-      if (isTeamOnlyMode) {
-        return conversationEntity.accessState(ACCESS_STATE.TEAM.TEAM_ONLY);
+      if (accessState) {
+        return conversationEntity.accessState(accessState);
       }
 
-      const isVerifiedRole = accessRole === CONVERSATION_ACCESS_ROLE.ACTIVATED;
-      if (isVerifiedRole) {
-        return conversationEntity.accessState(ACCESS_STATE.TEAM.GUEST_ROOM);
+      //api <= v2 legacy
+      if (!Array.isArray(accessRole)) {
+        return conversationEntity.accessState(this.mapLegacyAccessState(accessModes, accessRole));
       }
-      const isNonVerifiedRole = accessRole === CONVERSATION_ACCESS_ROLE.NON_ACTIVATED;
-
-      const includesCodeMode = accessModes.includes(CONVERSATION_ACCESS.CODE);
-      const isExpectedModes = includesCodeMode && includesInviteMode && accessModes.length === 2;
-
-      const isGuestRoomMode = isNonVerifiedRole && isExpectedModes;
-      return isGuestRoomMode
-        ? conversationEntity.accessState(ACCESS_STATE.TEAM.GUESTS_SERVICES)
-        : conversationEntity.accessState(ACCESS_STATE.TEAM.LEGACY);
     }
 
     if (conversationEntity.isSelf()) {
@@ -487,6 +533,54 @@ export class ConversationMapper {
     const personalAccessState = conversationEntity.isGroup()
       ? ACCESS_STATE.PERSONAL.GROUP
       : ACCESS_STATE.PERSONAL.ONE2ONE;
+
     return conversationEntity.accessState(personalAccessState);
+  }
+
+  private static mapAccessStateV2(accessRole: CONVERSATION_ACCESS_ROLE[]) {
+    if (!accessRole.includes(CONVERSATION_ACCESS_ROLE.TEAM_MEMBER)) {
+      return undefined;
+    }
+
+    if (
+      accessRole.includes(CONVERSATION_ACCESS_ROLE.GUEST) ||
+      accessRole.includes(CONVERSATION_ACCESS_ROLE.NON_TEAM_MEMBER)
+    ) {
+      if (accessRole.includes(CONVERSATION_ACCESS_ROLE.SERVICE)) {
+        return ACCESS_STATE.TEAM.GUESTS_SERVICES;
+      }
+      return ACCESS_STATE.TEAM.GUEST_ROOM;
+    } else if (accessRole.includes(CONVERSATION_ACCESS_ROLE.SERVICE)) {
+      return ACCESS_STATE.TEAM.SERVICES;
+    }
+    return ACCESS_STATE.TEAM.TEAM_ONLY;
+  }
+
+  private static mapLegacyAccessState(
+    accessModes: CONVERSATION_ACCESS[],
+    accessRole: CONVERSATION_LEGACY_ACCESS_ROLE,
+  ): ACCESS_STATE {
+    const isTeamRole = accessRole === CONVERSATION_LEGACY_ACCESS_ROLE.TEAM;
+
+    const includesInviteMode = accessModes.includes(CONVERSATION_ACCESS.INVITE);
+    const isInviteModeOnly = includesInviteMode && accessModes.length === 1;
+
+    const isTeamOnlyMode = isTeamRole && isInviteModeOnly;
+    if (isTeamOnlyMode) {
+      return ACCESS_STATE.TEAM.TEAM_ONLY;
+    }
+
+    const isActivatedRole = accessRole === CONVERSATION_LEGACY_ACCESS_ROLE.ACTIVATED;
+    if (isActivatedRole) {
+      return ACCESS_STATE.TEAM.GUEST_ROOM;
+    }
+    const isNonActivatedRole = accessRole === CONVERSATION_LEGACY_ACCESS_ROLE.NON_ACTIVATED;
+
+    const includesCodeMode = accessModes.includes(CONVERSATION_ACCESS.CODE);
+    const isExpectedModes = includesCodeMode && includesInviteMode && accessModes.length === 2;
+
+    const isGuestRoomMode = isNonActivatedRole && isExpectedModes;
+
+    return isGuestRoomMode ? ACCESS_STATE.TEAM.GUESTS_SERVICES : ACCESS_STATE.TEAM.LEGACY;
   }
 }

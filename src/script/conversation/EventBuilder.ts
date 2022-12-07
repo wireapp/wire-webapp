@@ -17,169 +17,229 @@
  *
  */
 
-import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
-import {ConversationOtrMessageAddEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
-import type {QualifiedId} from '@wireapp/api-client/lib/user/';
-import {ReactionType} from '@wireapp/core/lib/conversation';
+import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data';
+import {
+  CONVERSATION_EVENT,
+  ConversationMLSMessageAddEvent,
+  ConversationOtrMessageAddEvent,
+} from '@wireapp/api-client/lib/event';
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import {AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
+import {ReactionType} from '@wireapp/core/lib/conversation/ReactionType';
 import {DecryptionError} from '@wireapp/core/lib/errors/DecryptionError';
 
 import type {REASON as AVS_REASON} from '@wireapp/avs';
-import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
+import type {Asset, LegalHoldStatus} from '@wireapp/protocol-messaging';
 
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
-import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
+import {AssetTransferState} from '../assets/AssetTransferState';
 import type {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
 import type {User} from '../entity/User';
-import {CALL, ClientEvent, CONVERSATION} from '../event/Client';
+import {ClientEvent, CONVERSATION} from '../event/Client';
+import {E2EIVerificationMessageType} from '../message/E2EIVerificationMessageType';
 import {StatusType} from '../message/StatusType';
 import {VerificationMessageType} from '../message/VerificationMessageType';
-import {AssetRecord, EventRecord} from '../storage';
+import {ReactionMap, ReadReceipt, UserReactionMap} from '../storage';
 
 export interface BaseEvent {
   conversation: string;
   data?: unknown;
   from: string;
   id: string;
+  from_client_id?: string;
   qualified_conversation?: QualifiedId;
   qualified_from?: QualifiedId;
   server_time?: string;
   time: string;
 }
 
-export interface ConversationEvent<T> extends BaseEvent {
-  data: T;
-  id: string;
-  type: CONVERSATION;
+export interface ConversationEvent<Type extends CONVERSATION | CONVERSATION_EVENT, Data = undefined> extends BaseEvent {
+  data: Data;
+  type: Type;
 }
 
-export interface CallingEvent {
-  /**
-   * content is an object that comes from avs
-   */
-  content: {
-    keys: {
-      idx: number;
-      data: string;
-    }[];
-    resp: boolean;
-    sessid: string;
-    src_clientid: string;
-    src_userid: string;
-    type: CALL_MESSAGE_TYPE;
-    version: string;
-  };
-  conversation: string;
-  from: string;
-  qualified_conversation?: QualifiedId;
-  qualified_from?: QualifiedId;
-  sender: string;
-  time?: string;
-  type: CALL;
-  senderClientId?: string;
-}
-
-export interface BackendEventMessage<T> extends Omit<BaseEvent, 'id'> {
-  data: T;
+export interface BackendEventMessage<Type, Data> extends Omit<BaseEvent, 'id'> {
+  data: Data;
   id?: string;
-  type: string;
+  type: Type;
 }
 
-export interface VoiceChannelActivateEvent extends BaseEvent {
+export type VoiceChannelActivateEvent = ConversationEvent<CONVERSATION.VOICE_CHANNEL_ACTIVATE> & {
   protocol_version: number;
-  type: CONVERSATION.VOICE_CHANNEL_ACTIVATE;
-}
-export type AllVerifiedEventData = {type: VerificationMessageType};
-export type AllVerifiedEvent = ConversationEvent<AllVerifiedEventData>;
-export type AssetAddEvent = Omit<ConversationEvent<any>, 'id'> &
-  Partial<Pick<ConversationEvent<any>, 'id'>> & {status: StatusType; type: CONVERSATION.ASSET_ADD};
-export type DegradedMessageEventData = {type: VerificationMessageType; userIds: QualifiedId[]};
-export type DegradedMessageEvent = ConversationEvent<DegradedMessageEventData>;
-export type DeleteEvent = ConversationEvent<{deleted_time: number; message_id: string; time: string}> & {
-  type: CONVERSATION.MESSAGE_DELETE;
 };
+export type VoiceChannelDeactivateEvent = ConversationEvent<
+  CONVERSATION.VOICE_CHANNEL_DEACTIVATE,
+  {duration: number; reason: AVS_REASON}
+> & {
+  protocol_version: number;
+};
+
+export type AllVerifiedEventData = {type: VerificationMessageType.VERIFIED};
+export type AllVerifiedEvent = ConversationEvent<CONVERSATION.VERIFICATION, AllVerifiedEventData>;
+export type AssetAddEvent = ConversationEvent<
+  CONVERSATION.ASSET_ADD,
+  {
+    expects_read_confirmation?: boolean;
+    key?: string;
+    preview_key?: string;
+    info?: {
+      name: string;
+    };
+    content_type: string;
+    content_length: number;
+    status: AssetTransferState;
+    reason?: Asset.NotUploaded | AssetTransferState;
+  }
+>;
+
+export type DegradedMessageEventData = {type: VerificationMessageType; userIds: QualifiedId[]};
+export type DegradedMessageEvent = ConversationEvent<CONVERSATION.VERIFICATION, DegradedMessageEventData>;
+export type DeleteEvent = ConversationEvent<
+  CONVERSATION.MESSAGE_DELETE,
+  {deleted_time: number; message_id: string; time: string}
+>;
+export type FederationStopEvent = ConversationEvent<CONVERSATION.FEDERATION_STOP, {domains: string[]}>;
 export type GroupCreationEventData = {
   allTeamMembers: boolean;
   name: string;
   userIds: QualifiedId[];
 };
-export type GroupCreationEvent = ConversationEvent<GroupCreationEventData> & {type: CONVERSATION.GROUP_CREATION};
-export type LegalHoldMessageEvent = ConversationEvent<{legal_hold_status: LegalHoldStatus}> & {
-  type: CONVERSATION.LEGAL_HOLD_UPDATE;
-};
-export type MemberJoinEvent = BackendEventMessage<{qualified_user_ids?: QualifiedId[]; user_ids: string[]}>;
-export type MemberLeaveEvent = BackendEventMessage<{
-  name?: string;
-  qualified_user_ids?: QualifiedId[];
-  reason?: MemberLeaveReason;
-  user_ids: string[];
-}>;
-export type MessageAddEvent = Omit<ConversationEvent<{}>, 'id'> & {
+export type GroupCreationEvent = ConversationEvent<CONVERSATION.GROUP_CREATION, GroupCreationEventData>;
+export type LegalHoldMessageEvent = ConversationEvent<
+  CONVERSATION.LEGAL_HOLD_UPDATE,
+  {legal_hold_status: LegalHoldStatus}
+>;
+export type MemberJoinEvent = BackendEventMessage<
+  CONVERSATION_EVENT.MEMBER_JOIN,
+  {qualified_user_ids?: QualifiedId[]; user_ids: string[]}
+>;
+export type MemberLeaveEvent = BackendEventMessage<
+  CONVERSATION_EVENT.MEMBER_LEAVE,
+  {
+    name?: string;
+    qualified_user_ids?: QualifiedId[];
+    reason?: MemberLeaveReason;
+    user_ids: string[];
+  }
+>;
+export type MessageAddEvent = ConversationEvent<
+  CONVERSATION.MESSAGE_ADD,
+  {
+    sender: string;
+    content: string;
+    replacing_message_id?: string;
+    previews?: string[];
+    expects_read_confirmation?: boolean;
+    quote?:
+      | string
+      | {
+          message_id: string;
+          user_id: string;
+          hash: Uint8Array;
+        }
+      | {error: {type: string}};
+  }
+> & {
+  /** who have received/read the event */
+  read_receipts?: ReadReceipt[];
+  /** who reacted to the event */
+  reactions?: UserReactionMap | ReactionMap;
   edited_time?: string;
   status: StatusType;
-  type: CONVERSATION.MESSAGE_ADD;
+  version?: number;
 };
 export type MissedEvent = BaseEvent & {id: string; type: CONVERSATION.MISSED_MESSAGES};
-export type OneToOneCreationEvent = ConversationEvent<{userIds: QualifiedId[]}> & {
-  type: CONVERSATION.ONE2ONE_CREATION;
+export type JoinedAfterMLSMigrationFinalisationEvent = BaseEvent & {
+  type: CONVERSATION.JOINED_AFTER_MLS_MIGRATION;
 };
-export type TeamMemberLeaveEvent = ConversationEvent<{name: string; user_ids: string[]}> & {
+export type MLSMigrationFinalisationOngoingCallEvent = BaseEvent & {
+  type: CONVERSATION.MLS_MIGRATION_ONGOING_CALL;
+};
+export type MLSConversationRecoveredEvent = BaseEvent & {id: string; type: CONVERSATION.MLS_CONVERSATION_RECOVERED};
+export type OneToOneCreationEvent = ConversationEvent<CONVERSATION.ONE2ONE_CREATION, {userIds: QualifiedId[]}>;
+export type TeamMemberLeaveEvent = Omit<MemberLeaveEvent, 'type'> & {
   type: CONVERSATION.TEAM_MEMBER_LEAVE;
 };
-export type ReactionEvent = ConversationEvent<{message_id: string; reaction: ReactionType}> & {
-  type: CONVERSATION.REACTION;
-};
-export type MessageHiddenEvent = ConversationEvent<{conversation_id: string; message_id: string}> & {
-  type: CONVERSATION.MESSAGE_HIDDEN;
-};
-export type ButtonActionConfirmationEvent = ConversationEvent<{buttonId: string; messageId: string}> & {
-  type: CONVERSATION.BUTTON_ACTION_CONFIRMATION;
-};
-export type DeleteEverywhereEvent = ConversationEvent<{}> & {
-  type: CONVERSATION.DELETE_EVERYWHERE;
-};
-export type CompositeMessageAddEvent = ConversationEvent<{}> & {
-  type: CONVERSATION.COMPOSITE_MESSAGE_ADD;
-};
-export type IncomingMessageTooBigEvent = ConversationEvent<{}> & {
-  type: CONVERSATION.INCOMING_MESSAGE_TOO_BIG;
-};
-export type KnockEvent = ConversationEvent<{}> & {
-  type: CONVERSATION.KNOCK;
-};
-export type LocationEvent = ConversationEvent<{}> & {
-  type: CONVERSATION.LOCATION;
-};
-export type UnableToDecryptEvent = ConversationEvent<{}> & {
-  type: CONVERSATION.UNABLE_TO_DECRYPT;
-};
-export type VerificationEvent = ConversationEvent<{}> & {
-  type: CONVERSATION.VERIFICATION;
-};
-export type VoiceChannelDeactivateEvent = ConversationEvent<{duration: number; reason: AVS_REASON}> & {
-  protocol_version: number;
-  type: CONVERSATION.VOICE_CHANNEL_DEACTIVATE;
-};
-export type FileTypeRestrictedEvent = ConversationEvent<{fileExt: string; isIncoming: boolean; name: string}> & {
-  type: CONVERSATION.FILE_TYPE_RESTRICTED;
-};
-export type CallingTimeoutEvent = ConversationEvent<{reason: AVS_REASON.NOONE_JOINED | AVS_REASON.EVERYONE_LEFT}> & {
-  type: CONVERSATION.CALL_TIME_OUT;
-};
+export type ReactionEvent = ConversationEvent<CONVERSATION.REACTION, {message_id: string; reaction: ReactionType}>;
+export type MessageHiddenEvent = ConversationEvent<
+  CONVERSATION.MESSAGE_HIDDEN,
+  {conversation_id: string; message_id: string}
+>;
+export type ConfirmationEvent = ConversationEvent<
+  CONVERSATION.CONFIRMATION,
+  {
+    message_id: string;
+    more_message_ids: string[];
+    status: StatusType;
+  }
+>;
+export type ButtonActionConfirmationEvent = ConversationEvent<
+  CONVERSATION.BUTTON_ACTION_CONFIRMATION,
+  {buttonId: string; messageId: string}
+>;
+export type DeleteEverywhereEvent = ConversationEvent<
+  CONVERSATION.DELETE_EVERYWHERE,
+  {
+    deleted_time: string;
+  }
+>;
+export type CompositeMessageAddEvent = ConversationEvent<CONVERSATION.COMPOSITE_MESSAGE_ADD>;
+export type IncomingMessageTooBigEvent = ConversationEvent<CONVERSATION.INCOMING_MESSAGE_TOO_BIG>;
+export type KnockEvent = ConversationEvent<
+  CONVERSATION.KNOCK,
+  {
+    expects_read_confirmation?: boolean;
+  }
+>;
+export type LocationEvent = ConversationEvent<
+  CONVERSATION.LOCATION,
+  {
+    expects_read_confirmation?: boolean;
+  }
+>;
+export type UnableToDecryptEvent = ConversationEvent<CONVERSATION.UNABLE_TO_DECRYPT>;
+export type VerificationEvent = ConversationEvent<CONVERSATION.VERIFICATION>;
+export type FileTypeRestrictedEvent = ConversationEvent<
+  CONVERSATION.FILE_TYPE_RESTRICTED,
+  {fileExt: string; isIncoming: boolean; name: string}
+>;
+export type CallingTimeoutEvent = ConversationEvent<
+  CONVERSATION.CALL_TIME_OUT,
+  {reason: AVS_REASON.NOONE_JOINED | AVS_REASON.EVERYONE_LEFT}
+>;
+export type FailedToAddUsersMessageEvent = ConversationEvent<
+  CONVERSATION.FAILED_TO_ADD_USERS,
+  {
+    qualifiedIds: QualifiedId[];
+    reason: AddUsersFailureReasons;
+    backends: string[];
+  }
+>;
 
-export interface ErrorEvent extends BaseEvent {
+export interface ErrorEvent
+  extends ConversationEvent<CONVERSATION.UNABLE_TO_DECRYPT | CONVERSATION.INCOMING_MESSAGE_TOO_BIG> {
   error: string;
   error_code: number | string;
   id: string;
-  type: CONVERSATION;
 }
 
+// E2EI Verification Events
+export type E2EIVerificationEventData = {type: E2EIVerificationMessageType; userIds?: QualifiedId[]};
+export type E2EIVerificationEvent = ConversationEvent<CONVERSATION.E2EI_VERIFICATION, E2EIVerificationEventData>;
+
 export type ClientConversationEvent =
+  | AllVerifiedEvent
+  | E2EIVerificationEvent
   | AssetAddEvent
+  | ErrorEvent
   | CompositeMessageAddEvent
+  | ConfirmationEvent
+  | FederationStopEvent
   | DeleteEvent
   | DeleteEverywhereEvent
+  | DegradedMessageEvent
   | ButtonActionConfirmationEvent
   | KnockEvent
   | IncomingMessageTooBigEvent
@@ -189,12 +249,18 @@ export type ClientConversationEvent =
   | LegalHoldMessageEvent
   | MessageAddEvent
   | MessageHiddenEvent
+  | MemberLeaveEvent
+  | MemberJoinEvent
   | OneToOneCreationEvent
   | VoiceChannelDeactivateEvent
   | FileTypeRestrictedEvent
   | CallingTimeoutEvent
+  | FailedToAddUsersMessageEvent
   | UnableToDecryptEvent
   | MissedEvent
+  | JoinedAfterMLSMigrationFinalisationEvent
+  | MLSMigrationFinalisationOngoingCallEvent
+  | MLSConversationRecoveredEvent
   | LocationEvent
   | VoiceChannelActivateEvent
   | VerificationEvent;
@@ -218,7 +284,7 @@ export const EventBuilder = {
         userIds: conversationEntity.participating_user_ids(),
       },
       from: creatorId,
-      id: createRandomUuid(),
+      id: createUuid(),
       time: isoDate,
       type: ClientEvent.CONVERSATION.ONE2ONE_CREATION,
     };
@@ -231,20 +297,40 @@ export const EventBuilder = {
         type: VerificationMessageType.VERIFIED,
       },
       from: conversationEntity.selfUser().id,
-      id: createRandomUuid(),
+      id: createUuid(),
       time: new Date(conversationEntity.getNextTimestamp()).toISOString(),
       type: ClientEvent.CONVERSATION.VERIFICATION,
     };
   },
 
-  buildAssetAdd(conversationEntity: Conversation, data: AssetRecord, currentTimestamp: number): AssetAddEvent {
+  buildAllE2EIVerified(conversationEntity: Conversation): E2EIVerificationEvent {
     return {
       ...buildQualifiedId(conversationEntity),
-      data,
-      from: conversationEntity.selfUser().id,
-      status: StatusType.SENDING,
-      time: conversationEntity.getNextIsoDate(currentTimestamp),
-      type: ClientEvent.CONVERSATION.ASSET_ADD,
+      data: {
+        type: E2EIVerificationMessageType.VERIFIED,
+      },
+      from: '',
+      id: createUuid(),
+      time: conversationEntity.getNextIsoDate(),
+      type: ClientEvent.CONVERSATION.E2EI_VERIFICATION,
+    };
+  },
+
+  buildE2EIDegraded(
+    conversationEntity: Conversation,
+    type: E2EIVerificationMessageType,
+    userIds?: QualifiedId[],
+  ): E2EIVerificationEvent {
+    return {
+      ...buildQualifiedId(conversationEntity),
+      data: {
+        type,
+        userIds,
+      },
+      from: '',
+      id: createUuid(),
+      time: conversationEntity.getNextIsoDate(),
+      type: ClientEvent.CONVERSATION.E2EI_VERIFICATION,
     };
   },
 
@@ -259,9 +345,28 @@ export const EventBuilder = {
         reason,
       },
       from: userId,
-      id: createRandomUuid(),
+      id: createUuid(),
       time: conversation.getNextIsoDate(),
       type: ClientEvent.CONVERSATION.CALL_TIME_OUT,
+    };
+  },
+
+  buildFailedToAddUsersEvent(
+    failedToAdd: {users: QualifiedId[]; reason: AddUsersFailureReasons; backends: string[]},
+    conversation: Conversation,
+    userId: string,
+  ): FailedToAddUsersMessageEvent {
+    return {
+      ...buildQualifiedId(conversation),
+      data: {
+        qualifiedIds: failedToAdd.users,
+        reason: failedToAdd.reason,
+        backends: failedToAdd.backends,
+      },
+      from: userId,
+      id: createUuid(),
+      time: conversation.getNextIsoDate(),
+      type: ClientEvent.CONVERSATION.FAILED_TO_ADD_USERS,
     };
   },
 
@@ -277,7 +382,7 @@ export const EventBuilder = {
         userIds,
       },
       from: conversationEntity.selfUser().id,
-      id: createRandomUuid(),
+      id: createUuid(),
       time: new Date(conversationEntity.getNextTimestamp()).toISOString(),
       type: ClientEvent.CONVERSATION.VERIFICATION,
     };
@@ -345,7 +450,7 @@ export const EventBuilder = {
         userIds,
       },
       from: isTemporaryGuest ? selfUserId : creatorId,
-      id: createRandomUuid(),
+      id: createUuid(),
       time: isoDate,
       type: ClientEvent.CONVERSATION.GROUP_CREATION,
     };
@@ -360,10 +465,11 @@ export const EventBuilder = {
 
     return {
       ...buildQualifiedId(conversationId || conversation),
+      data: undefined,
       error: `${messageError.message} (${eventData.sender})`,
       error_code: errorCode,
       from,
-      id: createRandomUuid(),
+      id: createUuid(),
       time,
       type: ClientEvent.CONVERSATION.INCOMING_MESSAGE_TOO_BIG,
     };
@@ -382,7 +488,7 @@ export const EventBuilder = {
         legal_hold_status: legalHoldStatus,
       },
       from: userId.id,
-      id: createRandomUuid(),
+      id: createUuid(),
       qualified_conversation: conversationId,
       qualified_from: userId,
       time: new Date(timestamp + (beforeMessage ? -1 : 0)).toISOString(),
@@ -414,29 +520,54 @@ export const EventBuilder = {
 
   buildMemberLeave(
     conversationEntity: Conversation,
-    userId: QualifiedId,
-    removedBySelfUser: boolean,
+    userIds: QualifiedId[],
+    from: string,
     currentTimestamp: number,
   ): MemberLeaveEvent {
     return {
       ...buildQualifiedId(conversationEntity),
       data: {
-        qualified_user_ids: [userId],
-        user_ids: [userId.id],
+        qualified_user_ids: userIds,
+        user_ids: userIds.map(({id}) => id),
       },
-      from: removedBySelfUser ? conversationEntity.selfUser().id : userId.id,
+      from: from,
       time: conversationEntity.getNextIsoDate(currentTimestamp),
       type: CONVERSATION_EVENT.MEMBER_LEAVE,
     };
   },
 
-  buildMessageAdd(conversationEntity: Conversation, currentTimestamp: number, senderId: string): MessageAddEvent {
+  buildFederationStop(
+    conversationEntity: Conversation,
+    selfUser: User,
+    domains: string[],
+    currentTimestamp: number,
+  ): FederationStopEvent {
     return {
       ...buildQualifiedId(conversationEntity),
       data: {
-        sender: senderId,
+        domains,
       },
-      from: conversationEntity.selfUser().id,
+      id: createUuid(),
+      from: selfUser.id,
+      time: conversationEntity.getNextIsoDate(currentTimestamp),
+      type: CONVERSATION.FEDERATION_STOP,
+    };
+  },
+
+  buildMessageAdd(
+    conversationEntity: Conversation,
+    currentTimestamp: number,
+    senderId: string,
+    clientId: string,
+  ): MessageAddEvent {
+    return {
+      ...buildQualifiedId(conversationEntity),
+      data: {
+        content: '',
+        sender: clientId,
+      },
+      id: createUuid(),
+      from: senderId,
       status: StatusType.SENDING,
       time: conversationEntity.getNextIsoDate(currentTimestamp),
       type: ClientEvent.CONVERSATION.MESSAGE_ADD,
@@ -447,9 +578,50 @@ export const EventBuilder = {
     return {
       ...buildQualifiedId(conversationEntity),
       from: conversationEntity.selfUser().id,
-      id: createRandomUuid(),
+      id: createUuid(),
       time: conversationEntity.getNextIsoDate(currentTimestamp),
       type: ClientEvent.CONVERSATION.MISSED_MESSAGES,
+    };
+  },
+
+  buildMLSConversationRecovered(
+    conversationEntity: Conversation,
+    currentTimestamp: number,
+  ): MLSConversationRecoveredEvent {
+    return {
+      ...buildQualifiedId(conversationEntity),
+      from: conversationEntity.selfUser().id,
+      id: createUuid(),
+      time: conversationEntity.getNextIsoDate(currentTimestamp),
+      type: ClientEvent.CONVERSATION.MLS_CONVERSATION_RECOVERED,
+    };
+  },
+
+  buildJoinedAfterMLSMigrationFinalisation(
+    conversationEntity: Conversation,
+    currentTimestamp: number,
+  ): JoinedAfterMLSMigrationFinalisationEvent {
+    return {
+      ...buildQualifiedId(conversationEntity),
+      from: conversationEntity.selfUser().id,
+      id: createUuid(),
+      data: null,
+      time: conversationEntity.getNextIsoDate(currentTimestamp),
+      type: ClientEvent.CONVERSATION.JOINED_AFTER_MLS_MIGRATION,
+    };
+  },
+
+  buildMLSMigrationFinalisationOngoingCall(
+    conversationEntity: Conversation,
+    currentTimestamp: number,
+  ): MLSMigrationFinalisationOngoingCallEvent {
+    return {
+      ...buildQualifiedId(conversationEntity),
+      from: conversationEntity.selfUser().id,
+      id: createUuid(),
+      data: null,
+      time: conversationEntity.getNextIsoDate(currentTimestamp),
+      type: ClientEvent.CONVERSATION.MLS_MIGRATION_ONGOING_CALL,
     };
   },
 
@@ -465,21 +637,25 @@ export const EventBuilder = {
         user_ids: [userEntity.id],
       },
       from: userEntity.id,
-      id: createRandomUuid(),
+      id: createUuid(),
       time: new Date(isoDate).toISOString(),
       type: ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE,
     };
   },
 
-  buildUnableToDecrypt(event: EventRecord, decryptionError: DecryptionError): ErrorEvent {
+  buildUnableToDecrypt(
+    event: ConversationOtrMessageAddEvent | ConversationMLSMessageAddEvent,
+    decryptionError: DecryptionError,
+  ): ErrorEvent {
     const {qualified_conversation: conversationId, qualified_from, conversation, data: eventData, from, time} = event;
 
     return {
       ...buildQualifiedId(conversationId || conversation),
-      error: `${decryptionError.message} (${eventData.sender})`,
+      error: `${decryptionError.message} (${(eventData as any).sender})`,
+      data: undefined,
       error_code: decryptionError.code ?? '',
       from,
-      id: createRandomUuid(),
+      id: createUuid(),
       qualified_from: qualified_from || {domain: '', id: from},
       time,
       type: ClientEvent.CONVERSATION.UNABLE_TO_DECRYPT,
@@ -494,12 +670,13 @@ export const EventBuilder = {
   ): VoiceChannelActivateEvent {
     return {
       ...buildQualifiedId(conversation),
+      data: undefined,
       from: userId.id,
-      id: createRandomUuid(),
+      id: createUuid(),
       protocol_version: protocolVersion,
       qualified_from: userId,
       time,
-      type: ClientEvent.CONVERSATION.VOICE_CHANNEL_ACTIVATE,
+      type: CONVERSATION.VOICE_CHANNEL_ACTIVATE,
     };
   },
 
@@ -518,7 +695,7 @@ export const EventBuilder = {
         reason,
       },
       from: userId.id,
-      id: createRandomUuid(),
+      id: createUuid(),
       protocol_version: protocolVersion,
       qualified_from: userId,
       time,

@@ -17,16 +17,16 @@
  *
  */
 
-import type {BackendError} from '@wireapp/api-client/lib/http/';
-import type {QualifiedId} from '@wireapp/api-client/lib/user/';
+import {RegisteredClient} from '@wireapp/api-client/lib/client';
+import type {BackendError} from '@wireapp/api-client/lib/http';
 import {AxiosError} from 'axios';
 
-import {QualifiedUserClientEntityMap} from '../client/ClientRepository';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
+import {isObject} from '../guards/common';
 import {ClientRecord} from '../storage/record/ClientRecord';
 
-export function isAxiosError(errorCandidate: any): errorCandidate is AxiosError {
+export function isAxiosError<T>(errorCandidate: any): errorCandidate is AxiosError<T> {
   return errorCandidate && errorCandidate.isAxiosError === true;
 }
 
@@ -38,14 +38,6 @@ export function isUser(userCandidate: any): userCandidate is User {
   return userCandidate instanceof User;
 }
 
-export function isQualifiedIdArray(ids: string[] | QualifiedId[]): ids is QualifiedId[] {
-  return !!ids.length && isQualifiedId(ids[0]);
-}
-
-export function isQualifiedId(userId: string | QualifiedId): userId is QualifiedId {
-  return typeof userId === 'object' && 'domain' in userId;
-}
-
 export function isConversationEntity(conversation: any): conversation is Conversation {
   return conversation instanceof Conversation;
 }
@@ -54,6 +46,6 @@ export function isClientRecord(record: any): record is ClientRecord {
   return !!record.meta;
 }
 
-export function isQualifiedUserClientEntityMap(map: any): map is QualifiedUserClientEntityMap {
-  return Object.keys(map)[0]?.includes('.');
+export function isClientWithMLSPublicKeys(record: unknown): record is RegisteredClient {
+  return isObject(record) && 'mls_public_keys' in record;
 }

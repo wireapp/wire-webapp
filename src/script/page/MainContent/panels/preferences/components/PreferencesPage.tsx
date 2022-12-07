@@ -21,9 +21,9 @@ import {useContext, FC} from 'react';
 
 import {IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
 
+import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {RootContext} from 'src/script/page/RootProvider';
 import {useAppMainState, ViewType} from 'src/script/page/state';
-import {initFadingScrollbar} from 'src/script/ui/fadingScrollbar';
 
 interface PreferencesPageProps {
   children: React.ReactNode;
@@ -62,9 +62,7 @@ const PreferencesPage: FC<PreferencesPageProps> = ({title, children}) => {
           />
         )}
       </div>
-      <div className="preferences-content" ref={initFadingScrollbar}>
-        {children}
-      </div>
+      <FadingScrollbar className="preferences-content">{children}</FadingScrollbar>
     </div>
   );
 };

@@ -59,6 +59,7 @@
 @blue-600: #0552a0;
 @blue-700: #043e78;
 @blue-800: #022950;
+@blue-900: #021f3c;
 
 @blue-dark-50: #eef7ff;
 @blue-dark-100: #ddedff;
@@ -69,6 +70,7 @@
 @blue-dark-600: #4385cc;
 @blue-dark-700: #326499;
 @blue-dark-800: #224266;
+@blue-dark-900: #19324d;
 
 @green-50: #e8f1ea;
 @green-100: #d2e4d6;
@@ -79,6 +81,7 @@
 @green-600: #176029;
 @green-700: #11481f;
 @green-800: #0c3014;
+@green-900: #09240f;
 
 @green-dark-50: #ebfcef;
 @green-dark-100: #d6f8de;
@@ -89,6 +92,7 @@
 @green-dark-600: #26af49;
 @green-dark-700: #1d8337;
 @green-dark-800: #135824;
+@green-dark-900: #0e421b;
 
 @turquoise-50: #e5f1f3;
 @turquoise-100: #cce2e7;
@@ -99,6 +103,7 @@
 @turquoise-600: #015a6e;
 @turquoise-700: #014352;
 @turquoise-800: #002d37;
+@turquoise-900: #002229;
 
 @turquoise-dark-50: #effdff;
 @turquoise-dark-100: #dffaff;
@@ -109,6 +114,7 @@
 @turquoise-dark-600: #4ab8cc;
 @turquoise-dark-700: #388a99;
 @turquoise-dark-800: #255c66;
+@turquoise-dark-900: #1c454d;
 
 @purple-50: #f4edf7;
 @purple-100: #e7daee;
@@ -119,6 +125,7 @@
 @purple-600: #6e3689;
 @purple-700: #522967;
 @purple-800: #371b44;
+@purple-900: #291433;
 
 @purple-dark-50: #fcf4ff;
 @purple-dark-100: #f8e9ff;
@@ -129,6 +136,7 @@
 @purple-dark-600: #ae72cc;
 @purple-dark-700: #835699;
 @purple-dark-800: #573966;
+@purple-dark-900: #412b4d;
 
 @red-50: #f9e6e8;
 @red-100: #f3ccd0;
@@ -139,6 +147,7 @@
 @red-600: #9b000f;
 @red-700: #74000b;
 @red-800: #4e0008;
+@red-900: #3a0006;
 
 @red-dark-50: #fff2f1;
 @red-dark-100: #ffe4e2;
@@ -149,6 +158,7 @@
 @red-dark-600: #cc5f5a;
 @red-dark-700: #994743;
 @red-dark-800: #66302d;
+@red-dark-900: #4d2422;
 
 @amber-50: #f6eee8;
 @amber-100: #ecded0;
@@ -159,6 +169,7 @@
 @amber-600: #824711;
 @amber-700: #61350d;
 @amber-800: #412408;
+@amber-900: #412408;
 
 @amber-dark-50: #fffbea;
 @amber-dark-100: #fff6d4;
@@ -169,6 +180,7 @@
 @amber-dark-600: #ccaa1e;
 @amber-dark-700: #997f17;
 @amber-dark-800: #66550f;
+@amber-dark-900: #4d400b;
 
 .colors() {
   amber: 5;
@@ -179,7 +191,7 @@
   turquoise: 6;
 }
 
-@color-index: 50, 100, 200, 300, 400, 500, 600, 700, 800;
+@color-index: 50, 100, 200, 300, 400, 500, 600, 700, 800, 900;
 
 body {
   &.theme-default {
@@ -206,8 +218,7 @@ each(.colors(), .(@color-key, @color-name) {
   @accent-color-border: '@{name}-500';
   @accent-color-focus: '@{name}-400';
   @accent-color-selection: '@{name}-300';
-  @icon-primary-active-fill: '@{name}-500';
-  @icon-secondary-active-border: 'accent_colors-0';
+  @accent-color-self-mention: '@{name}-200';
   @button-primary-hover: '@{name}-600';
   @button-primary-focus-border: '@{name}-700';
   @button-primary-active: '@{name}-800';
@@ -215,12 +226,22 @@ each(.colors(), .(@color-key, @color-name) {
   @button-secondary-hover-border: '@{name}-500';
   @button-secondary-active-bg: '@{name}-50';
   @button-secondary-active-border: '@{name}-500';
+  @message-actions-active-border: '@{name}-300';
+  @message-actions-active-background: '@{name}-50';
+  @message-reactions-active-border: '@{name}-300';
+  @message-reactions-active-background: '@{name}-50';
+  @message-reactions-background: 'w-gray-20';
+  @message-reactions-border: 'w-gray-50';
+  @message-reactions-focus-border: '@{name}-500';
+  @message-reactions-count: 'w-gray-80';
   @toggle-button-hover-bg: '@{name}-700';
+  @icon-primary-active-fill: '@{name}-500';
+  @icon-secondary-active-border: 'accent_colors-0';
+  @indicator-range-input-thumb: '@{name}-700';
   @toggle-button-unselected-bg: '@{name}-100';
+  @content-message-timestamp: 'w-gray-70';
 
   .main-accent-color-@{color-key} {
-    --icon-primary-active-fill: @@icon-primary-active-fill;
-    --icon-secondary-active-border: @@icon-secondary-active-border;
     --button-primary-hover: @@button-primary-hover;
     --button-primary-focus-border: @@button-primary-focus-border;
     --button-primary-active: @@button-primary-active;
@@ -228,7 +249,19 @@ each(.colors(), .(@color-key, @color-name) {
     --button-secondary-hover-border: @@button-secondary-hover-border;
     --button-secondary-active-bg: @@button-secondary-active-bg;
     --button-secondary-active-border: @@button-secondary-active-border;
+    --message-actions-active-border:@@message-actions-active-border;
+    --message-actions-active-background:@@message-actions-active-background;
+    --message-reactions-active-border:@@message-reactions-active-border;
+    --message-reactions-active-background:@@message-reactions-active-background;
+    --message-reactions-background: @@message-reactions-background;
+    --message-reactions-border: @@message-reactions-border;
+    --message-reactions-focus-border: @@message-reactions-focus-border;
+    --message-reactions-count: @@message-reactions-count;
+    --content-message-timestamp:@@content-message-timestamp;
     --toggle-button-hover-bg: @@toggle-button-hover-bg;
+    --icon-primary-active-fill: @@icon-primary-active-fill;
+    --icon-secondary-active-border: @@icon-secondary-active-border;
+    --indicator-range-input-thumb: @@indicator-range-input-thumb;
     --toggle-button-unselected-bg: @@toggle-button-unselected-bg;
     --accent-color: @@accent-color;
     --accent-color-highlight: @@accent-color-highlight;
@@ -236,6 +269,7 @@ each(.colors(), .(@color-key, @color-name) {
     --accent-color-border: @@accent-color-border;
     --accent-color-focus: @@accent-color-focus;
     --accent-color-selection: @@accent-color-selection;
+    --accent-color-self-mention: @@accent-color-self-mention;
     --accent-color-fade-16: fade(@@accent-color, 16%);
     --accent-color-fade-24: fade(@@accent-color, 24%);
     --accent-color-darken-16: darken(@@accent-color, 16%);
@@ -256,8 +290,7 @@ each(.colors(), .(@color-key, @color-name) {
     @accent-color-border-dark: '@{name}-dark-600';
     @accent-color-focus-dark: '@{name}-dark-600';
     @accent-color-selection-dark: '@{name}-dark-700';
-    @icon-primary-active-fill-dark: 'w-white';
-    @icon-secondary-active-border-dark: '@{name}-dark-800' ;
+    @accent-color-self-mention-dark: '@{name}-dark-800';
     @button-primary-hover-dark: '@{name}-dark-400';
     @button-primary-focus-border-dark: '@{name}-dark-100';
     @button-primary-active-dark: '@{name}-dark-800';
@@ -265,11 +298,21 @@ each(.colors(), .(@color-key, @color-name) {
     @button-secondary-hover-border-dark: 'w-gray-70';
     @button-secondary-active-bg-dark: 'w-gray-95';
     @button-secondary-active-border-dark: '@{name}-dark-800';
+    @message-actions-active-border-dark: '@{name}-dark-600';
+    @message-actions-active-background-dark: '@{name}-dark-800';
+    @message-reactions-active-border-dark: '@{name}-dark-700';
+    @message-reactions-active-background-dark: '@{name}-dark-900';
+    @message-reactions-background-dark: 'w-gray-90';
+    @message-reactions-border-dark: 'w-gray-80';
+    @message-reactions-focus-border-dark: '@{name}-dark-500';
+    @message-reactions-count-dark: 'w-gray-20';
+    @content-message-timestamp-dark: 'w-gray-60';
     @toggle-button-hover-bg-dark: '@{name}-dark-300';
+    @icon-primary-active-fill-dark: 'w-white';
+    @icon-secondary-active-border-dark: '@{name}-dark-800' ;
+    @indicator-range-input-thumb-dark: '@{name}-dark-300';
     @toggle-button-unselected-bg-dark: '@{name}-dark-800';
     .main-accent-color-@{color-key} {
-      --icon-primary-active-fill: @@icon-primary-active-fill-dark;
-      --icon-secondary-active-border: @@icon-secondary-active-border-dark;
       --button-primary-hover: @@button-primary-hover-dark;
       --button-primary-focus-border: @@button-primary-focus-border-dark;
       --button-primary-active: @@button-primary-active-dark;
@@ -277,6 +320,18 @@ each(.colors(), .(@color-key, @color-name) {
       --button-secondary-hover-border: @@button-secondary-hover-border-dark;
       --button-secondary-active-bg: @@button-secondary-active-bg-dark;
       --button-secondary-active-border: @@button-secondary-active-border-dark;
+      --message-actions-active-border: @@message-actions-active-border-dark;
+      --message-actions-active-background: @@message-actions-active-background-dark;
+      --message-reactions-active-border: @@message-reactions-active-border-dark;
+      --message-reactions-active-background: @@message-reactions-active-background-dark;
+      --message-reactions-background: @@message-reactions-background-dark;
+      --message-reactions-border: @@message-reactions-border-dark;
+      --message-reactions-focus-border: @@message-reactions-focus-border-dark;
+      --message-reactions-count: @@message-reactions-count-dark;
+      --content-message-timestamp:@@content-message-timestamp-dark;
+      --icon-primary-active-fill: @@icon-primary-active-fill-dark;
+      --icon-secondary-active-border: @@icon-secondary-active-border-dark;
+      --indicator-range-input-thumb: @@indicator-range-input-thumb-dark;
       --toggle-button-hover-bg: @@toggle-button-hover-bg-dark;
       --toggle-button-unselected-bg: @@toggle-button-unselected-bg-dark;
       --accent-color: @@accent-color-dark;
@@ -285,6 +340,7 @@ each(.colors(), .(@color-key, @color-name) {
       --accent-color-border: @@accent-color-border-dark;
       --accent-color-focus: @@accent-color-focus-dark;
       --accent-color-selection: @@accent-color-selection-dark;
+      --accent-color-self-mention: @@accent-color-self-mention-dark;
       each(@color-index, {
         @accent-color: '@{name}-dark-@{value}';
         --accent-color-@{value}: @@accent-color;

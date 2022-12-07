@@ -20,12 +20,14 @@
 import React from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {VIDEO_STATE} from '@wireapp/avs';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {Icon} from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {isEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {Video} from './Video';
@@ -35,11 +37,29 @@ import type {Participant} from '../../calling/Participant';
 export interface GroupVideoGridTileProps {
   isMaximized: boolean;
   minimized: boolean;
-  onParticipantDoubleClick: (userId: QualifiedId, clientId: string) => void;
+  onTileDoubleClick: (userId: QualifiedId, clientId: string) => void;
   participant: Participant;
   participantCount: number;
   selfParticipant: Participant;
 }
+
+const getParticipantNameColor = ({
+  isActivelySpeaking,
+  isAudioEstablished,
+}: {
+  isActivelySpeaking: boolean;
+  isAudioEstablished: boolean;
+}) => {
+  if (!isAudioEstablished) {
+    return 'var(--gray-60)';
+  }
+
+  if (isActivelySpeaking) {
+    return 'var(--app-bg-secondary)';
+  }
+
+  return 'var(--white)';
+};
 
 const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
   minimized,
@@ -47,14 +67,12 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
   selfParticipant,
   participantCount,
   isMaximized,
-  onParticipantDoubleClick,
+  onTileDoubleClick,
 }) => {
-  const {isMuted, videoState, videoStream, isActivelySpeaking} = useKoSubscribableChildren(participant, [
-    'isMuted',
-    'videoStream',
-    'isActivelySpeaking',
-    'videoState',
-  ]);
+  const {isMuted, videoState, videoStream, isActivelySpeaking, isAudioEstablished} = useKoSubscribableChildren(
+    participant,
+    ['isMuted', 'videoStream', 'isActivelySpeaking', 'videoState', 'isAudioEstablished'],
+  );
   const {name} = useKoSubscribableChildren(participant?.user, ['name']);
 
   const sharesScreen = videoState === VIDEO_STATE.SCREENSHARE;
@@ -64,25 +82,81 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
   const activelySpeakingBoxShadow = `inset 0px 0px 0px 1px var(--group-video-bg), inset 0px 0px 0px 4px var(--accent-color), inset 0px 0px 0px 7px var(--app-bg-secondary)`;
   const groupVideoBoxShadow = participantCount > 1 ? 'inset 0px 0px 0px 2px var(--group-video-bg)' : 'initial';
 
-  return (
+  const handleTileClick = () => onTileDoubleClick(participant?.user.qualifiedId, participant?.clientId);
+
+  const handleEnterTileClick = (keyboardEvent: React.KeyboardEvent) => {
+    if (isEnterKey(keyboardEvent)) {
+      handleTileClick();
+    }
+  };
+
+  const participantNameColor = getParticipantNameColor({isActivelySpeaking, isAudioEstablished});
+
+  const nameContainer = !minimized && (
     <div
+      className="group-video-grid__element__label"
+      css={{
+        backgroundColor: isActivelySpeaking ? 'var(--accent-color)' : 'var(--black)',
+      }}
+    >
+      <span
+        data-uie-name={isActivelySpeaking ? 'status-active-speaking' : isMuted ? 'status-audio-off' : 'status-audio-on'}
+        css={{
+          overflow: 'hidden',
+          display: 'flex',
+          color: participantNameColor,
+        }}
+      >
+        <span
+          data-uie-name="call-participant-name"
+          css={{
+            textOverflow: 'ellipsis',
+            overflow: 'hidden',
+          }}
+        >
+          {name}
+        </span>
+        {!isAudioEstablished && (
+          <span
+            css={{
+              color: 'var(--participant-audio-connecting-color)',
+              flexShrink: 0,
+              '&::before': {
+                content: "' • '",
+                whiteSpace: 'pre',
+                color: participantNameColor,
+              },
+            }}
+          >
+            {t('videoCallParticipantConnecting')}
+          </span>
+        )}
+      </span>
+    </div>
+  );
+
+  return (
+    <button
       data-uie-name="item-grid"
-      css={{position: 'relative'}}
       data-user-id={participant?.user.id}
       className="group-video-grid__element"
-      onDoubleClick={() => onParticipantDoubleClick(participant?.user.qualifiedId, participant?.clientId)}
+      onDoubleClick={handleTileClick}
+      onKeyDown={handleEnterTileClick}
+      tabIndex={isMaximized ? TabIndex.FOCUSABLE : TabIndex.UNFOCUSABLE}
     >
       {hasActiveVideo ? (
-        <Video
-          autoPlay
-          playsInline
-          srcObject={videoStream}
-          className="group-video-grid__element-video"
-          css={{
-            objectFit: isMaximized || sharesScreen ? 'contain' : 'cover',
-            transform: participant === selfParticipant && sharesCamera ? 'rotateY(180deg)' : 'initial',
-          }}
-        />
+        <div className="tile-wrapper">
+          <Video
+            autoPlay
+            playsInline
+            srcObject={videoStream}
+            className="group-video-grid__element-video"
+            css={{
+              objectFit: isMaximized || sharesScreen ? 'contain' : 'cover',
+              transform: participant === selfParticipant && sharesCamera ? 'rotateY(180deg)' : 'initial',
+            }}
+          />
+        </div>
       ) : (
         <div
           css={{
@@ -98,6 +172,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
           <Avatar avatarSize={minimized ? AVATAR_SIZE.MEDIUM : AVATAR_SIZE.LARGE} participant={participant?.user} />
         </div>
       )}
+
       <div
         css={{
           borderRadius: '8px',
@@ -110,47 +185,34 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
           transition: 'box-shadow 0.3s ease-in-out',
         }}
       />
+
       {!minimized && isMuted && (
         <span className="group-video-grid__element__label__icon">
           <Icon.MicOff data-uie-name="mic-icon-off" />
         </span>
       )}
+
       {isMaximized && (
         <div className="group-video-grid__element__overlay">
           <span className="group-video-grid__element__overlay__label">{t('videoCallOverlayFitVideoLabelGoBack')}</span>
         </div>
       )}
+
       {!minimized && participantCount > 1 && (
         <div className="group-video-grid__element__overlay">
           <span className="group-video-grid__element__overlay__label">{t('videoCallOverlayFitVideoLabel')}</span>
         </div>
       )}
-      {!minimized && (
-        <div
-          className="group-video-grid__element__label"
-          css={{
-            backgroundColor: isActivelySpeaking ? 'var(--accent-color)' : 'var(--black)',
-          }}
-        >
-          <span
-            data-uie-name={
-              isActivelySpeaking ? 'status-active-speaking' : isMuted ? 'status-audio-off' : 'status-audio-on'
-            }
-            className="group-video-grid__element__label__name"
-            css={{
-              color: isActivelySpeaking ? 'var(--app-bg-secondary)' : 'var(--white)',
-            }}
-          >
-            {name}
-          </span>
-        </div>
-      )}
+
+      {nameContainer}
+
       {hasPausedVideo && (
         <div className="group-video-grid__pause-overlay">
           <div className="background">
             <div className="background-image"></div>
             <div className="background-darken"></div>
           </div>
+
           <div
             className="group-video-grid__pause-overlay__label"
             css={{fontsize: minimized ? '0.6875rem' : '0.875rem'}}
@@ -158,9 +220,10 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
           >
             {t('videoCallPaused')}
           </div>
+          {nameContainer}
         </div>
       )}
-    </div>
+    </button>
   );
 };
 

@@ -188,7 +188,7 @@ body.theme-dark {
   .search-list-item {
     margin-right: 20px;
 
-    &:nth-child(3n) {
+    &:nth-of-type(3n) {
       margin-right: 0;
     }
     &:nth-last-child(-n + 3) {
@@ -200,11 +200,10 @@ body.theme-dark {
 .start-ui-no-contacts,
 .start-ui-no-search-results {
   .text-light;
-  margin-top: 72px;
-  margin-bottom: 16px;
+  margin: 72px 20px 16px;
   line-height: @line-height-lg;
   text-align: center;
-  white-space: pre;
+  white-space: pre-wrap;
 
   &__content {
     display: flex;
@@ -324,22 +323,6 @@ body.theme-dark .start-ui-list-header {
     font-weight: 600;
     text-align: center;
   }
-
-  &__manage-button {
-    .button-reset-default;
-
-    padding: 4px 16px;
-    border-radius: 4px;
-    margin-top: 16px;
-    background-color: rgba(255, 255, 255, 0.24);
-    cursor: pointer;
-    font-size: @font-size-medium;
-    font-weight: 600;
-
-    &--alternate {
-      background-color: @separator-color;
-    }
-  }
 }
 
 .start-ui-fed-wrapper {
@@ -359,11 +342,11 @@ body.theme-dark .start-ui-list-header {
   }
 
   &__text {
-    margin-top: 24px;
+    margin: 24px 20px 0;
     font-size: @font-size-small;
     font-weight: @font-weight-bold;
     text-align: center;
-    white-space: pre;
+    white-space: pre-wrap;
   }
 
   &__button {

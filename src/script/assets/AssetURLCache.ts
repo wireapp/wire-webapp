@@ -17,24 +17,15 @@
  *
  */
 
-import {LRUCache} from '@wireapp/lru-cache';
+const cache = new Map<string, Promise<string>>();
 
-const cache: LRUCache<string> = new LRUCache(100);
+export const getAssetUrl = (identifier: string): Promise<string> | undefined => cache.get(identifier);
 
-export const getAssetUrl = (identifier: string): string | undefined => cache.get(identifier);
-
-export const setAssetUrl = (identifier: string, url: string) => {
+export const setAssetUrl = (identifier: string, url: Promise<string>) => {
   const isExistingUrl = getAssetUrl(identifier);
 
-  if (isExistingUrl) {
-    window.URL.revokeObjectURL(url);
-    return isExistingUrl;
-  }
-
-  const outdatedUrl = cache.set(identifier, url);
-
-  if (outdatedUrl != null) {
-    window.URL.revokeObjectURL(outdatedUrl);
+  if (!isExistingUrl) {
+    cache.set(identifier, url);
   }
 
   return url;

@@ -31,11 +31,11 @@ interface PromiseQueueOptions {
   timeout?: number;
 }
 
-export type PromiseFn<T> = (...args: any[]) => Promise<T>;
-export type PromiseResolveFn = (value?: unknown) => void;
-export type PromiseRejectFn = (reason?: any) => void;
+type PromiseFn<T> = (...args: any[]) => Promise<T>;
+type PromiseResolveFn = (value?: unknown) => void;
+type PromiseRejectFn = (reason?: any) => void;
 
-export interface QueueEntry<T> {
+interface QueueEntry<T> {
   fn: PromiseFn<T>;
   rejectFn: PromiseRejectFn;
   resolveFn?: PromiseResolveFn;
@@ -90,8 +90,7 @@ export class PromiseQueue {
 
       this.interval = window.setInterval(() => {
         if (!this.paused) {
-          const logObject = {pendingEntry: queueEntry, queueState: this.queue};
-          this.logger.warn(`Promise queue timed-out after ${this.timeout}ms, unblocking queue`, logObject);
+          this.logger.warn(`Promise queue timed-out after ${this.timeout}ms, unblocking queue`);
           this.resume();
         }
       }, this.timeout);
@@ -192,4 +191,15 @@ export class PromiseQueue {
       this.interval = undefined;
     }
   }
+}
+
+/**
+ * Will make sure a function is executed in order. If the function is already running, then the next payload will be queued.
+ * @param callback the function to queue
+ */
+export function queue<ReturnType, Params extends any[]>(
+  callback: (...params: Params) => Promise<ReturnType>,
+): (...params: Params) => Promise<ReturnType> {
+  const promiseQueue = new PromiseQueue({name: 'queue'});
+  return (...params: Params) => promiseQueue.push(() => callback(...params));
 }

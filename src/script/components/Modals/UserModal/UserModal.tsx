@@ -19,18 +19,25 @@
 
 import React, {useContext, useEffect, useState} from 'react';
 
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
+import {Link, LinkVariant} from '@wireapp/react-ui-kit';
+
+import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
 import {ModalComponent} from 'Components/ModalComponent';
 import {EnrichedFields} from 'Components/panel/EnrichedFields';
 import {UserActions} from 'Components/panel/UserActions';
 import {UserDetails} from 'Components/panel/UserDetails';
+import {getPrivacyUnverifiedUsersUrl} from 'src/script/externalRoute';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {handleKeyDown} from 'Util/KeyboardUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 
 import {useUserModalState} from './UserModal.state';
+import {userModalStyle, userModalWrapperStyle} from './UserModal.styles';
 
 import {Config} from '../../../Config';
 import {User} from '../../../entity/User';
@@ -38,11 +45,10 @@ import {RootContext} from '../../../page/RootProvider';
 import {Core} from '../../../service/CoreSingleton';
 import {TeamState} from '../../../team/TeamState';
 import {UserRepository} from '../../../user/UserRepository';
-import {UserState} from '../../../user/UserState';
 
 export interface UserModalProps {
   userRepository: UserRepository;
-  userState?: UserState;
+  selfUser: User;
   teamState?: TeamState;
   core?: Core;
 }
@@ -92,14 +98,38 @@ const UserModalUserActionsSection: React.FC<UserModalUserActionsSectionProps> = 
       onAction={onAction}
       isSelfActivated={isSelfActivated}
       selfUser={selfUser}
+      isModal
     />
+  );
+};
+
+interface UnverifiedUserWarningProps {
+  user?: User;
+}
+
+export const UnverifiedUserWarning: React.FC<UnverifiedUserWarningProps> = ({user}) => {
+  return (
+    <div css={{display: 'flex', color: 'var(--danger-color)', fill: 'var(--danger-color)', margin: '1em 0'}}>
+      <Icon.Info css={{height: '1rem', margin: '0.15em 1em', minWidth: '1rem'}} />
+      <p css={{fontSize: 'var(--font-size-medium)'}}>
+        {user ? t('userNotVerified', {user: user.name()}) : t('conversationConnectionVerificationWarning')}
+        <Link
+          css={{fontSize: 'var(--font-size-medium)', margin: '0 0.2em'}}
+          variant={LinkVariant.PRIMARY}
+          targetBlank
+          href={getPrivacyUnverifiedUsersUrl()}
+        >
+          {t('modalUserLearnMore')}
+        </Link>
+      </p>
+    </div>
   );
 };
 
 const UserModal: React.FC<UserModalProps> = ({
   userRepository,
+  selfUser,
   core = container.resolve(Core),
-  userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
 }) => {
   const onClose = useUserModalState(state => state.onClose);
@@ -117,16 +147,19 @@ const UserModal: React.FC<UserModalProps> = ({
     resetState();
   };
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
-  const {self, isActivatedAccount} = useKoSubscribableChildren(userState, ['self', 'isActivatedAccount']);
-  const {is_verified: isSelfVerified} = useKoSubscribableChildren(self, ['is_verified']);
+  const {is_trusted: isTrusted, isActivatedAccount} = useKoSubscribableChildren(selfUser, [
+    'is_trusted',
+    'isActivatedAccount',
+  ]);
   const isFederated = core.backendFeatures?.isFederated;
 
   useEffect(() => {
     if (userId) {
       userRepository
-        .getUserById(userId)
+        // We want to get the fresh version of the user from backend (in case the user was deleted)
+        .refreshUser(userId)
         .then(user => {
-          if (user.isDeleted) {
+          if (user.isDeleted || !user.isAvailable()) {
             setUserNotFound(true);
             return;
           }
@@ -148,7 +181,9 @@ const UserModal: React.FC<UserModalProps> = ({
       onBgClick={hide}
       onClosed={onModalClosed}
       className="user-modal"
+      css={userModalStyle}
       data-uie-name={user ? 'modal-user-profile' : userNotFound ? 'modal-cannot-open-profile' : ''}
+      wrapperCSS={userModalWrapperStyle}
     >
       <div className="modal__header">
         {userNotFound && (
@@ -157,21 +192,31 @@ const UserModal: React.FC<UserModalProps> = ({
           </h2>
         )}
 
-        <Icon.Close className="modal__header__button" onClick={hide} data-uie-name="do-close" />
+        <Icon.Close
+          className="modal__header__button"
+          onClick={hide}
+          onKeyDown={event => handleKeyDown(event, hide)}
+          data-uie-name="do-close"
+          tabIndex={TabIndex.FOCUSABLE}
+        />
       </div>
 
-      <div className={cx('modal__body user-modal__wrapper', {'user-modal__wrapper--max': !user && !userNotFound})}>
+      <FadingScrollbar
+        className={cx('modal__body user-modal__wrapper', {'user-modal__wrapper--max': !user && !userNotFound})}
+      >
         {user && (
           <>
-            <UserDetails participant={user} isSelfVerified={isSelfVerified} classifiedDomains={classifiedDomains} />
+            <UserDetails participant={user} classifiedDomains={classifiedDomains} />
 
             <EnrichedFields user={user} showDomain={isFederated} />
+
+            {!isTrusted && <UnverifiedUserWarning user={user} />}
 
             <UserModalUserActionsSection
               user={user}
               onAction={hide}
               isSelfActivated={isActivatedAccount}
-              selfUser={self}
+              selfUser={selfUser}
             />
           </>
         )}
@@ -194,7 +239,7 @@ const UserModal: React.FC<UserModalProps> = ({
             </div>
           </>
         )}
-      </div>
+      </FadingScrollbar>
     </ModalComponent>
   );
 };

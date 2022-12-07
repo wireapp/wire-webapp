@@ -17,15 +17,22 @@
  *
  */
 
-import {amplify} from 'amplify';
+import {
+  ConversationProtocol,
+  CONVERSATION_TYPE,
+  DefaultConversationRoleName,
+} from '@wireapp/api-client/lib/conversation';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import 'jsdom-worker';
 import ko, {Subscription} from 'knockout';
+import {container} from 'tsyringe';
 
 import {CONV_TYPE, CALL_TYPE, STATE as CALL_STATE, REASON, Wcall} from '@wireapp/avs';
+import {Runtime} from '@wireapp/commons';
 
 import {Call} from 'src/script/calling/Call';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
-import {CallState} from 'src/script/calling/CallState';
+import {CallState, MuteState} from 'src/script/calling/CallState';
 import {Participant} from 'src/script/calling/Participant';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
@@ -33,14 +40,15 @@ import {EventRepository} from 'src/script/event/EventRepository';
 import {MediaType} from 'src/script/media/MediaType';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 import {TestFactory} from 'test/helper/TestFactory';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 
-import {usePrimaryModalState} from '../components/Modals/PrimaryModal';
+import {CallingEvent} from '../event/CallingEvent';
 import {CALL} from '../event/Client';
 import {MediaDevicesHandler} from '../media/MediaDevicesHandler';
+import {Core} from '../service/CoreSingleton';
 import {UserRepository} from '../user/UserRepository';
 
 const createSelfParticipant = () => {
@@ -49,8 +57,19 @@ const createSelfParticipant = () => {
   return new Participant(selfUser, 'client1');
 };
 
-const createConversationId = () => {
-  return {domain: '', id: createRandomUuid()};
+const createConversation = (
+  type: CONVERSATION_TYPE = CONVERSATION_TYPE.ONE_TO_ONE,
+  protocol: ConversationProtocol = ConversationProtocol.PROTEUS,
+  conversationId: QualifiedId = {id: createUuid(), domain: ''},
+  groupId = 'group-id',
+) => {
+  const conversation = new Conversation(conversationId.id, conversationId.domain, protocol);
+  conversation.participating_user_ets.push(new User(createUuid()));
+  conversation.type(type);
+  if (protocol === ConversationProtocol.MLS) {
+    conversation.groupId = groupId;
+  }
+  return conversation;
 };
 
 describe('CallingRepository', () => {
@@ -58,14 +77,15 @@ describe('CallingRepository', () => {
   let callingRepository: CallingRepository;
   let wCall: Wcall;
   let wUser: number;
-  const selfUser = new User(createRandomUuid());
-  const clientId = createRandomUuid();
+  const selfUser = new User(createUuid());
+  selfUser.isMe = true;
+  const clientId = createUuid();
 
   const mediaDevices = {
-    audioInput: ko.pureComputed(() => 'test'),
-    audioOutput: ko.pureComputed(() => 'test'),
-    screenInput: ko.pureComputed(() => 'test'),
-    videoInput: ko.pureComputed(() => 'test'),
+    audioinput: ko.pureComputed(() => 'test'),
+    audiooutput: ko.pureComputed(() => 'test'),
+    screeninput: ko.pureComputed(() => 'test'),
+    videoinput: ko.pureComputed(() => 'test'),
   };
 
   beforeAll(() => {
@@ -80,45 +100,287 @@ describe('CallingRepository', () => {
 
   afterEach(() => {
     callingRepository['callState'].calls([]);
+    callingRepository['conversationState'].conversations([]);
+    callingRepository.destroy();
+    jest.clearAllMocks();
   });
 
   afterAll(() => {
     return wCall && wCall.destroy(wUser);
   });
 
-  describe('startCall', () => {
-    it('warns the user that there is an ongoing call before starting a new one', done => {
-      const activeCall = new Call(
-        selfUser.qualifiedId,
-        createConversationId(),
-        CONV_TYPE.ONEONONE,
-        new Participant(new User(), ''),
-        0,
-        {currentAvailableDeviceId: mediaDevices} as MediaDevicesHandler,
+  describe('onCallEvent', () => {
+    it('does mute itself when remote muted message arrives', async () => {
+      const conversation = createConversation();
+      const selfParticipant = createSelfParticipant();
+      const senderUserId = {domain: 'senderdomain', id: 'senderid'};
+      const selfUserId = callingRepository['selfUser']?.qualifiedId!;
+      const selfClientId = callingRepository['selfClientId']!;
+      const call = new Call(
+        selfUserId,
+        conversation.qualifiedId,
+        CONV_TYPE.CONFERENCE,
+        selfParticipant,
+        CALL_TYPE.NORMAL,
+        {
+          currentAvailableDeviceId: mediaDevices,
+        } as unknown as MediaDevicesHandler,
       );
-      activeCall.state(CALL_STATE.MEDIA_ESTAB);
-      spyOn(callingRepository['callState'], 'calls').and.returnValue([activeCall]);
-      spyOn(amplify, 'publish').and.returnValue(undefined);
-      const conversationId = createConversationId();
-      const conversationType = CONV_TYPE.ONEONONE;
-      const callType = CALL_TYPE.NORMAL;
-      spyOn(wCall, 'start');
-      callingRepository.startCall(conversationId, conversationType, callType).catch(done);
-      setTimeout(() => {
-        expect(usePrimaryModalState.getState().currentModalId).not.toBeNull();
-        expect(wCall.start).not.toHaveBeenCalled();
-        done();
-      }, 10);
+
+      conversation.roles({[senderUserId.id]: DefaultConversationRoleName.WIRE_ADMIN});
+
+      callingRepository['conversationState'].conversations.push(conversation);
+      spyOn(callingRepository, 'findCall').and.returnValue(call);
+      spyOn(callingRepository, 'muteCall').and.callThrough();
+      spyOn(wCall, 'recvMsg').and.callThrough();
+
+      const event: CallingEvent = {
+        content: {
+          type: CALL_MESSAGE_TYPE.REMOTE_MUTE,
+          version: '',
+          data: {targets: {[selfUserId.domain]: {[selfUserId.id]: [selfClientId]}}},
+        },
+        conversation: conversation.id,
+        from: senderUserId.id,
+        qualified_from: senderUserId,
+        sender: 'test',
+        time: new Date().toISOString(),
+        type: CALL.E_CALL,
+        qualified_conversation: conversation.qualifiedId,
+      };
+
+      await callingRepository.onCallEvent(event, EventRepository.SOURCE.WEB_SOCKET);
+      expect(callingRepository.muteCall).toHaveBeenCalledWith(call, true, MuteState.REMOTE_MUTED);
+      expect(wCall.recvMsg).toHaveBeenCalled();
     });
 
-    it('starts a normal call in a 1:1 conversation', () => {
-      const conversationId = createConversationId();
-      const conversationType = CONV_TYPE.ONEONONE;
+    it('should not mute itself when remote muted message arrives but the event sender is not an admin', async () => {
+      const conversation = createConversation();
+      const selfParticipant = createSelfParticipant();
+      const senderUserId = {domain: 'senderdomain', id: 'senderid'};
+      const selfUserId = callingRepository['selfUser']?.qualifiedId!;
+      const selfClientId = callingRepository['selfClientId']!;
+      const call = new Call(
+        selfUserId,
+        conversation.qualifiedId,
+        CONV_TYPE.CONFERENCE,
+        selfParticipant,
+        CALL_TYPE.NORMAL,
+        {
+          currentAvailableDeviceId: mediaDevices,
+        } as unknown as MediaDevicesHandler,
+      );
+
+      conversation.roles({[senderUserId.id]: DefaultConversationRoleName.WIRE_MEMBER});
+
+      callingRepository['conversationState'].conversations.push(conversation);
+      spyOn(callingRepository, 'findCall').and.returnValue(call);
+      spyOn(callingRepository, 'muteCall').and.callThrough();
+      spyOn(wCall, 'recvMsg').and.callThrough();
+
+      const event: CallingEvent = {
+        content: {
+          type: CALL_MESSAGE_TYPE.REMOTE_MUTE,
+          version: '',
+          data: {targets: {[selfUserId.domain]: {[selfUserId.id]: [selfClientId]}}},
+        },
+        conversation: conversation.id,
+        from: senderUserId.id,
+        qualified_from: senderUserId,
+        sender: 'test',
+        time: new Date().toISOString(),
+        type: CALL.E_CALL,
+        qualified_conversation: conversation.qualifiedId,
+      };
+
+      await callingRepository.onCallEvent(event, EventRepository.SOURCE.WEB_SOCKET);
+      expect(callingRepository.muteCall).not.toHaveBeenCalled();
+      expect(wCall.recvMsg).not.toHaveBeenCalled();
+    });
+
+    it('should not mute itself when remote muted message arrives but client was not included in targets list', async () => {
+      const conversation = createConversation();
+      const selfParticipant = createSelfParticipant();
+      const senderUserId = {domain: 'senderdomain', id: 'senderid'};
+      const selfUserId = callingRepository['selfUser']?.qualifiedId!;
+
+      const call = new Call(
+        selfUserId,
+        conversation.qualifiedId,
+        CONV_TYPE.CONFERENCE,
+        selfParticipant,
+        CALL_TYPE.NORMAL,
+        {
+          currentAvailableDeviceId: mediaDevices,
+        } as unknown as MediaDevicesHandler,
+      );
+
+      conversation.roles({[senderUserId.id]: DefaultConversationRoleName.WIRE_ADMIN});
+
+      callingRepository['conversationState'].conversations.push(conversation);
+      spyOn(callingRepository, 'findCall').and.returnValue(call);
+      spyOn(callingRepository, 'muteCall').and.callThrough();
+      spyOn(wCall, 'recvMsg').and.callThrough();
+
+      const someOtherClientId = 'some-other-client';
+
+      const event: CallingEvent = {
+        content: {
+          type: CALL_MESSAGE_TYPE.REMOTE_MUTE,
+          version: '',
+          data: {targets: {[selfUserId.domain]: {[selfUserId.id]: [someOtherClientId]}}},
+        },
+        conversation: conversation.id,
+        from: senderUserId.id,
+        qualified_from: senderUserId,
+        sender: 'test',
+        time: new Date().toISOString(),
+        type: CALL.E_CALL,
+        qualified_conversation: conversation.qualifiedId,
+      };
+
+      await callingRepository.onCallEvent(event, EventRepository.SOURCE.WEB_SOCKET);
+      expect(callingRepository.muteCall).not.toHaveBeenCalled();
+      expect(wCall.recvMsg).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('startCall', () => {
+    it.each([ConversationProtocol.PROTEUS, ConversationProtocol.MLS])(
+      'starts a ONEONONE call for proteus or MLS 1:1 conversation',
+      async protocol => {
+        const conversation = createConversation(CONVERSATION_TYPE.ONE_TO_ONE, protocol);
+        const callType = CALL_TYPE.NORMAL;
+        spyOn(wCall, 'start');
+        await callingRepository.startCall(conversation, callType);
+        expect(wCall.start).toHaveBeenCalledWith(wUser, conversation.id, callType, CONV_TYPE.ONEONONE, 0);
+      },
+    );
+
+    it('starts a conference call in a group conversation for proteus', async () => {
+      jest.spyOn(Runtime, 'isSupportingConferenceCalling').mockReturnValue(true);
+      const conversation = createConversation(CONVERSATION_TYPE.REGULAR, ConversationProtocol.PROTEUS);
       const callType = CALL_TYPE.NORMAL;
       spyOn(wCall, 'start');
-      return callingRepository.startCall(conversationId, conversationType, callType).then(() => {
-        expect(wCall.start).toHaveBeenCalledWith(wUser, conversationId.id, conversationType, callType, 0);
-      });
+      await callingRepository.startCall(conversation, callType);
+      expect(wCall.start).toHaveBeenCalledWith(wUser, conversation.id, callType, CONV_TYPE.CONFERENCE, 0);
+    });
+
+    it('starts a MLS conference call in a group conversation for MLS', async () => {
+      jest.spyOn(Runtime, 'isSupportingConferenceCalling').mockReturnValue(true);
+      const conversation = createConversation(CONVERSATION_TYPE.REGULAR, ConversationProtocol.MLS);
+      const callType = CALL_TYPE.NORMAL;
+      spyOn(wCall, 'start');
+      await callingRepository.startCall(conversation, callType);
+      expect(wCall.start).toHaveBeenCalledWith(wUser, conversation.id, callType, CONV_TYPE.CONFERENCE_MLS, 0);
+    });
+
+    it('subscribes to epoch updates after initiating a mls conference call', async () => {
+      const conversationId = {domain: 'example.com', id: 'conversation1'};
+
+      const groupId = 'groupId';
+      const mlsConversation = createConversation(
+        CONVERSATION_TYPE.REGULAR,
+        ConversationProtocol.MLS,
+        conversationId,
+        groupId,
+      );
+
+      await callingRepository.startCall(mlsConversation, CALL_TYPE.NORMAL);
+
+      expect(container.resolve(Core).service?.subconversation.subscribeToEpochUpdates).toHaveBeenCalledWith(
+        conversationId,
+        groupId,
+        expect.any(Function),
+        expect.any(Function),
+      );
+    });
+
+    it('does not subscribe to epoch updates after initiating a call in 1:1 mls conversation', async () => {
+      const conversationId = {domain: 'example.com', id: 'conversation1'};
+
+      const groupId = 'groupId';
+      const mlsConversation = createConversation(
+        CONVERSATION_TYPE.ONE_TO_ONE,
+        ConversationProtocol.MLS,
+        conversationId,
+        groupId,
+      );
+
+      await callingRepository.startCall(mlsConversation, CALL_TYPE.NORMAL);
+
+      expect(container.resolve(Core).service?.subconversation.subscribeToEpochUpdates).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('answerCall', () => {
+    it('subscribes to epoch updates after answering a mls conference call', async () => {
+      const conversationId = {domain: 'example.com', id: 'conversation2'};
+      const selfParticipant = createSelfParticipant();
+      const userId = {domain: '', id: ''};
+
+      const groupId = 'groupId';
+      const mlsConversation = createConversation(
+        CONVERSATION_TYPE.REGULAR,
+        ConversationProtocol.MLS,
+        conversationId,
+        groupId,
+      );
+
+      const incomingCall = new Call(
+        userId,
+        mlsConversation.qualifiedId,
+        CONV_TYPE.CONFERENCE_MLS,
+        selfParticipant,
+        CALL_TYPE.NORMAL,
+        {
+          currentAvailableDeviceId: mediaDevices,
+        } as unknown as MediaDevicesHandler,
+      );
+
+      jest.spyOn(callingRepository, 'pushClients').mockResolvedValueOnce(true);
+      callingRepository['conversationState'].conversations.push(mlsConversation);
+
+      await callingRepository.answerCall(incomingCall);
+
+      expect(container.resolve(Core).service?.subconversation.subscribeToEpochUpdates).toHaveBeenCalledWith(
+        conversationId,
+        groupId,
+        expect.any(Function),
+        expect.any(Function),
+      );
+    });
+
+    it('does not subscribe to epoch updates after answering a call in mls 1:1 conversation', async () => {
+      const conversationId = {domain: 'example.com', id: 'conversation2'};
+      const selfParticipant = createSelfParticipant();
+      const userId = {domain: '', id: ''};
+
+      const groupId = 'groupId';
+      const mlsConversation = createConversation(
+        CONVERSATION_TYPE.ONE_TO_ONE,
+        ConversationProtocol.MLS,
+        conversationId,
+        groupId,
+      );
+
+      const incomingCall = new Call(
+        userId,
+        mlsConversation.qualifiedId,
+        CONV_TYPE.ONEONONE,
+        selfParticipant,
+        CALL_TYPE.NORMAL,
+        {
+          currentAvailableDeviceId: mediaDevices,
+        } as unknown as MediaDevicesHandler,
+      );
+
+      jest.spyOn(callingRepository, 'pushClients').mockResolvedValueOnce(true);
+      callingRepository['conversationState'].conversations.push(mlsConversation);
+
+      await callingRepository.answerCall(incomingCall);
+
+      expect(container.resolve(Core).service?.subconversation.subscribeToEpochUpdates).not.toHaveBeenCalled();
     });
   });
 
@@ -128,37 +390,37 @@ describe('CallingRepository', () => {
       const userId = {domain: '', id: ''};
       const incomingCall = new Call(
         userId,
-        createConversationId(),
+        createConversation().qualifiedId,
         CONV_TYPE.CONFERENCE,
         selfParticipant,
         CALL_TYPE.NORMAL,
         {
           currentAvailableDeviceId: mediaDevices,
-        } as MediaDevicesHandler,
+        } as unknown as MediaDevicesHandler,
       );
       incomingCall.state(CALL_STATE.INCOMING);
 
       const activeCall = new Call(
         userId,
-        createConversationId(),
+        createConversation().qualifiedId,
         CONV_TYPE.CONFERENCE,
         selfParticipant,
         CALL_TYPE.NORMAL,
         {
           currentAvailableDeviceId: mediaDevices,
-        } as MediaDevicesHandler,
+        } as unknown as MediaDevicesHandler,
       );
       activeCall.state(CALL_STATE.MEDIA_ESTAB);
 
       const declinedCall = new Call(
         userId,
-        createConversationId(),
+        createConversation().qualifiedId,
         CONV_TYPE.CONFERENCE,
         selfParticipant,
         CALL_TYPE.NORMAL,
         {
           currentAvailableDeviceId: mediaDevices,
-        } as MediaDevicesHandler,
+        } as unknown as MediaDevicesHandler,
       );
       declinedCall.state(CALL_STATE.INCOMING);
       declinedCall.reason(REASON.STILL_ONGOING);
@@ -173,9 +435,16 @@ describe('CallingRepository', () => {
     it('returns cached mediastream for self user if set', () => {
       const selfParticipant = createSelfParticipant();
       const userId = {domain: '', id: ''};
-      const call = new Call(userId, createConversationId(), CONV_TYPE.CONFERENCE, selfParticipant, CALL_TYPE.NORMAL, {
-        currentAvailableDeviceId: mediaDevices,
-      } as MediaDevicesHandler);
+      const call = new Call(
+        userId,
+        createConversation().qualifiedId,
+        CONV_TYPE.CONFERENCE,
+        selfParticipant,
+        CALL_TYPE.NORMAL,
+        {
+          currentAvailableDeviceId: mediaDevices,
+        } as unknown as MediaDevicesHandler,
+      );
       const source = new window.RTCAudioSource();
       const audioTrack = source.createTrack();
       const selfMediaStream = new MediaStream([audioTrack]);
@@ -190,6 +459,7 @@ describe('CallingRepository', () => {
       });
       return Promise.all(queries).then(() => {
         expect(selfParticipant.getMediaStream).toHaveBeenCalledTimes(queries.length);
+        audioTrack.stop();
       });
     });
 
@@ -197,13 +467,13 @@ describe('CallingRepository', () => {
       const selfParticipant = createSelfParticipant();
       const call = new Call(
         {domain: '', id: ''},
-        createConversationId(),
+        createConversation().qualifiedId,
         CONV_TYPE.CONFERENCE,
         selfParticipant,
         CALL_TYPE.NORMAL,
         {
           currentAvailableDeviceId: mediaDevices,
-        } as MediaDevicesHandler,
+        } as unknown as MediaDevicesHandler,
       );
       const source = new window.RTCAudioSource();
       const audioTrack = source.createTrack();
@@ -220,6 +490,7 @@ describe('CallingRepository', () => {
       });
       return Promise.all(queries).then(() => {
         expect(callingRepository['mediaStreamHandler'].requestMediaStream).toHaveBeenCalledTimes(1);
+        audioTrack.stop();
       });
     });
   });
@@ -230,9 +501,16 @@ describe('CallingRepository', () => {
       spyOn(selfParticipant, 'releaseAudioStream');
       spyOn(selfParticipant, 'releaseVideoStream');
 
-      const call = new Call({domain: '', id: ''}, createConversationId(), 0, selfParticipant, CALL_TYPE.NORMAL, {
-        currentAvailableDeviceId: mediaDevices,
-      } as MediaDevicesHandler);
+      const call = new Call(
+        {domain: '', id: ''},
+        createConversation().qualifiedId,
+        0,
+        selfParticipant,
+        CALL_TYPE.NORMAL,
+        {
+          currentAvailableDeviceId: mediaDevices,
+        } as unknown as MediaDevicesHandler,
+      );
       spyOn(callingRepository['callState'], 'joinedCall').and.returnValue(call);
       callingRepository.stopMediaSource(MediaType.AUDIO);
 
@@ -249,10 +527,10 @@ describe('CallingRepository', () => {
 
 describe('CallingRepository ISO', () => {
   const mediaDevices = {
-    audioInput: ko.pureComputed(() => 'test'),
-    audioOutput: ko.pureComputed(() => 'test'),
-    screenInput: ko.pureComputed(() => 'test'),
-    videoInput: ko.pureComputed(() => 'test'),
+    audioinput: ko.pureComputed(() => 'test'),
+    audiooutput: ko.pureComputed(() => 'test'),
+    screeninput: ko.pureComputed(() => 'test'),
+    videoinput: ko.pureComputed(() => 'test'),
   };
   describe('incoming call', () => {
     let avsUser: number;
@@ -263,10 +541,10 @@ describe('CallingRepository ISO', () => {
     });
 
     it('creates and stores a new call when an incoming call arrives', async () => {
-      const selfUser = new User(createRandomUuid());
+      const selfUser = new User(createUuid());
       selfUser.isMe = true;
 
-      const conversation = new Conversation(createRandomUuid());
+      const conversation = new Conversation(createUuid());
 
       const callingRepo = new CallingRepository(
         {
@@ -279,7 +557,7 @@ describe('CallingRepository ISO', () => {
         {} as any, // MediaStreamHandler
         {
           currentAvailableDeviceId: mediaDevices,
-        } as MediaDevicesHandler, // mediaDevicesHandler
+        } as unknown as MediaDevicesHandler, // mediaDevicesHandler
         {
           toServerTimestamp: jest.fn().mockImplementation(() => Date.now()),
         } as any, // ServerTimeHandler
@@ -291,7 +569,7 @@ describe('CallingRepository ISO', () => {
         new CallState(),
       );
 
-      const avs = await callingRepo.initAvs(selfUser, createRandomUuid());
+      const avs = await callingRepo.initAvs(selfUser, createUuid());
       // provide global handle for cleanup
       avsUser = avs.wUser;
       avsCall = avs.wCall;
@@ -427,7 +705,17 @@ describe.skip('E2E audio call', () => {
     spyOn<any>(client, 'checkConcurrentJoinedCall').and.returnValue(Promise.resolve(true));
     spyOn<any>(client, 'sendMessage').and.callFake(
       (context, convId, userId, clientid, destUserId, destDeviceId, payload) => {
-        wCall.recvMsg(remoteWuser, payload, payload.length, Date.now(), Date.now(), convId, userId, clientid);
+        wCall.recvMsg(
+          remoteWuser,
+          payload,
+          payload.length,
+          Date.now(),
+          Date.now(),
+          convId,
+          userId,
+          clientid,
+          CONV_TYPE.CONFERENCE,
+        );
       },
     );
     return client.initAvs(user, 'device').then(({wCall: wCallInstance, wUser}) => {
@@ -474,12 +762,12 @@ describe.skip('E2E audio call', () => {
 
   it('calls and connect with the remote user', done => {
     onCallClosed = done;
-    const conversationId = createConversationId();
+    const conversation = createConversation();
     onCallConnected = () => {
       expect(client['sendMessage']).toHaveBeenCalledTimes(1);
       expect(client.onCallEvent).toHaveBeenCalledTimes(1);
       client
-        .getStats(conversationId)
+        .getStats(conversation.qualifiedId)
         ?.then(extractAudioStats)
         .then(audioStats => {
           expect(audioStats.length).toBeGreaterThan(0);
@@ -488,16 +776,16 @@ describe.skip('E2E audio call', () => {
           });
 
           expect(client['callState'].joinedCall()).toBeDefined();
-          client.leaveCall(conversationId, LEAVE_CALL_REASON.MANUAL_LEAVE_BY_UI_CLICK);
+          client.leaveCall(conversation.qualifiedId, LEAVE_CALL_REASON.MANUAL_LEAVE_BY_UI_CLICK);
         })
         .catch(done.fail);
     };
-    client.startCall(conversationId, CONV_TYPE.ONEONONE, CALL_TYPE.NORMAL).catch(done.fail);
+    client.startCall(conversation, CALL_TYPE.NORMAL).catch(done.fail);
   });
 
   it('answers an incoming call and connect with the remote peer', done => {
     onCallClosed = done;
-    const conversationId = createConversationId();
+    const conversationId = createConversation().qualifiedId;
     onCallConnected = () => {
       expect(client.onCallEvent).toHaveBeenCalled();
       expect(client['incomingCallCallback']).toHaveBeenCalled();
@@ -533,8 +821,8 @@ function extractAudioStats(stats: any) {
 }
 
 function createAutoAnsweringWuser(wCall: Wcall, remoteCallingRepository: CallingRepository) {
-  const selfUserId = createRandomUuid();
-  const selfClientId = createRandomUuid();
+  const selfUserId = createUuid();
+  const selfClientId = createUuid();
   const sendMsg = (
     _context: number,
     conversationId: string,

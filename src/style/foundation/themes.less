@@ -44,6 +44,7 @@ body.theme-default {
   // ----------------------------------------------------------------------------
   @group-video-bg: var(--gray-10);
   @group-video-tile-bg: var(--gray-90);
+  @participant-audio-connecting-color: @red-dark-500;
   @inactive-call-button-bg: var(--white);
   @inactive-call-button-border: var(--gray-40);
   @inactive-call-button-hover-bg: var(--gray-20);
@@ -103,6 +104,12 @@ body.theme-default {
   // ----------------------------------------------------------------------------
   @group-creation-modal-teamname-input-bg: #fff;
 
+  // message actions menu
+  @message-actions-background: #fff;
+  @message-actions-border: @gray-40;
+  @message-actions-background-hover: @gray-20;
+  @message-actions-border-hover: @gray-50;
+
   .applyTheme();
 
   // Force the conversation list calling cell and the
@@ -138,6 +145,7 @@ body.theme-dark {
   // ----------------------------------------------------------------------------
   @group-video-bg: var(--gray-100);
   @group-video-tile-bg: var(--gray-95);
+  @participant-audio-connecting-color: @red-dark-500;
   @inactive-call-button-bg: var(--gray-90);
   @inactive-call-button-border: var(--gray-100);
   @inactive-call-button-hover-bg: var(--gray-80);
@@ -186,6 +194,12 @@ body.theme-dark {
   @checkbox-border-hover: @blue-dark-500;
   @checkbox-border-disabled: @gray-70;
   @checkbox-alert: @red-dark-500;
+
+  // message actions menu
+  @message-actions-background: @gray-90;
+  @message-actions-border: @gray-100;
+  @message-actions-background-hover: @gray-80;
+  @message-actions-border-hover: @gray-70;
 
   // ----------------------------------------------------------------------------
   // Message Quote Vertical Bar

@@ -19,18 +19,15 @@
 
 import {Router} from 'express';
 
-import type {ServerConfig} from '../../ServerConfig';
+import {ClientConfig, ServerConfig} from '../../config';
+import {replaceHostname} from '../../util/hostnameReplacer';
 
-export const ConfigRoute = (config: ServerConfig) =>
-  Router().get('/config.js', (_, res) => {
-    const clientConfig = {
-      ...config.CLIENT,
-      APP_BASE: config.SERVER.APP_BASE,
-    };
-
-    const payload = `
-window.wire = window.wire || {};
-window.wire.env = ${JSON.stringify(clientConfig)};`;
-
+export const ConfigRoute = (serverConfig: ServerConfig, clientConfig: ClientConfig) =>
+  Router().get('/config.js', (request, res) => {
+    const serializedConfig = `window.wire = window.wire || {}; window.wire.env = ${JSON.stringify(clientConfig)};`;
+    const payload = serverConfig.ENABLE_DYNAMIC_HOSTNAME
+      ? // In case we want URLs that depends on the the hostname, we need to replace the placeholder with the actual hostname.
+        replaceHostname(serializedConfig, request)
+      : serializedConfig;
     res.type('application/javascript').send(payload);
   });

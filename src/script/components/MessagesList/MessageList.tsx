@@ -19,8 +19,10 @@
 
 import React, {FC, useEffect, useLayoutEffect, useRef, useState} from 'react';
 
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 
+import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
@@ -31,15 +33,15 @@ import {User} from 'src/script/entity/User';
 import {useRoveFocus} from 'src/script/hooks/useRoveFocus';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {onHitTopOrBottom} from 'Util/DOM/onHitTopOrBottom';
+import {useResizeObserver} from 'Util/DOM/resizeObserver';
+import {filterMessages} from 'Util/messagesFilterUtil';
 
 import {Message, MessageActions} from './Message';
 
 import {Conversation as ConversationEntity, Conversation} from '../../entity/Conversation';
-import {isMemberMessage, isContentMessage} from '../../guards/Message';
+import {isContentMessage} from '../../guards/Message';
 import {StatusType} from '../../message/StatusType';
-import {initFadingScrollbar} from '../../ui/fadingScrollbar';
-import {onHitTopOrBottom} from '../../ui/onHitTopOrBottom';
-import {useResizeObserver} from '../../ui/resizeObserver';
 
 type FocusedElement = {center?: boolean; element: Element};
 
@@ -60,42 +62,14 @@ interface MessagesListParams {
   resetSession: (messageError: DecryptErrorMessage) => void;
   selfUser: User;
   showImageDetails: (message: ContentMessage, event: React.UIEvent) => void;
-  showMessageDetails: (message: MessageEntity, showLikes?: boolean) => void;
+  showMessageDetails: (message: MessageEntity, showReactions?: boolean) => void;
+  showMessageReactions: (message: MessageEntity, showReactions?: boolean) => void;
   showParticipants: (users: User[]) => void;
   showUserDetails: (user: User | ServiceEntity) => void;
   isLastReceivedMessage: (messageEntity: MessageEntity, conversationEntity: ConversationEntity) => boolean;
   isMsgElementsFocusable: boolean;
   setMsgElementsFocusable: (isMsgElementsFocusable: boolean) => void;
 }
-
-const filterDuplicatedMemberMessages = (messages: MessageEntity[]) => {
-  const typesToFilter = ['conversation.member-join', 'conversation.group-creation', 'conversation.member-leave'];
-  return messages.reduce<MessageEntity[]>((uniqMessages, currentMessage) => {
-    if (isMemberMessage(currentMessage)) {
-      const uniqMemberMessages = uniqMessages.filter(isMemberMessage);
-
-      if (!!uniqMemberMessages.length && typesToFilter.includes(currentMessage.type)) {
-        switch (currentMessage.type) {
-          case 'conversation.group-creation':
-            // Dont show duplicated group creation messages
-            if (uniqMemberMessages.some(m => m.type === currentMessage.type)) {
-              return uniqMessages;
-            }
-          case 'conversation.member-join':
-          case 'conversation.member-leave':
-            // Dont show duplicated member join/leave messages that follow each other
-            if (uniqMemberMessages?.[uniqMemberMessages.length - 1]?.htmlCaption() === currentMessage.htmlCaption()) {
-              return uniqMessages;
-            }
-        }
-      }
-    }
-
-    return [...uniqMessages, currentMessage];
-  }, []);
-};
-
-const filterHiddenMessages = (messages: MessageEntity[]) => messages.filter(message => message.visible());
 
 const MessagesList: FC<MessagesListParams> = ({
   conversation,
@@ -107,6 +81,7 @@ const MessagesList: FC<MessagesListParams> = ({
   onClickMessage,
   showUserDetails,
   showMessageDetails,
+  showMessageReactions,
   showImageDetails,
   showParticipants,
   cancelConnectionRequest,
@@ -142,7 +117,7 @@ const MessagesList: FC<MessagesListParams> = ({
   const [loaded, setLoaded] = useState(false);
   const [focusedMessage, setFocusedMessage] = useState<string | undefined>(initialMessage?.id);
 
-  const filteredMessages = filterDuplicatedMemberMessages(filterHiddenMessages(allMessages));
+  const filteredMessages = filterMessages(allMessages);
   const filteredMessagesLength = filteredMessages.length;
 
   const [messagesContainer, setMessageContainer] = useState<HTMLDivElement | null>(null);
@@ -219,7 +194,7 @@ const MessagesList: FC<MessagesListParams> = ({
   };
 
   const loadFollowingMessages = () => {
-    const lastMessage = conversation.getLastMessage();
+    const lastMessage = conversation.getNewestMessage();
 
     if (lastMessage) {
       if (!isLastReceivedMessage(lastMessage, conversation)) {
@@ -257,20 +232,18 @@ const MessagesList: FC<MessagesListParams> = ({
   }, [loaded]);
 
   const defaultFocus = -1;
-  const {currentFocus, handleKeyDown, setCurrentFocus} = useRoveFocus(filteredMessagesLength, defaultFocus);
+  const isMsgListInfinite = false;
+  const {currentFocus, handleKeyDown, setCurrentFocus} = useRoveFocus(
+    filteredMessagesLength,
+    defaultFocus,
+    isMsgListInfinite,
+  );
 
   if (!loaded) {
     return null;
   }
   return (
-    <div
-      ref={element => {
-        initFadingScrollbar(element);
-        messageListRef.current = element;
-      }}
-      id="message-list"
-      className="message-list"
-    >
+    <FadingScrollbar ref={messageListRef} id="message-list" className="message-list" tabIndex={TabIndex.UNFOCUSABLE}>
       <div ref={setMessageContainer} className={cx('messages', {'flex-center': verticallyCenterMessage()})}>
         {filteredMessages.map((message, index) => {
           const previousMessage = filteredMessages[index - 1];
@@ -308,10 +281,10 @@ const MessagesList: FC<MessagesListParams> = ({
               onClickCancelRequest={cancelConnectionRequest}
               onClickImage={showImageDetails}
               onClickInvitePeople={() => invitePeople(conversation)}
-              onClickLikes={message => showMessageDetails(message, true)}
+              onClickReactionDetails={message => showMessageReactions(message, true)}
               onClickMessage={onClickMessage}
               onClickParticipants={showParticipants}
-              onClickReceipts={message => showMessageDetails(message)}
+              onClickDetails={message => showMessageDetails(message)}
               onClickResetSession={resetSession}
               onClickTimestamp={async function (messageId: string) {
                 setFocusedMessage(messageId);
@@ -324,12 +297,11 @@ const MessagesList: FC<MessagesListParams> = ({
                   conversationRepository.getMessagesWithOffset(conversation, messageEntity);
                 }
               }}
-              onLike={message => messageRepository.toggleLike(conversation, message)}
               selfId={selfUser.qualifiedId}
               shouldShowInvitePeople={shouldShowInvitePeople}
               totalMessage={filteredMessagesLength}
               index={index}
-              focusConversation={currentFocus === index}
+              isMessageFocused={currentFocus === index}
               handleFocus={setCurrentFocus}
               handleArrowKeyDown={handleKeyDown}
               isMsgElementsFocusable={isMsgElementsFocusable}
@@ -338,7 +310,7 @@ const MessagesList: FC<MessagesListParams> = ({
           );
         })}
       </div>
-    </div>
+    </FadingScrollbar>
   );
 };
 

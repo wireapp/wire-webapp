@@ -19,24 +19,22 @@
 
 import type {RegisteredClient} from '@wireapp/api-client/lib/client/';
 
-import {AUTH_ACTION, AppActions, CLIENT_ACTION, NOTIFICATION_ACTION} from '../action/creator/';
+import {AUTH_ACTION, AppActions, CLIENT_ACTION} from '../action/creator/';
 
 export interface ClientState {
-  clients: RegisteredClient[];
-  currentClient: RegisteredClient;
-  error: Error;
+  clients: RegisteredClient[] | null;
+  currentClient: RegisteredClient | null;
+  error: Error | null;
   fetching: boolean;
-  hasHistory: boolean;
   isNewClient: boolean;
 }
 
 export const initialClientState: ClientState = {
-  clients: [],
+  clients: null,
   currentClient: null,
   error: null,
   fetching: false,
-  hasHistory: null,
-  isNewClient: null,
+  isNewClient: false,
 };
 
 export function clientReducer(state: ClientState = initialClientState, action: AppActions): ClientState {
@@ -44,8 +42,8 @@ export function clientReducer(state: ClientState = initialClientState, action: A
     case CLIENT_ACTION.CLIENT_INIT_SUCCESS: {
       return {
         ...state,
-        currentClient: action.payload.localClient,
-        isNewClient: action.payload.isNewClient,
+        currentClient: action.payload.client,
+        isNewClient: action.payload.isNew,
       };
     }
     case CLIENT_ACTION.CLIENTS_FETCH_START: {
@@ -78,7 +76,7 @@ export function clientReducer(state: ClientState = initialClientState, action: A
     case CLIENT_ACTION.CLIENT_REMOVE_SUCCESS: {
       return {
         ...state,
-        clients: [...state.clients.filter(client => client.id !== action.payload)],
+        clients: [...(state.clients ?? []).filter(client => client.id !== action.payload)],
         error: null,
         fetching: false,
       };
@@ -89,12 +87,6 @@ export function clientReducer(state: ClientState = initialClientState, action: A
         error: action.error,
         fetching: false,
       };
-    }
-    case NOTIFICATION_ACTION.NOTIFICATION_CHECK_HISTORY_SUCCESS: {
-      return {...state, hasHistory: action.payload};
-    }
-    case NOTIFICATION_ACTION.NOTIFICATION_CHECK_HISTORY_RESET: {
-      return {...state, hasHistory: initialClientState.hasHistory};
     }
     case CLIENT_ACTION.CLIENT_RESET_ERROR: {
       return {...state, error: null};

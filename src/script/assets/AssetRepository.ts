@@ -38,8 +38,9 @@ import {Conversation} from '../entity/Conversation';
 import {FileAsset} from '../entity/message/FileAsset';
 import type {User} from '../entity/User';
 import {Core} from '../service/CoreSingleton';
+import {TeamState} from '../team/TeamState';
 
-export interface CompressedImage {
+interface CompressedImage {
   compressedBytes: Uint8Array;
   compressedImage: HTMLImageElement;
 }
@@ -50,7 +51,7 @@ export interface AssetUploadOptions extends AssetOptions {
   legalHoldStatus?: LegalHoldStatus;
 }
 
-export interface UploadStatus {
+interface UploadStatus {
   messageId: string;
   progress: ko.Observable<number>;
 }
@@ -64,6 +65,7 @@ export class AssetRepository {
   constructor(
     private readonly assetService = container.resolve(AssetService),
     private readonly core = container.resolve(Core),
+    private readonly teamState = container.resolve(TeamState),
   ) {
     this.logger = getLogger('AssetRepository');
   }
@@ -78,12 +80,15 @@ export class AssetRepository {
       return objectUrl;
     }
 
-    const blob = await this.load(asset);
-    if (!blob) {
-      return undefined;
-    }
-    const url = window.URL.createObjectURL(blob);
-    return setAssetUrl(asset.identifier, url);
+    const urlPromise = new Promise<string>(async (resolve, reject) => {
+      const blob = await this.load(asset);
+      if (!blob) {
+        return reject(undefined);
+      }
+      const url = window.URL.createObjectURL(blob);
+      resolve(url);
+    });
+    return setAssetUrl(asset.identifier, urlPromise);
   }
 
   public async load(asset: AssetRemoteData): Promise<undefined | Blob> {
@@ -211,7 +216,7 @@ export class AssetRepository {
     if (skipCompression === true) {
       compressedBytes = new Uint8Array(buffer as ArrayBuffer);
     } else {
-      const worker = new WebWorker('/worker/image-worker.js');
+      const worker = new WebWorker(() => new Worker(new URL('./imageWorker', import.meta.url)));
       compressedBytes = await worker.post({buffer, useProfileImageSize});
     }
     const compressedImage = await loadImage(new Blob([compressedBytes], {type: image.type}));
@@ -222,11 +227,11 @@ export class AssetRepository {
   }
 
   getAssetRetention(userEntity: User, conversationEntity: Conversation): AssetRetentionPolicy {
-    const isTeamMember = userEntity.inTeam();
-    const isTeamConversation = conversationEntity.inTeam();
+    const isTeamMember = this.teamState.isInTeam(userEntity);
+    const isTeamConversation = this.teamState.isInTeam(conversationEntity);
     const isTeamUserInConversation = conversationEntity
       .participating_user_ets()
-      .some(conversationParticipant => conversationParticipant.inTeam());
+      .some(conversationParticipant => this.teamState.isInTeam(conversationParticipant));
 
     const isEternalInfrequentAccess = isTeamMember || isTeamConversation || isTeamUserInConversation;
     return isEternalInfrequentAccess ? AssetRetentionPolicy.ETERNAL_INFREQUENT_ACCESS : AssetRetentionPolicy.EXPIRING;

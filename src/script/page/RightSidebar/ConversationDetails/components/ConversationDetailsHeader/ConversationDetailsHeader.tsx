@@ -20,11 +20,14 @@
 import {ChangeEvent, FC, KeyboardEvent, useEffect, useRef, useState} from 'react';
 
 import {Icon} from 'Components/Icon';
+import {ConversationVerificationBadges} from 'Components/VerificationBadge';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {removeLineBreaks} from 'Util/StringUtil';
 
 import {ConversationRepository} from '../../../../../conversation/ConversationRepository';
+import {Conversation} from '../../../../../entity/Conversation';
 import {User} from '../../../../../entity/User';
 import {ServiceEntity} from '../../../../../integration/ServiceEntity';
 import {GroupDetails} from '../GroupDetails/GroupDetails';
@@ -32,27 +35,28 @@ import {GroupDetails} from '../GroupDetails/GroupDetails';
 interface ConversationDetailsHeaderProps {
   isActiveGroupParticipant: boolean;
   canRenameGroup: boolean;
-  displayName: string;
   updateConversationName: (conversationName: string) => void;
-  isGroup: boolean;
   userParticipants: User[];
   serviceParticipants: ServiceEntity[];
   allUsersCount: number;
   isTeam?: boolean;
+  conversation: Conversation;
 }
 
 const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
   isActiveGroupParticipant,
   canRenameGroup,
-  displayName,
   updateConversationName,
-  isGroup,
   userParticipants,
   serviceParticipants,
   allUsersCount,
   isTeam = false,
+  conversation,
 }) => {
+  const {isGroup, display_name: displayName} = useKoSubscribableChildren(conversation, ['isGroup', 'display_name']);
+
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
+  const isEditGroupNameTouched = useRef(false);
 
   const [isEditingName, setIsEditingName] = useState<boolean>(false);
   const [groupName, setGroupName] = useState(displayName);
@@ -73,16 +77,16 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
     if (isEnterKey(event)) {
       event.preventDefault();
       const {value: currentValue} = event.currentTarget;
-
       const currentConversationName = displayName.trim();
       const newConversationName = removeLineBreaks(currentValue.trim());
-
       const isNameChanged = newConversationName !== currentConversationName;
 
       if (isNameChanged) {
         updateConversationName(newConversationName);
         setGroupName(newConversationName);
         setIsEditingName(false);
+
+        isEditGroupNameTouched.current = false;
       }
     }
   };
@@ -95,13 +99,17 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
         textAreaRef.current.style.height = `${scrollHeight}px`;
       }
 
-      setTimeout(() => {
-        const currentValue = textAreaRef.current?.value;
-        const caretPosition = currentValue?.length || 0;
+      if (!isEditGroupNameTouched.current) {
+        setTimeout(() => {
+          const currentValue = textAreaRef.current?.value;
+          const caretPosition = currentValue?.length || 0;
 
-        textAreaRef.current?.setSelectionRange(caretPosition, caretPosition);
-        textAreaRef.current?.focus();
-      }, 0);
+          textAreaRef.current?.setSelectionRange(caretPosition, caretPosition);
+          textAreaRef.current?.focus();
+
+          isEditGroupNameTouched.current = true;
+        }, 0);
+      }
     }
   }, [isEditingName, groupName]);
 
@@ -112,15 +120,21 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
           {!isEditingName ? (
             <div
               className="conversation-details__name"
-              title={t('tooltipConversationDetailsRename')}
               data-uie-name="status-name"
               {...(canRenameGroup && {
                 onClick: clickToEditGroupName,
               })}
             >
-              {displayName && <div className="conversation-details__name">{displayName}</div>}
+              {displayName && <span className="conversation-details__name">{displayName}</span>}
 
-              {canRenameGroup && <Icon.Edit className="conversation-details__name__edit-icon" />}
+              {canRenameGroup && (
+                <button
+                  className="conversation-details__name__edit-icon"
+                  aria-label={t('tooltipConversationDetailsRename')}
+                >
+                  <Icon.Edit />
+                </button>
+              )}
             </div>
           ) : (
             <textarea
@@ -135,6 +149,8 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
               data-uie-name="enter-name"
             />
           )}
+
+          <ConversationVerificationBadges displayTitle conversation={conversation} />
         </>
       ) : (
         <div className="conversation-details__name">

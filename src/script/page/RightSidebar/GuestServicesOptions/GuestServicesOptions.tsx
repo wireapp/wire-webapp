@@ -19,6 +19,7 @@
 
 import {FC, useState} from 'react';
 
+import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -31,7 +32,6 @@ import {ConversationRepository} from '../../../conversation/ConversationReposito
 import {Conversation} from '../../../entity/Conversation';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {TeamState} from '../../../team/TeamState';
-import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {PanelHeader} from '../PanelHeader';
 
 interface GuestServicesOptionsProps {
@@ -42,6 +42,7 @@ interface GuestServicesOptionsProps {
   onClose: () => void;
   teamState: TeamState;
   isGuest?: boolean;
+  isPasswordSupported?: boolean;
 }
 
 const GuestServicesOptions: FC<GuestServicesOptionsProps> = ({
@@ -52,6 +53,7 @@ const GuestServicesOptions: FC<GuestServicesOptionsProps> = ({
   onClose,
   teamState,
   isGuest = false,
+  isPasswordSupported = false,
 }) => {
   const [isRequestOngoing, setIsRequestOngoing] = useState<boolean>(false);
 
@@ -87,11 +89,11 @@ const GuestServicesOptions: FC<GuestServicesOptionsProps> = ({
         preventClose: true,
         primaryAction: {
           action: changeAccessState,
-          text: t('modalConversationRemoveAction'),
+          text: t('modalConversationRemoveGuestsOrServicesAction'),
         },
         text: {
           message,
-          title: t('modalConversationRemoveGuestsAndServicesHeadline'),
+          title: isGuest ? t('modalConversationRemoveGuestsHeadline') : t('modalConversationRemoveServicesHeadline'),
         },
       });
     }
@@ -106,7 +108,7 @@ const GuestServicesOptions: FC<GuestServicesOptionsProps> = ({
         title={isGuest ? t('guestOptionsTitle') : t('servicesOptionsTitle')}
       />
 
-      <div className="panel__content" ref={initFadingScrollbar}>
+      <FadingScrollbar className="panel__content">
         {isGuest ? (
           <GuestOptions
             activeConversation={activeConversation}
@@ -117,6 +119,7 @@ const GuestServicesOptions: FC<GuestServicesOptionsProps> = ({
             isRequestOngoing={isRequestOngoing}
             setIsRequestOngoing={setIsRequestOngoing}
             isToggleDisabled={isToggleDisabled}
+            isPasswordSupported={isPasswordSupported}
           />
         ) : (
           <ServicesOptions
@@ -125,7 +128,7 @@ const GuestServicesOptions: FC<GuestServicesOptionsProps> = ({
             isToggleDisabled={isToggleDisabled}
           />
         )}
-      </div>
+      </FadingScrollbar>
     </div>
   );
 };

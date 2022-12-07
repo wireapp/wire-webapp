@@ -20,6 +20,7 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 
 import {amplify} from 'amplify';
+import cx from 'classnames';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
 
@@ -30,7 +31,7 @@ import {Icon} from 'Components/Icon';
 import {ModalComponent} from 'Components/ModalComponent';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
-import {ClientRepository} from 'src/script/client/ClientRepository';
+import {ClientRepository} from 'src/script/client';
 import {ClientState} from 'src/script/client/ClientState';
 import {Config} from 'src/script/Config';
 import {AppLockRepository} from 'src/script/user/AppLockRepository';
@@ -210,7 +211,7 @@ const AppLock: React.FC<AppLockProps> = ({
     const target = event.target as HTMLFormElement & {password: HTMLInputElement};
     try {
       setIsLoading(true);
-      const currentClientId = clientState.currentClient().id;
+      const currentClientId = clientState.currentClient.id;
       await clientRepository.clientService.deleteClient(currentClientId, target.password.value);
       appLockRepository.removeCode();
       amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, true);
@@ -285,21 +286,29 @@ const AppLock: React.FC<AppLockProps> = ({
             </span>
           </button>
         )}
+
         <h2 className="modal__header__title" data-uie-name="applock-modal-header">
           {headerText()}
         </h2>
       </div>
+
       <div className="modal__body" data-uie-name="applock-modal-body" data-uie-value={state}>
         {state === APPLOCK_STATE.SETUP && (
           <form onSubmit={onSetCode}>
-            <div
+            <p
               className="modal__text"
               dangerouslySetInnerHTML={{__html: t('modalAppLockSetupMessage', {}, {br: '<br><br>'})}}
               data-uie-name="label-applock-set-text"
             />
-            <div className="modal__text modal__label" data-uie-name="label-applock-unlock-text">
+
+            <label
+              className="modal__text modal__label"
+              data-uie-name="label-applock-unlock-text"
+              htmlFor="input-applock-set-a"
+            >
               {t('modalAppLockPasscode')}
-            </div>
+            </label>
+
             {/* eslint jsx-a11y/no-autofocus : "off" */}
             <input
               aria-label={t('modalAppLockSetupTitle')}
@@ -311,44 +320,51 @@ const AppLock: React.FC<AppLockProps> = ({
               data-uie-status={isSetupPassphraseValid ? 'valid' : 'invalid'}
               data-uie-name="input-applock-set-a"
               autoComplete="new-password"
+              id="input-applock-set-a"
             />
-            <div
-              className={`modal__passcode__info ${isSetupPassphraseLength ? 'modal__passcode__info--valid' : ''}`}
+
+            <p
+              className={cx('modal__passcode__info', {'modal__passcode__info--valid': isSetupPassphraseLength})}
               data-uie-status={isSetupPassphraseLength ? 'valid' : 'invalid'}
               data-uie-name="passcode-validation-charnumber"
             >
               {t('modalAppLockSetupLong', {
                 minPasswordLength: Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH.toString(),
               })}
-            </div>
-            <div
-              className={`modal__passcode__info ${isSetupPassphraseLower ? 'modal__passcode__info--valid' : ''}`}
+            </p>
+
+            <p
+              className={cx('modal__passcode__info', {'modal__passcode__info--valid': isSetupPassphraseLower})}
               data-uie-status={isSetupPassphraseLower ? 'valid' : 'invalid'}
               data-uie-name="passcode-validation-lowercase"
             >
               {t('modalAppLockSetupLower')}
-            </div>
-            <div
-              className={`modal__passcode__info ${isSetupPassphraseUpper ? 'modal__passcode__info--valid' : ''}`}
+            </p>
+
+            <p
+              className={cx('modal__passcode__info', {'modal__passcode__info--valid': isSetupPassphraseUpper})}
               data-uie-status={isSetupPassphraseUpper ? 'valid' : 'invalid'}
               data-uie-name="passcode-validation-uppercase"
             >
               {t('modalAppLockSetupUppercase')}
-            </div>
-            <div
-              className={`modal__passcode__info ${isSetupPassphraseDigit ? 'modal__passcode__info--valid' : ''}`}
+            </p>
+
+            <p
+              className={cx('modal__passcode__info', {'modal__passcode__info--valid': isSetupPassphraseDigit})}
               data-uie-status={isSetupPassphraseDigit ? 'valid' : 'invalid'}
               data-uie-name="passcode-validation-digit"
             >
               {t('modalAppLockSetupDigit')}
-            </div>
-            <div
-              className={`modal__passcode__info ${isSetupPassphraseSpecial ? 'modal__passcode__info--valid' : ''}`}
+            </p>
+
+            <p
+              className={cx('modal__passcode__info', {'modal__passcode__info--valid': isSetupPassphraseSpecial})}
               data-uie-status={isSetupPassphraseSpecial ? 'valid' : 'invalid'}
               data-uie-name="passcode-validation-specialchar"
             >
               {t('modalAppLockSetupSpecial')}
-            </div>
+            </p>
+
             <div className="modal__buttons">
               {!isAppLockEnforced && (
                 <button
@@ -360,6 +376,7 @@ const AppLock: React.FC<AppLockProps> = ({
                   {t('modalConfirmSecondary')}
                 </button>
               )}
+
               <button
                 type="submit"
                 className="modal__button modal__button--primary modal__button--full"
@@ -371,6 +388,7 @@ const AppLock: React.FC<AppLockProps> = ({
             </div>
           </form>
         )}
+
         {state === APPLOCK_STATE.SETUP_CHANGE && (
           <form onSubmit={onSetCode}>
             <div
@@ -384,9 +402,11 @@ const AppLock: React.FC<AppLockProps> = ({
               }}
               data-uie-name="label-applock-set-text"
             />
+
             <div className="modal__text modal__label" data-uie-name="label-applock-unlock-text">
               {t('modalAppLockPasscode')}
             </div>
+
             <input
               aria-label={t('modalAppLockSetupChangeTitle')}
               autoFocus
@@ -398,23 +418,29 @@ const AppLock: React.FC<AppLockProps> = ({
               data-uie-name="input-applock-set-a"
               autoComplete="new-password"
             />
-            <div className={`modal__passcode__info ${isSetupPassphraseLength ? 'modal__passcode__info--valid' : ''}`}>
+
+            <p className={cx('modal__passcode__info', {'modal__passcode__info--valid': isSetupPassphraseLength})}>
               {t('modalAppLockSetupLong', {
                 minPasswordLength: Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH.toString(),
               })}
-            </div>
-            <div className={`modal__passcode__info ${isSetupPassphraseLower ? 'modal__passcode__info--valid' : ''}`}>
+            </p>
+
+            <p className={cx('modal__passcode__info', {'modal__passcode__info--valid': isSetupPassphraseLower})}>
               {t('modalAppLockSetupLower')}
-            </div>
-            <div className={`modal__passcode__info ${isSetupPassphraseUpper ? 'modal__passcode__info--valid' : ''}`}>
+            </p>
+
+            <p className={cx('modal__passcode__info', {'modal__passcode__info--valid': isSetupPassphraseUpper})}>
               {t('modalAppLockSetupUppercase')}
-            </div>
-            <div className={`modal__passcode__info ${isSetupPassphraseDigit ? 'modal__passcode__info--valid' : ''}`}>
+            </p>
+
+            <p className={cx('modal__passcode__info', {'modal__passcode__info--valid': isSetupPassphraseDigit})}>
               {t('modalAppLockSetupDigit')}
-            </div>
-            <div className={`modal__passcode__info ${isSetupPassphraseSpecial ? 'modal__passcode__info--valid' : ''}`}>
+            </p>
+
+            <p className={cx('modal__passcode__info', {'modal__passcode__info--valid': isSetupPassphraseSpecial})}>
               {t('modalAppLockSetupSpecial')}
-            </div>
+            </p>
+
             <div className="modal__buttons">
               <button
                 type="submit"
@@ -433,6 +459,7 @@ const AppLock: React.FC<AppLockProps> = ({
             <div className="modal__text modal__label" data-uie-name="label-applock-unlock-text">
               {t('modalAppLockPasscode')}
             </div>
+
             <input
               aria-label={t('modalAppLockLockedTitle')}
               autoFocus
@@ -444,9 +471,10 @@ const AppLock: React.FC<AppLockProps> = ({
               data-uie-name="input-applock-unlock"
               autoComplete="new-password"
             />
-            <div className="modal__input__error" data-uie-name="label-applock-unlock-error">
+
+            <p className="modal__input__error" data-uie-name="label-applock-unlock-error">
               {unlockError}
-            </div>
+            </p>
 
             <button
               type="button"
@@ -474,6 +502,7 @@ const AppLock: React.FC<AppLockProps> = ({
             <div className="modal__text" data-uie-name="label-applock-forgot-text">
               {t('modalAppLockForgotMessage')}
             </div>
+
             <button
               type="button"
               className="button-reset-default block modal__cta"
@@ -482,6 +511,7 @@ const AppLock: React.FC<AppLockProps> = ({
             >
               {t('modalAppLockForgotWipeCTA')}
             </button>
+
             <div className="modal__buttons">
               <button
                 onClick={onGoBack}
@@ -499,10 +529,12 @@ const AppLock: React.FC<AppLockProps> = ({
             <div className="modal__text" data-uie-name="label-applock-wipe-confirm-text">
               {t('modalAppLockWipeConfirmMessage')}
             </div>
+
             <div className="modal__buttons">
               <button onClick={onGoBack} className="modal__button modal__button--secondary" data-uie-name="do-go-back">
                 {t('modalAppLockWipeConfirmGoBackButton')}
               </button>
+
               <button
                 onClick={onClickWipeConfirm}
                 className="modal__button modal__button--primary modal__button--alert"
@@ -527,9 +559,11 @@ const AppLock: React.FC<AppLockProps> = ({
               onKeyDown={clearWipeError}
               data-uie-name="input-applock-wipe"
             />
-            <div className="modal__input__error" style={{height: 20}} data-uie-name="label-applock-wipe-error">
+
+            <p className="modal__input__error" style={{height: 20}} data-uie-name="label-applock-wipe-error">
               {wipeError}
-            </div>
+            </p>
+
             <div className="modal__buttons">
               <button
                 type="button"
@@ -539,6 +573,7 @@ const AppLock: React.FC<AppLockProps> = ({
               >
                 {t('modalAppLockWipePasswordGoBackButton')}
               </button>
+
               <button
                 type="submit"
                 className="modal__button modal__button--primary modal__button--alert"

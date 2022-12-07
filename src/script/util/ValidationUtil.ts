@@ -35,11 +35,6 @@ export class ValidationUtilError extends Error {
 }
 
 export const isValidUsername = (username: string) => /^@?[a-z_0-9.-]{2,256}$/.test(username);
-export const isValidFederationUsername = (username: string) => {
-  const federationUsernameRegex =
-    /^(@?[a-z_0-9.-]{2,256})@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  return federationUsernameRegex.test(username);
-};
 
 /**
  * Checks if input has the format of an international phone number
@@ -67,16 +62,6 @@ export const isBearerToken = (token: string): boolean => /^[a-zA-Z0-9\-._~+/]+[=
 export const isUUID = (string: string): boolean =>
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(string);
 
-export const isBase64 = (string: string): boolean => {
-  try {
-    // Will raise a DOM exception if base64 string is invalid
-    window.atob(string);
-  } catch (error) {
-    return false;
-  }
-  return true;
-};
-
 export const isValidApiPath = (path: string): boolean => {
   const [urlPath] = path.split('?');
   if (!/^\/[a-zA-Z0-9\-_/,]+$/.test(urlPath)) {
@@ -99,7 +84,7 @@ export const legacyAsset = (assetId: string, conversationId: string): true => {
 };
 
 // https://github.com/wireapp/wire-server/blob/dc3e9a8af5250c0d045e96a31aa23c255b4e01a3/libs/cargohold-types/src/CargoHold/Types/V3.hs#L156-L177
-export const assetRetentionPolicy = (policyId: number | string): boolean => policyId > 0 && policyId < 6;
+export const assetRetentionPolicy = (policyId: number): boolean => policyId > 0 && policyId < 6;
 
 export const assetV3 = (assetKey: string, assetToken?: string): true => {
   if (!assetKey) {
@@ -112,7 +97,7 @@ export const assetV3 = (assetKey: string, assetToken?: string): true => {
   if (version !== '3') {
     throw new ValidationUtilError('Invalid asset key (version)');
   }
-  if (!assetRetentionPolicy(type)) {
+  if (!assetRetentionPolicy(parseInt(type, 10))) {
     throw new ValidationUtilError('Invalid asset key (type)');
   }
   if (!isUUID(uuid.join(SEPARATOR))) {

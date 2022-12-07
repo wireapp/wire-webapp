@@ -18,8 +18,9 @@
  */
 
 import type {SSOSettings} from '@wireapp/api-client/lib/account/SSOSettings';
-import type {LoginData} from '@wireapp/api-client/lib/auth/';
+import {LoginData} from '@wireapp/api-client/lib/auth';
 import {ClientType} from '@wireapp/api-client/lib/client/';
+import {OAuthClient} from '@wireapp/api-client/lib/oauth/OAuthClient';
 import type {TeamData} from '@wireapp/api-client/lib/team/';
 import type {UserAsset} from '@wireapp/api-client/lib/user/';
 
@@ -43,6 +44,8 @@ export interface RegistrationDataState {
   termsAccepted: boolean;
 }
 
+export type LoginDataState = Pick<LoginData, 'clientType' | 'phone'>;
+
 export type AuthState = {
   readonly account: RegistrationDataState;
   readonly currentFlow: string;
@@ -53,7 +56,8 @@ export type AuthState = {
   readonly fetchingSSOSettings: boolean;
   readonly isAuthenticated: boolean;
   readonly isSendingTwoFactorCode: boolean;
-  readonly loginData: Partial<LoginData>;
+  readonly loginData: LoginDataState;
+  readonly oAuthApp?: OAuthClient;
   readonly ssoSettings?: SSOSettings;
 };
 
@@ -84,6 +88,7 @@ export const initialAuthState: AuthState = {
   loginData: {
     clientType: Config.getConfig().FEATURE.DEFAULT_LOGIN_TEMPORARY_CLIENT ? ClientType.TEMPORARY : ClientType.PERMANENT,
   },
+  oAuthApp: undefined,
   ssoSettings: {
     default_sso_code: undefined,
   },
@@ -93,6 +98,7 @@ export function authReducer(state: AuthState = initialAuthState, action: AppActi
   switch (action.type) {
     case AUTH_ACTION.LOGIN_START:
     case AUTH_ACTION.REGISTER_JOIN_START:
+    case AUTH_ACTION.REGISTER_WIRELESS_START:
     case AUTH_ACTION.REGISTER_PERSONAL_START:
     case AUTH_ACTION.REGISTER_TEAM_START:
     case USER_ACTION.USER_SEND_ACTIVATION_CODE_START: {
@@ -109,13 +115,21 @@ export function authReducer(state: AuthState = initialAuthState, action: AppActi
         isSendingTwoFactorCode: true,
       };
     }
-    case AUTH_ACTION.SEND_TWO_FACTOR_CODE_SUCCESS:
-    case AUTH_ACTION.SEND_TWO_FACTOR_CODE_FAILED: {
+    case AUTH_ACTION.SEND_TWO_FACTOR_CODE_SUCCESS: {
       return {
         ...state,
         isSendingTwoFactorCode: false,
       };
     }
+    case AUTH_ACTION.SEND_TWO_FACTOR_CODE_FAILED: {
+      return {
+        ...state,
+        error: action.error,
+        isSendingTwoFactorCode: false,
+      };
+    }
+    case AUTH_ACTION.FETCH_OAUTH_APP_START:
+    case AUTH_ACTION.FETCH_TEAM_START:
     case AUTH_ACTION.REFRESH_START: {
       return {
         ...state,
@@ -133,6 +147,7 @@ export function authReducer(state: AuthState = initialAuthState, action: AppActi
     case AUTH_ACTION.LOGIN_FAILED:
     case AUTH_ACTION.REGISTER_JOIN_FAILED:
     case AUTH_ACTION.REGISTER_PERSONAL_FAILED:
+    case AUTH_ACTION.REGISTER_WIRELESS_FAILED:
     case AUTH_ACTION.REGISTER_TEAM_FAILED:
     case USER_ACTION.USER_SEND_ACTIVATION_CODE_FAILED: {
       return {
@@ -142,9 +157,18 @@ export function authReducer(state: AuthState = initialAuthState, action: AppActi
         isAuthenticated: false,
       };
     }
+    case AUTH_ACTION.FETCH_OAUTH_APP_FAILED:
+    case AUTH_ACTION.FETCH_TEAM_FAILED: {
+      return {
+        ...state,
+        error: action.error,
+        fetching: false,
+      };
+    }
     case AUTH_ACTION.LOGIN_SUCCESS:
     case AUTH_ACTION.REFRESH_SUCCESS:
     case AUTH_ACTION.REGISTER_JOIN_SUCCESS:
+    case AUTH_ACTION.REGISTER_WIRELESS_SUCCESS:
     case AUTH_ACTION.REGISTER_PERSONAL_SUCCESS:
     case AUTH_ACTION.REGISTER_TEAM_SUCCESS: {
       return {
@@ -154,6 +178,24 @@ export function authReducer(state: AuthState = initialAuthState, action: AppActi
         fetched: true,
         fetching: false,
         isAuthenticated: true,
+      };
+    }
+    case AUTH_ACTION.FETCH_TEAM_SUCCESS: {
+      return {
+        ...state,
+        account: {...state.account, team: action.payload},
+        error: null,
+        fetched: true,
+        fetching: false,
+      };
+    }
+    case AUTH_ACTION.FETCH_OAUTH_APP_SUCCESS: {
+      return {
+        ...state,
+        oAuthApp: action.payload,
+        error: null,
+        fetched: true,
+        fetching: false,
       };
     }
     case AUTH_ACTION.GET_SSO_SETTINGS_START: {

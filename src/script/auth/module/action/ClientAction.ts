@@ -18,7 +18,7 @@
  */
 
 import {ClientClassification, ClientType, RegisteredClient} from '@wireapp/api-client/lib/client/';
-import type {ClientInfo} from '@wireapp/core/lib/client/';
+import {ClientInfo} from '@wireapp/core/lib/client/';
 
 import {Runtime} from '@wireapp/commons';
 
@@ -61,25 +61,24 @@ export class ClientAction {
     verificationCode?: string,
     entropyData?: Uint8Array,
   ): ThunkAction => {
-    return async (dispatch, getState, {core, actions: {clientAction, webSocketAction}}) => {
-      dispatch(ClientActionCreator.startInitializeClient());
-      try {
-        const creationStatus = await core.initClient(
-          {clientType, password, verificationCode},
-          clientAction.generateClientPayload(clientType),
-          entropyData,
-        );
-        await dispatch(clientAction.doGetAllClients());
-        await dispatch(webSocketAction.listen());
-        dispatch(ClientActionCreator.successfulInitializeClient(creationStatus));
-      } catch (error) {
-        dispatch(ClientActionCreator.failedInitializeClient(error));
-        throw error;
-      }
+    return async (dispatch, getState, {core, actions: {clientAction}}) => {
+      const localClient = await core.initClient();
+      const creationStatus = localClient
+        ? {isNew: false, client: localClient}
+        : {
+            isNew: true,
+            client: await core.registerClient(
+              {clientType, password, verificationCode},
+              clientAction.generateClientPayload(clientType),
+              entropyData,
+            ),
+          };
+
+      dispatch(ClientActionCreator.successfulInitializeClient(creationStatus));
     };
   };
 
-  generateClientPayload = (clientType: ClientType): ClientInfo | undefined => {
+  private generateClientPayload = (clientType: ClientType): ClientInfo | undefined => {
     if (clientType === ClientType.NONE) {
       return undefined;
     }

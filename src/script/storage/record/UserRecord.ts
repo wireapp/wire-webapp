@@ -17,9 +17,8 @@
  *
  */
 
-import {Availability} from '@wireapp/protocol-messaging';
+import type {Self as APIClientSelf} from '@wireapp/api-client/lib/self';
+import type {User as APIClientUser} from '@wireapp/api-client/lib/user';
+import {AvailabilityType} from '@wireapp/core/lib/broadcast';
 
-export interface UserRecord {
-  availability: Availability.Type;
-  id: string;
-}
+export type UserRecord = (APIClientUser | APIClientSelf) & {availability?: AvailabilityType};

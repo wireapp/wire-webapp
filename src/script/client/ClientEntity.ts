@@ -26,6 +26,10 @@ import {ClientMapper} from './ClientMapper';
 
 import {ClientRecord} from '../storage';
 
+export enum MLSPublicKeys {
+  ED25519 = 'ed25519',
+}
+
 export class ClientEntity {
   static CONFIG = {
     DEFAULT_VALUE: '?',
@@ -34,22 +38,20 @@ export class ClientEntity {
   address?: string;
   class: ClientClassification | '?';
   cookie?: string;
-  domain?: string;
+  domain?: string | null;
   id: string;
   isSelfClient: boolean;
   label?: string;
-  location?: {
-    lat?: number;
-    lon?: number;
-  };
+
   meta: {
-    isVerified?: ko.Observable<boolean>;
+    isVerified: ko.Observable<boolean>;
     primaryKey?: string;
     userId?: string;
   };
   model?: string;
   time?: string;
   type?: ClientType.PERMANENT | ClientType.TEMPORARY;
+  mlsPublicKeys?: Partial<Record<MLSPublicKeys, string>>;
 
   constructor(isSelfClient: boolean, domain: string | null, id = '') {
     this.isSelfClient = isSelfClient;
@@ -62,7 +64,6 @@ export class ClientEntity {
       this.address = '';
       this.cookie = '';
       this.label = ClientEntity.CONFIG.DEFAULT_VALUE;
-      this.location = {};
       this.model = ClientEntity.CONFIG.DEFAULT_VALUE;
       this.time = ClientEntity.CONFIG.DEFAULT_VALUE;
       this.type = ClientType.TEMPORARY;
@@ -73,17 +74,6 @@ export class ClientEntity {
       isVerified: ko.observable(false),
       primaryKey: undefined,
     };
-  }
-
-  /**
-   * Splits an ID into user ID, client ID & domain (if any).
-   */
-  static dismantleUserClientId(id: string): {clientId: string; domain?: string; userId: string} {
-    // see https://regex101.com/r/c8FtCw/1
-    const regex = /((?<domain>.+)@)?(?<userId>.+)@(?<clientId>.+)$/g;
-    const match = regex.exec(id);
-    const {domain, userId, clientId} = match?.groups || {};
-    return {clientId, domain, userId};
   }
 
   /**
@@ -106,7 +96,7 @@ export class ClientEntity {
     return this.type === ClientType.TEMPORARY;
   }
 
-  getName(): string {
+  getName(): string | undefined {
     const hasModel = this.model && this.model !== ClientEntity.CONFIG.DEFAULT_VALUE;
     return hasModel ? this.model : this.class.toUpperCase();
   }
@@ -126,6 +116,9 @@ export class ClientEntity {
 
     jsonObject.meta.is_verified = jsonObject.meta.isVerified;
     delete jsonObject.meta.isVerified;
+
+    jsonObject.meta.is_mls_verified = jsonObject.meta.isMLSVerified;
+    delete jsonObject.meta.isMLSVerified;
 
     if (jsonObject.meta.primaryKey) {
       jsonObject.meta.primary_key = jsonObject.meta.primaryKey;

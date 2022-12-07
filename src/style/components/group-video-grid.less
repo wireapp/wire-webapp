@@ -23,6 +23,13 @@
   height: 100%;
 }
 
+.tile-wrapper {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+
 .group-video {
   position: relative;
   width: 100%;
@@ -95,6 +102,13 @@
       width: calc(100% / var(--columns));
       height: calc(100% / var(--rows));
       box-sizing: border-box;
+      padding: 0;
+      border: none;
+      background-color: inherit;
+
+      &:focus {
+        z-index: 1;
+      }
 
       &__overlay {
         position: absolute;
@@ -131,7 +145,6 @@
       }
 
       &-video {
-        position: absolute;
         width: 100%;
         height: 100%;
         border-radius: 8px;
@@ -188,6 +201,7 @@
       height: 100%;
       align-items: center;
       justify-content: center;
+      border-radius: 8px;
       background-color: var(--background-fade-16);
       transform: translateZ(0);
 
@@ -205,6 +219,7 @@
       }
 
       .background {
+        border-radius: 8px;
         transition: none;
       }
     }
@@ -212,6 +227,7 @@
 
   &__thumbnail {
     position: absolute;
+    z-index: 2;
     top: 12px;
     right: 12px;
     display: flex;

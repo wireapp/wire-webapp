@@ -29,4 +29,5 @@ export enum LEAVE_CALL_REASON {
   ABORTED_BECAUSE_FAILED_TO_UPDATE_MISSING_CLIENTS = 'abort_failed_to_update_missing_clients',
   ABORTED_BECAUSE_FAILED_TO_SEND_CALLING_MESSAGE = 'abort_failed_to_update_missing_clients',
   ABORTED_BECAUSE_USER_CANCELLED_MESSAGE_SENDING_BECAUSE_OF_A_DEGRADATION_WARNING = 'abort_failed_because_user_cancelled_message_sending_because_of_a_degradation_warning',
+  CONVERSATION_DEGRADED = 'conversation_degraded',
 }

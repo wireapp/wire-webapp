@@ -24,6 +24,7 @@ import {connect} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
+import {UrlUtil} from '@wireapp/commons';
 import {ContainerXS, Loading} from '@wireapp/react-ui-kit';
 
 import {getLogger} from 'Util/Logger';
@@ -56,6 +57,7 @@ const ClientListComponent = ({
 }: Props & ConnectedProps & DispatchProps) => {
   const navigate = useNavigate();
   const [showLoading, setShowLoading] = React.useState(false);
+  const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE);
   const [currentlySelectedClient, setCurrentlySelectedClient] = React.useState<string | null>(null);
 
   const setSelectedClient = (clientId: string) => {
@@ -76,6 +78,11 @@ const ClientListComponent = ({
       await doInitializeClient(persist ? ClientType.PERMANENT : ClientType.TEMPORARY, password, SFAcode, entropy);
       removeLocalStorage(QUERY_KEY.CONVERSATION_CODE);
       removeLocalStorage(QUERY_KEY.JOIN_EXPIRES);
+
+      if (isOauth) {
+        return navigate(ROUTE.AUTHORIZE);
+      }
+
       return navigate(ROUTE.HISTORY_INFO);
     } catch (error) {
       logger.error(error);
@@ -99,7 +106,7 @@ const ClientListComponent = ({
       {permanentClients.map(client => (
         <ClientItem
           client={client}
-          clientError={isSelectedClient(client.id) ? clientError : undefined}
+          clientError={isSelectedClient(client.id) ? clientError ?? undefined : undefined}
           key={client.id}
           onClick={() => setSelectedClient(client.id)}
           onClientRemoval={(password?: string) => removeClient(client.id, password)}

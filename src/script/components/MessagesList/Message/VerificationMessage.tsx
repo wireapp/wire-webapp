@@ -63,15 +63,15 @@ const VerificationMessage: React.FC<VerificationMessageProps> = ({message}) => {
         <VerifiedIcon isVerified={isTypeVerified} />
       </div>
       <div
-        className="message-header-label"
+        className="message-header-label message-header-label--verification"
         data-uie-name="element-message-verification"
         data-uie-value={verificationMessageType}
       >
-        {isTypeVerified && <span>{t('tooltipConversationAllVerified')}</span>}
+        {isTypeVerified && <span>{t('conversation.AllVerified')}</span>}
         {isTypeUnverified && (
           <>
             <span className="message-header-sender-name">{unsafeSenderName}</span>
-            <span className="ellipsis">{t('conversationDeviceUnverified')}</span>
+            <span>{t('conversationDeviceUnverified')}</span>
             <button
               type="button"
               className="button-reset-default message-verification-action accent-text"
@@ -87,8 +87,12 @@ const VerificationMessage: React.FC<VerificationMessageProps> = ({message}) => {
         {isTypeNewDevice && (
           <>
             <span className="message-header-plain-sender-name">{nameList}</span>
-            <span className="ellipsis">
-              {hasMultipleUsers ? t('conversationDeviceStartedUsingMany') : t('conversationDeviceStartedUsingOne')}
+            <span>
+              {hasMultipleUsers
+                ? t('conversationDeviceStartedUsingMany')
+                : isSelfClient
+                  ? t('conversationDeviceStartedUsingYou')
+                  : t('conversationDeviceStartedUsingOne')}
             </span>
             <button
               type="button"
@@ -102,7 +106,7 @@ const VerificationMessage: React.FC<VerificationMessageProps> = ({message}) => {
         )}
         {isTypeNewMember && (
           <>
-            <span className="ellipsis">{t('conversationDeviceNewPeopleJoined')}</span>
+            <span>{t('conversationDeviceNewPeopleJoined')}</span>
             &nbsp;
             <button
               type="button"

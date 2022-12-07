@@ -19,17 +19,21 @@
 
 import React from 'react';
 
+import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {amplify} from 'amplify';
+import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {TeamState} from 'src/script/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import type {MenuItem} from './PanelActions';
 import {PanelActions} from './PanelActions';
+import {SingleAction} from './SingleAction/SingleAction';
 
 import {ACCESS_STATE} from '../../conversation/AccessState';
 import type {ConversationRoleRepository} from '../../conversation/ConversationRoleRepository';
@@ -71,6 +75,8 @@ export interface UserActionsProps {
   onAction: (action: Actions) => void;
   selfUser: User;
   user: User;
+  isModal?: boolean;
+  teamState?: TeamState;
 }
 
 function createPlaceholder1to1Conversation(user: User, selfUser: User) {
@@ -95,20 +101,22 @@ const UserActions: React.FC<UserActionsProps> = ({
   onAction,
   conversationRoleRepository,
   selfUser,
+  isModal = false,
+  teamState = container.resolve(TeamState),
 }) => {
   const {
+    isAvailable,
     isBlocked,
     isCanceled,
     isRequest,
-    isTeamMember,
     isTemporaryGuest,
     isUnknown,
     isConnected,
     isOutgoingRequest,
     isIncomingRequest,
   } = useKoSubscribableChildren(user, [
+    'isAvailable',
     'isTemporaryGuest',
-    'isTeamMember',
     'isBlocked',
     'isOutgoingRequest',
     'isIncomingRequest',
@@ -117,6 +125,7 @@ const UserActions: React.FC<UserActionsProps> = ({
     'isUnknown',
     'isConnected',
   ]);
+  const isTeamMember = teamState.isInTeam(user);
 
   const isNotMe = !user.isMe && isSelfActivated;
 
@@ -157,7 +166,7 @@ const UserActions: React.FC<UserActionsProps> = ({
       : undefined;
 
   const open1To1Conversation: MenuItem | undefined =
-    isNotMe && (isConnected || isTeamMember)
+    isNotMe && isAvailable && (isConnected || isTeamMember)
       ? {
           click: async () => {
             await create1to1Conversation(user, true);
@@ -170,7 +179,7 @@ const UserActions: React.FC<UserActionsProps> = ({
       : undefined;
 
   const acceptConnectionRequest: MenuItem | undefined =
-    isNotMe && isIncomingRequest
+    isNotMe && isAvailable && isIncomingRequest
       ? {
           click: async () => {
             await actionsViewModel.acceptConnectionRequest(user);
@@ -214,20 +223,29 @@ const UserActions: React.FC<UserActionsProps> = ({
   const canConnect = !isTeamMember && !isTemporaryGuest;
 
   const sendConnectionRequest: MenuItem | undefined =
-    isNotMe && isNotConnectedUser && canConnect
+    isNotMe && isAvailable && isNotConnectedUser && canConnect
       ? {
           click: async () => {
-            const connectionIsSent = await actionsViewModel.sendConnectionRequest(user);
-            if (!connectionIsSent) {
+            const connectionData = await actionsViewModel.sendConnectionRequest(user);
+
+            if (!connectionData) {
               // Sending the connection failed, there is nothing more to do
               return;
             }
-            // We create a local 1:1 conversation that will act as a placeholder before the other user has accepted the request
-            const newConversation = createPlaceholder1to1Conversation(user, selfUser);
-            const savedConversation = await actionsViewModel.saveConversation(newConversation);
+
+            const {connectionStatus, conversationId} = connectionData;
+
+            // If connection's state is SENT, we create a local 1:1 conversation that will act as a placeholder
+            // before the other user has accepted the request.
+            const connectionConversation =
+              connectionStatus === ConnectionStatus.SENT
+                ? createPlaceholder1to1Conversation(user, selfUser)
+                : await actionsViewModel.getConversationById(conversationId);
+
+            const savedConversation = await actionsViewModel.saveConversation(connectionConversation);
             if (!conversation) {
               // Only open the new conversation if we aren't currently in a conversation context
-              actionsViewModel.open1to1Conversation(savedConversation);
+              await actionsViewModel.open1to1Conversation(savedConversation);
             }
             onAction(Actions.SEND_REQUEST);
           },
@@ -238,7 +256,7 @@ const UserActions: React.FC<UserActionsProps> = ({
       : undefined;
 
   const blockUser: MenuItem | undefined =
-    isNotMe && (isConnected || isRequest)
+    isNotMe && isAvailable && (isConnected || isRequest)
       ? {
           click: async () => {
             await actionsViewModel.blockUser(user);
@@ -252,7 +270,7 @@ const UserActions: React.FC<UserActionsProps> = ({
       : undefined;
 
   const unblockUser: MenuItem | undefined =
-    isNotMe && isBlocked
+    isNotMe && isAvailable && isBlocked
       ? {
           click: async () => {
             await actionsViewModel.unblockUser(user);
@@ -295,7 +313,11 @@ const UserActions: React.FC<UserActionsProps> = ({
     removeUserFromConversation,
   ].filter((item): item is MenuItem => !!item);
 
-  return <PanelActions items={items} />;
+  return items.length === 1 && isModal ? (
+    <SingleAction item={items[0]} onCancel={onAction} />
+  ) : (
+    <PanelActions items={items} />
+  );
 };
 
 export {UserActions};

@@ -17,12 +17,13 @@
  *
  */
 
-import React from 'react';
+import React, {useEffect} from 'react';
 
-import {ClientType} from '@wireapp/api-client/lib/client';
+import {ClientType} from '@wireapp/api-client/lib/client/index';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {Navigate, useNavigate} from 'react-router-dom';
+import {AnyAction, Dispatch} from 'redux';
 
 import {Button, ContainerXS, H1, Link, Paragraph} from '@wireapp/react-ui-kit';
 
@@ -32,36 +33,44 @@ import {Page} from './Page';
 
 import {Config} from '../../Config';
 import {historyInfoStrings} from '../../strings';
-import {RootState} from '../module/reducer';
+import {actionRoot} from '../module/action/';
+import {bindActionCreators, RootState} from '../module/reducer';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import {ROUTE} from '../route';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
 const HistoryInfoComponent = ({
-  hasHistory,
   clients,
   currentSelfClient,
+  hasLoadedClients,
   isNewCurrentSelfClient,
-}: Props & ConnectedProps) => {
+  doGetAllClients,
+}: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
   const navigate = useNavigate();
+  const shouldLoadClients = !hasLoadedClients && isNewCurrentSelfClient;
 
   const onContinue = () => {
     return navigate(ROUTE.SET_EMAIL);
   };
-  const headline = hasHistory ? historyInfoStrings.hasHistoryHeadline : historyInfoStrings.noHistoryHeadline;
-  const infoText = hasHistory ? historyInfoStrings.hasHistoryInfo : historyInfoStrings.noHistoryInfo;
+
+  useEffect(() => {
+    if (shouldLoadClients) {
+      doGetAllClients();
+    }
+  }, [doGetAllClients, shouldLoadClients]);
 
   /**
-   * Show history screen when a new client was created and:
-   *   1. database contains at least one event
-   *   2. there is at least one previously registered client
-   *   3. new local client is temporary
+   * Show history screen when a new client was created and there is at least one previously registered client
    */
   const shouldShowHistoryInfo =
     isNewCurrentSelfClient &&
-    (hasHistory || clients.length > 1 || (currentSelfClient && currentSelfClient.type === ClientType.TEMPORARY));
+    (clients.length > 1 || (currentSelfClient && currentSelfClient.type === ClientType.TEMPORARY));
+
+  if (shouldLoadClients) {
+    return null;
+  }
 
   if (!shouldShowHistoryInfo) {
     return <Navigate to={ROUTE.SET_EMAIL} />;
@@ -70,10 +79,10 @@ const HistoryInfoComponent = ({
   return (
     <Page>
       <ContainerXS centerText verticalCenter style={{width: '100%'}}>
-        <H1 center>{_(headline, {brandName: Config.getConfig().BRAND_NAME})}</H1>
+        <H1 center>{_(historyInfoStrings.noHistoryHeadline, {brandName: Config.getConfig().BRAND_NAME})}</H1>
         <Paragraph center style={{marginBottom: 56}}>
           <FormattedMessage
-            {...infoText}
+            {...historyInfoStrings.noHistoryInfo}
             values={{
               newline: <br />,
             }}
@@ -92,13 +101,11 @@ const HistoryInfoComponent = ({
         >
           {_(historyInfoStrings.ok)}
         </Button>
-        {!hasHistory && (
-          <Paragraph center style={{marginTop: 40}}>
-            <Link href={Config.getConfig().URL.SUPPORT.HISTORY} target="_blank" data-uie-name="do-history-learn-more">
-              {_(historyInfoStrings.learnMore)}
-            </Link>
-          </Paragraph>
-        )}
+        <Paragraph center style={{marginTop: 40}}>
+          <Link href={Config.getConfig().URL.SUPPORT.HISTORY} target="_blank" data-uie-name="do-history-learn-more">
+            {_(historyInfoStrings.learnMore)}
+          </Link>
+        </Paragraph>
       </ContainerXS>
     </Page>
   );
@@ -107,11 +114,21 @@ const HistoryInfoComponent = ({
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
   clients: ClientSelector.getClients(state),
+  isFeching: ClientSelector.isFetching(state),
   currentSelfClient: ClientSelector.getCurrentSelfClient(state),
-  hasHistory: ClientSelector.hasHistory(state),
+  hasLoadedClients: ClientSelector.hasLoadedClients(state),
   isNewCurrentSelfClient: ClientSelector.isNewCurrentSelfClient(state),
 });
 
-const HistoryInfo = connect(mapStateToProps)(HistoryInfoComponent);
+type DispatchProps = ReturnType<typeof mapDispatchToProps>;
+const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
+  bindActionCreators(
+    {
+      doGetAllClients: actionRoot.clientAction.doGetAllClients,
+    },
+    dispatch,
+  );
+
+const HistoryInfo = connect(mapStateToProps, mapDispatchToProps)(HistoryInfoComponent);
 
 export {HistoryInfo};

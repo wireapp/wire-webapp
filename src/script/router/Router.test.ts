@@ -19,7 +19,7 @@
 
 import {waitFor} from '@testing-library/react';
 
-import {configureRoutes, navigate} from './Router';
+import {configureRoutes, navigate, setHistoryParam} from './Router';
 
 describe('Router', () => {
   afterEach(() => {
@@ -75,6 +75,44 @@ describe('Router', () => {
       waitFor(() => {
         expect(handlers.conversation).toHaveBeenCalled();
       });
+    });
+  });
+
+  describe('setHistoryParam', () => {
+    // Mock window.history.replaceState before each test
+    beforeEach(() => {
+      global.history.replaceState = jest.fn();
+    });
+
+    // Restore the original method after each test
+    afterEach(() => {
+      (global.history.replaceState as jest.Mock).mockRestore();
+    });
+
+    it('uses history.state if it is not empty and stateObj is not provided', () => {
+      const mockState = {eventKey: 'Enter'};
+      Object.defineProperty(window.history, 'state', {value: mockState, writable: true});
+
+      setHistoryParam('/path');
+      expect(global.history.replaceState).toHaveBeenCalledWith(mockState, '', '#/path');
+    });
+
+    it('uses stateObj even if history.state is not empty', () => {
+      const mockState = {eventKey: 'Tab'};
+      Object.defineProperty(window.history, 'state', {value: mockState, writable: true});
+
+      const newStateObj = {newState: 'state'};
+      setHistoryParam('/path', newStateObj);
+      expect(global.history.replaceState).toHaveBeenCalledWith(newStateObj, '', '#/path');
+    });
+
+    it('explicitely resetting the state is allowed', () => {
+      const mockState = {eventKey: 'Tab'};
+      Object.defineProperty(window.history, 'state', {value: mockState, writable: true});
+
+      const newStateObj = {};
+      setHistoryParam('/path', newStateObj);
+      expect(global.history.replaceState).toHaveBeenCalledWith(newStateObj, '', '#/path');
     });
   });
 });

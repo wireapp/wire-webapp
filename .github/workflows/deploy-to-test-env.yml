@@ -1,0 +1,63 @@
+name: Deploys to testing environments
+
+on:
+  workflow_dispatch:
+    inputs:
+      env:
+        description: 'The environment the branch should be deployed to'
+        required: true
+        type: choice
+        options:
+          - wire-webapp-qa-al2-migration
+          - wire-webapp-mls-al2
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS: 150
+      AWS_APPLICATION_NAME: Webapp
+      AWS_BUILD_ZIP_PATH: server/dist/s3/ebs.zip
+
+    steps:
+      - name: Print environment variables
+        run: |
+          echo -e "branch = ${{github.ref_name}}"
+          echo -e "env = ${{inputs.env}}"
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 16.x
+          cache: 'yarn'
+
+      - name: Install JS dependencies
+        run: yarn --immutable
+
+      - name: Build
+        run: yarn build:prod
+
+      - name: Deploy to Elastic Beanstalk
+        uses: einaregilsson/beanstalk-deploy@v21
+        with:
+          application_name: ${{env.AWS_APPLICATION_NAME}}
+          aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
+          aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
+          deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
+          environment_name: ${{inputs.env}}
+          region: eu-central-1
+          use_existing_version_if_available: true
+          version_description: ${{github.sha}}
+          version_label: ${{github.run_id}}
+          wait_for_deployment: false
+          wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}

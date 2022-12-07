@@ -20,6 +20,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 
 import {Icon} from 'Components/Icon';
+import {MediaDeviceType} from 'src/script/media/MediaDeviceType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
@@ -27,7 +28,7 @@ import {getLogger} from 'Util/Logger';
 import {DeviceSelect} from './DeviceSelect';
 
 import {Config} from '../../../../../Config';
-import {DeviceTypes, MediaDevicesHandler} from '../../../../../media/MediaDevicesHandler';
+import {MediaDevicesHandler} from '../../../../../media/MediaDevicesHandler';
 import {MediaStreamHandler} from '../../../../../media/MediaStreamHandler';
 import {MediaType} from '../../../../../media/MediaType';
 import {PreferencesSection} from '../components/PreferencesSection';
@@ -50,12 +51,13 @@ const CameraPreferences: React.FC<CameraPreferencesProps> = ({
   const [isRequesting, setIsRequesting] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const videoElement = useRef<HTMLVideoElement>(null);
-  const {[DeviceTypes.VIDEO_INPUT]: availableDevices} = useKoSubscribableChildren(devicesHandler?.availableDevices, [
-    DeviceTypes.VIDEO_INPUT,
-  ]);
+  const {[MediaDeviceType.VIDEO_INPUT]: availableDevices} = useKoSubscribableChildren(
+    devicesHandler?.availableDevices,
+    [MediaDeviceType.VIDEO_INPUT],
+  );
 
-  const {[DeviceTypes.VIDEO_INPUT]: currentDeviceId} = useKoSubscribableChildren(devicesHandler?.currentDeviceId, [
-    DeviceTypes.VIDEO_INPUT,
+  const {[MediaDeviceType.VIDEO_INPUT]: currentDeviceId} = useKoSubscribableChildren(devicesHandler?.currentDeviceId, [
+    MediaDeviceType.VIDEO_INPUT,
   ]);
 
   const {URL: urls, BRAND_NAME: brandName} = Config.getConfig();
@@ -120,7 +122,7 @@ const CameraPreferences: React.FC<CameraPreferencesProps> = ({
         defaultDeviceName={t('preferencesAVCamera')}
         icon={Icon.Camera}
         isRequesting={isRequesting}
-        onChange={deviceId => devicesHandler.currentDeviceId[DeviceTypes.VIDEO_INPUT](deviceId)}
+        onChange={deviceId => devicesHandler.currentDeviceId[MediaDeviceType.VIDEO_INPUT](deviceId)}
         title={t('preferencesAVCamera')}
       />
 
@@ -140,8 +142,9 @@ const CameraPreferences: React.FC<CameraPreferencesProps> = ({
                   __html: t('preferencesAVNoCamera', brandName, {
                     '/faqLink': '</a>',
                     br: '<br>',
-                    faqLink:
-                      "<a href='https://support.wire.com/hc/articles/202935412' data-uie-name='go-no-camera-faq' target='_blank' rel='noopener noreferrer'>",
+                    faqLink: `<a href='${
+                      Config.getConfig().URL.SUPPORT.CAMERA_ACCESS_DENIED
+                    }' data-uie-name='go-no-camera-faq' target='_blank' rel='noopener noreferrer'>`,
                   }),
                 }}
               />

@@ -17,12 +17,17 @@
  *
  */
 
-import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE, CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {
+  CONVERSATION_ACCESS,
+  CONVERSATION_LEGACY_ACCESS_ROLE,
+  CONVERSATION_TYPE,
+} from '@wireapp/api-client/lib/conversation';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
 
 import {ConversationFilter} from './ConversationFilter';
 import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';
 import {ConversationStatus} from './ConversationStatus';
+import {ConversationVerificationState} from './ConversationVerificationState';
 
 import {Conversation} from '../entity/Conversation';
 
@@ -40,6 +45,7 @@ describe('ConversationFilter', () => {
         accessRoleV2: undefined,
         access_role: undefined,
         archived_state: false,
+        readonly_state: null,
         archived_timestamp: 0,
         cipher_suite: 1,
         cleared_timestamp: 0,
@@ -51,7 +57,6 @@ describe('ConversationFilter', () => {
         group_id: 'test-group-id',
         id: '796161e1-a319-41e3-9b33-2b3ab0b3b87a',
         is_guest: false,
-        is_managed: false,
         last_event_timestamp: 9,
         last_read_timestamp: 0,
         last_server_timestamp: 9,
@@ -61,13 +66,15 @@ describe('ConversationFilter', () => {
         name: 'Florian@Staging11',
         others: ['71e25be1-5433-4647-964d-03a5d9e7c970'],
         protocol: ConversationProtocol.PROTEUS,
+        initial_protocol: ConversationProtocol.PROTEUS,
         qualified_others: undefined,
         receipt_mode: null,
         roles: {},
         status: 0,
         team_id: undefined,
         type: 3,
-        verification_state: 0,
+        verification_state: ConversationVerificationState.UNVERIFIED,
+        mlsVerificationState: ConversationVerificationState.UNVERIFIED,
       };
       const [conversationEntity] = ConversationMapper.mapConversations([conversationData]);
       expect(conversationEntity.is1to1()).toBeFalsy();
@@ -87,8 +94,9 @@ describe('ConversationFilter', () => {
       const conversationData: ConversationDatabaseData = {
         access: [CONVERSATION_ACCESS.PRIVATE],
         accessRoleV2: undefined,
-        access_role: CONVERSATION_ACCESS_ROLE.PRIVATE,
+        access_role: CONVERSATION_LEGACY_ACCESS_ROLE.PRIVATE,
         archived_state: false,
+        readonly_state: null,
         archived_timestamp: 0,
         cipher_suite: 1,
         cleared_timestamp: 0,
@@ -100,7 +108,6 @@ describe('ConversationFilter', () => {
         group_id: 'test-group-id',
         id: '796161e1-a319-41e3-9b33-2b3ab0b3b87a',
         is_guest: false,
-        is_managed: false,
         last_event_timestamp: 4,
         last_read_timestamp: 0,
         last_server_timestamp: 1627916459003,
@@ -110,6 +117,7 @@ describe('ConversationFilter', () => {
         muted_timestamp: 0,
         name: 'Florian@Staging11',
         others: ['71e25be1-5433-4647-964d-03a5d9e7c970'],
+        initial_protocol: ConversationProtocol.PROTEUS,
         protocol: ConversationProtocol.PROTEUS,
         qualified_others: undefined,
         receipt_mode: null,
@@ -120,7 +128,8 @@ describe('ConversationFilter', () => {
         status: 0,
         team_id: null,
         type: 2,
-        verification_state: 0,
+        verification_state: ConversationVerificationState.UNVERIFIED,
+        mlsVerificationState: ConversationVerificationState.UNVERIFIED,
       };
       const [conversationEntity] = ConversationMapper.mapConversations([conversationData]);
       expect(conversationEntity.is1to1()).toBeTruthy();

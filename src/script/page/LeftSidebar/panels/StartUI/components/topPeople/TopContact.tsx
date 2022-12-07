@@ -20,6 +20,7 @@
 import React, {useEffect, useState} from 'react';
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -51,7 +52,7 @@ const TopContact: React.FC<TopContactProps> = ({assetRepository, user, clickOnUs
       data-uie-uid={user.id}
       data-uie-value={name}
       role="button"
-      tabIndex={0}
+      tabIndex={TabIndex.FOCUSABLE}
       onClick={event => {
         clickOnUser?.(user, event);
       }}
