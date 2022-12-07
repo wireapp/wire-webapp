@@ -69,7 +69,7 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
             }
 
             const {domain, id} = conversationEntity;
-            const conversationId = domain ? {id, domain} : id;
+            const conversationId = {id, domain};
 
             await this.conversationService.putConversationAccess(conversationId, accessModes, accessRole);
 
