@@ -83,7 +83,11 @@ export const IndicatorRangeInput: FC<IndicatorRangeInputProps> = forwardRef<
 
     return (
       <div css={{wrapperCSS, width: '100%'}}>
-        {label && <InputLabel htmlFor={id}>{label}</InputLabel>}
+        {label && (
+          <InputLabel css={(theme: Theme) => ({fontSize: theme.fontSizes.base})} htmlFor={id}>
+            {label}
+          </InputLabel>
+        )}
 
         <div css={containerStyles}>
           {isCustomSlider && (
