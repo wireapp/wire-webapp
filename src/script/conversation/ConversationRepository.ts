@@ -396,9 +396,15 @@ export class ConversationRepository {
       };
 
       if (accessState) {
-        const {accessModes: access, accessRole: access_role_v2} = updateAccessRights(accessState);
+        const {accessModes: access, accessRole} = updateAccessRights(accessState);
 
-        payload = {...payload, access, access_role_v2};
+        const accessRoleField = this.core.backendFeatures.version >= 3 ? 'access_role' : 'access_role_v2';
+
+        payload = {
+          ...payload,
+          access,
+          [accessRoleField]: accessRole,
+        };
       }
     }
 
