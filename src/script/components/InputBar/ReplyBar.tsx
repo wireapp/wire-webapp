@@ -66,7 +66,12 @@ const ReplyBar: FC<ReplyBarProps> = ({replyMessageEntity, onCancel}) => {
             </span>
 
             {wasEdited && (
-              <Icon.Edit data-uie-name="message-edited-reply-box" aria-label={t('replyBarEditMessage')} tabIndex={0} />
+              <Icon.Edit
+                className="edit-icon"
+                data-uie-name="message-edited-reply-box"
+                aria-label={t('replyBarEditMessage')}
+                tabIndex={0}
+              />
             )}
           </div>
 
