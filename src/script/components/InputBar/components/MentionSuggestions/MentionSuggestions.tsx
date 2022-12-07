@@ -32,6 +32,9 @@ type MentionSuggestionListProps = {
   suggestions: User[];
   targetInput?: HTMLTextAreaElement | null;
 };
+
+export const mentionSuggestionsClassName = 'conversation-input-bar-mention-suggestion';
+
 const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps> = ({
   suggestions,
   onSelectionValidated,

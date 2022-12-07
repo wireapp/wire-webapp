@@ -21,6 +21,12 @@ import {ChangeEvent, FormEvent, KeyboardEvent as ReactKeyboardEvent, useEffect, 
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
+import {useResizeTarget} from 'src/script/hooks/useResizeTarget';
+import {useScrollSync} from 'src/script/hooks/useScrollSync';
+import {useTextAreaFocus} from 'src/script/hooks/useTextAreaFocus';
+import {ControlButtons} from 'src/script/page/message-list/InputBarControls/ControlButtons';
+import {GiphyButton} from 'src/script/page/message-list/InputBarControls/GiphyButton';
+import {MentionSuggestionList, mentionSuggestionsClassName} from 'src/script/page/message-list/MentionSuggestions';
 import {container} from 'tsyringe';
 
 import {Availability} from '@wireapp/protocol-messaging';
@@ -29,12 +35,13 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {checkFileSharingPermission} from 'Components/Conversation/utils/checkFileSharingPermission';
-import {useEmoji} from 'Components/Emoji/useEmoji';
+import {emojiComponentClassName, useEmoji} from 'Components/Emoji/useEmoji';
 import {Icon} from 'Components/Icon';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
+import {contextMenuClassName} from 'src/script/ui/ContextMenu';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from 'src/script/user/TypingIndicatorMode';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {loadDraftState, saveDraftState} from 'Util/DraftStateUtil';
@@ -49,18 +56,12 @@ import {
 import {formatLocale, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {getSelectionPosition} from 'Util/util';
 
-import {ControlButtons} from './components/InputBarControls/ControlButtons';
-import {GiphyButton} from './components/InputBarControls/GiphyButton';
-import {MentionSuggestionList} from './components/MentionSuggestions';
 import {PastedFileControls} from './components/PastedFileControls';
 import {ReplyBar} from './components/ReplyBar';
 import {TYPING_TIMEOUT} from './components/TypingIndicator';
 import {TypingIndicator} from './components/TypingIndicator/TypingIndicator';
 import {getRichTextInput} from './getRichTextInput';
 import {useFilePaste} from './hooks/useFilePaste';
-import {useResizeTarget} from './hooks/useResizeTarget';
-import {useScrollSync} from './hooks/useScrollSync';
-import {useTextAreaFocus} from './hooks/useTextAreaFocus';
 
 import {Config} from '../../Config';
 import {MessageRepository, OutgoingQuote} from '../../conversation/MessageRepository';
@@ -100,6 +101,8 @@ interface InputBarProps {
   uploadImages: (images: File[]) => void;
   uploadFiles: (files: File[]) => void;
 }
+
+const conversationInputBarClassName = 'conversation-input-bar';
 
 const InputBar = ({
   conversationEntity,
@@ -635,7 +638,7 @@ const InputBar = ({
 
   const onWindowClick = (event: Event): void => {
     const ignoredParent = (event.target as HTMLElement).closest(
-      '.conversation-input-bar, .conversation-input-bar-mention-suggestion, .ctx-menu',
+      `.${conversationInputBarClassName}, .${mentionSuggestionsClassName}, .${contextMenuClassName}, .${emojiComponentClassName}`,
     );
 
     if (!ignoredParent) {
@@ -776,9 +779,8 @@ const InputBar = ({
 
   return (
     <div
-      aria-live="polite"
-      id="conversation-input-bar"
-      className={cx('conversation-input-bar', {'is-right-panel-open': isRightSidebarOpen})}
+      id={`${conversationInputBarClassName}`}
+      className={cx(`${conversationInputBarClassName}`, {'is-right-panel-open': isRightSidebarOpen})}
     >
       {!!isTypingIndicatorEnabled && <TypingIndicator conversationId={conversationEntity.id} />}
 
@@ -788,7 +790,11 @@ const InputBar = ({
 
       {isReplying && !isEditing && <ReplyBar replyMessageEntity={replyMessageEntity} onCancel={handleCancelReply} />}
 
-      <div className={cx('conversation-input-bar__input', {'conversation-input-bar__input--editing': isEditing})}>
+      <div
+        className={cx(`${conversationInputBarClassName}__input`, {
+          [`${conversationInputBarClassName}__input--editing`]: isEditing,
+        })}
+      >
         {!isOutgoingRequest && (
           <>
             <div className="controls-left">
@@ -804,9 +810,9 @@ const InputBar = ({
                 <div className="controls-center">
                   <textarea
                     ref={textareaRef}
-                    id="conversation-input-bar-text"
-                    className={cx('conversation-input-bar-text', {
-                      'conversation-input-bar-text--accent': hasLocalEphemeralTimer,
+                    id={`${conversationInputBarClassName}-text`}
+                    className={cx(`${conversationInputBarClassName}-text`, {
+                      [`${conversationInputBarClassName}-text--accent`]: hasLocalEphemeralTimer,
                     })}
                     onKeyDown={onTextAreaKeyDown}
                     onKeyUp={onTextareaKeyUp}
