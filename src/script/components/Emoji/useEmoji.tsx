@@ -400,7 +400,7 @@ const useEmoji = (
 
   const renderEmojiComponent = () =>
     isVisible ? (
-      <div className={`${emojiComponentClassName}`} ref={emojiWrapperRef}>
+      <div className={emojiComponentClassName} ref={emojiWrapperRef}>
         {mappedEmojiList.map((emoji, index) => {
           return (
             <EmojiItem

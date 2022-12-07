@@ -901,7 +901,7 @@ const InputBar = ({
 
   return (
     <div
-      id={`${conversationInputBarClassName}`}
+      id={conversationInputBarClassName}
       className={cx(`${conversationInputBarClassName}`, {'is-right-panel-open': isRightSidebarOpen})}
     >
       <TypingIndicator conversationId={conversationEntity.id} />
