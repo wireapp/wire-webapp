@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [22.9.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@22.8.0...@wireapp/api-client@22.9.0) (2022-12-07)
+
+### Features
+
+* **api-client:** api v3 deprecated endpoints [FS-1268] ([#4693](https://github.com/wireapp/wire-web-packages/issues/4693)) ([c54b7e5](https://github.com/wireapp/wire-web-packages/commit/c54b7e5cad895ecffcf1a9be775aad98697a53a1))
+
 # [22.8.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@22.7.0...@wireapp/api-client@22.8.0) (2022-12-06)
 
 ### Features
