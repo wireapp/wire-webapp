@@ -26,7 +26,7 @@ import {useScrollSync} from 'src/script/hooks/useScrollSync';
 import {useTextAreaFocus} from 'src/script/hooks/useTextAreaFocus';
 import {ControlButtons} from 'src/script/page/message-list/InputBarControls/ControlButtons';
 import {GiphyButton} from 'src/script/page/message-list/InputBarControls/GiphyButton';
-import {MentionSuggestionList, mentionSuggestionsClassName} from 'src/script/page/message-list/MentionSuggestions';
+import {MentionSuggestionList} from 'src/script/page/message-list/MentionSuggestions';
 import {container} from 'tsyringe';
 
 import {Availability} from '@wireapp/protocol-messaging';
@@ -35,13 +35,12 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {checkFileSharingPermission} from 'Components/Conversation/utils/checkFileSharingPermission';
-import {emojiComponentClassName, useEmoji} from 'Components/Emoji/useEmoji';
+import {useEmoji} from 'Components/Emoji/useEmoji';
 import {Icon} from 'Components/Icon';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
-import {contextMenuClassName} from 'src/script/ui/ContextMenu';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from 'src/script/user/TypingIndicatorMode';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {loadDraftState, saveDraftState} from 'Util/DraftStateUtil';
@@ -62,6 +61,7 @@ import {TYPING_TIMEOUT} from './components/TypingIndicator';
 import {TypingIndicator} from './components/TypingIndicator/TypingIndicator';
 import {getRichTextInput} from './getRichTextInput';
 import {useFilePaste} from './hooks/useFilePaste';
+import {handleClickOutsideOfInputBar, IgnoreClickWrapper} from './util/clickHandlers';
 
 import {Config} from '../../Config';
 import {MessageRepository, OutgoingQuote} from '../../conversation/MessageRepository';
@@ -636,16 +636,11 @@ const InputBar = ({
     });
   };
 
-  const onWindowClick = (event: Event): void => {
-    const ignoredParent = (event.target as HTMLElement).closest(
-      `.${conversationInputBarClassName}, .${mentionSuggestionsClassName}, .${contextMenuClassName}, .${emojiComponentClassName}`,
-    );
-
-    if (!ignoredParent) {
+  const onWindowClick = (event: Event): void =>
+    handleClickOutsideOfInputBar(event, () => {
       cancelMessageEditing(true, true);
       cancelMessageReply();
-    }
-  };
+    });
 
   useEffect(() => {
     amplify.subscribe(WebAppEvents.CONVERSATION.IMAGE.SEND, uploadImages);
@@ -778,7 +773,7 @@ const InputBar = ({
   };
 
   return (
-    <div
+    <IgnoreClickWrapper
       id={conversationInputBarClassName}
       className={cx(conversationInputBarClassName, {'is-right-panel-open': isRightSidebarOpen})}
     >
@@ -864,7 +859,7 @@ const InputBar = ({
 
         {pastedFile && <PastedFileControls pastedFile={pastedFile} onClear={clearPastedFile} onSend={sendPastedFile} />}
       </div>
-    </div>
+    </IgnoreClickWrapper>
   );
 };
 

@@ -20,6 +20,7 @@
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
+import {IgnoreClickWrapper} from 'Components/InputBar/util/clickHandlers';
 import {KEY} from 'Util/KeyboardUtil';
 import {clamp} from 'Util/NumberUtil';
 
@@ -32,8 +33,6 @@ type MentionSuggestionListProps = {
   suggestions: User[];
   targetInput?: HTMLTextAreaElement | null;
 };
-
-export const mentionSuggestionsClassName = 'conversation-input-bar-mention-suggestion';
 
 const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps> = ({
   suggestions,
@@ -102,26 +101,28 @@ const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps>
   }, [isVisible, suggestions, selectedSuggestionIndex]);
 
   return isVisible ? (
-    <FadingScrollbar
-      className="conversation-input-bar-mention-suggestion"
-      style={{bottom, overflowY: 'auto'}}
-      data-uie-name="list-mention-suggestions"
-    >
-      <div className="mention-suggestion-list">
-        {suggestions
-          .map((suggestion, index) => (
-            <MentionSuggestionsItem
-              key={suggestion.id}
-              suggestion={suggestion}
-              isSelected={index === selectedSuggestionIndex}
-              onSuggestionClick={() => onSelectionValidated(suggestion)}
-              onMouseEnter={() => setSelectedSuggestionIndex(index)}
-              ref={index === selectedSuggestionIndex ? element => (selectedItem.current = element) : undefined}
-            />
-          ))
-          .reverse()}
-      </div>
-    </FadingScrollbar>
+    <IgnoreClickWrapper>
+      <FadingScrollbar
+        className="conversation-input-bar-mention-suggestion"
+        style={{bottom, overflowY: 'auto'}}
+        data-uie-name="list-mention-suggestions"
+      >
+        <div className="mention-suggestion-list">
+          {suggestions
+            .map((suggestion, index) => (
+              <MentionSuggestionsItem
+                key={suggestion.id}
+                suggestion={suggestion}
+                isSelected={index === selectedSuggestionIndex}
+                onSuggestionClick={() => onSelectionValidated(suggestion)}
+                onMouseEnter={() => setSelectedSuggestionIndex(index)}
+                ref={index === selectedSuggestionIndex ? element => (selectedItem.current = element) : undefined}
+              />
+            ))
+            .reverse()}
+        </div>
+      </FadingScrollbar>
+    </IgnoreClickWrapper>
   ) : null;
 };
 
