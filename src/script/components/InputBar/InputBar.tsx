@@ -37,7 +37,7 @@ import {useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import {useEmoji, emojiComponentClassName} from 'Components/Emoji/useEmoji';
+import {useEmoji} from 'Components/Emoji/useEmoji';
 import {Icon} from 'Components/Icon';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -47,9 +47,8 @@ import {useScrollSync} from 'src/script/hooks/useScrollSync';
 import {useTextAreaFocus} from 'src/script/hooks/useTextAreaFocus';
 import {ControlButtons} from 'src/script/page/message-list/InputBarControls/ControlButtons';
 import {GiphyButton} from 'src/script/page/message-list/InputBarControls/GiphyButton';
-import {MentionSuggestionList, mentionSuggestionsClassName} from 'src/script/page/message-list/MentionSuggestions';
+import {MentionSuggestionList} from 'src/script/page/message-list/MentionSuggestions';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
-import {contextMenuClassName} from 'src/script/ui/ContextMenu';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {loadDraftState, saveDraftState} from 'Util/DraftStateUtil';
 import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/FileTypeUtil';
@@ -70,6 +69,7 @@ import {PastedFileControls} from './PastedFileControls';
 import {ReplyBar} from './ReplyBar';
 import {TYPING_TIMEOUT} from './TypingIndicator';
 import {TypingIndicator} from './TypingIndicator/TypingIndicator';
+import {handleClickOutsideOfInputBar, IgnoreClickWrapper} from './util/clickHandlers';
 
 import {AssetRepository} from '../../assets/AssetRepository';
 import {Config} from '../../Config';
@@ -752,16 +752,11 @@ const InputBar = ({
     });
   };
 
-  const onWindowClick = (event: Event): void => {
-    const ignoredParent = (event.target as HTMLElement).closest(
-      `.${conversationInputBarClassName}, .${mentionSuggestionsClassName}, .${contextMenuClassName}, .${emojiComponentClassName}`,
-    );
-
-    if (!ignoredParent) {
+  const onWindowClick = (event: Event): void =>
+    handleClickOutsideOfInputBar(event, () => {
       cancelMessageEditing(true, true);
       cancelMessageReply();
-    }
-  };
+    });
 
   useEffect(() => {
     amplify.subscribe(WebAppEvents.CONVERSATION.IMAGE.SEND, uploadImages);
@@ -900,7 +895,7 @@ const InputBar = ({
   };
 
   return (
-    <div
+    <IgnoreClickWrapper
       id={conversationInputBarClassName}
       className={cx(conversationInputBarClassName, {'is-right-panel-open': isRightSidebarOpen})}
     >
@@ -987,7 +982,7 @@ const InputBar = ({
 
         {pastedFile && <PastedFileControls pastedFile={pastedFile} onClear={clearPastedFile} onSend={sendPastedFile} />}
       </div>
-    </div>
+    </IgnoreClickWrapper>
   );
 };
 

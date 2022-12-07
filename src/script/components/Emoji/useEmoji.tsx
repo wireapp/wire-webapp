@@ -24,6 +24,7 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {IgnoreClickWrapper} from 'Components/InputBar/util/clickHandlers';
 import {isEnterKey, isKey, KEY} from 'Util/KeyboardUtil';
 import {updateMentionRanges} from 'Util/MentionUtil';
 import {getCursorPixelPosition} from 'Util/PopupUtil';
@@ -82,8 +83,6 @@ export type EmojiListItem = {
   icon: string;
   name: string;
 };
-
-export const emojiComponentClassName = 'conversation-input-bar-emoji-list';
 
 const useEmoji = (
   propertiesRepository: PropertiesRepository,
@@ -400,23 +399,25 @@ const useEmoji = (
 
   const renderEmojiComponent = () =>
     isVisible ? (
-      <div className={emojiComponentClassName} ref={emojiWrapperRef}>
-        {mappedEmojiList.map((emoji, index) => {
-          return (
-            <EmojiItem
-              key={emoji.name}
-              selectedEmoji={selectedEmojiIndex === index}
-              emoji={emoji}
-              onMouseEnter={() => setSelectedEmojiIndex(index)}
-              onClick={() => {
-                if (textareaElement) {
-                  enterEmojiPopupLine(textareaElement, emoji);
-                }
-              }}
-            />
-          );
-        })}
-      </div>
+      <IgnoreClickWrapper>
+        <div className="conversation-input-bar-emoji-list" ref={emojiWrapperRef}>
+          {mappedEmojiList.map((emoji, index) => {
+            return (
+              <EmojiItem
+                key={emoji.name}
+                selectedEmoji={selectedEmojiIndex === index}
+                emoji={emoji}
+                onMouseEnter={() => setSelectedEmojiIndex(index)}
+                onClick={() => {
+                  if (textareaElement) {
+                    enterEmojiPopupLine(textareaElement, emoji);
+                  }
+                }}
+              />
+            );
+          })}
+        </div>
+      </IgnoreClickWrapper>
     ) : null;
 
   useEffect(() => {

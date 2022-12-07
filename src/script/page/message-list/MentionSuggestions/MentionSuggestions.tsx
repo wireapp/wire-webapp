@@ -19,6 +19,7 @@
 
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 
+import {IgnoreClickWrapper} from 'Components/InputBar/util/clickHandlers';
 import {KEY} from 'Util/KeyboardUtil';
 import {clamp} from 'Util/NumberUtil';
 
@@ -32,8 +33,6 @@ type MentionSuggestionListProps = {
   suggestions: User[];
   targetInput?: HTMLTextAreaElement | null;
 };
-
-export const mentionSuggestionsClassName = 'conversation-input-bar-mention-suggestion';
 
 const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps> = ({
   suggestions,
@@ -102,8 +101,8 @@ const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps>
   }, [isVisible, suggestions, selectedSuggestionIndex]);
 
   return isVisible ? (
-    <div
-      className={mentionSuggestionsClassName}
+    <IgnoreClickWrapper
+      className="conversation-input-bar-mention-suggestion"
       style={{bottom, overflowY: 'auto'}}
       data-uie-name="list-mention-suggestions"
       ref={initFadingScrollbar}
@@ -122,7 +121,7 @@ const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps>
           ))
           .reverse()}
       </div>
-    </div>
+    </IgnoreClickWrapper>
   ) : null;
 };
 
