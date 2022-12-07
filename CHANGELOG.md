@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [37.2.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@37.2.3...@wireapp/core@37.2.4) (2022-12-07)
+
+### Bug Fixes
+
+* Block message sending when notification stream is being processed ([#4695](https://github.com/wireapp/wire-web-packages/issues/4695)) ([b90270a](https://github.com/wireapp/wire-web-packages/commit/b90270abb9bc1f9b1ddfdb85fff29079b321ce34))
+
 ## [37.2.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@37.2.2...@wireapp/core@37.2.3) (2022-12-07)
 
 **Note:** Version bump only for package @wireapp/core
