@@ -22,7 +22,7 @@ import {CONVERSATION_ACCESS, CONVERSATION_LEGACY_ACCESS_ROLE, CONVERSATION_ACCES
 /**@deprecated */
 export interface ConversationAccessV2UpdateData {
   access: CONVERSATION_ACCESS[];
-  access_role: CONVERSATION_LEGACY_ACCESS_ROLE;
+  access_role?: CONVERSATION_LEGACY_ACCESS_ROLE;
   access_role_v2?: CONVERSATION_ACCESS_ROLE[];
 }
 

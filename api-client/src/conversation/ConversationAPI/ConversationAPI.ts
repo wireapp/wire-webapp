@@ -25,7 +25,6 @@ import {
   ClientMismatch,
   Conversation,
   ConversationCode,
-  ConversationIds,
   ConversationRolesList,
   Conversations,
   DefaultConversationRoleName,
@@ -86,7 +85,6 @@ export class ConversationAPI {
     CODE_CHECK: '/code-check',
     CONVERSATIONS: '/conversations',
     MLS: '/mls',
-    IDS: 'ids',
     JOIN: '/join',
     LIST: 'list',
     LIST_IDS: 'list-ids',
@@ -104,6 +102,12 @@ export class ConversationAPI {
   };
 
   constructor(protected readonly client: HttpClient, protected readonly backendFeatures: BackendFeatures) {}
+
+  private generateBaseConversationUrl(conversationId: QualifiedId): string {
+    return this.backendFeatures.federationEndpoints
+      ? `${ConversationAPI.URL.CONVERSATIONS}/${conversationId.domain}/${conversationId.id}`
+      : `${ConversationAPI.URL.CONVERSATIONS}/${conversationId.id}`;
+  }
 
   /**
    * Delete a conversation code.
@@ -280,27 +284,6 @@ export class ConversationAPI {
     };
 
     return getConversationChunks();
-  }
-
-  /**
-   * Get all conversation IDs.
-   * @param limit Max. number of IDs to return
-   * @param conversationId Conversation ID to start from (exclusive)
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/conversationIds
-   * @deprecated Use `getListConversations()` instead.
-   */
-  public async getConversationIds(limit: number, conversationId?: string): Promise<ConversationIds> {
-    const config: AxiosRequestConfig = {
-      method: 'get',
-      params: {
-        size: limit,
-        start: conversationId,
-      },
-      url: `${ConversationAPI.URL.CONVERSATIONS}/${ConversationAPI.URL.IDS}`,
-    };
-
-    const response = await this.client.sendJSON<ConversationIds>(config);
-    return response.data;
   }
 
   /**
@@ -890,19 +873,18 @@ export class ConversationAPI {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/updateConversationAccess
    */
   public async putAccess(
-    conversationId: string,
+    conversationId: QualifiedId,
     accessData: ConversationAccessUpdateData,
   ): Promise<ConversationAccessUpdateEvent> {
     const config: AxiosRequestConfig = {
       data: accessData,
       method: 'put',
-      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.ACCESS}`,
+      url: `${this.generateBaseConversationUrl(conversationId)}/${ConversationAPI.URL.ACCESS}`,
     };
 
     const response = await this.client.sendJSON<ConversationAccessUpdateEvent>(config);
     return response.data;
   }
-
   /**
    * Update conversation properties.
    * @param conversationId The conversation ID to update properties of
