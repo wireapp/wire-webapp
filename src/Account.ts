@@ -50,7 +50,7 @@ import {BroadcastService} from './broadcast/';
 import {ClientInfo, ClientService} from './client/';
 import {ConnectionService} from './connection/';
 import {AssetService, ConversationService} from './conversation/';
-import {getQueueLength, resumeMessageSending} from './conversation/message/messageSender';
+import {getQueueLength, pauseMessageSending, resumeMessageSending} from './conversation/message/messageSender';
 import {CoreError} from './CoreError';
 import {CryptographyService, SessionId} from './cryptography/';
 import {GiphyService} from './giphy/';
@@ -640,7 +640,9 @@ export class Account<T = any> extends EventEmitter {
     const processNotificationStream = async (abortHandler: AbortHandler) => {
       // Lock websocket in order to buffer any message that arrives while we handle the notification stream
       this.apiClient.transport.ws.lock();
+      pauseMessageSending();
       onConnectionStateChanged(ConnectionState.PROCESSING_NOTIFICATIONS);
+
       const results = await this.service!.notification.processNotificationStream(
         async (notification, source, progress) => {
           await handleNotification(notification, source);
@@ -650,6 +652,7 @@ export class Account<T = any> extends EventEmitter {
         abortHandler,
       );
       this.logger.log(`Finished processing notifications ${JSON.stringify(results)}`, results);
+
       if (abortHandler.isAborted()) {
         this.logger.warn('Ending connection process as websocket was closed');
         return;
