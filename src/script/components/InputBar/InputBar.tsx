@@ -37,7 +37,7 @@ import {useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import {useEmoji} from 'Components/Emoji/useEmoji';
+import {useEmoji, emojiComponentClassName} from 'Components/Emoji/useEmoji';
 import {Icon} from 'Components/Icon';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -47,8 +47,9 @@ import {useScrollSync} from 'src/script/hooks/useScrollSync';
 import {useTextAreaFocus} from 'src/script/hooks/useTextAreaFocus';
 import {ControlButtons} from 'src/script/page/message-list/InputBarControls/ControlButtons';
 import {GiphyButton} from 'src/script/page/message-list/InputBarControls/GiphyButton';
-import {MentionSuggestionList} from 'src/script/page/message-list/MentionSuggestions';
+import {MentionSuggestionList, mentionSuggestionsClassName} from 'src/script/page/message-list/MentionSuggestions';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
+import {contextMenuClassName} from 'src/script/ui/ContextMenu';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {loadDraftState, saveDraftState} from 'Util/DraftStateUtil';
 import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/FileTypeUtil';
@@ -117,6 +118,8 @@ interface InputBarProps {
   readonly userState: UserState;
   onShiftTab: () => void;
 }
+
+const conversationInputBarClassName = 'conversation-input-bar';
 
 const InputBar = ({
   assetRepository,
@@ -751,7 +754,7 @@ const InputBar = ({
 
   const onWindowClick = (event: Event): void => {
     const ignoredParent = (event.target as HTMLElement).closest(
-      '.conversation-input-bar, .conversation-input-bar-mention-suggestion, .ctx-menu',
+      `.${conversationInputBarClassName}, .${mentionSuggestionsClassName}, .${contextMenuClassName}, .${emojiComponentClassName}`,
     );
 
     if (!ignoredParent) {
@@ -898,8 +901,8 @@ const InputBar = ({
 
   return (
     <div
-      id="conversation-input-bar"
-      className={cx('conversation-input-bar', {'is-right-panel-open': isRightSidebarOpen})}
+      id={`${conversationInputBarClassName}`}
+      className={cx(`${conversationInputBarClassName}`, {'is-right-panel-open': isRightSidebarOpen})}
     >
       <TypingIndicator conversationId={conversationEntity.id} />
 
@@ -909,7 +912,11 @@ const InputBar = ({
 
       {isReplying && !isEditing && <ReplyBar replyMessageEntity={replyMessageEntity} onCancel={handleCancelReply} />}
 
-      <div className={cx('conversation-input-bar__input', {'conversation-input-bar__input--editing': isEditing})}>
+      <div
+        className={cx(`${conversationInputBarClassName}__input`, {
+          [`${conversationInputBarClassName}__input--editing`]: isEditing,
+        })}
+      >
         {!isOutgoingRequest && (
           <>
             <div className="controls-left">
@@ -925,9 +932,9 @@ const InputBar = ({
                 <div className="controls-center">
                   <textarea
                     ref={textareaRef}
-                    id="conversation-input-bar-text"
-                    className={cx('conversation-input-bar-text', {
-                      'conversation-input-bar-text--accent': hasLocalEphemeralTimer,
+                    id={`${conversationInputBarClassName}-text`}
+                    className={cx(`${conversationInputBarClassName}-text`, {
+                      [`${conversationInputBarClassName}-text--accent`]: hasLocalEphemeralTimer,
                     })}
                     onKeyDown={onTextAreaKeyDown}
                     onKeyUp={onTextareaKeyUp}

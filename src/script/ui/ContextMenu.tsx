@@ -60,7 +60,14 @@ const cleanUp = () => {
 
 const getButtonId = (label: string): string => `btn-${label?.split(' ').join('-').toLowerCase()}`;
 
-const ContextMenu: React.FC<ContextMenuProps> = ({entries, defaultIdentifier = 'ctx-menu-item', posX, posY}) => {
+export const contextMenuClassName = 'ctx-menu';
+
+const ContextMenu: React.FC<ContextMenuProps> = ({
+  entries,
+  defaultIdentifier = `${contextMenuClassName}-item`,
+  posX,
+  posY,
+}) => {
   const [mainElement, setMainElement] = useState<HTMLUListElement>();
   const [selected, setSelected] = useState<ContextMenuEntry>();
 
@@ -146,16 +153,21 @@ const ContextMenu: React.FC<ContextMenuProps> = ({entries, defaultIdentifier = '
   }, [mainElement, selected]);
 
   return (
-    <ul className="ctx-menu" ref={setMainElement} style={{maxHeight: window.innerHeight, ...style}} role="menu">
+    <ul
+      className={contextMenuClassName}
+      ref={setMainElement}
+      style={{maxHeight: window.innerHeight, ...style}}
+      role="menu"
+    >
       {entries.map((entry, index) =>
         entry.isSeparator ? (
-          <li key={`${index}`} className="ctx-menu__separator" />
+          <li key={`${index}`} className={`${contextMenuClassName}__separator`} />
         ) : (
           <li
             key={`${index}`}
-            className={cx('ctx-menu__item', {
-              'ctx-menu__item--checked': entry.isChecked,
-              'ctx-menu__item--disabled': entry.isDisabled,
+            className={cx(`${contextMenuClassName}__item`, {
+              [`${contextMenuClassName}__item--checked`]: entry.isChecked,
+              [`${contextMenuClassName}__item--disabled`]: entry.isDisabled,
               selected: entry === selected,
             })}
             role="menuitem"
@@ -163,7 +175,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({entries, defaultIdentifier = '
           >
             <button
               id={getButtonId(entry.label!)}
-              className="ctx-menu__button"
+              className={`${contextMenuClassName}__button`}
               type="button"
               data-uie-name={entry.identifier || defaultIdentifier}
               title={entry.title || entry.label}
@@ -180,9 +192,14 @@ const ContextMenu: React.FC<ContextMenuProps> = ({entries, defaultIdentifier = '
                     },
                   })}
             >
-              {entry.icon && <Icon name={entry.icon} className="ctx-menu__icon" />}
+              {entry.icon && <Icon name={entry.icon} className={`${contextMenuClassName}__icon`} />}
               <span>{entry.label}</span>
-              {entry.isChecked && <Icon.Check className="ctx-menu__check" data-uie-name="ctx-menu-check" />}
+              {entry.isChecked && (
+                <Icon.Check
+                  className={`${contextMenuClassName}__check`}
+                  data-uie-name={`${contextMenuClassName}-check`}
+                />
+              )}
             </button>
           </li>
         ),

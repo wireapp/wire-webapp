@@ -32,6 +32,9 @@ type MentionSuggestionListProps = {
   suggestions: User[];
   targetInput?: HTMLTextAreaElement | null;
 };
+
+export const mentionSuggestionsClassName = 'conversation-input-bar-mention-suggestion';
+
 const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps> = ({
   suggestions,
   onSelectionValidated,
@@ -100,7 +103,7 @@ const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps>
 
   return isVisible ? (
     <div
-      className="conversation-input-bar-mention-suggestion"
+      className={mentionSuggestionsClassName}
       style={{bottom, overflowY: 'auto'}}
       data-uie-name="list-mention-suggestions"
       ref={initFadingScrollbar}

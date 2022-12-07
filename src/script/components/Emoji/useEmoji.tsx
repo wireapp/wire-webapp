@@ -83,6 +83,8 @@ export type EmojiListItem = {
   name: string;
 };
 
+export const emojiComponentClassName = 'conversation-input-bar-emoji-list';
+
 const useEmoji = (
   propertiesRepository: PropertiesRepository,
   updateText: (text: string) => void,
@@ -398,7 +400,7 @@ const useEmoji = (
 
   const renderEmojiComponent = () =>
     isVisible ? (
-      <div className="conversation-input-bar-emoji-list" ref={emojiWrapperRef}>
+      <div className={`${emojiComponentClassName}`} ref={emojiWrapperRef}>
         {mappedEmojiList.map((emoji, index) => {
           return (
             <EmojiItem
