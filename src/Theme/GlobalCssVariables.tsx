@@ -59,6 +59,10 @@ const light: () => CSSObject = () => ({
   // Select
   '--select-focused-description': COLOR_V2.WHITE,
 
+  // Range Input
+  '--indicator-range-input-thumb': COLOR_V2.BLUE_LIGHT_700,
+  '--indicator-range-input-track-bg': COLOR_V2.GRAY_60,
+
   // General
   '--danger-color': COLOR_V2.RED_LIGHT_500,
   '--app-bg': COLOR_V2.GRAY_10,
@@ -103,6 +107,10 @@ const dark: () => CSSObject = () => ({
   // Select
   '--select-focused-description': COLOR_V2.GRAY_40,
 
+  // Range Input
+  '--indicator-range-input-thumb': COLOR_V2.BLUE_DARK_300,
+  '--indicator-range-input-track-bg': COLOR_V2.GRAY_70,
+
   // General
   '--danger-color': COLOR_V2.RED_DARK_500,
   '--app-bg': COLOR_V2.GRAY_95,
@@ -115,15 +123,16 @@ const accentColors: () => CSSObject = () => ({
   '--accent-color-highlight-inversed': COLOR_V2.BLUE_LIGHT_800,
   '--accent-color-border': COLOR_V2.BLUE_LIGHT_500,
   '--accent-color-focus': COLOR_V2.BLUE_LIGHT_400,
-  '--icon-primary-active-fill': COLOR_V2.BLUE_LIGHT_500,
-  '--icon-secondary-active-border': 'transparent',
   '--button-primary-hover': COLOR_V2.BLUE_LIGHT_600,
   '--button-primary-active': COLOR_V2.BLUE_LIGHT_700,
   '--button-primary-active-border': COLOR_V2.BLUE_LIGHT_700,
   '--button-primary-focus-border': COLOR_V2.BLUE_LIGHT_700,
-  '--button-secondary-active-bg)': COLOR_V2.BLUE_LIGHT_50,
-  '--button-secondary-active-border)': COLOR_V2.BLUE_LIGHT_500,
-  '--button-secondary-hover-border)': COLOR_V2.BLUE_LIGHT_500,
+  '--button-secondary-active-bg': COLOR_V2.BLUE_LIGHT_50,
+  '--button-secondary-active-border': COLOR_V2.BLUE_LIGHT_500,
+  '--button-secondary-hover-border': COLOR_V2.BLUE_LIGHT_500,
+  '--icon-primary-active-fill': COLOR_V2.BLUE_LIGHT_500,
+  '--icon-secondary-active-border': 'transparent',
+  '--indicator-range-input-thumb': COLOR_V2.BLUE_LIGHT_700,
 });
 
 export const GlobalCssVariables = {
