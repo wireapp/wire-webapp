@@ -396,10 +396,7 @@ const InputBar = ({
   }, [editMessageEntity]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (!hasUserTyped.current) {
-      return;
-    }
-    if (!typingIndicatorMode) {
+    if (!hasUserTyped.current || !typingIndicatorMode) {
       return;
     }
     if (isTyping) {
