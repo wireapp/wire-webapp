@@ -17,16 +17,7 @@
  *
  */
 
-import {
-  ChangeEvent,
-  ClipboardEvent as ReactClipboardEvent,
-  FormEvent,
-  KeyboardEvent as ReactKeyboardEvent,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import {ChangeEvent, FormEvent, KeyboardEvent as ReactKeyboardEvent, useEffect, useMemo, useRef, useState} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
@@ -41,10 +32,6 @@ import {useEmoji} from 'Components/Emoji/useEmoji';
 import {Icon} from 'Components/Icon';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {useDropFiles} from 'src/script/hooks/useDropFiles';
-import {useResizeTarget} from 'src/script/hooks/useResizeTarget';
-import {useScrollSync} from 'src/script/hooks/useScrollSync';
-import {useTextAreaFocus} from 'src/script/hooks/useTextAreaFocus';
 import {ControlButtons} from 'src/script/page/message-list/InputBarControls/ControlButtons';
 import {GiphyButton} from 'src/script/page/message-list/InputBarControls/GiphyButton';
 import {MentionSuggestionList} from 'src/script/page/message-list/MentionSuggestions';
@@ -65,6 +52,11 @@ import {formatLocale, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {formatBytes, getSelectionPosition} from 'Util/util';
 
 import {getRichTextInput} from './getRichTextInput';
+import {useDropFiles} from './hooks/useDropFiles';
+import {useFilePaste} from './hooks/useFilePaste';
+import {useResizeTarget} from './hooks/useResizeTarget';
+import {useScrollSync} from './hooks/useScrollSync';
+import {useTextAreaFocus} from './hooks/useTextAreaFocus';
 import {PastedFileControls} from './PastedFileControls';
 import {ReplyBar} from './ReplyBar';
 import {TYPING_TIMEOUT} from './TypingIndicator';
@@ -257,18 +249,9 @@ const InputBar = ({
 
   const clearPastedFile = () => setPastedFile(null);
 
-  const onDropOrPastedFile = (droppedFiles: File[]) => {
+  const uploadDroppedFiles = (droppedFiles: File[]) => {
     const images: File[] = [];
     const files: File[] = [];
-
-    if (!isFileSharingSendingEnabled) {
-      showWarningModal(
-        t('conversationModalRestrictedFileSharingHeadline'),
-        t('conversationModalRestrictedFileSharingDescription'),
-      );
-
-      return;
-    }
 
     if (!isHittingUploadLimit(droppedFiles, assetRepository)) {
       Array.from(droppedFiles).forEach(file => {
@@ -288,7 +271,7 @@ const InputBar = ({
 
   const sendPastedFile = () => {
     if (pastedFile) {
-      onDropOrPastedFile([pastedFile]);
+      uploadDroppedFiles([pastedFile]);
       clearPastedFile();
     }
   };
@@ -680,34 +663,36 @@ const InputBar = ({
     }
   };
 
-  const onPasteFiles = (event: ClipboardEvent | ReactClipboardEvent): void => {
-    if (event?.clipboardData?.types.includes('text/plain')) {
-      return;
+  /**
+   * higher order function to check if file sharing is enabled.
+   * If not enabled, it will show a warning modal else will return the given callback
+   *
+   * @param callback - function to be called if file sharing is enabled
+   */
+  function checkFileSharingPermission<T extends (...args: any[]) => void>(callback: T): T | (() => void) {
+    if (isFileSharingSendingEnabled) {
+      return callback;
     }
-
-    if (!isFileSharingSendingEnabled) {
+    return () => {
       showWarningModal(
         t('conversationModalRestrictedFileSharingHeadline'),
         t('conversationModalRestrictedFileSharingDescription'),
       );
+    };
+  }
 
-      return;
-    }
+  const handlePasteFiles = (files: FileList): void => {
+    const [pastedFile] = files;
+    const {lastModified} = pastedFile;
 
-    const pastedFiles = event?.clipboardData?.files;
-    if (pastedFiles) {
-      const [pastedFile] = pastedFiles;
-      const {lastModified} = pastedFile;
+    const date = formatLocale(lastModified || new Date(), 'PP, pp');
+    const fileName = t('conversationSendPastedFile', date);
 
-      const date = formatLocale(lastModified || new Date(), 'PP, pp');
-      const fileName = t('conversationSendPastedFile', date);
+    const newFile = new File([pastedFile], fileName, {
+      type: pastedFile.type,
+    });
 
-      const newFile = new File([pastedFile], fileName, {
-        type: pastedFile.type,
-      });
-
-      setPastedFile(newFile);
-    }
+    setPastedFile(newFile);
   };
 
   const loadInitialStateForConversation = async (): Promise<void> => {
@@ -840,12 +825,8 @@ const InputBar = ({
   }, [isEditing]);
 
   // Temporarily functionality for dropping files on conversation container, should be moved to Conversation Component
-  useDropFiles('#conversation', onDropOrPastedFile, [isFileSharingSendingEnabled]);
-
-  useEffect(() => {
-    document.addEventListener('paste', onPasteFiles);
-    return () => document.removeEventListener('paste', onPasteFiles);
-  }, []);
+  useDropFiles('#conversation', checkFileSharingPermission(uploadDroppedFiles));
+  useFilePaste(checkFileSharingPermission(handlePasteFiles));
 
   const sendImageOnEnterClick = (event: KeyboardEvent) => {
     if (event.key === KEY.ENTER && !event.shiftKey && !event.altKey && !event.metaKey) {
