@@ -17,15 +17,20 @@
  *
  */
 
-import {useEffect} from 'react';
+import {useEffect, useState} from 'react';
 
 import {isDragEvent} from '../../../guards/Event';
 
 const onDragOver = (event: Event) => event.preventDefault();
 
-export const useDropFiles = (selector: string, onFileDropped: (files: File[]) => void) => {
+export const useDropFiles = (onFileDropped: (files: File[]) => void) => {
+  const [elementRef, setElementRef] = useState<HTMLElement | null>(null);
+
   useEffect(() => {
-    const container = document.querySelector(selector);
+    if (!elementRef) {
+      return () => undefined;
+    }
+
     const handleDrop = (event: Event) => {
       event.preventDefault();
 
@@ -40,16 +45,14 @@ export const useDropFiles = (selector: string, onFileDropped: (files: File[]) =>
       }
     };
 
-    if (container) {
-      container.addEventListener('drop', handleDrop);
-      container.addEventListener('dragover', onDragOver);
+    elementRef.addEventListener('drop', handleDrop);
+    elementRef.addEventListener('dragover', onDragOver);
 
-      return () => {
-        container.removeEventListener('drop', handleDrop);
-        container.removeEventListener('dragover', onDragOver);
-      };
-    }
+    return () => {
+      elementRef.removeEventListener('drop', handleDrop);
+      elementRef.removeEventListener('dragover', onDragOver);
+    };
+  }, [elementRef, onFileDropped]);
 
-    return () => undefined;
-  }, [onFileDropped, selector]);
+  return {handleFileDrop: setElementRef};
 };
