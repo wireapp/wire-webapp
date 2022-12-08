@@ -399,12 +399,15 @@ const InputBar = ({
     if (!hasUserTyped.current) {
       return;
     }
-    if (isTyping && typingIndicatorMode) {
+    if (!typingIndicatorMode) {
+      return;
+    }
+    if (isTyping) {
       conversationRepository.sendTypingStart(conversationEntity);
     } else {
       conversationRepository.sendTypingStop(conversationEntity);
     }
-  }, [isTyping, conversationRepository, conversationEntity, typingIndicatorMode]);
+  }, [isTyping, typingIndicatorMode]);
 
   useEffect(() => {
     if (!hasUserTyped.current) {
