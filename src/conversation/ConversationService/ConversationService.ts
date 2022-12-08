@@ -199,11 +199,11 @@ export class ConversationService {
     return sendMessage(() => (isMLS(params) ? this.sendMLSMessage(params) : this.proteusService.sendMessage(params)));
   }
 
-  public sendTypingStart(conversationId: string): Promise<void> {
+  public sendTypingStart(conversationId: QualifiedId): Promise<void> {
     return this.apiClient.api.conversation.postTyping(conversationId, {status: CONVERSATION_TYPING.STARTED});
   }
 
-  public sendTypingStop(conversationId: string): Promise<void> {
+  public sendTypingStop(conversationId: QualifiedId): Promise<void> {
     return this.apiClient.api.conversation.postTyping(conversationId, {status: CONVERSATION_TYPING.STOPPED});
   }
 
