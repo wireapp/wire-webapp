@@ -19,23 +19,25 @@
 
 import {HTMLProps, ReactNode} from 'react';
 
-interface IgnoreClickWrapperProps extends HTMLProps<HTMLDivElement> {
+const dataAttribute = 'data-outside-click-ignore';
+
+interface IgnoreOutsideClickWrapperProps extends HTMLProps<HTMLDivElement> {
   children: ReactNode;
 }
-const IgnoreClickWrapper = ({children, ...rest}: IgnoreClickWrapperProps) => {
+const IgnoreOutsideClickWrapper = ({children, ...rest}: IgnoreOutsideClickWrapperProps) => {
   return (
-    <div {...rest} data-ignore-click>
+    <div {...rest} {...{[dataAttribute]: ''}}>
       {children}
     </div>
   );
 };
 
 const handleClickOutsideOfInputBar = (event: Event, callback: () => void): void => {
-  const ignoredParent = (event.target as HTMLElement).closest('div[data-ignore-click]') !== null;
+  const ignoredParent = (event.target as HTMLElement).closest(`div[${dataAttribute}]`) !== null;
 
   if (!ignoredParent) {
     callback();
   }
 };
 
-export {handleClickOutsideOfInputBar, IgnoreClickWrapper};
+export {handleClickOutsideOfInputBar, IgnoreOutsideClickWrapper};

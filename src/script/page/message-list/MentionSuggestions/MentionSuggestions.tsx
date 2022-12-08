@@ -19,7 +19,7 @@
 
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 
-import {IgnoreClickWrapper} from 'Components/InputBar/util/clickHandlers';
+import {IgnoreOutsideClickWrapper} from 'Components/InputBar/util/clickHandlers';
 import {KEY} from 'Util/KeyboardUtil';
 import {clamp} from 'Util/NumberUtil';
 
@@ -101,7 +101,7 @@ const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps>
   }, [isVisible, suggestions, selectedSuggestionIndex]);
 
   return isVisible ? (
-    <IgnoreClickWrapper
+    <IgnoreOutsideClickWrapper
       className="conversation-input-bar-mention-suggestion"
       style={{bottom, overflowY: 'auto'}}
       data-uie-name="list-mention-suggestions"
@@ -121,7 +121,7 @@ const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps>
           ))
           .reverse()}
       </div>
-    </IgnoreClickWrapper>
+    </IgnoreOutsideClickWrapper>
   ) : null;
 };
 

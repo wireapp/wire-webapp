@@ -25,7 +25,7 @@ import {createRoot, Root} from 'react-dom/client';
 import {Availability} from '@wireapp/protocol-messaging';
 
 import {Icon} from 'Components/Icon';
-import {IgnoreClickWrapper} from 'Components/InputBar/util/clickHandlers';
+import {IgnoreOutsideClickWrapper} from 'Components/InputBar/util/clickHandlers';
 import {isEnterKey, isEscapeKey, isKey, isOneOfKeys, isSpaceKey, KEY} from 'Util/KeyboardUtil';
 
 export interface ContextMenuEntry {
@@ -154,7 +154,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
   }, [mainElement, selected]);
 
   return (
-    <IgnoreClickWrapper>
+    <IgnoreOutsideClickWrapper>
       <ul
         className={contextMenuClassName}
         ref={setMainElement}
@@ -207,7 +207,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
           ),
         )}
       </ul>
-    </IgnoreClickWrapper>
+    </IgnoreOutsideClickWrapper>
   );
 };
 

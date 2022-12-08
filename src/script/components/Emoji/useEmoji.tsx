@@ -24,7 +24,7 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {IgnoreClickWrapper} from 'Components/InputBar/util/clickHandlers';
+import {IgnoreOutsideClickWrapper} from 'Components/InputBar/util/clickHandlers';
 import {isEnterKey, isKey, KEY} from 'Util/KeyboardUtil';
 import {updateMentionRanges} from 'Util/MentionUtil';
 import {getCursorPixelPosition} from 'Util/PopupUtil';
@@ -399,7 +399,7 @@ const useEmoji = (
 
   const renderEmojiComponent = () =>
     isVisible ? (
-      <IgnoreClickWrapper>
+      <IgnoreOutsideClickWrapper>
         <div className="conversation-input-bar-emoji-list" ref={emojiWrapperRef}>
           {mappedEmojiList.map((emoji, index) => {
             return (
@@ -417,7 +417,7 @@ const useEmoji = (
             );
           })}
         </div>
-      </IgnoreClickWrapper>
+      </IgnoreOutsideClickWrapper>
     ) : null;
 
   useEffect(() => {
