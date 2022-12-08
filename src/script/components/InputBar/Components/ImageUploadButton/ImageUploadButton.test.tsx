@@ -21,14 +21,7 @@ import {render, fireEvent} from '@testing-library/react';
 
 import {ImageUploadButton} from '.';
 
-jest.mock('../../../Config', () => ({
-  Config: {
-    getConfig: () => ({
-      ALLOWED_IMAGE_TYPES: ['image/gif', 'image/avif'],
-      FEATURE: {ALLOWED_FILE_UPLOAD_EXTENSIONS: ['*']},
-    }),
-  },
-}));
+const ALLOWED_IMAGE_TYPES = ['image/gif', 'image/avif'];
 
 const pngFile = new File(['(⌐□_□)'], 'chucknorris.png', {type: 'image/png'});
 
@@ -36,7 +29,9 @@ describe('ImageUploadButton', () => {
   it('Does call onSelectImages with uploaded image file', () => {
     const onSelectImages = jest.fn();
 
-    const {container} = render(<ImageUploadButton onSelectImages={onSelectImages} />);
+    const {container} = render(
+      <ImageUploadButton onSelectImages={onSelectImages} acceptedImageTypes={ALLOWED_IMAGE_TYPES} />,
+    );
     const fileInput = container.querySelector('input[type="file"]') as HTMLInputElement;
 
     fireEvent.change(fileInput, {
@@ -49,7 +44,9 @@ describe('ImageUploadButton', () => {
   it('Does reset a form with input after upload', () => {
     const onSelectImages = jest.fn();
 
-    const {container} = render(<ImageUploadButton onSelectImages={onSelectImages} />);
+    const {container} = render(
+      <ImageUploadButton onSelectImages={onSelectImages} acceptedImageTypes={ALLOWED_IMAGE_TYPES} />,
+    );
 
     const form = container.querySelector('form');
     jest.spyOn(form!, 'reset');

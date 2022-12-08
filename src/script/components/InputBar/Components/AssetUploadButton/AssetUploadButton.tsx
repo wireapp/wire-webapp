@@ -57,7 +57,7 @@ export const AssetUploadButton = ({onSelectFiles, acceptedFileTypes}: AssetUploa
         <Icon.Attachment />
         <input
           ref={fileRef}
-          accept={acceptedFileTypes?.join(',') ?? '*'}
+          accept={acceptedFileTypes?.join(',')}
           id="conversation-input-bar-files"
           tabIndex={-1}
           onChange={handleFileChange}
