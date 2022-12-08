@@ -576,25 +576,14 @@ const InputBar = ({
     }
   };
 
-  /**
-   * higher order function to check if file sharing is enabled.
-   * If not enabled, it will show a warning modal else will return the given callback
-   *
-   * @param callback - function to be called if file sharing is enabled
-   */
-  function checkFileSharingPermission<T extends (...args: any[]) => void>(callback: T): T | (() => void) {
-    if (isFileSharingSendingEnabled) {
-      return callback;
-    }
-    return () => {
-      showWarningModal(
+  const handlePasteFiles = (files: FileList): void => {
+    if (!isFileSharingSendingEnabled) {
+      return showWarningModal(
         t('conversationModalRestrictedFileSharingHeadline'),
         t('conversationModalRestrictedFileSharingDescription'),
       );
-    };
-  }
+    }
 
-  const handlePasteFiles = (files: FileList): void => {
     const [pastedFile] = files;
     const {lastModified} = pastedFile;
 
@@ -737,7 +726,7 @@ const InputBar = ({
     return () => undefined;
   }, [isEditing]);
 
-  useFilePaste(checkFileSharingPermission(handlePasteFiles));
+  useFilePaste(handlePasteFiles);
 
   const sendImageOnEnterClick = (event: KeyboardEvent) => {
     if (event.key === KEY.ENTER && !event.shiftKey && !event.altKey && !event.metaKey) {

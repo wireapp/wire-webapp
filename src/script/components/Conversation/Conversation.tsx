@@ -133,27 +133,6 @@ export const Conversation: FC<ConversationProps> = ({
     }
   }, [readMessagesBuffer.length]);
 
-  /**
-   * higher order function to check if file sharing is enabled.
-   * If not enabled, it will show a warning modal else will return the given callback
-   *
-   * @param callback - function to be called if file sharing is enabled
-   */
-  const checkFileSharingPermission = useCallback(
-    <T extends (...args: any[]) => void>(callback: T): T | (() => void) => {
-      if (isFileSharingSendingEnabled) {
-        return callback;
-      }
-      return () => {
-        showWarningModal(
-          t('conversationModalRestrictedFileSharingHeadline'),
-          t('conversationModalRestrictedFileSharingDescription'),
-        );
-      };
-    },
-    [isFileSharingSendingEnabled],
-  );
-
   const uploadImages = useCallback(
     (images: File[]) => {
       if (!activeConversation) {
@@ -230,6 +209,13 @@ export const Conversation: FC<ConversationProps> = ({
 
   const uploadDroppedFiles = useCallback(
     (droppedFiles: File[]) => {
+      if (!isFileSharingSendingEnabled) {
+        return showWarningModal(
+          t('conversationModalRestrictedFileSharingHeadline'),
+          t('conversationModalRestrictedFileSharingDescription'),
+        );
+      }
+
       const images: File[] = [];
       const files: File[] = [];
 
@@ -248,10 +234,10 @@ export const Conversation: FC<ConversationProps> = ({
         uploadFiles(files);
       }
     },
-    [repositories.asset, uploadFiles, uploadImages],
+    [isFileSharingSendingEnabled, repositories.asset, uploadFiles, uploadImages],
   );
 
-  const {handleFileDrop} = useDropFiles(checkFileSharingPermission(uploadDroppedFiles));
+  const {ref: handleFileDrop} = useDropFiles(uploadDroppedFiles);
 
   const openGiphy = (text: string) => {
     setInputValue(text);

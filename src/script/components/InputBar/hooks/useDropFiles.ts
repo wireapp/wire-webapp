@@ -54,5 +54,5 @@ export const useDropFiles = (onFileDropped: (files: File[]) => void) => {
     };
   }, [elementRef, onFileDropped]);
 
-  return {handleFileDrop: setElementRef};
+  return {ref: setElementRef};
 };
