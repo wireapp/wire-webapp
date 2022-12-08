@@ -61,7 +61,7 @@ import {TYPING_TIMEOUT} from './components/TypingIndicator';
 import {TypingIndicator} from './components/TypingIndicator/TypingIndicator';
 import {getRichTextInput} from './getRichTextInput';
 import {useFilePaste} from './hooks/useFilePaste';
-import {handleClickOutsideOfInputBar, IgnoreClickWrapper} from './util/clickHandlers';
+import {handleClickOutsideOfInputBar, IgnoreOutsideClickWrapper} from './util/clickHandlers';
 
 import {Config} from '../../Config';
 import {MessageRepository, OutgoingQuote} from '../../conversation/MessageRepository';
@@ -773,7 +773,7 @@ const InputBar = ({
   };
 
   return (
-    <IgnoreClickWrapper
+    <IgnoreOutsideClickWrapper
       id={conversationInputBarClassName}
       className={cx(conversationInputBarClassName, {'is-right-panel-open': isRightSidebarOpen})}
     >
@@ -859,7 +859,7 @@ const InputBar = ({
 
         {pastedFile && <PastedFileControls pastedFile={pastedFile} onClear={clearPastedFile} onSend={sendPastedFile} />}
       </div>
-    </IgnoreClickWrapper>
+    </IgnoreOutsideClickWrapper>
   );
 };
 
