@@ -86,6 +86,9 @@ const getDefaultProps = () => ({
     self: () => new User('id'),
   } as UserState,
   onShiftTab: jest.fn(),
+  uploadDroppedFiles: jest.fn(),
+  uploadImages: jest.fn(),
+  uploadFiles: jest.fn(),
 });
 
 describe('InputBar', () => {
