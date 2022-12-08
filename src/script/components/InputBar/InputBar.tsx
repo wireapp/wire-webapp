@@ -407,7 +407,7 @@ const InputBar = ({
     } else {
       conversationRepository.sendTypingStop(conversationEntity);
     }
-  }, [isTyping, typingIndicatorMode]);
+  }, [isTyping, conversationRepository, conversationEntity, typingIndicatorMode]);
 
   useEffect(() => {
     if (!hasUserTyped.current) {
