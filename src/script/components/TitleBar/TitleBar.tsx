@@ -289,7 +289,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
           </div>
         )}
 
-        {mdBreakpoint ? (
+        {showCallControls && mdBreakpoint ? (
           <>
             <IconButton
               className="icon-search"
