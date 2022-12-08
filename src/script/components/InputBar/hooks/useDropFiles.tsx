@@ -19,40 +19,39 @@
 
 import {useEffect} from 'react';
 
-import {isDragEvent} from '../guards/Event';
+import {isDragEvent} from '../../../guards/Event';
 
 const onDragOver = (event: Event) => event.preventDefault();
 
-const useDropFiles = (selector: string, onDropOrPastedFile: (files: File[]) => void, deps: unknown[] = []) => {
-  const onDropFiles = (event: Event) => {
-    event.preventDefault();
-
-    if (isDragEvent(event)) {
-      const {dataTransfer} = event;
-      const eventDataTransfer: Partial<DataTransfer> = dataTransfer || {};
-      const files = eventDataTransfer.files || new FileList();
-
-      if (files.length > 0) {
-        onDropOrPastedFile([files[0]]);
-      }
-    }
-  };
-
+const useDropFiles = (selector: string, onFileDropped: (files: File[]) => void) => {
   useEffect(() => {
     const container = document.querySelector(selector);
+    const handleDrop = (event: Event) => {
+      event.preventDefault();
+
+      if (isDragEvent(event)) {
+        const {dataTransfer} = event;
+        const eventDataTransfer: Partial<DataTransfer> = dataTransfer || {};
+        const files = eventDataTransfer.files || new FileList();
+
+        if (files.length > 0) {
+          onFileDropped([files[0]]);
+        }
+      }
+    };
 
     if (container) {
-      container.addEventListener('drop', onDropFiles);
+      container.addEventListener('drop', handleDrop);
       container.addEventListener('dragover', onDragOver);
 
       return () => {
-        container.removeEventListener('drop', onDropFiles);
+        container.removeEventListener('drop', handleDrop);
         container.removeEventListener('dragover', onDragOver);
       };
     }
 
     return () => undefined;
-  }, [selector, ...deps]);
+  }, [onFileDropped, selector]);
 };
 
 export {useDropFiles};
