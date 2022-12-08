@@ -22,15 +22,12 @@ import {useRef} from 'react';
 import {Icon} from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
-import {Config} from '../../../Config';
-
 interface ImageUploadButtonProps {
   onSelectImages: (files: File[]) => void;
+  acceptedImageTypes: string[];
 }
 
-export const ImageUploadButton = ({onSelectImages}: ImageUploadButtonProps) => {
-  const acceptedImageTypes = Config.getConfig().ALLOWED_IMAGE_TYPES.join(',');
-
+export const ImageUploadButton = ({onSelectImages, acceptedImageTypes}: ImageUploadButtonProps) => {
   const imageRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -59,7 +56,7 @@ export const ImageUploadButton = ({onSelectImages}: ImageUploadButtonProps) => {
 
         <input
           ref={imageRef}
-          accept={acceptedImageTypes}
+          accept={acceptedImageTypes.join(',')}
           tabIndex={-1}
           id="conversation-input-bar-photo"
           onChange={handleImageFileChange}

@@ -17,9 +17,9 @@
  *
  */
 
-import {overlayedObserver} from 'src/script/ui/overlayedObserver';
+import {overlayedObserver} from './overlayedObserver';
 
-describe.skip('overlayedObserver', () => {
+describe('overlayedObserver', () => {
   beforeEach(() => {
     jest.useFakeTimers();
   });
@@ -38,6 +38,7 @@ describe.skip('overlayedObserver', () => {
       const element = document.createElement('div');
       element.style.height = '10px';
       document.body.appendChild(element);
+      document.elementFromPoint = () => element;
 
       overlayedObserver.onElementVisible(element, callbackSpy.onVisible);
 
@@ -64,6 +65,7 @@ describe.skip('overlayedObserver', () => {
       element.style.width = '10px';
       document.body.appendChild(element);
       document.body.appendChild(overlay);
+      document.elementFromPoint = () => overlay;
 
       overlayedObserver.onElementVisible(element, callbackSpy.onVisible);
 
@@ -91,12 +93,14 @@ describe.skip('overlayedObserver', () => {
       element.style.width = '10px';
       document.body.appendChild(element);
       document.body.appendChild(overlay);
+      document.elementFromPoint = () => overlay;
 
       overlayedObserver.onElementVisible(element, callbackSpy.onVisible);
 
       expect(callbackSpy.onVisible).not.toHaveBeenCalled();
 
       document.body.removeChild(overlay);
+      document.elementFromPoint = () => element;
       jest.advanceTimersByTime(301);
 
       expect(callbackSpy.onVisible).toHaveBeenCalled();

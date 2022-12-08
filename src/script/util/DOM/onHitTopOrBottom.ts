@@ -17,7 +17,11 @@
  *
  */
 
-const onHitTopOrBottom = (scrollingElement: HTMLElement | null, onHitTop: () => void, onHitBottom: () => void) => {
+export const onHitTopOrBottom = (
+  scrollingElement: HTMLElement | null,
+  onHitTop: () => void,
+  onHitBottom: () => void,
+) => {
   const onScroll = (event: Event) => {
     const element = event.target as HTMLElement;
     const scrollPosition = Math.ceil(element.scrollTop);
@@ -55,5 +59,3 @@ const onHitTopOrBottom = (scrollingElement: HTMLElement | null, onHitTop: () => 
     scrollingElement.addEventListener('wheel', onMouseWheel);
   }
 };
-
-export {onHitTopOrBottom};

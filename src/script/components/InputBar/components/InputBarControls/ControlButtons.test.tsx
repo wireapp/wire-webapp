@@ -23,15 +23,6 @@ import {withTheme} from 'src/script/auth/util/test/TestUtil';
 
 import {ControlButtons} from './ControlButtons';
 
-const mockConfig = {
-  ALLOWED_IMAGE_TYPES: ['image/gif', 'image/avif'],
-  FEATURE: {ALLOWED_FILE_UPLOAD_EXTENSIONS: ['*']},
-};
-
-jest.mock('../../../Config', () => ({
-  Config: {getConfig: () => mockConfig},
-}));
-
 type PropsType = React.ComponentProps<typeof ControlButtons>;
 const defaultParams: PropsType = {
   conversation: undefined,

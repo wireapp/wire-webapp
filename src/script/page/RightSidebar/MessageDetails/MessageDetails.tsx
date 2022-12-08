@@ -28,6 +28,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {Icon} from 'Components/Icon';
 import {UserSearchableList} from 'Components/UserSearchableList';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {initFadingScrollbar} from 'Util/DOM/fadingScrollbar';
 import {t} from 'Util/LocalizerUtil';
 import {formatLocale} from 'Util/TimeUtil';
 
@@ -41,7 +42,6 @@ import {SuperType} from '../../../message/SuperType';
 import {SearchRepository} from '../../../search/SearchRepository';
 import {UserReactionMap} from '../../../storage';
 import {TeamRepository} from '../../../team/TeamRepository';
-import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {UserRepository} from '../../../user/UserRepository';
 import {PanelHeader} from '../PanelHeader';
 
