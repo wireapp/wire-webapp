@@ -48,13 +48,13 @@ import {
 import {formatLocale, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {formatBytes, getSelectionPosition} from 'Util/util';
 
-import {ControlButtons} from './Components/InputBarControls/ControlButtons';
-import {GiphyButton} from './Components/InputBarControls/GiphyButton';
-import {MentionSuggestionList} from './Components/MentionSuggestions';
-import {PastedFileControls} from './Components/PastedFileControls';
-import {ReplyBar} from './Components/ReplyBar';
-import {TYPING_TIMEOUT} from './Components/TypingIndicator';
-import {TypingIndicator} from './Components/TypingIndicator/TypingIndicator';
+import {ControlButtons} from './components/InputBarControls/ControlButtons';
+import {GiphyButton} from './components/InputBarControls/GiphyButton';
+import {MentionSuggestionList} from './components/MentionSuggestions';
+import {PastedFileControls} from './components/PastedFileControls';
+import {ReplyBar} from './components/ReplyBar';
+import {TYPING_TIMEOUT} from './components/TypingIndicator';
+import {TypingIndicator} from './components/TypingIndicator/TypingIndicator';
 import {getRichTextInput} from './getRichTextInput';
 import {useDropFiles} from './hooks/useDropFiles';
 import {useFilePaste} from './hooks/useFilePaste';
