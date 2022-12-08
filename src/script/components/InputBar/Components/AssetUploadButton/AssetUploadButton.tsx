@@ -22,15 +22,12 @@ import {useRef} from 'react';
 import {Icon} from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
-import {Config} from '../../../Config';
-
 interface AssetUploadButtonProps {
   onSelectFiles: (files: File[]) => void;
+  acceptedFileTypes?: string[];
 }
 
-export const AssetUploadButton = ({onSelectFiles}: AssetUploadButtonProps) => {
-  const acceptedFileTypes = Config.getConfig().FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS.join(',');
-
+export const AssetUploadButton = ({onSelectFiles, acceptedFileTypes}: AssetUploadButtonProps) => {
   const fileRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -60,7 +57,7 @@ export const AssetUploadButton = ({onSelectFiles}: AssetUploadButtonProps) => {
         <Icon.Attachment />
         <input
           ref={fileRef}
-          accept={acceptedFileTypes ?? null}
+          accept={acceptedFileTypes?.join(',') ?? '*'}
           id="conversation-input-bar-files"
           tabIndex={-1}
           onChange={handleFileChange}

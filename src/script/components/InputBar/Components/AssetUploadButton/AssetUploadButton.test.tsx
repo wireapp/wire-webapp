@@ -19,7 +19,7 @@
 
 import {render, fireEvent} from '@testing-library/react';
 
-import {AssetUploadButton} from './';
+import {AssetUploadButton} from '.';
 
 jest.mock('../../../Config', () => ({
   Config: {

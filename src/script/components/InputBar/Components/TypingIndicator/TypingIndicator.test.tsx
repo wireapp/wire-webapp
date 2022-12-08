@@ -23,7 +23,7 @@ import {act} from 'react-dom/test-utils';
 import {TypingIndicator, TypingIndicatorProps} from './TypingIndicator';
 import {useTypingIndicatorState} from './TypingIndicator.state';
 
-import {User} from '../../../entity/User';
+import {User} from '../../../../entity/User';
 
 describe('TypingIndicator', () => {
   afterEach(() => {

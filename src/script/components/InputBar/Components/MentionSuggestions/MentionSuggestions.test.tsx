@@ -23,7 +23,7 @@ import {createRandomUuid} from 'Util/util';
 
 import {MentionSuggestionList} from './MentionSuggestions';
 
-import {User} from '../../../entity/User';
+import {User} from '../../../../entity/User';
 
 // mocked data
 const first = generateUser('patryktest1', 'patryktest1');
