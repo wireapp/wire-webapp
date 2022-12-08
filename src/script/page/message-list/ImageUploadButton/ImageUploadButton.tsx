@@ -64,6 +64,7 @@ export const ImageUploadButton = ({onSelectImages}: ImageUploadButtonProps) => {
           id="conversation-input-bar-photo"
           onChange={handleImageFileChange}
           type="file"
+          multiple
         />
       </button>
     </form>

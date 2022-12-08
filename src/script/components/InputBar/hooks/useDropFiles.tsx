@@ -23,7 +23,7 @@ import {isDragEvent} from '../../../guards/Event';
 
 const onDragOver = (event: Event) => event.preventDefault();
 
-const useDropFiles = (selector: string, onFileDropped: (files: File[]) => void) => {
+export const useDropFiles = (selector: string, onFileDropped: (files: File[]) => void) => {
   useEffect(() => {
     const container = document.querySelector(selector);
     const handleDrop = (event: Event) => {
@@ -35,7 +35,7 @@ const useDropFiles = (selector: string, onFileDropped: (files: File[]) => void) 
         const files = eventDataTransfer.files || new FileList();
 
         if (files.length > 0) {
-          onFileDropped([files[0]]);
+          onFileDropped(Array.from(files));
         }
       }
     };
@@ -53,5 +53,3 @@ const useDropFiles = (selector: string, onFileDropped: (files: File[]) => void) 
     return () => undefined;
   }, [onFileDropped, selector]);
 };
-
-export {useDropFiles};
