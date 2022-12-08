@@ -33,7 +33,7 @@ const useDropFiles = (selector: string, onDropOrPastedFile: (files: File[]) => v
       const files = eventDataTransfer.files || new FileList();
 
       if (files.length > 0) {
-        onDropOrPastedFile([files[0]]);
+        onDropOrPastedFile(Array.from(files));
       }
     }
   };
