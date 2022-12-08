@@ -35,31 +35,12 @@ function parseColor(color: string) {
   return [+r, +g, +b, +a];
 }
 
-export const FadingScrollbar = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>((props, ref) => {
-  const {ref: fadingScrollbarRef} = useFadingScrollbar();
-  return (
-    <div
-      ref={element => {
-        fadingScrollbarRef(element);
-        if (typeof ref === 'function') {
-          ref(element);
-        } else if (ref) {
-          ref.current = element;
-        }
-      }}
-      {...props}
-    />
-  );
-});
-
-FadingScrollbar.displayName = 'FadingScrollbar';
-
 const useFadingScrollbar = () => {
   const [element, setElement] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
     if (!element) {
-      return;
+      return () => {};
     }
 
     const initialColor = parseColor(window.getComputedStyle(element).getPropertyValue('--scrollbar-color'));
@@ -126,3 +107,22 @@ const useFadingScrollbar = () => {
 
   return {ref: setElement};
 };
+
+export const FadingScrollbar = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>((props, ref) => {
+  const {ref: fadingScrollbarRef} = useFadingScrollbar();
+  return (
+    <div
+      ref={element => {
+        fadingScrollbarRef(element);
+        if (typeof ref === 'function') {
+          ref(element);
+        } else if (ref) {
+          ref.current = element;
+        }
+      }}
+      {...props}
+    />
+  );
+});
+
+FadingScrollbar.displayName = 'FadingScrollbar';
