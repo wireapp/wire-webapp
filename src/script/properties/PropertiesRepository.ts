@@ -37,7 +37,7 @@ import {Config} from '../Config';
 import type {User} from '../entity/User';
 import type {SelfService} from '../self/SelfService';
 import {ConsentValue} from '../user/ConsentValue';
-import {CONVERSATION_TYPING_MODE} from '../user/TypingIndicatorMode';
+import {CONVERSATION_TYPING_INDICATOR_MODE} from '../user/TypingIndicatorMode';
 
 export class PropertiesRepository {
   // Value names are specified by the protocol but key names can be changed.
@@ -53,7 +53,7 @@ export class PropertiesRepository {
         key: 'WIRE_RECEIPT_MODE',
       },
       WIRE_TYPING_MODE: {
-        defaultValue: CONVERSATION_TYPING_MODE.ON,
+        defaultValue: CONVERSATION_TYPING_INDICATOR_MODE.ON,
         key: 'WIRE_TYPING_MODE',
       },
     };
@@ -62,7 +62,7 @@ export class PropertiesRepository {
   private readonly logger: Logger;
   public readonly propertiesService: PropertiesService;
   public readonly receiptMode: ko.Observable<RECEIPT_MODE>;
-  public readonly typingIndicatorMode: ko.Observable<CONVERSATION_TYPING_MODE>;
+  public readonly typingIndicatorMode: ko.Observable<CONVERSATION_TYPING_INDICATOR_MODE>;
   private readonly selfService: SelfService;
   private readonly selfUser: ko.Observable<User>;
   public properties: WebappProperties;
@@ -266,7 +266,7 @@ export class PropertiesRepository {
         this.setProperty(key, RECEIPT_MODE.OFF);
         break;
       case PropertiesRepository.CONFIG.WIRE_TYPING_MODE.key:
-        this.setProperty(key, CONVERSATION_TYPING_MODE.OFF);
+        this.setProperty(key, CONVERSATION_TYPING_INDICATOR_MODE.OFF);
         break;
       case PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.key:
         this.setProperty(key, ConsentValue.NOT_GIVEN);
@@ -305,7 +305,7 @@ export class PropertiesRepository {
         }
         return this.propertiesService.putPropertiesByKey(key, value);
       case PropertiesRepository.CONFIG.WIRE_TYPING_MODE.key:
-        if (value === CONVERSATION_TYPING_MODE.ON) {
+        if (value === CONVERSATION_TYPING_INDICATOR_MODE.ON) {
           return this.propertiesService.deletePropertiesByKey(key);
         }
         return this.propertiesService.putPropertiesByKey(key, value);

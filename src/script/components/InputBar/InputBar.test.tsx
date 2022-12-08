@@ -108,10 +108,10 @@ describe('InputBar', () => {
   it('has passed value', async () => {
     const promise = Promise.resolve();
     const props = getDefaultProps();
-    const {container} = render(withTheme(<InputBar {...props} />));
+    const {getByTestId} = render(withTheme(<InputBar {...props} />));
     await act(() => promise);
 
-    const textArea = await container.querySelector('textarea[data-uie-name="input-message"]');
+    const textArea = getByTestId('input-message');
 
     expect(textArea).not.toBeNull();
     fireEvent.change(textArea!, {target: {value: testMessage}});

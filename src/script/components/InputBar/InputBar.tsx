@@ -49,7 +49,7 @@ import {ControlButtons} from 'src/script/page/message-list/InputBarControls/Cont
 import {GiphyButton} from 'src/script/page/message-list/InputBarControls/GiphyButton';
 import {MentionSuggestionList} from 'src/script/page/message-list/MentionSuggestions';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
-import {CONVERSATION_TYPING_MODE} from 'src/script/user/TypingIndicatorMode';
+import {CONVERSATION_TYPING_INDICATOR_MODE} from 'src/script/user/TypingIndicatorMode';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {loadDraftState, saveDraftState} from 'Util/DraftStateUtil';
 import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/FileTypeUtil';
@@ -165,7 +165,7 @@ const InputBar = ({
   ]);
 
   const {typingIndicatorMode} = useKoSubscribableChildren(propertiesRepository, ['typingIndicatorMode']);
-  const isTypingIndicatorEnabled = typingIndicatorMode === CONVERSATION_TYPING_MODE.ON;
+  const isTypingIndicatorEnabled = typingIndicatorMode === CONVERSATION_TYPING_INDICATOR_MODE.ON;
   const shadowInputRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -406,7 +406,7 @@ const InputBar = ({
     } else {
       conversationRepository.sendTypingStop(conversationEntity);
     }
-  }, [isTyping, conversationRepository, conversationEntity, typingIndicatorMode]);
+  }, [isTyping, conversationRepository, conversationEntity, isTypingIndicatorEnabled]);
 
   useEffect(() => {
     if (!hasUserTyped.current) {

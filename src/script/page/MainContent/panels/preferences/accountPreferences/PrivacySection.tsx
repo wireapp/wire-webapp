@@ -31,7 +31,7 @@ import {formatDurationCaption} from 'Util/TimeUtil';
 import {PropertiesRepository} from '../../../../../properties/PropertiesRepository';
 import {AppLockRepository} from '../../../../../user/AppLockRepository';
 import {AppLockState} from '../../../../../user/AppLockState';
-import {CONVERSATION_TYPING_MODE} from '../../../../../user/TypingIndicatorMode';
+import {CONVERSATION_TYPING_INDICATOR_MODE} from '../../../../../user/TypingIndicatorMode';
 import {PreferencesSection} from '../components/PreferencesSection';
 
 interface PrivacySectionProps {
@@ -60,7 +60,7 @@ const PrivacySection: React.FC<PrivacySectionProps> = ({
     const isChecked = event.target.checked;
     propertiesRepository.updateProperty(
       PropertiesRepository.CONFIG.WIRE_TYPING_MODE.key,
-      isChecked ? CONVERSATION_TYPING_MODE.ON : CONVERSATION_TYPING_MODE.OFF,
+      isChecked ? CONVERSATION_TYPING_INDICATOR_MODE.ON : CONVERSATION_TYPING_INDICATOR_MODE.OFF,
     );
   };
   return (
@@ -86,7 +86,7 @@ const PrivacySection: React.FC<PrivacySectionProps> = ({
       <div className="checkbox-margin">
         <Checkbox
           onChange={handleTypingModeChange}
-          checked={typingIndicatorMode === CONVERSATION_TYPING_MODE.ON}
+          checked={typingIndicatorMode === CONVERSATION_TYPING_INDICATOR_MODE.ON}
           data-uie-name="status-preference-typing-indicator"
         >
           <CheckboxLabel htmlFor="status-preference-typing-indicator">

@@ -17,7 +17,7 @@
  *
  */
 
-export enum CONVERSATION_TYPING_MODE {
+export enum CONVERSATION_TYPING_INDICATOR_MODE {
   OFF = 0,
   ON = 1,
 }
