@@ -65,6 +65,7 @@ export const AssetUploadButton = ({onSelectFiles}: AssetUploadButtonProps) => {
           tabIndex={-1}
           onChange={handleFileChange}
           type="file"
+          multiple
         />
       </button>
     </form>
