@@ -19,8 +19,8 @@
 
 import {useState, FC} from 'react';
 
+import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {initFadingScrollbar} from 'Util/DOM/fadingScrollbar';
 import {t} from 'Util/LocalizerUtil';
 
 import {NOTIFICATION_STATE, getNotificationText} from '../../../conversation/NotificationSetting';
@@ -60,7 +60,7 @@ const Notifications: FC<NotificationsProps> = ({activeConversation, onGoBack, on
         closeBtnTitle={t('accessibility.closeNotificationsLabel')}
       />
 
-      <div className="panel__content" ref={initFadingScrollbar}>
+      <FadingScrollbar className="panel__content">
         <fieldset className="notification-section">
           <PreferencesRadio
             name="preferences-options-notifications"
@@ -73,7 +73,7 @@ const Notifications: FC<NotificationsProps> = ({activeConversation, onGoBack, on
         <p className="panel__info-text notification-settings__disclaimer" tabIndex={0}>
           {t('notificationSettingsDisclaimer')}
         </p>
-      </div>
+      </FadingScrollbar>
     </div>
   );
 };

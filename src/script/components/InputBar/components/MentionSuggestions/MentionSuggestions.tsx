@@ -19,7 +19,7 @@
 
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 
-import {initFadingScrollbar} from 'Util/DOM/fadingScrollbar';
+import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {KEY} from 'Util/KeyboardUtil';
 import {clamp} from 'Util/NumberUtil';
 
@@ -99,11 +99,10 @@ const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps>
   }, [isVisible, suggestions, selectedSuggestionIndex]);
 
   return isVisible ? (
-    <div
+    <FadingScrollbar
       className="conversation-input-bar-mention-suggestion"
       style={{bottom, overflowY: 'auto'}}
       data-uie-name="list-mention-suggestions"
-      ref={initFadingScrollbar}
     >
       <div className="mention-suggestion-list">
         {suggestions
@@ -119,7 +118,7 @@ const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps>
           ))
           .reverse()}
       </div>
-    </div>
+    </FadingScrollbar>
   ) : null;
 };
 
