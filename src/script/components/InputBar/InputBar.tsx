@@ -934,7 +934,6 @@ const InputBar = ({
                     onClick={handleMentionFlow}
                     onInput={updateMentions}
                     onChange={onChange}
-                    onPaste={onPasteFiles}
                     onBlur={() => setIsTyping(false)}
                     value={inputValue}
                     placeholder={inputPlaceholder}
