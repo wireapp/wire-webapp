@@ -1000,6 +1000,8 @@
   "preferencesAccountPrivacy": "Privacy",
   "preferencesAccountReadReceiptsCheckbox": "Read receipts",
   "preferencesAccountReadReceiptsDetail": "When this is off, you won’t be able to see read receipts from other people. This setting does not apply to group conversations.",
+  "preferencesAccountTypingIndicatorCheckbox": "Typing Indicator",
+  "preferencesAccountTypingIndicatorsDetail": "When this is off, you won’t be able to see when other people are typing, and others won’t see when you are typing. This setting applies to all conversations on this device.",
   "preferencesAccountResetAppLockPassphrase": "Reset app lock passcode",
   "preferencesAccountResetPassword": "Reset password",
   "preferencesAccountSetAppLockPassphrase": "Set app lock passcode",
