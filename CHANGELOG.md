@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [22.10.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@22.9.0...@wireapp/api-client@22.10.0) (2022-12-08)
+
+### Features
+
+* **api-client, core:** api v3 support for typing endpoint [FS-1311] ([#4696](https://github.com/wireapp/wire-web-packages/issues/4696)) ([780a2bf](https://github.com/wireapp/wire-web-packages/commit/780a2bfe5535ea3f4c55e8ca0bf0904569f65405))
+
 # [22.9.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@22.8.0...@wireapp/api-client@22.9.0) (2022-12-07)
 
 ### Features
