@@ -213,15 +213,15 @@ export class PropertiesRepository {
   }
 
   private fetchTypingIndicatorSetting(): Promise<void> {
-    const property = PropertiesRepository.CONFIG.WIRE_TYPING_MODE;
+    const {key: propertyKey, defaultValue} = PropertiesRepository.CONFIG.WIRE_TYPING_MODE;
 
     return this.propertiesService
-      .getPropertiesByKey(property.key)
+      .getPropertiesByKey(propertyKey)
       .then(value => {
-        this.setProperty(property.key, value);
+        this.setProperty(propertyKey, value);
       })
       .catch(() => {
-        const message = `Property "${property.key}" doesn't exist for this account. Continuing with the default value of "${property.defaultValue}".`;
+        const message = `Property "${propertyKey}" doesn't exist for this account. Continuing with the default value of "${defaultValue}".`;
         this.logger.warn(message);
       });
   }

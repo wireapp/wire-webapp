@@ -123,8 +123,8 @@ describe('InputBar', () => {
 
   it('typing request is sent if the typing indicator mode is enabled and user is typing', async () => {
     const props = getDefaultProps();
-    const {container} = render(withTheme(<InputBar {...props} />));
-    const textArea = container.querySelector('textarea[data-uie-name="input-message"]');
+    const {getByTestId} = render(withTheme(<InputBar {...props} />));
+    const textArea = getByTestId('input-message');
 
     expect(textArea).not.toBeNull();
     fireEvent.change(textArea!, {target: {value: testMessage}});
@@ -142,8 +142,8 @@ describe('InputBar', () => {
 
   it('typing request is not sent when user is typing but the typing indicator mode is disabled', async () => {
     const props = getDefaultProps();
-    const {container} = render(withTheme(<InputBar {...props} />));
-    const textArea = container.querySelector('textarea[data-uie-name="input-message"]');
+    const {getByTestId} = render(withTheme(<InputBar {...props} />));
+    const textArea = getByTestId('input-message');
     const property = PropertiesRepository.CONFIG.WIRE_TYPING_MODE;
     const defaultValue = property.defaultValue;
 

@@ -49,6 +49,7 @@ import {ControlButtons} from 'src/script/page/message-list/InputBarControls/Cont
 import {GiphyButton} from 'src/script/page/message-list/InputBarControls/GiphyButton';
 import {MentionSuggestionList} from 'src/script/page/message-list/MentionSuggestions';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
+import {CONVERSATION_TYPING_MODE} from 'src/script/user/TypingIndicatorMode';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {loadDraftState, saveDraftState} from 'Util/DraftStateUtil';
 import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/FileTypeUtil';
@@ -164,6 +165,7 @@ const InputBar = ({
   ]);
 
   const {typingIndicatorMode} = useKoSubscribableChildren(propertiesRepository, ['typingIndicatorMode']);
+  const isTypingIndicatorEnabled = typingIndicatorMode === CONVERSATION_TYPING_MODE.ON;
   const shadowInputRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -396,7 +398,7 @@ const InputBar = ({
   }, [editMessageEntity]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (!hasUserTyped.current || !typingIndicatorMode) {
+    if (!hasUserTyped.current || !isTypingIndicatorEnabled) {
       return;
     }
     if (isTyping) {
@@ -902,7 +904,7 @@ const InputBar = ({
       id="conversation-input-bar"
       className={cx('conversation-input-bar', {'is-right-panel-open': isRightSidebarOpen})}
     >
-      {!!typingIndicatorMode && <TypingIndicator conversationId={conversationEntity.id} />}
+      {!!isTypingIndicatorEnabled && <TypingIndicator conversationId={conversationEntity.id} />}
 
       {classifiedDomains && !isConnectionRequest && (
         <ClassifiedBar users={participatingUserEts} classifiedDomains={classifiedDomains} />
