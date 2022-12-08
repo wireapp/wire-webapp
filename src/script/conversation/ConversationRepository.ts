@@ -1717,27 +1717,11 @@ export class ConversationRepository {
   }
 
   public async sendTypingStart(conversationEntity: Conversation) {
-    /*
-      Currently typing endpoint is not implemented on backend for federated environments
-      @todo: remove this condition when backend is ready and api-client in packages is updated to support domain in typing endpoint
-    */
-    const isFederated = this.core.backendFeatures?.isFederated;
-    if (isFederated) {
-      return;
-    }
-    this.core.service!.conversation.sendTypingStart(conversationEntity.id);
+    this.core.service!.conversation.sendTypingStart(conversationEntity.qualifiedId);
   }
 
   public async sendTypingStop(conversationEntity: Conversation) {
-    /*
-      Currently typing endpoint is not implemented on backend for federated environments
-      @todo: remove this condition when backend is ready and api-client in packages is updated to support domain in typing endpoint
-    */
-    const isFederated = this.core.backendFeatures?.isFederated;
-    if (isFederated) {
-      return;
-    }
-    this.core.service!.conversation.sendTypingStop(conversationEntity.id);
+    this.core.service!.conversation.sendTypingStop(conversationEntity.qualifiedId);
   }
 
   private async toggleArchiveConversation(
