@@ -207,15 +207,29 @@ export const Conversation: FC<ConversationProps> = ({
     [activeConversation, conversationRepository, inTeam, repositories.asset, repositories.message, selfUser],
   );
 
-  const uploadDroppedFiles = useCallback(
-    (droppedFiles: File[]) => {
-      if (!isFileSharingSendingEnabled) {
-        return showWarningModal(
+  /**
+   * higher order function to check if file sharing is enabled.
+   * If not enabled, it will show a warning modal else will return the given callback
+   *
+   * @param callback - function to be called if file sharing is enabled
+   */
+  const checkFileSharingPermission = useCallback(
+    <T extends (...args: any[]) => void>(callback: T): T | (() => void) => {
+      if (isFileSharingSendingEnabled) {
+        return callback;
+      }
+      return () => {
+        showWarningModal(
           t('conversationModalRestrictedFileSharingHeadline'),
           t('conversationModalRestrictedFileSharingDescription'),
         );
-      }
+      };
+    },
+    [isFileSharingSendingEnabled],
+  );
 
+  const uploadDroppedFiles = useCallback(
+    (droppedFiles: File[]) => {
       const images: File[] = [];
       const files: File[] = [];
 
@@ -234,10 +248,10 @@ export const Conversation: FC<ConversationProps> = ({
         uploadFiles(files);
       }
     },
-    [isFileSharingSendingEnabled, repositories.asset, uploadFiles, uploadImages],
+    [repositories.asset, uploadFiles, uploadImages],
   );
 
-  const {ref: handleFileDrop} = useDropFiles(uploadDroppedFiles);
+  const {ref: handleFileDrop} = useDropFiles(checkFileSharingPermission(uploadDroppedFiles));
 
   const openGiphy = (text: string) => {
     setInputValue(text);
@@ -575,6 +589,7 @@ export const Conversation: FC<ConversationProps> = ({
             teamState={teamState}
             userState={userState}
             onShiftTab={() => setMsgElementsFocusable(false)}
+            checkFileSharingPermission={checkFileSharingPermission}
             uploadDroppedFiles={uploadDroppedFiles}
             uploadImages={uploadImages}
             uploadFiles={uploadFiles}

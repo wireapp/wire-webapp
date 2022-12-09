@@ -95,6 +95,7 @@ interface InputBarProps {
   readonly teamState: TeamState;
   readonly userState: UserState;
   onShiftTab: () => void;
+  checkFileSharingPermission: <T extends (...args: any[]) => void>(callback: T) => T | (() => void);
   uploadDroppedFiles: (droppedFiles: File[]) => void;
   uploadImages: (images: File[]) => void;
   uploadFiles: (files: File[]) => void;
@@ -112,6 +113,7 @@ const InputBar = ({
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
   onShiftTab,
+  checkFileSharingPermission,
   uploadDroppedFiles,
   uploadImages,
   uploadFiles,
@@ -580,13 +582,6 @@ const InputBar = ({
   };
 
   const handlePasteFiles = (files: FileList): void => {
-    if (!isFileSharingSendingEnabled) {
-      return showWarningModal(
-        t('conversationModalRestrictedFileSharingHeadline'),
-        t('conversationModalRestrictedFileSharingDescription'),
-      );
-    }
-
     const [pastedFile] = files;
     const {lastModified} = pastedFile;
 
@@ -729,7 +724,7 @@ const InputBar = ({
     return () => undefined;
   }, [isEditing]);
 
-  useFilePaste(handlePasteFiles);
+  useFilePaste(checkFileSharingPermission(handlePasteFiles));
 
   const sendImageOnEnterClick = (event: KeyboardEvent) => {
     if (event.key === KEY.ENTER && !event.shiftKey && !event.altKey && !event.metaKey) {
