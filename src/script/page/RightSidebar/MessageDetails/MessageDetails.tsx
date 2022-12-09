@@ -25,10 +25,10 @@ import cx from 'classnames';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
 import {UserSearchableList} from 'Components/UserSearchableList';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {initFadingScrollbar} from 'Util/DOM/fadingScrollbar';
 import {t} from 'Util/LocalizerUtil';
 import {formatLocale} from 'Util/TimeUtil';
 
@@ -217,7 +217,7 @@ const MessageDetails: FC<MessageDetailsProps> = ({
         </div>
       )}
 
-      <div className="panel__content" ref={initFadingScrollbar} style={{flexGrow: 1}}>
+      <FadingScrollbar className="panel__content" style={{flexGrow: 1}}>
         {messageState === MESSAGE_STATES.RECEIPTS && (
           <UserSearchableList
             dataUieName="read-list"
@@ -261,7 +261,7 @@ const MessageDetails: FC<MessageDetailsProps> = ({
             <div className="message-details__empty__text">{t('messageDetailsReceiptsOff')}</div>
           </div>
         )}
-      </div>
+      </FadingScrollbar>
 
       <div className="panel__footer">
         <div className="panel__footer__info" data-uie-name="status-message-details-sent">

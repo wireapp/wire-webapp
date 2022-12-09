@@ -24,13 +24,13 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
 import {EnrichedFields} from 'Components/panel/EnrichedFields';
 import {UserActions, Actions} from 'Components/panel/UserActions';
 import {UserDetails} from 'Components/panel/UserDetails';
 import {BaseToggle} from 'Components/toggle/BaseToggle';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {initFadingScrollbar} from 'Util/DOM/fadingScrollbar';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -145,7 +145,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
         onClose={onClose}
       />
 
-      <div className="panel__content" ref={initFadingScrollbar}>
+      <FadingScrollbar className="panel__content">
         <UserDetails
           participant={currentUser}
           badge={teamRepository.getRoleBadge(currentUser.id)}
@@ -218,7 +218,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
           conversationRoleRepository={conversationRoleRepository}
           selfUser={selfUser}
         />
-      </div>
+      </FadingScrollbar>
     </div>
   );
 };

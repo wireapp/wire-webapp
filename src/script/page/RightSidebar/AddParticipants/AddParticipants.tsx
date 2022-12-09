@@ -23,12 +23,12 @@ import cx from 'classnames';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
+import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
 import {SearchInput} from 'Components/SearchInput';
 import {ServiceList} from 'Components/ServiceList';
 import {UserSearchableList} from 'Components/UserSearchableList';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {initFadingScrollbar} from 'Util/DOM/fadingScrollbar';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
@@ -228,7 +228,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
           </div>
         )}
 
-        <div className="add-participants__list panel__content" ref={initFadingScrollbar}>
+        <FadingScrollbar className="add-participants__list panel__content">
           {isAddPeopleState && (
             <UserSearchableList
               users={contacts}
@@ -307,7 +307,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
               )}
             </>
           )}
-        </div>
+        </FadingScrollbar>
 
         {isAddPeopleState && (
           <div className="add-participants__footer">

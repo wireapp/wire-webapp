@@ -19,8 +19,8 @@
 
 import {FC} from 'react';
 
+import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {UserDevices, UserDevicesState, useUserDevicesHistory} from 'Components/UserDevices';
-import {initFadingScrollbar} from 'Util/DOM/fadingScrollbar';
 import {t} from 'Util/LocalizerUtil';
 
 import type {User} from '../../../entity/User';
@@ -53,7 +53,7 @@ const ParticipantDevices: FC<ParticipantDevicesProps> = ({repositories, onClose,
         goBackUie="go-back-participant-devices"
       />
 
-      <div className="panel__content" ref={initFadingScrollbar}>
+      <FadingScrollbar className="panel__content">
         <UserDevices
           clientRepository={repositories.client}
           cryptographyRepository={repositories.cryptography}
@@ -62,7 +62,7 @@ const ParticipantDevices: FC<ParticipantDevicesProps> = ({repositories, onClose,
           goTo={history.goTo}
           user={user}
         />
-      </div>
+      </FadingScrollbar>
     </div>
   );
 };

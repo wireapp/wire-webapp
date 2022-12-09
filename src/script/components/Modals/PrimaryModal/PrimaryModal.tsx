@@ -21,9 +21,9 @@ import {FC, FormEvent, MouseEvent, useState, useRef, ChangeEvent} from 'react';
 
 import cx from 'classnames';
 
+import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
 import {ModalComponent} from 'Components/ModalComponent';
-import {initFadingScrollbar} from 'Util/DOM/fadingScrollbar';
 
 import {usePrimaryModalState, showNextModalInQueue, defaultContent, removeCurrentModal} from './PrimaryModalState';
 import {Action, PrimaryModalType} from './PrimaryModalTypes';
@@ -133,7 +133,7 @@ export const PrimaryModalComponent: FC = () => {
                 <Icon.Close className="modal__header__icon" aria-hidden="true" />
               </button>
             </div>
-            <div className="modal__body" ref={initFadingScrollbar}>
+            <FadingScrollbar className="modal__body">
               {(messageHtml || messageText) && (
                 <div className="modal__text" data-uie-name="status-modal-text">
                   {messageHtml && <div id="modal-description-html" dangerouslySetInnerHTML={{__html: messageHtml}} />}
@@ -211,7 +211,7 @@ export const PrimaryModalComponent: FC = () => {
                   </button>
                 )}
               </div>
-            </div>
+            </FadingScrollbar>
           </>
         )}
       </ModalComponent>
