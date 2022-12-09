@@ -28,6 +28,7 @@ import {useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {checkFileSharingPermission} from 'Components/Conversation/utils/checkFileSharingPermission';
 import {useEmoji} from 'Components/Emoji/useEmoji';
 import {Icon} from 'Components/Icon';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';
@@ -95,7 +96,6 @@ interface InputBarProps {
   readonly teamState: TeamState;
   readonly userState: UserState;
   onShiftTab: () => void;
-  checkFileSharingPermission: <T extends (...args: any[]) => void>(callback: T) => T | (() => void);
   uploadDroppedFiles: (droppedFiles: File[]) => void;
   uploadImages: (images: File[]) => void;
   uploadFiles: (files: File[]) => void;
@@ -113,7 +113,6 @@ const InputBar = ({
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
   onShiftTab,
-  checkFileSharingPermission,
   uploadDroppedFiles,
   uploadImages,
   uploadFiles,

@@ -44,6 +44,8 @@ import {getLogger} from 'Util/Logger';
 import {safeMailOpen, safeWindowOpen} from 'Util/SanitizationUtil';
 import {formatBytes, incomingCssClass, removeAnimationsClass} from 'Util/util';
 
+import {checkFileSharingPermission} from './utils/checkFileSharingPermission';
+
 import {ConversationState} from '../../conversation/ConversationState';
 import {Conversation as ConversationEntity} from '../../entity/Conversation';
 import {ContentMessage} from '../../entity/message/ContentMessage';
@@ -98,7 +100,7 @@ export const Conversation: FC<ConversationProps> = ({
   const conversationState = container.resolve(ConversationState);
   const callState = container.resolve(CallState);
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
-  const {classifiedDomains, isFileSharingSendingEnabled} = useKoSubscribableChildren(teamState, [
+  const {classifiedDomains} = useKoSubscribableChildren(teamState, [
     'classifiedDomains',
     'isFileSharingSendingEnabled',
   ]);
@@ -205,27 +207,6 @@ export const Conversation: FC<ConversationProps> = ({
       }
     },
     [activeConversation, conversationRepository, inTeam, repositories.asset, repositories.message, selfUser],
-  );
-
-  /**
-   * higher order function to check if file sharing is enabled.
-   * If not enabled, it will show a warning modal else will return the given callback
-   *
-   * @param callback - function to be called if file sharing is enabled
-   */
-  const checkFileSharingPermission = useCallback(
-    <T extends (...args: any[]) => void>(callback: T): T | (() => void) => {
-      if (isFileSharingSendingEnabled) {
-        return callback;
-      }
-      return () => {
-        showWarningModal(
-          t('conversationModalRestrictedFileSharingHeadline'),
-          t('conversationModalRestrictedFileSharingDescription'),
-        );
-      };
-    },
-    [isFileSharingSendingEnabled],
   );
 
   const uploadDroppedFiles = useCallback(
@@ -589,7 +570,6 @@ export const Conversation: FC<ConversationProps> = ({
             teamState={teamState}
             userState={userState}
             onShiftTab={() => setMsgElementsFocusable(false)}
-            checkFileSharingPermission={checkFileSharingPermission}
             uploadDroppedFiles={uploadDroppedFiles}
             uploadImages={uploadImages}
             uploadFiles={uploadFiles}

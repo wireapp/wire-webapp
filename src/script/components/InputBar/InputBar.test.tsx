@@ -93,7 +93,6 @@ describe('InputBar', () => {
     uploadDroppedFiles: jest.fn(),
     uploadImages: jest.fn(),
     uploadFiles: jest.fn(),
-    checkFileSharingPermission: jest.fn(() => jest.fn()),
   });
 
   beforeEach(() => {
