@@ -17,21 +17,21 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useEffect, useRef} from 'react';
 
 const useTimeout = (onTimeoutStop: () => void, duration: number) => {
-  const [timerId, setTimerId] = useState(null);
+  const timerRef = useRef<number | null>(null);
 
   const removeTimeout = () => {
-    if (timerId) {
-      window.clearTimeout(timerId);
-      setTimerId(null);
+    if (timerRef.current) {
+      window.clearTimeout(timerRef.current);
+      timerRef.current = null;
     }
   };
 
   const start = () => {
     removeTimeout();
-    setTimerId(window.setTimeout(onStop, duration));
+    timerRef.current = window.setTimeout(onStop, duration);
   };
 
   const onStop = () => {
