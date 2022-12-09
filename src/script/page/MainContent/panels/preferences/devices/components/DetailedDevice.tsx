@@ -39,7 +39,9 @@ const DetailedDevice: React.FC<DeviceProps> = ({device, fingerprint}) => {
       </h3>
 
       <p className="preferences-devices-id">
-        <span>{t('preferencesDevicesId')}</span>
+        <span>
+          <strong>{t('preferencesDevicesId')}</strong>
+        </span>
 
         <span data-uie-name="preferences-device-current-id">
           <FormattedId idSlices={splitFingerprint(device.id)} />

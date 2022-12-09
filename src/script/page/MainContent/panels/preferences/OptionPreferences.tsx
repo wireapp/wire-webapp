@@ -229,7 +229,7 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
                 </CheckboxLabel>
               </Checkbox>
 
-              <div
+              <p
                 className="preferences-detail preferences-detail-intended"
                 aria-hidden="true"
                 dangerouslySetInnerHTML={{
@@ -256,9 +256,9 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
                 </CheckboxLabel>
               </Checkbox>
 
-              <div className="preferences-detail preferences-detail-intended">
+              <p className="preferences-detail preferences-detail-intended">
                 {t('preferencesOptionsPreviewsSendDetail')}
-              </div>
+              </p>
             </div>
           </>
         )}
