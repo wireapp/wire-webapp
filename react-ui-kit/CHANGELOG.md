@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.2.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.2.2...@wireapp/react-ui-kit@9.2.3) (2022-12-09)
+
+### Bug Fixes
+
+* improve useTimeout hook with ref ([#4697](https://github.com/wireapp/wire-web-packages/issues/4697)) ([0784341](https://github.com/wireapp/wire-web-packages/commit/07843417b3c0a3fe4fbd8dea91384124df44f774))
+
 ## [9.2.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.2.1...@wireapp/react-ui-kit@9.2.2) (2022-12-07)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
