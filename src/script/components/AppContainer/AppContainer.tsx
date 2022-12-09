@@ -23,6 +23,7 @@ import {ClientType} from '@wireapp/api-client/lib/client/';
 import {container} from 'tsyringe';
 
 import {Configuration} from '../../Config';
+import {setAppLocale} from '../../localization/Localizer';
 import {App} from '../../main/app';
 import {AppMain} from '../../page/AppMain';
 import {APIClient} from '../../service/APIClientSingleton';
@@ -36,6 +37,7 @@ interface AppProps {
 }
 
 export const AppContainer: FC<AppProps> = ({config, clientType}) => {
+  setAppLocale();
   const app = new App(container.resolve(Core), container.resolve(APIClient), config);
   // Publishing application on the global scope for debug and testing purposes.
   window.wire.app = app;

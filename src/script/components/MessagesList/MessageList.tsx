@@ -31,15 +31,15 @@ import {User} from 'src/script/entity/User';
 import {useRoveFocus} from 'src/script/hooks/useRoveFocus';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {initFadingScrollbar} from 'Util/DOM/fadingScrollbar';
+import {onHitTopOrBottom} from 'Util/DOM/onHitTopOrBottom';
+import {useResizeObserver} from 'Util/DOM/resizeObserver';
 
 import {Message, MessageActions} from './Message';
 
 import {Conversation as ConversationEntity, Conversation} from '../../entity/Conversation';
 import {isMemberMessage, isContentMessage} from '../../guards/Message';
 import {StatusType} from '../../message/StatusType';
-import {initFadingScrollbar} from '../../ui/fadingScrollbar';
-import {onHitTopOrBottom} from '../../ui/onHitTopOrBottom';
-import {useResizeObserver} from '../../ui/resizeObserver';
 
 type FocusedElement = {center?: boolean; element: Element};
 

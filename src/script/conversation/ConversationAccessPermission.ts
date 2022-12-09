@@ -17,7 +17,7 @@
  *
  */
 
-import {ACCESS_ROLE_V2, CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conversation/';
+import {CONVERSATION_ACCESS_ROLE, CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conversation/';
 
 import {ACCESS_STATE, TEAM} from './AccessState';
 
@@ -79,7 +79,7 @@ export function featureFromStateChange(prevState: ACCESS_STATE, current: ACCESS_
   const [featureName, featureBitmask] = Object.entries(ACCESS).find(
     ([, bitmask]) => bitmask & (teamPermissionsForAccessState(prevState) ^ teamPermissionsForAccessState(current)),
   );
-  const featString = ACCESS_ROLE_V2[featureName as keyof typeof ACCESS_ROLE_V2];
+  const featString = CONVERSATION_ACCESS_ROLE[featureName as keyof typeof CONVERSATION_ACCESS_ROLE];
   return {
     feature: featString,
     featureName: (featString?.[0].toUpperCase() + featString?.slice(1)) as 'Guest' | 'Service',
@@ -118,7 +118,7 @@ export function toggleFeature(feature: number, state: ACCESS_STATE): TEAM {
 
 export interface UpdatedAccessRights {
   accessModes: CONVERSATION_ACCESS[];
-  accessRole: ACCESS_ROLE_V2[];
+  accessRole: CONVERSATION_ACCESS_ROLE[];
 }
 
 /**
@@ -138,7 +138,7 @@ export function updateAccessRights(accessState: ACCESS_STATE): UpdatedAccessRigh
     //find the name of the feature with the correct sigfigs
     .map((bit: '1' | '0', i) => Object.entries(ACCESS).find(([, bitmask]) => bitmask === +bit << i)?.[0])
     .forEach(feature => {
-      const accessRole = ACCESS_ROLE_V2[feature as keyof typeof ACCESS_ROLE_V2];
+      const accessRole = CONVERSATION_ACCESS_ROLE[feature as keyof typeof CONVERSATION_ACCESS_ROLE];
       const accessModes = CONVERSATION_ACCESS[feature as keyof typeof CONVERSATION_ACCESS];
       if (accessRole) {
         newAccessRights.accessRole.push(accessRole);

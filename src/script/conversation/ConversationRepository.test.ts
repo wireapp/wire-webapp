@@ -19,7 +19,11 @@
 
 import {ClientClassification} from '@wireapp/api-client/lib/client/';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
-import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE, CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
+import {
+  CONVERSATION_ACCESS,
+  CONVERSATION_LEGACY_ACCESS_ROLE,
+  CONVERSATION_TYPE,
+} from '@wireapp/api-client/lib/conversation/';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
 import {ConversationCreateEvent, ConversationMemberJoinEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
@@ -532,7 +536,7 @@ describe('ConversationRepository', () => {
         (server as any).respondWith('GET', matchConversations, (xhr: any, conversationId: string) => {
           const conversation = {
             access: [CONVERSATION_ACCESS.PRIVATE],
-            accessRole: CONVERSATION_ACCESS_ROLE.ACTIVATED,
+            accessRole: CONVERSATION_LEGACY_ACCESS_ROLE.ACTIVATED,
             creator: '6761450e-1bd6-4027-a338-1191fe5e349f',
             id: conversationId,
             members: {
@@ -636,7 +640,7 @@ describe('ConversationRepository', () => {
           conversation: conversationId,
           data: {
             access: [CONVERSATION_ACCESS.INVITE],
-            access_role: CONVERSATION_ACCESS_ROLE.ACTIVATED,
+            access_role: CONVERSATION_LEGACY_ACCESS_ROLE.ACTIVATED,
             access_role_v2: [],
             creator: 'c472ba79-0bca-4a74-aaa3-a559a16705d3',
             id: 'c9405f98-e25a-4b1f-ade7-227ea765dff7',

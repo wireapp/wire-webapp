@@ -23,7 +23,7 @@ import {IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-ki
 
 import {RootContext} from 'src/script/page/RootProvider';
 import {useAppMainState, ViewType} from 'src/script/page/state';
-import {initFadingScrollbar} from 'src/script/ui/fadingScrollbar';
+import {initFadingScrollbar} from 'Util/DOM/fadingScrollbar';
 
 interface PreferencesPageProps {
   children: React.ReactNode;

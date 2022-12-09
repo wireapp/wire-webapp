@@ -18,9 +18,10 @@
  */
 
 import {
+  CONVERSATION_ACCESS_ROLE,
   Conversation as ConversationBackendData,
   CONVERSATION_ACCESS,
-  CONVERSATION_ACCESS_ROLE,
+  CONVERSATION_LEGACY_ACCESS_ROLE,
   CONVERSATION_TYPE,
   Member as MemberBackendData,
   OtherMember as OtherMemberBackendData,
@@ -28,6 +29,7 @@ import {
 } from '@wireapp/api-client/lib/conversation/';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
+import ko from 'knockout';
 
 import {
   ConversationDatabaseData,
@@ -39,6 +41,8 @@ import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
 import {Conversation} from 'src/script/entity/Conversation';
 import {BaseError} from 'src/script/error/BaseError';
 import {createRandomUuid} from 'Util/util';
+
+import {ACCESS_STATE} from './AccessState';
 
 import {entities, payload} from '../../../test/api/payloads';
 
@@ -341,7 +345,7 @@ describe('ConversationMapper', () => {
 
       const remoteData: Partial<ConversationDatabaseData> = {
         access: [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE],
-        access_role: CONVERSATION_ACCESS_ROLE.NON_ACTIVATED,
+        access_role: CONVERSATION_LEGACY_ACCESS_ROLE.NON_ACTIVATED,
         creator: conversationCreatorId,
         id: conversationId,
         last_event_timestamp: new Date('1970-01-01T00:00:00.000Z').getTime(),
@@ -619,6 +623,180 @@ describe('ConversationMapper', () => {
       );
 
       expect(mergedConversation.receipt_mode).toBe(remoteReceiptMode);
+    });
+  });
+
+  describe('mapAccessState', () => {
+    it('maps "access_state_v2" first (if exists)', () => {
+      const accessModes = [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE];
+      // ACCESS_STATE.TEAM.GUESTS_SERVICES
+      const accessRole = [
+        CONVERSATION_ACCESS_ROLE.GUEST,
+        CONVERSATION_ACCESS_ROLE.NON_TEAM_MEMBER,
+        CONVERSATION_ACCESS_ROLE.TEAM_MEMBER,
+        CONVERSATION_ACCESS_ROLE.SERVICE,
+      ];
+
+      // ACCESS_STATE.TEAM.GUEST_ROOM
+      const accessRoleV2 = [
+        CONVERSATION_ACCESS_ROLE.GUEST,
+        CONVERSATION_ACCESS_ROLE.NON_TEAM_MEMBER,
+        CONVERSATION_ACCESS_ROLE.TEAM_MEMBER,
+      ];
+
+      const conversationEntity = new Conversation('conversation-id', 'domain');
+      conversationEntity.team_id = 'team_id';
+
+      ConversationMapper.mapAccessState(conversationEntity, accessModes, accessRole, accessRoleV2);
+      expect(conversationEntity.accessState()).toEqual(ACCESS_STATE.TEAM.GUEST_ROOM);
+    });
+
+    it('maps "access_state" if "access_state_v2" is not defined', () => {
+      const accessModes = [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE];
+      // ACCESS_STATE.TEAM.GUESTS_SERVICES
+      const accessRole = [
+        CONVERSATION_ACCESS_ROLE.GUEST,
+        CONVERSATION_ACCESS_ROLE.NON_TEAM_MEMBER,
+        CONVERSATION_ACCESS_ROLE.TEAM_MEMBER,
+        CONVERSATION_ACCESS_ROLE.SERVICE,
+      ];
+
+      const accessRoleV2: undefined = undefined;
+
+      const conversationEntity = new Conversation();
+      conversationEntity.team_id = 'team_id';
+
+      ConversationMapper.mapAccessState(conversationEntity, accessModes, accessRole, accessRoleV2);
+      expect(conversationEntity.accessState()).toEqual(ACCESS_STATE.TEAM.GUESTS_SERVICES);
+    });
+
+    describe('maps roles properly for legacy api < v3', () => {
+      const mockRightsLegacy: [
+        ACCESS_STATE,
+        {accessRole: CONVERSATION_LEGACY_ACCESS_ROLE; accessModes: CONVERSATION_ACCESS[]},
+      ][] = [
+        [
+          ACCESS_STATE.TEAM.TEAM_ONLY,
+          {
+            accessRole: CONVERSATION_LEGACY_ACCESS_ROLE.TEAM,
+            accessModes: [CONVERSATION_ACCESS.INVITE],
+          },
+        ],
+        [
+          ACCESS_STATE.TEAM.GUEST_ROOM,
+          {
+            accessRole: CONVERSATION_LEGACY_ACCESS_ROLE.ACTIVATED,
+            accessModes: [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE],
+          },
+        ],
+        [
+          ACCESS_STATE.TEAM.GUESTS_SERVICES,
+          {
+            accessRole: CONVERSATION_LEGACY_ACCESS_ROLE.NON_ACTIVATED,
+            accessModes: [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE],
+          },
+        ],
+        [
+          ACCESS_STATE.TEAM.LEGACY,
+          {
+            accessRole: CONVERSATION_LEGACY_ACCESS_ROLE.NON_ACTIVATED,
+            accessModes: [CONVERSATION_ACCESS.INVITE],
+          },
+        ],
+        [
+          ACCESS_STATE.TEAM.LEGACY,
+          {
+            accessRole: CONVERSATION_LEGACY_ACCESS_ROLE.NON_ACTIVATED,
+            accessModes: [CONVERSATION_ACCESS.CODE],
+          },
+        ],
+        [
+          ACCESS_STATE.TEAM.LEGACY,
+          {
+            accessRole: CONVERSATION_LEGACY_ACCESS_ROLE.TEAM,
+            accessModes: [CONVERSATION_ACCESS.CODE],
+          },
+        ],
+        [
+          ACCESS_STATE.TEAM.LEGACY,
+          {
+            accessRole: CONVERSATION_LEGACY_ACCESS_ROLE.TEAM,
+            accessModes: [CONVERSATION_ACCESS.CODE, CONVERSATION_ACCESS.INVITE],
+          },
+        ],
+      ];
+
+      it.each(mockRightsLegacy)('sets correct accessState for %s', (state, {accessModes, accessRole}) => {
+        const conversationEntity = new Conversation();
+        conversationEntity.team_id = 'team_id';
+
+        ConversationMapper.mapAccessState(conversationEntity, accessModes, accessRole);
+        expect(conversationEntity.accessState()).toEqual(state);
+      });
+    });
+
+    describe('maps roles properly for api >= 3v', () => {
+      const mockRightsV3 = {
+        [ACCESS_STATE.TEAM.GUESTS_SERVICES]: {
+          accessRole: [
+            CONVERSATION_ACCESS_ROLE.GUEST,
+            CONVERSATION_ACCESS_ROLE.NON_TEAM_MEMBER,
+            CONVERSATION_ACCESS_ROLE.TEAM_MEMBER,
+            CONVERSATION_ACCESS_ROLE.SERVICE,
+          ],
+          accessModes: [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE],
+        },
+        [ACCESS_STATE.TEAM.GUEST_ROOM]: {
+          accessRole: [
+            CONVERSATION_ACCESS_ROLE.GUEST,
+            CONVERSATION_ACCESS_ROLE.NON_TEAM_MEMBER,
+            CONVERSATION_ACCESS_ROLE.TEAM_MEMBER,
+          ],
+          accessModes: [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE],
+        },
+        [ACCESS_STATE.TEAM.SERVICES]: {
+          accessModes: [CONVERSATION_ACCESS.INVITE],
+          accessRole: [CONVERSATION_ACCESS_ROLE.TEAM_MEMBER, CONVERSATION_ACCESS_ROLE.SERVICE],
+        },
+        [ACCESS_STATE.TEAM.TEAM_ONLY]: {
+          accessModes: [CONVERSATION_ACCESS.INVITE],
+          accessRole: [CONVERSATION_ACCESS_ROLE.TEAM_MEMBER],
+        },
+      };
+
+      const mockAccessRights = Object.entries(mockRightsV3);
+
+      it.each(mockAccessRights)('sets correct accessState for %s', (state, {accessModes, accessRole}) => {
+        const conversationEntity = new Conversation();
+        conversationEntity.team_id = 'team_id';
+
+        ConversationMapper.mapAccessState(conversationEntity, accessModes, accessRole);
+        expect(conversationEntity.accessState()).toEqual(state);
+      });
+    });
+
+    it('maps roles properly for self conversation', () => {
+      const conversationEntity = new Conversation();
+      conversationEntity.type(CONVERSATION_TYPE.SELF);
+
+      ConversationMapper.mapAccessState(conversationEntity, [], []);
+      expect(conversationEntity.accessState()).toEqual(ACCESS_STATE.OTHER.SELF);
+    });
+
+    it('maps roles properly for personal group conversation', () => {
+      const conversationEntity = new Conversation();
+      jest.spyOn(conversationEntity, 'isGroup').mockImplementationOnce(ko.pureComputed(() => true));
+
+      ConversationMapper.mapAccessState(conversationEntity, [], []);
+      expect(conversationEntity.accessState()).toEqual(ACCESS_STATE.PERSONAL.GROUP);
+    });
+
+    it('maps roles properly for personal one2one conversation', () => {
+      const conversationEntity = new Conversation();
+      jest.spyOn(conversationEntity, 'isGroup').mockImplementationOnce(ko.pureComputed(() => false));
+
+      ConversationMapper.mapAccessState(conversationEntity, [], []);
+      expect(conversationEntity.accessState()).toEqual(ACCESS_STATE.PERSONAL.ONE2ONE);
     });
   });
 });

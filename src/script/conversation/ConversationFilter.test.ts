@@ -17,7 +17,11 @@
  *
  */
 
-import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE, CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {
+  CONVERSATION_ACCESS,
+  CONVERSATION_LEGACY_ACCESS_ROLE,
+  CONVERSATION_TYPE,
+} from '@wireapp/api-client/lib/conversation';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
 
 import {ConversationFilter} from './ConversationFilter';
@@ -87,7 +91,7 @@ describe('ConversationFilter', () => {
       const conversationData: ConversationDatabaseData = {
         access: [CONVERSATION_ACCESS.PRIVATE],
         accessRoleV2: undefined,
-        access_role: CONVERSATION_ACCESS_ROLE.PRIVATE,
+        access_role: CONVERSATION_LEGACY_ACCESS_ROLE.PRIVATE,
         archived_state: false,
         archived_timestamp: 0,
         cipher_suite: 1,
