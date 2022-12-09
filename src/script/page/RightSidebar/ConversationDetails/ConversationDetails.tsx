@@ -21,6 +21,7 @@ import {FC, useCallback, useEffect, useMemo, useState} from 'react';
 
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/';
 
+import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
 import {ConversationProtocolDetails} from 'Components/panel/ConversationProtocolDetails/ConversationProtocolDetails';
 import {PanelActions} from 'Components/panel/PanelActions';
@@ -28,7 +29,6 @@ import {ServiceDetails} from 'Components/panel/ServiceDetails';
 import {ServiceList} from 'Components/ServiceList';
 import {UserSearchableList} from 'Components/UserSearchableList';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {initFadingScrollbar} from 'Util/DOM/fadingScrollbar';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 import {formatDuration} from 'Util/TimeUtil';
@@ -272,7 +272,7 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
         onToggleMute={toggleMute}
       />
 
-      <div className="panel__content" ref={initFadingScrollbar}>
+      <FadingScrollbar className="panel__content">
         {isSingleUserMode && isServiceMode && selectedService && <ServiceDetails service={selectedService} />}
 
         {isSingleUserMode && !isServiceMode && firstParticipant && (
@@ -413,7 +413,7 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
           protocol={activeConversation.protocol}
           cipherSuite={activeConversation.cipherSuite}
         />
-      </div>
+      </FadingScrollbar>
     </div>
   );
 };

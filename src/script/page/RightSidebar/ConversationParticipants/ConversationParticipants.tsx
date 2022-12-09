@@ -19,10 +19,10 @@
 
 import {FC, useMemo, useState} from 'react';
 
+import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {SearchInput} from 'Components/SearchInput';
 import {UserSearchableList} from 'Components/UserSearchableList';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {initFadingScrollbar} from 'Util/DOM/fadingScrollbar';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
@@ -100,7 +100,7 @@ const ConversationParticipants: FC<ConversationParticipantsProps> = ({
           forceDark
         />
 
-        <div className="conversation-participants__list panel__content" ref={initFadingScrollbar}>
+        <FadingScrollbar className="conversation-participants__list panel__content">
           <UserSearchableList
             dataUieName="list-conversation-participants"
             users={participants}
@@ -115,7 +115,7 @@ const ConversationParticipants: FC<ConversationParticipantsProps> = ({
             selfFirst={false}
             noSelfInteraction
           />
-        </div>
+        </FadingScrollbar>
       </div>
     </div>
   );

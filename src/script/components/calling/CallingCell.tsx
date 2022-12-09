@@ -29,12 +29,12 @@ import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {GroupAvatar} from 'Components/avatar/GroupAvatar';
 import {Duration} from 'Components/calling/Duration';
 import {GroupVideoGrid} from 'Components/calling/GroupVideoGrid';
+import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';
 import {ParticipantItem} from 'Components/list/ParticipantItem';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {initFadingScrollbar} from 'Util/DOM/fadingScrollbar';
 import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
@@ -475,7 +475,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
                     'call-ui__participant-list__wrapper--active': showParticipants,
                   })}
                 >
-                  <div ref={initFadingScrollbar} className="call-ui__participant-list__container">
+                  <FadingScrollbar className="call-ui__participant-list__container">
                     <ul className="call-ui__participant-list" data-uie-name="list-call-ui-participants">
                       {participants
                         .slice()
@@ -500,7 +500,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
                           </li>
                         ))}
                     </ul>
-                  </div>
+                  </FadingScrollbar>
                 </div>
               )}
             </>

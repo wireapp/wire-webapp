@@ -22,8 +22,8 @@ import React, {ReactElement} from 'react';
 import {css} from '@emotion/react';
 import {throttle} from 'underscore';
 
+import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
-import {initFadingScrollbar} from 'Util/DOM/fadingScrollbar';
 import {t} from 'Util/LocalizerUtil';
 import {isScrollable, isScrolledBottom, isScrolledTop} from 'Util/scroll-helpers';
 
@@ -113,17 +113,14 @@ const ListWrapper: React.FC<LeftListWrapperProps> = ({
 
       {before ?? null}
 
-      <div
+      <FadingScrollbar
         role="list"
         aria-label={t('accessibility.conversation.sectionLabel')}
         css={scrollStyle}
-        ref={element => {
-          initBorderedScroll(element);
-          initFadingScrollbar(element);
-        }}
+        ref={initBorderedScroll}
       >
         {children}
-      </div>
+      </FadingScrollbar>
 
       {footer ?? null}
     </div>

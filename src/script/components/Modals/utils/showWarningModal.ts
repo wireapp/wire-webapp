@@ -17,26 +17,13 @@
  *
  */
 
-import {FC, ReactNode, createContext, useContext} from 'react';
+import {PrimaryModal} from '../PrimaryModal';
 
-import {MainViewModel} from '../view_model/MainViewModel';
-
-export const RootContext = createContext<MainViewModel | null>(null);
-
-interface RootProviderProps {
-  children?: ReactNode;
-  value: MainViewModel;
-}
-
-export const RootProvider: FC<RootProviderProps> = ({children, value}) => {
-  return <RootContext.Provider value={value}>{children}</RootContext.Provider>;
-};
-
-export const useMainViewModel = () => {
-  const context = useContext(RootContext);
-  if (!context) {
-    throw new Error('MainViewModel was not initialised');
-  }
-
-  return context;
+export const showWarningModal = (title: string, message: string): void => {
+  // Timeout needed for display warning modal - we need to update modal
+  setTimeout(() => {
+    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
+      text: {message, title},
+    });
+  }, 0);
 };

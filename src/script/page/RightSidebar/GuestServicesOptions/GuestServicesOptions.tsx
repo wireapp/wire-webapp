@@ -19,9 +19,9 @@
 
 import {FC, useState} from 'react';
 
+import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {initFadingScrollbar} from 'Util/DOM/fadingScrollbar';
 import {t} from 'Util/LocalizerUtil';
 
 import {GuestOptions} from './components/GuestOptions';
@@ -106,7 +106,7 @@ const GuestServicesOptions: FC<GuestServicesOptionsProps> = ({
         title={isGuest ? t('guestOptionsTitle') : t('servicesOptionsTitle')}
       />
 
-      <div className="panel__content" ref={initFadingScrollbar}>
+      <FadingScrollbar className="panel__content">
         {isGuest ? (
           <GuestOptions
             activeConversation={activeConversation}
@@ -125,7 +125,7 @@ const GuestServicesOptions: FC<GuestServicesOptionsProps> = ({
             isToggleDisabled={isToggleDisabled}
           />
         )}
-      </div>
+      </FadingScrollbar>
     </div>
   );
 };
