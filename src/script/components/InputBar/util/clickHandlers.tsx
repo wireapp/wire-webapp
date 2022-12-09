@@ -32,7 +32,7 @@ const IgnoreOutsideClickWrapper = ({children, ...rest}: IgnoreOutsideClickWrappe
   );
 };
 
-const handleClickOutsideOfInputBar = (event: Event, callback: () => void): void => {
+const handleOutsideClick = (event: Event, callback: () => void): void => {
   const ignoredParent = (event.target as HTMLElement).closest(`div[${dataAttribute}]`) !== null;
 
   if (!ignoredParent) {
