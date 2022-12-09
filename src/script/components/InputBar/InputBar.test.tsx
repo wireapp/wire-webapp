@@ -133,7 +133,7 @@ describe('InputBar', () => {
       expect((textArea as HTMLTextAreaElement).value).toBe(testMessage);
     });
 
-    const property = PropertiesRepository.CONFIG.WIRE_TYPING_MODE;
+    const property = PropertiesRepository.CONFIG.WIRE_TYPING_INDICATOR_MODE;
     const defaultValue = property.defaultValue;
 
     expect(propertiesRepository.typingIndicatorMode()).toBe(defaultValue);
@@ -144,7 +144,7 @@ describe('InputBar', () => {
     const props = getDefaultProps();
     const {getByTestId} = render(withTheme(<InputBar {...props} />));
     const textArea = getByTestId('input-message');
-    const property = PropertiesRepository.CONFIG.WIRE_TYPING_MODE;
+    const property = PropertiesRepository.CONFIG.WIRE_TYPING_INDICATOR_MODE;
     const defaultValue = property.defaultValue;
 
     propertiesRepository.setProperty(property.key, !defaultValue);
