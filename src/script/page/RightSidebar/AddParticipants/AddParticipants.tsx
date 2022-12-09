@@ -21,13 +21,14 @@ import {FC, useMemo, useState} from 'react';
 
 import cx from 'classnames';
 
-import {Button} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {Icon} from 'Components/Icon';
 import {SearchInput} from 'Components/SearchInput';
 import {ServiceList} from 'Components/ServiceList';
 import {UserSearchableList} from 'Components/UserSearchableList';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {initFadingScrollbar} from 'Util/DOM/fadingScrollbar';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
@@ -43,7 +44,6 @@ import {ServiceEntity} from '../../../integration/ServiceEntity';
 import {SearchRepository} from '../../../search/SearchRepository';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {TeamState} from '../../../team/TeamState';
-import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {generatePermissionHelpers} from '../../../user/UserPermission';
 import {UserState} from '../../../user/UserState';
 import {PanelHeader} from '../PanelHeader';
@@ -284,16 +284,17 @@ const AddParticipants: FC<AddParticipantsProps> = ({
                         {t('addParticipantsNoServicesManager')}
                       </div>
 
-                      <div
-                        role="button"
+                      <Button
+                        variant={ButtonVariant.TERTIARY}
+                        type="button"
                         tabIndex={0}
-                        className="search__no-services__manage-button search__no-services__manage-button--alternate"
                         onClick={openManageServices}
                         onKeyDown={event => handleKeyDown(event, openManageServices)}
                         data-uie-name="go-enable-services"
+                        style={{marginTop: '1em'}}
                       >
                         {t('addParticipantsManageServicesNoResults')}
-                      </div>
+                      </Button>
                     </>
                   )}
 
@@ -310,7 +311,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
 
         {isAddPeopleState && (
           <div className="add-participants__footer">
-            <Button disabled={!enabledAddAction} onClick={onAddParticipants} data-uie-name="do-create">
+            <Button type="button" disabled={!enabledAddAction} onClick={onAddParticipants} data-uie-name="do-create">
               {t('addParticipantsConfirmLabel')}
             </Button>
           </div>

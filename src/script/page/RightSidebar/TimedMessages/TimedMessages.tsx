@@ -20,12 +20,12 @@
 import {FC, useEffect, useState} from 'react';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {initFadingScrollbar} from 'Util/DOM/fadingScrollbar';
 import {t} from 'Util/LocalizerUtil';
 import {formatDuration} from 'Util/TimeUtil';
 
 import {Conversation} from '../../../entity/Conversation';
 import {EphemeralTimings} from '../../../ephemeral/EphemeralTimings';
-import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';
 import {PanelHeader} from '../PanelHeader';
 
@@ -110,7 +110,7 @@ const TimedMessages: FC<TimedMessagesPanelProps> = ({activeConversation, onClose
           </label>
         ))}
 
-        <div className="panel__info-text timed-messages__disclaimer">{t('timedMessageDisclaimer')}</div>
+        <p className="panel__info-text timed-messages__disclaimer">{t('timedMessageDisclaimer')}</p>
       </div>
     </div>
   );

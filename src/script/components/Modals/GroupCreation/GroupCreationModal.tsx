@@ -36,6 +36,7 @@ import {BaseToggle} from 'Components/toggle/BaseToggle';
 import {InfoToggle} from 'Components/toggle/InfoToggle';
 import {UserSearchableList} from 'Components/UserSearchableList';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {initFadingScrollbar} from 'Util/DOM/fadingScrollbar';
 import {handleEnterDown, offEscKey, onEscKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
@@ -53,7 +54,6 @@ import {User} from '../../../entity/User';
 import {isProtocolOption, ProtocolOption} from '../../../guards/Protocol';
 import {RootContext} from '../../../page/RootProvider';
 import {TeamState} from '../../../team/TeamState';
-import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {UserState} from '../../../user/UserState';
 
 interface GroupCreationModalProps {

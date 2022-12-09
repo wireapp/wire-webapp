@@ -22,6 +22,8 @@ import {act, fireEvent, render, waitFor} from '@testing-library/react';
 import {InputBar} from 'Components/InputBar/index';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {Config} from 'src/script/Config';
+import {PropertiesService} from 'src/script/properties/PropertiesService';
+import {SelfService} from 'src/script/self/SelfService';
 import {createMentionEntity, getMentionCandidate} from 'Util/MentionUtil';
 import {createRandomUuid} from 'Util/util';
 
@@ -40,10 +42,6 @@ import {TeamState} from '../../team/TeamState';
 import {UserState} from '../../user/UserState';
 
 const testFactory = new TestFactory();
-const conversationRepository = {
-  sendTypingStart: jest.fn(),
-  sendTypingStop: jest.fn(),
-} as unknown as ConversationRepository;
 
 let eventRepository: EventRepository;
 let searchRepository: SearchRepository;
@@ -71,34 +69,49 @@ beforeAll(() => {
   });
 });
 
-const getDefaultProps = () => ({
-  assetRepository: new AssetRepository(new AssetService()),
-  conversationEntity: new Conversation(createRandomUuid()),
-  conversationRepository,
-  eventRepository,
-  messageRepository: {} as MessageRepository,
-  openGiphy: jest.fn(),
-  propertiesRepository: new PropertiesRepository({} as any, {} as any),
-  searchRepository,
-  storageRepository,
-  teamState: new TeamState(),
-  userState: {
-    self: () => new User('id'),
-  } as UserState,
-  onShiftTab: jest.fn(),
-});
-
 describe('InputBar', () => {
+  let propertiesRepository: PropertiesRepository;
+
+  const getDefaultProps = () => ({
+    assetRepository: new AssetRepository(new AssetService()),
+    conversationEntity: new Conversation(createRandomUuid()),
+    conversationRepository: {
+      sendTypingStart: jest.fn(),
+      sendTypingStop: jest.fn(),
+    } as unknown as ConversationRepository,
+    eventRepository,
+    messageRepository: {} as MessageRepository,
+    openGiphy: jest.fn(),
+    propertiesRepository,
+    searchRepository,
+    storageRepository,
+    teamState: new TeamState(),
+    userState: {
+      self: () => new User('id'),
+    } as UserState,
+    onShiftTab: jest.fn(),
+  });
+
+  beforeEach(() => {
+    const propertiesService = new PropertiesService();
+    const selfService = new SelfService();
+    propertiesRepository = new PropertiesRepository(propertiesService, selfService);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   const testMessage = 'Write custom text message';
   const pngFile = new File(['(⌐□_□)'], 'wire-example-image.png', {type: 'image/png'});
 
   it('has passed value', async () => {
     const promise = Promise.resolve();
     const props = getDefaultProps();
-    const {container} = render(withTheme(<InputBar {...props} />));
+    const {getByTestId} = render(withTheme(<InputBar {...props} />));
     await act(() => promise);
 
-    const textArea = await container.querySelector('textarea[data-uie-name="input-message"]');
+    const textArea = getByTestId('input-message');
 
     expect(textArea).not.toBeNull();
     fireEvent.change(textArea!, {target: {value: testMessage}});
@@ -106,6 +119,45 @@ describe('InputBar', () => {
     await waitFor(() => {
       expect((textArea as HTMLTextAreaElement).value).toBe(testMessage);
     });
+  });
+
+  it('typing request is sent if the typing indicator mode is enabled and user is typing', async () => {
+    const props = getDefaultProps();
+    const {getByTestId} = render(withTheme(<InputBar {...props} />));
+    const textArea = getByTestId('input-message');
+
+    expect(textArea).not.toBeNull();
+    fireEvent.change(textArea!, {target: {value: testMessage}});
+
+    await waitFor(() => {
+      expect((textArea as HTMLTextAreaElement).value).toBe(testMessage);
+    });
+
+    const property = PropertiesRepository.CONFIG.WIRE_TYPING_MODE;
+    const defaultValue = property.defaultValue;
+
+    expect(propertiesRepository.typingIndicatorMode()).toBe(defaultValue);
+    expect(props.conversationRepository.sendTypingStart).toHaveBeenCalledTimes(1);
+  });
+
+  it('typing request is not sent when user is typing but the typing indicator mode is disabled', async () => {
+    const props = getDefaultProps();
+    const {getByTestId} = render(withTheme(<InputBar {...props} />));
+    const textArea = getByTestId('input-message');
+    const property = PropertiesRepository.CONFIG.WIRE_TYPING_MODE;
+    const defaultValue = property.defaultValue;
+
+    propertiesRepository.setProperty(property.key, !defaultValue);
+    expect(propertiesRepository.typingIndicatorMode()).not.toBe(defaultValue);
+
+    expect(textArea).not.toBeNull();
+    fireEvent.change(textArea!, {target: {value: testMessage}});
+
+    await waitFor(() => {
+      expect((textArea as HTMLTextAreaElement).value).toBe(testMessage);
+    });
+    expect(props.conversationRepository.sendTypingStart).not.toHaveBeenCalled();
+    expect(props.conversationRepository.sendTypingStop).not.toHaveBeenCalled();
   });
 
   it('has pasted image', async () => {

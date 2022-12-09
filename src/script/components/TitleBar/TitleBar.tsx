@@ -301,16 +301,17 @@ export const TitleBar: React.FC<TitleBarProps> = ({
             >
               <span className="visually-hidden">{t('tooltipConversationSearch')}</span>
             </IconButton>
-
-            <IconButton
-              title={t('tooltipConversationCall')}
-              aria-label={t('tooltipConversationCall')}
-              css={{marginBottom: 0}}
-              onClick={onClickStartAudio}
-              data-uie-name="do-call"
-            >
-              <Icon.Pickup />
-            </IconButton>
+            {showCallControls && (
+              <IconButton
+                title={t('tooltipConversationCall')}
+                aria-label={t('tooltipConversationCall')}
+                css={{marginBottom: 0}}
+                onClick={onClickStartAudio}
+                data-uie-name="do-call"
+              >
+                <Icon.Pickup />
+              </IconButton>
+            )}
           </>
         ) : (
           <button

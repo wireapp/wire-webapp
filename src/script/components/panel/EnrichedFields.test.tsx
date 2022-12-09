@@ -19,7 +19,6 @@
 
 import {render, waitFor} from '@testing-library/react';
 import type {RichInfo} from '@wireapp/api-client/lib/user/';
-import {act} from 'react-dom/test-utils';
 
 import {User} from 'src/script/entity/User';
 import {RichProfileRepository} from 'src/script/user/RichProfileRepository';
@@ -51,13 +50,9 @@ describe('EnrichedFields', () => {
 
     const {getAllByTestId} = render(<EnrichedFields {...props} />);
 
-    await act(() =>
-      waitFor(() => {
-        expect(richProfileRepository.getUserRichProfile).toHaveBeenCalled();
-      }),
-    );
+    await waitFor(() => getAllByTestId('item-enriched-key'));
 
-    expect(getAllByTestId('item-enriched-key')).toHaveLength(2);
+    expect(getAllByTestId('item-enriched-key')).toHaveLength(richInfo.fields!.length);
   });
 
   it('displays the email if set on user', async () => {
@@ -69,11 +64,7 @@ describe('EnrichedFields', () => {
 
     const {getAllByTestId} = render(<EnrichedFields {...props} />);
 
-    await act(() =>
-      waitFor(() => {
-        expect(richProfileRepository.getUserRichProfile).toHaveBeenCalled();
-      }),
-    );
+    await waitFor(() => getAllByTestId('item-enriched-key'));
 
     expect(getAllByTestId('item-enriched-key')).toHaveLength(3);
   });
@@ -85,13 +76,9 @@ describe('EnrichedFields', () => {
 
     const props = {richProfileRepository, showDomain: true, user};
 
-    const {container} = render(<EnrichedFields {...props} />);
+    const {container, getAllByTestId} = render(<EnrichedFields {...props} />);
 
-    await act(() =>
-      waitFor(() => {
-        expect(richProfileRepository.getUserRichProfile).toHaveBeenCalled();
-      }),
-    );
+    await waitFor(() => getAllByTestId('item-enriched-key'));
 
     const itemEnrichedValues = container.querySelectorAll(
       `[data-uie-name="item-enriched-value"][data-uie-value="${domain}"]`,
@@ -107,13 +94,9 @@ describe('EnrichedFields', () => {
 
     const props = {richProfileRepository, user};
 
-    const {container} = render(<EnrichedFields {...props} />);
+    const {container, getAllByTestId} = render(<EnrichedFields {...props} />);
 
-    await act(() =>
-      waitFor(() => {
-        expect(richProfileRepository.getUserRichProfile).toHaveBeenCalled();
-      }),
-    );
+    await waitFor(() => getAllByTestId('item-enriched-key'));
 
     const itemEnrichedValues = container.querySelectorAll(
       `[data-uie-name="item-enriched-value"][data-uie-value="${domain}"]`,
@@ -129,13 +112,9 @@ describe('EnrichedFields', () => {
 
     const props = {onFieldsLoaded, richProfileRepository, user};
 
-    render(<EnrichedFields {...props} />);
+    const {getAllByTestId} = render(<EnrichedFields {...props} />);
 
-    await act(() =>
-      waitFor(() => {
-        expect(richProfileRepository.getUserRichProfile).toHaveBeenCalled();
-      }),
-    );
+    await waitFor(() => getAllByTestId('item-enriched-key'));
 
     expect(onFieldsLoaded).toHaveBeenCalledWith(richInfo.fields);
   });

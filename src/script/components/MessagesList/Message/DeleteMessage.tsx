@@ -61,7 +61,7 @@ const DeleteMessage: React.FC<DeleteMessageProps> = ({message, onClickAvatar}) =
         </p>
         <span className="message-header-label-icon icon-trash" title={formattedDeletionTime} />
       </div>
-      <div className="message-body-actions">
+      <p className="message-body-actions">
         <MessageTime
           timestamp={deletedTimeStamp}
           data-uie-uid={message.id}
@@ -69,7 +69,7 @@ const DeleteMessage: React.FC<DeleteMessageProps> = ({message, onClickAvatar}) =
         >
           {formattedDeletionTime}
         </MessageTime>
-      </div>
+      </p>
     </div>
   );
 };

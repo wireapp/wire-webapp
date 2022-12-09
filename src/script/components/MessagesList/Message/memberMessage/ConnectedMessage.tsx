@@ -50,9 +50,9 @@ const ConnectedMessage: React.FC<ConnectedMessageProps> = ({
       <h2 className="message-connected-header">{name}</h2>
 
       {isService ? (
-        <span className="message-connected-provider-name">{providerName}</span>
+        <p className="message-connected-provider-name">{providerName}</p>
       ) : (
-        <span className="message-connected-username label-username">{handle}</span>
+        <p className="message-connected-username label-username">{handle}</p>
       )}
 
       {isOutgoingRequest && classifiedDomains && <ClassifiedBar users={[user]} classifiedDomains={classifiedDomains} />}

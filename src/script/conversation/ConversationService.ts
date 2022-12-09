@@ -18,7 +18,7 @@
  */
 
 import type {
-  ACCESS_ROLE_V2,
+  CONVERSATION_ACCESS_ROLE,
   ClientMismatch,
   Conversation as BackendConversation,
   ConversationCode,
@@ -220,13 +220,15 @@ export class ConversationService {
    * @returns Resolves with the server response
    */
   putConversationAccess(
-    conversationId: string,
+    conversationId: QualifiedId,
     accessModes: CONVERSATION_ACCESS[],
-    accessRole: ACCESS_ROLE_V2[],
+    accessRole: CONVERSATION_ACCESS_ROLE[],
   ): Promise<ConversationEvent> {
+    const accessRoleField = this.apiClient.backendFeatures.version >= 3 ? 'access_role' : 'access_role_v2';
+
     return this.apiClient.api.conversation.putAccess(conversationId, {
       access: accessModes,
-      access_role_v2: accessRole,
+      [accessRoleField]: accessRole,
     });
   }
 

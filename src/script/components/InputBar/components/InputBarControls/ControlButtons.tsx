@@ -20,6 +20,7 @@
 import React from 'react';
 
 import {Icon} from 'Components/Icon';
+import {Config} from 'src/script/Config';
 import {Conversation} from 'src/script/entity/Conversation';
 import {t} from 'Util/LocalizerUtil';
 
@@ -98,11 +99,17 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
             </li>
 
             <li>
-              <ImageUploadButton onSelectImages={onSelectImages} />
+              <ImageUploadButton
+                onSelectImages={onSelectImages}
+                acceptedImageTypes={Config.getConfig().ALLOWED_IMAGE_TYPES}
+              />
             </li>
 
             <li>
-              <AssetUploadButton onSelectFiles={onSelectFiles} />
+              <AssetUploadButton
+                onSelectFiles={onSelectFiles}
+                acceptedFileTypes={Config.getConfig().FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS}
+              />
             </li>
           </>
         )}

@@ -145,5 +145,3 @@ export const replaceLink = (href: string, className: string = '', uieName: strin
   '/link': '</a>',
   link: `<a href="${href}" data-uie-name="${uieName}" class="${className}" rel="nofollow noopener noreferrer" target="_blank">`,
 });
-
-window.t = LocalizerUtil.translate;

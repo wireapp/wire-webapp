@@ -17,12 +17,7 @@
  *
  */
 
-const fileList = require.context('Resource/image/icon', true, /.+\.svg$/);
-
-fileList.keys().forEach(iconFileName => {
-  const iconPath = iconFileName.replace(/^\.\//, '');
-  const iconName = iconFileName.substring(iconFileName.lastIndexOf('/') + 1).replace(/\.svg$/i, '');
-  ko.components.register(iconName, {
-    template: require(`Resource/image/icon/${iconPath}`),
-  });
-});
+export enum CONVERSATION_TYPING_INDICATOR_MODE {
+  OFF = 0,
+  ON = 1,
+}

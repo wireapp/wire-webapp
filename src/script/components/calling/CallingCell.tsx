@@ -34,6 +34,7 @@ import {ClassifiedBar} from 'Components/input/ClassifiedBar';
 import {ParticipantItem} from 'Components/list/ParticipantItem';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {initFadingScrollbar} from 'Util/DOM/fadingScrollbar';
 import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
@@ -49,7 +50,6 @@ import {generateConversationUrl} from '../../router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from '../../router/routerBindings';
 import {TeamState} from '../../team/TeamState';
 import {ContextMenuEntry, showContextMenu} from '../../ui/ContextMenu';
-import {initFadingScrollbar} from '../../ui/fadingScrollbar';
 import {CallActions, CallViewTab} from '../../view_model/CallingViewModel';
 
 interface VideoCallProps {

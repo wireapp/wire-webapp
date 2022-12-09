@@ -18,6 +18,7 @@
  */
 
 import {CONVERSATION_EVENT, ConversationEvent} from '@wireapp/api-client/lib/event/';
+import {container} from 'tsyringe';
 
 import {LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
@@ -63,6 +64,7 @@ import {MentionEntity} from '../message/MentionEntity';
 import {QuoteEntity} from '../message/QuoteEntity';
 import {StatusType} from '../message/StatusType';
 import {SystemMessageType} from '../message/SystemMessageType';
+import {APIClient} from '../service/APIClientSingleton';
 import type {EventRecord} from '../storage';
 
 // Event Mapper to convert all server side JSON events into core entities.
@@ -71,8 +73,12 @@ export class EventMapper {
   /**
    * Construct a new Event Mapper.
    */
-  constructor() {
+  constructor(private readonly apiClient = container.resolve(APIClient)) {
     this.logger = getLogger('EventMapper');
+  }
+
+  private get fallbackDomain() {
+    return this.apiClient.context?.domain;
   }
 
   /**
@@ -156,7 +162,7 @@ export class EventMapper {
       const {
         preview_id,
         preview_key,
-        preview_domain = qualified_conversation?.domain,
+        preview_domain = qualified_conversation?.domain || this.fallbackDomain,
         preview_otr_key,
         preview_sha256,
         preview_token,
@@ -741,7 +747,7 @@ export class EventMapper {
     const {
       preview_id,
       preview_key,
-      preview_domain = qualified_conversation?.domain,
+      preview_domain = qualified_conversation?.domain || this.fallbackDomain,
       preview_otr_key,
       preview_sha256,
       preview_token,
@@ -769,7 +775,6 @@ export class EventMapper {
     const {data: eventData, conversation: conversationId, qualified_conversation} = event;
     const {content_length, content_type, id: assetId, info} = eventData;
     const assetEntity = new MediumImage(assetId);
-
     assetEntity.file_size = content_length;
     assetEntity.file_type = content_type;
 
@@ -778,12 +783,11 @@ export class EventMapper {
       assetEntity.height = `${info.height}px`;
     }
 
-    const {key, otr_key, sha256, token, domain = qualified_conversation?.domain} = eventData;
+    const {key, otr_key, sha256, token, domain = qualified_conversation?.domain || this.fallbackDomain} = eventData;
 
     if (!otr_key || !sha256) {
       return assetEntity;
     }
-
     const remoteData = key
       ? AssetRemoteData.v3(key, domain, otr_key, sha256, token, true)
       : AssetRemoteData.v2(conversationId, assetId, otr_key, sha256, true);
@@ -818,7 +822,14 @@ export class EventMapper {
           otrKey = new Uint8Array(otrKey);
           sha256 = new Uint8Array(sha256);
 
-          const remoteData = AssetRemoteData.v3(assetKey, assetDomain, otrKey, sha256, assetToken, true);
+          const remoteData = AssetRemoteData.v3(
+            assetKey,
+            assetDomain || this.fallbackDomain,
+            otrKey,
+            sha256,
+            assetToken,
+            true,
+          );
           linkPreviewData.image = remoteData;
         }
       }

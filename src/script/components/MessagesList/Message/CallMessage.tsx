@@ -62,9 +62,9 @@ const CallMessage: React.FC<CallMessageProps> = ({message}) => {
           <span>{caption}</span>
         </p>
       </div>
-      <div className="message-body-actions">
+      <p className="message-body-actions">
         <MessageTime timestamp={timestamp} data-uie-uid={message.id} data-uie-name="item-message-call-timestamp" />
-      </div>
+      </p>
     </div>
   );
 };

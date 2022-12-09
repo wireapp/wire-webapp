@@ -90,9 +90,9 @@ const UserDetails: React.FC<UserDetailsProps> = ({
       </div>
 
       {participant.handle && (
-        <div className="panel-participant__user-name" data-uie-name="status-username" title={participant.handle}>
+        <p className="panel-participant__user-name" data-uie-name="status-username" title={participant.handle}>
           {participant.handle}
-        </div>
+        </p>
       )}
 
       {classifiedDomains && (

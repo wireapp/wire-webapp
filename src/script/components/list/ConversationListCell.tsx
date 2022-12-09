@@ -32,8 +32,6 @@ import {AvailabilityState} from 'Components/AvailabilityState';
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {GroupAvatar} from 'Components/avatar/GroupAvatar';
 import {Icon} from 'Components/Icon';
-import {generateConversationUrl} from 'src/script/router/routeGenerator';
-import {setHistoryParam} from 'src/script/router/Router';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isKey, isOneOfKeys, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -172,12 +170,6 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
       handleFocus(index);
     }
   }, [index, isActive, isFolder, isConversationListFocus, handleFocus]);
-
-  // on conversation/app load reset last message focus to ensure last message is focused
-  // only when user enters a new conversation using keyboard(press enter)
-  useEffect(() => {
-    setHistoryParam(generateConversationUrl(conversation.qualifiedId));
-  }, [conversation]);
 
   return (
     <li onContextMenu={openContextMenu}>

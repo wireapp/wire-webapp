@@ -49,7 +49,7 @@ import {flatten} from 'underscore';
 import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {TYPING_TIMEOUT, useTypingIndicatorState} from 'Components/InputBar/TypingIndicator';
+import {TYPING_TIMEOUT, useTypingIndicatorState} from 'Components/InputBar/components/TypingIndicator';
 import {getNextItem} from 'Util/ArrayUtil';
 import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/FileTypeUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
@@ -396,9 +396,15 @@ export class ConversationRepository {
       };
 
       if (accessState) {
-        const {accessModes: access, accessRole: access_role_v2} = updateAccessRights(accessState);
+        const {accessModes: access, accessRole} = updateAccessRights(accessState);
 
-        payload = {...payload, access, access_role_v2};
+        const accessRoleField = this.core.backendFeatures.version >= 3 ? 'access_role' : 'access_role_v2';
+
+        payload = {
+          ...payload,
+          access,
+          [accessRoleField]: accessRole,
+        };
       }
     }
 
@@ -1711,27 +1717,11 @@ export class ConversationRepository {
   }
 
   public async sendTypingStart(conversationEntity: Conversation) {
-    /*
-      Currently typing endpoint is not implemented on backend for federated environments
-      @todo: remove this condition when backend is ready and api-client in packages is updated to support domain in typing endpoint
-    */
-    const isFederated = this.core.backendFeatures?.isFederated;
-    if (isFederated) {
-      return;
-    }
-    this.core.service!.conversation.sendTypingStart(conversationEntity.id);
+    this.core.service!.conversation.sendTypingStart(conversationEntity.qualifiedId);
   }
 
   public async sendTypingStop(conversationEntity: Conversation) {
-    /*
-      Currently typing endpoint is not implemented on backend for federated environments
-      @todo: remove this condition when backend is ready and api-client in packages is updated to support domain in typing endpoint
-    */
-    const isFederated = this.core.backendFeatures?.isFederated;
-    if (isFederated) {
-      return;
-    }
-    this.core.service!.conversation.sendTypingStop(conversationEntity.id);
+    this.core.service!.conversation.sendTypingStop(conversationEntity.qualifiedId);
   }
 
   private async toggleArchiveConversation(

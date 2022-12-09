@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,37 +17,10 @@
  *
  */
 
-.bubble-menu {
-  .list-unstyled;
-
-  width: 168px;
-  padding: @bubble-border-radius;
-  border-radius: @bubble-border-radius;
-  margin: -@bubble-border-radius;
-  background-color: var(--app-bg-secondary);
-  text-align: center;
-
-  > li {
-    .label-bold-xs;
-
-    height: 40px;
-    color: var(--background);
-    cursor: pointer;
-    line-height: 2.5rem;
-    user-select: none;
-
-    &.hover,
-    &:hover {
-      background-color: var(--foreground-fade-8);
-    }
-
-    &.active,
-    &:active {
-      background-color: var(--foreground-fade-16);
-    }
-  }
-
-  > li + li {
-    border-top: 1px solid var(--foreground-fade-16);
-  }
-}
+module.exports = {
+  env: {
+    test: {
+      presets: ['@babel/preset-typescript', ['@babel/preset-env', {modules: 'commonjs'}]],
+    },
+  },
+};
