@@ -25,7 +25,7 @@ import {Icon} from 'Components/Icon';
 import {User} from 'src/script/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-import {useDisposableRef} from 'Util/useDisposableRef';
+import {useDisposableRefNew} from 'Util/useDisposableRef';
 
 import {ConnectedMessage} from './memberMessage/ConnectedMessage';
 import {MessageTime} from './MessageTime';
@@ -82,7 +82,7 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
   const isMemberLeave = message.isMemberLeave();
   const isMemberChange = message.isMemberChange();
 
-  const initShowMore = useDisposableRef(element => {
+  const {ref: initShowMore} = useDisposableRefNew(element => {
     const link = element.querySelector('.message-header-show-more');
     if (link) {
       const listener = () => onClickParticipants(highlightedUsers);
