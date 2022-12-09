@@ -137,11 +137,7 @@ export const Conversation: FC<ConversationProps> = ({
 
   const uploadImages = useCallback(
     (images: File[]) => {
-      if (!activeConversation) {
-        return;
-      }
-
-      if (isHittingUploadLimit(images, repositories.asset)) {
+      if (!activeConversation || isHittingUploadLimit(images, repositories.asset)) {
         return;
       }
 
@@ -150,14 +146,13 @@ export const Conversation: FC<ConversationProps> = ({
 
         if (isImageTooLarge) {
           const isGif = image.type === 'image/gif';
-          const maxSize = CONFIG.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024;
+          const bytesMultiplier = 1024;
+          const maxSize = CONFIG.MAXIMUM_IMAGE_FILE_SIZE / bytesMultiplier / bytesMultiplier;
 
-          showWarningModal(
+          return showWarningModal(
             t(isGif ? 'modalGifTooLargeHeadline' : 'modalPictureTooLargeHeadline'),
             t(isGif ? 'modalGifTooLargeMessage' : 'modalPictureTooLargeMessage', maxSize),
           );
-
-          return;
         }
       }
 
