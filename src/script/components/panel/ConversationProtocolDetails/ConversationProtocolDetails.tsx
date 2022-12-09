@@ -81,7 +81,7 @@ const wrapperStyles: CSSObject = {
 
 const ConversationProtocolDetails: React.FC<ConversationProtocolDetailsProps> = ({protocol, cipherSuite}) => (
   <div>
-    <h5 className="conversation-details__list-head">{t('conversationDetailsProtocolDetails')}</h5>
+    <h3 className="conversation-details__list-head">{t('conversationDetailsProtocolDetails')}</h3>
 
     <div css={wrapperStyles}>
       <div css={titleStyles}>Protocol</div>

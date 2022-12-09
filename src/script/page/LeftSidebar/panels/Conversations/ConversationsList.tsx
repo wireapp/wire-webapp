@@ -188,7 +188,7 @@ export const ConversationsList: React.FC<{
     );
   return (
     <>
-      {isFolderView && <h2 className="visually-hidden">{t('folderViewTooltip')}</h2>}
+      <h2 className="visually-hidden">{t(isFolderView ? 'folderViewTooltip' : 'conversationViewTooltip')}</h2>
 
       <ul css={css({margin: 0, paddingLeft: 0})} data-uie-name={uieName}>
         {connectionRequests}

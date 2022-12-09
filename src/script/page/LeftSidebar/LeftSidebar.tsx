@@ -67,7 +67,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({listViewModel, selfUser, isAct
   }, []);
 
   return (
-    <div id="left-column" className={cx('left-column', {'left-column--light-theme': !isActivatedAccount})}>
+    <aside id="left-column" className={cx('left-column', {'left-column--light-theme': !isActivatedAccount})}>
       <SwitchTransition>
         <Animated key={listState}>
           <>
@@ -123,7 +123,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({listViewModel, selfUser, isAct
           </>
         </Animated>
       </SwitchTransition>
-    </div>
+    </aside>
   );
 };
 

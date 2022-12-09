@@ -93,9 +93,11 @@ const ListWrapper: React.FC<LeftListWrapperProps> = ({
           headerElement
         ) : (
           <>
+            {/* FIXME?: Replace h2 tag with span? Need verification */}
             <span className="left-list-header-text" data-uie-name={headerUieName}>
               {header}
             </span>
+
             <button
               type="button"
               className="left-list-header-close-button button-icon-large"
@@ -108,7 +110,9 @@ const ListWrapper: React.FC<LeftListWrapperProps> = ({
           </>
         )}
       </header>
+
       {before ?? null}
+
       <div
         role="list"
         aria-label={t('accessibility.conversation.sectionLabel')}
@@ -120,6 +124,7 @@ const ListWrapper: React.FC<LeftListWrapperProps> = ({
       >
         {children}
       </div>
+
       {footer ?? null}
     </div>
   );

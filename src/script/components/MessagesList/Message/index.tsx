@@ -205,10 +205,10 @@ const Message: React.FC<
     >
       <div className={cx('message-header message-timestamp', getTimestampClass())}>
         <div className="message-header-icon">
-          <span className="message-unread-dot"></span>
+          <span className="message-unread-dot" />
         </div>
 
-        <h4 className="message-header-label">
+        <h3 className="message-header-label">
           <MessageTime timestamp={timestamp} className="label-xs" data-timestamp-type="normal">
             {timeAgo}
           </MessageTime>
@@ -216,7 +216,7 @@ const Message: React.FC<
           <MessageTime timestamp={timestamp} data-timestamp-type="day" className="label-bold-xs">
             {timeAgoDay}
           </MessageTime>
-        </h4>
+        </h3>
       </div>
 
       {/*eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions*/}

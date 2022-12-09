@@ -17,7 +17,7 @@
  *
  */
 
-import React, {ChangeEvent, Fragment, useState} from 'react';
+import React, {ChangeEvent, useState} from 'react';
 
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -147,10 +147,10 @@ const UserList: React.FC<UserListProps> = ({
     content = (
       <>
         {(admins.length > 0 || showEmptyAdmin) && (
-          <Fragment>
-            <h5 className="user-list__header" data-uie-name="label-conversation-admins">
+          <>
+            <h3 className="user-list__header" data-uie-name="label-conversation-admins">
               {t('searchListAdmins', adminCount)}
-            </h5>
+            </h3>
 
             {admins.length > 0 && (
               <ul className={cx('search-list', cssClasses)} data-uie-name="list-admins">
@@ -181,14 +181,14 @@ const UserList: React.FC<UserListProps> = ({
                 {t('searchListNoAdmins')}
               </div>
             )}
-          </Fragment>
+          </>
         )}
 
         {members.length > 0 && maxShownUsers > admins.length && (
-          <Fragment>
-            <h5 className="user-list__header" data-uie-name="label-conversation-members">
+          <>
+            <h3 className="user-list__header" data-uie-name="label-conversation-members">
               {t('searchListMembers', memberCount)}
-            </h5>
+            </h3>
 
             <ul className={cx('search-list', cssClasses)} data-uie-name="list-members">
               {members.slice(0, maxShownUsers - admins.length).map(user => (
@@ -212,7 +212,7 @@ const UserList: React.FC<UserListProps> = ({
                 </li>
               ))}
             </ul>
-          </Fragment>
+          </>
         )}
       </>
     );

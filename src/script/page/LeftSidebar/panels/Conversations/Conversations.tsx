@@ -20,6 +20,7 @@
 import React, {useEffect, useState} from 'react';
 
 import {amplify} from 'amplify';
+import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -42,7 +43,7 @@ import {ConversationRepository} from '../../../../conversation/ConversationRepos
 import {ConversationState} from '../../../../conversation/ConversationState';
 import {User} from '../../../../entity/User';
 import {useRoveFocus} from '../../../../hooks/useRoveFocus';
-import {useMLSConversationState} from '../../../../mls/mlsConversationState';
+import {useMLSConversationState} from '../../../../mls';
 import {PreferenceNotificationRepository} from '../../../../notification/PreferenceNotificationRepository';
 import {PropertiesRepository} from '../../../../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../../../../properties/PropertiesType';
@@ -99,10 +100,10 @@ const Conversations: React.FC<ConversationsProps> = ({
     'visibleConversations',
   ]);
   const {notifications} = useKoSubscribableChildren(preferenceNotificationRepository, ['notifications']);
+  const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
 
   const {filterEstablishedConversations} = useMLSConversationState();
 
-  const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
   const initialViewStyle = propertiesRepository.getPreference(PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS)
     ? ConversationViewStyle.FOLDER
     : ConversationViewStyle.RECENT;
@@ -110,9 +111,11 @@ const Conversations: React.FC<ConversationsProps> = ({
   const [viewStyle, setViewStyle] = useState<ConversationViewStyle>(initialViewStyle);
   const showBadge = notifications.length > 0;
 
+  const isRecentViewStyle = viewStyle === ConversationViewStyle.RECENT;
+  const isFolderViewStyle = viewStyle === ConversationViewStyle.FOLDER;
+
   const hasNoConversations = conversations.length + connectRequests.length === 0;
-  const openFolder = useFolderState(state => state.openFolder);
-  const isFolderOpen = useFolderState(state => state.isOpen);
+  const {isOpen: isFolderOpen, openFolder} = useFolderState();
 
   const {conversationLabelRepository} = conversationRepository;
   const [isConversationListFocus, focusConversationList] = useState(false);
@@ -132,10 +135,11 @@ const Conversations: React.FC<ConversationsProps> = ({
     if (!activeConversation) {
       return () => {};
     }
+
     const conversationLabels = conversationLabelRepository.getConversationLabelIds(activeConversation);
     amplify.subscribe(WebAppEvents.CONTENT.EXPAND_FOLDER, openFolder);
-    const hasAlreadyOpenFolder = conversationLabels.some(isFolderOpen);
-    if (!hasAlreadyOpenFolder) {
+
+    if (!conversationLabels.some(isFolderOpen)) {
       openFolder(conversationLabels[0]);
     }
 
@@ -153,17 +157,14 @@ const Conversations: React.FC<ConversationsProps> = ({
   }, []);
 
   useEffect(() => {
-    propertiesRepository.savePreference(
-      PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS,
-      viewStyle === ConversationViewStyle.FOLDER,
-    );
-  }, [viewStyle]);
+    propertiesRepository.savePreference(PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS, isFolderViewStyle);
+  }, [isFolderViewStyle]);
 
   const header = (
     <>
       <button
         type="button"
-        className={`conversations-settings-button accent-text ${showBadge ? 'conversations-settings--badge' : ''}`}
+        className={cx(`conversations-settings-button accent-text`, {'conversations-settings--badge': showBadge})}
         title={t('tooltipConversationsPreferences')}
         onClick={onClickPreferences}
         data-uie-name="go-preferences"
@@ -178,15 +179,13 @@ const Conversations: React.FC<ConversationsProps> = ({
             className="left-list-header-availability"
             css={{...(showLegalHold && {gridColumn: '2/3'})}}
             onClick={event => AvailabilityContextMenu.show(event.nativeEvent, 'left-list-availability-menu')}
-            onBlur={event => {
-              // on blur conversation list should get the focus
-              focusConversationList(true);
-            }}
+            // on blur conversation list should get the focus
+            onBlur={() => focusConversationList(true)}
           >
             <AvailabilityState
               className="availability-state"
               availability={userAvailability}
-              dataUieName={'status-availability'}
+              dataUieName="status-availability"
               label={userName}
             />
           </button>
@@ -206,11 +205,9 @@ const Conversations: React.FC<ConversationsProps> = ({
           data-uie-name="status-name"
           role="presentation"
           tabIndex={0}
-          onBlur={event => {
-            // personal user won't see availability status menu, on blur of the user name
-            // conversation list should get the focus
-            focusConversationList(true);
-          }}
+          // personal user won't see availability status menu, on blur of the userName
+          // conversation list should get the focus
+          onBlur={() => focusConversationList(true)}
         >
           {userName}
         </span>
@@ -220,83 +217,76 @@ const Conversations: React.FC<ConversationsProps> = ({
 
   const footer = (
     <nav className="conversations-footer">
-      <h2 className="visually-hidden">{t('accessibility.headings.sidebar')}</h2>
+      <div
+        role="tablist"
+        aria-label={t('accessibility.headings.sidebar')}
+        aria-owns="tab-1 tab-2 tab-3"
+        className="conversations-footer-list"
+      >
+        <button
+          id="tab-1"
+          type="button"
+          className="conversations-footer-btn"
+          onClick={() => switchList(ListState.START_UI)}
+          onKeyDown={event => {
+            //shift+tab from contacts tab should focus on the first conversation
+            if (event.shiftKey && isTabKey(event)) {
+              focusConversationList(true);
+            }
+          }}
+          title={t('tooltipConversationsStart', Shortcut.getShortcutTooltip(ShortcutType.START))}
+          data-uie-name="go-people"
+        >
+          <Icon.People />
 
-      <div role="tablist" aria-owns="tab-1 tab-2 tab-3">
-        <ul className="conversations-footer-list">
-          <li className="conversations-footer-list-item">
-            <button
-              id="tab-1"
-              type="button"
-              className="conversations-footer-btn"
-              onClick={() => switchList(ListState.START_UI)}
-              onKeyDown={event => {
-                //shift+tab from contacts tab should focus on the first conversation
-                if (event.shiftKey && isTabKey(event)) {
-                  focusConversationList(true);
-                }
-              }}
-              title={t('tooltipConversationsStart', Shortcut.getShortcutTooltip(ShortcutType.START))}
-              data-uie-name="go-people"
-            >
-              <Icon.People />
+          <span className="conversations-footer-btn--text">{t('conversationFooterContacts')}</span>
+        </button>
 
-              <h3 className="conversations-footer-btn--text">{t('conversationFooterContacts')}</h3>
-            </button>
-          </li>
+        <button
+          id="tab-2"
+          type="button"
+          role="tab"
+          className={cx(`conversations-footer-btn`, {active: isRecentViewStyle})}
+          onClick={() => setViewStyle(ConversationViewStyle.RECENT)}
+          title={t('conversationViewTooltip')}
+          data-uie-name="go-recent-view"
+          data-uie-status={isRecentViewStyle ? 'active' : 'inactive'}
+          aria-selected={isRecentViewStyle}
+        >
+          <Icon.ConversationsRecent />
 
-          <li className="conversations-footer-list-item">
-            <button
-              id="tab-2"
-              type="button"
-              role="tab"
-              className={`conversations-footer-btn ${viewStyle === ConversationViewStyle.RECENT ? 'active' : ''}`}
-              onClick={() => setViewStyle(ConversationViewStyle.RECENT)}
-              title={t('conversationViewTooltip')}
-              data-uie-name="go-recent-view"
-              data-uie-status={viewStyle === ConversationViewStyle.RECENT ? 'active' : 'inactive'}
-              aria-selected={viewStyle === ConversationViewStyle.RECENT}
-            >
-              <Icon.ConversationsRecent />
+          <span className="conversations-footer-btn--text">{t('conversationViewTooltip')}</span>
+        </button>
 
-              <h3 className="conversations-footer-btn--text">{t('conversationViewTooltip')}</h3>
-            </button>
-          </li>
+        <button
+          id="tab-3"
+          type="button"
+          role="tab"
+          className={cx(`conversations-footer-btn`, {active: isFolderViewStyle})}
+          onClick={() => setViewStyle(ConversationViewStyle.FOLDER)}
+          title={t('folderViewTooltip')}
+          data-uie-name="go-folder-view"
+          data-uie-status={isFolderViewStyle ? 'active' : 'inactive'}
+          aria-selected={isFolderViewStyle}
+        >
+          <Icon.ConversationsFolder />
 
-          <li className="conversations-footer-list-item">
-            <button
-              id="tab-3"
-              type="button"
-              role="tab"
-              className={`conversations-footer-btn ${viewStyle === ConversationViewStyle.FOLDER ? 'active' : ''}`}
-              onClick={() => setViewStyle(ConversationViewStyle.FOLDER)}
-              title={t('folderViewTooltip')}
-              data-uie-name="go-folder-view"
-              data-uie-status={viewStyle === ConversationViewStyle.FOLDER ? 'active' : 'inactive'}
-              aria-selected={viewStyle === ConversationViewStyle.FOLDER}
-            >
-              <Icon.ConversationsFolder />
+          <span className="conversations-footer-btn--text">{t('folderViewTooltip')}</span>
+        </button>
 
-              <h3 className="conversations-footer-btn--text">{t('folderViewTooltip')}</h3>
-            </button>
-          </li>
+        {archivedConversations.length > 0 && (
+          <button
+            type="button"
+            className="conversations-footer-btn"
+            data-uie-name="go-archive"
+            onClick={() => switchList(ListState.ARCHIVE)}
+            title={t('tooltipConversationsArchived', archivedConversations.length)}
+          >
+            <Icon.Archive />
 
-          {archivedConversations.length > 0 && (
-            <li className="conversations-footer-list-item">
-              <button
-                type="button"
-                className="conversations-footer-btn"
-                data-uie-name="go-archive"
-                onClick={() => switchList(ListState.ARCHIVE)}
-                title={t('tooltipConversationsArchived', archivedConversations.length)}
-              >
-                <Icon.Archive />
-
-                <h3 className="conversations-footer-btn--text">{t('conversationFooterArchive')}</h3>
-              </button>
-            </li>
-          )}
-        </ul>
+            <span className="conversations-footer-btn--text">{t('conversationFooterArchive')}</span>
+          </button>
+        )}
       </div>
     </nav>
   );
@@ -327,10 +317,11 @@ const Conversations: React.FC<ConversationsProps> = ({
       })}
     </>
   );
+
   const {currentFocus, handleKeyDown, setCurrentFocus} = useRoveFocus(conversations.length);
 
   return (
-    <ListWrapper id={'conversations'} headerElement={header} footer={footer} before={callingView}>
+    <ListWrapper id="conversations" headerElement={header} footer={footer} before={callingView}>
       {hasNoConversations ? (
         <>
           {archivedConversations.length === 0 ? (

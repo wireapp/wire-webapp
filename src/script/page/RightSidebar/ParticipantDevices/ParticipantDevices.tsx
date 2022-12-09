@@ -39,6 +39,8 @@ const ParticipantDevices: FC<ParticipantDevicesProps> = ({repositories, onClose,
 
   return (
     <div id="participant-devices" className="panel__page participant-devices">
+      <h2 className="visually-hidden">{t('conversationDetailsActionDevices')}</h2>
+
       <PanelHeader
         onGoBack={() => {
           if (history.current.state === UserDevicesState.DEVICE_LIST) {
