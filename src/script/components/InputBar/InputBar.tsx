@@ -32,9 +32,6 @@ import {useEmoji} from 'Components/Emoji/useEmoji';
 import {Icon} from 'Components/Icon';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
-import {ControlButtons} from 'src/script/page/message-list/InputBarControls/ControlButtons';
-import {GiphyButton} from 'src/script/page/message-list/InputBarControls/GiphyButton';
-import {MentionSuggestionList} from 'src/script/page/message-list/MentionSuggestions';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from 'src/script/user/TypingIndicatorMode';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -50,15 +47,18 @@ import {
 import {formatLocale, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {getSelectionPosition} from 'Util/util';
 
+import {ControlButtons} from './components/InputBarControls/ControlButtons';
+import {GiphyButton} from './components/InputBarControls/GiphyButton';
+import {MentionSuggestionList} from './components/MentionSuggestions';
+import {PastedFileControls} from './components/PastedFileControls';
+import {ReplyBar} from './components/ReplyBar';
+import {TYPING_TIMEOUT} from './components/TypingIndicator';
+import {TypingIndicator} from './components/TypingIndicator/TypingIndicator';
 import {getRichTextInput} from './getRichTextInput';
 import {useFilePaste} from './hooks/useFilePaste';
 import {useResizeTarget} from './hooks/useResizeTarget';
 import {useScrollSync} from './hooks/useScrollSync';
 import {useTextAreaFocus} from './hooks/useTextAreaFocus';
-import {PastedFileControls} from './PastedFileControls';
-import {ReplyBar} from './ReplyBar';
-import {TYPING_TIMEOUT} from './TypingIndicator';
-import {TypingIndicator} from './TypingIndicator/TypingIndicator';
 
 import {Config} from '../../Config';
 import {ConversationRepository} from '../../conversation/ConversationRepository';

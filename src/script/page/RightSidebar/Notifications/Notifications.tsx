@@ -20,11 +20,11 @@
 import {useState, FC} from 'react';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {initFadingScrollbar} from 'Util/DOM/fadingScrollbar';
 import {t} from 'Util/LocalizerUtil';
 
 import {NOTIFICATION_STATE, getNotificationText} from '../../../conversation/NotificationSetting';
 import {Conversation} from '../../../entity/Conversation';
-import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';
 import {PreferencesRadio} from '../../MainContent/panels/preferences/components/PreferencesRadio';
 import {PanelHeader} from '../PanelHeader';

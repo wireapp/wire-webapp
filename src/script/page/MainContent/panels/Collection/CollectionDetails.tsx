@@ -21,6 +21,7 @@ import React, {Fragment} from 'react';
 
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {initFadingScrollbar} from 'Util/DOM/fadingScrollbar';
 import {t} from 'Util/LocalizerUtil';
 import {formatLocale, isThisYear, isToday} from 'Util/TimeUtil';
 import {noop} from 'Util/util';
@@ -28,7 +29,6 @@ import {noop} from 'Util/util';
 import {CollectionItem} from './CollectionItem';
 
 import {Conversation} from '../../../../entity/Conversation';
-import {initFadingScrollbar} from '../../../../ui/fadingScrollbar';
 
 interface CollectionDetailsProps {
   conversation: Conversation;

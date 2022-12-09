@@ -20,10 +20,10 @@
 import {FC} from 'react';
 
 import {UserDevices, UserDevicesState, useUserDevicesHistory} from 'Components/UserDevices';
+import {initFadingScrollbar} from 'Util/DOM/fadingScrollbar';
 import {t} from 'Util/LocalizerUtil';
 
 import type {User} from '../../../entity/User';
-import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';
 import {PanelHeader} from '../PanelHeader';
 

@@ -23,10 +23,9 @@ import {css} from '@emotion/react';
 import {throttle} from 'underscore';
 
 import {Icon} from 'Components/Icon';
+import {initFadingScrollbar} from 'Util/DOM/fadingScrollbar';
 import {t} from 'Util/LocalizerUtil';
 import {isScrollable, isScrolledBottom, isScrolledTop} from 'Util/scroll-helpers';
-
-import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 
 type LeftListWrapperProps = {
   /** A react element that will be inserted after the header but before the list */

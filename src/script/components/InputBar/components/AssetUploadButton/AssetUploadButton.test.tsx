@@ -19,16 +19,7 @@
 
 import {render, fireEvent} from '@testing-library/react';
 
-import {AssetUploadButton} from './';
-
-jest.mock('../../../Config', () => ({
-  Config: {
-    getConfig: () => ({
-      ALLOWED_IMAGE_TYPES: ['image/gif', 'image/avif'],
-      FEATURE: {ALLOWED_FILE_UPLOAD_EXTENSIONS: ['*']},
-    }),
-  },
-}));
+import {AssetUploadButton} from '.';
 
 const pngFile = new File(['(⌐□_□)'], 'chucknorris.png', {type: 'image/png'});
 
