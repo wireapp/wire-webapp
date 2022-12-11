@@ -1440,15 +1440,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/commons@npm:5.0.3":
-  version: 5.0.3
-  resolution: "@wireapp/commons@npm:5.0.3"
+"@wireapp/commons@npm:5.0.4":
+  version: 5.0.4
+  resolution: "@wireapp/commons@npm:5.0.4"
   dependencies:
     ansi-regex: 5.0.1
-    fs-extra: 10.1.0
+    fs-extra: 11.1.0
     logdown: 3.3.1
     platform: 1.3.6
-  checksum: cf69ac8d0c3c116b0ccde13cee46d3c6623f36c395f449a73ac4dbb602aff229abb86b0a811b3cc91e8773ee9c6892ffc455612aa876009ddba63f782b73e5b0
+  checksum: 714285b048d4c8b708d662b55e78c0fec1a6fa8c976c78fef420b4325c91087af8f32551850c78cea947710bad8b1ac288e21006f62cd982fe01a6f4983b1b24
   languageName: node
   linkType: hard
 
@@ -2808,17 +2808,6 @@ __metadata:
   version: 0.5.2
   resolution: "fresh@npm:0.5.2"
   checksum: 13ea8b08f91e669a64e3ba3a20eb79d7ca5379a81f1ff7f4310d54e2320645503cc0c78daedc93dfb6191287295f6479544a649c64d8e41a1c0fb0c221552346
-  languageName: node
-  linkType: hard
-
-"fs-extra@npm:10.1.0":
-  version: 10.1.0
-  resolution: "fs-extra@npm:10.1.0"
-  dependencies:
-    graceful-fs: ^4.2.0
-    jsonfile: ^6.0.1
-    universalify: ^2.0.0
-  checksum: dc94ab37096f813cc3ca12f0f1b5ad6744dfed9ed21e953d72530d103cea193c2f81584a39e9dee1bea36de5ee66805678c0dddc048e8af1427ac19c00fffc50
   languageName: node
   linkType: hard
 
@@ -6011,7 +6000,7 @@ __metadata:
     "@types/hbs": 4.0.1
     "@types/jest": ^29.2.4
     "@types/node": 12.20.55
-    "@wireapp/commons": 5.0.3
+    "@wireapp/commons": 5.0.4
     dotenv: 16.0.3
     dotenv-extended: 2.9.0
     express: 4.18.2
