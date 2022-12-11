@@ -33,7 +33,7 @@
     "react-intl": "6.2.5",
     "react-redux": "8.0.5",
     "react-router": "6.4.4",
-    "react-router-dom": "6.4.4",
+    "react-router-dom": "6.4.5",
     "react-transition-group": "4.4.5",
     "redux": "4.2.0",
     "redux-logdown": "1.0.4",
