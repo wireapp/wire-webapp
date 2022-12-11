@@ -3425,7 +3425,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:>=13.7.0, @types/node@npm:^18.11.10":
+"@types/node@npm:*, @types/node@npm:>=13.7.0":
   version: 18.11.10
   resolution: "@types/node@npm:18.11.10"
   checksum: 0f60cb090b2ee91fcd3dc4311bc1ed7889b92f14644c0069f100776f86474c12eebbcc6c75bc0d7d96b975a103b4d5d6b3c22b4e88bea6e7f4e2b1bb0daf5ea8
@@ -3436,6 +3436,13 @@ __metadata:
   version: 13.13.4
   resolution: "@types/node@npm:13.13.4"
   checksum: 07b869f5e9e477ef116eec4183cb9cbb1cdec1f6390fba925471235a668032e897bb1bff446d9df8bd17d0d81a4dbfe4e69458baaad0a05b6a64b0b4c59df5aa
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^18.11.13":
+  version: 18.11.13
+  resolution: "@types/node@npm:18.11.13"
+  checksum: b0c1aa3bd2f5df8240e61096a49d6d4be600109b824d23408ec4ba1ec057dc0c60588e09f73b8a60455ad26d367e9c5562fad8403099f885cbc7b4cace83ec4c
   languageName: node
   linkType: hard
 
@@ -16213,7 +16220,7 @@ __metadata:
     "@types/libsodium-wrappers-sumo": 0.7.5
     "@types/linkify-it": 3.0.2
     "@types/markdown-it": 12.2.3
-    "@types/node": ^18.11.10
+    "@types/node": ^18.11.13
     "@types/open-graph": 0.2.2
     "@types/platform": 1.3.4
     "@types/prettier": ^2.7.1
