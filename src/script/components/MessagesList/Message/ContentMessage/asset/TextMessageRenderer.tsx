@@ -19,7 +19,8 @@
 
 import {useEffect, FC, useState} from 'react';
 
-import {Text} from 'src/script/entity/message/Text';
+import murmurhash from 'murmurhash';
+
 import {isKeyDownEvent} from 'src/script/guards/Event';
 import {isMouseEvent} from 'src/script/guards/Mouse';
 import {getAllFocusableElements, setElementsTabIndex} from 'Util/focusUtil';
@@ -32,9 +33,7 @@ interface TextMessageRendererProps {
   text: string;
   isCurrentConversationFocused: boolean;
   msgClass: string;
-  asset: Text;
   isQuoteMsg?: boolean;
-  editedTimestamp?: number;
   setCanShowMore?: (showMore: boolean) => void;
 }
 export interface MessageDetails {
@@ -48,9 +47,7 @@ export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
   onMessageClick,
   msgClass,
   isCurrentConversationFocused,
-  asset,
   isQuoteMsg = false,
-  editedTimestamp,
   setCanShowMore,
   ...props
 }) => {
@@ -128,7 +125,7 @@ export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
     // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
     <p
       ref={setContainerRef}
-      key={`${editedTimestamp}:${text}`}
+      key={murmurhash.v3(text)}
       onClick={handleInteraction}
       onAuxClick={handleInteraction}
       onKeyDown={handleInteraction}

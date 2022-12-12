@@ -160,15 +160,7 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
     headerSenderName,
     was_edited,
     timestamp,
-    edited_timestamp: editedTimestamp,
-  } = useKoSubscribableChildren(quotedMessage, [
-    'user',
-    'assets',
-    'headerSenderName',
-    'was_edited',
-    'timestamp',
-    'edited_timestamp',
-  ]);
+  } = useKoSubscribableChildren(quotedMessage, ['user', 'assets', 'headerSenderName', 'was_edited', 'timestamp']);
   const [showFullText, setShowFullText] = useState(false);
   const [canShowMore, setCanShowMore] = useState(false);
 
@@ -217,11 +209,9 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
                   'message-quote__text--large': includesOnlyEmojis(asset.text),
                 })}
                 isCurrentConversationFocused={focusConversation}
-                asset={asset}
                 data-uie-name="media-text-quote"
                 isQuoteMsg
                 setCanShowMore={setCanShowMore}
-                editedTimestamp={editedTimestamp}
               />
               {canShowMore && (
                 <RenderShowMsgBtn

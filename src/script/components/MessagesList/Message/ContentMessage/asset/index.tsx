@@ -77,7 +77,6 @@ const ContentAsset = ({
                 'ephemeral-message-obfuscated': isObfuscated,
               })}
               isCurrentConversationFocused={focusConversation}
-              asset={asset as Text}
             />
           )}
           {(asset as Text).previews().map(preview => (
