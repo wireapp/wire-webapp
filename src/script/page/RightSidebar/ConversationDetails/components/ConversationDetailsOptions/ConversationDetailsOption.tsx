@@ -43,8 +43,8 @@ const ConversationDetailsOption: FC<ConversationDetailsOptionProps> = ({
 }) => (
   <li className={className}>
     <button className="panel__action-item" onClick={onClick} data-uie-name={dataUieName} type="button">
+      2nd one
       <span className="panel__action-item__icon">{icon}</span>
-
       <span className="panel__action-item__summary">
         <span className="panel__action-item__text">
           <p>{title}</p>
@@ -54,7 +54,6 @@ const ConversationDetailsOption: FC<ConversationDetailsOptionProps> = ({
           {statusText}
         </p>
       </span>
-
       <Icon.ChevronRight className="chevron-right-icon" />
     </button>
   </li>

@@ -220,27 +220,28 @@ const UserList: React.FC<UserListProps> = ({
     const truncatedUsers = truncate ? users.slice(0, reducedUserCount) : users;
 
     content = (
-      <div className={cx('search-list', cssClasses)}>
+      <ul className={cx('search-list', cssClasses)}>
         {truncatedUsers.slice(0, maxShownUsers).map(user => (
-          <ParticipantItem
-            key={user.id}
-            noInteraction={noSelfInteraction && user.isMe}
-            participant={user}
-            noUnderline={noUnderline}
-            highlighted={highlightedUserIds.includes(user.id)}
-            customInfo={infos && infos[user.id]}
-            canSelect={isSelectEnabled}
-            isSelected={isSelected(user)}
-            mode={mode}
-            external={teamState.isExternal(user.id)}
-            selfInTeam={selfInTeam}
-            isSelfVerified={isSelfVerified}
-            onClick={onClickOrKeyPressed}
-            onKeyDown={onUserKeyPressed}
-            showArrow={showArrow}
-          />
+          <li key={user.id}>
+            <ParticipantItem
+              noInteraction={noSelfInteraction && user.isMe}
+              participant={user}
+              noUnderline={noUnderline}
+              highlighted={highlightedUserIds.includes(user.id)}
+              customInfo={infos && infos[user.id]}
+              canSelect={isSelectEnabled}
+              isSelected={isSelected(user)}
+              mode={mode}
+              external={teamState.isExternal(user.id)}
+              selfInTeam={selfInTeam}
+              isSelfVerified={isSelfVerified}
+              onClick={onClickOrKeyPressed}
+              onKeyDown={onUserKeyPressed}
+              showArrow={showArrow}
+            />
+          </li>
         ))}
-      </div>
+      </ul>
     );
   }
 
