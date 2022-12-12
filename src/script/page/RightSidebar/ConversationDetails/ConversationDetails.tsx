@@ -24,8 +24,10 @@ import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
 import {ConversationProtocolDetails} from 'Components/panel/ConversationProtocolDetails/ConversationProtocolDetails';
+import {EnrichedFields} from 'Components/panel/EnrichedFields';
 import {PanelActions} from 'Components/panel/PanelActions';
 import {ServiceDetails} from 'Components/panel/ServiceDetails';
+import {UserDetails} from 'Components/panel/UserDetails';
 import {ServiceList} from 'Components/ServiceList';
 import {UserSearchableList} from 'Components/UserSearchableList';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -36,7 +38,6 @@ import {formatDuration} from 'Util/TimeUtil';
 import {ConversationDetailsBottomActions} from './components/ConversationDetailsBottomActions';
 import {ConversationDetailsHeader} from './components/ConversationDetailsHeader';
 import {ConversationDetailsOptions} from './components/ConversationDetailsOptions';
-import {UserConversationDetails} from './components/UserConversationDetails';
 import {getConversationActions} from './utils/getConversationActions';
 
 import {ConversationRepository} from '../../../conversation/ConversationRepository';
@@ -276,15 +277,17 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
         {isSingleUserMode && isServiceMode && selectedService && <ServiceDetails service={selectedService} />}
 
         {isSingleUserMode && !isServiceMode && firstParticipant && (
-          <UserConversationDetails
-            firstParticipant={firstParticipant}
-            isVerified={isVerified}
-            isSelfVerified={isSelfVerified}
-            isFederated={isFederated}
-            badge={teamRepository.getRoleBadge(firstParticipant.id)}
-            classifiedDomains={classifiedDomains}
-            onDevicesClick={openParticipantDevices}
-          />
+          <>
+            <UserDetails
+              participant={firstParticipant}
+              isVerified={isVerified}
+              isSelfVerified={isSelfVerified}
+              badge={teamRepository.getRoleBadge(firstParticipant.id)}
+              classifiedDomains={classifiedDomains}
+            />
+
+            <EnrichedFields user={firstParticipant} showDomain={isFederated} />
+          </>
         )}
 
         {!isSingleUserMode && (
@@ -398,12 +401,30 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
         {isActivatedAccount && (
           <>
             <ConversationDetailsBottomActions
+              isDeviceActionEnabled={!!(firstParticipant.isConnected || firstParticipant.inTeam)}
+              showDevices={openParticipantDevices}
               showNotifications={showNotifications}
               notificationStatusText={notificationStatusText}
               showOptionNotifications1To1={showOptionNotifications1To1}
-              isSingleUserMode={isSingleUserMode}
-              hasReceiptsEnabled={hasReceiptsEnabled}
             />
+
+            {isSingleUserMode && (
+              <div className="conversation-details__read-receipts" data-uie-name="label-1to1-read-receipts">
+                <strong className="panel__info-text panel__info-text--head panel__info-text--margin-bottom">
+                  {hasReceiptsEnabled
+                    ? t('conversationDetails1to1ReceiptsHeadEnabled')
+                    : t('conversationDetails1to1ReceiptsHeadDisabled')}
+                </strong>
+
+                <p className="panel__info-text panel__info-text--margin-bottom">
+                  {t('conversationDetails1to1ReceiptsFirst')}
+                </p>
+
+                <p className="panel__info-text panel__info-text--margin">
+                  {t('conversationDetails1to1ReceiptsSecond')}
+                </p>
+              </div>
+            )}
 
             <PanelActions items={conversationActions} />
           </>
