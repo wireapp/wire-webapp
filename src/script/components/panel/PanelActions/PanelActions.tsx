@@ -39,11 +39,11 @@ const PanelActions: React.FC<PanelActionsProps> = ({items}) => {
     <ul css={listCSS}>
       {items.map(({click, identifier, icon, label}) => (
         <li key={identifier}>
-          1st one
           <button className="panel__action-item" onClick={click} data-uie-name={identifier} type="button">
             <span className="panel__action-item__icon">
               <Icon name={icon} />
             </span>
+
             <span data-uie-name={`${identifier}-item-text`} className="panel__action-item__text">
               {label}
             </span>
