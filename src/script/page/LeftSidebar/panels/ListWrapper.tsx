@@ -27,18 +27,6 @@ import {Icon} from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 import {isScrollable, isScrolledBottom, isScrolledTop} from 'Util/scroll-helpers';
 
-type LeftListWrapperProps = {
-  /** A react element that will be inserted after the header but before the list */
-  before?: ReactElement;
-  children: React.ReactNode;
-  footer?: ReactElement;
-  header?: string;
-  headerElement?: ReactElement;
-  headerUieName?: string;
-  id: string;
-  onClose?: () => void;
-};
-
 const scrollStyle = css`
   flex: 1 1 auto;
   min-height: 150px;
@@ -56,7 +44,19 @@ const style = css`
   width: 100%;
 `;
 
-const ListWrapper: React.FC<LeftListWrapperProps> = ({
+interface LeftListWrapperProps {
+  /** A react element that will be inserted after the header but before the list */
+  before?: ReactElement;
+  children: React.ReactNode;
+  footer?: ReactElement;
+  header?: string;
+  headerElement?: ReactElement;
+  headerUieName?: string;
+  id: string;
+  onClose?: () => void;
+}
+
+const ListWrapper = ({
   id,
   header,
   headerElement,
@@ -65,7 +65,7 @@ const ListWrapper: React.FC<LeftListWrapperProps> = ({
   footer,
   before,
   headerUieName,
-}) => {
+}: LeftListWrapperProps) => {
   const calculateBorders = throttle((element: HTMLElement) => {
     window.requestAnimationFrame(() => {
       if (element.offsetHeight <= 0 || !isScrollable(element)) {
@@ -93,10 +93,9 @@ const ListWrapper: React.FC<LeftListWrapperProps> = ({
           headerElement
         ) : (
           <>
-            {/* FIXME?: Replace h2 tag with span? Need verification */}
-            <span className="left-list-header-text" data-uie-name={headerUieName}>
+            <h2 className="left-list-header-text" data-uie-name={headerUieName}>
               {header}
-            </span>
+            </h2>
 
             <button
               type="button"
