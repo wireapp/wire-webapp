@@ -20,6 +20,8 @@
 import {useEffect, FC, useState} from 'react';
 
 import {Text} from 'src/script/entity/message/Text';
+import {isKeyDownEvent} from 'src/script/guards/Event';
+import {isMouseEvent} from 'src/script/guards/Mouse';
 import {getAllFocusableElements, setElementsTabIndex} from 'Util/focusUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 
@@ -68,12 +70,11 @@ export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
   }, [isQuoteMsg, setCanShowMore, containerRef]);
 
   useEffect(() => {
-    const element = containerRef;
-    if (!element) {
+    if (!containerRef) {
       return;
     }
 
-    const interactiveMsgElements = getAllFocusableElements(element);
+    const interactiveMsgElements = getAllFocusableElements(containerRef);
     setElementsTabIndex(interactiveMsgElements, isCurrentConversationFocused);
   }, [isCurrentConversationFocused, containerRef]);
 
@@ -82,12 +83,12 @@ export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
     elementType: ElementType,
     messageDetails: MessageDetails,
   ) => {
-    if (event.type === 'keydown' && isCurrentConversationFocused) {
-      handleKeyDown(event as KeyboardEvent, () => {
+    if (isKeyDownEvent(event) && isCurrentConversationFocused) {
+      handleKeyDown(event, () => {
         event.preventDefault();
         onMessageClick(event, elementType, messageDetails);
       });
-    } else if (event.type === 'click') {
+    } else if (isMouseEvent(event)) {
       event.preventDefault();
       onMessageClick(event, elementType, messageDetails);
     }
