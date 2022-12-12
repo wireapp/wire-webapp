@@ -26,7 +26,7 @@ import {createRandomUuid} from 'Util/util';
 
 import {TextMessageRenderer} from './TextMessageRenderer';
 
-import {MentionEntity} from '../../../../../message/MentionEntity';
+import {MentionEntity} from '../../../../../../message/MentionEntity';
 
 const mention = {
   domain: '',

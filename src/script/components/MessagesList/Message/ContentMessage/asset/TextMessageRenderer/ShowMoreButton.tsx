@@ -17,40 +17,37 @@
  *
  */
 
-import {FC} from 'react';
+import {FC, HTMLProps} from 'react';
 
 import cx from 'classnames';
 
 import {Icon} from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
-interface ShowMsgBtnProps {
-  showFullText: boolean;
+interface ShowMoreButtonProps {
+  active: boolean;
   isCurrentConversationFocused: boolean;
-  setShowFullText: (showMore: boolean) => void;
 }
 
-export const RenderShowMsgBtn: FC<ShowMsgBtnProps> = ({
-  showFullText,
+export const ShowMoreButton: FC<ShowMoreButtonProps & HTMLProps<HTMLButtonElement>> = ({
+  active,
   isCurrentConversationFocused,
-  setShowFullText,
+  ...props
 }) => {
   return (
-    <>
-      <button
-        type="button"
-        className="button-reset-default message-quote__text__show-more"
-        onClick={() => setShowFullText(!showFullText)}
-        data-uie-name="do-show-more-quote"
-        tabIndex={isCurrentConversationFocused ? 0 : -1}
-      >
-        <span>{showFullText ? t('replyQuoteShowLess') : t('replyQuoteShowMore')}</span>
-        <Icon.Disclose
-          className={cx('disclose-icon', {
-            'upside-down': showFullText,
-          })}
-        />
-      </button>
-    </>
+    <button
+      className="button-reset-default message-quote__text__show-more"
+      data-uie-name="do-show-more-quote"
+      tabIndex={isCurrentConversationFocused ? 0 : -1}
+      {...props}
+      type="button"
+    >
+      <span>{active ? t('replyQuoteShowLess') : t('replyQuoteShowMore')}</span>
+      <Icon.Disclose
+        className={cx('disclose-icon', {
+          'upside-down': active,
+        })}
+      />
+    </button>
   );
 };

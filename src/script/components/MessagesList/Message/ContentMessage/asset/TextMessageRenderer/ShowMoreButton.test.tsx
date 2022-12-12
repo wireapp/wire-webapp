@@ -21,14 +21,14 @@ import {fireEvent, render} from '@testing-library/react';
 
 import {t} from 'Util/LocalizerUtil';
 
-import {RenderShowMsgBtn} from './RenderShowMsgBtn';
+import {ShowMoreButton} from './ShowMoreButton';
 
-describe('ToggleMsgFullTxt', () => {
+describe('ShowMoreButton', () => {
   it('toggles button show more/show less for a quoted message', () => {
     let show = true;
     const setShowFullText = jest.fn(show => !show);
     const {getByTestId, getByText, rerender} = render(
-      <RenderShowMsgBtn showFullText={show} setShowFullText={setShowFullText} isCurrentConversationFocused />,
+      <ShowMoreButton active={show} onClick={setShowFullText} isCurrentConversationFocused />,
     );
 
     expect(getByText(t('replyQuoteShowLess'))).not.toBeNull();
@@ -40,7 +40,7 @@ describe('ToggleMsgFullTxt', () => {
     show = false;
 
     // re-render the same component with different props
-    rerender(<RenderShowMsgBtn showFullText={show} setShowFullText={setShowFullText} isCurrentConversationFocused />);
+    rerender(<ShowMoreButton active={show} onClick={setShowFullText} isCurrentConversationFocused />);
     fireEvent.click(toggleShowBtn);
 
     expect(setShowFullText).toHaveBeenCalled();
