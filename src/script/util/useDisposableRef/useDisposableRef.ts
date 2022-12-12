@@ -17,7 +17,7 @@
  *
  */
 
-import {useLayoutEffect, useRef, useState} from 'react';
+import {useCallback, useLayoutEffect, useRef, useState} from 'react';
 
 /**
  * Hooks that takes an init function that will be ran whenever a DOM element changes
@@ -41,9 +41,14 @@ export function useDisposableRef(init: (element: HTMLElement) => () => void, dep
 export function useDisposableRefNew(init: (element: HTMLElement) => () => void) {
   const [elementRef, setElementRef] = useState<HTMLElement | null>(null);
 
+  const setRef = useCallback((element: HTMLElement | null) => {
+    setElementRef(element);
+    return element;
+  }, []);
+
   useLayoutEffect(() => {
     return elementRef ? init(elementRef) : () => {};
   }, [elementRef, init]);
 
-  return {ref: setElementRef};
+  return {ref: setRef};
 }

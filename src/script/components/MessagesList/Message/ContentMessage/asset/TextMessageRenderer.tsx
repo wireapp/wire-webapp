@@ -17,12 +17,12 @@
  *
  */
 
-import {useEffect, useRef, FC} from 'react';
+import {useEffect, useRef, FC, useCallback} from 'react';
 
 import {Text} from 'src/script/entity/message/Text';
 import {getAllFocusableElements, setElementsTabIndex} from 'Util/focusUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
-import {useDisposableRef} from 'Util/useDisposableRef';
+import {useDisposableRefNew} from 'Util/useDisposableRef';
 
 export type ElementType = 'markdownLink' | 'email' | 'mention';
 
@@ -59,9 +59,10 @@ export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
   setCanShowMore,
   ...props
 }) => {
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const detectLongQuotes = useDisposableRef(
-    element => {
+  const containerRef = useRef<HTMLElement | null>(null);
+
+  const handleLongQuotes = useCallback(
+    (element: HTMLElement) => {
       const preNode = element.querySelector('pre');
       const width = Math.max(element.scrollWidth, preNode ? preNode.scrollWidth : 0);
       const height = Math.max(element.scrollHeight, preNode ? preNode.scrollHeight : 0);
@@ -70,8 +71,10 @@ export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
       setCanShowMore?.(isWider || isHigher);
       return () => {};
     },
-    [editedTimestamp],
+    [setCanShowMore],
   );
+
+  const {ref: detectLongQuotes} = useDisposableRefNew(handleLongQuotes);
 
   useEffect(() => {
     if (!containerRef.current) {
@@ -164,6 +167,7 @@ export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
           containerRef.current = element;
         }
       }}
+      key={text}
       className={msgClass}
       dangerouslySetInnerHTML={{__html: text}}
       dir="auto"
