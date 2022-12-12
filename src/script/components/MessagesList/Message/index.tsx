@@ -38,7 +38,6 @@ import type {ContentMessage} from '../../../entity/message/ContentMessage';
 import type {DecryptErrorMessage} from '../../../entity/message/DecryptErrorMessage';
 import type {MemberMessage as MemberMessageEntity} from '../../../entity/message/MemberMessage';
 import {Message as BaseMessage} from '../../../entity/message/Message';
-import type {Text} from '../../../entity/message/Text';
 import type {User} from '../../../entity/User';
 import {useRelativeTimestamp} from '../../../hooks/useRelativeTimestamp';
 import {TeamState} from '../../../team/TeamState';
@@ -49,12 +48,7 @@ export interface MessageActions {
   onClickImage: (message: ContentMessage, event: React.UIEvent) => void;
   onClickInvitePeople: () => void;
   onClickLikes: (message: BaseMessage) => void;
-  onClickMessage: (
-    asset: Text,
-    event: MouseEvent | KeyboardEvent,
-    elementType: ElementType,
-    messageDetails: MessageDetails,
-  ) => void;
+  onClickMessage: (event: MouseEvent | KeyboardEvent, elementType: ElementType, messageDetails: MessageDetails) => void;
   onClickParticipants: (participants: User[]) => void;
   onClickReceipts: (message: BaseMessage) => void;
   onClickResetSession: (messageError: DecryptErrorMessage) => void;
