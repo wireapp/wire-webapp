@@ -17,13 +17,14 @@
  *
  */
 
-import {useEffect, FC, useState} from 'react';
+import {useEffect, FC, useState, HTMLProps, useRef} from 'react';
 
-import {Text} from 'src/script/entity/message/Text';
 import {isKeyDownEvent} from 'src/script/guards/Event';
 import {isMouseEvent} from 'src/script/guards/Mouse';
 import {getAllFocusableElements, setElementsTabIndex} from 'Util/focusUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
+
+import {ShowMoreButton} from './ShowMoreButton';
 
 export type ElementType = 'markdownLink' | 'email' | 'mention';
 
@@ -31,10 +32,8 @@ interface TextMessageRendererProps {
   onMessageClick: (event: MouseEvent | KeyboardEvent, elementType: ElementType, messageDetails: MessageDetails) => void;
   text: string;
   isCurrentConversationFocused: boolean;
-  msgClass: string;
-  asset: Text;
-  isQuoteMsg?: boolean;
-  editedTimestamp?: number;
+  /** will collapse the text to a single line when set (and add a `showMore` button if there is more content to show) */
+  collapse?: boolean;
   setCanShowMore?: (showMore: boolean) => void;
 }
 export interface MessageDetails {
@@ -43,31 +42,34 @@ export interface MessageDetails {
   userDomain?: string;
 }
 
-export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
+export const TextMessageRenderer: FC<TextMessageRendererProps & HTMLProps<HTMLParagraphElement>> = ({
   text,
   onMessageClick,
-  msgClass,
   isCurrentConversationFocused,
-  asset,
-  isQuoteMsg = false,
-  editedTimestamp,
-  setCanShowMore,
+  className,
+  collapse = false,
   ...props
 }) => {
   const [containerRef, setContainerRef] = useState<HTMLParagraphElement | null>(null);
+  const [canShowMore, setCanShowMore] = useState<boolean>(false);
+  const [showFullText, setShowFullText] = useState<boolean>(!collapse);
+
+  const collapsedHeightRef = useRef<number>(0);
 
   useEffect(() => {
     const element = containerRef;
 
-    if (element && isQuoteMsg) {
+    if (element && collapse) {
       const preNode = element.querySelector('pre');
+      const collapsedHeight = collapsedHeightRef.current || element.clientHeight;
       const width = Math.max(element.scrollWidth, preNode ? preNode.scrollWidth : 0);
       const height = Math.max(element.scrollHeight, preNode ? preNode.scrollHeight : 0);
       const isWider = width > element.clientWidth;
-      const isHigher = height > element.clientHeight;
+      const isHigher = height > collapsedHeight;
+      collapsedHeightRef.current = collapsedHeight;
       setCanShowMore?.(isWider || isHigher);
     }
-  }, [isQuoteMsg, setCanShowMore, containerRef]);
+  }, [collapse, setCanShowMore, containerRef]);
 
   useEffect(() => {
     if (!containerRef) {
@@ -121,22 +123,38 @@ export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
       forwardEvent(event.nativeEvent, 'mention', mentionMsgDetails);
     }
   };
+  const extraClasses = showFullText ? 'message-quote__text--full' : '';
+
+  const toggleShowMore = () => setShowFullText(prev => !prev);
 
   return (
-    // We will register the click event on the paragraph element and determine the type of the element clicked.
-    // This is because the paragraph element is fed with raw HTML and we cannot register the click event on the clickabled elements directly.
-    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
-    <p
-      ref={setContainerRef}
-      key={`${editedTimestamp}:${text}`}
-      onClick={handleInteraction}
-      onAuxClick={handleInteraction}
-      onKeyDown={handleInteraction}
-      onKeyUp={handleInteraction}
-      className={msgClass}
-      dangerouslySetInnerHTML={{__html: text}}
-      dir="auto"
-      {...props}
-    />
+    <>
+      {
+        // We will register the click event on the paragraph element and determine the type of the element clicked. //
+        //This is because the paragraph element is fed with raw HTML and we cannot register the click event on the
+        //clickabled elements directly.
+      }
+      {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
+      <p
+        ref={setContainerRef}
+        // We want to make sure that this element is re-rendered when the text changes (this will trigger the containerRef to be updated).
+        key={text}
+        onClick={handleInteraction}
+        onAuxClick={handleInteraction}
+        onKeyDown={handleInteraction}
+        onKeyUp={handleInteraction}
+        dangerouslySetInnerHTML={{__html: text}}
+        dir="auto"
+        className={`${className} ${extraClasses}`}
+        {...props}
+      />
+      {canShowMore && (
+        <ShowMoreButton
+          onClick={toggleShowMore}
+          isCurrentConversationFocused={isCurrentConversationFocused}
+          active={showFullText}
+        ></ShowMoreButton>
+      )}
+    </>
   );
 };
