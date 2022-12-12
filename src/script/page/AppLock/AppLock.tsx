@@ -297,7 +297,11 @@ const AppLock: React.FC<AppLockProps> = ({
               dangerouslySetInnerHTML={{__html: t('modalAppLockSetupMessage', {}, {br: '<br><br>'})}}
               data-uie-name="label-applock-set-text"
             />
-            <label className="modal__text modal__label" data-uie-name="label-applock-unlock-text">
+            <label
+              className="modal__text modal__label"
+              data-uie-name="label-applock-unlock-text"
+              htmlFor="input-applock-set-a"
+            >
               {t('modalAppLockPasscode')}
             </label>
             {/* eslint jsx-a11y/no-autofocus : "off" */}
@@ -311,6 +315,7 @@ const AppLock: React.FC<AppLockProps> = ({
               data-uie-status={isSetupPassphraseValid ? 'valid' : 'invalid'}
               data-uie-name="input-applock-set-a"
               autoComplete="new-password"
+              id="input-applock-set-a"
             />
             <p
               className={`modal__passcode__info ${isSetupPassphraseLength ? 'modal__passcode__info--valid' : ''}`}
