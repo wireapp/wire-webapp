@@ -24,7 +24,6 @@ import {ClientType} from '@wireapp/api-client/lib/client/';
 import {LowDiskSpaceError} from '@wireapp/store-engine/lib/engine/error';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-import type {Account} from '@wireapp/core';
 import type {CRUDEngine} from '@wireapp/store-engine';
 import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
 
@@ -103,7 +102,7 @@ export class AuthAction {
       try {
         await onBeforeLogin(dispatch, getState, global);
         await core.login(loginData, false, clientAction.generateClientPayload(loginData.clientType));
-        await this.persistAuthData(loginData.clientType, core, dispatch, localStorageAction);
+        await this.persistClientData(loginData.clientType, dispatch, localStorageAction);
         await dispatch(
           cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: global.getConfig().APP_INSTANCE_ID}),
         );
@@ -176,7 +175,7 @@ export class AuthAction {
       try {
         // we first init the core without initializing the client for now (this will be done later on)
         await core.init(clientType, {initClient: false});
-        await this.persistAuthData(clientType, core, dispatch, localStorageAction);
+        await this.persistClientData(clientType, dispatch, localStorageAction);
         await dispatch(selfAction.fetchSelf());
         await dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: getConfig().APP_INSTANCE_ID}));
         await dispatch(clientAction.doInitializeClient(clientType));
@@ -221,26 +220,16 @@ export class AuthAction {
     };
   };
 
-  persistAuthData = (
+  private persistClientData = (
     clientType: ClientType,
-    core: Account,
     dispatch: ThunkDispatch,
     localStorageAction: LocalStorageAction,
-  ): Promise<void[]> => {
-    const persist = clientType === ClientType.PERMANENT;
-    const accessToken = core['apiClient']['accessTokenStore'].accessToken;
-    const expiresMillis = accessToken.expires_in * 1000;
-    const expireTimestamp = Date.now() + expiresMillis;
-    const saveTasks = [
-      dispatch(localStorageAction.setLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.EXPIRATION, expireTimestamp)),
-      dispatch(localStorageAction.setLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.TTL, expiresMillis)),
-      dispatch(localStorageAction.setLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.TYPE, accessToken.token_type)),
-      dispatch(localStorageAction.setLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.VALUE, accessToken.access_token)),
-    ];
-    if (clientType !== ClientType.NONE) {
-      saveTasks.push(dispatch(localStorageAction.setLocalStorage(LocalStorageKey.AUTH.PERSIST, persist)));
+  ): Promise<void> => {
+    if (clientType === ClientType.NONE) {
+      return Promise.resolve();
     }
-    return Promise.all(saveTasks);
+    const persist = clientType === ClientType.PERMANENT;
+    return dispatch(localStorageAction.setLocalStorage(LocalStorageKey.AUTH.PERSIST, persist));
   };
 
   pushAccountRegistrationData = (registration: Partial<RegistrationDataState>): ThunkAction => {
@@ -279,7 +268,7 @@ export class AuthAction {
       try {
         await dispatch(this.doSilentLogout());
         await core.register(registration, clientType);
-        await this.persistAuthData(clientType, core, dispatch, localStorageAction);
+        await this.persistClientData(clientType, dispatch, localStorageAction);
         await dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: getConfig().APP_INSTANCE_ID}));
         await dispatch(selfAction.fetchSelf());
         await dispatch(clientAction.doInitializeClient(clientType));
@@ -306,7 +295,7 @@ export class AuthAction {
       try {
         await dispatch(authAction.doSilentLogout());
         await core.register(registration, clientType);
-        await this.persistAuthData(clientType, core, dispatch, localStorageAction);
+        await this.persistClientData(clientType, dispatch, localStorageAction);
         await dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: getConfig().APP_INSTANCE_ID}));
         await dispatch(selfAction.fetchSelf());
         await dispatch(clientAction.doInitializeClient(clientType, undefined, undefined, entropyData));
@@ -336,7 +325,7 @@ export class AuthAction {
       try {
         await dispatch(authAction.doSilentLogout());
         await core.register(registrationData, clientType);
-        await this.persistAuthData(clientType, core, dispatch, localStorageAction);
+        await this.persistClientData(clientType, dispatch, localStorageAction);
         await dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: getConfig().APP_INSTANCE_ID}));
         await dispatch(selfAction.fetchSelf());
         await (clientType !== ClientType.NONE &&
@@ -365,7 +354,7 @@ export class AuthAction {
         const clientType = persist ? ClientType.PERMANENT : ClientType.TEMPORARY;
 
         await core.init(clientType, {initClient: false});
-        await this.persistAuthData(clientType, core, dispatch, localStorageAction);
+        await this.persistClientData(clientType, dispatch, localStorageAction);
 
         if (options.shouldValidateLocalClient) {
           await dispatch(authAction.validateLocalClient());
@@ -428,7 +417,6 @@ export class AuthAction {
           window.location.reload();
         }
         await dispatch(cookieAction.safelyRemoveCookie(COOKIE_NAME_APP_OPENED, getConfig().APP_INSTANCE_ID));
-        await dispatch(localStorageAction.deleteLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.VALUE));
         dispatch(AuthActionCreator.successfulLogout());
       } catch (error) {
         dispatch(AuthActionCreator.failedLogout(error));
@@ -442,7 +430,6 @@ export class AuthAction {
       try {
         await core.logout();
         await dispatch(cookieAction.safelyRemoveCookie(COOKIE_NAME_APP_OPENED, getConfig().APP_INSTANCE_ID));
-        await dispatch(localStorageAction.deleteLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.VALUE));
         dispatch(AuthActionCreator.successfulSilentLogout());
       } catch (error) {
         dispatch(AuthActionCreator.failedLogout(error));
