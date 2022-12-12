@@ -103,10 +103,10 @@ describe('TextMessageRenderer', () => {
     expect(linkElem).not.toBe(null);
 
     fireEvent.click(linkElem);
-    expect(onClickElement).toHaveBeenCalled();
+    expect(onClickElement).toHaveBeenCalledTimes(1);
 
-    fireEvent.keyDown(linkElem);
-    expect(onClickElement).toHaveBeenCalled();
+    fireEvent.keyDown(linkElem, {key: 'Enter'});
+    expect(onClickElement).toHaveBeenCalledTimes(2);
   });
 
   it('should not trigger a key event if the message is not focused', () => {
