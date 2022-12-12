@@ -86,4 +86,23 @@ describe('TextMessageRenderer', () => {
     fireEvent.keyDown(linkElem);
     expect(onClickElement).not.toHaveBeenCalled();
   });
+
+  it('collapses long text when asked to', () => {
+    const onClickElement = jest.fn();
+
+    const text = 'this is a link<br>multiline text';
+
+    Object.defineProperty(HTMLParagraphElement.prototype, 'clientHeight', {get: () => 100});
+    Object.defineProperty(HTMLParagraphElement.prototype, 'scrollHeight', {get: () => 200});
+
+    const {getByText} = render(
+      <TextMessageRenderer text={text} onMessageClick={onClickElement} isCurrentConversationFocused={false} collapse />,
+    );
+    const showMoreButton = getByText('replyQuoteShowMore');
+    expect(showMoreButton).not.toBe(null);
+
+    fireEvent.click(showMoreButton);
+    const showLessButton = getByText('replyQuoteShowLess');
+    expect(showLessButton).not.toBe(null);
+  });
 });
