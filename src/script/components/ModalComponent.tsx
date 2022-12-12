@@ -70,7 +70,7 @@ const ModalContentStyles: CSSObject = {
   margin: 'auto',
   maxHeight: 615,
   overflow: 'hidden',
-  overflowY: 'hidden',
+  overflowY: 'auto',
   padding: 16,
   position: 'relative',
   transform: 'scale(0.8)',

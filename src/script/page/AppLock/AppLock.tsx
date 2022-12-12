@@ -292,14 +292,18 @@ const AppLock: React.FC<AppLockProps> = ({
       <div className="modal__body" data-uie-name="applock-modal-body" data-uie-value={state}>
         {state === APPLOCK_STATE.SETUP && (
           <form onSubmit={onSetCode}>
-            <div
+            <p
               className="modal__text"
               dangerouslySetInnerHTML={{__html: t('modalAppLockSetupMessage', {}, {br: '<br><br>'})}}
               data-uie-name="label-applock-set-text"
             />
-            <div className="modal__text modal__label" data-uie-name="label-applock-unlock-text">
+            <label
+              className="modal__text modal__label"
+              data-uie-name="label-applock-unlock-text"
+              htmlFor="input-applock-set-a"
+            >
               {t('modalAppLockPasscode')}
-            </div>
+            </label>
             {/* eslint jsx-a11y/no-autofocus : "off" */}
             <input
               aria-label={t('modalAppLockSetupTitle')}
@@ -311,8 +315,9 @@ const AppLock: React.FC<AppLockProps> = ({
               data-uie-status={isSetupPassphraseValid ? 'valid' : 'invalid'}
               data-uie-name="input-applock-set-a"
               autoComplete="new-password"
+              id="input-applock-set-a"
             />
-            <div
+            <p
               className={`modal__passcode__info ${isSetupPassphraseLength ? 'modal__passcode__info--valid' : ''}`}
               data-uie-status={isSetupPassphraseLength ? 'valid' : 'invalid'}
               data-uie-name="passcode-validation-charnumber"
@@ -320,35 +325,35 @@ const AppLock: React.FC<AppLockProps> = ({
               {t('modalAppLockSetupLong', {
                 minPasswordLength: Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH.toString(),
               })}
-            </div>
-            <div
+            </p>
+            <p
               className={`modal__passcode__info ${isSetupPassphraseLower ? 'modal__passcode__info--valid' : ''}`}
               data-uie-status={isSetupPassphraseLower ? 'valid' : 'invalid'}
               data-uie-name="passcode-validation-lowercase"
             >
               {t('modalAppLockSetupLower')}
-            </div>
-            <div
+            </p>
+            <p
               className={`modal__passcode__info ${isSetupPassphraseUpper ? 'modal__passcode__info--valid' : ''}`}
               data-uie-status={isSetupPassphraseUpper ? 'valid' : 'invalid'}
               data-uie-name="passcode-validation-uppercase"
             >
               {t('modalAppLockSetupUppercase')}
-            </div>
-            <div
+            </p>
+            <p
               className={`modal__passcode__info ${isSetupPassphraseDigit ? 'modal__passcode__info--valid' : ''}`}
               data-uie-status={isSetupPassphraseDigit ? 'valid' : 'invalid'}
               data-uie-name="passcode-validation-digit"
             >
               {t('modalAppLockSetupDigit')}
-            </div>
-            <div
+            </p>
+            <p
               className={`modal__passcode__info ${isSetupPassphraseSpecial ? 'modal__passcode__info--valid' : ''}`}
               data-uie-status={isSetupPassphraseSpecial ? 'valid' : 'invalid'}
               data-uie-name="passcode-validation-specialchar"
             >
               {t('modalAppLockSetupSpecial')}
-            </div>
+            </p>
             <div className="modal__buttons">
               {!isAppLockEnforced && (
                 <button

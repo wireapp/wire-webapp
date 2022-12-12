@@ -91,13 +91,13 @@ const Device: React.FC<{
             {device.getName()}
           </div>
 
-          <div className="preferences-devices-id">
-            <span>{t('preferencesDevicesId')}</span>
+          <p className="preferences-devices-id">
+            <strong>{t('preferencesDevicesId')}</strong>
 
             <span data-uie-name="preferences-device-active-id">
               <FormattedId idSlices={device.formatId()} />
             </span>
-          </div>
+          </p>
         </div>
       </div>
 

@@ -136,8 +136,8 @@ export const PrimaryModalComponent: FC = () => {
             <FadingScrollbar className="modal__body">
               {(messageHtml || messageText) && (
                 <div className="modal__text" data-uie-name="status-modal-text">
-                  {messageHtml && <div id="modal-description-html" dangerouslySetInnerHTML={{__html: messageHtml}} />}
-                  {messageText && <div id="modal-description-text">{messageText}</div>}
+                  {messageHtml && <p id="modal-description-html" dangerouslySetInnerHTML={{__html: messageHtml}} />}
+                  {messageText && <p id="modal-description-text">{messageText}</p>}
                 </div>
               )}
               {hasPassword && (

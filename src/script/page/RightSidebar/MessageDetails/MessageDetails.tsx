@@ -244,34 +244,34 @@ const MessageDetails: FC<MessageDetailsProps> = ({
         {messageState === MESSAGE_STATES.NO_RECEIPTS && (
           <div className="message-details__empty" data-uie-name="message-details-no-receipts-placeholder">
             <Icon.Read className="message-details__empty__icon" />
-            <div className="message-details__empty__text">{t('messageDetailsNoReceipts')}</div>
+            <p className="message-details__empty__text">{t('messageDetailsNoReceipts')}</p>
           </div>
         )}
 
         {messageState === MESSAGE_STATES.NO_LIKES && (
           <div className="message-details__empty" data-uie-name="message-details-no-likes-placeholder">
             <Icon.Like className="message-details__empty__icon" />
-            <div className="message-details__empty__text">{t('messageDetailsNoLikes')}</div>
+            <p className="message-details__empty__text">{t('messageDetailsNoLikes')}</p>
           </div>
         )}
 
         {messageState === MESSAGE_STATES.RECEIPTS_OFF && (
           <div className="message-details__empty" data-uie-name="message-details-receipts-off-placeholder">
             <Icon.Read className="message-details__empty__icon" />
-            <div className="message-details__empty__text">{t('messageDetailsReceiptsOff')}</div>
+            <p className="message-details__empty__text">{t('messageDetailsReceiptsOff')}</p>
           </div>
         )}
       </FadingScrollbar>
 
       <div className="panel__footer">
-        <div className="panel__footer__info" data-uie-name="status-message-details-sent">
+        <p className="panel__footer__info" data-uie-name="status-message-details-sent">
           {t('messageDetailsSent', sentFooter)}
-        </div>
+        </p>
 
         {editedFooter && (
-          <div className="panel__footer__info" data-uie-name="status-message-details-edited">
+          <p className="panel__footer__info" data-uie-name="status-message-details-edited">
             {t('messageDetailsEdited', editedFooter)}
-          </div>
+          </p>
         )}
       </div>
     </div>
