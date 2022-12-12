@@ -93,7 +93,11 @@ export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
     }
   };
 
-  const handleClick = (event: React.MouseEvent | React.KeyboardEvent) => {
+  /**
+   * Will handle interaction with the message.
+   * Depending on the child element clicked, it will forward the event to the parent component.
+   */
+  const handleInteraction = (event: React.MouseEvent | React.KeyboardEvent) => {
     const target = event.target as HTMLElement;
     if (!target) {
       return;
@@ -124,10 +128,10 @@ export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
     <p
       ref={setContainerRef}
       key={`${editedTimestamp}:${text}`}
-      onClick={handleClick}
-      onAuxClick={handleClick}
-      onKeyDown={handleClick}
-      onKeyUp={handleClick}
+      onClick={handleInteraction}
+      onAuxClick={handleInteraction}
+      onKeyDown={handleInteraction}
+      onKeyUp={handleInteraction}
       className={msgClass}
       dangerouslySetInnerHTML={{__html: text}}
       dir="auto"
