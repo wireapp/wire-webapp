@@ -52,9 +52,9 @@ export class PropertiesRepository {
         defaultValue: RECEIPT_MODE.OFF,
         key: 'WIRE_RECEIPT_MODE',
       },
-      WIRE_TYPING_MODE: {
+      WIRE_TYPING_INDICATOR_MODE: {
         defaultValue: CONVERSATION_TYPING_INDICATOR_MODE.ON,
-        key: 'WIRE_TYPING_MODE',
+        key: 'WIRE_TYPING_INDICATOR_MODE',
       },
     };
   }
@@ -106,7 +106,7 @@ export class PropertiesRepository {
     };
     this.selfUser = ko.observable();
     this.receiptMode = ko.observable(PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.defaultValue);
-    this.typingIndicatorMode = ko.observable(PropertiesRepository.CONFIG.WIRE_TYPING_MODE.defaultValue);
+    this.typingIndicatorMode = ko.observable(PropertiesRepository.CONFIG.WIRE_TYPING_INDICATOR_MODE.defaultValue);
     /** @type {ko.Observable<ConsentValue | boolean>} */
     this.marketingConsent = ko.observable(PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.defaultValue);
   }
@@ -213,7 +213,7 @@ export class PropertiesRepository {
   }
 
   private fetchTypingIndicatorSetting(): Promise<void> {
-    const {key: propertyKey, defaultValue} = PropertiesRepository.CONFIG.WIRE_TYPING_MODE;
+    const {key: propertyKey, defaultValue} = PropertiesRepository.CONFIG.WIRE_TYPING_INDICATOR_MODE;
 
     return this.propertiesService
       .getPropertiesByKey(propertyKey)
@@ -265,7 +265,7 @@ export class PropertiesRepository {
       case PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key:
         this.setProperty(key, RECEIPT_MODE.OFF);
         break;
-      case PropertiesRepository.CONFIG.WIRE_TYPING_MODE.key:
+      case PropertiesRepository.CONFIG.WIRE_TYPING_INDICATOR_MODE.key:
         this.setProperty(key, CONVERSATION_TYPING_INDICATOR_MODE.OFF);
         break;
       case PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.key:
@@ -290,7 +290,7 @@ export class PropertiesRepository {
       case PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key:
         this.receiptMode(value);
         break;
-      case PropertiesRepository.CONFIG.WIRE_TYPING_MODE.key:
+      case PropertiesRepository.CONFIG.WIRE_TYPING_INDICATOR_MODE.key:
         this.typingIndicatorMode(value);
         break;
     }
@@ -304,7 +304,7 @@ export class PropertiesRepository {
           return this.propertiesService.deletePropertiesByKey(key);
         }
         return this.propertiesService.putPropertiesByKey(key, value);
-      case PropertiesRepository.CONFIG.WIRE_TYPING_MODE.key:
+      case PropertiesRepository.CONFIG.WIRE_TYPING_INDICATOR_MODE.key:
         if (value === CONVERSATION_TYPING_INDICATOR_MODE.ON) {
           return this.propertiesService.deletePropertiesByKey(key);
         }
