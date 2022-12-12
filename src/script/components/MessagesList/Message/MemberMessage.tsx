@@ -25,7 +25,6 @@ import {Icon} from 'Components/Icon';
 import {User} from 'src/script/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-import {useDisposableRef} from 'Util/useDisposableRef';
 
 import {ConnectedMessage} from './memberMessage/ConnectedMessage';
 import {MessageTime} from './MessageTime';
@@ -82,17 +81,12 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
   const isMemberLeave = message.isMemberLeave();
   const isMemberChange = message.isMemberChange();
 
-  const {ref: initShowMore} = useDisposableRef(element => {
-    const link = element.querySelector('.message-header-show-more');
-    if (link) {
-      const listener = () => onClickParticipants(highlightedUsers);
-      link.addEventListener('click', listener);
-      return () => {
-        link.removeEventListener('click', listener);
-      };
+  const handleShowMoreClick = (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
+    const clickedOnShowMore = (event.target as HTMLElement).closest('.message-header-show-more');
+    if (clickedOnShowMore) {
+      onClickParticipants(highlightedUsers);
     }
-    return () => {};
-  });
+  };
 
   return (
     <>
@@ -121,7 +115,9 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
                 {isMemberRemoval && <span className="icon-minus" />}
                 {isMemberJoin && <span className="icon-plus" />}
               </div>
-              <div ref={initShowMore} className="message-header-label">
+              {/* event is being triggered only when clicked on <a> tag with specified class (keyboard accessible by default) */}
+              {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
+              <div onClick={handleShowMoreClick} className="message-header-label">
                 <p className="message-header-caption" dangerouslySetInnerHTML={{__html: htmlCaption}} />
               </div>
               {isMemberChange && (
