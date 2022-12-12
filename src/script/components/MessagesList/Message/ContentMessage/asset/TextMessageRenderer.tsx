@@ -17,12 +17,11 @@
  *
  */
 
-import {useEffect, useRef, FC} from 'react';
+import {useEffect, FC, useState} from 'react';
 
 import {Text} from 'src/script/entity/message/Text';
 import {getAllFocusableElements, setElementsTabIndex} from 'Util/focusUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
-import {useDisposableRef} from 'Util/useDisposableRef';
 
 export type ElementType = 'markdownLink' | 'email' | 'mention';
 
@@ -59,32 +58,34 @@ export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
   setCanShowMore,
   ...props
 }) => {
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const detectLongQuotes = useDisposableRef(
-    element => {
+  const [containerRef, setContainerRef] = useState<HTMLParagraphElement | null>(null);
+
+  useEffect(() => {
+    const element = containerRef;
+
+    if (element && isQuoteMsg) {
       const preNode = element.querySelector('pre');
       const width = Math.max(element.scrollWidth, preNode ? preNode.scrollWidth : 0);
       const height = Math.max(element.scrollHeight, preNode ? preNode.scrollHeight : 0);
       const isWider = width > element.clientWidth;
       const isHigher = height > element.clientHeight;
       setCanShowMore?.(isWider || isHigher);
-      return () => {};
-    },
-    [editedTimestamp],
-  );
+    }
+  }, [isQuoteMsg, setCanShowMore, containerRef]);
 
   useEffect(() => {
-    if (!containerRef.current) {
+    const element = containerRef;
+    if (!element) {
       return undefined;
     }
 
-    const interactiveMsgElements = getAllFocusableElements(containerRef.current);
+    const interactiveMsgElements = getAllFocusableElements(element);
     setElementsTabIndex(interactiveMsgElements, isCurrentConversationFocused);
 
-    const emailLinks = [...containerRef.current.querySelectorAll('[data-email-link]')];
-    const markdownLinkTargets = [...containerRef.current.querySelectorAll('[data-md-link]')];
+    const emailLinks = [...element.querySelectorAll('[data-email-link]')];
+    const markdownLinkTargets = [...element.querySelectorAll('[data-md-link]')];
     const hasMentions = asset && asset.mentions().length;
-    const msgMentions = hasMentions ? [...containerRef.current.querySelectorAll('.message-mention')] : [];
+    const msgMentions = hasMentions ? [...element.querySelectorAll('.message-mention')] : [];
 
     const handleKeyEvent = (event: KeyboardEvent, elementType: ElementType, messageDetails: MessageDetails) => {
       if (isCurrentConversationFocused) {
@@ -153,17 +154,12 @@ export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
       removeEventListener(markdownLinkTargets);
       removeEventListener(msgMentions);
     };
-  }, [onMessageClick, asset, isCurrentConversationFocused]);
+  }, [onMessageClick, asset, isCurrentConversationFocused, containerRef]);
 
   return (
     <p
-      ref={element => {
-        if (isQuoteMsg) {
-          containerRef.current = detectLongQuotes(element);
-        } else {
-          containerRef.current = element;
-        }
-      }}
+      ref={setContainerRef}
+      key={`${editedTimestamp}:${text}`}
       className={msgClass}
       dangerouslySetInnerHTML={{__html: text}}
       dir="auto"
