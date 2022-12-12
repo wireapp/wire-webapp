@@ -776,6 +776,7 @@ const InputBar = ({
 
   return (
     <div
+      aria-live="polite"
       id="conversation-input-bar"
       className={cx('conversation-input-bar', {'is-right-panel-open': isRightSidebarOpen})}
     >
