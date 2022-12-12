@@ -37,6 +37,12 @@ const ConversationDetailsBottomActions: FC<ConversationDetailsBottomActionsProps
   hasReceiptsEnabled = false,
   notificationStatusText = '',
 }) => {
+  const renderConversationDetailsActions = showOptionNotifications1To1 || isSingleUserMode;
+
+  if (!renderConversationDetailsActions) {
+    return null;
+  }
+
   return (
     <ul className="conversation-details__bottom-actions">
       {showOptionNotifications1To1 && (

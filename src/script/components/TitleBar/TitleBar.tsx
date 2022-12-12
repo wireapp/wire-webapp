@@ -251,9 +251,9 @@ export const TitleBar: React.FC<TitleBarProps> = ({
               />
             )}
 
-            <h2 className="conversation-title-bar-name-label" data-uie-name="status-conversation-title-bar-label">
+            <span className="conversation-title-bar-name-label" data-uie-name="status-conversation-title-bar-label">
               {displayName}
-            </h2>
+            </span>
           </div>
 
           {conversationSubtitle && <div className="conversation-title-bar-name--subtitle">{conversationSubtitle}</div>}

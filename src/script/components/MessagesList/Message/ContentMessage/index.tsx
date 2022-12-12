@@ -120,15 +120,18 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
           avatarSize={AVATAR_SIZE.X_SMALL}
         />
       </div>
+
       <div className="message-header-label">
-        <span className={`message-header-label-sender ${message.accent_color()}`} data-uie-name="sender-name">
+        <h4 className={`message-header-label-sender ${message.accent_color()}`} data-uie-name="sender-name">
           {headerSenderName}
-        </span>
+        </h4>
+
         {message.user().isService && (
           <span className="message-header-icon-service">
             <Icon.Service />
           </span>
         )}
+
         {message.user().isExternal() && (
           <span
             className="message-header-icon-external with-tooltip with-tooltip--external"
@@ -138,6 +141,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             <Icon.External />
           </span>
         )}
+
         {message.user().isFederated && (
           <span
             className="message-header-icon-guest with-tooltip with-tooltip--external"
@@ -147,6 +151,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             <Icon.Federation />
           </span>
         )}
+
         {message.user().isDirectGuest() && (
           <span
             className="message-header-icon-guest with-tooltip with-tooltip--external"
@@ -156,6 +161,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             <Icon.Guest />
           </span>
         )}
+
         {was_edited && (
           <span className="message-header-label-icon icon-edit" title={message.displayEditedTimestamp()}></span>
         )}
@@ -233,6 +239,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
               onClick={event => showContextMenu(event, menuEntries, 'message-options-menu')}
             ></button>
           )}
+
           {ephemeral_status === EphemeralStatusType.ACTIVE && (
             <time
               className="time"
@@ -244,11 +251,13 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
               {message.displayTimestampShort()}
             </time>
           )}
+
           {ephemeral_status !== EphemeralStatusType.ACTIVE && (
             <MessageTime data-uie-uid={message.id} timestamp={timestamp}>
               {message.displayTimestampShort()}
             </MessageTime>
           )}
+
           <ReadReceiptStatus
             message={message}
             is1to1Conversation={conversation.is1to1()}
@@ -258,6 +267,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
           />
         </div>
       </div>
+
       {other_likes.length > 0 && (
         <div>
           <MessageFooterLike

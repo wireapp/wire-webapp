@@ -261,6 +261,8 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
 
   return (
     <div id="conversation-details" className="panel__page conversation-details">
+      <h2 className="visually-hidden">{t('tooltipConversationInfo')}</h2>
+
       <PanelHeader
         isReverse
         showBackArrow={false}
@@ -379,7 +381,7 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
 
             {!!serviceParticipants.length && (
               <div className="conversation-details__participants">
-                <div className="conversation-details__list-head">{t('conversationDetailsServices')}</div>
+                <h3 className="conversation-details__list-head">{t('conversationDetailsServices')}</h3>
 
                 <ServiceList
                   services={serviceParticipants}
