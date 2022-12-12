@@ -19,8 +19,6 @@
 
 import {useEffect, FC, useState, HTMLProps} from 'react';
 
-import murmurhash from 'murmurhash';
-
 import {isKeyDownEvent} from 'src/script/guards/Event';
 import {isMouseEvent} from 'src/script/guards/Mouse';
 import {getAllFocusableElements, setElementsTabIndex} from 'Util/focusUtil';
@@ -134,7 +132,7 @@ export const TextMessageRenderer: FC<TextMessageRendererProps & HTMLProps<HTMLPa
       <p
         ref={setContainerRef}
         // We want to make sure that this element is re-rendered when the text changes (this will trigger the containerRef to be updated).
-        key={murmurhash.v3(text)}
+        key={text}
         onClick={handleInteraction}
         onAuxClick={handleInteraction}
         onKeyDown={handleInteraction}
