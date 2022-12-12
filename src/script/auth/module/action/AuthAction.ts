@@ -417,7 +417,6 @@ export class AuthAction {
           window.location.reload();
         }
         await dispatch(cookieAction.safelyRemoveCookie(COOKIE_NAME_APP_OPENED, getConfig().APP_INSTANCE_ID));
-        await dispatch(localStorageAction.deleteLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.VALUE));
         dispatch(AuthActionCreator.successfulLogout());
       } catch (error) {
         dispatch(AuthActionCreator.failedLogout(error));
@@ -431,7 +430,6 @@ export class AuthAction {
       try {
         await core.logout();
         await dispatch(cookieAction.safelyRemoveCookie(COOKIE_NAME_APP_OPENED, getConfig().APP_INSTANCE_ID));
-        await dispatch(localStorageAction.deleteLocalStorage(LocalStorageKey.AUTH.ACCESS_TOKEN.VALUE));
         dispatch(AuthActionCreator.successfulSilentLogout());
       } catch (error) {
         dispatch(AuthActionCreator.failedLogout(error));
