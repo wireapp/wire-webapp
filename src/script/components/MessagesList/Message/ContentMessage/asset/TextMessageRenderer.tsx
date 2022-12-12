@@ -167,7 +167,7 @@ export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
           containerRef.current = element;
         }
       }}
-      key={text}
+      key={`${editedTimestamp}:${text}`}
       className={msgClass}
       dangerouslySetInnerHTML={{__html: text}}
       dir="auto"
