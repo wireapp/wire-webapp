@@ -52,7 +52,6 @@ import {ContentMessage} from '../../entity/message/ContentMessage';
 import {DecryptErrorMessage} from '../../entity/message/DecryptErrorMessage';
 import {MemberMessage} from '../../entity/message/MemberMessage';
 import {Message} from '../../entity/message/Message';
-import {Text} from '../../entity/message/Text';
 import {User} from '../../entity/User';
 import {UserError} from '../../error/UserError';
 import {isMouseRightClickEvent, isAuxRightClickEvent} from '../../guards/Mouse';
@@ -330,7 +329,6 @@ export const Conversation: FC<ConversationProps> = ({
   };
 
   const handleClickOnMessage = (
-    messageEntity: ContentMessage | Text,
     event: MouseEvent | KeyboardEvent,
     elementType: ElementType,
     messageDetails: MessageDetails = {

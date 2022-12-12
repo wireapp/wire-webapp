@@ -26,12 +26,7 @@ import {handleKeyDown} from 'Util/KeyboardUtil';
 export type ElementType = 'markdownLink' | 'email' | 'mention';
 
 interface TextMessageRendererProps {
-  onMessageClick: (
-    asset: Text,
-    event: MouseEvent | KeyboardEvent,
-    elementType: ElementType,
-    messageDetails: MessageDetails,
-  ) => void;
+  onMessageClick: (event: MouseEvent | KeyboardEvent, elementType: ElementType, messageDetails: MessageDetails) => void;
   text: string;
   isCurrentConversationFocused: boolean;
   msgClass: string;
@@ -40,7 +35,6 @@ interface TextMessageRendererProps {
   editedTimestamp?: number;
   setCanShowMore?: (showMore: boolean) => void;
 }
-const events = ['click', 'keydown', 'auxclick'];
 export interface MessageDetails {
   href?: string;
   userId?: string;
@@ -76,90 +70,64 @@ export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
   useEffect(() => {
     const element = containerRef;
     if (!element) {
-      return undefined;
+      return;
     }
 
     const interactiveMsgElements = getAllFocusableElements(element);
     setElementsTabIndex(interactiveMsgElements, isCurrentConversationFocused);
+  }, [isCurrentConversationFocused, containerRef]);
 
-    const emailLinks = [...element.querySelectorAll('[data-email-link]')];
-    const markdownLinkTargets = [...element.querySelectorAll('[data-md-link]')];
-    const hasMentions = asset && asset.mentions().length;
-    const msgMentions = hasMentions ? [...element.querySelectorAll('.message-mention')] : [];
-
-    const handleKeyEvent = (event: KeyboardEvent, elementType: ElementType, messageDetails: MessageDetails) => {
-      if (isCurrentConversationFocused) {
-        handleKeyDown(event, () => onMessageClick(asset, event, elementType, messageDetails));
-      }
-    };
-
-    const handleMsgEvent = (event: Event) => {
-      const currentTarget = event.currentTarget as HTMLElement;
-      const markdownLinkTarget = currentTarget?.dataset.mdLink;
-      const emailLink = currentTarget?.dataset.emailLink;
-      const msgMention = currentTarget?.dataset.userId;
-
-      if (emailLink) {
-        const href = (event.target as HTMLAnchorElement).href;
-        const emailDetails = {
-          href: href,
-        };
-
-        return event.type === 'keydown'
-          ? handleKeyEvent(event as KeyboardEvent, 'email', emailDetails)
-          : onMessageClick(asset, event as MouseEvent, 'email', emailDetails);
-      } else if (markdownLinkTarget) {
-        const href = (event.target as HTMLAnchorElement).href;
-        const markdownLinkDetails = {
-          href: href,
-        };
-
-        return event.type === 'keydown'
-          ? handleKeyEvent(event as KeyboardEvent, 'markdownLink', markdownLinkDetails)
-          : onMessageClick(asset, event as MouseEvent, 'markdownLink', markdownLinkDetails);
-      } else if (msgMention) {
-        const mentionMsgDetails = {
-          userId: currentTarget?.dataset.userId,
-          userDomain: currentTarget?.dataset.userDomain,
-        };
-
-        return event.type === 'keydown'
-          ? handleKeyEvent(event as KeyboardEvent, 'mention', mentionMsgDetails)
-          : onMessageClick(asset, event as MouseEvent, 'mention', mentionMsgDetails);
-      }
-    };
-
-    function addEventListener(elements: Element[]) {
-      elements?.forEach(element => {
-        events.forEach(eventName => {
-          element.addEventListener(eventName, handleMsgEvent);
-        });
+  const forwardEvent = (
+    event: KeyboardEvent | MouseEvent,
+    elementType: ElementType,
+    messageDetails: MessageDetails,
+  ) => {
+    if (event.type === 'keydown' && isCurrentConversationFocused) {
+      handleKeyDown(event as KeyboardEvent, () => {
+        event.preventDefault();
+        onMessageClick(event, elementType, messageDetails);
       });
+    } else if (event.type === 'click') {
+      event.preventDefault();
+      onMessageClick(event, elementType, messageDetails);
     }
+  };
 
-    function removeEventListener(elements: Element[]) {
-      elements?.forEach(element => {
-        events.forEach(eventName => {
-          element.removeEventListener(eventName, handleMsgEvent);
-        });
-      });
+  const handleClick = (event: React.MouseEvent | React.KeyboardEvent) => {
+    const target = event.target as HTMLElement;
+    if (!target) {
+      return;
     }
+    const isEmail = target.closest('[data-email-link]');
+    const isMarkdownLink = target.closest('[data-md-link]');
+    const isMention = target.closest('.message-mention');
 
-    addEventListener(emailLinks);
-    addEventListener(markdownLinkTargets);
-    addEventListener(msgMentions);
-
-    return () => {
-      removeEventListener(emailLinks);
-      removeEventListener(markdownLinkTargets);
-      removeEventListener(msgMentions);
-    };
-  }, [onMessageClick, asset, isCurrentConversationFocused, containerRef]);
+    if (isEmail || isMarkdownLink) {
+      const href = (event.target as HTMLAnchorElement).href;
+      const markdownLinkDetails = {
+        href: href,
+      };
+      forwardEvent(event.nativeEvent, isEmail ? 'email' : 'markdownLink', markdownLinkDetails);
+    } else if (isMention) {
+      const mentionMsgDetails = {
+        userId: target.dataset.userId,
+        userDomain: target.dataset.userDomain,
+      };
+      forwardEvent(event.nativeEvent, 'mention', mentionMsgDetails);
+    }
+  };
 
   return (
+    // We will register the click event on the paragraph element and determine the type of the element clicked.
+    // This is because the paragraph element is fed with raw HTML and we cannot register the click event on the clickabled elements directly.
+    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
     <p
       ref={setContainerRef}
       key={`${editedTimestamp}:${text}`}
+      onClick={handleClick}
+      onAuxClick={handleClick}
+      onKeyDown={handleClick}
+      onKeyUp={handleClick}
       className={msgClass}
       dangerouslySetInnerHTML={{__html: text}}
       dir="auto"
