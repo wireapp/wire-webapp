@@ -22,7 +22,7 @@ import {useEffect, useRef, FC, useCallback} from 'react';
 import {Text} from 'src/script/entity/message/Text';
 import {getAllFocusableElements, setElementsTabIndex} from 'Util/focusUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
-import {useDisposableRefNew} from 'Util/useDisposableRef';
+import {useDisposableRef} from 'Util/useDisposableRef';
 
 export type ElementType = 'markdownLink' | 'email' | 'mention';
 
@@ -74,7 +74,7 @@ export const TextMessageRenderer: FC<TextMessageRendererProps> = ({
     [setCanShowMore],
   );
 
-  const {ref: detectLongQuotes} = useDisposableRefNew(handleLongQuotes);
+  const {ref: detectLongQuotes} = useDisposableRef(handleLongQuotes);
 
   useEffect(() => {
     if (!containerRef.current) {

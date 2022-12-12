@@ -23,15 +23,16 @@ import {useDisposableRef} from './useDisposableRef';
 
 interface ComponentProps {
   callback: (element: HTMLElement) => () => void;
-  state?: number;
   otherState?: number;
 }
-const Component: React.FC<ComponentProps> = ({callback, state = 0}: ComponentProps) => {
-  const disposableRef = useDisposableRef(callback, [state]);
+const Component: React.FC<ComponentProps> = ({callback}: ComponentProps) => {
+  const {ref: disposableRef} = useDisposableRef(callback);
 
   return (
     <div>
-      <div ref={disposableRef}>{state}</div>
+      <div ref={disposableRef}>
+        <p>Hello!</p>
+      </div>
     </div>
   );
 };
@@ -55,19 +56,19 @@ describe('useDisposableRef', () => {
     expect(disposeFn).toHaveBeenCalled();
   });
 
-  it('runs the dispose and the init when element updates', async () => {
+  it('runs the dispose and the init when element changes', async () => {
     const disposeFn = jest.fn();
     const initFn = jest.fn(e => {
       return disposeFn;
     });
 
-    const {rerender} = render(<Component callback={initFn} state={0} />);
+    const {rerender} = render(<Component callback={initFn} key={0} />);
     await waitFor(() => expect(initFn).toHaveBeenCalled());
 
     expect(initFn).toHaveBeenCalledTimes(1);
     expect(disposeFn).not.toHaveBeenCalled();
 
-    rerender(<Component callback={initFn} state={1} />);
+    rerender(<Component callback={initFn} key={1} />);
     expect(disposeFn).toHaveBeenCalled();
     expect(initFn).toHaveBeenCalledTimes(2);
   });
