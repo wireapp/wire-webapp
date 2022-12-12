@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, FC, useState, HTMLProps} from 'react';
+import {useEffect, FC, useState, HTMLProps, useRef} from 'react';
 
 import {isKeyDownEvent} from 'src/script/guards/Event';
 import {isMouseEvent} from 'src/script/guards/Mouse';
@@ -54,15 +54,19 @@ export const TextMessageRenderer: FC<TextMessageRendererProps & HTMLProps<HTMLPa
   const [canShowMore, setCanShowMore] = useState<boolean>(false);
   const [showFullText, setShowFullText] = useState<boolean>(!collapse);
 
+  const collapsedHeightRef = useRef<number>(0);
+
   useEffect(() => {
     const element = containerRef;
 
     if (element && collapse) {
       const preNode = element.querySelector('pre');
+      const collapsedHeight = collapsedHeightRef.current || element.clientHeight;
       const width = Math.max(element.scrollWidth, preNode ? preNode.scrollWidth : 0);
       const height = Math.max(element.scrollHeight, preNode ? preNode.scrollHeight : 0);
       const isWider = width > element.clientWidth;
-      const isHigher = height > element.clientHeight;
+      const isHigher = height > collapsedHeight;
+      collapsedHeightRef.current = collapsedHeight;
       setCanShowMore?.(isWider || isHigher);
     }
   }, [collapse, setCanShowMore, containerRef]);
@@ -121,6 +125,8 @@ export const TextMessageRenderer: FC<TextMessageRendererProps & HTMLProps<HTMLPa
   };
   const extraClasses = showFullText ? 'message-quote__text--full' : '';
 
+  const toggleShowMore = () => setShowFullText(prev => !prev);
+
   return (
     <>
       {
@@ -144,7 +150,7 @@ export const TextMessageRenderer: FC<TextMessageRendererProps & HTMLProps<HTMLPa
       />
       {canShowMore && (
         <ShowMoreButton
-          onClick={() => setShowFullText(!showFullText)}
+          onClick={toggleShowMore}
           isCurrentConversationFocused={isCurrentConversationFocused}
           active={showFullText}
         ></ShowMoreButton>
