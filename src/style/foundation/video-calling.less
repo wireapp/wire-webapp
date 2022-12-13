@@ -77,7 +77,7 @@
 
   @media (max-height: @screen-height-sm) {
     height: 30px;
-    line-height: 12px;
+    line-height: 0.8rem;
   }
 
   &__info-bar {
@@ -90,11 +90,15 @@
 }
 
 .video-remote-name {
-  .heading-h3;
   display: flex;
-  overflow: hidden;
   flex-direction: column;
   align-items: center;
+}
+
+.video-remote-title {
+  .heading-h3;
+  overflow: hidden;
+  margin: 0;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -118,7 +122,7 @@
   &__fit-info {
     width: 100%;
     color: #fff;
-    font-size: 11px;
+    font-size: @font-size-xsmall;
     font-weight: @font-weight-regular;
     text-align: center;
     text-transform: uppercase;

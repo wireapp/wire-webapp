@@ -49,7 +49,7 @@ import {flatten} from 'underscore';
 import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {TYPING_TIMEOUT, useTypingIndicatorState} from 'Components/InputBar/TypingIndicator';
+import {TYPING_TIMEOUT, useTypingIndicatorState} from 'Components/InputBar/components/TypingIndicator';
 import {getNextItem} from 'Util/ArrayUtil';
 import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/FileTypeUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
@@ -396,9 +396,15 @@ export class ConversationRepository {
       };
 
       if (accessState) {
-        const {accessModes: access, accessRole: access_role_v2} = updateAccessRights(accessState);
+        const {accessModes: access, accessRole} = updateAccessRights(accessState);
 
-        payload = {...payload, access, access_role_v2};
+        const accessRoleField = this.core.backendFeatures.version >= 3 ? 'access_role' : 'access_role_v2';
+
+        payload = {
+          ...payload,
+          access,
+          [accessRoleField]: accessRole,
+        };
       }
     }
 
@@ -1711,27 +1717,11 @@ export class ConversationRepository {
   }
 
   public async sendTypingStart(conversationEntity: Conversation) {
-    /*
-      Currently typing endpoint is not implemented on backend for federated environments
-      @todo: remove this condition when backend is ready and api-client in packages is updated to support domain in typing endpoint
-    */
-    const isFederated = this.core.backendFeatures?.isFederated;
-    if (isFederated) {
-      return;
-    }
-    this.core.service!.conversation.sendTypingStart(conversationEntity.id);
+    this.core.service!.conversation.sendTypingStart(conversationEntity.qualifiedId);
   }
 
   public async sendTypingStop(conversationEntity: Conversation) {
-    /*
-      Currently typing endpoint is not implemented on backend for federated environments
-      @todo: remove this condition when backend is ready and api-client in packages is updated to support domain in typing endpoint
-    */
-    const isFederated = this.core.backendFeatures?.isFederated;
-    if (isFederated) {
-      return;
-    }
-    this.core.service!.conversation.sendTypingStop(conversationEntity.id);
+    this.core.service!.conversation.sendTypingStop(conversationEntity.qualifiedId);
   }
 
   private async toggleArchiveConversation(
@@ -1965,8 +1955,7 @@ export class ConversationRepository {
       `Handling event '${type}' in conversation '${conversationId.id}/${conversationId.domain}' (Source: ${eventSource})`,
     );
 
-    const selfConversation = this.conversationState.selfConversation();
-    const inSelfConversation = selfConversation && matchQualifiedIds(conversationId, selfConversation.qualifiedId);
+    const inSelfConversation = this.conversationState.isSelfConversation(conversationId);
     if (inSelfConversation) {
       const typesInSelfConversation = [
         CONVERSATION_EVENT.MEMBER_UPDATE,
@@ -2589,8 +2578,7 @@ export class ConversationRepository {
     }
 
     const isBackendEvent = eventData.otr_archived_ref || eventData.otr_muted_ref;
-    const selfConversation = this.conversationState.selfConversation();
-    const inSelfConversation = selfConversation && matchQualifiedIds(selfConversation, conversationId);
+    const inSelfConversation = this.conversationState.isSelfConversation(conversationId);
     if (!inSelfConversation && conversation && !isBackendEvent) {
       this.logger.warn(
         `A conversation update message was not sent in the selfConversation. Skipping conversation update`,
@@ -2722,11 +2710,11 @@ export class ConversationRepository {
    * @returns Resolves when the event was handled
    */
   private async onMessageHidden(eventJson: MessageHiddenEvent) {
-    const {conversation: conversationId, data: eventData, from} = eventJson;
+    const {conversation, qualified_conversation, data: eventData, from} = eventJson;
 
+    const conversationId = qualified_conversation || {id: conversation, domain: ''};
     try {
-      const inSelfConversation =
-        !this.conversationState.selfConversation() || conversationId === this.conversationState.selfConversation()?.id;
+      const inSelfConversation = this.conversationState.isSelfConversation(conversationId);
       if (!inSelfConversation) {
         throw new ConversationError(
           ConversationError.TYPE.WRONG_CONVERSATION,

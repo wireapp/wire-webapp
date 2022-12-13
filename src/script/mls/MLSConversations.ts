@@ -24,22 +24,26 @@ import {arrayToBase64} from 'Util/util';
 import {mlsConversationState} from './mlsConversationState';
 
 import {ConversationRepository} from '../conversation/ConversationRepository';
+import {
+  isMLSConversation,
+  isSelfConversation,
+  isTeamConversation,
+  MLSConversation,
+} from '../conversation/ConversationSelectors';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
+
+type MLSConversationRepository = Pick<
+  ConversationRepository,
+  'findConversationByGroupId' | 'getConversationById' | 'conversationRoleRepository'
+>;
 
 export async function initMLSConversations(
   conversations: Conversation[],
   selfUser: User,
   core: Account,
-  conversationRepository: ConversationRepository,
+  conversationRepository: MLSConversationRepository,
 ): Promise<void> {
-  // We send external proposal to all the MLS conversations that are in an unknown state (not established nor pendingWelcome)
-  await mlsConversationState.getState().sendExternalToPendingJoin(
-    conversations,
-    groupId => core.service!.conversation.isMLSConversationEstablished(groupId),
-    conversationId => core.service!.conversation.joinByExternalCommit(conversationId),
-  );
-
   core.configureMLSCallbacks({
     authorize: groupIdBytes => {
       const groupId = arrayToBase64(groupIdBytes);
@@ -57,4 +61,52 @@ export async function initMLSConversations(
     // This is enforced by backend, no need to implement this on the client side.
     userAuthorize: () => true,
   });
+
+  const mlsConversations = conversations.filter(isMLSConversation);
+  await joinNewConversations(mlsConversations, core);
+}
+
+/**
+ * Will join all the conversation that the current user is part of but that are not joined by the current user's device
+ *
+ * @param conversations - all the conversations that the user is part of
+ * @param core - the instance of the core
+ */
+async function joinNewConversations(conversations: MLSConversation[], core: Account): Promise<void> {
+  // We send external proposal to all the MLS conversations that are in an unknown state (not established nor pendingWelcome)
+  await mlsConversationState.getState().sendExternalToPendingJoin(
+    conversations,
+    groupId => core.service!.conversation.isMLSConversationEstablished(groupId),
+    conversationId => core.service!.conversation.joinByExternalCommit(conversationId),
+  );
+}
+
+/**
+ * Will register special conversations agains the core.
+ * The self conversation and the team conversation as special conversation that are created by noone and, thus, need to be manually created by the first device that detects them
+ *
+ * @param conversations all the conversations the user is part of
+ * @param core instance of the core
+ */
+export async function registerUninitializedConversations(
+  conversations: Conversation[],
+  selfUser: User,
+  selfClientId: string,
+  core: Account,
+): Promise<void> {
+  const uninitializedConversations = conversations.filter(
+    (conversation): conversation is MLSConversation =>
+      isMLSConversation(conversation) &&
+      conversation.epoch === 0 &&
+      (isSelfConversation(conversation) || isTeamConversation(conversation)),
+  );
+
+  await Promise.all(
+    uninitializedConversations.map(conversation =>
+      core.service?.mls.registerConversation(conversation.groupId, [selfUser.qualifiedId], {
+        user: selfUser,
+        client: selfClientId,
+      }),
+    ),
+  );
 }

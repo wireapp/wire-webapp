@@ -25,7 +25,7 @@ import {
   UserClients,
 } from '@wireapp/api-client/lib/conversation';
 import {QualifiedId, RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/lib/user';
-import {MessageTargetMode, PayloadBundleState, ReactionType} from '@wireapp/core/lib/conversation';
+import {MessageSendingState, MessageTargetMode, ReactionType} from '@wireapp/core/lib/conversation';
 import {
   AudioMetaData,
   EditedTextContent,
@@ -55,7 +55,7 @@ import {roundLogarithmic} from 'Util/NumberUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {createRandomUuid, loadUrlBlob} from 'Util/util';
+import {createRandomUuid, loadUrlBlob, supportsMLS} from 'Util/util';
 
 import {findDeletedClients} from './ClientMismatchUtil';
 import {ConversationRepository} from './ConversationRepository';
@@ -336,7 +336,7 @@ export class MessageRepository {
       quote: quoteEntity,
     };
     const {state} = await this.sendText(textPayload);
-    if (state !== PayloadBundleState.CANCELLED) {
+    if (state !== MessageSendingState.CANCELLED) {
       await this.handleLinkPreview(textPayload);
     }
   }
@@ -375,7 +375,7 @@ export class MessageRepository {
       originalMessageId: originalMessage.id,
     };
     const {state} = await this.sendEdit(messagePayload);
-    if (state !== PayloadBundleState.CANCELLED) {
+    if (state !== MessageSendingState.CANCELLED) {
       await this.handleLinkPreview(messagePayload);
     }
   }
@@ -472,7 +472,7 @@ export class MessageRepository {
   ): Promise<EventRecord | void> {
     const uploadStarted = Date.now();
     const {id, state} = await this.sendAssetMetadata(conversation, file, asImage);
-    if (state === PayloadBundleState.CANCELLED) {
+    if (state === MessageSendingState.CANCELLED) {
       throw new ConversationError(
         ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION,
         ConversationError.MESSAGE.DEGRADED_CONVERSATION_CANCELLATION,
@@ -754,12 +754,12 @@ export class MessageRepository {
 
     const shouldProceedSending = await injectOptimisticEvent();
     if (shouldProceedSending === false) {
-      return {id: payload.messageId, state: PayloadBundleState.CANCELLED};
+      return {id: payload.messageId, state: MessageSendingState.CANCELLED};
     }
 
     const result = await this.conversationService.send(sendOptions);
 
-    if (result.state === PayloadBundleState.OUTGOING_SENT) {
+    if (result.state === MessageSendingState.OUTGOING_SENT) {
       handleSuccess(result.sentAt);
     }
     return result;
@@ -875,7 +875,7 @@ export class MessageRepository {
       targetMode: MessageTargetMode.USERS,
     };
     const {state} = await this.sendAndInjectMessage(confirmationMessage, conversationEntity, sendingOptions);
-    if (state === PayloadBundleState.CANCELLED) {
+    if (state === MessageSendingState.CANCELLED) {
       this.sendAndInjectMessage(confirmationMessage, conversationEntity, {
         ...sendingOptions,
         // If the message was auto cancelled because of a mismatch, we will force sending the message only to the clients we know of (ignoring unverified clients)
@@ -969,19 +969,13 @@ export class MessageRepository {
    */
   public async deleteMessage(conversation: Conversation, message: Message): Promise<void> {
     try {
-      const selfConversation = this.conversationState.selfConversation();
-      if (!selfConversation) {
-        throw new Error('cannot delete message as selfConversation is not defined');
-      }
       const payload = MessageBuilder.buildHideMessage({
         conversationId: conversation.id,
         messageId: message.id,
         qualifiedConversationId: conversation.qualifiedId,
       });
-      await this.sendAndInjectMessage(payload, selfConversation, {
-        skipInjection: true,
-      });
 
+      await this.sendToSelfConversations(payload);
       await this.deleteMessageById(conversation, message.id);
     } catch (error) {
       this.logger.info(
@@ -992,18 +986,25 @@ export class MessageRepository {
     }
   }
 
+  private async sendToSelfConversations(payload: GenericMessage) {
+    const selfConversations = this.conversationState.getSelfConversations(supportsMLS());
+    await Promise.all(
+      selfConversations.map(selfConversation =>
+        this.sendAndInjectMessage(payload, selfConversation, {
+          skipInjection: true,
+        }),
+      ),
+    );
+  }
+
   /**
    * Update cleared of conversation using timestamp.
    */
   public async updateClearedTimestamp(conversation: Conversation): Promise<void> {
     const timestamp = conversation.getLastKnownTimestamp(this.serverTimeHandler.toServerTimestamp());
-    const selfConversation = this.conversationState.selfConversation();
-    if (!selfConversation) {
-      throw new Error('cannot clear conversation as selfConversation is not defined');
-    }
     if (timestamp && conversation.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.CLEARED)) {
       const payload = MessageBuilder.buildClearedMessage(conversation.qualifiedId);
-      await this.sendAndInjectMessage(payload, selfConversation, {skipInjection: true});
+      await this.sendToSelfConversations(payload);
     }
   }
 
@@ -1241,13 +1242,9 @@ export class MessageRepository {
    * @param conversation Conversation to be marked as read
    */
   public async markAsRead(conversation: Conversation) {
-    const selfConversation = this.conversationState.selfConversation();
-    if (!selfConversation) {
-      throw new Error('cannot mark as read as selfConversation is not defined');
-    }
     const timestamp = conversation.last_read_timestamp();
     const payload = MessageBuilder.buildLastReadMessage(conversation.qualifiedId, timestamp);
-    await this.sendAndInjectMessage(payload, selfConversation, {skipInjection: true});
+    await this.sendToSelfConversations(payload);
     /*
      * FIXME notification removal can be improved.
      * We can add the conversation ID in the payload of the event and only check unread messages for this particular conversation
@@ -1262,12 +1259,8 @@ export class MessageRepository {
    * @param countlyId Countly new ID
    */
   public async sendCountlySync(countlyId: string) {
-    const selfConversation = this.conversationState.selfConversation();
-    if (!selfConversation) {
-      throw new Error('cannot mark as read as selfConversation is not defined');
-    }
     const payload = MessageBuilder.buildDataTransferMessage(countlyId);
-    await this.sendAndInjectMessage(payload, selfConversation, {skipInjection: true});
+    await this.sendToSelfConversations(payload);
     this.logger.info(`Sent countly sync message with ID ${countlyId}`);
   }
 

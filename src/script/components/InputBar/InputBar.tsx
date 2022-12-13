@@ -17,16 +17,7 @@
  *
  */
 
-import {
-  ChangeEvent,
-  ClipboardEvent as ReactClipboardEvent,
-  FormEvent,
-  KeyboardEvent as ReactKeyboardEvent,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import {ChangeEvent, FormEvent, KeyboardEvent as ReactKeyboardEvent, useEffect, useMemo, useRef, useState} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
@@ -37,23 +28,17 @@ import {useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {checkFileSharingPermission} from 'Components/Conversation/utils/checkFileSharingPermission';
 import {useEmoji} from 'Components/Emoji/useEmoji';
 import {Icon} from 'Components/Icon';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {useDropFiles} from 'src/script/hooks/useDropFiles';
-import {useResizeTarget} from 'src/script/hooks/useResizeTarget';
-import {useScrollSync} from 'src/script/hooks/useScrollSync';
-import {useTextAreaFocus} from 'src/script/hooks/useTextAreaFocus';
-import {ControlButtons} from 'src/script/page/message-list/InputBarControls/ControlButtons';
-import {GiphyButton} from 'src/script/page/message-list/InputBarControls/GiphyButton';
-import {MentionSuggestionList} from 'src/script/page/message-list/MentionSuggestions';
+import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
+import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
+import {CONVERSATION_TYPING_INDICATOR_MODE} from 'src/script/user/TypingIndicatorMode';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {loadDraftState, saveDraftState} from 'Util/DraftStateUtil';
-import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/FileTypeUtil';
-import {isHittingUploadLimit} from 'Util/isHittingUploadLimit';
-import {insertAtCaret, isFunctionKey, KEY} from 'Util/KeyboardUtil';
+import {insertAtCaret, isFunctionKey, isTabKey, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {
   createMentionEntity,
@@ -62,17 +47,22 @@ import {
   updateMentionRanges,
 } from 'Util/MentionUtil';
 import {formatLocale, TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {formatBytes, getSelectionPosition} from 'Util/util';
+import {getSelectionPosition} from 'Util/util';
 
+import {ControlButtons} from './components/InputBarControls/ControlButtons';
+import {GiphyButton} from './components/InputBarControls/GiphyButton';
+import {MentionSuggestionList} from './components/MentionSuggestions';
+import {PastedFileControls} from './components/PastedFileControls';
+import {ReplyBar} from './components/ReplyBar';
+import {TYPING_TIMEOUT} from './components/TypingIndicator';
+import {TypingIndicator} from './components/TypingIndicator/TypingIndicator';
 import {getRichTextInput} from './getRichTextInput';
-import {PastedFileControls} from './PastedFileControls';
-import {ReplyBar} from './ReplyBar';
-import {TYPING_TIMEOUT} from './TypingIndicator';
-import {TypingIndicator} from './TypingIndicator/TypingIndicator';
+import {useFilePaste} from './hooks/useFilePaste';
+import {useResizeTarget} from './hooks/useResizeTarget';
+import {useScrollSync} from './hooks/useScrollSync';
+import {useTextAreaFocus} from './hooks/useTextAreaFocus';
 
-import {AssetRepository} from '../../assets/AssetRepository';
 import {Config} from '../../Config';
-import {ConversationRepository} from '../../conversation/ConversationRepository';
 import {MessageRepository, OutgoingQuote} from '../../conversation/MessageRepository';
 import {Conversation} from '../../entity/Conversation';
 import {ContentMessage} from '../../entity/message/ContentMessage';
@@ -94,17 +84,7 @@ const CONFIG = {
   PING_TIMEOUT: TIME_IN_MILLIS.SECOND * 2,
 };
 
-const showWarningModal = (title: string, message: string): void => {
-  // Timeout needed for display warning modal - we need to update modal
-  setTimeout(() => {
-    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-      text: {message, title},
-    });
-  }, 0);
-};
-
 interface InputBarProps {
-  readonly assetRepository: AssetRepository;
   readonly conversationEntity: Conversation;
   readonly conversationRepository: ConversationRepository;
   readonly eventRepository: EventRepository;
@@ -115,10 +95,13 @@ interface InputBarProps {
   readonly storageRepository: StorageRepository;
   readonly teamState: TeamState;
   readonly userState: UserState;
+  onShiftTab: () => void;
+  uploadDroppedFiles: (droppedFiles: File[]) => void;
+  uploadImages: (images: File[]) => void;
+  uploadFiles: (files: File[]) => void;
 }
 
 const InputBar = ({
-  assetRepository,
   conversationEntity,
   conversationRepository,
   eventRepository,
@@ -129,6 +112,10 @@ const InputBar = ({
   storageRepository,
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
+  onShiftTab,
+  uploadDroppedFiles,
+  uploadImages,
+  uploadFiles,
 }: InputBarProps) => {
   const {classifiedDomains, isSelfDeletingMessagesEnabled, isFileSharingSendingEnabled} = useKoSubscribableChildren(
     teamState,
@@ -161,6 +148,8 @@ const InputBar = ({
     'isIncomingRequest',
   ]);
 
+  const {typingIndicatorMode} = useKoSubscribableChildren(propertiesRepository, ['typingIndicatorMode']);
+  const isTypingIndicatorEnabled = typingIndicatorMode === CONVERSATION_TYPING_INDICATOR_MODE.ON;
   const shadowInputRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -255,38 +244,9 @@ const InputBar = ({
 
   const clearPastedFile = () => setPastedFile(null);
 
-  const onDropOrPastedFile = (droppedFiles: File[]) => {
-    const images: File[] = [];
-    const files: File[] = [];
-
-    if (!isFileSharingSendingEnabled) {
-      showWarningModal(
-        t('conversationModalRestrictedFileSharingHeadline'),
-        t('conversationModalRestrictedFileSharingDescription'),
-      );
-
-      return;
-    }
-
-    if (!isHittingUploadLimit(droppedFiles, assetRepository)) {
-      Array.from(droppedFiles).forEach(file => {
-        const isSupportedImage = CONFIG.ALLOWED_IMAGE_TYPES.includes(file.type);
-
-        if (isSupportedImage) {
-          images.push(file);
-        } else {
-          files.push(file);
-        }
-      });
-
-      uploadImages(images);
-      uploadFiles(files);
-    }
-  };
-
   const sendPastedFile = () => {
     if (pastedFile) {
-      onDropOrPastedFile([pastedFile]);
+      uploadDroppedFiles([pastedFile]);
       clearPastedFile();
     }
   };
@@ -393,7 +353,7 @@ const InputBar = ({
   }, [editMessageEntity]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (!hasUserTyped.current) {
+    if (!hasUserTyped.current || !isTypingIndicatorEnabled) {
       return;
     }
     if (isTyping) {
@@ -401,7 +361,7 @@ const InputBar = ({
     } else {
       conversationRepository.sendTypingStop(conversationEntity);
     }
-  }, [isTyping, conversationRepository, conversationEntity]);
+  }, [isTyping, conversationRepository, conversationEntity, isTypingIndicatorEnabled]);
 
   useEffect(() => {
     if (!hasUserTyped.current) {
@@ -451,7 +411,10 @@ const InputBar = ({
 
   const onTextAreaKeyDown = (keyboardEvent: ReactKeyboardEvent<HTMLTextAreaElement>): void | boolean => {
     const inputHandledByEmoji = !editedMention && emojiKeyDown(keyboardEvent);
-
+    // shift+tab from message input bar set last focused message's elements non focusable
+    if (keyboardEvent.shiftKey && isTabKey(keyboardEvent)) {
+      onShiftTab();
+    }
     if (!inputHandledByEmoji) {
       switch (keyboardEvent.key) {
         case KEY.ARROW_UP: {
@@ -605,64 +568,6 @@ const InputBar = ({
     renderEmojiComponent,
   } = useEmoji(propertiesRepository, setInputValue, onSend, currentMentions, setCurrentMentions, textareaRef.current);
 
-  const uploadFiles = (files: File[]) => {
-    const fileArray = Array.from(files);
-
-    if (!allowsAllFiles()) {
-      for (const file of fileArray) {
-        if (!hasAllowedExtension(file.name)) {
-          conversationRepository.injectFileTypeRestrictedMessage(
-            conversationEntity,
-            selfUser,
-            false,
-            getFileExtensionOrName(file.name),
-          );
-
-          return;
-        }
-      }
-    }
-
-    const uploadLimit = inTeam ? CONFIG.MAXIMUM_ASSET_FILE_SIZE_TEAM : CONFIG.MAXIMUM_ASSET_FILE_SIZE_PERSONAL;
-
-    if (!isHittingUploadLimit(files, assetRepository)) {
-      for (const file of fileArray) {
-        const isFileTooLarge = file.size > uploadLimit;
-
-        if (isFileTooLarge) {
-          const fileSize = formatBytes(uploadLimit);
-          showWarningModal(t('modalAssetTooLargeHeadline'), t('modalAssetTooLargeMessage', fileSize));
-
-          return;
-        }
-      }
-
-      messageRepository.uploadFiles(conversationEntity, files);
-    }
-  };
-
-  const uploadImages = (images: File[]) => {
-    if (!isHittingUploadLimit(images, assetRepository)) {
-      for (const image of Array.from(images)) {
-        const isImageTooLarge = image.size > CONFIG.MAXIMUM_IMAGE_FILE_SIZE;
-
-        if (isImageTooLarge) {
-          const isGif = image.type === 'image/gif';
-          const maxSize = CONFIG.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024;
-
-          showWarningModal(
-            t(isGif ? 'modalGifTooLargeHeadline' : 'modalPictureTooLargeHeadline'),
-            t(isGif ? 'modalGifTooLargeMessage' : 'modalPictureTooLargeMessage', maxSize),
-          );
-
-          return;
-        }
-      }
-
-      messageRepository.uploadImages(conversationEntity, images);
-    }
-  };
-
   const onGifClick = () => openGiphy(inputValue);
 
   const onPingClick = () => {
@@ -675,34 +580,18 @@ const InputBar = ({
     }
   };
 
-  const onPasteFiles = (event: ClipboardEvent | ReactClipboardEvent): void => {
-    if (event?.clipboardData?.types.includes('text/plain')) {
-      return;
-    }
+  const handlePasteFiles = (files: FileList): void => {
+    const [pastedFile] = files;
+    const {lastModified} = pastedFile;
 
-    if (!isFileSharingSendingEnabled) {
-      showWarningModal(
-        t('conversationModalRestrictedFileSharingHeadline'),
-        t('conversationModalRestrictedFileSharingDescription'),
-      );
+    const date = formatLocale(lastModified || new Date(), 'PP, pp');
+    const fileName = t('conversationSendPastedFile', date);
 
-      return;
-    }
+    const newFile = new File([pastedFile], fileName, {
+      type: pastedFile.type,
+    });
 
-    const pastedFiles = event?.clipboardData?.files;
-    if (pastedFiles) {
-      const [pastedFile] = pastedFiles;
-      const {lastModified} = pastedFile;
-
-      const date = formatLocale(lastModified || new Date(), 'PP, pp');
-      const fileName = t('conversationSendPastedFile', date);
-
-      const newFile = new File([pastedFile], fileName, {
-        type: pastedFile.type,
-      });
-
-      setPastedFile(newFile);
-    }
+    setPastedFile(newFile);
   };
 
   const loadInitialStateForConversation = async (): Promise<void> => {
@@ -834,13 +723,7 @@ const InputBar = ({
     return () => undefined;
   }, [isEditing]);
 
-  // Temporarily functionality for dropping files on conversation container, should be moved to Conversation Component
-  useDropFiles('#conversation', onDropOrPastedFile, [isFileSharingSendingEnabled]);
-
-  useEffect(() => {
-    document.addEventListener('paste', onPasteFiles);
-    return () => document.removeEventListener('paste', onPasteFiles);
-  }, []);
+  useFilePaste(checkFileSharingPermission(handlePasteFiles));
 
   const sendImageOnEnterClick = (event: KeyboardEvent) => {
     if (event.key === KEY.ENTER && !event.shiftKey && !event.altKey && !event.metaKey) {
@@ -893,10 +776,11 @@ const InputBar = ({
 
   return (
     <div
+      aria-live="polite"
       id="conversation-input-bar"
       className={cx('conversation-input-bar', {'is-right-panel-open': isRightSidebarOpen})}
     >
-      <TypingIndicator conversationId={conversationEntity.id} />
+      {!!isTypingIndicatorEnabled && <TypingIndicator conversationId={conversationEntity.id} />}
 
       {classifiedDomains && !isConnectionRequest && (
         <ClassifiedBar users={participatingUserEts} classifiedDomains={classifiedDomains} />
@@ -929,7 +813,6 @@ const InputBar = ({
                     onClick={handleMentionFlow}
                     onInput={updateMentions}
                     onChange={onChange}
-                    onPaste={onPasteFiles}
                     onBlur={() => setIsTyping(false)}
                     value={inputValue}
                     placeholder={inputPlaceholder}

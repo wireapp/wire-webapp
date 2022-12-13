@@ -18,9 +18,9 @@
  */
 
 import {
-  ACCESS_ROLE_V2,
-  CONVERSATION_ACCESS,
   CONVERSATION_ACCESS_ROLE,
+  CONVERSATION_ACCESS,
+  CONVERSATION_LEGACY_ACCESS_ROLE,
   CONVERSATION_TYPE,
 } from '@wireapp/api-client/lib/conversation/';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
@@ -54,6 +54,7 @@ import {Config} from '../Config';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
 import {ACCESS_STATE} from '../conversation/AccessState';
 import {ConversationRepository} from '../conversation/ConversationRepository';
+import {isSelfConversation} from '../conversation/ConversationSelectors';
 import {ConversationStatus} from '../conversation/ConversationStatus';
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
 import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
@@ -140,6 +141,7 @@ export class Conversation {
   public readonly isLeavable: ko.PureComputed<boolean>;
   public readonly isMutable: ko.PureComputed<boolean>;
   public readonly isRequest: ko.PureComputed<boolean>;
+  /** @deprecated use isSelfConversation from conversationSelectors */
   public readonly isSelf: ko.PureComputed<boolean>;
   public readonly isTeamOnly: ko.PureComputed<boolean>;
   public readonly last_event_timestamp: ko.Observable<number>;
@@ -171,7 +173,7 @@ export class Conversation {
   public readonly hasExternal: ko.PureComputed<boolean>;
   public readonly hasFederatedUsers: ko.PureComputed<boolean>;
   public accessModes?: CONVERSATION_ACCESS[];
-  public accessRole?: CONVERSATION_ACCESS_ROLE | ACCESS_ROLE_V2[];
+  public accessRole?: CONVERSATION_LEGACY_ACCESS_ROLE | CONVERSATION_ACCESS_ROLE[];
   public domain: string;
 
   static get TIMESTAMP_TYPE(): typeof TIMESTAMP_TYPE {
@@ -344,7 +346,7 @@ export class Conversation {
     this.blockLegalHoldMessage = false;
 
     this.legalHoldStatus.subscribe(legalHoldStatus => {
-      if (!this.blockLegalHoldMessage && this.hasInitializedUsers()) {
+      if (!this.blockLegalHoldMessage && !isSelfConversation(this) && this.hasInitializedUsers()) {
         amplify.publish(WebAppEvents.CONVERSATION.INJECT_LEGAL_HOLD_MESSAGE, {
           conversationEntity: this,
           legalHoldStatus,

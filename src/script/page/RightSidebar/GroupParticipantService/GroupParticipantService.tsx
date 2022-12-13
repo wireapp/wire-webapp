@@ -19,6 +19,7 @@
 
 import {FC, useEffect} from 'react';
 
+import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
 import {ServiceDetails} from 'Components/panel/ServiceDetails';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -30,7 +31,6 @@ import {Conversation} from '../../../entity/Conversation';
 import {User} from '../../../entity/User';
 import {IntegrationRepository} from '../../../integration/IntegrationRepository';
 import {ServiceEntity} from '../../../integration/ServiceEntity';
-import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {generatePermissionHelpers} from '../../../user/UserPermission';
 import {UserState} from '../../../user/UserState';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
@@ -97,7 +97,7 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
     <div id="group-participant-service" className="panel__page group-participant">
       <PanelHeader onGoBack={onBack} goBackUie="go-back-group-participant" onClose={onClose} />
 
-      <div className="panel__content panel__content--fill" ref={initFadingScrollbar}>
+      <FadingScrollbar className="panel__content panel__content--fill">
         <ServiceDetails service={serviceEntity} />
 
         {showActions && canChatWithServices() && (
@@ -133,7 +133,7 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
             <div className="panel__action-item__text">{t('groupParticipantActionRemove')}</div>
           </div>
         )}
-      </div>
+      </FadingScrollbar>
 
       {isAddMode && (
         <div className="panel__footer">

@@ -62,7 +62,7 @@ const PanelHeader: FC<PanelHeaderProps> = ({
   onToggleMute = noop,
 }: PanelHeaderProps) => {
   return (
-    <div className={cx('panel__header', {'panel__header--reverse': isReverse}, className)}>
+    <header className={cx('panel__header', {'panel__header--reverse': isReverse}, className)}>
       {showBackArrow && (
         <DragableClickWrapper onClick={() => onGoBack()}>
           <button className="icon-button" data-uie-name={goBackUie} title={goBackTitle} onBlur={handleBlur}>
@@ -72,9 +72,9 @@ const PanelHeader: FC<PanelHeaderProps> = ({
       )}
 
       {title && (
-        <h3 className="panel__header__title" tabIndex={0} data-uie-name={titleDataUieName}>
+        <h2 className="panel__header__title" tabIndex={0} data-uie-name={titleDataUieName}>
           {title}
-        </h3>
+        </h2>
       )}
 
       <DragableClickWrapper onClick={onClose}>
@@ -97,7 +97,7 @@ const PanelHeader: FC<PanelHeaderProps> = ({
           </button>
         </DragableClickWrapper>
       )}
-    </div>
+    </header>
   );
 };
 

@@ -19,11 +19,12 @@
 
 import React from 'react';
 
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
+
 import {Icon} from 'Components/Icon';
 import {User} from 'src/script/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-import {useDisposableRef} from 'Util/useDisposableRef';
 
 import {ConnectedMessage} from './memberMessage/ConnectedMessage';
 import {MessageTime} from './MessageTime';
@@ -80,17 +81,12 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
   const isMemberLeave = message.isMemberLeave();
   const isMemberChange = message.isMemberChange();
 
-  const initShowMore = useDisposableRef(element => {
-    const link = element.querySelector('.message-header-show-more');
-    if (link) {
-      const listener = () => onClickParticipants(highlightedUsers);
-      link.addEventListener('click', listener);
-      return () => {
-        link.removeEventListener('click', listener);
-      };
+  const handleShowMoreClick = (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
+    const clickedOnShowMore = (event.target as HTMLElement).closest('.message-header-show-more');
+    if (clickedOnShowMore) {
+      onClickParticipants(highlightedUsers);
     }
-    return () => {};
-  });
+  };
 
   return (
     <>
@@ -105,7 +101,7 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
         <>
           {showNamedCreation && (
             <div className="message-group-creation-header">
-              <div
+              <p
                 className="message-group-creation-header-text"
                 dangerouslySetInnerHTML={{__html: htmlGroupCreationHeader}}
               />
@@ -119,9 +115,10 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
                 {isMemberRemoval && <span className="icon-minus" />}
                 {isMemberJoin && <span className="icon-plus" />}
               </div>
-              <div ref={initShowMore} className="message-header-label">
-                <span className="message-header-caption" dangerouslySetInnerHTML={{__html: htmlCaption}} />
-                <hr className="message-header-line" />
+              {/* event is being triggered only when clicked on <a> tag with specified class (keyboard accessible by default) */}
+              {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
+              <div onClick={handleShowMoreClick} className="message-header-label">
+                <p className="message-header-caption" dangerouslySetInnerHTML={{__html: htmlCaption}} />
               </div>
               {isMemberChange && (
                 <div className="message-body-actions">
@@ -135,27 +132,31 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
             </div>
           )}
           {hasUsers && message.showServicesWarning && (
-            <div className="message-services-warning" data-uie-name="label-services-warning">
+            <p className="message-services-warning" data-uie-name="label-services-warning">
               {t('conversationServicesWarning')}
-            </div>
+            </p>
           )}
+
           {isGroupCreation && shouldShowInvitePeople && (
             <div className="message-member-footer">
-              <div>{t('guestRoomConversationHead')}</div>
-              <button
+              <p>{t('guestRoomConversationHead')}</p>
+
+              <Button
+                variant={ButtonVariant.TERTIARY}
                 type="button"
                 onClick={onClickInvitePeople}
-                className="button-reset-default message-member-footer-button"
                 data-uie-name="do-invite-people"
+                style={{marginTop: '1em'}}
               >
                 {t('guestRoomConversationButton')}
-              </button>
+              </Button>
             </div>
           )}
+
           {isGroupCreation && isSelfTemporaryGuest && (
             <div className="message-member-footer">
-              <div className="message-member-footer-message">{t('temporaryGuestJoinMessage')}</div>
-              <div className="message-member-footer-description">{t('temporaryGuestJoinDescription')}</div>
+              <p className="message-member-footer-message">{t('temporaryGuestJoinMessage')}</p>
+              <p className="message-member-footer-description">{t('temporaryGuestJoinDescription')}</p>
             </div>
           )}
           {isGroupCreation && hasReadReceiptsTurnedOn && (
@@ -163,15 +164,14 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
               <div className="message-header-icon message-header-icon--svg text-foreground">
                 <Icon.Read />
               </div>
-              <div className="message-header-label">
+              <p className="message-header-label">
                 <span className="ellipsis">{t('conversationCreateReceiptsEnabled')}</span>
-                <hr className="message-header-line" />
-              </div>
+              </p>
             </div>
           )}
           {isMemberLeave && user.isMe && isSelfTemporaryGuest && (
             <div className="message-member-footer">
-              <div className="message-member-footer-description">{t('temporaryGuestLeaveDescription')}</div>
+              <p className="message-member-footer-description">{t('temporaryGuestLeaveDescription')}</p>
             </div>
           )}
         </>

@@ -41,12 +41,14 @@ export interface FileAssetProps {
   hasHeader?: boolean;
   message: ContentMessage;
   teamState?: TeamState;
+  isCurrentConversationFocused?: boolean;
 }
 
 const FileAsset: React.FC<FileAssetProps> = ({
   message,
   hasHeader = false,
   teamState = container.resolve(TeamState),
+  isCurrentConversationFocused = true,
 }) => {
   const asset = message.getFirstAsset() as FileAssetType;
 
@@ -88,7 +90,7 @@ const FileAsset: React.FC<FileAssetProps> = ({
           data-uie-name="file"
           data-uie-value={asset.file_name}
           role="button"
-          tabIndex={0}
+          tabIndex={isCurrentConversationFocused ? 0 : -1}
           aria-label={`${t('conversationContextMenuDownload')} ${fileName}.${fileExtension}`}
           onClick={() => {
             if (isUploaded) {
@@ -122,9 +124,9 @@ const FileAsset: React.FC<FileAssetProps> = ({
               )}
 
               <div className="file__desc">
-                <div className="label-bold-xs ellipsis" data-uie-name="file-name">
+                <p className="label-bold-xs ellipsis" data-uie-name="file-name">
                   {fileName}
-                </div>
+                </p>
                 <ul className="file__desc__meta label-xs text-foreground">
                   <li className="label-nocase-xs" data-uie-name="file-size">
                     {formattedFileSize}

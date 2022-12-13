@@ -61,13 +61,13 @@ export interface ConversationProtocolDetailsProps {
 }
 
 const titleStyles: CSSObject = {
-  fontSize: 14,
+  fontSize: '0.875rem',
   fontWeight: 400,
 };
 
 const subTitleStyles: CSSObject = {
   color: 'var(--gray-70)',
-  fontSize: 12,
+  fontSize: '0.75rem',
   fontWeight: 400,
   marginBottom: 16,
   wordBreak: 'break-all',
@@ -79,26 +79,27 @@ const wrapperStyles: CSSObject = {
   paddingTop: 4,
 };
 
-const ConversationProtocolDetails: React.FC<ConversationProtocolDetailsProps> = ({protocol, cipherSuite}) => {
-  return (
-    <div>
-      <div className="conversation-details__list-head">{t('conversationDetailsProtocolDetails')}</div>
-      <div css={wrapperStyles}>
-        <div css={titleStyles}>Protocol</div>
-        <div css={subTitleStyles} data-uie-name="protocol-name">
-          {protocol.toUpperCase()}
-        </div>
-        {protocol === ConversationProtocol.MLS && cipherSuite && (
-          <>
-            <div css={titleStyles}>Cipher Suite</div>
-            <div css={subTitleStyles} data-uie-name="cipher-suite">
-              {Ciphersuite[cipherSuite]}
-            </div>
-          </>
-        )}
-      </div>
+const ConversationProtocolDetails: React.FC<ConversationProtocolDetailsProps> = ({protocol, cipherSuite}) => (
+  <div>
+    <h3 className="conversation-details__list-head">{t('conversationDetailsProtocolDetails')}</h3>
+
+    <div css={wrapperStyles}>
+      <div css={titleStyles}>Protocol</div>
+
+      <p css={subTitleStyles} data-uie-name="protocol-name">
+        {protocol.toUpperCase()}
+      </p>
+
+      {protocol === ConversationProtocol.MLS && cipherSuite && (
+        <>
+          <div css={titleStyles}>Cipher Suite</div>
+          <p css={subTitleStyles} data-uie-name="cipher-suite">
+            {Ciphersuite[cipherSuite]}
+          </p>
+        </>
+      )}
     </div>
-  );
-};
+  </div>
+);
 
 export {ConversationProtocolDetails};

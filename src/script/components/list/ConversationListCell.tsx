@@ -17,7 +17,14 @@
  *
  */
 
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import React, {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  MouseEvent as ReactMouseEvent,
+  KeyboardEvent as ReactKeyBoardEvent,
+} from 'react';
 
 import cx from 'classnames';
 
@@ -39,7 +46,7 @@ export interface ConversationListCellProps {
   conversation: Conversation;
   dataUieName: string;
   isSelected?: (conversation: Conversation) => boolean;
-  onClick: React.MouseEventHandler<Element>;
+  onClick: (event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>) => void;
   onJoinCall: (conversation: Conversation, mediaType: MediaType) => void;
   rightClick: (conversation: Conversation, event: MouseEvent | React.MouseEvent<Element, MouseEvent>) => void;
   showJoinButton: boolean;
@@ -99,6 +106,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
   const contextMenuRef = useRef<HTMLButtonElement>(null);
   const [focusContextMenu, setContextMenuFocus] = useState(false);
   const [isContextMenuOpen, setContextMenuOpen] = useState(false);
+  const contextMenuKeyboardShortcut = `keyboard-shortcut-${conversation.id}`;
 
   const openContextMenu = (event: MouseEvent | React.MouseEvent<Element, MouseEvent>) => {
     event.stopPropagation();
@@ -115,7 +123,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
 
   const handleDivKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key === KEY.SPACE || event.key === KEY.ENTER) {
-      onClick(event as unknown as React.MouseEvent<Element, MouseEvent>);
+      onClick(event);
     } else if (isKey(event, KEY.ARROW_RIGHT)) {
       setContextMenuFocus(true);
     } else {
@@ -181,8 +189,9 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
           data-uie-name="go-open-conversation"
           tabIndex={focusConversation ? 0 : -1}
           aria-label={t('accessibility.openConversation', displayName)}
-          title={t('accessibility.conversationOptionsMenuAccessKey')}
+          aria-describedby={contextMenuKeyboardShortcut}
         >
+          <span id={contextMenuKeyboardShortcut} aria-label={t('accessibility.conversationOptionsMenuAccessKey')} />
           <div
             className={cx('conversation-list-cell-left', {
               'conversation-list-cell-left-opaque': removedFromConversation || users.length === 0,

@@ -19,48 +19,15 @@
 
 .full-search {
   display: inline-block;
-  width: 624px + 72px;
-  &__header {
-    display: flex;
-    height: 40px;
-    align-items: center;
-    margin-bottom: 16px;
-    &__icon {
-      width: @conversation-message-sender-width;
-      flex: 0 0 auto;
-      color: var(--foreground);
-      text-align: center;
-    }
-    &__input {
-      display: flex;
-      width: 100%;
-      height: 100%;
-      align-items: center;
-      border-bottom: 1px solid @separator-color;
+  max-width: 624px + 72px;
 
-      > input {
-        .reset-textarea;
-
-        width: 100%;
-        height: 24px;
-        background-color: transparent;
-        color: var(--background);
-        line-height: 24px;
-
-        &::placeholder {
-          .label-xs;
-
-          height: 24px;
-          padding-left: 8px;
-          color: var(--foreground-fade-48);
-          line-height: 24px;
-        }
-      }
-    }
-    .button-icon {
-      .button-reset-default;
+  body.theme-dark & {
+    header div,
+    header input {
+      background-color: var(--gray-100);
     }
   }
+
   &__item {
     position: relative;
     display: flex;

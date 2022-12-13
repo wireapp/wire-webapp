@@ -18,8 +18,7 @@
  */
 
 module.exports = {
-  moduleDirectories: ['node_modules', './'],
-  preset: 'ts-jest',
+  moduleDirectories: ['node_modules', __dirname],
   testEnvironment: 'node',
   testPathIgnorePatterns: ['<rootDir>/dist'],
   testRegex: '(test|Spec)\\.[tj]sx?$',

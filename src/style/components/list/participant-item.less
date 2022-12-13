@@ -114,13 +114,13 @@
       height: @avatar-diameter-m;
       flex: 1 1;
       align-items: center;
-      line-height: 16px;
+      line-height: @line-height-sm;
 
       &__text {
         display: flex;
         min-width: 0; // this will ensure that ellipses is working
         max-width: @participant-max-width;
-        height: @avatar-diameter-m;
+        min-height: @avatar-diameter-m;
         flex-direction: column;
         flex-grow: 1;
         align-items: flex-start;

@@ -49,8 +49,10 @@ import {PanelState} from '../RightSidebar';
 import {RootContext} from '../RootProvider';
 import {ContentState, useAppState} from '../useAppState';
 
+export const ANIMATED_PAGE_TRANSITION_DURATION = 500;
+
 const Animated: FC<{children: ReactNode}> = ({children, ...rest}) => (
-  <CSSTransition classNames="slide-in-left" timeout={{enter: 500}} {...rest}>
+  <CSSTransition classNames="slide-in-left" timeout={{enter: ANIMATED_PAGE_TRANSITION_DURATION}} {...rest}>
     {children}
   </CSSTransition>
 );
@@ -120,7 +122,7 @@ const MainContent: FC<MainContentProps> = ({
   };
 
   return (
-    <div id="center-column" className="center-column">
+    <section id="center-column" className="center-column">
       <h1 className="visually-hidden">{title}</h1>
 
       <SwitchTransition>
@@ -242,7 +244,7 @@ const MainContent: FC<MainContentProps> = ({
         </Animated>
       </SwitchTransition>
       <div className="center-column__overlay" />
-    </div>
+    </section>
   );
 };
 

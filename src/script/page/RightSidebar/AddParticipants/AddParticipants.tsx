@@ -21,6 +21,9 @@ import {FC, useMemo, useState} from 'react';
 
 import cx from 'classnames';
 
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
+
+import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
 import {SearchInput} from 'Components/SearchInput';
 import {ServiceList} from 'Components/ServiceList';
@@ -41,7 +44,6 @@ import {ServiceEntity} from '../../../integration/ServiceEntity';
 import {SearchRepository} from '../../../search/SearchRepository';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {TeamState} from '../../../team/TeamState';
-import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {generatePermissionHelpers} from '../../../user/UserPermission';
 import {UserState} from '../../../user/UserState';
 import {PanelHeader} from '../PanelHeader';
@@ -226,7 +228,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
           </div>
         )}
 
-        <div className="add-participants__list panel__content" ref={initFadingScrollbar}>
+        <FadingScrollbar className="add-participants__list panel__content">
           {isAddPeopleState && (
             <UserSearchableList
               users={contacts}
@@ -282,16 +284,17 @@ const AddParticipants: FC<AddParticipantsProps> = ({
                         {t('addParticipantsNoServicesManager')}
                       </div>
 
-                      <div
-                        role="button"
+                      <Button
+                        variant={ButtonVariant.TERTIARY}
+                        type="button"
                         tabIndex={0}
-                        className="search__no-services__manage-button search__no-services__manage-button--alternate"
                         onClick={openManageServices}
                         onKeyDown={event => handleKeyDown(event, openManageServices)}
                         data-uie-name="go-enable-services"
+                        style={{marginTop: '1em'}}
                       >
                         {t('addParticipantsManageServicesNoResults')}
-                      </div>
+                      </Button>
                     </>
                   )}
 
@@ -304,19 +307,13 @@ const AddParticipants: FC<AddParticipantsProps> = ({
               )}
             </>
           )}
-        </div>
+        </FadingScrollbar>
 
         {isAddPeopleState && (
           <div className="add-participants__footer">
-            <button
-              type="button"
-              className="button button-full"
-              disabled={!enabledAddAction}
-              onClick={onAddParticipants}
-              data-uie-name="do-create"
-            >
-              <span>{t('addParticipantsConfirmLabel')}</span>
-            </button>
+            <Button type="button" disabled={!enabledAddAction} onClick={onAddParticipants} data-uie-name="do-create">
+              {t('addParticipantsConfirmLabel')}
+            </Button>
           </div>
         )}
       </div>

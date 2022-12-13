@@ -44,6 +44,7 @@ import {useWindowTitle} from './useWindowTitle';
 
 import {ConversationState} from '../conversation/ConversationState';
 import {User} from '../entity/User';
+import {useInitializeRootFontSize} from '../hooks/useRootFontSize';
 import {App} from '../main/app';
 import {generateConversationUrl} from '../router/routeGenerator';
 import {configureRoutes, navigate} from '../router/Router';
@@ -73,6 +74,8 @@ const AppMain: FC<AppMainProps> = ({
   conversationState = container.resolve(ConversationState),
 }) => {
   const apiContext = app.getAPIContext();
+
+  useInitializeRootFontSize();
 
   if (!apiContext) {
     throw new Error('API Context has not been set');
@@ -141,6 +144,14 @@ const AppMain: FC<AppMainProps> = ({
         amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentState.CONNECTION_REQUESTS);
       }
     };
+
+    // on app load reset last message focus to ensure last message is focused
+    // only when user enters a new conversation using keyboard(press enter)
+    const historyState = window.history.state;
+    if (historyState && !!historyState.eventKey) {
+      historyState.eventKey = '';
+      window.history.replaceState(historyState, '', window.location.hash);
+    }
 
     configureRoutes({
       '/': showMostRecentConversation,

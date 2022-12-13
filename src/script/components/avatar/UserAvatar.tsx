@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import React, {MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent} from 'react';
 
 import {COLOR} from '@wireapp/react-ui-kit';
 
@@ -39,7 +39,9 @@ export interface UserAvatarProps extends React.HTMLProps<HTMLDivElement> {
   avatarAlt?: string;
   noBadge?: boolean;
   noFilter?: boolean;
-  onClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+  onAvatarInteraction?: (
+    event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>,
+  ) => void;
   participant: User;
   state: STATE;
 }
@@ -57,7 +59,7 @@ const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
   noBadge,
   noFilter,
   state,
-  onClick,
+  onAvatarInteraction,
   ...props
 }) => {
   const isImageGrey = !noFilter && [STATE.BLOCKED, STATE.IGNORED, STATE.PENDING, STATE.UNKNOWN].includes(state);
@@ -84,7 +86,8 @@ const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
       data-uie-name="element-avatar-user"
       data-uie-value={participant.id}
       data-uie-status={state}
-      onClick={onClick}
+      onClick={onAvatarInteraction}
+      onKeyDown={onAvatarInteraction}
       title={name}
       {...props}
     >

@@ -48,6 +48,7 @@ export interface AudioAssetProps {
   hasHeader?: boolean;
   message: ContentMessage;
   teamState?: TeamState;
+  isCurrentConversationFocused?: boolean;
 }
 
 const AudioAsset: React.FC<AudioAssetProps> = ({
@@ -55,6 +56,7 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
   className,
   hasHeader = false,
   teamState = container.resolve(TeamState),
+  isCurrentConversationFocused = true,
 }) => {
   const asset = message.getFirstAsset() as FileAsset;
   const [audioElement, setAudioElement] = useEffectRef<HTMLAudioElement>();
@@ -129,6 +131,7 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
                     cancel={cancelUpload}
                     transferState={transferState}
                     uploadProgress={uploadProgress}
+                    isCurrentConversationFocused={isCurrentConversationFocused}
                   />
 
                   {transferState !== AssetTransferState.UPLOADING && audioElement && (

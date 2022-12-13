@@ -28,6 +28,7 @@ import {container} from 'tsyringe';
 import {Button, ButtonVariant, Select} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
 import {ModalComponent} from 'Components/ModalComponent';
 import {SearchInput} from 'Components/SearchInput';
@@ -53,7 +54,6 @@ import {User} from '../../../entity/User';
 import {isProtocolOption, ProtocolOption} from '../../../guards/Protocol';
 import {RootContext} from '../../../page/RootProvider';
 import {TeamState} from '../../../team/TeamState';
-import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {UserState} from '../../../user/UserState';
 
 interface GroupCreationModalProps {
@@ -354,7 +354,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
         )}
 
         {stateIsParticipants && (
-          <div className="group-creation__list" ref={initFadingScrollbar}>
+          <FadingScrollbar className="group-creation__list">
             {contacts.length > 0 && (
               <UserSearchableList
                 users={contacts}
@@ -367,7 +367,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                 noUnderline
               />
             )}
-          </div>
+          </FadingScrollbar>
         )}
         {/* eslint jsx-a11y/no-autofocus : "off" */}
         {stateIsPreferences && (

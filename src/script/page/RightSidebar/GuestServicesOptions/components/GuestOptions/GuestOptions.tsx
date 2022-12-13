@@ -21,6 +21,8 @@ import {FC, useCallback, useEffect, useMemo, useState} from 'react';
 
 import cx from 'classnames';
 
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
+
 import {CopyToClipboard} from 'Components/CopyToClipboard';
 import {Icon} from 'Components/Icon';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -229,20 +231,17 @@ const GuestOptions: FC<GuestOptionsProps> = ({
               )}
 
               {!hasAccessCode && (
-                <button
-                  className="panel__action-item panel__action-item--link"
-                  type="button"
-                  disabled={isRequestOngoing}
-                  onClick={requestAccessCode}
-                >
-                  <span className="panel__action-item__icon">
-                    <Icon.Link />
-                  </span>
-
-                  <span className="panel__action-item__text" data-uie-name="do-create-link">
+                <div className="guest-options__content">
+                  <Button
+                    disabled={isRequestOngoing}
+                    variant={ButtonVariant.TERTIARY}
+                    onClick={requestAccessCode}
+                    data-uie-name="do-create-link"
+                  >
+                    <Icon.Link width="16" height="16" css={{marginRight: '10px'}} />
                     {t('guestOptionsCreateLink')}
-                  </span>
-                </button>
+                  </Button>
+                </div>
               )}
             </>
           )}

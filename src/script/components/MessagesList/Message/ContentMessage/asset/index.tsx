@@ -18,15 +18,16 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import cx from 'classnames';
 
 import {Asset} from 'src/script/entity/message/Asset';
 import type {FileAsset as FileAssetType} from 'src/script/entity/message/FileAsset';
 import type {Location} from 'src/script/entity/message/Location';
 import type {MediumImage} from 'src/script/entity/message/MediumImage';
-import type {Text} from 'src/script/entity/message/Text';
+import {Text} from 'src/script/entity/message/Text';
+import {StatusType} from 'src/script/message/StatusType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
-import {handleKeyDown} from 'Util/KeyboardUtil';
 
 import {AudioAsset} from './AudioAsset';
 import {FileAsset} from './FileAssetComponent';
@@ -34,6 +35,7 @@ import {ImageAsset} from './ImageAsset';
 import {LinkPreviewAsset} from './LinkPreviewAssetComponent';
 import {LocationAsset} from './LocationAsset';
 import {MessageButton} from './MessageButton';
+import {TextMessageRenderer} from './TextMessageRenderer';
 import {VideoAsset} from './VideoAsset';
 
 import {MessageActions} from '../..';
@@ -41,7 +43,6 @@ import {AssetType} from '../../../../../assets/AssetType';
 import {Button} from '../../../../../entity/message/Button';
 import {CompositeMessage} from '../../../../../entity/message/CompositeMessage';
 import {ContentMessage} from '../../../../../entity/message/ContentMessage';
-import {StatusType} from '../../../../../message/StatusType';
 
 const ContentAsset = ({
   asset,
@@ -50,6 +51,7 @@ const ContentAsset = ({
   onClickImage,
   onClickMessage,
   onClickButton,
+  focusConversation,
 }: {
   asset: Asset;
   message: ContentMessage;
@@ -57,24 +59,24 @@ const ContentAsset = ({
   onClickImage: MessageActions['onClickImage'];
   onClickMessage: MessageActions['onClickMessage'];
   selfId: QualifiedId;
+  focusConversation: boolean;
 }) => {
   const {isObfuscated, status} = useKoSubscribableChildren(message, ['isObfuscated', 'status']);
+
   switch (asset.type) {
     case AssetType.TEXT:
       return (
         <>
           {(asset as Text).should_render_text() && (
-            <div
-              role="button"
-              tabIndex={0}
-              className={`text ${includesOnlyEmojis((asset as Text).text) ? 'text-large' : ''} ${
-                status === StatusType.SENDING ? 'text-foreground' : ''
-              } ${isObfuscated ? 'ephemeral-message-obfuscated' : ''}`}
-              dangerouslySetInnerHTML={{__html: (asset as Text).render(selfId, message.accent_color())}}
-              onClick={event => onClickMessage(asset as Text, event)}
-              onKeyDown={event => handleKeyDown(event, () => onClickMessage(asset as Text, event))}
-              onAuxClick={event => onClickMessage(asset as Text, event)}
-              dir="auto"
+            <TextMessageRenderer
+              onMessageClick={onClickMessage}
+              text={(asset as Text).render(selfId, message.accent_color())}
+              className={cx('text', {
+                'text-foreground': status === StatusType.SENDING,
+                'text-large': includesOnlyEmojis(asset.text),
+                'ephemeral-message-obfuscated': isObfuscated,
+              })}
+              isCurrentConversationFocused={focusConversation}
             />
           )}
           {(asset as Text).previews().map(preview => (
@@ -88,7 +90,7 @@ const ContentAsset = ({
       if ((asset as FileAssetType).isFile()) {
         return (
           <div className={`message-asset ${isObfuscated ? 'ephemeral-asset-expired icon-file' : ''}`}>
-            <FileAsset message={message} />
+            <FileAsset message={message} isCurrentConversationFocused={focusConversation} />
           </div>
         );
       }
@@ -96,7 +98,7 @@ const ContentAsset = ({
       if ((asset as FileAssetType).isAudio()) {
         return (
           <div className={`message-asset ${isObfuscated ? 'ephemeral-asset-expired' : ''}`}>
-            <AudioAsset message={message} />
+            <AudioAsset message={message} isCurrentConversationFocused={focusConversation} />
           </div>
         );
       }
@@ -104,7 +106,7 @@ const ContentAsset = ({
       if ((asset as FileAssetType).isVideo()) {
         return (
           <div className={`message-asset ${isObfuscated ? 'ephemeral-asset-expired icon-movie' : ''}`}>
-            <VideoAsset message={message} />
+            <VideoAsset message={message} isCurrentConversationFocused={focusConversation} />
           </div>
         );
       }

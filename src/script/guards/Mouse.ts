@@ -17,7 +17,12 @@
  *
  */
 
-import {MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyboardEvent} from 'react';
+const secondaryBtnRightClick = 2;
+export const isClickEvent = (event: MouseEvent | KeyboardEvent): event is MouseEvent => event.type === 'click';
+export const isAuxClickEvent = (event: MouseEvent | KeyboardEvent): event is MouseEvent => event.type === 'auxclick';
 
-export const isMouseEvent = (event: ReactMouseEvent | ReactKeyboardEvent): event is ReactMouseEvent =>
-  event.type === 'click';
+export const isMouseRightClickEvent = (event: MouseEvent | KeyboardEvent): event is MouseEvent =>
+  isClickEvent(event) && event.button === secondaryBtnRightClick;
+
+export const isAuxRightClickEvent = (event: MouseEvent | KeyboardEvent): event is MouseEvent =>
+  isAuxClickEvent(event) && event.button === secondaryBtnRightClick;

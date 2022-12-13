@@ -43,24 +43,27 @@ const ConnectedMessage: React.FC<ConnectedMessageProps> = ({
     'providerName',
     'isOutgoingRequest',
   ]);
-  const handle = user.handle;
-  const isService = user.isService;
+  const {handle, isService} = user;
 
   return (
     <div className="message-connected" data-uie-name="element-connected-message">
       <h2 className="message-connected-header">{name}</h2>
+
       {isService ? (
-        <span className="message-connected-provider-name">{providerName}</span>
+        <p className="message-connected-provider-name">{providerName}</p>
       ) : (
-        <span className="message-connected-username label-username">{handle}</span>
+        <p className="message-connected-username label-username">{handle}</p>
       )}
+
       {isOutgoingRequest && classifiedDomains && <ClassifiedBar users={[user]} classifiedDomains={classifiedDomains} />}
+
       <Avatar
         avatarSize={AVATAR_SIZE.X_LARGE}
         participant={user}
         noBadge={isOutgoingRequest}
         className="message-connected-avatar cursor-default"
       />
+
       {isOutgoingRequest && (
         <button
           type="button"
@@ -71,6 +74,7 @@ const ConnectedMessage: React.FC<ConnectedMessageProps> = ({
           {t('conversationConnectionCancelRequest')}
         </button>
       )}
+
       {showServicesWarning && (
         <div className="message-services-warning" data-uie-name="label-services-warning">
           {t('conversationServicesWarning')}

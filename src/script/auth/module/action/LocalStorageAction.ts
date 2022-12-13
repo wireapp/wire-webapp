@@ -23,12 +23,6 @@ import type {ThunkAction} from '../reducer';
 
 export const LocalStorageKey = {
   AUTH: {
-    ACCESS_TOKEN: {
-      EXPIRATION: '__amplify__z.storage.StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION',
-      TTL: '__amplify__z.storage.StorageKey.AUTH.ACCESS_TOKEN.TTL',
-      TYPE: '__amplify__z.storage.StorageKey.AUTH.ACCESS_TOKEN.TYPE',
-      VALUE: '__amplify__z.storage.StorageKey.AUTH.ACCESS_TOKEN.VALUE',
-    },
     COOKIE_LABEL: '__amplify__z.storage.StorageKey.AUTH.COOKIE_LABEL',
     LOGIN_CONVERSATION_KEY: 'LOGIN_CONVERSATION_KEY',
     PERSIST: '__amplify__z.storage.StorageKey.AUTH.PERSIST',

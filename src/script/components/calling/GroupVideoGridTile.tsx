@@ -153,7 +153,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
           </div>
           <div
             className="group-video-grid__pause-overlay__label"
-            css={{fontsize: minimized ? 11 : 14}}
+            css={{fontsize: minimized ? '0.6875rem' : '0.875rem'}}
             data-uie-name="status-video-paused"
           >
             {t('videoCallPaused')}

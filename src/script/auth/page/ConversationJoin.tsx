@@ -231,7 +231,7 @@ const ConversationJoinComponent = ({
             <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} data-uie-name="status-full-headline">
               <FormattedMessage {...conversationJoinStrings.fullConversationHeadline} />
             </H2>
-            <Text style={{fontSize: '16px', marginTop: '10px'}} data-uie-name="status-full-text">
+            <Text style={{fontSize: '1rem', marginTop: '10px'}} data-uie-name="status-full-text">
               {_(conversationJoinStrings.fullConversationSubhead)}
             </Text>
           </ContainerXS>
@@ -247,7 +247,7 @@ const ConversationJoinComponent = ({
                   }}
                 />
               </H2>
-              <Text style={{fontSize: '16px', marginTop: '10px'}}>
+              <Text style={{fontSize: '1rem', marginTop: '10px'}}>
                 <FormattedMessage {...conversationJoinStrings.subhead} />
               </Text>
               <Form style={{marginTop: 30}}>
@@ -305,7 +305,7 @@ const ConversationJoinComponent = ({
                   })
                 : _(conversationJoinStrings.headline, {brandName: Config.getConfig().BRAND_NAME})}
             </H2>
-            <Text block style={{fontSize: '16px', marginTop: '10px'}}>
+            <Text block style={{fontSize: '1rem', marginTop: '10px'}}>
               {_(conversationJoinStrings.existentAccountSubhead)}
             </Text>
             <Button
