@@ -190,7 +190,7 @@ export const PrimaryModalComponent: FC = () => {
                       onChange={onOptionChange}
                     />
                     <label className="label-xs" htmlFor="clear-data-checkbox">
-                      <span className="modal-option-text text-background">{checkboxLabel}</span>
+                      <p className="modal-option-text text-background">{checkboxLabel}</p>
                     </label>
                   </div>
                 </div>
