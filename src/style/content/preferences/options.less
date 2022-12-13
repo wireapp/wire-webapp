@@ -33,6 +33,14 @@
 .preferences-options-radio {
   margin: 0;
 
+  &-option {
+    margin-bottom: 20px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
   input[type='radio'] {
     position: absolute;
     opacity: 0;
@@ -42,14 +50,9 @@
     position: relative;
     display: flex;
     align-items: center;
-    margin-bottom: 20px;
     color: var(--black);
     cursor: pointer;
     white-space: pre;
-
-    &:last-child {
-      margin-bottom: 0;
-    }
   }
 
   input[type='radio']:focus-visible + label {

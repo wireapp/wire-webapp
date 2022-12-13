@@ -134,6 +134,7 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
     <PreferencesPage title={t('preferencesOptions')}>
       <PreferencesSection title={t('preferencesOptionsAudio')}>
         <PreferencesRadio
+          ariaLabelledBy={t('preferencesOptionsAudio')}
           name="preferences-options-audio"
           selectedValue={optionAudio}
           onChange={saveOptionAudioPreference}
@@ -163,6 +164,7 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
 
           <PreferencesSection title={t('preferencesOptionsNotifications')}>
             <PreferencesRadio
+              ariaLabelledBy={t('preferencesOptionsNotifications')}
               name="preferences-options-notification"
               selectedValue={optionNotifications}
               onChange={saveOptionNotificationsPreference}
