@@ -92,7 +92,6 @@ module.exports = {
     "no-magic-numbers": ["warn", {
       "ignore": [-1, 0, 1],
       "ignoreArrayIndexes": true,
-      "detectObjects": true,
       "ignoreDefaultValues": true
     }],
     'no-restricted-globals': [
