@@ -17,16 +17,16 @@
  *
  */
 
-import React, {forwardRef, useEffect, useState} from 'react';
+import React, {forwardRef, useRef} from 'react';
 
 import {debounce} from 'underscore';
 
 const config = {
-  ANIMATION_SPEED: 0.05,
+  ANIMATION_STEP: 0.05,
   DEBOUNCE_THRESHOLD: 1000,
 };
 
-function parseColor(color: string) {
+function parseColor(color: string): [number, number, number, number] {
   const el = document.body.appendChild(document.createElement('thiselementdoesnotexist'));
   el.style.color = color;
   const col = getComputedStyle(el).color;
@@ -35,91 +35,66 @@ function parseColor(color: string) {
   return [+r, +g, +b, +a];
 }
 
-const useFadingScrollbar = () => {
-  const [element, setElement] = useState<HTMLElement | null>(null);
-
-  useEffect(() => {
-    if (!element) {
-      return () => {};
-    }
-
-    const initialColor = parseColor(window.getComputedStyle(element).getPropertyValue('--scrollbar-color'));
-    const currentColor = initialColor.slice();
-    let state = 'idle';
-    let animating = false;
-
-    function setAnimationState(newState: string) {
-      state = newState;
-      if (!animating) {
-        animate();
-      }
-    }
-
-    function animate() {
-      switch (state) {
-        case 'fadein':
-          fadeStep(config.ANIMATION_SPEED);
-          break;
-        case 'fadeout':
-          fadeStep(-config.ANIMATION_SPEED);
-          break;
-
-        default:
-          animating = false;
-          return;
-      }
-      animating = true;
-      window.requestAnimationFrame(animate);
-    }
-
-    const fadeStep = (delta: number) => {
-      const alphaChanelIndex = 3;
-      const initialAlpha = initialColor[alphaChanelIndex];
-      const currentAlpha = currentColor[alphaChanelIndex];
-      const hasAppeared = delta > 0 && currentAlpha >= initialAlpha;
-      const hasDisappeared = delta < 0 && currentAlpha <= 0;
-      if (hasAppeared || hasDisappeared) {
-        return setAnimationState('idle');
-      }
-      currentColor[alphaChanelIndex] += delta;
-      element.style.setProperty('--scrollbar-color', `rgba(${currentColor})`);
-    };
-    const fadeIn = () => setAnimationState('fadein');
-    const fadeOut = () => setAnimationState('fadeout');
-    const debouncedFadeOut = debounce(fadeOut, config.DEBOUNCE_THRESHOLD);
-    const fadeInIdle = () => {
-      fadeIn();
-      debouncedFadeOut();
-    };
-
-    const events = {
-      mouseenter: fadeIn,
-      mouseleave: fadeOut,
-      mousemove: fadeInIdle,
-      scroll: fadeInIdle,
-    };
-
-    Object.entries(events).forEach(([eventName, handler]) => element.addEventListener(eventName, handler));
-    return () => {
-      Object.entries(events).forEach(([eventName, handler]) => element.removeEventListener(eventName, handler));
-    };
-  }, [element]);
-
-  return {ref: setElement};
+const fadeStep = (state: number, {step, goal}: {step: number; goal: number}) => {
+  const hasReachedGoal = step < 0 ? state <= goal : state >= goal;
+  if (hasReachedGoal) {
+    return false;
+  }
+  return state + step;
 };
 
 export const FadingScrollbar = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>((props, ref) => {
-  const {ref: fadingScrollbarRef} = useFadingScrollbar();
+  const isAnimating = useRef(false);
+  const initalColor = useRef<[number, number, number, number]>();
+  const currentAlpha = useRef<number>(1);
+
+  const getInitialColor = (element: HTMLElement) => {
+    if (!initalColor.current) {
+      initalColor.current = parseColor(window.getComputedStyle(element).getPropertyValue('--scrollbar-color'));
+    }
+    return initalColor.current;
+  };
+
+  function animate(animation: 'fadein' | 'fadeout', element: HTMLElement) {
+    const modifiers = {
+      fadein: {step: config.ANIMATION_STEP, goal: 1},
+      fadeout: {step: -config.ANIMATION_STEP, goal: 0},
+    };
+
+    const nextAlpha = fadeStep(currentAlpha.current, modifiers[animation]);
+    if (nextAlpha === false) {
+      isAnimating.current = false;
+      return;
+    }
+    const newColor = getInitialColor(element).slice();
+    newColor[3] = nextAlpha;
+    element.style.setProperty('--scrollbar-color', `rgba(${newColor})`);
+    currentAlpha.current = nextAlpha;
+    isAnimating.current = true;
+    window.requestAnimationFrame(() => animate(animation, element));
+  }
+
+  function setAnimationState(animation: 'fadein' | 'fadeout', element: HTMLElement) {
+    if (!isAnimating.current) {
+      animate(animation, element);
+    }
+  }
+
+  const fadeIn = (element: HTMLElement) => setAnimationState('fadein', element);
+  const fadeOut = (element: HTMLElement) => setAnimationState('fadeout', element);
+  const debouncedFadeOut = debounce(fadeOut, config.DEBOUNCE_THRESHOLD);
+  const fadeInIdle = (element: HTMLElement) => {
+    fadeIn(element);
+    debouncedFadeOut(element);
+  };
+
   return (
     <div
-      ref={element => {
-        fadingScrollbarRef(element);
-        if (typeof ref === 'function') {
-          ref(element);
-        } else if (ref) {
-          ref.current = element;
-        }
-      }}
+      onMouseEnter={event => fadeInIdle(event.currentTarget)}
+      onMouseLeave={event => fadeOut(event.currentTarget)}
+      onMouseMove={event => fadeInIdle(event.currentTarget)}
+      onScroll={event => fadeInIdle(event.currentTarget)}
+      ref={ref}
       {...props}
     />
   );
