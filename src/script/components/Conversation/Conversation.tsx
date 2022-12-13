@@ -482,10 +482,13 @@ export const Conversation: FC<ConversationProps> = ({
     };
   };
 
-  const wrapperRefHandler = (element: HTMLElement | null) => {
-    removeAnimationsClass(element);
-    handleFileDrop(element);
-  };
+  const wrapperRefHandler = useCallback(
+    (element: HTMLElement | null) => {
+      removeAnimationsClass(element);
+      handleFileDrop(element);
+    },
+    [handleFileDrop],
+  );
 
   return (
     <div
