@@ -401,7 +401,7 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
         {isActivatedAccount && (
           <>
             <ConversationDetailsBottomActions
-              isDeviceActionEnabled={!!(firstParticipant.isConnected || firstParticipant.inTeam)}
+              isDeviceActionEnabled={firstParticipant && (firstParticipant.isConnected() || firstParticipant.inTeam())}
               showDevices={openParticipantDevices}
               showNotifications={showNotifications}
               notificationStatusText={notificationStatusText}
