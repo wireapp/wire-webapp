@@ -144,12 +144,12 @@ export const PrimaryModalComponent: FC = () => {
 
               {hasPassword && (
                 <form onSubmit={doAction(confirm, !!closeOnConfirm)}>
-                  <label htmlFor="modal_pswt" className="visually-hidden">
+                  <label htmlFor="modal_pswd" className="visually-hidden">
                     {inputPlaceholder}
                   </label>
 
                   <input
-                    id="modal_pswt"
+                    id="modal_pswd"
                     className="modal__input"
                     type="password"
                     value={passwordValue}
