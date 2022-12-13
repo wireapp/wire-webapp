@@ -20,7 +20,7 @@
 import {useEffect, FC, useState, HTMLProps, useRef} from 'react';
 
 import {isKeyDownEvent} from 'src/script/guards/Event';
-import {isMouseEvent} from 'src/script/guards/Mouse';
+import {isAuxClickEvent, isClickEvent} from 'src/script/guards/Mouse';
 import {getAllFocusableElements, setElementsTabIndex} from 'Util/focusUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 
@@ -90,7 +90,7 @@ export const TextMessageRenderer: FC<TextMessageRendererProps & HTMLProps<HTMLPa
         event.preventDefault();
         onMessageClick(event, elementType, messageDetails);
       });
-    } else if (isMouseEvent(event)) {
+    } else if (isClickEvent(event) || isAuxClickEvent(event)) {
       event.preventDefault();
       onMessageClick(event, elementType, messageDetails);
     }
