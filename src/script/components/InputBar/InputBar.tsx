@@ -33,6 +33,7 @@ import {useEmoji} from 'Components/Emoji/useEmoji';
 import {Icon} from 'Components/Icon';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
+import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from 'src/script/user/TypingIndicatorMode';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -62,7 +63,6 @@ import {useScrollSync} from './hooks/useScrollSync';
 import {useTextAreaFocus} from './hooks/useTextAreaFocus';
 
 import {Config} from '../../Config';
-import {ConversationRepository} from '../../conversation/ConversationRepository';
 import {MessageRepository, OutgoingQuote} from '../../conversation/MessageRepository';
 import {Conversation} from '../../entity/Conversation';
 import {ContentMessage} from '../../entity/message/ContentMessage';
