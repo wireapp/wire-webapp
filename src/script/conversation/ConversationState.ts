@@ -137,6 +137,14 @@ export class ConversationState {
     return proteusConversation;
   }
 
+  getSelfMLSConversation(): Conversation {
+    const proteusConversation = this.selfMLSConversation();
+    if (!proteusConversation) {
+      throw new Error('No MLS self conversation');
+    }
+    return proteusConversation;
+  }
+
   /**
    * returns true if the conversation should be visible to the user
    * @param conversation the conversation to check visibility

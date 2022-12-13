@@ -1260,6 +1260,14 @@ export class MessageRepository {
   }
 
   /**
+   * Sends a call message only to self conversation (eg. REJECT message that warn the user's other clients that the call has been picked up)
+   * @param payload
+   * @returns
+   */
+  public sendSelfCallingMessage(payload: string) {
+    return this.sendCallingMessage(this.conversationState.getSelfMLSConversation(), payload);
+  }
+  /**
    * Send call message in specified conversation.
    *
    * @param eventInfoEntity Event info to be send

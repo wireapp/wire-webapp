@@ -558,13 +558,21 @@ export class CallingRepository {
     );
   }
 
+  private extractTargetedConversationId(event: CallingEvent): QualifiedId {
+    const {content, conversation, qualified_conversation} = event;
+    const targetedConversationId =
+      'qualified_conversation' in content ? content.qualified_conversation : qualified_conversation;
+    const conversationId = targetedConversationId ?? {domain: '', id: conversation};
+
+    return conversationId;
+  }
+
   /**
    * Handle incoming calling events from backend.
    */
   onCallEvent = async (event: CallingEvent, source: string): Promise<void> => {
     const {
       content,
-      conversation,
       qualified_conversation,
       from,
       qualified_from,
@@ -574,13 +582,13 @@ export class CallingRepository {
     } = event;
     const isFederated = this.core.backendFeatures.isFederated && qualified_conversation && qualified_from;
     const userId = isFederated ? qualified_from : {domain: '', id: from};
-    const conversationId = isFederated ? qualified_conversation : {domain: '', id: conversation};
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
     const toSecond = (timestamp: number) => Math.floor(timestamp / 1000);
     const contentStr = JSON.stringify(content);
-    const conversationEntity = this.conversationState.findConversation(conversationId);
+    const conversationId = this.extractTargetedConversationId(event);
+    const conversation = this.conversationState.findConversation(conversationId);
 
-    if (!conversationEntity) {
+    if (!conversation) {
       this.logger.warn(`Unable to find a conversation with id of ${conversationId}`);
       return;
     }
@@ -588,13 +596,12 @@ export class CallingRepository {
       case CALL_MESSAGE_TYPE.CONFKEY: {
         if (source !== EventRepository.SOURCE.STREAM) {
           const {id, domain} = conversationId;
-          const allClients = conversationEntity.isUsingMLSProtocol
+          const allClients = conversation.isUsingMLSProtocol
             ? await this.core.service!.conversation.fetchAllParticipantsClients(id, domain)
             : await this.core.service!.conversation.getAllParticipantsClients(conversationId);
           // We warn the message repository that a mismatch has happened outside of its lifecycle (eventually triggering a conversation degradation)
-          // We warn the message repository that a mismatch has happened outside of its lifecycle (eventually triggering a conversation degradation)
           const shouldContinue = await this.messageRepository.updateMissingClients(
-            conversationEntity,
+            conversation,
             allClients,
             CONSENT_TYPE.INCOMING_CALL,
           );
@@ -631,7 +638,8 @@ export class CallingRepository {
       toSecond(new Date(time).getTime()),
       this.serializeQualifiedId(conversationId),
       this.serializeQualifiedId(userId),
-      conversationEntity?.isUsingMLSProtocol ? senderClientId : clientId,
+      conversation?.isUsingMLSProtocol ? senderClientId : clientId,
+      conversation?.isUsingMLSProtocol ? CONV_TYPE.CONFERENCE_MLS : CONV_TYPE.CONFERENCE,
     );
 
     if (res !== 0) {
@@ -1093,7 +1101,7 @@ export class CallingRepository {
     conversationId: QualifiedId,
     payload: string | Object,
     options?: MessageSendingOptions,
-  ) => {
+  ): Promise<void> => {
     const conversation = this.conversationState.findConversation(conversationId);
     if (!conversation) {
       this.logger.warn(`Unable to send calling message, no conversation found with id ${conversationId}`);
@@ -1112,7 +1120,7 @@ export class CallingRepository {
       const parsedPayload = JSON.parse(payload);
       const messageType = parsedPayload.type as CALL_MESSAGE_TYPE;
       if (messageType === CALL_MESSAGE_TYPE.REJECT) {
-        return;
+        return void this.messageRepository.sendSelfCallingMessage(payload);
       }
     }
 
