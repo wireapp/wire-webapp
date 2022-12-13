@@ -26,7 +26,12 @@ const config = {
   DEBOUNCE_THRESHOLD: 1000,
 };
 
-function parseColor(color: string): [number, number, number, number] {
+const animations = {
+  fadein: {step: config.ANIMATION_STEP, goal: 1},
+  fadeout: {step: -config.ANIMATION_STEP, goal: 0},
+};
+
+export function parseColor(color: string): [number, number, number, number] {
   const el = document.body.appendChild(document.createElement('thiselementdoesnotexist'));
   el.style.color = color;
   const col = getComputedStyle(el).color;
@@ -46,27 +51,23 @@ const fadeStep = (state: number, {step, goal}: {step: number; goal: number}) => 
 export const FadingScrollbar = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>((props, ref) => {
   const isAnimating = useRef(false);
   const initalColor = useRef<[number, number, number, number]>();
-  const currentAlpha = useRef<number>(1);
+  const currentAlpha = useRef<number>(0);
 
   const getInitialColor = (element: HTMLElement) => {
     if (!initalColor.current) {
       initalColor.current = parseColor(window.getComputedStyle(element).getPropertyValue('--scrollbar-color'));
+      currentAlpha.current = initalColor.current[3];
     }
     return initalColor.current;
   };
 
   function animate(animation: 'fadein' | 'fadeout', element: HTMLElement) {
-    const modifiers = {
-      fadein: {step: config.ANIMATION_STEP, goal: 1},
-      fadeout: {step: -config.ANIMATION_STEP, goal: 0},
-    };
-
-    const nextAlpha = fadeStep(currentAlpha.current, modifiers[animation]);
+    const newColor = getInitialColor(element).slice();
+    const nextAlpha = fadeStep(currentAlpha.current, animations[animation]);
     if (nextAlpha === false) {
       isAnimating.current = false;
       return;
     }
-    const newColor = getInitialColor(element).slice();
     newColor[3] = nextAlpha;
     element.style.setProperty('--scrollbar-color', `rgba(${newColor})`);
     currentAlpha.current = nextAlpha;
@@ -74,14 +75,14 @@ export const FadingScrollbar = forwardRef<HTMLDivElement, React.HTMLAttributes<H
     window.requestAnimationFrame(() => animate(animation, element));
   }
 
-  function setAnimationState(animation: 'fadein' | 'fadeout', element: HTMLElement) {
+  function startAnimation(animation: 'fadein' | 'fadeout', element: HTMLElement) {
     if (!isAnimating.current) {
       animate(animation, element);
     }
   }
 
-  const fadeIn = (element: HTMLElement) => setAnimationState('fadein', element);
-  const fadeOut = (element: HTMLElement) => setAnimationState('fadeout', element);
+  const fadeIn = (element: HTMLElement) => startAnimation('fadein', element);
+  const fadeOut = (element: HTMLElement) => startAnimation('fadeout', element);
   const debouncedFadeOut = debounce(fadeOut, config.DEBOUNCE_THRESHOLD);
   const fadeInIdle = (element: HTMLElement) => {
     fadeIn(element);
