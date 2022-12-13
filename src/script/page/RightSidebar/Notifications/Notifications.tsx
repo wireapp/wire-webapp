@@ -63,6 +63,7 @@ const Notifications: FC<NotificationsProps> = ({activeConversation, onGoBack, on
       <FadingScrollbar className="panel__content">
         <fieldset className="notification-section">
           <PreferencesRadio
+            ariaLabelledBy={t('notificationSettingsTitle')}
             name="preferences-options-notifications"
             selectedValue={notificationState}
             onChange={saveOptionNotificationPreference}
