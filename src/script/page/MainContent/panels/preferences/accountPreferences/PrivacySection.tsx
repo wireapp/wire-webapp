@@ -59,7 +59,7 @@ const PrivacySection: React.FC<PrivacySectionProps> = ({
   const handleTypingModeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const isChecked = event.target.checked;
     propertiesRepository.updateProperty(
-      PropertiesRepository.CONFIG.WIRE_TYPING_MODE.key,
+      PropertiesRepository.CONFIG.WIRE_TYPING_INDICATOR_MODE.key,
       isChecked ? CONVERSATION_TYPING_INDICATOR_MODE.ON : CONVERSATION_TYPING_INDICATOR_MODE.OFF,
     );
   };

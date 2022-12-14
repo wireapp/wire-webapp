@@ -154,7 +154,7 @@ const HistoryImport: FC<HistoryImportProps> = ({backupRepository, file, switchCo
 
   return (
     <div style={{height: '100%'}}>
-      <h1 className="visually-hidden">{t('accessibility.headings.historyImport')}</h1>
+      <h2 className="visually-hidden">{t('accessibility.headings.historyImport')}</h2>
 
       <div id="history-import">
         {isPreparing && <LoadingBar progress={loadingProgress} message={loadingMessage} />}

@@ -21,6 +21,7 @@ import React, {FC, useEffect, useLayoutEffect, useRef, useState} from 'react';
 
 import cx from 'classnames';
 
+import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
@@ -31,7 +32,6 @@ import {User} from 'src/script/entity/User';
 import {useRoveFocus} from 'src/script/hooks/useRoveFocus';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {initFadingScrollbar} from 'Util/DOM/fadingScrollbar';
 import {onHitTopOrBottom} from 'Util/DOM/onHitTopOrBottom';
 import {useResizeObserver} from 'Util/DOM/resizeObserver';
 
@@ -268,14 +268,7 @@ const MessagesList: FC<MessagesListParams> = ({
     return null;
   }
   return (
-    <div
-      ref={element => {
-        initFadingScrollbar(element);
-        messageListRef.current = element;
-      }}
-      id="message-list"
-      className="message-list"
-    >
+    <FadingScrollbar ref={messageListRef} id="message-list" className="message-list">
       <div ref={setMessageContainer} className={cx('messages', {'flex-center': verticallyCenterMessage()})}>
         {filteredMessages.map((message, index) => {
           const previousMessage = filteredMessages[index - 1];
@@ -343,7 +336,7 @@ const MessagesList: FC<MessagesListParams> = ({
           );
         })}
       </div>
-    </div>
+    </FadingScrollbar>
   );
 };
 

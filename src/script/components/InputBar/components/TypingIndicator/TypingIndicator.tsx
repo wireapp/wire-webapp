@@ -48,7 +48,7 @@ const TypingIndicator: FC<TypingIndicatorProps> = ({conversationId}) => {
 
   return (
     <div css={wrapperStyles} data-uie-name="typing-indicator">
-      <div css={{display: 'flex', marginRight: 8}}>
+      <div aria-hidden css={{display: 'flex', marginRight: 8}}>
         {users.slice(0, 3).map((user, index) => (
           <Avatar
             key={user.id}
@@ -59,7 +59,7 @@ const TypingIndicator: FC<TypingIndicatorProps> = ({conversationId}) => {
           />
         ))}
       </div>
-      <span css={indicatorTitleStyles} data-uie-name="typing-indicator-title">
+      <p css={indicatorTitleStyles} data-uie-name="typing-indicator-title">
         {usersCount === 1 && t('tooltipConversationInputOneUserTyping' as StringIdentifer, {user1: users[0].name()})}
         {usersCount === 2 &&
           t('tooltipConversationInputTwoUserTyping' as StringIdentifer, {
@@ -71,7 +71,7 @@ const TypingIndicator: FC<TypingIndicatorProps> = ({conversationId}) => {
             user1: users[0].name(),
             count: (usersCount - 1).toString(),
           })}
-      </span>
+      </p>
       <div css={indicatorAnimationWrapperStyles}>
         <div css={dotOneStyles} />
         <div css={dotTwoStyles} />

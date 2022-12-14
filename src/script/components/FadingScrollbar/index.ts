@@ -17,20 +17,4 @@
  *
  */
 
-interface FormattedIdProps {
-  idSlices: string[];
-}
-
-export const FormattedId = ({idSlices}: FormattedIdProps) => (
-  <>
-    {idSlices.map((slice, index) => {
-      const Component = index % 2 === 0 ? 'strong' : 'span';
-
-      return (
-        <Component className="device-id-part" key={slice + index}>
-          {slice}
-        </Component>
-      );
-    })}
-  </>
-);
+export * from './FadingScrollbar';

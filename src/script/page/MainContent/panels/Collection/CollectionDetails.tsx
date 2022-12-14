@@ -19,9 +19,9 @@
 
 import React, {Fragment} from 'react';
 
+import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {initFadingScrollbar} from 'Util/DOM/fadingScrollbar';
 import {t} from 'Util/LocalizerUtil';
 import {formatLocale, isThisYear, isToday} from 'Util/TimeUtil';
 import {noop} from 'Util/util';
@@ -81,7 +81,7 @@ const CollectionDetails: React.FC<CollectionDetailsProps> = ({
       </div>
 
       <div className="content-list-wrapper">
-        <div className="content-list collection-list" ref={initFadingScrollbar}>
+        <FadingScrollbar className="content-list collection-list">
           <div className="collection-images">
             {groupByDate(messages).map(([groupName, groupMessages]) => {
               return (
@@ -99,7 +99,7 @@ const CollectionDetails: React.FC<CollectionDetailsProps> = ({
               );
             })}
           </div>
-        </div>
+        </FadingScrollbar>
       </div>
     </div>
   );

@@ -35,7 +35,6 @@ import {formatDateNumeral, formatTimeShort, isBeforeToday} from 'Util/TimeUtil';
 import {AudioAsset} from './asset/AudioAsset';
 import {FileAsset} from './asset/FileAssetComponent';
 import {LocationAsset} from './asset/LocationAsset';
-import {RenderShowMsgBtn} from './asset/RenderShowMsgBtn';
 import {TextMessageRenderer} from './asset/TextMessageRenderer';
 import {VideoAsset} from './asset/VideoAsset';
 
@@ -160,21 +159,7 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
     headerSenderName,
     was_edited,
     timestamp,
-    edited_timestamp: editedTimestamp,
-  } = useKoSubscribableChildren(quotedMessage, [
-    'user',
-    'assets',
-    'headerSenderName',
-    'was_edited',
-    'timestamp',
-    'edited_timestamp',
-  ]);
-  const [showFullText, setShowFullText] = useState(false);
-  const [canShowMore, setCanShowMore] = useState(false);
-
-  useEffect(() => {
-    setShowFullText(false);
-  }, [quotedMessage]);
+  } = useKoSubscribableChildren(quotedMessage, ['user', 'assets', 'headerSenderName', 'was_edited', 'timestamp']);
 
   return (
     <>
@@ -208,29 +193,16 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
           )}
 
           {asset.isText() && (
-            <>
-              <TextMessageRenderer
-                onMessageClick={handleClickOnMessage}
-                text={asset.render(selfId)}
-                msgClass={cx('message-quote__text', {
-                  'message-quote__text--full': showFullText,
-                  'message-quote__text--large': includesOnlyEmojis(asset.text),
-                })}
-                isCurrentConversationFocused={focusConversation}
-                asset={asset}
-                data-uie-name="media-text-quote"
-                isQuoteMsg
-                setCanShowMore={setCanShowMore}
-                editedTimestamp={editedTimestamp}
-              />
-              {canShowMore && (
-                <RenderShowMsgBtn
-                  showFullText={showFullText}
-                  setShowFullText={setShowFullText}
-                  isCurrentConversationFocused={focusConversation}
-                />
-              )}
-            </>
+            <TextMessageRenderer
+              onMessageClick={handleClickOnMessage}
+              text={asset.render(selfId)}
+              className={cx('message-quote__text', {
+                'message-quote__text--large': includesOnlyEmojis(asset.text),
+              })}
+              isCurrentConversationFocused={focusConversation}
+              data-uie-name="media-text-quote"
+              collapse
+            />
           )}
 
           {asset.isVideo() && (

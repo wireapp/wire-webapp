@@ -74,7 +74,7 @@ describe('AuthAction', () => {
     await store.dispatch(actionRoot.authAction.doLoginPlain({clientType: ClientType.PERMANENT, email, password}));
 
     expect(store.getActions()).toEqual([AuthActionCreator.startLogin(), AuthActionCreator.successfulLogin()]);
-    expect(spies.setLocalStorage.calls.count()).toEqual(5);
+    expect(spies.setLocalStorage.calls.count()).toEqual(1);
     expect(spies.setCookie.calls.count()).toEqual(1);
     expect(spies.fetchSelf.calls.count()).toEqual(1);
     expect(spies.generateClientPayload.calls.count()).toEqual(1);

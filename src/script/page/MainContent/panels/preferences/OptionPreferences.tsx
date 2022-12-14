@@ -134,6 +134,7 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
     <PreferencesPage title={t('preferencesOptions')}>
       <PreferencesSection title={t('preferencesOptionsAudio')}>
         <PreferencesRadio
+          ariaLabelledBy={t('preferencesOptionsAudio')}
           name="preferences-options-audio"
           selectedValue={optionAudio}
           onChange={saveOptionAudioPreference}
@@ -163,6 +164,7 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
 
           <PreferencesSection title={t('preferencesOptionsNotifications')}>
             <PreferencesRadio
+              ariaLabelledBy={t('preferencesOptionsNotifications')}
               name="preferences-options-notification"
               selectedValue={optionNotifications}
               onChange={saveOptionNotificationsPreference}
@@ -229,7 +231,7 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
                 </CheckboxLabel>
               </Checkbox>
 
-              <div
+              <p
                 className="preferences-detail preferences-detail-intended"
                 aria-hidden="true"
                 dangerouslySetInnerHTML={{
@@ -256,9 +258,9 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
                 </CheckboxLabel>
               </Checkbox>
 
-              <div className="preferences-detail preferences-detail-intended">
+              <p className="preferences-detail preferences-detail-intended">
                 {t('preferencesOptionsPreviewsSendDetail')}
-              </div>
+              </p>
             </div>
           </>
         )}

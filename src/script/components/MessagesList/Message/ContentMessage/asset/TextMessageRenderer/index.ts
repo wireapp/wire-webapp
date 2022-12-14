@@ -17,4 +17,4 @@
  *
  */
 
-export * from './useDisposableRef';
+export * from './TextMessageRenderer';

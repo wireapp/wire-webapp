@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, UIEvent, useContext, useEffect, useState} from 'react';
+import {FC, UIEvent, useCallback, useEffect, useState} from 'react';
 
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -26,18 +26,25 @@ import {groupBy} from 'underscore';
 import {useMatchMedia} from '@wireapp/react-ui-kit';
 
 import {CallingCell} from 'Components/calling/CallingCell';
+import {DropFileArea} from 'Components/DropFileArea';
 import {Giphy} from 'Components/Giphy';
 import {InputBar} from 'Components/InputBar';
 import {MessagesList} from 'Components/MessagesList';
 import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
 import {TitleBar} from 'Components/TitleBar';
 import {CallState} from 'src/script/calling/CallState';
+import {Config} from 'src/script/Config';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/FileTypeUtil';
+import {isHittingUploadLimit} from 'Util/isHittingUploadLimit';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {safeMailOpen, safeWindowOpen} from 'Util/SanitizationUtil';
-import {incomingCssClass, removeAnimationsClass} from 'Util/util';
+import {formatBytes, incomingCssClass, removeAnimationsClass} from 'Util/util';
+
+import {checkFileSharingPermission} from './utils/checkFileSharingPermission';
 
 import {ConversationState} from '../../conversation/ConversationState';
 import {Conversation as ConversationEntity} from '../../entity/Conversation';
@@ -45,7 +52,6 @@ import {ContentMessage} from '../../entity/message/ContentMessage';
 import {DecryptErrorMessage} from '../../entity/message/DecryptErrorMessage';
 import {MemberMessage} from '../../entity/message/MemberMessage';
 import {Message} from '../../entity/message/Message';
-import {Text} from '../../entity/message/Text';
 import {User} from '../../entity/User';
 import {UserError} from '../../error/UserError';
 import {isMouseRightClickEvent, isAuxRightClickEvent} from '../../guards/Mouse';
@@ -54,7 +60,7 @@ import {ServiceEntity} from '../../integration/ServiceEntity';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {RightSidebarParams} from '../../page/AppMain';
 import {PanelState} from '../../page/RightSidebar';
-import {RootContext} from '../../page/RootProvider';
+import {useMainViewModel} from '../../page/RootProvider';
 import {TeamState} from '../../team/TeamState';
 import {UserState} from '../../user/UserState';
 import {ElementType, MessageDetails} from '../MessagesList/Message/ContentMessage/asset/TextMessageRenderer';
@@ -69,6 +75,8 @@ interface ConversationProps {
   isRightSidebarOpen?: boolean;
 }
 
+const CONFIG = Config.getConfig();
+
 export const Conversation: FC<ConversationProps> = ({
   initialMessage,
   teamState,
@@ -78,7 +86,9 @@ export const Conversation: FC<ConversationProps> = ({
 }) => {
   const messageListLogger = getLogger('ConversationList');
 
-  const mainViewModel = useContext(RootContext);
+  const mainViewModel = useMainViewModel();
+  const {content: contentViewModel} = mainViewModel;
+  const {conversationRepository, repositories} = contentViewModel;
 
   const [isConversationLoaded, setIsConversationLoaded] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>('');
@@ -89,9 +99,14 @@ export const Conversation: FC<ConversationProps> = ({
   const conversationState = container.resolve(ConversationState);
   const callState = container.resolve(CallState);
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
-  const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
+  const {classifiedDomains} = useKoSubscribableChildren(teamState, [
+    'classifiedDomains',
+    'isFileSharingSendingEnabled',
+  ]);
   const {is1to1, isRequest} = useKoSubscribableChildren(activeConversation!, ['is1to1', 'isRequest']);
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
+  const {inTeam} = useKoSubscribableChildren(selfUser, ['inTeam']);
+
   const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
   const [isMsgElementsFocusable, setMsgElementsFocusable] = useState(true);
 
@@ -119,12 +134,97 @@ export const Conversation: FC<ConversationProps> = ({
     }
   }, [readMessagesBuffer.length]);
 
-  if (!mainViewModel) {
-    return null;
-  }
+  const uploadImages = useCallback(
+    (images: File[]) => {
+      if (!activeConversation || isHittingUploadLimit(images, repositories.asset)) {
+        return;
+      }
 
-  const {content: contentViewModel} = mainViewModel;
-  const {conversationRepository, repositories} = contentViewModel;
+      for (const image of Array.from(images)) {
+        const isImageTooLarge = image.size > CONFIG.MAXIMUM_IMAGE_FILE_SIZE;
+
+        if (isImageTooLarge) {
+          const isGif = image.type === 'image/gif';
+          const bytesMultiplier = 1024;
+          const maxSize = CONFIG.MAXIMUM_IMAGE_FILE_SIZE / bytesMultiplier / bytesMultiplier;
+
+          return showWarningModal(
+            t(isGif ? 'modalGifTooLargeHeadline' : 'modalPictureTooLargeHeadline'),
+            t(isGif ? 'modalGifTooLargeMessage' : 'modalPictureTooLargeMessage', maxSize),
+          );
+        }
+      }
+
+      repositories.message.uploadImages(activeConversation, images);
+    },
+    [activeConversation, repositories.asset, repositories.message],
+  );
+
+  const uploadFiles = useCallback(
+    (files: File[]) => {
+      if (!activeConversation) {
+        return;
+      }
+
+      const fileArray = Array.from(files);
+
+      if (!allowsAllFiles()) {
+        for (const file of fileArray) {
+          if (!hasAllowedExtension(file.name)) {
+            conversationRepository.injectFileTypeRestrictedMessage(
+              activeConversation,
+              selfUser,
+              false,
+              getFileExtensionOrName(file.name),
+            );
+
+            return;
+          }
+        }
+      }
+
+      const uploadLimit = inTeam ? CONFIG.MAXIMUM_ASSET_FILE_SIZE_TEAM : CONFIG.MAXIMUM_ASSET_FILE_SIZE_PERSONAL;
+
+      if (!isHittingUploadLimit(files, repositories.asset)) {
+        for (const file of fileArray) {
+          const isFileTooLarge = file.size > uploadLimit;
+
+          if (isFileTooLarge) {
+            const fileSize = formatBytes(uploadLimit);
+            showWarningModal(t('modalAssetTooLargeHeadline'), t('modalAssetTooLargeMessage', fileSize));
+
+            return;
+          }
+        }
+
+        repositories.message.uploadFiles(activeConversation, files);
+      }
+    },
+    [activeConversation, conversationRepository, inTeam, repositories.asset, repositories.message, selfUser],
+  );
+
+  const uploadDroppedFiles = useCallback(
+    (droppedFiles: File[]) => {
+      const images: File[] = [];
+      const files: File[] = [];
+
+      if (!isHittingUploadLimit(droppedFiles, repositories.asset)) {
+        Array.from(droppedFiles).forEach(file => {
+          const isSupportedImage = CONFIG.ALLOWED_IMAGE_TYPES.includes(file.type);
+
+          if (isSupportedImage) {
+            images.push(file);
+          } else {
+            files.push(file);
+          }
+        });
+
+        uploadImages(images);
+        uploadFiles(files);
+      }
+    },
+    [repositories.asset, uploadFiles, uploadImages],
+  );
 
   const openGiphy = (text: string) => {
     setInputValue(text);
@@ -227,7 +327,6 @@ export const Conversation: FC<ConversationProps> = ({
   };
 
   const handleClickOnMessage = (
-    messageEntity: ContentMessage | Text,
     event: MouseEvent | KeyboardEvent,
     elementType: ElementType,
     messageDetails: MessageDetails = {
@@ -382,7 +481,8 @@ export const Conversation: FC<ConversationProps> = ({
   };
 
   return (
-    <div
+    <DropFileArea
+      onFileDropped={checkFileSharingPermission(uploadDroppedFiles)}
       id="conversation"
       className={cx('conversation', {[incomingCssClass]: isConversationLoaded, loading: !isConversationLoaded})}
       ref={removeAnimationsClass}
@@ -447,7 +547,6 @@ export const Conversation: FC<ConversationProps> = ({
 
           <InputBar
             conversationEntity={activeConversation}
-            assetRepository={repositories.asset}
             conversationRepository={repositories.conversation}
             eventRepository={repositories.event}
             messageRepository={repositories.message}
@@ -458,6 +557,9 @@ export const Conversation: FC<ConversationProps> = ({
             teamState={teamState}
             userState={userState}
             onShiftTab={() => setMsgElementsFocusable(false)}
+            uploadDroppedFiles={uploadDroppedFiles}
+            uploadImages={uploadImages}
+            uploadFiles={uploadFiles}
           />
 
           <div className="conversation-loading">
@@ -469,6 +571,6 @@ export const Conversation: FC<ConversationProps> = ({
       {isGiphyModalOpen && inputValue && (
         <Giphy giphyRepository={repositories.giphy} inputValue={inputValue} onClose={closeGiphy} />
       )}
-    </div>
+    </DropFileArea>
   );
 };

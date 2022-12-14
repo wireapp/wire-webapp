@@ -17,4 +17,13 @@
  *
  */
 
-export * from './UserConversationDetails';
+import {PrimaryModal} from '../PrimaryModal';
+
+export const showWarningModal = (title: string, message: string): void => {
+  // Timeout needed for display warning modal - we need to update modal
+  setTimeout(() => {
+    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
+      text: {message, title},
+    });
+  }, 0);
+};

@@ -185,6 +185,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
   return (
     <TransitionGroup
       id="right-column"
+      component="aside"
       className="right-column"
       childFactory={child =>
         cloneElement(child, {

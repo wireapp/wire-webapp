@@ -22,22 +22,10 @@ import React, {ReactElement} from 'react';
 import {css} from '@emotion/react';
 import {throttle} from 'underscore';
 
+import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
-import {initFadingScrollbar} from 'Util/DOM/fadingScrollbar';
 import {t} from 'Util/LocalizerUtil';
 import {isScrollable, isScrolledBottom, isScrolledTop} from 'Util/scroll-helpers';
-
-type LeftListWrapperProps = {
-  /** A react element that will be inserted after the header but before the list */
-  before?: ReactElement;
-  children: React.ReactNode;
-  footer?: ReactElement;
-  header?: string;
-  headerElement?: ReactElement;
-  headerUieName?: string;
-  id: string;
-  onClose?: () => void;
-};
 
 const scrollStyle = css`
   flex: 1 1 auto;
@@ -56,7 +44,19 @@ const style = css`
   width: 100%;
 `;
 
-const ListWrapper: React.FC<LeftListWrapperProps> = ({
+interface LeftListWrapperProps {
+  /** A react element that will be inserted after the header but before the list */
+  before?: ReactElement;
+  children: React.ReactNode;
+  footer?: ReactElement;
+  header?: string;
+  headerElement?: ReactElement;
+  headerUieName?: string;
+  id: string;
+  onClose?: () => void;
+}
+
+const ListWrapper = ({
   id,
   header,
   headerElement,
@@ -65,7 +65,7 @@ const ListWrapper: React.FC<LeftListWrapperProps> = ({
   footer,
   before,
   headerUieName,
-}) => {
+}: LeftListWrapperProps) => {
   const calculateBorders = throttle((element: HTMLElement) => {
     window.requestAnimationFrame(() => {
       if (element.offsetHeight <= 0 || !isScrollable(element)) {
@@ -88,14 +88,15 @@ const ListWrapper: React.FC<LeftListWrapperProps> = ({
 
   return (
     <div id={id} className={`left-list-${id} ${id}`} css={style}>
-      <section className={`left-list-header left-list-header-${id}`}>
+      <header className={`left-list-header left-list-header-${id}`}>
         {headerElement ? (
           headerElement
         ) : (
           <>
-            <span className="left-list-header-text" data-uie-name={headerUieName}>
+            <h2 className="left-list-header-text" data-uie-name={headerUieName}>
               {header}
-            </span>
+            </h2>
+
             <button
               type="button"
               className="left-list-header-close-button button-icon-large"
@@ -107,19 +108,19 @@ const ListWrapper: React.FC<LeftListWrapperProps> = ({
             </button>
           </>
         )}
-      </section>
+      </header>
+
       {before ?? null}
-      <div
+
+      <FadingScrollbar
         role="list"
         aria-label={t('accessibility.conversation.sectionLabel')}
         css={scrollStyle}
-        ref={element => {
-          initBorderedScroll(element);
-          initFadingScrollbar(element);
-        }}
+        ref={initBorderedScroll}
       >
         {children}
-      </div>
+      </FadingScrollbar>
+
       {footer ?? null}
     </div>
   );

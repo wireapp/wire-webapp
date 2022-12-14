@@ -43,6 +43,7 @@ const PanelActions: React.FC<PanelActionsProps> = ({items}) => {
             <span className="panel__action-item__icon">
               <Icon name={icon} />
             </span>
+
             <span data-uie-name={`${identifier}-item-text`} className="panel__action-item__text">
               {label}
             </span>

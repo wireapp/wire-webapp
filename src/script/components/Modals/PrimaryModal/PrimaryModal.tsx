@@ -21,9 +21,9 @@ import {FC, FormEvent, MouseEvent, useState, useRef, ChangeEvent} from 'react';
 
 import cx from 'classnames';
 
+import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
 import {ModalComponent} from 'Components/ModalComponent';
-import {initFadingScrollbar} from 'Util/DOM/fadingScrollbar';
 
 import {usePrimaryModalState, showNextModalInQueue, defaultContent, removeCurrentModal} from './PrimaryModalState';
 import {Action, PrimaryModalType} from './PrimaryModalTypes';
@@ -133,16 +133,23 @@ export const PrimaryModalComponent: FC = () => {
                 <Icon.Close className="modal__header__icon" aria-hidden="true" />
               </button>
             </div>
-            <div className="modal__body" ref={initFadingScrollbar}>
+
+            <FadingScrollbar className="modal__body">
               {(messageHtml || messageText) && (
                 <div className="modal__text" data-uie-name="status-modal-text">
-                  {messageHtml && <div id="modal-description-html" dangerouslySetInnerHTML={{__html: messageHtml}} />}
-                  {messageText && <div id="modal-description-text">{messageText}</div>}
+                  {messageHtml && <p id="modal-description-html" dangerouslySetInnerHTML={{__html: messageHtml}} />}
+                  {messageText && <p id="modal-description-text">{messageText}</p>}
                 </div>
               )}
+
               {hasPassword && (
                 <form onSubmit={doAction(confirm, !!closeOnConfirm)}>
+                  <label htmlFor="modal_pswd" className="visually-hidden">
+                    {inputPlaceholder}
+                  </label>
+
                   <input
+                    id="modal_pswd"
                     className="modal__input"
                     type="password"
                     value={passwordValue}
@@ -151,18 +158,26 @@ export const PrimaryModalComponent: FC = () => {
                   />
                 </form>
               )}
+
               {hasInput && (
                 <form onSubmit={doAction(confirm, !!closeOnConfirm)}>
+                  <label htmlFor="modal-input" className="visually-hidden">
+                    {inputPlaceholder}
+                  </label>
+
                   <input
                     maxLength={64}
                     className="modal__input"
+                    id="modal-input"
                     value={inputValue}
                     placeholder={inputPlaceholder}
                     onChange={event => updateInputValue(event.target.value)}
                   />
                 </form>
               )}
+
               {errorMessage && <div className="modal__input__error">{errorMessage}</div>}
+
               {hasOption && (
                 <div className="modal-option">
                   <div className="checkbox accent-text">
@@ -175,11 +190,12 @@ export const PrimaryModalComponent: FC = () => {
                       onChange={onOptionChange}
                     />
                     <label className="label-xs" htmlFor="clear-data-checkbox">
-                      <span className="modal-option-text text-background">{checkboxLabel}</span>
+                      <p className="modal-option-text text-background">{checkboxLabel}</p>
                     </label>
                   </div>
                 </div>
               )}
+
               <div className={cx('modal__buttons', {'modal__buttons--column': hasMultipleSecondary})}>
                 {secondaryActions
                   .filter((action): action is Action => action !== null && !!action.text)
@@ -211,7 +227,7 @@ export const PrimaryModalComponent: FC = () => {
                   </button>
                 )}
               </div>
-            </div>
+            </FadingScrollbar>
           </>
         )}
       </ModalComponent>

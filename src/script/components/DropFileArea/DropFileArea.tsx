@@ -17,19 +17,21 @@
  *
  */
 
-import {useEffect} from 'react';
+import {forwardRef, ReactNode, useCallback, HTMLAttributes} from 'react';
 
-import {isDragEvent} from '../../../guards/Event';
+interface DropFileAreaProps extends HTMLAttributes<HTMLDivElement> {
+  children: ReactNode;
+  onFileDropped: (files: File[]) => void;
+}
 
-const onDragOver = (event: Event) => event.preventDefault();
+const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => event.preventDefault();
 
-export const useDropFiles = (selector: string, onFileDropped: (files: File[]) => void) => {
-  useEffect(() => {
-    const container = document.querySelector(selector);
-    const handleDrop = (event: Event) => {
-      event.preventDefault();
+export const DropFileArea = forwardRef<HTMLDivElement, DropFileAreaProps>(
+  ({children, onFileDropped, ...props}, ref) => {
+    const handleDrop = useCallback(
+      (event: React.DragEvent<HTMLDivElement>) => {
+        event.preventDefault();
 
-      if (isDragEvent(event)) {
         const {dataTransfer} = event;
         const eventDataTransfer: Partial<DataTransfer> = dataTransfer || {};
         const files = eventDataTransfer.files || new FileList();
@@ -37,19 +39,16 @@ export const useDropFiles = (selector: string, onFileDropped: (files: File[]) =>
         if (files.length > 0) {
           onFileDropped(Array.from(files));
         }
-      }
-    };
+      },
+      [onFileDropped],
+    );
 
-    if (container) {
-      container.addEventListener('drop', handleDrop);
-      container.addEventListener('dragover', onDragOver);
+    return (
+      <div {...props} ref={ref} onDrop={handleDrop} onDragOver={handleDragOver}>
+        {children}
+      </div>
+    );
+  },
+);
 
-      return () => {
-        container.removeEventListener('drop', handleDrop);
-        container.removeEventListener('dragover', onDragOver);
-      };
-    }
-
-    return () => undefined;
-  }, [onFileDropped, selector]);
-};
+DropFileArea.displayName = 'DropFileArea';

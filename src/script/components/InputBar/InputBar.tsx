@@ -28,16 +28,16 @@ import {useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {checkFileSharingPermission} from 'Components/Conversation/utils/checkFileSharingPermission';
 import {useEmoji} from 'Components/Emoji/useEmoji';
 import {Icon} from 'Components/Icon';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
+import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from 'src/script/user/TypingIndicatorMode';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {loadDraftState, saveDraftState} from 'Util/DraftStateUtil';
-import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/FileTypeUtil';
-import {isHittingUploadLimit} from 'Util/isHittingUploadLimit';
 import {insertAtCaret, isFunctionKey, isTabKey, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {
@@ -47,7 +47,7 @@ import {
   updateMentionRanges,
 } from 'Util/MentionUtil';
 import {formatLocale, TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {formatBytes, getSelectionPosition} from 'Util/util';
+import {getSelectionPosition} from 'Util/util';
 
 import {ControlButtons} from './components/InputBarControls/ControlButtons';
 import {GiphyButton} from './components/InputBarControls/GiphyButton';
@@ -57,15 +57,12 @@ import {ReplyBar} from './components/ReplyBar';
 import {TYPING_TIMEOUT} from './components/TypingIndicator';
 import {TypingIndicator} from './components/TypingIndicator/TypingIndicator';
 import {getRichTextInput} from './getRichTextInput';
-import {useDropFiles} from './hooks/useDropFiles';
 import {useFilePaste} from './hooks/useFilePaste';
 import {useResizeTarget} from './hooks/useResizeTarget';
 import {useScrollSync} from './hooks/useScrollSync';
 import {useTextAreaFocus} from './hooks/useTextAreaFocus';
 
-import {AssetRepository} from '../../assets/AssetRepository';
 import {Config} from '../../Config';
-import {ConversationRepository} from '../../conversation/ConversationRepository';
 import {MessageRepository, OutgoingQuote} from '../../conversation/MessageRepository';
 import {Conversation} from '../../entity/Conversation';
 import {ContentMessage} from '../../entity/message/ContentMessage';
@@ -87,17 +84,7 @@ const CONFIG = {
   PING_TIMEOUT: TIME_IN_MILLIS.SECOND * 2,
 };
 
-const showWarningModal = (title: string, message: string): void => {
-  // Timeout needed for display warning modal - we need to update modal
-  setTimeout(() => {
-    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-      text: {message, title},
-    });
-  }, 0);
-};
-
 interface InputBarProps {
-  readonly assetRepository: AssetRepository;
   readonly conversationEntity: Conversation;
   readonly conversationRepository: ConversationRepository;
   readonly eventRepository: EventRepository;
@@ -109,10 +96,12 @@ interface InputBarProps {
   readonly teamState: TeamState;
   readonly userState: UserState;
   onShiftTab: () => void;
+  uploadDroppedFiles: (droppedFiles: File[]) => void;
+  uploadImages: (images: File[]) => void;
+  uploadFiles: (files: File[]) => void;
 }
 
 const InputBar = ({
-  assetRepository,
   conversationEntity,
   conversationRepository,
   eventRepository,
@@ -124,6 +113,9 @@ const InputBar = ({
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
   onShiftTab,
+  uploadDroppedFiles,
+  uploadImages,
+  uploadFiles,
 }: InputBarProps) => {
   const {classifiedDomains, isSelfDeletingMessagesEnabled, isFileSharingSendingEnabled} = useKoSubscribableChildren(
     teamState,
@@ -251,26 +243,6 @@ const InputBar = ({
   };
 
   const clearPastedFile = () => setPastedFile(null);
-
-  const uploadDroppedFiles = (droppedFiles: File[]) => {
-    const images: File[] = [];
-    const files: File[] = [];
-
-    if (!isHittingUploadLimit(droppedFiles, assetRepository)) {
-      Array.from(droppedFiles).forEach(file => {
-        const isSupportedImage = CONFIG.ALLOWED_IMAGE_TYPES.includes(file.type);
-
-        if (isSupportedImage) {
-          images.push(file);
-        } else {
-          files.push(file);
-        }
-      });
-
-      uploadImages(images);
-      uploadFiles(files);
-    }
-  };
 
   const sendPastedFile = () => {
     if (pastedFile) {
@@ -596,64 +568,6 @@ const InputBar = ({
     renderEmojiComponent,
   } = useEmoji(propertiesRepository, setInputValue, onSend, currentMentions, setCurrentMentions, textareaRef.current);
 
-  const uploadFiles = (files: File[]) => {
-    const fileArray = Array.from(files);
-
-    if (!allowsAllFiles()) {
-      for (const file of fileArray) {
-        if (!hasAllowedExtension(file.name)) {
-          conversationRepository.injectFileTypeRestrictedMessage(
-            conversationEntity,
-            selfUser,
-            false,
-            getFileExtensionOrName(file.name),
-          );
-
-          return;
-        }
-      }
-    }
-
-    const uploadLimit = inTeam ? CONFIG.MAXIMUM_ASSET_FILE_SIZE_TEAM : CONFIG.MAXIMUM_ASSET_FILE_SIZE_PERSONAL;
-
-    if (!isHittingUploadLimit(files, assetRepository)) {
-      for (const file of fileArray) {
-        const isFileTooLarge = file.size > uploadLimit;
-
-        if (isFileTooLarge) {
-          const fileSize = formatBytes(uploadLimit);
-          showWarningModal(t('modalAssetTooLargeHeadline'), t('modalAssetTooLargeMessage', fileSize));
-
-          return;
-        }
-      }
-
-      messageRepository.uploadFiles(conversationEntity, files);
-    }
-  };
-
-  const uploadImages = (images: File[]) => {
-    if (!isHittingUploadLimit(images, assetRepository)) {
-      for (const image of Array.from(images)) {
-        const isImageTooLarge = image.size > CONFIG.MAXIMUM_IMAGE_FILE_SIZE;
-
-        if (isImageTooLarge) {
-          const isGif = image.type === 'image/gif';
-          const maxSize = CONFIG.MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024;
-
-          showWarningModal(
-            t(isGif ? 'modalGifTooLargeHeadline' : 'modalPictureTooLargeHeadline'),
-            t(isGif ? 'modalGifTooLargeMessage' : 'modalPictureTooLargeMessage', maxSize),
-          );
-
-          return;
-        }
-      }
-
-      messageRepository.uploadImages(conversationEntity, images);
-    }
-  };
-
   const onGifClick = () => openGiphy(inputValue);
 
   const onPingClick = () => {
@@ -665,24 +579,6 @@ const InputBar = ({
       });
     }
   };
-
-  /**
-   * higher order function to check if file sharing is enabled.
-   * If not enabled, it will show a warning modal else will return the given callback
-   *
-   * @param callback - function to be called if file sharing is enabled
-   */
-  function checkFileSharingPermission<T extends (...args: any[]) => void>(callback: T): T | (() => void) {
-    if (isFileSharingSendingEnabled) {
-      return callback;
-    }
-    return () => {
-      showWarningModal(
-        t('conversationModalRestrictedFileSharingHeadline'),
-        t('conversationModalRestrictedFileSharingDescription'),
-      );
-    };
-  }
 
   const handlePasteFiles = (files: FileList): void => {
     const [pastedFile] = files;
@@ -827,8 +723,6 @@ const InputBar = ({
     return () => undefined;
   }, [isEditing]);
 
-  // Temporarily functionality for dropping files on conversation container, should be moved to Conversation Component
-  useDropFiles('#conversation', checkFileSharingPermission(uploadDroppedFiles));
   useFilePaste(checkFileSharingPermission(handlePasteFiles));
 
   const sendImageOnEnterClick = (event: KeyboardEvent) => {
@@ -882,6 +776,7 @@ const InputBar = ({
 
   return (
     <div
+      aria-live="polite"
       id="conversation-input-bar"
       className={cx('conversation-input-bar', {'is-right-panel-open': isRightSidebarOpen})}
     >

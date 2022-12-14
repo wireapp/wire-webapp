@@ -71,13 +71,12 @@ const ContentAsset = ({
             <TextMessageRenderer
               onMessageClick={onClickMessage}
               text={(asset as Text).render(selfId, message.accent_color())}
-              msgClass={cx('text', {
+              className={cx('text', {
                 'text-foreground': status === StatusType.SENDING,
                 'text-large': includesOnlyEmojis(asset.text),
                 'ephemeral-message-obfuscated': isObfuscated,
               })}
               isCurrentConversationFocused={focusConversation}
-              asset={asset as Text}
             />
           )}
           {(asset as Text).previews().map(preview => (

@@ -21,14 +21,16 @@ import {FC, useCallback, useEffect, useMemo, useState} from 'react';
 
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/';
 
+import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
 import {ConversationProtocolDetails} from 'Components/panel/ConversationProtocolDetails/ConversationProtocolDetails';
+import {EnrichedFields} from 'Components/panel/EnrichedFields';
 import {PanelActions} from 'Components/panel/PanelActions';
 import {ServiceDetails} from 'Components/panel/ServiceDetails';
+import {UserDetails} from 'Components/panel/UserDetails';
 import {ServiceList} from 'Components/ServiceList';
 import {UserSearchableList} from 'Components/UserSearchableList';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {initFadingScrollbar} from 'Util/DOM/fadingScrollbar';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 import {formatDuration} from 'Util/TimeUtil';
@@ -36,7 +38,6 @@ import {formatDuration} from 'Util/TimeUtil';
 import {ConversationDetailsBottomActions} from './components/ConversationDetailsBottomActions';
 import {ConversationDetailsHeader} from './components/ConversationDetailsHeader';
 import {ConversationDetailsOptions} from './components/ConversationDetailsOptions';
-import {UserConversationDetails} from './components/UserConversationDetails';
 import {getConversationActions} from './utils/getConversationActions';
 
 import {ConversationRepository} from '../../../conversation/ConversationRepository';
@@ -261,6 +262,8 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
 
   return (
     <div id="conversation-details" className="panel__page conversation-details">
+      <h2 className="visually-hidden">{t('tooltipConversationInfo')}</h2>
+
       <PanelHeader
         isReverse
         showBackArrow={false}
@@ -270,19 +273,21 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
         onToggleMute={toggleMute}
       />
 
-      <div className="panel__content" ref={initFadingScrollbar}>
+      <FadingScrollbar className="panel__content">
         {isSingleUserMode && isServiceMode && selectedService && <ServiceDetails service={selectedService} />}
 
         {isSingleUserMode && !isServiceMode && firstParticipant && (
-          <UserConversationDetails
-            firstParticipant={firstParticipant}
-            isVerified={isVerified}
-            isSelfVerified={isSelfVerified}
-            isFederated={isFederated}
-            badge={teamRepository.getRoleBadge(firstParticipant.id)}
-            classifiedDomains={classifiedDomains}
-            onDevicesClick={openParticipantDevices}
-          />
+          <>
+            <UserDetails
+              participant={firstParticipant}
+              isVerified={isVerified}
+              isSelfVerified={isSelfVerified}
+              badge={teamRepository.getRoleBadge(firstParticipant.id)}
+              classifiedDomains={classifiedDomains}
+            />
+
+            <EnrichedFields user={firstParticipant} showDomain={isFederated} />
+          </>
         )}
 
         {!isSingleUserMode && (
@@ -379,7 +384,7 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
 
             {!!serviceParticipants.length && (
               <div className="conversation-details__participants">
-                <div className="conversation-details__list-head">{t('conversationDetailsServices')}</div>
+                <h3 className="conversation-details__list-head">{t('conversationDetailsServices')}</h3>
 
                 <ServiceList
                   services={serviceParticipants}
@@ -396,12 +401,30 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
         {isActivatedAccount && (
           <>
             <ConversationDetailsBottomActions
+              isDeviceActionEnabled={firstParticipant && (firstParticipant.isConnected() || firstParticipant.inTeam())}
+              showDevices={openParticipantDevices}
               showNotifications={showNotifications}
               notificationStatusText={notificationStatusText}
               showOptionNotifications1To1={showOptionNotifications1To1}
-              isSingleUserMode={isSingleUserMode}
-              hasReceiptsEnabled={hasReceiptsEnabled}
             />
+
+            {isSingleUserMode && (
+              <div className="conversation-details__read-receipts" data-uie-name="label-1to1-read-receipts">
+                <strong className="panel__info-text panel__info-text--head panel__info-text--margin-bottom">
+                  {hasReceiptsEnabled
+                    ? t('conversationDetails1to1ReceiptsHeadEnabled')
+                    : t('conversationDetails1to1ReceiptsHeadDisabled')}
+                </strong>
+
+                <p className="panel__info-text panel__info-text--margin-bottom">
+                  {t('conversationDetails1to1ReceiptsFirst')}
+                </p>
+
+                <p className="panel__info-text panel__info-text--margin">
+                  {t('conversationDetails1to1ReceiptsSecond')}
+                </p>
+              </div>
+            )}
 
             <PanelActions items={conversationActions} />
           </>
@@ -411,7 +434,7 @@ const ConversationDetails: FC<ConversationDetailsProps> = ({
           protocol={activeConversation.protocol}
           cipherSuite={activeConversation.cipherSuite}
         />
-      </div>
+      </FadingScrollbar>
     </div>
   );
 };

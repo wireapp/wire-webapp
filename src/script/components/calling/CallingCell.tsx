@@ -29,12 +29,12 @@ import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {GroupAvatar} from 'Components/avatar/GroupAvatar';
 import {Duration} from 'Components/calling/Duration';
 import {GroupVideoGrid} from 'Components/calling/GroupVideoGrid';
+import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';
 import {ParticipantItem} from 'Components/list/ParticipantItem';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {initFadingScrollbar} from 'Util/DOM/fadingScrollbar';
 import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
@@ -262,36 +262,38 @@ const CallingCell: React.FC<CallingCellProps> = ({
                   )}
                 </div>
               )}
-              <div
+
+              <h2
                 className={cx('conversation-list-cell-center ', {
                   'conversation-list-cell-center-no-left': temporaryUserStyle,
                 })}
               >
-                <p className="conversation-list-cell-name">{conversationName}</p>
+                <span className="conversation-list-cell-name">{conversationName}</span>
 
                 {currentCallStatus && (
-                  <p className="conversation-list-cell-description" data-uie-name={currentCallStatus.dataUieName}>
+                  <span className="conversation-list-cell-description" data-uie-name={currentCallStatus.dataUieName}>
                     {currentCallStatus.text}
-                  </p>
+                  </span>
                 )}
 
                 {isOngoing && startedAt && (
                   <div className="conversation-list-info-wrapper">
-                    <p
+                    <span
                       className="conversation-list-cell-description"
                       data-uie-name="call-duration"
                       aria-label={t('callDurationLabel')}
                     >
                       <Duration {...{startedAt}} />
-                    </p>
+                    </span>
+
                     {isCbrEnabled && (
-                      <p className="conversation-list-cell-description" data-uie-name="call-cbr">
+                      <span className="conversation-list-cell-description" data-uie-name="call-cbr">
                         {t('callStateCbr')}
-                      </p>
+                      </span>
                     )}
                   </div>
                 )}
-              </div>
+              </h2>
             </div>
 
             <div className="conversation-list-cell-right">
@@ -473,7 +475,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
                     'call-ui__participant-list__wrapper--active': showParticipants,
                   })}
                 >
-                  <div ref={initFadingScrollbar} className="call-ui__participant-list__container">
+                  <FadingScrollbar className="call-ui__participant-list__container">
                     <ul className="call-ui__participant-list" data-uie-name="list-call-ui-participants">
                       {participants
                         .slice()
@@ -498,7 +500,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
                           </li>
                         ))}
                     </ul>
-                  </div>
+                  </FadingScrollbar>
                 </div>
               )}
             </>

@@ -193,6 +193,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
             onClick={minimize}
           />
         )}
+
         {classifiedDomains && (
           <ClassifiedBar
             users={conversationParticipants}
@@ -208,12 +209,15 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
             }}
           />
         )}
+
         <div className="video-remote-name">
-          {conversationName}
+          <h2 className="video-remote-title">{conversationName}</h2>
+
           <div data-uie-name="video-timer" className="video-timer label-xs">
             <Duration startedAt={startedAt} />
           </div>
         </div>
+
         {muteState === MuteState.REMOTE_MUTED && (
           <div
             className="video-title__info-bar"
