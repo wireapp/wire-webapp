@@ -106,7 +106,6 @@ const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps>
         className="conversation-input-bar-mention-suggestion"
         style={{bottom, overflowY: 'auto'}}
         data-uie-name="list-mention-suggestions"
-        ref={initFadingScrollbar}
       >
         <div className="mention-suggestion-list">
           {suggestions
