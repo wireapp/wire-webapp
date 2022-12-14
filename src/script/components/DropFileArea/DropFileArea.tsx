@@ -17,24 +17,21 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {forwardRef, ReactNode, useCallback, HTMLAttributes} from 'react';
 
-import {isDragEvent} from '../../../guards/Event';
+interface DropFileAreaProps extends HTMLAttributes<HTMLDivElement> {
+  children: ReactNode;
+  onFileDropped: (files: File[]) => void;
+}
 
-const onDragOver = (event: Event) => event.preventDefault();
+const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => event.preventDefault();
 
-export const useDropFiles = (onFileDropped: (files: File[]) => void) => {
-  const [elementRef, setElementRef] = useState<HTMLElement | null>(null);
+export const DropFileArea = forwardRef<HTMLDivElement, DropFileAreaProps>(
+  ({children, onFileDropped, ...props}, ref) => {
+    const handleDrop = useCallback(
+      (event: React.DragEvent<HTMLDivElement>) => {
+        event.preventDefault();
 
-  useEffect(() => {
-    if (!elementRef) {
-      return () => undefined;
-    }
-
-    const handleDrop = (event: Event) => {
-      event.preventDefault();
-
-      if (isDragEvent(event)) {
         const {dataTransfer} = event;
         const eventDataTransfer: Partial<DataTransfer> = dataTransfer || {};
         const files = eventDataTransfer.files || new FileList();
@@ -42,17 +39,16 @@ export const useDropFiles = (onFileDropped: (files: File[]) => void) => {
         if (files.length > 0) {
           onFileDropped(Array.from(files));
         }
-      }
-    };
+      },
+      [onFileDropped],
+    );
 
-    elementRef.addEventListener('drop', handleDrop);
-    elementRef.addEventListener('dragover', onDragOver);
+    return (
+      <div {...props} ref={ref} onDrop={handleDrop} onDragOver={handleDragOver}>
+        {children}
+      </div>
+    );
+  },
+);
 
-    return () => {
-      elementRef.removeEventListener('drop', handleDrop);
-      elementRef.removeEventListener('dragover', onDragOver);
-    };
-  }, [elementRef, onFileDropped]);
-
-  return {ref: setElementRef};
-};
+DropFileArea.displayName = 'DropFileArea';
