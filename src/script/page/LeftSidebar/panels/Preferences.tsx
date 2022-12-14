@@ -19,6 +19,7 @@
 
 import React, {useEffect} from 'react';
 
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {amplify} from 'amplify';
 
 import {Runtime} from '@wireapp/commons';
@@ -91,7 +92,13 @@ const PreferenceItem: React.FC<{
   uieName: string;
 }> = ({onSelect, isSelected, label, uieName, IconComponent}) => {
   return (
-    <li role="tab" aria-selected={isSelected} aria-controls={label} tabIndex={-1} className="left-list-item">
+    <li
+      role="tab"
+      aria-selected={isSelected}
+      aria-controls={label}
+      tabIndex={TabIndex.UNFOCUSABLE}
+      className="left-list-item"
+    >
       <button
         type="button"
         className={`left-list-item-button ${isSelected ? 'left-list-item-button--active' : ''}`}

@@ -19,6 +19,7 @@
 
 import React, {useCallback, useEffect, useState} from 'react';
 
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
@@ -169,7 +170,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
               onLoadedMetadata={syncVideoTimeRest}
               className={cx({hidden: isUploading})}
               style={{backgroundColor: videoPreview ? '#000' : ''}}
-              tabIndex={-1}
+              tabIndex={TabIndex.UNFOCUSABLE}
             />
             {videoPlaybackError ? (
               <div className="video-asset__playback-error label-xs">{t('conversationPlaybackError')}</div>

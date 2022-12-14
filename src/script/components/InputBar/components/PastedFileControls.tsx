@@ -19,6 +19,8 @@
 
 import {FC} from 'react';
 
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+
 import {Icon} from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
@@ -56,7 +58,7 @@ const PastedFileControls: FC<PastedFileControlsProps> = ({pastedFile, onClear, o
         )}
 
         {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
-        <span tabIndex={0}>{pastedFile.name}</span>
+        <span tabIndex={TabIndex.FOCUSABLE}>{pastedFile.name}</span>
       </div>
 
       <div className="controls-right">

@@ -20,6 +20,7 @@
 import React, {useEffect, useMemo} from 'react';
 
 import {css} from '@emotion/react';
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {container} from 'tsyringe';
 
 import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
@@ -364,7 +365,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                     onKeyDown={handleToggleCameraKeydown}
                     role="switch"
                     aria-checked={selfSharesCamera}
-                    tabIndex={0}
+                    tabIndex={TabIndex.FOCUSABLE}
                     css={selfSharesCamera ? videoControlActiveStyles : videoControlInActiveStyles}
                     aria-labelledby="video-label"
                     data-uie-name="do-call-controls-toggle-video"

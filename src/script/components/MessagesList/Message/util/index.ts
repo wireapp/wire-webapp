@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2021 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,32 +17,14 @@
  *
  */
 
-import React from 'react';
+import {useMemo} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
-import {Link, LinkVariant} from '@wireapp/react-ui-kit';
+const useMessageFocusedTabIndex = (isMessageFocused: boolean) => {
+  const tabIndex = useMemo(() => (isMessageFocused ? TabIndex.FOCUSABLE : TabIndex.UNFOCUSABLE), [isMessageFocused]);
 
-import {t} from 'Util/LocalizerUtil';
+  return tabIndex;
+};
 
-import type {ClientRepository} from '../../../../../client/ClientRepository';
-
-interface LogoutSectionProps {
-  clientRepository: ClientRepository;
-}
-
-const LogoutSection: React.FC<LogoutSectionProps> = ({clientRepository}) => (
-  <section className="preferences-section">
-    <Link
-      tabIndex={TabIndex.FOCUSABLE}
-      variant={LinkVariant.PRIMARY}
-      onClick={() => clientRepository.logoutClient()}
-      data-uie-name="do-logout"
-      type="button"
-    >
-      {t('preferencesAccountLogOut')}
-    </Link>
-  </section>
-);
-
-export {LogoutSection};
+export {useMessageFocusedTabIndex};

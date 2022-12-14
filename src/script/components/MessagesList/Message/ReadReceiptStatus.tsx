@@ -27,6 +27,8 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatDateNumeral, formatTimeShort} from 'Util/TimeUtil';
 
+import {useMessageFocusedTabIndex} from './util';
+
 export interface ReadReceiptStatusProps {
   is1to1Conversation: boolean;
   isLastDeliveredMessage: boolean;
@@ -42,6 +44,7 @@ const ReadReceiptStatus: React.FC<ReadReceiptStatusProps> = ({
   isLastDeliveredMessage,
   isMessageFocused,
 }) => {
+  const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
   const [readReceiptText, setReadReceiptText] = useState('');
   const [readReceiptTooltip, setReadReceiptTooltip] = useState('');
   const {readReceipts} = useKoSubscribableChildren(message, ['readReceipts']);
@@ -72,7 +75,7 @@ const ReadReceiptStatus: React.FC<ReadReceiptStatusProps> = ({
       {showEyeIndicator && (
         <button
           type="button"
-          tabIndex={isMessageFocused ? 0 : -1}
+          tabIndex={messageFocusedTabIndex}
           className={cx('button-reset-default', 'message-status-read', {
             'message-status-read--clickable': !is1to1Conversation,
             'message-status-read--visible': isLastDeliveredMessage,

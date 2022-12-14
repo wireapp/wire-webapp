@@ -19,6 +19,7 @@
 
 import React, {useEffect, useState} from 'react';
 
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -204,7 +205,7 @@ const Conversations: React.FC<ConversationsProps> = ({
           className="left-list-header-text"
           data-uie-name="status-name"
           role="presentation"
-          tabIndex={0}
+          tabIndex={TabIndex.FOCUSABLE}
           // personal user won't see availability status menu, on blur of the userName
           // conversation list should get the focus
           onBlur={() => focusConversationList(true)}

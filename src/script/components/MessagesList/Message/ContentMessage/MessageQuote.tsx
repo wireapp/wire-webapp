@@ -44,6 +44,7 @@ import type {ContentMessage} from '../../../../entity/message/ContentMessage';
 import type {User} from '../../../../entity/User';
 import {ConversationError} from '../../../../error/ConversationError';
 import {QuoteEntity} from '../../../../message/QuoteEntity';
+import {useMessageFocusedTabIndex} from '../util';
 
 export interface QuoteProps {
   conversation: Conversation;
@@ -160,6 +161,7 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
     was_edited,
     timestamp,
   } = useKoSubscribableChildren(quotedMessage, ['user', 'assets', 'headerSenderName', 'was_edited', 'timestamp']);
+  const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
 
   return (
     <>
@@ -169,7 +171,7 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
           className="button-reset-default"
           onClick={() => showUserDetails(quotedUser)}
           data-uie-name="label-name-quote"
-          tabIndex={isMessageFocused ? 0 : -1}
+          tabIndex={messageFocusedTabIndex}
         >
           {headerSenderName}
         </button>
@@ -245,7 +247,7 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
           }
         }}
         data-uie-name="label-timestamp-quote"
-        tabIndex={isMessageFocused ? 0 : -1}
+        tabIndex={messageFocusedTabIndex}
       >
         {isBeforeToday(timestamp)
           ? t('replyQuoteTimeStampDate', formatDateNumeral(timestamp))
