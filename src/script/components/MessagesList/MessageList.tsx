@@ -268,7 +268,7 @@ const MessagesList: FC<MessagesListParams> = ({
     return null;
   }
   return (
-    <FadingScrollbar ref={messageListRef} id="message-list" className="message-list">
+    <FadingScrollbar ref={messageListRef} id="message-list" className="message-list" tabIndex={-1}>
       <div ref={setMessageContainer} className={cx('messages', {'flex-center': verticallyCenterMessage()})}>
         {filteredMessages.map((message, index) => {
           const previousMessage = filteredMessages[index - 1];
