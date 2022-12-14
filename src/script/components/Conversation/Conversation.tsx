@@ -26,7 +26,7 @@ import {groupBy} from 'underscore';
 import {useMatchMedia} from '@wireapp/react-ui-kit';
 
 import {CallingCell} from 'Components/calling/CallingCell';
-import {DropFileArea} from 'Components/DropFileArea/DropFileArea';
+import {DropFileArea} from 'Components/DropFileArea';
 import {Giphy} from 'Components/Giphy';
 import {InputBar} from 'Components/InputBar';
 import {MessagesList} from 'Components/MessagesList';
