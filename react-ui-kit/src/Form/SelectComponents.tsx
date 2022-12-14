@@ -31,11 +31,12 @@ import {Option} from './Select';
 
 import {ArrowDown} from '../Icon/ArrowDown';
 import {Theme} from '../Layout';
+import {TabIndex} from '../types/enums';
 // SelectContainer
 export const SelectContainer = (props: ContainerProps) => {
   return (
     <components.SelectContainer {...props}>
-      <div tabIndex={0}>{props.children}</div>
+      <div tabIndex={TabIndex.FOCUSABLE}>{props.children}</div>
     </components.SelectContainer>
   );
 };
