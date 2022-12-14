@@ -53,7 +53,7 @@ const TypingIndicator: FC<TypingIndicatorProps> = ({conversationId}) => {
           <Avatar
             key={user.id}
             className="cursor-default"
-            style={index > 0 ? {marginLeft: -12} : {}}
+            style={index > 0 ? {marginLeft: -10} : {}}
             participant={user}
             avatarSize={AVATAR_SIZE.XXX_SMALL}
           />
