@@ -21,12 +21,6 @@ import {ChangeEvent, FormEvent, KeyboardEvent as ReactKeyboardEvent, useEffect, 
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
-import {useResizeTarget} from 'src/script/hooks/useResizeTarget';
-import {useScrollSync} from 'src/script/hooks/useScrollSync';
-import {useTextAreaFocus} from 'src/script/hooks/useTextAreaFocus';
-import {ControlButtons} from 'src/script/page/message-list/InputBarControls/ControlButtons';
-import {GiphyButton} from 'src/script/page/message-list/InputBarControls/GiphyButton';
-import {MentionSuggestionList} from 'src/script/page/message-list/MentionSuggestions';
 import {container} from 'tsyringe';
 
 import {Availability} from '@wireapp/protocol-messaging';
@@ -55,12 +49,18 @@ import {
 import {formatLocale, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {getSelectionPosition} from 'Util/util';
 
+import {ControlButtons} from './components/InputBarControls/ControlButtons';
+import {GiphyButton} from './components/InputBarControls/GiphyButton';
+import {MentionSuggestionList} from './components/MentionSuggestions';
 import {PastedFileControls} from './components/PastedFileControls';
 import {ReplyBar} from './components/ReplyBar';
 import {TYPING_TIMEOUT} from './components/TypingIndicator';
 import {TypingIndicator} from './components/TypingIndicator/TypingIndicator';
 import {getRichTextInput} from './getRichTextInput';
 import {useFilePaste} from './hooks/useFilePaste';
+import {useResizeTarget} from './hooks/useResizeTarget';
+import {useScrollSync} from './hooks/useScrollSync';
+import {useTextAreaFocus} from './hooks/useTextAreaFocus';
 import {handleClickOutsideOfInputBar, IgnoreOutsideClickWrapper} from './util/clickHandlers';
 
 import {Config} from '../../Config';
