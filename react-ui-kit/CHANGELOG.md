@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.3.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.2.3...@wireapp/react-ui-kit@9.3.0) (2022-12-14)
+
+### Features
+
+* add enum for TabIndex ([#4708](https://github.com/wireapp/wire-web-packages/issues/4708)) ([59ebbbd](https://github.com/wireapp/wire-web-packages/commit/59ebbbd34c6dc19785ea8ad49512f567f2db230b))
+
 ## [9.2.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.2.2...@wireapp/react-ui-kit@9.2.3) (2022-12-09)
 
 ### Bug Fixes
