@@ -35,6 +35,7 @@ import {
 import {customStyles} from './SelectStyles';
 
 import {Theme} from '../Layout';
+import {TabIndex} from '../types/enums';
 
 export type Option = {
   value: string | number;
@@ -103,7 +104,7 @@ export const Select = <IsMulti extends boolean = false>({
           ValueContainer,
           IndicatorsContainer,
         }}
-        tabIndex={-1}
+        tabIndex={TabIndex.UNFOCUSABLE}
         isDisabled={disabled}
         hideSelectedOptions={false}
         isSearchable={false}

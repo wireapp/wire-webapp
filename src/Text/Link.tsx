@@ -17,6 +17,8 @@
  *
  */
 
+import {ReactNode} from 'react';
+
 import {CSSObject} from '@emotion/react';
 
 import {TextProps, filterTextProps, textStyle} from './Text';
@@ -33,6 +35,7 @@ export enum LinkVariant {
 export interface LinkProps<T = HTMLAnchorElement> extends TextProps<T> {
   variant?: LinkVariant;
   targetBlank?: Boolean;
+  children?: ReactNode;
 }
 
 export const linkStyle: <T>(theme: Theme, props: LinkProps<T>) => CSSObject = (
