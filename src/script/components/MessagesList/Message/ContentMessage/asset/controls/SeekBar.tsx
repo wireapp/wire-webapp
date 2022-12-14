@@ -28,6 +28,7 @@ export interface SeekBarProps extends React.HTMLProps<HTMLDivElement> {
   ['data-uie-name']?: string;
   disabled?: boolean;
   mediaElement: HTMLMediaElement;
+  isCurrentConversationFocused?: boolean;
 }
 
 export interface SeekBarCSS extends CSSProperties {
@@ -40,6 +41,7 @@ const SeekBar: React.FC<SeekBarProps> = ({
   mediaElement,
   className,
   'data-uie-name': dataUieName,
+  isCurrentConversationFocused = true,
 }: SeekBarProps) => {
   const [isSeekBarMouseOver, setIsSeekBarMouseOver] = useState<boolean>(false);
   const [isSeekBarThumbDragged, setIsSeekBarThumbDragged] = useState<boolean>(false);
@@ -98,6 +100,7 @@ const SeekBar: React.FC<SeekBarProps> = ({
         }
         type="range"
         value={isNaN(progress) ? 0 : progress}
+        tabIndex={isCurrentConversationFocused ? 0 : -1}
       />
     </div>
   );

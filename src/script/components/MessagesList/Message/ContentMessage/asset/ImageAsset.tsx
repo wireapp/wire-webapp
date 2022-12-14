@@ -43,9 +43,16 @@ export interface ImageAssetProps {
   message: ContentMessage;
   onClick: (message: ContentMessage, event: React.MouseEvent | React.KeyboardEvent) => void;
   teamState?: TeamState;
+  isCurrentConversationFocused?: boolean;
 }
 
-const ImageAsset: React.FC<ImageAssetProps> = ({asset, message, onClick, teamState = container.resolve(TeamState)}) => {
+const ImageAsset: React.FC<ImageAssetProps> = ({
+  asset,
+  message,
+  onClick,
+  teamState = container.resolve(TeamState),
+  isCurrentConversationFocused = true,
+}) => {
   const [imageUrl, setImageUrl] = useState<string>();
   const {resource} = useKoSubscribableChildren(asset, ['resource']);
   const {isObfuscated, visible} = useKoSubscribableChildren(message, ['isObfuscated', 'visible']);
@@ -108,7 +115,7 @@ const ImageAsset: React.FC<ImageAssetProps> = ({asset, message, onClick, teamSta
           data-uie-status={imageUrl ? 'loaded' : 'loading'}
           onClick={event => onClick(message, event)}
           onKeyDown={event => handleKeyDown(event, onClick.bind(null, message, event))}
-          tabIndex={0}
+          tabIndex={isCurrentConversationFocused ? 0 : -1}
           role="button"
           data-uie-name="go-image-detail"
           aria-label={imageAltText}

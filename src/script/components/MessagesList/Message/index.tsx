@@ -26,6 +26,7 @@ import {InViewport} from 'Components/utils/InViewport';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getMessageMarkerType, MessageMarkerType} from 'Util/conversationMessages';
+import {getAllFocusableElements, setElementsTabIndex} from 'Util/focusUtil';
 import {isTabKey} from 'Util/KeyboardUtil';
 
 import {ElementType, MessageDetails} from './ContentMessage/asset/TextMessageRenderer';
@@ -164,6 +165,16 @@ const Message: React.FC<
       messageRef.current?.focus();
     }
   }, [focusConversation, message]);
+
+  // set message elements focus for non content type mesages
+  // some non content type message has interactive element like invite people for member message
+  useEffect(() => {
+    if (!messageRef.current || message.isContent()) {
+      return;
+    }
+    const interactiveMsgElements = getAllFocusableElements(messageRef.current);
+    setElementsTabIndex(interactiveMsgElements, isMsgElementsFocusable && focusConversation);
+  }, [focusConversation, isMsgElementsFocusable, message]);
 
   const getTimestampClass = (): string => {
     const classes = {

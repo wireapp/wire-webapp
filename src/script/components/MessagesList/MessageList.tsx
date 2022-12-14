@@ -257,7 +257,12 @@ const MessagesList: FC<MessagesListParams> = ({
   }, [loaded]);
 
   const defaultFocus = -1;
-  const {currentFocus, handleKeyDown, setCurrentFocus} = useRoveFocus(filteredMessagesLength, defaultFocus);
+  const isMsgListInfinite = false;
+  const {currentFocus, handleKeyDown, setCurrentFocus} = useRoveFocus(
+    filteredMessagesLength,
+    defaultFocus,
+    isMsgListInfinite,
+  );
 
   if (!loaded) {
     return null;
