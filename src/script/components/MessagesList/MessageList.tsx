@@ -327,7 +327,7 @@ const MessagesList: FC<MessagesListParams> = ({
               shouldShowInvitePeople={shouldShowInvitePeople}
               totalMessage={filteredMessagesLength}
               index={index}
-              focusConversation={currentFocus === index}
+              isMessageFocused={currentFocus === index}
               handleFocus={setCurrentFocus}
               handleArrowKeyDown={handleKeyDown}
               isMsgElementsFocusable={isMsgElementsFocusable}

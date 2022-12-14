@@ -43,7 +43,7 @@ export interface ImageAssetProps {
   message: ContentMessage;
   onClick: (message: ContentMessage, event: React.MouseEvent | React.KeyboardEvent) => void;
   teamState?: TeamState;
-  isCurrentConversationFocused?: boolean;
+  isFocusable?: boolean;
 }
 
 const ImageAsset: React.FC<ImageAssetProps> = ({
@@ -51,7 +51,7 @@ const ImageAsset: React.FC<ImageAssetProps> = ({
   message,
   onClick,
   teamState = container.resolve(TeamState),
-  isCurrentConversationFocused = true,
+  isFocusable = true,
 }) => {
   const [imageUrl, setImageUrl] = useState<string>();
   const {resource} = useKoSubscribableChildren(asset, ['resource']);
@@ -115,7 +115,7 @@ const ImageAsset: React.FC<ImageAssetProps> = ({
           data-uie-status={imageUrl ? 'loaded' : 'loading'}
           onClick={event => onClick(message, event)}
           onKeyDown={event => handleKeyDown(event, onClick.bind(null, message, event))}
-          tabIndex={isCurrentConversationFocused ? 0 : -1}
+          tabIndex={isFocusable ? 0 : -1}
           role="button"
           data-uie-name="go-image-detail"
           aria-label={imageAltText}

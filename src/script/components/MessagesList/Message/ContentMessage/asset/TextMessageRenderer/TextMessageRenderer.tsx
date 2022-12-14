@@ -31,7 +31,7 @@ export type ElementType = 'markdownLink' | 'email' | 'mention';
 interface TextMessageRendererProps {
   onMessageClick: (event: MouseEvent | KeyboardEvent, elementType: ElementType, messageDetails: MessageDetails) => void;
   text: string;
-  isCurrentConversationFocused: boolean;
+  isFocusable: boolean;
   /** will collapse the text to a single line when set (and add a `showMore` button if there is more content to show) */
   collapse?: boolean;
   setCanShowMore?: (showMore: boolean) => void;
@@ -45,7 +45,7 @@ export interface MessageDetails {
 export const TextMessageRenderer: FC<TextMessageRendererProps & HTMLProps<HTMLParagraphElement>> = ({
   text,
   onMessageClick,
-  isCurrentConversationFocused,
+  isFocusable,
   className,
   collapse = false,
   ...props
@@ -77,15 +77,15 @@ export const TextMessageRenderer: FC<TextMessageRendererProps & HTMLProps<HTMLPa
     }
 
     const interactiveMsgElements = getAllFocusableElements(containerRef);
-    setElementsTabIndex(interactiveMsgElements, isCurrentConversationFocused);
-  }, [isCurrentConversationFocused, containerRef]);
+    setElementsTabIndex(interactiveMsgElements, isFocusable);
+  }, [isFocusable, containerRef]);
 
   const forwardEvent = (
     event: KeyboardEvent | MouseEvent,
     elementType: ElementType,
     messageDetails: MessageDetails,
   ) => {
-    if (isKeyDownEvent(event) && isCurrentConversationFocused) {
+    if (isKeyDownEvent(event) && isFocusable) {
       handleKeyDown(event, () => {
         event.preventDefault();
         onMessageClick(event, elementType, messageDetails);
@@ -149,11 +149,7 @@ export const TextMessageRenderer: FC<TextMessageRendererProps & HTMLProps<HTMLPa
         {...props}
       />
       {canShowMore && (
-        <ShowMoreButton
-          onClick={toggleShowMore}
-          isCurrentConversationFocused={isCurrentConversationFocused}
-          active={showFullText}
-        ></ShowMoreButton>
+        <ShowMoreButton onClick={toggleShowMore} isFocusable={isFocusable} active={showFullText}></ShowMoreButton>
       )}
     </>
   );
