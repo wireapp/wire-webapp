@@ -78,7 +78,7 @@ export interface MessageParams extends MessageActions {
   teamState?: TeamState;
   totalMessage: number;
   index: number;
-  focusConversation: boolean;
+  isMessageFocused: boolean;
   handleFocus: (index: number) => void;
   handleArrowKeyDown: (e: React.KeyboardEvent) => void;
   isMsgElementsFocusable: boolean;
@@ -96,7 +96,7 @@ const Message: React.FC<
     onVisible,
     scrollTo,
     totalMessage,
-    focusConversation,
+    isMessageFocused,
     handleFocus,
     handleArrowKeyDown,
     index,
@@ -155,10 +155,10 @@ const Message: React.FC<
 
   useEffect(() => {
     // Move element into view when it is focused
-    if (focusConversation) {
+    if (isMessageFocused) {
       messageRef.current?.focus();
     }
-  }, [focusConversation, message]);
+  }, [isMessageFocused, message]);
 
   // set message elements focus for non content type mesages
   // some non content type message has interactive element like invite people for member message
@@ -167,8 +167,18 @@ const Message: React.FC<
       return;
     }
     const interactiveMsgElements = getAllFocusableElements(messageRef.current);
-    setElementsTabIndex(interactiveMsgElements, isMsgElementsFocusable && focusConversation);
-  }, [focusConversation, isMsgElementsFocusable, message]);
+    setElementsTabIndex(interactiveMsgElements, isMsgElementsFocusable && isMessageFocused);
+  }, [isMessageFocused, isMsgElementsFocusable, message]);
+
+  // set message elements focus for non content type mesages
+  // some non content type message has interactive element like invite people for member message
+  useEffect(() => {
+    if (!messageRef.current || message.isContent()) {
+      return;
+    }
+    const interactiveMsgElements = getAllFocusableElements(messageRef.current);
+    setElementsTabIndex(interactiveMsgElements, isMsgElementsFocusable && isMessageFocused);
+  }, [isMessageFocused, isMsgElementsFocusable, message]);
 
   const getTimestampClass = (): string => {
     const classes = {
@@ -184,7 +194,7 @@ const Message: React.FC<
     <MessageWrapper
       {...props}
       hasMarker={markerType !== MessageMarkerType.NONE}
-      focusConversation={focusConversation}
+      isMessageFocused={isMessageFocused}
       isMsgElementsFocusable={isMsgElementsFocusable}
     />
   );
@@ -226,7 +236,7 @@ const Message: React.FC<
 
       {/*eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions*/}
       <div
-        tabIndex={focusConversation ? 0 : -1}
+        tabIndex={isMessageFocused ? 0 : -1}
         ref={messageRef}
         role="listitem"
         onKeyDown={handleDivKeyDown}

@@ -51,7 +51,7 @@ export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetS
   findMessage: (conversation: Conversation, messageId: string) => Promise<ContentMessage | undefined>;
   focusMessage?: () => void;
   hasMarker?: boolean;
-  focusConversation: boolean;
+  isMessageFocused: boolean;
   isLastDeliveredMessage: boolean;
   message: ContentMessage;
   onClickButton: (message: CompositeMessage, buttonId: string) => void;
@@ -69,7 +69,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   findMessage,
   selfId,
   hasMarker,
-  focusConversation,
+  isMessageFocused,
   isLastDeliveredMessage,
   contextMenu,
   previousMessage,
@@ -109,7 +109,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   };
 
   // check if current message is focused and its elements focusable
-  const msgFocusState = isMsgElementsFocusable && focusConversation;
+  const msgFocusState = isMsgElementsFocusable && isMessageFocused;
   const avatarSection = shouldShowAvatar() ? (
     <div className="message-header">
       <div className="message-header-icon">
@@ -195,7 +195,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
           focusMessage={onClickTimestamp}
           handleClickOnMessage={onClickMessage}
           showUserDetails={onClickAvatar}
-          focusConversation={msgFocusState}
+          isMessageFocused={msgFocusState}
         />
       )}
       <div className="message-body" title={ephemeral_caption}>
@@ -214,7 +214,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             onClickButton={onClickButton}
             onClickImage={onClickImage}
             onClickMessage={onClickMessage}
-            focusConversation={msgFocusState}
+            isMessageFocused={msgFocusState}
           />
         ))}
 
@@ -224,7 +224,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
               className="message-body-like-icon like-button message-show-on-hover"
               message={message}
               onLike={onLike}
-              focusConversation={msgFocusState}
+              isMessageFocused={msgFocusState}
             />
           </div>
         )}
@@ -263,7 +263,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             is1to1Conversation={conversation.is1to1()}
             isLastDeliveredMessage={isLastDeliveredMessage}
             onClickReceipts={onClickReceipts}
-            focusConversation={msgFocusState}
+            isMessageFocused={msgFocusState}
           />
         </div>
       </div>
@@ -275,7 +275,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             is1to1Conversation={conversation.is1to1()}
             onLike={onLike}
             onClickLikes={onClickLikes}
-            focusConversation={msgFocusState}
+            isMessageFocused={msgFocusState}
           />
         </div>
       )}

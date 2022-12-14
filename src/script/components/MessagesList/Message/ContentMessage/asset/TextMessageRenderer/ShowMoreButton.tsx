@@ -26,19 +26,19 @@ import {t} from 'Util/LocalizerUtil';
 
 interface ShowMoreButtonProps {
   active: boolean;
-  isCurrentConversationFocused: boolean;
+  isFocusable: boolean;
 }
 
 export const ShowMoreButton: FC<ShowMoreButtonProps & HTMLProps<HTMLButtonElement>> = ({
   active,
-  isCurrentConversationFocused,
+  isFocusable,
   ...props
 }) => {
   return (
     <button
       className="button-reset-default message-quote__text__show-more"
       data-uie-name="do-show-more-quote"
-      tabIndex={isCurrentConversationFocused ? 0 : -1}
+      tabIndex={isFocusable ? 0 : -1}
       {...props}
       type="button"
     >

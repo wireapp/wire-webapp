@@ -25,9 +25,7 @@ describe('TextMessageRenderer', () => {
   it('renders a text message', () => {
     const onClickElement = jest.fn();
     const txtMsg = 'simple message';
-    const {getByText} = render(
-      <TextMessageRenderer text={txtMsg} onMessageClick={onClickElement} isCurrentConversationFocused />,
-    );
+    const {getByText} = render(<TextMessageRenderer text={txtMsg} onMessageClick={onClickElement} isFocusable />);
     const txtMsgElement = getByText(txtMsg);
     expect(txtMsgElement).not.toBe(null);
 
@@ -41,9 +39,7 @@ describe('TextMessageRenderer', () => {
   it('renders and trigger click/keydown event of mention message correcly', () => {
     const onClickElement = jest.fn();
     const text = `<div class="message-mention" role="buttton" data-uie-name="label-other-mention" data-user-id="1fc1e32d-084b-49be-a392-85377f7208f3" data-user-domain="staging.zinfra.io"><span class="mention-at-sign">@</span>jj</div> yes it is`;
-    const {getByTestId} = render(
-      <TextMessageRenderer text={text} onMessageClick={onClickElement} isCurrentConversationFocused />,
-    );
+    const {getByTestId} = render(<TextMessageRenderer text={text} onMessageClick={onClickElement} isFocusable />);
     const mention = getByTestId('label-other-mention');
     fireEvent.click(mention);
     expect(onClickElement).toHaveBeenCalled();
@@ -58,9 +54,7 @@ describe('TextMessageRenderer', () => {
     const linkTxt = 'this is a link';
     const text = `<a href="https://link.com" target="_blank" rel="nofollow noopener noreferrer" data-md-link="true" data-uie-name="markdown-link">${linkTxt}</a>`;
 
-    const {getByText} = render(
-      <TextMessageRenderer text={text} onMessageClick={onClickElement} isCurrentConversationFocused />,
-    );
+    const {getByText} = render(<TextMessageRenderer text={text} onMessageClick={onClickElement} isFocusable />);
     const linkElem = getByText(linkTxt);
     expect(linkElem).not.toBe(null);
 
@@ -77,9 +71,7 @@ describe('TextMessageRenderer', () => {
     const linkTxt = 'this is a link';
     const text = `<a href="https://link.com" target="_blank" rel="nofollow noopener noreferrer" data-md-link="true" data-uie-name="markdown-link">${linkTxt}</a>`;
 
-    const {getByText} = render(
-      <TextMessageRenderer text={text} onMessageClick={onClickElement} isCurrentConversationFocused={false} />,
-    );
+    const {getByText} = render(<TextMessageRenderer text={text} onMessageClick={onClickElement} isFocusable={false} />);
     const linkElem = getByText(linkTxt);
     expect(linkElem).not.toBe(null);
 
@@ -96,7 +88,7 @@ describe('TextMessageRenderer', () => {
     Object.defineProperty(HTMLParagraphElement.prototype, 'scrollHeight', {get: () => 200});
 
     const {getByText} = render(
-      <TextMessageRenderer text={text} onMessageClick={onClickElement} isCurrentConversationFocused={false} collapse />,
+      <TextMessageRenderer text={text} onMessageClick={onClickElement} isFocusable={false} collapse />,
     );
     const showMoreButton = getByText('replyQuoteShowMore');
     expect(showMoreButton).not.toBe(null);

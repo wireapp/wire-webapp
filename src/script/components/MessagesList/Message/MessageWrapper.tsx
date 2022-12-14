@@ -48,12 +48,12 @@ import {ContextMenuEntry} from '../../../ui/ContextMenu';
 
 import {MessageParams} from './index';
 
-export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; focusConversation: boolean}> = ({
+export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMessageFocused: boolean}> = ({
   message,
   conversation,
   selfId,
   hasMarker,
-  focusConversation,
+  isMessageFocused,
   isSelfTemporaryGuest,
   isLastDeliveredMessage,
   shouldShowInvitePeople,
@@ -181,7 +181,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; focus
         onClickInvitePeople={onClickInvitePeople}
         onClickParticipants={onClickParticipants}
         onClickReceipts={onClickReceipts}
-        focusConversation={focusConversation}
+        isMessageFocused={isMessageFocused}
         handleFocus={handleFocus}
         totalMessage={totalMessage}
         isMsgElementsFocusable={isMsgElementsFocusable}
@@ -230,7 +230,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; focus
         is1to1Conversation={conversation.is1to1()}
         isLastDeliveredMessage={isLastDeliveredMessage}
         onClickReceipts={onClickReceipts}
-        focusConversation={focusConversation}
+        isMessageFocused={isMessageFocused}
       />
     );
   }

@@ -45,7 +45,7 @@ interface VideoAssetProps {
   isQuote?: boolean;
   message: ContentMessage;
   teamState?: TeamState;
-  isCurrentConversationFocused?: boolean;
+  isFocusable?: boolean;
 }
 
 const VideoAsset: React.FC<VideoAssetProps> = ({
@@ -53,7 +53,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
   isQuote,
   teamState = container.resolve(TeamState),
   assetRepository = container.resolve(AssetRepository),
-  isCurrentConversationFocused = true,
+  isFocusable = true,
 }) => {
   const asset = message.getFirstAsset() as FileAsset;
   const {isObfuscated} = useKoSubscribableChildren(message, ['isObfuscated']);
@@ -193,7 +193,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
                         cancel={() => (isUploading ? cancelUpload() : asset.cancelDownload())}
                         transferState={transferState}
                         uploadProgress={uploadProgress}
-                        isCurrentConversationFocused={isCurrentConversationFocused}
+                        isFocusable={isFocusable}
                       />
                     </div>
 
@@ -203,7 +203,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
                           className="video-asset__controls__bottom__seekbar"
                           data-uie-name="status-video-seekbar"
                           mediaElement={videoElement}
-                          isCurrentConversationFocused={isCurrentConversationFocused}
+                          isFocusable={isFocusable}
                         />
                         <span
                           className="video-asset__controls__bottom__time label-xs"
