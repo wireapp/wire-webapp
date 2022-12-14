@@ -257,13 +257,18 @@ const MessagesList: FC<MessagesListParams> = ({
   }, [loaded]);
 
   const defaultFocus = -1;
-  const {currentFocus, handleKeyDown, setCurrentFocus} = useRoveFocus(filteredMessagesLength, defaultFocus);
+  const isMsgListInfinite = false;
+  const {currentFocus, handleKeyDown, setCurrentFocus} = useRoveFocus(
+    filteredMessagesLength,
+    defaultFocus,
+    isMsgListInfinite,
+  );
 
   if (!loaded) {
     return null;
   }
   return (
-    <FadingScrollbar ref={messageListRef} id="message-list" className="message-list">
+    <FadingScrollbar ref={messageListRef} id="message-list" className="message-list" tabIndex={-1}>
       <div ref={setMessageContainer} className={cx('messages', {'flex-center': verticallyCenterMessage()})}>
         {filteredMessages.map((message, index) => {
           const previousMessage = filteredMessages[index - 1];

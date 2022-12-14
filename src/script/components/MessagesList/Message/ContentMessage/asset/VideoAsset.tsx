@@ -169,6 +169,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
               onLoadedMetadata={syncVideoTimeRest}
               className={cx({hidden: isUploading})}
               style={{backgroundColor: videoPreview ? '#000' : ''}}
+              tabIndex={-1}
             />
             {videoPlaybackError ? (
               <div className="video-asset__playback-error label-xs">{t('conversationPlaybackError')}</div>
@@ -202,6 +203,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
                           className="video-asset__controls__bottom__seekbar"
                           data-uie-name="status-video-seekbar"
                           mediaElement={videoElement}
+                          isCurrentConversationFocused={isCurrentConversationFocused}
                         />
                         <span
                           className="video-asset__controls__bottom__time label-xs"
