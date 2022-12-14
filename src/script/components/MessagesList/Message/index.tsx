@@ -177,8 +177,8 @@ const Message: React.FC<
       return;
     }
     const interactiveMsgElements = getAllFocusableElements(messageRef.current);
-    setElementsTabIndex(interactiveMsgElements, isMsgElementsFocusable && focusConversation);
-  }, [focusConversation, isMsgElementsFocusable, message]);
+    setElementsTabIndex(interactiveMsgElements, isMsgElementsFocusable && isMessageFocused);
+  }, [isMessageFocused, isMsgElementsFocusable, message]);
 
   const getTimestampClass = (): string => {
     const classes = {
