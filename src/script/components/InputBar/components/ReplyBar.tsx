@@ -21,6 +21,8 @@
 
 import {FC} from 'react';
 
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+
 import {RestrictedVideo} from 'Components/asset/RestrictedVideo';
 import {ParticipantMicOnIcon} from 'Components/calling/ParticipantMicOnIcon';
 import {Icon} from 'Components/Icon';
@@ -61,7 +63,7 @@ const ReplyBar: FC<ReplyBarProps> = ({replyMessageEntity, onCancel}) => {
 
         <div className="input-bar__reply__text">
           <div className="input-bar__reply__sender-name">
-            <span data-uie-name="label-name-reply-box" tabIndex={0}>
+            <span data-uie-name="label-name-reply-box" tabIndex={TabIndex.FOCUSABLE}>
               {headerSenderName}
             </span>
 
@@ -70,7 +72,7 @@ const ReplyBar: FC<ReplyBarProps> = ({replyMessageEntity, onCancel}) => {
                 className="edit-icon"
                 data-uie-name="message-edited-reply-box"
                 aria-label={t('replyBarEditMessage')}
-                tabIndex={0}
+                tabIndex={TabIndex.FOCUSABLE}
               />
             )}
           </div>
@@ -81,12 +83,16 @@ const ReplyBar: FC<ReplyBarProps> = ({replyMessageEntity, onCancel}) => {
               data-uie-name="media-text-reply-box"
               dangerouslySetInnerHTML={{__html: renderMessage(replyAsset.text, null, replyAsset.mentions())}}
               aria-label={replyAsset.text}
-              tabIndex={0}
+              tabIndex={TabIndex.FOCUSABLE}
             />
           )}
 
           {replyAsset?.isImage() && (
-            <div data-uie-name="media-picture-reply-box" tabIndex={0} aria-label={replyAsset.file_name}>
+            <div
+              data-uie-name="media-picture-reply-box"
+              tabIndex={TabIndex.FOCUSABLE}
+              aria-label={replyAsset.file_name}
+            >
               <Image
                 className="bar__reply__message input-bar__reply__message__image"
                 asset={replyAsset.resource()}
@@ -96,7 +102,7 @@ const ReplyBar: FC<ReplyBarProps> = ({replyMessageEntity, onCancel}) => {
           )}
 
           {replyAsset?.isVideo() && (
-            <div data-uie-name="media-video-reply-box" tabIndex={0} aria-label={replyAsset.file_name}>
+            <div data-uie-name="media-video-reply-box" tabIndex={TabIndex.FOCUSABLE} aria-label={replyAsset.file_name}>
               <RestrictedVideo className="input-bar__reply__message" showMessage={false} isSmall />
             </div>
           )}
@@ -105,7 +111,7 @@ const ReplyBar: FC<ReplyBarProps> = ({replyMessageEntity, onCancel}) => {
             <div className="input-bar__reply__message" data-uie-name="media-audio-reply-box">
               <ParticipantMicOnIcon className="input-bar__reply__icon" />
 
-              <span tabIndex={0}>{t('replyAudioMessage')}</span>
+              <span tabIndex={TabIndex.FOCUSABLE}>{t('replyAudioMessage')}</span>
             </div>
           )}
 
@@ -113,7 +119,7 @@ const ReplyBar: FC<ReplyBarProps> = ({replyMessageEntity, onCancel}) => {
             <div className="input-bar__reply__message" data-uie-name="media-file-reply-box">
               <Icon.File className="input-bar__reply__icon" />
 
-              <span tabIndex={0}>{replyAsset.file_name}</span>
+              <span tabIndex={TabIndex.FOCUSABLE}>{replyAsset.file_name}</span>
             </div>
           )}
 
@@ -121,7 +127,7 @@ const ReplyBar: FC<ReplyBarProps> = ({replyMessageEntity, onCancel}) => {
             <div className="input-bar__reply__message" data-uie-name="media-location-reply-box">
               <Icon.Location className="input-bar__reply__icon" aria-label={t('replyBarLocation')} />
 
-              <span tabIndex={0}>{replyAsset.name}</span>
+              <span tabIndex={TabIndex.FOCUSABLE}>{replyAsset.name}</span>
             </div>
           )}
         </div>

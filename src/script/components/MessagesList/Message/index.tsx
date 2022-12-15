@@ -32,6 +32,7 @@ import {isTabKey} from 'Util/KeyboardUtil';
 import {ElementType, MessageDetails} from './ContentMessage/asset/TextMessageRenderer';
 import {MessageTime} from './MessageTime';
 import {MessageWrapper} from './MessageWrapper';
+import {useMessageFocusedTabIndex} from './util';
 
 import type {MessageRepository} from '../../../conversation/MessageRepository';
 import type {Conversation} from '../../../entity/Conversation';
@@ -112,6 +113,7 @@ const Message: React.FC<
   ]);
   const timeAgo = useRelativeTimestamp(message.timestamp());
   const timeAgoDay = useRelativeTimestamp(message.timestamp(), true);
+  const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
   const markerType = getMessageMarkerType(message, lastReadTimestamp, previousMessage);
 
   useLayoutEffect(() => {
@@ -236,7 +238,7 @@ const Message: React.FC<
 
       {/*eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions*/}
       <div
-        tabIndex={isMessageFocused ? 0 : -1}
+        tabIndex={messageFocusedTabIndex}
         ref={messageRef}
         role="listitem"
         onKeyDown={handleDivKeyDown}

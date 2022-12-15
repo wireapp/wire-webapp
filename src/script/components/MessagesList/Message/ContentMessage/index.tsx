@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import React, {useMemo} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
@@ -44,6 +44,7 @@ import {ContextMenuEntry, showContextMenu} from '../../../../ui/ContextMenu';
 import {EphemeralTimer} from '../EphemeralTimer';
 import {MessageTime} from '../MessageTime';
 import {ReadReceiptStatus} from '../ReadReceiptStatus';
+import {useMessageFocusedTabIndex} from '../util';
 
 export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetSession'> {
   contextMenu: {entries: ko.Subscribable<ContextMenuEntry[]>};
@@ -85,6 +86,11 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   totalMessage,
   isMsgElementsFocusable,
 }) => {
+  const msgFocusState = useMemo(
+    () => isMsgElementsFocusable && isMessageFocused,
+    [isMsgElementsFocusable, isMessageFocused],
+  );
+  const messageFocusedTabIndex = useMessageFocusedTabIndex(msgFocusState);
   const {entries: menuEntries} = useKoSubscribableChildren(contextMenu, ['entries']);
   const {headerSenderName, timestamp, ephemeral_caption, ephemeral_status, assets, other_likes, was_edited} =
     useKoSubscribableChildren(message, [
@@ -109,12 +115,11 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   };
 
   // check if current message is focused and its elements focusable
-  const msgFocusState = isMsgElementsFocusable && isMessageFocused;
   const avatarSection = shouldShowAvatar() ? (
     <div className="message-header">
       <div className="message-header-icon">
         <Avatar
-          tabIndex={msgFocusState ? 0 : -1}
+          tabIndex={messageFocusedTabIndex}
           participant={message.user()}
           onAvatarClick={onClickAvatar}
           avatarSize={AVATAR_SIZE.X_SMALL}
@@ -232,7 +237,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
         <div className="message-body-actions">
           {menuEntries.length > 0 && (
             <button
-              tabIndex={msgFocusState ? 0 : -1}
+              tabIndex={messageFocusedTabIndex}
               className="context-menu icon-more font-size-xs"
               aria-label={t('accessibility.conversationContextMenuOpenLabel')}
               onKeyDown={handleContextKeyDown}

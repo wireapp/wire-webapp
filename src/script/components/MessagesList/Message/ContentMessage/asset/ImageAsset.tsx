@@ -37,6 +37,7 @@ import {Config} from '../../../../../Config';
 import {ContentMessage} from '../../../../../entity/message/ContentMessage';
 import {MediumImage} from '../../../../../entity/message/MediumImage';
 import {TeamState} from '../../../../../team/TeamState';
+import {useMessageFocusedTabIndex} from '../../util';
 
 export interface ImageAssetProps {
   asset: MediumImage;
@@ -59,6 +60,7 @@ const ImageAsset: React.FC<ImageAssetProps> = ({
   const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
   const [isInViewport, setIsInViewport] = useState(false);
   const {isUploading, uploadProgress, cancelUpload, loadAsset} = useAssetTransfer(message);
+  const messageFocusedTabIndex = useMessageFocusedTabIndex(isFocusable);
 
   useEffect(() => {
     if (!imageUrl && isInViewport && resource && isFileSharingReceivingEnabled) {
@@ -115,7 +117,7 @@ const ImageAsset: React.FC<ImageAssetProps> = ({
           data-uie-status={imageUrl ? 'loaded' : 'loading'}
           onClick={event => onClick(message, event)}
           onKeyDown={event => handleKeyDown(event, onClick.bind(null, message, event))}
-          tabIndex={isFocusable ? 0 : -1}
+          tabIndex={messageFocusedTabIndex}
           role="button"
           data-uie-name="go-image-detail"
           aria-label={imageAltText}

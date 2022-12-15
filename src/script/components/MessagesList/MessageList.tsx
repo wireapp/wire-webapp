@@ -19,6 +19,7 @@
 
 import React, {FC, useEffect, useLayoutEffect, useRef, useState} from 'react';
 
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
@@ -268,7 +269,7 @@ const MessagesList: FC<MessagesListParams> = ({
     return null;
   }
   return (
-    <FadingScrollbar ref={messageListRef} id="message-list" className="message-list" tabIndex={-1}>
+    <FadingScrollbar ref={messageListRef} id="message-list" className="message-list" tabIndex={TabIndex.UNFOCUSABLE}>
       <div ref={setMessageContainer} className={cx('messages', {'flex-center': verticallyCenterMessage()})}>
         {filteredMessages.map((message, index) => {
           const previousMessage = filteredMessages[index - 1];

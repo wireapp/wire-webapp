@@ -21,6 +21,7 @@ import React, {useEffect, useState} from 'react';
 
 import cx from 'classnames';
 
+import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {noop} from 'Util/util';
@@ -56,6 +57,7 @@ const MediaButton: React.FC<MediaButtonProps> = ({
   const onPlay = () => setIsPlaying(true);
   const onPause = () => setIsPlaying(false);
   const unwrappedAsset = useKoSubscribableChildren(asset, ['downloadProgress']);
+  const messageFocusedTabIndex = useMessageFocusedTabIndex(isFocusable);
 
   useEffect(() => {
     if (mediaElement) {
@@ -87,7 +89,7 @@ const MediaButton: React.FC<MediaButtonProps> = ({
           onClick={play}
           data-uie-name="do-play-media"
           aria-label={t('mediaBtnPlay')}
-          tabIndex={isFocusable ? 0 : -1}
+          tabIndex={messageFocusedTabIndex}
         />
       )}
       {isUploaded && isPlaying && (
@@ -97,7 +99,7 @@ const MediaButton: React.FC<MediaButtonProps> = ({
           onClick={pause}
           data-uie-name="do-pause-media"
           aria-label={t('mediaBtnPause')}
-          tabIndex={isFocusable ? 0 : -1}
+          tabIndex={messageFocusedTabIndex}
         />
       )}
       {isDownloading && (

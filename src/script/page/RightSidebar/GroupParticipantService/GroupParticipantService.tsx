@@ -19,6 +19,8 @@
 
 import {FC, useEffect} from 'react';
 
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
 import {ServiceDetails} from 'Components/panel/ServiceDetails';
@@ -103,7 +105,7 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
         {showActions && canChatWithServices() && (
           <div
             role="button"
-            tabIndex={0}
+            tabIndex={TabIndex.FOCUSABLE}
             className="panel__action-item"
             data-uie-name="go-conversation"
             onClick={onOpen}
@@ -120,7 +122,7 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
         {showActions && canUpdateGroupParticipants() && (
           <div
             role="button"
-            tabIndex={0}
+            tabIndex={TabIndex.FOCUSABLE}
             className="panel__action-item"
             data-uie-name="do-remove"
             onClick={onRemove}

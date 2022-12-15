@@ -19,6 +19,7 @@
 
 import React from 'react';
 
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 
 import {Image} from 'Components/Image';
@@ -78,7 +79,7 @@ const LinkPreviewAsset: React.FC<LinkPreviewAssetProps> = ({header = false, mess
   ) : (
     <div
       role="button"
-      tabIndex={0}
+      tabIndex={TabIndex.FOCUSABLE}
       className="link-preview-asset"
       onClick={onClick}
       onKeyDown={e => handleKeyDown(e, onClick)}
