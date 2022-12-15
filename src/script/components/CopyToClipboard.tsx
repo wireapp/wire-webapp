@@ -51,7 +51,7 @@ const CopyToClipboard: React.FC<CopyToClipboardProps> = ({text, className = '', 
       data-uie-name={dataUieName}
       className={cx('copy-to-clipboard', className)}
       onClick={onClick}
-      onKeyDown={e => handleKeyDown(e, onClick.bind(null, e))}
+      onKeyDown={event => handleKeyDown(event, () => onClick(event))}
     >
       {text}
     </div>

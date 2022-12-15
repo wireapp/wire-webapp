@@ -38,6 +38,7 @@ const AssetHeader: React.FC<AssetHeaderProps> = ({message}) => {
       <span className={cx('asset-header-name', message.accent_color())} data-uie-name="asset-header-user-name">
         {message.user().name()}
       </span>
+
       <span className="asset-header-time" data-uie-name="asset-header-time">
         {timeText}
       </span>
