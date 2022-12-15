@@ -21,7 +21,7 @@ import {FC} from 'react';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {Icon} from 'Components/Icon';
-import {StringIdentifer, t} from 'Util/LocalizerUtil';
+import {t} from 'Util/LocalizerUtil';
 
 import {useTypingIndicatorState} from './TypingIndicator.state';
 import {
@@ -60,17 +60,27 @@ const TypingIndicator: FC<TypingIndicatorProps> = ({conversationId}) => {
         ))}
       </div>
       <p css={indicatorTitleStyles} data-uie-name="typing-indicator-title">
-        {usersCount === 1 && t('tooltipConversationInputOneUserTyping' as StringIdentifer, {user1: users[0].name()})}
+        {usersCount === 1 && t('tooltipConversationInputOneUserTyping', {user1: users[0].name()}, undefined, true)}
         {usersCount === 2 &&
-          t('tooltipConversationInputTwoUserTyping' as StringIdentifer, {
-            user1: users[0].name(),
-            user2: users[1].name(),
-          })}
+          t(
+            'tooltipConversationInputTwoUserTyping',
+            {
+              user1: users[0].name(),
+              user2: users[1].name(),
+            },
+            undefined,
+            true,
+          )}
         {usersCount > 2 &&
-          t('tooltipConversationInputMoreThanTwoUserTyping' as StringIdentifer, {
-            user1: users[0].name(),
-            count: (usersCount - 1).toString(),
-          })}
+          t(
+            'tooltipConversationInputMoreThanTwoUserTyping',
+            {
+              user1: users[0].name(),
+              count: (usersCount - 1).toString(),
+            },
+            undefined,
+            true,
+          )}
       </p>
       <div css={indicatorAnimationWrapperStyles}>
         <div css={dotOneStyles} />
