@@ -20,6 +20,7 @@
 import {FC, useEffect, useState} from 'react';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
+import {Radio} from 'Components/Radio';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatDuration} from 'Util/TimeUtil';
@@ -27,7 +28,6 @@ import {formatDuration} from 'Util/TimeUtil';
 import {Conversation} from '../../../entity/Conversation';
 import {EphemeralTimings} from '../../../ephemeral/EphemeralTimings';
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';
-import {PreferencesRadio} from '../../MainContent/panels/preferences/components/PreferencesRadio';
 import {PanelHeader} from '../PanelHeader';
 
 interface TimedMessagesPanelProps {
@@ -93,16 +93,19 @@ const TimedMessages: FC<TimedMessagesPanelProps> = ({activeConversation, onClose
       />
 
       <FadingScrollbar className="panel__content">
-        <PreferencesRadio
-          ariaLabelledBy={t('timedMessagesTitle')}
-          name="timed-message-settings"
-          selectedValue={currentMessageTimer}
-          onChange={timedMessageChange}
-          options={messageTimes.map(({text, isCustom, value}) => ({
-            label: text,
-            value: value,
-          }))}
-        />
+        <div css={{margin: '16px'}}>
+          <Radio
+            ariaLabelledBy={t('timedMessagesTitle')}
+            name="timed-message-settings"
+            selectedValue={currentMessageTimer}
+            onChange={timedMessageChange}
+            options={messageTimes.map(({text, isCustom, value}) => ({
+              label: text,
+              value: value,
+              isDisabled: isCustom,
+            }))}
+          />
+        </div>
         <p className="panel__info-text timed-messages__disclaimer">{t('timedMessageDisclaimer')}</p>
       </FadingScrollbar>
     </div>
