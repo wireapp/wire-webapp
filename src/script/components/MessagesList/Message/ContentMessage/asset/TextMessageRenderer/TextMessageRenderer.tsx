@@ -28,7 +28,7 @@ import {ShowMoreButton} from './ShowMoreButton';
 
 export type ElementType = 'markdownLink' | 'email' | 'mention';
 
-interface TextMessageRendererProps {
+interface TextMessageRendererProps extends HTMLProps<HTMLParagraphElement> {
   onMessageClick: (event: MouseEvent | KeyboardEvent, elementType: ElementType, messageDetails: MessageDetails) => void;
   text: string;
   isFocusable: boolean;
@@ -42,7 +42,7 @@ export interface MessageDetails {
   userDomain?: string;
 }
 
-const TextMessage: FC<TextMessageRendererProps & HTMLProps<HTMLParagraphElement>> = ({
+const TextMessage: FC<TextMessageRendererProps> = ({
   text,
   onMessageClick,
   isFocusable,
