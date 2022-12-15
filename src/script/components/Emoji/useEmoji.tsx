@@ -202,7 +202,7 @@ const useEmoji = (
   const replaceAllInlineEmoji = (input: HTMLInputElement | HTMLTextAreaElement, shiftKeyPressed = false) => {
     const {selectionStart: selection, value: text} = input;
 
-    if (selection) {
+    if (selection !== null) {
       let textBeforeCursor = text.slice(0, selection);
       let textAfterCursor = text.slice(selection);
 
