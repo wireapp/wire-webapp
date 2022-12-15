@@ -33,6 +33,11 @@ export const wrapperStyles: CSSObject = {
   top: -26,
   borderTopLeftRadius: 4,
   borderTopRightRadius: 4,
+  'div:first-child': {
+    img: {
+      border: '1px solid var(--gray-40)',
+    },
+  },
 };
 
 export const indicatorAnimationWrapperStyles: CSSObject = {
