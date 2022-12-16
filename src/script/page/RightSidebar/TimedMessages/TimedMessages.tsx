@@ -20,6 +20,7 @@
 import {FC, useEffect, useState} from 'react';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
+import {RadioGroup} from 'Components/Radio';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatDuration} from 'Util/TimeUtil';
@@ -92,24 +93,19 @@ const TimedMessages: FC<TimedMessagesPanelProps> = ({activeConversation, onClose
       />
 
       <FadingScrollbar className="panel__content">
-        {messageTimes.map(({text, isCustom, value}) => (
-          <label
-            key={value}
-            className="panel__action-item panel__action-item__option"
-            data-uie-name="item-timed-messages-option"
-          >
-            <input
-              type="radio"
-              name="timed-message-settings"
-              disabled={isCustom}
-              value={value}
-              checked={currentMessageTimer === value}
-              onChange={() => timedMessageChange(value)}
-            />
-            <span>{text}</span>
-          </label>
-        ))}
-
+        <div css={{margin: '16px'}}>
+          <RadioGroup
+            ariaLabelledBy={t('timedMessagesTitle')}
+            name="timed-message-settings"
+            selectedValue={currentMessageTimer}
+            onChange={timedMessageChange}
+            options={messageTimes.map(({text, isCustom, value}) => ({
+              label: text,
+              value: value,
+              isDisabled: isCustom,
+            }))}
+          />
+        </div>
         <p className="panel__info-text timed-messages__disclaimer">{t('timedMessageDisclaimer')}</p>
       </FadingScrollbar>
     </div>
