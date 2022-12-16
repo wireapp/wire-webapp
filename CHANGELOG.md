@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [37.4.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@37.3.0...@wireapp/core@37.4.0) (2022-12-16)
+
+### Features
+
+* **core:** recover mls conversation from quick sync 404 error [FS-1172] ([#4706](https://github.com/wireapp/wire-web-packages/issues/4706)) ([0152aec](https://github.com/wireapp/wire-web-packages/commit/0152aecd33d0fc1fd2f14034da94ddb2f5ee66d8))
+
 # [37.3.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@37.2.4...@wireapp/core@37.3.0) (2022-12-08)
 
 ### Features
