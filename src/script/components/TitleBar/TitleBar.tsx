@@ -19,6 +19,7 @@
 
 import React, {useMemo, useEffect, useCallback} from 'react';
 
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -231,7 +232,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
           onKeyDown={e => handleKeyDown(e, onClickDetails)}
           data-placement="bottom"
           role="button"
-          tabIndex={0}
+          tabIndex={TabIndex.FOCUSABLE}
           data-uie-name="do-participants"
         >
           <div className="conversation-title-bar-name-label--wrapper">
@@ -251,9 +252,9 @@ export const TitleBar: React.FC<TitleBarProps> = ({
               />
             )}
 
-            <h2 className="conversation-title-bar-name-label" data-uie-name="status-conversation-title-bar-label">
+            <span className="conversation-title-bar-name-label" data-uie-name="status-conversation-title-bar-label">
               {displayName}
-            </h2>
+            </span>
           </div>
 
           {conversationSubtitle && <div className="conversation-title-bar-name--subtitle">{conversationSubtitle}</div>}
@@ -301,16 +302,17 @@ export const TitleBar: React.FC<TitleBarProps> = ({
             >
               <span className="visually-hidden">{t('tooltipConversationSearch')}</span>
             </IconButton>
-
-            <IconButton
-              title={t('tooltipConversationCall')}
-              aria-label={t('tooltipConversationCall')}
-              css={{marginBottom: 0}}
-              onClick={onClickStartAudio}
-              data-uie-name="do-call"
-            >
-              <Icon.Pickup />
-            </IconButton>
+            {showCallControls && (
+              <IconButton
+                title={t('tooltipConversationCall')}
+                aria-label={t('tooltipConversationCall')}
+                css={{marginBottom: 0}}
+                onClick={onClickStartAudio}
+                data-uie-name="do-call"
+              >
+                <Icon.Pickup />
+              </IconButton>
+            )}
           </>
         ) : (
           <button

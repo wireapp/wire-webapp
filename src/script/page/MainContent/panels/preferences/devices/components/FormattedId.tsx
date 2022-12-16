@@ -17,16 +17,20 @@
  *
  */
 
-import React from 'react';
+interface FormattedIdProps {
+  idSlices: string[];
+}
 
-export const FormattedId: React.FC<{idSlices: string[]}> = ({idSlices}) => {
-  return (
-    <>
-      {idSlices.map((slice, index) => (
-        <span className="device-id-part" key={slice + index}>
-          {index % 2 === 0 ? <strong>{slice}</strong> : slice}
-        </span>
-      ))}
-    </>
-  );
-};
+export const FormattedId = ({idSlices}: FormattedIdProps) => (
+  <>
+    {idSlices.map((slice, index) => {
+      const Component = index % 2 === 0 ? 'strong' : 'span';
+
+      return (
+        <Component className="device-id-part" key={slice + index}>
+          {slice}
+        </Component>
+      );
+    })}
+  </>
+);

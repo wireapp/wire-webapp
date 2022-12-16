@@ -63,11 +63,10 @@ const DecryptErrorMessage: React.FC<DecryptErrorMessageProps> = ({message, onCli
           >
             {t('conversationUnableToDecryptLink')}
           </a>
-          <hr className="message-header-line" />
         </div>
       </div>
       <div className="message-body message-body-decrypt-error">
-        <div className="message-header-decrypt-error-label" data-uie-name="status-decrypt-error">
+        <p className="message-header-decrypt-error-label" data-uie-name="status-decrypt-error">
           {message.error_code && (
             <>
               {`${t('conversationUnableToDecryptErrorMessage')} `}
@@ -80,7 +79,7 @@ const DecryptErrorMessage: React.FC<DecryptErrorMessageProps> = ({message, onCli
               <DeviceId deviceId={message.client_id} />
             </>
           )}
-        </div>
+        </p>
         {isRecoverable && (
           <div className="message-header-decrypt-reset-session">
             {isResettingSession ? (

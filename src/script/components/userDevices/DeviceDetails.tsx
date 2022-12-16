@@ -88,7 +88,9 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
 
   const clickToResetSession = () => {
     const _resetProgress = () => window.setTimeout(() => setIsResettingSession(false), MotionDuration.LONG);
-    const conversation = user.isMe ? conversationState.getSelfConversation() : conversationState.activeConversation();
+    const conversation = user.isMe
+      ? conversationState.getSelfProteusConversation()
+      : conversationState.activeConversation();
     setIsResettingSession(true);
     if (conversation) {
       messageRepository
@@ -109,7 +111,7 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
       >
         {t('participantDevicesDetailShowMyDevice')}
       </button>
-      <div
+      <p
         className="panel__info-text"
         dangerouslySetInnerHTML={{
           __html: user ? t('participantDevicesDetailHeadline', {user: userName}) : '',

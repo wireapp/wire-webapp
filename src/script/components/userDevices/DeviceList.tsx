@@ -44,9 +44,10 @@ const DeviceList: React.FC<DeviceListProps> = ({user, noPadding, clients, clickO
   return (
     <>
       <div className={cx('participant-devices__header', {'participant-devices__header--padding': !noPadding})}>
-        <div className="participant-devices__text-block panel__info-text" data-uie-name="status-devices-headline">
+        <p className="participant-devices__text-block panel__info-text" data-uie-name="status-devices-headline">
           {user ? t('participantDevicesHeadline', {brandName: Config.getConfig().BRAND_NAME, user: userName}) : ''}
-        </div>
+        </p>
+
         <a
           className="participant-devices__link accent-text"
           href={getPrivacyWhyUrl()}
@@ -57,9 +58,9 @@ const DeviceList: React.FC<DeviceListProps> = ({user, noPadding, clients, clickO
         </a>
       </div>
 
-      <div className="participant-devices__device-list">
+      <ul className="participant-devices__device-list">
         {clients.map(client => (
-          <div
+          <li
             key={client.id}
             className={cx('participant-devices__device-item', {
               'participant-devices__device-item--padding': !noPadding,
@@ -67,9 +68,9 @@ const DeviceList: React.FC<DeviceListProps> = ({user, noPadding, clients, clickO
             data-uie-name="item-device"
           >
             <DeviceCard device={client} click={() => clickOnDevice(client)} showVerified showIcon />
-          </div>
+          </li>
         ))}
-      </div>
+      </ul>
     </>
   );
 };

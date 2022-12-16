@@ -20,10 +20,11 @@
 import React, {useEffect, useState} from 'react';
 
 import {AudioPreference, NotificationPreference, WebappProperties} from '@wireapp/api-client/lib/user/data/';
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
-import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
+import {Checkbox, CheckboxLabel, IndicatorRangeInput} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -33,15 +34,27 @@ import {PreferencesPage} from './components/PreferencesPage';
 import {PreferencesRadio} from './components/PreferencesRadio';
 import {PreferencesSection} from './components/PreferencesSection';
 
+import {RootFontSize, useRootFontSize} from '../../../../hooks/useRootFontSize';
 import {PropertiesRepository} from '../../../../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../../../../properties/PropertiesType';
 import {UserState} from '../../../../user/UserState';
 import {THEMES as ThemeViewModelThemes} from '../../../../view_model/ThemeViewModel';
-
 interface OptionPreferencesProps {
   propertiesRepository: PropertiesRepository;
   userState?: UserState;
 }
+
+const fontSliderOptions = [
+  {value: 0, label: RootFontSize.XXS, heading: 'Small'},
+  {value: 1, label: RootFontSize.XS},
+  {value: 2, label: RootFontSize.S},
+  {value: 3, label: RootFontSize.M, heading: 'Default'},
+  {value: 4, label: RootFontSize.L},
+  {value: 5, label: RootFontSize.XL},
+  {value: 6, label: RootFontSize.XXL, heading: 'Large'},
+];
+
+const fontSizes = Object.values(RootFontSize);
 
 const OptionPreferences: React.FC<OptionPreferencesProps> = ({
   propertiesRepository,
@@ -56,6 +69,8 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
   const [optionDarkMode, setOptionDarkMode] = useState<boolean>(settings.interface.theme === ThemeViewModelThemes.DARK);
   const [optionSendPreviews, setOptionSendPreviews] = useState<boolean>(settings.previews.send);
   const [optionNotifications, setOptionNotifications] = useState<NotificationPreference>(settings.notifications);
+  const [currentRootFontSize, setCurrentRootFontSize] = useRootFontSize();
+  const [sliderValue, setSliderValue] = useState<number>(fontSizes.indexOf(currentRootFontSize));
 
   useEffect(() => {
     const updateProperties = ({settings}: WebappProperties): void => {
@@ -65,6 +80,7 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
       setOptionSendPreviews(settings.previews.send);
       setOptionNotifications(settings.notifications);
     };
+
     const updateDarkMode = (newDarkMode: boolean) => setOptionDarkMode(newDarkMode);
 
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.USE_DARK_MODE, updateDarkMode);
@@ -102,10 +118,24 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
     setOptionDarkMode(useDarkMode);
   };
 
+  const saveOptionFontSize = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const index = parseInt(event.target.value);
+    const fontSize = fontSizes[index];
+    setSliderValue(index);
+    setCurrentRootFontSize(fontSize);
+  };
+
+  const handleOptionClick = (value: number) => {
+    const fontSize = fontSizes[value];
+    setSliderValue(value);
+    setCurrentRootFontSize(fontSize);
+  };
+
   return (
     <PreferencesPage title={t('preferencesOptions')}>
       <PreferencesSection title={t('preferencesOptionsAudio')}>
         <PreferencesRadio
+          ariaLabelledBy={t('preferencesOptionsAudio')}
           name="preferences-options-audio"
           selectedValue={optionAudio}
           onChange={saveOptionAudioPreference}
@@ -135,6 +165,7 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
 
           <PreferencesSection title={t('preferencesOptionsNotifications')}>
             <PreferencesRadio
+              ariaLabelledBy={t('preferencesOptionsNotifications')}
               name="preferences-options-notification"
               selectedValue={optionNotifications}
               onChange={saveOptionNotificationsPreference}
@@ -158,12 +189,24 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
               ]}
             />
           </PreferencesSection>
+        </>
+      )}
+      <hr className="preferences-separator" />
 
-          <hr className="preferences-separator" />
-
-          <PreferencesSection title={t('preferencesOptionsPopular')}>
+      <PreferencesSection title={t('preferencesOptionsAppearance')}>
+        <div css={{marginBottom: '1.5rem', width: '100%'}}>
+          <IndicatorRangeInput
+            value={sliderValue}
+            label={t('preferencesOptionsAppearanceTextSize')}
+            onChange={saveOptionFontSize}
+            onOptionClick={handleOptionClick}
+            dataListOptions={fontSliderOptions}
+          />
+        </div>
+        {isActivatedAccount && (
+          <>
             <Checkbox
-              tabIndex={0}
+              tabIndex={TabIndex.FOCUSABLE}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 saveOptionNewTheme(event.target.checked);
               }}
@@ -177,7 +220,7 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
 
             <div className="checkbox-margin">
               <Checkbox
-                tabIndex={0}
+                tabIndex={TabIndex.FOCUSABLE}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                   saveOptionEmojiPreference(event.target.checked);
                 }}
@@ -189,7 +232,7 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
                 </CheckboxLabel>
               </Checkbox>
 
-              <div
+              <p
                 className="preferences-detail preferences-detail-intended"
                 aria-hidden="true"
                 dangerouslySetInnerHTML={{
@@ -204,7 +247,7 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
 
             <div className="checkbox-margin">
               <Checkbox
-                tabIndex={0}
+                tabIndex={TabIndex.FOCUSABLE}
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                   saveOptionSendPreviewsPreference(event.target.checked);
                 }}
@@ -216,13 +259,13 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
                 </CheckboxLabel>
               </Checkbox>
 
-              <div className="preferences-detail preferences-detail-intended">
+              <p className="preferences-detail preferences-detail-intended">
                 {t('preferencesOptionsPreviewsSendDetail')}
-              </div>
+              </p>
             </div>
-          </PreferencesSection>
-        </>
-      )}
+          </>
+        )}
+      </PreferencesSection>
     </PreferencesPage>
   );
 };

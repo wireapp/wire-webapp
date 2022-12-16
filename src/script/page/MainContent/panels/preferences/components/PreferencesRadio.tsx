@@ -17,7 +17,9 @@
  *
  */
 
-import {Fragment, useRef} from 'react';
+import {useRef} from 'react';
+
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 interface PreferencesRadioProps<T> {
   name: string;
@@ -29,6 +31,7 @@ interface PreferencesRadioProps<T> {
   }[];
   selectedValue: T;
   uieName?: string;
+  ariaLabelledBy: string;
 }
 
 const PreferencesRadio = <T extends string | number>({
@@ -37,32 +40,45 @@ const PreferencesRadio = <T extends string | number>({
   options,
   onChange,
   uieName = name,
+  ariaLabelledBy,
 }: PreferencesRadioProps<T>) => {
   const {current: id} = useRef(Math.random().toString(36).slice(2));
 
   return (
     <div className="preferences-option">
       <div className="preferences-options-radio" data-uie-name={uieName}>
-        {options.map(({value, label, detailLabel}) => (
-          <Fragment key={value}>
-            <input
-              tabIndex={0}
-              type="radio"
-              id={id + value}
-              name={name}
-              value={value}
-              onChange={() => onChange(value)}
-              checked={selectedValue === value}
-              data-uie-name={`${uieName}-${value}`}
-            />
-            <label htmlFor={id + value}>
-              <span>{label}</span>
-              {detailLabel && selectedValue === value && (
-                <span className="preferences-hint">{` · ${detailLabel}`}</span>
-              )}
-            </label>
-          </Fragment>
-        ))}
+        {options.map(({value, label, detailLabel}) => {
+          const currentId = id + value;
+
+          return (
+            <div
+              key={value}
+              className="preferences-options-radio-option"
+              role="radiogroup"
+              aria-labelledby={ariaLabelledBy}
+              aria-describedby={currentId}
+            >
+              <input
+                tabIndex={TabIndex.FOCUSABLE}
+                type="radio"
+                id={currentId}
+                name={name}
+                value={value}
+                onChange={() => onChange(value)}
+                checked={selectedValue === value}
+                data-uie-name={`${uieName}-${value}`}
+              />
+
+              <label htmlFor={currentId}>
+                <span>{label}</span>
+
+                {detailLabel && selectedValue === value && (
+                  <span className="preferences-hint">{` · ${detailLabel}`}</span>
+                )}
+              </label>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

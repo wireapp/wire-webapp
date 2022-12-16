@@ -26,11 +26,13 @@ import {InViewport} from 'Components/utils/InViewport';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getMessageMarkerType, MessageMarkerType} from 'Util/conversationMessages';
+import {getAllFocusableElements, setElementsTabIndex} from 'Util/focusUtil';
 import {isTabKey} from 'Util/KeyboardUtil';
 
 import {ElementType, MessageDetails} from './ContentMessage/asset/TextMessageRenderer';
 import {MessageTime} from './MessageTime';
 import {MessageWrapper} from './MessageWrapper';
+import {useMessageFocusedTabIndex} from './util';
 
 import type {MessageRepository} from '../../../conversation/MessageRepository';
 import type {Conversation} from '../../../entity/Conversation';
@@ -38,7 +40,6 @@ import type {ContentMessage} from '../../../entity/message/ContentMessage';
 import type {DecryptErrorMessage} from '../../../entity/message/DecryptErrorMessage';
 import type {MemberMessage as MemberMessageEntity} from '../../../entity/message/MemberMessage';
 import {Message as BaseMessage} from '../../../entity/message/Message';
-import type {Text} from '../../../entity/message/Text';
 import type {User} from '../../../entity/User';
 import {useRelativeTimestamp} from '../../../hooks/useRelativeTimestamp';
 import {TeamState} from '../../../team/TeamState';
@@ -49,12 +50,7 @@ export interface MessageActions {
   onClickImage: (message: ContentMessage, event: React.UIEvent) => void;
   onClickInvitePeople: () => void;
   onClickLikes: (message: BaseMessage) => void;
-  onClickMessage: (
-    asset: Text,
-    event: MouseEvent | KeyboardEvent,
-    elementType: ElementType,
-    messageDetails: MessageDetails,
-  ) => void;
+  onClickMessage: (event: MouseEvent | KeyboardEvent, elementType: ElementType, messageDetails: MessageDetails) => void;
   onClickParticipants: (participants: User[]) => void;
   onClickReceipts: (message: BaseMessage) => void;
   onClickResetSession: (messageError: DecryptErrorMessage) => void;
@@ -83,7 +79,7 @@ export interface MessageParams extends MessageActions {
   teamState?: TeamState;
   totalMessage: number;
   index: number;
-  focusConversation: boolean;
+  isMessageFocused: boolean;
   handleFocus: (index: number) => void;
   handleArrowKeyDown: (e: React.KeyboardEvent) => void;
   isMsgElementsFocusable: boolean;
@@ -101,7 +97,7 @@ const Message: React.FC<
     onVisible,
     scrollTo,
     totalMessage,
-    focusConversation,
+    isMessageFocused,
     handleFocus,
     handleArrowKeyDown,
     index,
@@ -115,8 +111,9 @@ const Message: React.FC<
     'ephemeral_expires',
     'timestamp',
   ]);
-  const timeago = useRelativeTimestamp(message.timestamp());
-  const timeagoDay = useRelativeTimestamp(message.timestamp(), true);
+  const timeAgo = useRelativeTimestamp(message.timestamp());
+  const timeAgoDay = useRelativeTimestamp(message.timestamp(), true);
+  const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
   const markerType = getMessageMarkerType(message, lastReadTimestamp, previousMessage);
 
   useLayoutEffect(() => {
@@ -160,10 +157,30 @@ const Message: React.FC<
 
   useEffect(() => {
     // Move element into view when it is focused
-    if (focusConversation) {
+    if (isMessageFocused) {
       messageRef.current?.focus();
     }
-  }, [focusConversation, message]);
+  }, [isMessageFocused, message]);
+
+  // set message elements focus for non content type mesages
+  // some non content type message has interactive element like invite people for member message
+  useEffect(() => {
+    if (!messageRef.current || message.isContent()) {
+      return;
+    }
+    const interactiveMsgElements = getAllFocusableElements(messageRef.current);
+    setElementsTabIndex(interactiveMsgElements, isMsgElementsFocusable && isMessageFocused);
+  }, [isMessageFocused, isMsgElementsFocusable, message]);
+
+  // set message elements focus for non content type mesages
+  // some non content type message has interactive element like invite people for member message
+  useEffect(() => {
+    if (!messageRef.current || message.isContent()) {
+      return;
+    }
+    const interactiveMsgElements = getAllFocusableElements(messageRef.current);
+    setElementsTabIndex(interactiveMsgElements, isMsgElementsFocusable && isMessageFocused);
+  }, [isMessageFocused, isMsgElementsFocusable, message]);
 
   const getTimestampClass = (): string => {
     const classes = {
@@ -179,10 +196,11 @@ const Message: React.FC<
     <MessageWrapper
       {...props}
       hasMarker={markerType !== MessageMarkerType.NONE}
-      focusConversation={focusConversation}
+      isMessageFocused={isMessageFocused}
       isMsgElementsFocusable={isMsgElementsFocusable}
     />
   );
+
   const wrappedContent = onVisible ? (
     <InViewport requireFullyInView allowBiggerThanViewport checkOverlay onVisible={onVisible}>
       {content}
@@ -190,6 +208,7 @@ const Message: React.FC<
   ) : (
     content
   );
+
   return (
     <div
       className={cx('message', {'message-marked': isMarked})}
@@ -203,20 +222,23 @@ const Message: React.FC<
     >
       <div className={cx('message-header message-timestamp', getTimestampClass())}>
         <div className="message-header-icon">
-          <span className="message-unread-dot"></span>
+          <span className="message-unread-dot" />
         </div>
-        <div className="message-header-label">
+
+        <h3 className="message-header-label">
           <MessageTime timestamp={timestamp} className="label-xs" data-timestamp-type="normal">
-            {timeago}
+            {timeAgo}
           </MessageTime>
+
           <MessageTime timestamp={timestamp} data-timestamp-type="day" className="label-bold-xs">
-            {timeagoDay}
+            {timeAgoDay}
           </MessageTime>
-        </div>
+        </h3>
       </div>
+
       {/*eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions*/}
       <div
-        tabIndex={focusConversation ? 0 : -1}
+        tabIndex={messageFocusedTabIndex}
         ref={messageRef}
         role="listitem"
         onKeyDown={handleDivKeyDown}

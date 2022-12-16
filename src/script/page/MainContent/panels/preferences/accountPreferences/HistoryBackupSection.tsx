@@ -19,6 +19,8 @@
 
 import {FC, useRef} from 'react';
 
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {CONFIG as HistoryExportConfig} from 'Components/HistoryExport';
@@ -62,7 +64,7 @@ const HistoryBackupSection: FC<HistoryBackupSectionProps> = ({brandName, importF
         variant={ButtonVariant.TERTIARY}
         className="preferences-history-restore-button"
         role="button"
-        tabIndex={0}
+        tabIndex={TabIndex.FOCUSABLE}
         onKeyDown={event => handleKeyDown(event, fileInputClick)}
         aria-labelledby="do-backup-import"
       >
@@ -76,7 +78,7 @@ const HistoryBackupSection: FC<HistoryBackupSectionProps> = ({brandName, importF
           <input
             id="file-import-input"
             ref={fileInputRef}
-            tabIndex={-1}
+            tabIndex={TabIndex.UNFOCUSABLE}
             type="file"
             accept={`.${HistoryExportConfig.FILE_EXTENSION}`}
             onChange={event => {

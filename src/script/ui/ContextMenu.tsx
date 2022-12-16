@@ -25,6 +25,7 @@ import {createRoot, Root} from 'react-dom/client';
 import {Availability} from '@wireapp/protocol-messaging';
 
 import {Icon} from 'Components/Icon';
+import {IgnoreOutsideClickWrapper} from 'Components/InputBar/util/clickHandlers';
 import {isEnterKey, isEscapeKey, isKey, isOneOfKeys, isSpaceKey, KEY} from 'Util/KeyboardUtil';
 
 export interface ContextMenuEntry {
@@ -60,7 +61,14 @@ const cleanUp = () => {
 
 const getButtonId = (label: string): string => `btn-${label?.split(' ').join('-').toLowerCase()}`;
 
-const ContextMenu: React.FC<ContextMenuProps> = ({entries, defaultIdentifier = 'ctx-menu-item', posX, posY}) => {
+const contextMenuClassName = 'ctx-menu';
+
+const ContextMenu: React.FC<ContextMenuProps> = ({
+  entries,
+  defaultIdentifier = `${contextMenuClassName}-item`,
+  posX,
+  posY,
+}) => {
   const [mainElement, setMainElement] = useState<HTMLUListElement>();
   const [selected, setSelected] = useState<ContextMenuEntry>();
 
@@ -146,48 +154,60 @@ const ContextMenu: React.FC<ContextMenuProps> = ({entries, defaultIdentifier = '
   }, [mainElement, selected]);
 
   return (
-    <ul className="ctx-menu" ref={setMainElement} style={{maxHeight: window.innerHeight, ...style}} role="menu">
-      {entries.map((entry, index) =>
-        entry.isSeparator ? (
-          <li key={`${index}`} className="ctx-menu__separator" />
-        ) : (
-          <li
-            key={`${index}`}
-            className={cx('ctx-menu__item', {
-              'ctx-menu__item--checked': entry.isChecked,
-              'ctx-menu__item--disabled': entry.isDisabled,
-              selected: entry === selected,
-            })}
-            role="menuitem"
-            aria-haspopup="true"
-          >
-            <button
-              id={getButtonId(entry.label!)}
-              className="ctx-menu__button"
-              type="button"
-              data-uie-name={entry.identifier || defaultIdentifier}
-              title={entry.title || entry.label}
-              {...(entry.isDisabled
-                ? undefined
-                : {
-                    onClick: event => {
-                      event.preventDefault();
-                      cleanUp();
-                      entry.click?.(event.nativeEvent);
-                    },
-                    onMouseEnter: () => {
-                      setSelected(undefined);
-                    },
-                  })}
+    <IgnoreOutsideClickWrapper>
+      <ul
+        className={contextMenuClassName}
+        ref={setMainElement}
+        style={{maxHeight: window.innerHeight, ...style}}
+        role="menu"
+      >
+        {entries.map((entry, index) =>
+          entry.isSeparator ? (
+            <li key={`${index}`} className={`${contextMenuClassName}__separator`} />
+          ) : (
+            <li
+              key={`${index}`}
+              className={cx(`${contextMenuClassName}__item`, {
+                [`${contextMenuClassName}__item--checked`]: entry.isChecked,
+                [`${contextMenuClassName}__item--disabled`]: entry.isDisabled,
+                selected: entry === selected,
+              })}
+              role="menuitem"
+              aria-haspopup="true"
             >
-              {entry.icon && <Icon name={entry.icon} className="ctx-menu__icon" />}
-              <span>{entry.label}</span>
-              {entry.isChecked && <Icon.Check className="ctx-menu__check" data-uie-name="ctx-menu-check" />}
-            </button>
-          </li>
-        ),
-      )}
-    </ul>
+              <button
+                id={getButtonId(entry.label!)}
+                className={`${contextMenuClassName}__button`}
+                type="button"
+                data-uie-name={entry.identifier || defaultIdentifier}
+                title={entry.title || entry.label}
+                {...(entry.isDisabled
+                  ? undefined
+                  : {
+                      onClick: event => {
+                        event.preventDefault();
+                        cleanUp();
+                        entry.click?.(event.nativeEvent);
+                      },
+                      onMouseEnter: () => {
+                        setSelected(undefined);
+                      },
+                    })}
+              >
+                {entry.icon && <Icon name={entry.icon} className={`${contextMenuClassName}__icon`} />}
+                <span>{entry.label}</span>
+                {entry.isChecked && (
+                  <Icon.Check
+                    className={`${contextMenuClassName}__check`}
+                    data-uie-name={`${contextMenuClassName}-check`}
+                  />
+                )}
+              </button>
+            </li>
+          ),
+        )}
+      </ul>
+    </IgnoreOutsideClickWrapper>
   );
 };
 

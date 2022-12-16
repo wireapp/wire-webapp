@@ -37,8 +37,7 @@ link-preview-asset,
 }
 
 .link-preview-image-container {
-  .square(@link-preview-height);
-
+  width: @link-preview-height;
   flex: 0 0 auto;
   background-color: var(--foreground-fade-24);
 }
@@ -59,7 +58,7 @@ link-preview-asset,
 .link-preview-info {
   display: flex;
   width: 0;
-  height: @link-preview-height;
+  min-height: @link-preview-height;
   flex: 1 1 auto;
   flex-direction: column;
   justify-content: center;
@@ -83,8 +82,6 @@ link-preview-asset,
 
 .link-preview-info-title-multiline {
   .ellipsis-multiline(2);
-
-  max-height: 48px;
 }
 
 .link-preview-info-link {

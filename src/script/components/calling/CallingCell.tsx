@@ -20,6 +20,7 @@
 import React, {useCallback, useState} from 'react';
 
 import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation/';
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
@@ -29,6 +30,7 @@ import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {GroupAvatar} from 'Components/avatar/GroupAvatar';
 import {Duration} from 'Components/calling/Duration';
 import {GroupVideoGrid} from 'Components/calling/GroupVideoGrid';
+import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';
 import {ParticipantItem} from 'Components/list/ParticipantItem';
@@ -49,7 +51,6 @@ import {generateConversationUrl} from '../../router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from '../../router/routerBindings';
 import {TeamState} from '../../team/TeamState';
 import {ContextMenuEntry, showContextMenu} from '../../ui/ContextMenu';
-import {initFadingScrollbar} from '../../ui/fadingScrollbar';
 import {CallActions, CallViewTab} from '../../view_model/CallingViewModel';
 
 interface VideoCallProps {
@@ -250,7 +251,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
               className="conversation-list-cell conversation-list-cell-button"
               onClick={createNavigate(conversationUrl)}
               onKeyDown={createNavigateKeyboard(conversationUrl)}
-              tabIndex={0}
+              tabIndex={TabIndex.FOCUSABLE}
               role="button"
               aria-label={t('accessibility.openConversation', conversationName)}
             >
@@ -262,36 +263,38 @@ const CallingCell: React.FC<CallingCellProps> = ({
                   )}
                 </div>
               )}
-              <div
+
+              <h2
                 className={cx('conversation-list-cell-center ', {
                   'conversation-list-cell-center-no-left': temporaryUserStyle,
                 })}
               >
-                <p className="conversation-list-cell-name">{conversationName}</p>
+                <span className="conversation-list-cell-name">{conversationName}</span>
 
                 {currentCallStatus && (
-                  <p className="conversation-list-cell-description" data-uie-name={currentCallStatus.dataUieName}>
+                  <span className="conversation-list-cell-description" data-uie-name={currentCallStatus.dataUieName}>
                     {currentCallStatus.text}
-                  </p>
+                  </span>
                 )}
 
                 {isOngoing && startedAt && (
                   <div className="conversation-list-info-wrapper">
-                    <p
+                    <span
                       className="conversation-list-cell-description"
                       data-uie-name="call-duration"
                       aria-label={t('callDurationLabel')}
                     >
                       <Duration {...{startedAt}} />
-                    </p>
+                    </span>
+
                     {isCbrEnabled && (
-                      <p className="conversation-list-cell-description" data-uie-name="call-cbr">
+                      <span className="conversation-list-cell-description" data-uie-name="call-cbr">
                         {t('callStateCbr')}
-                      </p>
+                      </span>
                     )}
                   </div>
                 )}
-              </div>
+              </h2>
             </div>
 
             <div className="conversation-list-cell-right">
@@ -315,7 +318,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
               onClick={handleMinimizedClick}
               onKeyDown={handleMinimizedKeydown}
               role="button"
-              tabIndex={0}
+              tabIndex={TabIndex.FOCUSABLE}
               aria-label={t('callMaximizeLabel')}
             >
               <GroupVideoGrid
@@ -473,7 +476,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
                     'call-ui__participant-list__wrapper--active': showParticipants,
                   })}
                 >
-                  <div ref={initFadingScrollbar} className="call-ui__participant-list__container">
+                  <FadingScrollbar className="call-ui__participant-list__container">
                     <ul className="call-ui__participant-list" data-uie-name="list-call-ui-participants">
                       {participants
                         .slice()
@@ -498,7 +501,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
                           </li>
                         ))}
                     </ul>
-                  </div>
+                  </FadingScrollbar>
                 </div>
               )}
             </>

@@ -19,13 +19,13 @@
 
 import {FC, useEffect, useState} from 'react';
 
+import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatDuration} from 'Util/TimeUtil';
 
 import {Conversation} from '../../../entity/Conversation';
 import {EphemeralTimings} from '../../../ephemeral/EphemeralTimings';
-import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';
 import {PanelHeader} from '../PanelHeader';
 
@@ -91,7 +91,7 @@ const TimedMessages: FC<TimedMessagesPanelProps> = ({activeConversation, onClose
         goBackUie="go-back-timed-messages-options"
       />
 
-      <div ref={initFadingScrollbar} className="panel__content">
+      <FadingScrollbar className="panel__content">
         {messageTimes.map(({text, isCustom, value}) => (
           <label
             key={value}
@@ -110,8 +110,8 @@ const TimedMessages: FC<TimedMessagesPanelProps> = ({activeConversation, onClose
           </label>
         ))}
 
-        <div className="panel__info-text timed-messages__disclaimer">{t('timedMessageDisclaimer')}</div>
-      </div>
+        <p className="panel__info-text timed-messages__disclaimer">{t('timedMessageDisclaimer')}</p>
+      </FadingScrollbar>
     </div>
   );
 };

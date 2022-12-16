@@ -18,9 +18,9 @@
  */
 
 import {
-  ACCESS_ROLE_V2,
-  CONVERSATION_ACCESS,
   CONVERSATION_ACCESS_ROLE,
+  CONVERSATION_ACCESS,
+  CONVERSATION_LEGACY_ACCESS_ROLE,
   CONVERSATION_TYPE,
 } from '@wireapp/api-client/lib/conversation/';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
@@ -173,7 +173,7 @@ export class Conversation {
   public readonly hasExternal: ko.PureComputed<boolean>;
   public readonly hasFederatedUsers: ko.PureComputed<boolean>;
   public accessModes?: CONVERSATION_ACCESS[];
-  public accessRole?: CONVERSATION_ACCESS_ROLE | ACCESS_ROLE_V2[];
+  public accessRole?: CONVERSATION_LEGACY_ACCESS_ROLE | CONVERSATION_ACCESS_ROLE[];
   public domain: string;
 
   static get TIMESTAMP_TYPE(): typeof TIMESTAMP_TYPE {

@@ -26,7 +26,6 @@ require('fake-indexeddb/auto');
 
 require('src/script/util/test/mock/createObjectURLMock');
 require('src/script/util/test/mock/cryptoMock');
-require('src/script/util/test/mock/iconsMock');
 require('src/script/util/test/mock/matchMediaMock');
 require('src/script/util/test/mock/mediaDevicesMock');
 require('src/script/util/test/mock/navigatorPermissionsMock');

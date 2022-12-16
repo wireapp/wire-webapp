@@ -90,11 +90,15 @@
 }
 
 .video-remote-name {
-  .heading-h3;
   display: flex;
-  overflow: hidden;
   flex-direction: column;
   align-items: center;
+}
+
+.video-remote-title {
+  .heading-h3;
+  overflow: hidden;
+  margin: 0;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -175,7 +179,7 @@
       left: 50%;
       margin: 0;
       color: var(--main-color);
-      font-size: @font-size-xsmall;
+      font-size: 11px;
       font-weight: @font-weight-regular;
       transform: translateX(-50%);
       white-space: nowrap;

@@ -20,10 +20,12 @@
 import {FC, useEffect} from 'react';
 
 import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/lib/conversation/';
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
 import {EnrichedFields} from 'Components/panel/EnrichedFields';
 import {UserActions, Actions} from 'Components/panel/UserActions';
@@ -40,7 +42,6 @@ import {User} from '../../../entity/User';
 import {ClientEvent} from '../../../event/Client';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {TeamState} from '../../../team/TeamState';
-import {initFadingScrollbar} from '../../../ui/fadingScrollbar';
 import {UserState} from '../../../user/UserState';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {PanelHeader} from '../PanelHeader';
@@ -145,7 +146,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
         onClose={onClose}
       />
 
-      <div className="panel__content" ref={initFadingScrollbar}>
+      <FadingScrollbar className="panel__content">
         <UserDetails
           participant={currentUser}
           badge={teamRepository.getRoleBadge(currentUser.id)}
@@ -178,7 +179,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
           <>
             <div className="conversation-details__admin">
               <div
-                tabIndex={0}
+                tabIndex={TabIndex.FOCUSABLE}
                 role="button"
                 className="panel__action-item modal-style panel__action-button"
                 data-uie-name="toggle-admin"
@@ -201,9 +202,9 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
               </div>
             </div>
 
-            <div className="panel__action-item panel__info-text panel__item-offset" tabIndex={0}>
+            <p className="panel__info-text panel__item-offset" css={{padding: '16px'}} tabIndex={TabIndex.FOCUSABLE}>
               {t('conversationDetailsGroupAdminInfo')}
-            </div>
+            </p>
           </>
         )}
 
@@ -218,7 +219,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
           conversationRoleRepository={conversationRoleRepository}
           selfUser={selfUser}
         />
-      </div>
+      </FadingScrollbar>
     </div>
   );
 };

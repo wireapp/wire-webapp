@@ -6,6 +6,14 @@
   font-size: @font-size-medium;
   line-height: 1.5em;
 
+  button {
+    &:focus-visible {
+      .focus-outline;
+      .focus-border-radius;
+      .focus-offset;
+    }
+  }
+
   &::before {
     position: absolute;
     top: 0;
@@ -116,5 +124,9 @@
 
   .video-asset {
     background-color: transparent;
+  }
+
+  .message-mention {
+    font-size: @font-size-medium;
   }
 }

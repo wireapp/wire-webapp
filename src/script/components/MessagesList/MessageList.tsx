@@ -19,8 +19,10 @@
 
 import React, {FC, useEffect, useLayoutEffect, useRef, useState} from 'react';
 
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 
+import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
@@ -31,15 +33,14 @@ import {User} from 'src/script/entity/User';
 import {useRoveFocus} from 'src/script/hooks/useRoveFocus';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {onHitTopOrBottom} from 'Util/DOM/onHitTopOrBottom';
+import {useResizeObserver} from 'Util/DOM/resizeObserver';
 
 import {Message, MessageActions} from './Message';
 
 import {Conversation as ConversationEntity, Conversation} from '../../entity/Conversation';
 import {isMemberMessage, isContentMessage} from '../../guards/Message';
 import {StatusType} from '../../message/StatusType';
-import {initFadingScrollbar} from '../../ui/fadingScrollbar';
-import {onHitTopOrBottom} from '../../ui/onHitTopOrBottom';
-import {useResizeObserver} from '../../ui/resizeObserver';
 
 type FocusedElement = {center?: boolean; element: Element};
 
@@ -257,20 +258,18 @@ const MessagesList: FC<MessagesListParams> = ({
   }, [loaded]);
 
   const defaultFocus = -1;
-  const {currentFocus, handleKeyDown, setCurrentFocus} = useRoveFocus(filteredMessagesLength, defaultFocus);
+  const isMsgListInfinite = false;
+  const {currentFocus, handleKeyDown, setCurrentFocus} = useRoveFocus(
+    filteredMessagesLength,
+    defaultFocus,
+    isMsgListInfinite,
+  );
 
   if (!loaded) {
     return null;
   }
   return (
-    <div
-      ref={element => {
-        initFadingScrollbar(element);
-        messageListRef.current = element;
-      }}
-      id="message-list"
-      className="message-list"
-    >
+    <FadingScrollbar ref={messageListRef} id="message-list" className="message-list" tabIndex={TabIndex.UNFOCUSABLE}>
       <div ref={setMessageContainer} className={cx('messages', {'flex-center': verticallyCenterMessage()})}>
         {filteredMessages.map((message, index) => {
           const previousMessage = filteredMessages[index - 1];
@@ -329,7 +328,7 @@ const MessagesList: FC<MessagesListParams> = ({
               shouldShowInvitePeople={shouldShowInvitePeople}
               totalMessage={filteredMessagesLength}
               index={index}
-              focusConversation={currentFocus === index}
+              isMessageFocused={currentFocus === index}
               handleFocus={setCurrentFocus}
               handleArrowKeyDown={handleKeyDown}
               isMsgElementsFocusable={isMsgElementsFocusable}
@@ -338,7 +337,7 @@ const MessagesList: FC<MessagesListParams> = ({
           );
         })}
       </div>
-    </div>
+    </FadingScrollbar>
   );
 };
 
