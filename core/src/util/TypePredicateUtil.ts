@@ -17,8 +17,15 @@
  *
  */
 
-import {QualifiedUserClients, UserClients} from '@wireapp/api-client/lib/conversation/';
+import {
+  Conversation,
+  ConversationProtocol,
+  QualifiedUserClients,
+  UserClients,
+} from '@wireapp/api-client/lib/conversation/';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
+
+import {MLSConversation} from '../messagingProtocols/mls/types';
 
 export function isStringArray(obj: any): obj is string[] {
   return Array.isArray(obj) && (obj.length === 0 || typeof obj[0] === 'string');
@@ -49,4 +56,9 @@ export function isUserClients(obj: any): obj is UserClients {
     return isStringArray(firstUserClientArray);
   }
   return false;
+}
+
+export function isMLSConversation(conversation: Conversation): conversation is MLSConversation {
+  const {protocol, epoch, group_id} = conversation;
+  return protocol === ConversationProtocol.MLS && epoch !== undefined && group_id !== undefined;
 }

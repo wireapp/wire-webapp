@@ -177,8 +177,9 @@ export class MLSService {
     return coreCryptoKeyPackagesPayload;
   }
 
-  public getEpoch(groupId: Uint8Array) {
-    return this.coreCryptoClient.conversationEpoch(groupId);
+  public getEpoch(groupId: string | Uint8Array) {
+    const groupIdBytes = typeof groupId === 'string' ? Decoder.fromBase64(groupId).asBytes : groupId;
+    return this.coreCryptoClient.conversationEpoch(groupIdBytes);
   }
 
   public async newProposal(proposalType: ProposalType, args: ProposalArgs | AddProposalArgs | RemoveProposalArgs) {
