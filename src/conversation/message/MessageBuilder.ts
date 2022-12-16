@@ -40,12 +40,12 @@ import {
   Reaction,
   LastRead,
   Cleared,
+  ICalling,
 } from '@wireapp/protocol-messaging';
 
 import {
   ButtonActionConfirmationMessage,
   ButtonActionMessage,
-  CallMessage,
   ConfirmationMessage,
   DeleteMessage,
   EditedTextMessage,
@@ -296,10 +296,8 @@ export function buildSessionResetMessage(): GenericMessage {
   });
 }
 
-export function buildCallMessage(payloadBundle: CallMessage['content']): GenericMessage {
-  const callMessage = Calling.create({
-    content: payloadBundle,
-  });
+export function buildCallMessage(payload: ICalling): GenericMessage {
+  const callMessage = Calling.create(payload);
 
   return GenericMessage.create({
     [GenericMessageType.CALLING]: callMessage,
