@@ -19,6 +19,8 @@
 
 import {useRef} from 'react';
 
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+
 interface PreferencesRadioProps<T> {
   name: string;
   onChange: (newValue: T) => void;
@@ -57,7 +59,7 @@ const PreferencesRadio = <T extends string | number>({
               aria-describedby={currentId}
             >
               <input
-                tabIndex={0}
+                tabIndex={TabIndex.FOCUSABLE}
                 type="radio"
                 id={currentId}
                 name={name}

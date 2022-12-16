@@ -19,6 +19,8 @@
 
 import React from 'react';
 
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {handleKeyDown} from 'Util/KeyboardUtil';
@@ -97,7 +99,7 @@ const AvatarInput: React.FC<AvatarInputProps> = ({selfUser, isActivatedAccount, 
 
   return (
     <div
-      tabIndex={0}
+      tabIndex={TabIndex.FOCUSABLE}
       role="button"
       onKeyDown={(event: React.KeyboardEvent<HTMLElement>) => handleKeyDown(event, inputClick)}
       aria-label={`${t('tooltipPreferencesPicture')}`}
@@ -118,7 +120,7 @@ const AvatarInput: React.FC<AvatarInputProps> = ({selfUser, isActivatedAccount, 
           id="self-upload-file-input"
           data-uie-name="do-select-picture"
           fileTypes={FILE_TYPES}
-          tabIndex={-1}
+          tabIndex={TabIndex.UNFOCUSABLE}
           onFileChange={files => {
             const newUserPicture = files.item(0);
             if (newUserPicture) {

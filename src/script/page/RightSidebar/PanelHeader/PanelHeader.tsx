@@ -19,6 +19,7 @@
 
 import {FC} from 'react';
 
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 
 import {DragableClickWrapper} from 'Components/DragableClickWrapper';
@@ -72,7 +73,7 @@ const PanelHeader: FC<PanelHeaderProps> = ({
       )}
 
       {title && (
-        <h2 className="panel__header__title" tabIndex={0} data-uie-name={titleDataUieName}>
+        <h2 className="panel__header__title" tabIndex={TabIndex.FOCUSABLE} data-uie-name={titleDataUieName}>
           {title}
         </h2>
       )}

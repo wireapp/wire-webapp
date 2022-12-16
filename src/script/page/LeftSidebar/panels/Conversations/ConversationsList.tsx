@@ -20,6 +20,7 @@
 import React, {MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent} from 'react';
 
 import {css} from '@emotion/react';
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {GroupAvatar} from 'Components/avatar/GroupAvatar';
@@ -127,7 +128,7 @@ export const ConversationsList: React.FC<{
         })}
       </>
     ) : (
-      <li tabIndex={-1}>
+      <li tabIndex={TabIndex.UNFOCUSABLE}>
         <GroupedConversations
           callState={callState}
           conversationRepository={conversationRepository}
@@ -150,10 +151,10 @@ export const ConversationsList: React.FC<{
 
   const connectionRequests =
     connectRequests.length === 0 ? null : (
-      <li tabIndex={-1}>
+      <li tabIndex={TabIndex.UNFOCUSABLE}>
         <div
           role="button"
-          tabIndex={0}
+          tabIndex={TabIndex.FOCUSABLE}
           className={`conversation-list-cell ${isShowingConnectionRequests ? 'conversation-list-cell-active' : ''}`}
           onClick={onConnectionRequestClick}
           onKeyDown={e => handleKeyDown(e, onConnectionRequestClick)}

@@ -19,6 +19,8 @@
 
 import React from 'react';
 
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {GroupAvatar} from 'Components/avatar/GroupAvatar';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -48,7 +50,7 @@ const GroupListItem: React.FC<GroupListItemProps> = ({click, group}) => {
   return (
     <div
       role="button"
-      tabIndex={0}
+      tabIndex={TabIndex.FOCUSABLE}
       key={group.id}
       data-uie-name="item-group"
       className="search-list-item"

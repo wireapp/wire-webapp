@@ -19,6 +19,8 @@
 
 import {useRef} from 'react';
 
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+
 import {Icon} from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
@@ -57,7 +59,7 @@ export const ImageUploadButton = ({onSelectImages, acceptedImageTypes}: ImageUpl
         <input
           ref={imageRef}
           accept={acceptedImageTypes.join(',')}
-          tabIndex={-1}
+          tabIndex={TabIndex.UNFOCUSABLE}
           id="conversation-input-bar-photo"
           onChange={handleImageFileChange}
           type="file"

@@ -20,6 +20,7 @@
 import React, {useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {container} from 'tsyringe';
 
 import {Icon} from 'Components/Icon';
@@ -74,7 +75,7 @@ const Device: React.FC<{
       className="preferences-devices-card"
       onClick={() => onSelect(device)}
       onKeyDown={e => handleKeyDown(e, onSelect.bind(null, device))}
-      tabIndex={0}
+      tabIndex={TabIndex.FOCUSABLE}
       role="button"
     >
       <div className="preferences-devices-card-data">

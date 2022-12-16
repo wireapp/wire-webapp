@@ -20,6 +20,7 @@
 import {forwardRef, useCallback, useEffect, useMemo, useState} from 'react';
 
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/';
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
@@ -266,7 +267,12 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
     }, [getService]);
 
     return (
-      <div id="conversation-details" className="panel__page conversation-details" ref={ref} tabIndex={0}>
+      <div
+        id="conversation-details"
+        className="panel__page conversation-details"
+        ref={ref}
+        tabIndex={TabIndex.FOCUSABLE}
+      >
         <h2 className="visually-hidden">{t('tooltipConversationInfo')}</h2>
 
         <PanelHeader

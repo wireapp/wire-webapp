@@ -27,6 +27,8 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {MessageLike} from './MessageLike';
 
+import {useMessageFocusedTabIndex} from '../util';
+
 export interface MessageFooterLikeProps {
   is1to1Conversation: boolean;
   message: ContentMessage;
@@ -42,6 +44,7 @@ const MessageFooterLike: React.FC<MessageFooterLikeProps> = ({
   onClickLikes,
   isMessageFocused,
 }) => {
+  const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
   const {like_caption: likeCaption, reactions_user_ids: reactionsUserIds} = useKoSubscribableChildren(message, [
     'is_liked',
     'like_caption',
@@ -59,7 +62,7 @@ const MessageFooterLike: React.FC<MessageFooterLikeProps> = ({
           'cursor-pointer': !is1to1Conversation,
         })}
         onClick={is1to1Conversation ? undefined : () => onClickLikes(message)}
-        tabIndex={isMessageFocused ? 0 : -1}
+        tabIndex={messageFocusedTabIndex}
       >
         <span className="message-footer-text" data-uie-name="message-liked-names" data-uie-value={reactionsUserIds}>
           {likeCaption}

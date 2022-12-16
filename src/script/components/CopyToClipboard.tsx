@@ -19,6 +19,7 @@
 
 import React from 'react';
 
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 
 import {handleKeyDown} from 'Util/KeyboardUtil';
@@ -46,7 +47,7 @@ const CopyToClipboard: React.FC<CopyToClipboardProps> = ({text, className = '', 
   return (
     <div
       role="button"
-      tabIndex={0}
+      tabIndex={TabIndex.FOCUSABLE}
       data-uie-name={dataUieName}
       className={cx('copy-to-clipboard', className)}
       onClick={onClick}
