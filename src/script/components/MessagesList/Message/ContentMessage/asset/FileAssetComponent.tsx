@@ -77,7 +77,11 @@ const FileAsset: React.FC<FileAssetProps> = ({
   const isFailedDownloadingHash = assetStatus === AssetTransferState.DOWNLOAD_FAILED_HASH;
   const isUploading = assetStatus === AssetTransferState.UPLOADING;
 
-  const onDownloadAsset = async () => downloadAsset(asset);
+  const onDownloadAsset = async () => {
+    if (isUploaded) {
+      downloadAsset(asset);
+    }
+  };
 
   if (isObfuscated) {
     return null;
@@ -97,16 +101,8 @@ const FileAsset: React.FC<FileAssetProps> = ({
           role="button"
           tabIndex={messageFocusedTabIndex}
           aria-label={`${t('conversationContextMenuDownload')} ${fileName}.${fileExtension}`}
-          onClick={async () => {
-            if (isUploaded) {
-              await onDownloadAsset();
-            }
-          }}
-          onKeyDown={event => {
-            if (isUploaded) {
-              handleKeyDown(event, onDownloadAsset);
-            }
-          }}
+          onClick={onDownloadAsset}
+          onKeyDown={event => handleKeyDown(event, onDownloadAsset)}
         >
           {isPendingUpload ? (
             <div className="asset-placeholder loading-dots" />
