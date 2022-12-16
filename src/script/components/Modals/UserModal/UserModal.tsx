@@ -29,7 +29,7 @@ import {EnrichedFields} from 'Components/panel/EnrichedFields';
 import {UserActions} from 'Components/panel/UserActions';
 import {UserDetails} from 'Components/panel/UserDetails';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {KEY} from 'Util/KeyboardUtil';
+import {isEnterKey} from 'Util/KeyboardUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 
 import {useUserModalState} from './UserModal.state';
@@ -163,7 +163,7 @@ const UserModal: React.FC<UserModalProps> = ({
             className="modal__header__button"
             onClick={hide}
             onKeyDown={(event: React.KeyboardEvent<SVGSVGElement>) => {
-              if (event.key === KEY.ENTER) {
+              if (isEnterKey(event)) {
                 hide();
               }
             }}
