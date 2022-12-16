@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [37.5.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@37.4.0...@wireapp/core@37.5.0) (2022-12-16)
+
+### Features
+
+* Add conversationId to calling messages ([#4714](https://github.com/wireapp/wire-web-packages/issues/4714)) ([4263018](https://github.com/wireapp/wire-web-packages/commit/426301807706e880a2a6e22b25dc0ab73f5142fc))
+
 # [37.4.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@37.3.0...@wireapp/core@37.4.0) (2022-12-16)
 
 ### Features
