@@ -4241,7 +4241,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/lru-cache@npm:3.8.1, @wireapp/lru-cache@npm:^3.8.1":
+"@wireapp/lru-cache@npm:3.8.1":
   version: 3.8.1
   resolution: "@wireapp/lru-cache@npm:3.8.1"
   checksum: 901ae35ac6a2370ef52eeea08217f23ff7cc1db3f5e82199324d88dc8128d68e01f6b06928df9eb2ae03a6cc97587c2f501cec6aa61665a60a7d8cf415f1b21a
@@ -16302,7 +16302,7 @@ __metadata:
     "@wireapp/copy-config": 2.0.4
     "@wireapp/core": 37.4.0
     "@wireapp/eslint-config": 2.1.0
-    "@wireapp/lru-cache": ^3.8.1
+    "@wireapp/lru-cache": 3.8.1
     "@wireapp/prettier-config": 0.5.2
     "@wireapp/react-ui-kit": 9.3.0
     "@wireapp/store-engine": ^5.0.3
