@@ -17,9 +17,7 @@
  *
  */
 
-import {LRUCache} from '@wireapp/lru-cache';
-
-const cache: LRUCache<string> = new LRUCache(100);
+const cache = new Map<string, string>();
 
 export const getAssetUrl = (identifier: string): string | undefined => cache.get(identifier);
 
@@ -31,11 +29,8 @@ export const setAssetUrl = (identifier: string, url: string) => {
     return isExistingUrl;
   }
 
-  const outdatedUrl = cache.set(identifier, url);
-
-  if (outdatedUrl != null) {
-    window.URL.revokeObjectURL(outdatedUrl);
-  }
+  cache.set(identifier, url);
+  window.URL.revokeObjectURL(url);
 
   return url;
 };
