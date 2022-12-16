@@ -116,7 +116,7 @@ const ImageAsset: React.FC<ImageAssetProps> = ({
           data-uie-visible={visible && !isObfuscated}
           data-uie-status={imageUrl ? 'loaded' : 'loading'}
           onClick={event => onClick(message, event)}
-          onKeyDown={event => handleKeyDown(event, onClick.bind(null, message, event))}
+          onKeyDown={event => handleKeyDown(event, () => onClick(message, event))}
           tabIndex={messageFocusedTabIndex}
           role="button"
           data-uie-name="go-image-detail"
