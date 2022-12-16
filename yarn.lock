@@ -16302,7 +16302,6 @@ __metadata:
     "@wireapp/copy-config": 2.0.4
     "@wireapp/core": 37.4.0
     "@wireapp/eslint-config": 2.1.0
-    "@wireapp/lru-cache": 3.8.1
     "@wireapp/prettier-config": 0.5.2
     "@wireapp/react-ui-kit": 9.3.0
     "@wireapp/store-engine": ^5.0.3
