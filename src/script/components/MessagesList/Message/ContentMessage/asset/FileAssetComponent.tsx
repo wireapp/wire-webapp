@@ -36,19 +36,20 @@ import {AssetTransferState} from '../../../../../assets/AssetTransferState';
 import type {ContentMessage} from '../../../../../entity/message/ContentMessage';
 import type {FileAsset as FileAssetType} from '../../../../../entity/message/FileAsset';
 import {TeamState} from '../../../../../team/TeamState';
+import {useMessageFocusedTabIndex} from '../../util';
 
 export interface FileAssetProps {
   hasHeader?: boolean;
   message: ContentMessage;
   teamState?: TeamState;
-  isCurrentConversationFocused?: boolean;
+  isFocusable?: boolean;
 }
 
 const FileAsset: React.FC<FileAssetProps> = ({
   message,
   hasHeader = false,
   teamState = container.resolve(TeamState),
-  isCurrentConversationFocused = true,
+  isFocusable = true,
 }) => {
   const asset = message.getFirstAsset() as FileAssetType;
 
@@ -56,6 +57,7 @@ const FileAsset: React.FC<FileAssetProps> = ({
   const {isObfuscated} = useKoSubscribableChildren(message, ['isObfuscated']);
   const {downloadProgress} = useKoSubscribableChildren(asset, ['downloadProgress']);
   const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
+  const messageFocusedTabIndex = useMessageFocusedTabIndex(isFocusable);
 
   const fileName = trimFileExtension(asset.file_name);
   const fileExtension = getFileExtension(asset.file_name);
@@ -90,7 +92,7 @@ const FileAsset: React.FC<FileAssetProps> = ({
           data-uie-name="file"
           data-uie-value={asset.file_name}
           role="button"
-          tabIndex={isCurrentConversationFocused ? 0 : -1}
+          tabIndex={messageFocusedTabIndex}
           aria-label={`${t('conversationContextMenuDownload')} ${fileName}.${fileExtension}`}
           onClick={() => {
             if (isUploaded) {

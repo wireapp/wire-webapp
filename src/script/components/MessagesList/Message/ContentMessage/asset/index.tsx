@@ -51,7 +51,7 @@ const ContentAsset = ({
   onClickImage,
   onClickMessage,
   onClickButton,
-  focusConversation,
+  isMessageFocused,
 }: {
   asset: Asset;
   message: ContentMessage;
@@ -59,7 +59,7 @@ const ContentAsset = ({
   onClickImage: MessageActions['onClickImage'];
   onClickMessage: MessageActions['onClickMessage'];
   selfId: QualifiedId;
-  focusConversation: boolean;
+  isMessageFocused: boolean;
 }) => {
   const {isObfuscated, status} = useKoSubscribableChildren(message, ['isObfuscated', 'status']);
 
@@ -76,7 +76,7 @@ const ContentAsset = ({
                 'text-large': includesOnlyEmojis(asset.text),
                 'ephemeral-message-obfuscated': isObfuscated,
               })}
-              isCurrentConversationFocused={focusConversation}
+              isFocusable={isMessageFocused}
             />
           )}
           {(asset as Text).previews().map(preview => (
@@ -90,7 +90,7 @@ const ContentAsset = ({
       if ((asset as FileAssetType).isFile()) {
         return (
           <div className={`message-asset ${isObfuscated ? 'ephemeral-asset-expired icon-file' : ''}`}>
-            <FileAsset message={message} isCurrentConversationFocused={focusConversation} />
+            <FileAsset message={message} isFocusable={isMessageFocused} />
           </div>
         );
       }
@@ -98,7 +98,7 @@ const ContentAsset = ({
       if ((asset as FileAssetType).isAudio()) {
         return (
           <div className={`message-asset ${isObfuscated ? 'ephemeral-asset-expired' : ''}`}>
-            <AudioAsset message={message} isCurrentConversationFocused={focusConversation} />
+            <AudioAsset message={message} isFocusable={isMessageFocused} />
           </div>
         );
       }
@@ -106,12 +106,19 @@ const ContentAsset = ({
       if ((asset as FileAssetType).isVideo()) {
         return (
           <div className={`message-asset ${isObfuscated ? 'ephemeral-asset-expired icon-movie' : ''}`}>
-            <VideoAsset message={message} isCurrentConversationFocused={focusConversation} />
+            <VideoAsset message={message} isFocusable={isMessageFocused} />
           </div>
         );
       }
     case AssetType.IMAGE:
-      return <ImageAsset asset={asset as MediumImage} message={message} onClick={onClickImage} />;
+      return (
+        <ImageAsset
+          asset={asset as MediumImage}
+          message={message}
+          onClick={onClickImage}
+          isFocusable={isMessageFocused}
+        />
+      );
     case AssetType.LOCATION:
       return <LocationAsset asset={asset as Location} />;
     case AssetType.BUTTON:

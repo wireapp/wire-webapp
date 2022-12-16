@@ -26,9 +26,9 @@ import {groupBy} from 'underscore';
 import {useMatchMedia} from '@wireapp/react-ui-kit';
 
 import {CallingCell} from 'Components/calling/CallingCell';
+import {DropFileArea} from 'Components/DropFileArea';
 import {Giphy} from 'Components/Giphy';
 import {InputBar} from 'Components/InputBar';
-import {useDropFiles} from 'Components/InputBar/hooks/useDropFiles';
 import {MessagesList} from 'Components/MessagesList';
 import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -225,8 +225,6 @@ export const Conversation: FC<ConversationProps> = ({
     },
     [repositories.asset, uploadFiles, uploadImages],
   );
-
-  const {ref: handleFileDrop} = useDropFiles(checkFileSharingPermission(uploadDroppedFiles));
 
   const openGiphy = (text: string) => {
     setInputValue(text);
@@ -482,16 +480,12 @@ export const Conversation: FC<ConversationProps> = ({
     };
   };
 
-  const wrapperRefHandler = (element: HTMLElement | null) => {
-    removeAnimationsClass(element);
-    handleFileDrop(element);
-  };
-
   return (
-    <div
+    <DropFileArea
+      onFileDropped={checkFileSharingPermission(uploadDroppedFiles)}
       id="conversation"
       className={cx('conversation', {[incomingCssClass]: isConversationLoaded, loading: !isConversationLoaded})}
-      ref={wrapperRefHandler}
+      ref={removeAnimationsClass}
       key={activeConversation?.id}
     >
       {activeConversation && (
@@ -577,6 +571,6 @@ export const Conversation: FC<ConversationProps> = ({
       {isGiphyModalOpen && inputValue && (
         <Giphy giphyRepository={repositories.giphy} inputValue={inputValue} onClose={closeGiphy} />
       )}
-    </div>
+    </DropFileArea>
   );
 };

@@ -17,4 +17,4 @@
  *
  */
 
-export * from './Giphy';
+export * from './DropFileArea';

@@ -28,10 +28,10 @@ import {ShowMoreButton} from './ShowMoreButton';
 
 export type ElementType = 'markdownLink' | 'email' | 'mention';
 
-interface TextMessageRendererProps {
+interface TextMessageRendererProps extends HTMLProps<HTMLParagraphElement> {
   onMessageClick: (event: MouseEvent | KeyboardEvent, elementType: ElementType, messageDetails: MessageDetails) => void;
   text: string;
-  isCurrentConversationFocused: boolean;
+  isFocusable: boolean;
   /** will collapse the text to a single line when set (and add a `showMore` button if there is more content to show) */
   collapse?: boolean;
   setCanShowMore?: (showMore: boolean) => void;
@@ -42,22 +42,22 @@ export interface MessageDetails {
   userDomain?: string;
 }
 
-export const TextMessageRenderer: FC<TextMessageRendererProps & HTMLProps<HTMLParagraphElement>> = ({
+const TextMessage: FC<TextMessageRendererProps> = ({
   text,
   onMessageClick,
-  isCurrentConversationFocused,
+  isFocusable,
   className,
   collapse = false,
   ...props
 }) => {
-  const [containerRef, setContainerRef] = useState<HTMLParagraphElement | null>(null);
+  const containerRef = useRef<HTMLParagraphElement | null>(null);
   const [canShowMore, setCanShowMore] = useState<boolean>(false);
   const [showFullText, setShowFullText] = useState<boolean>(!collapse);
 
   const collapsedHeightRef = useRef<number>(0);
 
   useEffect(() => {
-    const element = containerRef;
+    const element = containerRef.current;
 
     if (element && collapse) {
       const preNode = element.querySelector('pre');
@@ -69,23 +69,25 @@ export const TextMessageRenderer: FC<TextMessageRendererProps & HTMLProps<HTMLPa
       collapsedHeightRef.current = collapsedHeight;
       setCanShowMore?.(isWider || isHigher);
     }
-  }, [collapse, setCanShowMore, containerRef]);
+  }, [collapse, setCanShowMore]);
 
   useEffect(() => {
-    if (!containerRef) {
+    const element = containerRef.current;
+
+    if (!element) {
       return;
     }
 
-    const interactiveMsgElements = getAllFocusableElements(containerRef);
-    setElementsTabIndex(interactiveMsgElements, isCurrentConversationFocused);
-  }, [isCurrentConversationFocused, containerRef]);
+    const interactiveMsgElements = getAllFocusableElements(element);
+    setElementsTabIndex(interactiveMsgElements, isFocusable);
+  }, [isFocusable]);
 
   const forwardEvent = (
     event: KeyboardEvent | MouseEvent,
     elementType: ElementType,
     messageDetails: MessageDetails,
   ) => {
-    if (isKeyDownEvent(event) && isCurrentConversationFocused) {
+    if (isKeyDownEvent(event) && isFocusable) {
       handleKeyDown(event, () => {
         event.preventDefault();
         onMessageClick(event, elementType, messageDetails);
@@ -123,6 +125,7 @@ export const TextMessageRenderer: FC<TextMessageRendererProps & HTMLProps<HTMLPa
       forwardEvent(event.nativeEvent, 'mention', mentionMsgDetails);
     }
   };
+
   const extraClasses = showFullText ? 'message-quote__text--full' : '';
 
   const toggleShowMore = () => setShowFullText(prev => !prev);
@@ -136,9 +139,7 @@ export const TextMessageRenderer: FC<TextMessageRendererProps & HTMLProps<HTMLPa
       }
       {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
       <p
-        ref={setContainerRef}
-        // We want to make sure that this element is re-rendered when the text changes (this will trigger the containerRef to be updated).
-        key={text}
+        ref={containerRef}
         onClick={handleInteraction}
         onAuxClick={handleInteraction}
         onKeyDown={handleInteraction}
@@ -149,12 +150,13 @@ export const TextMessageRenderer: FC<TextMessageRendererProps & HTMLProps<HTMLPa
         {...props}
       />
       {canShowMore && (
-        <ShowMoreButton
-          onClick={toggleShowMore}
-          isCurrentConversationFocused={isCurrentConversationFocused}
-          active={showFullText}
-        ></ShowMoreButton>
+        <ShowMoreButton onClick={toggleShowMore} isFocusable={isFocusable} active={showFullText}></ShowMoreButton>
       )}
     </>
   );
+};
+
+export const TextMessageRenderer = (props: TextMessageRendererProps) => {
+  // We want to make sure that this element is re-rendered when the text changes (this will trigger useEffects' calculations to run).
+  return <TextMessage key={props.text} {...props} />;
 };

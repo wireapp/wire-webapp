@@ -26,11 +26,13 @@ import {InViewport} from 'Components/utils/InViewport';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getMessageMarkerType, MessageMarkerType} from 'Util/conversationMessages';
+import {getAllFocusableElements, setElementsTabIndex} from 'Util/focusUtil';
 import {isTabKey} from 'Util/KeyboardUtil';
 
 import {ElementType, MessageDetails} from './ContentMessage/asset/TextMessageRenderer';
 import {MessageTime} from './MessageTime';
 import {MessageWrapper} from './MessageWrapper';
+import {useMessageFocusedTabIndex} from './util';
 
 import type {MessageRepository} from '../../../conversation/MessageRepository';
 import type {Conversation} from '../../../entity/Conversation';
@@ -77,7 +79,7 @@ export interface MessageParams extends MessageActions {
   teamState?: TeamState;
   totalMessage: number;
   index: number;
-  focusConversation: boolean;
+  isMessageFocused: boolean;
   handleFocus: (index: number) => void;
   handleArrowKeyDown: (e: React.KeyboardEvent) => void;
   isMsgElementsFocusable: boolean;
@@ -95,7 +97,7 @@ const Message: React.FC<
     onVisible,
     scrollTo,
     totalMessage,
-    focusConversation,
+    isMessageFocused,
     handleFocus,
     handleArrowKeyDown,
     index,
@@ -111,6 +113,7 @@ const Message: React.FC<
   ]);
   const timeAgo = useRelativeTimestamp(message.timestamp());
   const timeAgoDay = useRelativeTimestamp(message.timestamp(), true);
+  const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
   const markerType = getMessageMarkerType(message, lastReadTimestamp, previousMessage);
 
   useLayoutEffect(() => {
@@ -154,10 +157,30 @@ const Message: React.FC<
 
   useEffect(() => {
     // Move element into view when it is focused
-    if (focusConversation) {
+    if (isMessageFocused) {
       messageRef.current?.focus();
     }
-  }, [focusConversation, message]);
+  }, [isMessageFocused, message]);
+
+  // set message elements focus for non content type mesages
+  // some non content type message has interactive element like invite people for member message
+  useEffect(() => {
+    if (!messageRef.current || message.isContent()) {
+      return;
+    }
+    const interactiveMsgElements = getAllFocusableElements(messageRef.current);
+    setElementsTabIndex(interactiveMsgElements, isMsgElementsFocusable && isMessageFocused);
+  }, [isMessageFocused, isMsgElementsFocusable, message]);
+
+  // set message elements focus for non content type mesages
+  // some non content type message has interactive element like invite people for member message
+  useEffect(() => {
+    if (!messageRef.current || message.isContent()) {
+      return;
+    }
+    const interactiveMsgElements = getAllFocusableElements(messageRef.current);
+    setElementsTabIndex(interactiveMsgElements, isMsgElementsFocusable && isMessageFocused);
+  }, [isMessageFocused, isMsgElementsFocusable, message]);
 
   const getTimestampClass = (): string => {
     const classes = {
@@ -173,7 +196,7 @@ const Message: React.FC<
     <MessageWrapper
       {...props}
       hasMarker={markerType !== MessageMarkerType.NONE}
-      focusConversation={focusConversation}
+      isMessageFocused={isMessageFocused}
       isMsgElementsFocusable={isMsgElementsFocusable}
     />
   );
@@ -215,7 +238,7 @@ const Message: React.FC<
 
       {/*eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions*/}
       <div
-        tabIndex={focusConversation ? 0 : -1}
+        tabIndex={messageFocusedTabIndex}
         ref={messageRef}
         role="listitem"
         onKeyDown={handleDivKeyDown}

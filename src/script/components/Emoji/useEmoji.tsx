@@ -24,6 +24,7 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {IgnoreOutsideClickWrapper} from 'Components/InputBar/util/clickHandlers';
 import {isEnterKey, isKey, KEY} from 'Util/KeyboardUtil';
 import {updateMentionRanges} from 'Util/MentionUtil';
 import {getCursorPixelPosition} from 'Util/PopupUtil';
@@ -201,7 +202,7 @@ const useEmoji = (
   const replaceAllInlineEmoji = (input: HTMLInputElement | HTMLTextAreaElement, shiftKeyPressed = false) => {
     const {selectionStart: selection, value: text} = input;
 
-    if (selection) {
+    if (selection !== null) {
       let textBeforeCursor = text.slice(0, selection);
       let textAfterCursor = text.slice(selection);
 
@@ -398,23 +399,25 @@ const useEmoji = (
 
   const renderEmojiComponent = () =>
     isVisible ? (
-      <div className="conversation-input-bar-emoji-list" ref={emojiWrapperRef}>
-        {mappedEmojiList.map((emoji, index) => {
-          return (
-            <EmojiItem
-              key={emoji.name}
-              selectedEmoji={selectedEmojiIndex === index}
-              emoji={emoji}
-              onMouseEnter={() => setSelectedEmojiIndex(index)}
-              onClick={() => {
-                if (textareaElement) {
-                  enterEmojiPopupLine(textareaElement, emoji);
-                }
-              }}
-            />
-          );
-        })}
-      </div>
+      <IgnoreOutsideClickWrapper>
+        <div className="conversation-input-bar-emoji-list" ref={emojiWrapperRef}>
+          {mappedEmojiList.map((emoji, index) => {
+            return (
+              <EmojiItem
+                key={emoji.name}
+                selectedEmoji={selectedEmojiIndex === index}
+                emoji={emoji}
+                onMouseEnter={() => setSelectedEmojiIndex(index)}
+                onClick={() => {
+                  if (textareaElement) {
+                    enterEmojiPopupLine(textareaElement, emoji);
+                  }
+                }}
+              />
+            );
+          })}
+        </div>
+      </IgnoreOutsideClickWrapper>
     ) : null;
 
   useEffect(() => {

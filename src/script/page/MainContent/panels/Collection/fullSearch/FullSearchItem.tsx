@@ -19,6 +19,8 @@
 
 import React from 'react';
 
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
@@ -43,7 +45,7 @@ const FullSearchItem: React.FC<FullSearchItemProps> = ({message, onClick, format
       className="full-search__item"
       onClick={onClick}
       role="button"
-      tabIndex={0}
+      tabIndex={TabIndex.FOCUSABLE}
       onKeyDown={e => handleKeyDown(e, onClick)}
       data-uie-name="full-search-item"
     >

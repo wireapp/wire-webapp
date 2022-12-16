@@ -19,6 +19,8 @@
 
 import React from 'react';
 
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+
 import {handleKeyDown} from 'Util/KeyboardUtil';
 
 import {Icon} from '../../../../Icon';
@@ -43,7 +45,7 @@ const AssetLoader: React.FC<AssetLoaderProps> = ({large, loadProgress, onCancel}
   return (
     <div
       role="button"
-      tabIndex={0}
+      tabIndex={TabIndex.FOCUSABLE}
       className="media-button"
       onClick={onClick}
       onKeyDown={e => handleKeyDown(e, onClick.bind(null, e))}

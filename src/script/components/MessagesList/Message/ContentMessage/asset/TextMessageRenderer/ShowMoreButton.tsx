@@ -22,23 +22,25 @@ import {FC, HTMLProps} from 'react';
 import cx from 'classnames';
 
 import {Icon} from 'Components/Icon';
+import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
 import {t} from 'Util/LocalizerUtil';
 
 interface ShowMoreButtonProps {
   active: boolean;
-  isCurrentConversationFocused: boolean;
+  isFocusable: boolean;
 }
 
 export const ShowMoreButton: FC<ShowMoreButtonProps & HTMLProps<HTMLButtonElement>> = ({
   active,
-  isCurrentConversationFocused,
+  isFocusable,
   ...props
 }) => {
+  const messageFocusedTabIndex = useMessageFocusedTabIndex(isFocusable);
   return (
     <button
       className="button-reset-default message-quote__text__show-more"
       data-uie-name="do-show-more-quote"
-      tabIndex={isCurrentConversationFocused ? 0 : -1}
+      tabIndex={messageFocusedTabIndex}
       {...props}
       type="button"
     >

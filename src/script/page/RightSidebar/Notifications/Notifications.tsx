@@ -19,6 +19,8 @@
 
 import {useState, FC} from 'react';
 
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Radio} from 'Components/Radio';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -71,7 +73,7 @@ const Notifications: FC<NotificationsProps> = ({activeConversation, onGoBack, on
           />
         </fieldset>
 
-        <p className="panel__info-text notification-settings__disclaimer" tabIndex={0}>
+        <p className="panel__info-text notification-settings__disclaimer" tabIndex={TabIndex.FOCUSABLE}>
           {t('notificationSettingsDisclaimer')}
         </p>
       </FadingScrollbar>

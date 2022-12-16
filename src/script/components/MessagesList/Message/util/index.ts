@@ -17,4 +17,14 @@
  *
  */
 
-export * from './Giphy';
+import {useMemo} from 'react';
+
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+
+const useMessageFocusedTabIndex = (isMessageFocused: boolean) => {
+  const tabIndex = useMemo(() => (isMessageFocused ? TabIndex.FOCUSABLE : TabIndex.UNFOCUSABLE), [isMessageFocused]);
+
+  return tabIndex;
+};
+
+export {useMessageFocusedTabIndex};

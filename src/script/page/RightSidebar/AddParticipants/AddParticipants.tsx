@@ -19,6 +19,7 @@
 
 import {FC, useMemo, useState} from 'react';
 
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
@@ -206,7 +207,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
           <div className="panel__tabs">
             <div
               role="button"
-              tabIndex={0}
+              tabIndex={TabIndex.FOCUSABLE}
               className={cx('panel__tab', {'panel__tab--active': isAddPeopleState})}
               onClick={onAddPeople}
               onKeyDown={event => handleKeyDown(event, onAddPeople)}
@@ -217,7 +218,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
 
             <div
               role="button"
-              tabIndex={0}
+              tabIndex={TabIndex.FOCUSABLE}
               className={cx('panel__tab', {'panel__tab--active': isAddServiceState})}
               onClick={onAddServices}
               onKeyDown={event => handleKeyDown(event, onAddServices)}
@@ -249,7 +250,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
                     <ul className="panel-manage-services left-list-items">
                       <li
                         role="presentation"
-                        tabIndex={0}
+                        tabIndex={TabIndex.FOCUSABLE}
                         className="left-list-item left-list-item-clickable"
                         onClick={openManageServices}
                         onKeyDown={event => handleKeyDown(event, openManageServices)}
@@ -287,7 +288,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
                       <Button
                         variant={ButtonVariant.TERTIARY}
                         type="button"
-                        tabIndex={0}
+                        tabIndex={TabIndex.FOCUSABLE}
                         onClick={openManageServices}
                         onKeyDown={event => handleKeyDown(event, openManageServices)}
                         data-uie-name="go-enable-services"

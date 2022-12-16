@@ -28,7 +28,7 @@ describe('ShowMoreButton', () => {
     let show = true;
     const setShowFullText = jest.fn(show => !show);
     const {getByTestId, getByText, rerender} = render(
-      <ShowMoreButton active={show} onClick={setShowFullText} isCurrentConversationFocused />,
+      <ShowMoreButton active={show} onClick={setShowFullText} isFocusable />,
     );
 
     expect(getByText(t('replyQuoteShowLess'))).not.toBeNull();
@@ -40,7 +40,7 @@ describe('ShowMoreButton', () => {
     show = false;
 
     // re-render the same component with different props
-    rerender(<ShowMoreButton active={show} onClick={setShowFullText} isCurrentConversationFocused />);
+    rerender(<ShowMoreButton active={show} onClick={setShowFullText} isFocusable />);
     fireEvent.click(toggleShowBtn);
 
     expect(setShowFullText).toHaveBeenCalled();

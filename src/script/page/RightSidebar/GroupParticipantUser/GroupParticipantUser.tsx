@@ -20,6 +20,7 @@
 import {FC, useEffect} from 'react';
 
 import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/lib/conversation/';
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -178,7 +179,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
           <>
             <div className="conversation-details__admin">
               <div
-                tabIndex={0}
+                tabIndex={TabIndex.FOCUSABLE}
                 role="button"
                 className="panel__action-item modal-style panel__action-button"
                 data-uie-name="toggle-admin"
@@ -201,7 +202,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
               </div>
             </div>
 
-            <p className="panel__info-text panel__item-offset" css={{padding: '16px'}} tabIndex={0}>
+            <p className="panel__info-text panel__item-offset" css={{padding: '16px'}} tabIndex={TabIndex.FOCUSABLE}>
               {t('conversationDetailsGroupAdminInfo')}
             </p>
           </>

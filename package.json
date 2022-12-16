@@ -3,8 +3,8 @@
     "@emotion/react": "11.10.5",
     "@types/eslint": "^8.4.10",
     "@wireapp/avs": "8.2.17",
-    "@wireapp/core": "37.3.0",
-    "@wireapp/react-ui-kit": "9.2.3",
+    "@wireapp/core": "37.4.0",
+    "@wireapp/react-ui-kit": "9.3.0",
     "@wireapp/store-engine-dexie": "2.0.3",
     "@wireapp/store-engine-sqleet": "1.8.9",
     "@wireapp/webapp-events": "0.16.0",
@@ -217,9 +217,7 @@
     "lint:other": "yarn prettier --list-different && yarn stylelint",
     "lint:code": "eslint -c .eslintrc.json --ext .js,.ts,.tsx .",
     "lint:spelling": "cspell -c .cspell.json 'src/script/**/*.{js,ts,tsx,md}' src/i18n/en-US.json",
-    "check:circular-dependencies": "yarn check:circular-dependencies:app && yarn check:circular-dependencies:auth",
-    "check:circular-dependencies:app": "dpdm -T ./src/script/main/app.ts",
-    "check:circular-dependencies:auth": "dpdm -T ./src/script/auth/main.tsx",
+    "check:circular-dependencies": "dpdm --no-warning --no-tree -T  ./src/script/auth/main.tsx ./src/script/main/app.ts",
     "postinstall": "yarn configure && cd server && yarn && cd .. && husky install",
     "prettier": "prettier --ignore-path .prettierignore \"**/*.{json,md,yml}\"",
     "release:staging": "git checkout dev && git pull && ts-node ./bin/release_tag.ts staging",
@@ -237,6 +235,6 @@
     "translate:upload": "yarn translate:merge && ts-node ./bin/translations_upload.ts",
     "translate:download": "ts-node ./bin/translations_download.ts"
   },
-  "version": "0.24.0",
+  "version": "0.25.0",
   "packageManager": "yarn@3.2.3"
 }
