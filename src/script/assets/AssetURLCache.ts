@@ -24,11 +24,9 @@ export const getAssetUrl = (identifier: string): string | undefined => cache.get
 export const setAssetUrl = (identifier: string, url: string) => {
   const isExistingUrl = getAssetUrl(identifier);
 
-  if (isExistingUrl) {
-    window.URL.revokeObjectURL(url);
-    return isExistingUrl;
+  if (!isExistingUrl) {
+    cache.set(identifier, url);
   }
 
-  cache.set(identifier, url);
   return url;
 };
