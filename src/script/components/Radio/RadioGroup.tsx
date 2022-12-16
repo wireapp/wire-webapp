@@ -32,6 +32,7 @@ interface RadioGroupProps<T> {
     value: T;
     detailLabel?: string;
     isDisabled?: boolean;
+    optionUeiName?: string;
   }[];
   selectedValue: T;
   uieName?: string;
@@ -49,7 +50,7 @@ const RadioGroup = <T extends string | number>({
 
   return (
     <div aria-labelledby={ariaLabelledBy} data-uie-name={uieName} role="radiogroup">
-      {options.map(({value, label, detailLabel, isDisabled = false}) => {
+      {options.map(({value, label, detailLabel, isDisabled = false, optionUeiName = `${uieName}-${value}`}) => {
         const currentId = radioId + value;
         const isChecked = selectedValue === value;
 
@@ -65,7 +66,7 @@ const RadioGroup = <T extends string | number>({
               value={value}
               onChange={() => onChange(value)}
               checked={isChecked}
-              data-uie-name={`${uieName}-${value}`}
+              data-uie-name={optionUeiName}
             />
 
             <label css={radioLabelStyles(isDisabled)} htmlFor={currentId}>

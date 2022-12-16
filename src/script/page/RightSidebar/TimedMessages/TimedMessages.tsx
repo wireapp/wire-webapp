@@ -103,6 +103,7 @@ const TimedMessages: FC<TimedMessagesPanelProps> = ({activeConversation, onClose
               label: text,
               value: value,
               isDisabled: isCustom,
+              optionUeiName: 'item-timed-messages-option',
             }))}
           />
         </div>
