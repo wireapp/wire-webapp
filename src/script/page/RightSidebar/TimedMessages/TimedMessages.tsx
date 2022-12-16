@@ -20,7 +20,7 @@
 import {FC, useEffect, useState} from 'react';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {Radio} from 'Components/Radio';
+import {RadioGroup} from 'Components/Radio';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatDuration} from 'Util/TimeUtil';
@@ -94,7 +94,7 @@ const TimedMessages: FC<TimedMessagesPanelProps> = ({activeConversation, onClose
 
       <FadingScrollbar className="panel__content">
         <div css={{margin: '16px'}}>
-          <Radio
+          <RadioGroup
             ariaLabelledBy={t('timedMessagesTitle')}
             name="timed-message-settings"
             selectedValue={currentMessageTimer}
