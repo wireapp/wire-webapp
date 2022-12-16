@@ -51,6 +51,7 @@ const RadioGroup = <T extends string | number>({
     <div aria-labelledby={ariaLabelledBy} data-uie-name={uieName} role="radiogroup">
       {options.map(({value, label, detailLabel, isDisabled = false}) => {
         const currentId = radioId + value;
+        const isChecked = selectedValue === value;
 
         return (
           <div key={value} css={radioOptionStyles} aria-describedby={currentId}>
@@ -63,14 +64,14 @@ const RadioGroup = <T extends string | number>({
               name={name}
               value={value}
               onChange={() => onChange(value)}
-              checked={selectedValue === value}
+              checked={isChecked}
               data-uie-name={`${uieName}-${value}`}
             />
 
             <label css={radioLabelStyles(isDisabled)} htmlFor={currentId}>
               <span>{label}</span>
 
-              {detailLabel && selectedValue === value && <span css={radioHintStyles}>{` · ${detailLabel}`}</span>}
+              {detailLabel && isChecked && <span css={radioHintStyles}>{` · ${detailLabel}`}</span>}
             </label>
           </div>
         );
