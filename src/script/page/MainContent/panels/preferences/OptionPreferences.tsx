@@ -27,7 +27,7 @@ import {container} from 'tsyringe';
 import {Checkbox, CheckboxLabel, IndicatorRangeInput} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Radio} from 'Components/Radio';
+import {RadioGroup} from 'Components/Radio';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -134,7 +134,7 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
   return (
     <PreferencesPage title={t('preferencesOptions')}>
       <PreferencesSection title={t('preferencesOptionsAudio')}>
-        <Radio
+        <RadioGroup
           ariaLabelledBy={t('preferencesOptionsAudio')}
           name="preferences-options-audio"
           selectedValue={optionAudio}
@@ -164,7 +164,7 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
           <hr className="preferences-separator" />
 
           <PreferencesSection title={t('preferencesOptionsNotifications')}>
-            <Radio
+            <RadioGroup
               ariaLabelledBy={t('preferencesOptionsNotifications')}
               name="preferences-options-notification"
               selectedValue={optionNotifications}

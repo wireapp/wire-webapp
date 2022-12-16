@@ -17,13 +17,13 @@
  *
  */
 
-import {useRef} from 'react';
+import {useId} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
-import {radioHintStyles, radioInputStyles, radioLabelStyles, radioOptionStyles} from './Radio.styles';
+import {radioHintStyles, radioInputStyles, radioLabelStyles, radioOptionStyles} from './RadioGroup.styles';
 
-interface RadioProps<T> {
+interface RadioGroupProps<T> {
   ariaLabelledBy: string;
   name: string;
   onChange: (newValue: T) => void;
@@ -37,29 +37,23 @@ interface RadioProps<T> {
   uieName?: string;
 }
 
-const Radio = <T extends string | number>({
+const RadioGroup = <T extends string | number>({
   ariaLabelledBy,
   name,
   options,
   onChange,
   uieName = name,
   selectedValue,
-}: RadioProps<T>) => {
-  const {current: id} = useRef(Math.random().toString(36).slice(2));
+}: RadioGroupProps<T>) => {
+  const radioId = useId();
 
   return (
-    <div data-uie-name={uieName}>
+    <div aria-labelledby={ariaLabelledBy} data-uie-name={uieName} role="radiogroup">
       {options.map(({value, label, detailLabel, isDisabled = false}) => {
-        const currentId = id + value;
+        const currentId = radioId + value;
 
         return (
-          <div
-            key={value}
-            css={radioOptionStyles}
-            role="radiogroup"
-            aria-labelledby={ariaLabelledBy}
-            aria-describedby={currentId}
-          >
+          <div key={value} css={radioOptionStyles} aria-describedby={currentId}>
             <input
               css={radioInputStyles(isDisabled)}
               disabled={isDisabled}
@@ -85,4 +79,4 @@ const Radio = <T extends string | number>({
   );
 };
 
-export {Radio};
+export {RadioGroup};

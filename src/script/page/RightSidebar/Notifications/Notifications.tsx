@@ -22,7 +22,7 @@ import {useState, FC} from 'react';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {Radio} from 'Components/Radio';
+import {RadioGroup} from 'Components/Radio';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -64,7 +64,7 @@ const Notifications: FC<NotificationsProps> = ({activeConversation, onGoBack, on
 
       <FadingScrollbar className="panel__content">
         <fieldset className="notification-section">
-          <Radio
+          <RadioGroup
             ariaLabelledBy={t('notificationSettingsTitle')}
             name="preferences-options-notifications"
             selectedValue={notificationState}
