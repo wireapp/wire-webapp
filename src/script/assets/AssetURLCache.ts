@@ -30,7 +30,5 @@ export const setAssetUrl = (identifier: string, url: string) => {
   }
 
   cache.set(identifier, url);
-  window.URL.revokeObjectURL(url);
-
   return url;
 };
