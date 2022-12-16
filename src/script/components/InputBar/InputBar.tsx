@@ -384,7 +384,7 @@ const InputBar = ({
 
   const replyMessage = (messageEntity: ContentMessage): void => {
     if (messageEntity?.isReplyable() && messageEntity !== replyMessageEntity) {
-      cancelMessageReply();
+      cancelMessageReply(false);
       cancelMessageEditing(!!editMessageEntity);
       setReplyMessageEntity(messageEntity);
 
@@ -553,6 +553,7 @@ const InputBar = ({
 
       return;
     }
+
     const updatedMentions = updateMentionRanges(currentMentions, 0, 0, trimmedStartLength - beforeLength);
 
     if (isEditing) {
