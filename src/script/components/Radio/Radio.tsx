@@ -19,6 +19,8 @@
 
 import {useRef} from 'react';
 
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+
 import {radioHintStyles, radioInputStyles, radioLabelStyles, radioOptionStyles} from './Radio.styles';
 
 interface RadioProps<T> {
@@ -61,7 +63,7 @@ const Radio = <T extends string | number>({
             <input
               css={radioInputStyles(isDisabled)}
               disabled={isDisabled}
-              tabIndex={0}
+              tabIndex={TabIndex.FOCUSABLE}
               type="radio"
               id={currentId}
               name={name}
