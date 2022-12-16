@@ -637,6 +637,13 @@ export class Account<T = any> extends EventEmitter {
       }
     });
 
+    const handleMissedNotifications = async (notificationId: string) => {
+      if (this.cryptoProtocolConfig?.mls && this.backendFeatures.supportsMLS) {
+        await this.service?.conversation.handleEpochMismatch();
+      }
+      return onMissedNotifications(notificationId);
+    };
+
     const processNotificationStream = async (abortHandler: AbortHandler) => {
       // Lock websocket in order to buffer any message that arrives while we handle the notification stream
       this.apiClient.transport.ws.lock();
@@ -648,7 +655,7 @@ export class Account<T = any> extends EventEmitter {
           await handleNotification(notification, source);
           onNotificationStreamProgress(progress);
         },
-        onMissedNotifications,
+        handleMissedNotifications,
         abortHandler,
       );
       this.logger.log(`Finished processing notifications ${JSON.stringify(results)}`, results);
