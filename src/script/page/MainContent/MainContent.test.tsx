@@ -17,41 +17,59 @@
  *
  */
 
-import ko from 'knockout';
-import {act, render, waitFor} from '@testing-library/react';
-import MainContent from './MainContent';
-import {ContentViewModel, ContentState} from 'src/script/view_model/ContentViewModel';
+import {act, render, screen, waitFor} from '@testing-library/react';
 
-jest.mock(
-  './panels/preferences/AccountPreferences',
-  () =>
-    function AccountPreferences() {
-      return <span>AccountPreferences</span>;
-    },
-);
+import {ContentViewModel} from 'src/script/view_model/ContentViewModel';
+
+import {MainContent} from './MainContent';
+
+import {withTheme} from '../../auth/util/test/TestUtil';
+import {MainViewModel} from '../../view_model/MainViewModel';
+import {RootProvider} from '../RootProvider';
+import {ContentState, useAppState} from '../useAppState';
+
+jest.mock('./panels/preferences/AccountPreferences', () => ({
+  AccountPreferences: () => <span>AccountPreferences</span>,
+  __esModule: true,
+}));
 
 describe('Preferences', () => {
-  const defaultParams = {
-    contentViewModel: {
+  const mainViewModel = {
+    content: {
       repositories: {} as any,
-      state: ko.observable(ContentState.PREFERENCES_ACCOUNT),
     } as ContentViewModel,
+  } as MainViewModel;
+
+  const defaultParams = {
+    openRightSidebar: jest.fn(),
   };
 
   it('renders the right component according to view state', () => {
+    const {setContentState} = useAppState.getState();
+
     jest.useFakeTimers();
-    const {queryByText, getByText} = render(<MainContent {...defaultParams} />);
-    expect(queryByText('accessibility.headings.preferencesAbout')).toBeNull();
-    expect(queryByText('AccountPreferences')).not.toBeNull();
+    render(
+      withTheme(
+        <RootProvider value={mainViewModel}>
+          <MainContent {...defaultParams} />
+        </RootProvider>,
+      ),
+    );
+
+    expect(screen.queryByText('accessibility.headings.preferencesAbout')).toBeNull();
 
     act(() => {
-      defaultParams.contentViewModel.state(ContentState.PREFERENCES_ABOUT);
+      setContentState(ContentState.PREFERENCES_ABOUT);
     });
-    waitFor(() => getByText('accessibility.headings.preferencesAbout'));
+
+    waitFor(() => screen.getByText('accessibility.headings.preferencesAbout'));
+
     act(() => {
       jest.advanceTimersByTime(1000);
     });
-    expect(queryByText('AccountPreferences')).toBeNull();
-    expect(queryByText('accessibility.headings.preferencesAbout')).not.toBeNull();
+
+    expect(screen.queryByText('AccountPreferences')).toBeNull();
+    expect(screen.queryByText('accessibility.headings.preferencesAbout')).not.toBeNull();
+    jest.useRealTimers();
   });
 });

@@ -79,8 +79,8 @@
   appearance: none;
   background: var(--text-input-background);
   color: currentColor;
-  font-size: 16px;
-  line-height: 24px;
+  font-size: @font-size-base;
+  line-height: @line-height-lg;
   outline: none;
 
   .text-light;
@@ -94,6 +94,11 @@
       color: var(--gray-50);
     }
     color: var(--gray-70);
+  }
+
+  &:placeholder-shown {
+    .ellipsis-nowrap;
+    font-size: 16px;
   }
 
   // hack for chrome to fix line height issue

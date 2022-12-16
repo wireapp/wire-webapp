@@ -17,14 +17,16 @@
  *
  */
 
+import {render} from '@testing-library/react';
 import ko from 'knockout';
+import {act} from 'react-dom/test-utils';
 
 import {createRandomUuid} from 'Util/util';
-import GroupedConversationHeader from './GroupedConversationHeader';
+
+import {GroupedConversationHeader} from './GroupedConversationHeader';
+
 import {ConversationLabel, LabelType} from '../../../../conversation/ConversationLabelRepository';
 import {Conversation} from '../../../../entity/Conversation';
-import {act} from 'react-dom/test-utils';
-import {render} from '@testing-library/react';
 
 describe('GroupedConversationHeader', () => {
   it('displays the unread badge', () => {

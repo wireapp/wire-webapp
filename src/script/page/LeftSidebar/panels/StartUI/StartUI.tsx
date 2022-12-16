@@ -19,31 +19,34 @@
 
 import React, {useRef, useState} from 'react';
 
-import ListWrapper from '../ListWrapper';
-import {container} from 'tsyringe';
-import {TeamState} from '../../../../team/TeamState';
-import {UserState} from '../../../../user/UserState';
-import SearchInput from 'Components/SearchInput';
-import {t} from 'Util/LocalizerUtil';
 import cx from 'classnames';
-import {SearchRepository} from '../../../../search/SearchRepository';
-import {generatePermissionHelpers} from '../../../../user/UserPermission';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {ConversationState} from '../../../../conversation/ConversationState';
-import {TeamRepository} from '../../../../team/TeamRepository';
-import {ConversationRepository} from '../../../../conversation/ConversationRepository';
-import {Config} from '../../../../Config';
-import {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
-import {ServicesTab} from './ServicesTab';
-import {PeopleTab, SearchResultsData} from './PeopleTab';
-import {MainViewModel} from 'src/script/view_model/MainViewModel';
-import {UserRepository} from 'src/script/user/UserRepository';
-import {User} from 'src/script/entity/User';
+import {container} from 'tsyringe';
+
+import {showInviteModal} from 'Components/Modals/InviteModal';
+import {showServiceModal} from 'Components/Modals/ServiceModal';
+import {showUserModal} from 'Components/Modals/UserModal';
+import {SearchInput} from 'Components/SearchInput';
 import {Conversation} from 'src/script/entity/Conversation';
+import {User} from 'src/script/entity/User';
+import {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
-import showUserModal from 'Components/Modals/UserModal';
-import showServiceModal from 'Components/Modals/ServiceModal';
-import showInviteModal from 'Components/Modals/InviteModal';
+import {UserRepository} from 'src/script/user/UserRepository';
+import {MainViewModel} from 'src/script/view_model/MainViewModel';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
+
+import {PeopleTab, SearchResultsData} from './PeopleTab';
+import {ServicesTab} from './ServicesTab';
+
+import {Config} from '../../../../Config';
+import {ConversationRepository} from '../../../../conversation/ConversationRepository';
+import {ConversationState} from '../../../../conversation/ConversationState';
+import {SearchRepository} from '../../../../search/SearchRepository';
+import {TeamRepository} from '../../../../team/TeamRepository';
+import {TeamState} from '../../../../team/TeamState';
+import {generatePermissionHelpers} from '../../../../user/UserPermission';
+import {UserState} from '../../../../user/UserState';
+import {ListWrapper} from '../ListWrapper';
 
 type StartUIProps = {
   conversationRepository: ConversationRepository;
@@ -121,11 +124,7 @@ const StartUI: React.FC<StartUIProps> = ({
       return;
     }
 
-    showUserModal({
-      actionsViewModel: mainViewModel.actions,
-      userId: {domain: user.domain, id: user.id},
-      userRepository: userRepository,
-    });
+    showUserModal({domain: user.domain, id: user.id});
   };
 
   const openService = (service: ServiceEntity) => {
@@ -185,26 +184,30 @@ const StartUI: React.FC<StartUIProps> = ({
 
   const content =
     activeTab === Tabs.PEOPLE ? (
-      <PeopleTab
-        searchQuery={searchQuery}
-        isTeam={isTeam}
-        isFederated={isFederated}
-        teamRepository={teamRepository}
-        teamState={teamState}
-        userState={userState}
-        canSearchUnconnectedUsers={canSearchUnconnectedUsers()}
-        conversationState={conversationState}
-        searchRepository={searchRepository}
-        conversationRepository={conversationRepository}
-        canInviteTeamMembers={canInviteTeamMembers()}
-        canCreateGroupConversation={canCreateGroupConversation()}
-        canCreateGuestRoom={canCreateGuestRoom()}
-        userRepository={userRepository}
-        onClickContact={openContact}
-        onClickConversation={openConversation}
-        onClickUser={openOther}
-        onSearchResults={searchResult => (peopleSearchResults.current = searchResult)}
-      />
+      <>
+        <h2 className="visually-hidden">{t('conversationFooterContacts')}</h2>
+
+        <PeopleTab
+          searchQuery={searchQuery}
+          isTeam={isTeam}
+          isFederated={isFederated}
+          teamRepository={teamRepository}
+          teamState={teamState}
+          userState={userState}
+          canSearchUnconnectedUsers={canSearchUnconnectedUsers()}
+          conversationState={conversationState}
+          searchRepository={searchRepository}
+          conversationRepository={conversationRepository}
+          canInviteTeamMembers={canInviteTeamMembers()}
+          canCreateGroupConversation={canCreateGroupConversation()}
+          canCreateGuestRoom={canCreateGuestRoom()}
+          userRepository={userRepository}
+          onClickContact={openContact}
+          onClickConversation={openConversation}
+          onClickUser={openOther}
+          onSearchResults={searchResult => (peopleSearchResults.current = searchResult)}
+        />
+      </>
     ) : (
       <ServicesTab
         searchQuery={searchQuery}
@@ -223,7 +226,7 @@ const StartUI: React.FC<StartUIProps> = ({
 
   return (
     <ListWrapper
-      id={'start-ui'}
+      id="start-ui"
       header={teamName}
       headerUieName="status-team-name-search"
       onClose={onClose}
@@ -235,4 +238,4 @@ const StartUI: React.FC<StartUIProps> = ({
   );
 };
 
-export default StartUI;
+export {StartUI};

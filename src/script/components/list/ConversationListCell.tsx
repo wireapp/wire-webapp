@@ -17,31 +17,37 @@
  *
  */
 
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import React, {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  MouseEvent as ReactMouseEvent,
+  KeyboardEvent as ReactKeyBoardEvent,
+} from 'react';
+
 import cx from 'classnames';
 
-import {noop, setContextMenuPosition} from 'Util/util';
-import {t} from 'Util/LocalizerUtil';
+import {AvailabilityState} from 'Components/AvailabilityState';
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {GroupAvatar} from 'Components/avatar/GroupAvatar';
+import {Icon} from 'Components/Icon';
+import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-
-import {AVATAR_SIZE} from 'Components/Avatar';
+import {isKey, isOneOfKeys, KEY} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
+import {noop, setContextMenuPosition} from 'Util/util';
 
 import {generateCellState} from '../../conversation/ConversationCellState';
 import {ConversationStatusIcon} from '../../conversation/ConversationStatusIcon';
 import type {Conversation} from '../../entity/Conversation';
 import {MediaType} from '../../media/MediaType';
 
-import Avatar from 'Components/Avatar';
-import GroupAvatar from 'Components/avatar/GroupAvatar';
-import AvailabilityState from 'Components/AvailabilityState';
-import Icon from 'Components/Icon';
-import {isKey, isOneOfKeys, KEY} from 'Util/KeyboardUtil';
-
 export interface ConversationListCellProps {
   conversation: Conversation;
   dataUieName: string;
   isSelected?: (conversation: Conversation) => boolean;
-  onClick: React.MouseEventHandler<Element>;
+  onClick: (event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>) => void;
   onJoinCall: (conversation: Conversation, mediaType: MediaType) => void;
   rightClick: (conversation: Conversation, event: MouseEvent | React.MouseEvent<Element, MouseEvent>) => void;
   showJoinButton: boolean;
@@ -101,6 +107,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
   const contextMenuRef = useRef<HTMLButtonElement>(null);
   const [focusContextMenu, setContextMenuFocus] = useState(false);
   const [isContextMenuOpen, setContextMenuOpen] = useState(false);
+  const contextMenuKeyboardShortcut = `keyboard-shortcut-${conversation.id}`;
 
   const openContextMenu = (event: MouseEvent | React.MouseEvent<Element, MouseEvent>) => {
     event.stopPropagation();
@@ -117,7 +124,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
 
   const handleDivKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key === KEY.SPACE || event.key === KEY.ENTER) {
-      onClick(event as unknown as React.MouseEvent<Element, MouseEvent>);
+      onClick(event);
     } else if (isKey(event, KEY.ARROW_RIGHT)) {
       setContextMenuFocus(true);
     } else {
@@ -165,6 +172,9 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
     }
   }, [index, isActive, isFolder, isConversationListFocus, handleFocus]);
 
+  const mainButtonTabIndex = useMessageFocusedTabIndex(focusConversation);
+  const contextMenuButtonTabIndex = useMessageFocusedTabIndex(focusContextMenu && focusConversation);
+
   return (
     <li onContextMenu={openContextMenu}>
       <div
@@ -181,10 +191,11 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
           onClick={onClick}
           onKeyDown={handleDivKeyDown}
           data-uie-name="go-open-conversation"
-          tabIndex={focusConversation ? 0 : -1}
+          tabIndex={mainButtonTabIndex}
           aria-label={t('accessibility.openConversation', displayName)}
-          title={t('accessibility.conversationOptionsMenuAccessKey')}
+          aria-describedby={contextMenuKeyboardShortcut}
         >
+          <span id={contextMenuKeyboardShortcut} aria-label={t('accessibility.conversationOptionsMenuAccessKey')} />
           <div
             className={cx('conversation-list-cell-left', {
               'conversation-list-cell-left-opaque': removedFromConversation || users.length === 0,
@@ -230,7 +241,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
             data-uie-name="go-options"
             aria-label={t('accessibility.conversationOptionsMenu')}
             type="button"
-            tabIndex={focusContextMenu && focusConversation ? 0 : -1}
+            tabIndex={contextMenuButtonTabIndex}
             aria-haspopup="true"
             onClick={event => {
               event.stopPropagation();
@@ -322,4 +333,4 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
   );
 };
 
-export default ConversationListCell;
+export {ConversationListCell};

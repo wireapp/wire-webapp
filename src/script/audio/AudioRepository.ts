@@ -17,18 +17,20 @@
  *
  */
 
-import {AudioPreference, WebappProperties} from '@wireapp/api-client/src/user/data/';
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {AudioPreference, WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {Logger, getLogger} from 'Util/Logger';
 
-import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
-import {DeviceTypes, MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import {AudioPlayingType} from './AudioPlayingType';
 import {AudioState} from './AudioState';
 import {AudioType} from './AudioType';
+
+import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
+import {DeviceTypes, MediaDevicesHandler} from '../media/MediaDevicesHandler';
 
 enum AUDIO_PLAY_PERMISSION {
   ALLOWED = 0,
@@ -206,6 +208,7 @@ export class AudioRepository {
     if (!audioElement?.paused) {
       this.logger.info(`Stopping sound '${audioId}'`);
       audioElement.pause();
+      audioElement.load();
     }
   };
 

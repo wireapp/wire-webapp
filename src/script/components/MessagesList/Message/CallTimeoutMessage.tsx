@@ -18,13 +18,16 @@
  */
 
 import React from 'react';
-import Icon from 'Components/Icon';
-import {t} from 'Util/LocalizerUtil';
-import {CallingTimeoutMessage} from '../../../entity/message/CallingTimeoutMessage';
 
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import MessageTime from './MessageTime';
 import {REASON} from '@wireapp/avs';
+
+import {Icon} from 'Components/Icon';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
+
+import {MessageTime} from './MessageTime';
+
+import {CallingTimeoutMessage} from '../../../entity/message/CallingTimeoutMessage';
 
 export interface CallTimeoutMessageProps {
   message: CallingTimeoutMessage;
@@ -47,16 +50,16 @@ const CallTimeoutMessage: React.FC<CallTimeoutMessageProps> = ({message}) => {
         data-uie-name="element-message-call"
         data-uie-value={reason === REASON.NOONE_JOINED ? 'no-one-joined' : 'everyone-left'}
       >
-        <span className="ellipsis">
+        <p>
           {text}
           <b>{reason === REASON.NOONE_JOINED ? t('callNoOneJoined') : t('callEveryOneLeft')}</b>
-        </span>
+        </p>
       </div>
-      <div className="message-body-actions">
+      <p className="message-body-actions">
         <MessageTime timestamp={timestamp} data-uie-uid={message.id} data-uie-name="item-message-call-timestamp" />
-      </div>
+      </p>
     </div>
   );
 };
 
-export default CallTimeoutMessage;
+export {CallTimeoutMessage};

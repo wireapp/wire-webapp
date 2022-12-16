@@ -19,31 +19,29 @@
 
 //@ts-check
 
-import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
+import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 
+import {ClientEntity} from 'src/script/client/ClientEntity';
+import {ConnectionMapper} from 'src/script/connection/ConnectionMapper';
+import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
+import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
 import 'src/script/localization/Localizer';
+import {CALL_MESSAGE_TYPE} from 'src/script/message/CallMessageType';
+import {MentionEntity} from 'src/script/message/MentionEntity';
+import {StatusType} from 'src/script/message/StatusType';
 import {createRandomUuid} from 'Util/util';
 
 import {Conversation} from './Conversation';
-import {ContentMessage} from './message/ContentMessage';
 import {CallMessage} from './message/CallMessage';
+import {ContentMessage} from './message/ContentMessage';
+import {MemberMessage} from './message/MemberMessage';
 import {Message} from './message/Message';
 import {PingMessage} from './message/PingMessage';
-import {User} from './User';
 import {Text} from './message/Text';
-import {MemberMessage} from './message/MemberMessage';
+import {User} from './User';
 
-import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
-import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
-
-import {StatusType} from 'src/script/message/StatusType';
-import {CALL_MESSAGE_TYPE} from 'src/script/message/CallMessageType';
-
-import {ConnectionMapper} from 'src/script/connection/ConnectionMapper';
-import {ClientEntity} from 'src/script/client/ClientEntity';
-import {MentionEntity} from 'src/script/message/MentionEntity';
 import {entities} from '../../../test/api/payloads';
 
 describe('Conversation', () => {
@@ -510,7 +508,7 @@ describe('Conversation', () => {
     it('displays "Empty Conversation" if no other participants are in the conversation', () => {
       conversation_et.type(CONVERSATION_TYPE.REGULAR);
 
-      expect(conversation_et.display_name()).toBe(window.z.string.conversationsEmptyConversation);
+      expect(conversation_et.display_name()).toBe('Group conversation');
     });
 
     it('displays a fallback if no user name has been set for a group conversation', () => {
@@ -1081,7 +1079,7 @@ describe('Conversation', () => {
     it('updates the participating user IDs with the user ID of the other party', () => {
       const connector_user_id = 'b43b376d-7b5a-4d77-89be-81a02892db8c';
 
-      /** @type {import('@wireapp/api-client/src/connection/').Connection} */
+      /** @type {import('@wireapp/api-client/lib/connection/').Connection} */
       const payload_connection = {
         conversation: '15a7f358-8eba-4b8e-bcf2-61a08eb53349',
         from: '616cbbeb-1360-4e17-b333-e000662257bd',

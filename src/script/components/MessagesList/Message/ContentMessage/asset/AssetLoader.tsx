@@ -19,8 +19,11 @@
 
 import React from 'react';
 
-import Icon from '../../../../Icon';
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+
 import {handleKeyDown} from 'Util/KeyboardUtil';
+
+import {Icon} from '../../../../Icon';
 
 export interface AssetLoaderProps {
   large?: boolean;
@@ -42,10 +45,10 @@ const AssetLoader: React.FC<AssetLoaderProps> = ({large, loadProgress, onCancel}
   return (
     <div
       role="button"
-      tabIndex={0}
+      tabIndex={TabIndex.FOCUSABLE}
       className="media-button"
       onClick={onClick}
-      onKeyDown={e => handleKeyDown(e, onClick.bind(null, e))}
+      onKeyDown={event => handleKeyDown(event, () => onClick(event))}
       data-uie-name="status-loading-media"
     >
       <svg aria-hidden="true" viewBox={viewBox} data-uie-name="asset-loader-svg">
@@ -58,6 +61,7 @@ const AssetLoader: React.FC<AssetLoaderProps> = ({large, loadProgress, onCancel}
           data-uie-name="asset-loader-circle"
         />
       </svg>
+
       <div className="media-button__icon">
         <Icon.Close />
       </div>
@@ -65,4 +69,4 @@ const AssetLoader: React.FC<AssetLoaderProps> = ({large, loadProgress, onCancel}
   );
 };
 
-export default AssetLoader;
+export {AssetLoader};

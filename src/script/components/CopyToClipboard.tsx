@@ -18,14 +18,19 @@
  */
 
 import React from 'react';
-import {registerReactComponent} from 'Util/ComponentUtil';
+
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+import cx from 'classnames';
+
 import {handleKeyDown} from 'Util/KeyboardUtil';
 
 export interface CopyToClipboardProps {
   text: string;
+  className?: string;
+  dataUieName?: string;
 }
 
-const CopyToClipboard: React.FC<CopyToClipboardProps> = ({text}) => {
+const CopyToClipboard: React.FC<CopyToClipboardProps> = ({text, className = '', dataUieName = 'copy-to-clipboard'}) => {
   const onClick = ({currentTarget}: React.UIEvent) => {
     if (window.getSelection) {
       const selectionRange = document.createRange();
@@ -42,16 +47,15 @@ const CopyToClipboard: React.FC<CopyToClipboardProps> = ({text}) => {
   return (
     <div
       role="button"
-      tabIndex={0}
-      data-uie-name="copy-to-clipboard"
-      className="copy-to-clipboard"
+      tabIndex={TabIndex.FOCUSABLE}
+      data-uie-name={dataUieName}
+      className={cx('copy-to-clipboard', className)}
       onClick={onClick}
-      onKeyDown={e => handleKeyDown(e, onClick.bind(null, e))}
+      onKeyDown={event => handleKeyDown(event, () => onClick(event))}
     >
       {text}
     </div>
   );
 };
 
-export default CopyToClipboard;
-registerReactComponent('copy-to-clipboard', CopyToClipboard);
+export {CopyToClipboard};

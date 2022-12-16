@@ -18,7 +18,9 @@
  */
 
 import React from 'react';
+
 import cx from 'classnames';
+
 import {Select} from '@wireapp/react-ui-kit';
 
 interface DeviceSelectProps {
@@ -55,12 +57,13 @@ const DeviceSelect: React.FC<DeviceSelectProps> = ({
       className={cx('preferences-option', {
         'preferences-av-select-disabled': disabled,
       })}
+      css={{width: 'var(--preferences-width)'}}
     >
       <div className="preferences-option-icon preferences-av-select-icon">
         <DeviceIcon />
       </div>
 
-      <div css={{width: '550px'}}>
+      <div css={{width: '100%'}}>
         <Select
           id={uieName}
           onChange={option => {
@@ -81,4 +84,4 @@ const DeviceSelect: React.FC<DeviceSelectProps> = ({
   );
 };
 
-export default DeviceSelect;
+export {DeviceSelect};

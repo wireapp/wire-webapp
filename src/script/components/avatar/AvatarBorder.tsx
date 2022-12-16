@@ -18,6 +18,7 @@
  */
 
 import React from 'react';
+
 import {CSS_FILL_PARENT} from 'Util/CSSMixin';
 
 export interface AvatarBorderProps {
@@ -34,4 +35,4 @@ const AvatarBorder: React.FunctionComponent<AvatarBorderProps> = ({borderRadius 
   />
 );
 
-export default AvatarBorder;
+export {AvatarBorder};

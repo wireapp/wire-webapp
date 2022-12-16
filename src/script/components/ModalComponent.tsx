@@ -17,14 +17,20 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
 import React, {useEffect, useId, useRef, useState, useCallback} from 'react';
+
+import {CSSObject} from '@emotion/react';
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+
 import {noop, preventFocusOutside} from 'Util/util';
-import Icon from './Icon';
+
+import {Icon} from './Icon';
 
 interface ModalComponentProps {
   children: React.ReactNode;
   isShown: boolean;
+  id?: string;
+  className?: string;
   onBgClick?: () => void;
   onClosed?: () => void;
   showLoading?: boolean;
@@ -61,11 +67,11 @@ const ModalContentStyles: CSSObject = {
   cursor: 'default',
   display: 'flex',
   flexDirection: 'column',
-  fontSize: 14,
+  fontSize: '0.875rem',
   margin: 'auto',
   maxHeight: 615,
   overflow: 'hidden',
-  overflowY: 'hidden',
+  overflowY: 'auto',
   padding: 16,
   position: 'relative',
   transform: 'scale(0.8)',
@@ -79,6 +85,8 @@ const ModalContentVisibleStyles: CSSObject = {
 };
 
 const ModalComponent: React.FC<ModalComponentProps> = ({
+  id,
+  className = '',
   isShown,
   onBgClick = noop,
   onClosed = noop,
@@ -138,9 +146,11 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
       onClick={onBgClick}
       css={hasVisibleClass ? ModalOverlayVisibleStyles : ModalOverlayStyles}
       style={{display: displayNone ? 'none' : 'flex'}}
-      tabIndex={0}
+      tabIndex={TabIndex.FOCUSABLE}
       role="button"
       onKeyDown={noop}
+      id={id}
+      className={className}
       {...rest}
     >
       {showLoading ? (
@@ -150,7 +160,7 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
           id={trapId}
           onClick={event => event.stopPropagation()}
           role="button"
-          tabIndex={-1}
+          tabIndex={TabIndex.UNFOCUSABLE}
           onKeyDown={noop}
           css={{...(hasVisibleClass ? ModalContentVisibleStyles : ModalContentStyles), ...wrapperCSS}}
         >
@@ -161,4 +171,4 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
   );
 };
 
-export default ModalComponent;
+export {ModalComponent};

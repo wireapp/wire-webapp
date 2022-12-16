@@ -18,6 +18,7 @@
  */
 
 import React from 'react';
+
 import {CSS_SQUARE, CSS_FLEX_CENTER} from 'Util/CSSMixin';
 
 import type {User} from '../../entity/User';
@@ -73,4 +74,4 @@ const GroupAvatar: React.FC<GroupAvatarProps> = ({users, isLight = false, classN
   );
 };
 
-export default GroupAvatar;
+export {GroupAvatar};

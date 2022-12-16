@@ -18,14 +18,15 @@
  */
 
 import React from 'react';
-import {LegalHoldMessage as LegalHoldMessageEntity} from '../../../entity/message/LegalHoldMessage';
-import LegalHoldDot from 'Components/LegalHoldDot';
 
-import {t} from 'Util/LocalizerUtil';
-import {amplify} from 'amplify';
-import {LegalHoldModalViewModel} from '../../../view_model/content/LegalHoldModalViewModel';
 import {container} from 'tsyringe';
+
+import {LegalHoldDot} from 'Components/LegalHoldDot';
+import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
+import {t} from 'Util/LocalizerUtil';
+
 import {ConversationState} from '../../../conversation/ConversationState';
+import {LegalHoldMessage as LegalHoldMessageEntity} from '../../../entity/message/LegalHoldMessage';
 
 export interface LegalHoldMessageProps {
   conversationState?: ConversationState;
@@ -36,18 +37,20 @@ const LegalHoldMessage: React.FC<LegalHoldMessageProps> = ({
   message,
   conversationState = container.resolve(ConversationState),
 }) => {
-  const showLegalHold = () => {
-    amplify.publish(LegalHoldModalViewModel.SHOW_DETAILS, conversationState.activeConversation());
-  };
+  const {showUsers} = useLegalHoldModalState(state => state);
+  const showLegalHold = () => showUsers(false, conversationState.activeConversation());
+
   return (
     <div className="message-header">
       <div className="message-header-icon">
         <LegalHoldDot isMessage />
       </div>
+
       <div className="message-header-label">
         {message.isActivationMessage ? (
           <>
-            <span data-uie-name="status-legalhold-activated">{t('legalHoldActivated')}</span>
+            <p data-uie-name="status-legalhold-activated">{t('legalHoldActivated')}</p>
+
             <button
               type="button"
               className="button-reset-default message-header-label__learn-more"
@@ -57,13 +60,13 @@ const LegalHoldMessage: React.FC<LegalHoldMessageProps> = ({
             </button>
           </>
         ) : (
-          <span className="message-header-label" data-uie-name="status-legalhold-deactivated">
+          <p className="message-header-label" data-uie-name="status-legalhold-deactivated">
             {t('legalHoldDeactivated')}
-          </span>
+          </p>
         )}
       </div>
     </div>
   );
 };
 
-export default LegalHoldMessage;
+export {LegalHoldMessage};

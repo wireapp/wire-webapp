@@ -19,11 +19,12 @@
 
 import ko from 'knockout';
 
+import {Runtime} from '@wireapp/commons';
+
 import {Logger, getLogger} from 'Util/Logger';
 import {loadValue, storeValue} from 'Util/StorageUtil';
 
 import {MediaDeviceType} from './MediaDeviceType';
-import {Runtime} from '@wireapp/commons';
 
 declare global {
   interface Window {
@@ -271,16 +272,16 @@ export class MediaDevicesHandler {
        * for further info please visit:
        * https://www.electronjs.org/docs/latest/breaking-changes#removed-desktopcapturergetsources-in-the-renderer
        */
-      if (window.desktopCapturer.getDesktopSources) {
+      if (window.desktopCapturer?.getDesktopSources) {
         return window.desktopCapturer.getDesktopSources(options);
       }
-      if (window.desktopCapturer.getSources.constructor.name === 'AsyncFunction') {
+      if (window.desktopCapturer?.getSources.constructor.name === 'AsyncFunction') {
         // Electron > 4
         return window.desktopCapturer.getSources(options);
       }
       // Electron <= 4
       return new Promise((resolve, reject) =>
-        window.desktopCapturer.getSources(options, (error, screenSources) =>
+        window.desktopCapturer?.getSources(options, (error, screenSources) =>
           error ? reject(error) : resolve(screenSources),
         ),
       );

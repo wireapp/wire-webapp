@@ -18,40 +18,46 @@
  */
 
 import React from 'react';
+
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import AssetHeader from './AssetHeader';
-import RestrictedFile from 'Components/asset/RestrictedFile';
-import AssetLoader from './AssetLoader';
-import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
-import {t} from 'Util/LocalizerUtil';
+import {RestrictedFile} from 'Components/asset/RestrictedFile';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
+import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
-import type {FileAsset} from '../../../../../entity/message/FileAsset';
-import type {ContentMessage} from '../../../../../entity/message/ContentMessage';
-import {AssetTransferState} from '../../../../../assets/AssetTransferState';
-import {TeamState} from '../../../../../team/TeamState';
 import {useAssetTransfer} from './AbstractAssetTransferStateTracker';
+import {AssetHeader} from './AssetHeader';
+import {AssetLoader} from './AssetLoader';
+
+import {AssetTransferState} from '../../../../../assets/AssetTransferState';
+import type {ContentMessage} from '../../../../../entity/message/ContentMessage';
+import type {FileAsset as FileAssetType} from '../../../../../entity/message/FileAsset';
+import {TeamState} from '../../../../../team/TeamState';
+import {useMessageFocusedTabIndex} from '../../util';
 
 export interface FileAssetProps {
   hasHeader?: boolean;
   message: ContentMessage;
   teamState?: TeamState;
+  isFocusable?: boolean;
 }
 
-const FileAssetComponent: React.FC<FileAssetProps> = ({
+const FileAsset: React.FC<FileAssetProps> = ({
   message,
   hasHeader = false,
   teamState = container.resolve(TeamState),
+  isFocusable = true,
 }) => {
-  const asset = message.getFirstAsset() as FileAsset;
+  const asset = message.getFirstAsset() as FileAssetType;
 
   const {transferState, downloadAsset, uploadProgress, cancelUpload} = useAssetTransfer(message);
   const {isObfuscated} = useKoSubscribableChildren(message, ['isObfuscated']);
   const {downloadProgress} = useKoSubscribableChildren(asset, ['downloadProgress']);
   const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
+  const messageFocusedTabIndex = useMessageFocusedTabIndex(isFocusable);
 
   const fileName = trimFileExtension(asset.file_name);
   const fileExtension = getFileExtension(asset.file_name);
@@ -71,6 +77,12 @@ const FileAssetComponent: React.FC<FileAssetProps> = ({
   const isFailedDownloadingHash = assetStatus === AssetTransferState.DOWNLOAD_FAILED_HASH;
   const isUploading = assetStatus === AssetTransferState.UPLOADING;
 
+  const onDownloadAsset = async () => {
+    if (isUploaded) {
+      downloadAsset(asset);
+    }
+  };
+
   if (isObfuscated) {
     return null;
   }
@@ -78,6 +90,7 @@ const FileAssetComponent: React.FC<FileAssetProps> = ({
   return (
     <div className="file-asset" data-uie-name="file-asset" data-uie-value={asset.file_name}>
       {hasHeader && <AssetHeader message={message} />}
+
       {isFileSharingReceivingEnabled ? (
         <div
           className={cx('file', {
@@ -86,18 +99,10 @@ const FileAssetComponent: React.FC<FileAssetProps> = ({
           data-uie-name="file"
           data-uie-value={asset.file_name}
           role="button"
-          tabIndex={0}
+          tabIndex={messageFocusedTabIndex}
           aria-label={`${t('conversationContextMenuDownload')} ${fileName}.${fileExtension}`}
-          onClick={() => {
-            if (isUploaded) {
-              downloadAsset(asset);
-            }
-          }}
-          onKeyDown={event => {
-            if (isUploaded) {
-              handleKeyDown(event, downloadAsset.bind(null, asset));
-            }
-          }}
+          onClick={onDownloadAsset}
+          onKeyDown={event => handleKeyDown(event, onDownloadAsset)}
         >
           {isPendingUpload ? (
             <div className="asset-placeholder loading-dots" />
@@ -120,20 +125,26 @@ const FileAssetComponent: React.FC<FileAssetProps> = ({
               )}
 
               <div className="file__desc">
-                <div className="label-bold-xs ellipsis" data-uie-name="file-name">
+                <p className="label-bold-xs ellipsis" data-uie-name="file-name">
                   {fileName}
-                </div>
+                </p>
                 <ul className="file__desc__meta label-xs text-foreground">
                   <li className="label-nocase-xs" data-uie-name="file-size">
                     {formattedFileSize}
                   </li>
+
                   {fileExtension && <li data-uie-name="file-type">{fileExtension}</li>}
+
                   {isUploading && <li data-uie-name="file-status">{t('conversationAssetUploading')}</li>}
+
                   {isFailedUpload && <li data-uie-name="file-status">{t('conversationAssetUploadFailed')}</li>}
+
                   {isDownloading && <li data-uie-name="file-status">{t('conversationAssetDownloading')}</li>}
+
                   {isFailedDownloadingDecrypt && (
                     <li data-uie-name="file-status">{t('conversationAssetFailedDecryptDownloading')}</li>
                   )}
+
                   {isFailedDownloadingHash && (
                     <li data-uie-name="file-status">{t('conversationAssetFailedHashDownloading')}</li>
                   )}
@@ -149,4 +160,4 @@ const FileAssetComponent: React.FC<FileAssetProps> = ({
   );
 };
 
-export default FileAssetComponent;
+export {FileAsset};

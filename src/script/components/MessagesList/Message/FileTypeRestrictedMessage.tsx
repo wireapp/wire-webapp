@@ -18,7 +18,9 @@
  */
 
 import React from 'react';
+
 import {t} from 'Util/LocalizerUtil';
+
 import {FileTypeRestrictedMessage as FileTypeRestrictedMessageEntity} from '../../../entity/message/FileTypeRestrictedMessage';
 
 export interface FileTypeRestrictedMessageProps {
@@ -32,14 +34,14 @@ const FileTypeRestrictedMessage: React.FC<FileTypeRestrictedMessageProps> = ({me
         <span className="icon-sysmsg-error text-red" />
       </div>
       {message.isIncoming ? (
-        <div
+        <p
           className="message-header-label"
           dangerouslySetInnerHTML={{__html: t('fileTypeRestrictedIncoming', message.name)}}
           data-uie-name="filetype-restricted-message-text"
           data-uie-value="incoming"
         />
       ) : (
-        <div
+        <p
           className="message-header-label"
           dangerouslySetInnerHTML={{__html: t('fileTypeRestrictedOutgoing', message.fileExt)}}
           data-uie-name="filetype-restricted-message-text"
@@ -50,4 +52,4 @@ const FileTypeRestrictedMessage: React.FC<FileTypeRestrictedMessageProps> = ({me
   );
 };
 
-export default FileTypeRestrictedMessage;
+export {FileTypeRestrictedMessage};

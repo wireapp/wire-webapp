@@ -17,10 +17,11 @@
  *
  */
 
-import {Mention, IMention} from '@wireapp/protocol-messaging';
-import {matchQualifiedIds} from 'Util/QualifiedId';
-import {QualifiedId} from '@wireapp/api-client/src/user';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 
+import {IMention, Mention} from '@wireapp/protocol-messaging';
+
+import {matchQualifiedIds} from 'Util/QualifiedId';
 import {isUUID} from 'Util/ValidationUtil';
 
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';

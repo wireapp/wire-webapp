@@ -188,7 +188,7 @@
   -webkit-appearance: none;
   background: none;
   cursor: pointer;
-  line-height: 24px;
+  line-height: @line-height-lg;
   outline: 0;
 
   &.disabled {
@@ -465,7 +465,6 @@
 
   &:focus-visible {
     background-color: var(--gray-20);
-    outline: 1px solid var(--gray-60);
   }
 
   body.theme-dark & {
@@ -480,7 +479,6 @@
 
     &:focus-visible {
       background-color: var(--gray-80);
-      outline: 1px solid var(--gray-50);
     }
   }
 

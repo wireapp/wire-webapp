@@ -20,6 +20,7 @@
 import dotenv from 'dotenv-extended';
 import fs from 'fs-extra';
 import logdown from 'logdown';
+
 import path from 'path';
 
 import type {ServerConfig} from './ServerConfig';
@@ -122,6 +123,7 @@ const config: ServerConfig = {
     BRAND_NAME: process.env.BRAND_NAME,
     CHROME_ORIGIN_TRIAL_TOKEN: process.env.CHROME_ORIGIN_TRIAL_TOKEN,
     COUNTLY_API_KEY: process.env.COUNTLY_API_KEY,
+    ENABLE_DEV_BACKEND_API: process.env.ENABLE_DEV_BACKEND_API == 'true',
     ENVIRONMENT: nodeEnvironment,
     FEATURE: {
       ALLOWED_FILE_UPLOAD_EXTENSIONS: (process.env.FEATURE_ALLOWED_FILE_UPLOAD_EXTENSIONS || '*')
@@ -143,6 +145,7 @@ const config: ServerConfig = {
       ENABLE_MEDIA_EMBEDS: process.env.FEATURE_ENABLE_MEDIA_EMBEDS != 'false',
       ENABLE_MLS: process.env.FEATURE_ENABLE_MLS == 'true',
       ENABLE_PHONE_LOGIN: process.env.FEATURE_ENABLE_PHONE_LOGIN != 'false',
+      ENABLE_PROTEUS_CORE_CRYPTO: process.env.FEATURE_ENABLE_PROTEUS_CORE_CRYPTO == 'true',
       ENABLE_SSO: process.env.FEATURE_ENABLE_SSO == 'true',
       ENFORCE_CONSTANT_BITRATE: process.env.FEATURE_ENFORCE_CONSTANT_BITRATE == 'true',
       FORCE_EXTRA_CLIENT_ENTROPY: process.env.FEATURE_FORCE_EXTRA_CLIENT_ENTROPY == 'true',

@@ -19,9 +19,9 @@
 
 import React from 'react';
 
-import {registerReactComponent} from 'Util/ComponentUtil';
-import Icon from '../../Icon';
 import {listCSS} from './PanelActions.styles';
+
+import {Icon} from '../../Icon';
 
 export interface MenuItem {
   click: () => void;
@@ -43,6 +43,7 @@ const PanelActions: React.FC<PanelActionsProps> = ({items}) => {
             <span className="panel__action-item__icon">
               <Icon name={icon} />
             </span>
+
             <span data-uie-name={`${identifier}-item-text`} className="panel__action-item__text">
               {label}
             </span>
@@ -53,6 +54,4 @@ const PanelActions: React.FC<PanelActionsProps> = ({items}) => {
   );
 };
 
-export default PanelActions;
-
-registerReactComponent('panel-actions', PanelActions);
+export {PanelActions};

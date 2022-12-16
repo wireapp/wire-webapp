@@ -17,54 +17,55 @@
  *
  */
 
-import {CONVERSATION_EVENT, ConversationEvent} from '@wireapp/api-client/src/event/';
+import {CONVERSATION_EVENT, ConversationEvent} from '@wireapp/api-client/lib/event/';
+import {container} from 'tsyringe';
+
 import {LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
-import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
+import {getLogger, Logger} from 'Util/Logger';
 import {base64ToArray} from 'Util/util';
 
-import {AssetTransferState} from '../assets/AssetTransferState';
+import {MemberJoinEvent, MemberLeaveEvent, TeamMemberLeaveEvent, ErrorEvent} from './EventBuilder';
 
-import {MediumImage} from '../entity/message/MediumImage';
-import {VerificationMessage} from '../entity/message/VerificationMessage';
-import {MessageTimerUpdateMessage} from '../entity/message/MessageTimerUpdateMessage';
-import {RenameMessage} from '../entity/message/RenameMessage';
-import {Location} from '../entity/message/Location';
-import {DeleteMessage} from '../entity/message/DeleteMessage';
-import {MemberMessage} from '../entity/message/MemberMessage';
-import {DecryptErrorMessage} from '../entity/message/DecryptErrorMessage';
+import {AssetRemoteData} from '../assets/AssetRemoteData';
+import {AssetTransferState} from '../assets/AssetTransferState';
+import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
+import {AssetData} from '../cryptography/CryptographyMapper';
+import type {Conversation} from '../entity/Conversation';
+import type {Asset} from '../entity/message/Asset';
+import {Button} from '../entity/message/Button';
+import {CallingTimeoutMessage} from '../entity/message/CallingTimeoutMessage';
+import {CallMessage} from '../entity/message/CallMessage';
+import {CompositeMessage} from '../entity/message/CompositeMessage';
 import {ContentMessage} from '../entity/message/ContentMessage';
+import {DecryptErrorMessage} from '../entity/message/DecryptErrorMessage';
+import {DeleteMessage} from '../entity/message/DeleteMessage';
+import {FileAsset} from '../entity/message/FileAsset';
+import {FileTypeRestrictedMessage} from '../entity/message/FileTypeRestrictedMessage';
+import {LegalHoldMessage} from '../entity/message/LegalHoldMessage';
+import {LinkPreview as LinkPreviewEntity, LinkPreviewData} from '../entity/message/LinkPreview';
+import {Location} from '../entity/message/Location';
+import {MediumImage} from '../entity/message/MediumImage';
+import {MemberMessage} from '../entity/message/MemberMessage';
+import type {Message} from '../entity/message/Message';
+import {MessageTimerUpdateMessage} from '../entity/message/MessageTimerUpdateMessage';
 import {MissedMessage} from '../entity/message/MissedMessage';
 import {PingMessage} from '../entity/message/PingMessage';
-import {Text} from '../entity/message/Text';
-import {FileAsset} from '../entity/message/FileAsset';
-import {Button} from '../entity/message/Button';
 import {ReceiptModeUpdateMessage} from '../entity/message/ReceiptModeUpdateMessage';
-
-import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
-import {ClientEvent} from '../event/Client';
-import {AssetRemoteData} from '../assets/AssetRemoteData';
-
-import {SystemMessageType} from '../message/SystemMessageType';
-import {StatusType} from '../message/StatusType';
-import {CallMessage} from '../entity/message/CallMessage';
-import {CALL_MESSAGE_TYPE} from '../message/CallMessageType';
-import {QuoteEntity} from '../message/QuoteEntity';
-import {MentionEntity} from '../message/MentionEntity';
-import {LegalHoldMessage} from '../entity/message/LegalHoldMessage';
-import {CompositeMessage} from '../entity/message/CompositeMessage';
-import {ConversationError} from '../error/ConversationError';
-import {FileTypeRestrictedMessage} from '../entity/message/FileTypeRestrictedMessage';
-import type {EventRecord} from '../storage';
-import type {Conversation} from '../entity/Conversation';
-import type {Message} from '../entity/message/Message';
-import type {Asset} from '../entity/message/Asset';
+import {RenameMessage} from '../entity/message/RenameMessage';
+import {Text} from '../entity/message/Text';
 import type {Text as TextAsset} from '../entity/message/Text';
-import {LinkPreview as LinkPreviewEntity, LinkPreviewData} from '../entity/message/LinkPreview';
-import {CallingTimeoutMessage} from '../entity/message/CallingTimeoutMessage';
-import {MemberJoinEvent, MemberLeaveEvent, TeamMemberLeaveEvent, ErrorEvent} from './EventBuilder';
-import {AssetData} from '../cryptography/CryptographyMapper';
+import {VerificationMessage} from '../entity/message/VerificationMessage';
+import {ConversationError} from '../error/ConversationError';
+import {ClientEvent} from '../event/Client';
+import {CALL_MESSAGE_TYPE} from '../message/CallMessageType';
+import {MentionEntity} from '../message/MentionEntity';
+import {QuoteEntity} from '../message/QuoteEntity';
+import {StatusType} from '../message/StatusType';
+import {SystemMessageType} from '../message/SystemMessageType';
+import {APIClient} from '../service/APIClientSingleton';
+import type {EventRecord} from '../storage';
 
 // Event Mapper to convert all server side JSON events into core entities.
 export class EventMapper {
@@ -72,8 +73,12 @@ export class EventMapper {
   /**
    * Construct a new Event Mapper.
    */
-  constructor() {
+  constructor(private readonly apiClient = container.resolve(APIClient)) {
     this.logger = getLogger('EventMapper');
+  }
+
+  private get fallbackDomain() {
+    return this.apiClient.context?.domain;
   }
 
   /**
@@ -157,7 +162,7 @@ export class EventMapper {
       const {
         preview_id,
         preview_key,
-        preview_domain = qualified_conversation?.domain,
+        preview_domain = qualified_conversation?.domain || this.fallbackDomain,
         preview_otr_key,
         preview_sha256,
         preview_token,
@@ -742,7 +747,7 @@ export class EventMapper {
     const {
       preview_id,
       preview_key,
-      preview_domain = qualified_conversation?.domain,
+      preview_domain = qualified_conversation?.domain || this.fallbackDomain,
       preview_otr_key,
       preview_sha256,
       preview_token,
@@ -770,7 +775,6 @@ export class EventMapper {
     const {data: eventData, conversation: conversationId, qualified_conversation} = event;
     const {content_length, content_type, id: assetId, info} = eventData;
     const assetEntity = new MediumImage(assetId);
-
     assetEntity.file_size = content_length;
     assetEntity.file_type = content_type;
 
@@ -779,12 +783,11 @@ export class EventMapper {
       assetEntity.height = `${info.height}px`;
     }
 
-    const {key, otr_key, sha256, token, domain = qualified_conversation?.domain} = eventData;
+    const {key, otr_key, sha256, token, domain = qualified_conversation?.domain || this.fallbackDomain} = eventData;
 
     if (!otr_key || !sha256) {
       return assetEntity;
     }
-
     const remoteData = key
       ? AssetRemoteData.v3(key, domain, otr_key, sha256, token, true)
       : AssetRemoteData.v2(conversationId, assetId, otr_key, sha256, true);
@@ -819,7 +822,14 @@ export class EventMapper {
           otrKey = new Uint8Array(otrKey);
           sha256 = new Uint8Array(sha256);
 
-          const remoteData = AssetRemoteData.v3(assetKey, assetDomain, otrKey, sha256, assetToken, true);
+          const remoteData = AssetRemoteData.v3(
+            assetKey,
+            assetDomain || this.fallbackDomain,
+            otrKey,
+            sha256,
+            assetToken,
+            true,
+          );
           linkPreviewData.image = remoteData;
         }
       }

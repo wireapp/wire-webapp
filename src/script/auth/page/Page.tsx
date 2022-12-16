@@ -17,11 +17,13 @@
  *
  */
 
-import {TeamData} from '@wireapp/api-client/src/team';
 import React from 'react';
+
+import {TeamData} from '@wireapp/api-client/lib/team';
 import {connect} from 'react-redux';
 import {Navigate} from 'react-router-dom';
-import UnsupportedBrowser from '../component/UnsupportedBrowser';
+
+import {UnsupportedBrowser} from '../component/UnsupportedBrowser';
 import {RootState} from '../module/reducer';
 import {RegistrationDataState} from '../module/reducer/authReducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
@@ -43,7 +45,7 @@ const redirects = {
   [AuthSelector.REGISTER_FLOW.TEAM]: ROUTE.CREATE_TEAM,
 };
 
-const Page = ({
+const PageComponent = ({
   hasAccountData,
   hasTeamData,
   currentFlow,
@@ -69,4 +71,6 @@ const mapStateToProps = (state: RootState) => ({
   isStateAuthenticated: AuthSelector.isAuthenticated(state),
 });
 
-export default connect(mapStateToProps)(Page);
+const Page = connect(mapStateToProps)(PageComponent);
+
+export {Page};

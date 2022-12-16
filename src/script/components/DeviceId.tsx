@@ -18,6 +18,7 @@
  */
 
 import React from 'react';
+
 import {splitFingerprint} from 'Util/StringUtil';
 
 export interface DeviceIdProps {
@@ -36,4 +37,4 @@ const DeviceId: React.FC<DeviceIdProps> = ({deviceId}) => {
   );
 };
 
-export default DeviceId;
+export {DeviceId};

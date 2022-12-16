@@ -17,10 +17,12 @@
  *
  */
 
-import {LoginData} from '@wireapp/api-client/src/auth';
-import {Input, Loading, Button} from '@wireapp/react-ui-kit';
 import React, {useRef, useState} from 'react';
+
+import {LoginData} from '@wireapp/api-client/lib/auth';
 import {useIntl} from 'react-intl';
+
+import {Button, Input, Loading} from '@wireapp/react-ui-kit';
 
 import {isValidEmail, isValidPhoneNumber, isValidUsername} from 'Util/ValidationUtil';
 
@@ -130,4 +132,4 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
   );
 };
 
-export default LoginForm;
+export {LoginForm};

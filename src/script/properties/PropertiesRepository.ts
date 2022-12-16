@@ -17,24 +17,27 @@
  *
  */
 
-import ko from 'knockout';
+import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
+import {ConsentType} from '@wireapp/api-client/lib/self/';
+import {AudioPreference, NotificationPreference, WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
+import ko from 'knockout';
+
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {AudioPreference, NotificationPreference, WebappProperties} from '@wireapp/api-client/src/user/data/';
-import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
-import {ConsentType} from '@wireapp/api-client/src/self/';
 
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
-import {Logger, getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 
+import type {PropertiesService} from './PropertiesService';
+import {PROPERTIES_TYPE} from './PropertiesType';
+
+import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
 import type {User} from '../entity/User';
 import type {SelfService} from '../self/SelfService';
 import {ConsentValue} from '../user/ConsentValue';
-import {ModalsViewModel} from '../view_model/ModalsViewModel';
-import type {PropertiesService} from './PropertiesService';
-import {PROPERTIES_TYPE} from './PropertiesType';
+import {CONVERSATION_TYPING_INDICATOR_MODE} from '../user/TypingIndicatorMode';
 
 export class PropertiesRepository {
   // Value names are specified by the protocol but key names can be changed.
@@ -49,12 +52,17 @@ export class PropertiesRepository {
         defaultValue: RECEIPT_MODE.OFF,
         key: 'WIRE_RECEIPT_MODE',
       },
+      WIRE_TYPING_INDICATOR_MODE: {
+        defaultValue: CONVERSATION_TYPING_INDICATOR_MODE.ON,
+        key: 'WIRE_TYPING_INDICATOR_MODE',
+      },
     };
   }
 
   private readonly logger: Logger;
   public readonly propertiesService: PropertiesService;
   public readonly receiptMode: ko.Observable<RECEIPT_MODE>;
+  public readonly typingIndicatorMode: ko.Observable<CONVERSATION_TYPING_INDICATOR_MODE>;
   private readonly selfService: SelfService;
   private readonly selfUser: ko.Observable<User>;
   public properties: WebappProperties;
@@ -77,6 +85,7 @@ export class PropertiesRepository {
           replace_inline: true,
         },
         interface: {
+          font_size: '',
           theme: 'default',
           view_folders: false,
         },
@@ -97,6 +106,7 @@ export class PropertiesRepository {
     };
     this.selfUser = ko.observable();
     this.receiptMode = ko.observable(PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.defaultValue);
+    this.typingIndicatorMode = ko.observable(PropertiesRepository.CONFIG.WIRE_TYPING_INDICATOR_MODE.defaultValue);
     /** @type {ko.Observable<ConsentValue | boolean>} */
     this.marketingConsent = ko.observable(PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.defaultValue);
   }
@@ -125,7 +135,7 @@ export class PropertiesRepository {
     }
 
     return new Promise(resolve => {
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
         preventClose: true,
         primaryAction: {
           action: () => {
@@ -202,8 +212,26 @@ export class PropertiesRepository {
       });
   }
 
+  private fetchTypingIndicatorSetting(): Promise<void> {
+    const {key: propertyKey, defaultValue} = PropertiesRepository.CONFIG.WIRE_TYPING_INDICATOR_MODE;
+
+    return this.propertiesService
+      .getPropertiesByKey(propertyKey)
+      .then(value => {
+        this.setProperty(propertyKey, value);
+      })
+      .catch(() => {
+        const message = `Property "${propertyKey}" doesn't exist for this account. Continuing with the default value of "${defaultValue}".`;
+        this.logger.warn(message);
+      });
+  }
+
   private initActivatedAccount(): Promise<void> {
-    return Promise.all([this.fetchWebAppAccountSettings(), this.fetchReadReceiptsSetting()]).then(() => {
+    return Promise.all([
+      this.fetchWebAppAccountSettings(),
+      this.fetchReadReceiptsSetting(),
+      this.fetchTypingIndicatorSetting(),
+    ]).then(() => {
       this.logger.info('Loaded user properties', this.properties);
       this.publishProperties();
     });
@@ -237,6 +265,9 @@ export class PropertiesRepository {
       case PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key:
         this.setProperty(key, RECEIPT_MODE.OFF);
         break;
+      case PropertiesRepository.CONFIG.WIRE_TYPING_INDICATOR_MODE.key:
+        this.setProperty(key, CONVERSATION_TYPING_INDICATOR_MODE.OFF);
+        break;
       case PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.key:
         this.setProperty(key, ConsentValue.NOT_GIVEN);
         break;
@@ -259,6 +290,9 @@ export class PropertiesRepository {
       case PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key:
         this.receiptMode(value);
         break;
+      case PropertiesRepository.CONFIG.WIRE_TYPING_INDICATOR_MODE.key:
+        this.typingIndicatorMode(value);
+        break;
     }
   }
 
@@ -267,6 +301,11 @@ export class PropertiesRepository {
     switch (key) {
       case PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key:
         if (value === RECEIPT_MODE.OFF) {
+          return this.propertiesService.deletePropertiesByKey(key);
+        }
+        return this.propertiesService.putPropertiesByKey(key, value);
+      case PropertiesRepository.CONFIG.WIRE_TYPING_INDICATOR_MODE.key:
+        if (value === CONVERSATION_TYPING_INDICATOR_MODE.ON) {
           return this.propertiesService.deletePropertiesByKey(key);
         }
         return this.propertiesService.putPropertiesByKey(key, value);

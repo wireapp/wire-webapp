@@ -17,44 +17,45 @@
  *
  */
 
-import {ConversationProtocol} from '@wireapp/api-client/src/conversation/NewConversation';
-import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
+import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
+import {MessageSendingState} from '@wireapp/core/lib/conversation';
+import {container} from 'tsyringe';
+
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
-import {createRandomUuid} from 'Util/util';
-import {Conversation} from 'src/script/entity/Conversation';
+
 import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
-import {User} from 'src/script/entity/User';
-import {Text} from 'src/script/entity/message/Text';
-import {Message} from 'src/script/entity/message/Message';
-import {ConversationError} from 'src/script/error/ConversationError';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
+import {Conversation} from 'src/script/entity/Conversation';
+import {Message} from 'src/script/entity/message/Message';
+import {Text} from 'src/script/entity/message/Text';
+import {User} from 'src/script/entity/User';
+import {ConversationError} from 'src/script/error/ConversationError';
+import {createRandomUuid} from 'Util/util';
+
 import {ConversationRepository} from './ConversationRepository';
+import {ConversationState} from './ConversationState';
+
+import {AssetRepository} from '../assets/AssetRepository';
+import {ClientEntity} from '../client/ClientEntity';
+import {ClientState} from '../client/ClientState';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
+import {ContentMessage} from '../entity/message/ContentMessage';
 import {EventRepository} from '../event/EventRepository';
-import {MessageSender} from '../message/MessageSender';
+import {EventService} from '../event/EventService';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
+import {Core} from '../service/CoreSingleton';
+import {TeamState} from '../team/TeamState';
 import {ServerTimeHandler, serverTimeHandler} from '../time/serverTimeHandler';
 import {UserRepository} from '../user/UserRepository';
-import {AssetRepository} from '../assets/AssetRepository';
 import {UserState} from '../user/UserState';
-import {ClientState} from '../client/ClientState';
-import {EventService} from '../event/EventService';
-import {Core} from '../service/CoreSingleton';
-import {container} from 'tsyringe';
-import {ClientEntity} from '../client/ClientEntity';
-import {TeamState} from '../team/TeamState';
-import {ContentMessage} from '../entity/message/ContentMessage';
-import {PayloadBundleState} from '@wireapp/core/src/main/conversation';
-import {ConversationState} from './ConversationState';
 
 const selfUser = new User('selfid', '');
 selfUser.isMe = true;
 
 const commonSendResponse = {
   onClientMismatch: expect.any(Function),
-  onStart: expect.any(Function),
-  onSuccess: expect.any(Function),
   protocol: ConversationProtocol.PROTEUS,
 };
 
@@ -65,7 +66,6 @@ type MessageRepositoryDependencies = {
   core: Core;
   cryptographyRepository: CryptographyRepository;
   eventRepository: EventRepository;
-  messageSender: MessageSender;
   propertiesRepository: PropertiesRepository;
   serverTimeHandler: ServerTimeHandler;
   userRepository: UserRepository;
@@ -79,10 +79,8 @@ async function buildMessageRepository(): Promise<[MessageRepository, MessageRepo
   const clientState = new ClientState();
   clientState.currentClient(new ClientEntity(true, ''));
   const core = container.resolve(Core);
-  const messageSender = new MessageSender();
-  messageSender.pauseQueue(false);
   await core.initServices({} as any);
-  /* eslint-disable sort-keys-fix/sort-keys-fix */
+
   const conversationState = new ConversationState(userState);
   const selfConversation = new Conversation(selfUser.id);
   selfConversation.selfUser(selfUser);
@@ -91,7 +89,6 @@ async function buildMessageRepository(): Promise<[MessageRepository, MessageRepo
     conversationRepository: () => ({} as ConversationRepository),
     cryptographyRepository: new CryptographyRepository({} as any),
     eventRepository: new EventRepository(new EventService({} as any), {} as any, {} as any, {} as any),
-    messageSender,
     propertiesRepository: new PropertiesRepository({} as any, {} as any),
     serverTimeHandler: serverTimeHandler,
     userRepository: {} as UserRepository,
@@ -102,9 +99,11 @@ async function buildMessageRepository(): Promise<[MessageRepository, MessageRepo
     conversationState,
     core,
   };
-  /* eslint-disable sort-keys-fix/sort-keys-fix */
+
   const deps = Object.values(dependencies) as ConstructorParameters<typeof MessageRepository>;
-  return [new MessageRepository(...deps), dependencies];
+  const messageRepository = new MessageRepository(...deps);
+  jest.spyOn(messageRepository as any, 'updateMessageAsSent').mockReturnValue(undefined);
+  return [messageRepository, dependencies];
 }
 
 describe('MessageRepository', () => {
@@ -126,21 +125,25 @@ describe('MessageRepository', () => {
     return conversation;
   };
 
+  const successPayload = {
+    sentAt: new Date().toISOString(),
+    id: createRandomUuid(),
+    state: MessageSendingState.OUTGOING_SENT,
+  };
+
   describe('sendPing', () => {
     it('sends a ping', async () => {
-      const [messageRepository, {core}] = await buildMessageRepository();
-      spyOn(core.service!.conversation, 'send').and.returnValue(Promise.resolve());
+      const [messageRepository, {core, eventRepository}] = await buildMessageRepository();
+      jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
+      jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
       const conversation = generateConversation();
 
       await messageRepository.sendPing(conversation);
       expect(core.service!.conversation.send).toHaveBeenCalledWith({
         ...commonSendResponse,
-        conversationDomain: undefined,
+        conversationId: conversation.qualifiedId,
         nativePush: true,
-        payload: expect.objectContaining({
-          content: expect.objectContaining({hotKnock: false}),
-          conversation: conversation.id,
-        }),
+        payload: expect.objectContaining({knock: expect.objectContaining({hotKnock: false})}),
         targetMode: undefined,
         userIds: expect.any(Object),
       });
@@ -149,10 +152,9 @@ describe('MessageRepository', () => {
 
   describe('sendMessageEdit', () => {
     it('sends an edit message if original message exists', async () => {
-      const [messageRepository, {core}] = await buildMessageRepository();
-      spyOn(core.service!.conversation, 'send').and.returnValue(
-        Promise.resolve({state: PayloadBundleState.OUTGOING_SENT}),
-      );
+      const [messageRepository, {core, eventRepository}] = await buildMessageRepository();
+      jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
+      jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
 
       const originalMessage = new ContentMessage(createRandomUuid());
       originalMessage.assets.push(new Text(createRandomUuid(), 'old text'));
@@ -162,11 +164,13 @@ describe('MessageRepository', () => {
       await messageRepository.sendMessageEdit(conversation, 'new text', originalMessage, []);
       expect(core.service!.conversation.send).toHaveBeenCalledWith({
         ...commonSendResponse,
-        conversationDomain: undefined,
+        conversationId: conversation.qualifiedId,
         nativePush: true,
         payload: expect.objectContaining({
-          content: expect.objectContaining({text: 'new text', originalMessageId: originalMessage.id}),
-          conversation: conversation.id,
+          edited: expect.objectContaining({
+            replacingMessageId: originalMessage.id,
+            text: expect.objectContaining({content: 'new text'}),
+          }),
         }),
         targetMode: undefined,
         userIds: expect.any(Object),
@@ -178,20 +182,15 @@ describe('MessageRepository', () => {
     it('sends a text message', async () => {
       const [messageRepository, {eventRepository, core, propertiesRepository}] = await buildMessageRepository();
       spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
-      spyOn(core.service!.conversation, 'send').and.returnValue(
-        Promise.resolve({state: PayloadBundleState.OUTGOING_SENT}),
-      );
+      jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
       spyOn(eventRepository, 'injectEvent').and.returnValue(Promise.resolve());
       const conversation = generateConversation();
       await messageRepository.sendTextWithLinkPreview(conversation, 'hello there', []);
       expect(core.service!.conversation.send).toHaveBeenCalledWith({
         ...commonSendResponse,
-        conversationDomain: undefined,
+        conversationId: conversation.qualifiedId,
         nativePush: true,
-        payload: expect.objectContaining({
-          content: expect.objectContaining({text: 'hello there'}),
-          conversation: conversation.id,
-        }),
+        payload: expect.objectContaining({text: expect.objectContaining({content: 'hello there'})}),
         targetMode: undefined,
         userIds: expect.any(Object),
       });
@@ -208,7 +207,7 @@ describe('MessageRepository', () => {
       conversation.addMessage(msgToDelete);
       const [messageRepository, {core}] = await buildMessageRepository();
       spyOn(core.service!.conversation, 'send').and.returnValue(
-        Promise.resolve({state: PayloadBundleState.OUTGOING_SENT}),
+        Promise.resolve({state: MessageSendingState.OUTGOING_SENT, sentAt: new Date().toISOString()}),
       );
 
       await expect(messageRepository.deleteMessageForEveryone(conversation, msgToDelete)).rejects.toMatchObject({
@@ -226,21 +225,13 @@ describe('MessageRepository', () => {
       conversation.addMessage(messageToDelete);
 
       const [messageRepository, {core, eventRepository}] = await buildMessageRepository();
-      spyOn(core.service!.conversation, 'send').and.returnValue(
-        Promise.resolve({state: PayloadBundleState.OUTGOING_SENT}),
-      );
+      jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
       spyOn(eventRepository.eventService, 'deleteEvent').and.returnValue(Promise.resolve());
 
       await messageRepository.deleteMessageForEveryone(conversation, messageToDelete);
       expect(core.service!.conversation.send).toHaveBeenCalledWith(
         expect.objectContaining({
-          payload: expect.objectContaining({
-            conversation: conversation.id,
-            content: expect.objectContaining({
-              messageId: messageToDelete.id,
-            }),
-            type: 'PayloadBundleType.MESSAGE_DELETE',
-          }),
+          payload: expect.objectContaining({deleted: {messageId: messageToDelete.id}}),
           userIds: {selfid: [], user1: []},
         }),
       );
@@ -250,7 +241,7 @@ describe('MessageRepository', () => {
   describe('resetSession', () => {
     it('resets the session with another device', async () => {
       const [messageRepository, {cryptographyRepository, core}] = await buildMessageRepository();
-      jest.spyOn(core.service!.conversation, 'send').mockResolvedValue({} as any);
+      jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
       spyOn(cryptographyRepository, 'deleteSession');
       const conversation = generateConversation();
 

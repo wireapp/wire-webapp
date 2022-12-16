@@ -18,10 +18,12 @@
  */
 
 import {act, render, waitFor} from '@testing-library/react';
-import DeviceDetailsPreferences from './DeviceDetailsPreferences';
+
+import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {createRandomUuid} from 'Util/util';
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+
+import {DeviceDetailsPreferences} from './DeviceDetailsPreferences';
 
 describe('DeviceDetailsPreferences', () => {
   const device = new ClientEntity(true, '', createRandomUuid());

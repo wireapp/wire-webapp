@@ -18,13 +18,15 @@
  */
 
 import React from 'react';
-import Icon from 'Components/Icon';
 
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import MessageTime from './MessageTime';
-import {SystemMessageType} from '../../../message/SystemMessageType';
-import {RenameMessage} from '../../../entity/message/RenameMessage';
+import {Icon} from 'Components/Icon';
 import {SystemMessage as SystemMessageEntity} from 'src/script/entity/message/SystemMessage';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+
+import {MessageTime} from './MessageTime';
+
+import {RenameMessage} from '../../../entity/message/RenameMessage';
+import {SystemMessageType} from '../../../message/SystemMessageType';
 export interface SystemMessageProps {
   message: SystemMessageEntity;
 }
@@ -47,13 +49,12 @@ const SystemMessage: React.FC<SystemMessageProps> = ({message}) => {
           {message.system_message_type === SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE && <Icon.Timer />}
           {message.system_message_type === SystemMessageType.CONVERSATION_RECEIPT_MODE_UPDATE && <Icon.Read />}
         </div>
-        <div className="message-header-label">
+        <p className="message-header-label">
           <span className="message-header-label__multiline">
             <span className="message-header-sender-name">{unsafeSenderName}</span>
             <span className="ellipsis">{caption}</span>
           </span>
-          <hr className="message-header-line" />
-        </div>
+        </p>
         <div className="message-body-actions">
           <MessageTime timestamp={timestamp} data-uie-uid={message.id} data-uie-name="item-message-call-timestamp" />
         </div>
@@ -63,4 +64,4 @@ const SystemMessage: React.FC<SystemMessageProps> = ({message}) => {
   );
 };
 
-export default SystemMessage;
+export {SystemMessage};

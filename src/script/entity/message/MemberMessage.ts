@@ -17,20 +17,23 @@
  *
  */
 
-import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
-import {MemberLeaveReason} from '@wireapp/api-client/src/conversation/data/';
+import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
+import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import ko from 'knockout';
+
 import {Declension, joinNames, replaceLink, t} from 'Util/LocalizerUtil';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 import {getUserName} from 'Util/SanitizationUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
+
+import {SystemMessage} from './SystemMessage';
+
+import {Config} from '../../Config';
 import {ClientEvent} from '../../event/Client';
 import {SuperType} from '../../message/SuperType';
 import {SystemMessageType} from '../../message/SystemMessageType';
 import {User} from '../User';
-import {SystemMessage} from './SystemMessage';
-import {Config} from '../../Config';
-import type {QualifiedId} from '@wireapp/api-client/src/user/';
-import {matchQualifiedIds} from 'Util/QualifiedId';
 
 export class MemberMessage extends SystemMessage {
   public allTeamMembers: User[];

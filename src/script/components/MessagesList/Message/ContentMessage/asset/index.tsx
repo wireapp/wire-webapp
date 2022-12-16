@@ -17,31 +17,32 @@
  *
  */
 
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
+import cx from 'classnames';
 
-import {QualifiedId} from '@wireapp/api-client/src/user';
 import {Asset} from 'src/script/entity/message/Asset';
-import type {FileAsset} from 'src/script/entity/message/FileAsset';
-import type {MediumImage} from 'src/script/entity/message/MediumImage';
-import type {Text} from 'src/script/entity/message/Text';
+import type {FileAsset as FileAssetType} from 'src/script/entity/message/FileAsset';
 import type {Location} from 'src/script/entity/message/Location';
+import type {MediumImage} from 'src/script/entity/message/MediumImage';
+import {Text} from 'src/script/entity/message/Text';
+import {StatusType} from 'src/script/message/StatusType';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {includesOnlyEmojis} from 'Util/EmojiUtil';
 
-import FileAssetComponent from './FileAssetComponent';
-import AudioAssetComponent from './AudioAsset';
-import ImageAssetComponent from './ImageAsset';
-import LinkPreviewAssetComponent from './LinkPreviewAssetComponent';
-import LocationAssetComponent from './LocationAsset';
-import VideoAssetComponent from './VideoAsset';
-import ButtonAssetComponent from './MessageButton';
+import {AudioAsset} from './AudioAsset';
+import {FileAsset} from './FileAssetComponent';
+import {ImageAsset} from './ImageAsset';
+import {LinkPreviewAsset} from './LinkPreviewAssetComponent';
+import {LocationAsset} from './LocationAsset';
+import {MessageButton} from './MessageButton';
+import {TextMessageRenderer} from './TextMessageRenderer';
+import {VideoAsset} from './VideoAsset';
 
+import {MessageActions} from '../..';
 import {AssetType} from '../../../../../assets/AssetType';
 import {Button} from '../../../../../entity/message/Button';
 import {CompositeMessage} from '../../../../../entity/message/CompositeMessage';
-import {StatusType} from '../../../../../message/StatusType';
-import {includesOnlyEmojis} from 'Util/EmojiUtil';
 import {ContentMessage} from '../../../../../entity/message/ContentMessage';
-import {MessageActions} from '../..';
-import {handleKeyDown} from 'Util/KeyboardUtil';
 
 const ContentAsset = ({
   asset,
@@ -50,6 +51,7 @@ const ContentAsset = ({
   onClickImage,
   onClickMessage,
   onClickButton,
+  isMessageFocused,
 }: {
   asset: Asset;
   message: ContentMessage;
@@ -57,61 +59,68 @@ const ContentAsset = ({
   onClickImage: MessageActions['onClickImage'];
   onClickMessage: MessageActions['onClickMessage'];
   selfId: QualifiedId;
+  isMessageFocused: boolean;
 }) => {
   const {isObfuscated, status} = useKoSubscribableChildren(message, ['isObfuscated', 'status']);
+
   switch (asset.type) {
     case AssetType.TEXT:
       return (
         <>
           {(asset as Text).should_render_text() && (
-            <div
-              role="button"
-              tabIndex={0}
-              className={`text ${includesOnlyEmojis((asset as Text).text) ? 'text-large' : ''} ${
-                status === StatusType.SENDING ? 'text-foreground' : ''
-              } ${isObfuscated ? 'ephemeral-message-obfuscated' : ''}`}
-              dangerouslySetInnerHTML={{__html: (asset as Text).render(selfId, message.accent_color())}}
-              onClick={event => onClickMessage(asset as Text, event)}
-              onKeyDown={event => handleKeyDown(event, () => onClickMessage(asset as Text, event))}
-              onAuxClick={event => onClickMessage(asset as Text, event)}
-              dir="auto"
+            <TextMessageRenderer
+              onMessageClick={onClickMessage}
+              text={(asset as Text).render(selfId, message.accent_color())}
+              className={cx('text', {
+                'text-foreground': status === StatusType.SENDING,
+                'text-large': includesOnlyEmojis(asset.text),
+                'ephemeral-message-obfuscated': isObfuscated,
+              })}
+              isFocusable={isMessageFocused}
             />
           )}
           {(asset as Text).previews().map(preview => (
             <div key={preview.url} className="message-asset">
-              <LinkPreviewAssetComponent message={message} />
+              <LinkPreviewAsset message={message} />
             </div>
           ))}
         </>
       );
     case AssetType.FILE:
-      if ((asset as FileAsset).isFile()) {
+      if ((asset as FileAssetType).isFile()) {
         return (
           <div className={`message-asset ${isObfuscated ? 'ephemeral-asset-expired icon-file' : ''}`}>
-            <FileAssetComponent message={message} />
+            <FileAsset message={message} isFocusable={isMessageFocused} />
           </div>
         );
       }
 
-      if ((asset as FileAsset).isAudio()) {
+      if ((asset as FileAssetType).isAudio()) {
         return (
           <div className={`message-asset ${isObfuscated ? 'ephemeral-asset-expired' : ''}`}>
-            <AudioAssetComponent message={message} />
+            <AudioAsset message={message} isFocusable={isMessageFocused} />
           </div>
         );
       }
 
-      if ((asset as FileAsset).isVideo()) {
+      if ((asset as FileAssetType).isVideo()) {
         return (
           <div className={`message-asset ${isObfuscated ? 'ephemeral-asset-expired icon-movie' : ''}`}>
-            <VideoAssetComponent message={message} />
+            <VideoAsset message={message} isFocusable={isMessageFocused} />
           </div>
         );
       }
     case AssetType.IMAGE:
-      return <ImageAssetComponent asset={asset as MediumImage} message={message} onClick={onClickImage} />;
+      return (
+        <ImageAsset
+          asset={asset as MediumImage}
+          message={message}
+          onClick={onClickImage}
+          isFocusable={isMessageFocused}
+        />
+      );
     case AssetType.LOCATION:
-      return <LocationAssetComponent asset={asset as Location} />;
+      return <LocationAsset asset={asset as Location} />;
     case AssetType.BUTTON:
       const assetId = asset.id;
       if (!(message instanceof CompositeMessage && asset instanceof Button && assetId)) {
@@ -119,7 +128,7 @@ const ContentAsset = ({
       }
 
       return (
-        <ButtonAssetComponent
+        <MessageButton
           onClick={() => onClickButton(message, assetId)}
           label={asset.text}
           id={assetId}
@@ -130,4 +139,4 @@ const ContentAsset = ({
   return null;
 };
 
-export default ContentAsset;
+export {ContentAsset};

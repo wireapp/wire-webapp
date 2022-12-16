@@ -18,21 +18,33 @@
  */
 
 import React from 'react';
+
 import cx from 'classnames';
 
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {Message} from 'src/script/entity/message/Message';
-import MessageLike from './MessageLike';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+
+import {MessageLike} from './MessageLike';
+
+import {useMessageFocusedTabIndex} from '../util';
 
 export interface MessageFooterLikeProps {
   is1to1Conversation: boolean;
   message: ContentMessage;
   onClickLikes: (message: Message) => void;
   onLike: (message: ContentMessage, button?: boolean) => void;
+  isMessageFocused: boolean;
 }
 
-const MessageFooterLike: React.FC<MessageFooterLikeProps> = ({message, is1to1Conversation, onLike, onClickLikes}) => {
+const MessageFooterLike: React.FC<MessageFooterLikeProps> = ({
+  message,
+  is1to1Conversation,
+  onLike,
+  onClickLikes,
+  isMessageFocused,
+}) => {
+  const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
   const {like_caption: likeCaption, reactions_user_ids: reactionsUserIds} = useKoSubscribableChildren(message, [
     'is_liked',
     'like_caption',
@@ -42,7 +54,7 @@ const MessageFooterLike: React.FC<MessageFooterLikeProps> = ({message, is1to1Con
   return (
     <div className="message-footer">
       <div className="message-footer-icon">
-        <MessageLike className="like-button" message={message} onLike={onLike} />
+        <MessageLike className="like-button" message={message} onLike={onLike} isMessageFocused={isMessageFocused} />
       </div>
       <button
         type="button"
@@ -50,6 +62,7 @@ const MessageFooterLike: React.FC<MessageFooterLikeProps> = ({message, is1to1Con
           'cursor-pointer': !is1to1Conversation,
         })}
         onClick={is1to1Conversation ? undefined : () => onClickLikes(message)}
+        tabIndex={messageFocusedTabIndex}
       >
         <span className="message-footer-text" data-uie-name="message-liked-names" data-uie-value={reactionsUserIds}>
           {likeCaption}
@@ -59,4 +72,4 @@ const MessageFooterLike: React.FC<MessageFooterLikeProps> = ({message, is1to1Con
   );
 };
 
-export default MessageFooterLike;
+export {MessageFooterLike};

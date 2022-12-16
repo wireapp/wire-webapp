@@ -17,15 +17,18 @@
  *
  */
 
-import React from 'react';
+import {FC, HTMLProps, MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent} from 'react';
+
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {handleKeyDown} from 'Util/KeyboardUtil';
+
+import {ServiceAvatar} from './avatar/ServiceAvatar';
+import {TemporaryGuestAvatar} from './avatar/TemporaryGuestAvatar';
+import {UserAvatar} from './avatar/UserAvatar';
 
 import {User} from '../entity/User';
+import {isServiceEntity} from '../guards/Service';
 import {ServiceEntity} from '../integration/ServiceEntity';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
-
-import UserAvatar from './avatar/UserAvatar';
-import ServiceAvatar from './avatar/ServiceAvatar';
-import TemporaryGuestAvatar from './avatar/TemporaryGuestAvatar';
 
 export enum AVATAR_SIZE {
   LARGE = 'avatar-l',
@@ -67,7 +70,7 @@ export const INITIALS_SIZE = {
   [AVATAR_SIZE.XXX_SMALL]: '8px',
 };
 
-export interface AvatarProps extends React.HTMLProps<HTMLDivElement> {
+export interface AvatarProps extends HTMLProps<HTMLDivElement> {
   avatarSize?: AVATAR_SIZE;
   avatarAlt?: string;
   noBadge?: boolean;
@@ -76,7 +79,7 @@ export interface AvatarProps extends React.HTMLProps<HTMLDivElement> {
   participant: User | ServiceEntity;
 }
 
-const Avatar: React.FunctionComponent<AvatarProps> = ({
+const Avatar: FC<AvatarProps> = ({
   avatarSize = AVATAR_SIZE.LARGE,
   noBadge = false,
   noFilter = false,
@@ -84,56 +87,61 @@ const Avatar: React.FunctionComponent<AvatarProps> = ({
   participant,
   ...props
 }) => {
-  const user = useKoSubscribableChildren(participant as User, [
-    'isTemporaryGuest',
-    'isTeamMember',
-    'isBlocked',
-    'isRequest',
-    'isIgnored',
-    'isCanceled',
-    'isUnknown',
-  ]);
-  const isMe = (participant as User).isMe;
-
-  const clickHandler = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    if (event.currentTarget.parentNode) {
-      onAvatarClick?.(participant, event.currentTarget.parentNode);
+  const handleAvatarInteraction = (
+    event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>,
+  ) => {
+    const parentNode = event.currentTarget.parentNode;
+    if (parentNode) {
+      if ('key' in event) {
+        handleKeyDown(event, () => onAvatarClick?.(participant, parentNode));
+        return;
+      }
+      onAvatarClick?.(participant, parentNode);
     }
   };
 
-  if (participant instanceof ServiceEntity || participant.isService) {
+  const {isTemporaryGuest, isTeamMember, isBlocked, isRequest, isIgnored, isCanceled, isUnknown} =
+    // @ts-ignore
+    useKoSubscribableChildren(participant, [
+      'isTemporaryGuest',
+      'isTeamMember',
+      'isBlocked',
+      'isRequest',
+      'isIgnored',
+      'isCanceled',
+      'isUnknown',
+    ]);
+
+  if (isServiceEntity(participant)) {
     return (
-      <ServiceAvatar
-        avatarSize={avatarSize}
-        participant={participant as ServiceEntity}
-        onClick={clickHandler}
-        {...props}
-      />
+      <ServiceAvatar avatarSize={avatarSize} participant={participant} onClick={handleAvatarInteraction} {...props} />
     );
   }
+
+  const isMe = participant?.isMe;
 
   let avatarState = STATE.NONE;
 
   if (isMe) {
     avatarState = STATE.SELF;
-  } else if (user.isTeamMember) {
+  } else if (isTeamMember) {
     avatarState = STATE.NONE;
-  } else if (user.isBlocked) {
+  } else if (isBlocked) {
     avatarState = STATE.BLOCKED;
-  } else if (user.isRequest) {
+  } else if (isRequest) {
     avatarState = STATE.PENDING;
-  } else if (user.isIgnored) {
+  } else if (isIgnored) {
     avatarState = STATE.IGNORED;
-  } else if (user.isCanceled || user.isUnknown) {
+  } else if (isCanceled || isUnknown) {
     avatarState = STATE.UNKNOWN;
   }
 
-  if (user.isTemporaryGuest) {
+  if (isTemporaryGuest) {
     return (
       <TemporaryGuestAvatar
         avatarSize={avatarSize}
         noBadge={noBadge}
-        onClick={clickHandler}
+        onClick={handleAvatarInteraction}
         participant={participant}
         state={avatarState}
         {...props}
@@ -146,7 +154,7 @@ const Avatar: React.FunctionComponent<AvatarProps> = ({
       avatarSize={avatarSize}
       noBadge={noBadge}
       noFilter={noFilter}
-      onClick={clickHandler}
+      onAvatarInteraction={handleAvatarInteraction}
       participant={participant}
       state={avatarState}
       {...props}
@@ -154,5 +162,4 @@ const Avatar: React.FunctionComponent<AvatarProps> = ({
   );
 };
 
-export default Avatar;
-registerReactComponent('participant-avatar', Avatar);
+export {Avatar};

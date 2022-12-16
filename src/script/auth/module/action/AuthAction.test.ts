@@ -17,15 +17,18 @@
  *
  */
 
-import type {APIClient} from '@wireapp/api-client';
-import {ClientType} from '@wireapp/api-client/src/client/';
-import type {TypeUtil} from '@wireapp/commons';
+import {ClientType} from '@wireapp/api-client/lib/client/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-import {mockStoreFactory} from '../../util/test/mockStoreFactory';
-import {actionRoot} from './';
+import type {APIClient} from '@wireapp/api-client';
+import type {TypeUtil} from '@wireapp/commons';
+
 import {BackendError} from './BackendError';
 import {AuthActionCreator} from './creator/';
+
+import {mockStoreFactory} from '../../util/test/mockStoreFactory';
+
+import {actionRoot} from './';
 
 describe('AuthAction', () => {
   it('authenticates a user successfully', async () => {
@@ -71,7 +74,7 @@ describe('AuthAction', () => {
     await store.dispatch(actionRoot.authAction.doLoginPlain({clientType: ClientType.PERMANENT, email, password}));
 
     expect(store.getActions()).toEqual([AuthActionCreator.startLogin(), AuthActionCreator.successfulLogin()]);
-    expect(spies.setLocalStorage.calls.count()).toEqual(5);
+    expect(spies.setLocalStorage.calls.count()).toEqual(1);
     expect(spies.setCookie.calls.count()).toEqual(1);
     expect(spies.fetchSelf.calls.count()).toEqual(1);
     expect(spies.generateClientPayload.calls.count()).toEqual(1);

@@ -18,10 +18,12 @@
  */
 
 import React from 'react';
-import {t} from 'Util/LocalizerUtil';
-import {copyText} from 'Util/ClipboardUtil';
+
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
-import Icon from 'Components/Icon';
+
+import {Icon} from 'Components/Icon';
+import {copyText} from 'Util/ClipboardUtil';
+import {t} from 'Util/LocalizerUtil';
 
 interface AccountLinkProps {
   'data-uie-name'?: string;
@@ -55,9 +57,9 @@ const AccountLink: React.FC<AccountLinkProps> = ({label, value, ...rest}) => {
           {label}
         </label>
 
-        <div data-uie-name="profile-link" data-uie-value={value} {...rest}>
+        <p data-uie-name="profile-link" data-uie-value={value} {...rest}>
           {value}
-        </div>
+        </p>
       </div>
       <div
         css={{
@@ -80,4 +82,4 @@ const AccountLink: React.FC<AccountLinkProps> = ({label, value, ...rest}) => {
   );
 };
 
-export default AccountLink;
+export {AccountLink};

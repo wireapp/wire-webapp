@@ -17,9 +17,11 @@
  *
  */
 
-import {isAxiosError, isBackendError, isQualifiedUserClientEntityMap} from 'Util/TypePredicateUtil';
+import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import type {AxiosError} from 'axios';
-import {BackendError, BackendErrorLabel} from '@wireapp/api-client/src/http/';
+
+import {isAxiosError, isBackendError, isQualifiedUserClientEntityMap} from 'Util/TypePredicateUtil';
+
 import {QualifiedUserClientEntityMap, UserClientEntityMap} from '../client/ClientRepository';
 
 describe('TypePredicateUtil', () => {

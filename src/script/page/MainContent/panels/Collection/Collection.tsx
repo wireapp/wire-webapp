@@ -18,25 +18,35 @@
  */
 
 import React, {useEffect, useState} from 'react';
+
 import {amplify} from 'amplify';
+
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {Conversation} from '../../../../entity/Conversation';
 
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {t} from 'Util/LocalizerUtil';
-import {isOfCategory, Category} from './utils';
-import Icon from 'Components/Icon';
+import {Icon} from 'Components/Icon';
+import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
-import {MessageCategory} from '../../../../message/MessageCategory';
+import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import {generateConversationUrl} from 'src/script/router/routeGenerator';
+import {createNavigate} from 'src/script/router/routerBindings';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
 
-import FullSearch from './FullSearch';
-import CollectionDetails from './CollectionDetails';
-import CollectionSection from './CollectionSection';
+import {CollectionDetails} from './CollectionDetails';
+import {CollectionSection} from './CollectionSection';
+import {FullSearch} from './FullSearch';
+import {Category, isOfCategory} from './utils';
+
+import {AssetRepository} from '../../../../assets/AssetRepository';
+import {MessageRepository} from '../../../../conversation/MessageRepository';
+import {Conversation} from '../../../../entity/Conversation';
+import {MessageCategory} from '../../../../message/MessageCategory';
 
 interface CollectionDetailsProps {
   conversation: Conversation;
   conversationRepository: ConversationRepository;
+  assetRepository: AssetRepository;
+  messageRepository: MessageRepository;
 }
 
 type Categories = Record<Category, ContentMessage[]>;
@@ -68,7 +78,12 @@ function splitIntoCategories(messages: ContentMessage[]): Categories {
   );
 }
 
-const Collection: React.FC<CollectionDetailsProps> = ({conversation, conversationRepository}) => {
+const Collection: React.FC<CollectionDetailsProps> = ({
+  conversation,
+  conversationRepository,
+  assetRepository,
+  messageRepository,
+}) => {
   const [searchTerm, setSearchTerm] = useState('');
   const {display_name} = useKoSubscribableChildren(conversation, ['display_name']);
   const [messages, setMessages] = useState<ContentMessage[]>([]);
@@ -110,12 +125,22 @@ const Collection: React.FC<CollectionDetailsProps> = ({conversation, conversatio
   const categories = splitIntoCategories(messages);
   const {images, audio, links, files} = categories;
 
+  const onImageClick = (message: ContentMessage) => {
+    showDetailViewModal({
+      assetRepository,
+      conversationRepository,
+      currentMessageEntity: message,
+      messageRepository,
+    });
+  };
+
   if (detailCategory && categories[detailCategory].length > 0) {
     return (
       <CollectionDetails
         conversation={conversation}
         messages={categories[detailCategory]}
         onClose={() => setDetailCategory(undefined)}
+        onImageClick={onImageClick}
       />
     );
   }
@@ -127,6 +152,7 @@ const Collection: React.FC<CollectionDetailsProps> = ({conversation, conversatio
         limit={12}
         uieName={'collection-section-image'}
         onSelect={() => setDetailCategory('images')}
+        onImageClick={onImageClick}
         label={t('collectionSectionImages')}
       >
         <span className={`collection-header-icon icon-library`}></span>
@@ -168,7 +194,7 @@ const Collection: React.FC<CollectionDetailsProps> = ({conversation, conversatio
           <button
             className="content-titlebar-icon"
             data-uie-name="do-close-collection"
-            onClick={() => amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversation, {})}
+            onClick={createNavigate(generateConversationUrl(conversation))}
             aria-label={t('fullsearchCancelLabel')}
           >
             <Icon.Close />
@@ -191,4 +217,4 @@ const Collection: React.FC<CollectionDetailsProps> = ({conversation, conversatio
   );
 };
 
-export default Collection;
+export {Collection};

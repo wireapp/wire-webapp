@@ -18,22 +18,24 @@
  */
 
 import React from 'react';
+
+import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {amplify} from 'amplify';
+
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 
+import type {MenuItem} from './PanelActions';
+import {PanelActions} from './PanelActions';
+
+import {ACCESS_STATE} from '../../conversation/AccessState';
 import type {ConversationRoleRepository} from '../../conversation/ConversationRoleRepository';
 import {Conversation} from '../../entity/Conversation';
-import type {ActionsViewModel} from '../../view_model/ActionsViewModel';
 import type {User} from '../../entity/User';
-import type {MenuItem} from './PanelActions';
-
-import PanelActions from './PanelActions';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {matchQualifiedIds} from 'Util/QualifiedId';
-import {ACCESS_STATE} from '../../conversation/AccessState';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
+import type {ActionsViewModel} from '../../view_model/ActionsViewModel';
 
 export enum Actions {
   ACCEPT_REQUEST = 'UserActions.ACCEPT_REQUEST',
@@ -296,6 +298,4 @@ const UserActions: React.FC<UserActionsProps> = ({
   return <PanelActions items={items} />;
 };
 
-export default UserActions;
-
-registerReactComponent('user-actions', UserActions);
+export {UserActions};

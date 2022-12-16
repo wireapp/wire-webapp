@@ -23,12 +23,7 @@ import {container} from 'tsyringe';
 import {chunk} from 'Util/ArrayUtil';
 import {Logger, getLogger} from 'Util/Logger';
 
-import type {ConversationRepository} from '../conversation/ConversationRepository';
-import type {Conversation} from '../entity/Conversation';
-import {ClientEvent} from '../event/Client';
-import {StorageSchemata} from '../storage/StorageSchemata';
 import {BackupService} from './BackupService';
-import {WebWorker} from '../util/worker';
 import {
   CancelError,
   DifferentAccountError,
@@ -37,10 +32,16 @@ import {
   IncompatiblePlatformError,
   InvalidMetaDataError,
 } from './Error';
+
 import {ClientState} from '../client/ClientState';
-import {UserState} from '../user/UserState';
-import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {ConnectionState} from '../connection/ConnectionState';
+import type {ConversationRepository} from '../conversation/ConversationRepository';
+import type {Conversation} from '../entity/Conversation';
+import {ClientEvent} from '../event/Client';
+import {ConversationRecord} from '../storage/record/ConversationRecord';
+import {StorageSchemata} from '../storage/StorageSchemata';
+import {UserState} from '../user/UserState';
+import {WebWorker} from '../util/worker';
 
 export interface Metadata {
   client_id: string;

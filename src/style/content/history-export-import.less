@@ -7,8 +7,9 @@
   margin-left: -@conversation-list-width;
   background-color: var(--app-bg);
 
-  loading-bar {
+  .loading-bar {
     margin: auto;
+
     &.with-cancel {
       padding-top: 72px;
     }
@@ -19,9 +20,9 @@
 
     margin-bottom: 56px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: @font-size-medium;
     font-weight: @font-weight-regular;
-    line-height: 16px;
+    line-height: @line-height-sm;
     user-select: none;
   }
 
@@ -45,16 +46,16 @@
     &__headline {
       padding: 0;
       margin: 0;
-      font-size: 14px;
+      font-size: @font-size-medium;
       font-weight: @font-weight-bold;
-      line-height: 24px;
+      line-height: @line-height-lg;
     }
 
     &__info {
       margin: 8px 0 0;
-      font-size: 14px;
+      font-size: @font-size-medium;
       font-weight: @font-weight-regular;
-      line-height: 24px;
+      line-height: @line-height-lg;
     }
 
     &__buttons {

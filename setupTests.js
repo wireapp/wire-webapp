@@ -17,6 +17,8 @@
  *
  */
 
+/* eslint-disable import/order */
+
 // Polyfill for "tsyringe" dependency injection
 require('core-js/full/reflect');
 require('intersection-observer');
@@ -24,13 +26,13 @@ require('fake-indexeddb/auto');
 
 require('src/script/util/test/mock/createObjectURLMock');
 require('src/script/util/test/mock/cryptoMock');
-require('src/script/util/test/mock/iconsMock');
 require('src/script/util/test/mock/matchMediaMock');
 require('src/script/util/test/mock/mediaDevicesMock');
 require('src/script/util/test/mock/navigatorPermissionsMock');
 require('src/script/util/test/mock/ResponseMock');
 require('src/script/util/test/mock/SVGProviderMock');
 require('src/script/util/test/mock/WebRTCMock');
+require('src/script/util/test/mock/resizeObserver.mock');
 
 jest.mock('axios', () => {
   return {
@@ -47,11 +49,6 @@ jest.mock('axios', () => {
 });
 
 require('test/api/payloads');
-
-const Adapter = require('@wojtekmaj/enzyme-adapter-react-17');
-const {configure} = require('enzyme');
-
-configure({adapter: new Adapter()});
 
 const encoding = require('text-encoding');
 window.TextEncoder = encoding.TextEncoder;
@@ -77,6 +74,8 @@ window.wire = {
 };
 
 window.z = {userPermission: {}};
+
+window.URL.createObjectURL = jest.fn();
 
 const testLib = require('@testing-library/react');
 testLib.configure({testIdAttribute: 'data-uie-name'});

@@ -21,10 +21,11 @@ import ko from 'knockout';
 
 import {t} from 'Util/LocalizerUtil';
 
+import {Message} from './Message';
+
 import type {TERMINATION_REASON} from '../../calling/enum/TerminationReason';
 import {CALL_MESSAGE_TYPE} from '../../message/CallMessageType';
 import {SuperType} from '../../message/SuperType';
-import {Message} from './Message';
 
 export class CallMessage extends Message {
   private readonly call_message_type: CALL_MESSAGE_TYPE;

@@ -17,6 +17,7 @@
  *
  */
 
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import hljs from 'highlight.js';
 import MarkdownIt from 'markdown-it';
 import type Token from 'markdown-it/lib/token';
@@ -24,7 +25,6 @@ import {escape} from 'underscore';
 
 import {replaceInRange} from './StringUtil';
 
-import {QualifiedId} from '@wireapp/api-client/src/user';
 import type {MentionEntity} from '../message/MentionEntity';
 
 interface MentionText {
@@ -71,28 +71,6 @@ markdownit.renderer.rules.paragraph_open = (tokens, idx) => {
 };
 markdownit.renderer.rules.paragraph_close = () => '';
 
-// https://github.com/markdown-it/markdown-it/issues/458#issuecomment-401221267
-function modifyMarkdownLinks(markdown: string): string {
-  const matches = markdownit.linkify.match(markdown);
-  if (!matches || matches.length === 0) {
-    return markdown;
-  }
-  const result = [];
-  let prevEndIndex = 0;
-  for (const match of matches) {
-    const startsWithProto = /^https?:\/\//i.test(match.raw);
-    const noStartBracket = match.index === 0 || markdown[match.index - 1] !== '<';
-    const noEndBracket = match.lastIndex === markdown.length || markdown[match.lastIndex] !== '>';
-    const shouldInsertBrackets = startsWithProto && noStartBracket && noEndBracket;
-
-    result.push(markdown.slice(prevEndIndex, match.index));
-    result.push(shouldInsertBrackets ? `<${match.raw}>` : match.raw);
-    prevEndIndex = match.lastIndex;
-  }
-  result.push(markdown.slice(prevEndIndex));
-  return result.join('');
-}
-
 markdownit.normalizeLinkText = text => text;
 
 export const renderMessage = (message: string, selfId: QualifiedId | null, mentionEntities: MentionEntity[] = []) => {
@@ -100,15 +78,15 @@ export const renderMessage = (message: string, selfId: QualifiedId | null, menti
   const renderMention = (mentionData: MentionText) => {
     const elementClasses = mentionData.isSelfMentioned ? ' self-mention' : '';
     let elementAttributes = mentionData.isSelfMentioned
-      ? ' data-uie-name="label-self-mention"'
-      : ` data-uie-name="label-other-mention" data-user-id="${escape(mentionData.userId)}"`;
+      ? ' data-uie-name="label-self-mention" role="button"'
+      : ` data-uie-name="label-other-mention" data-user-id="${escape(mentionData.userId)}" role="button"`;
     if (!mentionData.isSelfMentioned && mentionData.domain) {
       elementAttributes += ` data-user-domain="${escape(mentionData.domain)}"`;
     }
 
     const mentionText = mentionData.text.replace(/^@/, '');
     const content = `<span class="mention-at-sign">@</span>${escape(mentionText)}`;
-    return `<span class="message-mention${elementClasses}"${elementAttributes}>${content}</span>`;
+    return `<div class="message-mention${elementClasses}"${elementAttributes}>${content}</div>`;
   };
 
   const mentionTexts: Record<string, MentionText> = {};
@@ -193,7 +171,6 @@ export const renderMessage = (message: string, selfId: QualifiedId | null, menti
     return self.renderToken(tokens, idx, options);
   };
   const originalTokens = markdownit.parse(mentionlessText, {});
-  mentionlessText = modifyMarkdownLinks(mentionlessText);
   const modifiedLinksTokens = markdownit.parse(mentionlessText, {});
   const fixCodeTokens = (modifiedTokens: Token[], originalTokens: Token[]) =>
     modifiedTokens.map((modifiedToken, index) => {

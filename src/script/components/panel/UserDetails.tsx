@@ -18,17 +18,19 @@
  */
 
 import React, {useEffect} from 'react';
-import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {amplify} from 'amplify';
 
+import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {AvailabilityState} from 'Components/AvailabilityState';
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {Icon} from 'Components/Icon';
+import {ClassifiedBar} from 'Components/input/ClassifiedBar';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import type {User} from '../../entity/User';
-import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
-import Icon from 'Components/Icon';
-import AvailabilityState from 'Components/AvailabilityState';
-import ClassifiedBar from 'Components/input/ClassifiedBar';
 
 export interface UserDetailsProps {
   badge?: string;
@@ -78,6 +80,7 @@ const UserDetails: React.FC<UserDetailsProps> = ({
             {user.name}
           </h2>
         )}
+
         {isSelfVerified && user.is_verified && (
           <Icon.Verified
             className="panel-participant__head__verified-icon"
@@ -87,9 +90,9 @@ const UserDetails: React.FC<UserDetailsProps> = ({
       </div>
 
       {participant.handle && (
-        <div className="panel-participant__user-name" data-uie-name="status-username" title={participant.handle}>
+        <p className="panel-participant__user-name" data-uie-name="status-username" title={participant.handle}>
           {participant.handle}
-        </div>
+        </p>
       )}
 
       {classifiedDomains && (
@@ -144,6 +147,4 @@ const UserDetails: React.FC<UserDetailsProps> = ({
   );
 };
 
-export default UserDetails;
-
-registerReactComponent('panel-user-details', UserDetails);
+export {UserDetails};

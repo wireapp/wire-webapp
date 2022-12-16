@@ -17,11 +17,12 @@
  *
  */
 
-import {AssetType} from '../../assets/AssetType';
 import type {FileAsset} from './FileAsset';
 import type {Location as LocationAsset} from './Location';
 import type {MediumImage as MediumImageAsset} from './MediumImage';
 import type {Text as TextAsset} from './Text';
+
+import {AssetType} from '../../assets/AssetType';
 
 export interface AssetPayload {
   id: string;
@@ -32,15 +33,18 @@ export interface AssetPayload {
 
 export class Asset {
   public file_type?: string;
+  public file_name?: string;
   public id?: string;
   public key: string;
   public size: string;
   public type: string;
+  public text: string;
 
   constructor(id?: string) {
     this.id = id;
     this.key = '';
     this.type = '';
+    this.text = '';
   }
 
   isDownloadable(): boolean {

@@ -18,14 +18,16 @@
  */
 
 import React from 'react';
-import {DeleteMessage as DeleteMessageEntity} from '../../../entity/message/DeleteMessage';
 
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {User} from 'src/script/entity/User';
-import MessageTime from './MessageTime';
-import {formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
+import {formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
+
+import {MessageTime} from './MessageTime';
+
+import {DeleteMessage as DeleteMessageEntity} from '../../../entity/message/DeleteMessage';
 import {ServiceEntity} from '../../../integration/ServiceEntity';
 
 export interface DeleteMessageProps {
@@ -54,12 +56,12 @@ const DeleteMessage: React.FC<DeleteMessageProps> = ({message, onClickAvatar}) =
         />
       </div>
       <div className="message-header-label" data-uie-name="element-message-delete">
-        <span className="message-header-label-sender" data-uie-name="element-message-delete-sender-name">
+        <p className="message-header-label-sender" data-uie-name="element-message-delete-sender-name">
           {unsafeSenderName}
-        </span>
+        </p>
         <span className="message-header-label-icon icon-trash" title={formattedDeletionTime} />
       </div>
-      <div className="message-body-actions message-body-actions-large">
+      <p className="message-body-actions">
         <MessageTime
           timestamp={deletedTimeStamp}
           data-uie-uid={message.id}
@@ -67,9 +69,9 @@ const DeleteMessage: React.FC<DeleteMessageProps> = ({message, onClickAvatar}) =
         >
           {formattedDeletionTime}
         </MessageTime>
-      </div>
+      </p>
     </div>
   );
 };
 
-export default DeleteMessage;
+export {DeleteMessage};

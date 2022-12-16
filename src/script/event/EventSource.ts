@@ -17,12 +17,12 @@
  *
  */
 
-import {PayloadBundleSource} from '@wireapp/core/src/main/conversation';
+import {NotificationSource} from '@wireapp/core/lib/notification';
 
 enum WebAppEventSource {
   BACKEND_RESPONSE = 'backend_response',
   INJECTED = 'injected',
 }
 
-export type EventSource = PayloadBundleSource | WebAppEventSource;
-export const EventSource = {...WebAppEventSource, ...PayloadBundleSource};
+export type EventSource = NotificationSource | WebAppEventSource;
+export const EventSource = {...WebAppEventSource, ...NotificationSource};

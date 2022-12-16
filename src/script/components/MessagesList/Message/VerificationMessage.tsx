@@ -17,16 +17,19 @@
  *
  */
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-import {amplify} from 'amplify';
-import VerifiedIcon from 'Components/VerifiedIcon';
 import React, {useMemo} from 'react';
-import {VerificationMessage as VerificationMessageEntity} from '../../../entity/message/VerificationMessage';
-import {VerificationMessageType} from '../../../message/VerificationMessageType';
 
+import {amplify} from 'amplify';
+
+import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {VerifiedIcon} from 'Components/VerifiedIcon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {Declension, joinNames, t} from 'Util/LocalizerUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
+
+import {VerificationMessage as VerificationMessageEntity} from '../../../entity/message/VerificationMessage';
+import {VerificationMessageType} from '../../../message/VerificationMessageType';
 
 export interface VerificationMessageProps {
   message: VerificationMessageEntity;
@@ -111,10 +114,9 @@ const VerificationMessage: React.FC<VerificationMessageProps> = ({message}) => {
             </button>
           </>
         )}
-        <hr className="message-header-line" />
       </div>
     </div>
   );
 };
 
-export default VerificationMessage;
+export {VerificationMessage};

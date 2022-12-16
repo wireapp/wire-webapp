@@ -17,14 +17,15 @@
  *
  */
 
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
+
 import cx from 'classnames';
 
 import {interpolate} from 'Util/ArrayUtil';
 import {clamp} from 'Util/NumberUtil';
+import {createRandomUuid} from 'Util/util';
 
 import {FileAsset} from '../../../../../../entity/message/FileAsset';
-import {createRandomUuid} from 'Util/util';
 
 export interface AudioSeekBarProps {
   asset: FileAsset;
@@ -126,4 +127,4 @@ const AudioSeekBar: React.FC<AudioSeekBarProps> = ({asset, audioElement, disable
   );
 };
 
-export default AudioSeekBar;
+export {AudioSeekBar};

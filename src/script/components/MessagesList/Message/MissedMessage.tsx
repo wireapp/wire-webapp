@@ -18,6 +18,7 @@
  */
 
 import React from 'react';
+
 import {t} from 'Util/LocalizerUtil';
 
 export interface MissedMessageProps {}
@@ -28,9 +29,9 @@ const MissedMessage: React.FC<MissedMessageProps> = ({}) => {
       <div className="message-header-icon">
         <span className="icon-sysmsg-error text-red" />
       </div>
-      <div className="message-header-label">{t('conversationMissedMessages')}</div>
+      <p className="message-header-label">{t('conversationMissedMessages')}</p>
     </div>
   );
 };
 
-export default MissedMessage;
+export {MissedMessage};

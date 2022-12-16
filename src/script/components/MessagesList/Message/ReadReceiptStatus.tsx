@@ -18,19 +18,23 @@
  */
 
 import React, {useEffect, useState} from 'react';
-import Icon from 'Components/Icon';
 
+import cx from 'classnames';
+
+import {Icon} from 'Components/Icon';
+import {Message} from 'src/script/entity/message/Message';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-import cx from 'classnames';
-import {Message} from 'src/script/entity/message/Message';
 import {formatDateNumeral, formatTimeShort} from 'Util/TimeUtil';
+
+import {useMessageFocusedTabIndex} from './util';
 
 export interface ReadReceiptStatusProps {
   is1to1Conversation: boolean;
   isLastDeliveredMessage: boolean;
   message: Message;
   onClickReceipts?: (message: Message) => void;
+  isMessageFocused: boolean;
 }
 
 const ReadReceiptStatus: React.FC<ReadReceiptStatusProps> = ({
@@ -38,7 +42,9 @@ const ReadReceiptStatus: React.FC<ReadReceiptStatusProps> = ({
   onClickReceipts,
   is1to1Conversation,
   isLastDeliveredMessage,
+  isMessageFocused,
 }) => {
+  const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
   const [readReceiptText, setReadReceiptText] = useState('');
   const [readReceiptTooltip, setReadReceiptTooltip] = useState('');
   const {readReceipts} = useKoSubscribableChildren(message, ['readReceipts']);
@@ -69,13 +75,16 @@ const ReadReceiptStatus: React.FC<ReadReceiptStatusProps> = ({
       {showEyeIndicator && (
         <button
           type="button"
+          tabIndex={messageFocusedTabIndex}
           className={cx('button-reset-default', 'message-status-read', {
             'message-status-read--clickable': !is1to1Conversation,
             'message-status-read--visible': isLastDeliveredMessage,
             'with-tooltip with-tooltip--receipt': readReceiptTooltip,
           })}
           data-tooltip={readReceiptTooltip}
-          onClick={!is1to1Conversation && onClickReceipts ? () => onClickReceipts(message) : undefined}
+          {...(!is1to1Conversation && {
+            onClick: () => onClickReceipts?.(message),
+          })}
           data-uie-name="status-message-read-receipts"
           aria-label={t('accessibility.messageDetailsReadReceipts', readReceiptText)}
         >
@@ -89,4 +98,4 @@ const ReadReceiptStatus: React.FC<ReadReceiptStatusProps> = ({
   );
 };
 
-export default ReadReceiptStatus;
+export {ReadReceiptStatus};

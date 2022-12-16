@@ -17,13 +17,17 @@
  *
  */
 
+import {render} from '@testing-library/react';
 import ko from 'knockout';
-import VerificationMessage from './VerificationMessage';
+
+import {QualifiedUserId} from '@wireapp/protocol-messaging';
+
 import {VerificationMessage as VerificationMessageEntity} from 'src/script/entity/message/VerificationMessage';
 import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
-import {render} from '@testing-library/react';
+
+import {VerificationMessage} from './VerificationMessage';
+
 import {User} from '../../../entity/User';
-import {QualifiedUserId} from '@wireapp/protocol-messaging';
 
 const createVerificationMessage = (partialVerificationMessage: Partial<VerificationMessageEntity>) => {
   const verificationMessage: Partial<VerificationMessageEntity> = {

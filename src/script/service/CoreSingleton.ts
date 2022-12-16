@@ -17,17 +17,21 @@
  *
  */
 
-import {Account} from '@wireapp/core';
-import {ClientType} from '@wireapp/api-client/src/client/';
+import {ClientType} from '@wireapp/api-client/lib/client/';
 import {container, singleton} from 'tsyringe';
+
+import {Account} from '@wireapp/core';
+
+import {isTemporaryClientAndNonPersistent, supportsCoreCryptoProteus, supportsMLS} from 'Util/util';
+
 import {APIClient} from './APIClientSingleton';
 import {createStorageEngine, DatabaseTypes} from './StoreEngineProvider';
-import {isTemporaryClientAndNonPersistent} from 'Util/util';
+
 import {Config} from '../Config';
 
 declare global {
   interface Window {
-    secretsCrypto?: {
+    systemCrypto?: {
       decrypt: (value: Uint8Array) => Promise<Uint8Array>;
       encrypt: (encrypted: Uint8Array) => Promise<Uint8Array>;
     };
@@ -45,18 +49,22 @@ export class Core extends Account<Uint8Array> {
 
         return createStorageEngine(storeName, dbType);
       },
-      mlsConfig: Config.getConfig().FEATURE.ENABLE_MLS
-        ? {
-            coreCrypoWasmFilePath: '/min/core-crypto.wasm',
-            /*
-             * When in an electron context, the window.secretsCrypto will be populated by the renderer process.
-             * We then give those crypto primitives to the core that will use them when encrypting MLS secrets.
-             * When in an browser context, then this secretsCrypto will be undefined and the core will then use it's internal encryption system
-             */
-            keyingMaterialUpdateThreshold: Config.getConfig().FEATURE.MLS_CONFIG_KEYING_MATERIAL_UPDATE_THRESHOLD,
-            secretsCrypto: window.secretsCrypto,
-          }
-        : undefined,
+      cryptoProtocolConfig: {
+        coreCrypoWasmFilePath: '/min/core-crypto.wasm',
+        mls: supportsMLS()
+          ? {
+              keyingMaterialUpdateThreshold: Config.getConfig().FEATURE.MLS_CONFIG_KEYING_MATERIAL_UPDATE_THRESHOLD,
+            }
+          : undefined,
+
+        proteus: supportsCoreCryptoProteus(),
+        /*
+         * When in an electron context, the window.systemCrypto will be populated by the renderer process.
+         * We then give those crypto primitives to the core that will use them when encrypting MLS secrets.
+         * When in a browser context, then this systemCrypto will be undefined and the core will then use it's internal encryption system
+         */
+        systemCrypto: window.systemCrypto,
+      },
       nbPrekeys: 100,
     });
   }

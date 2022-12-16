@@ -17,23 +17,26 @@
  *
  */
 
-const commonConfig = require('./webpack.config.common');
-const path = require('path');
 const webpack = require('webpack');
+
+const path = require('path');
+
+const commonConfig = require('./webpack.config.common');
 
 const srcScript = 'src/script/';
 
 module.exports = {
   ...commonConfig,
+  devtool: 'eval-source-map',
   entry: {
     ...commonConfig.entry,
-    app: ['webpack-hot-middleware/client?reload=true', path.resolve(__dirname, srcScript, 'main/app.ts')],
+    app: ['webpack-hot-middleware/client?reload=true', path.resolve(__dirname, srcScript, 'main/index.tsx')],
     auth: ['webpack-hot-middleware/client', path.resolve(__dirname, srcScript, 'auth/main.tsx')],
   },
   mode: 'development',
   plugins: [...commonConfig.plugins, new webpack.HotModuleReplacementPlugin()],
-  resolve: {...commonConfig.resolve, alias: {...commonConfig.resolve.alias}},
   snapshot: {
+    // This will make sure that changes in the node_modules will be detected and recompiled automatically (when using yalc for example)
     managedPaths: [],
   },
 };

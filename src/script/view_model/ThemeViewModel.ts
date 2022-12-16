@@ -17,12 +17,13 @@
  *
  */
 
-import {WebAppEvents} from '@wireapp/webapp-events';
+import type {WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
-import type {WebappProperties} from '@wireapp/api-client/src/user/data/';
 
-import {PROPERTIES_TYPE} from '../properties/PropertiesType';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import type {PropertiesRepository} from '../properties/PropertiesRepository';
+import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 
 const THEMES_CLASS_PREFIX = 'theme-';
 

@@ -17,40 +17,41 @@
  *
  */
 
-import {Asset as ProtobufAsset, GenericMessage} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/lib/event/';
+import {NotificationSource, HandledEventPayload} from '@wireapp/core/lib/notification';
 import {amplify} from 'amplify';
 import ko from 'knockout';
-import {USER_EVENT, CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
 import {container} from 'tsyringe';
+
+import {Account, ConnectionState, ProcessedEventPayload} from '@wireapp/core';
+import {Asset as ProtobufAsset, GenericMessage} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {getLogger, Logger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
-import {AssetTransferState} from '../assets/AssetTransferState';
-
-import {EVENT_TYPE} from './EventType';
 import {ClientEvent} from './Client';
-import {EventTypeHandling} from './EventTypeHandling';
-import {NOTIFICATION_HANDLING_STATE} from './NotificationHandlingState';
-import {categoryFromEvent} from '../message/MessageCategorization';
+import type {EventService} from './EventService';
 import {EventSource} from './EventSource';
+import {EVENT_TYPE} from './EventType';
+import {EventTypeHandling} from './EventTypeHandling';
 import {EventValidation} from './EventValidation';
 import {validateEvent} from './EventValidator';
+import {NOTIFICATION_HANDLING_STATE} from './NotificationHandlingState';
+import type {NotificationService} from './NotificationService';
+
+import {AssetTransferState} from '../assets/AssetTransferState';
+import type {ClientEntity} from '../client/ClientEntity';
+import {EventBuilder} from '../conversation/EventBuilder';
+import {AssetData, CryptographyMapper} from '../cryptography/CryptographyMapper';
 import {CryptographyError} from '../error/CryptographyError';
 import {EventError} from '../error/EventError';
-import type {EventService} from './EventService';
-import type {ServerTimeHandler} from '../time/serverTimeHandler';
-import type {ClientEntity} from '../client/ClientEntity';
+import {categoryFromEvent} from '../message/MessageCategorization';
 import type {EventRecord} from '../storage';
-import type {NotificationService} from './NotificationService';
-import {UserState} from '../user/UserState';
-import {AssetData, CryptographyMapper} from '../cryptography/CryptographyMapper';
-import Warnings from '../view_model/WarningsContainer';
-import {Account, ConnectionState, ProcessedEventPayload} from '@wireapp/core';
-import {HandledEventPayload} from '@wireapp/core/src/main/notification';
-import {EventBuilder} from '../conversation/EventBuilder';
+import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import {EventName} from '../tracking/EventName';
-import {PayloadBundleSource} from '@wireapp/core/src/main/conversation';
+import {UserState} from '../user/UserState';
+import {Warnings} from '../view_model/WarningsContainer';
 
 export class EventRepository {
   logger: Logger;
@@ -59,7 +60,6 @@ export class EventRepository {
   previousHandlingState: NOTIFICATION_HANDLING_STATE | undefined;
   notificationsHandled: number;
   notificationsTotal: number;
-  lastNotificationId: ko.Observable<string | undefined>;
   lastEventDate: ko.Observable<string | undefined>;
   eventProcessMiddlewares: Function[];
 
@@ -109,7 +109,6 @@ export class EventRepository {
     this.notificationsHandled = 0;
     this.notificationsTotal = 0;
 
-    this.lastNotificationId = ko.observable();
     this.lastEventDate = ko.observable();
 
     this.eventProcessMiddlewares = [];
@@ -130,34 +129,35 @@ export class EventRepository {
   //##############################################################################
 
   private readonly updateConnectivitityStatus = (state: ConnectionState) => {
+    this.logger.log('Websocket connection state changed to', state);
     switch (state) {
       case ConnectionState.CONNECTING: {
-        amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.NO_INTERNET);
-        amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.CONNECTIVITY_RECONNECT);
+        Warnings.hideWarning(Warnings.TYPE.NO_INTERNET);
+        Warnings.showWarning(Warnings.TYPE.CONNECTIVITY_RECONNECT);
         return;
       }
       case ConnectionState.PROCESSING_NOTIFICATIONS: {
         this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.STREAM);
-        amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.NO_INTERNET);
-        amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.CONNECTIVITY_RECONNECT);
-        amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.CONNECTIVITY_RECOVERY);
+        Warnings.hideWarning(Warnings.TYPE.NO_INTERNET);
+        Warnings.hideWarning(Warnings.TYPE.CONNECTIVITY_RECONNECT);
+        Warnings.showWarning(Warnings.TYPE.CONNECTIVITY_RECOVERY);
         return;
       }
       case ConnectionState.CLOSED: {
-        amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.NO_INTERNET);
+        Warnings.showWarning(Warnings.TYPE.NO_INTERNET);
         return;
       }
       case ConnectionState.LIVE: {
         this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
         amplify.publish(WebAppEvents.CONNECTION.ONLINE);
-        amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.NO_INTERNET);
-        amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.CONNECTIVITY_RECONNECT);
-        amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.CONNECTIVITY_RECOVERY);
+        Warnings.hideWarning(Warnings.TYPE.NO_INTERNET);
+        Warnings.hideWarning(Warnings.TYPE.CONNECTIVITY_RECONNECT);
+        Warnings.hideWarning(Warnings.TYPE.CONNECTIVITY_RECOVERY);
       }
     }
   };
 
-  private readonly handleIncomingEvent = async (payload: HandledEventPayload, source: PayloadBundleSource) => {
+  private readonly handleIncomingEvent = async (payload: HandledEventPayload, source: NotificationSource) => {
     try {
       await this.handleEvent({...payload, event: payload.event as EventRecord}, source);
     } catch (error) {
@@ -185,7 +185,7 @@ export class EventRepository {
       // We make sure there is only be a single active connection to the WebSocket.
       this.disconnectWebSocket?.();
       return new Promise<void>(async resolve => {
-        this.disconnectWebSocket = await account.listen({
+        this.disconnectWebSocket = account.listen({
           onConnectionStateChanged: connectionState => {
             this.updateConnectivitityStatus(connectionState);
             if (connectionState === ConnectionState.LIVE) {
@@ -207,7 +207,7 @@ export class EventRepository {
     window.addEventListener('offline', () => {
       this.logger.warn('Internet connection lost');
       this.disconnectWebSocket();
-      amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.NO_INTERNET);
+      Warnings.showWarning(Warnings.TYPE.NO_INTERNET);
     });
     return connect();
   }
@@ -258,7 +258,7 @@ export class EventRepository {
     const shouldUpdatePersistedId = missedNotificationId !== notificationId;
     if (shouldUpdatePersistedId) {
       amplify.publish(WebAppEvents.CONVERSATION.MISSED_EVENTS);
-      this.notificationService.saveMissedIdToDb(this.lastNotificationId());
+      this.notificationService.saveMissedIdToDb(missedNotificationId);
     }
   };
 
@@ -366,10 +366,6 @@ export class EventRepository {
       default: {
         return Promise.resolve(event as EventRecord);
       }
-      case EventValidation.IGNORED_TYPE: {
-        this.logger.info(`Ignored event type '${event.type}'`, logObject);
-        return Promise.resolve(event as EventRecord);
-      }
       case EventValidation.OUTDATED_TIMESTAMP: {
         this.logger.info(`Ignored outdated event type: '${event.type}'`, logObject);
         return Promise.resolve(event as EventRecord);
@@ -398,7 +394,7 @@ export class EventRepository {
         208, // Outated event decyption error (see https://github.com/wireapp/wire-web-core/blob/5c8c56097eadfa55e79856cd6745087f0fd12e24/packages/proteus/README.md#decryption-errors)
         209, // Duplicate event decryption error (see https://github.com/wireapp/wire-web-core/blob/5c8c56097eadfa55e79856cd6745087f0fd12e24/packages/proteus/README.md#decryption-errors)
       ];
-      if (ignoredCodes.includes(decryptionError.code)) {
+      if (decryptionError.code && ignoredCodes.includes(decryptionError.code)) {
         return undefined;
       }
       amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.E2EE.FAILED_MESSAGE_DECRYPTION, {

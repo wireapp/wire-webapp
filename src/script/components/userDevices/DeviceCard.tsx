@@ -18,17 +18,19 @@
  */
 
 import React from 'react';
-import cx from 'classnames';
-import {ClientClassification} from '@wireapp/api-client/src/client';
 
+import {ClientClassification} from '@wireapp/api-client/lib/client';
+import cx from 'classnames';
+
+import {DeviceId} from 'Components/DeviceId';
+import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
+import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
-import DeviceId from 'Components/DeviceId';
 
 import type {ClientEntity} from '../../client/ClientEntity';
-import Icon from '../Icon';
-import LegalHoldDot from '../LegalHoldDot';
-import VerifiedIcon from '../VerifiedIcon';
-import {handleKeyDown} from 'Util/KeyboardUtil';
+import {Icon} from '../Icon';
+import {LegalHoldDot} from '../LegalHoldDot';
+import {VerifiedIcon} from '../VerifiedIcon';
 
 export interface DeviceCardProps {
   click?: (device: ClientEntity) => void;
@@ -43,6 +45,7 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
   showVerified = false,
   showIcon = false,
 }) => {
+  const messageFocusedTabIndex = useMessageFocusedTabIndex(!!click);
   const {class: deviceClass = '?', id = '', label = '?', meta} = clientEntity;
   const name = clientEntity.getName();
   const clickable = !!click;
@@ -60,7 +63,7 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
   return (
     <div
       role={clickable ? 'button' : undefined}
-      tabIndex={clickable ? 0 : -1}
+      tabIndex={messageFocusedTabIndex}
       className={cx('device-card', {'device-card__no-hover': !clickable})}
       onClick={clickOnDevice}
       onKeyDown={e => handleKeyDown(e, clickOnDevice)}
@@ -79,12 +82,12 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
         <div className="label-xs">
           <span className="device-card__model">{name}</span>
         </div>
-        <div className="text-background label-xs">
+        <p className="text-background label-xs">
           <span>{t('preferencesDevicesId')}</span>
           <span data-uie-name="device-id">
             <DeviceId deviceId={id} />
           </span>
-        </div>
+        </p>
       </div>
       {showVerified && <VerifiedIcon isVerified={!!isVerified && isVerified()} />}
       {clickable && <Icon.ChevronRight className="disclose-icon" data-uie-name="disclose-icon" />}
@@ -92,4 +95,4 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
   );
 };
 
-export default DeviceCard;
+export {DeviceCard};

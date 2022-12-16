@@ -17,7 +17,8 @@
  *
  */
 
-import {AssetUploadData} from '@wireapp/api-client/src/asset/';
+import {AssetUploadData} from '@wireapp/api-client/lib/asset/';
+import {container} from 'tsyringe';
 
 import {createRandomUuid} from 'Util/util';
 import {ValidationUtilError} from 'Util/ValidationUtil';
@@ -25,11 +26,11 @@ import {ValidationUtilError} from 'Util/ValidationUtil';
 import {encryptAesAsset} from './AssetCrypto';
 import {AssetRemoteData} from './AssetRemoteData';
 import {AssetRepository, AssetUploadOptions} from './AssetRepository';
-import {EventMapper} from '../conversation/EventMapper';
 import {AssetService} from './AssetService';
+
+import {EventMapper} from '../conversation/EventMapper';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
-import {container} from 'tsyringe';
 
 describe('AssetRepository', () => {
   let assetRepository: AssetRepository;

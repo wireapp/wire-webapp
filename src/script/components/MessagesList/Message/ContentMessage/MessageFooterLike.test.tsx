@@ -17,10 +17,12 @@
  *
  */
 
-import ko from 'knockout';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import MessageFooterLike from './MessageFooterLike';
 import {render, fireEvent} from '@testing-library/react';
+import ko from 'knockout';
+
+import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+
+import {MessageFooterLike} from './MessageFooterLike';
 
 const createLikeMessage = (partialLikeMessage: Partial<ContentMessage>) => {
   const likeMessage: Partial<ContentMessage> = {
@@ -37,6 +39,7 @@ describe('MessageFooterLike', () => {
     const message = createLikeMessage({});
 
     const props = {
+      isMessageFocused: true,
       is1to1Conversation: false,
       message,
       onClickLikes: jest.fn(),
@@ -52,6 +55,7 @@ describe('MessageFooterLike', () => {
 
   it('does open conversation details in group conversation when clicking on like names', async () => {
     const props = {
+      isMessageFocused: true,
       is1to1Conversation: false,
       message: createLikeMessage({
         is_liked: ko.pureComputed(() => true),
@@ -69,6 +73,7 @@ describe('MessageFooterLike', () => {
 
   it('does not open conversation details in 1:1 conversation when clicking on like names', async () => {
     const props = {
+      isMessageFocused: true,
       is1to1Conversation: true,
       message: createLikeMessage({
         is_liked: ko.pureComputed(() => true),

@@ -17,16 +17,19 @@
  *
  */
 
+import {fireEvent, waitFor} from '@testing-library/react';
+
+import {TypeUtil} from '@wireapp/commons';
+
+import {SingleSignOnForm} from './SingleSignOnForm';
+
+import {Config, Configuration} from '../../Config';
 import {actionRoot} from '../module/action';
+import {ValidationError} from '../module/action/ValidationError';
 import {initialRootState} from '../module/reducer';
 import {ROUTE, QUERY_KEY} from '../route';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
-import SingleSignOnForm from './SingleSignOnForm';
-import {ValidationError} from '../module/action/ValidationError';
-import {TypeUtil} from '@wireapp/commons';
-import {Config, Configuration} from '../../Config';
-import {fireEvent, waitFor} from '@testing-library/react';
 
 const codeOrEmailInputId = 'enter-code';
 const submitButtonId = 'do-sso-sign-in';

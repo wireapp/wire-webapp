@@ -19,8 +19,9 @@
 
 import Cookies from 'js-cookie';
 
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {Runtime} from '@wireapp/commons';
+
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 let checkIntervalId = 0;
 

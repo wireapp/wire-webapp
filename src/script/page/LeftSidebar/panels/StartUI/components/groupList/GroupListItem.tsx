@@ -17,24 +17,25 @@
  *
  */
 
-import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import React from 'react';
+
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {GroupAvatar} from 'Components/avatar/GroupAvatar';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {AssetRepository} from '../../../../../../assets/AssetRepository';
-import type {Conversation} from '../../../../../../entity/Conversation';
-import {generateConversationUrl} from '../../../../../../router/routeGenerator';
-import {Router} from '../../../../../../router/Router';
-import GroupAvatar from 'Components/avatar/GroupAvatar';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 
+import type {Conversation} from '../../../../../../entity/Conversation';
+import {generateConversationUrl} from '../../../../../../router/routeGenerator';
+import {navigate} from '../../../../../../router/Router';
+
 export interface GroupListItemProps {
-  assetRepository: AssetRepository;
   click: (group: Conversation) => void;
   group: Conversation;
-  router: Router;
 }
 
-const GroupListItem: React.FC<GroupListItemProps> = ({assetRepository, click, group, router}) => {
+const GroupListItem: React.FC<GroupListItemProps> = ({click, group}) => {
   const {
     display_name: displayName,
     participating_user_ets: participatingUserEts,
@@ -43,13 +44,13 @@ const GroupListItem: React.FC<GroupListItemProps> = ({assetRepository, click, gr
 
   const onClick = () => {
     click(group);
-    router.navigate(generateConversationUrl(group.id, group.domain));
+    navigate(generateConversationUrl(group.qualifiedId));
   };
 
   return (
     <div
       role="button"
-      tabIndex={0}
+      tabIndex={TabIndex.FOCUSABLE}
       key={group.id}
       data-uie-name="item-group"
       className="search-list-item"
@@ -67,4 +68,4 @@ const GroupListItem: React.FC<GroupListItemProps> = ({assetRepository, click, gr
   );
 };
 
-export default GroupListItem;
+export {GroupListItem};

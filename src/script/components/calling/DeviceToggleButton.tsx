@@ -18,7 +18,9 @@
  */
 
 import React from 'react';
+
 import {css, SerializedStyles} from '@emotion/react';
+
 import {handleKeyDown} from 'Util/KeyboardUtil';
 export interface DeviceToggleButtonProps {
   currentDevice: string;
@@ -58,7 +60,7 @@ const DeviceToggleButton: React.FC<DeviceToggleButtonProps> = ({currentDevice, d
             data-uie-name="device-toggle-button-indicator-dot"
             data-uie-value={isCurrentDevice ? 'active' : 'inactive'}
             onClick={selectNextDevice}
-            onKeyDown={e => handleKeyDown(e, selectNextDevice.bind(null, e))}
+            onKeyDown={event => handleKeyDown(event, () => selectNextDevice(event))}
             css={{
               '&:focus-visible': {
                 backgroundColor: isCurrentDevice
@@ -75,9 +77,8 @@ const DeviceToggleButton: React.FC<DeviceToggleButtonProps> = ({currentDevice, d
                   ? '1px solid var(--toggle-button-hover-bg)'
                   : '1px solid var(--toggle-button-unselected-hover-border)',
               },
-              /* eslint-disable sort-keys-fix/sort-keys-fix */
+
               '&:active': {
-                /* eslint-enable sort-keys-fix/sort-keys-fix */
                 backgroundColor: isCurrentDevice ? 'var(--accent-color)' : 'var(--toggle-button-unselected-bg)',
                 border: '1px solid var(--accent-color)',
               },
@@ -98,4 +99,4 @@ const DeviceToggleButton: React.FC<DeviceToggleButtonProps> = ({currentDevice, d
   );
 };
 
-export default DeviceToggleButton;
+export {DeviceToggleButton};

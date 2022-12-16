@@ -41,7 +41,7 @@
       justify-content: center;
       background-color: var(--foreground-fade-16);
       color: var(--background);
-      font-size: 12px;
+      font-size: @font-size-small;
       font-weight: 600;
       text-align: center;
       text-transform: uppercase;
@@ -199,7 +199,7 @@
         z-index: 1;
         max-width: 50%;
         color: #fff;
-        font-size: 14px;
+        font-size: @font-size-medium;
         font-weight: @font-weight-bold;
         text-align: center;
       }
@@ -217,7 +217,9 @@
     display: flex;
     overflow: hidden;
     width: 200px;
+    max-width: 33%;
     height: 120px;
+    max-height: 33%;
     border-radius: 4px;
     background-color: #54585a;
     box-shadow: 0 0 0 1px var(--gray-90);

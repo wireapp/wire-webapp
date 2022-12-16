@@ -18,27 +18,27 @@
  */
 
 import React, {useEffect, useState} from 'react';
-import {TeamState} from '../../../../../team/TeamState';
-import {container} from 'tsyringe';
-import cx from 'classnames';
 
+import cx from 'classnames';
+import {container} from 'tsyringe';
+
+import {RestrictedAudio} from 'Components/asset/RestrictedAudio';
+import {Icon} from 'Components/Icon';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getLogger} from 'Util/Logger';
 import {formatSeconds} from 'Util/TimeUtil';
+import {useEffectRef} from 'Util/useEffectRef';
+
+import {useAssetTransfer} from './AbstractAssetTransferStateTracker';
+import {AssetHeader} from './AssetHeader';
+import {AudioSeekBar} from './controls/AudioSeekBar';
+import {MediaButton} from './controls/MediaButton';
+import {SeekBar} from './controls/SeekBar';
 
 import {AssetTransferState} from '../../../../../assets/AssetTransferState';
 import type {ContentMessage} from '../../../../../entity/message/ContentMessage';
 import type {FileAsset} from '../../../../../entity/message/FileAsset';
-
-import RestrictedAudio from 'Components/asset/RestrictedAudio';
-import SeekBar from './controls/SeekBar';
-import AudioSeekBar from './controls/AudioSeekBar';
-import AssetHeader from './AssetHeader';
-import MediaButton from './controls/MediaButton';
-
-import Icon from 'Components/Icon';
-import useEffectRef from 'Util/useEffectRef';
-import {useAssetTransfer} from './AbstractAssetTransferStateTracker';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {TeamState} from '../../../../../team/TeamState';
 
 const logger = getLogger('AudioAssetComponent');
 
@@ -48,6 +48,7 @@ export interface AudioAssetProps {
   hasHeader?: boolean;
   message: ContentMessage;
   teamState?: TeamState;
+  isFocusable?: boolean;
 }
 
 const AudioAsset: React.FC<AudioAssetProps> = ({
@@ -55,6 +56,7 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
   className,
   hasHeader = false,
   teamState = container.resolve(TeamState),
+  isFocusable = true,
 }) => {
   const asset = message.getFirstAsset() as FileAsset;
   const [audioElement, setAudioElement] = useEffectRef<HTMLAudioElement>();
@@ -129,6 +131,7 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
                     cancel={cancelUpload}
                     transferState={transferState}
                     uploadProgress={uploadProgress}
+                    isFocusable={isFocusable}
                   />
 
                   {transferState !== AssetTransferState.UPLOADING && audioElement && (
@@ -162,4 +165,4 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
   );
 };
 
-export default AudioAsset;
+export {AudioAsset};

@@ -17,27 +17,33 @@
  *
  */
 
+import React, {MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent} from 'react';
+
 import {css} from '@emotion/react';
-import React from 'react';
-import {t} from 'Util/LocalizerUtil';
-import {ListViewModel} from '../../../../view_model/ListViewModel';
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {GroupAvatar} from 'Components/avatar/GroupAvatar';
+import {ConversationListCell} from 'Components/list/ConversationListCell';
+import {Call} from 'src/script/calling/Call';
+import {User} from 'src/script/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {handleKeyDown} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
+import {matchQualifiedIds} from 'Util/QualifiedId';
+
+import {ConversationViewStyle} from './Conversations';
+import {GroupedConversations} from './GroupedConversations';
+
+import {CallState} from '../../../../calling/CallState';
+import {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import {ConversationState} from '../../../../conversation/ConversationState';
 import {Conversation} from '../../../../entity/Conversation';
-import ConversationListCell from 'Components/list/ConversationListCell';
-import GroupedConversations from './GroupedConversations';
-import {createNavigate} from '../../../../router/routerBindings';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
-import {CallState} from '../../../../calling/CallState';
-import {Call} from 'src/script/calling/Call';
-import {matchQualifiedIds} from 'Util/QualifiedId';
-import {ConversationRepository} from '../../../../conversation/ConversationRepository';
-import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
-import GroupAvatar from 'Components/avatar/GroupAvatar';
-import {ContentViewModel} from '../../../../view_model/ContentViewModel';
-import {ConverationViewStyle} from './Conversations';
-import {User} from 'src/script/entity/User';
-import {handleKeyDown} from 'Util/KeyboardUtil';
+import {createNavigate, createNavigateKeyboard} from '../../../../router/routerBindings';
+import {ListViewModel} from '../../../../view_model/ListViewModel';
+import {useAppMainState, ViewType} from '../../../state';
+import {ContentState, useAppState} from '../../../useAppState';
 
 export const ConversationsList: React.FC<{
   callState: CallState;
@@ -46,7 +52,7 @@ export const ConversationsList: React.FC<{
   conversations: Conversation[];
   conversationState: ConversationState;
   listViewModel: ListViewModel;
-  viewStyle: ConverationViewStyle;
+  viewStyle: ConversationViewStyle;
   currentFocus: number;
   isConversationListFocus: boolean;
   handleFocus: (index: number) => void;
@@ -64,6 +70,8 @@ export const ConversationsList: React.FC<{
   handleFocus,
   handleArrowKeyDown,
 }) => {
+  const {contentState} = useAppState();
+
   const {joinableCalls} = useKoSubscribableChildren(callState, ['joinableCalls']);
 
   const isActiveConversation = (conversation: Conversation) => conversationState.isActiveConversation(conversation);
@@ -71,8 +79,7 @@ export const ConversationsList: React.FC<{
   const openContextMenu = (conversation: Conversation, event: MouseEvent | React.MouseEvent<Element, MouseEvent>) =>
     listViewModel.onContextMenu(conversation, event);
   const answerCall = (conversation: Conversation) => listViewModel.answerCall(conversation);
-  const {state: contentState} = useKoSubscribableChildren(listViewModel.contentViewModel, ['state']);
-  const isShowingConnectionRequests = contentState === ContentViewModel.STATE.CONNECTION_REQUESTS;
+  const isShowingConnectionRequests = contentState === ContentState.CONNECTION_REQUESTS;
 
   const hasJoinableCall = (conversation: Conversation) => {
     const call = joinableCalls.find((callInstance: Call) =>
@@ -84,12 +91,15 @@ export const ConversationsList: React.FC<{
     return !conversation.removed_from_conversation();
   };
 
+  const {setCurrentView} = useAppMainState(state => state.responsiveView);
+
   const onConnectionRequestClick = () => {
-    listViewModel.contentViewModel.switchContent(ContentViewModel.STATE.CONNECTION_REQUESTS);
+    setCurrentView(ViewType.CENTRAL_COLUMN);
+    listViewModel.contentViewModel.switchContent(ContentState.CONNECTION_REQUESTS);
   };
 
   const conversationView =
-    viewStyle === ConverationViewStyle.RECENT ? (
+    viewStyle === ConversationViewStyle.RECENT ? (
       <>
         {conversations.map((conversation, index) => {
           return (
@@ -102,7 +112,13 @@ export const ConversationsList: React.FC<{
               index={index}
               dataUieName="item-conversation"
               conversation={conversation}
-              onClick={createNavigate(generateConversationUrl(conversation.id, conversation.domain))}
+              onClick={(event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>) => {
+                if ('key' in event) {
+                  createNavigateKeyboard(generateConversationUrl(conversation.qualifiedId), true)(event);
+                } else {
+                  createNavigate(generateConversationUrl(conversation.qualifiedId))(event);
+                }
+              }}
               isSelected={isActiveConversation}
               onJoinCall={answerCall}
               rightClick={openContextMenu}
@@ -112,7 +128,7 @@ export const ConversationsList: React.FC<{
         })}
       </>
     ) : (
-      <li tabIndex={-1}>
+      <li tabIndex={TabIndex.UNFOCUSABLE}>
         <GroupedConversations
           callState={callState}
           conversationRepository={conversationRepository}
@@ -125,7 +141,8 @@ export const ConversationsList: React.FC<{
       </li>
     );
 
-  const uieName = viewStyle === ConverationViewStyle.FOLDER ? 'folder-view' : 'recent-view';
+  const isFolderView = viewStyle === ConversationViewStyle.FOLDER;
+  const uieName = isFolderView ? 'folder-view' : 'recent-view';
 
   const connectionText =
     connectRequests.length > 1
@@ -134,10 +151,10 @@ export const ConversationsList: React.FC<{
 
   const connectionRequests =
     connectRequests.length === 0 ? null : (
-      <li tabIndex={-1}>
+      <li tabIndex={TabIndex.UNFOCUSABLE}>
         <div
           role="button"
-          tabIndex={0}
+          tabIndex={TabIndex.FOCUSABLE}
           className={`conversation-list-cell ${isShowingConnectionRequests ? 'conversation-list-cell-active' : ''}`}
           onClick={onConnectionRequestClick}
           onKeyDown={e => handleKeyDown(e, onConnectionRequestClick)}
@@ -171,9 +188,13 @@ export const ConversationsList: React.FC<{
       </li>
     );
   return (
-    <ul css={css({margin: 0, paddingLeft: 0})} data-uie-name={uieName}>
-      {connectionRequests}
-      {conversationView}
-    </ul>
+    <>
+      <h2 className="visually-hidden">{t(isFolderView ? 'folderViewTooltip' : 'conversationViewTooltip')}</h2>
+
+      <ul css={css({margin: 0, paddingLeft: 0})} data-uie-name={uieName}>
+        {connectionRequests}
+        {conversationView}
+      </ul>
+    </>
   );
 };

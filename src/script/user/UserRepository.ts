@@ -17,61 +17,63 @@
  *
  */
 
-import {amplify} from 'amplify';
-import {Availability} from '@wireapp/protocol-messaging';
-import {ConsentType, Self as APIClientSelf} from '@wireapp/api-client/src/self/';
-import {container} from 'tsyringe';
-import {flatten} from 'underscore';
-import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import type {AddedClient, PublicClient} from '@wireapp/api-client/lib/client';
 import {
   UserEvent,
-  UserLegalHoldRequestEvent,
   UserLegalHoldDisableEvent,
+  UserLegalHoldRequestEvent,
   USER_EVENT,
-} from '@wireapp/api-client/src/event';
+} from '@wireapp/api-client/lib/event';
+import type {BackendError, TraceState} from '@wireapp/api-client/lib/http';
+import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
+import {ConsentType, Self as APIClientSelf} from '@wireapp/api-client/lib/self/';
+import type {QualifiedHandle, User as APIClientUser} from '@wireapp/api-client/lib/user';
 import {
+  QualifiedId,
   UserAsset as APIClientUserAsset,
   UserAssetType as APIClientUserAssetType,
-  QualifiedId,
-} from '@wireapp/api-client/src/user';
-import {WebAppEvents} from '@wireapp/webapp-events';
-import type {AccentColor} from '@wireapp/commons';
-import type {BackendError, TraceState} from '@wireapp/api-client/src/http';
-import {BackendErrorLabel} from '@wireapp/api-client/src/http';
-import type {PublicClient, AddedClient} from '@wireapp/api-client/src/client';
-import type {User as APIClientUser, QualifiedHandle} from '@wireapp/api-client/src/user';
+} from '@wireapp/api-client/lib/user';
+import {amplify} from 'amplify';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {container} from 'tsyringe';
+import {flatten} from 'underscore';
 
+import type {AccentColor} from '@wireapp/commons';
+import {Availability} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {chunk, partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
-import {Logger, getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
+import {matchQualifiedIds} from 'Util/QualifiedId';
+import {fixWebsocketString} from 'Util/StringUtil';
 import {isAxiosError, isBackendError, isQualifiedId} from 'Util/TypePredicateUtil';
 
-import {AssetRepository} from '../assets/AssetRepository';
-import {ClientEntity} from '../client/ClientEntity';
-import {USER} from '../event/Client';
-import {ClientMapper} from '../client/ClientMapper';
-import {Config} from '../Config';
-import {ConsentValue} from './ConsentValue';
-import {EventRepository} from '../event/EventRepository';
-import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
-import {mapProfileAssetsV1} from '../assets/AssetMapper';
 import {valueFromType} from './AvailabilityMapper';
 import {showAvailabilityModal} from './AvailabilityModal';
+import {ConsentValue} from './ConsentValue';
+import {UserMapper} from './UserMapper';
+import type {UserService} from './UserService';
+import {UserState} from './UserState';
+
+import {mapProfileAssetsV1} from '../assets/AssetMapper';
+import {AssetRepository} from '../assets/AssetRepository';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
+import {ClientEntity} from '../client/ClientEntity';
+import {ClientMapper} from '../client/ClientMapper';
+import type {ClientRepository, QualifiedUserClientEntityMap} from '../client/ClientRepository';
+import {Config} from '../Config';
+import type {ConnectionEntity} from '../connection/ConnectionEntity';
+import {flattenUserClientsQualifiedIds} from '../conversation/userClientsUtils';
 import {User} from '../entity/User';
 import {UserError} from '../error/UserError';
-import {UserMapper} from './UserMapper';
-import {UserState} from './UserState';
-import type {ClientRepository, QualifiedUserClientEntityMap} from '../client/ClientRepository';
-import type {ConnectionEntity} from '../connection/ConnectionEntity';
+import {USER} from '../event/Client';
+import {EventRepository} from '../event/EventRepository';
 import type {EventSource} from '../event/EventSource';
 import type {PropertiesRepository} from '../properties/PropertiesRepository';
 import type {SelfService} from '../self/SelfService';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
-import type {UserService} from './UserService';
-import {fixWebsocketString} from 'Util/StringUtil';
-import {matchQualifiedIds} from 'Util/QualifiedId';
-import {flattenUserClientsQualifiedIds} from '../conversation/userClientsUtils';
 
 interface UserAvailabilityEvent {
   data: {availability: Availability.Type};
@@ -302,19 +304,26 @@ export class UserRepository {
         ? clientPayload
         : ClientMapper.mapClient(clientPayload, userEntity.isMe, userId.domain);
     const wasClientAdded = userEntity.addClient(clientEntity);
+
     if (wasClientAdded) {
       await this.clientRepository.saveClientInDb(userId, clientEntity.toJson());
+
+      const {showUsers} = useLegalHoldModalState.getState();
+
       if (clientEntity.isLegalHold()) {
         const isSelfUser = userId.id === this.userState.self().id;
         if (isSelfUser) {
-          amplify.publish(LegalHoldModalViewModel.SHOW_DETAILS);
+          showUsers(false);
         }
       }
+
       if (publishClient) {
         amplify.publish(WebAppEvents.USER.CLIENT_ADDED, userId, clientEntity);
       }
+
       return clientEntity;
     }
+
     return undefined;
   };
 
@@ -378,7 +387,9 @@ export class UserRepository {
   private onLegalHoldRequestCanceled(eventJson: UserLegalHoldDisableEvent): void {
     if (this.userState.self().id === eventJson.id) {
       this.userState.self().hasPendingLegalHold(false);
-      amplify.publish(LegalHoldModalViewModel.HIDE_REQUEST);
+
+      const {closeRequestModal} = useLegalHoldModalState.getState();
+      closeRequestModal();
     } else {
       /*
        * TODO:
@@ -406,7 +417,9 @@ export class UserRepository {
       clientId,
       last_prekey,
     );
-    amplify.publish(LegalHoldModalViewModel.SHOW_REQUEST, fingerprint);
+
+    const {showRequestModal} = useLegalHoldModalState.getState();
+    showRequestModal(false, false, fingerprint);
   }
 
   /**

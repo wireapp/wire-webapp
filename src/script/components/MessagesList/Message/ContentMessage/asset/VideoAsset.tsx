@@ -18,30 +18,35 @@
  */
 
 import React, {useCallback, useEffect, useState} from 'react';
-import {container} from 'tsyringe';
-import cx from 'classnames';
 
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+import cx from 'classnames';
+import {container} from 'tsyringe';
+
+import {useTimeout} from '@wireapp/react-ui-kit';
+
+import {RestrictedVideo} from 'Components/asset/RestrictedVideo';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
+import {formatSeconds} from 'Util/TimeUtil';
+import {useEffectRef} from 'Util/useEffectRef';
+
+import {useAssetTransfer} from './AbstractAssetTransferStateTracker';
+import {MediaButton} from './controls/MediaButton';
+import {SeekBar} from './controls/SeekBar';
+
+import {AssetRepository} from '../../../../../assets/AssetRepository';
 import {AssetTransferState} from '../../../../../assets/AssetTransferState';
 import type {ContentMessage} from '../../../../../entity/message/ContentMessage';
 import type {FileAsset} from '../../../../../entity/message/FileAsset';
-import {useAssetTransfer} from './AbstractAssetTransferStateTracker';
 import {TeamState} from '../../../../../team/TeamState';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import SeekBar from './controls/SeekBar';
-import MediaButton from './controls/MediaButton';
-import {t} from 'Util/LocalizerUtil';
-import {formatSeconds} from 'Util/TimeUtil';
-import useEffectRef from 'Util/useEffectRef';
-import {AssetRepository} from '../../../../../assets/AssetRepository';
-import {useTimeout} from '@wireapp/react-ui-kit';
-import RestrictedVideo from 'Components/asset/RestrictedVideo';
-import clx from 'classnames';
 
 interface VideoAssetProps {
   assetRepository?: AssetRepository;
   isQuote?: boolean;
   message: ContentMessage;
   teamState?: TeamState;
+  isFocusable?: boolean;
 }
 
 const VideoAsset: React.FC<VideoAssetProps> = ({
@@ -49,6 +54,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
   isQuote,
   teamState = container.resolve(TeamState),
   assetRepository = container.resolve(AssetRepository),
+  isFocusable = true,
 }) => {
   const asset = message.getFirstAsset() as FileAsset;
   const {isObfuscated} = useKoSubscribableChildren(message, ['isObfuscated']);
@@ -162,8 +168,9 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
               onPlaying={onVideoPlaying}
               onTimeUpdate={syncVideoTimeRest}
               onLoadedMetadata={syncVideoTimeRest}
-              className={clx({hidden: isUploading})}
+              className={cx({hidden: isUploading})}
               style={{backgroundColor: videoPreview ? '#000' : ''}}
+              tabIndex={TabIndex.UNFOCUSABLE}
             />
             {videoPlaybackError ? (
               <div className="video-asset__playback-error label-xs">{t('conversationPlaybackError')}</div>
@@ -187,6 +194,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
                         cancel={() => (isUploading ? cancelUpload() : asset.cancelDownload())}
                         transferState={transferState}
                         uploadProgress={uploadProgress}
+                        isFocusable={isFocusable}
                       />
                     </div>
 
@@ -196,6 +204,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
                           className="video-asset__controls__bottom__seekbar"
                           data-uie-name="status-video-seekbar"
                           mediaElement={videoElement}
+                          isFocusable={isFocusable}
                         />
                         <span
                           className="video-asset__controls__bottom__time label-xs"
@@ -218,4 +227,4 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
   ) : null;
 };
 
-export default VideoAsset;
+export {VideoAsset};

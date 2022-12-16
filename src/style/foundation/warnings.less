@@ -43,13 +43,14 @@
   width: 100%;
   justify-content: center;
   background-color: var(--accent-color);
-  color: #fff;
+  color: var(--app-bg-secondary);
 
-  a {
-    color: @w-white;
+  a,
+  button {
+    color: var(--app-bg-secondary);
     &:hover,
     &:focus {
-      color: fade(@w-white, 80%);
+      color: var(--app-bg);
     }
   }
 }

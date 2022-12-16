@@ -18,18 +18,21 @@
  */
 
 import React from 'react';
+
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
+
+import {AudioOutPreferences} from './avPreferences/AudioOutPreferences';
+import {CallOptions} from './avPreferences/CallOptions';
+import {CameraPreferences} from './avPreferences/CameraPreferences';
+import {MicrophonePreferences} from './avPreferences/MicrophonePreferences';
+import {SaveCallLogs} from './avPreferences/SaveCallLogs';
+import {PreferencesPage} from './components/PreferencesPage';
+
 import type {CallingRepository} from '../../../../calling/CallingRepository';
+import {DeviceTypes} from '../../../../media/MediaDevicesHandler';
 import type {MediaRepository} from '../../../../media/MediaRepository';
 import type {PropertiesRepository} from '../../../../properties/PropertiesRepository';
-import {t} from 'Util/LocalizerUtil';
-import {DeviceTypes} from '../../../../media/MediaDevicesHandler';
-import SaveCallLogs from './avPreferences/SaveCallLogs';
-import CallOptions from './avPreferences/CallOptions';
-import CameraPreferences from './avPreferences/CameraPreferences';
-import MicrophonePreferences from './avPreferences/MicrophonePreferences';
-import AudioOutPreferences from './avPreferences/AudioOutPreferences';
-import PreferencesPage from './components/PreferencesPage';
 
 interface AVPreferencesProps {
   callingRepository: CallingRepository;
@@ -70,4 +73,4 @@ const AVPreferences: React.FC<AVPreferencesProps> = ({
   );
 };
 
-export default AVPreferences;
+export {AVPreferences};

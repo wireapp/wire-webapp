@@ -17,15 +17,18 @@
  *
  */
 
-import {ContainerXS, H2, Text} from '@wireapp/react-ui-kit';
 import React from 'react';
+
 import {FormattedMessage, useIntl} from 'react-intl';
+
+import {ContainerXS, H2, Text} from '@wireapp/react-ui-kit';
+
 import {Config} from '../../Config';
 import {conversationJoinStrings} from '../../strings';
-import UnsupportedBrowser from '../component/UnsupportedBrowser';
-import WirelessContainer from '../component/WirelessContainer';
+import {UnsupportedBrowser} from '../component/UnsupportedBrowser';
+import {WirelessContainer} from '../component/WirelessContainer';
 
-interface Props extends React.HTMLProps<HTMLDivElement> {}
+type Props = React.HTMLProps<HTMLDivElement>;
 
 const ConversationJoinInvalid = ({}: Props) => {
   const {formatMessage: _} = useIntl();
@@ -41,7 +44,7 @@ const ConversationJoinInvalid = ({}: Props) => {
               }}
             />
           </H2>
-          <Text style={{fontSize: '16px', marginTop: '10px'}} data-uie-name="status-invalid-text">
+          <Text style={{fontSize: '1rem', marginTop: '10px'}} data-uie-name="status-invalid-text">
             {_(conversationJoinStrings.invalidSubhead)}
           </Text>
         </ContainerXS>
@@ -50,4 +53,4 @@ const ConversationJoinInvalid = ({}: Props) => {
   );
 };
 
-export default ConversationJoinInvalid;
+export {ConversationJoinInvalid};

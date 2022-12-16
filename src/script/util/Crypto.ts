@@ -19,6 +19,7 @@
 
 import uint32 from 'uint32';
 
+/* eslint-disable no-magic-numbers */
 export const joaatHash = (stringToHash: string): number => {
   let hash = uint32.toUint32(0);
   const key = stringToHash.toLowerCase();

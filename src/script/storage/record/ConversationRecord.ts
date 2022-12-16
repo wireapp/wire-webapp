@@ -17,22 +17,24 @@
  *
  */
 
+import {
+  CONVERSATION_ACCESS_ROLE,
+  CONVERSATION_ACCESS,
+  CONVERSATION_LEGACY_ACCESS_ROLE,
+  CONVERSATION_TYPE,
+  DefaultConversationRoleName,
+} from '@wireapp/api-client/lib/conversation';
+import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
+import type {QualifiedId} from '@wireapp/api-client/lib/user/';
+
+import {LegalHoldStatus} from '@wireapp/protocol-messaging';
+
 import {ConversationStatus} from '../../conversation/ConversationStatus';
 import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
-import {
-  ACCESS_ROLE_V2,
-  DefaultConversationRoleName,
-  CONVERSATION_ACCESS,
-  CONVERSATION_ACCESS_ROLE,
-  CONVERSATION_TYPE,
-} from '@wireapp/api-client/src/conversation';
-import type {QualifiedId} from '@wireapp/api-client/src/user/';
-import {LegalHoldStatus} from '@wireapp/protocol-messaging';
-import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
-import {ConversationProtocol} from '@wireapp/api-client/src/conversation/NewConversation';
 
 export interface ConversationRecord {
-  access_role: CONVERSATION_ACCESS_ROLE | ACCESS_ROLE_V2[];
+  access_role: CONVERSATION_LEGACY_ACCESS_ROLE | CONVERSATION_ACCESS_ROLE[];
   access: CONVERSATION_ACCESS[];
   archived_state: boolean;
   archived_timestamp: number;

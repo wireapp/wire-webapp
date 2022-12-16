@@ -17,30 +17,32 @@
  *
  */
 
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
-import {t} from 'Util/LocalizerUtil';
 import {container} from 'tsyringe';
 
-import {ModalsViewModel} from './ModalsViewModel';
-import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
-import {BackendClientError} from '../error/BackendClientError';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {PrimaryModal, removeCurrentModal, usePrimaryModalState} from 'Components/Modals/PrimaryModal';
+import {t} from 'Util/LocalizerUtil';
+import {isBackendError} from 'Util/TypePredicateUtil';
+
 import type {MainViewModel} from './MainViewModel';
+
+import type {ClientEntity} from '../client/ClientEntity';
 import type {ClientRepository} from '../client/ClientRepository';
 import type {ConnectionRepository} from '../connection/ConnectionRepository';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
-import type {IntegrationRepository} from '../integration/IntegrationRepository';
-import type {User} from '../entity/User';
-import type {Conversation} from '../entity/Conversation';
-import type {ClientEntity} from '../client/ClientEntity';
-import type {Message} from '../entity/message/Message';
-import type {ServiceEntity} from '../integration/ServiceEntity';
 import type {MessageRepository} from '../conversation/MessageRepository';
+import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
+import type {Conversation} from '../entity/Conversation';
+import type {Message} from '../entity/message/Message';
+import type {User} from '../entity/User';
+import {BackendClientError} from '../error/BackendClientError';
+import type {IntegrationRepository} from '../integration/IntegrationRepository';
+import type {ServiceEntity} from '../integration/ServiceEntity';
 import {UserState} from '../user/UserState';
 
 export class ActionsViewModel {
-  modalsViewModel: ModalsViewModel;
-
   constructor(
     mainViewModel: MainViewModel,
     private readonly clientRepository: ClientRepository,
@@ -49,9 +51,7 @@ export class ActionsViewModel {
     private readonly integrationRepository: IntegrationRepository,
     private readonly messageRepository: MessageRepository,
     private readonly userState = container.resolve(UserState),
-  ) {
-    this.modalsViewModel = mainViewModel.modals;
-  }
+  ) {}
 
   readonly acceptConnectionRequest = (userEntity: User): Promise<void> => {
     return this.connectionRepository.acceptRequest(userEntity);
@@ -78,7 +78,7 @@ export class ActionsViewModel {
   ): Promise<void> => {
     // TODO: Does the promise resolve when there is no primary action (i.e. cancel button gets clicked)?
     return new Promise(resolve => {
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
         primaryAction: {
           action: async () => {
             await this.connectionRepository.blockUser(userEntity, hideConversation, nextConversationEntity);
@@ -112,7 +112,7 @@ export class ActionsViewModel {
     }
 
     return new Promise(resolve => {
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
         primaryAction: {
           action: () => {
             this.connectionRepository.cancelRequest(userEntity, hideConversation, nextConversationEntity);
@@ -133,9 +133,9 @@ export class ActionsViewModel {
 
   readonly clearConversation = (conversationEntity: Conversation): void => {
     if (conversationEntity) {
-      const modalType = conversationEntity.isLeavable() ? ModalsViewModel.TYPE.OPTION : ModalsViewModel.TYPE.CONFIRM;
+      const modalType = conversationEntity.isLeavable() ? PrimaryModal.type.OPTION : PrimaryModal.type.CONFIRM;
 
-      amplify.publish(WebAppEvents.WARNING.MODAL, modalType, {
+      PrimaryModal.show(modalType, {
         primaryAction: {
           action: (leaveConversation = false) => {
             this.conversationRepository.clearConversation(conversationEntity, leaveConversation);
@@ -165,8 +165,8 @@ export class ActionsViewModel {
         [BackendClientError.LABEL.INVALID_CREDENTIALS]: t('BackendError.LABEL.INVALID_CREDENTIALS'),
       };
       let isSending = false;
-      this.modalsViewModel.showModal(
-        ModalsViewModel.TYPE.PASSWORD,
+      PrimaryModal.show(
+        PrimaryModal.type.PASSWORD,
         {
           closeOnConfirm: false,
           preventClose: true,
@@ -176,10 +176,13 @@ export class ActionsViewModel {
                 isSending = true;
                 try {
                   await this.clientRepository.deleteClient(clientEntity.id, password);
-                  this.modalsViewModel.hide();
+                  removeCurrentModal();
                   resolve();
                 } catch (error) {
-                  this.modalsViewModel.errorMessage(expectedErrors[error.label] || error.message);
+                  if (isBackendError(error)) {
+                    const {updateErrorMessage} = usePrimaryModalState.getState();
+                    updateErrorMessage(expectedErrors[error.label] || error.message);
+                  }
                 } finally {
                   isSending = false;
                 }
@@ -202,7 +205,7 @@ export class ActionsViewModel {
   readonly deleteMessage = (conversationEntity: Conversation, messageEntity: Message): Promise<void> => {
     if (conversationEntity && messageEntity) {
       return new Promise(resolve => {
-        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+        PrimaryModal.show(PrimaryModal.type.CONFIRM, {
           primaryAction: {
             action: () => {
               this.messageRepository.deleteMessage(conversationEntity, messageEntity);
@@ -225,7 +228,7 @@ export class ActionsViewModel {
   readonly deleteMessageEveryone = (conversationEntity: Conversation, messageEntity: Message): Promise<void> => {
     if (conversationEntity && messageEntity) {
       return new Promise(resolve => {
-        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+        PrimaryModal.show(PrimaryModal.type.CONFIRM, {
           primaryAction: {
             action: () => {
               this.messageRepository.deleteMessageForEveryone(conversationEntity, messageEntity);
@@ -258,7 +261,7 @@ export class ActionsViewModel {
     }
 
     return new Promise(resolve => {
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.OPTION, {
+      PrimaryModal.show(PrimaryModal.type.OPTION, {
         primaryAction: {
           action: (clearContent = false) => {
             this.conversationRepository.removeMember(
@@ -284,11 +287,9 @@ export class ActionsViewModel {
   readonly deleteConversation = (conversationEntity: Conversation): Promise<void> => {
     if (conversationEntity && conversationEntity.isCreatedBySelf()) {
       return new Promise(() => {
-        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+        PrimaryModal.show(PrimaryModal.type.CONFIRM, {
           primaryAction: {
-            action: () => {
-              return this.conversationRepository.deleteConversation(conversationEntity);
-            },
+            action: () => this.conversationRepository.deleteConversation(conversationEntity),
             text: t('modalConversationDeleteGroupAction'),
           },
           text: {
@@ -353,7 +354,7 @@ export class ActionsViewModel {
       }
 
       return new Promise((resolve, reject) => {
-        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+        PrimaryModal.show(PrimaryModal.type.CONFIRM, {
           primaryAction: {
             action: async () => {
               try {
@@ -400,7 +401,7 @@ export class ActionsViewModel {
    */
   readonly unblockUser = (userEntity: User): Promise<void> => {
     return new Promise(resolve => {
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
         primaryAction: {
           action: async () => {
             await this.connectionRepository.unblockUser(userEntity);

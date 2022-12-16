@@ -17,19 +17,20 @@
  *
  */
 
-import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
+import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {container} from 'tsyringe';
 
-import {getLogger, Logger} from 'Util/Logger';
+import {QualifiedUserId} from '@wireapp/protocol-messaging';
 
-import {UserState} from '../../user/UserState';
+import {getLogger, Logger} from 'Util/Logger';
+import {matchQualifiedIds} from 'Util/QualifiedId';
+
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
 import {EventRecord} from '../../storage/record/EventRecord';
 import type {UserRepository} from '../../user/UserRepository';
+import {UserState} from '../../user/UserState';
 import {ClientEvent} from '../Client';
-import type {QualifiedId} from '@wireapp/api-client/src/user/';
-import {QualifiedUserId} from '@wireapp/protocol-messaging';
-import {matchQualifiedIds} from 'Util/QualifiedId';
 
 interface MemberJoinEvent {
   user_ids: string[];

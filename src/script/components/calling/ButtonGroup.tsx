@@ -18,6 +18,7 @@
  */
 
 import React from 'react';
+
 import {CSSObject} from '@emotion/react';
 
 export interface ButtonGroupTab {
@@ -65,7 +66,7 @@ const buttonGroupItemStyles: CSSObject = {
   backgroundColor: 'var(--app-bg-secondary)',
   color: 'var(--main-color)',
   cursor: 'pointer',
-  fontSize: 11,
+  fontSize: '0.6875rem',
   fontWeight: 500,
   padding: '10px 12px',
 };
@@ -103,4 +104,4 @@ const ButtonGroup: React.FC<ButtonGroupProps> = ({style, items, currentItem, onC
   );
 };
 
-export default ButtonGroup;
+export {ButtonGroup};

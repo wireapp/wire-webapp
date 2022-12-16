@@ -39,8 +39,9 @@ const AvatarWrapper: React.FunctionComponent<AvatarWrapperProps> = ({color, avat
       transform: 'translateZ(0)',
       userSelect: 'none',
     }}
+    role="button"
     {...props}
   />
 );
 
-export default AvatarWrapper;
+export {AvatarWrapper};

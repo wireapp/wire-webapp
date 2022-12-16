@@ -1,6 +1,0 @@
-<div id="icons" data-bind="foreach: {data: Object.keys(ko.components._allRegisteredComponents).filter(key => /-icon$/.test(key)), as: 'iconName'}">
-    <div class="iconpreview">
-        <div class="iconpreview__icon" data-bind="component: iconName, css: {'override-color': ['verified-icon'].includes(iconName)}"></div>
-        <div class="iconpreview__name" data-bind="text: iconName"></div>
-    </div>
-</div>

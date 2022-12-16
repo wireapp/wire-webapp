@@ -18,11 +18,13 @@
  */
 
 import {escape} from 'underscore';
+
 import en from 'I18n/en-US.json';
 
-import type {User} from '../entity/User';
 import {getSelfName} from './SanitizationUtil';
 import {sortUsersByPriority} from './StringUtil';
+
+import type {User} from '../entity/User';
 
 type Substitutes = Record<string, string> | string | number;
 
@@ -143,5 +145,3 @@ export const replaceLink = (href: string, className: string = '', uieName: strin
   '/link': '</a>',
   link: `<a href="${href}" data-uie-name="${uieName}" class="${className}" rel="nofollow noopener noreferrer" target="_blank">`,
 });
-
-window.t = LocalizerUtil.translate;

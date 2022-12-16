@@ -17,6 +17,15 @@
  *
  */
 
+import React, {useRef, useState} from 'react';
+
+import {amplify} from 'amplify';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {useIntl} from 'react-intl';
+import {connect} from 'react-redux';
+import {useParams} from 'react-router-dom';
+import {AnyAction, Dispatch} from 'redux';
+
 import {
   ArrowIcon,
   COLOR,
@@ -33,31 +42,26 @@ import {
   Text,
 } from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import React, {useRef, useState} from 'react';
-import {useIntl} from 'react-intl';
-import {connect} from 'react-redux';
-import {AnyAction, Dispatch} from 'redux';
-import {useParams} from 'react-router-dom';
+
 import {getLogger} from 'Util/Logger';
-import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+
+import {Page} from './Page';
+import {SingleSignOnForm} from './SingleSignOnForm';
 
 import {Config} from '../../Config';
 import {ssoLoginStrings} from '../../strings';
-import AppAlreadyOpen from '../component/AppAlreadyOpen';
-import RouterLink from '../component/RouterLink';
+import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
+import {RouterLink} from '../component/RouterLink';
 import {BackendError} from '../module/action/BackendError';
 import {RootState, bindActionCreators} from '../module/reducer';
-import {ROUTE} from '../route';
-import Page from './Page';
-import SingleSignOnForm from './SingleSignOnForm';
 import * as AuthSelector from '../module/selector/AuthSelector';
-import {amplify} from 'amplify';
+import {ROUTE} from '../route';
 
-interface Props extends React.HTMLAttributes<HTMLDivElement> {}
+type Props = React.HTMLAttributes<HTMLDivElement>;
 
 const logger = getLogger('SingleSignOn');
 
-const SingleSignOn = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
+const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
   const ssoWindowRef = useRef<Window>();
   const params = useParams<{code?: string}>();
@@ -210,7 +214,7 @@ const SingleSignOn = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProp
               <Logo height={24} color={COLOR.WHITE} />
             </div>
             <Text
-              style={{fontSize: '14px', fontWeight: 400, marginTop: '32px'}}
+              style={{fontSize: '0.875rem', fontWeight: 400, marginTop: '32px'}}
               color={COLOR.WHITE}
               data-uie-name="status-overlay-description"
             >
@@ -221,7 +225,7 @@ const SingleSignOn = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProp
               center
               style={{
                 color: COLOR.WHITE,
-                fontSize: '14px',
+                fontSize: '0.875rem',
                 fontWeight: 600,
                 marginTop: '24px',
                 textDecoration: 'underline',
@@ -276,6 +280,11 @@ const SingleSignOn = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProp
           <Column />
         </Columns>
       </Container>
+      {!hasDefaultSSOCode && (
+        <IsMobile>
+          <div style={{minWidth: 48}} />
+        </IsMobile>
+      )}
     </Page>
   );
 };
@@ -288,4 +297,6 @@ const mapStateToProps = (state: RootState) => ({
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
 const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) => bindActionCreators({}, dispatch);
 
-export default connect(mapStateToProps, mapDispatchToProps)(SingleSignOn);
+const SingleSignOn = connect(mapStateToProps, mapDispatchToProps)(SingleSignOnComponent);
+
+export {SingleSignOn};

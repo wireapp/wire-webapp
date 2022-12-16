@@ -18,21 +18,19 @@
  */
 
 import {render} from '@testing-library/react';
-import {EntropyData} from '../../util/Entropy';
+
+import {EntropyContainer} from './EntropyContainer';
+
 import {withIntl, withTheme} from '../util/test/TestUtil';
-import EntropyContainer from './EntropyContainer';
 require('jest-canvas-mock');
 
 describe('EntropyContainer', () => {
-  const mockonSetEntropy = jest.fn().mockImplementation((a: EntropyData) => {
-    // eslint-disable-next-line no-console
-    console.log(a);
-  });
+  const mockonSetEntropy = jest.fn().mockImplementation();
 
   it('renders elements', () => {
     const {getByText, queryByText} = render(withTheme(withIntl(<EntropyContainer onSetEntropy={mockonSetEntropy} />)));
-    expect(getByText(/Increase your account’s security/gi)).toBeTruthy();
-    expect(getByText(/move your mouse/gi)).toBeTruthy();
-    expect(queryByText(/success/gi)).toBeNull();
+    expect(getByText(/Increase your account’s security/i)).toBeTruthy();
+    expect(getByText(/move your mouse/i)).toBeTruthy();
+    expect(queryByText(/success/i)).toBeNull();
   });
 });

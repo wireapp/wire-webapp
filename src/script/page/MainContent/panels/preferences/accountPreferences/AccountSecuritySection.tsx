@@ -17,23 +17,28 @@
  *
  */
 
-import {Runtime} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
-import {amplify} from 'amplify';
 import React from 'react';
+
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+import {amplify} from 'amplify';
+import {container} from 'tsyringe';
+
+import {Runtime} from '@wireapp/commons';
+import {Link, LinkVariant} from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
+import {safeWindowOpen} from 'Util/SanitizationUtil';
+
 import {User} from '../../../../../entity/User';
 import {getAccountPagesUrl, getCreateTeamUrl, getManageTeamUrl, URL_PATH} from '../../../../../externalRoute';
 import {TeamState} from '../../../../../team/TeamState';
 import {AppLockState} from '../../../../../user/AppLockState';
 import {FEATURES, hasAccessToFeature} from '../../../../../user/UserPermission';
 import {UserRepository} from '../../../../../user/UserRepository';
-import {modals, ModalsViewModel} from '../../../../../view_model/ModalsViewModel';
-import {container} from 'tsyringe';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
-import {safeWindowOpen} from 'Util/SanitizationUtil';
-import PreferencesSection from '../components/PreferencesSection';
-import {Link, LinkVariant} from '@wireapp/react-ui-kit';
+import {PreferencesSection} from '../components/PreferencesSection';
 
 interface AccountSecuritySectionProps {
   appLockState?: AppLockState;
@@ -56,8 +61,8 @@ const AccountSecuritySection: React.FC<AccountSecuritySectionProps> = ({
   const isMacOsWrapper = Runtime.isDesktopApp() && Runtime.isMacOS();
 
   const onClickDeleteAccount = () =>
-    modals.showModal(
-      ModalsViewModel.TYPE.CONFIRM,
+    PrimaryModal.show(
+      PrimaryModal.type.CONFIRM,
       {
         primaryAction: {
           action: () => userRepository.deleteMe(),
@@ -75,7 +80,7 @@ const AccountSecuritySection: React.FC<AccountSecuritySectionProps> = ({
     <PreferencesSection hasSeparator className="preferences-section-account-security">
       {manageTeamUrl && hasAccessToFeature(FEATURES.MANAGE_TEAM, teamRole) && (
         <Link
-          tabIndex={0}
+          tabIndex={TabIndex.FOCUSABLE}
           variant={LinkVariant.PRIMARY}
           onClick={() => safeWindowOpen(manageTeamUrl)}
           data-uie-name="do-manage-team"
@@ -92,7 +97,7 @@ const AccountSecuritySection: React.FC<AccountSecuritySectionProps> = ({
       )}
       {isAppLockActivated && (
         <Link
-          tabIndex={0}
+          tabIndex={TabIndex.FOCUSABLE}
           variant={LinkVariant.PRIMARY}
           onClick={() => amplify.publish(WebAppEvents.PREFERENCES.CHANGE_APP_LOCK_PASSPHRASE)}
           data-uie-name="do-reset-app-lock"
@@ -103,7 +108,7 @@ const AccountSecuritySection: React.FC<AccountSecuritySectionProps> = ({
       )}
       {!selfUser?.isNoPasswordSSO && (
         <Link
-          tabIndex={0}
+          tabIndex={TabIndex.FOCUSABLE}
           variant={LinkVariant.PRIMARY}
           onClick={() => safeWindowOpen(getAccountPagesUrl(URL_PATH.PASSWORD_RESET))}
           title={t('tooltipPreferencesPassword')}
@@ -116,7 +121,7 @@ const AccountSecuritySection: React.FC<AccountSecuritySectionProps> = ({
 
       {!isTeam && (
         <Link
-          tabIndex={0}
+          tabIndex={TabIndex.FOCUSABLE}
           variant={LinkVariant.PRIMARY}
           onClick={onClickDeleteAccount}
           data-uie-name="go-delete-account"
@@ -129,4 +134,4 @@ const AccountSecuritySection: React.FC<AccountSecuritySectionProps> = ({
   );
 };
 
-export default AccountSecuritySection;
+export {AccountSecuritySection};

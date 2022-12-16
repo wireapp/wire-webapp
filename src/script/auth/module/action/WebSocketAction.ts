@@ -17,12 +17,14 @@
  *
  */
 
-import * as Events from '@wireapp/api-client/src/event/';
-import {ConnectionState, HttpClient} from '@wireapp/api-client/src/http/';
-import {PayloadBundle, PayloadBundleType} from '@wireapp/core/src/main/conversation/';
-import type {UserUpdateMessage} from '@wireapp/core/src/main/conversation/message/UserMessage';
-import {UserMapper} from '@wireapp/core/src/main/user/UserMapper';
+import {USER_EVENT} from '@wireapp/api-client/lib/event/';
+import {ConnectionState, HttpClient} from '@wireapp/api-client/lib/http/';
+import {PayloadBundle, PayloadBundleType} from '@wireapp/core/lib/conversation/';
+import type {UserUpdateMessage} from '@wireapp/core/lib/conversation/message/UserMessage';
+import {UserMapper} from '@wireapp/core/lib/user/UserMapper';
+
 import {getLogger} from 'Util/Logger';
+
 import type {ThunkAction} from '../../module/reducer';
 import * as SelfSelector from '../../module/selector/SelfSelector';
 
@@ -45,7 +47,7 @@ export class WebSocketAction {
           let data: PayloadBundle | void;
           try {
             switch (event.type) {
-              case Events.USER_EVENT.UPDATE: {
+              case USER_EVENT.UPDATE: {
                 data = UserMapper.mapUserEvent(event, apiClient.context!.userId, source);
               }
               // Note: We do not want to update the last message timestamp

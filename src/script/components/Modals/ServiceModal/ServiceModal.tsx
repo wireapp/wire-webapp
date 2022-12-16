@@ -17,16 +17,18 @@
  *
  */
 
-import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
-import Icon from 'Components/Icon';
-import ModalComponent from 'Components/ModalComponent';
 import React from 'react';
+
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {Icon} from 'Components/Icon';
+import {ModalComponent} from 'Components/ModalComponent';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
+import {renderElement} from 'Util/renderElement';
+
 import {IntegrationRepository} from '../../../integration/IntegrationRepository';
 import {ServiceEntity} from '../../../integration/ServiceEntity';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
-import renderModal from 'Util/renderModal';
 
 interface ServiceModalProps {
   readonly service: ServiceEntity;
@@ -96,6 +98,6 @@ const ServiceModal: React.FC<ServiceModalProps> = ({
   );
 };
 
-export default ServiceModal;
+const showServiceModal = renderElement<ServiceModalProps>(ServiceModal);
 
-export const showServiceModal = renderModal<ServiceModalProps>(ServiceModal);
+export {ServiceModal, showServiceModal};

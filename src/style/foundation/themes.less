@@ -37,6 +37,7 @@ body.theme-default {
   @conversation-list-bg-opacity: fade(#000, 64%);
   @sidebar-box-shadow: #eee;
   @sidebar-box-shadow-lg: rgba(0, 0, 0, 0.12);
+  @input-bar-bg: var(--white);
 
   // ----------------------------------------------------------------------------
   // Calling
@@ -110,7 +111,7 @@ body.theme-default {
     .applyTheme();
   }
 
-  @import (less) '../../node_modules/highlight.js/styles/base16/solarized-light.css';
+  @import (less) 'highlight.js/styles/base16/solarized-light.css';
 }
 
 body.theme-dark {
@@ -130,6 +131,7 @@ body.theme-dark {
   @border-color: var(--gray-90);
   @app-bg-secondary: var(--black);
   @conversation-list-bg-opacity: fade(#000, 78%);
+  @input-bar-bg: var(--gray-100);
 
   // ----------------------------------------------------------------------------
   // Calling
@@ -197,5 +199,5 @@ body.theme-dark {
 
   .applyTheme();
 
-  @import (less) '../../node_modules/highlight.js/styles/base16/solarized-dark.css';
+  @import (less) 'highlight.js/styles/base16/solarized-dark.css';
 }

@@ -17,41 +17,35 @@
  *
  */
 
-import ko from 'knockout';
 import React from 'react';
 
-import type {Router} from './Router';
 import {KEY} from 'Util/KeyboardUtil';
 
-let router: Router;
+import {navigate} from './Router';
 
-export function initRouterBindings(routerInstance: Router): void {
-  router = routerInstance;
-  ko.bindingHandlers.link_to = {
-    init(element: Node, valueAccessor): void {
-      const navigate = (event: Event) => {
-        routerInstance.navigate(valueAccessor());
-        event.preventDefault();
-      };
-      element.addEventListener('click', navigate);
-
-      ko.utils.domNodeDisposal.addDisposeCallback(element, () => element.removeEventListener('click', navigate));
-    },
-  };
-}
+import {useAppMainState, ViewType} from '../page/state';
 
 export const createNavigate =
   (link: string): React.MouseEventHandler =>
   (event: React.MouseEvent<Element, MouseEvent>) => {
-    router?.navigate(link);
+    setResponsiveView();
+    navigate(link);
     event.preventDefault();
   };
 
 export const createNavigateKeyboard =
-  (link: string): React.KeyboardEventHandler =>
+  (link: string, setIsResponsive = false): React.KeyboardEventHandler =>
   (event: React.KeyboardEvent<Element>) => {
+    if (setIsResponsive) {
+      setResponsiveView();
+    }
     if (event.key === KEY.ENTER || event.key === KEY.SPACE) {
-      router?.navigate(link);
+      navigate(link, {eventKey: event.key});
       event.preventDefault();
     }
   };
+
+export const setResponsiveView = () => {
+  const {responsiveView} = useAppMainState.getState();
+  responsiveView.setCurrentView(ViewType.CENTRAL_COLUMN);
+};

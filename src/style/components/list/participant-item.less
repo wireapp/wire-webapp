@@ -17,6 +17,8 @@
  *
  */
 
+@participant-max-width: 180px;
+
 .participant-item-wrapper {
   position: relative;
   display: block;
@@ -83,6 +85,10 @@
     background-color: var(--background-fade-8);
   }
 
+  input[type='checkbox'] + label > span {
+    width: calc(100% - 22px - 0.75rem);
+  }
+
   .participant-item {
     display: flex;
     overflow: hidden;
@@ -108,12 +114,13 @@
       height: @avatar-diameter-m;
       flex: 1 1;
       align-items: center;
-      line-height: 16px;
+      line-height: @line-height-sm;
 
       &__text {
         display: flex;
         min-width: 0; // this will ensure that ellipses is working
-        height: @avatar-diameter-m;
+        max-width: @participant-max-width;
+        min-height: @avatar-diameter-m;
         flex-direction: column;
         flex-grow: 1;
         align-items: flex-start;

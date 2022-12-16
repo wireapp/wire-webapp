@@ -30,7 +30,7 @@
   height: @conversation-input-min-height;
   align-items: center;
   justify-content: space-between;
-  padding-left: 0;
+  padding: 2px 0;
   border-top: 1px solid var(--sidebar-border-color);
   margin: 0;
   color: #fff;
@@ -51,20 +51,24 @@
 
 .conversations-footer-btn {
   .button-reset-default;
-  .label-small-medium;
   display: flex;
   width: 100%;
-  min-width: 76px;
   height: 100%;
+  flex: 1;
   flex-direction: column;
   align-items: center;
-  padding: 8px;
+  justify-content: center;
   border-radius: 6px;
-  color: var(--main-color);
-  text-transform: capitalize;
 
   svg {
     margin-bottom: 4px;
+  }
+
+  &--text {
+    .label-small-medium;
+    color: var(--main-color);
+    font-size: 11px;
+    text-transform: capitalize;
   }
 
   .button-states();
@@ -82,6 +86,10 @@
       svg {
         fill: var(--black);
       }
+
+      .conversations-footer-btn--text {
+        color: var(--black);
+      }
     }
   }
 
@@ -91,6 +99,10 @@
 
     svg {
       fill: var(--white);
+    }
+
+    .conversations-footer-btn--text {
+      color: var(--white);
     }
   }
 }
@@ -109,21 +121,12 @@
   &--badge::after {
     .dot-md;
     position: absolute;
-    top: 5px;
-    right: 5px;
+    top: 10px;
+    right: 10px;
     background-color: currentColor;
     color: inherit;
     content: '';
   }
-}
-
-.conversations-settings-badge {
-  .dot-md;
-
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  content: '';
 }
 
 .conversations-hint {
@@ -185,6 +188,8 @@
       .ellipsis;
       .text-medium;
       flex: 1;
+      font-size: @font-size-medium;
+      font-weight: @font-weight-medium;
     }
 
     &__badge {

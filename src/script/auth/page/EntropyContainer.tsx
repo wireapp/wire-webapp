@@ -17,16 +17,18 @@
  *
  */
 
-import {Button, CheckRoundIcon, ContainerSM, H1, Muted, Text} from '@wireapp/react-ui-kit';
 import React, {useState} from 'react';
 
-import {setEntropyStrings} from '../../strings';
 import {useIntl} from 'react-intl';
-import EntropyCanvas from '../component/EntropyCanvas';
-import {EntropyData} from '../../util/Entropy';
 
-import {ProgressBar} from '../component/ProgressBar';
+import {Button, CheckRoundIcon, ContainerSM, H1, Muted, Text} from '@wireapp/react-ui-kit';
+
 import {KEY} from 'Util/KeyboardUtil';
+
+import {setEntropyStrings} from '../../strings';
+import {EntropyData} from '../../util/Entropy';
+import {EntropyCanvas} from '../component/EntropyCanvas';
+import {ProgressBar} from '../component/ProgressBar';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {
   onSetEntropy: (entropyData: Uint8Array) => void;
@@ -103,4 +105,4 @@ const EntropyContainer = ({onSetEntropy, containerSize = 400}: Props) => {
   );
 };
 
-export default EntropyContainer;
+export {EntropyContainer};

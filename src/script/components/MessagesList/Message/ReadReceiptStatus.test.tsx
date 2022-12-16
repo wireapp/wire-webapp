@@ -17,12 +17,14 @@
  *
  */
 
+import {render, fireEvent} from '@testing-library/react';
 import ko from 'knockout';
+
 import {Message as MessageEntity} from 'src/script/entity/message/Message';
-import ReadReceiptStatus from './ReadReceiptStatus';
 import {ReadReceipt} from 'src/script/storage';
 import {formatTimeShort} from 'Util/TimeUtil';
-import {render, fireEvent} from '@testing-library/react';
+
+import {ReadReceiptStatus} from './ReadReceiptStatus';
 
 const createReadReceiptMessage = (partialReadReceiptStatus: Partial<MessageEntity>) => {
   const readReceiptMessage: Partial<MessageEntity> = {
@@ -36,6 +38,7 @@ const createReadReceiptMessage = (partialReadReceiptStatus: Partial<MessageEntit
 describe('ReadReceiptStatus', () => {
   it('is not shown when message is not last delivered message', () => {
     const props = {
+      isMessageFocused: true,
       is1to1Conversation: false,
       isLastDeliveredMessage: false,
       message: createReadReceiptMessage({
@@ -51,6 +54,7 @@ describe('ReadReceiptStatus', () => {
 
   it('shows "delivered" when noone read the message', () => {
     const props = {
+      isMessageFocused: true,
       is1to1Conversation: false,
       isLastDeliveredMessage: true,
       message: createReadReceiptMessage({
@@ -67,6 +71,7 @@ describe('ReadReceiptStatus', () => {
 
   it('shows the read icon', () => {
     const props = {
+      isMessageFocused: true,
       is1to1Conversation: false,
       isLastDeliveredMessage: true,
       message: createReadReceiptMessage({
@@ -86,6 +91,7 @@ describe('ReadReceiptStatus', () => {
       const onClickReceiptsSpy = jest.fn();
       const readReceiptTime = new Date().toISOString();
       const props = {
+        isMessageFocused: true,
         is1to1Conversation: true,
         isLastDeliveredMessage: true,
         message: createReadReceiptMessage({
@@ -104,6 +110,7 @@ describe('ReadReceiptStatus', () => {
     it('shows timestamp instead of read count', () => {
       const readReceiptTime = new Date().toISOString();
       const props = {
+        isMessageFocused: true,
         is1to1Conversation: true,
         isLastDeliveredMessage: true,
         message: createReadReceiptMessage({
@@ -123,6 +130,7 @@ describe('ReadReceiptStatus', () => {
       const onClickReceiptsSpy = jest.fn();
       const readReceiptTime = new Date().toISOString();
       const props = {
+        isMessageFocused: true,
         is1to1Conversation: false,
         isLastDeliveredMessage: true,
         message: createReadReceiptMessage({
@@ -141,6 +149,7 @@ describe('ReadReceiptStatus', () => {
 
     it('shows read count', async () => {
       const props = {
+        isMessageFocused: true,
         is1to1Conversation: false,
         isLastDeliveredMessage: true,
         message: createReadReceiptMessage({

@@ -17,45 +17,48 @@
  *
  */
 
-import React from 'react';
-import cx from 'classnames';
+import {FC, Fragment, MouseEvent as ReactMouseEvent, useEffect, useState} from 'react';
+
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
+import cx from 'classnames';
+
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {isBeforeToday, formatDateNumeral, formatTimeShort} from 'Util/TimeUtil';
+import {Icon} from 'Components/Icon';
+import {Image} from 'Components/Image';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
+import {t} from 'Util/LocalizerUtil';
+import {formatDateNumeral, formatTimeShort, isBeforeToday} from 'Util/TimeUtil';
 
-import {QualifiedId} from '@wireapp/api-client/src/user';
-import {QuoteEntity} from '../../../../message/QuoteEntity';
-import {ConversationError} from '../../../../error/ConversationError';
+import {AudioAsset} from './asset/AudioAsset';
+import {FileAsset} from './asset/FileAssetComponent';
+import {LocationAsset} from './asset/LocationAsset';
+import {TextMessageRenderer} from './asset/TextMessageRenderer';
+import {VideoAsset} from './asset/VideoAsset';
+
+import {MessageActions} from '..';
 import type {Conversation} from '../../../../entity/Conversation';
 import type {ContentMessage} from '../../../../entity/message/ContentMessage';
 import type {User} from '../../../../entity/User';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {useEffect, useState} from 'react';
-import Image from 'Components/Image';
-import Icon from 'Components/Icon';
-import {t} from 'Util/LocalizerUtil';
-import VideoAsset from './asset/VideoAsset';
-import AudioAsset from './asset/AudioAsset';
-import FileAssetComponent from './asset/FileAssetComponent';
-import LocationAsset from './asset/LocationAsset';
-import {Text} from 'src/script/entity/message/Text';
-import {handleKeyDown} from 'Util/KeyboardUtil';
-import {useDisposableRef} from 'Util/useDisposableRef';
+import {ConversationError} from '../../../../error/ConversationError';
+import {QuoteEntity} from '../../../../message/QuoteEntity';
+import {useMessageFocusedTabIndex} from '../util';
 
 export interface QuoteProps {
   conversation: Conversation;
   findMessage: (conversation: Conversation, messageId: string) => Promise<ContentMessage | undefined>;
   focusMessage: (id: string) => void;
-  handleClickOnMessage: (message: Text, event: React.UIEvent) => void;
+  handleClickOnMessage: MessageActions['onClickMessage'];
   quote: QuoteEntity;
   selfId: QualifiedId;
-  showDetail: (message: ContentMessage, event: React.MouseEvent) => void;
+  showDetail: (message: ContentMessage, event: ReactMouseEvent) => void;
   showUserDetails: (user: User) => void;
+  isMessageFocused: boolean;
 }
 
-const Quote: React.FC<QuoteProps> = ({
+const Quote: FC<QuoteProps> = ({
   conversation,
   findMessage,
   focusMessage,
@@ -64,6 +67,7 @@ const Quote: React.FC<QuoteProps> = ({
   selfId,
   showDetail,
   showUserDetails,
+  isMessageFocused,
 }) => {
   const [quotedMessage, setQuotedMessage] = useState<ContentMessage>();
   const [error, setError] = useState<Error | string | undefined>(quote.error);
@@ -123,6 +127,7 @@ const Quote: React.FC<QuoteProps> = ({
             handleClickOnMessage={handleClickOnMessage}
             showDetail={showDetail}
             showUserDetails={showUserDetails}
+            isMessageFocused={isMessageFocused}
           />
         )
       )}
@@ -132,20 +137,22 @@ const Quote: React.FC<QuoteProps> = ({
 
 interface QuotedMessageProps {
   focusMessage: (id: string) => void;
-  handleClickOnMessage: (message: Text, event: React.UIEvent) => void;
+  handleClickOnMessage: MessageActions['onClickMessage'];
   quotedMessage: ContentMessage;
   selfId: QualifiedId;
-  showDetail: (message: ContentMessage, event: React.MouseEvent) => void;
+  showDetail: (message: ContentMessage, event: ReactMouseEvent) => void;
   showUserDetails: (user: User) => void;
+  isMessageFocused: boolean;
 }
 
-const QuotedMessage: React.FC<QuotedMessageProps> = ({
+const QuotedMessage: FC<QuotedMessageProps> = ({
   quotedMessage,
   focusMessage,
   selfId,
   handleClickOnMessage,
   showDetail,
   showUserDetails,
+  isMessageFocused,
 }) => {
   const {
     user: quotedUser,
@@ -153,33 +160,8 @@ const QuotedMessage: React.FC<QuotedMessageProps> = ({
     headerSenderName,
     was_edited,
     timestamp,
-    edited_timestamp,
-  } = useKoSubscribableChildren(quotedMessage, [
-    'user',
-    'assets',
-    'headerSenderName',
-    'was_edited',
-    'timestamp',
-    'edited_timestamp',
-  ]);
-  const [canShowMore, setCanShowMore] = useState(false);
-  const [showFullText, setShowFullText] = useState(false);
-  const detectLongQuotes = useDisposableRef(
-    element => {
-      const preNode = element.querySelector('pre');
-      const width = Math.max(element.scrollWidth, preNode ? preNode.scrollWidth : 0);
-      const height = Math.max(element.scrollHeight, preNode ? preNode.scrollHeight : 0);
-      const isWider = width > element.clientWidth;
-      const isHigher = height > element.clientHeight;
-      setCanShowMore(isWider || isHigher);
-      return () => {};
-    },
-    [edited_timestamp],
-  );
-
-  useEffect(() => {
-    setShowFullText(false);
-  }, [quotedMessage]);
+  } = useKoSubscribableChildren(quotedMessage, ['user', 'assets', 'headerSenderName', 'was_edited', 'timestamp']);
+  const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
 
   return (
     <>
@@ -189,6 +171,7 @@ const QuotedMessage: React.FC<QuotedMessageProps> = ({
           className="button-reset-default"
           onClick={() => showUserDetails(quotedUser)}
           data-uie-name="label-name-quote"
+          tabIndex={messageFocusedTabIndex}
         >
           {headerSenderName}
         </button>
@@ -199,7 +182,7 @@ const QuotedMessage: React.FC<QuotedMessageProps> = ({
         )}
       </div>
       {quotedAssets.map((asset, index) => (
-        <React.Fragment key={index}>
+        <Fragment key={index}>
           {asset.isImage() && (
             <div data-uie-name="media-picture-quote">
               <Image
@@ -212,37 +195,16 @@ const QuotedMessage: React.FC<QuotedMessageProps> = ({
           )}
 
           {asset.isText() && (
-            <>
-              <div
-                role="button"
-                tabIndex={0}
-                className={cx('message-quote__text', {
-                  'message-quote__text--full': showFullText,
-                  'message-quote__text--large': includesOnlyEmojis(asset.text),
-                })}
-                ref={detectLongQuotes}
-                onClick={event => handleClickOnMessage(asset, event)}
-                onKeyDown={event => handleKeyDown(event, () => handleClickOnMessage(asset, event))}
-                dangerouslySetInnerHTML={{__html: asset.render(selfId)}}
-                dir="auto"
-                data-uie-name="media-text-quote"
-              />
-              {canShowMore && (
-                <button
-                  type="button"
-                  className="button-reset-default message-quote__text__show-more"
-                  onClick={() => setShowFullText(!showFullText)}
-                  data-uie-name="do-show-more-quote"
-                >
-                  <span>{showFullText ? t('replyQuoteShowLess') : t('replyQuoteShowMore')}</span>
-                  <Icon.Disclose
-                    className={cx('disclose-icon', {
-                      'upside-down': showFullText,
-                    })}
-                  />
-                </button>
-              )}
-            </>
+            <TextMessageRenderer
+              onMessageClick={handleClickOnMessage}
+              text={asset.render(selfId)}
+              className={cx('message-quote__text', {
+                'message-quote__text--large': includesOnlyEmojis(asset.text),
+              })}
+              isFocusable={isMessageFocused}
+              data-uie-name="media-text-quote"
+              collapse
+            />
           )}
 
           {asset.isVideo() && (
@@ -251,23 +213,30 @@ const QuotedMessage: React.FC<QuotedMessageProps> = ({
               message={quotedMessage}
               // className="message-quote__video"
               data-uie-name="media-video-quote"
+              isFocusable={isMessageFocused}
             />
           )}
 
           {asset.isAudio() && (
-            <AudioAsset message={quotedMessage} className="message-quote__audio" data-uie-name="media-audio-quote" />
+            <AudioAsset
+              message={quotedMessage}
+              className="message-quote__audio"
+              data-uie-name="media-audio-quote"
+              isFocusable={isMessageFocused}
+            />
           )}
 
           {asset.isFile() && (
-            <FileAssetComponent
+            <FileAsset
               message={quotedMessage}
               // className="message-quote__file"
               data-uie-name="media-file-quote"
+              isFocusable={isMessageFocused}
             />
           )}
 
           {asset.isLocation() && <LocationAsset asset={asset} data-uie-name="media-location-quote" />}
-        </React.Fragment>
+        </Fragment>
       ))}
       <button
         type="button"
@@ -278,6 +247,7 @@ const QuotedMessage: React.FC<QuotedMessageProps> = ({
           }
         }}
         data-uie-name="label-timestamp-quote"
+        tabIndex={messageFocusedTabIndex}
       >
         {isBeforeToday(timestamp)
           ? t('replyQuoteTimeStampDate', formatDateNumeral(timestamp))
@@ -287,4 +257,4 @@ const QuotedMessage: React.FC<QuotedMessageProps> = ({
   );
 };
 
-export default Quote;
+export {Quote, QuotedMessage};

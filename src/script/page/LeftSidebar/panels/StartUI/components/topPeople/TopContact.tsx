@@ -17,14 +17,17 @@
  *
  */
 
-import {User} from '../../../../../../entity/User';
-import {AssetRepository} from '../../../../../../assets/AssetRepository';
-import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
+import React, {useEffect, useState} from 'react';
+
+import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {useEffect, useState} from 'react';
-import {ConnectionStatus} from '@wireapp/api-client/src/connection';
-import React from 'react';
 import {handleKeyDown} from 'Util/KeyboardUtil';
+
+import {AssetRepository} from '../../../../../../assets/AssetRepository';
+import {User} from '../../../../../../entity/User';
 
 export interface TopContactProps {
   assetRepository: AssetRepository;
@@ -49,7 +52,7 @@ const TopContact: React.FC<TopContactProps> = ({assetRepository, user, clickOnUs
       data-uie-uid={user.id}
       data-uie-value={name}
       role="button"
-      tabIndex={0}
+      tabIndex={TabIndex.FOCUSABLE}
       onClick={event => {
         clickOnUser?.(user, event);
       }}
@@ -63,4 +66,4 @@ const TopContact: React.FC<TopContactProps> = ({assetRepository, user, clickOnUs
   );
 };
 
-export default TopContact;
+export {TopContact};

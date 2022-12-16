@@ -17,11 +17,13 @@
  *
  */
 
-import type {ConversationEvent} from '@wireapp/api-client/src/event/';
+import type {ConversationEvent} from '@wireapp/api-client/lib/event/';
+
+import {ConversationActionCreator} from './creator';
+
+import {mockStoreFactory} from '../../util/test/mockStoreFactory';
 
 import {actionRoot} from '.';
-import {mockStoreFactory} from '../../util/test/mockStoreFactory';
-import {ConversationActionCreator} from './creator';
 
 describe('ConversationAction', () => {
   it('checks conversation code', async () => {

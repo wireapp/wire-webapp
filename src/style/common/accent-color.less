@@ -20,6 +20,18 @@
 @w-black: #000000;
 @w-white: #ffffff;
 
+@w-gray-10: #fafafa;
+@w-gray-20: #edeff0;
+@w-gray-30: #e5e8ea;
+@w-gray-40: #dce0e3;
+@w-gray-50: #cbced1;
+@w-gray-60: #9fa1a7;
+@w-gray-70: #676b71;
+@w-gray-80: #54585f;
+@w-gray-90: #34373d;
+@w-gray-95: #26272c;
+@w-gray-100: #17181a;
+
 @w-blue: #2391d3;
 @w-green: #00c800;
 @w-gray: #bac8d1;
@@ -194,23 +206,31 @@ each(.colors(), .(@color-key, @color-name) {
   @accent-color-border: '@{name}-500';
   @accent-color-focus: '@{name}-400';
   @accent-color-selection: '@{name}-300';
-  @icon-primary-active-fill: '@{name}-500';
-  @icon-secondary-active-border: 'accent_colors-0';
   @button-primary-hover: '@{name}-600';
   @button-primary-focus-border: '@{name}-700';
   @button-primary-active: '@{name}-800';
   @button-primary-active-border: '@{name}-800';
+  @button-secondary-hover-border: '@{name}-500';
+  @button-secondary-active-bg: '@{name}-50';
+  @button-secondary-active-border: '@{name}-500';
   @toggle-button-hover-bg: '@{name}-700';
+  @icon-primary-active-fill: '@{name}-500';
+  @icon-secondary-active-border: 'accent_colors-0';
+  @indicator-range-input-thumb: '@{name}-700';
   @toggle-button-unselected-bg: '@{name}-100';
 
   .main-accent-color-@{color-key} {
-    --icon-primary-active-fill: @@icon-primary-active-fill;
-    --icon-secondary-active-border: @@icon-secondary-active-border;
     --button-primary-hover: @@button-primary-hover;
     --button-primary-focus-border: @@button-primary-focus-border;
     --button-primary-active: @@button-primary-active;
     --button-primary-active-border: @@button-primary-active-border;
+    --button-secondary-hover-border: @@button-secondary-hover-border;
+    --button-secondary-active-bg: @@button-secondary-active-bg;
+    --button-secondary-active-border: @@button-secondary-active-border;
     --toggle-button-hover-bg: @@toggle-button-hover-bg;
+    --icon-primary-active-fill: @@icon-primary-active-fill;
+    --icon-secondary-active-border: @@icon-secondary-active-border;
+    --indicator-range-input-thumb: @@indicator-range-input-thumb;
     --toggle-button-unselected-bg: @@toggle-button-unselected-bg;
     --accent-color: @@accent-color;
     --accent-color-highlight: @@accent-color-highlight;
@@ -238,21 +258,29 @@ each(.colors(), .(@color-key, @color-name) {
     @accent-color-border-dark: '@{name}-dark-600';
     @accent-color-focus-dark: '@{name}-dark-600';
     @accent-color-selection-dark: '@{name}-dark-700';
-    @icon-primary-active-fill-dark: 'w-white';
-    @icon-secondary-active-border-dark: '@{name}-dark-800' ;
     @button-primary-hover-dark: '@{name}-dark-400';
     @button-primary-focus-border-dark: '@{name}-dark-100';
     @button-primary-active-dark: '@{name}-dark-800';
     @button-primary-active-border-dark: '@{name}-dark-600';
+    @button-secondary-hover-border-dark: 'w-gray-70';
+    @button-secondary-active-bg-dark: 'w-gray-95';
+    @button-secondary-active-border-dark: '@{name}-dark-800';
     @toggle-button-hover-bg-dark: '@{name}-dark-300';
+    @icon-primary-active-fill-dark: 'w-white';
+    @icon-secondary-active-border-dark: '@{name}-dark-800' ;
+    @indicator-range-input-thumb-dark: '@{name}-dark-300';
     @toggle-button-unselected-bg-dark: '@{name}-dark-800';
     .main-accent-color-@{color-key} {
-      --icon-primary-active-fill: @@icon-primary-active-fill-dark;
-      --icon-secondary-active-border: @@icon-secondary-active-border-dark;
       --button-primary-hover: @@button-primary-hover-dark;
       --button-primary-focus-border: @@button-primary-focus-border-dark;
       --button-primary-active: @@button-primary-active-dark;
       --button-primary-active-border: @@button-primary-active-border-dark;
+      --button-secondary-hover-border: @@button-secondary-hover-border-dark;
+      --button-secondary-active-bg: @@button-secondary-active-bg-dark;
+      --button-secondary-active-border: @@button-secondary-active-border-dark;
+      --icon-primary-active-fill: @@icon-primary-active-fill-dark;
+      --icon-secondary-active-border: @@icon-secondary-active-border-dark;
+      --indicator-range-input-thumb: @@indicator-range-input-thumb-dark;
       --toggle-button-hover-bg: @@toggle-button-hover-bg-dark;
       --toggle-button-unselected-bg: @@toggle-button-unselected-bg-dark;
       --accent-color: @@accent-color-dark;

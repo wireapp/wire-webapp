@@ -17,7 +17,7 @@
  *
  */
 
-import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 
 import {ClientEvent} from './Client';
 
@@ -29,7 +29,6 @@ export const EventTypeHandling = {
     ClientEvent.CONVERSATION.LOCATION,
     ClientEvent.CONVERSATION.MESSAGE_ADD,
   ],
-  IGNORE: [CONVERSATION_EVENT.TYPING],
   STORE: [
     CONVERSATION_EVENT.MEMBER_JOIN,
     CONVERSATION_EVENT.MEMBER_LEAVE,

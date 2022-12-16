@@ -17,24 +17,29 @@
  *
  */
 
-import {CodeInput, ContainerXS, H1, Muted} from '@wireapp/react-ui-kit';
 import React from 'react';
+
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {AnyAction, Dispatch} from 'redux';
 import {useNavigate} from 'react-router-dom';
+import {AnyAction, Dispatch} from 'redux';
+
+import {CodeInput, ContainerXS, H1, Muted} from '@wireapp/react-ui-kit';
+
 import {getLogger} from 'Util/Logger';
+
+import {Page} from './Page';
+
 import {verifyStrings} from '../../strings';
-import RouterLink from '../component/RouterLink';
+import {LinkButton} from '../component/LinkButton';
+import {RouterLink} from '../component/RouterLink';
 import {actionRoot as ROOT_ACTIONS} from '../module/action';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
 import {parseError} from '../util/errorUtil';
-import Page from './Page';
-import LinkButton from '../component/LinkButton';
 
-interface Props extends React.HTMLProps<HTMLDivElement> {}
+type Props = React.HTMLProps<HTMLDivElement>;
 
 const changeEmailRedirect = {
   [AuthSelector.REGISTER_FLOW.PERSONAL]: ROUTE.CREATE_ACCOUNT,
@@ -42,7 +47,7 @@ const changeEmailRedirect = {
   [AuthSelector.REGISTER_FLOW.TEAM]: ROUTE.CREATE_TEAM_ACCOUNT,
 };
 
-const VerifyEmailCode = ({
+const VerifyEmailCodeComponent = ({
   account,
   authError,
   currentFlow,
@@ -141,4 +146,6 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(mapStateToProps, mapDispatchToProps)(VerifyEmailCode);
+const VerifyEmailCode = connect(mapStateToProps, mapDispatchToProps)(VerifyEmailCodeComponent);
+
+export {VerifyEmailCode};

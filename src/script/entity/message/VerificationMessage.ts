@@ -19,12 +19,15 @@
 
 import ko from 'knockout';
 
+import {QualifiedUserId} from '@wireapp/protocol-messaging';
+
+import {isQualifiedId} from 'Util/TypePredicateUtil';
+
+import {Message} from './Message';
+
 import {SuperType} from '../../message/SuperType';
 import {VerificationMessageType} from '../../message/VerificationMessageType';
 import type {User} from '../User';
-import {QualifiedUserId} from '@wireapp/protocol-messaging';
-import {isQualifiedId} from 'Util/TypePredicateUtil';
-import {Message} from './Message';
 
 export class VerificationMessage extends Message {
   public readonly userEntities: ko.ObservableArray<User>;

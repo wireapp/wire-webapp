@@ -17,17 +17,19 @@
  *
  */
 
-import {ClientClassification, ClientType} from '@wireapp/api-client/src/client/';
+import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+
 import {Runtime} from '@wireapp/commons';
 
-import {User} from 'src/script/entity/User';
-import {ClientRepository} from 'src/script/client/ClientRepository';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {ClientMapper} from 'src/script/client/ClientMapper';
+import {ClientRepository} from 'src/script/client/ClientRepository';
+import {User} from 'src/script/entity/User';
 import {ClientError} from 'src/script/error/ClientError';
-import {TestFactory} from '../../../test/helper/TestFactory';
+
 import {entities} from '../../../test/api/payloads';
+import {TestFactory} from '../../../test/helper/TestFactory';
 import {ClientRecord} from '../storage/record/ClientRecord';
 
 describe('ClientRepository', () => {

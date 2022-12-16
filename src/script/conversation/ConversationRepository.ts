@@ -17,51 +17,80 @@
  *
  */
 
-import ko from 'knockout';
-import {amplify} from 'amplify';
-import {Confirmation, LegalHoldStatus, Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
-import {flatten} from 'underscore';
-import {WebAppEvents} from '@wireapp/webapp-events';
-import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {
-  CONVERSATION_EVENT,
-  ConversationMessageTimerUpdateEvent,
-  ConversationRenameEvent,
-  ConversationMemberJoinEvent,
-  ConversationCreateEvent,
-  ConversationEvent,
-  ConversationReceiptModeUpdateEvent,
-  ConversationMemberLeaveEvent,
-} from '@wireapp/api-client/src/event';
-
-import {
-  DefaultConversationRoleName as DefaultRole,
-  CONVERSATION_TYPE,
-  NewConversation,
   Conversation as BackendConversation,
   ConversationProtocol,
-} from '@wireapp/api-client/src/conversation/';
+  CONVERSATION_TYPE,
+  DefaultConversationRoleName as DefaultRole,
+  NewConversation,
+} from '@wireapp/api-client/lib/conversation/';
+import {ConversationReceiptModeUpdateData} from '@wireapp/api-client/lib/conversation/data/';
+import {CONVERSATION_TYPING} from '@wireapp/api-client/lib/conversation/data/ConversationTypingData';
+import {
+  ConversationCreateEvent,
+  ConversationEvent,
+  ConversationMemberJoinEvent,
+  ConversationMemberLeaveEvent,
+  ConversationMemberUpdateEvent,
+  ConversationMessageTimerUpdateEvent,
+  ConversationReceiptModeUpdateEvent,
+  ConversationRenameEvent,
+  ConversationTypingEvent,
+  CONVERSATION_EVENT,
+} from '@wireapp/api-client/lib/event';
+import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
+import type {QualifiedId} from '@wireapp/api-client/lib/user/';
+import {MLSReturnType} from '@wireapp/core/lib/conversation';
+import {amplify} from 'amplify';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
-import {ConversationReceiptModeUpdateData} from '@wireapp/api-client/src/conversation/data/';
-import {BackendErrorLabel} from '@wireapp/api-client/src/http/';
-import type {QualifiedId} from '@wireapp/api-client/src/user/';
-import {Logger, getLogger} from 'Util/Logger';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {PromiseQueue} from 'Util/PromiseQueue';
-import {replaceLink, t} from 'Util/LocalizerUtil';
+import {flatten} from 'underscore';
+
+import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {TYPING_TIMEOUT, useTypingIndicatorState} from 'Components/InputBar/components/TypingIndicator';
 import {getNextItem} from 'Util/ArrayUtil';
-import {base64ToArray, createRandomUuid, noop} from 'Util/util';
 import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/FileTypeUtil';
+import {replaceLink, t} from 'Util/LocalizerUtil';
+import {getLogger, Logger} from 'Util/Logger';
+import {PromiseQueue} from 'Util/PromiseQueue';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 import {
   compareTransliteration,
-  sortByPriority,
-  startsWith,
-  sortUsersByPriority,
   fixWebsocketString,
+  sortByPriority,
+  sortUsersByPriority,
+  startsWith,
 } from 'Util/StringUtil';
-import {ClientEvent, CONVERSATION as CLIENT_CONVERSATION_EVENT} from '../event/Client';
-import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
-import {EventRepository} from '../event/EventRepository';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {base64ToArray, createRandomUuid, noop} from 'Util/util';
+
+import {ACCESS_STATE} from './AccessState';
+import {extractClientDiff} from './ClientMismatchUtil';
+import {updateAccessRights} from './ConversationAccessPermission';
+import {ConversationEphemeralHandler} from './ConversationEphemeralHandler';
+import {ConversationFilter} from './ConversationFilter';
+import {ConversationLabelRepository} from './ConversationLabelRepository';
+import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';
+import {ConversationRoleRepository} from './ConversationRoleRepository';
+import {ConversationService} from './ConversationService';
+import {ConversationState} from './ConversationState';
+import {ConversationStateHandler} from './ConversationStateHandler';
+import {ConversationStatus} from './ConversationStatus';
+import {ConversationVerificationState} from './ConversationVerificationState';
+import {ConversationVerificationStateHandler} from './ConversationVerificationStateHandler';
+import {EventMapper} from './EventMapper';
+import {MessageRepository} from './MessageRepository';
+import {NOTIFICATION_STATE} from './NotificationSetting';
+
+import {AssetTransferState} from '../assets/AssetTransferState';
+import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
+import {ClientState} from '../client/ClientState';
+import {PrimaryModal} from '../components/Modals/PrimaryModal';
+import {Config} from '../Config';
+import {ConnectionEntity} from '../connection/ConnectionEntity';
+import {ConnectionRepository} from '../connection/ConnectionRepository';
 import {
   AssetAddEvent,
   ButtonActionConfirmationEvent,
@@ -75,60 +104,36 @@ import {
   TeamMemberLeaveEvent,
 } from '../conversation/EventBuilder';
 import {Conversation} from '../entity/Conversation';
-import {Message} from '../entity/message/Message';
-import {ConversationMapper, ConversationDatabaseData} from './ConversationMapper';
-import {ConversationStateHandler} from './ConversationStateHandler';
-import {EventMapper} from './EventMapper';
-import {ACCESS_STATE} from './AccessState';
-import {ConversationStatus} from './ConversationStatus';
-import {ConversationVerificationStateHandler} from './ConversationVerificationStateHandler';
-import {NOTIFICATION_STATE} from './NotificationSetting';
-import {ConversationEphemeralHandler} from './ConversationEphemeralHandler';
-import {ConversationLabelRepository} from './ConversationLabelRepository';
-import {AssetTransferState} from '../assets/AssetTransferState';
-import {ModalsViewModel} from '../view_model/ModalsViewModel';
-import {SystemMessageType} from '../message/SystemMessageType';
-import {SuperType} from '../message/SuperType';
-import {MessageCategory} from '../message/MessageCategory';
-import {Config} from '../Config';
-import {BaseError, BASE_ERROR_TYPE} from '../error/BaseError';
-import {BackendClientError} from '../error/BackendClientError';
-import * as LegalHoldEvaluator from '../legal-hold/LegalHoldEvaluator';
-import {DeleteConversationMessage} from '../entity/message/DeleteConversationMessage';
-import {ConversationRoleRepository} from './ConversationRoleRepository';
-import {ConversationError} from '../error/ConversationError';
-import {ConversationService} from './ConversationService';
-import {ConnectionRepository} from '../connection/ConnectionRepository';
-import {UserRepository} from '../user/UserRepository';
-import {PropertiesRepository} from '../properties/PropertiesRepository';
-import {ServerTimeHandler} from '../time/serverTimeHandler';
 import {ContentMessage} from '../entity/message/ContentMessage';
-import {User} from '../entity/User';
-import {EventService} from '../event/EventService';
-import {ConnectionEntity} from '../connection/ConnectionEntity';
-import {EventSource} from '../event/EventSource';
-import {MemberMessage} from '../entity/message/MemberMessage';
+import {DeleteConversationMessage} from '../entity/message/DeleteConversationMessage';
 import {FileAsset} from '../entity/message/FileAsset';
-import type {EventRecord} from '../storage';
-import {MessageRepository} from './MessageRepository';
-import {UserState} from '../user/UserState';
-import {TeamState} from '../team/TeamState';
-import {TeamRepository} from '../team/TeamRepository';
-import {ConversationState} from './ConversationState';
-import {ConversationRecord} from '../storage/record/ConversationRecord';
-import {UserFilter} from '../user/UserFilter';
-import {ConversationFilter} from './ConversationFilter';
-import {ConversationMemberUpdateEvent} from '@wireapp/api-client/src/event';
-import {matchQualifiedIds} from 'Util/QualifiedId';
-import {ConversationVerificationState} from './ConversationVerificationState';
-import {extractClientDiff} from './ClientMismatchUtil';
-import {Core} from '../service/CoreSingleton';
-import {updateAccessRights} from './ConversationAccessPermission';
-import {ClientState} from '../client/ClientState';
-import {MLSReturnType} from '@wireapp/core/src/main/conversation';
+import {MemberMessage} from '../entity/message/MemberMessage';
+import {Message} from '../entity/message/Message';
+import {User} from '../entity/User';
+import {BackendClientError} from '../error/BackendClientError';
+import {BaseError, BASE_ERROR_TYPE} from '../error/BaseError';
+import {ConversationError} from '../error/ConversationError';
+import {ClientEvent, CONVERSATION as CLIENT_CONVERSATION_EVENT} from '../event/Client';
+import {EventRepository} from '../event/EventRepository';
+import {EventService} from '../event/EventService';
+import {EventSource} from '../event/EventSource';
+import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {isMemberMessage} from '../guards/Message';
-import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
-import {mlsConversationState} from '../mls/mlsConversationState';
+import * as LegalHoldEvaluator from '../legal-hold/LegalHoldEvaluator';
+import {MessageCategory} from '../message/MessageCategory';
+import {SuperType} from '../message/SuperType';
+import {SystemMessageType} from '../message/SystemMessageType';
+import {mlsConversationState} from '../mls';
+import {PropertiesRepository} from '../properties/PropertiesRepository';
+import {Core} from '../service/CoreSingleton';
+import type {EventRecord} from '../storage';
+import {ConversationRecord} from '../storage/record/ConversationRecord';
+import {TeamRepository} from '../team/TeamRepository';
+import {TeamState} from '../team/TeamState';
+import {ServerTimeHandler} from '../time/serverTimeHandler';
+import {UserFilter} from '../user/UserFilter';
+import {UserRepository} from '../user/UserRepository';
+import {UserState} from '../user/UserState';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {rejectFn: (error: ConversationError) => void; resolveFn: (conversation: Conversation) => void};
@@ -265,7 +270,7 @@ export class ConversationRepository {
 
     this.conversationLabelRepository = new ConversationLabelRepository(
       this.conversationState.conversations,
-      this.conversationState.conversations_unarchived,
+      this.conversationState.visibleConversations,
       propertyRepository.propertiesService,
     );
 
@@ -275,28 +280,6 @@ export class ConversationRepository {
 
   checkMessageTimer(messageEntity: ContentMessage): void {
     this.ephemeralHandler.checkMessageTimer(messageEntity, this.serverTimeHandler.getTimeOffset());
-  }
-
-  private initStateUpdates(): void {
-    ko.computed(() => {
-      const conversationsArchived: Conversation[] = [];
-      const conversationsCleared: Conversation[] = [];
-      const conversationsUnarchived: Conversation[] = [];
-
-      this.conversationState.sorted_conversations().forEach(conversationEntity => {
-        if (conversationEntity.is_cleared()) {
-          conversationsCleared.push(conversationEntity);
-        } else if (conversationEntity.is_archived()) {
-          conversationsArchived.push(conversationEntity);
-        } else {
-          conversationsUnarchived.push(conversationEntity);
-        }
-      });
-
-      this.conversationState.conversations_archived(conversationsArchived);
-      this.conversationState.conversations_cleared(conversationsCleared);
-      this.conversationState.conversations_unarchived(conversationsUnarchived);
-    });
   }
 
   private initSubscriptions(): void {
@@ -413,9 +396,15 @@ export class ConversationRepository {
       };
 
       if (accessState) {
-        const {accessModes: access, accessRole: access_role_v2} = updateAccessRights(accessState);
+        const {accessModes: access, accessRole} = updateAccessRights(accessState);
 
-        payload = {...payload, access, access_role_v2};
+        const accessRoleField = this.core.backendFeatures.version >= 3 ? 'access_role' : 'access_role_v2';
+
+        payload = {
+          ...payload,
+          access,
+          [accessRoleField]: accessRole,
+        };
       }
     }
 
@@ -507,7 +496,11 @@ export class ConversationRepository {
     }
   }
 
-  public async getConversations(): Promise<Conversation[]> {
+  /**
+   * Will load all the conversations in memory
+   * @returns all the load conversations from backend merged with the locally stored conversations
+   */
+  public async loadConversations(): Promise<Conversation[]> {
     const remoteConversationsPromise = this.conversationService.getAllConversations().catch(error => {
       this.logger.error(`Failed to get all conversations from backend: ${error.message}`);
       return {found: []};
@@ -518,7 +511,7 @@ export class ConversationRepository {
       remoteConversationsPromise,
     ]);
     let conversationsData: any[];
-    if (!remoteConversations.found.length) {
+    if (!remoteConversations.found?.length) {
       conversationsData = localConversations;
     } else {
       const data = ConversationMapper.mergeConversation(localConversations, remoteConversations);
@@ -772,7 +765,7 @@ export class ConversationRepository {
   public async updateConversationsOnAppInit() {
     this.logger.info('Updating group participants');
     await this.updateUnarchivedConversations();
-    const updatePromises = this.conversationState.sorted_conversations().map(conversationEntity => {
+    const updatePromises = this.conversationState.filteredConversations().map(conversationEntity => {
       return this.updateParticipatingUserEntities(conversationEntity, true);
     });
     return Promise.all(updatePromises);
@@ -782,14 +775,14 @@ export class ConversationRepository {
    * Update users and events for archived conversations currently visible.
    */
   public updateArchivedConversations() {
-    this.updateConversations(this.conversationState.conversations_archived());
+    this.updateConversations(this.conversationState.archivedConversations());
   }
 
   /**
    * Update users and events for all unarchived conversations.
    */
   private updateUnarchivedConversations() {
-    return this.updateConversations(this.conversationState.conversations_unarchived());
+    return this.updateConversations(this.conversationState.visibleConversations());
   }
 
   private async updateConversationFromBackend(conversationEntity: Conversation) {
@@ -832,7 +825,7 @@ export class ConversationRepository {
         this.deleteConversationLocally(conversationEntity, true);
       })
       .catch(() => {
-        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+        PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
           text: {
             message: t('modalConversationDeleteErrorMessage', conversationEntity.name()),
             title: t('modalConversationDeleteErrorHeadline'),
@@ -914,7 +907,7 @@ export class ConversationRepository {
    */
   getGroupsByName(query: string, isHandle: boolean) {
     return this.conversationState
-      .sorted_conversations()
+      .filteredConversations()
       .filter(conversationEntity => {
         if (!conversationEntity.isGroup()) {
           return false;
@@ -949,7 +942,7 @@ export class ConversationRepository {
    * @returns Timestamp value
    */
   private getLatestEventTimestamp(increment = false) {
-    const mostRecentConversation = this.getMostRecentConversation(true);
+    const mostRecentConversation = this.conversationState.getMostRecentConversation(true);
     if (mostRecentConversation) {
       const lastEventTimestamp = mostRecentConversation.last_event_timestamp();
       return lastEventTimestamp + (increment ? 1 : 0);
@@ -965,19 +958,14 @@ export class ConversationRepository {
    * @returns Next conversation
    */
   getNextConversation(conversationEntity: Conversation) {
-    return getNextItem(this.conversationState.conversations_unarchived(), conversationEntity);
+    return getNextItem(this.conversationState.visibleConversations(), conversationEntity);
   }
 
   /**
-   * Get unarchived conversation with the most recent event.
-   * @param allConversations Search all conversations
-   * @returns Most recent conversation
+   * @deprecated import the `ConversationState` wherever you need it and call `getMostRecentConversation` directly from there
    */
-  getMostRecentConversation(allConversations = false) {
-    const [conversationEntity] = allConversations
-      ? this.conversationState.sorted_conversations()
-      : this.conversationState.conversations_unarchived();
-    return conversationEntity;
+  public getMostRecentConversation() {
+    return this.conversationState.getMostRecentConversation();
   }
 
   /**
@@ -1069,10 +1057,6 @@ export class ConversationRepository {
     }
   }
 
-  initializeConversations(): void {
-    this.initStateUpdates();
-  }
-
   /**
    * Starts the join public conversation flow.
    * Opens conversation directly when it is already known.
@@ -1103,7 +1087,7 @@ export class ConversationRepository {
         amplify.publish(WebAppEvents.CONVERSATION.SHOW, knownConversation, {});
         return;
       }
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
         primaryAction: {
           action: async () => {
             try {
@@ -1248,7 +1232,7 @@ export class ConversationRepository {
 
   private mapGuestStatusSelf() {
     this.conversationState
-      .filtered_conversations()
+      .filteredConversations()
       .forEach(conversationEntity => this._mapGuestStatusSelf(conversationEntity));
 
     if (this.teamState.isTeam()) {
@@ -1485,8 +1469,10 @@ export class ConversationRepository {
 
   async leaveGuestRoom(): Promise<void> {
     if (this.userState.self().isTemporaryGuest()) {
-      const conversationEntity = this.getMostRecentConversation(true);
-      await this.conversationService.deleteMembers(conversationEntity.qualifiedId, this.userState.self().qualifiedId);
+      const conversation = this.conversationState.getMostRecentConversation(true);
+      if (conversation) {
+        await this.conversationService.deleteMembers(conversation.qualifiedId, this.userState.self().qualifiedId);
+      }
     }
   }
 
@@ -1613,7 +1599,7 @@ export class ConversationRepository {
    */
   async updateConversationMessageTimer(
     conversationEntity: Conversation,
-    messageTimer: number,
+    messageTimer: number | null,
   ): Promise<ConversationMessageTimerUpdateEvent> {
     messageTimer = ConversationEphemeralHandler.validateTimer(messageTimer);
 
@@ -1728,6 +1714,14 @@ export class ConversationRepository {
   public async unarchiveConversation(conversationEntity: Conversation, forceChange = false, trigger = 'unknown') {
     await this.toggleArchiveConversation(conversationEntity, false, forceChange);
     this.logger.info(`Conversation '${conversationEntity.id}' unarchived by trigger '${trigger}'`);
+  }
+
+  public async sendTypingStart(conversationEntity: Conversation) {
+    this.core.service!.conversation.sendTypingStart(conversationEntity.qualifiedId);
+  }
+
+  public async sendTypingStop(conversationEntity: Conversation) {
+    this.core.service!.conversation.sendTypingStop(conversationEntity.qualifiedId);
   }
 
   private async toggleArchiveConversation(
@@ -1847,7 +1841,7 @@ export class ConversationRepository {
   }
 
   private showModal(messageText: string, titleText: string) {
-    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
       text: {
         message: messageText,
         title: titleText,
@@ -1865,7 +1859,7 @@ export class ConversationRepository {
     const messageText = t('modalLegalHoldConversationMissingConsentMessage', {}, replaceLinkLegalHold);
     const titleText = t('modalUserCannotBeAddedHeadline');
 
-    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
       text: {
         htmlMessage: messageText,
         title: titleText,
@@ -1961,8 +1955,7 @@ export class ConversationRepository {
       `Handling event '${type}' in conversation '${conversationId.id}/${conversationId.domain}' (Source: ${eventSource})`,
     );
 
-    const selfConversation = this.conversationState.self_conversation();
-    const inSelfConversation = selfConversation && matchQualifiedIds(conversationId, selfConversation.qualifiedId);
+    const inSelfConversation = this.conversationState.isSelfConversation(conversationId);
     if (inSelfConversation) {
       const typesInSelfConversation = [
         CONVERSATION_EVENT.MEMBER_UPDATE,
@@ -2179,6 +2172,9 @@ export class ConversationRepository {
       case CONVERSATION_EVENT.MEMBER_UPDATE:
         return this.onMemberUpdate(conversationEntity, eventJson);
 
+      case CONVERSATION_EVENT.TYPING:
+        return this.onTyping(conversationEntity, eventJson);
+
       case CONVERSATION_EVENT.RENAME:
         return this.onRename(conversationEntity, eventJson, eventSource === EventRepository.SOURCE.WEB_SOCKET);
 
@@ -2312,7 +2308,7 @@ export class ConversationRepository {
    */
   private readonly onMissedEvents = (): void => {
     this.conversationState
-      .filtered_conversations()
+      .filteredConversations()
       .filter(conversationEntity => !conversationEntity.removed_from_conversation())
       .forEach(conversationEntity => {
         const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
@@ -2582,8 +2578,7 @@ export class ConversationRepository {
     }
 
     const isBackendEvent = eventData.otr_archived_ref || eventData.otr_muted_ref;
-    const selfConversation = this.conversationState.self_conversation();
-    const inSelfConversation = selfConversation && matchQualifiedIds(selfConversation, conversationId);
+    const inSelfConversation = this.conversationState.isSelfConversation(conversationId);
     if (!inSelfConversation && conversation && !isBackendEvent) {
       this.logger.warn(
         `A conversation update message was not sent in the selfConversation. Skipping conversation update`,
@@ -2715,11 +2710,11 @@ export class ConversationRepository {
    * @returns Resolves when the event was handled
    */
   private async onMessageHidden(eventJson: MessageHiddenEvent) {
-    const {conversation: conversationId, data: eventData, from} = eventJson;
+    const {conversation, qualified_conversation, data: eventData, from} = eventJson;
 
+    const conversationId = qualified_conversation || {id: conversation, domain: ''};
     try {
-      const inSelfConversation =
-        !this.conversationState.self_conversation() || conversationId === this.conversationState.self_conversation().id;
+      const inSelfConversation = this.conversationState.isSelfConversation(conversationId);
       if (!inSelfConversation) {
         throw new ConversationError(
           ConversationError.TYPE.WRONG_CONVERSATION,
@@ -2823,6 +2818,49 @@ export class ConversationRepository {
     const {messageEntity} = await this.addEventToConversation(conversationEntity, eventJson);
     ConversationMapper.updateProperties(conversationEntity, eventJson.data);
     return {conversationEntity, messageEntity};
+  }
+
+  /**
+   * A user started or stopped typing in a conversation.
+   *
+   * @param conversationEntity Conversation entity that will the user will be added to its active typing users
+   * @param eventJson JSON data of 'conversation.typing' event
+   * @returns Resolves when the event was handled
+   */
+  private async onTyping(conversationEntity: Conversation, eventJson: ConversationTypingEvent) {
+    const qualifiedUserId = eventJson.qualified_from || {domain: '', id: eventJson.from};
+    const qualifiedUser = conversationEntity
+      .participating_user_ets()
+      .find(user => matchQualifiedIds(user, qualifiedUserId));
+
+    if (!qualifiedUser) {
+      this.logger.warn(`No sender user found for event of type ${eventJson.type}`);
+      return {conversationEntity};
+    }
+
+    const conversationId = conversationEntity.id;
+    const {addTypingUser, getTypingUser, removeTypingUser} = useTypingIndicatorState.getState();
+
+    const oldUser = getTypingUser(qualifiedUser, conversationId);
+    if (oldUser) {
+      window.clearTimeout(oldUser.timerId);
+    }
+
+    if (eventJson.data.status === CONVERSATION_TYPING.STARTED) {
+      const timerId = window.setTimeout(() => {
+        removeTypingUser(qualifiedUser, conversationId);
+      }, TYPING_TIMEOUT * 6); // 10000 * 6 => 1 minute
+
+      const typingUser = {conversationId, user: qualifiedUser, timerId};
+
+      addTypingUser(typingUser);
+    }
+
+    if (eventJson.data.status === CONVERSATION_TYPING.STOPPED) {
+      removeTypingUser(qualifiedUser, conversationId);
+    }
+
+    return {conversationEntity};
   }
 
   /**

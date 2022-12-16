@@ -17,16 +17,19 @@
  *
  */
 
-import ko from 'knockout';
-import ContentMessageComponent, {ContentMessageProps} from './index';
 import {render, waitFor} from '@testing-library/react';
-import {ContentMessage} from '../../../../entity/message/ContentMessage';
-import {Conversation} from '../../../../entity/Conversation';
-import {createRandomUuid} from '../../../../util/util';
-import {Text} from '../../../../entity/message/Text';
-import {User} from '../../../../entity/User';
+import ko from 'knockout';
+
 import {LinkPreview} from 'src/script/entity/message/LinkPreview';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
+
+import {Conversation} from '../../../../entity/Conversation';
+import {ContentMessage} from '../../../../entity/message/ContentMessage';
+import {Text} from '../../../../entity/message/Text';
+import {User} from '../../../../entity/User';
+import {createRandomUuid} from '../../../../util/util';
+
+import {ContentMessageComponent, ContentMessageProps} from './index';
 
 describe('message', () => {
   let defaultParams: ContentMessageProps;
@@ -43,6 +46,8 @@ describe('message', () => {
       contextMenu: {entries: ko.observable([])},
       conversation: new Conversation(),
       findMessage: jest.fn(),
+      isMessageFocused: true,
+      handleFocus: jest.fn(),
       isLastDeliveredMessage: false,
       message,
       onClickAvatar: jest.fn(),
@@ -58,6 +63,8 @@ describe('message', () => {
       onLike: jest.fn(),
       previousMessage: undefined,
       selfId: {domain: '', id: createRandomUuid()},
+      totalMessage: 1,
+      isMsgElementsFocusable: true,
     };
   });
 

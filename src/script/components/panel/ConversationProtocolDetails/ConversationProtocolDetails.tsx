@@ -17,11 +17,11 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
 import React from 'react';
-import {ConversationProtocol} from '@wireapp/api-client/src/conversation/NewConversation';
 
-import {registerReactComponent} from 'Util/ComponentUtil';
+import {CSSObject} from '@emotion/react';
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
+
 import {t} from 'Util/LocalizerUtil';
 
 export enum Ciphersuite {
@@ -61,13 +61,13 @@ export interface ConversationProtocolDetailsProps {
 }
 
 const titleStyles: CSSObject = {
-  fontSize: 14,
+  fontSize: '0.875rem',
   fontWeight: 400,
 };
 
 const subTitleStyles: CSSObject = {
   color: 'var(--gray-70)',
-  fontSize: 12,
+  fontSize: '0.75rem',
   fontWeight: 400,
   marginBottom: 16,
   wordBreak: 'break-all',
@@ -79,28 +79,27 @@ const wrapperStyles: CSSObject = {
   paddingTop: 4,
 };
 
-const ConversationProtocolDetails: React.FC<ConversationProtocolDetailsProps> = ({protocol, cipherSuite}) => {
-  return (
-    <>
-      <div className="conversation-details__list-head">{t('conversationDetailsProtocolDetails')}</div>
-      <div css={wrapperStyles}>
-        <div css={titleStyles}>Protocol</div>
-        <div css={subTitleStyles} data-uie-name="protocol-name">
-          {protocol}
-        </div>
-        {protocol.toLocaleLowerCase() === ConversationProtocol.MLS && cipherSuite && (
-          <>
-            <div css={titleStyles}>Cipher Suite</div>
-            <div css={subTitleStyles} data-uie-name="cipher-suite">
-              {Ciphersuite[cipherSuite]}
-            </div>
-          </>
-        )}
-      </div>
-    </>
-  );
-};
+const ConversationProtocolDetails: React.FC<ConversationProtocolDetailsProps> = ({protocol, cipherSuite}) => (
+  <div>
+    <h3 className="conversation-details__list-head">{t('conversationDetailsProtocolDetails')}</h3>
 
-export default ConversationProtocolDetails;
+    <div css={wrapperStyles}>
+      <div css={titleStyles}>Protocol</div>
 
-registerReactComponent('conversation-protocol-details', ConversationProtocolDetails);
+      <p css={subTitleStyles} data-uie-name="protocol-name">
+        {protocol.toUpperCase()}
+      </p>
+
+      {protocol === ConversationProtocol.MLS && cipherSuite && (
+        <>
+          <div css={titleStyles}>Cipher Suite</div>
+          <p css={subTitleStyles} data-uie-name="cipher-suite">
+            {Ciphersuite[cipherSuite]}
+          </p>
+        </>
+      )}
+    </div>
+  </div>
+);
+
+export {ConversationProtocolDetails};

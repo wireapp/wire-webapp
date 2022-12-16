@@ -17,24 +17,24 @@
  *
  */
 
-import React, {Fragment, useState} from 'react';
+import React, {ChangeEvent, useState} from 'react';
+
 import cx from 'classnames';
-
 import {container} from 'tsyringe';
-import {isEnterKey, isSpaceKey} from 'Util/KeyboardUtil';
 
+import {ParticipantItem} from 'Components/list/ParticipantItem';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {isEnterKey, isSpaceKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
+import {InViewport} from './utils/InViewport';
+
 import type {ConversationRepository} from '../conversation/ConversationRepository';
+import {ConversationState} from '../conversation/ConversationState';
 import type {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
-
-import {UserState} from '../user/UserState';
-import {ConversationState} from '../conversation/ConversationState';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import ParticipantItem from 'Components/list/ParticipantItem';
 import {TeamState} from '../team/TeamState';
-import InViewport from './utils/InViewport';
+import {UserState} from '../user/UserState';
 
 export enum UserlistMode {
   COMPACT = 'UserlistMode.COMPACT',
@@ -54,7 +54,8 @@ export interface UserListProps {
   mode?: UserlistMode;
   noSelfInteraction?: boolean;
   noUnderline?: boolean;
-  onClick?: (userEntity: User, event: MouseEvent | KeyboardEvent) => void;
+  showArrow?: boolean;
+  onClick?: (userEntity: User, event: MouseEvent | KeyboardEvent | ChangeEvent) => void;
   onSelectUser?: (user: User) => void;
   reducedUserCount?: number;
   selectedUsers?: User[];
@@ -80,6 +81,7 @@ const UserList: React.FC<UserListProps> = ({
   reducedUserCount = 5,
   showEmptyAdmin = false,
   noSelfInteraction = false,
+  showArrow = false,
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
   onSelectUser,
@@ -107,7 +109,7 @@ const UserList: React.FC<UserListProps> = ({
     return true;
   };
 
-  const onClickOrKeyPressed = (userEntity: User, event: MouseEvent | KeyboardEvent) => {
+  const onClickOrKeyPressed = (userEntity: User, event: MouseEvent | KeyboardEvent | ChangeEvent) => {
     onSelectUser?.(userEntity);
     onClick?.(userEntity, event);
   };
@@ -145,10 +147,11 @@ const UserList: React.FC<UserListProps> = ({
     content = (
       <>
         {(admins.length > 0 || showEmptyAdmin) && (
-          <Fragment>
-            <div className="user-list__header" data-uie-name="label-conversation-admins">
+          <>
+            <h3 className="user-list__header" data-uie-name="label-conversation-admins">
               {t('searchListAdmins', adminCount)}
-            </div>
+            </h3>
+
             {admins.length > 0 && (
               <ul className={cx('search-list', cssClasses)} data-uie-name="list-admins">
                 {admins.slice(0, maxShownUsers).map(user => (
@@ -167,6 +170,7 @@ const UserList: React.FC<UserListProps> = ({
                       isSelfVerified={isSelfVerified}
                       onClick={onClickOrKeyPressed}
                       onKeyDown={onUserKeyPressed}
+                      showArrow={showArrow}
                     />
                   </li>
                 ))}
@@ -177,13 +181,15 @@ const UserList: React.FC<UserListProps> = ({
                 {t('searchListNoAdmins')}
               </div>
             )}
-          </Fragment>
+          </>
         )}
+
         {members.length > 0 && maxShownUsers > admins.length && (
-          <Fragment>
-            <div className="user-list__header" data-uie-name="label-conversation-members">
+          <>
+            <h3 className="user-list__header" data-uie-name="label-conversation-members">
               {t('searchListMembers', memberCount)}
-            </div>
+            </h3>
+
             <ul className={cx('search-list', cssClasses)} data-uie-name="list-members">
               {members.slice(0, maxShownUsers - admins.length).map(user => (
                 <li key={user.id}>
@@ -201,11 +207,12 @@ const UserList: React.FC<UserListProps> = ({
                     isSelfVerified={isSelfVerified}
                     onClick={onClickOrKeyPressed}
                     onKeyDown={onUserKeyPressed}
+                    showArrow={showArrow}
                   />
                 </li>
               ))}
             </ul>
-          </Fragment>
+          </>
         )}
       </>
     );
@@ -213,25 +220,28 @@ const UserList: React.FC<UserListProps> = ({
     const truncatedUsers = truncate ? users.slice(0, reducedUserCount) : users;
 
     content = (
-      <div className={cx('search-list', cssClasses)}>
+      <ul className={cx('search-list', cssClasses)}>
         {truncatedUsers.slice(0, maxShownUsers).map(user => (
-          <ParticipantItem
-            key={user.id}
-            noInteraction={noSelfInteraction && user.isMe}
-            participant={user}
-            noUnderline={noUnderline}
-            highlighted={highlightedUserIds.includes(user.id)}
-            customInfo={infos && infos[user.id]}
-            canSelect={isSelectEnabled}
-            isSelected={isSelected(user)}
-            mode={mode}
-            external={teamState.isExternal(user.id)}
-            selfInTeam={selfInTeam}
-            isSelfVerified={isSelfVerified}
-            onClick={onClickOrKeyPressed}
-          />
+          <li key={user.id}>
+            <ParticipantItem
+              noInteraction={noSelfInteraction && user.isMe}
+              participant={user}
+              noUnderline={noUnderline}
+              highlighted={highlightedUserIds.includes(user.id)}
+              customInfo={infos && infos[user.id]}
+              canSelect={isSelectEnabled}
+              isSelected={isSelected(user)}
+              mode={mode}
+              external={teamState.isExternal(user.id)}
+              selfInTeam={selfInTeam}
+              isSelfVerified={isSelfVerified}
+              onClick={onClickOrKeyPressed}
+              onKeyDown={onUserKeyPressed}
+              showArrow={showArrow}
+            />
+          </li>
         ))}
-      </div>
+      </ul>
     );
   }
 
@@ -249,4 +259,4 @@ const UserList: React.FC<UserListProps> = ({
   );
 };
 
-export default UserList;
+export {UserList};

@@ -17,9 +17,10 @@
  *
  */
 
-import {ConversationProtocol} from '@wireapp/api-client/src/conversation/NewConversation';
-import ConversationProtocolDetails, {Ciphersuite} from './ConversationProtocolDetails';
 import {render} from '@testing-library/react';
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
+
+import {ConversationProtocolDetails, Ciphersuite} from './ConversationProtocolDetails';
 
 describe('ConversationProtocolDetails', () => {
   it('renders the correct infos for the conversation with mls protocol', () => {
@@ -30,7 +31,7 @@ describe('ConversationProtocolDetails', () => {
 
     const {queryByText} = render(<ConversationProtocolDetails {...props} />);
 
-    expect(queryByText('mls')).not.toBeNull();
+    expect(queryByText('MLS')).not.toBeNull();
     expect(queryByText('MLS_128_DHKEMP256_AES128GCM_SHA256_P256')).not.toBeNull();
   });
 
@@ -41,6 +42,6 @@ describe('ConversationProtocolDetails', () => {
 
     const {queryByText} = render(<ConversationProtocolDetails {...props} />);
 
-    expect(queryByText('proteus')).not.toBeNull();
+    expect(queryByText('PROTEUS')).not.toBeNull();
   });
 });

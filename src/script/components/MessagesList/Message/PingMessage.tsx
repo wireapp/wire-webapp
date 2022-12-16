@@ -18,19 +18,23 @@
  */
 
 import React from 'react';
-import cx from 'classnames';
-import {PingMessage as PingMessageEntity} from '../../../entity/message/PingMessage';
 
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import MessageTime from './MessageTime';
-import ReadReceiptStatus from './ReadReceiptStatus';
+import cx from 'classnames';
+
 import {Message} from 'src/script/entity/message/Message';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+
+import {MessageTime} from './MessageTime';
+import {ReadReceiptStatus} from './ReadReceiptStatus';
+
+import {PingMessage as PingMessageEntity} from '../../../entity/message/PingMessage';
 
 export interface PingMessageProps {
   is1to1Conversation: boolean;
   isLastDeliveredMessage: boolean;
   message: PingMessageEntity;
   onClickReceipts?: (message: Message) => void;
+  isMessageFocused: boolean;
 }
 
 const PingMessage: React.FC<PingMessageProps> = ({
@@ -38,6 +42,7 @@ const PingMessage: React.FC<PingMessageProps> = ({
   is1to1Conversation,
   isLastDeliveredMessage,
   onClickReceipts,
+  isMessageFocused,
 }) => {
   const {unsafeSenderName, caption, timestamp, ephemeral_caption, isObfuscated, get_icon_classes} =
     useKoSubscribableChildren(message, [
@@ -54,18 +59,18 @@ const PingMessage: React.FC<PingMessageProps> = ({
       <div className="message-header-icon">
         <div className={`icon-ping ${get_icon_classes}`} />
       </div>
-      <div
+      <p
         className={cx('message-header-label', {
           'ephemeral-message-obfuscated': isObfuscated,
         })}
         title={ephemeral_caption}
         data-uie-name="element-message-ping-text"
       >
-        <span className="message-header-label__multiline">
+        <p className="message-header-label__multiline">
           <span className="message-header-sender-name">{unsafeSenderName}</span>
           <span className="ellipsis">{caption}</span>
-        </span>
-      </div>
+        </p>
+      </p>
       <div className="message-body-actions">
         <MessageTime timestamp={timestamp} data-uie-uid={message.id} data-uie-name="item-message-call-timestamp" />
         <ReadReceiptStatus
@@ -73,10 +78,11 @@ const PingMessage: React.FC<PingMessageProps> = ({
           is1to1Conversation={is1to1Conversation}
           isLastDeliveredMessage={isLastDeliveredMessage}
           onClickReceipts={onClickReceipts}
+          isMessageFocused={isMessageFocused}
         />
       </div>
     </div>
   );
 };
 
-export default PingMessage;
+export {PingMessage};

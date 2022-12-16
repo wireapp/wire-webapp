@@ -17,18 +17,23 @@
  *
  */
 
+import {render, screen} from '@testing-library/react';
 import ko from 'knockout';
+
 import {CallMessage as CallMessageEntity} from 'src/script/entity/message/CallMessage';
-import CallMessage from './CallMessage';
-import {render} from '@testing-library/react';
+
+import {CallMessage} from './CallMessage';
 
 jest.mock('Components/Icon', () => ({
-  Hangup: function HangupIcon() {
-    return <span>hangupIcon</span>;
+  Icon: {
+    Hangup: () => {
+      return <span>hangupIcon</span>;
+    },
+    Pickup: () => {
+      return <span>pickupIcon</span>;
+    },
   },
-  Pickup: function PickupIcon() {
-    return <span>pickupIcon</span>;
-  },
+  __esModule: true,
 }));
 
 const createCallMessage = (partialCallMessage: Partial<CallMessageEntity>) => {
@@ -51,13 +56,13 @@ describe('CallMessage', () => {
       }),
     };
 
-    const {getByTestId, queryByText} = render(<CallMessage {...props} />);
+    render(<CallMessage {...props} />);
 
-    const elementMessageCall = getByTestId('element-message-call');
+    const elementMessageCall = screen.getByTestId('element-message-call');
     expect(elementMessageCall.getAttribute('data-uie-value')).toEqual('completed');
 
-    expect(queryByText('hangupIcon')).toBeNull();
-    expect(queryByText('pickupIcon')).not.toBeNull();
+    expect(screen.queryByText('hangupIcon')).toBeNull();
+    expect(screen.queryByText('pickupIcon')).not.toBeNull();
   });
 
   it('shows red hangup icon for incompleted calls', async () => {
@@ -67,12 +72,12 @@ describe('CallMessage', () => {
       }),
     };
 
-    const {getByTestId, queryByText} = render(<CallMessage {...props} />);
+    render(<CallMessage {...props} />);
 
-    const elementMessageCall = getByTestId('element-message-call');
+    const elementMessageCall = screen.getByTestId('element-message-call');
     expect(elementMessageCall.getAttribute('data-uie-value')).toEqual('not_completed');
 
-    expect(queryByText('pickupIcon')).toBeNull();
-    expect(queryByText('hangupIcon')).not.toBeNull();
+    expect(screen.queryByText('pickupIcon')).toBeNull();
+    expect(screen.queryByText('hangupIcon')).not.toBeNull();
   });
 });

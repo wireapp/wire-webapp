@@ -17,13 +17,18 @@
  *
  */
 
-import cx from 'classnames';
-import AssetLoader from '../AssetLoader';
 import React, {useEffect, useState} from 'react';
-import type {FileAsset} from '../../../../../../entity/message/FileAsset';
-import {AssetTransferState} from '../../../../../../assets/AssetTransferState';
-import {noop} from 'Util/util';
+
+import cx from 'classnames';
+
+import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
+import {noop} from 'Util/util';
+
+import {AssetTransferState} from '../../../../../../assets/AssetTransferState';
+import type {FileAsset} from '../../../../../../entity/message/FileAsset';
+import {AssetLoader} from '../AssetLoader';
 
 export interface MediaButtonProps {
   asset: FileAsset;
@@ -34,6 +39,7 @@ export interface MediaButtonProps {
   play: () => void;
   transferState: AssetTransferState;
   uploadProgress: number;
+  isFocusable?: boolean;
 }
 
 const MediaButton: React.FC<MediaButtonProps> = ({
@@ -45,11 +51,13 @@ const MediaButton: React.FC<MediaButtonProps> = ({
   play,
   pause = noop,
   cancel = noop,
+  isFocusable = true,
 }) => {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const onPlay = () => setIsPlaying(true);
   const onPause = () => setIsPlaying(false);
   const unwrappedAsset = useKoSubscribableChildren(asset, ['downloadProgress']);
+  const messageFocusedTabIndex = useMessageFocusedTabIndex(isFocusable);
 
   useEffect(() => {
     if (mediaElement) {
@@ -80,6 +88,8 @@ const MediaButton: React.FC<MediaButtonProps> = ({
           className="button-reset-default media-button media-button-play icon-play"
           onClick={play}
           data-uie-name="do-play-media"
+          aria-label={t('mediaBtnPlay')}
+          tabIndex={messageFocusedTabIndex}
         />
       )}
       {isUploaded && isPlaying && (
@@ -88,6 +98,8 @@ const MediaButton: React.FC<MediaButtonProps> = ({
           className="button-reset-default media-button media-button-pause icon-pause"
           onClick={pause}
           data-uie-name="do-pause-media"
+          aria-label={t('mediaBtnPause')}
+          tabIndex={messageFocusedTabIndex}
         />
       )}
       {isDownloading && (
@@ -98,4 +110,4 @@ const MediaButton: React.FC<MediaButtonProps> = ({
   );
 };
 
-export default MediaButton;
+export {MediaButton};

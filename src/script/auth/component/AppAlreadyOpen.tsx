@@ -17,10 +17,12 @@
  *
  */
 
-import {Button, Column, Columns, Container, H3, Modal, Text} from '@wireapp/react-ui-kit';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
+
+import {Button, Column, Columns, Container, H3, Modal, Text} from '@wireapp/react-ui-kit';
+
 import {Config} from '../../Config';
 import {appAlreadyOpenStrings} from '../../strings';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
@@ -33,7 +35,7 @@ export interface Props {
 
 type AppAlreadyOpenProps = Props & ConnectedProps & DispatchProps;
 
-const AppAlreadyOpen = ({isAppAlreadyOpen, fullscreen, removeCookie}: AppAlreadyOpenProps) => {
+const AppAlreadyOpenComponent = ({isAppAlreadyOpen, fullscreen, removeCookie}: AppAlreadyOpenProps) => {
   const {formatMessage: _} = useIntl();
   if (!isAppAlreadyOpen) {
     return null;
@@ -78,4 +80,6 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     dispatch,
   );
 
-export default connect(mapStateToProps, mapDispatchToProps)(AppAlreadyOpen);
+const AppAlreadyOpen = connect(mapStateToProps, mapDispatchToProps)(AppAlreadyOpenComponent);
+
+export {AppAlreadyOpen};

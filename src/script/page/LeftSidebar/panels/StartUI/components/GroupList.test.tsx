@@ -17,15 +17,21 @@
  *
  */
 
-import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
-import GroupList from './GroupList';
+import {fireEvent, render} from '@testing-library/react';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import type {QualifiedId} from '@wireapp/api-client/lib/user/';
+
 import {createRandomUuid, noop} from 'Util/util';
-import {AssetRepository} from '../../../../../assets/AssetRepository';
+
+import {GroupList} from './GroupList';
+
 import {Conversation} from '../../../../../entity/Conversation';
 import {User} from '../../../../../entity/User';
-import {Router} from '../../../../../router/Router';
-import type {QualifiedId} from '@wireapp/api-client/src/user/';
-import {render, fireEvent} from '@testing-library/react';
+import {navigate} from '../../../../../router/Router';
+
+jest.mock('../../../../../router/Router', () => ({
+  navigate: jest.fn(),
+}));
 
 const getGroupItemById = (container: HTMLElement, id: string) =>
   container.querySelector(`[data-uie-name="item-group"][data-uie-uid="${id}"]`);
@@ -57,14 +63,10 @@ describe('GroupList', () => {
 
   it('shows group list', () => {
     const groups = [createGroupConversation('groupA'), create1on1Conversation('groupB')];
-    const assetRepository: Partial<AssetRepository> = {};
-    const router: Partial<Router> = {};
 
     const props = {
-      assetRepository: assetRepository as AssetRepository,
       click: noop,
       groups,
-      router: router as Router,
     };
 
     const {container} = render(<GroupList {...props} />);
@@ -75,17 +77,11 @@ describe('GroupList', () => {
 
   it('shows group list and navigates conversation on click', () => {
     const groups = [createGroupConversation('groupA'), create1on1Conversation('groupB')];
-    const assetRepository: Partial<AssetRepository> = {};
-    const router: Partial<Router> = {
-      navigate: jest.fn(),
-    };
     const onClickSpy = jest.fn();
 
     const props = {
-      assetRepository: assetRepository as AssetRepository,
       click: onClickSpy,
       groups,
-      router: router as Router,
     };
 
     const {container} = render(<GroupList {...props} />);
@@ -93,13 +89,13 @@ describe('GroupList', () => {
     const itemGroup1 = getGroupItemById(container, groups[0].id);
     fireEvent.click(itemGroup1!);
 
-    expect(router.navigate).toHaveBeenCalledWith(`/conversation/${groups[0].id}`);
+    expect(navigate).toHaveBeenCalledWith(`/conversation/${groups[0].id}`);
     expect(onClickSpy).toHaveBeenCalledWith(groups[0]);
 
     const itemGroup2 = getGroupItemById(container, groups[1].id);
     fireEvent.click(itemGroup2!);
 
-    expect(router.navigate).toHaveBeenCalledWith(`/conversation/${groups[1].id}`);
+    expect(navigate).toHaveBeenCalledWith(`/conversation/${groups[1].id}`);
     expect(onClickSpy).toHaveBeenCalledWith(groups[1]);
   });
 });

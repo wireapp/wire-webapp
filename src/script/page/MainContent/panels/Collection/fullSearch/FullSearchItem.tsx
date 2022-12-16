@@ -19,13 +19,15 @@
 
 import React from 'react';
 
-import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {formatDateShort} from 'Util/TimeUtil';
-import {handleKeyDown} from 'Util/KeyboardUtil';
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
-import type {Text} from '../../../../../entity/message/Text';
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {handleKeyDown} from 'Util/KeyboardUtil';
+import {formatDateShort} from 'Util/TimeUtil';
+
 import type {ContentMessage} from '../../../../../entity/message/ContentMessage';
+import type {Text} from '../../../../../entity/message/Text';
 
 interface FullSearchItemProps {
   formatText: (text: string) => {matches: number; parts: string[]};
@@ -43,7 +45,7 @@ const FullSearchItem: React.FC<FullSearchItemProps> = ({message, onClick, format
       className="full-search__item"
       onClick={onClick}
       role="button"
-      tabIndex={0}
+      tabIndex={TabIndex.FOCUSABLE}
       onKeyDown={e => handleKeyDown(e, onClick)}
       data-uie-name="full-search-item"
     >
@@ -78,4 +80,4 @@ const FullSearchItem: React.FC<FullSearchItemProps> = ({message, onClick, format
   );
 };
 
-export default FullSearchItem;
+export {FullSearchItem};

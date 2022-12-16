@@ -23,16 +23,16 @@ import type {
   QualifiedUserClientMap,
   ClientCapabilityData,
   PublicClient,
-} from '@wireapp/api-client/src/client';
-import type {QualifiedId} from '@wireapp/api-client/src/user';
+} from '@wireapp/api-client/lib/client';
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
 
+import {APIClient} from '../service/APIClientSingleton';
 import type {ClientRecord} from '../storage';
 import {StorageService} from '../storage';
 import {StorageSchemata} from '../storage/StorageSchemata';
-import {APIClient} from '../service/APIClientSingleton';
 
 export class ClientService {
   private readonly logger: Logger;

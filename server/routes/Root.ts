@@ -48,7 +48,6 @@ const Root = () => [
     await addGeoIP(req);
     return res.render('login/index');
   }),
-  Router().get('/demo', (_req, res) => res.render('demo/index')),
 ];
 
 export {Root};

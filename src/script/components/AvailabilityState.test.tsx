@@ -17,9 +17,11 @@
  *
  */
 
-import {Availability} from '@wireapp/protocol-messaging';
-import AvailabilityState from './AvailabilityState';
 import {render} from '@testing-library/react';
+
+import {Availability} from '@wireapp/protocol-messaging';
+
+import {AvailabilityState} from './AvailabilityState';
 
 const defaultProps = {
   availability: Availability.Type.AVAILABLE,

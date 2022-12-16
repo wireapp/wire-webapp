@@ -18,17 +18,22 @@
  */
 
 import React from 'react';
-import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
-import {User} from '../../../../../entity/User';
-import {t} from 'Util/LocalizerUtil';
-import FileInput from './FileInput';
-import {UserError} from '../../../../../error/UserError';
-import {Config} from '../../../../../Config';
-import {UserRepository} from '../../../../../user/UserRepository';
-import {validateProfileImageResolution} from 'Util/util';
-import {getLogger} from 'Util/Logger';
-import {modals, ModalsViewModel} from '../../../../../view_model/ModalsViewModel';
+
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {handleKeyDown} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
+import {getLogger} from 'Util/Logger';
+import {validateProfileImageResolution} from 'Util/util';
+
+import {FileInput} from './FileInput';
+
+import {Config} from '../../../../../Config';
+import {User} from '../../../../../entity/User';
+import {UserError} from '../../../../../error/UserError';
+import {UserRepository} from '../../../../../user/UserRepository';
 
 interface AvatarInputProps {
   isActivatedAccount: boolean;
@@ -40,7 +45,7 @@ const FILE_TYPES = ['image/bmp', 'image/jpeg', 'image/jpg', 'image/png', '.jpg-l
 const logger = getLogger('AvatarInput');
 
 const AvatarInput: React.FC<AvatarInputProps> = ({selfUser, isActivatedAccount, userRepository}) => {
-  const inputRef = React.useRef(null);
+  const inputRef = React.useRef<HTMLInputElement>(null);
 
   if (!isActivatedAccount) {
     return <Avatar participant={selfUser} avatarSize={AVATAR_SIZE.X_LARGE} />;
@@ -48,7 +53,7 @@ const AvatarInput: React.FC<AvatarInputProps> = ({selfUser, isActivatedAccount, 
 
   const showUploadWarning = (title: string, message: string): Promise<never> => {
     const modalOptions = {text: {message, title}};
-    modals.showModal(ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions, undefined);
+    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, modalOptions, undefined);
     return Promise.reject(new UserError(UserError.TYPE.INVALID_UPDATE, UserError.MESSAGE.INVALID_UPDATE));
   };
 
@@ -89,12 +94,12 @@ const AvatarInput: React.FC<AvatarInputProps> = ({selfUser, isActivatedAccount, 
   };
 
   const inputClick = () => {
-    inputRef.current.click();
+    inputRef.current?.click();
   };
 
   return (
     <div
-      tabIndex={0}
+      tabIndex={TabIndex.FOCUSABLE}
       role="button"
       onKeyDown={(event: React.KeyboardEvent<HTMLElement>) => handleKeyDown(event, inputClick)}
       aria-label={`${t('tooltipPreferencesPicture')}`}
@@ -115,16 +120,17 @@ const AvatarInput: React.FC<AvatarInputProps> = ({selfUser, isActivatedAccount, 
           id="self-upload-file-input"
           data-uie-name="do-select-picture"
           fileTypes={FILE_TYPES}
-          tabIndex={-1}
+          tabIndex={TabIndex.UNFOCUSABLE}
           onFileChange={files => {
             const newUserPicture = files.item(0);
-
-            setPicture(newUserPicture).catch(error => {
-              const isInvalidUpdate = error.type === UserError.TYPE.INVALID_UPDATE;
-              if (!isInvalidUpdate) {
-                throw error;
-              }
-            });
+            if (newUserPicture) {
+              setPicture(newUserPicture).catch(error => {
+                const isInvalidUpdate = error.type === UserError.TYPE.INVALID_UPDATE;
+                if (!isInvalidUpdate) {
+                  throw error;
+                }
+              });
+            }
           }}
         />
         <span className="icon-camera" />
@@ -133,4 +139,4 @@ const AvatarInput: React.FC<AvatarInputProps> = ({selfUser, isActivatedAccount, 
   );
 };
 
-export default AvatarInput;
+export {AvatarInput};

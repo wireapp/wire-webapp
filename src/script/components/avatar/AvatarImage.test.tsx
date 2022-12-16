@@ -17,14 +17,16 @@
  *
  */
 
-import {waitFor} from '@testing-library/react';
-import {act} from 'react-dom/test-utils';
-import AvatarImage from './AvatarImage';
-import {User} from '../../entity/User';
-import {AssetRepository} from '../../assets/AssetRepository';
+import {render, waitFor} from '@testing-library/react';
+
 import {AVATAR_SIZE} from 'Components/Avatar';
 import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
-import {render} from '@testing-library/react';
+
+import {AvatarImage} from './AvatarImage';
+
+import {AssetRepository} from '../../assets/AssetRepository';
+import {User} from '../../entity/User';
+jest.mock('../../auth/util/SVGProvider');
 
 describe('AvatarImage', () => {
   it('fetches full avatar image for large avatars', async () => {
@@ -49,7 +51,7 @@ describe('AvatarImage', () => {
 
     render(<AvatarImage {...props} />);
 
-    await act(() => waitFor(() => expect(assetRepoSpy.getObjectUrl).toHaveBeenCalledWith(resource)));
+    await waitFor(() => expect(assetRepoSpy.getObjectUrl).toHaveBeenCalledWith(resource));
   });
 
   it('fetches preview avatar image for low pixel ratio devices', async () => {
@@ -74,7 +76,7 @@ describe('AvatarImage', () => {
 
     render(<AvatarImage {...props} />);
 
-    await act(() => waitFor(() => expect(assetRepoSpy.getObjectUrl).toHaveBeenCalledWith(resource)));
+    await waitFor(() => expect(assetRepoSpy.getObjectUrl).toHaveBeenCalledWith(resource));
   });
 
   it('fetches preview avatar image for small avatars', async () => {
@@ -98,9 +100,7 @@ describe('AvatarImage', () => {
 
     render(<AvatarImage {...props} />);
 
-    await act(() =>
-      waitFor(() => expect(assetRepoSpy.getObjectUrl).toHaveBeenCalledWith(participant.previewPictureResource())),
-    );
+    await waitFor(() => expect(assetRepoSpy.getObjectUrl).toHaveBeenCalledWith(participant.previewPictureResource()));
   });
 
   it('does not try to fetch non-existent avatar', async () => {
@@ -120,6 +120,6 @@ describe('AvatarImage', () => {
 
     render(<AvatarImage {...props} />);
 
-    await act(() => waitFor(() => expect(assetRepoSpy.getObjectUrl).not.toHaveBeenCalled()));
+    await waitFor(() => expect(assetRepoSpy.getObjectUrl).not.toHaveBeenCalled());
   });
 });
