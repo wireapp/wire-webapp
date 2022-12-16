@@ -270,6 +270,43 @@ const AppLock: React.FC<AppLockProps> = ({
     }
   };
 
+  const modalInfos = {
+    'passcode-validation-charnumber': {
+      text: t('modalAppLockSetupLong', {
+        minPasswordLength: Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH.toString(),
+      }),
+      isValid: isSetupPassphraseLength,
+    },
+    'passcode-validation-lowercase': {
+      text: t('modalAppLockSetupLower'),
+      isValid: isSetupPassphraseLower,
+    },
+    'passcode-validation-uppercase': {
+      text: t('modalAppLockSetupUppercase'),
+      isValid: isSetupPassphraseUpper,
+    },
+    'passcode-validation-digit': {
+      text: t('modalAppLockSetupDigit'),
+      isValid: isSetupPassphraseDigit,
+    },
+    'passcode-validation-specialchar': {
+      text: t('modalAppLockSetupSpecial'),
+      isValid: isSetupPassphraseSpecial,
+    },
+  };
+
+  const renderModalInfos = (withUieName: boolean = false) =>
+    Object.entries(modalInfos).map(([key, {text, isValid}]) => (
+      <p
+        key={key}
+        className={cx('modal__passcode__info', {'modal__passcode__info--valid': isValid})}
+        data-uie-status={isValid ? 'valid' : 'invalid'}
+        data-uie-name={withUieName ? key : ''}
+      >
+        {text}
+      </p>
+    ));
+
   return (
     <ModalComponent isShown={isVisible} showLoading={isLoading} onClosed={onClosed} data-uie-name="applock-modal">
       <div className="modal__header">
@@ -323,47 +360,7 @@ const AppLock: React.FC<AppLockProps> = ({
               id="input-applock-set-a"
             />
 
-            <p
-              className={cx('modal__passcode__info', {'modal__passcode__info--valid': isSetupPassphraseLength})}
-              data-uie-status={isSetupPassphraseLength ? 'valid' : 'invalid'}
-              data-uie-name="passcode-validation-charnumber"
-            >
-              {t('modalAppLockSetupLong', {
-                minPasswordLength: Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH.toString(),
-              })}
-            </p>
-
-            <p
-              className={cx('modal__passcode__info', {'modal__passcode__info--valid': isSetupPassphraseLower})}
-              data-uie-status={isSetupPassphraseLower ? 'valid' : 'invalid'}
-              data-uie-name="passcode-validation-lowercase"
-            >
-              {t('modalAppLockSetupLower')}
-            </p>
-
-            <p
-              className={cx('modal__passcode__info', {'modal__passcode__info--valid': isSetupPassphraseUpper})}
-              data-uie-status={isSetupPassphraseUpper ? 'valid' : 'invalid'}
-              data-uie-name="passcode-validation-uppercase"
-            >
-              {t('modalAppLockSetupUppercase')}
-            </p>
-
-            <p
-              className={cx('modal__passcode__info', {'modal__passcode__info--valid': isSetupPassphraseDigit})}
-              data-uie-status={isSetupPassphraseDigit ? 'valid' : 'invalid'}
-              data-uie-name="passcode-validation-digit"
-            >
-              {t('modalAppLockSetupDigit')}
-            </p>
-
-            <p
-              className={cx('modal__passcode__info', {'modal__passcode__info--valid': isSetupPassphraseSpecial})}
-              data-uie-status={isSetupPassphraseSpecial ? 'valid' : 'invalid'}
-              data-uie-name="passcode-validation-specialchar"
-            >
-              {t('modalAppLockSetupSpecial')}
-            </p>
+            {renderModalInfos(true)}
 
             <div className="modal__buttons">
               {!isAppLockEnforced && (
@@ -419,27 +416,7 @@ const AppLock: React.FC<AppLockProps> = ({
               autoComplete="new-password"
             />
 
-            <p className={cx('modal__passcode__info', {'modal__passcode__info--valid': isSetupPassphraseLength})}>
-              {t('modalAppLockSetupLong', {
-                minPasswordLength: Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH.toString(),
-              })}
-            </p>
-
-            <p className={cx('modal__passcode__info', {'modal__passcode__info--valid': isSetupPassphraseLower})}>
-              {t('modalAppLockSetupLower')}
-            </p>
-
-            <p className={cx('modal__passcode__info', {'modal__passcode__info--valid': isSetupPassphraseUpper})}>
-              {t('modalAppLockSetupUppercase')}
-            </p>
-
-            <p className={cx('modal__passcode__info', {'modal__passcode__info--valid': isSetupPassphraseDigit})}>
-              {t('modalAppLockSetupDigit')}
-            </p>
-
-            <p className={cx('modal__passcode__info', {'modal__passcode__info--valid': isSetupPassphraseSpecial})}>
-              {t('modalAppLockSetupSpecial')}
-            </p>
+            {renderModalInfos()}
 
             <div className="modal__buttons">
               <button
