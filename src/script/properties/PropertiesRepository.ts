@@ -305,7 +305,7 @@ export class PropertiesRepository {
         }
         return this.propertiesService.putPropertiesByKey(key, value);
       case PropertiesRepository.CONFIG.WIRE_TYPING_INDICATOR_MODE.key:
-        if (value === CONVERSATION_TYPING_INDICATOR_MODE.ON) {
+        if (value === CONVERSATION_TYPING_INDICATOR_MODE.OFF) {
           return this.propertiesService.deletePropertiesByKey(key);
         }
         return this.propertiesService.putPropertiesByKey(key, value);
