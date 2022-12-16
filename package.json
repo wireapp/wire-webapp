@@ -3,7 +3,7 @@
     "@emotion/react": "11.10.5",
     "@types/eslint": "^8.4.10",
     "@wireapp/avs": "8.2.17",
-    "@wireapp/core": "37.3.0",
+    "@wireapp/core": "37.4.0",
     "@wireapp/react-ui-kit": "9.3.0",
     "@wireapp/store-engine-dexie": "2.0.3",
     "@wireapp/store-engine-sqleet": "1.8.9",
