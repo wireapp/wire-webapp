@@ -4270,9 +4270,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/eslint-config@npm:2.1.0":
-  version: 2.1.0
-  resolution: "@wireapp/eslint-config@npm:2.1.0"
+"@wireapp/eslint-config@npm:2.1.1":
+  version: 2.1.1
+  resolution: "@wireapp/eslint-config@npm:2.1.1"
   peerDependencies:
     "@types/eslint": ^8
     "@types/prettier": ^2
@@ -4298,7 +4298,7 @@ __metadata:
     eslint-plugin-unused-imports: ^2
     prettier: ^2
     typescript: ^4
-  checksum: 1b0e61533b7f477d3b4ac6b4a03a5c1f1484ef17e997513b60d11675cbcfdbda25ed17c25465c24ccc08d7f48097d95cde927475b7049ed9cdb83d0c5fd04be5
+  checksum: 4884395e3a46ae6e188eff22a85928695c819ba47d0304d26dd450fdd8281b0095582da3631a8e5a8bc2aa36a9d24a00d4a1cf85401f0fd08748daf9c3818a97
   languageName: node
   linkType: hard
 
@@ -16357,7 +16357,7 @@ __metadata:
     "@wireapp/avs": 8.2.17
     "@wireapp/copy-config": 2.0.4
     "@wireapp/core": 37.4.0
-    "@wireapp/eslint-config": 2.1.0
+    "@wireapp/eslint-config": 2.1.1
     "@wireapp/prettier-config": 0.5.2
     "@wireapp/react-ui-kit": 9.3.0
     "@wireapp/store-engine": ^5.0.3
