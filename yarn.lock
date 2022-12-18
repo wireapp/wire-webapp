@@ -4165,13 +4165,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^22.10.0":
-  version: 22.10.0
-  resolution: "@wireapp/api-client@npm:22.10.0"
+"@wireapp/api-client@npm:^22.10.1":
+  version: 22.10.1
+  resolution: "@wireapp/api-client@npm:22.10.1"
   dependencies:
     "@wireapp/commons": ^5.0.4
     "@wireapp/priority-queue": ^2.0.3
-    "@wireapp/protocol-messaging": 1.42.0
+    "@wireapp/protocol-messaging": 1.43.0
     axios: 1.2.1
     axios-retry: 3.3.1
     http-status-codes: 2.2.0
@@ -4180,7 +4180,7 @@ __metadata:
     spark-md5: 3.0.2
     tough-cookie: 4.1.2
     ws: 8.11.0
-  checksum: 4e6f330d7ef18c138a281fc08aec800ec6a3925e9d663275b46246ed336249e12241a0a928b058cd88d548cf3a1aad2dd2fd0e55caf86e0cd274226e6345d049
+  checksum: e416cdb964bb67b295786314156e08884311814f6ef3eced975db845a0bca62d32c96538e257cb00bc256fa82ab303162f2a4e1786971b6b25204c86811e582e
   languageName: node
   linkType: hard
 
@@ -4233,16 +4233,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:37.4.0":
-  version: 37.4.0
-  resolution: "@wireapp/core@npm:37.4.0"
+"@wireapp/core@npm:37.5.0":
+  version: 37.5.0
+  resolution: "@wireapp/core@npm:37.5.0"
   dependencies:
-    "@wireapp/api-client": ^22.10.0
+    "@wireapp/api-client": ^22.10.1
     "@wireapp/commons": ^5.0.4
     "@wireapp/core-crypto": 0.6.0-pre.4
     "@wireapp/cryptobox": 12.8.0
     "@wireapp/promise-queue": ^2.1.1
-    "@wireapp/protocol-messaging": 1.42.0
+    "@wireapp/protocol-messaging": 1.43.0
     "@wireapp/store-engine-dexie": ^2.0.3
     axios: 1.2.1
     bazinga64: 6.0.3
@@ -4252,7 +4252,7 @@ __metadata:
     logdown: 3.3.1
     long: ^5.2.0
     uuidjs: 4.2.12
-  checksum: 5d03e3f3fa195a827ba006f8a82392280315c326d0bb912382bfb4d94101d944da2e0f5028bc30d967ab965b5b7640efe20ea43791fe0bc3564201b6e808c763
+  checksum: 20c42132c03ef1c43f0565ec8fb4fdc86032a7d9e4ed94c9909d08ad0069e0383fae6c49bd6f8045a00db1f31d4367f0db82bc1be460cb689e0df81588464f36
   languageName: node
   linkType: hard
 
@@ -4351,15 +4351,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/protocol-messaging@npm:1.42.0":
-  version: 1.42.0
-  resolution: "@wireapp/protocol-messaging@npm:1.42.0"
+"@wireapp/protocol-messaging@npm:1.43.0":
+  version: 1.43.0
+  resolution: "@wireapp/protocol-messaging@npm:1.43.0"
   dependencies:
     long: 5.2.0
     protobufjs: 7.1.2
     protobufjs-cli: 1.0.2
     typescript: 4.8.4
-  checksum: 5ed5a07fdcca9ca269480ef838e5ef00dd9236e5cb7124d48732fed67065f67343c015734ace52d2d8a84ef183016b8520ad8b06386c49216904adb0b17cd72c
+  checksum: 6d6fc2e9cb6118cb5180a22898ca23a0b1bf3783b31a94840001195da8f1644b2e42009bd9513f1048208a2d469aa20d750f3a42515a4a7960efa38c1894e479
   languageName: node
   linkType: hard
 
@@ -16356,7 +16356,7 @@ __metadata:
     "@typescript-eslint/parser": ^5.46.1
     "@wireapp/avs": 8.2.17
     "@wireapp/copy-config": 2.0.4
-    "@wireapp/core": 37.4.0
+    "@wireapp/core": 37.5.0
     "@wireapp/eslint-config": 2.1.1
     "@wireapp/prettier-config": 0.5.2
     "@wireapp/react-ui-kit": 9.3.0
