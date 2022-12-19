@@ -111,9 +111,10 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
     });
   };
 
-  const formatDate = (dateString: string): string =>
-    dateString
-      ? new Date(dateString).toLocaleString('en-US', {
+  const formatDate = (dateString: string): string => {
+    const navLang = navigator.languages.concat(['en-US']);
+    return dateString
+      ? new Date(dateString).toLocaleString(navLang[0], {
           day: 'numeric',
           hour: 'numeric',
           hour12: false,
@@ -123,6 +124,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
           year: 'numeric',
         })
       : '?';
+  };
 
   const formatName = (model: string, clazz: string): string | JSX.Element =>
     model || (
