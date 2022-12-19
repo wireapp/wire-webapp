@@ -4151,7 +4151,7 @@ __metadata:
 
 "@wireapp/core@file:.yalc/@wireapp/core::locator=wire-webapp%40workspace%3A.":
   version: 37.4.0
-  resolution: "@wireapp/core@file:.yalc/@wireapp/core#.yalc/@wireapp/core::hash=77ecdb&locator=wire-webapp%40workspace%3A."
+  resolution: "@wireapp/core@file:.yalc/@wireapp/core#.yalc/@wireapp/core::hash=8a2f90&locator=wire-webapp%40workspace%3A."
   dependencies:
     "@wireapp/api-client": ^22.10.0
     "@wireapp/commons": ^5.0.4
@@ -4168,7 +4168,7 @@ __metadata:
     logdown: 3.3.1
     long: ^5.2.0
     uuidjs: 4.2.12
-  checksum: a59718f77f0b3295312ae38350d01b5edb5bf2dd0f1df5c5c6eb753f6943084faeaab7687727870734c3e1dd0aedab6f1eb544095c8339f345e53a9c0407e18b
+  checksum: dd9e18889f408c95e46e376be488a65206f1ef9c5ce6fb0285596d4ae7e74cc23bb6e9ebda949844a1406b09a997eb22bc70a89eb9670bf4ece2347583549329
   languageName: node
   linkType: hard
 

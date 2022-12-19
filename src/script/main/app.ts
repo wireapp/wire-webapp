@@ -384,7 +384,9 @@ export class App {
 
       let context: Context;
       try {
-        context = await this.core.init(clientType);
+        context = await this.core.init(clientType, {initClient: false});
+        await this.core.runCryptoboxMigration();
+        await this.core.initClient({clientType});
       } catch (error) {
         throw new ClientError(CLIENT_ERROR_TYPE.NO_VALID_CLIENT, 'Client has been deleted on backend');
       }

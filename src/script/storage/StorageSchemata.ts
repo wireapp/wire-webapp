@@ -28,6 +28,7 @@ import {Core} from '../service/CoreSingleton';
 interface DexieSchema {
   schema: Record<string, string>;
   upgrade?: (transaction: Transaction, database?: Dexie) => void;
+  prepareUpgrade?: (name: string) => Promise<void>;
   version: number;
 }
 
@@ -417,36 +418,6 @@ export class StorageSchemata {
       {
         schema: {},
         version: 19,
-      },
-      {
-        schema: {},
-        upgrade: transaction => {
-          this.core.runCryptoboxMigration(transaction.db.name);
-        },
-        version: 20,
-      },
-
-      {
-        schema: {},
-        upgrade: transaction => {
-          // We can clear 3 stores (keys - local identity, prekeys and sessions) from wire db.
-          // They will be stored in corecrypto database now.
-          const storesToRemove = [
-            StorageSchemata.OBJECT_STORE.KEYS,
-            StorageSchemata.OBJECT_STORE.PRE_KEYS,
-            StorageSchemata.OBJECT_STORE.SESSIONS,
-          ];
-
-          for (const storeName of storesToRemove) {
-            console.info('patryk clearing', storeName);
-            transaction
-              .table(storeName)
-              .clear()
-              .catch(error => console.info('patryk error', error));
-            console.info('patryk cleared', storeName);
-          }
-        },
-        version: 21,
       },
     ];
   }

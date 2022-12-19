@@ -50,9 +50,12 @@ export class DexieDatabase extends Dexie {
     this.logger = getLogger(`Dexie (${dbName})`);
 
     const schema = new StorageSchemata();
-    schema.getSchema().forEach(({schema, upgrade, version}) => {
+    schema.getSchema().forEach(async ({schema, upgrade, prepareUpgrade, version}) => {
       const versionInstance = this.version(version).stores(schema);
       if (upgrade) {
+        if (prepareUpgrade) {
+          await prepareUpgrade(dbName);
+        }
         versionInstance.upgrade((transaction: Transaction) => {
           this.logger.warn(`Database upgrade to version '${version}'`);
           upgrade(transaction, this);
