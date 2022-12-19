@@ -22,6 +22,7 @@ import {FC, useEffect, useState} from 'react';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 
+import {Button} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {GifImage} from 'Components/Giphy/GifImage';
@@ -258,27 +259,27 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
           </div>
 
           <footer className="giphy-modal-footer modal-footer">
-            <button
+            <Button
               type="button"
-              className={cx('button button-inverted', {'button-disabled': !hasGifs})}
               aria-disabled={!hasGifs}
+              disabled={!hasGifs}
               onClick={getRandomGif}
               data-uie-name="do-try-another"
               aria-label={t('accessibility.giphyModal.tryAnother')}
             >
               {t('extensionsGiphyButtonMore')}
-            </button>
+            </Button>
 
-            <button
+            <Button
               type="button"
-              className={cx('button', {'button-disabled': !selectedGif})}
               aria-disabled={!selectedGif}
+              disabled={!selectedGif}
               onClick={onSend}
               data-uie-name="do-send-gif"
               aria-label={t('accessibility.giphyModal.sendGif')}
             >
               {t('extensionsGiphyButtonOk')}
-            </button>
+            </Button>
           </footer>
         </div>
       </div>
