@@ -57,7 +57,6 @@ import {mapLanguage, normalizeLanguage} from '../localeConfig';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
-import * as CookieSelector from '../module/selector/CookieSelector';
 import * as LanguageSelector from '../module/selector/LanguageSelector';
 import {ROUTE} from '../route';
 
@@ -74,9 +73,6 @@ const RootComponent: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
   isAuthenticated,
   language,
   isFetchingSSOSettings,
-  startPolling,
-  safelyRemoveCookie,
-  stopPolling,
   doGetSSOSettings,
 }) => {
   useEffect(() => {
@@ -93,14 +89,6 @@ const RootComponent: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
     window.addEventListener('hashchange', forceSlashAfterHash);
     return () => {
       window.removeEventListener('hashchange', forceSlashAfterHash);
-    };
-  }, []);
-
-  useEffect(() => {
-    startPolling();
-    window.onbeforeunload = () => {
-      safelyRemoveCookie(CookieSelector.COOKIE_NAME_APP_OPENED, Config.getConfig().APP_INSTANCE_ID);
-      stopPolling();
     };
   }, []);
 
@@ -236,9 +224,6 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
   bindActionCreators(
     {
       doGetSSOSettings: ROOT_ACTIONS.authAction.doGetSSOSettings,
-      safelyRemoveCookie: ROOT_ACTIONS.cookieAction.safelyRemoveCookie,
-      startPolling: ROOT_ACTIONS.cookieAction.startPolling,
-      stopPolling: ROOT_ACTIONS.cookieAction.stopPolling,
     },
     dispatch,
   );

@@ -18,26 +18,21 @@
  */
 
 import {useIntl} from 'react-intl';
-import {connect} from 'react-redux';
-import {AnyAction, Dispatch} from 'redux';
 
 import {Button, Column, Columns, Container, H3, Modal, Text} from '@wireapp/react-ui-kit';
 
+import {useSingleInstance} from 'src/script/hooks/useSingleInstance';
+
 import {Config} from '../../Config';
 import {appAlreadyOpenStrings} from '../../strings';
-import {actionRoot as ROOT_ACTIONS} from '../module/action/';
-import {RootState, bindActionCreators} from '../module/reducer';
-import * as CookieSelector from '../module/selector/CookieSelector';
 
-export interface Props {
+interface AppAlreadyOpenProps {
   fullscreen?: boolean;
 }
-
-type AppAlreadyOpenProps = Props & ConnectedProps & DispatchProps;
-
-const AppAlreadyOpenComponent = ({isAppAlreadyOpen, fullscreen, removeCookie}: AppAlreadyOpenProps) => {
+export const AppAlreadyOpen = ({fullscreen}: AppAlreadyOpenProps) => {
   const {formatMessage: _} = useIntl();
-  if (!isAppAlreadyOpen) {
+  const {hasOtherInstance, killRunningInstance} = useSingleInstance();
+  if (!hasOtherInstance) {
     return null;
   }
 
@@ -53,7 +48,7 @@ const AppAlreadyOpenComponent = ({isAppAlreadyOpen, fullscreen, removeCookie}: A
             <Button
               type="button"
               block
-              onClick={() => removeCookie(CookieSelector.COOKIE_NAME_APP_OPENED)}
+              onClick={killRunningInstance}
               style={{marginBottom: '10px'}}
               data-uie-name="do-action"
             >
@@ -65,21 +60,3 @@ const AppAlreadyOpenComponent = ({isAppAlreadyOpen, fullscreen, removeCookie}: A
     </Modal>
   );
 };
-
-type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => ({
-  isAppAlreadyOpen: CookieSelector.isAppAlreadyOpen(state),
-});
-
-type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
-  bindActionCreators(
-    {
-      removeCookie: ROOT_ACTIONS.cookieAction.removeCookie,
-    },
-    dispatch,
-  );
-
-const AppAlreadyOpen = connect(mapStateToProps, mapDispatchToProps)(AppAlreadyOpenComponent);
-
-export {AppAlreadyOpen};

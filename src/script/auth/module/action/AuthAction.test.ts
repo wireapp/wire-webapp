@@ -41,16 +41,12 @@ describe('AuthAction', () => {
       doInitializeClient: jasmine.createSpy().and.returnValue(() => Promise.resolve()),
       fetchSelf: jasmine.createSpy().and.returnValue(() => Promise.resolve()),
       generateClientPayload: jasmine.createSpy().and.returnValue({}),
-      setCookie: jasmine.createSpy().and.returnValue(() => Promise.resolve()),
       setLocalStorage: jasmine.createSpy().and.returnValue(() => Promise.resolve()),
     };
     const mockedActions = {
       clientAction: {
         doInitializeClient: spies.doInitializeClient,
         generateClientPayload: spies.generateClientPayload,
-      },
-      cookieAction: {
-        setCookie: spies.setCookie,
       },
       localStorageAction: {
         setLocalStorage: spies.setLocalStorage,
@@ -75,7 +71,6 @@ describe('AuthAction', () => {
 
     expect(store.getActions()).toEqual([AuthActionCreator.startLogin(), AuthActionCreator.successfulLogin()]);
     expect(spies.setLocalStorage.calls.count()).toEqual(1);
-    expect(spies.setCookie.calls.count()).toEqual(1);
     expect(spies.fetchSelf.calls.count()).toEqual(1);
     expect(spies.generateClientPayload.calls.count()).toEqual(1);
     expect(spies.doInitializeClient.calls.count()).toEqual(1);
@@ -93,16 +88,12 @@ describe('AuthAction', () => {
         .and.returnValue(() => Promise.reject({label: BackendError.LABEL.TOO_MANY_CLIENTS})),
       fetchSelf: jasmine.createSpy().and.returnValue(() => Promise.resolve()),
       generateClientPayload: jasmine.createSpy().and.returnValue({}),
-      setCookie: jasmine.createSpy().and.returnValue(() => Promise.resolve()),
       setLocalStorage: jasmine.createSpy().and.returnValue(() => Promise.resolve()),
     };
     const mockedActions = {
       clientAction: {
         doInitializeClient: spies.doInitializeClient,
         generateClientPayload: spies.generateClientPayload,
-      },
-      cookieAction: {
-        setCookie: spies.setCookie,
       },
       localStorageAction: {
         setLocalStorage: spies.setLocalStorage,

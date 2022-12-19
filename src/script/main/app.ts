@@ -38,10 +38,9 @@ import {getLogger, Logger} from 'Util/Logger';
 import {includesString} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {appendParameter} from 'Util/UrlUtil';
-import {checkIndexedDb, createRandomUuid, supportsMLS} from 'Util/util';
+import {checkIndexedDb, supportsMLS} from 'Util/util';
 
 import {migrateToQualifiedSessionIds} from './sessionIdMigrator';
-import {SingleInstanceHandler} from './SingleInstanceHandler';
 
 import '../../style/default.less';
 import {AssetRepository} from '../assets/AssetRepository';
@@ -139,7 +138,6 @@ export class App {
   repository: ViewModelRepositories = {} as ViewModelRepositories;
   debug?: DebugUtil;
   util?: {debug: DebugUtil};
-  singleInstanceHandler: SingleInstanceHandler;
 
   static get CONFIG() {
     return {
@@ -187,9 +185,6 @@ export class App {
         this.util = {debug: this.debug}; // Alias for QA
       });
     }
-
-    const onExtraInstanceStarted = () => this._redirectToLogin(SIGN_OUT_REASON.MULTIPLE_TABS);
-    this.singleInstanceHandler = new SingleInstanceHandler(onExtraInstanceStarted);
 
     this._subscribeToEvents();
     this.initServiceWorker();
@@ -378,7 +373,6 @@ export class App {
         user: userRepository,
       } = this.repository;
       await checkIndexedDb();
-      this._registerSingleInstance();
       onProgress(2.5);
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
 
@@ -519,7 +513,7 @@ export class App {
     if (isAuthError) {
       const isTypeMultipleTabs = type === AuthError.TYPE.MULTIPLE_TABS;
       const signOutReason = isTypeMultipleTabs ? SIGN_OUT_REASON.MULTIPLE_TABS : SIGN_OUT_REASON.INDEXED_DB;
-      return this._redirectToLogin(signOutReason);
+      return this.redirectToLogin(signOutReason);
     }
 
     this.logger.debug(
@@ -530,14 +524,14 @@ export class App {
 
       if (isSessionExpired.includes(type as ACCESS_TOKEN_ERROR_TYPE)) {
         this.logger.warn(`Session expired on page reload: ${message}`, error);
-        return this._redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED);
+        return this.redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED);
       }
 
       const isAccessTokenError = error instanceof AccessTokenError;
       const isInvalidClient = type === ClientError.TYPE.NO_VALID_CLIENT;
 
       if (isInvalidClient) {
-        return this._redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED);
+        return this.redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED);
       }
 
       if (isAccessTokenError) {
@@ -550,17 +544,17 @@ export class App {
       switch (type) {
         case CLIENT_ERROR_TYPE.NO_VALID_CLIENT: {
           this.logger.warn(`Redirecting to login: ${error.message}`, error);
-          return this._redirectToLogin(SIGN_OUT_REASON.CLIENT_REMOVED);
+          return this.redirectToLogin(SIGN_OUT_REASON.CLIENT_REMOVED);
         }
         case AccessTokenError.TYPE.NOT_FOUND_IN_CACHE:
         case AccessTokenError.TYPE.RETRIES_EXCEEDED:
         case AccessTokenError.TYPE.REQUEST_FORBIDDEN: {
           this.logger.warn(`Redirecting to login: ${error.message}`, error);
-          return this._redirectToLogin(SIGN_OUT_REASON.NOT_SIGNED_IN);
+          return this.redirectToLogin(SIGN_OUT_REASON.NOT_SIGNED_IN);
         }
         case TeamError.TYPE.NO_APP_CONFIG: {
           this.logger.warn(`Logging out user: ${error.message}`, error);
-          return this._redirectToLogin(SIGN_OUT_REASON.NO_APP_CONFIG);
+          return this.redirectToLogin(SIGN_OUT_REASON.NO_APP_CONFIG);
         }
 
         default: {
@@ -633,27 +627,6 @@ export class App {
     return window.performance.navigation.type === NAVIGATION_TYPE_RELOAD;
   }
 
-  //##############################################################################
-  // Multiple tabs check
-  //##############################################################################
-
-  /**
-   * Check that this is the single instance tab of the app.
-   * @returns Resolves when page is the first tab
-   */
-  private _registerSingleInstance(): void {
-    const instanceId = createRandomUuid();
-
-    if (this.singleInstanceHandler.registerInstance(instanceId)) {
-      return this._registerSingleInstanceCleaning();
-    }
-    throw new AuthError(AuthError.TYPE.MULTIPLE_TABS, AuthError.MESSAGE.MULTIPLE_TABS);
-  }
-
-  private _registerSingleInstanceCleaning() {
-    window.addEventListener('beforeunload', () => this.singleInstanceHandler.deregisterInstance());
-  }
-
   /**
    * Subscribe to 'beforeunload' to stop calls and disconnect the WebSocket.
    */
@@ -698,7 +671,7 @@ export class App {
     this.isLoggingOut = true;
     const _redirectToLogin = () => {
       amplify.publish(WebAppEvents.LIFECYCLE.SIGNED_OUT, clearData);
-      this._redirectToLogin(signOutReason);
+      this.redirectToLogin(signOutReason);
     };
 
     const _logout = async () => {
@@ -811,7 +784,7 @@ export class App {
    * Redirect to the login page after internet connectivity has been verified.
    * @param signOutReason Redirect triggered by session expiration
    */
-  private _redirectToLogin(signOutReason: SIGN_OUT_REASON): void {
+  redirectToLogin(signOutReason: SIGN_OUT_REASON): void {
     this.logger.info(`Redirecting to login after connectivity verification. Reason: ${signOutReason}`);
     const isTemporaryGuestReason = App.CONFIG.SIGN_OUT_REASONS.TEMPORARY_GUEST.includes(signOutReason);
     const isLeavingGuestRoom = isTemporaryGuestReason && this.repository.user['userState'].isTemporaryGuest();
