@@ -46,13 +46,14 @@ export const AppContainer: FC<AppProps> = ({config, clientType}) => {
   window.wire.app = app;
   const mainView = new MainViewModel(app.repository);
 
-  const {hasOtherInstance, registerInstance, killRunningInstance} = useSingleInstance();
+  const {hasOtherInstance, registerInstance} = useSingleInstance();
 
   useEffect(() => {
-    registerInstance();
-    window.addEventListener('beforeunload', () => {
-      killRunningInstance();
-    });
+    if (hasOtherInstance) {
+      return;
+    }
+    const killInstance = registerInstance();
+    window.addEventListener('beforeunload', killInstance);
   }, []);
 
   if (hasOtherInstance) {

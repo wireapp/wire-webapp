@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useMemo, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 
 import Cookies from 'js-cookie';
 
@@ -31,76 +31,49 @@ const CONFIG = {
   INTERVAL: TIME_IN_MILLIS.SECOND,
 };
 
-/**
- * Class responsible for checking that only the current instance of the app is running.
- */
-export class SingleInstanceHandler {
-  instanceId?: string = undefined;
-
-  poll(onNewInstance: () => void) {
-    const checkSingleInstance = (): void => {
-      if (!this.isRunningInstance()) {
-        onNewInstance();
-      }
-    };
-    const interval = window.setInterval(checkSingleInstance, CONFIG.INTERVAL);
-    return () => window.clearInterval(interval);
-  }
-
-  /**
-   * Set the cookie to verify we are running a single instance tab.
-   * Returns `true` if the instance has been registered successfully.
-   * Returns `false` if the app is already running in another instance.
-   *
-   * Side effects: will also start the interval check if a callback was provided in the constructor
-   *
-   * @returns Was the app registered successfully.
-   */
-  registerInstance() {
-    this.instanceId = createRandomUuid();
-    const cookieName = CONFIG.COOKIE_NAME;
-    if (!!Cookies.get(cookieName)) {
-      return false;
-    }
-    Cookies.set(cookieName, JSON.stringify({appInstanceId: this.instanceId}), {sameSite: 'Lax'});
+function isRunningInstance(instanceId?: string) {
+  if (Runtime.isDesktopApp()) {
     return true;
   }
+  const cookieValue = Cookies.get(CONFIG.COOKIE_NAME);
+  const otherInstanceId = cookieValue ? JSON.parse(cookieValue).appInstanceId : cookieValue;
+  return otherInstanceId === instanceId;
+}
 
-  deregisterLocalInstance() {
-    if (this.isRunningInstance()) {
-      this.deregisterCurrentInstance();
+function poll(instanceIdRef: {current: string | undefined}, onNewInstance: () => void) {
+  const checkSingleInstance = (): void => {
+    if (!isRunningInstance(instanceIdRef.current)) {
+      onNewInstance();
     }
-  }
+  };
+  const interval = window.setInterval(checkSingleInstance, CONFIG.INTERVAL);
+  return () => window.clearInterval(interval);
+}
 
-  deregisterCurrentInstance() {
-    return Cookies.remove(CONFIG.COOKIE_NAME);
-  }
+function killCurrentInstance() {
+  return Cookies.remove(CONFIG.COOKIE_NAME);
+}
 
-  isRunningInstance() {
-    if (Runtime.isDesktopApp()) {
-      return true;
-    }
-    const cookieValue = Cookies.get(CONFIG.COOKIE_NAME);
-    const instanceId = cookieValue ? JSON.parse(cookieValue).appInstanceId : cookieValue;
-    return this.instanceId === instanceId;
-  }
+function register(instanceId: string) {
+  Cookies.set(CONFIG.COOKIE_NAME, JSON.stringify({appInstanceId: instanceId}), {sameSite: 'Lax'});
+  return () => killCurrentInstance();
 }
 
 export function useSingleInstance() {
-  const singleInstance = useMemo(() => new SingleInstanceHandler(), []);
-  const [hasOtherInstance, setHasOtherInstance] = useState(!singleInstance.isRunningInstance());
+  const instanceId = useRef<string | undefined>(undefined);
+  const [hasOtherInstance, setHasOtherInstance] = useState(!isRunningInstance(instanceId.current));
 
-  const registerInstance = () => singleInstance.registerInstance();
+  const registerInstance = () => {
+    instanceId.current = createRandomUuid();
+    return register(instanceId.current);
+  };
 
   const killRunningInstance = () => {
-    singleInstance.deregisterCurrentInstance();
+    killCurrentInstance();
     setHasOtherInstance(false);
   };
 
-  useEffect(() => {
-    const stopPolling = singleInstance.poll(() => setHasOtherInstance(true));
-    return stopPolling;
-  });
+  useEffect(() => poll(instanceId, () => setHasOtherInstance(true)));
 
   return {hasOtherInstance, killRunningInstance, registerInstance};
 }

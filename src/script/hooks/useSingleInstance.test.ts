@@ -45,7 +45,7 @@ describe('useSingleInstance', () => {
     } = renderHook(() => useSingleInstance());
     expect(firstIntance.hasOtherInstance).toBeFalsy();
 
-    firstIntance.registerInstance();
+    firstIntance.register();
 
     const {
       result: {current: secondInstance},
@@ -64,7 +64,7 @@ describe('useSingleInstance', () => {
     const {result: secondInstance} = renderHook(() => useSingleInstance());
     expect(secondInstance.current.hasOtherInstance).toBeFalsy();
 
-    firstIntance.registerInstance();
+    firstIntance.register();
 
     act(() => {
       jest.advanceTimersByTime(1001);
