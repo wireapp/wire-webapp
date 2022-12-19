@@ -421,15 +421,33 @@ export class StorageSchemata {
       {
         schema: {},
         upgrade: transaction => {
-          this.core.service?.proteus.proteusCryptoboxMigrate(transaction.db.name);
+          this.core.runCryptoboxMigration(transaction.db.name);
         },
         version: 20,
       },
 
-      //TODO:
-      // When defining new upgrade (v21) we should delete those 3 tables:
-      // - StorageSchemata.OBJECT_STORE.KEYS, StorageSchemata.OBJECT_STORE.PRE_KEYS, StorageSchemata.OBJECT_STORE.SESSIONS
-      // (only when they're empty - that would mean the data was successfully migrated to corecrypto)
+      {
+        schema: {},
+        upgrade: transaction => {
+          // We can clear 3 stores (keys - local identity, prekeys and sessions) from wire db.
+          // They will be stored in corecrypto database now.
+          const storesToRemove = [
+            StorageSchemata.OBJECT_STORE.KEYS,
+            StorageSchemata.OBJECT_STORE.PRE_KEYS,
+            StorageSchemata.OBJECT_STORE.SESSIONS,
+          ];
+
+          for (const storeName of storesToRemove) {
+            console.info('patryk clearing', storeName);
+            transaction
+              .table(storeName)
+              .clear()
+              .catch(error => console.info('patryk error', error));
+            console.info('patryk cleared', storeName);
+          }
+        },
+        version: 21,
+      },
     ];
   }
 }
