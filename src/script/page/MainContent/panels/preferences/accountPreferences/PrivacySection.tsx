@@ -75,6 +75,7 @@ const PrivacySection: React.FC<PrivacySectionProps> = ({
       isChecked ? CONVERSATION_TYPING_INDICATOR_MODE.ON : CONVERSATION_TYPING_INDICATOR_MODE.OFF,
     );
   };
+
   return (
     <PreferencesSection hasSeparator className="preferences-section-privacy" title={t('preferencesAccountPrivacy')}>
       <>
