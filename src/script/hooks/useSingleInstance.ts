@@ -62,7 +62,7 @@ export class SingleInstanceHandler {
     if (!!Cookies.get(cookieName)) {
       return false;
     }
-    Cookies.set(cookieName, this.instanceId, {sameSite: 'Lax'});
+    Cookies.set(cookieName, JSON.stringify({appInstanceId: this.instanceId}), {sameSite: 'Lax'});
     return true;
   }
 
@@ -81,7 +81,8 @@ export class SingleInstanceHandler {
       return true;
     }
     const cookieValue = Cookies.get(CONFIG.COOKIE_NAME);
-    return this.instanceId === cookieValue;
+    const instanceId = cookieValue ? JSON.parse(cookieValue).appInstanceId : cookieValue;
+    return this.instanceId === instanceId;
   }
 }
 
