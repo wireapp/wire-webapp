@@ -17,15 +17,10 @@
  *
  */
 
-import {Config} from '../../../Config';
 import type {RootState} from '../reducer';
 
 export const COOKIE_NAME_APP_OPENED = 'app_opened';
 
-export const isAppAlreadyOpen = (state: RootState) => {
-  const selectedCookie: {[key: string]: any} = getCookies(state)[COOKIE_NAME_APP_OPENED];
-  return selectedCookie ? selectedCookie['appInstanceId'] !== Config.getConfig().APP_INSTANCE_ID : false;
-};
 export const getCookies = (state: RootState): {[key: string]: object} => state.cookieState.cookies || {};
 export const isFetching = (state: RootState) => state.cookieState.fetching;
 export const getError = (state: RootState) => state.cookieState.error;

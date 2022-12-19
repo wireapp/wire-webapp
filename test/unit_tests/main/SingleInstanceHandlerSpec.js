@@ -28,7 +28,7 @@ describe('SingleInstanceHandler', () => {
       const instanceId = 'instance-id-12';
       spyOn(Cookies, 'get').and.returnValue(undefined);
       spyOn(Cookies, 'set').and.returnValue(undefined);
-      const result = singleInstanceHandler.registerInstance(instanceId);
+      const result = singleInstanceHandler.makeMainInstance(instanceId);
 
       expect(Cookies.set).toHaveBeenCalledWith('app_opened', JSON.stringify({appInstanceId: instanceId}), {
         sameSite: 'Lax',
@@ -43,7 +43,7 @@ describe('SingleInstanceHandler', () => {
       spyOn(Cookies, 'get').and.returnValue(undefined);
       spyOn(Cookies, 'set').and.returnValue(undefined);
 
-      singleInstanceHandler.registerInstance(instanceId);
+      singleInstanceHandler.makeMainInstance(instanceId);
 
       expect(window.setInterval).toHaveBeenCalled();
     });
@@ -52,7 +52,7 @@ describe('SingleInstanceHandler', () => {
       const singleInstanceHandler = new SingleInstanceHandler();
       spyOn(Cookies, 'get').and.returnValue({status: 'true'});
       spyOn(Cookies, 'set').and.returnValue(undefined);
-      const result = singleInstanceHandler.registerInstance('instance-id');
+      const result = singleInstanceHandler.makeMainInstance('instance-id');
 
       expect(Cookies.set).not.toHaveBeenCalled();
       expect(result).toBe(false);
@@ -68,8 +68,8 @@ describe('SingleInstanceHandler', () => {
       spyOn(window, 'clearInterval').and.returnValue(undefined);
       spyOn(window, 'setInterval').and.returnValue(12);
 
-      singleInstanceHandler.registerInstance(instanceId);
-      singleInstanceHandler.deregisterInstance();
+      singleInstanceHandler.makeMainInstance(instanceId);
+      singleInstanceHandler.deregisterCurrentInstance();
 
       expect(Cookies.remove).toHaveBeenCalledWith('app_opened');
       expect(window.clearInterval).toHaveBeenCalledWith(12);
@@ -82,7 +82,7 @@ describe('SingleInstanceHandler', () => {
       spyOn(Cookies, 'remove').and.returnValue(undefined);
       singleInstanceHandler.instanceId = instanceId;
 
-      singleInstanceHandler.deregisterInstance();
+      singleInstanceHandler.deregisterCurrentInstance();
 
       expect(Cookies.remove).not.toHaveBeenCalled();
     });
@@ -94,26 +94,9 @@ describe('SingleInstanceHandler', () => {
       spyOn(Cookies, 'remove').and.returnValue(undefined);
       singleInstanceHandler.instanceId = instanceId;
 
-      singleInstanceHandler.deregisterInstance(true);
+      singleInstanceHandler.deregisterCurrentInstance(true);
 
       expect(Cookies.remove).toHaveBeenCalledWith('app_opened');
-    });
-  });
-
-  describe('hasOtherRunningInstance', () => {
-    const singleInstanceHandler = new SingleInstanceHandler();
-    it('returns false if the cookie is not set', () => {
-      spyOn(Cookies, 'get').and.returnValue(undefined);
-      const hasOtherInstance = singleInstanceHandler.hasOtherRunningInstance();
-
-      expect(hasOtherInstance).toBe(false);
-    });
-
-    it('throws an error if the current instance has be registered', () => {
-      spyOn(Cookies, 'get').and.returnValue({appInstanceId: 'instance-id'});
-      const hasOtherInstance = singleInstanceHandler.hasOtherRunningInstance();
-
-      expect(hasOtherInstance).toBe(true);
     });
   });
 });

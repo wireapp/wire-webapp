@@ -17,13 +17,14 @@
  *
  */
 
+import {useEffect, useState} from 'react';
+
 import Cookies from 'js-cookie';
 
 import {Runtime} from '@wireapp/commons';
 
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-
-let checkIntervalId = 0;
+import {createRandomUuid} from 'Util/util';
 
 const CONFIG = {
   COOKIE_NAME: 'app_opened',
@@ -34,16 +35,16 @@ const CONFIG = {
  * Class responsible for checking that only the current instance of the app is running.
  */
 export class SingleInstanceHandler {
-  instanceId?: string;
-  onOtherInstanceStarted?: () => void;
+  instanceId?: string = undefined;
 
-  /**
-   * @param onOtherInstanceStarted A callback to be called if another instance starts.
-   * If provided, will also run an interval that checks the instance integrity once an instance is registered
-   */
-  constructor(onOtherInstanceStarted?: () => void) {
-    this.instanceId = undefined;
-    this.onOtherInstanceStarted = onOtherInstanceStarted;
+  poll(onNewInstance: () => void) {
+    const checkSingleInstance = (): void => {
+      if (!this.isRunningInstance()) {
+        onNewInstance();
+      }
+    };
+    const interval = window.setInterval(checkSingleInstance, CONFIG.INTERVAL);
+    return () => window.clearInterval(interval);
   }
 
   /**
@@ -53,83 +54,53 @@ export class SingleInstanceHandler {
    *
    * Side effects: will also start the interval check if a callback was provided in the constructor
    *
-   * @param instanceId The instance id to register.
    * @returns Was the app registered successfully.
    */
-  registerInstance(instanceId: string): boolean {
-    this.instanceId = instanceId;
+  registerInstance() {
+    this.instanceId = createRandomUuid();
     const cookieName = CONFIG.COOKIE_NAME;
     if (!!Cookies.get(cookieName)) {
       return false;
     }
-    Cookies.set(cookieName, JSON.stringify({appInstanceId: this.instanceId}), {
-      sameSite: 'Lax',
-    });
-    if (this.onOtherInstanceStarted) {
-      this._startSingleInstanceCheck();
-    }
+    Cookies.set(cookieName, this.instanceId, {sameSite: 'Lax'});
     return true;
   }
 
-  /**
-   * Removes the cookie that keeps track of the running instance.
-   *
-   * Side Effects: will also stop the interval check
-   *
-   * @param forceRemoval Do not check that the instance removing it is the current instance.
-   */
-  deregisterInstance(forceRemoval = false): void {
-    const cookieValue = Cookies.get(CONFIG.COOKIE_NAME);
-    const singleInstanceCookie = cookieValue && JSON.parse(cookieValue);
-
-    const isOwnInstanceId = singleInstanceCookie?.appInstanceId === this.instanceId;
-    if (forceRemoval || isOwnInstanceId) {
-      Cookies.remove(CONFIG.COOKIE_NAME);
-      this._stopSingleInstanceCheck();
+  deregisterLocalInstance() {
+    if (this.isRunningInstance()) {
+      this.deregisterCurrentInstance();
     }
   }
 
-  /**
-   * Returns `true` if another instance is running.
-   * Does not check for the id of the running instance and thus cannot be
-   * invoked once the registering of the current instance has been done.
-   *
-   * @throws When the current app has already been registered.
-   */
-  hasOtherRunningInstance(): boolean {
-    if (this.instanceId) {
-      throw new Error('Current instance has been registered, cannot check other running instances');
-    }
-
-    return !!Cookies.get(CONFIG.COOKIE_NAME);
+  deregisterCurrentInstance() {
+    return Cookies.remove(CONFIG.COOKIE_NAME);
   }
 
-  private _isSingleRunningInstance(): boolean {
+  isRunningInstance() {
     if (Runtime.isDesktopApp()) {
       return true;
     }
     const cookieValue = Cookies.get(CONFIG.COOKIE_NAME);
-    const singleInstanceCookie = cookieValue && JSON.parse(cookieValue);
-
-    return singleInstanceCookie?.appInstanceId === this.instanceId;
+    return this.instanceId === cookieValue;
   }
+}
 
-  private readonly _checkSingleInstance = (): void => {
-    if (!this._isSingleRunningInstance()) {
-      // warn listeners if the app has started in another instance
-      this.onOtherInstanceStarted();
-    }
+const singleInstance = new SingleInstanceHandler();
+
+export function useSingleInstance() {
+  const [hasOtherInstance, setHasOtherInstance] = useState(!singleInstance.isRunningInstance());
+
+  const registerInstance = () => singleInstance.registerInstance();
+
+  const killRunningInstance = () => {
+    singleInstance.deregisterCurrentInstance();
+    setHasOtherInstance(false);
   };
 
-  private _startSingleInstanceCheck(): void {
-    this._stopSingleInstanceCheck();
-    checkIntervalId = window.setInterval(this._checkSingleInstance, CONFIG.INTERVAL);
-  }
+  useEffect(() => {
+    const stopPolling = singleInstance.poll(() => setHasOtherInstance(true));
+    return stopPolling;
+  });
 
-  private _stopSingleInstanceCheck(): void {
-    if (checkIntervalId) {
-      window.clearInterval(checkIntervalId);
-    }
-    checkIntervalId = 0;
-  }
+  return {hasOtherInstance, killRunningInstance, registerInstance};
 }
