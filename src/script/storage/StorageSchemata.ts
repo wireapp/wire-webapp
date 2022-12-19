@@ -18,11 +18,12 @@
  */
 
 import type {Dexie, Transaction} from 'dexie';
+import {container} from 'tsyringe';
 
-import {dbMigrationStateStore} from 'Util/dbMigrationStateStore/dbMigrationStateStore';
 import {base64ToArray} from 'Util/util';
 
 import {categoryFromEvent} from '../message/MessageCategorization';
+import {Core} from '../service/CoreSingleton';
 
 interface DexieSchema {
   schema: Record<string, string>;
@@ -31,6 +32,8 @@ interface DexieSchema {
 }
 
 export class StorageSchemata {
+  constructor(private readonly core = container.resolve(Core)) {}
+
   static get OBJECT_STORE() {
     return {
       AMPLIFY: 'amplify',
@@ -48,7 +51,7 @@ export class StorageSchemata {
     };
   }
 
-  static get SCHEMATA(): DexieSchema[] {
+  public getSchema(): DexieSchema[] {
     return [
       {
         schema: {
@@ -417,7 +420,9 @@ export class StorageSchemata {
       },
       {
         schema: {},
-        upgrade: dbMigrationStateStore.setNeedsCoreDBMigration,
+        upgrade: transaction => {
+          this.core.service?.proteus.proteusCryptoboxMigrate(transaction.db.name);
+        },
         version: 20,
       },
 
