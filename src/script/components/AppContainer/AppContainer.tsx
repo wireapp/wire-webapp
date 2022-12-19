@@ -23,7 +23,7 @@ import {ClientType} from '@wireapp/api-client/lib/client/';
 import {container} from 'tsyringe';
 
 import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
-import {useSingleInstance} from 'src/script/main/SingleInstanceHandler';
+import {useSingleInstance} from 'src/script/hooks/useSingleInstance';
 
 import {Configuration} from '../../Config';
 import {setAppLocale} from '../../localization/Localizer';

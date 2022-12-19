@@ -73,7 +73,6 @@ const RootComponent: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
   isAuthenticated,
   language,
   isFetchingSSOSettings,
-  safelyRemoveCookie,
   doGetSSOSettings,
 }) => {
   useEffect(() => {

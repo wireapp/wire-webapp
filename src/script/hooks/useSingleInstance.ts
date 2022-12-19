@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 
 import Cookies from 'js-cookie';
 
@@ -85,9 +85,8 @@ export class SingleInstanceHandler {
   }
 }
 
-const singleInstance = new SingleInstanceHandler();
-
 export function useSingleInstance() {
+  const singleInstance = useMemo(() => new SingleInstanceHandler(), []);
   const [hasOtherInstance, setHasOtherInstance] = useState(!singleInstance.isRunningInstance());
 
   const registerInstance = () => singleInstance.registerInstance();

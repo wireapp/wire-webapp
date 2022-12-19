@@ -21,7 +21,7 @@ import {useIntl} from 'react-intl';
 
 import {Button, Column, Columns, Container, H3, Modal, Text} from '@wireapp/react-ui-kit';
 
-import {useSingleInstance} from 'src/script/main/SingleInstanceHandler';
+import {useSingleInstance} from 'src/script/hooks/useSingleInstance';
 
 import {Config} from '../../Config';
 import {appAlreadyOpenStrings} from '../../strings';

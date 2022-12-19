@@ -49,7 +49,6 @@ export const actionRoot: ActionRoot = {
   authAction,
   clientAction,
   conversationAction,
-  cookieAction,
   invitationAction,
   localStorageAction,
   navigationAction,
