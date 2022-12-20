@@ -385,6 +385,10 @@ export class App {
       let context: Context;
       try {
         context = await this.core.init(clientType, {initClient: false});
+        if (context.domain) {
+          // Migrate all existing session to fully qualified ids (if need be)
+          await migrateToQualifiedSessionIds(this.core.storage.db.sessions, context.domain);
+        }
         await this.core.runCryptoboxMigration();
         await this.core.initClient({clientType});
       } catch (error) {
@@ -397,11 +401,6 @@ export class App {
       });
 
       const selfUser = await this.initiateSelfUser();
-
-      if (this.apiClient.backendFeatures.isFederated && this.repository.storage.storageService.db && context.domain) {
-        // Migrate all existing session to fully qualified ids (if need be)
-        await migrateToQualifiedSessionIds(this.repository.storage.storageService.db.sessions, context.domain);
-      }
 
       onProgress(5, t('initReceivedSelfUser', selfUser.name()));
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_SELF_USER);
