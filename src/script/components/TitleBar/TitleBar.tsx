@@ -141,13 +141,12 @@ export const TitleBar: React.FC<TitleBarProps> = ({
   const mdBreakpoint = useMatchMedia('max-width: 768px');
   const smBreakpoint = useMatchMedia('max-width: 640px');
 
-  const {setCurrentView: setView} = useAppMainState(state => state.responsiveView);
-
-  const setLeftSidebar = () => setView(ViewType.LEFT_SIDEBAR);
   const {close: closeRightSidebar} = useAppMainState(state => state.rightSidebar);
 
-  const onClickBack = () => {
-    setLeftSidebar();
+  const {setCurrentView: setView} = useAppMainState(state => state.responsiveView);
+
+  const setLeftSidebar = () => {
+    setView(ViewType.LEFT_SIDEBAR);
     closeRightSidebar();
   };
 
@@ -197,7 +196,9 @@ export const TitleBar: React.FC<TitleBarProps> = ({
 
   const onClickStartAudio = () => {
     callActions.startAudio(conversation);
-    setLeftSidebar();
+    if (smBreakpoint) {
+      setLeftSidebar();
+    }
   };
 
   return (
@@ -211,7 +212,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
             variant={IconButtonVariant.SECONDARY}
             className="conversation-title-bar-icon icon-back"
             css={{marginBottom: 0}}
-            onClick={onClickBack}
+            onClick={setLeftSidebar}
           />
         )}
 
