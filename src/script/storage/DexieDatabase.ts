@@ -49,7 +49,7 @@ export class DexieDatabase extends Dexie {
     super(dbName);
     this.logger = getLogger(`Dexie (${dbName})`);
 
-    StorageSchemata.SCHEMATA.forEach(async ({schema, upgrade, version}) => {
+    StorageSchemata.SCHEMATA.forEach(({schema, upgrade, version}) => {
       const versionInstance = this.version(version).stores(schema);
       if (upgrade) {
         versionInstance.upgrade((transaction: Transaction) => {
