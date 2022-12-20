@@ -143,7 +143,16 @@ export const TitleBar: React.FC<TitleBarProps> = ({
 
   const {setCurrentView: setView} = useAppMainState(state => state.responsiveView);
 
-  const setLeftSidebar = () => setView(ViewType.LEFT_SIDEBAR);
+  const setLeftSidebar = () => {
+    setView(ViewType.LEFT_SIDEBAR);
+  };
+
+  const {close: closeRightSidebar} = useAppMainState(state => state.rightSidebar);
+
+  const onClickBack = () => {
+    setLeftSidebar();
+    closeRightSidebar();
+  };
 
   const showDetails = useCallback(
     (addParticipants: boolean): void => {
@@ -205,7 +214,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
             variant={IconButtonVariant.SECONDARY}
             className="conversation-title-bar-icon icon-back"
             css={{marginBottom: 0}}
-            onClick={setLeftSidebar}
+            onClick={onClickBack}
           />
         )}
 
