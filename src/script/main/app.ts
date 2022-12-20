@@ -32,7 +32,6 @@ import {container} from 'tsyringe';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {dbMigrationStateStore} from 'Util/dbMigrationStateStore/dbMigrationStateStore';
 import {DebugUtil} from 'Util/DebugUtil';
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
@@ -93,7 +92,7 @@ import {SearchService} from '../search/SearchService';
 import {SelfService} from '../self/SelfService';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
-import {StorageKey, StorageRepository, StorageSchemata, StorageService} from '../storage';
+import {StorageKey, StorageRepository, StorageService} from '../storage';
 import {TeamRepository} from '../team/TeamRepository';
 import {TeamService} from '../team/TeamService';
 import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';
@@ -385,7 +384,13 @@ export class App {
 
       let context: Context;
       try {
-        context = await this.core.init(clientType);
+        context = await this.core.init(clientType, {initClient: false});
+        if (context.domain) {
+          // Migrate all existing session to fully qualified ids (if need be)
+          await migrateToQualifiedSessionIds(this.core.storage.db.sessions, context.domain);
+        }
+        await this.core.runCryptoboxMigration();
+        await this.core.initClient({clientType});
       } catch (error) {
         throw new ClientError(CLIENT_ERROR_TYPE.NO_VALID_CLIENT, 'Client has been deleted on backend');
       }
@@ -396,13 +401,6 @@ export class App {
       });
 
       const selfUser = await this.initiateSelfUser();
-
-      await this.triggerDatabaseMigration();
-
-      if (this.apiClient.backendFeatures.isFederated && this.repository.storage.storageService.db && context.domain) {
-        // Migrate all existing session to fully qualified ids (if need be)
-        await migrateToQualifiedSessionIds(this.repository.storage.storageService.db.sessions, context.domain);
-      }
 
       onProgress(5, t('initReceivedSelfUser', selfUser.name()));
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_SELF_USER);
@@ -604,45 +602,6 @@ export class App {
     await this.repository.properties.init(userEntity);
 
     return userEntity;
-  }
-
-  /**
-   * Trigger database migration if needed.
-   */
-  private async triggerDatabaseMigration() {
-    const isMigrationNeeded = dbMigrationStateStore.isCoreDBMigrationNeeded();
-    if (!isMigrationNeeded) {
-      return;
-    }
-
-    const storeName = this.service.storage.dbName;
-    if (!storeName) {
-      this.logger.error('Client was not able to perform DB migration: storage was not initialised yet.');
-      return;
-    }
-
-    this.logger.log(`Migrating data from cryptobox store (${storeName}) to corecrypto.`);
-
-    try {
-      await this.core.proteusCryptoboxMigrate(storeName);
-      this.logger.log(`Successfully migrated from cryptobox store (${storeName}) to corecrypto.`);
-
-      // We can clear 3 stores (keys - local identity, prekeys and sessions) from wire db.
-      // They will be stored in corecrypto database now.
-      const storesToRemove = [
-        StorageSchemata.OBJECT_STORE.KEYS,
-        StorageSchemata.OBJECT_STORE.PRE_KEYS,
-        StorageSchemata.OBJECT_STORE.SESSIONS,
-      ];
-
-      for (const storeName of storesToRemove) {
-        await this.service.storage.deleteStore(storeName);
-      }
-
-      dbMigrationStateStore.markCoreDBMigrationDone();
-    } catch (error) {
-      this.logger.error('Client was not able to perform DB migration:', error);
-    }
   }
 
   /**
