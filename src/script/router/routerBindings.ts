@@ -28,8 +28,9 @@ import {useAppMainState, ViewType} from '../page/state';
 export const createNavigate =
   (link: string): React.MouseEventHandler =>
   (event: React.MouseEvent<Element, MouseEvent>) => {
-    setResponsiveView();
+    // The order here matters, setting the view before calling navigate() would not save the history
     navigate(link);
+    setResponsiveView();
     event.preventDefault();
   };
 
