@@ -187,6 +187,7 @@ const ParticipantItem = <UserType extends User | ServiceEntity>(
                   </div>
                 )}
               </div>
+
               {showDropdown && (
                 <button
                   tabIndex={TabIndex.UNFOCUSABLE}
@@ -225,7 +226,9 @@ const ParticipantItem = <UserType extends User | ServiceEntity>(
             )}
 
             {isUser && isSelfVerified && isVerified && (
-              <Icon.Verified className="verified-icon" data-uie-name="status-verified" />
+              <span className="verified-icon">
+                <Icon.Verified data-uie-name="status-verified" />
+              </span>
             )}
 
             {callParticipant && (
