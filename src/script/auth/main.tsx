@@ -42,6 +42,8 @@ import {Core} from '../service/CoreSingleton';
 
 exposeWrapperGlobals();
 
+const mainId = 'main';
+
 const apiClient = container.resolve(APIClient);
 const core = container.resolve(Core);
 
@@ -59,7 +61,6 @@ const store = configureStore({
 });
 
 const render = (Component: FC): void => {
-  const mainId = 'main';
   const container = document.getElementById(mainId);
   if (!container) {
     throw new Error(`No container '${mainId}' found to render application`);
