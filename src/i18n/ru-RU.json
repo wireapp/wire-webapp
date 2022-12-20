@@ -1004,6 +1004,8 @@
   "preferencesAccountResetPassword": "Сбросить пароль",
   "preferencesAccountSetAppLockPassphrase": "Установить код доступа к приложению",
   "preferencesAccountTeam": "Команда",
+  "preferencesAccountTypingIndicatorCheckbox": "Индикатор набора текста",
+  "preferencesAccountTypingIndicatorsDetail": "Если этот параметр выключен, вы не сможете видеть, когда собеседники набирают текст, а собеседники не смогут видеть, когда вы набираете текст. Эта настройка применяется ко всем разговорам на этом устройстве.",
   "preferencesAccountUsername": "Псевдоним",
   "preferencesAccountUsernameAvailable": "Доступно",
   "preferencesAccountUsernameErrorTaken": "Уже занято",
