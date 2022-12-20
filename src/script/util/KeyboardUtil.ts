@@ -140,8 +140,8 @@ export const offEscKey = (handler: KeyboardHandler) => {
 };
 
 export const handleKeyDown = (
-  event: React.KeyboardEvent<HTMLElement> | KeyboardEvent,
-  callback: (event?: React.KeyboardEvent<HTMLElement> | KeyboardEvent) => void,
+  event: React.KeyboardEvent<Element> | KeyboardEvent,
+  callback: (event?: React.KeyboardEvent<Element> | KeyboardEvent) => void,
 ) => {
   if (event.key === KEY.ENTER || event.key === KEY.SPACE) {
     callback(event);

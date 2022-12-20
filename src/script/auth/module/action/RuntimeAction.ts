@@ -17,7 +17,7 @@
  *
  */
 
-import type {CookiesStatic} from 'js-cookie';
+import Cookies from 'js-cookie';
 
 import {Runtime} from '@wireapp/commons';
 
@@ -58,10 +58,10 @@ export class RuntimeAction {
   };
 
   checkCookieSupport = (): ThunkAction<void> => {
-    return async (dispatch, getState, {actions: {runtimeAction}, cookieStore}) => {
+    return async (dispatch, getState, {actions: {runtimeAction}}) => {
       dispatch(RuntimeActionCreator.startCheckCookie());
       try {
-        await runtimeAction.hasCookieSupport(cookieStore);
+        await runtimeAction.hasCookieSupport();
         dispatch(RuntimeActionCreator.finishCheckCookie(true));
       } catch (error) {
         dispatch(RuntimeActionCreator.finishCheckCookie(false));
@@ -69,7 +69,7 @@ export class RuntimeAction {
     };
   };
 
-  hasCookieSupport = (cookieStore: CookiesStatic): Promise<void> => {
+  hasCookieSupport = (): Promise<void> => {
     const cookieName = 'cookie_supported';
 
     return new Promise((resolve, reject) => {
@@ -79,9 +79,9 @@ export class RuntimeAction {
         case false:
           return reject(new Error());
         default:
-          cookieStore.set(cookieName, 'yes');
-          if (cookieStore.get(cookieName)) {
-            cookieStore.remove(cookieName);
+          Cookies.set(cookieName, 'yes');
+          if (Cookies.get(cookieName)) {
+            Cookies.remove(cookieName);
             return resolve();
           }
           return reject(new Error());
