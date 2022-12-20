@@ -385,7 +385,7 @@ export class App {
       let context: Context;
       try {
         context = await this.core.init(clientType, {initClient: false});
-        await this.triggerDatabaseMigration();
+        await this.core.runCryptoboxMigration();
         await this.core.initClient({clientType});
       } catch (error) {
         throw new ClientError(CLIENT_ERROR_TYPE.NO_VALID_CLIENT, 'Client has been deleted on backend');
@@ -492,27 +492,6 @@ export class App {
         return undefined;
       }
       throw error;
-    }
-  }
-
-  /**
-   * Trigger database migration if needed.
-   */
-  private async triggerDatabaseMigration() {
-    const dbName = this.core.storage.storeName;
-
-    if (!dbName) {
-      this.logger.error('Client was not able to perform DB migration: storage was not initialised yet.');
-      return;
-    }
-
-    this.logger.log(`Migrating data from cryptobox store (${dbName}) to corecrypto.`);
-
-    try {
-      await this.core.runCryptoboxMigration(dbName);
-      this.logger.log(`Successfully migrated from cryptobox store (${dbName}) to corecrypto.`);
-    } catch (error) {
-      this.logger.error('Client was not able to perform DB migration:', error);
     }
   }
 

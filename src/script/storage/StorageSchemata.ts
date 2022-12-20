@@ -18,23 +18,18 @@
  */
 
 import type {Dexie, Transaction} from 'dexie';
-import {container} from 'tsyringe';
 
 import {base64ToArray} from 'Util/util';
 
 import {categoryFromEvent} from '../message/MessageCategorization';
-import {Core} from '../service/CoreSingleton';
 
 interface DexieSchema {
-  schema: Record<string, string | null>;
+  schema: Record<string, string>;
   upgrade?: (transaction: Transaction, database?: Dexie) => void;
-  prepareUpgrade?: (name: string) => Promise<void>;
   version: number;
 }
 
 export class StorageSchemata {
-  constructor(private readonly core = container.resolve(Core)) {}
-
   static get OBJECT_STORE() {
     return {
       AMPLIFY: 'amplify',
@@ -52,7 +47,7 @@ export class StorageSchemata {
     } as const;
   }
 
-  public getSchema(): DexieSchema[] {
+  static get SCHEMATA(): DexieSchema[] {
     return [
       {
         schema: {

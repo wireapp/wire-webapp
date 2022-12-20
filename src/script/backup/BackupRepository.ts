@@ -364,8 +364,7 @@ export class BackupRepository {
     }
 
     const lowestDbVersion = Math.min(archiveMetadata.version, localMetadata.version);
-    const schema = new StorageSchemata();
-    const involvesDatabaseMigration = schema.getSchema().reduce((involvesMigration, schemaData) => {
+    const involvesDatabaseMigration = StorageSchemata.SCHEMATA.reduce((involvesMigration, schemaData) => {
       if (schemaData.version > lowestDbVersion) {
         return involvesMigration || !!schemaData.upgrade;
       }
