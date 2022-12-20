@@ -28,8 +28,8 @@ import {useAppMainState, ViewType} from '../page/state';
 export const createNavigate =
   (link: string): React.MouseEventHandler =>
   (event: React.MouseEvent<Element, MouseEvent>) => {
-    setResponsiveView();
     navigate(link);
+    setResponsiveView();
     event.preventDefault();
   };
 
