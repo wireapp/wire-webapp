@@ -1004,6 +1004,8 @@
   "preferencesAccountResetPassword": "Buat ulang sandi",
   "preferencesAccountSetAppLockPassphrase": "Set app lock passcode",
   "preferencesAccountTeam": "Team",
+  "preferencesAccountTypingIndicatorCheckbox": "Typing Indicator",
+  "preferencesAccountTypingIndicatorsDetail": "When this is off, you won’t be able to see when other people are typing, and others won’t see when you are typing. This setting applies to all conversations on this device.",
   "preferencesAccountUsername": "Username",
   "preferencesAccountUsernameAvailable": "Tersedia",
   "preferencesAccountUsernameErrorTaken": "Telah diambil",
