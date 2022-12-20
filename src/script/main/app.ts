@@ -317,19 +317,6 @@ export class App {
   private _subscribeToEvents() {
     amplify.subscribe(WebAppEvents.LIFECYCLE.REFRESH, this.refresh);
     amplify.subscribe(WebAppEvents.LIFECYCLE.SIGN_OUT, this.logout);
-    amplify.subscribe(WebAppEvents.CONNECTION.ACCESS_TOKEN.RENEW, async (source: string) => {
-      this.logger.info(`Access token refresh triggered by "${source}"...`);
-      try {
-        await this.apiClient.transport.http.refreshAccessToken();
-        amplify.publish(WebAppEvents.CONNECTION.ACCESS_TOKEN.RENEWED);
-        this.logger.info(`Refreshed access token.`);
-      } catch (error) {
-        if (error instanceof BaseError) {
-          this.logger.warn(`Logging out user because access token cannot be refreshed: ${error.message}`, error);
-        }
-        this.logout(SIGN_OUT_REASON.NOT_SIGNED_IN, false);
-      }
-    });
   }
 
   //##############################################################################
