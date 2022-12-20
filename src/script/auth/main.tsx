@@ -22,11 +22,10 @@ import 'core-js/full/object';
 import 'core-js/full/reflect';
 
 // eslint-disable-next-line import/order
-import React from 'react';
+import {FC} from 'react';
 
-import cookieStore from 'js-cookie';
 import {createRoot} from 'react-dom/client';
-import {Provider, ConnectedComponent} from 'react-redux';
+import {Provider} from 'react-redux';
 import {container} from 'tsyringe';
 
 import {enableLogging} from 'Util/LoggerUtil';
@@ -54,20 +53,22 @@ try {
 const store = configureStore({
   actions: actionRoot,
   apiClient,
-  cookieStore,
   core,
   getConfig: Config.getConfig,
   localStorage,
 });
 
-const Wrapper = (Component: ConnectedComponent<React.FunctionComponent, any>): JSX.Element => (
-  <Provider store={store}>
-    <Component />
-  </Provider>
-);
-
-const render = (Component: ConnectedComponent<React.FunctionComponent, any>): void => {
-  createRoot(document.getElementById('main')).render(Wrapper(Component));
+const render = (Component: FC): void => {
+  const mainId = 'main';
+  const container = document.getElementById(mainId);
+  if (!container) {
+    throw new Error(`No container '${mainId}' found to render application`);
+  }
+  createRoot(container).render(
+    <Provider store={store}>
+      <Component />
+    </Provider>,
+  );
 };
 
 function runApp(): void {

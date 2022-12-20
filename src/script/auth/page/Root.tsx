@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect} from 'react';
+import {FC, useEffect} from 'react';
 
 import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
 import {IntlProvider} from 'react-intl';
@@ -62,14 +62,14 @@ import {ROUTE} from '../route';
 
 interface RootProps {}
 
-const Title: React.FC<{title: string; children: React.ReactNode}> = ({title, children}) => {
+const Title: FC<{title: string; children: React.ReactNode}> = ({title, children}) => {
   useEffect(() => {
     document.title = title;
   }, [title]);
   return <>{children}</>;
 };
 
-const RootComponent: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
+const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
   isAuthenticated,
   language,
   isFetchingSSOSettings,
