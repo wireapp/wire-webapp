@@ -19,11 +19,9 @@
 
 import React, {useEffect} from 'react';
 
-import {amplify} from 'amplify';
 import cx from 'classnames';
 
 import {Runtime} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Icon} from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
@@ -34,7 +32,11 @@ import {CONFIG, TYPE} from './WarningsTypes';
 
 import {Config} from '../../Config';
 
-const WarningsContainer: React.FC = () => {
+interface WarningProps {
+  onRefresh: () => void;
+}
+
+const WarningsContainer: React.FC<WarningProps> = ({onRefresh}) => {
   const name = useWarningsState(state => state.name);
   const warnings = useWarningsState(state => state.warnings);
   const type = TYPE;
@@ -56,7 +58,6 @@ const WarningsContainer: React.FC = () => {
     afterRender(() => window.dispatchEvent(new Event('resize')));
   }, [warnings]);
 
-  const lifeCycleRefresh = WebAppEvents.LIFECYCLE.REFRESH;
   const brandName = Config.getConfig().BRAND_NAME;
   const URL = Config.getConfig().URL;
 
@@ -322,7 +323,7 @@ const WarningsContainer: React.FC = () => {
             <button
               type="button"
               className="warning-bar-link button-reset-default"
-              onClick={() => amplify.publish(lifeCycleRefresh)}
+              onClick={onRefresh}
               data-uie-name="do-update"
             >
               {t('warningLifecycleUpdateLink')}

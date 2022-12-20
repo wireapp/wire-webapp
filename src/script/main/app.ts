@@ -315,7 +315,6 @@ export class App {
    * Subscribe to amplify events.
    */
   private _subscribeToEvents() {
-    amplify.subscribe(WebAppEvents.LIFECYCLE.REFRESH, this.refresh);
     amplify.subscribe(WebAppEvents.LIFECYCLE.SIGN_OUT, this.logout);
     amplify.subscribe(WebAppEvents.CONNECTION.ACCESS_TOKEN.RENEW, async (source: string) => {
       this.logger.info(`Access token refresh triggered by "${source}"...`);
@@ -761,7 +760,7 @@ export class App {
   /**
    * Refresh the web app or desktop wrapper
    */
-  private readonly refresh = (): void => {
+  readonly refresh = (): void => {
     this.logger.info('Refresh to update started');
     if (Runtime.isDesktopApp()) {
       // if we are in a desktop env, we just warn the wrapper that we need to reload. It then decide what should be done
