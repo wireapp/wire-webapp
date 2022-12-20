@@ -26,7 +26,7 @@ import {categoryFromEvent} from '../message/MessageCategorization';
 import {Core} from '../service/CoreSingleton';
 
 interface DexieSchema {
-  schema: Record<string, string>;
+  schema: Record<string, string | null>;
   upgrade?: (transaction: Transaction, database?: Dexie) => void;
   prepareUpgrade?: (name: string) => Promise<void>;
   version: number;
@@ -49,7 +49,7 @@ export class StorageSchemata {
       PRE_KEYS: 'prekeys',
       SESSIONS: 'sessions',
       USERS: 'users',
-    };
+    } as const;
   }
 
   public getSchema(): DexieSchema[] {
