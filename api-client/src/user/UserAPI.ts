@@ -347,7 +347,7 @@ export class UserAPI {
   }
 
   /**
-   * @deprecated use getUser instead
+   * @deprecated use getUser, getSearchContacts or postListUsers instead
    * List users.
    * Note: The 'ids' and 'handles' parameters are mutually exclusive.
    * @param parameters Multiple user's handles or IDs

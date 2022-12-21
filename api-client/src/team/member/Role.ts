@@ -25,6 +25,7 @@ export enum Role {
   EXTERNAL = 'partner',
   MEMBER = 'member',
   OWNER = 'owner',
+  NONE = 'none',
 }
 
 export const roleToPermissions = (role: string): Permissions => {
