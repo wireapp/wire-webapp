@@ -17,7 +17,7 @@
  *
  */
 
-import {render} from '@testing-library/react';
+import {render, waitFor} from '@testing-library/react';
 import ko from 'knockout';
 
 import {ClientEntity} from 'src/script/client/ClientEntity';
@@ -44,7 +44,7 @@ describe('DevicesPreferences', () => {
     clientState: clientState,
     conversationState: new ConversationState(),
     cryptographyRepository: {
-      getLocalFingerprint: jest.fn().mockReturnValue('0000000000000'),
+      getLocalFingerprint: jest.fn().mockResolvedValue('0000000000000'),
       getRemoteFingerprint: jest.fn().mockResolvedValue('1111111111'),
     } as unknown as CryptographyRepository,
     removeDevice: jest.fn(),
@@ -56,6 +56,7 @@ describe('DevicesPreferences', () => {
   it('displays all devices', async () => {
     const {getByText, getAllByText} = render(<DevicesPreferences {...defaultParams} />);
 
+    await waitFor(() => getByText('preferencesDevicesCurrent'));
     expect(getByText('preferencesDevicesCurrent')).toBeDefined();
     expect(getAllByText('preferencesDevicesId')).toHaveLength(clientState.clients().length + 1);
   });

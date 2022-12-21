@@ -21,6 +21,7 @@ import React from 'react';
 
 import {DeviceId} from 'Components/DeviceId';
 import {Icon} from 'Components/Icon';
+import {getWebsiteUrl, URL_PATH} from 'src/script/externalRoute';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -35,9 +36,14 @@ const DecryptErrorMessage: React.FC<DecryptErrorMessageProps> = ({message, onCli
   const {
     is_resetting_session: isResettingSession,
     is_recoverable: isRecoverable,
-    link,
-    htmlCaption,
-  } = useKoSubscribableChildren(message, ['is_resetting_session', 'is_recoverable', 'link', 'htmlCaption']);
+    user,
+  } = useKoSubscribableChildren(message, ['is_resetting_session', 'is_recoverable', 'user']);
+
+  const link = getWebsiteUrl(URL_PATH.DECRYPT_ERROR_1);
+  const caption = t('conversationUnableToDecrypt1', user.name(), {
+    '/highlight': '</span>',
+    highlight: '<span class="label-bold-xs">',
+  });
 
   return (
     <div data-uie-name="element-message-decrypt-error">
@@ -46,7 +52,7 @@ const DecryptErrorMessage: React.FC<DecryptErrorMessageProps> = ({message, onCli
           <span className="icon-sysmsg-error text-red" />
         </div>
         <div className="message-header-label ellipsis">
-          <span dangerouslySetInnerHTML={{__html: htmlCaption}} />
+          <span dangerouslySetInnerHTML={{__html: caption}} />
           <span>&nbsp;</span>
           <a
             className="accent-text"

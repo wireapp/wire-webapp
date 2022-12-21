@@ -47,7 +47,7 @@ import {UsernameInput} from './accountPreferences/UsernameInput';
 import {PreferencesPage} from './components/PreferencesPage';
 import {PreferencesSection} from './components/PreferencesSection';
 
-import {ClientRepository} from '../../../../client/ClientRepository';
+import {ClientRepository} from '../../../../client';
 import {Config} from '../../../../Config';
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import {User} from '../../../../entity/User';

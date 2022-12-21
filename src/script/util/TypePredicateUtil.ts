@@ -21,7 +21,7 @@ import type {BackendError} from '@wireapp/api-client/lib/http/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {AxiosError} from 'axios';
 
-import {QualifiedUserClientEntityMap} from '../client/ClientRepository';
+import {QualifiedUserClientEntityMap} from '../client';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {ClientRecord} from '../storage/record/ClientRecord';

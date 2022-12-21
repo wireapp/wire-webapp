@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
@@ -145,6 +145,11 @@ const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
   const getFingerprint = (device: ClientEntity) =>
     cryptographyRepository.getRemoteFingerprint(self.qualifiedId, device.id);
 
+  const [localFingerprint, setLocalFingerprint] = useState('');
+  useEffect(() => {
+    cryptographyRepository.getLocalFingerprint().then(setLocalFingerprint);
+  }, [cryptographyRepository]);
+
   if (selectedDevice) {
     return (
       <DeviceDetailsPreferences
@@ -167,7 +172,7 @@ const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
     <PreferencesPage title={t('preferencesDevices')}>
       <fieldset className="preferences-section" data-uie-name="preferences-device-current">
         <legend className="preferences-header">{t('preferencesDevicesCurrent')}</legend>
-        <DetailedDevice device={currentClient} fingerprint={cryptographyRepository.getLocalFingerprint()} />
+        <DetailedDevice device={currentClient} fingerprint={localFingerprint} />
       </fieldset>
 
       <hr className="preferences-devices-separator preferences-separator" />

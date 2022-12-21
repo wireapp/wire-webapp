@@ -23,6 +23,7 @@ import 'core-js/full/reflect';
 
 import {Context} from '@wireapp/api-client/lib/auth';
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
+import {EVENTS as CoreEvents} from '@wireapp/core/lib/Account';
 import {amplify} from 'amplify';
 import Dexie from 'dexie';
 import platform from 'platform';
@@ -52,8 +53,7 @@ import {BackupRepository} from '../backup/BackupRepository';
 import {BackupService} from '../backup/BackupService';
 import {CacheRepository} from '../cache/CacheRepository';
 import {CallingRepository} from '../calling/CallingRepository';
-import {ClientRepository} from '../client/ClientRepository';
-import {ClientService} from '../client/ClientService';
+import {ClientRepository, ClientService} from '../client';
 import {Configuration} from '../Config';
 import {ConnectionRepository} from '../connection/ConnectionRepository';
 import {ConnectionService} from '../connection/ConnectionService';
@@ -364,23 +364,23 @@ export class App {
 
       let context: Context;
       try {
-        context = await this.core.init(clientType, {
-          onNewClient({userId, clientId, domain}) {
-            const qualifiedId = {domain: domain ?? '', id: userId};
-            const newClient = {class: ClientClassification.UNKNOWN, id: clientId};
-            userRepository.addClientToUser(qualifiedId, newClient, true);
-          },
-        });
+        context = await this.core.init(clientType, {initClient: false});
+        if (context.domain) {
+          // Migrate all existing session to fully qualified ids (if need be)
+          await migrateToQualifiedSessionIds(this.core.storage.db.sessions, context.domain);
+        }
+        await this.core.runCryptoboxMigration();
+        await this.core.initClient({clientType});
       } catch (error) {
         throw new ClientError(CLIENT_ERROR_TYPE.NO_VALID_CLIENT, 'Client has been deleted on backend');
       }
 
-      const selfUser = await this.initiateSelfUser();
+      this.core.on(CoreEvents.NEW_SESSION, ({userId, clientId}) => {
+        const newClient = {class: ClientClassification.UNKNOWN, id: clientId};
+        userRepository.addClientToUser(userId, newClient, true);
+      });
 
-      if (this.apiClient.backendFeatures.isFederated && this.repository.storage.storageService.db && context.domain) {
-        // Migrate all existing session to fully qualified ids (if need be)
-        await migrateToQualifiedSessionIds(this.repository.storage.storageService.db.sessions, context.domain);
-      }
+      const selfUser = await this.initiateSelfUser();
 
       onProgress(5, t('initReceivedSelfUser', selfUser.name()));
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_SELF_USER);
