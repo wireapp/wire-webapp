@@ -255,7 +255,8 @@ export const downloadFile = (url: string, fileName: string, mimeType?: string): 
   }, 100);
 };
 
-export const createRandomUuid = (): string => UUID.genV4().toString();
+export const createRandomUuid = (version: 4 | 1 = 4): string =>
+  (version === 4 ? UUID.genV4() : UUID.genV1()).toString();
 
 // Note: IE10 listens to "transitionend" instead of "animationend"
 export const alias = {
