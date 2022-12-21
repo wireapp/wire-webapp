@@ -1267,7 +1267,7 @@ export class MessageRepository {
    * @returns Resolves when the confirmation was sent
    */
   public sendCallingMessage(conversation: Conversation, payload: string, options: MessageSendingOptions = {}) {
-    const message = MessageBuilder.buildCallMessage(payload);
+    const message = MessageBuilder.buildCallMessage({content: payload});
 
     return this.sendAndInjectMessage(message, conversation, {
       ...options,
