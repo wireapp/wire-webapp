@@ -22,6 +22,15 @@ import {TeamContact} from './TeamContact';
 export interface TeamSearchResult {
   documents: TeamContact[];
   found: number;
+  has_more?: boolean;
+  paging_state?: string;
   returned: number;
+  search_policy?: FederatedSearchPolicy[];
   took: number;
+}
+
+export enum FederatedSearchPolicy {
+  noSearch = 'no_search',
+  fullSearch = 'full_search',
+  exactHandleSearch = 'exact_handle_search',
 }

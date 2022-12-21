@@ -94,8 +94,9 @@ export class MemberAPI {
   }
 
   /**
-   * This endpoint returns all members of the a team unless it's a large team (>2000 team members).
+   * This endpoint returns all members of the a team.
    * If the queried team is a large team the `hasMore` flag will switch to `true`.
+   * Supplying the paging state from the last response will return the next page of results.
    */
   public async getAllMembers(teamId: string, maxResults = 2000, pagingState?: string): Promise<Members> {
     const config: AxiosRequestConfig = {

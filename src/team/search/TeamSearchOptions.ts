@@ -35,4 +35,6 @@ export interface TeamSearchOptions {
   sortby?: keyof Pick<TeamContact, 'email' | 'name' | 'handle' | 'created_at' | 'role' | 'managed_by' | 'saml_idp'>;
   /** Sort order (asc | desc | undefined) */
   sortorder?: SearchOrder;
+  /** Paging state. returns next page when provided*/
+  pagingState?: string;
 }
