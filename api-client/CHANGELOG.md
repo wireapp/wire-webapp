@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [22.11.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@22.10.2...@wireapp/api-client@22.11.0) (2022-12-21)
+
+### Features
+
+* paginated search endpoint (SQSERVICES-1805) ([#4723](https://github.com/wireapp/wire-web-packages/issues/4723)) ([bb0a9a0](https://github.com/wireapp/wire-web-packages/commit/bb0a9a0e476ba7f57e635f8b425323d841d4dd55))
+
 ## [22.10.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@22.10.1...@wireapp/api-client@22.10.2) (2022-12-21)
 
 ### Bug Fixes
