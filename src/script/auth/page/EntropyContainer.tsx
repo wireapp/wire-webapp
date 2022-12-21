@@ -47,6 +47,12 @@ const EntropyContainer = ({onSetEntropy, containerSize = 400}: Props) => {
     setPercent(percentage);
   };
 
+  const forwardEntropy = async (entropy: Uint8Array) => {
+    // we want to hash the entire entropy array to get a 256 bit (32 bytes) array
+    const hashedValue = await window.crypto.subtle.digest('SHA-256', entropy);
+    onSetEntropy(new Uint8Array(hashedValue));
+  };
+
   return (
     <ContainerSM
       centerText
@@ -70,11 +76,11 @@ const EntropyContainer = ({onSetEntropy, containerSize = 400}: Props) => {
           </Muted>
           <Button
             css={{width: '70%'}}
-            onClick={() => onSetEntropy(entropy.entropyData)}
+            onClick={() => forwardEntropy(entropy.entropyData)}
             data-uie-name="do-entropy-confirm"
             onKeyDown={(event: React.KeyboardEvent) => {
               if (event.key === KEY.ENTER) {
-                onSetEntropy(entropy.entropyData);
+                forwardEntropy(entropy.entropyData);
               }
             }}
           >
