@@ -232,7 +232,7 @@ const AppMain: FC<AppMainProps> = ({
           </div>
 
           <AppLock clientRepository={repositories.client} />
-          <WarningsContainer />
+          <WarningsContainer onRefresh={app.refresh} />
 
           <CallingContainer
             multitasking={mainView.multitasking}
