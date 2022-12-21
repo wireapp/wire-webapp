@@ -288,12 +288,15 @@ export class AssetAPI {
     forceCaching: boolean = false,
     progressCallback?: ProgressCallback,
   ) {
+    const version2 = 2;
+
     if (!isValidUUID(assetId)) {
       throw new TypeError(`Expected asset ID "${assetId}" to only contain alphanumeric values and dashes.`);
     }
-
-    const assetBaseUrl = this.backendFeatures.version >= 2 ? ASSET_URLS.ASSETS_URL : ASSET_URLS.ASSET_V3_URL;
-    return this.getAssetShared(`${assetBaseUrl}/${assetId}`, token, forceCaching, progressCallback);
+    if (this.backendFeatures.version >= version2) {
+      throw new TypeError('Asset v3 is not supported on backend version 2 or higher.');
+    }
+    return this.getAssetShared(`${ASSET_URLS.ASSET_V3_URL}/${assetId}`, token, forceCaching, progressCallback);
   }
 
   getAssetV4(
