@@ -27,6 +27,7 @@ import {
   USER_EVENT,
 } from '@wireapp/api-client/lib/event/';
 import type {Notification} from '@wireapp/api-client/lib/notification/';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import Dexie from 'dexie';
 import {container} from 'tsyringe';
 
@@ -99,28 +100,19 @@ export class DebugUtil {
     return Promise.all(blockUsers);
   }
 
-  /** FIXME restore this functionnality for CoreCrypto
-   * Used by QA test automation.
+  /** Used by QA test automation. */
   async breakSession(userId: string | QualifiedId, clientId: string): Promise<void> {
-    const qualifiedId = isQualifiedId(userId) ? userId : {domain: '', id: userId};
-    const sessionId = this.core.service!.cryptography.constructSessionId(qualifiedId, clientId);
-    const cryptobox = this.cryptographyRepository.proteusService.cryptobox;
-    const cryptoboxSession = await cryptobox.session_load(sessionId);
-    cryptoboxSession.session.session_states = {};
-
-    const record = {
-      created: Date.now(),
-      id: sessionId,
-      serialised: arrayToBase64(cryptoboxSession.session.serialise()),
-      version: 'broken_by_qa',
-    };
-
-    cryptobox['cachedSessions'].set(sessionId, cryptoboxSession);
-
-    const sessionStoreName = StorageSchemata.OBJECT_STORE.SESSIONS;
-    await this.storageRepository.storageService.update(sessionStoreName, sessionId, record);
-    this.logger.log(`Corrupted Session ID '${sessionId}'`);
-  } */
+    const proteusService = this.core.service!.proteus;
+    const qualifiedId = typeof userId === 'string' ? {domain: '', id: userId} : userId;
+    const sessionId = proteusService.constructSessionId(qualifiedId, clientId);
+    const fakePrekey = [
+      165, 0, 1, 1, 24, 57, 2, 161, 0, 88, 32, 212, 202, 30, 83, 242, 93, 67, 164, 202, 137, 214, 167, 166, 183, 236,
+      249, 32, 21, 117, 247, 56, 223, 135, 170, 3, 151, 16, 228, 165, 186, 124, 208, 3, 161, 0, 161, 0, 88, 32, 123,
+      200, 16, 166, 184, 70, 21, 81, 43, 80, 21, 231, 182, 142, 51, 220, 131, 162, 11, 255, 162, 74, 78, 162, 95, 156,
+      131, 48, 203, 5, 77, 122, 4, 246,
+    ];
+    proteusService['coreCryptoClient'].proteusSessionFromPrekey(sessionId, Uint8Array.from(fakePrekey));
+  }
 
   /** Used by QA test automation. */
   triggerVersionCheck(baseVersion: string): Promise<string | void> {
@@ -161,6 +153,7 @@ export class DebugUtil {
     };
   }
 
+  /** Used by QA test automation. */
   isSendingMessage(): boolean {
     return this.core.service!.conversation.isSendingMessage();
   }
