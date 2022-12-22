@@ -59,7 +59,10 @@ export const AppContainer: FC<AppProps> = ({config, clientType}) => {
   useEffect(() => {
     // Prevent Chrome (and Electron) from pushing the content out of the
     // viewport when using form elements (e.g. in the preferences)
-    document.addEventListener('scroll', () => window.scrollTo(0, 0));
+    const resetWindowScroll = () => window.scrollTo(0, 0);
+    document.addEventListener('scroll', resetWindowScroll);
+
+    return () => document.removeEventListener('scroll', resetWindowScroll);
   }, []);
 
   if (hasOtherInstance) {
