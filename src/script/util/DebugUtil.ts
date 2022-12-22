@@ -27,7 +27,8 @@ import {
   USER_EVENT,
 } from '@wireapp/api-client/lib/event/';
 import type {Notification} from '@wireapp/api-client/lib/notification/';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
+import {DatabaseKeys} from '@wireapp/core/lib/notification/NotificationDatabaseRepository';
 import Dexie from 'dexie';
 import {container} from 'tsyringe';
 
@@ -49,7 +50,7 @@ import {EventRepository} from '../event/EventRepository';
 import {checkVersion} from '../lifecycle/newVersionHandler';
 import {MessageCategory} from '../message/MessageCategory';
 import {Core} from '../service/CoreSingleton';
-import {EventRecord, StorageRepository} from '../storage';
+import {EventRecord, StorageRepository, StorageSchemata} from '../storage';
 import {UserRepository} from '../user/UserRepository';
 import {UserState} from '../user/UserState';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
@@ -92,6 +93,14 @@ export class DebugUtil {
     this.messageRepository = message;
 
     this.logger = getLogger('DebugUtil');
+  }
+
+  breakLastNotificationId() {
+    return this.storageRepository.storageService.update(
+      StorageSchemata.OBJECT_STORE.AMPLIFY,
+      DatabaseKeys.PRIMARY_KEY_LAST_NOTIFICATION,
+      {value: createRandomUuid(1)},
+    );
   }
 
   /** Used by QA test automation. */
