@@ -26,8 +26,6 @@ import {PrimaryModal, removeCurrentModal, usePrimaryModalState} from 'Components
 import {t} from 'Util/LocalizerUtil';
 import {isBackendError} from 'Util/TypePredicateUtil';
 
-import type {MainViewModel} from './MainViewModel';
-
 import type {ClientRepository, ClientEntity} from '../client';
 import type {ConnectionRepository} from '../connection/ConnectionRepository';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
@@ -43,7 +41,6 @@ import {UserState} from '../user/UserState';
 
 export class ActionsViewModel {
   constructor(
-    mainViewModel: MainViewModel,
     private readonly clientRepository: ClientRepository,
     private readonly connectionRepository: ConnectionRepository,
     private readonly conversationRepository: ConversationRepository,

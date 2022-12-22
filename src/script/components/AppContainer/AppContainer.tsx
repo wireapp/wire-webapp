@@ -56,6 +56,12 @@ export const AppContainer: FC<AppProps> = ({config, clientType}) => {
     window.addEventListener('beforeunload', killInstance);
   }, []);
 
+  useEffect(() => {
+    // Prevent Chrome (and Electron) from pushing the content out of the
+    // viewport when using form elements (e.g. in the preferences)
+    document.addEventListener('scroll', () => window.scrollTo(0, 0));
+  }, []);
+
   if (hasOtherInstance) {
     app.redirectToLogin(SIGN_OUT_REASON.MULTIPLE_TABS);
     return null;
