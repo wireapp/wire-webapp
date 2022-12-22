@@ -908,14 +908,14 @@ export class Conversation {
   /**
    * Get the first message of the conversation.
    */
-  getFirstMessage(): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
+  getOldestMessage(): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
     return this.messages()[0];
   }
 
   /**
    * Get the last message of the conversation.
    */
-  getLastMessage(): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
+  getNewestMessage(): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
     return this.messages()[this.messages().length - 1];
   }
 
@@ -997,7 +997,9 @@ export class Conversation {
   }
 
   readonly isShowingLastReceivedMessage = (): boolean => {
-    return this.getLastMessage()?.timestamp() ? this.getLastMessage().timestamp() >= this.last_event_timestamp() : true;
+    return this.getNewestMessage()?.timestamp()
+      ? this.getNewestMessage().timestamp() >= this.last_event_timestamp()
+      : true;
   };
 
   serialize(): ConversationRecord {

@@ -1044,14 +1044,14 @@ export class MessageRepository {
    */
   public async deleteMessageById(conversationEntity: Conversation, messageId: string): Promise<number> {
     const isLastDeleted =
-      conversationEntity.isShowingLastReceivedMessage() && conversationEntity.getLastMessage()?.id === messageId;
+      conversationEntity.isShowingLastReceivedMessage() && conversationEntity.getNewestMessage()?.id === messageId;
 
     const deleteCount = await this.eventService.deleteEvent(conversationEntity.id, messageId);
 
     amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, messageId, conversationEntity.id);
 
-    if (isLastDeleted && conversationEntity.getLastMessage()?.timestamp()) {
-      conversationEntity.updateTimestamps(conversationEntity.getLastMessage(), true);
+    if (isLastDeleted && conversationEntity.getNewestMessage()?.timestamp()) {
+      conversationEntity.updateTimestamps(conversationEntity.getNewestMessage(), true);
     }
 
     return deleteCount;

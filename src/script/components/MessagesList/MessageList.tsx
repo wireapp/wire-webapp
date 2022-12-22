@@ -220,7 +220,7 @@ const MessagesList: FC<MessagesListParams> = ({
   };
 
   const loadFollowingMessages = () => {
-    const lastMessage = conversation.getLastMessage();
+    const lastMessage = conversation.getNewestMessage();
 
     if (lastMessage) {
       if (!isLastReceivedMessage(lastMessage, conversation)) {

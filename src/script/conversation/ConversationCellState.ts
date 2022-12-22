@@ -188,7 +188,7 @@ const _getStateDefault = {
 
 const _getStateGroupActivity = {
   description: (conversationEntity: Conversation): string => {
-    const lastMessageEntity = conversationEntity.getLastMessage();
+    const lastMessageEntity = conversationEntity.getNewestMessage();
 
     if (lastMessageEntity.isMember()) {
       const userCount = (lastMessageEntity as MemberMessage).userEntities().length;
@@ -248,7 +248,7 @@ const _getStateGroupActivity = {
     return '';
   },
   icon: (conversationEntity: Conversation): ConversationStatusIcon | void => {
-    const lastMessageEntity = conversationEntity.getLastMessage();
+    const lastMessageEntity = conversationEntity.getNewestMessage();
     const isMemberRemoval = lastMessageEntity.isMember() && (lastMessageEntity as MemberMessage).isMemberRemoval();
 
     if (isMemberRemoval) {
@@ -258,7 +258,7 @@ const _getStateGroupActivity = {
     }
   },
   match: (conversationEntity: Conversation) => {
-    const lastMessageEntity = conversationEntity.getLastMessage();
+    const lastMessageEntity = conversationEntity.getNewestMessage();
     const isExpectedType = lastMessageEntity ? lastMessageEntity.isMember() || lastMessageEntity.isSystem() : false;
     const unreadEvents = conversationEntity.unreadState().allEvents;
 
@@ -291,7 +291,7 @@ const _getStateMuted = {
 
 const _getStateRemoved = {
   description: (conversationEntity: Conversation) => {
-    const lastMessageEntity = conversationEntity.getLastMessage();
+    const lastMessageEntity = conversationEntity.getNewestMessage();
     const selfUserId = conversationEntity.selfUser().id;
 
     const isMemberRemoval = lastMessageEntity && lastMessageEntity.isMember() && lastMessageEntity.isMemberRemoval();
@@ -373,7 +373,7 @@ const _getStateUserName = {
     }
   },
   match: (conversationEntity: Conversation): boolean => {
-    const lastMessageEntity = conversationEntity.getLastMessage();
+    const lastMessageEntity = conversationEntity.getNewestMessage();
     const isMemberJoin =
       lastMessageEntity && lastMessageEntity.isMember() && (lastMessageEntity as MemberMessage).isMemberJoin();
     const isEmpty1to1Conversation = conversationEntity.is1to1() && isMemberJoin;
