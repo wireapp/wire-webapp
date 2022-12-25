@@ -2851,6 +2851,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@remix-run/router@npm:1.2.1":
+  version: 1.2.1
+  resolution: "@remix-run/router@npm:1.2.1"
+  checksum: 71c947f83e130bf006226332aca395f626ad599b6d35dfe936f6a8f139cf37278bc1b36bce38c30f6062724402358296329f31c385b11ae59b13b76a2716d701
+  languageName: node
+  linkType: hard
+
 "@rollup/plugin-babel@npm:^5.2.0":
   version: 5.2.2
   resolution: "@rollup/plugin-babel@npm:5.2.2"
@@ -13250,16 +13257,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-router-dom@npm:6.5.0":
-  version: 6.5.0
-  resolution: "react-router-dom@npm:6.5.0"
+"react-router-dom@npm:6.6.1":
+  version: 6.6.1
+  resolution: "react-router-dom@npm:6.6.1"
   dependencies:
-    "@remix-run/router": 1.1.0
-    react-router: 6.5.0
+    "@remix-run/router": 1.2.1
+    react-router: 6.6.1
   peerDependencies:
     react: ">=16.8"
     react-dom: ">=16.8"
-  checksum: b428d3cfd5d7c95caac6130f6814a619c82b26c2c1de49a7bcf6062f5d3fe873eb405cca0732440b961f34d87633951a65f682bece7f55096775e6a456dc7671
+  checksum: 68a4419c203add0df0203ac2a58e5832949105e0c0561a0850f74cac8e3108507fd8d9c62baeb10ea5ce4cb8eaddea9475bcb3787bdabb3ede23b55564b835ae
   languageName: node
   linkType: hard
 
@@ -13271,6 +13278,17 @@ __metadata:
   peerDependencies:
     react: ">=16.8"
   checksum: f1f43361e3c7cfc04c92812362f36fb42609cc93ee6625afc18aff76a92534d1066261c0714d75b8f98b673933247eb743129c90babe684d6ad844574024ad07
+  languageName: node
+  linkType: hard
+
+"react-router@npm:6.6.1":
+  version: 6.6.1
+  resolution: "react-router@npm:6.6.1"
+  dependencies:
+    "@remix-run/router": 1.2.1
+  peerDependencies:
+    react: ">=16.8"
+  checksum: 58f0ad29123e2854d547915a1ae1cc2687504e396d71db50fe8f36ad733d7940a2914d45868a8478b6138536e119fa5e3303212b7c7b1d81d80cd5b0bbefdfa2
   languageName: node
   linkType: hard
 
@@ -16225,7 +16243,7 @@ __metadata:
     react-intl: 6.2.5
     react-redux: 8.0.5
     react-router: 6.5.0
-    react-router-dom: 6.5.0
+    react-router-dom: 6.6.1
     react-transition-group: 4.4.5
     redux: 4.2.0
     redux-devtools-extension: 2.13.9
