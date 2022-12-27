@@ -289,6 +289,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
 
                     {isCbrEnabled && (
                       <span
+                        title={t('callStateCbr')}
                         aria-label={t('callStateCbr')}
                         className="conversation-list-cell-description"
                         data-uie-name="call-cbr"
