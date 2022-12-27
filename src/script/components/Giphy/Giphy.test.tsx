@@ -17,39 +17,47 @@
  *
  */
 
-import {fireEvent, render} from '@testing-library/react';
+import {fireEvent, render, waitFor} from '@testing-library/react';
 
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 
 import {GiphyRepository} from '../../extension/GiphyRepository';
-import {GiphyService} from '../../extension/GiphyService';
 
 import {Giphy, GiphyState} from '.';
 
 const inputValue = 'Yammy yammy';
 const getDefaultProps = () => ({
-  giphyRepository: new GiphyRepository(new GiphyService()),
+  giphyRepository: {getGifs: jest.fn().mockResolvedValue([])} as unknown as GiphyRepository,
   inputValue,
   onClose: jest.fn(),
 });
 
+const closeButtonId = 'do-close-giphy-modal';
+
 describe('Giphy', () => {
-  it('rendered modal', () => {
-    const {getByText} = render(withTheme(<Giphy {...getDefaultProps()} defaultGiphyState={GiphyState.RESULT} />));
+  it('rendered modal', async () => {
+    const {getByText, getByTestId} = render(
+      withTheme(<Giphy {...getDefaultProps()} defaultGiphyState={GiphyState.RESULT} />),
+    );
+    await waitFor(() => getByTestId(closeButtonId));
     expect(getByText(inputValue)).not.toBeNull();
   });
 
   it('closes giphy modal', async () => {
     const {getByTestId} = render(withTheme(<Giphy {...getDefaultProps()} />));
-    const closeButton = getByTestId('do-close-giphy-modal');
+    await waitFor(() => getByTestId(closeButtonId));
+    const closeButton = getByTestId(closeButtonId);
 
     expect(closeButton).not.toBeNull();
     fireEvent.click(closeButton);
   });
 
   it('no giphys found', async () => {
-    const {getByText} = render(withTheme(<Giphy {...getDefaultProps()} defaultGiphyState={GiphyState.ERROR} />));
+    const {getByText, getByTestId} = render(
+      withTheme(<Giphy {...getDefaultProps()} defaultGiphyState={GiphyState.ERROR} />),
+    );
 
+    await waitFor(() => getByTestId(closeButtonId));
     expect(getByText('extensionsGiphyNoGifs')).not.toBeNull();
   });
 });
