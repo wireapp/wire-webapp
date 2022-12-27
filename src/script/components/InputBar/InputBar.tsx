@@ -765,7 +765,7 @@ const InputBar = ({
     input: inputValue,
     isEditing: isEditing,
     isScaledDown: isScaledDown,
-    onCancelEditing: cancelMessageEditing,
+    onCancelEditing: () => cancelMessageEditing(true, true),
     onClickPing: onPingClick,
     onGifClick: onGifClick,
     onSelectFiles: uploadFiles,
