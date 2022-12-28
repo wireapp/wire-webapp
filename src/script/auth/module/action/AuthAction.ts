@@ -165,7 +165,6 @@ export class AuthAction {
     return async (dispatch, getState, {getConfig, core, actions: {clientAction, selfAction, localStorageAction}}) => {
       dispatch(AuthActionCreator.startLogin());
       try {
-        // we first init the core without initializing the client for now (this will be done later on)
         await core.init(clientType);
         await this.persistClientData(clientType, dispatch, localStorageAction);
         await dispatch(selfAction.fetchSelf());
@@ -340,10 +339,6 @@ export class AuthAction {
         await core.init(clientType);
         await this.persistClientData(clientType, dispatch, localStorageAction);
 
-        if (options.shouldValidateLocalClient) {
-          await dispatch(authAction.validateLocalClient());
-        }
-
         await dispatch(selfAction.fetchSelf());
         dispatch(AuthActionCreator.successfulRefresh());
       } catch (error) {
@@ -353,19 +348,6 @@ export class AuthAction {
           : Promise.resolve();
         await Promise.all([doLogout, deleteClientType]);
         dispatch(AuthActionCreator.failedRefresh(error));
-      }
-    };
-  };
-
-  validateLocalClient = (): ThunkAction => {
-    return async (dispatch, getState, {core}) => {
-      dispatch(AuthActionCreator.startValidateLocalClient());
-      try {
-        await core.loadAndValidateLocalClient();
-        dispatch(AuthActionCreator.successfulValidateLocalClient());
-      } catch (error) {
-        dispatch(AuthActionCreator.failedValidateLocalClient(error));
-        throw error;
       }
     };
   };

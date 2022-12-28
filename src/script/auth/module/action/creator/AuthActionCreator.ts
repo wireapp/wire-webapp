@@ -70,9 +70,6 @@ export enum AUTH_ACTION {
   SEND_TWO_FACTOR_CODE_SUCCESS = 'SEND_TWO_FACTOR_CODE_SUCCESS',
   SILENT_LOGOUT_FAILED = 'SILENT_LOGOUT_FAILED',
   SILENT_LOGOUT_SUCCESS = 'SILENT_LOGOUT_SUCCESS',
-  VALIDATE_LOCAL_CLIENT_FAILED = 'VALIDATE_LOCAL_CLIENT_FAILED',
-  VALIDATE_LOCAL_CLIENT_START = 'VALIDATE_LOCAL_CLIENT_START',
-  VALIDATE_LOCAL_CLIENT_SUCCESS = 'VALIDATE_LOCAL_CLIENT_SUCCESS',
 }
 
 export type AuthActions =
@@ -100,9 +97,6 @@ export type AuthActions =
   | RefreshStartAction
   | RefreshSuccessAction
   | RefreshFailedAction
-  | ValidateClientStartAction
-  | ValidateClientSuccessAction
-  | ValidateClientFailedAction
   | GetSSOSettingsStartAction
   | GetSSOSettingsSuccessAction
   | GetSSOSettingsFailedAction
@@ -214,17 +208,6 @@ export interface RefreshSuccessAction extends AppAction {
 export interface RefreshFailedAction extends AppAction {
   readonly error: Error;
   readonly type: AUTH_ACTION.REFRESH_FAILED;
-}
-
-export interface ValidateClientStartAction extends AppAction {
-  readonly type: AUTH_ACTION.VALIDATE_LOCAL_CLIENT_START;
-}
-export interface ValidateClientSuccessAction extends AppAction {
-  readonly type: AUTH_ACTION.VALIDATE_LOCAL_CLIENT_SUCCESS;
-}
-export interface ValidateClientFailedAction extends AppAction {
-  readonly error: Error;
-  readonly type: AUTH_ACTION.VALIDATE_LOCAL_CLIENT_FAILED;
 }
 
 export interface GetSSOSettingsStartAction extends AppAction {
@@ -400,19 +383,6 @@ export class AuthActionCreator {
   static failedRefresh = (error: Error): RefreshFailedAction => ({
     error,
     type: AUTH_ACTION.REFRESH_FAILED,
-  });
-
-  static startValidateLocalClient = (): ValidateClientStartAction => ({
-    type: AUTH_ACTION.VALIDATE_LOCAL_CLIENT_START,
-  });
-
-  static successfulValidateLocalClient = (): ValidateClientSuccessAction => ({
-    type: AUTH_ACTION.VALIDATE_LOCAL_CLIENT_SUCCESS,
-  });
-
-  static failedValidateLocalClient = (error: Error): ValidateClientFailedAction => ({
-    error,
-    type: AUTH_ACTION.VALIDATE_LOCAL_CLIENT_FAILED,
   });
 
   static startGetSSOSettings = (): GetSSOSettingsStartAction => ({
