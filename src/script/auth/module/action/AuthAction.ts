@@ -100,16 +100,13 @@ export class AuthAction {
       dispatch(AuthActionCreator.startLogin());
       try {
         await onBeforeLogin(dispatch, getState, global);
-        await core.login(loginData, false, clientAction.generateClientPayload(loginData.clientType));
+        await core.login(loginData);
         await this.persistClientData(loginData.clientType, dispatch, localStorageAction);
         await dispatch(selfAction.fetchSelf());
         let entropyData: Uint8Array | undefined = undefined;
         if (getEntropy) {
-          try {
-            await core.loadAndValidateLocalClient();
-          } catch (e) {
-            entropyData = await getEntropy();
-          }
+          const existingClient = await core.service!.client.loadClient();
+          entropyData = existingClient ? undefined : await getEntropy();
         }
         await onAfterLogin(dispatch, getState, global);
         await dispatch(

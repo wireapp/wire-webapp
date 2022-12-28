@@ -42,9 +42,7 @@ export type ClientActions =
   | RemoveClientStartAction
   | RemoveClientSuccessAction
   | RemoveClientFailedAction
-  | InitializeClientStartAction
   | InitializeClientSuccessAction
-  | InitializeClientFailedAction
   | ResetClientErrorsAction;
 
 export interface GetAllClientsStartAction extends AppAction {
