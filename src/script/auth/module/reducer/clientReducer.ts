@@ -44,8 +44,8 @@ export function clientReducer(state: ClientState = initialClientState, action: A
     case CLIENT_ACTION.CLIENT_INIT_SUCCESS: {
       return {
         ...state,
-        currentClient: action.payload.localClient,
-        isNewClient: action.payload.isNewClient,
+        currentClient: action.payload.client,
+        isNewClient: action.payload.isNew,
       };
     }
     case CLIENT_ACTION.CLIENTS_FETCH_START: {

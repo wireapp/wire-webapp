@@ -28,11 +28,7 @@ export enum AUTH_ACTION {
   AUTH_RESET_ERROR = 'AUTH_RESET_ERROR',
   ENTER_GENERIC_INVITATION_FLOW = 'ENTER_GENERIC_INVITATION_FLOW',
   ENTER_PERSONAL_CREATION_FLOW = 'ENTER_PERSONAL_CREATION_FLOW',
-  ENTER_PERSONAL_INVITATION_FLOW = 'ENTER_PERSONAL_INVITATION_FLOW',
   ENTER_TEAM_CREATION_FLOW = 'ENTER_TEAM_CREATION_FLOW',
-  GET_INVITATION_FROM_CODE_FAILED = 'GET_INVITATION_FROM_CODE_FAILED',
-  GET_INVITATION_FROM_CODE_START = 'GET_INVITATION_FROM_CODE_START',
-  GET_INVITATION_FROM_CODE_SUCCESS = 'GET_INVITATION_FROM_CODE_SUCCESS',
   GET_SSO_SETTINGS_FAILED = 'GET_SSO_SETTINGS_FAILED',
   GET_SSO_SETTINGS_START = 'GET_SSO_SETTINGS_START',
   GET_SSO_SETTINGS_SUCCESS = 'GET_SSO_SETTINGS_SUCCESS',
@@ -40,7 +36,6 @@ export enum AUTH_ACTION {
   LOGIN_START = 'LOGIN_START',
   LOGIN_SUCCESS = 'LOGIN_SUCCESS',
   LOGOUT_FAILED = 'LOGOUT_FAILED',
-  LOGOUT_START = 'LOGOUT_START',
   LOGOUT_SUCCESS = 'LOGOUT_SUCCESS',
   PUSH_LOGIN_DATA = 'PUSH_LOGIN_DATA',
   REFRESH_FAILED = 'REFRESH_FAILED',
@@ -70,9 +65,6 @@ export enum AUTH_ACTION {
   SEND_TWO_FACTOR_CODE_SUCCESS = 'SEND_TWO_FACTOR_CODE_SUCCESS',
   SILENT_LOGOUT_FAILED = 'SILENT_LOGOUT_FAILED',
   SILENT_LOGOUT_SUCCESS = 'SILENT_LOGOUT_SUCCESS',
-  VALIDATE_LOCAL_CLIENT_FAILED = 'VALIDATE_LOCAL_CLIENT_FAILED',
-  VALIDATE_LOCAL_CLIENT_START = 'VALIDATE_LOCAL_CLIENT_START',
-  VALIDATE_LOCAL_CLIENT_SUCCESS = 'VALIDATE_LOCAL_CLIENT_SUCCESS',
 }
 
 export type AuthActions =
@@ -100,13 +92,9 @@ export type AuthActions =
   | RefreshStartAction
   | RefreshSuccessAction
   | RefreshFailedAction
-  | ValidateClientStartAction
-  | ValidateClientSuccessAction
-  | ValidateClientFailedAction
   | GetSSOSettingsStartAction
   | GetSSOSettingsSuccessAction
   | GetSSOSettingsFailedAction
-  | LogoutStartAction
   | LogoutSuccessAction
   | LogoutFailedAction
   | LogoutSilentSuccessAction
@@ -216,17 +204,6 @@ export interface RefreshFailedAction extends AppAction {
   readonly type: AUTH_ACTION.REFRESH_FAILED;
 }
 
-export interface ValidateClientStartAction extends AppAction {
-  readonly type: AUTH_ACTION.VALIDATE_LOCAL_CLIENT_START;
-}
-export interface ValidateClientSuccessAction extends AppAction {
-  readonly type: AUTH_ACTION.VALIDATE_LOCAL_CLIENT_SUCCESS;
-}
-export interface ValidateClientFailedAction extends AppAction {
-  readonly error: Error;
-  readonly type: AUTH_ACTION.VALIDATE_LOCAL_CLIENT_FAILED;
-}
-
 export interface GetSSOSettingsStartAction extends AppAction {
   readonly type: AUTH_ACTION.GET_SSO_SETTINGS_START;
 }
@@ -239,9 +216,6 @@ export interface GetSSOSettingsFailedAction extends AppAction {
   readonly type: AUTH_ACTION.GET_SSO_SETTINGS_FAILED;
 }
 
-export interface LogoutStartAction extends AppAction {
-  readonly type: AUTH_ACTION.LOGOUT_START;
-}
 export interface LogoutSuccessAction extends AppAction {
   readonly type: AUTH_ACTION.LOGOUT_SUCCESS;
 }
@@ -402,19 +376,6 @@ export class AuthActionCreator {
     type: AUTH_ACTION.REFRESH_FAILED,
   });
 
-  static startValidateLocalClient = (): ValidateClientStartAction => ({
-    type: AUTH_ACTION.VALIDATE_LOCAL_CLIENT_START,
-  });
-
-  static successfulValidateLocalClient = (): ValidateClientSuccessAction => ({
-    type: AUTH_ACTION.VALIDATE_LOCAL_CLIENT_SUCCESS,
-  });
-
-  static failedValidateLocalClient = (error: Error): ValidateClientFailedAction => ({
-    error,
-    type: AUTH_ACTION.VALIDATE_LOCAL_CLIENT_FAILED,
-  });
-
   static startGetSSOSettings = (): GetSSOSettingsStartAction => ({
     type: AUTH_ACTION.GET_SSO_SETTINGS_START,
   });
@@ -427,10 +388,6 @@ export class AuthActionCreator {
   static failedGetSSOSettings = (error: Error): GetSSOSettingsFailedAction => ({
     error,
     type: AUTH_ACTION.GET_SSO_SETTINGS_FAILED,
-  });
-
-  static startLogout = (): LogoutStartAction => ({
-    type: AUTH_ACTION.LOGOUT_START,
   });
 
   static successfulLogout = (): LogoutSuccessAction => ({

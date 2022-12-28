@@ -41,8 +41,6 @@ import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {appendParameter} from 'Util/UrlUtil';
 import {checkIndexedDb, supportsMLS} from 'Util/util';
 
-import {migrateToQualifiedSessionIds} from './sessionIdMigrator';
-
 import '../../style/default.less';
 import {AssetRepository} from '../assets/AssetRepository';
 import {AssetService} from '../assets/AssetService';
@@ -362,16 +360,9 @@ export class App {
       onProgress(2.5);
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
 
-      let context: Context;
-      try {
-        context = await this.core.init(clientType, {initClient: false});
-        if (context.domain) {
-          // Migrate all existing session to fully qualified ids (if need be)
-          await migrateToQualifiedSessionIds(this.core.storage.db.sessions, context.domain);
-        }
-        await this.core.runCryptoboxMigration();
-        await this.core.initClient({clientType});
-      } catch (error) {
+      await this.core.init(clientType);
+      const localClient = await this.core.initClient();
+      if (!localClient) {
         throw new ClientError(CLIENT_ERROR_TYPE.NO_VALID_CLIENT, 'Client has been deleted on backend');
       }
 
