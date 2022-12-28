@@ -174,7 +174,7 @@ describe('AuthAction', () => {
     })({});
     await store.dispatch(actionRoot.authAction.doLogout());
 
-    expect(store.getActions()).toEqual([AuthActionCreator.startLogout(), AuthActionCreator.failedLogout(backendError)]);
+    expect(store.getActions()).toEqual([AuthActionCreator.failedLogout(backendError)]);
   });
 
   it('requests phone login code', async () => {

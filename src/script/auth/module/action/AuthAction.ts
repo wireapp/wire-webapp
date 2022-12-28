@@ -369,7 +369,6 @@ export class AuthAction {
 
   doLogout = (): ThunkAction => {
     return async (dispatch, getState, {getConfig, core, actions: {localStorageAction}}) => {
-      dispatch(AuthActionCreator.startLogout());
       try {
         await core.logout();
         if (isTemporaryClientAndNonPersistent(false)) {
@@ -388,7 +387,6 @@ export class AuthAction {
 
   doSilentLogout = (): ThunkAction => {
     return async (dispatch, getState, {getConfig, core, actions: {localStorageAction}}) => {
-      dispatch(AuthActionCreator.startLogout());
       try {
         await core.logout();
         dispatch(AuthActionCreator.successfulSilentLogout());

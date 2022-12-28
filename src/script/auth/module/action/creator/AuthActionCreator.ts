@@ -28,11 +28,7 @@ export enum AUTH_ACTION {
   AUTH_RESET_ERROR = 'AUTH_RESET_ERROR',
   ENTER_GENERIC_INVITATION_FLOW = 'ENTER_GENERIC_INVITATION_FLOW',
   ENTER_PERSONAL_CREATION_FLOW = 'ENTER_PERSONAL_CREATION_FLOW',
-  ENTER_PERSONAL_INVITATION_FLOW = 'ENTER_PERSONAL_INVITATION_FLOW',
   ENTER_TEAM_CREATION_FLOW = 'ENTER_TEAM_CREATION_FLOW',
-  GET_INVITATION_FROM_CODE_FAILED = 'GET_INVITATION_FROM_CODE_FAILED',
-  GET_INVITATION_FROM_CODE_START = 'GET_INVITATION_FROM_CODE_START',
-  GET_INVITATION_FROM_CODE_SUCCESS = 'GET_INVITATION_FROM_CODE_SUCCESS',
   GET_SSO_SETTINGS_FAILED = 'GET_SSO_SETTINGS_FAILED',
   GET_SSO_SETTINGS_START = 'GET_SSO_SETTINGS_START',
   GET_SSO_SETTINGS_SUCCESS = 'GET_SSO_SETTINGS_SUCCESS',
@@ -40,7 +36,6 @@ export enum AUTH_ACTION {
   LOGIN_START = 'LOGIN_START',
   LOGIN_SUCCESS = 'LOGIN_SUCCESS',
   LOGOUT_FAILED = 'LOGOUT_FAILED',
-  LOGOUT_START = 'LOGOUT_START',
   LOGOUT_SUCCESS = 'LOGOUT_SUCCESS',
   PUSH_LOGIN_DATA = 'PUSH_LOGIN_DATA',
   REFRESH_FAILED = 'REFRESH_FAILED',
@@ -100,7 +95,6 @@ export type AuthActions =
   | GetSSOSettingsStartAction
   | GetSSOSettingsSuccessAction
   | GetSSOSettingsFailedAction
-  | LogoutStartAction
   | LogoutSuccessAction
   | LogoutFailedAction
   | LogoutSilentSuccessAction
@@ -222,9 +216,6 @@ export interface GetSSOSettingsFailedAction extends AppAction {
   readonly type: AUTH_ACTION.GET_SSO_SETTINGS_FAILED;
 }
 
-export interface LogoutStartAction extends AppAction {
-  readonly type: AUTH_ACTION.LOGOUT_START;
-}
 export interface LogoutSuccessAction extends AppAction {
   readonly type: AUTH_ACTION.LOGOUT_SUCCESS;
 }
@@ -397,10 +388,6 @@ export class AuthActionCreator {
   static failedGetSSOSettings = (error: Error): GetSSOSettingsFailedAction => ({
     error,
     type: AUTH_ACTION.GET_SSO_SETTINGS_FAILED,
-  });
-
-  static startLogout = (): LogoutStartAction => ({
-    type: AUTH_ACTION.LOGOUT_START,
   });
 
   static successfulLogout = (): LogoutSuccessAction => ({
