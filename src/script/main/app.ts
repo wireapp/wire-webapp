@@ -361,8 +361,8 @@ export class App {
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
 
       await this.core.init(clientType);
-      const locaClient = await this.core.initClient();
-      if (!locaClient) {
+      const localClient = await this.core.initClient();
+      if (!localClient) {
         throw new ClientError(CLIENT_ERROR_TYPE.NO_VALID_CLIENT, 'Client has been deleted on backend');
       }
 
