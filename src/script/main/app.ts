@@ -361,11 +361,10 @@ export class App {
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
 
       await this.core.init(clientType);
-      const locaClient = await this.core.loadClient();
+      const locaClient = await this.core.initClient();
       if (!locaClient) {
         throw new ClientError(CLIENT_ERROR_TYPE.NO_VALID_CLIENT, 'Client has been deleted on backend');
       }
-      await this.core.initClient(locaClient);
 
       this.core.on(CoreEvents.NEW_SESSION, ({userId, clientId}) => {
         const newClient = {class: ClientClassification.UNKNOWN, id: clientId};
