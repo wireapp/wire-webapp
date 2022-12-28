@@ -33,7 +33,7 @@ export const wrapperStyles: CSSObject = {
   top: -26,
   borderTopLeftRadius: 4,
   borderTopRightRadius: 4,
-  'div:first-child': {
+  'div:first-of-type': {
     img: {
       border: '1px solid var(--gray-40)',
     },
