@@ -19,6 +19,7 @@
 
 import React, {useEffect} from 'react';
 
+import {ClientType} from '@wireapp/api-client/lib/client/index';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {Navigate, useNavigate} from 'react-router-dom';
@@ -63,7 +64,9 @@ const HistoryInfoComponent = ({
   /**
    * Show history screen when a new client was created and there is at least one previously registered client
    */
-  const shouldShowHistoryInfo = isNewCurrentSelfClient && clients.length > 1;
+  const shouldShowHistoryInfo =
+    isNewCurrentSelfClient &&
+    (clients.length > 1 || (currentSelfClient && currentSelfClient.type === ClientType.TEMPORARY));
 
   if (shouldLoadClients) {
     return null;
