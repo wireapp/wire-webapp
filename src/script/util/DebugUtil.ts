@@ -109,6 +109,10 @@ export class DebugUtil {
     return Promise.all(blockUsers);
   }
 
+  async resetIdentity(): Promise<void> {
+    this.core['coreCryptoClient'].wipe();
+  }
+
   /** Used by QA test automation. */
   async breakSession(userId: string | QualifiedId, clientId: string): Promise<void> {
     const proteusService = this.core.service!.proteus;
