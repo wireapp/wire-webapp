@@ -372,18 +372,15 @@ export const Conversation: FC<ConversationProps> = ({
   const onSessionResetClick = async (messageEntity: DecryptErrorMessage): Promise<void> => {
     const resetProgress = () => {
       setTimeout(() => {
-        messageEntity.is_resetting_session(false);
         PrimaryModal.show(PrimaryModal.type.SESSION_RESET, {});
       }, MotionDuration.LONG);
     };
-
-    messageEntity.is_resetting_session(true);
 
     try {
       if (messageEntity.fromDomain && activeConversation) {
         await repositories.message.resetSession(
           {domain: messageEntity.fromDomain, id: messageEntity.from},
-          messageEntity.client_id,
+          messageEntity.clientId,
           activeConversation,
         );
         resetProgress();

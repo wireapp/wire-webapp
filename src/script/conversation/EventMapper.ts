@@ -644,14 +644,9 @@ export class EventMapper {
    * @returns Decrypt error message entity
    */
   private _mapEventUnableToDecrypt({error_code: errorCode, error}: ErrorEvent) {
-    const messageEntity = new DecryptErrorMessage();
-
-    if (errorCode) {
-      messageEntity.error_code = typeof errorCode === 'string' ? parseInt(errorCode.split(' ')[0], 10) : errorCode;
-      messageEntity.client_id = error.replace(/\n/g, '').replace(/^.*\(([\w\d]+)\)$/g, '$1');
-    }
-
-    return messageEntity;
+    const code = typeof errorCode === 'string' ? parseInt(errorCode.split(' ')[0], 10) : errorCode;
+    const clientId = error.replace(/\n/g, '').replace(/^.*\(([\w\d]+)\)$/g, '$1');
+    return new DecryptErrorMessage(clientId, code);
   }
 
   /**

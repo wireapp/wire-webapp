@@ -4355,9 +4355,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:38.0.0-beta.5":
-  version: 38.0.0-beta.5
-  resolution: "@wireapp/core@npm:38.0.0-beta.5"
+"@wireapp/core@npm:38.0.0-beta.6":
+  version: 38.0.0-beta.6
+  resolution: "@wireapp/core@npm:38.0.0-beta.6"
   dependencies:
     "@wireapp/api-client": ^22.10.1
     "@wireapp/commons": ^5.0.4
@@ -4374,7 +4374,7 @@ __metadata:
     logdown: 3.3.1
     long: ^5.2.0
     uuidjs: 4.2.12
-  checksum: 3b7c8b685ea367430f9a9021f751e2869d5781f1408f8b224cc1061021345edde11593ef2067547ac0b3886c0f460237a813850929dd243f789601b278e224ac
+  checksum: 8d11f9aa9c7c6dec324846bb9e91cffa8025cd6d322eb79682760c5b348296e202f626b8db7352a334b6f5ed9e7186ba54dbcb7be1fc8920388020d4d305b469
   languageName: node
   linkType: hard
 
@@ -16415,7 +16415,7 @@ __metadata:
     "@typescript-eslint/parser": ^5.47.0
     "@wireapp/avs": 8.2.17
     "@wireapp/copy-config": 2.0.4
-    "@wireapp/core": 38.0.0-beta.5
+    "@wireapp/core": 38.0.0-beta.6
     "@wireapp/eslint-config": 2.1.1
     "@wireapp/lru-cache": 3.8.1
     "@wireapp/prettier-config": 0.5.2
