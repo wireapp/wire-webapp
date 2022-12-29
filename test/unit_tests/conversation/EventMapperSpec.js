@@ -360,8 +360,8 @@ describe('Event Mapper', () => {
 
       const message_et = event_mapper._mapEventUnableToDecrypt(event);
 
-      expect(message_et.error_code).toBe(205);
-      expect(message_et.client_id).toBe('c0a70d96aaeb87b6');
+      expect(message_et.code).toBe(205);
+      expect(message_et.clientId).toBe('c0a70d96aaeb87b6');
     });
   });
 });
