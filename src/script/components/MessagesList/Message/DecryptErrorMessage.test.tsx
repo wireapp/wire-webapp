@@ -26,38 +26,24 @@ import {User} from 'src/script/entity/User';
 
 import {DecryptErrorMessage} from './DecryptErrorMessage';
 
-const createDecryptErrorMessage = (partialDecryptErrorMessage: Partial<DecryptErrorMessageEntity>) => {
-  const decryptErrorMessage: Partial<DecryptErrorMessageEntity> = {
-    user: ko.observable(new User()),
-    is_recoverable: ko.pureComputed(() => false),
-    is_resetting_session: ko.observable(false),
-    ...partialDecryptErrorMessage,
-  };
-  return decryptErrorMessage as DecryptErrorMessageEntity;
-};
+function createError(code: number) {
+  const error = new DecryptErrorMessageEntity('client', code);
+  error.user(new User());
+  return error;
+}
 
 describe('DecryptErrorMessage', () => {
   it('shows "reset session" action when error is recoverable', async () => {
-    const isRecoverable = ko.observable(false);
     const props = {
-      message: createDecryptErrorMessage({
-        is_recoverable: ko.pureComputed(() => isRecoverable()),
-      }),
+      message: createError(200),
       onClickResetSession: jest.fn(),
     };
 
-    const {queryByTestId, rerender} = render(<DecryptErrorMessage {...props} />);
+    const {queryByTestId} = render(<DecryptErrorMessage {...props} />);
 
     expect(queryByTestId('do-reset-encryption-session')).toBeNull();
 
     const decryptErrorMessage = queryByTestId('element-message-decrypt-error');
-    expect(decryptErrorMessage).not.toBeNull();
-
-    act(() => {
-      isRecoverable(true);
-    });
-    rerender(<DecryptErrorMessage {...props} />);
-
     expect(decryptErrorMessage).not.toBeNull();
   });
 
@@ -65,10 +51,7 @@ describe('DecryptErrorMessage', () => {
     const isResetting = ko.observable(false);
 
     const props = {
-      message: createDecryptErrorMessage({
-        is_recoverable: ko.pureComputed(() => true),
-        is_resetting_session: isResetting,
-      }),
+      message: createError(200),
       onClickResetSession: jest.fn(() => {
         isResetting(true);
       }),
