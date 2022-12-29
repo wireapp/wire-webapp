@@ -23,6 +23,7 @@ import {Message} from './Message';
 
 import {SuperType} from '../../message/SuperType';
 
+const UNKNOWN_ERROR_CODE = 999;
 export class DecryptErrorMessage extends Message {
   public client_id: string;
   public error_code: number;
@@ -38,7 +39,9 @@ export class DecryptErrorMessage extends Message {
     this.client_id = '';
 
     this.is_recoverable = ko.pureComputed(() => {
-      return this.error_code.toString().startsWith('2');
+      // We consider a decryption error recoverable if the error code starts with 2 or if the error code is unknown
+      // in the case of the unkonwn error the session might actually not be recoverable but since we now use coreCrypto to decrypt, all errors are now unknown
+      return this.error_code.toString().startsWith('2') || this.error_code === UNKNOWN_ERROR_CODE;
     });
     this.is_resetting_session = ko.observable(false);
   }
