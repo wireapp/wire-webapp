@@ -876,14 +876,6 @@ export const clientItemStrings = defineMessages({
 });
 
 export const historyInfoStrings = defineMessages({
-  hasHistoryHeadline: {
-    defaultMessage: 'You’ve used {brandName} on this device before.',
-    id: 'historyInfo.hasHistoryHeadline',
-  },
-  hasHistoryInfo: {
-    defaultMessage: 'Messages sent in the meantime {newline}will not appear here.',
-    id: 'historyInfo.hasHistoryInfo',
-  },
   learnMore: {
     defaultMessage: 'Learn more',
     id: 'historyInfo.learnMore',
