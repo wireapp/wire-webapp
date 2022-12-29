@@ -74,7 +74,6 @@ export class ClientAction {
             ),
           };
 
-      await dispatch(clientAction.doGetAllClients());
       dispatch(ClientActionCreator.successfulInitializeClient(creationStatus));
     };
   };
