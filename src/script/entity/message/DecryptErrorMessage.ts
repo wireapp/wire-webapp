@@ -24,7 +24,7 @@ import {Message} from './Message';
 import {SuperType} from '../../message/SuperType';
 
 export class DecryptErrorMessage extends Message {
-  constructor(public readonly clientId: String, public readonly code: number) {
+  constructor(public readonly clientId: string, public readonly code: number) {
     super();
     this.super_type = SuperType.UNABLE_TO_DECRYPT;
   }
