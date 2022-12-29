@@ -18,7 +18,7 @@
  */
 
 import {render, fireEvent} from '@testing-library/react';
-import ko from 'knockout';
+import {ProteusErrors} from '@wireapp/core/lib/messagingProtocols/proteus';
 import {act} from 'react-dom/test-utils';
 
 import {DecryptErrorMessage as DecryptErrorMessageEntity} from 'src/script/entity/message/DecryptErrorMessage';
@@ -35,29 +35,37 @@ function createError(code: number) {
 describe('DecryptErrorMessage', () => {
   it('shows "reset session" action when error is recoverable', async () => {
     const props = {
-      message: createError(200),
+      message: createError(ProteusErrors.InvalidMessage),
       onClickResetSession: jest.fn(),
     };
 
-    const {queryByTestId} = render(<DecryptErrorMessage {...props} />);
+    const {getByText} = render(<DecryptErrorMessage {...props} />);
 
-    expect(queryByTestId('do-reset-encryption-session')).toBeNull();
+    expect(getByText('conversationUnableToDecryptResetSession')).not.toBeNull();
 
-    const decryptErrorMessage = queryByTestId('element-message-decrypt-error');
-    expect(decryptErrorMessage).not.toBeNull();
+    expect(getByText('conversationUnableToDecrypt1')).not.toBeNull();
+  });
+
+  it('shows remote identity changed error if sender has changed identity', async () => {
+    const props = {
+      message: createError(ProteusErrors.RemoteIdentityChanged),
+      onClickResetSession: jest.fn(),
+    };
+
+    const {getByText, queryByText} = render(<DecryptErrorMessage {...props} />);
+
+    expect(getByText('conversationUnableToDecrypt2')).not.toBeNull();
+    expect(queryByText('conversationUnableToDecryptResetSession')).toBeNull();
   });
 
   it('shows loading spinner during session reset', async () => {
-    const isResetting = ko.observable(false);
-
+    jest.useFakeTimers();
     const props = {
       message: createError(200),
-      onClickResetSession: jest.fn(() => {
-        isResetting(true);
-      }),
+      onClickResetSession: jest.fn(() => {}),
     };
 
-    const {getByTestId, queryByTestId, rerender} = render(<DecryptErrorMessage {...props} />);
+    const {getByTestId, queryByTestId} = render(<DecryptErrorMessage {...props} />);
 
     const decryptErrorMessage = queryByTestId('element-message-decrypt-error');
     expect(decryptErrorMessage).not.toBeNull();
@@ -77,11 +85,9 @@ describe('DecryptErrorMessage', () => {
     expect(queryByTestId('status-loading')).not.toBeNull();
 
     act(() => {
-      isResetting(false);
+      jest.runAllTimers();
     });
-    rerender(<DecryptErrorMessage {...props} />);
-
-    expect(resetEncryptionSessionLink).not.toBeNull();
-    expect(resetEncryptionSessionLoadingSpinner).toBeNull();
+    expect(queryByTestId('status-loading')).toBeNull();
+    expect(queryByTestId('do-reset-encryption-session')).not.toBeNull();
   });
 });

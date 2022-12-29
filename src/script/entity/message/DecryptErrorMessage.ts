@@ -17,7 +17,7 @@
  *
  */
 
-import {ProteusErrors} from '@wireapp/core';
+import {ProteusErrors} from '@wireapp/core/lib/messagingProtocols/proteus';
 
 import {Message} from './Message';
 
