@@ -27,7 +27,6 @@ import {NotificationAction, notificationAction} from './NotificationAction';
 import {RuntimeAction, runtimeAction} from './RuntimeAction';
 import {SelfAction, selfAction} from './SelfAction';
 import {UserAction, userAction} from './UserAction';
-import {WebSocketAction, webSocketAction} from './WebSocketAction';
 import {WrapperEventAction, wrapperEventAction} from './WrapperEventAction';
 
 export interface ActionRoot {
@@ -41,7 +40,6 @@ export interface ActionRoot {
   runtimeAction: RuntimeAction;
   selfAction: SelfAction;
   userAction: UserAction;
-  webSocketAction: WebSocketAction;
   wrapperEventAction: WrapperEventAction;
 }
 
@@ -56,6 +54,5 @@ export const actionRoot: ActionRoot = {
   runtimeAction,
   selfAction,
   userAction,
-  webSocketAction,
   wrapperEventAction,
 };

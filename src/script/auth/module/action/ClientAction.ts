@@ -61,7 +61,7 @@ export class ClientAction {
     verificationCode?: string,
     entropyData?: Uint8Array,
   ): ThunkAction => {
-    return async (dispatch, getState, {core, actions: {clientAction, webSocketAction}}) => {
+    return async (dispatch, getState, {core, actions: {clientAction}}) => {
       const localClient = await core.initClient();
       const creationStatus = localClient
         ? {isNew: false, client: localClient}
@@ -75,7 +75,6 @@ export class ClientAction {
           };
 
       await dispatch(clientAction.doGetAllClients());
-      await dispatch(webSocketAction.listen());
       dispatch(ClientActionCreator.successfulInitializeClient(creationStatus));
     };
   };
