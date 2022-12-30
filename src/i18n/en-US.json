@@ -1217,6 +1217,8 @@
   "userAvailabilityAway": "Away",
   "userAvailabilityBusy": "Busy",
   "userAvailabilityNone": "None",
+  "userListContacts": "Contacts",
+  "userListSelectedContacts": "Selected ({{selectedContacts}})",
   "userNotFoundMessage": "You may not have permission with this account or the person may not be on {{brandName}}.",
   "userNotFoundTitle": "{{brandName}} can’t find this person.",
   "userProfileButtonConnect": "Connect",

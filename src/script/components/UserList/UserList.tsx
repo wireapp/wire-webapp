@@ -22,24 +22,30 @@ import React, {ChangeEvent, useState} from 'react';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
+import {Icon} from 'Components/Icon';
 import {ParticipantItem} from 'Components/list/ParticipantItem';
+import {collapseButton, collapseIcon} from 'Components/UserList/UserList.styles';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isEnterKey, isSpaceKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import {InViewport} from './utils/InViewport';
-
-import type {ConversationRepository} from '../conversation/ConversationRepository';
-import {ConversationState} from '../conversation/ConversationState';
-import type {Conversation} from '../entity/Conversation';
-import type {User} from '../entity/User';
-import {TeamState} from '../team/TeamState';
-import {UserState} from '../user/UserState';
+import type {ConversationRepository} from '../../conversation/ConversationRepository';
+import {ConversationState} from '../../conversation/ConversationState';
+import type {Conversation} from '../../entity/Conversation';
+import type {User} from '../../entity/User';
+import {TeamState} from '../../team/TeamState';
+import {UserState} from '../../user/UserState';
+import {InViewport} from '../utils/InViewport';
 
 export enum UserlistMode {
   COMPACT = 'UserlistMode.COMPACT',
   DEFAULT = 'UserlistMode.DEFAULT',
   OTHERS = 'UserlistMode.OTHERS',
+}
+
+export enum UserListFolder {
+  CONTACTS = 'UserListFolder.CONTACTS',
+  SELECTED_CONTACTS = 'UserListFolder.SELECTED_CONTACTS',
 }
 
 const USER_CHUNK_SIZE = 64;
@@ -66,7 +72,7 @@ export interface UserListProps {
   userState?: UserState;
 }
 
-const UserList: React.FC<UserListProps> = ({
+export const UserList: React.FC<UserListProps> = ({
   onClick,
   conversationRepository,
   users,
@@ -87,6 +93,11 @@ const UserList: React.FC<UserListProps> = ({
   onSelectUser,
 }) => {
   const [maxShownUsers, setMaxShownUsers] = useState(USER_CHUNK_SIZE);
+
+  const [expandedFolders, setExpandedFolders] = useState<UserListFolder[]>([
+    UserListFolder.CONTACTS,
+    UserListFolder.SELECTED_CONTACTS,
+  ]);
 
   const hasMoreUsers = !truncate && users.length > maxShownUsers;
 
@@ -218,36 +229,86 @@ const UserList: React.FC<UserListProps> = ({
     );
   } else {
     const truncatedUsers = truncate ? users.slice(0, reducedUserCount) : users;
+    const selectedUsers = truncatedUsers.filter(user => isSelected(user));
+
+    const hasSelectedUsers = selectedUsers.length > 0;
+
+    const toggleFolder = (folderName: UserListFolder) => {
+      setExpandedFolders(prevState =>
+        prevState.includes(folderName) ? prevState.filter(name => folderName !== name) : [...prevState, folderName],
+      );
+    };
+
+    const isSelectedContactsOpen = expandedFolders.includes(UserListFolder.SELECTED_CONTACTS);
+    const isContactsOpen = expandedFolders.includes(UserListFolder.CONTACTS);
+
+    const renderParticipantItem = (user: User, isLastItem: boolean = false) => (
+      <li key={user.id}>
+        <ParticipantItem
+          noInteraction={noSelfInteraction && user.isMe}
+          participant={user}
+          noUnderline={isLastItem || noUnderline}
+          highlighted={highlightedUserIds.includes(user.id)}
+          customInfo={infos && infos[user.id]}
+          canSelect={isSelectEnabled}
+          isSelected={isSelected(user)}
+          mode={mode}
+          external={teamState.isExternal(user.id)}
+          selfInTeam={selfInTeam}
+          isSelfVerified={isSelfVerified}
+          onClick={onClickOrKeyPressed}
+          onKeyDown={onUserKeyPressed}
+          showArrow={showArrow}
+        />
+      </li>
+    );
 
     content = (
-      <ul className={cx('search-list', cssClasses)}>
-        {truncatedUsers.slice(0, maxShownUsers).map(user => (
-          <li key={user.id}>
-            <ParticipantItem
-              noInteraction={noSelfInteraction && user.isMe}
-              participant={user}
-              noUnderline={noUnderline}
-              highlighted={highlightedUserIds.includes(user.id)}
-              customInfo={infos && infos[user.id]}
-              canSelect={isSelectEnabled}
-              isSelected={isSelected(user)}
-              mode={mode}
-              external={teamState.isExternal(user.id)}
-              selfInTeam={selfInTeam}
-              isSelfVerified={isSelfVerified}
-              onClick={onClickOrKeyPressed}
-              onKeyDown={onUserKeyPressed}
-              showArrow={showArrow}
-            />
-          </li>
-        ))}
-      </ul>
+      <>
+        {hasSelectedUsers && (
+          <>
+            <button onClick={() => toggleFolder(UserListFolder.SELECTED_CONTACTS)} css={collapseButton}>
+              <span css={collapseIcon(isSelectedContactsOpen)}>
+                <Icon.Disclose width={16} height={16} />
+              </span>
+
+              {t('userListSelectedContacts', selectedUsers.length)}
+            </button>
+
+            <ul data-uie-name="selected-search-list">
+              {isSelectedContactsOpen &&
+                selectedUsers.map((user, index) => {
+                  const isLastItem = index === selectedUsers.length - 1;
+
+                  return renderParticipantItem(user, isLastItem);
+                })}
+            </ul>
+          </>
+        )}
+
+        <button onClick={() => toggleFolder(UserListFolder.CONTACTS)} css={collapseButton}>
+          <span css={collapseIcon(isContactsOpen)}>
+            <Icon.Disclose width={16} height={16} />
+          </span>
+
+          {t('userListContacts')}
+        </button>
+
+        <ul className={cx('search-list', cssClasses)} data-uie-name="search-list">
+          {isContactsOpen &&
+            truncatedUsers
+              .slice(0, maxShownUsers)
+              .filter(user => !isSelected(user))
+              .map(user => renderParticipantItem(user))}
+        </ul>
+      </>
     );
   }
 
   return (
     <>
       {content}
+
       {hasMoreUsers && (
         <InViewport
           onVisible={() => setMaxShownUsers(maxShownUsers + USER_CHUNK_SIZE)}
@@ -258,5 +319,3 @@ const UserList: React.FC<UserListProps> = ({
     </>
   );
 };
-
-export {UserList};

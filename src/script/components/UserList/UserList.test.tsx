@@ -1,0 +1,63 @@
+/*
+ * Wire
+ * Copyright (C) 2021 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {render} from '@testing-library/react';
+
+import {UserList} from 'Components/UserList/UserList';
+import {User} from 'src/script/entity/User';
+
+import {TestFactory} from '../../../../test/helper/TestFactory';
+import {withTheme} from '../../auth/util/test/TestUtil';
+import {ConversationRepository} from '../../conversation/ConversationRepository';
+import {UserState} from '../../user/UserState';
+
+const testFactory = new TestFactory();
+let conversationRepository: ConversationRepository;
+
+beforeAll(() => {
+  testFactory.exposeConversationActors().then(factory => {
+    conversationRepository = factory;
+    return conversationRepository;
+  });
+});
+
+describe('UserList', () => {
+  it('lists all selected users', () => {
+    const userState = new UserState();
+    const user = new User('test-id');
+
+    userState.self(user);
+
+    const users = ['1', '2', '3', '4'].map(id => new User(id));
+    const props = {
+      conversationRepository,
+      onSelectUser: (user: User) => jest.fn(),
+      userState,
+      selectedUsers: users,
+      users,
+    };
+
+    const {getByTestId} = render(withTheme(<UserList {...props} />));
+
+    const selectedSearchList = getByTestId('selected-search-list');
+    const usersListItems = selectedSearchList.querySelectorAll('li');
+
+    expect(usersListItems).toHaveLength(4);
+  });
+});

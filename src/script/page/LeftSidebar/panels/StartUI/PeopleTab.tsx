@@ -27,7 +27,7 @@ import {partition} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Icon} from 'Components/Icon';
-import {UserList, UserlistMode} from 'Components/UserList';
+import {UserList, UserlistMode} from 'Components/UserList/UserList';
 import {Conversation} from 'src/script/entity/Conversation';
 import {UserRepository} from 'src/script/user/UserRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';

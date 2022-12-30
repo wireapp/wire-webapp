@@ -28,7 +28,7 @@ import {AvailabilityState} from 'Components/AvailabilityState';
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {ParticipantMicOnIcon} from 'Components/calling/ParticipantMicOnIcon';
 import {Icon} from 'Components/Icon';
-import {UserlistMode} from 'Components/UserList';
+import {UserlistMode} from 'Components/UserList/UserList';
 import {InViewport} from 'Components/utils/InViewport';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {KEY} from 'Util/KeyboardUtil';
