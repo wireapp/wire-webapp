@@ -3747,9 +3747,9 @@ __metadata:
   linkType: hard
 
 "@types/seedrandom@npm:^3":
-  version: 3.0.3
-  resolution: "@types/seedrandom@npm:3.0.3"
-  checksum: d24b6ba51e766bdc02cc3b208597aad78ffe358d41e9e2a829128106bc594f867b57de03b66ec16d86ea179b23431dc3120a33def5914a6b32138c0aaad18f2c
+  version: 3.0.4
+  resolution: "@types/seedrandom@npm:3.0.4"
+  checksum: 994f444f2c4ea2c7d8ca3358fc16f4a912c71b2d015647597ec28c8e6ba403101e8075bde382977189b065fcbb64d6af09a9e55d5db444e2b95f7643efb2f8c3
   languageName: node
   linkType: hard
 
