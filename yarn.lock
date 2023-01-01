@@ -16541,7 +16541,7 @@ __metadata:
     webpack-hot-middleware: 2.25.3
     webrtc-adapter: 6.4.8
     workbox-webpack-plugin: 6.5.4
-    zustand: 4.1.5
+    zustand: 4.2.0
   languageName: unknown
   linkType: soft
 
@@ -16995,9 +16995,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zustand@npm:4.1.5":
-  version: 4.1.5
-  resolution: "zustand@npm:4.1.5"
+"zustand@npm:4.2.0":
+  version: 4.2.0
+  resolution: "zustand@npm:4.2.0"
   dependencies:
     use-sync-external-store: 1.2.0
   peerDependencies:
@@ -17008,6 +17008,6 @@ __metadata:
       optional: true
     react:
       optional: true
-  checksum: 13190ee8e8a797c5347b525a7c392be62b2addacdd9645dd20d37ea053f96c7c7067c099c6201e98ebb8d54991f2e04e241cc323f9a25b841d44f0ae048e3afc
+  checksum: 70f9c9272c7ee6534d16e23e1f273822fdf4cb17a9865db588946ed250a51e169f8b0dcaf0a8d15e866239182263c015bca644756a69314ea1da4fe61ba1b67f
   languageName: node
   linkType: hard
