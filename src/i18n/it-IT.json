@@ -588,8 +588,6 @@
   "guestRoomToggleInfoExtended": "Open this conversation to people outside your team. You can always change it later.",
   "guestRoomToggleInfoHead": "Guest Links",
   "guestRoomToggleName": "Allow Guests",
-  "historyInfo.hasHistoryHeadline": "Hai utilizzato {brandName} su questo dispositivo prima.",
-  "historyInfo.hasHistoryInfo": "Messages sent in the meantime {newline}will not appear here.",
   "historyInfo.learnMore": "Ulteriori informazioni",
   "historyInfo.noHistoryHeadline": "È la prima volta che utilizzi {brandName} questo dispositivo.",
   "historyInfo.noHistoryInfo": "For privacy reasons, {newline}your conversation history will not appear here.",

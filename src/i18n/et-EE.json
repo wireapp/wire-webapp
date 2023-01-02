@@ -588,8 +588,6 @@
   "guestRoomToggleInfoExtended": "Open this conversation to people outside your team. You can always change it later.",
   "guestRoomToggleInfoHead": "Guest Links",
   "guestRoomToggleName": "Allow Guests",
-  "historyInfo.hasHistoryHeadline": "Oled sellel seadmel juba varem {brandName}’i kasutanud.",
-  "historyInfo.hasHistoryInfo": "Vahepeal saadetud sõnumid{newline} ei ilmu siia.",
   "historyInfo.learnMore": "Loe lähemalt",
   "historyInfo.noHistoryHeadline": "Kasutad sellel seadmel {brandName}’it esimest korda.",
   "historyInfo.noHistoryInfo": "Privaatuse tagamiseks{newline} ei ilmu siia sinu varasemad vestlused.",

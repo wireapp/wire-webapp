@@ -588,8 +588,6 @@
   "guestRoomToggleInfoExtended": "Open this conversation to people outside your team. You can always change it later.",
   "guestRoomToggleInfoHead": "Guest Links",
   "guestRoomToggleName": "Allow Guests",
-  "historyInfo.hasHistoryHeadline": "Раније сте користили {brandName} на овом уређају.",
-  "historyInfo.hasHistoryInfo": "Поруке послате у међувремену {newline}неће се појавити овде.",
   "historyInfo.learnMore": "Сазнајте више",
   "historyInfo.noHistoryHeadline": "Ово је први пут да користите {brandName} на овом уређају.",
   "historyInfo.noHistoryInfo": "Због приватности, овде се неће појавити,{newline}историја разговора.",

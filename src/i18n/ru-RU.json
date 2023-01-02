@@ -588,8 +588,6 @@
   "guestRoomToggleInfoExtended": "Открыть эту беседу для людей не из вашей команды. Вы всегда сможете изменить это позже.",
   "guestRoomToggleInfoHead": "Гостевые ссылки",
   "guestRoomToggleName": "Разрешить гостей",
-  "historyInfo.hasHistoryHeadline": "Вы уже использовали {brandName} на этом устройстве.",
-  "historyInfo.hasHistoryInfo": "Сообщения, отправленные пока устройство{newline}не использовалось, отображаться не будут.",
   "historyInfo.learnMore": "Подробнее",
   "historyInfo.noHistoryHeadline": "Вы впервые используете {brandName} на этом устройстве.",
   "historyInfo.noHistoryInfo": "История бесед не отображается в целях {newline}обеспечения конфиденциальности.",

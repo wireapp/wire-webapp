@@ -588,8 +588,6 @@
   "guestRoomToggleInfoExtended": "Open this conversation to people outside your team. You can always change it later.",
   "guestRoomToggleInfoHead": "Guest Links",
   "guestRoomToggleName": "Allow Guests",
-  "historyInfo.hasHistoryHeadline": "Έχετε χρησιμοποιήσει ξανά το {brandName} σε αυτήν την συσκευή.",
-  "historyInfo.hasHistoryInfo": "Messages sent in the meantime {newline}will not appear here.",
   "historyInfo.learnMore": "Μάθετε περισσότερα",
   "historyInfo.noHistoryHeadline": "Είναι η πρώτη φορά που χρησιμοποιείτε το {brandName} σε αυτήν τη συσκευή.",
   "historyInfo.noHistoryInfo": "For privacy reasons, {newline}your conversation history will not appear here.",
