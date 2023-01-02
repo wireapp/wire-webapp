@@ -559,9 +559,8 @@ export class CallingRepository {
   }
 
   private extractTargetedConversationId(event: CallingEvent): QualifiedId {
-    const {content, conversation, qualified_conversation} = event;
-    const targetedConversationId =
-      'qualified_conversation' in content ? content.qualified_conversation : qualified_conversation;
+    const {targetConversation, conversation, qualified_conversation} = event;
+    const targetedConversationId = targetConversation || qualified_conversation;
     const conversationId = targetedConversationId ?? {domain: '', id: conversation};
 
     return conversationId;
@@ -1120,7 +1119,7 @@ export class CallingRepository {
       const parsedPayload = JSON.parse(payload);
       const messageType = parsedPayload.type as CALL_MESSAGE_TYPE;
       if (messageType === CALL_MESSAGE_TYPE.REJECT) {
-        return void this.messageRepository.sendSelfCallingMessage(payload);
+        return void this.messageRepository.sendSelfCallingMessage(payload, conversation.qualifiedId);
       }
     }
 

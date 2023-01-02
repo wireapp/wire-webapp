@@ -1264,8 +1264,11 @@ export class MessageRepository {
    * @param payload
    * @returns
    */
-  public sendSelfCallingMessage(payload: string) {
-    return this.sendCallingMessage(this.conversationState.getSelfMLSConversation(), payload);
+  public sendSelfCallingMessage(payload: string, targetConversation: QualifiedId) {
+    return this.sendCallingMessage(this.conversationState.getSelfMLSConversation(), {
+      content: payload,
+      qualifiedConversationId: targetConversation,
+    });
   }
   /**
    * Send call message in specified conversation.
@@ -1274,8 +1277,13 @@ export class MessageRepository {
    * @param conversationId id of the conversation to send call message to
    * @returns Resolves when the confirmation was sent
    */
-  public sendCallingMessage(conversation: Conversation, payload: string, options: MessageSendingOptions = {}) {
-    const message = MessageBuilder.buildCallMessage({content: payload});
+  public sendCallingMessage(
+    conversation: Conversation,
+    payload: string | {content: string; qualifiedConversationId: QualifiedId},
+    options: MessageSendingOptions = {},
+  ) {
+    const objectPayload = typeof payload === 'string' ? {content: payload} : payload;
+    const message = MessageBuilder.buildCallMessage(objectPayload);
 
     return this.sendAndInjectMessage(message, conversation, {
       ...options,
