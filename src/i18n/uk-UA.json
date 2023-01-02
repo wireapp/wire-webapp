@@ -588,8 +588,6 @@
   "guestRoomToggleInfoExtended": "Open this conversation to people outside your team. You can always change it later.",
   "guestRoomToggleInfoHead": "Guest Links",
   "guestRoomToggleName": "Allow Guests",
-  "historyInfo.hasHistoryHeadline": "Ви уже використовували {brandName} на цьому пристрої раніше.",
-  "historyInfo.hasHistoryInfo": "Повідомлення, надіслані в той час,{newline}коли ви вийшли з Wire, не відображатимуться.",
   "historyInfo.learnMore": "Дізнатися більше",
   "historyInfo.noHistoryHeadline": "Це перший раз, коли ви використовуєте {brandName} на цьому пристрої.",
   "historyInfo.noHistoryInfo": "З міркувань конфіденційності,{newline}історія ваших розмов тут не показується.",

@@ -588,8 +588,6 @@
   "guestRoomToggleInfoExtended": "Öffnen Sie diese Unterhaltung für Personen außerhalb Ihres Teams. Diese Einstellung kann später jederzeit geändert werden.",
   "guestRoomToggleInfoHead": "Gäste-Links",
   "guestRoomToggleName": "Gäste zulassen",
-  "historyInfo.hasHistoryHeadline": "{brandName} wurde auf diesem Gerät bereits genutzt.",
-  "historyInfo.hasHistoryInfo": "Nachrichten, die in der Zwischenzeit {newline}gesendet wurden, werden nicht angezeigt.",
   "historyInfo.learnMore": "Mehr erfahren",
   "historyInfo.noHistoryHeadline": "Sie nutzen {brandName} zum ersten Mal auf diesem Gerät.",
   "historyInfo.noHistoryInfo": "Aus Datenschutzgründen{newline}wird der bisherige Gesprächsverlauf nicht angezeigt.",

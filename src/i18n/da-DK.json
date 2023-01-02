@@ -588,8 +588,6 @@
   "guestRoomToggleInfoExtended": "Open this conversation to people outside your team. You can always change it later.",
   "guestRoomToggleInfoHead": "Guest Links",
   "guestRoomToggleName": "Allow Guests",
-  "historyInfo.hasHistoryHeadline": "Du har brugt {brandName} på denne enhed før.",
-  "historyInfo.hasHistoryInfo": "Messages sent in the meantime {newline}will not appear here.",
   "historyInfo.learnMore": "Lær mere",
   "historyInfo.noHistoryHeadline": "Det er første gang du bruger {brandName} på denne enhed.",
   "historyInfo.noHistoryInfo": "For privacy reasons, {newline}your conversation history will not appear here.",
