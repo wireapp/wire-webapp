@@ -59,7 +59,7 @@ const PingMessage: React.FC<PingMessageProps> = ({
       <div className="message-header-icon">
         <div className={`icon-ping ${get_icon_classes}`} />
       </div>
-      <p
+      <div
         className={cx('message-header-label', {
           'ephemeral-message-obfuscated': isObfuscated,
         })}
@@ -70,7 +70,7 @@ const PingMessage: React.FC<PingMessageProps> = ({
           <span className="message-header-sender-name">{unsafeSenderName}</span>
           <span className="ellipsis">{caption}</span>
         </p>
-      </p>
+      </div>
       <div className="message-body-actions">
         <MessageTime timestamp={timestamp} data-uie-uid={message.id} data-uie-name="item-message-call-timestamp" />
         <ReadReceiptStatus
