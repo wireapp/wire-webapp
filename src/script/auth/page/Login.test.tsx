@@ -19,6 +19,7 @@
 
 import {fireEvent, waitFor} from '@testing-library/react';
 import {ClientType} from '@wireapp/api-client/lib/client';
+import {StatusCodes} from 'http-status-codes';
 
 import {TypeUtil} from '@wireapp/commons';
 
@@ -79,7 +80,7 @@ describe('Login', () => {
     const password = 'password';
 
     spyOn(actionRoot.authAction, 'doLogin').and.returnValue(() =>
-      Promise.reject(new BackendError({label: BackendError.LABEL.TOO_MANY_CLIENTS, code: 401})),
+      Promise.reject(new BackendError({label: BackendError.LABEL.TOO_MANY_CLIENTS, code: StatusCodes.NOT_FOUND})),
     );
 
     const {getByTestId} = mountComponent(
