@@ -98,7 +98,7 @@ const LoginComponent = ({
   const [conversationKey, setConversationKey] = useState<string | null>(null);
 
   const [isValidLink, setIsValidLink] = useState(true);
-  const [validationErrors, setValidationErrors] = useState([]);
+  const [validationErrors, setValidationErrors] = useState<Error[]>([]);
 
   const [twoFactorSubmitError, setTwoFactorSubmitError] = useState<string | Error>('');
   const [twoFactorLoginData, setTwoFactorLoginData] = useState<LoginData>();
@@ -192,9 +192,8 @@ const LoginComponent = ({
 
       return navigate(ROUTE.HISTORY_INFO);
     } catch (error) {
-      if ((error as BackendError).label) {
-        const backendError = error as BackendError;
-        switch (backendError.label) {
+      if (error instanceof BackendError) {
+        switch (error.label) {
           case BackendError.LABEL.TOO_MANY_CLIENTS: {
             resetAuthError();
             if (formLoginData?.verificationCode) {
@@ -208,9 +207,11 @@ const LoginComponent = ({
           }
           case BackendError.LABEL.CODE_AUTHENTICATION_REQUIRED: {
             const login: LoginData = {...formLoginData, clientType: loginData.clientType};
-            setTwoFactorLoginData(login);
-            doSendTwoFactorCode(login.email);
-            doSetLocalStorage(QUERY_KEY.JOIN_EXPIRES, Date.now() + 1000 * 60 * 10);
+            if (login.email) {
+              setTwoFactorLoginData(login);
+              doSendTwoFactorCode(login.email);
+              doSetLocalStorage(QUERY_KEY.JOIN_EXPIRES, Date.now() + 1000 * 60 * 10);
+            }
             break;
           }
           case BackendError.LABEL.CODE_AUTHENTICATION_FAILED: {
@@ -223,11 +224,12 @@ const LoginComponent = ({
             break;
           }
           default: {
+            const backendError = error;
             const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
               backendError.label.endsWith(errorType),
             );
             if (!isValidationError) {
-              throw backendError;
+              throw error;
             }
           }
         }
@@ -239,7 +241,10 @@ const LoginComponent = ({
 
   const resendTwoFactorCode = async () => {
     try {
-      await doSendTwoFactorCode(twoFactorLoginData.email);
+      const email = twoFactorLoginData?.email;
+      if (email) {
+        await doSendTwoFactorCode(email);
+      }
     } catch (error) {
       setTwoFactorSubmitError(
         new BackendError({code: StatusCodes.TOO_MANY_REQUESTS, label: BackendError.GENERAL_ERRORS.TOO_MANY_REQUESTS}),
@@ -247,7 +252,7 @@ const LoginComponent = ({
     }
   };
 
-  const submitTwoFactorLogin = (code: string) => {
+  const submitTwoFactorLogin = (code?: string) => {
     setTwoFactorSubmitError('');
     handleSubmit({...twoFactorLoginData, verificationCode: code}, []);
   };
