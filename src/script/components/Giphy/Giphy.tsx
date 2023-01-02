@@ -22,7 +22,7 @@ import {FC, useEffect, useState} from 'react';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 
-import {Button} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {GifImage} from 'Components/Giphy/GifImage';
@@ -261,6 +261,7 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
           <footer className="giphy-modal-footer modal-footer">
             <Button
               type="button"
+              variant={ButtonVariant.SECONDARY}
               aria-disabled={!hasGifs}
               disabled={!hasGifs}
               onClick={getRandomGif}
