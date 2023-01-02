@@ -59,7 +59,7 @@ import {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationService} from '../conversation/ConversationService';
 import {MessageRepository} from '../conversation/MessageRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
-import {AccessTokenError, ACCESS_TOKEN_ERROR_TYPE} from '../error/AccessTokenError';
+import {AccessTokenError} from '../error/AccessTokenError';
 import {AuthError} from '../error/AuthError';
 import {BaseError} from '../error/BaseError';
 import {ClientError, CLIENT_ERROR_TYPE} from '../error/ClientError';
@@ -338,8 +338,6 @@ export class App {
     const platformCssClass = Runtime.isDesktopApp() ? 'platform-electron' : 'platform-web';
     document.body.classList.add(osCssClass, platformCssClass);
 
-    const isReload = this._isReload();
-    this.logger.debug(`App init starts (isReload: '${isReload}')`);
     new ThemeViewModel(this.repository.properties);
     const telemetry = new AppInitTelemetry();
 
@@ -360,7 +358,11 @@ export class App {
       onProgress(2.5);
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
 
-      await this.core.init(clientType);
+      try {
+        await this.core.init(clientType);
+      } catch (error) {
+        throw new AccessTokenError(AccessTokenError.TYPE.REQUEST_FORBIDDEN, 'Session has expired');
+      }
       const localClient = await this.core.initClient();
       if (!localClient) {
         throw new ClientError(CLIENT_ERROR_TYPE.NO_VALID_CLIENT, 'Client has been deleted on backend');
@@ -458,7 +460,7 @@ export class App {
       return selfUser;
     } catch (error) {
       if (error instanceof BaseError) {
-        this._appInitFailure(error, isReload);
+        this._appInitFailure(error);
         return undefined;
       }
       throw error;
@@ -476,16 +478,16 @@ export class App {
     }
   }
 
-  private _appInitFailure(error: BaseError, isReload: boolean) {
+  private _appInitFailure(error: BaseError) {
+    const {message, type} = error;
     let logMessage = `Could not initialize app version '${Environment.version(false)}'`;
 
     if (Runtime.isDesktopApp()) {
       logMessage += ` - Electron '${platform.os?.family}' '${Environment.version()}'`;
     }
 
-    this.logger.warn(`${logMessage}: ${error.message}`, {error});
+    this.logger.warn(`${logMessage}: ${message}`, {error});
 
-    const {message, type} = error;
     const isAuthError = error instanceof AuthError;
     if (isAuthError) {
       const isTypeMultipleTabs = type === AuthError.TYPE.MULTIPLE_TABS;
@@ -493,49 +495,30 @@ export class App {
       return this.redirectToLogin(signOutReason);
     }
 
-    this.logger.debug(
-      `App reload: '${isReload}', Document referrer: '${document.referrer}', Location: '${window.location.href}'`,
-    );
-    if (isReload) {
-      const isSessionExpired = [AccessTokenError.TYPE.REQUEST_FORBIDDEN, AccessTokenError.TYPE.NOT_FOUND_IN_CACHE];
-
-      if (isSessionExpired.includes(type as ACCESS_TOKEN_ERROR_TYPE)) {
-        this.logger.warn(`Session expired on page reload: ${message}`, error);
-        return this.redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED);
-      }
-
-      const isAccessTokenError = error instanceof AccessTokenError;
-      const isInvalidClient = type === ClientError.TYPE.NO_VALID_CLIENT;
-
-      if (isInvalidClient) {
-        return this.redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED);
-      }
-
-      if (isAccessTokenError) {
-        this.logger.warn('Connectivity issues. Trigger reload.', error);
-        return window.location.reload();
-      }
-    }
-
     if (navigator.onLine === true) {
+      const isReload = this._isReload();
       switch (type) {
         case CLIENT_ERROR_TYPE.NO_VALID_CLIENT: {
-          this.logger.warn(`Redirecting to login: ${error.message}`, error);
-          return this.redirectToLogin(SIGN_OUT_REASON.CLIENT_REMOVED);
+          this.logger.warn(`Redirecting to login: ${message}`, error);
+          return isReload
+            ? this.redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED)
+            : this.redirectToLogin(SIGN_OUT_REASON.CLIENT_REMOVED);
         }
         case AccessTokenError.TYPE.NOT_FOUND_IN_CACHE:
         case AccessTokenError.TYPE.RETRIES_EXCEEDED:
         case AccessTokenError.TYPE.REQUEST_FORBIDDEN: {
-          this.logger.warn(`Redirecting to login: ${error.message}`, error);
-          return this.redirectToLogin(SIGN_OUT_REASON.NOT_SIGNED_IN);
+          this.logger.warn(`Redirecting to login: ${message}`, error);
+          return isReload
+            ? this.redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED)
+            : this.redirectToLogin(SIGN_OUT_REASON.NOT_SIGNED_IN);
         }
         case TeamError.TYPE.NO_APP_CONFIG: {
-          this.logger.warn(`Logging out user: ${error.message}`, error);
+          this.logger.warn(`Logging out user: ${message}`, error);
           return this.redirectToLogin(SIGN_OUT_REASON.NO_APP_CONFIG);
         }
 
         default: {
-          this.logger.error(`Caused by: ${(error ? error.message : undefined) || error}`, error);
+          this.logger.error(`Caused by: ${message || error}`, error);
 
           const isAccessTokenError = error instanceof AccessTokenError;
           if (isAccessTokenError) {
