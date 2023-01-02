@@ -558,6 +558,11 @@ export class CallingRepository {
     );
   }
 
+  /**
+   * Will extract the conversation that is referred to by the calling event.
+   * It could happen that messages relative to a particular conversation was sent in a different conversation (most likely the self conversation).
+   * We need to find the correct conversation in order for AVS to know which call is concerned
+   */
   private extractTargetedConversationId(event: CallingEvent): QualifiedId {
     const {targetConversation, conversation, qualified_conversation} = event;
     const targetedConversationId = targetConversation || qualified_conversation;
