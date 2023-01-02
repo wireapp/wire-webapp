@@ -18,7 +18,6 @@
  */
 
 import type {SSOSettings} from '@wireapp/api-client/lib/account/SSOSettings';
-import type {LoginData} from '@wireapp/api-client/lib/auth/';
 import {ClientType} from '@wireapp/api-client/lib/client/';
 import type {TeamData} from '@wireapp/api-client/lib/team/';
 import type {UserAsset} from '@wireapp/api-client/lib/user/';
@@ -43,6 +42,11 @@ export interface RegistrationDataState {
   termsAccepted: boolean;
 }
 
+export interface LoginDataState {
+  clientType: ClientType;
+  phone?: string;
+}
+
 export type AuthState = {
   readonly account: RegistrationDataState;
   readonly currentFlow: string;
@@ -53,7 +57,7 @@ export type AuthState = {
   readonly fetchingSSOSettings: boolean;
   readonly isAuthenticated: boolean;
   readonly isSendingTwoFactorCode: boolean;
-  readonly loginData: Partial<LoginData>;
+  readonly loginData: LoginDataState;
   readonly ssoSettings?: SSOSettings;
 };
 

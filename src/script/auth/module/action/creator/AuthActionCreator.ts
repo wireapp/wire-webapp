@@ -18,9 +18,9 @@
  */
 
 import type {SSOSettings} from '@wireapp/api-client/lib/account/SSOSettings';
-import type {LoginData, RegisterData} from '@wireapp/api-client/lib/auth/';
+import type {RegisterData} from '@wireapp/api-client/lib/auth/';
 
-import type {RegistrationDataState} from '../../reducer/authReducer';
+import type {LoginDataState, RegistrationDataState} from '../../reducer/authReducer';
 
 import type {AppAction} from '.';
 
@@ -252,7 +252,7 @@ export interface ResetLoginDataAction extends AppAction {
   readonly type: AUTH_ACTION.RESET_LOGIN_DATA;
 }
 export interface PushLoginDataAction extends AppAction {
-  readonly payload: Partial<LoginData>;
+  readonly payload: Partial<LoginDataState>;
   readonly type: AUTH_ACTION.PUSH_LOGIN_DATA;
 }
 
@@ -428,7 +428,7 @@ export class AuthActionCreator {
     };
   };
 
-  static pushLoginData = (loginData: Partial<LoginData>): PushLoginDataAction => ({
+  static pushLoginData = (loginData: Partial<LoginDataState>): PushLoginDataAction => ({
     payload: loginData,
     type: AUTH_ACTION.PUSH_LOGIN_DATA,
   });
