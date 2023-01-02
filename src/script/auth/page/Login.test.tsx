@@ -79,7 +79,7 @@ describe('Login', () => {
     const password = 'password';
 
     spyOn(actionRoot.authAction, 'doLogin').and.returnValue(() =>
-      Promise.reject({label: BackendError.LABEL.TOO_MANY_CLIENTS}),
+      Promise.reject(new BackendError({label: BackendError.LABEL.TOO_MANY_CLIENTS, code: 401})),
     );
 
     const {getByTestId} = mountComponent(
