@@ -138,11 +138,11 @@ export class ConversationState {
   }
 
   getSelfMLSConversation(): Conversation {
-    const proteusConversation = this.selfMLSConversation();
-    if (!proteusConversation) {
+    const mlsConversation = this.selfMLSConversation();
+    if (!mlsConversation) {
       throw new Error('No MLS self conversation');
     }
-    return proteusConversation;
+    return mlsConversation;
   }
 
   /**
