@@ -28,18 +28,23 @@ import {User} from '../../entity/User';
 
 describe('GroupVideoGrid', () => {
   it('renders video grids', async () => {
-    const user = new User('id');
-    user.name('Anton Bertha');
-    const participant = new Participant(user, 'example');
+    const self = new User('self');
+    self.name('Anton Bertha');
+
+    const user = new User('user1');
+    user.name('Anot Heruser');
+
+    const selfParticipant = new Participant(self, 'selfClient');
+    const participant = new Participant(user, 'otherClient');
 
     const props: GroupVideoGripProps = {
       grid: {
-        grid: [participant, participant],
+        grid: [selfParticipant, participant],
         thumbnail: null,
       },
       maximizedParticipant: null,
       minimized: false,
-      selfParticipant: participant,
+      selfParticipant: selfParticipant,
       setMaximizedParticipant: jest.fn(),
     };
 
@@ -107,11 +112,10 @@ describe('GroupVideoGrid', () => {
   });
 
   it('renders thumbnail', async () => {
-    const user = new User('id');
+    const user = new User('user1');
     user.name('Anton Bertha');
 
-    const participant = new Participant(user, 'example');
-    participant.setVideoStream(new MediaStream(), false);
+    const participant = new Participant(user, 'example1');
     participant.isMuted(true);
 
     const props: GroupVideoGripProps = {
