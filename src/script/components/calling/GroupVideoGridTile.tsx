@@ -37,7 +37,7 @@ import type {Participant} from '../../calling/Participant';
 export interface GroupVideoGridTileProps {
   isMaximized: boolean;
   minimized: boolean;
-  onParticipantDoubleClick: (userId: QualifiedId, clientId: string) => void;
+  handleTileClick: (userId: QualifiedId, clientId: string) => void;
   participant: Participant;
   participantCount: number;
   selfParticipant: Participant;
@@ -49,7 +49,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
   selfParticipant,
   participantCount,
   isMaximized,
-  onParticipantDoubleClick,
+  handleTileClick,
 }) => {
   const {isMuted, videoState, videoStream, isActivelySpeaking} = useKoSubscribableChildren(participant, [
     'isMuted',
@@ -66,14 +66,14 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
   const activelySpeakingBoxShadow = `inset 0px 0px 0px 1px var(--group-video-bg), inset 0px 0px 0px 4px var(--accent-color), inset 0px 0px 0px 7px var(--app-bg-secondary)`;
   const groupVideoBoxShadow = participantCount > 1 ? 'inset 0px 0px 0px 2px var(--group-video-bg)' : 'initial';
 
-  const onTileClick = () => onParticipantDoubleClick(participant?.user.qualifiedId, participant?.clientId);
+  const onTileClick = () => handleTileClick(participant?.user.qualifiedId, participant?.clientId);
 
   const onTileEnterClick = (keyboardEvent: React.KeyboardEvent) => {
     if (!isEnterKey(keyboardEvent)) {
       return;
     }
 
-    onParticipantDoubleClick(participant?.user.qualifiedId, participant?.clientId);
+    onTileClick();
   };
 
   return (
