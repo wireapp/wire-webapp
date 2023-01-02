@@ -75,7 +75,7 @@ import {parseError, parseValidationErrors} from '../util/errorUtil';
 type Props = React.HTMLProps<HTMLDivElement>;
 
 const LoginComponent = ({
-  loginError,
+  authError,
   resetAuthError,
   doCheckConversationCode,
   doInit,
@@ -328,8 +328,8 @@ const LoginComponent = ({
                         <LoginForm isFetching={isFetching} onSubmit={handleSubmit} />
                         {validationErrors.length ? (
                           parseValidationErrors(validationErrors)
-                        ) : loginError ? (
-                          parseError(loginError)
+                        ) : authError ? (
+                          parseError(authError)
                         ) : (
                           <div style={{marginTop: '4px'}}>&nbsp;</div>
                         )}
@@ -392,7 +392,7 @@ const mapStateToProps = (state: RootState) => ({
   isFetching: AuthSelector.isFetching(state),
   isSendingTwoFactorCode: AuthSelector.isSendingTwoFactorCode(state),
   loginData: AuthSelector.getLoginData(state),
-  loginError: AuthSelector.getError(state),
+  authError: AuthSelector.getError(state),
 });
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
