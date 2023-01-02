@@ -1260,14 +1260,30 @@ export class MessageRepository {
   }
 
   /**
+   * Sends a call message only to self conversation (eg. REJECT message that warn the user's other clients that the call has been picked up)
+   * @param payload
+   * @returns
+   */
+  public sendSelfCallingMessage(payload: string, targetConversation: QualifiedId) {
+    return this.sendCallingMessage(this.conversationState.getSelfMLSConversation(), {
+      content: payload,
+      qualifiedConversationId: targetConversation,
+    });
+  }
+  /**
    * Send call message in specified conversation.
    *
    * @param eventInfoEntity Event info to be send
    * @param conversationId id of the conversation to send call message to
    * @returns Resolves when the confirmation was sent
    */
-  public sendCallingMessage(conversation: Conversation, payload: string, options: MessageSendingOptions = {}) {
-    const message = MessageBuilder.buildCallMessage({content: payload});
+  public sendCallingMessage(
+    conversation: Conversation,
+    payload: string | {content: string; qualifiedConversationId: QualifiedId},
+    options: MessageSendingOptions = {},
+  ) {
+    const objectPayload = typeof payload === 'string' ? {content: payload} : payload;
+    const message = MessageBuilder.buildCallMessage(objectPayload);
 
     return this.sendAndInjectMessage(message, conversation, {
       ...options,
