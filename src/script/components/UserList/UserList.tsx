@@ -17,7 +17,7 @@
  *
  */
 
-import React, {ChangeEvent, useState} from 'react';
+import {ChangeEvent, useState} from 'react';
 
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -72,7 +72,7 @@ export interface UserListProps {
   userState?: UserState;
 }
 
-export const UserList: React.FC<UserListProps> = ({
+export const UserList = ({
   onClick,
   conversationRepository,
   users,
@@ -91,7 +91,7 @@ export const UserList: React.FC<UserListProps> = ({
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
   onSelectUser,
-}) => {
+}: UserListProps) => {
   const [maxShownUsers, setMaxShownUsers] = useState(USER_CHUNK_SIZE);
 
   const [expandedFolders, setExpandedFolders] = useState<UserListFolder[]>([
@@ -187,6 +187,7 @@ export const UserList: React.FC<UserListProps> = ({
                 ))}
               </ul>
             )}
+
             {!(admins.length > 0) && (
               <div className="user-list__no-admin" data-uie-name="status-no-admins">
                 {t('searchListNoAdmins')}
@@ -268,7 +269,7 @@ export const UserList: React.FC<UserListProps> = ({
         {hasSelectedUsers && (
           <>
             <button onClick={() => toggleFolder(UserListFolder.SELECTED_CONTACTS)} css={collapseButton}>
-              <span css={collapseIcon(isSelectedContactsOpen)}>
+              <span css={collapseIcon(isSelectedContactsOpen)} aria-hidden="true">
                 <Icon.Disclose width={16} height={16} />
               </span>
 
@@ -287,7 +288,7 @@ export const UserList: React.FC<UserListProps> = ({
         )}
 
         <button onClick={() => toggleFolder(UserListFolder.CONTACTS)} css={collapseButton}>
-          <span css={collapseIcon(isContactsOpen)}>
+          <span css={collapseIcon(isContactsOpen)} aria-hidden="true">
             <Icon.Disclose width={16} height={16} />
           </span>
 

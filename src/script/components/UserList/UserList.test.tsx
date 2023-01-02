@@ -17,7 +17,9 @@
  *
  */
 
-import {render} from '@testing-library/react';
+import React from 'react';
+
+import {fireEvent, render} from '@testing-library/react';
 
 import {UserList} from 'Components/UserList/UserList';
 import {User} from 'src/script/entity/User';
@@ -59,5 +61,36 @@ describe('UserList', () => {
     const usersListItems = selectedSearchList.querySelectorAll('li');
 
     expect(usersListItems).toHaveLength(4);
+  });
+
+  it('select user', async () => {
+    const userState = new UserState();
+    const user = new User('test-id');
+
+    userState.self(user);
+
+    const setStateMock = jest.fn();
+    const useStateMock: any = (useState: any) => [useState, setStateMock];
+    jest.spyOn(React, 'useState').mockImplementation(useStateMock);
+
+    const [selectedUsers, setSelectedUsers] = useStateMock([]);
+
+    const mockOnSelectUser = jest.fn((user: User) => setSelectedUsers(user));
+
+    const users = ['1', '2', '3', '4'].map(id => new User(id));
+    const props = {
+      conversationRepository,
+      onSelectUser: mockOnSelectUser,
+      userState,
+      selectedUsers,
+      users,
+    };
+
+    const {getAllByTestId} = render(withTheme(<UserList {...props} />));
+    const contactsList = getAllByTestId('item-user');
+
+    expect(contactsList).toHaveLength(4);
+    fireEvent.click(contactsList[0]);
+    expect(mockOnSelectUser).toHaveBeenCalledWith(users[0]);
   });
 });
