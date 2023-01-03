@@ -61,7 +61,7 @@ describe('useDebounce', () => {
     expect(callback).toHaveBeenCalledTimes(1);
   });
 
-  it('should not call the callback if it is unmounted before the debounce time', () => {
+  it('should not call the callback if it is unmounted before the debounce time is over', () => {
     const callback = jest.fn();
     const time = 1000;
 
@@ -69,7 +69,7 @@ describe('useDebounce', () => {
 
     act(() => {
       unmount();
-      jest.advanceTimersByTime(500);
+      jest.advanceTimersByTime(1500);
     });
     expect(callback).not.toHaveBeenCalled();
   });
