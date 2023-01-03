@@ -29,46 +29,46 @@ type ReadMessageBuffer = {conversation: Conversation; message: Message};
 
 const DEBOUNCE = 500;
 
-export const useReadReceiptSender = (sender: Pick<MessageRepository, 'sendReadReceipt'>) => {
+export const useReadReceiptSender = (messageSender: Pick<MessageRepository, 'sendReadReceipt'>) => {
   const readMessagesBuffer = useRef<ReadMessageBuffer[]>([]);
-  const timer = useRef<number>();
+  const flushTimer = useRef<number>();
 
-  const sendReadReceiptBatch = useCallback(() => {
-    if (timer.current) {
-      window.clearTimeout(timer.current);
-    }
-
+  const flush = useCallback(() => {
     const readMessages = readMessagesBuffer.current;
     if (readMessages.length) {
       const groupedMessages = groupBy(readMessages, ({conversation, message}) => conversation.id + message.from);
 
-      timer.current = window.setTimeout(() => {
-        Object.values(groupedMessages).forEach(readMessagesBatch => {
-          const [firstEntry, ...otherEntries] = readMessagesBatch;
+      Object.values(groupedMessages).forEach(readMessagesBatch => {
+        const [firstEntry, ...otherEntries] = readMessagesBatch;
 
-          if (firstEntry) {
-            const {conversation, message: firstMessage} = firstEntry;
-            const otherMessageIds = otherEntries.map(({message}) => message);
-            sender.sendReadReceipt(conversation, firstMessage, otherMessageIds);
-          }
-        });
-        readMessagesBuffer.current = [];
-      }, DEBOUNCE);
+        if (firstEntry) {
+          const {conversation, message: firstMessage} = firstEntry;
+          const otherMessageIds = otherEntries.map(({message}) => message);
+          messageSender.sendReadReceipt(conversation, firstMessage, otherMessageIds);
+        }
+      });
+      readMessagesBuffer.current = [];
     }
-  }, [sender]);
+  }, [messageSender]);
 
   return {
     addReadReceiptToBatch: (conversation: Conversation, message: Message) => {
-      // add the message in the buffer of read messages (actual read receipt will be sent in the next batch)
+      // Check that the message has not already been batched for a future read receipt
       const hasBatchedReadReceipts = readMessagesBuffer.current.some(
         readReceipt => readReceipt.message.id === message.id,
       );
       if (hasBatchedReadReceipts) {
         return;
       }
+
+      if (flushTimer.current) {
+        window.clearTimeout(flushTimer.current);
+      }
+
+      // add the message in the buffer of read messages (actual read receipt will be sent in the next batch)
       const entry = {conversation, message};
       readMessagesBuffer.current = readMessagesBuffer.current.concat(entry);
-      sendReadReceiptBatch();
+      flushTimer.current = window.setTimeout(flush, DEBOUNCE);
     },
   };
 };

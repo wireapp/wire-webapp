@@ -85,4 +85,29 @@ describe('useReadReceipt', () => {
     jest.runAllTimers();
     expect(sendReadReceipt).toHaveBeenCalledTimes(2);
   });
+
+  it('does not add the same message multiple times', async () => {
+    const sendReadReceipt = jest.fn();
+    const {result} = renderHook(() => useReadReceiptSender({sendReadReceipt}));
+    const conversation = new Conversation(createRandomUuid());
+
+    const message = new Message(createRandomUuid());
+    message.from = createRandomUuid();
+
+    const firstBatch = [
+      [conversation, message],
+      [conversation, message],
+      [conversation, message],
+      [conversation, message],
+    ] as const;
+
+    firstBatch.forEach(([conversation, message]) => {
+      result.current.addReadReceiptToBatch(conversation, message);
+    });
+
+    expect(sendReadReceipt).not.toHaveBeenCalled();
+    jest.runAllTimers();
+    expect(sendReadReceipt).toHaveBeenCalledTimes(1);
+    expect(sendReadReceipt).toHaveBeenCalledWith(conversation, message, []);
+  });
 });
