@@ -53,6 +53,7 @@ import {
 } from '@wireapp/react-ui-kit';
 
 import {getLogger} from 'Util/Logger';
+import {isBackendError} from 'Util/TypePredicateUtil';
 
 import {EntropyContainer} from './EntropyContainer';
 import {Page} from './Page';
@@ -192,7 +193,7 @@ const LoginComponent = ({
 
       return navigate(ROUTE.HISTORY_INFO);
     } catch (error) {
-      if (error instanceof BackendError) {
+      if (isBackendError(error)) {
         switch (error.label) {
           case BackendError.LABEL.TOO_MANY_CLIENTS: {
             resetAuthError();
