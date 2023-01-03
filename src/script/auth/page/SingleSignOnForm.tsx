@@ -63,7 +63,7 @@ const SSO_CODE_PREFIX_REGEX = '[wW][iI][rR][eE]-';
 const SingleSignOnFormComponent = ({
   initialCode,
   isFetching,
-  loginError,
+  authError,
   resetAuthError,
   validateSSOCode,
   doLogin,
@@ -286,8 +286,8 @@ const SingleSignOnFormComponent = ({
       </InputBlock>
       {validationError ? (
         parseValidationErrors([validationError])
-      ) : loginError ? (
-        parseError(loginError)
+      ) : authError ? (
+        parseError(authError)
       ) : ssoError ? (
         parseError(ssoError)
       ) : logoutReason ? (
@@ -324,7 +324,7 @@ const SingleSignOnFormComponent = ({
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
   isFetching: AuthSelector.isFetching(state),
-  loginError: AuthSelector.getError(state),
+  authError: AuthSelector.getError(state),
 });
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
