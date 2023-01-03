@@ -43,9 +43,9 @@ export enum UserlistMode {
   OTHERS = 'UserlistMode.OTHERS',
 }
 
-export enum UserListFolder {
-  CONTACTS = 'UserListFolder.CONTACTS',
-  SELECTED_CONTACTS = 'UserListFolder.SELECTED_CONTACTS',
+export enum UserListSections {
+  CONTACTS = 'UserListSections.CONTACTS',
+  SELECTED_CONTACTS = 'UserListSections.SELECTED_CONTACTS',
 }
 
 const USER_CHUNK_SIZE = 64;
@@ -94,9 +94,9 @@ export const UserList = ({
 }: UserListProps) => {
   const [maxShownUsers, setMaxShownUsers] = useState(USER_CHUNK_SIZE);
 
-  const [expandedFolders, setExpandedFolders] = useState<UserListFolder[]>([
-    UserListFolder.CONTACTS,
-    UserListFolder.SELECTED_CONTACTS,
+  const [expandedFolders, setExpandedFolders] = useState<UserListSections[]>([
+    UserListSections.CONTACTS,
+    UserListSections.SELECTED_CONTACTS,
   ]);
 
   const hasMoreUsers = !truncate && users.length > maxShownUsers;
@@ -234,14 +234,14 @@ export const UserList = ({
 
     const hasSelectedUsers = selectedUsers.length > 0;
 
-    const toggleFolder = (folderName: UserListFolder) => {
+    const toggleFolder = (folderName: UserListSections) => {
       setExpandedFolders(prevState =>
         prevState.includes(folderName) ? prevState.filter(name => folderName !== name) : [...prevState, folderName],
       );
     };
 
-    const isSelectedContactsOpen = expandedFolders.includes(UserListFolder.SELECTED_CONTACTS);
-    const isContactsOpen = expandedFolders.includes(UserListFolder.CONTACTS);
+    const isSelectedContactsOpen = expandedFolders.includes(UserListSections.SELECTED_CONTACTS);
+    const isContactsOpen = expandedFolders.includes(UserListSections.CONTACTS);
 
     const renderParticipantItem = (user: User, isLastItem: boolean = false) => (
       <li key={user.id}>
@@ -268,7 +268,7 @@ export const UserList = ({
       <>
         {hasSelectedUsers && (
           <>
-            <button onClick={() => toggleFolder(UserListFolder.SELECTED_CONTACTS)} css={collapseButton}>
+            <button onClick={() => toggleFolder(UserListSections.SELECTED_CONTACTS)} css={collapseButton}>
               <span css={collapseIcon(isSelectedContactsOpen)} aria-hidden="true">
                 <Icon.Disclose width={16} height={16} />
               </span>
@@ -287,7 +287,7 @@ export const UserList = ({
           </>
         )}
 
-        <button onClick={() => toggleFolder(UserListFolder.CONTACTS)} css={collapseButton}>
+        <button onClick={() => toggleFolder(UserListSections.CONTACTS)} css={collapseButton}>
           <span css={collapseIcon(isContactsOpen)} aria-hidden="true">
             <Icon.Disclose width={16} height={16} />
           </span>
