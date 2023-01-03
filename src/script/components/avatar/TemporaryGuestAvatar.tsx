@@ -36,7 +36,7 @@ export interface TemporaryGuestAvatarProps extends React.HTMLProps<HTMLDivElemen
   noBadge?: boolean;
   onClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   participant: User;
-  responsive?: boolean;
+  isResponsive?: boolean;
   state: STATE;
 }
 
@@ -45,7 +45,7 @@ const TemporaryGuestAvatar: React.FunctionComponent<TemporaryGuestAvatarProps> =
   noBadge,
   onClick,
   participant,
-  responsive = false,
+  isResponsive = false,
   state,
   ...props
 }) => {
@@ -68,11 +68,16 @@ const TemporaryGuestAvatar: React.FunctionComponent<TemporaryGuestAvatarProps> =
       data-uie-status={state}
       onClick={onClick}
       title={participant.name()}
-      responsive
+      isResponsive
       {...props}
     >
       <AvatarBackground />
-      <AvatarInitials color="var(--background)" avatarSize={avatarSize} initials={participant.initials()} responsive />
+      <AvatarInitials
+        color="var(--background)"
+        avatarSize={avatarSize}
+        initials={participant.initials()}
+        isResponsive
+      />
       {!noBadge && shouldShowBadge(avatarSize, state) && <AvatarBadge state={state} />}
       <AvatarBorder />
       <svg

@@ -76,7 +76,7 @@ export interface AvatarProps extends HTMLProps<HTMLDivElement> {
   avatarAlt?: string;
   noBadge?: boolean;
   noFilter?: boolean;
-  responsive?: boolean;
+  isResponsive?: boolean;
   onAvatarClick?: (participant: User | ServiceEntity, target: Node) => void;
 }
 
@@ -86,7 +86,7 @@ const Avatar: FC<AvatarProps> = ({
   noFilter = false,
   onAvatarClick,
   participant,
-  responsive = false,
+  isResponsive = false,
   ...props
 }) => {
   const handleAvatarInteraction = (
@@ -145,7 +145,7 @@ const Avatar: FC<AvatarProps> = ({
         noBadge={noBadge}
         onClick={handleAvatarInteraction}
         participant={participant}
-        responsive
+        isResponsive
         state={avatarState}
         {...props}
       />
@@ -159,7 +159,7 @@ const Avatar: FC<AvatarProps> = ({
       noFilter={noFilter}
       onAvatarInteraction={handleAvatarInteraction}
       participant={participant}
-      responsive
+      isResponsive
       state={avatarState}
       {...props}
     />

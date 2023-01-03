@@ -26,16 +26,16 @@ import {DIAMETER, AVATAR_SIZE} from '../Avatar';
 export interface AvatarWrapperProps extends React.HTMLProps<HTMLDivElement> {
   avatarSize: AVATAR_SIZE;
   color: string;
-  responsive?: boolean;
+  isResponsive?: boolean;
 }
 
 const AvatarWrapper: React.FunctionComponent<AvatarWrapperProps> = ({
   color,
   avatarSize,
-  responsive = false,
+  isResponsive = false,
   ...props
 }) => {
-  const avatarDiameter = responsive ? `${DIAMETER[avatarSize] / 16}rem` : DIAMETER[avatarSize];
+  const avatarDiameter = isResponsive ? `${DIAMETER[avatarSize] / 16}rem` : DIAMETER[avatarSize];
   return (
     <div
       css={{
