@@ -17,104 +17,106 @@
  *
  */
 
-// input mixin
-.input-box {
-  display: block;
-  width: 100%;
-  height: @button-height;
-  padding: 0 16px;
-  border-radius: @button-border-radius;
-  margin-bottom: 8px;
-  color: #fff;
-  line-height: @button-height;
-  outline: 0;
+body.webapp {
+  // input mixin
+  .input-box {
+    display: block;
+    width: 100%;
+    height: @button-height;
+    padding: 0 16px;
+    border-radius: @button-border-radius;
+    margin-bottom: 8px;
+    color: #fff;
+    line-height: @button-height;
+    outline: 0;
 
-  &::-ms-clear {
-    display: none;
-  }
-}
-
-// input
-.input {
-  .input-box;
-
-  border: none;
-  background-color: fade(#000, 40%);
-
-  &::placeholder {
-    .label-xs;
-
-    color: fade(#fff, 56%);
-  }
-}
-
-.input-select {
-  position: relative;
-
-  select {
-    appearance: none;
-    cursor: pointer;
-
-    // fixes firefox outline
-    // http://stackoverflow.com/questions/3773430/remove-outline-from-select-box-in-ff
-    &:-moz-focusring {
-      color: transparent;
-      text-shadow: 0 0 0 #fff;
-    }
-
-    // hide select box arrow in IE
-    &::-ms-expand {
+    &::-ms-clear {
       display: none;
     }
   }
 
-  span {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: @button-height;
-    height: @button-height;
-    line-height: @button-height;
-    pointer-events: none;
-    text-align: center;
-  }
-}
+  // input
+  .input {
+    .input-box;
 
-.input-group {
-  display: flex;
-  overflow: hidden;
-  border-radius: @button-border-radius;
-  margin-bottom: 8px;
+    border: none;
+    background-color: fade(#000, 40%);
 
-  button,
-  input {
-    border-radius: 0;
-    margin-bottom: 0;
+    &::placeholder {
+      .label-xs;
 
-    &:invalid {
-      box-shadow: none;
+      color: fade(#fff, 56%);
     }
   }
-}
 
-.input-group-button {
-  width: @button-height;
-  flex: 0 0 auto;
-  padding: 0;
-  line-height: @button-height;
+  .input-select {
+    position: relative;
 
-  &.visible {
-    display: block;
+    select {
+      appearance: none;
+      cursor: pointer;
+
+      // fixes firefox outline
+      // http://stackoverflow.com/questions/3773430/remove-outline-from-select-box-in-ff
+      &:-moz-focusring {
+        color: transparent;
+        text-shadow: 0 0 0 #fff;
+      }
+
+      // hide select box arrow in IE
+      &::-ms-expand {
+        display: none;
+      }
+    }
+
+    span {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: @button-height;
+      height: @button-height;
+      line-height: @button-height;
+      pointer-events: none;
+      text-align: center;
+    }
   }
 
-  .has-error &,
-  &:not(.visible) {
-    display: none;
-  }
-}
+  .input-group {
+    display: flex;
+    overflow: hidden;
+    border-radius: @button-border-radius;
+    margin-bottom: 8px;
 
-.input-code {
-  font-size: @font-size-lg;
-  letter-spacing: 8px;
-  text-align: center;
+    button,
+    input {
+      border-radius: 0;
+      margin-bottom: 0;
+
+      &:invalid {
+        box-shadow: none;
+      }
+    }
+  }
+
+  .input-group-button {
+    width: @button-height;
+    flex: 0 0 auto;
+    padding: 0;
+    line-height: @button-height;
+
+    &.visible {
+      display: block;
+    }
+
+    .has-error &,
+    &:not(.visible) {
+      display: none;
+    }
+  }
+
+  .input-code {
+    font-size: @font-size-lg;
+    letter-spacing: 8px;
+    text-align: center;
+  }
 }

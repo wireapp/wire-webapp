@@ -262,6 +262,10 @@ const LoginComponent = ({
     </RouterLink>
   );
 
+  useEffect(() => {
+    document.body.classList.remove('webapp');
+  }, []);
+
   return (
     <Page>
       {(Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ||

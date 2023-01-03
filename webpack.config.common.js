@@ -32,7 +32,6 @@ const auth = path.resolve(SRC_PATH, 'script/auth');
 const srcScript = path.resolve(SRC_PATH, 'script');
 
 const HOME_TEMPLATE_PATH = path.resolve(SRC_PATH, 'page/index.ejs');
-const AUTH_TEMPLATE_PATH = path.resolve(SRC_PATH, 'page/auth.ejs');
 
 const {
   config: {SERVER: serverConfigs, CLIENT: clientConfigs},
@@ -59,7 +58,6 @@ module.exports = {
   devtool: 'source-map',
   entry: {
     app: path.resolve(srcScript, 'main/index.tsx'),
-    auth: path.resolve(auth, 'main.tsx'),
   },
   externals: {
     'fs-extra': '{}',
@@ -160,16 +158,9 @@ module.exports = {
       ],
     }),
     new webpack.IgnorePlugin({resourceRegExp: /.*\.wasm/}),
-    // @todo: We should merge these when main & auth app are merged.
     new HtmlWebpackPlugin({
       inject: false,
       template: HOME_TEMPLATE_PATH,
-      templateParameters,
-    }),
-    new HtmlWebpackPlugin({
-      inject: false,
-      filename: 'auth/index.html',
-      template: AUTH_TEMPLATE_PATH,
       templateParameters,
     }),
   ],

@@ -47,6 +47,7 @@ import '../../style/default.less';
 import {AssetRepository} from '../assets/AssetRepository';
 import {AssetService} from '../assets/AssetService';
 import {AudioRepository} from '../audio/AudioRepository';
+import '../auth/main';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {URLParameter} from '../auth/URLParameter';
 import {BackupRepository} from '../backup/BackupRepository';

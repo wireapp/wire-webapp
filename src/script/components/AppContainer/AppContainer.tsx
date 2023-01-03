@@ -20,10 +20,15 @@
 import {FC, useEffect} from 'react';
 
 import {ClientType} from '@wireapp/api-client/lib/client/';
+import {Navigate} from 'react-router';
 import {container} from 'tsyringe';
+
+import {Runtime} from '@wireapp/commons';
 
 import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
 import {useSingleInstance} from 'src/script/hooks/useSingleInstance';
+import {StorageKey} from 'src/script/storage';
+import {loadValue} from 'Util/StorageUtil';
 
 import {Configuration} from '../../Config';
 import {setAppLocale} from '../../localization/Localizer';
@@ -36,10 +41,9 @@ import {AppLoader} from '../AppLoader';
 
 interface AppProps {
   config: Configuration;
-  clientType: ClientType;
 }
 
-export const AppContainer: FC<AppProps> = ({config, clientType}) => {
+export const AppContainer: FC<AppProps> = ({config}) => {
   setAppLocale();
   const app = new App(container.resolve(Core), container.resolve(APIClient), config);
   // Publishing application on the global scope for debug and testing purposes.
@@ -65,10 +69,28 @@ export const AppContainer: FC<AppProps> = ({config, clientType}) => {
     return () => document.removeEventListener('scroll', resetWindowScroll);
   }, []);
 
+  useEffect(() => {
+    document.body.classList.add('webapp');
+  }, []);
+
   if (hasOtherInstance) {
-    app.redirectToLogin(SIGN_OUT_REASON.MULTIPLE_TABS);
-    return null;
+    return <Navigate to={`/auth/login?reason=${SIGN_OUT_REASON.MULTIPLE_TABS}`} />;
   }
+
+  const enforceDesktopApplication = config.FEATURE.ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY && !Runtime.isDesktopApp();
+
+  if (enforceDesktopApplication) {
+    return <Navigate to={`/auth/login?reason=${SIGN_OUT_REASON.APP_INIT}`} />;
+  }
+
+  const shouldPersist = loadValue<boolean>(StorageKey.AUTH.PERSIST);
+
+  if (shouldPersist === undefined) {
+    return <Navigate to={`/auth/login?reason=${SIGN_OUT_REASON.NOT_SIGNED_IN}`} />;
+  }
+
+  const clientType = shouldPersist ? ClientType.PERMANENT : ClientType.TEMPORARY;
+  console.info('bardia render app container');
 
   return (
     <AppLoader init={onProgress => app.initApp(clientType, onProgress)}>
