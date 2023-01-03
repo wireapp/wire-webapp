@@ -21,7 +21,7 @@ import {FC, useEffect} from 'react';
 
 import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
 import {IntlProvider} from 'react-intl';
-import {Provider, useSelector, useDispatch} from 'react-redux';
+import {Provider, useSelector} from 'react-redux';
 import {HashRouter as Router, Route, Routes} from 'react-router-dom';
 import {container} from 'tsyringe';
 
@@ -56,10 +56,10 @@ import {VerifyEmailLink} from './VerifyEmailLink';
 import {VerifyPhoneCode} from './VerifyPhoneCode';
 
 import {Config} from '../../Config';
-import {configureStore} from '../configureStore';
+import {configureStore, useAppDispatch} from '../configureStore';
 import {mapLanguage, normalizeLanguage} from '../localeConfig';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
-import {ThunkAction, RootState} from '../module/reducer';
+import {RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as LanguageSelector from '../module/selector/LanguageSelector';
 import {ROUTE} from '../route';
@@ -85,7 +85,7 @@ const Title: FC<{title: string; children: React.ReactNode}> = ({title, children}
 };
 
 export const RootComponent: FC<RootProps> = () => {
-  const dispatch = useDispatch<ThunkAction>();
+  const dispatch = useAppDispatch();
   const doGetSSOSettings = () => dispatch(ROOT_ACTIONS.authAction.doGetSSOSettings());
 
   const isAuthenticated = useSelector<RootState, boolean>(AuthSelector.isAuthenticated);

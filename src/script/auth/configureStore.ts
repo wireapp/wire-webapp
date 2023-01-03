@@ -17,6 +17,7 @@
  *
  */
 
+import {useDispatch} from 'react-redux';
 import {Store, applyMiddleware, combineReducers, createStore} from 'redux';
 import {composeWithDevTools} from 'redux-devtools-extension/developmentOnly';
 import thunk from 'redux-thunk';
@@ -56,5 +57,7 @@ const createMiddleware = (thunkArguments: object) => {
   // https://github.com/zalmoxisus/redux-devtools-extension/blob/master/npm-package/developmentOnly.js
   return composeWithDevTools(applyMiddleware(...middlewares));
 };
+
+export const useAppDispatch = () => useDispatch<ThunkDispatch>();
 
 export {configureStore};
