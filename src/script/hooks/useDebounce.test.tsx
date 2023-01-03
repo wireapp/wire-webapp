@@ -22,8 +22,15 @@ import {renderHook, act} from '@testing-library/react';
 import {useDebounce} from './useDebounce';
 
 describe('useDebounce', () => {
-  it('should debounce the callback', () => {
+  beforeAll(() => {
     jest.useFakeTimers();
+  });
+
+  afterAll(() => {
+    jest.useRealTimers();
+  });
+
+  it('should debounce the callback', () => {
     const callback = jest.fn();
     const time = 1000;
 
@@ -41,7 +48,6 @@ describe('useDebounce', () => {
   });
 
   it('should only call the callback once when multiple calls are made within the debounce time', () => {
-    jest.useFakeTimers();
     const callback = jest.fn();
     const time = 1000;
 
@@ -56,7 +62,6 @@ describe('useDebounce', () => {
   });
 
   it('should not call the callback if it is unmounted before the debounce time', () => {
-    jest.useFakeTimers();
     const callback = jest.fn();
     const time = 1000;
 
@@ -70,7 +75,6 @@ describe('useDebounce', () => {
   });
 
   it('should re-run the effect when the dependencies change', () => {
-    jest.useFakeTimers();
     const callback = jest.fn();
     const time = 1000;
     const deps = ['dep1'];
