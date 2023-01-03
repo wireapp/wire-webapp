@@ -30,7 +30,7 @@ describe('useReadReceipt', () => {
     jest.useFakeTimers();
   });
 
-  it('batches the read receipt sending per conversation/sender', async () => {
+  it('batches the read receipt sending per conversation', async () => {
     const sendReadReceipt = jest.fn();
     const {result} = renderHook(() => useReadReceiptSender({sendReadReceipt}));
     const conversation1 = new Conversation(createRandomUuid());
@@ -58,5 +58,31 @@ describe('useReadReceipt', () => {
     expect(sendReadReceipt).toHaveBeenCalledTimes(2);
     jest.runAllTimers();
     expect(sendReadReceipt).toHaveBeenCalledTimes(3);
+  });
+
+  it('batches the read receipt sending per sender', async () => {
+    const sendReadReceipt = jest.fn();
+    const {result} = renderHook(() => useReadReceiptSender({sendReadReceipt}));
+    const conversation = new Conversation(createRandomUuid());
+
+    const sender1 = createRandomUuid();
+    const sender2 = createRandomUuid();
+
+    const firstBatch = [
+      [conversation, sender1],
+      [conversation, sender1],
+      [conversation, sender2],
+      [conversation, sender2],
+    ] as const;
+
+    firstBatch.forEach(([conversation, sender]) => {
+      const message = new Message(createRandomUuid());
+      message.from = sender;
+      result.current.addReadReceiptToBatch(conversation, message);
+    });
+
+    expect(sendReadReceipt).not.toHaveBeenCalled();
+    jest.runAllTimers();
+    expect(sendReadReceipt).toHaveBeenCalledTimes(2);
   });
 });
