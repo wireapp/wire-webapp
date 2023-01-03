@@ -151,7 +151,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
             selfParticipant={selfParticipant}
             participantCount={participants.length}
             isMaximized={!!maximizedParticipant}
-            onParticipantDoubleClick={doubleClickedOnVideo}
+            onTileDoubleClick={doubleClickedOnVideo}
           />
         ))}
       </div>

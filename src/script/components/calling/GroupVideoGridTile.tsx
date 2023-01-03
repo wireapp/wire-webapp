@@ -20,12 +20,14 @@
 import React from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {VIDEO_STATE} from '@wireapp/avs';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {Icon} from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {isEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {Video} from './Video';
@@ -35,7 +37,7 @@ import type {Participant} from '../../calling/Participant';
 export interface GroupVideoGridTileProps {
   isMaximized: boolean;
   minimized: boolean;
-  onParticipantDoubleClick: (userId: QualifiedId, clientId: string) => void;
+  onTileDoubleClick: (userId: QualifiedId, clientId: string) => void;
   participant: Participant;
   participantCount: number;
   selfParticipant: Participant;
@@ -47,7 +49,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
   selfParticipant,
   participantCount,
   isMaximized,
-  onParticipantDoubleClick,
+  onTileDoubleClick,
 }) => {
   const {isMuted, videoState, videoStream, isActivelySpeaking} = useKoSubscribableChildren(participant, [
     'isMuted',
@@ -64,13 +66,24 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
   const activelySpeakingBoxShadow = `inset 0px 0px 0px 1px var(--group-video-bg), inset 0px 0px 0px 4px var(--accent-color), inset 0px 0px 0px 7px var(--app-bg-secondary)`;
   const groupVideoBoxShadow = participantCount > 1 ? 'inset 0px 0px 0px 2px var(--group-video-bg)' : 'initial';
 
+  const handleTileClick = () => onTileDoubleClick(participant?.user.qualifiedId, participant?.clientId);
+
+  const handleEnterTileClick = (keyboardEvent: React.KeyboardEvent) => {
+    if (!isEnterKey(keyboardEvent)) {
+      return;
+    }
+
+    handleTileClick();
+  };
+
   return (
-    <div
+    <button
       data-uie-name="item-grid"
-      css={{position: 'relative'}}
       data-user-id={participant?.user.id}
       className="group-video-grid__element"
-      onDoubleClick={() => onParticipantDoubleClick(participant?.user.qualifiedId, participant?.clientId)}
+      onDoubleClick={handleTileClick}
+      onKeyDown={handleEnterTileClick}
+      tabIndex={isMaximized ? TabIndex.FOCUSABLE : TabIndex.UNFOCUSABLE}
     >
       {hasActiveVideo ? (
         <Video
@@ -98,6 +111,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
           <Avatar avatarSize={minimized ? AVATAR_SIZE.MEDIUM : AVATAR_SIZE.LARGE} participant={participant?.user} />
         </div>
       )}
+
       <div
         css={{
           borderRadius: '8px',
@@ -110,21 +124,25 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
           transition: 'box-shadow 0.3s ease-in-out',
         }}
       />
+
       {!minimized && isMuted && (
         <span className="group-video-grid__element__label__icon">
           <Icon.MicOff data-uie-name="mic-icon-off" />
         </span>
       )}
+
       {isMaximized && (
         <div className="group-video-grid__element__overlay">
           <span className="group-video-grid__element__overlay__label">{t('videoCallOverlayFitVideoLabelGoBack')}</span>
         </div>
       )}
+
       {!minimized && participantCount > 1 && (
         <div className="group-video-grid__element__overlay">
           <span className="group-video-grid__element__overlay__label">{t('videoCallOverlayFitVideoLabel')}</span>
         </div>
       )}
+
       {!minimized && (
         <div
           className="group-video-grid__element__label"
@@ -145,12 +163,14 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
           </span>
         </div>
       )}
+
       {hasPausedVideo && (
         <div className="group-video-grid__pause-overlay">
           <div className="background">
             <div className="background-image"></div>
             <div className="background-darken"></div>
           </div>
+
           <div
             className="group-video-grid__pause-overlay__label"
             css={{fontsize: minimized ? '0.6875rem' : '0.875rem'}}
@@ -160,7 +180,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
           </div>
         </div>
       )}
-    </div>
+    </button>
   );
 };
 
