@@ -80,7 +80,13 @@ describe('Login', () => {
     const password = 'password';
 
     spyOn(actionRoot.authAction, 'doLogin').and.returnValue(() =>
-      Promise.reject(new BackendError({label: BackendError.LABEL.TOO_MANY_CLIENTS, code: StatusCodes.NOT_FOUND})),
+      Promise.reject(
+        new BackendError({
+          label: BackendError.LABEL.TOO_MANY_CLIENTS,
+          code: StatusCodes.NOT_FOUND,
+          message: 'Too may clients',
+        }),
+      ),
     );
 
     const {getByTestId} = mountComponent(
