@@ -17,34 +17,7 @@
  *
  */
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-* {
-  --scrollbar-color: fade(#000, 50%);
-  @scrollbar-size: 7px;
-  scrollbar-color: var(--scrollbar-color) transparent;
-  scrollbar-width: thin;
-  &::-webkit-scrollbar {
-    width: @scrollbar-size;
-    height: @scrollbar-size;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: none;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    border-radius: @scrollbar-size;
-    background-color: var(--scrollbar-color);
-    transition: background-color 1s;
-  }
-}
-
-body {
+body.webapp {
   color: var(--main-color);
   font-family: @font-family-base;
   font-size: @font-size-sm;
@@ -52,64 +25,91 @@ body {
   overflow-x: hidden;
   overflow-y: hidden !important;
   text-rendering: optimizeLegibility;
-}
 
-// Set default icon size
-[class^='icon-'],
-[class*=' icon-'] {
-  font-size: @icon-size-sm;
-}
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
 
-// common focus indicator for all the focusable elements
-* {
-  outline: none;
+  * {
+    --scrollbar-color: fade(#000, 50%);
+    @scrollbar-size: 7px;
+    scrollbar-color: var(--scrollbar-color) transparent;
+    scrollbar-width: thin;
+    &::-webkit-scrollbar {
+      width: @scrollbar-size;
+      height: @scrollbar-size;
+    }
 
-  &:focus-visible {
-    outline: 1px solid #9bc2e9;
+    &::-webkit-scrollbar-track {
+      background: none;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      border-radius: @scrollbar-size;
+      background-color: var(--scrollbar-color);
+      transition: background-color 1s;
+    }
+  }
+
+  input[type='radio']:focus-visible + label {
     .focus-outline;
+    .focus-offset;
     .focus-border-radius;
   }
-}
 
-input[type='radio']:focus-visible + label {
-  .focus-outline;
-  .focus-offset;
-  .focus-border-radius;
-}
-
-a {
-  text-decoration: none;
-}
-
-input[type='text']::-ms-clear {
-  display: none;
-}
-
-pre {
-  direction: ltr;
-
-  code {
-    display: block;
-    overflow: auto;
+  a {
+    text-decoration: none;
   }
-}
 
-// Set the right background color for bubbles
-.bubble {
-  &:after {
-    background: linear-gradient(
-      -45deg,
-      var(--app-bg-secondary),
-      var(--app-bg-secondary) 50%,
-      transparent 0,
-      transparent
-    );
+  input[type='text']::-ms-clear {
+    display: none;
   }
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background-color: transparent;
-}
 
-b,
-strong {
-  font-weight: @font-weight-bold;
+  pre {
+    direction: ltr;
+
+    code {
+      display: block;
+      overflow: auto;
+    }
+  }
+
+  // Set the right background color for bubbles
+  .bubble {
+    &:after {
+      background: linear-gradient(
+        -45deg,
+        var(--app-bg-secondary),
+        var(--app-bg-secondary) 50%,
+        transparent 0,
+        transparent
+      );
+    }
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background-color: transparent;
+  }
+
+  b,
+  strong {
+    font-weight: @font-weight-bold;
+  }
+
+  // Set default icon size
+  [class^='icon-'],
+  [class*=' icon-'] {
+    font-size: @icon-size-sm;
+  }
+
+  // common focus indicator for all the focusable elements
+  * {
+    outline: none;
+
+    &:focus-visible {
+      outline: 1px solid #9bc2e9;
+      .focus-outline;
+      .focus-border-radius;
+    }
+  }
 }

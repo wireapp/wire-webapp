@@ -45,6 +45,7 @@ import '../../style/default.less';
 import {AssetRepository} from '../assets/AssetRepository';
 import {AssetService} from '../assets/AssetService';
 import {AudioRepository} from '../audio/AudioRepository';
+import '../auth/main';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {URLParameter} from '../auth/URLParameter';
 import {BackupRepository} from '../backup/BackupRepository';
@@ -103,6 +104,12 @@ import {UserService} from '../user/UserService';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
 import {ThemeViewModel} from '../view_model/ThemeViewModel';
 import {Warnings} from '../view_model/WarningsContainer';
+
+// Catch localStorage access for disabled cookie scenario
+let localStorage: any;
+try {
+  localStorage = window.localStorage;
+} catch (error) {}
 
 export function doRedirect(signOutReason: SIGN_OUT_REASON) {
   let url = `/auth/${location.search}`;

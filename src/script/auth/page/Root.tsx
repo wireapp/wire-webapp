@@ -21,12 +21,15 @@ import {FC, useEffect} from 'react';
 
 import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
 import {IntlProvider} from 'react-intl';
-import {connect} from 'react-redux';
-import {HashRouter as Router, Navigate, Route, Routes} from 'react-router-dom';
-import {AnyAction, Dispatch} from 'redux';
+import {Provider, useSelector, useDispatch} from 'react-redux';
+import {HashRouter as Router, Route, Routes} from 'react-router-dom';
+import {container} from 'tsyringe';
 
 import {ContainerXS, Loading, StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
+import {AppContainer} from 'Components/AppContainer';
+import {APIClient} from 'src/script/service/APIClientSingleton';
+import {Core} from 'src/script/service/CoreSingleton';
 import {t} from 'Util/LocalizerUtil';
 
 import {CheckPassword} from './CheckPassword';
@@ -53,14 +56,26 @@ import {VerifyEmailLink} from './VerifyEmailLink';
 import {VerifyPhoneCode} from './VerifyPhoneCode';
 
 import {Config} from '../../Config';
+import {configureStore} from '../configureStore';
 import {mapLanguage, normalizeLanguage} from '../localeConfig';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
-import {bindActionCreators, RootState} from '../module/reducer';
+import {ThunkAction, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as LanguageSelector from '../module/selector/LanguageSelector';
 import {ROUTE} from '../route';
 
 interface RootProps {}
+
+const apiClient = container.resolve(APIClient);
+const core = container.resolve(Core);
+
+const store = configureStore({
+  actions: ROOT_ACTIONS,
+  apiClient,
+  core,
+  getConfig: Config.getConfig,
+  localStorage,
+});
 
 const Title: FC<{title: string; children: React.ReactNode}> = ({title, children}) => {
   useEffect(() => {
@@ -69,12 +84,16 @@ const Title: FC<{title: string; children: React.ReactNode}> = ({title, children}
   return <>{children}</>;
 };
 
-const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
-  isAuthenticated,
-  language,
-  isFetchingSSOSettings,
-  doGetSSOSettings,
-}) => {
+export const RootComponent: FC<RootProps> = () => {
+  const dispatch = useDispatch<ThunkAction>();
+  const doGetSSOSettings = () => dispatch(ROOT_ACTIONS.authAction.doGetSSOSettings());
+
+  const isAuthenticated = useSelector<RootState, boolean>(AuthSelector.isAuthenticated);
+  const language = useSelector<RootState, ReturnType<typeof LanguageSelector.getLanguage>>(
+    LanguageSelector.getLanguage,
+  );
+  const isFetchingSSOSettings = useSelector<RootState>(AuthSelector.isFetchingSSOSettings);
+
   useEffect(() => {
     // Force the hash url to have a initial `/` (see https://stackoverflow.com/a/71864506)
     const forceSlashAfterHash = () => {
@@ -116,6 +135,10 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
   const ProtectedSetPassword = () => isAuthenticatedCheck(<SetPassword />);
 
   const brandName = Config.getConfig().BRAND_NAME;
+  const config = Config.getConfig();
+
+  console.info('bardia render');
+
   return (
     <IntlProvider locale={normalizeLanguage(language)} messages={loadLanguage(language)}>
       <StyledApp themeId={THEME_ID.DEFAULT} style={{display: 'flex', height: '100%', minHeight: '100vh'}}>
@@ -127,7 +150,7 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
           <Router>
             <Routes>
               <Route
-                path={ROUTE.INDEX}
+                path={ROUTE.AUTH}
                 element={
                   <Title title={`${t('authLandingPageTitleP1')} ${brandName} . ${t('authLandingPageTitleP2')}`}>
                     <Index />
@@ -203,7 +226,7 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
               {Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
                 <Route path={ROUTE.CREATE_TEAM_ACCOUNT} element={<CreateAccount />} />
               )}
-              <Route path="*" element={<Navigate to={ROUTE.INDEX} replace />} />
+              <Route path={ROUTE.INDEX} element={<AppContainer config={config} />} />
             </Routes>
           </Router>
         )}
@@ -212,22 +235,10 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
   );
 };
 
-type ConnectedProps = ReturnType<typeof mapStateToProps>;
-const mapStateToProps = (state: RootState) => ({
-  isAuthenticated: AuthSelector.isAuthenticated(state),
-  isFetchingSSOSettings: AuthSelector.isFetchingSSOSettings(state),
-  language: LanguageSelector.getLanguage(state),
-});
-
-type DispatchProps = ReturnType<typeof mapDispatchToProps>;
-const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
-  bindActionCreators(
-    {
-      doGetSSOSettings: ROOT_ACTIONS.authAction.doGetSSOSettings,
-    },
-    dispatch,
+export function Root() {
+  return (
+    <Provider store={store}>
+      <RootComponent />
+    </Provider>
   );
-
-const Root = connect(mapStateToProps, mapDispatchToProps)(RootComponent);
-
-export {Root};
+}
