@@ -72,7 +72,7 @@ const CreatePersonalAccountComponent = ({
   );
   const backArrow = (
     <RouterLink
-      to={isMacOsWrapper ? ROUTE.INDEX : ROUTE.SET_ACCOUNT_TYPE}
+      to={isMacOsWrapper ? ROUTE.AUTH : ROUTE.SET_ACCOUNT_TYPE}
       data-uie-name="go-index"
       aria-label={_(createPersonalAccountStrings.goBack)}
     >

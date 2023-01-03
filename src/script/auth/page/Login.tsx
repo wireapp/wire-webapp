@@ -263,7 +263,7 @@ const LoginComponent = ({
   };
 
   const backArrow = (
-    <RouterLink to={ROUTE.INDEX} data-uie-name="go-index" aria-label={_(loginStrings.goBack)}>
+    <RouterLink to={ROUTE.AUTH} data-uie-name="go-index" aria-label={_(loginStrings.goBack)}>
       <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
     </RouterLink>
   );
