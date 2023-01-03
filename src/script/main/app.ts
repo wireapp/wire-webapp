@@ -107,6 +107,12 @@ import {ViewModelRepositories} from '../view_model/MainViewModel';
 import {ThemeViewModel} from '../view_model/ThemeViewModel';
 import {Warnings} from '../view_model/WarningsContainer';
 
+// Catch localStorage access for disabled cookie scenario
+let localStorage: any;
+try {
+  localStorage = window.localStorage;
+} catch (error) {}
+
 export function doRedirect(signOutReason: SIGN_OUT_REASON) {
   let url = `/auth/${location.search}`;
 

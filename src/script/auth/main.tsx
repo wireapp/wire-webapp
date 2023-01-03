@@ -26,9 +26,3 @@ import {exposeWrapperGlobals} from 'Util/wrapper';
 import './configureEnvironment';
 
 exposeWrapperGlobals();
-
-let localStorage;
-try {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  localStorage = window.localStorage;
-} catch (error) {}
