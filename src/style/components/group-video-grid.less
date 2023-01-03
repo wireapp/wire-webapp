@@ -98,6 +98,10 @@
       padding: 0;
       border: none;
 
+      &:focus {
+        z-index: 1;
+      }
+
       &__overlay {
         position: absolute;
         top: 0;
@@ -133,7 +137,6 @@
       }
 
       &-video {
-        position: absolute;
         width: 100%;
         height: 100%;
         border-radius: 8px;

@@ -77,7 +77,6 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
   return (
     <button
       data-uie-name="item-grid"
-      css={{position: 'relative'}}
       data-user-id={participant?.user.id}
       className="group-video-grid__element"
       onDoubleClick={handleTileClick}
