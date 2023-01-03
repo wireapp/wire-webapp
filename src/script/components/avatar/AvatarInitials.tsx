@@ -36,7 +36,7 @@ const AvatarInitials: FC<AvatarInitialsProps> = ({avatarSize, initials, color = 
     css={{
       ...CSS_FILL_PARENT,
       color,
-      fontSize: INITIALS_SIZE[avatarSize],
+      fontSize: responsive ? `${INITIALS_SIZE[avatarSize] / 16}rem` : `${INITIALS_SIZE[avatarSize]}px`,
       lineHeight: responsive ? `${DIAMETER[avatarSize] / 16}rem` : `${DIAMETER[avatarSize]}px`,
       textAlign: 'center',
       userSelect: 'none',
