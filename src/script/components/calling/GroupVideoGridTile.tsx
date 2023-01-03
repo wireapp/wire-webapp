@@ -69,16 +69,15 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
   const handleTileClick = () => onTileDoubleClick(participant?.user.qualifiedId, participant?.clientId);
 
   const handleEnterTileClick = (keyboardEvent: React.KeyboardEvent) => {
-    if (!isEnterKey(keyboardEvent)) {
-      return;
+    if (isEnterKey(keyboardEvent)) {
+      handleTileClick();
     }
-
-    handleTileClick();
   };
 
   return (
     <button
       data-uie-name="item-grid"
+      css={{position: 'relative'}}
       data-user-id={participant?.user.id}
       className="group-video-grid__element"
       onDoubleClick={handleTileClick}
