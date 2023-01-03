@@ -84,7 +84,7 @@ describe('Login', () => {
         new BackendError({
           label: BackendError.LABEL.TOO_MANY_CLIENTS,
           code: StatusCodes.NOT_FOUND,
-          message: 'Too may clients',
+          message: 'Too many clients',
         }),
       ),
     );
