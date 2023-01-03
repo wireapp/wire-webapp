@@ -38,7 +38,6 @@ export enum AVATAR_SIZE {
   X_SMALL = 'avatar-xs',
   XX_SMALL = 'avatar-xxs',
   XXX_SMALL = 'avatar-xxxs',
-  RESPONSIVE = 'avatar-responsive',
 }
 
 export enum STATE {
@@ -59,7 +58,6 @@ export const DIAMETER = {
   [AVATAR_SIZE.X_SMALL]: 24,
   [AVATAR_SIZE.XX_SMALL]: 20,
   [AVATAR_SIZE.XXX_SMALL]: 16,
-  [AVATAR_SIZE.RESPONSIVE]: 'var(--icon-size-sm)',
 };
 
 export const INITIALS_SIZE = {
@@ -70,16 +68,16 @@ export const INITIALS_SIZE = {
   [AVATAR_SIZE.X_SMALL]: '11px',
   [AVATAR_SIZE.XX_SMALL]: '11px',
   [AVATAR_SIZE.XXX_SMALL]: '8px',
-  [AVATAR_SIZE.RESPONSIVE]: 'var(--icon-size-sm)',
 };
 
 export interface AvatarProps extends HTMLProps<HTMLDivElement> {
+  participant: User | ServiceEntity;
   avatarSize?: AVATAR_SIZE;
   avatarAlt?: string;
   noBadge?: boolean;
   noFilter?: boolean;
+  responsive?: boolean;
   onAvatarClick?: (participant: User | ServiceEntity, target: Node) => void;
-  participant: User | ServiceEntity;
 }
 
 const Avatar: FC<AvatarProps> = ({
@@ -88,6 +86,7 @@ const Avatar: FC<AvatarProps> = ({
   noFilter = false,
   onAvatarClick,
   participant,
+  responsive = false,
   ...props
 }) => {
   const handleAvatarInteraction = (

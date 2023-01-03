@@ -28,15 +28,16 @@ export interface AvatarInitialsProps {
   avatarSize: AVATAR_SIZE;
   initials: string;
   color?: string;
+  responsive?: boolean;
 }
 
-const AvatarInitials: FC<AvatarInitialsProps> = ({avatarSize, initials, color = '#fff'}) => (
+const AvatarInitials: FC<AvatarInitialsProps> = ({avatarSize, initials, color = '#fff', responsive = false}) => (
   <div
     css={{
       ...CSS_FILL_PARENT,
       color,
       fontSize: INITIALS_SIZE[avatarSize],
-      lineHeight: `${DIAMETER[avatarSize]}px`,
+      lineHeight: responsive ? `${DIAMETER[avatarSize] / 16}rem` : `${DIAMETER[avatarSize]}px`,
       textAlign: 'center',
       userSelect: 'none',
     }}

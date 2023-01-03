@@ -55,7 +55,8 @@ const TypingIndicator: FC<TypingIndicatorProps> = ({conversationId}) => {
             className="cursor-default"
             style={index > 0 ? {marginLeft: -8} : {}}
             participant={user}
-            avatarSize={AVATAR_SIZE.RESPONSIVE}
+            avatarSize={AVATAR_SIZE.XXX_SMALL}
+            responsive
           />
         ))}
       </div>

@@ -26,22 +26,31 @@ import {DIAMETER, AVATAR_SIZE} from '../Avatar';
 export interface AvatarWrapperProps extends React.HTMLProps<HTMLDivElement> {
   avatarSize: AVATAR_SIZE;
   color: string;
+  responsive?: boolean;
 }
 
-const AvatarWrapper: React.FunctionComponent<AvatarWrapperProps> = ({color, avatarSize, ...props}) => (
-  <div
-    css={{
-      ...CSS_SQUARE(DIAMETER[avatarSize]),
-      color,
-      display: 'inline-block',
-      overflow: 'hidden',
-      position: 'relative',
-      transform: 'translateZ(0)',
-      userSelect: 'none',
-    }}
-    role="button"
-    {...props}
-  />
-);
+const AvatarWrapper: React.FunctionComponent<AvatarWrapperProps> = ({
+  color,
+  avatarSize,
+  responsive = false,
+  ...props
+}) => {
+  const avatarDiameter = responsive ? `${DIAMETER[avatarSize] / 16}rem` : DIAMETER[avatarSize];
+  return (
+    <div
+      css={{
+        ...CSS_SQUARE(avatarDiameter),
+        color,
+        display: 'inline-block',
+        overflow: 'hidden',
+        position: 'relative',
+        transform: 'translateZ(0)',
+        userSelect: 'none',
+      }}
+      role="button"
+      {...props}
+    />
+  );
+};
 
 export {AvatarWrapper};
