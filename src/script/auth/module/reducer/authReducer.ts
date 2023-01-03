@@ -18,6 +18,7 @@
  */
 
 import type {SSOSettings} from '@wireapp/api-client/lib/account/SSOSettings';
+import {LoginData} from '@wireapp/api-client/lib/auth';
 import {ClientType} from '@wireapp/api-client/lib/client/';
 import type {TeamData} from '@wireapp/api-client/lib/team/';
 import type {UserAsset} from '@wireapp/api-client/lib/user/';
@@ -42,10 +43,7 @@ export interface RegistrationDataState {
   termsAccepted: boolean;
 }
 
-export interface LoginDataState {
-  clientType: ClientType;
-  phone?: string;
-}
+export type LoginDataState = Pick<LoginData, 'clientType' | 'phone'>;
 
 export type AuthState = {
   readonly account: RegistrationDataState;
