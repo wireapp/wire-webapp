@@ -17,7 +17,7 @@
  *
  */
 
-import {renderHook, act} from '@testing-library/react';
+import {renderHook} from '@testing-library/react';
 
 import {useDebounce} from './useDebounce';
 
@@ -36,14 +36,10 @@ describe('useDebounce', () => {
 
     renderHook(() => useDebounce(callback, time));
 
-    act(() => {
-      jest.advanceTimersByTime(time - 1);
-    });
+    jest.advanceTimersByTime(time - 1);
     expect(callback).not.toHaveBeenCalled();
 
-    act(() => {
-      jest.advanceTimersByTime(1);
-    });
+    jest.advanceTimersByTime(1);
     expect(callback).toHaveBeenCalled();
   });
 
@@ -53,11 +49,9 @@ describe('useDebounce', () => {
 
     renderHook(() => useDebounce(callback, time));
 
-    act(() => {
-      jest.advanceTimersByTime(200);
-      jest.advanceTimersByTime(800);
-      jest.advanceTimersByTime(200);
-    });
+    jest.advanceTimersByTime(200);
+    jest.advanceTimersByTime(800);
+    jest.advanceTimersByTime(200);
     expect(callback).toHaveBeenCalledTimes(1);
   });
 
@@ -67,10 +61,8 @@ describe('useDebounce', () => {
 
     const {unmount} = renderHook(() => useDebounce(callback, time));
 
-    act(() => {
-      unmount();
-      jest.advanceTimersByTime(1500);
-    });
+    unmount();
+    jest.advanceTimersByTime(1500);
     expect(callback).not.toHaveBeenCalled();
   });
 
@@ -83,15 +75,16 @@ describe('useDebounce', () => {
       initialProps: {deps},
     });
 
-    act(() => {
-      jest.advanceTimersByTime(500);
-    });
+    jest.advanceTimersByTime(500);
     expect(callback).not.toHaveBeenCalled();
 
-    act(() => {
-      rerender({deps: ['dep2']});
-      jest.advanceTimersByTime(500);
-    });
+    rerender({deps: ['dep2']});
+
+    // Re-render will clear the current timeout so need to wait for 1000ms for the callback to be called
+    jest.advanceTimersByTime(500);
+    expect(callback).not.toHaveBeenCalled();
+
+    jest.advanceTimersByTime(500);
     expect(callback).toHaveBeenCalled();
   });
 });
