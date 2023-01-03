@@ -53,7 +53,7 @@ const SetAccountType = ({}: Props) => {
   const isMacOsWrapper = Runtime.isDesktopApp() && Runtime.isMacOS();
 
   const backArrow = (
-    <RouterLink to={ROUTE.INDEX} data-uie-name="go-index" aria-label={_(setAccountTypeStrings.goBack)}>
+    <RouterLink to={ROUTE.AUTH} data-uie-name="go-index" aria-label={_(setAccountTypeStrings.goBack)}>
       <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
     </RouterLink>
   );
@@ -78,7 +78,7 @@ const SetAccountType = ({}: Props) => {
         </IsMobile>
       )}
       {!Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
-        <Navigate to={pathWithParams(ROUTE.INDEX)} replace data-uie-name="redirect-login" />
+        <Navigate to={pathWithParams(ROUTE.AUTH)} replace data-uie-name="redirect-login" />
       )}
       {isMacOsWrapper && (
         <Navigate to={pathWithParams(ROUTE.CREATE_ACCOUNT)} replace data-uie-name="redirect-register-personal" />

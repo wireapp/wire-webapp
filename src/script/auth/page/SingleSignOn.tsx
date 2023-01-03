@@ -200,7 +200,7 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
   };
 
   const backArrow = (
-    <RouterLink to={ROUTE.INDEX} data-uie-name="go-login">
+    <RouterLink to={ROUTE.AUTH} data-uie-name="go-login">
       <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
     </RouterLink>
   );
