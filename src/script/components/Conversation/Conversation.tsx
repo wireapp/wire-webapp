@@ -17,11 +17,11 @@
  *
  */
 
-import {FC, UIEvent, useCallback, useEffect, useState} from 'react';
+import {FC, UIEvent, useCallback, useRef, useState} from 'react';
 
 import cx from 'classnames';
 import {container} from 'tsyringe';
-import {groupBy} from 'underscore';
+import {debounce, groupBy} from 'underscore';
 
 import {useMatchMedia} from '@wireapp/react-ui-kit';
 
@@ -94,7 +94,7 @@ export const Conversation: FC<ConversationProps> = ({
   const [inputValue, setInputValue] = useState<string>('');
   const [isGiphyModalOpen, setIsGiphyModalOpen] = useState<boolean>(false);
 
-  const [readMessagesBuffer, setReadMessagesBuffer] = useState<ReadMessageBuffer[]>([]);
+  const readMessagesBuffer = useRef<ReadMessageBuffer[]>([]);
 
   const conversationState = container.resolve(ConversationState);
   const callState = container.resolve(CallState);
@@ -113,26 +113,27 @@ export const Conversation: FC<ConversationProps> = ({
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
   const smBreakpoint = useMatchMedia('max-width: 640px');
 
-  useEffect(() => {
-    if (readMessagesBuffer.length) {
-      const groupedMessagesTest = groupBy(
-        readMessagesBuffer,
-        ({conversation, message}) => conversation.id + message.from,
-      );
+  const sendReadReceiptBatch = useCallback(
+    debounce(() => {
+      const readMessages = readMessagesBuffer.current;
+      if (readMessages.length) {
+        const groupedMessagesTest = groupBy(readMessages, ({conversation, message}) => conversation.id + message.from);
 
-      Object.values(groupedMessagesTest).forEach(readMessagesBatch => {
-        const poppedMessage = readMessagesBatch.pop();
+        Object.values(groupedMessagesTest).forEach(readMessagesBatch => {
+          const [firstEntry, ...otherEntries] = readMessagesBatch;
 
-        if (poppedMessage) {
-          const {conversation, message: firstMessage} = poppedMessage;
-          const otherMessages = readMessagesBatch.map(({message}) => message);
-          repositories.message.sendReadReceipt(conversation, firstMessage, otherMessages);
-        }
-      });
+          if (firstEntry) {
+            const {conversation, message: firstMessage} = firstEntry;
+            const otherMessageIds = otherEntries.map(({message}) => message);
+            repositories.message.sendReadReceipt(conversation, firstMessage, otherMessageIds);
+          }
+        });
 
-      setReadMessagesBuffer([]);
-    }
-  }, [readMessagesBuffer.length]);
+        readMessagesBuffer.current = [];
+      }
+    }, 500),
+    [],
+  );
 
   const uploadImages = useCallback(
     (images: File[]) => {
@@ -420,9 +421,17 @@ export const Conversation: FC<ConversationProps> = ({
       }
     }
 
-    const sendReadReceipt = () => {
+    const batchReadReceipt = () => {
       // add the message in the buffer of read messages (actual read receipt will be sent in the next batch)
-      setReadMessagesBuffer(prevState => [...prevState, {conversation: conversationEntity, message: messageEntity}]);
+      const hasBatchedReadReceipts = readMessagesBuffer.current.some(
+        readReceipt => readReceipt.message.id === messageEntity.id,
+      );
+      if (hasBatchedReadReceipts) {
+        return;
+      }
+      const entry = {conversation: conversationEntity, message: messageEntity};
+      readMessagesBuffer.current = readMessagesBuffer.current.concat(entry);
+      sendReadReceiptBatch();
     };
 
     const updateLastRead = () => {
@@ -462,7 +471,7 @@ export const Conversation: FC<ConversationProps> = ({
     if (isUnreadMessage && isNotOwnMessage) {
       callbacks.push(updateLastRead);
       if (shouldSendReadReceipt) {
-        callbacks.push(sendReadReceipt);
+        callbacks.push(batchReadReceipt);
       }
     }
 
