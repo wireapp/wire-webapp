@@ -161,6 +161,8 @@ const Login = ({
   const immediateLogin = async () => {
     try {
       await doInit({isImmediateLogin: true, shouldValidateLocalClient: false});
+      // Try to initialize to check if the client needs 2fa before checking for entropyData
+      await doInitializeClient(ClientType.PERMANENT, undefined, undefined, undefined);
       const entropyData = await getEntropy?.();
       await doInitializeClient(ClientType.PERMANENT, undefined, undefined, entropyData);
       return history.push(ROUTE.HISTORY_INFO);
