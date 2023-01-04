@@ -260,7 +260,7 @@
   "clientManager.subhead": "Bu cihazda {brandName}’ı kullanabilmek için diğer cihazlarınızdan birini kaldırınız.",
   "collectionSectionAudio": "Audio",
   "collectionSectionFiles": "Dosyalar",
-  "collectionSectionImages": "Resimler",
+  "collectionSectionImages": "Images",
   "collectionSectionLinks": "Bağlantılar",
   "collectionShowAll": "{{number}}’nun tümünü göster",
   "connectionRequestConnect": "Bağlan",

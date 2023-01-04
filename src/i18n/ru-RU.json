@@ -260,7 +260,7 @@
   "clientManager.subhead": "Удалите одно из ваших устройств, чтобы начать использовать {brandName} на этом.",
   "collectionSectionAudio": "Аудио",
   "collectionSectionFiles": "Файлы",
-  "collectionSectionImages": "Изображения",
+  "collectionSectionImages": "Images",
   "collectionSectionLinks": "Ссылки",
   "collectionShowAll": "Показать все {{number}}",
   "connectionRequestConnect": "Связаться",

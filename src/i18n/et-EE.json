@@ -260,7 +260,7 @@
   "clientManager.subhead": "Eemalda üks oma teistest seadmetest, et sellel {brandName}’i kasutada.",
   "collectionSectionAudio": "Audio",
   "collectionSectionFiles": "Failid",
-  "collectionSectionImages": "Pildid",
+  "collectionSectionImages": "Images",
   "collectionSectionLinks": "Lingid",
   "collectionShowAll": "Kuva kõik {{number}}",
   "connectionRequestConnect": "Ühendu",
