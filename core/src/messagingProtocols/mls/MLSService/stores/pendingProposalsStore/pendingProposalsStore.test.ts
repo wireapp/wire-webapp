@@ -19,14 +19,10 @@
 
 import {PendingProposalsParams, pendingProposalsStore} from './pendingProposalsStore';
 
-import {storageMock} from '../stores.mock';
-
 const mockEntries: PendingProposalsParams[] = [
   {groupId: 'group0', firingDate: 1},
   {groupId: 'group1', firingDate: 2},
 ];
-// Storage Mock
-(global as any).localStorage = storageMock();
 
 describe('pendingProposalsStore', () => {
   it('adds and retrieves items to/from dates store', () => {

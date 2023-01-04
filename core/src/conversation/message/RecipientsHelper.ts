@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2022 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,16 +17,18 @@
  *
  */
 
-const baseConfig = require('../../jest.config.base');
+import {OTRClientMap, OTRRecipients} from '@wireapp/api-client/lib/conversation/';
+import {Encoder} from 'bazinga64';
 
-const {TextDecoder, TextEncoder} = require('util');
-
-module.exports = {
-  ...baseConfig,
-  testEnvironment: 'node',
-  setupFilesAfterEnv: ['./jest.setup.ts'],
-  globals: {
-    TextDecoder,
-    TextEncoder,
-  },
-};
+export function recipientsToBase64(recipients: OTRRecipients<Uint8Array>): OTRRecipients<string> {
+  return Object.fromEntries(
+    Object.entries(recipients).map(([userId, otrClientMap]) => {
+      const otrClientMapWithBase64: OTRClientMap<string> = Object.fromEntries(
+        Object.entries(otrClientMap).map(([clientId, payload]) => {
+          return [clientId, Encoder.toBase64(payload).asString];
+        }),
+      );
+      return [userId, otrClientMapWithBase64];
+    }),
+  );
+}

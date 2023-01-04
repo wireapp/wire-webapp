@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,24 +19,16 @@
 
 import {CRUDEngine} from '@wireapp/store-engine';
 
-export enum DatabaseStores {
-  AMPLIFY = 'amplify',
-  CLIENTS = 'clients',
-  KEYS = 'keys',
-  PRE_KEYS = 'prekeys',
-  SESSIONS = 'sessions',
-  GROUP_IDS = 'group_ids',
-}
+/** all the tables in the database that stores information relative to the client identity */
+const IDENTITY_STORES = ['amplify', 'clients', 'keys', 'prekeys', 'sessions', 'group_ids'] as const;
 
-export class CryptographyDatabaseRepository {
-  public static readonly STORES = DatabaseStores;
-
-  constructor(private readonly storeEngine: CRUDEngine) {}
-
-  public deleteStores(): Promise<boolean[]> {
-    return Promise.all(
-      //make sure we use enum's lowercase values, not uppercase keys
-      Object.values(CryptographyDatabaseRepository.STORES).map(store => this.storeEngine.deleteAll(store)),
-    );
-  }
+/**
+ * Will remove any information relative to the client identity.
+ * @param storeEngine The engine that currently holds the identity information
+ */
+export function deleteIdentity(storeEngine: CRUDEngine): Promise<boolean[]> {
+  return Promise.all(
+    //make sure we use enum's lowercase values, not uppercase keys
+    IDENTITY_STORES.map(store => storeEngine.deleteAll(store)),
+  );
 }

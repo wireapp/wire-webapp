@@ -18,30 +18,25 @@
  */
 
 /* eslint-disable import/order */
-import * as GenericMessageParams from './Utility/getGenericMessageParams';
+import * as GenericMessageParams from '../Utility/getGenericMessageParams';
 
-import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client';
+import {ClientClassification} from '@wireapp/api-client/lib/client';
 import {Conversation, ConversationProtocol, NewConversation} from '@wireapp/api-client/lib/conversation';
-
-import {APIClient} from '@wireapp/api-client';
-import {MemoryEngine} from '@wireapp/store-engine';
-
-import {ProteusService} from './ProteusService';
 
 import {MessageSendingState} from '../../../conversation';
 import {buildTextMessage} from '../../../conversation/message/MessageBuilder';
-import {CryptographyService} from '../../../cryptography';
-import {getUUID} from '../../../test/PayloadHelper';
+import {buildProteusService} from './ProteusService.mocks';
 
-jest.mock('./Utility/getGenericMessageParams', () => {
+jest.mock('../Utility/getGenericMessageParams', () => {
   return {
     getGenericMessageParams: jest.fn(),
   };
 });
 const MockedGenericMessageParams = GenericMessageParams as jest.Mocked<typeof GenericMessageParams>;
 
-const buildProteusService = (federated: boolean = false) => {
-  const apiClient = new APIClient({urls: APIClient.BACKEND.STAGING});
+const prepareProteusService = async () => {
+  const [proteusService, {apiClient}] = await buildProteusService();
+
   jest.spyOn(apiClient.api.user, 'postListClients').mockImplementation(() =>
     Promise.resolve({
       qualified_user_map: {
@@ -59,23 +54,14 @@ const buildProteusService = (federated: boolean = false) => {
     .spyOn(apiClient.api.conversation, 'postConversation')
     .mockImplementation(data => Promise.resolve(data as Conversation));
 
-  apiClient.context = {
-    clientType: ClientType.NONE,
-    userId: getUUID(),
-    clientId: getUUID(),
-  };
-
-  const cryptographyService = new CryptographyService(apiClient, new MemoryEngine(), {
-    useQualifiedIds: false,
-    nbPrekeys: 1,
-  });
-  return new ProteusService(apiClient, cryptographyService, {useQualifiedIds: federated});
+  return proteusService;
 };
 
 describe('sendGenericMessage', () => {
   describe('targetted messages', () => {
     it(`indicates when sending was canceled`, async () => {
-      const proteusService = buildProteusService();
+      const proteusService = await prepareProteusService();
+
       MockedGenericMessageParams.getGenericMessageParams.mockResolvedValue({
         error: true,
       } as any);
@@ -103,7 +89,7 @@ describe('createConversation', () => {
       users: ['user1', 'user2'],
     };
     it('when a new conversation object is given', async () => {
-      const proteusService = buildProteusService();
+      const proteusService = await prepareProteusService();
       const conversationData = createConversationResult as unknown as NewConversation;
       const returnData = await proteusService.createConversation({conversationData});
 
@@ -111,7 +97,7 @@ describe('createConversation', () => {
     });
 
     it('create a new conversation with no name', async () => {
-      const proteusService = buildProteusService();
+      const proteusService = await prepareProteusService();
       const otherUserIds = ['user1', 'user2'];
       const conversationData = {users: ['user1', 'user2'], receipt_mode: null};
       const returnData = await proteusService.createConversation({conversationData, otherUserIds});
@@ -120,7 +106,8 @@ describe('createConversation', () => {
     });
 
     it('when a conversation string and userIds are given', async () => {
-      const proteusService = buildProteusService();
+      const proteusService = await prepareProteusService();
+
       const otherUserIds = ['user1', 'user2'];
       const conversationData = 'test';
       const returnData = await proteusService.createConversation({conversationData, otherUserIds});

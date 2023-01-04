@@ -17,8 +17,13 @@
  *
  */
 
+import 'fake-indexeddb/auto';
+
+import nodeCrypto from 'crypto';
+
+// Storage Mock
 function storageMock() {
-  const storage: any = {};
+  let storage: any = {};
 
   return {
     setItem: function (key: any, value: any) {
@@ -37,7 +42,15 @@ function storageMock() {
       const keys = Object.keys(storage);
       return keys[i] || null;
     },
+    clear() {
+      storage = {};
+    },
   };
 }
 
-export {storageMock};
+// @ts-ignore
+global.localStorage = storageMock();
+// @ts-ignore
+global.crypto = nodeCrypto.webcrypto;
+global.btoa = (text: string) => Buffer.from(text).toString('base64');
+global.atob = (base64: string) => Buffer.from(base64, 'base64').toString();

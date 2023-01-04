@@ -23,7 +23,7 @@ import {CRUDEngine} from '@wireapp/store-engine';
 
 import {MetaClient} from './ClientService';
 
-import {CryptographyService} from '../cryptography/';
+import {constructSessionId} from '../messagingProtocols/proteus/Utility/SessionHandler';
 
 export enum DatabaseStores {
   CLIENTS = 'clients',
@@ -36,7 +36,7 @@ export class ClientDatabaseRepository {
     LOCAL_IDENTITY: 'local_identity',
   };
 
-  constructor(private readonly storeEngine: CRUDEngine, private readonly cryptographyService: CryptographyService) {}
+  constructor(private readonly storeEngine: CRUDEngine, private readonly useQualifiedIds: boolean) {}
 
   public getLocalClient(): Promise<MetaClient> {
     return this.getClient(ClientDatabaseRepository.KEYS.LOCAL_IDENTITY);
@@ -86,7 +86,12 @@ export class ClientDatabaseRepository {
     const transformedClient = this.transformClient(userId, client, false, domain);
     await this.storeEngine.update(
       ClientDatabaseRepository.STORES.CLIENTS,
-      this.cryptographyService.constructSessionId(userId, client.id, domain),
+      constructSessionId({
+        userId,
+        clientId: client.id,
+        domain,
+        useQualifiedIds: this.useQualifiedIds,
+      }),
       transformedClient,
     );
     return transformedClient;
@@ -96,7 +101,12 @@ export class ClientDatabaseRepository {
     const transformedClient = this.transformClient(userId, client, false, domain);
     await this.storeEngine.create(
       ClientDatabaseRepository.STORES.CLIENTS,
-      this.cryptographyService.constructSessionId(userId, client.id, domain),
+      constructSessionId({
+        userId,
+        clientId: client.id,
+        domain,
+        useQualifiedIds: this.useQualifiedIds,
+      }),
       transformedClient,
     );
     return transformedClient;
@@ -108,7 +118,12 @@ export class ClientDatabaseRepository {
       domain,
       meta: {
         is_verified: verified,
-        primary_key: this.cryptographyService.constructSessionId(userId, client.id, domain),
+        primary_key: constructSessionId({
+          userId,
+          clientId: client.id,
+          domain,
+          useQualifiedIds: this.useQualifiedIds,
+        }),
       },
     };
   }

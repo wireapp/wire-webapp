@@ -18,10 +18,13 @@
  */
 
 import {BackendEvent, ConversationOtrMessageAddEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
+import {Decoder} from 'bazinga64';
 
-import {DecryptionError} from '../../../../../../errors/DecryptionError';
-import {EventHandlerResult} from '../../../../../common.types';
-import {EventHandlerParams} from '../../../EventHandler.types';
+import {GenericMessage} from '@wireapp/protocol-messaging';
+
+import {DecryptionError} from '../../../../../errors/DecryptionError';
+import {EventHandlerResult} from '../../../../common.types';
+import {EventHandlerParams} from '../../EventHandler.types';
 
 const isOtrMessageAddEvent = (event: BackendEvent): event is ConversationOtrMessageAddEvent =>
   event.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD;
@@ -29,8 +32,9 @@ const isOtrMessageAddEvent = (event: BackendEvent): event is ConversationOtrMess
 type HandleOtrMessageAddParams = Omit<EventHandlerParams, 'event'> & {
   event: ConversationOtrMessageAddEvent;
 };
+
 const handleOtrMessageAdd = async ({
-  cryptographyService,
+  decryptMessage,
   event,
   dryRun = false,
 }: HandleOtrMessageAddParams): EventHandlerResult => {
@@ -40,16 +44,23 @@ const handleOtrMessageAdd = async ({
     return {event};
   }
   try {
-    const decryptedData = await cryptographyService.decryptMessage(event);
+    const {
+      from,
+      qualified_from,
+      data: {sender: clientId, text: encodedCiphertext},
+    } = event;
+    const userId = qualified_from || {id: from, domain: ''};
+    const messageBytes = Decoder.fromBase64(encodedCiphertext).asBytes;
+    const decryptedData = await decryptMessage(messageBytes, userId, clientId);
     return {
       event,
-      decryptedData,
+      decryptedData: GenericMessage.decode(decryptedData),
     };
   } catch (error) {
     if (error instanceof DecryptionError) {
       return {event, decryptionError: error};
     }
-    return {event, decryptionError: error as DecryptionError};
+    throw error;
   }
 };
 

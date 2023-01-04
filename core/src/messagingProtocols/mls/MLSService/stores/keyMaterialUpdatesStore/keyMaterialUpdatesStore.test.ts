@@ -19,11 +19,7 @@
 
 import {keyMaterialUpdatesStore, LastKeyMaterialUpdateParams} from './keyMaterialUpdatesStore';
 
-import {storageMock} from '../stores.mock';
-
 const mockUpdateEntries: LastKeyMaterialUpdateParams[] = [{groupId: 'group0'}, {groupId: 'group1'}];
-// Storage Mock
-(global as any).localStorage = storageMock();
 
 describe('keyMaterialUpdatesStore', () => {
   it('adds and retrieves items to/from dates store', () => {

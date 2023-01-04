@@ -22,11 +22,10 @@ import {Conversation, ConversationProtocol} from '@wireapp/api-client/lib/conver
 
 import {APIClient} from '@wireapp/api-client';
 import {GenericMessage} from '@wireapp/protocol-messaging';
-import {MemoryEngine} from '@wireapp/store-engine';
 
 import {ConversationService, MessageSendingState} from '..';
-import {CryptographyService} from '../../cryptography';
 import {MLSService} from '../../messagingProtocols/mls';
+import {ProteusService} from '../../messagingProtocols/proteus';
 import * as MessagingProtocols from '../../messagingProtocols/proteus';
 import * as PayloadHelper from '../../test/PayloadHelper';
 import * as MessageBuilder from '../message/MessageBuilder';
@@ -54,7 +53,7 @@ const mockedMLSService = {
 const mockedProteusService = {
   encryptGenericMessage: () => Promise.resolve(),
   sendProteusMessage: () => Promise.resolve({sentAt: new Date()}),
-} as unknown as MessagingProtocols.ProteusService;
+} as unknown as ProteusService;
 
 describe('ConversationService', () => {
   beforeAll(() => {
@@ -93,7 +92,6 @@ describe('ConversationService', () => {
 
     const conversationService = new ConversationService(
       client,
-      new CryptographyService(client, new MemoryEngine(), {useQualifiedIds: false, nbPrekeys: 1}),
       {
         useQualifiedIds: federated,
       },
@@ -120,9 +118,6 @@ describe('ConversationService', () => {
         const [conversationService] = buildConversationService();
         const sentTime = new Date().toISOString();
 
-        MockedMessagingProtocols.getGenericMessageParams.mockResolvedValue({
-          time: sentTime,
-        } as unknown as MessagingProtocols.MessageParams);
         mockedProteusService.sendMessage = jest.fn().mockResolvedValue({sentAt: sentTime});
         const promise = conversationService.send({
           protocol: ConversationProtocol.PROTEUS,
@@ -228,13 +223,23 @@ describe('ConversationService', () => {
 
   describe('fetchAllParticipantsClients', () => {
     it('gives the members and clients of a federated conversation', async () => {
+      const [conversationService, {apiClient}] = buildConversationService(true);
+      jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValue({
+        members: {
+          others: [
+            {qualified_id: {domain: 'test-domain', id: 'test-id-1'}},
+            {qualified_id: {domain: 'test-domain', id: 'test-id-2'}},
+          ],
+          self: {},
+        },
+      } as any);
       const members = {
         'test-domain': {
           ['test-id-1']: ['test-client-id-1-user-1'],
           ['test-id-2']: ['test-client-id-1-user-2', 'test-client-id-2-user-2'],
         },
       };
-      const [conversationService] = buildConversationService(true);
+
       MockedMessagingProtocols.getConversationQualifiedMembers.mockResolvedValue([
         {domain: 'test-domain', id: 'test-id-1'},
         {domain: 'test-domain', id: 'test-id-2'},

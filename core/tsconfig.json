@@ -4,6 +4,6 @@
     "esModuleInterop": true,
     "outDir": "lib"
   },
-  "exclude": ["node_modules", "src/test", "src/**/*.test.ts", "src/demo"],
+  "exclude": ["node_modules", "src/test", "**.test.ts", "src/demo"],
   "include": ["src"]
 }

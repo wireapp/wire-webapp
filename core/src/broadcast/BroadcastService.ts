@@ -31,14 +31,14 @@ import {GenericMessage} from '@wireapp/protocol-messaging';
 import {sendMessage} from '../conversation/message/messageSender';
 import {MessageService} from '../conversation/message/MessageService';
 import {flattenQualifiedUserClients} from '../conversation/message/UserClientsUtil';
-import {CryptographyService} from '../cryptography/';
+import {ProteusService} from '../messagingProtocols/proteus';
 import {isQualifiedUserClients} from '../util';
 
 export class BroadcastService {
   private readonly messageService: MessageService;
 
-  constructor(private readonly apiClient: APIClient, private readonly cryptographyService: CryptographyService) {
-    this.messageService = new MessageService(this.apiClient, this.cryptographyService);
+  constructor(private readonly apiClient: APIClient, private readonly proteusService: ProteusService) {
+    this.messageService = new MessageService(this.apiClient, this.proteusService);
   }
 
   /**

@@ -48,7 +48,7 @@ import {pendingProposalsStore} from './stores/pendingProposalsStore';
 
 import {QualifiedUsers} from '../../../conversation';
 import {sendMessage} from '../../../conversation/message/messageSender';
-import {parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUtils';
+import {constructFullyQualifiedClientId, parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUtils';
 import {cancelRecurringTask, registerRecurringTask} from '../../../util/RecurringTaskScheduler';
 import {TaskScheduler} from '../../../util/TaskScheduler';
 import {EventHandlerResult} from '../../common.types';
@@ -73,7 +73,7 @@ export class MLSService {
 
   constructor(
     private readonly apiClient: APIClient,
-    private readonly coreCryptoClientProvider: () => CoreCrypto | undefined,
+    private readonly coreCryptoClient: CoreCrypto,
     {
       keyingMaterialUpdateThreshold = defaultConfig.keyingMaterialUpdateThreshold,
       nbKeyPackages = defaultConfig.nbKeyPackages,
@@ -85,12 +85,19 @@ export class MLSService {
     };
   }
 
-  private get coreCryptoClient() {
-    const client = this.coreCryptoClientProvider();
-    if (!client) {
-      throw new Error('Could not get coreCryptoClient');
-    }
-    return client;
+  public async initClient(userId: QualifiedId, clientId: string) {
+    const encoder = new TextEncoder();
+    const qualifiedClientId = constructFullyQualifiedClientId(userId.id, clientId, userId.domain);
+    await this.coreCryptoClient.mlsInit(encoder.encode(qualifiedClientId));
+  }
+
+  public async createClient(userId: QualifiedId, clientId: string) {
+    await this.initClient(userId, clientId);
+    // If the device is new, we need to upload keypackages and public key to the backend
+    const publicKey = await this.coreCryptoClient.clientPublicKey();
+    const keyPackages = await this.coreCryptoClient.clientKeypackages(this.config.nbKeyPackages);
+    await this.uploadMLSPublicKeys(publicKey, clientId);
+    await this.uploadMLSKeyPackages(keyPackages, clientId);
   }
 
   private async uploadCommitBundle(
@@ -102,7 +109,7 @@ export class MLSService {
     try {
       const response = await this.apiClient.api.conversation.postMlsCommitBundle(bundlePayload.slice());
       if (isExternalCommit) {
-        await this.coreCryptoClient.mergePendingGroupFromExternalCommit(groupId, {});
+        await this.coreCryptoClient.mergePendingGroupFromExternalCommit(groupId);
       } else {
         await this.coreCryptoClient.commitAccepted(groupId);
       }
@@ -408,13 +415,13 @@ export class MLSService {
    * @param mlsClient Intance of the coreCrypto that represents the mls client
    * @param clientId The id of the client
    */
-  public async uploadMLSPublicKeys(publicKey: Uint8Array, clientId: string) {
+  private async uploadMLSPublicKeys(publicKey: Uint8Array, clientId: string) {
     return this.apiClient.api.client.putClient(clientId, {
       mls_public_keys: {ed25519: btoa(Converter.arrayBufferViewToBaselineString(publicKey))},
     });
   }
 
-  public async uploadMLSKeyPackages(keypackages: Uint8Array[], clientId: string) {
+  private async uploadMLSKeyPackages(keypackages: Uint8Array[], clientId: string) {
     return this.apiClient.api.client.uploadMLSKeyPackages(
       clientId,
       keypackages.map(keypackage => btoa(Converter.arrayBufferViewToBaselineString(keypackage))),

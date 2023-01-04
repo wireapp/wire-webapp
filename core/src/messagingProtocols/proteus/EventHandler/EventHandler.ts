@@ -17,11 +17,16 @@
  *
  */
 
-import {handleConversationEvent} from './ConversationEvent';
 import {EventHandlerParams} from './EventHandler.types';
+import {handleOtrMessageAdd, isOtrMessageAddEvent} from './events';
 
 import {EventHandlerResult} from '../../common.types';
 
-const handleBackendEvent = async (params: EventHandlerParams): EventHandlerResult => handleConversationEvent(params);
+const handleBackendEvent = async (params: EventHandlerParams): EventHandlerResult => {
+  const {event} = params;
+  if (isOtrMessageAddEvent(event)) {
+    return handleOtrMessageAdd({...params, event});
+  }
+};
 
 export {handleBackendEvent};

@@ -163,7 +163,9 @@ describe('NotificationService', () => {
         jest.spyOn(notificationService as any, 'handleEvent').mockImplementation(() => {
           throw new Error('Test error');
         });
-        const spySetLastNotificationId = jest.spyOn(notificationService, 'setLastNotificationId').mockResolvedValue('');
+        const spySetLastNotificationId = jest
+          .spyOn(notificationService as any, 'setLastNotificationId')
+          .mockResolvedValue('');
 
         const notification = {
           payload: [{}],
