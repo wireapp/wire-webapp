@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [38.0.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@37.5.2...@wireapp/core@38.0.0) (2023-01-04)
+
+### Features
+
+* Replace cryptobox with CoreCrypto ([#4622](https://github.com/wireapp/wire-web-packages/issues/4622)) ([a169e7e](https://github.com/wireapp/wire-web-packages/commit/a169e7ebe1b03f238b4b0a6657e46f62ec1dafc3))
+
+### BREAKING CHANGES
+
+* The login and init method now do not have the possibility to also init the client, it should be done in a separate step.
+
 ## [37.5.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@37.5.1...@wireapp/core@37.5.2) (2022-12-21)
 
 **Note:** Version bump only for package @wireapp/core
