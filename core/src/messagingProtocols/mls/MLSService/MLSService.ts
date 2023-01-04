@@ -17,7 +17,7 @@
  *
  */
 
-import {PostMlsMessageResponse} from '@wireapp/api-client/lib/conversation';
+import {PostMlsMessageResponse, SUBCONVERSATION_ID} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import axios from 'axios';
 import {Converter, Decoder, Encoder} from 'bazinga64';
@@ -204,6 +204,38 @@ export class MLSService {
       isExternalCommit: true,
       regenerateCommitBundle: async () => (await generateCommit()).commitBundle,
     });
+  }
+
+  /**
+   * Will join or register an mls subconversation for conference calls.
+   * Will return the secret key derived from the subconversation
+   *
+   * @param conversationId Id of the parent conversation in which the call should happen
+   */
+  public async joinConferenceSubconversation(
+    conversationId: QualifiedId,
+  ): Promise<{epoch: number; secretKey: string; keyLength: number}> {
+    const subconversation = await this.apiClient.api.conversation.getSubconversation(
+      conversationId,
+      SUBCONVERSATION_ID.CONFERENCE,
+    );
+    if (subconversation.epoch === 0) {
+      await this.registerConversation(subconversation.group_id, []);
+    } else {
+      await this.joinByExternalCommit(() =>
+        this.apiClient.api.conversation.getSubconversationGroupInfo(conversationId, SUBCONVERSATION_ID.CONFERENCE),
+      );
+    }
+
+    const keyLength = 256;
+    const groupIdBytes = Decoder.fromBase64(subconversation.group_id).asBytes;
+    const secretKey = await this.coreCryptoClient.exportSecretKey(groupIdBytes, keyLength);
+
+    return {
+      epoch: subconversation.epoch,
+      secretKey: new TextDecoder().decode(secretKey),
+      keyLength,
+    };
   }
 
   public async newExternalProposal(
