@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [38.1.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.0.1...@wireapp/core@38.1.0) (2023-01-04)
+
+### Features
+
+* Add method to join mls conference subconversation ([#4747](https://github.com/wireapp/wire-web-packages/issues/4747)) ([971e868](https://github.com/wireapp/wire-web-packages/commit/971e868f6f20989eb0e31d0b3e7cf308e8afb20e))
+
 ## [38.0.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.0.0...@wireapp/core@38.0.1) (2023-01-04)
 
 **Note:** Version bump only for package @wireapp/core
