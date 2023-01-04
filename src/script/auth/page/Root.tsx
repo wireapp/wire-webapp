@@ -137,8 +137,6 @@ export const RootComponent: FC<RootProps> = () => {
   const brandName = Config.getConfig().BRAND_NAME;
   const config = Config.getConfig();
 
-  console.info('bardia render');
-
   return (
     <IntlProvider locale={normalizeLanguage(language)} messages={loadLanguage(language)}>
       <StyledApp themeId={THEME_ID.DEFAULT} style={{display: 'flex', height: '100%', minHeight: '100vh'}}>
