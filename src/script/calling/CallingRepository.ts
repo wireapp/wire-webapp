@@ -67,6 +67,7 @@ import {Config} from '../Config';
 import {ConversationState} from '../conversation/ConversationState';
 import {CallingEvent, EventBuilder} from '../conversation/EventBuilder';
 import {CONSENT_TYPE, MessageRepository, MessageSendingOptions} from '../conversation/MessageRepository';
+import {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
 import {NoAudioInputError} from '../error/NoAudioInputError';
 import {EventRepository} from '../event/EventRepository';
@@ -663,24 +664,33 @@ export class CallingRepository {
   //##############################################################################
 
   private readonly toggleState = (withVideo: boolean): void => {
-    const conversationEntity = this.conversationState.activeConversation();
-    if (conversationEntity) {
-      const isActiveCall = this.findCall(conversationEntity.qualifiedId);
-      const isGroupCall = conversationEntity.isGroup() ? CONV_TYPE.GROUP : CONV_TYPE.ONEONONE;
+    const conversation = this.conversationState.activeConversation();
+    if (conversation) {
+      const isActiveCall = this.findCall(conversation.qualifiedId);
       const callType = withVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
       return (
         (isActiveCall
-          ? this.leaveCall(conversationEntity.qualifiedId, LEAVE_CALL_REASON.ELECTRON_TRAY_MENU_MESSAGE)
-          : this.startCall(conversationEntity.qualifiedId, isGroupCall, callType)) && undefined
+          ? this.leaveCall(conversation.qualifiedId, LEAVE_CALL_REASON.ELECTRON_TRAY_MENU_MESSAGE)
+          : this.startCall(conversation, callType)) && undefined
       );
     }
   };
 
+  private getConversationType(conversation: Conversation): CONV_TYPE {
+    if (!conversation.isGroup) {
+      return CONV_TYPE.ONEONONE;
+    }
+
+    if (conversation.isUsingMLSProtocol) {
+      return CONV_TYPE.CONFERENCE_MLS;
+    }
+    return this.supportsConferenceCalling ? CONV_TYPE.CONFERENCE : CONV_TYPE.GROUP;
+  }
+
   async startCall(
-    conversationId: QualifiedId,
-    conversationType: CONV_TYPE,
+    conversation: Conversation,
     callType: CALL_TYPE,
-    keyData?: {epoch: number; secretKey: Uint8Array},
+    keyData?: {epoch: number; secretKey: string; keyLength: number},
   ): Promise<void | Call> {
     if (!this.selfUser || !this.selfClientId) {
       this.logger.warn(
@@ -692,14 +702,11 @@ export class CallingRepository {
       );
       return;
     }
+    const conversationId = conversation.qualifiedId;
     const convId = this.serializeQualifiedId(conversationId);
     this.logger.log(`Starting a call of type "${callType}" in conversation ID "${convId}"...`);
     try {
       await this.checkConcurrentJoinedCall(conversationId, CALL_STATE.OUTGOING);
-      conversationType =
-        conversationType === CONV_TYPE.GROUP && this.supportsConferenceCalling
-          ? CONV_TYPE.CONFERENCE
-          : conversationType;
       const rejectedCallInConversation = this.findCall(conversationId);
       if (rejectedCallInConversation) {
         // if there is a rejected call, we can remove it from the store
@@ -707,6 +714,7 @@ export class CallingRepository {
         this.removeCall(rejectedCallInConversation);
       }
       const selfParticipant = new Participant(this.selfUser, this.selfClientId);
+      const conversationType = this.getConversationType(conversation);
       const call = new Call(
         this.selfUser.qualifiedId,
         conversationId,
@@ -730,8 +738,8 @@ export class CallingRepository {
         this.wCall?.setMute(this.wUser, 0);
         this.wCall?.start(this.wUser, convId, callType, conversationType, this.callState.cbrEncoding());
         if (keyData) {
-          const decoder = new TextDecoder();
-          this.wCall?.setEpochInfo(this.wUser, convId, keyData?.epoch, '', decoder.decode(keyData?.secretKey), 256);
+          const {epoch, secretKey, keyLength} = keyData;
+          this.wCall?.setEpochInfo(this.wUser, convId, epoch, '', secretKey, keyLength);
         }
         this.sendCallingEvent(EventName.CALLING.INITIATED_CALL, call);
         this.sendCallingEvent(EventName.CONTRIBUTED, call, {

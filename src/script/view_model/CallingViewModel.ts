@@ -17,7 +17,6 @@
  *
  */
 
-import {SUBCONVERSATION_ID} from '@wireapp/api-client/lib/conversation/Subconversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 import {container} from 'tsyringe';
@@ -141,32 +140,11 @@ export class CallingViewModel {
       });
     };
 
-    async function joinMLSSubgroup(conversation: Conversation) {
-      const subgroup = await apiClient.api.conversation.getSubconversation(
-        conversation.qualifiedId,
-        SUBCONVERSATION_ID.CONFERENCE,
-      );
-      if (subgroup.epoch === 0) {
-        await core.service!.mls.registerConversation(subgroup.group_id, []);
-      } else {
-        await core.service!.mls.joinByExternalCommit(() =>
-          apiClient.api.conversation.getSubconversationGroupInfo(
-            conversation.qualifiedId,
-            SUBCONVERSATION_ID.CONFERENCE,
-          ),
-        );
-      }
-      return {
-        epoch: subgroup.epoch,
-        secretKey: await core.service!.mls.exportSecretKey(subgroup.group_id, 256),
-      };
-      //core.service.conversation.joinMLSSubgroup(conversation.qualifiedId).then((subgroupId) => {
-    }
-
     const startCall = async (conversation: Conversation, callType: CALL_TYPE): Promise<void> => {
-      const keyData = conversation.isUsingMLSProtocol ? await joinMLSSubgroup(conversation) : undefined;
-      const convType = CONV_TYPE.CONFERENCE_MLS; // conversation.isGroup() ? CONV_TYPE.GROUP : CONV_TYPE.ONEONONE;
-      this.callingRepository.startCall(conversation.qualifiedId, convType, callType, keyData).then(call => {
+      const keyData = conversation.isUsingMLSProtocol
+        ? await core.service!.mls.joinConferenceSubconversation(conversation)
+        : undefined;
+      this.callingRepository.startCall(conversation, callType, keyData).then(call => {
         if (!call) {
           return;
         }
