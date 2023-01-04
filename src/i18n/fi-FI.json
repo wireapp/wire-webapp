@@ -260,7 +260,7 @@
   "clientManager.subhead": "Poista yksi laitteistasi aloittaaksesi Wiren käytön tässä laiteessa.",
   "collectionSectionAudio": "Audio",
   "collectionSectionFiles": "Tiedostot",
-  "collectionSectionImages": "Kuvat",
+  "collectionSectionImages": "Images",
   "collectionSectionLinks": "Linkit",
   "collectionShowAll": "Näytä kaikki {{number}}",
   "connectionRequestConnect": "Yhdistä",

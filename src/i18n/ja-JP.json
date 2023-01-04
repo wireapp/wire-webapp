@@ -260,7 +260,7 @@
   "clientManager.subhead": "このデバイスで {brandName} を使用するため、他のデバイスを 1 つ削除してください。",
   "collectionSectionAudio": "Audio",
   "collectionSectionFiles": "ファイル",
-  "collectionSectionImages": "写真",
+  "collectionSectionImages": "Images",
   "collectionSectionLinks": "リンク",
   "collectionShowAll": "すべて表示 {{number}}",
   "connectionRequestConnect": "つながる",
