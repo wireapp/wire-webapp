@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [22.13.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@22.12.0...@wireapp/api-client@22.13.0) (2023-01-04)
+
+### Features
+
+* Add method to join mls conference subconversation ([#4747](https://github.com/wireapp/wire-web-packages/issues/4747)) ([971e868](https://github.com/wireapp/wire-web-packages/commit/971e868f6f20989eb0e31d0b3e7cf308e8afb20e))
+
 # [22.12.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@22.11.0...@wireapp/api-client@22.12.0) (2023-01-04)
 
 ### Features
