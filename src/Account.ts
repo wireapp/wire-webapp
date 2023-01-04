@@ -32,17 +32,14 @@ import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 import {Notification} from '@wireapp/api-client/lib/notification/';
 import {AbortHandler, WebSocketClient} from '@wireapp/api-client/lib/tcp/';
 import {WEBSOCKET_STATE} from '@wireapp/api-client/lib/tcp/ReconnectingWebsocket';
-import axios from 'axios';
 import {Encoder} from 'bazinga64';
-import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import logdown from 'logdown';
 
 import {EventEmitter} from 'events';
 
 import {APIClient, BackendFeatures} from '@wireapp/api-client';
 import {CoreCrypto} from '@wireapp/core-crypto';
-import * as cryptobox from '@wireapp/cryptobox';
-import {CRUDEngine, error as StoreEngineError, MemoryEngine} from '@wireapp/store-engine';
+import {CRUDEngine, MemoryEngine} from '@wireapp/store-engine';
 
 import {AccountService} from './account/';
 import {LoginSanitizer} from './auth/';
@@ -51,23 +48,22 @@ import {ClientInfo, ClientService} from './client/';
 import {ConnectionService} from './connection/';
 import {AssetService, ConversationService} from './conversation/';
 import {getQueueLength, pauseMessageSending, resumeMessageSending} from './conversation/message/messageSender';
-import {CoreError} from './CoreError';
-import {CryptographyService, SessionId} from './cryptography/';
 import {GiphyService} from './giphy/';
 import {LinkPreviewService} from './linkPreview';
 import {MLSService} from './messagingProtocols/mls';
 import {MLSCallbacks, CryptoProtocolConfig} from './messagingProtocols/mls/types';
-import {ProteusService} from './messagingProtocols/proteus';
+import {NewClient, ProteusService} from './messagingProtocols/proteus';
 import {HandledEventPayload, NotificationService, NotificationSource} from './notification/';
 import {SelfService} from './self/';
+import {CoreDatabase, deleteDB, openDB} from './storage/CoreDB';
 import {TeamService} from './team/';
 import {UserService} from './user/';
-import {createCustomEncryptedStore, createEncryptedStore, deleteEncryptedStore} from './util/encryptedStore';
+import {createCustomEncryptedStore, createEncryptedStore, EncryptedStore} from './util/encryptedStore';
 
 export type ProcessedEventPayload = HandledEventPayload;
 
-enum TOPIC {
-  ERROR = 'Account.TOPIC.ERROR',
+export enum EVENTS {
+  NEW_SESSION = 'new_session',
 }
 
 export enum ConnectionState {
@@ -82,7 +78,11 @@ export enum ConnectionState {
 }
 
 export interface Account {
-  on(event: TOPIC.ERROR, listener: (payload: CoreError) => void): this;
+  /**
+   * event triggered when a message from an unknown client is received.
+   * An unknown client is a client we don't yet have a session with
+   */
+  on(event: EVENTS.NEW_SESSION, listener: (client: NewClient) => void): this;
 }
 
 export type CreateStoreFn = (storeName: string, context: Context) => undefined | Promise<CRUDEngine | undefined>;
@@ -111,15 +111,6 @@ interface AccountOptions<T> {
 type InitOptions = {
   /** cookie used to identify the current user. Will use the browser cookie if not defined */
   cookie?: Cookie;
-
-  /** fully initiate the client and register periodic checks */
-  initClient?: boolean;
-
-  /**
-   * callback triggered when a message from an unknown client is received.
-   * An unknown client is a client we don't yet have a session with
-   */
-  onNewClient?: (sessionId: SessionId) => void;
 };
 
 const coreDefaultClient: ClientInfo = {
@@ -133,20 +124,21 @@ export class Account<T = any> extends EventEmitter {
   private readonly logger: logdown.Logger;
   private readonly createStore: CreateStoreFn;
   private storeEngine?: CRUDEngine;
+  private db?: CoreDatabase;
+  private secretsDb?: EncryptedStore<any>;
   private readonly nbPrekeys: number;
   private readonly cryptoProtocolConfig?: CryptoProtocolConfig<T>;
   private coreCryptoClient?: CoreCrypto;
 
-  public static readonly TOPIC = TOPIC;
   public service?: {
     mls: MLSService;
+    proteus: ProteusService;
     account: AccountService;
     asset: AssetService;
     broadcast: BroadcastService;
     client: ClientService;
     connection: ConnectionService;
     conversation: ConversationService;
-    cryptography: CryptographyService;
     giphy: GiphyService;
     linkPreview: LinkPreviewService;
     notification: NotificationService;
@@ -230,145 +222,122 @@ export class Account<T = any> extends EventEmitter {
   }
 
   /**
-   * Will init the core with an already existing client (both on backend and local)
-   * Will fail if local client cannot be found
+   * Will init the core with an already logged in user
    *
    * @param clientType The type of client the user is using (temporary or permanent)
    */
-  public async init(
-    clientType: ClientType,
-    {cookie, initClient = true, onNewClient}: InitOptions = {},
-  ): Promise<Context> {
+  public async init(clientType: ClientType, {cookie}: InitOptions = {}): Promise<Context> {
     const context = await this.apiClient.init(clientType, cookie);
     await this.initServices(context);
-
-    /** @fixme
-     * When we will start migrating to CoreCrypto encryption/decryption, those hooks won't be available anymore
-     * We will need to implement
-     *   - the mechanism to handle messages from an unknown sender
-     *   - the mechanism to generate new prekeys when we reach a certain threshold of prekeys
-     */
-    this.service!.cryptography.setCryptoboxHooks({
-      onNewPrekeys: async prekeys => {
-        this.logger.debug(`Received '${prekeys.length}' new PreKeys.`);
-
-        await this.apiClient.api.client.putClient(context.clientId!, {prekeys});
-        this.logger.debug(`Successfully uploaded '${prekeys.length}' PreKeys.`);
-      },
-
-      onNewSession: onNewClient,
-    });
-
-    // Assumption: client gets only initialized once
-    if (initClient) {
-      const {localClient} = await this.initClient({clientType});
-
-      //call /access endpoint with client_id after client initialisation
-      await this.apiClient.transport.http.associateClientWithSession(localClient.id);
-
-      if (this.cryptoProtocolConfig?.mls && this.backendFeatures.supportsMLS) {
-        // initialize schedulers for pending mls proposals once client is initialized
-        await this.service?.mls.checkExistingPendingProposals();
-
-        // initialize schedulers for renewing key materials
-        this.service?.mls.checkForKeyMaterialsUpdate();
-
-        // initialize scheduler for syncing key packages with backend
-        this.service?.mls.checkForKeyPackagesBackendSync();
-      }
-    }
     return context;
   }
 
   /**
    * Will log the user in with the given credential.
-   * Will also create the local client and store it in DB
    *
    * @param loginData The credentials of the user
-   * @param initClient Should the call also create the local client
    * @param clientInfo Info about the client to create (name, type...)
    */
-  public async login(
-    loginData: LoginData,
-    initClient: boolean = true,
-    clientInfo: ClientInfo = coreDefaultClient,
-  ): Promise<Context> {
+  public async login(loginData: LoginData): Promise<Context> {
     this.resetContext();
     LoginSanitizer.removeNonPrintableCharacters(loginData);
 
     const context = await this.apiClient.login(loginData);
     await this.initServices(context);
 
-    if (initClient) {
-      await this.initClient(loginData, clientInfo);
-    }
-
     return context;
   }
 
   /**
-   * Will try to get the load the local client from local DB.
-   * If clientInfo are provided, will also create the client on backend and DB
-   * If clientInfo are not provided, the method will fail if local client cannot be found
-   *
-   * @param loginData User's credentials
-   * @param clientInfo Will allow creating the client if the local client cannot be found (else will fail if local client is not found)
-   * @param entropyData Additional entropy data
-   * @returns The local existing client or newly created client
+   * Will register a new client for the current user
    */
-  public async initClient(
+  public async registerClient(
     loginData: LoginData,
-    clientInfo?: ClientInfo,
+    clientInfo: ClientInfo = coreDefaultClient,
     entropyData?: Uint8Array,
-  ): Promise<{isNewClient: boolean; localClient: RegisteredClient}> {
-    if (!this.service) {
+  ): Promise<RegisteredClient> {
+    if (!this.service || !this.apiClient.context || !this.coreCryptoClient || !this.storeEngine) {
+      throw new Error('Services are not set or context not initialized.');
+    }
+    const shouldCreateMlsClient = !!this.cryptoProtocolConfig?.mls;
+    this.logger.info(`Creating new client {mls: ${shouldCreateMlsClient}}`);
+    if (entropyData) {
+      await this.coreCryptoClient.reseedRng(entropyData);
+    }
+    await this.service.proteus.initClient(this.storeEngine, this.apiClient.context);
+    const initialPreKeys = await this.service.proteus.createClient();
+
+    const client = await this.service.client.register(loginData, clientInfo, initialPreKeys);
+
+    if (shouldCreateMlsClient) {
+      const {userId, domain = ''} = this.apiClient.context;
+      await this.service.mls.createClient({id: userId, domain}, client.id);
+    }
+    this.logger.info('Client is created');
+
+    await this.service.notification.initializeNotificationStream();
+    await this.service.client.synchronizeClients();
+
+    await this.initClient(client);
+    return client;
+  }
+
+  /**
+   * Will initiate all the cryptographic material of the device and setup all the background tasks.
+   *
+   * @returns The local existing client or undefined if the client does not exist or is not valid (non existing on backend)
+   */
+  public async initClient(client?: RegisteredClient): Promise<RegisteredClient | undefined> {
+    if (!this.service || !this.apiClient.context || !this.coreCryptoClient || !this.storeEngine) {
       throw new Error('Services are not set.');
     }
-
-    try {
-      const localClient = await this.loadAndValidateLocalClient(entropyData);
-      return {isNewClient: false, localClient};
-    } catch (error) {
-      if (!clientInfo) {
-        // If no client info provided, the client should not be created
-        throw error;
-      }
-      // There was no client so we need to "create" and "register" a client
-      const notFoundInDatabase =
-        error instanceof cryptobox.error.CryptoboxError ||
-        (error as Error).constructor.name === 'CryptoboxError' ||
-        error instanceof StoreEngineError.RecordNotFoundError ||
-        (error as Error).constructor.name === StoreEngineError.RecordNotFoundError.name;
-      const notFoundOnBackend = axios.isAxiosError(error) ? error.response?.status === HTTP_STATUS.NOT_FOUND : false;
-
-      if (notFoundInDatabase) {
-        this.logger.log(`Could not find valid client in database "${this.storeEngine?.storeName}".`);
-        return this.registerClient(loginData, clientInfo, entropyData);
-      }
-
-      if (notFoundOnBackend) {
-        this.logger.log('Could not find valid client on backend');
-        const client = await this.service!.client.getLocalClient();
-        const shouldDeleteWholeDatabase = client.type === ClientType.TEMPORARY;
-        if (shouldDeleteWholeDatabase) {
-          this.logger.log('Last client was temporary - Deleting database');
-
-          if (this.storeEngine) {
-            await this.storeEngine.clearTables();
-          }
-          const context = await this.apiClient.init(loginData.clientType);
-          await this.initEngine(context);
-
-          return this.registerClient(loginData, clientInfo, entropyData);
-        }
-
-        this.logger.log('Last client was permanent - Deleting cryptography stores');
-        await this.service!.cryptography.deleteCryptographyStores();
-        return this.registerClient(loginData, clientInfo, entropyData);
-      }
-
-      throw error;
+    const validClient = client ?? (await this.service!.client.loadClient());
+    if (!validClient) {
+      return undefined;
     }
+    this.apiClient.context.clientId = validClient.id;
+
+    // Call /access endpoint with client_id after client initialisation
+    await this.apiClient.transport.http.associateClientWithSession(validClient.id);
+
+    await this.service.proteus.initClient(this.storeEngine, this.apiClient.context);
+    if (this.backendFeatures.supportsMLS && this.cryptoProtocolConfig?.mls) {
+      const {userId, domain = ''} = this.apiClient.context;
+      await this.service.mls.initClient({id: userId, domain}, validClient.id);
+      // initialize schedulers for pending mls proposals once client is initialized
+      await this.service.mls.checkExistingPendingProposals();
+
+      // initialize schedulers for renewing key materials
+      this.service.mls.checkForKeyMaterialsUpdate();
+
+      // initialize scheduler for syncing key packages with backend
+      this.service.mls.checkForKeyPackagesBackendSync();
+    }
+
+    return validClient;
+  }
+
+  private async initCoreCrypto(context: Context) {
+    const coreCryptoKeyId = 'corecrypto-key';
+    const dbName = this.generateSecretsDbName(context);
+
+    const systemCrypto = this.cryptoProtocolConfig?.systemCrypto;
+    this.secretsDb = systemCrypto
+      ? await createCustomEncryptedStore(dbName, systemCrypto)
+      : await createEncryptedStore(dbName);
+
+    let key = await this.secretsDb.getsecretValue(coreCryptoKeyId);
+    if (!key) {
+      key = crypto.getRandomValues(new Uint8Array(16));
+      await this.secretsDb.saveSecretValue(coreCryptoKeyId, key);
+    }
+
+    return CoreCrypto.deferredInit(
+      `corecrypto-${this.generateDbName(context)}`,
+      Encoder.toBase64(key).asString,
+      undefined, // We pass a placeholder entropy data. It will be set later on by calling `reseedRng`
+      this.cryptoProtocolConfig?.coreCrypoWasmFilePath,
+    );
   }
 
   /**
@@ -383,31 +352,36 @@ export class Account<T = any> extends EventEmitter {
   }
 
   public async initServices(context: Context): Promise<void> {
+    this.coreCryptoClient = await this.initCoreCrypto(context);
     this.storeEngine = await this.initEngine(context);
+    this.db = await openDB(this.generateCoreDbName(context));
     const accountService = new AccountService(this.apiClient);
     const assetService = new AssetService(this.apiClient);
-    const cryptographyService = new CryptographyService(this.apiClient, this.storeEngine, {
-      // We want to encrypt with fully qualified session ids, only if the backend is federated with other backends
-      useQualifiedIds: this.backendFeatures.isFederated,
-      nbPrekeys: this.nbPrekeys,
-    });
 
-    const clientService = new ClientService(this.apiClient, this.storeEngine, cryptographyService);
-    const mlsService = new MLSService(this.apiClient, () => this.coreCryptoClient, {
+    const mlsService = new MLSService(this.apiClient, this.coreCryptoClient, {
       ...this.cryptoProtocolConfig?.mls,
       nbKeyPackages: this.nbPrekeys,
     });
-    const proteusService = new ProteusService(this.apiClient, cryptographyService, {
+    const proteusService = new ProteusService(this.apiClient, this.coreCryptoClient, this.db, {
       // We can use qualified ids to send messages as long as the backend supports federated endpoints
       useQualifiedIds: this.backendFeatures.federationEndpoints,
+      onNewClient: payload => this.emit(EVENTS.NEW_SESSION, payload),
+      nbPrekeys: this.nbPrekeys,
+      onNewPrekeys: async prekeys => {
+        this.logger.debug(`Received '${prekeys.length}' new PreKeys.`);
+
+        await this.apiClient.api.client.putClient(context.clientId!, {prekeys});
+        this.logger.debug(`Successfully uploaded '${prekeys.length}' PreKeys.`);
+      },
     });
+
+    const clientService = new ClientService(this.apiClient, proteusService, this.storeEngine);
     const connectionService = new ConnectionService(this.apiClient);
     const giphyService = new GiphyService(this.apiClient);
     const linkPreviewService = new LinkPreviewService(assetService);
     const notificationService = new NotificationService(this.apiClient, mlsService, proteusService, this.storeEngine);
     const conversationService = new ConversationService(
       this.apiClient,
-      cryptographyService,
       {
         // We can use qualified ids to send messages as long as the backend supports federated endpoints
         useQualifiedIds: this.backendFeatures.federationEndpoints,
@@ -419,18 +393,18 @@ export class Account<T = any> extends EventEmitter {
     const selfService = new SelfService(this.apiClient);
     const teamService = new TeamService(this.apiClient);
 
-    const broadcastService = new BroadcastService(this.apiClient, cryptographyService);
+    const broadcastService = new BroadcastService(this.apiClient, proteusService);
     const userService = new UserService(this.apiClient, broadcastService, connectionService);
 
     this.service = {
       mls: mlsService,
+      proteus: proteusService,
       account: accountService,
       asset: assetService,
       broadcast: broadcastService,
       client: clientService,
       connection: connectionService,
       conversation: conversationService,
-      cryptography: cryptographyService,
       giphy: giphyService,
       linkPreview: linkPreviewService,
       notification: notificationService,
@@ -438,94 +412,6 @@ export class Account<T = any> extends EventEmitter {
       team: teamService,
       user: userService,
     };
-  }
-
-  public async loadAndValidateLocalClient(entropyData?: Uint8Array): Promise<RegisteredClient> {
-    const loadedClient = await this.service!.client.getLocalClient();
-    await this.apiClient.api.client.getClient(loadedClient.id);
-    this.apiClient.context!.clientId = loadedClient.id;
-    await this.service!.cryptography.initCryptobox();
-    if (this.cryptoProtocolConfig?.mls && this.backendFeatures.supportsMLS) {
-      this.coreCryptoClient = await this.createMLSClient(
-        loadedClient,
-        this.apiClient.context!,
-        this.cryptoProtocolConfig,
-        entropyData,
-      );
-    }
-
-    return loadedClient;
-  }
-
-  private async createMLSClient(
-    client: RegisteredClient,
-    context: Context,
-    cryptoProtocolConfig: CryptoProtocolConfig,
-    entropyData?: Uint8Array,
-  ) {
-    if (!this.service) {
-      throw new Error('Services are not set.');
-    }
-    const coreCryptoKeyId = 'corecrypto-key';
-    const dbName = this.generateSecretsDbName(context);
-
-    const secretStore = cryptoProtocolConfig.systemCrypto
-      ? await createCustomEncryptedStore(dbName, cryptoProtocolConfig.systemCrypto)
-      : await createEncryptedStore(dbName);
-
-    let key = await secretStore.getsecretValue(coreCryptoKeyId);
-    let isNewMLSDevice = false;
-    if (!key) {
-      key = window.crypto.getRandomValues(new Uint8Array(16));
-      await secretStore.saveSecretValue(coreCryptoKeyId, key);
-      // Keeping track that this device is a new MLS device (but can be an old proteus device)
-      isNewMLSDevice = true;
-    }
-
-    const {userId, domain} = this.apiClient.context!;
-    const mlsClient = await CoreCrypto.init({
-      databaseName: `corecrypto-${this.generateDbName(context)}`,
-      key: Encoder.toBase64(key).asString,
-      clientId: `${userId}:${client.id}@${domain}`,
-      wasmFilePath: cryptoProtocolConfig.coreCrypoWasmFilePath,
-      entropySeed: entropyData,
-    });
-
-    if (isNewMLSDevice) {
-      // If the device is new, we need to upload keypackages and public key to the backend
-      await this.service.mls.uploadMLSPublicKeys(await mlsClient.clientPublicKey(), client.id);
-      await this.service.mls.uploadMLSKeyPackages(await mlsClient.clientKeypackages(this.nbPrekeys), client.id);
-    }
-
-    return mlsClient;
-  }
-
-  private async registerClient(
-    loginData: LoginData,
-    clientInfo: ClientInfo = coreDefaultClient,
-    entropyData?: Uint8Array,
-  ): Promise<{isNewClient: boolean; localClient: RegisteredClient}> {
-    if (!this.service) {
-      throw new Error('Services are not set.');
-    }
-    this.logger.info(`Creating new client {mls: ${!!this.cryptoProtocolConfig}}`);
-    const registeredClient = await this.service.client.register(loginData, clientInfo, entropyData);
-    if (this.cryptoProtocolConfig && this.backendFeatures.supportsMLS) {
-      this.coreCryptoClient = await this.createMLSClient(
-        registeredClient,
-        this.apiClient.context!,
-        this.cryptoProtocolConfig,
-        entropyData,
-      );
-    }
-    this.apiClient.context!.clientId = registeredClient.id;
-    this.logger.info('Client is created');
-
-    await this.service!.notification.initializeNotificationStream();
-    await this.service!.client.synchronizeClients();
-    await this.service!.cryptography.initCryptobox();
-
-    return {isNewClient: true, localClient: registeredClient};
   }
 
   private resetContext(): void {
@@ -538,12 +424,23 @@ export class Account<T = any> extends EventEmitter {
    * @param clearData if set to `true` will completely wipe any database that was created by the Account
    */
   public async logout(clearData: boolean = false): Promise<void> {
-    if (clearData && this.coreCryptoClient) {
-      await this.coreCryptoClient.wipe();
-      await deleteEncryptedStore(this.generateSecretsDbName(this.apiClient.context!));
+    this.db?.close();
+    this.secretsDb?.close();
+    if (clearData) {
+      this.wipe();
     }
     await this.apiClient.logout();
     this.resetContext();
+  }
+
+  private async wipe(): Promise<void> {
+    if (this.coreCryptoClient) {
+      await this.coreCryptoClient.wipe();
+    }
+    await this.secretsDb?.wipe();
+    if (this.db) {
+      await deleteDB(this.db);
+    }
   }
 
   /**
@@ -688,6 +585,10 @@ export class Account<T = any> extends EventEmitter {
 
   private generateSecretsDbName(context: Context) {
     return `secrets-${this.generateDbName(context)}`;
+  }
+
+  private generateCoreDbName(context: Context) {
+    return `core-${this.generateDbName(context)}`;
   }
 
   private async initEngine(context: Context): Promise<CRUDEngine> {

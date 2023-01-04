@@ -45,7 +45,7 @@ const MOCK_BACKEND = {
   ws: `wss://${BASE_URL}`,
 };
 
-async function createAccount(storageName = `test-${Date.now()}`): Promise<{account: Account; apiClient: APIClient}> {
+async function createAccount(): Promise<{account: Account; apiClient: APIClient}> {
   const apiClient = new APIClient({urls: MOCK_BACKEND});
   const account = new Account(apiClient);
   await account.initServices({
@@ -80,6 +80,8 @@ const waitFor = (assertion: () => void) => {
 describe('Account', () => {
   const CLIENT_ID = '4e37b32f57f6da55';
 
+  // Fix for node 16, crypto.subtle.decrypt has a type problem
+  jest.spyOn(global.crypto.subtle, 'decrypt').mockImplementation();
   const accessTokenData = {
     access_token:
       'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==.v=1.k=1.d=1498600993.t=a.l=.u=aaf9a833-ef30-4c22-86a0-9adc8a15b3b4.c=15037015562284012115',
@@ -92,7 +94,7 @@ describe('Account', () => {
     nock(MOCK_BACKEND.rest)
       .post(AuthAPI.URL.LOGIN, body => body.email && body.password)
       .query(() => true)
-      .reply((uri, body: any) => {
+      .reply((_, body: any) => {
         if (body.password === 'wrong') {
           return [
             HTTP_STATUS.FORBIDDEN,
@@ -166,7 +168,6 @@ describe('Account', () => {
       await account.initServices({clientType: ClientType.TEMPORARY, userId: ''});
 
       expect(account.service!.conversation).toBeDefined();
-      expect(account.service!.cryptography).toBeDefined();
 
       const message = GenericMessage.create({
         messageId: '2d7cb6d8-118f-11e8-b642-0ed5f89f718b',
@@ -183,13 +184,12 @@ describe('Account', () => {
       const account = new Account(apiClient);
 
       await account.initServices({clientType: ClientType.TEMPORARY, userId: ''});
-      const {clientId, clientType, userId} = await account.login({
+      const {clientType, userId} = await account.login({
         clientType: ClientType.TEMPORARY,
         email: 'hello@example.com',
         password: 'my-secret',
       });
 
-      expect(clientId).toBe(CLIENT_ID);
       expect(ValidationUtil.isUUIDv4(userId)).toBe(true);
       expect(clientType).toBe(ClientType.TEMPORARY);
     });
@@ -211,8 +211,9 @@ describe('Account', () => {
       } catch (error) {
         backendError = error as BackendError;
       } finally {
-        expect(backendError.code).toBe(HTTP_STATUS.FORBIDDEN);
-        expect(backendError.label).toBe(BackendErrorLabel.INVALID_CREDENTIALS);
+        const {code, label} = backendError as {code: number; label: string};
+        expect(code).toBe(HTTP_STATUS.FORBIDDEN);
+        expect(label).toBe(BackendErrorLabel.INVALID_CREDENTIALS);
       }
     });
   });
@@ -249,7 +250,7 @@ describe('Account', () => {
     let dependencies: {account: Account; apiClient: APIClient};
 
     const mockNotifications = (size: number) => {
-      const notifications = Array.from(new Array(size)).map(i => ({
+      const notifications = Array.from(new Array(size)).map(() => ({
         id: genV4().toString(),
         payload: [{}] as BackendEvent[],
       }));
@@ -286,6 +287,9 @@ describe('Account', () => {
       jest
         .spyOn(dependencies.account.service!.notification, 'handleNotification')
         .mockImplementation(notif => notif.payload as any);
+      jest
+        .spyOn(dependencies.account.service!.notification['database'], 'getLastNotificationId')
+        .mockResolvedValue('0');
     });
 
     afterEach(() => {

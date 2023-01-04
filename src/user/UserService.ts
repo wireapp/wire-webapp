@@ -26,7 +26,7 @@ import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
 import {AvailabilityType, BroadcastService} from '../broadcast/';
 import {ConnectionService} from '../connection';
 import {createId} from '../conversation/message/MessageBuilder';
-import {getPreKeyBundleMap} from '../messagingProtocols/proteus';
+import {getPreKeyBundleMap} from '../messagingProtocols/proteus/Utility/PreKeyBundle';
 import {isQualifiedIdArray} from '../util/TypePredicateUtil';
 
 export class UserService {

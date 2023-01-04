@@ -21,10 +21,10 @@ import {APIClient} from '@wireapp/api-client/lib/APIClient';
 import {QualifiedUserClients, UserClients} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId, QualifiedUserPreKeyBundleMap, UserPreKeyBundleMap} from '@wireapp/api-client/lib/user';
 
-import {getQualifiedPreKeyBundle, getPreKeyBundleMap} from './PreKeyBundle';
+import {getQualifiedPreKeyBundle, getPreKeyBundleMap} from './PreKeyBundle/PreKeyBundle';
 
-import {getConversationQualifiedMembers} from '../../../../conversation/ConversationService/Utility/getConversationQualifiedMembers';
-import {isQualifiedUserClients, isUserClients} from '../../../../util';
+import {getConversationQualifiedMembers} from '../../../conversation/ConversationService/Utility/getConversationQualifiedMembers';
+import {isQualifiedUserClients, isUserClients} from '../../../util';
 
 interface GetRecipientsForConversationQualifiedParams {
   apiClient: APIClient;

@@ -123,7 +123,7 @@ export class NotificationService extends EventEmitter {
     return databaseLastEventDate;
   }
 
-  public async setLastNotificationId(lastNotification: Notification): Promise<string> {
+  private async setLastNotificationId(lastNotification: Notification): Promise<string> {
     return this.database.updateLastNotificationId(lastNotification);
   }
 

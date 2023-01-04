@@ -42,7 +42,6 @@ import {GenericMessage} from '@wireapp/protocol-messaging';
 import {AddUsersParams, MLSReturnType, SendMlsMessageParams, SendResult} from './ConversationService.types';
 
 import {MessageTimer, MessageSendingState, RemoveUsersParams} from '../../conversation/';
-import {CryptographyService} from '../../cryptography/';
 import {decryptAsset} from '../../cryptography/AssetCryptography';
 import {MLSService, optionalToUint8Array} from '../../messagingProtocols/mls';
 import {getConversationQualifiedMembers, ProteusService} from '../../messagingProtocols/proteus';
@@ -63,13 +62,12 @@ export class ConversationService {
 
   constructor(
     private readonly apiClient: APIClient,
-    cryptographyService: CryptographyService,
     private readonly config: {useQualifiedIds?: boolean},
     private readonly mlsService: MLSService,
     private readonly proteusService: ProteusService,
   ) {
     this.messageTimer = new MessageTimer();
-    this.messageService = new MessageService(this.apiClient, cryptographyService);
+    this.messageService = new MessageService(this.apiClient, this.proteusService);
   }
 
   /**

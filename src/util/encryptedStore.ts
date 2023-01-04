@@ -42,7 +42,7 @@ type EncryptedStoreConfig<EncryptedPayload> = {
   decrypt: DecryptFn<EncryptedPayload>;
 };
 
-class EncryptedStore<EncryptedPayload> {
+export class EncryptedStore<EncryptedPayload> {
   readonly #decrypt: DecryptFn<EncryptedPayload>;
   readonly #encrypt: EncryptFn<EncryptedPayload>;
   constructor(
@@ -64,6 +64,15 @@ class EncryptedStore<EncryptedPayload> {
       return undefined;
     }
     return this.#decrypt(result);
+  }
+
+  async close() {
+    this.db.close();
+  }
+
+  async wipe() {
+    this.db.close();
+    deleteDB(this.db.name);
   }
 }
 
@@ -132,8 +141,4 @@ export async function createCustomEncryptedStore<EncryptedPayload>(
   });
 
   return new EncryptedStore(db, config);
-}
-
-export async function deleteEncryptedStore(dbName: string) {
-  return deleteDB(dbName);
 }

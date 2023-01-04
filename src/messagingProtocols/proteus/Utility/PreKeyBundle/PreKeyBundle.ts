@@ -23,6 +23,13 @@ import {QualifiedId, QualifiedUserPreKeyBundleMap, UserPreKeyBundleMap} from '@w
 
 import {isQualifiedIdArray, isStringArray, isUserClients} from '../../../../util';
 
+const preKeyBundleToUserClients = (users: UserPreKeyBundleMap): UserClients => {
+  return Object.entries(users).reduce<UserClients>((acc, [userId, clientsObj]) => {
+    acc[userId] = Object.keys(clientsObj);
+    return acc;
+  }, {});
+};
+
 interface GetPreKeyBundleMapParams {
   apiClient: APIClient;
   conversationId: QualifiedId;
@@ -118,4 +125,4 @@ const getQualifiedPreKeyBundle = async ({
   }, {});
 };
 
-export {getPreKeyBundleMap, getQualifiedPreKeyBundle};
+export {getPreKeyBundleMap, getQualifiedPreKeyBundle, preKeyBundleToUserClients};

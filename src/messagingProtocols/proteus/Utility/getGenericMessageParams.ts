@@ -26,8 +26,8 @@ import {GenericMessage} from '@wireapp/protocol-messaging';
 import {getQualifiedRecipientsForConversation, getRecipientsForConversation} from './Recipients';
 import {extractQualifiedUserIds, extractUserIds} from './UserIds';
 
-import {MessageTargetMode, MessageSendingOptions} from '../../../../conversation';
-import {isStringArray, isUserClients, isQualifiedUserClients, isQualifiedIdArray} from '../../../../util';
+import {MessageTargetMode, MessageSendingOptions} from '../../../conversation';
+import {isStringArray, isUserClients, isQualifiedUserClients, isQualifiedIdArray} from '../../../util';
 
 export type FederatedMessageParams = {
   federated: true;

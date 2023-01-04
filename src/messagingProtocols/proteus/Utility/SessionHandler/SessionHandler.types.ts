@@ -17,16 +17,8 @@
  *
  */
 
-import {isOtrMessageAddEvent, handleOtrMessageAdd} from './events';
-
-import {EventHandlerParams} from '..';
-import {EventHandlerResult} from '../../../common.types';
-
-const handleConversationEvent = async (params: EventHandlerParams): EventHandlerResult => {
-  const {event} = params;
-  if (isOtrMessageAddEvent(event)) {
-    return handleOtrMessageAdd({...params, event});
-  }
+export type SessionId = {
+  userId: string;
+  clientId: string;
+  domain?: string;
 };
-
-export {handleConversationEvent};

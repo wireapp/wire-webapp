@@ -27,3 +27,21 @@ export enum RatchetTreeType {
   Delta = 2,
   ByRef = 3,
 }
+
+export class CoreCrypto {
+  static deferredInit() {
+    return {
+      proteusInit: jest.fn(),
+      proteusNewPrekey: jest.fn(() => Uint8Array.from([])),
+      getRemoteFingerprint: jest.fn(),
+      getLocalFingerprint: jest.fn(),
+      proteusSessionExists: jest.fn(),
+      proteusSessionFromPrekey: jest.fn(),
+      proteusFingerprintRemote: jest.fn(),
+      proteusEncryptBatched: jest.fn(),
+      proteusSessionSave: jest.fn(),
+      proteusDecrypt: jest.fn().mockResolvedValue(Uint8Array.from([])),
+      proteusSessionFromMessage: jest.fn().mockResolvedValue(Uint8Array.from([])),
+    };
+  }
+}

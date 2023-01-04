@@ -22,9 +22,7 @@ import {Notification} from '@wireapp/api-client/lib/notification/';
 
 import {CRUDEngine} from '@wireapp/store-engine';
 
-import {CryptographyDatabaseRepository} from '../cryptography/CryptographyDatabaseRepository';
-
-export enum DatabaseStores {
+enum DatabaseStores {
   EVENTS = 'events',
 }
 
@@ -34,7 +32,7 @@ export enum DatabaseKeys {
 }
 
 const STORES = {
-  ...CryptographyDatabaseRepository.STORES,
+  AMPLIFY: 'amplify',
 };
 
 export class NotificationDatabaseRepository {

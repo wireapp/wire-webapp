@@ -18,8 +18,8 @@
  */
 
 import {BackendEvent} from '@wireapp/api-client/lib/event';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {CryptographyService} from '../../../cryptography';
 import {NotificationSource} from '../../../notification';
 
 export {BackendEvent};
@@ -28,5 +28,5 @@ export type EventHandlerParams = {
   dryRun?: boolean;
   event: BackendEvent;
   source: NotificationSource;
-  cryptographyService: CryptographyService;
+  decryptMessage: (encryptedPayload: Uint8Array, userId: QualifiedId, clientId: string) => Promise<Uint8Array>;
 };

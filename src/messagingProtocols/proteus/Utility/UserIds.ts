@@ -20,7 +20,7 @@
 import {UserClients, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {isUserClients, isQualifiedUserClients} from '../../../../util';
+import {isUserClients, isQualifiedUserClients} from '../../../util';
 
 interface ExtractUserIdsParams {
   userIds?: string[] | UserClients;

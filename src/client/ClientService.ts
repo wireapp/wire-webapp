@@ -17,14 +17,19 @@
  *
  */
 
-import {LoginData, PreKey} from '@wireapp/api-client/lib/auth/';
+import {LoginData} from '@wireapp/api-client/lib/auth/';
 import {ClientType, CreateClientPayload, RegisteredClient} from '@wireapp/api-client/lib/client/';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import axios from 'axios';
+import {StatusCodes} from 'http-status-codes';
+import logdown from 'logdown';
 
 import {APIClient} from '@wireapp/api-client';
 import {CRUDEngine} from '@wireapp/store-engine';
 
-import {CryptographyService} from '../cryptography/';
+import {deleteIdentity} from '../identity/identityClearer';
+import type {ProteusService} from '../messagingProtocols/proteus';
+import {NewDevicePrekeys} from '../messagingProtocols/proteus/ProteusService';
 
 import {ClientInfo, ClientBackendRepository, ClientDatabaseRepository} from './';
 
@@ -39,13 +44,17 @@ export interface MetaClient extends RegisteredClient {
 export class ClientService {
   private readonly database: ClientDatabaseRepository;
   private readonly backend: ClientBackendRepository;
+  private readonly logger = logdown('@wireapp/core/Client', {
+    logger: console,
+    markdown: false,
+  });
 
   constructor(
     private readonly apiClient: APIClient,
+    private readonly proteusService: ProteusService,
     private readonly storeEngine: CRUDEngine,
-    private readonly cryptographyService: CryptographyService,
   ) {
-    this.database = new ClientDatabaseRepository(this.storeEngine, this.cryptographyService);
+    this.database = new ClientDatabaseRepository(this.storeEngine, this.apiClient.backendFeatures.federationEndpoints);
     this.backend = new ClientBackendRepository(this.apiClient);
   }
 
@@ -64,7 +73,7 @@ export class ClientService {
   public async deleteClient(clientId: string, password?: string): Promise<unknown> {
     const userId: QualifiedId = {id: this.apiClient.userId as string, domain: this.apiClient.domain || ''};
     await this.backend.deleteClient(clientId, password);
-    return this.database.deleteClient(this.cryptographyService.constructSessionId(userId, clientId));
+    return this.database.deleteClient(this.proteusService.constructSessionId(userId, clientId));
   }
 
   /**
@@ -80,11 +89,49 @@ export class ClientService {
     return this.database.deleteLocalClient();
   }
 
-  public getLocalClient(): Promise<MetaClient> {
-    return this.database.getLocalClient();
+  private async getLocalClient(): Promise<MetaClient | undefined> {
+    try {
+      return await this.database.getLocalClient();
+    } catch (error) {
+      return undefined;
+    }
   }
 
-  public createLocalClient(client: RegisteredClient, domain?: string): Promise<MetaClient> {
+  /**
+   * Will try to load the local client from the database into memory.
+   * Will return undefined if the client is not found in the database or if the client does not exist on the backend.
+   * If the client doesn't exist on backend it will purge the database and return undefined.
+   *
+   * @return the loaded client or undefined
+   */
+  public async loadClient(): Promise<RegisteredClient | undefined> {
+    const loadedClient = await this.getLocalClient();
+
+    if (!loadedClient) {
+      return undefined;
+    }
+
+    try {
+      await this.apiClient.api.client.getClient(loadedClient.id);
+      return loadedClient;
+    } catch (error) {
+      const notFoundOnBackend = axios.isAxiosError(error) ? error.response?.status === StatusCodes.NOT_FOUND : false;
+      if (notFoundOnBackend && this.storeEngine) {
+        this.logger.log('Could not find valid client on backend');
+        const shouldDeleteWholeDatabase = loadedClient.type === ClientType.TEMPORARY;
+        if (shouldDeleteWholeDatabase) {
+          this.logger.log('Last client was temporary - Deleting database');
+          await this.storeEngine.clearTables();
+        } else {
+          this.logger.log('Last client was permanent - Deleting previous identity');
+          deleteIdentity(this.storeEngine);
+        }
+      }
+    }
+    return undefined;
+  }
+
+  private createLocalClient(client: RegisteredClient, domain?: string): Promise<MetaClient> {
     return this.database.createLocalClient(client, domain);
   }
 
@@ -102,7 +149,7 @@ export class ClientService {
   public async register(
     loginData: LoginData,
     clientInfo: ClientInfo,
-    entropyData?: Uint8Array,
+    {prekeys, lastPrekey}: NewDevicePrekeys,
   ): Promise<RegisteredClient> {
     if (!this.apiClient.context) {
       throw new Error('Context is not set.');
@@ -112,22 +159,16 @@ export class ClientService {
       throw new Error(`Can't register client of type "${ClientType.NONE}"`);
     }
 
-    const serializedPreKeys: PreKey[] = await this.cryptographyService.createCryptobox(entropyData);
-
-    if (!this.cryptographyService.cryptobox.lastResortPreKey) {
-      throw new Error('Cryptobox got initialized without a last resort PreKey.');
-    }
-
     const newClient: CreateClientPayload = {
       class: clientInfo.classification,
       cookie: clientInfo.cookieLabel,
       label: clientInfo.label,
-      lastkey: this.cryptographyService.cryptobox.serialize_prekey(this.cryptographyService.cryptobox.lastResortPreKey),
+      lastkey: lastPrekey,
       location: clientInfo.location,
       model: clientInfo.model,
       password: loginData.password ? String(loginData.password) : undefined,
       verification_code: loginData.verificationCode,
-      prekeys: serializedPreKeys,
+      prekeys: prekeys,
       type: loginData.clientType,
     };
 

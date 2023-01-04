@@ -17,17 +17,9 @@
  *
  */
 
-require('fake-indexeddb/auto');
-import nodeCrypto from 'crypto';
-
 import {createCustomEncryptedStore, createEncryptedStore} from './encryptedStore';
 
 describe('encryptedStore', () => {
-  beforeEach(() => {
-    // @ts-ignore
-    global.crypto = nodeCrypto.webcrypto;
-  });
-
   describe('Store and restore secret values with default encryption', () => {
     it('Stores secret values', async () => {
       const store = await createEncryptedStore('test');

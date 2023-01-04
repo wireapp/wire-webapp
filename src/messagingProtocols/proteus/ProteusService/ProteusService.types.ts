@@ -17,6 +17,7 @@
  *
  */
 
+import {PreKey} from '@wireapp/api-client/lib/auth';
 import {
   UserClients,
   QualifiedUserClients,
@@ -29,9 +30,18 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {AddUsersParams, MessageSendingOptions, SendCommonParams} from '../../../conversation';
 
+export interface NewClient {
+  clientId: string;
+  userId: QualifiedId;
+}
 export type ProteusServiceConfig = {
   useQualifiedIds: boolean;
+  onNewClient?: (client: NewClient) => void;
+  nbPrekeys: number;
+  onNewPrekeys: (prekeys: PreKey[]) => void;
 };
+
+export type NewDevicePrekeys = {prekeys: PreKey[]; lastPrekey: PreKey};
 
 export type SendProteusMessageParams = SendCommonParams &
   MessageSendingOptions & {

@@ -18,5 +18,6 @@
  */
 
 export * from './ProteusService';
-export * from './Utility';
-export * from './Utility/getGenericMessageParams';
+export * from '../Utility';
+export * from './ProteusService.types';
+export {ProteusErrors} from './DecryptionErrorGenerator';

@@ -17,16 +17,4 @@
  *
  */
 
-const baseConfig = require('../../jest.config.base');
-
-const {TextDecoder, TextEncoder} = require('util');
-
-module.exports = {
-  ...baseConfig,
-  testEnvironment: 'node',
-  setupFilesAfterEnv: ['./jest.setup.ts'],
-  globals: {
-    TextDecoder,
-    TextEncoder,
-  },
-};
+export * from './PreKeyBundle';

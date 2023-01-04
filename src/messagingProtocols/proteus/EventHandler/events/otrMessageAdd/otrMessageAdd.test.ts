@@ -17,16 +17,26 @@
  *
  */
 
-const baseConfig = require('../../jest.config.base');
+import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 
-const {TextDecoder, TextEncoder} = require('util');
+import {BackendEvent} from '../../EventHandler.types';
 
-module.exports = {
-  ...baseConfig,
-  testEnvironment: 'node',
-  setupFilesAfterEnv: ['./jest.setup.ts'],
-  globals: {
-    TextDecoder,
-    TextEncoder,
-  },
-};
+import {isOtrMessageAddEvent} from '.';
+
+describe('MLS messageAdd eventHandler', () => {
+  describe('isMessageAdd', () => {
+    it('returns true for a messageAdd event', () => {
+      const event = {
+        type: CONVERSATION_EVENT.OTR_MESSAGE_ADD,
+      } as BackendEvent;
+      expect(isOtrMessageAddEvent(event)).toBe(true);
+    });
+
+    it('returns false for a non-messageAdd event', () => {
+      const event = {
+        type: CONVERSATION_EVENT.MEMBER_JOIN,
+      } as BackendEvent;
+      expect(isOtrMessageAddEvent(event)).toBe(false);
+    });
+  });
+});
