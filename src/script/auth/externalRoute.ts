@@ -22,7 +22,7 @@ import {Config} from '../Config';
 export const EXTERNAL_ROUTE = {
   PWA: Config.getConfig().URL.MOBILE_BASE,
   PWA_LOGIN: `${Config.getConfig().URL.MOBILE_BASE}/login/`,
-  WEBAPP: '../',
+  WEBAPP: '/',
   WIRE_ACCOUNT: Config.getConfig().URL.ACCOUNT_BASE,
   WIRE_ACCOUNT_PASSWORD_RESET: `${Config.getConfig().URL.ACCOUNT_BASE}/forgot/`,
   WIRE_TEAM_FEATURES: `${Config.getConfig().URL.WEBSITE_BASE}/create-team/#features`,

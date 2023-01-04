@@ -90,7 +90,6 @@ export const AppContainer: FC<AppProps> = ({config}) => {
   }
 
   const clientType = shouldPersist ? ClientType.PERMANENT : ClientType.TEMPORARY;
-  console.info('bardia render app container');
 
   return (
     <AppLoader init={onProgress => app.initApp(clientType, onProgress)}>

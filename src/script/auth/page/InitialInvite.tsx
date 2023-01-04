@@ -21,6 +21,7 @@ import React, {useState} from 'react';
 
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
+import {useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
 import {
@@ -71,12 +72,13 @@ const InitialInviteComponent = ({
   const emailInput = React.useRef<HTMLInputElement>();
   const [enteredEmail, setEnteredEmail] = useState('');
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   const onInviteDone = async () => {
     await doFlushDatabase();
     // Remove local storage item for 2FA logout if token expires.
     removeLocalStorage(QUERY_KEY.JOIN_EXPIRES);
-    window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
+    navigate(pathWithParams(EXTERNAL_ROUTE.WEBAPP), {replace: true});
   };
 
   const renderEmail = (email: string): JSX.Element => (

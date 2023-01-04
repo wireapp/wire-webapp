@@ -22,7 +22,7 @@ import React, {useEffect, useState} from 'react';
 import type {RegisterData} from '@wireapp/api-client/lib/auth';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {Navigate} from 'react-router-dom';
+import {Navigate, useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
 import {Runtime, UrlUtil} from '@wireapp/commons';
@@ -80,6 +80,7 @@ const ConversationJoinComponent = ({
 }: Props & ConnectedProps & DispatchProps) => {
   const nameInput = React.useRef<HTMLInputElement>();
   const {formatMessage: _} = useIntl();
+  const navigate = useNavigate();
 
   const [accentColor] = useState(AccentColor.random());
   const [isPwaEnabled, setIsPwaEnabled] = useState<boolean>();
@@ -135,7 +136,7 @@ const ConversationJoinComponent = ({
       : `${UrlUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP)}${
           conversation && `#/conversation/${conversation}${domain && `/${domain}`}`
         }`;
-    window.location.replace(redirectLocation);
+    navigate(redirectLocation);
   };
 
   const handleSubmit = async (entropyData?: Uint8Array) => {
