@@ -24,13 +24,13 @@ export const wrapperStyles: CSSObject = {
   alignItems: 'center',
   marginLeft: 15,
   color: 'var(--text-input-placeholder)',
-  fontSize: 11,
+  fontSize: 'var(--font-size-xsmall)',
   fontWeight: 500,
-  paddingTop: 2,
+  paddingTop: '0.125rem',
   backgroundColor: 'var(--app-bg)',
-  padding: 5,
+  padding: '0.3125rem',
   position: 'absolute',
-  top: -26,
+  top: '-1.625rem',
   borderTopLeftRadius: 4,
   borderTopRightRadius: 4,
   'div:first-of-type': {
@@ -41,11 +41,11 @@ export const wrapperStyles: CSSObject = {
 };
 
 export const indicatorAnimationWrapperStyles: CSSObject = {
-  width: 38,
-  height: 16,
+  width: '2.375rem',
+  height: '1rem',
   marginLeft: 2,
   position: 'relative',
-  bottom: 3,
+  bottom: '0.1875rem',
 };
 
 const animationStyles: CSSObject = {
@@ -127,7 +127,7 @@ export const dotThreeStyles = css`
 `;
 
 export const indicatorTitleStyles = css`
-  height: 16px;
+  height: var(--icon-size-sm);
   position: relative;
   top: 1px;
 `;
