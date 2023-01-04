@@ -17,6 +17,7 @@
  *
  */
 
+import {SUBCONVERSATION_ID} from '@wireapp/api-client/lib/conversation/Subconversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 import {container} from 'tsyringe';
@@ -47,6 +48,8 @@ import type {PermissionRepository} from '../permission/PermissionRepository';
 import {PermissionStatusState} from '../permission/PermissionStatusState';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
+import {APIClient} from '../service/APIClientSingleton';
+import {Core} from '../service/CoreSingleton';
 import type {TeamRepository} from '../team/TeamRepository';
 import {TeamState} from '../team/TeamState';
 import {ROLE} from '../user/UserPermission';
@@ -100,6 +103,8 @@ export class CallingViewModel {
     private readonly conversationState = container.resolve(ConversationState),
     readonly callState = container.resolve(CallState),
     private readonly teamState = container.resolve(TeamState),
+    core = container.resolve(Core),
+    apiClient = container.resolve(APIClient),
   ) {
     this.isSelfVerified = ko.pureComputed(() => selfUser().is_verified());
     this.activeCalls = ko.pureComputed(() =>
@@ -136,9 +141,32 @@ export class CallingViewModel {
       });
     };
 
-    const startCall = (conversationEntity: Conversation, callType: CALL_TYPE): void => {
-      const convType = conversationEntity.isGroup() ? CONV_TYPE.GROUP : CONV_TYPE.ONEONONE;
-      this.callingRepository.startCall(conversationEntity.qualifiedId, convType, callType).then(call => {
+    async function joinMLSSubgroup(conversation: Conversation) {
+      const subgroup = await apiClient.api.conversation.getSubconversation(
+        conversation.qualifiedId,
+        SUBCONVERSATION_ID.CONFERENCE,
+      );
+      if (subgroup.epoch === 0) {
+        await core.service!.mls.registerConversation(subgroup.group_id, []);
+      } else {
+        await core.service!.mls.joinByExternalCommit(() =>
+          apiClient.api.conversation.getSubconversationGroupInfo(
+            conversation.qualifiedId,
+            SUBCONVERSATION_ID.CONFERENCE,
+          ),
+        );
+      }
+      return {
+        epoch: subgroup.epoch,
+        secretKey: await core.service!.mls.exportSecretKey(subgroup.group_id, 256),
+      };
+      //core.service.conversation.joinMLSSubgroup(conversation.qualifiedId).then((subgroupId) => {
+    }
+
+    const startCall = async (conversation: Conversation, callType: CALL_TYPE): Promise<void> => {
+      const keyData = conversation.isUsingMLSProtocol ? await joinMLSSubgroup(conversation) : undefined;
+      const convType = CONV_TYPE.CONFERENCE_MLS; // conversation.isGroup() ? CONV_TYPE.GROUP : CONV_TYPE.ONEONONE;
+      this.callingRepository.startCall(conversation.qualifiedId, convType, callType, keyData).then(call => {
         if (!call) {
           return;
         }

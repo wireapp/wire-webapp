@@ -676,7 +676,12 @@ export class CallingRepository {
     }
   };
 
-  async startCall(conversationId: QualifiedId, conversationType: CONV_TYPE, callType: CALL_TYPE): Promise<void | Call> {
+  async startCall(
+    conversationId: QualifiedId,
+    conversationType: CONV_TYPE,
+    callType: CALL_TYPE,
+    keyData?: {epoch: number; secretKey: Uint8Array},
+  ): Promise<void | Call> {
     if (!this.selfUser || !this.selfClientId) {
       this.logger.warn(
         `Calling repository is not initialized correctly \n ${JSON.stringify({
@@ -724,6 +729,10 @@ export class CallingRepository {
          */
         this.wCall?.setMute(this.wUser, 0);
         this.wCall?.start(this.wUser, convId, callType, conversationType, this.callState.cbrEncoding());
+        if (keyData) {
+          const decoder = new TextDecoder();
+          this.wCall?.setEpochInfo(this.wUser, convId, keyData?.epoch, '', decoder.decode(keyData?.secretKey), 256);
+        }
         this.sendCallingEvent(EventName.CALLING.INITIATED_CALL, call);
         this.sendCallingEvent(EventName.CONTRIBUTED, call, {
           [Segmentation.MESSAGE.ACTION]: callType === CALL_TYPE.VIDEO ? 'video_call' : 'audio_call',
