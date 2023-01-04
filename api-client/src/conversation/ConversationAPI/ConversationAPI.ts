@@ -67,6 +67,7 @@ import {
   ConversationTypingData,
 } from '../data';
 import {MlsEvent} from '../data/MlsEventData';
+import {Subconversation, SUBCONVERSATION_ID} from '../Subconversation';
 
 export type PostMlsMessageResponse = {
   events: MlsEvent[];
@@ -84,6 +85,8 @@ export class ConversationAPI {
     CODE: 'code',
     CODE_CHECK: '/code-check',
     CONVERSATIONS: '/conversations',
+    SUBCONVERSATIONS: 'subconversations',
+    GROUP_INFO: 'groupinfo',
     MLS: '/mls',
     JOIN: '/join',
     LIST: 'list',
@@ -250,6 +253,52 @@ export class ConversationAPI {
     return response.data;
   }
 
+  public async getSubconversation(
+    conversationId: QualifiedId,
+    subconversationId: SUBCONVERSATION_ID,
+  ): Promise<Subconversation> {
+    const {id, domain} = conversationId;
+
+    const url = `${ConversationAPI.URL.CONVERSATIONS}/${domain}/${id}/${ConversationAPI.URL.SUBCONVERSATIONS}/${subconversationId}`;
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      url,
+    };
+    const response = await this.client.sendJSON<Subconversation>(config);
+    return response.data;
+  }
+
+  public async deleteSubconversationSelf(
+    conversationId: QualifiedId,
+    subconversationId: SUBCONVERSATION_ID,
+  ): Promise<void> {
+    const {id, domain} = conversationId;
+
+    const url = `${ConversationAPI.URL.CONVERSATIONS}/${domain}/${id}/${ConversationAPI.URL.SUBCONVERSATIONS}/${subconversationId}/${ConversationAPI.URL.SELF}`;
+
+    const config: AxiosRequestConfig = {
+      method: 'delete',
+      url,
+    };
+
+    await this.client.sendJSON(config);
+  }
+
+  public async getSubconversationGroupInfo(conversationId: QualifiedId, subconversationId: SUBCONVERSATION_ID) {
+    const {id, domain} = conversationId;
+
+    const url = `${ConversationAPI.URL.CONVERSATIONS}/${domain}/${id}/${ConversationAPI.URL.SUBCONVERSATIONS}/${subconversationId}/${ConversationAPI.URL.GROUP_INFO}`;
+
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      url,
+      responseType: 'arraybuffer',
+    };
+
+    const response = await this.client.sendRequest<ArrayBuffer>(config);
+    return new Uint8Array(response.data);
+  }
+
   /**
    * Get all qualified conversation IDs.
    * @param limit Max. number of qualified IDs to return
@@ -406,7 +455,7 @@ export class ConversationAPI {
    * see https://staging-nginz-https.zinfra.io/api/swagger-ui/#/default/get_conversations__cnv_domain___cnv__groupinfo
    */
   public async getGroupInfo({id, domain}: QualifiedId) {
-    const url = `/conversations/${domain}/${id}/groupinfo`;
+    const url = `/conversations/${domain}/${id}/${ConversationAPI.URL.GROUP_INFO}`;
     const response = await this.client.sendRequest<ArrayBuffer>({
       url,
       responseType: 'arraybuffer',
@@ -437,7 +486,7 @@ export class ConversationAPI {
   public async getMembershipProperties(conversationId: string): Promise<Member> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/self`,
+      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.SELF}`,
     };
 
     const response = await this.client.sendJSON<Member>(config);
