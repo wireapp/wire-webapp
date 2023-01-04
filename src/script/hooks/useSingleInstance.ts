@@ -50,7 +50,7 @@ function poll(instanceIdRef: {current: string | undefined}, onNewInstance: () =>
   return () => window.clearInterval(interval);
 }
 
-function killCurrentInstance() {
+export function killCurrentInstance() {
   return Cookies.remove(CONFIG.COOKIE_NAME);
 }
 
