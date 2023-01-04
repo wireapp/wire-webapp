@@ -17,11 +17,13 @@
  *
  */
 
+import {ConversationProtocol, CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {amplify} from 'amplify';
 import 'jsdom-worker';
 import ko, {Subscription} from 'knockout';
 
 import {CONV_TYPE, CALL_TYPE, STATE as CALL_STATE, REASON, Wcall} from '@wireapp/avs';
+import {Runtime} from '@wireapp/commons';
 
 import {Call} from 'src/script/calling/Call';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
@@ -49,8 +51,14 @@ const createSelfParticipant = () => {
   return new Participant(selfUser, 'client1');
 };
 
-const createConversationId = () => {
-  return {domain: '', id: createRandomUuid()};
+const createConversation = (
+  type: CONVERSATION_TYPE = CONVERSATION_TYPE.ONE_TO_ONE,
+  protocol: ConversationProtocol = ConversationProtocol.PROTEUS,
+) => {
+  const conversation = new Conversation(createRandomUuid(), '', protocol);
+  conversation.participating_user_ets.push(new User(createRandomUuid()));
+  conversation.type(type);
+  return conversation;
 };
 
 describe('CallingRepository', () => {
@@ -59,6 +67,7 @@ describe('CallingRepository', () => {
   let wCall: Wcall;
   let wUser: number;
   const selfUser = new User(createRandomUuid());
+  selfUser.isMe = true;
   const clientId = createRandomUuid();
 
   const mediaDevices = {
@@ -90,7 +99,7 @@ describe('CallingRepository', () => {
     it('warns the user that there is an ongoing call before starting a new one', done => {
       const activeCall = new Call(
         selfUser.qualifiedId,
-        createConversationId(),
+        createConversation(CONVERSATION_TYPE.REGULAR, ConversationProtocol.PROTEUS),
         CONV_TYPE.ONEONONE,
         new Participant(new User(), ''),
         0,
@@ -99,11 +108,10 @@ describe('CallingRepository', () => {
       activeCall.state(CALL_STATE.MEDIA_ESTAB);
       spyOn(callingRepository['callState'], 'calls').and.returnValue([activeCall]);
       spyOn(amplify, 'publish').and.returnValue(undefined);
-      const conversationId = createConversationId();
-      const conversationType = CONV_TYPE.ONEONONE;
+      const conversation = createConversation(CONVERSATION_TYPE.REGULAR, ConversationProtocol.PROTEUS);
       const callType = CALL_TYPE.NORMAL;
       spyOn(wCall, 'start');
-      callingRepository.startCall(conversationId, conversationType, callType).catch(done);
+      callingRepository.startCall(conversation, callType).catch(done);
       setTimeout(() => {
         expect(usePrimaryModalState.getState().currentModalId).not.toBeNull();
         expect(wCall.start).not.toHaveBeenCalled();
@@ -111,14 +119,33 @@ describe('CallingRepository', () => {
       }, 10);
     });
 
-    it('starts a normal call in a 1:1 conversation', () => {
-      const conversationId = createConversationId();
-      const conversationType = CONV_TYPE.ONEONONE;
+    it.each([ConversationProtocol.PROTEUS, ConversationProtocol.MLS])(
+      'starts a normal call in a 1:1 conversation for proteus or MLS conversation',
+      async protocol => {
+        const conversation = createConversation(CONVERSATION_TYPE.ONE_TO_ONE, protocol);
+        const callType = CALL_TYPE.NORMAL;
+        spyOn(wCall, 'start');
+        await callingRepository.startCall(conversation, callType);
+        expect(wCall.start).toHaveBeenCalledWith(wUser, conversation.id, callType, CONV_TYPE.ONEONONE, 0);
+      },
+    );
+
+    it('starts a conference call in a group conversation for proteus', async () => {
+      jest.spyOn(Runtime, 'isSupportingConferenceCalling').mockReturnValue(true);
+      const conversation = createConversation(CONVERSATION_TYPE.REGULAR, ConversationProtocol.PROTEUS);
       const callType = CALL_TYPE.NORMAL;
       spyOn(wCall, 'start');
-      return callingRepository.startCall(conversationId, conversationType, callType).then(() => {
-        expect(wCall.start).toHaveBeenCalledWith(wUser, conversationId.id, conversationType, callType, 0);
-      });
+      await callingRepository.startCall(conversation, callType);
+      expect(wCall.start).toHaveBeenCalledWith(wUser, conversation.id, callType, CONV_TYPE.CONFERENCE, 0);
+    });
+
+    it('starts a MLS conference call in a group conversation for MLS', async () => {
+      jest.spyOn(Runtime, 'isSupportingConferenceCalling').mockReturnValue(true);
+      const conversation = createConversation(CONVERSATION_TYPE.REGULAR, ConversationProtocol.MLS);
+      const callType = CALL_TYPE.NORMAL;
+      spyOn(wCall, 'start');
+      await callingRepository.startCall(conversation, callType, {secretKey: '', keyLength: 256, epoch: 0});
+      expect(wCall.start).toHaveBeenCalledWith(wUser, conversation.id, callType, CONV_TYPE.CONFERENCE_MLS, 0);
     });
   });
 
@@ -128,7 +155,7 @@ describe('CallingRepository', () => {
       const userId = {domain: '', id: ''};
       const incomingCall = new Call(
         userId,
-        createConversationId(),
+        createConversation(),
         CONV_TYPE.CONFERENCE,
         selfParticipant,
         CALL_TYPE.NORMAL,
@@ -140,7 +167,7 @@ describe('CallingRepository', () => {
 
       const activeCall = new Call(
         userId,
-        createConversationId(),
+        createConversation(),
         CONV_TYPE.CONFERENCE,
         selfParticipant,
         CALL_TYPE.NORMAL,
@@ -152,7 +179,7 @@ describe('CallingRepository', () => {
 
       const declinedCall = new Call(
         userId,
-        createConversationId(),
+        createConversation(),
         CONV_TYPE.CONFERENCE,
         selfParticipant,
         CALL_TYPE.NORMAL,
@@ -173,7 +200,7 @@ describe('CallingRepository', () => {
     it('returns cached mediastream for self user if set', () => {
       const selfParticipant = createSelfParticipant();
       const userId = {domain: '', id: ''};
-      const call = new Call(userId, createConversationId(), CONV_TYPE.CONFERENCE, selfParticipant, CALL_TYPE.NORMAL, {
+      const call = new Call(userId, createConversation(), CONV_TYPE.CONFERENCE, selfParticipant, CALL_TYPE.NORMAL, {
         currentAvailableDeviceId: mediaDevices,
       } as MediaDevicesHandler);
       const source = new window.RTCAudioSource();
@@ -190,6 +217,7 @@ describe('CallingRepository', () => {
       });
       return Promise.all(queries).then(() => {
         expect(selfParticipant.getMediaStream).toHaveBeenCalledTimes(queries.length);
+        audioTrack.stop();
       });
     });
 
@@ -197,7 +225,7 @@ describe('CallingRepository', () => {
       const selfParticipant = createSelfParticipant();
       const call = new Call(
         {domain: '', id: ''},
-        createConversationId(),
+        createConversation(),
         CONV_TYPE.CONFERENCE,
         selfParticipant,
         CALL_TYPE.NORMAL,
@@ -220,6 +248,7 @@ describe('CallingRepository', () => {
       });
       return Promise.all(queries).then(() => {
         expect(callingRepository['mediaStreamHandler'].requestMediaStream).toHaveBeenCalledTimes(1);
+        audioTrack.stop();
       });
     });
   });
@@ -230,7 +259,7 @@ describe('CallingRepository', () => {
       spyOn(selfParticipant, 'releaseAudioStream');
       spyOn(selfParticipant, 'releaseVideoStream');
 
-      const call = new Call({domain: '', id: ''}, createConversationId(), 0, selfParticipant, CALL_TYPE.NORMAL, {
+      const call = new Call({domain: '', id: ''}, createConversation(), 0, selfParticipant, CALL_TYPE.NORMAL, {
         currentAvailableDeviceId: mediaDevices,
       } as MediaDevicesHandler);
       spyOn(callingRepository['callState'], 'joinedCall').and.returnValue(call);
@@ -484,7 +513,7 @@ describe.skip('E2E audio call', () => {
 
   it('calls and connect with the remote user', done => {
     onCallClosed = done;
-    const conversationId = createConversationId();
+    const conversationId = createConversation();
     onCallConnected = () => {
       expect(client['sendMessage']).toHaveBeenCalledTimes(1);
       expect(client.onCallEvent).toHaveBeenCalledTimes(1);
@@ -502,12 +531,12 @@ describe.skip('E2E audio call', () => {
         })
         .catch(done.fail);
     };
-    client.startCall(conversationId, CONV_TYPE.ONEONONE, CALL_TYPE.NORMAL).catch(done.fail);
+    client.startCall(conversationId, CALL_TYPE.NORMAL).catch(done.fail);
   });
 
   it('answers an incoming call and connect with the remote peer', done => {
     onCallClosed = done;
-    const conversationId = createConversationId();
+    const conversationId = createConversation();
     onCallConnected = () => {
       expect(client.onCallEvent).toHaveBeenCalled();
       expect(client['incomingCallCallback']).toHaveBeenCalled();

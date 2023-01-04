@@ -47,7 +47,6 @@ import type {PermissionRepository} from '../permission/PermissionRepository';
 import {PermissionStatusState} from '../permission/PermissionStatusState';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
-import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
 import type {TeamRepository} from '../team/TeamRepository';
 import {TeamState} from '../team/TeamState';
@@ -103,7 +102,6 @@ export class CallingViewModel {
     readonly callState = container.resolve(CallState),
     private readonly teamState = container.resolve(TeamState),
     core = container.resolve(Core),
-    apiClient = container.resolve(APIClient),
   ) {
     this.isSelfVerified = ko.pureComputed(() => selfUser().is_verified());
     this.activeCalls = ko.pureComputed(() =>

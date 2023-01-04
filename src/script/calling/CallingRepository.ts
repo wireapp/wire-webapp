@@ -677,7 +677,7 @@ export class CallingRepository {
   };
 
   private getConversationType(conversation: Conversation): CONV_TYPE {
-    if (!conversation.isGroup) {
+    if (!conversation.isGroup()) {
       return CONV_TYPE.ONEONONE;
     }
 
