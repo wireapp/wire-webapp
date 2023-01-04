@@ -39,4 +39,5 @@ export * from './QualifiedUserClients';
 export * from './QualifiedConversationIds';
 export * from './RemoteConversations';
 export * from './ServiceRef';
+export * from './Subconversation';
 export * from './UserClients';
