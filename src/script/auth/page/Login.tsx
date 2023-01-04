@@ -164,7 +164,9 @@ const Login = ({
       // Try to initialize to check if the client needs 2fa before checking for entropyData
       await doInitializeClient(ClientType.PERMANENT, undefined, undefined, undefined);
       const entropyData = await getEntropy?.();
-      await doInitializeClient(ClientType.PERMANENT, undefined, undefined, entropyData);
+      if (entropyData) {
+        await doInitializeClient(ClientType.PERMANENT, undefined, undefined, entropyData);
+      }
       return history.push(ROUTE.HISTORY_INFO);
     } catch (error) {
       logger.error('Unable to login immediately', error);
