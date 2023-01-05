@@ -45,7 +45,7 @@ const allButtonTitles = [
 
 describe('ControlButtons', () => {
   it.each<[Partial<PropsType>, string[]]>([
-    [{disableFilesharing: true}, []],
+    [{disableFilesharing: true}, ['tooltipConversationPing']],
     [{isEditing: true}, []],
   ])('renders the right buttons depending on props (%s)', (overrides, buttonTitles) => {
     const params = {...defaultParams, ...overrides};
