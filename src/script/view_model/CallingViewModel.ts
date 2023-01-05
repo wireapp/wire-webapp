@@ -138,37 +138,36 @@ export class CallingViewModel {
       });
     };
 
+    const generateMembers = async (conversationId: QualifiedId, subconversation: Subconversation): Promise<any> => {
+      const mlsService = core.service!.mls;
+
+      const parentGroupId = await mlsService.getGroupIdFromConversationId(conversationId);
+      const memberIds = await core.service!.mls.getClientIds(parentGroupId);
+
+      return memberIds.map(parentMember => {
+        const isSubconversationMember = !!subconversation.members.find(
+          ({user_id, client_id}) => user_id === parentMember.userId && client_id === parentMember.clientId,
+        );
+
+        return {userid: parentMember.userId, clientid: parentMember.clientId, in_subconv: isSubconversationMember};
+      });
+    };
+
     const startCall = async (conversation: Conversation, callType: CALL_TYPE): Promise<void> => {
+      const call = await this.callingRepository.startCall(conversation, callType);
+      if (!call) {
+        return;
+      }
+
       const subconversationData = conversation.isUsingMLSProtocol
         ? await core.service!.mls.joinConferenceSubconversation(conversation)
         : undefined;
-
-      /*
-      setInterval(async () => {
-        const subconversation = subconversationData!.subconversation;
-        const groupIdBytes = Decoder.fromBase64(subconversation.group_id).asBytes;
-        const secretKey = await core.service!.mls['coreCrypotClient'].exportSecretKey(groupIdBytes, 256);
-        const memberIds = await core.service!.mls.getClientIds(subconversation.group_id);
-        const clientsList = memberIds.map(parentMember => {
-          const isSubconversationMember = !!subconversation.members.find(
-            ({user_id, client_id}) => user_id === parentMember.userId && client_id === parentMember.clientId,
-          );
-
-          return {userid: parentMember.userId, clientId: parentMember.clientId, in_subconv: isSubconversationMember};
-        });
-
-        const clientsJson = JSON.stringify({convid: conversation.qualifiedId, clients: clientsList});
-
-        console.log('new secret key', secretKey);
-        this.callingRepository.setEpochInfo(call.conversationId.id, subconversation.epoch, clientsJson, secretKey, 256);
-      }, 1000);
-      */
-      this.callingRepository.startCall(conversation, callType, subconversationData).then(call => {
-        if (!call) {
-          return;
-        }
-        ring(call);
-      });
+      const subconversation = subconversationData?.subconversation;
+      if (subconversation) {
+        const members = await generateMembers(conversation, subconversation);
+        this.callingRepository.setEpochInfo(conversation.qualifiedId, subconversationData, members);
+      }
+      ring(call);
     };
 
     const joinOngoingCall = async (call: Call) => {
@@ -182,24 +181,14 @@ export class CallingViewModel {
       const subconversationData = await mlsService.joinConferenceSubconversation(call.conversationId);
       const {subconversation} = subconversationData;
 
-      //update epoch info
-      const parentGroupId = await mlsService.getGroupIdFromConversationId(call.conversationId);
-      const memberIds = await core.service!.mls.getClientIds(parentGroupId);
-
-      const members = memberIds.map(parentMember => {
-        const isSubconversationMember = !!subconversation.members.find(
-          ({user_id, client_id}) => user_id === parentMember.userId && client_id === parentMember.clientId,
-        );
-
-        return {userid: parentMember.userId, clientId: parentMember.clientId, in_subconv: isSubconversationMember};
-      });
+      const members = await generateMembers(call.conversationId, subconversation);
 
       this.callingRepository.setEpochInfo(call.conversationId, subconversationData, members);
     };
 
     const answerCall = async (call: Call) => {
-      await joinOngoingCall(call);
       await this.callingRepository.answerCall(call);
+      await joinOngoingCall(call);
     };
 
     const hasSoundlessCallsEnabled = (): boolean => {
