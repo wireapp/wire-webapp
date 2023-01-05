@@ -118,6 +118,8 @@ enum CALL_DIRECTION {
   OUTGOING = 'outgoing',
 }
 
+type SubconversationData = {subconversation: {epoch: number}; secretKey: string; keyLength: number};
+
 export class CallingRepository {
   private readonly acceptVersionWarning: (conversationId: QualifiedId) => void;
   private readonly callLog: string[];
@@ -690,7 +692,7 @@ export class CallingRepository {
   async startCall(
     conversation: Conversation,
     callType: CALL_TYPE,
-    keyData?: {epoch: number; secretKey: string; keyLength: number},
+    subconversationData?: SubconversationData,
   ): Promise<void | Call> {
     if (!this.selfUser || !this.selfClientId) {
       this.logger.warn(
@@ -737,9 +739,8 @@ export class CallingRepository {
          */
         this.wCall?.setMute(this.wUser, 0);
         this.wCall?.start(this.wUser, convId, callType, conversationType, this.callState.cbrEncoding());
-        if (keyData) {
-          const {epoch, secretKey, keyLength} = keyData;
-          this.wCall?.setEpochInfo(this.wUser, convId, epoch, '', secretKey, keyLength);
+        if (subconversationData) {
+          this.setEpochInfo(conversationId, subconversationData);
         }
         this.sendCallingEvent(EventName.CALLING.INITIATED_CALL, call);
         this.sendCallingEvent(EventName.CONTRIBUTED, call, {
@@ -860,8 +861,17 @@ export class CallingRepository {
     }
   }
 
-  setEpochInfo(conversationId: string, epoch: number, clients_json: string, secretKey: string, keyLength: number) {
-    return this.wCall?.setEpochInfo(this.wUser, conversationId, epoch, clients_json, secretKey, keyLength);
+  setEpochInfo(conversationId: QualifiedId, subconversationData: SubconversationData, members: any[] = []) {
+    const serializedConversationId = this.serializeQualifiedId(conversationId);
+    const {subconversation, secretKey, keyLength} = subconversationData;
+    return this.wCall?.setEpochInfo(
+      this.wUser,
+      serializedConversationId,
+      subconversation.epoch,
+      JSON.stringify(members),
+      secretKey,
+      keyLength,
+    );
   }
 
   rejectCall(conversationId: QualifiedId): void {
