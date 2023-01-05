@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [38.2.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.1.0...@wireapp/core@38.2.0) (2023-01-05)
+
+### Features
+
+* **core:** expose getClientIds method [FS-1285] ([#4748](https://github.com/wireapp/wire-web-packages/issues/4748)) ([07b009b](https://github.com/wireapp/wire-web-packages/commit/07b009b6841fb5fa167c369ef086cb87d4b46cb9))
+
 # [38.1.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.0.1...@wireapp/core@38.1.0) (2023-01-04)
 
 ### Features
