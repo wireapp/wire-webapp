@@ -1,4 +1,4 @@
-name: Deploys to testing environments (qa or edge)
+name: Deploys to testing environments
 
 on:
   workflow_dispatch:
@@ -16,7 +16,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test_build_deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     env:
@@ -25,6 +25,11 @@ jobs:
       AWS_BUILD_ZIP_PATH: server/dist/s3/ebs.zip
 
     steps:
+      - name: Print environment variables
+        run: |
+          echo -e "branch = ${{github.ref_name}}"
+          echo -e "env = ${{inputs.env}}"
+
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -44,8 +49,7 @@ jobs:
       - name: Build
         run: yarn build:prod
 
-      - name: Deploy edge build to Elastic Beanstalk
-        if: env.BRANCH_NAME == 'dev'
+      - name: Deploy to Elastic Beanstalk
         uses: einaregilsson/beanstalk-deploy@v21
         with:
           application_name: ${{env.AWS_APPLICATION_NAME}}
