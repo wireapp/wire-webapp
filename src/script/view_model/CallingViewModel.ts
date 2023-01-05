@@ -139,9 +139,16 @@ export class CallingViewModel {
     };
 
     const startCall = async (conversation: Conversation, callType: CALL_TYPE): Promise<void> => {
-      const keyData = conversation.isUsingMLSProtocol
+      const subconversationData = conversation.isUsingMLSProtocol
         ? await core.service!.mls.joinConferenceSubconversation(conversation)
         : undefined;
+
+      const keyData = subconversationData && {
+        epoch: subconversationData.subconversation.epoch,
+        keyLength: subconversationData.keyLength,
+        secretKey: subconversationData.secretKey,
+      };
+
       this.callingRepository.startCall(conversation, callType, keyData).then(call => {
         if (!call) {
           return;
@@ -150,29 +157,22 @@ export class CallingViewModel {
       });
     };
 
-    const answerCall = async (call: Call) => {
-      //answer call
-      await this.callingRepository.answerCall(call);
-
+    const joinOngoingCall = async (call: Call) => {
       //we don't have to do anything if it's not mls conference
       if (call.conversationType !== CONV_TYPE.CONFERENCE_MLS) {
         return;
       }
 
       //join subconversation
-      const {
-        groupId,
-        epoch,
-        keyLength,
-        secretKey,
-        members: subconversationMembers,
-      } = await core.service!.mls.joinConferenceSubconversation(call.conversationId);
+      const {subconversation, keyLength, secretKey} = await core.service!.mls.joinConferenceSubconversation(
+        call.conversationId,
+      );
 
       //update epoch info
-      const parentConversationMemberIds = await core.service!.mls.getClientIds(groupId);
+      const parentConversationMemberIds = await core.service!.mls.getClientIds(subconversation.group_id);
 
       const clientsList = parentConversationMemberIds.map(parentMember => {
-        const isSubconversationMember = !!subconversationMembers.find(
+        const isSubconversationMember = !!subconversation.members.find(
           ({user_id, client_id}) => user_id === parentMember.userId && client_id === parentMember.clientId,
         );
 
@@ -181,7 +181,18 @@ export class CallingViewModel {
 
       const clientsJson = JSON.stringify({convid: call.conversationId.id, clients: clientsList});
 
-      this.callingRepository.setEpochInfo(call.conversationId.id, epoch, clientsJson, secretKey, keyLength);
+      this.callingRepository.setEpochInfo(
+        call.conversationId.id,
+        subconversation.epoch,
+        clientsJson,
+        secretKey,
+        keyLength,
+      );
+    };
+
+    const answerCall = async (call: Call) => {
+      await this.callingRepository.answerCall(call);
+      await joinOngoingCall(call);
     };
 
     const hasSoundlessCallsEnabled = (): boolean => {
@@ -192,7 +203,9 @@ export class CallingViewModel {
       return !!this.callState.joinedCall();
     };
 
-    this.callingRepository.onIncomingCall((call: Call) => {
+    this.callingRepository.onIncomingCall(async (call: Call) => {
+      await joinOngoingCall(call);
+
       const shouldRing = this.selfUser().availability() !== Availability.Type.AWAY;
       if (shouldRing && (!hasSoundlessCallsEnabled() || !hasJoinedCall())) {
         ring(call);
