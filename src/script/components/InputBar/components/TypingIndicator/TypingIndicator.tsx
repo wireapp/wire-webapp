@@ -56,6 +56,7 @@ const TypingIndicator: FC<TypingIndicatorProps> = ({conversationId}) => {
             style={index > 0 ? {marginLeft: -8} : {}}
             participant={user}
             avatarSize={AVATAR_SIZE.XXX_SMALL}
+            isResponsive
           />
         ))}
       </div>

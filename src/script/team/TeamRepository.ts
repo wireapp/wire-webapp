@@ -216,10 +216,15 @@ export class TeamRepository {
   }
 
   readonly onTeamEvent = (eventJson: any, source: EventSource): void => {
-    const type = eventJson.type;
+    if (this.teamState.isTeamDeleted()) {
+      // We don't want to handle any events after the team has been deleted
+      return;
+    }
 
+    const type = eventJson.type;
     const logObject = {eventJson: JSON.stringify(eventJson), eventObject: eventJson};
-    this.logger.info(`»» Team Event: '${type}' (Source: ${source})`, logObject);
+
+    this.logger.info(`Team Event: '${type}' (Source: ${source})`, logObject);
 
     switch (type) {
       case TEAM_EVENT.CONVERSATION_DELETE: {

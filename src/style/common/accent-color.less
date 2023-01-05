@@ -206,6 +206,7 @@ each(.colors(), .(@color-key, @color-name) {
   @accent-color-border: '@{name}-500';
   @accent-color-focus: '@{name}-400';
   @accent-color-selection: '@{name}-300';
+  @accent-color-self-mention: '@{name}-200';
   @button-primary-hover: '@{name}-600';
   @button-primary-focus-border: '@{name}-700';
   @button-primary-active: '@{name}-800';
@@ -238,6 +239,7 @@ each(.colors(), .(@color-key, @color-name) {
     --accent-color-border: @@accent-color-border;
     --accent-color-focus: @@accent-color-focus;
     --accent-color-selection: @@accent-color-selection;
+    --accent-color-self-mention: @@accent-color-self-mention;
     --accent-color-fade-16: fade(@@accent-color, 16%);
     --accent-color-fade-24: fade(@@accent-color, 24%);
     --accent-color-darken-16: darken(@@accent-color, 16%);
@@ -258,6 +260,7 @@ each(.colors(), .(@color-key, @color-name) {
     @accent-color-border-dark: '@{name}-dark-600';
     @accent-color-focus-dark: '@{name}-dark-600';
     @accent-color-selection-dark: '@{name}-dark-700';
+    @accent-color-self-mention-dark: '@{name}-dark-800';
     @button-primary-hover-dark: '@{name}-dark-400';
     @button-primary-focus-border-dark: '@{name}-dark-100';
     @button-primary-active-dark: '@{name}-dark-800';
@@ -289,6 +292,7 @@ each(.colors(), .(@color-key, @color-name) {
       --accent-color-border: @@accent-color-border-dark;
       --accent-color-focus: @@accent-color-focus-dark;
       --accent-color-selection: @@accent-color-selection-dark;
+      --accent-color-self-mention: @@accent-color-self-mention-dark;
       each(@color-index, {
         @accent-color: '@{name}-dark-@{value}';
         --accent-color-@{value}: @@accent-color;

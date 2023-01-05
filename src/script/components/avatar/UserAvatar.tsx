@@ -39,6 +39,7 @@ export interface UserAvatarProps extends React.HTMLProps<HTMLDivElement> {
   avatarAlt?: string;
   noBadge?: boolean;
   noFilter?: boolean;
+  isResponsive?: boolean;
   onAvatarInteraction?: (
     event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>,
   ) => void;
@@ -58,6 +59,7 @@ const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
   avatarAlt = '',
   noBadge,
   noFilter,
+  isResponsive = false,
   state,
   onAvatarInteraction,
   ...props
@@ -89,6 +91,7 @@ const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
       onClick={onAvatarInteraction}
       onKeyDown={onAvatarInteraction}
       title={name}
+      isResponsive
       {...props}
     >
       <AvatarBackground backgroundColor={backgroundColor} />

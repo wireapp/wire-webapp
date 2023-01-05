@@ -17,29 +17,23 @@
  *
  */
 
-import ko from 'knockout';
+import {ProteusErrors} from '@wireapp/core/lib/messagingProtocols/proteus';
 
 import {Message} from './Message';
 
 import {SuperType} from '../../message/SuperType';
 
 export class DecryptErrorMessage extends Message {
-  public client_id: string;
-  public error_code: number;
-  public domain?: string;
-  public readonly is_recoverable: ko.PureComputed<boolean>;
-  public readonly is_resetting_session: ko.Observable<boolean>;
-
-  constructor() {
+  constructor(public readonly clientId: string, public readonly code: number) {
     super();
     this.super_type = SuperType.UNABLE_TO_DECRYPT;
+  }
 
-    this.error_code = 0;
-    this.client_id = '';
+  get isRecoverable(): boolean {
+    return !this.isIdentityChanged && this.code >= 200 && this.code < 300;
+  }
 
-    this.is_recoverable = ko.pureComputed(() => {
-      return this.error_code.toString().startsWith('2');
-    });
-    this.is_resetting_session = ko.observable(false);
+  get isIdentityChanged(): boolean {
+    return this.code === ProteusErrors.RemoteIdentityChanged;
   }
 }

@@ -112,7 +112,7 @@ describe('InputBar', () => {
     const promise = Promise.resolve();
     const props = getDefaultProps();
     const {getByTestId} = render(withTheme(<InputBar {...props} />));
-    await act(() => promise);
+    await promise;
 
     const textArea = getByTestId('input-message');
 
@@ -150,7 +150,9 @@ describe('InputBar', () => {
     const property = PropertiesRepository.CONFIG.WIRE_TYPING_INDICATOR_MODE;
     const defaultValue = property.defaultValue;
 
-    propertiesRepository.setProperty(property.key, !defaultValue);
+    act(() => {
+      propertiesRepository.setProperty(property.key, !defaultValue);
+    });
     expect(propertiesRepository.typingIndicatorMode()).not.toBe(defaultValue);
 
     expect(textArea).not.toBeNull();
@@ -167,7 +169,7 @@ describe('InputBar', () => {
     const promise = Promise.resolve();
     const props = getDefaultProps();
     const {container} = render(withTheme(<InputBar {...props} />));
-    await act(() => promise);
+    await promise;
 
     const textArea = await container.querySelector('textarea[data-uie-name="input-message"]');
 
