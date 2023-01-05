@@ -21,10 +21,14 @@ body.webapp {
   color: var(--main-color);
   font-family: @font-family-base;
   font-size: @font-size-sm;
-  font-weight: 300;
+  font-weight: @font-weight-light;
   overflow-x: hidden;
   overflow-y: hidden !important;
   text-rendering: optimizeLegibility;
+
+  &.theme-dark {
+    font-weight: @font-weight-regular;
+  }
 
   *,
   *::before,
