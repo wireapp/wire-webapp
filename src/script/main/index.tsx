@@ -21,21 +21,13 @@
 import 'core-js/full/reflect';
 
 // eslint-disable-next-line import/order
-import {ClientType} from '@wireapp/api-client/lib/client/';
 import {createRoot} from 'react-dom/client';
 
-import {Runtime} from '@wireapp/commons';
-
-import {AppContainer} from 'Components/AppContainer/AppContainer';
 import {enableLogging} from 'Util/LoggerUtil';
-import {loadValue} from 'Util/StorageUtil';
 import {exposeWrapperGlobals} from 'Util/wrapper';
 
-import {doRedirect} from './app';
-
-import {SIGN_OUT_REASON} from '../auth/SignOutReason';
+import {Root} from '../auth/page/Root';
 import {Config} from '../Config';
-import {StorageKey} from '../storage';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const config = Config.getConfig();
@@ -49,19 +41,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     throw new Error('container for application does not exist in the DOM');
   }
 
-  const enforceDesktopApplication = config.FEATURE.ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY && !Runtime.isDesktopApp();
-
-  if (enforceDesktopApplication) {
-    doRedirect(SIGN_OUT_REASON.APP_INIT);
-  }
-
-  const shouldPersist = loadValue<boolean>(StorageKey.AUTH.PERSIST);
-
-  if (shouldPersist === undefined) {
-    return doRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);
-  }
-
-  createRoot(appContainer).render(
-    <AppContainer config={config} clientType={shouldPersist ? ClientType.PERMANENT : ClientType.TEMPORARY} />,
-  );
+  createRoot(appContainer).render(<Root />);
 });

@@ -23,6 +23,7 @@ import {SetAccountType} from './SetAccountType';
 
 import {Config, Configuration} from '../../Config';
 import {initialRootState} from '../module/reducer';
+import {ROUTE} from '../route';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
 jest.mock('../util/SVGProvider');
@@ -62,7 +63,7 @@ describe('when visiting the set account type page', () => {
           },
         }),
       );
-      const redirect = getByText('Navigate to /');
+      const redirect = getByText(`Navigate to ${ROUTE.AUTH}`);
 
       expect(redirect).not.toBeNull();
     });

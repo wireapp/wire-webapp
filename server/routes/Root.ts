@@ -42,11 +42,7 @@ const Root = () => [
   Router().get('/', (_req, res) => res.render('index')),
   Router().get('/auth', async (req, res) => {
     await addGeoIP(req);
-    return res.render('auth/index');
-  }),
-  Router().get('/login', async (req, res) => {
-    await addGeoIP(req);
-    return res.render('login/index');
+    return res.redirect('/');
   }),
 ];
 

@@ -45,6 +45,7 @@ import '../../style/default.less';
 import {AssetRepository} from '../assets/AssetRepository';
 import {AssetService} from '../assets/AssetService';
 import {AudioRepository} from '../audio/AudioRepository';
+import '../auth/main';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {URLParameter} from '../auth/URLParameter';
 import {BackupRepository} from '../backup/BackupRepository';
@@ -74,6 +75,7 @@ import {ServiceMiddleware} from '../event/preprocessor/ServiceMiddleware';
 import {GiphyRepository} from '../extension/GiphyRepository';
 import {GiphyService} from '../extension/GiphyService';
 import {getWebsiteUrl} from '../externalRoute';
+import {killCurrentInstance} from '../hooks/useSingleInstance';
 import {IntegrationRepository} from '../integration/IntegrationRepository';
 import {IntegrationService} from '../integration/IntegrationService';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
@@ -104,8 +106,14 @@ import {ViewModelRepositories} from '../view_model/MainViewModel';
 import {ThemeViewModel} from '../view_model/ThemeViewModel';
 import {Warnings} from '../view_model/WarningsContainer';
 
+// Catch localStorage access for disabled cookie scenario
+let localStorage: any;
+try {
+  localStorage = window.localStorage;
+} catch (error) {}
+
 export function doRedirect(signOutReason: SIGN_OUT_REASON) {
-  let url = `/auth/${location.search}`;
+  let url = `/#/auth/${location.search}`;
 
   if (location.hash.startsWith('#/user/') && signOutReason === SIGN_OUT_REASON.NOT_SIGNED_IN) {
     localStorage.setItem(App.LOCAL_STORAGE_LOGIN_REDIRECT_KEY, location.hash);
@@ -745,7 +753,8 @@ export class App {
    * @param signOutReason Redirect triggered by session expiration
    */
   redirectToLogin(signOutReason: SIGN_OUT_REASON): void {
-    this.logger.info(`Redirecting to login after connectivity verification. Reason: ${signOutReason}`);
+    killCurrentInstance();
+    this.logger.info(`bardia Redirecting to login after connectivity verification. Reason: ${signOutReason}`);
     const isTemporaryGuestReason = App.CONFIG.SIGN_OUT_REASONS.TEMPORARY_GUEST.includes(signOutReason);
     const isLeavingGuestRoom = isTemporaryGuestReason && this.repository.user['userState'].isTemporaryGuest();
 

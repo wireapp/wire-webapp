@@ -59,7 +59,7 @@ const PageComponent = ({
     (hasTeamData && hasInvalidTeamData(account) && !isStateAuthenticated) ||
     (isAuthenticated && !isStateAuthenticated)
   ) {
-    return <Navigate to={redirects[currentFlow] || ROUTE.INDEX} replace />;
+    return <Navigate to={redirects[currentFlow] || ROUTE.AUTH} replace />;
   }
   return <UnsupportedBrowser>{children}</UnsupportedBrowser>;
 };
