@@ -79,22 +79,22 @@ const ControlButtons: React.FC<ControlButtonsProps> = ({
   if (input.length === 0) {
     return (
       <>
+        <li>
+          <button
+            className="controls-right-button buttons-group-button-left"
+            type="button"
+            onClick={onClickPing}
+            disabled={disablePing}
+            title={pingTooltip}
+            aria-label={pingTooltip}
+            data-uie-name="do-ping"
+          >
+            <Icon.Ping />
+          </button>
+        </li>
+
         {!disableFilesharing && (
           <>
-            <li>
-              <button
-                className="controls-right-button buttons-group-button-left"
-                type="button"
-                onClick={onClickPing}
-                disabled={disablePing}
-                title={pingTooltip}
-                aria-label={pingTooltip}
-                data-uie-name="do-ping"
-              >
-                <Icon.Ping />
-              </button>
-            </li>
-
             <li>
               <button
                 type="button"
