@@ -35,7 +35,6 @@ import type {Call} from '../calling/Call';
 import {CallingRepository} from '../calling/CallingRepository';
 import {CallState} from '../calling/CallState';
 import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
-import {parseClientId} from '../client/ClientIdUtil';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
 import {ConversationState} from '../conversation/ConversationState';
@@ -172,9 +171,7 @@ export class CallingViewModel {
       //update epoch info
       const parentConversationMemberIds = await core.service!.mls.getClientIds(groupId);
 
-      const clientsList = parentConversationMemberIds.map(qualifiedId => {
-        const parentMember = parseClientId(qualifiedId);
-
+      const clientsList = parentConversationMemberIds.map(parentMember => {
         const isSubconversationMember = !!subconversationMembers.find(
           ({user_id, client_id}) => user_id === parentMember.userId && client_id === parentMember.clientId,
         );
@@ -182,7 +179,7 @@ export class CallingViewModel {
         return {userid: parentMember.userId, clientId: parentMember.clientId, in_subconv: isSubconversationMember};
       });
 
-      const clientsJson = JSON.stringify({convid: call.conversationId, clients: clientsList});
+      const clientsJson = JSON.stringify({convid: call.conversationId.id, clients: clientsList});
 
       this.callingRepository.setEpochInfo(call.conversationId.id, epoch, clientsJson, secretKey, keyLength);
     };
