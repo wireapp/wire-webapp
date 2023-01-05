@@ -35,6 +35,7 @@ import type {Call} from '../calling/Call';
 import {CallingRepository} from '../calling/CallingRepository';
 import {CallState} from '../calling/CallState';
 import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
+import {parseClientId} from '../client/ClientIdUtil';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
 import {ConversationState} from '../conversation/ConversationState';
@@ -150,6 +151,42 @@ export class CallingViewModel {
       });
     };
 
+    const answerCall = async (call: Call) => {
+      //answer call
+      await this.callingRepository.answerCall(call);
+
+      //we don't have to do anything if it's not mls conference
+      if (call.conversationType !== CONV_TYPE.CONFERENCE_MLS) {
+        return;
+      }
+
+      //join subconversation
+      const {
+        groupId,
+        epoch,
+        keyLength,
+        secretKey,
+        members: subconversationMembers,
+      } = await core.service!.mls.joinConferenceSubconversation(call.conversationId);
+
+      //update epoch info
+      const parentConversationMemberIds = await core.service!.mls.getClientIds(groupId);
+
+      const clientsList = parentConversationMemberIds.map(qualifiedId => {
+        const parentMember = parseClientId(qualifiedId);
+
+        const isSubconversationMember = !!subconversationMembers.find(
+          ({user_id, client_id}) => user_id === parentMember.userId && client_id === parentMember.clientId,
+        );
+
+        return {userid: parentMember.userId, clientId: parentMember.clientId, in_subconv: isSubconversationMember};
+      });
+
+      const clientsJson = JSON.stringify({convid: call.conversationId, clients: clientsList});
+
+      this.callingRepository.setEpochInfo(call.conversationId.id, epoch, clientsJson, secretKey, keyLength);
+    };
+
     const hasSoundlessCallsEnabled = (): boolean => {
       return this.propertiesRepository.getPreference(PROPERTIES_TYPE.CALL.ENABLE_SOUNDLESS_INCOMING_CALLS);
     };
@@ -182,7 +219,7 @@ export class CallingViewModel {
             },
           });
         } else {
-          this.callingRepository.answerCall(call);
+          answerCall(call);
         }
       },
       changePage: (newPage, call) => {

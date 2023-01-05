@@ -860,6 +860,10 @@ export class CallingRepository {
     }
   }
 
+  setEpochInfo(conversationId: string, epoch: number, clients_json: string, secretKey: string, keyLength: number) {
+    return this.wCall?.setEpochInfo(this.wUser, conversationId, epoch, clients_json, secretKey, keyLength);
+  }
+
   rejectCall(conversationId: QualifiedId): void {
     this.wCall?.reject(this.wUser, this.serializeQualifiedId(conversationId));
   }
