@@ -12,7 +12,7 @@
     "@wireapp/core": "workspace:^",
     "@wireapp/store-engine-fs": "workspace:^",
     "axios": "1.2.1",
-    "commander": "9.4.1",
+    "commander": "9.5.0",
     "dotenv": "16.0.3",
     "fs-extra": "11.1.0"
   },
