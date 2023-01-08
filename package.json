@@ -111,7 +111,7 @@
     "dotenv": "16.0.3",
     "dpdm": "3.10.0",
     "eslint": "^8.31.0",
-    "eslint-config-prettier": "^8.5.0",
+    "eslint-config-prettier": "^8.6.0",
     "eslint-import-resolver-alias": "^1.1.2",
     "eslint-import-resolver-typescript": "^3.5.2",
     "eslint-plugin-babel": "5.3.1",
