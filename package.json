@@ -101,7 +101,7 @@
     "adm-zip": "0.5.10",
     "archiver": "^5.3.1",
     "autoprefixer": "^10.4.13",
-    "babel-loader": "9.1.0",
+    "babel-loader": "9.1.2",
     "caniuse-lite": "^1.0.30001442",
     "cross-env": "7.0.3",
     "cspell": "6.18.1",
