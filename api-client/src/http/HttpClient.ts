@@ -239,7 +239,7 @@ export class HttpClient extends EventEmitter {
     };
 
     if (expiredAccessToken?.access_token && config?.headers) {
-      config.headers = {...config.headers} as AxiosHeaders;
+      config.headers = new AxiosHeaders(config.headers as AxiosHeaders);
       config.headers.set(
         'Authorization',
         `${expiredAccessToken.token_type} ${decodeURIComponent(expiredAccessToken.access_token)}`,
