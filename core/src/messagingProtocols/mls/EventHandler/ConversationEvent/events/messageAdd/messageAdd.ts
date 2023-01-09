@@ -39,6 +39,7 @@ const handleMLSMessageAdd = async ({mlsService, event, logger}: HandleMLSMessage
 
   const groupId = await mlsService.getGroupIdFromConversationId(
     event.qualified_conversation ?? {id: event.conversation, domain: ''},
+    event.subconv,
   );
   const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
 
