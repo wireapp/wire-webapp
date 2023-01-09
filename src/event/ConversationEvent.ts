@@ -157,6 +157,8 @@ export interface ConversationOtrMessageAddEvent extends BaseConversationEvent {
 export interface ConversationMLSMessageAddEvent extends BaseConversationEvent {
   data: ConversationMLSMessageAddData;
   type: CONVERSATION_EVENT.MLS_MESSAGE_ADD;
+  /** if the message is sent in a subconversation, there is the identifier of the subconversation */
+  subconv?: string;
   senderClientId: string;
 }
 
