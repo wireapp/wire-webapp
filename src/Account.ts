@@ -555,7 +555,7 @@ export class Account<T = any> extends EventEmitter {
         handleMissedNotifications,
         abortHandler,
       );
-      this.logger.log(`Finished processing notifications ${JSON.stringify(results)}`, results);
+      this.logger.info(`Finished processing notifications ${JSON.stringify(results)}`, results);
 
       if (abortHandler.isAborted()) {
         this.logger.warn('Ending connection process as websocket was closed');
@@ -597,10 +597,10 @@ export class Account<T = any> extends EventEmitter {
     const openDb = async () => {
       const initializedDb = await this.createStore(dbName, context);
       if (initializedDb) {
-        this.logger.log(`Initialized store with existing engine "${dbName}".`);
+        this.logger.info(`Initialized store with existing engine "${dbName}".`);
         return initializedDb;
       }
-      this.logger.log(`Initialized store with new memory engine "${dbName}".`);
+      this.logger.info(`Initialized store with new memory engine "${dbName}".`);
       const memoryEngine = new MemoryEngine();
       await memoryEngine.init(dbName);
       return memoryEngine;
