@@ -59,7 +59,7 @@ export const sendRequestWithCookie = async <T>(
 ): Promise<AxiosResponse<T>> => {
   const cookie = CookieStore.getCookie();
   if (cookie && !cookie.isExpired) {
-    config.headers = {...config.headers} as AxiosHeaders;
+    config.headers = new AxiosHeaders(config.headers as AxiosHeaders);
     config.headers.set('Cookie', `zuid=${cookie.zuid}`);
     config.withCredentials = true;
   }
