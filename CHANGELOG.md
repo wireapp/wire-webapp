@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [38.3.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.2.0...@wireapp/core@38.3.0) (2023-01-09)
+
+### Bug Fixes
+
+* autofix prettier issues ([440d143](https://github.com/wireapp/wire-web-packages/commit/440d143410be65af3909f0b848aa11324c26808b))
+
+### Features
+
+* Keep track of subconversation group ids ([#4764](https://github.com/wireapp/wire-web-packages/issues/4764)) ([8095373](https://github.com/wireapp/wire-web-packages/commit/809537330242c16db95c259074383db4280d671d))
+
 # [38.2.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.1.0...@wireapp/core@38.2.0) (2023-01-05)
 
 ### Features
