@@ -285,7 +285,7 @@ export class ProteusService {
       return;
     }
     // We want sessions to be fully qualified from now on
-    migrateToQualifiedSessionIds(storeEngine, context.domain ?? '');
+    await migrateToQualifiedSessionIds(storeEngine, context.domain ?? '');
 
     this.logger.log(`Migrating data from cryptobox store (${dbName}) to corecrypto.`);
     try {
