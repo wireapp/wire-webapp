@@ -110,6 +110,7 @@ const AccountSecuritySection: React.FC<AccountSecuritySectionProps> = ({
         <Link
           tabIndex={TabIndex.FOCUSABLE}
           variant={LinkVariant.PRIMARY}
+          href="#"
           onClick={() => safeWindowOpen(getAccountPagesUrl(URL_PATH.PASSWORD_RESET))}
           title={t('tooltipPreferencesPassword')}
           data-uie-name="do-reset-password"
