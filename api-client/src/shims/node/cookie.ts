@@ -17,7 +17,7 @@
  *
  */
 
-import {AxiosRequestConfig, AxiosResponse} from 'axios';
+import {AxiosHeaders, AxiosRequestConfig, AxiosResponse} from 'axios';
 import logdown from 'logdown';
 import {Cookie as ToughCookie} from 'tough-cookie';
 
@@ -59,8 +59,8 @@ export const sendRequestWithCookie = async <T>(
 ): Promise<AxiosResponse<T>> => {
   const cookie = CookieStore.getCookie();
   if (cookie && !cookie.isExpired) {
-    config.headers = config.headers || {};
-    config.headers.Cookie = `zuid=${cookie.zuid}`;
+    config.headers = {...config.headers} as AxiosHeaders;
+    config.headers.set('Cookie', `zuid=${cookie.zuid}`);
     config.withCredentials = true;
   }
   return client._sendRequest<T>(config);

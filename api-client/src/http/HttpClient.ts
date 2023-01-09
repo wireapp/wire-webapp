@@ -17,7 +17,7 @@
  *
  */
 
-import axios, {AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse} from 'axios';
+import axios, {AxiosError, AxiosHeaders, AxiosInstance, AxiosRequestConfig, AxiosResponse} from 'axios';
 import axiosRetry, {isNetworkOrIdempotentRequestError, exponentialDelay} from 'axios-retry';
 import logdown from 'logdown';
 
@@ -239,9 +239,11 @@ export class HttpClient extends EventEmitter {
     };
 
     if (expiredAccessToken?.access_token && config?.headers) {
-      config.headers.Authorization = `${expiredAccessToken.token_type} ${decodeURIComponent(
-        expiredAccessToken.access_token,
-      )}`;
+      config.headers = {...config.headers} as AxiosHeaders;
+      config.headers.set(
+        'Authorization',
+        `${expiredAccessToken.token_type} ${decodeURIComponent(expiredAccessToken.access_token)}`,
+      );
     }
 
     const response = await sendRequestWithCookie<AccessTokenData>(this, config);
