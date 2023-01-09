@@ -132,7 +132,7 @@ const Preferences: React.FC<PreferencesProps> = ({
 
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
 
-  const onClickSelect = (item: typeof items[number]) => {
+  const onClickSelect = (item: (typeof items)[number]) => {
     setCurrentView(ViewType.CENTRAL_COLUMN);
     contentViewModel.switchContent(item.id);
 
