@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [22.14.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@22.14.0...@wireapp/api-client@22.14.1) (2023-01-09)
+
+### Bug Fixes
+
+* Fix axios types ([#4763](https://github.com/wireapp/wire-web-packages/issues/4763)) ([efb0adb](https://github.com/wireapp/wire-web-packages/commit/efb0adb85a205198a23f06cd2eb597f0045be5d0))
+
 # [22.14.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@22.13.0...@wireapp/api-client@22.14.0) (2023-01-09)
 
 ### Bug Fixes
