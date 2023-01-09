@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [38.3.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.3.1...@wireapp/core@38.3.2) (2023-01-09)
+
+### Bug Fixes
+
+* Await for proteus session migration before initing coreCrypto ([#4765](https://github.com/wireapp/wire-web-packages/issues/4765)) ([f829c75](https://github.com/wireapp/wire-web-packages/commit/f829c750d325f4beca78c7012384930e9e9c7928))
+
 ## [38.3.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.3.0...@wireapp/core@38.3.1) (2023-01-09)
 
 **Note:** Version bump only for package @wireapp/core
