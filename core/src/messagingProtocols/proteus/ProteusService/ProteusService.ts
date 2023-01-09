@@ -301,7 +301,7 @@ export class ProteusService {
       }
       */
 
-      this.logger.log(`Successfully migrated from cryptobox store (${dbName}) to corecrypto.`);
+      this.logger.info(`Successfully migrated from cryptobox store (${dbName}) to corecrypto.`);
       localStorage.setItem(migrationFlag, '1');
     } catch (error) {
       this.logger.error('Client was not able to perform DB migration: ', error);
