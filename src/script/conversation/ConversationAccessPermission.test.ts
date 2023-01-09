@@ -66,7 +66,7 @@ describe('ConversationAccessPermissions', () => {
   describe('teamPermissionsForAccessState', () => {
     it.each(mockAccessTeam)('should return the features for %s', (accessState, results) => {
       expect(
-        teamPermissionsForAccessState(accessState as typeof ACCESS_STATE.TEAM[keyof typeof ACCESS_STATE.TEAM]),
+        teamPermissionsForAccessState(accessState as (typeof ACCESS_STATE.TEAM)[keyof typeof ACCESS_STATE.TEAM]),
       ).toBe(results);
     });
 
