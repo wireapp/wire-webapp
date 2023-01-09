@@ -46,6 +46,7 @@ import {toProtobufCommitBundle} from './commitBundleUtil';
 import {MLSServiceConfig, UploadCommitOptions} from './MLSService.types';
 import {keyMaterialUpdatesStore} from './stores/keyMaterialUpdatesStore';
 import {pendingProposalsStore} from './stores/pendingProposalsStore';
+import {getGroupId, storeSubconversationGroupId} from './subconversationGroupIdMapper';
 
 import {QualifiedUsers} from '../../../conversation';
 import {sendMessage} from '../../../conversation/message/messageSender';
@@ -227,6 +228,9 @@ export class MLSService {
         this.apiClient.api.conversation.getSubconversationGroupInfo(conversationId, SUBCONVERSATION_ID.CONFERENCE),
       );
     }
+
+    // We store the mapping between the subconversation and the parent conversation
+    storeSubconversationGroupId(conversationId, subconversation.subconv_id, subconversation.group_id);
 
     const keyLength = 256;
     const groupIdBytes = Decoder.fromBase64(subconversation.group_id).asBytes;
@@ -475,9 +479,14 @@ export class MLSService {
    *
    * @param conversationQualifiedId
    */
-  public async getGroupIdFromConversationId(conversationQualifiedId: QualifiedId): Promise<string> {
+  public async getGroupIdFromConversationId(
+    conversationQualifiedId: QualifiedId,
+    subconversationId?: string,
+  ): Promise<string> {
     const {id: conversationId, domain: conversationDomain} = conversationQualifiedId;
-    const groupId = await this.groupIdFromConversationId?.(conversationQualifiedId);
+    const groupId = subconversationId
+      ? getGroupId(conversationQualifiedId, subconversationId)
+      : await this.groupIdFromConversationId?.(conversationQualifiedId);
 
     if (!groupId) {
       throw new Error(`Could not find a group_id for conversation ${conversationId}@${conversationDomain}`);
