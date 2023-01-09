@@ -777,6 +777,7 @@ const InputBar = ({
     <IgnoreOutsideClickWrapper
       id={conversationInputBarClassName}
       className={cx(conversationInputBarClassName, {'is-right-panel-open': isRightSidebarOpen})}
+      aria-live="assertive"
     >
       {!!isTypingIndicatorEnabled && <TypingIndicator conversationId={conversationEntity.id} />}
 
