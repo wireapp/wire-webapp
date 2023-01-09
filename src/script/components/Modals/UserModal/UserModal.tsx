@@ -19,6 +19,7 @@
 
 import React, {useContext, useEffect, useState} from 'react';
 
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
@@ -28,6 +29,7 @@ import {EnrichedFields} from 'Components/panel/EnrichedFields';
 import {UserActions} from 'Components/panel/UserActions';
 import {UserDetails} from 'Components/panel/UserDetails';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {handleKeyDown} from 'Util/KeyboardUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 
 import {useUserModalState} from './UserModal.state';
@@ -157,7 +159,13 @@ const UserModal: React.FC<UserModalProps> = ({
             </h2>
           )}
 
-          <Icon.Close className="modal__header__button" onClick={hide} data-uie-name="do-close" />
+          <Icon.Close
+            className="modal__header__button"
+            onClick={hide}
+            onKeyDown={event => handleKeyDown(event, hide)}
+            data-uie-name="do-close"
+            tabIndex={TabIndex.FOCUSABLE}
+          />
         </div>
 
         <div className={cx('modal__body user-modal__wrapper', {'user-modal__wrapper--max': !user && !userNotFound})}>

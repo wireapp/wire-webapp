@@ -33,6 +33,7 @@ import {useEmoji} from 'Components/Emoji/useEmoji';
 import {Icon} from 'Components/Icon';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
+import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from 'src/script/user/TypingIndicatorMode';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -60,9 +61,9 @@ import {useFilePaste} from './hooks/useFilePaste';
 import {useResizeTarget} from './hooks/useResizeTarget';
 import {useScrollSync} from './hooks/useScrollSync';
 import {useTextAreaFocus} from './hooks/useTextAreaFocus';
+import {handleClickOutsideOfInputBar, IgnoreOutsideClickWrapper} from './util/clickHandlers';
 
 import {Config} from '../../Config';
-import {ConversationRepository} from '../../conversation/ConversationRepository';
 import {MessageRepository, OutgoingQuote} from '../../conversation/MessageRepository';
 import {Conversation} from '../../entity/Conversation';
 import {ContentMessage} from '../../entity/message/ContentMessage';
@@ -100,6 +101,8 @@ interface InputBarProps {
   uploadImages: (images: File[]) => void;
   uploadFiles: (files: File[]) => void;
 }
+
+const conversationInputBarClassName = 'conversation-input-bar';
 
 const InputBar = ({
   conversationEntity,
@@ -381,7 +384,7 @@ const InputBar = ({
 
   const replyMessage = (messageEntity: ContentMessage): void => {
     if (messageEntity?.isReplyable() && messageEntity !== replyMessageEntity) {
-      cancelMessageReply();
+      cancelMessageReply(false);
       cancelMessageEditing(!!editMessageEntity);
       setReplyMessageEntity(messageEntity);
 
@@ -550,6 +553,7 @@ const InputBar = ({
 
       return;
     }
+
     const updatedMentions = updateMentionRanges(currentMentions, 0, 0, trimmedStartLength - beforeLength);
 
     if (isEditing) {
@@ -633,16 +637,11 @@ const InputBar = ({
     });
   };
 
-  const onWindowClick = (event: Event): void => {
-    const ignoredParent = (event.target as HTMLElement).closest(
-      '.conversation-input-bar, .conversation-input-bar-mention-suggestion, .ctx-menu',
-    );
-
-    if (!ignoredParent) {
+  const onWindowClick = (event: Event): void =>
+    handleClickOutsideOfInputBar(event, () => {
       cancelMessageEditing(true, true);
       cancelMessageReply();
-    }
-  };
+    });
 
   useEffect(() => {
     amplify.subscribe(WebAppEvents.CONVERSATION.IMAGE.SEND, uploadImages);
@@ -766,7 +765,7 @@ const InputBar = ({
     input: inputValue,
     isEditing: isEditing,
     isScaledDown: isScaledDown,
-    onCancelEditing: cancelMessageEditing,
+    onCancelEditing: () => cancelMessageEditing(true, true),
     onClickPing: onPingClick,
     onGifClick: onGifClick,
     onSelectFiles: uploadFiles,
@@ -775,9 +774,9 @@ const InputBar = ({
   };
 
   return (
-    <div
-      id="conversation-input-bar"
-      className={cx('conversation-input-bar', {'is-right-panel-open': isRightSidebarOpen})}
+    <IgnoreOutsideClickWrapper
+      id={conversationInputBarClassName}
+      className={cx(conversationInputBarClassName, {'is-right-panel-open': isRightSidebarOpen})}
     >
       {!!isTypingIndicatorEnabled && <TypingIndicator conversationId={conversationEntity.id} />}
 
@@ -787,7 +786,11 @@ const InputBar = ({
 
       {isReplying && !isEditing && <ReplyBar replyMessageEntity={replyMessageEntity} onCancel={handleCancelReply} />}
 
-      <div className={cx('conversation-input-bar__input', {'conversation-input-bar__input--editing': isEditing})}>
+      <div
+        className={cx(`${conversationInputBarClassName}__input`, {
+          [`${conversationInputBarClassName}__input--editing`]: isEditing,
+        })}
+      >
         {!isOutgoingRequest && (
           <>
             <div className="controls-left">
@@ -803,9 +806,9 @@ const InputBar = ({
                 <div className="controls-center">
                   <textarea
                     ref={textareaRef}
-                    id="conversation-input-bar-text"
-                    className={cx('conversation-input-bar-text', {
-                      'conversation-input-bar-text--accent': hasLocalEphemeralTimer,
+                    id={`${conversationInputBarClassName}-text`}
+                    className={cx(`${conversationInputBarClassName}-text`, {
+                      [`${conversationInputBarClassName}-text--accent`]: hasLocalEphemeralTimer,
                     })}
                     onKeyDown={onTextAreaKeyDown}
                     onKeyUp={onTextareaKeyUp}
@@ -857,7 +860,7 @@ const InputBar = ({
 
         {pastedFile && <PastedFileControls pastedFile={pastedFile} onClear={clearPastedFile} onSend={sendPastedFile} />}
       </div>
-    </div>
+    </IgnoreOutsideClickWrapper>
   );
 };
 

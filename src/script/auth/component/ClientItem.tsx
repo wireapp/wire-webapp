@@ -20,6 +20,7 @@
 import React, {useEffect, useState} from 'react';
 
 import {RegisteredClient} from '@wireapp/api-client/lib/client/index';
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {useIntl} from 'react-intl';
 
 import {
@@ -36,6 +37,7 @@ import {
   TrashIcon,
 } from '@wireapp/react-ui-kit';
 
+import {isEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';
 
@@ -45,7 +47,7 @@ import {parseError, parseValidationErrors} from '../util/errorUtil';
 
 export interface Props extends React.HTMLProps<HTMLDivElement> {
   client: RegisteredClient;
-  onClick: (event: React.MouseEvent<HTMLDivElement>) => void;
+  onClick: (event: React.MouseEvent<HTMLDivElement> | React.KeyboardEvent) => void;
   onClientRemoval: (password?: string) => void;
   requirePassword: boolean;
   selected: boolean;
@@ -137,9 +139,16 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
     setIsAnimating(false);
   };
 
-  const wrappedOnClick = (event: React.MouseEvent<HTMLDivElement>): void => {
+  const handleWrapperClick = (event: React.MouseEvent<HTMLDivElement> | React.KeyboardEvent): void => {
     resetState();
     onClick(event);
+  };
+
+  const onWrapperEnter = (event: React.KeyboardEvent) => {
+    if (!isEnterKey(event)) {
+      return;
+    }
+    handleWrapperClick(event);
   };
 
   const handlePasswordlessClientDeletion = (event: React.FormEvent): Promise<void> => {
@@ -228,13 +237,18 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
         data-uie-value={client.model}
       >
         <ContainerXS
-          onClick={(event: React.MouseEvent<HTMLDivElement>) => requirePassword && wrappedOnClick(event)}
-          style={{
+          onClick={(event: React.MouseEvent<HTMLDivElement>) => requirePassword && handleWrapperClick(event)}
+          onKeyDown={(event: React.KeyboardEvent) => requirePassword && onWrapperEnter(event)}
+          css={{
+            ['&:focus-visible']: {
+              outline: `none`,
+            },
             cursor: requirePassword ? 'pointer' : 'auto',
             margin: `${smoothMarginTop}px 0 0 0`,
             padding: `0 ${animatedCardSpacing.m}px`,
           }}
           data-uie-name="go-remove-device"
+          tabIndex={TabIndex.FOCUSABLE}
         >
           <FlexBox>
             <div
@@ -286,7 +300,9 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
                 }}
               >
                 <FlexBox css={{flexGrow: 1, marginRight: `${animatedCardSpacing.s}px`}}>
+                  {/* eslint jsx-a11y/no-autofocus : "off" */}
                   <Input
+                    autoFocus
                     id="remove-device-password"
                     autoComplete="section-login password"
                     data-uie-name="remove-device-password"

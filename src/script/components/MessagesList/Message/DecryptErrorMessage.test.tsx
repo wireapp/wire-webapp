@@ -18,63 +18,54 @@
  */
 
 import {render, fireEvent} from '@testing-library/react';
-import ko from 'knockout';
+import {ProteusErrors} from '@wireapp/core/lib/messagingProtocols/proteus';
 import {act} from 'react-dom/test-utils';
 
 import {DecryptErrorMessage as DecryptErrorMessageEntity} from 'src/script/entity/message/DecryptErrorMessage';
+import {User} from 'src/script/entity/User';
 
 import {DecryptErrorMessage} from './DecryptErrorMessage';
 
-const createDecryptErrorMessage = (partialDecryptErrorMessage: Partial<DecryptErrorMessageEntity>) => {
-  const decryptErrorMessage: Partial<DecryptErrorMessageEntity> = {
-    htmlCaption: ko.pureComputed(() => ''),
-    is_recoverable: ko.pureComputed(() => false),
-    is_resetting_session: ko.observable(false),
-    link: ko.pureComputed(() => ''),
-    ...partialDecryptErrorMessage,
-  };
-  return decryptErrorMessage as DecryptErrorMessageEntity;
-};
+function createError(code: number) {
+  const error = new DecryptErrorMessageEntity('client', code);
+  error.user(new User());
+  return error;
+}
 
 describe('DecryptErrorMessage', () => {
   it('shows "reset session" action when error is recoverable', async () => {
-    const isRecoverable = ko.observable(false);
     const props = {
-      message: createDecryptErrorMessage({
-        is_recoverable: ko.pureComputed(() => isRecoverable()),
-      }),
+      message: createError(ProteusErrors.InvalidMessage),
       onClickResetSession: jest.fn(),
     };
 
-    const {queryByTestId, rerender} = render(<DecryptErrorMessage {...props} />);
+    const {getByText} = render(<DecryptErrorMessage {...props} />);
 
-    expect(queryByTestId('do-reset-encryption-session')).toBeNull();
+    expect(getByText('conversationUnableToDecryptResetSession')).not.toBeNull();
 
-    const decryptErrorMessage = queryByTestId('element-message-decrypt-error');
-    expect(decryptErrorMessage).not.toBeNull();
+    expect(getByText('conversationUnableToDecrypt1')).not.toBeNull();
+  });
 
-    act(() => {
-      isRecoverable(true);
-    });
-    rerender(<DecryptErrorMessage {...props} />);
+  it('shows remote identity changed error if sender has changed identity', async () => {
+    const props = {
+      message: createError(ProteusErrors.RemoteIdentityChanged),
+      onClickResetSession: jest.fn(),
+    };
 
-    expect(decryptErrorMessage).not.toBeNull();
+    const {getByText, queryByText} = render(<DecryptErrorMessage {...props} />);
+
+    expect(getByText('conversationUnableToDecrypt2')).not.toBeNull();
+    expect(queryByText('conversationUnableToDecryptResetSession')).toBeNull();
   });
 
   it('shows loading spinner during session reset', async () => {
-    const isResetting = ko.observable(false);
-
+    jest.useFakeTimers();
     const props = {
-      message: createDecryptErrorMessage({
-        is_recoverable: ko.pureComputed(() => true),
-        is_resetting_session: isResetting,
-      }),
-      onClickResetSession: jest.fn(() => {
-        isResetting(true);
-      }),
+      message: createError(200),
+      onClickResetSession: jest.fn(() => {}),
     };
 
-    const {getByTestId, queryByTestId, rerender} = render(<DecryptErrorMessage {...props} />);
+    const {getByTestId, queryByTestId} = render(<DecryptErrorMessage {...props} />);
 
     const decryptErrorMessage = queryByTestId('element-message-decrypt-error');
     expect(decryptErrorMessage).not.toBeNull();
@@ -94,11 +85,9 @@ describe('DecryptErrorMessage', () => {
     expect(queryByTestId('status-loading')).not.toBeNull();
 
     act(() => {
-      isResetting(false);
+      jest.runAllTimers();
     });
-    rerender(<DecryptErrorMessage {...props} />);
-
-    expect(resetEncryptionSessionLink).not.toBeNull();
-    expect(resetEncryptionSessionLoadingSpinner).toBeNull();
+    expect(queryByTestId('status-loading')).toBeNull();
+    expect(queryByTestId('do-reset-encryption-session')).not.toBeNull();
   });
 });

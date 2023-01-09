@@ -80,6 +80,7 @@ const UserDetails: React.FC<UserDetailsProps> = ({
             {user.name}
           </h2>
         )}
+
         {isSelfVerified && user.is_verified && (
           <Icon.Verified
             className="panel-participant__head__verified-icon"

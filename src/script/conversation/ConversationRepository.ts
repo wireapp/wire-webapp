@@ -561,7 +561,7 @@ export class ConversationRepository {
   public async getPrecedingMessages(conversationEntity: Conversation): Promise<ContentMessage[]> {
     conversationEntity.is_pending(true);
 
-    const firstMessageEntity = conversationEntity.getFirstMessage();
+    const firstMessageEntity = conversationEntity.getOldestMessage();
     const upperBound =
       firstMessageEntity && firstMessageEntity.timestamp()
         ? new Date(firstMessageEntity.timestamp())
@@ -588,7 +588,7 @@ export class ConversationRepository {
     conversationEntity.hasAdditionalMessages(hasAdditionalMessages);
 
     if (!hasAdditionalMessages) {
-      const firstMessage = conversationEntity.getFirstMessage();
+      const firstMessage = conversationEntity.getOldestMessage();
       const checkCreationMessage = isMemberMessage(firstMessage) && firstMessage?.isCreation();
       if (checkCreationMessage) {
         const groupCreationMessageIn1to1 = conversationEntity.is1to1() && firstMessage?.isGroupCreation();
@@ -724,7 +724,7 @@ export class ConversationRepository {
    * @param conversationEntity Conversation to start from
    */
   private async getUnreadEvents(conversationEntity: Conversation): Promise<void> {
-    const first_message = conversationEntity.getFirstMessage();
+    const first_message = conversationEntity.getOldestMessage();
     const lower_bound = new Date(conversationEntity.last_read_timestamp());
     const upper_bound = first_message
       ? new Date(first_message.timestamp())
@@ -2639,7 +2639,7 @@ export class ConversationRepository {
        *
        * Our assumption is that the `_handleAssetUpdate` function (invoked by `notificationsQueue.subscribe`) is executed before this function.
        */
-      return conversationEntity.updateTimestamps(conversationEntity.getLastMessage(), true);
+      return conversationEntity.updateTimestamps(conversationEntity.getNewestMessage(), true);
     }
 
     if (!allowsAllFiles()) {

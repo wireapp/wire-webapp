@@ -118,7 +118,7 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
                 onClick: clickToEditGroupName,
               })}
             >
-              {displayName && <div className="conversation-details__name">{displayName}</div>}
+              {displayName && <span className="conversation-details__name">{displayName}</span>}
 
               {canRenameGroup && <Icon.Edit className="conversation-details__name__edit-icon" />}
             </div>

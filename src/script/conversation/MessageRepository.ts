@@ -780,21 +780,16 @@ export class MessageRepository {
     }
   }
 
-  async resetSession(userId: QualifiedId, client_id: string, conversation: Conversation): Promise<void> {
-    this.logger.info(`Resetting session with client '${client_id}' of user '${userId.id}'.`);
+  async resetSession(userId: QualifiedId, clientId: string, conversation: Conversation): Promise<void> {
+    this.logger.info(`Resetting session with client '${clientId}' of user '${userId.id}'.`);
 
     try {
       // We delete the stored session so that it can be recreated later on
-      const session_id = await this.cryptography_repository.deleteSession(userId, client_id);
-      if (session_id) {
-        this.logger.info(`Deleted session with client '${client_id}' of user '${userId.id}'.`);
-      } else {
-        this.logger.warn('No local session found to delete.');
-      }
-      return await this.sendSessionReset(userId, client_id, conversation);
+      await this.cryptography_repository.deleteSession(userId, clientId);
+      return await this.sendSessionReset(userId, clientId, conversation);
     } catch (error) {
       const message = error instanceof Error ? error.message : error;
-      const logMessage = `Failed to reset session for client '${client_id}' of user '${userId.id}': ${message}`;
+      const logMessage = `Failed to reset session for client '${clientId}' of user '${userId.id}': ${message}`;
       this.logger.warn(logMessage, error);
       throw error;
     }
@@ -1049,14 +1044,14 @@ export class MessageRepository {
    */
   public async deleteMessageById(conversationEntity: Conversation, messageId: string): Promise<number> {
     const isLastDeleted =
-      conversationEntity.isShowingLastReceivedMessage() && conversationEntity.getLastMessage()?.id === messageId;
+      conversationEntity.isShowingLastReceivedMessage() && conversationEntity.getNewestMessage()?.id === messageId;
 
     const deleteCount = await this.eventService.deleteEvent(conversationEntity.id, messageId);
 
     amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, messageId, conversationEntity.id);
 
-    if (isLastDeleted && conversationEntity.getLastMessage()?.timestamp()) {
-      conversationEntity.updateTimestamps(conversationEntity.getLastMessage(), true);
+    if (isLastDeleted && conversationEntity.getNewestMessage()?.timestamp()) {
+      conversationEntity.updateTimestamps(conversationEntity.getNewestMessage(), true);
     }
 
     return deleteCount;
@@ -1265,14 +1260,30 @@ export class MessageRepository {
   }
 
   /**
+   * Sends a call message only to self conversation (eg. REJECT message that warn the user's other clients that the call has been picked up)
+   * @param payload
+   * @returns
+   */
+  public sendSelfCallingMessage(payload: string, targetConversation: QualifiedId) {
+    return this.sendCallingMessage(this.conversationState.getSelfMLSConversation(), {
+      content: payload,
+      qualifiedConversationId: targetConversation,
+    });
+  }
+  /**
    * Send call message in specified conversation.
    *
    * @param eventInfoEntity Event info to be send
    * @param conversationId id of the conversation to send call message to
    * @returns Resolves when the confirmation was sent
    */
-  public sendCallingMessage(conversation: Conversation, payload: string, options: MessageSendingOptions = {}) {
-    const message = MessageBuilder.buildCallMessage(payload);
+  public sendCallingMessage(
+    conversation: Conversation,
+    payload: string | {content: string; qualifiedConversationId: QualifiedId},
+    options: MessageSendingOptions = {},
+  ) {
+    const objectPayload = typeof payload === 'string' ? {content: payload} : payload;
+    const message = MessageBuilder.buildCallMessage(objectPayload);
 
     return this.sendAndInjectMessage(message, conversation, {
       ...options,

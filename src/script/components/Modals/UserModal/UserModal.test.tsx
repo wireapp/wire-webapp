@@ -45,7 +45,8 @@ describe('UserModal', () => {
       userState: {} as UserState,
     };
     showUserModal({domain: 'test-domain.mock', id: 'mock-id'});
-    render(<UserModal {...props} />);
+    const {getByTestId} = render(<UserModal {...props} />);
+    await waitFor(() => getByTestId('do-close'));
 
     expect(getUserById).toHaveBeenCalledTimes(1);
   });

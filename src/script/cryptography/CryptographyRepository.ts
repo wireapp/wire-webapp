@@ -47,19 +47,19 @@ export class CryptographyRepository {
     this.cryptographyMapper = new CryptographyMapper();
   }
 
-  get cryptographyService() {
+  get proteusService() {
     if (!this.core.service) {
       throw new Error('Core is not initiated');
     }
-    return this.core.service!.cryptography;
+    return this.core.service!.proteus;
   }
 
   /**
    * Get the fingerprint of the local identity.
    * @returns Fingerprint of local identity public key
    */
-  getLocalFingerprint(): string {
-    return this.cryptographyService.getLocalFingerprint();
+  getLocalFingerprint(): Promise<string> {
+    return this.proteusService.getLocalFingerprint();
   }
 
   /**
@@ -70,12 +70,10 @@ export class CryptographyRepository {
    * @returns Resolves with the remote fingerprint
    */
   async getRemoteFingerprint(userId: QualifiedId, clientId: string, prekey?: BackendPreKey) {
-    return this.cryptographyService.getRemoteFingerprint(userId, clientId, prekey);
+    return this.proteusService.getRemoteFingerprint(userId, clientId, prekey);
   }
 
-  async deleteSession(userId: QualifiedId, clientId: string): Promise<string> {
-    const sessionId = this.cryptographyService.constructSessionId(userId, clientId);
-    await this.cryptographyService.resetSession(sessionId);
-    return sessionId;
+  deleteSession(userId: QualifiedId, clientId: string): Promise<void> {
+    return this.proteusService.deleteSession(userId, clientId);
   }
 }

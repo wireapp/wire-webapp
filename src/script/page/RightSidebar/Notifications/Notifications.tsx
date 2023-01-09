@@ -19,14 +19,16 @@
 
 import {useState, FC} from 'react';
 
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+
 import {FadingScrollbar} from 'Components/FadingScrollbar';
+import {RadioGroup} from 'Components/Radio';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {NOTIFICATION_STATE, getNotificationText} from '../../../conversation/NotificationSetting';
 import {Conversation} from '../../../entity/Conversation';
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';
-import {PreferencesRadio} from '../../MainContent/panels/preferences/components/PreferencesRadio';
 import {PanelHeader} from '../PanelHeader';
 
 export interface NotificationsProps {
@@ -62,7 +64,8 @@ const Notifications: FC<NotificationsProps> = ({activeConversation, onGoBack, on
 
       <FadingScrollbar className="panel__content">
         <fieldset className="notification-section">
-          <PreferencesRadio
+          <RadioGroup
+            ariaLabelledBy={t('notificationSettingsTitle')}
             name="preferences-options-notifications"
             selectedValue={notificationState}
             onChange={saveOptionNotificationPreference}
@@ -70,7 +73,7 @@ const Notifications: FC<NotificationsProps> = ({activeConversation, onGoBack, on
           />
         </fieldset>
 
-        <p className="panel__info-text notification-settings__disclaimer" tabIndex={0}>
+        <p className="panel__info-text notification-settings__disclaimer" tabIndex={TabIndex.FOCUSABLE}>
           {t('notificationSettingsDisclaimer')}
         </p>
       </FadingScrollbar>

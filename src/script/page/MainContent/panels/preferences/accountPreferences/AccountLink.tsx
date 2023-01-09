@@ -57,9 +57,9 @@ const AccountLink: React.FC<AccountLinkProps> = ({label, value, ...rest}) => {
           {label}
         </label>
 
-        <div data-uie-name="profile-link" data-uie-value={value} {...rest}>
+        <p data-uie-name="profile-link" data-uie-value={value} {...rest}>
           {value}
-        </div>
+        </p>
       </div>
       <div
         css={{

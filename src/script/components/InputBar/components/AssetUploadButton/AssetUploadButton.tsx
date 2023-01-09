@@ -19,6 +19,8 @@
 
 import {useRef} from 'react';
 
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+
 import {Icon} from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
@@ -59,7 +61,7 @@ export const AssetUploadButton = ({onSelectFiles, acceptedFileTypes}: AssetUploa
           ref={fileRef}
           accept={acceptedFileTypes?.join(',')}
           id="conversation-input-bar-files"
-          tabIndex={-1}
+          tabIndex={TabIndex.UNFOCUSABLE}
           onChange={handleFileChange}
           type="file"
           multiple

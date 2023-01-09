@@ -20,6 +20,7 @@
 import React, {useEffect, useMemo} from 'react';
 
 import {css} from '@emotion/react';
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {container} from 'tsyringe';
 
 import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
@@ -193,6 +194,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
             onClick={minimize}
           />
         )}
+
         {classifiedDomains && (
           <ClassifiedBar
             users={conversationParticipants}
@@ -208,12 +210,15 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
             }}
           />
         )}
+
         <div className="video-remote-name">
-          {conversationName}
+          <h2 className="video-remote-title">{conversationName}</h2>
+
           <div data-uie-name="video-timer" className="video-timer label-xs">
             <Duration startedAt={startedAt} />
           </div>
         </div>
+
         {muteState === MuteState.REMOTE_MUTED && (
           <div
             className="video-title__info-bar"
@@ -360,7 +365,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                     onKeyDown={handleToggleCameraKeydown}
                     role="switch"
                     aria-checked={selfSharesCamera}
-                    tabIndex={0}
+                    tabIndex={TabIndex.FOCUSABLE}
                     css={selfSharesCamera ? videoControlActiveStyles : videoControlInActiveStyles}
                     aria-labelledby="video-label"
                     data-uie-name="do-call-controls-toggle-video"

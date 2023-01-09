@@ -20,6 +20,7 @@
 import React, {useCallback, useState} from 'react';
 
 import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation/';
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
@@ -250,7 +251,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
               className="conversation-list-cell conversation-list-cell-button"
               onClick={createNavigate(conversationUrl)}
               onKeyDown={createNavigateKeyboard(conversationUrl)}
-              tabIndex={0}
+              tabIndex={TabIndex.FOCUSABLE}
               role="button"
               aria-label={t('accessibility.openConversation', conversationName)}
             >
@@ -262,36 +263,43 @@ const CallingCell: React.FC<CallingCellProps> = ({
                   )}
                 </div>
               )}
-              <div
+
+              <h2
                 className={cx('conversation-list-cell-center ', {
                   'conversation-list-cell-center-no-left': temporaryUserStyle,
                 })}
               >
-                <p className="conversation-list-cell-name">{conversationName}</p>
+                <span className="conversation-list-cell-name">{conversationName}</span>
 
                 {currentCallStatus && (
-                  <p className="conversation-list-cell-description" data-uie-name={currentCallStatus.dataUieName}>
+                  <span className="conversation-list-cell-description" data-uie-name={currentCallStatus.dataUieName}>
                     {currentCallStatus.text}
-                  </p>
+                  </span>
                 )}
 
                 {isOngoing && startedAt && (
                   <div className="conversation-list-info-wrapper">
-                    <p
+                    <span
                       className="conversation-list-cell-description"
                       data-uie-name="call-duration"
                       aria-label={t('callDurationLabel')}
                     >
                       <Duration {...{startedAt}} />
-                    </p>
+                    </span>
+
                     {isCbrEnabled && (
-                      <p className="conversation-list-cell-description" data-uie-name="call-cbr">
-                        {t('callStateCbr')}
-                      </p>
+                      <span
+                        title={t('callStateCbr')}
+                        aria-label={t('callStateCbr')}
+                        className="conversation-list-cell-description"
+                        data-uie-name="call-cbr"
+                      >
+                        CBR
+                      </span>
                     )}
                   </div>
                 )}
-              </div>
+              </h2>
             </div>
 
             <div className="conversation-list-cell-right">
@@ -315,7 +323,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
               onClick={handleMinimizedClick}
               onKeyDown={handleMinimizedKeydown}
               role="button"
-              tabIndex={0}
+              tabIndex={TabIndex.FOCUSABLE}
               aria-label={t('callMaximizeLabel')}
             >
               <GroupVideoGrid

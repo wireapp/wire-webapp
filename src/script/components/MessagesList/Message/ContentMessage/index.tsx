@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import React, {useMemo} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
@@ -44,6 +44,7 @@ import {ContextMenuEntry, showContextMenu} from '../../../../ui/ContextMenu';
 import {EphemeralTimer} from '../EphemeralTimer';
 import {MessageTime} from '../MessageTime';
 import {ReadReceiptStatus} from '../ReadReceiptStatus';
+import {useMessageFocusedTabIndex} from '../util';
 
 export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetSession'> {
   contextMenu: {entries: ko.Subscribable<ContextMenuEntry[]>};
@@ -51,7 +52,7 @@ export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetS
   findMessage: (conversation: Conversation, messageId: string) => Promise<ContentMessage | undefined>;
   focusMessage?: () => void;
   hasMarker?: boolean;
-  focusConversation: boolean;
+  isMessageFocused: boolean;
   isLastDeliveredMessage: boolean;
   message: ContentMessage;
   onClickButton: (message: CompositeMessage, buttonId: string) => void;
@@ -69,7 +70,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   findMessage,
   selfId,
   hasMarker,
-  focusConversation,
+  isMessageFocused,
   isLastDeliveredMessage,
   contextMenu,
   previousMessage,
@@ -85,6 +86,11 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   totalMessage,
   isMsgElementsFocusable,
 }) => {
+  const msgFocusState = useMemo(
+    () => isMsgElementsFocusable && isMessageFocused,
+    [isMsgElementsFocusable, isMessageFocused],
+  );
+  const messageFocusedTabIndex = useMessageFocusedTabIndex(msgFocusState);
   const {entries: menuEntries} = useKoSubscribableChildren(contextMenu, ['entries']);
   const {headerSenderName, timestamp, ephemeral_caption, ephemeral_status, assets, other_likes, was_edited} =
     useKoSubscribableChildren(message, [
@@ -109,26 +115,28 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   };
 
   // check if current message is focused and its elements focusable
-  const msgFocusState = isMsgElementsFocusable && focusConversation;
   const avatarSection = shouldShowAvatar() ? (
     <div className="message-header">
       <div className="message-header-icon">
         <Avatar
-          tabIndex={msgFocusState ? 0 : -1}
+          tabIndex={messageFocusedTabIndex}
           participant={message.user()}
           onAvatarClick={onClickAvatar}
           avatarSize={AVATAR_SIZE.X_SMALL}
         />
       </div>
+
       <div className="message-header-label">
-        <span className={`message-header-label-sender ${message.accent_color()}`} data-uie-name="sender-name">
+        <h4 className={`message-header-label-sender ${message.accent_color()}`} data-uie-name="sender-name">
           {headerSenderName}
-        </span>
+        </h4>
+
         {message.user().isService && (
           <span className="message-header-icon-service">
             <Icon.Service />
           </span>
         )}
+
         {message.user().isExternal() && (
           <span
             className="message-header-icon-external with-tooltip with-tooltip--external"
@@ -138,6 +146,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             <Icon.External />
           </span>
         )}
+
         {message.user().isFederated && (
           <span
             className="message-header-icon-guest with-tooltip with-tooltip--external"
@@ -147,6 +156,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             <Icon.Federation />
           </span>
         )}
+
         {message.user().isDirectGuest() && (
           <span
             className="message-header-icon-guest with-tooltip with-tooltip--external"
@@ -156,6 +166,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             <Icon.Guest />
           </span>
         )}
+
         {was_edited && (
           <span className="message-header-label-icon icon-edit" title={message.displayEditedTimestamp()}></span>
         )}
@@ -189,7 +200,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
           focusMessage={onClickTimestamp}
           handleClickOnMessage={onClickMessage}
           showUserDetails={onClickAvatar}
-          focusConversation={msgFocusState}
+          isMessageFocused={msgFocusState}
         />
       )}
       <div className="message-body" title={ephemeral_caption}>
@@ -208,7 +219,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             onClickButton={onClickButton}
             onClickImage={onClickImage}
             onClickMessage={onClickMessage}
-            focusConversation={msgFocusState}
+            isMessageFocused={msgFocusState}
           />
         ))}
 
@@ -218,7 +229,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
               className="message-body-like-icon like-button message-show-on-hover"
               message={message}
               onLike={onLike}
-              focusConversation={msgFocusState}
+              isMessageFocused={msgFocusState}
             />
           </div>
         )}
@@ -226,13 +237,14 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
         <div className="message-body-actions">
           {menuEntries.length > 0 && (
             <button
-              tabIndex={msgFocusState ? 0 : -1}
+              tabIndex={messageFocusedTabIndex}
               className="context-menu icon-more font-size-xs"
               aria-label={t('accessibility.conversationContextMenuOpenLabel')}
               onKeyDown={handleContextKeyDown}
               onClick={event => showContextMenu(event, menuEntries, 'message-options-menu')}
             ></button>
           )}
+
           {ephemeral_status === EphemeralStatusType.ACTIVE && (
             <time
               className="time"
@@ -244,20 +256,23 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
               {message.displayTimestampShort()}
             </time>
           )}
+
           {ephemeral_status !== EphemeralStatusType.ACTIVE && (
             <MessageTime data-uie-uid={message.id} timestamp={timestamp}>
               {message.displayTimestampShort()}
             </MessageTime>
           )}
+
           <ReadReceiptStatus
             message={message}
             is1to1Conversation={conversation.is1to1()}
             isLastDeliveredMessage={isLastDeliveredMessage}
             onClickReceipts={onClickReceipts}
-            focusConversation={msgFocusState}
+            isMessageFocused={msgFocusState}
           />
         </div>
       </div>
+
       {other_likes.length > 0 && (
         <div>
           <MessageFooterLike
@@ -265,7 +280,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             is1to1Conversation={conversation.is1to1()}
             onLike={onLike}
             onClickLikes={onClickLikes}
-            focusConversation={msgFocusState}
+            isMessageFocused={msgFocusState}
           />
         </div>
       )}

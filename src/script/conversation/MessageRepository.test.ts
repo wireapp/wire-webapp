@@ -21,8 +21,8 @@ import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
 import {MessageSendingState} from '@wireapp/core/lib/conversation';
-import {container} from 'tsyringe';
 
+import {Account} from '@wireapp/core';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
@@ -45,7 +45,6 @@ import {ContentMessage} from '../entity/message/ContentMessage';
 import {EventRepository} from '../event/EventRepository';
 import {EventService} from '../event/EventService';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
-import {Core} from '../service/CoreSingleton';
 import {TeamState} from '../team/TeamState';
 import {ServerTimeHandler, serverTimeHandler} from '../time/serverTimeHandler';
 import {UserRepository} from '../user/UserRepository';
@@ -63,7 +62,7 @@ type MessageRepositoryDependencies = {
   assetRepository: AssetRepository;
   clientState: ClientState;
   conversationRepository: () => ConversationRepository;
-  core: Core;
+  core: Account;
   cryptographyRepository: CryptographyRepository;
   eventRepository: EventRepository;
   propertiesRepository: PropertiesRepository;
@@ -78,8 +77,7 @@ async function buildMessageRepository(): Promise<[MessageRepository, MessageRepo
   userState.self(selfUser);
   const clientState = new ClientState();
   clientState.currentClient(new ClientEntity(true, ''));
-  const core = container.resolve(Core);
-  await core.initServices({} as any);
+  const core = new Account();
 
   const conversationState = new ConversationState(userState);
   const selfConversation = new Conversation(selfUser.id);

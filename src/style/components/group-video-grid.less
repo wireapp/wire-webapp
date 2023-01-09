@@ -95,6 +95,13 @@
       width: calc(100% / var(--columns));
       height: calc(100% / var(--rows));
       box-sizing: border-box;
+      padding: 0;
+      border: none;
+      background-color: inherit;
+
+      &:focus {
+        z-index: 1;
+      }
 
       &__overlay {
         position: absolute;
@@ -131,7 +138,6 @@
       }
 
       &-video {
-        position: absolute;
         width: 100%;
         height: 100%;
         border-radius: 8px;

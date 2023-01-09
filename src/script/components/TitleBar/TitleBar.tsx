@@ -19,6 +19,7 @@
 
 import React, {useMemo, useEffect, useCallback} from 'react';
 
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -140,9 +141,14 @@ export const TitleBar: React.FC<TitleBarProps> = ({
   const mdBreakpoint = useMatchMedia('max-width: 768px');
   const smBreakpoint = useMatchMedia('max-width: 640px');
 
+  const {close: closeRightSidebar} = useAppMainState(state => state.rightSidebar);
+
   const {setCurrentView: setView} = useAppMainState(state => state.responsiveView);
 
-  const setLeftSidebar = () => setView(ViewType.LEFT_SIDEBAR);
+  const setLeftSidebar = () => {
+    setView(ViewType.LEFT_SIDEBAR);
+    closeRightSidebar();
+  };
 
   const showDetails = useCallback(
     (addParticipants: boolean): void => {
@@ -190,7 +196,9 @@ export const TitleBar: React.FC<TitleBarProps> = ({
 
   const onClickStartAudio = () => {
     callActions.startAudio(conversation);
-    setLeftSidebar();
+    if (smBreakpoint) {
+      setLeftSidebar();
+    }
   };
 
   return (
@@ -231,7 +239,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
           onKeyDown={e => handleKeyDown(e, onClickDetails)}
           data-placement="bottom"
           role="button"
-          tabIndex={0}
+          tabIndex={TabIndex.FOCUSABLE}
           data-uie-name="do-participants"
         >
           <div className="conversation-title-bar-name-label--wrapper">
@@ -251,9 +259,9 @@ export const TitleBar: React.FC<TitleBarProps> = ({
               />
             )}
 
-            <h2 className="conversation-title-bar-name-label" data-uie-name="status-conversation-title-bar-label">
+            <span className="conversation-title-bar-name-label" data-uie-name="status-conversation-title-bar-label">
               {displayName}
-            </h2>
+            </span>
           </div>
 
           {conversationSubtitle && <div className="conversation-title-bar-name--subtitle">{conversationSubtitle}</div>}

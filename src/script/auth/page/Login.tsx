@@ -53,6 +53,7 @@ import {
 } from '@wireapp/react-ui-kit';
 
 import {getLogger} from 'Util/Logger';
+import {isBackendError} from 'Util/TypePredicateUtil';
 
 import {EntropyContainer} from './EntropyContainer';
 import {Page} from './Page';
@@ -75,7 +76,7 @@ import {parseError, parseValidationErrors} from '../util/errorUtil';
 type Props = React.HTMLProps<HTMLDivElement>;
 
 const LoginComponent = ({
-  loginError,
+  authError,
   resetAuthError,
   doCheckConversationCode,
   doInit,
@@ -98,7 +99,7 @@ const LoginComponent = ({
   const [conversationKey, setConversationKey] = useState<string | null>(null);
 
   const [isValidLink, setIsValidLink] = useState(true);
-  const [validationErrors, setValidationErrors] = useState([]);
+  const [validationErrors, setValidationErrors] = useState<Error[]>([]);
 
   const [twoFactorSubmitError, setTwoFactorSubmitError] = useState<string | Error>('');
   const [twoFactorLoginData, setTwoFactorLoginData] = useState<LoginData>();
@@ -192,9 +193,8 @@ const LoginComponent = ({
 
       return navigate(ROUTE.HISTORY_INFO);
     } catch (error) {
-      if ((error as BackendError).label) {
-        const backendError = error as BackendError;
-        switch (backendError.label) {
+      if (isBackendError(error)) {
+        switch (error.label) {
           case BackendError.LABEL.TOO_MANY_CLIENTS: {
             resetAuthError();
             if (formLoginData?.verificationCode) {
@@ -208,9 +208,11 @@ const LoginComponent = ({
           }
           case BackendError.LABEL.CODE_AUTHENTICATION_REQUIRED: {
             const login: LoginData = {...formLoginData, clientType: loginData.clientType};
-            setTwoFactorLoginData(login);
-            doSendTwoFactorCode(login.email);
-            doSetLocalStorage(QUERY_KEY.JOIN_EXPIRES, Date.now() + 1000 * 60 * 10);
+            if (login.email) {
+              setTwoFactorLoginData(login);
+              doSendTwoFactorCode(login.email);
+              doSetLocalStorage(QUERY_KEY.JOIN_EXPIRES, Date.now() + 1000 * 60 * 10);
+            }
             break;
           }
           case BackendError.LABEL.CODE_AUTHENTICATION_FAILED: {
@@ -223,11 +225,12 @@ const LoginComponent = ({
             break;
           }
           default: {
+            const backendError = error;
             const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
               backendError.label.endsWith(errorType),
             );
             if (!isValidationError) {
-              throw backendError;
+              throw error;
             }
           }
         }
@@ -239,7 +242,10 @@ const LoginComponent = ({
 
   const resendTwoFactorCode = async () => {
     try {
-      await doSendTwoFactorCode(twoFactorLoginData.email);
+      const email = twoFactorLoginData?.email;
+      if (email) {
+        await doSendTwoFactorCode(email);
+      }
     } catch (error) {
       setTwoFactorSubmitError(
         new BackendError({code: StatusCodes.TOO_MANY_REQUESTS, label: BackendError.GENERAL_ERRORS.TOO_MANY_REQUESTS}),
@@ -247,7 +253,7 @@ const LoginComponent = ({
     }
   };
 
-  const submitTwoFactorLogin = (code: string) => {
+  const submitTwoFactorLogin = (code?: string) => {
     setTwoFactorSubmitError('');
     handleSubmit({...twoFactorLoginData, verificationCode: code}, []);
   };
@@ -328,8 +334,8 @@ const LoginComponent = ({
                         <LoginForm isFetching={isFetching} onSubmit={handleSubmit} />
                         {validationErrors.length ? (
                           parseValidationErrors(validationErrors)
-                        ) : loginError ? (
-                          parseError(loginError)
+                        ) : authError ? (
+                          parseError(authError)
                         ) : (
                           <div style={{marginTop: '4px'}}>&nbsp;</div>
                         )}
@@ -392,7 +398,7 @@ const mapStateToProps = (state: RootState) => ({
   isFetching: AuthSelector.isFetching(state),
   isSendingTwoFactorCode: AuthSelector.isSendingTwoFactorCode(state),
   loginData: AuthSelector.getLoginData(state),
-  loginError: AuthSelector.getError(state),
+  authError: AuthSelector.getError(state),
 });
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;

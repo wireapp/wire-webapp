@@ -27,7 +27,7 @@ import {ServiceEntity} from '../integration/ServiceEntity';
 
 jest.mock('Components/utils/InViewport', () => ({
   InViewport: ({onVisible, children}: {onVisible: () => void; children: any}) => {
-    onVisible();
+    setTimeout(onVisible);
     return <div>{children}</div>;
   },
   __esModule: true,

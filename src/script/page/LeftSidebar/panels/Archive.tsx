@@ -70,6 +70,8 @@ const Archive: React.FC<ArchiveProps> = ({
 
   return (
     <ListWrapper id="archive" header={t('archiveHeader')} onClose={onClose}>
+      <h2 className="visually-hidden">{t('archiveHeader')}</h2>
+
       <ul className="left-list-items no-scroll">
         {conversations.map((conversation, index) => (
           <ConversationListCell

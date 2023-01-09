@@ -21,7 +21,7 @@ import {FC} from 'react';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {Icon} from 'Components/Icon';
-import {StringIdentifer, t} from 'Util/LocalizerUtil';
+import {t} from 'Util/LocalizerUtil';
 
 import {useTypingIndicatorState} from './TypingIndicator.state';
 import {
@@ -48,30 +48,41 @@ const TypingIndicator: FC<TypingIndicatorProps> = ({conversationId}) => {
 
   return (
     <div css={wrapperStyles} data-uie-name="typing-indicator">
-      <div css={{display: 'flex', marginRight: 8}}>
+      <div aria-hidden css={{display: 'flex', marginRight: 8}}>
         {users.slice(0, 3).map((user, index) => (
           <Avatar
             key={user.id}
             className="cursor-default"
-            style={index > 0 ? {marginLeft: -12} : {}}
+            style={index > 0 ? {marginLeft: -8} : {}}
             participant={user}
             avatarSize={AVATAR_SIZE.XXX_SMALL}
+            isResponsive
           />
         ))}
       </div>
-      <span css={indicatorTitleStyles} data-uie-name="typing-indicator-title">
-        {usersCount === 1 && t('tooltipConversationInputOneUserTyping' as StringIdentifer, {user1: users[0].name()})}
+      <p css={indicatorTitleStyles} data-uie-name="typing-indicator-title">
+        {usersCount === 1 && t('tooltipConversationInputOneUserTyping', {user1: users[0].name()}, undefined, true)}
         {usersCount === 2 &&
-          t('tooltipConversationInputTwoUserTyping' as StringIdentifer, {
-            user1: users[0].name(),
-            user2: users[1].name(),
-          })}
+          t(
+            'tooltipConversationInputTwoUserTyping',
+            {
+              user1: users[0].name(),
+              user2: users[1].name(),
+            },
+            undefined,
+            true,
+          )}
         {usersCount > 2 &&
-          t('tooltipConversationInputMoreThanTwoUserTyping' as StringIdentifer, {
-            user1: users[0].name(),
-            count: (usersCount - 1).toString(),
-          })}
-      </span>
+          t(
+            'tooltipConversationInputMoreThanTwoUserTyping',
+            {
+              user1: users[0].name(),
+              count: (usersCount - 1).toString(),
+            },
+            undefined,
+            true,
+          )}
+      </p>
       <div css={indicatorAnimationWrapperStyles}>
         <div css={dotOneStyles} />
         <div css={dotTwoStyles} />

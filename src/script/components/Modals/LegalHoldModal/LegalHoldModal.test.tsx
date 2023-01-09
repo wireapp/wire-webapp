@@ -27,7 +27,7 @@ import {LegalHoldModal, LegalHoldModalType} from './LegalHoldModal';
 
 import {TestFactory} from '../../../../../test/helper/TestFactory';
 import {CallingRepository} from '../../../calling/CallingRepository';
-import {ClientRepository} from '../../../client/ClientRepository';
+import {ClientRepository} from '../../../client';
 import {ConversationRepository} from '../../../conversation/ConversationRepository';
 import {MessageRepository} from '../../../conversation/MessageRepository';
 import {CryptographyRepository} from '../../../cryptography/CryptographyRepository';

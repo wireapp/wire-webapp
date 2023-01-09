@@ -60,7 +60,7 @@ const DeviceToggleButton: React.FC<DeviceToggleButtonProps> = ({currentDevice, d
             data-uie-name="device-toggle-button-indicator-dot"
             data-uie-value={isCurrentDevice ? 'active' : 'inactive'}
             onClick={selectNextDevice}
-            onKeyDown={e => handleKeyDown(e, selectNextDevice.bind(null, e))}
+            onKeyDown={event => handleKeyDown(event, () => selectNextDevice(event))}
             css={{
               '&:focus-visible': {
                 backgroundColor: isCurrentDevice

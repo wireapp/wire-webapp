@@ -404,6 +404,9 @@ export class EventRepository {
     }
     if (decryptedData) {
       event = await new CryptographyMapper().mapGenericMessage(decryptedData, event);
+      if (!event) {
+        return undefined;
+      }
     }
     for (const eventProcessMiddleware of this.eventProcessMiddlewares) {
       event = await eventProcessMiddleware(event);

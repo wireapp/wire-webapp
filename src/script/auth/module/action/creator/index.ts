@@ -22,11 +22,9 @@ import type {Action} from 'redux';
 import type {AuthActions} from './AuthActionCreator';
 import type {ClientActions} from './ClientActionCreator';
 import type {ConversationActions} from './ConversationActionCreator';
-import type {CookieActions} from './CookieActionCreator';
 import type {InvitationActions} from './InvitationActionCreator';
 import type {LanguageActions} from './LanguageActionCreator';
 import type {LocalStorageActions} from './LocalStorageActionCreator';
-import type {NotificationActions} from './NotificationActionCreator';
 import type {RuntimeActions} from './RuntimeActionCreator';
 import type {SelfActions} from './SelfActionCreator';
 import type {UserActions} from './UserActionCreator';
@@ -39,11 +37,9 @@ export type AppActions =
   | AuthActions
   | ClientActions
   | ConversationActions
-  | CookieActions
   | InvitationActions
   | LanguageActions
   | LocalStorageActions
-  | NotificationActions
   | RuntimeActions
   | SelfActions
   | UserActions;
@@ -51,11 +47,9 @@ export type AppActions =
 export * from './AuthActionCreator';
 export * from './ClientActionCreator';
 export * from './ConversationActionCreator';
-export * from './CookieActionCreator';
 export * from './InvitationActionCreator';
 export * from './LanguageActionCreator';
 export * from './LocalStorageActionCreator';
-export * from './NotificationActionCreator';
 export * from './RuntimeActionCreator';
 export * from './SelfActionCreator';
 export * from './UserActionCreator';

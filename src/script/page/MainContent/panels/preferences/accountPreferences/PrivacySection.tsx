@@ -53,27 +53,34 @@ const PrivacySection: React.FC<PrivacySectionProps> = ({
       'appLockInactivityTimeoutSecs',
     ]);
 
-  const {receiptMode} = useKoSubscribableChildren(propertiesRepository, ['receiptMode']);
-  const {typingIndicatorMode} = useKoSubscribableChildren(propertiesRepository, ['typingIndicatorMode']);
+  const {receiptMode, typingIndicatorMode} = useKoSubscribableChildren(propertiesRepository, [
+    'receiptMode',
+    'typingIndicatorMode',
+  ]);
+
+  const changeReceiptMode = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const isChecked = event.target.checked;
+
+    propertiesRepository.updateProperty(
+      PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key,
+      isChecked ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF,
+    );
+  };
 
   const handleTypingModeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const isChecked = event.target.checked;
+
     propertiesRepository.updateProperty(
-      PropertiesRepository.CONFIG.WIRE_TYPING_MODE.key,
+      PropertiesRepository.CONFIG.WIRE_TYPING_INDICATOR_MODE.key,
       isChecked ? CONVERSATION_TYPING_INDICATOR_MODE.ON : CONVERSATION_TYPING_INDICATOR_MODE.OFF,
     );
   };
+
   return (
     <PreferencesSection hasSeparator className="preferences-section-privacy" title={t('preferencesAccountPrivacy')}>
       <>
         <Checkbox
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            const isChecked = event.target.checked;
-            propertiesRepository.updateProperty(
-              PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key,
-              isChecked ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF,
-            );
-          }}
+          onChange={changeReceiptMode}
           checked={receiptMode === RECEIPT_MODE.ON}
           data-uie-name="status-preference-read-receipts"
         >
@@ -83,6 +90,7 @@ const PrivacySection: React.FC<PrivacySectionProps> = ({
         </Checkbox>
         <p className="preferences-detail preferences-detail-intended">{t('preferencesAccountReadReceiptsDetail')}</p>
       </>
+
       <div className="checkbox-margin">
         <Checkbox
           onChange={handleTypingModeChange}
@@ -97,6 +105,7 @@ const PrivacySection: React.FC<PrivacySectionProps> = ({
           {t('preferencesAccountTypingIndicatorsDetail')}
         </p>
       </div>
+
       {isAppLockAvailable && (
         <div className="checkbox-margin">
           <Checkbox

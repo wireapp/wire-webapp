@@ -146,7 +146,7 @@ const StartUI: React.FC<StartUIProps> = ({
       <div className="start-ui-header-user-input" data-uie-name="enter-search">
         <SearchInput
           input={searchQuery}
-          placeholder={isFederated ? t('searchPlaceholderFederation') : t('searchPlaceholder')}
+          placeholder={t('searchPlaceholder')}
           selectedUsers={[]}
           setInput={setSearchQuery}
           enter={openFirstConversation}
@@ -184,26 +184,30 @@ const StartUI: React.FC<StartUIProps> = ({
 
   const content =
     activeTab === Tabs.PEOPLE ? (
-      <PeopleTab
-        searchQuery={searchQuery}
-        isTeam={isTeam}
-        isFederated={isFederated}
-        teamRepository={teamRepository}
-        teamState={teamState}
-        userState={userState}
-        canSearchUnconnectedUsers={canSearchUnconnectedUsers()}
-        conversationState={conversationState}
-        searchRepository={searchRepository}
-        conversationRepository={conversationRepository}
-        canInviteTeamMembers={canInviteTeamMembers()}
-        canCreateGroupConversation={canCreateGroupConversation()}
-        canCreateGuestRoom={canCreateGuestRoom()}
-        userRepository={userRepository}
-        onClickContact={openContact}
-        onClickConversation={openConversation}
-        onClickUser={openOther}
-        onSearchResults={searchResult => (peopleSearchResults.current = searchResult)}
-      />
+      <>
+        <h2 className="visually-hidden">{t('conversationFooterContacts')}</h2>
+
+        <PeopleTab
+          searchQuery={searchQuery}
+          isTeam={isTeam}
+          isFederated={isFederated}
+          teamRepository={teamRepository}
+          teamState={teamState}
+          userState={userState}
+          canSearchUnconnectedUsers={canSearchUnconnectedUsers()}
+          conversationState={conversationState}
+          searchRepository={searchRepository}
+          conversationRepository={conversationRepository}
+          canInviteTeamMembers={canInviteTeamMembers()}
+          canCreateGroupConversation={canCreateGroupConversation()}
+          canCreateGuestRoom={canCreateGuestRoom()}
+          userRepository={userRepository}
+          onClickContact={openContact}
+          onClickConversation={openConversation}
+          onClickUser={openOther}
+          onSearchResults={searchResult => (peopleSearchResults.current = searchResult)}
+        />
+      </>
     ) : (
       <ServicesTab
         searchQuery={searchQuery}
@@ -222,7 +226,7 @@ const StartUI: React.FC<StartUIProps> = ({
 
   return (
     <ListWrapper
-      id={'start-ui'}
+      id="start-ui"
       header={teamName}
       headerUieName="status-team-name-search"
       onClose={onClose}
