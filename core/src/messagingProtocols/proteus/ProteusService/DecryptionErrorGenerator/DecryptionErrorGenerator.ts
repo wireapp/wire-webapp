@@ -30,7 +30,7 @@ export const ProteusErrors = {
 } as const;
 
 type CoreCryptoErrors = keyof typeof ProteusErrors;
-type ProteusErrorCode = typeof ProteusErrors[CoreCryptoErrors];
+type ProteusErrorCode = (typeof ProteusErrors)[CoreCryptoErrors];
 
 const CoreCryptoErrorMapping: Record<CoreCryptoErrors, ProteusErrorCode> = {
   InvalidMessage: ProteusErrors.InvalidMessage,
