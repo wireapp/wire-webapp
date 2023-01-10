@@ -44,6 +44,7 @@ import {useWindowTitle} from './useWindowTitle';
 
 import {ConversationState} from '../conversation/ConversationState';
 import {User} from '../entity/User';
+import {useAutomaticTheme} from '../hooks/useAutomaticTheme';
 import {useInitializeRootFontSize} from '../hooks/useRootFontSize';
 import {App} from '../main/app';
 import {generateConversationUrl} from '../router/routeGenerator';
@@ -198,6 +199,8 @@ const AppMain: FC<AppMainProps> = ({
   useLayoutEffect(() => {
     initializeApp();
   }, []);
+
+  useAutomaticTheme(app.repository.properties);
 
   return (
     <StyledApp
