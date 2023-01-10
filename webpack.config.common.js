@@ -155,6 +155,7 @@ module.exports = {
         },
         // copying all static resources (audio, images, fonts...)
         {from: 'resource', to: dist},
+        {from: 'tmp-js/js', to: `${dist}/min/edge`},
         // copying worker files
         {context: `${SRC_PATH}`, from: 'worker', to: `${dist}/worker`},
       ],

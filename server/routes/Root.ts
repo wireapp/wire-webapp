@@ -39,10 +39,14 @@ async function addGeoIP(req: Request) {
 }
 
 const Root = () => [
-  Router().get('/', (_req, res) => res.render('index')),
+  Router().get('/', (_req, res) => {
+    const path = _req.headers.cookie?.match(/bleeding_edge/) ? 'min/edge' : 'min';
+    return res.render('index', {path});
+  }),
   Router().get('/auth', async (req, res) => {
     await addGeoIP(req);
-    return res.render('auth/index');
+    const path = req.headers.cookie?.match(/bleeding_edge/) ? 'min/edge' : 'min';
+    return res.render('auth/index', {path});
   }),
   Router().get('/login', async (req, res) => {
     await addGeoIP(req);
