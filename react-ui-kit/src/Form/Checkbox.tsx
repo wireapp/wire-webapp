@@ -83,7 +83,7 @@ const StyledLabel = ({
           boxSizing: 'border-box',
           content: '""',
           display: 'inline-block',
-          width: '22px',
+          minWidth: '22px',
           height: '22px',
           lineHeight: '1.4rem',
           margin: '0 8px 0 0px',
