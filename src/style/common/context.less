@@ -50,8 +50,9 @@
     }
 
     &:hover,
-    &.selected {
+    & > :focus-visible {
       background-color: var(--foreground-fade-16);
+      outline: none;
     }
 
     &--disabled {
