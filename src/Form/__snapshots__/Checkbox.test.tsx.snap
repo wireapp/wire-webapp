@@ -78,7 +78,7 @@ exports[`"Checkbox" renders (dark theme) 1`] = `
   box-sizing: border-box;
   content: "";
   display: inline-block;
-  width: 22px;
+  min-width: 22px;
   height: 22px;
   line-height: 1.4rem;
   margin: 0 8px 0 0px;
@@ -203,7 +203,7 @@ exports[`"Checkbox" renders 1`] = `
   box-sizing: border-box;
   content: "";
   display: inline-block;
-  width: 22px;
+  min-width: 22px;
   height: 22px;
   line-height: 1.4rem;
   margin: 0 8px 0 0px;
@@ -328,7 +328,7 @@ exports[`"Checkbox" renders as invalid 1`] = `
   box-sizing: border-box;
   content: "";
   display: inline-block;
-  width: 22px;
+  min-width: 22px;
   height: 22px;
   line-height: 1.4rem;
   margin: 0 8px 0 0px;
@@ -449,7 +449,7 @@ exports[`"Checkbox" renders disabled 1`] = `
   box-sizing: border-box;
   content: "";
   display: inline-block;
-  width: 22px;
+  min-width: 22px;
   height: 22px;
   line-height: 1.4rem;
   margin: 0 8px 0 0px;
