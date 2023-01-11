@@ -145,7 +145,7 @@ const Avatar: FC<AvatarProps> = ({
         noBadge={noBadge}
         onClick={handleAvatarInteraction}
         participant={participant}
-        isResponsive
+        isResponsive={isResponsive}
         state={avatarState}
         {...props}
       />
@@ -159,7 +159,7 @@ const Avatar: FC<AvatarProps> = ({
       noFilter={noFilter}
       onAvatarInteraction={handleAvatarInteraction}
       participant={participant}
-      isResponsive
+      isResponsive={isResponsive}
       state={avatarState}
       {...props}
     />
