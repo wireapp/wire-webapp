@@ -33,6 +33,7 @@ import type {ConversationRepository} from '../conversation/ConversationRepositor
 import {ConversationState} from '../conversation/ConversationState';
 import type {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
+import {isKeyDownEvent} from '../guards/Event';
 import {TeamState} from '../team/TeamState';
 import {UserState} from '../user/UserState';
 
@@ -110,6 +111,10 @@ const UserList: React.FC<UserListProps> = ({
   };
 
   const onClickOrKeyPressed = (userEntity: User, event: MouseEvent | KeyboardEvent | ChangeEvent) => {
+    if (!isSelectEnabled && isKeyDownEvent(event)) {
+      event.preventDefault();
+    }
+
     onSelectUser?.(userEntity);
     onClick?.(userEntity, event);
   };

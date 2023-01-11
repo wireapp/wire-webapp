@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import React, {useCallback} from 'react';
 
 import cx from 'classnames';
 
@@ -41,6 +41,10 @@ interface DeviceListProps {
 const DeviceList: React.FC<DeviceListProps> = ({user, noPadding, clients, clickOnDevice}) => {
   const {name: userName} = useKoSubscribableChildren(user, ['name']);
 
+  const linkRef = useCallback((element: HTMLAnchorElement | null) => {
+    element?.focus();
+  }, []);
+
   return (
     <>
       <div className={cx('participant-devices__header', {'participant-devices__header--padding': !noPadding})}>
@@ -49,6 +53,7 @@ const DeviceList: React.FC<DeviceListProps> = ({user, noPadding, clients, clickO
         </p>
 
         <a
+          ref={linkRef}
           className="participant-devices__link accent-text"
           href={getPrivacyWhyUrl()}
           rel="nofollow noopener noreferrer"

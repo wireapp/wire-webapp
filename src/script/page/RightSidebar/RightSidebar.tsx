@@ -167,7 +167,12 @@ const RightSidebar: FC<RightSidebarProps> = ({
     });
   }, []);
 
-  const containerRef = useCallback((element: HTMLDivElement | null) => element?.focus(), [currentState]);
+  const containerRef = useCallback(
+    (element: HTMLDivElement | HTMLButtonElement | null) => {
+      element?.focus();
+    },
+    [currentState],
+  );
 
   if (!activeConversation) {
     return null;
@@ -206,6 +211,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
 
           {currentState === PanelState.GROUP_PARTICIPANT_USER && userEntity && (
             <GroupParticipantUser
+              ref={containerRef}
               onBack={onBackClick}
               onClose={closePanel}
               goToRoot={goToRoot}

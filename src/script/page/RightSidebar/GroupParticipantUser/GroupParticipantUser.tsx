@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, useEffect} from 'react';
+import {forwardRef, useEffect} from 'react';
 
 import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/lib/conversation/';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
@@ -62,166 +62,176 @@ interface GroupParticipantUserProps {
   isFederated?: boolean;
 }
 
-const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
-  onBack,
-  onClose,
-  goToRoot,
-  showDevices,
-  currentUser,
-  actionsViewModel,
-  activeConversation,
-  conversationRoleRepository,
-  teamRepository,
-  teamState,
-  userState,
-  isFederated = false,
-}) => {
-  const {isGroup, roles} = useKoSubscribableChildren(activeConversation, ['isGroup', 'roles']);
-  const {isTemporaryGuest} = useKoSubscribableChildren(currentUser, ['isTemporaryGuest']);
-  const {classifiedDomains, isTeam, team} = useKoSubscribableChildren(teamState, [
-    'classifiedDomains',
-    'isTeam',
-    'team',
-  ]);
-  const {isActivatedAccount, self: selfUser} = useKoSubscribableChildren(userState, ['isActivatedAccount', 'self']);
-  const {is_verified: isSelfVerified} = useKoSubscribableChildren(selfUser, ['is_verified']);
+const GroupParticipantUser = forwardRef<HTMLButtonElement, GroupParticipantUserProps>(
+  (
+    {
+      onBack,
+      onClose,
+      goToRoot,
+      showDevices,
+      currentUser,
+      actionsViewModel,
+      activeConversation,
+      conversationRoleRepository,
+      teamRepository,
+      teamState,
+      userState,
+      isFederated = false,
+    },
+    containerRef,
+  ) => {
+    const {isGroup, roles} = useKoSubscribableChildren(activeConversation, ['isGroup', 'roles']);
+    const {isTemporaryGuest} = useKoSubscribableChildren(currentUser, ['isTemporaryGuest']);
+    const {classifiedDomains, isTeam, team} = useKoSubscribableChildren(teamState, [
+      'classifiedDomains',
+      'isTeam',
+      'team',
+    ]);
+    const {isActivatedAccount, self: selfUser} = useKoSubscribableChildren(userState, ['isActivatedAccount', 'self']);
+    const {is_verified: isSelfVerified} = useKoSubscribableChildren(selfUser, ['is_verified']);
 
-  const canChangeRole =
-    conversationRoleRepository.canChangeParticipantRoles(activeConversation) && !currentUser.isMe && !isTemporaryGuest;
+    const canChangeRole =
+      conversationRoleRepository.canChangeParticipantRoles(activeConversation) &&
+      !currentUser.isMe &&
+      !isTemporaryGuest;
 
-  const isAdmin = isGroup && conversationRoleRepository.isUserGroupAdmin(activeConversation, currentUser);
+    const isAdmin = isGroup && conversationRoleRepository.isUserGroupAdmin(activeConversation, currentUser);
 
-  const toggleAdmin = async () => {
-    if (currentUser.isFederated) {
-      return;
-    }
+    const toggleAdmin = async () => {
+      if (currentUser.isFederated) {
+        return;
+      }
 
-    const newRole = isAdmin ? DefaultRole.WIRE_MEMBER : DefaultRole.WIRE_ADMIN;
-    await conversationRoleRepository.setMemberConversationRole(activeConversation, currentUser.id, newRole);
+      const newRole = isAdmin ? DefaultRole.WIRE_MEMBER : DefaultRole.WIRE_ADMIN;
+      await conversationRoleRepository.setMemberConversationRole(activeConversation, currentUser.id, newRole);
 
-    roles[currentUser.id] = newRole;
-    activeConversation.roles(roles);
-  };
+      roles[currentUser.id] = newRole;
+      activeConversation.roles(roles);
+    };
 
-  const onUserAction = (action: Actions) => {
-    if (action === Actions.REMOVE) {
-      onBack(activeConversation);
-    }
-  };
+    const onUserAction = (action: Actions) => {
+      if (action === Actions.REMOVE) {
+        onBack(activeConversation);
+      }
+    };
 
-  const checkMemberLeave = ({type, data}: MemberLeaveEvent) => {
-    if (type === ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE && data.user_ids.includes(currentUser.id)) {
-      goToRoot();
-    }
-  };
+    const checkMemberLeave = ({type, data}: MemberLeaveEvent) => {
+      if (type === ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE && data.user_ids.includes(currentUser.id)) {
+        goToRoot();
+      }
+    };
 
-  useEffect(() => {
-    amplify.subscribe(WebAppEvents.CONVERSATION.EVENT_FROM_BACKEND, checkMemberLeave);
-  }, []);
+    useEffect(() => {
+      amplify.subscribe(WebAppEvents.CONVERSATION.EVENT_FROM_BACKEND, checkMemberLeave);
+    }, []);
 
-  useEffect(() => {
-    if (currentUser.isDeleted) {
-      goToRoot();
-    }
-  }, [currentUser]);
+    useEffect(() => {
+      if (currentUser.isDeleted) {
+        goToRoot();
+      }
+    }, [currentUser]);
 
-  useEffect(() => {
-    if (isTeam) {
-      teamRepository.updateTeamMembersByIds(team, [currentUser.id], true);
-    }
-  }, [isTeam, currentUser, teamRepository, team]);
+    useEffect(() => {
+      if (isTeam) {
+        teamRepository.updateTeamMembersByIds(team, [currentUser.id], true);
+      }
+    }, [isTeam, currentUser, teamRepository, team]);
 
-  useEffect(() => {
-    if (isTemporaryGuest) {
-      currentUser.checkGuestExpiration();
-    }
-  }, [isTemporaryGuest, currentUser]);
+    useEffect(() => {
+      if (isTemporaryGuest) {
+        currentUser.checkGuestExpiration();
+      }
+    }, [isTemporaryGuest, currentUser]);
 
-  return (
-    <div id="group-participant-user" className="panel__page group-participant">
-      <PanelHeader
-        showBackArrow
-        goBackUie="go-back-group-participant"
-        onGoBack={() => onBack(activeConversation)}
-        onClose={onClose}
-      />
-
-      <FadingScrollbar className="panel__content">
-        <UserDetails
-          participant={currentUser}
-          badge={teamRepository.getRoleBadge(currentUser.id)}
-          isGroupAdmin={isAdmin}
-          isSelfVerified={isSelfVerified}
-          classifiedDomains={classifiedDomains}
+    return (
+      <div id="group-participant-user" className="panel__page group-participant">
+        <PanelHeader
+          showBackArrow
+          goBackUie="go-back-group-participant"
+          onGoBack={() => onBack(activeConversation)}
+          onClose={onClose}
         />
 
-        {!currentUser.isMe && (
-          <div className="conversation-details__devices">
-            <button
-              className="panel__action-item"
-              onClick={() => showDevices(currentUser)}
-              aria-label={t('accessibility.conversationDetailsActionDevicesLabel')}
-              data-uie-name="go-devices"
-              type="button"
-            >
-              <span className="panel__action-item__icon">
-                <Icon.Devices />
-              </span>
+        <FadingScrollbar className="panel__content">
+          <UserDetails
+            participant={currentUser}
+            badge={teamRepository.getRoleBadge(currentUser.id)}
+            isGroupAdmin={isAdmin}
+            isSelfVerified={isSelfVerified}
+            classifiedDomains={classifiedDomains}
+          />
 
-              <span className="panel__action-item__text">{t('conversationDetailsActionDevices')}</span>
-
-              <Icon.ChevronRight className="chevron-right-icon" />
-            </button>
-          </div>
-        )}
-
-        {canChangeRole && (
-          <>
-            <div className="conversation-details__admin">
-              <div
-                tabIndex={TabIndex.FOCUSABLE}
-                role="button"
-                className="panel__action-item modal-style panel__action-button"
-                data-uie-name="toggle-admin"
-                aria-label={t('accessibility.conversationDetailsActionGroupAdminLabel')}
-                aria-pressed={isAdmin}
-                onClick={toggleAdmin}
-                onKeyDown={(event: React.KeyboardEvent<HTMLElement>) => handleKeyDown(event, toggleAdmin)}
+          {!currentUser.isMe && (
+            <div className="conversation-details__devices">
+              <button
+                ref={containerRef}
+                className="panel__action-item"
+                onClick={() => showDevices(currentUser)}
+                aria-label={t('accessibility.conversationDetailsActionDevicesLabel')}
+                data-uie-name="go-devices"
+                type="button"
               >
                 <span className="panel__action-item__icon">
-                  <Icon.GroupAdmin />
+                  <Icon.Devices />
                 </span>
 
-                <BaseToggle
-                  isChecked={isAdmin}
-                  setIsChecked={toggleAdmin}
-                  toggleName={t('conversationDetailsGroupAdmin')}
-                  toggleId="admin"
-                  isDisabled={currentUser.isFederated}
-                />
-              </div>
+                <span className="panel__action-item__text">{t('conversationDetailsActionDevices')}</span>
+
+                <Icon.ChevronRight className="chevron-right-icon" />
+              </button>
             </div>
+          )}
 
-            <p className="panel__info-text panel__item-offset" css={{padding: '16px'}} tabIndex={TabIndex.FOCUSABLE}>
-              {t('conversationDetailsGroupAdminInfo')}
-            </p>
-          </>
-        )}
+          {canChangeRole && (
+            <>
+              <div className="conversation-details__admin">
+                <div
+                  tabIndex={TabIndex.FOCUSABLE}
+                  role="button"
+                  className="panel__action-item modal-style panel__action-button"
+                  data-uie-name="toggle-admin"
+                  aria-label={t('accessibility.conversationDetailsActionGroupAdminLabel')}
+                  aria-pressed={isAdmin}
+                  onClick={toggleAdmin}
+                  onKeyDown={(event: React.KeyboardEvent<HTMLElement>) => handleKeyDown(event, toggleAdmin)}
+                >
+                  <span className="panel__action-item__icon">
+                    <Icon.GroupAdmin />
+                  </span>
 
-        {!isTemporaryGuest && <EnrichedFields user={currentUser} showDomain={isFederated} />}
+                  <BaseToggle
+                    isChecked={isAdmin}
+                    setIsChecked={toggleAdmin}
+                    toggleName={t('conversationDetailsGroupAdmin')}
+                    toggleId="admin"
+                    isDisabled={currentUser.isFederated}
+                  />
+                </div>
+              </div>
 
-        <UserActions
-          user={currentUser}
-          conversation={activeConversation}
-          actionsViewModel={actionsViewModel}
-          onAction={onUserAction}
-          isSelfActivated={isActivatedAccount}
-          conversationRoleRepository={conversationRoleRepository}
-          selfUser={selfUser}
-        />
-      </FadingScrollbar>
-    </div>
-  );
-};
+              <p className="panel__info-text panel__item-offset" css={{padding: '16px'}} tabIndex={TabIndex.FOCUSABLE}>
+                {t('conversationDetailsGroupAdminInfo')}
+              </p>
+            </>
+          )}
+
+          {!isTemporaryGuest && <EnrichedFields user={currentUser} showDomain={isFederated} />}
+
+          <UserActions
+            user={currentUser}
+            conversation={activeConversation}
+            actionsViewModel={actionsViewModel}
+            onAction={onUserAction}
+            isSelfActivated={isActivatedAccount}
+            conversationRoleRepository={conversationRoleRepository}
+            selfUser={selfUser}
+          />
+        </FadingScrollbar>
+      </div>
+    );
+  },
+);
+
+GroupParticipantUser.displayName = 'GroupParticipantUser';
 
 export {GroupParticipantUser};

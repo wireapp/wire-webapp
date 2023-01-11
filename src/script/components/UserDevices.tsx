@@ -135,7 +135,7 @@ const UserDevices: React.FC<UserDevicesProps> = ({
 
   return (
     <div>
-      {showDeviceList && deviceMode === FIND_MODE.FOUND && (
+      {showDeviceList && (deviceMode === FIND_MODE.FOUND || deviceMode === FIND_MODE.REQUESTING) && (
         <DeviceList {...{clickOnDevice, clients, noPadding, user}} />
       )}
 
