@@ -21,6 +21,7 @@ import React, {useEffect, useRef} from 'react';
 
 import cx from 'classnames';
 
+import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 
 export interface InputLevelProps extends React.HTMLProps<HTMLDivElement> {
@@ -86,7 +87,11 @@ const InputLevel: React.FC<InputLevelProps> = ({disabled, mediaStream, className
   }, [mediaStream]);
 
   return (
-    <div className={`input-level ${className}`} {...rest}>
+    <div
+      aria-label={level > 0 ? t('preferencesOptionsInputLevelDetected') : t('preferencesOptionsInputLevelNotDetected')}
+      className={`input-level ${className}`}
+      {...rest}
+    >
       {bullets.current.map(bulletIndex => (
         <div
           key={bulletIndex}
