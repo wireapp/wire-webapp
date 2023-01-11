@@ -64,8 +64,11 @@ const useAutomaticTheme = (propertiesRepository: PropertiesRepository): ThemeTyp
 
   useEffect(() => {
     const nextTheme = (isSystemDarkMode ? THEMES.DARK : THEMES.DEFAULT) as ThemeType;
-    updateTheme(nextTheme);
-    setTheme(nextTheme);
+    // @todo: For now we won't follow system preferences until we implement light/dark/system option.
+    if (propertiesRepository.getPreference(PROPERTIES_TYPE.INTERFACE.THEME) === 'default') {
+      updateTheme(nextTheme);
+      setTheme(nextTheme);
+    }
   }, [isSystemDarkMode]);
 
   return theme;
