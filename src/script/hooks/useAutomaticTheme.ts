@@ -48,10 +48,15 @@ export const THEMES = {
 const useAutomaticTheme = (propertiesRepository: PropertiesRepository): ThemeType => {
   const [theme, setTheme] = useState<ThemeType>(propertiesRepository.getPreference(PROPERTIES_TYPE.INTERFACE.THEME));
 
+  const onThemeChange = (nextTheme: ThemeType) => {
+    updateTheme(nextTheme);
+    setTheme(nextTheme);
+  };
+
   useEffect(() => {
-    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, setTheme);
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, onThemeChange);
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, (properties: WebappProperties) =>
-      setTheme(properties.settings.interface.theme),
+      onThemeChange(properties.settings.interface.theme),
     );
   }, []);
 
@@ -61,8 +66,7 @@ const useAutomaticTheme = (propertiesRepository: PropertiesRepository): ThemeTyp
     const nextTheme = (isSystemDarkMode ? THEMES.DARK : THEMES.DEFAULT) as ThemeType;
     // @todo: For now we won't follow system preferences until we implement light/dark/system option.
     if (propertiesRepository.getPreference(PROPERTIES_TYPE.INTERFACE.THEME) === 'default') {
-      updateTheme(nextTheme);
-      setTheme(nextTheme);
+      onThemeChange(nextTheme);
     }
   }, [isSystemDarkMode]);
 
