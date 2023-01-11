@@ -30,7 +30,7 @@ import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 
 type ThemeType = 'dark' | 'default';
 
-export const updateTheme = (newTheme: ThemeType) => {
+const updateTheme = (newTheme: ThemeType) => {
   const classes = document.body.className
     .split(' ')
     .filter(elementClass => !elementClass.startsWith(THEMES_CLASS_PREFIX))
@@ -45,11 +45,6 @@ export const THEMES = {
   DEFAULT: 'default',
 };
 
-export const useSystemTheme = () => {
-  const isSystemDarkMode = useMatchMedia('(prefers-color-scheme: dark)');
-  return isSystemDarkMode;
-};
-
 const useAutomaticTheme = (propertiesRepository: PropertiesRepository): ThemeType => {
   const [theme, setTheme] = useState<ThemeType>(propertiesRepository.getPreference(PROPERTIES_TYPE.INTERFACE.THEME));
 
@@ -60,7 +55,7 @@ const useAutomaticTheme = (propertiesRepository: PropertiesRepository): ThemeTyp
     );
   }, []);
 
-  const isSystemDarkMode = useSystemTheme();
+  const isSystemDarkMode = useMatchMedia('(prefers-color-scheme: dark)');
 
   useEffect(() => {
     const nextTheme = (isSystemDarkMode ? THEMES.DARK : THEMES.DEFAULT) as ThemeType;
