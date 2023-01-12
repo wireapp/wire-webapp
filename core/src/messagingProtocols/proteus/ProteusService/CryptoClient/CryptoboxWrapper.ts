@@ -128,5 +128,9 @@ export class CryptoboxWrapper implements CryptoClient {
     this.cryptobox['cachedSessions'].set(sessionId, session);
   }
 
+  async debugResetIdentity() {
+    await this.cryptobox.create();
+  }
+
   async wipe() {}
 }
