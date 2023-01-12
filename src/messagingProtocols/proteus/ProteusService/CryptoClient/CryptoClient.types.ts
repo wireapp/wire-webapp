@@ -27,7 +27,7 @@ export interface CryptoClient {
   decrypt(sessionId: string, message: Uint8Array): Promise<Uint8Array>;
 
   /**
-   * Will init an already existing client. The client should already exist in the database
+   * Will init an already existing client. The client should already exist in the database. If the client doesn't exist, it needs to be created using the `create` method.
    */
   init(): Promise<void>;
 
