@@ -20,7 +20,6 @@
 import {PreKey} from '@wireapp/api-client/lib/auth';
 import {UserClients} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId, UserPreKeyBundleMap} from '@wireapp/api-client/lib/user';
-import {CoreCrypto} from '@wireapp/core-crypto/platforms/web/corecrypto';
 import {Decoder} from 'bazinga64';
 import {Logger} from 'logdown';
 
@@ -29,6 +28,7 @@ import {APIClient} from '@wireapp/api-client';
 import {SessionId} from './SessionHandler.types';
 
 import {flattenUserClients} from '../../../../conversation/message/UserClientsUtil';
+import {CryptoClient} from '../../ProteusService/CryptoClient';
 
 interface ConstructSessionIdParams {
   userId: string | QualifiedId;
@@ -62,23 +62,28 @@ const parseSessionId = (sessionId: string): SessionId => {
 };
 
 interface CreateSessionParams {
-  coreCrypto: CoreCrypto;
+  cryptoClient: CryptoClient;
   apiClient: APIClient;
   sessionId: string;
   initialPrekey?: PreKey;
 }
-const createSession = async ({sessionId, initialPrekey, coreCrypto, apiClient}: CreateSessionParams): Promise<void> => {
+const createSession = async ({
+  sessionId,
+  initialPrekey,
+  cryptoClient,
+  apiClient,
+}: CreateSessionParams): Promise<void> => {
   const {userId, clientId, domain} = parseSessionId(sessionId);
   const prekey =
     initialPrekey ?? (await apiClient.api.user.getClientPreKey({id: userId, domain: domain ?? ''}, clientId)).prekey;
   const prekeyBuffer = Decoder.fromBase64(prekey.key).asBytes;
-  await coreCrypto.proteusSessionFromPrekey(sessionId, prekeyBuffer);
-  await coreCrypto.proteusSessionSave(sessionId);
+  await cryptoClient.sessionFromPrekey(sessionId, prekeyBuffer);
+  await cryptoClient.saveSession(sessionId);
 };
 
 interface CreateSessionsBase {
   apiClient: APIClient;
-  coreCrypto: CoreCrypto;
+  cryptoClient: CryptoClient;
   logger?: Logger;
 }
 
@@ -89,14 +94,14 @@ interface CreateLegacySessionsProps extends CreateSessionsBase {
 const createLegacySessions = async ({
   userClients,
   apiClient,
-  coreCrypto,
+  cryptoClient,
   logger,
 }: CreateLegacySessionsProps): Promise<string[]> => {
   const preKeyBundleMap = await apiClient.api.user.postMultiPreKeyBundles(userClients);
   const sessions = await createSessionsFromPreKeys({
     preKeyBundleMap,
     useQualifiedIds: false,
-    coreCrypto,
+    cryptoClient,
     logger,
   });
 
@@ -116,7 +121,7 @@ const createQualifiedSessions = async ({
   userClientMap,
   domain,
   apiClient,
-  coreCrypto,
+  cryptoClient,
   logger,
 }: CreateQualifiedSessionsProps): Promise<string[]> => {
   const prekeyBundleMap = await apiClient.api.user.postQualifiedMultiPreKeyBundles({[domain]: userClientMap});
@@ -130,7 +135,7 @@ const createQualifiedSessions = async ({
       preKeyBundleMap: domainUsers,
       domain,
       useQualifiedIds: true,
-      coreCrypto,
+      cryptoClient,
       logger,
     });
     sessions.push(...domainSessions);
@@ -145,21 +150,21 @@ interface CreateSessionsProps extends CreateSessionsBase {
 }
 
 /**
- * Will make sure the session is available in coreCrypto
+ * Will make sure the session is available in cryptoClient
  * @param sessionId the session to init
  */
 const initSession = async (
   {userId, clientId, initialPrekey}: {userId: QualifiedId; clientId: string; initialPrekey?: PreKey},
-  {coreCrypto, apiClient}: {apiClient: APIClient; coreCrypto: CoreCrypto},
+  {cryptoClient, apiClient}: {apiClient: APIClient; cryptoClient: CryptoClient},
 ): Promise<string> => {
   const sessionId = constructSessionId({userId, clientId, useQualifiedIds: !!userId.domain});
-  const sessionExists = await coreCrypto.proteusSessionExists(sessionId);
+  const sessionExists = await cryptoClient.sessionExists(sessionId);
   if (!sessionExists) {
     await createSession({
       sessionId,
       initialPrekey,
       apiClient: apiClient,
-      coreCrypto,
+      cryptoClient,
     });
   }
   return sessionId;
@@ -174,16 +179,16 @@ const createSessions = async ({
   userClientMap,
   domain,
   apiClient,
-  coreCrypto,
+  cryptoClient,
   logger,
 }: CreateSessionsProps): Promise<string[]> => {
   if (domain) {
-    return await createQualifiedSessions({userClientMap, domain, apiClient, coreCrypto, logger});
+    return await createQualifiedSessions({userClientMap, domain, apiClient, cryptoClient, logger});
   }
   return await createLegacySessions({
     userClients: userClientMap,
     apiClient,
-    coreCrypto,
+    cryptoClient,
     logger,
   });
 };
@@ -192,7 +197,7 @@ interface GetSessionsAndClientsFromRecipientsProps {
   recipients: UserClients | UserPreKeyBundleMap;
   domain?: string;
   apiClient: APIClient;
-  coreCrypto: CoreCrypto;
+  cryptoClient: CryptoClient;
   logger?: Logger;
 }
 
@@ -203,7 +208,7 @@ const initSessions = async ({
   recipients,
   domain = '',
   apiClient,
-  coreCrypto,
+  cryptoClient,
   logger,
 }: GetSessionsAndClientsFromRecipientsProps): Promise<string[]> => {
   const missingUserClients: UserClients = {};
@@ -215,7 +220,7 @@ const initSessions = async ({
     const clients = Array.isArray(data) ? data : Object.keys(data);
     for (const clientId of clients) {
       const sessionId = constructSessionId({userId, clientId, useQualifiedIds: !!domain});
-      if (await coreCrypto.proteusSessionExists(sessionId)) {
+      if (await cryptoClient.sessionExists(sessionId)) {
         existingSessions.push(sessionId);
         continue;
       }
@@ -232,7 +237,7 @@ const initSessions = async ({
     userClientMap: missingUserClients,
     domain,
     apiClient,
-    coreCrypto,
+    cryptoClient,
     logger,
   });
 
@@ -242,17 +247,17 @@ const initSessions = async ({
 interface DeleteSessionParams {
   userId: QualifiedId;
   clientId: string;
-  coreCrypto: CoreCrypto;
+  cryptoClient: CryptoClient;
   useQualifiedIds: boolean;
 }
-function deleteSession(params: DeleteSessionParams) {
+async function deleteSession(params: DeleteSessionParams) {
   const sessionId = constructSessionId(params);
-  return params.coreCrypto.proteusSessionDelete(sessionId);
+  await params.cryptoClient.deleteSession(sessionId);
 }
 
 interface CreateSessionsFromPreKeysProps {
   preKeyBundleMap: UserPreKeyBundleMap;
-  coreCrypto: CoreCrypto;
+  cryptoClient: CryptoClient;
   useQualifiedIds: boolean;
   domain?: string;
   logger?: Logger;
@@ -262,7 +267,7 @@ const createSessionsFromPreKeys = async ({
   preKeyBundleMap,
   domain = '',
   useQualifiedIds,
-  coreCrypto,
+  cryptoClient,
   logger,
 }: CreateSessionsFromPreKeysProps): Promise<string[]> => {
   const sessions: string[] = [];
@@ -285,8 +290,8 @@ const createSessionsFromPreKeys = async ({
 
       const prekeyBuffer = Decoder.fromBase64(prekey.key).asBytes;
 
-      await coreCrypto.proteusSessionFromPrekey(sessionId, prekeyBuffer);
-      await coreCrypto.proteusSessionSave(sessionId);
+      await cryptoClient.sessionFromPrekey(sessionId, prekeyBuffer);
+      await cryptoClient.saveSession(sessionId);
 
       sessions.push(sessionId);
     }

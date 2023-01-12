@@ -69,9 +69,9 @@ export class NotificationService extends EventEmitter {
 
   constructor(
     apiClient: APIClient,
-    private readonly mlsService: MLSService,
     private readonly proteusService: ProteusService,
     storeEngine: CRUDEngine,
+    private readonly mlsService?: MLSService,
   ) {
     super();
     this.apiClient = apiClient;
@@ -239,7 +239,7 @@ export class NotificationService extends EventEmitter {
     dryRun: boolean = false,
   ): Promise<HandledEventPayload | undefined> {
     // Handle MLS Events
-    const mlsResult = await this.mlsService.handleEvent({event, source, dryRun});
+    const mlsResult = await this.mlsService?.handleEvent({event, source, dryRun});
     if (mlsResult) {
       return mlsResult;
     }

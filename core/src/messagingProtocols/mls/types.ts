@@ -57,6 +57,8 @@ export interface CryptoProtocolConfig<T = any> {
    */
   systemCrypto?: SecretCrypto<T>;
 
+  useCoreCrypto?: boolean;
+
   /**
    * path on the public server to the core crypto wasm file.
    * This file will be downloaded lazily when corecrypto is needed.

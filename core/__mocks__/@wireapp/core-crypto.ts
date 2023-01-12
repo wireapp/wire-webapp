@@ -29,19 +29,19 @@ export enum RatchetTreeType {
 }
 
 export class CoreCrypto {
+  proteusInit = jest.fn();
+  proteusNewPrekey = jest.fn(() => Uint8Array.from([]));
+  getRemoteFingerprint = jest.fn();
+  getLocalFingerprint = jest.fn();
+  proteusSessionExists = jest.fn();
+  proteusSessionFromPrekey = jest.fn();
+  proteusFingerprintRemote = jest.fn();
+  proteusEncryptBatched = jest.fn();
+  proteusSessionSave = jest.fn();
+  proteusDecrypt = jest.fn().mockResolvedValue(Uint8Array.from([]));
+  proteusSessionFromMessage = jest.fn().mockResolvedValue(Uint8Array.from([]));
+
   static deferredInit() {
-    return {
-      proteusInit: jest.fn(),
-      proteusNewPrekey: jest.fn(() => Uint8Array.from([])),
-      getRemoteFingerprint: jest.fn(),
-      getLocalFingerprint: jest.fn(),
-      proteusSessionExists: jest.fn(),
-      proteusSessionFromPrekey: jest.fn(),
-      proteusFingerprintRemote: jest.fn(),
-      proteusEncryptBatched: jest.fn(),
-      proteusSessionSave: jest.fn(),
-      proteusDecrypt: jest.fn().mockResolvedValue(Uint8Array.from([])),
-      proteusSessionFromMessage: jest.fn().mockResolvedValue(Uint8Array.from([])),
-    };
+    return new CoreCrypto();
   }
 }

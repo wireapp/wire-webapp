@@ -17,4 +17,4 @@
  *
  */
 
-export * from './PrekeysGenerator';
+export * from './PrekeysTracker';

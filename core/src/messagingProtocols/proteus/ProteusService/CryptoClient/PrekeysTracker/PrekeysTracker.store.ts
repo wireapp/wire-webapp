@@ -17,7 +17,7 @@
  *
  */
 
-import {CoreDatabase} from '../../../../storage/CoreDB';
+import {CoreDatabase} from '../../../../../storage/CoreDB';
 
 const STATE_PRIMARY_KEY = 'prekeys_state';
 
@@ -25,7 +25,7 @@ type PrekeysState = {
   nbPrekeys: number;
   highestId: number;
 };
-export class PrekeysGeneratorStore {
+export class PrekeysTrackerStore {
   constructor(private readonly db: CoreDatabase) {}
 
   private async getState(): Promise<PrekeysState> {

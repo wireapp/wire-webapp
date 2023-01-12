@@ -29,7 +29,7 @@ import {CRUDEngine} from '@wireapp/store-engine';
 
 import {deleteIdentity} from '../identity/identityClearer';
 import type {ProteusService} from '../messagingProtocols/proteus';
-import {NewDevicePrekeys} from '../messagingProtocols/proteus/ProteusService';
+import {InitialPrekeys} from '../messagingProtocols/proteus/ProteusService/CryptoClient';
 
 import {ClientInfo, ClientBackendRepository, ClientDatabaseRepository} from './';
 
@@ -149,7 +149,7 @@ export class ClientService {
   public async register(
     loginData: LoginData,
     clientInfo: ClientInfo,
-    {prekeys, lastPrekey}: NewDevicePrekeys,
+    {prekeys, lastPrekey}: InitialPrekeys,
   ): Promise<RegisteredClient> {
     if (!this.apiClient.context) {
       throw new Error('Context is not set.');

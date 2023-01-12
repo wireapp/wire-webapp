@@ -14,6 +14,7 @@
     "@wireapp/api-client": "workspace:^",
     "@wireapp/commons": "workspace:^",
     "@wireapp/core-crypto": "0.6.0-rc.3",
+    "@wireapp/cryptobox": "12.8.0",
     "@wireapp/promise-queue": "workspace:^",
     "@wireapp/protocol-messaging": "1.43.0",
     "@wireapp/store-engine": "workspace:*",

@@ -41,8 +41,6 @@ export type ProteusServiceConfig = {
   onNewPrekeys: (prekeys: PreKey[]) => void;
 };
 
-export type NewDevicePrekeys = {prekeys: PreKey[]; lastPrekey: PreKey};
-
 export type SendProteusMessageParams = SendCommonParams &
   MessageSendingOptions & {
     conversationId: QualifiedId;

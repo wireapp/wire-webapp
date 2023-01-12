@@ -95,8 +95,8 @@ describe('ConversationService', () => {
       {
         useQualifiedIds: federated,
       },
-      mockedMLSService,
       mockedProteusService,
+      mockedMLSService,
     );
 
     jest.spyOn(conversationService, 'joinByExternalCommit');
