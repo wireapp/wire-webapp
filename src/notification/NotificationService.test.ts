@@ -47,9 +47,9 @@ describe('NotificationService', () => {
 
       const notificationService = new NotificationService(
         apiClient,
-        mockedMLSService,
         mockedProteusService,
         storeEngine,
+        mockedMLSService,
       );
 
       jest.spyOn(notificationService as any, 'handleEvent').mockImplementation(() => {
@@ -85,9 +85,9 @@ describe('NotificationService', () => {
       const apiClient = new APIClient({urls: MOCK_BACKEND});
       const notificationService = new NotificationService(
         apiClient,
-        mockedMLSService,
         mockedProteusService,
         storeEngine,
+        mockedMLSService,
       );
 
       jest.spyOn(notificationService as any, 'handleEvent').mockReturnValue({});
@@ -118,9 +118,9 @@ describe('NotificationService', () => {
       const apiClient = new APIClient({urls: MOCK_BACKEND});
       const notificationService = new NotificationService(
         apiClient,
-        mockedMLSService,
         mockedProteusService,
         storeEngine,
+        mockedMLSService,
       );
 
       jest.spyOn(notificationService as any, 'handleEvent').mockReturnValue({});
@@ -150,9 +150,9 @@ describe('NotificationService', () => {
         const apiClient = new APIClient({urls: MOCK_BACKEND});
         const notificationService = new NotificationService(
           apiClient,
-          mockedMLSService,
           mockedProteusService,
           storeEngine,
+          mockedMLSService,
         );
         notificationService.on(NotificationService.TOPIC.NOTIFICATION_ERROR, notificationError => {
           expect(notificationError.error.message).toBe('Test error');

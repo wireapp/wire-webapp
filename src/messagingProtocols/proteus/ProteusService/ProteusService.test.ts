@@ -32,9 +32,9 @@ import {NotificationSource} from '../../../notification';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
-jest.mock('./PrekeysGenerator', () => {
+jest.mock('./CryptoClient/PrekeysTracker', () => {
   return {
-    PrekeyGenerator: jest.fn().mockImplementation(() => {
+    PrekeyTracker: jest.fn().mockImplementation(() => {
       return {
         consumePrekey: jest.fn(),
         getNumberOfPrekeys: jest.fn().mockResolvedValue(0),
@@ -147,7 +147,7 @@ describe('ProteusService', () => {
     });
 
     it('create a session from given prekey if session does not exists', async () => {
-      const [proteusService, {apiClient, coreCrypto}] = await await buildProteusService();
+      const [proteusService, {apiClient, coreCrypto}] = await buildProteusService();
       const expectedFingerprint = 'fingerprint-client1';
 
       const getPrekeyMock = jest.spyOn(apiClient.api.user, 'getClientPreKey');

@@ -63,11 +63,18 @@ export class ConversationService {
   constructor(
     private readonly apiClient: APIClient,
     private readonly config: {useQualifiedIds?: boolean},
-    private readonly mlsService: MLSService,
     private readonly proteusService: ProteusService,
+    private readonly _mlsService?: MLSService,
   ) {
     this.messageTimer = new MessageTimer();
     this.messageService = new MessageService(this.apiClient, this.proteusService);
+  }
+
+  get mlsService(): MLSService {
+    if (!this._mlsService) {
+      throw new Error('Cannot do MLS operations on a non-mls environment');
+    }
+    return this._mlsService;
   }
 
   /**

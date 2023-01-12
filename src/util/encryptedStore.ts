@@ -72,7 +72,7 @@ export class EncryptedStore<EncryptedPayload> {
 
   async wipe() {
     this.db.close();
-    deleteDB(this.db.name);
+    await deleteDB(this.db.name);
   }
 }
 

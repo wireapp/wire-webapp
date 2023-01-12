@@ -17,9 +17,9 @@
  *
  */
 
-import {PrekeyGenerator, LAST_PREKEY_ID} from './PrekeysGenerator';
+import {PrekeyTracker} from './PrekeysTracker';
 
-import {CoreDatabase, openDB} from '../../../../storage/CoreDB';
+import {CoreDatabase, openDB} from '../../../../../storage/CoreDB';
 
 describe('PrekeysGenerator', () => {
   let db: CoreDatabase;
@@ -27,8 +27,8 @@ describe('PrekeysGenerator', () => {
     nbPrekeys: 10,
     onNewPrekeys: jest.fn(),
   };
-  const mockPrekeyGenerator = {
-    proteusNewPrekey: jest.fn().mockResolvedValue(Uint8Array.from([])),
+  const mockPrekeyTracker = {
+    newPrekey: jest.fn().mockResolvedValue(Uint8Array.from([])),
   };
 
   beforeEach(async () => {
@@ -39,27 +39,20 @@ describe('PrekeysGenerator', () => {
     await db.clear('prekeys');
   });
 
-  it('generates initial device prekeys', async () => {
-    const prekeyGenerator = new PrekeyGenerator(mockPrekeyGenerator, db, baseConfig);
-    const {prekeys, lastPrekey} = await prekeyGenerator.generateInitialPrekeys();
-    expect(prekeys).toHaveLength(baseConfig.nbPrekeys);
-    expect(lastPrekey.id).toBe(LAST_PREKEY_ID);
-  });
-
   it('triggers the threshold callback when number of prekeys hits the limit', async () => {
-    const prekeyGenerator = new PrekeyGenerator(mockPrekeyGenerator, db, baseConfig);
+    const prekeyTracker = new PrekeyTracker(mockPrekeyTracker, db, baseConfig);
 
-    await prekeyGenerator.generateInitialPrekeys();
+    await prekeyTracker.setInitialState(baseConfig.nbPrekeys);
 
     expect(baseConfig.onNewPrekeys).not.toHaveBeenCalled();
 
-    await prekeyGenerator.consumePrekey();
-    await prekeyGenerator.consumePrekey();
-    await prekeyGenerator.consumePrekey();
-    await prekeyGenerator.consumePrekey();
+    await prekeyTracker.consumePrekey();
+    await prekeyTracker.consumePrekey();
+    await prekeyTracker.consumePrekey();
+    await prekeyTracker.consumePrekey();
     expect(baseConfig.onNewPrekeys).not.toHaveBeenCalled();
 
-    await prekeyGenerator.consumePrekey();
+    await prekeyTracker.consumePrekey();
 
     expect(baseConfig.onNewPrekeys).toHaveBeenCalledTimes(1);
   });

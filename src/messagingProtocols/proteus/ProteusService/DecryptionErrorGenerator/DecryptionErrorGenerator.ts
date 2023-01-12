@@ -71,7 +71,7 @@ type SenderInfo = {clientId: string; userId: QualifiedId};
 export const generateDecryptionError = (senderInfo: SenderInfo, error: any): DecryptionError => {
   const {clientId: remoteClientId, userId} = senderInfo;
 
-  const code = mapCoreCryptoError(error);
+  const code = error.code || mapCoreCryptoError(error);
   const message = getErrorMessage(code, userId, remoteClientId, error);
 
   return new DecryptionError(message, code);

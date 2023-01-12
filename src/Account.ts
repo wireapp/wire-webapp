@@ -39,6 +39,7 @@ import {EventEmitter} from 'events';
 
 import {APIClient, BackendFeatures} from '@wireapp/api-client';
 import {CoreCrypto} from '@wireapp/core-crypto';
+import {Cryptobox} from '@wireapp/cryptobox';
 import {CRUDEngine, MemoryEngine} from '@wireapp/store-engine';
 
 import {AccountService} from './account/';
@@ -131,7 +132,7 @@ export class Account<T = any> extends EventEmitter {
   private coreCryptoClient?: CoreCrypto;
 
   public service?: {
-    mls: MLSService;
+    mls?: MLSService;
     proteus: ProteusService;
     account: AccountService;
     asset: AssetService;
@@ -256,24 +257,19 @@ export class Account<T = any> extends EventEmitter {
     clientInfo: ClientInfo = coreDefaultClient,
     entropyData?: Uint8Array,
   ): Promise<RegisteredClient> {
-    if (!this.service || !this.apiClient.context || !this.coreCryptoClient || !this.storeEngine) {
+    if (!this.service || !this.apiClient.context || !this.storeEngine) {
       throw new Error('Services are not set or context not initialized.');
     }
-    const shouldCreateMlsClient = !!this.cryptoProtocolConfig?.mls;
-    this.logger.info(`Creating new client {mls: ${shouldCreateMlsClient}}`);
-    if (entropyData) {
-      await this.coreCryptoClient.reseedRng(entropyData);
-    }
+    const initialPreKeys = await this.service.proteus.createClient(entropyData);
     await this.service.proteus.initClient(this.storeEngine, this.apiClient.context);
-    const initialPreKeys = await this.service.proteus.createClient();
 
     const client = await this.service.client.register(loginData, clientInfo, initialPreKeys);
 
-    if (shouldCreateMlsClient) {
+    if (this.service.mls) {
       const {userId, domain = ''} = this.apiClient.context;
       await this.service.mls.createClient({id: userId, domain}, client.id);
     }
-    this.logger.info('Client is created');
+    this.logger.info(`Created new client {mls: ${!!this.service.mls}, id: ${client.id}}`);
 
     await this.service.notification.initializeNotificationStream();
     await this.service.client.synchronizeClients();
@@ -288,7 +284,7 @@ export class Account<T = any> extends EventEmitter {
    * @returns The local existing client or undefined if the client does not exist or is not valid (non existing on backend)
    */
   public async initClient(client?: RegisteredClient): Promise<RegisteredClient | undefined> {
-    if (!this.service || !this.apiClient.context || !this.coreCryptoClient || !this.storeEngine) {
+    if (!this.service || !this.apiClient.context || !this.storeEngine) {
       throw new Error('Services are not set.');
     }
     const validClient = client ?? (await this.service!.client.loadClient());
@@ -301,7 +297,7 @@ export class Account<T = any> extends EventEmitter {
     await this.apiClient.transport.http.associateClientWithSession(validClient.id);
 
     await this.service.proteus.initClient(this.storeEngine, this.apiClient.context);
-    if (this.backendFeatures.supportsMLS && this.cryptoProtocolConfig?.mls) {
+    if (this.service.mls) {
       const {userId, domain = ''} = this.apiClient.context;
       await this.service.mls.initClient({id: userId, domain}, validClient.id);
       // initialize schedulers for pending mls proposals once client is initialized
@@ -348,21 +344,31 @@ export class Account<T = any> extends EventEmitter {
    * @param mlsCallbacks
    */
   configureMLSCallbacks(mlsCallbacks: MLSCallbacks) {
-    this.service?.mls.configureMLSCallbacks(mlsCallbacks);
+    this.service?.mls?.configureMLSCallbacks(mlsCallbacks);
   }
 
   public async initServices(context: Context): Promise<void> {
-    this.coreCryptoClient = await this.initCoreCrypto(context);
+    const enableMLS = this.backendFeatures.supportsMLS && this.cryptoProtocolConfig?.mls;
+    this.coreCryptoClient =
+      enableMLS || this.cryptoProtocolConfig?.useCoreCrypto ? await this.initCoreCrypto(context) : undefined;
     this.storeEngine = await this.initEngine(context);
     this.db = await openDB(this.generateCoreDbName(context));
     const accountService = new AccountService(this.apiClient);
     const assetService = new AssetService(this.apiClient);
 
-    const mlsService = new MLSService(this.apiClient, this.coreCryptoClient, {
-      ...this.cryptoProtocolConfig?.mls,
-      nbKeyPackages: this.nbPrekeys,
-    });
-    const proteusService = new ProteusService(this.apiClient, this.coreCryptoClient, this.db, {
+    const mlsService =
+      this.coreCryptoClient && enableMLS
+        ? new MLSService(this.apiClient, this.coreCryptoClient, {
+            ...this.cryptoProtocolConfig?.mls,
+            nbKeyPackages: this.nbPrekeys,
+          })
+        : undefined;
+
+    const proteusCryptoClient =
+      this.cryptoProtocolConfig?.useCoreCrypto && this.coreCryptoClient
+        ? this.coreCryptoClient
+        : new Cryptobox(this.storeEngine, this.nbPrekeys);
+    const proteusService = new ProteusService(this.apiClient, proteusCryptoClient, this.db, {
       // We can use qualified ids to send messages as long as the backend supports federated endpoints
       useQualifiedIds: this.backendFeatures.federationEndpoints,
       onNewClient: payload => this.emit(EVENTS.NEW_SESSION, payload),
@@ -379,15 +385,15 @@ export class Account<T = any> extends EventEmitter {
     const connectionService = new ConnectionService(this.apiClient);
     const giphyService = new GiphyService(this.apiClient);
     const linkPreviewService = new LinkPreviewService(assetService);
-    const notificationService = new NotificationService(this.apiClient, mlsService, proteusService, this.storeEngine);
+    const notificationService = new NotificationService(this.apiClient, proteusService, this.storeEngine, mlsService);
     const conversationService = new ConversationService(
       this.apiClient,
       {
         // We can use qualified ids to send messages as long as the backend supports federated endpoints
         useQualifiedIds: this.backendFeatures.federationEndpoints,
       },
-      mlsService,
       proteusService,
+      mlsService,
     );
 
     const selfService = new SelfService(this.apiClient);
@@ -425,9 +431,9 @@ export class Account<T = any> extends EventEmitter {
    */
   public async logout(clearData: boolean = false): Promise<void> {
     this.db?.close();
-    this.secretsDb?.close();
+    await this.secretsDb?.close();
     if (clearData) {
-      this.wipe();
+      await this.wipe();
     }
     await this.apiClient.logout();
     this.resetContext();
