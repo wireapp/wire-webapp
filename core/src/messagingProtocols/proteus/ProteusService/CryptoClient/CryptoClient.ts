@@ -17,7 +17,7 @@
  *
  */
 
-import {PreKey} from '@wireapp/api-client/src/auth';
+import {PreKey} from '@wireapp/api-client/lib/auth';
 
 import {CoreCrypto} from '@wireapp/core-crypto';
 import {Cryptobox} from '@wireapp/cryptobox';
