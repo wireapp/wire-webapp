@@ -72,7 +72,9 @@ const render = (Component: FC): void => {
   );
 };
 
-function runApp(): void {
+async function runApp() {
+  const config = Config.getConfig();
+  await core.useAPIVersion(config.SUPPORTED_API_VERSIONS, config.ENABLE_DEV_BACKEND_API);
   render(Root);
   if (module.hot) {
     module.hot.accept('./page/Root', () => {

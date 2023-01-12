@@ -3579,7 +3579,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/libsodium-wrappers@npm:^0":
+"@types/libsodium-wrappers-sumo@npm:0.7.5":
+  version: 0.7.5
+  resolution: "@types/libsodium-wrappers-sumo@npm:0.7.5"
+  dependencies:
+    "@types/libsodium-wrappers": "*"
+  checksum: 27846e49cd54556c05011ff475cc6564ce8dde8f9a02a542740e3ebaab7de21ed2dfb4afdc182510d7058d3475f748bab0aa4a41178cd105b9f8618a00f8ef3f
+  languageName: node
+  linkType: hard
+
+"@types/libsodium-wrappers@npm:*, @types/libsodium-wrappers@npm:^0":
   version: 0.7.10
   resolution: "@types/libsodium-wrappers@npm:0.7.10"
   checksum: 717054ebcb5fa553e378144b8d564bed8b691905c0d4e90b95c64d77ba24ec9fe798cb2c58cd61dad545ceacb1f05ab69b5597217f9829f2da7a23f0688d11d0
@@ -3642,6 +3651,13 @@ __metadata:
   version: 18.11.18
   resolution: "@types/node@npm:18.11.18"
   checksum: 03f17f9480f8d775c8a72da5ea7e9383db5f6d85aa5fefde90dd953a1449bd5e4ffde376f139da4f3744b4c83942166d2a7603969a6f8ea826edfb16e6e3b49d
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:~14":
+  version: 14.18.36
+  resolution: "@types/node@npm:14.18.36"
+  checksum: da7f479b3fc996d585e60b8329987c6e310ddbf051e14f2d900ce04f7768f42fa7b760f0eb376008d3eca130ce9431018fb5c9e44027dcb7bb139c547e44b9c5
   languageName: node
   linkType: hard
 
@@ -4319,9 +4335,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^22.14.1":
-  version: 22.14.1
-  resolution: "@wireapp/api-client@npm:22.14.1"
+"@wireapp/api-client@npm:^22.14.2":
+  version: 22.14.2
+  resolution: "@wireapp/api-client@npm:22.14.2"
   dependencies:
     "@wireapp/commons": ^5.0.4
     "@wireapp/priority-queue": ^2.0.3
@@ -4334,7 +4350,7 @@ __metadata:
     spark-md5: 3.0.2
     tough-cookie: 4.1.2
     ws: 8.11.0
-  checksum: 729ad364b92ba462c4c6b70e1808b9c15342e987aeab5c40f91e3cc29f309c0d32295f8e2ca4969c6073b1d9ebc1ccb2609cc3a65370c4b8715386464ef24f57
+  checksum: 3d9901ba5faf90958aa99c0660c91fbe51c363cdc79c9a5ea68baecafd9ef6bc9586070e85f157bfb3cf1ceb5baa6a3624f7c966276df8622fab04bc9a53f3c9
   languageName: node
   linkType: hard
 
@@ -4342,6 +4358,13 @@ __metadata:
   version: 8.2.30
   resolution: "@wireapp/avs@npm:8.2.30"
   checksum: 50ca7ebc98664d82b1583897003bfdccca4eca61d6e00ea4415d1335746c47a7e938ad0628b4be0b26869bf69c1bb0c66d834e3f2a459559e5e5036df7d2e2b3
+  languageName: node
+  linkType: hard
+
+"@wireapp/cbor@npm:4.7.3":
+  version: 4.7.3
+  resolution: "@wireapp/cbor@npm:4.7.3"
+  checksum: 4ea1bf302e08b342b9b0160835862984653d208a902c3e1071e32644d8ea78263a88fe3e2306931e745495e6e816d3b741d0bf10f2290932692f99bb1b28c18b
   languageName: node
   linkType: hard
 
@@ -4380,17 +4403,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:38.3.2":
-  version: 38.3.2
-  resolution: "@wireapp/core@npm:38.3.2"
+"@wireapp/core@npm:38.4.2":
+  version: 38.4.2
+  resolution: "@wireapp/core@npm:38.4.2"
   dependencies:
-    "@wireapp/api-client": ^22.14.1
+    "@wireapp/api-client": ^22.14.2
     "@wireapp/commons": ^5.0.4
     "@wireapp/core-crypto": 0.6.0-rc.3
+    "@wireapp/cryptobox": 12.8.0
     "@wireapp/promise-queue": ^2.1.1
     "@wireapp/protocol-messaging": 1.43.0
     "@wireapp/store-engine": 5.0.3
-    "@wireapp/store-engine-dexie": ^2.0.3
+    "@wireapp/store-engine-dexie": ^2.0.4
     axios: 1.2.2
     bazinga64: 6.0.3
     hash.js: 1.1.7
@@ -4398,8 +4422,22 @@ __metadata:
     idb: 7.1.1
     logdown: 3.3.1
     long: ^5.2.0
-    uuidjs: 4.2.12
-  checksum: 77f683d215b4260da770435a2d1fa7bdd26040a8ba0c9a0ab7598c94a68d4ec038a7ad5ed2a4b78eea7bb8fcd480d6b9c865c993bd438bf0d4bbe00e57835edc
+    uuidjs: 4.2.13
+  checksum: d7612b1894ae16f524e7791dc4961556c2480f8139b503487046836c4383d444c2c6ed9a75c627fe123265593a8a385bd1652b645b4945a37818031ffedd6b4a
+  languageName: node
+  linkType: hard
+
+"@wireapp/cryptobox@npm:12.8.0":
+  version: 12.8.0
+  resolution: "@wireapp/cryptobox@npm:12.8.0"
+  dependencies:
+    "@wireapp/lru-cache": 3.8.1
+    "@wireapp/priority-queue": 1.6.38
+    "@wireapp/proteus": 9.13.0
+    "@wireapp/store-engine": 4.9.8
+    bazinga64: 5.10.0
+    buffer: 6.0.3
+  checksum: 534fd44a8c32ddfab668f09a2682c4f72ccf6a0754c28c81c0218fd4ed8a4933eb1b7898260bbb848ade6bbacd9864bf9b6dde4295a78942f489e8ad0eadaf06
   languageName: node
   linkType: hard
 
@@ -4449,6 +4487,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@wireapp/priority-queue@npm:1.6.38":
+  version: 1.6.38
+  resolution: "@wireapp/priority-queue@npm:1.6.38"
+  dependencies:
+    "@types/node": ~14
+  checksum: cefa5c99a3b5640fb2b0a77392e13e8cbc816f05e1c9c859f96a4d1c93bbcc29ae56afeed94a09f5dce664b7c0243eb8a1d6075ef1fb6329ee4775515e843628
+  languageName: node
+  linkType: hard
+
 "@wireapp/priority-queue@npm:^2.0.3":
   version: 2.0.3
   resolution: "@wireapp/priority-queue@npm:2.0.3"
@@ -4460,6 +4507,18 @@ __metadata:
   version: 2.1.1
   resolution: "@wireapp/promise-queue@npm:2.1.1"
   checksum: 16da2f1d44bf3a7e488a9789956be8946115a7593407755324583e1743518c61340df46c115789f1ce0f0ba5e4159988525b16bbfd56cc82cf4f7a392bc118ca
+  languageName: node
+  linkType: hard
+
+"@wireapp/proteus@npm:9.13.0":
+  version: 9.13.0
+  resolution: "@wireapp/proteus@npm:9.13.0"
+  dependencies:
+    "@types/libsodium-wrappers-sumo": 0.7.5
+    "@types/node": ~14
+    "@wireapp/cbor": 4.7.3
+    libsodium-wrappers-sumo: 0.7.9
+  checksum: 46cf49b00ebe66caf67ef38dff5a6ca8ba238fa72a73eb6bda6812da370df1c7a2e20a8d47d8ac01eea90d1a4fc1c1c43119261e6a84c0eabdfc5b6bd227cc14
   languageName: node
   linkType: hard
 
@@ -4496,7 +4555,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/store-engine-dexie@npm:2.0.3, @wireapp/store-engine-dexie@npm:^2.0.3":
+"@wireapp/store-engine-dexie@npm:2.0.3":
   version: 2.0.3
   resolution: "@wireapp/store-engine-dexie@npm:2.0.3"
   dependencies:
@@ -4504,6 +4563,17 @@ __metadata:
   peerDependencies:
     "@wireapp/store-engine": 5.x.x
   checksum: b39fa39fe584d5cd87a29be55d5676148221db699f75b5634e9b2da9f926fea77ba3d3ea52362eef76dc18ea644ce744bcc74454529c4685e43aa45062449f20
+  languageName: node
+  linkType: hard
+
+"@wireapp/store-engine-dexie@npm:^2.0.4":
+  version: 2.0.4
+  resolution: "@wireapp/store-engine-dexie@npm:2.0.4"
+  dependencies:
+    dexie: 3.2.2
+  peerDependencies:
+    "@wireapp/store-engine": 5.x.x
+  checksum: 5128eb25ec2812e89787bc4c2e39ea7ae72aba4d2548e5675a013890e17993d0f6fb9db84a0eb4f76d31584a3436bfdfb4ae19562dc57885e77bf752190677a4
   languageName: node
   linkType: hard
 
@@ -4517,6 +4587,15 @@ __metadata:
   peerDependencies:
     "@wireapp/store-engine": 4.x.x
   checksum: 91d7019e0431b089b608debb790b25a6675596640829590db4295a53f1ea456b549807d612bc06b360088e00d47805090ddd1bee604a18413801131ba3bccb69
+  languageName: node
+  linkType: hard
+
+"@wireapp/store-engine@npm:4.9.8":
+  version: 4.9.8
+  resolution: "@wireapp/store-engine@npm:4.9.8"
+  dependencies:
+    "@types/node": ~14
+  checksum: bfe5e4522127eb0edcceabdc5c8e2dafc33a8dfa2a984364e1057e5a4784ea1a0e43c1ad760f9d49f40ab9e72db33b2fa24a073e76c53417b14f291c69f0906e
   languageName: node
   linkType: hard
 
@@ -5364,6 +5443,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"bazinga64@npm:5.10.0":
+  version: 5.10.0
+  resolution: "bazinga64@npm:5.10.0"
+  checksum: 26444dfd5e6abdb62ab7b6fd7fb7155651e5fd0884a30008b33693593c5838b4f5d213101751c55a6646e146d802f0783aa2b92d41f2165f1cd30568c6f6ac75
+  languageName: node
+  linkType: hard
+
 "bazinga64@npm:5.11.9":
   version: 5.11.9
   resolution: "bazinga64@npm:5.11.9"
@@ -5501,6 +5587,16 @@ __metadata:
   version: 1.1.2
   resolution: "buffer-from@npm:1.1.2"
   checksum: 0448524a562b37d4d7ed9efd91685a5b77a50672c556ea254ac9a6d30e3403a517d8981f10e565db24e8339413b43c97ca2951f10e399c6125a0d8911f5679bb
+  languageName: node
+  linkType: hard
+
+"buffer@npm:6.0.3":
+  version: 6.0.3
+  resolution: "buffer@npm:6.0.3"
+  dependencies:
+    base64-js: ^1.3.1
+    ieee754: ^1.2.1
+  checksum: 5ad23293d9a731e4318e420025800b42bf0d264004c0286c8cc010af7a270c7a0f6522e84f54b9ad65cbd6db20b8badbfd8d2ebf4f80fa03dab093b89e68c3f9
   languageName: node
   linkType: hard
 
@@ -8999,7 +9095,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ieee754@npm:^1.1.13":
+"ieee754@npm:^1.1.13, ieee754@npm:^1.2.1":
   version: 1.2.1
   resolution: "ieee754@npm:1.2.1"
   checksum: 5144c0c9815e54ada181d80a0b810221a253562422e7c6c3a60b1901154184f49326ec239d618c416c1c5945a2e197107aee8d986a3dd836b53dffefd99b5e7e
@@ -10710,6 +10806,22 @@ __metadata:
     prelude-ls: ~1.1.2
     type-check: ~0.3.2
   checksum: 0d084a524231a8246bb10fec48cdbb35282099f6954838604f3c7fc66f2e16fa66fd9cc2f3f20a541a113c4dafdf181e822c887c8a319c9195444e6c64ac395e
+  languageName: node
+  linkType: hard
+
+"libsodium-sumo@npm:^0.7.0":
+  version: 0.7.10
+  resolution: "libsodium-sumo@npm:0.7.10"
+  checksum: 67ed75fa15559bad7cca5cdc2d5eb20725281be38a08814f7e39af8ea0c0d83ed2211e534f7b47460b6a48a1f7bb5c31759e4bc5cc79fb74292ffea8f90ee741
+  languageName: node
+  linkType: hard
+
+"libsodium-wrappers-sumo@npm:0.7.9":
+  version: 0.7.9
+  resolution: "libsodium-wrappers-sumo@npm:0.7.9"
+  dependencies:
+    libsodium-sumo: ^0.7.0
+  checksum: 0b2af1f23455e1b3ecc2f721278e8b41b027e9f748f2675285e9771eeb2de062cd6b51688bb52ece14a53b4f5a51019972d9ceac1889c0381ef076a316201627
   languageName: node
   linkType: hard
 
@@ -15959,6 +16071,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"uuidjs@npm:4.2.13":
+  version: 4.2.13
+  resolution: "uuidjs@npm:4.2.13"
+  bin:
+    uuidjs: bin/cli.js
+  checksum: 67d4a32f6abbe68f692d57d9524aa01e2959a30dadf6e47779a6f31807dc89da057da349e02a4ded08b8f53bbbe29bb3a46fb667a59d5ed9627d5eebef55a6ad
+  languageName: node
+  linkType: hard
+
 "v8-compile-cache-lib@npm:^3.0.1":
   version: 3.0.1
   resolution: "v8-compile-cache-lib@npm:3.0.1"
@@ -16454,7 +16575,7 @@ __metadata:
     "@typescript-eslint/parser": ^5.48.0
     "@wireapp/avs": 8.2.30
     "@wireapp/copy-config": 2.0.4
-    "@wireapp/core": 38.3.2
+    "@wireapp/core": 38.4.2
     "@wireapp/eslint-config": 2.1.1
     "@wireapp/lru-cache": 3.8.1
     "@wireapp/prettier-config": 0.5.2

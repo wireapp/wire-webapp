@@ -118,13 +118,7 @@ export class DebugUtil {
     const proteusService = this.core.service!.proteus;
     const qualifiedId = typeof userId === 'string' ? {domain: '', id: userId} : userId;
     const sessionId = proteusService.constructSessionId(qualifiedId, clientId);
-    const fakePrekey = [
-      165, 0, 1, 1, 24, 57, 2, 161, 0, 88, 32, 212, 202, 30, 83, 242, 93, 67, 164, 202, 137, 214, 167, 166, 183, 236,
-      249, 32, 21, 117, 247, 56, 223, 135, 170, 3, 151, 16, 228, 165, 186, 124, 208, 3, 161, 0, 161, 0, 88, 32, 123,
-      200, 16, 166, 184, 70, 21, 81, 43, 80, 21, 231, 182, 142, 51, 220, 131, 162, 11, 255, 162, 74, 78, 162, 95, 156,
-      131, 48, 203, 5, 77, 122, 4, 246,
-    ];
-    proteusService['coreCryptoClient'].proteusSessionFromPrekey(sessionId, Uint8Array.from(fakePrekey));
+    await proteusService['cryptoClient'].debugBreakSession(sessionId);
   }
 
   /** Used by QA test automation. */
