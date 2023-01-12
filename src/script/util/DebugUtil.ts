@@ -118,7 +118,7 @@ export class DebugUtil {
     const proteusService = this.core.service!.proteus;
     const qualifiedId = typeof userId === 'string' ? {domain: '', id: userId} : userId;
     const sessionId = proteusService.constructSessionId(qualifiedId, clientId);
-    await proteusService['cryptoClient'].debug.breakSession(sessionId);
+    await proteusService['cryptoClient'].debugBreakSession(sessionId);
   }
 
   /** Used by QA test automation. */
