@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [38.4.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.4.0...@wireapp/core@38.4.1) (2023-01-12)
+
+### Bug Fixes
+
+* address api-client import ([72293f5](https://github.com/wireapp/wire-web-packages/commit/72293f5fc51f4484e6fa6e5134dca65299330c64))
+
 # [38.4.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.3.3...@wireapp/core@38.4.0) (2023-01-12)
 
 ### Features
