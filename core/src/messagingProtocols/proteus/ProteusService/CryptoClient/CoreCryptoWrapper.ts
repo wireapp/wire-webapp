@@ -76,6 +76,7 @@ export class CoreCryptoWrapper implements CryptoClient {
     if (entropy) {
       await this.coreCrypto.reseedRng(entropy);
     }
+    await this.init();
     const prekeys: PreKey[] = [];
     for (let id = 0; id < nbPrekeys; id++) {
       prekeys.push(await this.newPrekey(id));
