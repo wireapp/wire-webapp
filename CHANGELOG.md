@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [38.5.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.5.0...@wireapp/core@38.5.1) (2023-01-12)
+
+### Bug Fixes
+
+* Init proteus before generating prekey in coreCrypto ([7482178](https://github.com/wireapp/wire-web-packages/commit/7482178321b50439c5e52af25d4fb56d4b59e20f))
+
 # [38.5.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.4.3...@wireapp/core@38.5.0) (2023-01-12)
 
 ### Features
