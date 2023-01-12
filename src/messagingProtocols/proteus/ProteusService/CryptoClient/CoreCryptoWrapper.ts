@@ -136,6 +136,10 @@ export class CoreCryptoWrapper implements CryptoClient {
     await this.coreCrypto.proteusSessionFromPrekey(sessionId, Uint8Array.from(fakePrekey));
   }
 
+  async debugResetIdentity() {
+    await this.coreCrypto.wipe();
+  }
+
   async migrateFromCryptobox(dbName: string) {
     return this.coreCrypto.proteusCryptoboxMigrate(dbName);
   }
