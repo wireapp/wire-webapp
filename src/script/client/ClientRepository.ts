@@ -187,8 +187,7 @@ export class ClientRepository {
    * @param changes New values which should be updated on the client
    * @returns Number of updated records
    */
-  private updateClientInDb(userId: QualifiedId, clientId: string, changes: Partial<ClientRecord>): Promise<number> {
-    const primaryKey = constructClientId(userId, clientId);
+  private updateClientInDb(primaryKey: string, changes: Partial<ClientRecord>): Promise<number> {
     // Preserve primary key on update
     changes.meta.primary_key = primaryKey;
     return this.clientService.updateClientInDb(primaryKey, changes);
@@ -203,7 +202,8 @@ export class ClientRepository {
    * @returns Resolves when the verification state has been updated
    */
   async verifyClient(userId: QualifiedId, clientEntity: ClientEntity, isVerified: boolean): Promise<void> {
-    await this.updateClientInDb(userId, clientEntity.id, {meta: {is_verified: isVerified}});
+    const primaryKey = clientEntity.meta.primaryKey ?? constructClientId(userId, clientEntity.id);
+    await this.updateClientInDb(primaryKey, {meta: {is_verified: isVerified}});
     clientEntity.meta.isVerified(isVerified);
     amplify.publish(WebAppEvents.CLIENT.VERIFICATION_STATE_CHANGED, userId, clientEntity, isVerified);
   }

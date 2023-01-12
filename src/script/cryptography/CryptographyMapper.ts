@@ -398,6 +398,7 @@ export class CryptographyMapper {
   _mapCalling(calling: Calling, eventData: ConversationEvent & {sender: string}) {
     return {
       content: JSON.parse(calling.content),
+      targetConversation: calling.qualifiedConversationId,
       sender: eventData.sender,
       type: ClientEvent.CALL.E_CALL,
     };

@@ -36,7 +36,7 @@ import {LocalStorageAction, LocalStorageKey} from './LocalStorageAction';
 
 import {currentCurrency, currentLanguage} from '../../localeConfig';
 import type {Api, RootState, ThunkAction, ThunkDispatch} from '../reducer';
-import type {RegistrationDataState} from '../reducer/authReducer';
+import type {LoginDataState, RegistrationDataState} from '../reducer/authReducer';
 
 type LoginLifecycleFunction = (dispatch: ThunkDispatch, getState: () => RootState, global: Api) => Promise<void>;
 
@@ -225,7 +225,7 @@ export class AuthAction {
     };
   };
 
-  pushLoginData = (loginData: Partial<LoginData>): ThunkAction => {
+  pushLoginData = (loginData: Partial<LoginDataState>): ThunkAction => {
     return async dispatch => {
       dispatch(AuthActionCreator.pushLoginData(loginData));
     };

@@ -59,17 +59,10 @@ export interface CallingEvent {
    * content is an object that comes from avs
    */
   content: {
-    keys: {
-      idx: number;
-      data: string;
-    }[];
-    resp: boolean;
-    sessid: string;
-    src_clientid: string;
-    src_userid: string;
     type: CALL_MESSAGE_TYPE;
     version: string;
   };
+  targetConversation?: QualifiedId;
   conversation: string;
   from: string;
   qualified_conversation?: QualifiedId;

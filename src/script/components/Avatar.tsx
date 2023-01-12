@@ -61,22 +61,23 @@ export const DIAMETER = {
 };
 
 export const INITIALS_SIZE = {
-  [AVATAR_SIZE.LARGE]: '24px',
-  [AVATAR_SIZE.MEDIUM]: '16px',
-  [AVATAR_SIZE.SMALL]: '11px',
-  [AVATAR_SIZE.X_LARGE]: '32px',
-  [AVATAR_SIZE.X_SMALL]: '11px',
-  [AVATAR_SIZE.XX_SMALL]: '11px',
-  [AVATAR_SIZE.XXX_SMALL]: '8px',
+  [AVATAR_SIZE.LARGE]: 24,
+  [AVATAR_SIZE.MEDIUM]: 16,
+  [AVATAR_SIZE.SMALL]: 11,
+  [AVATAR_SIZE.X_LARGE]: 32,
+  [AVATAR_SIZE.X_SMALL]: 11,
+  [AVATAR_SIZE.XX_SMALL]: 11,
+  [AVATAR_SIZE.XXX_SMALL]: 8,
 };
 
 export interface AvatarProps extends HTMLProps<HTMLDivElement> {
+  participant: User | ServiceEntity;
   avatarSize?: AVATAR_SIZE;
   avatarAlt?: string;
   noBadge?: boolean;
   noFilter?: boolean;
+  isResponsive?: boolean;
   onAvatarClick?: (participant: User | ServiceEntity, target: Node) => void;
-  participant: User | ServiceEntity;
 }
 
 const Avatar: FC<AvatarProps> = ({
@@ -85,6 +86,7 @@ const Avatar: FC<AvatarProps> = ({
   noFilter = false,
   onAvatarClick,
   participant,
+  isResponsive = false,
   ...props
 }) => {
   const handleAvatarInteraction = (
@@ -143,6 +145,7 @@ const Avatar: FC<AvatarProps> = ({
         noBadge={noBadge}
         onClick={handleAvatarInteraction}
         participant={participant}
+        isResponsive={isResponsive}
         state={avatarState}
         {...props}
       />
@@ -156,6 +159,7 @@ const Avatar: FC<AvatarProps> = ({
       noFilter={noFilter}
       onAvatarInteraction={handleAvatarInteraction}
       participant={participant}
+      isResponsive={isResponsive}
       state={avatarState}
       {...props}
     />
