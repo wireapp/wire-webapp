@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [38.4.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.3.3...@wireapp/core@38.4.0) (2023-01-12)
+
+### Features
+
+* Have both CoreCrypto and Cryptobox as crypto client options ([#4773](https://github.com/wireapp/wire-web-packages/issues/4773)) ([2cc1815](https://github.com/wireapp/wire-web-packages/commit/2cc181561eb36ee99f8d8e4bc24eebf5446e9737))
+
 ## [38.3.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.3.2...@wireapp/core@38.3.3) (2023-01-09)
 
 ### Bug Fixes
