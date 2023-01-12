@@ -22,7 +22,8 @@ import {PreKey} from '@wireapp/api-client/lib/auth';
 export const LAST_PREKEY_ID = 65535;
 export type InitialPrekeys = {prekeys: PreKey[]; lastPrekey: PreKey};
 
-export interface CryptoClient {
+export interface CryptoClient<T = unknown> {
+  getNativeClient(): T;
   encrypt(sessions: string[], plainText: Uint8Array): Promise<Map<string, Uint8Array>>;
   decrypt(sessionId: string, message: Uint8Array): Promise<Uint8Array>;
 
@@ -45,6 +46,9 @@ export interface CryptoClient {
   deleteSession(sessionId: string): Promise<void>;
   newPrekey(id: number): Promise<PreKey>;
   debugBreakSession(sessionId: string): void;
-  migrateToCoreCrypto(dbName: string): Promise<void>;
-  get isCoreCrypto(): boolean;
+  /**
+   * Will migrate the database from a different client type
+   */
+  migrateFromCryptobox?(dbName: string): Promise<void>;
+  wipe(): Promise<void>;
 }

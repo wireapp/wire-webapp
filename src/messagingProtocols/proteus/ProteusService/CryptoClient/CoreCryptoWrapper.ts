@@ -21,6 +21,7 @@ import {PreKey} from '@wireapp/api-client/lib/auth';
 import {Encoder} from 'bazinga64';
 
 import {CoreCrypto} from '@wireapp/core-crypto';
+import type {CRUDEngine} from '@wireapp/store-engine';
 
 import {CryptoClient, LAST_PREKEY_ID} from './CryptoClient.types';
 import {PrekeyTracker} from './PrekeysTracker';
@@ -32,11 +33,31 @@ type Config = {
   onNewPrekeys: (prekeys: PreKey[]) => void;
 };
 
+export async function buildClient(
+  storeEngine: CRUDEngine,
+  secretKey: Uint8Array,
+  coreCryptoWasmFilePath: string,
+  db: CoreDatabase,
+  {nbPrekeys, onNewPrekeys}: Config,
+): Promise<CoreCryptoWrapper> {
+  const coreCrypto = await CoreCrypto.deferredInit(
+    `corecrypto-${storeEngine.storeName}`,
+    Encoder.toBase64(secretKey).asString,
+    undefined, // We pass a placeholder entropy data. It will be set later on by calling `reseedRng`
+    coreCryptoWasmFilePath,
+  );
+  return new CoreCryptoWrapper(coreCrypto, db, {nbPrekeys, onNewPrekeys});
+}
+
 export class CoreCryptoWrapper implements CryptoClient {
   private readonly prekeyTracker: PrekeyTracker;
 
   constructor(private readonly coreCrypto: CoreCrypto, db: CoreDatabase, config: Config) {
     this.prekeyTracker = new PrekeyTracker(this, db, config);
+  }
+
+  getNativeClient() {
+    return this.coreCrypto;
   }
 
   encrypt(sessions: string[], plainText: Uint8Array) {
@@ -115,11 +136,11 @@ export class CoreCryptoWrapper implements CryptoClient {
     await this.coreCrypto.proteusSessionFromPrekey(sessionId, Uint8Array.from(fakePrekey));
   }
 
-  async migrateToCoreCrypto(dbName: string) {
+  async migrateFromCryptobox(dbName: string) {
     return this.coreCrypto.proteusCryptoboxMigrate(dbName);
   }
 
-  get isCoreCrypto() {
-    return true;
+  async wipe() {
+    return this.coreCrypto.wipe();
   }
 }
