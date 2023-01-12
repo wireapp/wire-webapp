@@ -17,7 +17,7 @@
  *
  */
 
-import {CommitBundle} from '@wireapp/core-crypto/platforms/web/corecrypto';
+import type {CommitBundle} from '@wireapp/core-crypto';
 
 export interface UploadCommitOptions {
   /**

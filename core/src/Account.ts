@@ -32,14 +32,11 @@ import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 import {Notification} from '@wireapp/api-client/lib/notification/';
 import {AbortHandler, WebSocketClient} from '@wireapp/api-client/lib/tcp/';
 import {WEBSOCKET_STATE} from '@wireapp/api-client/lib/tcp/ReconnectingWebsocket';
-import {Encoder} from 'bazinga64';
 import logdown from 'logdown';
 
 import {EventEmitter} from 'events';
 
 import {APIClient, BackendFeatures} from '@wireapp/api-client';
-import {CoreCrypto} from '@wireapp/core-crypto';
-import {Cryptobox} from '@wireapp/cryptobox';
 import {CRUDEngine, MemoryEngine} from '@wireapp/store-engine';
 
 import {AccountService} from './account/';
@@ -54,6 +51,7 @@ import {LinkPreviewService} from './linkPreview';
 import {MLSService} from './messagingProtocols/mls';
 import {MLSCallbacks, CryptoProtocolConfig} from './messagingProtocols/mls/types';
 import {NewClient, ProteusService} from './messagingProtocols/proteus';
+import {buildCryptoClient, CryptoClientType} from './messagingProtocols/proteus/ProteusService/CryptoClient';
 import {HandledEventPayload, NotificationService, NotificationSource} from './notification/';
 import {SelfService} from './self/';
 import {CoreDatabase, deleteDB, openDB} from './storage/CoreDB';
@@ -129,7 +127,6 @@ export class Account<T = any> extends EventEmitter {
   private secretsDb?: EncryptedStore<any>;
   private readonly nbPrekeys: number;
   private readonly cryptoProtocolConfig?: CryptoProtocolConfig<T>;
-  private coreCryptoClient?: CoreCrypto;
 
   public service?: {
     mls?: MLSService;
@@ -316,9 +313,9 @@ export class Account<T = any> extends EventEmitter {
     return validClient;
   }
 
-  private async initCoreCrypto(context: Context) {
+  private async generateSecretKey(baseDbName: string) {
     const coreCryptoKeyId = 'corecrypto-key';
-    const dbName = this.generateSecretsDbName(context);
+    const dbName = `secrets-${baseDbName}`;
 
     const systemCrypto = this.cryptoProtocolConfig?.systemCrypto;
     this.secretsDb = systemCrypto
@@ -330,13 +327,33 @@ export class Account<T = any> extends EventEmitter {
       key = crypto.getRandomValues(new Uint8Array(16));
       await this.secretsDb.saveSecretValue(coreCryptoKeyId, key);
     }
+    await this.secretsDb?.close();
+    return key;
+  }
 
-    return CoreCrypto.deferredInit(
-      `corecrypto-${this.generateDbName(context)}`,
-      Encoder.toBase64(key).asString,
-      undefined, // We pass a placeholder entropy data. It will be set later on by calling `reseedRng`
-      this.cryptoProtocolConfig?.coreCrypoWasmFilePath,
-    );
+  private async buildCryptoClient(context: Context, storeEngine: CRUDEngine, db: CoreDatabase, enableMLS: boolean) {
+    const clientType =
+      enableMLS || !!this.cryptoProtocolConfig?.useCoreCrypto
+        ? CryptoClientType.CORE_CRYPTO
+        : CryptoClientType.CRYPTOBOX;
+
+    let key = Uint8Array.from([]);
+    if (clientType === CryptoClientType.CORE_CRYPTO) {
+      key = await this.generateSecretKey(storeEngine.storeName);
+    }
+
+    return buildCryptoClient(clientType, db, {
+      storeEngine,
+      secretKey: key,
+      nbPrekeys: this.nbPrekeys,
+      coreCryptoWasmFilePath: this.cryptoProtocolConfig?.coreCrypoWasmFilePath,
+      onNewPrekeys: async prekeys => {
+        this.logger.debug(`Received '${prekeys.length}' new PreKeys.`);
+
+        await this.apiClient.api.client.putClient(context.clientId!, {prekeys});
+        this.logger.debug(`Successfully uploaded '${prekeys.length}' PreKeys.`);
+      },
+    });
   }
 
   /**
@@ -351,37 +368,28 @@ export class Account<T = any> extends EventEmitter {
   }
 
   public async initServices(context: Context): Promise<void> {
-    const enableMLS = this.backendFeatures.supportsMLS && this.cryptoProtocolConfig?.mls;
-    this.coreCryptoClient =
-      enableMLS || this.cryptoProtocolConfig?.useCoreCrypto ? await this.initCoreCrypto(context) : undefined;
+    const enableMLS = this.backendFeatures.supportsMLS && !!this.cryptoProtocolConfig?.mls;
     this.storeEngine = await this.initEngine(context);
     this.db = await openDB(this.generateCoreDbName(context));
     const accountService = new AccountService(this.apiClient);
     const assetService = new AssetService(this.apiClient);
 
+    const cryptoClientDef = await this.buildCryptoClient(context, this.storeEngine, this.db, enableMLS);
+    const [clientType, cryptoClient] = cryptoClientDef;
+
     const mlsService =
-      this.coreCryptoClient && enableMLS
-        ? new MLSService(this.apiClient, this.coreCryptoClient, {
+      clientType === CryptoClientType.CORE_CRYPTO && enableMLS
+        ? new MLSService(this.apiClient, cryptoClient.getNativeClient(), {
             ...this.cryptoProtocolConfig?.mls,
             nbKeyPackages: this.nbPrekeys,
           })
         : undefined;
 
-    const proteusCryptoClient =
-      this.cryptoProtocolConfig?.useCoreCrypto && this.coreCryptoClient
-        ? this.coreCryptoClient
-        : new Cryptobox(this.storeEngine, this.nbPrekeys);
-    const proteusService = new ProteusService(this.apiClient, proteusCryptoClient, this.db, {
+    const proteusService = new ProteusService(this.apiClient, cryptoClient, {
       // We can use qualified ids to send messages as long as the backend supports federated endpoints
       useQualifiedIds: this.backendFeatures.federationEndpoints,
       onNewClient: payload => this.emit(EVENTS.NEW_SESSION, payload),
       nbPrekeys: this.nbPrekeys,
-      onNewPrekeys: async prekeys => {
-        this.logger.debug(`Received '${prekeys.length}' new PreKeys.`);
-
-        await this.apiClient.api.client.putClient(context.clientId!, {prekeys});
-        this.logger.debug(`Successfully uploaded '${prekeys.length}' PreKeys.`);
-      },
     });
 
     const clientService = new ClientService(this.apiClient, proteusService, this.storeEngine);
@@ -434,7 +442,6 @@ export class Account<T = any> extends EventEmitter {
    */
   public async logout(clearData: boolean = false): Promise<void> {
     this.db?.close();
-    await this.secretsDb?.close();
     if (clearData) {
       await this.wipe();
     }
@@ -443,9 +450,7 @@ export class Account<T = any> extends EventEmitter {
   }
 
   private async wipe(): Promise<void> {
-    if (this.coreCryptoClient) {
-      await this.coreCryptoClient.wipe();
-    }
+    await this.service?.proteus.wipe();
     await this.secretsDb?.wipe();
     if (this.db) {
       await deleteDB(this.db);
@@ -590,10 +595,6 @@ export class Account<T = any> extends EventEmitter {
   private generateDbName(context: Context) {
     const clientType = context.clientType === ClientType.NONE ? '' : `@${context.clientType}`;
     return `wire@${this.apiClient.config.urls.name}@${context.userId}${clientType}`;
-  }
-
-  private generateSecretsDbName(context: Context) {
-    return `secrets-${this.generateDbName(context)}`;
   }
 
   private generateCoreDbName(context: Context) {

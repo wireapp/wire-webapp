@@ -30,12 +30,10 @@ import type {
 import type {QualifiedId, QualifiedUserPreKeyBundleMap, UserPreKeyBundleMap} from '@wireapp/api-client/lib/user';
 import logdown from 'logdown';
 
-import {CoreCrypto} from '@wireapp/core-crypto';
-import {Cryptobox} from '@wireapp/cryptobox';
 import {ClientAction} from '@wireapp/protocol-messaging';
 import {CRUDEngine} from '@wireapp/store-engine';
 
-import {wrapCryptoClient, CryptoClient} from './CryptoClient';
+import {CryptoClient} from './CryptoClient';
 import {cryptoMigrationStore} from './cryptoMigrationStateStore';
 import {generateDecryptionError} from './DecryptionErrorGenerator';
 import type {
@@ -48,7 +46,6 @@ import {migrateToQualifiedSessionIds} from './sessionIdMigrator';
 
 import {GenericMessageType, MessageSendingState, SendResult} from '../../../conversation';
 import {MessageService} from '../../../conversation/message/MessageService';
-import {CoreDatabase} from '../../../storage/CoreDB';
 import type {EventHandlerResult} from '../../common.types';
 import {EventHandlerParams, handleBackendEvent} from '../EventHandler';
 import {getGenericMessageParams} from '../Utility/getGenericMessageParams';
@@ -64,16 +61,13 @@ import {
 export class ProteusService {
   private readonly messageService: MessageService;
   private readonly logger = logdown('@wireapp/core/ProteusService');
-  private readonly cryptoClient: CryptoClient;
 
   constructor(
     private readonly apiClient: APIClient,
-    cryptoClient: CoreCrypto | Cryptobox,
-    db: CoreDatabase,
+    private readonly cryptoClient: CryptoClient,
     private readonly config: ProteusServiceConfig,
   ) {
     this.messageService = new MessageService(this.apiClient, this);
-    this.cryptoClient = wrapCryptoClient(cryptoClient, db, config);
   }
 
   public async handleEvent(params: Pick<EventHandlerParams, 'event' | 'source' | 'dryRun'>): EventHandlerResult {
@@ -106,10 +100,10 @@ export class ProteusService {
       }
     }
 
-    if (!cryptoMigrationStore.coreCrypto.isReady(dbName) && this.cryptoClient.isCoreCrypto) {
+    if (!cryptoMigrationStore.coreCrypto.isReady(dbName) && this.cryptoClient.migrateFromCryptobox) {
       this.logger.info(`Migrating data from cryptobox store (${dbName}) to corecrypto.`);
       try {
-        await this.cryptoClient.migrateToCoreCrypto(dbName);
+        await this.cryptoClient.migrateFromCryptobox(dbName);
         cryptoMigrationStore.coreCrypto.markAsReady(dbName);
         this.logger.info(`Successfully migrated from cryptobox store (${dbName}) to corecrypto.`);
       } catch (error) {
@@ -286,5 +280,9 @@ export class ProteusService {
     }
 
     return qualifiedOTRRecipients;
+  }
+
+  wipe() {
+    return this.cryptoClient.wipe();
   }
 }

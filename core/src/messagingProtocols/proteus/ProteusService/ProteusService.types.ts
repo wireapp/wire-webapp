@@ -17,7 +17,6 @@
  *
  */
 
-import {PreKey} from '@wireapp/api-client/lib/auth';
 import {
   UserClients,
   QualifiedUserClients,
@@ -38,7 +37,6 @@ export type ProteusServiceConfig = {
   useQualifiedIds: boolean;
   onNewClient?: (client: NewClient) => void;
   nbPrekeys: number;
-  onNewPrekeys: (prekeys: PreKey[]) => void;
 };
 
 export type SendProteusMessageParams = SendCommonParams &

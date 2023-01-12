@@ -20,6 +20,7 @@
 import {PreKey} from '@wireapp/api-client/lib/auth';
 
 import {Cryptobox} from '@wireapp/cryptobox';
+import {CRUDEngine} from '@wireapp/store-engine';
 
 import {CryptoClient, LAST_PREKEY_ID} from './CryptoClient.types';
 
@@ -27,12 +28,20 @@ type Config = {
   onNewPrekeys: (prekeys: PreKey[]) => void;
 };
 
+export function buildClient(storeEngine: CRUDEngine, config: Config & {nbPrekeys: number}) {
+  const cryptobox = new Cryptobox(storeEngine, config.nbPrekeys);
+  return new CryptoboxWrapper(cryptobox, {onNewPrekeys: () => {}});
+}
 export class CryptoboxWrapper implements CryptoClient {
   constructor(private readonly cryptobox: Cryptobox, config: Config) {
     this.cryptobox.on(Cryptobox.TOPIC.NEW_PREKEYS, prekeys => {
       const serializedPreKeys = prekeys.map(prekey => this.cryptobox.serialize_prekey(prekey));
       config.onNewPrekeys(serializedPreKeys);
     });
+  }
+
+  getNativeClient() {
+    return this.cryptobox;
   }
 
   async encrypt(sessions: string[], plainText: Uint8Array) {
@@ -119,11 +128,5 @@ export class CryptoboxWrapper implements CryptoClient {
     this.cryptobox['cachedSessions'].set(sessionId, session);
   }
 
-  async migrateToCoreCrypto() {
-    // No migration needed for cryptobox
-  }
-
-  get isCoreCrypto() {
-    return false;
-  }
+  async wipe() {}
 }

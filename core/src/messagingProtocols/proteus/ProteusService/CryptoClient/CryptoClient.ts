@@ -19,21 +19,48 @@
 
 import {PreKey} from '@wireapp/api-client/lib/auth';
 
-import {CoreCrypto} from '@wireapp/core-crypto';
-import {Cryptobox} from '@wireapp/cryptobox';
+import type {CRUDEngine} from '@wireapp/store-engine';
 
-import {CoreCryptoWrapper} from './CoreCryptoWrapper';
-import {CryptoboxWrapper} from './CryptoboxWrapper';
-import {CryptoClient} from './CryptoClient.types';
+import type {CoreCryptoWrapper} from './CoreCryptoWrapper';
+import type {CryptoboxWrapper} from './CryptoboxWrapper';
 
 import {CoreDatabase} from '../../../../storage/CoreDB';
 
-type Config = {
+export enum CryptoClientType {
+  CORE_CRYPTO,
+  CRYPTOBOX,
+}
+
+export type CryptoClientDef =
+  | [CryptoClientType.CRYPTOBOX, CryptoboxWrapper]
+  | [CryptoClientType.CORE_CRYPTO, CoreCryptoWrapper];
+
+type WrapConfig = {
   nbPrekeys: number;
   onNewPrekeys: (prekeys: PreKey[]) => void;
 };
 
-export function wrapCryptoClient(cryptoClient: CoreCrypto | Cryptobox, db: CoreDatabase, config: Config): CryptoClient {
-  const isCoreCrypto = cryptoClient instanceof CoreCrypto;
-  return isCoreCrypto ? new CoreCryptoWrapper(cryptoClient, db, config) : new CryptoboxWrapper(cryptoClient, config);
+type InitConfig = WrapConfig & {
+  storeEngine: CRUDEngine;
+  secretKey: Uint8Array;
+  coreCryptoWasmFilePath?: string;
+};
+
+export async function buildCryptoClient(
+  clientType: CryptoClientType,
+  db: CoreDatabase,
+  {storeEngine, nbPrekeys, secretKey, coreCryptoWasmFilePath, onNewPrekeys}: InitConfig,
+): Promise<CryptoClientDef> {
+  if (clientType === CryptoClientType.CORE_CRYPTO) {
+    const {buildClient} = await import('./CoreCryptoWrapper');
+    const client = await buildClient(storeEngine, secretKey, coreCryptoWasmFilePath ?? '', db, {
+      nbPrekeys,
+      onNewPrekeys,
+    });
+    return [CryptoClientType.CORE_CRYPTO, client];
+  }
+
+  const {buildClient} = await import('./CryptoboxWrapper');
+  const client = await buildClient(storeEngine, {nbPrekeys, onNewPrekeys});
+  return [CryptoClientType.CRYPTOBOX, client];
 }
