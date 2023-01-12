@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [38.5.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.4.3...@wireapp/core@38.5.0) (2023-01-12)
+
+### Features
+
+* Add a way to reset local device identity ([f956ebe](https://github.com/wireapp/wire-web-packages/commit/f956ebe17a2eea65f0193c68a7eb40620c430574))
+
 ## [38.4.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.4.2...@wireapp/core@38.4.3) (2023-01-12)
 
 **Note:** Version bump only for package @wireapp/core
