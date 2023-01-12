@@ -299,7 +299,10 @@ export class Account<T = any> extends EventEmitter {
     await this.service.proteus.initClient(this.storeEngine, this.apiClient.context);
     if (this.service.mls) {
       const {userId, domain = ''} = this.apiClient.context;
-      await this.service.mls.initClient({id: userId, domain}, validClient.id);
+      if (!client) {
+        // If the client has been passed to the method, it means it also has been initialized
+        await this.service.mls.initClient({id: userId, domain}, validClient.id);
+      }
       // initialize schedulers for pending mls proposals once client is initialized
       await this.service.mls.checkExistingPendingProposals();
 
