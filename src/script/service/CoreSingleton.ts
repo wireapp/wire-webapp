@@ -64,6 +64,8 @@ export class Core extends Account<Uint8Array> {
          * When in a browser context, then this systemCrypto will be undefined and the core will then use it's internal encryption system
          */
         systemCrypto: window.systemCrypto,
+
+        useCoreCrypto: localStorage.getItem('useCoreCrypto') === '1',
       },
       nbPrekeys: 100,
     });
