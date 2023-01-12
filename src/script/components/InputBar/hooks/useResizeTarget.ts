@@ -26,6 +26,11 @@ const useResizeTarget = (element: HTMLElement | null, targetElement: HTMLElement
         return;
       }
 
+      const shouldForceScrollbar = targetElement.clientHeight < targetElement.scrollHeight;
+
+      element.style.overflowY = shouldForceScrollbar ? 'scroll' : 'auto';
+      targetElement.style.overflowY = shouldForceScrollbar ? 'scroll' : 'auto';
+
       const {offsetHeight: shadowInputHeight, scrollHeight: shadowInputScrollHeight} = element;
       const {offsetHeight: textAreaOffsetHeight} = targetElement;
 
