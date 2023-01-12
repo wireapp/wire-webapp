@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [38.4.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.4.1...@wireapp/core@38.4.2) (2023-01-12)
+
+### Bug Fixes
+
+* Avoid init MLS twice ([#4782](https://github.com/wireapp/wire-web-packages/issues/4782)) ([e0bd119](https://github.com/wireapp/wire-web-packages/commit/e0bd1198b6bda8af84454197166255abc357ec8f))
+
 ## [38.4.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.4.0...@wireapp/core@38.4.1) (2023-01-12)
 
 ### Bug Fixes
