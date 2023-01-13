@@ -110,7 +110,8 @@ export class DebugUtil {
   }
 
   async resetIdentity(): Promise<void> {
-    this.core['coreCryptoClient'].wipe();
+    const proteusService = this.core.service!.proteus;
+    await proteusService['cryptoClient'].debugResetIdentity();
   }
 
   /** Used by QA test automation. */
