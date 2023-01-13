@@ -19,24 +19,34 @@
 
 import {useEffect, DependencyList} from 'react';
 
-const useResizeTarget = (element: HTMLElement | null, targetElement: HTMLElement | null, deps?: DependencyList) => {
+const alignScrollBars = (shadowInput: HTMLElement, textarea: HTMLElement) => {
+  const shouldForceScrollbar = textarea.clientHeight < textarea.scrollHeight;
+
+  shadowInput.style.overflowY = shouldForceScrollbar ? 'scroll' : 'hidden';
+  textarea.style.overflowY = shouldForceScrollbar ? 'scroll' : 'hidden';
+};
+
+const alignHeights = (shadowInput: HTMLElement, textarea: HTMLElement) => {
+  const {offsetHeight: shadowInputHeight, scrollHeight: shadowInputScrollHeight} = shadowInput;
+  const {offsetHeight: textAreaOffsetHeight} = textarea;
+
+  if (shadowInputHeight !== textAreaOffsetHeight) {
+    textarea.style.height = `${shadowInputScrollHeight}px`;
+  }
+};
+
+const useResizeTarget = (shadowInput: HTMLElement | null, textarea: HTMLElement | null, deps?: DependencyList) => {
   const resizeTarget = () => {
-    if (element && targetElement) {
-      if (!targetElement?.offsetHeight) {
+    if (shadowInput && textarea) {
+      if (!textarea?.offsetHeight) {
         return;
       }
 
-      const shouldForceScrollbar = targetElement.clientHeight < targetElement.scrollHeight;
+      alignHeights(shadowInput, textarea);
+      alignScrollBars(shadowInput, textarea);
 
-      element.style.overflowY = shouldForceScrollbar ? 'scroll' : 'auto';
-      targetElement.style.overflowY = shouldForceScrollbar ? 'scroll' : 'auto';
-
-      const {offsetHeight: shadowInputHeight, scrollHeight: shadowInputScrollHeight} = element;
-      const {offsetHeight: textAreaOffsetHeight} = targetElement;
-
-      if (shadowInputHeight !== textAreaOffsetHeight) {
-        targetElement.style.height = `${shadowInputScrollHeight}px`;
-      }
+      //changing scroll appearance might change elements' height, we need to double check if their heights match
+      alignHeights(shadowInput, textarea);
     }
   };
 
