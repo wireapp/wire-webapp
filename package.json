@@ -94,7 +94,7 @@
     "@types/webpack-env": "1.18.0",
     "@typescript-eslint/eslint-plugin": "^5.48.0",
     "@typescript-eslint/parser": "^5.48.0",
-    "@wireapp/copy-config": "2.0.4",
+    "@wireapp/copy-config": "2.0.5",
     "@wireapp/eslint-config": "2.1.1",
     "@wireapp/prettier-config": "0.5.2",
     "@wireapp/store-engine": "^5.0.3",
