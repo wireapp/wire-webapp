@@ -5208,7 +5208,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rimraf@npm:3.0.2, rimraf@npm:^3.0.2":
+"rimraf@npm:4.0.5":
+  version: 4.0.5
+  resolution: "rimraf@npm:4.0.5"
+  bin:
+    rimraf: dist/cjs/src/bin.js
+  checksum: e99139d6460d4460125288565698ff43f5cb8734feda83694187a029b21bdd6e63c063a1cb899ae8deaccc4345fbb69fa45e655329b2fb93f21ad809da1948eb
+  languageName: node
+  linkType: hard
+
+"rimraf@npm:^3.0.2":
   version: 3.0.2
   resolution: "rimraf@npm:3.0.2"
   dependencies:
@@ -6040,7 +6049,7 @@ __metadata:
     nocache: 3.0.4
     opn: 6.0.0
     pm2: 5.2.2
-    rimraf: 3.0.2
+    rimraf: 4.0.5
     typescript: 4.9.4
   languageName: unknown
   linkType: soft
