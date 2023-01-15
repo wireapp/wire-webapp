@@ -4555,18 +4555,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/store-engine-dexie@npm:2.0.3":
-  version: 2.0.3
-  resolution: "@wireapp/store-engine-dexie@npm:2.0.3"
-  dependencies:
-    dexie: 3.2.2
-  peerDependencies:
-    "@wireapp/store-engine": 5.x.x
-  checksum: b39fa39fe584d5cd87a29be55d5676148221db699f75b5634e9b2da9f926fea77ba3d3ea52362eef76dc18ea644ce744bcc74454529c4685e43aa45062449f20
-  languageName: node
-  linkType: hard
-
-"@wireapp/store-engine-dexie@npm:^2.0.4":
+"@wireapp/store-engine-dexie@npm:2.0.4, @wireapp/store-engine-dexie@npm:^2.0.4":
   version: 2.0.4
   resolution: "@wireapp/store-engine-dexie@npm:2.0.4"
   dependencies:
@@ -16581,7 +16570,7 @@ __metadata:
     "@wireapp/prettier-config": 0.5.2
     "@wireapp/react-ui-kit": 9.3.3
     "@wireapp/store-engine": ^5.0.3
-    "@wireapp/store-engine-dexie": 2.0.3
+    "@wireapp/store-engine-dexie": 2.0.4
     "@wireapp/store-engine-sqleet": 1.8.9
     "@wireapp/webapp-events": 0.16.0
     adm-zip: 0.5.10
