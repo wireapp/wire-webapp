@@ -45,7 +45,7 @@
     "tsyringe": "4.7.0",
     "uint32": "0.2.1",
     "underscore": "1.13.6",
-    "uuidjs": "4.2.12",
+    "uuidjs": "4.2.13",
     "webrtc-adapter": "6.4.8",
     "zustand": "4.2.0"
   },
