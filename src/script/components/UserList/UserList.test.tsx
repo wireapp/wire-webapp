@@ -53,6 +53,7 @@ describe('UserList', () => {
       userState,
       selectedUsers: users,
       users,
+      isSelectable: true,
     };
 
     const {getByTestId} = render(withTheme(<UserList {...props} />));
@@ -84,6 +85,7 @@ describe('UserList', () => {
       userState,
       selectedUsers,
       users,
+      isSelectable: true,
     };
 
     const {getAllByTestId} = render(withTheme(<UserList {...props} />));
