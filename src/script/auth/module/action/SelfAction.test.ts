@@ -23,9 +23,9 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {SelfActionCreator} from './creator/';
 import {WebSocketAction} from './WebSocketAction';
 
-import {mockStoreFactory} from '../../util/test/mockStoreFactory';
-
 import {actionRoot} from '.';
+
+import {mockStoreFactory} from '../../util/test/mockStoreFactory';
 
 describe('SelfAction', () => {
   it('fetches the self user', async () => {
