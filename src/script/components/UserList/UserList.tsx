@@ -17,7 +17,7 @@
  *
  */
 
-import {ChangeEvent, useState} from 'react';
+import {ChangeEvent, useCallback, useState} from 'react';
 
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -70,6 +70,7 @@ export interface UserListProps {
   truncate?: boolean;
   users: User[];
   userState?: UserState;
+  isSelectable?: boolean;
 }
 
 export const UserList = ({
@@ -90,6 +91,7 @@ export const UserList = ({
   showArrow = false,
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
+  isSelectable = false,
   onSelectUser,
 }: UserListProps) => {
   const [maxShownUsers, setMaxShownUsers] = useState(USER_CHUNK_SIZE);
@@ -105,7 +107,6 @@ export const UserList = ({
   const selfInTeam = userState.self().inTeam();
   const {self} = useKoSubscribableChildren(userState, ['self']);
   const {is_verified: isSelfVerified} = useKoSubscribableChildren(self, ['is_verified']);
-  const isSelectEnabled = !!onSelectUser;
 
   // subscribe to roles changes in order to react to them
   useKoSubscribableChildren(conversation, ['roles']);
@@ -125,8 +126,34 @@ export const UserList = ({
     onClick?.(userEntity, event);
   };
 
-  const isSelected = (userEntity: User): boolean =>
-    isSelectEnabled && selectedUsers.some(user => user.id === userEntity.id);
+  const renderParticipantItem = useCallback(
+    (user: User, isLastItem: boolean = false) => {
+      const isSelected = (userEntity: User): boolean =>
+        isSelectable && selectedUsers.some(user => user.id === userEntity.id);
+
+      return (
+        <li key={user.id}>
+          <ParticipantItem
+            noInteraction={noSelfInteraction && user.isMe}
+            participant={user}
+            noUnderline={isLastItem || noUnderline}
+            highlighted={highlightedUserIds.includes(user.id)}
+            customInfo={infos && infos[user.id]}
+            canSelect={isSelectable}
+            isSelected={isSelected(user)}
+            mode={mode}
+            external={teamState.isExternal(user.id)}
+            selfInTeam={selfInTeam}
+            isSelfVerified={isSelfVerified}
+            onClick={onClickOrKeyPressed}
+            onKeyDown={onUserKeyPressed}
+            showArrow={showArrow}
+          />
+        </li>
+      );
+    },
+    [highlightedUserIds, isSelectable, isSelfVerified, mode, noSelfInteraction, selectedUsers, selfInTeam, teamState],
+  );
 
   let content;
 
@@ -165,26 +192,7 @@ export const UserList = ({
 
             {admins.length > 0 && (
               <ul className={cx('search-list', cssClasses)} data-uie-name="list-admins">
-                {admins.slice(0, maxShownUsers).map(user => (
-                  <li key={user.id}>
-                    <ParticipantItem
-                      noInteraction={noSelfInteraction && user.isMe}
-                      participant={user}
-                      noUnderline={noUnderline}
-                      highlighted={highlightedUserIds.includes(user.id)}
-                      customInfo={infos && infos[user.id]}
-                      canSelect={isSelectEnabled}
-                      isSelected={isSelected(user)}
-                      mode={mode}
-                      external={teamState.isExternal(user.id)}
-                      selfInTeam={selfInTeam}
-                      isSelfVerified={isSelfVerified}
-                      onClick={onClickOrKeyPressed}
-                      onKeyDown={onUserKeyPressed}
-                      showArrow={showArrow}
-                    />
-                  </li>
-                ))}
+                {admins.slice(0, maxShownUsers).map(user => renderParticipantItem(user))}
               </ul>
             )}
 
@@ -203,26 +211,7 @@ export const UserList = ({
             </h3>
 
             <ul className={cx('search-list', cssClasses)} data-uie-name="list-members">
-              {members.slice(0, maxShownUsers - admins.length).map(user => (
-                <li key={user.id}>
-                  <ParticipantItem
-                    noInteraction={noSelfInteraction && user.isMe}
-                    participant={user}
-                    noUnderline={noUnderline}
-                    highlighted={highlightedUserIds.includes(user.id)}
-                    customInfo={infos && infos[user.id]}
-                    canSelect={isSelectEnabled}
-                    isSelected={isSelected(user)}
-                    mode={mode}
-                    external={teamState.isExternal(user.id)}
-                    selfInTeam={selfInTeam}
-                    isSelfVerified={isSelfVerified}
-                    onClick={onClickOrKeyPressed}
-                    onKeyDown={onUserKeyPressed}
-                    showArrow={showArrow}
-                  />
-                </li>
-              ))}
+              {members.slice(0, maxShownUsers - admins.length).map(user => renderParticipantItem(user))}
             </ul>
           </>
         )}
@@ -230,9 +219,12 @@ export const UserList = ({
     );
   } else {
     const truncatedUsers = truncate ? users.slice(0, reducedUserCount) : users;
-    const selectedUsers = truncatedUsers.filter(user => isSelected(user));
+    const isSelected = (userEntity: User): boolean =>
+      isSelectable && !!selectedUsers?.some(user => user.id === userEntity.id);
 
-    const hasSelectedUsers = selectedUsers.length > 0;
+    const currentUsers = truncatedUsers.filter(user => isSelected(user));
+
+    const hasSelectedUsers = currentUsers.length > 0;
 
     const toggleFolder = (folderName: UserListSections) => {
       setExpandedFolders(prevState =>
@@ -243,43 +235,22 @@ export const UserList = ({
     const isSelectedContactsOpen = expandedFolders.includes(UserListSections.SELECTED_CONTACTS);
     const isContactsOpen = expandedFolders.includes(UserListSections.CONTACTS);
 
-    const renderParticipantItem = (user: User, isLastItem: boolean = false) => (
-      <li key={user.id}>
-        <ParticipantItem
-          noInteraction={noSelfInteraction && user.isMe}
-          participant={user}
-          noUnderline={isLastItem || noUnderline}
-          highlighted={highlightedUserIds.includes(user.id)}
-          customInfo={infos && infos[user.id]}
-          canSelect={isSelectEnabled}
-          isSelected={isSelected(user)}
-          mode={mode}
-          external={teamState.isExternal(user.id)}
-          selfInTeam={selfInTeam}
-          isSelfVerified={isSelfVerified}
-          onClick={onClickOrKeyPressed}
-          onKeyDown={onUserKeyPressed}
-          showArrow={showArrow}
-        />
-      </li>
-    );
-
     content = (
       <>
-        {hasSelectedUsers && (
+        {isSelectable && hasSelectedUsers && (
           <>
             <button onClick={() => toggleFolder(UserListSections.SELECTED_CONTACTS)} css={collapseButton}>
               <span css={collapseIcon(isSelectedContactsOpen)} aria-hidden="true">
                 <Icon.Disclose width={16} height={16} />
               </span>
 
-              {t('userListSelectedContacts', selectedUsers.length)}
+              {t('userListSelectedContacts', currentUsers.length)}
             </button>
 
-            <ul data-uie-name="selected-search-list">
+            <ul data-uie-name="selected-search-list" className={cx('search-list', cssClasses)}>
               {isSelectedContactsOpen &&
-                selectedUsers.map((user, index) => {
-                  const isLastItem = index === selectedUsers.length - 1;
+                currentUsers.map((user, index) => {
+                  const isLastItem = index === currentUsers.length - 1;
 
                   return renderParticipantItem(user, isLastItem);
                 })}
@@ -287,13 +258,15 @@ export const UserList = ({
           </>
         )}
 
-        <button onClick={() => toggleFolder(UserListSections.CONTACTS)} css={collapseButton}>
-          <span css={collapseIcon(isContactsOpen)} aria-hidden="true">
-            <Icon.Disclose width={16} height={16} />
-          </span>
+        {isSelectable && (
+          <button onClick={() => toggleFolder(UserListSections.CONTACTS)} css={collapseButton}>
+            <span css={collapseIcon(isContactsOpen)} aria-hidden="true">
+              <Icon.Disclose width={16} height={16} />
+            </span>
 
-          {t('userListContacts')}
-        </button>
+            {t('userListContacts')}
+          </button>
+        )}
 
         <ul className={cx('search-list', cssClasses)} data-uie-name="search-list">
           {isContactsOpen &&
