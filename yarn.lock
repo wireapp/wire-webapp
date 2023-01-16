@@ -5449,9 +5449,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"beautiful-react-hooks@npm:^3.11.2":
-  version: 3.11.2
-  resolution: "beautiful-react-hooks@npm:3.11.2"
+"beautiful-react-hooks@npm:^3.12.2":
+  version: 3.12.2
+  resolution: "beautiful-react-hooks@npm:3.12.2"
   dependencies:
     lodash.debounce: ^4.0.8
     lodash.throttle: ^4.1.1
@@ -5460,7 +5460,7 @@ __metadata:
     react-dom: ">=16.0.0"
     react-router-dom: ">=5.0.0"
     rxjs: ">=7.0.0"
-  checksum: f71e0ca29e549c3733f43c7adc60509f56412c5a2c169e944f50f84b1478a6e941701b54849fe58d45de92d15ab47d048a9684cb4cae33755d594a8cd2a27189
+  checksum: c473d401d0ab9401c4f5d4727e8fd2129519ab61faa64a6b74c589e54cd903c7c362b3ad339cb5db3960180aa6df58540099a557dde1d4cc3061193286bce832
   languageName: node
   linkType: hard
 
@@ -16795,7 +16795,7 @@ __metadata:
     archiver: ^5.3.1
     autoprefixer: ^10.4.13
     babel-loader: 9.1.2
-    beautiful-react-hooks: ^3.11.2
+    beautiful-react-hooks: ^3.12.2
     caniuse-lite: ^1.0.30001445
     classnames: 2.3.2
     copy-webpack-plugin: 11.0.0
