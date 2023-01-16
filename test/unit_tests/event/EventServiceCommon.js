@@ -17,8 +17,6 @@
  *
  */
 
-//@ts-nocheck
-
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 import {ConversationError} from 'src/script/error/ConversationError';
 import {StorageError} from 'src/script/error/StorageError';

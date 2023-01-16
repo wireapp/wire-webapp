@@ -17,8 +17,6 @@
  *
  */
 
-//@ts-nocheck
-
 import {Mention} from '@wireapp/protocol-messaging';
 
 import {MentionEntity} from 'src/script/message/MentionEntity';

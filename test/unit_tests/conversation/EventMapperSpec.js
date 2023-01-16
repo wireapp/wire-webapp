@@ -17,8 +17,6 @@
  *
  */
 
-//@ts-nocheck
-
 import {Article, LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
 import {AssetType} from 'src/script/assets/AssetType';

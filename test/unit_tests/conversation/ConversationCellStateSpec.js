@@ -17,8 +17,6 @@
  *
  */
 
-//@ts-nocheck
-
 import {generateCellState} from 'src/script/conversation/ConversationCellState';
 import {ConversationStatusIcon} from 'src/script/conversation/ConversationStatusIcon';
 import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';

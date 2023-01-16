@@ -17,8 +17,6 @@
  *
  */
 
-//@ts-nocheck
-
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 

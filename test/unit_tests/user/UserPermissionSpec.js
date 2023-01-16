@@ -17,8 +17,6 @@
  *
  */
 
-//@ts-nocheck
-
 import {
   ROLE,
   FEATURES,

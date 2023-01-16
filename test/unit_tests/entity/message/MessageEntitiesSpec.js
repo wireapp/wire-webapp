@@ -17,8 +17,6 @@
  *
  */
 
-//@ts-nocheck
-
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {FileAsset} from 'src/script/entity/message/FileAsset';
 import {MediumImage} from 'src/script/entity/message/MediumImage';

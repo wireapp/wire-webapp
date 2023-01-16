@@ -17,8 +17,6 @@
  *
  */
 
-//@ts-nocheck
-
 import {Quote} from '@wireapp/protocol-messaging';
 
 import {ClientEvent} from 'src/script/event/Client';

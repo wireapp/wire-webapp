@@ -17,8 +17,6 @@
  *
  */
 
-//@ts-nocheck
-
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 
 import {WebAppEvents} from '@wireapp/webapp-events';

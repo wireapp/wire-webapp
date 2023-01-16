@@ -17,8 +17,6 @@
  *
  */
 
-//@ts-nocheck
-
 import {AudioPreference} from '@wireapp/api-client/lib/user/data/';
 import {difference} from 'underscore';
 

@@ -17,8 +17,6 @@
  *
  */
 
-//@ts-nocheck
-
 import {CONV_TYPE, CALL_TYPE, VIDEO_STATE} from '@wireapp/avs';
 
 import {Call} from 'src/script/calling/Call';

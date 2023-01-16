@@ -17,8 +17,6 @@
  *
  */
 
-//@ts-nocheck
-
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import {ReactionType} from '@wireapp/core/lib/conversation/';
 import {isObject} from 'underscore';

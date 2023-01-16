@@ -17,8 +17,6 @@
  *
  */
 
-//@ts-nocheck
-
 import {TeamRepository} from 'src/script/team/TeamRepository';
 import {TeamState} from 'src/script/team/TeamState';
 import {UserState} from 'src/script/user/UserState';

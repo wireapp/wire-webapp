@@ -18,7 +18,7 @@
  */
 
 /* eslint-disable */
-//@ts-nocheck
+
 import {MediaDeviceType} from 'src/script/media/MediaDeviceType';
 import {MediaDevicesHandler} from 'src/script/media/MediaDevicesHandler';
 

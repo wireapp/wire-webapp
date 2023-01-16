@@ -17,8 +17,6 @@
  *
  */
 
-//@ts-nocheck
-
 import JSZip from 'jszip';
 
 import {BackupRepository} from 'src/script/backup/BackupRepository';

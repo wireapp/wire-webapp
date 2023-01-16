@@ -17,8 +17,6 @@
  *
  */
 
-//@ts-nocheck
-
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import {NotificationPreference} from '@wireapp/api-client/lib/user/data/';
