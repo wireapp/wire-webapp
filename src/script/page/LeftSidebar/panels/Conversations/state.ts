@@ -17,7 +17,7 @@
  *
  */
 
-import create from 'zustand';
+import {create} from 'zustand';
 
 type FolderState = {
   expandedFolders: string[];

@@ -18,8 +18,8 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import create from 'zustand';
-import createVanilla from 'zustand/vanilla';
+import {create} from 'zustand';
+import {createStore} from 'zustand/vanilla';
 
 import {loadState, saveState} from './conversationStateStorage';
 
@@ -52,7 +52,7 @@ type StoreState = MLSConversationState & {
   ): Promise<void>;
 };
 
-export const mlsConversationState = createVanilla<StoreState>((set, get) => {
+export const mlsConversationState = createStore<StoreState>((set, get) => {
   return {
     established: initialState.established,
     filterEstablishedConversations: conversations =>

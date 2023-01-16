@@ -18,7 +18,7 @@
  */
 
 import {isValid} from 'date-fns';
-import create from 'zustand';
+import {create} from 'zustand';
 
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
