@@ -20,6 +20,11 @@
 import {useEffect, DependencyList} from 'react';
 
 const alignScrollBars = (shadowInput: HTMLElement, textarea: HTMLElement) => {
+  /* According to documentation scrollHeight always shows the height of an element's content,
+    including content not visible on the screen due to overflow.
+    Using scroll and hidden values, we're making sure that scroll behaves the same way on both elements
+    (overflow: auto behaviour differs on textarea and div).
+  */
   const shouldForceScrollbar = textarea.clientHeight < textarea.scrollHeight;
 
   shadowInput.style.overflowY = shouldForceScrollbar ? 'scroll' : 'hidden';
