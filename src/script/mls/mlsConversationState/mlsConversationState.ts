@@ -19,7 +19,6 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {create} from 'zustand';
-import {createStore} from 'zustand/vanilla';
 
 import {loadState, saveState} from './conversationStateStorage';
 
@@ -52,7 +51,7 @@ type StoreState = MLSConversationState & {
   ): Promise<void>;
 };
 
-export const mlsConversationState = createStore<StoreState>((set, get) => {
+export const useMLSConversationState = create<StoreState>((set, get) => {
   return {
     established: initialState.established,
     filterEstablishedConversations: conversations =>
@@ -117,9 +116,4 @@ export const mlsConversationState = createStore<StoreState>((set, get) => {
   };
 });
 
-/**
- * react hook to manipulate the MLS conversation state
- */
-export const useMLSConversationState = create(mlsConversationState);
-
-mlsConversationState.subscribe(saveState);
+useMLSConversationState.subscribe(saveState);
