@@ -57,7 +57,7 @@ import {
   uk,
 } from 'date-fns/locale';
 
-import {t} from './LocalizerUtil/LocalizerUtil';
+import {t} from './LocalizerUtil';
 import {zeroPadding} from './util';
 
 export type FnDate = number | Date;
