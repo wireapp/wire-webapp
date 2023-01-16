@@ -26,7 +26,7 @@ import {User} from 'src/script/entity/User';
 import {ClientEvent} from 'src/script/event/Client';
 import {SuperType} from 'src/script/message/SuperType';
 import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
-import {createRandomUuid} from 'Util/util';
+import {createRandomUuid} from 'Util/uuid';
 
 import {VerificationMessage} from '../entity/message/VerificationMessage';
 import {EventRecord} from '../storage';

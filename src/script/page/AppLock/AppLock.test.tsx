@@ -24,7 +24,7 @@ import ko from 'knockout';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {createRandomUuid} from 'Util/util';
+import {createRandomUuid} from 'Util/uuid';
 
 import {AppLock, APPLOCK_STATE} from './AppLock';
 

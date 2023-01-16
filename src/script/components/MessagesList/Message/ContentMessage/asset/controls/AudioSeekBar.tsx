@@ -23,7 +23,7 @@ import cx from 'classnames';
 
 import {interpolate} from 'Util/ArrayUtil';
 import {clamp} from 'Util/NumberUtil';
-import {createRandomUuid} from 'Util/util';
+import {createRandomUuid} from 'Util/uuid';
 
 import {FileAsset} from '../../../../../../entity/message/FileAsset';
 

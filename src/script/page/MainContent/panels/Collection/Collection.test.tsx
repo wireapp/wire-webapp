@@ -27,7 +27,7 @@ import {FileAsset} from 'src/script/entity/message/FileAsset';
 import {LinkPreview} from 'src/script/entity/message/LinkPreview';
 import {MediumImage} from 'src/script/entity/message/MediumImage';
 import {MessageCategory} from 'src/script/message/MessageCategory';
-import {createRandomUuid} from 'Util/util';
+import {createRandomUuid} from 'Util/uuid';
 
 import {Collection} from './Collection';
 

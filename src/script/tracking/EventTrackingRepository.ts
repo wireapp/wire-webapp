@@ -28,7 +28,7 @@ import {roundLogarithmic} from 'Util/NumberUtil';
 import {loadValue, storeValue, resetStoreValue} from 'Util/StorageUtil';
 import {includesString} from 'Util/StringUtil';
 import {getParameter} from 'Util/UrlUtil';
-import {createRandomUuid} from 'Util/util';
+import {createRandomUuid} from 'Util/uuid';
 
 import {EventName} from './EventName';
 import {getPlatform} from './Helpers';

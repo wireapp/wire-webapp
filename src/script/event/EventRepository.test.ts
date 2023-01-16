@@ -26,7 +26,7 @@ import {EventError} from 'src/script/error/EventError';
 import {ClientEvent} from 'src/script/event/Client';
 import {EventRepository} from 'src/script/event/EventRepository';
 import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
-import {createRandomUuid} from 'Util/util';
+import {createRandomUuid} from 'Util/uuid';
 
 import {EventService} from './EventService';
 import {EventSource} from './EventSource';

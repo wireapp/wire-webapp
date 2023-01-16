@@ -21,7 +21,7 @@ import {render, waitFor} from '@testing-library/react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {Conversation} from 'src/script/entity/Conversation';
-import {createRandomUuid} from 'Util/util';
+import {createRandomUuid} from 'Util/uuid';
 
 import {MessageDetails} from './MessageDetails';
 

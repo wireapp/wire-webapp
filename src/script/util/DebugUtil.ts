@@ -33,8 +33,7 @@ import Dexie from 'dexie';
 import {container} from 'tsyringe';
 
 import {getLogger, Logger} from 'Util/Logger';
-
-import {createRandomUuid} from './util';
+import {createRandomUuid} from 'Util/uuid';
 
 import {CallingRepository} from '../calling/CallingRepository';
 import {CallState} from '../calling/CallState';

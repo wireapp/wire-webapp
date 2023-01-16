@@ -20,7 +20,7 @@
 import {AssetUploadData} from '@wireapp/api-client/lib/asset/';
 import {container} from 'tsyringe';
 
-import {createRandomUuid} from 'Util/util';
+import {createRandomUuid} from 'Util/uuid';
 import {ValidationUtilError} from 'Util/ValidationUtil';
 
 import {encryptAesAsset} from './AssetCrypto';

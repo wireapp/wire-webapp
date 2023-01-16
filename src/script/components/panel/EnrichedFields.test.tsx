@@ -22,7 +22,7 @@ import type {RichInfo} from '@wireapp/api-client/lib/user/';
 
 import {User} from 'src/script/entity/User';
 import {RichProfileRepository} from 'src/script/user/RichProfileRepository';
-import {createRandomUuid} from 'Util/util';
+import {createRandomUuid} from 'Util/uuid';
 
 import {EnrichedFields} from './EnrichedFields';
 

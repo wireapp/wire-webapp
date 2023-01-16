@@ -31,7 +31,7 @@ export const getFirstChar = (string: string): string => [...string][0]; // the d
  * @param bytes bytes to convert
  * @returns bytes as hex string
  */
-export const bytesToHex = (bytes: number[]): string => {
+export const bytesToHex = (bytes: number[] | Uint8Array): string => {
   const hexBase = 16;
   const padIndex = 2;
   return Array.from(bytes, byte => byte.toString(hexBase).padStart(padIndex, '0')).join('');

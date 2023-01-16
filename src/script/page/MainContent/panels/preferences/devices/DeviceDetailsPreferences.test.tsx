@@ -21,7 +21,7 @@ import {act, render, waitFor} from '@testing-library/react';
 
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {ClientEntity} from 'src/script/client/ClientEntity';
-import {createRandomUuid} from 'Util/util';
+import {createRandomUuid} from 'Util/uuid';
 
 import {DeviceDetailsPreferences} from './DeviceDetailsPreferences';
 

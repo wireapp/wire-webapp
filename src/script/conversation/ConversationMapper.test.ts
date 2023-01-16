@@ -40,7 +40,7 @@ import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
 import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
 import {Conversation} from 'src/script/entity/Conversation';
 import {BaseError} from 'src/script/error/BaseError';
-import {createRandomUuid} from 'Util/util';
+import {createRandomUuid} from 'Util/uuid';
 
 import {ACCESS_STATE} from './AccessState';
 

@@ -19,7 +19,7 @@
 
 import {GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
 
-import {createRandomUuid} from 'Util/util';
+import {createRandomUuid} from 'Util/uuid';
 
 import * as LegalHoldEvaluator from './LegalHoldEvaluator';
 

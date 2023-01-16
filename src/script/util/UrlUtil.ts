@@ -90,7 +90,7 @@ export function getDomainName(url: string): string {
   return url.replace(/^(?:.*:\/\/)?([^.]+)\..*/, '$1');
 }
 
-export const getLinksFromHtml = <T extends HTMLElement>(html: string): T[] => {
+export const getLinksFromHtml = <T extends HTMLAnchorElement>(html: string): T[] => {
   if (!html) {
     return [];
   }

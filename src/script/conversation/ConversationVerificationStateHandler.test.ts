@@ -22,7 +22,7 @@ import {ConversationVerificationState} from 'src/script/conversation/Conversatio
 import {EventBuilder} from 'src/script/conversation/EventBuilder';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
-import {createRandomUuid} from 'Util/util';
+import {createRandomUuid} from 'Util/uuid';
 
 import {ConversationRepository} from './ConversationRepository';
 import {ConversationVerificationStateHandler} from './ConversationVerificationStateHandler';

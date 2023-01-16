@@ -32,7 +32,7 @@ import {Message} from 'src/script/entity/message/Message';
 import {Text} from 'src/script/entity/message/Text';
 import {User} from 'src/script/entity/User';
 import {ConversationError} from 'src/script/error/ConversationError';
-import {createRandomUuid} from 'Util/util';
+import {createRandomUuid} from 'Util/uuid';
 
 import {ConversationRepository} from './ConversationRepository';
 import {ConversationState} from './ConversationState';

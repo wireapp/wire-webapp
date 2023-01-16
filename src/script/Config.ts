@@ -19,7 +19,8 @@
 
 import {ValidationUtil, Runtime} from '@wireapp/commons';
 
-import {createRandomUuid} from 'Util/util';
+import {createRandomUuid} from 'Util/uuid';
+
 const env = window.wire.env;
 
 export const ACCENT_ID = {

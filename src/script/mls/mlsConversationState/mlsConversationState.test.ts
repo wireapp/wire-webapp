@@ -19,7 +19,7 @@
 
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 
-import {createRandomUuid} from 'Util/util';
+import {createRandomUuid} from 'Util/uuid';
 
 import {mlsConversationState} from './mlsConversationState';
 

@@ -64,7 +64,8 @@ import {
   startsWith,
 } from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {base64ToArray, createRandomUuid, noop} from 'Util/util';
+import {base64ToArray, noop} from 'Util/util';
+import {createRandomUuid} from 'Util/uuid';
 
 import {ACCESS_STATE} from './AccessState';
 import {extractClientDiff} from './ClientMismatchUtil';

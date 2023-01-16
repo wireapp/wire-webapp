@@ -48,7 +48,8 @@ import {
 
 import {getLogger, Logger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {base64ToArray, arrayToBase64, createRandomUuid} from 'Util/util';
+import {base64ToArray, arrayToBase64} from 'Util/util';
+import {createRandomUuid} from 'Util/uuid';
 
 import {decryptAesAsset} from '../assets/AssetCrypto';
 import {AssetTransferState} from '../assets/AssetTransferState';

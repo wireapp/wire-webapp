@@ -20,7 +20,7 @@
 import {render} from '@testing-library/react';
 
 import * as TimeUtil from 'Util/TimeUtil';
-import {createRandomUuid} from 'Util/util';
+import {createRandomUuid} from 'Util/uuid';
 
 import {AssetHeader} from './AssetHeader';
 

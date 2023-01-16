@@ -25,6 +25,6 @@ export const Declension = {
   NOMINATIVE: 'nominative',
 };
 
-export type StringIdentifer = keyof typeof en | '';
+export type StringIdentifer = keyof typeof en | string | '';
 
 export type Substitutes = Record<string, string> | string | number;

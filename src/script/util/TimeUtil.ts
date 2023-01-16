@@ -82,7 +82,7 @@ export enum TIME_IN_MILLIS {
   WEEK = DAY * 7,
   YEAR = DAY * 365,
 }
-const locales = {cs, da, de, el, es, et, fi, fr, hr, hu, it, lt, nl, pl, pt, ro, ru, sk, sl, tr, uk};
+const locales = {cs, da, de, el, es, et, fi, fr, hr, hu, it, lt, nl, pl, pt, ro, ru, sk, sl, tr, uk, enUS};
 const defaultLocale = enUS;
 let locale = defaultLocale;
 export type LocaleType = keyof typeof locales;

@@ -19,7 +19,7 @@
 
 import {render} from '@testing-library/react';
 
-import {createRandomUuid} from 'Util/util';
+import {createRandomUuid} from 'Util/uuid';
 
 import {ServiceList} from './ServiceList';
 

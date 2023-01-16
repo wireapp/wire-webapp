@@ -24,7 +24,7 @@ import Cookies from 'js-cookie';
 import {Runtime} from '@wireapp/commons';
 
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {createRandomUuid} from 'Util/util';
+import {createRandomUuid} from 'Util/uuid';
 
 const CONFIG = {
   COOKIE_NAME: 'app_opened',

@@ -26,7 +26,12 @@
  * @param zoom Map zoom level
  * @returns URL to location in Google Maps
  */
-export function getMapsUrl(latitude: number, longitude: number, name: string, zoom: string): string {
+export function getMapsUrl(
+  latitude: number,
+  longitude: number,
+  name: string | undefined = undefined,
+  zoom: string | number | undefined = undefined,
+): string {
   const baseUrl = 'https://google.com/maps/';
 
   const nameParam = name ? `place/${name}/` : '';

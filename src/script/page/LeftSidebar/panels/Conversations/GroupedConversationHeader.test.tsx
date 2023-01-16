@@ -21,7 +21,7 @@ import {render} from '@testing-library/react';
 import ko from 'knockout';
 import {act} from 'react-dom/test-utils';
 
-import {createRandomUuid} from 'Util/util';
+import {createRandomUuid} from 'Util/uuid';
 
 import {GroupedConversationHeader} from './GroupedConversationHeader';
 

@@ -19,7 +19,7 @@
 
 import {render, fireEvent, screen} from '@testing-library/react';
 
-import {createRandomUuid} from 'Util/util';
+import {createRandomUuid} from 'Util/uuid';
 
 import {MentionSuggestionList} from './MentionSuggestions';
 

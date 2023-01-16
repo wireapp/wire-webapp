@@ -31,7 +31,7 @@ import 'src/script/localization/Localizer';
 import {CALL_MESSAGE_TYPE} from 'src/script/message/CallMessageType';
 import {MentionEntity} from 'src/script/message/MentionEntity';
 import {StatusType} from 'src/script/message/StatusType';
-import {createRandomUuid} from 'Util/util';
+import {createRandomUuid} from 'Util/uuid';
 
 import {Conversation} from './Conversation';
 import {CallMessage} from './message/CallMessage';
