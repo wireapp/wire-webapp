@@ -19,19 +19,39 @@
 
 import {useEffect, DependencyList} from 'react';
 
-const useResizeTarget = (element: HTMLElement | null, targetElement: HTMLElement | null, deps?: DependencyList) => {
+const alignScrollBars = (shadowInput: HTMLElement, textarea: HTMLElement) => {
+  /* According to documentation (https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollHeight) scrollHeight always shows the height of an element's content,
+    including content not visible on the screen due to overflow.
+    Using scroll and hidden values, we're making sure that scroll behaves the same way on both elements
+    (overflow: auto behaviour differs on textarea and div).
+  */
+  const shouldForceScrollbar = textarea.clientHeight < textarea.scrollHeight;
+
+  shadowInput.style.overflowY = shouldForceScrollbar ? 'scroll' : 'hidden';
+  textarea.style.overflowY = shouldForceScrollbar ? 'scroll' : 'hidden';
+};
+
+const alignHeights = (shadowInput: HTMLElement, textarea: HTMLElement) => {
+  const {offsetHeight: shadowInputHeight, scrollHeight: shadowInputScrollHeight} = shadowInput;
+  const {offsetHeight: textAreaOffsetHeight} = textarea;
+
+  if (shadowInputHeight !== textAreaOffsetHeight) {
+    textarea.style.height = `${shadowInputScrollHeight}px`;
+  }
+};
+
+const useResizeTarget = (shadowInput: HTMLElement | null, textarea: HTMLElement | null, deps?: DependencyList) => {
   const resizeTarget = () => {
-    if (element && targetElement) {
-      if (!targetElement?.offsetHeight) {
+    if (shadowInput && textarea) {
+      if (!textarea?.offsetHeight) {
         return;
       }
 
-      const {offsetHeight: shadowInputHeight, scrollHeight: shadowInputScrollHeight} = element;
-      const {offsetHeight: textAreaOffsetHeight} = targetElement;
+      alignHeights(shadowInput, textarea);
+      alignScrollBars(shadowInput, textarea);
 
-      if (shadowInputHeight !== textAreaOffsetHeight) {
-        targetElement.style.height = `${shadowInputScrollHeight}px`;
-      }
+      //changing scroll appearance might change elements' height, we need to double check if their heights match
+      alignHeights(shadowInput, textarea);
     }
   };
 

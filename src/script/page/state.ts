@@ -17,7 +17,7 @@
  *
  */
 
-import create from 'zustand';
+import {create} from 'zustand';
 
 import {PanelEntity, PanelState} from './RightSidebar';
 
