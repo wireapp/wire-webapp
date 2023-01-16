@@ -17,7 +17,7 @@
  *
  */
 
-import create from 'zustand';
+import {create} from 'zustand';
 
 import {LegalHoldModalType} from 'Components/Modals/LegalHoldModal/LegalHoldModal';
 import {splitFingerprint} from 'Util/StringUtil';

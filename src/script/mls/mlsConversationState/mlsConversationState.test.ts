@@ -21,7 +21,7 @@ import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 
 import {createRandomUuid} from 'Util/util';
 
-import {mlsConversationState} from './mlsConversationState';
+import {useMLSConversationState} from './mlsConversationState';
 
 import {Conversation} from '../../entity/Conversation';
 
@@ -61,24 +61,24 @@ describe('mlsPendingStateUtil', () => {
 
   it('load initial state from localStorage when imported', async () => {
     const conversationId = 'conversation-id';
-    mlsConversationState.getState().markAsEstablished(conversationId);
+    useMLSConversationState.getState().markAsEstablished(conversationId);
 
     const loadedMlsConversationState = await import('./mlsConversationState');
 
-    expect(loadedMlsConversationState.mlsConversationState.getState().isEstablished(conversationId)).toBeTruthy();
+    expect(loadedMlsConversationState.useMLSConversationState.getState().isEstablished(conversationId)).toBeTruthy();
   });
 
   it('sends external proposal to mls conversations that the device is not part of', async () => {
     const {conversations, nbMlsConversations} = createConversations(100);
     const sendExternalProposal = jest.fn();
-    await mlsConversationState
+    await useMLSConversationState
       .getState()
       .sendExternalToPendingJoin(conversations, () => Promise.resolve(false), sendExternalProposal);
 
     expect(sendExternalProposal).toHaveBeenCalledTimes(nbMlsConversations);
 
     const sendExternalProposal2 = jest.fn();
-    await mlsConversationState
+    await useMLSConversationState
       .getState()
       .sendExternalToPendingJoin(conversations, () => Promise.resolve(false), sendExternalProposal2);
     expect(sendExternalProposal2).not.toHaveBeenCalled();
@@ -91,13 +91,13 @@ describe('mlsPendingStateUtil', () => {
       createConversation(ConversationProtocol.MLS),
     ];
     const sendExternalProposal = jest.fn();
-    const currentSize = mlsConversationState.getState().established.size;
-    await mlsConversationState
+    const currentSize = useMLSConversationState.getState().established.size;
+    await useMLSConversationState
       .getState()
       .sendExternalToPendingJoin(conversations, () => Promise.resolve(true), sendExternalProposal);
 
     expect(sendExternalProposal).not.toHaveBeenCalled();
-    expect(mlsConversationState.getState().established.size).toBe(currentSize + conversations.length);
+    expect(useMLSConversationState.getState().established.size).toBe(currentSize + conversations.length);
   });
 
   it('sends external proposal only to conversations that are not pending and not established', async () => {
@@ -108,11 +108,11 @@ describe('mlsPendingStateUtil', () => {
       createConversation(ConversationProtocol.PROTEUS),
     ];
 
-    mlsConversationState.getState().markAsEstablished(conversations[1].groupId!);
-    mlsConversationState.getState().markAsPendingWelcome(conversations[2].groupId!);
+    useMLSConversationState.getState().markAsEstablished(conversations[1].groupId!);
+    useMLSConversationState.getState().markAsPendingWelcome(conversations[2].groupId!);
 
     const sendExternalProposal = jest.fn();
-    await mlsConversationState
+    await useMLSConversationState
       .getState()
       .sendExternalToPendingJoin(conversations, () => Promise.resolve(false), sendExternalProposal);
 

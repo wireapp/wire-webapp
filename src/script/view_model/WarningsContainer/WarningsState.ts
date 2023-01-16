@@ -18,7 +18,7 @@
  */
 
 import {amplify} from 'amplify';
-import create from 'zustand';
+import {create} from 'zustand';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 

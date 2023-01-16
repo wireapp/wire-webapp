@@ -17,7 +17,7 @@
  *
  */
 
-import create from 'zustand';
+import {create} from 'zustand';
 
 import {User} from '../../../../entity/User';
 

@@ -465,7 +465,9 @@ describe.skip('E2E audio call', () => {
           convId,
           userId,
           clientid,
+          /* FIXME uncomment when avs 9 has fixed bug with starting video conversation
           CONV_TYPE.CONFERENCE,
+          */
         );
       },
     );

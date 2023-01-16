@@ -644,7 +644,9 @@ export class CallingRepository {
       this.serializeQualifiedId(conversationId),
       this.serializeQualifiedId(userId),
       conversation?.isUsingMLSProtocol ? senderClientId : clientId,
+      /* FIXME uncomment when avs 9 has fixed bug with starting video conversation
       conversation?.isUsingMLSProtocol ? CONV_TYPE.CONFERENCE_MLS : CONV_TYPE.CONFERENCE,
+      */
     );
 
     if (res !== 0) {

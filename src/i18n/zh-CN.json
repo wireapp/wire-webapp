@@ -260,7 +260,7 @@
   "clientManager.subhead": "在此设备上使用 {brandName} 之前请先移除一个设备。",
   "collectionSectionAudio": "Audio",
   "collectionSectionFiles": "文件",
-  "collectionSectionImages": "图片",
+  "collectionSectionImages": "Images",
   "collectionSectionLinks": "链接",
   "collectionShowAll": "显示所有 {{number}}",
   "connectionRequestConnect": "好友请求",

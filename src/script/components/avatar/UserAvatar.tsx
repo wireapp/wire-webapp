@@ -91,7 +91,7 @@ const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
       onClick={onAvatarInteraction}
       onKeyDown={onAvatarInteraction}
       title={name}
-      isResponsive
+      isResponsive={isResponsive}
       {...props}
     >
       <AvatarBackground backgroundColor={backgroundColor} />

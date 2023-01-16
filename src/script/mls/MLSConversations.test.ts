@@ -24,7 +24,7 @@ import {randomUUID} from 'crypto';
 import {Account} from '@wireapp/core';
 
 import {initMLSConversations, registerUninitializedConversations} from './MLSConversations';
-import {mlsConversationState} from './mlsConversationState';
+import {useMLSConversationState} from './mlsConversationState';
 
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
@@ -51,7 +51,7 @@ function createConversations(
 
 describe('MLSConversations', () => {
   beforeEach(() => {
-    jest.spyOn(mlsConversationState.getState(), 'sendExternalToPendingJoin').mockReturnValue(undefined);
+    jest.spyOn(useMLSConversationState.getState(), 'sendExternalToPendingJoin').mockReturnValue(undefined);
   });
 
   describe('initMLSConversations', () => {
@@ -65,7 +65,7 @@ describe('MLSConversations', () => {
 
       await initMLSConversations(conversations, new User(), new Account(), {} as any);
 
-      expect(mlsConversationState.getState().sendExternalToPendingJoin).toHaveBeenCalledWith(
+      expect(useMLSConversationState.getState().sendExternalToPendingJoin).toHaveBeenCalledWith(
         mlsConversations,
         expect.any(Function),
         expect.any(Function),
