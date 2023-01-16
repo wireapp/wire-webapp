@@ -124,7 +124,7 @@ import * as LegalHoldEvaluator from '../legal-hold/LegalHoldEvaluator';
 import {MessageCategory} from '../message/MessageCategory';
 import {SuperType} from '../message/SuperType';
 import {SystemMessageType} from '../message/SystemMessageType';
-import {mlsConversationState} from '../mls';
+import {useMLSConversationState} from '../mls';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {Core} from '../service/CoreSingleton';
 import type {EventRecord} from '../storage';
@@ -437,7 +437,7 @@ export class ConversationRepository {
       });
       if (isMLSConversation && conversationEntity.groupId) {
         // since we are the creator of the conversation, we can safely mark it as established
-        mlsConversationState.getState().markAsEstablished(conversationEntity.groupId);
+        useMLSConversationState.getState().markAsEstablished(conversationEntity.groupId);
       }
       return conversationEntity;
     } catch (error) {
@@ -1969,7 +1969,7 @@ export class ConversationRepository {
       ];
 
       if (type === CONVERSATION_EVENT.MLS_WELCOME_MESSAGE) {
-        mlsConversationState.getState().markAsEstablished(eventData);
+        useMLSConversationState.getState().markAsEstablished(eventData);
       }
 
       const isExpectedType = typesInSelfConversation.includes(type);
@@ -2470,11 +2470,11 @@ export class ConversationRepository {
 
     if (
       conversationEntity.groupId &&
-      !mlsConversationState.getState().isEstablished(conversationEntity.groupId) &&
+      !useMLSConversationState.getState().isEstablished(conversationEntity.groupId) &&
       (await this.core.service!.conversation.isMLSConversationEstablished(conversationEntity.groupId))
     ) {
       // If the conversation was not previously marked as established and the core if aware of this conversation, we can mark is as established
-      mlsConversationState.getState().markAsEstablished(conversationEntity.groupId);
+      useMLSConversationState.getState().markAsEstablished(conversationEntity.groupId);
     }
 
     return updateSequence
