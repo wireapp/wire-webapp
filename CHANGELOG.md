@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [38.5.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.5.2...@wireapp/core@38.5.3) (2023-01-17)
+
+### Bug Fixes
+
+* Make sessionId migration resumable ([3f57752](https://github.com/wireapp/wire-web-packages/commit/3f577528183a569f1754f4be9d622bcba1a0adc3))
+
 ## [38.5.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.5.1...@wireapp/core@38.5.2) (2023-01-17)
 
 ### Bug Fixes
