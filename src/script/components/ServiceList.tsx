@@ -25,7 +25,7 @@ import {ParticipantItem} from 'Components/list/ParticipantItem';
 import {KEY} from 'Util/KeyboardUtil';
 
 import type {ServiceEntity} from '../integration/ServiceEntity';
-import {t} from '../util/LocalizerUtil/LocalizerUtil';
+import {t} from '../util/LocalizerUtil';
 
 export interface ServiceListProps {
   services: ServiceEntity[];
