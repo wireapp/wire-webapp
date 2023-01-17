@@ -231,7 +231,7 @@
     "test": "yarn test:types && yarn test:server && yarn test:app",
     "test:app": "jest --forceExit",
     "test:server": "cd server && yarn test",
-    "test:types": "tsc --project tsconfig.test.json --noEmit && cd server && tsc --noEmit",
+    "test:types": "tsc --project tsconfig.build.json --noEmit && cd server && tsc --noEmit",
     "translate:extract": "i18next-scanner 'src/{page,script}/**/*.{js,html,htm}'",
     "translate:merge": "formatjs extract --format './bin/translations_extract_formatter.js' --out-file './src/i18n/en-US.json' './src/script/strings.ts'",
     "translate:upload": "yarn translate:merge && ts-node ./bin/translations_upload.ts",

@@ -18,8 +18,7 @@
  */
 
 import {User} from 'src/script/entity/User';
-
-import {TestFactory} from '../../helper/TestFactory';
+import {TestFactory} from 'test/helper/TestFactory';
 
 describe('SearchRepository', () => {
   const testFactory = new TestFactory();

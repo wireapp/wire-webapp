@@ -22,12 +22,12 @@ import {container} from 'tsyringe';
 
 import {getLogger, Logger} from 'Util/Logger';
 
-import type {ConversationRepository} from '../../conversation/ConversationRepository';
-import {StatusType} from '../../message/StatusType';
-import type {EventRecord} from '../../storage/record/EventRecord';
-import {UserState} from '../../user/UserState';
-import {ClientEvent} from '../Client';
-import type {EventService} from '../EventService';
+import type {ConversationRepository} from '../../../conversation/ConversationRepository';
+import {StatusType} from '../../../message/StatusType';
+import type {EventRecord} from '../../../storage/record/EventRecord';
+import {UserState} from '../../../user/UserState';
+import {ClientEvent} from '../../Client';
+import type {EventService} from '../../EventService';
 
 export class ReceiptsMiddleware {
   private readonly eventService: EventService;

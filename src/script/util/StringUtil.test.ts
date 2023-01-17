@@ -31,7 +31,7 @@ import {
   obfuscate,
 } from 'Util/StringUtil';
 
-import {lorem_ipsum} from '../../api/payloads';
+import {lorem_ipsum} from '../../../test/api/payloads';
 
 describe('StringUtil', () => {
   describe('compareTransliteration', () => {

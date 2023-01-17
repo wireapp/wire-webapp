@@ -21,18 +21,17 @@ import {Runtime} from '@wireapp/commons';
 
 import {getLogger, Logger} from 'Util/Logger';
 
-import {MediaConstraintsHandler, ScreensharingMethods} from './MediaConstraintsHandler';
-import {MEDIA_STREAM_ERROR} from './MediaStreamError';
-import {MEDIA_STREAM_ERROR_TYPES} from './MediaStreamErrorTypes';
-import {MediaType} from './MediaType';
-
-import {MediaError} from '../error/MediaError';
-import {NoAudioInputError} from '../error/NoAudioInputError';
-import {PermissionError} from '../error/PermissionError';
-import type {PermissionRepository} from '../permission/PermissionRepository';
-import {PermissionStatusState} from '../permission/PermissionStatusState';
-import {PermissionType} from '../permission/PermissionType';
-import {Warnings} from '../view_model/WarningsContainer';
+import {MediaError} from '../../error/MediaError';
+import {NoAudioInputError} from '../../error/NoAudioInputError';
+import {PermissionError} from '../../error/PermissionError';
+import type {PermissionRepository} from '../../permission/PermissionRepository';
+import {PermissionStatusState} from '../../permission/PermissionStatusState';
+import {PermissionType} from '../../permission/PermissionType';
+import {Warnings} from '../../view_model/WarningsContainer';
+import {MediaConstraintsHandler, ScreensharingMethods} from '../MediaConstraintsHandler';
+import {MEDIA_STREAM_ERROR} from '../MediaStreamError';
+import {MEDIA_STREAM_ERROR_TYPES} from '../MediaStreamErrorTypes';
+import {MediaType} from '../MediaType';
 
 export class MediaStreamHandler {
   static get CONFIG() {

@@ -30,14 +30,13 @@ import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 
-import type {PropertiesService} from './PropertiesService';
-import {PROPERTIES_TYPE} from './PropertiesType';
-
-import {Config} from '../Config';
-import type {User} from '../entity/User';
-import type {SelfService} from '../self/SelfService';
-import {ConsentValue} from '../user/ConsentValue';
-import {CONVERSATION_TYPING_INDICATOR_MODE} from '../user/TypingIndicatorMode';
+import {Config} from '../../Config';
+import type {User} from '../../entity/User';
+import type {SelfService} from '../../self/SelfService';
+import {ConsentValue} from '../../user/ConsentValue';
+import {CONVERSATION_TYPING_INDICATOR_MODE} from '../../user/TypingIndicatorMode';
+import type {PropertiesService} from '../PropertiesService';
+import {PROPERTIES_TYPE} from '../PropertiesType';
 
 export class PropertiesRepository {
   // Value names are specified by the protocol but key names can be changed.

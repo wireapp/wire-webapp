@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,23 +17,4 @@
  *
  */
 
-import {TestFactory} from '../../helper/TestFactory';
-
-describe('StorageRepository', () => {
-  const testFactory = new TestFactory();
-
-  beforeAll(() => testFactory.exposeStorageActors());
-
-  beforeEach(() => testFactory.storage_repository.clearStores());
-
-  describe('saveValue', () => {
-    it('persists primitive values in an object format', () => {
-      const primary_key = 'test_key';
-      const primitive_value = 'test_value';
-
-      return testFactory.storage_repository.saveValue(primary_key, primitive_value).then(storage_key => {
-        expect(storage_key).toBe(primary_key);
-      });
-    });
-  });
-});
+export * from './ReceiptsMiddleware';

@@ -21,8 +21,7 @@ import sinon from 'sinon';
 
 import {ConversationDatabaseData, ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {StorageSchemata} from 'src/script/storage/StorageSchemata';
-
-import {TestFactory} from '../../helper/TestFactory';
+import {TestFactory} from 'test/helper/TestFactory';
 
 describe('ConversationService', () => {
   let conversation_service = null;

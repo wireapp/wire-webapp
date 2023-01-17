@@ -26,11 +26,11 @@ import {QualifiedUserId} from '@wireapp/protocol-messaging';
 import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
-import type {ConversationRepository} from '../../conversation/ConversationRepository';
-import {EventRecord} from '../../storage/record/EventRecord';
-import type {UserRepository} from '../../user/UserRepository';
-import {UserState} from '../../user/UserState';
-import {ClientEvent} from '../Client';
+import type {ConversationRepository} from '../../../conversation/ConversationRepository';
+import {EventRecord} from '../../../storage/record/EventRecord';
+import type {UserRepository} from '../../../user/UserRepository';
+import {UserState} from '../../../user/UserState';
+import {ClientEvent} from '../../Client';
 
 interface MemberJoinEvent {
   user_ids: string[];

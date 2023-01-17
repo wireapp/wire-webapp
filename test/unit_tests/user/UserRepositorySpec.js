@@ -23,7 +23,7 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {ClientMapper} from 'src/script/client/ClientMapper';
 import {User} from 'src/script/entity/User';
 import {EventRepository} from 'src/script/event/EventRepository';
-import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
+import {PropertiesRepository} from 'src/script/properties/PropertiesRepository/PropertiesRepository';
 import {ConsentValue} from 'src/script/user/ConsentValue';
 import {UserRepository} from 'src/script/user/UserRepository';
 

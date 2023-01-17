@@ -35,7 +35,6 @@ import {CallMessage} from 'src/script/entity/message/CallMessage';
 import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {Location} from 'src/script/entity/message/Location';
-import {MediumImage} from 'src/script/entity/message/MediumImage';
 import {MemberMessage} from 'src/script/entity/message/MemberMessage';
 import {MessageTimerUpdateMessage} from 'src/script/entity/message/MessageTimerUpdateMessage';
 import {PingMessage} from 'src/script/entity/message/PingMessage';
@@ -57,6 +56,7 @@ import {createRandomUuid} from 'Util/uuid';
 
 import {entities, payload} from '../../api/payloads';
 import {TestFactory} from '../../helper/TestFactory';
+import {MediumImage} from 'src/script/entity/message/MediumImage';
 
 window.wire = window.wire || {};
 window.wire.app = window.wire.app || {};

@@ -40,7 +40,7 @@ import {ClientState} from 'src/script/client/ClientState';
 import {ConnectionRepository} from 'src/script/connection/ConnectionRepository';
 import {ConnectionService} from 'src/script/connection/ConnectionService';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
-import {ConversationService} from 'src/script/conversation/ConversationService';
+import {ConversationService} from 'src/script/conversation/ConversationService/ConversationService';
 import {ConversationState} from 'src/script/conversation/ConversationState';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
 import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';

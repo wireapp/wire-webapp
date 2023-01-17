@@ -26,13 +26,12 @@ import {Declension, getUserName, joinNames, replaceLink, t} from 'Util/Localizer
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 
-import {SystemMessage} from './SystemMessage';
-
-import {Config} from '../../Config';
-import {ClientEvent} from '../../event/Client';
-import {SuperType} from '../../message/SuperType';
-import {SystemMessageType} from '../../message/SystemMessageType';
-import {User} from '../User';
+import {Config} from '../../../Config';
+import {ClientEvent} from '../../../event/Client';
+import {SuperType} from '../../../message/SuperType';
+import {SystemMessageType} from '../../../message/SystemMessageType';
+import {User} from '../../User';
+import {SystemMessage} from '../SystemMessage';
 
 export class MemberMessage extends SystemMessage {
   public allTeamMembers: User[];

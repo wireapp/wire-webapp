@@ -46,14 +46,14 @@ import {container} from 'tsyringe';
 
 import {getLogger, Logger} from 'Util/Logger';
 
-import type {Conversation as ConversationEntity} from '../entity/Conversation';
-import type {EventService} from '../event/EventService';
-import {MessageCategory} from '../message/MessageCategory';
-import {search as fullTextSearch} from '../search/FullTextSearch';
-import {APIClient} from '../service/APIClientSingleton';
-import {StorageService} from '../storage';
-import {ConversationRecord} from '../storage/record/ConversationRecord';
-import {StorageSchemata} from '../storage/StorageSchemata';
+import type {Conversation as ConversationEntity} from '../../entity/Conversation';
+import type {EventService} from '../../event/EventService';
+import {MessageCategory} from '../../message/MessageCategory';
+import {search as fullTextSearch} from '../../search/FullTextSearch';
+import {APIClient} from '../../service/APIClientSingleton';
+import {StorageService} from '../../storage';
+import {ConversationRecord} from '../../storage/record/ConversationRecord';
+import {StorageSchemata} from '../../storage/StorageSchemata';
 
 export class ConversationService {
   private readonly eventService: EventService;
