@@ -48,7 +48,6 @@ import {ClientEvent} from 'src/script/event/Client';
 import {arrayToBase64} from 'Util/util';
 import {createRandomUuid} from 'Util/uuid';
 
-//@ts-nocheck
 
 describe('CryptographyMapper', () => {
   const mapper = new CryptographyMapper();
