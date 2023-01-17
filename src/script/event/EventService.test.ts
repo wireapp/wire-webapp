@@ -17,6 +17,6 @@
  *
  */
 
-import {testEventServiceClass} from './EventServiceCommon';
+import {testEventServiceClass} from '../../../test/unit_tests/event/EventServiceCommon';
 
-testEventServiceClass('event_service_no_compound', 'EventServiceNoCompound');
+testEventServiceClass('event_service', 'EventService');
