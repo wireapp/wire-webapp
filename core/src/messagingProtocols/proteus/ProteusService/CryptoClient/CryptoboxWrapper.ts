@@ -30,8 +30,9 @@ type Config = {
 
 export function buildClient(storeEngine: CRUDEngine, config: Config & {nbPrekeys: number}) {
   const cryptobox = new Cryptobox(storeEngine, config.nbPrekeys);
-  return new CryptoboxWrapper(cryptobox, {onNewPrekeys: () => {}});
+  return new CryptoboxWrapper(cryptobox, config);
 }
+
 export class CryptoboxWrapper implements CryptoClient {
   constructor(private readonly cryptobox: Cryptobox, config: Config) {
     this.cryptobox.on(Cryptobox.TOPIC.NEW_PREKEYS, prekeys => {
