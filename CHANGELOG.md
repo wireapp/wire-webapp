@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [38.5.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.5.1...@wireapp/core@38.5.2) (2023-01-17)
+
+### Bug Fixes
+
+* Do call onNewPrekeys handler on cryptobox wrapper ([#4789](https://github.com/wireapp/wire-web-packages/issues/4789)) ([973624e](https://github.com/wireapp/wire-web-packages/commit/973624e059c9e49d4dd4edc452c266d1fa2d534f))
+
 ## [38.5.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.5.0...@wireapp/core@38.5.1) (2023-01-12)
 
 ### Bug Fixes
