@@ -27,9 +27,10 @@ import {Runtime} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Declension, t, getUserName} from 'Util/LocalizerUtil';
+import {Declension, t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {getRenderedTextContent} from 'Util/messageRenderer';
+import {getUserName} from 'Util/SanitizationUtil';
 import {truncate} from 'Util/StringUtil';
 import {formatDuration, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {ValidationUtilError} from 'Util/ValidationUtil';

@@ -23,7 +23,8 @@ import ko from 'knockout';
 
 import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
-import {t, getUserName} from 'Util/LocalizerUtil';
+import {t} from 'Util/LocalizerUtil';
+import {getUserName} from 'Util/SanitizationUtil';
 import {formatDateNumeral, formatDurationCaption, formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {CallingTimeoutMessage} from './CallingTimeoutMessage';
