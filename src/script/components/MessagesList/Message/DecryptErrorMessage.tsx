@@ -52,20 +52,24 @@ const DecryptErrorMessage: React.FC<DecryptErrorMessageProps> = ({message, onCli
         <div className="message-header-icon">
           <span className="icon-sysmsg-error text-red" />
         </div>
-        <div className="message-header-label ellipsis">
-          <span dangerouslySetInnerHTML={{__html: caption}} />
-          <span>&nbsp;</span>
-          <a
-            className="accent-text"
-            href={link}
-            rel="nofollow noopener noreferrer"
-            target="_blank"
-            data-uie-name="go-decrypt-error-link"
-          >
-            {t('conversationUnableToDecryptLink')}
-          </a>
+
+        <div className="message-header-label">
+          <p>
+            <span dangerouslySetInnerHTML={{__html: caption}} />
+            <span>&nbsp;</span>
+            <a
+              className="accent-text"
+              href={link}
+              rel="nofollow noopener noreferrer"
+              target="_blank"
+              data-uie-name="go-decrypt-error-link"
+            >
+              {t('conversationUnableToDecryptLink')}
+            </a>
+          </p>
         </div>
       </div>
+
       <div className="message-body message-body-decrypt-error">
         <p className="message-header-decrypt-error-label" data-uie-name="status-decrypt-error">
           {message.code && (
@@ -81,6 +85,7 @@ const DecryptErrorMessage: React.FC<DecryptErrorMessageProps> = ({message, onCli
             </>
           )}
         </p>
+
         {message.isRecoverable && (
           <div className="message-header-decrypt-reset-session">
             {isResettingSession ? (
