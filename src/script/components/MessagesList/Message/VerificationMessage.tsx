@@ -63,7 +63,7 @@ const VerificationMessage: React.FC<VerificationMessageProps> = ({message}) => {
         <VerifiedIcon isVerified={isTypeVerified} />
       </div>
       <div
-        className="message-header-label"
+        className="message-header-label message-header-label--verification"
         data-uie-name="element-message-verification"
         data-uie-value={verificationMessageType}
       >
@@ -71,7 +71,7 @@ const VerificationMessage: React.FC<VerificationMessageProps> = ({message}) => {
         {isTypeUnverified && (
           <>
             <span className="message-header-sender-name">{unsafeSenderName}</span>
-            <span className="ellipsis">{t('conversationDeviceUnverified')}</span>
+            <span>{t('conversationDeviceUnverified')}</span>
             <button
               type="button"
               className="button-reset-default message-verification-action accent-text"
@@ -87,7 +87,7 @@ const VerificationMessage: React.FC<VerificationMessageProps> = ({message}) => {
         {isTypeNewDevice && (
           <>
             <span className="message-header-plain-sender-name">{nameList}</span>
-            <span className="ellipsis">
+            <span>
               {hasMultipleUsers ? t('conversationDeviceStartedUsingMany') : t('conversationDeviceStartedUsingOne')}
             </span>
             <button
@@ -102,7 +102,7 @@ const VerificationMessage: React.FC<VerificationMessageProps> = ({message}) => {
         )}
         {isTypeNewMember && (
           <>
-            <span className="ellipsis">{t('conversationDeviceNewPeopleJoined')}</span>
+            <span>{t('conversationDeviceNewPeopleJoined')}</span>
             &nbsp;
             <button
               type="button"
