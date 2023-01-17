@@ -127,18 +127,30 @@ export class EventService {
 
     try {
       if (this.storageService.db) {
-        const entry = await this.storageService.db
+        let entry = await this.storageService.db
           .table(StorageSchemata.OBJECT_STORE.EVENTS)
           .where('id')
           .equals(eventId)
           .filter(record => record.conversation === conversationId)
           .first();
+        if (!entry) {
+          entry = await this.storageService.db
+            .table(StorageSchemata.OBJECT_STORE.EVENTS)
+            .where('conversation')
+            .equals(conversationId)
+            .filter(item => item.data.replacing_message_id === eventId)
+            .first();
+        }
         return entry;
       }
 
       const records = (await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS)) as EventRecord[];
       return records
-        .filter(record => record.id === eventId && record.conversation === conversationId)
+        .filter(
+          record =>
+            (record.id === eventId && record.conversation === conversationId) ||
+            (record.id === eventId && record.data.replacing_message_id === eventId),
+        )
         .sort(compareEventsById)
         .shift();
     } catch (error) {
