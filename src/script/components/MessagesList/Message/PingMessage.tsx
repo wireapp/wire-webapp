@@ -34,7 +34,7 @@ export interface PingMessageProps {
   isLastDeliveredMessage: boolean;
   message: PingMessageEntity;
   onClickReceipts?: (message: Message) => void;
-  focusConversation: boolean;
+  isMessageFocused: boolean;
 }
 
 const PingMessage: React.FC<PingMessageProps> = ({
@@ -42,7 +42,7 @@ const PingMessage: React.FC<PingMessageProps> = ({
   is1to1Conversation,
   isLastDeliveredMessage,
   onClickReceipts,
-  focusConversation,
+  isMessageFocused,
 }) => {
   const {unsafeSenderName, caption, timestamp, ephemeral_caption, isObfuscated, get_icon_classes} =
     useKoSubscribableChildren(message, [
@@ -59,7 +59,7 @@ const PingMessage: React.FC<PingMessageProps> = ({
       <div className="message-header-icon">
         <div className={`icon-ping ${get_icon_classes}`} />
       </div>
-      <p
+      <div
         className={cx('message-header-label', {
           'ephemeral-message-obfuscated': isObfuscated,
         })}
@@ -70,7 +70,7 @@ const PingMessage: React.FC<PingMessageProps> = ({
           <span className="message-header-sender-name">{unsafeSenderName}</span>
           <span className="ellipsis">{caption}</span>
         </p>
-      </p>
+      </div>
       <div className="message-body-actions">
         <MessageTime timestamp={timestamp} data-uie-uid={message.id} data-uie-name="item-message-call-timestamp" />
         <ReadReceiptStatus
@@ -78,7 +78,7 @@ const PingMessage: React.FC<PingMessageProps> = ({
           is1to1Conversation={is1to1Conversation}
           isLastDeliveredMessage={isLastDeliveredMessage}
           onClickReceipts={onClickReceipts}
-          focusConversation={focusConversation}
+          isMessageFocused={isMessageFocused}
         />
       </div>
     </div>

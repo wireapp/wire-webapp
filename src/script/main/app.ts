@@ -23,6 +23,7 @@ import 'core-js/full/reflect';
 
 import {Context} from '@wireapp/api-client/lib/auth';
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
+import {EVENTS as CoreEvents} from '@wireapp/core/lib/Account';
 import {amplify} from 'amplify';
 import Dexie from 'dexie';
 import platform from 'platform';
@@ -38,10 +39,7 @@ import {getLogger, Logger} from 'Util/Logger';
 import {includesString} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {appendParameter} from 'Util/UrlUtil';
-import {checkIndexedDb, createRandomUuid, supportsMLS} from 'Util/util';
-
-import {migrateToQualifiedSessionIds} from './sessionIdMigrator';
-import {SingleInstanceHandler} from './SingleInstanceHandler';
+import {checkIndexedDb, supportsMLS} from 'Util/util';
 
 import '../../style/default.less';
 import {AssetRepository} from '../assets/AssetRepository';
@@ -53,8 +51,7 @@ import {BackupRepository} from '../backup/BackupRepository';
 import {BackupService} from '../backup/BackupService';
 import {CacheRepository} from '../cache/CacheRepository';
 import {CallingRepository} from '../calling/CallingRepository';
-import {ClientRepository} from '../client/ClientRepository';
-import {ClientService} from '../client/ClientService';
+import {ClientRepository, ClientService} from '../client';
 import {Configuration} from '../Config';
 import {ConnectionRepository} from '../connection/ConnectionRepository';
 import {ConnectionService} from '../connection/ConnectionService';
@@ -62,7 +59,7 @@ import {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationService} from '../conversation/ConversationService';
 import {MessageRepository} from '../conversation/MessageRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
-import {AccessTokenError, ACCESS_TOKEN_ERROR_TYPE} from '../error/AccessTokenError';
+import {AccessTokenError} from '../error/AccessTokenError';
 import {AuthError} from '../error/AuthError';
 import {BaseError} from '../error/BaseError';
 import {ClientError, CLIENT_ERROR_TYPE} from '../error/ClientError';
@@ -139,7 +136,6 @@ export class App {
   repository: ViewModelRepositories = {} as ViewModelRepositories;
   debug?: DebugUtil;
   util?: {debug: DebugUtil};
-  singleInstanceHandler: SingleInstanceHandler;
 
   static get CONFIG() {
     return {
@@ -187,9 +183,6 @@ export class App {
         this.util = {debug: this.debug}; // Alias for QA
       });
     }
-
-    const onExtraInstanceStarted = () => this._redirectToLogin(SIGN_OUT_REASON.MULTIPLE_TABS);
-    this.singleInstanceHandler = new SingleInstanceHandler(onExtraInstanceStarted);
 
     this._subscribeToEvents();
     this.initServiceWorker();
@@ -320,21 +313,7 @@ export class App {
    * Subscribe to amplify events.
    */
   private _subscribeToEvents() {
-    amplify.subscribe(WebAppEvents.LIFECYCLE.REFRESH, this.refresh);
     amplify.subscribe(WebAppEvents.LIFECYCLE.SIGN_OUT, this.logout);
-    amplify.subscribe(WebAppEvents.CONNECTION.ACCESS_TOKEN.RENEW, async (source: string) => {
-      this.logger.info(`Access token refresh triggered by "${source}"...`);
-      try {
-        await this.apiClient.transport.http.refreshAccessToken();
-        amplify.publish(WebAppEvents.CONNECTION.ACCESS_TOKEN.RENEWED);
-        this.logger.info(`Refreshed access token.`);
-      } catch (error) {
-        if (error instanceof BaseError) {
-          this.logger.warn(`Logging out user because access token cannot be refreshed: ${error.message}`, error);
-        }
-        this.logout(SIGN_OUT_REASON.NOT_SIGNED_IN, false);
-      }
-    });
   }
 
   //##############################################################################
@@ -359,8 +338,6 @@ export class App {
     const platformCssClass = Runtime.isDesktopApp() ? 'platform-electron' : 'platform-web';
     document.body.classList.add(osCssClass, platformCssClass);
 
-    const isReload = this._isReload();
-    this.logger.debug(`App init starts (isReload: '${isReload}')`);
     new ThemeViewModel(this.repository.properties);
     const telemetry = new AppInitTelemetry();
 
@@ -378,29 +355,27 @@ export class App {
         user: userRepository,
       } = this.repository;
       await checkIndexedDb();
-      this._registerSingleInstance();
       onProgress(2.5);
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
 
-      let context: Context;
       try {
-        context = await this.core.init(clientType, {
-          onNewClient({userId, clientId, domain}) {
-            const qualifiedId = {domain: domain ?? '', id: userId};
-            const newClient = {class: ClientClassification.UNKNOWN, id: clientId};
-            userRepository.addClientToUser(qualifiedId, newClient, true);
-          },
-        });
+        await this.core.init(clientType);
       } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : error;
+        this.logger.error(`Error when initializing core: "${errorMessage}"`, error);
+        throw new AccessTokenError(AccessTokenError.TYPE.REQUEST_FORBIDDEN, 'Session has expired');
+      }
+      const localClient = await this.core.initClient();
+      if (!localClient) {
         throw new ClientError(CLIENT_ERROR_TYPE.NO_VALID_CLIENT, 'Client has been deleted on backend');
       }
 
-      const selfUser = await this.initiateSelfUser();
+      this.core.on(CoreEvents.NEW_SESSION, ({userId, clientId}) => {
+        const newClient = {class: ClientClassification.UNKNOWN, id: clientId};
+        userRepository.addClientToUser(userId, newClient, true);
+      });
 
-      if (this.apiClient.backendFeatures.isFederated && this.repository.storage.storageService.db && context.domain) {
-        // Migrate all existing session to fully qualified ids (if need be)
-        await migrateToQualifiedSessionIds(this.repository.storage.storageService.db.sessions, context.domain);
-      }
+      const selfUser = await this.initiateSelfUser();
 
       onProgress(5, t('initReceivedSelfUser', selfUser.name()));
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_SELF_USER);
@@ -487,7 +462,7 @@ export class App {
       return selfUser;
     } catch (error) {
       if (error instanceof BaseError) {
-        this._appInitFailure(error, isReload);
+        this._appInitFailure(error);
         return undefined;
       }
       throw error;
@@ -505,66 +480,47 @@ export class App {
     }
   }
 
-  private _appInitFailure(error: BaseError, isReload: boolean) {
+  private _appInitFailure(error: BaseError) {
+    const {message, type} = error;
     let logMessage = `Could not initialize app version '${Environment.version(false)}'`;
 
     if (Runtime.isDesktopApp()) {
       logMessage += ` - Electron '${platform.os?.family}' '${Environment.version()}'`;
     }
 
-    this.logger.warn(`${logMessage}: ${error.message}`, {error});
+    this.logger.warn(`${logMessage}: ${message}`, {error});
 
-    const {message, type} = error;
     const isAuthError = error instanceof AuthError;
     if (isAuthError) {
       const isTypeMultipleTabs = type === AuthError.TYPE.MULTIPLE_TABS;
       const signOutReason = isTypeMultipleTabs ? SIGN_OUT_REASON.MULTIPLE_TABS : SIGN_OUT_REASON.INDEXED_DB;
-      return this._redirectToLogin(signOutReason);
-    }
-
-    this.logger.debug(
-      `App reload: '${isReload}', Document referrer: '${document.referrer}', Location: '${window.location.href}'`,
-    );
-    if (isReload) {
-      const isSessionExpired = [AccessTokenError.TYPE.REQUEST_FORBIDDEN, AccessTokenError.TYPE.NOT_FOUND_IN_CACHE];
-
-      if (isSessionExpired.includes(type as ACCESS_TOKEN_ERROR_TYPE)) {
-        this.logger.warn(`Session expired on page reload: ${message}`, error);
-        return this._redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED);
-      }
-
-      const isAccessTokenError = error instanceof AccessTokenError;
-      const isInvalidClient = type === ClientError.TYPE.NO_VALID_CLIENT;
-
-      if (isInvalidClient) {
-        return this._redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED);
-      }
-
-      if (isAccessTokenError) {
-        this.logger.warn('Connectivity issues. Trigger reload.', error);
-        return window.location.reload();
-      }
+      return this.redirectToLogin(signOutReason);
     }
 
     if (navigator.onLine === true) {
+      const isReload = this._isReload();
       switch (type) {
         case CLIENT_ERROR_TYPE.NO_VALID_CLIENT: {
-          this.logger.warn(`Redirecting to login: ${error.message}`, error);
-          return this._redirectToLogin(SIGN_OUT_REASON.CLIENT_REMOVED);
+          this.logger.warn(`Redirecting to login: ${message}`, error);
+          return isReload
+            ? this.redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED)
+            : this.redirectToLogin(SIGN_OUT_REASON.CLIENT_REMOVED);
         }
         case AccessTokenError.TYPE.NOT_FOUND_IN_CACHE:
         case AccessTokenError.TYPE.RETRIES_EXCEEDED:
         case AccessTokenError.TYPE.REQUEST_FORBIDDEN: {
-          this.logger.warn(`Redirecting to login: ${error.message}`, error);
-          return this._redirectToLogin(SIGN_OUT_REASON.NOT_SIGNED_IN);
+          this.logger.warn(`Redirecting to login: ${message}`, error);
+          return isReload
+            ? this.redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED)
+            : this.redirectToLogin(SIGN_OUT_REASON.NOT_SIGNED_IN);
         }
         case TeamError.TYPE.NO_APP_CONFIG: {
-          this.logger.warn(`Logging out user: ${error.message}`, error);
-          return this._redirectToLogin(SIGN_OUT_REASON.NO_APP_CONFIG);
+          this.logger.warn(`Logging out user: ${message}`, error);
+          return this.redirectToLogin(SIGN_OUT_REASON.NO_APP_CONFIG);
         }
 
         default: {
-          this.logger.error(`Caused by: ${(error ? error.message : undefined) || error}`, error);
+          this.logger.error(`Caused by: ${message || error}`, error);
 
           const isAccessTokenError = error instanceof AccessTokenError;
           if (isAccessTokenError) {
@@ -633,27 +589,6 @@ export class App {
     return window.performance.navigation.type === NAVIGATION_TYPE_RELOAD;
   }
 
-  //##############################################################################
-  // Multiple tabs check
-  //##############################################################################
-
-  /**
-   * Check that this is the single instance tab of the app.
-   * @returns Resolves when page is the first tab
-   */
-  private _registerSingleInstance(): void {
-    const instanceId = createRandomUuid();
-
-    if (this.singleInstanceHandler.registerInstance(instanceId)) {
-      return this._registerSingleInstanceCleaning();
-    }
-    throw new AuthError(AuthError.TYPE.MULTIPLE_TABS, AuthError.MESSAGE.MULTIPLE_TABS);
-  }
-
-  private _registerSingleInstanceCleaning() {
-    window.addEventListener('beforeunload', () => this.singleInstanceHandler.deregisterInstance());
-  }
-
   /**
    * Subscribe to 'beforeunload' to stop calls and disconnect the WebSocket.
    */
@@ -698,7 +633,7 @@ export class App {
     this.isLoggingOut = true;
     const _redirectToLogin = () => {
       amplify.publish(WebAppEvents.LIFECYCLE.SIGNED_OUT, clearData);
-      this._redirectToLogin(signOutReason);
+      this.redirectToLogin(signOutReason);
     };
 
     const _logout = async () => {
@@ -788,7 +723,7 @@ export class App {
   /**
    * Refresh the web app or desktop wrapper
    */
-  private readonly refresh = (): void => {
+  readonly refresh = (): void => {
     this.logger.info('Refresh to update started');
     if (Runtime.isDesktopApp()) {
       // if we are in a desktop env, we just warn the wrapper that we need to reload. It then decide what should be done
@@ -811,7 +746,7 @@ export class App {
    * Redirect to the login page after internet connectivity has been verified.
    * @param signOutReason Redirect triggered by session expiration
    */
-  private _redirectToLogin(signOutReason: SIGN_OUT_REASON): void {
+  redirectToLogin(signOutReason: SIGN_OUT_REASON): void {
     this.logger.info(`Redirecting to login after connectivity verification. Reason: ${signOutReason}`);
     const isTemporaryGuestReason = App.CONFIG.SIGN_OUT_REASONS.TEMPORARY_GUEST.includes(signOutReason);
     const isLeavingGuestRoom = isTemporaryGuestReason && this.repository.user['userState'].isTemporaryGuest();

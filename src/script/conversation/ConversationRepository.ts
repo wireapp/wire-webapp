@@ -123,7 +123,7 @@ import * as LegalHoldEvaluator from '../legal-hold/LegalHoldEvaluator';
 import {MessageCategory} from '../message/MessageCategory';
 import {SuperType} from '../message/SuperType';
 import {SystemMessageType} from '../message/SystemMessageType';
-import {mlsConversationState} from '../mls';
+import {useMLSConversationState} from '../mls';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {Core} from '../service/CoreSingleton';
 import type {EventRecord} from '../storage';
@@ -436,7 +436,7 @@ export class ConversationRepository {
       });
       if (isMLSConversation && conversationEntity.groupId) {
         // since we are the creator of the conversation, we can safely mark it as established
-        mlsConversationState.getState().markAsEstablished(conversationEntity.groupId);
+        useMLSConversationState.getState().markAsEstablished(conversationEntity.groupId);
       }
       return conversationEntity;
     } catch (error) {
@@ -561,7 +561,7 @@ export class ConversationRepository {
   public async getPrecedingMessages(conversationEntity: Conversation): Promise<ContentMessage[]> {
     conversationEntity.is_pending(true);
 
-    const firstMessageEntity = conversationEntity.getFirstMessage();
+    const firstMessageEntity = conversationEntity.getOldestMessage();
     const upperBound =
       firstMessageEntity && firstMessageEntity.timestamp()
         ? new Date(firstMessageEntity.timestamp())
@@ -588,7 +588,7 @@ export class ConversationRepository {
     conversationEntity.hasAdditionalMessages(hasAdditionalMessages);
 
     if (!hasAdditionalMessages) {
-      const firstMessage = conversationEntity.getFirstMessage();
+      const firstMessage = conversationEntity.getOldestMessage();
       const checkCreationMessage = isMemberMessage(firstMessage) && firstMessage?.isCreation();
       if (checkCreationMessage) {
         const groupCreationMessageIn1to1 = conversationEntity.is1to1() && firstMessage?.isGroupCreation();
@@ -724,7 +724,7 @@ export class ConversationRepository {
    * @param conversationEntity Conversation to start from
    */
   private async getUnreadEvents(conversationEntity: Conversation): Promise<void> {
-    const first_message = conversationEntity.getFirstMessage();
+    const first_message = conversationEntity.getOldestMessage();
     const lower_bound = new Date(conversationEntity.last_read_timestamp());
     const upper_bound = first_message
       ? new Date(first_message.timestamp())
@@ -1968,7 +1968,7 @@ export class ConversationRepository {
       ];
 
       if (type === CONVERSATION_EVENT.MLS_WELCOME_MESSAGE) {
-        mlsConversationState.getState().markAsEstablished(eventData);
+        useMLSConversationState.getState().markAsEstablished(eventData);
       }
 
       const isExpectedType = typesInSelfConversation.includes(type);
@@ -2469,11 +2469,11 @@ export class ConversationRepository {
 
     if (
       conversationEntity.groupId &&
-      !mlsConversationState.getState().isEstablished(conversationEntity.groupId) &&
+      !useMLSConversationState.getState().isEstablished(conversationEntity.groupId) &&
       (await this.core.service!.conversation.isMLSConversationEstablished(conversationEntity.groupId))
     ) {
       // If the conversation was not previously marked as established and the core if aware of this conversation, we can mark is as established
-      mlsConversationState.getState().markAsEstablished(conversationEntity.groupId);
+      useMLSConversationState.getState().markAsEstablished(conversationEntity.groupId);
     }
 
     return updateSequence
@@ -2639,7 +2639,7 @@ export class ConversationRepository {
        *
        * Our assumption is that the `_handleAssetUpdate` function (invoked by `notificationsQueue.subscribe`) is executed before this function.
        */
-      return conversationEntity.updateTimestamps(conversationEntity.getLastMessage(), true);
+      return conversationEntity.updateTimestamps(conversationEntity.getNewestMessage(), true);
     }
 
     if (!allowsAllFiles()) {

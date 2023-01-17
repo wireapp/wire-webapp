@@ -21,10 +21,11 @@ import type {Self} from '@wireapp/api-client/lib/self/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {SelfActionCreator} from './creator/';
-
-import {mockStoreFactory} from '../../util/test/mockStoreFactory';
+import {WebSocketAction} from './WebSocketAction';
 
 import {actionRoot} from '.';
+
+import {mockStoreFactory} from '../../util/test/mockStoreFactory';
 
 describe('SelfAction', () => {
   it('fetches the self user', async () => {
@@ -151,6 +152,7 @@ describe('SelfAction', () => {
     const mockedApiClient = {
       api: {auth: {putEmail: () => Promise.resolve()}},
     };
+    jest.spyOn(WebSocketAction, 'listen').mockReturnValue({type: 'websocket-listen'} as any);
 
     const store = mockStoreFactory({
       apiClient: mockedApiClient,
@@ -160,6 +162,7 @@ describe('SelfAction', () => {
     expect(store.getActions()).toEqual([
       SelfActionCreator.startSetSelfEmail(),
       SelfActionCreator.successfulSetSelfEmail(email),
+      WebSocketAction.listen(),
     ]);
   });
 

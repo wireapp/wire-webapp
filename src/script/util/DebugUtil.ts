@@ -28,25 +28,22 @@ import {
 } from '@wireapp/api-client/lib/event/';
 import type {Notification} from '@wireapp/api-client/lib/notification/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
-import {isQualifiedId} from '@wireapp/core/lib/util';
+import {DatabaseKeys} from '@wireapp/core/lib/notification/NotificationDatabaseRepository';
 import Dexie from 'dexie';
 import {container} from 'tsyringe';
 
-import {util as ProteusUtil} from '@wireapp/proteus';
-
 import {getLogger, Logger} from 'Util/Logger';
 
-import {arrayToBase64, createRandomUuid, downloadFile} from './util';
+import {createRandomUuid} from './util';
 
 import {CallingRepository} from '../calling/CallingRepository';
 import {CallState} from '../calling/CallState';
-import {ClientRepository} from '../client/ClientRepository';
+import {ClientRepository} from '../client';
 import {ClientState} from '../client/ClientState';
 import {ConnectionRepository} from '../connection/ConnectionRepository';
 import {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationState} from '../conversation/ConversationState';
 import type {MessageRepository} from '../conversation/MessageRepository';
-import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {EventRepository} from '../event/EventRepository';
@@ -58,11 +55,6 @@ import {UserRepository} from '../user/UserRepository';
 import {UserState} from '../user/UserState';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
 
-function downloadText(text: string, filename: string = 'default.txt'): number {
-  const url = `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`;
-  return downloadFile(url, filename);
-}
-
 export class DebugUtil {
   private readonly logger: Logger;
   private readonly callingRepository: CallingRepository;
@@ -70,7 +62,6 @@ export class DebugUtil {
   private readonly connectionRepository: ConnectionRepository;
   /** Used by QA test automation. */
   public readonly conversationRepository: ConversationRepository;
-  private readonly cryptographyRepository: CryptographyRepository;
   private readonly eventRepository: EventRepository;
   private readonly storageRepository: StorageRepository;
   private readonly messageRepository: MessageRepository;
@@ -91,12 +82,11 @@ export class DebugUtil {
     this.$ = $;
     this.Dexie = Dexie;
 
-    const {calling, client, connection, conversation, cryptography, event, user, storage, message} = repositories;
+    const {calling, client, connection, conversation, event, user, storage, message} = repositories;
     this.callingRepository = calling;
     this.clientRepository = client;
     this.conversationRepository = conversation;
     this.connectionRepository = connection;
-    this.cryptographyRepository = cryptography;
     this.eventRepository = event;
     this.storageRepository = storage;
     this.userRepository = user;
@@ -105,32 +95,31 @@ export class DebugUtil {
     this.logger = getLogger('DebugUtil');
   }
 
+  breakLastNotificationId() {
+    return this.storageRepository.storageService.update(
+      StorageSchemata.OBJECT_STORE.AMPLIFY,
+      DatabaseKeys.PRIMARY_KEY_LAST_NOTIFICATION,
+      {value: createRandomUuid(1)},
+    );
+  }
+
   /** Used by QA test automation. */
   blockAllConnections(): Promise<void[]> {
     const blockUsers = this.userState.users().map(userEntity => this.connectionRepository.blockUser(userEntity));
     return Promise.all(blockUsers);
   }
 
+  async resetIdentity(): Promise<void> {
+    const proteusService = this.core.service!.proteus;
+    await proteusService['cryptoClient'].debugResetIdentity();
+  }
+
   /** Used by QA test automation. */
   async breakSession(userId: string | QualifiedId, clientId: string): Promise<void> {
-    const qualifiedId = isQualifiedId(userId) ? userId : {domain: '', id: userId};
-    const sessionId = this.core.service!.cryptography.constructSessionId(qualifiedId, clientId);
-    const cryptobox = this.cryptographyRepository.cryptographyService.cryptobox;
-    const cryptoboxSession = await cryptobox.session_load(sessionId);
-    cryptoboxSession.session.session_states = {};
-
-    const record = {
-      created: Date.now(),
-      id: sessionId,
-      serialised: arrayToBase64(cryptoboxSession.session.serialise()),
-      version: 'broken_by_qa',
-    };
-
-    cryptobox['cachedSessions'].set(sessionId, cryptoboxSession);
-
-    const sessionStoreName = StorageSchemata.OBJECT_STORE.SESSIONS;
-    await this.storageRepository.storageService.update(sessionStoreName, sessionId, record);
-    this.logger.log(`Corrupted Session ID '${sessionId}'`);
+    const proteusService = this.core.service!.proteus;
+    const qualifiedId = typeof userId === 'string' ? {domain: '', id: userId} : userId;
+    const sessionId = proteusService.constructSessionId(qualifiedId, clientId);
+    await proteusService['cryptoClient'].debugBreakSession(sessionId);
   }
 
   /** Used by QA test automation. */
@@ -172,6 +161,7 @@ export class DebugUtil {
     };
   }
 
+  /** Used by QA test automation. */
   isSendingMessage(): boolean {
     return this.core.service!.conversation.isSendingMessage();
   }
@@ -247,19 +237,6 @@ export class DebugUtil {
     this.logger.warn(`From: ${debugInformation.user.name()}`, debugInformation.user);
 
     return debugInformation;
-  }
-
-  async exportCryptobox(): Promise<void> {
-    const clientId = this.clientState.currentClient().id;
-    const userId = this.userState.self().id;
-    const fileName = `cryptobox-${userId}-${clientId}.json`;
-    const cryptobox = await this.cryptographyRepository.cryptographyService.cryptobox.serialize();
-    downloadText(JSON.stringify(cryptobox), fileName);
-  }
-
-  /** Used by QA test automation. */
-  isLibsodiumUsingWASM(): Promise<boolean> {
-    return ProteusUtil.WASMUtil.isUsingWASM();
   }
 
   /** Used by QA test automation. */

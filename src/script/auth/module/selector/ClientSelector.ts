@@ -22,12 +22,10 @@ import {ClientType, RegisteredClient} from '@wireapp/api-client/lib/client/';
 import type {RootState} from '../reducer';
 
 export const getClients = (state: RootState) => state.clientState.clients || [];
-export const getCurrentSelfClient = (state: RootState): RegisteredClient => state.clientState.currentClient;
+export const getCurrentSelfClient = (state: RootState): RegisteredClient | null => state.clientState.currentClient;
+export const hasLoadedClients = (state: RootState) => state.clientState.clients !== null;
 export const isNewCurrentSelfClient = (state: RootState): boolean => state.clientState.isNewClient;
 export const getPermanentClients = (state: RootState) =>
   getClients(state).filter(client => client.type === ClientType.PERMANENT) || [];
-export const getTemporaryClients = (state: RootState) =>
-  getClients(state).filter(client => client.type === ClientType.TEMPORARY) || [];
 export const getError = (state: RootState) => state.clientState.error;
 export const isFetching = (state: RootState) => state.clientState.fetching;
-export const hasHistory = (state: RootState) => state.clientState.hasHistory;

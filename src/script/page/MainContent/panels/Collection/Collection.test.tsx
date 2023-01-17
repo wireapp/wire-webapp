@@ -151,8 +151,8 @@ describe('Collection', () => {
       const input = getByTestId('full-search-header-input');
       fireEvent.change(input, {target: {value: 'term'}});
       jest.advanceTimersByTime(500);
-      await waitFor(() => expect(mockConversationRepository.searchInConversation).toHaveBeenCalled());
     });
+    await waitFor(() => expect(mockConversationRepository.searchInConversation).toHaveBeenCalled());
 
     expect(queryByText('CollectionTime')).toBeNull();
   });

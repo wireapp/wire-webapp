@@ -19,6 +19,7 @@
 
 import React, {ChangeEvent, useId, useState} from 'react';
 
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 
 import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
@@ -186,9 +187,10 @@ const ParticipantItem = <UserType extends User | ServiceEntity>(
                   </div>
                 )}
               </div>
+
               {showDropdown && (
                 <button
-                  tabIndex={-1}
+                  tabIndex={TabIndex.UNFOCUSABLE}
                   className="participant-item__content__chevron"
                   onClick={event => onContextMenu(event as unknown as React.MouseEvent<HTMLDivElement>)}
                   type="button"
@@ -224,7 +226,9 @@ const ParticipantItem = <UserType extends User | ServiceEntity>(
             )}
 
             {isUser && isSelfVerified && isVerified && (
-              <Icon.Verified className="verified-icon" data-uie-name="status-verified" />
+              <span className="verified-icon">
+                <Icon.Verified data-uie-name="status-verified" />
+              </span>
             )}
 
             {callParticipant && (
@@ -292,7 +296,7 @@ const ParticipantItem = <UserType extends User | ServiceEntity>(
         </div>
       ) : (
         <div
-          tabIndex={0}
+          tabIndex={TabIndex.FOCUSABLE}
           role="button"
           onContextMenu={onContextMenu}
           onClick={noInteraction ? onContextMenu : event => onClick(participant, event.nativeEvent)}

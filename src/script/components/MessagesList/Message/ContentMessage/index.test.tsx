@@ -23,13 +23,13 @@ import ko from 'knockout';
 import {LinkPreview} from 'src/script/entity/message/LinkPreview';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
 
+import {ContentMessageComponent, ContentMessageProps} from './index';
+
 import {Conversation} from '../../../../entity/Conversation';
 import {ContentMessage} from '../../../../entity/message/ContentMessage';
 import {Text} from '../../../../entity/message/Text';
 import {User} from '../../../../entity/User';
 import {createRandomUuid} from '../../../../util/util';
-
-import {ContentMessageComponent, ContentMessageProps} from './index';
 
 describe('message', () => {
   let defaultParams: ContentMessageProps;
@@ -46,7 +46,7 @@ describe('message', () => {
       contextMenu: {entries: ko.observable([])},
       conversation: new Conversation(),
       findMessage: jest.fn(),
-      focusConversation: true,
+      isMessageFocused: true,
       handleFocus: jest.fn(),
       isLastDeliveredMessage: false,
       message,

@@ -36,8 +36,7 @@ import {LocalStorageAction, LocalStorageKey} from './LocalStorageAction';
 
 import {currentCurrency, currentLanguage} from '../../localeConfig';
 import type {Api, RootState, ThunkAction, ThunkDispatch} from '../reducer';
-import type {RegistrationDataState} from '../reducer/authReducer';
-import {COOKIE_NAME_APP_OPENED} from '../selector/CookieSelector';
+import type {LoginDataState, RegistrationDataState} from '../reducer/authReducer';
 
 type LoginLifecycleFunction = (dispatch: ThunkDispatch, getState: () => RootState, global: Api) => Promise<void>;
 
@@ -96,24 +95,18 @@ export class AuthAction {
     return async (dispatch, getState, global) => {
       const {
         core,
-        actions: {clientAction, cookieAction, selfAction, localStorageAction},
+        actions: {clientAction, selfAction, localStorageAction},
       } = global;
       dispatch(AuthActionCreator.startLogin());
       try {
         await onBeforeLogin(dispatch, getState, global);
-        await core.login(loginData, false, clientAction.generateClientPayload(loginData.clientType));
+        await core.login(loginData);
         await this.persistClientData(loginData.clientType, dispatch, localStorageAction);
-        await dispatch(
-          cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: global.getConfig().APP_INSTANCE_ID}),
-        );
         await dispatch(selfAction.fetchSelf());
         let entropyData: Uint8Array | undefined = undefined;
         if (getEntropy) {
-          try {
-            await core.loadAndValidateLocalClient();
-          } catch (e) {
-            entropyData = await getEntropy();
-          }
+          const existingClient = await core.service!.client.loadClient();
+          entropyData = existingClient ? undefined : await getEntropy();
         }
         await onAfterLogin(dispatch, getState, global);
         await dispatch(
@@ -166,18 +159,12 @@ export class AuthAction {
   };
 
   doFinalizeSSOLogin = ({clientType}: {clientType: ClientType}): ThunkAction => {
-    return async (
-      dispatch,
-      getState,
-      {getConfig, core, actions: {cookieAction, clientAction, selfAction, localStorageAction}},
-    ) => {
+    return async (dispatch, getState, {getConfig, core, actions: {clientAction, selfAction, localStorageAction}}) => {
       dispatch(AuthActionCreator.startLogin());
       try {
-        // we first init the core without initializing the client for now (this will be done later on)
-        await core.init(clientType, {initClient: false});
+        await core.init(clientType);
         await this.persistClientData(clientType, dispatch, localStorageAction);
         await dispatch(selfAction.fetchSelf());
-        await dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: getConfig().APP_INSTANCE_ID}));
         await dispatch(clientAction.doInitializeClient(clientType));
         dispatch(AuthActionCreator.successfulLogin());
       } catch (error) {
@@ -238,7 +225,7 @@ export class AuthAction {
     };
   };
 
-  pushLoginData = (loginData: Partial<LoginData>): ThunkAction => {
+  pushLoginData = (loginData: Partial<LoginDataState>): ThunkAction => {
     return async dispatch => {
       dispatch(AuthActionCreator.pushLoginData(loginData));
     };
@@ -251,11 +238,7 @@ export class AuthAction {
   };
 
   doRegisterTeam = (registration: RegisterData): ThunkAction => {
-    return async (
-      dispatch,
-      getState,
-      {getConfig, core, actions: {cookieAction, clientAction, selfAction, localStorageAction}},
-    ) => {
+    return async (dispatch, getState, {getConfig, core, actions: {clientAction, selfAction, localStorageAction}}) => {
       const clientType = ClientType.PERMANENT;
       registration.locale = currentLanguage();
       registration.name = registration.name.trim();
@@ -269,7 +252,6 @@ export class AuthAction {
         await dispatch(this.doSilentLogout());
         await core.register(registration, clientType);
         await this.persistClientData(clientType, dispatch, localStorageAction);
-        await dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: getConfig().APP_INSTANCE_ID}));
         await dispatch(selfAction.fetchSelf());
         await dispatch(clientAction.doInitializeClient(clientType));
         dispatch(AuthActionCreator.successfulRegisterTeam(registration));
@@ -284,7 +266,7 @@ export class AuthAction {
     return async (
       dispatch,
       getState,
-      {getConfig, core, actions: {authAction, clientAction, cookieAction, selfAction, localStorageAction}},
+      {getConfig, core, actions: {authAction, clientAction, selfAction, localStorageAction}},
     ) => {
       const clientType = ClientType.PERMANENT;
       registration.locale = currentLanguage();
@@ -296,7 +278,6 @@ export class AuthAction {
         await dispatch(authAction.doSilentLogout());
         await core.register(registration, clientType);
         await this.persistClientData(clientType, dispatch, localStorageAction);
-        await dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: getConfig().APP_INSTANCE_ID}));
         await dispatch(selfAction.fetchSelf());
         await dispatch(clientAction.doInitializeClient(clientType, undefined, undefined, entropyData));
         dispatch(AuthActionCreator.successfulRegisterPersonal(registration));
@@ -315,7 +296,7 @@ export class AuthAction {
     return async (
       dispatch,
       getState,
-      {getConfig, core, actions: {authAction, cookieAction, clientAction, selfAction, localStorageAction}},
+      {getConfig, core, actions: {authAction, clientAction, selfAction, localStorageAction}},
     ) => {
       const clientType = options.shouldInitializeClient ? ClientType.TEMPORARY : ClientType.NONE;
       registrationData.locale = currentLanguage();
@@ -326,7 +307,6 @@ export class AuthAction {
         await dispatch(authAction.doSilentLogout());
         await core.register(registrationData, clientType);
         await this.persistClientData(clientType, dispatch, localStorageAction);
-        await dispatch(cookieAction.setCookie(COOKIE_NAME_APP_OPENED, {appInstanceId: getConfig().APP_INSTANCE_ID}));
         await dispatch(selfAction.fetchSelf());
         await (clientType !== ClientType.NONE &&
           dispatch(clientAction.doInitializeClient(clientType, undefined, undefined, entropyData)));
@@ -353,12 +333,8 @@ export class AuthAction {
         }
         const clientType = persist ? ClientType.PERMANENT : ClientType.TEMPORARY;
 
-        await core.init(clientType, {initClient: false});
+        await core.init(clientType);
         await this.persistClientData(clientType, dispatch, localStorageAction);
-
-        if (options.shouldValidateLocalClient) {
-          await dispatch(authAction.validateLocalClient());
-        }
 
         await dispatch(selfAction.fetchSelf());
         dispatch(AuthActionCreator.successfulRefresh());
@@ -369,19 +345,6 @@ export class AuthAction {
           : Promise.resolve();
         await Promise.all([doLogout, deleteClientType]);
         dispatch(AuthActionCreator.failedRefresh(error));
-      }
-    };
-  };
-
-  validateLocalClient = (): ThunkAction => {
-    return async (dispatch, getState, {core}) => {
-      dispatch(AuthActionCreator.startValidateLocalClient());
-      try {
-        await core.loadAndValidateLocalClient();
-        dispatch(AuthActionCreator.successfulValidateLocalClient());
-      } catch (error) {
-        dispatch(AuthActionCreator.failedValidateLocalClient(error));
-        throw error;
       }
     };
   };
@@ -405,8 +368,7 @@ export class AuthAction {
   };
 
   doLogout = (): ThunkAction => {
-    return async (dispatch, getState, {getConfig, core, actions: {cookieAction, localStorageAction}}) => {
-      dispatch(AuthActionCreator.startLogout());
+    return async (dispatch, getState, {getConfig, core, actions: {localStorageAction}}) => {
       try {
         await core.logout();
         if (isTemporaryClientAndNonPersistent(false)) {
@@ -416,7 +378,6 @@ export class AuthAction {
            */
           window.location.reload();
         }
-        await dispatch(cookieAction.safelyRemoveCookie(COOKIE_NAME_APP_OPENED, getConfig().APP_INSTANCE_ID));
         dispatch(AuthActionCreator.successfulLogout());
       } catch (error) {
         dispatch(AuthActionCreator.failedLogout(error));
@@ -425,11 +386,9 @@ export class AuthAction {
   };
 
   doSilentLogout = (): ThunkAction => {
-    return async (dispatch, getState, {getConfig, core, actions: {cookieAction, localStorageAction}}) => {
-      dispatch(AuthActionCreator.startLogout());
+    return async (dispatch, getState, {getConfig, core, actions: {localStorageAction}}) => {
       try {
         await core.logout();
-        await dispatch(cookieAction.safelyRemoveCookie(COOKIE_NAME_APP_OPENED, getConfig().APP_INSTANCE_ID));
         dispatch(AuthActionCreator.successfulSilentLogout());
       } catch (error) {
         dispatch(AuthActionCreator.failedLogout(error));

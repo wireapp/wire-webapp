@@ -20,6 +20,7 @@
 import React, {useCallback, useState} from 'react';
 
 import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation/';
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
@@ -250,7 +251,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
               className="conversation-list-cell conversation-list-cell-button"
               onClick={createNavigate(conversationUrl)}
               onKeyDown={createNavigateKeyboard(conversationUrl)}
-              tabIndex={0}
+              tabIndex={TabIndex.FOCUSABLE}
               role="button"
               aria-label={t('accessibility.openConversation', conversationName)}
             >
@@ -287,8 +288,13 @@ const CallingCell: React.FC<CallingCellProps> = ({
                     </span>
 
                     {isCbrEnabled && (
-                      <span className="conversation-list-cell-description" data-uie-name="call-cbr">
-                        {t('callStateCbr')}
+                      <span
+                        title={t('callStateCbr')}
+                        aria-label={t('callStateCbr')}
+                        className="conversation-list-cell-description"
+                        data-uie-name="call-cbr"
+                      >
+                        CBR
                       </span>
                     )}
                   </div>
@@ -317,7 +323,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
               onClick={handleMinimizedClick}
               onKeyDown={handleMinimizedKeydown}
               role="button"
-              tabIndex={0}
+              tabIndex={TabIndex.FOCUSABLE}
               aria-label={t('callMaximizeLabel')}
             >
               <GroupVideoGrid

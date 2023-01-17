@@ -131,14 +131,17 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
             <Icon.Loading
               css={{
                 '> path': {
-                  fill: '#fff',
+                  fill: 'var(--main-color)',
                 },
                 height: 32,
                 marginBottom: 32,
                 width: 32,
               }}
             />
-            <div data-uie-name="no-active-speakers" css={{color: '#fff', fontSize: '0.6875rem', fontWeight: 500}}>
+            <div
+              data-uie-name="no-active-speakers"
+              css={{color: 'var(--main-color)', fontSize: 'var(--font-size-xsmall)', fontWeight: 500}}
+            >
               {t('noActiveSpeakers')}
             </div>
           </div>
@@ -151,7 +154,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
             selfParticipant={selfParticipant}
             participantCount={participants.length}
             isMaximized={!!maximizedParticipant}
-            onParticipantDoubleClick={doubleClickedOnVideo}
+            onTileDoubleClick={doubleClickedOnVideo}
           />
         ))}
       </div>

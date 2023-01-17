@@ -49,7 +49,6 @@ import {BackendError} from '../module/action/BackendError';
 import {ValidationError} from '../module/action/ValidationError';
 import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
-import * as ClientSelector from '../module/selector/ClientSelector';
 import {QUERY_KEY, ROUTE} from '../route';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {getSearchParams} from '../util/urlUtil';
@@ -64,7 +63,7 @@ const SSO_CODE_PREFIX_REGEX = '[wW][iI][rR][eE]-';
 const SingleSignOnFormComponent = ({
   initialCode,
   isFetching,
-  loginError,
+  authError,
   resetAuthError,
   validateSSOCode,
   doLogin,
@@ -287,8 +286,8 @@ const SingleSignOnFormComponent = ({
       </InputBlock>
       {validationError ? (
         parseValidationErrors([validationError])
-      ) : loginError ? (
-        parseError(loginError)
+      ) : authError ? (
+        parseError(authError)
       ) : ssoError ? (
         parseError(ssoError)
       ) : logoutReason ? (
@@ -324,9 +323,8 @@ const SingleSignOnFormComponent = ({
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
-  hasHistory: ClientSelector.hasHistory(state),
   isFetching: AuthSelector.isFetching(state),
-  loginError: AuthSelector.getError(state),
+  authError: AuthSelector.getError(state),
 });
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
@@ -335,7 +333,6 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
     {
       doCheckConversationCode: ROOT_ACTIONS.conversationAction.doCheckConversationCode,
       doFinalizeSSOLogin: ROOT_ACTIONS.authAction.doFinalizeSSOLogin,
-      doGetAllClients: ROOT_ACTIONS.clientAction.doGetAllClients,
       doGetDomainInfo: ROOT_ACTIONS.authAction.doGetDomainInfo,
       doJoinConversationByCode: ROOT_ACTIONS.conversationAction.doJoinConversationByCode,
       doNavigate: ROOT_ACTIONS.navigationAction.doNavigate,

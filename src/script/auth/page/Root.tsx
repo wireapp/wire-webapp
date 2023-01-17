@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect} from 'react';
+import {FC, useEffect} from 'react';
 
 import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
 import {IntlProvider} from 'react-intl';
@@ -57,26 +57,22 @@ import {mapLanguage, normalizeLanguage} from '../localeConfig';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
-import * as CookieSelector from '../module/selector/CookieSelector';
 import * as LanguageSelector from '../module/selector/LanguageSelector';
 import {ROUTE} from '../route';
 
 interface RootProps {}
 
-const Title: React.FC<{title: string; children: React.ReactNode}> = ({title, children}) => {
+const Title: FC<{title: string; children: React.ReactNode}> = ({title, children}) => {
   useEffect(() => {
     document.title = title;
   }, [title]);
   return <>{children}</>;
 };
 
-const RootComponent: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
+const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
   isAuthenticated,
   language,
   isFetchingSSOSettings,
-  startPolling,
-  safelyRemoveCookie,
-  stopPolling,
   doGetSSOSettings,
 }) => {
   useEffect(() => {
@@ -93,14 +89,6 @@ const RootComponent: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
     window.addEventListener('hashchange', forceSlashAfterHash);
     return () => {
       window.removeEventListener('hashchange', forceSlashAfterHash);
-    };
-  }, []);
-
-  useEffect(() => {
-    startPolling();
-    window.onbeforeunload = () => {
-      safelyRemoveCookie(CookieSelector.COOKIE_NAME_APP_OPENED, Config.getConfig().APP_INSTANCE_ID);
-      stopPolling();
     };
   }, []);
 
@@ -236,9 +224,6 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
   bindActionCreators(
     {
       doGetSSOSettings: ROOT_ACTIONS.authAction.doGetSSOSettings,
-      safelyRemoveCookie: ROOT_ACTIONS.cookieAction.safelyRemoveCookie,
-      startPolling: ROOT_ACTIONS.cookieAction.startPolling,
-      stopPolling: ROOT_ACTIONS.cookieAction.stopPolling,
     },
     dispatch,
   );

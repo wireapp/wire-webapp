@@ -29,6 +29,9 @@ import {t} from 'Util/LocalizerUtil';
 
 import {CallMessage} from './CallMessage';
 import {CallTimeoutMessage} from './CallTimeoutMessage';
+
+import {MessageParams} from './index';
+
 import {ContentMessageComponent} from './ContentMessage';
 import {DecryptErrorMessage} from './DecryptErrorMessage';
 import {DeleteMessage} from './DeleteMessage';
@@ -46,14 +49,12 @@ import {CompositeMessage} from '../../../entity/message/CompositeMessage';
 import {TeamState} from '../../../team/TeamState';
 import {ContextMenuEntry} from '../../../ui/ContextMenu';
 
-import {MessageParams} from './index';
-
-export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; focusConversation: boolean}> = ({
+export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMessageFocused: boolean}> = ({
   message,
   conversation,
   selfId,
   hasMarker,
-  focusConversation,
+  isMessageFocused,
   isSelfTemporaryGuest,
   isLastDeliveredMessage,
   shouldShowInvitePeople,
@@ -181,7 +182,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; focus
         onClickInvitePeople={onClickInvitePeople}
         onClickParticipants={onClickParticipants}
         onClickReceipts={onClickReceipts}
-        focusConversation={focusConversation}
+        isMessageFocused={isMessageFocused}
         handleFocus={handleFocus}
         totalMessage={totalMessage}
         isMsgElementsFocusable={isMsgElementsFocusable}
@@ -230,7 +231,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; focus
         is1to1Conversation={conversation.is1to1()}
         isLastDeliveredMessage={isLastDeliveredMessage}
         onClickReceipts={onClickReceipts}
-        focusConversation={focusConversation}
+        isMessageFocused={isMessageFocused}
       />
     );
   }

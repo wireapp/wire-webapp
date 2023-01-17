@@ -17,9 +17,10 @@
  *
  */
 
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {container} from 'tsyringe';
 
 import {Icon} from 'Components/Icon';
@@ -60,26 +61,28 @@ const Device: React.FC<{
   const {isVerified} = useKoSubscribableChildren(device.meta, ['isVerified']);
   const verifiedLabel = isVerified ? t('preferencesDevicesVerification') : t('preferencesDeviceNotVerified');
   const deviceAriaLabel = `${t('preferencesDevice')} ${deviceNumber}, ${device.getName()}, ${verifiedLabel}`;
-  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
     onRemove(device);
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
   };
+
+  const onDeviceSelect = () => onSelect(device);
 
   return (
     <div
       className="preferences-devices-card"
-      onClick={() => onSelect(device)}
-      onKeyDown={e => handleKeyDown(e, onSelect.bind(null, device))}
-      tabIndex={0}
+      onClick={onDeviceSelect}
+      onKeyDown={event => handleKeyDown(event, onDeviceSelect)}
+      tabIndex={TabIndex.FOCUSABLE}
       role="button"
     >
       <div className="preferences-devices-card-data">
         <div className="preferences-devices-card-icon" data-uie-value={device.id} data-uie-name="device-id">
-          <VerifiedIcon data-uie-name={`user-device-${isVerified ? '' : 'not-'}verified`} isVerified={isVerified} />
+          <VerifiedIcon data-uie-name={`user-device-${isVerified ? '' : 'not-'}verified`} isVerified={!!isVerified} />
         </div>
 
         <div className="preferences-devices-card-info">
@@ -142,6 +145,11 @@ const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
   const getFingerprint = (device: ClientEntity) =>
     cryptographyRepository.getRemoteFingerprint(self.qualifiedId, device.id);
 
+  const [localFingerprint, setLocalFingerprint] = useState('');
+  useEffect(() => {
+    cryptographyRepository.getLocalFingerprint().then(setLocalFingerprint);
+  }, [cryptographyRepository]);
+
   if (selectedDevice) {
     return (
       <DeviceDetailsPreferences
@@ -164,7 +172,7 @@ const DevicesPreferences: React.FC<DevicesPreferencesProps> = ({
     <PreferencesPage title={t('preferencesDevices')}>
       <fieldset className="preferences-section" data-uie-name="preferences-device-current">
         <legend className="preferences-header">{t('preferencesDevicesCurrent')}</legend>
-        <DetailedDevice device={currentClient} fingerprint={cryptographyRepository.getLocalFingerprint()} />
+        <DetailedDevice device={currentClient} fingerprint={localFingerprint} />
       </fieldset>
 
       <hr className="preferences-devices-separator preferences-separator" />

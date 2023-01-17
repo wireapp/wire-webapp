@@ -17,18 +17,17 @@
  *
  */
 
-import {FC, UIEvent, useCallback, useEffect, useState} from 'react';
+import {FC, UIEvent, useCallback, useState} from 'react';
 
 import cx from 'classnames';
 import {container} from 'tsyringe';
-import {groupBy} from 'underscore';
 
 import {useMatchMedia} from '@wireapp/react-ui-kit';
 
 import {CallingCell} from 'Components/calling/CallingCell';
+import {DropFileArea} from 'Components/DropFileArea';
 import {Giphy} from 'Components/Giphy';
 import {InputBar} from 'Components/InputBar';
-import {useDropFiles} from 'Components/InputBar/hooks/useDropFiles';
 import {MessagesList} from 'Components/MessagesList';
 import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -44,6 +43,7 @@ import {getLogger} from 'Util/Logger';
 import {safeMailOpen, safeWindowOpen} from 'Util/SanitizationUtil';
 import {formatBytes, incomingCssClass, removeAnimationsClass} from 'Util/util';
 
+import {useReadReceiptSender} from './hooks/useReadReceipt';
 import {checkFileSharingPermission} from './utils/checkFileSharingPermission';
 
 import {ConversationState} from '../../conversation/ConversationState';
@@ -64,8 +64,6 @@ import {useMainViewModel} from '../../page/RootProvider';
 import {TeamState} from '../../team/TeamState';
 import {UserState} from '../../user/UserState';
 import {ElementType, MessageDetails} from '../MessagesList/Message/ContentMessage/asset/TextMessageRenderer';
-
-type ReadMessageBuffer = {conversation: ConversationEntity; message: Message};
 
 interface ConversationProps {
   readonly initialMessage?: Message;
@@ -94,8 +92,6 @@ export const Conversation: FC<ConversationProps> = ({
   const [inputValue, setInputValue] = useState<string>('');
   const [isGiphyModalOpen, setIsGiphyModalOpen] = useState<boolean>(false);
 
-  const [readMessagesBuffer, setReadMessagesBuffer] = useState<ReadMessageBuffer[]>([]);
-
   const conversationState = container.resolve(ConversationState);
   const callState = container.resolve(CallState);
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
@@ -113,26 +109,7 @@ export const Conversation: FC<ConversationProps> = ({
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
   const smBreakpoint = useMatchMedia('max-width: 640px');
 
-  useEffect(() => {
-    if (readMessagesBuffer.length) {
-      const groupedMessagesTest = groupBy(
-        readMessagesBuffer,
-        ({conversation, message}) => conversation.id + message.from,
-      );
-
-      Object.values(groupedMessagesTest).forEach(readMessagesBatch => {
-        const poppedMessage = readMessagesBatch.pop();
-
-        if (poppedMessage) {
-          const {conversation, message: firstMessage} = poppedMessage;
-          const otherMessages = readMessagesBatch.map(({message}) => message);
-          repositories.message.sendReadReceipt(conversation, firstMessage, otherMessages);
-        }
-      });
-
-      setReadMessagesBuffer([]);
-    }
-  }, [readMessagesBuffer.length]);
+  const {addReadReceiptToBatch} = useReadReceiptSender(repositories.message);
 
   const uploadImages = useCallback(
     (images: File[]) => {
@@ -225,8 +202,6 @@ export const Conversation: FC<ConversationProps> = ({
     },
     [repositories.asset, uploadFiles, uploadImages],
   );
-
-  const {ref: handleFileDrop} = useDropFiles(checkFileSharingPermission(uploadDroppedFiles));
 
   const openGiphy = (text: string) => {
     setInputValue(text);
@@ -374,18 +349,15 @@ export const Conversation: FC<ConversationProps> = ({
   const onSessionResetClick = async (messageEntity: DecryptErrorMessage): Promise<void> => {
     const resetProgress = () => {
       setTimeout(() => {
-        messageEntity.is_resetting_session(false);
         PrimaryModal.show(PrimaryModal.type.SESSION_RESET, {});
       }, MotionDuration.LONG);
     };
-
-    messageEntity.is_resetting_session(true);
 
     try {
       if (messageEntity.fromDomain && activeConversation) {
         await repositories.message.resetSession(
           {domain: messageEntity.fromDomain, id: messageEntity.from},
-          messageEntity.client_id,
+          messageEntity.clientId,
           activeConversation,
         );
         resetProgress();
@@ -425,11 +397,6 @@ export const Conversation: FC<ConversationProps> = ({
       }
     }
 
-    const sendReadReceipt = () => {
-      // add the message in the buffer of read messages (actual read receipt will be sent in the next batch)
-      setReadMessagesBuffer(prevState => [...prevState, {conversation: conversationEntity, message: messageEntity}]);
-    };
-
     const updateLastRead = () => {
       conversationEntity.setTimestamp(messageEntity.timestamp(), ConversationEntity.TIMESTAMP_TYPE.LAST_READ);
     };
@@ -467,7 +434,7 @@ export const Conversation: FC<ConversationProps> = ({
     if (isUnreadMessage && isNotOwnMessage) {
       callbacks.push(updateLastRead);
       if (shouldSendReadReceipt) {
-        callbacks.push(sendReadReceipt);
+        callbacks.push(() => addReadReceiptToBatch(conversationEntity, messageEntity));
       }
     }
 
@@ -482,19 +449,12 @@ export const Conversation: FC<ConversationProps> = ({
     };
   };
 
-  const wrapperRefHandler = useCallback(
-    (element: HTMLElement | null) => {
-      removeAnimationsClass(element);
-      handleFileDrop(element);
-    },
-    [handleFileDrop],
-  );
-
   return (
-    <div
+    <DropFileArea
+      onFileDropped={checkFileSharingPermission(uploadDroppedFiles)}
       id="conversation"
       className={cx('conversation', {[incomingCssClass]: isConversationLoaded, loading: !isConversationLoaded})}
-      ref={wrapperRefHandler}
+      ref={removeAnimationsClass}
       key={activeConversation?.id}
     >
       {activeConversation && (
@@ -580,6 +540,6 @@ export const Conversation: FC<ConversationProps> = ({
       {isGiphyModalOpen && inputValue && (
         <Giphy giphyRepository={repositories.giphy} inputValue={inputValue} onClose={closeGiphy} />
       )}
-    </div>
+    </DropFileArea>
   );
 };

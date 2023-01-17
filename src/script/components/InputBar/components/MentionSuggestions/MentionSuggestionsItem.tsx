@@ -19,6 +19,7 @@
 
 import React, {forwardRef} from 'react';
 
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
@@ -52,7 +53,7 @@ const MentionSuggestionsItemComponent: React.ForwardRefRenderFunction<HTMLDivEle
   return (
     <div
       role="button"
-      tabIndex={0}
+      tabIndex={TabIndex.FOCUSABLE}
       onClick={onClick}
       onKeyDown={e => handleKeyDown(e, () => onClick(e))}
       onMouseEnter={onMouseEnter}

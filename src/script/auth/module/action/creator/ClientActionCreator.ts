@@ -22,8 +22,6 @@ import type {RegisteredClient} from '@wireapp/api-client/lib/client/';
 import type {AppAction} from './';
 
 export enum CLIENT_ACTION {
-  CLIENT_INIT_FAILED = 'CLIENT_INIT_FAILED',
-  CLIENT_INIT_START = 'CLIENT_INIT_START',
   CLIENT_INIT_SUCCESS = 'CLIENT_INIT_SUCCESS',
 
   CLIENT_REMOVE_FAILED = 'CLIENT_REMOVE_FAILED',
@@ -44,9 +42,7 @@ export type ClientActions =
   | RemoveClientStartAction
   | RemoveClientSuccessAction
   | RemoveClientFailedAction
-  | InitializeClientStartAction
   | InitializeClientSuccessAction
-  | InitializeClientFailedAction
   | ResetClientErrorsAction;
 
 export interface GetAllClientsStartAction extends AppAction {
@@ -73,19 +69,12 @@ export interface RemoveClientFailedAction extends AppAction {
   readonly type: CLIENT_ACTION.CLIENT_REMOVE_FAILED;
 }
 
-export interface InitializeClientStartAction extends AppAction {
-  readonly type: CLIENT_ACTION.CLIENT_INIT_START;
-}
 export interface InitializeClientSuccessAction extends AppAction {
   readonly payload: {
-    isNewClient: boolean;
-    localClient: RegisteredClient;
+    isNew: boolean;
+    client: RegisteredClient;
   };
   readonly type: CLIENT_ACTION.CLIENT_INIT_SUCCESS;
-}
-export interface InitializeClientFailedAction extends AppAction {
-  readonly error: Error;
-  readonly type: CLIENT_ACTION.CLIENT_INIT_FAILED;
 }
 
 export interface ResetClientErrorsAction extends AppAction {
@@ -117,19 +106,12 @@ export class ClientActionCreator {
     type: CLIENT_ACTION.CLIENT_REMOVE_FAILED,
   });
 
-  static startInitializeClient = (): InitializeClientStartAction => ({
-    type: CLIENT_ACTION.CLIENT_INIT_START,
-  });
   static successfulInitializeClient = (creationStatus: {
-    isNewClient: boolean;
-    localClient: RegisteredClient;
+    isNew: boolean;
+    client: RegisteredClient;
   }): InitializeClientSuccessAction => ({
     payload: creationStatus,
     type: CLIENT_ACTION.CLIENT_INIT_SUCCESS,
-  });
-  static failedInitializeClient = (error: Error): InitializeClientFailedAction => ({
-    error,
-    type: CLIENT_ACTION.CLIENT_INIT_FAILED,
   });
 
   static resetError = (): ResetClientErrorsAction => ({

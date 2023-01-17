@@ -20,7 +20,6 @@
 import {AuthAction, authAction} from './AuthAction';
 import {ClientAction, clientAction} from './ClientAction';
 import {ConversationAction, conversationAction} from './ConversationAction';
-import {CookieAction, cookieAction} from './CookieAction';
 import {InvitationAction, invitationAction} from './InvitationAction';
 import {LocalStorageAction, localStorageAction} from './LocalStorageAction';
 import {NavigationAction, navigationAction} from './NavigationAction';
@@ -28,14 +27,12 @@ import {NotificationAction, notificationAction} from './NotificationAction';
 import {RuntimeAction, runtimeAction} from './RuntimeAction';
 import {SelfAction, selfAction} from './SelfAction';
 import {UserAction, userAction} from './UserAction';
-import {WebSocketAction, webSocketAction} from './WebSocketAction';
 import {WrapperEventAction, wrapperEventAction} from './WrapperEventAction';
 
 export interface ActionRoot {
   authAction: AuthAction;
   clientAction: ClientAction;
   conversationAction: ConversationAction;
-  cookieAction: CookieAction;
   invitationAction: InvitationAction;
   localStorageAction: LocalStorageAction;
   navigationAction: NavigationAction;
@@ -43,7 +40,6 @@ export interface ActionRoot {
   runtimeAction: RuntimeAction;
   selfAction: SelfAction;
   userAction: UserAction;
-  webSocketAction: WebSocketAction;
   wrapperEventAction: WrapperEventAction;
 }
 
@@ -51,7 +47,6 @@ export const actionRoot: ActionRoot = {
   authAction,
   clientAction,
   conversationAction,
-  cookieAction,
   invitationAction,
   localStorageAction,
   navigationAction,
@@ -59,6 +54,5 @@ export const actionRoot: ActionRoot = {
   runtimeAction,
   selfAction,
   userAction,
-  webSocketAction,
   wrapperEventAction,
 };

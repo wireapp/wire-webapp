@@ -427,7 +427,19 @@ describe.skip('E2E audio call', () => {
     spyOn<any>(client, 'checkConcurrentJoinedCall').and.returnValue(Promise.resolve(true));
     spyOn<any>(client, 'sendMessage').and.callFake(
       (context, convId, userId, clientid, destUserId, destDeviceId, payload) => {
-        wCall.recvMsg(remoteWuser, payload, payload.length, Date.now(), Date.now(), convId, userId, clientid);
+        wCall.recvMsg(
+          remoteWuser,
+          payload,
+          payload.length,
+          Date.now(),
+          Date.now(),
+          convId,
+          userId,
+          clientid,
+          /* FIXME uncomment when avs 9 has fixed bug with starting video conversation
+          CONV_TYPE.CONFERENCE,
+          */
+        );
       },
     );
     return client.initAvs(user, 'device').then(({wCall: wCallInstance, wUser}) => {

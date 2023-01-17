@@ -242,7 +242,7 @@ export class CryptographyMapper {
       default: {
         const logMessage = `Skipped event '${genericMessage.messageId}' of unhandled type '${genericMessage.content}'`;
         this.logger.debug(logMessage, {event, generic_message: genericMessage});
-        throw new CryptographyError(CryptographyError.TYPE.UNHANDLED_TYPE, logMessage);
+        return undefined;
       }
     }
 
@@ -398,6 +398,7 @@ export class CryptographyMapper {
   _mapCalling(calling: Calling, eventData: ConversationEvent & {sender: string}) {
     return {
       content: JSON.parse(calling.content),
+      targetConversation: calling.qualifiedConversationId,
       sender: eventData.sender,
       type: ClientEvent.CALL.E_CALL,
     };

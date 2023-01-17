@@ -20,6 +20,7 @@
 import React, {useEffect, useId, useRef, useState, useCallback} from 'react';
 
 import {CSSObject} from '@emotion/react';
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {noop, preventFocusOutside} from 'Util/util';
 
@@ -145,7 +146,7 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
       onClick={onBgClick}
       css={hasVisibleClass ? ModalOverlayVisibleStyles : ModalOverlayStyles}
       style={{display: displayNone ? 'none' : 'flex'}}
-      tabIndex={0}
+      tabIndex={TabIndex.FOCUSABLE}
       role="button"
       onKeyDown={noop}
       id={id}
@@ -159,7 +160,7 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
           id={trapId}
           onClick={event => event.stopPropagation()}
           role="button"
-          tabIndex={-1}
+          tabIndex={TabIndex.UNFOCUSABLE}
           onKeyDown={noop}
           css={{...(hasVisibleClass ? ModalContentVisibleStyles : ModalContentStyles), ...wrapperCSS}}
         >

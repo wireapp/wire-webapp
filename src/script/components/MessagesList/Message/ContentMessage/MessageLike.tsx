@@ -25,14 +25,17 @@ import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
+import {useMessageFocusedTabIndex} from '../util';
+
 export interface MessageLikeProps {
   className?: string;
   message: ContentMessage;
   onLike: (message: ContentMessage, button?: boolean) => void;
-  focusConversation: boolean;
+  isMessageFocused: boolean;
 }
 
-const MessageLike: React.FC<MessageLikeProps> = ({message, onLike, className, focusConversation}) => {
+const MessageLike: React.FC<MessageLikeProps> = ({message, onLike, className, isMessageFocused}) => {
+  const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
   const {is_liked: isLiked} = useKoSubscribableChildren(message, ['is_liked']);
 
   return (
@@ -48,7 +51,7 @@ const MessageLike: React.FC<MessageLikeProps> = ({message, onLike, className, fo
       aria-label={t(isLiked ? 'accessibility.messages.liked' : 'accessibility.messages.like')}
       onClick={() => onLike(message)}
       type="button"
-      tabIndex={focusConversation ? 0 : -1}
+      tabIndex={messageFocusedTabIndex}
     >
       <span className="icon-like-small"></span>
       <span className="icon-liked-small"></span>

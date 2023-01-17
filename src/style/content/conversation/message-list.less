@@ -48,7 +48,7 @@
   }
 
   &:last-child {
-    margin-bottom: 24px;
+    margin-bottom: 40px;
   }
 
   .context-menu,
@@ -104,7 +104,7 @@
 
     &.self-mention {
       padding: 3px 0 4px 0;
-      background-color: var(--accent-color-selection);
+      background-color: var(--accent-color-self-mention);
       color: var(--main-color);
     }
 
@@ -316,7 +316,6 @@
   position: relative;
   padding-right: var(--conversation-message-timestamp-width);
   padding-left: @conversation-message-sender-width;
-  margin-top: -5px;
 
   .text {
     .text-selection;
@@ -668,7 +667,7 @@
 .message-group-creation-header,
 .message-member-footer {
   padding-top: 16px;
-  margin-left: 72px;
+  margin-left: 54px;
   font-size: @font-size-small;
   font-weight: @font-weight-regular;
 }

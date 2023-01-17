@@ -176,7 +176,7 @@ describe('Conversation', () => {
       conversation_et.addMessage(message_et);
 
       expect(conversation_et.messages().length).toBe(2);
-      const last_message_et = conversation_et.getLastMessage();
+      const last_message_et = conversation_et.getNewestMessage();
 
       expect(last_message_et.id).toBe(message_et.id);
       expect(last_message_et.timestamp()).toBe(second_timestamp);
@@ -190,7 +190,7 @@ describe('Conversation', () => {
       conversation_et.addMessage(message_et);
 
       expect(conversation_et.messages().length).toBe(2);
-      const last_message_et = conversation_et.getFirstMessage();
+      const last_message_et = conversation_et.getOldestMessage();
 
       expect(last_message_et.id).toBe(message_et.id);
       expect(last_message_et.timestamp()).toBe(older_timestamp);

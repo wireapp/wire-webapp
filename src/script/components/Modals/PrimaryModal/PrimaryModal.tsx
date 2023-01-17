@@ -21,6 +21,8 @@ import {FC, FormEvent, MouseEvent, useState, useRef, ChangeEvent} from 'react';
 
 import cx from 'classnames';
 
+import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
+
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
 import {ModalComponent} from 'Components/ModalComponent';
@@ -180,19 +182,16 @@ export const PrimaryModalComponent: FC = () => {
 
               {hasOption && (
                 <div className="modal-option">
-                  <div className="checkbox accent-text">
-                    <input
-                      className="modal-checkbox"
-                      type="checkbox"
-                      id="clear-data-checkbox"
-                      checked={optionChecked}
-                      data-uie-name="modal-option-checkbox"
-                      onChange={onOptionChange}
-                    />
-                    <label className="label-xs" htmlFor="clear-data-checkbox">
-                      <p className="modal-option-text text-background">{checkboxLabel}</p>
-                    </label>
-                  </div>
+                  <Checkbox
+                    checked={optionChecked}
+                    data-uie-name="modal-option-checkbox"
+                    id="clear-data-checkbox"
+                    onChange={onOptionChange}
+                  >
+                    <CheckboxLabel className="label-xs" htmlFor="clear-data-checkbox">
+                      {checkboxLabel}
+                    </CheckboxLabel>
+                  </Checkbox>
                 </div>
               )}
 

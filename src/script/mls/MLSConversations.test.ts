@@ -24,7 +24,7 @@ import {randomUUID} from 'crypto';
 import {Account} from '@wireapp/core';
 
 import {initMLSConversations, registerUninitializedConversations} from './MLSConversations';
-import {mlsConversationState} from './mlsConversationState';
+import {useMLSConversationState} from './mlsConversationState';
 
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
@@ -49,16 +49,9 @@ function createConversations(
   return Array.from(new Array(nbConversations)).map(() => createConversation(protocol, type));
 }
 
-function mockCore() {
-  return {
-    configureMLSCallbacks: jest.fn(),
-    service: {mls: {registerConversation: jest.fn()}},
-  } as unknown as Account;
-}
-
 describe('MLSConversations', () => {
   beforeEach(() => {
-    jest.spyOn(mlsConversationState.getState(), 'sendExternalToPendingJoin').mockReturnValue(undefined);
+    jest.spyOn(useMLSConversationState.getState(), 'sendExternalToPendingJoin').mockReturnValue(undefined);
   });
 
   describe('initMLSConversations', () => {
@@ -72,7 +65,7 @@ describe('MLSConversations', () => {
 
       await initMLSConversations(conversations, new User(), new Account(), {} as any);
 
-      expect(mlsConversationState.getState().sendExternalToPendingJoin).toHaveBeenCalledWith(
+      expect(useMLSConversationState.getState().sendExternalToPendingJoin).toHaveBeenCalledWith(
         mlsConversations,
         expect.any(Function),
         expect.any(Function),
@@ -80,7 +73,7 @@ describe('MLSConversations', () => {
     });
 
     it('register all uninitiated conversations', async () => {
-      const core = mockCore();
+      const core = new Account();
       const nbProteusConversations = 5 + Math.ceil(Math.random() * 10);
       const nbMLSConversations = 5 + Math.ceil(Math.random() * 10);
 
@@ -98,7 +91,7 @@ describe('MLSConversations', () => {
     });
 
     it('does not register self and team conversation that have epoch > 0', async () => {
-      const core = mockCore();
+      const core = new Account();
       const nbProteusConversations = 5 + Math.ceil(Math.random() * 10);
       const nbMLSConversations = 5 + Math.ceil(Math.random() * 10);
 

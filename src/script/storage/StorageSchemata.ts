@@ -44,7 +44,7 @@ export class StorageSchemata {
       PRE_KEYS: 'prekeys',
       SESSIONS: 'sessions',
       USERS: 'users',
-    };
+    } as const;
   }
 
   static get SCHEMATA(): DexieSchema[] {

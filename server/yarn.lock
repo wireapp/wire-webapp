@@ -1266,6 +1266,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/express-serve-static-core@npm:^4.17.31":
+  version: 4.17.31
+  resolution: "@types/express-serve-static-core@npm:4.17.31"
+  dependencies:
+    "@types/node": "*"
+    "@types/qs": "*"
+    "@types/range-parser": "*"
+  checksum: 009bfbe1070837454a1056aa710d0390ee5fb8c05dfe5a1691cc3e2ca88dc256f80e1ca27cb51a978681631d2f6431bfc9ec352ea46dd0c6eb183d0170bde5df
+  languageName: node
+  linkType: hard
+
 "@types/express-sitemap-xml@npm:1.1.1":
   version: 1.1.1
   resolution: "@types/express-sitemap-xml@npm:1.1.1"
@@ -1284,7 +1295,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/express@npm:*, @types/express@npm:4.17.14":
+"@types/express@npm:*":
   version: 4.17.14
   resolution: "@types/express@npm:4.17.14"
   dependencies:
@@ -1293,6 +1304,18 @@ __metadata:
     "@types/qs": "*"
     "@types/serve-static": "*"
   checksum: 15c1af46d02de834e4a225eccaa9d85c0370fdbb3ed4e1bc2d323d24872309961542b993ae236335aeb3e278630224a6ea002078d39e651d78a3b0356b1eaa79
+  languageName: node
+  linkType: hard
+
+"@types/express@npm:4.17.15":
+  version: 4.17.15
+  resolution: "@types/express@npm:4.17.15"
+  dependencies:
+    "@types/body-parser": "*"
+    "@types/express-serve-static-core": ^4.17.31
+    "@types/qs": "*"
+    "@types/serve-static": "*"
+  checksum: b4acd8a836d4f6409cdf79b12d6e660485249b62500cccd61e7997d2f520093edf77d7f8498ca79d64a112c6434b6de5ca48039b8fde2c881679eced7e96979b
   languageName: node
   linkType: hard
 
@@ -1355,13 +1378,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/jest@npm:^29.2.4":
-  version: 29.2.4
-  resolution: "@types/jest@npm:29.2.4"
+"@types/jest@npm:^29.2.5":
+  version: 29.2.5
+  resolution: "@types/jest@npm:29.2.5"
   dependencies:
     expect: ^29.0.0
     pretty-format: ^29.0.0
-  checksum: 9deb4756fe1b438d41ff1aae7d6c216c9e49e5fe60f539f8edb6698ffeb530ff7b25d37e223439b03602ca3a7397c9c2e53e1a39c7bd616353472fce0cc04107
+  checksum: d668470f00ec4cb8b8457f1fd90f7358fad8f22d74b85006dad6be522d6b9bf10f49f597e88d1d1a518d211c1b65be32a1f27f0e49ce0658d110a9206b8ea310
   languageName: node
   linkType: hard
 
@@ -2703,9 +2726,9 @@ __metadata:
   linkType: hard
 
 "fast-json-patch@npm:^3.0.0-1":
-  version: 3.0.0-1
-  resolution: "fast-json-patch@npm:3.0.0-1"
-  checksum: d4a8dff174357a90f3e2b79812df4bcc179143524e7eb1ab84a3bd5a80bd283f6be53996abe5c38527aeb28e994f0d03084c9ce5fcd8eb3e2881986e991105aa
+  version: 3.1.1
+  resolution: "fast-json-patch@npm:3.1.1"
+  checksum: c4525b61b2471df60d4b025b4118b036d99778a93431aa44d1084218182841d82ce93056f0f3bbd731a24e6a8e69820128adf1873eb2199a26c62ef58d137833
   languageName: node
   linkType: hard
 
@@ -3966,11 +3989,11 @@ __metadata:
   linkType: hard
 
 "json5@npm:^2.2.1":
-  version: 2.2.1
-  resolution: "json5@npm:2.2.1"
+  version: 2.2.2
+  resolution: "json5@npm:2.2.2"
   bin:
     json5: lib/cli.js
-  checksum: 74b8a23b102a6f2bf2d224797ae553a75488b5adbaee9c9b6e5ab8b510a2fc6e38f876d4c77dea672d4014a44b2399e15f2051ac2b37b87f74c0c7602003543b
+  checksum: 9a878d66b72157b073cf0017f3e5d93ec209fa5943abcb38d37a54b208917c166bd473c26a24695e67a016ce65759aeb89946592991f8f9174fb96c8e2492683
   languageName: node
   linkType: hard
 
@@ -5992,13 +6015,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "wire-web-server@workspace:."
   dependencies:
-    "@types/express": 4.17.14
+    "@types/express": 4.17.15
     "@types/express-sitemap-xml": 1.1.1
     "@types/express-useragent": 1.0.2
     "@types/fs-extra": 9.0.13
     "@types/geolite2": 2.0.0
     "@types/hbs": 4.0.1
-    "@types/jest": ^29.2.4
+    "@types/jest": ^29.2.5
     "@types/node": 12.20.55
     "@wireapp/commons": 5.0.4
     dotenv: 16.0.3
