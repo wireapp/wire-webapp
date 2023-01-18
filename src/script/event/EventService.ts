@@ -149,7 +149,7 @@ export class EventService {
         .filter(
           record =>
             (record.id === eventId && record.conversation === conversationId) ||
-            (record.id === eventId && record.data.replacing_message_id === eventId),
+            (record.conversation === conversationId && record.data.replacing_message_id === eventId),
         )
         .sort(compareEventsById)
         .shift();
