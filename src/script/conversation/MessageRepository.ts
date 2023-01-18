@@ -1183,7 +1183,9 @@ export class MessageRepository {
     skipConversationMessages = false,
     ensureUser = false,
   ): Promise<StoredContentMessage> {
-    const messageEntity = !skipConversationMessages && conversation.getMessage(messageId);
+    const messageEntity =
+      !skipConversationMessages &&
+      (conversation.getMessageByReplacementId(messageId) || conversation.getMessage(messageId));
     const message =
       messageEntity ||
       (await this.eventService.loadEvent(conversation.id, messageId).then(event => {
