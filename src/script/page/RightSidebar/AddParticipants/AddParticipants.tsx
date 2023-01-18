@@ -177,10 +177,11 @@ const AddParticipants: FC<AddParticipantsProps> = ({
   };
 
   const onSearchInput = async (value: string) => {
+    setSearchInput(value);
+
     if (isAddServiceState) {
       await searchServices(value);
     }
-    setSearchInput(value);
   };
 
   return (
