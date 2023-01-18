@@ -140,7 +140,7 @@ export class EventService {
           .table(StorageSchemata.OBJECT_STORE.EVENTS)
           .where('conversation')
           .equals(conversationId)
-          .filter(item => item.data.replacing_message_id === eventId)
+          .filter(item => item.data?.replacing_message_id === eventId)
           .first();
       }
 
@@ -149,7 +149,7 @@ export class EventService {
         .filter(
           record =>
             (record.id === eventId && record.conversation === conversationId) ||
-            (record.conversation === conversationId && record.data.replacing_message_id === eventId),
+            (record.conversation === conversationId && record.data?.replacing_message_id === eventId),
         )
         .sort(compareEventsById)
         .shift();
