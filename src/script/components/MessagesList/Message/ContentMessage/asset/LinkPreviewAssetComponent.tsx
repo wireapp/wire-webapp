@@ -19,7 +19,6 @@
 
 import React from 'react';
 
-import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 
 import {Image} from 'Components/Image';
@@ -34,14 +33,16 @@ import {AssetHeader} from './AssetHeader';
 
 import type {ContentMessage} from '../../../../../entity/message/ContentMessage';
 import type {Text} from '../../../../../entity/message/Text';
+import {useMessageFocusedTabIndex} from '../../util';
 
 export interface LinkPreviewAssetProps {
   /** Does the asset have a visible header? */
   header?: boolean;
   message: ContentMessage;
+  isFocusable?: boolean;
 }
 
-const LinkPreviewAsset: React.FC<LinkPreviewAssetProps> = ({header = false, message}) => {
+const LinkPreviewAsset: React.FC<LinkPreviewAssetProps> = ({header = false, message, isFocusable = true}) => {
   const {
     previews: [preview],
   } = useKoSubscribableChildren(message.getFirstAsset() as Text, ['previews']);
@@ -51,6 +52,7 @@ const LinkPreviewAsset: React.FC<LinkPreviewAssetProps> = ({header = false, mess
   const author = isTweet ? preview.tweet?.author?.substring(0, 20) : '';
   const previewImage = preview?.image;
   const {isObfuscated} = useKoSubscribableChildren(message, ['isObfuscated']);
+  const messageFocusedTabIndex = useMessageFocusedTabIndex(isFocusable);
 
   const onClick = () => {
     if (!message.isExpired()) {
@@ -79,7 +81,7 @@ const LinkPreviewAsset: React.FC<LinkPreviewAssetProps> = ({header = false, mess
   ) : (
     <div
       role="button"
-      tabIndex={TabIndex.FOCUSABLE}
+      tabIndex={messageFocusedTabIndex}
       className="link-preview-asset"
       onClick={onClick}
       onKeyDown={e => handleKeyDown(e, onClick)}

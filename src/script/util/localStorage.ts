@@ -20,9 +20,8 @@
 /**
  * Gives back the browser's instance of localstorage if present.
  * Will prevent failing if localStorage is not accessible because cookies are disabled
- * @returns {any}
  */
-export function getStorage() {
+export function getStorage(): Storage | undefined {
   try {
     /**
      * If users disable cookies in their browsers, they won't have access to the localStorage API.

@@ -74,6 +74,25 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
     }
   };
 
+  const nameContainer = !minimized && (
+    <div
+      className="group-video-grid__element__label"
+      css={{
+        backgroundColor: isActivelySpeaking ? 'var(--accent-color)' : 'var(--black)',
+      }}
+    >
+      <span
+        data-uie-name={isActivelySpeaking ? 'status-active-speaking' : isMuted ? 'status-audio-off' : 'status-audio-on'}
+        className="group-video-grid__element__label__name"
+        css={{
+          color: isActivelySpeaking ? 'var(--app-bg-secondary)' : 'var(--white)',
+        }}
+      >
+        {name}
+      </span>
+    </div>
+  );
+
   return (
     <button
       data-uie-name="item-grid"
@@ -141,26 +160,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
         </div>
       )}
 
-      {!minimized && (
-        <div
-          className="group-video-grid__element__label"
-          css={{
-            backgroundColor: isActivelySpeaking ? 'var(--accent-color)' : 'var(--black)',
-          }}
-        >
-          <span
-            data-uie-name={
-              isActivelySpeaking ? 'status-active-speaking' : isMuted ? 'status-audio-off' : 'status-audio-on'
-            }
-            className="group-video-grid__element__label__name"
-            css={{
-              color: isActivelySpeaking ? 'var(--app-bg-secondary)' : 'var(--white)',
-            }}
-          >
-            {name}
-          </span>
-        </div>
-      )}
+      {nameContainer}
 
       {hasPausedVideo && (
         <div className="group-video-grid__pause-overlay">
@@ -176,6 +176,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
           >
             {t('videoCallPaused')}
           </div>
+          {nameContainer}
         </div>
       )}
     </button>
