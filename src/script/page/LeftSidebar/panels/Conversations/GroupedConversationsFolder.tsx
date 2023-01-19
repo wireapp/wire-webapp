@@ -67,7 +67,7 @@ const GroupedConversationsFolder: React.FC<GroupedConversationsFolderProps> = ({
               key={conversation.id}
               index={index}
               focusConversation={currentFocus === index}
-              isConversationListFocus
+              isConversationListFocus={currentFocus === index}
               handleFocus={setCurrentFocus}
               handleArrowKeyDown={handleKeyDown}
               onClick={(event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>) => {

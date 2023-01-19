@@ -106,7 +106,7 @@ export const ConversationsList: React.FC<{
             <ConversationListCell
               key={conversation.id}
               focusConversation={currentFocus === index}
-              isConversationListFocus={isConversationListFocus}
+              isConversationListFocus={isConversationListFocus && currentFocus === index}
               handleFocus={handleFocus}
               handleArrowKeyDown={handleArrowKeyDown}
               index={index}
