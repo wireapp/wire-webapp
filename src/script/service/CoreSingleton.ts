@@ -22,6 +22,7 @@ import {container, singleton} from 'tsyringe';
 
 import {Account} from '@wireapp/core';
 
+import {getStorage} from 'Util/localStorage';
 import {isTemporaryClientAndNonPersistent, supportsCoreCryptoProteus, supportsMLS} from 'Util/util';
 
 import {APIClient} from './APIClientSingleton';
@@ -64,6 +65,8 @@ export class Core extends Account<Uint8Array> {
          * When in a browser context, then this systemCrypto will be undefined and the core will then use it's internal encryption system
          */
         systemCrypto: window.systemCrypto,
+
+        useCoreCrypto: getStorage()?.getItem('useCoreCrypto') === '1',
       },
       nbPrekeys: 100,
     });

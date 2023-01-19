@@ -21,7 +21,7 @@ import {Account} from '@wireapp/core';
 
 import {arrayToBase64} from 'Util/util';
 
-import {mlsConversationState} from './mlsConversationState';
+import {useMLSConversationState} from './mlsConversationState';
 
 import {ConversationRepository} from '../conversation/ConversationRepository';
 import {
@@ -74,7 +74,7 @@ export async function initMLSConversations(
  */
 async function joinNewConversations(conversations: MLSConversation[], core: Account): Promise<void> {
   // We send external proposal to all the MLS conversations that are in an unknown state (not established nor pendingWelcome)
-  await mlsConversationState.getState().sendExternalToPendingJoin(
+  await useMLSConversationState.getState().sendExternalToPendingJoin(
     conversations,
     groupId => core.service!.conversation.isMLSConversationEstablished(groupId),
     conversationId => core.service!.conversation.joinByExternalCommit(conversationId),

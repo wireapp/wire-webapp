@@ -361,6 +361,8 @@ export class App {
       try {
         await this.core.init(clientType);
       } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : error;
+        this.logger.error(`Error when initializing core: "${errorMessage}"`, error);
         throw new AccessTokenError(AccessTokenError.TYPE.REQUEST_FORBIDDEN, 'Session has expired');
       }
       const localClient = await this.core.initClient();

@@ -1059,6 +1059,8 @@
   "preferencesOptionsEnableSoundlessIncomingCallsDetails": "Уведомление будет отключено, если вы в этот момент с кем-то разговариваете",
   "preferencesOptionsEnableVbrCheckbox": "Кодирование с переменным битрейтом",
   "preferencesOptionsEnableVbrDetails": "Благодаря этой опции аудиозвонки расходуют меньше данных и лучше работают при использовании низкоскоростных сетей. Выключите, чтобы использовать кодирование с постоянным битрейтом (CBR). Эта настройка влияет только на звонки 1:1; конференц-звонки всегда используют кодирование CBR.",
+  "preferencesOptionsInputLevelDetected": "Звук с микрофона обнаружен",
+  "preferencesOptionsInputLevelNotDetected": "Звук с микрофона не обнаружен",
   "preferencesOptionsNotifications": "Уведомления",
   "preferencesOptionsNotificationsNone": "Выключены",
   "preferencesOptionsNotificationsObfuscate": "Скрыть детали",

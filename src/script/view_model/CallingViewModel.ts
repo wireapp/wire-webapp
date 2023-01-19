@@ -17,6 +17,7 @@
  *
  */
 
+import {Subconversation} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 import {container} from 'tsyringe';
@@ -140,9 +141,12 @@ export class CallingViewModel {
 
     const generateMembers = async (conversationId: QualifiedId, subconversation: Subconversation): Promise<any> => {
       const mlsService = core.service!.mls;
+      if (!mlsService) {
+        throw new Error('mls service was not initialised');
+      }
 
       const parentGroupId = await mlsService.getGroupIdFromConversationId(conversationId);
-      const memberIds = await core.service!.mls.getClientIds(parentGroupId);
+      const memberIds = await mlsService.getClientIds(parentGroupId);
 
       return memberIds.map(parentMember => {
         const isSubconversationMember = !!subconversation.members.find(
@@ -160,8 +164,9 @@ export class CallingViewModel {
       }
 
       const subconversationData = conversation.isUsingMLSProtocol
-        ? await core.service!.mls.joinConferenceSubconversation(conversation)
+        ? await core.service!.mls?.joinConferenceSubconversation(conversation)
         : undefined;
+
       const subconversation = subconversationData?.subconversation;
       if (subconversation) {
         const members = await generateMembers(conversation, subconversation);
@@ -170,12 +175,11 @@ export class CallingViewModel {
       ring(call);
     };
 
-    const joinOngoingCall = async (call: Call) => {
-      //we don't have to do anything if it's not mls conference
-      if (call.conversationType !== CONV_TYPE.CONFERENCE_MLS) {
-        return;
-      }
+    const joinOngoingMlsConference = async (call: Call) => {
       const mlsService = core.service!.mls;
+      if (!mlsService) {
+        throw new Error('mls service was not initialised');
+      }
 
       //join subconversation
       const subconversationData = await mlsService.joinConferenceSubconversation(call.conversationId);
@@ -188,7 +192,10 @@ export class CallingViewModel {
 
     const answerCall = async (call: Call) => {
       await this.callingRepository.answerCall(call);
-      await joinOngoingCall(call);
+
+      if (call.conversationType === CONV_TYPE.CONFERENCE_MLS) {
+        await joinOngoingMlsConference(call);
+      }
     };
 
     const hasSoundlessCallsEnabled = (): boolean => {

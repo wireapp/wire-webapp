@@ -182,7 +182,7 @@ const Collection: React.FC<CollectionDetailsProps> = ({
         onSelect={() => setDetailCategory('files')}
         label={t('collectionSectionFiles')}
       >
-        <span className={`collection-header-icon icon-link`}></span>
+        <span className={`collection-header-icon icon-file`}></span>
       </CollectionSection>
     </>
   );
