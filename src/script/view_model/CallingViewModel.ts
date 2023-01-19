@@ -139,9 +139,16 @@ export class CallingViewModel {
     };
 
     const startCall = async (conversation: Conversation, callType: CALL_TYPE): Promise<void> => {
-      const keyData = conversation.isUsingMLSProtocol
-        ? await core.service!.mls.joinConferenceSubconversation(conversation)
+      const subConversationData = conversation.isUsingMLSProtocol
+        ? await core.service!.mls?.joinConferenceSubconversation(conversation)
         : undefined;
+
+      const keyData = subConversationData && {
+        epoch: subConversationData.subconversation.epoch,
+        secretKey: subConversationData.secretKey,
+        keyLength: subConversationData.keyLength,
+      };
+
       this.callingRepository.startCall(conversation, callType, keyData).then(call => {
         if (!call) {
           return;
