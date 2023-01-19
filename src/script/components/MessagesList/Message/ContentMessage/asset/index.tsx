@@ -80,8 +80,8 @@ const ContentAsset = ({
             />
           )}
           {(asset as Text).previews().map(preview => (
-            <div key={preview.url} className="message-asset">
-              <LinkPreviewAsset message={message} />
+            <div key={asset.id} className="message-asset">
+              <LinkPreviewAsset message={message} isFocusable={isMessageFocused} />
             </div>
           ))}
         </>

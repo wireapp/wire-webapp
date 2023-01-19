@@ -19,6 +19,8 @@
 
 import {FC, useEffect, useState} from 'react';
 
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {RadioGroup} from 'Components/Radio';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -107,7 +109,9 @@ const TimedMessages: FC<TimedMessagesPanelProps> = ({activeConversation, onClose
             }))}
           />
         </div>
-        <p className="panel__info-text timed-messages__disclaimer">{t('timedMessageDisclaimer')}</p>
+        <p className="panel__info-text timed-messages__disclaimer" tabIndex={TabIndex.FOCUSABLE}>
+          {t('timedMessageDisclaimer')}
+        </p>
       </FadingScrollbar>
     </div>
   );
