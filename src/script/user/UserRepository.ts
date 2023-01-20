@@ -259,7 +259,7 @@ export class UserRepository {
    * Assign all locally stored clients to the users.
    * @returns Resolves with all user entities where client entities have been assigned to.
    */
-  private async assignAllClients(): Promise<User[]> {
+  public async assignAllClients(): Promise<User[]> {
     const recipients = await this.clientRepository.getAllClientsFromDb();
     const userIds: QualifiedId[] = Object.entries(recipients).map(([userId, clientEntities]) => {
       return {
