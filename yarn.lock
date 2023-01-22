@@ -3974,20 +3974,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/parser@npm:^5.48.1":
-  version: 5.48.1
-  resolution: "@typescript-eslint/parser@npm:5.48.1"
+"@typescript-eslint/parser@npm:^5.48.2":
+  version: 5.48.2
+  resolution: "@typescript-eslint/parser@npm:5.48.2"
   dependencies:
-    "@typescript-eslint/scope-manager": 5.48.1
-    "@typescript-eslint/types": 5.48.1
-    "@typescript-eslint/typescript-estree": 5.48.1
+    "@typescript-eslint/scope-manager": 5.48.2
+    "@typescript-eslint/types": 5.48.2
+    "@typescript-eslint/typescript-estree": 5.48.2
     debug: ^4.3.4
   peerDependencies:
     eslint: ^6.0.0 || ^7.0.0 || ^8.0.0
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: c624d24eb209b4ce7f0a6c8116712363f10a9c9a5138f240e254ff265526ee4b0fd73b7b6b4b6a0e7611bd9934c42036350dd27f96ae2fa4efdade1a7ebd0e9e
+  checksum: 0ca1494dfde0019c647afc8d48e751856c0c9e302627cc63e59cb221d4350d2e260f99e57660e4ab27ded873c1c677e43e2dba973a0656c6522205b9b52e0290
   languageName: node
   linkType: hard
 
@@ -4008,16 +4008,6 @@ __metadata:
     "@typescript-eslint/types": 5.46.1
     "@typescript-eslint/visitor-keys": 5.46.1
   checksum: bf934603dc9c7da71eb26f415d13018f2a96dbba193a773bc440a5c93828365f09bb3db9be55189dfbbace414c6c48d7fad246c0d9717dab4676d0d79d6d8676
-  languageName: node
-  linkType: hard
-
-"@typescript-eslint/scope-manager@npm:5.48.1":
-  version: 5.48.1
-  resolution: "@typescript-eslint/scope-manager@npm:5.48.1"
-  dependencies:
-    "@typescript-eslint/types": 5.48.1
-    "@typescript-eslint/visitor-keys": 5.48.1
-  checksum: f60a7efe917798cccf8652925de6be58b023ded6c6ee44ce74d074f0c2a1927680398a6d73bab33d500c69474ad8c54d63b90fcc6e13256712707d12a60e0a64
   languageName: node
   linkType: hard
 
@@ -4062,13 +4052,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/types@npm:5.48.1":
-  version: 5.48.1
-  resolution: "@typescript-eslint/types@npm:5.48.1"
-  checksum: 8437986e9d86d792b23327517ae2f9861ec55992d5a9cd55991e525409b6244169436cd708f3987ab7c579e45e59b6eab5a9d3583f7729219e25691164293094
-  languageName: node
-  linkType: hard
-
 "@typescript-eslint/types@npm:5.48.2":
   version: 5.48.2
   resolution: "@typescript-eslint/types@npm:5.48.2"
@@ -4109,24 +4092,6 @@ __metadata:
     typescript:
       optional: true
   checksum: 21499b927b4118cd51e841b2e1b7e55621135f923f461b75dc8ca8442de38a82da5a0232dce5229e0266b6fc12d70696e0e912fcf1483d4c44f02e4cad39ed98
-  languageName: node
-  linkType: hard
-
-"@typescript-eslint/typescript-estree@npm:5.48.1":
-  version: 5.48.1
-  resolution: "@typescript-eslint/typescript-estree@npm:5.48.1"
-  dependencies:
-    "@typescript-eslint/types": 5.48.1
-    "@typescript-eslint/visitor-keys": 5.48.1
-    debug: ^4.3.4
-    globby: ^11.1.0
-    is-glob: ^4.0.3
-    semver: ^7.3.7
-    tsutils: ^3.21.0
-  peerDependenciesMeta:
-    typescript:
-      optional: true
-  checksum: 2b26e5848ef131e1bb99ed54d8c0efa8279cf8e8f7d8b72de00c2ca6cf2799d96c20f5bbbcf26e14e81b7b9d1035ba509bff30f2d852c174815879e8f14c27ed
   languageName: node
   linkType: hard
 
@@ -4217,16 +4182,6 @@ __metadata:
     "@typescript-eslint/types": 5.46.1
     eslint-visitor-keys: ^3.3.0
   checksum: 952cf20e29a040e0820e52d6815097abf042ea8e1fd5d013c0a319284ea0e2e29e0ca9ef244717450a6eb9d32ebf7fa9ed91185675a27adc35c9ad070d561b7c
-  languageName: node
-  linkType: hard
-
-"@typescript-eslint/visitor-keys@npm:5.48.1":
-  version: 5.48.1
-  resolution: "@typescript-eslint/visitor-keys@npm:5.48.1"
-  dependencies:
-    "@typescript-eslint/types": 5.48.1
-    eslint-visitor-keys: ^3.3.0
-  checksum: 2bda10cf4e6bc48b0d463767617e48a832d708b9434665dff6ed101f7d33e0d592f02af17a2259bde1bd17e666246448ae78d0fe006148cb93d897fff9b1d134
   languageName: node
   linkType: hard
 
@@ -16820,7 +16775,7 @@ __metadata:
     "@types/underscore": 1.11.4
     "@types/webpack-env": 1.18.0
     "@typescript-eslint/eslint-plugin": ^5.48.2
-    "@typescript-eslint/parser": ^5.48.1
+    "@typescript-eslint/parser": ^5.48.2
     "@wireapp/avs": 8.2.30
     "@wireapp/copy-config": 2.0.5
     "@wireapp/core": 38.5.3
