@@ -3442,16 +3442,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/fs-extra@npm:9.0.13":
-  version: 9.0.13
-  resolution: "@types/fs-extra@npm:9.0.13"
-  dependencies:
-    "@types/node": "*"
-  checksum: add79e212acd5ac76b97b9045834e03a7996aef60a814185e0459088fd290519a3c1620865d588fa36c4498bf614210d2a703af5cf80aa1dbc125db78f6edac3
-  languageName: node
-  linkType: hard
-
-"@types/fs-extra@npm:^11.0.1":
+"@types/fs-extra@npm:11.0.1, @types/fs-extra@npm:^11.0.1":
   version: 11.0.1
   resolution: "@types/fs-extra@npm:11.0.1"
   dependencies:
@@ -16793,7 +16784,7 @@ __metadata:
     "@types/dexie-batch": 0.4.3
     "@types/eslint": ^8.4.10
     "@types/eslint-scope": ^3.7.4
-    "@types/fs-extra": 9.0.13
+    "@types/fs-extra": 11.0.1
     "@types/generate-changelog": 1.8.1
     "@types/highlight.js": 10.1.0
     "@types/jest": 29.2.6
