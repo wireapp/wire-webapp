@@ -224,6 +224,7 @@ export class MLSService {
     if (subconversation.epoch === 0) {
       await this.registerConversation(subconversation.group_id, []);
     } else {
+      //TODO: check timestamp, if subconv is older than 24h -> delete and re-create subconversation
       await this.joinByExternalCommit(() =>
         this.apiClient.api.conversation.getSubconversationGroupInfo(conversationId, SUBCONVERSATION_ID.CONFERENCE),
       );
@@ -232,15 +233,20 @@ export class MLSService {
     // We store the mapping between the subconversation and the parent conversation
     storeSubconversationGroupId(conversationId, subconversation.subconv_id, subconversation.group_id);
 
-    const keyLength = 256;
-    const groupIdBytes = Decoder.fromBase64(subconversation.group_id).asBytes;
-    const secretKey = await this.coreCryptoClient.exportSecretKey(groupIdBytes, keyLength);
+    const keyLength = 32;
+    const secretKey = await this.exportSecretKey(subconversation.group_id, keyLength);
 
     return {
       subconversation,
-      secretKey: new TextDecoder().decode(secretKey),
+      secretKey,
       keyLength,
     };
+  }
+
+  private async exportSecretKey(groupId: string, keyLength: number): Promise<string> {
+    const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
+    const key = await this.coreCryptoClient.exportSecretKey(groupIdBytes, keyLength);
+    return Encoder.toBase64(key).asString;
   }
 
   public async newExternalProposal(
