@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [38.5.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.5.3...@wireapp/core@38.5.4) (2023-01-23)
+
+### Bug Fixes
+
+* Use qualifiedIds when querying single conversation ([#4807](https://github.com/wireapp/wire-web-packages/issues/4807)) ([c0f19a5](https://github.com/wireapp/wire-web-packages/commit/c0f19a54ee5920c075ae62d32dfb1d88b5812d9a))
+
 ## [38.5.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.5.2...@wireapp/core@38.5.3) (2023-01-17)
 
 ### Bug Fixes
