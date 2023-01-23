@@ -27,6 +27,8 @@ import {
   UserClients,
   ClientMismatch,
   ConversationProtocol,
+  SUBCONVERSATION_ID,
+  Subconversation,
   RemoteConversations,
 } from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_TYPING, ConversationMemberUpdateData} from '@wireapp/api-client/lib/conversation/data';
@@ -167,6 +169,13 @@ export class ConversationService {
       return this.apiClient.api.conversation.getConversationList();
     }
     return this.apiClient.api.conversation.getConversationsByQualifiedIds(conversationIds);
+  }
+
+  public async getSubconversation(
+    conversationId: QualifiedId,
+    subconversationId: SUBCONVERSATION_ID,
+  ): Promise<Subconversation> {
+    return this.apiClient.api.conversation.getSubconversation(conversationId, subconversationId);
   }
 
   public async getAsset({assetId, assetToken, otrKey, sha256}: RemoteData): Promise<Uint8Array> {
