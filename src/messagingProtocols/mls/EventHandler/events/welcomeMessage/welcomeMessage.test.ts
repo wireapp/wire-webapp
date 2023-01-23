@@ -21,8 +21,8 @@ import {BackendEvent, ConversationMLSWelcomeEvent, CONVERSATION_EVENT} from '@wi
 
 import {handleWelcomeMessage, isWelcomeMessageEvent} from './welcomeMessage';
 
-import {MLSService} from '../../../..';
-import {NotificationSource} from '../../../../../../notification';
+import {MLSService} from '../../..';
+import {NotificationSource} from '../../../../../notification';
 
 jest.mock('bazinga64', () => ({
   ...jest.requireActual('bazinga64'),
