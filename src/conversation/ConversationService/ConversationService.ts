@@ -27,6 +27,7 @@ import {
   UserClients,
   ClientMismatch,
   ConversationProtocol,
+  RemoteConversations,
 } from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_TYPING, ConversationMemberUpdateData} from '@wireapp/api-client/lib/conversation/data';
 import {ConversationMemberLeaveEvent} from '@wireapp/api-client/lib/event';
@@ -157,16 +158,15 @@ export class ConversationService {
     return this.proteusService.createConversation({conversationData, otherUserIds});
   }
 
-  public async getConversations(conversationId: string): Promise<Conversation>;
-  public async getConversations(conversationIds?: string[]): Promise<Conversation[]>;
-  public async getConversations(conversationIds?: string | string[]): Promise<Conversation[] | Conversation> {
-    if (!conversationIds || !conversationIds.length) {
-      return this.apiClient.api.conversation.getAllConversations();
+  public async getConversation(conversationId: QualifiedId): Promise<Conversation> {
+    return this.apiClient.api.conversation.getConversation(conversationId);
+  }
+
+  public async getConversations(conversationIds?: QualifiedId[]): Promise<RemoteConversations> {
+    if (!conversationIds) {
+      return this.apiClient.api.conversation.getConversationList();
     }
-    if (typeof conversationIds === 'string') {
-      return this.apiClient.api.conversation.getConversation(conversationIds);
-    }
-    return this.apiClient.api.conversation.getConversationsByIds(conversationIds);
+    return this.apiClient.api.conversation.getConversationsByQualifiedIds(conversationIds);
   }
 
   public async getAsset({assetId, assetToken, otrKey, sha256}: RemoteData): Promise<Uint8Array> {
@@ -340,7 +340,7 @@ export class ConversationService {
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
     const coreCryptoKeyPackagesPayload = await this.mlsService.getKeyPackagesPayload([...qualifiedUserIds]);
     const response = await this.mlsService.addUsersToExistingConversation(groupIdBytes, coreCryptoKeyPackagesPayload);
-    const conversation = await this.getConversations(conversationId.id);
+    const conversation = await this.getConversation(conversationId);
 
     //We store the info when user was added (and key material was created), so we will know when to renew it
     this.mlsService.resetKeyMaterialRenewal(groupId);
@@ -368,7 +368,7 @@ export class ConversationService {
     //key material gets updated after removing a user from the group, so we can reset last key update time value in the store
     this.mlsService.resetKeyMaterialRenewal(groupId);
 
-    const conversation = await this.getConversations(conversationId.id);
+    const conversation = await this.getConversation(conversationId);
 
     return {
       events: messageResponse?.events || [],
