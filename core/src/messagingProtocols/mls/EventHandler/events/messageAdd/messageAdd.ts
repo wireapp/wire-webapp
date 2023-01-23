@@ -19,22 +19,20 @@
 
 import {BackendEvent, ConversationMLSMessageAddEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 import {Decoder} from 'bazinga64';
-import logdown from 'logdown';
 
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
-import {EventHandlerResult} from '../../../../../common.types';
-import {optionalToUint8Array} from '../../../../MLSService/MLSService';
-import {EventHandlerParams} from '../../../EventHandler.types';
+import {EventHandlerResult} from '../../../../common.types';
+import {optionalToUint8Array} from '../../../MLSService/MLSService';
+import {EventHandlerParams} from '../../EventHandler.types';
 
 const isMLSMessageAddEvent = (event: BackendEvent): event is ConversationMLSMessageAddEvent =>
   event.type === CONVERSATION_EVENT.MLS_MESSAGE_ADD;
 
 interface HandleMLSMessageAddParams extends EventHandlerParams {
   event: ConversationMLSMessageAddEvent;
-  logger: logdown.Logger;
 }
-const handleMLSMessageAdd = async ({mlsService, event, logger}: HandleMLSMessageAddParams): EventHandlerResult => {
+const handleMLSMessageAdd = async ({mlsService, event}: HandleMLSMessageAddParams): EventHandlerResult => {
   const encryptedData = Decoder.fromBase64(event.data).asBytes;
 
   const groupId = await mlsService.getGroupIdFromConversationId(
@@ -70,9 +68,7 @@ const handleMLSMessageAdd = async ({mlsService, event, logger}: HandleMLSMessage
   }
 
   if (!message) {
-    const newEpoch = await mlsService.getEpoch(groupIdBytes);
-    logger.log(`Received commit message for group "${groupId}". New epoch is "${newEpoch}"`);
-    return;
+    return {event};
   }
   const decryptedData = GenericMessage.decode(message);
   return {

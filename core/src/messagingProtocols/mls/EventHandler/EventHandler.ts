@@ -17,11 +17,19 @@
  *
  */
 
-import {handleConversationEvent} from './ConversationEvent';
 import {EventHandlerParams} from './EventHandler.types';
+import {handleMLSMessageAdd, handleWelcomeMessage, isMLSMessageAddEvent, isWelcomeMessageEvent} from './events';
 
 import {EventHandlerResult} from '../../common.types';
 
-const handleBackendEvent = async (params: EventHandlerParams): EventHandlerResult => handleConversationEvent(params);
+const handleBackendEvent = async (params: EventHandlerParams): EventHandlerResult => {
+  const {event} = params;
+  if (isWelcomeMessageEvent(event)) {
+    return handleWelcomeMessage({...params, event});
+  }
+  if (isMLSMessageAddEvent(event)) {
+    return handleMLSMessageAdd({...params, event});
+  }
+};
 
 export {handleBackendEvent};

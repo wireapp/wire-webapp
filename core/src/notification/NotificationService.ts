@@ -38,8 +38,11 @@ import {MLSService} from '../messagingProtocols/mls';
 import {ProteusService} from '../messagingProtocols/proteus';
 
 export type HandledEventPayload = {
+  /** the raw event received from backend */
   event: BackendEvent;
+  /** the decrypted data in case the event was an encrypted event */
   decryptedData?: GenericMessage;
+  /** in case decryption went wrong, this will contain information about the decryption error */
   decryptionError?: DecryptionError;
 };
 
