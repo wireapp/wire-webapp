@@ -239,7 +239,11 @@ export const UserList = ({
       <>
         {isSelectable && hasSelectedUsers && (
           <>
-            <button onClick={() => toggleFolder(UserListSections.SELECTED_CONTACTS)} css={collapseButton}>
+            <button
+              onClick={() => toggleFolder(UserListSections.SELECTED_CONTACTS)}
+              css={collapseButton}
+              data-uie-name="do-toggle-selected-search-list"
+            >
               <span css={collapseIcon(isSelectedContactsOpen)} aria-hidden="true">
                 <Icon.Disclose width={16} height={16} />
               </span>
@@ -259,7 +263,11 @@ export const UserList = ({
         )}
 
         {isSelectable && (
-          <button onClick={() => toggleFolder(UserListSections.CONTACTS)} css={collapseButton}>
+          <button
+            onClick={() => toggleFolder(UserListSections.CONTACTS)}
+            css={collapseButton}
+            data-uie-name="do-toggle-search-list"
+          >
             <span css={collapseIcon(isContactsOpen)} aria-hidden="true">
               <Icon.Disclose width={16} height={16} />
             </span>
