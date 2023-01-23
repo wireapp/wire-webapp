@@ -22,8 +22,6 @@ import {Notification} from '@wireapp/api-client/lib/notification/';
 import {AbortHandler} from '@wireapp/api-client/lib/tcp';
 import logdown from 'logdown';
 
-import {EventEmitter} from 'events';
-
 import {APIClient} from '@wireapp/api-client';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
@@ -36,6 +34,7 @@ import {CoreError, NotificationError} from '../CoreError';
 import {DecryptionError} from '../errors/DecryptionError';
 import {MLSService} from '../messagingProtocols/mls';
 import {ProteusService} from '../messagingProtocols/proteus';
+import {TypedEventEmitter} from '../util/TypedEventEmitter';
 
 export type HandledEventPayload = {
   /** the raw event received from backend */
@@ -56,11 +55,11 @@ export type NotificationHandler = (
   progress: {done: number; total: number},
 ) => Promise<void>;
 
-export interface NotificationService {
-  on(event: TOPIC.NOTIFICATION_ERROR, listener: (payload: NotificationError) => void): this;
-}
+type Events = {
+  [TOPIC.NOTIFICATION_ERROR]: NotificationError;
+};
 
-export class NotificationService extends EventEmitter {
+export class NotificationService extends TypedEventEmitter<Events> {
   private readonly apiClient: APIClient;
   private readonly backend: NotificationBackendRepository;
   private readonly database: NotificationDatabaseRepository;
