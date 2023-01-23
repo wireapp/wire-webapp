@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [38.6.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.5.4...@wireapp/core@38.6.0) (2023-01-23)
+
+### Features
+
+* **core:** expose get subconversation in conversation service ([#4808](https://github.com/wireapp/wire-web-packages/issues/4808)) ([8fd3de5](https://github.com/wireapp/wire-web-packages/commit/8fd3de52c3b773853552b8a33d257042eb015e88))
+
 ## [38.5.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.5.3...@wireapp/core@38.5.4) (2023-01-23)
 
 ### Bug Fixes
