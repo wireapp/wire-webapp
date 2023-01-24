@@ -35,9 +35,11 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
+import {ReadReceiptState, useReadReceiptsHistoryEntry} from '../../../components/UserList';
 import {ConversationRoleRepository} from '../../../conversation/ConversationRoleRepository';
 import {MemberLeaveEvent} from '../../../conversation/EventBuilder';
 import {Conversation} from '../../../entity/Conversation';
+import {Message} from '../../../entity/message/Message';
 import {User} from '../../../entity/User';
 import {ClientEvent} from '../../../event/Client';
 import {TeamRepository} from '../../../team/TeamRepository';
@@ -46,7 +48,6 @@ import {UserState} from '../../../user/UserState';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {PanelHeader} from '../PanelHeader';
 import {PanelEntity} from '../RightSidebar';
-
 interface GroupParticipantUserProps {
   onBack: (entity: PanelEntity) => void;
   onClose: () => void;
@@ -57,6 +58,7 @@ interface GroupParticipantUserProps {
   activeConversation: Conversation;
   conversationRoleRepository: ConversationRoleRepository;
   teamRepository: TeamRepository;
+  message: Message;
   teamState: TeamState;
   userState: UserState;
   isFederated?: boolean;
@@ -75,6 +77,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
   teamState,
   userState,
   isFederated = false,
+  message,
 }) => {
   const {isGroup, roles} = useKoSubscribableChildren(activeConversation, ['isGroup', 'roles']);
   const {isTemporaryGuest} = useKoSubscribableChildren(currentUser, ['isTemporaryGuest']);
@@ -137,12 +140,19 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
     }
   }, [isTemporaryGuest, currentUser]);
 
+  const history = useReadReceiptsHistoryEntry();
   return (
     <div id="group-participant-user" className="panel__page group-participant">
       <PanelHeader
         showBackArrow
         goBackUie="go-back-group-participant"
-        onGoBack={() => onBack(activeConversation)}
+        // onGoBack={() => onBack(activeConversation)}
+        onGoBack={() => {
+          if (history.current.state === ReadReceiptState.MESSAGE_DETAILS) {
+            history.goBack();
+          }
+          onBack(activeConversation);
+        }}
         onClose={onClose}
       />
 

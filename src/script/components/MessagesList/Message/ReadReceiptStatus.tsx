@@ -72,7 +72,7 @@ const ReadReceiptStatus: React.FC<ReadReceiptStatusProps> = ({
           {t('conversationMessageDelivered')}
         </span>
       )}
-      {showEyeIndicator && (
+      {!showEyeIndicator && (
         <button
           type="button"
           tabIndex={messageFocusedTabIndex}

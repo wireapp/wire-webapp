@@ -211,6 +211,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
               goToRoot={goToRoot}
               showDevices={showDevices}
               currentUser={userEntity}
+              message={messageEntity}
               activeConversation={activeConversation}
               actionsViewModel={actionsViewModel}
               conversationRoleRepository={conversationRoleRepository}
@@ -297,10 +298,12 @@ const RightSidebar: FC<RightSidebarProps> = ({
               messageEntity={messageEntity}
               updateEntity={rightSidebar.updateEntity}
               teamRepository={teamRepository}
+              togglePanel={togglePanel}
               searchRepository={searchRepository}
               showLikes={rightSidebar.showLikes}
               userRepository={userRepository}
               onClose={closePanel}
+              onGoBack={onBackClick}
             />
           )}
 

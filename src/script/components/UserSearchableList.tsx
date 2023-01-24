@@ -27,7 +27,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {sortByPriority} from 'Util/StringUtil';
 
-import {UserList} from './UserList';
+import {UserList, useReadReceiptsHistoryEntry} from './UserList';
 
 import {ConversationState} from '../conversation/ConversationState';
 import type {User} from '../entity/User';
@@ -70,6 +70,7 @@ const UserSearchableList: React.FC<UserListProps> = ({
 
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
   const {inTeam: selfInTeam} = useKoSubscribableChildren(selfUser, ['inTeam']);
+  const history = useReadReceiptsHistoryEntry();
 
   /**
    * Try to load additional members from the backend.
@@ -169,6 +170,7 @@ const UserSearchableList: React.FC<UserListProps> = ({
           selectedUsers={selectedUsers}
           highlightedUsers={highlightedUsers}
           onSelectUser={toggleUserSelection}
+          goTo={history.goTo}
         />
       )}
     </div>

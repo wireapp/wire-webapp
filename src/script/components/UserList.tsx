@@ -17,7 +17,7 @@
  *
  */
 
-import React, {ChangeEvent, useState} from 'react';
+import React, {ChangeEvent, useMemo, useState} from 'react';
 
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -64,7 +64,33 @@ export interface UserListProps {
   truncate?: boolean;
   users: User[];
   userState?: UserState;
+  goTo: (state: ReadReceiptState, headline: string) => void;
 }
+
+export enum ReadReceiptState {
+  MESSAGE_DETAILS = 'ReadReceiptState.MESSAGE_DETAILS',
+  USER_LIST = 'ReadReceiptState.USER_LIST',
+}
+export interface ReadReceiptsHistoryEntry {
+  headline: string;
+  state: ReadReceiptState;
+}
+
+export const useReadReceiptsHistoryEntry = () => {
+  const [history, setHistory] = useState<ReadReceiptsHistoryEntry[]>([
+    {headline: '', state: ReadReceiptState.MESSAGE_DETAILS},
+  ]);
+  const current = useMemo<ReadReceiptsHistoryEntry>(() => history[history.length - 1], [history]);
+  return {
+    current,
+    goBack: () => {
+      setHistory(history.slice(0, -1));
+    },
+    goTo: (state: ReadReceiptState, headline: string) => {
+      setHistory([...history, {headline, state}]);
+    },
+  };
+};
 
 const UserList: React.FC<UserListProps> = ({
   onClick,
@@ -85,6 +111,7 @@ const UserList: React.FC<UserListProps> = ({
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
   onSelectUser,
+  goTo,
 }) => {
   const [maxShownUsers, setMaxShownUsers] = useState(USER_CHUNK_SIZE);
 
@@ -112,6 +139,7 @@ const UserList: React.FC<UserListProps> = ({
   const onClickOrKeyPressed = (userEntity: User, event: MouseEvent | KeyboardEvent | ChangeEvent) => {
     onSelectUser?.(userEntity);
     onClick?.(userEntity, event);
+    goTo(ReadReceiptState.USER_LIST, 'users list');
   };
 
   const isSelected = (userEntity: User): boolean =>
