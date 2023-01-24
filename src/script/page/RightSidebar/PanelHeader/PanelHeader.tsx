@@ -65,10 +65,10 @@ const PanelHeader: FC<PanelHeaderProps> = ({
   const panelHeaderRef = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
-    if (!!panelHeaderRef.current) {
-      const nextElementToFocus = panelHeaderRef.current.querySelector('button');
-      nextElementToFocus?.focus();
-    }
+    // if (!!panelHeaderRef.current) {
+    //   const nextElementToFocus = panelHeaderRef.current.querySelector('button');
+    //   nextElementToFocus?.focus();
+    // }
   }, []);
 
   return (
