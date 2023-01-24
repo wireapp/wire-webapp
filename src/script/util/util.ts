@@ -167,7 +167,7 @@ export const getFileExtension = (filename: string): string => {
   return foundExtension || '';
 };
 
-export const trimFileExtension = (filename: string): string => {
+export const trimFileExtension = (filename?: string): string => {
   if (typeof filename === 'string') {
     if (filename.endsWith('.tar.gz')) {
       filename = filename.replace(/\.tar\.gz$/, '');
