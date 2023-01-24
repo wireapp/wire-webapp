@@ -89,7 +89,9 @@ async function buildMessageRepository(): Promise<[MessageRepository, MessageRepo
     eventRepository: new EventRepository(new EventService({} as any), {} as any, {} as any, {} as any),
     propertiesRepository: new PropertiesRepository({} as any, {} as any),
     serverTimeHandler: serverTimeHandler,
-    userRepository: {} as UserRepository,
+    userRepository: {
+      assignAllClients: jest.fn().mockResolvedValue(true),
+    } as unknown as UserRepository,
     assetRepository: {} as AssetRepository,
     userState,
     teamState: new TeamState(),
