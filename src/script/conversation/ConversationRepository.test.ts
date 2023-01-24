@@ -62,11 +62,26 @@ import {EventRecord, StorageService} from '../storage';
 
 jest.deepUnmock('axios');
 
+const _generateConversation = (
+  conversation_type = CONVERSATION_TYPE.REGULAR,
+  connection_status = ConnectionStatus.ACCEPTED,
+) => {
+  const conversation = new Conversation(createRandomUuid(), '');
+  conversation.type(conversation_type);
+
+  const connectionEntity = new ConnectionEntity();
+  connectionEntity.conversationId = conversation.qualifiedId;
+  connectionEntity.status(connection_status);
+  conversation.connection(connectionEntity);
+
+  return conversation;
+};
+
 describe('ConversationRepository', () => {
   const testFactory = new TestFactory();
 
-  let conversation_et: Conversation;
-  let selfConversation: Conversation;
+  let conversation_et = _generateConversation(CONVERSATION_TYPE.REGULAR);
+  const selfConversation = _generateConversation(CONVERSATION_TYPE.SELF);
   let self_user_et;
   let server: sinon.SinonFakeServer;
   let storage_service: StorageService;
@@ -76,59 +91,50 @@ describe('ConversationRepository', () => {
     return ko.utils.arrayFirst(conversations(), _conversation => _conversation.id === conversation.id);
   };
 
-  const _generateConversation = (
-    conversation_type = CONVERSATION_TYPE.REGULAR,
-    connection_status = ConnectionStatus.ACCEPTED,
-  ) => {
-    const conversation = new Conversation(createRandomUuid(), '');
-    conversation.type(conversation_type);
-
-    const connectionEntity = new ConnectionEntity();
-    connectionEntity.conversationId = conversation.qualifiedId;
-    connectionEntity.status(connection_status);
-    conversation.connection(connectionEntity);
-
-    return conversation;
-  };
-
-  beforeEach(async () => {
+  beforeAll(async () => {
     server = sinon.fakeServer.create();
     server.autoRespond = true;
 
-    return testFactory.exposeConversationActors().then(async (conversation_repository: ConversationRepository) => {
-      amplify.publish(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
-      storage_service = conversation_repository['conversationService']['storageService'];
+    const ping_url = `${Config.getConfig().BACKEND_REST}/conversations/${conversation_et.id}/knock`;
+    server.respondWith('POST', ping_url, [
+      HTTP_STATUS.CREATED,
+      {'Content-Type': 'application/json'},
+      JSON.stringify(payload.conversations.knock.post),
+    ]);
 
-      spyOn(testFactory.event_repository, 'injectEvent').and.returnValue(Promise.resolve({}));
-      conversation_et = _generateConversation(CONVERSATION_TYPE.REGULAR);
-      selfConversation = _generateConversation(CONVERSATION_TYPE.SELF);
-      conversation_et.id = payload.conversations.knock.post.conversation;
+    server.respondWith('GET', `${Config.getConfig().BACKEND_REST}/users?ids=${messageSenderId}`, [
+      HTTP_STATUS.OK,
+      {'Content-Type': 'application/json'},
+      '',
+    ]);
 
-      const ping_url = `${Config.getConfig().BACKEND_REST}/conversations/${conversation_et.id}/knock`;
-      server.respondWith('POST', ping_url, [
-        HTTP_STATUS.CREATED,
-        {'Content-Type': 'application/json'},
-        JSON.stringify(payload.conversations.knock.post),
-      ]);
+    const mark_as_read_url = `${Config.getConfig().BACKEND_REST}/conversations/${conversation_et.id}/self`;
+    server.respondWith('PUT', mark_as_read_url, [HTTP_STATUS.OK, {}, '']);
 
-      server.respondWith('GET', `${Config.getConfig().BACKEND_REST}/users?ids=${messageSenderId}`, [
-        HTTP_STATUS.OK,
-        {'Content-Type': 'application/json'},
-        '',
-      ]);
+    const conversationRepository = await testFactory.exposeConversationActors();
+    amplify.publish(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+    storage_service = conversationRepository['conversationService']['storageService'];
 
-      const mark_as_read_url = `${Config.getConfig().BACKEND_REST}/conversations/${conversation_et.id}/self`;
-      server.respondWith('PUT', mark_as_read_url, [HTTP_STATUS.OK, {}, '']);
+    spyOn(testFactory.event_repository, 'injectEvent').and.returnValue(Promise.resolve({}));
+    conversation_et.id = payload.conversations.knock.post.conversation;
+  });
 
-      await conversation_repository['saveConversation'](selfConversation);
-      return conversation_repository['saveConversation'](conversation_et);
-    });
+  beforeEach(async () => {
+    const conversationRepository = testFactory.conversation_repository!;
+
+    jest.spyOn(conversationRepository['conversationService'], 'saveConversationStateInDb').mockResolvedValue({} as any);
+    await conversationRepository['saveConversation'](selfConversation);
+    conversationRepository['saveConversation'](conversation_et);
   });
 
   afterEach(() => {
+    const conversationRepository = testFactory.conversation_repository!;
+    conversationRepository['conversationState'].conversations.removeAll();
+  });
+
+  afterAll(() => {
     server.restore();
     storage_service.clearStores();
-    testFactory.conversation_repository['conversationState'].conversations.removeAll();
   });
 
   describe('filtered_conversations', () => {
@@ -338,16 +344,16 @@ describe('ConversationRepository', () => {
       const selfUser = UserGenerator.getRandomUser();
       spyOn(testFactory.conversation_repository['userState'], 'self').and.returnValue(selfUser);
 
-      conversation_et = new Conversation(createRandomUuid());
+      const conversation = new Conversation(createRandomUuid());
       const messageWithoutTime = {
-        conversation: `${conversation_et.id}`,
+        conversation: `${conversation.id}`,
         data: {content: 'Hello World :)', nonce: 'aeac8355-739b-4dfc-a119-891a52c6a8dc'},
         from: '532af01e-1e24-4366-aacf-33b67d4ee376',
         id: 'aeac8355-739b-4dfc-a119-891a52c6a8dc',
         type: 'conversation.message-add',
       };
       const messageWithTime = {
-        conversation: `${conversation_et.id}`,
+        conversation: `${conversation.id}`,
         data: {content: 'Fifth message', nonce: '5a8cd79a-82bb-49ca-a59e-9a8e76df77fb', previews: [] as any[]},
         from: '8b497692-7a38-4a5d-8287-e3d1006577d6',
         id: '5a8cd79a-82bb-49ca-a59e-9a8e76df77fb',
@@ -355,7 +361,7 @@ describe('ConversationRepository', () => {
         type: 'conversation.message-add',
       };
 
-      const bad_message_key = `${conversation_et.id}@${messageWithoutTime.from}@NaN`;
+      const bad_message_key = `${conversation.id}@${messageWithoutTime.from}@NaN`;
       /**
        * The 'events' table uses auto-incremented inbound keys, so there is no need to define a key, when saving a record.
        *  - With Dexie 2.x, specifying a key when saving a record with an auto-inc. inbound key results in an error: "Data provided to an operation does not meet requirements"
@@ -363,7 +369,7 @@ describe('ConversationRepository', () => {
        */
       await storage_service.save(StorageSchemata.OBJECT_STORE.EVENTS, bad_message_key, messageWithoutTime);
       await storage_service.save(StorageSchemata.OBJECT_STORE.EVENTS, undefined, messageWithTime);
-      const loadedEvents = await testFactory.conversation_repository.getPrecedingMessages(conversation_et);
+      const loadedEvents = await testFactory.conversation_repository.getPrecedingMessages(conversation);
 
       expect(loadedEvents.length).toBe(1);
       expect(loadedEvents[0].id).toBe(messageWithTime.id);
@@ -925,8 +931,6 @@ describe('ConversationRepository', () => {
 
         expect(conversation_et.getMessage(messageId)).toBeDefined();
 
-        spyOn(testFactory.conversation_repository['userState'], 'self').and.returnValue(selfUser);
-
         await expect(
           testFactory.conversation_repository['handleConversationEvent'](messageHiddenEvent),
         ).rejects.toMatchObject({
@@ -1189,6 +1193,8 @@ describe('ConversationRepository', () => {
     it('removes conversations that have been deleted on the backend', async () => {
       const existingGroup = _generateConversation(CONVERSATION_TYPE.REGULAR);
       const deletedGroup = _generateConversation(CONVERSATION_TYPE.REGULAR);
+      const conversationRepository = testFactory.conversation_repository!;
+
       spyOn(testFactory.conversation_service, 'getConversationById').and.callFake(({id}) => {
         if (id === deletedGroup.id) {
           // eslint-disable-next-line prefer-promise-reject-errors
@@ -1196,11 +1202,13 @@ describe('ConversationRepository', () => {
         }
         return Promise.resolve();
       });
-      testFactory.conversation_repository['saveConversation'](existingGroup);
-      testFactory.conversation_repository['saveConversation'](deletedGroup);
+      await conversationRepository['saveConversation'](existingGroup);
+      await conversationRepository['saveConversation'](deletedGroup);
+
+      const currentNbConversations = conversationRepository['conversationState'].conversations().length;
       await testFactory.conversation_repository.checkForDeletedConversations();
 
-      expect(testFactory.conversation_repository['conversationState'].conversations().length).toBe(3);
+      expect(conversationRepository['conversationState'].conversations()).toHaveLength(currentNbConversations - 1);
     });
   });
 
