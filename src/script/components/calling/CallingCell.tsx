@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 
 import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation/';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
@@ -36,7 +36,7 @@ import {ClassifiedBar} from 'Components/input/ClassifiedBar';
 import {ParticipantItem} from 'Components/list/ParticipantItem';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {KEY} from 'Util/KeyboardUtil';
+import {isEnterKey, isEscapeKey, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
@@ -222,11 +222,48 @@ const CallingCell: React.FC<CallingCellProps> = ({
 
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
 
+  const answerCall = () => {
+    callActions.answer(call);
+    setCurrentView(ViewType.LEFT_SIDEBAR);
+  };
+
+  const answerOrRejectCall = useCallback(
+    (event: KeyboardEvent) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      const removeEventListener = () => window.removeEventListener('keydown', answerOrRejectCall);
+
+      if (isEnterKey(event)) {
+        answerCall();
+        removeEventListener();
+      }
+
+      if (isEscapeKey(event)) {
+        callActions.reject(call);
+        removeEventListener();
+      }
+    },
+    [call, callActions],
+  );
+
+  useEffect(() => {
+    if (isIncoming) {
+      window.addEventListener('keydown', answerOrRejectCall);
+
+      return () => {
+        window.removeEventListener('keydown', answerOrRejectCall);
+      };
+    }
+
+    return () => undefined;
+  }, [answerOrRejectCall, isIncoming]);
+
   return (
     <div className="conversation-calling-cell">
       {isIncoming && (
         <p role="alert" className="visually-hidden">
-          {conversationName} - {t('callStateIncoming')}
+          {t('callConversationAcceptOrDecline', conversationName)}
         </p>
       )}
 
@@ -466,10 +503,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
                     <li className="conversation-list-calling-cell-controls-item">
                       <button
                         className="call-ui__button call-ui__button--green call-ui__button--large"
-                        onClick={() => {
-                          callActions.answer(call);
-                          setCurrentView(ViewType.LEFT_SIDEBAR);
-                        }}
+                        onClick={answerCall}
                         type="button"
                         title={t('callAccept')}
                         aria-label={t('callAccept')}
@@ -481,6 +515,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
                   )}
                 </ul>
               </div>
+
               {isFullUi && (
                 <div
                   className={cx('call-ui__participant-list__wrapper', {
