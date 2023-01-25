@@ -118,7 +118,7 @@ enum CALL_DIRECTION {
   OUTGOING = 'outgoing',
 }
 
-type SubconversationData = {subconversation: {epoch: number}; secretKey: string; keyLength: number};
+type SubconversationData = {epoch: number; secretKey: string; keyLength: number};
 
 export class CallingRepository {
   private readonly acceptVersionWarning: (conversationId: QualifiedId) => void;
@@ -126,6 +126,7 @@ export class CallingRepository {
   private readonly logger: Logger;
   private avsVersion: number = 0;
   private incomingCallCallback: (call: Call) => void;
+  private requestClientsCallback: (conversationId: QualifiedId) => void;
   private isReady: boolean = false;
   /** will cache the query to media stream (in order to avoid asking the system for streams multiple times when we have multiple peers) */
   private mediaStreamQuery?: Promise<MediaStream>;
@@ -163,6 +164,7 @@ export class CallingRepository {
   ) {
     this.logger = getLogger('CallingRepository');
     this.incomingCallCallback = () => {};
+    this.requestClientsCallback = () => {};
     this.callLog = [];
 
     /** {<userId>: <isVerified>} */
@@ -333,6 +335,7 @@ export class CallingRepository {
         data.map(clientid => ({clientid, userid: this.serializeQualifiedId(userId)})),
       ),
     );
+
     this.wCall?.setClientsForConv(
       this.wUser,
       this.serializeQualifiedId(call.conversationId),
@@ -402,6 +405,10 @@ export class CallingRepository {
 
   onIncomingCall(callback: (call: Call) => void): void {
     this.incomingCallCallback = callback;
+  }
+
+  onRequestClientsCallback(callback: (conversationId: QualifiedId) => void): void {
+    this.requestClientsCallback = callback;
   }
 
   findCall(conversationId: QualifiedId): Call | undefined {
@@ -856,7 +863,7 @@ export class CallingRepository {
 
   setEpochInfo(conversationId: QualifiedId, subconversationData: SubconversationData, members: any[]) {
     const serializedConversationId = this.serializeQualifiedId(conversationId);
-    const {subconversation, secretKey, keyLength} = subconversationData;
+    const {epoch, secretKey, keyLength} = subconversationData;
     const clients = {
       convid: serializedConversationId,
       clients: members,
@@ -864,10 +871,10 @@ export class CallingRepository {
     return this.wCall?.setEpochInfo(
       this.wUser,
       serializedConversationId,
-      subconversation.epoch,
+      epoch,
       JSON.stringify(clients),
-      'bLmN7usnpXsHdbkK9ZkocR9E2qIqkyqC8Mgp0JWHOg0=',
-      32,
+      secretKey,
+      keyLength,
     );
   }
 
@@ -1489,7 +1496,9 @@ export class CallingRepository {
       this.logger.warn(`Unable to find a call for the conversation id of ${convId}`);
       return;
     }
-    this.pushClients(call);
+    await this.pushClients(call);
+    const qualifiedConversationId = this.parseQualifiedId(convId);
+    this.requestClientsCallback(qualifiedConversationId);
   };
 
   private readonly getCallMediaStream = async (
