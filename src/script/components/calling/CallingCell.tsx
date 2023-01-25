@@ -224,6 +224,12 @@ const CallingCell: React.FC<CallingCellProps> = ({
 
   return (
     <div className="conversation-calling-cell">
+      {isIncoming && (
+        <p role="alert" className="visually-hidden">
+          {conversationName} - {t('callStateIncoming')}
+        </p>
+      )}
+
       {showJoinButton && isFullUi && (
         <button
           className="call-ui__button call-ui__button--green call-ui__button--join"
