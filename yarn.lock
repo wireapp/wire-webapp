@@ -4334,22 +4334,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^22.14.3":
-  version: 22.14.3
-  resolution: "@wireapp/api-client@npm:22.14.3"
+"@wireapp/api-client@npm:^22.14.4":
+  version: 22.14.4
+  resolution: "@wireapp/api-client@npm:22.14.4"
   dependencies:
     "@wireapp/commons": ^5.0.4
     "@wireapp/priority-queue": ^2.0.3
     "@wireapp/protocol-messaging": 1.44.0
     axios: 1.2.2
-    axios-retry: 3.3.1
+    axios-retry: 3.4.0
     http-status-codes: 2.2.0
     logdown: 3.3.1
     reconnecting-websocket: 4.4.0
     spark-md5: 3.0.2
     tough-cookie: 4.1.2
     ws: 8.11.0
-  checksum: 9530414998240a09721aba489c031f6058def4a19b2318c12838569b8a8d9dfd84db0a4a3e956f5670f706c526777e44c06b4832151435a7df44e712c3b16be7
+  checksum: 12ecfa3cae3d39b2b1757861421654311c2de2260589e5d0bbc6be7f9fe07aef7412721b671af860f3922cea7c9e301b3e677383b296f28a318279537eb99a1c
   languageName: node
   linkType: hard
 
@@ -4402,11 +4402,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:38.5.3":
-  version: 38.5.3
-  resolution: "@wireapp/core@npm:38.5.3"
+"@wireapp/core@npm:38.7.0":
+  version: 38.7.0
+  resolution: "@wireapp/core@npm:38.7.0"
   dependencies:
-    "@wireapp/api-client": ^22.14.3
+    "@wireapp/api-client": ^22.14.4
     "@wireapp/commons": ^5.0.4
     "@wireapp/core-crypto": 0.6.0-rc.3
     "@wireapp/cryptobox": 12.8.0
@@ -4422,7 +4422,7 @@ __metadata:
     logdown: 3.3.1
     long: ^5.2.0
     uuidjs: 4.2.13
-  checksum: 03167f87fcd046f632f97c9a21ee57a67a6ac840629a318ce51f2badf5fd5c3a9ad02e34b657b75dc5270cb3853ed809f8000bd106e3dbe97ea236e21d64ca48
+  checksum: 9f1f75190c0bfe1c197f4e979a3c640126371ab1f6766af46a48cb915857c7ce2bf47864d3c2b0829d03440db89149d3f53d64e8cb487f493d3f5c264dba6248
   languageName: node
   linkType: hard
 
@@ -5233,13 +5233,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios-retry@npm:3.3.1":
-  version: 3.3.1
-  resolution: "axios-retry@npm:3.3.1"
+"axios-retry@npm:3.4.0":
+  version: 3.4.0
+  resolution: "axios-retry@npm:3.4.0"
   dependencies:
     "@babel/runtime": ^7.15.4
     is-retry-allowed: ^2.2.0
-  checksum: 125c75e08048a28de5d0dfa9de9a1924185d863a4323a71472646a1d5a326f727ff59e75e1b557220da1aad7cba01222c47c26194c5940f295378668dd3b9163
+  checksum: fae18aeef220cfde22f93ed663d644e1a913a5cfc9760904ffd7a7e5ec8c7fbd53a58e1be461b6b30de19dce178823630655bcb77a487e17000f5e977ef94a2e
   languageName: node
   linkType: hard
 
@@ -16731,7 +16731,7 @@ __metadata:
     "@typescript-eslint/parser": ^5.48.1
     "@wireapp/avs": 9.0.1
     "@wireapp/copy-config": 2.0.5
-    "@wireapp/core": 38.5.3
+    "@wireapp/core": 38.7.0
     "@wireapp/eslint-config": 2.1.1
     "@wireapp/lru-cache": 3.8.1
     "@wireapp/prettier-config": 0.5.2
