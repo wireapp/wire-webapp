@@ -32,7 +32,10 @@ const isMLSMessageAddEvent = (event: BackendEvent): event is ConversationMLSMess
 interface HandleMLSMessageAddParams extends EventHandlerParams {
   event: ConversationMLSMessageAddEvent;
 }
-const handleMLSMessageAdd = async ({mlsService, event}: HandleMLSMessageAddParams): EventHandlerResult => {
+const handleMLSMessageAdd = async (
+  {mlsService, event}: HandleMLSMessageAddParams,
+  onEpochChanged: (groupId: string) => void,
+): EventHandlerResult => {
   const encryptedData = Decoder.fromBase64(event.data).asBytes;
 
   const groupId = await mlsService.getGroupIdFromConversationId(
@@ -46,6 +49,7 @@ const handleMLSMessageAdd = async ({mlsService, event}: HandleMLSMessageAddParam
     commitDelay,
     message,
     senderClientId: encodedSenderClientId,
+    hasEpochChanged,
   } = await mlsService.decryptMessage(groupIdBytes, encryptedData);
 
   if (encodedSenderClientId) {
@@ -63,18 +67,12 @@ const handleMLSMessageAdd = async ({mlsService, event}: HandleMLSMessageAddParam
       delayInMs: commitDelay ?? 0,
       eventTime: event.time,
     });
-    // This is not a text message, there is nothing more to do
-    return;
+  }
+  if (hasEpochChanged) {
+    onEpochChanged(groupId);
   }
 
-  if (!message) {
-    return {event};
-  }
-  const decryptedData = GenericMessage.decode(message);
-  return {
-    event,
-    decryptedData,
-  };
+  return message ? {event, decryptedData: GenericMessage.decode(message)} : undefined;
 };
 
 export {isMLSMessageAddEvent, handleMLSMessageAdd};

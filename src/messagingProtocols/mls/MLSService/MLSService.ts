@@ -53,6 +53,7 @@ import {sendMessage} from '../../../conversation/message/messageSender';
 import {constructFullyQualifiedClientId, parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUtils';
 import {cancelRecurringTask, registerRecurringTask} from '../../../util/RecurringTaskScheduler';
 import {TaskScheduler} from '../../../util/TaskScheduler';
+import {TypedEventEmitter} from '../../../util/TypedEventEmitter';
 import {EventHandlerResult} from '../../common.types';
 import {EventHandlerParams, handleBackendEvent} from '../EventHandler';
 import {CommitPendingProposalsParams, HandlePendingProposalsParams, MLSCallbacks} from '../types';
@@ -68,7 +69,11 @@ const defaultConfig: MLSServiceConfig = {
   nbKeyPackages: 100,
 };
 
-export class MLSService {
+type Events = {
+  newEpoch: {epoch: number; groupId: string};
+};
+
+export class MLSService extends TypedEventEmitter<Events> {
   logger = logdown('@wireapp/core/MLSService');
   config: MLSServiceConfig;
   groupIdFromConversationId?: MLSCallbacks['groupIdFromConversationId'];
@@ -81,6 +86,7 @@ export class MLSService {
       nbKeyPackages = defaultConfig.nbKeyPackages,
     }: Partial<MLSServiceConfig>,
   ) {
+    super();
     this.config = {
       keyingMaterialUpdateThreshold,
       nbKeyPackages,
@@ -117,7 +123,8 @@ export class MLSService {
       }
       const newEpoch = await this.getEpoch(groupId);
       const groupIdStr = Encoder.toBase64(groupId).asString;
-      this.logger.log(`Commit have been accepted for group "${groupIdStr}". New epoch is "${newEpoch}"`);
+
+      this.emit('newEpoch', {epoch: newEpoch, groupId: groupIdStr});
       return response;
     } catch (error) {
       const shouldRetry = axios.isAxiosError(error) && error.code === '409';
@@ -476,7 +483,10 @@ export class MLSService {
   }
 
   public async handleEvent(params: Omit<EventHandlerParams, 'mlsService'>): EventHandlerResult {
-    return handleBackendEvent({...params, mlsService: this});
+    return handleBackendEvent({...params, mlsService: this}, async groupId => {
+      const newEpoch = await this.getEpoch(groupId);
+      this.emit('newEpoch', {groupId, epoch: newEpoch});
+    });
   }
 
   /**
