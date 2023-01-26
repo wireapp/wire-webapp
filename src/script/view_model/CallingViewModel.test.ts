@@ -107,11 +107,7 @@ describe('CallingViewModel', () => {
       const callingViewModel = buildCallingViewModel();
       const conversation = new Conversation(createRandomUuid());
       await callingViewModel.callActions.startAudio(conversation);
-      expect(mockCallingRepository.startCall).toHaveBeenCalledWith(
-        conversation.qualifiedId,
-        CONV_TYPE.ONEONONE,
-        CALL_TYPE.NORMAL,
-      );
+      expect(mockCallingRepository.startCall).toHaveBeenCalledWith(conversation, CALL_TYPE.NORMAL, undefined);
     });
 
     it('lets the user leave previous call before starting a new one', async () => {
@@ -131,11 +127,7 @@ describe('CallingViewModel', () => {
         joinedCall.conversationId,
         LEAVE_CALL_REASON.MANUAL_LEAVE_TO_JOIN_ANOTHER_CALL,
       );
-      expect(mockCallingRepository.startCall).toHaveBeenCalledWith(
-        conversation.qualifiedId,
-        CONV_TYPE.ONEONONE,
-        CALL_TYPE.NORMAL,
-      );
+      expect(mockCallingRepository.startCall).toHaveBeenCalledWith(conversation, CALL_TYPE.NORMAL, undefined);
     });
   });
 });
