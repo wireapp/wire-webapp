@@ -106,8 +106,8 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
 
   const setActiveCallViewTab = (tab: string) => {
     callState.activeCallViewTab(tab);
-    if (tab === CallViewTab.ALL) {
-      callingRepository.requestCurrentPageVideoStreams();
+    if (tab === CallViewTab.ALL && joinedCall) {
+      callingRepository.requestCurrentPageVideoStreams(joinedCall);
     }
   };
 

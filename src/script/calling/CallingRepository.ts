@@ -849,18 +849,14 @@ export class CallingRepository {
     this.wCall?.reject(this.wUser, this.serializeQualifiedId(conversationId));
   }
 
-  changeCallPage(newPage: number, call: Call): void {
+  changeCallPage(call: Call, newPage: number): void {
     call.currentPage(newPage);
     if (!this.callState.isSpeakersViewActive()) {
-      this.requestCurrentPageVideoStreams();
+      this.requestCurrentPageVideoStreams(call);
     }
   }
 
-  requestCurrentPageVideoStreams(): void {
-    const call = this.callState.joinedCall();
-    if (!call) {
-      return;
-    }
+  requestCurrentPageVideoStreams(call: Call): void {
     const currentPageParticipants = call.pages()[call.currentPage()];
     this.requestVideoStreams(call.conversationId, currentPageParticipants);
   }
@@ -1436,7 +1432,7 @@ export class CallingRepository {
     }
 
     call.updatePages();
-    this.changeCallPage(call.currentPage(), call);
+    this.changeCallPage(call, call.currentPage());
   }
 
   private readonly handleCallParticipantChanges = (convId: SerializedConversationId, membersJson: string) => {

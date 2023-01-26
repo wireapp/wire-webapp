@@ -182,7 +182,7 @@ export class CallingViewModel {
         }
       },
       changePage: (newPage, call) => {
-        this.callingRepository.changeCallPage(newPage, call);
+        this.callingRepository.changeCallPage(call, newPage);
       },
       leave: (call: Call) => {
         this.callingRepository.leaveCall(call.conversationId, LEAVE_CALL_REASON.MANUAL_LEAVE_BY_UI_CLICK);
