@@ -174,6 +174,30 @@ export class CallingViewModel {
       return members;
     };
 
+    const getSubconversationEpochInfo = async (
+      conversationId: QualifiedId,
+      subconversation: Subconversation,
+    ): Promise<{
+      members: SubconversationEpochInfoMember[];
+      epoch: number;
+      secretKey: string;
+      keyLength: number;
+    }> => {
+      const mlsService = core.service?.mls;
+      if (!mlsService) {
+        throw new Error('mls service was not initialised');
+      }
+
+      const members = await generateSubconversationMembers(conversationId, subconversation);
+
+      const epoch = Number(await mlsService.getEpoch(subconversation.group_id));
+
+      const keyLength = 32;
+      const secretKey = await mlsService.exportSecretKey(subconversation.group_id, keyLength);
+
+      return {members, epoch, keyLength, secretKey};
+    };
+
     const subscribeToEpochUpdates = async (
       conversationId: QualifiedId,
       onEpochUpdate: (info: {
@@ -195,10 +219,8 @@ export class CallingViewModel {
         if (groupId !== subconversation.group_id) {
           return;
         }
-        const keyLength = 32;
-        const secretKey = await mlsService.exportSecretKey(subconversation.group_id, keyLength);
-        const members = await generateSubconversationMembers(conversationId, subconversation);
 
+        const {keyLength, secretKey, members} = await getSubconversationEpochInfo(conversationId, subconversation);
         onEpochUpdate({epoch: Number(epoch), keyLength, secretKey, members});
       };
 
@@ -262,21 +284,17 @@ export class CallingViewModel {
       }
     });
 
+    //update epoch info when AVS requests the list of clients
     this.callingRepository.onRequestClientsCallback(async (conversationId: QualifiedId) => {
-      // TODO update epoch info when AVS requests the list of clients
       const mlsService = core.service?.mls;
       if (!mlsService) {
         throw new Error('mls service was not initialised');
       }
 
-      const subconversation = await core.service?.conversation.getSubconversation(conversationId, 'conference' as any);
+      const subconversation = await mlsService.getConferenceSubconversation(conversationId);
 
-      if (!subconversation) {
-      }
-
-      //const {epoch, keyLength, secretKey, members} = await subscribeToEpochUpdates(conversationId, subconversation);
-
-      //this.callingRepository.setEpochInfo(conversationId, {epoch, keyLength, secretKey}, members);
+      const {epoch, keyLength, secretKey, members} = await getSubconversationEpochInfo(conversationId, subconversation);
+      this.callingRepository.setEpochInfo(conversationId, {epoch, keyLength, secretKey}, members);
     });
 
     //once we leave the call, we unsubscribe from all the events we've subscribed to during the call
