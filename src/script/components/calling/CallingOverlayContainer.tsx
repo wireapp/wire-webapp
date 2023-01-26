@@ -91,7 +91,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
   };
 
   const changePage = (newPage: number, call: Call) => {
-    callingRepository.changeCallPage(newPage, call);
+    callingRepository.changeCallPage(call, newPage);
   };
 
   const leave = (call: Call) => {
@@ -106,8 +106,8 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
 
   const setActiveCallViewTab = (tab: string) => {
     callState.activeCallViewTab(tab);
-    if (tab === CallViewTab.ALL) {
-      callingRepository.requestCurrentPageVideoStreams();
+    if (tab === CallViewTab.ALL && joinedCall) {
+      callingRepository.requestCurrentPageVideoStreams(joinedCall);
     }
   };
 

@@ -706,7 +706,6 @@ export class CallingRepository {
     const convId = this.serializeQualifiedId(conversationId);
     this.logger.log(`Starting a call of type "${callType}" in conversation ID "${convId}"...`);
     try {
-      await this.checkConcurrentJoinedCall(conversationId, CALL_STATE.OUTGOING);
       const rejectedCallInConversation = this.findCall(conversationId);
       if (rejectedCallInConversation) {
         // if there is a rejected call, we can remove it from the store
@@ -828,7 +827,6 @@ export class CallingRepository {
   async answerCall(call: Call, callType?: CALL_TYPE): Promise<void> {
     try {
       callType ??= call.getSelfParticipant().sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;
-      await this.checkConcurrentJoinedCall(call.conversationId, CALL_STATE.INCOMING);
 
       const isVideoCall = callType === CALL_TYPE.VIDEO;
       if (!isVideoCall) {
@@ -864,18 +862,14 @@ export class CallingRepository {
     this.wCall?.reject(this.wUser, this.serializeQualifiedId(conversationId));
   }
 
-  changeCallPage(newPage: number, call: Call): void {
+  changeCallPage(call: Call, newPage: number): void {
     call.currentPage(newPage);
     if (!this.callState.isSpeakersViewActive()) {
-      this.requestCurrentPageVideoStreams();
+      this.requestCurrentPageVideoStreams(call);
     }
   }
 
-  requestCurrentPageVideoStreams(): void {
-    const call = this.callState.joinedCall();
-    if (!call) {
-      return;
-    }
+  requestCurrentPageVideoStreams(call: Call): void {
     const currentPageParticipants = call.pages()[call.currentPage()];
     this.requestVideoStreams(call.conversationId, currentPageParticipants);
   }
@@ -1451,7 +1445,7 @@ export class CallingRepository {
     }
 
     call.updatePages();
-    this.changeCallPage(call.currentPage(), call);
+    this.changeCallPage(call, call.currentPage());
   }
 
   private readonly handleCallParticipantChanges = (convId: SerializedConversationId, membersJson: string) => {
@@ -1728,64 +1722,6 @@ export class CallingRepository {
 
   fetchConfig(limit?: number): Promise<CallConfigData> {
     return this.apiClient.api.account.getCallConfig(limit);
-  }
-
-  private checkConcurrentJoinedCall(conversationId: QualifiedId, newCallState: CALL_STATE): Promise<void> {
-    const idleCallStates = [CALL_STATE.INCOMING, CALL_STATE.NONE, CALL_STATE.UNKNOWN];
-    const activeCall = this.callState
-      .calls()
-      .find(call => !matchQualifiedIds(call.conversationId, conversationId) && !idleCallStates.includes(call.state()));
-    if (!activeCall) {
-      return Promise.resolve();
-    }
-
-    let actionString: string;
-    let messageString: string;
-    let titleString: string;
-
-    switch (newCallState) {
-      case CALL_STATE.INCOMING: {
-        actionString = t('modalCallSecondIncomingAction');
-        messageString = t('modalCallSecondIncomingMessage');
-        titleString = t('modalCallSecondIncomingHeadline');
-        break;
-      }
-
-      case CALL_STATE.OUTGOING: {
-        actionString = t('modalCallSecondOutgoingAction');
-        messageString = t('modalCallSecondOutgoingMessage');
-        titleString = t('modalCallSecondOutgoingHeadline');
-        break;
-      }
-
-      default: {
-        return Promise.reject(`Tried to join second call in unexpected state '${newCallState}'`);
-      }
-    }
-
-    return new Promise((resolve, reject) => {
-      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-        primaryAction: {
-          action: () => {
-            if (activeCall.state() === CALL_STATE.INCOMING) {
-              this.rejectCall(activeCall.conversationId);
-            } else {
-              this.leaveCall(activeCall.conversationId, LEAVE_CALL_REASON.MANUAL_LEAVE_TO_JOIN_ANOTHER_CALL);
-            }
-            window.setTimeout(resolve, 1000);
-          },
-          text: actionString,
-        },
-        secondaryAction: {
-          action: reject,
-        },
-        text: {
-          message: messageString,
-          title: titleString,
-        },
-      });
-      this.logger.warn(`Tried to join a second call while calling in conversation '${activeCall.conversationId}'.`);
-    });
   }
 
   private showNoAudioInputModal(): void {
