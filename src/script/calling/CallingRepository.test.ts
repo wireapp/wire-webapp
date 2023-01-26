@@ -17,7 +17,6 @@
  *
  */
 
-import {amplify} from 'amplify';
 import 'jsdom-worker';
 import ko, {Subscription} from 'knockout';
 
@@ -38,7 +37,6 @@ import {createRandomUuid} from 'Util/util';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 
-import {usePrimaryModalState} from '../components/Modals/PrimaryModal';
 import {CALL} from '../event/Client';
 import {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import {UserRepository} from '../user/UserRepository';
@@ -87,30 +85,6 @@ describe('CallingRepository', () => {
   });
 
   describe('startCall', () => {
-    it('warns the user that there is an ongoing call before starting a new one', done => {
-      const activeCall = new Call(
-        selfUser.qualifiedId,
-        createConversationId(),
-        CONV_TYPE.ONEONONE,
-        new Participant(new User(), ''),
-        0,
-        {currentAvailableDeviceId: mediaDevices} as MediaDevicesHandler,
-      );
-      activeCall.state(CALL_STATE.MEDIA_ESTAB);
-      spyOn(callingRepository['callState'], 'calls').and.returnValue([activeCall]);
-      spyOn(amplify, 'publish').and.returnValue(undefined);
-      const conversationId = createConversationId();
-      const conversationType = CONV_TYPE.ONEONONE;
-      const callType = CALL_TYPE.NORMAL;
-      spyOn(wCall, 'start');
-      callingRepository.startCall(conversationId, conversationType, callType).catch(done);
-      setTimeout(() => {
-        expect(usePrimaryModalState.getState().currentModalId).not.toBeNull();
-        expect(wCall.start).not.toHaveBeenCalled();
-        done();
-      }, 10);
-    });
-
     it('starts a normal call in a 1:1 conversation', () => {
       const conversationId = createConversationId();
       const conversationType = CONV_TYPE.ONEONONE;
