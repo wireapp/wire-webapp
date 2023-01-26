@@ -19,13 +19,11 @@
 
 import {Subconversation} from '@wireapp/api-client/lib/conversation/Subconversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
 import {CALL_TYPE, CONV_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {Availability} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ButtonGroupTab} from 'Components/calling/ButtonGroup';
 import 'Components/calling/ChooseScreen';
@@ -175,29 +173,39 @@ export class CallingViewModel {
       return members;
     };
 
-    const getSubconversationEpochInfo = async (
+    const subscribeToEpochUpdates = async (
       conversationId: QualifiedId,
-      subconversation: Subconversation,
-    ): Promise<{
-      members: SubconversationEpochInfoMember[];
-      epoch: number;
-      secretKey: string;
-      keyLength: number;
-    }> => {
-      const members = await generateSubconversationMembers(conversationId, subconversation);
-
+      onEpochUpdate: (info: {
+        members: SubconversationEpochInfoMember[];
+        epoch: number;
+        secretKey: string;
+        keyLength: number;
+      }) => void,
+    ): Promise<void> => {
       const mlsService = core.service?.mls;
-
       if (!mlsService) {
         throw new Error('mls service was not initialised');
       }
+      const subconversation = await mlsService.joinConferenceSubconversation(conversationId);
 
       const epoch = Number(await mlsService.getEpoch(subconversation.group_id));
 
-      const keyLength = 32;
-      const secretKey = await mlsService.exportSecretKey(subconversation.group_id, keyLength);
+      const forwardNewEpoch = async ({groupId, epoch}: {groupId: string; epoch: number}) => {
+        if (groupId !== subconversation.group_id) {
+          return;
+        }
+        const keyLength = 32;
+        const secretKey = await mlsService.exportSecretKey(subconversation.group_id, keyLength);
+        const members = await generateSubconversationMembers(conversationId, subconversation);
 
-      return {members, epoch, keyLength, secretKey};
+        onEpochUpdate({epoch, keyLength, secretKey, members});
+      };
+
+      mlsService.on('newEpoch', forwardNewEpoch);
+
+      await forwardNewEpoch({groupId: subconversation.group_id, epoch});
+
+      //return () => mlsService.off('newEpoch', forwardNewEpoch)
     };
 
     const startCall = async (conversation: Conversation, callType: CALL_TYPE): Promise<void> => {
@@ -207,37 +215,17 @@ export class CallingViewModel {
       }
 
       if (conversation.isUsingMLSProtocol) {
-        const mlsService = core.service?.mls;
-        if (!mlsService) {
-          throw new Error('mls service was not initialised');
-        }
-
-        const subconversation = await mlsService.joinConferenceSubconversation(conversation);
-
-        const {epoch, keyLength, secretKey, members} = await getSubconversationEpochInfo(
-          conversation.qualifiedId,
-          subconversation,
-        );
-
-        this.callingRepository.setEpochInfo(conversation.qualifiedId, {epoch, keyLength, secretKey}, members);
+        await subscribeToEpochUpdates(conversation.qualifiedId, ({epoch, keyLength, secretKey, members}) => {
+          this.callingRepository.setEpochInfo(conversation.qualifiedId, {epoch, keyLength, secretKey}, members);
+        });
       }
       ring(call);
     };
 
     const joinOngoingMlsConference = async (call: Call) => {
-      const mlsService = core.service!.mls;
-      if (!mlsService) {
-        throw new Error('mls service was not initialised');
-      }
-
-      const subconversation = await mlsService.joinConferenceSubconversation(call.conversationId);
-
-      const {epoch, keyLength, secretKey, members} = await getSubconversationEpochInfo(
-        call.conversationId,
-        subconversation,
-      );
-
-      this.callingRepository.setEpochInfo(call.conversationId, {epoch, keyLength, secretKey}, members);
+      await subscribeToEpochUpdates(call.conversationId, ({epoch, keyLength, secretKey, members}) => {
+        this.callingRepository.setEpochInfo(call.conversationId, {epoch, keyLength, secretKey}, members);
+      });
     };
 
     const answerCall = async (call: Call) => {
@@ -264,6 +252,7 @@ export class CallingViewModel {
     });
 
     this.callingRepository.onRequestClientsCallback(async (conversationId: QualifiedId) => {
+      // TODO update epoch info when AVS requests the list of clients
       const mlsService = core.service?.mls;
       if (!mlsService) {
         throw new Error('mls service was not initialised');
@@ -272,12 +261,11 @@ export class CallingViewModel {
       const subconversation = await core.service?.conversation.getSubconversation(conversationId, 'conference' as any);
 
       if (!subconversation) {
-        return;
       }
 
-      const {epoch, keyLength, secretKey, members} = await getSubconversationEpochInfo(conversationId, subconversation);
+      //const {epoch, keyLength, secretKey, members} = await subscribeToEpochUpdates(conversationId, subconversation);
 
-      this.callingRepository.setEpochInfo(conversationId, {epoch, keyLength, secretKey}, members);
+      //this.callingRepository.setEpochInfo(conversationId, {epoch, keyLength, secretKey}, members);
     });
 
     this.callActions = {
@@ -369,43 +357,6 @@ export class CallingViewModel {
         });
       },
     };
-
-    amplify.subscribe(
-      WebAppEvents.CONVERSATION.EVENT_FROM_BACKEND,
-      //FIXME: this code can be removed once we implement pub/sub of epoch change events
-      async (event: any): Promise<void> => {
-        if (!event.subconv) {
-          return;
-        }
-
-        if (!event.qualified_conversation) {
-          return;
-        }
-
-        const conversationId = event.qualified_conversation;
-
-        const subconversation = await core.service?.conversation.getSubconversation(
-          conversationId,
-          'conference' as any,
-        );
-
-        if (!subconversation) {
-          return;
-        }
-
-        const mlsService = core.service?.mls;
-        if (!mlsService) {
-          throw new Error('mls service was not initialised');
-        }
-
-        const {epoch, keyLength, secretKey, members} = await getSubconversationEpochInfo(
-          conversationId,
-          subconversation,
-        );
-
-        this.callingRepository.setEpochInfo(conversationId, {epoch, keyLength, secretKey}, members);
-      },
-    );
   }
 
   private showRestrictedConferenceCallingModal() {
