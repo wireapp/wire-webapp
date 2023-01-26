@@ -62,7 +62,7 @@ export const menuLinkStyle: <T>(theme: Theme, props: MenuLinkProps<T>) => CSSObj
   [media[QueryKeys.TABLET_DOWN]]: {
     border: 'none',
     fontSize: '2rem !important',
-    fontWeight: 300,
+    fontWeight: 400,
     maxWidth: '480px',
     padding: '8px 24px',
     textTransform: 'none !important',

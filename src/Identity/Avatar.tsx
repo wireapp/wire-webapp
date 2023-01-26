@@ -61,7 +61,7 @@ const avatarStyle: <T>(props: AvatarProps<T>) => CSSObject = ({
     color,
     display: 'flex',
     fontSize,
-    fontWeight: isAvatarGridItem ? 700 : 300,
+    fontWeight: isAvatarGridItem ? 700 : 400,
     height: `${size}px`,
     justifyContent: 'center',
     minHeight: `${size}px`,

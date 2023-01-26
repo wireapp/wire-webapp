@@ -67,7 +67,7 @@ export const textAreaStyle: <T>(theme: Theme, props: TextAreaProps<T>) => CSSObj
     boxShadow: markInvalid ? `0 0 0 1px ${COLOR.RED}` : `0 0 0 1px ${COLOR.GRAY}`,
     caretColor: COLOR.BLUE,
     color: theme.general.color,
-    fontWeight: 300,
+    fontWeight: 400,
     lineHeight: '1.5rem',
     margin: '0 0 16px',
     outline: 'none',

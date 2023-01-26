@@ -61,7 +61,7 @@ const getGlobalFontStyle = (): CSSObject => ({
   body: {
     fontFamily:
       '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";',
-    fontWeight: navigator.platform === 'Win32' ? 400 : 300,
+    fontWeight: 400,
     lineHeight: 1.5,
   },
 });

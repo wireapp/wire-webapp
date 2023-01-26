@@ -11,7 +11,7 @@ exports[`"TextLink" renders (dark theme) 1`] = `
   color: #0667c8;
   display: inline;
   font-size: 1rem;
-  font-weight: 300;
+  font-weight: 400;
   text-align: left;
   text-transform: none;
   cursor: pointer;
@@ -55,7 +55,7 @@ exports[`"TextLink" renders 1`] = `
   color: #0667c8;
   display: inline;
   font-size: 1rem;
-  font-weight: 300;
+  font-weight: 400;
   text-align: left;
   text-transform: none;
   cursor: pointer;

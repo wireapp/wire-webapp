@@ -11,7 +11,7 @@ exports[`"InputLabel" renders (dark theme) 1`] = `
   color: initial;
   display: inline;
   font-size: 0.75rem;
-  font-weight: 300;
+  font-weight: 400;
   text-align: left;
   text-transform: none;
   width: 100%;
@@ -43,7 +43,7 @@ exports[`"InputLabel" renders 1`] = `
   color: initial;
   display: inline;
   font-size: 0.75rem;
-  font-weight: 300;
+  font-weight: 400;
   text-align: left;
   text-transform: none;
   width: 100%;

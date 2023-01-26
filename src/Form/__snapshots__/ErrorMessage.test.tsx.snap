@@ -53,7 +53,7 @@ exports[`"ErrorMessage" renders 1`] = `
   color: rgb(29, 30, 31);
   display: inline;
   font-size: 0.75rem;
-  font-weight: 300;
+  font-weight: 400;
   text-align: left;
   text-transform: none;
   cursor: pointer;
@@ -78,7 +78,7 @@ exports[`"ErrorMessage" renders 1`] = `
   color: #c20013;
   display: inline;
   font-size: 12px;
-  font-weight: 300;
+  font-weight: 400;
   text-align: left;
   text-transform: none;
   font-weight: 400;
