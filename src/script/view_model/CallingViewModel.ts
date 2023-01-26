@@ -34,6 +34,7 @@ import type {AudioRepository} from '../audio/AudioRepository';
 import {AudioType} from '../audio/AudioType';
 import type {Call} from '../calling/Call';
 import {CallingRepository} from '../calling/CallingRepository';
+import {callingSubscriptions} from '../calling/callingSubscriptionsHandler';
 import {CallState} from '../calling/CallState';
 import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
@@ -173,6 +174,30 @@ export class CallingViewModel {
       return members;
     };
 
+    const getSubconversationEpochInfo = async (
+      conversationId: QualifiedId,
+      subconversation: Subconversation,
+    ): Promise<{
+      members: SubconversationEpochInfoMember[];
+      epoch: number;
+      secretKey: string;
+      keyLength: number;
+    }> => {
+      const mlsService = core.service?.mls;
+      if (!mlsService) {
+        throw new Error('mls service was not initialised');
+      }
+
+      const members = await generateSubconversationMembers(conversationId, subconversation);
+
+      const epoch = Number(await mlsService.getEpoch(subconversation.group_id));
+
+      const keyLength = 32;
+      const secretKey = await mlsService.exportSecretKey(subconversation.group_id, keyLength);
+
+      return {members, epoch, keyLength, secretKey};
+    };
+
     const subscribeToEpochUpdates = async (
       conversationId: QualifiedId,
       onEpochUpdate: (info: {
@@ -181,7 +206,7 @@ export class CallingViewModel {
         secretKey: string;
         keyLength: number;
       }) => void,
-    ): Promise<void> => {
+    ): Promise<() => void> => {
       const mlsService = core.service?.mls;
       if (!mlsService) {
         throw new Error('mls service was not initialised');
@@ -194,10 +219,8 @@ export class CallingViewModel {
         if (groupId !== subconversation.group_id) {
           return;
         }
-        const keyLength = 32;
-        const secretKey = await mlsService.exportSecretKey(subconversation.group_id, keyLength);
-        const members = await generateSubconversationMembers(conversationId, subconversation);
 
+        const {keyLength, secretKey, members} = await getSubconversationEpochInfo(conversationId, subconversation);
         onEpochUpdate({epoch: Number(epoch), keyLength, secretKey, members});
       };
 
@@ -205,7 +228,7 @@ export class CallingViewModel {
 
       await forwardNewEpoch({groupId: subconversation.group_id, epoch});
 
-      //return () => mlsService.off('newEpoch', forwardNewEpoch)
+      return () => mlsService.off('newEpoch', forwardNewEpoch);
     };
 
     const startCall = async (conversation: Conversation, callType: CALL_TYPE): Promise<void> => {
@@ -215,17 +238,27 @@ export class CallingViewModel {
       }
 
       if (conversation.isUsingMLSProtocol) {
-        await subscribeToEpochUpdates(conversation.qualifiedId, ({epoch, keyLength, secretKey, members}) => {
-          this.callingRepository.setEpochInfo(conversation.qualifiedId, {epoch, keyLength, secretKey}, members);
-        });
+        const unsubscribe = await subscribeToEpochUpdates(
+          conversation.qualifiedId,
+          ({epoch, keyLength, secretKey, members}) => {
+            this.callingRepository.setEpochInfo(conversation.qualifiedId, {epoch, keyLength, secretKey}, members);
+          },
+        );
+
+        callingSubscriptions.addOngoing(call.conversationId, unsubscribe);
       }
       ring(call);
     };
 
     const joinOngoingMlsConference = async (call: Call) => {
-      await subscribeToEpochUpdates(call.conversationId, ({epoch, keyLength, secretKey, members}) => {
-        this.callingRepository.setEpochInfo(call.conversationId, {epoch, keyLength, secretKey}, members);
-      });
+      const unsubscribe = await subscribeToEpochUpdates(
+        call.conversationId,
+        ({epoch, keyLength, secretKey, members}) => {
+          this.callingRepository.setEpochInfo(call.conversationId, {epoch, keyLength, secretKey}, members);
+        },
+      );
+
+      callingSubscriptions.addOngoing(call.conversationId, unsubscribe);
     };
 
     const answerCall = async (call: Call) => {
@@ -251,22 +284,21 @@ export class CallingViewModel {
       }
     });
 
+    //update epoch info when AVS requests the list of clients
     this.callingRepository.onRequestClientsCallback(async (conversationId: QualifiedId) => {
-      // TODO update epoch info when AVS requests the list of clients
       const mlsService = core.service?.mls;
       if (!mlsService) {
         throw new Error('mls service was not initialised');
       }
 
-      const subconversation = await core.service?.conversation.getSubconversation(conversationId, 'conference' as any);
+      const subconversation = await mlsService.getConferenceSubconversation(conversationId);
 
-      if (!subconversation) {
-      }
-
-      //const {epoch, keyLength, secretKey, members} = await subscribeToEpochUpdates(conversationId, subconversation);
-
-      //this.callingRepository.setEpochInfo(conversationId, {epoch, keyLength, secretKey}, members);
+      const {epoch, keyLength, secretKey, members} = await getSubconversationEpochInfo(conversationId, subconversation);
+      this.callingRepository.setEpochInfo(conversationId, {epoch, keyLength, secretKey}, members);
     });
+
+    //once we leave a call, we unsubscribe from all the events we've subscribed to during this call
+    this.callingRepository.onLeaveCall(callingSubscriptions.unsubscribe);
 
     this.callActions = {
       answer: (call: Call) => {
