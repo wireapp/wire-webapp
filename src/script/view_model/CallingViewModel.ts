@@ -139,7 +139,12 @@ export class CallingViewModel {
 
     const startCall = async (conversation: Conversation, callType: CALL_TYPE) => {
       const convType = conversation.isGroup() ? CONV_TYPE.GROUP : CONV_TYPE.ONEONONE;
-      const canStart = await this.initiateCallStart(conversation.qualifiedId);
+      const canStart = await this.canInitiateCall(conversation.qualifiedId, {
+        action: t('modalCallSecondOutgoingAction'),
+        message: t('modalCallSecondOutgoingMessage'),
+        title: t('modalCallSecondOutgoingHeadline'),
+      });
+
       if (!canStart) {
         return;
       }
@@ -167,7 +172,11 @@ export class CallingViewModel {
 
     this.callActions = {
       answer: async (call: Call) => {
-        const canAnwer = await this.initiateCallAnswer(call.conversationId);
+        const canAnwer = await this.canInitiateCall(call.conversationId, {
+          action: t('modalCallSecondIncomingAction'),
+          message: t('modalCallSecondIncomingMessage'),
+          title: t('modalCallSecondIncomingHeadline'),
+        });
         if (!canAnwer) {
           return;
         }
@@ -262,17 +271,6 @@ export class CallingViewModel {
   }
 
   /**
-   * Find active calls that are not related to the given conversation
-   * @param conversationId - the conversation to ignore
-   */
-  private findOtherActiveCall(conversationId: QualifiedId): Call | undefined {
-    const idleCallStates = [CALL_STATE.INCOMING, CALL_STATE.NONE, CALL_STATE.UNKNOWN];
-    return this.callState
-      .calls()
-      .find(call => !matchQualifiedIds(call.conversationId, conversationId) && !idleCallStates.includes(call.state()));
-  }
-
-  /**
    * Will reject or leave the call depending on the state of the call.
    * @param activeCall - the call to gracefully tear down
    */
@@ -287,46 +285,21 @@ export class CallingViewModel {
   }
 
   /**
-   * Will make sure everything is ready for a call to start in the given conversation.
-   * If there is another ongoing call, the user will be asked to first leave that other call before starting a new call.
-   * @param conversationId
-   * @returns
-   */
-  private initiateCallStart(conversationId: QualifiedId): Promise<boolean> {
-    const otherActiveCall = this.findOtherActiveCall(conversationId);
-    if (!otherActiveCall) {
-      return Promise.resolve(true);
-    }
-
-    return new Promise(resolve => {
-      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-        primaryAction: {
-          action: async () => {
-            await this.gracefullyTeardownCall(otherActiveCall);
-            resolve(true);
-          },
-          text: t('modalCallSecondOutgoingAction'),
-        },
-        secondaryAction: {
-          action: () => resolve(false),
-        },
-        text: {
-          message: t('modalCallSecondOutgoingMessage'),
-          title: t('modalCallSecondOutgoingHeadline'),
-        },
-      });
-    });
-  }
-
-  /**
-   * Will make sure everything is ready for a call to be answered in the given conversation.
+   * Will make sure everything is ready for a call to start/be joined in the given conversation.
    * If there is another ongoing call, the user will be asked to first leave that other call before starting a new call.
    *
-   * @param conversationId
-   * @returns
+   * @param conversationId - the conversation in which the call should be started/joined
+   * @param warningStrings - the strings to display in case there is already an active call
+   * @returns true if the call can be started, false otherwise
    */
-  private initiateCallAnswer(conversationId: QualifiedId): Promise<boolean> {
-    const otherActiveCall = this.findOtherActiveCall(conversationId);
+  private canInitiateCall(
+    conversationId: QualifiedId,
+    warningStrings: {action: string; message: string; title: string},
+  ): Promise<boolean> {
+    const idleCallStates = [CALL_STATE.INCOMING, CALL_STATE.NONE, CALL_STATE.UNKNOWN];
+    const otherActiveCall = this.callState
+      .calls()
+      .find(call => !matchQualifiedIds(call.conversationId, conversationId) && !idleCallStates.includes(call.state()));
     if (!otherActiveCall) {
       return Promise.resolve(true);
     }
@@ -338,14 +311,14 @@ export class CallingViewModel {
             await this.gracefullyTeardownCall(otherActiveCall);
             resolve(true);
           },
-          text: t('modalCallSecondIncomingAction'),
+          text: warningStrings.action,
         },
         secondaryAction: {
           action: () => resolve(false),
         },
         text: {
-          message: t('modalCallSecondIncomingMessage'),
-          title: t('modalCallSecondIncomingHeadline'),
+          message: warningStrings.message,
+          title: warningStrings.title,
         },
       });
     });
