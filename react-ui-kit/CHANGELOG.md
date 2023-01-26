@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.3.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.3.3...@wireapp/react-ui-kit@9.3.4) (2023-01-26)
+
+### Bug Fixes
+
+* change default font weight from 300 to 400 [ACC-436] ([#4813](https://github.com/wireapp/wire-web-packages/issues/4813)) ([c5e847a](https://github.com/wireapp/wire-web-packages/commit/c5e847a63c20fde64ec1f019aa747faa996ebc12))
+
 ## [9.3.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.3.2...@wireapp/react-ui-kit@9.3.3) (2023-01-10)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
