@@ -297,7 +297,7 @@ export class CallingViewModel {
       this.callingRepository.setEpochInfo(conversationId, {epoch, keyLength, secretKey}, members);
     });
 
-    //once we leave the call, we unsubscribe from all the events we've subscribed to during the call
+    //once we leave a call, we unsubscribe from all the events we've subscribed to during this call
     this.callingRepository.onLeaveCall(callingSubscriptions.unsubscribe);
 
     this.callActions = {
