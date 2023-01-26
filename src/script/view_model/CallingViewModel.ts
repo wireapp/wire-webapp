@@ -53,12 +53,12 @@ import {TeamState} from '../team/TeamState';
 import {ROLE} from '../user/UserPermission';
 
 export interface CallActions {
-  answer: (call: Call) => void;
+  answer: (call: Call) => Promise<void>;
   changePage: (newPage: number, call: Call) => void;
   leave: (call: Call) => void;
   reject: (call: Call) => void;
-  startAudio: (conversationEntity: Conversation) => void;
-  startVideo: (conversationEntity: Conversation) => void;
+  startAudio: (conversationEntity: Conversation) => Promise<void>;
+  startVideo: (conversationEntity: Conversation) => Promise<void>;
   switchCameraInput: (call: Call, deviceId: string) => void;
   switchScreenInput: (call: Call, deviceId: string) => void;
   toggleCamera: (call: Call) => void;
@@ -209,18 +209,18 @@ export class CallingViewModel {
       reject: (call: Call) => {
         this.callingRepository.rejectCall(call.conversationId);
       },
-      startAudio: (conversationEntity: Conversation): void => {
+      startAudio: async (conversationEntity: Conversation) => {
         if (conversationEntity.isGroup() && !this.teamState.isConferenceCallingEnabled()) {
           this.showRestrictedConferenceCallingModal();
         } else {
-          startCall(conversationEntity, CALL_TYPE.NORMAL);
+          await startCall(conversationEntity, CALL_TYPE.NORMAL);
         }
       },
-      startVideo: (conversationEntity: Conversation): void => {
+      startVideo: async (conversationEntity: Conversation) => {
         if (conversationEntity.isGroup() && !this.teamState.isConferenceCallingEnabled()) {
           this.showRestrictedConferenceCallingModal();
         } else {
-          startCall(conversationEntity, CALL_TYPE.VIDEO);
+          await startCall(conversationEntity, CALL_TYPE.VIDEO);
         }
       },
       switchCameraInput: (call: Call, deviceId: string) => {
