@@ -4382,10 +4382,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/avs@npm:9.0.1":
-  version: 9.0.1
-  resolution: "@wireapp/avs@npm:9.0.1"
-  checksum: 0488decc8b59cd165af07a611e33fe0ef108a1d0fa67aaeaec53346186b2b2dc4043d709db4556f3d77c81dae88545e5f0a98159bb494722d8d6a67bcced8d04
+"@wireapp/avs@npm:9.0.17":
+  version: 9.0.17
+  resolution: "@wireapp/avs@npm:9.0.17"
+  checksum: 3b62ee536fa23c6c096c203268d7a84b1487f6ea5a0ec9d86c07dad37204944b3be2a6386cb9cb814cc84a4bc69a35ac834cab59a2330f352fe2aade120ef417
   languageName: node
   linkType: hard
 
@@ -16755,7 +16755,7 @@ __metadata:
     "@types/webpack-env": 1.18.0
     "@typescript-eslint/eslint-plugin": ^5.48.2
     "@typescript-eslint/parser": ^5.48.2
-    "@wireapp/avs": 9.0.1
+    "@wireapp/avs": 9.0.17
     "@wireapp/copy-config": 2.0.5
     "@wireapp/core": 38.5.4
     "@wireapp/eslint-config": 2.1.1
