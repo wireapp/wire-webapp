@@ -34,6 +34,7 @@ import type {AudioRepository} from '../audio/AudioRepository';
 import {AudioType} from '../audio/AudioType';
 import type {Call} from '../calling/Call';
 import {CallingRepository} from '../calling/CallingRepository';
+import {callingSubscriptions} from '../calling/callingSubscriptionsHandler';
 import {CallState} from '../calling/CallState';
 import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
@@ -91,7 +92,6 @@ declare global {
 
 export class CallingViewModel {
   readonly activeCalls: ko.PureComputed<Call[]>;
-  readonly callSubscriptions: (() => void)[] = [];
   readonly callActions: CallActions;
   readonly isSelfVerified: ko.Computed<boolean>;
   readonly activeCallViewTab: ko.Observable<string>;
@@ -245,7 +245,7 @@ export class CallingViewModel {
           },
         );
 
-        this.callSubscriptions.push(unsubscribe);
+        callingSubscriptions.addOngoing(call.conversationId, unsubscribe);
       }
       ring(call);
     };
@@ -258,7 +258,7 @@ export class CallingViewModel {
         },
       );
 
-      this.callSubscriptions.push(unsubscribe);
+      callingSubscriptions.addOngoing(call.conversationId, unsubscribe);
     };
 
     const answerCall = async (call: Call) => {
@@ -298,7 +298,7 @@ export class CallingViewModel {
     });
 
     //once we leave the call, we unsubscribe from all the events we've subscribed to during the call
-    this.callingRepository.onLeaveCall(() => this.callSubscriptions.forEach(unsubscribe => unsubscribe()));
+    this.callingRepository.onLeaveCall(callingSubscriptions.unsubscribe);
 
     this.callActions = {
       answer: (call: Call) => {
