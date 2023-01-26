@@ -91,6 +91,7 @@ declare global {
 
 export class CallingViewModel {
   readonly activeCalls: ko.PureComputed<Call[]>;
+  readonly callSubscriptions: (() => void)[] = [];
   readonly callActions: CallActions;
   readonly isSelfVerified: ko.Computed<boolean>;
   readonly activeCallViewTab: ko.Observable<string>;
@@ -181,7 +182,7 @@ export class CallingViewModel {
         secretKey: string;
         keyLength: number;
       }) => void,
-    ): Promise<void> => {
+    ): Promise<() => void> => {
       const mlsService = core.service?.mls;
       if (!mlsService) {
         throw new Error('mls service was not initialised');
@@ -205,7 +206,7 @@ export class CallingViewModel {
 
       await forwardNewEpoch({groupId: subconversation.group_id, epoch});
 
-      //return () => mlsService.off('newEpoch', forwardNewEpoch)
+      return () => mlsService.off('newEpoch', forwardNewEpoch);
     };
 
     const startCall = async (conversation: Conversation, callType: CALL_TYPE): Promise<void> => {
@@ -215,17 +216,27 @@ export class CallingViewModel {
       }
 
       if (conversation.isUsingMLSProtocol) {
-        await subscribeToEpochUpdates(conversation.qualifiedId, ({epoch, keyLength, secretKey, members}) => {
-          this.callingRepository.setEpochInfo(conversation.qualifiedId, {epoch, keyLength, secretKey}, members);
-        });
+        const unsubscribe = await subscribeToEpochUpdates(
+          conversation.qualifiedId,
+          ({epoch, keyLength, secretKey, members}) => {
+            this.callingRepository.setEpochInfo(conversation.qualifiedId, {epoch, keyLength, secretKey}, members);
+          },
+        );
+
+        this.callSubscriptions.push(unsubscribe);
       }
       ring(call);
     };
 
     const joinOngoingMlsConference = async (call: Call) => {
-      await subscribeToEpochUpdates(call.conversationId, ({epoch, keyLength, secretKey, members}) => {
-        this.callingRepository.setEpochInfo(call.conversationId, {epoch, keyLength, secretKey}, members);
-      });
+      const unsubscribe = await subscribeToEpochUpdates(
+        call.conversationId,
+        ({epoch, keyLength, secretKey, members}) => {
+          this.callingRepository.setEpochInfo(call.conversationId, {epoch, keyLength, secretKey}, members);
+        },
+      );
+
+      this.callSubscriptions.push(unsubscribe);
     };
 
     const answerCall = async (call: Call) => {
@@ -267,6 +278,9 @@ export class CallingViewModel {
 
       //this.callingRepository.setEpochInfo(conversationId, {epoch, keyLength, secretKey}, members);
     });
+
+    //once we leave the call, we unsubscribe from all the events we've subscribed to during the call
+    this.callingRepository.onLeaveCall(() => this.callSubscriptions.forEach(unsubscribe => unsubscribe()));
 
     this.callActions = {
       answer: (call: Call) => {

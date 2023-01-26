@@ -127,6 +127,7 @@ export class CallingRepository {
   private avsVersion: number = 0;
   private incomingCallCallback: (call: Call) => void;
   private requestClientsCallback: (conversationId: QualifiedId) => void;
+  private leaveCallCallback: (conversationId: QualifiedId) => void;
   private isReady: boolean = false;
   /** will cache the query to media stream (in order to avoid asking the system for streams multiple times when we have multiple peers) */
   private mediaStreamQuery?: Promise<MediaStream>;
@@ -405,6 +406,10 @@ export class CallingRepository {
 
   onIncomingCall(callback: (call: Call) => void): void {
     this.incomingCallCallback = callback;
+  }
+
+  onLeaveCall(callback: (conversationId: QualifiedId) => void): void {
+    this.leaveCallCallback = callback;
   }
 
   onRequestClientsCallback(callback: (conversationId: QualifiedId) => void): void {
@@ -915,6 +920,8 @@ export class CallingRepository {
     const conversationIdStr = this.serializeQualifiedId(conversationId);
     delete this.poorCallQualityUsers[conversationIdStr];
     this.wCall?.end(this.wUser, conversationIdStr);
+
+    this.leaveCallCallback(conversationId);
   };
 
   muteCall(call: Call, shouldMute: boolean, reason?: MuteState): void {
