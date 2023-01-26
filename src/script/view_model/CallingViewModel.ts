@@ -188,7 +188,7 @@ export class CallingViewModel {
       }
       const subconversation = await mlsService.joinConferenceSubconversation(conversationId);
 
-      const epoch = Number(await mlsService.getEpoch(subconversation.group_id));
+      const epoch = await mlsService.getEpoch(subconversation.group_id);
 
       const forwardNewEpoch = async ({groupId, epoch}: {groupId: string; epoch: number}) => {
         if (groupId !== subconversation.group_id) {
@@ -198,7 +198,7 @@ export class CallingViewModel {
         const secretKey = await mlsService.exportSecretKey(subconversation.group_id, keyLength);
         const members = await generateSubconversationMembers(conversationId, subconversation);
 
-        onEpochUpdate({epoch, keyLength, secretKey, members});
+        onEpochUpdate({epoch: Number(epoch), keyLength, secretKey, members});
       };
 
       mlsService.on('newEpoch', forwardNewEpoch);
