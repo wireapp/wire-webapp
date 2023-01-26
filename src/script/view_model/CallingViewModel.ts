@@ -27,6 +27,7 @@ import {Availability} from '@wireapp/protocol-messaging';
 import {ButtonGroupTab} from 'Components/calling/ButtonGroup';
 import 'Components/calling/ChooseScreen';
 import {replaceLink, t} from 'Util/LocalizerUtil';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 
 import type {AudioRepository} from '../audio/AudioRepository';
@@ -136,14 +137,17 @@ export class CallingViewModel {
       });
     };
 
-    const startCall = (conversationEntity: Conversation, callType: CALL_TYPE): void => {
-      const convType = conversationEntity.isGroup() ? CONV_TYPE.GROUP : CONV_TYPE.ONEONONE;
-      this.callingRepository.startCall(conversationEntity.qualifiedId, convType, callType).then(call => {
-        if (!call) {
-          return;
-        }
-        ring(call);
-      });
+    const startCall = async (conversation: Conversation, callType: CALL_TYPE) => {
+      const convType = conversation.isGroup() ? CONV_TYPE.GROUP : CONV_TYPE.ONEONONE;
+      const canStart = await this.initiateCallStart(conversation.qualifiedId);
+      if (!canStart) {
+        return;
+      }
+      const call = await this.callingRepository.startCall(conversation.qualifiedId, convType, callType);
+      if (!call) {
+        return;
+      }
+      ring(call);
     };
 
     const hasSoundlessCallsEnabled = (): boolean => {
@@ -162,7 +166,12 @@ export class CallingViewModel {
     });
 
     this.callActions = {
-      answer: (call: Call) => {
+      answer: async (call: Call) => {
+        const canAnwer = await this.initiateCallAnswer(call.conversationId);
+        if (!canAnwer) {
+          return;
+        }
+
         if (call.conversationType === CONV_TYPE.CONFERENCE && !this.callingRepository.supportsConferenceCalling) {
           PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
             primaryAction: {
@@ -250,6 +259,96 @@ export class CallingViewModel {
         });
       },
     };
+  }
+
+  /**
+   * Find active calls that are not related to the given conversation
+   * @param conversationId - the conversation to ignore
+   */
+  private findOtherActiveCall(conversationId: QualifiedId): Call | undefined {
+    const idleCallStates = [CALL_STATE.INCOMING, CALL_STATE.NONE, CALL_STATE.UNKNOWN];
+    return this.callState
+      .calls()
+      .find(call => !matchQualifiedIds(call.conversationId, conversationId) && !idleCallStates.includes(call.state()));
+  }
+
+  /**
+   * Will reject or leave the call depending on the state of the call.
+   * @param activeCall - the call to gracefully tear down
+   */
+  private async gracefullyTeardownCall(activeCall: Call): Promise<void> {
+    if (activeCall.state() === CALL_STATE.INCOMING) {
+      this.callingRepository.rejectCall(activeCall.conversationId);
+    } else {
+      this.callingRepository.leaveCall(activeCall.conversationId, LEAVE_CALL_REASON.MANUAL_LEAVE_TO_JOIN_ANOTHER_CALL);
+    }
+    // We want to wait a bit to be sure the call have been tear down properly
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  }
+
+  /**
+   * Will make sure everything is ready for a call to start in the given conversation.
+   * If there is another ongoing call, the user will be asked to first leave that other call before starting a new call.
+   * @param conversationId
+   * @returns
+   */
+  private initiateCallStart(conversationId: QualifiedId): Promise<boolean> {
+    const otherActiveCall = this.findOtherActiveCall(conversationId);
+    if (!otherActiveCall) {
+      return Promise.resolve(true);
+    }
+
+    return new Promise(resolve => {
+      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+        primaryAction: {
+          action: async () => {
+            await this.gracefullyTeardownCall(otherActiveCall);
+            resolve(true);
+          },
+          text: t('modalCallSecondOutgoingAction'),
+        },
+        secondaryAction: {
+          action: () => resolve(false),
+        },
+        text: {
+          message: t('modalCallSecondOutgoingMessage'),
+          title: t('modalCallSecondOutgoingHeadline'),
+        },
+      });
+    });
+  }
+
+  /**
+   * Will make sure everything is ready for a call to be answered in the given conversation.
+   * If there is another ongoing call, the user will be asked to first leave that other call before starting a new call.
+   *
+   * @param conversationId
+   * @returns
+   */
+  private initiateCallAnswer(conversationId: QualifiedId): Promise<boolean> {
+    const otherActiveCall = this.findOtherActiveCall(conversationId);
+    if (!otherActiveCall) {
+      return Promise.resolve(true);
+    }
+
+    return new Promise(resolve => {
+      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+        primaryAction: {
+          action: async () => {
+            await this.gracefullyTeardownCall(otherActiveCall);
+            resolve(true);
+          },
+          text: t('modalCallSecondIncomingAction'),
+        },
+        secondaryAction: {
+          action: () => resolve(false),
+        },
+        text: {
+          message: t('modalCallSecondIncomingMessage'),
+          title: t('modalCallSecondIncomingHeadline'),
+        },
+      });
+    });
   }
 
   private showRestrictedConferenceCallingModal() {
