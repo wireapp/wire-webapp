@@ -91,7 +91,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
   };
 
   const changePage = (newPage: number, call: Call) => {
-    callingRepository.changeCallPage(newPage, call);
+    callingRepository.changeCallPage(call, newPage);
   };
 
   const leave = (call: Call) => {
