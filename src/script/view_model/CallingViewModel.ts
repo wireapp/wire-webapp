@@ -172,15 +172,6 @@ export class CallingViewModel {
 
     this.callActions = {
       answer: async (call: Call) => {
-        const canAnwer = await this.canInitiateCall(call.conversationId, {
-          action: t('modalCallSecondIncomingAction'),
-          message: t('modalCallSecondIncomingMessage'),
-          title: t('modalCallSecondIncomingHeadline'),
-        });
-        if (!canAnwer) {
-          return;
-        }
-
         if (call.conversationType === CONV_TYPE.CONFERENCE && !this.callingRepository.supportsConferenceCalling) {
           PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
             primaryAction: {
@@ -196,6 +187,15 @@ export class CallingViewModel {
             },
           });
         } else {
+          const canAnwer = await this.canInitiateCall(call.conversationId, {
+            action: t('modalCallSecondIncomingAction'),
+            message: t('modalCallSecondIncomingMessage'),
+            title: t('modalCallSecondIncomingHeadline'),
+          });
+          if (!canAnwer) {
+            return;
+          }
+
           this.callingRepository.answerCall(call);
         }
       },
