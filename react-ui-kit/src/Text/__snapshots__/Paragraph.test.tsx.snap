@@ -11,7 +11,7 @@ exports[`"Lead" renders (dark theme) 1`] = `
   color: #fff;
   display: block;
   font-size: 1.5rem;
-  font-weight: 300;
+  font-weight: 400;
   text-align: center;
   text-transform: none;
   margin-bottom: 56px;
@@ -46,7 +46,7 @@ exports[`"Lead" renders 1`] = `
   color: rgb(29, 30, 31);
   display: block;
   font-size: 1.5rem;
-  font-weight: 300;
+  font-weight: 400;
   text-align: center;
   text-transform: none;
   margin-bottom: 56px;
@@ -81,7 +81,7 @@ exports[`"Paragraph" renders (dark theme) 1`] = `
   color: #fff;
   display: block;
   font-size: 1rem;
-  font-weight: 300;
+  font-weight: 400;
   text-align: left;
   text-transform: none;
   margin-bottom: 16px;
@@ -110,7 +110,7 @@ exports[`"Paragraph" renders 1`] = `
   color: rgb(29, 30, 31);
   display: block;
   font-size: 1rem;
-  font-weight: 300;
+  font-weight: 400;
   text-align: left;
   text-transform: none;
   margin-bottom: 16px;

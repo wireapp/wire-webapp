@@ -27,7 +27,7 @@ exports[`"Input" renders 1`] = `
   box-shadow: 0 0 0 1px #dce0e3;
   caret-color: #0667c8;
   color: rgb(29, 30, 31);
-  font-weight: 300;
+  font-weight: 400;
   height: 48px;
   line-height: 1.5rem;
   outline: none;
@@ -112,7 +112,7 @@ exports[`"Input" renders as disabled 1`] = `
   box-shadow: 0 0 0 1px #dce0e3;
   caret-color: #0667c8;
   color: rgb(29, 30, 31);
-  font-weight: 300;
+  font-weight: 400;
   height: 48px;
   line-height: 1.5rem;
   outline: none;
@@ -194,7 +194,7 @@ exports[`"Input" renders as invalid 1`] = `
   box-shadow: 0 0 0 1px #c20013;
   caret-color: #0667c8;
   color: rgb(29, 30, 31);
-  font-weight: 300;
+  font-weight: 400;
   height: 48px;
   line-height: 1.5rem;
   outline: none;
@@ -275,7 +275,7 @@ exports[`"Input" renders with placeholderTextTransform 1`] = `
   box-shadow: 0 0 0 1px #dce0e3;
   caret-color: #0667c8;
   color: rgb(29, 30, 31);
-  font-weight: 300;
+  font-weight: 400;
   height: 48px;
   line-height: 1.5rem;
   outline: none;

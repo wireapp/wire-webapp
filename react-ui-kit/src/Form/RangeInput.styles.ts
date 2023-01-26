@@ -70,7 +70,7 @@ export const getValueLabelStyles = (theme: Theme, position: ValueLabelPosition):
   pointerEvents: 'none',
   bottom: '100%',
   fontSize: theme.fontSizes.base,
-  fontWeight: 300,
+  fontWeight: 400,
   position: 'absolute',
   [position]: '4px',
 });

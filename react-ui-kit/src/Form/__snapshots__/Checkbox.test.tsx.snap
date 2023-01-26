@@ -508,13 +508,13 @@ exports[`"CheckboxLabel" renders 1`] = `
   color: rgb(29, 30, 31);
   display: inline;
   font-size: 1rem;
-  font-weight: 300;
+  font-weight: 400;
   text-align: left;
   text-transform: none;
   color: rgb(29, 30, 31);
   display: inline;
   font-size: 1rem;
-  font-weight: 300;
+  font-weight: 400;
   text-align: left;
   text-transform: none;
 }

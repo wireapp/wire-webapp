@@ -72,7 +72,7 @@ export const textStyle: <T>(theme: Theme, props: TextProps<T>) => CSSObject = (
   color: muted ? COLOR.GRAY : color,
   display: block ? 'block' : 'inline',
   fontSize: fontSize,
-  fontWeight: bold ? 600 : light ? 200 : 300,
+  fontWeight: bold ? 600 : light ? 200 : 400,
   overflow: truncate ? 'hidden' : undefined,
   textAlign: center ? 'center' : 'left',
   textOverflow: truncate ? 'ellipsis' : undefined,

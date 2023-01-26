@@ -48,7 +48,7 @@ export const h1Style: <T>(theme: Theme, props: HeadingProps<T>) => CSSObject = (
 ) => ({
   ...textStyle(theme, {block, color, noWrap, textTransform, ...props}),
   fontSize: '3rem',
-  fontWeight: 300,
+  fontWeight: 400,
   lineHeight: '3.5rem',
   marginBottom: '64px',
   marginTop: 0,
@@ -105,7 +105,7 @@ export const h4Style: <T>(theme: Theme, props: HeadingProps<T>) => CSSObject = (
 ) => ({
   ...textStyle(theme, {block, color, noWrap, textTransform, ...props}),
   fontSize: theme.fontSizes.extraSmall,
-  fontWeight: 300,
+  fontWeight: 400,
   marginBottom: '5px',
   marginTop: '20px',
 });

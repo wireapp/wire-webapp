@@ -14,7 +14,7 @@ exports[`"TextArea" renders 1`] = `
   box-shadow: 0 0 0 1px #696c6e;
   caret-color: #0772de;
   color: rgb(29, 30, 31);
-  font-weight: 300;
+  font-weight: 400;
   line-height: 1.5rem;
   margin: 0 0 16px;
   outline: none;
@@ -75,7 +75,7 @@ exports[`"TextArea" renders as disabled 1`] = `
   box-shadow: 0 0 0 1px #696c6e;
   caret-color: #0772de;
   color: rgb(29, 30, 31);
-  font-weight: 300;
+  font-weight: 400;
   line-height: 1.5rem;
   margin: 0 0 16px;
   outline: none;
@@ -137,7 +137,7 @@ exports[`"TextArea" renders as invalid 1`] = `
   box-shadow: 0 0 0 1px #e02020;
   caret-color: #0772de;
   color: rgb(29, 30, 31);
-  font-weight: 300;
+  font-weight: 400;
   line-height: 1.5rem;
   margin: 0 0 16px;
   outline: none;
@@ -194,7 +194,7 @@ exports[`"TextArea" renders with placeholderTextTransform 1`] = `
   box-shadow: 0 0 0 1px #696c6e;
   caret-color: #0772de;
   color: rgb(29, 30, 31);
-  font-weight: 300;
+  font-weight: 400;
   line-height: 1.5rem;
   margin: 0 0 16px;
   outline: none;

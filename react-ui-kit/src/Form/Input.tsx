@@ -77,7 +77,7 @@ export const inputStyle: <T>(theme: Theme, props: InputProps<T>, hasError?: bool
     boxShadow: markInvalid ? `0 0 0 1px ${theme.general.dangerColor}` : `0 0 0 1px ${theme.Select.borderColor}`,
     caretColor: theme.general.primaryColor,
     color: theme.general.color,
-    fontWeight: 300,
+    fontWeight: 400,
     height: '48px',
     lineHeight: '1.5rem',
     outline: 'none',
