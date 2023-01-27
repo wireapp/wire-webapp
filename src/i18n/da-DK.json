@@ -1115,7 +1115,7 @@
   "searchOthers": "Forbind",
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Personer",
-  "searchPlaceholder": "Search",
+  "searchPeoplePlaceholder": "Search",
   "searchServiceConfirmButton": "Tilføj tjeneste",
   "searchServicePlaceholder": "Søg ved navn",
   "searchServices": "Tjenester",

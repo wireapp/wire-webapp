@@ -1115,7 +1115,7 @@
   "searchOthers": "درخواست دوستی",
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "افراد",
-  "searchPlaceholder": "Search",
+  "searchPeoplePlaceholder": "Search",
   "searchServiceConfirmButton": "Open Conversation",
   "searchServicePlaceholder": "جستجو بر اساس نام",
   "searchServices": "سرویس‌ها",

@@ -146,7 +146,7 @@ const StartUI: React.FC<StartUIProps> = ({
       <div className="start-ui-header-user-input" data-uie-name="enter-search">
         <SearchInput
           input={searchQuery}
-          placeholder={t('searchPlaceholder')}
+          placeholder={t('searchPeoplePlaceholder')}
           selectedUsers={[]}
           setInput={setSearchQuery}
           enter={openFirstConversation}

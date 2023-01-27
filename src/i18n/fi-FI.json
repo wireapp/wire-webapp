@@ -1115,7 +1115,7 @@
   "searchOthers": "Yhdistä",
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Ihmiset",
-  "searchPlaceholder": "Search",
+  "searchPeoplePlaceholder": "Search",
   "searchServiceConfirmButton": "Open Conversation",
   "searchServicePlaceholder": "Hae nimellä",
   "searchServices": "Palvelut",

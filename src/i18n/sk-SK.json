@@ -1115,7 +1115,7 @@
   "searchOthers": "Pripojiť",
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Ľudia",
-  "searchPlaceholder": "Search",
+  "searchPeoplePlaceholder": "Search",
   "searchServiceConfirmButton": "Open Conversation",
   "searchServicePlaceholder": "Vyhľadať podľa mena",
   "searchServices": "Služby",
