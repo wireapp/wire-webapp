@@ -296,15 +296,7 @@ export class CallingViewModel {
       return !!this.callState.joinedCall();
     };
 
-    this.callingRepository.onIncomingCall(async (call: Call) => {
-      const shouldRing = this.selfUser().availability() !== Availability.Type.AWAY;
-      if (shouldRing && (!hasSoundlessCallsEnabled() || !hasJoinedCall())) {
-        ring(call);
-      }
-    });
-
-    //update epoch info when AVS requests the list of clients
-    this.callingRepository.onRequestClientsCallback(async (conversationId: QualifiedId) => {
+    const updateEpochInfo = async (conversationId: QualifiedId) => {
       const mlsService = core.service?.mls;
       if (!mlsService) {
         throw new Error('mls service was not initialised');
@@ -314,7 +306,20 @@ export class CallingViewModel {
 
       const {epoch, keyLength, secretKey, members} = await getSubconversationEpochInfo(conversationId, subconversation);
       this.callingRepository.setEpochInfo(conversationId, {epoch, keyLength, secretKey}, members);
+    };
+
+    this.callingRepository.onIncomingCall(async (call: Call) => {
+      const shouldRing = this.selfUser().availability() !== Availability.Type.AWAY;
+      if (shouldRing && (!hasSoundlessCallsEnabled() || !hasJoinedCall())) {
+        ring(call);
+      }
     });
+
+    //update epoch info when AVS requests the list of clients
+    this.callingRepository.onRequestClientsCallback(updateEpochInfo);
+
+    //update epoch info when AVS requests new epoch
+    this.callingRepository.onRequestNewEpochCallback(updateEpochInfo);
 
     //once we leave a call, we unsubscribe from all the events we've subscribed to during this call
     this.callingRepository.onLeaveCall(callingSubscriptions.unsubscribe);

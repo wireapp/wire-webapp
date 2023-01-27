@@ -127,6 +127,7 @@ export class CallingRepository {
   private avsVersion: number = 0;
   private incomingCallCallback: (call: Call) => void;
   private requestClientsCallback: (conversationId: QualifiedId) => void;
+  private requestNewEpochCallback: (conversationId: QualifiedId) => void;
   private leaveCallCallback: (conversationId: QualifiedId) => void;
   private isReady: boolean = false;
   /** will cache the query to media stream (in order to avoid asking the system for streams multiple times when we have multiple peers) */
@@ -166,6 +167,8 @@ export class CallingRepository {
     this.logger = getLogger('CallingRepository');
     this.incomingCallCallback = () => {};
     this.requestClientsCallback = () => {};
+    this.requestNewEpochCallback = () => {};
+    this.leaveCallCallback = () => {};
     this.callLog = [];
 
     /** {<userId>: <isVerified>} */
@@ -294,6 +297,7 @@ export class CallingRepository {
     wCall.setStateHandler(wUser, this.updateCallState);
     wCall.setParticipantChangedHandler(wUser, this.handleCallParticipantChanges);
     wCall.setReqClientsHandler(wUser, this.requestClients);
+    wCall.setReqNewEpochHandler(wUser, this.requestNewEpoch);
     wCall.setActiveSpeakerHandler(wUser, this.updateActiveSpeakers);
 
     return wUser;
@@ -414,6 +418,10 @@ export class CallingRepository {
 
   onRequestClientsCallback(callback: (conversationId: QualifiedId) => void): void {
     this.requestClientsCallback = callback;
+  }
+
+  onRequestNewEpochCallback(callback: (conversationId: QualifiedId) => void): void {
+    this.requestNewEpochCallback = callback;
   }
 
   findCall(conversationId: QualifiedId): Call | undefined {
@@ -1500,6 +1508,11 @@ export class CallingRepository {
     await this.pushClients(call);
     const qualifiedConversationId = this.parseQualifiedId(convId);
     this.requestClientsCallback(qualifiedConversationId);
+  };
+
+  private readonly requestNewEpoch = async (wUser: number, convId: SerializedConversationId) => {
+    const qualifiedConversationId = this.parseQualifiedId(convId);
+    this.requestNewEpochCallback(qualifiedConversationId);
   };
 
   private readonly getCallMediaStream = async (
