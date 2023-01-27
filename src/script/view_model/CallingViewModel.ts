@@ -211,11 +211,11 @@ export class CallingViewModel {
       if (!mlsService) {
         throw new Error('mls service was not initialised');
       }
-      const subconversation = await mlsService.joinConferenceSubconversation(conversationId);
-
-      const epoch = await mlsService.getEpoch(subconversation.group_id);
+      const initialSubconversation = await mlsService.joinConferenceSubconversation(conversationId);
 
       const forwardNewEpoch = async ({groupId, epoch}: {groupId: string; epoch: number}) => {
+        const subconversation = await mlsService.getConferenceSubconversation(conversationId);
+
         if (groupId !== subconversation.group_id) {
           return;
         }
@@ -226,7 +226,7 @@ export class CallingViewModel {
 
       mlsService.on('newEpoch', forwardNewEpoch);
 
-      await forwardNewEpoch({groupId: subconversation.group_id, epoch});
+      await forwardNewEpoch({groupId: initialSubconversation.group_id, epoch: initialSubconversation.epoch});
 
       return () => mlsService.off('newEpoch', forwardNewEpoch);
     };
