@@ -22,13 +22,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Use latest Node.js v16
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 16.x
-
-      - name: Yarn cache
-        uses: c-hive/gha-yarn-cache@v2.1.0
+          cache: 'yarn'
 
       - name: Install JS dependencies
         run: yarn --immutable

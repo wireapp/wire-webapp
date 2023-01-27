@@ -18,7 +18,6 @@
  */
 
 import {ConversationProtocol, CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
-import {amplify} from 'amplify';
 import 'jsdom-worker';
 import ko, {Subscription} from 'knockout';
 
@@ -40,7 +39,6 @@ import {createRandomUuid} from 'Util/util';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 
-import {usePrimaryModalState} from '../components/Modals/PrimaryModal';
 import {CALL} from '../event/Client';
 import {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import {UserRepository} from '../user/UserRepository';
@@ -96,29 +94,6 @@ describe('CallingRepository', () => {
   });
 
   describe('startCall', () => {
-    it('warns the user that there is an ongoing call before starting a new one', done => {
-      const activeCall = new Call(
-        selfUser.qualifiedId,
-        createConversation(CONVERSATION_TYPE.REGULAR, ConversationProtocol.PROTEUS),
-        CONV_TYPE.ONEONONE,
-        new Participant(new User(), ''),
-        0,
-        {currentAvailableDeviceId: mediaDevices} as MediaDevicesHandler,
-      );
-      activeCall.state(CALL_STATE.MEDIA_ESTAB);
-      spyOn(callingRepository['callState'], 'calls').and.returnValue([activeCall]);
-      spyOn(amplify, 'publish').and.returnValue(undefined);
-      const conversation = createConversation(CONVERSATION_TYPE.REGULAR, ConversationProtocol.PROTEUS);
-      const callType = CALL_TYPE.NORMAL;
-      spyOn(wCall, 'start');
-      callingRepository.startCall(conversation, callType).catch(done);
-      setTimeout(() => {
-        expect(usePrimaryModalState.getState().currentModalId).not.toBeNull();
-        expect(wCall.start).not.toHaveBeenCalled();
-        done();
-      }, 10);
-    });
-
     it.each([ConversationProtocol.PROTEUS, ConversationProtocol.MLS])(
       'starts a normal call in a 1:1 conversation for proteus or MLS conversation',
       async protocol => {
