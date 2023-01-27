@@ -82,6 +82,7 @@
   "accessibility.conversationDetailsCloseLabel": "Close image details view",
   "accessibility.conversationOptionsMenu": "Open conversation options",
   "accessibility.conversationOptionsMenuAccessKey": "Use right arrow key to focus on the conversation options menu",
+  "accessibility.conversationTitle": "{{username}} status {{status}}",
   "accessibility.conversationStatusMuted": "Muted conversation",
   "accessibility.conversationStatusPending": "Pending connection request",
   "accessibility.conversationStatusUnread": "Unread message",
