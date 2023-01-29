@@ -14082,7 +14082,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"redux@npm:4.2.0, redux@npm:^4.0.0, redux@npm:^4.0.5":
+"redux@npm:4.2.1":
+  version: 4.2.1
+  resolution: "redux@npm:4.2.1"
+  dependencies:
+    "@babel/runtime": ^7.9.2
+  checksum: f63b9060c3a1d930ae775252bb6e579b42415aee7a23c4114e21a0b4ba7ec12f0ec76936c00f546893f06e139819f0e2855e0d55ebfce34ca9c026241a6950dd
+  languageName: node
+  linkType: hard
+
+"redux@npm:^4.0.0, redux@npm:^4.0.5":
   version: 4.2.0
   resolution: "redux@npm:4.2.0"
   dependencies:
@@ -16870,7 +16879,7 @@ __metadata:
     react-router: 6.8.0
     react-router-dom: 6.7.0
     react-transition-group: 4.4.5
-    redux: 4.2.0
+    redux: 4.2.1
     redux-devtools-extension: 2.13.9
     redux-logdown: 1.0.4
     redux-mock-store: 1.5.4
