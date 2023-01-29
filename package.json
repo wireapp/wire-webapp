@@ -37,7 +37,7 @@
     "react-router": "6.7.0",
     "react-router-dom": "6.7.0",
     "react-transition-group": "4.4.5",
-    "redux": "4.2.0",
+    "redux": "4.2.1",
     "redux-logdown": "1.0.4",
     "redux-thunk": "2.4.2",
     "speakingurl": "14.0.1",
