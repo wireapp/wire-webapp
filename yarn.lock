@@ -2440,12 +2440,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@formatjs/fast-memoize@npm:1.2.7":
-  version: 1.2.7
-  resolution: "@formatjs/fast-memoize@npm:1.2.7"
+"@formatjs/fast-memoize@npm:1.2.8":
+  version: 1.2.8
+  resolution: "@formatjs/fast-memoize@npm:1.2.8"
   dependencies:
     tslib: ^2.4.0
-  checksum: ba372a3e931bd99729d993f5b95aeb43e7d07b9f71e759722cc20c4e2faa0af11a942f0df9023a029b03230dc4dfad5354755be1e385c465750f63e4b3372b7b
+  checksum: 19f7f04657363d3ca4854ba3e5ecf4ae5bf0575c12ba8b2b24a7128131b38d91cf2692aeab778d42e9aa2e27cd2ea3b1e23cabf8ce4dff42988dcf65582c3a94
   languageName: node
   linkType: hard
 
@@ -2470,14 +2470,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@formatjs/intl-displaynames@npm:6.2.3":
-  version: 6.2.3
-  resolution: "@formatjs/intl-displaynames@npm:6.2.3"
+"@formatjs/intl-displaynames@npm:6.2.4":
+  version: 6.2.4
+  resolution: "@formatjs/intl-displaynames@npm:6.2.4"
   dependencies:
     "@formatjs/ecma402-abstract": 1.14.3
     "@formatjs/intl-localematcher": 0.2.32
     tslib: ^2.4.0
-  checksum: 2e5fe38231858f66f44eb740a5e0576f98c9039b49ad81a02c4bcb62de6425e3951413c3fa487dd1ad42cd25c0b8d725adac6ceddf841f94b97ca22e753f3d56
+  checksum: 17cee1a7f81260a2b6bab1606bc3fa3eea777f454fb7d233a8d50befa9e02a1b3bf5ce5a4a6030a3ad86f60ea65cdce273e1d562dab1fdbe2dd42b254e31320f
   languageName: node
   linkType: hard
 
@@ -2501,23 +2501,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@formatjs/intl@npm:2.6.3":
-  version: 2.6.3
-  resolution: "@formatjs/intl@npm:2.6.3"
+"@formatjs/intl@npm:2.6.4":
+  version: 2.6.4
+  resolution: "@formatjs/intl@npm:2.6.4"
   dependencies:
     "@formatjs/ecma402-abstract": 1.14.3
-    "@formatjs/fast-memoize": 1.2.7
+    "@formatjs/fast-memoize": 1.2.8
     "@formatjs/icu-messageformat-parser": 2.1.14
-    "@formatjs/intl-displaynames": 6.2.3
+    "@formatjs/intl-displaynames": 6.2.4
     "@formatjs/intl-listformat": 7.1.7
-    intl-messageformat: 10.2.5
+    intl-messageformat: 10.2.6
     tslib: ^2.4.0
   peerDependencies:
     typescript: ^4.7
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 1922ec1d63aed8f42bb09967fffbaa4f37f59a351dd34ccddf28b268d04b05a80c9a7790f61292cf97fec4d47e15177b52987a28b5fb10df96aed5f5008dfc5f
+  checksum: def19aaaccebaeb42d0b2610ddfaaf77c9ac7b6bdab6ac1be50ed839279d26ccfe0721f46b5b20af49e121b5e859e45b8912f843fc7a776f64a7fea1377f0dcc
   languageName: node
   linkType: hard
 
@@ -9301,15 +9301,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"intl-messageformat@npm:10.2.5":
-  version: 10.2.5
-  resolution: "intl-messageformat@npm:10.2.5"
+"intl-messageformat@npm:10.2.6":
+  version: 10.2.6
+  resolution: "intl-messageformat@npm:10.2.6"
   dependencies:
     "@formatjs/ecma402-abstract": 1.14.3
-    "@formatjs/fast-memoize": 1.2.7
+    "@formatjs/fast-memoize": 1.2.8
     "@formatjs/icu-messageformat-parser": 2.1.14
     tslib: ^2.4.0
-  checksum: 048d6e3e746bff5ea6d745c8cbc2d0049aadb42caf2bad0d47e0bcf9bede285ef48a1fbd3a87711b99587d270d2ab8d9488e51577b24a2227856cdf373dd25df
+  checksum: 5d48b9cc1365c025d9540e46568647ed62d749068255d498a24f1965bbea689e96c97c61a430626daee09318ffa3611d41cbd68b7406657079bb76d317113fc1
   languageName: node
   linkType: hard
 
@@ -13758,19 +13758,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-intl@npm:6.2.5":
-  version: 6.2.5
-  resolution: "react-intl@npm:6.2.5"
+"react-intl@npm:6.2.6":
+  version: 6.2.6
+  resolution: "react-intl@npm:6.2.6"
   dependencies:
     "@formatjs/ecma402-abstract": 1.14.3
     "@formatjs/icu-messageformat-parser": 2.1.14
-    "@formatjs/intl": 2.6.3
-    "@formatjs/intl-displaynames": 6.2.3
+    "@formatjs/intl": 2.6.4
+    "@formatjs/intl-displaynames": 6.2.4
     "@formatjs/intl-listformat": 7.1.7
     "@types/hoist-non-react-statics": ^3.3.1
     "@types/react": 16 || 17 || 18
     hoist-non-react-statics: ^3.3.2
-    intl-messageformat: 10.2.5
+    intl-messageformat: 10.2.6
     tslib: ^2.4.0
   peerDependencies:
     react: ^16.6.0 || 17 || 18
@@ -13778,7 +13778,7 @@ __metadata:
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 826b6ed593b367ad0a375de4e84b3ca3c7334c6583dcf307bb90e9c45c79c7f85cf43f6d15d15b9827e1da1d13f807b802c252a6725d0af4bd5a3fd43cbd9879
+  checksum: d542a3e8580cf15f3e18c00f5b1116ab3740ef7edd798e21c4c52379daf7632d03be9b9c9dc3952a545427acc52104891d5b2e37155edd9718787d8801fc730e
   languageName: node
   linkType: hard
 
@@ -16847,7 +16847,7 @@ __metadata:
     raf: 3.4.1
     react: 18.2.0
     react-dom: 18.2.0
-    react-intl: 6.2.5
+    react-intl: 6.2.6
     react-redux: 8.0.5
     react-router: 6.7.0
     react-router-dom: 6.7.0
