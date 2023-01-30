@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [22.15.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@22.14.4...@wireapp/api-client@22.15.0) (2023-01-30)
+
+### Features
+
+* **core, api-client:** mls conference improvements ([#4811](https://github.com/wireapp/wire-web-packages/issues/4811)) ([73b1664](https://github.com/wireapp/wire-web-packages/commit/73b166494ecc83ed08a9af99a95eac87422eefff))
+
 ## [22.14.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@22.14.3...@wireapp/api-client@22.14.4) (2023-01-23)
 
 **Note:** Version bump only for package @wireapp/api-client
