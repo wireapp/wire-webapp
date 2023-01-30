@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [38.8.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.7.1...@wireapp/core@38.8.0) (2023-01-30)
+
+### Features
+
+* **core, api-client:** mls conference improvements ([#4811](https://github.com/wireapp/wire-web-packages/issues/4811)) ([73b1664](https://github.com/wireapp/wire-web-packages/commit/73b166494ecc83ed08a9af99a95eac87422eefff))
+
 ## [38.7.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.7.0...@wireapp/core@38.7.1) (2023-01-30)
 
 **Note:** Version bump only for package @wireapp/core
