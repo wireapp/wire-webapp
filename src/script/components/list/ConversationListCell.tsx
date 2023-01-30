@@ -28,6 +28,8 @@ import React, {
 
 import cx from 'classnames';
 
+import {Availability} from '@wireapp/protocol-messaging';
+
 import {AvailabilityState} from 'Components/AvailabilityState';
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {GroupAvatar} from 'Components/avatar/GroupAvatar';
@@ -174,6 +176,19 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
 
   const mainButtonTabIndex = useMessageFocusedTabIndex(focusConversation);
   const contextMenuButtonTabIndex = useMessageFocusedTabIndex(focusContextMenu && focusConversation);
+  const availabilityStrings: Record<string, string> = {
+    [Availability.Type.AVAILABLE]: t('userAvailabilityAvailable'),
+    [Availability.Type.AWAY]: t('userAvailabilityAway'),
+    [Availability.Type.BUSY]: t('userAvailabilityBusy'),
+  };
+  const availabilityTitle = [Availability.Type.AWAY, Availability.Type.BUSY, Availability.Type.AVAILABLE].includes(
+    availabilityOfUser,
+  )
+    ? t('accessibility.conversationTitle', {
+        username: displayName,
+        status: availabilityStrings[availabilityOfUser],
+      })
+    : displayName;
 
   return (
     <li onContextMenu={openContextMenu}>
@@ -216,6 +231,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
                 label={displayName}
                 theme={isActive}
                 dataUieName="status-availability-item"
+                title={availabilityTitle}
               />
             ) : (
               <span className={cx('conversation-list-cell-name', {'conversation-list-cell-name--active': isActive})}>
