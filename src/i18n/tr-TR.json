@@ -1115,7 +1115,7 @@
   "searchOthers": "Bağlan",
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "İnsanlar",
-  "searchPlaceholder": "Search",
+  "searchPeoplePlaceholder": "Search",
   "searchServiceConfirmButton": "Sohbet Başlat",
   "searchServicePlaceholder": "İsme göre ara",
   "searchServices": "Servisler",

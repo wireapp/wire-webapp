@@ -1115,7 +1115,7 @@
   "searchOthers": "Csatlakozás",
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Partner",
-  "searchPlaceholder": "Search",
+  "searchPeoplePlaceholder": "Search",
   "searchServiceConfirmButton": "Új szolgáltatás",
   "searchServicePlaceholder": "Keresés név szerint",
   "searchServices": "Szolgáltatások",

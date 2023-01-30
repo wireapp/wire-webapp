@@ -67,7 +67,11 @@ const PanelHeader: FC<PanelHeaderProps> = ({
   useEffect(() => {
     if (!!panelHeaderRef.current) {
       const nextElementToFocus = panelHeaderRef.current.querySelector('button');
-      nextElementToFocus?.focus();
+      // TO-DO Remove setTimeout after replacing transition group animation libray
+      // triggering focus method without setTimeout is not working due to right side bar animation
+      setTimeout(() => {
+        nextElementToFocus?.focus();
+      }, 0);
     }
   }, []);
 

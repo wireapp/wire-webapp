@@ -1115,7 +1115,7 @@
   "searchOthers": "Připojit",
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Kontakty",
-  "searchPlaceholder": "Search",
+  "searchPeoplePlaceholder": "Search",
   "searchServiceConfirmButton": "Open Conversation",
   "searchServicePlaceholder": "Hledat podle jména",
   "searchServices": "Služby",

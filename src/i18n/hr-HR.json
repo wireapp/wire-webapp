@@ -1115,7 +1115,7 @@
   "searchOthers": "Poveži se",
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Kontakti",
-  "searchPlaceholder": "Search",
+  "searchPeoplePlaceholder": "Search",
   "searchServiceConfirmButton": "Otvori razgovor",
   "searchServicePlaceholder": "Traži po imenu",
   "searchServices": "Usluge",

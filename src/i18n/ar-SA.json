@@ -1115,7 +1115,7 @@
   "searchOthers": "تواصل",
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "أشخاص",
-  "searchPlaceholder": "Search",
+  "searchPeoplePlaceholder": "Search",
   "searchServiceConfirmButton": "أضف خدمة",
   "searchServicePlaceholder": "البحث بحسب الاسم",
   "searchServices": "الخدمات",

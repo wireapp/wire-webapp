@@ -21,6 +21,7 @@ import {create} from 'zustand';
 
 import {PanelEntity, PanelState} from './RightSidebar';
 
+import {Message} from '../entity/message/Message';
 import {User} from '../entity/User';
 
 export enum ViewType {
@@ -48,6 +49,7 @@ type AppMainState = {
     highlightedUsers: RightSidebarParams['highlighted'];
     history: PanelState[];
     showLikes: RightSidebarParams['showLikes'];
+    lastViewedMessageDetailsEntity: Message | null;
     updateEntity: (entity: RightSidebarParams['entity']) => void;
   };
 };
@@ -72,6 +74,7 @@ const useAppMainState = create<AppMainState>((set, get) => ({
         },
       })),
     entity: null,
+    lastViewedMessageDetailsEntity: null,
     goBack: (entity: RightSidebarParams['entity']) =>
       set(state => ({
         ...state,
@@ -84,11 +87,15 @@ const useAppMainState = create<AppMainState>((set, get) => ({
         const previousState = rightSidebar.history[lastItem];
         const replacedNewState = previousState === panel ? rightSidebar.history.slice(0, -1) : rightSidebar.history;
 
+        const lastViewedMessageDetailsEntity =
+          params?.entity instanceof Message ? params.entity : state.rightSidebar.lastViewedMessageDetailsEntity;
+
         return {
           ...state,
           rightSidebar: {
             ...state.rightSidebar,
             entity: params?.entity || null,
+            lastViewedMessageDetailsEntity,
             highlightedUsers: params?.highlighted || [],
             history: [...replacedNewState, panel],
             showLikes: !!params?.showLikes,

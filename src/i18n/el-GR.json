@@ -1115,7 +1115,7 @@
   "searchOthers": "Σύνδεση",
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Άτομα",
-  "searchPlaceholder": "Search",
+  "searchPeoplePlaceholder": "Search",
   "searchServiceConfirmButton": "Open Conversation",
   "searchServicePlaceholder": "Αναζήτηση βάση ονόματος",
   "searchServices": "Υπηρεσίες",
