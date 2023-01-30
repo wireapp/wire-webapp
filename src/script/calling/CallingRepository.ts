@@ -1177,10 +1177,8 @@ export class CallingRepository {
      * This message is used to tell your other clients you have answered or
      * rejected a call and to stop ringing.
      */
-    if (typeof payload === 'string' && conversation.isUsingMLSProtocol) {
-      if (options?.myClientsOnly) {
-        return void this.messageRepository.sendSelfCallingMessage(payload, conversation.qualifiedId);
-      }
+    if (typeof payload === 'string' && conversation.isUsingMLSProtocol && options?.myClientsOnly) {
+      return void this.messageRepository.sendSelfCallingMessage(payload, conversation.qualifiedId);
     }
 
     const message = await this.messageRepository.sendCallingMessage(conversation, content, options);
