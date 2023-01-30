@@ -4461,9 +4461,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:38.7.0":
-  version: 38.7.0
-  resolution: "@wireapp/core@npm:38.7.0"
+"@wireapp/core@npm:38.7.1":
+  version: 38.7.1
+  resolution: "@wireapp/core@npm:38.7.1"
   dependencies:
     "@wireapp/api-client": ^22.14.4
     "@wireapp/commons": ^5.0.4
@@ -4472,7 +4472,7 @@ __metadata:
     "@wireapp/promise-queue": ^2.1.1
     "@wireapp/protocol-messaging": 1.44.0
     "@wireapp/store-engine": 5.0.3
-    "@wireapp/store-engine-dexie": ^2.0.4
+    "@wireapp/store-engine-dexie": ^2.0.5
     axios: 1.2.2
     bazinga64: 6.0.3
     hash.js: 1.1.7
@@ -4481,7 +4481,7 @@ __metadata:
     logdown: 3.3.1
     long: ^5.2.0
     uuidjs: 4.2.13
-  checksum: 9f1f75190c0bfe1c197f4e979a3c640126371ab1f6766af46a48cb915857c7ce2bf47864d3c2b0829d03440db89149d3f53d64e8cb487f493d3f5c264dba6248
+  checksum: 4c8330846ca97a383960ed83cb5e2ba77ec117f0c9ab0b4d965d00d4dd74a7707192fd64c7fa915caf337f691866a3325331f75529c79295eeafb6976c188821
   languageName: node
   linkType: hard
 
@@ -4613,7 +4613,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/store-engine-dexie@npm:2.0.4, @wireapp/store-engine-dexie@npm:^2.0.4":
+"@wireapp/store-engine-dexie@npm:2.0.4":
   version: 2.0.4
   resolution: "@wireapp/store-engine-dexie@npm:2.0.4"
   dependencies:
@@ -4621,6 +4621,17 @@ __metadata:
   peerDependencies:
     "@wireapp/store-engine": 5.x.x
   checksum: 5128eb25ec2812e89787bc4c2e39ea7ae72aba4d2548e5675a013890e17993d0f6fb9db84a0eb4f76d31584a3436bfdfb4ae19562dc57885e77bf752190677a4
+  languageName: node
+  linkType: hard
+
+"@wireapp/store-engine-dexie@npm:^2.0.5":
+  version: 2.0.5
+  resolution: "@wireapp/store-engine-dexie@npm:2.0.5"
+  dependencies:
+    dexie: 3.2.3
+  peerDependencies:
+    "@wireapp/store-engine": 5.x.x
+  checksum: 381d4e50ee506d17242b87d0134f963d3ef4a4add8010080d5d0480db9954cb279457383d1bb41665c00121b9971ad849c571d58189160ba4fcb1861706f699f
   languageName: node
   linkType: hard
 
@@ -6938,6 +6949,13 @@ __metadata:
   version: 3.2.2
   resolution: "dexie@npm:3.2.2"
   checksum: 7a21079f7ab139ebd724a009917f9293f2b01c341e2a3cd51d2455dda4d4e78b9ca7de0373e963108395cf1921ce7f6556cac967c1e957005a3c7c11794ceccf
+  languageName: node
+  linkType: hard
+
+"dexie@npm:3.2.3":
+  version: 3.2.3
+  resolution: "dexie@npm:3.2.3"
+  checksum: 54fd7bc94364ed601dc2d53f8b488e49ac61d4ec532f001a68fde9ffccb4bf3c6a8af310b41d8f52c94c1a99c0e165437d7b223b655df582ceda90b9bfcd60e7
   languageName: node
   linkType: hard
 
@@ -16876,7 +16894,7 @@ __metadata:
     "@typescript-eslint/parser": ^5.49.0
     "@wireapp/avs": 8.2.30
     "@wireapp/copy-config": 2.0.5
-    "@wireapp/core": 38.7.0
+    "@wireapp/core": 38.7.1
     "@wireapp/eslint-config": 2.1.1
     "@wireapp/lru-cache": 3.8.1
     "@wireapp/prettier-config": 0.5.2
