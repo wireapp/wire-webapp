@@ -34,8 +34,9 @@ export class RuntimeAction {
       const isPwaSupportedBrowser = () => {
         return Runtime.isMobileOS() || Runtime.isSafari();
       };
+      console.log(Runtime.getUserAgent(), Runtime.getBrowserName(), Runtime.getOS());
       const pwaAware = hasURLParameter(QUERY_KEY.PWA_AWARE);
-      const isPwaEnabled = getConfig().URL.MOBILE_BASE && pwaAware && isPwaSupportedBrowser();
+      const isPwaEnabled = isPwaSupportedBrowser();
       if (
         (!RuntimeSelector.hasToUseDesktopApplication(getState()) && Runtime.isWebappSupportedBrowser()) ||
         isPwaEnabled
