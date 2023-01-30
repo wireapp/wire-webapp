@@ -118,6 +118,12 @@ enum CALL_DIRECTION {
   OUTGOING = 'outgoing',
 }
 
+interface EpochInfoMember {
+  userid: string;
+  clientid: string;
+  in_subconv: boolean;
+}
+
 type SubconversationData = {epoch: number; secretKey: string; keyLength: number};
 
 export class CallingRepository {
@@ -872,7 +878,7 @@ export class CallingRepository {
     }
   }
 
-  setEpochInfo(conversationId: QualifiedId, subconversationData: SubconversationData, members: any[]) {
+  setEpochInfo(conversationId: QualifiedId, subconversationData: SubconversationData, members: EpochInfoMember[]) {
     const serializedConversationId = this.serializeQualifiedId(conversationId);
     const {epoch, secretKey, keyLength} = subconversationData;
     const clients = {
