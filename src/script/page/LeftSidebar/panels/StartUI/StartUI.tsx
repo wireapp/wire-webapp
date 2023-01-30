@@ -117,12 +117,12 @@ const StartUI: React.FC<StartUIProps> = ({
     return actions.open1to1Conversation(conversationEntity);
   };
 
-  const openOther = async (user: User) => {
+  const openOther = (user: User) => {
     if (user.isOutgoingRequest()) {
       return openContact(user);
     }
 
-    showUserModal({domain: user.domain, id: user.id});
+    return showUserModal({domain: user.domain, id: user.id});
   };
 
   const openService = (service: ServiceEntity) => {
@@ -135,8 +135,9 @@ const StartUI: React.FC<StartUIProps> = ({
 
   const openInviteModal = () => showInviteModal({userState});
 
-  const openConversation = (conversation: Conversation): Promise<void> => {
-    return actions.openGroupConversation(conversation).then(onClose);
+  const openConversation = async (conversation: Conversation): Promise<void> => {
+    await actions.openGroupConversation(conversation);
+    close();
   };
 
   const before = (
