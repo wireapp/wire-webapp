@@ -104,24 +104,22 @@ const StartUI: React.FC<StartUIProps> = ({
     if (peopleSearchResults.current) {
       const {contacts, groups} = peopleSearchResults.current;
       if (contacts.length > 0) {
-        await openContact(contacts[0]);
-        return;
+        return openContact(contacts[0]);
       }
       if (groups.length > 0) {
-        await openConversation(groups[0]);
+        return openConversation(groups[0]);
       }
     }
   };
 
   const openContact = async (user: User) => {
     const conversationEntity = await actions.getOrCreate1to1Conversation(user);
-    await actions.open1to1Conversation(conversationEntity);
+    return actions.open1to1Conversation(conversationEntity);
   };
 
   const openOther = async (user: User) => {
     if (user.isOutgoingRequest()) {
-      await openContact(user);
-      return;
+      return openContact(user);
     }
 
     showUserModal({domain: user.domain, id: user.id});

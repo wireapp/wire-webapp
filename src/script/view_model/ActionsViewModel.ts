@@ -111,7 +111,7 @@ export class ActionsViewModel {
       PrimaryModal.show(PrimaryModal.type.CONFIRM, {
         primaryAction: {
           action: async () => {
-            await this.connectionRepository.cancelRequest(userEntity, hideConversation, nextConversationEntity);
+            return this.connectionRepository.cancelRequest(userEntity, hideConversation, nextConversationEntity);
             resolve();
           },
           text: t('modalConnectCancelAction'),
@@ -204,7 +204,7 @@ export class ActionsViewModel {
         PrimaryModal.show(PrimaryModal.type.CONFIRM, {
           primaryAction: {
             action: async () => {
-              await this.messageRepository.deleteMessage(conversationEntity, messageEntity);
+              return this.messageRepository.deleteMessage(conversationEntity, messageEntity);
               resolve();
             },
             text: t('modalConversationDeleteMessageAction'),
@@ -227,7 +227,7 @@ export class ActionsViewModel {
         PrimaryModal.show(PrimaryModal.type.CONFIRM, {
           primaryAction: {
             action: async () => {
-              await this.messageRepository.deleteMessageForEveryone(conversationEntity, messageEntity);
+              return this.messageRepository.deleteMessageForEveryone(conversationEntity, messageEntity);
               resolve();
             },
             text: t('modalConversationDeleteMessageEveryoneAction'),
@@ -260,7 +260,7 @@ export class ActionsViewModel {
       PrimaryModal.show(PrimaryModal.type.OPTION, {
         primaryAction: {
           action: async (clearContent = false) => {
-            await this.conversationRepository.removeMember(
+            return this.conversationRepository.removeMember(
               conversationEntity,
               this.userState.self().qualifiedId,
               clearContent,
@@ -332,7 +332,7 @@ export class ActionsViewModel {
 
   private readonly openConversation = async (conversationEntity: Conversation): Promise<void> => {
     if (conversationEntity.is_archived()) {
-      await this.conversationRepository.unarchiveConversation(conversationEntity, true);
+      return this.conversationRepository.unarchiveConversation(conversationEntity, true);
     }
 
     if (conversationEntity.is_cleared()) {
