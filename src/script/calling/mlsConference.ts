@@ -79,11 +79,11 @@ export const subscribeToEpochUpdates = async (
   const initialSubconversation = await mlsService.joinConferenceSubconversation(conversationId);
 
   const forwardNewEpoch = async ({groupId, epoch}: {groupId: string; epoch: number}) => {
-    const subconversation = await mlsService.getConferenceSubconversation(conversationId);
-
-    if (groupId !== subconversation.group_id) {
+    if (groupId !== initialSubconversation.group_id) {
       return;
     }
+
+    const subconversation = await mlsService.getConferenceSubconversation(conversationId);
 
     const {keyLength, secretKey, members} = await getSubconversationEpochInfo(
       {mlsService},
