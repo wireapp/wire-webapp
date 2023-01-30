@@ -1115,7 +1115,7 @@
   "searchOthers": "Connetti",
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Persone",
-  "searchPeoplePlaceholder": "Search",
+  "searchPeoplePlaceholder": "Search people by name or username",
   "searchServiceConfirmButton": "Open Conversation",
   "searchServicePlaceholder": "Cerca per nome",
   "searchServices": "Servizi",
