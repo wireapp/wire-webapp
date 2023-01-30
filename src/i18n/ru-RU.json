@@ -1115,7 +1115,7 @@
   "searchOthers": "Связаться",
   "searchOthersFederation": "Подключиться к {{domainName}}",
   "searchPeople": "Участники",
-  "searchPeoplePlaceholder": "Поиск",
+  "searchPeoplePlaceholder": "Search people by name or username",
   "searchServiceConfirmButton": "Добавить сервис",
   "searchServicePlaceholder": "Поиск по имени",
   "searchServices": "Сервисы",
