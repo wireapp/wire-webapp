@@ -21,16 +21,16 @@ import {fireEvent, render} from '@testing-library/react';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {createNavigate} from 'src/script/router/routerBindings';
 import {createRandomUuid, noop} from 'Util/util';
 
 import {GroupList} from './GroupList';
 
 import {Conversation} from '../../../../../entity/Conversation';
 import {User} from '../../../../../entity/User';
+import {navigate} from '../../../../../router/Router';
 
-jest.mock('../../../../../router/routerBindings', () => ({
-  createNavigate: jest.fn(),
+jest.mock('../../../../../router/Router', () => ({
+  navigate: jest.fn(),
 }));
 
 const getGroupItemById = (container: HTMLElement, id: string) =>
@@ -89,13 +89,13 @@ describe('GroupList', () => {
     const itemGroup1 = getGroupItemById(container, groups[0].id);
     fireEvent.click(itemGroup1!);
 
-    expect(createNavigate).toHaveBeenCalledWith(`/conversation/${groups[0].id}`);
+    expect(navigate).toHaveBeenCalledWith(`/conversation/${groups[0].id}`);
     expect(onClickSpy).toHaveBeenCalledWith(groups[0]);
 
     const itemGroup2 = getGroupItemById(container, groups[1].id);
     fireEvent.click(itemGroup2!);
 
-    expect(createNavigate).toHaveBeenCalledWith(`/conversation/${groups[1].id}`);
+    expect(navigate).toHaveBeenCalledWith(`/conversation/${groups[1].id}`);
     expect(onClickSpy).toHaveBeenCalledWith(groups[1]);
   });
 });
