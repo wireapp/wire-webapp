@@ -20,6 +20,7 @@
 import {PostMlsMessageResponse, SUBCONVERSATION_ID} from '@wireapp/api-client/lib/conversation';
 import {Subconversation} from '@wireapp/api-client/lib/conversation/Subconversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import axios from 'axios';
 import {Converter, Decoder, Encoder} from 'bazinga64';
 import logdown from 'logdown';
@@ -69,10 +70,15 @@ const defaultConfig: MLSServiceConfig = {
   nbKeyPackages: 100,
 };
 
+export interface SubconversationEpochInfoMember {
+  userid: string;
+  clientid: string;
+  in_subconv: boolean;
+}
+
 type Events = {
   newEpoch: {epoch: number; groupId: string};
 };
-
 export class MLSService extends TypedEventEmitter<Events> {
   logger = logdown('@wireapp/core/MLSService');
   config: MLSServiceConfig;
@@ -215,42 +221,63 @@ export class MLSService extends TypedEventEmitter<Events> {
     });
   }
 
+  public async getConferenceSubconversation(conversationId: QualifiedId): Promise<Subconversation> {
+    return this.apiClient.api.conversation.getSubconversation(conversationId, SUBCONVERSATION_ID.CONFERENCE);
+  }
+
+  private async deleteConferenceSubconversation(
+    conversationId: QualifiedId,
+    data: {groupId: string; epoch: number},
+  ): Promise<void> {
+    return this.apiClient.api.conversation.deleteSubconversation(conversationId, SUBCONVERSATION_ID.CONFERENCE, data);
+  }
+
   /**
    * Will join or register an mls subconversation for conference calls.
    * Will return the secret key derived from the subconversation
    *
    * @param conversationId Id of the parent conversation in which the call should happen
    */
-  public async joinConferenceSubconversation(
-    conversationId: QualifiedId,
-  ): Promise<{subconversation: Subconversation; secretKey: string; keyLength: number}> {
-    const subconversation = await this.apiClient.api.conversation.getSubconversation(
-      conversationId,
-      SUBCONVERSATION_ID.CONFERENCE,
-    );
+  public async joinConferenceSubconversation(conversationId: QualifiedId): Promise<Subconversation> {
+    const subconversation = await this.getConferenceSubconversation(conversationId);
+
     if (subconversation.epoch === 0) {
+      // if subconversation is not yet established, create it
       await this.registerConversation(subconversation.group_id, []);
     } else {
-      //TODO: check timestamp, if subconv is older than 24h -> delete and re-create subconversation
+      const epochUpdateTime = new Date(subconversation.epoch_timestamp).getTime();
+      const epochAge = new Date().getTime() - epochUpdateTime;
+
+      if (epochAge > TimeInMillis.DAY) {
+        // if subconversation does exist, but it's older than 24h, delete and re-join
+        await this.deleteConferenceSubconversation(conversationId, {
+          groupId: subconversation.group_id,
+          epoch: subconversation.epoch,
+        });
+        await this.wipeConversation(subconversation.group_id);
+
+        return this.joinConferenceSubconversation(conversationId);
+      }
+
       await this.joinByExternalCommit(() =>
         this.apiClient.api.conversation.getSubconversationGroupInfo(conversationId, SUBCONVERSATION_ID.CONFERENCE),
       );
     }
 
+    // We refetch subconversation after joining/registering
+    // This way we're sure we return the fresh list of subconversation members
+    const updatedSubconversation = await this.apiClient.api.conversation.getSubconversation(
+      conversationId,
+      SUBCONVERSATION_ID.CONFERENCE,
+    );
+
     // We store the mapping between the subconversation and the parent conversation
-    storeSubconversationGroupId(conversationId, subconversation.subconv_id, subconversation.group_id);
+    storeSubconversationGroupId(conversationId, updatedSubconversation.subconv_id, updatedSubconversation.group_id);
 
-    const keyLength = 32;
-    const secretKey = await this.exportSecretKey(subconversation.group_id, keyLength);
-
-    return {
-      subconversation,
-      secretKey,
-      keyLength,
-    };
+    return updatedSubconversation;
   }
 
-  private async exportSecretKey(groupId: string, keyLength: number): Promise<string> {
+  public async exportSecretKey(groupId: string, keyLength: number): Promise<string> {
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
     const key = await this.coreCryptoClient.exportSecretKey(groupIdBytes, keyLength);
     return Encoder.toBase64(key).asString;
