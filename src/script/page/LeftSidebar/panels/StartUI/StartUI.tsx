@@ -100,27 +100,27 @@ const StartUI: React.FC<StartUIProps> = ({
 
   const peopleSearchResults = useRef<SearchResultsData | undefined>(undefined);
 
-  const openFirstConversation = (): void => {
+  const openFirstConversation = async (): Promise<void> => {
     if (peopleSearchResults.current) {
       const {contacts, groups} = peopleSearchResults.current;
       if (contacts.length > 0) {
-        openContact(contacts[0]);
+        await openContact(contacts[0]);
         return;
       }
       if (groups.length > 0) {
-        openConversation(groups[0]);
+        await openConversation(groups[0]);
       }
     }
   };
 
   const openContact = async (user: User) => {
     const conversationEntity = await actions.getOrCreate1to1Conversation(user);
-    actions.open1to1Conversation(conversationEntity);
+    await actions.open1to1Conversation(conversationEntity);
   };
 
-  const openOther = (user: User) => {
+  const openOther = async (user: User) => {
     if (user.isOutgoingRequest()) {
-      openContact(user);
+      await openContact(user);
       return;
     }
 
