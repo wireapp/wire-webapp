@@ -1176,6 +1176,7 @@
   "tooltipConversationDetailsAddPeople": "Add participants to conversation ({{shortcut}})",
   "tooltipConversationDetailsRename": "Change conversation name",
   "tooltipConversationEphemeral": "Self-deleting message",
+  "tooltipConversationEphemeralAriaLabel": "Type a self-deleting message, currently set to {{time}}",
   "tooltipConversationFile": "Add file",
   "tooltipConversationInfo": "Conversation info",
   "tooltipConversationInputMoreThanTwoUserTyping": "{{user1}} and {{count}} more people are typing",

@@ -45,7 +45,7 @@ import {
   getMentionCandidate,
   updateMentionRanges,
 } from 'Util/MentionUtil';
-import {formatLocale, TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {formatDuration, formatLocale, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {getSelectionPosition} from 'Util/util';
 
 import {ControlButtons} from './components/InputBarControls/ControlButtons';
@@ -800,7 +800,11 @@ const InputBar = ({
                     onBlur={() => setIsTyping(false)}
                     value={inputValue}
                     placeholder={inputPlaceholder}
-                    aria-label={inputPlaceholder}
+                    aria-label={
+                      messageTimer
+                        ? t('tooltipConversationEphemeralAriaLabel', {time: formatDuration(messageTimer).text})
+                        : inputPlaceholder
+                    }
                     data-uie-name="input-message"
                     dir="auto"
                   />
