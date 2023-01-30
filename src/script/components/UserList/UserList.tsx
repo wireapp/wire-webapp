@@ -96,10 +96,7 @@ export const UserList = ({
 }: UserListProps) => {
   const [maxShownUsers, setMaxShownUsers] = useState(USER_CHUNK_SIZE);
 
-  const [expandedFolders, setExpandedFolders] = useState<UserListSections[]>([
-    UserListSections.CONTACTS,
-    UserListSections.SELECTED_CONTACTS,
-  ]);
+  const [expandedFolders, setExpandedFolders] = useState<UserListSections[]>([UserListSections.CONTACTS]);
 
   const hasMoreUsers = !truncate && users.length > maxShownUsers;
 
