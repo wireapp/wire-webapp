@@ -1173,8 +1173,7 @@ export class CallingRepository {
     const content = typeof payload === 'string' ? payload : JSON.stringify(payload);
 
     /**
-     * @note If the AVS message type is REJECT, we should ignore the message,
-     * eventually this will be send to the self-conversation
+     * @note If myClientsOnly option is true, the message should be sent via the self-conversation.
      * This message is used to tell your other clients you have answered or
      * rejected a call and to stop ringing.
      * @todo Remove the restriction when we are able to send MLS messages to a specific user in a call.
