@@ -23,7 +23,7 @@ import {MLSService} from '@wireapp/core/lib/messagingProtocols/mls';
 
 import {SubconversationEpochInfoMember} from './CallingRepository';
 
-export const generateSubconversationMembers = async (
+const generateSubconversationMembers = async (
   {mlsService}: {mlsService: MLSService},
   conversationId: QualifiedId,
   subconversation: Subconversation,
