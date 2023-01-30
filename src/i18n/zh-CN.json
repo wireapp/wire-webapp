@@ -1115,7 +1115,7 @@
   "searchOthers": "好友请求",
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "联系人",
-  "searchPlaceholder": "Search",
+  "searchPeoplePlaceholder": "Search",
   "searchServiceConfirmButton": "添加服务",
   "searchServicePlaceholder": "按名字搜索",
   "searchServices": "服务",

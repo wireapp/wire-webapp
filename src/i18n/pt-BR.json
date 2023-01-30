@@ -1115,7 +1115,7 @@
   "searchOthers": "Conectar",
   "searchOthersFederation": "Conectar com o {{domainName}}",
   "searchPeople": "Pessoas",
-  "searchPlaceholder": "Pesquisar",
+  "searchPeoplePlaceholder": "Pesquisar",
   "searchServiceConfirmButton": "Abrir conversa",
   "searchServicePlaceholder": "Pesquisar por nome",
   "searchServices": "Serviços",

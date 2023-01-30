@@ -1115,7 +1115,7 @@
   "searchOthers": "Užmegzti kontaktą",
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Žmonės",
-  "searchPlaceholder": "Search",
+  "searchPeoplePlaceholder": "Search",
   "searchServiceConfirmButton": "Pridėti paslaugą",
   "searchServicePlaceholder": "Ieškokite pagal vardą",
   "searchServices": "Paslaugos",

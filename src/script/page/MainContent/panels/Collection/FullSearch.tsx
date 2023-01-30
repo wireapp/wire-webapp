@@ -131,7 +131,7 @@ const FullSearch: React.FC<FullSearchProps> = ({searchProvider, click = noop, ch
             type="text"
             value={searchValue}
             ref={inputRef}
-            aria-label={t('tooltipConversationSearch')}
+            aria-label={t('fullsearchPlaceholder')}
             placeholder={t('fullsearchPlaceholder')}
             onChange={event => setSearchValue(event.currentTarget.value)}
             data-uie-name="full-search-header-input"

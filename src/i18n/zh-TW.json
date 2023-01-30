@@ -1115,7 +1115,7 @@
   "searchOthers": "連接",
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "聯絡人",
-  "searchPlaceholder": "Search",
+  "searchPeoplePlaceholder": "Search",
   "searchServiceConfirmButton": "Open Conversation",
   "searchServicePlaceholder": "按名稱搜尋",
   "searchServices": "服務",

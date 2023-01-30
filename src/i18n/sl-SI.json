@@ -1115,7 +1115,7 @@
   "searchOthers": "Poveži",
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Osebe",
-  "searchPlaceholder": "Search",
+  "searchPeoplePlaceholder": "Search",
   "searchServiceConfirmButton": "Open Conversation",
   "searchServicePlaceholder": "Iskanje po imenu",
   "searchServices": "Storitve",

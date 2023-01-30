@@ -1115,7 +1115,7 @@
   "searchOthers": "Verbind",
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Deelnemers",
-  "searchPlaceholder": "Search",
+  "searchPeoplePlaceholder": "Search",
   "searchServiceConfirmButton": "Service toevoegen",
   "searchServicePlaceholder": "Zoeken op naam",
   "searchServices": "Services",
