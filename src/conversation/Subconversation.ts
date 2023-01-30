@@ -34,6 +34,7 @@ export interface Subconversation {
   subconv_id: SUBCONVERSATION_ID;
   group_id: string;
   epoch: number;
+  epoch_timestamp: string;
   cipher_suite: number;
   members: SubconversationMember[];
 }
