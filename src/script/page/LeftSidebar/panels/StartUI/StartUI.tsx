@@ -137,7 +137,7 @@ const StartUI: React.FC<StartUIProps> = ({
 
   const openConversation = async (conversation: Conversation): Promise<void> => {
     await actions.openGroupConversation(conversation);
-    close();
+    onClose();
   };
 
   const before = (
