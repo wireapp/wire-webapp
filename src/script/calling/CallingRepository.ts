@@ -1176,7 +1176,6 @@ export class CallingRepository {
      * @note If myClientsOnly option is true, the message should be sent via the self-conversation.
      * This message is used to tell your other clients you have answered or
      * rejected a call and to stop ringing.
-     * @todo Remove the restriction when we are able to send MLS messages to a specific user in a call.
      */
     if (typeof payload === 'string' && conversation.isUsingMLSProtocol) {
       if (options?.myClientsOnly) {
