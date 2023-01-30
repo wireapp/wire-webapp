@@ -23,12 +23,12 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {GroupAvatar} from 'Components/avatar/GroupAvatar';
+import {createNavigate} from 'src/script/router/routerBindings';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 
 import type {Conversation} from '../../../../../../entity/Conversation';
 import {generateConversationUrl} from '../../../../../../router/routeGenerator';
-import {navigate} from '../../../../../../router/Router';
 
 export interface GroupListItemProps {
   click: (group: Conversation) => void;
@@ -43,8 +43,9 @@ const GroupListItem: React.FC<GroupListItemProps> = ({click, group}) => {
   } = useKoSubscribableChildren(group, ['display_name', 'participating_user_ets', 'is1to1']);
 
   const onClick = () => {
+    const url = generateConversationUrl(group.qualifiedId);
     click(group);
-    navigate(generateConversationUrl(group.qualifiedId));
+    createNavigate(url);
   };
 
   return (
@@ -56,7 +57,7 @@ const GroupListItem: React.FC<GroupListItemProps> = ({click, group}) => {
       className="search-list-item"
       data-uie-uid={`${group.id}`}
       onClick={onClick}
-      onKeyDown={e => handleKeyDown(e, onClick)}
+      onKeyDown={event => handleKeyDown(event, onClick)}
       data-uie-value={displayName}
     >
       <div className="search-list-item-image">

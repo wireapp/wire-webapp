@@ -138,7 +138,7 @@ const StartUI: React.FC<StartUIProps> = ({
   const openInviteModal = () => showInviteModal({userState});
 
   const openConversation = (conversation: Conversation): Promise<void> => {
-    return actions.openGroupConversation(conversation).then(close);
+    return actions.openGroupConversation(conversation).then(onClose);
   };
 
   const before = (
