@@ -1129,6 +1129,9 @@ export class CallingRepository {
     targets: string | null,
     _unused: string | null,
     payload: string,
+    _len: number,
+    _trans: number,
+    my_clients_only: number,
   ): number => {
     const conversationId = this.parseQualifiedId(convId);
     const call = this.findCall(conversationId);
@@ -1147,6 +1150,8 @@ export class CallingRepository {
         recipients,
       };
     }
+
+    options = {...options, myClientsOnly: my_clients_only === 1};
 
     this.sendCallingMessage(conversationId, payload, options).catch(error => {
       this.logger.warn('Failed to send calling message, aborting call', error);
@@ -1175,9 +1180,7 @@ export class CallingRepository {
      * @todo Remove the restriction when we are able to send MLS messages to a specific user in a call.
      */
     if (typeof payload === 'string' && conversation.isUsingMLSProtocol) {
-      const parsedPayload = JSON.parse(payload);
-      const messageType = parsedPayload.type as CALL_MESSAGE_TYPE;
-      if (messageType === CALL_MESSAGE_TYPE.REJECT) {
+      if (options?.myClientsOnly) {
         return void this.messageRepository.sendSelfCallingMessage(payload, conversation.qualifiedId);
       }
     }

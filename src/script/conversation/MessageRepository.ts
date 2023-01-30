@@ -107,6 +107,7 @@ export interface MessageSendingOptions {
   /** Send native push notification for message. Default is `true`. */
   nativePush?: boolean;
   recipients?: QualifiedId[] | QualifiedUserClients | UserClients;
+  myClientsOnly?: boolean;
 }
 
 export enum CONSENT_TYPE {
