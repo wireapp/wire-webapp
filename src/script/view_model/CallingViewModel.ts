@@ -224,6 +224,22 @@ export class CallingViewModel {
       this.callingRepository.setEpochInfo(conversationId, {epoch, keyLength, secretKey}, members);
     };
 
+    const leaveCall = async (conversationId: QualifiedId) => {
+      const conversation = this.conversationState.findConversation(conversationId);
+
+      if (conversation?.isUsingMLSProtocol && conversation.groupId) {
+        const mlsService = core.service?.mls;
+        if (!mlsService) {
+          throw new Error('mls service was not initialised');
+        }
+
+        await mlsService.leaveConferenceSubconversation(conversationId);
+        await mlsService.wipeConversation(conversation.groupId);
+
+        callingSubscriptions.unsubscribe(conversationId);
+      }
+    };
+
     this.callingRepository.onIncomingCall(async (call: Call) => {
       const shouldRing = this.selfUser().availability() !== Availability.Type.AWAY;
       if (shouldRing && (!hasSoundlessCallsEnabled() || !hasJoinedCall())) {
@@ -237,8 +253,8 @@ export class CallingViewModel {
     //update epoch info when AVS requests new epoch
     this.callingRepository.onRequestNewEpochCallback(updateEpochInfo);
 
-    //once we leave a call, we unsubscribe from all the events we've subscribed to during this call
-    this.callingRepository.onLeaveCall(callingSubscriptions.unsubscribe);
+    //once we leave a call, we remove ourselfes from subconversation and unsubscribe from all the call events
+    this.callingRepository.onLeaveCall(leaveCall);
 
     this.callActions = {
       answer: async (call: Call) => {
