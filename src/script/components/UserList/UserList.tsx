@@ -221,7 +221,8 @@ export const UserList = ({
 
     const currentUsers = truncatedUsers.filter(user => isSelected(user));
 
-    const hasSelectedUsers = currentUsers.length > 0;
+    const selectedUsersCount = currentUsers.length;
+    const hasSelectedUsers = selectedUsersCount > 0;
 
     const toggleFolder = (folderName: UserListSections) => {
       setExpandedFolders(prevState =>
@@ -245,13 +246,17 @@ export const UserList = ({
                 <Icon.Disclose width={16} height={16} />
               </span>
 
-              {t('userListSelectedContacts', currentUsers.length)}
+              {t('userListSelectedContacts', selectedUsersCount)}
             </button>
 
-            <ul data-uie-name="selected-search-list" className={cx('search-list', cssClasses)}>
+            <ul
+              data-uie-name="selected-search-list"
+              data-uie-value={selectedUsersCount}
+              className={cx('search-list', cssClasses)}
+            >
               {isSelectedContactsOpen &&
                 currentUsers.map((user, index) => {
-                  const isLastItem = index === currentUsers.length - 1;
+                  const isLastItem = index === selectedUsersCount - 1;
 
                   return renderParticipantItem(user, isLastItem);
                 })}

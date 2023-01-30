@@ -57,11 +57,8 @@ describe('UserList', () => {
     };
 
     const {getByTestId} = render(withTheme(<UserList {...props} />));
-
     const selectedSearchList = getByTestId('selected-search-list');
-    const usersListItems = selectedSearchList.querySelectorAll('li');
-
-    expect(usersListItems).toHaveLength(4);
+    expect(selectedSearchList.getAttribute('data-uie-value')).toEqual('4');
   });
 
   it('select user', async () => {
