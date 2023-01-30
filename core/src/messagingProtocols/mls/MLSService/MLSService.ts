@@ -478,8 +478,9 @@ export class MLSService extends TypedEventEmitter<Events> {
     );
   }
 
-  public async wipeConversation(conversationId: ConversationId): Promise<void> {
-    return this.coreCryptoClient.wipeConversation(conversationId);
+  public async wipeConversation(groupId: string): Promise<void> {
+    const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
+    return this.coreCryptoClient.wipeConversation(groupIdBytes);
   }
 
   public async handleEvent(params: Omit<EventHandlerParams, 'mlsService'>): EventHandlerResult {
