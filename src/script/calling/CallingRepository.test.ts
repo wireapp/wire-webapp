@@ -119,7 +119,7 @@ describe('CallingRepository', () => {
       const conversation = createConversation(CONVERSATION_TYPE.REGULAR, ConversationProtocol.MLS);
       const callType = CALL_TYPE.NORMAL;
       spyOn(wCall, 'start');
-      await callingRepository.startCall(conversation, callType, {secretKey: '', keyLength: 256, epoch: 0});
+      await callingRepository.startCall(conversation, callType);
       expect(wCall.start).toHaveBeenCalledWith(wUser, conversation.id, callType, CONV_TYPE.CONFERENCE_MLS, 0);
     });
   });

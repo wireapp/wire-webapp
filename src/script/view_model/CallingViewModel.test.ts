@@ -37,6 +37,9 @@ const mockCallingRepository = {
   answerCall: jest.fn(),
   leaveCall: jest.fn(),
   onIncomingCall: jest.fn(),
+  onRequestClientsCallback: jest.fn(),
+  onRequestNewEpochCallback: jest.fn(),
+  onLeaveCall: jest.fn(),
 } as unknown as CallingRepository;
 
 const callState = new CallState();
@@ -71,6 +74,7 @@ function buildCallingViewModel() {
 describe('CallingViewModel', () => {
   afterEach(() => {
     callState.calls.removeAll();
+    jest.clearAllMocks();
   });
 
   describe('answerCall', () => {
@@ -107,7 +111,7 @@ describe('CallingViewModel', () => {
       const callingViewModel = buildCallingViewModel();
       const conversation = new Conversation(createRandomUuid());
       await callingViewModel.callActions.startAudio(conversation);
-      expect(mockCallingRepository.startCall).toHaveBeenCalledWith(conversation, CALL_TYPE.NORMAL, undefined);
+      expect(mockCallingRepository.startCall).toHaveBeenCalledWith(conversation, CALL_TYPE.NORMAL);
     });
 
     it('lets the user leave previous call before starting a new one', async () => {
@@ -127,7 +131,7 @@ describe('CallingViewModel', () => {
         joinedCall.conversationId,
         LEAVE_CALL_REASON.MANUAL_LEAVE_TO_JOIN_ANOTHER_CALL,
       );
-      expect(mockCallingRepository.startCall).toHaveBeenCalledWith(conversation, CALL_TYPE.NORMAL, undefined);
+      expect(mockCallingRepository.startCall).toHaveBeenCalledWith(conversation, CALL_TYPE.NORMAL);
     });
   });
 });

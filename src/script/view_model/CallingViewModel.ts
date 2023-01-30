@@ -266,7 +266,7 @@ export class CallingViewModel {
             },
           });
         } else {
-          answerCall(call);
+          return answerCall(call);
         }
       },
       changePage: (newPage, call) => {
