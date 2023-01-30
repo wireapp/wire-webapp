@@ -111,7 +111,7 @@ export class ActionsViewModel {
       PrimaryModal.show(PrimaryModal.type.CONFIRM, {
         primaryAction: {
           action: async () => {
-            return this.connectionRepository.cancelRequest(userEntity, hideConversation, nextConversationEntity);
+            await this.connectionRepository.cancelRequest(userEntity, hideConversation, nextConversationEntity);
             resolve();
           },
           text: t('modalConnectCancelAction'),
@@ -204,7 +204,7 @@ export class ActionsViewModel {
         PrimaryModal.show(PrimaryModal.type.CONFIRM, {
           primaryAction: {
             action: async () => {
-              return this.messageRepository.deleteMessage(conversationEntity, messageEntity);
+              await this.messageRepository.deleteMessage(conversationEntity, messageEntity);
               resolve();
             },
             text: t('modalConversationDeleteMessageAction'),
@@ -227,7 +227,7 @@ export class ActionsViewModel {
         PrimaryModal.show(PrimaryModal.type.CONFIRM, {
           primaryAction: {
             action: async () => {
-              return this.messageRepository.deleteMessageForEveryone(conversationEntity, messageEntity);
+              await this.messageRepository.deleteMessageForEveryone(conversationEntity, messageEntity);
               resolve();
             },
             text: t('modalConversationDeleteMessageEveryoneAction'),
@@ -260,7 +260,7 @@ export class ActionsViewModel {
       PrimaryModal.show(PrimaryModal.type.OPTION, {
         primaryAction: {
           action: async (clearContent = false) => {
-            return this.conversationRepository.removeMember(
+            await this.conversationRepository.removeMember(
               conversationEntity,
               this.userState.self().qualifiedId,
               clearContent,
