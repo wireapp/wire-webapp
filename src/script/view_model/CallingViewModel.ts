@@ -34,8 +34,10 @@ import type {AudioRepository} from '../audio/AudioRepository';
 import {AudioType} from '../audio/AudioType';
 import type {Call} from '../calling/Call';
 import {CallingRepository} from '../calling/CallingRepository';
+import {callingSubscriptions} from '../calling/callingSubscriptionsHandler';
 import {CallState} from '../calling/CallState';
 import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
+import {getSubconversationEpochInfo, subscribeToEpochUpdates} from '../calling/mlsConference';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
 import {ConversationState} from '../conversation/ConversationState';
@@ -138,7 +140,7 @@ export class CallingViewModel {
       });
     };
 
-    const startCall = async (conversation: Conversation, callType: CALL_TYPE) => {
+    const startCall = async (conversation: Conversation, callType: CALL_TYPE): Promise<void> => {
       const canStart = await this.canInitiateCall(conversation.qualifiedId, {
         action: t('modalCallSecondOutgoingAction'),
         message: t('modalCallSecondOutgoingMessage'),
@@ -148,21 +150,63 @@ export class CallingViewModel {
       if (!canStart) {
         return;
       }
-      const subConversationData = conversation.isUsingMLSProtocol
-        ? await core.service!.mls?.joinConferenceSubconversation(conversation)
-        : undefined;
 
-      const keyData = subConversationData && {
-        epoch: subConversationData.subconversation.epoch,
-        secretKey: subConversationData.secretKey,
-        keyLength: subConversationData.keyLength,
-      };
-
-      const call = await this.callingRepository.startCall(conversation, callType, keyData);
+      const call = await this.callingRepository.startCall(conversation, callType);
       if (!call) {
         return;
       }
+
+      if (conversation.isUsingMLSProtocol) {
+        const mlsService = core.service?.mls;
+        if (!mlsService) {
+          throw new Error('mls service was not initialised');
+        }
+
+        const unsubscribe = await subscribeToEpochUpdates(
+          {mlsService},
+          conversation.qualifiedId,
+          ({epoch, keyLength, secretKey, members}) => {
+            this.callingRepository.setEpochInfo(conversation.qualifiedId, {epoch, keyLength, secretKey}, members);
+          },
+        );
+
+        callingSubscriptions.addOngoing(call.conversationId, unsubscribe);
+      }
       ring(call);
+    };
+
+    const joinOngoingMlsConference = async (call: Call) => {
+      const mlsService = core.service?.mls;
+      if (!mlsService) {
+        throw new Error('mls service was not initialised');
+      }
+
+      const unsubscribe = await subscribeToEpochUpdates(
+        {mlsService},
+        call.conversationId,
+        ({epoch, keyLength, secretKey, members}) => {
+          this.callingRepository.setEpochInfo(call.conversationId, {epoch, keyLength, secretKey}, members);
+        },
+      );
+
+      callingSubscriptions.addOngoing(call.conversationId, unsubscribe);
+    };
+
+    const answerCall = async (call: Call) => {
+      const canAnswer = await this.canInitiateCall(call.conversationId, {
+        action: t('modalCallSecondIncomingAction'),
+        message: t('modalCallSecondIncomingMessage'),
+        title: t('modalCallSecondIncomingHeadline'),
+      });
+      if (!canAnswer) {
+        return;
+      }
+
+      await this.callingRepository.answerCall(call);
+
+      if (call.conversationType === CONV_TYPE.CONFERENCE_MLS) {
+        await joinOngoingMlsConference(call);
+      }
     };
 
     const hasSoundlessCallsEnabled = (): boolean => {
@@ -173,12 +217,37 @@ export class CallingViewModel {
       return !!this.callState.joinedCall();
     };
 
-    this.callingRepository.onIncomingCall((call: Call) => {
+    const updateEpochInfo = async (conversationId: QualifiedId) => {
+      const mlsService = core.service?.mls;
+      if (!mlsService) {
+        throw new Error('mls service was not initialised');
+      }
+
+      const subconversation = await mlsService.getConferenceSubconversation(conversationId);
+
+      const {epoch, keyLength, secretKey, members} = await getSubconversationEpochInfo(
+        {mlsService},
+        conversationId,
+        subconversation,
+      );
+      this.callingRepository.setEpochInfo(conversationId, {epoch, keyLength, secretKey}, members);
+    };
+
+    this.callingRepository.onIncomingCall(async (call: Call) => {
       const shouldRing = this.selfUser().availability() !== Availability.Type.AWAY;
       if (shouldRing && (!hasSoundlessCallsEnabled() || !hasJoinedCall())) {
         ring(call);
       }
     });
+
+    //update epoch info when AVS requests the list of clients
+    this.callingRepository.onRequestClientsCallback(updateEpochInfo);
+
+    //update epoch info when AVS requests new epoch
+    this.callingRepository.onRequestNewEpochCallback(updateEpochInfo);
+
+    //once we leave a call, we unsubscribe from all the events we've subscribed to during this call
+    this.callingRepository.onLeaveCall(callingSubscriptions.unsubscribe);
 
     this.callActions = {
       answer: async (call: Call) => {
@@ -197,16 +266,7 @@ export class CallingViewModel {
             },
           });
         } else {
-          const canAnwer = await this.canInitiateCall(call.conversationId, {
-            action: t('modalCallSecondIncomingAction'),
-            message: t('modalCallSecondIncomingMessage'),
-            title: t('modalCallSecondIncomingHeadline'),
-          });
-          if (!canAnwer) {
-            return;
-          }
-
-          this.callingRepository.answerCall(call);
+          answerCall(call);
         }
       },
       changePage: (newPage, call) => {
