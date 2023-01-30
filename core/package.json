@@ -36,7 +36,7 @@
     "@types/long": "^5.0.0",
     "@types/rimraf": "^3.0.2",
     "@types/tough-cookie": "4.0.2",
-    "commander": "9.5.0",
+    "commander": "10.0.0",
     "cross-env": "7.0.3",
     "dotenv-defaults": "5.0.2",
     "fake-indexeddb": "^4.0.0",
