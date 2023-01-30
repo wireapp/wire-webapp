@@ -1115,7 +1115,7 @@
   "searchOthers": "Conectare",
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Persoane",
-  "searchPlaceholder": "Search",
+  "searchPeoplePlaceholder": "Search",
   "searchServiceConfirmButton": "Adaugă serviciu",
   "searchServicePlaceholder": "Caută după nume",
   "searchServices": "Servicii",

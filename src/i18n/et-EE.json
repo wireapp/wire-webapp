@@ -1115,7 +1115,7 @@
   "searchOthers": "Ühendu",
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Inimesed",
-  "searchPlaceholder": "Search",
+  "searchPeoplePlaceholder": "Search",
   "searchServiceConfirmButton": "Lisa teenus",
   "searchServicePlaceholder": "Otsi nime järgi",
   "searchServices": "Teenused",

@@ -44,6 +44,7 @@ import {UserReactionMap} from '../../../storage';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {UserRepository} from '../../../user/UserRepository';
 import {PanelHeader} from '../PanelHeader';
+import {PanelEntity, PanelState} from '../RightSidebar';
 
 const MESSAGE_STATES = {
   LIKES: 'likes',
@@ -70,6 +71,7 @@ interface MessageDetailsProps {
   userRepository: UserRepository;
   showLikes?: boolean;
   updateEntity: (message: Message) => void;
+  togglePanel: (state: PanelState, entity: PanelEntity, addMode?: boolean) => void;
 }
 
 const MessageDetails: FC<MessageDetailsProps> = ({
@@ -82,6 +84,7 @@ const MessageDetails: FC<MessageDetailsProps> = ({
   userRepository,
   onClose,
   updateEntity,
+  togglePanel,
 }) => {
   const [receiptUsers, setReceiptUsers] = useState<User[]>([]);
   const [likeUsers, setLikeUsers] = useState<User[]>([]);
@@ -189,6 +192,8 @@ const MessageDetails: FC<MessageDetailsProps> = ({
     });
   }, [messageId, supportsLikes]);
 
+  const onParticipantClick = (userEntity: User) => togglePanel(PanelState.GROUP_PARTICIPANT_USER, userEntity);
+
   return (
     <div id="message-details" className="panel__page message-details">
       <PanelHeader
@@ -227,6 +232,7 @@ const MessageDetails: FC<MessageDetailsProps> = ({
             conversationRepository={conversationRepository}
             searchRepository={searchRepository}
             teamRepository={teamRepository}
+            onClick={onParticipantClick}
           />
         )}
 
@@ -238,6 +244,7 @@ const MessageDetails: FC<MessageDetailsProps> = ({
             conversationRepository={conversationRepository}
             searchRepository={searchRepository}
             teamRepository={teamRepository}
+            onClick={onParticipantClick}
           />
         )}
 
