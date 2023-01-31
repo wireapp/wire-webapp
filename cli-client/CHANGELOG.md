@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.0.56](https://github.com/wireapp/wire-web-packages/compare/@wireapp/cli-client@12.0.55...@wireapp/cli-client@12.0.56) (2023-01-31)
+
+**Note:** Version bump only for package @wireapp/cli-client
+
 ## [12.0.55](https://github.com/wireapp/wire-web-packages/compare/@wireapp/cli-client@12.0.54...@wireapp/cli-client@12.0.55) (2023-01-30)
 
 **Note:** Version bump only for package @wireapp/cli-client
