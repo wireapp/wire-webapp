@@ -1131,7 +1131,7 @@ export class CallingRepository {
     payload: string,
     _len: number,
     _trans: number,
-    my_clients_only: number,
+    myClientsOnly: number,
   ): number => {
     const conversationId = this.parseQualifiedId(convId);
     const call = this.findCall(conversationId);
@@ -1151,9 +1151,7 @@ export class CallingRepository {
       };
     }
 
-    options = {...options, myClientsOnly: my_clients_only === 1};
-
-    this.sendCallingMessage(conversationId, payload, options).catch(error => {
+    this.sendCallingMessage(conversationId, payload, options, myClientsOnly === 1).catch(error => {
       this.logger.warn('Failed to send calling message, aborting call', error);
       this.abortCall(conversationId, LEAVE_CALL_REASON.ABORTED_BECAUSE_FAILED_TO_SEND_CALLING_MESSAGE);
     });
@@ -1164,6 +1162,7 @@ export class CallingRepository {
     conversationId: QualifiedId,
     payload: string | Object,
     options?: MessageSendingOptions,
+    myClientsOnly: boolean = false,
   ): Promise<void> => {
     const conversation = this.conversationState.findConversation(conversationId);
     if (!conversation) {
@@ -1177,7 +1176,7 @@ export class CallingRepository {
      * This message is used to tell your other clients you have answered or
      * rejected a call and to stop ringing.
      */
-    if (typeof payload === 'string' && conversation.isUsingMLSProtocol && options?.myClientsOnly) {
+    if (typeof payload === 'string' && conversation.isUsingMLSProtocol && myClientsOnly) {
       return void this.messageRepository.sendSelfCallingMessage(payload, conversation.qualifiedId);
     }
 
