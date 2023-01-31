@@ -26,9 +26,9 @@ import type {TypeUtil} from '@wireapp/commons';
 import {BackendError} from './BackendError';
 import {AuthActionCreator} from './creator/';
 
-import {actionRoot} from './';
-
 import {mockStoreFactory} from '../../util/test/mockStoreFactory';
+
+import {actionRoot} from './';
 
 describe('AuthAction', () => {
   it('authenticates a user successfully', async () => {

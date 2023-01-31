@@ -97,7 +97,13 @@ const AppMain: FC<AppMainProps> = ({
 
   const {isActivatedAccount} = useKoSubscribableChildren(userState, ['isActivatedAccount']);
 
-  const {history, entity: currentEntity, close: closeRightSidebar, goTo} = useAppMainState(state => state.rightSidebar);
+  const {
+    history,
+    entity: currentEntity,
+    close: closeRightSidebar,
+    lastViewedMessageDetailsEntity,
+    goTo,
+  } = useAppMainState(state => state.rightSidebar);
   const currentState = history[history.length - 1];
 
   const toggleRightSidebar = (panelState: PanelState, params: RightSidebarParams, compareEntityId = false) => {
@@ -221,6 +227,7 @@ const AppMain: FC<AppMainProps> = ({
 
             {currentState && (
               <RightSidebar
+                lastViewedMessageDetailsEntity={lastViewedMessageDetailsEntity}
                 currentEntity={currentEntity}
                 repositories={repositories}
                 actionsViewModel={mainView.actions}

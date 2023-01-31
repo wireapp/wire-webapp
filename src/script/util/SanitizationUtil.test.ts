@@ -17,9 +17,9 @@
  *
  */
 
-import {Declension, LocalizerUtil, t} from 'Util/LocalizerUtil';
+import {Declension, LocalizerUtil, t, getSelfName, getUserName} from 'Util/LocalizerUtil';
 
-import {escapeRegex, getSelfName, getUserName, safeWindowOpen} from './SanitizationUtil';
+import {escapeRegex, safeWindowOpen} from './SanitizationUtil';
 
 import {User} from '../entity/User';
 

@@ -177,10 +177,11 @@ const AddParticipants: FC<AddParticipantsProps> = ({
   };
 
   const onSearchInput = async (value: string) => {
+    setSearchInput(value);
+
     if (isAddServiceState) {
       await searchServices(value);
     }
-    setSearchInput(value);
   };
 
   return (
@@ -239,6 +240,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
               searchRepository={searchRepository}
               teamRepository={teamRepository}
               conversationRepository={conversationRepository}
+              isSelectable
             />
           )}
 

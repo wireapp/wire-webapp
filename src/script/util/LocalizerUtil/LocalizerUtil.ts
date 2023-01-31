@@ -19,19 +19,32 @@
 
 import {escape} from 'underscore';
 
-import en from 'I18n/en-US.json';
+import {Substitutes, Declension, StringIdentifer} from './LocalizerUtil.types';
 
-import {getSelfName} from './SanitizationUtil';
-import {sortUsersByPriority} from './StringUtil';
-
-import type {User} from '../entity/User';
-
-type Substitutes = Record<string, string> | string | number;
+import type {User} from '../../entity/User';
+import {sortUsersByPriority} from '../StringUtil';
 
 export const DEFAULT_LOCALE = 'en';
 
 let locale = DEFAULT_LOCALE;
 let strings: Record<string, Record<string, string>> = {};
+
+export const getSelfName = (declension = Declension.NOMINATIVE, bypassSanitization = false) => {
+  const selfNameDeclensions = {
+    [Declension.NOMINATIVE]: t('conversationYouNominative'),
+    [Declension.DATIVE]: t('conversationYouDative'),
+    [Declension.ACCUSATIVE]: t('conversationYouAccusative'),
+  };
+  const selfName = selfNameDeclensions[declension];
+  return bypassSanitization ? selfName : escape(selfName);
+};
+
+export const getUserName = (userEntity: User, declension?: string, bypassSanitization: boolean = false): string => {
+  if (userEntity.isMe) {
+    return getSelfName(declension, bypassSanitization);
+  }
+  return bypassSanitization ? userEntity.name() : escape(userEntity.name());
+};
 
 const isStringOrNumber = (toTest: any): toTest is string | number =>
   typeof toTest === 'string' || typeof toTest === 'number';
@@ -114,12 +127,6 @@ export const LocalizerUtil = {
   },
 };
 
-export const Declension = {
-  ACCUSATIVE: 'accusative',
-  DATIVE: 'dative',
-  NOMINATIVE: 'nominative',
-};
-
 export const setLocale = (newLocale: string): void => {
   locale = newLocale;
 };
@@ -127,8 +134,6 @@ export const setLocale = (newLocale: string): void => {
 export const setStrings = (newStrings: typeof strings): void => {
   strings = newStrings;
 };
-
-export type StringIdentifer = keyof typeof en | '';
 
 export function t(
   identifier: StringIdentifer,
