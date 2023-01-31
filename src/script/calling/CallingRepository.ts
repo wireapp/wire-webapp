@@ -1129,6 +1129,9 @@ export class CallingRepository {
     targets: string | null,
     _unused: string | null,
     payload: string,
+    _len: number,
+    _trans: number,
+    myClientsOnly: number,
   ): number => {
     const conversationId = this.parseQualifiedId(convId);
     const call = this.findCall(conversationId);
@@ -1148,7 +1151,7 @@ export class CallingRepository {
       };
     }
 
-    this.sendCallingMessage(conversationId, payload, options).catch(error => {
+    this.sendCallingMessage(conversationId, payload, options, myClientsOnly === 1).catch(error => {
       this.logger.warn('Failed to send calling message, aborting call', error);
       this.abortCall(conversationId, LEAVE_CALL_REASON.ABORTED_BECAUSE_FAILED_TO_SEND_CALLING_MESSAGE);
     });
@@ -1159,6 +1162,7 @@ export class CallingRepository {
     conversationId: QualifiedId,
     payload: string | Object,
     options?: MessageSendingOptions,
+    myClientsOnly: boolean = false,
   ): Promise<void> => {
     const conversation = this.conversationState.findConversation(conversationId);
     if (!conversation) {
@@ -1168,18 +1172,12 @@ export class CallingRepository {
     const content = typeof payload === 'string' ? payload : JSON.stringify(payload);
 
     /**
-     * @note If the AVS message type is REJECT, we should ignore the message,
-     * eventually this will be send to the self-conversation
+     * @note If myClientsOnly option is true, the message should be sent via the self-conversation.
      * This message is used to tell your other clients you have answered or
      * rejected a call and to stop ringing.
-     * @todo Remove the restriction when we are able to send MLS messages to a specific user in a call.
      */
-    if (typeof payload === 'string' && conversation.isUsingMLSProtocol) {
-      const parsedPayload = JSON.parse(payload);
-      const messageType = parsedPayload.type as CALL_MESSAGE_TYPE;
-      if (messageType === CALL_MESSAGE_TYPE.REJECT) {
-        return void this.messageRepository.sendSelfCallingMessage(payload, conversation.qualifiedId);
-      }
+    if (typeof payload === 'string' && conversation.isUsingMLSProtocol && myClientsOnly) {
+      return void this.messageRepository.sendSelfCallingMessage(payload, conversation.qualifiedId);
     }
 
     const message = await this.messageRepository.sendCallingMessage(conversation, content, options);
