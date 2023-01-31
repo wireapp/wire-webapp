@@ -382,8 +382,9 @@ export class MLSService extends TypedEventEmitter<Events> {
     return commitBundle ? void (await this.uploadCommitBundle(groupId, commitBundle)) : undefined;
   }
 
-  public async conversationExists(conversationId: ConversationId): Promise<boolean> {
-    return this.coreCryptoClient.conversationExists(conversationId);
+  public async conversationExists(groupId: string): Promise<boolean> {
+    const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
+    return this.coreCryptoClient.conversationExists(groupIdBytes);
   }
 
   public async clientValidKeypackagesCount(): Promise<number> {
@@ -401,7 +402,7 @@ export class MLSService extends TypedEventEmitter<Events> {
    */
   private async renewKeyMaterial(groupId: string) {
     try {
-      const groupConversationExists = await this.conversationExists(Decoder.fromBase64(groupId).asBytes);
+      const groupConversationExists = await this.conversationExists(groupId);
 
       if (!groupConversationExists) {
         keyMaterialUpdatesStore.deleteLastKeyMaterialUpdateDate({groupId});
