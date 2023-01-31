@@ -56,7 +56,7 @@ const GroupListItem: React.FC<GroupListItemProps> = ({click, group}) => {
       className="search-list-item"
       data-uie-uid={`${group.id}`}
       onClick={onClick}
-      onKeyDown={e => handleKeyDown(e, onClick)}
+      onKeyDown={event => handleKeyDown(event, onClick)}
       data-uie-value={displayName}
     >
       <div className="search-list-item-image">
