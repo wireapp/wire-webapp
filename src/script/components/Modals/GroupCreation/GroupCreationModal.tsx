@@ -360,6 +360,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                 users={contacts}
                 filter={participantsInput}
                 selected={selectedContacts}
+                isSelectable
                 onUpdateSelectedUsers={setSelectedContacts}
                 searchRepository={searchRepository}
                 teamRepository={teamRepository}
@@ -369,6 +370,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
             )}
           </FadingScrollbar>
         )}
+
         {/* eslint jsx-a11y/no-autofocus : "off" */}
         {stateIsPreferences && (
           <>
@@ -395,6 +397,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                 errorMessage={nameError}
               />
             </div>
+
             {isTeam && (
               <>
                 <p
