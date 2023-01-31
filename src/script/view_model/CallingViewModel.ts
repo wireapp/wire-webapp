@@ -234,7 +234,6 @@ export class CallingViewModel {
         }
 
         await mlsService.leaveConferenceSubconversation(conversationId);
-        await mlsService.wipeConversation(conversation.groupId);
 
         callingSubscriptions.unsubscribe(conversationId);
       }
