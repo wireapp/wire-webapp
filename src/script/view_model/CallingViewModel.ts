@@ -225,6 +225,12 @@ export class CallingViewModel {
 
       const subconversation = await mlsService.getConferenceSubconversation(conversationId);
 
+      //we don't want to react to avs callbacks when conversation was not yet established
+      const isMLSConversationEstablished = await mlsService.conversationExists(subconversation.group_id);
+      if (!isMLSConversationEstablished) {
+        return;
+      }
+
       const {epoch, keyLength, secretKey, members} = await getSubconversationEpochInfo(
         {mlsService},
         conversationId,
