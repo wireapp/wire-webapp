@@ -89,6 +89,7 @@ describe('MessageDetails', () => {
     const {getByText} = render(
       <MessageDetails
         {...defaultProps}
+        togglePanel={() => undefined}
         activeConversation={conversation}
         messageEntity={message}
         userRepository={userRepository}

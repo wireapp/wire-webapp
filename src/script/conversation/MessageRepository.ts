@@ -749,7 +749,7 @@ export class MessageRepository {
           payload,
           protocol: ConversationProtocol.PROTEUS,
           targetMode,
-          userIds: this.generateRecipients(conversation, recipients, skipSelf),
+          userIds: await this.generateRecipients(conversation, recipients, skipSelf),
         };
 
     const shouldProceedSending = await injectOptimisticEvent();
@@ -1148,24 +1148,31 @@ export class MessageRepository {
     }, {} as UserClients);
   }
 
-  private generateRecipients(
+  private async generateRecipients(
     conversation: Conversation,
     recipients?: QualifiedId[] | QualifiedUserClients | UserClients,
     skipSelf?: boolean,
-  ): QualifiedUserClients | UserClients {
+  ): Promise<QualifiedUserClients | UserClients> {
     if (isQualifiedUserClients(recipients) || isUserClients(recipients)) {
       // If we get a userId>client pairs, we just return those, no need to create recipients
       return recipients;
     }
-    const users = conversation.allUserEntities
+    const filteredUsers = conversation.allUserEntities
+      // filter possible undefined values
+      .flatMap(user => (user ? [user] : []))
       // if users are given by the caller, we filter to only keep those users
       .filter(user => !recipients || recipients.some(userId => matchQualifiedIds(user, userId)))
       // we filter the self user if skipSelf is true
       .filter(user => !skipSelf || !user.isMe);
 
+    // Check if we have users without assigned clients and assign them from local database if possible
+    if (filteredUsers.some(user => user?.devices().length === 0)) {
+      await this.userRepository.assignAllClients();
+    }
+
     return this.core.backendFeatures.federationEndpoints
-      ? this.createQualifiedRecipients(users)
-      : this.createRecipients(users);
+      ? this.createQualifiedRecipients(filteredUsers)
+      : this.createRecipients(filteredUsers);
   }
 
   /**
@@ -1183,7 +1190,9 @@ export class MessageRepository {
     skipConversationMessages = false,
     ensureUser = false,
   ): Promise<StoredContentMessage> {
-    const messageEntity = !skipConversationMessages && conversation.getMessage(messageId);
+    const messageEntity =
+      !skipConversationMessages &&
+      (conversation.getMessageByReplacementId(messageId) || conversation.getMessage(messageId));
     const message =
       messageEntity ||
       (await this.eventService.loadEvent(conversation.id, messageId).then(event => {

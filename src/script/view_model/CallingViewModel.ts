@@ -27,6 +27,7 @@ import {Availability} from '@wireapp/protocol-messaging';
 import {ButtonGroupTab} from 'Components/calling/ButtonGroup';
 import 'Components/calling/ChooseScreen';
 import {replaceLink, t} from 'Util/LocalizerUtil';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 
 import type {AudioRepository} from '../audio/AudioRepository';
@@ -52,12 +53,12 @@ import {TeamState} from '../team/TeamState';
 import {ROLE} from '../user/UserPermission';
 
 export interface CallActions {
-  answer: (call: Call) => void;
+  answer: (call: Call) => Promise<void>;
   changePage: (newPage: number, call: Call) => void;
   leave: (call: Call) => void;
   reject: (call: Call) => void;
-  startAudio: (conversationEntity: Conversation) => void;
-  startVideo: (conversationEntity: Conversation) => void;
+  startAudio: (conversationEntity: Conversation) => Promise<void>;
+  startVideo: (conversationEntity: Conversation) => Promise<void>;
   switchCameraInput: (call: Call, deviceId: string) => void;
   switchScreenInput: (call: Call, deviceId: string) => void;
   toggleCamera: (call: Call) => void;
@@ -136,14 +137,22 @@ export class CallingViewModel {
       });
     };
 
-    const startCall = (conversationEntity: Conversation, callType: CALL_TYPE): void => {
-      const convType = conversationEntity.isGroup() ? CONV_TYPE.GROUP : CONV_TYPE.ONEONONE;
-      this.callingRepository.startCall(conversationEntity.qualifiedId, convType, callType).then(call => {
-        if (!call) {
-          return;
-        }
-        ring(call);
+    const startCall = async (conversation: Conversation, callType: CALL_TYPE) => {
+      const convType = conversation.isGroup() ? CONV_TYPE.GROUP : CONV_TYPE.ONEONONE;
+      const canStart = await this.canInitiateCall(conversation.qualifiedId, {
+        action: t('modalCallSecondOutgoingAction'),
+        message: t('modalCallSecondOutgoingMessage'),
+        title: t('modalCallSecondOutgoingHeadline'),
       });
+
+      if (!canStart) {
+        return;
+      }
+      const call = await this.callingRepository.startCall(conversation.qualifiedId, convType, callType);
+      if (!call) {
+        return;
+      }
+      ring(call);
     };
 
     const hasSoundlessCallsEnabled = (): boolean => {
@@ -162,7 +171,7 @@ export class CallingViewModel {
     });
 
     this.callActions = {
-      answer: (call: Call) => {
+      answer: async (call: Call) => {
         if (call.conversationType === CONV_TYPE.CONFERENCE && !this.callingRepository.supportsConferenceCalling) {
           PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
             primaryAction: {
@@ -178,11 +187,20 @@ export class CallingViewModel {
             },
           });
         } else {
+          const canAnwer = await this.canInitiateCall(call.conversationId, {
+            action: t('modalCallSecondIncomingAction'),
+            message: t('modalCallSecondIncomingMessage'),
+            title: t('modalCallSecondIncomingHeadline'),
+          });
+          if (!canAnwer) {
+            return;
+          }
+
           this.callingRepository.answerCall(call);
         }
       },
       changePage: (newPage, call) => {
-        this.callingRepository.changeCallPage(newPage, call);
+        this.callingRepository.changeCallPage(call, newPage);
       },
       leave: (call: Call) => {
         this.callingRepository.leaveCall(call.conversationId, LEAVE_CALL_REASON.MANUAL_LEAVE_BY_UI_CLICK);
@@ -191,18 +209,18 @@ export class CallingViewModel {
       reject: (call: Call) => {
         this.callingRepository.rejectCall(call.conversationId);
       },
-      startAudio: (conversationEntity: Conversation): void => {
+      startAudio: async (conversationEntity: Conversation) => {
         if (conversationEntity.isGroup() && !this.teamState.isConferenceCallingEnabled()) {
           this.showRestrictedConferenceCallingModal();
         } else {
-          startCall(conversationEntity, CALL_TYPE.NORMAL);
+          await startCall(conversationEntity, CALL_TYPE.NORMAL);
         }
       },
-      startVideo: (conversationEntity: Conversation): void => {
+      startVideo: async (conversationEntity: Conversation) => {
         if (conversationEntity.isGroup() && !this.teamState.isConferenceCallingEnabled()) {
           this.showRestrictedConferenceCallingModal();
         } else {
-          startCall(conversationEntity, CALL_TYPE.VIDEO);
+          await startCall(conversationEntity, CALL_TYPE.VIDEO);
         }
       },
       switchCameraInput: (call: Call, deviceId: string) => {
@@ -250,6 +268,60 @@ export class CallingViewModel {
         });
       },
     };
+  }
+
+  /**
+   * Will reject or leave the call depending on the state of the call.
+   * @param activeCall - the call to gracefully tear down
+   */
+  private async gracefullyTeardownCall(activeCall: Call): Promise<void> {
+    if (activeCall.state() === CALL_STATE.INCOMING) {
+      this.callingRepository.rejectCall(activeCall.conversationId);
+    } else {
+      this.callingRepository.leaveCall(activeCall.conversationId, LEAVE_CALL_REASON.MANUAL_LEAVE_TO_JOIN_ANOTHER_CALL);
+    }
+    // We want to wait a bit to be sure the call have been tear down properly
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  }
+
+  /**
+   * Will make sure everything is ready for a call to start/be joined in the given conversation.
+   * If there is another ongoing call, the user will be asked to first leave that other call before starting a new call.
+   *
+   * @param conversationId - the conversation in which the call should be started/joined
+   * @param warningStrings - the strings to display in case there is already an active call
+   * @returns true if the call can be started, false otherwise
+   */
+  private canInitiateCall(
+    conversationId: QualifiedId,
+    warningStrings: {action: string; message: string; title: string},
+  ): Promise<boolean> {
+    const idleCallStates = [CALL_STATE.INCOMING, CALL_STATE.NONE, CALL_STATE.UNKNOWN];
+    const otherActiveCall = this.callState
+      .calls()
+      .find(call => !matchQualifiedIds(call.conversationId, conversationId) && !idleCallStates.includes(call.state()));
+    if (!otherActiveCall) {
+      return Promise.resolve(true);
+    }
+
+    return new Promise(resolve => {
+      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+        primaryAction: {
+          action: async () => {
+            await this.gracefullyTeardownCall(otherActiveCall);
+            resolve(true);
+          },
+          text: warningStrings.action,
+        },
+        secondaryAction: {
+          action: () => resolve(false),
+        },
+        text: {
+          message: warningStrings.message,
+          title: warningStrings.title,
+        },
+      });
+    });
   }
 
   private showRestrictedConferenceCallingModal() {

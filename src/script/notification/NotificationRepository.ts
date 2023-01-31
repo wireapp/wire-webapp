@@ -27,10 +27,9 @@ import {Runtime} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Declension, t} from 'Util/LocalizerUtil';
+import {Declension, t, getUserName} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {getRenderedTextContent} from 'Util/messageRenderer';
-import {getUserName} from 'Util/SanitizationUtil';
 import {truncate} from 'Util/StringUtil';
 import {formatDuration, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {ValidationUtilError} from 'Util/ValidationUtil';
@@ -259,7 +258,9 @@ export class NotificationRepository {
             const messageInfo = messageId
               ? `message '${messageId}' of type '${messageType}'`
               : `'${messageType}' message`;
-            this.logger.info(`Removed read notification for ${messageInfo} in '${conversationId}'.`);
+            this.logger.info(
+              `Removed read notification for ${messageInfo} in '${conversationId?.id || conversationId}'.`,
+            );
           }
         });
       }
@@ -857,30 +858,35 @@ export class NotificationRepository {
       this.contentViewModelState.multitasking.isMinimized(true);
       notificationContent.trigger();
 
-      this.logger.info(`Notification for ${messageInfo} in '${conversationId}' closed by click.`);
+      this.logger.info(`Notification for ${messageInfo} in '${conversationId?.id || conversationId}' closed by click.`);
       notification.close();
     };
 
     notification.onclose = () => {
       window.clearTimeout(timeoutTriggerId);
       this.notifications.splice(this.notifications.indexOf(notification), 1);
-      this.logger.info(`Removed notification for ${messageInfo} in '${conversationId}' locally.`);
+      this.logger.info(`Removed notification for ${messageInfo} in '${conversationId?.id || conversationId}' locally.`);
     };
 
     notification.onerror = error => {
-      this.logger.error(`Notification for ${messageInfo} in '${conversationId}' closed by error.`, error);
+      this.logger.error(
+        `Notification for ${messageInfo} in '${conversationId?.id || conversationId}' closed by error.`,
+        error,
+      );
       notification.close();
     };
 
     notification.onshow = () => {
       timeoutTriggerId = window.setTimeout(() => {
-        this.logger.info(`Notification for ${messageInfo} in '${conversationId}' closed by timeout.`);
+        this.logger.info(
+          `Notification for ${messageInfo} in '${conversationId?.id || conversationId}' closed by timeout.`,
+        );
         notification.close();
       }, notificationContent.timeout);
     };
 
     this.notifications.push(notification);
-    this.logger.info(`Added notification for ${messageInfo} in '${conversationId}' to queue.`);
+    this.logger.info(`Added notification for ${messageInfo} in '${conversationId?.id || conversationId}' to queue.`);
   }
 
   /**

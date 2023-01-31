@@ -238,8 +238,7 @@ const Conversations: React.FC<ConversationsProps> = ({
           title={t('tooltipConversationsStart', Shortcut.getShortcutTooltip(ShortcutType.START))}
           data-uie-name="go-people"
         >
-          <Icon.People />
-
+          <Icon.PeopleOutline className="people-outline" />
           <span className="conversations-footer-btn--text">{t('conversationFooterContacts')}</span>
         </button>
 
@@ -254,8 +253,7 @@ const Conversations: React.FC<ConversationsProps> = ({
           data-uie-status={isRecentViewStyle ? 'active' : 'inactive'}
           aria-selected={isRecentViewStyle}
         >
-          <Icon.ConversationsRecent />
-
+          <Icon.ConversationsOutline className={cx('conversations-outline', {active: isRecentViewStyle})} />
           <span className="conversations-footer-btn--text">{t('conversationViewTooltip')}</span>
         </button>
 
@@ -270,8 +268,7 @@ const Conversations: React.FC<ConversationsProps> = ({
           data-uie-status={isFolderViewStyle ? 'active' : 'inactive'}
           aria-selected={isFolderViewStyle}
         >
-          <Icon.ConversationsFolder />
-
+          <Icon.FoldersOutline className={cx('folders-outline', {active: isFolderViewStyle})} />
           <span className="conversations-footer-btn--text">{t('folderViewTooltip')}</span>
         </button>
 
@@ -283,8 +280,7 @@ const Conversations: React.FC<ConversationsProps> = ({
             onClick={() => switchList(ListState.ARCHIVE)}
             title={t('tooltipConversationsArchived', archivedConversations.length)}
           >
-            <Icon.Archive />
-
+            <Icon.ArchiveOutline className="archive-outline" />
             <span className="conversations-footer-btn--text">{t('conversationFooterArchive')}</span>
           </button>
         )}
