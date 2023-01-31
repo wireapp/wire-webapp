@@ -161,7 +161,6 @@ const config: ServerConfig = {
       (process.env.NEW_PASSWORD_MINIMUM_LENGTH && Number(process.env.NEW_PASSWORD_MINIMUM_LENGTH)) || 8,
     URL: {
       ACCOUNT_BASE: process.env.URL_ACCOUNT_BASE,
-      MOBILE_BASE: process.env.URL_MOBILE_BASE,
       PRICING: process.env.URL_PRICING,
       PRIVACY_POLICY: process.env.URL_PRIVACY_POLICY,
       SUPPORT: {

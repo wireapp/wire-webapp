@@ -52,7 +52,6 @@ export class Configuration {
   readonly NEW_PASSWORD_MINIMUM_LENGTH = env.NEW_PASSWORD_MINIMUM_LENGTH || ValidationUtil.DEFAULT_PASSWORD_MIN_LENGTH;
   readonly URL = {
     ACCOUNT_BASE: 'https://account.wire.com',
-    MOBILE_BASE: '',
     PRICING: '#',
     PRIVACY_POLICY: 'https://wire-website-staging.zinfra.io/security',
     SUPPORT: {
