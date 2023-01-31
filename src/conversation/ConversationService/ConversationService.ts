@@ -404,8 +404,7 @@ export class ConversationService {
   }
 
   public async isMLSConversationEstablished(groupId: string) {
-    const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
-    return this.mlsService.conversationExists(groupIdBytes);
+    return this.mlsService.conversationExists(groupId);
   }
 
   public async wipeMLSConversation(groupId: string): Promise<void> {
