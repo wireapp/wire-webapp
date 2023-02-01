@@ -23,14 +23,23 @@ const serializeQualifiedId = ({id, domain}: QualifiedId) => `${id}@${domain}`;
 
 const store = new Map<string, (() => void)[]>();
 
-const addOngoing = (conversationId: QualifiedId, unsubscribe: () => void) => {
+/**
+ * will keep track of all the subscriptions that are made for a given call
+ * @param conversationId the conversation in which the call is happening
+ * @param unsubscribe the function to call to teardown the subscription once the call is terminated
+ */
+const addCall = (conversationId: QualifiedId, unsubscribe: () => void) => {
   const serialisedId = serializeQualifiedId(conversationId);
 
   const existingCallbacks = store.get(serialisedId) || [];
   store.set(serialisedId, [...existingCallbacks, unsubscribe]);
 };
 
-const unsubscribe = (conversationId: QualifiedId) => {
+/**
+ * Will cleanly terminate all the subscriptions for a given call
+ * @param conversationId the conversation in which the call is happening
+ */
+const removeCall = (conversationId: QualifiedId) => {
   const serialisedId = serializeQualifiedId(conversationId);
 
   const existingCallbacks = store.get(serialisedId);
@@ -40,4 +49,4 @@ const unsubscribe = (conversationId: QualifiedId) => {
   store.delete(serialisedId);
 };
 
-export const callingSubscriptions = {addOngoing, unsubscribe};
+export const callingSubscriptions = {addCall, removeCall};

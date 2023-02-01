@@ -165,7 +165,7 @@ export class CallingViewModel {
           },
         );
 
-        callingSubscriptions.addOngoing(call.conversationId, unsubscribe);
+        callingSubscriptions.addCall(call.conversationId, unsubscribe);
       }
       ring(call);
     };
@@ -179,7 +179,7 @@ export class CallingViewModel {
         },
       );
 
-      callingSubscriptions.addOngoing(call.conversationId, unsubscribe);
+      callingSubscriptions.addCall(call.conversationId, unsubscribe);
     };
 
     const answerCall = async (call: Call) => {
@@ -238,7 +238,7 @@ export class CallingViewModel {
     this.callingRepository.onRequestNewEpochCallback(updateEpochInfo);
 
     //once we leave a call, we unsubscribe from all the events we've subscribed to during this call
-    this.callingRepository.onLeaveCall(callingSubscriptions.unsubscribe);
+    this.callingRepository.onLeaveCall(callingSubscriptions.removeCall);
 
     this.callActions = {
       answer: async (call: Call) => {
