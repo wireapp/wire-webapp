@@ -41,8 +41,6 @@ enum MOCKED_CLIENT_IDS {
   CLIENT3 = '4130002c223',
 }
 
-const encoder = new TextEncoder();
-
 describe('constructFullyQualifiedClientId', () => {
   it('construct fullyQualifiedClientId client id', () => {
     expect(
@@ -84,9 +82,7 @@ describe('mapQualifiedUserClientIdsToFullyQualifiedClientIds', () => {
       },
     };
 
-    const expectedResult = [`${MOCKED_USER_IDS.USER1}:${MOCKED_CLIENT_IDS.CLIENT1}@${MOCKED_DOMAINS.DOMAIN1}`].map(x =>
-      encoder.encode(x),
-    );
+    const expectedResult = [`${MOCKED_USER_IDS.USER1}:${MOCKED_CLIENT_IDS.CLIENT1}@${MOCKED_DOMAINS.DOMAIN1}`];
 
     const result = mapQualifiedUserClientIdsToFullyQualifiedClientIds(qualified_user_map3);
 
@@ -121,7 +117,7 @@ describe('mapQualifiedUserClientIdsToFullyQualifiedClientIds', () => {
       `${MOCKED_USER_IDS.USER1}:${MOCKED_CLIENT_IDS.CLIENT1}@${MOCKED_DOMAINS.DOMAIN1}`,
       `${MOCKED_USER_IDS.USER1}:${MOCKED_CLIENT_IDS.CLIENT2}@${MOCKED_DOMAINS.DOMAIN2}`,
       `${MOCKED_USER_IDS.USER1}:${MOCKED_CLIENT_IDS.CLIENT3}@${MOCKED_DOMAINS.DOMAIN2}`,
-    ].map(x => encoder.encode(x));
+    ];
 
     const result = mapQualifiedUserClientIdsToFullyQualifiedClientIds(qualified_user_map3);
 
@@ -170,7 +166,7 @@ describe('mapQualifiedUserClientIdsToFullyQualifiedClientIds', () => {
       `${MOCKED_USER_IDS.USER1}:${MOCKED_CLIENT_IDS.CLIENT2}@${MOCKED_DOMAINS.DOMAIN2}`,
       `${MOCKED_USER_IDS.USER1}:${MOCKED_CLIENT_IDS.CLIENT3}@${MOCKED_DOMAINS.DOMAIN2}`,
       `${MOCKED_USER_IDS.USER2}:${MOCKED_CLIENT_IDS.CLIENT2}@${MOCKED_DOMAINS.DOMAIN2}`,
-    ].map(x => encoder.encode(x));
+    ];
 
     const result = mapQualifiedUserClientIdsToFullyQualifiedClientIds(qualified_user_map3);
 

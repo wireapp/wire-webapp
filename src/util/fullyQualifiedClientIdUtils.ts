@@ -40,11 +40,10 @@ export const parseFullQualifiedClientId = (qualifiedId: string): {user: UserId; 
 };
 
 export const mapQualifiedUserClientIdsToFullyQualifiedClientIds = (qualifiedUserMap: QualifiedUserClientMap) => {
-  const encoder = new TextEncoder();
   return Object.entries(qualifiedUserMap).flatMap(([domain, users]) => {
     const clients = Object.entries(users);
     return clients.flatMap(([userId, clients]) =>
-      clients.map(client => encoder.encode(constructFullyQualifiedClientId(userId, client.id, domain))),
+      clients.map(client => constructFullyQualifiedClientId(userId, client.id, domain)),
     );
   });
 };

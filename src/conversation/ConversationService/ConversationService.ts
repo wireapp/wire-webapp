@@ -355,15 +355,13 @@ export class ConversationService {
     conversationId,
     qualifiedUserIds,
   }: RemoveUsersParams): Promise<MLSReturnType> {
-    const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
-
     const clientsToRemove = await this.apiClient.api.user.postListClients({qualified_users: qualifiedUserIds});
 
     const fullyQualifiedClientIds = mapQualifiedUserClientIdsToFullyQualifiedClientIds(
       clientsToRemove.qualified_user_map,
     );
 
-    const messageResponse = await this.mlsService.removeClientsFromConversation(groupIdBytes, fullyQualifiedClientIds);
+    const messageResponse = await this.mlsService.removeClientsFromConversation(groupId, fullyQualifiedClientIds);
 
     //key material gets updated after removing a user from the group, so we can reset last key update time value in the store
     this.mlsService.resetKeyMaterialRenewal(groupId);
