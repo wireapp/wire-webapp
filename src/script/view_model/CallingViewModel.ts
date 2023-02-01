@@ -18,10 +18,11 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {TaskScheduler} from '@wireapp/core/lib/util/TaskScheduler';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {CALL_TYPE, CONV_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
+import {AUDIO_STATE, CALL_TYPE, CONV_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {Availability} from '@wireapp/protocol-messaging';
 
 import {ButtonGroupTab} from 'Components/calling/ButtonGroup';
@@ -29,11 +30,12 @@ import 'Components/calling/ChooseScreen';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import type {AudioRepository} from '../audio/AudioRepository';
 import {AudioType} from '../audio/AudioType';
 import type {Call} from '../calling/Call';
-import {CallingRepository} from '../calling/CallingRepository';
+import {CallingRepository, QualifiedWcallMember} from '../calling/CallingRepository';
 import {callingSubscriptions} from '../calling/callingSubscriptionsHandler';
 import {CallState} from '../calling/CallState';
 import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
@@ -231,6 +233,38 @@ export class CallingViewModel {
       }
     });
 
+    const handleCallParticipantChange = (conversationId: QualifiedId, members: QualifiedWcallMember[]) => {
+      const serializeQualifiedId = ({userId, clientId, domain}: {userId: string; clientId: string; domain: string}) =>
+        `${userId}:${clientId}@${domain}`;
+
+      const conversation = this.getConversationById(conversationId);
+      if (conversation?.isUsingMLSProtocol) {
+        for (const member of members) {
+          const {id: userId, domain} = member.userId;
+          const clientQualifiedId = serializeQualifiedId({userId, domain, clientId: member.clientid});
+          const key = `mls-call-client-${clientQualifiedId}`;
+
+          // audio state is established -> clear timer
+          if (member.aestab === AUDIO_STATE.ESTABLISHED) {
+            TaskScheduler.cancelTask(key);
+            continue;
+          }
+
+          // otherwise, remove the client from subconversation if it won't establish their audio state in following 3 mins
+          const firingDate = new Date().getTime() + TIME_IN_MILLIS.MINUTE * 3;
+          TaskScheduler.addTask({
+            firingDate,
+            key,
+            task: async () => {
+              // if timer expires = client is stale -> remove client from the subconversation
+              const subconversation = await this.mlsService.getConferenceSubconversation(conversationId);
+              return this.mlsService.removeClientsFromConversation(subconversation.group_id, [clientQualifiedId]);
+            },
+          });
+        }
+      }
+    };
+
     //update epoch info when AVS requests the list of clients
     this.callingRepository.onRequestClientsCallback(updateEpochInfo);
 
@@ -239,6 +273,9 @@ export class CallingViewModel {
 
     //once we leave a call, we unsubscribe from all the events we've subscribed to during this call
     this.callingRepository.onLeaveCall(callingSubscriptions.unsubscribe);
+
+    //handle participant change avs callback to detect inactive members in subconversations
+    this.callingRepository.onCallParticipantChangedCallback(handleCallParticipantChange);
 
     this.callActions = {
       answer: async (call: Call) => {
