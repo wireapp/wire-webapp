@@ -26,6 +26,7 @@ import {flattenQualifiedUserClients, flattenUserClients} from '@wireapp/core/lib
 import {isQualifiedUserClients} from '@wireapp/core/lib/util';
 import {amplify} from 'amplify';
 import axios from 'axios';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 import 'webrtc-adapter';
@@ -764,7 +765,7 @@ export class CallingRepository {
       if (newState === VIDEO_STATE.STOPPED) {
         selfParticipant.releaseVideoStream(true);
       } else {
-        this.warmupMediaStreams(call, false, true);
+        void this.warmupMediaStreams(call, false, true);
       }
     }
     this.wCall?.setVideoSendState(this.wUser, this.serializeQualifiedId(call.conversationId), newState);
@@ -1041,7 +1042,7 @@ export class CallingRepository {
 
   private injectActivateEvent(conversationId: QualifiedId, userId: QualifiedId, time: string): void {
     const event = EventBuilder.buildVoiceChannelActivate(conversationId, userId, time, this.avsVersion);
-    this.eventRepository.injectEvent(event as unknown as EventRecord, EventSource.INJECTED);
+    void this.eventRepository.injectEvent(event as unknown as EventRecord, EventSource.INJECTED);
   }
 
   private injectDeactivateEvent(
@@ -1060,7 +1061,7 @@ export class CallingRepository {
       time,
       this.avsVersion,
     );
-    this.eventRepository.injectEvent(event as unknown as EventRecord, source as EventSource);
+    void this.eventRepository.injectEvent(event as unknown as EventRecord, source as EventSource);
   }
 
   private readonly sendMessage = (
@@ -1157,12 +1158,12 @@ export class CallingRepository {
 
   readonly sendModeratorMute = (conversationId: QualifiedId, participants: Participant[]) => {
     const recipients = this.convertParticipantsToCallingMessageRecepients(participants);
-    this.sendCallingMessage(conversationId, {type: CALL_MESSAGE_TYPE.REMOTE_MUTE}, {nativePush: true, recipients});
+    void this.sendCallingMessage(conversationId, {type: CALL_MESSAGE_TYPE.REMOTE_MUTE}, {nativePush: true, recipients});
   };
 
   readonly sendModeratorKick = (conversationId: QualifiedId, participants: Participant[]) => {
     const recipients = this.convertParticipantsToCallingMessageRecepients(participants);
-    this.sendCallingMessage(conversationId, {type: CALL_MESSAGE_TYPE.REMOTE_KICK}, {nativePush: true, recipients});
+    void this.sendCallingMessage(conversationId, {type: CALL_MESSAGE_TYPE.REMOTE_KICK}, {nativePush: true, recipients});
   };
 
   private readonly sendSFTRequest = (
@@ -1170,36 +1171,33 @@ export class CallingRepository {
     url: string,
     data: string,
     _dataLength: number,
-    _: number,
+    __: number,
   ): number => {
-    (async () => {
-      try {
-        const response = await axios.post(url, data);
-
-        const {status, data: axiosData} = response;
-        const jsonData = JSON.stringify(axiosData);
-        this.wCall?.sftResp(this.wUser!, status, jsonData, jsonData.length, context);
-      } catch (error) {
-        const message = error instanceof Error ? error.message : error;
-        this.avsLogHandler(LOG_LEVEL.WARN, `Request to sft server failed with error: ${message}`, error);
-        avsLogger.warn(`Request to sft server failed with error`, error);
-      }
-    })();
+    const _sendSFTRequest = async () => {
+      const response = await axios.post(url, data);
+      const {status, data: axiosData} = response;
+      const jsonData = JSON.stringify(axiosData);
+      this.wCall?.sftResp(this.wUser!, status, jsonData, jsonData.length, context);
+    };
+    _sendSFTRequest().catch(error => {
+      this.avsLogHandler(LOG_LEVEL.WARN, `Request to sft server failed with error: ${error?.message}`, error);
+      avsLogger.warn(`Request to sft server failed with error`, error);
+      this.wCall?.sftResp(this.wUser!, HTTP_STATUS.SERVICE_UNAVAILABLE, '', 0, context);
+    });
 
     return 0;
   };
 
   private readonly requestConfig = () => {
-    (async () => {
+    const _requestConfig = async () => {
       const limit = Runtime.isFirefox() ? CallingRepository.CONFIG.MAX_FIREFOX_TURN_COUNT : undefined;
-      try {
-        const config = await this.fetchConfig(limit);
-        this.wCall?.configUpdate(this.wUser, 0, JSON.stringify(config));
-      } catch (error) {
-        this.logger.warn('Failed fetching calling config', error);
-        this.wCall?.configUpdate(this.wUser, 1, '');
-      }
-    })();
+      const config = await this.fetchConfig(limit);
+      this.wCall?.configUpdate(this.wUser, 0, JSON.stringify(config));
+    };
+    _requestConfig().catch(error => {
+      this.logger.warn('Failed fetching calling config', error);
+      this.wCall?.configUpdate(this.wUser, 1, '');
+    });
 
     return 0;
   };
@@ -1227,7 +1225,7 @@ export class CallingRepository {
           conversationEntity,
           call.getSelfParticipant().user.id,
         );
-        this.eventRepository.injectEvent(callingEvent as EventRecord);
+        void this.eventRepository.injectEvent(callingEvent as EventRecord);
       }
     }
 
@@ -1362,7 +1360,7 @@ export class CallingRepository {
     }
     call.state(CALL_STATE.INCOMING);
     if (canRing && isVideoCall) {
-      this.warmupMediaStreams(call, true, true);
+      void this.warmupMediaStreams(call, true, true);
     }
     this.injectActivateEvent(conversationId, qualifiedUserId, new Date(timestamp * 1000).toISOString());
 
@@ -1451,13 +1449,13 @@ export class CallingRepository {
     this.updateParticipantVideoState(call, members);
   };
 
-  private readonly requestClients = async (wUser: number, convId: SerializedConversationId, _: number) => {
+  private readonly requestClients = async (wUser: number, convId: SerializedConversationId, __: number) => {
     const call = this.findCall(this.parseQualifiedId(convId));
     if (!call) {
       this.logger.warn(`Unable to find a call for the conversation id of ${convId}`);
       return;
     }
-    this.pushClients(call);
+    void this.pushClients(call);
   };
 
   private readonly getCallMediaStream = async (
@@ -1525,12 +1523,14 @@ export class CallingRepository {
       }
     })();
 
-    this.mediaStreamQuery.then(() => {
-      const selfParticipant = call.getSelfParticipant();
-      if (selfParticipant.videoState() === VIDEO_STATE.STOPPED) {
-        selfParticipant.releaseVideoStream(true);
-      }
-    });
+    this.mediaStreamQuery
+      .then(() => {
+        const selfParticipant = call.getSelfParticipant();
+        if (selfParticipant.videoState() === VIDEO_STATE.STOPPED) {
+          selfParticipant.releaseVideoStream(true);
+        }
+      })
+      .catch(this.logger.warn);
     return this.mediaStreamQuery;
   };
 
