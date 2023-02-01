@@ -17,20 +17,16 @@
  *
  */
 
-import {Logger, getLogger} from 'Util/Logger';
-
 import {AppInitStatistics, AppStatistics} from './AppInitStatistics';
 import type {AppInitStatisticsValue} from './AppInitStatisticsValue';
 import {AppInitTimings} from './AppInitTimings';
 import type {AppInitTimingsStep} from './AppInitTimingsStep';
 
 export class AppInitTelemetry {
-  private readonly logger: Logger;
   private readonly timings: AppInitTimings;
   private readonly statistics: AppInitStatistics;
 
   constructor() {
-    this.logger = getLogger('AppInitTelemetry');
     this.timings = new AppInitTimings();
     this.statistics = new AppInitStatistics();
   }
@@ -51,12 +47,11 @@ export class AppInitTelemetry {
     this.timings.log();
   }
 
-  report(): void {
-    const segmentations = this.getStatistics();
-    segmentations.loading_time = this.timings.getAppLoad();
-    this.logger.info(`App version '${segmentations.app_version}' initialized within ${segmentations.loading_time}s`);
+  report(): number {
     this.logStatistics();
     this.logTimings();
+
+    return this.timings.getAppLoad();
   }
 
   timeStep(step: AppInitTimingsStep): void {
