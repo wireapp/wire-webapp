@@ -18,6 +18,7 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {constructFullyQualifiedClientId} from '@wireapp/core/lib/util/fullyQualifiedClientIdUtils';
 import {TaskScheduler} from '@wireapp/core/lib/util/TaskScheduler';
 import ko from 'knockout';
 import {container} from 'tsyringe';
@@ -234,14 +235,11 @@ export class CallingViewModel {
     });
 
     const handleCallParticipantChange = (conversationId: QualifiedId, members: QualifiedWcallMember[]) => {
-      const serializeQualifiedId = ({userId, clientId, domain}: {userId: string; clientId: string; domain: string}) =>
-        `${userId}:${clientId}@${domain}`;
-
       const conversation = this.getConversationById(conversationId);
       if (conversation?.isUsingMLSProtocol) {
         for (const member of members) {
           const {id: userId, domain} = member.userId;
-          const clientQualifiedId = serializeQualifiedId({userId, domain, clientId: member.clientid});
+          const clientQualifiedId = constructFullyQualifiedClientId(userId, member.clientid, domain);
           const key = `mls-call-client-${clientQualifiedId}`;
 
           // audio state is established -> clear timer
@@ -274,7 +272,7 @@ export class CallingViewModel {
     //once we leave a call, we unsubscribe from all the events we've subscribed to during this call
     this.callingRepository.onLeaveCall(callingSubscriptions.unsubscribe);
 
-    //handle participant change avs callback to detect inactive members in subconversations
+    //handle participant change avs callback to detect stale clients in subconversations
     this.callingRepository.onCallParticipantChangedCallback(handleCallParticipantChange);
 
     this.callActions = {
