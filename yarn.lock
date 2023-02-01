@@ -1392,7 +1392,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:^7.11.2, @babel/runtime@npm:^7.12.0, @babel/runtime@npm:^7.12.1, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.15.4, @babel/runtime@npm:^7.16.3, @babel/runtime@npm:^7.18.3, @babel/runtime@npm:^7.20.7, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.8.4, @babel/runtime@npm:^7.8.7, @babel/runtime@npm:^7.9.2":
+"@babel/runtime@npm:^7.11.2, @babel/runtime@npm:^7.12.0, @babel/runtime@npm:^7.12.1, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.16.3, @babel/runtime@npm:^7.18.3, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.8.4, @babel/runtime@npm:^7.8.7, @babel/runtime@npm:^7.9.2":
+  version: 7.20.1
+  resolution: "@babel/runtime@npm:7.20.1"
+  dependencies:
+    regenerator-runtime: ^0.13.10
+  checksum: 00567a333d3357925742a6f5e39394dcc0af6e6029103fe188158bf7ae8b0b3ee3c6c0f68fccc217f0a6cfa455f6be252298baf56b3f5ff37b34313b170cd9f6
+  languageName: node
+  linkType: hard
+
+"@babel/runtime@npm:^7.15.4, @babel/runtime@npm:^7.20.7":
   version: 7.20.7
   resolution: "@babel/runtime@npm:7.20.7"
   dependencies:
@@ -4226,14 +4235,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^22.14.4":
-  version: 22.14.4
-  resolution: "@wireapp/api-client@npm:22.14.4"
+"@wireapp/api-client@npm:^22.15.0":
+  version: 22.15.0
+  resolution: "@wireapp/api-client@npm:22.15.0"
   dependencies:
     "@wireapp/commons": ^5.0.4
     "@wireapp/priority-queue": ^2.0.3
     "@wireapp/protocol-messaging": 1.44.0
-    axios: 1.2.2
+    axios: 1.2.6
     axios-retry: 3.4.0
     http-status-codes: 2.2.0
     logdown: 3.3.1
@@ -4241,7 +4250,7 @@ __metadata:
     spark-md5: 3.0.2
     tough-cookie: 4.1.2
     ws: 8.11.0
-  checksum: 12ecfa3cae3d39b2b1757861421654311c2de2260589e5d0bbc6be7f9fe07aef7412721b671af860f3922cea7c9e301b3e677383b296f28a318279537eb99a1c
+  checksum: 61cb242765314dd0dbe804daecbba97ea178bc39b91de2442337e4b6ba23e608b3fa2719802982be0c63e4f9118bdb9888cbb7113bacc9bf5521f3fe425f3d2e
   languageName: node
   linkType: hard
 
@@ -4294,11 +4303,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:38.7.1":
-  version: 38.7.1
-  resolution: "@wireapp/core@npm:38.7.1"
+"@wireapp/core@npm:38.8.1":
+  version: 38.8.1
+  resolution: "@wireapp/core@npm:38.8.1"
   dependencies:
-    "@wireapp/api-client": ^22.14.4
+    "@wireapp/api-client": ^22.15.0
     "@wireapp/commons": ^5.0.4
     "@wireapp/core-crypto": 0.6.0-rc.3
     "@wireapp/cryptobox": 12.8.0
@@ -4306,7 +4315,7 @@ __metadata:
     "@wireapp/protocol-messaging": 1.44.0
     "@wireapp/store-engine": 5.0.3
     "@wireapp/store-engine-dexie": ^2.0.5
-    axios: 1.2.2
+    axios: 1.2.6
     bazinga64: 6.0.3
     hash.js: 1.1.7
     http-status-codes: 2.2.0
@@ -4314,7 +4323,7 @@ __metadata:
     logdown: 3.3.1
     long: ^5.2.0
     uuidjs: 4.2.13
-  checksum: 4c8330846ca97a383960ed83cb5e2ba77ec117f0c9ab0b4d965d00d4dd74a7707192fd64c7fa915caf337f691866a3325331f75529c79295eeafb6976c188821
+  checksum: 0ad3e96226952af61db3b5b0e96fc8a404b7096408f6b8e23ce67b57c30185ccfe0c4cec591dae18ab77b2876222c8102ba2ffb5a27322b9de70611834959d81
   languageName: node
   linkType: hard
 
@@ -5147,6 +5156,17 @@ __metadata:
     form-data: ^4.0.0
     proxy-from-env: ^1.1.0
   checksum: 6e357491b38426c5720f7328ecbafca3c643b03952c052d787570672ce7a9365717c2d64db4ce97cfbee3f830fa405101e360e14d0857ef7f96a9f4d814c4e03
+  languageName: node
+  linkType: hard
+
+"axios@npm:1.2.6":
+  version: 1.2.6
+  resolution: "axios@npm:1.2.6"
+  dependencies:
+    follow-redirects: ^1.15.0
+    form-data: ^4.0.0
+    proxy-from-env: ^1.1.0
+  checksum: cbd19be3e07d2fbb6a0b126e49880cecdd44c1f68496ae0e7d21e7dc1c31fd59703a8eec51c9fd69034344f519cc1cdc22c22153131063657c4cef50195f0c00
   languageName: node
   linkType: hard
 
@@ -7715,7 +7735,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"espree@npm:^9.0.0, espree@npm:^9.4.0":
+"espree@npm:^9.0.0":
+  version: 9.4.1
+  resolution: "espree@npm:9.4.1"
+  dependencies:
+    acorn: ^8.8.0
+    acorn-jsx: ^5.3.2
+    eslint-visitor-keys: ^3.3.0
+  checksum: 4d266b0cf81c7dfe69e542c7df0f246e78d29f5b04dda36e514eb4c7af117ee6cfbd3280e560571ed82ff6c9c3f0003c05b82583fc7a94006db7497c4fe4270e
+  languageName: node
+  linkType: hard
+
+"espree@npm:^9.4.0":
   version: 9.4.0
   resolution: "espree@npm:9.4.0"
   dependencies:
@@ -11064,7 +11095,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash@npm:^4.0.0, lodash@npm:^4.17.14, lodash@npm:^4.17.15, lodash@npm:^4.17.20, lodash@npm:^4.17.21, lodash@npm:^4.7.0":
+"lodash@npm:^4.0.0, lodash@npm:^4.17.15, lodash@npm:^4.17.20, lodash@npm:^4.17.21, lodash@npm:^4.7.0":
   version: 4.17.21
   resolution: "lodash@npm:4.17.21"
   checksum: eb835a2e51d381e561e508ce932ea50a8e5a68f4ebdd771ea240d3048244a8d13658acbd502cd4829768c56f2e16bdd4340b9ea141297d472517b83868e677f7
@@ -11279,12 +11310,12 @@ __metadata:
   linkType: hard
 
 "markdown-it-anchor@npm:^8.4.1":
-  version: 8.6.5
-  resolution: "markdown-it-anchor@npm:8.6.5"
+  version: 8.6.6
+  resolution: "markdown-it-anchor@npm:8.6.6"
   peerDependencies:
     "@types/markdown-it": "*"
     markdown-it: "*"
-  checksum: 9a466279e52e3c04d67f1e706f2c14df9340e64ddac6eaad22ceaeca777e381103caa942464003e98765a7555bd1ccb5055b624565cb4522a7071dce6ae93460
+  checksum: d67044f132cd94728227e065b2a82063a05ac5fb82a991c190fe48ac5ab308ed85f49a28e859bcf203e882af814902e67dd69724f6761c61709834b075cc6f95
   languageName: node
   linkType: hard
 
@@ -11319,11 +11350,11 @@ __metadata:
   linkType: hard
 
 "marked@npm:^4.0.10":
-  version: 4.1.1
-  resolution: "marked@npm:4.1.1"
+  version: 4.2.5
+  resolution: "marked@npm:4.2.5"
   bin:
     marked: bin/marked.js
-  checksum: 717e3357952ee53de831bf0eb110ed075bebca2376c58bcdf7ee523ef540d45308ad6d51b2c933da0968832ea4386f31c142ca65443e77c098e84f6cce73e418
+  checksum: dd7da20a3983c66b516463fad5dc8d15dc70e137d20b6dc491e134f671e84bd2ed5f859e2c35f21e56830a122e4356b9e574bcde49b72b7ad6bc121a215a1a98
   languageName: node
   linkType: hard
 
@@ -13900,7 +13931,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"regenerator-runtime@npm:^0.13.11":
+"regenerator-runtime@npm:^0.13.10, regenerator-runtime@npm:^0.13.11":
   version: 0.13.11
   resolution: "regenerator-runtime@npm:0.13.11"
   checksum: 27481628d22a1c4e3ff551096a683b424242a216fee44685467307f14d58020af1e19660bf2e26064de946bad7eff28950eae9f8209d55723e2d9351e632bbb4
@@ -14078,11 +14109,11 @@ __metadata:
   linkType: hard
 
 "requizzle@npm:^0.2.3":
-  version: 0.2.3
-  resolution: "requizzle@npm:0.2.3"
+  version: 0.2.4
+  resolution: "requizzle@npm:0.2.4"
   dependencies:
-    lodash: ^4.17.14
-  checksum: b1b27c6ad16a2621d4cdb57cd44f01d302974df60f84f94b4d9d313dfe1d375e5b1a12f46010929fe508e83c40696a2105d38c1d1906c228500ac72b23a0d0c6
+    lodash: ^4.17.21
+  checksum: fceaa448b235f9ed111aa58360129225a3cec1a897a23293dc08d2a00f001756c042a62df0a9d4d1e2669ace52dec960aea73437f407b30c51bfba2e9da208b7
   languageName: node
   linkType: hard
 
@@ -16561,7 +16592,7 @@ __metadata:
     "@typescript-eslint/parser": ^5.49.0
     "@wireapp/avs": 9.0.20
     "@wireapp/copy-config": 2.0.5
-    "@wireapp/core": 38.7.1
+    "@wireapp/core": 38.8.1
     "@wireapp/eslint-config": 2.1.1
     "@wireapp/lru-cache": 3.8.1
     "@wireapp/prettier-config": 0.5.2

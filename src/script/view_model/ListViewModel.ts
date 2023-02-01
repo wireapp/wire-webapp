@@ -160,7 +160,7 @@ export class ListViewModel {
         },
       });
     } else {
-      this.callingRepository.answerCall(call);
+      this.callingViewModel.callActions.answer(call);
     }
   };
 

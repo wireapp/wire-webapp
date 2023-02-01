@@ -34,8 +34,10 @@ import type {AudioRepository} from '../audio/AudioRepository';
 import {AudioType} from '../audio/AudioType';
 import type {Call} from '../calling/Call';
 import {CallingRepository} from '../calling/CallingRepository';
+import {callingSubscriptions} from '../calling/callingSubscriptionsHandler';
 import {CallState} from '../calling/CallState';
 import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
+import {getSubconversationEpochInfo, subscribeToEpochUpdates} from '../calling/mlsConference';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
 import {ConversationState} from '../conversation/ConversationState';
@@ -48,6 +50,7 @@ import type {PermissionRepository} from '../permission/PermissionRepository';
 import {PermissionStatusState} from '../permission/PermissionStatusState';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
+import {Core} from '../service/CoreSingleton';
 import type {TeamRepository} from '../team/TeamRepository';
 import {TeamState} from '../team/TeamState';
 import {ROLE} from '../user/UserPermission';
@@ -86,7 +89,6 @@ export class CallingViewModel {
   readonly activeCalls: ko.PureComputed<Call[]>;
   readonly callActions: CallActions;
   readonly isSelfVerified: ko.Computed<boolean>;
-  readonly activeCallViewTab: ko.Observable<string>;
 
   constructor(
     readonly callingRepository: CallingRepository,
@@ -101,6 +103,7 @@ export class CallingViewModel {
     private readonly conversationState = container.resolve(ConversationState),
     readonly callState = container.resolve(CallState),
     private readonly teamState = container.resolve(TeamState),
+    private readonly core = container.resolve(Core),
   ) {
     this.isSelfVerified = ko.pureComputed(() => selfUser().is_verified());
     this.activeCalls = ko.pureComputed(() =>
@@ -137,8 +140,7 @@ export class CallingViewModel {
       });
     };
 
-    const startCall = async (conversation: Conversation, callType: CALL_TYPE) => {
-      const convType = conversation.isGroup() ? CONV_TYPE.GROUP : CONV_TYPE.ONEONONE;
+    const startCall = async (conversation: Conversation, callType: CALL_TYPE): Promise<void> => {
       const canStart = await this.canInitiateCall(conversation.qualifiedId, {
         action: t('modalCallSecondOutgoingAction'),
         message: t('modalCallSecondOutgoingMessage'),
@@ -148,11 +150,53 @@ export class CallingViewModel {
       if (!canStart) {
         return;
       }
-      const call = await this.callingRepository.startCall(conversation.qualifiedId, convType, callType);
+
+      const call = await this.callingRepository.startCall(conversation, callType);
       if (!call) {
         return;
       }
+
+      if (conversation.isUsingMLSProtocol) {
+        const unsubscribe = await subscribeToEpochUpdates(
+          {mlsService: this.mlsService},
+          conversation.qualifiedId,
+          ({epoch, keyLength, secretKey, members}) => {
+            this.callingRepository.setEpochInfo(conversation.qualifiedId, {epoch, keyLength, secretKey}, members);
+          },
+        );
+
+        callingSubscriptions.addCall(call.conversationId, unsubscribe);
+      }
       ring(call);
+    };
+
+    const joinOngoingMlsConference = async (call: Call) => {
+      const unsubscribe = await subscribeToEpochUpdates(
+        {mlsService: this.mlsService},
+        call.conversationId,
+        ({epoch, keyLength, secretKey, members}) => {
+          this.callingRepository.setEpochInfo(call.conversationId, {epoch, keyLength, secretKey}, members);
+        },
+      );
+
+      callingSubscriptions.addCall(call.conversationId, unsubscribe);
+    };
+
+    const answerCall = async (call: Call) => {
+      const canAnswer = await this.canInitiateCall(call.conversationId, {
+        action: t('modalCallSecondIncomingAction'),
+        message: t('modalCallSecondIncomingMessage'),
+        title: t('modalCallSecondIncomingHeadline'),
+      });
+      if (!canAnswer) {
+        return;
+      }
+
+      await this.callingRepository.answerCall(call);
+
+      if (call.conversationType === CONV_TYPE.CONFERENCE_MLS) {
+        await joinOngoingMlsConference(call);
+      }
     };
 
     const hasSoundlessCallsEnabled = (): boolean => {
@@ -163,12 +207,38 @@ export class CallingViewModel {
       return !!this.callState.joinedCall();
     };
 
-    this.callingRepository.onIncomingCall((call: Call) => {
+    const updateEpochInfo = async (conversationId: QualifiedId) => {
+      const subconversation = await this.mlsService.getConferenceSubconversation(conversationId);
+
+      //we don't want to react to avs callbacks when conversation was not yet established
+      const isMLSConversationEstablished = await this.mlsService.conversationExists(subconversation.group_id);
+      if (!isMLSConversationEstablished) {
+        return;
+      }
+
+      const {epoch, keyLength, secretKey, members} = await getSubconversationEpochInfo(
+        {mlsService: this.mlsService},
+        conversationId,
+        subconversation,
+      );
+      this.callingRepository.setEpochInfo(conversationId, {epoch, keyLength, secretKey}, members);
+    };
+
+    this.callingRepository.onIncomingCall(async (call: Call) => {
       const shouldRing = this.selfUser().availability() !== Availability.Type.AWAY;
       if (shouldRing && (!hasSoundlessCallsEnabled() || !hasJoinedCall())) {
         ring(call);
       }
     });
+
+    //update epoch info when AVS requests the list of clients
+    this.callingRepository.onRequestClientsCallback(updateEpochInfo);
+
+    //update epoch info when AVS requests new epoch
+    this.callingRepository.onRequestNewEpochCallback(updateEpochInfo);
+
+    //once we leave a call, we unsubscribe from all the events we've subscribed to during this call
+    this.callingRepository.onLeaveCall(callingSubscriptions.removeCall);
 
     this.callActions = {
       answer: async (call: Call) => {
@@ -187,16 +257,7 @@ export class CallingViewModel {
             },
           });
         } else {
-          const canAnwer = await this.canInitiateCall(call.conversationId, {
-            action: t('modalCallSecondIncomingAction'),
-            message: t('modalCallSecondIncomingMessage'),
-            title: t('modalCallSecondIncomingHeadline'),
-          });
-          if (!canAnwer) {
-            return;
-          }
-
-          this.callingRepository.answerCall(call);
+          return answerCall(call);
         }
       },
       changePage: (newPage, call) => {
@@ -268,6 +329,15 @@ export class CallingViewModel {
         });
       },
     };
+  }
+
+  get mlsService() {
+    const mlsService = this.core.service?.mls;
+    if (!mlsService) {
+      throw new Error('mls service was not initialised');
+    }
+
+    return mlsService;
   }
 
   /**
@@ -388,7 +458,7 @@ export class CallingViewModel {
     return call.state() === CALL_STATE.MEDIA_ESTAB;
   }
 
-  getConversationById(conversationId: QualifiedId): Conversation {
+  getConversationById(conversationId: QualifiedId): Conversation | undefined {
     return this.conversationState.findConversation(conversationId);
   }
 
