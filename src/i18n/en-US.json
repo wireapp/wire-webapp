@@ -736,6 +736,7 @@
   "modalAvailabilityDontShowAgain": "Do not display this information again",
   "modalAvailabilityNoneMessage": "You will receive notifications for incoming calls and for messages according to the Notifications setting in each conversation.",
   "modalAvailabilityNoneTitle": "No status set",
+  "modalAvailabilityRemoveBtn": "Close window 'Set a status'",
   "modalCallEmptyConversationHeadline": "No one to call",
   "modalCallEmptyConversationMessage": "There is no one left here.",
   "modalCallEmptyLogCloseBtn": "Close window 'No calls'",
