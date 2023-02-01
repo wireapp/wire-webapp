@@ -228,12 +228,7 @@ export class CallingViewModel {
       const conversation = this.conversationState.findConversation(conversationId);
 
       if (conversation?.isUsingMLSProtocol && conversation.groupId) {
-        const mlsService = core.service?.mls;
-        if (!mlsService) {
-          throw new Error('mls service was not initialised');
-        }
-
-        await mlsService.leaveConferenceSubconversation(conversationId);
+        await this.mlsService.leaveConferenceSubconversation(conversationId);
 
         callingSubscriptions.unsubscribe(conversationId);
       }
