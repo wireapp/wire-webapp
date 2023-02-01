@@ -92,14 +92,9 @@ export class AudioRepository {
       return;
     }
     Object.values(this.audioElements).forEach(element => {
-      element
-        .setSinkId(currentOutputDevice)
-        .then(() => {
-          this.logger.info(`Updated audio element output to: ${currentOutputDevice}`);
-        })
-        .catch(error => {
-          this.logger.warn(error);
-        });
+      element.setSinkId?.(currentOutputDevice).catch(error => {
+        this.logger.warn(error);
+      });
     });
   }
 
