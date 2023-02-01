@@ -103,7 +103,7 @@ export class CallingViewModel {
     private readonly conversationState = container.resolve(ConversationState),
     readonly callState = container.resolve(CallState),
     private readonly teamState = container.resolve(TeamState),
-    core = container.resolve(Core),
+    private readonly core = container.resolve(Core),
   ) {
     this.isSelfVerified = ko.pureComputed(() => selfUser().is_verified());
     this.activeCalls = ko.pureComputed(() =>
@@ -157,13 +157,8 @@ export class CallingViewModel {
       }
 
       if (conversation.isUsingMLSProtocol) {
-        const mlsService = core.service?.mls;
-        if (!mlsService) {
-          throw new Error('mls service was not initialised');
-        }
-
         const unsubscribe = await subscribeToEpochUpdates(
-          {mlsService},
+          {mlsService: this.mlsService},
           conversation.qualifiedId,
           ({epoch, keyLength, secretKey, members}) => {
             this.callingRepository.setEpochInfo(conversation.qualifiedId, {epoch, keyLength, secretKey}, members);
@@ -176,13 +171,8 @@ export class CallingViewModel {
     };
 
     const joinOngoingMlsConference = async (call: Call) => {
-      const mlsService = core.service?.mls;
-      if (!mlsService) {
-        throw new Error('mls service was not initialised');
-      }
-
       const unsubscribe = await subscribeToEpochUpdates(
-        {mlsService},
+        {mlsService: this.mlsService},
         call.conversationId,
         ({epoch, keyLength, secretKey, members}) => {
           this.callingRepository.setEpochInfo(call.conversationId, {epoch, keyLength, secretKey}, members);
@@ -218,21 +208,16 @@ export class CallingViewModel {
     };
 
     const updateEpochInfo = async (conversationId: QualifiedId) => {
-      const mlsService = core.service?.mls;
-      if (!mlsService) {
-        throw new Error('mls service was not initialised');
-      }
-
-      const subconversation = await mlsService.getConferenceSubconversation(conversationId);
+      const subconversation = await this.mlsService.getConferenceSubconversation(conversationId);
 
       //we don't want to react to avs callbacks when conversation was not yet established
-      const isMLSConversationEstablished = await mlsService.conversationExists(subconversation.group_id);
+      const isMLSConversationEstablished = await this.mlsService.conversationExists(subconversation.group_id);
       if (!isMLSConversationEstablished) {
         return;
       }
 
       const {epoch, keyLength, secretKey, members} = await getSubconversationEpochInfo(
-        {mlsService},
+        {mlsService: this.mlsService},
         conversationId,
         subconversation,
       );
@@ -344,6 +329,15 @@ export class CallingViewModel {
         });
       },
     };
+  }
+
+  get mlsService() {
+    const mlsService = this.core.service?.mls;
+    if (!mlsService) {
+      throw new Error('mls service was not initialised');
+    }
+
+    return mlsService;
   }
 
   /**
