@@ -29,10 +29,10 @@ const store = new Map<string, (() => void)[]>();
  * @param unsubscribe the function to call to teardown the subscription once the call is terminated
  */
 const addCall = (conversationId: QualifiedId, unsubscribe: () => void) => {
-  const serialisedId = serializeQualifiedId(conversationId);
+  const serializedId = serializeQualifiedId(conversationId);
 
-  const existingCallbacks = store.get(serialisedId) || [];
-  store.set(serialisedId, [...existingCallbacks, unsubscribe]);
+  const existingCallbacks = store.get(serializedId) || [];
+  store.set(serializedId, [...existingCallbacks, unsubscribe]);
 };
 
 /**
@@ -40,13 +40,13 @@ const addCall = (conversationId: QualifiedId, unsubscribe: () => void) => {
  * @param conversationId the conversation in which the call is happening
  */
 const removeCall = (conversationId: QualifiedId) => {
-  const serialisedId = serializeQualifiedId(conversationId);
+  const serializedId = serializeQualifiedId(conversationId);
 
-  const existingCallbacks = store.get(serialisedId);
+  const existingCallbacks = store.get(serializedId);
   if (existingCallbacks) {
     existingCallbacks.forEach(unsubscribe => unsubscribe());
   }
-  store.delete(serialisedId);
+  store.delete(serializedId);
 };
 
 export const callingSubscriptions = {addCall, removeCall};

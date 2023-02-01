@@ -33,7 +33,7 @@ const generateSubconversationMembers = async (
   const parentGroupId = await mlsService.getGroupIdFromConversationId(conversationId);
   const memberIds = await mlsService.getClientIds(parentGroupId);
 
-  const members = memberIds.map(parentMember => {
+  return memberIds.map(parentMember => {
     const isSubconversationMember = !!subconversation.members.find(
       ({user_id, client_id}) => user_id === parentMember.userId && client_id === parentMember.clientId,
     );
@@ -44,8 +44,6 @@ const generateSubconversationMembers = async (
       in_subconv: isSubconversationMember,
     };
   });
-
-  return members;
 };
 
 export const getSubconversationEpochInfo = async (
