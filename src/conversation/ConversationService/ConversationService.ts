@@ -328,7 +328,7 @@ export class ConversationService {
     return {
       id: payload.messageId,
       sentAt,
-      state: sentAt ? MessageSendingState.OUTGOING_SENT : MessageSendingState.CANCELLED,
+      state: sentAt ? MessageSendingState.OUTGOING_SENT : MessageSendingState.CANCELED,
     };
   }
 

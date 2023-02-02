@@ -132,4 +132,6 @@ export type SendResult = {
   sentAt: string;
   /** The sending state of the payload (has the payload been succesfully sent or canceled) */
   state: MessageSendingState;
+  /** In case the message was sent to some federated backend, if the backend was down at the moment of sending the `failedToSend` property will contain all the users/devices that couldn't get the message */
+  failedToSend?: QualifiedUserClients;
 };
