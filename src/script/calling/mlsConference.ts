@@ -23,6 +23,8 @@ import {MLSService} from '@wireapp/core/lib/messagingProtocols/mls';
 
 import {SubconversationEpochInfoMember} from './CallingRepository';
 
+const KEY_LENGTH = 32;
+
 const generateSubconversationMembers = async (
   {mlsService}: {mlsService: MLSService},
   conversationId: QualifiedId,
@@ -31,7 +33,7 @@ const generateSubconversationMembers = async (
   const parentGroupId = await mlsService.getGroupIdFromConversationId(conversationId);
   const memberIds = await mlsService.getClientIds(parentGroupId);
 
-  const members = memberIds.map(parentMember => {
+  return memberIds.map(parentMember => {
     const isSubconversationMember = !!subconversation.members.find(
       ({user_id, client_id}) => user_id === parentMember.userId && client_id === parentMember.clientId,
     );
@@ -42,8 +44,6 @@ const generateSubconversationMembers = async (
       in_subconv: isSubconversationMember,
     };
   });
-
-  return members;
 };
 
 export const getSubconversationEpochInfo = async (
@@ -60,10 +60,9 @@ export const getSubconversationEpochInfo = async (
 
   const epoch = Number(await mlsService.getEpoch(subconversation.group_id));
 
-  const keyLength = 32;
-  const secretKey = await mlsService.exportSecretKey(subconversation.group_id, keyLength);
+  const secretKey = await mlsService.exportSecretKey(subconversation.group_id, KEY_LENGTH);
 
-  return {members, epoch, keyLength, secretKey};
+  return {members, epoch, keyLength: KEY_LENGTH, secretKey};
 };
 
 export const subscribeToEpochUpdates = async (

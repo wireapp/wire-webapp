@@ -130,7 +130,7 @@ describe('CallingRepository', () => {
       const userId = {domain: '', id: ''};
       const incomingCall = new Call(
         userId,
-        createConversation(),
+        createConversation().qualifiedId,
         CONV_TYPE.CONFERENCE,
         selfParticipant,
         CALL_TYPE.NORMAL,
@@ -142,7 +142,7 @@ describe('CallingRepository', () => {
 
       const activeCall = new Call(
         userId,
-        createConversation(),
+        createConversation().qualifiedId,
         CONV_TYPE.CONFERENCE,
         selfParticipant,
         CALL_TYPE.NORMAL,
@@ -154,7 +154,7 @@ describe('CallingRepository', () => {
 
       const declinedCall = new Call(
         userId,
-        createConversation(),
+        createConversation().qualifiedId,
         CONV_TYPE.CONFERENCE,
         selfParticipant,
         CALL_TYPE.NORMAL,
@@ -175,9 +175,16 @@ describe('CallingRepository', () => {
     it('returns cached mediastream for self user if set', () => {
       const selfParticipant = createSelfParticipant();
       const userId = {domain: '', id: ''};
-      const call = new Call(userId, createConversation(), CONV_TYPE.CONFERENCE, selfParticipant, CALL_TYPE.NORMAL, {
-        currentAvailableDeviceId: mediaDevices,
-      } as MediaDevicesHandler);
+      const call = new Call(
+        userId,
+        createConversation().qualifiedId,
+        CONV_TYPE.CONFERENCE,
+        selfParticipant,
+        CALL_TYPE.NORMAL,
+        {
+          currentAvailableDeviceId: mediaDevices,
+        } as MediaDevicesHandler,
+      );
       const source = new window.RTCAudioSource();
       const audioTrack = source.createTrack();
       const selfMediaStream = new MediaStream([audioTrack]);
@@ -200,7 +207,7 @@ describe('CallingRepository', () => {
       const selfParticipant = createSelfParticipant();
       const call = new Call(
         {domain: '', id: ''},
-        createConversation(),
+        createConversation().qualifiedId,
         CONV_TYPE.CONFERENCE,
         selfParticipant,
         CALL_TYPE.NORMAL,
@@ -234,9 +241,16 @@ describe('CallingRepository', () => {
       spyOn(selfParticipant, 'releaseAudioStream');
       spyOn(selfParticipant, 'releaseVideoStream');
 
-      const call = new Call({domain: '', id: ''}, createConversation(), 0, selfParticipant, CALL_TYPE.NORMAL, {
-        currentAvailableDeviceId: mediaDevices,
-      } as MediaDevicesHandler);
+      const call = new Call(
+        {domain: '', id: ''},
+        createConversation().qualifiedId,
+        0,
+        selfParticipant,
+        CALL_TYPE.NORMAL,
+        {
+          currentAvailableDeviceId: mediaDevices,
+        } as MediaDevicesHandler,
+      );
       spyOn(callingRepository['callState'], 'joinedCall').and.returnValue(call);
       callingRepository.stopMediaSource(MediaType.AUDIO);
 
@@ -488,12 +502,12 @@ describe.skip('E2E audio call', () => {
 
   it('calls and connect with the remote user', done => {
     onCallClosed = done;
-    const conversationId = createConversation();
+    const conversation = createConversation();
     onCallConnected = () => {
       expect(client['sendMessage']).toHaveBeenCalledTimes(1);
       expect(client.onCallEvent).toHaveBeenCalledTimes(1);
       client
-        .getStats(conversationId)
+        .getStats(conversation.qualifiedId)
         ?.then(extractAudioStats)
         .then(audioStats => {
           expect(audioStats.length).toBeGreaterThan(0);
@@ -502,16 +516,16 @@ describe.skip('E2E audio call', () => {
           });
 
           expect(client['callState'].joinedCall()).toBeDefined();
-          client.leaveCall(conversationId, LEAVE_CALL_REASON.MANUAL_LEAVE_BY_UI_CLICK);
+          client.leaveCall(conversation.qualifiedId, LEAVE_CALL_REASON.MANUAL_LEAVE_BY_UI_CLICK);
         })
         .catch(done.fail);
     };
-    client.startCall(conversationId, CALL_TYPE.NORMAL).catch(done.fail);
+    client.startCall(conversation, CALL_TYPE.NORMAL).catch(done.fail);
   });
 
   it('answers an incoming call and connect with the remote peer', done => {
     onCallClosed = done;
-    const conversationId = createConversation();
+    const conversationId = createConversation().qualifiedId;
     onCallConnected = () => {
       expect(client.onCallEvent).toHaveBeenCalled();
       expect(client['incomingCallCallback']).toHaveBeenCalled();

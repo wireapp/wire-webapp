@@ -168,7 +168,7 @@ export class CallingViewModel {
           },
         );
 
-        callingSubscriptions.addOngoing(call.conversationId, unsubscribe);
+        callingSubscriptions.addCall(call.conversationId, unsubscribe);
       }
       ring(call);
     };
@@ -182,7 +182,7 @@ export class CallingViewModel {
         },
       );
 
-      callingSubscriptions.addOngoing(call.conversationId, unsubscribe);
+      callingSubscriptions.addCall(call.conversationId, unsubscribe);
     };
 
     const answerCall = async (call: Call) => {
@@ -211,6 +211,11 @@ export class CallingViewModel {
     };
 
     const updateEpochInfo = async (conversationId: QualifiedId) => {
+      const conversation = this.getConversationById(conversationId);
+      if (!conversation?.isUsingMLSProtocol) {
+        return;
+      }
+
       const subconversation = await this.mlsService.getConferenceSubconversation(conversationId);
 
       //we don't want to react to avs callbacks when conversation was not yet established
@@ -270,7 +275,7 @@ export class CallingViewModel {
     this.callingRepository.onRequestNewEpochCallback(updateEpochInfo);
 
     //once we leave a call, we unsubscribe from all the events we've subscribed to during this call
-    this.callingRepository.onLeaveCall(callingSubscriptions.unsubscribe);
+    this.callingRepository.onLeaveCall(callingSubscriptions.removeCall);
 
     //handle participant change avs callback to detect stale clients in subconversations
     this.callingRepository.onCallParticipantChangedCallback(handleCallParticipantChange);
