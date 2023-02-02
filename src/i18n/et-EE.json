@@ -228,6 +228,7 @@
   "callAccept": "Nõustu",
   "callChooseSharedScreen": "Vali ekraan, mida jagada",
   "callChooseSharedWindow": "Choose a window to share",
+  "callConversationAcceptOrDecline": "{{conversationName}} is calling. Press enter to accept the call or press escape to decline the call.",
   "callDecline": "Keeldu",
   "callDegradationAction": "OK",
   "callDegradationDescription": "The call was disconnected because {{username}} is no longer a verified contact.",
