@@ -228,6 +228,7 @@
   "callAccept": "Annehmen",
   "callChooseSharedScreen": "Wählen Sie einen Bildschirm aus",
   "callChooseSharedWindow": "Wählen Sie ein Fenster zur Freigabe aus",
+  "callConversationAcceptOrDecline": "{{conversationName}} is calling. Press enter to accept the call or press escape to decline the call.",
   "callDecline": "Ablehnen",
   "callDegradationAction": "Verstanden",
   "callDegradationDescription": "Der Anruf wurde unterbrochen, weil {{username}} kein verifizierter Kontakt mehr ist.",
