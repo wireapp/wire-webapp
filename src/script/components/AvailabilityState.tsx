@@ -34,6 +34,7 @@ export interface AvailabilityStateProps {
   className?: string;
   dataUieName: string;
   label: string;
+  title?: string;
   onClick?: (event: React.MouseEvent | React.KeyboardEvent) => void;
   showArrow?: boolean;
   theme?: boolean;
@@ -58,6 +59,7 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
   className,
   dataUieName,
   label,
+  title,
   showArrow = false,
   theme = false,
   onClick,
@@ -117,7 +119,7 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
           className={cx('availability-state-label', {'availability-state-label--active': theme})}
           css={{userSelect: 'none'}}
           data-uie-name="status-label"
-          title={label}
+          title={title || label}
         >
           {label}
         </span>
