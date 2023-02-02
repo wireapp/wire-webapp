@@ -567,6 +567,9 @@ const InputBar = ({
 
   const handlePasteFiles = (files: FileList): void => {
     const [pastedFile] = files;
+    if (!pastedFile) {
+      return;
+    }
     const {lastModified} = pastedFile;
 
     const date = formatLocale(lastModified || new Date(), 'PP, pp');
