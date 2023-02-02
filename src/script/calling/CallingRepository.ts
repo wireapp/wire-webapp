@@ -1181,7 +1181,7 @@ export class CallingRepository {
     }
 
     const message = await this.messageRepository.sendCallingMessage(conversation, content, options);
-    if (message.state === MessageSendingState.CANCELLED) {
+    if (message.state === MessageSendingState.CANCELED) {
       // If the user has cancelled message sending because of a degradation warning, we abort the call
       this.abortCall(
         conversationId,
