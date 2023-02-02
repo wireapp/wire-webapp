@@ -203,7 +203,7 @@ export class ProteusService {
           onClientMismatch: mismatch => onClientMismatch?.(mismatch, false),
         });
 
-    if (!response.errored) {
+    if (!response.canceled) {
       if (!isClearFromMismatch(response)) {
         // We warn the consumer that there is a mismatch that did not prevent message sending
         await onClientMismatch?.(response, true);
@@ -211,10 +211,18 @@ export class ProteusService {
       this.logger.log(`Successfully sent Proteus message to conversation '${conversationId.id}'`);
     }
 
+    const sendingState = response.canceled ? MessageSendingState.CANCELED : MessageSendingState.OUTGOING_SENT;
+
+    const failedToSend =
+      'failed_to_send' in response && Object.keys(response.failed_to_send).length > 0
+        ? response.failed_to_send
+        : undefined;
+
     return {
       id: payload.messageId,
       sentAt: response.time,
-      state: response.errored ? MessageSendingState.CANCELLED : MessageSendingState.OUTGOING_SENT,
+      state: sendingState,
+      failedToSend,
     };
   }
 

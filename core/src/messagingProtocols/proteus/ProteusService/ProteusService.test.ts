@@ -22,7 +22,7 @@ import * as Recipients from '../Utility/Recipients';
 
 import {ConversationProtocol, QualifiedUserClients, UserClients} from '@wireapp/api-client/lib/conversation';
 
-import {MessageTargetMode} from '../../../conversation';
+import {MessageSendingState, MessageTargetMode} from '../../../conversation';
 import {buildTextMessage} from '../../../conversation/message/MessageBuilder';
 import {SendProteusMessageParams} from './ProteusService.types';
 import {buildProteusService} from './ProteusService.mocks';
@@ -528,6 +528,33 @@ describe('ProteusService', () => {
             }),
           );
         });
+      });
+
+      it(`returns the recipients that could not receive the message`, async () => {
+        const [proteusService] = await buildProteusService(true);
+        const recipients: QualifiedUserClients = {
+          domain1: {user1: ['client1'], user2: ['client11', 'client12']},
+          domain2: {user3: ['client3']},
+        };
+        MockedRecipients.getQualifiedRecipientsForConversation.mockResolvedValue({} as any);
+        jest.spyOn(proteusService['messageService'], 'sendFederatedMessage').mockResolvedValue({
+          missing: {},
+          redundant: {},
+          failed_to_send: {domain2: recipients.domain2},
+          time: new Date().toISOString(),
+          deleted: {},
+        });
+
+        const result = await proteusService.sendMessage({
+          protocol: ConversationProtocol.PROTEUS,
+          conversationId: {id: 'conv1', domain: 'domain1'},
+          payload: message,
+          targetMode: MessageTargetMode.USERS_CLIENTS,
+          userIds: recipients,
+        });
+
+        expect(result.state).toBe(MessageSendingState.OUTGOING_SENT);
+        expect(result.failedToSend).toEqual({domain2: recipients.domain2});
       });
     });
   });
