@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [38.9.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.8.3...@wireapp/core@38.9.0) (2023-02-02)
+
+### Features
+
+* **core:** Return federated users that could not receive a message ([#4844](https://github.com/wireapp/wire-web-packages/issues/4844)) ([9022e10](https://github.com/wireapp/wire-web-packages/commit/9022e102afb24ddbf99f07be7cd86178df086a2d))
+
 ## [38.8.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.8.2...@wireapp/core@38.8.3) (2023-02-02)
 
 **Note:** Version bump only for package @wireapp/core
