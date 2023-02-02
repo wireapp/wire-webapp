@@ -239,40 +239,63 @@ export class CallingViewModel {
       }
     });
 
+    const removeStaleClient = async (conversationId: QualifiedId, member: QualifiedWcallMember) => {
+      const subconversation = await this.mlsService.getConferenceSubconversation(conversationId);
+
+      const isMLSConversationEstablished = await this.mlsService.conversationExists(subconversation.group_id);
+      if (!isMLSConversationEstablished) {
+        return;
+      }
+
+      const {id: userId, domain} = member.userId;
+      const clientQualifiedId = constructFullyQualifiedClientId(userId, member.clientid, domain);
+
+      const isSubconversationMember = subconversation.members.some(
+        ({user_id, client_id, domain}) =>
+          constructFullyQualifiedClientId(user_id, client_id, domain) === clientQualifiedId,
+      );
+
+      if (!isSubconversationMember) {
+        return;
+      }
+
+      const call = this.activeCalls().find(call => call.conversationId === conversationId);
+      const isSelfClient = member.clientid === call?.selfClientId;
+
+      if (isSelfClient) {
+        return () => {}; //TODO: remove self user with backend /self endpoint
+      }
+
+      return this.mlsService.removeClientsFromConversation(subconversation.group_id, [clientQualifiedId]);
+    };
+
     const handleCallParticipantChange = (conversationId: QualifiedId, members: QualifiedWcallMember[]) => {
       const conversation = this.getConversationById(conversationId);
-      if (conversation?.isUsingMLSProtocol) {
-        for (const member of members) {
-          const {id: userId, domain} = member.userId;
-          const clientQualifiedId = constructFullyQualifiedClientId(userId, member.clientid, domain);
-          const key = `mls-call-client-${conversation.id}-${clientQualifiedId}`;
+      if (!conversation?.isUsingMLSProtocol) {
+        return;
+      }
 
-          // audio state is established -> clear timer
-          if (member.aestab === AUDIO_STATE.ESTABLISHED) {
-            TaskScheduler.cancelTask(key);
-            continue;
-          }
+      for (const member of members) {
+        const {id: userId, domain} = member.userId;
+        const clientQualifiedId = constructFullyQualifiedClientId(userId, member.clientid, domain);
 
-          // otherwise, remove the client from subconversation if it won't establish their audio state in following 3 mins
-          const firingDate = new Date().getTime() + TIME_IN_MILLIS.MINUTE * 3;
-          TaskScheduler.addTask({
-            firingDate,
-            key,
-            task: async () => {
-              // if timer expires = client is stale -> remove client from the subconversation
-              const subconversation = await this.mlsService.getConferenceSubconversation(conversationId);
+        const key = `mls-call-client-${conversation.id}-${clientQualifiedId}`;
 
-              const isSubconversationMember = subconversation.members.some(
-                ({user_id, client_id, domain}) =>
-                  constructFullyQualifiedClientId(user_id, client_id, domain) === clientQualifiedId,
-              );
-
-              if (isSubconversationMember) {
-                await this.mlsService.removeClientsFromConversation(subconversation.group_id, [clientQualifiedId]);
-              }
-            },
-          });
+        // audio state is established -> clear timer
+        if (member.aestab === AUDIO_STATE.ESTABLISHED) {
+          TaskScheduler.cancelTask(key);
+          continue;
         }
+
+        // otherwise, remove the client from subconversation if it won't establish their audio state in 3 mins timeout
+        const firingDate = new Date().getTime() + TIME_IN_MILLIS.MINUTE * 3;
+
+        TaskScheduler.addTask({
+          firingDate,
+          key,
+          // if timer expires = client is stale -> remove client from the subconversation
+          task: () => removeStaleClient(conversationId, member),
+        });
       }
     };
 
