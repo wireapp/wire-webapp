@@ -231,7 +231,8 @@ export class MessageRepository {
       legalHoldStatus: conversation.legalHoldStatus(),
     });
 
-    return this.sendAndInjectMessage(ping, conversation, {enableEphemeral: true, playPingAudio: true});
+    amplify.publish(WebAppEvents.AUDIO.PLAY, AudioType.OUTGOING_PING);
+    return this.sendAndInjectMessage(ping, conversation, {enableEphemeral: true});
   }
 
   /**
@@ -336,7 +337,7 @@ export class MessageRepository {
       quote: quoteEntity,
     };
     const {state} = await this.sendText(textPayload);
-    if (state !== MessageSendingState.CANCELLED) {
+    if (state !== MessageSendingState.CANCELED) {
       await this.handleLinkPreview(textPayload);
     }
   }
@@ -375,7 +376,7 @@ export class MessageRepository {
       originalMessageId: originalMessage.id,
     };
     const {state} = await this.sendEdit(messagePayload);
-    if (state !== MessageSendingState.CANCELLED) {
+    if (state !== MessageSendingState.CANCELED) {
       await this.handleLinkPreview(messagePayload);
     }
   }
@@ -472,7 +473,7 @@ export class MessageRepository {
   ): Promise<EventRecord | void> {
     const uploadStarted = Date.now();
     const {id, state} = await this.sendAssetMetadata(conversation, file, asImage);
-    if (state === MessageSendingState.CANCELLED) {
+    if (state === MessageSendingState.CANCELED) {
       throw new ConversationError(
         ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION,
         ConversationError.MESSAGE.DEGRADED_CONVERSATION_CANCELLATION,
@@ -664,7 +665,6 @@ export class MessageRepository {
    * @param conversation - the conversation the message should be sent to
    * @param options
    * @param options.syncTimestamp should the message timestamp be synchronized with backend response timestamp
-   * @param options.playPingAudio should the 'ping' audio be played when message is being sent
    * @param options.nativePush use nativePush for sending to mobile devices
    * @param options.recipients can be used to target specific users of the conversation. Will send to all the conversation participants if not defined
    * @param options.skipSelf do not forward this message to self user (will not encrypt and send to all self clients)
@@ -675,7 +675,6 @@ export class MessageRepository {
     conversation: Conversation,
     {
       syncTimestamp = true,
-      playPingAudio = false,
       nativePush = true,
       enableEphemeral = false,
       targetMode,
@@ -685,7 +684,6 @@ export class MessageRepository {
       silentDegradationWarning,
       consentType = CONSENT_TYPE.MESSAGE,
     }: MessageSendingOptions & {
-      playPingAudio?: boolean;
       enableEphemeral?: boolean;
       silentDegradationWarning?: boolean;
       skipInjection?: boolean;
@@ -694,7 +692,6 @@ export class MessageRepository {
       targetMode?: MessageTargetMode;
       consentType?: CONSENT_TYPE;
     } = {
-      playPingAudio: false,
       syncTimestamp: true,
     },
   ) {
@@ -704,9 +701,6 @@ export class MessageRepository {
     const payload = enableEphemeral && messageTimer ? MessageBuilder.wrapInEphemeral(message, messageTimer) : message;
 
     const injectOptimisticEvent = async () => {
-      if (playPingAudio) {
-        amplify.publish(WebAppEvents.AUDIO.PLAY, AudioType.OUTGOING_PING);
-      }
       if (!skipInjection) {
         const senderId = this.clientState.currentClient().id;
         const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
@@ -728,7 +722,7 @@ export class MessageRepository {
       // Trigger an empty mismatch to check for users that have no devices and that could have been removed from the team
       await this.onClientMismatch?.({time: preMessageTimestamp}, conversation, silentDegradationWarning);
       if (!skipInjection) {
-        this.updateMessageAsSent(conversation, payload.messageId, syncTimestamp ? sentAt : undefined);
+        await this.updateMessageAsSent(conversation, payload.messageId, syncTimestamp ? sentAt : undefined);
       }
     };
 
@@ -754,13 +748,13 @@ export class MessageRepository {
 
     const shouldProceedSending = await injectOptimisticEvent();
     if (shouldProceedSending === false) {
-      return {id: payload.messageId, state: MessageSendingState.CANCELLED};
+      return {id: payload.messageId, state: MessageSendingState.CANCELED};
     }
 
     const result = await this.conversationService.send(sendOptions);
 
     if (result.state === MessageSendingState.OUTGOING_SENT) {
-      handleSuccess(result.sentAt);
+      await handleSuccess(result.sentAt);
     }
     return result;
   }
@@ -870,7 +864,7 @@ export class MessageRepository {
       targetMode: MessageTargetMode.USERS,
     };
     const {state} = await this.sendAndInjectMessage(confirmationMessage, conversationEntity, sendingOptions);
-    if (state === MessageSendingState.CANCELLED) {
+    if (state === MessageSendingState.CANCELED) {
       this.sendAndInjectMessage(confirmationMessage, conversationEntity, {
         ...sendingOptions,
         // If the message was auto cancelled because of a mismatch, we will force sending the message only to the clients we know of (ignoring unverified clients)
