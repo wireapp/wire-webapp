@@ -261,7 +261,15 @@ export class CallingViewModel {
             task: async () => {
               // if timer expires = client is stale -> remove client from the subconversation
               const subconversation = await this.mlsService.getConferenceSubconversation(conversationId);
-              return this.mlsService.removeClientsFromConversation(subconversation.group_id, [clientQualifiedId]);
+
+              const isSubconversationMember = subconversation.members.some(
+                ({user_id, client_id, domain}) =>
+                  constructFullyQualifiedClientId(user_id, client_id, domain) === clientQualifiedId,
+              );
+
+              if (isSubconversationMember) {
+                await this.mlsService.removeClientsFromConversation(subconversation.group_id, [clientQualifiedId]);
+              }
             },
           });
         }
