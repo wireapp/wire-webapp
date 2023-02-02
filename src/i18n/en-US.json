@@ -235,6 +235,7 @@
   "callDurationLabel": "Duration",
   "callEveryOneLeft": "all other participants left.",
   "callJoin": "Join",
+  "callConversationAcceptOrDecline": "{{conversationName}} is calling. Press enter to accept the call or press escape to decline the call.",
   "callMaximizeLabel": "Maximize Call",
   "callNoCameraAccess": "No camera access",
   "callNoOneJoined": "no other participant joined.",
