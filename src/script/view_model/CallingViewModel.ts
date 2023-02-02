@@ -245,7 +245,7 @@ export class CallingViewModel {
         for (const member of members) {
           const {id: userId, domain} = member.userId;
           const clientQualifiedId = constructFullyQualifiedClientId(userId, member.clientid, domain);
-          const key = `mls-call-client-${clientQualifiedId}`;
+          const key = `mls-call-client-${conversation.id}-${clientQualifiedId}`;
 
           // audio state is established -> clear timer
           if (member.aestab === AUDIO_STATE.ESTABLISHED) {
