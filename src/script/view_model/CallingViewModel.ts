@@ -239,7 +239,7 @@ export class CallingViewModel {
       }
     });
 
-    const removeStaleClient = async (conversationId: QualifiedId, member: QualifiedWcallMember) => {
+    const removeStaleClient = async (conversationId: QualifiedId, member: QualifiedWcallMember): Promise<void> => {
       const subconversation = await this.mlsService.getConferenceSubconversation(conversationId);
 
       const isMLSConversationEstablished = await this.mlsService.conversationExists(subconversation.group_id);
@@ -263,10 +263,10 @@ export class CallingViewModel {
       const isSelfClient = member.clientid === call?.selfClientId;
 
       if (isSelfClient) {
-        return () => {}; //TODO: remove self user with backend /self endpoint
+        return; //TODO: remove self user with backend /self endpoint
       }
 
-      return this.mlsService.removeClientsFromConversation(subconversation.group_id, [clientQualifiedId]);
+      return void this.mlsService.removeClientsFromConversation(subconversation.group_id, [clientQualifiedId]);
     };
 
     const handleCallParticipantChange = (conversationId: QualifiedId, members: QualifiedWcallMember[]) => {
