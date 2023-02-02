@@ -20,8 +20,8 @@
 import {ClientType} from '@wireapp/api-client/lib/client';
 
 import {APIClient} from '@wireapp/api-client';
-import {CoreCrypto} from '@wireapp/core-crypto';
 
+import {CryptoClient} from './CryptoClient';
 import {CoreCryptoWrapper} from './CryptoClient/CoreCryptoWrapper';
 import {ProteusService} from './ProteusService';
 
@@ -29,7 +29,7 @@ import {getUUID} from '../../../test/PayloadHelper';
 
 export const buildProteusService = async (
   federated = false,
-): Promise<[ProteusService, {apiClient: APIClient; coreCrypto: CoreCrypto}]> => {
+): Promise<[ProteusService, {apiClient: APIClient; cryptoClient: CryptoClient}]> => {
   const apiClient = new APIClient({urls: APIClient.BACKEND.STAGING});
 
   apiClient.context = {
@@ -38,11 +38,11 @@ export const buildProteusService = async (
     clientId: getUUID(),
   };
 
-  const coreCrypto = await CoreCrypto.deferredInit('store-name', 'key');
+  const cryptoClient = new CoreCryptoWrapper({} as any, {} as any, {} as any);
 
-  const proteusService = new ProteusService(apiClient, new CoreCryptoWrapper(coreCrypto, {} as any, {} as any), {
+  const proteusService = new ProteusService(apiClient, cryptoClient, {
     nbPrekeys: 0,
     useQualifiedIds: federated,
   });
-  return [proteusService, {apiClient, coreCrypto}];
+  return [proteusService, {apiClient, cryptoClient}];
 };

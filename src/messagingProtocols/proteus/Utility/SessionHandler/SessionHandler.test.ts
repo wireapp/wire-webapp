@@ -18,13 +18,42 @@
  */
 
 import type {UserClients} from '@wireapp/api-client/lib/conversation';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
+
+import {APIClient} from '@wireapp/api-client';
 
 import {constructSessionId, initSession, initSessions} from './SessionHandler';
 
-import {CoreCryptoWrapper} from '../../ProteusService/CryptoClient/CoreCryptoWrapper';
-import {buildProteusService} from '../../ProteusService/ProteusService.mocks';
+import {CryptoClient} from '../../ProteusService/CryptoClient';
+
+function generatePrekeys(userId: QualifiedId, clientIds: string[]) {
+  const clients = clientIds.reduce((prekeys, clientId, index) => {
+    return {
+      ...prekeys,
+      [clientId]: {
+        id: index,
+        key: 'pQABARn//wKhAFggJ1Fbpg5l6wnzKOJE+vXpRnkqUYhIvVnR5lNXEbO2o/0DoQChAFggHxZvgvtDktY/vqBcpjjo6rQnXvcNQhfwmy8AJQJKlD0E9g==',
+      },
+    };
+  }, {});
+
+  return {
+    [userId.id]: {
+      ...clients,
+    },
+  };
+}
 
 describe('SessionHandler', () => {
+  const cryptoClient = {
+    sessionFromMessage: jest.fn(),
+    sessionFromPrekey: jest.fn(),
+    sessionExists: jest.fn(),
+    saveSession: jest.fn(),
+    deleteSession: jest.fn(),
+  } as unknown as CryptoClient;
+  const apiClient = new APIClient({urls: APIClient.BACKEND.STAGING});
+
   describe('constructSessionId', () => {
     describe('constructs a session ID', () => {
       it('without a domain', () => {
@@ -74,48 +103,51 @@ describe('SessionHandler', () => {
 
   describe('initSession', () => {
     it('only returns sessions that already exists', async () => {
-      const {apiClient, coreCrypto} = (await buildProteusService())[1];
-      jest.spyOn(coreCrypto as any, 'proteusSessionExists').mockResolvedValue(true);
+      jest.spyOn(cryptoClient, 'sessionExists').mockResolvedValue(true);
 
-      const sessionFromPrekeySpy = jest.spyOn(coreCrypto, 'proteusSessionFromPrekey');
-      await initSession(
-        {userId: {id: 'user1', domain: 'domain'}, clientId: 'client1'},
-        {apiClient, cryptoClient: new CoreCryptoWrapper(coreCrypto, {} as any, {} as any)},
-      );
+      await initSession({userId: {id: 'user1', domain: 'domain'}, clientId: 'client1'}, {apiClient, cryptoClient});
 
-      expect(sessionFromPrekeySpy).not.toHaveBeenCalled();
+      expect(cryptoClient.sessionFromPrekey).not.toHaveBeenCalled();
     });
 
     it('creates the session if it does not already exist', async () => {
-      const {apiClient, coreCrypto} = (await buildProteusService())[1];
-      jest.spyOn(coreCrypto as any, 'proteusSessionExists').mockResolvedValue(false);
-      jest.spyOn(apiClient.api.user, 'getClientPreKey').mockResolvedValue({
-        prekey: {
-          id: 1,
-          key: 'pQABARn//wKhAFggJ1Fbpg5l6wnzKOJE+vXpRnkqUYhIvVnR5lNXEbO2o/0DoQChAFggHxZvgvtDktY/vqBcpjjo6rQnXvcNQhfwmy8AJQJKlD0E9g==',
-        },
-        client: 'client1',
-      });
+      const userId = {id: 'user1', domain: 'domain'};
+      const clientId = 'client1';
+      jest.spyOn(cryptoClient, 'sessionExists').mockResolvedValue(false);
+      jest
+        .spyOn(apiClient.api.user, 'postQualifiedMultiPreKeyBundles')
+        .mockResolvedValue({domain: generatePrekeys(userId, [clientId])});
 
       const sessionId = constructSessionId({
-        userId: {id: 'user1', domain: 'domain'},
-        clientId: 'client1',
+        userId,
+        clientId,
         useQualifiedIds: true,
       });
-      const sessionFromPrekeySpy = jest.spyOn(coreCrypto, 'proteusSessionFromPrekey');
-      await initSession(
-        {userId: {id: 'user1', domain: 'domain'}, clientId: 'client1'},
-        {apiClient, cryptoClient: new CoreCryptoWrapper(coreCrypto, {} as any, {} as any)},
-      );
+      await initSession({userId, clientId}, {apiClient, cryptoClient});
 
-      expect(sessionFromPrekeySpy).toHaveBeenCalledWith(sessionId, expect.any(Object));
+      expect(cryptoClient.sessionFromPrekey).toHaveBeenCalledWith(sessionId, expect.any(Object));
+    });
+
+    it('indicates the consumer if a session could not be created', async () => {
+      const userId = {id: 'user1', domain: 'domain'};
+      const clientId = 'client1';
+      jest
+        .spyOn(apiClient.api.user, 'postQualifiedMultiPreKeyBundles')
+        .mockResolvedValue({domain: generatePrekeys(userId, [clientId])});
+
+      const sessionId = constructSessionId({
+        userId,
+        clientId,
+        useQualifiedIds: true,
+      });
+      await initSession({userId, clientId}, {apiClient, cryptoClient});
+
+      expect(cryptoClient.sessionFromPrekey).toHaveBeenCalledWith(sessionId, expect.any(Object));
     });
   });
 
   describe('initSessions', () => {
     it('creates new sessions only for sessions that are missing', async () => {
-      const {apiClient, coreCrypto} = (await buildProteusService())[1];
-
       const existingUserClients: UserClients = {
         'existing-user1': ['client1'],
         'existing-user2': ['client1', 'client2'],
@@ -128,32 +160,18 @@ describe('SessionHandler', () => {
 
       jest.spyOn(apiClient.api.user, 'postQualifiedMultiPreKeyBundles').mockResolvedValue({});
       jest.spyOn(apiClient.api.user, 'postMultiPreKeyBundles').mockResolvedValue({
-        'missing-user1': {
-          client1: {
-            id: 1,
-            key: 'pQABARn//wKhAFggJ1Fbpg5l6wnzKOJE+vXpRnkqUYhIvVnR5lNXEbO2o/0DoQChAFggHxZvgvtDktY/vqBcpjjo6rQnXvcNQhfwmy8AJQJKlD0E9g==',
-          },
-        },
-        'missing-user2': {
-          client1: {
-            id: 1,
-            key: 'pQABARn//wKhAFggJ1Fbpg5l6wnzKOJE+vXpRnkqUYhIvVnR5lNXEbO2o/0DoQChAFggHxZvgvtDktY/vqBcpjjo6rQnXvcNQhfwmy8AJQJKlD0E9g==',
-          },
-          client2: {
-            id: 1,
-            key: 'pQABARn//wKhAFggJ1Fbpg5l6wnzKOJE+vXpRnkqUYhIvVnR5lNXEbO2o/0DoQChAFggHxZvgvtDktY/vqBcpjjo6rQnXvcNQhfwmy8AJQJKlD0E9g==',
-          },
-        },
+        ...generatePrekeys({id: 'missing-user1', domain: ''}, ['client1']),
+        ...generatePrekeys({id: 'missing-user2', domain: ''}, ['client1', 'client2']),
       });
       jest
-        .spyOn(coreCrypto, 'proteusSessionExists')
+        .spyOn(cryptoClient, 'sessionExists')
         .mockImplementation(sessionId => Promise.resolve(sessionId.includes('missing') as any));
 
-      const sessionFromPrekeySpy = jest.spyOn(coreCrypto, 'proteusSessionFromPrekey');
+      const sessionFromPrekeySpy = jest.spyOn(cryptoClient, 'sessionFromPrekey');
       const sessions = await initSessions({
         recipients: {...existingUserClients, ...missingUserClients},
         apiClient,
-        cryptoClient: new CoreCryptoWrapper(coreCrypto, {} as any, {} as any),
+        cryptoClient,
       });
 
       expect(sessionFromPrekeySpy).toHaveBeenCalledTimes(3);
