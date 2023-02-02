@@ -208,6 +208,11 @@ export class CallingViewModel {
     };
 
     const updateEpochInfo = async (conversationId: QualifiedId) => {
+      const conversation = this.getConversationById(conversationId);
+      if (!conversation?.isUsingMLSProtocol) {
+        return;
+      }
+
       const subconversation = await this.mlsService.getConferenceSubconversation(conversationId);
 
       //we don't want to react to avs callbacks when conversation was not yet established
