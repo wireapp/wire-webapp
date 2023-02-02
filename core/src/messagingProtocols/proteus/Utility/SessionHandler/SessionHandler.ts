@@ -61,26 +61,6 @@ const parseSessionId = (sessionId: string): SessionId => {
   return match.groups;
 };
 
-interface CreateSessionParams {
-  cryptoClient: CryptoClient;
-  apiClient: APIClient;
-  sessionId: string;
-  initialPrekey?: PreKey;
-}
-const createSession = async ({
-  sessionId,
-  initialPrekey,
-  cryptoClient,
-  apiClient,
-}: CreateSessionParams): Promise<void> => {
-  const {userId, clientId, domain} = parseSessionId(sessionId);
-  const prekey =
-    initialPrekey ?? (await apiClient.api.user.getClientPreKey({id: userId, domain: domain ?? ''}, clientId)).prekey;
-  const prekeyBuffer = Decoder.fromBase64(prekey.key).asBytes;
-  await cryptoClient.sessionFromPrekey(sessionId, prekeyBuffer);
-  await cryptoClient.saveSession(sessionId);
-};
-
 interface CreateSessionsBase {
   apiClient: APIClient;
   cryptoClient: CryptoClient;
@@ -159,15 +139,22 @@ const initSession = async (
 ): Promise<string> => {
   const sessionId = constructSessionId({userId, clientId, useQualifiedIds: !!userId.domain});
   const sessionExists = await cryptoClient.sessionExists(sessionId);
-  if (!sessionExists) {
-    await createSession({
-      sessionId,
-      initialPrekey,
-      apiClient: apiClient,
-      cryptoClient,
-    });
+  if (sessionExists) {
+    return sessionId;
   }
-  return sessionId;
+  if (initialPrekey) {
+    const prekeyBuffer = Decoder.fromBase64(initialPrekey.key).asBytes;
+    await cryptoClient.sessionFromPrekey(sessionId, prekeyBuffer);
+    await cryptoClient.saveSession(sessionId);
+    return sessionId;
+  }
+  const sessions = await initSessions({
+    recipients: {[userId.id]: [clientId]},
+    domain: userId.domain,
+    apiClient,
+    cryptoClient,
+  });
+  return sessions[0];
 };
 
 /**

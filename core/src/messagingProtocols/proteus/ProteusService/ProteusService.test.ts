@@ -25,7 +25,6 @@ import {ConversationProtocol, QualifiedUserClients, UserClients} from '@wireapp/
 import {MessageTargetMode} from '../../../conversation';
 import {buildTextMessage} from '../../../conversation/message/MessageBuilder';
 import {SendProteusMessageParams} from './ProteusService.types';
-import {QualifiedUserPreKeyBundleMap, UserPreKeyBundleMap} from '@wireapp/api-client/lib/user';
 import {buildProteusService} from './ProteusService.mocks';
 import {constructSessionId} from '../Utility/SessionHandler';
 import {NotificationSource} from '../../../notification';
@@ -52,7 +51,7 @@ jest.mock('../Utility/Recipients', () => ({
 const MockedRecipients = Recipients as jest.Mocked<typeof Recipients>;
 
 const prepareDataForEncryption = async (useQualifiedIds: boolean = true) => {
-  const [proteusService, {coreCrypto, apiClient}] = await buildProteusService(useQualifiedIds);
+  const [proteusService, {cryptoClient, apiClient}] = await buildProteusService(useQualifiedIds);
 
   const domain = 'staging.zinfra.io';
   //user 1
@@ -77,7 +76,7 @@ const prepareDataForEncryption = async (useQualifiedIds: boolean = true) => {
   //user 2
   const secondUserId = 'cd0c88f1-49a5-4ar2-889a-62885af37069';
   //user 2 client
-  const thirdClientId = 'be67218b77d02d69';
+  const thirdClientId = 'ce67218b77d02d69';
   //user 2 sessions
   const secondClientSessionId = constructSessionId({
     userId: secondUserId,
@@ -100,7 +99,7 @@ const prepareDataForEncryption = async (useQualifiedIds: boolean = true) => {
   };
 
   return {
-    services: {proteusService, apiClient, coreCryptoClient: coreCrypto},
+    services: {proteusService, apiClient, cryptoClient},
     data: {
       firstUser: {
         id: firstUserId,
@@ -124,35 +123,41 @@ const prepareDataForEncryption = async (useQualifiedIds: boolean = true) => {
 describe('ProteusService', () => {
   describe('getRemoteFingerprint', () => {
     it('create a session if session does not exists', async () => {
-      const [proteusService, {apiClient, coreCrypto}] = await buildProteusService();
+      const [proteusService, {apiClient, cryptoClient}] = await buildProteusService();
       const expectedFingerprint = 'fingerprint-client1';
-
-      const getPrekeyMock = jest.spyOn(apiClient.api.user, 'getClientPreKey').mockResolvedValue({
-        client: 'client1',
-        prekey: {
-          id: 123,
-          key: 'pQABARhIAqEAWCCaJpFa9c626ORmjj1aV6OnOYgmTjfoiE3ynOfNfGAOmgOhAKEAWCD60VMzRrLfO+1GSjgyhnVp2N7L58DM+eeJhZJi1tBLfQT2',
-        },
-      });
-      jest.spyOn(coreCrypto, 'proteusFingerprintRemote').mockResolvedValue(expectedFingerprint);
-      jest.spyOn(coreCrypto as any, 'proteusSessionExists').mockResolvedValue(false);
 
       const userId = {id: 'user1', domain: 'domain.com'};
       const clientId = 'client1';
 
+      jest.spyOn(apiClient.api.user, 'postQualifiedMultiPreKeyBundles').mockResolvedValue({
+        [userId.domain]: {
+          [userId.id]: {
+            [clientId]: {
+              id: 123,
+              key: 'pQABARhIAqEAWCCaJpFa9c626ORmjj1aV6OnOYgmTjfoiE3ynOfNfGAOmgOhAKEAWCD60VMzRrLfO+1GSjgyhnVp2N7L58DM+eeJhZJi1tBLfQT2',
+            },
+          },
+        },
+      });
+      jest.spyOn(cryptoClient, 'getRemoteFingerprint').mockResolvedValue(expectedFingerprint);
+      jest.spyOn(cryptoClient, 'sessionFromPrekey').mockResolvedValue(undefined);
+      jest.spyOn(cryptoClient, 'saveSession').mockResolvedValue(undefined);
+      jest.spyOn(cryptoClient, 'sessionExists').mockResolvedValue(false);
+
       const result = await proteusService.getRemoteFingerprint(userId, clientId);
 
-      expect(getPrekeyMock).toHaveBeenCalledWith(userId, clientId);
       expect(result).toBe(expectedFingerprint);
     });
 
     it('create a session from given prekey if session does not exists', async () => {
-      const [proteusService, {apiClient, coreCrypto}] = await buildProteusService();
+      const [proteusService, {apiClient, cryptoClient}] = await buildProteusService();
       const expectedFingerprint = 'fingerprint-client1';
 
       const getPrekeyMock = jest.spyOn(apiClient.api.user, 'getClientPreKey');
-      jest.spyOn(coreCrypto, 'proteusFingerprintRemote').mockResolvedValue(expectedFingerprint);
-      jest.spyOn(coreCrypto as any, 'proteusSessionExists').mockResolvedValue(false);
+      jest.spyOn(cryptoClient, 'getRemoteFingerprint').mockResolvedValue(expectedFingerprint);
+      jest.spyOn(cryptoClient, 'sessionFromPrekey').mockResolvedValue(undefined);
+      jest.spyOn(cryptoClient, 'saveSession').mockResolvedValue(undefined);
+      jest.spyOn(cryptoClient, 'sessionExists').mockResolvedValue(false);
 
       const userId = {id: 'user1', domain: 'domain.com'};
       const clientId = 'client1';
@@ -167,13 +172,13 @@ describe('ProteusService', () => {
     });
 
     it('returns the fingerprint from existing session', async () => {
-      const [proteusService, {apiClient, coreCrypto}] = await buildProteusService();
+      const [proteusService, {apiClient, cryptoClient}] = await buildProteusService();
       const expectedFingerprint = 'fingerprint-client1';
 
       const getPrekeyMock = jest.spyOn(apiClient.api.user, 'getClientPreKey');
-      const sessionFromPrekeyMock = jest.spyOn(coreCrypto, 'proteusSessionFromPrekey');
-      jest.spyOn(coreCrypto, 'proteusFingerprintRemote').mockResolvedValue(expectedFingerprint);
-      jest.spyOn(coreCrypto as any, 'proteusSessionExists').mockResolvedValue(true);
+      const sessionFromPrekeyMock = jest.spyOn(cryptoClient, 'sessionFromPrekey');
+      jest.spyOn(cryptoClient, 'getRemoteFingerprint').mockResolvedValue(expectedFingerprint);
+      jest.spyOn(cryptoClient, 'sessionExists').mockResolvedValue(true);
 
       const userId = {id: 'user1', domain: 'domain.com'};
       const clientId = 'client1';
@@ -196,24 +201,31 @@ describe('ProteusService', () => {
       source: NotificationSource.WEBSOCKET,
     } as any;
     const decryptedMessage = {} as any;
+
     it('decrypts incoming proteus encrypted events when session already exists', async () => {
-      const [proteusService, {coreCrypto}] = await buildProteusService();
-      jest.spyOn(coreCrypto, 'proteusSessionExists').mockResolvedValue(true as any);
-      const createSessionSpy = jest.spyOn(coreCrypto, 'proteusSessionFromMessage');
+      const [proteusService, {cryptoClient}] = await buildProteusService();
+      jest.spyOn(cryptoClient, 'sessionExists').mockResolvedValue(true);
+      const createSessionSpy = jest.spyOn(cryptoClient, 'sessionFromMessage');
+      jest.spyOn(cryptoClient, 'decrypt').mockResolvedValue(new Uint8Array());
       jest.spyOn(GenericMessage, 'decode').mockReturnValue(decryptedMessage);
+
       const result = await proteusService.handleEvent(eventPayload);
+
       expect(result).toBeDefined();
       expect(createSessionSpy).not.toHaveBeenCalled();
       expect(result?.decryptedData).toBe(decryptedMessage);
     });
 
     it('decrypts incoming proteus encrypted and creates session if not already existing', async () => {
-      const [proteusService, {coreCrypto}] = await buildProteusService();
-      jest.spyOn(coreCrypto, 'proteusSessionExists').mockResolvedValue(false as any);
-      const createSessionSpy = jest.spyOn(coreCrypto, 'proteusSessionFromMessage');
-      const decryptSpy = jest.spyOn(coreCrypto, 'proteusDecrypt');
+      const [proteusService, {cryptoClient}] = await buildProteusService();
+      jest.spyOn(cryptoClient, 'sessionExists').mockResolvedValue(false);
+      jest.spyOn(cryptoClient, 'saveSession').mockResolvedValue(undefined);
+      const createSessionSpy = jest.spyOn(cryptoClient, 'sessionFromMessage').mockResolvedValue(new Uint8Array());
+      const decryptSpy = jest.spyOn(cryptoClient, 'decrypt');
       jest.spyOn(GenericMessage, 'decode').mockReturnValue(decryptedMessage);
+
       const result = await proteusService.handleEvent(eventPayload);
+
       expect(result).toBeDefined();
       expect(createSessionSpy).toHaveBeenCalled();
       expect(decryptSpy).not.toHaveBeenCalled();
@@ -225,18 +237,11 @@ describe('ProteusService', () => {
     it('returns encrypted payload', async () => {
       const {
         services,
-        data: {firstUser, validPreKey, encryptedMessageBuffer, messageBuffer},
+        data: {firstUser, encryptedMessageBuffer, messageBuffer},
       } = await prepareDataForEncryption(false);
 
       const userClients: UserClients = {
         [firstUser.id]: [firstUser.clients.first, firstUser.clients.second],
-      };
-
-      const preKeyBundleMap: UserPreKeyBundleMap = {
-        [firstUser.id]: {
-          [firstUser.clients.first]: validPreKey,
-          [firstUser.clients.second]: validPreKey,
-        },
       };
 
       const encryptedPayload = new Map([
@@ -244,17 +249,12 @@ describe('ProteusService', () => {
         [firstUser.sessions.second, encryptedMessageBuffer],
       ]);
 
-      jest
-        .spyOn(services.apiClient.api.user, 'postMultiPreKeyBundles')
-        .mockImplementationOnce(() => Promise.resolve(preKeyBundleMap));
-
-      jest
-        .spyOn(services.coreCryptoClient, 'proteusEncryptBatched')
-        .mockImplementationOnce(() => Promise.resolve(encryptedPayload));
+      jest.spyOn(services.cryptoClient, 'sessionExists').mockResolvedValue(true);
+      jest.spyOn(services.cryptoClient, 'encrypt').mockImplementationOnce(() => Promise.resolve(encryptedPayload));
 
       const encrypted = await services.proteusService.encrypt(messageBuffer, userClients);
 
-      expect(services.coreCryptoClient.proteusEncryptBatched).toHaveBeenCalledWith(
+      expect(services.cryptoClient.encrypt).toHaveBeenCalledWith(
         [firstUser.sessions.first, firstUser.sessions.second],
         messageBuffer,
       );
@@ -270,22 +270,12 @@ describe('ProteusService', () => {
     it('returns encrypted payload for multiple users', async () => {
       const {
         services,
-        data: {firstUser, secondUser, validPreKey, encryptedMessageBuffer, messageBuffer},
+        data: {firstUser, secondUser, encryptedMessageBuffer, messageBuffer},
       } = await prepareDataForEncryption(false);
 
       const userClients: UserClients = {
         [firstUser.id]: [firstUser.clients.first, firstUser.clients.second],
         [secondUser.id]: [secondUser.clients.first],
-      };
-
-      const preKeyBundleMap: UserPreKeyBundleMap = {
-        [firstUser.id]: {
-          [firstUser.clients.first]: validPreKey,
-          [firstUser.clients.second]: null,
-        },
-        [secondUser.id]: {
-          [secondUser.clients.first]: validPreKey,
-        },
       };
 
       const encryptedPayload = new Map([
@@ -294,17 +284,13 @@ describe('ProteusService', () => {
         [secondUser.sessions.first, encryptedMessageBuffer],
       ]);
 
-      jest
-        .spyOn(services.apiClient.api.user, 'postMultiPreKeyBundles')
-        .mockImplementationOnce(() => Promise.resolve(preKeyBundleMap));
-      jest
-        .spyOn(services.coreCryptoClient, 'proteusEncryptBatched')
-        .mockImplementationOnce(() => Promise.resolve(encryptedPayload));
+      jest.spyOn(services.cryptoClient, 'sessionExists').mockResolvedValue(true);
+      jest.spyOn(services.cryptoClient, 'encrypt').mockResolvedValueOnce(encryptedPayload);
 
       const encrypted = await services.proteusService.encrypt(messageBuffer, userClients);
 
-      expect(services.coreCryptoClient.proteusEncryptBatched).toHaveBeenCalledWith(
-        [firstUser.sessions.first, secondUser.sessions.first],
+      expect(services.cryptoClient.encrypt).toHaveBeenCalledWith(
+        [firstUser.sessions.first, firstUser.sessions.second, secondUser.sessions.first],
         messageBuffer,
       );
 
@@ -324,7 +310,7 @@ describe('ProteusService', () => {
     it('returns encrypted payload', async () => {
       const {
         services,
-        data: {firstUser, validPreKey, encryptedMessageBuffer, messageBuffer, domain},
+        data: {firstUser, encryptedMessageBuffer, messageBuffer, domain},
       } = await prepareDataForEncryption();
 
       const userClients: QualifiedUserClients = {
@@ -333,33 +319,19 @@ describe('ProteusService', () => {
         },
       };
 
-      const preKeyBundleMap: QualifiedUserPreKeyBundleMap = {
-        [domain]: {
-          [firstUser.id]: {
-            [firstUser.clients.first]: validPreKey,
-            [firstUser.clients.second]: validPreKey,
-          },
-        },
-      };
-
       const encryptedPayload = new Map([
         [firstUser.sessions.first, encryptedMessageBuffer],
         [firstUser.sessions.second, encryptedMessageBuffer],
       ]);
 
-      jest
-        .spyOn(services.apiClient.api.user, 'postQualifiedMultiPreKeyBundles')
-        .mockImplementationOnce(() => Promise.resolve(preKeyBundleMap));
-
-      jest
-        .spyOn(services.coreCryptoClient, 'proteusEncryptBatched')
-        .mockImplementationOnce(() => Promise.resolve(encryptedPayload));
+      jest.spyOn(services.cryptoClient, 'sessionExists').mockResolvedValue(true);
+      jest.spyOn(services.cryptoClient, 'encrypt').mockResolvedValueOnce(encryptedPayload);
 
       const encrypted = await services.proteusService.encryptQualified(messageBuffer, userClients);
 
       // console.log({encrypted, missing});
 
-      expect(services.coreCryptoClient.proteusEncryptBatched).toHaveBeenCalledWith(
+      expect(services.cryptoClient.encrypt).toHaveBeenCalledWith(
         [firstUser.sessions.first, firstUser.sessions.second],
         messageBuffer,
       );
@@ -377,7 +349,7 @@ describe('ProteusService', () => {
     it('returns missing clients and encrypted payload for multiple users', async () => {
       const {
         services,
-        data: {firstUser, secondUser, validPreKey, encryptedMessageBuffer, messageBuffer, domain},
+        data: {firstUser, secondUser, encryptedMessageBuffer, messageBuffer, domain},
       } = await prepareDataForEncryption();
 
       const userClients: QualifiedUserClients = {
@@ -387,34 +359,19 @@ describe('ProteusService', () => {
         },
       };
 
-      const preKeyBundleMap: QualifiedUserPreKeyBundleMap = {
-        [domain]: {
-          [firstUser.id]: {
-            [firstUser.clients.first]: validPreKey,
-            [firstUser.clients.second]: null,
-          },
-          [secondUser.id]: {
-            [secondUser.clients.first]: validPreKey,
-          },
-        },
-      };
-
       const encryptedPayload = new Map([
         [firstUser.sessions.first, encryptedMessageBuffer],
+        [firstUser.sessions.second, encryptedMessageBuffer],
         [secondUser.sessions.first, encryptedMessageBuffer],
       ]);
 
-      jest
-        .spyOn(services.apiClient.api.user, 'postQualifiedMultiPreKeyBundles')
-        .mockImplementationOnce(() => Promise.resolve(preKeyBundleMap));
-      jest
-        .spyOn(services.coreCryptoClient, 'proteusEncryptBatched')
-        .mockImplementationOnce(() => Promise.resolve(encryptedPayload));
+      jest.spyOn(services.cryptoClient, 'sessionExists').mockResolvedValue(true);
+      jest.spyOn(services.cryptoClient, 'encrypt').mockResolvedValueOnce(encryptedPayload);
 
       const encrypted = await services.proteusService.encryptQualified(messageBuffer, userClients);
 
-      expect(services.coreCryptoClient.proteusEncryptBatched).toHaveBeenCalledWith(
-        [firstUser.sessions.first, secondUser.sessions.first],
+      expect(services.cryptoClient.encrypt).toHaveBeenCalledWith(
+        [firstUser.sessions.first, firstUser.sessions.second, secondUser.sessions.first],
         messageBuffer,
       );
 
@@ -422,6 +379,7 @@ describe('ProteusService', () => {
         [domain]: {
           [firstUser.id]: {
             [firstUser.clients.first]: encryptedMessageBuffer,
+            [firstUser.clients.second]: encryptedMessageBuffer,
           },
           [secondUser.id]: {
             [secondUser.clients.first]: encryptedMessageBuffer,
