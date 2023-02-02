@@ -115,16 +115,17 @@ const buildMessageService = async () => {
 
 describe('MessageService', () => {
   describe('sendFederatedMessage', () => {
-    it('sends a message', async () => {
+    it('sends a message and forwards backend response', async () => {
       const [messageService, {apiClient}] = await buildMessageService();
 
       jest.spyOn(apiClient.api.conversation, 'postOTRMessageV2').mockResolvedValue(baseMessageSendingStatus);
       const recipients = generateQualifiedRecipients([user1, user2]);
 
-      await messageService.sendFederatedMessage('senderclientid', recipients, new Uint8Array(), {
+      const result = await messageService.sendFederatedMessage('senderclientid', recipients, new Uint8Array(), {
         conversationId: {id: 'convid', domain: ''},
       });
       expect(apiClient.api.conversation.postOTRMessageV2).toHaveBeenCalled();
+      expect(result).toEqual(baseMessageSendingStatus);
     });
 
     describe('client mismatch', () => {
