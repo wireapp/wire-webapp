@@ -976,6 +976,8 @@
   "preferencesAccountAppLockCheckbox": "Lock with passcode",
   "preferencesAccountAppLockDetail": "Lock Wire after {{locktime}} in the background. Unlock with Touch ID or enter your passcode.",
   "preferencesAccountAvailabilityUnset": "Set a status",
+  "preferencesAccountSelectedLabel": "Selected",
+  "preferencesAccountUpdateLabel": "Change your status to",
   "preferencesAccountCopyLink": "Copy Profile Link",
   "preferencesAccountCreateTeam": "Create a team",
   "preferencesAccountData": "Data usage permissions",

@@ -124,6 +124,11 @@ const AvailabilityButtons: React.FC<AvailabilityInputProps> = ({availability}) =
               key={item.availability}
               type="button"
               onClick={() => item.click?.()}
+              aria-label={
+                isActive
+                  ? `${t('preferencesAccountSelectedLabel')}, ${item.label}`
+                  : `${t('preferencesAccountUpdateLabel')} ${item.label}`
+              }
             >
               {item.availability !== undefined && icons[item.availability]}
               {item.label}
