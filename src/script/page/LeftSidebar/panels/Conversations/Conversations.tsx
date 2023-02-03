@@ -32,7 +32,6 @@ import {Icon} from 'Components/Icon';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {ListState} from 'src/script/page/useAppState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {isTabKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {ConversationsList} from './ConversationsList';
@@ -179,8 +178,6 @@ const Conversations: React.FC<ConversationsProps> = ({
             className="left-list-header-availability"
             css={{...(showLegalHold && {gridColumn: '2/3'})}}
             onClick={event => AvailabilityContextMenu.show(event.nativeEvent, 'left-list-availability-menu')}
-            // on blur conversation list should get the focus
-            // onBlur={() => focusConversationList(true)}
           >
             <AvailabilityState
               className="availability-state"
@@ -205,9 +202,6 @@ const Conversations: React.FC<ConversationsProps> = ({
           data-uie-name="status-name"
           role="presentation"
           tabIndex={TabIndex.FOCUSABLE}
-          // personal user won't see availability status menu, on blur of the userName
-          // conversation list should get the focus
-          // onBlur={() => focusConversationList(true)}
         >
           {userName}
         </span>
@@ -228,12 +222,6 @@ const Conversations: React.FC<ConversationsProps> = ({
           type="button"
           className="conversations-footer-btn"
           onClick={() => switchList(ListState.START_UI)}
-          onKeyDown={event => {
-            //shift+tab from contacts tab should focus on the first conversation
-            if (event.shiftKey && isTabKey(event)) {
-              // focusConversationList(true);
-            }
-          }}
           title={t('tooltipConversationsStart', Shortcut.getShortcutTooltip(ShortcutType.START))}
           data-uie-name="go-people"
         >
