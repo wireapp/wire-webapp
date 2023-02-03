@@ -38,7 +38,6 @@ const mockCallingRepository = {
   leaveCall: jest.fn(),
   onIncomingCall: jest.fn(),
   onRequestClientsCallback: jest.fn(),
-  onRequestNewEpochCallback: jest.fn(),
   onLeaveCall: jest.fn(),
 } as unknown as CallingRepository;
 

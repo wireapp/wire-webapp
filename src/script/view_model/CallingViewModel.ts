@@ -239,9 +239,6 @@ export class CallingViewModel {
     //update epoch info when AVS requests the list of clients
     this.callingRepository.onRequestClientsCallback(updateEpochInfo);
 
-    //update epoch info when AVS requests new epoch
-    this.callingRepository.onRequestNewEpochCallback(updateEpochInfo);
-
     //once we leave a call, we unsubscribe from all the events we've subscribed to during this call
     this.callingRepository.onLeaveCall(callingSubscriptions.removeCall);
 
