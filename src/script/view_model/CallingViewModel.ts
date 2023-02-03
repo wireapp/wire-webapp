@@ -259,9 +259,7 @@ export class CallingViewModel {
         return;
       }
 
-      const call = this.activeCalls().find(call => call.conversationId === conversationId);
-      const isSelfClient = member.clientid === call?.selfClientId;
-
+      const isSelfClient = member.clientid === this.core.clientId;
       if (isSelfClient) {
         return; //TODO: remove self user with backend /self endpoint
       }
