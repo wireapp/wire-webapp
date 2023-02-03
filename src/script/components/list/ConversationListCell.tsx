@@ -116,6 +116,7 @@ const ConversationListCell = ({
       onClick(event);
     } else if (isKey(event, KEY.ARROW_RIGHT)) {
       setContextMenuFocus(true);
+      contextMenuRef.current?.focus();
     } else {
       setContextMenuFocus(false);
     }
@@ -148,13 +149,6 @@ const ConversationListCell = ({
       conversationRef.current?.focus();
     }
   }, [isFocused]);
-
-  useEffect(() => {
-    // Move element into view when it is focused
-    if (isFocused && focusContextMenu) {
-      contextMenuRef.current?.focus();
-    }
-  }, [isFocused, focusContextMenu]);
 
   return (
     <li onContextMenu={openContextMenu}>
