@@ -86,6 +86,7 @@ interface RightSidebarProps {
   teamState: TeamState;
   userState: UserState;
   isFederated: boolean;
+  lastViewedMessageDetailsEntity: Message | null;
 }
 
 const RightSidebar: FC<RightSidebarProps> = ({
@@ -95,6 +96,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
   teamState,
   userState,
   isFederated,
+  lastViewedMessageDetailsEntity,
 }) => {
   const {
     conversation: conversationRepository,
@@ -105,7 +107,6 @@ const RightSidebar: FC<RightSidebarProps> = ({
   } = repositories;
   const {conversationRoleRepository} = conversationRepository;
   const conversationState = container.resolve(ConversationState);
-
   const {activeConversation} = useKoSubscribableChildren(conversationState, ['activeConversation']);
 
   const [isAddMode, setIsAddMode] = useState<boolean>(false);
@@ -134,6 +135,12 @@ const RightSidebar: FC<RightSidebarProps> = ({
     const previousHistory = rightSidebar.history.slice(0, -1);
     const hasPreviousHistory = !!previousHistory.length;
     setAnimatePanelToLeft(false);
+
+    if (hasPreviousHistory && previousHistory.length === 1 && previousHistory[0] === PanelState.MESSAGE_DETAILS) {
+      rightSidebar.goBack(lastViewedMessageDetailsEntity);
+
+      return;
+    }
 
     if (hasPreviousHistory) {
       rightSidebar.goBack(entity);
@@ -301,6 +308,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
               showLikes={rightSidebar.showLikes}
               userRepository={userRepository}
               onClose={closePanel}
+              togglePanel={togglePanel}
             />
           )}
 

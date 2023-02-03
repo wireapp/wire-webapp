@@ -100,31 +100,29 @@ const StartUI: React.FC<StartUIProps> = ({
 
   const peopleSearchResults = useRef<SearchResultsData | undefined>(undefined);
 
-  const openFirstConversation = (): void => {
+  const openFirstConversation = async (): Promise<void> => {
     if (peopleSearchResults.current) {
       const {contacts, groups} = peopleSearchResults.current;
       if (contacts.length > 0) {
-        openContact(contacts[0]);
-        return;
+        return openContact(contacts[0]);
       }
       if (groups.length > 0) {
-        openConversation(groups[0]);
+        return openConversation(groups[0]);
       }
     }
   };
 
   const openContact = async (user: User) => {
     const conversationEntity = await actions.getOrCreate1to1Conversation(user);
-    actions.open1to1Conversation(conversationEntity);
+    return actions.open1to1Conversation(conversationEntity);
   };
 
   const openOther = (user: User) => {
     if (user.isOutgoingRequest()) {
-      openContact(user);
-      return;
+      return openContact(user);
     }
 
-    showUserModal({domain: user.domain, id: user.id});
+    return showUserModal({domain: user.domain, id: user.id});
   };
 
   const openService = (service: ServiceEntity) => {
@@ -137,8 +135,9 @@ const StartUI: React.FC<StartUIProps> = ({
 
   const openInviteModal = () => showInviteModal({userState});
 
-  const openConversation = (conversation: Conversation): Promise<void> => {
-    return actions.openGroupConversation(conversation).then(close);
+  const openConversation = async (conversation: Conversation): Promise<void> => {
+    await actions.openGroupConversation(conversation);
+    onClose();
   };
 
   const before = (
@@ -146,7 +145,7 @@ const StartUI: React.FC<StartUIProps> = ({
       <div className="start-ui-header-user-input" data-uie-name="enter-search">
         <SearchInput
           input={searchQuery}
-          placeholder={t('searchPlaceholder')}
+          placeholder={t('searchPeoplePlaceholder')}
           selectedUsers={[]}
           setInput={setSearchQuery}
           enter={openFirstConversation}

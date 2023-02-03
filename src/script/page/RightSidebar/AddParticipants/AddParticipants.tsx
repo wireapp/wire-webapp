@@ -240,6 +240,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
               searchRepository={searchRepository}
               teamRepository={teamRepository}
               conversationRepository={conversationRepository}
+              isSelectable
             />
           )}
 

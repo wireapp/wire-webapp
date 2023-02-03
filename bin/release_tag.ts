@@ -123,14 +123,7 @@ const ask = (questionToAsk: string): Promise<string> => {
   if (answer === 'yes') {
     logger.info(`Creating tag "${tagName}" ...`);
     if (!isDryRun) {
-      if (stage === DeploymentStage.PRODUCTION) {
-        exec('npm version minor --no-git-tag-version');
-        exec('git commit -am "chore: Bump application version"');
-      }
       exec(`git tag ${tagName} ${commitId}`);
-    }
-
-    if (!isDryRun) {
       logger.info(`Pushing "${tagName}" to "${origin}" ...`);
       exec(`git push origin && git push ${origin} ${tagName}`);
     }

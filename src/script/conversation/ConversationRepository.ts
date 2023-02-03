@@ -64,7 +64,7 @@ import {
   startsWith,
 } from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {base64ToArray, createRandomUuid, noop} from 'Util/util';
+import {createRandomUuid, noop} from 'Util/util';
 
 import {ACCESS_STATE} from './AccessState';
 import {extractClientDiff} from './ClientMismatchUtil';
@@ -2515,8 +2515,7 @@ export class ConversationRepository {
       if (conversationEntity.protocol === ConversationProtocol.MLS) {
         const {groupId} = conversationEntity;
         if (groupId) {
-          const groupIdDecodedFromBase64 = base64ToArray(groupId);
-          await this.core.service!.conversation.wipeMLSConversation(groupIdDecodedFromBase64);
+          await this.core.service!.conversation.wipeMLSConversation(groupId);
         }
       }
     }

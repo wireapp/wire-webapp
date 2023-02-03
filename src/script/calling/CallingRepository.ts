@@ -67,6 +67,7 @@ import {Config} from '../Config';
 import {ConversationState} from '../conversation/ConversationState';
 import {CallingEvent, EventBuilder} from '../conversation/EventBuilder';
 import {CONSENT_TYPE, MessageRepository, MessageSendingOptions} from '../conversation/MessageRepository';
+import {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
 import {NoAudioInputError} from '../error/NoAudioInputError';
 import {EventRepository} from '../event/EventRepository';
@@ -117,12 +118,23 @@ enum CALL_DIRECTION {
   OUTGOING = 'outgoing',
 }
 
+export interface SubconversationEpochInfoMember {
+  userid: string;
+  clientid: string;
+  in_subconv: boolean;
+}
+
+type SubconversationData = {epoch: number; secretKey: string; keyLength: number};
+
 export class CallingRepository {
   private readonly acceptVersionWarning: (conversationId: QualifiedId) => void;
   private readonly callLog: string[];
   private readonly logger: Logger;
   private avsVersion: number = 0;
   private incomingCallCallback: (call: Call) => void;
+  private requestClientsCallback: (conversationId: QualifiedId) => void;
+  private requestNewEpochCallback: (conversationId: QualifiedId) => void;
+  private leaveCallCallback: (conversationId: QualifiedId) => void;
   private isReady: boolean = false;
   /** will cache the query to media stream (in order to avoid asking the system for streams multiple times when we have multiple peers) */
   private mediaStreamQuery?: Promise<MediaStream>;
@@ -160,6 +172,9 @@ export class CallingRepository {
   ) {
     this.logger = getLogger('CallingRepository');
     this.incomingCallCallback = () => {};
+    this.requestClientsCallback = () => {};
+    this.requestNewEpochCallback = () => {};
+    this.leaveCallCallback = () => {};
     this.callLog = [];
 
     /** {<userId>: <isVerified>} */
@@ -288,6 +303,7 @@ export class CallingRepository {
     wCall.setStateHandler(wUser, this.updateCallState);
     wCall.setParticipantChangedHandler(wUser, this.handleCallParticipantChanges);
     wCall.setReqClientsHandler(wUser, this.requestClients);
+    wCall.setReqNewEpochHandler(wUser, this.requestNewEpoch);
     wCall.setActiveSpeakerHandler(wUser, this.updateActiveSpeakers);
 
     return wUser;
@@ -330,6 +346,7 @@ export class CallingRepository {
         data.map(clientid => ({clientid, userid: this.serializeQualifiedId(userId)})),
       ),
     );
+
     this.wCall?.setClientsForConv(
       this.wUser,
       this.serializeQualifiedId(call.conversationId),
@@ -399,6 +416,18 @@ export class CallingRepository {
 
   onIncomingCall(callback: (call: Call) => void): void {
     this.incomingCallCallback = callback;
+  }
+
+  onLeaveCall(callback: (conversationId: QualifiedId) => void): void {
+    this.leaveCallCallback = callback;
+  }
+
+  onRequestClientsCallback(callback: (conversationId: QualifiedId) => void): void {
+    this.requestClientsCallback = callback;
+  }
+
+  onRequestNewEpochCallback(callback: (conversationId: QualifiedId) => void): void {
+    this.requestNewEpochCallback = callback;
   }
 
   findCall(conversationId: QualifiedId): Call | undefined {
@@ -643,9 +672,7 @@ export class CallingRepository {
       this.serializeQualifiedId(conversationId),
       this.serializeQualifiedId(userId),
       conversation?.isUsingMLSProtocol ? senderClientId : clientId,
-      /* FIXME uncomment when avs 9 has fixed bug with starting video conversation
       conversation?.isUsingMLSProtocol ? CONV_TYPE.CONFERENCE_MLS : CONV_TYPE.CONFERENCE,
-      */
     );
 
     if (res !== 0) {
@@ -665,20 +692,30 @@ export class CallingRepository {
   //##############################################################################
 
   private readonly toggleState = (withVideo: boolean): void => {
-    const conversationEntity = this.conversationState.activeConversation();
-    if (conversationEntity) {
-      const isActiveCall = this.findCall(conversationEntity.qualifiedId);
-      const isGroupCall = conversationEntity.isGroup() ? CONV_TYPE.GROUP : CONV_TYPE.ONEONONE;
+    const conversation = this.conversationState.activeConversation();
+    if (conversation) {
+      const isActiveCall = this.findCall(conversation.qualifiedId);
       const callType = withVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
       return (
         (isActiveCall
-          ? this.leaveCall(conversationEntity.qualifiedId, LEAVE_CALL_REASON.ELECTRON_TRAY_MENU_MESSAGE)
-          : this.startCall(conversationEntity.qualifiedId, isGroupCall, callType)) && undefined
+          ? this.leaveCall(conversation.qualifiedId, LEAVE_CALL_REASON.ELECTRON_TRAY_MENU_MESSAGE)
+          : this.startCall(conversation, callType)) && undefined
       );
     }
   };
 
-  async startCall(conversationId: QualifiedId, conversationType: CONV_TYPE, callType: CALL_TYPE): Promise<void | Call> {
+  private getConversationType(conversation: Conversation): CONV_TYPE {
+    if (!conversation.isGroup()) {
+      return CONV_TYPE.ONEONONE;
+    }
+
+    if (conversation.isUsingMLSProtocol) {
+      return CONV_TYPE.CONFERENCE_MLS;
+    }
+    return this.supportsConferenceCalling ? CONV_TYPE.CONFERENCE : CONV_TYPE.GROUP;
+  }
+
+  async startCall(conversation: Conversation, callType: CALL_TYPE): Promise<void | Call> {
     if (!this.selfUser || !this.selfClientId) {
       this.logger.warn(
         `Calling repository is not initialized correctly \n ${JSON.stringify({
@@ -689,14 +726,10 @@ export class CallingRepository {
       );
       return;
     }
+    const conversationId = conversation.qualifiedId;
     const convId = this.serializeQualifiedId(conversationId);
     this.logger.log(`Starting a call of type "${callType}" in conversation ID "${convId}"...`);
     try {
-      await this.checkConcurrentJoinedCall(conversationId, CALL_STATE.OUTGOING);
-      conversationType =
-        conversationType === CONV_TYPE.GROUP && this.supportsConferenceCalling
-          ? CONV_TYPE.CONFERENCE
-          : conversationType;
       const rejectedCallInConversation = this.findCall(conversationId);
       if (rejectedCallInConversation) {
         // if there is a rejected call, we can remove it from the store
@@ -704,6 +737,7 @@ export class CallingRepository {
         this.removeCall(rejectedCallInConversation);
       }
       const selfParticipant = new Participant(this.selfUser, this.selfClientId);
+      const conversationType = this.getConversationType(conversation);
       const call = new Call(
         this.selfUser.qualifiedId,
         conversationId,
@@ -813,7 +847,6 @@ export class CallingRepository {
   async answerCall(call: Call, callType?: CALL_TYPE): Promise<void> {
     try {
       callType ??= call.getSelfParticipant().sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;
-      await this.checkConcurrentJoinedCall(call.conversationId, CALL_STATE.INCOMING);
 
       const isVideoCall = callType === CALL_TYPE.VIDEO;
       if (!isVideoCall) {
@@ -845,22 +878,39 @@ export class CallingRepository {
     }
   }
 
+  setEpochInfo(
+    conversationId: QualifiedId,
+    subconversationData: SubconversationData,
+    members: SubconversationEpochInfoMember[],
+  ) {
+    const serializedConversationId = this.serializeQualifiedId(conversationId);
+    const {epoch, secretKey, keyLength} = subconversationData;
+    const clients = {
+      convid: serializedConversationId,
+      clients: members,
+    };
+    return this.wCall?.setEpochInfo(
+      this.wUser,
+      serializedConversationId,
+      epoch,
+      JSON.stringify(clients),
+      secretKey,
+      keyLength,
+    );
+  }
+
   rejectCall(conversationId: QualifiedId): void {
     this.wCall?.reject(this.wUser, this.serializeQualifiedId(conversationId));
   }
 
-  changeCallPage(newPage: number, call: Call): void {
+  changeCallPage(call: Call, newPage: number): void {
     call.currentPage(newPage);
     if (!this.callState.isSpeakersViewActive()) {
-      this.requestCurrentPageVideoStreams();
+      this.requestCurrentPageVideoStreams(call);
     }
   }
 
-  requestCurrentPageVideoStreams(): void {
-    const call = this.callState.joinedCall();
-    if (!call) {
-      return;
-    }
+  requestCurrentPageVideoStreams(call: Call): void {
     const currentPageParticipants = call.pages()[call.currentPage()];
     this.requestVideoStreams(call.conversationId, currentPageParticipants);
   }
@@ -882,6 +932,8 @@ export class CallingRepository {
     const conversationIdStr = this.serializeQualifiedId(conversationId);
     delete this.poorCallQualityUsers[conversationIdStr];
     this.wCall?.end(this.wUser, conversationIdStr);
+
+    this.leaveCallCallback(conversationId);
   };
 
   muteCall(call: Call, shouldMute: boolean, reason?: MuteState): void {
@@ -1077,6 +1129,9 @@ export class CallingRepository {
     targets: string | null,
     _unused: string | null,
     payload: string,
+    _len: number,
+    _trans: number,
+    myClientsOnly: number,
   ): number => {
     const conversationId = this.parseQualifiedId(convId);
     const call = this.findCall(conversationId);
@@ -1096,7 +1151,7 @@ export class CallingRepository {
       };
     }
 
-    this.sendCallingMessage(conversationId, payload, options).catch(error => {
+    this.sendCallingMessage(conversationId, payload, options, myClientsOnly === 1).catch(error => {
       this.logger.warn('Failed to send calling message, aborting call', error);
       this.abortCall(conversationId, LEAVE_CALL_REASON.ABORTED_BECAUSE_FAILED_TO_SEND_CALLING_MESSAGE);
     });
@@ -1107,6 +1162,7 @@ export class CallingRepository {
     conversationId: QualifiedId,
     payload: string | Object,
     options?: MessageSendingOptions,
+    myClientsOnly: boolean = false,
   ): Promise<void> => {
     const conversation = this.conversationState.findConversation(conversationId);
     if (!conversation) {
@@ -1116,22 +1172,16 @@ export class CallingRepository {
     const content = typeof payload === 'string' ? payload : JSON.stringify(payload);
 
     /**
-     * @note If the AVS message type is REJECT, we should ignore the message,
-     * eventually this will be send to the self-conversation
+     * @note If myClientsOnly option is true, the message should be sent via the self-conversation.
      * This message is used to tell your other clients you have answered or
      * rejected a call and to stop ringing.
-     * @todo Remove the restriction when we are able to send MLS messages to a specific user in a call.
      */
-    if (typeof payload === 'string' && conversation.isUsingMLSProtocol) {
-      const parsedPayload = JSON.parse(payload);
-      const messageType = parsedPayload.type as CALL_MESSAGE_TYPE;
-      if (messageType === CALL_MESSAGE_TYPE.REJECT) {
-        return void this.messageRepository.sendSelfCallingMessage(payload, conversation.qualifiedId);
-      }
+    if (typeof payload === 'string' && conversation.isUsingMLSProtocol && myClientsOnly) {
+      return void this.messageRepository.sendSelfCallingMessage(payload, conversation.qualifiedId);
     }
 
     const message = await this.messageRepository.sendCallingMessage(conversation, content, options);
-    if (message.state === MessageSendingState.CANCELLED) {
+    if (message.state === MessageSendingState.CANCELED) {
       // If the user has cancelled message sending because of a degradation warning, we abort the call
       this.abortCall(
         conversationId,
@@ -1436,7 +1486,7 @@ export class CallingRepository {
     }
 
     call.updatePages();
-    this.changeCallPage(call.currentPage(), call);
+    this.changeCallPage(call, call.currentPage());
   }
 
   private readonly handleCallParticipantChanges = (convId: SerializedConversationId, membersJson: string) => {
@@ -1463,7 +1513,14 @@ export class CallingRepository {
       this.logger.warn(`Unable to find a call for the conversation id of ${convId}`);
       return;
     }
-    this.pushClients(call);
+    await this.pushClients(call);
+    const qualifiedConversationId = this.parseQualifiedId(convId);
+    this.requestClientsCallback(qualifiedConversationId);
+  };
+
+  private readonly requestNewEpoch = async (wUser: number, convId: SerializedConversationId) => {
+    const qualifiedConversationId = this.parseQualifiedId(convId);
+    this.requestNewEpochCallback(qualifiedConversationId);
   };
 
   private readonly getCallMediaStream = async (
@@ -1713,64 +1770,6 @@ export class CallingRepository {
 
   fetchConfig(limit?: number): Promise<CallConfigData> {
     return this.apiClient.api.account.getCallConfig(limit);
-  }
-
-  private checkConcurrentJoinedCall(conversationId: QualifiedId, newCallState: CALL_STATE): Promise<void> {
-    const idleCallStates = [CALL_STATE.INCOMING, CALL_STATE.NONE, CALL_STATE.UNKNOWN];
-    const activeCall = this.callState
-      .calls()
-      .find(call => !matchQualifiedIds(call.conversationId, conversationId) && !idleCallStates.includes(call.state()));
-    if (!activeCall) {
-      return Promise.resolve();
-    }
-
-    let actionString: string;
-    let messageString: string;
-    let titleString: string;
-
-    switch (newCallState) {
-      case CALL_STATE.INCOMING: {
-        actionString = t('modalCallSecondIncomingAction');
-        messageString = t('modalCallSecondIncomingMessage');
-        titleString = t('modalCallSecondIncomingHeadline');
-        break;
-      }
-
-      case CALL_STATE.OUTGOING: {
-        actionString = t('modalCallSecondOutgoingAction');
-        messageString = t('modalCallSecondOutgoingMessage');
-        titleString = t('modalCallSecondOutgoingHeadline');
-        break;
-      }
-
-      default: {
-        return Promise.reject(`Tried to join second call in unexpected state '${newCallState}'`);
-      }
-    }
-
-    return new Promise((resolve, reject) => {
-      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-        primaryAction: {
-          action: () => {
-            if (activeCall.state() === CALL_STATE.INCOMING) {
-              this.rejectCall(activeCall.conversationId);
-            } else {
-              this.leaveCall(activeCall.conversationId, LEAVE_CALL_REASON.MANUAL_LEAVE_TO_JOIN_ANOTHER_CALL);
-            }
-            window.setTimeout(resolve, 1000);
-          },
-          text: actionString,
-        },
-        secondaryAction: {
-          action: reject,
-        },
-        text: {
-          message: messageString,
-          title: titleString,
-        },
-      });
-      this.logger.warn(`Tried to join a second call while calling in conversation '${activeCall.conversationId}'.`);
-    });
   }
 
   private showNoAudioInputModal(): void {
