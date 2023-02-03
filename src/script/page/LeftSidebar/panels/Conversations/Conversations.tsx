@@ -43,7 +43,7 @@ import {DefaultLabelIds} from '../../../../conversation/ConversationLabelReposit
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import {ConversationState} from '../../../../conversation/ConversationState';
 import {User} from '../../../../entity/User';
-import {useRoveFocus} from '../../../../hooks/useRoveFocus';
+import {useConversationFocus} from '../../../../hooks/useConversationFocus';
 import {useMLSConversationState} from '../../../../mls';
 import {PreferenceNotificationRepository} from '../../../../notification/PreferenceNotificationRepository';
 import {PropertiesRepository} from '../../../../properties/PropertiesRepository';
@@ -119,7 +119,6 @@ const Conversations: React.FC<ConversationsProps> = ({
   const {isOpen: isFolderOpen, openFolder} = useFolderState();
 
   const {conversationLabelRepository} = conversationRepository;
-  const [isConversationListFocus, focusConversationList] = useState(false);
 
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
   const {close: closeRightSidebar} = useAppMainState(state => state.rightSidebar);
@@ -181,7 +180,7 @@ const Conversations: React.FC<ConversationsProps> = ({
             css={{...(showLegalHold && {gridColumn: '2/3'})}}
             onClick={event => AvailabilityContextMenu.show(event.nativeEvent, 'left-list-availability-menu')}
             // on blur conversation list should get the focus
-            onBlur={() => focusConversationList(true)}
+            // onBlur={() => focusConversationList(true)}
           >
             <AvailabilityState
               className="availability-state"
@@ -208,7 +207,7 @@ const Conversations: React.FC<ConversationsProps> = ({
           tabIndex={TabIndex.FOCUSABLE}
           // personal user won't see availability status menu, on blur of the userName
           // conversation list should get the focus
-          onBlur={() => focusConversationList(true)}
+          // onBlur={() => focusConversationList(true)}
         >
           {userName}
         </span>
@@ -232,7 +231,7 @@ const Conversations: React.FC<ConversationsProps> = ({
           onKeyDown={event => {
             //shift+tab from contacts tab should focus on the first conversation
             if (event.shiftKey && isTabKey(event)) {
-              focusConversationList(true);
+              // focusConversationList(true);
             }
           }}
           title={t('tooltipConversationsStart', Shortcut.getShortcutTooltip(ShortcutType.START))}
@@ -294,6 +293,7 @@ const Conversations: React.FC<ConversationsProps> = ({
         const conversation = conversationState.findConversation(call.conversationId);
         const callingViewModel = listViewModel.callingViewModel;
         const callingRepository = callingViewModel.callingRepository;
+
         return (
           conversation && (
             <div className="calling-cell" key={conversation.id}>
@@ -315,7 +315,8 @@ const Conversations: React.FC<ConversationsProps> = ({
     </>
   );
 
-  const {currentFocus, handleKeyDown, setCurrentFocus} = useRoveFocus(conversations.length);
+  const filteredConversations = filterEstablishedConversations(conversations);
+  const {currentFocus, handleKeyDown} = useConversationFocus(filteredConversations);
 
   return (
     <ListWrapper id="conversations" headerElement={header} footer={footer} before={callingView}>
@@ -334,14 +335,12 @@ const Conversations: React.FC<ConversationsProps> = ({
         <ConversationsList
           connectRequests={connectRequests}
           callState={callState}
-          conversations={filterEstablishedConversations(conversations)}
+          conversations={filteredConversations}
           viewStyle={viewStyle}
           listViewModel={listViewModel}
           conversationState={conversationState}
           conversationRepository={conversationRepository}
-          handleFocus={setCurrentFocus}
           currentFocus={currentFocus}
-          isConversationListFocus={isConversationListFocus}
           handleArrowKeyDown={handleKeyDown}
         />
       )}

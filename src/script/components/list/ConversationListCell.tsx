@@ -26,13 +26,13 @@ import React, {
   KeyboardEvent as ReactKeyBoardEvent,
 } from 'react';
 
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 
 import {AvailabilityState} from 'Components/AvailabilityState';
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {GroupAvatar} from 'Components/avatar/GroupAvatar';
 import {Icon} from 'Components/Icon';
-import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isKey, isOneOfKeys, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -51,18 +51,11 @@ export interface ConversationListCellProps {
   onJoinCall: (conversation: Conversation, mediaType: MediaType) => void;
   rightClick: (conversation: Conversation, event: MouseEvent | React.MouseEvent<Element, MouseEvent>) => void;
   showJoinButton: boolean;
-  index: number;
-  /** it determines whether the conversation item is currently focused  */
-  focusConversation: boolean;
-  /** conversation list can only be focused using tab key from user name so enable
-   * it when this condition satisfies  */
-  isConversationListFocus: boolean;
-  handleFocus: (index: number) => void;
   handleArrowKeyDown: (e: React.KeyboardEvent) => void;
-  isFolder?: boolean;
+  currentFocusId: string;
 }
 
-const ConversationListCell: React.FC<ConversationListCellProps> = ({
+const ConversationListCell = ({
   showJoinButton,
   conversation,
   onJoinCall,
@@ -70,13 +63,9 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
   isSelected = () => false,
   rightClick = noop,
   dataUieName,
-  index,
-  focusConversation,
-  isConversationListFocus,
-  handleFocus,
   handleArrowKeyDown,
-  isFolder = false,
-}) => {
+  currentFocusId,
+}: ConversationListCellProps) => {
   const {
     isGroup,
     is1to1,
@@ -130,23 +119,9 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
     } else {
       setContextMenuFocus(false);
     }
+
     handleArrowKeyDown(event);
   };
-
-  useEffect(() => {
-    // Move element into view when it is focused
-    if (focusConversation && conversationRef.current && isConversationListFocus) {
-      // isConversationListFocus is required to focus on first conversation only
-      conversationRef.current.focus();
-    }
-  }, [focusConversation, isConversationListFocus]);
-
-  useEffect(() => {
-    // Move element into view when it is focused
-    if (focusConversation && contextMenuRef.current && focusContextMenu) {
-      contextMenuRef.current.focus();
-    }
-  }, [focusConversation, focusContextMenu]);
 
   const handleContextKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === KEY.SPACE || event.key === KEY.ENTER) {
@@ -155,6 +130,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
       setContextMenuOpen(true);
       return;
     }
+
     setContextMenuFocus(false);
     setContextMenuOpen(false);
 
@@ -165,15 +141,20 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
     }
   };
 
-  // always focus on the selected conversation when the folder tab loaded
-  useEffect(() => {
-    if (isActive && isConversationListFocus && isFolder) {
-      handleFocus(index);
-    }
-  }, [index, isActive, isFolder, isConversationListFocus, handleFocus]);
+  const isFocused = currentFocusId === conversation.id;
 
-  const mainButtonTabIndex = useMessageFocusedTabIndex(focusConversation);
-  const contextMenuButtonTabIndex = useMessageFocusedTabIndex(focusContextMenu && focusConversation);
+  useEffect(() => {
+    if (isFocused) {
+      conversationRef.current?.focus();
+    }
+  }, [isFocused]);
+
+  useEffect(() => {
+    // Move element into view when it is focused
+    if (isFocused && focusContextMenu) {
+      contextMenuRef.current?.focus();
+    }
+  }, [isFocused, focusContextMenu]);
 
   return (
     <li onContextMenu={openContextMenu}>
@@ -191,23 +172,26 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
           onClick={onClick}
           onKeyDown={handleDivKeyDown}
           data-uie-name="go-open-conversation"
-          tabIndex={mainButtonTabIndex}
+          tabIndex={isFocused ? TabIndex.FOCUSABLE : TabIndex.UNFOCUSABLE}
           aria-label={t('accessibility.openConversation', displayName)}
           aria-describedby={contextMenuKeyboardShortcut}
         >
           <span id={contextMenuKeyboardShortcut} aria-label={t('accessibility.conversationOptionsMenuAccessKey')} />
+
           <div
             className={cx('conversation-list-cell-left', {
               'conversation-list-cell-left-opaque': removedFromConversation || users.length === 0,
             })}
           >
             {isGroup && <GroupAvatar className="conversation-list-cell-avatar-arrow" users={users} />}
+
             {!isGroup && !!users.length && (
               <div className="avatar-halo">
                 <Avatar participant={users[0]} avatarSize={AVATAR_SIZE.SMALL} />
               </div>
             )}
           </div>
+
           <div className="conversation-list-cell-center">
             {is1to1 && selfUser?.inTeam() ? (
               <AvailabilityState
@@ -222,6 +206,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
                 {displayName}
               </span>
             )}
+
             <span
               className={cx('conversation-list-cell-description', {
                 'conversation-list-cell-description--active': isActive,
@@ -232,6 +217,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
             </span>
           </div>
         </div>
+
         <div className="conversation-list-cell-right">
           <button
             ref={contextMenuRef}
@@ -241,7 +227,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
             data-uie-name="go-options"
             aria-label={t('accessibility.conversationOptionsMenu')}
             type="button"
-            tabIndex={contextMenuButtonTabIndex}
+            tabIndex={focusContextMenu && isFocused ? TabIndex.FOCUSABLE : TabIndex.UNFOCUSABLE}
             aria-haspopup="true"
             onClick={event => {
               event.stopPropagation();
@@ -249,6 +235,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
             }}
             onKeyDown={handleContextKeyDown}
           />
+
           {!showJoinButton && (
             <>
               {cellState.icon === ConversationStatusIcon.PENDING_CONNECTION && (
@@ -260,6 +247,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
                   <Icon.Pending className="svg-icon" />
                 </span>
               )}
+
               {cellState.icon === ConversationStatusIcon.UNREAD_MENTION && (
                 <span
                   className="conversation-list-cell-badge cell-badge-dark"
@@ -269,6 +257,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
                   <Icon.Mention className="svg-icon" />
                 </span>
               )}
+
               {cellState.icon === ConversationStatusIcon.UNREAD_REPLY && (
                 <span
                   className="conversation-list-cell-badge cell-badge-dark"
@@ -279,6 +268,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
                   <Icon.Reply className="svg-icon" />
                 </span>
               )}
+
               {cellState.icon === ConversationStatusIcon.UNREAD_PING && (
                 <span
                   className="conversation-list-cell-badge cell-badge-dark"
@@ -288,6 +278,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
                   <Icon.Ping className="svg-icon" />
                 </span>
               )}
+
               {cellState.icon === ConversationStatusIcon.MISSED_CALL && (
                 <span
                   className="conversation-list-cell-badge cell-badge-dark"
@@ -297,6 +288,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
                   <Icon.Hangup className="svg-icon" />
                 </span>
               )}
+
               {cellState.icon === ConversationStatusIcon.MUTED && (
                 <span
                   className="conversation-list-cell-badge cell-badge-light conversation-muted"
@@ -306,6 +298,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
                   <Icon.Mute className="svg-icon" />
                 </span>
               )}
+
               {cellState.icon === ConversationStatusIcon.UNREAD_MESSAGES && unreadState.allMessages.length > 0 && (
                 <span
                   className="conversation-list-cell-badge cell-badge-dark"
@@ -317,6 +310,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
               )}
             </>
           )}
+
           {showJoinButton && (
             <button
               onClick={onClickJoinCall}
