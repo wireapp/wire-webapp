@@ -79,7 +79,6 @@ const GroupedConversationsFolder = ({
               showJoinButton={hasJoinableCall(conversation)}
               isSelected={isSelectedConversation}
               onJoinCall={onJoinCall}
-              isFolder
             />
           ))}
       </ul>
