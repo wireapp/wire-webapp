@@ -6957,9 +6957,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dpdm@npm:3.11.0":
-  version: 3.11.0
-  resolution: "dpdm@npm:3.11.0"
+"dpdm@npm:3.12.0":
+  version: 3.12.0
+  resolution: "dpdm@npm:3.12.0"
   dependencies:
     "@types/fs-extra": ^11.0.1
     "@types/glob": ^8.0.0
@@ -6973,7 +6973,7 @@ __metadata:
     yargs: ^17.6.2
   bin:
     dpdm: lib/bin/dpdm.js
-  checksum: a9949d8c9a29b9ce0b32787fc306741c54018b9d1e97721ee4aaf34ed49b268629eea2a69526f5a40b6d316345eee5086891c9b72cfa53d8aa46b1b14a116c94
+  checksum: af612fe53f7d1a68f9735e66fa593f76b58963625205c5491bbb6e3127449d9e28f23854cef33c36ac279dc114ada4c0f6e5e930cb85353b7c513e117623ea1e
   languageName: node
   linkType: hard
 
@@ -16620,7 +16620,7 @@ __metadata:
     dexie: ^3.2.2
     dexie-batch: 0.4.3
     dotenv: 16.0.3
-    dpdm: 3.11.0
+    dpdm: 3.12.0
     eslint: ^8.33.0
     eslint-config-prettier: ^8.6.0
     eslint-import-resolver-alias: ^1.1.2
