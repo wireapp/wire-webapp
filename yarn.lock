@@ -3847,20 +3847,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/parser@npm:^5.49.0":
-  version: 5.49.0
-  resolution: "@typescript-eslint/parser@npm:5.49.0"
+"@typescript-eslint/parser@npm:^5.50.0":
+  version: 5.50.0
+  resolution: "@typescript-eslint/parser@npm:5.50.0"
   dependencies:
-    "@typescript-eslint/scope-manager": 5.49.0
-    "@typescript-eslint/types": 5.49.0
-    "@typescript-eslint/typescript-estree": 5.49.0
+    "@typescript-eslint/scope-manager": 5.50.0
+    "@typescript-eslint/types": 5.50.0
+    "@typescript-eslint/typescript-estree": 5.50.0
     debug: ^4.3.4
   peerDependencies:
     eslint: ^6.0.0 || ^7.0.0 || ^8.0.0
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 87b3760cfc29b3edd3d28fe0d5e9e5a3833d60398d7779ecc657b9e3bfec624cd464176e26b24b0761fb79cc88daddae19560340f91119c4856b91f9663594dd
+  checksum: 816a421ce9a5c61a2e92499d6d400aed4211ca5b685e0212844b6659f7acfeba1cca0418b462236c44eea6e8a2574cd51ccb7abc2bf4a8cad5b7a275d71ae9bf
   languageName: node
   linkType: hard
 
@@ -16698,7 +16698,7 @@ __metadata:
     "@types/underscore": 1.11.4
     "@types/webpack-env": 1.18.0
     "@typescript-eslint/eslint-plugin": ^5.50.0
-    "@typescript-eslint/parser": ^5.49.0
+    "@typescript-eslint/parser": ^5.50.0
     "@wireapp/avs": 9.0.20
     "@wireapp/copy-config": 2.0.7
     "@wireapp/core": 38.9.0
