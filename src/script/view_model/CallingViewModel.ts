@@ -207,7 +207,7 @@ export class CallingViewModel {
       return !!this.callState.joinedCall();
     };
 
-    const updateEpochInfo = async (conversationId: QualifiedId) => {
+    const updateEpochInfo = async (conversationId: QualifiedId, shouldAdvanceEpoch = false) => {
       const conversation = this.getConversationById(conversationId);
       if (!conversation?.isUsingMLSProtocol) {
         return;
@@ -228,6 +228,7 @@ export class CallingViewModel {
         {mlsService: this.mlsService},
         subconversationGroupId,
         parentGroupId,
+        shouldAdvanceEpoch,
       );
       this.callingRepository.setEpochInfo(conversationId, {epoch, keyLength, secretKey}, members);
     };
@@ -243,7 +244,7 @@ export class CallingViewModel {
     this.callingRepository.onRequestClientsCallback(updateEpochInfo);
 
     //update epoch info when AVS requests new epoch
-    this.callingRepository.onRequestNewEpochCallback(updateEpochInfo);
+    this.callingRepository.onRequestNewEpochCallback(conversationId => updateEpochInfo(conversationId, true));
 
     //once we leave a call, we unsubscribe from all the events we've subscribed to during this call
     this.callingRepository.onLeaveCall(callingSubscriptions.removeCall);

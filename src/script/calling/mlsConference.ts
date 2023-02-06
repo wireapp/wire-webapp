@@ -52,6 +52,7 @@ export const getSubconversationEpochInfo = async (
   {mlsService}: {mlsService: MLSService},
   subconversationGroupId: string,
   parentGroupId: string,
+  shouldAdvanceEpoch = false,
 ): Promise<{
   members: SubconversationEpochInfoMember[];
   epoch: number;
@@ -59,6 +60,10 @@ export const getSubconversationEpochInfo = async (
   keyLength: number;
 }> => {
   const members = await generateSubconversationMembers({mlsService}, subconversationGroupId, parentGroupId);
+
+  if (shouldAdvanceEpoch) {
+    await mlsService.renewKeyMaterial(subconversationGroupId);
+  }
 
   const epoch = Number(await mlsService.getEpoch(subconversationGroupId));
 
