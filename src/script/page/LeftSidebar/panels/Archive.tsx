@@ -75,7 +75,7 @@ const Archive = ({
       <ul className="left-list-items no-scroll">
         {conversations.map((conversation, index) => (
           <ConversationListCell
-            currentFocusId={currentFocus}
+            isFocused={currentFocus === conversation.id}
             key={conversation.id}
             handleArrowKeyDown={handleKeyDown(index)}
             dataUieName="item-conversation-archived"

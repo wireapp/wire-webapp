@@ -64,7 +64,7 @@ const GroupedConversationsFolder = ({
           conversations.map((conversation, index) => (
             <ConversationListCell
               dataUieName="item-conversation"
-              currentFocusId={currentFocus}
+              isFocused={currentFocus === conversation.id}
               key={conversation.id}
               handleArrowKeyDown={handleKeyDown(index)}
               onClick={event => {

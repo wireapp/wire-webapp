@@ -103,7 +103,7 @@ export const ConversationsList = ({
           return (
             <ConversationListCell
               key={conversation.id}
-              currentFocusId={currentFocus}
+              isFocused={currentFocus === conversation.id}
               handleArrowKeyDown={handleArrowKeyDown(index)}
               dataUieName="item-conversation"
               conversation={conversation}

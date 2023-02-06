@@ -54,7 +54,7 @@ export interface ConversationListCellProps {
   rightClick: (conversation: Conversation, event: MouseEvent | React.MouseEvent<Element, MouseEvent>) => void;
   showJoinButton: boolean;
   handleArrowKeyDown: (e: React.KeyboardEvent) => void;
-  currentFocusId: string;
+  isFocused?: boolean;
 }
 
 const ConversationListCell = ({
@@ -66,7 +66,7 @@ const ConversationListCell = ({
   rightClick = noop,
   dataUieName,
   handleArrowKeyDown,
-  currentFocusId,
+  isFocused = false,
 }: ConversationListCellProps) => {
   const {
     isGroup,
@@ -143,8 +143,6 @@ const ConversationListCell = ({
       handleArrowKeyDown(event);
     }
   };
-
-  const isFocused = currentFocusId === conversation.id;
 
   // always focus on the selected conversation when the folder tab loaded
   useEffect(() => {
