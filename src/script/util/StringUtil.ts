@@ -161,3 +161,20 @@ export const fixWebsocketString = (originalString: string): string => {
   const decoder = new TextDecoder();
   return decoder.decode(charArray);
 };
+
+const umlautMap: Record<string, string> = {
+  a: 'á|à|ã|â|À|Á|Ã|Â',
+  e: 'é|è|ê|É|È|Ê',
+  i: 'í|ì|î|Í|Ì|Î',
+  o: 'ó|ò|ô|õ|Ó|Ò|Ô|Õ',
+  u: 'ú|ù|û|ü|Ú|Ù|Û|Ü',
+  c: 'ç|Ç',
+  n: 'ñ|Ñ',
+};
+
+/**
+ * @param text The string to replace umlaut its charachters
+ * @returns new string with replaced umlaut charachters
+ */
+export const replaceUmlaute = (text: string) =>
+  Object.keys(umlautMap).reduce((acc, cur) => acc.replace(new RegExp(umlautMap[cur], 'g'), cur), text);
