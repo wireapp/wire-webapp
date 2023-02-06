@@ -22,9 +22,8 @@ import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import ko from 'knockout';
 
-import {Declension, joinNames, replaceLink, t} from 'Util/LocalizerUtil';
+import {Declension, getUserName, joinNames, replaceLink, t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
-import {getUserName} from 'Util/SanitizationUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 
 import {SystemMessage} from './SystemMessage';

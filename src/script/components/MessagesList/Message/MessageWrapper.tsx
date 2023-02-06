@@ -29,9 +29,6 @@ import {t} from 'Util/LocalizerUtil';
 
 import {CallMessage} from './CallMessage';
 import {CallTimeoutMessage} from './CallTimeoutMessage';
-
-import {MessageParams} from './index';
-
 import {ContentMessageComponent} from './ContentMessage';
 import {DecryptErrorMessage} from './DecryptErrorMessage';
 import {DeleteMessage} from './DeleteMessage';
@@ -48,6 +45,8 @@ import {Conversation} from '../../../entity/Conversation';
 import {CompositeMessage} from '../../../entity/message/CompositeMessage';
 import {TeamState} from '../../../team/TeamState';
 import {ContextMenuEntry} from '../../../ui/ContextMenu';
+
+import {MessageParams} from './index';
 
 export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMessageFocused: boolean}> = ({
   message,

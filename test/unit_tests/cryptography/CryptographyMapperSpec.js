@@ -40,7 +40,7 @@ import {isObject} from 'underscore';
 
 import {encryptAesAsset} from 'src/script/assets/AssetCrypto';
 import {CryptographyMapper} from 'src/script/cryptography/CryptographyMapper';
-import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
+import {GenericMessageType} from '@wireapp/core/lib/conversation';
 import {PROTO_MESSAGE_TYPE} from 'src/script/cryptography/ProtoMessageType';
 import {CryptographyError} from 'src/script/error/CryptographyError';
 import {ClientEvent} from 'src/script/event/Client';
@@ -78,7 +78,7 @@ describe('CryptographyMapper', () => {
       const asset = new Asset({original: original_asset});
 
       const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.ASSET]: asset,
+        [GenericMessageType.ASSET]: asset,
         messageId: createRandomUuid(),
       });
 
@@ -109,7 +109,7 @@ describe('CryptographyMapper', () => {
       const asset = new Asset({original: original_asset});
 
       const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.ASSET]: asset,
+        [GenericMessageType.ASSET]: asset,
         messageId: createRandomUuid(),
       });
 
@@ -148,7 +148,7 @@ describe('CryptographyMapper', () => {
       const asset = new Asset({uploaded: uploaded_asset});
 
       const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.ASSET]: asset,
+        [GenericMessageType.ASSET]: asset,
         messageId: createRandomUuid(),
       });
 
@@ -170,7 +170,7 @@ describe('CryptographyMapper', () => {
       const asset = new Asset({notUploaded: Asset.NotUploaded.CANCELLED});
 
       const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.ASSET]: asset,
+        [GenericMessageType.ASSET]: asset,
         messageId: createRandomUuid(),
       });
 
@@ -191,7 +191,7 @@ describe('CryptographyMapper', () => {
       });
 
       const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.ASSET]: asset,
+        [GenericMessageType.ASSET]: asset,
         messageId: createRandomUuid(),
       });
 
@@ -226,7 +226,7 @@ describe('CryptographyMapper', () => {
       });
 
       const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.ASSET]: asset,
+        [GenericMessageType.ASSET]: asset,
         messageId: createRandomUuid(),
       });
 
@@ -246,7 +246,7 @@ describe('CryptographyMapper', () => {
       const availability = new Availability({type: Availability.Type.AVAILABLE});
 
       const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.AVAILABILITY]: availability,
+        [GenericMessageType.AVAILABILITY]: availability,
         messageId: createRandomUuid(),
       });
 
@@ -270,7 +270,7 @@ describe('CryptographyMapper', () => {
         conversationId: conversation_id,
       });
       const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.CLEARED]: cleared,
+        [GenericMessageType.CLEARED]: cleared,
         messageId: createRandomUuid(),
       });
 
@@ -294,7 +294,7 @@ describe('CryptographyMapper', () => {
         messageId: message_id,
       });
       const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.HIDDEN]: message_hide,
+        [GenericMessageType.HIDDEN]: message_hide,
         messageId: createRandomUuid(),
       });
 
@@ -313,7 +313,7 @@ describe('CryptographyMapper', () => {
     it('resolves with a mapped deleted message', () => {
       const message_id = createRandomUuid();
       const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.DELETED]: new MessageDelete({messageId: message_id}),
+        [GenericMessageType.DELETED]: new MessageDelete({messageId: message_id}),
         messageId: createRandomUuid(),
       });
 
@@ -350,7 +350,7 @@ describe('CryptographyMapper', () => {
         width: image.width,
       });
       const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.IMAGE]: image_asset,
+        [GenericMessageType.IMAGE]: image_asset,
         messageId: createRandomUuid(),
       });
 
@@ -395,7 +395,7 @@ describe('CryptographyMapper', () => {
       });
 
       const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.ASSET]: asset,
+        [GenericMessageType.ASSET]: asset,
         messageId: createRandomUuid(),
       });
 
@@ -437,7 +437,7 @@ describe('CryptographyMapper', () => {
         width: image.width,
       });
       const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.IMAGE]: image_asset,
+        [GenericMessageType.IMAGE]: image_asset,
         messageId: createRandomUuid(),
       });
 
@@ -462,7 +462,7 @@ describe('CryptographyMapper', () => {
 
     it('rejects with an error for a preview image message', done => {
       const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.IMAGE]: new ImageAsset({tag: 'preview'}),
+        [GenericMessageType.IMAGE]: new ImageAsset({tag: 'preview'}),
         messageId: createRandomUuid(),
       });
 
@@ -478,7 +478,7 @@ describe('CryptographyMapper', () => {
 
     it('resolves with a mapped knock message', () => {
       const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.KNOCK]: new Knock({hotKnock: false}),
+        [GenericMessageType.KNOCK]: new Knock({hotKnock: false}),
         messageId: createRandomUuid(),
       });
 
@@ -511,7 +511,7 @@ describe('CryptographyMapper', () => {
       });
 
       const genericMessage = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.KNOCK]: protoKnock,
+        [GenericMessageType.KNOCK]: protoKnock,
         messageId: createRandomUuid(),
       });
 
@@ -526,7 +526,7 @@ describe('CryptographyMapper', () => {
 
       const last_read = new LastRead({conversationId: conversation_id, lastReadTimestamp: date});
       const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.LAST_READ]: last_read,
+        [GenericMessageType.LAST_READ]: last_read,
         messageId: createRandomUuid(),
       });
 
@@ -550,7 +550,7 @@ describe('CryptographyMapper', () => {
         messageId,
       });
       const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.REACTION]: reaction,
+        [GenericMessageType.REACTION]: reaction,
         messageId,
       });
 
@@ -568,7 +568,7 @@ describe('CryptographyMapper', () => {
 
     it('resolves with a mapped text message', () => {
       const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: 'Unit test'}),
+        [GenericMessageType.TEXT]: new Text({content: 'Unit test'}),
         messageId: createRandomUuid(),
       });
 
@@ -598,7 +598,7 @@ describe('CryptographyMapper', () => {
       const plaintext = 'Test';
       const text = new Text({content: plaintext});
       const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.TEXT]: text,
+        [GenericMessageType.TEXT]: text,
         messageId: createRandomUuid(),
       });
 
@@ -653,7 +653,7 @@ describe('CryptographyMapper', () => {
         zoom: 1,
       });
       const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.LOCATION]: location,
+        [GenericMessageType.LOCATION]: location,
         messageId: createRandomUuid(),
       });
 
@@ -705,7 +705,7 @@ describe('CryptographyMapper', () => {
 
       const calling = new Calling({content: JSON.stringify(content_message)});
       const generic_message = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.CALLING]: calling,
+        [GenericMessageType.CALLING]: calling,
         messageId: createRandomUuid(),
       });
 

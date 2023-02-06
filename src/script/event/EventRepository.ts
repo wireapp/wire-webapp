@@ -487,12 +487,12 @@ export class EventRepository {
   }
 
   private handleEventReplacement(originalEvent: EventRecord, newEvent: EventRecord): Promise<EventRecord> {
-    const newData = newEvent.data || {};
-    if (originalEvent.data.from !== newData.from) {
+    if (originalEvent.from !== newEvent.from) {
       const logMessage = `ID previously used by user '${newEvent.from}'`;
       const errorMessage = 'ID reused by other user';
       this.throwValidationError(newEvent, errorMessage, logMessage);
     }
+    const newData = newEvent.data || {};
     const primaryKeyUpdate = {primary_key: originalEvent.primary_key};
     const isLinkPreviewEdit = newData.previews && !!newData.previews.length;
 

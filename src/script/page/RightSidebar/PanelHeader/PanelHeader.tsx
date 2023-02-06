@@ -17,7 +17,7 @@
  *
  */
 
-import {FC} from 'react';
+import {FC, useEffect, useRef} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
@@ -62,8 +62,21 @@ const PanelHeader: FC<PanelHeaderProps> = ({
   onGoBack = noop,
   onToggleMute = noop,
 }: PanelHeaderProps) => {
+  const panelHeaderRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => {
+    if (!!panelHeaderRef.current) {
+      const nextElementToFocus = panelHeaderRef.current.querySelector('button');
+      // TO-DO Remove setTimeout after replacing transition group animation libray
+      // triggering focus method without setTimeout is not working due to right side bar animation
+      setTimeout(() => {
+        nextElementToFocus?.focus();
+      }, 0);
+    }
+  }, []);
+
   return (
-    <header className={cx('panel__header', {'panel__header--reverse': isReverse}, className)}>
+    <header className={cx('panel__header', {'panel__header--reverse': isReverse}, className)} ref={panelHeaderRef}>
       {showBackArrow && (
         <DragableClickWrapper onClick={() => onGoBack()}>
           <button className="icon-button" data-uie-name={goBackUie} title={goBackTitle} onBlur={handleBlur}>

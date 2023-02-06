@@ -17,13 +17,12 @@
  *
  */
 
-import {ChangeEvent, FormEvent, KeyboardEvent as ReactKeyboardEvent, useEffect, useMemo, useRef, useState} from 'react';
+import {ChangeEvent, FormEvent, KeyboardEvent as ReactKeyboardEvent, useEffect, useRef, useState} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {Availability} from '@wireapp/protocol-messaging';
 import {useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -46,7 +45,7 @@ import {
   getMentionCandidate,
   updateMentionRanges,
 } from 'Util/MentionUtil';
-import {formatLocale, TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {formatDuration, formatLocale, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {getSelectionPosition} from 'Util/util';
 
 import {ControlButtons} from './components/InputBarControls/ControlButtons';
@@ -125,16 +124,13 @@ const InputBar = ({
     ['classifiedDomains', 'isSelfDeletingMessagesEnabled', 'isFileSharingSendingEnabled'],
   );
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
-  const {inTeam} = useKoSubscribableChildren(selfUser, ['inTeam']);
   const {
     connection,
-    firstUserEntity,
     participating_user_ets: participatingUserEts,
     localMessageTimer,
     messageTimer,
     hasGlobalMessageTimer,
     removed_from_conversation: removedFromConversation,
-    is1to1,
   } = useKoSubscribableChildren(conversationEntity, [
     'connection',
     'firstUserEntity',
@@ -145,7 +141,6 @@ const InputBar = ({
     'removed_from_conversation',
     'is1to1',
   ]);
-  const {availability} = useKoSubscribableChildren(firstUserEntity, ['availability']);
   const {isOutgoingRequest, isIncomingRequest} = useKoSubscribableChildren(connection, [
     'isOutgoingRequest',
     'isIncomingRequest',
@@ -173,21 +168,7 @@ const InputBar = ({
   const currentState = rightSidebar.history[lastItem];
   const isRightSidebarOpen = !!currentState;
 
-  const availabilityIsNone = availability === Availability.Type.NONE;
-  const showAvailabilityTooltip = firstUserEntity && inTeam && is1to1 && !availabilityIsNone;
-  const availabilityStrings: Record<string, string> = {
-    [Availability.Type.AVAILABLE]: t('userAvailabilityAvailable'),
-    [Availability.Type.AWAY]: t('userAvailabilityAway'),
-    [Availability.Type.BUSY]: t('userAvailabilityBusy'),
-  };
-
-  const inputPlaceholder = useMemo(() => {
-    if (showAvailabilityTooltip) {
-      return availabilityStrings[availability];
-    }
-
-    return messageTimer ? t('tooltipConversationEphemeral') : t('tooltipConversationInputPlaceholder');
-  }, [availability, messageTimer, showAvailabilityTooltip]); // eslint-disable-line react-hooks/exhaustive-deps
+  const inputPlaceholder = messageTimer ? t('tooltipConversationEphemeral') : t('tooltipConversationInputPlaceholder');
 
   const candidates = participatingUserEts.filter(userEntity => !userEntity.isService);
   const mentionSuggestions = editedMention ? searchRepository.searchUserInSet(editedMention.term, candidates) : [];
@@ -586,6 +567,9 @@ const InputBar = ({
 
   const handlePasteFiles = (files: FileList): void => {
     const [pastedFile] = files;
+    if (!pastedFile) {
+      return;
+    }
     const {lastModified} = pastedFile;
 
     const date = formatLocale(lastModified || new Date(), 'PP, pp');
@@ -819,7 +803,11 @@ const InputBar = ({
                     onBlur={() => setIsTyping(false)}
                     value={inputValue}
                     placeholder={inputPlaceholder}
-                    aria-label={inputPlaceholder}
+                    aria-label={
+                      messageTimer
+                        ? t('tooltipConversationEphemeralAriaLabel', {time: formatDuration(messageTimer).text})
+                        : inputPlaceholder
+                    }
                     data-uie-name="input-message"
                     dir="auto"
                   />

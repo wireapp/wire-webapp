@@ -21,8 +21,6 @@ import type {MemberData, TeamData} from '@wireapp/api-client/lib/team/';
 import type {TeamUpdateData} from '@wireapp/api-client/lib/team/data/';
 import type {PermissionsData} from '@wireapp/api-client/lib/team/member/PermissionsData';
 
-import {Logger, getLogger} from 'Util/Logger';
-
 import {TeamEntity} from './TeamEntity';
 import {TeamMemberEntity} from './TeamMemberEntity';
 
@@ -30,12 +28,6 @@ import type {User} from '../entity/User';
 import {roleFromTeamPermissions} from '../user/UserPermission';
 
 export class TeamMapper {
-  private readonly logger: Logger;
-
-  constructor() {
-    this.logger = getLogger('TeamMapper');
-  }
-
   mapTeamFromObject(data: TeamData, teamEntity?: TeamEntity): TeamEntity {
     return this.updateTeamFromObject(data, teamEntity);
   }
@@ -81,10 +73,6 @@ export class TeamMapper {
   mapRole(userEntity: User, permissions?: PermissionsData): void {
     if (permissions) {
       const teamRole = roleFromTeamPermissions(permissions);
-      this.logger.info(
-        `Identified user '${userEntity.id}' of team '${userEntity.teamId}' as '${teamRole}'`,
-        permissions,
-      );
       userEntity.teamRole(teamRole);
     }
   }

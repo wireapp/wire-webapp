@@ -28,7 +28,6 @@ describe('TypePredicateUtil', () => {
   describe('isAxiosError', () => {
     it('recognizes axios error structures', () => {
       const error: AxiosError = {
-        config: {},
         isAxiosError: true,
         message: 'Server Error',
         name: 'AxiosError',

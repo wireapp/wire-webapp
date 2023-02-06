@@ -85,7 +85,6 @@ export class ClientRepository {
 
   init(selfUser: User): void {
     this.selfUser(selfUser);
-    this.logger.info(`Initialized repository with user ID '${this.selfUser().id}'`);
   }
 
   //##############################################################################
@@ -155,13 +154,12 @@ export class ClientRepository {
       })
       .then(clientRecord => {
         if (typeof clientRecord === 'string') {
-          this.logger.info('No local client found in database');
+          this.logger.warn('No local client found in database');
           throw new ClientError(ClientError.TYPE.NO_VALID_CLIENT, ClientError.MESSAGE.NO_VALID_CLIENT);
         }
 
         const currentClient = ClientMapper.mapClient(clientRecord, true, clientRecord.domain);
         this.clientState.currentClient(currentClient);
-        this.logger.info(`Loaded local client '${currentClient.id}'`, this.clientState.currentClient());
         return this.clientState.currentClient();
       });
   }
@@ -485,7 +483,7 @@ export class ClientRepository {
           }
 
           // Locally unknown client new on backend
-          this.logger.info(`New client '${clientId}' of user '${userId}' will be stored locally`);
+          this.logger.debug(`New client '${clientId}' of user '${userId}' will be stored locally`);
           if (matchQualifiedIds(this.selfUser(), userId)) {
             this.onClientAdd({client: clientPayload as RegisteredClient});
           }
@@ -551,7 +549,7 @@ export class ClientRepository {
    * @param eventJson JSON data of 'user.client-add' event
    */
   private onClientAdd(eventJson: Pick<UserClientAddEvent, 'client'>): void {
-    this.logger.info('Client of self user added', eventJson);
+    this.logger.debug('Client of self user added', eventJson);
     amplify.publish(WebAppEvents.CLIENT.ADD, this.selfUser().qualifiedId, eventJson.client, true);
   }
 
