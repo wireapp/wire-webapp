@@ -30,11 +30,11 @@ const generateSubconversationMembers = async (
   subconversationGroupId: string,
   parentGroupId: string,
 ): Promise<SubconversationEpochInfoMember[]> => {
-  const subconversationMembersId = await mlsService.getClientIds(subconversationGroupId);
+  const subconversationMemberIds = await mlsService.getClientIds(subconversationGroupId);
   const parentMemberIds = await mlsService.getClientIds(parentGroupId);
 
   return parentMemberIds.map(parentMember => {
-    const isSubconversationMember = subconversationMembersId.some(
+    const isSubconversationMember = subconversationMemberIds.some(
       ({userId, clientId, domain}) =>
         constructFullyQualifiedClientId(userId, clientId, domain) ===
         constructFullyQualifiedClientId(parentMember.userId, parentMember.clientId, parentMember.domain),
