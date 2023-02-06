@@ -221,10 +221,13 @@ export class CallingViewModel {
         return;
       }
 
+      const parentGroupId = await this.mlsService.getGroupIdFromConversationId(conversationId);
+      const subconversationGroupId = subconversation.group_id;
+
       const {epoch, keyLength, secretKey, members} = await getSubconversationEpochInfo(
         {mlsService: this.mlsService},
-        conversationId,
-        subconversation,
+        subconversationGroupId,
+        parentGroupId,
       );
       this.callingRepository.setEpochInfo(conversationId, {epoch, keyLength, secretKey}, members);
     };
