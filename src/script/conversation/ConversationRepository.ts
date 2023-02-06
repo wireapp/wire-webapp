@@ -54,7 +54,6 @@ import {getNextItem} from 'Util/ArrayUtil';
 import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/FileTypeUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
-import {PromiseQueue} from 'Util/PromiseQueue';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {
   compareTransliteration,
@@ -149,7 +148,6 @@ export class ConversationRepository {
   private readonly event_mapper: EventMapper;
   private readonly eventService: EventService;
   public leaveCall: (conversationId: QualifiedId, reason: LEAVE_CALL_REASON) => void;
-  private readonly receiving_queue: PromiseQueue;
   private readonly logger: Logger;
   public readonly stateHandler: ConversationStateHandler;
   public readonly verificationStateHandler: ConversationVerificationStateHandler;
@@ -257,7 +255,6 @@ export class ConversationRepository {
     this.conversationsWithNewEvents = new Map();
 
     this.teamState.isTeam.subscribe(() => this.mapGuestStatusSelf());
-    this.receiving_queue = new PromiseQueue({name: 'ConversationRepository.Receiving'});
 
     this.initSubscriptions();
 
@@ -775,7 +772,7 @@ export class ConversationRepository {
    * Update users and events for archived conversations currently visible.
    */
   public updateArchivedConversations() {
-    this.updateConversations(this.conversationState.archivedConversations());
+    return this.updateConversations(this.conversationState.archivedConversations());
   }
 
   /**
@@ -802,7 +799,7 @@ export class ConversationRepository {
     const mapOfUserIds = conversationEntities.map(conversationEntity => conversationEntity.participating_user_ids());
     const userIds = flatten(mapOfUserIds);
     await this.userRepository.getUsersById(userIds);
-    conversationEntities.forEach(conversationEntity => this.fetchUsersAndEvents(conversationEntity));
+    await Promise.all(conversationEntities.map(conversationEntity => this.fetchUsersAndEvents(conversationEntity)));
   }
 
   //##############################################################################
@@ -1921,16 +1918,15 @@ export class ConversationRepository {
   /**
    * Listener for incoming events.
    *
-   * @param eventJson JSON data for event
-   * @param eventSource Source of event
+   * @param event JSON data for event
+   * @param source Source of event
    * @returns Resolves when event was handled
    */
-  private readonly onConversationEvent = (eventJson: IncomingEvent, eventSource = EventRepository.SOURCE.STREAM) => {
-    const logObject = {eventJson: JSON.stringify(eventJson), eventObject: eventJson};
-    const logMessage = `Conversation Event: '${eventJson.type}' (Source: ${eventSource})`;
+  private readonly onConversationEvent = (event: IncomingEvent, source = EventRepository.SOURCE.STREAM) => {
+    const logObject = {eventJson: JSON.stringify(event), eventObject: event};
+    const logMessage = `Conversation Event: '${event.type}' (Source: ${source})`;
     this.logger.info(logMessage, logObject);
-
-    return this.pushToReceivingQueue(eventJson, eventSource);
+    return this.handleConversationEvent(event, source);
   };
 
   private handleConversationEvent(
@@ -2295,15 +2291,6 @@ export class ConversationRepository {
   }
 
   /**
-   * Push to receiving queue.
-   * @param eventJson JSON data for event
-   * @param source Source of event
-   */
-  private pushToReceivingQueue(eventJson: IncomingEvent, source: EventSource) {
-    this.receiving_queue.push(() => this.handleConversationEvent(eventJson, source));
-  }
-
-  /**
    * Add "missed events" system message to conversation.
    */
   private readonly onMissedEvents = (): void => {
@@ -2554,7 +2541,7 @@ export class ConversationRepository {
    * @param eventJson JSON data of 'conversation.member-update' event
    * @returns Resolves when the event was handled
    */
-  private onMemberUpdate(
+  private async onMemberUpdate(
     conversationEntity: Conversation,
     eventJson: Pick<ConversationMemberUpdateEvent, 'data' | 'from'> & {conversation?: string},
   ) {
@@ -2978,10 +2965,10 @@ export class ConversationRepository {
    *
    * @param conversationEntity Conversation fetch events and users for
    */
-  private fetchUsersAndEvents(conversationEntity: Conversation) {
+  private async fetchUsersAndEvents(conversationEntity: Conversation) {
     if (!conversationEntity.is_loaded() && !conversationEntity.is_pending()) {
-      this.updateParticipatingUserEntities(conversationEntity);
-      this.getUnreadEvents(conversationEntity);
+      await this.updateParticipatingUserEntities(conversationEntity);
+      await this.getUnreadEvents(conversationEntity);
     }
   }
 
