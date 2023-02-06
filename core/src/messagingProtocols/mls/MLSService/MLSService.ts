@@ -403,7 +403,7 @@ export class MLSService extends TypedEventEmitter<Events> {
    *
    * @param groupId groupId of the conversation
    */
-  private async renewKeyMaterial(groupId: string) {
+  public async renewKeyMaterial(groupId: string) {
     try {
       const groupConversationExists = await this.conversationExists(groupId);
 
