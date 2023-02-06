@@ -25,7 +25,7 @@ import {
   UserClients,
 } from '@wireapp/api-client/lib/conversation';
 import {QualifiedId, RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/lib/user';
-import {MessageSendingState, MessageTargetMode, ReactionType} from '@wireapp/core/lib/conversation';
+import {MessageSendingState, MessageTargetMode, ReactionType, GenericMessageType} from '@wireapp/core/lib/conversation';
 import {
   AudioMetaData,
   EditedTextContent,
@@ -72,7 +72,6 @@ import {ClientState} from '../client/ClientState';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {EventBuilder} from '../conversation/EventBuilder';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
-import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {Conversation} from '../entity/Conversation';
 import {CompositeMessage} from '../entity/message/CompositeMessage';
@@ -1054,7 +1053,7 @@ export class MessageRepository {
   private readonly sendAvailabilityStatus = async (availability: Availability.Type) => {
     const protoAvailability = new Availability({type: protoFromType(availability)});
     const genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.AVAILABILITY]: protoAvailability,
+      [GenericMessageType.AVAILABILITY]: protoAvailability,
       messageId: createRandomUuid(),
     });
 
@@ -1312,7 +1311,7 @@ export class MessageRepository {
    * @param callMessageEntity Optional call message
    */
   private trackContributed(conversationEntity: Conversation, genericMessage: GenericMessage) {
-    const isEphemeral = genericMessage.content === GENERIC_MESSAGE_TYPE.EPHEMERAL;
+    const isEphemeral = genericMessage.content === GenericMessageType.EPHEMERAL;
 
     if (isEphemeral) {
       genericMessage = genericMessage.ephemeral as any;
