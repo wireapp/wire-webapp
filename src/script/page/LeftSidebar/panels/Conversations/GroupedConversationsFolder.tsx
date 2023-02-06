@@ -17,8 +17,6 @@
  *
  */
 
-import React from 'react';
-
 import {css} from '@emotion/react';
 
 import {ConversationListCell} from 'Components/list/ConversationListCell';
