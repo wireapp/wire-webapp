@@ -25,7 +25,7 @@ import {isKey, isTabKey, KEY} from 'Util/KeyboardUtil';
 import {Conversation} from '../entity/Conversation';
 
 function useConversationFocus(conversations: Conversation[]) {
-  const [currentFocus, setCurrentFocus] = useState(conversations[0].id);
+  const [currentFocus, setCurrentFocus] = useState(conversations[0]?.id || '');
 
   const handleKeyDown = useCallback(
     (index: number) => (event: ReactKeyboardEvent | KeyboardEvent) => {
