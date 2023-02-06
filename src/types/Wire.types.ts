@@ -45,7 +45,6 @@ type FeatureVariables = {
 
 type URLVariables = {
   ACCOUNT_BASE: string;
-  MOBILE_BASE: string;
   PRICING: string;
   PRIVACY_POLICY: string;
   SUPPORT: {

@@ -190,7 +190,6 @@ const LoginComponent = ({
       } else {
         await doLogin(login, getEntropy);
       }
-
       return navigate(ROUTE.HISTORY_INFO);
     } catch (error) {
       if (isBackendError(error)) {

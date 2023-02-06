@@ -25,7 +25,7 @@ import {connect} from 'react-redux';
 import {Navigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
-import {Runtime, UrlUtil} from '@wireapp/commons';
+import {UrlUtil} from '@wireapp/commons';
 import {
   ArrowIcon,
   Button,
@@ -82,7 +82,6 @@ const ConversationJoinComponent = ({
   const {formatMessage: _} = useIntl();
 
   const [accentColor] = useState(AccentColor.random());
-  const [isPwaEnabled, setIsPwaEnabled] = useState<boolean>();
   const [conversationCode, setConversationCode] = useState<string>();
   const [conversationKey, setConversationKey] = useState<string>();
   const [enteredName, setEnteredName] = useState<string>();
@@ -94,10 +93,6 @@ const ConversationJoinComponent = ({
   const [showCookiePolicyBanner, setShowCookiePolicyBanner] = useState(true);
   const [showEntropyForm, setShowEntropyForm] = useState(false);
   const isEntropyRequired = Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY;
-
-  const isPwaSupportedBrowser = () => {
-    return Runtime.isMobileOS() || Runtime.isSafari();
-  };
 
   useEffect(() => {
     const localConversationCode = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE);
@@ -120,27 +115,16 @@ const ConversationJoinComponent = ({
       });
   }, []);
 
-  useEffect(() => {
-    const isEnabled =
-      Config.getConfig().URL.MOBILE_BASE && UrlUtil.hasURLParameter(QUERY_KEY.PWA_AWARE) && isPwaSupportedBrowser();
-    setIsPwaEnabled(isEnabled);
-    if (isEnabled) {
-      setForceNewTemporaryGuestAccount(true);
-    }
-  }, []);
-
   const routeToApp = (conversation: string = '', domain: string = '') => {
-    const redirectLocation = isPwaEnabled
-      ? UrlUtil.pathWithParams(EXTERNAL_ROUTE.PWA_LOGIN, {[QUERY_KEY.IMMEDIATE_LOGIN]: 'true'})
-      : `${UrlUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP)}${
-          conversation && `#/conversation/${conversation}${domain && `/${domain}`}`
-        }`;
+    const redirectLocation = `${UrlUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP)}${
+      conversation && `#/conversation/${conversation}${domain && `/${domain}`}`
+    }`;
     window.location.replace(redirectLocation);
   };
 
   const handleSubmit = async (entropyData?: Uint8Array) => {
     try {
-      const name = enteredName.trim();
+      const name = enteredName?.trim();
       const registrationData = {
         accent_id: accentColor.id,
         expires_in: expiresIn,
@@ -149,18 +133,18 @@ const ConversationJoinComponent = ({
       await doRegisterWireless(
         registrationData as RegisterData,
         {
-          shouldInitializeClient: !isPwaEnabled,
+          shouldInitializeClient: true,
         },
         entropyData,
       );
-      const conversationEvent = await doJoinConversationByCode(conversationKey, conversationCode);
+      const conversationEvent = await doJoinConversationByCode(conversationKey ?? '', conversationCode ?? '');
       /* When we join a conversation, we create the join event before loading the webapp.
        * That means that when the webapp loads and tries to fetch the notificationStream is will get the join event once again and will try to handle it
        * Here we set the core's lastEventDate so that it knows that this duplicated event should be skipped
        */
       await setLastEventDate(new Date(conversationEvent.time));
 
-      routeToApp(conversationEvent.conversation, conversationEvent.qualified_conversation.domain);
+      routeToApp(conversationEvent.conversation, conversationEvent.qualified_conversation?.domain);
     } catch (error) {
       if (error.label) {
         switch (error.label) {
@@ -188,7 +172,7 @@ const ConversationJoinComponent = ({
 
   const checkNameValidity = (event: React.FormEvent) => {
     event.preventDefault();
-    nameInput.current.value = nameInput.current.value.trim();
+    nameInput.current.value = nameInput.current?.value.trim() ?? '';
     if (!nameInput.current.checkValidity()) {
       setError(ValidationError.handleValidationState('name', nameInput.current.validity));
       setIsValidName(false);
@@ -238,7 +222,7 @@ const ConversationJoinComponent = ({
         ) : renderTemporaryGuestAccountCreation ? (
           <div>
             <ContainerXS style={{margin: 'auto 0'}}>
-              <AppAlreadyOpen fullscreen={isPwaEnabled} />
+              <AppAlreadyOpen />
               <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}}>
                 <FormattedMessage
                   {...conversationJoinStrings.headline}
@@ -280,23 +264,21 @@ const ConversationJoinComponent = ({
                 </InputBlock>
                 {error ? parseValidationErrors(error) : parseError(conversationError)}
               </Form>
-              {!isPwaEnabled && (
-                <Small block>
-                  {`${_(conversationJoinStrings.hasAccount)} `}
-                  <RouterLink
-                    to={`${ROUTE.LOGIN}/${conversationKey}/${conversationCode}`}
-                    textTransform={'none'}
-                    data-uie-name="go-login"
-                  >
-                    {_(conversationJoinStrings.loginLink)}
-                  </RouterLink>
-                </Small>
-              )}
+              <Small block>
+                {`${_(conversationJoinStrings.hasAccount)} `}
+                <RouterLink
+                  to={`${ROUTE.LOGIN}/${conversationKey}/${conversationCode}`}
+                  textTransform={'none'}
+                  data-uie-name="go-login"
+                >
+                  {_(conversationJoinStrings.loginLink)}
+                </RouterLink>
+              </Small>
             </ContainerXS>
           </div>
         ) : (
           <ContainerXS style={{margin: 'auto 0'}}>
-            <AppAlreadyOpen fullscreen={isPwaEnabled} />
+            <AppAlreadyOpen />
             <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} data-uie-name="status-join-headline">
               {selfName
                 ? _(conversationJoinStrings.existentAccountHeadline, {
@@ -313,8 +295,11 @@ const ConversationJoinComponent = ({
               style={{marginTop: 16}}
               onClick={async () => {
                 try {
-                  const conversationEvent = await doJoinConversationByCode(conversationKey, conversationCode);
-                  routeToApp(conversationEvent.conversation, conversationEvent.qualified_conversation.domain);
+                  const conversationEvent = await doJoinConversationByCode(
+                    conversationKey ?? '',
+                    conversationCode ?? '',
+                  );
+                  routeToApp(conversationEvent.conversation, conversationEvent.qualified_conversation?.domain);
                 } catch (error) {
                   console.warn('Unable to join conversation with existing account', error);
                 }
