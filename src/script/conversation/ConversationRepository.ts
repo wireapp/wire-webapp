@@ -2541,7 +2541,7 @@ export class ConversationRepository {
    * @param eventJson JSON data of 'conversation.member-update' event
    * @returns Resolves when the event was handled
    */
-  private onMemberUpdate(
+  private async onMemberUpdate(
     conversationEntity: Conversation,
     eventJson: Pick<ConversationMemberUpdateEvent, 'data' | 'from'> & {conversation?: string},
   ) {
