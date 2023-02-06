@@ -133,24 +133,12 @@ export class EventService {
           .equals(eventId)
           .filter(record => record.conversation === conversationId)
           .first();
-        if (entry) {
-          return entry;
-        }
-        return await this.storageService.db
-          .table(StorageSchemata.OBJECT_STORE.EVENTS)
-          .where('conversation')
-          .equals(conversationId)
-          .filter(item => item.data?.replacing_message_id === eventId)
-          .first();
+        return entry;
       }
 
       const records = (await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS)) as EventRecord[];
       return records
-        .filter(
-          record =>
-            (record.id === eventId && record.conversation === conversationId) ||
-            (record.conversation === conversationId && record.data?.replacing_message_id === eventId),
-        )
+        .filter(record => record.id === eventId && record.conversation === conversationId)
         .sort(compareEventsById)
         .shift();
     } catch (error) {
