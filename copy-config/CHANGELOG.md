@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.0.8](https://github.com/wireapp/wire-web-packages/compare/@wireapp/copy-config@2.0.7...@wireapp/copy-config@2.0.8) (2023-02-06)
+
+**Note:** Version bump only for package @wireapp/copy-config
+
 ## [2.0.7](https://github.com/wireapp/wire-web-packages/compare/@wireapp/copy-config@2.0.6...@wireapp/copy-config@2.0.7) (2023-02-02)
 
 **Note:** Version bump only for package @wireapp/copy-config
