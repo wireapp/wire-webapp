@@ -29,6 +29,7 @@ import {
   sortByPriority,
   utf8ToUtf16BE,
   obfuscate,
+  replaceUmlaute,
 } from 'Util/StringUtil';
 
 import {lorem_ipsum} from '../../api/payloads';
@@ -207,6 +208,17 @@ describe('StringUtil', () => {
       const result = utf8ToUtf16BE(string);
 
       expect(result).toEqual(expected);
+    });
+  });
+
+  describe('replaceUmlaute', () => {
+    it('converts strings with umlaute values to pure strings with replaced umlaute values', () => {
+      const stringValue = 'müge';
+      const expectedResult = 'muge';
+
+      const resultValue = replaceUmlaute(stringValue);
+
+      expect(resultValue).toBe(expectedResult);
     });
   });
 });
