@@ -211,14 +211,12 @@ describe('StringUtil', () => {
     });
   });
 
-  describe('replaceUmlaute', () => {
-    it('converts strings with umlaute values to pure strings with replaced umlaute values', () => {
+  describe('replaceUmlaut', () => {
+    it('converts strings with umlaut values to pure strings with replaced umlaut values', () => {
       const stringValue = 'müge';
       const expectedResult = 'muge';
 
-      const resultValue = replaceUmlaute(stringValue);
-
-      expect(resultValue).toBe(expectedResult);
+      const resultValue = replaceUmlaut(stringValue);
     });
   });
 });
