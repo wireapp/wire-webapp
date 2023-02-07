@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [38.10.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.10.2...@wireapp/core@38.10.3) (2023-02-07)
+
+### Bug Fixes
+
+* Improve MLS backend response types ([96d8c6b](https://github.com/wireapp/wire-web-packages/commit/96d8c6b5cbabe119337f409447301b3f79dbdeab))
+
 ## [38.10.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.10.1...@wireapp/core@38.10.2) (2023-02-07)
 
 ### Bug Fixes
