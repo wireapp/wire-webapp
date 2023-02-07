@@ -25,7 +25,7 @@ import {
   UserClients,
   Conversation,
 } from '@wireapp/api-client/lib/conversation';
-import {MlsEvent} from '@wireapp/api-client/lib/conversation/data/MlsEventData';
+import {BackendEvent} from '@wireapp/api-client/lib/event';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {GenericMessage} from '@wireapp/protocol-messaging';
@@ -123,7 +123,7 @@ export type RemoveUsersParams = {
   groupId: string;
 };
 
-export type MLSReturnType = {events: MlsEvent[]; conversation: Conversation};
+export type MLSReturnType = {events: BackendEvent[]; conversation: Conversation};
 
 export type SendResult = {
   /** The id of the message sent */
