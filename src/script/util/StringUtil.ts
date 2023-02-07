@@ -176,5 +176,5 @@ const umlautMap: Record<string, string> = {
  * @param text The string to replace umlaut its charachters
  * @returns new string with replaced umlaut charachters
  */
-export const replaceUmlaute = (text: string) =>
+export const replaceUmlaut = (text: string) =>
   Object.keys(umlautMap).reduce((acc, cur) => acc.replace(new RegExp(umlautMap[cur], 'g'), cur), text);
