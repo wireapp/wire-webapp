@@ -238,7 +238,7 @@ export class MLSService extends TypedEventEmitter<Events> {
    *
    * @param conversationId Id of the parent conversation in which the call should happen
    */
-  public async joinConferenceSubconversation(conversationId: QualifiedId): Promise<Subconversation> {
+  public async joinConferenceSubconversation(conversationId: QualifiedId): Promise<{groupId: string; epoch: number}> {
     const subconversation = await this.getConferenceSubconversation(conversationId);
 
     if (subconversation.epoch === 0) {
@@ -264,10 +264,12 @@ export class MLSService extends TypedEventEmitter<Events> {
       );
     }
 
+    const epoch = Number(await this.getEpoch(subconversation.group_id));
+
     // We store the mapping between the subconversation and the parent conversation
     storeSubconversationGroupId(conversationId, subconversation.subconv_id, subconversation.group_id);
 
-    return subconversation;
+    return {groupId: subconversation.group_id, epoch};
   }
 
   public async exportSecretKey(groupId: string, keyLength: number): Promise<string> {
