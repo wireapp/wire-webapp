@@ -24,7 +24,7 @@ import {base64ToArray} from 'Util/util';
 
 import {MessageHasher} from '../../message/MessageHasher';
 import {QuoteEntity} from '../../message/QuoteEntity';
-import {LegacyEventRecord} from '../../storage/record/EventRecord';
+import {EventRecord} from '../../storage/record/EventRecord';
 import {ClientEvent} from '../Client';
 import type {EventService} from '../EventService';
 
@@ -44,7 +44,7 @@ export class QuotedMessageMiddleware {
    * @param event event in the DB format
    * @returns the original event if no quote is found (or does not validate). The decorated event if the quote is valid
    */
-  async processEvent(event: LegacyEventRecord): Promise<LegacyEventRecord> {
+  async processEvent(event: EventRecord): Promise<EventRecord> {
     switch (event.type) {
       case ClientEvent.CONVERSATION.MESSAGE_ADD: {
         if (event.data.replacing_message_id) {
@@ -63,7 +63,7 @@ export class QuotedMessageMiddleware {
     }
   }
 
-  private async _handleDeleteEvent(event: LegacyEventRecord): Promise<LegacyEventRecord> {
+  private async _handleDeleteEvent(event: EventRecord): Promise<EventRecord> {
     const originalMessageId = event.data.message_id;
     const {replies} = await this._findRepliesToMessage(event.conversation, originalMessageId);
     this.logger.info(`Invalidating '${replies.length}' replies to deleted message '${originalMessageId}'`);
@@ -74,7 +74,7 @@ export class QuotedMessageMiddleware {
     return event;
   }
 
-  private async _handleEditEvent(event: LegacyEventRecord): Promise<LegacyEventRecord> {
+  private async _handleEditEvent(event: EventRecord): Promise<EventRecord> {
     const originalMessageId = event.data.replacing_message_id;
     const {originalEvent, replies} = await this._findRepliesToMessage(event.conversation, originalMessageId);
     if (!originalEvent) {
@@ -91,7 +91,7 @@ export class QuotedMessageMiddleware {
     return {...event, data: decoratedData};
   }
 
-  private async _handleAddEvent(event: LegacyEventRecord): Promise<LegacyEventRecord> {
+  private async _handleAddEvent(event: EventRecord): Promise<EventRecord> {
     const rawQuote = event.data && event.data.quote;
 
     if (!rawQuote) {
@@ -143,7 +143,7 @@ export class QuotedMessageMiddleware {
   private async _findRepliesToMessage(
     conversationId: string,
     messageId: string,
-  ): Promise<{originalEvent?: LegacyEventRecord; replies: LegacyEventRecord[]}> {
+  ): Promise<{originalEvent?: EventRecord; replies: EventRecord[]}> {
     const originalEvent = await this.eventService.loadEvent(conversationId, messageId);
 
     if (!originalEvent) {
