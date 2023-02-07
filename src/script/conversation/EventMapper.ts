@@ -216,6 +216,9 @@ export class EventMapper {
 
     switch (event.type) {
       case CONVERSATION_EVENT.MEMBER_JOIN: {
+        /* FIXME: the 'as any' is needed here because we need data that comes from the ServiceMiddleware.
+         * We would need to create a super type that represents an event that has been decorated by middlewares...
+         */
         messageEntity = this._mapEventMemberJoin(event as any, conversationEntity);
         break;
       }
