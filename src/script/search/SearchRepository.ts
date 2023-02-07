@@ -24,7 +24,7 @@ import {EMOJI_RANGES} from 'Util/EmojiUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {
   computeTransliteration,
-  replaceUmlaute,
+  replaceUmlaut,
   sortByPriority,
   startsWith,
   transliterationIndex,
