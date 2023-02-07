@@ -29,7 +29,7 @@ import {
   sortByPriority,
   utf8ToUtf16BE,
   obfuscate,
-  replaceUmlaute,
+  replaceUmlaut,
 } from 'Util/StringUtil';
 
 import {lorem_ipsum} from '../../api/payloads';
