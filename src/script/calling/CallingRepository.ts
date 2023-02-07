@@ -132,7 +132,6 @@ export class CallingRepository {
   private readonly logger: Logger;
   private avsVersion: number = 0;
   private incomingCallCallback: (call: Call) => void;
-  private requestClientsCallback: (conversationId: QualifiedId) => void;
   private requestNewEpochCallback: (conversationId: QualifiedId) => void;
   private leaveCallCallback: (conversationId: QualifiedId) => void;
   private isReady: boolean = false;
@@ -172,7 +171,6 @@ export class CallingRepository {
   ) {
     this.logger = getLogger('CallingRepository');
     this.incomingCallCallback = () => {};
-    this.requestClientsCallback = () => {};
     this.requestNewEpochCallback = () => {};
     this.leaveCallCallback = () => {};
     this.callLog = [];
@@ -420,10 +418,6 @@ export class CallingRepository {
 
   onLeaveCall(callback: (conversationId: QualifiedId) => void): void {
     this.leaveCallCallback = callback;
-  }
-
-  onRequestClientsCallback(callback: (conversationId: QualifiedId) => void): void {
-    this.requestClientsCallback = callback;
   }
 
   onRequestNewEpochCallback(callback: (conversationId: QualifiedId) => void): void {
@@ -1514,8 +1508,6 @@ export class CallingRepository {
       return;
     }
     await this.pushClients(call);
-    const qualifiedConversationId = this.parseQualifiedId(convId);
-    this.requestClientsCallback(qualifiedConversationId);
   };
 
   private readonly requestNewEpoch = async (wUser: number, convId: SerializedConversationId) => {
