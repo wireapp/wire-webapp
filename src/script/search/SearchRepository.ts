@@ -24,7 +24,7 @@ import {EMOJI_RANGES} from 'Util/EmojiUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {
   computeTransliteration,
-  replaceUmlaut,
+  replaceAccents,
   sortByPriority,
   startsWith,
   transliterationIndex,
@@ -147,8 +147,9 @@ export class SearchRepository {
       return 100;
     }
     const nameSlug = computeTransliteration(value, excludedChars);
-    const nameIndexWithoutUmlaut = transliterationIndex(replaceUmlaut(value).toLowerCase(), term.toLowerCase());
-    const nameIndex = Math.max(nameIndexWithSlug, nameIndexWithoutUmlaut);
+    const nameIndexWithSlug = transliterationIndex(nameSlug, termSlug);
+    const nameIndexReplacedAccents = transliterationIndex(replaceAccents(value).toLowerCase(), term.toLowerCase());
+    const nameIndex = Math.max(nameIndexWithSlug, nameIndexReplacedAccents);
     const isStrictTransliteratedMatch = nameIndex === 0;
     if (isStrictTransliteratedMatch) {
       // give a little less points if the pattern strictly matches the transliterated string

@@ -29,7 +29,7 @@ import {
   sortByPriority,
   utf8ToUtf16BE,
   obfuscate,
-  replaceUmlaut,
+  replaceAccents,
 } from 'Util/StringUtil';
 
 import {lorem_ipsum} from '../../api/payloads';
@@ -211,12 +211,12 @@ describe('StringUtil', () => {
     });
   });
 
-  describe('replaceUmlaut', () => {
-    it('converts strings with umlaut values to pure strings with replaced umlaut values', () => {
+  describe('replaceAccents', () => {
+    it('converts strings with accents values to pure strings with replaced accents values', () => {
       const stringValue = 'müge';
       const expectedResult = 'muge';
 
-      const resultValue = replaceUmlaut(stringValue);
+      const resultValue = replaceAccents(stringValue);
     });
   });
 });

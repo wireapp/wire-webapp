@@ -162,19 +162,19 @@ export const fixWebsocketString = (originalString: string): string => {
   return decoder.decode(charArray);
 };
 
-const umlautMap: Record<string, string> = {
-  a: 'á|à|ã|â|À|Á|Ã|Â',
-  e: 'é|è|ê|É|È|Ê',
-  i: 'í|ì|î|Í|Ì|Î',
-  o: 'ó|ò|ô|õ|Ó|Ò|Ô|Õ',
+const accentsMap: Record<string, string> = {
+  a: 'ä|á|à|ã|â|À|Á|Ã|Â',
+  e: 'ë|é|è|ê|É|È|Ê',
+  i: 'ï|í|ì|î|Í|Ì|Î',
+  o: 'ö|ó|ò|ô|õ|Ó|Ò|Ô|Õ',
   u: 'ú|ù|û|ü|Ú|Ù|Û|Ü',
   c: 'ç|Ç',
   n: 'ñ|Ñ',
 };
 
 /**
- * @param text The string to replace umlaut its charachters
- * @returns new string with replaced umlaut charachters
+ * @param text The string to replace accents its charachters
+ * @returns new string with replaced accents charachters
  */
-export const replaceUmlaut = (text: string) =>
-  Object.keys(umlautMap).reduce((acc, cur) => acc.replace(new RegExp(umlautMap[cur], 'g'), cur), text);
+export const replaceAccents = (text: string) =>
+  Object.keys(accentsMap).reduce((acc, cur) => acc.replace(new RegExp(accentsMap[cur], 'g'), cur), text);
