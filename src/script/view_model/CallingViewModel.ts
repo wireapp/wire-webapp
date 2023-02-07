@@ -17,6 +17,7 @@
  *
  */
 
+import {SUBCONVERSATION_ID} from '@wireapp/api-client/lib/conversation/Subconversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 import {container} from 'tsyringe';
@@ -213,21 +214,20 @@ export class CallingViewModel {
         return;
       }
 
-      const subconversation = await this.mlsService.getConferenceSubconversation(conversationId);
+      const subconversationGroupId = await this.mlsService.getGroupIdFromConversationId(
+        conversationId,
+        SUBCONVERSATION_ID.CONFERENCE,
+      );
 
       //we don't want to react to avs callbacks when conversation was not yet established
-      const isMLSConversationEstablished = await this.mlsService.conversationExists(subconversation.group_id);
+      const isMLSConversationEstablished = await this.mlsService.conversationExists(subconversationGroupId);
       if (!isMLSConversationEstablished) {
         return;
       }
 
-      const parentGroupId = await this.mlsService.getGroupIdFromConversationId(conversationId);
-      const subconversationGroupId = subconversation.group_id;
-
       const {epoch, keyLength, secretKey, members} = await getSubconversationEpochInfo(
         {mlsService: this.mlsService},
-        subconversationGroupId,
-        parentGroupId,
+        conversationId,
         shouldAdvanceEpoch,
       );
       this.callingRepository.setEpochInfo(conversationId, {epoch, keyLength, secretKey}, members);

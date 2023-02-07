@@ -17,6 +17,7 @@
  *
  */
 
+import {SUBCONVERSATION_ID} from '@wireapp/api-client/lib/conversation/Subconversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {MLSService} from '@wireapp/core/lib/messagingProtocols/mls';
 import {constructFullyQualifiedClientId} from '@wireapp/core/lib/util/fullyQualifiedClientIdUtils';
@@ -50,8 +51,7 @@ const generateSubconversationMembers = async (
 
 export const getSubconversationEpochInfo = async (
   {mlsService}: {mlsService: MLSService},
-  subconversationGroupId: string,
-  parentGroupId: string,
+  conversationId: QualifiedId,
   shouldAdvanceEpoch = false,
 ): Promise<{
   members: SubconversationEpochInfoMember[];
@@ -59,6 +59,12 @@ export const getSubconversationEpochInfo = async (
   secretKey: string;
   keyLength: number;
 }> => {
+  const subconversationGroupId = await mlsService.getGroupIdFromConversationId(
+    conversationId,
+    SUBCONVERSATION_ID.CONFERENCE,
+  );
+  const parentGroupId = await mlsService.getGroupIdFromConversationId(conversationId);
+
   const members = await generateSubconversationMembers({mlsService}, subconversationGroupId, parentGroupId);
 
   if (shouldAdvanceEpoch) {
@@ -82,27 +88,22 @@ export const subscribeToEpochUpdates = async (
     keyLength: number;
   }) => void,
 ): Promise<() => void> => {
-  const subconversation = await mlsService.joinConferenceSubconversation(conversationId);
+  const {epoch: initialEpoch, groupId: subconversationGroupId} = await mlsService.joinConferenceSubconversation(
+    conversationId,
+  );
 
   const forwardNewEpoch = async ({groupId, epoch}: {groupId: string; epoch: number}) => {
-    if (groupId !== subconversation.group_id) {
+    if (groupId !== subconversationGroupId) {
       return;
     }
 
-    const subconversationGroupId = subconversation.group_id;
-    const parentConversationGroupId = await mlsService.getGroupIdFromConversationId(conversationId);
-
-    const {keyLength, secretKey, members} = await getSubconversationEpochInfo(
-      {mlsService},
-      subconversationGroupId,
-      parentConversationGroupId,
-    );
+    const {keyLength, secretKey, members} = await getSubconversationEpochInfo({mlsService}, conversationId);
     onEpochUpdate({epoch: Number(epoch), keyLength, secretKey, members});
   };
 
   mlsService.on('newEpoch', forwardNewEpoch);
 
-  await forwardNewEpoch({groupId: subconversation.group_id, epoch: subconversation.epoch});
+  await forwardNewEpoch({groupId: subconversationGroupId, epoch: initialEpoch});
 
   return () => mlsService.off('newEpoch', forwardNewEpoch);
 };
