@@ -38,7 +38,6 @@ import {
 } from '..';
 import {BackendFeatures} from '../../APIClient';
 import {
-  BackendEvent,
   ConversationAccessUpdateEvent,
   ConversationCodeDeleteEvent,
   ConversationCodeUpdateEvent,
@@ -70,7 +69,7 @@ import {
 import {Subconversation, SUBCONVERSATION_ID} from '../Subconversation';
 
 export type PostMlsMessageResponse = {
-  events: BackendEvent[];
+  events: ConversationEvent[];
   time: string;
 };
 
