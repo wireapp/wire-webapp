@@ -91,7 +91,7 @@ import {StatusType} from '../message/StatusType';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 import {Core} from '../service/CoreSingleton';
-import type {EventRecord} from '../storage';
+import type {LegacyEventRecord} from '../storage';
 import {TeamState} from '../team/TeamState';
 import {ServerTimeHandler} from '../time/serverTimeHandler';
 import {UserType} from '../tracking/attribute';
@@ -469,7 +469,7 @@ export class MessageRepository {
     conversation: Conversation,
     file: Blob,
     asImage: boolean = false,
-  ): Promise<EventRecord | void> {
+  ): Promise<LegacyEventRecord | void> {
     const uploadStarted = Date.now();
     const {id, state} = await this.sendAssetMetadata(conversation, file, asImage);
     if (state === MessageSendingState.CANCELED) {
@@ -707,7 +707,7 @@ export class MessageRepository {
         this.trackContributed(conversation, payload);
         const mappedEvent = await this.cryptography_repository.cryptographyMapper.mapGenericMessage(
           payload,
-          optimisticEvent as EventRecord,
+          optimisticEvent as LegacyEventRecord,
         );
         await this.eventRepository.injectEvent(mappedEvent);
       }
@@ -1098,12 +1098,12 @@ export class MessageRepository {
     conversationEntity: Conversation,
     eventId: string,
     isoDate?: string,
-  ): Promise<Pick<Partial<EventRecord>, 'status' | 'time'> | void> {
+  ): Promise<Pick<Partial<LegacyEventRecord>, 'status' | 'time'> | void> {
     try {
       const messageEntity = await this.getMessageInConversationById(conversationEntity, eventId);
       const updatedStatus = messageEntity.readReceipts().length ? StatusType.SEEN : StatusType.SENT;
       messageEntity.status(updatedStatus);
-      const changes: Pick<Partial<EventRecord>, 'status' | 'time'> = {
+      const changes: Pick<Partial<LegacyEventRecord>, 'status' | 'time'> = {
         status: updatedStatus,
       };
       if (isoDate) {

@@ -77,7 +77,6 @@ import type {MediaStreamHandler} from '../media/MediaStreamHandler';
 import {MediaType} from '../media/MediaType';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
-import type {EventRecord} from '../storage';
 import {TeamState} from '../team/TeamState';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import {EventName} from '../tracking/EventName';
@@ -1099,7 +1098,7 @@ export class CallingRepository {
 
   private injectActivateEvent(conversationId: QualifiedId, userId: QualifiedId, time: string): void {
     const event = EventBuilder.buildVoiceChannelActivate(conversationId, userId, time, this.avsVersion);
-    this.eventRepository.injectEvent(event as unknown as EventRecord, EventSource.INJECTED);
+    this.eventRepository.injectEvent(event, EventSource.INJECTED);
   }
 
   private injectDeactivateEvent(
@@ -1118,7 +1117,7 @@ export class CallingRepository {
       time,
       this.avsVersion,
     );
-    this.eventRepository.injectEvent(event as unknown as EventRecord, source as EventSource);
+    this.eventRepository.injectEvent(event, source);
   }
 
   private readonly sendMessage = (
@@ -1283,7 +1282,7 @@ export class CallingRepository {
           conversationEntity,
           call.getSelfParticipant().user.id,
         );
-        this.eventRepository.injectEvent(callingEvent as EventRecord);
+        this.eventRepository.injectEvent(callingEvent);
       }
     }
 

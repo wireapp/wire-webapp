@@ -58,7 +58,7 @@ import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {CryptographyError} from '../error/CryptographyError';
 import {ClientEvent, CONVERSATION} from '../event/Client';
 import {StatusType} from '../message/StatusType';
-import {EventRecord} from '../storage';
+import {LegacyEventRecord} from '../storage';
 
 export interface MappedText {
   data: {content: string; mentions: string[]; previews: string[]; quote?: string; replacing_message_id?: string};
@@ -100,7 +100,7 @@ export interface AssetData {
   status?: AssetTransferState;
   token?: string;
 }
-type ConversationEvent = Omit<EventRecord, 'id'>;
+type ConversationEvent = Omit<LegacyEventRecord, 'id'>;
 
 export class CryptographyMapper {
   private readonly logger: Logger;

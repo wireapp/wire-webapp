@@ -97,6 +97,7 @@ import {
   DeleteEvent,
   EventBuilder,
   GroupCreationEvent,
+  MemberLeaveEvent,
   MessageHiddenEvent,
   OneToOneCreationEvent,
   ReactionEvent,
@@ -2481,7 +2482,7 @@ export class ConversationRepository {
    */
   private async onMemberLeave(
     conversationEntity: Conversation,
-    eventJson: ConversationMemberLeaveEvent | TeamMemberLeaveEvent,
+    eventJson: ConversationMemberLeaveEvent | TeamMemberLeaveEvent | MemberLeaveEvent,
   ): Promise<{conversationEntity: Conversation; messageEntity: Message} | undefined> {
     const {data: eventData, from} = eventJson;
     const isFromSelf = from === this.userState.self().id;

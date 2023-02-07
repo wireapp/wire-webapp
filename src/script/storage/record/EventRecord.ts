@@ -17,7 +17,8 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import type {ConversationEvent} from '@wireapp/api-client/lib/event';
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {ReactionType} from '@wireapp/core/lib/conversation/';
 
 import {StatusType} from '../../message/StatusType';
@@ -38,7 +39,17 @@ export interface AssetRecord {
 
 export type UserReactionMap = {[userId: string]: ReactionType};
 
-export interface EventRecord<T = any> {
+/** represents an event that was saved to the DB */
+type StoredEvent = {
+  primary_key: string;
+  category: number;
+  id: string;
+};
+
+export type EventRecord = StoredEvent & ConversationEvent;
+
+/** @deprecated This is the old swallow-all type. Use the EventRecord Discriminated Union Type instead */
+export interface LegacyEventRecord<T = any> {
   category?: number;
   client?: {time: string};
   connection?: {lastUpdate: string};
