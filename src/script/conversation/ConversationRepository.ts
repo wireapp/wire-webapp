@@ -1350,7 +1350,7 @@ export class ConversationRepository {
           qualifiedUserIds,
         });
         if (!!events.length) {
-          events.forEach(event => this.eventRepository.injectEvent(event as ClientConversationEvent));
+          events.forEach(event => this.eventRepository.injectEvent(event));
         }
       } else {
         const conversationMemberJoinEvent = await this.core.service!.conversation.addUsersToProteusConversation({
@@ -1358,7 +1358,7 @@ export class ConversationRepository {
           qualifiedUserIds,
         });
         if (conversationMemberJoinEvent) {
-          this.eventRepository.injectEvent(conversationMemberJoinEvent as any, EventRepository.SOURCE.BACKEND_RESPONSE);
+          this.eventRepository.injectEvent(conversationMemberJoinEvent, EventRepository.SOURCE.BACKEND_RESPONSE);
         }
       }
     } catch (error) {
@@ -1490,7 +1490,7 @@ export class ConversationRepository {
     });
 
     if (!!events.length) {
-      events.forEach(event => this.eventRepository.injectEvent(event as ClientConversationEvent));
+      events.forEach(event => this.eventRepository.injectEvent(event));
     }
   }
 

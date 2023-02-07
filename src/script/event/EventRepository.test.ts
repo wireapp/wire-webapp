@@ -245,9 +245,7 @@ describe('EventRepository', () => {
         from: createRandomUuid(),
         id: createRandomUuid(),
         time: new Date().toISOString(),
-        type: CONVERSATION_EVENT.OTR_MESSAGE_ADD,
-        primary_key: '1',
-        category: 16,
+        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       };
 
       jest
