@@ -24,7 +24,7 @@ import {getLogger, Logger} from 'Util/Logger';
 
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
 import {StatusType} from '../../message/StatusType';
-import type {EventRecord} from '../../storage/record/EventRecord';
+import type {LegacyEventRecord} from '../../storage/record/EventRecord';
 import {UserState} from '../../user/UserState';
 import {ClientEvent} from '../Client';
 import type {EventService} from '../EventService';
@@ -47,7 +47,7 @@ export class ReceiptsMiddleware {
   /**
    * Handles incoming (and injected outgoing) events.
    */
-  async processEvent(event: EventRecord): Promise<EventRecord> {
+  async processEvent(event: LegacyEventRecord): Promise<LegacyEventRecord> {
     switch (event.type) {
       case ClientEvent.CONVERSATION.ASSET_ADD:
       case ClientEvent.CONVERSATION.KNOCK:
@@ -64,7 +64,7 @@ export class ReceiptsMiddleware {
       }
       case ClientEvent.CONVERSATION.CONFIRMATION: {
         const messageIds = event.data.more_message_ids.concat(event.data.message_id);
-        const originalEvents: EventRecord[] = await this.eventService.loadEvents(event.conversation, messageIds);
+        const originalEvents: LegacyEventRecord[] = await this.eventService.loadEvents(event.conversation, messageIds);
         originalEvents.forEach(originalEvent => this.updateConfirmationStatus(originalEvent, event));
         this.logger.info(
           `Confirmed '${originalEvents.length}' messages with status '${event.data.status}' from '${event.from}'`,
@@ -78,14 +78,14 @@ export class ReceiptsMiddleware {
     }
   }
 
-  isMyMessage(originalEvent: EventRecord): boolean {
+  isMyMessage(originalEvent: LegacyEventRecord): boolean {
     return this.userState.self() && this.userState.self().id === originalEvent.from;
   }
 
   private updateConfirmationStatus(
-    originalEvent: EventRecord,
-    confirmationEvent: EventRecord,
-  ): Promise<EventRecord | void> {
+    originalEvent: LegacyEventRecord,
+    confirmationEvent: LegacyEventRecord,
+  ): Promise<LegacyEventRecord | void> {
     const status = confirmationEvent.data.status;
     const currentReceipts = originalEvent.read_receipts || [];
 

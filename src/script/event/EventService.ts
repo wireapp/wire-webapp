@@ -31,20 +31,21 @@ import {ConversationError} from '../error/ConversationError';
 import {StorageError} from '../error/StorageError';
 import {categoryFromEvent} from '../message/MessageCategorization';
 import {MessageCategory} from '../message/MessageCategory';
-import {StorageService, DatabaseListenerCallback, EventRecord} from '../storage';
+import {StorageService, DatabaseListenerCallback, LegacyEventRecord, EventRecord} from '../storage';
 import {StorageSchemata} from '../storage/StorageSchemata';
 
 export type Includes = {includeFrom: boolean; includeTo: boolean};
 type DexieCollection = Dexie.Collection<any, any>;
-export type DBEvents = DexieCollection | EventRecord[];
+export type DBEvents = DexieCollection | LegacyEventRecord[];
 
 export const eventTimeToDate = (time: string) => new Date(time) || new Date(parseInt(time, 10));
 
-export const compareEventsByConversation = (eventA: EventRecord, eventB: EventRecord) =>
+export const compareEventsByConversation = (eventA: LegacyEventRecord, eventB: LegacyEventRecord) =>
   eventA.conversation.localeCompare(eventB.conversation);
 
-export const compareEventsById = (eventA: EventRecord, eventB: EventRecord) => eventA.id.localeCompare(eventB.id);
-export const compareEventsByTime = (eventA: EventRecord, eventB: EventRecord) =>
+export const compareEventsById = (eventA: LegacyEventRecord, eventB: LegacyEventRecord) =>
+  eventA.id.localeCompare(eventB.id);
+export const compareEventsByTime = (eventA: LegacyEventRecord, eventB: LegacyEventRecord) =>
   eventTimeToDate(eventA.time).getTime() - eventTimeToDate(eventB.time).getTime();
 
 /** Handles all databases interactions related to events */
@@ -55,7 +56,7 @@ export class EventService {
     this.logger = getLogger('EventService');
   }
 
-  async loadEvents(conversationId: string, eventIds: string[]): Promise<EventRecord[]> {
+  async loadEvents(conversationId: string, eventIds: string[]): Promise<LegacyEventRecord[]> {
     if (!conversationId || !eventIds) {
       this.logger.error(`Cannot get events '${eventIds}' in conversation '${conversationId}' without IDs`);
       throw new ConversationError(BASE_ERROR_TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER);
@@ -72,7 +73,7 @@ export class EventService {
         return events;
       }
 
-      const records = (await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS)) as EventRecord[];
+      const records = (await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS)) as LegacyEventRecord[];
       return records
         .filter(record => record.conversation === conversationId && eventIds.includes(record.id))
         .sort(compareEventsById);
@@ -85,7 +86,7 @@ export class EventService {
     }
   }
 
-  async loadEphemeralEvents(conversationId: string): Promise<EventRecord[]> {
+  async loadEphemeralEvents(conversationId: string): Promise<LegacyEventRecord[]> {
     if (!conversationId) {
       this.logger.error(`Cannot get ephemeral events in conversation '${conversationId}' without ID`);
       throw new ConversationError(BASE_ERROR_TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER);
@@ -102,7 +103,7 @@ export class EventService {
         return events;
       }
 
-      const records = (await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS)) as EventRecord[];
+      const records = (await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS)) as LegacyEventRecord[];
       return records
         .filter(record => record.conversation === conversationId && !!record.ephemeral_expires)
         .sort(compareEventsById);
@@ -119,7 +120,7 @@ export class EventService {
    * @param conversationId ID of conversation
    * @param eventId ID of event to retrieve
    */
-  async loadEvent(conversationId: string, eventId: string): Promise<EventRecord> {
+  async loadEvent(conversationId: string, eventId: string): Promise<EventRecord | undefined> {
     if (!conversationId || !eventId) {
       this.logger.error(`Cannot get event '${eventId}' in conversation '${conversationId}' without IDs`);
       throw new ConversationError(BASE_ERROR_TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER);
@@ -136,7 +137,7 @@ export class EventService {
         return entry;
       }
 
-      const records = (await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS)) as EventRecord[];
+      const records = await this.storageService.getAll<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS);
       return records
         .filter(record => record.id === eventId && record.conversation === conversationId)
         .sort(compareEventsById)
@@ -160,7 +161,7 @@ export class EventService {
     categoryMin: MessageCategory,
     categoryMax = MessageCategory.LIKED,
   ): Promise<DBEvents> {
-    const filterExpired = (record: EventRecord) => {
+    const filterExpired = (record: LegacyEventRecord) => {
       if (typeof record.ephemeral_expires !== 'undefined') {
         return +record.ephemeral_expires - Date.now() > 0;
       }
@@ -178,7 +179,7 @@ export class EventService {
       return events;
     }
 
-    const records = (await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS)) as EventRecord[];
+    const records = (await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS)) as LegacyEventRecord[];
     return records
       .filter(
         record =>
@@ -199,7 +200,7 @@ export class EventService {
       return events;
     }
 
-    const records = (await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS)) as EventRecord[];
+    const records = (await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS)) as LegacyEventRecord[];
     return records
       .filter(record => {
         return (
@@ -235,7 +236,7 @@ export class EventService {
       const events = await this._loadEventsInDateRange(conversationId, fromDate, toDate, limit, includeParams);
       return this.storageService.db
         ? await (events as Dexie.Collection<any, any>).reverse().sortBy('time')
-        : (events as EventRecord[]).reverse().sort(compareEventsByTime);
+        : (events as LegacyEventRecord[]).reverse().sort(compareEventsByTime);
     } catch (error) {
       const message = `Failed to load events for conversation '${conversationId}' from database: '${error.message}'`;
       this.logger.error(message);
@@ -270,7 +271,7 @@ export class EventService {
     const events = await this._loadEventsInDateRange(conversationId, fromDate, toDate, limit, includeParams);
     return this.storageService.db
       ? (events as DexieCollection).sortBy('time')
-      : (events as EventRecord[]).sort(compareEventsByTime);
+      : (events as LegacyEventRecord[]).sort(compareEventsByTime);
   }
 
   /**
@@ -313,7 +314,7 @@ export class EventService {
       return events;
     }
 
-    const records = (await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS)) as EventRecord[];
+    const records = (await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS)) as LegacyEventRecord[];
     return records
       .filter(record => {
         const recordDate = eventTimeToDate(record.time).getTime();
@@ -333,7 +334,7 @@ export class EventService {
    *
    * @param event JSON event to be stored
    */
-  async saveEvent(event: EventRecord): Promise<EventRecord> {
+  async saveEvent(event: LegacyEventRecord): Promise<LegacyEventRecord> {
     event.category = categoryFromEvent(event);
     event.primary_key = await this.storageService.save(StorageSchemata.OBJECT_STORE.EVENTS, undefined, event);
     if (this.storageService.isTemporaryAndNonPersistent) {
@@ -348,7 +349,7 @@ export class EventService {
     return event;
   }
 
-  async replaceEvent<T extends Partial<EventRecord>>(event: T): Promise<T> {
+  async replaceEvent<T extends Partial<LegacyEventRecord>>(event: T): Promise<T> {
     await this.storageService.update(StorageSchemata.OBJECT_STORE.EVENTS, event.primary_key, event);
     return event;
   }
@@ -370,8 +371,8 @@ export class EventService {
   async updateEventAsUploadFailed(
     primaryKey: string,
     reason: ProtobufAsset.NotUploaded | AssetTransferState,
-  ): Promise<EventRecord | undefined> {
-    const record = await this.storageService.load<EventRecord<AssetData>>(
+  ): Promise<LegacyEventRecord | undefined> {
+    const record = await this.storageService.load<LegacyEventRecord<AssetData>>(
       StorageSchemata.OBJECT_STORE.EVENTS,
       primaryKey,
     );
@@ -393,7 +394,7 @@ export class EventService {
    * @param primaryKey event's primary key
    * @param updates Updates to perform on the message.
    */
-  async updateEvent<T extends Partial<EventRecord>>(
+  async updateEvent<T extends Partial<LegacyEventRecord>>(
     primaryKey: string,
     updates: T,
   ): Promise<T & {primary_key: string}> {
@@ -417,7 +418,7 @@ export class EventService {
    * @param primaryKey Event primary key
    * @param changes Changes to update message with
    */
-  async updateEventSequentially(primaryKey: string, changes: Partial<EventRecord> = {}): Promise<number> {
+  async updateEventSequentially(primaryKey: string, changes: Partial<LegacyEventRecord> = {}): Promise<number> {
     const hasVersionedChanges = !!changes.version;
     if (!hasVersionedChanges) {
       throw new ConversationError(ConversationError.TYPE.WRONG_CHANGE, ConversationError.MESSAGE.WRONG_CHANGE);
@@ -426,7 +427,10 @@ export class EventService {
     if (this.storageService.db) {
       // Create a DB transaction to avoid concurrent sequential update.
       return this.storageService.db.transaction('rw', StorageSchemata.OBJECT_STORE.EVENTS, async () => {
-        const record = await this.storageService.load<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey);
+        const record = await this.storageService.load<LegacyEventRecord>(
+          StorageSchemata.OBJECT_STORE.EVENTS,
+          primaryKey,
+        );
         if (!record) {
           throw new StorageError(StorageError.TYPE.NOT_FOUND, StorageError.MESSAGE.NOT_FOUND);
         }

@@ -17,7 +17,7 @@
  *
  */
 
-import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/lib/event/';
+import {CONVERSATION_EVENT, USER_EVENT, ConversationEvent} from '@wireapp/api-client/lib/event/';
 import {NotificationSource, HandledEventPayload} from '@wireapp/core/lib/notification';
 import {amplify} from 'amplify';
 import ko from 'knockout';
@@ -42,12 +42,12 @@ import type {NotificationService} from './NotificationService';
 
 import {AssetTransferState} from '../assets/AssetTransferState';
 import type {ClientEntity} from '../client/ClientEntity';
-import {EventBuilder} from '../conversation/EventBuilder';
+import {ClientConversationEvent, EventBuilder} from '../conversation/EventBuilder';
 import {AssetData, CryptographyMapper} from '../cryptography/CryptographyMapper';
 import {CryptographyError} from '../error/CryptographyError';
 import {EventError} from '../error/EventError';
 import {categoryFromEvent} from '../message/MessageCategorization';
-import type {EventRecord} from '../storage';
+import type {LegacyEventRecord} from '../storage';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import {EventName} from '../tracking/EventName';
 import {UserState} from '../user/UserState';
@@ -159,7 +159,7 @@ export class EventRepository {
 
   private readonly handleIncomingEvent = async (payload: HandledEventPayload, source: NotificationSource) => {
     try {
-      await this.handleEvent({...payload, event: payload.event as EventRecord}, source);
+      await this.handleEvent({...payload, event: payload.event as LegacyEventRecord}, source);
     } catch (error) {
       if (source === EventSource.NOTIFICATION_STREAM) {
         this.logger.warn(`Failed to handle event of type "${event.type}": ${error.message}`, error);
@@ -231,7 +231,7 @@ export class EventRepository {
     }
   }
 
-  private getIsoDateFromEvent(event: EventRecord, defaultValue = false): string | void {
+  private getIsoDateFromEvent(event: LegacyEventRecord, defaultValue = false): string | void {
     const {client, connection, time: eventDate, type: eventType} = event;
 
     if (eventDate) {
@@ -288,7 +288,10 @@ export class EventRepository {
    * @param source Source of injection
    * @returns Resolves when the event has been processed
    */
-  async injectEvent(event: EventRecord, source: EventSource = EventSource.INJECTED): Promise<EventRecord | undefined> {
+  async injectEvent(
+    event: ClientConversationEvent | ConversationEvent,
+    source: EventSource = EventSource.INJECTED,
+  ): Promise<LegacyEventRecord | undefined> {
     if (!event) {
       throw new EventError(EventError.TYPE.NO_EVENT, EventError.MESSAGE.NO_EVENT);
     }
@@ -298,7 +301,8 @@ export class EventRepository {
       source = EventRepository.SOURCE.INJECTED;
     }
 
-    const {conversation: conversationId, id = 'ID not specified', type} = event;
+    const id = 'id' in event ? event.id : 'ID not specified';
+    const {conversation: conversationId, type} = event;
     const inSelfConversation = conversationId === this.userState.self().id;
     if (!inSelfConversation) {
       this.logger.info(`Injected event ID '${id}' of type '${type}' with source '${source}'`, event);
@@ -313,7 +317,7 @@ export class EventRepository {
    * @param event Mapped event to be distributed
    * @param source Source of notification
    */
-  private async distributeEvent(event: EventRecord, source: EventSource): Promise<EventRecord> {
+  private async distributeEvent(event: LegacyEventRecord, source: EventSource): Promise<LegacyEventRecord> {
     const {conversation: conversationId, from: userId, type} = event;
 
     const hasIds = conversationId && userId;
@@ -353,9 +357,9 @@ export class EventRepository {
    * @returns Resolves with the saved record or the plain event if the event was skipped
    */
   private handleEvent(
-    {event, decryptedData, decryptionError}: Omit<ProcessedEventPayload, 'event'> & {event: EventRecord},
+    {event, decryptedData, decryptionError}: Omit<ProcessedEventPayload, 'event'> & {event: LegacyEventRecord},
     source: EventSource,
-  ): Promise<EventRecord | undefined> {
+  ): Promise<LegacyEventRecord | undefined> {
     const logObject = {eventJson: JSON.stringify(event), eventObject: event};
     const validationResult = validateEvent(
       event as {time: string; type: CONVERSATION_EVENT | USER_EVENT},
@@ -364,14 +368,14 @@ export class EventRepository {
     );
     switch (validationResult) {
       default: {
-        return Promise.resolve(event as EventRecord);
+        return Promise.resolve(event);
       }
       case EventValidation.OUTDATED_TIMESTAMP: {
         this.logger.info(`Ignored outdated event type: '${event.type}'`, logObject);
-        return Promise.resolve(event as EventRecord);
+        return Promise.resolve(event);
       }
       case EventValidation.VALID:
-        return this.processEvent(event as EventRecord, source, decryptedData, decryptionError);
+        return this.processEvent(event, source, decryptedData, decryptionError);
     }
   }
 
@@ -383,11 +387,11 @@ export class EventRepository {
    * @returns Resolves with the saved record or `true` if the event was skipped
    */
   private async processEvent(
-    event: EventRecord,
+    event: LegacyEventRecord,
     source: EventSource,
     decryptedData?: GenericMessage,
     decryptionError?: HandledEventPayload['decryptionError'],
-  ): Promise<EventRecord | undefined> {
+  ): Promise<LegacyEventRecord | undefined> {
     if (decryptionError) {
       this.logger.warn(`Decryption Error: (${decryptionError.code}) ${decryptionError.message}`, decryptionError);
       const ignoredCodes = [
@@ -428,7 +432,7 @@ export class EventRepository {
    * @param source Source of event
    * @returns The distributed event
    */
-  private handleEventDistribution(event: EventRecord, source: EventSource): Promise<EventRecord> {
+  private handleEventDistribution(event: LegacyEventRecord, source: EventSource): Promise<LegacyEventRecord> {
     const eventDate = this.getIsoDateFromEvent(event);
     const isInjectedEvent = source === EventRepository.SOURCE.INJECTED;
     const canSetEventDate = !isInjectedEvent && eventDate;
@@ -452,7 +456,7 @@ export class EventRepository {
    * @param event Backend event extracted from notification stream
    * @returns Resolves with the saved event
    */
-  private handleEventSaving(event: EventRecord): Promise<EventRecord | undefined> {
+  private handleEventSaving(event: LegacyEventRecord): Promise<LegacyEventRecord | undefined> {
     const conversationId = event.conversation;
     const mappedData = event.data || {};
 
@@ -461,7 +465,7 @@ export class EventRepository {
       ? this.eventService.loadEvent(conversationId, mappedData.replacing_message_id)
       : Promise.resolve();
 
-    return (findEventToReplacePromise as Promise<EventRecord>).then((eventToReplace: EventRecord) => {
+    return (findEventToReplacePromise as Promise<LegacyEventRecord>).then((eventToReplace: LegacyEventRecord) => {
       const hasLinkPreview = mappedData.previews && mappedData.previews.length;
       const isReplacementWithoutOriginal = !eventToReplace && mappedData.replacing_message_id;
       if (isReplacementWithoutOriginal && !hasLinkPreview) {
@@ -469,13 +473,13 @@ export class EventRepository {
         this.throwValidationError(event, 'Edit event without original event');
       }
 
-      const handleEvent = (newEvent: EventRecord) => {
+      const handleEvent = (newEvent: LegacyEventRecord) => {
         // check for duplicates (same id)
         const loadEventPromise = newEvent.id
           ? this.eventService.loadEvent(conversationId, newEvent.id)
           : Promise.resolve(undefined);
 
-        return loadEventPromise.then((storedEvent?: EventRecord) => {
+        return loadEventPromise.then((storedEvent?: LegacyEventRecord) => {
           return storedEvent
             ? this.handleDuplicatedEvent(storedEvent, newEvent)
             : this.eventService.saveEvent(newEvent);
@@ -486,7 +490,10 @@ export class EventRepository {
     });
   }
 
-  private handleEventReplacement(originalEvent: EventRecord, newEvent: EventRecord): Promise<EventRecord> {
+  private handleEventReplacement(
+    originalEvent: LegacyEventRecord,
+    newEvent: LegacyEventRecord,
+  ): Promise<LegacyEventRecord> {
     if (originalEvent.from !== newEvent.from) {
       const logMessage = `ID previously used by user '${newEvent.from}'`;
       const errorMessage = 'ID reused by other user';
@@ -508,7 +515,7 @@ export class EventRepository {
     return this.eventService.replaceEvent(identifiedUpdates);
   }
 
-  private handleDuplicatedEvent(originalEvent: EventRecord, newEvent: EventRecord) {
+  private handleDuplicatedEvent(originalEvent: LegacyEventRecord, newEvent: LegacyEventRecord) {
     switch (newEvent.type) {
       case ClientEvent.CONVERSATION.ASSET_ADD:
         return this.handleAssetUpdate(originalEvent, newEvent);
@@ -522,9 +529,9 @@ export class EventRepository {
   }
 
   private async handleAssetUpdate(
-    originalEvent: EventRecord<AssetData>,
-    newEvent: EventRecord<AssetData>,
-  ): Promise<EventRecord> {
+    originalEvent: LegacyEventRecord<AssetData>,
+    newEvent: LegacyEventRecord<AssetData>,
+  ): Promise<LegacyEventRecord> {
     const newEventData = newEvent.data;
     // the preview status is not sent by the client so we fake a 'preview' status in order to cleanly handle it in the switch statement
     const ASSET_PREVIEW = 'preview';
@@ -559,7 +566,10 @@ export class EventRepository {
     }
   }
 
-  private handleLinkPreviewUpdate(originalEvent: EventRecord, newEvent: EventRecord): Promise<EventRecord> {
+  private handleLinkPreviewUpdate(
+    originalEvent: LegacyEventRecord,
+    newEvent: LegacyEventRecord,
+  ): Promise<LegacyEventRecord> {
     const newEventData = newEvent.data;
     const originalData = originalEvent.data;
     if (originalEvent.from !== newEvent.from) {
@@ -591,7 +601,7 @@ export class EventRepository {
     return this.eventService.replaceEvent(identifiedUpdates);
   }
 
-  private static getCommonMessageUpdates(originalEvent: EventRecord, newEvent: EventRecord) {
+  private static getCommonMessageUpdates(originalEvent: LegacyEventRecord, newEvent: LegacyEventRecord) {
     return {
       ...newEvent,
       data: {...newEvent.data, expects_read_confirmation: originalEvent.data.expects_read_confirmation},
@@ -604,14 +614,14 @@ export class EventRepository {
   }
 
   private static getUpdatesForEditMessage(
-    originalEvent: EventRecord,
-    newEvent: EventRecord,
-  ): EventRecord & {reactions: {}} {
+    originalEvent: LegacyEventRecord,
+    newEvent: LegacyEventRecord,
+  ): LegacyEventRecord & {reactions: {}} {
     // Remove reactions, so that likes (hearts) don't stay when a message's text gets edited
     return {...newEvent, reactions: {}};
   }
 
-  private getUpdatesForLinkPreview(originalEvent: EventRecord, newEvent: EventRecord): EventRecord {
+  private getUpdatesForLinkPreview(originalEvent: LegacyEventRecord, newEvent: LegacyEventRecord): LegacyEventRecord {
     const newData = newEvent.data;
     const originalData = originalEvent.data;
     const updatingLinkPreview = !!originalData.previews.length;
@@ -638,7 +648,7 @@ export class EventRepository {
     };
   }
 
-  private throwValidationError(event: EventRecord, errorMessage: string, logMessage?: string): never {
+  private throwValidationError(event: LegacyEventRecord, errorMessage: string, logMessage?: string): never {
     const baseLogMessage = `Ignored '${event.type}' (${event.id || 'no ID'}) in '${event.conversation}' from '${
       event.from
     }':'`;

@@ -58,7 +58,7 @@ import {entities, payload} from '../../../test/api/payloads';
 import {TestFactory} from '../../../test/helper/TestFactory';
 import {UserGenerator} from '../../../test/helper/UserGenerator';
 import {Core} from '../service/CoreSingleton';
-import {EventRecord, StorageService} from '../storage';
+import {LegacyEventRecord, StorageService} from '../storage';
 
 jest.deepUnmock('axios');
 
@@ -578,7 +578,7 @@ describe('ConversationRepository', () => {
           FEATURE: {ALLOWED_FILE_UPLOAD_EXTENSIONS: ['*']},
         });
 
-        const upload_start: EventRecord = {
+        const upload_start: LegacyEventRecord = {
           category: 512,
           conversation: conversation_id,
           data: {
@@ -594,7 +594,7 @@ describe('ConversationRepository', () => {
           time: '2017-09-06T09:43:32.278Z',
           type: 'conversation.asset-add',
         };
-        const upload_failed: EventRecord = {
+        const upload_failed: LegacyEventRecord = {
           conversation: conversation_id,
           data: {reason: 1, status: 'upload-failed'},
           from: sending_user_id,

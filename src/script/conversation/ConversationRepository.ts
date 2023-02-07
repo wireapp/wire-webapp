@@ -97,6 +97,7 @@ import {
   DeleteEvent,
   EventBuilder,
   GroupCreationEvent,
+  MemberLeaveEvent,
   MessageHiddenEvent,
   OneToOneCreationEvent,
   ReactionEvent,
@@ -1349,7 +1350,7 @@ export class ConversationRepository {
           qualifiedUserIds,
         });
         if (!!events.length) {
-          events.forEach(event => this.eventRepository.injectEvent(event));
+          events.forEach(event => this.eventRepository.injectEvent(event as ClientConversationEvent));
         }
       } else {
         const conversationMemberJoinEvent = await this.core.service!.conversation.addUsersToProteusConversation({
@@ -1357,7 +1358,7 @@ export class ConversationRepository {
           qualifiedUserIds,
         });
         if (conversationMemberJoinEvent) {
-          this.eventRepository.injectEvent(conversationMemberJoinEvent, EventRepository.SOURCE.BACKEND_RESPONSE);
+          this.eventRepository.injectEvent(conversationMemberJoinEvent as any, EventRepository.SOURCE.BACKEND_RESPONSE);
         }
       }
     } catch (error) {
@@ -1489,7 +1490,7 @@ export class ConversationRepository {
     });
 
     if (!!events.length) {
-      events.forEach(event => this.eventRepository.injectEvent(event));
+      events.forEach(event => this.eventRepository.injectEvent(event as ClientConversationEvent));
     }
   }
 
@@ -2481,7 +2482,7 @@ export class ConversationRepository {
    */
   private async onMemberLeave(
     conversationEntity: Conversation,
-    eventJson: ConversationMemberLeaveEvent | TeamMemberLeaveEvent,
+    eventJson: ConversationMemberLeaveEvent | TeamMemberLeaveEvent | MemberLeaveEvent,
   ): Promise<{conversationEntity: Conversation; messageEntity: Message} | undefined> {
     const {data: eventData, from} = eventJson;
     const isFromSelf = from === this.userState.self().id;
