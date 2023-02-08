@@ -468,6 +468,7 @@ export class CryptographyMapper {
   async _unwrapExternal(external: External, event: EncryptedEvent) {
     const {otrKey, sha256} = external;
     try {
+      // Only OTR proteus messages can be sent as external, MLS message should throw an error at this point
       const eventData = event.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD ? event.data : undefined;
       if (!eventData?.data || !otrKey || !sha256) {
         throw new Error('Not all expected properties defined');
