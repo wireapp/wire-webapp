@@ -53,7 +53,6 @@ import {getLogger, Logger} from 'Util/Logger';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
 import {roundLogarithmic} from 'Util/NumberUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
-import {removeClientFromUserClientMap} from 'Util/removeClientFromUserClientMap';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {createRandomUuid, loadUrlBlob, supportsMLS} from 'Util/util';
@@ -1226,12 +1225,7 @@ export class MessageRepository {
     const {id, domain} = conversation.qualifiedId;
     const missing = await this.conversationService.fetchAllParticipantsClients(id, domain);
 
-    //we filter out self client id to omit it in mismatch check
-    const {userId, clientId} = this.core;
-    const selfClient = {domain, userId, clientId};
-    const filteredMissing = removeClientFromUserClientMap(missing, selfClient);
-
-    const deleted = findDeletedClients(filteredMissing, await this.generateRecipients(conversation));
+    const deleted = findDeletedClients(missing, await this.generateRecipients(conversation));
     await this.onClientMismatch?.({deleted, missing} as ClientMismatch, conversation, true);
     if (blockSystemMessage) {
       conversation.blockLegalHoldMessage = false;

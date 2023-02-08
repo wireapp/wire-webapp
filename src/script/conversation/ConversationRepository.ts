@@ -18,11 +18,13 @@
  */
 
 import {
+  ClientMismatch,
   Conversation as BackendConversation,
   ConversationProtocol,
   CONVERSATION_TYPE,
   DefaultConversationRoleName as DefaultRole,
   NewConversation,
+  MessageSendingStatus,
 } from '@wireapp/api-client/lib/conversation/';
 import {ConversationReceiptModeUpdateData} from '@wireapp/api-client/lib/conversation/data/';
 import {CONVERSATION_TYPING} from '@wireapp/api-client/lib/conversation/data/ConversationTypingData';
@@ -55,6 +57,7 @@ import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/FileTy
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
+import {removeClientFromUserClientMap} from 'Util/removeClientFromUserClientMap';
 import {
   compareTransliteration,
   fixWebsocketString,
@@ -184,8 +187,14 @@ export class ConversationRepository {
     // we register a client mismatch handler agains the message repository so that we can react to missing members
     // FIXME this should be temporary. In the near future we want the core to handle clients/mismatch/verification. So the webapp won't need this logic at all
     this.messageRepository.setClientMismatchHandler(async (mismatch, conversation, silent, consentType) => {
+      //we filter out self client id to omit it in mismatch check
+      const {userId, clientId} = this.core;
+      const selfClient = {domain: conversation?.domain, userId, clientId};
+      const filteredMissing = mismatch.missing && removeClientFromUserClientMap(mismatch.missing, selfClient);
+      const filteredMismatch = {...mismatch, missing: filteredMissing} as ClientMismatch | MessageSendingStatus;
+
       const {missingClients, deletedClients, emptyUsers, missingUserIds} = extractClientDiff(
-        mismatch,
+        filteredMismatch,
         conversation?.allUserEntities,
         this.core.backendFeatures.federationEndpoints ? userState.self().domain : '',
       );
