@@ -480,7 +480,7 @@ export class EventRepository {
     };
 
     const canReplace =
-      eventToReplace.type === ClientEvent.CONVERSATION.MESSAGE_ADD &&
+      eventToReplace?.type === ClientEvent.CONVERSATION.MESSAGE_ADD &&
       event.type === ClientEvent.CONVERSATION.MESSAGE_ADD;
     return canReplace && eventToReplace ? this.handleEventReplacement(eventToReplace, event) : handleEvent(event);
   }
