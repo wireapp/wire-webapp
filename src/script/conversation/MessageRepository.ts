@@ -48,12 +48,12 @@ import {partition} from 'underscore';
 import {Asset, Availability, Confirmation, GenericMessage} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {removeClientFromUserClientMap} from 'Util/filterClientFromUserClientMap';
 import {Declension, joinNames, t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
 import {roundLogarithmic} from 'Util/NumberUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
+import {removeClientFromUserClientMap} from 'Util/removeClientFromUserClientMap';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {createRandomUuid, loadUrlBlob, supportsMLS} from 'Util/util';

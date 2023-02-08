@@ -17,7 +17,7 @@
  *
  */
 
-import {removeClientFromUserClientMap} from './filterClientFromUserClientMap';
+import {removeClientFromUserClientMap} from './removeClientFromUserClientMap';
 
 describe('removeClientFromUserClientMap', () => {
   it('removes client from user map', () => {

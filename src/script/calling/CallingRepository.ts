@@ -50,11 +50,11 @@ import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {flatten} from 'Util/ArrayUtil';
-import {removeClientFromUserClientMap} from 'Util/filterClientFromUserClientMap';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {roundLogarithmic} from 'Util/NumberUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
+import {removeClientFromUserClientMap} from 'Util/removeClientFromUserClientMap';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {Call, SerializedConversationId} from './Call';
