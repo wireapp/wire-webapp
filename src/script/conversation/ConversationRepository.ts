@@ -189,14 +189,16 @@ export class ConversationRepository {
     this.messageRepository.setClientMismatchHandler(async (mismatch, conversation, silent, consentType) => {
       //we filter out self client id to omit it in mismatch check
       const {userId, clientId} = this.core;
-      const selfClient = {domain: conversation?.domain, userId, clientId};
+      const domain = this.core.backendFeatures.federationEndpoints ? userState.self().domain : '';
+
+      const selfClient = {domain, userId, clientId};
       const filteredMissing = mismatch.missing && removeClientFromUserClientMap(mismatch.missing, selfClient);
       const filteredMismatch = {...mismatch, missing: filteredMissing} as ClientMismatch | MessageSendingStatus;
 
       const {missingClients, deletedClients, emptyUsers, missingUserIds} = extractClientDiff(
         filteredMismatch,
         conversation?.allUserEntities,
-        this.core.backendFeatures.federationEndpoints ? userState.self().domain : '',
+        domain,
       );
 
       if (conversation && missingUserIds.length) {
