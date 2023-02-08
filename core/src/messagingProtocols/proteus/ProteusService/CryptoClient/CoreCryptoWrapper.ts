@@ -40,12 +40,11 @@ export async function buildClient(
   db: CoreDatabase,
   {nbPrekeys, onNewPrekeys}: Config,
 ): Promise<CoreCryptoWrapper> {
-  const coreCrypto = await CoreCrypto.deferredInit(
-    `corecrypto-${storeEngine.storeName}`,
-    Encoder.toBase64(secretKey).asString,
-    undefined, // We pass a placeholder entropy data. It will be set later on by calling `reseedRng`
-    coreCryptoWasmFilePath,
-  );
+  const coreCrypto = await CoreCrypto.deferredInit({
+    databaseName: `corecrypto-${storeEngine.storeName}`,
+    key: Encoder.toBase64(secretKey).asString,
+    wasmFilePath: coreCryptoWasmFilePath,
+  });
   return new CoreCryptoWrapper(coreCrypto, db, {nbPrekeys, onNewPrekeys});
 }
 

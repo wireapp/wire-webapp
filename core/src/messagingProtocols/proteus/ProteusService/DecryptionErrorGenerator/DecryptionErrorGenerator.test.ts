@@ -17,46 +17,26 @@
  *
  */
 
-import {generateDecryptionError, ProteusErrors} from './DecryptionErrorGenerator';
+import {generateDecryptionError} from './DecryptionErrorGenerator';
 
 import {DecryptionError} from '../../../../errors/DecryptionError';
 
 const basePayload = {userId: {id: 'user1', domain: 'domain'}, clientId: 'client1'};
 
 describe('generateDecryptionError', () => {
-  it('handles unknown decryption error', () => {
-    const message = 'decryption error';
-    const error = generateDecryptionError(basePayload, new Error(message));
+  it('handles coreCrypto error', () => {
+    const coreCryptoError = {proteusErrorCode: Math.floor(Math.random() * 100), message: 'decryption error'};
+    const error = generateDecryptionError(basePayload, coreCryptoError);
     expect(error).toBeInstanceOf(DecryptionError);
-    expect(error.message).toBe(`Unknown decryption error from user1 (client1) (${message})`);
-    expect(error.code).toBe(ProteusErrors.Unknown);
+    expect(error.message).toBe(`Decryption error from user1 (client1) (${coreCryptoError.message})`);
+    expect(error.code).toBe(coreCryptoError.proteusErrorCode);
   });
 
-  it('handles remote identity changed', () => {
-    const error = generateDecryptionError(basePayload, new Error('RemoteIdentityChanged'));
+  it('handles cryptobox error', () => {
+    const coreCryptoError = {code: Math.floor(Math.random() * 100), message: 'decryption error'};
+    const error = generateDecryptionError(basePayload, coreCryptoError);
     expect(error).toBeInstanceOf(DecryptionError);
-    expect(error.message).toBe('Remote identity of user1 (client1) has changed');
-    expect(error.code).toBe(ProteusErrors.RemoteIdentityChanged);
-  });
-
-  it('handles invalid message', () => {
-    const error = generateDecryptionError(basePayload, new Error('InvalidMessage'));
-    expect(error).toBeInstanceOf(DecryptionError);
-    expect(error.message).toBe('Invalid message from user1 (client1)');
-    expect(error.code).toBe(ProteusErrors.InvalidMessage);
-  });
-
-  it('handles duplicated message', () => {
-    const error = generateDecryptionError(basePayload, new Error('DuplicateMessage'));
-    expect(error).toBeInstanceOf(DecryptionError);
-    expect(error.message).toBe('Message from user1 (client1) was decrypted twice');
-    expect(error.code).toBe(ProteusErrors.DuplicateMessage);
-  });
-
-  it('handles invalid signature', () => {
-    const error = generateDecryptionError(basePayload, new Error('InvalidSignature'));
-    expect(error).toBeInstanceOf(DecryptionError);
-    expect(error.message).toBe('Invalid signature from user1 (client1)');
-    expect(error.code).toBe(ProteusErrors.InvalidSignature);
+    expect(error.message).toBe(`Decryption error from user1 (client1) (${coreCryptoError.message})`);
+    expect(error.code).toBe(coreCryptoError.code);
   });
 });

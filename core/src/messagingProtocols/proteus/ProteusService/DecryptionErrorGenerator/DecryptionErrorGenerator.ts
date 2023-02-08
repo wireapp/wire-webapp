@@ -19,6 +19,8 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
+import {CoreCryptoError} from '@wireapp/core-crypto';
+
 import {DecryptionError} from '../../../../errors/DecryptionError';
 
 export const ProteusErrors = {
@@ -29,50 +31,25 @@ export const ProteusErrors = {
   Unknown: 999,
 } as const;
 
-type CoreCryptoErrors = keyof typeof ProteusErrors;
-type ProteusErrorCode = (typeof ProteusErrors)[CoreCryptoErrors];
+type CryptoboxError = Error & {code: number};
 
-const CoreCryptoErrorMapping: Record<CoreCryptoErrors, ProteusErrorCode> = {
-  InvalidMessage: ProteusErrors.InvalidMessage,
-  RemoteIdentityChanged: ProteusErrors.RemoteIdentityChanged,
-  InvalidSignature: ProteusErrors.InvalidSignature,
-  DuplicateMessage: ProteusErrors.DuplicateMessage,
-  Unknown: ProteusErrors.Unknown,
+const isCoreCryptoError = (error: any): error is CoreCryptoError => {
+  return 'proteusErrorCode' in error;
 };
-
-const mapCoreCryptoError = (error: any): ProteusErrorCode => {
-  return CoreCryptoErrorMapping[error.message as CoreCryptoErrors] ?? ProteusErrors.Unknown;
-};
-
-const getErrorMessage = (code: ProteusErrorCode, userId: QualifiedId, clientId: string, error: Error): string => {
-  const sender = `${userId.id} (${clientId})`;
-  switch (code) {
-    case ProteusErrors.InvalidMessage:
-      return `Invalid message from ${sender}`;
-
-    case ProteusErrors.InvalidSignature:
-      return `Invalid signature from ${sender}`;
-
-    case ProteusErrors.RemoteIdentityChanged:
-      return `Remote identity of ${sender} has changed`;
-
-    case ProteusErrors.DuplicateMessage:
-      return `Message from ${sender} was decrypted twice`;
-
-    case ProteusErrors.Unknown:
-      return `Unknown decryption error from ${sender} (${error.message})`;
-
-    default:
-      return `Unhandled error code "${code}" from ${sender} (${error.message})`;
-  }
+const isCryptoboxError = (error: any): error is CryptoboxError => {
+  return 'code' in error;
 };
 
 type SenderInfo = {clientId: string; userId: QualifiedId};
 export const generateDecryptionError = (senderInfo: SenderInfo, error: any): DecryptionError => {
-  const {clientId: remoteClientId, userId} = senderInfo;
+  const {clientId, userId} = senderInfo;
+  const sender = `${userId.id} (${clientId})`;
 
-  const code = error.code || mapCoreCryptoError(error);
-  const message = getErrorMessage(code, userId, remoteClientId, error);
+  const coreCryptoCode = isCoreCryptoError(error) && error.proteusErrorCode;
+  const cryptoboxCode = isCryptoboxError(error) && error.code;
+  const code = coreCryptoCode || cryptoboxCode || ProteusErrors.Unknown;
+
+  const message = `Decryption error from ${sender} (${error.message})`;
 
   return new DecryptionError(message, code);
 };
