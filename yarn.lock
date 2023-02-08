@@ -3315,13 +3315,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/eslint@npm:*, @types/eslint@npm:^8.4.10":
+"@types/eslint@npm:*":
   version: 8.4.10
   resolution: "@types/eslint@npm:8.4.10"
   dependencies:
     "@types/estree": "*"
     "@types/json-schema": "*"
   checksum: 21e009ed9ed9bc8920fdafc6e11ff321c4538b4cc18a56fdd59dc5184ea7bbf363c71638c9bdb59fc1254dddcdd567485136ed68b0ee4750948d4e32cb79c689
+  languageName: node
+  linkType: hard
+
+"@types/eslint@npm:^8.21.0":
+  version: 8.21.0
+  resolution: "@types/eslint@npm:8.21.0"
+  dependencies:
+    "@types/estree": "*"
+    "@types/json-schema": "*"
+  checksum: 48823b13e1ffbc6fe22c96d99f691a17507ef5a498c4aed95e3a9076ec6d44ff48ce8a632928b6f82bea92701ac8967bba0d78a5c9de4dfa3f2e12d26dae7da4
   languageName: node
   linkType: hard
 
@@ -16680,7 +16690,7 @@ __metadata:
     "@types/caniuse-lite": ^1.0.1
     "@types/classnames": 2.3.1
     "@types/dexie-batch": 0.4.3
-    "@types/eslint": ^8.4.10
+    "@types/eslint": ^8.21.0
     "@types/eslint-scope": ^3.7.4
     "@types/fs-extra": 11.0.1
     "@types/generate-changelog": 1.8.1

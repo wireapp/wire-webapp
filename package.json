@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "@emotion/react": "11.10.5",
-    "@types/eslint": "^8.4.10",
+    "@types/eslint": "^8.21.0",
     "@wireapp/avs": "9.0.20",
     "@wireapp/core": "38.11.1",
     "@wireapp/lru-cache": "3.8.1",
