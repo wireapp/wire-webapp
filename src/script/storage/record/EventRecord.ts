@@ -46,7 +46,12 @@ export type StoredEvent<T> = {
   primary_key: string;
   category: number;
   id: string;
-  /** if the message is ephemeral, that's the amount of time it should be displayed to the user */
+  /** if the message is ephemeral, that's the amount of time it should be displayed to the user
+   * the different types are
+   *  - string: a datestring
+   *  - number: a timestamp
+   *  - boolean: indicate it has been consumed
+   */
   ephemeral_expires?: number | boolean | string;
   ephemeral_started?: number;
   ephemeral_time?: string;
