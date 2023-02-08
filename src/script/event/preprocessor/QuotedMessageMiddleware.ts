@@ -103,17 +103,21 @@ export class QuotedMessageMiddleware {
 
     const messageId = quote.quotedMessageId;
 
-    const quotedMessage = await this.eventService.loadEvent(event.conversation, messageId);
+    let quotedMessage = await this.eventService.loadEvent(event.conversation, messageId);
     if (!quotedMessage) {
-      this.logger.warn(`Quoted message with ID "${messageId}" not found.`);
-      const quoteData = {
-        error: {
-          type: QuoteEntity.ERROR.MESSAGE_NOT_FOUND,
-        },
-      };
+      const replacedMessage = await this.eventService.loadReplacingEvent(event.conversation, messageId);
+      if (!replacedMessage) {
+        this.logger.warn(`Quoted message with ID "${messageId}" not found.`);
+        const quoteData = {
+          error: {
+            type: QuoteEntity.ERROR.MESSAGE_NOT_FOUND,
+          },
+        };
 
-      const decoratedData = {...event.data, quote: quoteData};
-      return {...event, data: decoratedData};
+        const decoratedData = {...event.data, quote: quoteData};
+        return {...event, data: decoratedData};
+      }
+      quotedMessage = replacedMessage;
     }
 
     const quoteData = {
