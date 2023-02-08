@@ -39,7 +39,7 @@ import {Text} from '../entity/message/Text';
 import type {EventService} from '../event/EventService';
 import {EphemeralStatusType} from '../message/EphemeralStatusType';
 import {StatusType} from '../message/StatusType';
-import type {EventRecord} from '../storage';
+import type {LegacyEventRecord} from '../storage';
 
 export class ConversationEphemeralHandler extends AbstractConversationEventHandler {
   eventListeners: Record<string, (...args: any[]) => void>;
@@ -124,7 +124,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
       case EphemeralStatusType.INACTIVE: {
         messageEntity.startMessageTimer(timeOffset);
 
-        const changes: Pick<Partial<EventRecord>, 'ephemeral_expires' | 'ephemeral_started'> = {
+        const changes: Pick<Partial<LegacyEventRecord>, 'ephemeral_expires' | 'ephemeral_started'> = {
           ephemeral_expires: messageEntity.ephemeral_expires(),
           ephemeral_started: Number(messageEntity.ephemeral_started()),
         };
@@ -170,7 +170,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
     messageEntity.ephemeral_expires(true);
 
     const assetEntity = messageEntity.getFirstAsset();
-    const changes: Pick<Partial<EventRecord>, 'data' | 'ephemeral_expires'> = {
+    const changes: Pick<Partial<LegacyEventRecord>, 'data' | 'ephemeral_expires'> = {
       data: {
         content_type: assetEntity.file_type,
         meta: {},
@@ -186,7 +186,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
     messageEntity.ephemeral_expires(true);
 
     const assetEntity = messageEntity.getFirstAsset() as MediumImage;
-    const changes: Pick<Partial<EventRecord>, 'data' | 'ephemeral_expires'> = {
+    const changes: Pick<Partial<LegacyEventRecord>, 'data' | 'ephemeral_expires'> = {
       data: {
         info: {
           height: assetEntity.size,
@@ -237,7 +237,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
     obfuscatedAsset.previews(assetEntity.previews());
 
     messageEntity.assets([obfuscatedAsset]);
-    const changes: Pick<Partial<EventRecord>, 'data' | 'ephemeral_expires'> = {
+    const changes: Pick<Partial<LegacyEventRecord>, 'data' | 'ephemeral_expires'> = {
       data: {
         content: obfuscatedAsset.text,
         previews: obfuscatedPreviews,

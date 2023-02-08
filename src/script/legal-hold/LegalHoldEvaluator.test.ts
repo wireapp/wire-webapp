@@ -28,7 +28,7 @@ import * as LegalHoldEvaluator from './LegalHoldEvaluator';
 import {CryptographyMapper} from '../cryptography/CryptographyMapper';
 import {ClientEvent} from '../event/Client';
 import {StatusType} from '../message/StatusType';
-import {EventRecord} from '../storage';
+import {LegacyEventRecord} from '../storage';
 
 describe('LegalHoldEvaluator', () => {
   describe('hasMessageLegalHoldFlag', () => {
@@ -60,7 +60,7 @@ describe('LegalHoldEvaluator', () => {
         type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       };
 
-      const mappedEvent = await cryptographyMapper.mapGenericMessage(legalHoldFlagOn, event as EventRecord);
+      const mappedEvent = await cryptographyMapper.mapGenericMessage(legalHoldFlagOn, event as LegacyEventRecord);
 
       expect(LegalHoldEvaluator.hasMessageLegalHoldFlag(mappedEvent)).toBe(true);
     });
@@ -87,7 +87,7 @@ describe('LegalHoldEvaluator', () => {
         type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       };
 
-      const mappedEvent = await cryptographyMapper.mapGenericMessage(legalHoldFlagOff, event as EventRecord);
+      const mappedEvent = await cryptographyMapper.mapGenericMessage(legalHoldFlagOff, event as LegacyEventRecord);
 
       expect(LegalHoldEvaluator.hasMessageLegalHoldFlag(mappedEvent)).toBe(true);
     });
@@ -113,7 +113,7 @@ describe('LegalHoldEvaluator', () => {
         type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       };
 
-      const mappedEvent = await cryptographyMapper.mapGenericMessage(legalHoldFlagMissing, event as EventRecord);
+      const mappedEvent = await cryptographyMapper.mapGenericMessage(legalHoldFlagMissing, event as LegacyEventRecord);
 
       expect(LegalHoldEvaluator.hasMessageLegalHoldFlag(mappedEvent)).toBe(false);
     });
