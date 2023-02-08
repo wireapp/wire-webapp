@@ -35,7 +35,7 @@ import type {User} from '../entity/User';
 import {CALL, ClientEvent, CONVERSATION} from '../event/Client';
 import {StatusType} from '../message/StatusType';
 import {VerificationMessageType} from '../message/VerificationMessageType';
-import {AssetRecord, LegacyEventRecord} from '../storage';
+import {AssetRecord, EventRecord, ReadReceipt, UserReactionMap} from '../storage';
 
 export interface BaseEvent {
   conversation: string;
@@ -116,7 +116,20 @@ export type MemberLeaveEvent = BackendEventMessage<{
 }> & {
   type: CONVERSATION_EVENT.MEMBER_LEAVE;
 };
-export type MessageAddEvent = Omit<ConversationEvent<{}>, 'id'> & {
+export type MessageAddEvent = Omit<
+  ConversationEvent<{
+    sender: string;
+    content: string;
+    replacing_message_id?: string;
+    previews?: string[];
+    expects_read_confirmation?: boolean;
+  }>,
+  'id'
+> & {
+  /** who have received/read the event */
+  read_receipts?: ReadReceipt[];
+  /** who reacted to the event */
+  reactions?: UserReactionMap;
   edited_time?: string;
   status: StatusType;
   type: CONVERSATION.MESSAGE_ADD;
@@ -133,6 +146,13 @@ export type ReactionEvent = ConversationEvent<{message_id: string; reaction: Rea
 };
 export type MessageHiddenEvent = ConversationEvent<{conversation_id: string; message_id: string}> & {
   type: CONVERSATION.MESSAGE_HIDDEN;
+};
+export type ConfirmationEvent = ConversationEvent<{
+  message_id: string;
+  more_message_ids: string[];
+  status: StatusType;
+}> & {
+  type: CONVERSATION.CONFIRMATION;
 };
 export type ButtonActionConfirmationEvent = ConversationEvent<{buttonId: string; messageId: string}> & {
   type: CONVERSATION.BUTTON_ACTION_CONFIRMATION;
@@ -173,13 +193,15 @@ export interface ErrorEvent extends BaseEvent {
   error: string;
   error_code: number | string;
   id: string;
-  type: CONVERSATION;
+  type: CONVERSATION.UNABLE_TO_DECRYPT | CONVERSATION.INCOMING_MESSAGE_TOO_BIG;
 }
 
 export type ClientConversationEvent =
   | AllVerifiedEvent
   | AssetAddEvent
+  | ErrorEvent
   | CompositeMessageAddEvent
+  | ConfirmationEvent
   | DeleteEvent
   | DeleteEverywhereEvent
   | DegradedMessageEvent
@@ -439,6 +461,7 @@ export const EventBuilder = {
     return {
       ...buildQualifiedId(conversationEntity),
       data: {
+        content: '',
         sender: senderId,
       },
       from: conversationEntity.selfUser().id,
@@ -476,7 +499,7 @@ export const EventBuilder = {
     };
   },
 
-  buildUnableToDecrypt(event: LegacyEventRecord, decryptionError: DecryptionError): ErrorEvent {
+  buildUnableToDecrypt(event: Partial<EventRecord>, decryptionError: DecryptionError): ErrorEvent {
     const {qualified_conversation: conversationId, qualified_from, conversation, data: eventData, from, time} = event;
 
     return {
