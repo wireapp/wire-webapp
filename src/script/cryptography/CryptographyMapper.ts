@@ -252,7 +252,7 @@ export class CryptographyMapper {
       id: genericMessage.messageId,
       qualified_conversation,
       qualified_from,
-      status: 'status' in event && event.status,
+      status: 'status' in event ? event.status : undefined,
       time: event.time,
     };
 
