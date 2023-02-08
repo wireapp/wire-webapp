@@ -336,7 +336,7 @@ export class EventService {
   async saveEvent(event: Omit<EventRecord, 'primary_key' | 'category'>): Promise<EventRecord> {
     const savedEvent: EventRecord = {
       ...event,
-      category: categoryFromEvent(event),
+      category: categoryFromEvent(event as EventRecord),
       primary_key: await this.storageService.save(StorageSchemata.OBJECT_STORE.EVENTS, undefined, event),
     } as EventRecord;
     if (this.storageService.isTemporaryAndNonPersistent) {

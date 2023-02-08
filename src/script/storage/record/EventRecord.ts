@@ -42,7 +42,7 @@ export interface AssetRecord {
 export type UserReactionMap = {[userId: string]: ReactionType};
 
 /** represents an event that was saved to the DB */
-export type StoredEvent = {
+export type StoredEvent<T> = {
   primary_key: string;
   category: number;
   id: string;
@@ -53,9 +53,11 @@ export type StoredEvent = {
   /** some events are updated sequentially and we keep track of a version */
   version?: number;
   status?: StatusType;
+} & {
+  [K in keyof T]: T[K];
 };
 
-export type EventRecord = StoredEvent & (ConversationEvent | ClientConversationEvent);
+export type EventRecord = StoredEvent<ConversationEvent | ClientConversationEvent>;
 
 /** @deprecated This is the old swallow-all type. Use the EventRecord Discriminated Union Type instead */
 export interface LegacyEventRecord<T = any> {

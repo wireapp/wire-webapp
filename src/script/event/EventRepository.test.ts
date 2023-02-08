@@ -444,7 +444,7 @@ describe('EventRepository', () => {
       event.data.replacing_message_id = originalMessage.id;
       event.time = changed_time;
 
-      return testFactory.event_repository!['handleEventSaving'](event).then((updatedEvent: EventRecord) => {
+      return testFactory.event_repository!['handleEventSaving'](event).then((updatedEvent: any) => {
         expect(updatedEvent.time).toEqual(initial_time);
         expect(updatedEvent.time).not.toEqual(changed_time);
         expect(updatedEvent.data.content).toEqual('new content');

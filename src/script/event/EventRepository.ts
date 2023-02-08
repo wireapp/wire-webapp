@@ -17,7 +17,12 @@
  *
  */
 
-import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/lib/event';
+import {
+  CONVERSATION_EVENT,
+  USER_EVENT,
+  ConversationOtrMessageAddEvent,
+  ConversationMLSMessageAddEvent,
+} from '@wireapp/api-client/lib/event';
 import type {BackendEvent} from '@wireapp/api-client/lib/event';
 import {NotificationSource, HandledEventPayload} from '@wireapp/core/lib/notification';
 import {amplify} from 'amplify';
@@ -25,7 +30,7 @@ import ko from 'knockout';
 import {container} from 'tsyringe';
 
 import {Account, ConnectionState, ProcessedEventPayload} from '@wireapp/core';
-import {Asset as ProtobufAsset, GenericMessage} from '@wireapp/protocol-messaging';
+import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {getLogger, Logger} from 'Util/Logger';
@@ -314,14 +319,7 @@ export class EventRepository {
    * @param source Source of notification
    */
   private async distributeEvent(event: IncomingEvent, source: EventSource) {
-    const {conversation: conversationId, from: userId, type} = event;
-
-    const hasIds = conversationId && userId;
-    const logMessage = hasIds
-      ? `Distributed '${type}' event for conversation '${conversationId}' from user '${userId}'`
-      : `Distributed '${type}' event`;
-    this.logger.info(logMessage, event);
-
+    const {type} = event;
     const [category] = type.split('.');
     switch (category) {
       case EVENT_TYPE.CALL:
@@ -352,7 +350,7 @@ export class EventRepository {
    * @param source Source of event
    * @returns Resolves with the saved record or the plain event if the event was skipped
    */
-  private handleEvent({event, decryptedData, decryptionError}: ProcessedEventPayload, source: EventSource) {
+  private async handleEvent({event, decryptedData, decryptionError}: ProcessedEventPayload, source: EventSource) {
     const logObject = {eventJson: JSON.stringify(event), eventObject: event};
     const validationResult = validateEvent(
       event as {time: string; type: CONVERSATION_EVENT | USER_EVENT},
@@ -361,30 +359,29 @@ export class EventRepository {
     );
     switch (validationResult) {
       default: {
-        return Promise.resolve(event);
+        return event;
       }
       case EventValidation.OUTDATED_TIMESTAMP: {
         this.logger.info(`Ignored outdated event type: '${event.type}'`, logObject);
-        return Promise.resolve(event);
+        return event;
       }
       case EventValidation.VALID:
-        return this.processEvent(event, source, decryptedData, decryptionError);
+        let eventToProcess: IncomingEvent | undefined = event;
+        if (event.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD || event.type === CONVERSATION_EVENT.MLS_MESSAGE_ADD) {
+          eventToProcess = await this.mapEncryptedEvent(event, {decryptedData, decryptionError});
+        }
+        if (!eventToProcess) {
+          return event;
+        }
+
+        return this.processEvent(eventToProcess, source);
     }
   }
 
-  /**
-   * Decrypts, saves and distributes an event received from the backend.
-   *
-   * @param event Backend event extracted from notification stream
-   * @param source Source of event
-   * @returns Resolves with the saved record or `true` if the event was skipped
-   */
-  private async processEvent(
-    event: IncomingEvent | ClientConversationEvent,
-    source: EventSource,
-    decryptedData?: GenericMessage,
-    decryptionError?: HandledEventPayload['decryptionError'],
-  ) {
+  private async mapEncryptedEvent(
+    event: ConversationOtrMessageAddEvent | ConversationMLSMessageAddEvent,
+    {decryptedData, decryptionError}: Pick<HandledEventPayload, 'decryptedData' | 'decryptionError'>,
+  ): Promise<IncomingEvent | undefined> {
     if (decryptionError) {
       this.logger.warn(`Decryption Error: (${decryptionError.code}) ${decryptionError.message}`, decryptionError);
       const ignoredCodes = [
@@ -397,14 +394,22 @@ export class EventRepository {
       amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.E2EE.FAILED_MESSAGE_DECRYPTION, {
         cause: decryptionError.code,
       });
-      event = EventBuilder.buildUnableToDecrypt(event, decryptionError);
+      return EventBuilder.buildUnableToDecrypt(event, decryptionError);
     }
-    if (decryptedData && event.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD) {
-      event = await new CryptographyMapper().mapGenericMessage(decryptedData, event);
-      if (!event) {
-        return undefined;
-      }
+    if (decryptedData) {
+      return await new CryptographyMapper().mapGenericMessage(decryptedData, event);
     }
+    return undefined;
+  }
+
+  /**
+   * Decrypts, saves and distributes an event received from the backend.
+   *
+   * @param event Backend event extracted from notification stream
+   * @param source Source of event
+   * @returns Resolves with the saved record or `true` if the event was skipped
+   */
+  private async processEvent(event: IncomingEvent | ClientConversationEvent, source: EventSource) {
     for (const eventProcessMiddleware of this.eventProcessMiddlewares) {
       event = await eventProcessMiddleware(event);
     }
@@ -465,14 +470,13 @@ export class EventRepository {
       this.throwValidationError(event, 'Edit event without original event');
     }
 
-    const handleEvent = (newEvent: IncomingEvent) => {
+    const handleEvent = async (newEvent: IncomingEvent) => {
       // check for duplicates (same id)
-      const loadEventPromise =
-        'id' in newEvent ? this.eventService.loadEvent(conversationId, newEvent.id) : Promise.resolve(undefined);
+      const storedEvent = 'id' in newEvent ? await this.eventService.loadEvent(conversationId, newEvent.id) : undefined;
 
-      return loadEventPromise.then(storedEvent => {
-        return storedEvent ? this.handleDuplicatedEvent(storedEvent, newEvent) : this.eventService.saveEvent(newEvent);
-      });
+      return storedEvent
+        ? this.handleDuplicatedEvent(storedEvent, newEvent)
+        : this.eventService.saveEvent(newEvent as EventRecord);
     };
 
     const canReplace =
@@ -481,7 +485,7 @@ export class EventRepository {
     return canReplace && eventToReplace ? this.handleEventReplacement(eventToReplace, event) : handleEvent(event);
   }
 
-  private handleEventReplacement(originalEvent: StoredEvent & MessageAddEvent, newEvent: MessageAddEvent) {
+  private handleEventReplacement(originalEvent: StoredEvent<MessageAddEvent>, newEvent: MessageAddEvent) {
     if (originalEvent.from !== newEvent.from) {
       const logMessage = `ID previously used by user '${newEvent.from}'`;
       const errorMessage = 'ID reused by other user';
@@ -583,7 +587,7 @@ export class EventRepository {
     return this.eventService.replaceEvent(identifiedUpdates);
   }
 
-  private static getCommonMessageUpdates(originalEvent: EventRecord, newEvent: MessageAddEvent) {
+  private static getCommonMessageUpdates(originalEvent: StoredEvent<MessageAddEvent>, newEvent: MessageAddEvent) {
     return {
       ...newEvent,
       data: {...newEvent.data, expects_read_confirmation: originalEvent.data.expects_read_confirmation},
@@ -595,15 +599,12 @@ export class EventRepository {
     };
   }
 
-  private static getUpdatesForEditMessage(
-    originalEvent: EventRecord,
-    newEvent: IncomingEvent,
-  ): EventRecord & {reactions: {}} {
+  private static getUpdatesForEditMessage(originalEvent: EventRecord, newEvent: MessageAddEvent): MessageAddEvent {
     // Remove reactions, so that likes (hearts) don't stay when a message's text gets edited
     return {...newEvent, reactions: {}};
   }
 
-  private getUpdatesForLinkPreview(originalEvent: EventRecord, newEvent: IncomingEvent): EventRecord {
+  private getUpdatesForLinkPreview(originalEvent: EventRecord, newEvent: MessageAddEvent) {
     const newData = newEvent.data;
     const originalData = originalEvent.data;
     const updatingLinkPreview = !!originalData.previews.length;
@@ -631,11 +632,11 @@ export class EventRepository {
   }
 
   private throwValidationError(event: IncomingEvent, errorMessage: string, logMessage?: string): never {
-    const baseLogMessage = `Ignored '${event.type}' (${event.id || 'no ID'}) in '${event.conversation}' from '${
-      event.from
-    }':'`;
-    const baseErrorMessage = 'Event validation failed:';
+    const conversation = 'conversation' in event && event.conversation;
+    const from = 'from' in event && event.from;
+
+    const baseLogMessage = `Ignored '${event.type}' in '${conversation}' from '${from}''`;
     this.logger.warn(`${baseLogMessage} ${logMessage || errorMessage}`, event);
-    throw new EventError(EventError.TYPE.VALIDATION_FAILED, `${baseErrorMessage} ${errorMessage}`);
+    throw new EventError(EventError.TYPE.VALIDATION_FAILED, `Event validation failed: ${errorMessage}`);
   }
 }

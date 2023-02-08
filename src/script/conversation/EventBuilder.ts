@@ -119,15 +119,17 @@ export type MemberLeaveEvent = BackendEventMessage<{
 export type MessageAddEvent = Omit<
   ConversationEvent<{
     sender: string;
+    content: string;
     replacing_message_id?: string;
     previews?: string[];
-    /** who have received/read the event */
-    read_receipts?: ReadReceipt[];
-    /** who reacted to the event */
-    reactions?: UserReactionMap;
+    expects_read_confirmation?: boolean;
   }>,
   'id'
 > & {
+  /** who have received/read the event */
+  read_receipts?: ReadReceipt[];
+  /** who reacted to the event */
+  reactions?: UserReactionMap;
   edited_time?: string;
   status: StatusType;
   type: CONVERSATION.MESSAGE_ADD;
@@ -459,6 +461,7 @@ export const EventBuilder = {
     return {
       ...buildQualifiedId(conversationEntity),
       data: {
+        content: '',
         sender: senderId,
       },
       from: conversationEntity.selfUser().id,
@@ -496,7 +499,7 @@ export const EventBuilder = {
     };
   },
 
-  buildUnableToDecrypt(event: EventRecord, decryptionError: DecryptionError): ErrorEvent {
+  buildUnableToDecrypt(event: Partial<EventRecord>, decryptionError: DecryptionError): ErrorEvent {
     const {qualified_conversation: conversationId, qualified_from, conversation, data: eventData, from, time} = event;
 
     return {
