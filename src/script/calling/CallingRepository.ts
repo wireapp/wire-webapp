@@ -50,6 +50,7 @@ import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {flatten} from 'Util/ArrayUtil';
+import {filterClientsFromUserClientMap} from 'Util/filterClientFromUserClientMap';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {roundLogarithmic} from 'Util/NumberUtil';
@@ -334,9 +335,14 @@ export class CallingRepository {
     }
     const {id, domain} = call.conversationId;
     const allClients = await this.core.service!.conversation.fetchAllParticipantsClients(id, domain);
-    const qualifiedClients = isQualifiedUserClients(allClients)
-      ? flattenQualifiedUserClients(allClients)
-      : flattenUserClients(allClients);
+    //we filter out self client id to omit it in mismatch check
+    const filteredAllClients = this.selfClientId
+      ? filterClientsFromUserClientMap(allClients, [this.selfClientId])
+      : allClients;
+
+    const qualifiedClients = isQualifiedUserClients(filteredAllClients)
+      ? flattenQualifiedUserClients(filteredAllClients)
+      : flattenUserClients(filteredAllClients);
 
     const clients: Clients = flatten(
       qualifiedClients.map(({data, userId}) =>
@@ -352,7 +358,9 @@ export class CallingRepository {
     // We warn the message repository that a mismatch has happened outside of its lifecycle (eventually triggering a conversation degradation)
     const consentType =
       this.getCallDirection(call) === CALL_DIRECTION.INCOMING ? CONSENT_TYPE.INCOMING_CALL : CONSENT_TYPE.OUTGOING_CALL;
-    return checkMismatch ? this.messageRepository.updateMissingClients(conversation, allClients, consentType) : true;
+    return checkMismatch
+      ? this.messageRepository.updateMissingClients(conversation, filteredAllClients, consentType)
+      : true;
   }
 
   private readonly updateCallQuality = (
@@ -627,10 +635,15 @@ export class CallingRepository {
         if (source !== EventRepository.SOURCE.STREAM) {
           const {id, domain} = conversationId;
           const allClients = await this.core.service!.conversation.fetchAllParticipantsClients(id, domain);
+          //we filter out self client id to omit it in mismatch check
+          const filteredAllClients = this.selfClientId
+            ? filterClientsFromUserClientMap(allClients, [this.selfClientId])
+            : allClients;
+
           // We warn the message repository that a mismatch has happened outside of its lifecycle (eventually triggering a conversation degradation)
           const shouldContinue = await this.messageRepository.updateMissingClients(
             conversation,
-            allClients,
+            filteredAllClients,
             CONSENT_TYPE.INCOMING_CALL,
           );
 

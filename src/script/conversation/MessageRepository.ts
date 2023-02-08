@@ -48,6 +48,7 @@ import {partition} from 'underscore';
 import {Asset, Availability, Confirmation, GenericMessage} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {filterClientsFromUserClientMap} from 'Util/filterClientFromUserClientMap';
 import {Declension, joinNames, t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
@@ -1224,7 +1225,10 @@ export class MessageRepository {
     }
     const {id, domain} = conversation.qualifiedId;
     const missing = await this.conversationService.fetchAllParticipantsClients(id, domain);
-    const deleted = findDeletedClients(missing, await this.generateRecipients(conversation));
+    //we filter out self client id to omit it in mismatch check
+    const filteredMissing = filterClientsFromUserClientMap(missing, [this.core.clientId]);
+
+    const deleted = findDeletedClients(filteredMissing, await this.generateRecipients(conversation));
     await this.onClientMismatch?.({deleted, missing} as ClientMismatch, conversation, true);
     if (blockSystemMessage) {
       conversation.blockLegalHoldMessage = false;
