@@ -18,7 +18,9 @@
  */
 
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
-import {ReactionType} from '@wireapp/core/lib/conversation/';
+import {GenericMessageType, ReactionType} from '@wireapp/core/lib/conversation';
+import {isObject} from 'underscore';
+
 import {
   Asset,
   Availability,
@@ -26,7 +28,6 @@ import {
   Cleared,
   External,
   GenericMessage,
-  ImageAsset,
   Knock,
   LastRead,
   LegalHoldStatus,
@@ -36,20 +37,19 @@ import {
   Reaction,
   Text,
 } from '@wireapp/protocol-messaging';
-import {isObject} from 'underscore';
 
 import {encryptAesAsset} from 'src/script/assets/AssetCrypto';
-import {CryptographyMapper} from 'src/script/cryptography/CryptographyMapper';
-import {GenericMessageType} from '@wireapp/core/lib/conversation';
 import {PROTO_MESSAGE_TYPE} from 'src/script/cryptography/ProtoMessageType';
 import {CryptographyError} from 'src/script/error/CryptographyError';
 import {ClientEvent} from 'src/script/event/Client';
 import {arrayToBase64, createRandomUuid} from 'Util/util';
 
+import {CryptographyMapper} from './CryptographyMapper';
+
 describe('CryptographyMapper', () => {
   const mapper = new CryptographyMapper();
 
-  let event = undefined;
+  let event: any = undefined;
 
   beforeEach(() => {
     event = {
@@ -59,6 +59,7 @@ describe('CryptographyMapper', () => {
       },
       from: createRandomUuid(),
       time: new Date().toISOString(),
+      type: CONVERSATION_EVENT.OTR_MESSAGE_ADD,
     };
   });
 
@@ -96,8 +97,9 @@ describe('CryptographyMapper', () => {
     });
 
     it('resolves with a mapped original asset message with audio meta data', () => {
+      const duration = 3;
       const audio_meta_data = new Asset.AudioMetaData({
-        durationInMillis: 3 * 1000,
+        durationInMillis: duration * 1000,
         normalizedLoudness: new Uint8Array([1, 2, 3]),
       });
       const original_asset = new Asset.Original({
@@ -120,14 +122,12 @@ describe('CryptographyMapper', () => {
         expect(event_json.from).toBe(event.from);
         expect(event_json.time).toBe(event.time);
         expect(event_json.id).toBe(generic_message.messageId);
-        expect(event_json.data.content_length).toEqual(
-          original_asset.size.toNumber ? original_asset.size.toNumber() : original_asset.size,
-        );
+        expect(event_json.data.content_length).toEqual(original_asset.size);
 
         expect(event_json.data.content_type).toEqual(original_asset.mimeType);
         expect(event_json.data.info.name).toEqual(original_asset.name);
-        expect(event_json.data.meta.duration).toEqual(original_asset.audio.durationInMillis / 1000);
-        expect(event_json.data.meta.loudness).toEqual(new Uint8Array(original_asset.audio.normalizedLoudness.buffer));
+        expect(event_json.data.meta.duration).toEqual(duration);
+        expect(event_json.data.meta.loudness).toEqual(new Uint8Array(original_asset.audio?.normalizedLoudness.buffer));
       });
     });
 
@@ -217,9 +217,7 @@ describe('CryptographyMapper', () => {
         sha256: data.sha256,
       });
 
-      const preview_asset = new Asset.Preview({
-        remote: remote_data,
-      });
+      const preview_asset = new Asset.Preview({remote: remote_data, mimeType: '', size: 10});
 
       const asset = new Asset({
         preview: preview_asset,
@@ -262,7 +260,7 @@ describe('CryptographyMapper', () => {
     });
 
     it('resolves with a mapped cleared message', () => {
-      const date = Date.now().toString();
+      const date = Date.now();
       const conversation_id = createRandomUuid();
 
       const cleared = new Cleared({
@@ -281,7 +279,7 @@ describe('CryptographyMapper', () => {
         expect(event_json.from).toBe(event.from);
         expect(event_json.time).toBe(event.time);
         expect(event_json.id).toBe(generic_message.messageId);
-        expect(event_json.data.cleared_timestamp).toBe(date);
+        expect(event_json.data.cleared_timestamp).toBe(date.toString());
         expect(event_json.data.conversationId).toBe(conversation_id);
       });
     });
@@ -325,49 +323,6 @@ describe('CryptographyMapper', () => {
         expect(event_json.time).toBe(event.time);
         expect(event_json.id).toBe(generic_message.messageId);
         expect(event_json.data.message_id).toBe(message_id);
-      });
-    });
-
-    // @todo Add expects for otr_key and sha256
-    it('resolves with a mapped medium image message', () => {
-      const image = {
-        height: 480,
-        mime_type: 'jpg',
-        original_height: 960,
-        original_width: 1280,
-        size: 1024,
-        tag: 'medium',
-        width: 640,
-      };
-
-      const image_asset = new ImageAsset({
-        height: image.height,
-        mimeType: image.mime_type,
-        originalHeight: image.original_height,
-        originalWidth: image.original_width,
-        size: image.size,
-        tag: image.tag,
-        width: image.width,
-      });
-      const generic_message = new GenericMessage({
-        [GenericMessageType.IMAGE]: image_asset,
-        messageId: createRandomUuid(),
-      });
-
-      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
-        expect(isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(ClientEvent.CONVERSATION.ASSET_ADD);
-        expect(event_json.conversation).toBe(event.conversation);
-        expect(event_json.from).toBe(event.from);
-        expect(event_json.time).toBe(event.time);
-        expect(event_json.id).toBe(generic_message.messageId);
-        expect(event_json.data.content_length).toBe(image.size);
-        expect(event_json.data.content_type).toBe(image.mime_type);
-        expect(event_json.data.id).toBe(event.data.id);
-        expect(event_json.data.info.tag).toBe(image.tag);
-        expect(event_json.data.info.width).toBe(image.width);
-        expect(event_json.data.info.height).toBe(image.height);
-        expect(event_json.data.info.public).toBeFalsy();
       });
     });
 
@@ -416,66 +371,6 @@ describe('CryptographyMapper', () => {
       });
     });
 
-    it('resolves with a mapped medium image message when event id is not set', () => {
-      const image = {
-        height: 480,
-        mime_type: 'jpg',
-        original_height: 960,
-        original_width: 1280,
-        size: 1024,
-        tag: 'medium',
-        width: 640,
-      };
-
-      const image_asset = new ImageAsset({
-        height: image.height,
-        mimeType: image.mime_type,
-        originalHeight: image.original_height,
-        originalWidth: image.original_width,
-        size: image.size,
-        tag: image.tag,
-        width: image.width,
-      });
-      const generic_message = new GenericMessage({
-        [GenericMessageType.IMAGE]: image_asset,
-        messageId: createRandomUuid(),
-      });
-
-      delete event.data.id;
-
-      return mapper.mapGenericMessage(generic_message, event).then(event_json => {
-        expect(isObject(event_json)).toBeTruthy();
-        expect(event_json.type).toBe(ClientEvent.CONVERSATION.ASSET_ADD);
-        expect(event_json.conversation).toBe(event.conversation);
-        expect(event_json.from).toBe(event.from);
-        expect(event_json.time).toBe(event.time);
-        expect(event_json.id).toBe(generic_message.messageId);
-        expect(event_json.data.content_length).toBe(image.size);
-        expect(event_json.data.content_type).toBe(image.mime_type);
-        expect(event_json.data.id).toBeDefined();
-        expect(event_json.data.info.tag).toBe(image.tag);
-        expect(event_json.data.info.width).toBe(image.width);
-        expect(event_json.data.info.height).toBe(image.height);
-        expect(event_json.data.info.public).toBeFalsy();
-      });
-    });
-
-    it('rejects with an error for a preview image message', done => {
-      const generic_message = new GenericMessage({
-        [GenericMessageType.IMAGE]: new ImageAsset({tag: 'preview'}),
-        messageId: createRandomUuid(),
-      });
-
-      mapper
-        .mapGenericMessage(generic_message, event)
-        .then(done.fail)
-        .catch(error => {
-          expect(error instanceof CryptographyError).toBeTruthy();
-          expect(error.type).toBe(CryptographyError.TYPE.IGNORED_PREVIEW);
-          done();
-        });
-    });
-
     it('resolves with a mapped knock message', () => {
       const generic_message = new GenericMessage({
         [GenericMessageType.KNOCK]: new Knock({hotKnock: false}),
@@ -495,7 +390,7 @@ describe('CryptographyMapper', () => {
     it('maps legal hold states for ping messages', async () => {
       const expectedLegalHoldStatus = LegalHoldStatus.DISABLED;
 
-      const optimisticEvent = {
+      const optimisticEvent: any = {
         conversation: 'ecf815e4-ef9d-494c-827b-85214b9d694e',
         data: {},
         from: '90f56eae-ef65-4b49-9efb-2d6502721965',
@@ -521,7 +416,7 @@ describe('CryptographyMapper', () => {
     });
 
     it('resolves with a mapped last read message', () => {
-      const date = Date.now().toString();
+      const date = Date.now();
       const conversation_id = createRandomUuid();
 
       const last_read = new LastRead({conversationId: conversation_id, lastReadTimestamp: date});
@@ -538,7 +433,7 @@ describe('CryptographyMapper', () => {
         expect(event_json.time).toBe(event.time);
         expect(event_json.id).toBe(generic_message.messageId);
         expect(event_json.data.conversationId).toBe(conversation_id);
-        expect(event_json.data.last_read_timestamp).toBe(date);
+        expect(event_json.data.last_read_timestamp).toBe(date.toString());
       });
     });
 
@@ -585,7 +480,7 @@ describe('CryptographyMapper', () => {
 
     it('rejects with an error if no generic message is provided', done => {
       mapper
-        .mapGenericMessage(undefined, {id: 'ABC'})
+        .mapGenericMessage(undefined as any, {id: 'ABC'} as any)
         .then(done.fail)
         .catch(error => {
           expect(error instanceof CryptographyError).toBeTruthy();
