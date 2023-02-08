@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [38.11.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.11.0...@wireapp/core@38.11.1) (2023-02-08)
+
+### Bug Fixes
+
+* Await incoming event handler ([#4866](https://github.com/wireapp/wire-web-packages/issues/4866)) ([b98d83e](https://github.com/wireapp/wire-web-packages/commit/b98d83e291b9c170464fe8f83e2163ea058b8d97))
+
 # [38.11.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.10.3...@wireapp/core@38.11.0) (2023-02-08)
 
 ### Features
