@@ -17,8 +17,11 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import type {ConversationEvent} from '@wireapp/api-client/lib/event';
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {ReactionType} from '@wireapp/core/lib/conversation/';
+
+import {ClientConversationEvent} from 'src/script/conversation/EventBuilder';
 
 import {StatusType} from '../../message/StatusType';
 
@@ -38,7 +41,31 @@ export interface AssetRecord {
 
 export type UserReactionMap = {[userId: string]: ReactionType};
 
-export interface EventRecord<T = any> {
+/** represents an event that was saved to the DB */
+export type StoredEvent<T> = {
+  primary_key: string;
+  category: number;
+  id: string;
+  /** if the message is ephemeral, that's the amount of time it should be displayed to the user
+   * the different types are
+   *  - string: a datestring
+   *  - number: a timestamp
+   *  - boolean: indicate it has been consumed
+   */
+  ephemeral_expires?: number | boolean | string;
+  ephemeral_started?: number;
+  ephemeral_time?: string;
+  /** some events are updated sequentially and we keep track of a version */
+  version?: number;
+  status?: StatusType;
+} & {
+  [K in keyof T]: T[K];
+};
+
+export type EventRecord = StoredEvent<ConversationEvent | ClientConversationEvent>;
+
+/** @deprecated This is the old swallow-all type. Use the EventRecord Discriminated Union Type instead */
+export interface LegacyEventRecord<T = any> {
   category?: number;
   client?: {time: string};
   connection?: {lastUpdate: string};

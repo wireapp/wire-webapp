@@ -34,7 +34,6 @@ import {EventBuilder} from '../conversation/EventBuilder';
 import type {Conversation} from '../entity/Conversation';
 import type {EventRepository} from '../event/EventRepository';
 import {VerificationMessageType} from '../message/VerificationMessageType';
-import {EventRecord} from '../storage';
 import {UserState} from '../user/UserState';
 
 export class ConversationVerificationStateHandler {
@@ -136,7 +135,7 @@ export class ConversationVerificationStateHandler {
   private checkChangeToVerified(conversationEntity: Conversation): boolean {
     if (this.willChangeToVerified(conversationEntity)) {
       const allVerifiedEvent = EventBuilder.buildAllVerified(conversationEntity);
-      this.eventRepository.injectEvent(allVerifiedEvent as EventRecord);
+      this.eventRepository.injectEvent(allVerifiedEvent);
       return true;
     }
 
@@ -175,7 +174,7 @@ export class ConversationVerificationStateHandler {
       }
 
       const event = EventBuilder.buildDegraded(conversationEntity, userIds, type);
-      this.eventRepository.injectEvent(event as EventRecord);
+      this.eventRepository.injectEvent(event);
 
       return true;
     }

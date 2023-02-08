@@ -33,6 +33,7 @@ export class QuoteEntity {
   userId: string;
 
   static ERROR = {
+    INVALID_HASH: 'INVALID_HASH',
     MESSAGE_NOT_FOUND: 'MESSAGE_NOT_FOUND',
   };
 

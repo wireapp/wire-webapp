@@ -17,6 +17,8 @@
  *
  */
 
+import {GenericMessageType} from '@wireapp/core/lib/conversation';
+
 import {GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
 
 import {createRandomUuid} from 'Util/util';
@@ -24,10 +26,9 @@ import {createRandomUuid} from 'Util/util';
 import * as LegalHoldEvaluator from './LegalHoldEvaluator';
 
 import {CryptographyMapper} from '../cryptography/CryptographyMapper';
-import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import {ClientEvent} from '../event/Client';
 import {StatusType} from '../message/StatusType';
-import {EventRecord} from '../storage';
+import {LegacyEventRecord} from '../storage';
 
 describe('LegalHoldEvaluator', () => {
   describe('hasMessageLegalHoldFlag', () => {
@@ -39,7 +40,7 @@ describe('LegalHoldEvaluator', () => {
 
     it('knows when a message has legal hold enabled', async () => {
       const legalHoldFlagOn = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.TEXT]: Text.create({
+        [GenericMessageType.TEXT]: Text.create({
           content: 'TEST',
           expectsReadConfirmation: false,
           legalHoldStatus: LegalHoldStatus.ENABLED,
@@ -59,14 +60,14 @@ describe('LegalHoldEvaluator', () => {
         type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       };
 
-      const mappedEvent = await cryptographyMapper.mapGenericMessage(legalHoldFlagOn, event as EventRecord);
+      const mappedEvent = await cryptographyMapper.mapGenericMessage(legalHoldFlagOn, event as LegacyEventRecord);
 
       expect(LegalHoldEvaluator.hasMessageLegalHoldFlag(mappedEvent)).toBe(true);
     });
 
     it('knows when a message has legal hold disabled', async () => {
       const legalHoldFlagOff = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.TEXT]: Text.create({
+        [GenericMessageType.TEXT]: Text.create({
           content: 'TEST',
           expectsReadConfirmation: false,
           legalHoldStatus: LegalHoldStatus.DISABLED,
@@ -86,14 +87,14 @@ describe('LegalHoldEvaluator', () => {
         type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       };
 
-      const mappedEvent = await cryptographyMapper.mapGenericMessage(legalHoldFlagOff, event as EventRecord);
+      const mappedEvent = await cryptographyMapper.mapGenericMessage(legalHoldFlagOff, event as LegacyEventRecord);
 
       expect(LegalHoldEvaluator.hasMessageLegalHoldFlag(mappedEvent)).toBe(true);
     });
 
     it('knows when a message is missing a legal hold flag', async () => {
       const legalHoldFlagMissing = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.TEXT]: Text.create({
+        [GenericMessageType.TEXT]: Text.create({
           content: 'TEST',
           expectsReadConfirmation: false,
         }),
@@ -112,7 +113,7 @@ describe('LegalHoldEvaluator', () => {
         type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       };
 
-      const mappedEvent = await cryptographyMapper.mapGenericMessage(legalHoldFlagMissing, event as EventRecord);
+      const mappedEvent = await cryptographyMapper.mapGenericMessage(legalHoldFlagMissing, event as LegacyEventRecord);
 
       expect(LegalHoldEvaluator.hasMessageLegalHoldFlag(mappedEvent)).toBe(false);
     });

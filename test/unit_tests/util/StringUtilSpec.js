@@ -29,6 +29,7 @@ import {
   sortByPriority,
   utf8ToUtf16BE,
   obfuscate,
+  replaceAccents,
 } from 'Util/StringUtil';
 
 import {lorem_ipsum} from '../../api/payloads';
@@ -207,6 +208,55 @@ describe('StringUtil', () => {
       const result = utf8ToUtf16BE(string);
 
       expect(result).toEqual(expected);
+    });
+  });
+
+  describe('replaceAccents', () => {
+    it('converts strings with accents values to pure strings with replaced accents values', () => {
+      expect(replaceAccents('täst')).toEqual('tast');
+      expect(replaceAccents('tást')).toEqual('tast');
+      expect(replaceAccents('tàst')).toEqual('tast');
+      expect(replaceAccents('tãst')).toEqual('tast');
+      expect(replaceAccents('tâst')).toEqual('tast');
+      expect(replaceAccents('tÀst')).toEqual('tast');
+      expect(replaceAccents('tÁst')).toEqual('tast');
+      expect(replaceAccents('tÃst')).toEqual('tast');
+      expect(replaceAccents('tÂst')).toEqual('tast');
+      expect(replaceAccents('tëst')).toEqual('test');
+      expect(replaceAccents('tést')).toEqual('test');
+      expect(replaceAccents('tèst')).toEqual('test');
+      expect(replaceAccents('têst')).toEqual('test');
+      expect(replaceAccents('tÉst')).toEqual('test');
+      expect(replaceAccents('tÈst')).toEqual('test');
+      expect(replaceAccents('tÊst')).toEqual('test');
+      expect(replaceAccents('tïst')).toEqual('tist');
+      expect(replaceAccents('tíst')).toEqual('tist');
+      expect(replaceAccents('tìst')).toEqual('tist');
+      expect(replaceAccents('tîst')).toEqual('tist');
+      expect(replaceAccents('tÍst')).toEqual('tist');
+      expect(replaceAccents('tÌst')).toEqual('tist');
+      expect(replaceAccents('tÎst')).toEqual('tist');
+      expect(replaceAccents('töst')).toEqual('tost');
+      expect(replaceAccents('tóst')).toEqual('tost');
+      expect(replaceAccents('tòst')).toEqual('tost');
+      expect(replaceAccents('tôst')).toEqual('tost');
+      expect(replaceAccents('tõst')).toEqual('tost');
+      expect(replaceAccents('tÓst')).toEqual('tost');
+      expect(replaceAccents('tÒst')).toEqual('tost');
+      expect(replaceAccents('tÔst')).toEqual('tost');
+      expect(replaceAccents('tÕst')).toEqual('tost');
+      expect(replaceAccents('túst')).toEqual('tust');
+      expect(replaceAccents('tùst')).toEqual('tust');
+      expect(replaceAccents('tûst')).toEqual('tust');
+      expect(replaceAccents('tüst')).toEqual('tust');
+      expect(replaceAccents('tÚst')).toEqual('tust');
+      expect(replaceAccents('tÙst')).toEqual('tust');
+      expect(replaceAccents('tÛst')).toEqual('tust');
+      expect(replaceAccents('tÜst')).toEqual('tust');
+      expect(replaceAccents('tçst')).toEqual('tcst');
+      expect(replaceAccents('tÇst')).toEqual('tcst');
+      expect(replaceAccents('tñst')).toEqual('tnst');
+      expect(replaceAccents('tÑst')).toEqual('tnst');
     });
   });
 });

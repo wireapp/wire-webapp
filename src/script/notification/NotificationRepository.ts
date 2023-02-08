@@ -258,9 +258,7 @@ export class NotificationRepository {
             const messageInfo = messageId
               ? `message '${messageId}' of type '${messageType}'`
               : `'${messageType}' message`;
-            this.logger.info(
-              `Removed read notification for ${messageInfo} in '${conversationId?.id || conversationId}'.`,
-            );
+            this.logger.info(`Removed read notification for ${messageInfo} in '${conversationId}'.`);
           }
         });
       }
@@ -858,35 +856,30 @@ export class NotificationRepository {
       this.contentViewModelState.multitasking.isMinimized(true);
       notificationContent.trigger();
 
-      this.logger.info(`Notification for ${messageInfo} in '${conversationId?.id || conversationId}' closed by click.`);
+      this.logger.info(`Notification for ${messageInfo} in '${conversationId}' closed by click.`);
       notification.close();
     };
 
     notification.onclose = () => {
       window.clearTimeout(timeoutTriggerId);
       this.notifications.splice(this.notifications.indexOf(notification), 1);
-      this.logger.info(`Removed notification for ${messageInfo} in '${conversationId?.id || conversationId}' locally.`);
+      this.logger.info(`Removed notification for ${messageInfo} in '${conversationId}' locally.`);
     };
 
     notification.onerror = error => {
-      this.logger.error(
-        `Notification for ${messageInfo} in '${conversationId?.id || conversationId}' closed by error.`,
-        error,
-      );
+      this.logger.error(`Notification for ${messageInfo} in '${conversationId}' closed by error.`, error);
       notification.close();
     };
 
     notification.onshow = () => {
       timeoutTriggerId = window.setTimeout(() => {
-        this.logger.info(
-          `Notification for ${messageInfo} in '${conversationId?.id || conversationId}' closed by timeout.`,
-        );
+        this.logger.info(`Notification for ${messageInfo} in '${conversationId}' closed by timeout.`);
         notification.close();
       }, notificationContent.timeout);
     };
 
     this.notifications.push(notification);
-    this.logger.info(`Added notification for ${messageInfo} in '${conversationId?.id || conversationId}' to queue.`);
+    this.logger.info(`Added notification for ${messageInfo} in '${conversationId}' to queue.`);
   }
 
   /**

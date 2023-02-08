@@ -29,7 +29,7 @@ import {
 } from './EventService';
 
 import {MessageCategory} from '../message/MessageCategory';
-import {EventRecord, StorageService} from '../storage';
+import {EventRecord, LegacyEventRecord, StorageService} from '../storage';
 import {StorageSchemata} from '../storage/StorageSchemata';
 
 // TODO: These types should be moved to a more appropriate place (e.g. EventService) once it has been migrated to TS
@@ -59,11 +59,11 @@ export class EventServiceNoCompound extends EventService {
         .equals(conversationId)
         .sortBy('time');
     } else {
-      const records = (await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS)) as EventRecord[];
+      const records = await this.storageService.getAll<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS);
       events = records.filter(record => record.conversation === conversationId).sort(compareEventsByTime);
     }
 
-    return (events as EventRecord[]).filter(record => record.category >= category);
+    return events.filter(record => record.category >= category);
   }
 
   async _loadEventsInDateRange(
@@ -95,14 +95,14 @@ export class EventServiceNoCompound extends EventService {
         .table(StorageSchemata.OBJECT_STORE.EVENTS)
         .where('conversation')
         .equals(conversationId)
-        .and((record: EventRecord) => {
+        .and((record: LegacyEventRecord) => {
           const timestamp = eventTimeToDate(record.time);
           return fromCompareFunction(fromDate, timestamp) && toCompareFunction(toDate, timestamp);
         })
         .limit(limit);
     }
 
-    const records = (await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS)) as EventRecord[];
+    const records = await this.storageService.getAll<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS);
     return records
       .filter(record => {
         const timestamp = eventTimeToDate(record.time);

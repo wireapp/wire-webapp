@@ -46,6 +46,7 @@ function showModal(storageKey: string, title: string, message: string): void {
           message,
           option: t('modalAvailabilityDontShowAgain'),
           title,
+          closeBtnLabel: t('modalAvailabilityRemoveBtn'),
         },
       },
       'availability',

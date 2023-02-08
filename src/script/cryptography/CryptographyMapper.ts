@@ -18,6 +18,7 @@
  */
 
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
+import {GenericMessageType} from '@wireapp/core/lib/conversation';
 
 import {
   Asset,
@@ -53,12 +54,11 @@ import {base64ToArray, arrayToBase64, createRandomUuid} from 'Util/util';
 import {decryptAesAsset} from '../assets/AssetCrypto';
 import {AssetTransferState} from '../assets/AssetTransferState';
 import {ConversationEphemeralHandler} from '../conversation/ConversationEphemeralHandler';
-import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {CryptographyError} from '../error/CryptographyError';
 import {ClientEvent, CONVERSATION} from '../event/Client';
 import {StatusType} from '../message/StatusType';
-import {EventRecord} from '../storage';
+import {LegacyEventRecord} from '../storage';
 
 export interface MappedText {
   data: {content: string; mentions: string[]; previews: string[]; quote?: string; replacing_message_id?: string};
@@ -100,7 +100,7 @@ export interface AssetData {
   status?: AssetTransferState;
   token?: string;
 }
-type ConversationEvent = Omit<EventRecord, 'id'>;
+type ConversationEvent = Omit<LegacyEventRecord, 'id'>;
 
 export class CryptographyMapper {
   private readonly logger: Logger;
@@ -141,100 +141,100 @@ export class CryptographyMapper {
     let specificContent;
 
     switch (genericMessage.content) {
-      case GENERIC_MESSAGE_TYPE.ASSET: {
+      case GenericMessageType.ASSET: {
         const mappedAsset = this._mapAsset(genericMessage.asset as Asset);
         specificContent = addMetadata(mappedAsset, genericMessage.asset);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.AVAILABILITY: {
+      case GenericMessageType.AVAILABILITY: {
         specificContent = this._mapAvailability(genericMessage.availability as Availability);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.CALLING: {
+      case GenericMessageType.CALLING: {
         specificContent = this._mapCalling(genericMessage.calling as Calling, event.data);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.CLEARED: {
+      case GenericMessageType.CLEARED: {
         specificContent = this._mapCleared(genericMessage.cleared as Cleared);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.CONFIRMATION: {
+      case GenericMessageType.CONFIRMATION: {
         specificContent = this._mapConfirmation(genericMessage.confirmation as Confirmation);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.DELETED: {
+      case GenericMessageType.DELETED: {
         specificContent = this._mapDeleted(genericMessage.deleted as MessageDelete);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.EDITED: {
+      case GenericMessageType.EDITED: {
         specificContent = await this._mapEdited(genericMessage.edited as MessageEdit);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.EPHEMERAL: {
+      case GenericMessageType.EPHEMERAL: {
         specificContent = await this._mapEphemeral(genericMessage, event);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.HIDDEN: {
+      case GenericMessageType.HIDDEN: {
         specificContent = this._mapHidden(genericMessage.hidden as MessageHide);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.IMAGE: {
+      case GenericMessageType.IMAGE: {
         const mappedImage = this._mapImage(genericMessage.image as ImageAsset, event.data.id);
         specificContent = addMetadata(mappedImage, genericMessage.image);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.KNOCK: {
+      case GenericMessageType.KNOCK: {
         const mappedKnock = this._mapKnock();
         specificContent = addMetadata(mappedKnock, genericMessage.knock);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.LAST_READ: {
+      case GenericMessageType.LAST_READ: {
         specificContent = this._mapLastRead(genericMessage.lastRead as LastRead);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.LOCATION: {
+      case GenericMessageType.LOCATION: {
         const mappedLocation = this._mapLocation(genericMessage.location as Location);
         specificContent = addMetadata(mappedLocation, genericMessage.location);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.REACTION: {
+      case GenericMessageType.REACTION: {
         specificContent = this._mapReaction(genericMessage.reaction as Reaction);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.TEXT: {
+      case GenericMessageType.TEXT: {
         const mappedText = this._mapText(genericMessage.text as Text);
         specificContent = addMetadata(mappedText, genericMessage.text);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.COMPOSITE_MESSAGE: {
+      case GenericMessageType.COMPOSITE: {
         const mappedComposite = await this._mapComposite(genericMessage.composite as Composite);
         specificContent = addMetadata(mappedComposite, genericMessage.composite);
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.BUTTON_ACTION_CONFIRMATION: {
+      case GenericMessageType.BUTTON_ACTION_CONFIRMATION: {
         specificContent = this._mapButtonActionConfirmation(
           genericMessage.buttonActionConfirmation as ButtonActionConfirmation,
         );
         break;
       }
 
-      case GENERIC_MESSAGE_TYPE.DATA_TRANSFER: {
+      case GenericMessageType.DATA_TRANSFER: {
         specificContent = this._mapDataTransfer(genericMessage.dataTransfer as DataTransfer);
         break;
       }
@@ -265,7 +265,7 @@ export class CryptographyMapper {
   async _mapComposite(composite: Composite) {
     const items = await Promise.all(
       composite.items.map(async item => {
-        if ((item as Composite.Item).content !== GENERIC_MESSAGE_TYPE.TEXT) {
+        if ((item as Composite.Item).content !== GenericMessageType.TEXT) {
           return item;
         }
 

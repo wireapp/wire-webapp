@@ -77,7 +77,6 @@ import type {MediaStreamHandler} from '../media/MediaStreamHandler';
 import {MediaType} from '../media/MediaType';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
-import type {EventRecord} from '../storage';
 import {TeamState} from '../team/TeamState';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import {EventName} from '../tracking/EventName';
@@ -334,9 +333,7 @@ export class CallingRepository {
       return false;
     }
     const {id, domain} = call.conversationId;
-    const allClients = conversation.isUsingMLSProtocol
-      ? await this.core.service!.conversation.fetchAllParticipantsClients(id, domain)
-      : await this.core.service!.conversation.getAllParticipantsClients(call.conversationId);
+    const allClients = await this.core.service!.conversation.fetchAllParticipantsClients(id, domain);
     const qualifiedClients = isQualifiedUserClients(allClients)
       ? flattenQualifiedUserClients(allClients)
       : flattenUserClients(allClients);
@@ -629,9 +626,7 @@ export class CallingRepository {
       case CALL_MESSAGE_TYPE.CONFKEY: {
         if (source !== EventRepository.SOURCE.STREAM) {
           const {id, domain} = conversationId;
-          const allClients = conversation.isUsingMLSProtocol
-            ? await this.core.service!.conversation.fetchAllParticipantsClients(id, domain)
-            : await this.core.service!.conversation.getAllParticipantsClients(conversationId);
+          const allClients = await this.core.service!.conversation.fetchAllParticipantsClients(id, domain);
           // We warn the message repository that a mismatch has happened outside of its lifecycle (eventually triggering a conversation degradation)
           const shouldContinue = await this.messageRepository.updateMissingClients(
             conversation,
@@ -1099,7 +1094,7 @@ export class CallingRepository {
 
   private injectActivateEvent(conversationId: QualifiedId, userId: QualifiedId, time: string): void {
     const event = EventBuilder.buildVoiceChannelActivate(conversationId, userId, time, this.avsVersion);
-    this.eventRepository.injectEvent(event as unknown as EventRecord, EventSource.INJECTED);
+    this.eventRepository.injectEvent(event, EventSource.INJECTED);
   }
 
   private injectDeactivateEvent(
@@ -1118,7 +1113,7 @@ export class CallingRepository {
       time,
       this.avsVersion,
     );
-    this.eventRepository.injectEvent(event as unknown as EventRecord, source as EventSource);
+    this.eventRepository.injectEvent(event, source);
   }
 
   private readonly sendMessage = (
@@ -1181,7 +1176,7 @@ export class CallingRepository {
     }
 
     const message = await this.messageRepository.sendCallingMessage(conversation, content, options);
-    if (message.state === MessageSendingState.CANCELLED) {
+    if (message.state === MessageSendingState.CANCELED) {
       // If the user has cancelled message sending because of a degradation warning, we abort the call
       this.abortCall(
         conversationId,
@@ -1283,7 +1278,7 @@ export class CallingRepository {
           conversationEntity,
           call.getSelfParticipant().user.id,
         );
-        this.eventRepository.injectEvent(callingEvent as EventRecord);
+        this.eventRepository.injectEvent(callingEvent);
       }
     }
 
