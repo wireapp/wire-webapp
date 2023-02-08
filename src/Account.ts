@@ -518,7 +518,7 @@ export class Account<T = any> extends TypedEventEmitter<Events> {
           break;
         }
       }
-      onEvent(payload, source);
+      await onEvent(payload, source);
     };
 
     const handleNotification = async (notification: Notification, source: NotificationSource): Promise<void> => {
