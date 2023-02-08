@@ -921,7 +921,7 @@ export class MessageRepository {
       if (!message.user().isMe && !message.ephemeral_expires()) {
         throw new ConversationError(ConversationError.TYPE.WRONG_USER, ConversationError.MESSAGE.WRONG_USER);
       }
-      const userIds = options.targetedUsers || conversation.allUserEntities.map(user => user.qualifiedId);
+      const userIds = options.targetedUsers || conversation.allUserEntities.map(user => user!.qualifiedId);
       const payload = MessageBuilder.buildDeleteMessage({
         messageId: message.id,
       });
@@ -1173,19 +1173,10 @@ export class MessageRepository {
    *
    * @param conversation Conversation message belongs to
    * @param messageId ID of message
-   * @param skipConversationMessages Don't use message entity from conversation
-   * @param ensureUser Make sure message entity has a valid user
    * @returns Resolves with the message
    */
-  async getMessageInConversationById(
-    conversation: Conversation,
-    messageId: string,
-    skipConversationMessages = false,
-    ensureUser = false,
-  ): Promise<StoredContentMessage> {
-    const messageEntity =
-      !skipConversationMessages &&
-      (conversation.getMessageByReplacementId(messageId) || conversation.getMessage(messageId));
+  async getMessageInConversationById(conversation: Conversation, messageId: string): Promise<StoredContentMessage> {
+    const messageEntity = conversation.getMessage(messageId);
     const message =
       messageEntity ||
       (await this.eventService.loadEvent(conversation.id, messageId).then(event => {
@@ -1199,7 +1190,35 @@ export class MessageRepository {
       );
     }
 
-    if (ensureUser && message.from && !message.user().id) {
+    return message as StoredContentMessage;
+  }
+
+  /**
+   * Get Message with given ID or a replacementId from the database.
+   *
+   * @param conversation Conversation message belongs to
+   * @param messageId ID of message
+   * @returns Resolves with the message
+   */
+  async getMessageInConversationByReplacementId(
+    conversation: Conversation,
+    messageId: string,
+  ): Promise<StoredContentMessage> {
+    const messageEntity = conversation.getMessageByReplacementId(messageId) || conversation.getMessage(messageId);
+    const message =
+      messageEntity ||
+      (await this.eventService.loadEvent(conversation.id, messageId).then(event => {
+        return event && this.event_mapper.mapJsonEvent(event, conversation);
+      }));
+
+    if (!message) {
+      throw new ConversationError(
+        ConversationError.TYPE.MESSAGE_NOT_FOUND,
+        ConversationError.MESSAGE.MESSAGE_NOT_FOUND,
+      );
+    }
+
+    if (message.from && !message.user().id) {
       const user = await this.userRepository.getUserById({domain: message.user().domain, id: message.from});
       message.user(user);
       return message as StoredContentMessage;
@@ -1212,7 +1231,7 @@ export class MessageRepository {
       // Since this is a bare API client user we use `.deleted`
       const isDeleted = user.deleted === true;
       if (isDeleted) {
-        await this.conversationRepositoryProvider().teamMemberLeave(this.teamState.team().id, {
+        await this.conversationRepositoryProvider().teamMemberLeave(this.teamState.team().id ?? '', {
           domain: this.userState.self().domain,
           id: user.id,
         });

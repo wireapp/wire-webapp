@@ -84,11 +84,9 @@ export const loadDraftState = async (
   const replyMessageId = storageValue.reply.messageId;
 
   if (replyMessageId) {
-    draftMessage.replyEntityPromise = messageRepository.getMessageInConversationById(
+    draftMessage.replyEntityPromise = messageRepository.getMessageInConversationByReplacementId(
       conversationEntity,
       replyMessageId,
-      false,
-      true,
     );
   }
 

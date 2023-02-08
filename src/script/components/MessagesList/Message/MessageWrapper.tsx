@@ -78,7 +78,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
   isMsgElementsFocusable,
 }) => {
   const findMessage = (conversation: Conversation, messageId: string) => {
-    return messageRepository.getMessageInConversationById(conversation, messageId, true, true);
+    return messageRepository.getMessageInConversationByReplacementId(conversation, messageId);
   };
   const clickButton = (message: CompositeMessage, buttonId: string) => {
     if (message.selectedButtonId() !== buttonId && message.waitingButtonId() !== buttonId) {
