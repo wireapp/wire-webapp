@@ -48,7 +48,7 @@ import {partition} from 'underscore';
 import {Asset, Availability, Confirmation, GenericMessage} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {filterClientsFromUserClientMap} from 'Util/filterClientFromUserClientMap';
+import {removeClientFromUserClientMap} from 'Util/filterClientFromUserClientMap';
 import {Declension, joinNames, t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
@@ -1225,8 +1225,11 @@ export class MessageRepository {
     }
     const {id, domain} = conversation.qualifiedId;
     const missing = await this.conversationService.fetchAllParticipantsClients(id, domain);
+
     //we filter out self client id to omit it in mismatch check
-    const filteredMissing = filterClientsFromUserClientMap(missing, [this.core.clientId]);
+    const {userId, clientId} = this.core;
+    const selfClient = {domain, userId, clientId};
+    const filteredMissing = removeClientFromUserClientMap(missing, selfClient);
 
     const deleted = findDeletedClients(filteredMissing, await this.generateRecipients(conversation));
     await this.onClientMismatch?.({deleted, missing} as ClientMismatch, conversation, true);

@@ -50,7 +50,7 @@ import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {flatten} from 'Util/ArrayUtil';
-import {filterClientsFromUserClientMap} from 'Util/filterClientFromUserClientMap';
+import {removeClientFromUserClientMap} from 'Util/filterClientFromUserClientMap';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {roundLogarithmic} from 'Util/NumberUtil';
@@ -335,10 +335,11 @@ export class CallingRepository {
     }
     const {id, domain} = call.conversationId;
     const allClients = await this.core.service!.conversation.fetchAllParticipantsClients(id, domain);
+
     //we filter out self client id to omit it in mismatch check
-    const filteredAllClients = this.selfClientId
-      ? filterClientsFromUserClientMap(allClients, [this.selfClientId])
-      : allClients;
+    const {userId, clientId} = this.core;
+    const selfClient = {domain, userId, clientId};
+    const filteredAllClients = removeClientFromUserClientMap(allClients, selfClient);
 
     const qualifiedClients = isQualifiedUserClients(filteredAllClients)
       ? flattenQualifiedUserClients(filteredAllClients)
@@ -635,10 +636,11 @@ export class CallingRepository {
         if (source !== EventRepository.SOURCE.STREAM) {
           const {id, domain} = conversationId;
           const allClients = await this.core.service!.conversation.fetchAllParticipantsClients(id, domain);
+
           //we filter out self client id to omit it in mismatch check
-          const filteredAllClients = this.selfClientId
-            ? filterClientsFromUserClientMap(allClients, [this.selfClientId])
-            : allClients;
+          const {userId, clientId} = this.core;
+          const selfClient = {domain, userId, clientId};
+          const filteredAllClients = removeClientFromUserClientMap(allClients, selfClient);
 
           // We warn the message repository that a mismatch has happened outside of its lifecycle (eventually triggering a conversation degradation)
           const shouldContinue = await this.messageRepository.updateMissingClients(

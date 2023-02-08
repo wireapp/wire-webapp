@@ -17,40 +17,45 @@
  *
  */
 
-import {filterClientsFromUserClientMap} from './filterClientFromUserClientMap';
+import {removeClientFromUserClientMap} from './filterClientFromUserClientMap';
 
-describe('filterClientsFromUserClientMap', () => {
-  it('filters clients from a user client map', () => {
+describe('removeClientFromUserClientMap', () => {
+  it('removes client from user map', () => {
     const userMap = {
-      user1: ['client1', 'client2'],
-      user2: ['client3', 'client4'],
+      user1: ['a', 'b', 'c'],
+      user2: ['d', 'e', 'f'],
     };
-    const clientsToExclude = ['client1', 'client3'];
-    const filteredUserMap = filterClientsFromUserClientMap(userMap, clientsToExclude);
-    expect(filteredUserMap).toEqual({
-      user1: ['client2'],
-      user2: ['client4'],
-    });
+    const clientToExclude = {
+      userId: 'user1',
+      clientId: 'b',
+    };
+    const expectedUserMap = {
+      user1: ['a', 'c'],
+      user2: ['d', 'e', 'f'],
+    };
+    const result = removeClientFromUserClientMap(userMap, clientToExclude);
+    expect(result).toEqual(expectedUserMap);
   });
 
-  it('filters clients from a qualified user client map', () => {
+  it('removes client from qualified user map', () => {
     const userMap = {
       'example.com': {
-        user1: ['client1', 'client3'],
-      },
-      'example.org': {
-        user2: ['client2', 'client4'],
+        user1: ['a', 'b', 'c'],
+        user2: ['d', 'e', 'f'],
       },
     };
-    const clientsToExclude = ['client1', 'client2'];
-    const filteredUserMap = filterClientsFromUserClientMap(userMap, clientsToExclude);
-    expect(filteredUserMap).toEqual({
+    const clientToExclude = {
+      domain: 'example.com',
+      userId: 'user1',
+      clientId: 'b',
+    };
+    const expectedUserMap = {
       'example.com': {
-        user1: ['client3'],
+        user1: ['a', 'c'],
+        user2: ['d', 'e', 'f'],
       },
-      'example.org': {
-        user2: ['client4'],
-      },
-    });
+    };
+    const result = removeClientFromUserClientMap(userMap, clientToExclude);
+    expect(result).toEqual(expectedUserMap);
   });
 });

@@ -20,34 +20,22 @@
 import type {QualifiedUserClients, UserClients} from '@wireapp/api-client/lib/conversation';
 import {isQualifiedUserClients} from '@wireapp/core/lib/util';
 
-export const filterClientsFromUserClientMap = (
+export const removeClientFromUserClientMap = (
   userMap: QualifiedUserClients | UserClients,
-  clientsToExclude: string[],
+  clientToExclude: {domain?: string; userId: string; clientId: string},
 ) => {
   if (isQualifiedUserClients(userMap)) {
-    return Object.keys(userMap).reduce<QualifiedUserClients>((acc, domain) => {
-      const userClients = userMap[domain];
-      const filteredUserClients = Object.keys(userClients).reduce<UserClients>((acc, userId) => {
-        const clients = userClients[userId];
-        const filteredClients = clients.filter(clientId => !clientsToExclude.includes(clientId));
-        if (filteredClients.length) {
-          acc[userId] = filteredClients;
-        }
-        return acc;
-      }, {});
-      if (Object.keys(filteredUserClients).length) {
-        acc[domain] = filteredUserClients;
-      }
-      return acc;
-    }, {});
+    const {domain, userId} = clientToExclude;
+    if (domain && userMap[domain] && userMap[domain][userId]) {
+      userMap[domain][userId] = userMap[domain][userId].filter(clientId => clientId !== clientToExclude.clientId);
+    }
+    return userMap;
   }
 
-  return Object.keys(userMap).reduce<UserClients>((acc, userId) => {
-    const clients = userMap[userId];
-    const filteredClients = clients.filter(clientId => !clientsToExclude.includes(clientId));
-    if (filteredClients.length) {
-      acc[userId] = filteredClients;
-    }
-    return acc;
-  }, {});
+  const {userId} = clientToExclude;
+  if (userMap[userId]) {
+    userMap[userId] = userMap[userId].filter(clientId => clientId !== clientToExclude.clientId);
+  }
+
+  return userMap;
 };
