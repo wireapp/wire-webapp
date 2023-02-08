@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [38.11.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.10.3...@wireapp/core@38.11.0) (2023-02-08)
+
+### Features
+
+* Use latest coreCrypto decryption error handling ([#4865](https://github.com/wireapp/wire-web-packages/issues/4865)) ([9b01c44](https://github.com/wireapp/wire-web-packages/commit/9b01c4473f6d8a7a34a0b6993aaa43f87e6f1f98))
+
 ## [38.10.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.10.2...@wireapp/core@38.10.3) (2023-02-07)
 
 ### Bug Fixes
