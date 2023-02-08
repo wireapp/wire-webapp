@@ -4376,20 +4376,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core-crypto@npm:0.6.0-rc.3":
-  version: 0.6.0-rc.3
-  resolution: "@wireapp/core-crypto@npm:0.6.0-rc.3"
-  checksum: 374609b9efad22ca7fb1c2b401c0e43b3f7d912d1780cc08a1b1a25f9466709ade4fceb2d0d7d6af8762f09ccc34851efef5cb1af286e485e766197bfc166e2c
+"@wireapp/core-crypto@npm:0.6.0-rc.7":
+  version: 0.6.0-rc.7
+  resolution: "@wireapp/core-crypto@npm:0.6.0-rc.7"
+  checksum: 837dee59e0f8fb24a48c10d31a9153cec3370132bbdcabc39414e56e4f26086ffd9576c778cfb15ebb1dd0cd64e6060ee475402b7217baef3a301d496b46fa09
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:38.10.3":
-  version: 38.10.3
-  resolution: "@wireapp/core@npm:38.10.3"
+"@wireapp/core@npm:38.11.0":
+  version: 38.11.0
+  resolution: "@wireapp/core@npm:38.11.0"
   dependencies:
     "@wireapp/api-client": ^22.15.4
     "@wireapp/commons": ^5.0.4
-    "@wireapp/core-crypto": 0.6.0-rc.3
+    "@wireapp/core-crypto": 0.6.0-rc.7
     "@wireapp/cryptobox": 12.8.0
     "@wireapp/promise-queue": ^2.1.1
     "@wireapp/protocol-messaging": 1.44.0
@@ -4403,7 +4403,7 @@ __metadata:
     logdown: 3.3.1
     long: ^5.2.0
     uuidjs: 4.2.13
-  checksum: 9c5bd6c5e5fd027c742a71cf80e46d9b67ce05d6a79e36db857f34d407d7268a6539dc0ef6b0cb72ffaddffc6bf8ae50e5a197e54fd9e43a437959cde64ec113
+  checksum: 41e0f8da4bb54a24b2c91a6a2f16b0d91a174e5febbdc3087045cb0ac9eb79c602e8716ee514e0d3f3aeeff4cb2605f3ce218372a11d53a47cd723e7142ca8af
   languageName: node
   linkType: hard
 
@@ -16712,7 +16712,7 @@ __metadata:
     "@typescript-eslint/parser": ^5.50.0
     "@wireapp/avs": 9.0.20
     "@wireapp/copy-config": 2.0.7
-    "@wireapp/core": 38.10.3
+    "@wireapp/core": 38.11.0
     "@wireapp/eslint-config": 2.1.1
     "@wireapp/lru-cache": 3.8.1
     "@wireapp/prettier-config": 0.5.2
