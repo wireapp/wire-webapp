@@ -25,7 +25,13 @@ import {
   UserClients,
 } from '@wireapp/api-client/lib/conversation';
 import {QualifiedId, RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/lib/user';
-import {MessageSendingState, MessageTargetMode, ReactionType, GenericMessageType} from '@wireapp/core/lib/conversation';
+import {
+  MessageSendingState,
+  MessageTargetMode,
+  ReactionType,
+  GenericMessageType,
+  SendResult,
+} from '@wireapp/core/lib/conversation';
 import {
   AudioMetaData,
   EditedTextContent,
@@ -714,14 +720,19 @@ export class MessageRepository {
       return silentDegradationWarning ? true : this.requestUserSendingPermission(conversation, false, consentType);
     };
 
-    const handleSuccess = async (sentAt: string) => {
+    const handleSuccess = async ({sentAt, failedToSend}: SendResult) => {
       const injectDelta = 10; // we want to make sure the message is injected slightly before it was received by the backend
       const sentTimestamp = new Date(sentAt).getTime() - injectDelta;
       const preMessageTimestamp = new Date(sentTimestamp).toISOString();
       // Trigger an empty mismatch to check for users that have no devices and that could have been removed from the team
       await this.onClientMismatch?.({time: preMessageTimestamp}, conversation, silentDegradationWarning);
       if (!skipInjection) {
-        await this.updateMessageAsSent(conversation, payload.messageId, syncTimestamp ? sentAt : undefined);
+        await this.updateMessageAsSent(
+          conversation,
+          payload.messageId,
+          syncTimestamp ? sentAt : undefined,
+          failedToSend,
+        );
       }
     };
 
@@ -753,7 +764,7 @@ export class MessageRepository {
     const result = await this.conversationService.send(sendOptions);
 
     if (result.state === MessageSendingState.OUTGOING_SENT) {
-      await handleSuccess(result.sentAt);
+      await handleSuccess(result);
     }
     return result;
   }
@@ -1094,13 +1105,19 @@ export class MessageRepository {
    * @param isoDate If defined it will update event timestamp
    * @returns Resolves when sent status was updated
    */
-  private async updateMessageAsSent(conversationEntity: Conversation, eventId: string, isoDate?: string) {
+  private async updateMessageAsSent(
+    conversationEntity: Conversation,
+    eventId: string,
+    isoDate?: string,
+    failedToSend?: QualifiedUserClients,
+  ) {
     try {
       const messageEntity = await this.getMessageInConversationById(conversationEntity, eventId);
       const updatedStatus = messageEntity.readReceipts().length ? StatusType.SEEN : StatusType.SENT;
       messageEntity.status(updatedStatus);
-      const changes: Pick<Partial<EventRecord>, 'status' | 'time'> = {
+      const changes: Pick<Partial<EventRecord>, 'status' | 'time' | 'failedToSend'> = {
         status: updatedStatus,
+        failedToSend,
       };
       if (isoDate) {
         const timestamp = new Date(isoDate).getTime();

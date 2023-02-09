@@ -65,6 +65,7 @@ import type {Text as TextAsset} from '../entity/message/Text';
 import {VerificationMessage} from '../entity/message/VerificationMessage';
 import {ConversationError} from '../error/ConversationError';
 import {ClientEvent} from '../event/Client';
+import {isContentMessage} from '../guards/Message';
 import {CALL_MESSAGE_TYPE} from '../message/CallMessageType';
 import {MentionEntity} from '../message/MentionEntity';
 import {QuoteEntity} from '../message/QuoteEntity';
@@ -140,7 +141,7 @@ export class EventMapper {
    * @param event new json data to feed into the entity
    * @returns the updated message entity
    */
-  async updateMessageEvent(originalEntity: ContentMessage, event: LegacyEventRecord): Promise<ContentMessage> {
+  async updateMessageEvent(originalEntity: ContentMessage, event: EventRecord): Promise<ContentMessage> {
     const {id, data: eventData, edited_time: editedTime, conversation, qualified_conversation} = event;
 
     if (eventData.quote) {
@@ -184,6 +185,10 @@ export class EventMapper {
     if (event.reactions) {
       originalEntity.reactions(event.reactions);
       originalEntity.version = event.version;
+    }
+
+    if (event.failedToSend) {
+      originalEntity.failedToSend(event.failedToSend);
     }
 
     if (event.selected_button_id) {
@@ -372,7 +377,7 @@ export class EventMapper {
     }
 
     if (messageEntity.isContent() || messageEntity.isPing()) {
-      messageEntity.status((event as LegacyEventRecord).status || StatusType.SENT);
+      messageEntity.status((event as EventRecord).status || StatusType.SENT);
     }
 
     if (messageEntity.isComposite()) {
@@ -394,7 +399,7 @@ export class EventMapper {
       messageEntity = undefined;
     }
 
-    return messageEntity;
+    return isContentMessage(messageEntity) ? this.updateMessageEvent(messageEntity, event) : messageEntity;
   }
 
   //##############################################################################
@@ -551,7 +556,7 @@ export class EventMapper {
    * @param event Message data
    * @returns Content message entity
    */
-  private async _mapEventMessageAdd(event: LegacyEventRecord) {
+  private async _mapEventMessageAdd(event: EventRecord) {
     const {data: eventData, edited_time: editedTime} = event;
     const messageEntity = new ContentMessage();
 

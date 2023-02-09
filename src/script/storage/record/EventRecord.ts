@@ -17,6 +17,7 @@
  *
  */
 
+import type {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import type {ConversationEvent} from '@wireapp/api-client/lib/event';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {ReactionType} from '@wireapp/core/lib/conversation/';
@@ -41,6 +42,15 @@ export interface AssetRecord {
 
 export type UserReactionMap = {[userId: string]: ReactionType};
 
+/**
+ * Represent an event that has been sent by the current device
+ */
+type SentEvent = {
+  /** sending status of the event*/
+  status: StatusType;
+  failedToSend?: QualifiedUserClients;
+};
+
 /** represents an event that was saved to the DB */
 export type StoredEvent<T> = {
   primary_key: string;
@@ -57,10 +67,9 @@ export type StoredEvent<T> = {
   ephemeral_time?: string;
   /** some events are updated sequentially and we keep track of a version */
   version?: number;
-  status?: StatusType;
-} & {
-  [K in keyof T]: T[K];
-};
+} & Partial<SentEvent> & {
+    [K in keyof T]: T[K];
+  };
 
 export type EventRecord = StoredEvent<ConversationEvent | ClientConversationEvent>;
 

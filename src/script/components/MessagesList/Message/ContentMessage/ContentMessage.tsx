@@ -59,8 +59,6 @@ export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetS
   previousMessage?: Message;
   quotedMessage?: ContentMessage;
   selfId: QualifiedId;
-  handleFocus: (index: number) => void;
-  totalMessage: number;
   isMsgElementsFocusable: boolean;
 }
 
@@ -82,8 +80,6 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   onClickLikes,
   onClickButton,
   onLike,
-  handleFocus,
-  totalMessage,
   isMsgElementsFocusable,
 }) => {
   const msgFocusState = useMemo(
@@ -92,16 +88,26 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   );
   const messageFocusedTabIndex = useMessageFocusedTabIndex(msgFocusState);
   const {entries: menuEntries} = useKoSubscribableChildren(contextMenu, ['entries']);
-  const {headerSenderName, timestamp, ephemeral_caption, ephemeral_status, assets, other_likes, was_edited} =
-    useKoSubscribableChildren(message, [
-      'headerSenderName',
-      'timestamp',
-      'ephemeral_caption',
-      'ephemeral_status',
-      'assets',
-      'other_likes',
-      'was_edited',
-    ]);
+  const {
+    headerSenderName,
+    timestamp,
+    ephemeral_caption,
+    ephemeral_status,
+    assets,
+    other_likes,
+    was_edited,
+    failedToSend,
+  } = useKoSubscribableChildren(message, [
+    'failedToSend',
+    'headerSenderName',
+    'timestamp',
+    'ephemeral_caption',
+    'ephemeral_status',
+    'assets',
+    'other_likes',
+    'was_edited',
+  ]);
+
   const shouldShowAvatar = (): boolean => {
     if (!previousMessage || hasMarker) {
       return true;
@@ -222,6 +228,8 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             isMessageFocused={msgFocusState}
           />
         ))}
+
+        {failedToSend && <div>{JSON.stringify(failedToSend)}</div>}
 
         {!other_likes.length && message.isReactable() && (
           <div className="message-body-like">
