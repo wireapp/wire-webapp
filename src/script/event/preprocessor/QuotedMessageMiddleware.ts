@@ -103,7 +103,7 @@ export class QuotedMessageMiddleware {
 
     const messageId = quote.quotedMessageId;
 
-    let quotedMessage = await this.eventService.loadEvent(event.conversation, messageId);
+    let quotedMessage = await this.eventService.loadEvent(event.conversation, messageId) ?? await this.eventService.loadReplacingEvent(event.conversation, messageId);
     if (!quotedMessage) {
       const replacedMessage = await this.eventService.loadReplacingEvent(event.conversation, messageId);
       if (!replacedMessage) {
