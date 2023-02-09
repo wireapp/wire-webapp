@@ -1217,13 +1217,18 @@ export class MessageRepository {
         ConversationError.MESSAGE.MESSAGE_NOT_FOUND,
       );
     }
+    await this.ensureMessageSender(message);
 
+    return message as StoredContentMessage;
+  }
+
+  async ensureMessageSender(message: Message) {
     if (message.from && !message.user().id) {
       const user = await this.userRepository.getUserById({domain: message.user().domain, id: message.from});
       message.user(user);
       return message as StoredContentMessage;
     }
-    return message as StoredContentMessage;
+    return message;
   }
 
   async triggerTeamMemberLeaveChecks(users: APIClientUser[]): Promise<void> {

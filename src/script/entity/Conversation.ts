@@ -977,7 +977,7 @@ export class Conversation {
    */
   getMessageByReplacementId(messageId: string): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
     return this.messages().find(
-      messageEntity => isContentMessage(messageEntity) && messageEntity?.replacing_message_id === messageId,
+      messageEntity => isContentMessage(messageEntity) && messageEntity.replacing_message_id === messageId,
     );
   }
 
