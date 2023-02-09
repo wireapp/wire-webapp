@@ -22,7 +22,7 @@ import {isObject} from 'underscore';
 import {MessageCategory} from './MessageCategory';
 
 import {ClientEvent} from '../event/Client';
-import {LegacyEventRecord} from '../storage/record/EventRecord';
+import {EventRecord} from '../storage/record/EventRecord';
 
 const _checkAsset = (event: any): MessageCategory | void => {
   const {data: eventData, type: eventType} = event;
@@ -80,9 +80,9 @@ const _checkText = (event: any): MessageCategory | void => {
   }
 };
 
-export const categoryFromEvent = (event: LegacyEventRecord): MessageCategory => {
+export const categoryFromEvent = (event: Partial<EventRecord>): MessageCategory => {
   try {
-    const eventReactions = event.reactions;
+    const eventReactions = 'reactions' in event && event.reactions;
     let category = MessageCategory.NONE;
 
     const categoryChecks = [_checkText, _checkAsset, _checkPing, _checkLocation, _checkComposite];

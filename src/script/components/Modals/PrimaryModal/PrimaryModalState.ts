@@ -18,6 +18,7 @@
  */
 
 import {isValid} from 'date-fns';
+import {escape} from 'underscore';
 import {create} from 'zustand';
 
 import {replaceLink, t} from 'Util/LocalizerUtil';
