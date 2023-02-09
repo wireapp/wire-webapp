@@ -51,6 +51,7 @@ type SentEvent = {
 
 /** represents an event that was saved to the DB */
 export type StoredEvent<T> = {
+  /** Only used with IndexedDB table 'event' */
   primary_key: string;
   category: number;
   id: string;
@@ -73,7 +74,6 @@ export type EventRecord = StoredEvent<ConversationEvent | ClientConversationEven
 
 /** @deprecated This is the old swallow-all type. Use the EventRecord Discriminated Union Type instead */
 export type LegacyEventRecord<T = any> = {
-  category?: number;
   client?: {time: string};
   connection?: {lastUpdate: string};
   content?: string;
@@ -84,12 +84,9 @@ export type LegacyEventRecord<T = any> = {
   error?: string;
   from: string;
   from_client_id?: string;
-  id?: string;
   mentions?: string[];
   message?: string;
   previews?: string[];
-  /** Only used with IndexedDB table 'event' */
-  primary_key?: string;
   qualified_conversation?: QualifiedId;
   qualified_from?: QualifiedId;
   reactions?: UserReactionMap;
