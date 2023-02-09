@@ -334,6 +334,7 @@ export class CallingRepository {
     }
     const {id, domain} = call.conversationId;
     const allClients = await this.core.service!.conversation.fetchAllParticipantsClients(id, domain);
+
     const qualifiedClients = isQualifiedUserClients(allClients)
       ? flattenQualifiedUserClients(allClients)
       : flattenUserClients(allClients);
@@ -627,6 +628,7 @@ export class CallingRepository {
         if (source !== EventRepository.SOURCE.STREAM) {
           const {id, domain} = conversationId;
           const allClients = await this.core.service!.conversation.fetchAllParticipantsClients(id, domain);
+
           // We warn the message repository that a mismatch has happened outside of its lifecycle (eventually triggering a conversation degradation)
           const shouldContinue = await this.messageRepository.updateMissingClients(
             conversation,
