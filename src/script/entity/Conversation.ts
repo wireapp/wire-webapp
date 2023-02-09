@@ -577,7 +577,9 @@ export class Conversation {
   }
 
   get allUserEntities() {
-    return [this.selfUser()].concat(this.participating_user_ets());
+    const selfUser = this.selfUser();
+    const selfUserArray = selfUser ? [selfUser] : [];
+    return selfUserArray.concat(this.participating_user_ets());
   }
 
   readonly persistState = (): void => {
