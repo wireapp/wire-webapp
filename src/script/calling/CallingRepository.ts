@@ -330,8 +330,7 @@ export class CallingRepository {
       this.logger.warn(`Unable to find a conversation with id of ${call.conversationId}`);
       return false;
     }
-    const {id, domain} = call.conversationId;
-    const allClients = await this.core.service!.conversation.fetchAllParticipantsClients(id, domain);
+    const allClients = await this.core.service!.conversation.fetchAllParticipantsClients(call.conversationId);
 
     const qualifiedClients = isQualifiedUserClients(allClients)
       ? flattenQualifiedUserClients(allClients)
@@ -620,8 +619,7 @@ export class CallingRepository {
     switch (content.type) {
       case CALL_MESSAGE_TYPE.CONFKEY: {
         if (source !== EventRepository.SOURCE.STREAM) {
-          const {id, domain} = conversationId;
-          const allClients = await this.core.service!.conversation.fetchAllParticipantsClients(id, domain);
+          const allClients = await this.core.service!.conversation.fetchAllParticipantsClients(conversationId);
 
           // We warn the message repository that a mismatch has happened outside of its lifecycle (eventually triggering a conversation degradation)
           const shouldContinue = await this.messageRepository.updateMissingClients(
