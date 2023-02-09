@@ -187,10 +187,6 @@ export class EventMapper {
       originalEntity.version = event.version;
     }
 
-    if (event.failedToSend) {
-      originalEntity.failedToSend(event.failedToSend);
-    }
-
     if (event.selected_button_id) {
       originalEntity.version = event.version;
     }

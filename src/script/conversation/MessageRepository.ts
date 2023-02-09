@@ -720,19 +720,14 @@ export class MessageRepository {
       return silentDegradationWarning ? true : this.requestUserSendingPermission(conversation, false, consentType);
     };
 
-    const handleSuccess = async ({sentAt, failedToSend}: SendResult) => {
+    const handleSuccess = async ({sentAt}: SendResult) => {
       const injectDelta = 10; // we want to make sure the message is injected slightly before it was received by the backend
       const sentTimestamp = new Date(sentAt).getTime() - injectDelta;
       const preMessageTimestamp = new Date(sentTimestamp).toISOString();
       // Trigger an empty mismatch to check for users that have no devices and that could have been removed from the team
       await this.onClientMismatch?.({time: preMessageTimestamp}, conversation, silentDegradationWarning);
       if (!skipInjection) {
-        await this.updateMessageAsSent(
-          conversation,
-          payload.messageId,
-          syncTimestamp ? sentAt : undefined,
-          failedToSend,
-        );
+        await this.updateMessageAsSent(conversation, payload.messageId, syncTimestamp ? sentAt : undefined);
       }
     };
 
@@ -1105,19 +1100,13 @@ export class MessageRepository {
    * @param isoDate If defined it will update event timestamp
    * @returns Resolves when sent status was updated
    */
-  private async updateMessageAsSent(
-    conversationEntity: Conversation,
-    eventId: string,
-    isoDate?: string,
-    failedToSend?: QualifiedUserClients,
-  ) {
+  private async updateMessageAsSent(conversationEntity: Conversation, eventId: string, isoDate?: string) {
     try {
       const messageEntity = await this.getMessageInConversationById(conversationEntity, eventId);
       const updatedStatus = messageEntity.readReceipts().length ? StatusType.SEEN : StatusType.SENT;
       messageEntity.status(updatedStatus);
-      const changes: Pick<Partial<EventRecord>, 'status' | 'time' | 'failedToSend'> = {
+      const changes: Pick<Partial<EventRecord>, 'status' | 'time'> = {
         status: updatedStatus,
-        failedToSend,
       };
       if (isoDate) {
         const timestamp = new Date(isoDate).getTime();
