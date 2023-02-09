@@ -339,7 +339,7 @@ export class EventService {
       category: categoryFromEvent(event as EventRecord),
     };
     const savedEvent: EventRecord = {
-      ...event,
+      ...categorizedEvent,
       primary_key: await this.storageService.save(StorageSchemata.OBJECT_STORE.EVENTS, undefined, categorizedEvent),
     } as EventRecord;
     if (this.storageService.isTemporaryAndNonPersistent) {
