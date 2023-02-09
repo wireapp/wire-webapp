@@ -17,16 +17,66 @@
  *
  */
 
-import {FC} from 'react';
+import {useState} from 'react';
 
 import type {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {User} from 'src/script/entity/User';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 
+export type User = {id: QualifiedId; name: string};
 type Props = {
   failedToSend: QualifiedUserClients;
   knownUsers: User[];
 };
-export const FailedToSendWarning: FC<Props> = ({failedToSend, knownUsers}) => {
-  return <div>{JSON.stringify(failedToSend)}</div>;
+
+function generateNamedUsers(users: User[], userClients: QualifiedUserClients): string[] {
+  return Object.entries(userClients).reduce<string[]>((namedUsers, [domain, domainUsers]) => {
+    const domainNamedUsers = Object.keys(domainUsers).reduce<string[]>((domainNamedUsers, userId) => {
+      const user = users.find(user => matchQualifiedIds(user.id, {id: userId, domain}));
+      if (user) {
+        return [...domainNamedUsers, user.name];
+      }
+      return domainNamedUsers;
+    }, []);
+    return [...namedUsers, ...domainNamedUsers];
+  }, []);
+}
+
+export const FailedToSendWarning = ({failedToSend, knownUsers}: Props) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const userCount = Object.entries(failedToSend).reduce(
+    (count, [_domain, users]) => count + Object.keys(users).length,
+    0,
+  );
+
+  const showToggle = userCount > 1;
+
+  const namedUsers = generateNamedUsers(knownUsers, failedToSend);
+
+  const message =
+    namedUsers.length === 1
+      ? `${namedUsers[0]} will receive your message later`
+      : `${userCount} Participants had issues receiving this message`;
+
+  return (
+    <div>
+      <p>{message}</p>
+      {showToggle && (
+        <>
+          {isOpen && (
+            <div>
+              {namedUsers.map(username => (
+                <span data-uie-name="recipient" key={username}>
+                  {username}
+                </span>
+              ))}
+            </div>
+          )}
+          <button onClick={() => setIsOpen(true)}>{isOpen ? 'Hide details' : 'Show details'}</button>
+        </>
+      )}
+    </div>
+  );
 };
