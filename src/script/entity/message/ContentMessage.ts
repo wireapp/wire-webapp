@@ -40,7 +40,7 @@ import {User} from '../User';
 export class ContentMessage extends Message {
   private readonly isLikedProvisional: ko.Observable<boolean>;
   public readonly reactions_user_ets: ko.ObservableArray<User>;
-  public readonly assets: ko.ObservableArray<Asset | FileAsset | TextAsset | MediumImage>;
+  public readonly assets: ko.ObservableArray<Asset | FileAsset | TextAsset | MediumImage> = ko.observableArray();
   public readonly is_liked: ko.PureComputed<boolean>;
   public readonly like_caption: ko.PureComputed<string>;
   public readonly other_likes: ko.PureComputed<User[]>;
@@ -48,22 +48,16 @@ export class ContentMessage extends Message {
   // TODO: Rename to `reactionsUsers`
   public readonly reactions_user_ids: ko.PureComputed<string>;
   public readonly was_edited: ko.PureComputed<boolean>;
-  public replacing_message_id: null | string;
-  readonly edited_timestamp: ko.Observable<number>;
+  public replacing_message_id: null | string = null;
+  readonly edited_timestamp: ko.Observable<number | null> = ko.observable(null);
   // TODO(Federation): Make reactions federation-aware.
-  readonly reactions: ko.Observable<UserReactionMap>;
+  readonly reactions: ko.Observable<UserReactionMap> = ko.observable({});
+  public super_type = SuperType.CONTENT;
 
   constructor(id?: string) {
     super(id);
-
-    this.assets = ko.observableArray([]);
-    this.super_type = SuperType.CONTENT;
-    this.replacing_message_id = null;
-    this.edited_timestamp = ko.observable(null);
-
     this.was_edited = ko.pureComputed(() => !!this.edited_timestamp());
 
-    this.reactions = ko.observable({});
     this.reactions_user_ets = ko.observableArray();
     this.reactions_user_ids = ko.pureComputed(() => {
       return this.reactions_user_ets()

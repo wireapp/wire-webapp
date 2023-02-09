@@ -25,7 +25,13 @@ import {
   UserClients,
 } from '@wireapp/api-client/lib/conversation';
 import {QualifiedId, RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/lib/user';
-import {MessageSendingState, MessageTargetMode, ReactionType, GenericMessageType} from '@wireapp/core/lib/conversation';
+import {
+  MessageSendingState,
+  MessageTargetMode,
+  ReactionType,
+  GenericMessageType,
+  SendResult,
+} from '@wireapp/core/lib/conversation';
 import {
   AudioMetaData,
   EditedTextContent,
@@ -714,7 +720,7 @@ export class MessageRepository {
       return silentDegradationWarning ? true : this.requestUserSendingPermission(conversation, false, consentType);
     };
 
-    const handleSuccess = async (sentAt: string) => {
+    const handleSuccess = async ({sentAt}: SendResult) => {
       const injectDelta = 10; // we want to make sure the message is injected slightly before it was received by the backend
       const sentTimestamp = new Date(sentAt).getTime() - injectDelta;
       const preMessageTimestamp = new Date(sentTimestamp).toISOString();
@@ -753,7 +759,7 @@ export class MessageRepository {
     const result = await this.conversationService.send(sendOptions);
 
     if (result.state === MessageSendingState.OUTGOING_SENT) {
-      await handleSuccess(result.sentAt);
+      await handleSuccess(result);
     }
     return result;
   }

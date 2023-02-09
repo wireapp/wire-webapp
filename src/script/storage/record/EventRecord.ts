@@ -41,8 +41,17 @@ export interface AssetRecord {
 
 export type UserReactionMap = {[userId: string]: ReactionType};
 
+/**
+ * Represent an event that has been sent by the current device
+ */
+type SentEvent = {
+  /** sending status of the event*/
+  status: StatusType;
+};
+
 /** represents an event that was saved to the DB */
 export type StoredEvent<T> = {
+  /** Only used with IndexedDB table 'event' */
   primary_key: string;
   category: number;
   id: string;
@@ -57,47 +66,37 @@ export type StoredEvent<T> = {
   ephemeral_time?: string;
   /** some events are updated sequentially and we keep track of a version */
   version?: number;
-  status?: StatusType;
-} & {
-  [K in keyof T]: T[K];
-};
+} & Partial<SentEvent> & {
+    [K in keyof T]: T[K];
+  };
 
 export type EventRecord = StoredEvent<ConversationEvent | ClientConversationEvent>;
 
 /** @deprecated This is the old swallow-all type. Use the EventRecord Discriminated Union Type instead */
-export interface LegacyEventRecord<T = any> {
-  category?: number;
+export type LegacyEventRecord<T = any> = {
   client?: {time: string};
   connection?: {lastUpdate: string};
   content?: string;
   conversation: string;
   data?: T;
   edited_time?: string;
-  ephemeral_expires?: boolean | string | number;
-  ephemeral_started?: number;
-  ephemeral_time?: string;
   error_code?: number | string;
   error?: string;
   from: string;
   from_client_id?: string;
-  id?: string;
   mentions?: string[];
   message?: string;
   previews?: string[];
-  /** Only used with IndexedDB table 'event' */
-  primary_key?: string;
   qualified_conversation?: QualifiedId;
   qualified_from?: QualifiedId;
   reactions?: UserReactionMap;
   read_receipts?: ReadReceipt[];
   selected_button_id?: string;
   server_time?: string;
-  status?: StatusType;
   /** The time as ISO date string */
   time: string;
   timestamp?: number;
   type: string;
-  version?: number;
   waiting_button_id?: string;
   senderClientId?: string;
-}
+} & Partial<StoredEvent<{}>>;

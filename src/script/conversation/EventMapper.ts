@@ -372,7 +372,7 @@ export class EventMapper {
     }
 
     if (messageEntity.isContent() || messageEntity.isPing()) {
-      messageEntity.status((event as LegacyEventRecord).status || StatusType.SENT);
+      messageEntity.status((event as EventRecord).status || StatusType.SENT);
     }
 
     if (messageEntity.isComposite()) {
