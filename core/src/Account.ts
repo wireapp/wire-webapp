@@ -396,15 +396,7 @@ export class Account<T = any> extends TypedEventEmitter<Events> {
     const giphyService = new GiphyService(this.apiClient);
     const linkPreviewService = new LinkPreviewService(assetService);
     const notificationService = new NotificationService(this.apiClient, proteusService, this.storeEngine, mlsService);
-    const conversationService = new ConversationService(
-      this.apiClient,
-      {
-        // We can use qualified ids to send messages as long as the backend supports federated endpoints
-        useQualifiedIds: this.backendFeatures.federationEndpoints,
-      },
-      proteusService,
-      mlsService,
-    );
+    const conversationService = new ConversationService(this.apiClient, proteusService, mlsService);
 
     const selfService = new SelfService(this.apiClient);
     const teamService = new TeamService(this.apiClient);
