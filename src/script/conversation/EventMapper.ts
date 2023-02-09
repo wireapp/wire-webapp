@@ -141,7 +141,7 @@ export class EventMapper {
    * @param event new json data to feed into the entity
    * @returns the updated message entity
    */
-  async updateMessageEvent(originalEntity: ContentMessage, event: EventRecord): Promise<ContentMessage> {
+  async updateMessageEvent(originalEntity: ContentMessage, event: LegacyEventRecord): Promise<ContentMessage> {
     const {id, data: eventData, edited_time: editedTime, conversation, qualified_conversation} = event;
 
     if (eventData.quote) {
@@ -399,7 +399,9 @@ export class EventMapper {
       messageEntity = undefined;
     }
 
-    return isContentMessage(messageEntity) ? this.updateMessageEvent(messageEntity, event) : messageEntity;
+    return isContentMessage(messageEntity)
+      ? this.updateMessageEvent(messageEntity, event as EventRecord)
+      : messageEntity;
   }
 
   //##############################################################################
@@ -556,7 +558,7 @@ export class EventMapper {
    * @param event Message data
    * @returns Content message entity
    */
-  private async _mapEventMessageAdd(event: EventRecord) {
+  private async _mapEventMessageAdd(event: LegacyEventRecord) {
     const {data: eventData, edited_time: editedTime} = event;
     const messageEntity = new ContentMessage();
 

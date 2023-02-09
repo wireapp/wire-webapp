@@ -74,7 +74,7 @@ export type StoredEvent<T> = {
 export type EventRecord = StoredEvent<ConversationEvent | ClientConversationEvent>;
 
 /** @deprecated This is the old swallow-all type. Use the EventRecord Discriminated Union Type instead */
-export interface LegacyEventRecord<T = any> {
+export type LegacyEventRecord<T = any> = {
   category?: number;
   client?: {time: string};
   connection?: {lastUpdate: string};
@@ -82,9 +82,6 @@ export interface LegacyEventRecord<T = any> {
   conversation: string;
   data?: T;
   edited_time?: string;
-  ephemeral_expires?: boolean | string | number;
-  ephemeral_started?: number;
-  ephemeral_time?: string;
   error_code?: number | string;
   error?: string;
   from: string;
@@ -101,12 +98,10 @@ export interface LegacyEventRecord<T = any> {
   read_receipts?: ReadReceipt[];
   selected_button_id?: string;
   server_time?: string;
-  status?: StatusType;
   /** The time as ISO date string */
   time: string;
   timestamp?: number;
   type: string;
-  version?: number;
   waiting_button_id?: string;
   senderClientId?: string;
-}
+} & Partial<StoredEvent<{}>>;
