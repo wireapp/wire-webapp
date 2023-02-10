@@ -332,21 +332,24 @@ export class CallingRepository {
     }
     const allClients = await this.core.service!.conversation.fetchAllParticipantsClients(call.conversationId);
 
-    const qualifiedClients = isQualifiedUserClients(allClients)
-      ? flattenQualifiedUserClients(allClients)
-      : flattenUserClients(allClients);
+    if (!conversation.isUsingMLSProtocol) {
+      const qualifiedClients = isQualifiedUserClients(allClients)
+        ? flattenQualifiedUserClients(allClients)
+        : flattenUserClients(allClients);
 
-    const clients: Clients = flatten(
-      qualifiedClients.map(({data, userId}) =>
-        data.map(clientid => ({clientid, userid: this.serializeQualifiedId(userId)})),
-      ),
-    );
+      const clients: Clients = flatten(
+        qualifiedClients.map(({data, userId}) =>
+          data.map(clientid => ({clientid, userid: this.serializeQualifiedId(userId)})),
+        ),
+      );
 
-    this.wCall?.setClientsForConv(
-      this.wUser,
-      this.serializeQualifiedId(call.conversationId),
-      JSON.stringify({clients}),
-    );
+      this.wCall?.setClientsForConv(
+        this.wUser,
+        this.serializeQualifiedId(call.conversationId),
+        JSON.stringify({clients}),
+      );
+    }
+
     // We warn the message repository that a mismatch has happened outside of its lifecycle (eventually triggering a conversation degradation)
     const consentType =
       this.getCallDirection(call) === CALL_DIRECTION.INCOMING ? CONSENT_TYPE.INCOMING_CALL : CONSENT_TYPE.OUTGOING_CALL;
