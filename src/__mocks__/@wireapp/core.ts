@@ -25,7 +25,13 @@ export class Account {
   configureMLSCallbacks = jest.fn();
 
   service = {
-    mls: {registerConversation: jest.fn()},
+    mls: {
+      registerConversation: jest.fn(),
+      joinConferenceSubconversation: jest.fn(),
+      on: jest.fn(),
+      getGroupIdFromConversationId: jest.fn(),
+      getClientIds: jest.fn(),
+    },
     asset: {
       uploadAsset: jest.fn(),
     },
