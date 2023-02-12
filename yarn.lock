@@ -4454,11 +4454,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/copy-config@npm:2.0.7":
-  version: 2.0.7
-  resolution: "@wireapp/copy-config@npm:2.0.7"
+"@wireapp/copy-config@npm:2.0.8":
+  version: 2.0.8
+  resolution: "@wireapp/copy-config@npm:2.0.8"
   dependencies:
-    axios: 1.3.0
+    axios: 1.3.2
     copy: 0.3.2
     cosmiconfig: 8.0.0
     fs-extra: 11.1.0
@@ -4466,7 +4466,7 @@ __metadata:
     logdown: 3.3.1
   bin:
     copy-config: lib/cli.js
-  checksum: 205dbc9671ad91e505eabf032c85160786beae8130864b8c24babc5d8233854b4ff2b06b0be13bbc5fa464aa618ec58d3ff91b80b189ef4409442d175714fb82
+  checksum: 3fdd619915f671a8984d9737953a74a55f5da510e9ef9e098936dd186634412f6ec316d74f617faee1b99f8e33d02b71176d4614d9a7efa904926c1b473f62da
   languageName: node
   linkType: hard
 
@@ -5319,17 +5319,6 @@ __metadata:
     "@babel/runtime": ^7.15.4
     is-retry-allowed: ^2.2.0
   checksum: fae18aeef220cfde22f93ed663d644e1a913a5cfc9760904ffd7a7e5ec8c7fbd53a58e1be461b6b30de19dce178823630655bcb77a487e17000f5e977ef94a2e
-  languageName: node
-  linkType: hard
-
-"axios@npm:1.3.0":
-  version: 1.3.0
-  resolution: "axios@npm:1.3.0"
-  dependencies:
-    follow-redirects: ^1.15.0
-    form-data: ^4.0.0
-    proxy-from-env: ^1.1.0
-  checksum: cdb22319fb0d04d9f1388c6dfeb273e3ef688e803a2bf3bae092771f3c9d334546bd27266ae0db9d6c0108f17ab84df8a39e553fe694810363923427b20080cf
   languageName: node
   linkType: hard
 
@@ -16858,7 +16847,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": ^5.50.0
     "@typescript-eslint/parser": ^5.51.0
     "@wireapp/avs": 9.0.20
-    "@wireapp/copy-config": 2.0.7
+    "@wireapp/copy-config": 2.0.8
     "@wireapp/core": 38.11.1
     "@wireapp/eslint-config": 2.1.1
     "@wireapp/lru-cache": 3.8.1
