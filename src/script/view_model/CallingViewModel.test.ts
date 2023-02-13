@@ -17,59 +17,27 @@
  *
  */
 
-import ko from 'knockout';
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 
 import {CALL_TYPE, CONV_TYPE, STATE} from '@wireapp/avs';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {createRandomUuid} from 'Util/util';
 
-import {CallingViewModel} from './CallingViewModel';
+import {
+  buildCall,
+  buildCallingViewModel,
+  callState,
+  expectedMemberListResult,
+  mockCallingRepository,
+  mockEpochNumber,
+  mockKeyLength,
+  mockSecretKey,
+  MOCK_GROUP_ID,
+} from './CallingViewModel.mocks';
 
-import {Call} from '../calling/Call';
-import {CallingRepository} from '../calling/CallingRepository';
-import {CallState} from '../calling/CallState';
 import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
 import {Conversation} from '../entity/Conversation';
-
-const mockCallingRepository = {
-  startCall: jest.fn(),
-  answerCall: jest.fn(),
-  leaveCall: jest.fn(),
-  onIncomingCall: jest.fn(),
-  onRequestClientsCallback: jest.fn(),
-  onRequestNewEpochCallback: jest.fn(),
-  onLeaveCall: jest.fn(),
-} as unknown as CallingRepository;
-
-const callState = new CallState();
-
-function buildCall(conversationId: string) {
-  return new Call(
-    {id: 'user1', domain: ''},
-    {id: conversationId, domain: ''},
-    CONV_TYPE.ONEONONE,
-    {} as any,
-    CALL_TYPE.NORMAL,
-    {currentAvailableDeviceId: {audioOutput: ko.observable()}} as any,
-  );
-}
-
-function buildCallingViewModel() {
-  return new CallingViewModel(
-    mockCallingRepository,
-    {} as any,
-    {} as any,
-    {} as any,
-    {} as any,
-    {} as any,
-    {} as any,
-    {} as any,
-    {} as any,
-    undefined,
-    callState,
-  );
-}
 
 describe('CallingViewModel', () => {
   afterEach(() => {
@@ -132,6 +100,92 @@ describe('CallingViewModel', () => {
         LEAVE_CALL_REASON.MANUAL_LEAVE_TO_JOIN_ANOTHER_CALL,
       );
       expect(mockCallingRepository.startCall).toHaveBeenCalledWith(conversation, CALL_TYPE.NORMAL);
+    });
+  });
+
+  describe('MLS conference call', () => {
+    it('updates epoch info after initiating a call', async () => {
+      const callingViewModel = buildCallingViewModel();
+      const conversationId = {domain: 'example.com', id: 'conversation1'};
+      const mlsConversation = new Conversation(conversationId.id, conversationId.domain, ConversationProtocol.MLS);
+
+      const mockedCall = buildCall(conversationId, CONV_TYPE.CONFERENCE_MLS);
+      jest.spyOn(mockCallingRepository, 'startCall').mockResolvedValueOnce(mockedCall);
+
+      await callingViewModel.callActions.startAudio(mlsConversation);
+
+      expect(mockCallingRepository.startCall).toHaveBeenCalledWith(mlsConversation, CALL_TYPE.NORMAL);
+
+      expect(mockCallingRepository.setEpochInfo).toHaveBeenCalledWith(
+        conversationId,
+        {
+          epoch: mockEpochNumber,
+          keyLength: mockKeyLength,
+          secretKey: mockSecretKey,
+        },
+        expectedMemberListResult,
+      );
+    });
+
+    it('updates epoch info after answering a call', async () => {
+      const callingViewModel = buildCallingViewModel();
+      const conversationId = {domain: 'example.com', id: 'conversation1'};
+
+      const call = buildCall(conversationId, CONV_TYPE.CONFERENCE_MLS);
+
+      await callingViewModel.callActions.answer(call);
+
+      expect(mockCallingRepository.answerCall).toHaveBeenCalledWith(call);
+
+      expect(mockCallingRepository.setEpochInfo).toHaveBeenCalledWith(
+        conversationId,
+        {
+          epoch: mockEpochNumber,
+          keyLength: mockKeyLength,
+          secretKey: mockSecretKey,
+        },
+        expectedMemberListResult,
+      );
+    });
+
+    it('updates epoch info after mls service has emmited "newEpoch" event', async () => {
+      const callingViewModel = buildCallingViewModel();
+      const conversationId = {domain: 'example.com', id: 'conversation1'};
+      const call = buildCall(conversationId, CONV_TYPE.CONFERENCE_MLS);
+
+      await callingViewModel.callActions.answer(call);
+      expect(mockCallingRepository.answerCall).toHaveBeenCalledWith(call);
+
+      //at this point we start to listen to the mls service events
+      expect(mockCallingRepository.setEpochInfo).toHaveBeenCalledWith(
+        conversationId,
+        {
+          epoch: mockEpochNumber,
+          keyLength: mockKeyLength,
+          secretKey: mockSecretKey,
+        },
+        expectedMemberListResult,
+      );
+
+      const newEpochNumber = 2;
+      callingViewModel.mlsService.emit('newEpoch', {
+        epoch: newEpochNumber,
+        groupId: MOCK_GROUP_ID.SUB_GROUP,
+      });
+
+      // we wait for all the promises to be resolved
+      // ('newEpoch' event handler is async)
+      setTimeout(() => {
+        expect(mockCallingRepository.setEpochInfo).toHaveBeenCalledWith(
+          conversationId,
+          {
+            epoch: newEpochNumber,
+            keyLength: mockKeyLength,
+            secretKey: mockSecretKey,
+          },
+          expectedMemberListResult,
+        );
+      }, 0);
     });
   });
 });
