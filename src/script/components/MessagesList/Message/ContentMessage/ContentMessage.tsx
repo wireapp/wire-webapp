@@ -230,7 +230,12 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
           />
         ))}
 
-        {failedToSend && <FailedToSendWarning failedToSend={failedToSend} knownUsers={conversation.allUserEntities} />}
+        {failedToSend && (
+          <FailedToSendWarning
+            failedToSend={failedToSend}
+            knownUsers={conversation.allUserEntities.map(user => ({id: user.qualifiedId, name: user.username()}))}
+          />
+        )}
 
         {!other_likes.length && message.isReactable() && (
           <div className="message-body-like">
