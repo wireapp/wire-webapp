@@ -86,6 +86,12 @@ describe('FailedToSendWarning', () => {
     });
 
     expect(getByText('Hide details')).not.toBeNull();
+
+    act(() => {
+      getByText('Hide details').click();
+    });
+
+    expect(getByText('Show details')).not.toBeNull();
   });
 
   it('displays the username of participant that could not receive the message', () => {

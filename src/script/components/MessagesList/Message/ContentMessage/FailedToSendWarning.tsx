@@ -74,7 +74,7 @@ export const FailedToSendWarning = ({failedToSend, knownUsers}: Props) => {
               ))}
             </div>
           )}
-          <button onClick={() => setIsOpen(true)}>{isOpen ? 'Hide details' : 'Show details'}</button>
+          <button onClick={() => setIsOpen(!isOpen)}>{isOpen ? 'Hide details' : 'Show details'}</button>
         </>
       )}
     </div>
