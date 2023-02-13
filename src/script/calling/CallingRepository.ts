@@ -118,7 +118,7 @@ enum CALL_DIRECTION {
 }
 
 export interface SubconversationEpochInfoMember {
-  userid: string;
+  userid: `${string}@${string}`;
   clientid: string;
   in_subconv: boolean;
 }
