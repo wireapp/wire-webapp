@@ -59,8 +59,6 @@ export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetS
   previousMessage?: Message;
   quotedMessage?: ContentMessage;
   selfId: QualifiedId;
-  handleFocus: (index: number) => void;
-  totalMessage: number;
   isMsgElementsFocusable: boolean;
 }
 
@@ -82,8 +80,6 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   onClickLikes,
   onClickButton,
   onLike,
-  handleFocus,
-  totalMessage,
   isMsgElementsFocusable,
 }) => {
   const msgFocusState = useMemo(
@@ -102,6 +98,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
       'other_likes',
       'was_edited',
     ]);
+
   const shouldShowAvatar = (): boolean => {
     if (!previousMessage || hasMarker) {
       return true;

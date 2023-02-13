@@ -260,7 +260,7 @@ export class CryptographyMapper {
   }
 
   private _mapComposite(composite: Composite) {
-    const items = composite.items.map(async item => {
+    const items = composite.items.map(item => {
       if ((item as Composite.Item).content !== GenericMessageType.TEXT) {
         return item;
       }
