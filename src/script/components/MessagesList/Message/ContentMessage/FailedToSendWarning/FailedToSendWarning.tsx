@@ -22,9 +22,11 @@ import {useState} from 'react';
 import type {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
+import {Bold, Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {matchQualifiedIds} from 'Util/QualifiedId';
+
+import {warning} from './FailedToSendWarning.styles';
 
 export type User = {id: QualifiedId; name: string};
 type Props = {
@@ -58,23 +60,29 @@ export const FailedToSendWarning = ({failedToSend, knownUsers}: Props) => {
   const namedUsers = generateNamedUsers(knownUsers, failedToSend);
 
   const message =
-    namedUsers.length === 1
-      ? `${namedUsers[0].name} will receive your message later`
-      : `${userCount} Participants had issues receiving this message`;
+    namedUsers.length === 1 ? (
+      <>
+        <Bold>{namedUsers[0].name}</Bold> will receive your message later
+      </>
+    ) : (
+      <>
+        <Bold>{userCount} Participants</Bold> had issues receiving this message
+      </>
+    );
 
   return (
     <div>
-      <p>{message}</p>
+      <p css={warning}>{message}</p>
       {showToggle && (
         <>
           {isOpen && (
-            <div>
+            <p css={warning}>
               {namedUsers.map(user => (
                 <span data-uie-name="recipient" data-uie-value={user.id.id} key={user.id.id}>
                   {user.name}
                 </span>
               ))}
-            </div>
+            </p>
           )}
           <Button type="button" variant={ButtonVariant.TERTIARY} onClick={() => setIsOpen(!isOpen)}>
             {isOpen ? 'Hide details' : 'Show details'}
