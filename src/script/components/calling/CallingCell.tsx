@@ -289,8 +289,10 @@ const CallingCell: React.FC<CallingCellProps> = ({
           {muteState === MuteState.REMOTE_MUTED && isFullUi && (
             <div className="conversation-list-calling-cell__info-bar">{t('muteStateRemoteMute')}</div>
           )}
+
           <div className="conversation-list-cell-right__calling">
             <div
+              ref={element => element?.focus()}
               className="conversation-list-cell conversation-list-cell-button"
               onClick={createNavigate(conversationUrl)}
               onKeyDown={createNavigateKeyboard(conversationUrl)}
@@ -347,15 +349,21 @@ const CallingCell: React.FC<CallingCellProps> = ({
 
             <div className="conversation-list-cell-right">
               {(isConnecting || isOngoing) && (
-                <button
-                  className="call-ui__button call-ui__button--red"
-                  onClick={() => callActions.leave(call)}
-                  title={t('videoCallOverlayHangUp')}
-                  type="button"
-                  data-uie-name="do-call-controls-call-leave"
-                >
-                  <Icon.Hangup className="small-icon" style={{maxWidth: 17}} />
-                </button>
+                <>
+                  <p role="alert" className="visually-hidden">
+                    You started a conference call with {conversationName}
+                  </p>
+
+                  <button
+                    className="call-ui__button call-ui__button--red"
+                    onClick={() => callActions.leave(call)}
+                    title={t('videoCallOverlayHangUp')}
+                    type="button"
+                    data-uie-name="do-call-controls-call-leave"
+                  >
+                    <Icon.Hangup className="small-icon" style={{maxWidth: 17}} />
+                  </button>
+                </>
               )}
             </div>
           </div>
@@ -486,17 +494,25 @@ const CallingCell: React.FC<CallingCellProps> = ({
                   )}
 
                   {(isIncoming || isOutgoing) && (
-                    <li className="conversation-list-calling-cell-controls-item">
-                      <button
-                        className="call-ui__button call-ui__button--red call-ui__button--large"
-                        onClick={() => (isIncoming ? callActions.reject(call) : callActions.leave(call))}
-                        title={t('videoCallOverlayHangUp')}
-                        type="button"
-                        data-uie-name="do-call-controls-call-decline"
-                      >
-                        <Icon.Hangup className="small-icon" style={{maxWidth: 17}} />
-                      </button>
-                    </li>
+                    <>
+                      <p role="alert" className="visually-hidden">
+                        {`You are calling ${conversationName}${isOutgoingVideoCall ? ', your camera is on' : ''}`}
+                        {/*{t('callConversationAcceptOrDecline', conversationName)}*/}
+                      </p>
+
+                      <li className="conversation-list-calling-cell-controls-item">
+                        <button
+                          ref={element => element?.focus()}
+                          className="call-ui__button call-ui__button--red call-ui__button--large"
+                          onClick={() => (isIncoming ? callActions.reject(call) : callActions.leave(call))}
+                          title={t('videoCallOverlayHangUp')}
+                          type="button"
+                          data-uie-name="do-call-controls-call-decline"
+                        >
+                          <Icon.Hangup className="small-icon" style={{maxWidth: 17}} />
+                        </button>
+                      </li>
+                    </>
                   )}
 
                   {isIncoming && (

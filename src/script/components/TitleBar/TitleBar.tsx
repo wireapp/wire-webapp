@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useMemo, useEffect, useCallback} from 'react';
+import React, {useMemo, useEffect, useCallback, useRef} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {amplify} from 'amplify';
@@ -101,8 +101,10 @@ export const TitleBar: React.FC<TitleBarProps> = ({
   ]);
 
   const {isActivatedAccount} = useKoSubscribableChildren(userState, ['isActivatedAccount']);
-  const {joinedCall} = useKoSubscribableChildren(callState, ['joinedCall']);
+  const {joinedCall, activeCalls} = useKoSubscribableChildren(callState, ['joinedCall', 'activeCalls']);
   const {isVideoCallingEnabled} = useKoSubscribableChildren(teamState, ['isVideoCallingEnabled']);
+
+  const currentFocusedElementRef = useRef<HTMLButtonElement | null>(null);
 
   const badgeLabelCopy = useMemo(() => {
     if (is1to1 && isRequest) {
@@ -196,10 +198,18 @@ export const TitleBar: React.FC<TitleBarProps> = ({
 
   const onClickStartAudio = () => {
     callActions.startAudio(conversation);
+
     if (smBreakpoint) {
       setLeftSidebar();
     }
   };
+
+  useEffect(() => {
+    if (!activeCalls.length && currentFocusedElementRef.current) {
+      currentFocusedElementRef.current.focus();
+      currentFocusedElementRef.current = null;
+    }
+  }, [activeCalls.length]);
 
   return (
     <ul
@@ -277,7 +287,10 @@ export const TitleBar: React.FC<TitleBarProps> = ({
                 className="conversation-title-bar-icon"
                 title={t('tooltipConversationVideoCall')}
                 aria-label={t('tooltipConversationVideoCall')}
-                onClick={() => callActions.startVideo(conversation)}
+                onClick={event => {
+                  currentFocusedElementRef.current = event.target;
+                  callActions.startVideo(conversation);
+                }}
                 data-uie-name="do-video-call"
               >
                 <Icon.Camera />
@@ -289,7 +302,10 @@ export const TitleBar: React.FC<TitleBarProps> = ({
               className="conversation-title-bar-icon"
               title={t('tooltipConversationCall')}
               aria-label={t('tooltipConversationCall')}
-              onClick={() => callActions.startAudio(conversation)}
+              onClick={event => {
+                currentFocusedElementRef.current = event.target;
+                callActions.startAudio(conversation);
+              }}
               data-uie-name="do-call"
             >
               <Icon.Pickup />
