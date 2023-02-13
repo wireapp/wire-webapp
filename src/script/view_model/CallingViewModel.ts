@@ -244,9 +244,12 @@ export class CallingViewModel {
     });
 
     const removeStaleClient = async (conversationId: QualifiedId, member: QualifiedWcallMember): Promise<void> => {
-      const subconversation = await this.mlsService.getConferenceSubconversation(conversationId);
+      const subconversationGroupId = await this.mlsService.getGroupIdFromConversationId(
+        conversationId,
+        SUBCONVERSATION_ID.CONFERENCE,
+      );
 
-      const isMLSConversationEstablished = await this.mlsService.conversationExists(subconversation.group_id);
+      const isMLSConversationEstablished = await this.mlsService.conversationExists(subconversationGroupId);
       if (!isMLSConversationEstablished) {
         return;
       }
@@ -254,21 +257,22 @@ export class CallingViewModel {
       const {id: userId, domain} = member.userId;
       const clientQualifiedId = constructFullyQualifiedClientId(userId, member.clientid, domain);
 
-      const isSubconversationMember = subconversation.members.some(
-        ({user_id, client_id, domain}) =>
-          constructFullyQualifiedClientId(user_id, client_id, domain) === clientQualifiedId,
+      const subconversationMembers = await this.mlsService.getClientIds(subconversationGroupId);
+
+      const isSubconversationMember = subconversationMembers.some(
+        ({userId, clientId, domain}) => constructFullyQualifiedClientId(userId, clientId, domain) === clientQualifiedId,
       );
 
       if (!isSubconversationMember) {
         return;
       }
 
-      const isSelfClient = member.clientid === this.core.clientId;
+      const isSelfClient = member.userId.id === this.core.userId && member.clientid === this.core.clientId;
       if (isSelfClient) {
-        return; //TODO: remove self user with backend /self endpoint
+        return;
       }
 
-      return void this.mlsService.removeClientsFromConversation(subconversation.group_id, [clientQualifiedId]);
+      return void this.mlsService.removeClientsFromConversation(subconversationGroupId, [clientQualifiedId]);
     };
 
     const handleCallParticipantChange = (conversationId: QualifiedId, members: QualifiedWcallMember[]) => {
