@@ -20,6 +20,7 @@
 import {act, render} from '@testing-library/react';
 import type {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 
+import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {createRandomUuid} from 'Util/util';
 
 import {FailedToSendWarning, User} from './FailedToSendWarning';
@@ -48,7 +49,7 @@ describe('FailedToSendWarning', () => {
     const users = generateUsers(nbUsers, 'domain');
 
     const failedToSend = generateUserClients(users);
-    const {getByText} = render(<FailedToSendWarning knownUsers={[]} failedToSend={failedToSend} />);
+    const {getByText} = render(withTheme(<FailedToSendWarning knownUsers={[]} failedToSend={failedToSend} />));
     expect(getByText(`${nbUsers} Participants had issues receiving this message`)).not.toBeNull();
   });
 
@@ -62,7 +63,7 @@ describe('FailedToSendWarning', () => {
       ...generateUserClients(users1),
       ...generateUserClients(users2),
     };
-    const {getByText} = render(<FailedToSendWarning knownUsers={[]} failedToSend={failedToSend} />);
+    const {getByText} = render(withTheme(<FailedToSendWarning knownUsers={[]} failedToSend={failedToSend} />));
     expect(
       getByText(`${nbUsersDomain1 + nbUsersDomain2} Participants had issues receiving this message`),
     ).not.toBeNull();
@@ -71,7 +72,9 @@ describe('FailedToSendWarning', () => {
   it('does not show the extra info toggle if there is only a single user', () => {
     const users = generateUsers(1, 'domain');
     const failedToSend = generateUserClients(users);
-    const {queryByText, getByText} = render(<FailedToSendWarning knownUsers={users} failedToSend={failedToSend} />);
+    const {queryByText, getByText} = render(
+      withTheme(<FailedToSendWarning knownUsers={users} failedToSend={failedToSend} />),
+    );
 
     expect(queryByText('Show details')).toBeNull();
     expect(getByText(`${users[0].name} will receive your message later`)).not.toBeNull();
@@ -79,7 +82,7 @@ describe('FailedToSendWarning', () => {
 
   it('toggles the extra info', () => {
     const failedToSend = generateUserClients(generateUsers(2, 'domain'));
-    const {getByText} = render(<FailedToSendWarning knownUsers={[]} failedToSend={failedToSend} />);
+    const {getByText} = render(withTheme(<FailedToSendWarning knownUsers={[]} failedToSend={failedToSend} />));
 
     act(() => {
       getByText('Show details').click();
@@ -99,7 +102,9 @@ describe('FailedToSendWarning', () => {
     const users = generateUsers(nbUsers, 'domain');
 
     const failedToSend = generateUserClients(users);
-    const {getByText, getAllByTestId} = render(<FailedToSendWarning knownUsers={users} failedToSend={failedToSend} />);
+    const {getByText, getAllByTestId} = render(
+      withTheme(<FailedToSendWarning knownUsers={users} failedToSend={failedToSend} />),
+    );
 
     act(() => {
       getByText('Show details').click();
