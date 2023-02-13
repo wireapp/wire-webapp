@@ -30,10 +30,7 @@ import {
   buildCallingViewModel,
   callState,
   mockCallingRepository,
-  mockEpochNumber,
-  mockKeyLength,
-  mockSecretKey,
-  prepareGroupMocks,
+  prepareMLSConferenceMocks,
 } from './CallingViewModel.mocks';
 
 import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
@@ -107,7 +104,10 @@ describe('CallingViewModel', () => {
     it('updates epoch info after initiating a call', async () => {
       const mockParentGroupId = 'mockParentGroupId1';
       const mockSubGroupId = 'mockSubGroupId1';
-      const {expectedMemberListResult} = prepareGroupMocks(mockParentGroupId, mockSubGroupId);
+      const {expectedMemberListResult, mockEpochNumber, mockKeyLength, mockSecretKey} = prepareMLSConferenceMocks(
+        mockParentGroupId,
+        mockSubGroupId,
+      );
 
       const callingViewModel = buildCallingViewModel();
       const conversationId = {domain: 'example.com', id: 'conversation1'};
@@ -134,7 +134,10 @@ describe('CallingViewModel', () => {
     it('updates epoch info after answering a call', async () => {
       const mockParentGroupId = 'mockParentGroupId2';
       const mockSubGroupId = 'mockSubGroupId2';
-      const {expectedMemberListResult} = prepareGroupMocks(mockParentGroupId, mockSubGroupId);
+      const {expectedMemberListResult, mockEpochNumber, mockKeyLength, mockSecretKey} = prepareMLSConferenceMocks(
+        mockParentGroupId,
+        mockSubGroupId,
+      );
 
       const callingViewModel = buildCallingViewModel();
       const conversationId = {domain: 'example.com', id: 'conversation1'};
@@ -159,7 +162,10 @@ describe('CallingViewModel', () => {
     it('updates epoch info after mls service has emmited "newEpoch" event', async () => {
       const mockParentGroupId = 'mockParentGroupId3';
       const mockSubGroupId = 'mockSubGroupId3';
-      const {expectedMemberListResult} = prepareGroupMocks(mockParentGroupId, mockSubGroupId);
+      const {expectedMemberListResult, mockEpochNumber, mockKeyLength, mockSecretKey} = prepareMLSConferenceMocks(
+        mockParentGroupId,
+        mockSubGroupId,
+      );
 
       const callingViewModel = buildCallingViewModel();
       const conversationId = {domain: 'example.com', id: 'conversation1'};

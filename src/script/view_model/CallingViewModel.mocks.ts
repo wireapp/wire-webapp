@@ -70,7 +70,7 @@ export function buildCallingViewModel() {
   );
 }
 
-export const prepareGroupMocks = (parentGroupId: string, subGroupId: string) => {
+export const prepareMLSConferenceMocks = (parentGroupId: string, subGroupId: string) => {
   const mockGetClientIdsResponses = {
     [parentGroupId]: [
       {userId: 'userId1', clientId: 'clientId1', domain: 'example.com'},
@@ -114,6 +114,10 @@ export const prepareGroupMocks = (parentGroupId: string, subGroupId: string) => 
     },
   ];
 
+  const mockSecretKey = 'secretKey';
+  const mockEpochNumber = 1;
+  const mockKeyLength = 32;
+
   jest
     .spyOn(mockCore.service!.mls!, 'joinConferenceSubconversation')
     .mockResolvedValue({epoch: mockEpochNumber, groupId: subGroupId});
@@ -130,13 +134,9 @@ export const prepareGroupMocks = (parentGroupId: string, subGroupId: string) => 
       Promise.resolve(mockGetClientIdsResponses[groupId as keyof typeof mockGetClientIdsResponses]),
     );
 
-  return {expectedMemberListResult};
+  jest.spyOn(mockCore.service!.mls!, 'getEpoch').mockImplementation(() => Promise.resolve(mockEpochNumber));
+
+  jest.spyOn(mockCore.service!.mls!, 'exportSecretKey').mockResolvedValue(mockSecretKey);
+
+  return {expectedMemberListResult, mockSecretKey, mockEpochNumber, mockKeyLength};
 };
-
-export const mockSecretKey = 'secretKey';
-export const mockEpochNumber = 1;
-export const mockKeyLength = 32;
-
-jest.spyOn(mockCore.service!.mls!, 'getEpoch').mockImplementation(() => Promise.resolve(mockEpochNumber));
-
-jest.spyOn(mockCore.service!.mls!, 'exportSecretKey').mockResolvedValue(mockSecretKey);
