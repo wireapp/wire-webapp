@@ -17,6 +17,7 @@
  *
  */
 
+import {SUBCONVERSATION_ID} from '@wireapp/api-client/lib/conversation/Subconversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {constructFullyQualifiedClientId} from '@wireapp/core/lib/util/fullyQualifiedClientIdUtils';
 import {TaskScheduler} from '@wireapp/core/lib/util/TaskScheduler';
@@ -210,16 +211,19 @@ export class CallingViewModel {
       return !!this.callState.joinedCall();
     };
 
-    const updateEpochInfo = async (conversationId: QualifiedId) => {
+    const updateEpochInfo = async (conversationId: QualifiedId, shouldAdvanceEpoch = false) => {
       const conversation = this.getConversationById(conversationId);
       if (!conversation?.isUsingMLSProtocol) {
         return;
       }
 
-      const subconversation = await this.mlsService.getConferenceSubconversation(conversationId);
+      const subconversationGroupId = await this.mlsService.getGroupIdFromConversationId(
+        conversationId,
+        SUBCONVERSATION_ID.CONFERENCE,
+      );
 
       //we don't want to react to avs callbacks when conversation was not yet established
-      const isMLSConversationEstablished = await this.mlsService.conversationExists(subconversation.group_id);
+      const isMLSConversationEstablished = await this.mlsService.conversationExists(subconversationGroupId);
       if (!isMLSConversationEstablished) {
         return;
       }
@@ -227,7 +231,7 @@ export class CallingViewModel {
       const {epoch, keyLength, secretKey, members} = await getSubconversationEpochInfo(
         {mlsService: this.mlsService},
         conversationId,
-        subconversation,
+        shouldAdvanceEpoch,
       );
       this.callingRepository.setEpochInfo(conversationId, {epoch, keyLength, secretKey}, members);
     };
@@ -297,11 +301,8 @@ export class CallingViewModel {
       }
     };
 
-    //update epoch info when AVS requests the list of clients
-    this.callingRepository.onRequestClientsCallback(updateEpochInfo);
-
     //update epoch info when AVS requests new epoch
-    this.callingRepository.onRequestNewEpochCallback(updateEpochInfo);
+    this.callingRepository.onRequestNewEpochCallback(conversationId => updateEpochInfo(conversationId, true));
 
     //once we leave a call, we unsubscribe from all the events we've subscribed to during this call
     this.callingRepository.onLeaveCall(callingSubscriptions.removeCall);

@@ -968,15 +968,6 @@ export class Conversation {
   getMessage(messageId: string): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
     return this.messages().find(messageEntity => messageEntity.id === messageId);
   }
-  /**
-   * Get a message by its replacing message id. Useful if the message in question is an edit and has replaced the original message.
-   * Only lookup in the loaded message list which is a limited view of all the messages in DB.
-   *
-   * @param messageId ID of message to be retrieved
-   */
-  getMessageByReplacementId(messageId: string): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
-    return this.messages().find(messageEntity => (messageEntity as ContentMessage)?.replacing_message_id === messageId);
-  }
 
   updateGuests(): void {
     this.getTemporaryGuests().forEach(userEntity => userEntity.checkGuestExpiration());

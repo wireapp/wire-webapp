@@ -22,6 +22,7 @@ import {Quote} from '@wireapp/protocol-messaging';
 import {getLogger, Logger} from 'Util/Logger';
 import {base64ToArray} from 'Util/util';
 
+import {MessageHasher} from '../../message/MessageHasher';
 import {QuoteEntity} from '../../message/QuoteEntity';
 import {EventRecord} from '../../storage/record/EventRecord';
 import {ClientEvent} from '../Client';
@@ -116,10 +117,24 @@ export class QuotedMessageMiddleware {
       return {...event, data: decoratedData};
     }
 
-    const quoteData = {
-      message_id: messageId,
-      user_id: quotedMessage.from,
-    };
+    const quotedMessageHash = new Uint8Array(quote.quotedMessageSha256).buffer;
+
+    const isValid = await MessageHasher.validateHash(quotedMessage, quotedMessageHash);
+    let quoteData;
+
+    if (!isValid) {
+      this.logger.warn(`Quoted message hash for message ID "${messageId}" does not match.`);
+      quoteData = {
+        error: {
+          type: QuoteEntity.ERROR.INVALID_HASH,
+        },
+      };
+    } else {
+      quoteData = {
+        message_id: messageId,
+        user_id: quotedMessage.from,
+      };
+    }
 
     const decoratedData = {...event.data, quote: quoteData};
     return {...event, data: decoratedData};

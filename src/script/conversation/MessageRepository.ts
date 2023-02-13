@@ -25,7 +25,13 @@ import {
   UserClients,
 } from '@wireapp/api-client/lib/conversation';
 import {QualifiedId, RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/lib/user';
-import {MessageSendingState, MessageTargetMode, ReactionType} from '@wireapp/core/lib/conversation';
+import {
+  MessageSendingState,
+  MessageTargetMode,
+  ReactionType,
+  GenericMessageType,
+  SendResult,
+} from '@wireapp/core/lib/conversation';
 import {
   AudioMetaData,
   EditedTextContent,
@@ -72,7 +78,6 @@ import {ClientState} from '../client/ClientState';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {EventBuilder} from '../conversation/EventBuilder';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
-import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {Conversation} from '../entity/Conversation';
 import {CompositeMessage} from '../entity/message/CompositeMessage';
@@ -231,7 +236,8 @@ export class MessageRepository {
       legalHoldStatus: conversation.legalHoldStatus(),
     });
 
-    return this.sendAndInjectMessage(ping, conversation, {enableEphemeral: true, playPingAudio: true});
+    amplify.publish(WebAppEvents.AUDIO.PLAY, AudioType.OUTGOING_PING);
+    return this.sendAndInjectMessage(ping, conversation, {enableEphemeral: true});
   }
 
   /**
@@ -336,7 +342,7 @@ export class MessageRepository {
       quote: quoteEntity,
     };
     const {state} = await this.sendText(textPayload);
-    if (state !== MessageSendingState.CANCELLED) {
+    if (state !== MessageSendingState.CANCELED) {
       await this.handleLinkPreview(textPayload);
     }
   }
@@ -375,7 +381,7 @@ export class MessageRepository {
       originalMessageId: originalMessage.id,
     };
     const {state} = await this.sendEdit(messagePayload);
-    if (state !== MessageSendingState.CANCELLED) {
+    if (state !== MessageSendingState.CANCELED) {
       await this.handleLinkPreview(messagePayload);
     }
   }
@@ -472,7 +478,7 @@ export class MessageRepository {
   ): Promise<EventRecord | void> {
     const uploadStarted = Date.now();
     const {id, state} = await this.sendAssetMetadata(conversation, file, asImage);
-    if (state === MessageSendingState.CANCELLED) {
+    if (state === MessageSendingState.CANCELED) {
       throw new ConversationError(
         ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION,
         ConversationError.MESSAGE.DEGRADED_CONVERSATION_CANCELLATION,
@@ -664,7 +670,6 @@ export class MessageRepository {
    * @param conversation - the conversation the message should be sent to
    * @param options
    * @param options.syncTimestamp should the message timestamp be synchronized with backend response timestamp
-   * @param options.playPingAudio should the 'ping' audio be played when message is being sent
    * @param options.nativePush use nativePush for sending to mobile devices
    * @param options.recipients can be used to target specific users of the conversation. Will send to all the conversation participants if not defined
    * @param options.skipSelf do not forward this message to self user (will not encrypt and send to all self clients)
@@ -675,7 +680,6 @@ export class MessageRepository {
     conversation: Conversation,
     {
       syncTimestamp = true,
-      playPingAudio = false,
       nativePush = true,
       enableEphemeral = false,
       targetMode,
@@ -685,7 +689,6 @@ export class MessageRepository {
       silentDegradationWarning,
       consentType = CONSENT_TYPE.MESSAGE,
     }: MessageSendingOptions & {
-      playPingAudio?: boolean;
       enableEphemeral?: boolean;
       silentDegradationWarning?: boolean;
       skipInjection?: boolean;
@@ -694,7 +697,6 @@ export class MessageRepository {
       targetMode?: MessageTargetMode;
       consentType?: CONSENT_TYPE;
     } = {
-      playPingAudio: false,
       syncTimestamp: true,
     },
   ) {
@@ -704,9 +706,6 @@ export class MessageRepository {
     const payload = enableEphemeral && messageTimer ? MessageBuilder.wrapInEphemeral(message, messageTimer) : message;
 
     const injectOptimisticEvent = async () => {
-      if (playPingAudio) {
-        amplify.publish(WebAppEvents.AUDIO.PLAY, AudioType.OUTGOING_PING);
-      }
       if (!skipInjection) {
         const senderId = this.clientState.currentClient().id;
         const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
@@ -714,21 +713,26 @@ export class MessageRepository {
         this.trackContributed(conversation, payload);
         const mappedEvent = await this.cryptography_repository.cryptographyMapper.mapGenericMessage(
           payload,
-          optimisticEvent as EventRecord,
+          optimisticEvent,
         );
         await this.eventRepository.injectEvent(mappedEvent);
       }
       return silentDegradationWarning ? true : this.requestUserSendingPermission(conversation, false, consentType);
     };
 
-    const handleSuccess = async (sentAt: string) => {
+    const handleSuccess = async ({sentAt, failedToSend}: SendResult) => {
       const injectDelta = 10; // we want to make sure the message is injected slightly before it was received by the backend
       const sentTimestamp = new Date(sentAt).getTime() - injectDelta;
       const preMessageTimestamp = new Date(sentTimestamp).toISOString();
       // Trigger an empty mismatch to check for users that have no devices and that could have been removed from the team
       await this.onClientMismatch?.({time: preMessageTimestamp}, conversation, silentDegradationWarning);
       if (!skipInjection) {
-        this.updateMessageAsSent(conversation, payload.messageId, syncTimestamp ? sentAt : undefined);
+        await this.updateMessageAsSent(
+          conversation,
+          payload.messageId,
+          syncTimestamp ? sentAt : undefined,
+          failedToSend,
+        );
       }
     };
 
@@ -754,13 +758,13 @@ export class MessageRepository {
 
     const shouldProceedSending = await injectOptimisticEvent();
     if (shouldProceedSending === false) {
-      return {id: payload.messageId, state: MessageSendingState.CANCELLED};
+      return {id: payload.messageId, state: MessageSendingState.CANCELED};
     }
 
     const result = await this.conversationService.send(sendOptions);
 
     if (result.state === MessageSendingState.OUTGOING_SENT) {
-      handleSuccess(result.sentAt);
+      await handleSuccess(result);
     }
     return result;
   }
@@ -870,7 +874,7 @@ export class MessageRepository {
       targetMode: MessageTargetMode.USERS,
     };
     const {state} = await this.sendAndInjectMessage(confirmationMessage, conversationEntity, sendingOptions);
-    if (state === MessageSendingState.CANCELLED) {
+    if (state === MessageSendingState.CANCELED) {
       this.sendAndInjectMessage(confirmationMessage, conversationEntity, {
         ...sendingOptions,
         // If the message was auto cancelled because of a mismatch, we will force sending the message only to the clients we know of (ignoring unverified clients)
@@ -1060,7 +1064,7 @@ export class MessageRepository {
   private readonly sendAvailabilityStatus = async (availability: Availability.Type) => {
     const protoAvailability = new Availability({type: protoFromType(availability)});
     const genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.AVAILABILITY]: protoAvailability,
+      [GenericMessageType.AVAILABILITY]: protoAvailability,
       messageId: createRandomUuid(),
     });
 
@@ -1105,13 +1109,15 @@ export class MessageRepository {
     conversationEntity: Conversation,
     eventId: string,
     isoDate?: string,
-  ): Promise<Pick<Partial<EventRecord>, 'status' | 'time'> | void> {
+    failedToSend?: QualifiedUserClients,
+  ) {
     try {
       const messageEntity = await this.getMessageInConversationById(conversationEntity, eventId);
       const updatedStatus = messageEntity.readReceipts().length ? StatusType.SEEN : StatusType.SENT;
       messageEntity.status(updatedStatus);
-      const changes: Pick<Partial<EventRecord>, 'status' | 'time'> = {
+      const changes: Pick<Partial<EventRecord>, 'status' | 'time' | 'failedToSend'> = {
         status: updatedStatus,
+        failedToSend,
       };
       if (isoDate) {
         const timestamp = new Date(isoDate).getTime();
@@ -1131,6 +1137,7 @@ export class MessageRepository {
         throw error;
       }
     }
+    return undefined;
   }
 
   private createQualifiedRecipients(users: User[]): QualifiedUserClients {
@@ -1190,9 +1197,7 @@ export class MessageRepository {
     skipConversationMessages = false,
     ensureUser = false,
   ): Promise<StoredContentMessage> {
-    const messageEntity =
-      !skipConversationMessages &&
-      (conversation.getMessageByReplacementId(messageId) || conversation.getMessage(messageId));
+    const messageEntity = !skipConversationMessages && conversation.getMessage(messageId);
     const message =
       messageEntity ||
       (await this.eventService.loadEvent(conversation.id, messageId).then(event => {
@@ -1231,7 +1236,8 @@ export class MessageRepository {
     if (blockSystemMessage) {
       conversation.blockLegalHoldMessage = true;
     }
-    const missing = await this.conversationService.getAllParticipantsClients(conversation.qualifiedId);
+    const missing = await this.conversationService.fetchAllParticipantsClients(conversation.qualifiedId);
+
     const deleted = findDeletedClients(missing, await this.generateRecipients(conversation));
     await this.onClientMismatch?.({deleted, missing} as ClientMismatch, conversation, true);
     if (blockSystemMessage) {
@@ -1318,7 +1324,7 @@ export class MessageRepository {
    * @param callMessageEntity Optional call message
    */
   private trackContributed(conversationEntity: Conversation, genericMessage: GenericMessage) {
-    const isEphemeral = genericMessage.content === GENERIC_MESSAGE_TYPE.EPHEMERAL;
+    const isEphemeral = genericMessage.content === GenericMessageType.EPHEMERAL;
 
     if (isEphemeral) {
       genericMessage = genericMessage.ephemeral as any;

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,26 +17,4 @@
  *
  */
 
-export enum GENERIC_MESSAGE_TYPE {
-  ASSET = 'asset',
-  AVAILABILITY = 'availability',
-  BUTTON_ACTION = 'buttonAction',
-  BUTTON_ACTION_CONFIRMATION = 'buttonActionConfirmation',
-  CALLING = 'calling',
-  CLEARED = 'cleared',
-  CLIENT_ACTION = 'clientAction',
-  COMPOSITE_MESSAGE = 'composite',
-  CONFIRMATION = 'confirmation',
-  DATA_TRANSFER = 'dataTransfer',
-  DELETED = 'deleted',
-  EDITED = 'edited',
-  EPHEMERAL = 'ephemeral',
-  EXTERNAL = 'external',
-  HIDDEN = 'hidden',
-  IMAGE = 'image',
-  KNOCK = 'knock',
-  LAST_READ = 'lastRead',
-  LOCATION = 'location',
-  REACTION = 'reaction',
-  TEXT = 'text',
-}
+export * from './ContentMessage';
