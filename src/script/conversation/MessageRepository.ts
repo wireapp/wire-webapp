@@ -1236,8 +1236,7 @@ export class MessageRepository {
     if (blockSystemMessage) {
       conversation.blockLegalHoldMessage = true;
     }
-    const {id, domain} = conversation.qualifiedId;
-    const missing = await this.conversationService.fetchAllParticipantsClients(id, domain);
+    const missing = await this.conversationService.fetchAllParticipantsClients(conversation.qualifiedId);
 
     const deleted = findDeletedClients(missing, await this.generateRecipients(conversation));
     await this.onClientMismatch?.({deleted, missing} as ClientMismatch, conversation, true);

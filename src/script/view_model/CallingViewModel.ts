@@ -240,9 +240,6 @@ export class CallingViewModel {
       }
     });
 
-    //update epoch info when AVS requests the list of clients
-    this.callingRepository.onRequestClientsCallback(updateEpochInfo);
-
     //update epoch info when AVS requests new epoch
     this.callingRepository.onRequestNewEpochCallback(conversationId => updateEpochInfo(conversationId, true));
 
