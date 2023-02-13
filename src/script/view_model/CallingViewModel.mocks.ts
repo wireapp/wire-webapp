@@ -70,74 +70,73 @@ export function buildCallingViewModel() {
   );
 }
 
-export const MOCK_GROUP_ID = {
-  PARENT_GROUP: 'parentGroupId',
-  SUB_GROUP: 'subGroupId',
-};
+export const prepareGroupMocks = (parentGroupId: string, subGroupId: string) => {
+  const mockGetClientIdsResponses = {
+    [parentGroupId]: [
+      {userId: 'userId1', clientId: 'clientId1', domain: 'example.com'},
+      {userId: 'userId1', clientId: 'clientId1A', domain: 'example.com'},
+      {userId: 'userId2', clientId: 'clientId2', domain: 'example.com'},
+      {userId: 'userId2', clientId: 'clientId2A', domain: 'example.com'},
+      {userId: 'userId3', clientId: 'clientId3', domain: 'example.com'},
+    ],
+    [subGroupId]: [
+      {userId: 'userId1', clientId: 'clientId1', domain: 'example.com'},
+      {userId: 'userId1', clientId: 'clientId1A', domain: 'example.com'},
+      {userId: 'userId2', clientId: 'clientId2', domain: 'example.com'},
+    ],
+  };
 
-export const mockGetClientIdsResponses = {
-  [MOCK_GROUP_ID.PARENT_GROUP]: [
-    {userId: 'userId1', clientId: 'clientId1', domain: 'example.com'},
-    {userId: 'userId1', clientId: 'clientId1A', domain: 'example.com'},
-    {userId: 'userId2', clientId: 'clientId2', domain: 'example.com'},
-    {userId: 'userId2', clientId: 'clientId2A', domain: 'example.com'},
-    {userId: 'userId3', clientId: 'clientId3', domain: 'example.com'},
-  ],
-  [MOCK_GROUP_ID.SUB_GROUP]: [
-    {userId: 'userId1', clientId: 'clientId1', domain: 'example.com'},
-    {userId: 'userId1', clientId: 'clientId1A', domain: 'example.com'},
-    {userId: 'userId2', clientId: 'clientId2', domain: 'example.com'},
-  ],
-};
+  const expectedMemberListResult = [
+    {
+      userid: 'userId1@example.com',
+      clientid: 'clientId1',
+      in_subconv: true,
+    },
+    {
+      userid: 'userId1@example.com',
+      clientid: 'clientId1A',
+      in_subconv: true,
+    },
+    {
+      userid: 'userId2@example.com',
+      clientid: 'clientId2',
+      in_subconv: true,
+    },
+    {
+      userid: 'userId2@example.com',
+      clientid: 'clientId2A',
+      in_subconv: false,
+    },
+    {
+      userid: 'userId3@example.com',
+      clientid: 'clientId3',
+      in_subconv: false,
+    },
+  ];
 
-export const expectedMemberListResult = [
-  {
-    userid: 'userId1@example.com',
-    clientid: 'clientId1',
-    in_subconv: true,
-  },
-  {
-    userid: 'userId1@example.com',
-    clientid: 'clientId1A',
-    in_subconv: true,
-  },
-  {
-    userid: 'userId2@example.com',
-    clientid: 'clientId2',
-    in_subconv: true,
-  },
-  {
-    userid: 'userId2@example.com',
-    clientid: 'clientId2A',
-    in_subconv: false,
-  },
-  {
-    userid: 'userId3@example.com',
-    clientid: 'clientId3',
-    in_subconv: false,
-  },
-];
+  jest
+    .spyOn(mockCore.service!.mls!, 'joinConferenceSubconversation')
+    .mockResolvedValue({epoch: mockEpochNumber, groupId: subGroupId});
+
+  jest
+    .spyOn(mockCore.service!.mls!, 'getGroupIdFromConversationId')
+    .mockImplementation((_conversationId, subconversationId) =>
+      subconversationId ? Promise.resolve(subGroupId) : Promise.resolve(parentGroupId),
+    );
+
+  jest
+    .spyOn(mockCore.service!.mls!, 'getClientIds')
+    .mockImplementation(groupId =>
+      Promise.resolve(mockGetClientIdsResponses[groupId as keyof typeof mockGetClientIdsResponses]),
+    );
+
+  return {expectedMemberListResult};
+};
 
 export const mockSecretKey = 'secretKey';
 export const mockEpochNumber = 1;
 export const mockKeyLength = 32;
 
-jest
-  .spyOn(mockCore.service!.mls!, 'joinConferenceSubconversation')
-  .mockResolvedValue({epoch: mockEpochNumber, groupId: MOCK_GROUP_ID.SUB_GROUP});
-
-jest
-  .spyOn(mockCore.service!.mls!, 'getGroupIdFromConversationId')
-  .mockImplementation((_conversationId, subconversationId) =>
-    subconversationId ? Promise.resolve(MOCK_GROUP_ID.SUB_GROUP) : Promise.resolve(MOCK_GROUP_ID.PARENT_GROUP),
-  );
-
-jest
-  .spyOn(mockCore.service!.mls!, 'getClientIds')
-  .mockImplementation(groupId =>
-    Promise.resolve(mockGetClientIdsResponses[groupId as keyof typeof mockGetClientIdsResponses]),
-  );
-
-jest.spyOn(mockCore.service!.mls!, 'getEpoch').mockImplementation(() => Promise.resolve(1));
+jest.spyOn(mockCore.service!.mls!, 'getEpoch').mockImplementation(() => Promise.resolve(mockEpochNumber));
 
 jest.spyOn(mockCore.service!.mls!, 'exportSecretKey').mockResolvedValue(mockSecretKey);

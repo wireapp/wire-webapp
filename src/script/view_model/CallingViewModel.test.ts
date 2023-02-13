@@ -17,6 +17,7 @@
  *
  */
 
+import {waitFor} from '@testing-library/react';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 
 import {CALL_TYPE, CONV_TYPE, STATE} from '@wireapp/avs';
@@ -28,12 +29,11 @@ import {
   buildCall,
   buildCallingViewModel,
   callState,
-  expectedMemberListResult,
   mockCallingRepository,
   mockEpochNumber,
   mockKeyLength,
   mockSecretKey,
-  MOCK_GROUP_ID,
+  prepareGroupMocks,
 } from './CallingViewModel.mocks';
 
 import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
@@ -105,6 +105,10 @@ describe('CallingViewModel', () => {
 
   describe('MLS conference call', () => {
     it('updates epoch info after initiating a call', async () => {
+      const mockParentGroupId = 'mockParentGroupId1';
+      const mockSubGroupId = 'mockSubGroupId1';
+      const {expectedMemberListResult} = prepareGroupMocks(mockParentGroupId, mockSubGroupId);
+
       const callingViewModel = buildCallingViewModel();
       const conversationId = {domain: 'example.com', id: 'conversation1'};
       const mlsConversation = new Conversation(conversationId.id, conversationId.domain, ConversationProtocol.MLS);
@@ -128,6 +132,10 @@ describe('CallingViewModel', () => {
     });
 
     it('updates epoch info after answering a call', async () => {
+      const mockParentGroupId = 'mockParentGroupId2';
+      const mockSubGroupId = 'mockSubGroupId2';
+      const {expectedMemberListResult} = prepareGroupMocks(mockParentGroupId, mockSubGroupId);
+
       const callingViewModel = buildCallingViewModel();
       const conversationId = {domain: 'example.com', id: 'conversation1'};
 
@@ -149,6 +157,10 @@ describe('CallingViewModel', () => {
     });
 
     it('updates epoch info after mls service has emmited "newEpoch" event', async () => {
+      const mockParentGroupId = 'mockParentGroupId3';
+      const mockSubGroupId = 'mockSubGroupId3';
+      const {expectedMemberListResult} = prepareGroupMocks(mockParentGroupId, mockSubGroupId);
+
       const callingViewModel = buildCallingViewModel();
       const conversationId = {domain: 'example.com', id: 'conversation1'};
       const call = buildCall(conversationId, CONV_TYPE.CONFERENCE_MLS);
@@ -170,12 +182,11 @@ describe('CallingViewModel', () => {
       const newEpochNumber = 2;
       callingViewModel.mlsService.emit('newEpoch', {
         epoch: newEpochNumber,
-        groupId: MOCK_GROUP_ID.SUB_GROUP,
+        groupId: mockSubGroupId,
       });
 
-      // we wait for all the promises to be resolved
-      // ('newEpoch' event handler is async)
-      setTimeout(() => {
+      await waitFor(() => {
+        expect(mockCallingRepository.setEpochInfo).toHaveBeenCalledTimes(2);
         expect(mockCallingRepository.setEpochInfo).toHaveBeenCalledWith(
           conversationId,
           {
@@ -185,7 +196,7 @@ describe('CallingViewModel', () => {
           },
           expectedMemberListResult,
         );
-      }, 0);
+      });
     });
   });
 });
