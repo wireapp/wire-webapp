@@ -93,7 +93,7 @@ interface MediaStreamQuery {
   screen?: boolean;
 }
 
-type QualifiedWcallMember = Omit<WcallMember, 'userid'> & {userId: QualifiedId};
+export type QualifiedWcallMember = Omit<WcallMember, 'userid'> & {userId: QualifiedId};
 
 interface SendMessageTarget {
   clients: WcallClient[];
@@ -133,6 +133,7 @@ export class CallingRepository {
   private incomingCallCallback: (call: Call) => void;
   private requestNewEpochCallback: (conversationId: QualifiedId) => void;
   private leaveCallCallback: (conversationId: QualifiedId) => void;
+  private callParticipantChangedCallback: (conversationId: QualifiedId, members: QualifiedWcallMember[]) => void;
   private isReady: boolean = false;
   /** will cache the query to media stream (in order to avoid asking the system for streams multiple times when we have multiple peers) */
   private mediaStreamQuery?: Promise<MediaStream>;
@@ -172,6 +173,7 @@ export class CallingRepository {
     this.incomingCallCallback = () => {};
     this.requestNewEpochCallback = () => {};
     this.leaveCallCallback = () => {};
+    this.callParticipantChangedCallback = () => {};
     this.callLog = [];
 
     /** {<userId>: <isVerified>} */
@@ -422,6 +424,12 @@ export class CallingRepository {
 
   onRequestNewEpochCallback(callback: (conversationId: QualifiedId) => void): void {
     this.requestNewEpochCallback = callback;
+  }
+
+  onCallParticipantChangedCallback(
+    callback: (conversationId: QualifiedId, members: QualifiedWcallMember[]) => void,
+  ): void {
+    this.callParticipantChangedCallback = callback;
   }
 
   findCall(conversationId: QualifiedId): Call | undefined {
@@ -1482,14 +1490,15 @@ export class CallingRepository {
   }
 
   private readonly handleCallParticipantChanges = (convId: SerializedConversationId, membersJson: string) => {
-    const call = this.findCall(this.parseQualifiedId(convId));
+    const conversationId = this.parseQualifiedId(convId);
+    const call = this.findCall(conversationId);
 
     if (!call) {
       return;
     }
 
     const {members: serializedMembers}: {members: WcallMember[]} = JSON.parse(membersJson);
-    const members = serializedMembers.map(member => ({
+    const members: QualifiedWcallMember[] = serializedMembers.map(member => ({
       ...member,
       userId: this.parseQualifiedId(member.userid),
     }));
@@ -1497,6 +1506,7 @@ export class CallingRepository {
     this.updateParticipantList(call, members);
     this.updateParticipantMutedState(call, members);
     this.updateParticipantVideoState(call, members);
+    this.callParticipantChangedCallback(conversationId, members);
   };
 
   private readonly requestClients = async (wUser: number, convId: SerializedConversationId, _: number) => {

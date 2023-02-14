@@ -37,6 +37,7 @@ export const mockCallingRepository = {
   onIncomingCall: jest.fn(),
   onRequestClientsCallback: jest.fn(),
   onRequestNewEpochCallback: jest.fn(),
+  onCallParticipantChangedCallback: jest.fn(),
   onLeaveCall: jest.fn(),
   setEpochInfo: jest.fn(),
 } as unknown as CallingRepository;
