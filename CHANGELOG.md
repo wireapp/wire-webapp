@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [38.12.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.11.2...@wireapp/core@38.12.0) (2023-02-14)
+
+### Features
+
+* update @wireapp/core-crypto to latest version with ACME support ([#4884](https://github.com/wireapp/wire-web-packages/issues/4884)) ([da922b7](https://github.com/wireapp/wire-web-packages/commit/da922b7bd10f94b6cf76209d4ddb4482845138a8))
+
 ## [38.11.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.11.1...@wireapp/core@38.11.2) (2023-02-09)
 
 **Note:** Version bump only for package @wireapp/core
