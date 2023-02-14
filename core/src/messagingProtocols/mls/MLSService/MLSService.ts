@@ -157,14 +157,16 @@ export class MLSService extends TypedEventEmitter<Events> {
   }
 
   public configureMLSCallbacks({groupIdFromConversationId, ...coreCryptoCallbacks}: MLSCallbacks): void {
-    this.coreCryptoClient.registerCallbacks({
+    void this.coreCryptoClient.registerCallbacks({
       ...coreCryptoCallbacks,
-      clientIsExistingGroupUser: (_groupId, client, otherClients) => {
+      clientIsExistingGroupUser: (_groupId, client, otherClients): Promise<boolean> => {
         const {user} = parseFullQualifiedClientId(this.textDecoder.decode(client));
-        return otherClients.some(client => {
-          const {user: otherUser} = parseFullQualifiedClientId(this.textDecoder.decode(client));
-          return otherUser.toLowerCase() === user.toLowerCase();
-        });
+        return Promise.resolve(
+          otherClients.some(client => {
+            const {user: otherUser} = parseFullQualifiedClientId(this.textDecoder.decode(client));
+            return otherUser.toLowerCase() === user.toLowerCase();
+          }),
+        );
       },
     });
     this.groupIdFromConversationId = groupIdFromConversationId;
