@@ -243,7 +243,10 @@ export class CallingViewModel {
       }
     });
 
-    const removeStaleClient = async (conversationId: QualifiedId, member: QualifiedWcallMember): Promise<void> => {
+    const removeStaleClient = async (
+      conversationId: QualifiedId,
+      memberToRemove: QualifiedWcallMember,
+    ): Promise<void> => {
       const subconversationGroupId = await this.mlsService.getGroupIdFromConversationId(
         conversationId,
         SUBCONVERSATION_ID.CONFERENCE,
@@ -254,25 +257,30 @@ export class CallingViewModel {
         return;
       }
 
-      const {id: userId, domain} = member.userId;
-      const clientQualifiedId = constructFullyQualifiedClientId(userId, member.clientid, domain);
+      const {
+        userId: {id: userId, domain},
+        clientid,
+      } = memberToRemove;
+      const clientToRemoveQualifiedId = constructFullyQualifiedClientId(userId, clientid, domain);
 
       const subconversationMembers = await this.mlsService.getClientIds(subconversationGroupId);
 
       const isSubconversationMember = subconversationMembers.some(
-        ({userId, clientId, domain}) => constructFullyQualifiedClientId(userId, clientId, domain) === clientQualifiedId,
+        ({userId, clientId, domain}) =>
+          constructFullyQualifiedClientId(userId, clientId, domain) === clientToRemoveQualifiedId,
       );
 
       if (!isSubconversationMember) {
         return;
       }
 
-      const isSelfClient = member.userId.id === this.core.userId && member.clientid === this.core.clientId;
+      const isSelfClient =
+        memberToRemove.userId.id === this.core.userId && memberToRemove.clientid === this.core.clientId;
       if (isSelfClient) {
         return;
       }
 
-      return void this.mlsService.removeClientsFromConversation(subconversationGroupId, [clientQualifiedId]);
+      return void this.mlsService.removeClientsFromConversation(subconversationGroupId, [clientToRemoveQualifiedId]);
     };
 
     const handleCallParticipantChange = (conversationId: QualifiedId, members: QualifiedWcallMember[]) => {
