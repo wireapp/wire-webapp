@@ -1204,20 +1204,13 @@ export class MessageRepository {
     conversation: Conversation,
     messageId: string,
   ): Promise<StoredContentMessage> {
-    const messageEntity = conversation.getMessageByReplacementId(messageId) || conversation.getMessage(messageId);
-    const message =
-      messageEntity ||
-      (await this.eventService.loadEvent(conversation.id, messageId).then(event => {
-        return event && this.event_mapper.mapJsonEvent(event, conversation);
-      }));
-
+    const message = conversation.getMessageByReplacementId(messageId);
     if (!message) {
       throw new ConversationError(
         ConversationError.TYPE.MESSAGE_NOT_FOUND,
         ConversationError.MESSAGE.MESSAGE_NOT_FOUND,
       );
     }
-    await this.ensureMessageSender(message);
 
     return message as StoredContentMessage;
   }
