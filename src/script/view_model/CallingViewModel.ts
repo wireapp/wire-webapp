@@ -247,6 +247,13 @@ export class CallingViewModel {
       conversationId: QualifiedId,
       memberToRemove: QualifiedWcallMember,
     ): Promise<void> => {
+      const isSelfClient =
+        memberToRemove.userId.id === this.core.userId && memberToRemove.clientid === this.core.clientId;
+      //this is not very likely to happen (selfClient will leave or get dropped from the call)
+      if (isSelfClient) {
+        return;
+      }
+
       const subconversationGroupId = await this.mlsService.getGroupIdFromConversationId(
         conversationId,
         SUBCONVERSATION_ID.CONFERENCE,
@@ -271,13 +278,6 @@ export class CallingViewModel {
       );
 
       if (!isSubconversationMember) {
-        return;
-      }
-
-      const isSelfClient =
-        memberToRemove.userId.id === this.core.userId && memberToRemove.clientid === this.core.clientId;
-      //this is not very likely to happen (selfClient will leave or get dropped from the call)
-      if (isSelfClient) {
         return;
       }
 
