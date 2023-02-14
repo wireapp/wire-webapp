@@ -276,6 +276,7 @@ export class CallingViewModel {
 
       const isSelfClient =
         memberToRemove.userId.id === this.core.userId && memberToRemove.clientid === this.core.clientId;
+      //this is not very likely to happen (selfClient will leave or get dropped from the call)
       if (isSelfClient) {
         return;
       }
