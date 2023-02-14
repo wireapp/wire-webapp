@@ -65,6 +65,7 @@ import type {Text as TextAsset} from '../entity/message/Text';
 import {VerificationMessage} from '../entity/message/VerificationMessage';
 import {ConversationError} from '../error/ConversationError';
 import {ClientEvent} from '../event/Client';
+import {isContentMessage} from '../guards/Message';
 import {CALL_MESSAGE_TYPE} from '../message/CallMessageType';
 import {MentionEntity} from '../message/MentionEntity';
 import {QuoteEntity} from '../message/QuoteEntity';
@@ -184,6 +185,10 @@ export class EventMapper {
     if (event.reactions) {
       originalEntity.reactions(event.reactions);
       originalEntity.version = event.version;
+    }
+
+    if (event.failedToSend) {
+      originalEntity.failedToSend(event.failedToSend);
     }
 
     if (event.selected_button_id) {
@@ -372,7 +377,7 @@ export class EventMapper {
     }
 
     if (messageEntity.isContent() || messageEntity.isPing()) {
-      messageEntity.status((event as LegacyEventRecord).status || StatusType.SENT);
+      messageEntity.status((event as EventRecord).status || StatusType.SENT);
     }
 
     if (messageEntity.isComposite()) {
@@ -394,7 +399,9 @@ export class EventMapper {
       messageEntity = undefined;
     }
 
-    return messageEntity;
+    return isContentMessage(messageEntity)
+      ? this.updateMessageEvent(messageEntity, event as EventRecord)
+      : messageEntity;
   }
 
   //##############################################################################

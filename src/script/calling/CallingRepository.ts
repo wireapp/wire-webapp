@@ -118,7 +118,7 @@ enum CALL_DIRECTION {
 }
 
 export interface SubconversationEpochInfoMember {
-  userid: string;
+  userid: `${string}@${string}`;
   clientid: string;
   in_subconv: boolean;
 }
@@ -131,7 +131,6 @@ export class CallingRepository {
   private readonly logger: Logger;
   private avsVersion: number = 0;
   private incomingCallCallback: (call: Call) => void;
-  private requestClientsCallback: (conversationId: QualifiedId) => void;
   private requestNewEpochCallback: (conversationId: QualifiedId) => void;
   private leaveCallCallback: (conversationId: QualifiedId) => void;
   private isReady: boolean = false;
@@ -171,7 +170,6 @@ export class CallingRepository {
   ) {
     this.logger = getLogger('CallingRepository');
     this.incomingCallCallback = () => {};
-    this.requestClientsCallback = () => {};
     this.requestNewEpochCallback = () => {};
     this.leaveCallCallback = () => {};
     this.callLog = [];
@@ -332,24 +330,26 @@ export class CallingRepository {
       this.logger.warn(`Unable to find a conversation with id of ${call.conversationId}`);
       return false;
     }
-    const {id, domain} = call.conversationId;
-    const allClients = await this.core.service!.conversation.fetchAllParticipantsClients(id, domain);
+    const allClients = await this.core.service!.conversation.fetchAllParticipantsClients(call.conversationId);
 
-    const qualifiedClients = isQualifiedUserClients(allClients)
-      ? flattenQualifiedUserClients(allClients)
-      : flattenUserClients(allClients);
+    if (!conversation.isUsingMLSProtocol) {
+      const qualifiedClients = isQualifiedUserClients(allClients)
+        ? flattenQualifiedUserClients(allClients)
+        : flattenUserClients(allClients);
 
-    const clients: Clients = flatten(
-      qualifiedClients.map(({data, userId}) =>
-        data.map(clientid => ({clientid, userid: this.serializeQualifiedId(userId)})),
-      ),
-    );
+      const clients: Clients = flatten(
+        qualifiedClients.map(({data, userId}) =>
+          data.map(clientid => ({clientid, userid: this.serializeQualifiedId(userId)})),
+        ),
+      );
 
-    this.wCall?.setClientsForConv(
-      this.wUser,
-      this.serializeQualifiedId(call.conversationId),
-      JSON.stringify({clients}),
-    );
+      this.wCall?.setClientsForConv(
+        this.wUser,
+        this.serializeQualifiedId(call.conversationId),
+        JSON.stringify({clients}),
+      );
+    }
+
     // We warn the message repository that a mismatch has happened outside of its lifecycle (eventually triggering a conversation degradation)
     const consentType =
       this.getCallDirection(call) === CALL_DIRECTION.INCOMING ? CONSENT_TYPE.INCOMING_CALL : CONSENT_TYPE.OUTGOING_CALL;
@@ -418,10 +418,6 @@ export class CallingRepository {
 
   onLeaveCall(callback: (conversationId: QualifiedId) => void): void {
     this.leaveCallCallback = callback;
-  }
-
-  onRequestClientsCallback(callback: (conversationId: QualifiedId) => void): void {
-    this.requestClientsCallback = callback;
   }
 
   onRequestNewEpochCallback(callback: (conversationId: QualifiedId) => void): void {
@@ -626,8 +622,7 @@ export class CallingRepository {
     switch (content.type) {
       case CALL_MESSAGE_TYPE.CONFKEY: {
         if (source !== EventRepository.SOURCE.STREAM) {
-          const {id, domain} = conversationId;
-          const allClients = await this.core.service!.conversation.fetchAllParticipantsClients(id, domain);
+          const allClients = await this.core.service!.conversation.fetchAllParticipantsClients(conversationId);
 
           // We warn the message repository that a mismatch has happened outside of its lifecycle (eventually triggering a conversation degradation)
           const shouldContinue = await this.messageRepository.updateMissingClients(
@@ -1511,8 +1506,6 @@ export class CallingRepository {
       return;
     }
     await this.pushClients(call);
-    const qualifiedConversationId = this.parseQualifiedId(convId);
-    this.requestClientsCallback(qualifiedConversationId);
   };
 
   private readonly requestNewEpoch = async (wUser: number, convId: SerializedConversationId) => {

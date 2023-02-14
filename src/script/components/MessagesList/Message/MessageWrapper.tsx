@@ -182,8 +182,6 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
         onClickParticipants={onClickParticipants}
         onClickReceipts={onClickReceipts}
         isMessageFocused={isMessageFocused}
-        handleFocus={handleFocus}
-        totalMessage={totalMessage}
         isMsgElementsFocusable={isMsgElementsFocusable}
       />
     );
