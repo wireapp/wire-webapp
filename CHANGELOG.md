@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [38.12.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.12.0...@wireapp/core@38.12.1) (2023-02-15)
+
+### Bug Fixes
+
+* Make sure cryptobox and coreCrypto identity are deleted when needed ([#4887](https://github.com/wireapp/wire-web-packages/issues/4887)) ([6f865a9](https://github.com/wireapp/wire-web-packages/commit/6f865a9281bf5b5da29dfcdb84e235152fff463b))
+
 # [38.12.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.11.2...@wireapp/core@38.12.0) (2023-02-14)
 
 ### Features
