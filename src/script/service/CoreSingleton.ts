@@ -32,15 +32,22 @@ import {Config} from '../Config';
 
 declare global {
   interface Window {
-    systemCrypto?: {
-      decrypt: (value: Uint8Array) => Promise<Uint8Array>;
-      encrypt: (encrypted: Uint8Array) => Promise<Uint8Array>;
-    };
+    systemCrypto?:
+      | {
+          encrypt: (value: Uint8Array) => Promise<Uint8Array>;
+          decrypt: (payload: Uint8Array) => Promise<Uint8Array>;
+          version: undefined;
+        }
+      | {
+          encrypt: (value: string) => Promise<Uint8Array>;
+          decrypt: (payload: Uint8Array) => Promise<string>;
+          version: 1;
+        };
   }
 }
 
 @singleton()
-export class Core extends Account<Uint8Array> {
+export class Core extends Account {
   constructor(apiClient = container.resolve(APIClient)) {
     super(apiClient, {
       createStore: (storeName, context) => {
