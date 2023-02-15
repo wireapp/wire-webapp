@@ -208,9 +208,9 @@ const LoginComponent = ({
           }
           case BackendError.LABEL.CODE_AUTHENTICATION_REQUIRED: {
             const login: LoginData = {...formLoginData, clientType: loginData.clientType};
-            if (login.email) {
+            if (login.email || login.handle) {
               setTwoFactorLoginData(login);
-              doSendTwoFactorCode(login.email);
+              doSendTwoFactorCode(login.email || login.handle || '');
               doSetLocalStorage(QUERY_KEY.JOIN_EXPIRES, Date.now() + 1000 * 60 * 10);
             }
             break;
@@ -218,6 +218,9 @@ const LoginComponent = ({
           case BackendError.LABEL.CODE_AUTHENTICATION_FAILED: {
             setTwoFactorSubmitError(error);
             break;
+          }
+          case BackendError.LABEL.BAD_REQUEST: {
+            throw new BackendError({code: StatusCodes.BAD_REQUEST, label: BackendError.AUTH_ERRORS.EMAIL_REQUIRED});
           }
           case BackendError.LABEL.INVALID_CREDENTIALS:
           case BackendError.LABEL.SUSPENDED:
