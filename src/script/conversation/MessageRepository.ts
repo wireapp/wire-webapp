@@ -1221,7 +1221,7 @@ export class MessageRepository {
       message.user(user);
       return message as StoredContentMessage;
     }
-    return message;
+    return message as StoredContentMessage;
   }
 
   async triggerTeamMemberLeaveChecks(users: APIClientUser[]): Promise<void> {
