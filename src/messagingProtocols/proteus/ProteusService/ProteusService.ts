@@ -36,6 +36,7 @@ import {CRUDEngine} from '@wireapp/store-engine';
 import {CryptoClient} from './CryptoClient';
 import {cryptoMigrationStore} from './cryptoMigrationStateStore';
 import {generateDecryptionError} from './DecryptionErrorGenerator';
+import {deleteIdentity} from './identityClearer';
 import type {
   AddUsersToProteusConversationParams,
   CreateProteusConversationParams,
@@ -290,7 +291,10 @@ export class ProteusService {
     return qualifiedOTRRecipients;
   }
 
-  wipe() {
+  async wipe(storeEngine?: CRUDEngine) {
+    if (storeEngine) {
+      await deleteIdentity(storeEngine);
+    }
     return this.cryptoClient.wipe();
   }
 }
