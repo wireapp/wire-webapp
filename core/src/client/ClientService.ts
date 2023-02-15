@@ -27,7 +27,6 @@ import logdown from 'logdown';
 import {APIClient} from '@wireapp/api-client';
 import {CRUDEngine} from '@wireapp/store-engine';
 
-import {deleteIdentity} from '../identity/identityClearer';
 import type {ProteusService} from '../messagingProtocols/proteus';
 import {InitialPrekeys} from '../messagingProtocols/proteus/ProteusService/CryptoClient';
 
@@ -124,7 +123,7 @@ export class ClientService {
           await this.storeEngine.clearTables();
         } else {
           this.logger.log('Last client was permanent - Deleting previous identity');
-          deleteIdentity(this.storeEngine);
+          await this.proteusService.wipe(this.storeEngine);
         }
       }
     }

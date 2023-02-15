@@ -440,8 +440,11 @@ export class Account<T = any> extends TypedEventEmitter<Events> {
     this.resetContext();
   }
 
+  /**
+   * Will delete the identity of the current user
+   */
   private async wipe(): Promise<void> {
-    await this.service?.proteus.wipe();
+    await this.service?.proteus.wipe(this.storeEngine);
     await this.secretsDb?.wipe();
     if (this.db) {
       await deleteDB(this.db);
