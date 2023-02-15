@@ -298,13 +298,6 @@ export class ClientRepository {
     return this.clientState.clients();
   }
 
-  removeLocalClient(): void {
-    this.storageRepository.deleteCryptographyStores().then(() => {
-      const shouldClearData = this.clientState.currentClient().isTemporary();
-      amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.CLIENT_REMOVED, shouldClearData);
-    });
-  }
-
   logoutClient = async (): Promise<void> => {
     if (this.clientState.currentClient()) {
       if (this.clientState.isTemporaryClient()) {
@@ -566,7 +559,10 @@ export class ClientRepository {
 
     const isCurrentClient = clientId === this.clientState.currentClient().id;
     if (isCurrentClient) {
-      return this.removeLocalClient();
+      const shouldClearData = this.clientState.currentClient().isTemporary();
+      // If the current client has been removed, we need to sign out
+      amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.CLIENT_REMOVED, shouldClearData);
+      return;
     }
     const localClients = await this.getClientsForSelf();
     const removedClient = localClients.find(client => client.id === clientId);

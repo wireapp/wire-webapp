@@ -674,11 +674,16 @@ export class App {
         const deletedKeys = CacheRepository.clearLocalStorage(keepConversationInput, keysToKeep);
         this.logger.debug(`Deleted "${deletedKeys.length}" keys from localStorage.`, deletedKeys);
       }
+      const shouldWipeIdentity = clearData || signOutReason === SIGN_OUT_REASON.CLIENT_REMOVED;
 
+      if (shouldWipeIdentity) {
+        localStorage.clear();
+      }
+
+      await this.core.logout(shouldWipeIdentity);
       if (clearData) {
         // Info: This async call cannot be awaited in an "beforeunload" scenario, so we call it without waiting for it in order to delete the CacheStorage in the background.
         CacheRepository.clearCacheStorage();
-        localStorage.clear();
 
         try {
           await this.repository.storage.deleteDatabase();
@@ -687,7 +692,6 @@ export class App {
         }
       }
 
-      await this.core.logout(clearData);
       return _redirectToLogin();
     };
 

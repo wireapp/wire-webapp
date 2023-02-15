@@ -32,18 +32,6 @@ export class StorageRepository {
   private readonly AMPLIFY_STORE_NAME: string;
   private readonly logger: Logger;
 
-  static get CONFIG() {
-    return {
-      CRYPTOGRAPHY_TABLES: [
-        StorageSchemata.OBJECT_STORE.AMPLIFY,
-        StorageSchemata.OBJECT_STORE.CLIENTS,
-        StorageSchemata.OBJECT_STORE.KEYS,
-        StorageSchemata.OBJECT_STORE.SESSIONS,
-        StorageSchemata.OBJECT_STORE.PRE_KEYS,
-      ],
-    };
-  }
-
   constructor(public readonly storageService = container.resolve(StorageService)) {
     this.logger = getLogger('StorageRepository');
     this.AMPLIFY_STORE_NAME = StorageSchemata.OBJECT_STORE.AMPLIFY;
@@ -53,10 +41,6 @@ export class StorageRepository {
     return this.storageService
       .clearStores()
       .then(() => this.logger.info(`Cleared database '${this.storageService.dbName}'`));
-  }
-
-  deleteCryptographyStores(): Promise<void> {
-    return this.storageService.deleteStores(StorageRepository.CONFIG.CRYPTOGRAPHY_TABLES);
   }
 
   deleteDatabase(): Promise<boolean> {
