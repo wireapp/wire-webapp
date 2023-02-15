@@ -19,10 +19,12 @@
 
 import {SUBCONVERSATION_ID} from '@wireapp/api-client/lib/conversation/Subconversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {constructFullyQualifiedClientId} from '@wireapp/core/lib/util/fullyQualifiedClientIdUtils';
+import {TaskScheduler} from '@wireapp/core/lib/util/TaskScheduler';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {CALL_TYPE, CONV_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
+import {AUDIO_STATE, CALL_TYPE, CONV_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {Availability} from '@wireapp/protocol-messaging';
 
 import {ButtonGroupTab} from 'Components/calling/ButtonGroup';
@@ -30,11 +32,12 @@ import 'Components/calling/ChooseScreen';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import type {AudioRepository} from '../audio/AudioRepository';
 import {AudioType} from '../audio/AudioType';
 import type {Call} from '../calling/Call';
-import {CallingRepository} from '../calling/CallingRepository';
+import {CallingRepository, QualifiedWcallMember} from '../calling/CallingRepository';
 import {callingSubscriptions} from '../calling/callingSubscriptionsHandler';
 import {CallState} from '../calling/CallState';
 import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
@@ -250,11 +253,84 @@ export class CallingViewModel {
       }
     });
 
+    const removeStaleClient = async (
+      conversationId: QualifiedId,
+      memberToRemove: QualifiedWcallMember,
+    ): Promise<void> => {
+      const subconversationGroupId = await this.mlsService.getGroupIdFromConversationId(
+        conversationId,
+        SUBCONVERSATION_ID.CONFERENCE,
+      );
+
+      const isMLSConversationEstablished = await this.mlsService.conversationExists(subconversationGroupId);
+      if (!isMLSConversationEstablished) {
+        return;
+      }
+
+      const {
+        userId: {id: userId, domain},
+        clientid,
+      } = memberToRemove;
+      const clientToRemoveQualifiedId = constructFullyQualifiedClientId(userId, clientid, domain);
+
+      const subconversationMembers = await this.mlsService.getClientIds(subconversationGroupId);
+
+      const isSubconversationMember = subconversationMembers.some(
+        ({userId, clientId, domain}) =>
+          constructFullyQualifiedClientId(userId, clientId, domain) === clientToRemoveQualifiedId,
+      );
+
+      if (!isSubconversationMember) {
+        return;
+      }
+
+      return void this.mlsService.removeClientsFromConversation(subconversationGroupId, [clientToRemoveQualifiedId]);
+    };
+
+    const handleCallParticipantChange = (conversationId: QualifiedId, members: QualifiedWcallMember[]) => {
+      const conversation = this.getConversationById(conversationId);
+      if (!conversation?.isUsingMLSProtocol) {
+        return;
+      }
+
+      for (const member of members) {
+        const isSelfClient = member.userId.id === this.core.userId && member.clientid === this.core.clientId;
+        //no need to set a timer for selfClient (it will most likely leave or get dropped from the call before the timer could expire)
+        if (isSelfClient) {
+          continue;
+        }
+
+        const {id: userId, domain} = member.userId;
+        const clientQualifiedId = constructFullyQualifiedClientId(userId, member.clientid, domain);
+
+        const key = `mls-call-client-${conversation.id}-${clientQualifiedId}`;
+
+        // audio state is established -> clear timer
+        if (member.aestab === AUDIO_STATE.ESTABLISHED) {
+          TaskScheduler.cancelTask(key);
+          continue;
+        }
+
+        // otherwise, remove the client from subconversation if it won't establish their audio state in 3 mins timeout
+        const firingDate = new Date().getTime() + TIME_IN_MILLIS.MINUTE * 3;
+
+        TaskScheduler.addTask({
+          firingDate,
+          key,
+          // if timer expires = client is stale -> remove client from the subconversation
+          task: () => removeStaleClient(conversationId, member),
+        });
+      }
+    };
+
     //update epoch info when AVS requests new epoch
     this.callingRepository.onRequestNewEpochCallback(conversationId => updateEpochInfo(conversationId, true));
 
     //once we leave a call, we remove ourselfes from subconversation and unsubscribe from all the call events
     this.callingRepository.onLeaveCall(leaveCall);
+
+    //handle participant change avs callback to detect stale clients in subconversations
+    this.callingRepository.onCallParticipantChangedCallback(handleCallParticipantChange);
 
     this.callActions = {
       answer: async (call: Call) => {
