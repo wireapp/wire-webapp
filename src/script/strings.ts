@@ -558,6 +558,10 @@ export const errorHandlerStrings = defineMessages({
     defaultMessage: 'Invalid input',
     id: 'BackendError.LABEL.BAD_REQUEST',
   },
+  [BackendError.LABEL.EMAIL_REQUIRED]: {
+    defaultMessage: 'Log in with an email address is required when two-factor authentication is activated',
+    id: 'BackendError.LABEL.EMAIL_REQUIRED',
+  },
   [BackendError.LABEL.INVALID_OPERATION]: {
     defaultMessage: 'Invalid operation',
     id: 'BackendError.LABEL.INVALID_OPERATION',
