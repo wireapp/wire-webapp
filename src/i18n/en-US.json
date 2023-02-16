@@ -896,6 +896,7 @@
   "modalUserCannotBeAddedHeadline": "Guests cannot be added",
   "modalUserCannotConnectLegalHoldHeadline": "Cannot connect to this user",
   "modalUserCannotConnectLegalHoldMessage": "You cannot connect to this user due to legal hold. [link]Learn more[/link]",
+  "modalUserLearnMore": "Learn more",
   "modalUserUnblockAction": "Unblock",
   "modalUserUnblockHeadline": "Unblock?",
   "modalUserUnblockMessage": "{{user}} will be able to contact you and add you to group conversations again.",

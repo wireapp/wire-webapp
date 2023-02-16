@@ -117,7 +117,7 @@ export const UnverifiedUserWarning: React.FC<UnverifiedUserWarningProps> = ({use
           targetBlank
           href={getPrivacyUnverifiedUsersUrl()}
         >
-          Learn more
+          {t('modalUserLearnMore')}
         </Link>
       </p>
     </div>
