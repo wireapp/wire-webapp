@@ -87,6 +87,7 @@ jobs:
 
       - uses: kanga333/variable-mapper@master
         with:
+          # We try to map a branch to a dev environment
           key: '${{github.ref}}'
           map: |
             {
@@ -97,6 +98,7 @@ jobs:
 
       - uses: kanga333/variable-mapper@master
         with:
+          # We try to map a tag to a dev environment
           key: '${{env.TAG}}'
           map: |
             {
