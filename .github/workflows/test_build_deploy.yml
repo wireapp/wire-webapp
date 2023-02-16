@@ -76,7 +76,7 @@ jobs:
         run: yarn --immutable
 
       - name: Test
-        run: yarn test --coverage --coverage-reporters=lcov --detectOpenHandles=false
+        run: yarn test --coverage --coverage-reporters=lcov --detectOpenHandles=false | tee ./unit-tests.log
 
       - name: Monitor coverage
         uses: codecov/codecov-action@v3.1.1
@@ -200,6 +200,7 @@ jobs:
           tag_name: ${{env.TAG}}
           name: ${{env.TAG}}
           body_path: ./CHANGELOG.md
+          files: ./unit-tests.log
           draft: false
           prerelease: false
 
@@ -226,6 +227,7 @@ jobs:
           tag_name: ${{env.TAG}}
           name: ${{env.TAG}}
           body_path: ./CHANGELOG.md
+          files: ./unit-tests.log
           draft: false
           prerelease: true
 
