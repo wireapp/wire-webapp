@@ -61,6 +61,7 @@ export class User {
   public readonly hasPendingLegalHold: ko.PureComputed<boolean>;
   public readonly initials: ko.PureComputed<string>;
   public readonly inTeam: ko.Observable<boolean>;
+  public readonly is_trusted: ko.PureComputed<boolean>;
   public readonly is_verified: ko.PureComputed<boolean>;
   public readonly isBlocked: ko.PureComputed<boolean>;
   public readonly isCanceled: ko.PureComputed<boolean>;
@@ -184,6 +185,10 @@ export class User {
     this.teamId = undefined;
 
     this.isRequest = ko.pureComputed(() => this.connection().isRequest());
+
+    this.is_trusted = ko.pureComputed(() => {
+      return false;
+    });
 
     this.devices = ko.observableArray();
     this.is_verified = ko.pureComputed(() => {
