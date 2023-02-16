@@ -55,7 +55,6 @@ import {SelfService} from './self/';
 import {CoreDatabase, deleteDB, openDB} from './storage/CoreDB';
 import {TeamService} from './team/';
 import {UserService} from './user/';
-import {createCustomEncryptedStore, createEncryptedStore, EncryptedStore} from './util/encryptedStore';
 import {TypedEventEmitter} from './util/TypedEventEmitter';
 
 export type ProcessedEventPayload = HandledEventPayload;
@@ -81,7 +80,7 @@ export enum ConnectionState {
 
 export type CreateStoreFn = (storeName: string, context: Context) => undefined | Promise<CRUDEngine | undefined>;
 
-interface AccountOptions<T> {
+interface AccountOptions {
   /** Used to store info in the database (will create a inMemory engine if returns undefined) */
   createStore?: CreateStoreFn;
 
@@ -99,7 +98,7 @@ interface AccountOptions<T> {
   /**
    * Config for MLS and proteus devices. Will fallback to the old proteus logic if not provided
    */
-  cryptoProtocolConfig?: CryptoProtocolConfig<T>;
+  cryptoProtocolConfig?: CryptoProtocolConfig;
 }
 
 type InitOptions = {
@@ -117,15 +116,14 @@ type Events = {
   [EVENTS.NEW_SESSION]: NewClient;
 };
 
-export class Account<T = any> extends TypedEventEmitter<Events> {
+export class Account extends TypedEventEmitter<Events> {
   private readonly apiClient: APIClient;
   private readonly logger: logdown.Logger;
   private readonly createStore: CreateStoreFn;
   private storeEngine?: CRUDEngine;
   private db?: CoreDatabase;
-  private secretsDb?: EncryptedStore<any>;
   private readonly nbPrekeys: number;
-  private readonly cryptoProtocolConfig?: CryptoProtocolConfig<T>;
+  private readonly cryptoProtocolConfig?: CryptoProtocolConfig;
 
   public service?: {
     mls?: MLSService;
@@ -151,7 +149,7 @@ export class Account<T = any> extends TypedEventEmitter<Events> {
    */
   constructor(
     apiClient: APIClient = new APIClient(),
-    {createStore = () => undefined, nbPrekeys = 2, cryptoProtocolConfig}: AccountOptions<T> = {},
+    {createStore = () => undefined, nbPrekeys = 2, cryptoProtocolConfig}: AccountOptions = {},
   ) {
     super();
     this.apiClient = apiClient;
@@ -312,40 +310,17 @@ export class Account<T = any> extends TypedEventEmitter<Events> {
     return validClient;
   }
 
-  private async generateSecretKey(baseDbName: string) {
-    const coreCryptoKeyId = 'corecrypto-key';
-    const dbName = `secrets-${baseDbName}`;
-
-    const systemCrypto = this.cryptoProtocolConfig?.systemCrypto;
-    this.secretsDb = systemCrypto
-      ? await createCustomEncryptedStore(dbName, systemCrypto)
-      : await createEncryptedStore(dbName);
-
-    let key = await this.secretsDb.getsecretValue(coreCryptoKeyId);
-    if (!key) {
-      key = crypto.getRandomValues(new Uint8Array(16));
-      await this.secretsDb.saveSecretValue(coreCryptoKeyId, key);
-    }
-    await this.secretsDb?.close();
-    return key;
-  }
-
   private async buildCryptoClient(context: Context, storeEngine: CRUDEngine, db: CoreDatabase, enableMLS: boolean) {
     const clientType =
       enableMLS || !!this.cryptoProtocolConfig?.useCoreCrypto
         ? CryptoClientType.CORE_CRYPTO
         : CryptoClientType.CRYPTOBOX;
 
-    let key = Uint8Array.from([]);
-    if (clientType === CryptoClientType.CORE_CRYPTO) {
-      key = await this.generateSecretKey(storeEngine.storeName);
-    }
-
     return buildCryptoClient(clientType, db, {
       storeEngine,
-      secretKey: key,
       nbPrekeys: this.nbPrekeys,
       coreCryptoWasmFilePath: this.cryptoProtocolConfig?.coreCrypoWasmFilePath,
+      systemCrypto: this.cryptoProtocolConfig?.systemCrypto,
       onNewPrekeys: async prekeys => {
         this.logger.debug(`Received '${prekeys.length}' new PreKeys.`);
 
@@ -445,7 +420,6 @@ export class Account<T = any> extends TypedEventEmitter<Events> {
    */
   private async wipe(): Promise<void> {
     await this.service?.proteus.wipe(this.storeEngine);
-    await this.secretsDb?.wipe();
     if (this.db) {
       await deleteDB(this.db);
     }
