@@ -77,8 +77,11 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
   totalMessage,
   isMsgElementsFocusable,
 }) => {
-  const findMessage = (conversation: Conversation, messageId: string) => {
-    return messageRepository.getMessageInConversationById(conversation, messageId, true, true);
+  const findMessage = async (conversation: Conversation, messageId: string) => {
+    const event =
+      (await messageRepository.getMessageInConversationById(conversation, messageId)) ||
+      (await messageRepository.getMessageInConversationByReplacementId(conversation, messageId));
+    return await messageRepository.ensureMessageSender(event);
   };
   const clickButton = (message: CompositeMessage, buttonId: string) => {
     if (message.selectedButtonId() !== buttonId && message.waitingButtonId() !== buttonId) {
