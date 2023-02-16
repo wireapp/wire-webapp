@@ -186,6 +186,8 @@ export class User {
 
     this.isRequest = ko.pureComputed(() => this.connection().isRequest());
 
+    /* Placeholder for a future feature allowing 3rd party user verification
+      As it is not implemented yet, it always returns false for now */
     this.is_trusted = ko.pureComputed(() => {
       return false;
     });
