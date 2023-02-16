@@ -21,8 +21,8 @@ import {PreKey} from '@wireapp/api-client/lib/auth';
 
 import {PrekeysTrackerStore} from './PrekeysTracker.store';
 
-import {CryptoClient} from '..';
-import type {CoreDatabase} from '../../../../../storage/CoreDB';
+import {CryptoClient} from '../..';
+import type {CoreDatabase} from '../../../../../../storage/CoreDB';
 
 type CoreCryptoPrekeyGenerator = Pick<CryptoClient, 'newPrekey'>;
 

@@ -21,10 +21,11 @@ import {PreKey} from '@wireapp/api-client/lib/auth';
 
 import type {CRUDEngine} from '@wireapp/store-engine';
 
-import type {CoreCryptoWrapper} from './CoreCryptoWrapper';
+import type {CoreCryptoWrapper} from './CoreCryptoWrapper/CoreCryptoWrapper';
 import type {CryptoboxWrapper} from './CryptoboxWrapper';
 
 import {CoreDatabase} from '../../../../storage/CoreDB';
+import {SecretCrypto} from '../../../mls/types';
 
 export enum CryptoClientType {
   CORE_CRYPTO,
@@ -42,18 +43,19 @@ type WrapConfig = {
 
 type InitConfig = WrapConfig & {
   storeEngine: CRUDEngine;
-  secretKey: Uint8Array;
+  systemCrypto?: SecretCrypto;
   coreCryptoWasmFilePath?: string;
 };
 
 export async function buildCryptoClient(
   clientType: CryptoClientType,
   db: CoreDatabase,
-  {storeEngine, nbPrekeys, secretKey, coreCryptoWasmFilePath, onNewPrekeys}: InitConfig,
+  {storeEngine, nbPrekeys, systemCrypto, coreCryptoWasmFilePath, onNewPrekeys}: InitConfig,
 ): Promise<CryptoClientDef> {
   if (clientType === CryptoClientType.CORE_CRYPTO) {
     const {buildClient} = await import('./CoreCryptoWrapper');
-    const client = await buildClient(storeEngine, secretKey, coreCryptoWasmFilePath ?? '', db, {
+    const client = await buildClient(storeEngine, coreCryptoWasmFilePath ?? '', db, {
+      systemCrypto,
       nbPrekeys,
       onNewPrekeys,
     });

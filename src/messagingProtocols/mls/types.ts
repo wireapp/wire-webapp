@@ -22,10 +22,17 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {CoreCryptoCallbacks} from '@wireapp/core-crypto';
 
-type SecretCrypto<T> = {
-  encrypt: (value: Uint8Array) => Promise<T>;
-  decrypt: (payload: T) => Promise<Uint8Array>;
-};
+export type SecretCrypto =
+  | {
+      encrypt: (value: Uint8Array) => Promise<Uint8Array>;
+      decrypt: (payload: Uint8Array) => Promise<Uint8Array>;
+      version: undefined;
+    }
+  | {
+      encrypt: (value: string) => Promise<Uint8Array>;
+      decrypt: (payload: Uint8Array) => Promise<string>;
+      version: 1;
+    };
 
 export interface MLSCallbacks extends Pick<CoreCryptoCallbacks, 'authorize' | 'userAuthorize'> {
   /**
@@ -50,12 +57,12 @@ export type CommitPendingProposalsParams = {
   skipDelete?: boolean;
 } & CommonMLS;
 
-export interface CryptoProtocolConfig<T = any> {
+export interface CryptoProtocolConfig {
   /**
    * encrypt/decrypt function pair that will be called before storing/fetching secrets in the secrets database.
    * If not provided will use the built in encryption mechanism
    */
-  systemCrypto?: SecretCrypto<T>;
+  systemCrypto?: SecretCrypto;
 
   useCoreCrypto?: boolean;
 

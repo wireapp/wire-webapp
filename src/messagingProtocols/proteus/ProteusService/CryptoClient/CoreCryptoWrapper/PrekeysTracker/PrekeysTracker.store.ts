@@ -17,7 +17,7 @@
  *
  */
 
-import {CoreDatabase} from '../../../../../storage/CoreDB';
+import {CoreDatabase} from '../../../../../../storage/CoreDB';
 
 const STATE_PRIMARY_KEY = 'prekeys_state';
 

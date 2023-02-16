@@ -19,7 +19,7 @@
 
 import {PrekeyTracker} from './PrekeysTracker';
 
-import {CoreDatabase, openDB} from '../../../../../storage/CoreDB';
+import {CoreDatabase, openDB} from '../../../../../../storage/CoreDB';
 
 describe('PrekeysGenerator', () => {
   let db: CoreDatabase;
