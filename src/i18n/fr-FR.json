@@ -9,6 +9,7 @@
   "BackendError.LABEL.CONVERSATION_NOT_FOUND": "La conversation n'a pas été trouvée",
   "BackendError.LABEL.CONVERSATION_TOO_MANY_MEMBERS": "Cette conversation a atteint la limite de participants",
   "BackendError.LABEL.EMAIL_EXISTS": "Cette adresse e-mail est déjà utilisée. {supportEmailExistsLink}",
+  "BackendError.LABEL.EMAIL_REQUIRED": "Log in with an email address is required when two-factor authentication is activated",
   "BackendError.LABEL.HANDLE_EXISTS": "Ce nom d'utilisateur est déjà utilisé",
   "BackendError.LABEL.HANDLE_TOO_SHORT": "Veuillez entrer un nom d'utilisateur composé d'au moins 2 caractères",
   "BackendError.LABEL.INVALID_CODE": "Please retry, or request another code.",

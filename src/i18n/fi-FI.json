@@ -9,6 +9,7 @@
   "BackendError.LABEL.CONVERSATION_NOT_FOUND": "CONVERSATION_NOT_FOUND",
   "BackendError.LABEL.CONVERSATION_TOO_MANY_MEMBERS": "Tämä keskustelu on saavuttanut osallistujien enimmäismäärän",
   "BackendError.LABEL.EMAIL_EXISTS": "Sähköpostiosoite jonka annoit on jo käytössä. {supportEmailExistsLink}",
+  "BackendError.LABEL.EMAIL_REQUIRED": "Log in with an email address is required when two-factor authentication is activated",
   "BackendError.LABEL.HANDLE_EXISTS": "Käyttäjätunnus on jo käytössä",
   "BackendError.LABEL.HANDLE_TOO_SHORT": "Kirjoita käyttäjätunnus, jossa on vähintään 2 merkkiä",
   "BackendError.LABEL.INVALID_CODE": "Please retry, or request another code.",
