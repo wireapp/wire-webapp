@@ -208,7 +208,7 @@ export class App {
     repositories.storage = new StorageRepository();
 
     repositories.cryptography = new CryptographyRepository();
-    repositories.client = new ClientRepository(new ClientService(), repositories.cryptography, repositories.storage);
+    repositories.client = new ClientRepository(new ClientService(), repositories.cryptography);
     repositories.media = new MediaRepository(new PermissionRepository());
     repositories.audio = new AudioRepository(repositories.media.devicesHandler);
 

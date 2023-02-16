@@ -46,7 +46,7 @@ import type {CryptographyRepository} from '../cryptography/CryptographyRepositor
 import type {User} from '../entity/User';
 import {ClientError} from '../error/ClientError';
 import {Core} from '../service/CoreSingleton';
-import {ClientRecord, StorageRepository} from '../storage';
+import {ClientRecord} from '../storage';
 import {StorageKey} from '../storage/StorageKey';
 
 export type UserClientEntityMap = {[userId: string]: ClientEntity[]};
@@ -69,7 +69,6 @@ export class ClientRepository {
   constructor(
     public readonly clientService: ClientService,
     public readonly cryptographyRepository: CryptographyRepository,
-    private readonly storageRepository: StorageRepository,
     private readonly clientState = container.resolve(ClientState),
     private readonly core = container.resolve(Core),
   ) {
