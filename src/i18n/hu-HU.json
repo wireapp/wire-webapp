@@ -9,6 +9,7 @@
   "BackendError.LABEL.CONVERSATION_NOT_FOUND": "BESZÉLGETÉS_NEM_TALÁLHATÓ",
   "BackendError.LABEL.CONVERSATION_TOO_MANY_MEMBERS": "Ez a beszélgetés elérte a résztvevők maximális számát",
   "BackendError.LABEL.EMAIL_EXISTS": "A megadott e-mail cím már használatban van. {supportEmailExistsLink}",
+  "BackendError.LABEL.EMAIL_REQUIRED": "Log in with an email address is required when two-factor authentication is activated",
   "BackendError.LABEL.HANDLE_EXISTS": "A felhasználónév már foglalt",
   "BackendError.LABEL.HANDLE_TOO_SHORT": "Kérjük, legalább 2 karakterből álló nevet adj meg",
   "BackendError.LABEL.INVALID_CODE": "Please retry, or request another code.",
