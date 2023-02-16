@@ -23,7 +23,7 @@ import {Encoder} from 'bazinga64';
 import {CoreCrypto} from '@wireapp/core-crypto';
 import type {CRUDEngine} from '@wireapp/store-engine';
 
-import {CryptoClient, LAST_PREKEY_ID} from './CryptoClient.types';
+import {CryptoClient} from './CryptoClient.types';
 import {PrekeyTracker} from './PrekeysTracker';
 
 import {CoreDatabase} from '../../../../storage/CoreDB';
@@ -82,9 +82,14 @@ export class CoreCryptoWrapper implements CryptoClient {
     }
     await this.prekeyTracker.setInitialState(prekeys.length);
 
+    const lastPrekeyBytes = await this.coreCrypto.proteusLastResortPrekey();
+    const lastPrekey = Encoder.toBase64(lastPrekeyBytes).asString;
+
+    const lastPrekeyId = CoreCrypto.proteusLastResortPrekeyId();
+
     return {
       prekeys,
-      lastPrekey: await this.newPrekey(LAST_PREKEY_ID),
+      lastPrekey: {id: lastPrekeyId, key: lastPrekey},
     };
   }
 

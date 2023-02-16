@@ -19,7 +19,6 @@
 
 import {PreKey} from '@wireapp/api-client/lib/auth';
 
-export const LAST_PREKEY_ID = 65535;
 export type InitialPrekeys = {prekeys: PreKey[]; lastPrekey: PreKey};
 
 export interface CryptoClient<T = unknown> {
