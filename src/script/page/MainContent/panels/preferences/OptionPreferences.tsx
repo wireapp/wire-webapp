@@ -45,13 +45,13 @@ interface OptionPreferencesProps {
 }
 
 const fontSliderOptions = [
-  {value: 0, label: RootFontSize.XXS, heading: 'Small'},
+  {value: 0, label: RootFontSize.XXS, heading: t('preferencesOptionsFontSizeSmall')},
   {value: 1, label: RootFontSize.XS},
   {value: 2, label: RootFontSize.S},
-  {value: 3, label: RootFontSize.M, heading: 'Default'},
+  {value: 3, label: RootFontSize.M, heading: t('preferencesOptionsFontSizeDefault')},
   {value: 4, label: RootFontSize.L},
   {value: 5, label: RootFontSize.XL},
-  {value: 6, label: RootFontSize.XXL, heading: 'Large'},
+  {value: 6, label: RootFontSize.XXL, heading: t('preferencesOptionsFontSizeLarge')},
 ];
 
 const fontSizes = Object.values(RootFontSize);
