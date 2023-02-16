@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [38.13.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.13.0...@wireapp/core@38.13.1) (2023-02-16)
+
+### Bug Fixes
+
+* Improve secretKey generator to handle multiple system crypto ([#4885](https://github.com/wireapp/wire-web-packages/issues/4885)) ([bccadbf](https://github.com/wireapp/wire-web-packages/commit/bccadbfd9afebc9f3f9a3a1637f929f4d8fa0199))
+
 # [38.13.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.12.1...@wireapp/core@38.13.0) (2023-02-16)
 
 ### Features
