@@ -27,6 +27,7 @@ import {container} from 'tsyringe';
 import {IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {Icon} from 'Components/Icon';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {useAppMainState, ViewType} from 'src/script/page/state';
@@ -198,6 +199,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
 
   const onClickStartAudio = () => {
     callActions.startAudio(conversation);
+    showStartedCallAlert(isGroup);
 
     if (smBreakpoint) {
       setLeftSidebar();
@@ -210,6 +212,8 @@ export const TitleBar: React.FC<TitleBarProps> = ({
       currentFocusedElementRef.current = null;
     }
   }, [activeCalls.length]);
+
+  const {showStartedCallAlert} = useCallAlertState();
 
   return (
     <ul
@@ -246,7 +250,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
           onClick={onClickDetails}
           title={peopleTooltip}
           aria-label={peopleTooltip}
-          onKeyDown={e => handleKeyDown(e, onClickDetails)}
+          onKeyDown={event => handleKeyDown(event, onClickDetails)}
           data-placement="bottom"
           role="button"
           tabIndex={TabIndex.FOCUSABLE}
@@ -288,8 +292,9 @@ export const TitleBar: React.FC<TitleBarProps> = ({
                 title={t('tooltipConversationVideoCall')}
                 aria-label={t('tooltipConversationVideoCall')}
                 onClick={event => {
-                  currentFocusedElementRef.current = event.target;
+                  currentFocusedElementRef.current = event.target as HTMLButtonElement;
                   callActions.startVideo(conversation);
+                  showStartedCallAlert(isGroup, true);
                 }}
                 data-uie-name="do-video-call"
               >
@@ -303,8 +308,9 @@ export const TitleBar: React.FC<TitleBarProps> = ({
               title={t('tooltipConversationCall')}
               aria-label={t('tooltipConversationCall')}
               onClick={event => {
-                currentFocusedElementRef.current = event.target;
+                currentFocusedElementRef.current = event.target as HTMLButtonElement;
                 callActions.startAudio(conversation);
+                showStartedCallAlert(isGroup);
               }}
               data-uie-name="do-call"
             >

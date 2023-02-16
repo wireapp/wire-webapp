@@ -30,6 +30,7 @@ import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {GroupAvatar} from 'Components/avatar/GroupAvatar';
 import {Duration} from 'Components/calling/Duration';
 import {GroupVideoGrid} from 'Components/calling/GroupVideoGrid';
+import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';
@@ -101,6 +102,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
       'currentPage',
       'muteState',
     ]);
+
   const {
     isGroup,
     participating_user_ets: userEts,
@@ -146,8 +148,10 @@ const CallingCell: React.FC<CallingCellProps> = ({
 
   const currentCallStatus = callStatus[state];
 
-  const showNoCameraPreview = !hasAccessToCamera && call.initialType === CALL_TYPE.VIDEO && !isOngoing;
-  const showVideoButton = isVideoCallingEnabled && (call.initialType === CALL_TYPE.VIDEO || isOngoing);
+  const isVideoCall = call.initialType === CALL_TYPE.VIDEO;
+
+  const showNoCameraPreview = !hasAccessToCamera && isVideoCall && !isOngoing;
+  const showVideoButton = isVideoCallingEnabled && (isVideoCall || isOngoing);
   const showParticipantsButton = isOngoing && isGroup;
 
   const videoGrid = useVideoGrid(call);
@@ -221,6 +225,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
   }, [isOngoing, multitasking]);
 
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
+  const {showAlert, clearShowAlert} = useCallAlertState();
 
   const answerCall = () => {
     callActions.answer(call);
@@ -256,8 +261,22 @@ const CallingCell: React.FC<CallingCellProps> = ({
       };
     }
 
-    return () => undefined;
+    return () => {
+      clearShowAlert();
+    };
   }, [answerOrRejectCall, isIncoming]);
+
+  const call1To1StartedAlert = t(
+    isOutgoingVideoCall ? 'startedVideoCallingAlert' : 'startedAudioCallingAlert',
+    conversationName,
+  );
+
+  const onGoingCallAlert = t(isOutgoingVideoCall ? 'ongoingVideoCall' : 'ongoingAudioCall', conversationName);
+
+  const callGroupStartedAlert = t(
+    isOutgoingVideoCall ? 'startedVideoGroupCallingAlert' : 'startedGroupCallingAlert',
+    conversationName,
+  );
 
   return (
     <div className="conversation-calling-cell">
@@ -270,7 +289,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
       {showJoinButton && isFullUi && (
         <button
           className="call-ui__button call-ui__button--green call-ui__button--join"
-          style={{margin: '40px 16px 0px 16px'}}
+          style={{margin: '40px 16px 0px'}}
           onClick={() => callActions.answer(call)}
           type="button"
           data-uie-name="do-call-controls-call-join"
@@ -292,13 +311,22 @@ const CallingCell: React.FC<CallingCellProps> = ({
 
           <div className="conversation-list-cell-right__calling">
             <div
-              ref={element => element?.focus()}
+              ref={element => {
+                if (isGroup && showAlert && !isVideoCall) {
+                  element?.focus();
+                }
+              }}
               className="conversation-list-cell conversation-list-cell-button"
               onClick={createNavigate(conversationUrl)}
+              onBlur={() => clearShowAlert()}
               onKeyDown={createNavigateKeyboard(conversationUrl)}
               tabIndex={TabIndex.FOCUSABLE}
               role="button"
-              aria-label={t('accessibility.openConversation', conversationName)}
+              aria-label={
+                showAlert
+                  ? callGroupStartedAlert
+                  : `${isOngoing ? `${onGoingCallAlert} ` : ''}${t('accessibility.openConversation', conversationName)}`
+              }
             >
               {!temporaryUserStyle && (
                 <div className="conversation-list-cell-left">
@@ -350,10 +378,6 @@ const CallingCell: React.FC<CallingCellProps> = ({
             <div className="conversation-list-cell-right">
               {(isConnecting || isOngoing) && (
                 <>
-                  <p role="alert" className="visually-hidden">
-                    You started a conference call with {conversationName}
-                  </p>
-
                   <button
                     className="call-ui__button call-ui__button--red"
                     onClick={() => callActions.leave(call)}
@@ -368,38 +392,40 @@ const CallingCell: React.FC<CallingCellProps> = ({
             </div>
           </div>
 
-          {(isOngoing || selfHasActiveVideo) && isMinimized && !!videoGrid?.grid?.length && isFullUi ? (
-            <div
-              className="group-video__minimized-wrapper"
-              onClick={handleMinimizedClick}
-              onKeyDown={handleMinimizedKeydown}
-              role="button"
-              tabIndex={TabIndex.FOCUSABLE}
-              aria-label={t('callMaximizeLabel')}
-            >
-              <GroupVideoGrid
-                grid={activeCallViewTab === CallViewTab.ALL ? videoGrid : {grid: activeSpeakers, thumbnail: null}}
-                minimized
-                maximizedParticipant={maximizedParticipant}
-                selfParticipant={selfParticipant}
-              />
-              {isOngoing && (
-                <div className="group-video__minimized-wrapper__overlay" data-uie-name="do-maximize-call">
-                  <Icon.Fullscreen />
-                </div>
-              )}
-            </div>
-          ) : (
-            showNoCameraPreview &&
-            isFullUi && (
+          <>
+            {(isOngoing || selfHasActiveVideo) && isMinimized && !!videoGrid?.grid?.length && isFullUi ? (
               <div
-                className="group-video__minimized-wrapper group-video__minimized-wrapper--no-camera-access"
-                data-uie-name="label-no-camera-access-preview"
+                className="group-video__minimized-wrapper"
+                onClick={handleMinimizedClick}
+                onKeyDown={handleMinimizedKeydown}
+                role="button"
+                tabIndex={TabIndex.FOCUSABLE}
+                aria-label={t('callMaximizeLabel')}
               >
-                {t('callNoCameraAccess')}
+                <GroupVideoGrid
+                  grid={activeCallViewTab === CallViewTab.ALL ? videoGrid : {grid: activeSpeakers, thumbnail: null}}
+                  minimized
+                  maximizedParticipant={maximizedParticipant}
+                  selfParticipant={selfParticipant}
+                />
+                {isOngoing && (
+                  <div className="group-video__minimized-wrapper__overlay" data-uie-name="do-maximize-call">
+                    <Icon.Fullscreen />
+                  </div>
+                )}
               </div>
-            )
-          )}
+            ) : (
+              showNoCameraPreview &&
+              isFullUi && (
+                <div
+                  className="group-video__minimized-wrapper group-video__minimized-wrapper--no-camera-access"
+                  data-uie-name="label-no-camera-access-preview"
+                >
+                  {t('callNoCameraAccess')}
+                </div>
+              )
+            )}
+          </>
 
           {classifiedDomains && <ClassifiedBar users={userEts} classifiedDomains={classifiedDomains} />}
 
@@ -494,25 +520,21 @@ const CallingCell: React.FC<CallingCellProps> = ({
                   )}
 
                   {(isIncoming || isOutgoing) && (
-                    <>
-                      <p role="alert" className="visually-hidden">
-                        {`You are calling ${conversationName}${isOutgoingVideoCall ? ', your camera is on' : ''}`}
-                        {/*{t('callConversationAcceptOrDecline', conversationName)}*/}
-                      </p>
-
-                      <li className="conversation-list-calling-cell-controls-item">
-                        <button
-                          ref={element => element?.focus()}
-                          className="call-ui__button call-ui__button--red call-ui__button--large"
-                          onClick={() => (isIncoming ? callActions.reject(call) : callActions.leave(call))}
-                          title={t('videoCallOverlayHangUp')}
-                          type="button"
-                          data-uie-name="do-call-controls-call-decline"
-                        >
-                          <Icon.Hangup className="small-icon" style={{maxWidth: 17}} />
-                        </button>
-                      </li>
-                    </>
+                    <li className="conversation-list-calling-cell-controls-item">
+                      <button
+                        // eslint-disable-next-line jsx-a11y/no-autofocus
+                        autoFocus={!isGroup}
+                        className="call-ui__button call-ui__button--red call-ui__button--large"
+                        onClick={() => (isIncoming ? callActions.reject(call) : callActions.leave(call))}
+                        onBlur={() => clearShowAlert()}
+                        title={!isGroup && showAlert ? call1To1StartedAlert : t('videoCallOverlayHangUp')}
+                        aria-label={!isGroup && showAlert ? call1To1StartedAlert : t('videoCallOverlayHangUp')}
+                        type="button"
+                        data-uie-name="do-call-controls-call-decline"
+                      >
+                        <Icon.Hangup className="small-icon" style={{maxWidth: 17}} />
+                      </button>
+                    </li>
                   )}
 
                   {isIncoming && (
