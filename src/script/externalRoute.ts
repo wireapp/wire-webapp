@@ -48,7 +48,7 @@ export const URL_PATH = {
   PRIVACY_UNVERIFIED_USERS: '/articles/202857164',
   PRIVACY_WHY: '/articles/207859815',
   SUPPORT_USERNAME: '/support/username/',
-};
+} as const;
 
 const getTeamSettingsUrl = (path: string = '', utmSource?: string): string | undefined => {
   const query = utmSource ? `?utm_source=${utmSource}&utm_term=desktop` : '';
@@ -64,7 +64,7 @@ export const getWebsiteUrl = (path: string = '', pkCampaign?: string): string | 
   }
   return undefined;
 };
-export const getHelpCenterUrl = (path: string = ''): string | undefined => {
+export const getHelpCenterUrl = (path: (typeof URL_PATH)[keyof typeof URL_PATH]) => {
   if (URL.SUPPORT) {
     const helpcenterUrl = `${URL.SUPPORT}${path}`;
     return addLocaleToHelpCenterUrl(URL.SUPPORT ? helpcenterUrl : undefined);
@@ -102,7 +102,7 @@ export const addLocaleToUrl = (url?: string): string => {
   return url.replace(Config.getConfig().URL.WEBSITE_BASE, `${Config.getConfig().URL.WEBSITE_BASE}/${websiteLanguage}`);
 };
 
-export const addLocaleToHelpCenterUrl = (url?: string): string => {
+const addLocaleToHelpCenterUrl = (url?: string): string => {
   if (!url) {
     return undefined;
   }
