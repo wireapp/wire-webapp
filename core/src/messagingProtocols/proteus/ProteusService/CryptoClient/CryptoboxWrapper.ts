@@ -20,9 +20,10 @@
 import {PreKey} from '@wireapp/api-client/lib/auth';
 
 import {Cryptobox} from '@wireapp/cryptobox';
+import {keys as ProteusKeys} from '@wireapp/proteus';
 import {CRUDEngine} from '@wireapp/store-engine';
 
-import {CryptoClient, LAST_PREKEY_ID} from './CryptoClient.types';
+import {CryptoClient} from './CryptoClient.types';
 
 type Config = {
   onNewPrekeys: (prekeys: PreKey[]) => void;
@@ -67,7 +68,7 @@ export class CryptoboxWrapper implements CryptoClient {
     const prekeys = initialPrekeys
       .map(preKey => {
         const preKeyJson = this.cryptobox.serialize_prekey(preKey);
-        if (preKeyJson.id !== LAST_PREKEY_ID) {
+        if (preKeyJson.id !== ProteusKeys.PreKey.MAX_PREKEY_ID) {
           return preKeyJson;
         }
         return {id: -1, key: ''};
