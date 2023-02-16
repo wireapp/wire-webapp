@@ -77,7 +77,6 @@ import type {MediaStreamHandler} from '../media/MediaStreamHandler';
 import {MediaType} from '../media/MediaType';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
-import type {EventRecord} from '../storage';
 import {TeamState} from '../team/TeamState';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import {EventName} from '../tracking/EventName';
@@ -94,7 +93,7 @@ interface MediaStreamQuery {
   screen?: boolean;
 }
 
-type QualifiedWcallMember = Omit<WcallMember, 'userid'> & {userId: QualifiedId};
+export type QualifiedWcallMember = Omit<WcallMember, 'userid'> & {userId: QualifiedId};
 
 interface SendMessageTarget {
   clients: WcallClient[];
@@ -119,7 +118,7 @@ enum CALL_DIRECTION {
 }
 
 export interface SubconversationEpochInfoMember {
-  userid: string;
+  userid: `${string}@${string}`;
   clientid: string;
   in_subconv: boolean;
 }
@@ -132,9 +131,9 @@ export class CallingRepository {
   private readonly logger: Logger;
   private avsVersion: number = 0;
   private incomingCallCallback: (call: Call) => void;
-  private requestClientsCallback: (conversationId: QualifiedId) => void;
   private requestNewEpochCallback: (conversationId: QualifiedId) => void;
   private leaveCallCallback: (conversationId: QualifiedId) => void;
+  private callParticipantChangedCallback: (conversationId: QualifiedId, members: QualifiedWcallMember[]) => void;
   private isReady: boolean = false;
   /** will cache the query to media stream (in order to avoid asking the system for streams multiple times when we have multiple peers) */
   private mediaStreamQuery?: Promise<MediaStream>;
@@ -172,9 +171,9 @@ export class CallingRepository {
   ) {
     this.logger = getLogger('CallingRepository');
     this.incomingCallCallback = () => {};
-    this.requestClientsCallback = () => {};
     this.requestNewEpochCallback = () => {};
     this.leaveCallCallback = () => {};
+    this.callParticipantChangedCallback = () => {};
     this.callLog = [];
 
     /** {<userId>: <isVerified>} */
@@ -333,25 +332,26 @@ export class CallingRepository {
       this.logger.warn(`Unable to find a conversation with id of ${call.conversationId}`);
       return false;
     }
-    const {id, domain} = call.conversationId;
-    const allClients = conversation.isUsingMLSProtocol
-      ? await this.core.service!.conversation.fetchAllParticipantsClients(id, domain)
-      : await this.core.service!.conversation.getAllParticipantsClients(call.conversationId);
-    const qualifiedClients = isQualifiedUserClients(allClients)
-      ? flattenQualifiedUserClients(allClients)
-      : flattenUserClients(allClients);
+    const allClients = await this.core.service!.conversation.fetchAllParticipantsClients(call.conversationId);
 
-    const clients: Clients = flatten(
-      qualifiedClients.map(({data, userId}) =>
-        data.map(clientid => ({clientid, userid: this.serializeQualifiedId(userId)})),
-      ),
-    );
+    if (!conversation.isUsingMLSProtocol) {
+      const qualifiedClients = isQualifiedUserClients(allClients)
+        ? flattenQualifiedUserClients(allClients)
+        : flattenUserClients(allClients);
 
-    this.wCall?.setClientsForConv(
-      this.wUser,
-      this.serializeQualifiedId(call.conversationId),
-      JSON.stringify({clients}),
-    );
+      const clients: Clients = flatten(
+        qualifiedClients.map(({data, userId}) =>
+          data.map(clientid => ({clientid, userid: this.serializeQualifiedId(userId)})),
+        ),
+      );
+
+      this.wCall?.setClientsForConv(
+        this.wUser,
+        this.serializeQualifiedId(call.conversationId),
+        JSON.stringify({clients}),
+      );
+    }
+
     // We warn the message repository that a mismatch has happened outside of its lifecycle (eventually triggering a conversation degradation)
     const consentType =
       this.getCallDirection(call) === CALL_DIRECTION.INCOMING ? CONSENT_TYPE.INCOMING_CALL : CONSENT_TYPE.OUTGOING_CALL;
@@ -422,12 +422,14 @@ export class CallingRepository {
     this.leaveCallCallback = callback;
   }
 
-  onRequestClientsCallback(callback: (conversationId: QualifiedId) => void): void {
-    this.requestClientsCallback = callback;
-  }
-
   onRequestNewEpochCallback(callback: (conversationId: QualifiedId) => void): void {
     this.requestNewEpochCallback = callback;
+  }
+
+  onCallParticipantChangedCallback(
+    callback: (conversationId: QualifiedId, members: QualifiedWcallMember[]) => void,
+  ): void {
+    this.callParticipantChangedCallback = callback;
   }
 
   findCall(conversationId: QualifiedId): Call | undefined {
@@ -628,10 +630,8 @@ export class CallingRepository {
     switch (content.type) {
       case CALL_MESSAGE_TYPE.CONFKEY: {
         if (source !== EventRepository.SOURCE.STREAM) {
-          const {id, domain} = conversationId;
-          const allClients = conversation.isUsingMLSProtocol
-            ? await this.core.service!.conversation.fetchAllParticipantsClients(id, domain)
-            : await this.core.service!.conversation.getAllParticipantsClients(conversationId);
+          const allClients = await this.core.service!.conversation.fetchAllParticipantsClients(conversationId);
+
           // We warn the message repository that a mismatch has happened outside of its lifecycle (eventually triggering a conversation degradation)
           const shouldContinue = await this.messageRepository.updateMissingClients(
             conversation,
@@ -1099,7 +1099,7 @@ export class CallingRepository {
 
   private injectActivateEvent(conversationId: QualifiedId, userId: QualifiedId, time: string): void {
     const event = EventBuilder.buildVoiceChannelActivate(conversationId, userId, time, this.avsVersion);
-    this.eventRepository.injectEvent(event as unknown as EventRecord, EventSource.INJECTED);
+    this.eventRepository.injectEvent(event, EventSource.INJECTED);
   }
 
   private injectDeactivateEvent(
@@ -1118,7 +1118,7 @@ export class CallingRepository {
       time,
       this.avsVersion,
     );
-    this.eventRepository.injectEvent(event as unknown as EventRecord, source as EventSource);
+    this.eventRepository.injectEvent(event, source);
   }
 
   private readonly sendMessage = (
@@ -1283,7 +1283,7 @@ export class CallingRepository {
           conversationEntity,
           call.getSelfParticipant().user.id,
         );
-        this.eventRepository.injectEvent(callingEvent as EventRecord);
+        this.eventRepository.injectEvent(callingEvent);
       }
     }
 
@@ -1490,14 +1490,15 @@ export class CallingRepository {
   }
 
   private readonly handleCallParticipantChanges = (convId: SerializedConversationId, membersJson: string) => {
-    const call = this.findCall(this.parseQualifiedId(convId));
+    const conversationId = this.parseQualifiedId(convId);
+    const call = this.findCall(conversationId);
 
     if (!call) {
       return;
     }
 
     const {members: serializedMembers}: {members: WcallMember[]} = JSON.parse(membersJson);
-    const members = serializedMembers.map(member => ({
+    const members: QualifiedWcallMember[] = serializedMembers.map(member => ({
       ...member,
       userId: this.parseQualifiedId(member.userid),
     }));
@@ -1505,6 +1506,7 @@ export class CallingRepository {
     this.updateParticipantList(call, members);
     this.updateParticipantMutedState(call, members);
     this.updateParticipantVideoState(call, members);
+    this.callParticipantChangedCallback(conversationId, members);
   };
 
   private readonly requestClients = async (wUser: number, convId: SerializedConversationId, _: number) => {
@@ -1514,8 +1516,6 @@ export class CallingRepository {
       return;
     }
     await this.pushClients(call);
-    const qualifiedConversationId = this.parseQualifiedId(convId);
-    this.requestClientsCallback(qualifiedConversationId);
   };
 
   private readonly requestNewEpoch = async (wUser: number, convId: SerializedConversationId) => {

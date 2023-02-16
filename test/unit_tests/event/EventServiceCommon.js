@@ -300,17 +300,19 @@ const testEventServiceClass = (testedServiceName, className) => {
       const newEvent = {
         conversation: conversationId,
         id: '4af67f76-09f9-4831-b3a4-9df877b8c29a',
+        data: {},
         from: senderId,
         time: '2016-08-04T13:27:58.993Z',
         type: 'conversation.message-add',
       };
+      const categorizedEvent = {...newEvent, category: MessageCategory.TEXT};
 
       it('save event in the database', () => {
         spyOn(testFactory.storage_service, 'save').and.callFake(event => Promise.resolve(event));
 
         return testFactory[testedServiceName].saveEvent(newEvent).then(event => {
           expect(event.category).toBeDefined();
-          expect(testFactory.storage_service.save).toHaveBeenCalledWith(eventStoreName, undefined, newEvent);
+          expect(testFactory.storage_service.save).toHaveBeenCalledWith(eventStoreName, undefined, categorizedEvent);
         });
       });
     });

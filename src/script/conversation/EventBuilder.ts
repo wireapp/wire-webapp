@@ -35,7 +35,7 @@ import type {User} from '../entity/User';
 import {CALL, ClientEvent, CONVERSATION} from '../event/Client';
 import {StatusType} from '../message/StatusType';
 import {VerificationMessageType} from '../message/VerificationMessageType';
-import {AssetRecord, EventRecord} from '../storage';
+import {AssetRecord, EventRecord, ReadReceipt, UserReactionMap} from '../storage';
 
 export interface BaseEvent {
   conversation: string;
@@ -83,12 +83,16 @@ export interface VoiceChannelActivateEvent extends BaseEvent {
   protocol_version: number;
   type: CONVERSATION.VOICE_CHANNEL_ACTIVATE;
 }
-export type AllVerifiedEventData = {type: VerificationMessageType};
-export type AllVerifiedEvent = ConversationEvent<AllVerifiedEventData>;
+export type AllVerifiedEventData = {type: VerificationMessageType.VERIFIED};
+export type AllVerifiedEvent = ConversationEvent<AllVerifiedEventData> & {
+  type: typeof ClientEvent.CONVERSATION.VERIFICATION;
+};
 export type AssetAddEvent = Omit<ConversationEvent<any>, 'id'> &
   Partial<Pick<ConversationEvent<any>, 'id'>> & {status: StatusType; type: CONVERSATION.ASSET_ADD};
 export type DegradedMessageEventData = {type: VerificationMessageType; userIds: QualifiedId[]};
-export type DegradedMessageEvent = ConversationEvent<DegradedMessageEventData>;
+export type DegradedMessageEvent = ConversationEvent<DegradedMessageEventData> & {
+  type: typeof ClientEvent.CONVERSATION.VERIFICATION;
+};
 export type DeleteEvent = ConversationEvent<{deleted_time: number; message_id: string; time: string}> & {
   type: CONVERSATION.MESSAGE_DELETE;
 };
@@ -101,14 +105,31 @@ export type GroupCreationEvent = ConversationEvent<GroupCreationEventData> & {ty
 export type LegalHoldMessageEvent = ConversationEvent<{legal_hold_status: LegalHoldStatus}> & {
   type: CONVERSATION.LEGAL_HOLD_UPDATE;
 };
-export type MemberJoinEvent = BackendEventMessage<{qualified_user_ids?: QualifiedId[]; user_ids: string[]}>;
+export type MemberJoinEvent = BackendEventMessage<{qualified_user_ids?: QualifiedId[]; user_ids: string[]}> & {
+  type: CONVERSATION_EVENT.MEMBER_JOIN;
+};
 export type MemberLeaveEvent = BackendEventMessage<{
   name?: string;
   qualified_user_ids?: QualifiedId[];
   reason?: MemberLeaveReason;
   user_ids: string[];
-}>;
-export type MessageAddEvent = Omit<ConversationEvent<{}>, 'id'> & {
+}> & {
+  type: CONVERSATION_EVENT.MEMBER_LEAVE;
+};
+export type MessageAddEvent = Omit<
+  ConversationEvent<{
+    sender: string;
+    content: string;
+    replacing_message_id?: string;
+    previews?: string[];
+    expects_read_confirmation?: boolean;
+  }>,
+  'id'
+> & {
+  /** who have received/read the event */
+  read_receipts?: ReadReceipt[];
+  /** who reacted to the event */
+  reactions?: UserReactionMap;
   edited_time?: string;
   status: StatusType;
   type: CONVERSATION.MESSAGE_ADD;
@@ -117,7 +138,7 @@ export type MissedEvent = BaseEvent & {id: string; type: CONVERSATION.MISSED_MES
 export type OneToOneCreationEvent = ConversationEvent<{userIds: QualifiedId[]}> & {
   type: CONVERSATION.ONE2ONE_CREATION;
 };
-export type TeamMemberLeaveEvent = ConversationEvent<{name: string; user_ids: string[]}> & {
+export type TeamMemberLeaveEvent = Omit<MemberLeaveEvent, 'type'> & {
   type: CONVERSATION.TEAM_MEMBER_LEAVE;
 };
 export type ReactionEvent = ConversationEvent<{message_id: string; reaction: ReactionType}> & {
@@ -125,6 +146,13 @@ export type ReactionEvent = ConversationEvent<{message_id: string; reaction: Rea
 };
 export type MessageHiddenEvent = ConversationEvent<{conversation_id: string; message_id: string}> & {
   type: CONVERSATION.MESSAGE_HIDDEN;
+};
+export type ConfirmationEvent = ConversationEvent<{
+  message_id: string;
+  more_message_ids: string[];
+  status: StatusType;
+}> & {
+  type: CONVERSATION.CONFIRMATION;
 };
 export type ButtonActionConfirmationEvent = ConversationEvent<{buttonId: string; messageId: string}> & {
   type: CONVERSATION.BUTTON_ACTION_CONFIRMATION;
@@ -165,14 +193,18 @@ export interface ErrorEvent extends BaseEvent {
   error: string;
   error_code: number | string;
   id: string;
-  type: CONVERSATION;
+  type: CONVERSATION.UNABLE_TO_DECRYPT | CONVERSATION.INCOMING_MESSAGE_TOO_BIG;
 }
 
 export type ClientConversationEvent =
+  | AllVerifiedEvent
   | AssetAddEvent
+  | ErrorEvent
   | CompositeMessageAddEvent
+  | ConfirmationEvent
   | DeleteEvent
   | DeleteEverywhereEvent
+  | DegradedMessageEvent
   | ButtonActionConfirmationEvent
   | KnockEvent
   | IncomingMessageTooBigEvent
@@ -182,6 +214,8 @@ export type ClientConversationEvent =
   | LegalHoldMessageEvent
   | MessageAddEvent
   | MessageHiddenEvent
+  | MemberLeaveEvent
+  | MemberJoinEvent
   | OneToOneCreationEvent
   | VoiceChannelDeactivateEvent
   | FileTypeRestrictedEvent
@@ -427,6 +461,7 @@ export const EventBuilder = {
     return {
       ...buildQualifiedId(conversationEntity),
       data: {
+        content: '',
         sender: senderId,
       },
       from: conversationEntity.selfUser().id,
@@ -464,7 +499,7 @@ export const EventBuilder = {
     };
   },
 
-  buildUnableToDecrypt(event: EventRecord, decryptionError: DecryptionError): ErrorEvent {
+  buildUnableToDecrypt(event: Partial<EventRecord>, decryptionError: DecryptionError): ErrorEvent {
     const {qualified_conversation: conversationId, qualified_from, conversation, data: eventData, from, time} = event;
 
     return {
