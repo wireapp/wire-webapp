@@ -136,7 +136,7 @@ const LoginComponent = ({
     if (defaultSSOCode) {
       navigate(`${ROUTE.SSO}/${defaultSSOCode}`);
     }
-  }, [defaultSSOCode]);
+  }, [defaultSSOCode, navigate]);
 
   useEffect(() => {
     const queryConversationCode = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE) || null;
@@ -196,25 +196,28 @@ const LoginComponent = ({
       if (isBackendError(error)) {
         switch (error.label) {
           case BackendError.LABEL.TOO_MANY_CLIENTS: {
-            resetAuthError();
+            await resetAuthError();
             if (formLoginData?.verificationCode) {
-              doSetLocalStorage(QUERY_KEY.CONVERSATION_CODE, formLoginData.verificationCode);
+              await doSetLocalStorage(QUERY_KEY.CONVERSATION_CODE, formLoginData.verificationCode);
             }
             if (entropy.current) {
-              pushEntropyData(entropy.current);
+              await pushEntropyData(entropy.current);
             }
             navigate(ROUTE.CLIENTS);
             break;
           }
+
           case BackendError.LABEL.CODE_AUTHENTICATION_REQUIRED: {
+            await resetAuthError();
             const login: LoginData = {...formLoginData, clientType: loginData.clientType};
-            if (login.email) {
+            if (login.email || login.handle) {
+              await doSendTwoFactorCode(login.email || login.handle || '');
               setTwoFactorLoginData(login);
-              doSendTwoFactorCode(login.email);
-              doSetLocalStorage(QUERY_KEY.JOIN_EXPIRES, Date.now() + 1000 * 60 * 10);
+              await doSetLocalStorage(QUERY_KEY.JOIN_EXPIRES, Date.now() + 1000 * 60 * 10);
             }
             break;
           }
+
           case BackendError.LABEL.CODE_AUTHENTICATION_FAILED: {
             setTwoFactorSubmitError(error);
             break;
