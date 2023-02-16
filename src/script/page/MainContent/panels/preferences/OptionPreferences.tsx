@@ -51,7 +51,7 @@ const fontSliderOptions = [
   {value: 3, label: RootFontSize.M, heading: t('preferencesOptionsFontSizeDefault')},
   {value: 4, label: RootFontSize.L},
   {value: 5, label: RootFontSize.XL},
-  {value: 6, label: RootFontSize.XXL, heading: t('preferencesOptionsFontSizeDefault')},
+  {value: 6, label: RootFontSize.XXL, heading: t('preferencesOptionsFontSizeLarge')},
 ];
 
 const fontSizes = Object.values(RootFontSize);
