@@ -1233,6 +1233,7 @@
   "userListSelectedContacts": "Selected ({{selectedContacts}})",
   "userNotFoundMessage": "You may not have permission with this account or the person may not be on {{brandName}}.",
   "userNotFoundTitle": "{{brandName}} can’t find this person.",
+  "userNotVerified": "Get certainty about {{user}}’s identity before connecting.",
   "userProfileButtonConnect": "Connect",
   "userProfileButtonIgnore": "Ignore",
   "userProfileButtonUnblock": "Unblock",

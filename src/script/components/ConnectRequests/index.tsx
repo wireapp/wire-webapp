@@ -25,6 +25,7 @@ import {Button, ButtonVariant, IconButton, IconButtonVariant, useMatchMedia} fro
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';
+import {UnverifiedUserWarning} from 'Components/Modals/UserModal';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -129,6 +130,8 @@ const ConnectRequests: FC<ConnectRequestsProps> = ({
                 noBadge
                 noFilter
               />
+
+              <UnverifiedUserWarning user={connectRequest} />
 
               <div className="connect-request-button-group">
                 <Button
