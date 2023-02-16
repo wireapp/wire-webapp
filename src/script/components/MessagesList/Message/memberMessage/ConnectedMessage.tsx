@@ -20,6 +20,7 @@
 import React from 'react';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {Icon} from 'Components/Icon';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';
 import {User} from 'src/script/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -80,6 +81,17 @@ const ConnectedMessage: React.FC<ConnectedMessageProps> = ({
           {t('conversationServicesWarning')}
         </div>
       )}
+
+      <div css={{display: 'flex'}}>
+        <div css={{minWidth: '56px'}}>
+          <Icon.Info />
+        </div>
+
+        <div>
+          <p>{t('conversationNewConversation')}</p>
+          <p>{t('conversationUnverifiedUserWarning')}</p>
+        </div>
+      </div>
     </div>
   );
 };
