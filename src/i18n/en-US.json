@@ -279,6 +279,7 @@
   "conversationConnectionAccepted": "Connected",
   "conversationConnectionBlocked": "Blocked",
   "conversationConnectionCancelRequest": "Cancel connection request",
+  "conversationConnectionVerificationWarning": "Please verify the person's identity before sharing any sensitive information.",
   "conversationContextMenuCopy": "Copy",
   "conversationContextMenuDelete": "Delete for Me…",
   "conversationContextMenuDeleteEveryone": "Delete for Everyone…",

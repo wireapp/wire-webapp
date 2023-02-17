@@ -19,6 +19,8 @@
 
 import React from 'react';
 
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
+
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {Icon} from 'Components/Icon';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';
@@ -66,14 +68,16 @@ const ConnectedMessage: React.FC<ConnectedMessageProps> = ({
       />
 
       {isOutgoingRequest && (
-        <button
-          type="button"
-          className="button-reset-default message-connected-cancel accent-text"
-          onClick={onClickCancelRequest}
-          data-uie-name="do-cancel-request"
-        >
-          {t('conversationConnectionCancelRequest')}
-        </button>
+        <>
+          <div css={{display: 'flex', color: 'var(--danger-color)', fill: 'var(--danger-color)', margin: '2em'}}>
+            <Icon.Info css={{height: '1rem', margin: '0.2em 1em', minWidth: '1rem'}} />
+            <p>{t('conversationConnectionVerificationWarning')}</p>
+          </div>
+
+          <Button variant={ButtonVariant.SECONDARY} onClick={onClickCancelRequest} data-uie-name="do-cancel-request">
+            {t('conversationConnectionCancelRequest')}
+          </Button>
+        </>
       )}
 
       {showServicesWarning && (
@@ -82,16 +86,26 @@ const ConnectedMessage: React.FC<ConnectedMessageProps> = ({
         </div>
       )}
 
-      <div css={{display: 'flex'}}>
-        <div css={{minWidth: '56px'}}>
-          <Icon.Info />
-        </div>
-
-        <div>
+      {!isOutgoingRequest && (
+        <div css={{margin: '56px'}}>
           <p>{t('conversationNewConversation')}</p>
-          <p>{t('conversationUnverifiedUserWarning')}</p>
+          <div css={{display: 'flex', marginTop: '1rem'}}>
+            <div
+              css={{
+                fill: 'var(--text-input-placeholder)',
+                display: 'flex',
+                justifyContent: 'center',
+                left: 0,
+                position: 'absolute',
+                width: '56px',
+              }}
+            >
+              <Icon.Info css={{height: 'var(--font-size-base)', margin: '0.2em', with: 'var(--font-size-base)'}} />
+            </div>
+            <p>{t('conversationUnverifiedUserWarning')}</p>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
