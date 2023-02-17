@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [22.15.5](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@22.15.4...@wireapp/api-client@22.15.5) (2023-02-17)
+
+### Bug Fixes
+
+* Trigger reconnect method on ping pong failure (SQSERVICES-1896) ([#4886](https://github.com/wireapp/wire-web-packages/issues/4886)) ([517049b](https://github.com/wireapp/wire-web-packages/commit/517049bce6ee4ae3c0f96d156e793d1c1829f98d))
+
 ## [22.15.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@22.15.3...@wireapp/api-client@22.15.4) (2023-02-07)
 
 ### Bug Fixes
