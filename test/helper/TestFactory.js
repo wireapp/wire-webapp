@@ -142,12 +142,7 @@ export class TestFactory {
     user.phone(entities.user.john_doe.phone);
 
     this.client_service = new ClientService(this.storage_service);
-    this.client_repository = new ClientRepository(
-      this.client_service,
-      this.cryptography_repository,
-      this.storage_repository,
-      new ClientState(),
-    );
+    this.client_repository = new ClientRepository(this.client_service, this.cryptography_repository, new ClientState());
     this.client_repository.init(user);
 
     const currentClient = new ClientEntity(false, null);
