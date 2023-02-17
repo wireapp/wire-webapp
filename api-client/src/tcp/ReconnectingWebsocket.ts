@@ -161,6 +161,7 @@ export class ReconnectingWebsocket {
       if (this.hasUnansweredPing) {
         this.logger.warn('Ping interval check failed');
         this.stopPinging();
+        this.socket.reconnect();
         return;
       }
       this.hasUnansweredPing = true;
