@@ -186,12 +186,15 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     };
   }, []);
 
-  const callGroupStartedAlert = t(
-    isGroupCall ? 'startedVideoGroupCallingAlert' : 'startedVideoCallingAlert',
+  const callGroupStartedAlert = t(isGroupCall ? 'startedVideoGroupCallingAlert' : 'startedVideoCallingAlert', {
     conversationName,
-  );
+    cameraStatus: t(selfSharesCamera ? 'cameraStatusOn' : 'cameraStatusOff'),
+  });
 
-  const onGoingGroupCallAlert = t(isGroupCall ? 'ongoingGroupVideoCall' : 'ongoingVideoCall', conversationName);
+  const onGoingGroupCallAlert = t(isGroupCall ? 'ongoingGroupVideoCall' : 'ongoingVideoCall', {
+    conversationName,
+    cameraStatus: t(selfSharesCamera ? 'cameraStatusOn' : 'cameraStatusOff'),
+  });
 
   return (
     <div id="video-calling" className="video-calling">
@@ -225,7 +228,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
         <div
           className="video-remote-name"
           aria-label={showAlert ? callGroupStartedAlert : onGoingGroupCallAlert}
-          // aria-label={t(showAlert ? 'startedVideoGroupCallingAlert' : 'ongoingGroupVideoCall', conversationName)}
           tabIndex={TabIndex.FOCUSABLE}
           ref={element => {
             if (showAlert) {

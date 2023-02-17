@@ -266,17 +266,20 @@ const CallingCell: React.FC<CallingCellProps> = ({
     };
   }, [answerOrRejectCall, isIncoming]);
 
-  const call1To1StartedAlert = t(
-    isOutgoingVideoCall ? 'startedVideoCallingAlert' : 'startedAudioCallingAlert',
+  const call1To1StartedAlert = t(isOutgoingVideoCall ? 'startedVideoCallingAlert' : 'startedAudioCallingAlert', {
     conversationName,
-  );
+    cameraStatus: t(selfSharesCamera ? 'cameraStatusOn' : 'cameraStatusOff'),
+  });
 
-  const onGoingCallAlert = t(isOutgoingVideoCall ? 'ongoingVideoCall' : 'ongoingAudioCall', conversationName);
-
-  const callGroupStartedAlert = t(
-    isOutgoingVideoCall ? 'startedVideoGroupCallingAlert' : 'startedGroupCallingAlert',
+  const onGoingCallAlert = t(isOutgoingVideoCall ? 'ongoingVideoCall' : 'ongoingAudioCall', {
     conversationName,
-  );
+    cameraStatus: t(selfSharesCamera ? 'cameraStatusOn' : 'cameraStatusOff'),
+  });
+
+  const callGroupStartedAlert = t(isOutgoingVideoCall ? 'startedVideoGroupCallingAlert' : 'startedGroupCallingAlert', {
+    conversationName,
+    cameraStatus: t(selfSharesCamera ? 'cameraStatusOn' : 'cameraStatusOff'),
+  });
 
   return (
     <div className="conversation-calling-cell">
@@ -377,55 +380,51 @@ const CallingCell: React.FC<CallingCellProps> = ({
 
             <div className="conversation-list-cell-right">
               {(isConnecting || isOngoing) && (
-                <>
-                  <button
-                    className="call-ui__button call-ui__button--red"
-                    onClick={() => callActions.leave(call)}
-                    title={t('videoCallOverlayHangUp')}
-                    type="button"
-                    data-uie-name="do-call-controls-call-leave"
-                  >
-                    <Icon.Hangup className="small-icon" style={{maxWidth: 17}} />
-                  </button>
-                </>
+                <button
+                  className="call-ui__button call-ui__button--red"
+                  onClick={() => callActions.leave(call)}
+                  title={t('videoCallOverlayHangUp')}
+                  type="button"
+                  data-uie-name="do-call-controls-call-leave"
+                >
+                  <Icon.Hangup className="small-icon" style={{maxWidth: 17}} />
+                </button>
               )}
             </div>
           </div>
 
-          <>
-            {(isOngoing || selfHasActiveVideo) && isMinimized && !!videoGrid?.grid?.length && isFullUi ? (
-              <div
-                className="group-video__minimized-wrapper"
-                onClick={handleMinimizedClick}
-                onKeyDown={handleMinimizedKeydown}
-                role="button"
-                tabIndex={TabIndex.FOCUSABLE}
-                aria-label={t('callMaximizeLabel')}
-              >
-                <GroupVideoGrid
-                  grid={activeCallViewTab === CallViewTab.ALL ? videoGrid : {grid: activeSpeakers, thumbnail: null}}
-                  minimized
-                  maximizedParticipant={maximizedParticipant}
-                  selfParticipant={selfParticipant}
-                />
-                {isOngoing && (
-                  <div className="group-video__minimized-wrapper__overlay" data-uie-name="do-maximize-call">
-                    <Icon.Fullscreen />
-                  </div>
-                )}
-              </div>
-            ) : (
-              showNoCameraPreview &&
-              isFullUi && (
-                <div
-                  className="group-video__minimized-wrapper group-video__minimized-wrapper--no-camera-access"
-                  data-uie-name="label-no-camera-access-preview"
-                >
-                  {t('callNoCameraAccess')}
+          {(isOngoing || selfHasActiveVideo) && isMinimized && !!videoGrid?.grid?.length && isFullUi ? (
+            <div
+              className="group-video__minimized-wrapper"
+              onClick={handleMinimizedClick}
+              onKeyDown={handleMinimizedKeydown}
+              role="button"
+              tabIndex={TabIndex.FOCUSABLE}
+              aria-label={t('callMaximizeLabel')}
+            >
+              <GroupVideoGrid
+                grid={activeCallViewTab === CallViewTab.ALL ? videoGrid : {grid: activeSpeakers, thumbnail: null}}
+                minimized
+                maximizedParticipant={maximizedParticipant}
+                selfParticipant={selfParticipant}
+              />
+              {isOngoing && (
+                <div className="group-video__minimized-wrapper__overlay" data-uie-name="do-maximize-call">
+                  <Icon.Fullscreen />
                 </div>
-              )
-            )}
-          </>
+              )}
+            </div>
+          ) : (
+            showNoCameraPreview &&
+            isFullUi && (
+              <div
+                className="group-video__minimized-wrapper group-video__minimized-wrapper--no-camera-access"
+                data-uie-name="label-no-camera-access-preview"
+              >
+                {t('callNoCameraAccess')}
+              </div>
+            )
+          )}
 
           {classifiedDomains && <ClassifiedBar users={userEts} classifiedDomains={classifiedDomains} />}
 
