@@ -51,10 +51,10 @@
     margin-bottom: 40px;
   }
 
-  .context-menu,
-  .time {
-    background-color: var(--app-bg);
-  }
+  // .context-menu,
+  // .time {
+  //   background-color: var(--app-bg);
+  // }
 
   &.hover .time,
   &:hover .time,
@@ -311,13 +311,17 @@
   outline-offset: -0.1rem;
 }
 
+.message-wrapper:hover {
+  background-color: #fff;
+}
+
 .message-mention {
   outline-offset: 0.4rem;
 }
 
 // MESSAGE - BODY
 .message-body {
-  position: relative;
+  // position: relative;
   padding-right: var(--conversation-message-timestamp-width);
   padding-left: @conversation-message-sender-width;
 
@@ -501,100 +505,101 @@
   }
 }
 
-// MESSAGE - ACTIONS
-.message-body-actions {
-  position: absolute;
-  top: 0;
-  right: 0;
-  display: flex;
-  width: var(--conversation-message-timestamp-width);
-  height: 24px;
-  align-items: center;
+// // MESSAGE - ACTIONS
+// .message-body-actions {
+//   align-items: center;
+//   height: 24px;
+//   position: absolute;
+//   right: 0;
+//   top: -0.5rem;
+//   left: 28rem;
+//   width: var(--conversation-message-timestamp-width);
 
-  @media (max-width: @screen-md-min) {
-    height: 45px;
-    flex-direction: column;
-  }
+//   @media (max-width: @screen-md-min) {
+//     height: 45px;
+//     flex-direction: column;
+//   }
 
-  // actions pill
-  .action-pill-style() {
-    z-index: 1;
-    display: flex;
-    height: 16px;
-    align-items: center;
-    opacity: 0;
-    text-decoration: none;
-    transition: opacity, 0.3s;
-  }
+//   // actions pill
+//   .action-pill-style() {
+//     z-index: 1;
+//     display: flex;
+//     height: 16px;
+//     align-items: center;
+//     opacity: 0;
+//     text-decoration: none;
+//     transition: opacity, 0.3s;
+//   }
 
-  // CONTEXT MENU
-  .context-menu {
-    .action-pill-style;
-    .button-icon-secondary;
-    .square(16px);
+//   CONTEXT MENU
+//   .context-menu {
+//     .action-pill-style;
+//     .button-icon-secondary;
+//     .square(16px);
+//     opacity: 1 !important;
 
-    @media (min-width: @screen-md-min) {
-      position: absolute;
-      left: 8px;
-    }
+//     // @media (min-width: @screen-md-min) {
+//     //   position: absolute;
+//     //   left: 8px;
+//     // }
 
-    min-width: 0;
-    min-height: 0;
-    justify-content: center;
+//     min-width: 0;
+//     min-height: 0;
+//     justify-content: center;
 
-    &:focus,
-    &:focus-visible {
-      opacity: 1 !important;
-    }
-  }
+//     &:focus,
+//     &:focus-visible {
+//       opacity: 1 !important;
+//     }
+//   }
 
-  .message-status-read {
-    svg {
-      max-width: 12px;
-      max-height: 12px;
-      fill: currentColor;
-    }
+//   .message-status-read {
+//     svg {
+//       max-width: 12px;
+//       max-height: 12px;
+//       fill: currentColor;
+//     }
 
-    &__count {
-      margin-left: 4px;
-    }
+//     &__count {
+//       margin-left: 4px;
+//     }
 
-    &:focus,
-    &:focus-visible {
-      opacity: 1;
-    }
-  }
+//     &:focus,
+//     &:focus-visible {
+//       opacity: 1;
+//     }
+//   }
 
-  .time,
-  .message-status,
-  .message-status-read {
-    .action-pill-style;
-    color: var(--gray-70);
-    font-size: 12px !important;
-    pointer-events: none;
-    user-select: none;
+//   .time,
+//   .message-status,
+//   .message-status-read {
+//     .action-pill-style;
+//     color: var(--gray-70);
+//     font-size: 12px !important;
+//     pointer-events: none;
+//     user-select: none;
 
-    @media (min-width: @screen-md-min) {
-      position: absolute;
-      bottom: 3px;
-    }
+//     @media (min-width: @screen-md-min) {
+//       position: absolute;
+//       bottom: 3px;
+//     }
 
-    .subline;
+//     .subline;
 
-    body.theme-dark & {
-      color: var(--gray-60);
-    }
+//     body.theme-dark & {
+//       color: var(--gray-60);
+//     }
 
-    &--clickable {
-      cursor: pointer;
-      pointer-events: all;
-    }
-  }
-  .message-status,
-  .message-status-read--visible {
-    opacity: 1;
-  }
-}
+//     &--clickable {
+//       cursor: pointer;
+//       pointer-events: all;
+//     }
+//   }
+//   .message-status,
+//   .message-status-read--visible {
+//     opacity: 1;
+//   }
+// }
 
 @media (min-width: @screen-md-min) {
   .time {
@@ -869,4 +874,12 @@
   path {
     fill: #fff;
   }
+}
+
+.menu-visiable {
+  display: inline-flex;
+}
+
+.menu-hidden {
+  display: none;
 }
