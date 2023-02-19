@@ -10415,24 +10415,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jest-environment-jsdom@npm:29.4.2":
-  version: 29.4.2
-  resolution: "jest-environment-jsdom@npm:29.4.2"
+"jest-environment-jsdom@npm:29.4.3":
+  version: 29.4.3
+  resolution: "jest-environment-jsdom@npm:29.4.3"
   dependencies:
-    "@jest/environment": ^29.4.2
-    "@jest/fake-timers": ^29.4.2
-    "@jest/types": ^29.4.2
+    "@jest/environment": ^29.4.3
+    "@jest/fake-timers": ^29.4.3
+    "@jest/types": ^29.4.3
     "@types/jsdom": ^20.0.0
     "@types/node": "*"
-    jest-mock: ^29.4.2
-    jest-util: ^29.4.2
+    jest-mock: ^29.4.3
+    jest-util: ^29.4.3
     jsdom: ^20.0.0
   peerDependencies:
     canvas: ^2.5.0
   peerDependenciesMeta:
     canvas:
       optional: true
-  checksum: 00e5d4ddada59816494f1dc3b0b3b7a4bf5d185c9cb43c9b3b83ec75ed615410aebbbadd0a81522f6ce55960e7209e409b28191bb1bc47507d1feab0e8bcb0a3
+  checksum: 3fb29bb4b472e05a38fdb235aa936ad469dfa2f6c1cab97fe3d1a7c585351976d05c7bbbd715b9747f070a225dcf10a9166df1461e0fb838ea7a377a8e64bed4
   languageName: node
   linkType: hard
 
@@ -17371,7 +17371,7 @@ __metadata:
     intersection-observer: 0.12.2
     jest: 29.4.3
     jest-canvas-mock: 2.4.0
-    jest-environment-jsdom: 29.4.2
+    jest-environment-jsdom: 29.4.3
     jest-jasmine2: 29.4.2
     jquery: 3.6.3
     js-cookie: 3.0.1
