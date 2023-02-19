@@ -71,7 +71,7 @@
     "@types/highlight.js": "10.1.0",
     "@types/jest": "29.4.0",
     "@types/jquery": "^3",
-    "@types/js-cookie": "3.0.2",
+    "@types/js-cookie": "3.0.3",
     "@types/jsdom": "20.0.1",
     "@types/keyboardjs": "2.5.0",
     "@types/libsodium-wrappers": "^0",
