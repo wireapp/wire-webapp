@@ -140,7 +140,7 @@
     "jest": "29.4.3",
     "jest-canvas-mock": "2.4.0",
     "jest-environment-jsdom": "29.4.3",
-    "jest-jasmine2": "29.4.2",
+    "jest-jasmine2": "29.4.3",
     "jsdom-worker": "0.3.0",
     "less": "3.13.1",
     "less-loader": "^11.1.0",
