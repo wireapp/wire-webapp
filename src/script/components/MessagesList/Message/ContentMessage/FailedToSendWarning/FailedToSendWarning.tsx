@@ -60,28 +60,28 @@ export const FailedToSendWarning = ({failedToSend, knownUsers}: Props) => {
   const namedUsers = generateNamedUsers(knownUsers, failedToSend);
 
   const message =
-    namedUsers.length === 1 ? (
-      <>
-        <Bold>{namedUsers[0].name}</Bold> will receive your message later
-      </>
-    ) : (
-      <>
-        <Bold>{userCount} Participants</Bold> had issues receiving this message
-      </>
-    );
+    namedUsers.length === 1
+      ? {head: namedUsers[0].name, rest: 'will receive your message later'}
+      : {head: `${userCount} Participants`, rest: 'had issues receiving this message'};
 
   return (
     <div>
-      <p css={warning}>{message}</p>
+      <p css={warning}>
+        <Bold css={warning}>{message.head}</Bold> {message.rest}
+      </p>
       {showToggle && (
         <>
           {isOpen && (
             <p css={warning}>
-              {namedUsers.map(user => (
-                <span data-uie-name="recipient" data-uie-value={user.id.id} key={user.id.id}>
-                  {user.name}
-                </span>
-              ))}
+              {namedUsers
+                .map(user => (
+                  <span data-uie-name="recipient" data-uie-value={user.id.id} key={user.id.id}>
+                    {user.name}
+                  </span>
+                ))
+                .reduce((prev, element) => {
+                  return prev.length === 0 ? [element] : [...prev, ', ', element];
+                }, [] as any[])}
             </p>
           )}
           <Button type="button" variant={ButtonVariant.TERTIARY} onClick={() => setIsOpen(!isOpen)}>
