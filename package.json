@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "@emotion/react": "11.10.6",
-    "@types/eslint": "^8.21.1",
+    "@types/eslint": "8.4.10",
     "@wireapp/avs": "9.0.21",
     "@wireapp/core": "38.13.2",
     "@wireapp/lru-cache": "3.8.1",
@@ -65,7 +65,6 @@
     "@types/caniuse-lite": "^1.0.1",
     "@types/classnames": "2.3.1",
     "@types/dexie-batch": "0.4.3",
-    "@types/eslint-scope": "^3.7.4",
     "@types/fs-extra": "11.0.1",
     "@types/generate-changelog": "1.8.1",
     "@types/highlight.js": "10.1.0",
