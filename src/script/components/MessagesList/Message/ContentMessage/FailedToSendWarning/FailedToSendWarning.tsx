@@ -24,6 +24,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {Bold, Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
+import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {warning} from './FailedToSendWarning.styles';
@@ -34,17 +35,29 @@ type Props = {
   knownUsers: User[];
 };
 
-function generateNamedUsers(users: User[], userClients: QualifiedUserClients): User[] {
-  return Object.entries(userClients).reduce<User[]>((namedUsers, [domain, domainUsers]) => {
-    const domainNamedUsers = Object.keys(domainUsers).reduce<User[]>((domainNamedUsers, userId) => {
-      const user = users.find(user => matchQualifiedIds(user.id, {id: userId, domain}));
-      if (user) {
-        return [...domainNamedUsers, user];
-      }
-      return domainNamedUsers;
-    }, []);
-    return [...namedUsers, ...domainNamedUsers];
-  }, []);
+type ParsedUsers = {namedUsers: User[]; unknownUsers: QualifiedId[]};
+
+function generateNamedUsers(users: User[], userClients: QualifiedUserClients): ParsedUsers {
+  return Object.entries(userClients).reduce<ParsedUsers>(
+    (namedUsers, [domain, domainUsers]) => {
+      const domainNamedUsers = Object.keys(domainUsers).reduce<ParsedUsers>(
+        (domainNamedUsers, userId) => {
+          const user = users.find(user => matchQualifiedIds(user.id, {id: userId, domain}));
+          if (user) {
+            domainNamedUsers.namedUsers.push(user);
+          } else {
+            domainNamedUsers.unknownUsers.push({id: userId, domain});
+          }
+          return domainNamedUsers;
+        },
+        {namedUsers: [], unknownUsers: []},
+      );
+      namedUsers.namedUsers.push(...domainNamedUsers.namedUsers);
+      namedUsers.unknownUsers.push(...domainNamedUsers.unknownUsers);
+      return namedUsers;
+    },
+    {namedUsers: [], unknownUsers: []},
+  );
 }
 
 export const FailedToSendWarning = ({failedToSend, knownUsers}: Props) => {
@@ -57,12 +70,15 @@ export const FailedToSendWarning = ({failedToSend, knownUsers}: Props) => {
 
   const showToggle = userCount > 1;
 
-  const namedUsers = generateNamedUsers(knownUsers, failedToSend);
+  const {namedUsers} = generateNamedUsers(knownUsers, failedToSend);
 
   const message =
     namedUsers.length === 1
-      ? {head: namedUsers[0].name, rest: 'will receive your message later'}
-      : {head: `${userCount} Participants`, rest: 'had issues receiving this message'};
+      ? {head: namedUsers[0].name, rest: t('messageFailedToSendToOne')}
+      : {
+          head: t('messageFailedToSendParticipants', {count: userCount.toString()}),
+          rest: t('messageFailedToSendToSome'),
+        };
 
   return (
     <div>
@@ -82,6 +98,7 @@ export const FailedToSendWarning = ({failedToSend, knownUsers}: Props) => {
                 .reduce((prev, element) => {
                   return prev.length === 0 ? [element] : [...prev, ', ', element];
                 }, [] as any[])}
+              {` ${t('messageFailedToSendWillReceive')}`}
             </p>
           )}
           <Button type="button" variant={ButtonVariant.TERTIARY} onClick={() => setIsOpen(!isOpen)}>

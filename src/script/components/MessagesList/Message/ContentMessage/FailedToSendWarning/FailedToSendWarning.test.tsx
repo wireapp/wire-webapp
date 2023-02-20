@@ -20,11 +20,14 @@
 import {act, render} from '@testing-library/react';
 import type {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 
+import en from 'I18n/en-US.json';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {setStrings} from 'Util/LocalizerUtil';
 import {createRandomUuid} from 'Util/util';
 
 import {FailedToSendWarning, User} from './FailedToSendWarning';
 
+setStrings({en});
 function generateUsers(nbUsers: number, domain: string) {
   const users: User[] = [];
   for (let i = 0; i < nbUsers; i++) {
