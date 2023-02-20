@@ -49,8 +49,8 @@ describe('FailedToSendWarning', () => {
     const users = generateUsers(nbUsers, 'domain');
 
     const failedToSend = generateUserClients(users);
-    const {getByText} = render(withTheme(<FailedToSendWarning knownUsers={[]} failedToSend={failedToSend} />));
-    expect(getByText(`${nbUsers} Participants had issues receiving this message`)).not.toBeNull();
+    const {container} = render(withTheme(<FailedToSendWarning knownUsers={[]} failedToSend={failedToSend} />));
+    expect(container.textContent).toContain(`${nbUsers} Participants had issues receiving this message`);
   });
 
   it('displays the number of users that did not get the message across multiple domains', () => {
@@ -63,21 +63,21 @@ describe('FailedToSendWarning', () => {
       ...generateUserClients(users1),
       ...generateUserClients(users2),
     };
-    const {getByText} = render(withTheme(<FailedToSendWarning knownUsers={[]} failedToSend={failedToSend} />));
-    expect(
-      getByText(`${nbUsersDomain1 + nbUsersDomain2} Participants had issues receiving this message`),
-    ).not.toBeNull();
+    const {container} = render(withTheme(<FailedToSendWarning knownUsers={[]} failedToSend={failedToSend} />));
+    expect(container.textContent).toContain(
+      `${nbUsersDomain1 + nbUsersDomain2} Participants had issues receiving this message`,
+    );
   });
 
   it('does not show the extra info toggle if there is only a single user', () => {
     const users = generateUsers(1, 'domain');
     const failedToSend = generateUserClients(users);
-    const {queryByText, getByText} = render(
+    const {queryByText, container} = render(
       withTheme(<FailedToSendWarning knownUsers={users} failedToSend={failedToSend} />),
     );
 
     expect(queryByText('Show details')).toBeNull();
-    expect(getByText(`${users[0].name} will receive your message later`)).not.toBeNull();
+    expect(container.textContent).toContain(`${users[0].name} will receive your message later`);
   });
 
   it('toggles the extra info', () => {
