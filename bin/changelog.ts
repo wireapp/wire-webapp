@@ -22,7 +22,8 @@ const branchName = args[0];
 void (async () => {
   const tags = await simpleGit().tags({'--list': null});
   const outputPath = path.join(__dirname, '../CHANGELOG.md');
-  const productionTags = tags.all.filter(tag => tag.includes('-production.'));
+  const lookupTag = branchName === 'dev' ? 'staging' : 'production';
+  const productionTags = tags.all.filter(tag => tag.includes(`-${lookupTag}.`));
 
   const newProductionTag = productionTags.sort().reverse()[0];
   const lastProductionTag = productionTags.sort().reverse()[1];
