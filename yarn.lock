@@ -2377,9 +2377,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@formatjs/cli@npm:5.1.12":
-  version: 5.1.12
-  resolution: "@formatjs/cli@npm:5.1.12"
+"@formatjs/cli@npm:6.0.1":
+  version: 6.0.1
+  resolution: "@formatjs/cli@npm:6.0.1"
   peerDependencies:
     "@vue/compiler-sfc": ^3.2.34
   peerDependenciesMeta:
@@ -2387,7 +2387,7 @@ __metadata:
       optional: true
   bin:
     formatjs: bin/formatjs
-  checksum: a76c5995078aebc750b58ae049dae0118e265054e4b9c004e45efcf42086138267fa7ab35a5161f027a5c79eef1ea8e5897073a70dfa1dd93b99023a73c280f9
+  checksum: 828df70ed698259c547b8161d3bb14c23188a1bfedaccfa1669c76cf75fdab4605ab180d757d593f53d677495b0fca8becde2518fe6d4fe515ccc0c439a69c2a
   languageName: node
   linkType: hard
 
@@ -16876,7 +16876,7 @@ __metadata:
     "@emotion/eslint-plugin": ^11.10.0
     "@emotion/react": 11.10.6
     "@faker-js/faker": 7.6.0
-    "@formatjs/cli": 5.1.12
+    "@formatjs/cli": 6.0.1
     "@koush/wrtc": 0.5.3
     "@testing-library/react": 14.0.0
     "@types/adm-zip": 0.5.0
