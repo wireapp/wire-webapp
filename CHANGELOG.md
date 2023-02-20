@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [38.14.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.13.2...@wireapp/core@38.14.0) (2023-02-20)
+
+### Features
+
+* user leaves mls conference call [FS-1288] ([#4834](https://github.com/wireapp/wire-web-packages/issues/4834)) ([fe31c0a](https://github.com/wireapp/wire-web-packages/commit/fe31c0a4da091a137d9633f8b50dbbac70cfc45a))
+
 ## [38.13.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.13.1...@wireapp/core@38.13.2) (2023-02-17)
 
 **Note:** Version bump only for package @wireapp/core
