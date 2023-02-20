@@ -78,7 +78,7 @@ jobs:
       - name: Test
         run: |
           set -o pipefail
-          yarn test --coverage --coverage-reporters=lcov --detectOpenHandles=false | tee ./unit-tests.log
+          yarn test --coverage --coverage-reporters=lcov --detectOpenHandles=false 2>&1 | tee ./unit-tests.log
 
       - name: Monitor coverage
         uses: codecov/codecov-action@v3.1.1
