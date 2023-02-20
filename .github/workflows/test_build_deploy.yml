@@ -188,7 +188,7 @@ jobs:
 
       - name: Generate changelog for production release
         if: contains(env.TAG, 'production')
-        run: yarn changelog:ci
+        run: yarn changelog:production
 
       - name: Create GitHub production release
         id: create_release_production
@@ -215,7 +215,7 @@ jobs:
 
       - name: Generate changelog for staging release
         if: contains(env.TAG, 'staging')
-        run: yarn changelog:dev
+        run: yarn changelog:staging
 
       - name: Create GitHub staging release
         id: create_release_staging
