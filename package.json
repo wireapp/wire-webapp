@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "@emotion/react": "11.10.6",
-    "@types/eslint": "^8.4.10",
+    "@types/eslint": "^8.21.1",
     "@wireapp/avs": "9.0.21",
     "@wireapp/core": "38.13.2",
     "@wireapp/lru-cache": "3.8.1",
@@ -110,7 +110,7 @@
     "dexie": "^3.2.2",
     "dotenv": "16.0.3",
     "dpdm": "3.12.0",
-    "eslint": "^8.33.0",
+    "eslint": "^8.34.0",
     "eslint-config-prettier": "^8.6.0",
     "eslint-import-resolver-alias": "^1.1.2",
     "eslint-import-resolver-typescript": "^3.5.3",
