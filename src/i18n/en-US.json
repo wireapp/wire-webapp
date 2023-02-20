@@ -422,7 +422,7 @@
   "conversationUnableToDecryptErrorMessage": "Error",
   "conversationUnableToDecryptLink": "Why?",
   "conversationUnableToDecryptResetSession": "Reset session",
-  "conversationUnverifiedUserWarning": "Please still be careful with who you share sensitive information.",
+  "conversationUnverifiedUserWarning": "Please still be careful with whom you share sensitive information.",
   "conversationUpdatedTimer": " set the message timer to {{time}}",
   "conversationUpdatedTimerYou": " set the message timer to {{time}}",
   "conversationVideoAssetRestricted": "Receiving videos is prohibited",

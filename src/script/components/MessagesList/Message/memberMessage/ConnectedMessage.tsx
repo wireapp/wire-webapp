@@ -22,8 +22,8 @@ import React from 'react';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import {Icon} from 'Components/Icon';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';
+import {UnverifiedUserWarning} from 'Components/Modals/UserModal';
 import {User} from 'src/script/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -69,9 +69,8 @@ const ConnectedMessage: React.FC<ConnectedMessageProps> = ({
 
       {isOutgoingRequest && (
         <>
-          <div css={{display: 'flex', color: 'var(--danger-color)', fill: 'var(--danger-color)', margin: '2em'}}>
-            <Icon.Info css={{height: '1rem', margin: '0.2em 1em', minWidth: '1rem'}} />
-            <p>{t('conversationConnectionVerificationWarning')}</p>
+          <div css={{margin: '2em'}}>
+            <UnverifiedUserWarning />
           </div>
 
           <Button variant={ButtonVariant.SECONDARY} onClick={onClickCancelRequest} data-uie-name="do-cancel-request">
@@ -83,27 +82,6 @@ const ConnectedMessage: React.FC<ConnectedMessageProps> = ({
       {showServicesWarning && (
         <div className="message-services-warning" data-uie-name="label-services-warning">
           {t('conversationServicesWarning')}
-        </div>
-      )}
-
-      {!isOutgoingRequest && (
-        <div css={{margin: '56px'}}>
-          <p>{t('conversationNewConversation')}</p>
-          <div css={{display: 'flex', marginTop: '1rem'}}>
-            <div
-              css={{
-                fill: 'var(--text-input-placeholder)',
-                display: 'flex',
-                justifyContent: 'center',
-                left: 0,
-                position: 'absolute',
-                width: '56px',
-              }}
-            >
-              <Icon.Info css={{height: 'var(--font-size-base)', margin: '0.2em', with: 'var(--font-size-base)'}} />
-            </div>
-            <p>{t('conversationUnverifiedUserWarning')}</p>
-          </div>
         </div>
       )}
     </div>

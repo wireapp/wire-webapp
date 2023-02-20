@@ -102,17 +102,17 @@ const UserModalUserActionsSection: React.FC<UserModalUserActionsSectionProps> = 
 };
 
 interface UnverifiedUserWarningProps {
-  user: User;
+  user?: User;
 }
 
 export const UnverifiedUserWarning: React.FC<UnverifiedUserWarningProps> = ({user}) => {
   return (
-    <div css={{display: 'flex', color: 'var(--danger-color)', fill: 'var(--danger-color)', marginBottom: '1em'}}>
-      <Icon.Info css={{height: '1rem', margin: '0.2em 1em', minWidth: '1rem'}} />
+    <div css={{display: 'flex', color: 'var(--danger-color)', fill: 'var(--danger-color)', margin: '1em 0'}}>
+      <Icon.Info css={{height: '1rem', margin: '0.15em 1em', minWidth: '1rem'}} />
       <p css={{fontSize: 'var(--font-size-medium)'}}>
-        {t('userNotVerified', {user: user.name()})}
+        {user ? t('userNotVerified', {user: user.name()}) : t('conversationConnectionVerificationWarning')}
         <Link
-          css={{fontSize: 'var(--font-size-medium)', margin: '0 1em'}}
+          css={{fontSize: 'var(--font-size-medium)', margin: '0 0.2em'}}
           variant={LinkVariant.PRIMARY}
           targetBlank
           href={getPrivacyUnverifiedUsersUrl()}

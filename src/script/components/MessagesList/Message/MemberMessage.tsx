@@ -176,6 +176,16 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
           )}
         </>
       )}
+      <div className="message-header">
+        <div className="message-header-icon" />
+        <p className="message-header-label">{t('conversationNewConversation')}</p>
+      </div>
+      <div className="message-header">
+        <div className="message-header-icon message-header-icon--svg text-foreground">
+          <Icon.Info />
+        </div>
+        <p className="message-header-label">{t('conversationUnverifiedUserWarning')}</p>
+      </div>
     </>
   );
 };

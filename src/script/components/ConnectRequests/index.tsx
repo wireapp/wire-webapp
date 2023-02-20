@@ -131,7 +131,7 @@ const ConnectRequests: FC<ConnectRequestsProps> = ({
                 noFilter
               />
 
-              <UnverifiedUserWarning user={connectRequest} />
+              <UnverifiedUserWarning />
 
               <div className="connect-request-button-group">
                 <Button
