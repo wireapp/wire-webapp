@@ -219,6 +219,8 @@ describe('CallingViewModel', () => {
         groupId: mockSubGroupId,
       });
 
+      // Wait for all the callback queue tasks to be executed so we know that the function was not called.
+      // Without this, test will always succeed (even without unsubscribing to epoch changes) because the function was not called YET.
       await new Promise(r => setTimeout(r, 0));
       expect(mockCallingRepository.setEpochInfo).not.toHaveBeenCalledWith(
         conversationId,
