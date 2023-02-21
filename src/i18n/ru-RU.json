@@ -229,7 +229,7 @@
   "callAccept": "Принять",
   "callChooseSharedScreen": "Выберите экран для совместного использования",
   "callChooseSharedWindow": "Выберите окно для совместного использования",
-  "callConversationAcceptOrDecline": "Вызывает {{conversationName}}. Нажмите Enter, чтобы принять или Escape, чтобы отклонить вызов.",
+  "callConversationAcceptOrDecline": "Вызывает {{conversationName}}. Нажмите control + enter, чтобы принять или control + shift + enter, чтобы отклонить вызов.",
   "callDecline": "Отклонить",
   "callDegradationAction": "OK",
   "callDegradationDescription": "Вызов был прерван, поскольку {{username}} больше не является верифицированным контактом.",
