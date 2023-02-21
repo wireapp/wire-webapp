@@ -237,7 +237,7 @@ export class CallingViewModel {
     };
 
     const leaveCall = async (conversationId: QualifiedId) => {
-      const conversation = this.conversationState.findConversation(conversationId);
+      const conversation = this.getConversationById(conversationId);
 
       if (!conversation?.isUsingMLSProtocol) {
         return;

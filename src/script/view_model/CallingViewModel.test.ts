@@ -101,6 +101,10 @@ describe('CallingViewModel', () => {
   });
 
   describe('MLS conference call', () => {
+    beforeAll(() => {
+      jest.useRealTimers();
+    });
+
     it('updates epoch info after initiating a call', async () => {
       const mockParentGroupId = 'mockParentGroupId1';
       const mockSubGroupId = 'mockSubGroupId1';
@@ -140,7 +144,7 @@ describe('CallingViewModel', () => {
       );
 
       const callingViewModel = buildCallingViewModel();
-      const conversationId = {domain: 'example.com', id: 'conversation1'};
+      const conversationId = {domain: 'example.com', id: 'conversation2'};
 
       const call = buildCall(conversationId, CONV_TYPE.CONFERENCE_MLS);
 
@@ -168,7 +172,7 @@ describe('CallingViewModel', () => {
       );
 
       const callingViewModel = buildCallingViewModel();
-      const conversationId = {domain: 'example.com', id: 'conversation1'};
+      const conversationId = {domain: 'example.com', id: 'conversation3'};
       const call = buildCall(conversationId, CONV_TYPE.CONFERENCE_MLS);
 
       await callingViewModel.callActions.answer(call);
@@ -203,6 +207,28 @@ describe('CallingViewModel', () => {
           expectedMemberListResult,
         );
       });
+
+      // once we leave the call, we stop listening to the mls service events
+      await waitFor(() => {
+        callingViewModel.callingRepository.leaveCall(conversationId, LEAVE_CALL_REASON.MANUAL_LEAVE_BY_UI_CLICK);
+      });
+
+      const anotherEpochNumber = 3;
+      callingViewModel.mlsService.emit('newEpoch', {
+        epoch: anotherEpochNumber,
+        groupId: mockSubGroupId,
+      });
+
+      await new Promise(r => setTimeout(r, 0));
+      expect(mockCallingRepository.setEpochInfo).not.toHaveBeenCalledWith(
+        conversationId,
+        {
+          epoch: anotherEpochNumber,
+          keyLength: mockKeyLength,
+          secretKey: mockSecretKey,
+        },
+        expectedMemberListResult,
+      );
     });
   });
 });
