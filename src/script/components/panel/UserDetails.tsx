@@ -20,11 +20,13 @@
 import React, {useEffect} from 'react';
 
 import {amplify} from 'amplify';
+import {ErrorBoundary} from 'react-error-boundary';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {AvailabilityState} from 'Components/AvailabilityState';
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {ErrorFallback} from 'Components/ErrorFallback';
 import {Icon} from 'Components/Icon';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -41,7 +43,7 @@ export interface UserDetailsProps {
   participant: User;
 }
 
-const UserDetails: React.FC<UserDetailsProps> = ({
+const UserDetailsComponent: React.FC<UserDetailsProps> = ({
   badge,
   participant,
   isSelfVerified,
@@ -62,8 +64,8 @@ const UserDetails: React.FC<UserDetailsProps> = ({
     amplify.publish(WebAppEvents.USER.UPDATE, participant.qualifiedId);
   }, [participant]);
 
-  const isFederated = participant.isFederated;
-  const isGuest = !isFederated && participant.isGuest();
+  const isFederated = user.isFederated;
+  const isGuest = !isFederated && user.isGuest;
 
   return (
     <div className="panel-participant">
@@ -144,6 +146,14 @@ const UserDetails: React.FC<UserDetailsProps> = ({
         </div>
       )}
     </div>
+  );
+};
+
+const UserDetails: React.FC<UserDetailsProps> = props => {
+  return (
+    <ErrorBoundary FallbackComponent={ErrorFallback}>
+      <UserDetailsComponent {...props} />
+    </ErrorBoundary>
   );
 };
 
