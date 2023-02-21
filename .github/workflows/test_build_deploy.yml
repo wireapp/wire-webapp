@@ -76,7 +76,9 @@ jobs:
         run: yarn --immutable
 
       - name: Test
-        run: yarn test --coverage --coverage-reporters=lcov --detectOpenHandles=false | tee ./unit-tests.log
+        run: |
+          set -o pipefail
+          yarn test --coverage --coverage-reporters=lcov --detectOpenHandles=false 2>&1 | tee ./unit-tests.log
 
       - name: Monitor coverage
         uses: codecov/codecov-action@v3.1.1
@@ -188,7 +190,7 @@ jobs:
 
       - name: Generate changelog for production release
         if: contains(env.TAG, 'production')
-        run: yarn changelog:ci
+        run: yarn changelog:production
 
       - name: Create GitHub production release
         id: create_release_production
@@ -215,7 +217,7 @@ jobs:
 
       - name: Generate changelog for staging release
         if: contains(env.TAG, 'staging')
-        run: yarn changelog:dev
+        run: yarn changelog:staging
 
       - name: Create GitHub staging release
         id: create_release_staging
@@ -238,7 +240,6 @@ jobs:
           email: ${{secrets.WIRE_BOT_EMAIL}}
           password: ${{secrets.WIRE_BOT_PASSWORD}}
           conversation: '697c93e8-0b13-4204-a35e-59270462366a'
-          send_gif: 'in the oven'
           send_text: 'Staging bump for commit **${{github.sha}}** ("${{env.TITLE}}") done! 🏁'
 
       - name: Notify CI error

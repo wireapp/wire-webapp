@@ -23,11 +23,14 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
+import {Link, LinkVariant} from '@wireapp/react-ui-kit';
+
 import {Icon} from 'Components/Icon';
 import {ModalComponent} from 'Components/ModalComponent';
 import {EnrichedFields} from 'Components/panel/EnrichedFields';
 import {UserActions} from 'Components/panel/UserActions';
 import {UserDetails} from 'Components/panel/UserDetails';
+import {getPrivacyUnverifiedUsersUrl} from 'src/script/externalRoute';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
@@ -98,6 +101,29 @@ const UserModalUserActionsSection: React.FC<UserModalUserActionsSectionProps> = 
   );
 };
 
+interface UnverifiedUserWarningProps {
+  user?: User;
+}
+
+export const UnverifiedUserWarning: React.FC<UnverifiedUserWarningProps> = ({user}) => {
+  return (
+    <div css={{display: 'flex', color: 'var(--danger-color)', fill: 'var(--danger-color)', margin: '1em 0'}}>
+      <Icon.Info css={{height: '1rem', margin: '0.15em 1em', minWidth: '1rem'}} />
+      <p css={{fontSize: 'var(--font-size-medium)'}}>
+        {user ? t('userNotVerified', {user: user.name()}) : t('conversationConnectionVerificationWarning')}
+        <Link
+          css={{fontSize: 'var(--font-size-medium)', margin: '0 0.2em'}}
+          variant={LinkVariant.PRIMARY}
+          targetBlank
+          href={getPrivacyUnverifiedUsersUrl()}
+        >
+          {t('modalUserLearnMore')}
+        </Link>
+      </p>
+    </div>
+  );
+};
+
 const UserModal: React.FC<UserModalProps> = ({
   userRepository,
   core = container.resolve(Core),
@@ -120,6 +146,7 @@ const UserModal: React.FC<UserModalProps> = ({
   };
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
   const {self, isActivatedAccount} = useKoSubscribableChildren(userState, ['self', 'isActivatedAccount']);
+  const {is_trusted: isTrusted} = useKoSubscribableChildren(self, ['is_trusted']);
   const {is_verified: isSelfVerified} = useKoSubscribableChildren(self, ['is_verified']);
   const isFederated = core.backendFeatures?.isFederated;
 
@@ -174,6 +201,8 @@ const UserModal: React.FC<UserModalProps> = ({
               <UserDetails participant={user} isSelfVerified={isSelfVerified} classifiedDomains={classifiedDomains} />
 
               <EnrichedFields user={user} showDomain={isFederated} />
+
+              {!isTrusted && <UnverifiedUserWarning user={user} />}
 
               <UserModalUserActionsSection
                 user={user}

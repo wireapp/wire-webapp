@@ -36,7 +36,7 @@ import {ClassifiedBar} from 'Components/input/ClassifiedBar';
 import {ParticipantItem} from 'Components/list/ParticipantItem';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {isEnterKey, isEscapeKey, KEY} from 'Util/KeyboardUtil';
+import {isEnterKey, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
@@ -229,17 +229,14 @@ const CallingCell: React.FC<CallingCellProps> = ({
 
   const answerOrRejectCall = useCallback(
     (event: KeyboardEvent) => {
-      event.preventDefault();
-      event.stopPropagation();
-
       const removeEventListener = () => window.removeEventListener('keydown', answerOrRejectCall);
 
-      if (isEnterKey(event)) {
+      if (!event.shiftKey && event.ctrlKey && isEnterKey(event)) {
         answerCall();
         removeEventListener();
       }
 
-      if (isEscapeKey(event)) {
+      if (event.ctrlKey && event.shiftKey && isEnterKey(event)) {
         callActions.reject(call);
         removeEventListener();
       }
