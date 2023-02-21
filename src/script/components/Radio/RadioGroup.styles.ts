@@ -64,6 +64,7 @@ export const radioLabelStyles = (isDisabled: boolean): CSSObject => ({
 
 export const radioOptionStyles: CSSObject = {
   marginBottom: '20px',
+  position: 'relative',
   ['&:last-child']: {
     marginBottom: 0,
   },
