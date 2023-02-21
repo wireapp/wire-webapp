@@ -229,7 +229,7 @@
   "callAccept": "Pieņemt",
   "callChooseSharedScreen": "Izvēlieties ekrānu, ar kuru dalīties",
   "callChooseSharedWindow": "Choose a window to share",
-  "callConversationAcceptOrDecline": "{{conversationName}} is calling. Press enter to accept the call or press escape to decline the call.",
+  "callConversationAcceptOrDecline": "{{conversationName}} is calling. Press control + enter to accept the call or press control + shift + enter to decline the call.",
   "callDecline": "Noraidīt",
   "callDegradationAction": "OK",
   "callDegradationDescription": "The call was disconnected because {{username}} is no longer a verified contact.",
