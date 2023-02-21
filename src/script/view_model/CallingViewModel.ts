@@ -239,12 +239,7 @@ export class CallingViewModel {
     const leaveCall = async (conversationId: QualifiedId) => {
       const conversation = this.conversationState.findConversation(conversationId);
 
-      if (!conversation?.isUsingMLSProtocol || !conversation.groupId) {
-        return;
-      }
-
-      const isMLSConversationEstablished = await this.mlsService.conversationExists(conversation.groupId);
-      if (!isMLSConversationEstablished) {
+      if (!conversation?.isUsingMLSProtocol) {
         return;
       }
 
