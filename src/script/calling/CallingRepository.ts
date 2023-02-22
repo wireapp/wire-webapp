@@ -132,7 +132,7 @@ export class CallingRepository {
   private avsVersion: number = 0;
   private incomingCallCallback: (call: Call) => void;
   private requestNewEpochCallback: (conversationId: QualifiedId) => void;
-  private leaveCallCallback: (conversationId: QualifiedId) => void;
+  private callClosedCallback: (conversationId: QualifiedId) => void;
   private callParticipantChangedCallback: (conversationId: QualifiedId, members: QualifiedWcallMember[]) => void;
   private isReady: boolean = false;
   /** will cache the query to media stream (in order to avoid asking the system for streams multiple times when we have multiple peers) */
@@ -172,7 +172,7 @@ export class CallingRepository {
     this.logger = getLogger('CallingRepository');
     this.incomingCallCallback = () => {};
     this.requestNewEpochCallback = () => {};
-    this.leaveCallCallback = () => {};
+    this.callClosedCallback = () => {};
     this.callParticipantChangedCallback = () => {};
     this.callLog = [];
 
@@ -418,8 +418,8 @@ export class CallingRepository {
     this.incomingCallCallback = callback;
   }
 
-  onLeaveCall(callback: (conversationId: QualifiedId) => void): void {
-    this.leaveCallCallback = callback;
+  onCallClosed(callback: (conversationId: QualifiedId) => void): void {
+    this.callClosedCallback = callback;
   }
 
   onRequestNewEpochCallback(callback: (conversationId: QualifiedId) => void): void {
@@ -889,6 +889,7 @@ export class CallingRepository {
       convid: serializedConversationId,
       clients: members,
     };
+
     return this.wCall?.setEpochInfo(
       this.wUser,
       serializedConversationId,
@@ -932,8 +933,6 @@ export class CallingRepository {
     const conversationIdStr = this.serializeQualifiedId(conversationId);
     delete this.poorCallQualityUsers[conversationIdStr];
     this.wCall?.end(this.wUser, conversationIdStr);
-
-    this.leaveCallCallback(conversationId);
   };
 
   muteCall(call: Call, shouldMute: boolean, reason?: MuteState): void {
@@ -1267,6 +1266,8 @@ export class CallingRepository {
     if (!call) {
       return;
     }
+
+    this.callClosedCallback(conversationId);
 
     if (reason === REASON.NORMAL) {
       this.callState.selectableScreens([]);

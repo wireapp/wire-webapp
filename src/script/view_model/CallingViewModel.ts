@@ -236,6 +236,17 @@ export class CallingViewModel {
       this.callingRepository.setEpochInfo(conversationId, {epoch, keyLength, secretKey}, members);
     };
 
+    const leaveCall = async (conversationId: QualifiedId) => {
+      const conversation = this.getConversationById(conversationId);
+
+      if (!conversation?.isUsingMLSProtocol) {
+        return;
+      }
+
+      await this.mlsService.leaveConferenceSubconversation(conversationId);
+      callingSubscriptions.removeCall(conversationId);
+    };
+
     this.callingRepository.onIncomingCall(async (call: Call) => {
       const shouldRing = this.selfUser().availability() !== Availability.Type.AWAY;
       if (shouldRing && (!hasSoundlessCallsEnabled() || !hasJoinedCall())) {
@@ -316,8 +327,8 @@ export class CallingViewModel {
     //update epoch info when AVS requests new epoch
     this.callingRepository.onRequestNewEpochCallback(conversationId => updateEpochInfo(conversationId, true));
 
-    //once we leave a call, we unsubscribe from all the events we've subscribed to during this call
-    this.callingRepository.onLeaveCall(callingSubscriptions.removeCall);
+    //once the call gets closed (eg. we leave a call or get dropped), we remove ourselfes from subconversation and unsubscribe from all the call events
+    this.callingRepository.onCallClosed(leaveCall);
 
     //handle participant change avs callback to detect stale clients in subconversations
     this.callingRepository.onCallParticipantChangedCallback(handleCallParticipantChange);

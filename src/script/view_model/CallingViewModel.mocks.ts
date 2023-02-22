@@ -28,17 +28,20 @@ import {CallingViewModel} from './CallingViewModel';
 import {Call} from '../calling/Call';
 import {CallingRepository} from '../calling/CallingRepository';
 import {CallState} from '../calling/CallState';
+import {Conversation} from '../entity/Conversation';
 import {Core} from '../service/CoreSingleton';
+
+let callClosedCallback: (conversationId: QualifiedId) => void = (conversationId: QualifiedId) => {};
 
 export const mockCallingRepository = {
   startCall: jest.fn(),
   answerCall: jest.fn(),
-  leaveCall: jest.fn(),
   onIncomingCall: jest.fn(),
   onRequestClientsCallback: jest.fn(),
   onRequestNewEpochCallback: jest.fn(),
   onCallParticipantChangedCallback: jest.fn(),
-  onLeaveCall: jest.fn(),
+  onCallClosed: jest.fn().mockImplementation(callback => (callClosedCallback = callback)),
+  leaveCall: jest.fn().mockImplementation(conversationId => callClosedCallback(conversationId)),
   setEpochInfo: jest.fn(),
 } as unknown as CallingRepository;
 
@@ -54,7 +57,7 @@ export function buildCall(conversationId: string | QualifiedId, convType = CONV_
 const mockCore = container.resolve(Core);
 
 export function buildCallingViewModel() {
-  return new CallingViewModel(
+  const callingViewModel = new CallingViewModel(
     mockCallingRepository,
     {} as any,
     {} as any,
@@ -69,6 +72,12 @@ export function buildCallingViewModel() {
     undefined,
     mockCore,
   );
+
+  jest
+    .spyOn(callingViewModel, 'getConversationById')
+    .mockImplementation(() => ({isUsingMLSProtocol: true} as Conversation));
+
+  return callingViewModel;
 }
 
 export const prepareMLSConferenceMocks = (parentGroupId: string, subGroupId: string) => {
