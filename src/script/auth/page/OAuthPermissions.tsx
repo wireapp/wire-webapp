@@ -17,15 +17,15 @@
  *
  */
 
-import React, {useEffect} from 'react';
+import React from 'react';
 
-import {ClientType} from '@wireapp/api-client/lib/client/index';
+// import {ClientType} from '@wireapp/api-client/lib/client/index';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {Navigate, useNavigate} from 'react-router-dom';
+// import {Navigate, useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
-import {Button, ButtonVariant, ContainerXS, H1, H2, Link, Text, Paragraph, Box} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, ContainerXS, H2, Link, Text, Paragraph, Box} from '@wireapp/react-ui-kit';
 
 import {KEY} from 'Util/KeyboardUtil';
 
@@ -36,7 +36,7 @@ import {oauthStrings} from '../../strings';
 import {actionRoot} from '../module/action';
 import {bindActionCreators, RootState} from '../module/reducer';
 import * as ClientSelector from '../module/selector/ClientSelector';
-import {ROUTE} from '../route';
+// import {ROUTE} from '../route';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
@@ -62,7 +62,7 @@ const OAuthPermissionsComponent = ({
   doGetAllClients,
 }: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const params = decodeURI(window.location.search.slice(1))
     .split('&')
     .reduce((acc, param) => {

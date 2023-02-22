@@ -40,6 +40,7 @@ import {HistoryInfo} from './HistoryInfo';
 import {Index} from './Index';
 import {InitialInvite} from './InitialInvite';
 import {Login} from './Login';
+import {OAuthPermissions} from './OAuthPermissions';
 import {PhoneLogin} from './PhoneLogin';
 import {SetAccountType} from './SetAccountType';
 import {SetEmail} from './SetEmail';
@@ -59,7 +60,6 @@ import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as LanguageSelector from '../module/selector/LanguageSelector';
 import {ROUTE} from '../route';
-import {OAuthPermissions} from './OAuthPermissions';
 
 interface RootProps {}
 
@@ -115,7 +115,7 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
   const ProtectedSetHandle = () => isAuthenticatedCheck(<SetHandle />);
   const ProtectedSetEmail = () => isAuthenticatedCheck(<SetEmail />);
   const ProtectedSetPassword = () => isAuthenticatedCheck(<SetPassword />);
-  const ProtectedOAuthPermissions = () => isAuthenticatedCheck(<OAuthPermissions />);
+  // const ProtectedOAuthPermissions = () => isAuthenticatedCheck(<OAuthPermissions />);
 
   const brandName = Config.getConfig().BRAND_NAME;
   return (
