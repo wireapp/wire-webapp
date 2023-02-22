@@ -37,7 +37,7 @@ import {ContentAsset} from './asset';
 import {MessageFooterLike} from './MessageFooterLike';
 import {MessageLike} from './MessageLike';
 import {Quote} from './MessageQuote';
-import {FailedToSendWarning} from './Warnings/FailedToSend';
+import {FailedToSendWarning} from './Warnings';
 
 import {MessageActions} from '..';
 import {EphemeralStatusType} from '../../../../message/EphemeralStatusType';
