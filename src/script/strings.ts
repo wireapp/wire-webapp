@@ -42,6 +42,7 @@ import {defineMessages} from 'react-intl';
 import {BackendError} from './auth/module/action/BackendError';
 import {LabeledError} from './auth/module/action/LabeledError';
 import {ValidationError} from './auth/module/action/ValidationError';
+import {Scope} from './auth/page/OAuthPermissions';
 import {LOGOUT_REASON} from './auth/route';
 import {BackendClientError} from './error/BackendClientError';
 
@@ -891,5 +892,49 @@ export const historyInfoStrings = defineMessages({
   ok: {
     defaultMessage: 'OK',
     id: 'historyInfo.ok',
+  },
+});
+
+export const oauthStrings = defineMessages({
+  headline: {
+    defaultMessage: 'Permissions',
+    id: 'oauth.headline',
+  },
+  cancel: {
+    defaultMessage: "Don't Allow",
+    id: 'oauth.cancel',
+  },
+  allow: {
+    defaultMessage: 'Allow',
+    id: 'oauth.allow',
+  },
+  subhead: {
+    defaultMessage: '{app} requires your permission to:',
+    id: 'oauth.subhead',
+  },
+  details: {
+    defaultMessage:
+      'If you allow the permissions listed, Wire™ will be able to connect to your calendar. It won’t see the content of your calendar, just the ones happening with Wire. If you don’t grant the permissions, you can’t use this add-in. <learnMore>Learn more</learnMore> about these permissions in the settings.',
+    id: 'oauth.details',
+  },
+  privacyPolicy: {
+    defaultMessage: "Wire's <privacypolicy>Privacy Policy</privacypolicy>",
+    id: 'oauth.privacypolicy',
+  },
+  [Scope.WRITE_CONVERSATIONS]: {
+    defaultMessage: 'Create conversations',
+    id: 'oauth.scope.write_conversations',
+  },
+  [Scope.WRITE_CONVERSATIONS_CODE]: {
+    defaultMessage: 'Create conversation guest links',
+    id: 'oauth.scope.write_conversations_code',
+  },
+  [Scope.READ_SELF]: {
+    defaultMessage: 'Access user information',
+    id: 'oauth.scope.read_self',
+  },
+  [Scope.READ_FEATURE_CONFIGS]: {
+    defaultMessage: 'Access team feature configurations',
+    id: 'oauth.scope.read_feature_configs',
   },
 });

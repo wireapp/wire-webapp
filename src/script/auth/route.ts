@@ -52,6 +52,7 @@ export const LOGOUT_REASON = {
 };
 
 export const ROUTE = {
+  AUTHORIZE: '/authorize',
   CHECK_PASSWORD: '/checkpassword',
   CLIENTS: '/clients',
   CONVERSATION_JOIN: '/join-conversation',

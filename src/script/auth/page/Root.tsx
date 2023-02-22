@@ -59,6 +59,7 @@ import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import * as LanguageSelector from '../module/selector/LanguageSelector';
 import {ROUTE} from '../route';
+import {OAuthPermissions} from './OAuthPermissions';
 
 interface RootProps {}
 
@@ -114,6 +115,7 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
   const ProtectedSetHandle = () => isAuthenticatedCheck(<SetHandle />);
   const ProtectedSetEmail = () => isAuthenticatedCheck(<SetEmail />);
   const ProtectedSetPassword = () => isAuthenticatedCheck(<SetPassword />);
+  const ProtectedOAuthPermissions = () => isAuthenticatedCheck(<OAuthPermissions />);
 
   const brandName = Config.getConfig().BRAND_NAME;
   return (
@@ -143,6 +145,7 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
               )}
               <Route path={ROUTE.HISTORY_INFO} element={<ProtectedHistoryInfo />} />
               <Route path={ROUTE.INITIAL_INVITE} element={<ProtectedInitialInvite />} />
+              <Route path={`${ROUTE.AUTHORIZE}/*`} element={<OAuthPermissions />} />
               <Route
                 path={`${ROUTE.LOGIN}/*`}
                 element={
