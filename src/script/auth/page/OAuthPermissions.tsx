@@ -68,7 +68,10 @@ const OAuthPermissionsComponent = ({
     .reduce((acc, param) => {
       const [key, value] = param.split('=');
       if (key === 'scope') {
-        return {...acc, [key]: value.split(' ') as Scope[]};
+        return {
+          ...acc,
+          [key]: value.split(' ').filter(scope => Object.values(Scope).includes(scope as Scope)) as Scope[],
+        };
       }
       return {...acc, [key]: value};
     }, {} as AuthParams);
