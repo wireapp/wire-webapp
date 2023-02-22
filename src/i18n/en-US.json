@@ -670,6 +670,8 @@
   "messageFailedToSendToSome": "had issues receiving this message.",
   "messageFailedToSendWillReceive": "will receive the message later.",
   "messageFailedToSendWillNotReceive": "will not receive the message.",
+  "messageFailedToSendShowDetails": "Show details",
+  "messageFailedToSendHideDetails": "Hide details",
   "mlsToggleInfo": "When this is on, conversation will use the new messaging layer security (MLS) protocol.",
   "mlsToggleName": "MLS",
   "modalAccountCreateAction": "OK",

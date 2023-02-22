@@ -95,14 +95,14 @@ export const FailedToSendWarning = ({failedToSend, knownUsers}: Props) => {
                     {user.name}
                   </span>
                 ))
-                .reduce((prev, element) => {
+                .reduce<React.ReactNode[]>((prev, element) => {
                   return prev.length === 0 ? [element] : [...prev, ', ', element];
-                }, [] as any[])}
+                }, [])}
               {` ${t('messageFailedToSendWillReceive')}`}
             </p>
           )}
-          <Button type="button" variant={ButtonVariant.TERTIARY} onClick={() => setIsOpen(!isOpen)}>
-            {isOpen ? 'Hide details' : 'Show details'}
+          <Button type="button" variant={ButtonVariant.TERTIARY} onClick={() => setIsOpen(state => !state)}>
+            {isOpen ? t('messageFailedToSendHideDetails') : t('messageFailedToSendShowDetails')}
           </Button>
         </>
       )}
