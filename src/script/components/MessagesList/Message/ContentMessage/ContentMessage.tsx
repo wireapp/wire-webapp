@@ -37,7 +37,7 @@ import {ContentAsset} from './asset';
 import {MessageFooterLike} from './MessageFooterLike';
 import {MessageLike} from './MessageLike';
 import {Quote} from './MessageQuote';
-import {FailedToSendWarning} from './Warnings';
+import {PartialFailureToSendWarning} from './Warnings';
 
 import {MessageActions} from '..';
 import {EphemeralStatusType} from '../../../../message/EphemeralStatusType';
@@ -230,7 +230,9 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
           />
         ))}
 
-        {failedToSend && <FailedToSendWarning failedToSend={failedToSend} knownUsers={conversation.allUserEntities} />}
+        {failedToSend && (
+          <PartialFailureToSendWarning failedToSend={failedToSend} knownUsers={conversation.allUserEntities} />
+        )}
 
         {!other_likes.length && message.isReactable() && (
           <div className="message-body-like">
