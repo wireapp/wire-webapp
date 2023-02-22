@@ -26,6 +26,7 @@ import {container} from 'tsyringe';
 import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
 import {IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
 
+import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {Icon} from 'Components/Icon';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -128,6 +129,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   const {videoInput: currentCameraDevice} = useKoSubscribableChildren(mediaDevicesHandler.currentDeviceId, [
     DeviceTypes.VIDEO_INPUT,
   ]);
+
   const minimize = () => multitasking.isMinimized(true);
   const {videoInput} = useKoSubscribableChildren(mediaDevicesHandler.availableDevices, [DeviceTypes.VIDEO_INPUT]);
   const showToggleVideo =
@@ -155,16 +157,17 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   const {unreadMessagesCount} = useAppState();
   const hasUnreadMessages = unreadMessagesCount > 0;
 
+  const {showAlert, isGroupCall, clearShowAlert} = useCallAlertState();
+
   const totalPages = callPages.length;
 
-  const isSpaceOrEnterKey = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    return event.key === KEY.ENTER || event.key === KEY.SPACE;
-  };
+  const isSpaceOrEnterKey = (event: React.KeyboardEvent<HTMLDivElement>) => [KEY.ENTER, KEY.SPACE].includes(event.key);
 
   const handleToggleCameraKeydown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (isSpaceOrEnterKey(event)) {
       toggleCamera(call);
     }
+
     return true;
   };
 
@@ -182,6 +185,16 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
       document.removeEventListener('keydown', onKeyDown);
     };
   }, []);
+
+  const callGroupStartedAlert = t(isGroupCall ? 'startedVideoGroupCallingAlert' : 'startedVideoCallingAlert', {
+    conversationName,
+    cameraStatus: t(selfSharesCamera ? 'cameraStatusOn' : 'cameraStatusOff'),
+  });
+
+  const onGoingGroupCallAlert = t(isGroupCall ? 'ongoingGroupVideoCall' : 'ongoingVideoCall', {
+    conversationName,
+    cameraStatus: t(selfSharesCamera ? 'cameraStatusOn' : 'cameraStatusOff'),
+  });
 
   return (
     <div id="video-calling" className="video-calling">
@@ -211,7 +224,18 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
           />
         )}
 
-        <div className="video-remote-name">
+        {/* Calling conversation name and duration */}
+        <div
+          className="video-remote-name"
+          aria-label={showAlert ? callGroupStartedAlert : onGoingGroupCallAlert}
+          tabIndex={TabIndex.FOCUSABLE}
+          ref={element => {
+            if (showAlert) {
+              element?.focus();
+            }
+          }}
+          onBlur={() => clearShowAlert()}
+        >
           <h2 className="video-remote-title">{conversationName}</h2>
 
           <div data-uie-name="video-timer" className="video-timer label-xs">
