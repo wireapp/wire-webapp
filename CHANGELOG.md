@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [22.16.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@22.15.6...@wireapp/api-client@22.16.0) (2023-02-22)
+
+### Features
+
+* add generic request for backend calls ([#4909](https://github.com/wireapp/wire-web-packages/issues/4909)) ([33cf656](https://github.com/wireapp/wire-web-packages/commit/33cf656e2422caa06fcf5206c367e6b2c045b6fc))
+
 ## [22.15.6](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@22.15.5...@wireapp/api-client@22.15.6) (2023-02-20)
 
 **Note:** Version bump only for package @wireapp/api-client
