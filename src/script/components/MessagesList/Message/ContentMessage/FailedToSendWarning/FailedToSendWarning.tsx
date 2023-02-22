@@ -29,7 +29,7 @@ import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {warning} from './FailedToSendWarning.styles';
 
-export type User = {id: QualifiedId; name: string};
+export type User = {qualifiedId: QualifiedId; username: () => string};
 type Props = {
   failedToSend: QualifiedUserClients;
   knownUsers: User[];
@@ -42,7 +42,7 @@ function generateNamedUsers(users: User[], userClients: QualifiedUserClients): P
     (namedUsers, [domain, domainUsers]) => {
       const domainNamedUsers = Object.keys(domainUsers).reduce<ParsedUsers>(
         (domainNamedUsers, userId) => {
-          const user = users.find(user => matchQualifiedIds(user.id, {id: userId, domain}));
+          const user = users.find(user => matchQualifiedIds(user.qualifiedId, {id: userId, domain}));
           if (user) {
             domainNamedUsers.namedUsers.push(user);
           } else {
@@ -74,7 +74,7 @@ export const FailedToSendWarning = ({failedToSend, knownUsers}: Props) => {
 
   const message =
     namedUsers.length === 1
-      ? {head: namedUsers[0].name, rest: t('messageFailedToSendToOne')}
+      ? {head: namedUsers[0].username(), rest: t('messageFailedToSendToOne')}
       : {
           head: t('messageFailedToSendParticipants', {count: userCount.toString()}),
           rest: t('messageFailedToSendToSome'),
@@ -91,8 +91,8 @@ export const FailedToSendWarning = ({failedToSend, knownUsers}: Props) => {
             <p css={warning}>
               {namedUsers
                 .map(user => (
-                  <span data-uie-name="recipient" data-uie-value={user.id.id} key={user.id.id}>
-                    {user.name}
+                  <span data-uie-name="recipient" data-uie-value={user.qualifiedId.id} key={user.qualifiedId.id}>
+                    {user.username()}
                   </span>
                 ))
                 .reduce<React.ReactNode[]>((prev, element) => {

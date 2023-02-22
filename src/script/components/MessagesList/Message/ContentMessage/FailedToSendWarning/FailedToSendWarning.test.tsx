@@ -31,7 +31,7 @@ setStrings({en});
 function generateUsers(nbUsers: number, domain: string) {
   const users: User[] = [];
   for (let i = 0; i < nbUsers; i++) {
-    users.push({id: {id: createRandomUuid(), domain}, name: `User ${i}`});
+    users.push({qualifiedId: {id: createRandomUuid(), domain}, username: () => `User ${i}`});
   }
   return users;
 }
@@ -39,9 +39,9 @@ function generateUsers(nbUsers: number, domain: string) {
 function generateUserClients(users: User[]): QualifiedUserClients {
   const userClients: QualifiedUserClients = {};
   users.forEach(user => {
-    const domainUsers = userClients[user.id.domain] || {};
-    domainUsers[user.id.id] = [];
-    userClients[user.id.domain] = domainUsers;
+    const domainUsers = userClients[user.qualifiedId.domain] || {};
+    domainUsers[user.qualifiedId.id] = [];
+    userClients[user.qualifiedId.domain] = domainUsers;
   });
   return userClients;
 }
@@ -80,7 +80,7 @@ describe('FailedToSendWarning', () => {
     );
 
     expect(queryByText('Show details')).toBeNull();
-    expect(container.textContent).toContain(`${users[0].name} will receive your message later`);
+    expect(container.textContent).toContain(`${users[0].username()} will receive your message later`);
   });
 
   it('toggles the extra info', () => {
