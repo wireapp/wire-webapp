@@ -292,12 +292,10 @@ export class MessageService {
     plainText: Uint8Array,
   ): Promise<OTRRecipients<Uint8Array>> {
     const deleted = flattenUserClients(mismatch.deleted);
-    const missing = flattenUserClients(mismatch.missing);
     // remove deleted clients to the recipients
     deleted.forEach(({userId, data}) => data.forEach(clientId => delete recipients[userId.id][clientId]));
-    if (missing.length) {
-      const missingPreKeyBundles = await this.apiClient.api.user.postMultiPreKeyBundles(mismatch.missing);
-      const encrypted = await this.proteusService.encrypt(plainText, missingPreKeyBundles);
+    if (Object.keys(mismatch.missing).length) {
+      const encrypted = await this.proteusService.encrypt(plainText, mismatch.missing);
       const reEncryptedPayloads = flattenUserClients<{[client: string]: Uint8Array}>(encrypted);
       // add missing clients to the recipients
       reEncryptedPayloads.forEach(({data, userId}) => (recipients[userId.id] = {...recipients[userId.id], ...data}));
@@ -319,15 +317,13 @@ export class MessageService {
     plainText: Uint8Array,
   ): Promise<QualifiedOTRRecipients> {
     const deleted = flattenQualifiedUserClients(mismatch.deleted);
-    const missing = flattenQualifiedUserClients(mismatch.missing);
     // remove deleted clients to the recipients
     deleted.forEach(({userId, data}) =>
       data.forEach(clientId => delete recipients[userId.domain][userId.id][clientId]),
     );
 
-    if (Object.keys(missing).length) {
-      const missingPreKeyBundles = await this.apiClient.api.user.postQualifiedMultiPreKeyBundles(mismatch.missing);
-      const encrypted = await this.proteusService.encryptQualified(plainText, missingPreKeyBundles);
+    if (Object.keys(mismatch.missing).length) {
+      const encrypted = await this.proteusService.encryptQualified(plainText, mismatch.missing);
       const reEncryptedPayloads = flattenQualifiedUserClients<{[client: string]: Uint8Array}>(encrypted);
       reEncryptedPayloads.forEach(
         ({data, userId}) => (recipients[userId.domain][userId.id] = {...recipients[userId.domain][userId.id], ...data}),
