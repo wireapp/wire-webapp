@@ -27,7 +27,7 @@ import {Bold, Button, ButtonVariant} from '@wireapp/react-ui-kit';
 import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
-import {warning} from './FailedToSendWarning.styles';
+import {warning} from '../Warnings.styles';
 
 export type User = {qualifiedId: QualifiedId; username: () => string};
 type Props = {

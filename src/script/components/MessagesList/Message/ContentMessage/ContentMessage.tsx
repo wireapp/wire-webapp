@@ -34,10 +34,10 @@ import {t} from 'Util/LocalizerUtil';
 import {setContextMenuPosition} from 'Util/util';
 
 import {ContentAsset} from './asset';
-import {FailedToSendWarning} from './FailedToSendWarning';
 import {MessageFooterLike} from './MessageFooterLike';
 import {MessageLike} from './MessageLike';
 import {Quote} from './MessageQuote';
+import {FailedToSendWarning} from './Warnings/FailedToSend';
 
 import {MessageActions} from '..';
 import {EphemeralStatusType} from '../../../../message/EphemeralStatusType';

@@ -25,7 +25,7 @@ import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {setStrings} from 'Util/LocalizerUtil';
 import {createRandomUuid} from 'Util/util';
 
-import {FailedToSendWarning, User} from './FailedToSendWarning';
+import {FailedToSendWarning, User} from './FailedToSend';
 
 setStrings({en});
 function generateUsers(nbUsers: number, domain: string) {

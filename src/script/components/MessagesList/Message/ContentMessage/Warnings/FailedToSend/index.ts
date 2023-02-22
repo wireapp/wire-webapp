@@ -17,4 +17,4 @@
  *
  */
 
-export * from './FailedToSendWarning';
+export * from './FailedToSend';
