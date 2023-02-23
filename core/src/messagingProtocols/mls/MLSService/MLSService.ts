@@ -47,7 +47,7 @@ import {toProtobufCommitBundle} from './commitBundleUtil';
 import {MLSServiceConfig, UploadCommitOptions} from './MLSService.types';
 import {keyMaterialUpdatesStore} from './stores/keyMaterialUpdatesStore';
 import {pendingProposalsStore} from './stores/pendingProposalsStore';
-import {getGroupId, storeSubconversationGroupId} from './subconversationGroupIdMapper';
+import {subconversationGroupIdStore} from './stores/subconversationGroupIdStore/subconversationGroupIdStore';
 
 import {QualifiedUsers} from '../../../conversation';
 import {sendMessage} from '../../../conversation/message/messageSender';
@@ -234,19 +234,46 @@ export class MLSService extends TypedEventEmitter<Events> {
     return this.apiClient.api.conversation.deleteSubconversation(conversationId, SUBCONVERSATION_ID.CONFERENCE, data);
   }
 
+  /**
+   * Will leave conference subconversation if it's known by client and established.
+   *
+   * @param conversationId Id of the parent conversation which subconversation we want to leave
+   */
   public async leaveConferenceSubconversation(conversationId: QualifiedId): Promise<void> {
     const subconversationGroupId = await this.getGroupIdFromConversationId(
       conversationId,
       SUBCONVERSATION_ID.CONFERENCE,
     );
 
+    if (!subconversationGroupId) {
+      return;
+    }
+
     const isSubconversationEstablished = await this.conversationExists(subconversationGroupId);
     if (!isSubconversationEstablished) {
       return;
     }
 
-    await this.apiClient.api.conversation.deleteSubconversationSelf(conversationId, SUBCONVERSATION_ID.CONFERENCE);
-    return this.wipeConversation(subconversationGroupId);
+    try {
+      await this.apiClient.api.conversation.deleteSubconversationSelf(conversationId, SUBCONVERSATION_ID.CONFERENCE);
+    } catch (error) {
+      this.logger.error(`Failed to leave conference subconversation:`, error);
+    }
+
+    await this.wipeConversation(subconversationGroupId);
+
+    // once we've left the subconversation, we can remove it from the store
+    subconversationGroupIdStore.removeGroupId(conversationId, SUBCONVERSATION_ID.CONFERENCE);
+  }
+
+  public async leaveStaleConferenceSubconversations(): Promise<void> {
+    const conversationIds = subconversationGroupIdStore.getAllGroupIdsBySubconversationId(
+      SUBCONVERSATION_ID.CONFERENCE,
+    );
+
+    for (const {parentConversation} of conversationIds) {
+      await this.leaveConferenceSubconversation(parentConversation);
+    }
   }
 
   /**
@@ -284,7 +311,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     const epoch = Number(await this.getEpoch(subconversation.group_id));
 
     // We store the mapping between the subconversation and the parent conversation
-    storeSubconversationGroupId(conversationId, subconversation.subconv_id, subconversation.group_id);
+    subconversationGroupIdStore.storeGroupId(conversationId, subconversation.subconv_id, subconversation.group_id);
 
     return {groupId: subconversation.group_id, epoch};
   }
@@ -548,16 +575,12 @@ export class MLSService extends TypedEventEmitter<Events> {
    */
   public async getGroupIdFromConversationId(
     conversationQualifiedId: QualifiedId,
-    subconversationId?: string,
-  ): Promise<string> {
-    const {id: conversationId, domain: conversationDomain} = conversationQualifiedId;
+    subconversationId?: SUBCONVERSATION_ID,
+  ): Promise<string | undefined> {
     const groupId = subconversationId
-      ? getGroupId(conversationQualifiedId, subconversationId)
+      ? subconversationGroupIdStore.getGroupId(conversationQualifiedId, subconversationId)
       : await this.groupIdFromConversationId?.(conversationQualifiedId);
 
-    if (!groupId) {
-      throw new Error(`Could not find a group_id for conversation ${conversationId}@${conversationDomain}`);
-    }
     return groupId;
   }
 

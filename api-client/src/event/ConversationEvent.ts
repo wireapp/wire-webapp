@@ -17,6 +17,7 @@
  *
  */
 
+import {SUBCONVERSATION_ID} from '../conversation';
 import {
   ConversationAccessUpdateData,
   ConversationCodeUpdateData,
@@ -158,7 +159,7 @@ export interface ConversationMLSMessageAddEvent extends BaseConversationEvent {
   data: ConversationMLSMessageAddData;
   type: CONVERSATION_EVENT.MLS_MESSAGE_ADD;
   /** if the message is sent in a subconversation, there is the identifier of the subconversation */
-  subconv?: string;
+  subconv?: SUBCONVERSATION_ID;
   senderClientId: string;
 }
 
