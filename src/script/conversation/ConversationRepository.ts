@@ -2532,6 +2532,8 @@ export class ConversationRepository {
           }
         });
 
+      // Update conversation roles (in case the removed user had some special role)
+      await this.conversationRoleRepository.updateConversationRoles(conversationEntity);
       await this.updateParticipatingUserEntities(conversationEntity);
 
       this.verificationStateHandler.onMemberLeft(conversationEntity);
