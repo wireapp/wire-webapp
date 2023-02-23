@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [22.17.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@22.16.0...@wireapp/api-client@22.17.0) (2023-02-23)
+
+### Features
+
+* **core, api-client:** leave stale subconversations after crash [FS-1564] ([#4912](https://github.com/wireapp/wire-web-packages/issues/4912)) ([b42de93](https://github.com/wireapp/wire-web-packages/commit/b42de937a8a6189e77b4934aca4c251442672a02))
+
 # [22.16.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@22.15.6...@wireapp/api-client@22.16.0) (2023-02-22)
 
 ### Features
