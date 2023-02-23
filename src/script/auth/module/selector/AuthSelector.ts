@@ -64,6 +64,7 @@ export const getEntropy = (state: RootState) => state.authState.entropy;
 export const getAccount = (state: RootState): RegistrationDataState => state.authState.account || unsetRegistrationData;
 export const getAccountTeam = (state: RootState) => getAccount(state).team || unsetTeam;
 export const getAccountTeamName = (state: RootState) => getAccountTeam(state).name;
+export const getAccountTeamIcon = (state: RootState) => getAccountTeam(state).icon_key;
 
 export const isGenericInvitationFlow = (state: RootState) => getCurrentFlow(state) === REGISTER_FLOW.GENERIC_INVITATION;
 export const isPersonalFlow = (state: RootState) => getCurrentFlow(state) === REGISTER_FLOW.PERSONAL;

@@ -25,7 +25,18 @@ import {connect} from 'react-redux';
 // import {Navigate, useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
-import {Button, ButtonVariant, ContainerXS, H2, Link, Text, Paragraph, Box} from '@wireapp/react-ui-kit';
+import {
+  Button,
+  ButtonVariant,
+  ContainerXS,
+  H2,
+  Text,
+  Paragraph,
+  Box,
+  Link,
+  LinkVariant,
+  // COLOR_V2,
+} from '@wireapp/react-ui-kit';
 
 import {KEY} from 'Util/KeyboardUtil';
 
@@ -35,7 +46,8 @@ import {Config} from '../../Config';
 import {oauthStrings} from '../../strings';
 import {actionRoot} from '../module/action';
 import {bindActionCreators, RootState} from '../module/reducer';
-import * as ClientSelector from '../module/selector/ClientSelector';
+import * as AuthSelector from '../module/selector/AuthSelector';
+import * as SelfSelector from '../module/selector/SelfSelector';
 // import {ROUTE} from '../route';
 
 type Props = React.HTMLProps<HTMLDivElement>;
@@ -54,13 +66,7 @@ interface AuthParams {
   response_type: string;
 }
 
-const OAuthPermissionsComponent = ({
-  clients,
-  currentSelfClient,
-  hasLoadedClients,
-  isNewCurrentSelfClient,
-  doGetAllClients,
-}: Props & ConnectedProps & DispatchProps) => {
+const OAuthPermissionsComponent = ({doLogout, userEmail, teamIcon}: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
   // const navigate = useNavigate();
   const params = decodeURI(window.location.search.slice(1))
@@ -82,8 +88,19 @@ const OAuthPermissionsComponent = ({
 
   return (
     <Page>
-      <ContainerXS centerText verticalCenter style={{width: '100%'}}>
+      <ContainerXS centerText verticalCenter style={{width: '100%', display: 'flex', flexDirection: 'column'}}>
         <H2 center>{_(oauthStrings.headline)}</H2>
+        <Box style={{backgroundImage: teamIcon}} />
+        <Text>{userEmail}</Text>
+        <Link
+          onClick={doLogout}
+          data-uie-name="go-logout"
+          variant={LinkVariant.PRIMARY}
+          center
+          // color={COLOR_V2.SECONDARY}
+        >
+          {_(oauthStrings.logout)}
+        </Link>
         <Text center>{_(oauthStrings.subhead, {app: 'Wire'})} </Text>
         {/* TODO: update to correct app name from BE */}
         {params.scope && (
@@ -133,7 +150,7 @@ const OAuthPermissionsComponent = ({
             onKeyDown={(event: React.KeyboardEvent) => {
               if (event.key === KEY.ESC) {
                 window.open('', '_self', '');
-                window.close();
+                window.close(); //this doesnt work
               }
             }}
           >
@@ -154,24 +171,22 @@ const OAuthPermissionsComponent = ({
           </Button>
         </div>
         <Paragraph center style={{marginTop: 40}}>
-          <Link href={Config.getConfig().URL.SUPPORT.HISTORY} target="_blank" data-uie-name="do-history-learn-more">
-            <FormattedMessage
-              {...oauthStrings.privacyPolicy}
-              values={{
-                // eslint-disable-next-line react/display-name
-                privacypolicy: ((...chunks: string[] | React.ReactNode[]) => (
-                  <a
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    data-uie-name="go-privacy-policy"
-                    href={Config.getConfig().URL.PRIVACY_POLICY}
-                  >
-                    {chunks}
-                  </a>
-                )) as any,
-              }}
-            />
-          </Link>
+          <FormattedMessage
+            {...oauthStrings.privacyPolicy}
+            values={{
+              // eslint-disable-next-line react/display-name
+              privacypolicy: ((...chunks: string[] | React.ReactNode[]) => (
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-uie-name="go-privacy-policy"
+                  href={Config.getConfig().URL.PRIVACY_POLICY}
+                >
+                  {chunks}
+                </a>
+              )) as any,
+            }}
+          />
         </Paragraph>
       </ContainerXS>
     </Page>
@@ -180,18 +195,15 @@ const OAuthPermissionsComponent = ({
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
-  clients: ClientSelector.getClients(state),
-  isFeching: ClientSelector.isFetching(state),
-  currentSelfClient: ClientSelector.getCurrentSelfClient(state),
-  hasLoadedClients: ClientSelector.hasLoadedClients(state),
-  isNewCurrentSelfClient: ClientSelector.isNewCurrentSelfClient(state),
+  userEmail: SelfSelector.getSelfEmail(state),
+  teamIcon: AuthSelector.getAccountTeamIcon(state),
 });
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
 const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
   bindActionCreators(
     {
-      doGetAllClients: actionRoot.clientAction.doGetAllClients,
+      doLogout: actionRoot.authAction.doLogout,
     },
     dispatch,
   );

@@ -900,6 +900,10 @@ export const oauthStrings = defineMessages({
     defaultMessage: 'Permissions',
     id: 'oauth.headline',
   },
+  logout: {
+    defaultMessage: 'Switch account',
+    id: 'oauth.logout',
+  },
   cancel: {
     defaultMessage: "Don't Allow",
     id: 'oauth.cancel',
