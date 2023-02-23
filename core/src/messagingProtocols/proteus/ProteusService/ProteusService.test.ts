@@ -153,9 +153,9 @@ describe('ProteusService', () => {
       const [proteusService, {apiClient, cryptoClient}] = await buildProteusService();
       const expectedFingerprint = 'fingerprint-client1';
 
-      const getPrekeyMock = jest.spyOn(apiClient.api.user, 'getClientPreKey');
+      const getPrekeysSpy = jest.spyOn(apiClient.api.user, 'postQualifiedMultiPreKeyBundles');
       jest.spyOn(cryptoClient, 'getRemoteFingerprint').mockResolvedValue(expectedFingerprint);
-      jest.spyOn(cryptoClient, 'sessionFromPrekey').mockResolvedValue(undefined);
+      const saveSessionSpy = jest.spyOn(cryptoClient, 'sessionFromPrekey').mockResolvedValue(undefined);
       jest.spyOn(cryptoClient, 'saveSession').mockResolvedValue(undefined);
       jest.spyOn(cryptoClient, 'sessionExists').mockResolvedValue(false);
 
@@ -167,7 +167,8 @@ describe('ProteusService', () => {
         id: 123,
       });
 
-      expect(getPrekeyMock).not.toHaveBeenCalled();
+      expect(saveSessionSpy).toHaveBeenCalled();
+      expect(getPrekeysSpy).not.toHaveBeenCalled();
       expect(result).toBe(expectedFingerprint);
     });
 
