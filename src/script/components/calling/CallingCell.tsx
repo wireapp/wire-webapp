@@ -340,7 +340,6 @@ const CallingCell: React.FC<CallingCellProps> = ({
                   : `${isOngoing ? `${ongoingCallAlert} ` : ''}${t('accessibility.openConversation', conversationName)}`
               }
             >
-              1.
               {!temporaryUserStyle && (
                 <div className="conversation-list-cell-left">
                   {isGroup && <GroupAvatar users={conversationParticipants} isLight />}
@@ -535,8 +534,6 @@ const CallingCell: React.FC<CallingCellProps> = ({
                             element?.focus();
                           }
                         }}
-                        // eslint-disable-next-line jsx-a11y/no-autofocus
-                        // autoFocus={!isGroup}
                         className="call-ui__button call-ui__button--red call-ui__button--large"
                         onClick={() => (isIncoming ? callActions.reject(call) : callActions.leave(call))}
                         onBlur={() => clearShowAlert()}
@@ -545,7 +542,6 @@ const CallingCell: React.FC<CallingCellProps> = ({
                         type="button"
                         data-uie-name="do-call-controls-call-decline"
                       >
-                        2.
                         <Icon.Hangup className="small-icon" style={{maxWidth: 17}} />
                       </button>
                     </li>
