@@ -210,7 +210,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
       if (!isOngoing) {
         return;
       }
-      if (event.key === KEY.ENTER || event.key === KEY.SPACE) {
+      if ([KEY.ENTER, KEY.SPACE].includes(event.key)) {
         multitasking?.isMinimized(false);
       }
     },
