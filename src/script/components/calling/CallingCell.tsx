@@ -278,6 +278,14 @@ const CallingCell: React.FC<CallingCellProps> = ({
     cameraStatus: t(selfSharesCamera ? 'cameraStatusOn' : 'cameraStatusOff'),
   });
 
+  const onGoingGroupCallAlert = t(isOutgoingVideoCall ? 'ongoingGroupVideoCall' : 'ongoingGroupAudioCall', {
+    conversationName,
+    cameraStatus: t(selfSharesCamera ? 'cameraStatusOn' : 'cameraStatusOff'),
+  });
+
+  const callStartedAlert = isGroup ? callGroupStartedAlert : call1To1StartedAlert;
+  const ongoingCallAlert = isGroup ? onGoingGroupCallAlert : onGoingCallAlert;
+
   return (
     <div className="conversation-calling-cell">
       {isIncoming && (
@@ -312,22 +320,27 @@ const CallingCell: React.FC<CallingCellProps> = ({
           <div className="conversation-list-cell-right__calling">
             <div
               ref={element => {
-                if (isGroup && showAlert && !isVideoCall) {
+                if ((isGroup || isOngoing) && showAlert && !isVideoCall) {
                   element?.focus();
                 }
               }}
               className="conversation-list-cell conversation-list-cell-button"
               onClick={createNavigate(conversationUrl)}
-              onBlur={() => clearShowAlert()}
+              onBlur={() => {
+                if (isGroup || isOngoing) {
+                  clearShowAlert();
+                }
+              }}
               onKeyDown={createNavigateKeyboard(conversationUrl)}
               tabIndex={TabIndex.FOCUSABLE}
               role="button"
               aria-label={
                 showAlert
-                  ? callGroupStartedAlert
-                  : `${isOngoing ? `${onGoingCallAlert} ` : ''}${t('accessibility.openConversation', conversationName)}`
+                  ? callStartedAlert
+                  : `${isOngoing ? `${ongoingCallAlert} ` : ''}${t('accessibility.openConversation', conversationName)}`
               }
             >
+              1.
               {!temporaryUserStyle && (
                 <div className="conversation-list-cell-left">
                   {isGroup && <GroupAvatar users={conversationParticipants} isLight />}
@@ -336,7 +349,6 @@ const CallingCell: React.FC<CallingCellProps> = ({
                   )}
                 </div>
               )}
-
               <h2
                 className={cx('conversation-list-cell-center ', {
                   'conversation-list-cell-center-no-left': temporaryUserStyle,
@@ -504,7 +516,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
                         className={cx('call-ui__button call-ui__button--participants', {
                           'call-ui__button--active': showParticipants,
                         })}
-                        onClick={() => setShowParticipants(current => !showParticipants)}
+                        onClick={() => setShowParticipants(prevState => !prevState)}
                         type="button"
                         data-uie-name="do-toggle-participants"
                         aria-pressed={showParticipants}
@@ -518,8 +530,13 @@ const CallingCell: React.FC<CallingCellProps> = ({
                   {(isIncoming || isOutgoing) && (
                     <li className="conversation-list-calling-cell-controls-item">
                       <button
+                        ref={element => {
+                          if (showAlert && !isGroup) {
+                            element?.focus();
+                          }
+                        }}
                         // eslint-disable-next-line jsx-a11y/no-autofocus
-                        autoFocus={!isGroup}
+                        // autoFocus={!isGroup}
                         className="call-ui__button call-ui__button--red call-ui__button--large"
                         onClick={() => (isIncoming ? callActions.reject(call) : callActions.leave(call))}
                         onBlur={() => clearShowAlert()}
@@ -528,6 +545,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
                         type="button"
                         data-uie-name="do-call-controls-call-decline"
                       >
+                        2.
                         <Icon.Hangup className="small-icon" style={{maxWidth: 17}} />
                       </button>
                     </li>
