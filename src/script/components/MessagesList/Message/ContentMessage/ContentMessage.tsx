@@ -27,6 +27,7 @@ import {Conversation} from 'src/script/entity/Conversation';
 import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {Message} from 'src/script/entity/message/Message';
+import {StatusType} from 'src/script/message/StatusType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getMessageAriaLabel} from 'Util/conversationMessages';
 import {KEY} from 'Util/KeyboardUtil';
@@ -37,7 +38,7 @@ import {ContentAsset} from './asset';
 import {MessageFooterLike} from './MessageFooterLike';
 import {MessageLike} from './MessageLike';
 import {Quote} from './MessageQuote';
-import {PartialFailureToSendWarning} from './Warnings';
+import {CompleteFailureToSendWarning, PartialFailureToSendWarning} from './Warnings';
 
 import {MessageActions} from '..';
 import {EphemeralStatusType} from '../../../../message/EphemeralStatusType';
@@ -98,6 +99,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
     other_likes,
     was_edited,
     failedToSend,
+    status,
   } = useKoSubscribableChildren(message, [
     'headerSenderName',
     'timestamp',
@@ -107,6 +109,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
     'other_likes',
     'was_edited',
     'failedToSend',
+    'status',
   ]);
 
   const shouldShowAvatar = (): boolean => {
@@ -233,6 +236,8 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
         {failedToSend && (
           <PartialFailureToSendWarning failedToSend={failedToSend} knownUsers={conversation.allUserEntities} />
         )}
+
+        {status === StatusType.FAILED && <CompleteFailureToSendWarning />}
 
         {!other_likes.length && message.isReactable() && (
           <div className="message-body-like">

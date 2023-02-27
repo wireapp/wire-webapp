@@ -198,7 +198,7 @@ export class EventMapper {
     originalEntity.id = id;
 
     if (originalEntity.isContent() || (originalEntity as Message).isPing()) {
-      originalEntity.status(event.status || StatusType.SENT);
+      originalEntity.status(event.status ?? StatusType.SENT);
     }
 
     originalEntity.replacing_message_id = eventData.replacing_message_id;
@@ -377,7 +377,7 @@ export class EventMapper {
     }
 
     if (messageEntity.isContent() || messageEntity.isPing()) {
-      messageEntity.status((event as EventRecord).status || StatusType.SENT);
+      messageEntity.status((event as EventRecord).status ?? StatusType.SENT);
     }
 
     if (messageEntity.isComposite()) {
