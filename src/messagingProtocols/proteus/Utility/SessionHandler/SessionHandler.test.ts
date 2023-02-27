@@ -37,11 +37,7 @@ function generatePrekeys(userId: QualifiedId, clientIds: string[]) {
     };
   }, {});
 
-  return {
-    [userId.id]: {
-      ...clients,
-    },
-  };
+  return {[userId.id]: clients};
 }
 
 describe('SessionHandler', () => {
@@ -168,7 +164,7 @@ describe('SessionHandler', () => {
         .mockImplementation(sessionId => Promise.resolve(sessionId.includes('missing') as any));
 
       const sessionFromPrekeySpy = jest.spyOn(cryptoClient, 'sessionFromPrekey');
-      const sessions = await initSessions({
+      const {sessions} = await initSessions({
         recipients: {...existingUserClients, ...missingUserClients},
         apiClient,
         cryptoClient,
@@ -176,6 +172,25 @@ describe('SessionHandler', () => {
 
       expect(sessionFromPrekeySpy).toHaveBeenCalledTimes(3);
       expect(sessions).toHaveLength(6);
+    });
+
+    it('returns the list of deleted clients (clients with null prekeys)', async () => {
+      const userClients: UserClients = {
+        'existing-user1': ['client1', 'deleteclient'],
+      };
+
+      const allKeys = generatePrekeys({id: 'existing-user1', domain: ''}, ['client1']) as any;
+      allKeys['existing-user1']['deleteclient'] = null;
+      jest.spyOn(apiClient.api.user, 'postMultiPreKeyBundles').mockResolvedValue(allKeys);
+
+      const {sessions, unknowns} = await initSessions({
+        recipients: userClients,
+        apiClient,
+        cryptoClient,
+      });
+
+      expect(sessions).toEqual(['existing-user1@client1']);
+      expect(unknowns).toEqual({'existing-user1': ['deleteclient']});
     });
   });
 });

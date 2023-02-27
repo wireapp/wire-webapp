@@ -83,13 +83,15 @@ export class MessageService {
       cipherText = externalPayload.cipherText;
     }
 
-    const encryptedPayload = await this.proteusService.encrypt(plainTextPayload, recipients);
+    const {payloads: encryptedPayload, unknowns} = await this.proteusService.encrypt(plainTextPayload, recipients);
 
-    const send = (payload: OTRRecipients<Uint8Array>) => {
-      return options.sendAsProtobuf
-        ? this.sendOTRProtobufMessage(sendingClientId, payload, {...options, assetData: cipherText})
-        : this.sendOTRMessage(sendingClientId, payload, {...options, assetData: cipherText});
+    const send = async (payload: OTRRecipients<Uint8Array>) => {
+      const result = options.sendAsProtobuf
+        ? await this.sendOTRProtobufMessage(sendingClientId, payload, {...options, assetData: cipherText})
+        : await this.sendOTRMessage(sendingClientId, payload, {...options, assetData: cipherText});
+      return unknowns ? {...result, deleted: {...result.deleted, ...unknowns}} : result;
     };
+
     try {
       return await send(encryptedPayload);
     } catch (error) {
@@ -130,10 +132,15 @@ export class MessageService {
       onClientMismatch?: (mismatch: MessageSendingStatus) => void | boolean | Promise<boolean>;
     },
   ): Promise<MessageSendingStatus & {canceled?: boolean}> {
-    const send = (payload: QualifiedOTRRecipients) => {
-      return this.sendFederatedOtrMessage(sendingClientId, payload, options);
+    const {payloads: encryptedPayload, unknowns: unknows} = await this.proteusService.encryptQualified(
+      plainText,
+      recipients,
+    );
+
+    const send = async (payload: QualifiedOTRRecipients) => {
+      const result = await this.sendFederatedOtrMessage(sendingClientId, payload, options);
+      return unknows ? {...result, deleted: {...result.deleted, ...unknows}} : result;
     };
-    const encryptedPayload = await this.proteusService.encryptQualified(plainText, recipients);
 
     try {
       return await send(encryptedPayload);
@@ -295,8 +302,8 @@ export class MessageService {
     // remove deleted clients to the recipients
     deleted.forEach(({userId, data}) => data.forEach(clientId => delete recipients[userId.id][clientId]));
     if (Object.keys(mismatch.missing).length) {
-      const encrypted = await this.proteusService.encrypt(plainText, mismatch.missing);
-      const reEncryptedPayloads = flattenUserClients<{[client: string]: Uint8Array}>(encrypted);
+      const {payloads} = await this.proteusService.encrypt(plainText, mismatch.missing);
+      const reEncryptedPayloads = flattenUserClients<{[client: string]: Uint8Array}>(payloads);
       // add missing clients to the recipients
       reEncryptedPayloads.forEach(({data, userId}) => (recipients[userId.id] = {...recipients[userId.id], ...data}));
     }
@@ -323,8 +330,8 @@ export class MessageService {
     );
 
     if (Object.keys(mismatch.missing).length) {
-      const encrypted = await this.proteusService.encryptQualified(plainText, mismatch.missing);
-      const reEncryptedPayloads = flattenQualifiedUserClients<{[client: string]: Uint8Array}>(encrypted);
+      const {payloads} = await this.proteusService.encryptQualified(plainText, mismatch.missing);
+      const reEncryptedPayloads = flattenQualifiedUserClients<{[client: string]: Uint8Array}>(payloads);
       reEncryptedPayloads.forEach(
         ({data, userId}) => (recipients[userId.domain][userId.id] = {...recipients[userId.domain][userId.id], ...data}),
       );
