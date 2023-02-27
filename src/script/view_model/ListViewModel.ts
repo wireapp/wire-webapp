@@ -25,7 +25,7 @@ import {CONV_TYPE} from '@wireapp/avs';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal, usePrimaryModalState} from 'Components/Modals/PrimaryModal';
 import {iterateItem} from 'Util/ArrayUtil';
 import {isEscapeKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -160,7 +160,7 @@ export class ListViewModel {
         },
       });
     } else {
-      this.callingRepository.answerCall(call);
+      this.callingViewModel.callActions.answer(call);
     }
   };
 
@@ -182,7 +182,10 @@ export class ListViewModel {
   };
 
   onKeyDownListView = (keyboardEvent: KeyboardEvent) => {
-    if (isEscapeKey(keyboardEvent)) {
+    const {currentModalId} = usePrimaryModalState.getState();
+    // don't switch view for primary modal(ex: preferences->set status->modal opened)
+    // when user press escape, only close the modal and stay within the preference screen
+    if (isEscapeKey(keyboardEvent) && currentModalId === null) {
       const newState = this.isActivatedAccount() ? ListState.CONVERSATIONS : ListState.TEMPORARY_GUEST;
       this.switchList(newState);
     }

@@ -46,7 +46,7 @@ import type {CryptographyRepository} from '../cryptography/CryptographyRepositor
 import type {User} from '../entity/User';
 import {ClientError} from '../error/ClientError';
 import {Core} from '../service/CoreSingleton';
-import {ClientRecord, StorageRepository} from '../storage';
+import {ClientRecord} from '../storage';
 import {StorageKey} from '../storage/StorageKey';
 
 export type UserClientEntityMap = {[userId: string]: ClientEntity[]};
@@ -69,7 +69,6 @@ export class ClientRepository {
   constructor(
     public readonly clientService: ClientService,
     public readonly cryptographyRepository: CryptographyRepository,
-    private readonly storageRepository: StorageRepository,
     private readonly clientState = container.resolve(ClientState),
     private readonly core = container.resolve(Core),
   ) {
@@ -85,7 +84,6 @@ export class ClientRepository {
 
   init(selfUser: User): void {
     this.selfUser(selfUser);
-    this.logger.info(`Initialized repository with user ID '${this.selfUser().id}'`);
   }
 
   //##############################################################################
@@ -155,13 +153,12 @@ export class ClientRepository {
       })
       .then(clientRecord => {
         if (typeof clientRecord === 'string') {
-          this.logger.info('No local client found in database');
+          this.logger.warn('No local client found in database');
           throw new ClientError(ClientError.TYPE.NO_VALID_CLIENT, ClientError.MESSAGE.NO_VALID_CLIENT);
         }
 
         const currentClient = ClientMapper.mapClient(clientRecord, true, clientRecord.domain);
         this.clientState.currentClient(currentClient);
-        this.logger.info(`Loaded local client '${currentClient.id}'`, this.clientState.currentClient());
         return this.clientState.currentClient();
       });
   }
@@ -298,13 +295,6 @@ export class ClientRepository {
     selfUser.removeClient(clientId);
     amplify.publish(WebAppEvents.USER.CLIENT_REMOVED, selfUser.qualifiedId, clientId);
     return this.clientState.clients();
-  }
-
-  removeLocalClient(): void {
-    this.storageRepository.deleteCryptographyStores().then(() => {
-      const shouldClearData = this.clientState.currentClient().isTemporary();
-      amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.CLIENT_REMOVED, shouldClearData);
-    });
   }
 
   logoutClient = async (): Promise<void> => {
@@ -485,7 +475,7 @@ export class ClientRepository {
           }
 
           // Locally unknown client new on backend
-          this.logger.info(`New client '${clientId}' of user '${userId}' will be stored locally`);
+          this.logger.debug(`New client '${clientId}' of user '${userId}' will be stored locally`);
           if (matchQualifiedIds(this.selfUser(), userId)) {
             this.onClientAdd({client: clientPayload as RegisteredClient});
           }
@@ -551,7 +541,7 @@ export class ClientRepository {
    * @param eventJson JSON data of 'user.client-add' event
    */
   private onClientAdd(eventJson: Pick<UserClientAddEvent, 'client'>): void {
-    this.logger.info('Client of self user added', eventJson);
+    this.logger.debug('Client of self user added', eventJson);
     amplify.publish(WebAppEvents.CLIENT.ADD, this.selfUser().qualifiedId, eventJson.client, true);
   }
 
@@ -568,7 +558,10 @@ export class ClientRepository {
 
     const isCurrentClient = clientId === this.clientState.currentClient().id;
     if (isCurrentClient) {
-      return this.removeLocalClient();
+      const shouldClearData = this.clientState.currentClient().isTemporary();
+      // If the current client has been removed, we need to sign out
+      amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.CLIENT_REMOVED, shouldClearData);
+      return;
     }
     const localClients = await this.getClientsForSelf();
     const removedClient = localClients.find(client => client.id === clientId);

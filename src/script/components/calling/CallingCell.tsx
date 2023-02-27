@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 
 import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation/';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
@@ -30,13 +30,14 @@ import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {GroupAvatar} from 'Components/avatar/GroupAvatar';
 import {Duration} from 'Components/calling/Duration';
 import {GroupVideoGrid} from 'Components/calling/GroupVideoGrid';
+import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';
 import {ParticipantItem} from 'Components/list/ParticipantItem';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {KEY} from 'Util/KeyboardUtil';
+import {isEnterKey, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
@@ -101,6 +102,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
       'currentPage',
       'muteState',
     ]);
+
   const {
     isGroup,
     participating_user_ets: userEts,
@@ -146,8 +148,10 @@ const CallingCell: React.FC<CallingCellProps> = ({
 
   const currentCallStatus = callStatus[state];
 
-  const showNoCameraPreview = !hasAccessToCamera && call.initialType === CALL_TYPE.VIDEO && !isOngoing;
-  const showVideoButton = isVideoCallingEnabled && (call.initialType === CALL_TYPE.VIDEO || isOngoing);
+  const isVideoCall = call.initialType === CALL_TYPE.VIDEO;
+
+  const showNoCameraPreview = !hasAccessToCamera && isVideoCall && !isOngoing;
+  const showVideoButton = isVideoCallingEnabled && (isVideoCall || isOngoing);
   const showParticipantsButton = isOngoing && isGroup;
 
   const videoGrid = useVideoGrid(call);
@@ -206,7 +210,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
       if (!isOngoing) {
         return;
       }
-      if (event.key === KEY.ENTER || event.key === KEY.SPACE) {
+      if ([KEY.ENTER, KEY.SPACE].includes(event.key)) {
         multitasking?.isMinimized(false);
       }
     },
@@ -221,13 +225,79 @@ const CallingCell: React.FC<CallingCellProps> = ({
   }, [isOngoing, multitasking]);
 
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
+  const {showAlert, clearShowAlert} = useCallAlertState();
+
+  const answerCall = () => {
+    callActions.answer(call);
+    setCurrentView(ViewType.LEFT_SIDEBAR);
+  };
+
+  const answerOrRejectCall = useCallback(
+    (event: KeyboardEvent) => {
+      const removeEventListener = () => window.removeEventListener('keydown', answerOrRejectCall);
+
+      if (!event.shiftKey && event.ctrlKey && isEnterKey(event)) {
+        answerCall();
+        removeEventListener();
+      }
+
+      if (event.ctrlKey && event.shiftKey && isEnterKey(event)) {
+        callActions.reject(call);
+        removeEventListener();
+      }
+    },
+    [call, callActions],
+  );
+
+  useEffect(() => {
+    if (isIncoming) {
+      window.addEventListener('keydown', answerOrRejectCall);
+
+      return () => {
+        window.removeEventListener('keydown', answerOrRejectCall);
+      };
+    }
+
+    return () => {
+      clearShowAlert();
+    };
+  }, [answerOrRejectCall, isIncoming]);
+
+  const call1To1StartedAlert = t(isOutgoingVideoCall ? 'startedVideoCallingAlert' : 'startedAudioCallingAlert', {
+    conversationName,
+    cameraStatus: t(selfSharesCamera ? 'cameraStatusOn' : 'cameraStatusOff'),
+  });
+
+  const onGoingCallAlert = t(isOutgoingVideoCall ? 'ongoingVideoCall' : 'ongoingAudioCall', {
+    conversationName,
+    cameraStatus: t(selfSharesCamera ? 'cameraStatusOn' : 'cameraStatusOff'),
+  });
+
+  const callGroupStartedAlert = t(isOutgoingVideoCall ? 'startedVideoGroupCallingAlert' : 'startedGroupCallingAlert', {
+    conversationName,
+    cameraStatus: t(selfSharesCamera ? 'cameraStatusOn' : 'cameraStatusOff'),
+  });
+
+  const onGoingGroupCallAlert = t(isOutgoingVideoCall ? 'ongoingGroupVideoCall' : 'ongoingGroupAudioCall', {
+    conversationName,
+    cameraStatus: t(selfSharesCamera ? 'cameraStatusOn' : 'cameraStatusOff'),
+  });
+
+  const callStartedAlert = isGroup ? callGroupStartedAlert : call1To1StartedAlert;
+  const ongoingCallAlert = isGroup ? onGoingGroupCallAlert : onGoingCallAlert;
 
   return (
     <div className="conversation-calling-cell">
+      {isIncoming && (
+        <p role="alert" className="visually-hidden">
+          {t('callConversationAcceptOrDecline', conversationName)}
+        </p>
+      )}
+
       {showJoinButton && isFullUi && (
         <button
           className="call-ui__button call-ui__button--green call-ui__button--join"
-          style={{margin: '40px 16px 0px 16px'}}
+          style={{margin: '40px 16px 0px'}}
           onClick={() => callActions.answer(call)}
           type="button"
           data-uie-name="do-call-controls-call-join"
@@ -246,14 +316,29 @@ const CallingCell: React.FC<CallingCellProps> = ({
           {muteState === MuteState.REMOTE_MUTED && isFullUi && (
             <div className="conversation-list-calling-cell__info-bar">{t('muteStateRemoteMute')}</div>
           )}
+
           <div className="conversation-list-cell-right__calling">
             <div
+              ref={element => {
+                if ((isGroup || isOngoing) && showAlert && !isVideoCall) {
+                  element?.focus();
+                }
+              }}
               className="conversation-list-cell conversation-list-cell-button"
               onClick={createNavigate(conversationUrl)}
+              onBlur={() => {
+                if (isGroup || isOngoing) {
+                  clearShowAlert();
+                }
+              }}
               onKeyDown={createNavigateKeyboard(conversationUrl)}
               tabIndex={TabIndex.FOCUSABLE}
               role="button"
-              aria-label={t('accessibility.openConversation', conversationName)}
+              aria-label={
+                showAlert
+                  ? callStartedAlert
+                  : `${isOngoing ? `${ongoingCallAlert} ` : ''}${t('accessibility.openConversation', conversationName)}`
+              }
             >
               {!temporaryUserStyle && (
                 <div className="conversation-list-cell-left">
@@ -263,7 +348,6 @@ const CallingCell: React.FC<CallingCellProps> = ({
                   )}
                 </div>
               )}
-
               <h2
                 className={cx('conversation-list-cell-center ', {
                   'conversation-list-cell-center-no-left': temporaryUserStyle,
@@ -431,7 +515,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
                         className={cx('call-ui__button call-ui__button--participants', {
                           'call-ui__button--active': showParticipants,
                         })}
-                        onClick={() => setShowParticipants(current => !showParticipants)}
+                        onClick={() => setShowParticipants(prevState => !prevState)}
                         type="button"
                         data-uie-name="do-toggle-participants"
                         aria-pressed={showParticipants}
@@ -445,9 +529,16 @@ const CallingCell: React.FC<CallingCellProps> = ({
                   {(isIncoming || isOutgoing) && (
                     <li className="conversation-list-calling-cell-controls-item">
                       <button
+                        ref={element => {
+                          if (showAlert && !isGroup) {
+                            element?.focus();
+                          }
+                        }}
                         className="call-ui__button call-ui__button--red call-ui__button--large"
                         onClick={() => (isIncoming ? callActions.reject(call) : callActions.leave(call))}
-                        title={t('videoCallOverlayHangUp')}
+                        onBlur={() => clearShowAlert()}
+                        title={!isGroup && showAlert ? call1To1StartedAlert : t('videoCallOverlayHangUp')}
+                        aria-label={!isGroup && showAlert ? call1To1StartedAlert : t('videoCallOverlayHangUp')}
                         type="button"
                         data-uie-name="do-call-controls-call-decline"
                       >
@@ -460,10 +551,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
                     <li className="conversation-list-calling-cell-controls-item">
                       <button
                         className="call-ui__button call-ui__button--green call-ui__button--large"
-                        onClick={() => {
-                          callActions.answer(call);
-                          setCurrentView(ViewType.LEFT_SIDEBAR);
-                        }}
+                        onClick={answerCall}
                         type="button"
                         title={t('callAccept')}
                         aria-label={t('callAccept')}
@@ -475,6 +563,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
                   )}
                 </ul>
               </div>
+
               {isFullUi && (
                 <div
                   className={cx('call-ui__participant-list__wrapper', {

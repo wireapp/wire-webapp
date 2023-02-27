@@ -80,9 +80,9 @@ const _checkText = (event: any): MessageCategory | void => {
   }
 };
 
-export const categoryFromEvent = (event: EventRecord): MessageCategory => {
+export const categoryFromEvent = (event: Partial<EventRecord>): MessageCategory => {
   try {
-    const eventReactions = event.reactions;
+    const eventReactions = 'reactions' in event && event.reactions;
     let category = MessageCategory.NONE;
 
     const categoryChecks = [_checkText, _checkAsset, _checkPing, _checkLocation, _checkComposite];

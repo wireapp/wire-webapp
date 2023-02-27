@@ -59,6 +59,7 @@ import {ConversationStatus} from '../conversation/ConversationStatus';
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
 import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
 import {ConversationError} from '../error/ConversationError';
+import {isContentMessage} from '../guards/Message';
 import {StatusType} from '../message/StatusType';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {TeamState} from '../team/TeamState';
@@ -576,7 +577,9 @@ export class Conversation {
   }
 
   get allUserEntities() {
-    return [this.selfUser()].concat(this.participating_user_ets());
+    const selfUser = this.selfUser();
+    const selfUserArray = selfUser ? [selfUser] : [];
+    return selfUserArray.concat(this.participating_user_ets());
   }
 
   readonly persistState = (): void => {
@@ -975,7 +978,9 @@ export class Conversation {
    * @param messageId ID of message to be retrieved
    */
   getMessageByReplacementId(messageId: string): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
-    return this.messages().find(messageEntity => (messageEntity as ContentMessage)?.replacing_message_id === messageId);
+    return this.messages().find(
+      messageEntity => isContentMessage(messageEntity) && messageEntity.replacing_message_id === messageId,
+    );
   }
 
   updateGuests(): void {

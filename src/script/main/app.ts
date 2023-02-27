@@ -208,7 +208,7 @@ export class App {
     repositories.storage = new StorageRepository();
 
     repositories.cryptography = new CryptographyRepository();
-    repositories.client = new ClientRepository(new ClientService(), repositories.cryptography, repositories.storage);
+    repositories.client = new ClientRepository(new ClientService(), repositories.cryptography);
     repositories.media = new MediaRepository(new PermissionRepository());
     repositories.audio = new AudioRepository(repositories.media.devicesHandler);
 
@@ -439,14 +439,10 @@ export class App {
       telemetry.timeStep(AppInitTimingsStep.APP_PRE_LOADED);
 
       userRepository['userState'].self().devices(clientEntities);
-      this.logger.info('App pre-loading completed');
       this._handleUrlParams();
       await conversationRepository.updateConversationsOnAppInit();
       await conversationRepository.conversationLabelRepository.loadLabels();
 
-      telemetry.timeStep(AppInitTimingsStep.APP_LOADED);
-
-      telemetry.report();
       amplify.publish(WebAppEvents.LIFECYCLE.LOADED);
 
       telemetry.timeStep(AppInitTimingsStep.UPDATED_CONVERSATIONS);
@@ -457,12 +453,15 @@ export class App {
       audioRepository.init(true);
       conversationRepository.cleanupConversations();
       callingRepository.setReady();
-      this.logger.info('App fully loaded');
+      telemetry.timeStep(AppInitTimingsStep.APP_LOADED);
+
+      const loadTime = telemetry.report();
+      this.logger.info(`App loaded within ${loadTime}s for user "${selfUser.id}" and client "${clientEntity().id}"`);
 
       return selfUser;
     } catch (error) {
       if (error instanceof BaseError) {
-        this._appInitFailure(error);
+        await this._appInitFailure(error);
         return undefined;
       }
       throw error;
@@ -472,11 +471,11 @@ export class App {
   /**
    * Initialize ServiceWorker if supported.
    */
-  private initServiceWorker(): void {
+  private async initServiceWorker() {
     if (navigator.serviceWorker) {
-      navigator.serviceWorker
+      await navigator.serviceWorker
         .register(`/sw.js?${Environment.version(false)}`)
-        .then(({scope}) => this.logger.info(`ServiceWorker registration successful with scope: ${scope}`));
+        .then(({scope}) => this.logger.debug(`ServiceWorker registration successful with scope: ${scope}`));
     }
   }
 
@@ -673,13 +672,18 @@ export class App {
 
         const keepConversationInput = signOutReason === SIGN_OUT_REASON.SESSION_EXPIRED;
         const deletedKeys = CacheRepository.clearLocalStorage(keepConversationInput, keysToKeep);
-        this.logger.info(`Deleted "${deletedKeys.length}" keys from localStorage.`, deletedKeys);
+        this.logger.debug(`Deleted "${deletedKeys.length}" keys from localStorage.`, deletedKeys);
+      }
+      const shouldWipeIdentity = clearData || signOutReason === SIGN_OUT_REASON.CLIENT_REMOVED;
+
+      if (shouldWipeIdentity) {
+        localStorage.clear();
       }
 
+      await this.core.logout(shouldWipeIdentity);
       if (clearData) {
         // Info: This async call cannot be awaited in an "beforeunload" scenario, so we call it without waiting for it in order to delete the CacheStorage in the background.
         CacheRepository.clearCacheStorage();
-        localStorage.clear();
 
         try {
           await this.repository.storage.deleteDatabase();
@@ -688,7 +692,6 @@ export class App {
         }
       }
 
-      await this.core.logout(clearData);
       return _redirectToLogin();
     };
 
