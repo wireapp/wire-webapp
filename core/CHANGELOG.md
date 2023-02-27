@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [38.15.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.15.0...@wireapp/core@38.15.1) (2023-02-27)
+
+### Bug Fixes
+
+* Warn consumer that some clients have been deleted ([#4914](https://github.com/wireapp/wire-web-packages/issues/4914)) ([e3376d2](https://github.com/wireapp/wire-web-packages/commit/e3376d27f5a26f0eb8656f24ea49389835ba6000))
+
 # [38.15.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.14.3...@wireapp/core@38.15.0) (2023-02-23)
 
 ### Features
