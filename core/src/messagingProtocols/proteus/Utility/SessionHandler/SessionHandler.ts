@@ -37,6 +37,13 @@ interface ConstructSessionIdParams {
   domain?: string;
 }
 
+type InitSessionsResult = {
+  /** valid sessions that either already existed or have been freshly created */
+  sessions: string[];
+  /** client that do we do not have sessions with and that do not have existence on backend (deleted clients) */
+  unknowns?: UserClients;
+};
+
 const constructSessionId = ({userId, clientId, useQualifiedIds, domain}: ConstructSessionIdParams): string => {
   const id = typeof userId === 'string' ? userId : userId.id;
   const baseDomain = typeof userId === 'string' ? domain : userId.domain;
@@ -75,14 +82,12 @@ const createLegacySessions = async ({
   userClients,
   apiClient,
   cryptoClient,
-  logger,
-}: CreateLegacySessionsProps): Promise<string[]> => {
+}: CreateLegacySessionsProps): Promise<InitSessionsResult> => {
   const preKeyBundleMap = await apiClient.api.user.postMultiPreKeyBundles(userClients);
   const sessions = await createSessionsFromPreKeys({
     preKeyBundleMap,
     useQualifiedIds: false,
     cryptoClient,
-    logger,
   });
 
   return sessions;
@@ -102,26 +107,26 @@ const createQualifiedSessions = async ({
   domain,
   apiClient,
   cryptoClient,
-  logger,
-}: CreateQualifiedSessionsProps): Promise<string[]> => {
+}: CreateQualifiedSessionsProps): Promise<InitSessionsResult> => {
   const prekeyBundleMap = await apiClient.api.user.postQualifiedMultiPreKeyBundles({[domain]: userClientMap});
 
   const sessions: string[] = [];
+  let unknowns: UserClients = {};
 
   for (const domain in prekeyBundleMap) {
     const domainUsers = prekeyBundleMap[domain];
 
-    const domainSessions = await createSessionsFromPreKeys({
+    const {sessions: createdSessions, unknowns: domainUnknowns} = await createSessionsFromPreKeys({
       preKeyBundleMap: domainUsers,
       domain,
       useQualifiedIds: true,
       cryptoClient,
-      logger,
     });
-    sessions.push(...domainSessions);
+    sessions.push(...createdSessions);
+    unknowns = {...unknowns, ...domainUnknowns};
   }
 
-  return sessions;
+  return {sessions, unknowns};
 };
 
 interface CreateSessionsProps extends CreateSessionsBase {
@@ -138,7 +143,7 @@ const initSession = async (
   {cryptoClient, apiClient}: {apiClient: APIClient; cryptoClient: CryptoClient},
 ): Promise<string> => {
   const recipients = initialPrekey ? {[userId.id]: {[clientId]: initialPrekey}} : {[userId.id]: [clientId]};
-  const sessions = await initSessions({
+  const {sessions} = await initSessions({
     recipients,
     domain: userId.domain,
     apiClient,
@@ -152,22 +157,14 @@ const initSession = async (
  * Will call createQualifiedSessions or createLegacySessions based on passed userClientMap.
  * @param {userClientMap} map of domain to (map of user IDs to client IDs) or map of user IDs containg the lists of clients
  */
-const createSessions = async ({
-  userClientMap,
-  domain,
-  apiClient,
-  cryptoClient,
-  logger,
-}: CreateSessionsProps): Promise<string[]> => {
-  if (domain) {
-    return await createQualifiedSessions({userClientMap, domain, apiClient, cryptoClient, logger});
-  }
-  return await createLegacySessions({
-    userClients: userClientMap,
-    apiClient,
-    cryptoClient,
-    logger,
-  });
+const createSessions = async ({userClientMap, domain, apiClient, cryptoClient, logger}: CreateSessionsProps) => {
+  return domain
+    ? createQualifiedSessions({userClientMap, domain, apiClient, cryptoClient, logger})
+    : createLegacySessions({
+        userClients: userClientMap,
+        apiClient,
+        cryptoClient,
+      });
 };
 
 interface GetSessionsAndClientsFromRecipientsProps {
@@ -187,7 +184,7 @@ const initSessions = async ({
   apiClient,
   cryptoClient,
   logger,
-}: GetSessionsAndClientsFromRecipientsProps): Promise<string[]> => {
+}: GetSessionsAndClientsFromRecipientsProps): Promise<InitSessionsResult> => {
   const missingClients: UserClients = {};
   const missingClientsWithPrekeys: UserPreKeyBundleMap = {};
   const existingSessions: string[] = [];
@@ -212,7 +209,7 @@ const initSessions = async ({
     }
   }
 
-  const newPrekeySessions =
+  const {sessions: prekeyCreated, unknowns: prekeyUnknows} =
     Object.keys(missingClientsWithPrekeys).length > 0
       ? await createSessionsFromPreKeys({
           preKeyBundleMap: missingClientsWithPrekeys,
@@ -220,9 +217,9 @@ const initSessions = async ({
           useQualifiedIds: !!domain,
           cryptoClient,
         })
-      : [];
+      : {sessions: [], unknowns: {}};
 
-  const newSessions =
+  const {sessions: created, unknowns} =
     Object.keys(missingClients).length > 0
       ? await createSessions({
           userClientMap: missingClients,
@@ -231,9 +228,13 @@ const initSessions = async ({
           cryptoClient,
           logger,
         })
-      : [];
+      : {sessions: [], unknowns: {}};
 
-  return [...existingSessions, ...newPrekeySessions, ...newSessions];
+  const allUnknowns = {...prekeyUnknows, ...unknowns};
+  return {
+    sessions: [...existingSessions, ...prekeyCreated, ...created],
+    unknowns: Object.keys(allUnknowns).length > 0 ? allUnknowns : undefined,
+  };
 };
 
 interface DeleteSessionParams {
@@ -260,9 +261,9 @@ const createSessionsFromPreKeys = async ({
   domain = '',
   useQualifiedIds,
   cryptoClient,
-  logger,
-}: CreateSessionsFromPreKeysProps): Promise<string[]> => {
+}: CreateSessionsFromPreKeysProps): Promise<InitSessionsResult> => {
   const sessions: string[] = [];
+  const unknowns: UserClients = {};
 
   for (const userId in preKeyBundleMap) {
     const userClients = preKeyBundleMap[userId];
@@ -272,11 +273,8 @@ const createSessionsFromPreKeys = async ({
       const prekey = userClients[clientId];
 
       if (!prekey) {
-        logger?.warn(
-          `A prekey for client ${clientId} of user ${userId}${
-            domain ? ` on domain ${domain}` : ''
-          } was not found, session won't be created.`,
-        );
+        unknowns[userId] = unknowns[userId] || [];
+        unknowns[userId].push(clientId);
         continue;
       }
 
@@ -289,7 +287,7 @@ const createSessionsFromPreKeys = async ({
     }
   }
 
-  return sessions;
+  return {sessions, unknowns};
 };
 
 type EncryptedPayloads<T> = Record<string, Record<string, T>>;

@@ -59,6 +59,12 @@ import {
   initSessions,
 } from '../Utility/SessionHandler';
 
+type EncryptionResult = {
+  /** the encrypted payloads for the clients that have a valid sessions */
+  payloads: OTRRecipients<Uint8Array>;
+  /** user-client that do not have prekeys on backend (deleted clients) */
+  unknowns?: UserClients;
+};
 export class ProteusService {
   private readonly messageService: MessageService;
   private readonly logger = logdown('@wireapp/core/ProteusService');
@@ -254,8 +260,8 @@ export class ProteusService {
     plainText: Uint8Array,
     recipients: UserPreKeyBundleMap | UserClients,
     domain: string = '',
-  ): Promise<OTRRecipients<Uint8Array>> {
-    const sessions = await initSessions({
+  ): Promise<EncryptionResult> {
+    const {sessions, unknowns} = await initSessions({
       recipients,
       domain,
       apiClient: this.apiClient,
@@ -265,7 +271,7 @@ export class ProteusService {
 
     const payload = await this.cryptoClient.encrypt(sessions, plainText);
 
-    return buildEncryptedPayloads(payload);
+    return {payloads: buildEncryptedPayloads(payload), unknowns};
   }
 
   public deleteSession(userId: QualifiedId, clientId: string) {
@@ -280,15 +286,22 @@ export class ProteusService {
   public async encryptQualified(
     plainText: Uint8Array,
     preKeyBundles: QualifiedUserPreKeyBundleMap | QualifiedUserClients,
-  ): Promise<QualifiedOTRRecipients> {
+  ): Promise<{payloads: QualifiedOTRRecipients; unknowns?: QualifiedUserClients}> {
     const qualifiedOTRRecipients: QualifiedOTRRecipients = {};
+    const missingRecipients: QualifiedUserClients = {};
 
     for (const [domain, preKeyBundleMap] of Object.entries(preKeyBundles)) {
-      const result = await this.encrypt(plainText, preKeyBundleMap, domain);
-      qualifiedOTRRecipients[domain] = result;
+      const {unknowns, payloads} = await this.encrypt(plainText, preKeyBundleMap, domain);
+      qualifiedOTRRecipients[domain] = payloads;
+      if (unknowns) {
+        missingRecipients[domain] = unknowns;
+      }
     }
 
-    return qualifiedOTRRecipients;
+    return {
+      payloads: qualifiedOTRRecipients,
+      unknowns: Object.keys(missingRecipients).length > 0 ? missingRecipients : undefined,
+    };
   }
 
   async wipe(storeEngine?: CRUDEngine) {
