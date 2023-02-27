@@ -118,12 +118,11 @@ export class ClientService {
       if (notFoundOnBackend && this.storeEngine) {
         this.logger.log('Could not find valid client on backend');
         const shouldDeleteWholeDatabase = loadedClient.type === ClientType.TEMPORARY;
+        this.logger.log('Deleting previous identity');
+        await this.proteusService.wipe(this.storeEngine);
         if (shouldDeleteWholeDatabase) {
-          this.logger.log('Last client was temporary - Deleting database');
+          this.logger.log('Last client was temporary - Deleting content database');
           await this.storeEngine.clearTables();
-        } else {
-          this.logger.log('Last client was permanent - Deleting previous identity');
-          await this.proteusService.wipe(this.storeEngine);
         }
       }
     }
