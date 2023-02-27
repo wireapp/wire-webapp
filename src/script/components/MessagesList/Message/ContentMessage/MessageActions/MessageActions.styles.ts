@@ -19,10 +19,6 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const wrapperStyles: CSSObject = {
-  display: 'inline-flex',
-};
-
 export const messageActionsGroup: CSSObject = {
   display: 'flex',
   marginLeft: '8px',
@@ -30,6 +26,7 @@ export const messageActionsGroup: CSSObject = {
 };
 
 export const messageBodyActions: CSSObject = {
+  display: 'inline-flex',
   alignItems: 'center',
   height: '24px',
   position: 'absolute',
@@ -49,27 +46,51 @@ export const messageActionsMenuButton: CSSObject = {
   justifyContent: 'center',
   alignItems: 'center',
   padding: '8px 12px',
-  background: '#FFFFFF',
-  border: '1px solid #DCE0E3',
   cursor: 'pointer',
+  '&:first-of-type': {
+    borderRadius: '12px 0px 0px 12px',
+  },
+  '&:last-of-type': {
+    borderRadius: '0px 12px 12px 0px',
+  },
 };
 
-export const messageActionsMenuButtonFirst: CSSObject = {
-  borderRadius: '12px 0px 0px 12px',
+export const getIconCSS: CSSObject = {
+  'body.theme-dark &': {
+    'svg path': {
+      fill: 'var(--white)',
+    },
+    'svg path:nth-of-type(2)': {
+      stroke: 'var(--white)',
+    },
+  },
 };
 
-export const messageActionsMenuButtonLast: CSSObject = {
-  borderRadius: '0px 12px 12px 0px',
+export const getActionsMenuCSS = (isActive?: boolean): CSSObject => {
+  if (isActive) {
+    return {
+      border: '1px solid var(--message-actions-active-border)',
+      backgroundColor: 'var(--message-actions-active-background)',
+      color: 'var(--accent-color)',
+      outline: 'none',
+    };
+  }
+  return {
+    border: '1px solid var(--message-actions-border)',
+    backgroundColor: 'var(--message-actions-background)',
+    outline: 'none',
+
+    '&:hover': {
+      backgroundColor: 'var(--message-actions-background-hover)',
+      border: '1px solid var(--message-actions-border-hover)',
+    },
+    '&:focus-visible': {
+      border: '1px solid var(--accent-color-focus)',
+      outline: 'none',
+    },
+  };
 };
 
 export const messageWithHeaderTop: CSSObject = {
   top: '2.8rem',
 };
-
-// export const quoteMessageTop: CSSObject = {
-//   top: '2.8rem',
-// };
-
-// export const quoteMessageWithoutHeaderTop: CSSObject = {
-//   top: '-5rem',
-// };

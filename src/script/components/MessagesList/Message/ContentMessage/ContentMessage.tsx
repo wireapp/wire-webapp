@@ -32,12 +32,11 @@ import {getMessageAriaLabel} from 'Util/conversationMessages';
 import {t} from 'Util/LocalizerUtil';
 
 import {ContentAsset} from './asset';
+import {MessageActions} from './MessageActions/MessageActions';
 import {MessageFooterLike} from './MessageFooterLike';
 import {MessageLike} from './MessageLike';
 import {Quote} from './MessageQuote';
-import {MessageReaction} from './MessageReaction/MessageReaction';
 
-import {MessageActions} from '..';
 import {EphemeralStatusType} from '../../../../message/EphemeralStatusType';
 import {ContextMenuEntry} from '../../../../ui/ContextMenu';
 import {EphemeralTimer} from '../EphemeralTimer';
@@ -173,22 +172,29 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
     headerSenderName,
   });
 
-  const [menuClass, setStyle] = useState('menu-hidden');
+  const [isActionMenuVisible, setActionMenuVisibility] = useState(true);
+  const [isMenuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    if (msgFocusState) {
-      setStyle('menu-visible');
+    if (isMessageFocused || msgFocusState) {
+      setActionMenuVisibility(true);
+    } else {
+      setActionMenuVisibility(false);
     }
-  }, [msgFocusState]);
+  }, [msgFocusState, isMessageFocused]);
 
   return (
     <div
       aria-label={messageAriaLabel}
+      className="content-message-wrapper"
       onMouseEnter={event => {
-        setStyle('menu-visiable');
+        setActionMenuVisibility(true);
       }}
       onMouseLeave={event => {
-        setStyle('menu-hidden');
+        // close message actions when no active menu is open like context menu/emoji picker
+        if (!isMenuOpen) {
+          setActionMenuVisibility(false);
+        }
       }}
     >
       {avatarSection}
@@ -235,13 +241,16 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             />
           </div>
         )}
-        <MessageReaction
-          isMsgWithHeader={shouldShowAvatar()}
-          message={message}
-          menuClass={menuClass}
-          contextMenu={contextMenu}
-          isMessageFocused={msgFocusState}
-        />
+        {isActionMenuVisible && (
+          <MessageActions
+            isMsgWithHeader={shouldShowAvatar()}
+            message={message}
+            handleActionMenuVisibility={setActionMenuVisibility}
+            contextMenu={contextMenu}
+            isMessageFocused={msgFocusState}
+            handleMenuOpen={setMenuOpen}
+          />
+        )}
       </div>
 
       {other_likes.length > 0 && (

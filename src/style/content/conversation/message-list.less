@@ -311,8 +311,15 @@
   outline-offset: -0.1rem;
 }
 
-.message-wrapper:hover {
-  background-color: #fff;
+.message-wrapper {
+  &:hover,
+  &:focus-visible {
+    background-color: #fff;
+
+    body.theme-dark & {
+      background-color: var(--gray-90);
+    }
+  }
 }
 
 .message-mention {
@@ -874,12 +881,4 @@
   path {
     fill: #fff;
   }
-}
-
-.menu-visiable {
-  display: inline-flex;
-}
-
-.menu-hidden {
-  display: none;
 }

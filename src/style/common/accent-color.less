@@ -214,6 +214,8 @@ each(.colors(), .(@color-key, @color-name) {
   @button-secondary-hover-border: '@{name}-500';
   @button-secondary-active-bg: '@{name}-50';
   @button-secondary-active-border: '@{name}-500';
+  @message-actions-active-border: '@{name}-300';
+  @message-actions-active-background: '@{name}-50';
   @toggle-button-hover-bg: '@{name}-700';
   @icon-primary-active-fill: '@{name}-500';
   @icon-secondary-active-border: 'accent_colors-0';
@@ -228,6 +230,8 @@ each(.colors(), .(@color-key, @color-name) {
     --button-secondary-hover-border: @@button-secondary-hover-border;
     --button-secondary-active-bg: @@button-secondary-active-bg;
     --button-secondary-active-border: @@button-secondary-active-border;
+    --message-actions-active-border:@@message-actions-active-border;
+    --message-actions-active-background:@@message-actions-active-background;
     --toggle-button-hover-bg: @@toggle-button-hover-bg;
     --icon-primary-active-fill: @@icon-primary-active-fill;
     --icon-secondary-active-border: @@icon-secondary-active-border;
@@ -268,6 +272,8 @@ each(.colors(), .(@color-key, @color-name) {
     @button-secondary-hover-border-dark: 'w-gray-70';
     @button-secondary-active-bg-dark: 'w-gray-95';
     @button-secondary-active-border-dark: '@{name}-dark-800';
+    @message-actions-active-border-dark: '@{name}-dark-600';
+    @message-actions-active-background-dark: '@{name}-dark-800';
     @toggle-button-hover-bg-dark: '@{name}-dark-300';
     @icon-primary-active-fill-dark: 'w-white';
     @icon-secondary-active-border-dark: '@{name}-dark-800' ;
@@ -281,6 +287,8 @@ each(.colors(), .(@color-key, @color-name) {
       --button-secondary-hover-border: @@button-secondary-hover-border-dark;
       --button-secondary-active-bg: @@button-secondary-active-bg-dark;
       --button-secondary-active-border: @@button-secondary-active-border-dark;
+      --message-actions-active-border: @@message-actions-active-border-dark;
+      --message-actions-active-background: @@message-actions-active-background-dark;
       --icon-primary-active-fill: @@icon-primary-active-fill-dark;
       --icon-secondary-active-border: @@icon-secondary-active-border-dark;
       --indicator-range-input-thumb: @@indicator-range-input-thumb-dark;
