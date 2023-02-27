@@ -234,14 +234,22 @@ const CallingCell: React.FC<CallingCellProps> = ({
 
   const answerOrRejectCall = useCallback(
     (event: KeyboardEvent) => {
+      const answerCallShortcut = !event.shiftKey && event.ctrlKey && isEnterKey(event);
+      const hangUpCallShortcut = event.ctrlKey && event.shiftKey && isEnterKey(event);
+
       const removeEventListener = () => window.removeEventListener('keydown', answerOrRejectCall);
 
-      if (!event.shiftKey && event.ctrlKey && isEnterKey(event)) {
+      if (answerCallShortcut || hangUpCallShortcut) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+
+      if (answerCallShortcut) {
         answerCall();
         removeEventListener();
       }
 
-      if (event.ctrlKey && event.shiftKey && isEnterKey(event)) {
+      if (hangUpCallShortcut) {
         callActions.reject(call);
         removeEventListener();
       }
@@ -251,10 +259,10 @@ const CallingCell: React.FC<CallingCellProps> = ({
 
   useEffect(() => {
     if (isIncoming) {
-      window.addEventListener('keydown', answerOrRejectCall);
+      document.addEventListener('keydown', answerOrRejectCall, {capture: true});
 
       return () => {
-        window.removeEventListener('keydown', answerOrRejectCall);
+        document.removeEventListener('keydown', answerOrRejectCall, {capture: true});
       };
     }
 
