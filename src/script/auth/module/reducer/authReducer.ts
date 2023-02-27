@@ -97,7 +97,6 @@ export function authReducer(state: AuthState = initialAuthState, action: AppActi
     case AUTH_ACTION.REGISTER_JOIN_START:
     case AUTH_ACTION.REGISTER_PERSONAL_START:
     case AUTH_ACTION.REGISTER_TEAM_START:
-    case AUTH_ACTION.FETCH_TEAM_START:
     case USER_ACTION.USER_SEND_ACTIVATION_CODE_START: {
       return {
         ...state,
@@ -119,6 +118,7 @@ export function authReducer(state: AuthState = initialAuthState, action: AppActi
         isSendingTwoFactorCode: false,
       };
     }
+    case AUTH_ACTION.FETCH_TEAM_START:
     case AUTH_ACTION.REFRESH_START: {
       return {
         ...state,
@@ -137,13 +137,19 @@ export function authReducer(state: AuthState = initialAuthState, action: AppActi
     case AUTH_ACTION.REGISTER_JOIN_FAILED:
     case AUTH_ACTION.REGISTER_PERSONAL_FAILED:
     case AUTH_ACTION.REGISTER_TEAM_FAILED:
-    case AUTH_ACTION.FETCH_TEAM_FAILED:
     case USER_ACTION.USER_SEND_ACTIVATION_CODE_FAILED: {
       return {
         ...state,
         error: action.error,
         fetching: false,
         isAuthenticated: false,
+      };
+    }
+    case AUTH_ACTION.FETCH_TEAM_FAILED: {
+      return {
+        ...state,
+        error: action.error,
+        fetching: false,
       };
     }
     case AUTH_ACTION.LOGIN_SUCCESS:
@@ -163,9 +169,7 @@ export function authReducer(state: AuthState = initialAuthState, action: AppActi
     case AUTH_ACTION.FETCH_TEAM_SUCCESS: {
       return {
         ...state,
-        account: {
-          team: action.payload,
-        },
+        account: {...state.account, team: action.payload},
         error: null,
         fetched: true,
         fetching: false,

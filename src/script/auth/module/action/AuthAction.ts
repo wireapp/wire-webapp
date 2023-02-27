@@ -180,11 +180,10 @@ export class AuthAction {
   };
 
   doGetTeamData = (teamId?: string): ThunkAction<Promise<TeamData>> => {
-    return async (dispatch, getState, {actions: {authAction, selfAction}, apiClient}) => {
+    return async (dispatch, getState, {apiClient}) => {
       dispatch(AuthActionCreator.startFetchTeam());
       try {
-        const teamData = await apiClient.api.teams.team.getTeam(teamId ?? getState().authState.account.team.id);
-        await dispatch(selfAction.doCheckPasswordState());
+        const teamData = await apiClient.api.teams.team.getTeam(teamId ?? getState().selfState.self.team ?? '');
         dispatch(AuthActionCreator.successfulFetchTeam(teamData));
         return teamData;
       } catch (error) {

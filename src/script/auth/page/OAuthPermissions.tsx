@@ -66,7 +66,14 @@ interface AuthParams {
   response_type: string;
 }
 
-const OAuthPermissionsComponent = ({doLogout, userEmail, teamIcon}: Props & ConnectedProps & DispatchProps) => {
+const OAuthPermissionsComponent = ({
+  doLogout,
+  userEmail,
+  selfTeamId,
+  teamIcon,
+  getSelf,
+  getTeam,
+}: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
   // const navigate = useNavigate();
   const params = decodeURIComponent(window.location.search.slice(1))
@@ -86,7 +93,16 @@ const OAuthPermissionsComponent = ({doLogout, userEmail, teamIcon}: Props & Conn
     // return navigate(ROUTE.SET_EMAIL);
   };
 
-  // console.log(userEmail, teamIcon, params);
+  React.useEffect(() => {
+    const getUserData = async () => {
+      await getSelf();
+      await getTeam(selfTeamId);
+    };
+    getUserData().catch(error => {
+      console.error(error);
+    });
+  }, [getSelf, getTeam, selfTeamId]);
+
   return (
     <Page>
       <ContainerXS
@@ -95,7 +111,7 @@ const OAuthPermissionsComponent = ({doLogout, userEmail, teamIcon}: Props & Conn
         style={{width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center'}}
       >
         <H2 center>{_(oauthStrings.headline)}</H2>
-        {teamIcon && <Box style={{backgroundImage: teamIcon}} />}
+        {/* {teamIcon && <Box style={{backgroundImage: teamIcon}} />} */}
         <Text>{userEmail}</Text>
         <Link
           onClick={doLogout}
@@ -202,6 +218,7 @@ type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
   userEmail: SelfSelector.getSelfEmail(state),
   teamIcon: AuthSelector.getAccountTeamIcon(state),
+  selfTeamId: SelfSelector.getSelfTeamId(state),
 });
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
