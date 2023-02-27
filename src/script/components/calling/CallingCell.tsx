@@ -259,6 +259,9 @@ const CallingCell: React.FC<CallingCellProps> = ({
 
   useEffect(() => {
     if (isIncoming) {
+      // Capture will be dispatched to registered element before being dispatched to any EventTarget beneath it in the DOM Tree.
+      // It's needed because when someone is calling we need to change order of shortcuts to the top of keyboard usage.
+      // If we didn't pass this prop other Event Listeners will be dispatched in same time.
       document.addEventListener('keydown', answerOrRejectCall, {capture: true});
 
       return () => {
