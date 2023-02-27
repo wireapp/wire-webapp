@@ -2517,6 +2517,9 @@ export class ConversationRepository {
           await this.core.service!.conversation.wipeMLSConversation(groupId);
         }
       }
+    } else {
+      // Update conversation roles (in case the removed user had some special role and it's not the self user)
+      await this.conversationRoleRepository.updateConversationRoles(conversationEntity);
     }
 
     if (!selfLeavingClearedConversation) {
@@ -2532,8 +2535,6 @@ export class ConversationRepository {
           }
         });
 
-      // Update conversation roles (in case the removed user had some special role)
-      await this.conversationRoleRepository.updateConversationRoles(conversationEntity);
       await this.updateParticipatingUserEntities(conversationEntity);
 
       this.verificationStateHandler.onMemberLeft(conversationEntity);
