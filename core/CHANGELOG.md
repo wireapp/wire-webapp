@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [38.15.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.15.1...@wireapp/core@38.15.2) (2023-02-27)
+
+### Bug Fixes
+
+* Reset CoreCrypto instance when client is registered ([#4926](https://github.com/wireapp/wire-web-packages/issues/4926)) ([a72fa5e](https://github.com/wireapp/wire-web-packages/commit/a72fa5e13ae38dfbbe071eee6359f5c9e9a0f8b2))
+
 ## [38.15.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.15.0...@wireapp/core@38.15.1) (2023-02-27)
 
 ### Bug Fixes
