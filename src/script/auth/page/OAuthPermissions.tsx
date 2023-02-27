@@ -22,7 +22,7 @@ import React from 'react';
 // import {ClientType} from '@wireapp/api-client/lib/client/index';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
-// import {Navigate, useNavigate} from 'react-router-dom';
+// import {useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
 import {
@@ -69,14 +69,14 @@ interface AuthParams {
 const OAuthPermissionsComponent = ({doLogout, userEmail, teamIcon}: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
   // const navigate = useNavigate();
-  const params = decodeURI(window.location.search.slice(1))
+  const params = decodeURIComponent(window.location.search.slice(1))
     .split('&')
     .reduce((acc, param) => {
       const [key, value] = param.split('=');
       if (key === 'scope') {
         return {
           ...acc,
-          [key]: value.split(' ').filter(scope => Object.values(Scope).includes(scope as Scope)) as Scope[],
+          [key]: value.split(/\+|%20/).filter(scope => Object.values(Scope).includes(scope as Scope)) as Scope[],
         };
       }
       return {...acc, [key]: value};
@@ -86,11 +86,16 @@ const OAuthPermissionsComponent = ({doLogout, userEmail, teamIcon}: Props & Conn
     // return navigate(ROUTE.SET_EMAIL);
   };
 
+  // console.log(userEmail, teamIcon, params);
   return (
     <Page>
-      <ContainerXS centerText verticalCenter style={{width: '100%', display: 'flex', flexDirection: 'column'}}>
+      <ContainerXS
+        centerText
+        verticalCenter
+        style={{width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center'}}
+      >
         <H2 center>{_(oauthStrings.headline)}</H2>
-        <Box style={{backgroundImage: teamIcon}} />
+        {teamIcon && <Box style={{backgroundImage: teamIcon}} />}
         <Text>{userEmail}</Text>
         <Link
           onClick={doLogout}
@@ -103,7 +108,7 @@ const OAuthPermissionsComponent = ({doLogout, userEmail, teamIcon}: Props & Conn
         </Link>
         <Text center>{_(oauthStrings.subhead, {app: 'Wire'})} </Text>
         {/* TODO: update to correct app name from BE */}
-        {params.scope && (
+        {params.scope.length > 1 && (
           <Box style={{marginTop: '24px', marginBottom: '24px'}}>
             <ul>
               {params.scope.map((scope, index) => (
@@ -203,7 +208,9 @@ type DispatchProps = ReturnType<typeof mapDispatchToProps>;
 const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
   bindActionCreators(
     {
+      getSelf: actionRoot.selfAction.fetchSelf,
       doLogout: actionRoot.authAction.doLogout,
+      getTeam: actionRoot.authAction.doGetTeamData,
     },
     dispatch,
   );

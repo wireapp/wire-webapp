@@ -97,6 +97,7 @@ export function authReducer(state: AuthState = initialAuthState, action: AppActi
     case AUTH_ACTION.REGISTER_JOIN_START:
     case AUTH_ACTION.REGISTER_PERSONAL_START:
     case AUTH_ACTION.REGISTER_TEAM_START:
+    case AUTH_ACTION.FETCH_TEAM_START:
     case USER_ACTION.USER_SEND_ACTIVATION_CODE_START: {
       return {
         ...state,
@@ -136,6 +137,7 @@ export function authReducer(state: AuthState = initialAuthState, action: AppActi
     case AUTH_ACTION.REGISTER_JOIN_FAILED:
     case AUTH_ACTION.REGISTER_PERSONAL_FAILED:
     case AUTH_ACTION.REGISTER_TEAM_FAILED:
+    case AUTH_ACTION.FETCH_TEAM_FAILED:
     case USER_ACTION.USER_SEND_ACTIVATION_CODE_FAILED: {
       return {
         ...state,
@@ -156,6 +158,17 @@ export function authReducer(state: AuthState = initialAuthState, action: AppActi
         fetched: true,
         fetching: false,
         isAuthenticated: true,
+      };
+    }
+    case AUTH_ACTION.FETCH_TEAM_SUCCESS: {
+      return {
+        ...state,
+        account: {
+          team: action.payload,
+        },
+        error: null,
+        fetched: true,
+        fetching: false,
       };
     }
     case AUTH_ACTION.GET_SSO_SETTINGS_START: {

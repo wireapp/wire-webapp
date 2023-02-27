@@ -165,6 +165,13 @@ const LoginComponent = ({
     };
   }, []);
 
+  // useEffect(() => {
+  //   const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE);
+  //   if (isOauth) {
+
+  //   }
+  //   },[]);
+
   const immediateLogin = async () => {
     try {
       await doInit({isImmediateLogin: true, shouldValidateLocalClient: false});
@@ -190,7 +197,10 @@ const LoginComponent = ({
       } else {
         await doLogin(login, getEntropy);
       }
-
+      const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE);
+      if (isOauth) {
+        return navigate(ROUTE.AUTHORIZE);
+      }
       return navigate(ROUTE.HISTORY_INFO);
     } catch (error) {
       if (isBackendError(error)) {

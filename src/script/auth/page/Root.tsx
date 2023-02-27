@@ -115,7 +115,7 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
   const ProtectedSetHandle = () => isAuthenticatedCheck(<SetHandle />);
   const ProtectedSetEmail = () => isAuthenticatedCheck(<SetEmail />);
   const ProtectedSetPassword = () => isAuthenticatedCheck(<SetPassword />);
-  // const ProtectedOAuthPermissions = () => isAuthenticatedCheck(<OAuthPermissions />);
+  const ProtectedOAuthPermissions = () => isAuthenticatedCheck(<OAuthPermissions />);
 
   const brandName = Config.getConfig().BRAND_NAME;
   return (
@@ -145,7 +145,7 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
               )}
               <Route path={ROUTE.HISTORY_INFO} element={<ProtectedHistoryInfo />} />
               <Route path={ROUTE.INITIAL_INVITE} element={<ProtectedInitialInvite />} />
-              <Route path={`${ROUTE.AUTHORIZE}/*`} element={<OAuthPermissions />} />
+              <Route path={`${ROUTE.AUTHORIZE}/*`} element={<ProtectedOAuthPermissions />} />
               <Route
                 path={`${ROUTE.LOGIN}/*`}
                 element={

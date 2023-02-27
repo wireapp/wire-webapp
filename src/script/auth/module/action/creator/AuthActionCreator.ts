@@ -19,6 +19,7 @@
 
 import type {SSOSettings} from '@wireapp/api-client/lib/account/SSOSettings';
 import type {RegisterData} from '@wireapp/api-client/lib/auth/';
+import {TeamData} from '@wireapp/api-client/lib/team';
 
 import type {LoginDataState, RegistrationDataState} from '../../reducer/authReducer';
 
@@ -29,6 +30,9 @@ export enum AUTH_ACTION {
   ENTER_GENERIC_INVITATION_FLOW = 'ENTER_GENERIC_INVITATION_FLOW',
   ENTER_PERSONAL_CREATION_FLOW = 'ENTER_PERSONAL_CREATION_FLOW',
   ENTER_TEAM_CREATION_FLOW = 'ENTER_TEAM_CREATION_FLOW',
+  FETCH_TEAM_FAILED = 'FETCH_TEAM_FAILED',
+  FETCH_TEAM_START = 'FETCH_TEAM_START',
+  FETCH_TEAM_SUCCESS = 'FETCH_TEAM_SUCCESS',
   GET_SSO_SETTINGS_FAILED = 'GET_SSO_SETTINGS_FAILED',
   GET_SSO_SETTINGS_START = 'GET_SSO_SETTINGS_START',
   GET_SSO_SETTINGS_SUCCESS = 'GET_SSO_SETTINGS_SUCCESS',
@@ -80,6 +84,9 @@ export type AuthActions =
   | RegisterTeamStartAction
   | RegisterTeamSuccessAction
   | RegisterTeamFailedAction
+  | FetchTeamStartAction
+  | FetchTeamSuccessAction
+  | FetchTeamFailedAction
   | RegisterPersonalStartAction
   | RegisterPersonalSuccessAction
   | RegisterPersonalFailedAction
@@ -155,6 +162,18 @@ export interface RegisterTeamSuccessAction extends AppAction {
 export interface RegisterTeamFailedAction extends AppAction {
   readonly error: Error;
   readonly type: AUTH_ACTION.REGISTER_TEAM_FAILED;
+}
+
+export interface FetchTeamStartAction extends AppAction {
+  readonly type: AUTH_ACTION.FETCH_TEAM_START;
+}
+export interface FetchTeamSuccessAction extends AppAction {
+  readonly payload: TeamData;
+  readonly type: AUTH_ACTION.FETCH_TEAM_SUCCESS;
+}
+export interface FetchTeamFailedAction extends AppAction {
+  readonly error: Error;
+  readonly type: AUTH_ACTION.FETCH_TEAM_FAILED;
 }
 
 export interface RegisterPersonalStartAction extends AppAction {
@@ -321,6 +340,19 @@ export class AuthActionCreator {
     type: AUTH_ACTION.REGISTER_TEAM_FAILED,
   });
 
+  static startFetchTeam = (): FetchTeamStartAction => ({
+    type: AUTH_ACTION.FETCH_TEAM_START,
+  });
+
+  static successfulFetchTeam = (teamData: TeamData): FetchTeamSuccessAction => ({
+    payload: teamData,
+    type: AUTH_ACTION.FETCH_TEAM_SUCCESS,
+  });
+
+  static failedFetchTeam = (error: Error): FetchTeamFailedAction => ({
+    error,
+    type: AUTH_ACTION.FETCH_TEAM_FAILED,
+  });
   static startRegisterPersonal = (): RegisterPersonalStartAction => ({
     type: AUTH_ACTION.REGISTER_PERSONAL_START,
   });
