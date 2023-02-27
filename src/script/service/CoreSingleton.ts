@@ -22,7 +22,6 @@ import {container, singleton} from 'tsyringe';
 
 import {Account} from '@wireapp/core';
 
-import {getStorage} from 'Util/localStorage';
 import {isTemporaryClientAndNonPersistent, supportsCoreCryptoProteus, supportsMLS} from 'Util/util';
 
 import {APIClient} from './APIClientSingleton';
@@ -73,7 +72,7 @@ export class Core extends Account {
          */
         systemCrypto: window.systemCrypto,
 
-        useCoreCrypto: getStorage()?.getItem('useCoreCrypto') === '1',
+        useCoreCrypto: true,
       },
       nbPrekeys: 100,
     });
