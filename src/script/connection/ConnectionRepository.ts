@@ -185,7 +185,7 @@ export class ConnectionRepository {
    */
   public async createConnection(userEntity: User): Promise<boolean> {
     try {
-      const response = await this.connectionService.postConnections(userEntity.qualifiedId, userEntity.name());
+      const response = await this.connectionService.postConnections(userEntity.qualifiedId);
       const connectionEvent = {connection: response, user: {name: userEntity.name()}};
       await this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED);
       return true;
