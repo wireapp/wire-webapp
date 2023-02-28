@@ -104,9 +104,10 @@ const LoginComponent = ({
   const [twoFactorSubmitError, setTwoFactorSubmitError] = useState<string | Error>('');
   const [twoFactorLoginData, setTwoFactorLoginData] = useState<LoginData>();
 
+  const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE);
+
   const [showEntropyForm, setShowEntropyForm] = useState(false);
   const isEntropyRequired = Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY;
-
   const onEntropyGenerated = useRef<((entropy: Uint8Array) => void) | undefined>();
   const entropy = useRef<Uint8Array | undefined>();
   const getEntropy = isEntropyRequired
@@ -157,7 +158,8 @@ const LoginComponent = ({
   useEffect(() => {
     resetAuthError();
     const isImmediateLogin = UrlUtil.hasURLParameter(QUERY_KEY.IMMEDIATE_LOGIN);
-    if (isImmediateLogin) {
+
+    if (isImmediateLogin || isOauth) {
       immediateLogin();
     }
     return () => {
@@ -165,18 +167,15 @@ const LoginComponent = ({
     };
   }, []);
 
-  // useEffect(() => {
-  //   const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE);
-  //   if (isOauth) {
-
-  //   }
-  //   },[]);
-
   const immediateLogin = async () => {
     try {
       await doInit({isImmediateLogin: true, shouldValidateLocalClient: false});
       const entropyData = await getEntropy?.();
       await doInitializeClient(ClientType.PERMANENT, undefined, undefined, entropyData);
+
+      if (isOauth) {
+        return navigate(ROUTE.AUTHORIZE);
+      }
       return navigate(ROUTE.HISTORY_INFO);
     } catch (error) {
       logger.error('Unable to login immediately', error);
@@ -197,7 +196,7 @@ const LoginComponent = ({
       } else {
         await doLogin(login, getEntropy);
       }
-      const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE);
+
       if (isOauth) {
         return navigate(ROUTE.AUTHORIZE);
       }
