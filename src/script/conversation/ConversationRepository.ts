@@ -189,7 +189,7 @@ export class ConversationRepository {
     this.messageRepository.setClientMismatchHandler(async (mismatch, conversation, silent, consentType) => {
       //we filter out self client id to omit it in mismatch check
       const {userId, clientId} = this.core;
-      const domain = this.core.backendFeatures.federationEndpoints ? userState.self().domain : '';
+      const domain = userState.self().domain;
 
       const selfClient = {domain, userId, clientId};
       const filteredMissing = mismatch.missing && removeClientFromUserClientMap(mismatch.missing, selfClient);
@@ -372,14 +372,10 @@ export class ConversationRepository {
     options: Partial<NewConversation> = {},
   ): Promise<Conversation | undefined> {
     const userIds = userEntities.map(user => user.qualifiedId);
-    const usersPayload = this.core.backendFeatures.federationEndpoints
-      ? {
-          qualified_users: userIds,
-          users: [] as string[],
-        }
-      : {
-          users: userIds.map(({id}) => id),
-        };
+    const usersPayload = {
+      qualified_users: userIds,
+      users: [] as string[],
+    };
 
     let payload: NewConversation & {conversation_role: string} = {
       conversation_role: DefaultRole.WIRE_MEMBER,
