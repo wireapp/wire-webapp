@@ -168,6 +168,37 @@ describe('MessageService', () => {
         time: new Date().toISOString(),
       };
 
+      it('handles client mismatch when no other clients from that domain are known', async () => {
+        const [messageService, {apiClient}] = await buildMessageService();
+
+        let spyCounter = 0;
+        const clientMismatch = {
+          ...baseClientMismatch,
+          missing: {[user1.domain]: {[user1.id]: ['client']}},
+        };
+        jest.spyOn(apiClient.api.conversation, 'postOTRMessage').mockImplementation(() => {
+          spyCounter++;
+          if (spyCounter === 1) {
+            const error = new Error();
+            (error as any).response = {
+              status: StatusCodes.PRECONDITION_FAILED,
+              data: clientMismatch,
+            };
+            return Promise.reject(error);
+          }
+          return Promise.resolve(baseClientMismatch);
+        });
+        jest.spyOn(apiClient.api.user, 'postMultiPreKeyBundles').mockReturnValue(Promise.resolve({}));
+
+        const recipients = generateRecipients([]);
+
+        await messageService.sendMessage('senderclientid', recipients, new Uint8Array(), {
+          reportMissing: true,
+          conversationId: {id: 'convid', domain: ''},
+        });
+        expect(apiClient.api.conversation.postOTRMessage).toHaveBeenCalledTimes(2);
+      });
+
       it('handles client mismatch internally if no onClientMismatch is given', async () => {
         const [messageService, {apiClient}] = await buildMessageService();
 

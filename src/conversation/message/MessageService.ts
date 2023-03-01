@@ -180,9 +180,11 @@ export class MessageService {
     if (Object.keys(mismatch.missing).length) {
       const {payloads} = await this.proteusService.encrypt(plainText, mismatch.missing);
       const reEncryptedPayloads = flattenQualifiedUserClients<{[client: string]: Uint8Array}>(payloads);
-      reEncryptedPayloads.forEach(
-        ({data, userId}) => (recipients[userId.domain][userId.id] = {...recipients[userId.domain][userId.id], ...data}),
-      );
+      reEncryptedPayloads.forEach(({data, userId}) => {
+        const domainRecipients = recipients[userId.domain] ?? {};
+        domainRecipients[userId.id] = {...domainRecipients[userId.id], ...data};
+        recipients[userId.domain] = domainRecipients;
+      });
     }
     return recipients;
   }
