@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import type {KeyboardEvent as ReactKeyboardEvent} from 'react';
 
 import {isKey, isTabKey, KEY} from 'Util/KeyboardUtil';
@@ -39,14 +39,28 @@ function useConversationFocus(conversations: Conversation[]) {
         const prevConversation = conversations?.[index - 1];
 
         setCurrentFocus(prevConversation?.id || conversations[conversations.length - 1].id);
-      } else if (isTabKey(event)) {
+      } else if (isTabKey(event) || (event.shiftKey && isTabKey(event))) {
         setCurrentFocus(conversations[0].id);
       }
     },
     [conversations],
   );
 
-  return {currentFocus, handleKeyDown, setCurrentFocus};
+  const setDefaultFocus = () => setCurrentFocus(conversations[0]?.id || '');
+
+  useEffect(() => {
+    if (currentFocus === conversations[0]?.id) {
+      return;
+    }
+
+    document.addEventListener('click', setDefaultFocus);
+
+    return () => {
+      document.removeEventListener('click', setDefaultFocus);
+    };
+  }, [currentFocus]);
+
+  return {currentFocus, handleKeyDown, setCurrentFocus, setDefaultFocus};
 }
 
 export {useConversationFocus};

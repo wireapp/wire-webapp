@@ -55,6 +55,7 @@ export interface ConversationListCellProps {
   showJoinButton: boolean;
   handleArrowKeyDown: (e: React.KeyboardEvent) => void;
   isFocused?: boolean;
+  setDefaultFocus: () => void;
 }
 
 const ConversationListCell = ({
@@ -67,6 +68,7 @@ const ConversationListCell = ({
   dataUieName,
   handleArrowKeyDown,
   isFocused = false,
+  setDefaultFocus,
 }: ConversationListCellProps) => {
   const {
     isGroup,
@@ -132,6 +134,10 @@ const ConversationListCell = ({
       rightClick(conversation, newEvent);
       setContextMenuOpen(true);
       return;
+    }
+
+    if (event.key === KEY.TAB || (event.shiftKey && event.key === KEY.TAB)) {
+      setDefaultFocus();
     }
 
     setContextMenuFocus(false);
