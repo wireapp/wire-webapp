@@ -222,7 +222,9 @@ const InputBar = ({
     setCurrentMentions([]);
 
     if (resetInputValue) {
-      setInputValue('');
+      setTimeout(() => {
+        setInputValue('');
+      }, 0);
     }
   };
 
