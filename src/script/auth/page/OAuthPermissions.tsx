@@ -24,6 +24,7 @@ import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 // import {useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
+import {container} from 'tsyringe';
 
 import {
   Button,
@@ -35,10 +36,13 @@ import {
   Box,
   Link,
   LinkVariant,
-  // COLOR_V2,
+  COLOR_V2,
 } from '@wireapp/react-ui-kit';
 
+import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
+import {AssetRepository} from 'src/script/assets/AssetRepository';
 import {KEY} from 'Util/KeyboardUtil';
+import {loadDataUrl} from 'Util/util';
 
 import {Page} from './Page';
 
@@ -46,11 +50,12 @@ import {Config} from '../../Config';
 import {oauthStrings} from '../../strings';
 import {actionRoot} from '../module/action';
 import {bindActionCreators, RootState} from '../module/reducer';
-import * as AuthSelector from '../module/selector/AuthSelector';
 import * as SelfSelector from '../module/selector/SelfSelector';
 // import {ROUTE} from '../route';
 
-type Props = React.HTMLProps<HTMLDivElement>;
+interface Props extends React.HTMLProps<HTMLDivElement> {
+  assetRepository?: AssetRepository;
+}
 
 export enum Scope {
   WRITE_CONVERSATIONS = 'write:conversations',
@@ -68,13 +73,14 @@ interface AuthParams {
 
 const OAuthPermissionsComponent = ({
   doLogout,
-  userEmail,
+  selfUser,
   selfTeamId,
-  teamIcon,
+  assetRepository = container.resolve(AssetRepository),
   getSelf,
   getTeam,
 }: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
+  const [teamImage, setTeamImage] = React.useState<string | ArrayBuffer | undefined>(undefined);
   // const navigate = useNavigate();
   const params = decodeURIComponent(window.location.search.slice(1))
     .split('&')
@@ -96,12 +102,15 @@ const OAuthPermissionsComponent = ({
   React.useEffect(() => {
     const getUserData = async () => {
       await getSelf();
-      await getTeam(selfTeamId);
+      const team = await getTeam(selfTeamId);
+      const teamIcon = AssetRemoteData.v3(team.icon, selfUser.qualified_id?.domain);
+      const teamImageBlob = await assetRepository.load(teamIcon);
+      setTeamImage(teamImageBlob && (await loadDataUrl(teamImageBlob)));
     };
     getUserData().catch(error => {
       console.error(error);
     });
-  }, [getSelf, getTeam, selfTeamId]);
+  }, [assetRepository, getSelf, getTeam, selfTeamId, selfUser.qualified_id?.domain]);
 
   return (
     <Page>
@@ -111,9 +120,23 @@ const OAuthPermissionsComponent = ({
         style={{width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center'}}
       >
         <H2 center>{_(oauthStrings.headline)}</H2>
-        {/* {teamIcon && <Box style={{backgroundImage: teamIcon}} />} */}
-        <Text>{userEmail}</Text>
+        {typeof teamImage === 'string' && (
+          <img
+            src={teamImage}
+            style={{
+              width: '22px',
+              height: '22px',
+              borderRadius: '6px',
+              border: 'black 1px solid',
+              padding: '2px',
+              margin: '15px',
+            }}
+            alt="teamIcon"
+          />
+        )}
+        <Text style={{marginBottom: '8px'}}>{selfUser.email}</Text>
         <Link
+          style={{marginBottom: '32px'}}
           onClick={doLogout}
           data-uie-name="go-logout"
           variant={LinkVariant.PRIMARY}
@@ -122,10 +145,16 @@ const OAuthPermissionsComponent = ({
         >
           {_(oauthStrings.logout)}
         </Link>
-        <Text center>{_(oauthStrings.subhead, {app: 'Wire'})} </Text>
-        {/* TODO: update to correct app name from BE */}
+        <Text center>{_(oauthStrings.subhead, {app: Config.getConfig().BACKEND_NAME})}</Text>
         {params.scope.length > 1 && (
-          <Box style={{marginTop: '24px', marginBottom: '24px'}}>
+          <Box
+            style={{
+              marginTop: '24px',
+              marginBottom: '24px',
+              background: COLOR_V2.GRAY_20,
+              borderColor: COLOR_V2.GRAY_20,
+            }}
+          >
             <ul>
               {params.scope.map((scope, index) => (
                 <li key={index}>
@@ -158,7 +187,7 @@ const OAuthPermissionsComponent = ({
             }}
           />
         </Text>
-        <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: '48px'}}>
+        <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: '16px', gap: '16px'}}>
           <Button
             variant={ButtonVariant.SECONDARY}
             style={{margin: 'auto', width: 200}}
@@ -216,8 +245,7 @@ const OAuthPermissionsComponent = ({
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
-  userEmail: SelfSelector.getSelfEmail(state),
-  teamIcon: AuthSelector.getAccountTeamIcon(state),
+  selfUser: SelfSelector.getSelf(state),
   selfTeamId: SelfSelector.getSelfTeamId(state),
 });
 
