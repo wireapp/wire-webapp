@@ -17,94 +17,212 @@
  *
  */
 
-import {FC} from 'react';
+import {useState, useEffect, useCallback, forwardRef, RefObject} from 'react';
 
+import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
+import {setContextMenuPosition} from 'Util/util';
 
+import {EmojiPickerContainer} from './EmojiPicker';
 import {MessageActionsId} from './MessageActions';
+import {useMessageActionsState} from './MessageActions.state';
 import {messageActionsMenuButton, getActionsMenuCSS, getIconCSS} from './MessageActions.styles';
 
-export interface MessageReactions {
+export interface MessageReactionsProps {
   messageFocusedTabIndex: number;
   currentMsgActionName: string;
-  handleMsgActionClick: (event: React.MouseEvent<HTMLButtonElement> | React.KeyboardEvent<HTMLButtonElement>) => void;
+  toggleActiveMessageAction: (
+    event: React.MouseEvent<HTMLButtonElement> | React.KeyboardEvent<HTMLButtonElement>,
+  ) => void;
   handleKeyDown: (event: React.KeyboardEvent<HTMLButtonElement>) => void;
+  handleCurrentMsgAction: (actionName: string) => void;
 }
 
-const MessageReactions: FC<MessageReactions> = ({
-  messageFocusedTabIndex,
-  currentMsgActionName,
-  handleMsgActionClick,
-  handleKeyDown,
-}) => {
-  const isThumbUpAction = currentMsgActionName === MessageActionsId.THUMBSUP;
-  const isLikeAction = currentMsgActionName === MessageActionsId.HEART;
-  return (
-    <>
-      <button
-        css={{
-          ...messageActionsMenuButton,
-          ...getIconCSS,
-          ...getActionsMenuCSS(isThumbUpAction),
-        }}
-        aria-label={t('accessibility.messageActionsMenuThumbsUp')}
-        data-uie-name={MessageActionsId.THUMBSUP}
-        aria-pressed={isThumbUpAction}
-        type="button"
-        tabIndex={messageFocusedTabIndex}
-        onClick={handleMsgActionClick}
-        onKeyDown={handleKeyDown}
-      >
-        <span aria-hidden={true}>👍</span>
-      </button>
-      <button
-        css={{
-          ...messageActionsMenuButton,
-          ...getIconCSS,
-          ...getActionsMenuCSS(isLikeAction),
-        }}
-        aria-label={t('accessibility.messageActionsMenuLike')}
-        data-uie-name={MessageActionsId.HEART}
-        aria-pressed={isLikeAction}
-        type="button"
-        tabIndex={messageFocusedTabIndex}
-        onClick={handleMsgActionClick}
-        onKeyDown={handleKeyDown}
-      >
-        <span aria-hidden={true}>❤️</span>
-      </button>
-      <button
-        css={{
-          ...messageActionsMenuButton,
-          ...getIconCSS,
-          ...getActionsMenuCSS(currentMsgActionName === MessageActionsId.EMOJI),
-        }}
-        aria-label={t('accessibility.messageActionsMenuEmoji')}
-        data-uie-name={MessageActionsId.EMOJI}
-        type="button"
-        tabIndex={messageFocusedTabIndex}
-        onClick={handleMsgActionClick}
-        onKeyDown={handleKeyDown}
-      >
-        <svg width="23" height="23" viewBox="0 0 23 23" fill="none">
-          <path
-            fillRule="evenodd"
-            clipRule="evenodd"
-            d="M19.4908 9.20192C19.7806 10.0821 19.9375 11.0227 19.9375 12C19.9375 16.936 15.936 20.9375 11 20.9375C6.06396 20.9375 2.0625 16.936 2.0625 12C2.0625 7.06396 6.06396 3.0625 11 3.0625C11.9773 3.0625 12.9179 3.21935 13.7981 3.50925C13.8958 2.80497 14.1389 2.1472 14.4963 1.56728C13.3979 1.19934 12.2222 1 11 1C4.92487 1 0 5.92487 0 12C0 18.0751 4.92487 23 11 23C17.0751 23 22 18.0751 22 12C22 10.7778 21.8007 9.6021 21.4327 8.50372C20.8528 8.86105 20.195 9.10423 19.4908 9.20192ZM11 18.875C7.67393 18.875 4.89952 16.5131 4.26253 13.375H17.7375C17.1005 16.5131 14.3261 18.875 11 18.875ZM15.7764 14.75C12.0833 14.75 6.24584 14.7695 6.24584 14.7695C6.5442 15.2807 6.92214 15.7378 7.36161 16.125H14.6384C15.4473 15.4123 15.7764 14.75 15.7764 14.75ZM13.75 10.625C14.5094 10.625 15.125 10.0094 15.125 9.25C15.125 8.49061 14.5094 7.875 13.75 7.875C12.9906 7.875 12.375 8.49061 12.375 9.25C12.375 10.0094 12.9906 10.625 13.75 10.625ZM9.625 9.25C9.625 10.0094 9.00939 10.625 8.25 10.625C7.49061 10.625 6.875 10.0094 6.875 9.25C6.875 8.49061 7.49061 7.875 8.25 7.875C9.00939 7.875 9.625 8.49061 9.625 9.25Z"
-            fill="#34373D"
-          />
-          <path
-            fillRule="evenodd"
-            clipRule="evenodd"
-            d="M15.5835 3.64687V4.40312H18.2304V7.05H18.9866V4.40312H21.6335V3.64687H18.9866V1H18.2304V3.64687H15.5835Z"
-            fill="#34373D"
-            stroke="#34373D"
-            strokeWidth="1.25"
-          />
-        </svg>
-      </button>
-    </>
-  );
-};
+const MessageReactions = forwardRef<RefObject<HTMLDivElement>, MessageReactionsProps>(
+  ({
+    messageFocusedTabIndex,
+    currentMsgActionName,
+    handleCurrentMsgAction,
+    toggleActiveMessageAction,
+    handleKeyDown,
+  }) => {
+    const isThumbUpAction = currentMsgActionName === MessageActionsId.THUMBSUP;
+    const isLikeAction = currentMsgActionName === MessageActionsId.HEART;
+    const [showEmojis, setShowEmojis] = useState(false);
+    const {handleMenuOpen} = useMessageActionsState();
+    const [clientX, setPOSX] = useState(0);
+    const [clientY, setPOSY] = useState(0);
 
+    const cleanUp = () => {
+      handleCurrentMsgAction('');
+      handleMenuOpen(false);
+    };
+
+    useEffect(() => {
+      if (currentMsgActionName !== MessageActionsId.EMOJI && showEmojis) {
+        setShowEmojis(false);
+      }
+    }, [currentMsgActionName]);
+
+    const handleReactionCurrentState = useCallback(
+      (actionName = '') => {
+        const isActive = !!actionName;
+        handleCurrentMsgAction(actionName);
+        handleMenuOpen(isActive);
+        setShowEmojis(isActive);
+      },
+      [handleCurrentMsgAction, handleMenuOpen],
+    );
+
+    const handleEmojiBtnClick = useCallback(
+      (event: React.MouseEvent<HTMLButtonElement>) => {
+        const selectedMsgActionName = event.currentTarget.dataset.uieName;
+        if (currentMsgActionName === selectedMsgActionName) {
+          // reset on double click
+          handleReactionCurrentState('');
+        } else if (selectedMsgActionName) {
+          handleReactionCurrentState(selectedMsgActionName);
+          showReactions(event);
+        }
+      },
+      [currentMsgActionName, handleReactionCurrentState],
+    );
+
+    const handleEmojiKeyDown = useCallback(
+      (event: React.KeyboardEvent<HTMLButtonElement>) => {
+        const selectedMsgActionName = event.currentTarget.dataset.uieName;
+        handleKeyDown(event);
+        if ([KEY.SPACE, KEY.ENTER].includes(event.key)) {
+          if (currentMsgActionName === selectedMsgActionName) {
+            // reset on double click
+            handleReactionCurrentState('');
+          } else if (selectedMsgActionName) {
+            handleReactionCurrentState(selectedMsgActionName);
+            const newEvent = setContextMenuPosition(event);
+            showReactions(newEvent);
+          }
+        }
+      },
+      [currentMsgActionName, handleKeyDown, handleReactionCurrentState],
+    );
+
+    const showReactions = (event: MouseEvent | React.MouseEvent) => {
+      setPOSX(event.clientX);
+      setPOSY(event.clientY);
+    };
+
+    const handleMsgActionClick = useCallback(
+      (event: React.MouseEvent<HTMLButtonElement>) => {
+        const actionType = event.currentTarget.dataset.uieName;
+        switch (actionType) {
+          case MessageActionsId.EMOJI:
+            handleEmojiBtnClick(event);
+            break;
+          case MessageActionsId.THUMBSUP:
+            toggleActiveMessageAction(event);
+            break;
+          case MessageActionsId.HEART:
+            toggleActiveMessageAction(event);
+            break;
+        }
+      },
+      [handleEmojiBtnClick, toggleActiveMessageAction],
+    );
+
+    const handleMsgActionKeyDown = useCallback(
+      (event: React.KeyboardEvent<HTMLButtonElement>) => {
+        const actionType = event.currentTarget.dataset.uieName;
+        switch (actionType) {
+          case MessageActionsId.EMOJI:
+            handleEmojiKeyDown(event);
+            break;
+          case MessageActionsId.THUMBSUP:
+            handleKeyDown(event);
+            break;
+          case MessageActionsId.HEART:
+            handleKeyDown(event);
+            break;
+        }
+      },
+      [handleEmojiKeyDown, handleKeyDown],
+    );
+
+    return (
+      <>
+        <button
+          css={{
+            ...messageActionsMenuButton,
+            ...getIconCSS,
+            ...getActionsMenuCSS(isThumbUpAction),
+          }}
+          aria-label={t('accessibility.messageActionsMenuThumbsUp')}
+          data-uie-name={MessageActionsId.THUMBSUP}
+          aria-pressed={isThumbUpAction}
+          type="button"
+          tabIndex={messageFocusedTabIndex}
+          onClick={handleMsgActionClick}
+          onKeyDown={handleMsgActionKeyDown}
+        >
+          <span aria-hidden={true}>👍</span>
+        </button>
+        <button
+          css={{
+            ...messageActionsMenuButton,
+            ...getIconCSS,
+            ...getActionsMenuCSS(isLikeAction),
+          }}
+          aria-label={t('accessibility.messageActionsMenuLike')}
+          data-uie-name={MessageActionsId.HEART}
+          aria-pressed={isLikeAction}
+          type="button"
+          tabIndex={messageFocusedTabIndex}
+          onClick={handleMsgActionClick}
+          onKeyDown={handleMsgActionKeyDown}
+        >
+          <span aria-hidden={true}>❤️</span>
+        </button>
+        <button
+          css={{
+            ...messageActionsMenuButton,
+            ...getIconCSS,
+            ...getActionsMenuCSS(currentMsgActionName === MessageActionsId.EMOJI),
+          }}
+          aria-label={t('accessibility.messageActionsMenuEmoji')}
+          data-uie-name={MessageActionsId.EMOJI}
+          type="button"
+          tabIndex={messageFocusedTabIndex}
+          onClick={handleMsgActionClick}
+          onKeyDown={handleMsgActionKeyDown}
+        >
+          <svg width="23" height="23" viewBox="0 0 23 23" fill="none">
+            <path
+              fillRule="evenodd"
+              clipRule="evenodd"
+              d="M19.4908 9.20192C19.7806 10.0821 19.9375 11.0227 19.9375 12C19.9375 16.936 15.936 20.9375 11 20.9375C6.06396 20.9375 2.0625 16.936 2.0625 12C2.0625 7.06396 6.06396 3.0625 11 3.0625C11.9773 3.0625 12.9179 3.21935 13.7981 3.50925C13.8958 2.80497 14.1389 2.1472 14.4963 1.56728C13.3979 1.19934 12.2222 1 11 1C4.92487 1 0 5.92487 0 12C0 18.0751 4.92487 23 11 23C17.0751 23 22 18.0751 22 12C22 10.7778 21.8007 9.6021 21.4327 8.50372C20.8528 8.86105 20.195 9.10423 19.4908 9.20192ZM11 18.875C7.67393 18.875 4.89952 16.5131 4.26253 13.375H17.7375C17.1005 16.5131 14.3261 18.875 11 18.875ZM15.7764 14.75C12.0833 14.75 6.24584 14.7695 6.24584 14.7695C6.5442 15.2807 6.92214 15.7378 7.36161 16.125H14.6384C15.4473 15.4123 15.7764 14.75 15.7764 14.75ZM13.75 10.625C14.5094 10.625 15.125 10.0094 15.125 9.25C15.125 8.49061 14.5094 7.875 13.75 7.875C12.9906 7.875 12.375 8.49061 12.375 9.25C12.375 10.0094 12.9906 10.625 13.75 10.625ZM9.625 9.25C9.625 10.0094 9.00939 10.625 8.25 10.625C7.49061 10.625 6.875 10.0094 6.875 9.25C6.875 8.49061 7.49061 7.875 8.25 7.875C9.00939 7.875 9.625 8.49061 9.625 9.25Z"
+              fill="#34373D"
+            />
+            <path
+              fillRule="evenodd"
+              clipRule="evenodd"
+              d="M15.5835 3.64687V4.40312H18.2304V7.05H18.9866V4.40312H21.6335V3.64687H18.9866V1H18.2304V3.64687H15.5835Z"
+              fill="#34373D"
+              stroke="#34373D"
+              strokeWidth="1.25"
+            />
+          </svg>
+        </button>
+        {showEmojis ? (
+          <EmojiPickerContainer
+            posX={clientX}
+            posY={clientY}
+            handleCurrentMsgAction={handleCurrentMsgAction}
+            cleanUp={cleanUp}
+          />
+        ) : null}
+      </>
+    );
+  },
+);
+
+MessageReactions.displayName = 'MessageReactions';
 export {MessageReactions};

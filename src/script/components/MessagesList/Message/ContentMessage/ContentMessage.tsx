@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useMemo, useState, useEffect} from 'react';
+import React, {useMemo, useState, useEffect, useRef} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
@@ -33,6 +33,7 @@ import {t} from 'Util/LocalizerUtil';
 
 import {ContentAsset} from './asset';
 import {MessageActions} from './MessageActions/MessageActions';
+import {useMessageActionsState} from './MessageActions/MessageActions.state';
 import {MessageFooterLike} from './MessageFooterLike';
 import {MessageLike} from './MessageLike';
 import {Quote} from './MessageQuote';
@@ -173,7 +174,8 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   });
 
   const [isActionMenuVisible, setActionMenuVisibility] = useState(true);
-  const [isMenuOpen, setMenuOpen] = useState(false);
+  const isMenuOpen = useMessageActionsState(state => state.isMenuOpen);
+  const contentMessageRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (isMessageFocused || msgFocusState) {
@@ -188,14 +190,18 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
       aria-label={messageAriaLabel}
       className="content-message-wrapper"
       onMouseEnter={event => {
-        setActionMenuVisibility(true);
+        // open another floating action menu if none already open
+        if (!isMenuOpen) {
+          setActionMenuVisibility(true);
+        }
       }}
       onMouseLeave={event => {
-        // close message actions when no active menu is open like context menu/emoji picker
+        // close floating message actions when no active menu is open like context menu/emoji picker
         if (!isMenuOpen) {
           setActionMenuVisibility(false);
         }
       }}
+      ref={contentMessageRef}
     >
       {avatarSection}
       {message.quote() && (
@@ -248,7 +254,6 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             handleActionMenuVisibility={setActionMenuVisibility}
             contextMenu={contextMenu}
             isMessageFocused={msgFocusState}
-            handleMenuOpen={setMenuOpen}
           />
         )}
       </div>

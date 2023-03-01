@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, useState, useEffect, useCallback, useRef} from 'react';
+import {FC, useState, useCallback, useRef} from 'react';
 
 import {amplify} from 'amplify';
 
@@ -25,12 +25,14 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Icon} from 'Components/Icon';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import {useClickOutside} from 'src/script/hooks/useClickOutside';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/ContextMenu';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isTabKey, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {setContextMenuPosition} from 'Util/util';
 
+import {useMessageActionsState} from './MessageActions.state';
 import {
   messageActionsGroup,
   messageBodyActions,
@@ -57,13 +59,11 @@ export interface MessageActionsProps {
   contextMenu: {entries: ko.Subscribable<ContextMenuEntry[]>};
   isMessageFocused: boolean;
   handleActionMenuVisibility: (isVisible: boolean) => void;
-  handleMenuOpen: (isMenuOpen: boolean) => void;
 }
 
 const MessageActions: FC<MessageActionsProps> = ({
   isMsgWithHeader,
   message,
-  handleMenuOpen,
   contextMenu,
   isMessageFocused,
   handleActionMenuVisibility,
@@ -73,6 +73,7 @@ const MessageActions: FC<MessageActionsProps> = ({
   const [currentMsgActionName, setCurrentMsgAction] = useState('');
   const wrapperRef = useRef<HTMLDivElement>(null);
   const mesageReactionTop = isMsgWithHeader ? messageWithHeaderTop : null;
+  const {handleMenuOpen} = useMessageActionsState();
 
   const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLButtonElement>) => {
     if (isTabKey(event)) {
@@ -109,9 +110,17 @@ const MessageActions: FC<MessageActionsProps> = ({
     [currentMsgActionName, handleMenuOpen, menuEntries],
   );
 
+  const cleanUp = () => {
+    setCurrentMsgAction('');
+    handleMenuOpen(false);
+    handleActionMenuVisibility(false);
+  };
+  useClickOutside(wrapperRef, cleanUp);
+
   const toggleActiveMessageAction = useCallback(
     (event: React.MouseEvent<HTMLButtonElement> | React.KeyboardEvent<HTMLButtonElement>) => {
       const selectedMsgActionName = event.currentTarget.dataset.uieName;
+      handleMenuOpen(false);
       if (currentMsgActionName === selectedMsgActionName) {
         // reset on double click
         setCurrentMsgAction('');
@@ -119,32 +128,8 @@ const MessageActions: FC<MessageActionsProps> = ({
         setCurrentMsgAction(selectedMsgActionName);
       }
     },
-    [currentMsgActionName],
+    [currentMsgActionName, handleMenuOpen],
   );
-
-  const handleMsgActionClick = useCallback(
-    (event: React.MouseEvent<HTMLButtonElement> | React.KeyboardEvent<HTMLButtonElement>) => {
-      toggleActiveMessageAction(event);
-    },
-    [toggleActiveMessageAction],
-  );
-
-  const handleClickOutside = useCallback(
-    (event: MouseEvent | KeyboardEvent) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
-        setCurrentMsgAction('');
-        handleActionMenuVisibility(false);
-      }
-    },
-    [handleActionMenuVisibility],
-  );
-
-  useEffect(() => {
-    document.addEventListener('click', handleClickOutside);
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
-  }, [handleClickOutside]);
 
   return (
     <div css={{...messageBodyActions, ...mesageReactionTop}} ref={wrapperRef}>
@@ -157,8 +142,9 @@ const MessageActions: FC<MessageActionsProps> = ({
         <MessageReactions
           messageFocusedTabIndex={messageFocusedTabIndex}
           currentMsgActionName={currentMsgActionName}
+          handleCurrentMsgAction={setCurrentMsgAction}
+          toggleActiveMessageAction={toggleActiveMessageAction}
           handleKeyDown={handleKeyDown}
-          handleMsgActionClick={handleMsgActionClick}
         />
         <button
           css={{
@@ -171,7 +157,7 @@ const MessageActions: FC<MessageActionsProps> = ({
           data-uie-name={MessageActionsId.REPLY}
           aria-label={t('conversationContextMenuReply')}
           onClick={event => {
-            handleMsgActionClick(event);
+            toggleActiveMessageAction(event);
             amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REPLY, message);
           }}
           onKeyDown={handleKeyDown}
