@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [39.0.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@39.0.1...@wireapp/core@39.0.2) (2023-03-01)
+
+### Bug Fixes
+
+* Avoid crashing when a mismatch happens on a domain we are not aware of ([#4929](https://github.com/wireapp/wire-web-packages/issues/4929)) ([958ee22](https://github.com/wireapp/wire-web-packages/commit/958ee22629283942e6ea87f5e15521f421bb2930))
+
 ## [39.0.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@39.0.0...@wireapp/core@39.0.1) (2023-03-01)
 
 ### Bug Fixes
