@@ -21,7 +21,6 @@ import {useState, useEffect, useCallback, forwardRef, RefObject} from 'react';
 
 import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
-import {setContextMenuPosition} from 'Util/util';
 
 import {EmojiPickerContainer} from './EmojiPicker';
 import {MessageActionsId} from './MessageActions';
@@ -82,7 +81,7 @@ const MessageReactions = forwardRef<RefObject<HTMLDivElement>, MessageReactionsP
           handleReactionCurrentState('');
         } else if (selectedMsgActionName) {
           handleReactionCurrentState(selectedMsgActionName);
-          showReactions(event);
+          showReactions(event.currentTarget.getBoundingClientRect());
         }
       },
       [currentMsgActionName, handleReactionCurrentState],
@@ -98,17 +97,16 @@ const MessageReactions = forwardRef<RefObject<HTMLDivElement>, MessageReactionsP
             handleReactionCurrentState('');
           } else if (selectedMsgActionName) {
             handleReactionCurrentState(selectedMsgActionName);
-            const newEvent = setContextMenuPosition(event);
-            showReactions(newEvent);
+            showReactions(event.currentTarget.getBoundingClientRect());
           }
         }
       },
       [currentMsgActionName, handleKeyDown, handleReactionCurrentState],
     );
 
-    const showReactions = (event: MouseEvent | React.MouseEvent) => {
-      setPOSX(event.clientX);
-      setPOSY(event.clientY);
+    const showReactions = (rect: DOMRect) => {
+      setPOSX(rect.x);
+      setPOSY(rect.y);
     };
 
     const handleMsgActionClick = useCallback(

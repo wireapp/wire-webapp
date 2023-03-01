@@ -46,11 +46,26 @@ const EmojiPickerContainer = forwardRef<RefObject<HTMLDivElement>, EmojiPickerCo
     useEffect(() => {
       const mainElement = emojiRef && emojiRef.current;
       function updateSize() {
-        const left = mainElement && window.innerWidth - posX;
+        const emojiPickerWidth = 350;
+        const reactionMenuOpenerButtonHeight = 40;
+        const left = mainElement && posX - emojiPickerWidth;
         const top = Math.max(
-          mainElement && window.innerHeight - posY < mainElement.clientHeight ? posY - mainElement.offsetHeight : posY,
+          mainElement && window.innerHeight - posY < mainElement.clientHeight
+            ? posY - mainElement.offsetHeight + reactionMenuOpenerButtonHeight
+            : posY,
           0,
         );
+        // maybe could help for further changing top position
+        // const middlePosition = mainElement && posY - mainElement?.offsetHeight / 2;
+        // const topPosition = posY;
+        // const bottomPosition = mainElement && posY - mainElement.offsetHeight + reactionMenuOpenerButtonHeight;
+        // console.info({
+        //   middlePosition,
+        //   topPosition,
+        //   bottomPosition,
+        //   offsetHeight: mainElement?.offsetHeight,
+        //   'window.innerHeight': window.innerHeight,
+        // });
         const style = {
           left,
           top,
