@@ -50,6 +50,7 @@ import {MLSService} from './messagingProtocols/mls';
 import {MLSCallbacks, CryptoProtocolConfig} from './messagingProtocols/mls/types';
 import {NewClient, ProteusService} from './messagingProtocols/proteus';
 import {buildCryptoClient, CryptoClientType} from './messagingProtocols/proteus/ProteusService/CryptoClient';
+import {cryptoMigrationStore} from './messagingProtocols/proteus/ProteusService/cryptoMigrationStateStore';
 import {HandledEventPayload, NotificationService, NotificationSource} from './notification/';
 import {SelfService} from './self/';
 import {CoreDatabase, deleteDB, openDB} from './storage/CoreDB';
@@ -316,8 +317,15 @@ export class Account extends TypedEventEmitter<Events> {
   }
 
   private async buildCryptoClient(context: Context, storeEngine: CRUDEngine, db: CoreDatabase, enableMLS: boolean) {
+    /* There are 3 cases where we want to instantiate CoreCrypto:
+     * 1. MLS is enabled
+     * 2. The user has enabled CoreCrypto in the config
+     * 3. The user has already used CoreCrypto in the past (cannot rollback to using cryptobox)
+     */
     const clientType =
-      enableMLS || !!this.cryptoProtocolConfig?.useCoreCrypto
+      enableMLS ||
+      !!this.cryptoProtocolConfig?.useCoreCrypto ||
+      cryptoMigrationStore.coreCrypto.isReady(storeEngine.storeName)
         ? CryptoClientType.CORE_CRYPTO
         : CryptoClientType.CRYPTOBOX;
 
