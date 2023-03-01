@@ -22,7 +22,6 @@ import type {
   RegisteredClient,
   QualifiedUserClientMap,
   ClientCapabilityData,
-  PublicClient,
 } from '@wireapp/api-client/lib/client';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
@@ -107,13 +106,6 @@ export class ClientService {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getClients
    */
   async getClientsByUserIds(userIds: QualifiedId[]): Promise<QualifiedUserClientMap> {
-    if (!this.apiClient.backendFeatures.federationEndpoints) {
-      const clientsMap: {[userId: string]: PublicClient[]} = {};
-      for (const {id} of userIds) {
-        clientsMap[id] = await this.apiClient.api.user.getClients(id);
-      }
-      return {'': clientsMap};
-    }
     const listedClients = await this.apiClient.api.user.postListClients({qualified_users: userIds});
     return listedClients.qualified_user_map;
   }

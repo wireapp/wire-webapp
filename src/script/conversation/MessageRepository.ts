@@ -45,7 +45,7 @@ import {
 import * as MessageBuilder from '@wireapp/core/lib/conversation/message/MessageBuilder';
 import {OtrMessage} from '@wireapp/core/lib/conversation/message/OtrMessage';
 import {TextContentBuilder} from '@wireapp/core/lib/conversation/message/TextContentBuilder';
-import {isQualifiedUserClients, isUserClients} from '@wireapp/core/lib/util';
+import {isQualifiedUserClients} from '@wireapp/core/lib/util';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
@@ -111,7 +111,7 @@ import {UserState} from '../user/UserState';
 export interface MessageSendingOptions {
   /** Send native push notification for message. Default is `true`. */
   nativePush?: boolean;
-  recipients?: QualifiedId[] | QualifiedUserClients | UserClients;
+  recipients?: QualifiedId[] | QualifiedUserClients;
 }
 
 export enum CONSENT_TYPE {
@@ -814,13 +814,13 @@ export class MessageRepository {
   private async sendSessionReset(userId: QualifiedId, clientId: string, conversation: Conversation) {
     const sessionReset = MessageBuilder.buildSessionResetMessage();
 
-    const userClient = {[userId.id]: [clientId]};
+    const userClient = {[userId.domain]: {[userId.id]: [clientId]}};
     await this.conversationService.send({
       conversationId: conversation.qualifiedId,
       payload: sessionReset,
       protocol: ConversationProtocol.PROTEUS,
       targetMode: MessageTargetMode.USERS_CLIENTS,
-      userIds: this.core.backendFeatures.federationEndpoints ? {[userId.domain]: userClient} : userClient, // we target this message to the specific client of the user (no need for mismatch handling here)
+      userIds: userClient, // we target this message to the specific client of the user (no need for mismatch handling here)
     });
   }
 
@@ -1080,13 +1080,11 @@ export class MessageRepository {
       UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST,
     );
 
-    const recipients = this.core.backendFeatures.federationEndpoints
-      ? this.createQualifiedRecipients(users)
-      : this.createRecipients(users);
-
-    this.core.service!.broadcast.broadcastGenericMessage(genericMessage, recipients, false, mismatch => {
-      this.onClientMismatch?.(mismatch);
-    });
+    await this.core.service!.broadcast.broadcastGenericMessage(
+      genericMessage,
+      this.createRecipients(users),
+      this.onClientMismatch,
+    );
   };
 
   /**
@@ -1140,7 +1138,7 @@ export class MessageRepository {
     return undefined;
   }
 
-  private createQualifiedRecipients(users: User[]): QualifiedUserClients {
+  private createRecipients(users: User[]): QualifiedUserClients {
     return users.reduce((userClients, user) => {
       userClients[user.domain] ||= {};
       userClients[user.domain][user.id] = user.devices().map(client => client.id);
@@ -1148,19 +1146,12 @@ export class MessageRepository {
     }, {} as QualifiedUserClients);
   }
 
-  private createRecipients(users: User[]): UserClients {
-    return users.reduce((userClients, user) => {
-      userClients[user.id] = user.devices().map(client => client.id);
-      return userClients;
-    }, {} as UserClients);
-  }
-
   private async generateRecipients(
     conversation: Conversation,
-    recipients?: QualifiedId[] | QualifiedUserClients | UserClients,
+    recipients?: QualifiedId[] | QualifiedUserClients,
     skipSelf?: boolean,
-  ): Promise<QualifiedUserClients | UserClients> {
-    if (isQualifiedUserClients(recipients) || isUserClients(recipients)) {
+  ): Promise<QualifiedUserClients> {
+    if (isQualifiedUserClients(recipients)) {
       // If we get a userId>client pairs, we just return those, no need to create recipients
       return recipients;
     }
@@ -1177,9 +1168,7 @@ export class MessageRepository {
       await this.userRepository.assignAllClients();
     }
 
-    return this.core.backendFeatures.federationEndpoints
-      ? this.createQualifiedRecipients(filteredUsers)
-      : this.createRecipients(filteredUsers);
+    return this.createRecipients(filteredUsers);
   }
 
   /**

@@ -232,7 +232,7 @@ describe('MessageRepository', () => {
       expect(core.service!.conversation.send).toHaveBeenCalledWith(
         expect.objectContaining({
           payload: expect.objectContaining({deleted: {messageId: messageToDelete.id}}),
-          userIds: {selfid: [], user1: []},
+          userIds: {'': {selfid: [], user1: []}},
         }),
       );
     });

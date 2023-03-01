@@ -18,7 +18,7 @@
  */
 
 import type {CallConfigData} from '@wireapp/api-client/lib/account/CallConfigData';
-import type {QualifiedUserClients, UserClients} from '@wireapp/api-client/lib/conversation';
+import type {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {WebappProperties} from '@wireapp/api-client/lib/user/data';
 import {MessageSendingState} from '@wireapp/core/lib/conversation';
@@ -1069,23 +1069,7 @@ export class CallingRepository {
     return selfParticipant.sharesCamera() && selfParticipant.hasActiveVideo();
   }
 
-  private mapTargets(targets: SendMessageTarget): UserClients {
-    const recipients: UserClients = {};
-
-    for (const target of targets.clients) {
-      const {userid, clientid} = target;
-
-      if (!recipients[userid]) {
-        recipients[userid] = [];
-      }
-
-      recipients[userid].push(clientid);
-    }
-
-    return recipients;
-  }
-
-  private mapQualifiedTargets(targets: SendMessageTarget): QualifiedUserClients {
+  private mapTargets(targets: SendMessageTarget): QualifiedUserClients {
     const recipients = targets.clients.reduce((acc, {userid, clientid}) => {
       const {domain: parsedDomain, id} = this.parseQualifiedId(userid);
       const domain = parsedDomain || this.selfUser?.domain || '';
@@ -1141,9 +1125,7 @@ export class CallingRepository {
 
     if (typeof targets === 'string') {
       const parsedTargets: SendMessageTarget = JSON.parse(targets);
-      const recipients = this.core.backendFeatures.federationEndpoints
-        ? this.mapQualifiedTargets(parsedTargets)
-        : this.mapTargets(parsedTargets);
+      const recipients = this.mapTargets(parsedTargets);
       options = {
         nativePush: true,
         recipients,
@@ -1189,25 +1171,12 @@ export class CallingRepository {
     }
   };
 
-  readonly convertParticipantsToCallingMessageRecepients = (
-    participants: Participant[],
-  ): UserClients | QualifiedUserClients => {
-    const isFederated = this.core.backendFeatures.federationEndpoints;
-
-    if (isFederated) {
-      return participants.reduce((participants, participant) => {
-        participants[participant.user.domain] ||= {};
-        participants[participant.user.domain][participant.user.id] = [participant.clientId];
-        return participants;
-      }, {} as QualifiedUserClients);
-    }
-
-    const recipients: UserClients = {};
-    for (const participant of participants) {
-      recipients[participant.user.id] = [participant.clientId];
-    }
-
-    return recipients;
+  readonly convertParticipantsToCallingMessageRecepients = (participants: Participant[]): QualifiedUserClients => {
+    return participants.reduce((participants, participant) => {
+      participants[participant.user.domain] ||= {};
+      participants[participant.user.domain][participant.user.id] = [participant.clientId];
+      return participants;
+    }, {} as QualifiedUserClients);
   };
 
   readonly sendModeratorMute = (conversationId: QualifiedId, participants: Participant[]) => {
