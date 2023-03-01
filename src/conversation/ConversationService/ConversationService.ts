@@ -78,9 +78,7 @@ export class ConversationService {
    * @param {string} conversationId
    * @param {string} conversationDomain? - If given will send the message to the new qualified endpoint
    */
-  public async fetchAllParticipantsClients(
-    conversationId: QualifiedId | string,
-  ): Promise<UserClients | QualifiedUserClients> {
+  public async fetchAllParticipantsClients(conversationId: QualifiedId): Promise<UserClients | QualifiedUserClients> {
     const qualifiedMembers = await getConversationQualifiedMembers({
       apiClient: this.apiClient,
       conversationId,

@@ -22,7 +22,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 interface Params {
   apiClient: APIClient;
-  conversationId: string | QualifiedId;
+  conversationId: QualifiedId;
 }
 const getConversationQualifiedMembers = async ({apiClient, conversationId}: Params): Promise<QualifiedId[]> => {
   const conversation = await apiClient.api.conversation.getConversation(conversationId);

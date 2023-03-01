@@ -18,7 +18,6 @@
  */
 
 import {
-  UserClients,
   QualifiedUserClients,
   ClientMismatch,
   MessageSendingStatus,
@@ -34,7 +33,6 @@ export interface NewClient {
   userId: QualifiedId;
 }
 export type ProteusServiceConfig = {
-  useQualifiedIds: boolean;
   onNewClient?: (client: NewClient) => void;
   nbPrekeys: number;
 };
@@ -44,13 +42,11 @@ export type SendProteusMessageParams = SendCommonParams &
     conversationId: QualifiedId;
 
     /**
-     * Can be either a QualifiedId[], string[], UserClients or QualfiedUserClients. The type has some effect on the behavior of the method. (Needed only for Proteus)
-     *    When given a QualifiedId[] or string[] the method will fetch the freshest list of devices for those users (since they are not given by the consumer). As a consequence no ClientMismatch error will trigger and we will ignore missing clients when sending
-     *    When given a QualifiedUserClients or UserClients the method will only send to the clients listed in the userIds. This could lead to ClientMismatch (since the given list of devices might not be the freshest one and new clients could have been created)
-     *    When given a QualifiedId[] or QualifiedUserClients the method will send the message through the federated API endpoint
-     *    When given a string[] or UserClients the method will send the message through the old API endpoint
+     * Can be either a QualifiedId[] or QualfiedUserClients. The type has some effect on the behavior of the method. (Needed only for Proteus)
+     *    When given a QualifiedId[] the method will fetch the freshest list of devices for those users (since they are not given by the consumer). As a consequence no ClientMismatch error will trigger and we will ignore missing clients when sending
+     *    When given a QualifiedUserClients the method will only send to the clients listed in the userIds. This could lead to ClientMismatch (since the given list of devices might not be the freshest one and new clients could have been created)
      */
-    userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients;
+    userIds?: QualifiedId[] | QualifiedUserClients;
     onClientMismatch?: (
       status: ClientMismatch | MessageSendingStatus,
       wasSent: boolean,
