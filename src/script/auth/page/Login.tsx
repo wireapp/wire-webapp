@@ -157,7 +157,9 @@ const LoginComponent = ({
   useEffect(() => {
     resetAuthError();
     const isImmediateLogin = UrlUtil.hasURLParameter(QUERY_KEY.IMMEDIATE_LOGIN);
-    if (isImmediateLogin) {
+    const is2FAEntropy = UrlUtil.hasURLParameter(QUERY_KEY.TWO_FACTOR) && isEntropyRequired;
+
+    if (isImmediateLogin && !is2FAEntropy) {
       immediateLogin();
     }
     return () => {
@@ -173,6 +175,7 @@ const LoginComponent = ({
       return navigate(ROUTE.HISTORY_INFO);
     } catch (error) {
       logger.error('Unable to login immediately', error);
+      setShowEntropyForm(false);
     }
   };
 
