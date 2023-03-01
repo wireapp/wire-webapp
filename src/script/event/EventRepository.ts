@@ -570,7 +570,7 @@ export class EventRepository {
 
     if (!containsLinkPreview && !isRetryAttempt) {
       const errorMessage =
-        'Message duplication event invalid: original message did not fail to sen and does not contain link preview';
+        'Message duplication event invalid: original message did not fail to send and does not contain link preview';
       return this.throwValidationError(newEvent, errorMessage);
     }
 
