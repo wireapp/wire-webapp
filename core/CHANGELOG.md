@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [39.0.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.15.2...@wireapp/core@39.0.0) (2023-03-01)
+
+### Code Refactoring
+
+* Sunset non-domain-aware message sending ([#4927](https://github.com/wireapp/wire-web-packages/issues/4927)) ([6828876](https://github.com/wireapp/wire-web-packages/commit/6828876ce3a37b95804c55ecc040a9dd8dfe8d65))
+
+### BREAKING CHANGES
+
+* Will not be compatible with a backend that only supports api v0 (backends that are >1 year old). You will now be forced to pass fully qualified ID when calling method that need conversation or user identification
+
 ## [38.15.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@38.15.1...@wireapp/core@38.15.2) (2023-02-27)
 
 ### Bug Fixes
