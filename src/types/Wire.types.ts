@@ -41,6 +41,7 @@ type FeatureVariables = {
   MLS_CONFIG_KEYING_MATERIAL_UPDATE_THRESHOLD: number;
   PERSIST_TEMPORARY_CLIENTS: boolean;
   SHOW_LOADING_INFORMATION: boolean;
+  USE_CORE_CRYPTO: boolean;
 };
 
 type URLVariables = {
