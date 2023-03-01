@@ -114,10 +114,9 @@ export class DebugUtil {
   }
 
   /** Used by QA test automation. */
-  async breakSession(userId: string | QualifiedId, clientId: string): Promise<void> {
+  async breakSession(userId: QualifiedId, clientId: string): Promise<void> {
     const proteusService = this.core.service!.proteus;
-    const qualifiedId = typeof userId === 'string' ? {domain: '', id: userId} : userId;
-    const sessionId = proteusService.constructSessionId(qualifiedId, clientId);
+    const sessionId = proteusService.constructSessionId(userId, clientId);
     await proteusService['cryptoClient'].debugBreakSession(sessionId);
   }
 

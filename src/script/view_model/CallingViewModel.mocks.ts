@@ -47,7 +47,7 @@ export const mockCallingRepository = {
 
 export const callState = new CallState();
 
-export function buildCall(conversationId: string | QualifiedId, convType = CONV_TYPE.ONEONONE) {
+export function buildCall(conversationId: QualifiedId, convType = CONV_TYPE.ONEONONE) {
   const qualifiedId = typeof conversationId === 'string' ? {id: conversationId, domain: ''} : conversationId;
   return new Call({id: 'user1', domain: ''}, qualifiedId, convType, {} as any, CALL_TYPE.NORMAL, {
     currentAvailableDeviceId: {audioOutput: ko.observable()},
