@@ -22,7 +22,7 @@ import {initClient} from './initClient';
 (async () => {
   const apiClient = await initClient();
   apiClient['accessTokenStore'].accessToken!.access_token = 'invalid';
-  await apiClient.api.conversation.getAllConversations();
+  await apiClient.api.conversation.getConversations();
 })().catch(error => {
   console.error(error);
   process.exit(1);

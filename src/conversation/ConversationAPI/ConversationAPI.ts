@@ -19,7 +19,7 @@
 
 import {chunk} from '@wireapp/commons/lib/util/ArrayUtil';
 import {proteus as ProtobufOTR} from '@wireapp/protocol-messaging/web/otr';
-import axios, {AxiosRequestConfig} from 'axios';
+import {AxiosRequestConfig} from 'axios';
 
 import {
   ClientMismatch,
@@ -32,7 +32,6 @@ import {
   Member,
   MessageSendingStatus,
   NewConversation,
-  NewOTRMessage,
   QualifiedConversationIds,
   RemoteConversations,
 } from '..';
@@ -106,7 +105,7 @@ export class ConversationAPI {
   constructor(protected readonly client: HttpClient, protected readonly backendFeatures: BackendFeatures) {}
 
   private generateBaseConversationUrl(conversationId: QualifiedId, supportsQualifiedEndpoint: boolean = true): string {
-    return this.backendFeatures.federationEndpoints && supportsQualifiedEndpoint && conversationId.domain
+    return supportsQualifiedEndpoint && conversationId.domain
       ? `${ConversationAPI.URL.CONVERSATIONS}/${conversationId.domain}/${conversationId.id}`
       : `${ConversationAPI.URL.CONVERSATIONS}/${conversationId.id}`;
   }
@@ -164,33 +163,6 @@ export class ConversationAPI {
   }
 
   /**
-   * Get all conversations.
-   * @deprecated - use getConversationList instead
-   */
-  public getAllConversations(): Promise<Conversation[]> {
-    let allConversations: Conversation[] = [];
-
-    const getConversationChunks = async (conversationId?: string): Promise<Conversation[]> => {
-      const {conversations, has_more} = await this.getConversations(conversationId, ConversationAPI.MAX_CHUNK_SIZE);
-
-      if (conversations.length) {
-        allConversations = allConversations.concat(conversations);
-      }
-
-      if (has_more) {
-        const lastConversation = conversations.pop();
-        if (lastConversation) {
-          return getConversationChunks(lastConversation.id);
-        }
-      }
-
-      return allConversations;
-    };
-
-    return getConversationChunks();
-  }
-
-  /**
    * Get a conversation code.
    * @param conversationId ID of conversation to get the code for
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/getConversationCode
@@ -219,29 +191,7 @@ export class ConversationAPI {
     return response.data;
   }
 
-  public async getConversation(conversationId: string | QualifiedId): Promise<Conversation> {
-    return this.backendFeatures.federationEndpoints && typeof conversationId !== 'string'
-      ? this.getConversation_v2(conversationId)
-      : this.getConversation_v1(typeof conversationId === 'string' ? conversationId : conversationId.id);
-  }
-
-  /**
-   * Get a conversation by ID.
-   * @param conversationId The conversation ID
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/conversation
-   */
-  private async getConversation_v1(conversationId: string): Promise<Conversation> {
-    const url = `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}`;
-    const config: AxiosRequestConfig = {
-      method: 'get',
-      url,
-    };
-
-    const response = await this.client.sendJSON<Conversation>(config);
-    return response.data;
-  }
-
-  private async getConversation_v2(conversationId: QualifiedId): Promise<Conversation> {
+  public async getConversation(conversationId: QualifiedId): Promise<Conversation> {
     const {id, domain} = conversationId;
     const url = `${ConversationAPI.URL.CONVERSATIONS}/${domain}/${id}`;
     const config: AxiosRequestConfig = {
@@ -398,9 +348,6 @@ export class ConversationAPI {
    * Get all local & remote conversations from a federated backend.
    */
   public async getConversationList(): Promise<RemoteConversations> {
-    if (!this.backendFeatures.federationEndpoints) {
-      return {found: await this.getAllConversations()};
-    }
     const allConversationIds = await this.getQualifiedConversationIds();
     const conversations = await this.getConversationsByQualifiedIds(allConversationIds);
     return conversations;
@@ -719,55 +666,6 @@ export class ConversationAPI {
   }
 
   /**
-   * Post an encrypted message to a conversation.
-   * @param sendingClientId The sender's client ID
-   * @param conversationId The conversation ID
-   * @param messageData The message content
-   * @param ignoreMissing Whether to report missing clients or not:
-   * `false`: Report about all missing clients
-   * `true`: Ignore all missing clients and force sending.
-   * Array: User IDs specifying which user IDs are allowed to have
-   * missing clients
-   * `undefined`: Default to setting of `report_missing` in `NewOTRMessage`
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/postOtrMessage
-   */
-  public async postOTRMessage(
-    sendingClientId: string,
-    conversationId: string,
-    messageData?: NewOTRMessage<string>,
-    ignoreMissing?: boolean | string[],
-  ): Promise<ClientMismatch> {
-    if (!sendingClientId) {
-      throw new ValidationError('Unable to send OTR message without client ID.');
-    }
-
-    messageData ||= {
-      recipients: {},
-      sender: sendingClientId,
-    };
-
-    const config: AxiosRequestConfig = {
-      data: messageData,
-      method: 'post',
-      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.OTR}/${ConversationAPI.URL.MESSAGES}`,
-    };
-
-    if (typeof ignoreMissing !== 'undefined') {
-      const ignore_missing = Array.isArray(ignoreMissing) ? ignoreMissing.join(',') : ignoreMissing;
-      config.params = {ignore_missing};
-      // `ignore_missing` takes precedence on the server so we can remove
-      // `report_missing` to save some bandwidth.
-      delete messageData.report_missing;
-    } else if (typeof messageData.report_missing === 'undefined' || !messageData.report_missing.length) {
-      // both `ignore_missing` and `report_missing` are undefined
-      config.params = {ignore_missing: !!messageData.data};
-    }
-
-    const response = await this.client.sendJSON<ClientMismatch>(config, true);
-    return response.data;
-  }
-
-  /**
    * This endpoint ensures that the list of clients is correct and only sends the message if the list is correct.
    * To override this, the endpoint accepts `client_mismatch_strategy` in the body. It can have these values:
    *
@@ -789,7 +687,7 @@ export class ConversationAPI {
    *
    * @see https://nginz-https.anta.wire.link/api/swagger-ui/#/default/post_conversations__cnv_domain___cnv__proteus_messages
    */
-  public async postOTRMessageV2(
+  public async postOTRMessage(
     conversationId: string,
     domain: string,
     messageData: ProtobufOTR.QualifiedNewOtrMessage,
@@ -888,18 +786,6 @@ export class ConversationAPI {
 
     const response = await this.client.sendProtocolBuffer<PostMlsMessageResponse>(config, true);
     return response.data;
-  }
-
-  public async postForClients(clientId: string, conversationId: string): Promise<void> {
-    try {
-      await this.postOTRMessage(clientId, conversationId);
-      throw new Error(`Expected backend to throw error.`);
-    } catch (error) {
-      if (axios.isAxiosError(error) && error.response?.data) {
-        return error.response.data;
-      }
-      throw error;
-    }
   }
 
   /**
@@ -1014,47 +900,11 @@ export class ConversationAPI {
   }
 
   /**
-   * Add users to an existing conversation.
-   * @param conversationId The conversation ID to add the users to
-   * @param users List of users to add to a conversation
-   */
-  private async postMembersV0(conversationId: string, userIds: string[]) {
-    const config: AxiosRequestConfig = {
-      data: {
-        conversation_role: DefaultConversationRoleName.WIRE_MEMBER,
-        users: userIds,
-      },
-      method: 'post',
-      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.MEMBERS}`,
-    };
-
-    try {
-      const response = await this.client.sendJSON<ConversationMemberJoinEvent>(config);
-      return response.data;
-    } catch (error) {
-      const backendError = error as BackendError;
-      switch (backendError.label) {
-        case BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT: {
-          throw new ConversationLegalholdMissingConsentError(backendError.message);
-        }
-      }
-      throw error;
-    }
-  }
-
-  /**
    * Add qualified members to an existing Proteus conversation.
    * @param conversationId The conversation ID to add the users to
    * @param users List of users to add to a conversation
    */
   public async postMembers(conversationId: QualifiedId, users: QualifiedId[]) {
-    if (!this.backendFeatures.federationEndpoints) {
-      return this.postMembersV0(
-        conversationId.id,
-        users.map(user => user.id),
-      );
-    }
-
     const config: AxiosRequestConfig = {
       data: {
         conversation_role: DefaultConversationRoleName.WIRE_MEMBER,
