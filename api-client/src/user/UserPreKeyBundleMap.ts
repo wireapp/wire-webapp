@@ -25,6 +25,4 @@ export interface UserPreKeyBundleMap {
   };
 }
 
-export interface QualifiedUserPreKeyBundleMap {
-  [domain: string]: UserPreKeyBundleMap;
-}
+export type QualifiedUserPreKeyBundleMap = Record<string, UserPreKeyBundleMap>;

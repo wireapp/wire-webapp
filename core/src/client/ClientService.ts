@@ -53,7 +53,7 @@ export class ClientService {
     private readonly proteusService: ProteusService,
     private readonly storeEngine: CRUDEngine,
   ) {
-    this.database = new ClientDatabaseRepository(this.storeEngine, this.apiClient.backendFeatures.federationEndpoints);
+    this.database = new ClientDatabaseRepository(this.storeEngine);
     this.backend = new ClientBackendRepository(this.apiClient);
   }
 
@@ -137,9 +137,8 @@ export class ClientService {
     const registeredClients = await this.backend.getClients();
     const filteredClients = registeredClients.filter(client => client.id !== this.apiClient.context!.clientId);
     return this.database.createClientList(
-      this.apiClient.context!.userId,
+      {id: this.apiClient.context!.userId, domain: this.apiClient.context!.domain ?? ''},
       filteredClients,
-      this.apiClient.context?.domain,
     );
   }
 

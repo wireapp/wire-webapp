@@ -29,7 +29,7 @@ import {BackendFeatures} from '../APIClient';
 import {ClientPreKey, PreKeyBundle} from '../auth/';
 import {VerificationActionType} from '../auth/VerificationActionType';
 import {PublicClient, QualifiedPublicClients} from '../client/';
-import {UserClients, QualifiedUserClients} from '../conversation/';
+import {QualifiedUserClients} from '../conversation/';
 import {BackendError, HttpClient, RequestCancelable, SyntheticErrorLabel} from '../http/';
 import {
   Activate,
@@ -44,7 +44,6 @@ import {
   SearchResult,
   SendActivationCode,
   User,
-  UserPreKeyBundleMap,
   VerifyDelete,
 } from '../user/';
 
@@ -144,12 +143,8 @@ export class UserAPI {
    * @param clientId The client ID
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getUserClient
    */
-  public async getClient(userId: string | QualifiedId, clientId: string): Promise<PublicClient> {
-    const strUserId = typeof userId === 'string' ? userId : userId.id;
-    const url =
-      this.backendFeatures.federationEndpoints && typeof userId !== 'string'
-        ? `${UserAPI.URL.USERS}/${userId.domain}/${userId.id}/${UserAPI.URL.CLIENTS}/${clientId}`
-        : `${UserAPI.URL.USERS}/${strUserId}/${UserAPI.URL.CLIENTS}/${clientId}`;
+  public async getClient(userId: QualifiedId, clientId: string): Promise<PublicClient> {
+    const url = `${UserAPI.URL.USERS}/${userId.domain}/${userId.id}/${UserAPI.URL.CLIENTS}/${clientId}`;
 
     const config: AxiosRequestConfig = {
       method: 'get',
@@ -166,26 +161,7 @@ export class UserAPI {
    * @param clientId The client ID
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getPrekey
    */
-  public async getClientPreKey(userId: string | QualifiedId, clientId: string): Promise<ClientPreKey> {
-    if (this.backendFeatures.federationEndpoints && typeof userId !== 'string') {
-      return this.getClientPreKey_v2(userId, clientId);
-    }
-    const strUserId = typeof userId === 'string' ? userId : userId.id;
-    return this.getClientPreKey_v1(strUserId, clientId);
-  }
-
-  private async getClientPreKey_v1(userId: string, clientId: string): Promise<ClientPreKey> {
-    const url = `${UserAPI.URL.USERS}/${userId}/${UserAPI.URL.PRE_KEYS}/${clientId}`;
-    const config: AxiosRequestConfig = {
-      method: 'get',
-      url,
-    };
-
-    const response = await this.client.sendJSON<ClientPreKey>(config);
-    return response.data;
-  }
-
-  private async getClientPreKey_v2(userId: QualifiedId, clientId: string): Promise<ClientPreKey> {
+  public async getClientPreKey(userId: QualifiedId, clientId: string): Promise<ClientPreKey> {
     const {id, domain} = userId;
     const url = `${UserAPI.URL.USERS}/${domain}/${id}/${UserAPI.URL.PRE_KEYS}/${clientId}`;
     const config: AxiosRequestConfig = {
@@ -202,12 +178,8 @@ export class UserAPI {
    * @param userId The user ID
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getUserClients
    */
-  public async getClients(userId: string | QualifiedId): Promise<PublicClient[]> {
-    const strUserId = typeof userId === 'string' ? userId : userId.id;
-    const url =
-      this.backendFeatures.federationEndpoints && typeof userId !== 'string'
-        ? `${UserAPI.URL.USERS}/${userId.domain}/${userId.id}/${UserAPI.URL.CLIENTS}`
-        : `${UserAPI.URL.USERS}/${strUserId}/${UserAPI.URL.CLIENTS}`;
+  public async getClients(userId: QualifiedId): Promise<PublicClient[]> {
+    const url = `${UserAPI.URL.USERS}/${userId.domain}/${userId.id}/${UserAPI.URL.CLIENTS}`;
 
     const config: AxiosRequestConfig = {
       method: 'get',
@@ -524,18 +496,7 @@ export class UserAPI {
     return response.data;
   }
 
-  private async postMultiPreKeyBundlesChunk(userClientMap: UserClients): Promise<UserPreKeyBundleMap> {
-    const config: AxiosRequestConfig = {
-      data: userClientMap,
-      method: 'post',
-      url: `${UserAPI.URL.USERS}/${UserAPI.URL.PRE_KEYS}`,
-    };
-
-    const response = await this.client.sendJSON<UserPreKeyBundleMap>(config, true);
-    return response.data;
-  }
-
-  private async postMultiQualifiedPreKeyBundlesChunk(
+  private async postMultiPreKeyBundlesChunk(
     userClientMap: QualifiedUserClients,
   ): Promise<QualifiedUserPreKeyBundleMap> {
     const config: AxiosRequestConfig = {
@@ -583,40 +544,10 @@ export class UserAPI {
   }
 
   /**
-   * Given a map of user IDs to client IDs return a prekey for each one.
-   * @param userClientMap A map of the user's clients
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getMultiPrekeyBundles
-   */
-  public async postMultiPreKeyBundles(
-    userClientMap: UserClients,
-    limit: number = UserAPI.DEFAULT_USERS_PREKEY_BUNDLE_CHUNK_SIZE,
-  ): Promise<UserPreKeyBundleMap> {
-    const userIdChunks = ArrayUtil.chunk(Object.keys(userClientMap), limit);
-
-    const chunksPromises = userIdChunks.map(userIdChunk => {
-      const rebuiltMap = userIdChunk.reduce<UserClients>((chunkedUserClientMap, userId) => {
-        chunkedUserClientMap[userId] = userClientMap[userId];
-        return chunkedUserClientMap;
-      }, {});
-
-      return this.postMultiPreKeyBundlesChunk(rebuiltMap);
-    });
-
-    const userPreKeyBundleMapChunks = await Promise.all(chunksPromises);
-
-    return userPreKeyBundleMapChunks.reduce((userPreKeyBundleMap, userPreKeyBundleMapChunk) => {
-      return {
-        ...userPreKeyBundleMap,
-        ...userPreKeyBundleMapChunk,
-      };
-    }, {});
-  }
-
-  /**
    * Given a map of qualified user IDs to client IDs return a prekey for each one.
    * @param userClientMap A map of the qualified user's clients
    */
-  public async postQualifiedMultiPreKeyBundles(
+  public async postMultiPreKeyBundles(
     userClientMap: QualifiedUserClients,
     limit: number = UserAPI.DEFAULT_USERS_PREKEY_BUNDLE_CHUNK_SIZE,
   ): Promise<QualifiedUserPreKeyBundleMap> {
@@ -640,7 +571,7 @@ export class UserAPI {
           };
         }, {});
       })
-      .map(chunkedMap => this.postMultiQualifiedPreKeyBundlesChunk(chunkedMap));
+      .map(chunkedMap => this.postMultiPreKeyBundlesChunk(chunkedMap));
 
     const userPreKeyBundleMapChunks = await Promise.all(chunksPromises);
 

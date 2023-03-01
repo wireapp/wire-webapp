@@ -27,9 +27,9 @@ import {ProteusService} from './ProteusService';
 
 import {getUUID} from '../../../test/PayloadHelper';
 
-export const buildProteusService = async (
-  federated = false,
-): Promise<[ProteusService, {apiClient: APIClient; cryptoClient: CryptoClient}]> => {
+export const buildProteusService = async (): Promise<
+  [ProteusService, {apiClient: APIClient; cryptoClient: CryptoClient}]
+> => {
   const apiClient = new APIClient({urls: APIClient.BACKEND.STAGING});
 
   apiClient.context = {
@@ -42,7 +42,6 @@ export const buildProteusService = async (
 
   const proteusService = new ProteusService(apiClient, cryptoClient, {
     nbPrekeys: 0,
-    useQualifiedIds: federated,
   });
   return [proteusService, {apiClient, cryptoClient}];
 };

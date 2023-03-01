@@ -22,12 +22,10 @@ import type {PreKey, Context} from '@wireapp/api-client/lib/auth';
 import type {
   Conversation,
   NewConversation,
-  OTRRecipients,
   QualifiedOTRRecipients,
   QualifiedUserClients,
-  UserClients,
 } from '@wireapp/api-client/lib/conversation';
-import type {QualifiedId, QualifiedUserPreKeyBundleMap, UserPreKeyBundleMap} from '@wireapp/api-client/lib/user';
+import type {QualifiedId, QualifiedUserPreKeyBundleMap} from '@wireapp/api-client/lib/user';
 import logdown from 'logdown';
 
 import {ClientAction} from '@wireapp/protocol-messaging';
@@ -61,9 +59,9 @@ import {
 
 type EncryptionResult = {
   /** the encrypted payloads for the clients that have a valid sessions */
-  payloads: OTRRecipients<Uint8Array>;
+  payloads: QualifiedOTRRecipients;
   /** user-client that do not have prekeys on backend (deleted clients) */
-  unknowns?: UserClients;
+  unknowns?: QualifiedUserClients;
 };
 export class ProteusService {
   private readonly messageService: MessageService;
@@ -96,9 +94,8 @@ export class ProteusService {
 
   public async initClient(storeEngine: CRUDEngine, context: Context) {
     const dbName = storeEngine.storeName;
-    if (context.domain && this.config.useQualifiedIds) {
+    if (context.domain) {
       // We want sessions to be fully qualified from now on
-
       if (!cryptoMigrationStore.qualifiedSessions.isReady(dbName)) {
         this.logger.info(`Migrating existing session ids to qualified ids.`);
         await migrateToQualifiedSessionIds(storeEngine, context.domain);
@@ -131,8 +128,8 @@ export class ProteusService {
     return this.cryptoClient.getFingerprint();
   }
 
-  public constructSessionId(userId: string | QualifiedId, clientId: string, domain?: string): string {
-    return constructSessionId({clientId, userId, domain, useQualifiedIds: this.config.useQualifiedIds});
+  public constructSessionId(userId: QualifiedId, clientId: string): string {
+    return constructSessionId({clientId, userId});
   }
 
   /**
@@ -176,7 +173,6 @@ export class ProteusService {
 
   public async sendMessage({
     userIds,
-    sendAsProtobuf,
     conversationId,
     nativePush,
     targetMode,
@@ -188,27 +184,18 @@ export class ProteusService {
       sendingClientId: this.apiClient.validatedClientId,
       conversationId,
       genericMessage: payload,
-      useQualifiedIds: this.config.useQualifiedIds,
       options: {
         userIds,
-        sendAsProtobuf,
         nativePush,
         targetMode,
-        onClientMismatch,
       },
     });
 
-    const {federated, sendingClientId, recipients, plainText, options} = messageParams;
-    const response = federated
-      ? await this.messageService.sendFederatedMessage(sendingClientId, recipients, plainText, {
-          ...options,
-          onClientMismatch: mismatch => onClientMismatch?.(mismatch, false),
-        })
-      : await this.messageService.sendMessage(sendingClientId, recipients, plainText, {
-          ...options,
-          sendAsProtobuf,
-          onClientMismatch: mismatch => onClientMismatch?.(mismatch, false),
-        });
+    const {sendingClientId, recipients, plainText, options} = messageParams;
+    const response = await this.messageService.sendMessage(sendingClientId, recipients, plainText, {
+      ...options,
+      onClientMismatch: mismatch => onClientMismatch?.(mismatch, false),
+    });
 
     if (!response.canceled) {
       if (!isClearFromMismatch(response)) {
@@ -256,51 +243,30 @@ export class ProteusService {
     }
   }
 
+  public deleteSession(userId: QualifiedId, clientId: string) {
+    return deleteSession({
+      userId,
+      clientId,
+      cryptoClient: this.cryptoClient,
+    });
+  }
+
   public async encrypt(
     plainText: Uint8Array,
-    recipients: UserPreKeyBundleMap | UserClients,
-    domain: string = '',
+    recipients: QualifiedUserPreKeyBundleMap | QualifiedUserClients,
   ): Promise<EncryptionResult> {
     const {sessions, unknowns} = await initSessions({
       recipients,
-      domain,
       apiClient: this.apiClient,
       cryptoClient: this.cryptoClient,
       logger: this.logger,
     });
 
-    const payload = await this.cryptoClient.encrypt(sessions, plainText);
-
-    return {payloads: buildEncryptedPayloads(payload), unknowns};
-  }
-
-  public deleteSession(userId: QualifiedId, clientId: string) {
-    return deleteSession({
-      userId,
-      clientId,
-      useQualifiedIds: this.config.useQualifiedIds,
-      cryptoClient: this.cryptoClient,
-    });
-  }
-
-  public async encryptQualified(
-    plainText: Uint8Array,
-    preKeyBundles: QualifiedUserPreKeyBundleMap | QualifiedUserClients,
-  ): Promise<{payloads: QualifiedOTRRecipients; unknowns?: QualifiedUserClients}> {
-    const qualifiedOTRRecipients: QualifiedOTRRecipients = {};
-    const missingRecipients: QualifiedUserClients = {};
-
-    for (const [domain, preKeyBundleMap] of Object.entries(preKeyBundles)) {
-      const {unknowns, payloads} = await this.encrypt(plainText, preKeyBundleMap, domain);
-      qualifiedOTRRecipients[domain] = payloads;
-      if (unknowns) {
-        missingRecipients[domain] = unknowns;
-      }
-    }
+    const payloads = await this.cryptoClient.encrypt(sessions, plainText);
 
     return {
-      payloads: qualifiedOTRRecipients,
-      unknowns: Object.keys(missingRecipients).length > 0 ? missingRecipients : undefined,
+      payloads: buildEncryptedPayloads(payloads),
+      unknowns,
     };
   }
 

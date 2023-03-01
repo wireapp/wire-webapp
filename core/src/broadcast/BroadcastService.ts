@@ -17,12 +17,7 @@
  *
  */
 
-import {
-  ClientMismatch,
-  MessageSendingStatus,
-  QualifiedUserClients,
-  UserClients,
-} from '@wireapp/api-client/lib/conversation';
+import {ClientMismatch, MessageSendingStatus, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {UserPreKeyBundleMap} from '@wireapp/api-client/lib/user/';
 
 import {APIClient} from '@wireapp/api-client';
@@ -32,7 +27,6 @@ import {sendMessage} from '../conversation/message/messageSender';
 import {MessageService} from '../conversation/message/MessageService';
 import {flattenQualifiedUserClients} from '../conversation/message/UserClientsUtil';
 import {ProteusService} from '../messagingProtocols/proteus';
-import {isQualifiedUserClients} from '../util';
 
 export class BroadcastService {
   private readonly messageService: MessageService;
@@ -79,22 +73,15 @@ export class BroadcastService {
 
   public async broadcastGenericMessage(
     genericMessage: GenericMessage,
-    recipients: UserPreKeyBundleMap | UserClients | QualifiedUserClients,
-    sendAsProtobuf?: boolean,
+    recipients: QualifiedUserClients,
     onClientMismatch?: (mismatch: ClientMismatch | MessageSendingStatus) => void | boolean | Promise<boolean>,
   ) {
     const plainTextArray = GenericMessage.encode(genericMessage).finish();
     const send = (): Promise<MessageSendingStatus | ClientMismatch> => {
-      return isQualifiedUserClients(recipients)
-        ? this.messageService.sendFederatedMessage(this.apiClient.validatedClientId, recipients, plainTextArray, {
-            reportMissing: flattenQualifiedUserClients(recipients).map(({userId}) => userId),
-            onClientMismatch,
-          })
-        : this.messageService.sendMessage(this.apiClient.validatedClientId, recipients, plainTextArray, {
-            sendAsProtobuf,
-            reportMissing: Object.keys(recipients),
-            onClientMismatch,
-          });
+      return this.messageService.sendMessage(this.apiClient.validatedClientId, recipients, plainTextArray, {
+        reportMissing: flattenQualifiedUserClients(recipients).map(({userId}) => userId),
+        onClientMismatch,
+      });
     };
 
     return sendMessage(send);

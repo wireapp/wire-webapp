@@ -18,19 +18,18 @@
  */
 
 import {APIClient} from '@wireapp/api-client/lib/APIClient';
-import {QualifiedUserClients, UserClients} from '@wireapp/api-client/lib/conversation';
-import {QualifiedId, QualifiedUserPreKeyBundleMap, UserPreKeyBundleMap} from '@wireapp/api-client/lib/user';
+import {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
+import {QualifiedId, QualifiedUserPreKeyBundleMap} from '@wireapp/api-client/lib/user';
 
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
-import {getQualifiedRecipientsForConversation, getRecipientsForConversation} from './Recipients';
-import {extractQualifiedUserIds, extractUserIds} from './UserIds';
+import {getRecipientsForConversation} from './Recipients';
+import {extractQualifiedUserIds} from './UserIds';
 
 import {MessageTargetMode, MessageSendingOptions} from '../../../conversation';
-import {isStringArray, isUserClients, isQualifiedUserClients, isQualifiedIdArray} from '../../../util';
+import {isQualifiedUserClients} from '../../../util';
 
-export type FederatedMessageParams = {
-  federated: true;
+export type MessageParams = {
   sendingClientId: string;
   recipients: QualifiedUserClients | QualifiedUserPreKeyBundleMap;
   plainText: Uint8Array;
@@ -40,29 +39,20 @@ export type FederatedMessageParams = {
     reportMissing: boolean | QualifiedId[] | undefined;
   };
 };
-export type MessageParams = Omit<FederatedMessageParams, 'recipients' | 'options' | 'federated'> & {
-  federated: false;
-  recipients: UserClients | UserPreKeyBundleMap;
-  options: Omit<FederatedMessageParams['options'], 'reportMissing'> & {
-    reportMissing: boolean | string[] | undefined;
-  };
-};
 interface GetGenericMessageParamsParams {
   sendingClientId: string;
   conversationId: QualifiedId;
   genericMessage: GenericMessage;
   options: MessageSendingOptions;
-  useQualifiedIds: boolean;
   apiClient: APIClient;
 }
-type GetGenericMessageParamsReturnType = Promise<MessageParams | FederatedMessageParams>;
+type GetGenericMessageParamsReturnType = Promise<MessageParams>;
 
 const getGenericMessageParams = async ({
   sendingClientId,
   conversationId,
   genericMessage,
   options: {targetMode = MessageTargetMode.NONE, userIds, nativePush},
-  useQualifiedIds,
   apiClient,
 }: GetGenericMessageParamsParams): GetGenericMessageParamsReturnType => {
   const plainText = GenericMessage.encode(genericMessage).finish();
@@ -70,48 +60,17 @@ const getGenericMessageParams = async ({
     throw new Error('Cannot send targetted message when no userIds are given');
   }
 
-  if (conversationId.domain && useQualifiedIds) {
-    if (isStringArray(userIds) || isUserClients(userIds)) {
-      throw new Error('Invalid userIds option for sending to federated backend');
-    }
-    const recipients = await getQualifiedRecipientsForConversation({apiClient, conversationId, userIds});
-    let reportMissing;
-    if (targetMode === MessageTargetMode.NONE) {
-      reportMissing = isQualifiedUserClients(userIds); // we want to check mismatch in case the consumer gave an exact list of users/devices
-    } else if (targetMode === MessageTargetMode.USERS) {
-      reportMissing = extractQualifiedUserIds({userIds});
-    } else {
-      // in case the message is fully targetted at user/client pairs, we do not want to report the missing clients or users at all
-      reportMissing = false;
-    }
-    return {
-      federated: true,
-      sendingClientId,
-      recipients,
-      plainText,
-      options: {
-        conversationId,
-        nativePush,
-        reportMissing,
-      },
-    };
-  }
-
-  if (isQualifiedIdArray(userIds) || isQualifiedUserClients(userIds)) {
-    throw new Error('Invalid userIds option for sending');
-  }
   const recipients = await getRecipientsForConversation({apiClient, conversationId, userIds});
   let reportMissing;
   if (targetMode === MessageTargetMode.NONE) {
-    reportMissing = isUserClients(userIds); // we want to check mismatch in case the consumer gave an exact list of users/devices
+    reportMissing = isQualifiedUserClients(userIds); // we want to check mismatch in case the consumer gave an exact list of users/devices
   } else if (targetMode === MessageTargetMode.USERS) {
-    reportMissing = extractUserIds({userIds});
+    reportMissing = extractQualifiedUserIds({userIds});
   } else {
     // in case the message is fully targetted at user/client pairs, we do not want to report the missing clients or users at all
     reportMissing = false;
   }
   return {
-    federated: false,
     sendingClientId,
     recipients,
     plainText,

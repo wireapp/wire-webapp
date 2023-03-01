@@ -238,7 +238,7 @@ describe('ConversationService', () => {
         {domain: 'test-domain', id: 'test-id-2'},
       ]);
 
-      const fetchedMembers = await conversationService.fetchAllParticipantsClients('convid');
+      const fetchedMembers = await conversationService.fetchAllParticipantsClients({id: 'convid', domain: ''});
       expect(fetchedMembers).toEqual(members);
     });
   });
