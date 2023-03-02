@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [39.1.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@39.1.2...@wireapp/core@39.1.3) (2023-03-02)
+
+### Bug Fixes
+
+* Improve fetchAllParticipantsClient types ([bc660e8](https://github.com/wireapp/wire-web-packages/commit/bc660e8e3e105aabaaba42115fb3ad7be36393aa))
+
 ## [39.1.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@39.1.1...@wireapp/core@39.1.2) (2023-03-02)
 
 **Note:** Version bump only for package @wireapp/core
