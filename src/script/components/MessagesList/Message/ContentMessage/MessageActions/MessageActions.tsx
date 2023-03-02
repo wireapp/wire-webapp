@@ -25,7 +25,6 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Icon} from 'Components/Icon';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {useClickOutside} from 'src/script/hooks/useClickOutside';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/ContextMenu';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isTabKey, KEY} from 'Util/KeyboardUtil';
@@ -75,6 +74,12 @@ const MessageActions: FC<MessageActionsProps> = ({
   const mesageReactionTop = isMsgWithHeader ? messageWithHeaderTop : null;
   const {handleMenuOpen} = useMessageActionsState();
 
+  const resetActionMenuStates = useCallback(() => {
+    setCurrentMsgAction('');
+    handleMenuOpen(false);
+    handleActionMenuVisibility(false);
+  }, [handleActionMenuVisibility, handleMenuOpen]);
+
   const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLButtonElement>) => {
     if (isTabKey(event)) {
       setCurrentMsgAction('');
@@ -85,13 +90,13 @@ const MessageActions: FC<MessageActionsProps> = ({
     (event: React.KeyboardEvent<HTMLButtonElement>) => {
       if ([KEY.SPACE, KEY.ENTER].includes(event.key)) {
         const newEvent = setContextMenuPosition(event);
-        showContextMenu(newEvent, menuEntries, 'message-options-menu');
+        showContextMenu(newEvent, menuEntries, 'message-options-menu', resetActionMenuStates);
       } else if (isTabKey(event)) {
         setCurrentMsgAction('');
         handleActionMenuVisibility(false);
       }
     },
-    [handleActionMenuVisibility, menuEntries],
+    [handleActionMenuVisibility, menuEntries, resetActionMenuStates],
   );
 
   const handleContextMenuClick = useCallback(
@@ -104,18 +109,11 @@ const MessageActions: FC<MessageActionsProps> = ({
       } else if (selectedMsgActionName) {
         setCurrentMsgAction(selectedMsgActionName);
         handleMenuOpen(true);
-        showContextMenu(event, menuEntries, 'message-options-menu');
+        showContextMenu(event, menuEntries, 'message-options-menu', resetActionMenuStates);
       }
     },
-    [currentMsgActionName, handleMenuOpen, menuEntries],
+    [resetActionMenuStates, currentMsgActionName, handleMenuOpen, menuEntries],
   );
-
-  const cleanUp = () => {
-    setCurrentMsgAction('');
-    handleMenuOpen(false);
-    handleActionMenuVisibility(false);
-  };
-  useClickOutside(wrapperRef, cleanUp);
 
   const toggleActiveMessageAction = useCallback(
     (event: React.MouseEvent<HTMLButtonElement> | React.KeyboardEvent<HTMLButtonElement>) => {
@@ -145,6 +143,8 @@ const MessageActions: FC<MessageActionsProps> = ({
           handleCurrentMsgAction={setCurrentMsgAction}
           toggleActiveMessageAction={toggleActiveMessageAction}
           handleKeyDown={handleKeyDown}
+          resetActionMenuStates={resetActionMenuStates}
+          wrapperRef={wrapperRef}
         />
         <button
           css={{

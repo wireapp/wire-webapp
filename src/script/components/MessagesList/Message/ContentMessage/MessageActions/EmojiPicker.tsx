@@ -17,102 +17,90 @@
  *
  */
 
-import {useState, useEffect, forwardRef, RefObject, useRef} from 'react';
+import {useState, useEffect, useRef, FC, RefObject} from 'react';
 
 import EmojiPicker, {EmojiClickData} from 'emoji-picker-react';
 import {createPortal} from 'react-dom';
 
+import {useClickOutside} from 'src/script/hooks/useClickOutside';
 import {isEscapeKey} from 'Util/KeyboardUtil';
 
 interface EmojiPickerContainerProps {
   posX: number;
   posY: number;
-  handleCurrentMsgAction: (actionName: string) => void;
-  cleanUp: () => void;
+  handleEscape: () => void;
+  resetActionMenuStates: () => void;
+  wrapperRef: RefObject<HTMLDivElement>;
 }
 
-const EmojiPickerContainer = forwardRef<RefObject<HTMLDivElement>, EmojiPickerContainerProps>(
-  ({posX, posY, handleCurrentMsgAction, cleanUp}) => {
-    const [selectedEmoji, setSelectedEmoji] = useState<string>('');
-    const emojiRef = useRef<HTMLDivElement>(null);
-    const [style, setStyle] = useState<object>({
-      left: 0,
-      top: 0,
-      opacity: 0,
-      width: '0px',
-      position: 'absolute',
-    });
+const EmojiPickerContainer: FC<EmojiPickerContainerProps> = ({
+  posX,
+  posY,
+  handleEscape,
+  resetActionMenuStates,
+  wrapperRef,
+}) => {
+  const [selectedEmoji, setSelectedEmoji] = useState<string>('');
+  const emojiRef = useRef<HTMLDivElement>(null);
+  useClickOutside(emojiRef, resetActionMenuStates, wrapperRef);
+  const [style, setStyle] = useState<object>({
+    left: 0,
+    top: 0,
+    opacity: 0,
+    width: '0px',
+    position: 'absolute',
+  });
 
-    useEffect(() => {
-      const mainElement = emojiRef && emojiRef.current;
-      function updateSize() {
-        const emojiPickerWidth = 350;
-        const reactionMenuOpenerButtonHeight = 40;
-        const left = mainElement && posX - emojiPickerWidth;
-        const top = Math.max(
-          mainElement && window.innerHeight - posY < mainElement.clientHeight
-            ? posY - mainElement.offsetHeight + reactionMenuOpenerButtonHeight
-            : posY,
-          0,
-        );
-        // maybe could help for further changing top position
-        // const middlePosition = mainElement && posY - mainElement?.offsetHeight / 2;
-        // const topPosition = posY;
-        // const bottomPosition = mainElement && posY - mainElement.offsetHeight + reactionMenuOpenerButtonHeight;
-        // console.info({
-        //   middlePosition,
-        //   topPosition,
-        //   bottomPosition,
-        //   offsetHeight: mainElement?.offsetHeight,
-        //   'window.innerHeight': window.innerHeight,
-        // });
-        const style = {
-          left,
-          top,
-          width: 'auto',
-          opacity: 1,
-          position: 'absolute',
-        };
-        setStyle(style);
-      }
-      window.addEventListener('resize', updateSize);
-      updateSize();
-      return () => window.removeEventListener('resize', updateSize);
-    }, [posX, posY]);
-
-    function onClick(emojiData: EmojiClickData, event: MouseEvent) {
-      setSelectedEmoji(emojiData.unified);
+  useEffect(() => {
+    const mainElement = emojiRef && emojiRef.current;
+    function updateSize() {
+      const emojiPickerWidth = 350;
+      const reactionMenuOpenerButtonHeight = 40;
+      const left = mainElement && posX - emojiPickerWidth;
+      const top = Math.max(
+        mainElement && window.innerHeight - posY < mainElement.clientHeight
+          ? posY - mainElement.offsetHeight + reactionMenuOpenerButtonHeight
+          : posY,
+        0,
+      );
+      const style = {
+        left,
+        top,
+        width: 'auto',
+        opacity: 1,
+        position: 'absolute',
+      };
+      setStyle(style);
     }
-    return (
-      <>
-        {createPortal(
-          // eslint-disable-next-line jsx-a11y/no-static-element-interactions
-          <div
-            style={{
-              height: '100vh',
-              width: '100vw',
-              position: 'relative',
-              left: 0,
-              right: 0,
-              zIndex: 1000,
-            }}
-            onKeyDown={event => {
-              if (isEscapeKey(event)) {
-                cleanUp();
-              }
-            }}
-          >
-            <div ref={emojiRef} style={{maxHeight: window.innerHeight, ...style}}>
-              <EmojiPicker onEmojiClick={onClick} />
-            </div>
-            <p>{selectedEmoji}</p>
-          </div>,
-          document.body,
-        )}
-      </>
-    );
-  },
-);
+    window.addEventListener('resize', updateSize);
+    updateSize();
+    return () => window.removeEventListener('resize', updateSize);
+  }, [posX, posY]);
 
-EmojiPickerContainer.displayName = 'EmojiPickerContainer';
+  function onClick(emojiData: EmojiClickData, event: MouseEvent) {
+    setSelectedEmoji(emojiData.unified);
+  }
+  return (
+    <>
+      {createPortal(
+        // eslint-disable-next-line jsx-a11y/no-static-element-interactions
+        <div
+          className="overlay"
+          onKeyDown={event => {
+            if (isEscapeKey(event)) {
+              handleEscape();
+            }
+          }}
+        >
+          <div ref={emojiRef} style={{maxHeight: window.innerHeight, ...style}}>
+            <EmojiPicker onEmojiClick={onClick} />
+          </div>
+          <p>{selectedEmoji}</p>
+        </div>,
+        document.body,
+      )}
+    </>
+  );
+};
+
 export {EmojiPickerContainer};

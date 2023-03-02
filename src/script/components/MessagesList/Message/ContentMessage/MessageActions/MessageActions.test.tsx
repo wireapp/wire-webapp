@@ -32,7 +32,6 @@ const defaultProps: MessageActionsProps = {
   contextMenu: {entries: ko.observable([{label: 'option1', text: 'option1'}])},
   isMessageFocused: true,
   handleActionMenuVisibility: jest.fn(),
-  handleMenuOpen: jest.fn(),
 };
 
 describe('MessageActions', () => {
@@ -66,18 +65,18 @@ describe('MessageActions', () => {
   });
 
   test('keeps the message actions menu open when context menu is open', () => {
-    const {getByLabelText} = render(<MessageActions {...defaultProps} />);
+    const {getByLabelText, getByText} = render(<MessageActions {...defaultProps} />);
     const optionsButton = getByLabelText(t('accessibility.conversationContextMenuOpenLabel'));
     fireEvent.click(optionsButton);
-    expect(defaultProps.handleMenuOpen).toHaveBeenCalledWith(true);
+    expect(getByText('option1')).toBeDefined();
   });
 
-  test('double click on context menu option will close the action menu', () => {
+  test('outside click will close the context menu option', () => {
     const {getByLabelText} = render(<MessageActions {...defaultProps} />);
     const optionsButton = getByLabelText(t('accessibility.conversationContextMenuOpenLabel'));
     fireEvent.click(optionsButton);
-    fireEvent.click(optionsButton);
-    expect(defaultProps.handleMenuOpen).toHaveBeenCalledWith(false);
+    fireEvent.click(document);
+    expect(defaultProps.handleActionMenuVisibility).toHaveBeenCalledWith(false);
   });
 
   test('toggles the active message action on click of any action button', () => {

@@ -19,16 +19,23 @@
 
 import {useEffect, RefObject} from 'react';
 
-export const useClickOutside = (ref: RefObject<Element>, onClick: (e: MouseEvent) => void) => {
+export const useClickOutside = (
+  ref: RefObject<Element>,
+  onClick: (e: MouseEvent) => void,
+  exclude?: RefObject<Element>,
+) => {
   useEffect(() => {
     const handleClick = (event: MouseEvent) => {
-      if (ref.current && ref.current !== event.target && !ref.current.contains(event.target as Node)) {
-        onClick(event);
+      const isOutsideClick = ref.current && ref.current !== event.target && !ref.current.contains(event.target as Node);
+      if (isOutsideClick) {
+        const isNonExcludedAreaClicked = exclude && exclude.current && !exclude.current.contains(event.target as Node);
+        if (isNonExcludedAreaClicked || !exclude) {
+          onClick(event);
+        }
       }
     };
-
     document.addEventListener('click', handleClick);
 
     return () => document.removeEventListener('click', handleClick);
-  }, [ref, onClick]);
+  }, [onClick]);
 };
