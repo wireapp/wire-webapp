@@ -125,8 +125,6 @@ const escKeyHandlers: KeyboardHandler[] = [];
 document.addEventListener('keydown', event => {
   if (event.key === 'Escape') {
     escKeyHandlers.forEach(handler => handler(event));
-  } else if (isMetaKey(event) && event.shiftKey && (isKey(event, '1') || isKey(event, '!'))) {
-    handleDebugKey();
   }
 });
 
