@@ -17,7 +17,6 @@
  *
  */
 
-export * from './ClientMismatch';
 export * from './Conversation';
 export * from './ConversationAPI';
 export * from './ConversationCode';
