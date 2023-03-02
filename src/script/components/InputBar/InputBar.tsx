@@ -222,18 +222,7 @@ const InputBar = ({
     setCurrentMentions([]);
 
     if (resetInputValue) {
-      /*
-        When trying to update a textarea with japanese value to
-        empty in onKeyDown handler the text is not fully cleared
-        and some parts of text is pasted by the OS/Browser after
-        we do setInputValue('');
-        To fix this we have to add a setTimeout in order to postpone
-        the operation of clearing the text to after of the proccess
-        of the onKeyDown and onKeyUp DOM events.
-       */
-      setTimeout(() => {
-        setInputValue('');
-      }, 0);
+      setInputValue('');
     }
   };
 
@@ -553,8 +542,18 @@ const InputBar = ({
     } else {
       sendMessage(messageText, updatedMentions);
     }
-
-    resetDraftState(true);
+    /*
+      When trying to update a textarea with japanese value to
+      empty in onKeyDown handler the text is not fully cleared
+      and some parts of text is pasted by the OS/Browser after
+      we do setInputValue('');
+      To fix this we have to add a setTimeout in order to postpone
+      the operation of clearing the text to after of the proccess
+      of the onKeyDown and onKeyUp DOM events.
+    */
+    setTimeout(() => {
+      resetDraftState(true);
+    }, 0);
     textareaRef.current?.focus();
   };
 
