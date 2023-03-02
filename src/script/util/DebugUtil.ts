@@ -30,6 +30,7 @@ import type {Notification} from '@wireapp/api-client/lib/notification/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {DatabaseKeys} from '@wireapp/core/lib/notification/NotificationDatabaseRepository';
 import Dexie from 'dexie';
+import keyboardjs from 'keyboardjs';
 import {container} from 'tsyringe';
 
 import {getLogger, Logger} from 'Util/Logger';
@@ -92,6 +93,36 @@ export class DebugUtil {
     this.messageRepository = message;
 
     this.logger = getLogger('DebugUtil');
+
+    keyboardjs.bind('command+shift+1', this.toggleDebugUi);
+  }
+
+  /** will print all the ids of entities that show on screen (userIds, conversationIds, messageIds) */
+  toggleDebugUi(): void {
+    const removeDebugInfo = (els: NodeListOf<HTMLElement>) => els.forEach(el => el.parentNode?.removeChild(el));
+
+    const addDebugInfo = (els: NodeListOf<HTMLElement>) =>
+      els.forEach(el => {
+        const debugInfo = document.createElement('div');
+        debugInfo.classList.add('debug-info');
+        const value = el.dataset.uieUid;
+        if (value) {
+          debugInfo.textContent = value;
+          el.appendChild(debugInfo);
+        }
+      });
+
+    const debugInfos = document.querySelectorAll<HTMLElement>('.debug-info');
+    const isShowingDebugInfo = debugInfos.length > 0;
+
+    if (isShowingDebugInfo) {
+      removeDebugInfo(debugInfos);
+    } else {
+      const debugElements = document.querySelectorAll<HTMLElement>(
+        '.message[data-uie-uid], .conversation-list-cell[data-uie-uid], [data-uie-name=sender-name]',
+      );
+      addDebugInfo(debugElements);
+    }
   }
 
   breakLastNotificationId() {

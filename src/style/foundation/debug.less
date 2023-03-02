@@ -13,15 +13,31 @@ body {
     color: #fff;
     font-size: 10px;
     font-weight: 300;
-    opacity: 1;
+    opacity: 0.5;
     user-select: text;
+    &:hover {
+      opacity: 1;
+    }
   }
 
   .message[data-uie-uid] .debug-info {
-    background-color: rgba(0, 0, 128, 0.5);
+    &::before {
+      content: 'message: ';
+    }
+    background-color: rgba(0, 0, 128);
+  }
+
+  [data-uie-name='sender-name'][data-uie-uid] .debug-info {
+    &::before {
+      content: 'user: ';
+    }
+    background-color: rgba(0, 128, 32);
   }
 
   .conversation-list-cell[data-uie-uid] .debug-info {
-    background-color: rgba(128, 0, 0, 0.5);
+    &::before {
+      content: 'conversation: ';
+    }
+    background-color: rgba(128, 0, 0);
   }
 }
