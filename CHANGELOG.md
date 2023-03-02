@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [39.1.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@39.1.0...@wireapp/core@39.1.1) (2023-03-02)
+
+### Bug Fixes
+
+* Do not consume prekeys when listing members-clients of a conversation ([#4932](https://github.com/wireapp/wire-web-packages/issues/4932)) ([c6ffa42](https://github.com/wireapp/wire-web-packages/commit/c6ffa4217df8a3fc28aef04786392df575f4b097))
+
 # [39.1.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@39.0.2...@wireapp/core@39.1.0) (2023-03-02)
 
 ### Features
