@@ -17,13 +17,7 @@
  *
  */
 
-import {
-  ClientMismatch,
-  ConversationProtocol,
-  MessageSendingStatus,
-  QualifiedUserClients,
-  UserClients,
-} from '@wireapp/api-client/lib/conversation';
+import {ConversationProtocol, MessageSendingStatus, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId, RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/lib/user';
 import {
   MessageSendingState,
@@ -123,7 +117,7 @@ export enum CONSENT_TYPE {
 export type ContributedSegmentations = Record<string, number | string | boolean | UserType>;
 
 type ClientMismatchHandlerFn = (
-  mismatch: Partial<ClientMismatch> | Partial<MessageSendingStatus>,
+  mismatch: Partial<MessageSendingStatus>,
   conversation?: Conversation,
   silent?: boolean,
   consentType?: CONSENT_TYPE,
@@ -203,10 +197,10 @@ export class MessageRepository {
    */
   public async updateMissingClients(
     conversation: Conversation,
-    allClients: UserClients | QualifiedUserClients,
+    allClients: QualifiedUserClients,
     consentType?: CONSENT_TYPE,
   ) {
-    const mismatch = {missing: allClients} as ClientMismatch;
+    const mismatch = {missing: allClients} as MessageSendingStatus;
     return this.onClientMismatch?.(mismatch, conversation, false, consentType);
   }
 
@@ -1247,7 +1241,7 @@ export class MessageRepository {
     const missing = await this.conversationService.fetchAllParticipantsClients(conversation.qualifiedId);
 
     const deleted = findDeletedClients(missing, await this.generateRecipients(conversation));
-    await this.onClientMismatch?.({deleted, missing} as ClientMismatch, conversation, true);
+    await this.onClientMismatch?.({deleted, missing} as MessageSendingStatus, conversation, true);
     if (blockSystemMessage) {
       conversation.blockLegalHoldMessage = false;
     }

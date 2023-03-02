@@ -18,7 +18,6 @@
  */
 
 import {
-  ClientMismatch,
   Conversation as BackendConversation,
   ConversationProtocol,
   CONVERSATION_TYPE,
@@ -193,7 +192,7 @@ export class ConversationRepository {
 
       const selfClient = {domain, userId, clientId};
       const filteredMissing = mismatch.missing && removeClientFromUserClientMap(mismatch.missing, selfClient);
-      const filteredMismatch = {...mismatch, missing: filteredMissing} as ClientMismatch | MessageSendingStatus;
+      const filteredMismatch = {...mismatch, missing: filteredMissing} as MessageSendingStatus;
 
       const {missingClients, deletedClients, emptyUsers, missingUserIds} = extractClientDiff(
         filteredMismatch,

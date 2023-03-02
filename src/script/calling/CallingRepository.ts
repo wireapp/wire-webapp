@@ -22,8 +22,7 @@ import type {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {WebappProperties} from '@wireapp/api-client/lib/user/data';
 import {MessageSendingState} from '@wireapp/core/lib/conversation';
-import {flattenQualifiedUserClients, flattenUserClients} from '@wireapp/core/lib/conversation/message/UserClientsUtil';
-import {isQualifiedUserClients} from '@wireapp/core/lib/util';
+import {flattenUserMap} from '@wireapp/core/lib/conversation/message/UserClientsUtil';
 import {amplify} from 'amplify';
 import axios from 'axios';
 import ko from 'knockout';
@@ -335,9 +334,7 @@ export class CallingRepository {
     const allClients = await this.core.service!.conversation.fetchAllParticipantsClients(call.conversationId);
 
     if (!conversation.isUsingMLSProtocol) {
-      const qualifiedClients = isQualifiedUserClients(allClients)
-        ? flattenQualifiedUserClients(allClients)
-        : flattenUserClients(allClients);
+      const qualifiedClients = flattenUserMap(allClients);
 
       const clients: Clients = flatten(
         qualifiedClients.map(({data, userId}) =>

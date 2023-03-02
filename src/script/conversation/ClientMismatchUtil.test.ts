@@ -54,12 +54,16 @@ describe('ClientMismatchUtil', () => {
     it('extract missing and deleted clients from a mismatch when no users given', () => {
       const mismatch = {
         deleted: {
-          user3: ['client1', 'client2'],
-          user4: ['client1', 'client2'],
+          domain: {
+            user3: ['client1', 'client2'],
+            user4: ['client1', 'client2'],
+          },
         },
         missing: {
-          user1: ['client1', 'client2'],
-          user2: ['client1', 'client2'],
+          domain: {
+            user1: ['client1', 'client2'],
+            user2: ['client1', 'client2'],
+          },
         },
       };
       const {missingClients, deletedClients, missingUserIds, emptyUsers} = extractClientDiff(mismatch);
@@ -79,12 +83,16 @@ describe('ClientMismatchUtil', () => {
     it('extract full diff with mismatch when users are given', () => {
       const mismatch = {
         deleted: {
-          user3: ['client1', 'client2'],
-          user4: ['client1'],
+          domain: {
+            user3: ['client1', 'client2'],
+            user4: ['client1'],
+          },
         },
         missing: {
-          user1: ['client1', 'client2'],
-          user2: ['client1', 'client2'],
+          domain: {
+            user1: ['client1', 'client2'],
+            user2: ['client1', 'client2'],
+          },
         },
       };
       const userWithoutClients = new User('user3');
@@ -116,8 +124,10 @@ describe('ClientMismatchUtil', () => {
     it('only gives unknown missing clients when users are given', () => {
       const mismatch = {
         missing: {
-          user1: ['client1', 'client2'],
-          user2: ['client1', 'client2'],
+          domain: {
+            user1: ['client1', 'client2'],
+            user2: ['client1', 'client2'],
+          },
         },
       };
       const user1 = new User('user1');
