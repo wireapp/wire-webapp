@@ -163,10 +163,11 @@ const handleDebugKey = () => {
     els.forEach(el => {
       const debugInfo = document.createElement('div');
       debugInfo.classList.add('debug-info');
-      if (el.dataset.uieUid) {
-        debugInfo.textContent = el.dataset.uieUid;
+      const value = el.dataset.uieUid || el.dataset.uieValue;
+      if (value) {
+        debugInfo.textContent = value;
+        el.appendChild(debugInfo);
       }
-      el.appendChild(debugInfo);
     });
 
   const debugInfos = document.querySelectorAll<HTMLElement>('.debug-info');
