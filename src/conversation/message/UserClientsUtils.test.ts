@@ -17,7 +17,7 @@
  *
  */
 
-import {flattenQualifiedUserClients, flattenUserClients} from './UserClientsUtil';
+import {flattenUserMap, nestUsersList} from './UserClientsUtil';
 
 describe('userClientsUtils', () => {
   it('extracts user and data info from qualified payload', () => {
@@ -28,17 +28,14 @@ describe('userClientsUtils', () => {
       {data: ['client1', 'client2'], userId: {domain: 'domain2', id: 'user3'}},
     ];
 
-    expect(flattenQualifiedUserClients(payload)).toEqual(expected);
+    expect(flattenUserMap(payload)).toEqual(expected);
   });
 
-  it('extracts user and data info from non-qualified payload', () => {
-    const payload = {user1: ['client1'], user2: ['client11'], user3: ['client1', 'client2']};
-    const expected = [
-      {data: ['client1'], userId: {domain: '', id: 'user1'}},
-      {data: ['client11'], userId: {domain: '', id: 'user2'}},
-      {data: ['client1', 'client2'], userId: {domain: '', id: 'user3'}},
-    ];
+  it('nest and flatten are inverse operations', () => {
+    const payload = {domain1: {user1: ['client1'], user2: ['client11']}, domain2: {user3: ['client1', 'client2']}};
 
-    expect(flattenUserClients(payload)).toEqual(expected);
+    const result = nestUsersList(flattenUserMap(payload));
+
+    expect(result).toEqual(payload);
   });
 });

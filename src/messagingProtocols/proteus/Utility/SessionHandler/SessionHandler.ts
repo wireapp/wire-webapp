@@ -27,7 +27,7 @@ import {APIClient} from '@wireapp/api-client';
 
 import {SessionId} from './SessionHandler.types';
 
-import {flattenQualifiedUserClients} from '../../../../conversation/message/UserClientsUtil';
+import {flattenUserMap} from '../../../../conversation/message/UserClientsUtil';
 import {CryptoClient} from '../../ProteusService/CryptoClient';
 
 interface ConstructSessionIdParams {
@@ -135,7 +135,7 @@ const initSessions = async ({
   const missingClients: QualifiedUserClients = {};
   const missingClientsWithPrekeys: QualifiedUserPreKeyBundleMap = {};
   const existingSessions: string[] = [];
-  const users = flattenQualifiedUserClients<string[] | Record<string, PreKey | null>>(recipients);
+  const users = flattenUserMap<string[] | Record<string, PreKey | null>>(recipients);
 
   for (const user of users) {
     const {userId, data} = user;

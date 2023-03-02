@@ -32,7 +32,7 @@ import Long from 'long';
 
 import {APIClient} from '@wireapp/api-client';
 
-import {flattenQualifiedUserClients} from './UserClientsUtil';
+import {flattenUserMap} from './UserClientsUtil';
 
 import type {ProteusService} from '../../messagingProtocols/proteus';
 import {isQualifiedIdArray} from '../../util';
@@ -171,7 +171,7 @@ export class MessageService {
     recipients: QualifiedOTRRecipients,
     plainText: Uint8Array,
   ): Promise<QualifiedOTRRecipients> {
-    const deleted = flattenQualifiedUserClients(mismatch.deleted);
+    const deleted = flattenUserMap(mismatch.deleted);
     // remove deleted clients to the recipients
     deleted.forEach(({userId, data}) =>
       data.forEach(clientId => delete recipients[userId.domain][userId.id][clientId]),
@@ -179,7 +179,7 @@ export class MessageService {
 
     if (Object.keys(mismatch.missing).length) {
       const {payloads} = await this.proteusService.encrypt(plainText, mismatch.missing);
-      const reEncryptedPayloads = flattenQualifiedUserClients<{[client: string]: Uint8Array}>(payloads);
+      const reEncryptedPayloads = flattenUserMap<{[client: string]: Uint8Array}>(payloads);
       reEncryptedPayloads.forEach(({data, userId}) => {
         const domainRecipients = recipients[userId.domain] ?? {};
         domainRecipients[userId.id] = {...domainRecipients[userId.id], ...data};

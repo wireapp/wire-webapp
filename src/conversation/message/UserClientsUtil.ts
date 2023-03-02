@@ -19,26 +19,31 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-type UserClientsContainer<T> = {[userId: string]: T};
-type QualifiedUserClientsContainer<T> = {[domain: string]: UserClientsContainer<T>};
+type UserMap<T> = {[userId: string]: T};
+type QualifiedUserMap<T> = {[domain: string]: UserMap<T>};
 
-export function flattenUserClients<T>(
-  userClients: UserClientsContainer<T>,
-  domain: string = '',
-): {data: T; userId: QualifiedId}[] {
-  return Object.entries(userClients).map(([id, data]) => ({data, userId: {domain, id}}));
+/**
+ * Will flatten a container of domain=>users=>anything infos to an array
+ *
+ * @param userMap The qualified UserMap to flatten
+ * @return An array containing the qualified user Ids and the clients info
+ */
+export function flattenUserMap<T = unknown>(userMap: QualifiedUserMap<T>): {data: T; userId: QualifiedId}[] {
+  return Object.entries(userMap).reduce((ids, [domain, userClients]) => {
+    return [...ids, ...Object.entries(userClients).map(([id, data]) => ({data, userId: {domain, id}}))];
+  }, [] as {data: T; userId: QualifiedId}[]);
 }
 
 /**
- * Will flatten a container of users=>clients infos to an array
- *
- * @param userClients The UserClients (qualified or not) to flatten
- * @return An array containing the qualified user Ids and the clients info
+ * Will convert a list of qualified users to a UserMap
+ * @param users the list of users to convert
  */
-export function flattenQualifiedUserClients<T = unknown>(
-  userClients: QualifiedUserClientsContainer<T>,
-): {data: T; userId: QualifiedId}[] {
-  return Object.entries(userClients).reduce((ids, [domain, userClients]) => {
-    return [...ids, ...flattenUserClients(userClients, domain)];
-  }, [] as {data: T; userId: QualifiedId}[]);
+export function nestUsersList<T = unknown>(users: {data: T; userId: QualifiedId}[]): QualifiedUserMap<T> {
+  return users.reduce((users, {data, userId: {domain, id}}) => {
+    if (!users[domain]) {
+      users[domain] = {};
+    }
+    users[domain][id] = data;
+    return users;
+  }, {} as QualifiedUserMap<T>);
 }

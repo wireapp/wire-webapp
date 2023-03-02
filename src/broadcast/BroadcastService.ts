@@ -24,7 +24,7 @@ import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {sendMessage} from '../conversation/message/messageSender';
 import {MessageService} from '../conversation/message/MessageService';
-import {flattenQualifiedUserClients} from '../conversation/message/UserClientsUtil';
+import {flattenUserMap} from '../conversation/message/UserClientsUtil';
 import {ProteusService} from '../messagingProtocols/proteus';
 
 export class BroadcastService {
@@ -42,7 +42,7 @@ export class BroadcastService {
     const plainTextArray = GenericMessage.encode(genericMessage).finish();
     const send = (): Promise<MessageSendingStatus | ClientMismatch> => {
       return this.messageService.sendMessage(this.apiClient.validatedClientId, recipients, plainTextArray, {
-        reportMissing: flattenQualifiedUserClients(recipients).map(({userId}) => userId),
+        reportMissing: flattenUserMap(recipients).map(({userId}) => userId),
         onClientMismatch,
       });
     };
