@@ -17,12 +17,13 @@
  *
  */
 
-import React, {useMemo, useState, useEffect, useRef} from 'react';
+import React, {useMemo, useState, useEffect} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {Icon} from 'Components/Icon';
+import {Config} from 'src/script/Config';
 import {Conversation} from 'src/script/entity/Conversation';
 import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
@@ -175,7 +176,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
 
   const [isActionMenuVisible, setActionMenuVisibility] = useState(true);
   const isMenuOpen = useMessageActionsState(state => state.isMenuOpen);
-  const contentMessageRef = useRef<HTMLDivElement>(null);
+  const isReactionFeatureEnabled = Config.getConfig().FEATURE.ENABLE_REACTION;
 
   useEffect(() => {
     if (isMessageFocused || msgFocusState) {
@@ -201,7 +202,6 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
           setActionMenuVisibility(false);
         }
       }}
-      ref={contentMessageRef}
     >
       {avatarSection}
       {message.quote() && (
@@ -247,7 +247,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             />
           </div>
         )}
-        {isActionMenuVisible && (
+        {isActionMenuVisible && isReactionFeatureEnabled && (
           <MessageActions
             isMsgWithHeader={shouldShowAvatar()}
             message={message}
