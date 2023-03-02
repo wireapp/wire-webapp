@@ -17,9 +17,9 @@
  *
  */
 
-import {ClientMismatch, MessageSendingStatus} from '@wireapp/api-client/lib/conversation';
+import {MessageSendingStatus} from '@wireapp/api-client/lib/conversation';
 
-const isClearFromMismatch = (mismatch: ClientMismatch | MessageSendingStatus): boolean => {
+const isClearFromMismatch = (mismatch: MessageSendingStatus): boolean => {
   const hasMissing = Object.keys(mismatch.missing || {}).length > 0;
   const hasDeleted = Object.keys(mismatch.deleted || {}).length > 0;
   const hasRedundant = Object.keys(mismatch.redundant || {}).length > 0;

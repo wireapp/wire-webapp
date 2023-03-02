@@ -19,7 +19,6 @@
 
 import {
   QualifiedUserClients,
-  ClientMismatch,
   MessageSendingStatus,
   ConversationProtocol,
   NewConversation,
@@ -47,10 +46,7 @@ export type SendProteusMessageParams = SendCommonParams &
      *    When given a QualifiedUserClients the method will only send to the clients listed in the userIds. This could lead to ClientMismatch (since the given list of devices might not be the freshest one and new clients could have been created)
      */
     userIds?: QualifiedId[] | QualifiedUserClients;
-    onClientMismatch?: (
-      status: ClientMismatch | MessageSendingStatus,
-      wasSent: boolean,
-    ) => void | boolean | Promise<boolean>;
+    onClientMismatch?: (status: MessageSendingStatus, wasSent: boolean) => void | boolean | Promise<boolean>;
     protocol: ConversationProtocol.PROTEUS;
   };
 

@@ -17,12 +17,7 @@
  *
  */
 
-import {
-  ClientMismatch,
-  MessageSendingStatus,
-  QualifiedOTRRecipients,
-  QualifiedUserClients,
-} from '@wireapp/api-client/lib/conversation';
+import {MessageSendingStatus, QualifiedOTRRecipients, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId, QualifiedUserPreKeyBundleMap} from '@wireapp/api-client/lib/user';
 import {uuidToBytes} from '@wireapp/commons/lib/util/StringUtil';
 import {proteus as ProtobufOTR} from '@wireapp/protocol-messaging/web/otr';
@@ -37,7 +32,7 @@ import {flattenUserMap} from './UserClientsUtil';
 import type {ProteusService} from '../../messagingProtocols/proteus';
 import {isQualifiedIdArray} from '../../util';
 
-type ClientMismatchError = AxiosError<ClientMismatch | MessageSendingStatus>;
+type ClientMismatchError = AxiosError<MessageSendingStatus>;
 
 export class MessageService {
   constructor(private readonly apiClient: APIClient, private readonly proteusService: ProteusService) {}
