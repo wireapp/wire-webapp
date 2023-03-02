@@ -23,7 +23,6 @@ import {
   MutedStatus,
   NewConversation,
   QualifiedUserClients,
-  UserClients,
   ConversationProtocol,
   RemoteConversations,
 } from '@wireapp/api-client/lib/conversation';
@@ -78,7 +77,7 @@ export class ConversationService {
    * @param {string} conversationId
    * @param {string} conversationDomain? - If given will send the message to the new qualified endpoint
    */
-  public async fetchAllParticipantsClients(conversationId: QualifiedId): Promise<UserClients | QualifiedUserClients> {
+  public async fetchAllParticipantsClients(conversationId: QualifiedId): Promise<QualifiedUserClients> {
     const qualifiedMembers = await getConversationQualifiedMembers({
       apiClient: this.apiClient,
       conversationId,
