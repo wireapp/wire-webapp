@@ -21,54 +21,12 @@ import {APIClient} from '@wireapp/api-client/lib/APIClient';
 import {QualifiedUserClients, UserClients} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId, QualifiedUserPreKeyBundleMap, UserPreKeyBundleMap} from '@wireapp/api-client/lib/user';
 
-import {isQualifiedIdArray, isStringArray, isUserClients} from '../../../../util';
+import {isQualifiedIdArray} from '../../../../util';
 
 const preKeyBundleToUserClients = (users: UserPreKeyBundleMap): UserClients => {
   return Object.entries(users).reduce<UserClients>((acc, [userId, clientsObj]) => {
     acc[userId] = Object.keys(clientsObj);
     return acc;
-  }, {});
-};
-
-interface GetPreKeyBundleMapParams {
-  apiClient: APIClient;
-  conversationId: QualifiedId;
-  userIds?: string[] | QualifiedId[] | UserClients;
-}
-const getPreKeyBundleMap = async ({
-  apiClient,
-  conversationId,
-  userIds = [],
-}: GetPreKeyBundleMapParams): Promise<UserPreKeyBundleMap> => {
-  let members: string[] = [];
-
-  if (userIds) {
-    if (isStringArray(userIds)) {
-      members = userIds;
-    } else if (isUserClients(userIds)) {
-      members = Object.keys(userIds);
-    }
-  }
-
-  if (!members.length) {
-    const conversation = await apiClient.api.conversation.getConversation(conversationId);
-    /*
-     * If you are sending a message to a conversation, you have to include
-     * yourself in the list of users if you want to sync a message also to your
-     * other clients.
-     */
-    members = conversation.members.others.map(member => member.id).concat(conversation.members.self.id);
-  }
-
-  const preKeys = await Promise.all(members.map(member => apiClient.api.user.getUserPreKeys(member)));
-
-  return preKeys.reduce((bundleMap: UserPreKeyBundleMap, bundle) => {
-    const userId = bundle.user;
-    bundleMap[userId] ||= {};
-    for (const client of bundle.clients) {
-      bundleMap[userId][client.client] = client.prekey;
-    }
-    return bundleMap;
   }, {});
 };
 
@@ -125,4 +83,4 @@ const getQualifiedPreKeyBundle = async ({
   }, {});
 };
 
-export {getPreKeyBundleMap, getQualifiedPreKeyBundle, preKeyBundleToUserClients};
+export {getQualifiedPreKeyBundle, preKeyBundleToUserClients};

@@ -47,6 +47,15 @@ import {
   VerifyDelete,
 } from '../user/';
 
+type PrekeysResponse = {
+  qualified_user_client_prekeys: QualifiedUserPreKeyBundleMap;
+  failed_to_list?: QualifiedId[];
+};
+
+function isPrekeysResponse(object: any): object is PrekeysResponse {
+  return object.qualified_user_client_prekeys && object.failed_to_list;
+}
+
 export class UserAPI {
   public static readonly DEFAULT_USERS_CHUNK_SIZE = 50;
   public static readonly DEFAULT_USERS_PREKEY_BUNDLE_CHUNK_SIZE = 128;
@@ -303,11 +312,8 @@ export class UserAPI {
     return response.data;
   }
 
-  public async getUserPreKeys(userId: string | QualifiedId): Promise<PreKeyBundle> {
-    const url =
-      typeof userId === 'string'
-        ? `${UserAPI.URL.USERS}/${userId}/${UserAPI.URL.PRE_KEYS}`
-        : `${UserAPI.URL.USERS}/${userId.domain}/${userId.id}/${UserAPI.URL.PRE_KEYS}`;
+  public async getUserPreKeys(userId: QualifiedId): Promise<PreKeyBundle> {
+    const url = `${UserAPI.URL.USERS}/${userId.domain}/${userId.id}/${UserAPI.URL.PRE_KEYS}`;
 
     const config: AxiosRequestConfig = {
       method: 'get',
@@ -496,17 +502,15 @@ export class UserAPI {
     return response.data;
   }
 
-  private async postMultiPreKeyBundlesChunk(
-    userClientMap: QualifiedUserClients,
-  ): Promise<QualifiedUserPreKeyBundleMap> {
+  private async postMultiPreKeyBundlesChunk(userClientMap: QualifiedUserClients): Promise<PrekeysResponse> {
     const config: AxiosRequestConfig = {
       data: userClientMap,
       method: 'post',
       url: `${UserAPI.URL.USERS}/${UserAPI.URL.LIST_PREKEYS}`,
     };
 
-    const response = await this.client.sendJSON<QualifiedUserPreKeyBundleMap>(config, true);
-    return response.data;
+    const response = await this.client.sendJSON<QualifiedUserPreKeyBundleMap | PrekeysResponse>(config, true);
+    return isPrekeysResponse(response.data) ? response.data : {qualified_user_client_prekeys: response.data};
   }
 
   /**
@@ -550,7 +554,7 @@ export class UserAPI {
   public async postMultiPreKeyBundles(
     userClientMap: QualifiedUserClients,
     limit: number = UserAPI.DEFAULT_USERS_PREKEY_BUNDLE_CHUNK_SIZE,
-  ): Promise<QualifiedUserPreKeyBundleMap> {
+  ): Promise<PrekeysResponse> {
     const flattenUsers = Object.entries(userClientMap).reduce((users, [domain, domainUsersClients]) => {
       const domainUsers = Object.entries(domainUsersClients).map(([userId, clients]) => ({
         userId: {id: userId, domain},
@@ -575,12 +579,19 @@ export class UserAPI {
 
     const userPreKeyBundleMapChunks = await Promise.all(chunksPromises);
 
-    return userPreKeyBundleMapChunks.reduce((userPreKeyBundleMap, userPreKeyBundleMapChunk) => {
-      Object.entries(userPreKeyBundleMapChunk).forEach(([domain, userClientMap]) => {
-        userPreKeyBundleMap[domain] = {...userPreKeyBundleMap[domain], ...userClientMap};
-      });
-      return userPreKeyBundleMap;
-    }, {});
+    return userPreKeyBundleMapChunks.reduce(
+      (response, userPreKeyBundleMapChunk) => {
+        Object.entries(userPreKeyBundleMapChunk.qualified_user_client_prekeys).forEach(([domain, userClientMap]) => {
+          response.qualified_user_client_prekeys[domain] = {
+            ...response.qualified_user_client_prekeys[domain],
+            ...userClientMap,
+          };
+        });
+        response.failed_to_list?.push(...(userPreKeyBundleMapChunk.failed_to_list ?? []));
+        return response;
+      },
+      {qualified_user_client_prekeys: {}, failed_to_list: []},
+    );
   }
 
   /**

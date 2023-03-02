@@ -41,6 +41,8 @@ type InitSessionsResult = {
   sessions: string[];
   /** client that do we do not have sessions with and that do not have existence on backend (deleted clients) */
   unknowns?: QualifiedUserClients;
+  /** clients for which we had problem fetch prekeys (federated server down) */
+  failed?: QualifiedId[];
 };
 
 const constructSessionId = ({userId, clientId}: ConstructSessionIdParams): string => {
@@ -100,12 +102,18 @@ const initSession = async (
  * @param {userClientMap} map of domain to (map of user IDs to client IDs) or map of user IDs containg the lists of clients
  */
 const createSessions = async ({recipients, apiClient, cryptoClient}: CreateSessionsProps) => {
-  const prekeyBundleMap = await apiClient.api.user.postMultiPreKeyBundles(recipients);
+  const {qualified_user_client_prekeys: prekeysBundle, failed_to_list: failed} =
+    await apiClient.api.user.postMultiPreKeyBundles(recipients);
 
-  return await createSessionsFromPreKeys({
-    recipients: prekeyBundleMap,
+  const result = await createSessionsFromPreKeys({
+    recipients: prekeysBundle,
     cryptoClient,
   });
+
+  return {
+    ...result,
+    failed,
+  };
 };
 
 interface GetSessionsAndClientsFromRecipientsProps {
@@ -160,19 +168,23 @@ const initSessions = async ({
         })
       : {sessions: [], unknowns: {}};
 
-  const {sessions: created, unknowns} =
-    Object.keys(missingClients).length > 0
-      ? await createSessions({
-          recipients: missingClients,
-          apiClient,
-          cryptoClient,
-          logger,
-        })
-      : {sessions: [], unknowns: {}};
+  const {
+    sessions: created,
+    failed,
+    unknowns,
+  } = Object.keys(missingClients).length > 0
+    ? await createSessions({
+        recipients: missingClients,
+        apiClient,
+        cryptoClient,
+        logger,
+      })
+    : {sessions: [], failed: undefined, unknowns: undefined};
 
   const allUnknowns = {...prekeyUnknows, ...unknowns};
   return {
     sessions: [...existingSessions, ...prekeyCreated, ...created],
+    failed,
     unknowns: Object.keys(allUnknowns).length > 0 ? allUnknowns : undefined,
   };
 };
