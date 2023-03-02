@@ -46,7 +46,7 @@ import type {CryptographyRepository} from '../cryptography/CryptographyRepositor
 import type {User} from '../entity/User';
 import {ClientError} from '../error/ClientError';
 import {Core} from '../service/CoreSingleton';
-import {ClientRecord, StorageRepository} from '../storage';
+import {ClientRecord} from '../storage';
 import {StorageKey} from '../storage/StorageKey';
 
 export type UserClientEntityMap = {[userId: string]: ClientEntity[]};
@@ -69,7 +69,6 @@ export class ClientRepository {
   constructor(
     public readonly clientService: ClientService,
     public readonly cryptographyRepository: CryptographyRepository,
-    private readonly storageRepository: StorageRepository,
     private readonly clientState = container.resolve(ClientState),
     private readonly core = container.resolve(Core),
   ) {
@@ -216,7 +215,7 @@ export class ClientRepository {
   private updateClientSchemaInDb(userId: QualifiedId, clientPayload: PublicClient): Promise<ClientRecord> {
     const clientRecord: ClientRecord = {
       ...clientPayload,
-      domain: this.core.backendFeatures.federationEndpoints ? userId.domain : undefined,
+      domain: userId.domain,
       meta: {
         is_verified: false,
         primary_key: constructClientId(userId, clientPayload.id),
@@ -296,13 +295,6 @@ export class ClientRepository {
     selfUser.removeClient(clientId);
     amplify.publish(WebAppEvents.USER.CLIENT_REMOVED, selfUser.qualifiedId, clientId);
     return this.clientState.clients();
-  }
-
-  removeLocalClient(): void {
-    this.storageRepository.deleteCryptographyStores().then(() => {
-      const shouldClearData = this.clientState.currentClient().isTemporary();
-      amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.CLIENT_REMOVED, shouldClearData);
-    });
   }
 
   logoutClient = async (): Promise<void> => {
@@ -446,7 +438,7 @@ export class ClientRepository {
           if (backendClient) {
             const {client, wasUpdated} = ClientMapper.updateClient(databaseClient, {
               ...backendClient,
-              domain: this.core.backendFeatures.federationEndpoints ? userId.domain : undefined,
+              domain: userId.domain,
             });
 
             delete clientsFromBackend[clientId];
@@ -566,7 +558,10 @@ export class ClientRepository {
 
     const isCurrentClient = clientId === this.clientState.currentClient().id;
     if (isCurrentClient) {
-      return this.removeLocalClient();
+      const shouldClearData = this.clientState.currentClient().isTemporary();
+      // If the current client has been removed, we need to sign out
+      amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.CLIENT_REMOVED, shouldClearData);
+      return;
     }
     const localClients = await this.getClientsForSelf();
     const removedClient = localClients.find(client => client.id === clientId);

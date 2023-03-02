@@ -45,7 +45,7 @@ export async function initMLSConversations(
   conversationRepository: MLSConversationRepository,
 ): Promise<void> {
   core.configureMLSCallbacks({
-    authorize: groupIdBytes => {
+    authorize: async groupIdBytes => {
       const groupId = arrayToBase64(groupIdBytes);
       const conversation = conversationRepository.findConversationByGroupId(groupId);
       if (!conversation) {
@@ -59,7 +59,7 @@ export async function initMLSConversations(
       return conversation?.groupId;
     },
     // This is enforced by backend, no need to implement this on the client side.
-    userAuthorize: () => true,
+    userAuthorize: async () => true,
   });
 
   const mlsConversations = conversations.filter(isMLSConversation);

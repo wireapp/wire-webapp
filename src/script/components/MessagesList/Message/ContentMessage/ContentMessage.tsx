@@ -38,6 +38,7 @@ import {useMessageActionsState} from './MessageActions/MessageActions.state';
 import {MessageFooterLike} from './MessageFooterLike';
 import {MessageLike} from './MessageLike';
 import {Quote} from './MessageQuote';
+import {FailedToSendWarning} from './Warnings';
 
 import {EphemeralStatusType} from '../../../../message/EphemeralStatusType';
 import {ContextMenuEntry} from '../../../../ui/ContextMenu';
@@ -85,7 +86,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
     [isMsgElementsFocusable, isMessageFocused],
   );
   const messageFocusedTabIndex = useMessageFocusedTabIndex(msgFocusState);
-  const {headerSenderName, ephemeral_caption, ephemeral_status, assets, other_likes, was_edited} =
+  const {headerSenderName, ephemeral_caption, ephemeral_status, assets, other_likes, was_edited, failedToSend} =
     useKoSubscribableChildren(message, [
       'headerSenderName',
       'timestamp',
@@ -94,6 +95,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
       'assets',
       'other_likes',
       'was_edited',
+      'failedToSend',
     ]);
 
   const shouldShowAvatar = (): boolean => {
@@ -121,7 +123,11 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
       </div>
 
       <div className="message-header-label">
-        <h4 className={`message-header-label-sender ${message.accent_color()}`} data-uie-name="sender-name">
+        <h4
+          className={`message-header-label-sender ${message.accent_color()}`}
+          data-uie-name="sender-name"
+          data-uie-uid={message.user().id}
+        >
           {headerSenderName}
         </h4>
 
@@ -236,6 +242,8 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             isMessageFocused={msgFocusState}
           />
         ))}
+
+        {failedToSend && <FailedToSendWarning failedToSend={failedToSend} knownUsers={conversation.allUserEntities} />}
 
         {!other_likes.length && message.isReactable() && (
           <div className="message-body-like">

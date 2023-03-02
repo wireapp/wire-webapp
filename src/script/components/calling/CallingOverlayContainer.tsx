@@ -23,6 +23,7 @@ import {container} from 'tsyringe';
 
 import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 
+import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {ChooseScreen, Screen} from './ChooseScreen';
@@ -90,14 +91,15 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     callState.selectableWindows([]);
   };
 
-  const changePage = (newPage: number, call: Call) => {
-    callingRepository.changeCallPage(call, newPage);
-  };
+  const changePage = (newPage: number, call: Call) => callingRepository.changeCallPage(call, newPage);
+
+  const {clearShowAlert} = useCallAlertState();
 
   const leave = (call: Call) => {
     callingRepository.leaveCall(call.conversationId, LEAVE_CALL_REASON.MANUAL_LEAVE_BY_UI_CLICK);
     callState.activeCallViewTab(CallViewTab.ALL);
     call.maximizedParticipant(null);
+    clearShowAlert();
   };
 
   const setMaximizedParticipant = (call: Call, participant: Participant | null) => {
@@ -121,13 +123,9 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     callingRepository.refreshAudioInput();
   };
 
-  const toggleCamera = (call: Call) => {
-    callingRepository.toggleCamera(call);
-  };
+  const toggleCamera = (call: Call) => callingRepository.toggleCamera(call);
 
-  const toggleMute = (call: Call, muteState: boolean) => {
-    callingRepository.muteCall(call, muteState);
-  };
+  const toggleMute = (call: Call, muteState: boolean) => callingRepository.muteCall(call, muteState);
 
   const toggleScreenshare = async (call: Call): Promise<void> => {
     if (call.getSelfParticipant().sharesScreen()) {

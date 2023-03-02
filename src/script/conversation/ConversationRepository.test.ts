@@ -536,9 +536,7 @@ describe('ConversationRepository', () => {
           xhr.respond(HTTP_STATUS.OK, {'Content-Type': 'application/json'}, JSON.stringify(users));
         });
 
-        const matchConversations = new RegExp(
-          `${escapeRegex(Config.getConfig().BACKEND_REST)}/conversations/([a-z0-9-]+)`,
-        );
+        const matchConversations = new RegExp(`${escapeRegex(Config.getConfig().BACKEND_REST)}/conversations/.*/(.*)`);
         (server as any).respondWith('GET', matchConversations, (xhr: any, conversationId: string) => {
           const conversation = {
             access: [CONVERSATION_ACCESS.PRIVATE],

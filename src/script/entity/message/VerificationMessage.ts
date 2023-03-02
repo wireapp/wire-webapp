@@ -21,7 +21,7 @@ import ko from 'knockout';
 
 import {QualifiedUserId} from '@wireapp/protocol-messaging';
 
-import {isQualifiedId} from 'Util/TypePredicateUtil';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {Message} from './Message';
 
@@ -31,7 +31,7 @@ import type {User} from '../User';
 
 export class VerificationMessage extends Message {
   public readonly userEntities: ko.ObservableArray<User>;
-  public userIds: ko.ObservableArray<QualifiedUserId | string>;
+  public userIds: ko.ObservableArray<QualifiedUserId>;
   public verificationMessageType: ko.Observable<VerificationMessageType>;
   public readonly isSelfClient: ko.PureComputed<boolean>;
 
@@ -42,15 +42,13 @@ export class VerificationMessage extends Message {
     this.affect_order(false);
 
     this.verificationMessageType = ko.observable();
-    this.userIds = ko.observableArray<QualifiedUserId | string>();
+    this.userIds = ko.observableArray<QualifiedUserId>();
 
     this.userEntities = ko.observableArray();
 
     this.isSelfClient = ko.pureComputed(() => {
       const messageUserId = this.userIds()?.length === 1 && this.userIds()[0];
-      return isQualifiedId(messageUserId)
-        ? messageUserId.id === this.user().id && messageUserId.domain === this.user().domain
-        : messageUserId === this.user().id;
+      return matchQualifiedIds(messageUserId, this.user().qualifiedId);
     });
   }
 }

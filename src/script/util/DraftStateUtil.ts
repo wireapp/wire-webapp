@@ -84,12 +84,10 @@ export const loadDraftState = async (
   const replyMessageId = storageValue.reply.messageId;
 
   if (replyMessageId) {
-    draftMessage.replyEntityPromise = messageRepository.getMessageInConversationById(
-      conversationEntity,
-      replyMessageId,
-      false,
-      true,
-    );
+    const message =
+      (await messageRepository.getMessageInConversationById(conversationEntity, replyMessageId)) ||
+      (await messageRepository.getMessageInConversationByReplacementId(conversationEntity, replyMessageId));
+    draftMessage.replyEntityPromise = messageRepository.ensureMessageSender(message) as Promise<ContentMessage>;
   }
 
   return draftMessage;

@@ -31,11 +31,13 @@ export class BackendError extends Error {
   }
 
   static AUTH_ERRORS = {
+    BAD_REQUEST: 'bad-request',
     BLACKLISTED_EMAIL: 'blacklisted-email',
     BLACKLISTED_PHONE: 'blacklisted-phone',
     CODE_AUTHENTICATION_FAILED: 'code-authentication-failed',
     CODE_AUTHENTICATION_REQUIRED: 'code-authentication-required',
     DOMAIN_BLOCKED_FOR_REGISTRATION: 'domain-blocked-for-registration',
+    EMAIL_REQUIRED: 'email-required', // Synthetic error label
     INVALID_CODE: 'invalid-code',
     INVALID_CREDENTIALS: 'invalid-credentials',
     INVALID_EMAIL: 'invalid-email',
