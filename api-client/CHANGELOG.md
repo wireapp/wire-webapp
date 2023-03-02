@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [23.1.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@23.0.0...@wireapp/api-client@23.1.0) (2023-03-02)
+
+### Features
+
+* Warn consumer that some prekeys could not be fetch when encrypting a message ([#4931](https://github.com/wireapp/wire-web-packages/issues/4931)) ([3c7e0eb](https://github.com/wireapp/wire-web-packages/commit/3c7e0eb59cbd34f25e11469a9b645cb8f2c306d2))
+
 # [23.0.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@22.17.1...@wireapp/api-client@23.0.0) (2023-03-01)
 
 ### Code Refactoring
