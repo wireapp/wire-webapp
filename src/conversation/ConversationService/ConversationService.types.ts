@@ -19,7 +19,6 @@
 
 import {
   QualifiedUserClients,
-  ClientMismatch,
   ConversationProtocol,
   MessageSendingStatus,
   Conversation,
@@ -70,10 +69,7 @@ export interface MessageSendingCallbacks {
    * @param wasSent Indicate whether the message was already sent or if it can still be canceled
    * @return
    */
-  onClientMismatch?: (
-    status: ClientMismatch | MessageSendingStatus,
-    wasSent: boolean,
-  ) => void | boolean | Promise<boolean>;
+  onClientMismatch?: (status: MessageSendingStatus, wasSent: boolean) => void | boolean | Promise<boolean>;
 }
 
 /**

@@ -17,7 +17,7 @@
  *
  */
 
-import {ClientMismatch, MessageSendingStatus, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
+import {MessageSendingStatus, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 
 import {APIClient} from '@wireapp/api-client';
 import {GenericMessage} from '@wireapp/protocol-messaging';
@@ -37,10 +37,10 @@ export class BroadcastService {
   public async broadcastGenericMessage(
     genericMessage: GenericMessage,
     recipients: QualifiedUserClients,
-    onClientMismatch?: (mismatch: ClientMismatch | MessageSendingStatus) => void | boolean | Promise<boolean>,
+    onClientMismatch?: (mismatch: MessageSendingStatus) => void | boolean | Promise<boolean>,
   ) {
     const plainTextArray = GenericMessage.encode(genericMessage).finish();
-    const send = (): Promise<MessageSendingStatus | ClientMismatch> => {
+    const send = (): Promise<MessageSendingStatus> => {
       return this.messageService.sendMessage(this.apiClient.validatedClientId, recipients, plainTextArray, {
         reportMissing: flattenUserMap(recipients).map(({userId}) => userId),
         onClientMismatch,
