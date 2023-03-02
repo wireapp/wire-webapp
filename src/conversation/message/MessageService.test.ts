@@ -188,7 +188,9 @@ describe('MessageService', () => {
           }
           return Promise.resolve(baseClientMismatch);
         });
-        jest.spyOn(apiClient.api.user, 'postMultiPreKeyBundles').mockReturnValue(Promise.resolve({}));
+        jest
+          .spyOn(apiClient.api.user, 'postMultiPreKeyBundles')
+          .mockReturnValue(Promise.resolve({qualified_user_client_prekeys: {}}));
 
         const recipients = generateRecipients([]);
 
@@ -220,7 +222,9 @@ describe('MessageService', () => {
           }
           return Promise.resolve(baseClientMismatch);
         });
-        jest.spyOn(apiClient.api.user, 'postMultiPreKeyBundles').mockReturnValue(Promise.resolve({}));
+        jest
+          .spyOn(apiClient.api.user, 'postMultiPreKeyBundles')
+          .mockReturnValue(Promise.resolve({qualified_user_client_prekeys: {}}));
 
         const recipients = generateRecipients([user1, user2]);
 
@@ -249,7 +253,9 @@ describe('MessageService', () => {
           }
           return Promise.resolve(baseClientMismatch);
         });
-        jest.spyOn(apiClient.api.user, 'postMultiPreKeyBundles').mockReturnValue(Promise.resolve({}));
+        jest
+          .spyOn(apiClient.api.user, 'postMultiPreKeyBundles')
+          .mockReturnValue(Promise.resolve({qualified_user_client_prekeys: {}}));
 
         const recipients = generateRecipients([user1, user2]);
 
@@ -275,7 +281,9 @@ describe('MessageService', () => {
           };
           return Promise.reject(error);
         });
-        jest.spyOn(apiClient.api.user, 'postMultiPreKeyBundles').mockReturnValue(Promise.resolve({}));
+        jest
+          .spyOn(apiClient.api.user, 'postMultiPreKeyBundles')
+          .mockReturnValue(Promise.resolve({qualified_user_client_prekeys: {}}));
 
         const recipients = generateRecipients([user1, user2]);
 
@@ -311,7 +319,9 @@ describe('MessageService', () => {
           }
           return Promise.resolve(baseMessageSendingStatus);
         });
-        jest.spyOn(apiClient.api.user, 'postMultiPreKeyBundles').mockReturnValue(Promise.resolve({}));
+        jest
+          .spyOn(apiClient.api.user, 'postMultiPreKeyBundles')
+          .mockReturnValue(Promise.resolve({qualified_user_client_prekeys: {}}));
 
         const recipients = generateQualifiedRecipients([user1, user2]);
 
@@ -340,7 +350,9 @@ describe('MessageService', () => {
           }
           return Promise.resolve(baseMessageSendingStatus);
         });
-        jest.spyOn(apiClient.api.user, 'postMultiPreKeyBundles').mockReturnValue(Promise.resolve({}));
+        jest
+          .spyOn(apiClient.api.user, 'postMultiPreKeyBundles')
+          .mockReturnValue(Promise.resolve({qualified_user_client_prekeys: {}}));
 
         const recipients = generateQualifiedRecipients([user1, user2]);
 
@@ -391,7 +403,9 @@ describe('MessageService', () => {
           };
           return Promise.reject(error);
         });
-        jest.spyOn(apiClient.api.user, 'postMultiPreKeyBundles').mockReturnValue(Promise.resolve({}));
+        jest
+          .spyOn(apiClient.api.user, 'postMultiPreKeyBundles')
+          .mockReturnValue(Promise.resolve({qualified_user_client_prekeys: {}}));
 
         const recipients = generateQualifiedRecipients([user1, user2]);
 

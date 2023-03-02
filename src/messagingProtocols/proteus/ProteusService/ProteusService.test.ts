@@ -124,11 +124,13 @@ describe('ProteusService', () => {
       const clientId = 'client1';
 
       jest.spyOn(apiClient.api.user, 'postMultiPreKeyBundles').mockResolvedValue({
-        [userId.domain]: {
-          [userId.id]: {
-            [clientId]: {
-              id: 123,
-              key: 'pQABARhIAqEAWCCaJpFa9c626ORmjj1aV6OnOYgmTjfoiE3ynOfNfGAOmgOhAKEAWCD60VMzRrLfO+1GSjgyhnVp2N7L58DM+eeJhZJi1tBLfQT2',
+        qualified_user_client_prekeys: {
+          [userId.domain]: {
+            [userId.id]: {
+              [clientId]: {
+                id: 123,
+                key: 'pQABARhIAqEAWCCaJpFa9c626ORmjj1aV6OnOYgmTjfoiE3ynOfNfGAOmgOhAKEAWCD60VMzRrLfO+1GSjgyhnVp2N7L58DM+eeJhZJi1tBLfQT2',
+              },
             },
           },
         },
@@ -328,18 +330,20 @@ describe('ProteusService', () => {
       ]);
 
       jest.spyOn(services.apiClient.api.user, 'postMultiPreKeyBundles').mockResolvedValue({
-        [domain]: {
-          [firstUser.id.id]: {
-            [firstUser.clients.first]: null,
-            [firstUser.clients.second]: {
-              id: 123,
-              key: 'pQABARhIAqEAWCCaJpFa9c626ORmjj1aV6OnOYgmTjfoiE3ynOfNfGAOmgOhAKEAWCD60VMzRrLfO+1GSjgyhnVp2N7L58DM+eeJhZJi1tBLfQT2',
+        qualified_user_client_prekeys: {
+          [domain]: {
+            [firstUser.id.id]: {
+              [firstUser.clients.first]: null,
+              [firstUser.clients.second]: {
+                id: 123,
+                key: 'pQABARhIAqEAWCCaJpFa9c626ORmjj1aV6OnOYgmTjfoiE3ynOfNfGAOmgOhAKEAWCD60VMzRrLfO+1GSjgyhnVp2N7L58DM+eeJhZJi1tBLfQT2',
+              },
             },
-          },
-          [secondUser.id.id]: {
-            [secondUser.clients.first]: {
-              id: 123,
-              key: 'pQABARhIAqEAWCCaJpFa9c626ORmjj1aV6OnOYgmTjfoiE3ynOfNfGAOmgOhAKEAWCD60VMzRrLfO+1GSjgyhnVp2N7L58DM+eeJhZJi1tBLfQT2',
+            [secondUser.id.id]: {
+              [secondUser.clients.first]: {
+                id: 123,
+                key: 'pQABARhIAqEAWCCaJpFa9c626ORmjj1aV6OnOYgmTjfoiE3ynOfNfGAOmgOhAKEAWCD60VMzRrLfO+1GSjgyhnVp2N7L58DM+eeJhZJi1tBLfQT2',
+              },
             },
           },
         },

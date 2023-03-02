@@ -62,6 +62,8 @@ type EncryptionResult = {
   payloads: QualifiedOTRRecipients;
   /** user-client that do not have prekeys on backend (deleted clients) */
   unknowns?: QualifiedUserClients;
+  /** users for whom we could retrieve a prekey and, thus, for which we could not encrypt the message */
+  failed?: QualifiedId[];
 };
 export class ProteusService {
   private readonly messageService: MessageService;
@@ -255,7 +257,7 @@ export class ProteusService {
     plainText: Uint8Array,
     recipients: QualifiedUserPreKeyBundleMap | QualifiedUserClients,
   ): Promise<EncryptionResult> {
-    const {sessions, unknowns} = await initSessions({
+    const {sessions, unknowns, failed} = await initSessions({
       recipients,
       apiClient: this.apiClient,
       cryptoClient: this.cryptoClient,
@@ -267,6 +269,7 @@ export class ProteusService {
     return {
       payloads: buildEncryptedPayloads(payloads),
       unknowns,
+      failed,
     };
   }
 
