@@ -50,7 +50,7 @@ function useConversationFocus(conversations: Conversation[]) {
 
   useEffect(() => {
     if (currentFocus === conversations[0]?.id) {
-      return;
+      return () => undefined;
     }
 
     document.addEventListener('click', setDefaultFocus);
