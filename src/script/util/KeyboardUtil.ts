@@ -155,30 +155,3 @@ export const handleEnterDown = (event: React.KeyboardEvent<HTMLElement> | Keyboa
   }
   return true;
 };
-
-const handleDebugKey = () => {
-  const removeDebugInfo = (els: NodeListOf<HTMLElement>) => els.forEach(el => el.parentNode?.removeChild(el));
-
-  const addDebugInfo = (els: NodeListOf<HTMLElement>) =>
-    els.forEach(el => {
-      const debugInfo = document.createElement('div');
-      debugInfo.classList.add('debug-info');
-      const value = el.dataset.uieUid || el.dataset.uieValue;
-      if (value) {
-        debugInfo.textContent = value;
-        el.appendChild(debugInfo);
-      }
-    });
-
-  const debugInfos = document.querySelectorAll<HTMLElement>('.debug-info');
-  const isShowingDebugInfo = debugInfos.length > 0;
-
-  if (isShowingDebugInfo) {
-    removeDebugInfo(debugInfos);
-  } else {
-    const debugElements = document.querySelectorAll<HTMLElement>(
-      '.message[data-uie-uid], .conversation-list-cell[data-uie-uid], [data-uie-name=element-avatar-user]',
-    );
-    addDebugInfo(debugElements);
-  }
-};
