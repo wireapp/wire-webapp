@@ -71,12 +71,12 @@ describe('ClientMismatchUtil', () => {
       expect(emptyUsers).toEqual([]);
       expect(missingUserIds).toEqual([]);
       expect(missingClients).toEqual([
-        {clients: ['client1', 'client2'], userId: {domain: '', id: 'user1'}},
-        {clients: ['client1', 'client2'], userId: {domain: '', id: 'user2'}},
+        {clients: ['client1', 'client2'], userId: {domain: 'domain', id: 'user1'}},
+        {clients: ['client1', 'client2'], userId: {domain: 'domain', id: 'user2'}},
       ]);
       expect(deletedClients).toEqual([
-        {clients: ['client1', 'client2'], userId: {domain: '', id: 'user3'}},
-        {clients: ['client1', 'client2'], userId: {domain: '', id: 'user4'}},
+        {clients: ['client1', 'client2'], userId: {domain: 'domain', id: 'user3'}},
+        {clients: ['client1', 'client2'], userId: {domain: 'domain', id: 'user4'}},
       ]);
     });
 
@@ -108,16 +108,16 @@ describe('ClientMismatchUtil', () => {
 
       expect(emptyUsers).toEqual([userWithoutClients]);
       expect(missingUserIds).toEqual([
-        {domain: '', id: 'user1'},
-        {domain: '', id: 'user2'},
+        {domain: 'domain', id: 'user1'},
+        {domain: 'domain', id: 'user2'},
       ]);
       expect(missingClients).toEqual([
-        {clients: ['client1', 'client2'], userId: {domain: '', id: 'user1'}},
-        {clients: ['client1', 'client2'], userId: {domain: '', id: 'user2'}},
+        {clients: ['client1', 'client2'], userId: {domain: 'domain', id: 'user1'}},
+        {clients: ['client1', 'client2'], userId: {domain: 'domain', id: 'user2'}},
       ]);
       expect(deletedClients).toEqual([
-        {clients: ['client1', 'client2'], userId: {domain: '', id: 'user3'}},
-        {clients: ['client1'], userId: {domain: '', id: 'user4'}},
+        {clients: ['client1', 'client2'], userId: {domain: 'domain', id: 'user3'}},
+        {clients: ['client1'], userId: {domain: 'domain', id: 'user4'}},
       ]);
     });
 
@@ -138,7 +138,7 @@ describe('ClientMismatchUtil', () => {
 
       const {missingClients} = extractClientDiff(mismatch, [user1, user2]);
 
-      expect(missingClients).toEqual([{clients: ['client2'], userId: {domain: '', id: 'user2'}}]);
+      expect(missingClients).toEqual([{clients: ['client2'], userId: {domain: 'domain', id: 'user2'}}]);
     });
   });
 });
