@@ -176,7 +176,7 @@ const handleDebugKey = () => {
     removeDebugInfo(debugInfos);
   } else {
     const debugElements = document.querySelectorAll<HTMLElement>(
-      '.message[data-uie-uid], .conversation-list-cell[data-uie-uid]',
+      '.message[data-uie-uid], .conversation-list-cell[data-uie-uid], [data-uie-name=element-avatar-user]',
     );
     addDebugInfo(debugElements);
   }
