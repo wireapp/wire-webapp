@@ -34,6 +34,7 @@ export const QUERY_KEY = {
   PWA_AWARE: 'pwa_aware',
   SSO_AUTO_LOGIN: 'sso_auto_login',
   TRACKING: 'tracking',
+  TWO_FACTOR: '2fa',
 };
 
 export const FORWARDED_QUERY_KEYS = [
