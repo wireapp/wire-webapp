@@ -19,17 +19,50 @@
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
+import {Conversation} from 'src/script/entity/Conversation';
+import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import {useMainViewModel} from 'src/script/page/RootProvider';
 import {t} from 'Util/LocalizerUtil';
 
 import {warning} from '../Warnings.styles';
 
-export const CompleteFailureToSendWarning = () => {
+type Props = {
+  conversation: Conversation;
+  message: ContentMessage;
+};
+
+export const CompleteFailureToSendWarning = ({conversation, message}: Props) => {
+  const mainViewModel = useMainViewModel();
+  const {content: contentViewModel} = mainViewModel;
+  const {messageRepository} = contentViewModel;
+
+  const handleRetrySending = async (textMessage: string, messageId: string) => {
+    await messageRepository.handleRetryAttempt(conversation, textMessage, messageId);
+  };
+
   return (
-    <div>
-      <p css={warning}>{t('messageCouldNotBeSent')}</p>
-      <Button type="button" variant={ButtonVariant.TERTIARY} onClick={() => {}}>
-        {t('messageCouldNotBeSentRetry')}
-      </Button>
-    </div>
+    <>
+      {message.getFirstAsset().isText() ? (
+        <div>
+          <p css={warning}>{t('messageCouldNotBeSent')}</p>
+
+          <Button
+            type="button"
+            variant={ButtonVariant.TERTIARY}
+            onClick={() => handleRetrySending(message.getFirstAsset().text, message.id)}
+          >
+            {t('messageCouldNotBeSentRetry')}
+          </Button>
+        </div>
+      ) : (
+        <div>
+          <p css={warning}>{t('messageWillNotBeSent')}</p>
+
+          <Button type="button" variant={ButtonVariant.TERTIARY} onClick={() => {}}>
+            {t('messageWillNotBeSentDiscard')}
+          </Button>
+        </div>
+      )}
+    </>
   );
 };

@@ -237,7 +237,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
           <PartialFailureToSendWarning failedToSend={failedToSend} knownUsers={conversation.allUserEntities} />
         )}
 
-        {status === StatusType.FAILED && <CompleteFailureToSendWarning />}
+        {status === StatusType.FAILED && <CompleteFailureToSendWarning conversation={conversation} message={message} />}
 
         {!other_likes.length && message.isReactable() && (
           <div className="message-body-like">
