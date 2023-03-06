@@ -51,6 +51,7 @@ export interface ServerConfig {
       MLS_CONFIG_KEYING_MATERIAL_UPDATE_THRESHOLD: number;
       PERSIST_TEMPORARY_CLIENTS: boolean;
       SHOW_LOADING_INFORMATION: boolean;
+      USE_CORE_CRYPTO: boolean;
     };
     MAX_GROUP_PARTICIPANTS: number;
     MAX_VIDEO_PARTICIPANTS: number;

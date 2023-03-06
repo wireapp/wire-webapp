@@ -45,7 +45,7 @@ describe('CallingViewModel', () => {
   describe('answerCall', () => {
     it('answers a call directly if no call is ongoing', async () => {
       const callingViewModel = buildCallingViewModel();
-      const call = buildCall('conversation1');
+      const call = buildCall({id: 'conversation1', domain: ''});
       await callingViewModel.callActions.answer(call);
       expect(mockCallingRepository.answerCall).toHaveBeenCalledWith(call);
     });
@@ -53,12 +53,12 @@ describe('CallingViewModel', () => {
     it('lets the user leave previous call before answering a new one', async () => {
       jest.useFakeTimers();
       const callingViewModel = buildCallingViewModel();
-      const joinedCall = buildCall('conversation1');
+      const joinedCall = buildCall({id: 'conversation1', domain: ''});
       joinedCall.state(STATE.MEDIA_ESTAB);
       callState.calls.push(joinedCall);
 
       jest.spyOn(PrimaryModal, 'show').mockImplementation((_, payload) => payload.primaryAction?.action?.());
-      const newCall = buildCall('conversation2');
+      const newCall = buildCall({id: 'conversation2', domain: ''});
       Promise.resolve().then(() => {
         jest.runAllTimers();
       });
@@ -82,7 +82,7 @@ describe('CallingViewModel', () => {
     it('lets the user leave previous call before starting a new one', async () => {
       jest.useFakeTimers();
       const callingViewModel = buildCallingViewModel();
-      const joinedCall = buildCall('conversation1');
+      const joinedCall = buildCall({id: 'conversation1', domain: ''});
       joinedCall.state(STATE.MEDIA_ESTAB);
       callState.calls.push(joinedCall);
 

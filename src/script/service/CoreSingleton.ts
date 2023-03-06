@@ -72,7 +72,7 @@ export class Core extends Account {
          */
         systemCrypto: window.systemCrypto,
 
-        useCoreCrypto: true,
+        useCoreCrypto: Config.getConfig().FEATURE.USE_CORE_CRYPTO,
       },
       nbPrekeys: 100,
     });

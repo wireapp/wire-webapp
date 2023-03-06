@@ -134,7 +134,11 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
       </div>
 
       <div className="message-header-label">
-        <h4 className={`message-header-label-sender ${message.accent_color()}`} data-uie-name="sender-name">
+        <h4
+          className={`message-header-label-sender ${message.accent_color()}`}
+          data-uie-name="sender-name"
+          data-uie-uid={message.user().id}
+        >
           {headerSenderName}
         </h4>
 
