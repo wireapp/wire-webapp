@@ -59,6 +59,6 @@
     "test:coverage": "jest --coverage",
     "watch": "tsc --watch"
   },
-  "version": "39.1.3",
+  "version": "39.1.4",
   "gitHead": "5339f01fe01ef0871da8c8bc8662fbe9e604754a"
 }
