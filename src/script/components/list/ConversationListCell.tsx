@@ -151,11 +151,58 @@ const ConversationListCell = ({
     }
   }, [isFocused]);
 
-  const availabilityStrings: Record<string, string> = {
-    [Availability.Type.AVAILABLE]: t('userAvailabilityAvailable'),
-    [Availability.Type.AWAY]: t('userAvailabilityAway'),
-    [Availability.Type.BUSY]: t('userAvailabilityBusy'),
-  };
+  const availabilityStrings: Record<string, string> = useMemo(
+    () => ({
+      [Availability.Type.AVAILABLE]: t('userAvailabilityAvailable'),
+      [Availability.Type.AWAY]: t('userAvailabilityAway'),
+      [Availability.Type.BUSY]: t('userAvailabilityBusy'),
+    }),
+    [],
+  );
+
+  const unreadMessages = unreadState.allMessages.length;
+  const isConversationMuted = cellState.icon === ConversationStatusIcon.MUTED;
+  const userHasStatus = [Availability.Type.AWAY, Availability.Type.BUSY, Availability.Type.AVAILABLE].includes(
+    availabilityOfUser,
+  );
+
+  const title = useMemo(() => {
+    const substitutions = {
+      username: displayName,
+      ...(unreadMessages && {unreadMessages: unreadMessages.toString()}),
+      ...(userHasStatus && {status: availabilityStrings[availabilityOfUser]}),
+    };
+
+    if (userHasStatus && isConversationMuted) {
+      return t(
+        !unreadMessages
+          ? 'accessibility.conversationTitleStatusSilenced'
+          : 'accessibility.conversationMutedTitleUnreadMessages',
+        substitutions,
+      );
+    }
+
+    if (isConversationMuted) {
+      return t(
+        !unreadMessages
+          ? 'accessibility.conversationTitleSilenced'
+          : 'accessibility.conversationMutedTitleUnreadMessagesWithoutStatus',
+        substitutions,
+      );
+    }
+
+    if (userHasStatus) {
+      return t(
+        !unreadMessages ? 'accessibility.conversationTitle' : 'accessibility.conversationTitleUnreadMessages',
+        substitutions,
+      );
+    }
+
+    return !unreadMessages
+      ? displayName
+      : t('accessibility.conversationTitleUnreadMessagesWithoutStatus', substitutions);
+  }, [displayName, unreadMessages, userHasStatus, availabilityStrings, availabilityOfUser, isConversationMuted]);
+
   const availabilityTitle = [Availability.Type.AWAY, Availability.Type.BUSY, Availability.Type.AVAILABLE].includes(
     availabilityOfUser,
   )
@@ -182,7 +229,8 @@ const ConversationListCell = ({
           onKeyDown={handleDivKeyDown}
           data-uie-name="go-open-conversation"
           tabIndex={isFocused ? TabIndex.FOCUSABLE : TabIndex.UNFOCUSABLE}
-          aria-label={t('accessibility.openConversation', displayName)}
+          // aria-label={t('accessibility.openConversation', displayName)}
+          aria-label={cellState.description ? `${title}, ${cellState.description}` : title}
           aria-describedby={contextMenuKeyboardShortcut}
         >
           <span id={contextMenuKeyboardShortcut} aria-label={t('accessibility.conversationOptionsMenuAccessKey')} />
@@ -299,7 +347,7 @@ const ConversationListCell = ({
                 </span>
               )}
 
-              {cellState.icon === ConversationStatusIcon.MUTED && (
+              {isConversationMuted && (
                 <span
                   className="conversation-list-cell-badge cell-badge-light conversation-muted"
                   data-uie-name="status-silence"
@@ -309,13 +357,13 @@ const ConversationListCell = ({
                 </span>
               )}
 
-              {cellState.icon === ConversationStatusIcon.UNREAD_MESSAGES && unreadState.allMessages.length > 0 && (
+              {cellState.icon === ConversationStatusIcon.UNREAD_MESSAGES && unreadMessages > 0 && (
                 <span
                   className="conversation-list-cell-badge cell-badge-dark"
                   data-uie-name="status-unread"
                   title={t('accessibility.conversationStatusUnread')}
                 >
-                  {unreadState.allMessages.length}
+                  {unreadMessages}
                 </span>
               )}
             </>
