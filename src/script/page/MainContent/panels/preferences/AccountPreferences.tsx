@@ -19,10 +19,12 @@
 
 import React, {useRef} from 'react';
 
+import {ErrorBoundary} from 'react-error-boundary';
 import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
 
+import {ErrorFallback} from 'Components/ErrorFallback';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {useEnrichedFields} from 'Components/panel/EnrichedFields';
 import {ContentState} from 'src/script/page/useAppState';
@@ -153,7 +155,9 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
         </h3>
 
         <div>
-          <AvatarInput {...{isActivatedAccount, selfUser, userRepository}} />
+          <ErrorBoundary FallbackComponent={ErrorFallback}>
+            <AvatarInput {...{isActivatedAccount, selfUser, userRepository}} />
+          </ErrorBoundary>
         </div>
 
         {isActivatedAccount && isTeam && <AvailabilityButtons {...{availability}} />}

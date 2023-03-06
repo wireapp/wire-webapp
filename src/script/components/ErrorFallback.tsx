@@ -23,20 +23,31 @@ import {FallbackProps} from 'react-error-boundary';
 
 import {getLogger} from 'Util/Logger';
 
+import {PrimaryModal} from './Modals/PrimaryModal';
+
 const logger = getLogger('ErrorFallback');
 
 const ErrorFallback: React.FC<FallbackProps> = ({error, resetErrorBoundary}) => {
   useEffect(() => {
     logger.error(error);
-  }, [error]);
+    PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+      preventClose: true,
+      secondaryAction: {
+        action: resetErrorBoundary,
+        text: 'Try again',
+      },
+      primaryAction: {
+        action: () => window.location.reload(),
+        text: 'Reload',
+      },
+      text: {
+        message: error.message,
+        title: error.name,
+      },
+    });
+  }, [error, resetErrorBoundary]);
 
-  return (
-    <p role="alert">
-      Something went wrong:
-      <span data-uie-name="error-message">{error.message}</span>
-      <button onClick={resetErrorBoundary}>Try again</button>
-    </p>
-  );
+  return null;
 };
 
 export {ErrorFallback};
