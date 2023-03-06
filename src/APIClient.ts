@@ -234,7 +234,7 @@ export class APIClient extends EventEmitter {
       version: backendVersion,
       federationEndpoints: backendVersion > 0,
       isFederated: responsePayload?.federation || false,
-      supportsMLS: backendVersion >= 2,
+      supportsMLS: backendVersion >= 4,
     };
   }
 
