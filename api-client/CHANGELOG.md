@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [23.1.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@23.1.1...@wireapp/api-client@23.1.2) (2023-03-06)
+
+### Bug Fixes
+
+* Move MLS endpoints to api v4 ([#4943](https://github.com/wireapp/wire-web-packages/issues/4943)) ([fed8510](https://github.com/wireapp/wire-web-packages/commit/fed8510e124c56b9e00a72387eae647cc1c07977))
+
 ## [23.1.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@23.1.0...@wireapp/api-client@23.1.1) (2023-03-02)
 
 **Note:** Version bump only for package @wireapp/api-client
