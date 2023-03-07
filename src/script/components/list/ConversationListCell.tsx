@@ -55,7 +55,8 @@ export interface ConversationListCellProps {
   showJoinButton: boolean;
   handleArrowKeyDown: (e: React.KeyboardEvent) => void;
   isFocused?: boolean;
-  setDefaultFocus: () => void;
+  // This method resetting the current focused conversation to first conversation on click outside or click tab or shift + tab
+  resetConversationFocus: () => void;
 }
 
 const ConversationListCell = ({
@@ -68,7 +69,7 @@ const ConversationListCell = ({
   dataUieName,
   handleArrowKeyDown,
   isFocused = false,
-  setDefaultFocus,
+  resetConversationFocus,
 }: ConversationListCellProps) => {
   const {
     isGroup,
@@ -137,7 +138,7 @@ const ConversationListCell = ({
     }
 
     if (event.key === KEY.TAB || (event.shiftKey && event.key === KEY.TAB)) {
-      setDefaultFocus();
+      resetConversationFocus();
     }
 
     setContextMenuFocus(false);

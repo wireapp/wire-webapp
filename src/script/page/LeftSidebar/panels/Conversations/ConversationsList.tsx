@@ -54,7 +54,7 @@ interface ConversationsListProps {
   listViewModel: ListViewModel;
   viewStyle: ConversationViewStyle;
   currentFocus: string;
-  setDefaultFocus: () => void;
+  resetConversationFocus: () => void;
   handleArrowKeyDown: (index: number) => (e: React.KeyboardEvent) => void;
 }
 
@@ -67,7 +67,7 @@ export const ConversationsList = ({
   conversationRepository,
   callState,
   currentFocus,
-  setDefaultFocus,
+  resetConversationFocus,
   handleArrowKeyDown,
 }: ConversationsListProps) => {
   const {contentState} = useAppState();
@@ -107,7 +107,7 @@ export const ConversationsList = ({
               key={conversation.id}
               isFocused={currentFocus === conversation.id}
               handleArrowKeyDown={handleArrowKeyDown(index)}
-              setDefaultFocus={setDefaultFocus}
+              resetConversationFocus={resetConversationFocus}
               dataUieName="item-conversation"
               conversation={conversation}
               onClick={event => {

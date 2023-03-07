@@ -46,21 +46,21 @@ function useConversationFocus(conversations: Conversation[]) {
     [conversations],
   );
 
-  const setDefaultFocus = () => setCurrentFocus(conversations[0]?.id || '');
+  const resetConversationFocus = () => setCurrentFocus(conversations[0]?.id || '');
 
   useEffect(() => {
     if (currentFocus === conversations[0]?.id) {
       return () => undefined;
     }
 
-    document.addEventListener('click', setDefaultFocus);
+    document.addEventListener('click', resetConversationFocus);
 
     return () => {
-      document.removeEventListener('click', setDefaultFocus);
+      document.removeEventListener('click', resetConversationFocus);
     };
   }, [currentFocus]);
 
-  return {currentFocus, handleKeyDown, setCurrentFocus, setDefaultFocus};
+  return {currentFocus, handleKeyDown, setCurrentFocus, resetConversationFocus};
 }
 
 export {useConversationFocus};

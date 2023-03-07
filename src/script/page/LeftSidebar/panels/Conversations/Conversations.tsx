@@ -304,7 +304,7 @@ const Conversations: React.FC<ConversationsProps> = ({
   );
 
   const filteredConversations = filterEstablishedConversations(conversations);
-  const {currentFocus, handleKeyDown, setDefaultFocus} = useConversationFocus(filteredConversations);
+  const {currentFocus, handleKeyDown, resetConversationFocus} = useConversationFocus(filteredConversations);
 
   return (
     <ListWrapper id="conversations" headerElement={header} footer={footer} before={callingView}>
@@ -329,7 +329,7 @@ const Conversations: React.FC<ConversationsProps> = ({
           conversationState={conversationState}
           conversationRepository={conversationRepository}
           currentFocus={currentFocus}
-          setDefaultFocus={setDefaultFocus}
+          resetConversationFocus={resetConversationFocus}
           handleArrowKeyDown={handleKeyDown}
         />
       )}
