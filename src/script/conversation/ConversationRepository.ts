@@ -838,7 +838,7 @@ export class ConversationRepository {
       });
   }
 
-  private readonly deleteConversationLocally = (conversationId: QualifiedId, skipNotification: boolean) => {
+  private readonly deleteConversationLocally = async (conversationId: QualifiedId, skipNotification: boolean) => {
     const conversationEntity = this.conversationState.findConversation(conversationId);
     if (!conversationEntity) {
       return;
@@ -856,7 +856,13 @@ export class ConversationRepository {
       this.conversationLabelRepository.saveLabels();
     }
     this.deleteConversationFromRepository(conversationId);
-    this.conversationService.deleteConversationFromDb(conversationId);
+    await this.conversationService.deleteConversationFromDb(conversationId);
+    if (conversationEntity.protocol === ConversationProtocol.MLS) {
+      const {groupId} = conversationEntity;
+      if (groupId) {
+        await this.core.service!.conversation.wipeMLSConversation(groupId);
+      }
+    }
   };
 
   public async getAllUsersInConversation(conversationId: QualifiedId): Promise<User[]> {
@@ -2013,7 +2019,8 @@ export class ConversationRepository {
       .then(conversationEntity => this.checkConversationParticipants(conversationEntity, eventJson, eventSource))
       .then(conversationEntity => this.triggerFeatureEventHandlers(conversationEntity, eventJson))
       .then(
-        conversationEntity => this.reactToConversationEvent(conversationEntity, eventJson, eventSource) as EntityObject,
+        conversationEntity =>
+          this.reactToConversationEvent(conversationEntity, eventJson, eventSource) as Promise<EntityObject>,
       )
       .then((entityObject = {} as EntityObject) => {
         if (type !== CONVERSATION_EVENT.MEMBER_JOIN && type !== CONVERSATION_EVENT.MEMBER_LEAVE) {
@@ -2153,7 +2160,7 @@ export class ConversationRepository {
    * @param eventSource Source of event
    * @returns Resolves when the event has been treated
    */
-  private reactToConversationEvent(
+  private async reactToConversationEvent(
     conversationEntity: Conversation,
     eventJson: IncomingEvent,
     eventSource: EventSource,
