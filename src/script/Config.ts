@@ -117,8 +117,8 @@ export class Configuration {
   /** Image MIME types */
   readonly ALLOWED_IMAGE_TYPES = ['image/bmp', 'image/gif', 'image/jpeg', 'image/jpg', 'image/png'];
 
-  /** Which versions of the backend api do we support */
-  readonly SUPPORTED_API_VERSIONS = [3, 2, 1];
+  /** Which min and max version of the backend api do we support */
+  readonly SUPPORTED_API_RANGE = [1, env.ENABLE_DEV_BACKEND_API ? Infinity : 3];
 }
 
 let instance: Configuration;
