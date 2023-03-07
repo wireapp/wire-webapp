@@ -209,6 +209,10 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
     await messageRepository.sendTextWithLinkPreview(conversation, messageText, mentions, quotes, messageId);
   };
 
+  const handleDiscard = async () => {
+    await messageRepository.deleteMessageById(conversation, message.id);
+  };
+
   const [messageAriaLabel] = getMessageAriaLabel({
     assets,
     displayTimestampShort: message.displayTimestampShort(),
@@ -258,6 +262,9 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
         {status === StatusType.FAILED && (
           <CompleteFailureToSendWarning
             isTextAsset={isTextAsset}
+            handleDiscard={async () => {
+              await handleDiscard();
+            }}
             handleRetry={async () => {
               await handleRetrySending();
             }}
