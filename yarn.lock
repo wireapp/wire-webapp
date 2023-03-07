@@ -4349,7 +4349,7 @@ __metadata:
 
 "@wireapp/api-client@file:.yalc/@wireapp/api-client::locator=wire-webapp%40workspace%3A.":
   version: 22.15.6
-  resolution: "@wireapp/api-client@file:.yalc/@wireapp/api-client#.yalc/@wireapp/api-client::hash=2cb9b6&locator=wire-webapp%40workspace%3A."
+  resolution: "@wireapp/api-client@file:.yalc/@wireapp/api-client#.yalc/@wireapp/api-client::hash=dcdf6e&locator=wire-webapp%40workspace%3A."
   dependencies:
     "@wireapp/commons": ^5.0.4
     "@wireapp/priority-queue": ^2.0.3
@@ -4362,7 +4362,7 @@ __metadata:
     spark-md5: 3.0.2
     tough-cookie: 4.1.2
     ws: 8.11.0
-  checksum: 3a432d19608c2af30d541a3d22b621f413c13f22f70040f4d99652f3ca1c2d5879a03c604dfe845ae5a53cb3921685ee43ff77cdca9422f2bff40b4256328868
+  checksum: 0329ecf462cfa29641a7ad58bd8600ffaa50ddf8bc4d06277ecd6e42031171e2d091a62fdb00bbe4edb1a43857e2dde509150e53bd8793e5771227b961cfdc75
   languageName: node
   linkType: hard
 

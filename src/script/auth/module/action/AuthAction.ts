@@ -21,6 +21,7 @@ import type {DomainData} from '@wireapp/api-client/lib/account/DomainData';
 import type {LoginData, RegisterData, SendLoginCode} from '@wireapp/api-client/lib/auth/';
 import {VerificationActionType} from '@wireapp/api-client/lib/auth/VerificationActionType';
 import {ClientType} from '@wireapp/api-client/lib/client/';
+import {OAuthBody} from '@wireapp/api-client/lib/oauth/OAuthBody';
 import {OAuthClient} from '@wireapp/api-client/lib/oauth/OAuthClient';
 import type {TeamData} from '@wireapp/api-client/lib/team/';
 import {LowDiskSpaceError} from '@wireapp/store-engine/lib/engine/error';
@@ -142,6 +143,19 @@ export class AuthAction {
         dispatch(AuthActionCreator.successfulSendPhoneLoginCode(expires_in));
       } catch (error) {
         dispatch(AuthActionCreator.failedSendPhoneLoginCode(error));
+        throw error;
+      }
+    };
+  };
+
+  doPostOAuthCode = (oauthBody: OAuthBody): ThunkAction => {
+    return async (dispatch, getState, {apiClient}) => {
+      dispatch(AuthActionCreator.startSendOAuthCode());
+      try {
+        await apiClient.api.oauth.postOAuthCode(oauthBody);
+        dispatch(AuthActionCreator.successfulSendOAuthCode());
+      } catch (error) {
+        dispatch(AuthActionCreator.failedSendOAuthCode(error));
         throw error;
       }
     };

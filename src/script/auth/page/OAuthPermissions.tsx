@@ -19,11 +19,9 @@
 
 import React, {useRef} from 'react';
 
-// import {ClientType} from '@wireapp/api-client/lib/client/index';
 import {OAuthClient} from '@wireapp/api-client/lib/oauth/OAuthClient';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
-// import {useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 import {container} from 'tsyringe';
 
@@ -53,8 +51,6 @@ import {actionRoot} from '../module/action';
 import {bindActionCreators, RootState} from '../module/reducer';
 import * as SelfSelector from '../module/selector/SelfSelector';
 
-// import {ROUTE} from '../route';
-
 interface Props extends React.HTMLProps<HTMLDivElement> {
   assetRepository?: AssetRepository;
 }
@@ -79,13 +75,14 @@ const OAuthPermissionsComponent = ({
   selfUser,
   selfTeamId,
   assetRepository = container.resolve(AssetRepository),
+  postOauthCode,
   getSelf,
   getTeam,
 }: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
   const [teamImage, setTeamImage] = React.useState<string | ArrayBuffer | undefined>(undefined);
-  // const navigate = useNavigate();
-  const params = decodeURIComponent(window.location.search.slice(1))
+
+  const oauthParams = decodeURIComponent(window.location.search.slice(1))
     .split('&')
     .reduce((acc, param) => {
       const [key, value] = param.split('=');
@@ -98,8 +95,18 @@ const OAuthPermissionsComponent = ({
       return {...acc, [key]: value};
     }, {} as AuthParams);
   const oAuthApp = useRef<OAuthClient | null>(null);
-  const onContinue = () => {
-    // return navigate(ROUTE.SET_EMAIL);
+
+  const onContinue = async () => {
+    try {
+      await postOauthCode(oauthParams);
+    } catch (error) {
+      console.error(error);
+    }
+    window.location.assign(oauthParams.redirect_uri);
+  };
+
+  const onCancel = () => {
+    window.location.assign(`${oauthParams.redirect_uri}?error=access_denied`);
   };
 
   React.useEffect(() => {
@@ -109,12 +116,20 @@ const OAuthPermissionsComponent = ({
       const teamIcon = AssetRemoteData.v3(team.icon, selfUser.qualified_id?.domain);
       const teamImageBlob = await assetRepository.load(teamIcon);
       setTeamImage(teamImageBlob && (await loadDataUrl(teamImageBlob)));
-      oAuthApp.current = !!params.client_id ? await getOAuthApp(params.client_id) : null;
+      oAuthApp.current = !!oauthParams.client_id ? await getOAuthApp(oauthParams.client_id) : null;
     };
     getUserData().catch(error => {
       console.error(error);
     });
-  }, [assetRepository, getOAuthApp, getSelf, getTeam, params.client_id, selfTeamId, selfUser.qualified_id?.domain]);
+  }, [
+    assetRepository,
+    getOAuthApp,
+    getSelf,
+    getTeam,
+    oauthParams.client_id,
+    selfTeamId,
+    selfUser.qualified_id?.domain,
+  ]);
 
   return (
     <Page>
@@ -149,18 +164,21 @@ const OAuthPermissionsComponent = ({
         >
           {_(oauthStrings.logout)}
         </Link>
-        {oAuthApp && <Text center>{_(oauthStrings.subhead, {app: oAuthApp.current?.applicationName})}</Text>}
-        {params.scope.length > 1 && (
+        {oAuthApp.current && (
+          <Text style={{marginBottom: '24px'}} center>
+            {_(oauthStrings.subhead, {app: oAuthApp.current?.applicationName})}
+          </Text>
+        )}
+        {oauthParams.scope.length > 1 && (
           <Box
             style={{
-              marginTop: '24px',
               marginBottom: '24px',
               background: COLOR_V2.GRAY_20,
               borderColor: COLOR_V2.GRAY_20,
             }}
           >
             <ul>
-              {params.scope.map((scope, index) => (
+              {oauthParams.scope.map((scope, index) => (
                 <li key={index}>
                   <Text>{_(oauthStrings[scope])}</Text>
                 </li>
@@ -196,15 +214,11 @@ const OAuthPermissionsComponent = ({
             variant={ButtonVariant.SECONDARY}
             style={{margin: 'auto', width: 200}}
             type="button"
-            onClick={() => {
-              window.open('', '_self', '');
-              window.close();
-            }}
+            onClick={onCancel}
             data-uie-name="do-oauth-cancel"
             onKeyDown={(event: React.KeyboardEvent) => {
               if (event.key === KEY.ESC) {
-                window.open('', '_self', '');
-                window.close(); //this doesnt work
+                onCancel();
               }
             }}
           >
@@ -261,6 +275,7 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
       getOAuthApp: actionRoot.authAction.doGetOAuthApplication,
       doLogout: actionRoot.authAction.doLogout,
       getTeam: actionRoot.authAction.doGetTeamData,
+      postOauthCode: actionRoot.authAction.doPostOAuthCode,
     },
     dispatch,
   );

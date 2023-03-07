@@ -68,6 +68,9 @@ export enum AUTH_ACTION {
   SEND_PHONE_LOGIN_CODE_FAILED = 'SEND_PHONE_LOGIN_CODE_FAILED',
   SEND_PHONE_LOGIN_CODE_START = 'SEND_PHONE_LOGIN_CODE_START',
   SEND_PHONE_LOGIN_CODE_SUCCESS = 'SEND_PHONE_LOGIN_CODE_SUCCESS',
+  SEND_OAUTH_CODE_FAILED = 'SEND_OAUTH_CODE_FAILED',
+  SEND_OAUTH_CODE_START = 'SEND_OAUTH_CODE_START',
+  SEND_OAUTH_CODE_SUCCESS = 'SEND_OAUTH_CODE_SUCCESS',
   SEND_TWO_FACTOR_CODE_FAILED = 'SEND_TWO_FACTOR_CODE_FAILED',
   SEND_TWO_FACTOR_CODE_START = 'SEND_TWO_FACTOR_CODE_START',
   SEND_TWO_FACTOR_CODE_SUCCESS = 'SEND_TWO_FACTOR_CODE_SUCCESS',
@@ -85,6 +88,9 @@ export type AuthActions =
   | SendPhoneLoginCodeStartAction
   | SendPhoneLoginCodeSuccessAction
   | SendPhoneLoginCodeFailedAction
+  | SendOAuthCodeStartAction
+  | SendOAuthCodeSuccessAction
+  | SendOAuthCodeFailedAction
   | RegisterTeamStartAction
   | RegisterTeamSuccessAction
   | RegisterTeamFailedAction
@@ -146,6 +152,17 @@ export interface SendPhoneLoginCodeSuccessAction extends AppAction {
 export interface SendPhoneLoginCodeFailedAction extends AppAction {
   readonly error: Error;
   readonly type: AUTH_ACTION.SEND_PHONE_LOGIN_CODE_FAILED;
+}
+
+export interface SendOAuthCodeStartAction extends AppAction {
+  readonly type: AUTH_ACTION.SEND_OAUTH_CODE_START;
+}
+export interface SendOAuthCodeSuccessAction extends AppAction {
+  readonly type: AUTH_ACTION.SEND_OAUTH_CODE_SUCCESS;
+}
+export interface SendOAuthCodeFailedAction extends AppAction {
+  readonly error: Error;
+  readonly type: AUTH_ACTION.SEND_OAUTH_CODE_FAILED;
 }
 
 export interface SendTwoFactorCodeStartAction extends AppAction {
@@ -330,6 +347,19 @@ export class AuthActionCreator {
   static failedSendPhoneLoginCode = (error: Error): SendPhoneLoginCodeFailedAction => ({
     error,
     type: AUTH_ACTION.SEND_PHONE_LOGIN_CODE_FAILED,
+  });
+
+  static startSendOAuthCode = (): SendOAuthCodeStartAction => ({
+    type: AUTH_ACTION.SEND_OAUTH_CODE_START,
+  });
+
+  static successfulSendOAuthCode = (): SendOAuthCodeSuccessAction => ({
+    type: AUTH_ACTION.SEND_OAUTH_CODE_SUCCESS,
+  });
+
+  static failedSendOAuthCode = (error: Error): SendOAuthCodeFailedAction => ({
+    error,
+    type: AUTH_ACTION.SEND_OAUTH_CODE_FAILED,
   });
 
   static startSendTwoFactorCode = (): SendTwoFactorCodeStartAction => ({
