@@ -28,6 +28,7 @@ import {createRoot} from 'react-dom/client';
 import {Provider} from 'react-redux';
 import {container} from 'tsyringe';
 
+import {initializeDataDog} from 'Util/DataDog';
 import {enableLogging} from 'Util/LoggerUtil';
 import {exposeWrapperGlobals} from 'Util/wrapper';
 
@@ -84,4 +85,5 @@ async function runApp() {
 }
 
 enableLogging(Config.getConfig().FEATURE.ENABLE_DEBUG);
+initializeDataDog(Config.getConfig());
 runApp();

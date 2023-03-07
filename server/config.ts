@@ -123,6 +123,8 @@ const config: ServerConfig = {
     BRAND_NAME: process.env.BRAND_NAME,
     CHROME_ORIGIN_TRIAL_TOKEN: process.env.CHROME_ORIGIN_TRIAL_TOKEN,
     COUNTLY_API_KEY: process.env.COUNTLY_API_KEY,
+    DATADOG_APPLICATION_ID: process.env.DATADOG_APPLICATION_ID,
+    DATADOG_CLIENT_TOKEN: process.env.DATADOG_CLIENT_TOKEN,
     ENABLE_DEV_BACKEND_API: process.env.ENABLE_DEV_BACKEND_API == 'true',
     ENVIRONMENT: nodeEnvironment,
     FEATURE: {
@@ -139,7 +141,6 @@ const config: ServerConfig = {
       ENABLE_ACCOUNT_REGISTRATION_ACCEPT_TERMS_AND_PRIVACY_POLICY:
         process.env.FEATURE_ENABLE_ACCOUNT_REGISTRATION_ACCEPT_TERMS_AND_PRIVACY_POLICY == 'true',
       ENABLE_DEBUG: process.env.FEATURE_ENABLE_DEBUG == 'true',
-      ENABLE_DATADOG: nodeEnvironment !== 'production',
       ENABLE_DOMAIN_DISCOVERY: process.env.FEATURE_ENABLE_DOMAIN_DISCOVERY != 'false',
       ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY: process.env.FEATURE_ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY == 'true',
       ENABLE_EXTRA_CLIENT_ENTROPY: process.env.FEATURE_ENABLE_EXTRA_CLIENT_ENTROPY == 'true',
@@ -197,8 +198,6 @@ const config: ServerConfig = {
     APP_BASE,
     CACHE_DURATION_SECONDS: 300,
     CSP: mergedCSP(),
-    DATADOG_APPLICATION_ID: process.env.DATADOG_APPLICATION_ID,
-    DATADOG_CLIENT_TOKEN: process.env.DATADOG_CLIENT_TOKEN,
     DEVELOPMENT: nodeEnvironment === 'development',
     ENFORCE_HTTPS: process.env.ENFORCE_HTTPS != 'false',
     ENVIRONMENT: nodeEnvironment,
