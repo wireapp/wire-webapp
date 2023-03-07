@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.4.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.3.9...@wireapp/react-ui-kit@9.4.0) (2023-03-07)
+
+### Features
+
+* improve typing for color packages ([#4930](https://github.com/wireapp/wire-web-packages/issues/4930)) ([4910695](https://github.com/wireapp/wire-web-packages/commit/491069528d53247384f6d6cdd2bb58aa5f921e3a))
+
 ## [9.3.9](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.3.8...@wireapp/react-ui-kit@9.3.9) (2023-02-27)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
