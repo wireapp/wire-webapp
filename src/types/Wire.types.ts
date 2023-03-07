@@ -28,6 +28,7 @@ type FeatureVariables = {
   ENABLE_ACCOUNT_REGISTRATION: boolean;
   ENABLE_ACCOUNT_REGISTRATION_ACCEPT_TERMS_AND_PRIVACY_POLICY: boolean;
   ENABLE_DEBUG: boolean;
+  ENABLE_DATADOG: boolean;
   ENABLE_DOMAIN_DISCOVERY: boolean;
   ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY: boolean;
   ENABLE_EXTRA_CLIENT_ENTROPY: boolean;
@@ -83,6 +84,8 @@ export type WireEnvironmentVariables = {
   BRAND_NAME: string;
   CHROME_ORIGIN_TRIAL_TOKEN: string;
   COUNTLY_API_KEY: string;
+  DATADOG_APPLICATION_ID?: string;
+  DATADOG_CLIENT_TOKEN?: string;
   ENABLE_DEV_BACKEND_API: boolean;
   ENVIRONMENT: string;
   FEATURE: FeatureVariables;

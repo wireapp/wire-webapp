@@ -119,6 +119,10 @@ export class Configuration {
 
   /** Which versions of the backend api do we support */
   readonly SUPPORTED_API_VERSIONS = [3, 2, 1];
+  readonly dataDog = {
+    clientToken: env.DATADOG_CLIENT_TOKEN,
+    applicationId: env.DATADOG_APPLICATION_ID,
+  };
 }
 
 let instance: Configuration;

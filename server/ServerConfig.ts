@@ -38,6 +38,7 @@ export interface ServerConfig {
       ENABLE_ACCOUNT_REGISTRATION: boolean;
       ENABLE_ACCOUNT_REGISTRATION_ACCEPT_TERMS_AND_PRIVACY_POLICY: boolean;
       ENABLE_DEBUG: boolean;
+      ENABLE_DATADOG: boolean;
       ENABLE_MLS: boolean;
       ENABLE_DOMAIN_DISCOVERY: boolean;
       ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY: boolean;
@@ -92,6 +93,8 @@ export interface ServerConfig {
     APP_BASE: string;
     CACHE_DURATION_SECONDS: number;
     CSP: Record<string, Iterable<string>>;
+    DATADOG_APPLICATION_ID?: string;
+    DATADOG_CLIENT_TOKEN?: string;
     DEVELOPMENT?: boolean;
     ENFORCE_HTTPS: boolean;
     ENVIRONMENT: string;

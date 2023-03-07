@@ -171,6 +171,7 @@ export class App {
     this.config = config;
     this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () => this.logout(SIGN_OUT_REASON.SESSION_EXPIRED, false));
     this.logger = getLogger('App');
+    this.initializeDataDog();
 
     new WindowHandler();
 
@@ -192,6 +193,37 @@ export class App {
   // Instantiation
   //##############################################################################
 
+  private initializeDataDog() {
+    if (this.config.FEATURE.ENABLE_DATADOG) {
+      const applicationId = this.config.dataDog?.applicationId;
+      const clientToken = this.config.dataDog?.clientToken;
+
+      if (!applicationId || !clientToken) {
+        console.error('The applicationId or clientToken is missing to initialize dataDog.');
+        return;
+      }
+
+      import('@datadog/browser-rum').then(({datadogRum}) => {
+        datadogRum.init({
+          applicationId,
+          clientToken,
+          site: 'datadoghq.eu',
+          service: 'web-internal',
+          env: this.config.ENVIRONMENT,
+          // Specify a version number to identify the deployed version of your application in Datadog
+          // version: '1.0.0',
+          sessionSampleRate: 100,
+          sessionReplaySampleRate: 20,
+          trackUserInteractions: true,
+          trackResources: true,
+          trackLongTasks: true,
+          defaultPrivacyLevel: 'mask-user-input',
+        });
+
+        datadogRum.startSessionReplayRecording();
+      });
+    }
+  }
   /**
    * Create all app repositories.
    * @returns All repositories
