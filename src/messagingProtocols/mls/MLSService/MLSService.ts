@@ -240,7 +240,7 @@ export class MLSService extends TypedEventEmitter<Events> {
    * @param conversationId Id of the parent conversation which subconversation we want to leave
    */
   public async leaveConferenceSubconversation(conversationId: QualifiedId): Promise<void> {
-    const subconversationGroupId = await this.getGroupIdFromConversationId(
+    const subconversationGroupId = subconversationGroupIdStore.getGroupId(
       conversationId,
       SUBCONVERSATION_ID.CONFERENCE,
     );
@@ -251,7 +251,8 @@ export class MLSService extends TypedEventEmitter<Events> {
 
     const isSubconversationEstablished = await this.conversationExists(subconversationGroupId);
     if (!isSubconversationEstablished) {
-      return;
+      // if the subconversation was known by a client but is not established anymore, we can remove it from the store
+      return subconversationGroupIdStore.removeGroupId(conversationId, SUBCONVERSATION_ID.CONFERENCE);
     }
 
     try {
@@ -271,8 +272,8 @@ export class MLSService extends TypedEventEmitter<Events> {
       SUBCONVERSATION_ID.CONFERENCE,
     );
 
-    for (const {parentConversation} of conversationIds) {
-      await this.leaveConferenceSubconversation(parentConversation);
+    for (const {parentConversationId} of conversationIds) {
+      await this.leaveConferenceSubconversation(parentConversationId);
     }
   }
 

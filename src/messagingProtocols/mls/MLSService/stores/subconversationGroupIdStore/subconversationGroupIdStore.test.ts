@@ -72,13 +72,13 @@ describe('subconversationGroupIdMapper', () => {
     const result = subconversationGroupIdStore.getAllGroupIdsBySubconversationId(SUBCONVERSATION_ID.CONFERENCE);
     expect(result).toEqual([
       {
-        parentConversation: conversationId,
-        subconversation: subconversation,
+        parentConversationId: conversationId,
+        subconversationId: subconversation,
         subconversationGroupId: groupId,
       },
       {
-        parentConversation: conversationId2,
-        subconversation: subconversation2,
+        parentConversationId: conversationId2,
+        subconversationId: subconversation2,
         subconversationGroupId: groupId2,
       },
     ]);

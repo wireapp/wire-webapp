@@ -22,18 +22,20 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 const storageKey = 'subconversationGroupIdStore';
 
-function generateSubconversationId(
-  parentConversation: QualifiedId,
-  subconversation: SUBCONVERSATION_ID,
-): `${string}@${string}:${SUBCONVERSATION_ID}` {
-  return `${parentConversation.id}@${parentConversation.domain}:${subconversation}`;
-}
+const generateSubconversationStoreKey = (
+  parentConversationId: QualifiedId,
+  subconversationId: SUBCONVERSATION_ID,
+): `${string}@${string}:${SUBCONVERSATION_ID}` => {
+  return `${parentConversationId.id}@${parentConversationId.domain}:${subconversationId}`;
+};
 
-function parseSubconversationId(subconversationId: string): {parentConversation: QualifiedId; subconversation: string} {
-  const [parentConversationId, subconversation] = subconversationId.split(':');
+const parseSubconversationStoreKey = (
+  subconversationStoreKey: string,
+): {parentConversationId: QualifiedId; subconversationId: SUBCONVERSATION_ID} => {
+  const [parentConversationId, subconversationId] = subconversationStoreKey.split(':') as [string, SUBCONVERSATION_ID];
   const [id, domain] = parentConversationId.split('@');
-  return {parentConversation: {domain, id}, subconversation};
-}
+  return {parentConversationId: {domain, id}, subconversationId};
+};
 
 const getCurrentMap = (): Map<string, string> => {
   const storedEntry = localStorage.getItem(storageKey);
@@ -52,29 +54,33 @@ const removeItemFromMap = (subconversationId: string) => {
   localStorage.setItem(storageKey, JSON.stringify(Array.from(currentMap.entries())));
 };
 
-function storeGroupId(parentConversation: QualifiedId, subconversation: SUBCONVERSATION_ID, subgroupId: string): void {
-  const subconversationId = generateSubconversationId(parentConversation, subconversation);
-  addItemToMap(subconversationId, subgroupId);
-}
+const storeGroupId = (
+  parentConversationId: QualifiedId,
+  subconversationId: SUBCONVERSATION_ID,
+  subconversationGroupId: string,
+) => {
+  const subconversationStoreKey = generateSubconversationStoreKey(parentConversationId, subconversationId);
+  addItemToMap(subconversationStoreKey, subconversationGroupId);
+};
 
-function getGroupId(parentConversation: QualifiedId, subconversation: SUBCONVERSATION_ID): string | undefined {
-  const subconversationId = generateSubconversationId(parentConversation, subconversation);
-  return getCurrentMap().get(subconversationId);
-}
+const getGroupId = (parentConversationId: QualifiedId, subconversationId: SUBCONVERSATION_ID) => {
+  const subconversationStoreKey = generateSubconversationStoreKey(parentConversationId, subconversationId);
+  return getCurrentMap().get(subconversationStoreKey);
+};
 
-function getAllGroupIdsBySubconversationId(subconversationId: SUBCONVERSATION_ID) {
+const getAllGroupIdsBySubconversationId = (subconversationIdQuery: SUBCONVERSATION_ID) => {
   return Array.from(getCurrentMap().entries())
     .map(([subconversationId, subconversationGroupId]) => ({
-      ...parseSubconversationId(subconversationId),
+      ...parseSubconversationStoreKey(subconversationId),
       subconversationGroupId,
     }))
-    .filter(({subconversation}) => subconversation === subconversationId);
-}
+    .filter(({subconversationId}) => subconversationId === subconversationIdQuery);
+};
 
-function removeGroupId(parentConversation: QualifiedId, subconversation: SUBCONVERSATION_ID) {
-  const subconversationId = generateSubconversationId(parentConversation, subconversation);
-  return removeItemFromMap(subconversationId);
-}
+const removeGroupId = (parentConversationId: QualifiedId, subconversationId: SUBCONVERSATION_ID) => {
+  const subconversationStoreKey = generateSubconversationStoreKey(parentConversationId, subconversationId);
+  return removeItemFromMap(subconversationStoreKey);
+};
 
 export const subconversationGroupIdStore = {
   storeGroupId,
