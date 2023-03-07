@@ -409,7 +409,7 @@ export class App {
 
       await conversationRepository.conversationRoleRepository.loadTeamRoles();
 
-      await userRepository.loadUsers();
+      await userRepository.loadTeamUserAvailabilities();
 
       await eventRepository.connectWebSocket(this.core, ({done, total}) => {
         const baseMessage = t('initDecryption');

@@ -161,22 +161,25 @@ export class UserRepository {
     }
   };
 
-  async loadUsers(): Promise<void> {
-    if (this.userState.isTeam()) {
-      const users = await this.userService.loadUserFromDb();
+  /**
+   * Will load the availability status to the team users and subscribe to changes.
+   */
+  async loadTeamUserAvailabilities(): Promise<void> {
+    const users = this.userState.users();
+    if (this.userState.isTeam() && users.length) {
+      const availabilities = await this.userService.loadUserFromDb();
 
-      if (users.length) {
-        this.logger.log(`Loaded state of '${users.length}' users from database`, users);
+      this.logger.log(`Loaded state of '${users.length}' users from database`, users);
 
-        await Promise.all(
-          users.map(async user => {
-            const userEntity = await this.getUserById({domain: user.domain, id: user.id});
-            userEntity.availability(user.availability);
-          }),
+      users.forEach(user => {
+        const userAvailability = availabilities.find(availability =>
+          matchQualifiedIds({id: availability.id, domain: availability.domain ?? ''}, user.qualifiedId),
         );
-      }
-
-      this.userState.users().forEach(userEntity => userEntity.subscribeToChanges());
+        if (userAvailability) {
+          user.availability(userAvailability.availability);
+        }
+        user.subscribeToChanges();
+      });
     }
   }
 
