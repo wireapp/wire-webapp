@@ -162,7 +162,7 @@ export class CallingViewModel {
 
       if (conversation.isUsingMLSProtocol) {
         const unsubscribe = await subscribeToEpochUpdates(
-          {mlsService: this.mlsService},
+          {mlsService: this.mlsService, conversationState: this.conversationState},
           conversation.qualifiedId,
           ({epoch, keyLength, secretKey, members}) => {
             this.callingRepository.setEpochInfo(conversation.qualifiedId, {epoch, keyLength, secretKey}, members);
@@ -176,7 +176,7 @@ export class CallingViewModel {
 
     const joinOngoingMlsConference = async (call: Call) => {
       const unsubscribe = await subscribeToEpochUpdates(
-        {mlsService: this.mlsService},
+        {mlsService: this.mlsService, conversationState: this.conversationState},
         call.conversationId,
         ({epoch, keyLength, secretKey, members}) => {
           this.callingRepository.setEpochInfo(call.conversationId, {epoch, keyLength, secretKey}, members);
