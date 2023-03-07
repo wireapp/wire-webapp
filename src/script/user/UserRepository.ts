@@ -170,11 +170,18 @@ export class UserRepository {
       const availabilities = await this.userService.loadUserFromDb();
 
       this.logger.log(`Loaded state of '${users.length}' users from database`, users);
+      /** availabilities we have in the DB that are not matching any loaded users */
+      const orphanAvailabilities = availabilities.filter(
+        availability => !users.find(user => matchQualifiedIds(user.qualifiedId, availability)),
+      );
+
+      // Remove availabilities that are not linked to any loaded users
+      orphanAvailabilities.forEach(async availability => {
+        await this.userService.removeUserFromDb({id: availability.id, domain: availability.domain ?? ''});
+      });
 
       users.forEach(user => {
-        const userAvailability = availabilities.find(availability =>
-          matchQualifiedIds({id: availability.id, domain: availability.domain ?? ''}, user.qualifiedId),
-        );
+        const userAvailability = availabilities.find(availability => matchQualifiedIds(availability, user.qualifiedId));
         if (userAvailability) {
           user.availability(userAvailability.availability);
         }
