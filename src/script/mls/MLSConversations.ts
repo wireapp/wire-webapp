@@ -58,9 +58,6 @@ export async function initMLSConversations(
       const conversation = await conversationRepository.getConversationById(conversationId);
       return conversation?.groupId;
     },
-    findConversationIdByGroupId: async groupId => {
-      return conversationRepository.findConversationByGroupId(groupId)?.qualifiedId;
-    },
     // This is enforced by backend, no need to implement this on the client side.
     userAuthorize: async () => true,
   });

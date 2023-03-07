@@ -24,6 +24,8 @@ import {constructFullyQualifiedClientId} from '@wireapp/core/lib/util/fullyQuali
 
 import {SubconversationEpochInfoMember} from './CallingRepository';
 
+import {ConversationState} from '../conversation/ConversationState';
+
 const KEY_LENGTH = 32;
 
 const generateSubconversationMembers = async (
@@ -89,7 +91,7 @@ export const getSubconversationEpochInfo = async (
 };
 
 export const subscribeToEpochUpdates = async (
-  {mlsService}: {mlsService: MLSService},
+  {mlsService, conversationState}: {mlsService: MLSService; conversationState: ConversationState},
   conversationId: QualifiedId,
   onEpochUpdate: (info: {
     members: SubconversationEpochInfoMember[];
@@ -104,13 +106,13 @@ export const subscribeToEpochUpdates = async (
 
   const forwardNewEpoch = async ({groupId, epoch}: {groupId: string; epoch: number}) => {
     if (groupId !== subconversationGroupId) {
-      const parentConversationId = await mlsService.findConversationIdByGroupId?.(groupId);
-      if (!parentConversationId) {
+      const parentConversation = conversationState.findConversationByGroupId(groupId);
+      if (!parentConversation) {
         return;
       }
 
       const foundSubconversationGroupId = await mlsService.getGroupIdFromConversationId?.(
-        parentConversationId,
+        parentConversation.qualifiedId,
         SUBCONVERSATION_ID.CONFERENCE,
       );
 
