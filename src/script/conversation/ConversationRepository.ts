@@ -18,7 +18,6 @@
  */
 
 import {
-  ClientMismatch,
   Conversation as BackendConversation,
   ConversationProtocol,
   CONVERSATION_TYPE,
@@ -189,11 +188,11 @@ export class ConversationRepository {
     this.messageRepository.setClientMismatchHandler(async (mismatch, conversation, silent, consentType) => {
       //we filter out self client id to omit it in mismatch check
       const {userId, clientId} = this.core;
-      const domain = this.core.backendFeatures.federationEndpoints ? userState.self().domain : '';
+      const domain = userState.self().domain;
 
       const selfClient = {domain, userId, clientId};
       const filteredMissing = mismatch.missing && removeClientFromUserClientMap(mismatch.missing, selfClient);
-      const filteredMismatch = {...mismatch, missing: filteredMissing} as ClientMismatch | MessageSendingStatus;
+      const filteredMismatch = {...mismatch, missing: filteredMissing} as MessageSendingStatus;
 
       const {missingClients, deletedClients, emptyUsers, missingUserIds} = extractClientDiff(
         filteredMismatch,
@@ -372,14 +371,10 @@ export class ConversationRepository {
     options: Partial<NewConversation> = {},
   ): Promise<Conversation | undefined> {
     const userIds = userEntities.map(user => user.qualifiedId);
-    const usersPayload = this.core.backendFeatures.federationEndpoints
-      ? {
-          qualified_users: userIds,
-          users: [] as string[],
-        }
-      : {
-          users: userIds.map(({id}) => id),
-        };
+    const usersPayload = {
+      qualified_users: userIds,
+      users: [] as string[],
+    };
 
     let payload: NewConversation & {conversation_role: string} = {
       conversation_role: DefaultRole.WIRE_MEMBER,
@@ -843,7 +838,7 @@ export class ConversationRepository {
       });
   }
 
-  private readonly deleteConversationLocally = (conversationId: QualifiedId, skipNotification: boolean) => {
+  private readonly deleteConversationLocally = async (conversationId: QualifiedId, skipNotification: boolean) => {
     const conversationEntity = this.conversationState.findConversation(conversationId);
     if (!conversationEntity) {
       return;
@@ -861,7 +856,13 @@ export class ConversationRepository {
       this.conversationLabelRepository.saveLabels();
     }
     this.deleteConversationFromRepository(conversationId);
-    this.conversationService.deleteConversationFromDb(conversationId);
+    await this.conversationService.deleteConversationFromDb(conversationId);
+    if (conversationEntity.protocol === ConversationProtocol.MLS) {
+      const {groupId} = conversationEntity;
+      if (groupId) {
+        await this.core.service!.conversation.wipeMLSConversation(groupId);
+      }
+    }
   };
 
   public async getAllUsersInConversation(conversationId: QualifiedId): Promise<User[]> {
@@ -2018,7 +2019,8 @@ export class ConversationRepository {
       .then(conversationEntity => this.checkConversationParticipants(conversationEntity, eventJson, eventSource))
       .then(conversationEntity => this.triggerFeatureEventHandlers(conversationEntity, eventJson))
       .then(
-        conversationEntity => this.reactToConversationEvent(conversationEntity, eventJson, eventSource) as EntityObject,
+        conversationEntity =>
+          this.reactToConversationEvent(conversationEntity, eventJson, eventSource) as Promise<EntityObject>,
       )
       .then((entityObject = {} as EntityObject) => {
         if (type !== CONVERSATION_EVENT.MEMBER_JOIN && type !== CONVERSATION_EVENT.MEMBER_LEAVE) {
@@ -2158,7 +2160,7 @@ export class ConversationRepository {
    * @param eventSource Source of event
    * @returns Resolves when the event has been treated
    */
-  private reactToConversationEvent(
+  private async reactToConversationEvent(
     conversationEntity: Conversation,
     eventJson: IncomingEvent,
     eventSource: EventSource,
@@ -2517,6 +2519,9 @@ export class ConversationRepository {
           await this.core.service!.conversation.wipeMLSConversation(groupId);
         }
       }
+    } else {
+      // Update conversation roles (in case the removed user had some special role and it's not the self user)
+      await this.conversationRoleRepository.updateConversationRoles(conversationEntity);
     }
 
     if (!selfLeavingClearedConversation) {

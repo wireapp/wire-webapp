@@ -63,7 +63,17 @@ export const getSubconversationEpochInfo = async (
     conversationId,
     SUBCONVERSATION_ID.CONFERENCE,
   );
+
   const parentGroupId = await mlsService.getGroupIdFromConversationId(conversationId);
+
+  // this method should not be called if the subconversation (and its parent conversation) is not established
+  if (!subconversationGroupId || !parentGroupId) {
+    throw new Error(
+      `Could not obtain epoch info for conference subconversation of conversation ${JSON.stringify(
+        conversationId,
+      )}: parent or subconversation group ID is missing`,
+    );
+  }
 
   const members = await generateSubconversationMembers({mlsService}, subconversationGroupId, parentGroupId);
 

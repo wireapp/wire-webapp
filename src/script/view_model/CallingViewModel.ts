@@ -222,6 +222,10 @@ export class CallingViewModel {
         SUBCONVERSATION_ID.CONFERENCE,
       );
 
+      if (!subconversationGroupId) {
+        return;
+      }
+
       //we don't want to react to avs callbacks when conversation was not yet established
       const isMLSConversationEstablished = await this.mlsService.conversationExists(subconversationGroupId);
       if (!isMLSConversationEstablished) {
@@ -262,6 +266,10 @@ export class CallingViewModel {
         conversationId,
         SUBCONVERSATION_ID.CONFERENCE,
       );
+
+      if (!subconversationGroupId) {
+        return;
+      }
 
       const isMLSConversationEstablished = await this.mlsService.conversationExists(subconversationGroupId);
       if (!isMLSConversationEstablished) {

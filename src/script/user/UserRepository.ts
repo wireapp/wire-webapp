@@ -48,7 +48,7 @@ import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {fixWebsocketString} from 'Util/StringUtil';
-import {isAxiosError, isBackendError, isQualifiedId} from 'Util/TypePredicateUtil';
+import {isAxiosError, isBackendError} from 'Util/TypePredicateUtil';
 
 import {valueFromType} from './AvailabilityMapper';
 import {showAvailabilityModal} from './AvailabilityModal';
@@ -520,13 +520,8 @@ export class UserRepository {
   /**
    * Find a local user.
    */
-  findUserById(userId: string | QualifiedId): User | undefined {
-    return this.userState.users().find(knownUser => {
-      return typeof userId === 'string'
-        ? knownUser.id === userId
-        : // Don't check for the domain when the user query has no domain
-          matchQualifiedIds(knownUser, userId);
-    });
+  findUserById(userId: QualifiedId): User | undefined {
+    return this.userState.users().find(knownUser => matchQualifiedIds(knownUser, userId));
   }
 
   /**
@@ -628,10 +623,6 @@ export class UserRepository {
     return knownUserEntities.concat(userEntities);
   }
 
-  getUserFromBackend(userId: string): Promise<APIClientUser> {
-    return this.userService.getUser(userId);
-  }
-
   getUserListFromBackend(userIds: QualifiedId[]): Promise<APIClientUser[]> {
     const qualifiedUserIds = userIds.map(({id, domain}) => ({domain: domain || this.userState.self().domain, id}));
     return this.userService.getUsers(qualifiedUserIds);
@@ -676,7 +667,7 @@ export class UserRepository {
   /**
    * Update a local user from the backend by ID.
    */
-  updateUserById = async (userId: string | QualifiedId): Promise<void> => {
+  updateUserById = async (userId: QualifiedId): Promise<void> => {
     const localUserEntity = this.findUserById(userId) || new User('', '');
     const updatedUserData = await this.userService.getUser(userId);
     const updatedUserEntity = this.userMapper.updateUserFromObject(localUserEntity, updatedUserData);
@@ -688,15 +679,12 @@ export class UserRepository {
     }
   };
 
-  static findMatchingUser(userId: string | QualifiedId, userEntities: User[]): User | undefined {
-    if (isQualifiedId(userId)) {
-      return userEntities.find(userEntity => matchQualifiedIds(userEntity, userId));
-    }
-    return userEntities.find(userEntity => userEntity.id === userId);
+  static findMatchingUser(userId: QualifiedId, userEntities: User[]): User | undefined {
+    return userEntities.find(userEntity => matchQualifiedIds(userEntity, userId));
   }
 
-  static createDeletedUser(userId: string | QualifiedId): User {
-    const userEntity = isQualifiedId(userId) ? new User(userId.id, userId.domain) : new User(userId, null);
+  static createDeletedUser(userId: QualifiedId): User {
+    const userEntity = new User(userId.id, userId.domain);
     userEntity.isDeleted = true;
     userEntity.name(t('nonexistentUser'));
     return userEntity;
@@ -706,7 +694,7 @@ export class UserRepository {
    * Add user entities for suspended users.
    * @returns User entities
    */
-  private addSuspendedUsers(userIds: string[] | QualifiedId[], userEntities: User[]): User[] {
+  private addSuspendedUsers(userIds: QualifiedId[], userEntities: User[]): User[] {
     for (const userId of userIds) {
       const matchingUserIds = UserRepository.findMatchingUser(userId, userEntities);
 

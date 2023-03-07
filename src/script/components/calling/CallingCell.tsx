@@ -210,7 +210,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
       if (!isOngoing) {
         return;
       }
-      if (event.key === KEY.ENTER || event.key === KEY.SPACE) {
+      if ([KEY.ENTER, KEY.SPACE].includes(event.key)) {
         multitasking?.isMinimized(false);
       }
     },
@@ -234,14 +234,22 @@ const CallingCell: React.FC<CallingCellProps> = ({
 
   const answerOrRejectCall = useCallback(
     (event: KeyboardEvent) => {
+      const answerCallShortcut = !event.shiftKey && event.ctrlKey && isEnterKey(event);
+      const hangUpCallShortcut = event.ctrlKey && event.shiftKey && isEnterKey(event);
+
       const removeEventListener = () => window.removeEventListener('keydown', answerOrRejectCall);
 
-      if (!event.shiftKey && event.ctrlKey && isEnterKey(event)) {
+      if (answerCallShortcut || hangUpCallShortcut) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+
+      if (answerCallShortcut) {
         answerCall();
         removeEventListener();
       }
 
-      if (event.ctrlKey && event.shiftKey && isEnterKey(event)) {
+      if (hangUpCallShortcut) {
         callActions.reject(call);
         removeEventListener();
       }
@@ -251,10 +259,13 @@ const CallingCell: React.FC<CallingCellProps> = ({
 
   useEffect(() => {
     if (isIncoming) {
-      window.addEventListener('keydown', answerOrRejectCall);
+      // Capture will be dispatched to registered element before being dispatched to any EventTarget beneath it in the DOM Tree.
+      // It's needed because when someone is calling we need to change order of shortcuts to the top of keyboard usage.
+      // If we didn't pass this prop other Event Listeners will be dispatched in same time.
+      document.addEventListener('keydown', answerOrRejectCall, {capture: true});
 
       return () => {
-        window.removeEventListener('keydown', answerOrRejectCall);
+        document.removeEventListener('keydown', answerOrRejectCall, {capture: true});
       };
     }
 
@@ -277,6 +288,14 @@ const CallingCell: React.FC<CallingCellProps> = ({
     conversationName,
     cameraStatus: t(selfSharesCamera ? 'cameraStatusOn' : 'cameraStatusOff'),
   });
+
+  const onGoingGroupCallAlert = t(isOutgoingVideoCall ? 'ongoingGroupVideoCall' : 'ongoingGroupAudioCall', {
+    conversationName,
+    cameraStatus: t(selfSharesCamera ? 'cameraStatusOn' : 'cameraStatusOff'),
+  });
+
+  const callStartedAlert = isGroup ? callGroupStartedAlert : call1To1StartedAlert;
+  const ongoingCallAlert = isGroup ? onGoingGroupCallAlert : onGoingCallAlert;
 
   return (
     <div className="conversation-calling-cell">
@@ -312,20 +331,24 @@ const CallingCell: React.FC<CallingCellProps> = ({
           <div className="conversation-list-cell-right__calling">
             <div
               ref={element => {
-                if (isGroup && showAlert && !isVideoCall) {
+                if ((isGroup || isOngoing) && showAlert && !isVideoCall) {
                   element?.focus();
                 }
               }}
               className="conversation-list-cell conversation-list-cell-button"
               onClick={createNavigate(conversationUrl)}
-              onBlur={() => clearShowAlert()}
+              onBlur={() => {
+                if (isGroup || isOngoing) {
+                  clearShowAlert();
+                }
+              }}
               onKeyDown={createNavigateKeyboard(conversationUrl)}
               tabIndex={TabIndex.FOCUSABLE}
               role="button"
               aria-label={
                 showAlert
-                  ? callGroupStartedAlert
-                  : `${isOngoing ? `${onGoingCallAlert} ` : ''}${t('accessibility.openConversation', conversationName)}`
+                  ? callStartedAlert
+                  : `${isOngoing ? `${ongoingCallAlert} ` : ''}${t('accessibility.openConversation', conversationName)}`
               }
             >
               {!temporaryUserStyle && (
@@ -336,7 +359,6 @@ const CallingCell: React.FC<CallingCellProps> = ({
                   )}
                 </div>
               )}
-
               <h2
                 className={cx('conversation-list-cell-center ', {
                   'conversation-list-cell-center-no-left': temporaryUserStyle,
@@ -504,7 +526,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
                         className={cx('call-ui__button call-ui__button--participants', {
                           'call-ui__button--active': showParticipants,
                         })}
-                        onClick={() => setShowParticipants(current => !showParticipants)}
+                        onClick={() => setShowParticipants(prevState => !prevState)}
                         type="button"
                         data-uie-name="do-toggle-participants"
                         aria-pressed={showParticipants}
@@ -518,8 +540,11 @@ const CallingCell: React.FC<CallingCellProps> = ({
                   {(isIncoming || isOutgoing) && (
                     <li className="conversation-list-calling-cell-controls-item">
                       <button
-                        // eslint-disable-next-line jsx-a11y/no-autofocus
-                        autoFocus={!isGroup}
+                        ref={element => {
+                          if (showAlert && !isGroup) {
+                            element?.focus();
+                          }
+                        }}
                         className="call-ui__button call-ui__button--red call-ui__button--large"
                         onClick={() => (isIncoming ? callActions.reject(call) : callActions.leave(call))}
                         onBlur={() => clearShowAlert()}
