@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [39.1.5](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@39.1.4...@wireapp/core@39.1.5) (2023-03-07)
+
+### Bug Fixes
+
+* More flexible useVersion api ([#4944](https://github.com/wireapp/wire-web-packages/issues/4944)) ([a328bfe](https://github.com/wireapp/wire-web-packages/commit/a328bfe85359fd371256e79b2545b50f89636ec2))
+
 ## [39.1.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@39.1.3...@wireapp/core@39.1.4) (2023-03-06)
 
 **Note:** Version bump only for package @wireapp/core

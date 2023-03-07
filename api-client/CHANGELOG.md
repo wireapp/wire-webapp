@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [23.1.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@23.1.2...@wireapp/api-client@23.1.3) (2023-03-07)
+
+### Bug Fixes
+
+* More flexible useVersion api ([#4944](https://github.com/wireapp/wire-web-packages/issues/4944)) ([a328bfe](https://github.com/wireapp/wire-web-packages/commit/a328bfe85359fd371256e79b2545b50f89636ec2))
+
 ## [23.1.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@23.1.1...@wireapp/api-client@23.1.2) (2023-03-06)
 
 ### Bug Fixes
