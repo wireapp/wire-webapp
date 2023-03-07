@@ -42,7 +42,7 @@ function opaque(color: ColorParam, amount: number): string {
     .toString();
 }
 
-const BASE_COLOR: Record<string, string> = {
+const BASE_COLOR = {
   BLACK: '#000',
   BLUE: '#0772de',
   GRAY: '#696c6e',
