@@ -178,16 +178,17 @@ export class Account extends TypedEventEmitter<Events> {
   /**
    * Will set the APIClient to use a specific version of the API (by default uses version 0)
    * It will fetch the API Config and use the highest possible version
-   * @param acceptedVersions Which version the consumer supports
-   * @param useDevVersion allow the api-client to use development version of the api (if present). The dev version also need to be listed on the supportedVersions given as parameters
+   * @param min mininum version to use
+   * @param max maximum version to use
+   * @param allowDev allow the api-client to use development version of the api (if present). The dev version also need to be listed on the supportedVersions given as parameters
    *   If we have version 2 that is a dev version, this is going to be the output of those calls
-   *   - useVersion([0, 1, 2], true) > version 2 is used
-   *   - useVersion([0, 1, 2], false) > version 1 is used
-   *   - useVersion([0, 1], true) > version 1 is used
+   *   - useVersion(0, 2, true) > version 2 is used
+   *   - useVersion(0, 2) > version 1 is used
+   *   - useVersion(0, 1, true) > version 1 is used
    * @return The highest version that is both supported by client and backend
    */
-  public async useAPIVersion(supportedVersions: number[], useDevVersion?: boolean) {
-    const features = await this.apiClient.useVersion(supportedVersions, useDevVersion);
+  public async useAPIVersion(min: number, max: number, allowDev?: boolean) {
+    const features = await this.apiClient.useVersion(min, max, allowDev);
     this.backendFeatures = features;
     return features;
   }
