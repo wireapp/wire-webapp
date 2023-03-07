@@ -19,6 +19,7 @@
 
 import type {SSOSettings} from '@wireapp/api-client/lib/account/SSOSettings';
 import type {RegisterData} from '@wireapp/api-client/lib/auth/';
+import {OAuthClient} from '@wireapp/api-client/lib/oauth/OAuthClient';
 import {TeamData} from '@wireapp/api-client/lib/team';
 
 import type {LoginDataState, RegistrationDataState} from '../../reducer/authReducer';
@@ -33,6 +34,9 @@ export enum AUTH_ACTION {
   FETCH_TEAM_FAILED = 'FETCH_TEAM_FAILED',
   FETCH_TEAM_START = 'FETCH_TEAM_START',
   FETCH_TEAM_SUCCESS = 'FETCH_TEAM_SUCCESS',
+  FETCH_OAUTH_APP_FAILED = 'FETCH_OAUTH_APP_FAILED',
+  FETCH_OAUTH_APP_START = 'FETCH_OAUTH_APP_START',
+  FETCH_OAUTH_APP_SUCCESS = 'FETCH_OAUTH_APP_SUCCESS',
   GET_SSO_SETTINGS_FAILED = 'GET_SSO_SETTINGS_FAILED',
   GET_SSO_SETTINGS_START = 'GET_SSO_SETTINGS_START',
   GET_SSO_SETTINGS_SUCCESS = 'GET_SSO_SETTINGS_SUCCESS',
@@ -87,6 +91,9 @@ export type AuthActions =
   | FetchTeamStartAction
   | FetchTeamSuccessAction
   | FetchTeamFailedAction
+  | FetchApplicationStartAction
+  | FetchApplicationSuccessAction
+  | FetchApplicationFailedAction
   | RegisterPersonalStartAction
   | RegisterPersonalSuccessAction
   | RegisterPersonalFailedAction
@@ -174,6 +181,18 @@ export interface FetchTeamSuccessAction extends AppAction {
 export interface FetchTeamFailedAction extends AppAction {
   readonly error: Error;
   readonly type: AUTH_ACTION.FETCH_TEAM_FAILED;
+}
+
+export interface FetchApplicationStartAction extends AppAction {
+  readonly type: AUTH_ACTION.FETCH_OAUTH_APP_START;
+}
+export interface FetchApplicationSuccessAction extends AppAction {
+  readonly payload: OAuthClient;
+  readonly type: AUTH_ACTION.FETCH_OAUTH_APP_SUCCESS;
+}
+export interface FetchApplicationFailedAction extends AppAction {
+  readonly error: Error;
+  readonly type: AUTH_ACTION.FETCH_OAUTH_APP_FAILED;
 }
 
 export interface RegisterPersonalStartAction extends AppAction {
@@ -353,6 +372,20 @@ export class AuthActionCreator {
     error,
     type: AUTH_ACTION.FETCH_TEAM_FAILED,
   });
+  static startFetchOAuth = (): FetchApplicationStartAction => ({
+    type: AUTH_ACTION.FETCH_OAUTH_APP_START,
+  });
+
+  static successfulFetchOAuth = (application: OAuthClient): FetchApplicationSuccessAction => ({
+    payload: application,
+    type: AUTH_ACTION.FETCH_OAUTH_APP_SUCCESS,
+  });
+
+  static failedFetchOAuth = (error: Error): FetchApplicationFailedAction => ({
+    error,
+    type: AUTH_ACTION.FETCH_OAUTH_APP_FAILED,
+  });
+
   static startRegisterPersonal = (): RegisterPersonalStartAction => ({
     type: AUTH_ACTION.REGISTER_PERSONAL_START,
   });

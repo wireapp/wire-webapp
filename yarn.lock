@@ -4347,6 +4347,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@wireapp/api-client@file:.yalc/@wireapp/api-client::locator=wire-webapp%40workspace%3A.":
+  version: 22.15.6
+  resolution: "@wireapp/api-client@file:.yalc/@wireapp/api-client#.yalc/@wireapp/api-client::hash=2cb9b6&locator=wire-webapp%40workspace%3A."
+  dependencies:
+    "@wireapp/commons": ^5.0.4
+    "@wireapp/priority-queue": ^2.0.3
+    "@wireapp/protocol-messaging": 1.44.0
+    axios: 1.3.3
+    axios-retry: 3.4.0
+    http-status-codes: 2.2.0
+    logdown: 3.3.1
+    reconnecting-websocket: 4.4.0
+    spark-md5: 3.0.2
+    tough-cookie: 4.1.2
+    ws: 8.11.0
+  checksum: 3a432d19608c2af30d541a3d22b621f413c13f22f70040f4d99652f3ca1c2d5879a03c604dfe845ae5a53cb3921685ee43ff77cdca9422f2bff40b4256328868
+  languageName: node
+  linkType: hard
+
 "@wireapp/api-client@npm:^22.15.4":
   version: 22.15.4
   resolution: "@wireapp/api-client@npm:22.15.4"
@@ -4546,9 +4565,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/react-ui-kit@npm:9.3.5":
-  version: 9.3.5
-  resolution: "@wireapp/react-ui-kit@npm:9.3.5"
+"@wireapp/react-ui-kit@npm:9.4.0":
+  version: 9.4.0
+  resolution: "@wireapp/react-ui-kit@npm:9.4.0"
   dependencies:
     "@types/color": 3.0.3
     color: 4.2.3
@@ -4563,7 +4582,7 @@ __metadata:
   peerDependenciesMeta:
     "@types/react":
       optional: true
-  checksum: ab8e5da48f907050ee032c368f81614b241642dab08e23aa4994740a37d1a134b9cfa8de0a8dd441cb6291f8025f8b21b29bc15785ae2d6614b6304994c07030
+  checksum: 058847c31afc8b74d6d77aec33b959c9178a14551dd7df1db92cbd5afc1ea6f8abf764ff0adf5961bb5e8f3e8186c99b746645e65cf0b72aa0478aa8640e0498
   languageName: node
   linkType: hard
 
@@ -5268,6 +5287,17 @@ __metadata:
     form-data: ^4.0.0
     proxy-from-env: ^1.1.0
   checksum: 9791af75a6df137b15ef45d13ad11eb357b3860d2496347ee18778db9d0abc2320362a4452f1e070e3160f1dbcc518fcefdc9e005be097e7db39acb22cf608e5
+  languageName: node
+  linkType: hard
+
+"axios@npm:1.3.3":
+  version: 1.3.3
+  resolution: "axios@npm:1.3.3"
+  dependencies:
+    follow-redirects: ^1.15.0
+    form-data: ^4.0.0
+    proxy-from-env: ^1.1.0
+  checksum: b734a4bc348e2fa27150a7d4289d783fa405feb3f79f8daf28fd05813a12c8525ae9d3854aafe7ba041b005a4a751a0ba3b923331ceed41296ae14c7e54e2f26
   languageName: node
   linkType: hard
 
@@ -16824,13 +16854,14 @@ __metadata:
     "@types/webpack-env": 1.18.0
     "@typescript-eslint/eslint-plugin": ^5.51.0
     "@typescript-eslint/parser": ^5.51.0
+    "@wireapp/api-client": "file:.yalc/@wireapp/api-client"
     "@wireapp/avs": 9.0.21
     "@wireapp/copy-config": 2.0.8
     "@wireapp/core": 38.12.0
     "@wireapp/eslint-config": 2.1.1
     "@wireapp/lru-cache": 3.8.1
     "@wireapp/prettier-config": 0.5.2
-    "@wireapp/react-ui-kit": 9.3.5
+    "@wireapp/react-ui-kit": 9.4.0
     "@wireapp/store-engine": ^5.0.3
     "@wireapp/store-engine-dexie": 2.0.4
     "@wireapp/store-engine-sqleet": 1.8.9

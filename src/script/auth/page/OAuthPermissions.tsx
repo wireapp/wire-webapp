@@ -17,9 +17,10 @@
  *
  */
 
-import React from 'react';
+import React, {useRef} from 'react';
 
 // import {ClientType} from '@wireapp/api-client/lib/client/index';
+import {OAuthClient} from '@wireapp/api-client/lib/oauth/OAuthClient';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 // import {useNavigate} from 'react-router-dom';
@@ -51,6 +52,7 @@ import {oauthStrings} from '../../strings';
 import {actionRoot} from '../module/action';
 import {bindActionCreators, RootState} from '../module/reducer';
 import * as SelfSelector from '../module/selector/SelfSelector';
+
 // import {ROUTE} from '../route';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {
@@ -73,6 +75,7 @@ interface AuthParams {
 
 const OAuthPermissionsComponent = ({
   doLogout,
+  getOAuthApp,
   selfUser,
   selfTeamId,
   assetRepository = container.resolve(AssetRepository),
@@ -94,7 +97,7 @@ const OAuthPermissionsComponent = ({
       }
       return {...acc, [key]: value};
     }, {} as AuthParams);
-
+  const oAuthApp = useRef<OAuthClient | null>(null);
   const onContinue = () => {
     // return navigate(ROUTE.SET_EMAIL);
   };
@@ -106,11 +109,12 @@ const OAuthPermissionsComponent = ({
       const teamIcon = AssetRemoteData.v3(team.icon, selfUser.qualified_id?.domain);
       const teamImageBlob = await assetRepository.load(teamIcon);
       setTeamImage(teamImageBlob && (await loadDataUrl(teamImageBlob)));
+      oAuthApp.current = !!params.client_id ? await getOAuthApp(params.client_id) : null;
     };
     getUserData().catch(error => {
       console.error(error);
     });
-  }, [assetRepository, getSelf, getTeam, selfTeamId, selfUser.qualified_id?.domain]);
+  }, [assetRepository, getOAuthApp, getSelf, getTeam, params.client_id, selfTeamId, selfUser.qualified_id?.domain]);
 
   return (
     <Page>
@@ -145,7 +149,7 @@ const OAuthPermissionsComponent = ({
         >
           {_(oauthStrings.logout)}
         </Link>
-        <Text center>{_(oauthStrings.subhead, {app: Config.getConfig().BACKEND_NAME})}</Text>
+        {oAuthApp && <Text center>{_(oauthStrings.subhead, {app: oAuthApp.current?.applicationName})}</Text>}
         {params.scope.length > 1 && (
           <Box
             style={{
@@ -254,6 +258,7 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
   bindActionCreators(
     {
       getSelf: actionRoot.selfAction.fetchSelf,
+      getOAuthApp: actionRoot.authAction.doGetOAuthApplication,
       doLogout: actionRoot.authAction.doLogout,
       getTeam: actionRoot.authAction.doGetTeamData,
     },

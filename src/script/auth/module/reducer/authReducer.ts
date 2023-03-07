@@ -20,6 +20,7 @@
 import type {SSOSettings} from '@wireapp/api-client/lib/account/SSOSettings';
 import {LoginData} from '@wireapp/api-client/lib/auth';
 import {ClientType} from '@wireapp/api-client/lib/client/';
+import {OAuthClient} from '@wireapp/api-client/lib/oauth/OAuthClient';
 import type {TeamData} from '@wireapp/api-client/lib/team/';
 import type {UserAsset} from '@wireapp/api-client/lib/user/';
 
@@ -56,6 +57,7 @@ export type AuthState = {
   readonly isAuthenticated: boolean;
   readonly isSendingTwoFactorCode: boolean;
   readonly loginData: LoginDataState;
+  readonly oAuthApp?: OAuthClient;
   readonly ssoSettings?: SSOSettings;
 };
 
@@ -86,6 +88,7 @@ export const initialAuthState: AuthState = {
   loginData: {
     clientType: Config.getConfig().FEATURE.DEFAULT_LOGIN_TEMPORARY_CLIENT ? ClientType.TEMPORARY : ClientType.PERMANENT,
   },
+  oAuthApp: undefined,
   ssoSettings: {
     default_sso_code: undefined,
   },
@@ -118,6 +121,7 @@ export function authReducer(state: AuthState = initialAuthState, action: AppActi
         isSendingTwoFactorCode: false,
       };
     }
+    case AUTH_ACTION.FETCH_OAUTH_APP_START:
     case AUTH_ACTION.FETCH_TEAM_START:
     case AUTH_ACTION.REFRESH_START: {
       return {
@@ -145,6 +149,7 @@ export function authReducer(state: AuthState = initialAuthState, action: AppActi
         isAuthenticated: false,
       };
     }
+    case AUTH_ACTION.FETCH_OAUTH_APP_FAILED:
     case AUTH_ACTION.FETCH_TEAM_FAILED: {
       return {
         ...state,
@@ -170,6 +175,15 @@ export function authReducer(state: AuthState = initialAuthState, action: AppActi
       return {
         ...state,
         account: {...state.account, team: action.payload},
+        error: null,
+        fetched: true,
+        fetching: false,
+      };
+    }
+    case AUTH_ACTION.FETCH_OAUTH_APP_SUCCESS: {
+      return {
+        ...state,
+        oAuthApp: action.payload,
         error: null,
         fetched: true,
         fetching: false,
