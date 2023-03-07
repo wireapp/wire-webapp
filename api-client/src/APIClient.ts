@@ -241,35 +241,31 @@ export class APIClient extends EventEmitter {
   /**
    * Will set the APIClient to use a specific version of the API (by default uses version 0)
    * It will fetch the API Config and use the highest possible version
-   * @param acceptedVersions Which version the consumer supports
-   * @param useDevVersion allow the api-client to use development version of the api (if present). The dev version also need to be listed on the supportedVersions given as parameters
+   * @param min mininum version to use
+   * @param max maximum version to use
+   * @param allowDev allow the api-client to use development version of the api (if present). The dev version also need to be listed on the supportedVersions given as parameters
    *   If we have version 2 that is a dev version, this is going to be the output of those calls
-   *   - useVersion([0, 1, 2], true) > version 2 is used
-   *   - useVersion([0, 1, 2], false) > version 1 is used
-   *   - useVersion([0, 1], true) > version 1 is used
+   *   - useVersion(0, 2, true) > version 2 is used
+   *   - useVersion(0, 2) > version 1 is used
+   *   - useVersion(0, 1, true) > version 1 is used
    * @return The highest version that is both supported by client and backend
    */
-  async useVersion(acceptedVersions: number[], useDevVersion = false): Promise<BackendFeatures> {
-    if (acceptedVersions.length === 1 && acceptedVersions[0] === 0) {
-      // Nothing to do since version 0 is the default one
-      return this.computeBackendFeatures(0);
-    }
+  async useVersion(min: number, max: number, allowDev?: boolean): Promise<BackendFeatures> {
     let backendVersions: BackendVersionResponse = {supported: [0]};
     try {
       backendVersions = (await this.transport.http.sendRequest<BackendVersionResponse>({url: '/api-version'})).data;
     } catch (error) {}
-    const devVersions = useDevVersion ? backendVersions.development ?? [] : [];
+    const devVersions = allowDev ? backendVersions.development ?? [] : [];
     const highestCommonVersion = backendVersions.supported
       .concat(devVersions)
       .sort()
       .reverse()
-      .find(version => acceptedVersions.includes(version));
+      .find(version => version >= min && version <= max);
 
     if (highestCommonVersion === undefined) {
+      const supportedStr = backendVersions.supported.join(', ');
       throw new Error(
-        `Backend does not support requested versions [${acceptedVersions.join(
-          ', ',
-        )}] (supported versions ${backendVersions.supported.join(', ')})`,
+        `Backend does not support requested versions [${min}-${max}] (supported versions ${supportedStr})`,
       );
     }
     this.backendFeatures = this.computeBackendFeatures(highestCommonVersion, backendVersions);

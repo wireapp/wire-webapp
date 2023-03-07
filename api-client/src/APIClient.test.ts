@@ -89,7 +89,7 @@ describe('APIClient', () => {
       const client = new APIClient();
       let errorMessage;
       try {
-        await client.useVersion([2, 3]);
+        await client.useVersion(2, 3);
       } catch (error) {
         errorMessage = error.message;
       } finally {
@@ -100,7 +100,7 @@ describe('APIClient', () => {
     it("uses version 0 if backend doesn't support /api-version endpoint", async () => {
       nock(baseUrl).get('/api-version').reply(404);
       const client = new APIClient();
-      const {version} = await client.useVersion([0, 1, 2, 3]);
+      const {version} = await client.useVersion(0, 3);
       expect(version).toBe(0);
     });
 
@@ -109,7 +109,7 @@ describe('APIClient', () => {
         .get('/api-version')
         .reply(200, {supported: [0, 1]});
       const client = new APIClient();
-      const {version, isFederated, federationEndpoints} = await client.useVersion([0, 1, 2]);
+      const {version, isFederated, federationEndpoints} = await client.useVersion(0, 2);
       expect(version).toBe(1);
       expect(isFederated).toBe(false);
       expect(federationEndpoints).toBe(true);
@@ -120,7 +120,7 @@ describe('APIClient', () => {
         .get('/api-version')
         .reply(200, {supported: [0, 1], development: [2]});
       const client = new APIClient();
-      const {version, isFederated, federationEndpoints} = await client.useVersion([0, 1, 2], true);
+      const {version, isFederated, federationEndpoints} = await client.useVersion(0, 2, true);
       expect(version).toBe(2);
       expect(isFederated).toBe(false);
       expect(federationEndpoints).toBe(true);
@@ -131,7 +131,7 @@ describe('APIClient', () => {
         .get('/api-version')
         .reply(200, {supported: [0, 1], development: [2]});
       const client = new APIClient();
-      const {version, isFederated, federationEndpoints} = await client.useVersion([0, 1, 2], false);
+      const {version, isFederated, federationEndpoints} = await client.useVersion(0, 2, false);
       expect(version).toBe(1);
       expect(isFederated).toBe(false);
       expect(federationEndpoints).toBe(true);
@@ -142,7 +142,7 @@ describe('APIClient', () => {
         .get('/api-version')
         .reply(200, {supported: [0, 1], development: [2]});
       const client = new APIClient();
-      const {version, isFederated, federationEndpoints} = await client.useVersion([0, 1], true);
+      const {version, isFederated, federationEndpoints} = await client.useVersion(0, 1, true);
       expect(version).toBe(1);
       expect(isFederated).toBe(false);
       expect(federationEndpoints).toBe(true);
@@ -152,7 +152,7 @@ describe('APIClient', () => {
       const response: BackendVersionResponse = {supported: [0, 1], federation: true};
       nock(baseUrl).get('/api-version').reply(200, response);
       const client = new APIClient();
-      const {isFederated} = await client.useVersion([0, 1, 2]);
+      const {isFederated} = await client.useVersion(0, 2);
       expect(isFederated).toBe(true);
     });
   });
