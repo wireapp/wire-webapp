@@ -106,6 +106,7 @@ export const subscribeToEpochUpdates = async (
 
   const forwardNewEpoch = async ({groupId, epoch}: {groupId: string; epoch: number}) => {
     if (groupId !== subconversationGroupId) {
+      // if the epoch update did not happen in the subconversation directly, check if it happened in the parent conversation
       const parentConversation = conversationState.findConversationByGroupId(groupId);
       if (!parentConversation) {
         return;
@@ -116,6 +117,7 @@ export const subscribeToEpochUpdates = async (
         SUBCONVERSATION_ID.CONFERENCE,
       );
 
+      // if the conference subconversation of parent conversation is not known, ignore the epoch update
       if (foundSubconversationGroupId !== subconversationGroupId) {
         return;
       }
