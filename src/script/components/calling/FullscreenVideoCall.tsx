@@ -213,13 +213,14 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
             users={conversationParticipants}
             classifiedDomains={classifiedDomains}
             style={{
-              display: 'inline-block',
-              left: '12px',
               lineHeight: '1.5em',
               margin: '1em 0',
               padding: '0 1em',
               position: 'absolute',
-              width: 'auto',
+              display: 'flex',
+              right: 0,
+              left: 0,
+              bottom: 100,
             }}
           />
         )}
