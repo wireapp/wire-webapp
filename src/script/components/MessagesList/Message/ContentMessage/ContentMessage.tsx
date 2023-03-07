@@ -27,7 +27,10 @@ import {Conversation} from 'src/script/entity/Conversation';
 import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {Message} from 'src/script/entity/message/Message';
+import {Text} from 'src/script/entity/message/Text';
+import {MentionEntity} from 'src/script/message/MentionEntity';
 import {StatusType} from 'src/script/message/StatusType';
+import {useMainViewModel} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getMessageAriaLabel} from 'Util/conversationMessages';
 import {KEY} from 'Util/KeyboardUtil';
@@ -191,6 +194,21 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
     }
   };
 
+  const mainViewModel = useMainViewModel();
+  const {content: contentViewModel} = mainViewModel;
+  const {messageRepository} = contentViewModel;
+
+  const isTextAsset = message.getFirstAsset().isText();
+
+  const handleRetrySending = async () => {
+    const messageAssets: Text = isTextAsset && message.getFirstAsset();
+    const mentions: MentionEntity[] = messageAssets?.mentions() && messageAssets?.mentions();
+    const quotes = message.quote();
+    const messageId = message.id;
+    const messageText = message.getFirstAsset().text;
+    await messageRepository.sendTextWithLinkPreview(conversation, messageText, mentions, quotes, messageId);
+  };
+
   const [messageAriaLabel] = getMessageAriaLabel({
     assets,
     displayTimestampShort: message.displayTimestampShort(),
@@ -237,7 +255,14 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
           <PartialFailureToSendWarning failedToSend={failedToSend} knownUsers={conversation.allUserEntities} />
         )}
 
-        {status === StatusType.FAILED && <CompleteFailureToSendWarning conversation={conversation} message={message} />}
+        {status === StatusType.FAILED && (
+          <CompleteFailureToSendWarning
+            isTextAsset={isTextAsset}
+            handleRetry={async () => {
+              await handleRetrySending();
+            }}
+          />
+        )}
 
         {!other_likes.length && message.isReactable() && (
           <div className="message-body-like">

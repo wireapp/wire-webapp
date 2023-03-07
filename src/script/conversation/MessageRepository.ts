@@ -333,13 +333,14 @@ export class MessageRepository {
     textMessage: string,
     mentions: MentionEntity[],
     quoteEntity?: OutgoingQuote,
+    messageId?: string,
   ): Promise<void> {
     const textPayload = {
       conversation,
       mentions,
       message: textMessage,
-      messageId: createRandomUuid(), // We set the id explicitely in order to be able to override the message if we generate a link preview
       quote: quoteEntity,
+      messageId: messageId ? messageId : createRandomUuid(), // We set the id explicitely in order to be able to override the message if we generate a link preview
     };
     const {state} = await this.sendText(textPayload);
     if (state !== MessageSendingState.CANCELED) {
