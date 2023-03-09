@@ -342,23 +342,6 @@ export class MessageRepository {
     }
   }
 
-  public async handleRetryAttempt(
-    conversation: Conversation,
-    textMessage: string,
-    messageId: string,
-    quoteEntity?: OutgoingQuote,
-  ): Promise<void> {
-    const textPayload = {
-      conversation,
-      messageId: messageId,
-      message: textMessage,
-      quote: quoteEntity,
-    };
-    const {state} = await this.sendText(textPayload, {syncTimestamp: true});
-    if (state !== MessageSendingState.CANCELED) {
-      await this.handleLinkPreview(textPayload);
-    }
-  }
   /**
    * Send edited message in specified conversation.
    *

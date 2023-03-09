@@ -204,10 +204,9 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   const mainViewModel = useMainViewModel();
   const {content: contentViewModel} = mainViewModel;
   const {messageRepository} = contentViewModel;
+  const eventRepository = contentViewModel.repositories.event;
 
   const isTextAsset = message.getFirstAsset().isText();
-
-  const eventRepository = contentViewModel.repositories.event;
 
   const handleRetrySending = async () => {
     const firstAsset = message.getFirstAsset();
