@@ -21,6 +21,7 @@ import React, {useEffect} from 'react';
 
 import {FallbackProps} from 'react-error-boundary';
 
+import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 
 import {PrimaryModal} from './Modals/PrimaryModal';
@@ -34,15 +35,15 @@ const ErrorFallback: React.FC<FallbackProps> = ({error, resetErrorBoundary}) => 
       preventClose: true,
       secondaryAction: {
         action: resetErrorBoundary,
-        text: 'Try again',
+        text: t('unknownApplicationErrorTryAgain'),
       },
       primaryAction: {
         action: () => window.location.reload(),
-        text: 'Reload',
+        text: t('unknownApplicationErrorReload'),
       },
       text: {
-        message: error.message,
-        title: error.name,
+        message: t('unknownApplicationErrorDescription'),
+        title: t('unknownApplicationErrorTitle'),
       },
     });
   }, [error, resetErrorBoundary]);
