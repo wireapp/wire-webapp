@@ -29,7 +29,7 @@ import {t} from 'Util/LocalizerUtil';
 import {EmojiPickerContainer} from './EmojiPicker';
 import {MessageActionsId} from './MessageActions';
 import {useMessageActionsState} from './MessageActions.state';
-import {messageActionsMenuButton, getActionsMenuCSS, getIconCSS} from './MessageActions.styles';
+import {messageActionsMenuButton, getActionsMenuCSS, getIconCSS, reactionImgSize} from './MessageActions.styles';
 
 import {MessageRepository} from '../../../../../conversation/MessageRepository';
 
@@ -189,7 +189,12 @@ const MessageReactions: FC<MessageReactionsProps> = ({
         onClick={handleMsgActionClick}
         onKeyDown={handleMsgActionKeyDown}
       >
-        <span aria-hidden={true}>{thumbsUpEmoji}</span>
+        <img
+          src="/image/emojis/img-apple-64/1f44d.png"
+          alt={t('accessibility.messageActionsMenuThumbsUp')}
+          loading="eager"
+          css={reactionImgSize}
+        />
       </button>
       <button
         css={{
@@ -205,7 +210,13 @@ const MessageReactions: FC<MessageReactionsProps> = ({
         onClick={handleMsgActionClick}
         onKeyDown={handleMsgActionKeyDown}
       >
-        <span aria-hidden={true}>{likeEmoji}</span>
+        <img
+          src="/image/emojis/img-apple-64/2764-fe0f.png"
+          alt={t('accessibility.messageActionsMenuLike')}
+          loading="eager"
+          css={reactionImgSize}
+          aria-hidden={true}
+        />
       </button>
       <button
         css={{
