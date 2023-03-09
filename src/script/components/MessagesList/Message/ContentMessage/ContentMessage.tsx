@@ -32,10 +32,12 @@ import {Message} from 'src/script/entity/message/Message';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getMessageAriaLabel} from 'Util/conversationMessages';
 import {t} from 'Util/LocalizerUtil';
+import {transformReactionObj} from 'Util/ReactionUtil';
 
 import {ContentAsset} from './asset';
 import {MessageActionsMenu} from './MessageActions/MessageActions';
 import {useMessageActionsState} from './MessageActions/MessageActions.state';
+import {MessageReactionsList} from './MessageActions/MessageReactionsList';
 import {Quote} from './MessageQuote';
 import {FailedToSendWarning} from './Warnings';
 
@@ -100,21 +102,6 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
       'failedToSend',
       'reactions',
     ]);
-
-  function transformReactionObj(reactions: {[key: string]: string}) {
-    const reactionsGroupByUser: {[key: string]: string[]} = {};
-    for (const user in reactions) {
-      const userReactions = reactions[user] && reactions[user].split(',');
-      for (const reaction of userReactions) {
-        if (reactionsGroupByUser[reaction]) {
-          reactionsGroupByUser[reaction].push(user);
-        } else {
-          reactionsGroupByUser[reaction] = [user];
-        }
-      }
-    }
-    return reactionsGroupByUser;
-  }
 
   const reactionGroupedByUser = transformReactionObj(reactions);
 
@@ -225,7 +212,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
       onMouseLeave={event => {
         // close floating message actions when no active menu is open like context menu/emoji picker
         if (!isMenuOpen) {
-          setActionMenuVisibility(false);
+          setActionMenuVisibility(true);
         }
       }}
     >
@@ -301,15 +288,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
         </div>
       )} */}
       {/* IN-PROGRESS */}
-      <div className="reactionContainer">
-        {reactionGroupedByUser &&
-          Object.entries(reactionGroupedByUser).map(([emoji, users], index) => (
-            <div key={index} className="reactionBox">
-              <span>{emoji}</span>
-              <span>({users.length})</span>
-            </div>
-          ))}
-      </div>
+      <MessageReactionsList reactionGroupedByUser={reactionGroupedByUser} />
     </div>
   );
 };
