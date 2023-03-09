@@ -843,6 +843,9 @@ export class ConversationRepository {
     if (!conversationEntity) {
       return;
     }
+
+    this.leaveCall(conversationEntity.qualifiedId, LEAVE_CALL_REASON.USER_MANUALY_LEFT_CONVERSATION);
+
     if (this.conversationState.isActiveConversation(conversationEntity)) {
       const nextConversation = this.getNextConversation(conversationEntity);
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversation, {});
