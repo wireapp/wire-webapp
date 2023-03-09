@@ -31,6 +31,7 @@ interface EmojiPickerContainerProps {
   handleEscape: () => void;
   resetActionMenuStates: () => void;
   wrapperRef: RefObject<HTMLDivElement>;
+  handleReactionClick: (emoji: string) => void;
 }
 
 const EmojiPickerContainer: FC<EmojiPickerContainerProps> = ({
@@ -39,6 +40,7 @@ const EmojiPickerContainer: FC<EmojiPickerContainerProps> = ({
   handleEscape,
   resetActionMenuStates,
   wrapperRef,
+  handleReactionClick,
 }) => {
   const [selectedEmoji, setSelectedEmoji] = useState<string>('');
   const emojiRef = useRef<HTMLDivElement>(null);
@@ -77,8 +79,14 @@ const EmojiPickerContainer: FC<EmojiPickerContainerProps> = ({
     return () => window.removeEventListener('resize', updateSize);
   }, [posX, posY]);
 
-  function onClick(emojiData: EmojiClickData, event: MouseEvent) {
+  function onEmojiClick(emojiData: EmojiClickData, event: MouseEvent) {
     setSelectedEmoji(emojiData.unified);
+    handleReactionClick(emojiData.emoji);
+  }
+
+  // Maps to the static server emojis url
+  function getEmojiUrl(unicode: string) {
+    return `/image/emojis/img-apple-64/${unicode}.png`;
   }
   return (
     <>
@@ -93,7 +101,7 @@ const EmojiPickerContainer: FC<EmojiPickerContainerProps> = ({
           }}
         >
           <div ref={emojiRef} style={{maxHeight: window.innerHeight, ...style}}>
-            <EmojiPicker onEmojiClick={onClick} />
+            <EmojiPicker onEmojiClick={onEmojiClick} getEmojiUrl={getEmojiUrl} />
           </div>
           <p>{selectedEmoji}</p>
         </div>,

@@ -24,6 +24,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {Icon} from 'Components/Icon';
 import {Config} from 'src/script/Config';
+import {MessageRepository} from 'src/script/conversation/MessageRepository';
 import {Conversation} from 'src/script/entity/Conversation';
 import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
@@ -33,13 +34,12 @@ import {getMessageAriaLabel} from 'Util/conversationMessages';
 import {t} from 'Util/LocalizerUtil';
 
 import {ContentAsset} from './asset';
-import {MessageActions} from './MessageActions/MessageActions';
+import {MessageActionsMenu} from './MessageActions/MessageActions';
 import {useMessageActionsState} from './MessageActions/MessageActions.state';
-import {MessageFooterLike} from './MessageFooterLike';
-import {MessageLike} from './MessageLike';
 import {Quote} from './MessageQuote';
 import {FailedToSendWarning} from './Warnings';
 
+import {MessageActions} from '..';
 import {EphemeralStatusType} from '../../../../message/EphemeralStatusType';
 import {ContextMenuEntry} from '../../../../ui/ContextMenu';
 import {EphemeralTimer} from '../EphemeralTimer';
@@ -59,6 +59,7 @@ export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetS
   quotedMessage?: ContentMessage;
   selfId: QualifiedId;
   isMsgElementsFocusable: boolean;
+  messageRepository: MessageRepository;
 }
 
 const ContentMessageComponent: React.FC<ContentMessageProps> = ({
@@ -66,7 +67,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   message,
   findMessage,
   selfId,
-  hasMarker,
+  hasMarker = false,
   isMessageFocused,
   isLastDeliveredMessage,
   contextMenu,
@@ -80,13 +81,14 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   onClickButton,
   onLike,
   isMsgElementsFocusable,
+  messageRepository,
 }) => {
   const msgFocusState = useMemo(
     () => isMsgElementsFocusable && isMessageFocused,
     [isMsgElementsFocusable, isMessageFocused],
   );
   const messageFocusedTabIndex = useMessageFocusedTabIndex(msgFocusState);
-  const {headerSenderName, ephemeral_caption, ephemeral_status, assets, other_likes, was_edited, failedToSend} =
+  const {headerSenderName, ephemeral_caption, ephemeral_status, assets, was_edited, failedToSend, reactions} =
     useKoSubscribableChildren(message, [
       'headerSenderName',
       'timestamp',
@@ -96,7 +98,25 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
       'other_likes',
       'was_edited',
       'failedToSend',
+      'reactions',
     ]);
+
+  function transformReactionObj(reactions: {[key: string]: string}) {
+    const reactionsGroupByUser: {[key: string]: string[]} = {};
+    for (const user in reactions) {
+      const userReactions = reactions[user] && reactions[user].split(',');
+      for (const reaction of userReactions) {
+        if (reactionsGroupByUser[reaction]) {
+          reactionsGroupByUser[reaction].push(user);
+        } else {
+          reactionsGroupByUser[reaction] = [user];
+        }
+      }
+    }
+    return reactionsGroupByUser;
+  }
+
+  const reactionGroupedByUser = transformReactionObj(reactions);
 
   const shouldShowAvatar = (): boolean => {
     if (!previousMessage || hasMarker) {
@@ -245,7 +265,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
 
         {failedToSend && <FailedToSendWarning failedToSend={failedToSend} knownUsers={conversation.allUserEntities} />}
 
-        {!other_likes.length && message.isReactable() && (
+        {/* {!other_likes.length && message.isReactable() && (
           <div className="message-body-like">
             <MessageLike
               className="message-body-like-icon like-button message-show-on-hover"
@@ -254,19 +274,22 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
               isMessageFocused={msgFocusState}
             />
           </div>
-        )}
+        )} */}
         {isActionMenuVisible && isReactionFeatureEnabled && (
-          <MessageActions
+          <MessageActionsMenu
             isMsgWithHeader={shouldShowAvatar()}
+            conversation={conversation}
             message={message}
             handleActionMenuVisibility={setActionMenuVisibility}
             contextMenu={contextMenu}
             isMessageFocused={msgFocusState}
+            messageRepository={messageRepository}
+            messageWithSection={hasMarker}
           />
         )}
       </div>
 
-      {other_likes.length > 0 && (
+      {/* {other_likes.length > 0 && (
         <div>
           <MessageFooterLike
             message={message}
@@ -276,7 +299,17 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             isMessageFocused={msgFocusState}
           />
         </div>
-      )}
+      )} */}
+      {/* IN-PROGRESS */}
+      <div className="reactionContainer">
+        {reactionGroupedByUser &&
+          Object.entries(reactionGroupedByUser).map(([emoji, users], index) => (
+            <div key={index} className="reactionBox">
+              <span>{emoji}</span>
+              <span>({users.length})</span>
+            </div>
+          ))}
+      </div>
     </div>
   );
 };

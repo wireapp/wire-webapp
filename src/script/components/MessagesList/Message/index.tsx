@@ -220,21 +220,23 @@ const Message: React.FC<
       data-uie-name="item-message"
       role="list"
     >
-      <div className={cx('message-header message-timestamp', getTimestampClass())}>
-        <div className="message-header-icon">
-          <span className="message-unread-dot" />
+      {markerType !== MessageMarkerType.NONE ? (
+        <div className={cx('message-header message-timestamp', getTimestampClass())}>
+          <div className="message-header-icon">
+            <span className="message-unread-dot" />
+          </div>
+
+          <h3 className="message-header-label">
+            <MessageTime timestamp={timestamp} className="label-xs" data-timestamp-type="normal">
+              {timeAgo}
+            </MessageTime>
+
+            <MessageTime timestamp={timestamp} data-timestamp-type="day" className="label-bold-xs">
+              {timeAgoDay}
+            </MessageTime>
+          </h3>
         </div>
-
-        <h3 className="message-header-label">
-          <MessageTime timestamp={timestamp} className="label-xs" data-timestamp-type="normal">
-            {timeAgo}
-          </MessageTime>
-
-          <MessageTime timestamp={timestamp} data-timestamp-type="day" className="label-bold-xs">
-            {timeAgoDay}
-          </MessageTime>
-        </h3>
-      </div>
+      ) : null}
 
       {/*eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions*/}
       <div

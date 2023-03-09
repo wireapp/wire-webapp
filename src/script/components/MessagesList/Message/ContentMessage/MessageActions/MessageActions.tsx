@@ -24,6 +24,7 @@ import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Icon} from 'Components/Icon';
+import {Conversation} from 'src/script/entity/Conversation';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/ContextMenu';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -42,6 +43,7 @@ import {
 } from './MessageActions.styles';
 import {MessageReactions} from './MessageReactions';
 
+import {MessageRepository} from '../../../../../conversation/MessageRepository';
 import {useMessageFocusedTabIndex} from '../../util';
 
 export const MessageActionsId = {
@@ -52,26 +54,32 @@ export const MessageActionsId = {
   OPTIONS: 'go-options',
 } as const;
 
-export interface MessageActionsProps {
+export interface MessageActionsMenuProps {
   isMsgWithHeader: boolean;
   message: ContentMessage;
+  conversation: Conversation;
   contextMenu: {entries: ko.Subscribable<ContextMenuEntry[]>};
   isMessageFocused: boolean;
   handleActionMenuVisibility: (isVisible: boolean) => void;
+  messageWithSection: boolean;
+  messageRepository: MessageRepository;
 }
 
-const MessageActions: FC<MessageActionsProps> = ({
+const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
   isMsgWithHeader,
-  message,
   contextMenu,
   isMessageFocused,
   handleActionMenuVisibility,
+  conversation,
+  message,
+  messageRepository,
+  messageWithSection,
 }) => {
   const {entries: menuEntries} = useKoSubscribableChildren(contextMenu, ['entries']);
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
   const [currentMsgActionName, setCurrentMsgAction] = useState('');
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const mesageReactionTop = isMsgWithHeader ? messageWithHeaderTop : null;
+  const mesageReactionTop = isMsgWithHeader && messageWithSection ? messageWithHeaderTop : null;
   const {handleMenuOpen} = useMessageActionsState();
 
   const resetActionMenuStates = useCallback(() => {
@@ -145,6 +153,9 @@ const MessageActions: FC<MessageActionsProps> = ({
           handleKeyDown={handleKeyDown}
           resetActionMenuStates={resetActionMenuStates}
           wrapperRef={wrapperRef}
+          conversation={conversation}
+          message={message}
+          messageRepository={messageRepository}
         />
         <button
           css={{
@@ -188,4 +199,4 @@ const MessageActions: FC<MessageActionsProps> = ({
   );
 };
 
-export {MessageActions};
+export {MessageActionsMenu};

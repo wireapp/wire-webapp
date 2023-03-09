@@ -19,6 +19,10 @@
 
 import {useState, useEffect, useCallback, RefObject, FC} from 'react';
 
+import {ReactionType} from '@wireapp/core/lib/conversation';
+
+import {Conversation} from 'src/script/entity/Conversation';
+import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -26,6 +30,11 @@ import {EmojiPickerContainer} from './EmojiPicker';
 import {MessageActionsId} from './MessageActions';
 import {useMessageActionsState} from './MessageActions.state';
 import {messageActionsMenuButton, getActionsMenuCSS, getIconCSS} from './MessageActions.styles';
+
+import {MessageRepository} from '../../../../../conversation/MessageRepository';
+
+const thumbsUpEmoji = '👍';
+const likeEmoji = '❤️';
 
 export interface MessageReactionsProps {
   messageFocusedTabIndex: number;
@@ -37,6 +46,9 @@ export interface MessageReactionsProps {
   handleCurrentMsgAction: (actionName: string) => void;
   resetActionMenuStates: () => void;
   wrapperRef: RefObject<HTMLDivElement>;
+  conversation: Conversation;
+  message: ContentMessage;
+  messageRepository: MessageRepository;
 }
 
 const MessageReactions: FC<MessageReactionsProps> = ({
@@ -47,6 +59,9 @@ const MessageReactions: FC<MessageReactionsProps> = ({
   handleKeyDown,
   resetActionMenuStates,
   wrapperRef,
+  message,
+  conversation,
+  messageRepository,
 }) => {
   const isThumbUpAction = currentMsgActionName === MessageActionsId.THUMBSUP;
   const isLikeAction = currentMsgActionName === MessageActionsId.HEART;
@@ -123,9 +138,11 @@ const MessageReactions: FC<MessageReactionsProps> = ({
           break;
         case MessageActionsId.THUMBSUP:
           toggleActiveMessageAction(event);
+          handleReactionClick(thumbsUpEmoji);
           break;
         case MessageActionsId.HEART:
           toggleActiveMessageAction(event);
+          handleReactionClick(likeEmoji);
           break;
       }
     },
@@ -150,6 +167,12 @@ const MessageReactions: FC<MessageReactionsProps> = ({
     [handleEmojiKeyDown, handleKeyDown],
   );
 
+  const handleReactionClick = useCallback(
+    (reaction: ReactionType) => {
+      messageRepository.onReactionClick(conversation, message, reaction);
+    },
+    [conversation, message, messageRepository],
+  );
   return (
     <>
       <button
@@ -166,7 +189,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
         onClick={handleMsgActionClick}
         onKeyDown={handleMsgActionKeyDown}
       >
-        <span aria-hidden={true}>👍</span>
+        <span aria-hidden={true}>{thumbsUpEmoji}</span>
       </button>
       <button
         css={{
@@ -182,7 +205,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
         onClick={handleMsgActionClick}
         onKeyDown={handleMsgActionKeyDown}
       >
-        <span aria-hidden={true}>❤️</span>
+        <span aria-hidden={true}>{likeEmoji}</span>
       </button>
       <button
         css={{
@@ -221,6 +244,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
           handleEscape={closeEmojiPicker}
           resetActionMenuStates={resetActionMenuStates}
           wrapperRef={wrapperRef}
+          handleReactionClick={handleReactionClick}
         />
       ) : null}
     </>

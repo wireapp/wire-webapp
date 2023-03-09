@@ -778,6 +778,12 @@ export class MessageRepository {
     }
   }
 
+  public onReactionClick(conversationEntity: Conversation, message_et: ContentMessage, reaction: string): void {
+    if (!conversationEntity.removed_from_conversation()) {
+      window.setTimeout(() => this.sendReaction(conversationEntity, message_et, reaction), 100);
+    }
+  }
+
   async resetSession(userId: QualifiedId, clientId: string, conversation: Conversation): Promise<void> {
     this.logger.info(`Resetting session with client '${clientId}' of user '${userId.id}'.`);
 
@@ -884,8 +890,14 @@ export class MessageRepository {
    * @param reactionType Reaction
    * @returns Resolves after sending the reaction
    */
-  private async sendReaction(conversation: Conversation, messageEntity: Message, reactionType: ReactionType) {
-    const reaction = MessageBuilder.buildReactionMessage({originalMessageId: messageEntity.id, type: reactionType});
+  // private async sendReaction(conversation: Conversation, messageEntity: Message, string: string) {
+  //   const reaction = MessageBuilder.buildReactionMessage({originalMessageId: messageEntity.id, type: string});
+
+  //   return this.sendAndInjectMessage(reaction, conversation);
+  // }
+
+  private async sendReaction(conversation: Conversation, messageEntity: Message, reactions: ReactionType) {
+    const reaction = MessageBuilder.buildReactionMessage({originalMessageId: messageEntity.id, type: reactions});
 
     return this.sendAndInjectMessage(reaction, conversation);
   }

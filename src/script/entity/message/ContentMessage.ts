@@ -131,8 +131,8 @@ export class ContentMessage extends Message {
   }): false | {reactions: UserReactionMap; version: number} {
     const reaction = event_data && event_data.reaction;
     const hasUser = this.reactions()[from];
-    const shouldAdd = reaction && !hasUser;
-    const shouldDelete = !reaction && hasUser;
+    const shouldAdd = hasUser ? !hasUser.includes(reaction) : true;
+    const shouldDelete = hasUser && hasUser.includes(reaction);
 
     if (!shouldAdd && !shouldDelete) {
       return false;
@@ -141,11 +141,23 @@ export class ContentMessage extends Message {
     const newReactions = {...this.reactions()};
 
     if (shouldAdd) {
-      newReactions[from] = reaction;
+      const msgReactions = {...this.reactions()};
+      const msgReactionsByUser = msgReactions && msgReactions[from];
+      if (msgReactionsByUser) {
+        let msgReactionsUserArr = msgReactionsByUser.split(',');
+        msgReactionsUserArr = [...msgReactionsUserArr, reaction];
+        newReactions[from] = msgReactionsUserArr.join(',');
+      } else {
+        newReactions[from] = reaction;
+      }
     } else {
-      delete newReactions[from];
+      const msgReactions = {...this.reactions()};
+      const msgReactionsByUser = msgReactions && msgReactions[from].split(',');
+      const filtered = msgReactionsByUser.filter(value => {
+        return value !== reaction;
+      });
+      newReactions[from] = filtered.length ? filtered.join(',') : '';
     }
-
     return {reactions: newReactions, version: this.version + 1};
   }
 

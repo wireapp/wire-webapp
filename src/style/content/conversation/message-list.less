@@ -264,10 +264,6 @@
     max-height: 40px;
   }
 
-  &:not(.message-timestamp-visible) {
-    display: none;
-  }
-
   .message-unread-dot {
     .dot-md;
     background-color: var(--accent-color);
@@ -880,4 +876,16 @@
   left: 0;
   width: 100vw;
   height: 100vh;
+}
+
+.reactionContainer {
+  display: flex;
+  padding: 1rem;
+  gap: 0.5rem;
+}
+.reactionBox {
+  padding: 0.1rem;
+  border: 1px solid #326499;
+  border-radius: 4px;
+  background: #19324d;
 }
