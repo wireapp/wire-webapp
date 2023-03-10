@@ -334,7 +334,9 @@ export class MessageRepository {
       mentions,
       message: textMessage,
       quote: quoteEntity,
-      messageId: messageId ? messageId : createRandomUuid(), // We set the id explicitely in order to be able to override the message if we generate a link preview
+      // We set the id explicitely in order to be able to override the message if we generate a link preview
+      // Similarly, we provide that same id when we retry to send a failed message in order to override the original
+      messageId: messageId ?? createRandomUuid(),
     };
     const {state} = await this.sendText(textPayload);
     if (state !== MessageSendingState.CANCELED) {
