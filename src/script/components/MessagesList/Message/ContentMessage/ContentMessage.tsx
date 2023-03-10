@@ -30,7 +30,6 @@ import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {Message} from 'src/script/entity/message/Message';
 import {Text} from 'src/script/entity/message/Text';
 import {MentionEntity} from 'src/script/message/MentionEntity';
-import {MessageHasher} from 'src/script/message/MessageHasher';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
 import {StatusType} from 'src/script/message/StatusType';
 import {useMainViewModel} from 'src/script/page/RootProvider';
@@ -204,27 +203,26 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   const mainViewModel = useMainViewModel();
   const {content: contentViewModel} = mainViewModel;
   const {messageRepository} = contentViewModel;
-  const eventRepository = contentViewModel.repositories.event;
 
   const isTextAsset = message.getFirstAsset().isText();
 
   const handleRetrySending = async () => {
     const firstAsset = message.getFirstAsset();
+
     if (firstAsset instanceof Text) {
-      const mentions: MentionEntity[] = firstAsset.mentions() && firstAsset.mentions();
-      const quotes = await eventRepository.eventService
-        .loadEvent(message.conversation_id, message.id)
-        .then(MessageHasher.hashEvent)
-        .then((messageHash: ArrayBuffer) => {
-          return new QuoteEntity({
-            hash: messageHash,
-            messageId: message.id,
-            userId: message.from,
-          }) as OutgoingQuote;
-        });
       const messageId = message.id;
       const messageText = message.getFirstAsset().text;
-      await messageRepository.sendTextWithLinkPreview(conversation, messageText, mentions, quotes, messageId);
+      const mentions: MentionEntity[] = firstAsset.mentions() && firstAsset.mentions();
+      const incomingQuote = message.quote();
+
+      const isOutgoingQuote = (quoteEntity: QuoteEntity): quoteEntity is OutgoingQuote => {
+        return quoteEntity.hash !== undefined;
+      };
+
+      const quote: OutgoingQuote | undefined =
+        incomingQuote && isOutgoingQuote(incomingQuote) ? (incomingQuote as OutgoingQuote) : undefined;
+
+      await messageRepository.sendTextWithLinkPreview(conversation, messageText, mentions, quote, messageId);
     }
   };
 

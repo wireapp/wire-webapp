@@ -145,8 +145,8 @@ export class EventMapper {
     const {id, data: eventData, edited_time: editedTime, conversation, qualified_conversation} = event;
 
     if (eventData.quote) {
-      const {message_id: messageId, user_id: userId, error} = eventData.quote;
-      originalEntity.quote(new QuoteEntity({error, messageId, userId}));
+      const {hash: hash, message_id: messageId, user_id: userId, error} = eventData.quote;
+      originalEntity.quote(new QuoteEntity({error, hash, messageId, userId}));
     }
 
     if (id !== originalEntity.id && originalEntity.hasAssetText()) {
