@@ -24,11 +24,20 @@ import {act, render, waitFor} from '@testing-library/react';
 import {Conversation} from 'src/script/entity/Conversation';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {User} from 'src/script/entity/User';
+import {RootProvider} from 'src/script/page/RootProvider';
+import {ContentViewModel} from 'src/script/view_model/ContentViewModel';
+import {MainViewModel} from 'src/script/view_model/MainViewModel';
 import {createRandomUuid} from 'Util/util';
 
 import {Text} from '../../entity/message/Text';
 
 import {MessagesList} from './';
+
+const mainViewModel = {
+  content: {
+    repositories: {} as any,
+  } as ContentViewModel,
+} as MainViewModel;
 
 const getDefaultParams = (): React.ComponentProps<typeof MessagesList> => {
   const conversation = new Conversation(createRandomUuid());
@@ -81,7 +90,11 @@ describe('MessagesList', () => {
     const params = getDefaultParams();
     params.conversation.addMessage(createTextMessage('hello'));
 
-    const {getByText} = render(<MessagesList {...params} />);
+    const {getByText} = render(
+      <RootProvider value={mainViewModel}>
+        <MessagesList {...params} />
+      </RootProvider>,
+    );
     await waitFor(() => getByText('hello'));
     expect(params.onLoading).toHaveBeenCalled();
     expect(params.conversationRepository.getPrecedingMessages).toHaveBeenCalled();
@@ -91,7 +104,11 @@ describe('MessagesList', () => {
     const params = getDefaultParams();
     params.conversation.addMessage(createTextMessage('first'));
 
-    const {getByText} = render(<MessagesList {...params} />);
+    const {getByText} = render(
+      <RootProvider value={mainViewModel}>
+        <MessagesList {...params} />
+      </RootProvider>,
+    );
     await waitFor(() => getByText('first'));
 
     act(() => {

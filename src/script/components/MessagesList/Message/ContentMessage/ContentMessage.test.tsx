@@ -22,6 +22,8 @@ import ko from 'knockout';
 
 import {LinkPreview} from 'src/script/entity/message/LinkPreview';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
+import {RootProvider} from 'src/script/page/RootProvider';
+import {ContentViewModel} from 'src/script/view_model/ContentViewModel';
 
 import {ContentMessageComponent, ContentMessageProps} from './ContentMessage';
 
@@ -30,10 +32,17 @@ import {ContentMessage} from '../../../../entity/message/ContentMessage';
 import {Text} from '../../../../entity/message/Text';
 import {User} from '../../../../entity/User';
 import {createRandomUuid} from '../../../../util/util';
+import {MainViewModel} from '../../../../view_model/MainViewModel';
 
 describe('message', () => {
   let defaultParams: ContentMessageProps;
   const textValue = 'hello';
+
+  const mainViewModel = {
+    content: {
+      repositories: {} as any,
+    } as ContentViewModel,
+  } as MainViewModel;
 
   beforeEach(() => {
     const message = new ContentMessage();
@@ -67,7 +76,11 @@ describe('message', () => {
   });
 
   it('displays a message', () => {
-    const {getByText} = render(<ContentMessageComponent {...defaultParams} />);
+    const {getByText} = render(
+      <RootProvider value={mainViewModel}>
+        <ContentMessageComponent {...defaultParams} />
+      </RootProvider>,
+    );
     expect(getByText(textValue)).toBeDefined();
   });
 
@@ -75,7 +88,11 @@ describe('message', () => {
     const linkPreview = new LinkPreview({title: 'A link to the past'});
     (defaultParams.message.getFirstAsset() as Text).previews([linkPreview]);
 
-    const {getByText} = render(<ContentMessageComponent {...defaultParams} />);
+    const {getByText} = render(
+      <RootProvider value={mainViewModel}>
+        <ContentMessageComponent {...defaultParams} />
+      </RootProvider>,
+    );
     expect(getByText(linkPreview.title)).not.toBe(null);
   });
 
@@ -92,8 +109,12 @@ describe('message', () => {
     message.quote(new QuoteEntity({messageId: quotedMessage.id, userId: ''}));
 
     const {getByText} = render(
-      <ContentMessageComponent {...defaultParams} message={message} findMessage={findMessage} />,
+      <RootProvider value={mainViewModel}>
+        <ContentMessageComponent {...defaultParams} message={message} findMessage={findMessage} />
+      </RootProvider>,
     );
-    await waitFor(() => getByText(quoteText));
+    expect(await waitFor(() => getByText(quoteText))).not.toBe(null);
+
+    //await waitFor(() => getByText(quoteText));
   });
 });

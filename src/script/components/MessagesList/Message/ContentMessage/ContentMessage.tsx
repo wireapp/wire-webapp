@@ -204,8 +204,6 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   const {content: contentViewModel} = mainViewModel;
   const {messageRepository} = contentViewModel;
 
-  const isTextAsset = message.getFirstAsset().isText();
-
   const handleRetrySending = async () => {
     const firstAsset = message.getFirstAsset();
 
@@ -278,7 +276,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
 
         {status === StatusType.FAILED && (
           <CompleteFailureToSendWarning
-            isTextAsset={isTextAsset}
+            isTextAsset={message.getFirstAsset().isText()}
             handleDiscard={async () => {
               await handleDiscard();
             }}
