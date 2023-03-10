@@ -215,7 +215,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
             style={{
               lineHeight: '1.5em',
               margin: '1em 0',
-              padding: '0 1em',
+              // padding: '0 1em',
               position: 'absolute',
               display: 'flex',
               right: 0,

@@ -295,6 +295,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
                 isSelfVerified={isSelfVerified}
                 badge={teamRepository.getRoleBadge(firstParticipant.id)}
                 classifiedDomains={classifiedDomains}
+                classifiedBarStyles={{marginTop: 16}}
               />
 
               <EnrichedFields user={firstParticipant} showDomain={isFederated} />

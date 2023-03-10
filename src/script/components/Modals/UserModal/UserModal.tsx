@@ -198,7 +198,18 @@ const UserModal: React.FC<UserModalProps> = ({
         <div className={cx('modal__body user-modal__wrapper', {'user-modal__wrapper--max': !user && !userNotFound})}>
           {user && (
             <>
-              <UserDetails participant={user} isSelfVerified={isSelfVerified} classifiedDomains={classifiedDomains} />
+              <UserDetails
+                avatarStyles={{
+                  marginTop: 60,
+                }}
+                classifiedBarStyles={{
+                  position: 'absolute',
+                  top: 130,
+                }}
+                participant={user}
+                isSelfVerified={isSelfVerified}
+                classifiedDomains={classifiedDomains}
+              />
 
               <EnrichedFields user={user} showDomain={isFederated} />
 
