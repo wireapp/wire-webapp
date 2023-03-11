@@ -114,7 +114,5 @@ describe('message', () => {
       </RootProvider>,
     );
     expect(await waitFor(() => getByText(quoteText))).not.toBe(null);
-
-    //await waitFor(() => getByText(quoteText));
   });
 });
