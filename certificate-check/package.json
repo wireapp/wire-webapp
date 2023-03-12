@@ -8,7 +8,7 @@
   ],
   "main": "lib/CertUtil",
   "dependencies": {
-    "jsrsasign": "10.6.1"
+    "jsrsasign": "10.7.0"
   },
   "devDependencies": {
     "@swc/core": "^1.3.10",
