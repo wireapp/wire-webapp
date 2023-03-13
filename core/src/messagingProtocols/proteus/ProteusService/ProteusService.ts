@@ -170,8 +170,8 @@ export class ProteusService {
     return this.apiClient.api.conversation.postConversation(payload);
   }
 
-  public async addUsersToConversation({conversationId, qualifiedUserIds}: AddUsersToProteusConversationParams) {
-    return this.apiClient.api.conversation.postMembers(conversationId, qualifiedUserIds);
+  public async addUsersToConversation({conversationId, qualifiedUsers}: AddUsersToProteusConversationParams) {
+    return this.apiClient.api.conversation.postMembers(conversationId, qualifiedUsers);
   }
 
   public async sendMessage({
