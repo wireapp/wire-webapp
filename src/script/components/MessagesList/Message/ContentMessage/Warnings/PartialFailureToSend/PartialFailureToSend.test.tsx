@@ -25,7 +25,7 @@ import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {setStrings} from 'Util/LocalizerUtil';
 import {createRandomUuid} from 'Util/util';
 
-import {FailedToSendWarning, User} from './FailedToSend';
+import {PartialFailureToSendWarning, User} from './PartialFailureToSend';
 
 setStrings({en});
 function generateUsers(nbUsers: number, domain: string) {
@@ -46,13 +46,13 @@ function generateUserClients(users: User[]): QualifiedUserClients {
   return userClients;
 }
 
-describe('FailedToSendWarning', () => {
+describe('PartialFailureToSendWarning', () => {
   it('displays the number of users that did not get the message', () => {
     const nbUsers = Math.floor(Math.random() * 100);
     const users = generateUsers(nbUsers, 'domain');
 
     const failedToSend = generateUserClients(users);
-    const {container} = render(withTheme(<FailedToSendWarning knownUsers={[]} failedToSend={failedToSend} />));
+    const {container} = render(withTheme(<PartialFailureToSendWarning knownUsers={[]} failedToSend={failedToSend} />));
     expect(container.textContent).toContain(`${nbUsers} Participants had issues receiving this message`);
   });
 
@@ -66,7 +66,7 @@ describe('FailedToSendWarning', () => {
       ...generateUserClients(users1),
       ...generateUserClients(users2),
     };
-    const {container} = render(withTheme(<FailedToSendWarning knownUsers={[]} failedToSend={failedToSend} />));
+    const {container} = render(withTheme(<PartialFailureToSendWarning knownUsers={[]} failedToSend={failedToSend} />));
     expect(container.textContent).toContain(
       `${nbUsersDomain1 + nbUsersDomain2} Participants had issues receiving this message`,
     );
@@ -76,7 +76,7 @@ describe('FailedToSendWarning', () => {
     const users = generateUsers(1, 'domain');
     const failedToSend = generateUserClients(users);
     const {queryByText, container} = render(
-      withTheme(<FailedToSendWarning knownUsers={users} failedToSend={failedToSend} />),
+      withTheme(<PartialFailureToSendWarning knownUsers={users} failedToSend={failedToSend} />),
     );
 
     expect(queryByText('Show details')).toBeNull();
@@ -85,7 +85,7 @@ describe('FailedToSendWarning', () => {
 
   it('toggles the extra info', () => {
     const failedToSend = generateUserClients(generateUsers(2, 'domain'));
-    const {getByText} = render(withTheme(<FailedToSendWarning knownUsers={[]} failedToSend={failedToSend} />));
+    const {getByText} = render(withTheme(<PartialFailureToSendWarning knownUsers={[]} failedToSend={failedToSend} />));
 
     act(() => {
       getByText('Show details').click();
@@ -106,7 +106,7 @@ describe('FailedToSendWarning', () => {
 
     const failedToSend = generateUserClients(users);
     const {getByText, getAllByTestId} = render(
-      withTheme(<FailedToSendWarning knownUsers={users} failedToSend={failedToSend} />),
+      withTheme(<PartialFailureToSendWarning knownUsers={users} failedToSend={failedToSend} />),
     );
 
     act(() => {

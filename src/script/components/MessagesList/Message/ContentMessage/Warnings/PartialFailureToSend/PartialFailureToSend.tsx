@@ -60,7 +60,7 @@ function generateNamedUsers(users: User[], userClients: QualifiedUserClients): P
   );
 }
 
-export const FailedToSendWarning = ({failedToSend, knownUsers}: Props) => {
+export const PartialFailureToSendWarning = ({failedToSend, knownUsers}: Props) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const userCount = Object.entries(failedToSend).reduce(

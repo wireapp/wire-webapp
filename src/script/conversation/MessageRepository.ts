@@ -327,13 +327,16 @@ export class MessageRepository {
     textMessage: string,
     mentions: MentionEntity[],
     quoteEntity?: OutgoingQuote,
+    messageId?: string,
   ): Promise<void> {
     const textPayload = {
       conversation,
       mentions,
       message: textMessage,
-      messageId: createRandomUuid(), // We set the id explicitely in order to be able to override the message if we generate a link preview
       quote: quoteEntity,
+      // We set the id explicitely in order to be able to override the message if we generate a link preview
+      // Similarly, we provide that same id when we retry to send a failed message in order to override the original
+      messageId: messageId ?? createRandomUuid(),
     };
     const {state} = await this.sendText(textPayload);
     if (state !== MessageSendingState.CANCELED) {
@@ -755,12 +758,17 @@ export class MessageRepository {
       return {id: payload.messageId, state: MessageSendingState.CANCELED};
     }
 
-    const result = await this.conversationService.send(sendOptions);
+    try {
+      const result = await this.conversationService.send(sendOptions);
 
-    if (result.state === MessageSendingState.OUTGOING_SENT) {
-      await handleSuccess(result);
+      if (result.state === MessageSendingState.OUTGOING_SENT) {
+        await handleSuccess(result);
+      }
+      return result;
+    } catch (error) {
+      await this.updateMessageAsFailed(conversation, payload.messageId);
+      throw error;
     }
-    return result;
   }
 
   /**
@@ -1124,6 +1132,20 @@ export class MessageRepository {
       if ((EventTypeHandling.STORE as string[]).includes(messageEntity.type) || messageEntity.hasAssetImage()) {
         return await this.eventService.updateEvent(messageEntity.primary_key, changes);
       }
+    } catch (error) {
+      if ((error as any).type !== ConversationError.TYPE.MESSAGE_NOT_FOUND) {
+        throw error;
+      }
+    }
+    return undefined;
+  }
+
+  private async updateMessageAsFailed(conversationEntity: Conversation, eventId: string) {
+    try {
+      const messageEntity = await this.getMessageInConversationById(conversationEntity, eventId);
+      const updatedStatus = StatusType.FAILED;
+      messageEntity.status(updatedStatus);
+      return await this.eventService.updateEvent(messageEntity.primary_key, {status: updatedStatus});
     } catch (error) {
       if ((error as any).type !== ConversationError.TYPE.MESSAGE_NOT_FOUND) {
         throw error;
