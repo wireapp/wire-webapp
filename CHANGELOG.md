@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [39.2.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@39.1.6...@wireapp/core@39.2.0) (2023-03-13)
+
+### Features
+
+* Forward users for which message could not be encrypted to sender ([#4949](https://github.com/wireapp/wire-web-packages/issues/4949)) ([0797eff](https://github.com/wireapp/wire-web-packages/commit/0797eff2926d9665d4c0a23e704a27d0fc50c97f))
+
 ## [39.1.6](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@39.1.5...@wireapp/core@39.1.6) (2023-03-07)
 
 **Note:** Version bump only for package @wireapp/core
