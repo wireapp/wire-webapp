@@ -23,16 +23,11 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {Icon} from 'Components/Icon';
-import {OutgoingQuote} from 'src/script/conversation/MessageRepository';
 import {Conversation} from 'src/script/entity/Conversation';
 import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {Message} from 'src/script/entity/message/Message';
-import {Text} from 'src/script/entity/message/Text';
-import {MentionEntity} from 'src/script/message/MentionEntity';
-import {QuoteEntity} from 'src/script/message/QuoteEntity';
 import {StatusType} from 'src/script/message/StatusType';
-import {useMainViewModel} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getMessageAriaLabel} from 'Util/conversationMessages';
 import {KEY} from 'Util/KeyboardUtil';
@@ -63,6 +58,8 @@ export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetS
   isLastDeliveredMessage: boolean;
   message: ContentMessage;
   onClickButton: (message: CompositeMessage, buttonId: string) => void;
+  onDiscard: () => void;
+  onRetry: (message: ContentMessage) => void;
   previousMessage?: Message;
   quotedMessage?: ContentMessage;
   selfId: QualifiedId;
@@ -87,6 +84,8 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   onClickLikes,
   onClickButton,
   onLike,
+  onDiscard,
+  onRetry,
   isMsgElementsFocusable,
 }) => {
   const msgFocusState = useMemo(
@@ -200,34 +199,6 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
     }
   };
 
-  const mainViewModel = useMainViewModel();
-  const {content: contentViewModel} = mainViewModel;
-  const {messageRepository} = contentViewModel;
-
-  const handleRetrySending = async () => {
-    const firstAsset = message.getFirstAsset();
-
-    if (firstAsset instanceof Text) {
-      const messageId = message.id;
-      const messageText = message.getFirstAsset().text;
-      const mentions: MentionEntity[] = firstAsset.mentions() && firstAsset.mentions();
-      const incomingQuote = message.quote();
-
-      const isOutgoingQuote = (quoteEntity: QuoteEntity): quoteEntity is OutgoingQuote => {
-        return quoteEntity.hash !== undefined;
-      };
-
-      const quote: OutgoingQuote | undefined =
-        incomingQuote && isOutgoingQuote(incomingQuote) ? (incomingQuote as OutgoingQuote) : undefined;
-
-      await messageRepository.sendTextWithLinkPreview(conversation, messageText, mentions, quote, messageId);
-    }
-  };
-
-  const handleDiscard = async () => {
-    await messageRepository.deleteMessageById(conversation, message.id);
-  };
-
   const [messageAriaLabel] = getMessageAriaLabel({
     assets,
     displayTimestampShort: message.displayTimestampShort(),
@@ -277,11 +248,11 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
         {status === StatusType.FAILED && (
           <CompleteFailureToSendWarning
             isTextAsset={message.getFirstAsset().isText()}
-            handleDiscard={async () => {
-              await handleDiscard();
+            onDiscard={() => {
+              onDiscard();
             }}
-            handleRetry={async () => {
-              await handleRetrySending();
+            onRetry={() => {
+              onRetry(message);
             }}
           />
         )}
