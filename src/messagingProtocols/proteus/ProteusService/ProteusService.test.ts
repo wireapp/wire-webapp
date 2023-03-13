@@ -535,7 +535,7 @@ describe('ProteusService', () => {
         });
       });
 
-      it(`returns the recipients that could not receive the message`, async () => {
+      it(`returns the recipients that will receive the message later`, async () => {
         const [proteusService] = await buildProteusService();
         const recipients: QualifiedUserClients = {
           domain1: {user1: ['client1'], user2: ['client11', 'client12']},
@@ -559,7 +559,7 @@ describe('ProteusService', () => {
         });
 
         expect(result.state).toBe(MessageSendingState.OUTGOING_SENT);
-        expect(result.failedToSend).toEqual({domain2: recipients.domain2});
+        expect(result.failedToSend?.queued).toEqual({domain2: recipients.domain2});
       });
     });
   });

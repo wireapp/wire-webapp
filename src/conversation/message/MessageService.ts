@@ -22,6 +22,7 @@ import {QualifiedId, QualifiedUserPreKeyBundleMap} from '@wireapp/api-client/lib
 import {uuidToBytes} from '@wireapp/commons/lib/util/StringUtil';
 import {proteus as ProtobufOTR} from '@wireapp/protocol-messaging/web/otr';
 import {AxiosError} from 'axios';
+import {deepmerge} from 'deepmerge-ts';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import Long from 'long';
 
@@ -29,7 +30,7 @@ import {APIClient} from '@wireapp/api-client';
 
 import {flattenUserMap} from './UserClientsUtil';
 
-import type {ProteusService} from '../../messagingProtocols/proteus';
+import type {EncryptionResult, ProteusService} from '../../messagingProtocols/proteus';
 import {isQualifiedIdArray} from '../../util';
 
 type ClientMismatchError = AxiosError<MessageSendingStatus>;
@@ -60,16 +61,17 @@ export class MessageService {
       nativePush?: boolean;
       onClientMismatch?: (mismatch: MessageSendingStatus) => void | boolean | Promise<boolean>;
     } = {},
-  ): Promise<MessageSendingStatus & {canceled?: boolean}> {
-    const {payloads: encryptedPayload, unknowns: unknows} = await this.proteusService.encrypt(plainText, recipients);
+  ): Promise<MessageSendingStatus & {canceled?: boolean; failed?: QualifiedId[]}> {
+    const encryptionResults = await this.proteusService.encrypt(plainText, recipients);
 
-    const send = async (payload: QualifiedOTRRecipients) => {
-      const result = await this.sendOtrMessage(sendingClientId, payload, options);
-      return unknows ? {...result, deleted: {...result.deleted, ...unknows}} : result;
+    const send = async ({payloads, unknowns, failed}: EncryptionResult): Promise<MessageSendingStatus> => {
+      const result = await this.sendOtrMessage(sendingClientId, payloads, options);
+      const extras = {failed, deleted: unknowns ?? {}};
+      return deepmerge(result, extras) as MessageSendingStatus & {failed?: QualifiedId[]};
     };
 
     try {
-      return await send(encryptedPayload);
+      return await send(encryptionResults);
     } catch (error) {
       if (!this.isClientMismatchError(error)) {
         throw error;
@@ -79,7 +81,7 @@ export class MessageService {
       if (shouldStopSending) {
         return {...mismatch, canceled: true};
       }
-      const reEncryptedPayload = await this.reencryptAfterMismatch(mismatch, encryptedPayload, plainText);
+      const reEncryptedPayload = await this.reencryptAfterMismatch(mismatch, encryptionResults, plainText);
       return send(reEncryptedPayload);
     }
   }
@@ -163,24 +165,19 @@ export class MessageService {
    */
   private async reencryptAfterMismatch(
     mismatch: {missing: QualifiedUserClients; deleted: QualifiedUserClients},
-    recipients: QualifiedOTRRecipients,
+    initialPayloads: EncryptionResult,
     plainText: Uint8Array,
-  ): Promise<QualifiedOTRRecipients> {
+  ): Promise<EncryptionResult> {
     const deleted = flattenUserMap(mismatch.deleted);
     // remove deleted clients to the recipients
     deleted.forEach(({userId, data}) =>
-      data.forEach(clientId => delete recipients[userId.domain][userId.id][clientId]),
+      data.forEach(clientId => delete initialPayloads.payloads[userId.domain][userId.id][clientId]),
     );
 
-    if (Object.keys(mismatch.missing).length) {
-      const {payloads} = await this.proteusService.encrypt(plainText, mismatch.missing);
-      const reEncryptedPayloads = flattenUserMap<{[client: string]: Uint8Array}>(payloads);
-      reEncryptedPayloads.forEach(({data, userId}) => {
-        const domainRecipients = recipients[userId.domain] ?? {};
-        domainRecipients[userId.id] = {...domainRecipients[userId.id], ...data};
-        recipients[userId.domain] = domainRecipients;
-      });
+    if (Object.keys(mismatch.missing).length === 0) {
+      return initialPayloads;
     }
-    return recipients;
+    const reencryptedResults = await this.proteusService.encrypt(plainText, mismatch.missing);
+    return deepmerge(initialPayloads, reencryptedResults);
   }
 }
