@@ -57,20 +57,16 @@ Object.keys(emojiesList).forEach(key => {
   if (!emojiValue) {
     return;
   }
+
   const emojiObject = emojiValue[0];
-  const emojiUnicodes = emojiObject.u.split('-');
   const emojiNames = emojiObject.n;
 
-  if (emojiNames.length > emojiUnicodes.length) {
-    emojiDictionary[key] = emojiNames[emojiNames.length - 1];
-  }
-
-  if (emojiNames.length === emojiUnicodes.length) {
-    emojiUnicodes.forEach((unicode, index) => {
-      emojiDictionary[unicode] = emojiNames[index];
-    });
-  }
+  emojiDictionary[key] = emojiNames[emojiNames.length - 1].replaceAll('-', ' ');
 });
+
+export const getEmojiTitleFromEmojiUnicode = (emojiUnicode: string): string => {
+  return emojiDictionary[emojiUnicode];
+};
 
 export const emojiToUnicode = (emoji: string): string => {
   let unicodeChar;
