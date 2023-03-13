@@ -249,7 +249,11 @@ export class ConversationRepository {
           shouldWarnLegalHold = hasChangedLegalHoldStatus && newDevices.some(device => device.isLegalHold());
         }
       }
-      return !conversation || silent
+      if (!conversation) {
+        // in case of a broadcast message, we want to keep sending the message even if there are some conversation degradation
+        return true;
+      }
+      return silent
         ? false
         : this.messageRepository.requestUserSendingPermission(conversation, shouldWarnLegalHold, consentType);
     });
