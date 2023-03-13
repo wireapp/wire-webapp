@@ -126,7 +126,7 @@ describe('MessageService', () => {
         conversationId: {id: 'convid', domain: 'domain'},
       });
       expect(apiClient.api.conversation.postOTRMessage).toHaveBeenCalled();
-      expect(result).toEqual(baseMessageSendingStatus);
+      expect(result).toEqual({...baseMessageSendingStatus, failed: undefined});
     });
 
     it('should send regular to conversation', async () => {

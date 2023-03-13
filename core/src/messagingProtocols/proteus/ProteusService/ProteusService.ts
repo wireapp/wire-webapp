@@ -57,7 +57,7 @@ import {
   initSessions,
 } from '../Utility/SessionHandler';
 
-type EncryptionResult = {
+export type EncryptionResult = {
   /** the encrypted payloads for the clients that have a valid sessions */
   payloads: QualifiedOTRRecipients;
   /** user-client that do not have prekeys on backend (deleted clients) */
@@ -65,6 +65,7 @@ type EncryptionResult = {
   /** users for whom we could retrieve a prekey and, thus, for which we could not encrypt the message */
   failed?: QualifiedId[];
 };
+
 export class ProteusService {
   private readonly messageService: MessageService;
   private readonly logger = logdown('@wireapp/core/ProteusService');
@@ -210,8 +211,11 @@ export class ProteusService {
     const sendingState = response.canceled ? MessageSendingState.CANCELED : MessageSendingState.OUTGOING_SENT;
 
     const failedToSend =
-      'failed_to_send' in response && Object.keys(response.failed_to_send).length > 0
-        ? response.failed_to_send
+      response.failed || Object.keys(response.failed_to_send ?? {}).length > 0
+        ? {
+            queued: response.failed_to_send,
+            failed: response.failed,
+          }
         : undefined;
 
     return {

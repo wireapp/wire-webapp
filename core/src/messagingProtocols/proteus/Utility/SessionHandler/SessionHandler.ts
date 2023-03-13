@@ -112,7 +112,7 @@ const createSessions = async ({recipients, apiClient, cryptoClient}: CreateSessi
 
   return {
     ...result,
-    failed,
+    failed: failed?.length ? failed : undefined,
   };
 };
 
