@@ -53,6 +53,10 @@ import {ContextMenuEntry} from '../../../ui/ContextMenu';
 
 import {MessageParams} from './index';
 
+const isOutgoingQuote = (quoteEntity: QuoteEntity): quoteEntity is OutgoingQuote => {
+  return quoteEntity.hash !== undefined;
+};
+
 export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMessageFocused: boolean}> = ({
   message,
   conversation,
@@ -95,17 +99,13 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
     }
   };
 
-  const isOutgoingQuote = (quoteEntity: QuoteEntity): quoteEntity is OutgoingQuote => {
-    return quoteEntity.hash !== undefined;
-  };
-
   const onRetry = async (message: ContentMessage) => {
     const firstAsset = message.getFirstAsset();
 
     if (firstAsset instanceof Text) {
       const messageId = message.id;
       const messageText = firstAsset.text;
-      const mentions: MentionEntity[] = firstAsset?.mentions?.() || [];
+      const mentions: MentionEntity[] = firstAsset.mentions();
       const incomingQuote = message.quote();
       const quote: OutgoingQuote | undefined =
         incomingQuote && isOutgoingQuote(incomingQuote) ? (incomingQuote as OutgoingQuote) : undefined;
