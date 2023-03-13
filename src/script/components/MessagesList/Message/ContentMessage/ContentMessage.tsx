@@ -248,12 +248,8 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
         {status === StatusType.FAILED && (
           <CompleteFailureToSendWarning
             isTextAsset={message.getFirstAsset().isText()}
-            onDiscard={() => {
-              onDiscard();
-            }}
-            onRetry={() => {
-              onRetry(message);
-            }}
+            onDiscard={() => onDiscard()}
+            onRetry={() => onRetry(message)}
           />
         )}
 
