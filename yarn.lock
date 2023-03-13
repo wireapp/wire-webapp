@@ -4811,9 +4811,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:39.1.6":
-  version: 39.1.6
-  resolution: "@wireapp/core@npm:39.1.6"
+"@wireapp/core@npm:39.2.0":
+  version: 39.2.0
+  resolution: "@wireapp/core@npm:39.2.0"
   dependencies:
     "@wireapp/api-client": ^23.1.3
     "@wireapp/commons": ^5.0.4
@@ -4825,13 +4825,14 @@ __metadata:
     "@wireapp/store-engine-dexie": ^2.0.5
     axios: 1.3.4
     bazinga64: 6.0.4
+    deepmerge-ts: 4.3.0
     hash.js: 1.1.7
     http-status-codes: 2.2.0
     idb: 7.1.1
     logdown: 3.3.1
     long: ^5.2.0
     uuidjs: 4.2.13
-  checksum: 7de3e325da60e49fd204986aedc7731b763f998de30a6c9ceef0e03b57a74d6b988b32e2977b8d9e0e56c6102bf2931f07a48913e4123021ea21504b314b43de
+  checksum: 676f98d206e643a67dc24bd3be8ae39f1949e1c944695c902f67c46f0b970fd8bd468d15373cbaa4846ea6343213c409d7eb5f6343904415c61ad85fecf3f8ba
   languageName: node
   linkType: hard
 
@@ -7203,6 +7204,13 @@ __metadata:
   version: 0.1.4
   resolution: "deep-is@npm:0.1.4"
   checksum: edb65dd0d7d1b9c40b2f50219aef30e116cedd6fc79290e740972c132c09106d2e80aa0bc8826673dd5a00222d4179c84b36a790eef63a4c4bca75a37ef90804
+  languageName: node
+  linkType: hard
+
+"deepmerge-ts@npm:4.3.0":
+  version: 4.3.0
+  resolution: "deepmerge-ts@npm:4.3.0"
+  checksum: d5f8a96df9a2bc7177d59544b9390ba76e50fb725f776669068ca04eef319e98ee8870cf7b7ecca9f636b711d57cea571ac61553ee01101a614c045f7a86e0be
   languageName: node
   linkType: hard
 
@@ -17518,7 +17526,7 @@ __metadata:
     "@typescript-eslint/parser": ^5.54.1
     "@wireapp/avs": 9.1.11
     "@wireapp/copy-config": 2.0.10
-    "@wireapp/core": 39.1.6
+    "@wireapp/core": 39.2.0
     "@wireapp/eslint-config": 2.1.1
     "@wireapp/lru-cache": 3.8.1
     "@wireapp/prettier-config": 0.5.2

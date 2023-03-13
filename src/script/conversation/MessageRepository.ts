@@ -1109,7 +1109,7 @@ export class MessageRepository {
     conversationEntity: Conversation,
     eventId: string,
     isoDate?: string,
-    failedToSend?: QualifiedUserClients,
+    failedToSend?: SendResult['failedToSend'],
   ) {
     try {
       const messageEntity = await this.getMessageInConversationById(conversationEntity, eventId);

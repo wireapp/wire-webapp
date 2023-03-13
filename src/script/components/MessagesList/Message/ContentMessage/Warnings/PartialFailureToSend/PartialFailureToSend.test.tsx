@@ -51,8 +51,8 @@ describe('PartialFailureToSendWarning', () => {
     const nbUsers = Math.floor(Math.random() * 100);
     const users = generateUsers(nbUsers, 'domain');
 
-    const failedToSend = generateUserClients(users);
-    const {container} = render(withTheme(<PartialFailureToSendWarning knownUsers={[]} failedToSend={failedToSend} />));
+    const queued = generateUserClients(users);
+    const {container} = render(withTheme(<PartialFailureToSendWarning knownUsers={[]} failedToSend={{queued}} />));
     expect(container.textContent).toContain(`${nbUsers} Participants had issues receiving this message`);
   });
 
@@ -62,11 +62,11 @@ describe('PartialFailureToSendWarning', () => {
     const users1 = generateUsers(nbUsersDomain1, 'domain1');
     const users2 = generateUsers(nbUsersDomain2, 'domain2');
 
-    const failedToSend = {
+    const queued = {
       ...generateUserClients(users1),
       ...generateUserClients(users2),
     };
-    const {container} = render(withTheme(<PartialFailureToSendWarning knownUsers={[]} failedToSend={failedToSend} />));
+    const {container} = render(withTheme(<PartialFailureToSendWarning knownUsers={[]} failedToSend={{queued}} />));
     expect(container.textContent).toContain(
       `${nbUsersDomain1 + nbUsersDomain2} Participants had issues receiving this message`,
     );
@@ -74,9 +74,9 @@ describe('PartialFailureToSendWarning', () => {
 
   it('does not show the extra info toggle if there is only a single user', () => {
     const users = generateUsers(1, 'domain');
-    const failedToSend = generateUserClients(users);
+    const queued = generateUserClients(users);
     const {queryByText, container} = render(
-      withTheme(<PartialFailureToSendWarning knownUsers={users} failedToSend={failedToSend} />),
+      withTheme(<PartialFailureToSendWarning knownUsers={users} failedToSend={{queued}} />),
     );
 
     expect(queryByText('Show details')).toBeNull();
@@ -84,8 +84,8 @@ describe('PartialFailureToSendWarning', () => {
   });
 
   it('toggles the extra info', () => {
-    const failedToSend = generateUserClients(generateUsers(2, 'domain'));
-    const {getByText} = render(withTheme(<PartialFailureToSendWarning knownUsers={[]} failedToSend={failedToSend} />));
+    const queued = generateUserClients(generateUsers(2, 'domain'));
+    const {getByText} = render(withTheme(<PartialFailureToSendWarning knownUsers={[]} failedToSend={{queued}} />));
 
     act(() => {
       getByText('Show details').click();
@@ -104,9 +104,9 @@ describe('PartialFailureToSendWarning', () => {
     const nbUsers = Math.floor(Math.random() * 10) + 2;
     const users = generateUsers(nbUsers, 'domain');
 
-    const failedToSend = generateUserClients(users);
+    const queued = generateUserClients(users);
     const {getByText, getAllByTestId} = render(
-      withTheme(<PartialFailureToSendWarning knownUsers={users} failedToSend={failedToSend} />),
+      withTheme(<PartialFailureToSendWarning knownUsers={users} failedToSend={{queued}} />),
     );
 
     act(() => {
