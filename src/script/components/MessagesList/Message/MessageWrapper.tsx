@@ -28,7 +28,6 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {OutgoingQuote} from 'src/script/conversation/MessageRepository';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {Text} from 'src/script/entity/message/Text';
-import {MentionEntity} from 'src/script/message/MentionEntity';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
 import {t} from 'Util/LocalizerUtil';
 
@@ -105,7 +104,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
     if (firstAsset instanceof Text) {
       const messageId = message.id;
       const messageText = firstAsset.text;
-      const mentions: MentionEntity[] = firstAsset.mentions();
+      const mentions = firstAsset.mentions();
       const incomingQuote = message.quote();
       const quote: OutgoingQuote | undefined =
         incomingQuote && isOutgoingQuote(incomingQuote) ? (incomingQuote as OutgoingQuote) : undefined;
