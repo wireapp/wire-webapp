@@ -1143,9 +1143,8 @@ export class MessageRepository {
   private async updateMessageAsFailed(conversationEntity: Conversation, eventId: string) {
     try {
       const messageEntity = await this.getMessageInConversationById(conversationEntity, eventId);
-      const updatedStatus = StatusType.FAILED;
-      messageEntity.status(updatedStatus);
-      return await this.eventService.updateEvent(messageEntity.primary_key, {status: updatedStatus});
+      messageEntity.status(StatusType.FAILED);
+      return await this.eventService.updateEvent(messageEntity.primary_key, {status: StatusType.FAILED});
     } catch (error) {
       if ((error as any).type !== ConversationError.TYPE.MESSAGE_NOT_FOUND) {
         throw error;

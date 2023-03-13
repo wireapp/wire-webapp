@@ -145,7 +145,7 @@ export class EventMapper {
     const {id, data: eventData, edited_time: editedTime, conversation, qualified_conversation} = event;
 
     if (eventData.quote) {
-      const {hash: hash, message_id: messageId, user_id: userId, error} = eventData.quote;
+      const {hash, message_id: messageId, user_id: userId, error} = eventData.quote;
       originalEntity.quote(new QuoteEntity({error, hash, messageId, userId}));
     }
 
