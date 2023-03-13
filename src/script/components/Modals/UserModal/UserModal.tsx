@@ -204,7 +204,7 @@ const UserModal: React.FC<UserModalProps> = ({
                 }}
                 classifiedBarStyles={{
                   position: 'absolute',
-                  top: 130,
+                  top: user.handle ? 130 : 100,
                 }}
                 participant={user}
                 isSelfVerified={isSelfVerified}
