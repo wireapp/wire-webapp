@@ -28,6 +28,12 @@ import {StorageSchemata} from '../storage/StorageSchemata';
 import {StorageService} from '../storage/StorageService';
 import {constructUserPrimaryKey} from '../util/StorageUtil';
 
+type StoredUser = {
+  availability: number;
+  id: string;
+  domain?: string;
+};
+
 export class UserService {
   private readonly logger: Logger;
   private readonly USER_STORE_NAME: string;
@@ -49,8 +55,14 @@ export class UserService {
    * @todo There might be more keys which are returned by this function
    * @returns Resolves with all the stored user states
    */
-  loadUserFromDb(): Promise<{availability: number; domain?: string; id: string}[]> {
-    return this.storageService.getAll(this.USER_STORE_NAME);
+  async loadUserFromDb(): Promise<{availability: number; domain: string; id: string}[]> {
+    const users = await this.storageService.getAll<StoredUser>(this.USER_STORE_NAME);
+    return users.map(user => ({...user, domain: user.domain ?? ''}));
+  }
+
+  async removeUserFromDb(user: {id: string; domain: string}): Promise<void> {
+    const primaryKey = constructUserPrimaryKey(user);
+    await this.storageService.delete(this.USER_STORE_NAME, primaryKey);
   }
 
   /**
@@ -123,7 +135,7 @@ export class UserService {
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/user
    */
-  getUser(userId: string | QualifiedId): Promise<APIClientUser> {
+  getUser(userId: QualifiedId): Promise<APIClientUser> {
     return this.apiClient.api.user.getUser(userId);
   }
 }

@@ -34,7 +34,7 @@ const createVerificationMessage = (partialVerificationMessage: Partial<Verificat
     isSelfClient: ko.pureComputed(() => false),
     unsafeSenderName: ko.pureComputed(() => 'senderName'),
     userEntities: ko.observableArray([] as User[]),
-    userIds: ko.observableArray([] as (string | QualifiedUserId)[]),
+    userIds: ko.observableArray([] as QualifiedUserId[]),
     ...partialVerificationMessage,
   };
   return verificationMessage as VerificationMessageEntity;

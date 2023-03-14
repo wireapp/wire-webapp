@@ -25,7 +25,7 @@ import {OAuthBody} from '@wireapp/api-client/lib/oauth/OAuthBody';
 import {OAuthClient} from '@wireapp/api-client/lib/oauth/OAuthClient';
 import type {TeamData} from '@wireapp/api-client/lib/team/';
 import {LowDiskSpaceError} from '@wireapp/store-engine/lib/engine/error';
-import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {StatusCodes as HTTP_STATUS, StatusCodes} from 'http-status-codes';
 
 import type {CRUDEngine} from '@wireapp/store-engine';
 import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
@@ -168,6 +168,13 @@ export class AuthAction {
         await apiClient.api.user.postVerificationCode(email, VerificationActionType.LOGIN);
         dispatch(AuthActionCreator.successfulSendTwoFactorCode());
       } catch (error) {
+        if (error.label === BackendError.LABEL.BAD_REQUEST) {
+          error = new BackendError({
+            code: StatusCodes.BAD_REQUEST,
+            label: BackendError.AUTH_ERRORS.EMAIL_REQUIRED,
+            message: error.message,
+          });
+        }
         dispatch(AuthActionCreator.failedSendTwoFactorCode(error));
         throw error;
       }

@@ -160,7 +160,7 @@ const ConversationJoinComponent = ({
        */
       await setLastEventDate(new Date(conversationEvent.time));
 
-      routeToApp(conversationEvent.conversation, conversationEvent.qualified_conversation.domain);
+      routeToApp(conversationEvent.conversation, conversationEvent.qualified_conversation?.domain ?? '');
     } catch (error) {
       if (error.label) {
         switch (error.label) {
@@ -314,7 +314,7 @@ const ConversationJoinComponent = ({
               onClick={async () => {
                 try {
                   const conversationEvent = await doJoinConversationByCode(conversationKey, conversationCode);
-                  routeToApp(conversationEvent.conversation, conversationEvent.qualified_conversation.domain);
+                  routeToApp(conversationEvent.conversation, conversationEvent.qualified_conversation?.domain ?? '');
                 } catch (error) {
                   console.warn('Unable to join conversation with existing account', error);
                 }

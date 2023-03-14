@@ -208,7 +208,7 @@ export class App {
     repositories.storage = new StorageRepository();
 
     repositories.cryptography = new CryptographyRepository();
-    repositories.client = new ClientRepository(new ClientService(), repositories.cryptography, repositories.storage);
+    repositories.client = new ClientRepository(new ClientService(), repositories.cryptography);
     repositories.media = new MediaRepository(new PermissionRepository());
     repositories.audio = new AudioRepository(repositories.media.devicesHandler);
 
@@ -333,7 +333,8 @@ export class App {
    */
   async initApp(clientType: ClientType, onProgress: (progress: number, message?: string) => void) {
     // add body information
-    await this.core.useAPIVersion(this.config.SUPPORTED_API_VERSIONS, this.config.ENABLE_DEV_BACKEND_API);
+    const [apiVersionMin, apiVersionMax] = this.config.SUPPORTED_API_RANGE;
+    await this.core.useAPIVersion(apiVersionMin, apiVersionMax, this.config.ENABLE_DEV_BACKEND_API);
     const osCssClass = Runtime.isMacOS() ? 'os-mac' : 'os-pc';
     const platformCssClass = Runtime.isDesktopApp() ? 'platform-electron' : 'platform-web';
     document.body.classList.add(osCssClass, platformCssClass);
@@ -408,7 +409,7 @@ export class App {
 
       await conversationRepository.conversationRoleRepository.loadTeamRoles();
 
-      await userRepository.loadUsers();
+      await userRepository.loadTeamUserAvailabilities();
 
       await eventRepository.connectWebSocket(this.core, ({done, total}) => {
         const baseMessage = t('initDecryption');
@@ -674,11 +675,16 @@ export class App {
         const deletedKeys = CacheRepository.clearLocalStorage(keepConversationInput, keysToKeep);
         this.logger.debug(`Deleted "${deletedKeys.length}" keys from localStorage.`, deletedKeys);
       }
+      const shouldWipeIdentity = clearData || signOutReason === SIGN_OUT_REASON.CLIENT_REMOVED;
 
+      if (shouldWipeIdentity) {
+        localStorage.clear();
+      }
+
+      await this.core.logout(shouldWipeIdentity);
       if (clearData) {
         // Info: This async call cannot be awaited in an "beforeunload" scenario, so we call it without waiting for it in order to delete the CacheStorage in the background.
         CacheRepository.clearCacheStorage();
-        localStorage.clear();
 
         try {
           await this.repository.storage.deleteDatabase();
@@ -687,7 +693,6 @@ export class App {
         }
       }
 
-      await this.core.logout(clearData);
       return _redirectToLogin();
     };
 

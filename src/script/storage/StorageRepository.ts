@@ -23,59 +23,21 @@ import {Logger, getLogger} from 'Util/Logger';
 
 import {StorageService} from './StorageService';
 
-import {StorageError} from '../error/StorageError';
-import {StorageSchemata} from '../storage/StorageSchemata';
-
-type AmplifyRecord = {key: string; value: string};
-
 export class StorageRepository {
-  private readonly AMPLIFY_STORE_NAME: string;
   private readonly logger: Logger;
-
-  static get CONFIG() {
-    return {
-      CRYPTOGRAPHY_TABLES: [
-        StorageSchemata.OBJECT_STORE.AMPLIFY,
-        StorageSchemata.OBJECT_STORE.CLIENTS,
-        StorageSchemata.OBJECT_STORE.KEYS,
-        StorageSchemata.OBJECT_STORE.SESSIONS,
-        StorageSchemata.OBJECT_STORE.PRE_KEYS,
-      ],
-    };
-  }
 
   constructor(public readonly storageService = container.resolve(StorageService)) {
     this.logger = getLogger('StorageRepository');
-    this.AMPLIFY_STORE_NAME = StorageSchemata.OBJECT_STORE.AMPLIFY;
   }
 
-  clearStores(): Promise<void> {
-    return this.storageService
-      .clearStores()
-      .then(() => this.logger.info(`Cleared database '${this.storageService.dbName}'`));
-  }
-
-  deleteCryptographyStores(): Promise<void> {
-    return this.storageService.deleteStores(StorageRepository.CONFIG.CRYPTOGRAPHY_TABLES);
+  async clearStores(): Promise<void> {
+    // Only used for testing purposes
+    await this.storageService.clearStores();
   }
 
   deleteDatabase(): Promise<boolean> {
     this.logger.warn(`Deleting database '${this.storageService.dbName}'`);
     return this.storageService.deleteDatabase();
-  }
-
-  getValue(primaryKey: string): Promise<string | AmplifyRecord> {
-    return this.storageService.load<AmplifyRecord>(this.AMPLIFY_STORE_NAME, primaryKey).then(record => {
-      if (record?.value) {
-        return record.value;
-      }
-      throw new StorageError(StorageError.TYPE.NOT_FOUND, StorageError.MESSAGE.NOT_FOUND);
-    });
-  }
-
-  async saveValue<T>(primaryKey: string, value: T): Promise<string> {
-    await this.storageService.save(this.AMPLIFY_STORE_NAME, primaryKey, {value});
-    return primaryKey;
   }
 
   terminate(reason: string): void {

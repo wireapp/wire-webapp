@@ -18,12 +18,11 @@
  */
 
 import type {CallConfigData} from '@wireapp/api-client/lib/account/CallConfigData';
-import type {QualifiedUserClients, UserClients} from '@wireapp/api-client/lib/conversation';
+import type {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {WebappProperties} from '@wireapp/api-client/lib/user/data';
 import {MessageSendingState} from '@wireapp/core/lib/conversation';
-import {flattenQualifiedUserClients, flattenUserClients} from '@wireapp/core/lib/conversation/message/UserClientsUtil';
-import {isQualifiedUserClients} from '@wireapp/core/lib/util';
+import {flattenUserMap} from '@wireapp/core/lib/conversation/message/UserClientsUtil';
 import {amplify} from 'amplify';
 import axios from 'axios';
 import ko from 'knockout';
@@ -132,7 +131,7 @@ export class CallingRepository {
   private avsVersion: number = 0;
   private incomingCallCallback: (call: Call) => void;
   private requestNewEpochCallback: (conversationId: QualifiedId) => void;
-  private leaveCallCallback: (conversationId: QualifiedId) => void;
+  private callClosedCallback: (conversationId: QualifiedId, conversationType: CONV_TYPE) => void;
   private callParticipantChangedCallback: (conversationId: QualifiedId, members: QualifiedWcallMember[]) => void;
   private isReady: boolean = false;
   /** will cache the query to media stream (in order to avoid asking the system for streams multiple times when we have multiple peers) */
@@ -172,7 +171,7 @@ export class CallingRepository {
     this.logger = getLogger('CallingRepository');
     this.incomingCallCallback = () => {};
     this.requestNewEpochCallback = () => {};
-    this.leaveCallCallback = () => {};
+    this.callClosedCallback = () => {};
     this.callParticipantChangedCallback = () => {};
     this.callLog = [];
 
@@ -335,9 +334,7 @@ export class CallingRepository {
     const allClients = await this.core.service!.conversation.fetchAllParticipantsClients(call.conversationId);
 
     if (!conversation.isUsingMLSProtocol) {
-      const qualifiedClients = isQualifiedUserClients(allClients)
-        ? flattenQualifiedUserClients(allClients)
-        : flattenUserClients(allClients);
+      const qualifiedClients = flattenUserMap(allClients);
 
       const clients: Clients = flatten(
         qualifiedClients.map(({data, userId}) =>
@@ -418,8 +415,8 @@ export class CallingRepository {
     this.incomingCallCallback = callback;
   }
 
-  onLeaveCall(callback: (conversationId: QualifiedId) => void): void {
-    this.leaveCallCallback = callback;
+  onCallClosed(callback: (conversationId: QualifiedId, conversationType: CONV_TYPE) => void): void {
+    this.callClosedCallback = callback;
   }
 
   onRequestNewEpochCallback(callback: (conversationId: QualifiedId) => void): void {
@@ -889,6 +886,7 @@ export class CallingRepository {
       convid: serializedConversationId,
       clients: members,
     };
+
     return this.wCall?.setEpochInfo(
       this.wUser,
       serializedConversationId,
@@ -932,8 +930,6 @@ export class CallingRepository {
     const conversationIdStr = this.serializeQualifiedId(conversationId);
     delete this.poorCallQualityUsers[conversationIdStr];
     this.wCall?.end(this.wUser, conversationIdStr);
-
-    this.leaveCallCallback(conversationId);
   };
 
   muteCall(call: Call, shouldMute: boolean, reason?: MuteState): void {
@@ -1070,23 +1066,7 @@ export class CallingRepository {
     return selfParticipant.sharesCamera() && selfParticipant.hasActiveVideo();
   }
 
-  private mapTargets(targets: SendMessageTarget): UserClients {
-    const recipients: UserClients = {};
-
-    for (const target of targets.clients) {
-      const {userid, clientid} = target;
-
-      if (!recipients[userid]) {
-        recipients[userid] = [];
-      }
-
-      recipients[userid].push(clientid);
-    }
-
-    return recipients;
-  }
-
-  private mapQualifiedTargets(targets: SendMessageTarget): QualifiedUserClients {
+  private mapTargets(targets: SendMessageTarget): QualifiedUserClients {
     const recipients = targets.clients.reduce((acc, {userid, clientid}) => {
       const {domain: parsedDomain, id} = this.parseQualifiedId(userid);
       const domain = parsedDomain || this.selfUser?.domain || '';
@@ -1142,9 +1122,7 @@ export class CallingRepository {
 
     if (typeof targets === 'string') {
       const parsedTargets: SendMessageTarget = JSON.parse(targets);
-      const recipients = this.core.backendFeatures.federationEndpoints
-        ? this.mapQualifiedTargets(parsedTargets)
-        : this.mapTargets(parsedTargets);
+      const recipients = this.mapTargets(parsedTargets);
       options = {
         nativePush: true,
         recipients,
@@ -1190,25 +1168,12 @@ export class CallingRepository {
     }
   };
 
-  readonly convertParticipantsToCallingMessageRecepients = (
-    participants: Participant[],
-  ): UserClients | QualifiedUserClients => {
-    const isFederated = this.core.backendFeatures.federationEndpoints;
-
-    if (isFederated) {
-      return participants.reduce((participants, participant) => {
-        participants[participant.user.domain] ||= {};
-        participants[participant.user.domain][participant.user.id] = [participant.clientId];
-        return participants;
-      }, {} as QualifiedUserClients);
-    }
-
-    const recipients: UserClients = {};
-    for (const participant of participants) {
-      recipients[participant.user.id] = [participant.clientId];
-    }
-
-    return recipients;
+  readonly convertParticipantsToCallingMessageRecepients = (participants: Participant[]): QualifiedUserClients => {
+    return participants.reduce((participants, participant) => {
+      participants[participant.user.domain] ||= {};
+      participants[participant.user.domain][participant.user.id] = [participant.clientId];
+      return participants;
+    }, {} as QualifiedUserClients);
   };
 
   readonly sendModeratorMute = (conversationId: QualifiedId, participants: Participant[]) => {
@@ -1267,6 +1232,8 @@ export class CallingRepository {
     if (!call) {
       return;
     }
+
+    this.callClosedCallback(conversationId, call.conversationType);
 
     if (reason === REASON.NORMAL) {
       this.callState.selectableScreens([]);

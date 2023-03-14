@@ -114,10 +114,16 @@ export function authReducer(state: AuthState = initialAuthState, action: AppActi
         isSendingTwoFactorCode: true,
       };
     }
-    case AUTH_ACTION.SEND_TWO_FACTOR_CODE_SUCCESS:
+    case AUTH_ACTION.SEND_TWO_FACTOR_CODE_SUCCESS: {
+      return {
+        ...state,
+        isSendingTwoFactorCode: false,
+      };
+    }
     case AUTH_ACTION.SEND_TWO_FACTOR_CODE_FAILED: {
       return {
         ...state,
+        error: action.error,
         isSendingTwoFactorCode: false,
       };
     }

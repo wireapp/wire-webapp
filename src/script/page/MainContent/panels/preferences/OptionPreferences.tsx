@@ -44,16 +44,6 @@ interface OptionPreferencesProps {
   userState?: UserState;
 }
 
-const fontSliderOptions = [
-  {value: 0, label: RootFontSize.XXS, heading: 'Small'},
-  {value: 1, label: RootFontSize.XS},
-  {value: 2, label: RootFontSize.S},
-  {value: 3, label: RootFontSize.M, heading: 'Default'},
-  {value: 4, label: RootFontSize.L},
-  {value: 5, label: RootFontSize.XL},
-  {value: 6, label: RootFontSize.XXL, heading: 'Large'},
-];
-
 const fontSizes = Object.values(RootFontSize);
 
 const OptionPreferences: React.FC<OptionPreferencesProps> = ({
@@ -130,6 +120,16 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
     setSliderValue(value);
     setCurrentRootFontSize(fontSize);
   };
+
+  const fontSliderOptions = [
+    {value: 0, label: RootFontSize.XXS, heading: t('preferencesOptionsFontSizeSmall')},
+    {value: 1, label: RootFontSize.XS},
+    {value: 2, label: RootFontSize.S},
+    {value: 3, label: RootFontSize.M, heading: t('preferencesOptionsFontSizeDefault')},
+    {value: 4, label: RootFontSize.L},
+    {value: 5, label: RootFontSize.XL},
+    {value: 6, label: RootFontSize.XXL, heading: t('preferencesOptionsFontSizeLarge')},
+  ];
 
   return (
     <PreferencesPage title={t('preferencesOptions')}>

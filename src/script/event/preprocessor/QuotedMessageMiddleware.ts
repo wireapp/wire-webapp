@@ -22,7 +22,6 @@ import {Quote} from '@wireapp/protocol-messaging';
 import {getLogger, Logger} from 'Util/Logger';
 import {base64ToArray} from 'Util/util';
 
-import {MessageHasher} from '../../message/MessageHasher';
 import {QuoteEntity} from '../../message/QuoteEntity';
 import {EventRecord} from '../../storage/record/EventRecord';
 import {ClientEvent} from '../Client';
@@ -104,37 +103,30 @@ export class QuotedMessageMiddleware {
 
     const messageId = quote.quotedMessageId;
 
-    const quotedMessage = await this.eventService.loadEvent(event.conversation, messageId);
+    let quotedMessage =
+      (await this.eventService.loadEvent(event.conversation, messageId)) ??
+      (await this.eventService.loadReplacingEvent(event.conversation, messageId));
     if (!quotedMessage) {
-      this.logger.warn(`Quoted message with ID "${messageId}" not found.`);
-      const quoteData = {
-        error: {
-          type: QuoteEntity.ERROR.MESSAGE_NOT_FOUND,
-        },
-      };
+      const replacedMessage = await this.eventService.loadReplacingEvent(event.conversation, messageId);
+      if (!replacedMessage) {
+        this.logger.warn(`Quoted message with ID "${messageId}" not found.`);
+        const quoteData = {
+          error: {
+            type: QuoteEntity.ERROR.MESSAGE_NOT_FOUND,
+          },
+        };
 
-      const decoratedData = {...event.data, quote: quoteData};
-      return {...event, data: decoratedData};
+        const decoratedData = {...event.data, quote: quoteData};
+        return {...event, data: decoratedData};
+      }
+      quotedMessage = replacedMessage;
     }
 
-    const quotedMessageHash = new Uint8Array(quote.quotedMessageSha256).buffer;
-
-    const isValid = await MessageHasher.validateHash(quotedMessage, quotedMessageHash);
-    let quoteData;
-
-    if (!isValid) {
-      this.logger.warn(`Quoted message hash for message ID "${messageId}" does not match.`);
-      quoteData = {
-        error: {
-          type: QuoteEntity.ERROR.INVALID_HASH,
-        },
-      };
-    } else {
-      quoteData = {
-        message_id: messageId,
-        user_id: quotedMessage.from,
-      };
-    }
+    const quoteData = {
+      message_id: messageId,
+      user_id: quotedMessage.from,
+      hash: quote.quotedMessageSha256,
+    };
 
     const decoratedData = {...event.data, quote: quoteData};
     return {...event, data: decoratedData};

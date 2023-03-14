@@ -21,7 +21,7 @@ import {EventEmitter} from 'stream';
 
 export class Account extends EventEmitter {
   backendFeatures = {
-    federationEndpoints: false,
+    federationEndpoints: true,
   };
 
   configureMLSCallbacks = jest.fn();
@@ -35,6 +35,7 @@ export class Account extends EventEmitter {
       getClientIds: jest.fn(),
       getEpoch: jest.fn(),
       exportSecretKey: jest.fn(),
+      leaveConferenceSubconversation: jest.fn(),
       on: this.on,
       emit: this.emit,
       off: this.off,

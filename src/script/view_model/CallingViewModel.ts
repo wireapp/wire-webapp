@@ -162,7 +162,7 @@ export class CallingViewModel {
 
       if (conversation.isUsingMLSProtocol) {
         const unsubscribe = await subscribeToEpochUpdates(
-          {mlsService: this.mlsService},
+          {mlsService: this.mlsService, conversationState: this.conversationState},
           conversation.qualifiedId,
           ({epoch, keyLength, secretKey, members}) => {
             this.callingRepository.setEpochInfo(conversation.qualifiedId, {epoch, keyLength, secretKey}, members);
@@ -176,7 +176,7 @@ export class CallingViewModel {
 
     const joinOngoingMlsConference = async (call: Call) => {
       const unsubscribe = await subscribeToEpochUpdates(
-        {mlsService: this.mlsService},
+        {mlsService: this.mlsService, conversationState: this.conversationState},
         call.conversationId,
         ({epoch, keyLength, secretKey, members}) => {
           this.callingRepository.setEpochInfo(call.conversationId, {epoch, keyLength, secretKey}, members);
@@ -222,6 +222,10 @@ export class CallingViewModel {
         SUBCONVERSATION_ID.CONFERENCE,
       );
 
+      if (!subconversationGroupId) {
+        return;
+      }
+
       //we don't want to react to avs callbacks when conversation was not yet established
       const isMLSConversationEstablished = await this.mlsService.conversationExists(subconversationGroupId);
       if (!isMLSConversationEstablished) {
@@ -234,6 +238,16 @@ export class CallingViewModel {
         shouldAdvanceEpoch,
       );
       this.callingRepository.setEpochInfo(conversationId, {epoch, keyLength, secretKey}, members);
+    };
+
+    const closeCall = async (conversationId: QualifiedId, conversationType: CONV_TYPE) => {
+      // There's nothing we need to do for non-mls calls
+      if (conversationType !== CONV_TYPE.CONFERENCE_MLS) {
+        return;
+      }
+
+      await this.mlsService.leaveConferenceSubconversation(conversationId);
+      callingSubscriptions.removeCall(conversationId);
     };
 
     this.callingRepository.onIncomingCall(async (call: Call) => {
@@ -251,6 +265,10 @@ export class CallingViewModel {
         conversationId,
         SUBCONVERSATION_ID.CONFERENCE,
       );
+
+      if (!subconversationGroupId) {
+        return;
+      }
 
       const isMLSConversationEstablished = await this.mlsService.conversationExists(subconversationGroupId);
       if (!isMLSConversationEstablished) {
@@ -316,8 +334,8 @@ export class CallingViewModel {
     //update epoch info when AVS requests new epoch
     this.callingRepository.onRequestNewEpochCallback(conversationId => updateEpochInfo(conversationId, true));
 
-    //once we leave a call, we unsubscribe from all the events we've subscribed to during this call
-    this.callingRepository.onLeaveCall(callingSubscriptions.removeCall);
+    //once the call gets closed (eg. we leave a call or get dropped), we remove ourselfes from subconversation and unsubscribe from all the call events
+    this.callingRepository.onCallClosed(closeCall);
 
     //handle participant change avs callback to detect stale clients in subconversations
     this.callingRepository.onCallParticipantChangedCallback(handleCallParticipantChange);
