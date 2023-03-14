@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [39.2.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@39.2.1...@wireapp/core@39.2.2) (2023-03-14)
+
+### Bug Fixes
+
+* Do not try to fetch clients when no users are given ([#4968](https://github.com/wireapp/wire-web-packages/issues/4968)) ([f01cd78](https://github.com/wireapp/wire-web-packages/commit/f01cd785698434fe778590e2a9a000c08771d8e8))
+
 ## [39.2.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@39.2.0...@wireapp/core@39.2.1) (2023-03-13)
 
 **Note:** Version bump only for package @wireapp/core
