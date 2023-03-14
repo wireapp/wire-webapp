@@ -96,10 +96,9 @@ export class TeamState {
     });
 
     this.classifiedDomains = ko.pureComputed(() => {
-      return ['aaa', 'bbb'];
-      // return this.teamFeatures()?.classifiedDomains.status === FeatureStatus.ENABLED
-      //   ? this.teamFeatures().classifiedDomains.config.domains
-      //   : undefined;
+      return this.teamFeatures()?.classifiedDomains.status === FeatureStatus.ENABLED
+        ? this.teamFeatures().classifiedDomains.config.domains
+        : undefined;
     });
 
     this.isSelfDeletingMessagesEnabled = ko.pureComputed(
