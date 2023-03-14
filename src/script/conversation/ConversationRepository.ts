@@ -1357,7 +1357,7 @@ export class ConversationRepository {
      * Needs to be done to receive the latest epoch and avoid epoch mismatch errors
      */
 
-    const qualifiedUserIds = userEntities.map(userEntity => userEntity.qualifiedId);
+    const qualifiedUsers = userEntities.map(userEntity => userEntity.qualifiedId);
 
     const {qualifiedId: conversationId, groupId} = conversation;
 
@@ -1366,7 +1366,7 @@ export class ConversationRepository {
         const {events} = await this.core.service!.conversation.addUsersToMLSConversation({
           conversationId,
           groupId,
-          qualifiedUserIds,
+          qualifiedUsers,
         });
         if (!!events.length) {
           events.forEach(event => this.eventRepository.injectEvent(event));
@@ -1374,7 +1374,7 @@ export class ConversationRepository {
       } else {
         const conversationMemberJoinEvent = await this.core.service!.conversation.addUsersToProteusConversation({
           conversationId,
-          qualifiedUserIds,
+          qualifiedUsers,
         });
         if (conversationMemberJoinEvent) {
           this.eventRepository.injectEvent(conversationMemberJoinEvent, EventRepository.SOURCE.BACKEND_RESPONSE);
@@ -1382,7 +1382,7 @@ export class ConversationRepository {
       }
     } catch (error) {
       if (error) {
-        this.handleAddToConversationError(error as BackendClientError, conversation, qualifiedUserIds);
+        this.handleAddToConversationError(error as BackendClientError, conversation, qualifiedUsers);
       }
     }
   }
