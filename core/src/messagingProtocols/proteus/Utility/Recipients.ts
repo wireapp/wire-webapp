@@ -49,7 +49,10 @@ const getRecipientsForConversation = async ({
     return userIds;
   }
 
-  const recipientIds = userIds || (await getConversationQualifiedMembers({apiClient: apiClient, conversationId}));
+  const recipientIds =
+    userIds && Object.keys(userIds).length > 0
+      ? userIds
+      : await getConversationQualifiedMembers({apiClient: apiClient, conversationId});
   const allClients = await apiClient.api.user.postListClients({qualified_users: recipientIds});
   return toQualifiedUserClients(allClients.qualified_user_map);
 };
