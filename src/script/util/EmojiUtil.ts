@@ -67,15 +67,3 @@ Object.keys(emojiesList).forEach(key => {
 export const getEmojiTitleFromEmojiUnicode = (emojiUnicode: string): string => {
   return emojiDictionary[emojiUnicode];
 };
-
-export const emojiToUnicode = (emoji: string): string => {
-  let unicodeChar;
-  if (emoji.length === 1) {
-    unicodeChar = emoji.charCodeAt(0);
-  }
-  unicodeChar = (emoji.charCodeAt(0) - 0xd800) * 0x400 + (emoji.charCodeAt(1) - 0xdc00) + 0x10000;
-  if (unicodeChar < 0) {
-    unicodeChar = emoji.charCodeAt(0);
-  }
-  return unicodeChar.toString(16);
-};
