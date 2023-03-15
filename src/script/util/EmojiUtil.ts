@@ -61,7 +61,7 @@ Object.keys(emojiesList).forEach(key => {
   const emojiObject = emojiValue[0];
   const emojiNames = emojiObject.n;
 
-  emojiDictionary[key] = emojiNames[emojiNames.length - 1].replaceAll('-', ' ');
+  emojiDictionary[key] = emojiNames[0].replaceAll('-', ' ');
 });
 
 export const getEmojiTitleFromEmojiUnicode = (emojiUnicode: string): string => {
