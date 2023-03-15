@@ -29,7 +29,7 @@ import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
 import {UserSearchableList} from 'Components/UserSearchableList';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {emojiDictionary, emojiToUnicode} from 'Util/EmojiUtil';
+import {emojiDictionary, getEmojiUnicode} from 'Util/EmojiUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatLocale} from 'Util/TimeUtil';
 
@@ -237,18 +237,18 @@ const MessageDetails: FC<MessageDetailsProps> = ({
       {showTabs && (
         <div className="panel__tabs">
           <button
-            className={cx('panel__tab button-reset-default', {'panel__tab--active': isReceiptsOpen})}
-            onClick={onReceipts}
-            data-uie-name="message-details-read-tab"
-          >
-            {receiptsTitle}
-          </button>
-          <button
             className={cx('panel__tab button-reset-default', {'panel__tab--active': !isReceiptsOpen})}
             onClick={onReactions}
             data-uie-name="message-details-reaction-tab"
           >
             {reactionsTitle}
+          </button>
+          <button
+            className={cx('panel__tab button-reset-default', {'panel__tab--active': isReceiptsOpen})}
+            onClick={onReceipts}
+            data-uie-name="message-details-read-tab"
+          >
+            {receiptsTitle}
           </button>
         </div>
       )}
@@ -270,9 +270,9 @@ const MessageDetails: FC<MessageDetailsProps> = ({
         {messageState === MESSAGE_STATES.REACTIONS &&
           Object.keys(reactionUsers).map(reactionUserGroupKey => (
             <Fragment key={reactionUserGroupKey}>
-              <div>
+              <div className="panel__content_title">
                 <span>{reactionUserGroupKey}</span>
-                <span>{emojiDictionary[emojiToUnicode(reactionUserGroupKey)]}</span>
+                <span>{emojiDictionary[getEmojiUnicode(reactionUserGroupKey)]}</span>
               </div>
               <UserSearchableList
                 key={reactionUserGroupKey}
