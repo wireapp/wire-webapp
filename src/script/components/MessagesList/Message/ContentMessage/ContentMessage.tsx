@@ -242,7 +242,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
         ))}
 
         {failedToSend && (
-          <PartialFailureToSendWarning failedToSend={failedToSend} knownUsers={conversation.allUserEntities} />
+          <PartialFailureToSendWarning failedToSend={failedToSend} knownUsers={conversation.allUserEntities()} />
         )}
 
         {status === StatusType.FAILED && (

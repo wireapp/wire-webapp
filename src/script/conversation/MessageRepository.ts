@@ -934,7 +934,7 @@ export class MessageRepository {
       if (!message.user().isMe && !message.ephemeral_expires()) {
         throw new ConversationError(ConversationError.TYPE.WRONG_USER, ConversationError.MESSAGE.WRONG_USER);
       }
-      const userIds = options.targetedUsers || conversation.allUserEntities.map(user => user!.qualifiedId);
+      const userIds = options.targetedUsers || conversation.allUserEntities().map(user => user!.qualifiedId);
       const payload = MessageBuilder.buildDeleteMessage({
         messageId: message.id,
       });
@@ -1170,7 +1170,8 @@ export class MessageRepository {
       // If we get a userId>client pairs, we just return those, no need to create recipients
       return recipients;
     }
-    const filteredUsers = conversation.allUserEntities
+    const filteredUsers = conversation
+      .allUserEntities()
       // filter possible undefined values
       .flatMap(user => (user ? [user] : []))
       // if users are given by the caller, we filter to only keep those users
