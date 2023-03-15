@@ -17,8 +17,9 @@
  *
  */
 
-import React, {useRef} from 'react';
+import React, {useState} from 'react';
 
+import {OAuthBody} from '@wireapp/api-client/lib/oauth/OAuthBody';
 import {OAuthClient} from '@wireapp/api-client/lib/oauth/OAuthClient';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
@@ -61,13 +62,6 @@ export enum Scope {
   READ_SELF = 'read:self',
   READ_FEATURE_CONFIGS = 'read:feature_configs',
 }
-interface AuthParams {
-  client_id: string;
-  scope: Scope[];
-  redirect_uri: string;
-  state: string;
-  response_type: string;
-}
 
 const OAuthPermissionsComponent = ({
   doLogout,
@@ -86,15 +80,12 @@ const OAuthPermissionsComponent = ({
     .split('&')
     .reduce((acc, param) => {
       const [key, value] = param.split('=');
-      if (key === 'scope') {
-        return {
-          ...acc,
-          [key]: value.split(/\+|%20/).filter(scope => Object.values(Scope).includes(scope as Scope)) as Scope[],
-        };
-      }
       return {...acc, [key]: value};
-    }, {} as AuthParams);
-  const oAuthApp = useRef<OAuthClient | null>(null);
+    }, {} as OAuthBody);
+  const [oAuthApp, setOAuthApp] = useState<OAuthClient | null>(null);
+  const oAuthScope = oauthParams.scope
+    .split(/\+|%20/)
+    .filter(scope => Object.values(Scope).includes(scope as Scope)) as Scope[];
 
   const onContinue = async () => {
     try {
@@ -102,11 +93,10 @@ const OAuthPermissionsComponent = ({
     } catch (error) {
       console.error(error);
     }
-    window.location.assign(oauthParams.redirect_uri);
   };
 
   const onCancel = () => {
-    window.location.assign(`${oauthParams.redirect_uri}?error=access_denied`);
+    window.location.replace(`${oauthParams.redirect_uri}?error=access_denied`);
   };
 
   React.useEffect(() => {
@@ -116,7 +106,7 @@ const OAuthPermissionsComponent = ({
       const teamIcon = AssetRemoteData.v3(team.icon, selfUser.qualified_id?.domain);
       const teamImageBlob = await assetRepository.load(teamIcon);
       setTeamImage(teamImageBlob && (await loadDataUrl(teamImageBlob)));
-      oAuthApp.current = !!oauthParams.client_id ? await getOAuthApp(oauthParams.client_id) : null;
+      setOAuthApp(!!oauthParams.client_id ? await getOAuthApp(oauthParams.client_id) : null);
     };
     getUserData().catch(error => {
       console.error(error);
@@ -164,9 +154,9 @@ const OAuthPermissionsComponent = ({
         >
           {_(oauthStrings.logout)}
         </Link>
-        {oAuthApp.current && (
+        {oAuthApp && (
           <Text style={{marginBottom: '24px'}} center>
-            {_(oauthStrings.subhead, {app: oAuthApp.current?.applicationName})}
+            {_(oauthStrings.subhead, {app: oAuthApp.application_name})}
           </Text>
         )}
         {oauthParams.scope.length > 1 && (
@@ -178,7 +168,7 @@ const OAuthPermissionsComponent = ({
             }}
           >
             <ul>
-              {oauthParams.scope.map((scope, index) => (
+              {oAuthScope.map((scope, index) => (
                 <li key={index}>
                   <Text>{_(oauthStrings[scope])}</Text>
                 </li>
