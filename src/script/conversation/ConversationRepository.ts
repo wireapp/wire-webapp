@@ -196,7 +196,7 @@ export class ConversationRepository {
 
       const {missingClients, deletedClients, emptyUsers, missingUserIds} = extractClientDiff(
         filteredMismatch,
-        conversation?.allUserEntities,
+        conversation?.allUserEntities(),
         domain,
       );
 
