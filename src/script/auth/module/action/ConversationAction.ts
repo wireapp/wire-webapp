@@ -42,6 +42,15 @@ export class ConversationAction {
       dispatch(ConversationActionCreator.startJoinConversationByCode());
       try {
         const conversationEvent = await apiClient.api.conversation.postJoinByCode({code, key, uri});
+
+        // if we've succesfully joined conversation,
+        // we store conversation id so we can access it after app initialisation
+        // some services (eg. mls) are not initialised at this point of app lifecycle
+        const conversationId = conversationEvent.qualified_conversation;
+        if (conversationId) {
+          localStorage.setItem('conversationJoinedByCode', JSON.stringify(conversationId));
+        }
+
         dispatch(ConversationActionCreator.successfulJoinConversationByCode(conversationEvent));
         return conversationEvent;
       } catch (error) {

@@ -17,6 +17,11 @@
  *
  */
 
+import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {KeyPackageClaimUser} from '@wireapp/core/lib/conversation';
+import {isQualifiedId} from '@wireapp/core/lib/util';
+
+import {Logger} from '@wireapp/commons';
 import {Account} from '@wireapp/core';
 
 import {useMLSConversationState} from './mlsConversationState';
@@ -99,4 +104,51 @@ export async function registerUninitializedConversations(
       }),
     ),
   );
+}
+
+export async function addOtherSelfClientsToLinkJoinedConversation(
+  selfUserId: QualifiedId,
+  clientId: string,
+  conversationRepository: MLSConversationRepository,
+  core: Account,
+  logger: Logger,
+) {
+  const linkJoinedConversationId = localStorage.getItem('conversationJoinedByCode');
+
+  if (!linkJoinedConversationId) {
+    return;
+  }
+
+  const conversationId = JSON.parse(linkJoinedConversationId);
+
+  if (!isQualifiedId(conversationId)) {
+    return;
+  }
+
+  try {
+    const conversation = await conversationRepository.getConversationById(conversationId);
+    const {groupId, isUsingMLSProtocol} = conversation;
+
+    if (!isUsingMLSProtocol || !groupId) {
+      return;
+    }
+
+    const selfQualifiedUser: KeyPackageClaimUser = {
+      ...selfUserId,
+      skipOwnClientId: clientId,
+    };
+
+    await core.service?.conversation.addUsersToMLSConversation({
+      conversationId,
+      groupId,
+      qualifiedUsers: [selfQualifiedUser],
+    });
+  } catch (error) {
+    logger.warn(
+      `Client was not able to add other self clients to MLS group of conversation ${conversationId.id}`,
+      error,
+    );
+  }
+
+  localStorage.removeItem('conversationJoinedByCode');
 }

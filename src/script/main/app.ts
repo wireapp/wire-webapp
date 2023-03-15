@@ -78,7 +78,11 @@ import {IntegrationRepository} from '../integration/IntegrationRepository';
 import {IntegrationService} from '../integration/IntegrationService';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {MediaRepository} from '../media/MediaRepository';
-import {initMLSConversations, registerUninitializedConversations} from '../mls';
+import {
+  addOtherSelfClientsToLinkJoinedConversation as addOtherSelfClientsToLinkJoinedMLSConversation,
+  initMLSConversations,
+  registerUninitializedConversations,
+} from '../mls';
 import {NotificationRepository} from '../notification/NotificationRepository';
 import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
 import {PermissionRepository} from '../permission/PermissionRepository';
@@ -422,6 +426,16 @@ export class App {
       const notificationsCount = eventRepository.notificationsTotal;
 
       if (supportsMLS()) {
+        // After mls conversations have been initialized we check if there's new mls conversation that user has joined via guest link
+        // if so, we can try adding other self clients to the related mls group
+        await addOtherSelfClientsToLinkJoinedMLSConversation(
+          selfUser.qualifiedId,
+          this.core.clientId,
+          this.repository.conversation,
+          this.core,
+          this.logger,
+        );
+
         // Once all the messages have been processed and the message sending queue freed we can now add the potential `self` and `team` conversations
         await registerUninitializedConversations(conversationEntities, selfUser, clientEntity().id, this.core);
       }
