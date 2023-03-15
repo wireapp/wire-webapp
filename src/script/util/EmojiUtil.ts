@@ -17,7 +17,7 @@
  *
  */
 
-import emojies from 'emoji-picker-react/src/data/emojis';
+import emojies from 'emoji-picker-react/src/data/emojis.json';
 import {groupBy} from 'underscore';
 
 // http://www.unicode.org/Public/emoji/11.0/emoji-data.txt
@@ -67,3 +67,10 @@ Object.keys(emojiesList).forEach(key => {
 export const getEmojiTitleFromEmojiUnicode = (emojiUnicode: string): string => {
   return emojiDictionary[emojiUnicode];
 };
+
+export function getEmojiUnicode(emojis: string) {
+  const hexCode = 16;
+  const padding = 4;
+  const unicode = [...emojis].map(emoji => emoji?.codePointAt(0)?.toString(hexCode).padStart(padding, '0')).join('-');
+  return unicode;
+}
