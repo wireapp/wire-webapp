@@ -19,6 +19,8 @@
 
 import type {ConversationEvent} from '@wireapp/api-client/lib/event/';
 
+import {joinCodeConversationIdStore} from 'src/script/conversation/joinCodeConversationIdStore';
+
 import {ConversationActionCreator} from './creator/';
 
 import type {ThunkAction} from '../reducer';
@@ -45,10 +47,10 @@ export class ConversationAction {
 
         // if we've succesfully joined conversation,
         // we store conversation id so we can access it after app initialisation
-        // some services (eg. mls) are not initialised at this point of app lifecycle
+        // some services (eg. mls) are not initialised at this point of app lifecycle (on /join page)
         const conversationId = conversationEvent.qualified_conversation;
         if (conversationId) {
-          localStorage.setItem('conversationJoinedByCode', JSON.stringify(conversationId));
+          joinCodeConversationIdStore.set(conversationId);
         }
 
         dispatch(ConversationActionCreator.successfulJoinConversationByCode(conversationEvent));

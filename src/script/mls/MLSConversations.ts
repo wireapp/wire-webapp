@@ -19,7 +19,6 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {KeyPackageClaimUser} from '@wireapp/core/lib/conversation';
-import {isQualifiedId} from '@wireapp/core/lib/util';
 
 import {Logger} from '@wireapp/commons';
 import {Account} from '@wireapp/core';
@@ -33,6 +32,7 @@ import {
   isTeamConversation,
   MLSConversation,
 } from '../conversation/ConversationSelectors';
+import {joinCodeConversationIdStore} from '../conversation/joinCodeConversationIdStore';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 
@@ -113,15 +113,9 @@ export async function addOtherSelfClientsToLinkJoinedConversation(
   core: Account,
   logger: Logger,
 ) {
-  const linkJoinedConversationId = localStorage.getItem('conversationJoinedByCode');
+  const conversationId = joinCodeConversationIdStore.get();
 
-  if (!linkJoinedConversationId) {
-    return;
-  }
-
-  const conversationId = JSON.parse(linkJoinedConversationId);
-
-  if (!isQualifiedId(conversationId)) {
+  if (!conversationId) {
     return;
   }
 
@@ -150,5 +144,6 @@ export async function addOtherSelfClientsToLinkJoinedConversation(
     );
   }
 
-  localStorage.removeItem('conversationJoinedByCode');
+  // once the client has added other self clients to the conversation, we can clear the store
+  joinCodeConversationIdStore.clear();
 }
