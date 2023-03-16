@@ -1053,11 +1053,12 @@ export class MessageRepository {
       conversationEntity.isShowingLastReceivedMessage() && conversationEntity.getNewestMessage()?.id === messageId;
 
     const deleteCount = await this.eventService.deleteEvent(conversationEntity.id, messageId);
+    const previousMessage = conversationEntity.getNewestMessage();
 
     amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, messageId, conversationEntity.id);
 
-    if (isLastDeleted && conversationEntity.getNewestMessage()?.timestamp()) {
-      conversationEntity.updateTimestamps(conversationEntity.getNewestMessage(), true);
+    if (isLastDeleted && previousMessage?.timestamp()) {
+      conversationEntity.updateTimestamps(previousMessage, true);
     }
 
     return deleteCount;

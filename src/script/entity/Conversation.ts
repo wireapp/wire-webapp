@@ -892,7 +892,10 @@ export class Conversation {
     if (message_et) {
       const timestamp = message_et.timestamp();
       if (timestamp <= this.last_server_timestamp()) {
-        if (message_et.timestamp_affects_order()) {
+        // Some message do not bubble the conversation up in the conversation list (call messages for example or some system messages).
+        // Those should not update the conversation timestamp.
+        // This is ignored if the `forceUpdate` flag is set.
+        if (message_et.timestamp_affects_order() || forceUpdate) {
           this.setTimestamp(timestamp, TIMESTAMP_TYPE.LAST_EVENT, forceUpdate);
 
           const from_self = message_et.user()?.isMe;
