@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [39.2.6](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@39.2.5...@wireapp/core@39.2.6) (2023-03-16)
+
+### Bug Fixes
+
+* Fix initClient type signature ([295d137](https://github.com/wireapp/wire-web-packages/commit/295d137db2ee3aec524e455fedcf9b65f39c7a55))
+
 ## [39.2.5](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@39.2.4...@wireapp/core@39.2.5) (2023-03-16)
 
 ### Bug Fixes
