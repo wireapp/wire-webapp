@@ -118,9 +118,9 @@ export class CryptoboxWrapper implements CryptoClient {
     await this.cryptobox.session_delete(sessionId);
   }
 
-  async newPrekey(id: number) {
+  async newPrekey() {
     // CryptoBox is generating prekeys internally
-    return {id, key: ''};
+    return {id: 0, key: ''};
   }
 
   async debugBreakSession(sessionId: string) {

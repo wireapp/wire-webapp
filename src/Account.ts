@@ -259,7 +259,6 @@ export class Account extends TypedEventEmitter<Events> {
     // we reset the services to re-instantiate a new CryptoClient instance
     await this.initServices(this.apiClient.context);
     const initialPreKeys = await this.service.proteus.createClient(entropyData);
-    await this.service.proteus.initClient(this.storeEngine, this.apiClient.context);
 
     const client = await this.service.client.register(loginData, clientInfo, initialPreKeys);
 
@@ -272,8 +271,7 @@ export class Account extends TypedEventEmitter<Events> {
     await this.service.notification.initializeNotificationStream();
     await this.service.client.synchronizeClients();
 
-    await this.initClient(client);
-    return client;
+    return this.initClient(client);
   }
 
   /**
@@ -281,6 +279,7 @@ export class Account extends TypedEventEmitter<Events> {
    *
    * @returns The local existing client or undefined if the client does not exist or is not valid (non existing on backend)
    */
+  public async initClient(client: RegisteredClient): Promise<RegisteredClient>;
   public async initClient(client?: RegisteredClient): Promise<RegisteredClient | undefined> {
     if (!this.service || !this.apiClient.context || !this.storeEngine) {
       throw new Error('Services are not set.');
@@ -317,7 +316,7 @@ export class Account extends TypedEventEmitter<Events> {
     return validClient;
   }
 
-  private async buildCryptoClient(context: Context, storeEngine: CRUDEngine, db: CoreDatabase, enableMLS: boolean) {
+  private async buildCryptoClient(context: Context, storeEngine: CRUDEngine, enableMLS: boolean) {
     /* There are 3 cases where we want to instantiate CoreCrypto:
      * 1. MLS is enabled
      * 2. The user has enabled CoreCrypto in the config
@@ -330,7 +329,7 @@ export class Account extends TypedEventEmitter<Events> {
         ? CryptoClientType.CORE_CRYPTO
         : CryptoClientType.CRYPTOBOX;
 
-    return buildCryptoClient(clientType, db, {
+    return buildCryptoClient(clientType, {
       storeEngine,
       nbPrekeys: this.nbPrekeys,
       coreCryptoWasmFilePath: this.cryptoProtocolConfig?.coreCrypoWasmFilePath,
@@ -362,7 +361,7 @@ export class Account extends TypedEventEmitter<Events> {
     const accountService = new AccountService(this.apiClient);
     const assetService = new AssetService(this.apiClient);
 
-    const cryptoClientDef = await this.buildCryptoClient(context, this.storeEngine, this.db, enableMLS);
+    const cryptoClientDef = await this.buildCryptoClient(context, this.storeEngine, enableMLS);
     const [clientType, cryptoClient] = cryptoClientDef;
 
     const mlsService =

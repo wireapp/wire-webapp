@@ -27,7 +27,6 @@ import type {CRUDEngine} from '@wireapp/store-engine';
 import {PrekeyTracker} from './PrekeysTracker';
 import {generateSecretKey, CorruptedKeyError} from './secretKeyGenerator';
 
-import {CoreDatabase} from '../../../../../storage/CoreDB';
 import {SecretCrypto} from '../../../../mls/types';
 import {CryptoClient} from '../CryptoClient.types';
 
@@ -44,7 +43,6 @@ type ClientConfig = Config & {
 export async function buildClient(
   storeEngine: CRUDEngine,
   coreCryptoWasmFilePath: string,
-  db: CoreDatabase,
   {systemCrypto, nbPrekeys, onNewPrekeys}: Config,
 ): Promise<CoreCryptoWrapper> {
   let key;
@@ -73,14 +71,14 @@ export async function buildClient(
     key: Encoder.toBase64(key.key).asString,
     wasmFilePath: coreCryptoWasmFilePath,
   });
-  return new CoreCryptoWrapper(coreCrypto, db, {nbPrekeys, onNewPrekeys, onWipe: key.deleteKey});
+  return new CoreCryptoWrapper(coreCrypto, {nbPrekeys, onNewPrekeys, onWipe: key.deleteKey});
 }
 
 export class CoreCryptoWrapper implements CryptoClient {
   private readonly prekeyTracker: PrekeyTracker;
 
-  constructor(private readonly coreCrypto: CoreCrypto, db: CoreDatabase, private readonly config: ClientConfig) {
-    this.prekeyTracker = new PrekeyTracker(this, db, config);
+  constructor(private readonly coreCrypto: CoreCrypto, private readonly config: ClientConfig) {
+    this.prekeyTracker = new PrekeyTracker(this, config);
   }
 
   getNativeClient() {
@@ -95,7 +93,10 @@ export class CoreCryptoWrapper implements CryptoClient {
     return this.coreCrypto.proteusDecrypt(sessionId, message);
   }
 
-  init() {
+  init(nbInitialPrekeys?: number) {
+    if (nbInitialPrekeys) {
+      this.prekeyTracker.setInitialState(nbInitialPrekeys);
+    }
     return this.coreCrypto.proteusInit();
   }
 
@@ -106,9 +107,8 @@ export class CoreCryptoWrapper implements CryptoClient {
     await this.init();
     const prekeys: PreKey[] = [];
     for (let id = 0; id < nbPrekeys; id++) {
-      prekeys.push(await this.newPrekey(id));
+      prekeys.push(await this.newPrekey());
     }
-    await this.prekeyTracker.setInitialState(prekeys.length);
 
     const lastPrekeyBytes = await this.coreCrypto.proteusLastResortPrekey();
     const lastPrekey = Encoder.toBase64(lastPrekeyBytes).asString;
@@ -154,9 +154,9 @@ export class CoreCryptoWrapper implements CryptoClient {
     return this.prekeyTracker.consumePrekey();
   }
 
-  async newPrekey(id: number) {
-    const key = await this.coreCrypto.proteusNewPrekey(id);
-    return {id, key: Encoder.toBase64(key).asString};
+  async newPrekey() {
+    const {id, pkb} = await this.coreCrypto.proteusNewPrekeyAuto();
+    return {id, key: Encoder.toBase64(pkb).asString};
   }
 
   async debugBreakSession(sessionId: string) {

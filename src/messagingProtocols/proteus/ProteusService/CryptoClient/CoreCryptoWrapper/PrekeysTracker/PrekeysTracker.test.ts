@@ -19,10 +19,7 @@
 
 import {PrekeyTracker} from './PrekeysTracker';
 
-import {CoreDatabase, openDB} from '../../../../../../storage/CoreDB';
-
 describe('PrekeysGenerator', () => {
-  let db: CoreDatabase;
   const baseConfig = {
     nbPrekeys: 10,
     onNewPrekeys: jest.fn(),
@@ -31,18 +28,10 @@ describe('PrekeysGenerator', () => {
     newPrekey: jest.fn().mockResolvedValue(Uint8Array.from([])),
   };
 
-  beforeEach(async () => {
-    db = await openDB('test');
-  });
-
-  afterEach(async () => {
-    await db.clear('prekeys');
-  });
-
   it('triggers the threshold callback when number of prekeys hits the limit', async () => {
-    const prekeyTracker = new PrekeyTracker(mockPrekeyTracker, db, baseConfig);
+    const prekeyTracker = new PrekeyTracker(mockPrekeyTracker, baseConfig);
 
-    await prekeyTracker.setInitialState(baseConfig.nbPrekeys);
+    prekeyTracker.setInitialState(baseConfig.nbPrekeys);
 
     expect(baseConfig.onNewPrekeys).not.toHaveBeenCalled();
 
