@@ -22,7 +22,6 @@ import {PreKey} from '@wireapp/api-client/lib/auth';
 import {PrekeysTrackerStore} from './PrekeysTracker.store';
 
 import {CryptoClient} from '../..';
-import type {CoreDatabase} from '../../../../../../storage/CoreDB';
 
 type CoreCryptoPrekeyGenerator = Pick<CryptoClient, 'newPrekey'>;
 
@@ -41,35 +40,30 @@ interface PrekeysGeneratorConfig {
 export class PrekeyTracker {
   private prekeyState: PrekeysTrackerStore;
 
-  constructor(
-    private readonly generator: CoreCryptoPrekeyGenerator,
-    db: CoreDatabase,
-    private config: PrekeysGeneratorConfig,
-  ) {
-    this.prekeyState = new PrekeysTrackerStore(db);
+  constructor(private readonly generator: CoreCryptoPrekeyGenerator, private config: PrekeysGeneratorConfig) {
+    this.prekeyState = new PrekeysTrackerStore();
   }
 
   private async generatePrekeys(nb: number): Promise<PreKey[]> {
     const prekeys: PreKey[] = [];
-    const ids = await this.prekeyState.createIds(nb);
-    for (const id of ids) {
-      prekeys.push(await this.generator.newPrekey(id));
+    for (let i = 0; i < nb; i++) {
+      prekeys.push(await this.generator.newPrekey());
     }
     return prekeys;
   }
 
+  setInitialState(nbPrekeys: number) {
+    return this.prekeyState.addPrekeys(nbPrekeys);
+  }
+
   async consumePrekey() {
-    const nbPrekeys = await this.prekeyState.consumePrekey();
+    const nbPrekeys = this.prekeyState.consumePrekey();
     const missingPrekeys = this.numberOfMissingPrekeys(nbPrekeys);
     if (missingPrekeys > 0) {
       // when the number of local prekeys hit less than a quarter of what it should be, we refill the stock
       const newPrekeys = await this.generatePrekeys(missingPrekeys);
       this.config.onNewPrekeys(newPrekeys);
     }
-  }
-
-  async setInitialState(nbInitialPrekeys: number) {
-    await this.prekeyState.createIds(nbInitialPrekeys);
   }
 
   private numberOfMissingPrekeys(currentNumberOfPrekeys: number): number {

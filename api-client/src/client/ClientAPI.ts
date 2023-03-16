@@ -131,13 +131,13 @@ export class ClientAPI {
     return response.data;
   }
 
-  public async getClientPreKeys(clientId: string): Promise<PreKeyBundle> {
+  public async getClientPreKeys(clientId: string): Promise<number[]> {
     const config: AxiosRequestConfig = {
       method: 'get',
       url: `${ClientAPI.URL.CLIENTS}/${clientId}/${ClientAPI.URL.PREKEYS}`,
     };
 
-    const response = await this.client.sendJSON<PreKeyBundle>(config, true);
+    const response = await this.client.sendJSON<number[]>(config, true);
     return response.data;
   }
 

@@ -29,7 +29,7 @@ export interface CryptoClient<T = unknown> {
   /**
    * Will init an already existing client. The client should already exist in the database. If the client doesn't exist, it needs to be created using the `create` method.
    */
-  init(): Promise<void>;
+  init(nbPrekeys: number): Promise<void>;
 
   /**
    * Will create a new client and store it in the database
@@ -43,7 +43,7 @@ export interface CryptoClient<T = unknown> {
   saveSession(sessionId: string): Promise<void>;
   consumePrekey: () => Promise<void>;
   deleteSession(sessionId: string): Promise<void>;
-  newPrekey(id: number): Promise<PreKey>;
+  newPrekey(): Promise<PreKey>;
   debugBreakSession(sessionId: string): void;
   debugResetIdentity(): Promise<void>;
   /**

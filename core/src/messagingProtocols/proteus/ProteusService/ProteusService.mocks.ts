@@ -38,7 +38,7 @@ export const buildProteusService = async (): Promise<
     clientId: getUUID(),
   };
 
-  const cryptoClient = new CoreCryptoWrapper({} as any, {} as any, {} as any);
+  const cryptoClient = new CoreCryptoWrapper({} as any, {} as any);
 
   const proteusService = new ProteusService(apiClient, cryptoClient, {
     nbPrekeys: 0,

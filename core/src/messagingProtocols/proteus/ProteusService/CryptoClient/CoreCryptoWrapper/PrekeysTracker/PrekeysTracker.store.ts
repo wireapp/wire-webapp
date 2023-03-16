@@ -17,49 +17,32 @@
  *
  */
 
-import {CoreDatabase} from '../../../../../../storage/CoreDB';
-
-const STATE_PRIMARY_KEY = 'prekeys_state';
-
 type PrekeysState = {
   nbPrekeys: number;
-  highestId: number;
 };
+
+let state: PrekeysState = {nbPrekeys: 0};
+
 export class PrekeysTrackerStore {
-  constructor(private readonly db: CoreDatabase) {}
-
-  private async getState(): Promise<PrekeysState> {
-    return (await this.db.get('prekeys', STATE_PRIMARY_KEY)) ?? {nbPrekeys: 0, highestId: 0};
-  }
-
-  private async saveState(state: PrekeysState): Promise<void> {
-    await this.db.put('prekeys', state, STATE_PRIMARY_KEY);
+  private setNbPrekeys(delta: number): number {
+    const newNbPrekeys = state.nbPrekeys + delta;
+    state = {...state, nbPrekeys: newNbPrekeys};
+    return newNbPrekeys;
   }
 
   /**
    * Will mark one prekey as consumed and decrease the total number of prekeys of 1
    * @returns the number of valid prekeys that are left
    */
-  async consumePrekey(): Promise<number> {
-    const currentState = await this.getState();
-    const newState = {...currentState, nbPrekeys: currentState.nbPrekeys - 1};
-    await this.saveState(newState);
-    return newState.nbPrekeys;
-  }
-
-  async getNumberOfPrekeys(): Promise<number> {
-    const currentState = await this.getState();
-    return currentState.nbPrekeys;
+  consumePrekey(): number {
+    return this.setNbPrekeys(-1);
   }
 
   /**
-   * will generate nbIds ids that can be used to store prekeys
+   * Will add to the number of prekeys that are stored
    * @param nbIds the number of ids to generate
    */
-  async createIds(nbIds: number): Promise<number[]> {
-    const currentState = await this.getState();
-    this.saveState({nbPrekeys: currentState.highestId + nbIds, highestId: currentState.highestId + nbIds});
-
-    return Array.from(new Array(nbIds)).map((_, i) => currentState.highestId + 1 + i);
+  addPrekeys(delta: number): number {
+    return this.setNbPrekeys(delta);
   }
 }
