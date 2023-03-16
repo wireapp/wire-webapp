@@ -20,7 +20,6 @@
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {KeyPackageClaimUser} from '@wireapp/core/lib/conversation';
 
-import {Logger} from '@wireapp/commons';
 import {Account} from '@wireapp/core';
 
 import {useMLSConversationState} from './mlsConversationState';
@@ -32,7 +31,6 @@ import {
   isTeamConversation,
   MLSConversation,
 } from '../conversation/ConversationSelectors';
-import {joinCodeConversationIdStore} from '../conversation/joinCodeConversationIdStore';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 
@@ -106,44 +104,37 @@ export async function registerUninitializedConversations(
   );
 }
 
-export async function addOtherSelfClientsToLinkJoinedConversation(
+/**
+ * Will add all other user's self clients to the mls group.
+ *
+ * @param conversationId id of the conversation
+ * @param selfUserId id of the self user who's clients should be added
+ * @param clientId id of the current client (that should be skipped)
+ * @param conversationRepository instance of the conversation repository
+ * @param core instance of the core
+ */
+export async function addOtherSelfClientsToMLSConversation(
+  conversationId: QualifiedId,
   selfUserId: QualifiedId,
   clientId: string,
   conversationRepository: MLSConversationRepository,
   core: Account,
-  logger: Logger,
 ) {
-  const conversationId = joinCodeConversationIdStore.get();
+  const conversation = await conversationRepository.getConversationById(conversationId);
+  const {groupId, isUsingMLSProtocol} = conversation;
 
-  if (!conversationId) {
+  if (!isUsingMLSProtocol || !groupId) {
     return;
   }
 
-  try {
-    const conversation = await conversationRepository.getConversationById(conversationId);
-    const {groupId, isUsingMLSProtocol} = conversation;
+  const selfQualifiedUser: KeyPackageClaimUser = {
+    ...selfUserId,
+    skipOwnClientId: clientId,
+  };
 
-    if (!isUsingMLSProtocol || !groupId) {
-      return;
-    }
-
-    const selfQualifiedUser: KeyPackageClaimUser = {
-      ...selfUserId,
-      skipOwnClientId: clientId,
-    };
-
-    await core.service?.conversation.addUsersToMLSConversation({
-      conversationId,
-      groupId,
-      qualifiedUsers: [selfQualifiedUser],
-    });
-  } catch (error) {
-    logger.warn(
-      `Client was not able to add other self clients to MLS group of conversation ${conversationId.id}`,
-      error,
-    );
-  }
-
-  // once the client has added other self clients to the conversation, we can clear the store
-  joinCodeConversationIdStore.clear();
+  await core.service?.conversation.addUsersToMLSConversation({
+    conversationId,
+    groupId,
+    qualifiedUsers: [selfQualifiedUser],
+  });
 }

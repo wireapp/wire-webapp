@@ -19,7 +19,7 @@
 
 import type {ConversationEvent} from '@wireapp/api-client/lib/event/';
 
-import {joinCodeConversationIdStore} from 'src/script/conversation/joinCodeConversationIdStore';
+import {joinCodeFlowFinalizer} from 'src/script/conversation/joinCodeFlowFinalizer';
 
 import {ConversationActionCreator} from './creator/';
 
@@ -45,12 +45,11 @@ export class ConversationAction {
       try {
         const conversationEvent = await apiClient.api.conversation.postJoinByCode({code, key, uri});
 
-        // if we've succesfully joined conversation,
-        // we store conversation id so we can access it after app initialisation
-        // some services (eg. mls) are not initialised at this point of app lifecycle (on /join page)
+        // if we've succesfully joined conversation, we start finalizing the join code flow
+        // some services (eg. mls) are not initialised at this point of app lifecycle (on /join page) so we have to wait for app to initialise after reload
         const conversationId = conversationEvent.qualified_conversation;
         if (conversationId) {
-          joinCodeConversationIdStore.set(conversationId);
+          joinCodeFlowFinalizer.init(conversationId);
         }
 
         dispatch(ConversationActionCreator.successfulJoinConversationByCode(conversationEvent));

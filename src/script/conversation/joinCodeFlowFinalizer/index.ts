@@ -17,4 +17,4 @@
  *
  */
 
-export * from './joinCodeConversationIdStore';
+export * from './joinCodeFlowFinalizer';
