@@ -19,6 +19,7 @@
 
 import {act, render} from '@testing-library/react';
 import type {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import en from 'I18n/en-US.json';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
@@ -45,6 +46,13 @@ function generateUserClients(users: User[]): QualifiedUserClients {
   });
   return userClients;
 }
+function generateQualifiedIds(nbUsers: number, domain: string) {
+  const users: QualifiedId[] = [];
+  for (let i = 0; i < nbUsers; i++) {
+    users.push({id: createRandomUuid(), domain});
+  }
+  return users;
+}
 
 describe('PartialFailureToSendWarning', () => {
   it('displays the number of users that did not get the message', () => {
@@ -53,10 +61,10 @@ describe('PartialFailureToSendWarning', () => {
 
     const queued = generateUserClients(users);
     const {container} = render(withTheme(<PartialFailureToSendWarning knownUsers={[]} failedToSend={{queued}} />));
-    expect(container.textContent).toContain(`${nbUsers} Participants had issues receiving this message`);
+    expect(container.textContent).toContain(`${nbUsers} participants didn't get your message`);
   });
 
-  it('displays the number of users that did not get the message across multiple domains', () => {
+  it('displays the number of named users that did not get the message across multiple domains', () => {
     const nbUsersDomain1 = Math.floor(Math.random() * 100);
     const nbUsersDomain2 = Math.floor(Math.random() * 100);
     const users1 = generateUsers(nbUsersDomain1, 'domain1');
@@ -67,12 +75,46 @@ describe('PartialFailureToSendWarning', () => {
       ...generateUserClients(users2),
     };
     const {container} = render(withTheme(<PartialFailureToSendWarning knownUsers={[]} failedToSend={{queued}} />));
+    expect(container.textContent).toContain(`${nbUsersDomain1 + nbUsersDomain2} participants didn't get your message`);
+  });
+  it('displays the number of unreachable users that did not get the message across multiple domains', () => {
+    const nbUsersDomain1 = Math.floor(Math.random() * 100);
+    const nbUsersDomain2 = Math.floor(Math.random() * 100);
+    const users1 = generateQualifiedIds(nbUsersDomain1, 'domain1');
+    const users2 = generateQualifiedIds(nbUsersDomain2, 'domain2');
+
+    const failed = [...users1, ...users2];
+    const {container} = render(withTheme(<PartialFailureToSendWarning knownUsers={[]} failedToSend={{failed}} />));
+    expect(container.textContent).toContain(`${nbUsersDomain1 + nbUsersDomain2} participants didn't get your message`);
+  });
+  it('displays the number of users, named or unreachable that did not get the message across multiple domains', () => {
+    const nbUsersDomain1 = Math.floor(Math.random() * 100);
+    const nbUsersDomain2 = Math.floor(Math.random() * 100);
+    const users1 = generateUsers(nbUsersDomain1, 'domain1');
+    const users2 = generateUsers(nbUsersDomain2, 'domain2');
+
+    const queued = {
+      ...generateUserClients(users1),
+      ...generateUserClients(users2),
+    };
+
+    const nbUnreachableUsersDomain1 = Math.floor(Math.random() * 100);
+    const nbUnreachableUsersDomain2 = Math.floor(Math.random() * 100);
+    const unreachableUsers1 = generateQualifiedIds(nbUnreachableUsersDomain1, 'domain1');
+    const unreachableUsers2 = generateQualifiedIds(nbUnreachableUsersDomain2, 'domain2');
+
+    const failed = [...unreachableUsers1, ...unreachableUsers2];
+    const {container} = render(
+      withTheme(<PartialFailureToSendWarning knownUsers={[]} failedToSend={{queued, failed}} />),
+    );
     expect(container.textContent).toContain(
-      `${nbUsersDomain1 + nbUsersDomain2} Participants had issues receiving this message`,
+      `${
+        nbUsersDomain1 + nbUsersDomain2 + nbUnreachableUsersDomain1 + nbUnreachableUsersDomain2
+      } participants didn't get your message`,
     );
   });
 
-  it('does not show the extra info toggle if there is only a single user', () => {
+  it('does not show the extra info toggle if there is only a single named user', () => {
     const users = generateUsers(1, 'domain');
     const queued = generateUserClients(users);
     const {queryByText, container} = render(
@@ -80,7 +122,17 @@ describe('PartialFailureToSendWarning', () => {
     );
 
     expect(queryByText('Show details')).toBeNull();
-    expect(container.textContent).toContain(`${users[0].username()} will receive your message later`);
+    expect(container.textContent).toContain(`${users[0].username()} will get your message later`);
+  });
+  it('does not show the extra info toggle if there is only a single unreachable user', () => {
+    const users = generateQualifiedIds(1, 'domain');
+    const failed = users;
+    const {queryByText, container} = render(
+      withTheme(<PartialFailureToSendWarning knownUsers={[]} failedToSend={{failed}} />),
+    );
+
+    expect(queryByText('Show details')).toBeNull();
+    expect(container.textContent).toContain(`1 participant from domain won't get your message`);
   });
 
   it('toggles the extra info', () => {
@@ -115,5 +167,31 @@ describe('PartialFailureToSendWarning', () => {
 
     expect(getAllByTestId('recipient')).toHaveLength(nbUsers);
     expect(getByText('Hide details')).not.toBeNull();
+  });
+
+  it('displays both the username of named participants and the correct domain of unreachable users when applicable', () => {
+    const nbNamedUsers = Math.floor(Math.random() * 10) + 2;
+    const namedUsers = generateUsers(nbNamedUsers, 'domain');
+    const queued = generateUserClients(namedUsers);
+
+    const nbUsersDomain1 = Math.floor(Math.random() * 10) + 2;
+    const nbUsersDomain2 = Math.floor(Math.random() * 10) + 2;
+    const failed = [
+      ...generateQualifiedIds(nbUsersDomain1, 'domain1'),
+      ...generateQualifiedIds(nbUsersDomain2, 'domain2'),
+    ];
+
+    const {getByText, getAllByTestId, container} = render(
+      withTheme(<PartialFailureToSendWarning knownUsers={namedUsers} failedToSend={{queued, failed}} />),
+    );
+
+    act(() => {
+      getByText('Show details').click();
+    });
+
+    expect(getAllByTestId('recipient')).toHaveLength(nbNamedUsers);
+    expect(container.textContent).toContain(
+      `${nbUsersDomain1} participants from domain1, ${nbUsersDomain2} participants from domain2 won't get your message`,
+    );
   });
 });
