@@ -280,6 +280,7 @@ export class Account extends TypedEventEmitter<Events> {
    * @returns The local existing client or undefined if the client does not exist or is not valid (non existing on backend)
    */
   public async initClient(client: RegisteredClient): Promise<RegisteredClient>;
+  public async initClient(): Promise<RegisteredClient | undefined>;
   public async initClient(client?: RegisteredClient): Promise<RegisteredClient | undefined> {
     if (!this.service || !this.apiClient.context || !this.storeEngine) {
       throw new Error('Services are not set.');
