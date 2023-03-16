@@ -19,10 +19,12 @@
 
 import React, {useEffect} from 'react';
 
+import {ClientType} from '@wireapp/api-client/lib/client';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 
+import {UrlUtil} from '@wireapp/commons';
 import {Button, ButtonVariant, ContainerXS, H1, Muted, useTimeout} from '@wireapp/react-ui-kit';
 
 import {Page} from './Page';
@@ -36,9 +38,15 @@ import {QUERY_KEY} from '../route';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 
-const ClientManagerComponent = ({doGetAllClients, doLogout}: Props & ConnectedProps & DispatchProps) => {
+const ClientManagerComponent = ({
+  doGetAllClients,
+  doLogout,
+  generateClientPayload,
+}: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
   const SFAcode = localStorage.getItem(QUERY_KEY.CONVERSATION_CODE);
+  const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE);
+  const browserVersion = generateClientPayload(ClientType.PERMANENT)?.model;
   const timeRemaining = JSON.parse(localStorage.getItem(QUERY_KEY.JOIN_EXPIRES) ?? '{}')?.data ?? Date.now();
 
   // Automatically log the user out if ten minutes passes and they are a 2fa user.
@@ -75,7 +83,9 @@ const ClientManagerComponent = ({doGetAllClients, doLogout}: Props & ConnectedPr
           {_(clientManagerStrings.headline)}
         </H1>
         <Muted center style={{marginBottom: '42px'}} data-uie-name="status-device-limit-info">
-          {_(clientManagerStrings.subhead, {brandName: Config.getConfig().BRAND_NAME})}
+          {isOauth
+            ? _(clientManagerStrings.oauth, {device: browserVersion})
+            : _(clientManagerStrings.subhead, {brandName: Config.getConfig().BRAND_NAME})}
         </Muted>
         <ClientList />
         <Button
@@ -98,6 +108,7 @@ type DispatchProps = ReturnType<typeof mapDispatchToProps>;
 const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
   bindActionCreators(
     {
+      generateClientPayload: ROOT_ACTIONS.clientAction.generateClientPayload,
       doGetAllClients: ROOT_ACTIONS.clientAction.doGetAllClients,
       doLogout: ROOT_ACTIONS.authAction.doLogout,
     },

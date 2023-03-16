@@ -871,6 +871,11 @@ export const clientManagerStrings = defineMessages({
     defaultMessage: 'Remove one of your other devices to start using {brandName} on this one.',
     id: 'clientManager.subhead',
   },
+  oauth: {
+    defaultMessage:
+      'You are adding a new device. Only 7 devices can be active. Remove one of your devices to start using Wire on this one ({device}).',
+    id: 'clientManager.oauth',
+  },
 });
 
 export const clientItemStrings = defineMessages({
