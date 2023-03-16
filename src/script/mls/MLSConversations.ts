@@ -19,8 +19,6 @@
 
 import {Account} from '@wireapp/core';
 
-import {arrayToBase64} from 'Util/util';
-
 import {useMLSConversationState} from './mlsConversationState';
 
 import {ConversationRepository} from '../conversation/ConversationRepository';
@@ -45,20 +43,12 @@ export async function initMLSConversations(
   conversationRepository: MLSConversationRepository,
 ): Promise<void> {
   core.configureMLSCallbacks({
-    authorize: async groupIdBytes => {
-      const groupId = arrayToBase64(groupIdBytes);
-      const conversation = conversationRepository.findConversationByGroupId(groupId);
-      if (!conversation) {
-        // If the conversation is not found, it means it's being created by the self user, thus they have admin rights
-        return true;
-      }
-      return conversationRepository.conversationRoleRepository.isUserGroupAdmin(conversation, selfUser);
-    },
     groupIdFromConversationId: async conversationId => {
       const conversation = await conversationRepository.getConversationById(conversationId);
       return conversation?.groupId;
     },
-    // This is enforced by backend, no need to implement this on the client side.
+    // These rules are enforced by backend, no need to implement them on the client side.
+    authorize: async () => true,
     userAuthorize: async () => true,
   });
 
