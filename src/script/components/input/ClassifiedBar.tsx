@@ -43,6 +43,7 @@ const ClassifiedBar: React.FC<ClassifiedBarProps> = ({users, classifiedDomains, 
   if (typeof classifiedDomains === 'undefined') {
     return null;
   }
+
   const classified = isClassified(users, classifiedDomains);
   const text = classified ? t('conversationClassified') : t('conversationNotClassified');
 

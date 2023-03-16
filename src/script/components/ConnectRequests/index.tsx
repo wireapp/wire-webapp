@@ -121,7 +121,9 @@ const ConnectRequests: FC<ConnectRequestsProps> = ({
 
               <div className="connect-request-username label-username">{connectRequest.handle}</div>
 
-              {classifiedDomains && <ClassifiedBar users={[connectRequest]} classifiedDomains={classifiedDomains} />}
+              {classifiedDomains && (
+                <ClassifiedBar users={[userState.self(), connectRequest]} classifiedDomains={classifiedDomains} />
+              )}
 
               <Avatar
                 className="connect-request-avatar avatar-no-filter cursor-default"
