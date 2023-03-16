@@ -58,11 +58,7 @@ const MESSAGE_STATES = {
 const formatUserCount = (users: User[]): string => (users.length ? ` (${users.length})` : '');
 
 const getTotalReactionUsersCount = (reactions: Record<string, User[]>): number => {
-  let total = 0;
-  Object.keys(reactions).forEach(key => {
-    total += reactions[key].length;
-  });
-  return total;
+  return Object.keys(reactions).reduce((total, current) => (total += reactions[current].length), 0);
 };
 
 const formatReactionCount = (reactions: Record<string, User[]>): string => {
