@@ -57,7 +57,6 @@ import {ConnectionRepository} from '../connection/ConnectionRepository';
 import {ConnectionService} from '../connection/ConnectionService';
 import {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationService} from '../conversation/ConversationService';
-import {joinCodeFlowFinalizer} from '../conversation/joinCodeFlowFinalizer';
 import {MessageRepository} from '../conversation/MessageRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {AccessTokenError} from '../error/AccessTokenError';
@@ -79,7 +78,7 @@ import {IntegrationRepository} from '../integration/IntegrationRepository';
 import {IntegrationService} from '../integration/IntegrationService';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {MediaRepository} from '../media/MediaRepository';
-import {addOtherSelfClientsToMLSConversation, initMLSConversations, registerUninitializedConversations} from '../mls';
+import {initMLSConversations, registerUninitializedConversations} from '../mls';
 import {NotificationRepository} from '../notification/NotificationRepository';
 import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
 import {PermissionRepository} from '../permission/PermissionRepository';
@@ -421,25 +420,6 @@ export class App {
         onProgress(25 + 50 * (done / total), `${baseMessage}${extraInfo}`);
       });
       const notificationsCount = eventRepository.notificationsTotal;
-
-      // After mls conversations have been initialized we check if there's new mls conversation that user has joined via guest link
-      // if so, we can try adding other self clients to the related mls group
-      await joinCodeFlowFinalizer.finalize(async conversationId => {
-        try {
-          await addOtherSelfClientsToMLSConversation(
-            conversationId,
-            selfUser.qualifiedId,
-            this.core.clientId,
-            this.repository.conversation,
-            this.core,
-          );
-        } catch (error) {
-          this.logger.warn(
-            `Client was not able to add other self clients to MLS group of conversation ${conversationId.id}`,
-            error,
-          );
-        }
-      });
 
       if (supportsMLS()) {
         // Once all the messages have been processed and the message sending queue freed we can now add the potential `self` and `team` conversations

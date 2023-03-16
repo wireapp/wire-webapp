@@ -107,33 +107,30 @@ export async function registerUninitializedConversations(
 /**
  * Will add all other user's self clients to the mls group.
  *
- * @param conversationId id of the conversation
+ * @param conversation id of the conversation
  * @param selfUserId id of the self user who's clients should be added
  * @param clientId id of the current client (that should be skipped)
  * @param conversationRepository instance of the conversation repository
  * @param core instance of the core
  */
 export async function addOtherSelfClientsToMLSConversation(
-  conversationId: QualifiedId,
+  conversation: Conversation,
   selfUserId: QualifiedId,
-  clientId: string,
-  conversationRepository: MLSConversationRepository,
   core: Account,
 ) {
-  const conversation = await conversationRepository.getConversationById(conversationId);
-  const {groupId, isUsingMLSProtocol} = conversation;
+  const {groupId, qualifiedId} = conversation;
 
-  if (!isUsingMLSProtocol || !groupId) {
-    return;
+  if (!groupId) {
+    throw new Error(`No group id found for MLS conversation ${conversation.id}`);
   }
 
   const selfQualifiedUser: KeyPackageClaimUser = {
     ...selfUserId,
-    skipOwnClientId: clientId,
+    skipOwnClientId: core.clientId,
   };
 
   await core.service?.conversation.addUsersToMLSConversation({
-    conversationId,
+    conversationId: qualifiedId,
     groupId,
     qualifiedUsers: [selfQualifiedUser],
   });

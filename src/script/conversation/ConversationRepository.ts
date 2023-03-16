@@ -125,7 +125,7 @@ import * as LegalHoldEvaluator from '../legal-hold/LegalHoldEvaluator';
 import {MessageCategory} from '../message/MessageCategory';
 import {SuperType} from '../message/SuperType';
 import {SystemMessageType} from '../message/SystemMessageType';
-import {useMLSConversationState} from '../mls';
+import {addOtherSelfClientsToMLSConversation, useMLSConversationState} from '../mls';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {Core} from '../service/CoreSingleton';
 import type {EventRecord} from '../storage';
@@ -2461,14 +2461,19 @@ export class ConversationRepository {
     }
 
     // Self user joins again
-    const selfUserRejoins = eventData.user_ids.includes(this.userState.self().id);
-    if (selfUserRejoins) {
+    const selfUserJoins =
+      eventData.user_ids.includes(this.userState.self().id) ||
+      eventData.users?.some(
+        ({qualified_id: qualifiedId}) =>
+          qualifiedId && matchQualifiedIds(qualifiedId, this.userState.self().qualifiedId),
+      );
+    if (selfUserJoins) {
       conversationEntity.status(ConversationStatus.CURRENT_MEMBER);
       await this.conversationRoleRepository.updateConversationRoles(conversationEntity);
     }
 
     const updateSequence =
-      selfUserRejoins || connectionEntity?.isConnected()
+      selfUserJoins || connectionEntity?.isConnected()
         ? this.updateConversationFromBackend(conversationEntity)
         : Promise.resolve();
 
@@ -2482,6 +2487,15 @@ export class ConversationRepository {
     ) {
       // If the conversation was not previously marked as established and the core if aware of this conversation, we can mark is as established
       useMLSConversationState.getState().markAsEstablished(conversationEntity.groupId);
+    }
+
+    const isFromSelf = eventJson.from === this.userState.self().id;
+
+    if (isFromSelf && selfUserJoins) {
+      // if user has joined and was also event creator (eg. joined via guest link) we need to add its other clients to mls group
+      if (conversationEntity.protocol === ConversationProtocol.MLS) {
+        await addOtherSelfClientsToMLSConversation(conversationEntity, this.userState.self().qualifiedId, this.core);
+      }
     }
 
     return updateSequence
