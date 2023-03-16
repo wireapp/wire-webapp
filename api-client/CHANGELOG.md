@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [23.2.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@23.2.0...@wireapp/api-client@23.2.1) (2023-03-16)
+
+### Bug Fixes
+
+* Improve prekeys tracking between client and backend ([#4967](https://github.com/wireapp/wire-web-packages/issues/4967)) ([388902c](https://github.com/wireapp/wire-web-packages/commit/388902cf08f0f5394143bad44f850683f6c3daff))
+
 # [23.2.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@23.1.3...@wireapp/api-client@23.2.0) (2023-03-15)
 
 ### Features
