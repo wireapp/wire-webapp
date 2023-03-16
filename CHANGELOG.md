@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [39.2.5](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@39.2.4...@wireapp/core@39.2.5) (2023-03-16)
+
+### Bug Fixes
+
+* Improve prekeys tracking between client and backend ([#4967](https://github.com/wireapp/wire-web-packages/issues/4967)) ([388902c](https://github.com/wireapp/wire-web-packages/commit/388902cf08f0f5394143bad44f850683f6c3daff))
+
 ## [39.2.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@39.2.3...@wireapp/core@39.2.4) (2023-03-15)
 
 **Note:** Version bump only for package @wireapp/core
