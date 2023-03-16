@@ -2494,7 +2494,11 @@ export class ConversationRepository {
     if (isFromSelf && selfUserJoins) {
       // if user has joined and was also event creator (eg. joined via guest link) we need to add its other clients to mls group
       if (conversationEntity.protocol === ConversationProtocol.MLS) {
-        await addOtherSelfClientsToMLSConversation(conversationEntity, this.userState.self().qualifiedId, this.core);
+        try {
+          await addOtherSelfClientsToMLSConversation(conversationEntity, this.userState.self().qualifiedId, this.core);
+        } catch (error) {
+          this.logger.warn(`Failed to add other self clients to MLS conversation: ${conversationEntity.id}`, error);
+        }
       }
     }
 
