@@ -105,9 +105,9 @@ export const PartialFailureToSendWarning = ({failedToSend, knownUsers}: Props) =
       {showToggle && (
         <>
           {isOpen && (
-            <p css={warning}>
+            <>
               {namedUsers.length !== 0 && (
-                <>
+                <p css={warning}>
                   {namedUsers
                     .map(user => (
                       <Bold
@@ -123,10 +123,10 @@ export const PartialFailureToSendWarning = ({failedToSend, knownUsers}: Props) =
                       return prev.length === 0 ? [element] : [...prev, ', ', element];
                     }, [])}
                   {` ${t('messageFailedToSendWillReceive')}`}
-                </>
+                </p>
               )}
               {failed && (
-                <p data-uie-name="failed">
+                <p css={warning} data-uie-name="failed">
                   {unreachableUsers
                     .map(user => (
                       <Bold css={warning} data-uie-name="unreachable-domain" key={user.domain + user.count.toString()}>
@@ -148,7 +148,7 @@ export const PartialFailureToSendWarning = ({failedToSend, knownUsers}: Props) =
                     : ` ${t('messageFailedToSendWillNotReceive')}`}
                 </p>
               )}
-            </p>
+            </>
           )}
           <Button type="button" variant={ButtonVariant.TERTIARY} onClick={() => setIsOpen(state => !state)}>
             {isOpen ? t('messageFailedToSendHideDetails') : t('messageFailedToSendShowDetails')}
