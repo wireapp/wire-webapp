@@ -85,22 +85,17 @@ export const PartialFailureToSendWarning = ({failedToSend, knownUsers}: Props) =
 
   const unreachableUsers = generateUnreachableUsers(failed);
 
-  const FailedToSendToOne =
-    namedUsers.length === 1
-      ? {head: namedUsers[0].username(), rest: t('messageFailedToSendWillReceiveSingular')}
-      : unreachableUsers.length === 1 && {
-          head: t('messageFailedToSendParticipantsFromDomainSingular', {
-            domain: unreachableUsers[0].domain,
-          }),
-          rest: t('messageFailedToSendWillNotReceiveSingular'),
-        };
-
-  const message = !showToggle
-    ? FailedToSendToOne
-    : {
-        head: t('messageFailedToSendParticipants', {count: userCount.toString()}),
-        rest: t('messageFailedToSendToSome'),
-      };
+  const message = {head: '', rest: ''};
+  if (showToggle) {
+    message.head = t('messageFailedToSendParticipants', {count: userCount.toString()});
+    message.rest = t('messageFailedToSendToSome');
+  } else if (namedUsers.length === 1) {
+    message.head = namedUsers[0].username();
+    message.rest = t('messageFailedToSendWillReceiveSingular');
+  } else if (unreachableUsers.length === 1) {
+    message.head = t('messageFailedToSendParticipantsFromDomainSingular', {domain: unreachableUsers[0].domain});
+    message.rest = t('messageFailedToSendWillNotReceiveSingular');
+  }
 
   return (
     <div>
