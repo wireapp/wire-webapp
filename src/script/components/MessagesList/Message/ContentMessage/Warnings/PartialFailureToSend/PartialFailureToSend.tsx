@@ -106,6 +106,8 @@ export const PartialFailureToSendWarning = ({failedToSend, knownUsers}: Props) =
         <>
           {isOpen && (
             <>
+              {/* maps through the known users that will receive the message later:
+              "Alice, Bob will get your message later" */}
               {namedUsers.length !== 0 && (
                 <p css={warning}>
                   {namedUsers
@@ -125,6 +127,9 @@ export const PartialFailureToSendWarning = ({failedToSend, knownUsers}: Props) =
                   {` ${t('messageFailedToSendWillReceive')}`}
                 </p>
               )}
+
+              {/* maps through the unreachable users that will never receive the message:
+              "3 participants from alpha.domain, 1 participant from beta.domain won't get your message" */}
               {failed && (
                 <p css={warning} data-uie-name="failed">
                   {unreachableUsers
