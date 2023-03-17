@@ -71,6 +71,6 @@ export const getEmojiTitleFromEmojiUnicode = (emojiUnicode: string): string => {
 export function getEmojiUnicode(emojis: string) {
   const hexCode = 16;
   const padding = 4;
-  const unicode = [...emojis].map(emoji => emoji?.codePointAt(0)?.toString(hexCode).padStart(padding, '0')).join('-');
+  const unicode = [...emojis].map(emoji => emoji.codePointAt(0)?.toString(hexCode).padStart(padding, '0')).join('-');
   return unicode;
 }
