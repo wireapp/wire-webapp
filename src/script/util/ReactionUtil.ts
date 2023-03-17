@@ -17,7 +17,7 @@
  *
  */
 
-export function transformReactionObj(reactions: {[key: string]: string}) {
+export function groupByReactionUsers(reactions: {[key: string]: string}) {
   const reactionsGroupByUser: {[key: string]: string[]} = {};
   for (const user in reactions) {
     const userReactions = reactions[user] && reactions[user].split(',');

@@ -32,7 +32,7 @@ import {Message} from 'src/script/entity/message/Message';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getMessageAriaLabel} from 'Util/conversationMessages';
 import {t} from 'Util/LocalizerUtil';
-import {transformReactionObj} from 'Util/ReactionUtil';
+import {groupByReactionUsers} from 'Util/ReactionUtil';
 
 import {ContentAsset} from './asset';
 import {MessageActionsMenu} from './MessageActions/MessageActions';
@@ -103,7 +103,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
       'reactions',
     ]);
 
-  const reactionGroupedByUser = transformReactionObj(reactions);
+  const reactionGroupedByUser = groupByReactionUsers(reactions);
 
   const shouldShowAvatar = (): boolean => {
     if (!previousMessage || hasMarker) {

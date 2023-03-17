@@ -29,8 +29,9 @@ import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
 import {UserSearchableList} from 'Components/UserSearchableList';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {emojiDictionary, getEmojiUnicode} from 'Util/EmojiUtil';
+import {getEmojiTitleFromEmojiUnicode, getEmojiUnicode} from 'Util/EmojiUtil';
 import {t} from 'Util/LocalizerUtil';
+import {groupByReactionUsers} from 'Util/ReactionUtil';
 import {formatLocale} from 'Util/TimeUtil';
 
 import {ConversationRepository} from '../../../conversation/ConversationRepository';
@@ -136,26 +137,21 @@ const MessageDetails: FC<MessageDetailsProps> = ({
     const usersMap = new Map<string, User>();
     const currentReactions = Object.keys(reactions);
     const usersReactions = await userRepository.getUsersById(
-      currentReactions.map(reactionId => ({domain: '', id: reactionId})),
+      currentReactions.map(userId => ({domain: '', id: userId})),
     );
     usersReactions.forEach(user => {
       usersMap.set(user.id, user);
     });
+    const reactionsGroupByUser = groupByReactionUsers(reactions);
+    const reactionsGroupByUserMap = new Map<string, User[]>();
+    Object.entries(reactionsGroupByUser).forEach(([reaction, users]) => {
+      reactionsGroupByUserMap.set(
+        reaction,
+        users.map(user => usersMap.get(user)!),
+      );
+    });
 
-    const reactionsGroupByUser = new Map<string, User[]>();
-    for (const userId in reactions) {
-      const user = usersMap.get(userId);
-      const userReactions = reactions[userId]?.split(',');
-      for (const reaction of userReactions) {
-        if (reactionsGroupByUser.has(reaction)) {
-          const currentUsers = reactionsGroupByUser.get(reaction);
-          reactionsGroupByUser.set(reaction, currentUsers ?? []);
-        } else if (user) {
-          reactionsGroupByUser.set(reaction, [user]);
-        }
-      }
-    }
-    setReactionUsers(reactionsGroupByUser);
+    setReactionUsers(reactionsGroupByUserMap);
   }, []);
 
   const receiptTimes = useMemo(() => {
@@ -269,7 +265,7 @@ const MessageDetails: FC<MessageDetailsProps> = ({
             <Fragment key={reactionUserGroupKey}>
               <div className="panel__content_title">
                 <span>{reactionUserGroupKey}</span>
-                <span>{emojiDictionary[getEmojiUnicode(reactionUserGroupKey)]}</span>
+                <span>{getEmojiTitleFromEmojiUnicode(getEmojiUnicode(reactionUserGroupKey))}</span>
               </div>
               <UserSearchableList
                 key={reactionUserGroupKey}
