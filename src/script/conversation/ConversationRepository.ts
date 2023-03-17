@@ -2514,7 +2514,11 @@ export class ConversationRepository {
       conversation.groupId,
     );
 
-    if (!isMLSConversationMarkedAsEstablished && isMLSConversationEstablished) {
+    if (!isMLSConversationEstablished) {
+      return;
+    }
+
+    if (!isMLSConversationMarkedAsEstablished) {
       // If the conversation was not previously marked as established and the core if aware of this conversation, we can mark is as established
       useMLSConversationState.getState().markAsEstablished(conversation.groupId);
     }
