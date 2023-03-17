@@ -63,8 +63,7 @@ function generateNamedUsers(users: User[], userClients: QualifiedUserClients): P
 
 function generateUnreachableUsers(users: QualifiedId[]) {
   const userCountByDomain = countBy(users, 'domain');
-  const unreachableUsers = map(userCountByDomain, (count, domain) => ({count, domain}));
-  return unreachableUsers;
+  return map(userCountByDomain, (count, domain) => ({count, domain}));
 }
 
 function reduceWithCommas(elements: React.ReactNode[]) {
