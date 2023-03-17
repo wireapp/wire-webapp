@@ -56,7 +56,7 @@ function generateQualifiedIds(nbUsers: number, domain: string) {
 
 describe('PartialFailureToSendWarning', () => {
   it('displays the number of users that did not get the message', () => {
-    const nbUsers = Math.floor(Math.random() * 100);
+    const nbUsers = Math.floor(Math.random() * 100) + 2;
     const users = generateUsers(nbUsers, 'domain');
 
     const queued = generateUserClients(users);
@@ -65,7 +65,7 @@ describe('PartialFailureToSendWarning', () => {
   });
 
   it('displays the number of named users that did not get the message across multiple domains', () => {
-    const nbUsersDomain1 = Math.floor(Math.random() * 100);
+    const nbUsersDomain1 = Math.floor(Math.random() * 100) + 2;
     const nbUsersDomain2 = Math.floor(Math.random() * 100);
     const users1 = generateUsers(nbUsersDomain1, 'domain1');
     const users2 = generateUsers(nbUsersDomain2, 'domain2');
@@ -79,7 +79,7 @@ describe('PartialFailureToSendWarning', () => {
   });
 
   it('displays the number of unreachable users that did not get the message across multiple domains', () => {
-    const nbUsersDomain1 = Math.floor(Math.random() * 100);
+    const nbUsersDomain1 = Math.floor(Math.random() * 100) + 2;
     const nbUsersDomain2 = Math.floor(Math.random() * 100);
     const users1 = generateQualifiedIds(nbUsersDomain1, 'domain1');
     const users2 = generateQualifiedIds(nbUsersDomain2, 'domain2');
@@ -90,7 +90,7 @@ describe('PartialFailureToSendWarning', () => {
   });
 
   it('displays the number of users, named or unreachable that did not get the message across multiple domains', () => {
-    const nbUsersDomain1 = Math.floor(Math.random() * 100);
+    const nbUsersDomain1 = Math.floor(Math.random() * 100) + 2;
     const nbUsersDomain2 = Math.floor(Math.random() * 100);
     const users1 = generateUsers(nbUsersDomain1, 'domain1');
     const users2 = generateUsers(nbUsersDomain2, 'domain2');
@@ -196,5 +196,27 @@ describe('PartialFailureToSendWarning', () => {
     expect(container.textContent).toContain(
       `${nbUsersDomain1} participants from domain1, ${nbUsersDomain2} participants from domain2 won't get your message`,
     );
+  });
+
+  it('displays the info toggle when there is a single named user and a single unreachable user', () => {
+    const namedUsers = generateUsers(1, 'domain1');
+    const queued = generateUserClients(namedUsers);
+
+    const failed = [...generateQualifiedIds(1, 'domain2')];
+
+    const {getByText} = render(
+      withTheme(<PartialFailureToSendWarning knownUsers={namedUsers} failedToSend={{queued, failed}} />),
+    );
+    act(() => {
+      getByText('Show details').click();
+    });
+
+    expect(getByText('Hide details')).not.toBeNull();
+
+    act(() => {
+      getByText('Hide details').click();
+    });
+
+    expect(getByText('Show details')).not.toBeNull();
   });
 });
