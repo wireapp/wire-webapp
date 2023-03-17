@@ -86,11 +86,11 @@ export const PartialFailureToSendWarning = ({failedToSend, knownUsers}: Props) =
   const unreachableUsers = generateUnreachableUsers(failed);
 
   const FailedToSendToOne =
-    namedUsers.length === 1 ?? unreachableUsers.length === 1
+    namedUsers.length === 1
       ? {head: namedUsers[0].username(), rest: t('messageFailedToSendWillReceiveSingular')}
-      : {
+      : unreachableUsers.length === 1 && {
           head: t('messageFailedToSendParticipantsFromDomainSingular', {
-            domain: unreachableUsers[0]?.domain,
+            domain: unreachableUsers[0].domain,
           }),
           rest: t('messageFailedToSendWillNotReceiveSingular'),
         };
