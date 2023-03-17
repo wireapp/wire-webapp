@@ -168,7 +168,7 @@ describe('PartialFailureToSendWarning', () => {
       getByText('Show details').click();
     });
 
-    expect(getAllByTestId('recipient')).toHaveLength(nbUsers);
+    expect(getAllByTestId('named-user')).toHaveLength(nbUsers);
     expect(getByText('Hide details')).not.toBeNull();
   });
 
@@ -192,7 +192,7 @@ describe('PartialFailureToSendWarning', () => {
       getByText('Show details').click();
     });
 
-    expect(getAllByTestId('recipient')).toHaveLength(nbNamedUsers);
+    expect(getAllByTestId('named-user')).toHaveLength(nbNamedUsers);
     expect(container.textContent).toContain(
       `${nbUsersDomain1} participants from domain1, ${nbUsersDomain2} participants from domain2 won't get your message`,
     );

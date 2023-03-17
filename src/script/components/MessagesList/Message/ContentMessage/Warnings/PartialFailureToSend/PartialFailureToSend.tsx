@@ -67,6 +67,12 @@ function generateUnreachableUsers(users: QualifiedId[]) {
   return unreachableUsers;
 }
 
+function reduceWithCommas(elements: React.ReactNode[]) {
+  return elements.reduce<React.ReactNode[]>((prev, element) => {
+    return prev.length === 0 ? [element] : [...prev, ', ', element];
+  }, []);
+}
+
 export const PartialFailureToSendWarning = ({failedToSend, knownUsers}: Props) => {
   const [isOpen, setIsOpen] = useState(false);
   const {queued = {}, failed = []} = failedToSend;
@@ -81,7 +87,7 @@ export const PartialFailureToSendWarning = ({failedToSend, knownUsers}: Props) =
   const unreachableUsers = generateUnreachableUsers(failed);
 
   const FailedToSendToOne =
-    namedUsers.length === 1
+    namedUsers.length === 1 ?? unreachableUsers.length === 1
       ? {head: namedUsers[0].username(), rest: t('messageFailedToSendWillReceiveSingular')}
       : {
           head: t('messageFailedToSendParticipantsFromDomainSingular', {
@@ -110,20 +116,18 @@ export const PartialFailureToSendWarning = ({failedToSend, knownUsers}: Props) =
               "Alice, Bob will get your message later" */}
               {namedUsers.length !== 0 && (
                 <p css={warning}>
-                  {namedUsers
-                    .map(user => (
+                  {reduceWithCommas(
+                    namedUsers.map(user => (
                       <Bold
                         css={warning}
-                        data-uie-name="recipient"
+                        data-uie-name="named-user"
                         data-uie-value={user.qualifiedId.id}
                         key={user.qualifiedId.id}
                       >
                         {user.username()}
                       </Bold>
-                    ))
-                    .reduce<React.ReactNode[]>((prev, element) => {
-                      return prev.length === 0 ? [element] : [...prev, ', ', element];
-                    }, [])}
+                    )),
+                  )}
                   {` ${t('messageFailedToSendWillReceive')}`}
                 </p>
               )}
@@ -131,9 +135,9 @@ export const PartialFailureToSendWarning = ({failedToSend, knownUsers}: Props) =
               {/* maps through the unreachable users that will never receive the message:
               "3 participants from alpha.domain, 1 participant from beta.domain won't get your message" */}
               {failed && (
-                <p css={warning} data-uie-name="failed">
-                  {unreachableUsers
-                    .map(user => (
+                <p css={warning}>
+                  {reduceWithCommas(
+                    unreachableUsers.map(user => (
                       <Bold css={warning} data-uie-name="unreachable-domain" key={user.domain + user.count.toString()}>
                         {user.count > 1
                           ? t('messageFailedToSendParticipantsFromDomain', {
@@ -144,10 +148,8 @@ export const PartialFailureToSendWarning = ({failedToSend, knownUsers}: Props) =
                               domain: user.domain,
                             })}
                       </Bold>
-                    ))
-                    .reduce<React.ReactNode[]>((prev, element) => {
-                      return prev.length === 0 ? [element] : [...prev, ', ', element];
-                    }, [])}
+                    )),
+                  )}
                   {unreachableUsers.length === 1
                     ? ` ${t('messageFailedToSendWillNotReceiveSingular')}`
                     : ` ${t('messageFailedToSendWillNotReceive')}`}
