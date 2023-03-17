@@ -2460,10 +2460,13 @@ export class ConversationRepository {
       });
     }
 
+    // Self user is a creator of the event
+    const isFromSelf = eventJson.from === this.userState.self().id;
+
     // Self user joins again
     const selfUserJoins =
       eventData.user_ids.includes(this.userState.self().id) ||
-      eventData.users?.some(
+      !!eventData.users?.some(
         ({qualified_id: qualifiedId}) =>
           qualifiedId && matchQualifiedIds(qualifiedId, this.userState.self().qualifiedId),
       );
@@ -2480,26 +2483,9 @@ export class ConversationRepository {
     const qualifiedUserIds =
       eventData.users?.map(user => user.qualified_id) || eventData.user_ids.map(userId => ({domain: '', id: userId}));
 
-    if (
-      conversationEntity.groupId &&
-      !useMLSConversationState.getState().isEstablished(conversationEntity.groupId) &&
-      (await this.core.service!.conversation.isMLSConversationEstablished(conversationEntity.groupId))
-    ) {
-      // If the conversation was not previously marked as established and the core if aware of this conversation, we can mark is as established
-      useMLSConversationState.getState().markAsEstablished(conversationEntity.groupId);
-    }
-
-    const isFromSelf = eventJson.from === this.userState.self().id;
-
-    if (isFromSelf && selfUserJoins) {
-      // if user has joined and was also event creator (eg. joined via guest link) we need to add its other clients to mls group
-      if (conversationEntity.protocol === ConversationProtocol.MLS) {
-        try {
-          await addOtherSelfClientsToMLSConversation(conversationEntity, this.userState.self().qualifiedId, this.core);
-        } catch (error) {
-          this.logger.warn(`Failed to add other self clients to MLS conversation: ${conversationEntity.id}`, error);
-        }
-      }
+    if (conversationEntity.isUsingMLSProtocol) {
+      const isSelfJoin = isFromSelf && selfUserJoins;
+      await this.handleMLSConversationMemberJoin(conversationEntity, isSelfJoin);
     }
 
     return updateSequence
@@ -2509,6 +2495,43 @@ export class ConversationRepository {
         this.verificationStateHandler.onMemberJoined(conversationEntity, qualifiedUserIds);
         return {conversationEntity, messageEntity};
       });
+  }
+
+  /**
+   * Handles member join event on mls group - updating mls conversation state and adding other self clients if user has joined by itself.
+   *
+   * @param conversation Conversation member joined to
+   * @param isSelfJoin whether user has joined by itself, if so we need to add other self clients to mls group
+   */
+  private async handleMLSConversationMemberJoin(conversation: Conversation, isSelfJoin: boolean) {
+    if (!conversation.groupId) {
+      throw new Error(`groupId not found for MLS conversation ${conversation.id}`);
+    }
+
+    const isMLSConversationMarkedAsEstablished = useMLSConversationState.getState().isEstablished(conversation.groupId);
+
+    const isMLSConversationEstablished = await this.core.service!.conversation.isMLSConversationEstablished(
+      conversation.groupId,
+    );
+
+    if (!isMLSConversationMarkedAsEstablished && isMLSConversationEstablished) {
+      // If the conversation was not previously marked as established and the core if aware of this conversation, we can mark is as established
+      useMLSConversationState.getState().markAsEstablished(conversation.groupId);
+    }
+
+    if (isSelfJoin) {
+      // if user has joined and was also event creator (eg. joined via guest link) we need to add its other clients to mls group
+      try {
+        await addOtherSelfClientsToMLSConversation(
+          conversation,
+          this.userState.self().qualifiedId,
+          this.core.clientId,
+          this.core,
+        );
+      } catch (error) {
+        this.logger.warn(`Failed to add other self clients to MLS conversation: ${conversation.id}`, error);
+      }
+    }
   }
 
   /**

@@ -109,13 +109,13 @@ export async function registerUninitializedConversations(
  *
  * @param conversation id of the conversation
  * @param selfUserId id of the self user who's clients should be added
- * @param clientId id of the current client (that should be skipped)
- * @param conversationRepository instance of the conversation repository
+ * @param selfClientId id of the current client (that should be skipped)
  * @param core instance of the core
  */
 export async function addOtherSelfClientsToMLSConversation(
   conversation: Conversation,
   selfUserId: QualifiedId,
+  selfClientId: string,
   core: Account,
 ) {
   const {groupId, qualifiedId} = conversation;
@@ -126,7 +126,7 @@ export async function addOtherSelfClientsToMLSConversation(
 
   const selfQualifiedUser: KeyPackageClaimUser = {
     ...selfUserId,
-    skipOwnClientId: core.clientId,
+    skipOwnClientId: selfClientId,
   };
 
   await core.service?.conversation.addUsersToMLSConversation({

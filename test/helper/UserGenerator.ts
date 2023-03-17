@@ -28,7 +28,9 @@ import {serverTimeHandler} from '../../src/script/time/serverTimeHandler';
 import {UserMapper} from '../../src/script/user/UserMapper';
 
 export class UserGenerator {
-  static getRandomUser(): User {
+  static getRandomUser(domain?: string): User {
+    const id = createRandomUuid();
+
     const template: APIClientUser = {
       accent_id: Math.floor(Math.random() * 7 + 1),
       assets: [
@@ -44,8 +46,9 @@ export class UserGenerator {
         },
       ],
       handle: faker.internet.userName(),
-      id: createRandomUuid(),
+      id,
       name: faker.name.fullName(),
+      qualified_id: domain ? {id, domain} : undefined,
     };
 
     return new UserMapper(serverTimeHandler).mapUserFromJson(template);
