@@ -57,11 +57,11 @@ const MESSAGE_STATES = {
 
 const formatUserCount = (users: User[]): string => (users.length ? ` (${users.length})` : '');
 
-const getTotalReactionUsersCount = (reactions: Record<string, User[]>): number => {
-  return Object.keys(reactions).reduce((total, current) => (total += reactions[current].length), 0);
+const getTotalReactionUsersCount = (reactions: Map<string, User[]>): number => {
+  return Object.keys(reactions).reduce((total, current) => (total += reactions.get(current)?.length ?? 0), 0);
 };
 
-const formatReactionCount = (reactions: Record<string, User[]>): string => {
+const formatReactionCount = (reactions: Map<string, User[]>): string => {
   const total = getTotalReactionUsersCount(reactions);
   return total ? ` (${total})` : '';
 };
@@ -97,7 +97,7 @@ const MessageDetails: FC<MessageDetailsProps> = ({
   togglePanel,
 }) => {
   const [receiptUsers, setReceiptUsers] = useState<User[]>([]);
-  const [reactionUsers, setReactionUsers] = useState<Record<string, User[]>>({});
+  const [reactionUsers, setReactionUsers] = useState<Map<string, User[]>>(new Map());
   const [messageId, setMessageId] = useState<string>(messageEntity.id);
 
   const [isReceiptsOpen, setIsReceiptsOpen] = useState<boolean>(!showReactions);
@@ -133,27 +133,28 @@ const MessageDetails: FC<MessageDetailsProps> = ({
   }, [supportsReceipts, isReceiptsOpen, messageEntity, receiptUsers, reactionUsers]);
 
   const getReactions = useCallback(async (reactions: UserReactionMap) => {
-    const usersMap: Record<string, User> = {};
+    const usersMap = new Map<string, User>();
     const currentReactions = Object.keys(reactions);
     const usersReactions = await userRepository.getUsersById(
       currentReactions.map(reactionId => ({domain: '', id: reactionId})),
     );
     usersReactions.forEach(user => {
-      usersMap[user.id] = user;
+      usersMap.set(user.id, user);
     });
-    const reactionsGroupByUser: {[key: string]: User[]} = {};
+
+    const reactionsGroupByUser = new Map<string, User[]>();
     for (const userId in reactions) {
-      const user = usersMap[userId];
-      const userReactions = reactions[userId] && reactions[userId].split(',');
+      const user = usersMap.get(userId);
+      const userReactions = reactions[userId]?.split(',');
       for (const reaction of userReactions) {
-        if (reactionsGroupByUser[reaction]) {
-          reactionsGroupByUser[reaction].push(user);
-        } else {
-          reactionsGroupByUser[reaction] = [user];
+        if (reactionsGroupByUser.has(reaction)) {
+          const currentUsers = reactionsGroupByUser.get(reaction);
+          reactionsGroupByUser.set(reaction, currentUsers ?? []);
+        } else if (user) {
+          reactionsGroupByUser.set(reaction, [user]);
         }
       }
     }
-
     setReactionUsers(reactionsGroupByUser);
   }, []);
 
@@ -273,7 +274,7 @@ const MessageDetails: FC<MessageDetailsProps> = ({
               <UserSearchableList
                 key={reactionUserGroupKey}
                 dataUieName="reaction-list"
-                users={reactionUsers[reactionUserGroupKey]}
+                users={reactionUsers.get(reactionUserGroupKey) ?? []}
                 noUnderline
                 conversationRepository={conversationRepository}
                 searchRepository={searchRepository}
