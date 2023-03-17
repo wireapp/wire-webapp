@@ -2508,8 +2508,6 @@ export class ConversationRepository {
       throw new Error(`groupId not found for MLS conversation ${conversation.id}`);
     }
 
-    const isMLSConversationMarkedAsEstablished = useMLSConversationState.getState().isEstablished(conversation.groupId);
-
     const isMLSConversationEstablished = await this.core.service!.conversation.isMLSConversationEstablished(
       conversation.groupId,
     );
@@ -2517,6 +2515,8 @@ export class ConversationRepository {
     if (!isMLSConversationEstablished) {
       return;
     }
+
+    const isMLSConversationMarkedAsEstablished = useMLSConversationState.getState().isEstablished(conversation.groupId);
 
     if (!isMLSConversationMarkedAsEstablished) {
       // If the conversation was not previously marked as established and the core if aware of this conversation, we can mark is as established
