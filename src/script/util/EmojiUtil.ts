@@ -45,11 +45,11 @@ export const includesOnlyEmojis = (text: string) =>
 
 const emojiesFlatten = Object.values(emojies).flat();
 export const emojiesList = groupBy(emojiesFlatten, 'u');
-export const emojiDictionary: Record<string, string> = {};
+export const emojiDictionary: Map<string, string> = new Map();
 
 Object.keys(emojiesList).forEach(key => {
   // return if already existing in the dictionary
-  if (emojiDictionary[key]) {
+  if (emojiDictionary.get(key)) {
     return;
   }
   const emojiValue = emojiesList[key];
@@ -61,11 +61,11 @@ Object.keys(emojiesList).forEach(key => {
   const emojiObject = emojiValue[0];
   const emojiNames = emojiObject.n;
 
-  emojiDictionary[key] = emojiNames[0].replaceAll('-', ' ');
+  emojiDictionary.set(key, emojiNames[0].replaceAll('-', ' '));
 });
 
 export const getEmojiTitleFromEmojiUnicode = (emojiUnicode: string): string => {
-  return emojiDictionary[emojiUnicode];
+  return emojiDictionary.get(emojiUnicode) ?? '';
 };
 
 export function getEmojiUnicode(emojis: string) {
