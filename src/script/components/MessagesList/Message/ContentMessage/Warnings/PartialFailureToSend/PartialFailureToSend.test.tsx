@@ -77,6 +77,7 @@ describe('PartialFailureToSendWarning', () => {
     const {container} = render(withTheme(<PartialFailureToSendWarning knownUsers={[]} failedToSend={{queued}} />));
     expect(container.textContent).toContain(`${nbUsersDomain1 + nbUsersDomain2} participants didn't get your message`);
   });
+  
   it('displays the number of unreachable users that did not get the message across multiple domains', () => {
     const nbUsersDomain1 = Math.floor(Math.random() * 100);
     const nbUsersDomain2 = Math.floor(Math.random() * 100);
@@ -87,6 +88,7 @@ describe('PartialFailureToSendWarning', () => {
     const {container} = render(withTheme(<PartialFailureToSendWarning knownUsers={[]} failedToSend={{failed}} />));
     expect(container.textContent).toContain(`${nbUsersDomain1 + nbUsersDomain2} participants didn't get your message`);
   });
+  
   it('displays the number of users, named or unreachable that did not get the message across multiple domains', () => {
     const nbUsersDomain1 = Math.floor(Math.random() * 100);
     const nbUsersDomain2 = Math.floor(Math.random() * 100);
@@ -124,6 +126,7 @@ describe('PartialFailureToSendWarning', () => {
     expect(queryByText('Show details')).toBeNull();
     expect(container.textContent).toContain(`${users[0].username()} will get your message later`);
   });
+  
   it('does not show the extra info toggle if there is only a single unreachable user', () => {
     const users = generateQualifiedIds(1, 'domain');
     const failed = users;
