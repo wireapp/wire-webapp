@@ -126,7 +126,7 @@ export const PartialFailureToSendWarning = ({failedToSend, knownUsers}: Props) =
                 </>
               )}
               {failed && (
-                <span data-uie-name="failed">
+                <p data-uie-name="failed">
                   {unreachableUsers
                     .map(user => (
                       <Bold css={warning} data-uie-name="unreachable-domain" key={user.domain + user.count.toString()}>
@@ -146,7 +146,7 @@ export const PartialFailureToSendWarning = ({failedToSend, knownUsers}: Props) =
                   {unreachableUsers.length === 1
                     ? ` ${t('messageFailedToSendWillNotReceiveSingular')}`
                     : ` ${t('messageFailedToSendWillNotReceive')}`}
-                </span>
+                </p>
               )}
             </p>
           )}
