@@ -2464,12 +2464,14 @@ export class ConversationRepository {
     const isFromSelf = eventJson.from === this.userState.self().id;
 
     // Self user joins again
-    const selfUserJoins =
-      eventData.user_ids.includes(this.userState.self().id) ||
-      !!eventData.users?.some(
-        ({qualified_id: qualifiedId}) =>
-          qualifiedId && matchQualifiedIds(qualifiedId, this.userState.self().qualifiedId),
-      );
+
+    const containsSelfId = eventData.user_ids.includes(this.userState.self().id);
+    const containsSelfQualifiedId = !!eventData.users?.some(
+      ({qualified_id: qualifiedId}) => qualifiedId && matchQualifiedIds(qualifiedId, this.userState.self().qualifiedId),
+    );
+
+    const selfUserJoins = containsSelfId || containsSelfQualifiedId;
+
     if (selfUserJoins) {
       conversationEntity.status(ConversationStatus.CURRENT_MEMBER);
       await this.conversationRoleRepository.updateConversationRoles(conversationEntity);
@@ -2504,23 +2506,25 @@ export class ConversationRepository {
    * @param isSelfJoin whether user has joined by itself, if so we need to add other self clients to mls group
    */
   private async handleMLSConversationMemberJoin(conversation: Conversation, isSelfJoin: boolean) {
-    if (!conversation.groupId) {
+    const {groupId} = conversation;
+
+    if (!groupId) {
       throw new Error(`groupId not found for MLS conversation ${conversation.id}`);
     }
 
-    const isMLSConversationEstablished = await this.core.service!.conversation.isMLSConversationEstablished(
-      conversation.groupId,
-    );
+    const isMLSConversationEstablished = await this.core.service!.conversation.isMLSConversationEstablished(groupId);
 
     if (!isMLSConversationEstablished) {
       return;
     }
 
-    const isMLSConversationMarkedAsEstablished = useMLSConversationState.getState().isEstablished(conversation.groupId);
+    const mlsConversationState = useMLSConversationState.getState();
+
+    const isMLSConversationMarkedAsEstablished = mlsConversationState.isEstablished(groupId);
 
     if (!isMLSConversationMarkedAsEstablished) {
       // If the conversation was not previously marked as established and the core if aware of this conversation, we can mark is as established
-      useMLSConversationState.getState().markAsEstablished(conversation.groupId);
+      mlsConversationState.markAsEstablished(groupId);
     }
 
     if (isSelfJoin) {
