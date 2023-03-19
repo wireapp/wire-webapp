@@ -24,14 +24,16 @@ import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {t} from 'Util/LocalizerUtil';
 import {createRandomUuid} from 'Util/util';
 
-import {MessageActions, MessageActionsProps} from './MessageActions';
+import {MessageActionsMenu, MessageActionsMenuProps} from './MessageActions';
 
-const defaultProps: MessageActionsProps = {
+const defaultProps: MessageActionsMenuProps = {
   isMsgWithHeader: true,
   message: new ContentMessage(createRandomUuid()),
   contextMenu: {entries: ko.observable([{label: 'option1', text: 'option1'}])},
   isMessageFocused: true,
   handleActionMenuVisibility: jest.fn(),
+  messageWithSection: false,
+  handleReactionClick: jest.fn(),
 };
 
 describe('MessageActions', () => {
@@ -39,13 +41,13 @@ describe('MessageActions', () => {
     jest.clearAllMocks();
   });
   test('renders the message actions menu', () => {
-    const {getByLabelText} = render(<MessageActions {...defaultProps} />);
+    const {getByLabelText} = render(<MessageActionsMenu {...defaultProps} />);
     const messageActionsMenu = getByLabelText(t('accessibility.messageActionsMenuLabel'));
     expect(messageActionsMenu).toBeDefined();
   });
 
   test('renders the message actions buttons', () => {
-    const {getByLabelText} = render(<MessageActions {...defaultProps} />);
+    const {getByLabelText} = render(<MessageActionsMenu {...defaultProps} />);
     const thumbsUpButton = getByLabelText(t('accessibility.messageActionsMenuThumbsUp'));
     const likeButton = getByLabelText(t('accessibility.messageActionsMenuLike'));
     const emojiButton = getByLabelText(t('accessibility.messageActionsMenuEmoji'));
@@ -57,7 +59,7 @@ describe('MessageActions', () => {
   });
 
   test('displays the context menu on options button click', () => {
-    const {getByLabelText, getByText, queryByText} = render(<MessageActions {...defaultProps} />);
+    const {getByLabelText, getByText, queryByText} = render(<MessageActionsMenu {...defaultProps} />);
     const optionsButton = getByLabelText(t('accessibility.conversationContextMenuOpenLabel'));
     fireEvent.click(optionsButton);
     expect(getByText('option1')).toBeDefined();
@@ -65,14 +67,14 @@ describe('MessageActions', () => {
   });
 
   test('keeps the message actions menu open when context menu is open', () => {
-    const {getByLabelText, getByText} = render(<MessageActions {...defaultProps} />);
+    const {getByLabelText, getByText} = render(<MessageActionsMenu {...defaultProps} />);
     const optionsButton = getByLabelText(t('accessibility.conversationContextMenuOpenLabel'));
     fireEvent.click(optionsButton);
     expect(getByText('option1')).toBeDefined();
   });
 
   test('outside click will close the context menu option', () => {
-    const {getByLabelText} = render(<MessageActions {...defaultProps} />);
+    const {getByLabelText} = render(<MessageActionsMenu {...defaultProps} />);
     const optionsButton = getByLabelText(t('accessibility.conversationContextMenuOpenLabel'));
     fireEvent.click(optionsButton);
     fireEvent.click(document);
@@ -80,7 +82,7 @@ describe('MessageActions', () => {
   });
 
   test('toggles the active message action on click of any action button', () => {
-    const {getByLabelText} = render(<MessageActions {...defaultProps} />);
+    const {getByLabelText} = render(<MessageActionsMenu {...defaultProps} />);
     const thumbsUpButton = getByLabelText(t('accessibility.messageActionsMenuThumbsUp'));
     const likeButton = getByLabelText(t('accessibility.messageActionsMenuLike'));
 
