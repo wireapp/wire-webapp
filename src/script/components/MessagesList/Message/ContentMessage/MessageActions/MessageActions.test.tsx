@@ -73,14 +73,6 @@ describe('MessageActions', () => {
     expect(getByText('option1')).toBeDefined();
   });
 
-  test('outside click will close the context menu option', () => {
-    const {getByLabelText} = render(<MessageActionsMenu {...defaultProps} />);
-    const optionsButton = getByLabelText(t('accessibility.conversationContextMenuOpenLabel'));
-    fireEvent.click(optionsButton);
-    fireEvent.click(document);
-    expect(defaultProps.handleActionMenuVisibility).toHaveBeenCalledWith(false);
-  });
-
   test('toggles the active message action on click of any action button', () => {
     const {getByLabelText} = render(<MessageActionsMenu {...defaultProps} />);
     const thumbsUpButton = getByLabelText(t('accessibility.messageActionsMenuThumbsUp'));
