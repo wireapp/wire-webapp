@@ -17,22 +17,53 @@
  *
  */
 
-import {FC} from 'react';
+import {FC, Fragment, useState} from 'react';
+
+import {getEmojiUnicode, getEmojiTitleFromEmojiUnicode} from 'Util/EmojiUtil';
+import {getEmojiUrl} from 'Util/ReactionUtil';
+
+import {EmojiImg} from './EmojiImg';
+import {
+  messageReactionButton,
+  messageReactionCount,
+  messageReactionWrapper,
+  getReactionsButtonCSS,
+} from './MessageReactions.styles';
 
 export interface MessageReactionsListProps {
   reactionGroupedByUser: {[key: string]: string[]};
+  handleReactionClick: (emoji: string) => void;
 }
 
-const MessageReactionsList: FC<MessageReactionsListProps> = ({reactionGroupedByUser}) => {
+const MessageReactionsList: FC<MessageReactionsListProps> = ({reactionGroupedByUser, handleReactionClick}) => {
+  const [isSelectedEmoji, setSelected] = useState('');
   return (
-    <div className="reactionContainer">
+    <div css={messageReactionWrapper}>
       {reactionGroupedByUser &&
-        Object.entries(reactionGroupedByUser).map(([emoji, users], index) => (
-          <div key={index} className="reactionBox">
-            <span>{emoji}</span>
-            <span>({users.length})</span>
-          </div>
-        ))}
+        Object.entries(reactionGroupedByUser).map(([emoji, users], index) => {
+          const emojiUnicode = getEmojiUnicode(emoji);
+          const emojiUrl = getEmojiUrl(emojiUnicode);
+          const emojiName = getEmojiTitleFromEmojiUnicode(emojiUnicode);
+          const isActive = isSelectedEmoji === emojiUrl;
+          return (
+            <Fragment key={emojiUnicode}>
+              <button
+                css={{...messageReactionButton, ...getReactionsButtonCSS(isActive)}}
+                aria-label={emojiName}
+                aria-pressed={isActive}
+                type="button"
+                className="button-reset-default"
+                onClick={() => {
+                  setSelected(emojiUrl);
+                  handleReactionClick(emoji);
+                }}
+              >
+                <EmojiImg emojiUrl={emojiUrl} emojiName={emojiName} />
+                <span css={messageReactionCount}>({users.length})</span>
+              </button>
+            </Fragment>
+          );
+        })}
     </div>
   );
 };

@@ -24,7 +24,6 @@ import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Icon} from 'Components/Icon';
-import {Conversation} from 'src/script/entity/Conversation';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/ContextMenu';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -43,7 +42,6 @@ import {
 } from './MessageActions.styles';
 import {MessageReactions} from './MessageReactions';
 
-import {MessageRepository} from '../../../../../conversation/MessageRepository';
 import {useMessageFocusedTabIndex} from '../../util';
 
 export const MessageActionsId = {
@@ -57,12 +55,11 @@ export const MessageActionsId = {
 export interface MessageActionsMenuProps {
   isMsgWithHeader: boolean;
   message: ContentMessage;
-  conversation: Conversation;
   contextMenu: {entries: ko.Subscribable<ContextMenuEntry[]>};
   isMessageFocused: boolean;
   handleActionMenuVisibility: (isVisible: boolean) => void;
   messageWithSection: boolean;
-  messageRepository: MessageRepository;
+  handleReactionClick: (emoji: string) => void;
 }
 
 const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
@@ -70,10 +67,9 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
   contextMenu,
   isMessageFocused,
   handleActionMenuVisibility,
-  conversation,
   message,
-  messageRepository,
   messageWithSection,
+  handleReactionClick,
 }) => {
   const {entries: menuEntries} = useKoSubscribableChildren(contextMenu, ['entries']);
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
@@ -153,9 +149,8 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
           handleKeyDown={handleKeyDown}
           resetActionMenuStates={resetActionMenuStates}
           wrapperRef={wrapperRef}
-          conversation={conversation}
           message={message}
-          messageRepository={messageRepository}
+          handleReactionClick={handleReactionClick}
         />
         <button
           css={{

@@ -24,6 +24,7 @@ import {createPortal} from 'react-dom';
 
 import {useClickOutside} from 'src/script/hooks/useClickOutside';
 import {isEscapeKey} from 'Util/KeyboardUtil';
+import {getEmojiUrl} from 'Util/ReactionUtil';
 
 interface EmojiPickerContainerProps {
   posX: number;
@@ -42,7 +43,6 @@ const EmojiPickerContainer: FC<EmojiPickerContainerProps> = ({
   wrapperRef,
   handleReactionClick,
 }) => {
-  const [selectedEmoji, setSelectedEmoji] = useState<string>('');
   const emojiRef = useRef<HTMLDivElement>(null);
   useClickOutside(emojiRef, resetActionMenuStates, wrapperRef);
   const [style, setStyle] = useState<object>({
@@ -80,13 +80,7 @@ const EmojiPickerContainer: FC<EmojiPickerContainerProps> = ({
   }, [posX, posY]);
 
   function onEmojiClick(emojiData: EmojiClickData, event: MouseEvent) {
-    setSelectedEmoji(emojiData.unified);
     handleReactionClick(emojiData.emoji);
-  }
-
-  // Maps to the static server emojis url
-  function getEmojiUrl(unicode: string) {
-    return `/image/emojis/img-apple-64/${unicode}.png`;
   }
   return (
     <>
@@ -100,10 +94,14 @@ const EmojiPickerContainer: FC<EmojiPickerContainerProps> = ({
             }
           }}
         >
-          <div ref={emojiRef} style={{maxHeight: window.innerHeight, ...style}}>
+          <div
+            ref={emojiRef}
+            style={{maxHeight: window.innerHeight, ...style}}
+            role="dialog"
+            data-uie-name="emoji-picker-dialog"
+          >
             <EmojiPicker onEmojiClick={onEmojiClick} getEmojiUrl={getEmojiUrl} />
           </div>
-          <p>{selectedEmoji}</p>
         </div>,
         document.body,
       )}

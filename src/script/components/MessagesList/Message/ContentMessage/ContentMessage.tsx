@@ -17,9 +17,10 @@
  *
  */
 
-import React, {useMemo, useState, useEffect} from 'react';
+import React, {useMemo, useState, useEffect, useCallback} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {ReactionType} from '@wireapp/core/lib/conversation';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {Icon} from 'Components/Icon';
@@ -199,6 +200,12 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
     }
   }, [msgFocusState, isMessageFocused]);
 
+  const handleReactionClick = useCallback(
+    (reaction: ReactionType) => {
+      messageRepository.onReactionClick(conversation, message, reaction);
+    },
+    [conversation, message, messageRepository],
+  );
   return (
     <div
       aria-label={messageAriaLabel}
@@ -212,7 +219,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
       onMouseLeave={event => {
         // close floating message actions when no active menu is open like context menu/emoji picker
         if (!isMenuOpen) {
-          setActionMenuVisibility(true);
+          setActionMenuVisibility(false);
         }
       }}
     >
@@ -252,43 +259,20 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
 
         {failedToSend && <FailedToSendWarning failedToSend={failedToSend} knownUsers={conversation.allUserEntities} />}
 
-        {/* {!other_likes.length && message.isReactable() && (
-          <div className="message-body-like">
-            <MessageLike
-              className="message-body-like-icon like-button message-show-on-hover"
-              message={message}
-              onLike={onLike}
-              isMessageFocused={msgFocusState}
-            />
-          </div>
-        )} */}
         {isActionMenuVisible && isReactionFeatureEnabled && (
           <MessageActionsMenu
             isMsgWithHeader={shouldShowAvatar()}
-            conversation={conversation}
             message={message}
             handleActionMenuVisibility={setActionMenuVisibility}
             contextMenu={contextMenu}
             isMessageFocused={msgFocusState}
-            messageRepository={messageRepository}
             messageWithSection={hasMarker}
+            handleReactionClick={handleReactionClick}
           />
         )}
       </div>
 
-      {/* {other_likes.length > 0 && (
-        <div>
-          <MessageFooterLike
-            message={message}
-            is1to1Conversation={conversation.is1to1()}
-            onLike={onLike}
-            onClickLikes={onClickLikes}
-            isMessageFocused={msgFocusState}
-          />
-        </div>
-      )} */}
-      {/* IN-PROGRESS */}
-      <MessageReactionsList reactionGroupedByUser={reactionGroupedByUser} />
+      <MessageReactionsList reactionGroupedByUser={reactionGroupedByUser} handleReactionClick={handleReactionClick} />
     </div>
   );
 };

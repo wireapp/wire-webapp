@@ -31,3 +31,8 @@ export function transformReactionObj(reactions: {[key: string]: string}) {
   }
   return reactionsGroupByUser;
 }
+
+// Maps to the static server emojis url
+export function getEmojiUrl(unicode: string) {
+  return `/image/emojis/img-apple-64/${unicode}.png`;
+}
