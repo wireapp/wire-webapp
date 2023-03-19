@@ -26,16 +26,13 @@ describe('MessageReactionsList', () => {
     jest.clearAllMocks();
   });
 
-  test('renders a button for each reaction', () => {
-    const reactionGroupedByUser = {
-      '😇': ['1', '2', '3'],
-      '😊': ['1', '2'],
-      '👍': ['2'],
-      '😉': ['2'],
+  test('renders a button for each reaction and user count', () => {
+    const reactions = {
+      '1': '😇,😊',
+      '2': '😊,👍,😉,😇',
+      '3': '😇',
     };
-    const {getAllByLabelText} = render(
-      <MessageReactionsList reactionGroupedByUser={reactionGroupedByUser} handleReactionClick={jest.fn()} />,
-    );
+    const {getAllByLabelText} = render(<MessageReactionsList reactions={reactions} handleReactionClick={jest.fn()} />);
 
     const winkButton = getAllByLabelText('winking face');
     const smileyFace1 = getAllByLabelText('smiling face with halo');
@@ -61,13 +58,14 @@ describe('MessageReactionsList', () => {
   });
 
   test('handles click on reaction button', () => {
-    const reactionGroupedByUser = {
-      '👍': ['3'],
-      '😉': ['1', '3'],
+    const reactions = {
+      '1': '😇,😊',
+      '2': '😊,👍,😉,😇',
+      '3': '😇',
     };
     const handleReactionClick = jest.fn();
     const {getByLabelText} = render(
-      <MessageReactionsList reactionGroupedByUser={reactionGroupedByUser} handleReactionClick={handleReactionClick} />,
+      <MessageReactionsList reactions={reactions} handleReactionClick={handleReactionClick} />,
     );
     const thumbsUpButton = getByLabelText('thumbs up sign');
 
