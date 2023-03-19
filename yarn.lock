@@ -8905,9 +8905,9 @@ dexie@latest:
   languageName: node
   linkType: hard
 
-"i18next-scanner@npm:4.1.1":
-  version: 4.1.1
-  resolution: "i18next-scanner@npm:4.1.1"
+"i18next-scanner@npm:4.2.0":
+  version: 4.2.0
+  resolution: "i18next-scanner@npm:4.2.0"
   dependencies:
     acorn: ^8.0.4
     acorn-dynamic-import: ^4.0.0
@@ -8931,7 +8931,7 @@ dexie@latest:
     vinyl-fs: ^3.0.1
   bin:
     i18next-scanner: bin/cli.js
-  checksum: d5cbe840a6e2bb629c84a0ae4d1a76ae32f4870a6e1f55acb0b658907b341b8ed634fca269a234b7a9446106182247e96b6409cb98251ba4f33864ed4d795854
+  checksum: 8c199fe7529171a03f1b71d0e964c65f9d6baf0c971a4f11f4545fa13fd09f5ef4788131afe1ed166a90c8771e75ea6a9b1966b3bdaa87f7d5800dbfe5c9e34c
   languageName: node
   linkType: hard
 
@@ -16580,7 +16580,7 @@ dexie@latest:
     html-webpack-plugin: ^5.5.0
     http-status-codes: 2.2.0
     husky: 7.0.4
-    i18next-scanner: 4.1.1
+    i18next-scanner: 4.2.0
     intersection-observer: 0.12.2
     jest: 29.5.0
     jest-canvas-mock: 2.4.0
