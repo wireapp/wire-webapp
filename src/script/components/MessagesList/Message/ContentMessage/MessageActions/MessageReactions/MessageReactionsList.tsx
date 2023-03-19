@@ -20,7 +20,7 @@
 import {FC, Fragment, useState} from 'react';
 
 import {getEmojiUnicode, getEmojiTitleFromEmojiUnicode} from 'Util/EmojiUtil';
-import {getEmojiUrl} from 'Util/ReactionUtil';
+import {Reactions, getEmojiUrl, transformReactionObj} from 'Util/ReactionUtil';
 
 import {EmojiImg} from './EmojiImg';
 import {
@@ -31,39 +31,39 @@ import {
 } from './MessageReactions.styles';
 
 export interface MessageReactionsListProps {
-  reactionGroupedByUser: {[key: string]: string[]};
+  reactions: Reactions;
   handleReactionClick: (emoji: string) => void;
 }
 
-const MessageReactionsList: FC<MessageReactionsListProps> = ({reactionGroupedByUser, handleReactionClick}) => {
+const MessageReactionsList: FC<MessageReactionsListProps> = ({reactions, handleReactionClick}) => {
   const [isSelectedEmoji, setSelected] = useState('');
+  const reactionGroupedByUser = transformReactionObj(reactions);
   return (
     <div css={messageReactionWrapper}>
-      {reactionGroupedByUser &&
-        Object.entries(reactionGroupedByUser).map(([emoji, users], index) => {
-          const emojiUnicode = getEmojiUnicode(emoji);
-          const emojiUrl = getEmojiUrl(emojiUnicode);
-          const emojiName = getEmojiTitleFromEmojiUnicode(emojiUnicode);
-          const isActive = isSelectedEmoji === emojiUrl;
-          return (
-            <Fragment key={emojiUnicode}>
-              <button
-                css={{...messageReactionButton, ...getReactionsButtonCSS(isActive)}}
-                aria-label={emojiName}
-                aria-pressed={isActive}
-                type="button"
-                className="button-reset-default"
-                onClick={() => {
-                  setSelected(emojiUrl);
-                  handleReactionClick(emoji);
-                }}
-              >
-                <EmojiImg emojiUrl={emojiUrl} emojiName={emojiName} />
-                <span css={messageReactionCount}>({users.length})</span>
-              </button>
-            </Fragment>
-          );
-        })}
+      {Array.from(reactionGroupedByUser).map(([emoji, users], index) => {
+        const emojiUnicode = getEmojiUnicode(emoji);
+        const emojiUrl = getEmojiUrl(emojiUnicode);
+        const emojiName = getEmojiTitleFromEmojiUnicode(emojiUnicode);
+        const isActive = isSelectedEmoji === emojiUrl;
+        return (
+          <Fragment key={emojiUnicode}>
+            <button
+              css={{...messageReactionButton, ...getReactionsButtonCSS(isActive)}}
+              aria-label={emojiName}
+              aria-pressed={isActive}
+              type="button"
+              className="button-reset-default"
+              onClick={() => {
+                setSelected(emojiUrl);
+                handleReactionClick(emoji);
+              }}
+            >
+              <EmojiImg emojiUrl={emojiUrl} emojiName={emojiName} />
+              <span css={messageReactionCount}>({users.length})</span>
+            </button>
+          </Fragment>
+        );
+      })}
     </div>
   );
 };
