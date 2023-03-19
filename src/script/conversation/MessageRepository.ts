@@ -890,11 +890,6 @@ export class MessageRepository {
    * @param reactionType Reaction
    * @returns Resolves after sending the reaction
    */
-  // private async sendReaction(conversation: Conversation, messageEntity: Message, string: string) {
-  //   const reaction = MessageBuilder.buildReactionMessage({originalMessageId: messageEntity.id, type: string});
-
-  //   return this.sendAndInjectMessage(reaction, conversation);
-  // }
 
   private async sendReaction(conversation: Conversation, messageEntity: Message, reactions: ReactionType) {
     const reaction = MessageBuilder.buildReactionMessage({originalMessageId: messageEntity.id, type: reactions});

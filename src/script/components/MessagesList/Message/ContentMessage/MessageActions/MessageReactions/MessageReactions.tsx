@@ -35,7 +35,8 @@ const thumbsUpEmoji = '👍';
 const likeEmoji = '❤️';
 const thumbsUpEmojiUrl = '/image/emojis/img-apple-64/1f44d.png';
 const likeEmojiUrl = '/image/emojis/img-apple-64/2764-fe0f.png';
-
+const INITIAL_CLIENT_X_POS = 0;
+const INITIAL_CLIENT_Y_POS = 0;
 export interface MessageReactionsProps {
   messageFocusedTabIndex: number;
   currentMsgActionName: string;
@@ -65,8 +66,8 @@ const MessageReactions: FC<MessageReactionsProps> = ({
   const isLikeAction = currentMsgActionName === MessageActionsId.HEART;
   const [showEmojis, setShowEmojis] = useState(false);
   const {handleMenuOpen} = useMessageActionsState();
-  const [clientX, setPOSX] = useState(0);
-  const [clientY, setPOSY] = useState(0);
+  const [clientX, setPOSX] = useState(INITIAL_CLIENT_X_POS);
+  const [clientY, setPOSY] = useState(INITIAL_CLIENT_Y_POS);
 
   const closeEmojiPicker = () => {
     if (showEmojis) {
