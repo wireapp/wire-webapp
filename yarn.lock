@@ -7652,9 +7652,9 @@ dexie@latest:
   languageName: node
   linkType: hard
 
-"eslint-plugin-typescript-sort-keys@npm:2.1.0":
-  version: 2.1.0
-  resolution: "eslint-plugin-typescript-sort-keys@npm:2.1.0"
+"eslint-plugin-typescript-sort-keys@npm:2.3.0":
+  version: 2.3.0
+  resolution: "eslint-plugin-typescript-sort-keys@npm:2.3.0"
   dependencies:
     "@typescript-eslint/experimental-utils": ^5.0.0
     json-schema: ^0.4.0
@@ -7662,8 +7662,8 @@ dexie@latest:
   peerDependencies:
     "@typescript-eslint/parser": ^1 || ^2 || ^3 || ^4 || ^5
     eslint: ^5 || ^6 || ^7 || ^8
-    typescript: ^3 || ^4
-  checksum: 98ea442519ca9cdd36aa4d7d4e4f3d96d16a9287e32ea69209865ff3cd10ce33d9c4acb86ddc2cc0406a072aea319841496e66b512f79c58aaf3924d85f73683
+    typescript: ^3 || ^4 || ^5
+  checksum: 3c00e77c2761dbd7c5b6d61883ddfb587eb32f4f5bddf2694f88ec278ac4e1f1c14694d04755c55cc6ed5313d7dcd407c376034cbc1871904f242f368a013091
   languageName: node
   linkType: hard
 
@@ -16707,7 +16707,7 @@ dexie@latest:
     eslint-plugin-simple-import-sort: ^8.0.0
     eslint-plugin-sort-keys-fix: 1.1.2
     eslint-plugin-testing-library: ^5.10.2
-    eslint-plugin-typescript-sort-keys: 2.1.0
+    eslint-plugin-typescript-sort-keys: 2.3.0
     eslint-plugin-unused-imports: ^2.0.0
     fake-indexeddb: 4.0.1
     generate-changelog: 1.8.0
