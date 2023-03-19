@@ -40,7 +40,7 @@ import {
   getIconCSS,
   messageWithHeaderTop,
 } from './MessageActions.styles';
-import {MessageReactions} from './MessageReactions';
+import {MessageReactions} from './MessageReactions/MessageReactions';
 
 import {useMessageFocusedTabIndex} from '../../util';
 

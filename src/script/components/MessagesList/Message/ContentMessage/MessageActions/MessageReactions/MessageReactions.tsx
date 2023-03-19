@@ -25,10 +25,11 @@ import {t} from 'Util/LocalizerUtil';
 
 import {EmojiImg} from './EmojiImg';
 import {EmojiPickerContainer} from './EmojiPicker';
-import {MessageActionsId} from './MessageActions';
-import {useMessageActionsState} from './MessageActions.state';
-import {messageActionsMenuButton, getActionsMenuCSS, getIconCSS} from './MessageActions.styles';
 import {actionMenuEmojiSize} from './MessageReactions.styles';
+
+import {MessageActionsId} from '../MessageActions';
+import {useMessageActionsState} from '../MessageActions.state';
+import {messageActionsMenuButton, getActionsMenuCSS, getIconCSS} from '../MessageActions.styles';
 
 const thumbsUpEmoji = '👍';
 const likeEmoji = '❤️';

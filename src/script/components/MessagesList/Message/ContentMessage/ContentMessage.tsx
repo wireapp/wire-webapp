@@ -38,7 +38,7 @@ import {transformReactionObj} from 'Util/ReactionUtil';
 import {ContentAsset} from './asset';
 import {MessageActionsMenu} from './MessageActions/MessageActions';
 import {useMessageActionsState} from './MessageActions/MessageActions.state';
-import {MessageReactionsList} from './MessageActions/MessageReactionsList';
+import {MessageReactionsList} from './MessageActions/MessageReactions/MessageReactionsList';
 import {Quote} from './MessageQuote';
 import {FailedToSendWarning} from './Warnings';
 
