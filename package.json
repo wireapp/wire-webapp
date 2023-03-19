@@ -150,7 +150,7 @@
     "postcss": "8.4.21",
     "postcss-import": "^15.1.0",
     "postcss-less": "6.0.0",
-    "postcss-loader": "^7.0.2",
+    "postcss-loader": "^7.1.0",
     "postcss-preset-env": "^8.0.1",
     "postcss-scss": "4.0.6",
     "prettier": "^2.8.4",

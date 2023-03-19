@@ -6267,6 +6267,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"cosmiconfig@npm:^8.0.0":
+  version: 8.1.3
+  resolution: "cosmiconfig@npm:8.1.3"
+  dependencies:
+    import-fresh: ^3.2.1
+    js-yaml: ^4.1.0
+    parse-json: ^5.0.0
+    path-type: ^4.0.0
+  checksum: b3d277bc3a8a9e649bf4c3fc9740f4c52bf07387481302aa79839f595045368903bf26ea24a8f7f7b8b180bf46037b027c5cb63b1391ab099f3f78814a147b2b
+  languageName: node
+  linkType: hard
+
 "countly-sdk-web@npm:22.6.5":
   version: 22.6.5
   resolution: "countly-sdk-web@npm:22.6.5"
@@ -10782,10 +10794,17 @@ dexie@latest:
   languageName: node
   linkType: hard
 
-"klona@npm:^2.0.4, klona@npm:^2.0.5":
+"klona@npm:^2.0.4":
   version: 2.0.5
   resolution: "klona@npm:2.0.5"
   checksum: 8c976126ea252b766e648a4866e1bccff9d3b08432474ad80c559f6c7265cf7caede2498d463754d8c88c4759895edd8210c85c0d3155e6aae4968362889466f
+  languageName: node
+  linkType: hard
+
+"klona@npm:^2.0.6":
+  version: 2.0.6
+  resolution: "klona@npm:2.0.6"
+  checksum: ac9ee3732e42b96feb67faae4d27cf49494e8a3bf3fa7115ce242fe04786788e0aff4741a07a45a2462e2079aa983d73d38519c85d65b70ef11447bbc3c58ce7
   languageName: node
   linkType: hard
 
@@ -12886,17 +12905,17 @@ dexie@latest:
   languageName: node
   linkType: hard
 
-"postcss-loader@npm:^7.0.2":
-  version: 7.0.2
-  resolution: "postcss-loader@npm:7.0.2"
+"postcss-loader@npm:^7.1.0":
+  version: 7.1.0
+  resolution: "postcss-loader@npm:7.1.0"
   dependencies:
-    cosmiconfig: ^7.0.0
-    klona: ^2.0.5
+    cosmiconfig: ^8.0.0
+    klona: ^2.0.6
     semver: ^7.3.8
   peerDependencies:
     postcss: ^7.0.0 || ^8.0.1
     webpack: ^5.0.0
-  checksum: 2d251537d482eb751f812c96c8b515f46d7c9905cad7afab33f0f34872670619b7440cefc9e2babbf89fb11b4708850d522d79fa5ff788227587645e78f16638
+  checksum: 44e4018a8f2f81150f501a5ca56e59571d81c965b5a8581f5dbae5e55a113b79bde33c3de0d4397cbf36a3be0c24b7e7e37f0154b6e63df16185edd086d4e352
   languageName: node
   linkType: hard
 
@@ -16778,7 +16797,7 @@ dexie@latest:
     postcss: 8.4.21
     postcss-import: ^15.1.0
     postcss-less: 6.0.0
-    postcss-loader: ^7.0.2
+    postcss-loader: ^7.1.0
     postcss-preset-env: ^8.0.1
     postcss-scss: 4.0.6
     prettier: ^2.8.4
