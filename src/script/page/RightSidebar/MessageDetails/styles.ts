@@ -21,11 +21,11 @@ import {CSSObject} from '@emotion/react';
 
 export const panelContentTitleStyles: CSSObject = {
   paddingLeft: 20,
-  borderBottom: '1px solid var(--gray-50)',
+  borderBottom: '1px solid var(--sidebar-border-color)',
   marginTop: 20,
   'span:first-child': {marginRight: '5px'},
   'span:last-child': {
-    color: 'var(--gray-70)',
+    color: 'var(--text-input-placeholder)',
     fontSize: 'var(--font-size-medium)',
   },
 };
