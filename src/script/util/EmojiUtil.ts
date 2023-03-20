@@ -65,7 +65,7 @@ Object.keys(emojiesList).forEach(key => {
 });
 
 export const getEmojiTitleFromEmojiUnicode = (emojiUnicode: string): string => {
-  return emojiDictionary.get(emojiUnicode) ?? '';
+  return emojiDictionary.has(emojiUnicode) ? emojiDictionary.get(emojiUnicode) : '';
 };
 
 export function getEmojiUnicode(emojis: string) {
