@@ -92,11 +92,11 @@ describe('MessagesList', () => {
     params.conversation.addMessage(createTextMessage('first'));
 
     const {getByText} = render(<MessagesList {...params} />);
-    await waitFor(() => getByText('first'));
+    expect(await waitFor(() => getByText('first'))).not.toBe(null);
 
     act(() => {
       params.conversation.addMessage(createTextMessage('second'));
     });
-    await waitFor(() => getByText('second'));
+    expect(await waitFor(() => getByText('second'))).not.toBe(null);
   });
 });

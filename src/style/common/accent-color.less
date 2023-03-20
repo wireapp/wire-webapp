@@ -59,6 +59,7 @@
 @blue-600: #0552a0;
 @blue-700: #043e78;
 @blue-800: #022950;
+@blue-900: #021f3c;
 
 @blue-dark-50: #eef7ff;
 @blue-dark-100: #ddedff;
@@ -69,6 +70,7 @@
 @blue-dark-600: #4385cc;
 @blue-dark-700: #326499;
 @blue-dark-800: #224266;
+@blue-dark-900: #19324d;
 
 @green-50: #e8f1ea;
 @green-100: #d2e4d6;
@@ -79,6 +81,7 @@
 @green-600: #176029;
 @green-700: #11481f;
 @green-800: #0c3014;
+@green-900: #09240f;
 
 @green-dark-50: #ebfcef;
 @green-dark-100: #d6f8de;
@@ -89,6 +92,7 @@
 @green-dark-600: #26af49;
 @green-dark-700: #1d8337;
 @green-dark-800: #135824;
+@green-dark-900: #0e421b;
 
 @turquoise-50: #e5f1f3;
 @turquoise-100: #cce2e7;
@@ -99,6 +103,7 @@
 @turquoise-600: #015a6e;
 @turquoise-700: #014352;
 @turquoise-800: #002d37;
+@turquoise-900: #002229;
 
 @turquoise-dark-50: #effdff;
 @turquoise-dark-100: #dffaff;
@@ -109,6 +114,7 @@
 @turquoise-dark-600: #4ab8cc;
 @turquoise-dark-700: #388a99;
 @turquoise-dark-800: #255c66;
+@turquoise-dark-900: #1c454d;
 
 @purple-50: #f4edf7;
 @purple-100: #e7daee;
@@ -119,6 +125,7 @@
 @purple-600: #6e3689;
 @purple-700: #522967;
 @purple-800: #371b44;
+@purple-900: #291433;
 
 @purple-dark-50: #fcf4ff;
 @purple-dark-100: #f8e9ff;
@@ -129,6 +136,7 @@
 @purple-dark-600: #ae72cc;
 @purple-dark-700: #835699;
 @purple-dark-800: #573966;
+@purple-dark-900: #412b4d;
 
 @red-50: #f9e6e8;
 @red-100: #f3ccd0;
@@ -139,6 +147,7 @@
 @red-600: #9b000f;
 @red-700: #74000b;
 @red-800: #4e0008;
+@red-900: #3a0006;
 
 @red-dark-50: #fff2f1;
 @red-dark-100: #ffe4e2;
@@ -149,6 +158,7 @@
 @red-dark-600: #cc5f5a;
 @red-dark-700: #994743;
 @red-dark-800: #66302d;
+@red-dark-900: #4d2422;
 
 @amber-50: #f6eee8;
 @amber-100: #ecded0;
@@ -159,6 +169,7 @@
 @amber-600: #824711;
 @amber-700: #61350d;
 @amber-800: #412408;
+@amber-900: #412408;
 
 @amber-dark-50: #fffbea;
 @amber-dark-100: #fff6d4;
@@ -168,7 +179,8 @@
 @amber-dark-500: #ffd426;
 @amber-dark-600: #ccaa1e;
 @amber-dark-700: #997f17;
-@amber-dark-800: #66550f;
+@amber-dark-800: #201204;
+@amber-dark-900: #4d400b;
 
 .colors() {
   amber: 5;
@@ -179,7 +191,7 @@
   turquoise: 6;
 }
 
-@color-index: 50, 100, 200, 300, 400, 500, 600, 700, 800;
+@color-index: 50, 100, 200, 300, 400, 500, 600, 700, 800, 900;
 
 body {
   &.theme-default {
@@ -216,6 +228,8 @@ each(.colors(), .(@color-key, @color-name) {
   @button-secondary-active-border: '@{name}-500';
   @message-actions-active-border: '@{name}-300';
   @message-actions-active-background: '@{name}-50';
+  @message-reactions-active-border: '@{name}-300';
+  @message-reactions-active-background: '@{name}-50';
   @toggle-button-hover-bg: '@{name}-700';
   @icon-primary-active-fill: '@{name}-500';
   @icon-secondary-active-border: 'accent_colors-0';
@@ -232,6 +246,8 @@ each(.colors(), .(@color-key, @color-name) {
     --button-secondary-active-border: @@button-secondary-active-border;
     --message-actions-active-border:@@message-actions-active-border;
     --message-actions-active-background:@@message-actions-active-background;
+    --message-reactions-active-border:@@message-reactions-active-border;
+    --message-reactions-active-background:@@message-reactions-active-background;
     --toggle-button-hover-bg: @@toggle-button-hover-bg;
     --icon-primary-active-fill: @@icon-primary-active-fill;
     --icon-secondary-active-border: @@icon-secondary-active-border;
@@ -274,6 +290,8 @@ each(.colors(), .(@color-key, @color-name) {
     @button-secondary-active-border-dark: '@{name}-dark-800';
     @message-actions-active-border-dark: '@{name}-dark-600';
     @message-actions-active-background-dark: '@{name}-dark-800';
+    @message-reactions-active-border-dark: '@{name}-dark-700';
+    @message-reactions-active-background-dark: '@{name}-dark-900';
     @toggle-button-hover-bg-dark: '@{name}-dark-300';
     @icon-primary-active-fill-dark: 'w-white';
     @icon-secondary-active-border-dark: '@{name}-dark-800' ;
@@ -289,6 +307,8 @@ each(.colors(), .(@color-key, @color-name) {
       --button-secondary-active-border: @@button-secondary-active-border-dark;
       --message-actions-active-border: @@message-actions-active-border-dark;
       --message-actions-active-background: @@message-actions-active-background-dark;
+      --message-reactions-active-border: @@message-reactions-active-border-dark;
+      --message-reactions-active-background: @@message-reactions-active-background-dark;
       --icon-primary-active-fill: @@icon-primary-active-fill-dark;
       --icon-secondary-active-border: @@icon-secondary-active-border-dark;
       --indicator-range-input-thumb: @@indicator-range-input-thumb-dark;

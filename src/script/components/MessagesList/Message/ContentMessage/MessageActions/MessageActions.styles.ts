@@ -94,7 +94,3 @@ export const getActionsMenuCSS = (isActive?: boolean): CSSObject => {
 export const messageWithHeaderTop: CSSObject = {
   top: '2.8rem',
 };
-
-export const reactionImgSize = {
-  width: '1rem',
-};

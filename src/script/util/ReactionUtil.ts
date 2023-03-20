@@ -17,17 +17,29 @@
  *
  */
 
-export function groupByReactionUsers(reactions: {[key: string]: string}) {
-  const reactionsGroupByUser: {[key: string]: string[]} = {};
+export interface Reactions {
+  [key: string]: string;
+}
+
+type ReactionsGroupedByUser = Map<string, string[]>;
+
+export function transformReactionObj(reactions: Reactions): ReactionsGroupedByUser {
+  const reactionsGroupedByUser = new Map<string, string[]>();
+
   for (const user in reactions) {
-    const userReactions = reactions[user] && reactions[user].split(',');
+    const userReactions = reactions[user] && reactions[user]?.split(',');
+
     for (const reaction of userReactions) {
-      if (reactionsGroupByUser[reaction]) {
-        reactionsGroupByUser[reaction].push(user);
-      } else {
-        reactionsGroupByUser[reaction] = [user];
-      }
+      const users = reactionsGroupedByUser.get(reaction) || [];
+      users.push(user);
+      reactionsGroupedByUser.set(reaction, users);
     }
   }
-  return reactionsGroupByUser;
+
+  return reactionsGroupedByUser;
+}
+
+// Maps to the static server emojis url
+export function getEmojiUrl(unicode: string) {
+  return `/image/emojis/img-apple-64/${unicode}.png`;
 }

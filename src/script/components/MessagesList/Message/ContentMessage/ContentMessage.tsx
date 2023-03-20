@@ -17,9 +17,10 @@
  *
  */
 
-import React, {useMemo, useState, useEffect} from 'react';
+import React, {useMemo, useState, useEffect, useCallback} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {ReactionType} from '@wireapp/core/lib/conversation';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {Icon} from 'Components/Icon';
@@ -29,17 +30,17 @@ import {Conversation} from 'src/script/entity/Conversation';
 import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {Message} from 'src/script/entity/message/Message';
+import {StatusType} from 'src/script/message/StatusType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getMessageAriaLabel} from 'Util/conversationMessages';
 import {t} from 'Util/LocalizerUtil';
-import {groupByReactionUsers} from 'Util/ReactionUtil';
 
 import {ContentAsset} from './asset';
 import {MessageActionsMenu} from './MessageActions/MessageActions';
 import {useMessageActionsState} from './MessageActions/MessageActions.state';
-import {MessageReactionsList} from './MessageActions/MessageReactionsList';
+import {MessageReactionsList} from './MessageActions/MessageReactions/MessageReactionsList';
 import {Quote} from './MessageQuote';
-import {FailedToSendWarning} from './Warnings';
+import {CompleteFailureToSendWarning, PartialFailureToSendWarning} from './Warnings';
 
 import {MessageActions} from '..';
 import {EphemeralStatusType} from '../../../../message/EphemeralStatusType';
@@ -57,6 +58,8 @@ export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetS
   isLastDeliveredMessage: boolean;
   message: ContentMessage;
   onClickButton: (message: CompositeMessage, buttonId: string) => void;
+  onDiscard: () => void;
+  onRetry: (message: ContentMessage) => void;
   previousMessage?: Message;
   quotedMessage?: ContentMessage;
   selfId: QualifiedId;
@@ -82,6 +85,8 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   onClickLikes,
   onClickButton,
   onLike,
+  onDiscard,
+  onRetry,
   isMsgElementsFocusable,
   messageRepository,
 }) => {
@@ -90,7 +95,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
     [isMsgElementsFocusable, isMessageFocused],
   );
   const messageFocusedTabIndex = useMessageFocusedTabIndex(msgFocusState);
-  const {headerSenderName, ephemeral_caption, ephemeral_status, assets, was_edited, failedToSend, reactions} =
+  const {headerSenderName, ephemeral_caption, ephemeral_status, assets, was_edited, failedToSend, reactions, status} =
     useKoSubscribableChildren(message, [
       'headerSenderName',
       'timestamp',
@@ -101,9 +106,8 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
       'was_edited',
       'failedToSend',
       'reactions',
+      'status',
     ]);
-
-  const reactionGroupedByUser = groupByReactionUsers(reactions);
 
   const shouldShowAvatar = (): boolean => {
     if (!previousMessage || hasMarker) {
@@ -199,6 +203,12 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
     }
   }, [msgFocusState, isMessageFocused]);
 
+  const handleReactionClick = useCallback(
+    (reaction: ReactionType) => {
+      messageRepository.onReactionClick(conversation, message, reaction);
+    },
+    [conversation, message, messageRepository],
+  );
   return (
     <div
       aria-label={messageAriaLabel}
@@ -212,7 +222,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
       onMouseLeave={event => {
         // close floating message actions when no active menu is open like context menu/emoji picker
         if (!isMenuOpen) {
-          setActionMenuVisibility(true);
+          setActionMenuVisibility(false);
         }
       }}
     >
@@ -250,45 +260,32 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
           />
         ))}
 
-        {failedToSend && <FailedToSendWarning failedToSend={failedToSend} knownUsers={conversation.allUserEntities} />}
+        {failedToSend && (
+          <PartialFailureToSendWarning failedToSend={failedToSend} knownUsers={conversation.allUserEntities()} />
+        )}
 
-        {/* {!other_likes.length && message.isReactable() && (
-          <div className="message-body-like">
-            <MessageLike
-              className="message-body-like-icon like-button message-show-on-hover"
-              message={message}
-              onLike={onLike}
-              isMessageFocused={msgFocusState}
-            />
-          </div>
-        )} */}
+        {status === StatusType.FAILED && (
+          <CompleteFailureToSendWarning
+            isTextAsset={message.getFirstAsset().isText()}
+            onDiscard={() => onDiscard()}
+            onRetry={() => onRetry(message)}
+          />
+        )}
+
         {isActionMenuVisible && isReactionFeatureEnabled && (
           <MessageActionsMenu
             isMsgWithHeader={shouldShowAvatar()}
-            conversation={conversation}
             message={message}
             handleActionMenuVisibility={setActionMenuVisibility}
             contextMenu={contextMenu}
             isMessageFocused={msgFocusState}
-            messageRepository={messageRepository}
             messageWithSection={hasMarker}
+            handleReactionClick={handleReactionClick}
           />
         )}
       </div>
 
-      {/* {other_likes.length > 0 && (
-        <div>
-          <MessageFooterLike
-            message={message}
-            is1to1Conversation={conversation.is1to1()}
-            onLike={onLike}
-            onClickLikes={onClickLikes}
-            isMessageFocused={msgFocusState}
-          />
-        </div>
-      )} */}
-      {/* IN-PROGRESS */}
-      <MessageReactionsList reactionGroupedByUser={reactionGroupedByUser} />
+      <MessageReactionsList reactions={reactions} handleReactionClick={handleReactionClick} />
     </div>
   );
 };

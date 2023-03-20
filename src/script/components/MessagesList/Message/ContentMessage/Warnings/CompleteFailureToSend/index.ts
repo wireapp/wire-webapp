@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2022 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,24 +17,4 @@
  *
  */
 
-import {FC} from 'react';
-
-export interface MessageReactionsListProps {
-  reactionGroupedByUser: {[key: string]: string[]};
-}
-
-const MessageReactionsList: FC<MessageReactionsListProps> = ({reactionGroupedByUser}) => {
-  return (
-    <div className="reactionContainer">
-      {reactionGroupedByUser &&
-        Object.entries(reactionGroupedByUser).map(([emoji, users], index) => (
-          <div key={index} className="reactionBox">
-            <span>{emoji}</span>
-            <span>({users.length})</span>
-          </div>
-        ))}
-    </div>
-  );
-};
-
-export {MessageReactionsList};
+export * from './CompleteFailureToSend';

@@ -327,13 +327,16 @@ export class MessageRepository {
     textMessage: string,
     mentions: MentionEntity[],
     quoteEntity?: OutgoingQuote,
+    messageId?: string,
   ): Promise<void> {
     const textPayload = {
       conversation,
       mentions,
       message: textMessage,
-      messageId: createRandomUuid(), // We set the id explicitely in order to be able to override the message if we generate a link preview
       quote: quoteEntity,
+      // We set the id explicitely in order to be able to override the message if we generate a link preview
+      // Similarly, we provide that same id when we retry to send a failed message in order to override the original
+      messageId: messageId ?? createRandomUuid(),
     };
     const {state} = await this.sendText(textPayload);
     if (state !== MessageSendingState.CANCELED) {
@@ -755,12 +758,17 @@ export class MessageRepository {
       return {id: payload.messageId, state: MessageSendingState.CANCELED};
     }
 
-    const result = await this.conversationService.send(sendOptions);
+    try {
+      const result = await this.conversationService.send(sendOptions);
 
-    if (result.state === MessageSendingState.OUTGOING_SENT) {
-      await handleSuccess(result);
+      if (result.state === MessageSendingState.OUTGOING_SENT) {
+        await handleSuccess(result);
+      }
+      return result;
+    } catch (error) {
+      await this.updateMessageAsFailed(conversation, payload.messageId);
+      throw error;
     }
-    return result;
   }
 
   /**
@@ -890,11 +898,6 @@ export class MessageRepository {
    * @param reactionType Reaction
    * @returns Resolves after sending the reaction
    */
-  // private async sendReaction(conversation: Conversation, messageEntity: Message, string: string) {
-  //   const reaction = MessageBuilder.buildReactionMessage({originalMessageId: messageEntity.id, type: string});
-
-  //   return this.sendAndInjectMessage(reaction, conversation);
-  // }
 
   private async sendReaction(conversation: Conversation, messageEntity: Message, reactions: ReactionType) {
     const reaction = MessageBuilder.buildReactionMessage({originalMessageId: messageEntity.id, type: reactions});
@@ -938,7 +941,7 @@ export class MessageRepository {
       if (!message.user().isMe && !message.ephemeral_expires()) {
         throw new ConversationError(ConversationError.TYPE.WRONG_USER, ConversationError.MESSAGE.WRONG_USER);
       }
-      const userIds = options.targetedUsers || conversation.allUserEntities.map(user => user!.qualifiedId);
+      const userIds = options.targetedUsers || conversation.allUserEntities().map(user => user!.qualifiedId);
       const payload = MessageBuilder.buildDeleteMessage({
         messageId: message.id,
       });
@@ -1057,11 +1060,12 @@ export class MessageRepository {
       conversationEntity.isShowingLastReceivedMessage() && conversationEntity.getNewestMessage()?.id === messageId;
 
     const deleteCount = await this.eventService.deleteEvent(conversationEntity.id, messageId);
+    const previousMessage = conversationEntity.getNewestMessage();
 
     amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, messageId, conversationEntity.id);
 
-    if (isLastDeleted && conversationEntity.getNewestMessage()?.timestamp()) {
-      conversationEntity.updateTimestamps(conversationEntity.getNewestMessage(), true);
+    if (isLastDeleted && previousMessage?.timestamp()) {
+      conversationEntity.updateTimestamps(previousMessage, true);
     }
 
     return deleteCount;
@@ -1113,7 +1117,7 @@ export class MessageRepository {
     conversationEntity: Conversation,
     eventId: string,
     isoDate?: string,
-    failedToSend?: QualifiedUserClients,
+    failedToSend?: SendResult['failedToSend'],
   ) {
     try {
       const messageEntity = await this.getMessageInConversationById(conversationEntity, eventId);
@@ -1144,6 +1148,19 @@ export class MessageRepository {
     return undefined;
   }
 
+  private async updateMessageAsFailed(conversationEntity: Conversation, eventId: string) {
+    try {
+      const messageEntity = await this.getMessageInConversationById(conversationEntity, eventId);
+      messageEntity.status(StatusType.FAILED);
+      return await this.eventService.updateEvent(messageEntity.primary_key, {status: StatusType.FAILED});
+    } catch (error) {
+      if ((error as any).type !== ConversationError.TYPE.MESSAGE_NOT_FOUND) {
+        throw error;
+      }
+    }
+    return undefined;
+  }
+
   private createRecipients(users: User[]): QualifiedUserClients {
     return users.reduce((userClients, user) => {
       userClients[user.domain] ||= {};
@@ -1161,7 +1178,8 @@ export class MessageRepository {
       // If we get a userId>client pairs, we just return those, no need to create recipients
       return recipients;
     }
-    const filteredUsers = conversation.allUserEntities
+    const filteredUsers = conversation
+      .allUserEntities()
       // filter possible undefined values
       .flatMap(user => (user ? [user] : []))
       // if users are given by the caller, we filter to only keep those users

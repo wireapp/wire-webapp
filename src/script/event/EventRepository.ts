@@ -53,6 +53,7 @@ import {CryptographyMapper} from '../cryptography/CryptographyMapper';
 import {CryptographyError} from '../error/CryptographyError';
 import {EventError} from '../error/EventError';
 import {categoryFromEvent} from '../message/MessageCategorization';
+import {StatusType} from '../message/StatusType';
 import type {EventRecord, StoredEvent} from '../storage';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import {EventName} from '../tracking/EventName';
@@ -498,7 +499,7 @@ export class EventRepository {
     const commonUpdates = EventRepository.getCommonMessageUpdates(originalEvent, newEvent);
 
     const specificUpdates = isLinkPreviewEdit
-      ? this.getUpdatesForLinkPreview(originalEvent, newEvent)
+      ? this.getUpdatesForMessage(originalEvent, newEvent)
       : EventRepository.getUpdatesForEditMessage(originalEvent, newEvent);
 
     const updates = {...specificUpdates, ...commonUpdates};
@@ -513,7 +514,7 @@ export class EventRepository {
         return this.handleAssetUpdate(originalEvent, newEvent);
 
       case ClientEvent.CONVERSATION.MESSAGE_ADD:
-        return this.handleLinkPreviewUpdate(originalEvent, newEvent);
+        return this.handleMessageUpdate(originalEvent, newEvent);
 
       default:
         this.throwValidationError(newEvent, `Forbidden type '${newEvent.type}' for duplicate events`);
@@ -555,7 +556,7 @@ export class EventRepository {
     }
   }
 
-  private handleLinkPreviewUpdate(originalEvent: EventRecord, newEvent: MessageAddEvent) {
+  private handleMessageUpdate(originalEvent: EventRecord, newEvent: MessageAddEvent) {
     const newEventData = newEvent.data;
     const originalData = originalEvent.data;
     if (originalEvent.from !== newEvent.from) {
@@ -565,15 +566,18 @@ export class EventRepository {
     }
 
     const containsLinkPreview = newEventData.previews && !!newEventData.previews.length;
-    if (!containsLinkPreview) {
-      const errorMessage = 'Link preview event does not contain previews';
+    const isRetryAttempt = originalEvent.status === StatusType.FAILED;
+
+    if (!containsLinkPreview && !isRetryAttempt) {
+      const errorMessage =
+        'Message duplication event invalid: original message did not fail to send and does not contain link preview';
       return this.throwValidationError(newEvent, errorMessage);
     }
 
     const textContentMatches = newEventData.content === originalData.content;
     if (!textContentMatches) {
       const errorMessage = 'ID of link preview reused';
-      const logMessage = 'Text content for link preview not matching';
+      const logMessage = 'Text content for message duplication not matching';
       return this.throwValidationError(newEvent, errorMessage, logMessage);
     }
 
@@ -582,7 +586,7 @@ export class EventRepository {
       return this.throwValidationError(newEvent, 'ID reused by same user');
     }
 
-    const updates = this.getUpdatesForLinkPreview(originalEvent, newEvent);
+    const updates = this.getUpdatesForMessage(originalEvent, newEvent);
     const identifiedUpdates = {primary_key: originalEvent.primary_key, ...updates};
     return this.eventService.replaceEvent(identifiedUpdates);
   }
@@ -604,7 +608,7 @@ export class EventRepository {
     return {...newEvent, reactions: {}};
   }
 
-  private getUpdatesForLinkPreview(originalEvent: EventRecord, newEvent: MessageAddEvent) {
+  private getUpdatesForMessage(originalEvent: EventRecord, newEvent: MessageAddEvent) {
     const newData = newEvent.data;
     const originalData = originalEvent.data;
     const updatingLinkPreview = !!originalData.previews.length;
@@ -612,10 +616,10 @@ export class EventRepository {
       this.throwValidationError(newEvent, 'ID of link preview reused');
     }
 
-    const textContentMatches = !newData.previews.length || newData.content === originalData.content;
+    const textContentMatches = !newData.previews?.length || newData.content === originalData.content;
     if (!textContentMatches) {
-      const logMessage = 'Text content for link preview not matching';
-      const errorMessage = 'ID of link preview reused';
+      const logMessage = 'Text content for message duplication not matching';
+      const errorMessage = 'ID of duplicated message reused';
       this.throwValidationError(newEvent, errorMessage, logMessage);
     }
 

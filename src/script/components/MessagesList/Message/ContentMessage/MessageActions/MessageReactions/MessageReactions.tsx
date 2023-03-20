@@ -19,23 +19,24 @@
 
 import {useState, useEffect, useCallback, RefObject, FC} from 'react';
 
-import {ReactionType} from '@wireapp/core/lib/conversation';
-
-import {Conversation} from 'src/script/entity/Conversation';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
+import {EmojiImg} from './EmojiImg';
 import {EmojiPickerContainer} from './EmojiPicker';
-import {MessageActionsId} from './MessageActions';
-import {useMessageActionsState} from './MessageActions.state';
-import {messageActionsMenuButton, getActionsMenuCSS, getIconCSS, reactionImgSize} from './MessageActions.styles';
+import {actionMenuEmojiSize} from './MessageReactions.styles';
 
-import {MessageRepository} from '../../../../../conversation/MessageRepository';
+import {MessageActionsId} from '../MessageActions';
+import {useMessageActionsState} from '../MessageActions.state';
+import {messageActionsMenuButton, getActionsMenuCSS, getIconCSS} from '../MessageActions.styles';
 
 const thumbsUpEmoji = '👍';
 const likeEmoji = '❤️';
-
+const thumbsUpEmojiUrl = '/image/emojis/img-apple-64/1f44d.png';
+const likeEmojiUrl = '/image/emojis/img-apple-64/2764-fe0f.png';
+const INITIAL_CLIENT_X_POS = 0;
+const INITIAL_CLIENT_Y_POS = 0;
 export interface MessageReactionsProps {
   messageFocusedTabIndex: number;
   currentMsgActionName: string;
@@ -46,9 +47,8 @@ export interface MessageReactionsProps {
   handleCurrentMsgAction: (actionName: string) => void;
   resetActionMenuStates: () => void;
   wrapperRef: RefObject<HTMLDivElement>;
-  conversation: Conversation;
   message: ContentMessage;
-  messageRepository: MessageRepository;
+  handleReactionClick: (emoji: string) => void;
 }
 
 const MessageReactions: FC<MessageReactionsProps> = ({
@@ -60,21 +60,25 @@ const MessageReactions: FC<MessageReactionsProps> = ({
   resetActionMenuStates,
   wrapperRef,
   message,
-  conversation,
-  messageRepository,
+  handleReactionClick,
 }) => {
   const isThumbUpAction = currentMsgActionName === MessageActionsId.THUMBSUP;
   const isLikeAction = currentMsgActionName === MessageActionsId.HEART;
   const [showEmojis, setShowEmojis] = useState(false);
   const {handleMenuOpen} = useMessageActionsState();
-  const [clientX, setPOSX] = useState(0);
-  const [clientY, setPOSY] = useState(0);
+  const [clientX, setPOSX] = useState(INITIAL_CLIENT_X_POS);
+  const [clientY, setPOSY] = useState(INITIAL_CLIENT_Y_POS);
 
   const closeEmojiPicker = () => {
     if (showEmojis) {
       handleCurrentMsgAction('');
       handleMenuOpen(false);
     }
+  };
+
+  const handleOutsideClick = () => {
+    resetActionMenuStates();
+    setShowEmojis(false);
   };
 
   useEffect(() => {
@@ -167,12 +171,6 @@ const MessageReactions: FC<MessageReactionsProps> = ({
     [handleEmojiKeyDown, handleKeyDown],
   );
 
-  const handleReactionClick = useCallback(
-    (reaction: ReactionType) => {
-      messageRepository.onReactionClick(conversation, message, reaction);
-    },
-    [conversation, message, messageRepository],
-  );
   return (
     <>
       <button
@@ -189,11 +187,10 @@ const MessageReactions: FC<MessageReactionsProps> = ({
         onClick={handleMsgActionClick}
         onKeyDown={handleMsgActionKeyDown}
       >
-        <img
-          src="/image/emojis/img-apple-64/1f44d.png"
-          alt={t('accessibility.messageActionsMenuThumbsUp')}
-          loading="eager"
-          css={reactionImgSize}
+        <EmojiImg
+          emojiUrl={thumbsUpEmojiUrl}
+          emojiName={t('accessibility.messageActionsMenuThumbsUp')}
+          emojiImgSize={actionMenuEmojiSize}
         />
       </button>
       <button
@@ -210,12 +207,10 @@ const MessageReactions: FC<MessageReactionsProps> = ({
         onClick={handleMsgActionClick}
         onKeyDown={handleMsgActionKeyDown}
       >
-        <img
-          src="/image/emojis/img-apple-64/2764-fe0f.png"
-          alt={t('accessibility.messageActionsMenuLike')}
-          loading="eager"
-          css={reactionImgSize}
-          aria-hidden={true}
+        <EmojiImg
+          emojiUrl={likeEmojiUrl}
+          emojiName={t('accessibility.messageActionsMenuLike')}
+          emojiImgSize={actionMenuEmojiSize}
         />
       </button>
       <button
@@ -253,7 +248,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
           posX={clientX}
           posY={clientY}
           handleEscape={closeEmojiPicker}
-          resetActionMenuStates={resetActionMenuStates}
+          resetActionMenuStates={handleOutsideClick}
           wrapperRef={wrapperRef}
           handleReactionClick={handleReactionClick}
         />
