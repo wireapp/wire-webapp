@@ -2463,8 +2463,6 @@ export class ConversationRepository {
     // Self user is a creator of the event
     const isFromSelf = eventJson.from === this.userState.self().id;
 
-    // Self user joins again
-
     const containsSelfId = eventData.user_ids.includes(this.userState.self().id);
     const containsSelfQualifiedId = !!eventData.users?.some(
       ({qualified_id: qualifiedId}) => qualifiedId && matchQualifiedIds(qualifiedId, this.userState.self().qualifiedId),
