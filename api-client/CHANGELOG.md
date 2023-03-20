@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [23.3.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@23.2.2...@wireapp/api-client@23.3.0) (2023-03-20)
+
+### Features
+
+* return response url from code endpoint ([#4990](https://github.com/wireapp/wire-web-packages/issues/4990)) ([edc82a6](https://github.com/wireapp/wire-web-packages/commit/edc82a61811401191cc4d438211ad570ede1999e))
+
 ## [23.2.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@23.2.1...@wireapp/api-client@23.2.2) (2023-03-20)
 
 **Note:** Version bump only for package @wireapp/api-client
