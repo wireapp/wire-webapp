@@ -19,7 +19,7 @@
 
 import {Configuration} from '../Config';
 
-export const initializeDataDog = (config: Configuration) => {
+export const initializeDataDog = (config: Configuration, domain?: string) => {
   const applicationId = config.dataDog?.applicationId;
   const clientToken = config.dataDog?.clientToken;
 
@@ -39,11 +39,35 @@ export const initializeDataDog = (config: Configuration) => {
       sessionSampleRate: 100,
       sessionReplaySampleRate: 20,
       trackUserInteractions: true,
+      trackInteractions: true,
       trackResources: true,
       trackLongTasks: true,
       defaultPrivacyLevel: 'mask-user-input',
     });
 
     datadogRum.startSessionReplayRecording();
+
+    const regex = /([a-z\d]{8})-([a-z\d]{4})-([a-z\d]{4})-([a-z\d]{4})-([a-z\d]{12})/gim;
+
+    const replacer = (_match: string, p1: string) => `${p1}***`;
+    const truncateDomain = (value: string) => `${value.substring(0, 3)}***`;
+    const replaceAllStrings = (string: string) => string.replaceAll(regex, replacer);
+    const replaceDomains = (string: string) => (domain ? string.replaceAll(domain, truncateDomain(domain)) : string);
+
+    import('@datadog/browser-logs').then(({datadogLogs}) => {
+      datadogLogs.init({
+        clientToken,
+        site: 'datadoghq.eu',
+        service: 'web-internal',
+        env: config.ENVIRONMENT,
+        forwardErrorsToLogs: true,
+        forwardConsoleLogs: 'all',
+        sessionSampleRate: 100,
+        beforeSend: log => {
+          log.view.url = '/';
+          log.message = replaceDomains(replaceAllStrings(log.message));
+        },
+      });
+    });
   });
 };

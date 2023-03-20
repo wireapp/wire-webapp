@@ -187,7 +187,6 @@ export class App {
 
     this._subscribeToEvents();
     this.initServiceWorker();
-    initializeDataDog(config);
   }
 
   //##############################################################################
@@ -378,6 +377,8 @@ export class App {
       });
 
       const selfUser = await this.initiateSelfUser();
+
+      initializeDataDog(this.config, selfUser.domain);
 
       onProgress(5, t('initReceivedSelfUser', selfUser.name()));
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_SELF_USER);
