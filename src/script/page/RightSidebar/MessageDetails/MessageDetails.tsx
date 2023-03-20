@@ -59,7 +59,11 @@ const MESSAGE_STATES = {
 const formatUserCount = (users: User[]): string => (users.length ? ` (${users.length})` : '');
 
 const getTotalReactionUsersCount = (reactions: Map<string, User[]>): number => {
-  return Object.keys(reactions).reduce((total, current) => (total += reactions.get(current)?.length ?? 0), 0);
+  let total = 0;
+  reactions.forEach(reaction => {
+    total += reaction.length;
+  });
+  return total;
 };
 
 const formatReactionCount = (reactions: Map<string, User[]>): string => {
@@ -144,10 +148,10 @@ const MessageDetails: FC<MessageDetailsProps> = ({
     });
     const reactionsGroupByUser = groupByReactionUsers(reactions);
     const reactionsGroupByUserMap = new Map<string, User[]>();
-    Object.entries(reactionsGroupByUser).forEach(([reaction, users]) => {
+    reactionsGroupByUser.forEach((userIds, reaction) => {
       reactionsGroupByUserMap.set(
         reaction,
-        users.map(user => usersMap.get(user)!),
+        userIds.map(userId => usersMap.get(userId)!),
       );
     });
 
@@ -261,24 +265,27 @@ const MessageDetails: FC<MessageDetailsProps> = ({
         )}
 
         {messageState === MESSAGE_STATES.REACTIONS &&
-          Object.keys(reactionUsers).map(reactionUserGroupKey => (
-            <Fragment key={reactionUserGroupKey}>
-              <div className="panel__content_title">
-                <span>{reactionUserGroupKey}</span>
-                <span>{getEmojiTitleFromEmojiUnicode(getEmojiUnicode(reactionUserGroupKey))}</span>
-              </div>
-              <UserSearchableList
-                key={reactionUserGroupKey}
-                dataUieName="reaction-list"
-                users={reactionUsers.get(reactionUserGroupKey) ?? []}
-                noUnderline
-                conversationRepository={conversationRepository}
-                searchRepository={searchRepository}
-                teamRepository={teamRepository}
-                onClick={onParticipantClick}
-              />
-            </Fragment>
-          ))}
+          Array.from(reactionUsers).map(reactions => {
+            const [reactionKey, users] = reactions;
+            return (
+              <Fragment key={reactionKey}>
+                <div className="panel__content_title">
+                  <span>{reactionKey}</span>
+                  <span>{getEmojiTitleFromEmojiUnicode(getEmojiUnicode(reactionKey))}</span>
+                </div>
+                <UserSearchableList
+                  key={reactionKey}
+                  dataUieName="reaction-list"
+                  users={users}
+                  noUnderline
+                  conversationRepository={conversationRepository}
+                  searchRepository={searchRepository}
+                  teamRepository={teamRepository}
+                  onClick={onParticipantClick}
+                />
+              </Fragment>
+            );
+          })}
 
         {messageState === MESSAGE_STATES.NO_RECEIPTS && (
           <div className="message-details__empty" data-uie-name="message-details-no-receipts-placeholder">
