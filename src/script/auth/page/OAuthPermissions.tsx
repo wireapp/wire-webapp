@@ -89,8 +89,8 @@ const OAuthPermissionsComponent = ({
 
   const onContinue = async () => {
     try {
-      await postOauthCode(oauthParams);
-      window.location.assign(oauthParams.redirect_uri);
+      const url = await postOauthCode(oauthParams);
+      window.location.replace(url);
     } catch (error) {
       console.error(error);
     }

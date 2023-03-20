@@ -148,12 +148,13 @@ export class AuthAction {
     };
   };
 
-  doPostOAuthCode = (oauthBody: OAuthBody): ThunkAction => {
+  doPostOAuthCode = (oauthBody: OAuthBody): ThunkAction<Promise<string>> => {
     return async (dispatch, getState, {apiClient}) => {
       dispatch(AuthActionCreator.startSendOAuthCode());
       try {
-        await apiClient.api.oauth.postOAuthCode(oauthBody);
+        const url = await apiClient.api.oauth.postOAuthCode(oauthBody);
         dispatch(AuthActionCreator.successfulSendOAuthCode());
+        return url;
       } catch (error) {
         dispatch(AuthActionCreator.failedSendOAuthCode(error));
         throw error;
