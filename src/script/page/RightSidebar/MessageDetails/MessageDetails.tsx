@@ -34,7 +34,7 @@ import {t} from 'Util/LocalizerUtil';
 import {groupByReactionUsers} from 'Util/ReactionUtil';
 import {formatLocale} from 'Util/TimeUtil';
 
-import {panelContentTitleStyles} from './styles';
+import {panelContentTitleStyles} from './MessageDetails.styles';
 
 import {ConversationRepository} from '../../../conversation/ConversationRepository';
 import {Conversation} from '../../../entity/Conversation';
