@@ -20,7 +20,7 @@
 import {FC, Fragment, useState} from 'react';
 
 import {getEmojiUnicode, getEmojiTitleFromEmojiUnicode} from 'Util/EmojiUtil';
-import {Reactions, getEmojiUrl, transformReactionObj} from 'Util/ReactionUtil';
+import {Reactions, getEmojiUrl, groupByReactionUsers} from 'Util/ReactionUtil';
 
 import {EmojiImg} from './EmojiImg';
 import {
@@ -37,7 +37,7 @@ export interface MessageReactionsListProps {
 
 const MessageReactionsList: FC<MessageReactionsListProps> = ({reactions, handleReactionClick}) => {
   const [isSelectedEmoji, setSelected] = useState('');
-  const reactionGroupedByUser = transformReactionObj(reactions);
+  const reactionGroupedByUser = groupByReactionUsers(reactions);
   return (
     <div css={messageReactionWrapper}>
       {Array.from(reactionGroupedByUser).map(([emoji, users], index) => {

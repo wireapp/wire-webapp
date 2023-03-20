@@ -49,12 +49,12 @@ beforeAll(() => {
   });
 });
 
-const getDefaultParams = (showLikes: boolean = false) => {
+const getDefaultParams = (showReactions: boolean = false) => {
   return {
     conversationRepository,
     onClose: jest.fn(),
     searchRepository,
-    showLikes,
+    showReactions,
     teamRepository: {
       conversationHasGuestLinkEnabled: async (conversationId: string) => true,
     } as TeamRepository,

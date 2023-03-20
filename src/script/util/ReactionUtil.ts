@@ -23,7 +23,7 @@ export interface Reactions {
 
 type ReactionsGroupedByUser = Map<string, string[]>;
 
-export function transformReactionObj(reactions: Reactions): ReactionsGroupedByUser {
+export function groupByReactionUsers(reactions: Reactions): ReactionsGroupedByUser {
   const reactionsGroupedByUser = new Map<string, string[]>();
 
   for (const user in reactions) {

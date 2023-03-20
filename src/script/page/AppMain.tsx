@@ -56,7 +56,7 @@ import {WarningsContainer} from '../view_model/WarningsContainer/WarningsContain
 
 export type RightSidebarParams = {
   entity: PanelEntity | null;
-  showLikes?: boolean;
+  showReactions?: boolean;
   highlighted?: User[];
 };
 
