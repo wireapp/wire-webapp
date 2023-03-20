@@ -17,6 +17,9 @@
  *
  */
 
+import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {KeyPackageClaimUser} from '@wireapp/core/lib/conversation';
+
 import {Account} from '@wireapp/core';
 
 import {useMLSConversationState} from './mlsConversationState';
@@ -99,4 +102,36 @@ export async function registerUninitializedConversations(
       }),
     ),
   );
+}
+
+/**
+ * Will add all other user's self clients to the mls group.
+ *
+ * @param conversation id of the conversation
+ * @param selfUserId id of the self user who's clients should be added
+ * @param selfClientId id of the current client (that should be skipped)
+ * @param core instance of the core
+ */
+export async function addOtherSelfClientsToMLSConversation(
+  conversation: Conversation,
+  selfUserId: QualifiedId,
+  selfClientId: string,
+  core: Account,
+) {
+  const {groupId, qualifiedId} = conversation;
+
+  if (!groupId) {
+    throw new Error(`No group id found for MLS conversation ${conversation.id}`);
+  }
+
+  const selfQualifiedUser: KeyPackageClaimUser = {
+    ...selfUserId,
+    skipOwnClientId: selfClientId,
+  };
+
+  await core.service?.conversation.addUsersToMLSConversation({
+    conversationId: qualifiedId,
+    groupId,
+    qualifiedUsers: [selfQualifiedUser],
+  });
 }
