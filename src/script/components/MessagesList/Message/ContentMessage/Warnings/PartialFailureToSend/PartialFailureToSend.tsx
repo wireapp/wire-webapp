@@ -88,7 +88,7 @@ export const PartialFailureToSendWarning = ({failedToSend, knownUsers}: Props) =
   const message = {head: '', rest: ''};
   if (showToggle) {
     message.head = t('messageFailedToSendParticipants', {count: userCount.toString()});
-    message.rest = t('messageFailedToSendToSome');
+    message.rest = t('messageFailedToSendPlural');
   } else if (namedUsers.length === 1) {
     message.head = namedUsers[0].username();
     message.rest = t('messageFailedToSendWillReceiveSingular');
@@ -123,7 +123,7 @@ export const PartialFailureToSendWarning = ({failedToSend, knownUsers}: Props) =
                     )),
                     ', ',
                   )}
-                  {` ${t('messageFailedToSendWillReceive')}`}
+                  {` ${t('messageFailedToSendWillReceivePlural')}`}
                 </p>
               )}
 
@@ -135,7 +135,7 @@ export const PartialFailureToSendWarning = ({failedToSend, knownUsers}: Props) =
                     unreachableUsers.map(user => (
                       <Bold css={warning} data-uie-name="unreachable-domain" key={user.domain + user.count.toString()}>
                         {user.count > 1
-                          ? t('messageFailedToSendParticipantsFromDomain', {
+                          ? t('messageFailedToSendParticipantsFromDomainPlural', {
                               count: user.count.toString(),
                               domain: user.domain,
                             })
@@ -148,7 +148,7 @@ export const PartialFailureToSendWarning = ({failedToSend, knownUsers}: Props) =
                   )}
                   {unreachableUsers.length === 1
                     ? ` ${t('messageFailedToSendWillNotReceiveSingular')}`
-                    : ` ${t('messageFailedToSendWillNotReceive')}`}
+                    : ` ${t('messageFailedToSendWillNotReceivePlural')}`}
                 </p>
               )}
             </>
