@@ -67,14 +67,15 @@ export class OAuthAPI {
   /**
    * Create an OAuth authorization code.
    */
-  public async postOAuthCode(oauthBody: OAuthBody): Promise<void> {
+  public async postOAuthCode(oauthBody: OAuthBody): Promise<string> {
     const config: AxiosRequestConfig = {
       data: oauthBody,
       method: 'post',
       url: `${OAuthAPI.URL.OAUTH}/${OAuthAPI.URL.AUTHORIZATION}/${OAuthAPI.URL.CODES}`,
     };
     try {
-      await this.client.sendJSON(config);
+      const response = await this.client.sendJSON(config);
+      return response.request?.responseURL;
     } catch (error) {
       throw error;
     }
