@@ -49,7 +49,7 @@ export const emojiDictionary: Map<string, string> = new Map();
 
 Object.keys(emojiesList).forEach(key => {
   // return if already existing in the dictionary
-  if (emojiDictionary.get(key)) {
+  if (emojiDictionary.has(key)) {
     return;
   }
   const emojiValue = emojiesList[key];
