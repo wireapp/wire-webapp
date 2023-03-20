@@ -34,6 +34,8 @@ import {t} from 'Util/LocalizerUtil';
 import {groupByReactionUsers} from 'Util/ReactionUtil';
 import {formatLocale} from 'Util/TimeUtil';
 
+import {panelContentTitleStyles} from './styles';
+
 import {ConversationRepository} from '../../../conversation/ConversationRepository';
 import {Conversation} from '../../../entity/Conversation';
 import {ContentMessage} from '../../../entity/message/ContentMessage';
@@ -269,7 +271,7 @@ const MessageDetails: FC<MessageDetailsProps> = ({
             const [reactionKey, users] = reactions;
             return (
               <Fragment key={reactionKey}>
-                <div className="panel__content_title">
+                <div css={panelContentTitleStyles} className="font-weight-bold">
                   <span>{reactionKey}</span>
                   <span>{getEmojiTitleFromEmojiUnicode(getEmojiUnicode(reactionKey))}</span>
                 </div>
