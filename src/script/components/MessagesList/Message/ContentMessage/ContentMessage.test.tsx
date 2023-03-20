@@ -61,6 +61,8 @@ describe('message', () => {
       onClickReceipts: jest.fn(),
       onClickTimestamp: jest.fn(),
       onLike: jest.fn(),
+      onDiscard: jest.fn(),
+      onRetry: jest.fn(),
       previousMessage: undefined,
       selfId: {domain: '', id: createRandomUuid()},
       isMsgElementsFocusable: true,
@@ -95,7 +97,7 @@ describe('message', () => {
     const {getByText} = render(
       <ContentMessageComponent {...defaultParams} message={message} findMessage={findMessage} />,
     );
-    await waitFor(() => getByText(quoteText));
+    expect(await waitFor(() => getByText(quoteText))).not.toBe(null);
   });
 
   test('should hide options menu when user clicks outside the component', () => {
