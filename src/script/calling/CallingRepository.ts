@@ -131,7 +131,7 @@ export class CallingRepository {
   private avsVersion: number = 0;
   private incomingCallCallback: (call: Call) => void;
   private requestNewEpochCallback: (conversationId: QualifiedId) => void;
-  private callClosedCallback: (conversationId: QualifiedId) => void;
+  private callClosedCallback: (conversationId: QualifiedId, conversationType: CONV_TYPE) => void;
   private callParticipantChangedCallback: (conversationId: QualifiedId, members: QualifiedWcallMember[]) => void;
   private isReady: boolean = false;
   /** will cache the query to media stream (in order to avoid asking the system for streams multiple times when we have multiple peers) */
@@ -415,7 +415,7 @@ export class CallingRepository {
     this.incomingCallCallback = callback;
   }
 
-  onCallClosed(callback: (conversationId: QualifiedId) => void): void {
+  onCallClosed(callback: (conversationId: QualifiedId, conversationType: CONV_TYPE) => void): void {
     this.callClosedCallback = callback;
   }
 
@@ -1233,7 +1233,7 @@ export class CallingRepository {
       return;
     }
 
-    this.callClosedCallback(conversationId);
+    this.callClosedCallback(conversationId, call.conversationType);
 
     if (reason === REASON.NORMAL) {
       this.callState.selectableScreens([]);

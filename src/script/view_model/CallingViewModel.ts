@@ -162,7 +162,7 @@ export class CallingViewModel {
 
       if (conversation.isUsingMLSProtocol) {
         const unsubscribe = await subscribeToEpochUpdates(
-          {mlsService: this.mlsService},
+          {mlsService: this.mlsService, conversationState: this.conversationState},
           conversation.qualifiedId,
           ({epoch, keyLength, secretKey, members}) => {
             this.callingRepository.setEpochInfo(conversation.qualifiedId, {epoch, keyLength, secretKey}, members);
@@ -176,7 +176,7 @@ export class CallingViewModel {
 
     const joinOngoingMlsConference = async (call: Call) => {
       const unsubscribe = await subscribeToEpochUpdates(
-        {mlsService: this.mlsService},
+        {mlsService: this.mlsService, conversationState: this.conversationState},
         call.conversationId,
         ({epoch, keyLength, secretKey, members}) => {
           this.callingRepository.setEpochInfo(call.conversationId, {epoch, keyLength, secretKey}, members);
@@ -240,10 +240,9 @@ export class CallingViewModel {
       this.callingRepository.setEpochInfo(conversationId, {epoch, keyLength, secretKey}, members);
     };
 
-    const leaveCall = async (conversationId: QualifiedId) => {
-      const conversation = this.getConversationById(conversationId);
-
-      if (!conversation?.isUsingMLSProtocol) {
+    const closeCall = async (conversationId: QualifiedId, conversationType: CONV_TYPE) => {
+      // There's nothing we need to do for non-mls calls
+      if (conversationType !== CONV_TYPE.CONFERENCE_MLS) {
         return;
       }
 
@@ -336,7 +335,7 @@ export class CallingViewModel {
     this.callingRepository.onRequestNewEpochCallback(conversationId => updateEpochInfo(conversationId, true));
 
     //once the call gets closed (eg. we leave a call or get dropped), we remove ourselfes from subconversation and unsubscribe from all the call events
-    this.callingRepository.onCallClosed(leaveCall);
+    this.callingRepository.onCallClosed(closeCall);
 
     //handle participant change avs callback to detect stale clients in subconversations
     this.callingRepository.onCallParticipantChangedCallback(handleCallParticipantChange);

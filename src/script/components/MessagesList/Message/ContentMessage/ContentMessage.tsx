@@ -30,6 +30,7 @@ import {Conversation} from 'src/script/entity/Conversation';
 import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {Message} from 'src/script/entity/message/Message';
+import {StatusType} from 'src/script/message/StatusType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getMessageAriaLabel} from 'Util/conversationMessages';
 import {t} from 'Util/LocalizerUtil';
@@ -39,7 +40,7 @@ import {MessageActionsMenu} from './MessageActions/MessageActions';
 import {useMessageActionsState} from './MessageActions/MessageActions.state';
 import {MessageReactionsList} from './MessageActions/MessageReactions/MessageReactionsList';
 import {Quote} from './MessageQuote';
-import {FailedToSendWarning} from './Warnings';
+import {CompleteFailureToSendWarning, PartialFailureToSendWarning} from './Warnings';
 
 import {MessageActions} from '..';
 import {EphemeralStatusType} from '../../../../message/EphemeralStatusType';
@@ -57,6 +58,8 @@ export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetS
   isLastDeliveredMessage: boolean;
   message: ContentMessage;
   onClickButton: (message: CompositeMessage, buttonId: string) => void;
+  onDiscard: () => void;
+  onRetry: (message: ContentMessage) => void;
   previousMessage?: Message;
   quotedMessage?: ContentMessage;
   selfId: QualifiedId;
@@ -82,6 +85,8 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   onClickLikes,
   onClickButton,
   onLike,
+  onDiscard,
+  onRetry,
   isMsgElementsFocusable,
   messageRepository,
 }) => {
@@ -90,7 +95,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
     [isMsgElementsFocusable, isMessageFocused],
   );
   const messageFocusedTabIndex = useMessageFocusedTabIndex(msgFocusState);
-  const {headerSenderName, ephemeral_caption, ephemeral_status, assets, was_edited, failedToSend, reactions} =
+  const {headerSenderName, ephemeral_caption, ephemeral_status, assets, was_edited, failedToSend, reactions, status} =
     useKoSubscribableChildren(message, [
       'headerSenderName',
       'timestamp',
@@ -101,6 +106,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
       'was_edited',
       'failedToSend',
       'reactions',
+      'status',
     ]);
 
   const shouldShowAvatar = (): boolean => {
@@ -254,7 +260,17 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
           />
         ))}
 
-        {failedToSend && <FailedToSendWarning failedToSend={failedToSend} knownUsers={conversation.allUserEntities} />}
+        {failedToSend && (
+          <PartialFailureToSendWarning failedToSend={failedToSend} knownUsers={conversation.allUserEntities()} />
+        )}
+
+        {status === StatusType.FAILED && (
+          <CompleteFailureToSendWarning
+            isTextAsset={message.getFirstAsset().isText()}
+            onDiscard={() => onDiscard()}
+            onRetry={() => onRetry(message)}
+          />
+        )}
 
         {isActionMenuVisible && isReactionFeatureEnabled && (
           <MessageActionsMenu

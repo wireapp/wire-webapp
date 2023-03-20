@@ -106,12 +106,14 @@ const CallingCell: React.FC<CallingCellProps> = ({
   const {
     isGroup,
     participating_user_ets: userEts,
+    allUserEntities: allUsers,
     selfUser,
     display_name: conversationName,
     roles,
   } = useKoSubscribableChildren(conversation, [
     'isGroup',
     'participating_user_ets',
+    'allUserEntities',
     'selfUser',
     'display_name',
     'roles',
@@ -445,7 +447,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
             )
           )}
 
-          {classifiedDomains && <ClassifiedBar users={userEts} classifiedDomains={classifiedDomains} />}
+          {classifiedDomains && <ClassifiedBar users={allUsers} classifiedDomains={classifiedDomains} />}
 
           {!isDeclined && (
             <>

@@ -31,7 +31,7 @@ import {warning} from '../Warnings.styles';
 
 export type User = {qualifiedId: QualifiedId; username: () => string};
 type Props = {
-  failedToSend: QualifiedUserClients;
+  failedToSend: {queued?: QualifiedUserClients; failed?: QualifiedId[]};
   knownUsers: User[];
 };
 
@@ -60,17 +60,15 @@ function generateNamedUsers(users: User[], userClients: QualifiedUserClients): P
   );
 }
 
-export const FailedToSendWarning = ({failedToSend, knownUsers}: Props) => {
+export const PartialFailureToSendWarning = ({failedToSend, knownUsers}: Props) => {
   const [isOpen, setIsOpen] = useState(false);
+  const {queued = {}} = failedToSend;
 
-  const userCount = Object.entries(failedToSend).reduce(
-    (count, [_domain, users]) => count + Object.keys(users).length,
-    0,
-  );
+  const userCount = Object.entries(queued).reduce((count, [_domain, users]) => count + Object.keys(users).length, 0);
 
   const showToggle = userCount > 1;
 
-  const {namedUsers} = generateNamedUsers(knownUsers, failedToSend);
+  const {namedUsers} = generateNamedUsers(knownUsers, queued);
 
   const message =
     namedUsers.length === 1

@@ -196,7 +196,7 @@ export class ConversationRepository {
 
       const {missingClients, deletedClients, emptyUsers, missingUserIds} = extractClientDiff(
         filteredMismatch,
-        conversation?.allUserEntities,
+        conversation?.allUserEntities(),
         domain,
       );
 
@@ -249,7 +249,11 @@ export class ConversationRepository {
           shouldWarnLegalHold = hasChangedLegalHoldStatus && newDevices.some(device => device.isLegalHold());
         }
       }
-      return !conversation || silent
+      if (!conversation) {
+        // in case of a broadcast message, we want to keep sending the message even if there are some conversation degradation
+        return true;
+      }
+      return silent
         ? false
         : this.messageRepository.requestUserSendingPermission(conversation, shouldWarnLegalHold, consentType);
     });
@@ -838,11 +842,14 @@ export class ConversationRepository {
       });
   }
 
-  private readonly deleteConversationLocally = (conversationId: QualifiedId, skipNotification: boolean) => {
+  private readonly deleteConversationLocally = async (conversationId: QualifiedId, skipNotification: boolean) => {
     const conversationEntity = this.conversationState.findConversation(conversationId);
     if (!conversationEntity) {
       return;
     }
+
+    this.leaveCall(conversationEntity.qualifiedId, LEAVE_CALL_REASON.USER_MANUALY_LEFT_CONVERSATION);
+
     if (this.conversationState.isActiveConversation(conversationEntity)) {
       const nextConversation = this.getNextConversation(conversationEntity);
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversation, {});
@@ -856,7 +863,13 @@ export class ConversationRepository {
       this.conversationLabelRepository.saveLabels();
     }
     this.deleteConversationFromRepository(conversationId);
-    this.conversationService.deleteConversationFromDb(conversationId);
+    await this.conversationService.deleteConversationFromDb(conversationId);
+    if (conversationEntity.protocol === ConversationProtocol.MLS) {
+      const {groupId} = conversationEntity;
+      if (groupId) {
+        await this.core.service!.conversation.wipeMLSConversation(groupId);
+      }
+    }
   };
 
   public async getAllUsersInConversation(conversationId: QualifiedId): Promise<User[]> {
@@ -1344,7 +1357,7 @@ export class ConversationRepository {
      * Needs to be done to receive the latest epoch and avoid epoch mismatch errors
      */
 
-    const qualifiedUserIds = userEntities.map(userEntity => userEntity.qualifiedId);
+    const qualifiedUsers = userEntities.map(userEntity => userEntity.qualifiedId);
 
     const {qualifiedId: conversationId, groupId} = conversation;
 
@@ -1353,7 +1366,7 @@ export class ConversationRepository {
         const {events} = await this.core.service!.conversation.addUsersToMLSConversation({
           conversationId,
           groupId,
-          qualifiedUserIds,
+          qualifiedUsers,
         });
         if (!!events.length) {
           events.forEach(event => this.eventRepository.injectEvent(event));
@@ -1361,7 +1374,7 @@ export class ConversationRepository {
       } else {
         const conversationMemberJoinEvent = await this.core.service!.conversation.addUsersToProteusConversation({
           conversationId,
-          qualifiedUserIds,
+          qualifiedUsers,
         });
         if (conversationMemberJoinEvent) {
           this.eventRepository.injectEvent(conversationMemberJoinEvent, EventRepository.SOURCE.BACKEND_RESPONSE);
@@ -1369,7 +1382,7 @@ export class ConversationRepository {
       }
     } catch (error) {
       if (error) {
-        this.handleAddToConversationError(error as BackendClientError, conversation, qualifiedUserIds);
+        this.handleAddToConversationError(error as BackendClientError, conversation, qualifiedUsers);
       }
     }
   }
@@ -2013,7 +2026,8 @@ export class ConversationRepository {
       .then(conversationEntity => this.checkConversationParticipants(conversationEntity, eventJson, eventSource))
       .then(conversationEntity => this.triggerFeatureEventHandlers(conversationEntity, eventJson))
       .then(
-        conversationEntity => this.reactToConversationEvent(conversationEntity, eventJson, eventSource) as EntityObject,
+        conversationEntity =>
+          this.reactToConversationEvent(conversationEntity, eventJson, eventSource) as Promise<EntityObject>,
       )
       .then((entityObject = {} as EntityObject) => {
         if (type !== CONVERSATION_EVENT.MEMBER_JOIN && type !== CONVERSATION_EVENT.MEMBER_LEAVE) {
@@ -2153,7 +2167,7 @@ export class ConversationRepository {
    * @param eventSource Source of event
    * @returns Resolves when the event has been treated
    */
-  private reactToConversationEvent(
+  private async reactToConversationEvent(
     conversationEntity: Conversation,
     eventJson: IncomingEvent,
     eventSource: EventSource,

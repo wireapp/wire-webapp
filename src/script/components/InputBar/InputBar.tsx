@@ -127,6 +127,7 @@ const InputBar = ({
   const {
     connection,
     participating_user_ets: participatingUserEts,
+    allUserEntities: allUsers,
     localMessageTimer,
     messageTimer,
     hasGlobalMessageTimer,
@@ -134,6 +135,7 @@ const InputBar = ({
   } = useKoSubscribableChildren(conversationEntity, [
     'connection',
     'firstUserEntity',
+    'allUserEntities',
     'participating_user_ets',
     'localMessageTimer',
     'messageTimer',
@@ -776,7 +778,7 @@ const InputBar = ({
       {!!isTypingIndicatorEnabled && <TypingIndicator conversationId={conversationEntity.id} />}
 
       {classifiedDomains && !isConnectionRequest && (
-        <ClassifiedBar users={participatingUserEts} classifiedDomains={classifiedDomains} />
+        <ClassifiedBar users={allUsers} classifiedDomains={classifiedDomains} />
       )}
 
       {isReplying && !isEditing && <ReplyBar replyMessageEntity={replyMessageEntity} onCancel={handleCancelReply} />}

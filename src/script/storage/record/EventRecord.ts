@@ -48,7 +48,10 @@ export type UserReactionMap = {[userId: string]: ReactionType};
 type SentEvent = {
   /** sending status of the event*/
   status: StatusType;
-  failedToSend?: QualifiedUserClients;
+  failedToSend?: {
+    queue?: QualifiedUserClients;
+    failed?: QualifiedId[];
+  };
 };
 
 /** represents an event that was saved to the DB */

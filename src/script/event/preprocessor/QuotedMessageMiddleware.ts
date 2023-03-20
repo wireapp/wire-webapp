@@ -125,6 +125,7 @@ export class QuotedMessageMiddleware {
     const quoteData = {
       message_id: messageId,
       user_id: quotedMessage.from,
+      hash: quote.quotedMessageSha256,
     };
 
     const decoratedData = {...event.data, quote: quoteData};
