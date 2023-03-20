@@ -145,8 +145,8 @@ export class EventMapper {
     const {id, data: eventData, edited_time: editedTime, conversation, qualified_conversation} = event;
 
     if (eventData.quote) {
-      const {message_id: messageId, user_id: userId, error} = eventData.quote;
-      originalEntity.quote(new QuoteEntity({error, messageId, userId}));
+      const {hash, message_id: messageId, user_id: userId, error} = eventData.quote;
+      originalEntity.quote(new QuoteEntity({error, hash, messageId, userId}));
     }
 
     if (id !== originalEntity.id && originalEntity.hasAssetText()) {
@@ -198,7 +198,7 @@ export class EventMapper {
     originalEntity.id = id;
 
     if (originalEntity.isContent() || (originalEntity as Message).isPing()) {
-      originalEntity.status(event.status || StatusType.SENT);
+      originalEntity.status(event.status ?? StatusType.SENT);
     }
 
     originalEntity.replacing_message_id = eventData.replacing_message_id;
@@ -377,7 +377,7 @@ export class EventMapper {
     }
 
     if (messageEntity.isContent() || messageEntity.isPing()) {
-      messageEntity.status((event as EventRecord).status || StatusType.SENT);
+      messageEntity.status((event as EventRecord).status ?? StatusType.SENT);
     }
 
     if (messageEntity.isComposite()) {

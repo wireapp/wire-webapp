@@ -68,7 +68,6 @@ const InViewport: React.FC<InViewportParams & React.HTMLProps<HTMLDivElement>> =
         inViewport = isInViewport;
         triggerCallbackIfVisible();
       },
-      element.parentElement || undefined,
       requireFullyInView,
       allowBiggerThanViewport,
     );
