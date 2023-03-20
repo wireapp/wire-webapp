@@ -127,7 +127,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
               },
             }}
           >
-            {'Connecting...'}
+            {t('videoCallParticipantConnecting')}
           </span>
         )}
       </span>
