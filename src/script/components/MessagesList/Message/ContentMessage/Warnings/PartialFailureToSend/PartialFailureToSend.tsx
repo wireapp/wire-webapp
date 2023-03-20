@@ -66,9 +66,9 @@ function generateUnreachableUsers(users: QualifiedId[]) {
   return map(userCountByDomain, (count, domain) => ({count, domain}));
 }
 
-function reduceWithCommas(elements: React.ReactNode[]) {
+function joinWith(elements: React.ReactNode[], separator: string) {
   return elements.reduce<React.ReactNode[]>((prev, element) => {
-    return prev.length === 0 ? [element] : [...prev, ', ', element];
+    return prev.length === 0 ? [element] : [...prev, separator, element];
   }, []);
 }
 
@@ -110,7 +110,7 @@ export const PartialFailureToSendWarning = ({failedToSend, knownUsers}: Props) =
               "Alice, Bob will get your message later" */}
               {namedUsers.length !== 0 && (
                 <p css={warning}>
-                  {reduceWithCommas(
+                  {joinWith(
                     namedUsers.map(user => (
                       <Bold
                         css={warning}
@@ -121,6 +121,7 @@ export const PartialFailureToSendWarning = ({failedToSend, knownUsers}: Props) =
                         {user.username()}
                       </Bold>
                     )),
+                    ', ',
                   )}
                   {` ${t('messageFailedToSendWillReceive')}`}
                 </p>
@@ -130,7 +131,7 @@ export const PartialFailureToSendWarning = ({failedToSend, knownUsers}: Props) =
               "3 participants from alpha.domain, 1 participant from beta.domain won't get your message" */}
               {failed && (
                 <p css={warning}>
-                  {reduceWithCommas(
+                  {joinWith(
                     unreachableUsers.map(user => (
                       <Bold css={warning} data-uie-name="unreachable-domain" key={user.domain + user.count.toString()}>
                         {user.count > 1
@@ -143,6 +144,7 @@ export const PartialFailureToSendWarning = ({failedToSend, knownUsers}: Props) =
                             })}
                       </Bold>
                     )),
+                    ', ',
                   )}
                   {unreachableUsers.length === 1
                     ? ` ${t('messageFailedToSendWillNotReceiveSingular')}`
