@@ -80,11 +80,14 @@ const OAuthPermissionsComponent = ({
     .split('&')
     .reduce((acc, param) => {
       const [key, value] = param.split('=');
+      if (key === 'scope') {
+        return {...acc, [key]: value.replaceAll('+', ' ')};
+      }
       return {...acc, [key]: value};
     }, {} as OAuthBody);
   const [oAuthApp, setOAuthApp] = useState<OAuthClient | null>(null);
   const oAuthScope = oauthParams.scope
-    .split(/\+|%20/)
+    .split(/\+|%20|\s/)
     .filter(scope => Object.values(Scope).includes(scope as Scope)) as Scope[];
 
   const onContinue = async () => {
