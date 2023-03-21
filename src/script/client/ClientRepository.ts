@@ -351,7 +351,7 @@ export class ClientRepository {
             const isSelfClient = matchQualifiedIds({domain, id: userId}, this.selfUser().qualifiedId);
             clientEntityMap[domain] ||= {};
             clientEntityMap[domain][userId] = updateClients
-              ? await this.updateClientsOfUserById({domain, id: userId}, clients, true)
+              ? await this.updateUserClients({domain, id: userId}, clients, true)
               : ClientMapper.mapClients(clients, isSelfClient, domain);
           }),
         ),
@@ -400,7 +400,7 @@ export class ClientRepository {
   async updateClientsForSelf(): Promise<ClientEntity[]> {
     const clientsData = await this.clientService.getClients();
     const {domain, id} = this.selfUser();
-    return this.updateClientsOfUserById({domain, id}, clientsData, false);
+    return this.updateUserClients({domain, id}, clientsData, false);
   }
 
   /**
@@ -413,7 +413,7 @@ export class ClientRepository {
    * @param publish Change clients using amplify
    * @returns Resolves with the entities once clients have been updated
    */
-  private async updateClientsOfUserById(
+  private async updateUserClients(
     userId: QualifiedId,
     clientsData: RegisteredClient[] | PublicClient[],
     publish: boolean = true,
