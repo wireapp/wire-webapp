@@ -452,7 +452,7 @@ export class ClientRepository {
             if (wasUpdated) {
               // Clear the previous client in DB (in case the domain changes the primary key will also change, thus invalidating the previous client)
               this.clientService.deleteClientFromDb(client.meta.primary_key);
-              this.logger.info(`Updating client '${clientId}' of user '${userId}' locally`);
+              this.logger.info(`Updating client '${clientId}' of user '${userId.id}' locally`);
               promises.push(this.saveClientInDb(userId, client));
               continue;
             }
@@ -463,7 +463,7 @@ export class ClientRepository {
           }
 
           // Locally known client deleted on backend
-          this.logger.warn(`Removing client '${clientId}' of user '${userId}' locally`);
+          this.logger.warn(`Removing client '${clientId}' of user '${userId.id}' locally`);
           this.removeClient(userId, clientId);
         }
 
@@ -475,7 +475,7 @@ export class ClientRepository {
           }
 
           // Locally unknown client new on backend
-          this.logger.debug(`New client '${clientId}' of user '${userId}' will be stored locally`);
+          this.logger.debug(`New client '${clientId}' of user '${userId.id}' will be stored locally`);
           if (matchQualifiedIds(this.selfUser(), userId)) {
             this.onClientAdd({client: clientPayload as RegisteredClient});
           }
