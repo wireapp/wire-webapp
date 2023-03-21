@@ -21,7 +21,7 @@ import {EventEmitter} from 'stream';
 
 export class Account extends EventEmitter {
   backendFeatures = {
-    federationEndpoints: false,
+    federationEndpoints: true,
   };
 
   configureMLSCallbacks = jest.fn();
@@ -46,6 +46,7 @@ export class Account extends EventEmitter {
     conversation: {
       send: jest.fn(),
       isMLSConversationEstablished: jest.fn(),
+      addUsersToMLSConversation: jest.fn(),
       messageTimer: {
         setConversationLevelTimer: jest.fn(),
       },

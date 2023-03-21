@@ -19,6 +19,7 @@
 
 import React, {useEffect} from 'react';
 
+import {CSSObject} from '@emotion/react';
 import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -39,6 +40,8 @@ export interface UserDetailsProps {
   isSelfVerified: boolean;
   isVerified?: boolean;
   participant: User;
+  avatarStyles?: React.CSSProperties;
+  classifiedBarStyles?: CSSObject;
 }
 
 const UserDetails: React.FC<UserDetailsProps> = ({
@@ -46,7 +49,9 @@ const UserDetails: React.FC<UserDetailsProps> = ({
   participant,
   isSelfVerified,
   isGroupAdmin,
+  avatarStyles,
   classifiedDomains,
+  classifiedBarStyles,
 }) => {
   const user = useKoSubscribableChildren(participant, [
     'inTeam',
@@ -99,7 +104,7 @@ const UserDetails: React.FC<UserDetailsProps> = ({
         <ClassifiedBar
           users={[participant]}
           classifiedDomains={classifiedDomains}
-          style={{width: 'calc(100% + 32px)'}}
+          style={{width: 'calc(100% + 32px)', ...classifiedBarStyles}}
         />
       )}
 
@@ -108,6 +113,7 @@ const UserDetails: React.FC<UserDetailsProps> = ({
         participant={participant}
         avatarSize={AVATAR_SIZE.X_LARGE}
         data-uie-name="status-profile-picture"
+        style={avatarStyles}
       />
 
       {badge && (

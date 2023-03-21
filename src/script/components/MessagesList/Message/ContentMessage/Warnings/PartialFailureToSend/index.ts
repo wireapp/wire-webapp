@@ -18,4 +18,3 @@
  */
 
 export * from './PartialFailureToSend';
-export * from './CompleteFailureToSend';

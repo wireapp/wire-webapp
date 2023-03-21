@@ -65,14 +65,20 @@ jest.deepUnmock('axios');
 const _generateConversation = (
   conversation_type = CONVERSATION_TYPE.REGULAR,
   connection_status = ConnectionStatus.ACCEPTED,
+  conversationProtocol = ConversationProtocol.PROTEUS,
+  domain = '',
 ) => {
-  const conversation = new Conversation(createRandomUuid(), '');
+  const conversation = new Conversation(createRandomUuid(), domain, conversationProtocol);
   conversation.type(conversation_type);
 
   const connectionEntity = new ConnectionEntity();
   connectionEntity.conversationId = conversation.qualifiedId;
   connectionEntity.status(connection_status);
   conversation.connection(connectionEntity);
+
+  if (conversationProtocol === ConversationProtocol.MLS) {
+    conversation.groupId = 'groupId';
+  }
 
   return conversation;
 };
@@ -536,9 +542,7 @@ describe('ConversationRepository', () => {
           xhr.respond(HTTP_STATUS.OK, {'Content-Type': 'application/json'}, JSON.stringify(users));
         });
 
-        const matchConversations = new RegExp(
-          `${escapeRegex(Config.getConfig().BACKEND_REST)}/conversations/([a-z0-9-]+)`,
-        );
+        const matchConversations = new RegExp(`${escapeRegex(Config.getConfig().BACKEND_REST)}/conversations/.*/(.*)`);
         (server as any).respondWith('GET', matchConversations, (xhr: any, conversationId: string) => {
           const conversation = {
             access: [CONVERSATION_ACCESS.PRIVATE],
@@ -745,6 +749,46 @@ describe('ConversationRepository', () => {
         return testFactory.conversation_repository['handleConversationEvent'](memberJoinEvent).then(() => {
           expect(testFactory.conversation_repository['onMemberJoin']).toHaveBeenCalled();
           expect(testFactory.conversation_repository.updateParticipatingUserEntities).toHaveBeenCalled();
+        });
+      });
+
+      it('should add other self clients to mls group if user was event creator', () => {
+        const mockDomain = 'example.com';
+        const mockSelfClientId = 'self-client-id';
+        const selfUser = UserGenerator.getRandomUser(mockDomain);
+
+        const conversationEntity = _generateConversation(
+          CONVERSATION_TYPE.REGULAR,
+          undefined,
+          ConversationProtocol.MLS,
+          mockDomain,
+        );
+        testFactory.conversation_repository['saveConversation'](conversationEntity);
+
+        const memberJoinEvent = {
+          conversation: conversationEntity.id,
+          data: {
+            user_ids: [selfUser.id],
+          },
+          from: selfUser.id,
+          time: '2015-04-27T11:42:31.475Z',
+          type: CONVERSATION_EVENT.MEMBER_JOIN,
+        } as ConversationMemberJoinEvent;
+
+        spyOn(testFactory.conversation_repository['userState'], 'self').and.returnValue(selfUser);
+
+        Object.defineProperty(container.resolve(Core), 'clientId', {
+          get: jest.fn(() => mockSelfClientId),
+        });
+
+        return testFactory.conversation_repository['handleConversationEvent'](memberJoinEvent).then(() => {
+          expect(testFactory.conversation_repository['onMemberJoin']).toHaveBeenCalled();
+          expect(testFactory.conversation_repository.updateParticipatingUserEntities).toHaveBeenCalled();
+          expect(container.resolve(Core).service!.conversation.addUsersToMLSConversation).toHaveBeenCalledWith({
+            conversationId: conversationEntity.qualifiedId,
+            groupId: 'groupId',
+            qualifiedUsers: [{domain: mockDomain, id: selfUser.id, skipOwnClientId: mockSelfClientId}],
+          });
         });
       });
 
