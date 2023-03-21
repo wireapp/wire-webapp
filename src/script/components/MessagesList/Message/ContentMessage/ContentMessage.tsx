@@ -17,15 +17,13 @@
  *
  */
 
-import React, {useMemo, useState, useEffect, useCallback} from 'react';
+import React, {useMemo, useState, useEffect} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {ReactionType} from '@wireapp/core/lib/conversation';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {Icon} from 'Components/Icon';
 import {Config} from 'src/script/Config';
-import {MessageRepository} from 'src/script/conversation/MessageRepository';
 import {Conversation} from 'src/script/entity/Conversation';
 import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
@@ -64,7 +62,7 @@ export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetS
   quotedMessage?: ContentMessage;
   selfId: QualifiedId;
   isMsgElementsFocusable: boolean;
-  messageRepository: MessageRepository;
+  onClickReaction: (emoji: string) => void;
 }
 
 const ContentMessageComponent: React.FC<ContentMessageProps> = ({
@@ -88,7 +86,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   onDiscard,
   onRetry,
   isMsgElementsFocusable,
-  messageRepository,
+  onClickReaction,
 }) => {
   const msgFocusState = useMemo(
     () => isMsgElementsFocusable && isMessageFocused,
@@ -203,12 +201,6 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
     }
   }, [msgFocusState, isMessageFocused]);
 
-  const handleReactionClick = useCallback(
-    (reaction: ReactionType) => {
-      messageRepository.onReactionClick(conversation, message, reaction);
-    },
-    [conversation, message, messageRepository],
-  );
   return (
     <div
       aria-label={messageAriaLabel}
@@ -280,12 +272,12 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             contextMenu={contextMenu}
             isMessageFocused={msgFocusState}
             messageWithSection={hasMarker}
-            handleReactionClick={handleReactionClick}
+            handleReactionClick={onClickReaction}
           />
         )}
       </div>
 
-      <MessageReactionsList reactions={reactions} handleReactionClick={handleReactionClick} />
+      <MessageReactionsList reactions={reactions} handleReactionClick={onClickReaction} />
     </div>
   );
 };

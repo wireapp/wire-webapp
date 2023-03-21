@@ -3666,7 +3666,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:*, @types/react@npm:16 || 17 || 18, @types/react@npm:^18.0.28":
+"@types/react@npm:*, @types/react@npm:16 || 17 || 18, @types/react@npm:18.0.28":
   version: 18.0.28
   resolution: "@types/react@npm:18.0.28"
   dependencies:
@@ -4188,9 +4188,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^23.2.1":
-  version: 23.2.1
-  resolution: "@wireapp/api-client@npm:23.2.1"
+"@wireapp/api-client@npm:^23.2.2":
+  version: 23.2.2
+  resolution: "@wireapp/api-client@npm:23.2.2"
   dependencies:
     "@wireapp/commons": ^5.0.4
     "@wireapp/priority-queue": ^2.0.3
@@ -4203,7 +4203,7 @@ __metadata:
     spark-md5: 3.0.2
     tough-cookie: 4.1.2
     ws: 8.11.0
-  checksum: aeddbbe94001c23415de215b08b8cd3e61ce2dbd9887b44e13ec82782b1625d078af91b65025393ac6b8d00c714e8a65251d8e45ced39f42bb61f8071372abfb
+  checksum: 1d4bdc66c8122e41fcc83ca2ad0762391b9a572ee98b0d559782bd1dcaba572dbe40e2c317f3cedb73b9171dc6f50a94cdb1916e3feb77d3d921780ebc5c073e
   languageName: node
   linkType: hard
 
@@ -4256,11 +4256,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:39.2.7":
-  version: 39.2.7
-  resolution: "@wireapp/core@npm:39.2.7"
+"@wireapp/core@npm:39.3.0":
+  version: 39.3.0
+  resolution: "@wireapp/core@npm:39.3.0"
   dependencies:
-    "@wireapp/api-client": ^23.2.1
+    "@wireapp/api-client": ^23.2.2
     "@wireapp/commons": ^5.0.4
     "@wireapp/core-crypto": 0.7.0-rc.3
     "@wireapp/cryptobox": 12.8.0
@@ -4277,7 +4277,7 @@ __metadata:
     logdown: 3.3.1
     long: ^5.2.0
     uuidjs: 4.2.13
-  checksum: 19098878b11465db1eca697b7ca8ead129fc76d1e4281e86ed0687ec83826c54bebbcb6d6e71c4426006f23863b2c1e5667ddb4c453f4fdafe120ed626db1152
+  checksum: 725701622f37a7a5e7cf5254df061004c00e0b624f5ed368dd2b1ee4e50061d0ea3dbde39f603ea54965e2252f75e300d7006427afdd7ef9ef932908922db130
   languageName: node
   linkType: hard
 
@@ -4388,9 +4388,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/react-ui-kit@npm:9.4.1":
-  version: 9.4.1
-  resolution: "@wireapp/react-ui-kit@npm:9.4.1"
+"@wireapp/react-ui-kit@npm:9.4.2":
+  version: 9.4.2
+  resolution: "@wireapp/react-ui-kit@npm:9.4.2"
   dependencies:
     "@types/color": 3.0.3
     color: 4.2.3
@@ -4405,7 +4405,7 @@ __metadata:
   peerDependenciesMeta:
     "@types/react":
       optional: true
-  checksum: f1b7fdd412a5e005b7dc16bd876f55a0b6d40c9b8b99c206ad598edbeb8fc5e906b83bf416cd9bd3ffbaf24685c738f18198ef032708c7afea51fd07adebd29d
+  checksum: 93e199d29c7d26956337f93c6ae7853dbd9ee86fc01464072d3322355715f3703c5207cc43f1e04a3cad9365429bb326e78c9feed34287e79fbd16553111134b
   languageName: node
   linkType: hard
 
@@ -16560,7 +16560,7 @@ dexie@latest:
     "@types/open-graph": 0.2.2
     "@types/platform": 1.3.4
     "@types/prettier": ^2.7.2
-    "@types/react": ^18.0.28
+    "@types/react": 18.0.28
     "@types/react-dom": 18.0.11
     "@types/react-redux": 7.1.25
     "@types/react-transition-group": 4.4.5
@@ -16575,11 +16575,11 @@ dexie@latest:
     "@typescript-eslint/parser": ^5.55.0
     "@wireapp/avs": 9.1.13
     "@wireapp/copy-config": 2.0.10
-    "@wireapp/core": 39.2.7
+    "@wireapp/core": 39.3.0
     "@wireapp/eslint-config": 2.1.1
     "@wireapp/lru-cache": 3.8.1
     "@wireapp/prettier-config": 0.5.2
-    "@wireapp/react-ui-kit": 9.4.1
+    "@wireapp/react-ui-kit": 9.4.2
     "@wireapp/store-engine": ^5.0.3
     "@wireapp/store-engine-dexie": 2.0.5
     "@wireapp/store-engine-sqleet": 1.8.9

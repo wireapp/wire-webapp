@@ -17,8 +17,9 @@
  *
  */
 
-import React from 'react';
+import React, {useCallback} from 'react';
 
+import {ReactionType} from '@wireapp/core/lib/conversation';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
@@ -189,6 +190,15 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
     return entries;
   });
 
+  const handleReactionClick = useCallback(
+    (reaction: ReactionType) => {
+      if (!message.isContent()) {
+        return;
+      }
+      return void messageRepository.toggleReaction(conversation, message, reaction, selfId.id);
+    },
+    [conversation, message, messageRepository, selfId.id],
+  );
   if (message.isContent()) {
     return (
       <ContentMessageComponent
@@ -215,7 +225,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
         onRetry={onRetry}
         isMessageFocused={isMessageFocused}
         isMsgElementsFocusable={isMsgElementsFocusable}
-        messageRepository={messageRepository}
+        onClickReaction={handleReactionClick}
       />
     );
   }

@@ -92,6 +92,7 @@ import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 import {Core} from '../service/CoreSingleton';
 import type {EventRecord} from '../storage';
+import {UserReactionMap} from '../storage/record/EventRecord';
 import {TeamState} from '../team/TeamState';
 import {ServerTimeHandler} from '../time/serverTimeHandler';
 import {UserType} from '../tracking/attribute';
@@ -782,14 +783,49 @@ export class MessageRepository {
       const reaction = message_et.is_liked() ? ReactionType.NONE : ReactionType.LIKE;
       message_et.is_liked(!message_et.is_liked());
 
-      window.setTimeout(() => this.sendReaction(conversationEntity, message_et, reaction), 100);
+      window.setTimeout(() => this.sendReactions(conversationEntity, message_et, reaction), 100);
     }
   }
 
-  public onReactionClick(conversationEntity: Conversation, message_et: ContentMessage, reaction: string): void {
-    if (!conversationEntity.removed_from_conversation()) {
-      window.setTimeout(() => this.sendReaction(conversationEntity, message_et, reaction), 100);
+  public updateUserReactions(reactions: UserReactionMap, userId: string, reaction: ReactionType) {
+    const userReactions = reactions[userId] || '';
+    const shouldAdd = !userReactions.includes(reaction);
+    const shouldDelete = userReactions.includes(reaction);
+
+    const updatedReactions = {...reactions};
+
+    if (shouldAdd) {
+      const msgReactions = {...reactions};
+      const msgReactionsByUser = msgReactions && msgReactions[userId];
+      if (msgReactionsByUser) {
+        let msgReactionsUserArr = msgReactionsByUser.split(',');
+        msgReactionsUserArr = [...msgReactionsUserArr, reaction];
+        updatedReactions[userId] = msgReactionsUserArr.join(',');
+      } else {
+        updatedReactions[userId] = reaction;
+      }
+    } else if (shouldDelete) {
+      const msgReactions = {...reactions};
+      const msgReactionsByUser = msgReactions && msgReactions[userId].split(',');
+      const filtered = msgReactionsByUser.filter(value => {
+        return value !== reaction;
+      });
+      updatedReactions[userId] = filtered.length ? filtered.join(',') : '';
     }
+    return updatedReactions[userId];
+  }
+
+  public toggleReaction(
+    conversationEntity: Conversation,
+    message_et: ContentMessage,
+    reaction: string,
+    userId: string,
+  ) {
+    if (conversationEntity.removed_from_conversation()) {
+      return;
+    }
+    const updatedReactions = this.updateUserReactions(message_et.reactions(), userId, reaction);
+    return this.sendReactions(conversationEntity, message_et, updatedReactions);
   }
 
   async resetSession(userId: QualifiedId, clientId: string, conversation: Conversation): Promise<void> {
@@ -899,7 +935,7 @@ export class MessageRepository {
    * @returns Resolves after sending the reaction
    */
 
-  private async sendReaction(conversation: Conversation, messageEntity: Message, reactions: ReactionType) {
+  private async sendReactions(conversation: Conversation, messageEntity: Message, reactions: ReactionType) {
     const reaction = MessageBuilder.buildReactionMessage({originalMessageId: messageEntity.id, type: reactions});
 
     return this.sendAndInjectMessage(reaction, conversation);
