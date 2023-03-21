@@ -90,13 +90,13 @@ export class MediaStreamHandler {
         const {state, type} = permission;
         const isPermissionPrompt = state === PermissionStatusState.PROMPT;
         if (isPermissionPrompt) {
-          this.logger.info(`Need to prompt for '${type}' permission`, permissions);
+          this.logger.info(`Need to prompt for '${type}' permission`);
           return false;
         }
 
         const isPermissionDenied = state === PermissionStatusState.DENIED;
         if (isPermissionDenied) {
-          this.logger.warn(`Permission for '${type}' is denied`, permissions);
+          this.logger.warn(`Permission for '${type}' is denied`);
           return false;
         }
       }
@@ -121,10 +121,7 @@ export class MediaStreamHandler {
     mediaStreamTracks.forEach((mediaStreamTrack: MediaStreamTrack) => {
       mediaStream.removeTrack(mediaStreamTrack);
       mediaStreamTrack.stop();
-      this.logger.info(
-        `Stopped MediaStreamTrack ID '${mediaStreamTrack.id}' of kind '${mediaStreamTrack.kind}'`,
-        mediaStreamTrack,
-      );
+      this.logger.info(`Stopped MediaStreamTrack ID '${mediaStreamTrack.id}' of kind '${mediaStreamTrack.kind}'`);
     });
   }
 
@@ -138,8 +135,6 @@ export class MediaStreamHandler {
     const mediaConstraints = screen
       ? this.constraintsHandler.getScreenStreamConstraints(this.screensharingMethod)
       : this.constraintsHandler.getMediaStreamConstraints(audio, video, isGroup);
-
-    this.logger.info('Requesting MediaStream', mediaConstraints);
 
     const willPromptForPermission = !hasPermission && !Runtime.isDesktopApp();
     if (willPromptForPermission) {

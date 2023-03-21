@@ -956,7 +956,7 @@ export class MessageRepository {
         return;
       }
       const logMessage = `Failed to delete message '${messageId}' in conversation '${conversationId}' for everyone`;
-      this.logger.info(logMessage, error);
+      this.logger.warn(logMessage, error);
       throw error;
     }
   }
@@ -979,7 +979,7 @@ export class MessageRepository {
       await this.sendToSelfConversations(payload);
       await this.deleteMessageById(conversation, message.id);
     } catch (error) {
-      this.logger.info(
+      this.logger.warn(
         `Failed to send delete message with id '${message.id}' for conversation '${conversation.id}'`,
         error,
       );

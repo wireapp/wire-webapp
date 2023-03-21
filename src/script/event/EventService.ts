@@ -419,7 +419,7 @@ export class EventService {
   ): Promise<EventRecord | undefined> {
     const record = await this.storageService.load<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey);
     if (!record) {
-      this.logger.warn('Did not find message to update asset (failed)', primaryKey);
+      this.logger.warn('Did not find message to update asset (failed)');
       return undefined;
     }
     record.data.reason = reason;

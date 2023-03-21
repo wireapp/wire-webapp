@@ -63,7 +63,7 @@ export async function initializeDataDog(config: Configuration, domain?: string) 
     service: 'web-internal',
     env: config.ENVIRONMENT,
     forwardErrorsToLogs: true,
-    forwardConsoleLogs: 'all',
+    forwardConsoleLogs: ['info', 'warn', 'error'], // For now those logs should be fine, we need to investigate if we need another logs in the future
     sessionSampleRate: 100,
     beforeSend: log => {
       log.view.url = '/';

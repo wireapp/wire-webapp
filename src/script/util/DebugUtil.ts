@@ -262,8 +262,8 @@ export class DebugUtil {
 
     const logMessage = `Hey ${this.userState.self().name()}, this is for you:`;
     this.logger.warn(logMessage, debugInformation);
-    this.logger.warn(`Conversation: ${debugInformation.conversation.name()}`, debugInformation.conversation);
-    this.logger.warn(`From: ${debugInformation.user.name()}`, debugInformation.user);
+    this.logger.warn(`Conversation: ${debugInformation.conversation.name()}`);
+    this.logger.warn(`From: ${debugInformation.user.name()}`);
 
     return debugInformation;
   }

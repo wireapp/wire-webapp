@@ -268,7 +268,7 @@ export class CryptographyMapper {
       const {mentions: protoMentions, content} = item.text;
 
       if (protoMentions && protoMentions.length > CryptographyMapper.CONFIG.MAX_MENTIONS_PER_MESSAGE) {
-        this.logger.warn(`Message contains '${protoMentions.length}' mentions exceeding limit`, item.text);
+        this.logger.warn(`Message contains '${protoMentions.length}' mentions exceeding limit`);
         protoMentions.length = CryptographyMapper.CONFIG.MAX_MENTIONS_PER_MESSAGE;
       }
 
@@ -551,7 +551,7 @@ export class CryptographyMapper {
     const protoLinkPreviews = text[PROTO_MESSAGE_TYPE.LINK_PREVIEWS];
 
     if (protoMentions && protoMentions.length > CryptographyMapper.CONFIG.MAX_MENTIONS_PER_MESSAGE) {
-      this.logger.warn(`Message contains '${protoMentions.length}' mentions exceeding limit`, text);
+      this.logger.warn(`Message contains '${protoMentions.length}' mentions exceeding limit`);
       protoMentions.length = CryptographyMapper.CONFIG.MAX_MENTIONS_PER_MESSAGE;
     }
 

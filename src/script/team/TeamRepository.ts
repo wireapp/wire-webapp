@@ -222,9 +222,8 @@ export class TeamRepository {
     }
 
     const type = eventJson.type;
-    const logObject = {eventJson: JSON.stringify(eventJson), eventObject: eventJson};
 
-    this.logger.info(`Team Event: '${type}' (Source: ${source})`, logObject);
+    this.logger.info(`Team Event: '${type}' (Source: ${source})`);
 
     switch (type) {
       case TEAM_EVENT.CONVERSATION_DELETE: {
@@ -298,7 +297,7 @@ export class TeamRepository {
         accountInfo.availability = this.userState.self().availability();
       }
 
-      this.logger.info('Publishing account info', accountInfo);
+      this.logger.log('Publishing account info', accountInfo);
       amplify.publish(WebAppEvents.TEAM.INFO, accountInfo);
       return accountInfo;
     }
