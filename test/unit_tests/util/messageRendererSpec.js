@@ -304,6 +304,33 @@ describe('renderMessage', () => {
         testCase: 'displays mention inside code block',
         text: 'salut\n```\n@you\n```',
       },
+      {
+        expected: 'salut<pre><code class="lang-@you"></code></pre>',
+        mentions: [{length: 4, startIndex: 10, userId: 'pain-id'}],
+        testCase: 'displays mention inside code block',
+        text: 'salut\n\n```@you\n```',
+      },
+      {
+        expected:
+          '<a href="https://wire.com/#@you" target="_blank" rel="nofollow noopener noreferrer" data-md-link="true" data-uie-name="markdown-link">text</a>',
+        mentions: [{length: 4, startIndex: 25, userId: 'pain-id'}],
+        testCase: 'displays mention inside code block',
+        text: '[text](https://wire.com/#@you)',
+      },
+      {
+        expected:
+          '<a href="https://wire.com/#" title="@you" target="_blank" rel="nofollow noopener noreferrer" data-md-link="true" data-uie-name="markdown-link">text</a>',
+        mentions: [{length: 4, startIndex: 27, userId: 'pain-id'}],
+        testCase: 'displays mention inside code block',
+        text: '[text](https://wire.com/# "@you")',
+      },
+      {
+        expected:
+          '<a href="https://wire.com" target="_blank" rel="nofollow noopener noreferrer" data-md-link="true" data-uie-name="markdown-link"><div class="message-mention" data-uie-name="label-other-mention" data-user-id="pain-id" role="button"><span class="mention-at-sign">@</span>you</div></a>',
+        mentions: [{length: 4, startIndex: 1, userId: 'pain-id'}],
+        testCase: 'displays mention inside code block',
+        text: '[@you](https://wire.com)',
+      },
     ];
 
     tests.forEach(({expected, mentions, testCase, text}) => {
