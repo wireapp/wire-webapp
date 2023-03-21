@@ -190,15 +190,12 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
     return entries;
   });
 
-  const handleReactionClick = useCallback(
-    (reaction: ReactionType) => {
+  const handleReactionClick = (reaction: ReactionType) => {
       if (!message.isContent()) {
         return;
       }
       return void messageRepository.toggleReaction(conversation, message, reaction, selfId.id);
-    },
-    [conversation, message, messageRepository, selfId.id],
-  );
+    };
   if (message.isContent()) {
     return (
       <ContentMessageComponent
