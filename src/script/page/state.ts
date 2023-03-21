@@ -31,7 +31,7 @@ export enum ViewType {
 
 type RightSidebarParams = {
   entity: PanelEntity | null;
-  showLikes?: boolean;
+  showReactions?: boolean;
   highlighted?: User[];
 };
 
@@ -48,7 +48,7 @@ type AppMainState = {
     goToRoot: (entity: RightSidebarParams['entity']) => void;
     highlightedUsers: RightSidebarParams['highlighted'];
     history: PanelState[];
-    showLikes: RightSidebarParams['showLikes'];
+    showReactions: RightSidebarParams['showReactions'];
     lastViewedMessageDetailsEntity: Message | null;
     updateEntity: (entity: RightSidebarParams['entity']) => void;
   };
@@ -70,7 +70,7 @@ const useAppMainState = create<AppMainState>((set, get) => ({
           entity: null,
           highlightedUsers: [],
           history: [],
-          showLikes: false,
+          showReactions: false,
         },
       })),
     entity: null,
@@ -98,7 +98,7 @@ const useAppMainState = create<AppMainState>((set, get) => ({
             lastViewedMessageDetailsEntity,
             highlightedUsers: params?.highlighted || [],
             history: [...replacedNewState, panel],
-            showLikes: !!params?.showLikes,
+            showReactions: !!params?.showReactions,
           },
         };
       });
@@ -110,7 +110,7 @@ const useAppMainState = create<AppMainState>((set, get) => ({
       })),
     highlightedUsers: [],
     history: [],
-    showLikes: false,
+    showReactions: false,
     updateEntity: (entity: RightSidebarParams['entity']) =>
       set(state => ({...state, rightSidebar: {...state.rightSidebar, entity}})),
   },

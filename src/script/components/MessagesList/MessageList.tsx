@@ -61,7 +61,7 @@ interface MessagesListParams {
   resetSession: (messageError: DecryptErrorMessage) => void;
   selfUser: User;
   showImageDetails: (message: ContentMessage, event: React.UIEvent) => void;
-  showMessageDetails: (message: MessageEntity, showLikes?: boolean) => void;
+  showMessageDetails: (message: MessageEntity, showReactions?: boolean) => void;
   showParticipants: (users: User[]) => void;
   showUserDetails: (user: User | ServiceEntity) => void;
   isLastReceivedMessage: (messageEntity: MessageEntity, conversationEntity: ConversationEntity) => boolean;
