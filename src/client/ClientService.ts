@@ -133,9 +133,13 @@ export class ClientService {
     return this.database.createLocalClient(client, domain);
   }
 
-  public async synchronizeClients(): Promise<MetaClient[]> {
+  /**
+   * Will download all the clients of the self user (excluding the current client) and will store them in the database
+   * @param currentClient - the id of the current client (to be excluded from the list)
+   */
+  public async synchronizeClients(currentClient: string): Promise<MetaClient[]> {
     const registeredClients = await this.backend.getClients();
-    const filteredClients = registeredClients.filter(client => client.id !== this.apiClient.context!.clientId);
+    const filteredClients = registeredClients.filter(client => client.id !== currentClient);
     return this.database.createClientList(
       {id: this.apiClient.context!.userId, domain: this.apiClient.context!.domain ?? ''},
       filteredClients,
