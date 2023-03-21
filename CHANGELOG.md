@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [39.3.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@39.3.2...@wireapp/core@39.3.3) (2023-03-21)
+
+### Bug Fixes
+
+* Make sure current client is not duplicated in database ([#4992](https://github.com/wireapp/wire-web-packages/issues/4992)) ([9a86fb1](https://github.com/wireapp/wire-web-packages/commit/9a86fb1e50ce0ae5f543b954b5c0498866028d17))
+
 ## [39.3.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@39.3.1...@wireapp/core@39.3.2) (2023-03-21)
 
 ### Bug Fixes
