@@ -269,7 +269,7 @@ export class Account extends TypedEventEmitter<Events> {
     this.logger.info(`Created new client {mls: ${!!this.service.mls}, id: ${client.id}}`);
 
     await this.service.notification.initializeNotificationStream();
-    await this.service.client.synchronizeClients();
+    await this.service.client.synchronizeClients(client.id);
 
     return this.initClient(client);
   }
