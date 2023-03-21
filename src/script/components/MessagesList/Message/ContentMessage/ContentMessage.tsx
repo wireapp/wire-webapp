@@ -34,13 +34,13 @@ import {getMessageAriaLabel} from 'Util/conversationMessages';
 import {t} from 'Util/LocalizerUtil';
 
 import {ContentAsset} from './asset';
-import {MessageActions} from './MessageActions/MessageActions';
+import {MessageActionsMenu} from './MessageActions/MessageActions';
 import {useMessageActionsState} from './MessageActions/MessageActions.state';
-import {MessageFooterLike} from './MessageFooterLike';
-import {MessageLike} from './MessageLike';
+import {MessageReactionsList} from './MessageActions/MessageReactions/MessageReactionsList';
 import {Quote} from './MessageQuote';
 import {CompleteFailureToSendWarning, PartialFailureToSendWarning} from './Warnings';
 
+import {MessageActions} from '..';
 import {EphemeralStatusType} from '../../../../message/EphemeralStatusType';
 import {ContextMenuEntry} from '../../../../ui/ContextMenu';
 import {EphemeralTimer} from '../EphemeralTimer';
@@ -62,6 +62,7 @@ export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetS
   quotedMessage?: ContentMessage;
   selfId: QualifiedId;
   isMsgElementsFocusable: boolean;
+  onClickReaction: (emoji: string) => void;
 }
 
 const ContentMessageComponent: React.FC<ContentMessageProps> = ({
@@ -69,7 +70,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   message,
   findMessage,
   selfId,
-  hasMarker,
+  hasMarker = false,
   isMessageFocused,
   isLastDeliveredMessage,
   contextMenu,
@@ -85,13 +86,14 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   onDiscard,
   onRetry,
   isMsgElementsFocusable,
+  onClickReaction,
 }) => {
   const msgFocusState = useMemo(
     () => isMsgElementsFocusable && isMessageFocused,
     [isMsgElementsFocusable, isMessageFocused],
   );
   const messageFocusedTabIndex = useMessageFocusedTabIndex(msgFocusState);
-  const {headerSenderName, ephemeral_caption, ephemeral_status, assets, other_likes, was_edited, failedToSend, status} =
+  const {headerSenderName, ephemeral_caption, ephemeral_status, assets, was_edited, failedToSend, reactions, status} =
     useKoSubscribableChildren(message, [
       'headerSenderName',
       'timestamp',
@@ -101,6 +103,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
       'other_likes',
       'was_edited',
       'failedToSend',
+      'reactions',
       'status',
     ]);
 
@@ -261,38 +264,20 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
           />
         )}
 
-        {!other_likes.length && message.isReactable() && (
-          <div className="message-body-like">
-            <MessageLike
-              className="message-body-like-icon like-button message-show-on-hover"
-              message={message}
-              onLike={onLike}
-              isMessageFocused={msgFocusState}
-            />
-          </div>
-        )}
         {isActionMenuVisible && isReactionFeatureEnabled && (
-          <MessageActions
+          <MessageActionsMenu
             isMsgWithHeader={shouldShowAvatar()}
             message={message}
             handleActionMenuVisibility={setActionMenuVisibility}
             contextMenu={contextMenu}
             isMessageFocused={msgFocusState}
+            messageWithSection={hasMarker}
+            handleReactionClick={onClickReaction}
           />
         )}
       </div>
 
-      {other_likes.length > 0 && (
-        <div>
-          <MessageFooterLike
-            message={message}
-            is1to1Conversation={conversation.is1to1()}
-            onLike={onLike}
-            onClickLikes={onClickLikes}
-            isMessageFocused={msgFocusState}
-          />
-        </div>
-      )}
+      <MessageReactionsList reactions={reactions} handleReactionClick={onClickReaction} />
     </div>
   );
 };

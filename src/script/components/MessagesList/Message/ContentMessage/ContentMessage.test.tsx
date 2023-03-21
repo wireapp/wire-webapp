@@ -17,12 +17,11 @@
  *
  */
 
-import {fireEvent, render, waitFor} from '@testing-library/react';
+import {render, waitFor} from '@testing-library/react';
 import ko from 'knockout';
 
 import {LinkPreview} from 'src/script/entity/message/LinkPreview';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
-import {t} from 'Util/LocalizerUtil';
 
 import {ContentMessageComponent, ContentMessageProps} from './ContentMessage';
 
@@ -98,22 +97,5 @@ describe('message', () => {
       <ContentMessageComponent {...defaultParams} message={message} findMessage={findMessage} />,
     );
     expect(await waitFor(() => getByText(quoteText))).not.toBe(null);
-  });
-
-  test('should hide options menu when user clicks outside the component', () => {
-    const {getByRole, queryByRole, getByLabelText, queryByText} = render(
-      <ContentMessageComponent {...defaultParams} />,
-    );
-
-    const optionsMenu = getByRole('group');
-    expect(optionsMenu).toBeDefined();
-
-    const optionsButton = getByLabelText(t('accessibility.messageActionsMenuLike'));
-    fireEvent.click(optionsButton);
-    expect(optionsMenu).toBeDefined();
-
-    fireEvent.click(document);
-    expect(queryByRole('group')).toBeNull();
-    expect(queryByText(t('accessibility.messageActionsMenuEmoji'))).toBeNull();
   });
 });

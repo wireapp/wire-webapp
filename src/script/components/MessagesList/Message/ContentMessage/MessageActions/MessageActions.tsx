@@ -40,7 +40,7 @@ import {
   getIconCSS,
   messageWithHeaderTop,
 } from './MessageActions.styles';
-import {MessageReactions} from './MessageReactions';
+import {MessageReactions} from './MessageReactions/MessageReactions';
 
 import {useMessageFocusedTabIndex} from '../../util';
 
@@ -52,26 +52,30 @@ export const MessageActionsId = {
   OPTIONS: 'go-options',
 } as const;
 
-export interface MessageActionsProps {
+export interface MessageActionsMenuProps {
   isMsgWithHeader: boolean;
   message: ContentMessage;
   contextMenu: {entries: ko.Subscribable<ContextMenuEntry[]>};
   isMessageFocused: boolean;
   handleActionMenuVisibility: (isVisible: boolean) => void;
+  messageWithSection: boolean;
+  handleReactionClick: (emoji: string) => void;
 }
 
-const MessageActions: FC<MessageActionsProps> = ({
+const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
   isMsgWithHeader,
-  message,
   contextMenu,
   isMessageFocused,
   handleActionMenuVisibility,
+  message,
+  messageWithSection,
+  handleReactionClick,
 }) => {
   const {entries: menuEntries} = useKoSubscribableChildren(contextMenu, ['entries']);
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
   const [currentMsgActionName, setCurrentMsgAction] = useState('');
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const mesageReactionTop = isMsgWithHeader ? messageWithHeaderTop : null;
+  const mesageReactionTop = isMsgWithHeader && messageWithSection ? messageWithHeaderTop : null;
   const {handleMenuOpen} = useMessageActionsState();
 
   const resetActionMenuStates = useCallback(() => {
@@ -145,6 +149,8 @@ const MessageActions: FC<MessageActionsProps> = ({
           handleKeyDown={handleKeyDown}
           resetActionMenuStates={resetActionMenuStates}
           wrapperRef={wrapperRef}
+          message={message}
+          handleReactionClick={handleReactionClick}
         />
         <button
           css={{
@@ -188,4 +194,4 @@ const MessageActions: FC<MessageActionsProps> = ({
   );
 };
 
-export {MessageActions};
+export {MessageActionsMenu};

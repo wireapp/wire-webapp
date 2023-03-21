@@ -24,6 +24,7 @@ import {createPortal} from 'react-dom';
 
 import {useClickOutside} from 'src/script/hooks/useClickOutside';
 import {isEscapeKey} from 'Util/KeyboardUtil';
+import {getEmojiUrl} from 'Util/ReactionUtil';
 
 interface EmojiPickerContainerProps {
   posX: number;
@@ -31,6 +32,7 @@ interface EmojiPickerContainerProps {
   handleEscape: () => void;
   resetActionMenuStates: () => void;
   wrapperRef: RefObject<HTMLDivElement>;
+  handleReactionClick: (emoji: string) => void;
 }
 
 const EmojiPickerContainer: FC<EmojiPickerContainerProps> = ({
@@ -39,8 +41,8 @@ const EmojiPickerContainer: FC<EmojiPickerContainerProps> = ({
   handleEscape,
   resetActionMenuStates,
   wrapperRef,
+  handleReactionClick,
 }) => {
-  const [selectedEmoji, setSelectedEmoji] = useState<string>('');
   const emojiRef = useRef<HTMLDivElement>(null);
   useClickOutside(emojiRef, resetActionMenuStates, wrapperRef);
   const [style, setStyle] = useState<object>({
@@ -77,8 +79,8 @@ const EmojiPickerContainer: FC<EmojiPickerContainerProps> = ({
     return () => window.removeEventListener('resize', updateSize);
   }, [posX, posY]);
 
-  function onClick(emojiData: EmojiClickData, event: MouseEvent) {
-    setSelectedEmoji(emojiData.unified);
+  function onEmojiClick(emojiData: EmojiClickData, event: MouseEvent) {
+    handleReactionClick(emojiData.emoji);
   }
   return (
     <>
@@ -92,10 +94,14 @@ const EmojiPickerContainer: FC<EmojiPickerContainerProps> = ({
             }
           }}
         >
-          <div ref={emojiRef} style={{maxHeight: window.innerHeight, ...style}}>
-            <EmojiPicker onEmojiClick={onClick} />
+          <div
+            ref={emojiRef}
+            style={{maxHeight: window.innerHeight, ...style}}
+            role="dialog"
+            data-uie-name="emoji-picker-dialog"
+          >
+            <EmojiPicker onEmojiClick={onEmojiClick} getEmojiUrl={getEmojiUrl} />
           </div>
-          <p>{selectedEmoji}</p>
         </div>,
         document.body,
       )}

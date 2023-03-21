@@ -130,24 +130,9 @@ export class ContentMessage extends Message {
     data: {reaction: ReactionType};
     from: string;
   }): false | {reactions: UserReactionMap; version: number} {
-    const reaction = event_data && event_data.reaction;
-    const hasUser = this.reactions()[from];
-    const shouldAdd = reaction && !hasUser;
-    const shouldDelete = !reaction && hasUser;
-
-    if (!shouldAdd && !shouldDelete) {
-      return false;
-    }
-
-    const newReactions = {...this.reactions()};
-
-    if (shouldAdd) {
-      newReactions[from] = reaction;
-    } else {
-      delete newReactions[from];
-    }
-
-    return {reactions: newReactions, version: this.version + 1};
+    const reactions = event_data && event_data.reaction;
+    const userReactions = {...this.reactions(), [from]: reactions};
+    return {reactions: userReactions, version: this.version + 1};
   }
 
   /**

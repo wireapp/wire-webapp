@@ -19,14 +19,24 @@
 
 import {useState, useEffect, useCallback, RefObject, FC} from 'react';
 
+import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
+import {EmojiImg} from './EmojiImg';
 import {EmojiPickerContainer} from './EmojiPicker';
-import {MessageActionsId} from './MessageActions';
-import {useMessageActionsState} from './MessageActions.state';
-import {messageActionsMenuButton, getActionsMenuCSS, getIconCSS} from './MessageActions.styles';
+import {actionMenuEmojiSize} from './MessageReactions.styles';
 
+import {MessageActionsId} from '../MessageActions';
+import {useMessageActionsState} from '../MessageActions.state';
+import {messageActionsMenuButton, getActionsMenuCSS, getIconCSS} from '../MessageActions.styles';
+
+const thumbsUpEmoji = '👍';
+const likeEmoji = '❤️';
+const thumbsUpEmojiUrl = '/image/emojis/img-apple-64/1f44d.png';
+const likeEmojiUrl = '/image/emojis/img-apple-64/2764-fe0f.png';
+const INITIAL_CLIENT_X_POS = 0;
+const INITIAL_CLIENT_Y_POS = 0;
 export interface MessageReactionsProps {
   messageFocusedTabIndex: number;
   currentMsgActionName: string;
@@ -37,6 +47,8 @@ export interface MessageReactionsProps {
   handleCurrentMsgAction: (actionName: string) => void;
   resetActionMenuStates: () => void;
   wrapperRef: RefObject<HTMLDivElement>;
+  message: ContentMessage;
+  handleReactionClick: (emoji: string) => void;
 }
 
 const MessageReactions: FC<MessageReactionsProps> = ({
@@ -47,19 +59,26 @@ const MessageReactions: FC<MessageReactionsProps> = ({
   handleKeyDown,
   resetActionMenuStates,
   wrapperRef,
+  message,
+  handleReactionClick,
 }) => {
   const isThumbUpAction = currentMsgActionName === MessageActionsId.THUMBSUP;
   const isLikeAction = currentMsgActionName === MessageActionsId.HEART;
   const [showEmojis, setShowEmojis] = useState(false);
   const {handleMenuOpen} = useMessageActionsState();
-  const [clientX, setPOSX] = useState(0);
-  const [clientY, setPOSY] = useState(0);
+  const [clientX, setPOSX] = useState(INITIAL_CLIENT_X_POS);
+  const [clientY, setPOSY] = useState(INITIAL_CLIENT_Y_POS);
 
   const closeEmojiPicker = () => {
     if (showEmojis) {
       handleCurrentMsgAction('');
       handleMenuOpen(false);
     }
+  };
+
+  const handleOutsideClick = () => {
+    resetActionMenuStates();
+    setShowEmojis(false);
   };
 
   useEffect(() => {
@@ -123,9 +142,11 @@ const MessageReactions: FC<MessageReactionsProps> = ({
           break;
         case MessageActionsId.THUMBSUP:
           toggleActiveMessageAction(event);
+          handleReactionClick(thumbsUpEmoji);
           break;
         case MessageActionsId.HEART:
           toggleActiveMessageAction(event);
+          handleReactionClick(likeEmoji);
           break;
       }
     },
@@ -166,7 +187,11 @@ const MessageReactions: FC<MessageReactionsProps> = ({
         onClick={handleMsgActionClick}
         onKeyDown={handleMsgActionKeyDown}
       >
-        <span aria-hidden={true}>👍</span>
+        <EmojiImg
+          emojiUrl={thumbsUpEmojiUrl}
+          emojiName={t('accessibility.messageActionsMenuThumbsUp')}
+          emojiImgSize={actionMenuEmojiSize}
+        />
       </button>
       <button
         css={{
@@ -182,7 +207,11 @@ const MessageReactions: FC<MessageReactionsProps> = ({
         onClick={handleMsgActionClick}
         onKeyDown={handleMsgActionKeyDown}
       >
-        <span aria-hidden={true}>❤️</span>
+        <EmojiImg
+          emojiUrl={likeEmojiUrl}
+          emojiName={t('accessibility.messageActionsMenuLike')}
+          emojiImgSize={actionMenuEmojiSize}
+        />
       </button>
       <button
         css={{
@@ -219,8 +248,9 @@ const MessageReactions: FC<MessageReactionsProps> = ({
           posX={clientX}
           posY={clientY}
           handleEscape={closeEmojiPicker}
-          resetActionMenuStates={resetActionMenuStates}
+          resetActionMenuStates={handleOutsideClick}
           wrapperRef={wrapperRef}
+          handleReactionClick={handleReactionClick}
         />
       ) : null}
     </>

@@ -57,7 +57,7 @@ const defaultCSP = {
     'https://*.vimeo.com',
     'https://*.youtube-nocookie.com',
   ],
-  imgSrc: ["'self'", 'blob:', 'data:', 'https://*.giphy.com', 'https://cdn.jsdelivr.net'],
+  imgSrc: ["'self'", 'blob:', 'data:', 'https://*.giphy.com'],
   manifestSrc: ["'self'"],
   mediaSrc: ["'self'", 'blob:', 'data:'],
   prefetchSrc: ["'self'"],
