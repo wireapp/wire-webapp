@@ -19,7 +19,9 @@
 
 import {Configuration} from '../Config';
 
-export const initializeDataDog = (config: Configuration, domain?: string) => {
+const uuidRegex = /([a-z\d]{8})-([a-z\d]{4})-([a-z\d]{4})-([a-z\d]{4})-([a-z\d]{12})/gim;
+
+export async function initializeDataDog(config: Configuration, domain?: string) {
   const applicationId = config.dataDog?.applicationId;
   const clientToken = config.dataDog?.clientToken;
 
@@ -27,47 +29,45 @@ export const initializeDataDog = (config: Configuration, domain?: string) => {
     return;
   }
 
-  import('@datadog/browser-rum').then(({datadogRum}) => {
-    datadogRum.init({
-      applicationId,
-      clientToken,
-      site: 'datadoghq.eu',
-      service: 'web-internal',
-      env: config.ENVIRONMENT,
-      // Specify a version number to identify the deployed version of your application in Datadog
-      // version: '1.0.0',
-      sessionSampleRate: 100,
-      sessionReplaySampleRate: 20,
-      trackUserInteractions: true,
-      trackInteractions: true,
-      trackResources: true,
-      trackLongTasks: true,
-      defaultPrivacyLevel: 'mask-user-input',
-    });
+  const replacer = (_match: string, p1: string) => `${p1}***`;
+  const truncateDomain = (value: string) => `${value.substring(0, 3)}***`;
+  const replaceAllStrings = (string: string) => string.replaceAll(uuidRegex, replacer);
+  const replaceDomains = (string: string) => (domain ? string.replaceAll(domain, truncateDomain(domain)) : string);
 
-    datadogRum.startSessionReplayRecording();
+  const {datadogRum} = await import('@datadog/browser-rum');
 
-    const regex = /([a-z\d]{8})-([a-z\d]{4})-([a-z\d]{4})-([a-z\d]{4})-([a-z\d]{12})/gim;
-
-    const replacer = (_match: string, p1: string) => `${p1}***`;
-    const truncateDomain = (value: string) => `${value.substring(0, 3)}***`;
-    const replaceAllStrings = (string: string) => string.replaceAll(regex, replacer);
-    const replaceDomains = (string: string) => (domain ? string.replaceAll(domain, truncateDomain(domain)) : string);
-
-    import('@datadog/browser-logs').then(({datadogLogs}) => {
-      datadogLogs.init({
-        clientToken,
-        site: 'datadoghq.eu',
-        service: 'web-internal',
-        env: config.ENVIRONMENT,
-        forwardErrorsToLogs: true,
-        forwardConsoleLogs: 'all',
-        sessionSampleRate: 100,
-        beforeSend: log => {
-          log.view.url = '/';
-          log.message = replaceDomains(replaceAllStrings(log.message));
-        },
-      });
-    });
+  datadogRum.init({
+    applicationId,
+    clientToken,
+    site: 'datadoghq.eu',
+    service: 'web-internal',
+    env: config.ENVIRONMENT,
+    // Specify a version number to identify the deployed version of your application in Datadog
+    version: config.VERSION,
+    sessionSampleRate: 100,
+    sessionReplaySampleRate: 20,
+    trackUserInteractions: true,
+    trackInteractions: true,
+    trackResources: true,
+    trackLongTasks: true,
+    defaultPrivacyLevel: 'mask-user-input',
   });
-};
+
+  datadogRum.startSessionReplayRecording();
+
+  const {datadogLogs} = await import('@datadog/browser-logs');
+
+  datadogLogs.init({
+    clientToken,
+    site: 'datadoghq.eu',
+    service: 'web-internal',
+    env: config.ENVIRONMENT,
+    forwardErrorsToLogs: true,
+    forwardConsoleLogs: 'all',
+    sessionSampleRate: 100,
+    beforeSend: log => {
+      log.view.url = '/';
+      log.message = replaceDomains(replaceAllStrings(log.message));
+    },
+  });
+}
