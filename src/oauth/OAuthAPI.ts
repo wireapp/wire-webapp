@@ -75,7 +75,7 @@ export class OAuthAPI {
     };
     try {
       const response = await this.client.sendJSON(config);
-      return response.request?.responseURL;
+      return response.headers.location;
     } catch (error) {
       throw error;
     }
