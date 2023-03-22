@@ -873,7 +873,7 @@ export const clientManagerStrings = defineMessages({
   },
   oauth: {
     defaultMessage:
-      'You are adding a new device. Only 7 devices can be active. Remove one of your devices to start using Wire on this one.',
+      'You are adding a new device. Only 7 devices can be active. Remove one of your devices to start using Wire on this one ({device}).',
     id: 'clientManager.oauth',
   },
 });

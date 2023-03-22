@@ -78,7 +78,7 @@ export class ClientAction {
     };
   };
 
-  generateClientPayload = (clientType: ClientType): ClientInfo | undefined => {
+  private generateClientPayload = (clientType: ClientType): ClientInfo | undefined => {
     if (clientType === ClientType.NONE) {
       return undefined;
     }
