@@ -163,13 +163,13 @@ describe('UserRepository', () => {
       });
 
       it('should find an existing user', () => {
-        const userEntity = testFactory.user_repository.findUserById(user.id);
+        const userEntity = testFactory.user_repository.findUserById({id: user.id, domain: ''});
 
         expect(userEntity).toEqual(user);
       });
 
       it('should not find an unknown user', () => {
-        const userEntity = testFactory.user_repository.findUserById('1');
+        const userEntity = testFactory.user_repository.findUserById({id: '1', domain: ''});
 
         expect(userEntity).toBe(undefined);
       });

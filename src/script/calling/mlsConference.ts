@@ -24,6 +24,8 @@ import {constructFullyQualifiedClientId} from '@wireapp/core/lib/util/fullyQuali
 
 import {SubconversationEpochInfoMember} from './CallingRepository';
 
+import {ConversationState} from '../conversation/ConversationState';
+
 const KEY_LENGTH = 32;
 
 const generateSubconversationMembers = async (
@@ -63,7 +65,17 @@ export const getSubconversationEpochInfo = async (
     conversationId,
     SUBCONVERSATION_ID.CONFERENCE,
   );
+
   const parentGroupId = await mlsService.getGroupIdFromConversationId(conversationId);
+
+  // this method should not be called if the subconversation (and its parent conversation) is not established
+  if (!subconversationGroupId || !parentGroupId) {
+    throw new Error(
+      `Could not obtain epoch info for conference subconversation of conversation ${JSON.stringify(
+        conversationId,
+      )}: parent or subconversation group ID is missing`,
+    );
+  }
 
   const members = await generateSubconversationMembers({mlsService}, subconversationGroupId, parentGroupId);
 
@@ -79,7 +91,7 @@ export const getSubconversationEpochInfo = async (
 };
 
 export const subscribeToEpochUpdates = async (
-  {mlsService}: {mlsService: MLSService},
+  {mlsService, conversationState}: {mlsService: MLSService; conversationState: ConversationState},
   conversationId: QualifiedId,
   onEpochUpdate: (info: {
     members: SubconversationEpochInfoMember[];
@@ -94,11 +106,26 @@ export const subscribeToEpochUpdates = async (
 
   const forwardNewEpoch = async ({groupId, epoch}: {groupId: string; epoch: number}) => {
     if (groupId !== subconversationGroupId) {
-      return;
+      // if the epoch update did not happen in the subconversation directly, check if it happened in the parent conversation
+      const parentConversation = conversationState.findConversationByGroupId(groupId);
+      if (!parentConversation) {
+        return;
+      }
+
+      const foundSubconversationGroupId = await mlsService.getGroupIdFromConversationId?.(
+        parentConversation.qualifiedId,
+        SUBCONVERSATION_ID.CONFERENCE,
+      );
+
+      // if the conference subconversation of parent conversation is not known, ignore the epoch update
+      if (foundSubconversationGroupId !== subconversationGroupId) {
+        return;
+      }
     }
 
     const {keyLength, secretKey, members} = await getSubconversationEpochInfo({mlsService}, conversationId);
-    onEpochUpdate({epoch: Number(epoch), keyLength, secretKey, members});
+
+    return onEpochUpdate({epoch: Number(epoch), keyLength, secretKey, members});
   };
 
   mlsService.on('newEpoch', forwardNewEpoch);

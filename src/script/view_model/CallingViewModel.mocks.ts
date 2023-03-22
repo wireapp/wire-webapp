@@ -33,18 +33,18 @@ import {Core} from '../service/CoreSingleton';
 export const mockCallingRepository = {
   startCall: jest.fn(),
   answerCall: jest.fn(),
-  leaveCall: jest.fn(),
   onIncomingCall: jest.fn(),
   onRequestClientsCallback: jest.fn(),
   onRequestNewEpochCallback: jest.fn(),
   onCallParticipantChangedCallback: jest.fn(),
-  onLeaveCall: jest.fn(),
+  onCallClosed: jest.fn(),
+  leaveCall: jest.fn(),
   setEpochInfo: jest.fn(),
 } as unknown as CallingRepository;
 
 export const callState = new CallState();
 
-export function buildCall(conversationId: string | QualifiedId, convType = CONV_TYPE.ONEONONE) {
+export function buildCall(conversationId: QualifiedId, convType = CONV_TYPE.ONEONONE) {
   const qualifiedId = typeof conversationId === 'string' ? {id: conversationId, domain: ''} : conversationId;
   return new Call({id: 'user1', domain: ''}, qualifiedId, convType, {} as any, CALL_TYPE.NORMAL, {
     currentAvailableDeviceId: {audioOutput: ko.observable()},
@@ -54,7 +54,7 @@ export function buildCall(conversationId: string | QualifiedId, convType = CONV_
 const mockCore = container.resolve(Core);
 
 export function buildCallingViewModel() {
-  return new CallingViewModel(
+  const callingViewModel = new CallingViewModel(
     mockCallingRepository,
     {} as any,
     {} as any,
@@ -69,6 +69,8 @@ export function buildCallingViewModel() {
     undefined,
     mockCore,
   );
+
+  return callingViewModel;
 }
 
 export const prepareMLSConferenceMocks = (parentGroupId: string, subGroupId: string) => {
@@ -138,6 +140,13 @@ export const prepareMLSConferenceMocks = (parentGroupId: string, subGroupId: str
   jest.spyOn(mockCore.service!.mls!, 'getEpoch').mockImplementation(() => Promise.resolve(mockEpochNumber));
 
   jest.spyOn(mockCore.service!.mls!, 'exportSecretKey').mockResolvedValue(mockSecretKey);
+
+  let callClosedCallback: (conversationId: QualifiedId, callType: CONV_TYPE) => void;
+
+  jest.spyOn(mockCallingRepository, 'onCallClosed').mockImplementation(callback => (callClosedCallback = callback));
+  jest
+    .spyOn(mockCallingRepository, 'leaveCall')
+    .mockImplementation(conversationId => callClosedCallback(conversationId, CONV_TYPE.CONFERENCE_MLS));
 
   return {expectedMemberListResult, mockSecretKey, mockEpochNumber, mockKeyLength};
 };

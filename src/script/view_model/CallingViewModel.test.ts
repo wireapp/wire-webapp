@@ -45,7 +45,7 @@ describe('CallingViewModel', () => {
   describe('answerCall', () => {
     it('answers a call directly if no call is ongoing', async () => {
       const callingViewModel = buildCallingViewModel();
-      const call = buildCall('conversation1');
+      const call = buildCall({id: 'conversation1', domain: ''});
       await callingViewModel.callActions.answer(call);
       expect(mockCallingRepository.answerCall).toHaveBeenCalledWith(call);
     });
@@ -53,12 +53,12 @@ describe('CallingViewModel', () => {
     it('lets the user leave previous call before answering a new one', async () => {
       jest.useFakeTimers();
       const callingViewModel = buildCallingViewModel();
-      const joinedCall = buildCall('conversation1');
+      const joinedCall = buildCall({id: 'conversation1', domain: ''});
       joinedCall.state(STATE.MEDIA_ESTAB);
       callState.calls.push(joinedCall);
 
       jest.spyOn(PrimaryModal, 'show').mockImplementation((_, payload) => payload.primaryAction?.action?.());
-      const newCall = buildCall('conversation2');
+      const newCall = buildCall({id: 'conversation2', domain: ''});
       Promise.resolve().then(() => {
         jest.runAllTimers();
       });
@@ -82,7 +82,7 @@ describe('CallingViewModel', () => {
     it('lets the user leave previous call before starting a new one', async () => {
       jest.useFakeTimers();
       const callingViewModel = buildCallingViewModel();
-      const joinedCall = buildCall('conversation1');
+      const joinedCall = buildCall({id: 'conversation1', domain: ''});
       joinedCall.state(STATE.MEDIA_ESTAB);
       callState.calls.push(joinedCall);
 
@@ -101,6 +101,10 @@ describe('CallingViewModel', () => {
   });
 
   describe('MLS conference call', () => {
+    beforeAll(() => {
+      jest.useRealTimers();
+    });
+
     it('updates epoch info after initiating a call', async () => {
       const mockParentGroupId = 'mockParentGroupId1';
       const mockSubGroupId = 'mockSubGroupId1';
@@ -140,7 +144,7 @@ describe('CallingViewModel', () => {
       );
 
       const callingViewModel = buildCallingViewModel();
-      const conversationId = {domain: 'example.com', id: 'conversation1'};
+      const conversationId = {domain: 'example.com', id: 'conversation2'};
 
       const call = buildCall(conversationId, CONV_TYPE.CONFERENCE_MLS);
 
@@ -168,7 +172,7 @@ describe('CallingViewModel', () => {
       );
 
       const callingViewModel = buildCallingViewModel();
-      const conversationId = {domain: 'example.com', id: 'conversation1'};
+      const conversationId = {domain: 'example.com', id: 'conversation3'};
       const call = buildCall(conversationId, CONV_TYPE.CONFERENCE_MLS);
 
       await callingViewModel.callActions.answer(call);
@@ -203,6 +207,30 @@ describe('CallingViewModel', () => {
           expectedMemberListResult,
         );
       });
+
+      // once we leave the call, we stop listening to the mls service events
+      await waitFor(() => {
+        callingViewModel.callingRepository.leaveCall(conversationId, LEAVE_CALL_REASON.MANUAL_LEAVE_BY_UI_CLICK);
+      });
+
+      const anotherEpochNumber = 3;
+      callingViewModel.mlsService.emit('newEpoch', {
+        epoch: anotherEpochNumber,
+        groupId: mockSubGroupId,
+      });
+
+      // Wait for all the callback queue tasks to be executed so we know that the function was not called.
+      // Without this, test will always succeed (even without unsubscribing to epoch changes) because the function was not called YET.
+      await new Promise(r => setTimeout(r, 0));
+      expect(mockCallingRepository.setEpochInfo).not.toHaveBeenCalledWith(
+        conversationId,
+        {
+          epoch: anotherEpochNumber,
+          keyLength: mockKeyLength,
+          secretKey: mockSecretKey,
+        },
+        expectedMemberListResult,
+      );
     });
   });
 });

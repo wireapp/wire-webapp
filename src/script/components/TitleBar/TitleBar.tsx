@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useMemo, useEffect, useCallback} from 'react';
+import React, {useMemo, useEffect, useCallback, useRef} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {amplify} from 'amplify';
@@ -27,6 +27,7 @@ import {container} from 'tsyringe';
 import {IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {Icon} from 'Components/Icon';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {useAppMainState, ViewType} from 'src/script/page/state';
@@ -101,8 +102,10 @@ export const TitleBar: React.FC<TitleBarProps> = ({
   ]);
 
   const {isActivatedAccount} = useKoSubscribableChildren(userState, ['isActivatedAccount']);
-  const {joinedCall} = useKoSubscribableChildren(callState, ['joinedCall']);
+  const {joinedCall, activeCalls} = useKoSubscribableChildren(callState, ['joinedCall', 'activeCalls']);
   const {isVideoCallingEnabled} = useKoSubscribableChildren(teamState, ['isVideoCallingEnabled']);
+
+  const currentFocusedElementRef = useRef<HTMLButtonElement | null>(null);
 
   const badgeLabelCopy = useMemo(() => {
     if (is1to1 && isRequest) {
@@ -196,10 +199,21 @@ export const TitleBar: React.FC<TitleBarProps> = ({
 
   const onClickStartAudio = () => {
     callActions.startAudio(conversation);
+    showStartedCallAlert(isGroup);
+
     if (smBreakpoint) {
       setLeftSidebar();
     }
   };
+
+  useEffect(() => {
+    if (!activeCalls.length && currentFocusedElementRef.current) {
+      currentFocusedElementRef.current.focus();
+      currentFocusedElementRef.current = null;
+    }
+  }, [activeCalls.length]);
+
+  const {showStartedCallAlert} = useCallAlertState();
 
   return (
     <ul
@@ -236,7 +250,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
           onClick={onClickDetails}
           title={peopleTooltip}
           aria-label={peopleTooltip}
-          onKeyDown={e => handleKeyDown(e, onClickDetails)}
+          onKeyDown={event => handleKeyDown(event, onClickDetails)}
           data-placement="bottom"
           role="button"
           tabIndex={TabIndex.FOCUSABLE}
@@ -277,7 +291,11 @@ export const TitleBar: React.FC<TitleBarProps> = ({
                 className="conversation-title-bar-icon"
                 title={t('tooltipConversationVideoCall')}
                 aria-label={t('tooltipConversationVideoCall')}
-                onClick={() => callActions.startVideo(conversation)}
+                onClick={event => {
+                  currentFocusedElementRef.current = event.target as HTMLButtonElement;
+                  callActions.startVideo(conversation);
+                  showStartedCallAlert(isGroup, true);
+                }}
                 data-uie-name="do-video-call"
               >
                 <Icon.Camera />
@@ -289,7 +307,11 @@ export const TitleBar: React.FC<TitleBarProps> = ({
               className="conversation-title-bar-icon"
               title={t('tooltipConversationCall')}
               aria-label={t('tooltipConversationCall')}
-              onClick={() => callActions.startAudio(conversation)}
+              onClick={event => {
+                currentFocusedElementRef.current = event.target as HTMLButtonElement;
+                callActions.startAudio(conversation);
+                showStartedCallAlert(isGroup);
+              }}
               data-uie-name="do-call"
             >
               <Icon.Pickup />
