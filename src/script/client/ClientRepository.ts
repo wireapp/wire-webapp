@@ -351,7 +351,7 @@ export class ClientRepository {
             const isSelfClient = matchQualifiedIds({domain, id: userId}, this.selfUser().qualifiedId);
             clientEntityMap[domain] ||= {};
             clientEntityMap[domain][userId] = updateClients
-              ? await this.updateClientsOfUserById({domain, id: userId}, clients, true)
+              ? await this.updateUserClients({domain, id: userId}, clients, true)
               : ClientMapper.mapClients(clients, isSelfClient, domain);
           }),
         ),
@@ -400,7 +400,7 @@ export class ClientRepository {
   async updateClientsForSelf(): Promise<ClientEntity[]> {
     const clientsData = await this.clientService.getClients();
     const {domain, id} = this.selfUser();
-    return this.updateClientsOfUserById({domain, id}, clientsData, false);
+    return this.updateUserClients({domain, id}, clientsData, false);
   }
 
   /**
@@ -413,7 +413,7 @@ export class ClientRepository {
    * @param publish Change clients using amplify
    * @returns Resolves with the entities once clients have been updated
    */
-  private updateClientsOfUserById(
+  private async updateUserClients(
     userId: QualifiedId,
     clientsData: RegisteredClient[] | PublicClient[],
     publish: boolean = true,
@@ -428,7 +428,7 @@ export class ClientRepository {
 
     // Find clients in database
     return this.getClientByUserIdFromDb(userId)
-      .then(clientsFromDatabase => {
+      .then(async clientsFromDatabase => {
         const promises = [];
 
         for (const databaseClient of clientsFromDatabase) {
@@ -445,13 +445,13 @@ export class ClientRepository {
 
             if (this.clientState.currentClient() && this.isCurrentClient(userId, clientId)) {
               this.logger.warn(`Removing duplicate self client '${clientId}' locally`);
-              this.removeClient(userId, clientId);
+              await this.removeClient(userId, clientId);
             }
 
             // Locally known client changed on backend
             if (wasUpdated) {
               // Clear the previous client in DB (in case the domain changes the primary key will also change, thus invalidating the previous client)
-              this.clientService.deleteClientFromDb(client.meta.primary_key);
+              await this.clientService.deleteClientFromDb(client.meta.primary_key);
               this.logger.info(`Updating client '${clientId}' of user '${userId.id}' locally`);
               promises.push(this.saveClientInDb(userId, client));
               continue;
@@ -464,7 +464,7 @@ export class ClientRepository {
 
           // Locally known client deleted on backend
           this.logger.warn(`Removing client '${clientId}' of user '${userId.id}' locally`);
-          this.removeClient(userId, clientId);
+          await this.removeClient(userId, clientId);
         }
 
         for (const clientId in clientsFromBackend) {
