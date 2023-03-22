@@ -40,6 +40,7 @@ import {
 } from '@wireapp/react-ui-kit';
 
 // import {Icon} from 'Components/Icon';
+import {Icon} from 'Components/Icon';
 import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
 import {AssetRepository} from 'src/script/assets/AssetRepository';
 import {KEY} from 'Util/KeyboardUtil';
@@ -109,8 +110,12 @@ const OAuthPermissionsComponent = ({
       await getSelf();
       const team = await getTeam(selfTeamId);
       const teamIcon = AssetRemoteData.v3(team.icon, selfUser.qualified_id?.domain);
-      const teamImageBlob = await assetRepository.load(teamIcon);
-      setTeamImage(teamImageBlob && (await loadDataUrl(teamImageBlob)));
+      if (teamIcon.identifier === 'default') {
+        setTeamImage(`${Config.getConfig().APP_BASE}/image/logo/wire-logo-120.png`);
+      } else {
+        const teamImageBlob = await assetRepository.load(teamIcon);
+        setTeamImage(teamImageBlob && (await loadDataUrl(teamImageBlob)));
+      }
       setOAuthApp(!!oauthParams.client_id ? await getOAuthApp(oauthParams.client_id) : null);
     };
     getUserData().catch(error => {
@@ -133,124 +138,130 @@ const OAuthPermissionsComponent = ({
         verticalCenter
         style={{width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center'}}
       >
-        <H2 center>{_(oauthStrings.headline)}</H2>
-        {typeof teamImage === 'string' && (
-          <img
-            src={teamImage}
-            style={{
-              width: '22px',
-              height: '22px',
-              borderRadius: '6px',
-              border: 'black 1px solid',
-              padding: '2px',
-              margin: '15px',
-            }}
-            alt="teamIcon"
-          />
-        )}
-        <Text style={{marginBottom: '8px'}}>{selfUser.email}</Text>
-        <Link
-          style={{marginBottom: '32px'}}
-          onClick={doLogout}
-          data-uie-name="go-logout"
-          variant={LinkVariant.PRIMARY}
-          center
-          // color={COLOR_V2.SECONDARY}
-        >
-          {_(oauthStrings.logout)}
-        </Link>
+        {!oAuthApp ? (
+          <Icon.Loading width="48" height="48" css={{path: {fill: 'var(--modal-bg)'}}} />
+        ) : (
+          <>
+            <H2 center>{_(oauthStrings.headline)}</H2>
+            {typeof teamImage === 'string' && (
+              <img
+                src={teamImage}
+                style={{
+                  width: '22px',
+                  height: '22px',
+                  borderRadius: '6px',
+                  border: 'black 1px solid',
+                  padding: '2px',
+                  margin: '15px',
+                }}
+                alt="teamIcon"
+              />
+            )}
+            <Text style={{marginBottom: '8px'}}>{selfUser.email}</Text>
+            <Link
+              style={{marginBottom: '32px'}}
+              onClick={doLogout}
+              data-uie-name="go-logout"
+              variant={LinkVariant.PRIMARY}
+              center
+              // color={COLOR_V2.SECONDARY}
+            >
+              {_(oauthStrings.logout)}
+            </Link>
 
-        <Text style={{marginBottom: '24px'}} center>
-          {_(oauthStrings.subhead, {app: oAuthApp?.application_name})}
-        </Text>
+            <Text style={{marginBottom: '24px'}} center>
+              {_(oauthStrings.subhead, {app: oAuthApp?.application_name})}
+            </Text>
 
-        {oauthParams.scope.length > 1 && (
-          <Box
-            style={{
-              marginBottom: '24px',
-              background: COLOR_V2.GRAY_20,
-              borderColor: COLOR_V2.GRAY_20,
-            }}
-          >
-            <ul>
-              {oAuthScope.map((scope, index) => (
-                <li key={index}>
-                  <Text>{_(oauthStrings[scope])}</Text>
-                </li>
-              ))}
-            </ul>
-          </Box>
+            {oauthParams.scope.length > 1 && (
+              <Box
+                style={{
+                  marginBottom: '24px',
+                  background: COLOR_V2.GRAY_20,
+                  borderColor: COLOR_V2.GRAY_20,
+                }}
+              >
+                <ul>
+                  {oAuthScope.map((scope, index) => (
+                    <li key={index}>
+                      <Text>{_(oauthStrings[scope])}</Text>
+                    </li>
+                  ))}
+                </ul>
+              </Box>
+            )}
+            <Text
+              muted
+              center
+              style={{fontSize: '12px', lineHeight: '16px', display: 'block'}}
+              data-uie-name="oauth-detail-learn-more"
+            >
+              <FormattedMessage
+                {...oauthStrings.details}
+                values={{
+                  // eslint-disable-next-line react/display-name
+                  learnMore: ((...chunks: string[] | React.ReactNode[]) => (
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      data-uie-name="go-learn-more"
+                      href={Config.getConfig().URL.PRIVACY_POLICY} //update to correct learn more link
+                    >
+                      {chunks}
+                    </a>
+                  )) as any,
+                }}
+              />
+            </Text>
+            <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: '16px', gap: '16px'}}>
+              <Button
+                variant={ButtonVariant.SECONDARY}
+                style={{margin: 'auto', width: 200}}
+                type="button"
+                onClick={onCancel}
+                data-uie-name="do-oauth-cancel"
+                onKeyDown={(event: React.KeyboardEvent) => {
+                  if (event.key === KEY.ESC) {
+                    onCancel();
+                  }
+                }}
+              >
+                {_(oauthStrings.cancel)}
+              </Button>
+              <Button
+                style={{margin: 'auto', width: 200}}
+                type="button"
+                onClick={onContinue}
+                data-uie-name="do-oauth-allow"
+                onKeyDown={(event: React.KeyboardEvent) => {
+                  if (event.key === KEY.ENTER) {
+                    onContinue();
+                  }
+                }}
+              >
+                {_(oauthStrings.allow)}
+              </Button>
+            </div>
+            <Paragraph center style={{marginTop: 40}}>
+              <FormattedMessage
+                {...oauthStrings.privacyPolicy}
+                values={{
+                  // eslint-disable-next-line react/display-name
+                  privacypolicy: ((...chunks: string[] | React.ReactNode[]) => (
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      data-uie-name="go-privacy-policy"
+                      href={Config.getConfig().URL.PRIVACY_POLICY}
+                    >
+                      {chunks}
+                    </a>
+                  )) as any,
+                }}
+              />
+            </Paragraph>
+          </>
         )}
-        <Text
-          muted
-          center
-          style={{fontSize: '12px', lineHeight: '16px', display: 'block'}}
-          data-uie-name="oauth-detail-learn-more"
-        >
-          <FormattedMessage
-            {...oauthStrings.details}
-            values={{
-              // eslint-disable-next-line react/display-name
-              learnMore: ((...chunks: string[] | React.ReactNode[]) => (
-                <a
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  data-uie-name="go-learn-more"
-                  href={Config.getConfig().URL.PRIVACY_POLICY} //update to correct learn more link
-                >
-                  {chunks}
-                </a>
-              )) as any,
-            }}
-          />
-        </Text>
-        <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: '16px', gap: '16px'}}>
-          <Button
-            variant={ButtonVariant.SECONDARY}
-            style={{margin: 'auto', width: 200}}
-            type="button"
-            onClick={onCancel}
-            data-uie-name="do-oauth-cancel"
-            onKeyDown={(event: React.KeyboardEvent) => {
-              if (event.key === KEY.ESC) {
-                onCancel();
-              }
-            }}
-          >
-            {_(oauthStrings.cancel)}
-          </Button>
-          <Button
-            style={{margin: 'auto', width: 200}}
-            type="button"
-            onClick={onContinue}
-            data-uie-name="do-oauth-allow"
-            onKeyDown={(event: React.KeyboardEvent) => {
-              if (event.key === KEY.ENTER) {
-                onContinue();
-              }
-            }}
-          >
-            {_(oauthStrings.allow)}
-          </Button>
-        </div>
-        <Paragraph center style={{marginTop: 40}}>
-          <FormattedMessage
-            {...oauthStrings.privacyPolicy}
-            values={{
-              // eslint-disable-next-line react/display-name
-              privacypolicy: ((...chunks: string[] | React.ReactNode[]) => (
-                <a
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  data-uie-name="go-privacy-policy"
-                  href={Config.getConfig().URL.PRIVACY_POLICY}
-                >
-                  {chunks}
-                </a>
-              )) as any,
-            }}
-          />
-        </Paragraph>
       </ContainerXS>
     </Page>
   );
