@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [23.3.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@23.3.0...@wireapp/api-client@23.3.1) (2023-03-22)
+
+### Bug Fixes
+
+* oauth redirects ([#4993](https://github.com/wireapp/wire-web-packages/issues/4993)) ([34f5a4f](https://github.com/wireapp/wire-web-packages/commit/34f5a4f975c753d405c7fe5cdb822e9cdfd56bd4))
+
 # [23.3.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@23.2.2...@wireapp/api-client@23.3.0) (2023-03-20)
 
 ### Features
