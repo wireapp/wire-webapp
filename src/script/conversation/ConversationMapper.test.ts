@@ -567,9 +567,9 @@ describe('ConversationMapper', () => {
 
     it('only maps other participants if they are still in the conversation', () => {
       const othersUpdate: OtherMemberBackendData[] = [
-        {id: '39b7f597-dfd1-4dff-86f5-fe1b79cb70a0', status: 1},
+        {id: '39b7f597-dfd1-4dff-86f5-fe1b79cb70a0', status: 0},
         {id: '5eeba863-44be-43ff-8c47-7565a028f182', status: 0},
-        {id: 'a187fd3e-479a-4e85-a77f-5e4ab95477cf', status: 1},
+        {id: 'a187fd3e-479a-4e85-a77f-5e4ab95477cf', status: 0},
         {id: 'd270c7b4-6492-4953-b1bf-be817fe665b2', status: 0},
       ];
 
