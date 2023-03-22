@@ -51,9 +51,17 @@ type PrekeysResponse = {
   qualified_user_client_prekeys: QualifiedUserPreKeyBundleMap;
   failed_to_list?: QualifiedId[];
 };
-
 function isPrekeysResponse(object: any): object is PrekeysResponse {
   return object.qualified_user_client_prekeys && object.failed_to_list;
+}
+
+type UsersReponse = {
+  found?: User[];
+  failed?: QualifiedId[];
+  not_found?: QualifiedId[];
+};
+function isUsersResponse(object: any): object is UsersReponse {
+  return object.found || object.failed || object.not_found;
 }
 
 export class UserAPI {
@@ -519,15 +527,18 @@ export class UserAPI {
    */
   public async postListUsers(
     users: {qualified_ids: QualifiedId[]} | {qualified_handles: QualifiedHandle[]},
-  ): Promise<User[]> {
+  ): Promise<UsersReponse> {
     const config: AxiosRequestConfig = {
       data: users,
       method: 'post',
       url: UserAPI.URL.LIST_USERS,
     };
 
-    const response = await this.client.sendJSON<User[]>(config);
-    return response.data;
+    const {data: userData} = await this.client.sendJSON<User[] | UsersReponse>(config);
+    if (isUsersResponse(userData)) {
+      return userData;
+    }
+    return {found: userData};
   }
 
   /**
