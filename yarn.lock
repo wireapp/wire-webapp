@@ -5493,18 +5493,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"beautiful-react-hooks@npm:^3.12.2":
-  version: 3.12.2
-  resolution: "beautiful-react-hooks@npm:3.12.2"
+"beautiful-react-hooks@npm:^4.3.0":
+  version: 4.3.0
+  resolution: "beautiful-react-hooks@npm:4.3.0"
   dependencies:
     lodash.debounce: ^4.0.8
     lodash.throttle: ^4.1.1
   peerDependencies:
-    react: ">=16.0.0"
-    react-dom: ">=16.0.0"
+    react: 18.2.0
+    react-dom: 18.2.0
     react-router-dom: ">=5.0.0"
     rxjs: ">=7.0.0"
-  checksum: c473d401d0ab9401c4f5d4727e8fd2129519ab61faa64a6b74c589e54cd903c7c362b3ad339cb5db3960180aa6df58540099a557dde1d4cc3061193286bce832
+  checksum: 8c26fb0870a10338ef7a4a2923d3c8f8248542bb6026aacca6f75ba6ca21f0824b3c6c8c9184065f52db1c523e8bb6e85e6e2fc95a0db7a2840e0fdb75ec627b
   languageName: node
   linkType: hard
 
@@ -6331,10 +6331,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"countly-sdk-web@npm:22.6.5":
-  version: 22.6.5
-  resolution: "countly-sdk-web@npm:22.6.5"
-  checksum: 512e1338f2d10d28b4afc7418f8ca3bda42a038d2cc5da521d4026a618c7b3810dd58ad84e9606729efe3a713988ccaa35d768218d9c37fe60cfadea5d74b3bc
+"countly-sdk-web@npm:23.2.0":
+  version: 23.2.0
+  resolution: "countly-sdk-web@npm:23.2.0"
+  checksum: e70230b7a3fa202d0528b368335bfc7994f45027c88742ecab023ac0e0f6312116f849531fa6d010fda755aa02a55d8fdcc9e656e780a5fadcf773de8a2e97e8
   languageName: node
   linkType: hard
 
@@ -15966,7 +15966,17 @@ dexie@latest:
   languageName: node
   linkType: hard
 
-"typescript@npm:^4.9.4, typescript@npm:^4.9.5":
+"typescript@npm:5.0.2":
+  version: 5.0.2
+  resolution: "typescript@npm:5.0.2"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: bef1dcd166acfc6934b2ec4d72f93edb8961a5fab36b8dd2aaf6f4f4cd5c0210f2e0850aef4724f3b4913d5aef203a94a28ded731b370880c8bcff7e4ff91fc1
+  languageName: node
+  linkType: hard
+
+"typescript@npm:^4.9.4":
   version: 4.9.5
   resolution: "typescript@npm:4.9.5"
   bin:
@@ -15986,7 +15996,17 @@ dexie@latest:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@^4.9.4#~builtin<compat/typescript>, typescript@patch:typescript@^4.9.5#~builtin<compat/typescript>":
+"typescript@patch:typescript@5.0.2#~builtin<compat/typescript>":
+  version: 5.0.2
+  resolution: "typescript@patch:typescript@npm%3A5.0.2#~builtin<compat/typescript>::version=5.0.2&hash=a1c5e5"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: bdbf3d0aac0d6cf010fbe0536753dc19f278eb4aba88140dcd25487dfe1c56ca8b33abc0dcd42078790a939b08ebc4046f3e9bb961d77d3d2c3cfa9829da4d53
+  languageName: node
+  linkType: hard
+
+"typescript@patch:typescript@^4.9.4#~builtin<compat/typescript>":
   version: 4.9.5
   resolution: "typescript@patch:typescript@npm%3A4.9.5#~builtin<compat/typescript>::version=4.9.5&hash=a1c5e5"
   bin:
@@ -16782,12 +16802,12 @@ dexie@latest:
     archiver: ^5.3.1
     autoprefixer: ^10.4.13
     babel-loader: 9.1.2
-    beautiful-react-hooks: ^3.12.2
+    beautiful-react-hooks: ^4.3.0
     caniuse-lite: ^1.0.30001468
     classnames: 2.3.2
     copy-webpack-plugin: 11.0.0
     core-js: 3.25.5
-    countly-sdk-web: 22.6.5
+    countly-sdk-web: 23.2.0
     cross-env: 7.0.3
     cspell: 6.30.2
     css-loader: ^6.7.3
@@ -16884,7 +16904,7 @@ dexie@latest:
     ts-node: 10.9.1
     tsc-watch: 6.0.0
     tsyringe: 4.7.0
-    typescript: ^4.9.5
+    typescript: 5.0.2
     uint32: 0.2.1
     underscore: 1.13.6
     uuidjs: 4.2.13
