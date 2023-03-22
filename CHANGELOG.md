@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [40.0.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@39.3.4...@wireapp/core@40.0.0) (2023-03-22)
+
+### Features
+
+* allow partial user listing for federated backends ([#4994](https://github.com/wireapp/wire-web-packages/issues/4994)) ([51f2545](https://github.com/wireapp/wire-web-packages/commit/51f25456fb48e6a6a1e8837c1e40f0496540f03c))
+
+### BREAKING CHANGES
+
+* The return type of postListUser will now always wrap the result in a full UsersResponse
+
 ## [39.3.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@39.3.3...@wireapp/core@39.3.4) (2023-03-22)
 
 **Note:** Version bump only for package @wireapp/core
