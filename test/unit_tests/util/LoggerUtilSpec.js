@@ -18,36 +18,39 @@
  */
 
 import {enableLogging} from 'src/script/util/LoggerUtil';
+import {Config} from 'src/script/Config';
 
 describe('enableLogging', () => {
   beforeEach(() => window.localStorage.clear());
 
-  it('writes a specified logger namespace into the localStorage API', () => {
+  const config = Config.getConfig();
+
+  it('writes a specified logger namespace into the localStorage API', async () => {
     const namespace = '@wireapp';
 
-    enableLogging(false, `?enableLogging=${namespace}`);
+    await enableLogging(config, `?enableLogging=${namespace}`);
 
     expect(localStorage.getItem('debug')).toBe(namespace);
 
-    enableLogging(true, `?enableLogging=${namespace}`);
+    await enableLogging(config, `?enableLogging=${namespace}`);
 
     expect(localStorage.getItem('debug')).toBe(namespace);
   });
 
-  it('removes an old namespace from the localStorage when there is no new namespace', () => {
+  it('removes an old namespace from the localStorage when there is no new namespace', async () => {
     const namespace = '@wireapp';
     localStorage.setItem('debug', namespace);
 
-    enableLogging(false, '');
+    await enableLogging(config, '');
 
     expect(localStorage.getItem('debug')).toBe(null);
   });
 
-  it('enable the webapp logs if dev mode is enabled', () => {
+  it('enable the webapp logs if dev mode is enabled', async () => {
     const namespace = '@wireapp';
     localStorage.setItem('debug', namespace);
 
-    enableLogging(true, '');
+    await enableLogging({...config, FEATURE: {...config.FEATURE, ENABLE_DEBUG: true}}, '');
 
     expect(localStorage.getItem('debug')).toBe('*');
   });

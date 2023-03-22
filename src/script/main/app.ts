@@ -32,6 +32,7 @@ import {container} from 'tsyringe';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {initializeDataDog} from 'Util/DataDog';
 import {DebugUtil} from 'Util/DebugUtil';
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
@@ -377,6 +378,8 @@ export class App {
       });
 
       const selfUser = await this.initiateSelfUser();
+
+      await initializeDataDog(this.config, selfUser.domain);
 
       onProgress(5, t('initReceivedSelfUser', selfUser.name()));
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_SELF_USER);

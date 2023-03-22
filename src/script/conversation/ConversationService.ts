@@ -366,8 +366,8 @@ export class ConversationService {
 
     return this.storageService
       .save(StorageSchemata.OBJECT_STORE.CONVERSATIONS, conversation_et.id, conversationData)
-      .then(primary_key => {
-        this.logger.info(`State of conversation '${primary_key}' was stored`, conversationData);
+      .then(() => {
+        this.logger.info(`State of conversation '${conversation_et.id}' was stored`);
         return conversation_et;
       });
   }

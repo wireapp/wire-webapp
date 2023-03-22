@@ -125,8 +125,7 @@ export class UserRepository {
    * Listener for incoming user events.
    */
   private readonly onUserEvent = (eventJson: UserEvent | UserAvailabilityEvent, source: EventSource): void => {
-    const logObject = {eventJson: JSON.stringify(eventJson), eventObject: eventJson};
-    this.logger.info(`»» User Event: '${eventJson.type}' (Source: ${source})`, logObject);
+    this.logger.info(`User Event: '${eventJson.type}' (Source: ${source})`);
 
     switch (eventJson.type) {
       case USER_EVENT.DELETE:
@@ -278,13 +277,13 @@ export class UserRepository {
       };
     });
 
-    this.logger.info(`Found locally stored clients for '${userIds.length}' users`, recipients);
+    this.logger.log(`Found locally stored clients for '${userIds.length}' users`, recipients);
     const userEntities = await this.getUsersById(userIds);
     userEntities.forEach(userEntity => {
       const clientEntities = recipients[userEntity.id];
       const tooManyClients = clientEntities.length > 8;
       if (tooManyClients) {
-        this.logger.warn(`Found '${clientEntities.length}' clients for '${userEntity.name()}'`, clientEntities);
+        this.logger.warn(`Found '${clientEntities.length}' clients for '${userEntity.name()}'`);
       }
       userEntity.devices(clientEntities);
     });

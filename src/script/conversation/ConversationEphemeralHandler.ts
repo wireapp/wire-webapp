@@ -209,7 +209,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
     } else if (messageEntity.hasAssetImage()) {
       this._obfuscateImageMessage(messageEntity);
     } else {
-      this.logger.warn(`Ephemeral message of unsupported type: ${messageEntity.type}`, messageEntity);
+      this.logger.warn(`Ephemeral message of unsupported type: ${messageEntity.type}`);
     }
   }
 

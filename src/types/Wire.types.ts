@@ -83,6 +83,8 @@ export type WireEnvironmentVariables = {
   BRAND_NAME: string;
   CHROME_ORIGIN_TRIAL_TOKEN: string;
   COUNTLY_API_KEY: string;
+  DATADOG_APPLICATION_ID?: string;
+  DATADOG_CLIENT_TOKEN?: string;
   ENABLE_DEV_BACKEND_API: boolean;
   ENVIRONMENT: string;
   FEATURE: FeatureVariables;
