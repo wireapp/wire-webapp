@@ -263,7 +263,7 @@
   "clientManager.headline": "Remove a device",
   "clientManager.logout": "Cancel process",
   "clientManager.subhead": "Remove one of your other devices to start using {brandName} on this one.",
-  "clientManager.oauth": "You are adding a new device. Only 7 devices can be active. Remove one of your devices to start using Wire on this one ({device}).",
+  "clientManager.oauth": "You are adding a new device. Only 7 devices can be active. Remove one of your devices to start using Wire on this one.",
   "collectionSectionAudio": "Audio",
   "collectionSectionFiles": "Files",
   "collectionSectionImages": "Images",
