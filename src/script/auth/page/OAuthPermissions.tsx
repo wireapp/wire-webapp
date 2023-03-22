@@ -39,6 +39,7 @@ import {
   COLOR_V2,
 } from '@wireapp/react-ui-kit';
 
+// import {Icon} from 'Components/Icon';
 import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
 import {AssetRepository} from 'src/script/assets/AssetRepository';
 import {KEY} from 'Util/KeyboardUtil';
@@ -158,11 +159,11 @@ const OAuthPermissionsComponent = ({
         >
           {_(oauthStrings.logout)}
         </Link>
-        {oAuthApp && (
-          <Text style={{marginBottom: '24px'}} center>
-            {_(oauthStrings.subhead, {app: oAuthApp.application_name})}
-          </Text>
-        )}
+
+        <Text style={{marginBottom: '24px'}} center>
+          {_(oauthStrings.subhead, {app: oAuthApp?.application_name})}
+        </Text>
+
         {oauthParams.scope.length > 1 && (
           <Box
             style={{
