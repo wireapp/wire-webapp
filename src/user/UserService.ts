@@ -21,8 +21,6 @@ import {QualifiedId, User} from '@wireapp/api-client/lib/user/';
 
 import {APIClient} from '@wireapp/api-client';
 
-import {isQualifiedIdArray} from '../util/TypePredicateUtil';
-
 export class UserService {
   private readonly apiClient: APIClient;
 
@@ -34,12 +32,10 @@ export class UserService {
     return this.apiClient.api.user.getUser(userId as QualifiedId);
   }
 
-  public async getUsers(userIds: string[] | QualifiedId[]): Promise<User[]> {
+  public async getUsers(userIds: QualifiedId[]) {
     if (!userIds.length) {
       return [];
     }
-    return isQualifiedIdArray(userIds)
-      ? this.apiClient.api.user.postListUsers({qualified_ids: userIds})
-      : this.apiClient.api.user.getUsers({ids: userIds});
+    return this.apiClient.api.user.postListUsers({qualified_ids: userIds});
   }
 }

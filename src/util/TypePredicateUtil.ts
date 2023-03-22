@@ -31,7 +31,7 @@ export function isStringArray(obj: any): obj is string[] {
   return Array.isArray(obj) && (obj.length === 0 || typeof obj[0] === 'string');
 }
 
-export function isQualifiedId(obj: any): obj is QualifiedId {
+function isQualifiedId(obj: any): obj is QualifiedId {
   return typeof obj === 'object' && typeof obj['domain'] === 'string';
 }
 
