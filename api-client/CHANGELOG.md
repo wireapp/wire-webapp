@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [24.0.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@23.3.1...@wireapp/api-client@24.0.0) (2023-03-22)
+
+### Features
+
+* allow partial user listing for federated backends ([#4994](https://github.com/wireapp/wire-web-packages/issues/4994)) ([51f2545](https://github.com/wireapp/wire-web-packages/commit/51f25456fb48e6a6a1e8837c1e40f0496540f03c))
+
+### BREAKING CHANGES
+
+* The return type of postListUser will now always wrap the result in a full UsersResponse
+
 ## [23.3.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@23.3.0...@wireapp/api-client@23.3.1) (2023-03-22)
 
 ### Bug Fixes
