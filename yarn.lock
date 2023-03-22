@@ -6279,10 +6279,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"countly-sdk-web@npm:22.6.5":
-  version: 22.6.5
-  resolution: "countly-sdk-web@npm:22.6.5"
-  checksum: 512e1338f2d10d28b4afc7418f8ca3bda42a038d2cc5da521d4026a618c7b3810dd58ad84e9606729efe3a713988ccaa35d768218d9c37fe60cfadea5d74b3bc
+"countly-sdk-web@npm:23.2.0":
+  version: 23.2.0
+  resolution: "countly-sdk-web@npm:23.2.0"
+  checksum: e70230b7a3fa202d0528b368335bfc7994f45027c88742ecab023ac0e0f6312116f849531fa6d010fda755aa02a55d8fdcc9e656e780a5fadcf773de8a2e97e8
   languageName: node
   linkType: hard
 
@@ -16733,7 +16733,7 @@ dexie@latest:
     classnames: 2.3.2
     copy-webpack-plugin: 11.0.0
     core-js: 3.25.5
-    countly-sdk-web: 22.6.5
+    countly-sdk-web: 23.2.0
     cross-env: 7.0.3
     cspell: 6.30.2
     css-loader: ^6.7.3
