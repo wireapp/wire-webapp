@@ -23,7 +23,7 @@ import {createRandomUuid} from 'Util/util';
 
 import {ServiceList} from './ServiceList';
 
-import {ServiceEntity} from '../integration/ServiceEntity';
+import {ServiceEntity} from '../../integration/ServiceEntity';
 
 jest.mock('Components/utils/InViewport', () => ({
   InViewport: ({onVisible, children}: {onVisible: () => void; children: any}) => {

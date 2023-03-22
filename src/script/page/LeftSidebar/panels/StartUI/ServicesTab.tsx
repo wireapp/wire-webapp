@@ -22,7 +22,7 @@ import React, {useState} from 'react';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {Icon} from 'Components/Icon';
-import {ServiceList} from 'Components/ServiceList';
+import {ServiceList} from 'Components/ServiceList/ServiceList';
 import {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {t} from 'Util/LocalizerUtil';

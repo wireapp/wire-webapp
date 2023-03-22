@@ -23,9 +23,9 @@ import cx from 'classnames';
 
 import {ParticipantItem} from 'Components/list/ParticipantItem';
 import {KEY} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
 
-import type {ServiceEntity} from '../integration/ServiceEntity';
-import {t} from '../util/LocalizerUtil';
+import type {ServiceEntity} from '../../integration/ServiceEntity';
 
 export interface ServiceListProps {
   services: ServiceEntity[];
@@ -42,7 +42,7 @@ export enum MODE {
   DEFAULT = 'ServiceList.MODE.DEFAULT',
 }
 
-const ServiceList: React.FC<ServiceListProps> = ({
+export const ServiceList: React.FC<ServiceListProps> = ({
   arrow,
   click,
   isSearching = false,
@@ -86,5 +86,3 @@ const ServiceList: React.FC<ServiceListProps> = ({
     </Fragment>
   );
 };
-
-export {ServiceList};
