@@ -18,35 +18,38 @@
  */
 
 import {Icon} from 'Components/Icon';
+import {Participant} from 'src/script/calling/Participant';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {ParticipantMicOnIcon} from '../ParticipantMicOnIcon';
 
 interface CallParticipantStatusIconsProps {
-  sharesScreen: boolean;
-  sharesCamera: boolean;
-  isMuted: boolean;
-  isActivelySpeaking: boolean;
+  callParticipant: Participant;
 }
 
-export const CallParticipantStatusIcons = ({
-  sharesScreen,
-  sharesCamera,
-  isMuted,
-  isActivelySpeaking,
-}: CallParticipantStatusIconsProps) => (
-  <>
-    {sharesScreen && <Icon.Screenshare className="screenshare-icon" data-uie-name="status-screenshare" />}
+export const CallParticipantStatusIcons = ({callParticipant}: CallParticipantStatusIconsProps) => {
+  const {sharesCamera, sharesScreen, isActivelySpeaking, isMuted} = useKoSubscribableChildren(callParticipant, [
+    'sharesCamera',
+    'sharesScreen',
+    'isActivelySpeaking',
+    'isMuted',
+  ]);
 
-    {sharesCamera && <Icon.Camera className="camera-icon" data-uie-name="status-video" />}
+  return (
+    <>
+      {sharesScreen && <Icon.Screenshare className="screenshare-icon" data-uie-name="status-screenshare" />}
 
-    {isMuted ? (
-      <Icon.MicOff className="mic-off-icon" data-uie-name="status-audio-off" style={{height: 12, width: 12}} />
-    ) : (
-      <ParticipantMicOnIcon
-        className="participant-mic-on-icon"
-        isActive={isActivelySpeaking}
-        data-uie-name={isActivelySpeaking ? 'status-active-speaking' : 'status-audio-on'}
-      />
-    )}
-  </>
-);
+      {sharesCamera && <Icon.Camera className="camera-icon" data-uie-name="status-video" />}
+
+      {isMuted ? (
+        <Icon.MicOff className="mic-off-icon" data-uie-name="status-audio-off" style={{height: 12, width: 12}} />
+      ) : (
+        <ParticipantMicOnIcon
+          className="participant-mic-on-icon"
+          isActive={isActivelySpeaking}
+          data-uie-name={isActivelySpeaking ? 'status-active-speaking' : 'status-audio-on'}
+        />
+      )}
+    </>
+  );
+};

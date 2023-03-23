@@ -61,13 +61,6 @@ export const CallParticipantsListItem = ({
     name: userName,
   } = useKoSubscribableChildren(user, ['isDirectGuest', 'is_verified', 'availability', 'name']);
 
-  const {sharesCamera, sharesScreen, isActivelySpeaking, isMuted} = useKoSubscribableChildren(callParticipant, [
-    'sharesCamera',
-    'sharesScreen',
-    'isActivelySpeaking',
-    'isMuted',
-  ]);
-
   const handleContextKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     handleKeyDown(event, () => {
       const newEvent = setContextMenuPosition(event);
@@ -135,12 +128,7 @@ export const CallParticipantsListItem = ({
           }}
         />
 
-        <CallParticipantStatusIcons
-          sharesScreen={sharesScreen}
-          sharesCamera={sharesCamera}
-          isMuted={isMuted}
-          isActivelySpeaking={isActivelySpeaking}
-        />
+        <CallParticipantStatusIcons callParticipant={callParticipant} />
       </div>
     </div>
   );
