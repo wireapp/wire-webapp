@@ -53,15 +53,12 @@ interface UserBadgesProps {
   config: {[key in BadgeKey]?: boolean};
 }
 
-export const UserBadges = ({config}: UserBadgesProps) => {
-  return (
-    <>
-      {Object.entries(config)
-        .filter(([_badge, shouldShow]) => shouldShow)
-        .map(([badge]) => {
-          return <React.Fragment key={badge}>{badgeToComponentMap[badge as BadgeKey]()}</React.Fragment>;
-        })}
-      ;
-    </>
-  );
-};
+export const UserBadges = ({config}: UserBadgesProps) => (
+  <>
+    {Object.entries(config)
+      .filter(([_badge, shouldShow]) => shouldShow)
+      .map(([badge]) => (
+        <React.Fragment key={badge}>{badgeToComponentMap[badge as BadgeKey]()}</React.Fragment>
+      ))}
+  </>
+);
