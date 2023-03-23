@@ -65,19 +65,29 @@ export const CallParticipantsListItem = ({
     'isMuted',
   ]);
 
-  const isSelf = participant.isMe;
-  const isFederated = participant.isFederated;
-  const selfString = `(${capitalizeFirstChar(t('conversationYouNominative'))})`;
-
-  const handleContextKeyDown = (event: React.KeyboardEvent) => {
+  const handleContextKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if ([KEY.SPACE, KEY.ENTER].includes(event.key)) {
       const newEvent = setContextMenuPosition(event);
       onContextMenu(newEvent as unknown as React.MouseEvent<HTMLDivElement>);
     }
   };
 
-  const RenderParticipant = () => {
-    return (
+  const isSelf = participant.isMe;
+  const isFederated = participant.isFederated;
+  const selfString = `(${capitalizeFirstChar(t('conversationYouNominative'))})`;
+
+  return (
+    <div
+      tabIndex={TabIndex.FOCUSABLE}
+      role="button"
+      onContextMenu={onContextMenu}
+      onClick={onContextMenu}
+      onKeyDown={handleContextKeyDown}
+      data-uie-name="item-user"
+      data-uie-value={participantName}
+      aria-label={t('accessibility.openConversation', participantName)}
+      className="participant-item-wrapper no-interaction no-underline"
+    >
       <div className="participant-item">
         <div className="participant-item__image">
           <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={participant} aria-hidden="true" />
@@ -167,22 +177,6 @@ export const CallParticipantsListItem = ({
           </>
         }
       </div>
-    );
-  };
-
-  return (
-    <div
-      tabIndex={TabIndex.FOCUSABLE}
-      role="button"
-      onContextMenu={onContextMenu}
-      onClick={onContextMenu}
-      onKeyDown={handleContextKeyDown}
-      data-uie-name="item-user"
-      data-uie-value={participantName}
-      aria-label={t('accessibility.openConversation', participantName)}
-      className="participant-item-wrapper no-interaction no-underline"
-    >
-      <RenderParticipant />
     </div>
   );
 };
