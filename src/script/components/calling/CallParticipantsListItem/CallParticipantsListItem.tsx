@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useState} from 'react';
+import React from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
@@ -25,7 +25,6 @@ import {AvailabilityState} from 'Components/AvailabilityState';
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {ParticipantMicOnIcon} from 'Components/calling/ParticipantMicOnIcon';
 import {Icon} from 'Components/Icon';
-import {InViewport} from 'Components/utils/InViewport';
 import {Participant} from 'src/script/calling/Participant';
 import {User} from 'src/script/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -43,7 +42,7 @@ export interface ParticipantItemProps extends Omit<React.HTMLProps<HTMLDivElemen
   showDropdown?: boolean;
 }
 
-const CallParticipantsListItem = ({
+export const CallParticipantsListItem = ({
   callParticipant,
   external,
   isSelfVerified = false,
@@ -52,8 +51,6 @@ const CallParticipantsListItem = ({
   showDropdown = false,
   onContextMenu = noop,
 }: React.PropsWithChildren<ParticipantItemProps>): React.ReactElement | null => {
-  const [isInViewport, setIsInViewport] = useState(false);
-
   const {
     isDirectGuest,
     is_verified: isVerified,
@@ -81,103 +78,95 @@ const CallParticipantsListItem = ({
 
   const RenderParticipant = () => {
     return (
-      <InViewport className="participant-item" onVisible={() => setIsInViewport(true)}>
-        {isInViewport && (
-          <>
-            <div className="participant-item__image">
-              <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={participant} aria-hidden="true" />
-            </div>
+      <div className="participant-item">
+        <div className="participant-item__image">
+          <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={participant} aria-hidden="true" />
+        </div>
 
-            <div className="participant-item__content">
-              <div className="participant-item__content__text">
-                <div className="participant-item__content__name-wrapper">
-                  {selfInTeam && (
-                    <AvailabilityState
-                      availability={availability}
-                      className="participant-item__content__availability participant-item__content__name"
-                      dataUieName="status-name"
-                      label={participantName}
-                    />
-                  )}
-
-                  {!selfInTeam && (
-                    <div className="participant-item__content__name" data-uie-name="status-name">
-                      {participantName}
-                    </div>
-                  )}
-                  {isSelf && <div className="participant-item__content__self-indicator">{selfString}</div>}
-                </div>
-              </div>
-
-              {showDropdown && (
-                <button
-                  tabIndex={TabIndex.UNFOCUSABLE}
-                  className="participant-item__content__chevron"
-                  onClick={event => onContextMenu(event as unknown as React.MouseEvent<HTMLDivElement>)}
-                  type="button"
-                  data-uie-name="participant-menu-icon"
-                >
-                  <Icon.Chevron />
-                </button>
+        <div className="participant-item__content">
+          <div className="participant-item__content__text">
+            <div className="participant-item__content__name-wrapper">
+              {selfInTeam && (
+                <AvailabilityState
+                  availability={availability}
+                  className="participant-item__content__availability participant-item__content__name"
+                  dataUieName="status-name"
+                  label={participantName}
+                />
               )}
+
+              {!selfInTeam && (
+                <div className="participant-item__content__name" data-uie-name="status-name">
+                  {participantName}
+                </div>
+              )}
+              {isSelf && <div className="participant-item__content__self-indicator">{selfString}</div>}
             </div>
+          </div>
 
-            {isDirectGuest && (
-              <span
-                className="guest-icon with-tooltip with-tooltip--external"
-                data-tooltip={t('conversationGuestIndicator')}
-              >
-                <Icon.Guest data-uie-name="status-guest" />
-              </span>
-            )}
+          {showDropdown && (
+            <button
+              tabIndex={TabIndex.UNFOCUSABLE}
+              className="participant-item__content__chevron"
+              onClick={event => onContextMenu(event as unknown as React.MouseEvent<HTMLDivElement>)}
+              type="button"
+              data-uie-name="participant-menu-icon"
+            >
+              <Icon.Chevron />
+            </button>
+          )}
+        </div>
 
-            {isFederated && (
-              <span
-                className="federation-icon with-tooltip with-tooltip--external"
-                data-tooltip={t('conversationFederationIndicator')}
-              >
-                <Icon.Federation data-uie-name="status-federated-user" />
-              </span>
-            )}
-
-            {external && (
-              <span className="partner-icon with-tooltip with-tooltip--external" data-tooltip={t('rolePartner')}>
-                <Icon.External data-uie-name="status-external" />
-              </span>
-            )}
-
-            {isSelfVerified && isVerified && (
-              <span className="verified-icon">
-                <Icon.Verified data-uie-name="status-verified" />
-              </span>
-            )}
-
-            {
-              <>
-                {sharesScreen && <Icon.Screenshare className="screenshare-icon" data-uie-name="status-screenshare" />}
-
-                {sharesCamera && <Icon.Camera className="camera-icon" data-uie-name="status-video" />}
-
-                {!isMuted && (
-                  <ParticipantMicOnIcon
-                    className="participant-mic-on-icon"
-                    isActive={isActivelySpeaking}
-                    data-uie-name={isActivelySpeaking ? 'status-active-speaking' : 'status-audio-on'}
-                  />
-                )}
-
-                {isMuted && (
-                  <Icon.MicOff
-                    className="mic-off-icon"
-                    data-uie-name="status-audio-off"
-                    style={{height: 12, width: 12}}
-                  />
-                )}
-              </>
-            }
-          </>
+        {isDirectGuest && (
+          <span
+            className="guest-icon with-tooltip with-tooltip--external"
+            data-tooltip={t('conversationGuestIndicator')}
+          >
+            <Icon.Guest data-uie-name="status-guest" />
+          </span>
         )}
-      </InViewport>
+
+        {isFederated && (
+          <span
+            className="federation-icon with-tooltip with-tooltip--external"
+            data-tooltip={t('conversationFederationIndicator')}
+          >
+            <Icon.Federation data-uie-name="status-federated-user" />
+          </span>
+        )}
+
+        {external && (
+          <span className="partner-icon with-tooltip with-tooltip--external" data-tooltip={t('rolePartner')}>
+            <Icon.External data-uie-name="status-external" />
+          </span>
+        )}
+
+        {isSelfVerified && isVerified && (
+          <span className="verified-icon">
+            <Icon.Verified data-uie-name="status-verified" />
+          </span>
+        )}
+
+        {
+          <>
+            {sharesScreen && <Icon.Screenshare className="screenshare-icon" data-uie-name="status-screenshare" />}
+
+            {sharesCamera && <Icon.Camera className="camera-icon" data-uie-name="status-video" />}
+
+            {!isMuted && (
+              <ParticipantMicOnIcon
+                className="participant-mic-on-icon"
+                isActive={isActivelySpeaking}
+                data-uie-name={isActivelySpeaking ? 'status-active-speaking' : 'status-audio-on'}
+              />
+            )}
+
+            {isMuted && (
+              <Icon.MicOff className="mic-off-icon" data-uie-name="status-audio-off" style={{height: 12, width: 12}} />
+            )}
+          </>
+        }
+      </div>
     );
   };
 
@@ -197,5 +186,3 @@ const CallParticipantsListItem = ({
     </div>
   );
 };
-
-export {CallParticipantsListItem};
