@@ -925,9 +925,13 @@ export const oauthStrings = defineMessages({
     defaultMessage: '{app} requires your permission to:',
     id: 'oauth.subhead',
   },
+  learnMore: {
+    defaultMessage: '<learnMore>Learn more</learnMore> about these permissions in the settings.',
+    id: 'oauth.learnMore',
+  },
   details: {
     defaultMessage:
-      'If you allow the permissions listed, Wire™ will be able to connect to your calendar. It won’t see the content of your calendar, just the ones happening with Wire. If you don’t grant the permissions, you can’t use this add-in. <learnMore>Learn more</learnMore> about these permissions in the settings.',
+      'If you allow the permissions listed, Wire™ will be able to connect to your calendar. It won’t see the content of your calendar, just the ones happening with Wire. If you don’t grant the permissions, you can’t use this add-in.',
     id: 'oauth.details',
   },
   privacyPolicy: {

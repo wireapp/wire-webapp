@@ -129,12 +129,10 @@ describe('AuthAction', () => {
     backendError.code = HTTP_STATUS.FORBIDDEN;
     backendError.label = 'invalid-credentials';
     backendError.message = 'Authentication failed.';
-    const spies = {
-      generateClientPayload: jasmine.createSpy().and.returnValue({}),
-    };
+
     const mockedActions = {
       clientAction: {
-        generateClientPayload: spies.generateClientPayload,
+        generateClientPayload: jasmine.createSpy().and.returnValue({}),
       },
     };
     const mockedCore = {

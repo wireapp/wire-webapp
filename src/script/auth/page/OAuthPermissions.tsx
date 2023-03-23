@@ -139,7 +139,7 @@ const OAuthPermissionsComponent = ({
         style={{width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center'}}
       >
         {!oAuthApp ? (
-          <Icon.Loading width="48" height="48" css={{path: {fill: 'var(--modal-bg)'}}} />
+          <Icon.Loading width="36" height="36" css={{path: {fill: COLOR_V2.BLUE_DARK_500}}} />
         ) : (
           <>
             <H2 center>{_(oauthStrings.headline)}</H2>
@@ -164,7 +164,7 @@ const OAuthPermissionsComponent = ({
               data-uie-name="go-logout"
               variant={LinkVariant.PRIMARY}
               center
-              // color={COLOR_V2.SECONDARY}
+              color={COLOR_V2.BLUE}
             >
               {_(oauthStrings.logout)}
             </Link>
@@ -179,39 +179,55 @@ const OAuthPermissionsComponent = ({
                   marginBottom: '24px',
                   background: COLOR_V2.GRAY_20,
                   borderColor: COLOR_V2.GRAY_20,
+                  padding: '8px',
                 }}
               >
-                <ul>
+                <ul
+                  style={{
+                    paddingInlineStart: '20px',
+                    fontSize: '12px',
+                  }}
+                >
                   {oAuthScope.map((scope, index) => (
                     <li key={index}>
                       <Text>{_(oauthStrings[scope])}</Text>
                     </li>
                   ))}
                 </ul>
+                <Text
+                  data-uie-name="oauth-learn-more"
+                  style={{
+                    fontSize: '12px',
+                    lineHeight: '16px',
+                    display: 'block',
+                  }}
+                >
+                  <FormattedMessage
+                    {...oauthStrings.learnMore}
+                    values={{
+                      // eslint-disable-next-line react/display-name
+                      learnMore: ((...chunks: string[] | React.ReactNode[]) => (
+                        <a
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          data-uie-name="go-learn-more"
+                          href="https://support.wire.com/hc/en-us/articles/9628065287965-Calendar-integration"
+                        >
+                          {chunks}
+                        </a>
+                      )) as any,
+                    }}
+                  />
+                </Text>
               </Box>
             )}
             <Text
               muted
               center
               style={{fontSize: '12px', lineHeight: '16px', display: 'block'}}
-              data-uie-name="oauth-detail-learn-more"
+              data-uie-name="oauth-details"
             >
-              <FormattedMessage
-                {...oauthStrings.details}
-                values={{
-                  // eslint-disable-next-line react/display-name
-                  learnMore: ((...chunks: string[] | React.ReactNode[]) => (
-                    <a
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      data-uie-name="go-learn-more"
-                      href={Config.getConfig().URL.PRIVACY_POLICY} //update to correct learn more link
-                    >
-                      {chunks}
-                    </a>
-                  )) as any,
-                }}
-              />
+              {_(oauthStrings.details)}
             </Text>
             <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: '16px', gap: '16px'}}>
               <Button
