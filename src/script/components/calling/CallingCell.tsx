@@ -40,7 +40,7 @@ import {isEnterKey, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
-import {CallParticipantsListItem} from './CallParticipantsListItem/CallParticipantsListItem';
+import {CallParticipantsListItem} from './CallParticipantsListItem';
 
 import type {Call} from '../../calling/Call';
 import type {CallingRepository} from '../../calling/CallingRepository';
