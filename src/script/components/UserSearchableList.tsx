@@ -19,12 +19,14 @@
 
 import React, {useCallback, useEffect, useState} from 'react';
 
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 import {debounce} from 'underscore';
 
 import {partition} from 'Util/ArrayUtil';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 import {sortByPriority} from 'Util/StringUtil';
 
 import {UserList} from './UserList';
@@ -51,6 +53,8 @@ export type UserListProps = React.ComponentProps<typeof UserList> & {
   truncate?: boolean;
   userState?: UserState;
   dataUieName?: string;
+  /* will prevent showing those users in the list */
+  excludeUsers?: QualifiedId[];
 };
 
 const UserSearchableList: React.FC<UserListProps> = ({
@@ -150,11 +154,13 @@ const UserSearchableList: React.FC<UserListProps> = ({
       }
     : undefined;
 
-  const userList = foundUserEntities();
+  const userList = foundUserEntities().filter(
+    user => !props.excludeUsers?.some(excludeId => matchQualifiedIds(user.qualifiedId, excludeId)),
+  );
   const isEmptyUserList = userList.length === 0;
-  const hasUsers = users.length === 0;
-  const noResultsDataUieName = hasUsers ? 'status-all-added' : 'status-no-matches';
-  const noResultsTranslationText = hasUsers ? 'searchListEveryoneParticipates' : 'searchListNoMatches';
+  const isSearching = filter.length > 0;
+  const noResultsDataUieName = !isSearching ? 'status-all-added' : 'status-no-matches';
+  const noResultsTranslationText = !isSearching ? 'searchListEveryoneParticipates' : 'searchListNoMatches';
 
   return (
     <div className="user-list-wrapper" data-uie-name={dataUieName} role="list">

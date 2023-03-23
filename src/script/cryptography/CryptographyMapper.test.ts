@@ -18,7 +18,7 @@
  */
 
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
-import {GenericMessageType, ReactionType} from '@wireapp/core/lib/conversation';
+import {GenericMessageType} from '@wireapp/core/lib/conversation';
 import {isObject} from 'underscore';
 
 import {
@@ -45,6 +45,8 @@ import {ClientEvent} from 'src/script/event/Client';
 import {arrayToBase64, createRandomUuid} from 'Util/util';
 
 import {CryptographyMapper} from './CryptographyMapper';
+
+import {ReactionType} from '../entity/message/ContentMessage';
 
 describe('CryptographyMapper', () => {
   const mapper = new CryptographyMapper();

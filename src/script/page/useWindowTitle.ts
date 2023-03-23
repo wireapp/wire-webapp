@@ -83,7 +83,6 @@ export const useWindowTitle = () => {
   );
 
   const initiateTitleUpdates = useCallback(() => {
-    windowTitleLogger.info('Starting to update window title');
     setUpdateWindowTitle(true);
 
     if (updateWindowTitle) {

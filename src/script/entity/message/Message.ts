@@ -104,17 +104,18 @@ export class Message {
     this.ephemeral_expires = ko.observable(false);
     this.ephemeral_started = ko.observable(0);
     this.ephemeral_status = ko.computed(() => {
-      const isExpired = this.ephemeral_expires() === true;
+      const expires = this.ephemeral_expires();
+      const isExpired = expires === true;
       if (isExpired) {
         return EphemeralStatusType.TIMED_OUT;
       }
 
-      if (typeof this.ephemeral_expires() === 'number') {
+      if (typeof expires === 'number') {
         return EphemeralStatusType.INACTIVE;
       }
 
-      if (typeof this.ephemeral_expires() === 'string') {
-        const isExpiring = Date.now() >= this.ephemeral_expires();
+      if (typeof expires === 'string') {
+        const isExpiring = Date.now() >= parseInt(expires, 10);
         return isExpiring ? EphemeralStatusType.TIMED_OUT : EphemeralStatusType.ACTIVE;
       }
 

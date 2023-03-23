@@ -32,6 +32,7 @@ import {container} from 'tsyringe';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {initializeDataDog} from 'Util/DataDog';
 import {DebugUtil} from 'Util/DebugUtil';
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
@@ -378,6 +379,8 @@ export class App {
 
       const selfUser = await this.initiateSelfUser();
 
+      await initializeDataDog(this.config, selfUser.domain);
+
       onProgress(5, t('initReceivedSelfUser', selfUser.name()));
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_SELF_USER);
       const clientEntity = await this._initiateSelfUserClients();
@@ -389,7 +392,7 @@ export class App {
       onProgress(10);
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
-      await teamRepository.initTeam();
+      const team = await teamRepository.initTeam(selfUser.teamId);
 
       const conversationEntities = await conversationRepository.loadConversations();
 
@@ -409,7 +412,9 @@ export class App {
 
       await conversationRepository.conversationRoleRepository.loadTeamRoles();
 
-      await userRepository.loadTeamUserAvailabilities();
+      if (team) {
+        await userRepository.loadTeamUserAvailabilities([...team.members(), selfUser]);
+      }
 
       await eventRepository.connectWebSocket(this.core, ({done, total}) => {
         const baseMessage = t('initDecryption');
@@ -553,7 +558,7 @@ export class App {
       }
     }
 
-    await container.resolve(StorageService).init(this.core.storage);
+    container.resolve(StorageService).init(this.core.storage);
     this.repository.client.init(userEntity);
     await this.repository.properties.init(userEntity);
 

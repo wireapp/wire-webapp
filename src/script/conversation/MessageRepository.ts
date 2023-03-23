@@ -19,13 +19,7 @@
 
 import {ConversationProtocol, MessageSendingStatus, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId, RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/lib/user';
-import {
-  MessageSendingState,
-  MessageTargetMode,
-  ReactionType,
-  GenericMessageType,
-  SendResult,
-} from '@wireapp/core/lib/conversation';
+import {MessageSendingState, MessageTargetMode, GenericMessageType, SendResult} from '@wireapp/core/lib/conversation';
 import {
   AudioMetaData,
   EditedTextContent,
@@ -75,7 +69,7 @@ import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {Conversation} from '../entity/Conversation';
 import {CompositeMessage} from '../entity/message/CompositeMessage';
-import {ContentMessage} from '../entity/message/ContentMessage';
+import {ContentMessage, ReactionType} from '../entity/message/ContentMessage';
 import {FileAsset} from '../entity/message/FileAsset';
 import {Message} from '../entity/message/Message';
 import {User} from '../entity/User';
@@ -934,7 +928,7 @@ export class MessageRepository {
       if (!message.user().isMe && !message.ephemeral_expires()) {
         throw new ConversationError(ConversationError.TYPE.WRONG_USER, ConversationError.MESSAGE.WRONG_USER);
       }
-      const userIds = options.targetedUsers || conversation.allUserEntities.map(user => user!.qualifiedId);
+      const userIds = options.targetedUsers || conversation.allUserEntities().map(user => user!.qualifiedId);
       const payload = MessageBuilder.buildDeleteMessage({
         messageId: message.id,
       });
@@ -956,7 +950,7 @@ export class MessageRepository {
         return;
       }
       const logMessage = `Failed to delete message '${messageId}' in conversation '${conversationId}' for everyone`;
-      this.logger.info(logMessage, error);
+      this.logger.warn(logMessage, error);
       throw error;
     }
   }
@@ -979,7 +973,7 @@ export class MessageRepository {
       await this.sendToSelfConversations(payload);
       await this.deleteMessageById(conversation, message.id);
     } catch (error) {
-      this.logger.info(
+      this.logger.warn(
         `Failed to send delete message with id '${message.id}' for conversation '${conversation.id}'`,
         error,
       );
@@ -1053,11 +1047,12 @@ export class MessageRepository {
       conversationEntity.isShowingLastReceivedMessage() && conversationEntity.getNewestMessage()?.id === messageId;
 
     const deleteCount = await this.eventService.deleteEvent(conversationEntity.id, messageId);
+    const previousMessage = conversationEntity.getNewestMessage();
 
     amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, messageId, conversationEntity.id);
 
-    if (isLastDeleted && conversationEntity.getNewestMessage()?.timestamp()) {
-      conversationEntity.updateTimestamps(conversationEntity.getNewestMessage(), true);
+    if (isLastDeleted && previousMessage?.timestamp()) {
+      conversationEntity.updateTimestamps(previousMessage, true);
     }
 
     return deleteCount;
@@ -1170,7 +1165,8 @@ export class MessageRepository {
       // If we get a userId>client pairs, we just return those, no need to create recipients
       return recipients;
     }
-    const filteredUsers = conversation.allUserEntities
+    const filteredUsers = conversation
+      .allUserEntities()
       // filter possible undefined values
       .flatMap(user => (user ? [user] : []))
       // if users are given by the caller, we filter to only keep those users

@@ -189,11 +189,7 @@ export class PropertiesRepository {
       })
       .catch(() => {
         this.logger.warn(
-          `Property "${
-            PropertiesRepository.CONFIG.WEBAPP_ACCOUNT_SETTINGS
-          }" doesn't exist for this account. Continuing with default values: ${JSON.stringify(
-            this.properties.settings,
-          )}`,
+          `Property "${PropertiesRepository.CONFIG.WEBAPP_ACCOUNT_SETTINGS}" doesn't exist for this account. Continuing with default values.`,
         );
       });
   }
@@ -214,7 +210,6 @@ export class PropertiesRepository {
       this.fetchPropertySetting(PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE),
       this.fetchPropertySetting(PropertiesRepository.CONFIG.WIRE_TYPING_INDICATOR_MODE),
     ]).then(() => {
-      this.logger.info('Loaded user properties', this.properties);
       this.publishProperties();
     });
   }
@@ -257,7 +252,7 @@ export class PropertiesRepository {
   }
 
   setProperty(key: string, value: any): void {
-    this.logger.info(`Setting key "${key}"...`, value);
+    this.logger.log(`Setting key "${key}"...`, value);
 
     switch (key) {
       case PropertiesRepository.CONFIG.WEBAPP_ACCOUNT_SETTINGS:

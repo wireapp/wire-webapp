@@ -125,7 +125,7 @@ import * as LegalHoldEvaluator from '../legal-hold/LegalHoldEvaluator';
 import {MessageCategory} from '../message/MessageCategory';
 import {SuperType} from '../message/SuperType';
 import {SystemMessageType} from '../message/SystemMessageType';
-import {useMLSConversationState} from '../mls';
+import {addOtherSelfClientsToMLSConversation, useMLSConversationState} from '../mls';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {Core} from '../service/CoreSingleton';
 import type {EventRecord} from '../storage';
@@ -196,7 +196,7 @@ export class ConversationRepository {
 
       const {missingClients, deletedClients, emptyUsers, missingUserIds} = extractClientDiff(
         filteredMismatch,
-        conversation?.allUserEntities,
+        conversation?.allUserEntities(),
         domain,
       );
 
@@ -1221,7 +1221,7 @@ export class ConversationRepository {
    * @param connectionEntities Connections entities
    */
   mapConnections(connectionEntities: ConnectionEntity[]): Promise<Conversation>[] {
-    this.logger.info(`Mapping '${connectionEntities.length}' user connection(s) to conversations`, connectionEntities);
+    this.logger.log(`Mapping '${connectionEntities.length}' user connection(s) to conversations`, connectionEntities);
 
     return connectionEntities.map(connectionEntity => this.mapConnection(connectionEntity));
   }
@@ -2097,7 +2097,7 @@ export class ConversationRepository {
         }
 
         const message = `Received '${type}' event from user '${senderId}' unknown in '${conversationEntity.id}'`;
-        this.logger.warn(message, eventJson);
+        this.logger.warn(message);
 
         const qualifiedSender: QualifiedId = {domain: '', id: senderId};
 
@@ -2460,28 +2460,32 @@ export class ConversationRepository {
       });
     }
 
-    // Self user joins again
-    const selfUserRejoins = eventData.user_ids.includes(this.userState.self().id);
-    if (selfUserRejoins) {
+    // Self user is a creator of the event
+    const isFromSelf = eventJson.from === this.userState.self().id;
+
+    const containsSelfId = eventData.user_ids.includes(this.userState.self().id);
+    const containsSelfQualifiedId = !!eventData.users?.some(
+      ({qualified_id: qualifiedId}) => qualifiedId && matchQualifiedIds(qualifiedId, this.userState.self().qualifiedId),
+    );
+
+    const selfUserJoins = containsSelfId || containsSelfQualifiedId;
+
+    if (selfUserJoins) {
       conversationEntity.status(ConversationStatus.CURRENT_MEMBER);
       await this.conversationRoleRepository.updateConversationRoles(conversationEntity);
     }
 
     const updateSequence =
-      selfUserRejoins || connectionEntity?.isConnected()
+      selfUserJoins || connectionEntity?.isConnected()
         ? this.updateConversationFromBackend(conversationEntity)
         : Promise.resolve();
 
     const qualifiedUserIds =
       eventData.users?.map(user => user.qualified_id) || eventData.user_ids.map(userId => ({domain: '', id: userId}));
 
-    if (
-      conversationEntity.groupId &&
-      !useMLSConversationState.getState().isEstablished(conversationEntity.groupId) &&
-      (await this.core.service!.conversation.isMLSConversationEstablished(conversationEntity.groupId))
-    ) {
-      // If the conversation was not previously marked as established and the core if aware of this conversation, we can mark is as established
-      useMLSConversationState.getState().markAsEstablished(conversationEntity.groupId);
+    if (conversationEntity.isUsingMLSProtocol) {
+      const isSelfJoin = isFromSelf && selfUserJoins;
+      await this.handleMLSConversationMemberJoin(conversationEntity, isSelfJoin);
     }
 
     return updateSequence
@@ -2491,6 +2495,49 @@ export class ConversationRepository {
         this.verificationStateHandler.onMemberJoined(conversationEntity, qualifiedUserIds);
         return {conversationEntity, messageEntity};
       });
+  }
+
+  /**
+   * Handles member join event on mls group - updating mls conversation state and adding other self clients if user has joined by itself.
+   *
+   * @param conversation Conversation member joined to
+   * @param isSelfJoin whether user has joined by itself, if so we need to add other self clients to mls group
+   */
+  private async handleMLSConversationMemberJoin(conversation: Conversation, isSelfJoin: boolean) {
+    const {groupId} = conversation;
+
+    if (!groupId) {
+      throw new Error(`groupId not found for MLS conversation ${conversation.id}`);
+    }
+
+    const isMLSConversationEstablished = await this.core.service!.conversation.isMLSConversationEstablished(groupId);
+
+    if (!isMLSConversationEstablished) {
+      return;
+    }
+
+    const mlsConversationState = useMLSConversationState.getState();
+
+    const isMLSConversationMarkedAsEstablished = mlsConversationState.isEstablished(groupId);
+
+    if (!isMLSConversationMarkedAsEstablished) {
+      // If the conversation was not previously marked as established and the core if aware of this conversation, we can mark is as established
+      mlsConversationState.markAsEstablished(groupId);
+    }
+
+    if (isSelfJoin) {
+      // if user has joined and was also event creator (eg. joined via guest link) we need to add its other clients to mls group
+      try {
+        await addOtherSelfClientsToMLSConversation(
+          conversation,
+          this.userState.self().qualifiedId,
+          this.core.clientId,
+          this.core,
+        );
+      } catch (error) {
+        this.logger.warn(`Failed to add other self clients to MLS conversation: ${conversation.id}`, error);
+      }
+    }
   }
 
   /**
@@ -2592,17 +2639,13 @@ export class ConversationRepository {
     if (!inSelfConversation && conversation && !isBackendEvent) {
       this.logger.warn(
         `A conversation update message was not sent in the selfConversation. Skipping conversation update`,
-        eventData,
       );
       return;
     }
 
     const isFromSelf = !this.userState.self() || from === this.userState.self().id;
     if (!isFromSelf) {
-      this.logger.warn(
-        `A conversation update message was not sent by the self user. Skipping conversation update`,
-        eventData,
-      );
+      this.logger.warn(`A conversation update message was not sent by the self user. Skipping conversation update`);
       return;
     }
 
@@ -2764,8 +2807,7 @@ export class ConversationRepository {
       if (!messageEntity || !messageEntity.isContent()) {
         const type = messageEntity ? messageEntity.type : 'unknown';
 
-        const logMessage = `Cannot react to '${type}' message '${messageId}' in conversation '${conversationId}'`;
-        this.logger.error(logMessage, messageEntity);
+        this.logger.error(`Cannot react to '${type}' message '${messageId}' in conversation '${conversationId}'`);
         throw new ConversationError(ConversationError.TYPE.WRONG_TYPE, ConversationError.MESSAGE.WRONG_TYPE);
       }
 
@@ -2781,7 +2823,7 @@ export class ConversationRepository {
       const isNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
       if (!isNotFound) {
         const logMessage = `Failed to handle reaction to message '${messageId}' in conversation '${conversationId}'`;
-        this.logger.error(logMessage, {error, event: eventJson});
+        this.logger.error(logMessage, error);
         throw error;
       }
     }
@@ -2795,8 +2837,9 @@ export class ConversationRepository {
       if (!messageEntity || !messageEntity.isComposite()) {
         const type = messageEntity ? messageEntity.type : 'unknown';
 
-        const log = `Cannot react to '${type}' message '${messageId}' in conversation '${conversationEntity.id}'`;
-        this.logger.error(log, messageEntity);
+        this.logger.error(
+          `Cannot react to '${type}' message '${messageId}' in conversation '${conversationEntity.id}'`,
+        );
         throw new ConversationError(ConversationError.TYPE.WRONG_TYPE, ConversationError.MESSAGE.WRONG_TYPE);
       }
       const changes = messageEntity.getSelectionChange(buttonId);
@@ -2808,7 +2851,7 @@ export class ConversationRepository {
       const isNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
       if (!isNotFound) {
         const log = `Failed to handle reaction to message '${messageId}' in conversation '${conversationEntity.id}'`;
-        this.logger.error(log, {error, event: eventJson});
+        this.logger.error(log, error);
         throw error;
       }
     }

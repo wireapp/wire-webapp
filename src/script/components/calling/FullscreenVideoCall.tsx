@@ -117,10 +117,10 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     startedAt,
     participants,
   } = useKoSubscribableChildren(call, ['activeSpeakers', 'currentPage', 'pages', 'startedAt', 'participants']);
-  const {display_name: conversationName, participating_user_ets: conversationParticipants} = useKoSubscribableChildren(
-    conversation,
-    ['display_name', 'participating_user_ets'],
-  );
+  const {display_name: conversationName, allUserEntities: allUsers} = useKoSubscribableChildren(conversation, [
+    'display_name',
+    'allUserEntities',
+  ]);
   const {isVideoCallingEnabled, classifiedDomains} = useKoSubscribableChildren(teamState, [
     'isVideoCallingEnabled',
     'classifiedDomains',
@@ -210,7 +210,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
 
         {classifiedDomains && (
           <ClassifiedBar
-            users={conversationParticipants}
+            users={allUsers}
             classifiedDomains={classifiedDomains}
             style={{
               lineHeight: '1.5em',
