@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,16 +30,15 @@ import {
   Button,
   ButtonVariant,
   ContainerXS,
-  H2,
   Text,
   Paragraph,
   Box,
   Link,
   LinkVariant,
   COLOR_V2,
+  H2,
 } from '@wireapp/react-ui-kit';
 
-// import {Icon} from 'Components/Icon';
 import {Icon} from 'Components/Icon';
 import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
 import {AssetRepository} from 'src/script/assets/AssetRepository';
@@ -142,7 +141,7 @@ const OAuthPermissionsComponent = ({
           <Icon.Loading width="36" height="36" css={{path: {fill: COLOR_V2.BLUE_DARK_500}}} />
         ) : (
           <>
-            <H2 center>{_(oauthStrings.headline)}</H2>
+            <H2 style={{fontWeight: 500, lineHeight: '28.64px', fontSize: '24px'}}>{_(oauthStrings.headline)}</H2>
             {typeof teamImage === 'string' && (
               <img
                 src={teamImage}
@@ -163,15 +162,12 @@ const OAuthPermissionsComponent = ({
               onClick={doLogout}
               data-uie-name="go-logout"
               variant={LinkVariant.PRIMARY}
-              center
               color={COLOR_V2.BLUE}
             >
               {_(oauthStrings.logout)}
             </Link>
 
-            <Text style={{marginBottom: '24px'}} center>
-              {_(oauthStrings.subhead, {app: oAuthApp?.application_name})}
-            </Text>
+            <Text style={{marginBottom: '24px'}}>{_(oauthStrings.subhead, {app: oAuthApp?.application_name})}</Text>
 
             {oauthParams.scope.length > 1 && (
               <Box
@@ -184,12 +180,13 @@ const OAuthPermissionsComponent = ({
               >
                 <ul
                   style={{
+                    marginTop: 0,
                     paddingInlineStart: '20px',
                     fontSize: '12px',
                   }}
                 >
                   {oAuthScope.map((scope, index) => (
-                    <li key={index}>
+                    <li key={index} style={{textAlign: 'start'}}>
                       <Text>{_(oauthStrings[scope])}</Text>
                     </li>
                   ))}
@@ -221,15 +218,10 @@ const OAuthPermissionsComponent = ({
                 </Text>
               </Box>
             )}
-            <Text
-              muted
-              center
-              style={{fontSize: '12px', lineHeight: '16px', display: 'block'}}
-              data-uie-name="oauth-details"
-            >
+            <Text muted style={{fontSize: '12px', lineHeight: '16px', display: 'block'}} data-uie-name="oauth-details">
               {_(oauthStrings.details)}
             </Text>
-            <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: '16px', gap: '16px'}}>
+            <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: '74px', gap: '16px'}}>
               <Button
                 variant={ButtonVariant.SECONDARY}
                 style={{margin: 'auto', width: 200}}
