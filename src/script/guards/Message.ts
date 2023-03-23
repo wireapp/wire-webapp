@@ -17,10 +17,10 @@
  *
  */
 
+import {ContentMessage} from 'Entities/message/ContentMessage';
+import {MemberMessage} from 'Entities/message/MemberMessage';
 import {Draft} from 'Util/DraftStateUtil';
 
-import {ContentMessage} from '../entity/message/ContentMessage';
-import {MemberMessage} from '../entity/message/MemberMessage';
 import {SuperType} from '../message/SuperType';
 
 export const isReadableMessage = (message: any): message is ContentMessage =>

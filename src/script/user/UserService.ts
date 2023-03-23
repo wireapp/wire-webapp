@@ -20,9 +20,9 @@
 import type {User as APIClientUser, QualifiedHandle, QualifiedId} from '@wireapp/api-client/lib/user/';
 import {container} from 'tsyringe';
 
+import type {User} from 'Entities/User';
 import {Logger, getLogger} from 'Util/Logger';
 
-import type {User} from '../entity/User';
 import {APIClient} from '../service/APIClientSingleton';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {StorageService} from '../storage/StorageService';
@@ -125,9 +125,9 @@ export class UserService {
    */
   async getUsers(userIds: QualifiedId[]) {
     if (userIds.length === 0) {
-      return [];
+      return {found: [], not_found: [], failed: []};
     }
-    return (await this.apiClient.api.user.postListUsers({qualified_ids: userIds})).found;
+    return this.apiClient.api.user.postListUsers({qualified_ids: userIds});
   }
 
   /**

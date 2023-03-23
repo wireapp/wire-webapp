@@ -21,6 +21,8 @@ import type {ConversationMemberJoinEvent} from '@wireapp/api-client/lib/event/';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
+import type {Conversation} from 'Entities/Conversation';
+import type {User} from 'Entities/User';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {compareTransliteration, sortByPriority} from 'Util/StringUtil';
@@ -35,8 +37,6 @@ import {ACCESS_STATE} from '../conversation/AccessState';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationState} from '../conversation/ConversationState';
 import {MemberLeaveEvent} from '../conversation/EventBuilder';
-import type {Conversation} from '../entity/Conversation';
-import type {User} from '../entity/User';
 import {ConversationError} from '../error/ConversationError';
 import type {TeamRepository} from '../team/TeamRepository';
 import {TeamState} from '../team/TeamState';

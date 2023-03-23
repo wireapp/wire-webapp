@@ -24,6 +24,9 @@ import {container, singleton} from 'tsyringe';
 
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
+import {Conversation} from 'Entities/Conversation';
+import {FileAsset} from 'Entities/message/FileAsset';
+import type {User} from 'Entities/User';
 import {getLogger, Logger} from 'Util/Logger';
 import {downloadBlob, loadFileBuffer, loadImage} from 'Util/util';
 import {WebWorker} from 'Util/worker';
@@ -34,9 +37,6 @@ import {AssetService} from './AssetService';
 import {AssetTransferState} from './AssetTransferState';
 import {getAssetUrl, setAssetUrl} from './AssetURLCache';
 
-import {Conversation} from '../entity/Conversation';
-import {FileAsset} from '../entity/message/FileAsset';
-import type {User} from '../entity/User';
 import {Core} from '../service/CoreSingleton';
 
 export interface CompressedImage {

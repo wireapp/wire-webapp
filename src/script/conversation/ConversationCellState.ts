@@ -17,6 +17,11 @@
  *
  */
 
+import type {Conversation} from 'Entities/Conversation';
+import type {FileAsset} from 'Entities/message/FileAsset';
+import type {MemberMessage} from 'Entities/message/MemberMessage';
+import type {SystemMessage} from 'Entities/message/SystemMessage';
+import type {Text} from 'Entities/message/Text';
 import {t} from 'Util/LocalizerUtil';
 import {getRenderedTextContent} from 'Util/messageRenderer';
 import {matchQualifiedIds} from 'Util/QualifiedId';
@@ -24,11 +29,6 @@ import {matchQualifiedIds} from 'Util/QualifiedId';
 import {ConversationStatusIcon} from './ConversationStatusIcon';
 
 import {AssetTransferState} from '../assets/AssetTransferState';
-import type {Conversation} from '../entity/Conversation';
-import type {FileAsset} from '../entity/message/FileAsset';
-import type {MemberMessage} from '../entity/message/MemberMessage';
-import type {SystemMessage} from '../entity/message/SystemMessage';
-import type {Text} from '../entity/message/Text';
 import {ConversationError} from '../error/ConversationError';
 
 enum ACTIVITY_TYPE {

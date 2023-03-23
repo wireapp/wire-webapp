@@ -19,7 +19,7 @@
 
 import {CONVERSATION_TYPE, ConversationProtocol} from '@wireapp/api-client/lib/conversation/';
 
-import {Conversation} from '../entity/Conversation';
+import {Conversation} from 'Entities/Conversation';
 
 export type MLSConversation = Conversation & {groupId: string};
 

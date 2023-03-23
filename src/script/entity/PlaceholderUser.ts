@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2022 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,19 +17,12 @@
  *
  */
 
-import {User} from 'Entities/User';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {ServiceEntity} from '../integration/ServiceEntity';
-import {PanelEntity} from '../page/RightSidebar/RightSidebar';
+export class PlaceholderUser {
+  constructor(public readonly id: QualifiedId) {}
 
-export const isServiceEntity = (entity: PanelEntity): entity is ServiceEntity => {
-  return 'isService' in entity && entity.isService;
-};
-
-export const isUserEntity = (entity: PanelEntity): entity is User => {
-  return !isServiceEntity(entity);
-};
-
-export const isUserServiceEntity = (entity: PanelEntity): entity is User => {
-  return isServiceEntity(entity);
-};
+  get name() {
+    return 'Username not available';
+  }
+}

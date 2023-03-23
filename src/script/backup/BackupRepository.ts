@@ -20,6 +20,7 @@
 import type Dexie from 'dexie';
 import {container} from 'tsyringe';
 
+import type {Conversation} from 'Entities/Conversation';
 import {chunk} from 'Util/ArrayUtil';
 import {Logger, getLogger} from 'Util/Logger';
 
@@ -36,7 +37,6 @@ import {
 import {ClientState} from '../client/ClientState';
 import {ConnectionState} from '../connection/ConnectionState';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
-import type {Conversation} from '../entity/Conversation';
 import {ClientEvent} from '../event/Client';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {StorageSchemata} from '../storage/StorageSchemata';

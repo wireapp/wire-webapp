@@ -43,6 +43,8 @@ import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
+import {PlaceholderUser} from 'Entities/PlaceholderUser';
+import {User} from 'Entities/User';
 import {chunk, partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
@@ -66,7 +68,6 @@ import {ClientMapper} from '../client/ClientMapper';
 import {Config} from '../Config';
 import type {ConnectionEntity} from '../connection/ConnectionEntity';
 import {flattenUserClientsQualifiedIds} from '../conversation/userClientsUtils';
-import {User} from '../entity/User';
 import {UserError} from '../error/UserError';
 import {USER} from '../event/Client';
 import {EventRepository} from '../event/EventRepository';
@@ -273,7 +274,7 @@ export class UserRepository {
     const recipients = await this.clientRepository.getAllClientsFromDb();
     const userIds: QualifiedId[] = Object.entries(recipients).map(([userId, clientEntities]) => {
       return {
-        domain: clientEntities[0].domain,
+        domain: clientEntities[0].domain || '',
         id: userId,
       };
     });
@@ -348,9 +349,8 @@ export class UserRepository {
     const addedClients = flatten(
       await Promise.all(
         users.map(async ({userId, clients}) => {
-          return (await Promise.all(clients.map(client => this.addClientToUser(userId, client, true)))).filter(
-            client => !!client,
-          );
+          const addedClient = await Promise.all(clients.map(client => this.addClientToUser(userId, client, true)));
+          return addedClient.filter((client): client is ClientEntity => !!client);
         }),
       ),
     );
@@ -448,7 +448,7 @@ export class UserRepository {
   /**
    * Get a user from the backend.
    */
-  private async fetchUserById(userId: QualifiedId): Promise<User> {
+  private async fetchUserById(userId: QualifiedId) {
     const [userEntity] = await this.fetchUsersById([userId]);
     return userEntity;
   }
@@ -456,44 +456,20 @@ export class UserRepository {
   /**
    * Get users from the backend.
    */
-  private async fetchUsersById(userIds: QualifiedId[]): Promise<User[]> {
+  private async fetchUsersById(userIds: QualifiedId[]): Promise<(User | PlaceholderUser)[]> {
     if (!userIds.length) {
       return [];
     }
 
-    const getUsers = async (chunkOfUserIds: QualifiedId[]): Promise<User[]> => {
-      const selfDomain = this.userState.self().domain;
-
-      const chunkOfQualifiedUserIds = chunkOfUserIds.map(({id, domain}) => ({domain: domain || selfDomain, id}));
-
+    const getUsers = async (userIdChunk: QualifiedId[]): Promise<User[]> => {
       try {
-        const response = await this.userService.getUsers(chunkOfQualifiedUserIds);
-        return response ? this.userMapper.mapUsersFromJson(response) : [];
-      } catch (error: any) {
-        if (
-          error.label === BackendErrorLabel.FEDERATION_NOT_AVAILABLE ||
-          error.label === BackendErrorLabel.FEDERATION_BACKEND_NOT_FOUND ||
-          error.label === BackendErrorLabel.FEDERATION_REMOTE_ERROR ||
-          error.label === BackendErrorLabel.FEDERATION_TLS_ERROR
-        ) {
-          this.logger.warn('loading federated users failed: trying loading same backend users only');
-          const [sameBackendUsers, federatedUsers] = partition(
-            chunkOfQualifiedUserIds,
-            userId => userId.domain === selfDomain,
-          );
-          const users = await getUsers(sameBackendUsers);
-
-          return users.concat(
-            federatedUsers.map(userId => {
-              /* When a federated backend is unreachable, we generate fake users locally with some default values
-               * This allows the webapp to load correctly and display conversations with those federated users
-               */
-              const fakeUser = new User(userId.id, userId.domain);
-              fakeUser.name(t('unavailableUser'));
-              return fakeUser;
-            }),
-          );
-        }
+        const response = await this.userService.getUsers(userIdChunk);
+        const foundUsers = this.userMapper.mapUsersFromJson(response.found);
+        const unknownUsers = [...response.failed, ...response.not_found].map(id => {
+          return new PlaceholderUser(id);
+        });
+        return [...foundUsers, ...unknownUsers];
+      } catch (error) {
         const isNotFound =
           (isAxiosError(error) && error.response?.status === HTTP_STATUS.NOT_FOUND) ||
           Number((error as BackendError).code) === HTTP_STATUS.NOT_FOUND;
@@ -507,7 +483,7 @@ export class UserRepository {
       }
     };
 
-    const chunksOfUserIds = chunk<QualifiedId>(
+    const chunksOfUserIds = chunk(
       userIds.filter(({id}) => !!id),
       Config.getConfig().MAXIMUM_USERS_PER_REQUEST,
     );

@@ -25,6 +25,7 @@ import {container} from 'tsyringe';
 
 import {Icon} from 'Components/Icon';
 import {VerifiedIcon} from 'Components/VerifiedIcon';
+import {Conversation} from 'Entities/Conversation';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
 import {handleKeyDown} from 'Util/KeyboardUtil';
@@ -36,7 +37,6 @@ import {DeviceDetailsPreferences} from './DeviceDetailsPreferences';
 
 import {ClientState} from '../../../../../client/ClientState';
 import {ConversationState} from '../../../../../conversation/ConversationState';
-import {Conversation} from '../../../../../entity/Conversation';
 import {UserState} from '../../../../../user/UserState';
 import {useKoSubscribableChildren} from '../../../../../util/ComponentUtil';
 import {PreferencesPage} from '../components/PreferencesPage';

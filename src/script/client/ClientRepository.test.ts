@@ -22,8 +22,8 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {Runtime} from '@wireapp/commons';
 
+import {User} from 'Entities/User';
 import {ClientRepository, ClientMapper, ClientEntity} from 'src/script/client';
-import {User} from 'src/script/entity/User';
 import {ClientError} from 'src/script/error/ClientError';
 
 import {entities} from '../../../test/api/payloads';

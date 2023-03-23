@@ -20,8 +20,8 @@
 import {css} from '@emotion/react';
 
 import {ConversationListCell} from 'Components/list/ConversationListCell';
+import {Conversation} from 'Entities/Conversation';
 import type {ConversationLabel} from 'src/script/conversation/ConversationLabelRepository';
-import {Conversation} from 'src/script/entity/Conversation';
 import {ListViewModel} from 'src/script/view_model/ListViewModel';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 

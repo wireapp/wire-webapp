@@ -19,8 +19,9 @@
 
 import ko from 'knockout';
 
+import type {User} from 'Entities/User';
+
 import {AssetRemoteData} from '../assets/AssetRemoteData';
-import type {User} from '../entity/User';
 import {assetV3} from '../util/ValidationUtil';
 
 export class TeamEntity {

@@ -23,6 +23,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 import {debounce} from 'underscore';
 
+import type {User} from 'Entities/User';
 import {partition} from 'Util/ArrayUtil';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -32,7 +33,6 @@ import {sortByPriority} from 'Util/StringUtil';
 import {UserList} from './UserList';
 
 import {ConversationState} from '../conversation/ConversationState';
-import type {User} from '../entity/User';
 import {SearchRepository} from '../search/SearchRepository';
 import type {TeamRepository} from '../team/TeamRepository';
 import {TeamState} from '../team/TeamState';

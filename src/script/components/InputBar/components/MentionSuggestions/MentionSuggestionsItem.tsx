@@ -24,10 +24,9 @@ import cx from 'classnames';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {Icon} from 'Components/Icon';
+import {User} from 'Entities/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
-
-import {User} from '../../../../entity/User';
 
 type MentionSuggestionsItemProps = {
   isSelected: boolean;

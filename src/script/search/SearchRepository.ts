@@ -20,6 +20,7 @@
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {container} from 'tsyringe';
 
+import type {User} from 'Entities/User';
 import {EMOJI_RANGES} from 'Util/EmojiUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {
@@ -32,7 +33,6 @@ import {
 
 import type {SearchService} from './SearchService';
 
-import type {User} from '../entity/User';
 import {Core} from '../service/CoreSingleton';
 import {validateHandle} from '../user/UserHandleGenerator';
 import type {UserRepository} from '../user/UserRepository';

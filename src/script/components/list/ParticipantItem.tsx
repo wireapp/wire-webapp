@@ -30,6 +30,7 @@ import {ParticipantMicOnIcon} from 'Components/calling/ParticipantMicOnIcon';
 import {Icon} from 'Components/Icon';
 import {UserlistMode} from 'Components/UserList';
 import {InViewport} from 'Components/utils/InViewport';
+import {User} from 'Entities/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -37,7 +38,6 @@ import {capitalizeFirstChar} from 'Util/StringUtil';
 import {noop, setContextMenuPosition} from 'Util/util';
 
 import {Participant} from '../../calling/Participant';
-import {User} from '../../entity/User';
 import {ServiceEntity} from '../../integration/ServiceEntity';
 
 export interface ParticipantItemProps<UserType> extends Omit<React.HTMLProps<HTMLDivElement>, 'onClick' | 'onKeyDown'> {

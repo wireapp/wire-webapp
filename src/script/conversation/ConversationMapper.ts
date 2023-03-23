@@ -33,12 +33,12 @@ import {isObject} from 'underscore';
 
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
+import {Conversation} from 'Entities/Conversation';
 import {matchQualifiedIds, QualifiedEntity} from 'Util/QualifiedId';
 
 import {ACCESS_STATE} from './AccessState';
 import {ConversationStatus} from './ConversationStatus';
 
-import {Conversation} from '../entity/Conversation';
 import {BaseError, BASE_ERROR_TYPE} from '../error/BaseError';
 import {ConversationError} from '../error/ConversationError';
 import {ConversationRecord} from '../storage/record/ConversationRecord';

@@ -24,6 +24,9 @@ import cx from 'classnames';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {Conversation} from 'Entities/Conversation';
+import {ContentMessage} from 'Entities/message/ContentMessage';
+import {MediumImage} from 'Entities/message/MediumImage';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {renderElement} from 'Util/renderElement';
@@ -34,9 +37,6 @@ import {DetailViewModalHeader} from './DetailViewModalHeader';
 import {AssetRepository} from '../../../assets/AssetRepository';
 import {ConversationRepository} from '../../../conversation/ConversationRepository';
 import {MessageRepository} from '../../../conversation/MessageRepository';
-import {Conversation} from '../../../entity/Conversation';
-import {ContentMessage} from '../../../entity/message/ContentMessage';
-import {MediumImage} from '../../../entity/message/MediumImage';
 import {isContentMessage} from '../../../guards/Message';
 import {MessageCategory} from '../../../message/MessageCategory';
 import {isOfCategory} from '../../../page/MainContent/panels/Collection/utils';

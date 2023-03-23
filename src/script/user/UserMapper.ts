@@ -21,13 +21,13 @@ import type {Self as APIClientSelf} from '@wireapp/api-client/lib/self/';
 import type {User as APIClientUser} from '@wireapp/api-client/lib/user/';
 import {container} from 'tsyringe';
 
+import {User} from 'Entities/User';
 import {joaatHash} from 'Util/Crypto';
 import {getLogger, Logger} from 'Util/Logger';
 
 import {UserState} from './UserState';
 
 import {mapProfileAssets, mapProfileAssetsV1, updateUserEntityAssets} from '../assets/AssetMapper';
-import {User} from '../entity/User';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import '../view_model/bindings/CommonBindings';
 

@@ -23,10 +23,10 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {Icon} from 'Components/Icon';
-import {Conversation} from 'src/script/entity/Conversation';
-import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {Message} from 'src/script/entity/message/Message';
+import {Conversation} from 'Entities/Conversation';
+import {CompositeMessage} from 'Entities/message/CompositeMessage';
+import {ContentMessage} from 'Entities/message/ContentMessage';
+import {Message} from 'Entities/message/Message';
 import {StatusType} from 'src/script/message/StatusType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getMessageAriaLabel} from 'Util/conversationMessages';

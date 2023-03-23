@@ -25,14 +25,14 @@ import {container} from 'tsyringe';
 import {Icon} from 'Components/Icon';
 import {ParticipantItem} from 'Components/list/ParticipantItem';
 import {collapseButton, collapseIcon} from 'Components/UserList/UserList.styles';
+import type {Conversation} from 'Entities/Conversation';
+import type {User} from 'Entities/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isEnterKey, isSpaceKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
 import {ConversationState} from '../../conversation/ConversationState';
-import type {Conversation} from '../../entity/Conversation';
-import type {User} from '../../entity/User';
 import {TeamState} from '../../team/TeamState';
 import {UserState} from '../../user/UserState';
 import {InViewport} from '../utils/InViewport';

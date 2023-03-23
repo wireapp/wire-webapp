@@ -20,12 +20,12 @@
 import {ChangeEvent, FC, KeyboardEvent, useEffect, useRef, useState} from 'react';
 
 import {Icon} from 'Components/Icon';
+import {User} from 'Entities/User';
 import {isEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {removeLineBreaks} from 'Util/StringUtil';
 
 import {ConversationRepository} from '../../../../../conversation/ConversationRepository';
-import {User} from '../../../../../entity/User';
 import {ServiceEntity} from '../../../../../integration/ServiceEntity';
 import {GroupDetails} from '../GroupDetails/GroupDetails';
 

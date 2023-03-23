@@ -23,8 +23,8 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
 import {ConnectionRepository} from 'src/script/connection/ConnectionRepository';
 import {ConnectionState} from 'src/script/connection/ConnectionState';
-import {Conversation} from 'src/script/entity/Conversation';
-import {User} from 'src/script/entity/User';
+import {Conversation} from 'Entities/Conversation';
+import {User} from 'Entities/User';
 import {createRandomUuid} from 'Util/util';
 
 import {TestFactory} from '../../helper/TestFactory';

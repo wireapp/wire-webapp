@@ -21,6 +21,7 @@ import React, {useEffect, useMemo, useState} from 'react';
 
 import {ClientClassification} from '@wireapp/api-client/lib/client/';
 
+import {User} from 'Entities/User';
 import {partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
@@ -35,7 +36,6 @@ import {ClientRepository, ClientEntity} from '../client';
 import {ConversationState} from '../conversation/ConversationState';
 import {MessageRepository} from '../conversation/MessageRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
-import {User} from '../entity/User';
 
 enum FIND_MODE {
   FOUND = 'UserDevices.MODE.FOUND',

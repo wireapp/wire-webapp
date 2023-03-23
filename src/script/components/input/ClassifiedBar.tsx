@@ -23,7 +23,7 @@ import {CSSObject} from '@emotion/react';
 import cx from 'classnames';
 
 import {Icon} from 'Components/Icon';
-import {User} from 'src/script/entity/User';
+import {User} from 'Entities/User';
 import {t} from 'Util/LocalizerUtil';
 
 function isClassified(users: User[], classifiedDomains: string[]): boolean {

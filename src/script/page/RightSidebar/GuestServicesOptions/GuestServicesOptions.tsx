@@ -21,6 +21,7 @@ import {FC, useState} from 'react';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {Conversation} from 'Entities/Conversation';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -29,7 +30,6 @@ import {ServicesOptions} from './components/ServicesOptions';
 
 import {toggleFeature} from '../../../conversation/ConversationAccessPermission';
 import {ConversationRepository} from '../../../conversation/ConversationRepository';
-import {Conversation} from '../../../entity/Conversation';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {TeamState} from '../../../team/TeamState';
 import {PanelHeader} from '../PanelHeader';

@@ -22,13 +22,13 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
 
+import {Conversation} from 'Entities/Conversation';
+import {User} from 'Entities/User';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {sortGroupsByLastEvent} from 'Util/util';
 
 import {isMLSConversation, isSelfConversation} from './ConversationSelectors';
 
-import {Conversation} from '../entity/Conversation';
-import {User} from '../entity/User';
 import {TeamState} from '../team/TeamState';
 import {UserState} from '../user/UserState';
 

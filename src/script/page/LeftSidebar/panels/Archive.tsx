@@ -25,6 +25,7 @@ import {container} from 'tsyringe';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ConversationListCell} from 'Components/list/ConversationListCell';
+import {Conversation} from 'Entities/Conversation';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -32,7 +33,6 @@ import {ListWrapper} from './ListWrapper';
 
 import {ConversationRepository} from '../../../conversation/ConversationRepository';
 import {ConversationState} from '../../../conversation/ConversationState';
-import {Conversation} from '../../../entity/Conversation';
 import {useConversationFocus} from '../../../hooks/useConversationFocus';
 import {ListViewModel} from '../../../view_model/ListViewModel';
 

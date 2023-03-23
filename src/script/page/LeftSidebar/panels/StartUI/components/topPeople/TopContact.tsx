@@ -23,11 +23,11 @@ import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {User} from 'Entities/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 
 import {AssetRepository} from '../../../../../../assets/AssetRepository';
-import {User} from '../../../../../../entity/User';
 
 export interface TopContactProps {
   assetRepository: AssetRepository;

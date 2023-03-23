@@ -35,15 +35,15 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {Conversation} from 'Entities/Conversation';
+import {Message} from 'Entities/message/Message';
+import {User} from 'Entities/User';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {Config} from 'src/script/Config';
 import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
 import {ConversationDatabaseData, ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
 import {DeleteEvent, EventBuilder, MessageHiddenEvent} from 'src/script/conversation/EventBuilder';
-import {Conversation} from 'src/script/entity/Conversation';
-import {Message} from 'src/script/entity/message/Message';
-import {User} from 'src/script/entity/User';
 import {ConversationError} from 'src/script/error/ConversationError';
 import {ClientEvent} from 'src/script/event/Client';
 import {EventRepository} from 'src/script/event/EventRepository';

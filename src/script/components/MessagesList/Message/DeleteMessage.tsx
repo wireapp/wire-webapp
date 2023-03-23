@@ -20,14 +20,14 @@
 import React from 'react';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import {User} from 'src/script/entity/User';
+import {DeleteMessage as DeleteMessageEntity} from 'Entities/message/DeleteMessage';
+import {User} from 'Entities/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {MessageTime} from './MessageTime';
 
-import {DeleteMessage as DeleteMessageEntity} from '../../../entity/message/DeleteMessage';
 import {ServiceEntity} from '../../../integration/ServiceEntity';
 
 export interface DeleteMessageProps {

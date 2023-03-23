@@ -21,9 +21,9 @@ import {FC} from 'react';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {UserDevices, UserDevicesState, useUserDevicesHistory} from 'Components/UserDevices';
+import type {User} from 'Entities/User';
 import {t} from 'Util/LocalizerUtil';
 
-import type {User} from '../../../entity/User';
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';
 import {PanelHeader} from '../PanelHeader';
 

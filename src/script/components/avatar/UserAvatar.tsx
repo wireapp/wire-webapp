@@ -21,6 +21,7 @@ import React, {MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEven
 
 import {COLOR} from '@wireapp/react-ui-kit';
 
+import {User} from 'Entities/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -31,7 +32,6 @@ import {AvatarImage} from './AvatarImage';
 import {AvatarInitials} from './AvatarInitials';
 import {AvatarWrapper} from './AvatarWrapper';
 
-import {User} from '../../entity/User';
 import {AVATAR_SIZE, STATE} from '../Avatar';
 
 export interface UserAvatarProps extends React.HTMLProps<HTMLDivElement> {

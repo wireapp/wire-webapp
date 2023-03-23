@@ -21,12 +21,12 @@ import {fireEvent, render} from '@testing-library/react';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 
+import {Conversation} from 'Entities/Conversation';
+import {User} from 'Entities/User';
 import {createRandomUuid, noop} from 'Util/util';
 
 import {GroupList} from './GroupList';
 
-import {Conversation} from '../../../../../entity/Conversation';
-import {User} from '../../../../../entity/User';
 import {navigate} from '../../../../../router/Router';
 
 jest.mock('../../../../../router/Router', () => ({

@@ -19,6 +19,7 @@
 
 import {FC, HTMLProps, MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent} from 'react';
 
+import {User} from 'Entities/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 
@@ -26,7 +27,6 @@ import {ServiceAvatar} from './avatar/ServiceAvatar';
 import {TemporaryGuestAvatar} from './avatar/TemporaryGuestAvatar';
 import {UserAvatar} from './avatar/UserAvatar';
 
-import {User} from '../entity/User';
 import {isServiceEntity} from '../guards/Service';
 import {ServiceEntity} from '../integration/ServiceEntity';
 

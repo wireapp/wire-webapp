@@ -20,8 +20,9 @@
 import type {BackendError} from '@wireapp/api-client/lib/http/';
 import {AxiosError} from 'axios';
 
-import {Conversation} from '../entity/Conversation';
-import {User} from '../entity/User';
+import {Conversation} from 'Entities/Conversation';
+import {User} from 'Entities/User';
+
 import {ClientRecord} from '../storage/record/ClientRecord';
 
 export function isAxiosError(errorCandidate: any): errorCandidate is AxiosError {

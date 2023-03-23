@@ -22,7 +22,7 @@ import React, {useEffect, useState} from 'react';
 import cx from 'classnames';
 
 import {Icon} from 'Components/Icon';
-import {Message} from 'src/script/entity/message/Message';
+import {Message} from 'Entities/message/Message';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatDateNumeral, formatTimeShort} from 'Util/TimeUtil';

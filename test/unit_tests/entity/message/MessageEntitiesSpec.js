@@ -17,10 +17,10 @@
  *
  */
 
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {FileAsset} from 'src/script/entity/message/FileAsset';
-import {MediumImage} from 'src/script/entity/message/MediumImage';
-import {Text} from 'src/script/entity/message/Text';
+import {ContentMessage} from 'Entities/message/ContentMessage';
+import {FileAsset} from 'Entities/message/FileAsset';
+import {MediumImage} from 'Entities/message/MediumImage';
+import {Text} from 'Entities/message/Text';
 import {StatusType} from 'src/script/message/StatusType';
 
 describe('Message Entities', () => {

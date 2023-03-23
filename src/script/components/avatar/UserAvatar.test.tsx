@@ -19,9 +19,10 @@
 
 import {render} from '@testing-library/react';
 
+import {User} from 'Entities/User';
+
 import {UserAvatar} from './UserAvatar';
 
-import {User} from '../../entity/User';
 import {AVATAR_SIZE, STATE} from '../Avatar';
 jest.mock('../../auth/util/SVGProvider');
 

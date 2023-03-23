@@ -25,13 +25,13 @@ import {DecryptionError} from '@wireapp/core/lib/errors/DecryptionError';
 import type {REASON as AVS_REASON} from '@wireapp/avs';
 import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
+import type {Conversation} from 'Entities/Conversation';
+import {ReactionType} from 'Entities/message/ContentMessage';
+import type {Message} from 'Entities/message/Message';
+import type {User} from 'Entities/User';
 import {createRandomUuid} from 'Util/util';
 
 import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
-import type {Conversation} from '../entity/Conversation';
-import {ReactionType} from '../entity/message/ContentMessage';
-import type {Message} from '../entity/message/Message';
-import type {User} from '../entity/User';
 import {CALL, ClientEvent, CONVERSATION} from '../event/Client';
 import {StatusType} from '../message/StatusType';
 import {VerificationMessageType} from '../message/VerificationMessageType';

@@ -28,7 +28,8 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Icon} from 'Components/Icon';
 import {UserList, UserlistMode} from 'Components/UserList';
-import {Conversation} from 'src/script/entity/Conversation';
+import {Conversation} from 'Entities/Conversation';
+import {User} from 'Entities/User';
 import {UserRepository} from 'src/script/user/UserRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -42,7 +43,6 @@ import {TopPeople} from './components/TopPeople';
 
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import {ConversationState} from '../../../../conversation/ConversationState';
-import {User} from '../../../../entity/User';
 import {getManageTeamUrl} from '../../../../externalRoute';
 import {useDebounce} from '../../../../hooks/useDebounce';
 import {SearchRepository} from '../../../../search/SearchRepository';

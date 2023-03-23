@@ -21,11 +21,10 @@ import React, {useState} from 'react';
 
 import {DeviceId} from 'Components/DeviceId';
 import {Icon} from 'Components/Icon';
+import {DecryptErrorMessage as DecryptErrorMessageEntity} from 'Entities/message/DecryptErrorMessage';
 import {getDecryptErrorUrl} from 'src/script/externalRoute';
 import {MotionDuration} from 'src/script/motion/MotionDuration';
 import {t} from 'Util/LocalizerUtil';
-
-import {DecryptErrorMessage as DecryptErrorMessageEntity} from '../../../entity/message/DecryptErrorMessage';
 
 export interface DecryptErrorMessageProps {
   message: DecryptErrorMessageEntity;

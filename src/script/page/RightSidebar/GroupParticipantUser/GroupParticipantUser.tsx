@@ -31,14 +31,14 @@ import {EnrichedFields} from 'Components/panel/EnrichedFields';
 import {UserActions, Actions} from 'Components/panel/UserActions';
 import {UserDetails} from 'Components/panel/UserDetails';
 import {BaseToggle} from 'Components/toggle/BaseToggle';
+import {Conversation} from 'Entities/Conversation';
+import {User} from 'Entities/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {ConversationRoleRepository} from '../../../conversation/ConversationRoleRepository';
 import {MemberLeaveEvent, TeamMemberLeaveEvent} from '../../../conversation/EventBuilder';
-import {Conversation} from '../../../entity/Conversation';
-import {User} from '../../../entity/User';
 import {ClientEvent} from '../../../event/Client';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {TeamState} from '../../../team/TeamState';

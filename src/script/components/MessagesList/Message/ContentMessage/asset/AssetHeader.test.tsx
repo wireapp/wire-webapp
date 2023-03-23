@@ -19,13 +19,12 @@
 
 import {render} from '@testing-library/react';
 
+import {Message} from 'Entities/message/Message';
+import {User} from 'Entities/User';
 import * as TimeUtil from 'Util/TimeUtil';
 import {createRandomUuid} from 'Util/util';
 
 import {AssetHeader} from './AssetHeader';
-
-import {Message} from '../../../../../entity/message/Message';
-import {User} from '../../../../../entity/User';
 
 describe('AssetHeader', () => {
   it('displays the expected username and time', () => {

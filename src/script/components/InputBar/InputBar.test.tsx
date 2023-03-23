@@ -20,6 +20,8 @@
 import {act, fireEvent, render, waitFor} from '@testing-library/react';
 
 import {InputBar} from 'Components/InputBar/index';
+import {Conversation} from 'Entities/Conversation';
+import {User} from 'Entities/User';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {Config} from 'src/script/Config';
 import {PropertiesService} from 'src/script/properties/PropertiesService';
@@ -32,8 +34,6 @@ import {AssetRepository} from '../../assets/AssetRepository';
 import {AssetService} from '../../assets/AssetService';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
 import {MessageRepository} from '../../conversation/MessageRepository';
-import {Conversation} from '../../entity/Conversation';
-import {User} from '../../entity/User';
 import {EventRepository} from '../../event/EventRepository';
 import {PropertiesRepository} from '../../properties/PropertiesRepository';
 import {SearchRepository} from '../../search/SearchRepository';

@@ -25,12 +25,13 @@ import {MessageSendingState} from '@wireapp/core/lib/conversation';
 import {Account} from '@wireapp/core';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
+import {Conversation} from 'Entities/Conversation';
+import {ContentMessage} from 'Entities/message/ContentMessage';
+import {Message} from 'Entities/message/Message';
+import {Text} from 'Entities/message/Text';
+import {User} from 'Entities/User';
 import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
-import {Conversation} from 'src/script/entity/Conversation';
-import {Message} from 'src/script/entity/message/Message';
-import {Text} from 'src/script/entity/message/Text';
-import {User} from 'src/script/entity/User';
 import {ConversationError} from 'src/script/error/ConversationError';
 import {createRandomUuid} from 'Util/util';
 
@@ -41,7 +42,6 @@ import {AssetRepository} from '../assets/AssetRepository';
 import {ClientEntity} from '../client/ClientEntity';
 import {ClientState} from '../client/ClientState';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
-import {ContentMessage} from '../entity/message/ContentMessage';
 import {EventRepository} from '../event/EventRepository';
 import {EventService} from '../event/EventService';
 import {PropertiesRepository} from '../properties/PropertiesRepository';

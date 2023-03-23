@@ -17,7 +17,8 @@
  *
  */
 
-import {User} from '../entity/User';
+import {User} from 'Entities/User';
+
 import {MentionEntity} from '../message/MentionEntity';
 
 export const findMentionAtPosition = (position: number, mentions: MentionEntity[]) =>

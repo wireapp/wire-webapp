@@ -26,6 +26,8 @@ import {container} from 'tsyringe';
 import {useTimeout} from '@wireapp/react-ui-kit';
 
 import {RestrictedVideo} from 'Components/asset/RestrictedVideo';
+import type {ContentMessage} from 'Entities/message/ContentMessage';
+import type {FileAsset} from 'Entities/message/FileAsset';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatSeconds} from 'Util/TimeUtil';
@@ -37,8 +39,6 @@ import {SeekBar} from './controls/SeekBar';
 
 import {AssetRepository} from '../../../../../assets/AssetRepository';
 import {AssetTransferState} from '../../../../../assets/AssetTransferState';
-import type {ContentMessage} from '../../../../../entity/message/ContentMessage';
-import type {FileAsset} from '../../../../../entity/message/FileAsset';
 import {TeamState} from '../../../../../team/TeamState';
 
 interface VideoAssetProps {

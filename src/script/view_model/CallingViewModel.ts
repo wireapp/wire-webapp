@@ -29,6 +29,8 @@ import {Availability} from '@wireapp/protocol-messaging';
 
 import {ButtonGroupTab} from 'Components/calling/ButtonGroup';
 import 'Components/calling/ChooseScreen';
+import type {Conversation} from 'Entities/Conversation';
+import type {User} from 'Entities/User';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
@@ -45,8 +47,6 @@ import {getSubconversationEpochInfo, subscribeToEpochUpdates} from '../calling/m
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
 import {ConversationState} from '../conversation/ConversationState';
-import type {Conversation} from '../entity/Conversation';
-import type {User} from '../entity/User';
 import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import type {MediaStreamHandler} from '../media/MediaStreamHandler';
 import type {Multitasking} from '../notification/NotificationRepository';

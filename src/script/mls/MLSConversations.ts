@@ -22,6 +22,9 @@ import {KeyPackageClaimUser} from '@wireapp/core/lib/conversation';
 
 import {Account} from '@wireapp/core';
 
+import {Conversation} from 'Entities/Conversation';
+import {User} from 'Entities/User';
+
 import {useMLSConversationState} from './mlsConversationState';
 
 import {ConversationRepository} from '../conversation/ConversationRepository';
@@ -31,8 +34,6 @@ import {
   isTeamConversation,
   MLSConversation,
 } from '../conversation/ConversationSelectors';
-import {Conversation} from '../entity/Conversation';
-import {User} from '../entity/User';
 
 type MLSConversationRepository = Pick<
   ConversationRepository,

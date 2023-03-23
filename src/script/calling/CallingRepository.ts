@@ -48,6 +48,8 @@ import {
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {Conversation} from 'Entities/Conversation';
+import type {User} from 'Entities/User';
 import {flatten} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
@@ -66,8 +68,6 @@ import {Config} from '../Config';
 import {ConversationState} from '../conversation/ConversationState';
 import {CallingEvent, EventBuilder} from '../conversation/EventBuilder';
 import {CONSENT_TYPE, MessageRepository, MessageSendingOptions} from '../conversation/MessageRepository';
-import {Conversation} from '../entity/Conversation';
-import type {User} from '../entity/User';
 import {NoAudioInputError} from '../error/NoAudioInputError';
 import {EventRepository} from '../event/EventRepository';
 import {EventSource} from '../event/EventSource';

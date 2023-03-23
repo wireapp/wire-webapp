@@ -20,7 +20,7 @@
 import {render, waitFor} from '@testing-library/react';
 import ko from 'knockout';
 
-import {Conversation} from 'src/script/entity/Conversation';
+import {Conversation} from 'Entities/Conversation';
 
 import {GuestServicesOptions} from './GuestServicesOptions';
 

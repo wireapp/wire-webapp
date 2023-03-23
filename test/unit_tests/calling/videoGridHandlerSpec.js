@@ -22,7 +22,7 @@ import {CONV_TYPE, CALL_TYPE, VIDEO_STATE} from '@wireapp/avs';
 import {Call} from 'src/script/calling/Call';
 import {Participant} from 'src/script/calling/Participant';
 import {getGrid} from 'src/script/calling/videoGridHandler';
-import {User} from 'src/script/entity/User';
+import {User} from 'Entities/User';
 describe('videoGridHandler', () => {
   let participants;
 

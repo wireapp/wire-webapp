@@ -21,8 +21,8 @@ import React from 'react';
 
 import cx from 'classnames';
 
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {Message} from 'src/script/entity/message/Message';
+import {ContentMessage} from 'Entities/message/ContentMessage';
+import {Message} from 'Entities/message/Message';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {MessageLike} from './MessageLike';

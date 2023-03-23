@@ -17,7 +17,7 @@
  *
  */
 
-import {Conversation} from 'src/script/entity/Conversation';
+import {Conversation} from 'Entities/Conversation';
 import {
   arrayToBase64,
   base64ToArray,

@@ -26,6 +26,8 @@ import {container} from 'tsyringe';
 import {RestrictedImage} from 'Components/asset/RestrictedImage';
 import {Icon} from 'Components/Icon';
 import {InViewport} from 'Components/utils/InViewport';
+import {ContentMessage} from 'Entities/message/ContentMessage';
+import {MediumImage} from 'Entities/message/MediumImage';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -34,8 +36,6 @@ import {useAssetTransfer} from './AbstractAssetTransferStateTracker';
 import {AssetLoader} from './AssetLoader';
 
 import {Config} from '../../../../../Config';
-import {ContentMessage} from '../../../../../entity/message/ContentMessage';
-import {MediumImage} from '../../../../../entity/message/MediumImage';
 import {TeamState} from '../../../../../team/TeamState';
 import {useMessageFocusedTabIndex} from '../../util';
 

@@ -21,6 +21,8 @@ import React, {useEffect, useMemo, useRef, useState} from 'react';
 
 import {CloseIcon, Input, InputSubmitCombo, SearchIcon} from '@wireapp/react-ui-kit';
 
+import {ContentMessage} from 'Entities/message/ContentMessage';
+import type {Message} from 'Entities/message/Message';
 import {t} from 'Util/LocalizerUtil';
 import {isScrolledBottom} from 'Util/scroll-helpers';
 import {useEffectRef} from 'Util/useEffectRef';
@@ -28,8 +30,6 @@ import {noop} from 'Util/util';
 
 import {FullSearchItem} from './fullSearch/FullSearchItem';
 
-import {ContentMessage} from '../../../../entity/message/ContentMessage';
-import type {Message} from '../../../../entity/message/Message';
 import {useDebounce} from '../../../../hooks/useDebounce';
 import {getSearchRegex} from '../../../../search/FullTextSearch';
 

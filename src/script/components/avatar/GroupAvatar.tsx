@@ -19,9 +19,8 @@
 
 import React from 'react';
 
+import type {User} from 'Entities/User';
 import {CSS_SQUARE, CSS_FLEX_CENTER} from 'Util/CSSMixin';
-
-import type {User} from '../../entity/User';
 
 export interface GroupAvatarProps {
   className?: string;

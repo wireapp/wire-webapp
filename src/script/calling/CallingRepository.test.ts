@@ -24,12 +24,12 @@ import ko, {Subscription} from 'knockout';
 import {CONV_TYPE, CALL_TYPE, STATE as CALL_STATE, REASON, Wcall} from '@wireapp/avs';
 import {Runtime} from '@wireapp/commons';
 
+import {Conversation} from 'Entities/Conversation';
+import {User} from 'Entities/User';
 import {Call} from 'src/script/calling/Call';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {CallState} from 'src/script/calling/CallState';
 import {Participant} from 'src/script/calling/Participant';
-import {Conversation} from 'src/script/entity/Conversation';
-import {User} from 'src/script/entity/User';
 import {EventRepository} from 'src/script/event/EventRepository';
 import {MediaType} from 'src/script/media/MediaType';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';

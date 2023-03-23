@@ -19,10 +19,10 @@
 
 import {FC} from 'react';
 
+import {User} from 'Entities/User';
 import {t} from 'Util/LocalizerUtil';
 
 import {ConversationRepository} from '../../../../../conversation/ConversationRepository';
-import {User} from '../../../../../entity/User';
 import {ServiceEntity} from '../../../../../integration/ServiceEntity';
 
 interface GroupDetailsProps {

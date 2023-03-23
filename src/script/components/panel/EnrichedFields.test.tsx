@@ -20,7 +20,7 @@
 import {render, waitFor} from '@testing-library/react';
 import type {RichInfo} from '@wireapp/api-client/lib/user/';
 
-import {User} from 'src/script/entity/User';
+import {User} from 'Entities/User';
 import {RichProfileRepository} from 'src/script/user/RichProfileRepository';
 import {createRandomUuid} from 'Util/util';
 

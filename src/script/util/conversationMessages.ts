@@ -17,12 +17,12 @@
  *
  */
 
-import {Asset} from 'src/script/entity/message/Asset';
-import type {FileAsset as FileAssetType} from 'src/script/entity/message/FileAsset';
+import {Asset} from 'Entities/message/Asset';
+import type {FileAsset as FileAssetType} from 'Entities/message/FileAsset';
+import {Message} from 'Entities/message/Message';
 import {isSameDay, differenceInMinutes} from 'Util/TimeUtil';
 
 import {AssetType} from '../assets/AssetType';
-import {Message} from '../entity/message/Message';
 
 export enum MessageMarkerType {
   /** The message should be displayed standalone and should not create any section*/

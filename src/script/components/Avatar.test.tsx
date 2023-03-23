@@ -19,9 +19,10 @@
 
 import {fireEvent, render} from '@testing-library/react';
 
+import {User} from 'Entities/User';
+
 import {Avatar} from './Avatar';
 
-import {User} from '../entity/User';
 import {ServiceEntity} from '../integration/ServiceEntity';
 
 describe('Avatar', () => {

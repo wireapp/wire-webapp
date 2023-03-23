@@ -22,6 +22,7 @@ import {ConversationAccessUpdateData} from '@wireapp/api-client/lib/conversation
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
+import type {Conversation} from 'Entities/Conversation';
 import {t} from 'Util/LocalizerUtil';
 
 import {AbstractConversationEventHandler, EventHandlingConfig} from './AbstractConversationEventHandler';
@@ -37,7 +38,6 @@ import type {ConversationService} from './ConversationService';
 import {ConversationEvent} from './EventBuilder';
 
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
-import type {Conversation} from '../entity/Conversation';
 
 export class ConversationStateHandler extends AbstractConversationEventHandler {
   private readonly conversationService: ConversationService;

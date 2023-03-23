@@ -23,11 +23,11 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {RadioGroup} from 'Components/Radio';
+import {Conversation} from 'Entities/Conversation';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {NOTIFICATION_STATE, getNotificationText} from '../../../conversation/NotificationSetting';
-import {Conversation} from '../../../entity/Conversation';
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';
 import {PanelHeader} from '../PanelHeader';
 

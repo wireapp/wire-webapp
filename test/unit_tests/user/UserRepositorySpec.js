@@ -21,7 +21,7 @@ import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {ClientMapper} from 'src/script/client/ClientMapper';
-import {User} from 'src/script/entity/User';
+import {User} from 'Entities/User';
 import {EventRepository} from 'src/script/event/EventRepository';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {ConsentValue} from 'src/script/user/ConsentValue';

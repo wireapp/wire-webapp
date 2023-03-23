@@ -33,6 +33,8 @@ import Dexie from 'dexie';
 import keyboardjs from 'keyboardjs';
 import {container} from 'tsyringe';
 
+import {Conversation} from 'Entities/Conversation';
+import {User} from 'Entities/User';
 import {getLogger, Logger} from 'Util/Logger';
 
 import {createRandomUuid} from './util';
@@ -45,8 +47,6 @@ import {ConnectionRepository} from '../connection/ConnectionRepository';
 import {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationState} from '../conversation/ConversationState';
 import type {MessageRepository} from '../conversation/MessageRepository';
-import {Conversation} from '../entity/Conversation';
-import {User} from '../entity/User';
 import {EventRepository} from '../event/EventRepository';
 import {checkVersion} from '../lifecycle/newVersionHandler';
 import {Core} from '../service/CoreSingleton';

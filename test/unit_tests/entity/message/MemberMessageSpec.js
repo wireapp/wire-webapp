@@ -18,11 +18,11 @@
  */
 
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {FileAsset} from 'src/script/entity/message/FileAsset';
-import {MemberMessage} from 'src/script/entity/message/MemberMessage';
-import {Text} from 'src/script/entity/message/Text';
-import {User} from 'src/script/entity/User';
+import {ContentMessage} from 'Entities/message/ContentMessage';
+import {FileAsset} from 'Entities/message/FileAsset';
+import {MemberMessage} from 'Entities/message/MemberMessage';
+import {Text} from 'Entities/message/Text';
+import {User} from 'Entities/User';
 import 'src/script/localization/Localizer';
 import {StatusType} from 'src/script/message/StatusType';
 import {createRandomUuid} from 'Util/util';

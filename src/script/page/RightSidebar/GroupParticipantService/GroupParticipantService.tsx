@@ -24,13 +24,13 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
 import {ServiceDetails} from 'Components/panel/ServiceDetails';
+import {Conversation} from 'Entities/Conversation';
+import {User} from 'Entities/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
-import {Conversation} from '../../../entity/Conversation';
-import {User} from '../../../entity/User';
 import {IntegrationRepository} from '../../../integration/IntegrationRepository';
 import {ServiceEntity} from '../../../integration/ServiceEntity';
 import {generatePermissionHelpers} from '../../../user/UserPermission';

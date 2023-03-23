@@ -31,6 +31,7 @@ import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import ko from 'knockout';
 
+import {Conversation} from 'Entities/Conversation';
 import {
   ConversationDatabaseData,
   ConversationMapper,
@@ -38,7 +39,6 @@ import {
 } from 'src/script/conversation/ConversationMapper';
 import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
 import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
-import {Conversation} from 'src/script/entity/Conversation';
 import {BaseError} from 'src/script/error/BaseError';
 import {createRandomUuid} from 'Util/util';
 

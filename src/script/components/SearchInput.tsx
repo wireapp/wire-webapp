@@ -21,12 +21,12 @@ import React, {useEffect, useLayoutEffect, useRef} from 'react';
 
 import cx from 'classnames';
 
+import type {User} from 'Entities/User';
 import {isRemovalAction, isEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {Icon} from './Icon';
 
-import type {User} from '../entity/User';
 import {MAX_HANDLE_LENGTH} from '../user/UserHandleGenerator';
 
 export interface SearchInputProps {

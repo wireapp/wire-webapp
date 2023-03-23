@@ -19,7 +19,7 @@
 
 import {render} from '@testing-library/react';
 
-import type {Location} from 'src/script/entity/message/Location';
+import type {Location} from 'Entities/message/Location';
 
 import {LocationAsset} from './LocationAsset';
 

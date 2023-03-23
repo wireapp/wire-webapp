@@ -19,12 +19,12 @@
 
 import ko from 'knockout';
 
+import {User} from 'Entities/User';
 import {createRandomUuid} from 'Util/util';
 
 import {MediaConstraintsHandler, ScreensharingMethods} from './MediaConstraintsHandler';
 import {CurrentAvailableDeviceId} from './MediaDevicesHandler';
 
-import {User} from '../entity/User';
 import {UserState} from '../user/UserState';
 
 describe('MediaConstraintsHandler', () => {

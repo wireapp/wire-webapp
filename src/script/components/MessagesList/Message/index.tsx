@@ -23,6 +23,12 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
 
 import {InViewport} from 'Components/utils/InViewport';
+import type {Conversation} from 'Entities/Conversation';
+import type {ContentMessage} from 'Entities/message/ContentMessage';
+import type {DecryptErrorMessage} from 'Entities/message/DecryptErrorMessage';
+import type {MemberMessage as MemberMessageEntity} from 'Entities/message/MemberMessage';
+import {Message as BaseMessage} from 'Entities/message/Message';
+import type {User} from 'Entities/User';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getMessageMarkerType, MessageMarkerType} from 'Util/conversationMessages';
@@ -35,12 +41,6 @@ import {MessageWrapper} from './MessageWrapper';
 import {useMessageFocusedTabIndex} from './util';
 
 import type {MessageRepository} from '../../../conversation/MessageRepository';
-import type {Conversation} from '../../../entity/Conversation';
-import type {ContentMessage} from '../../../entity/message/ContentMessage';
-import type {DecryptErrorMessage} from '../../../entity/message/DecryptErrorMessage';
-import type {MemberMessage as MemberMessageEntity} from '../../../entity/message/MemberMessage';
-import {Message as BaseMessage} from '../../../entity/message/Message';
-import type {User} from '../../../entity/User';
 import {useRelativeTimestamp} from '../../../hooks/useRelativeTimestamp';
 import {TeamState} from '../../../team/TeamState';
 

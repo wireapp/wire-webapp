@@ -22,12 +22,12 @@ import React, {useEffect, useState} from 'react';
 import cx from 'classnames';
 
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
+import type {FileAsset} from 'Entities/message/FileAsset';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {noop} from 'Util/util';
 
 import {AssetTransferState} from '../../../../../../assets/AssetTransferState';
-import type {FileAsset} from '../../../../../../entity/message/FileAsset';
 import {AssetLoader} from '../AssetLoader';
 
 export interface MediaButtonProps {

@@ -36,6 +36,7 @@ import {TextInput} from 'Components/TextInput';
 import {BaseToggle} from 'Components/toggle/BaseToggle';
 import {InfoToggle} from 'Components/toggle/InfoToggle';
 import {UserSearchableList} from 'Components/UserSearchableList';
+import {User} from 'Entities/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleEnterDown, offEscKey, onEscKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -50,7 +51,6 @@ import {
   toggleFeature,
 } from '../../../conversation/ConversationAccessPermission';
 import {ConversationRepository} from '../../../conversation/ConversationRepository';
-import {User} from '../../../entity/User';
 import {isProtocolOption, ProtocolOption} from '../../../guards/Protocol';
 import {RootContext} from '../../../page/RootProvider';
 import {TeamState} from '../../../team/TeamState';

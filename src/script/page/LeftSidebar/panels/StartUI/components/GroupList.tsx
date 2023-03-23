@@ -19,9 +19,9 @@
 
 import React from 'react';
 
-import {GroupListItem} from './groupList/GroupListItem';
+import type {Conversation} from 'Entities/Conversation';
 
-import type {Conversation} from '../../../../../entity/Conversation';
+import {GroupListItem} from './groupList/GroupListItem';
 
 export interface GroupListProps {
   click: (group: Conversation) => void;

@@ -19,17 +19,16 @@
 
 import {render} from '@testing-library/react';
 
-import {Conversation} from 'src/script/entity/Conversation';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {FileAsset} from 'src/script/entity/message/FileAsset';
-import {LinkPreview} from 'src/script/entity/message/LinkPreview';
-import {MediumImage} from 'src/script/entity/message/MediumImage';
+import {Conversation} from 'Entities/Conversation';
+import {ContentMessage} from 'Entities/message/ContentMessage';
+import {FileAsset} from 'Entities/message/FileAsset';
+import {LinkPreview} from 'Entities/message/LinkPreview';
+import {MediumImage} from 'Entities/message/MediumImage';
+import {Text} from 'Entities/message/Text';
 import {MessageCategory} from 'src/script/message/MessageCategory';
 import {createRandomUuid} from 'Util/util';
 
 import {CollectionDetails} from './CollectionDetails';
-
-import {Text} from '../../../../entity/message/Text';
 
 jest.mock('Components/Image', () => ({
   Image: () => <div>Image</div>,

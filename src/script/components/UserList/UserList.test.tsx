@@ -22,7 +22,7 @@ import React from 'react';
 import {fireEvent, render} from '@testing-library/react';
 
 import {UserList} from 'Components/UserList/UserList';
-import {User} from 'src/script/entity/User';
+import {User} from 'Entities/User';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
 import {withTheme} from '../../auth/util/test/TestUtil';

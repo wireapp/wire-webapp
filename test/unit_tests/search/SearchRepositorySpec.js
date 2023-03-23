@@ -17,7 +17,7 @@
  *
  */
 
-import {User} from 'src/script/entity/User';
+import {User} from 'Entities/User';
 
 import {TestFactory} from '../../helper/TestFactory';
 

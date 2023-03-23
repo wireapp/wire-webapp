@@ -24,6 +24,7 @@ import UUID from 'uuidjs';
 
 import {UrlUtil, Runtime} from '@wireapp/commons';
 
+import type {Conversation} from 'Entities/Conversation';
 import {isTabKey} from 'Util/KeyboardUtil';
 import {findMentionAtPosition} from 'Util/MentionUtil';
 
@@ -31,7 +32,6 @@ import {loadValue} from './StorageUtil';
 
 import {QUERY_KEY} from '../auth/route';
 import {Config} from '../Config';
-import type {Conversation} from '../entity/Conversation';
 import {AuthError} from '../error/AuthError';
 import {MentionEntity} from '../message/MentionEntity';
 import {StorageKey} from '../storage/StorageKey';

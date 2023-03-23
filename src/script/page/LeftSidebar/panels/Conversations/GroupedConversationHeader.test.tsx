@@ -21,12 +21,12 @@ import {render} from '@testing-library/react';
 import ko from 'knockout';
 import {act} from 'react-dom/test-utils';
 
+import {Conversation} from 'Entities/Conversation';
 import {createRandomUuid} from 'Util/util';
 
 import {GroupedConversationHeader} from './GroupedConversationHeader';
 
 import {ConversationLabel, LabelType} from '../../../../conversation/ConversationLabelRepository';
-import {Conversation} from '../../../../entity/Conversation';
 
 describe('GroupedConversationHeader', () => {
   it('displays the unread badge', () => {

@@ -19,8 +19,8 @@
 
 import {renderHook} from '@testing-library/react';
 
-import {Conversation} from 'src/script/entity/Conversation';
-import {Message} from 'src/script/entity/message/Message';
+import {Conversation} from 'Entities/Conversation';
+import {Message} from 'Entities/message/Message';
 import {createRandomUuid} from 'Util/util';
 
 import {useReadReceiptSender} from './useReadReceipt';

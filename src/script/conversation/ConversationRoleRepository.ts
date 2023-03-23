@@ -20,12 +20,12 @@
 import {DefaultConversationRoleName as DefaultRole, ConversationRole} from '@wireapp/api-client/lib/conversation/';
 import {container} from 'tsyringe';
 
+import type {Conversation} from 'Entities/Conversation';
+import type {User} from 'Entities/User';
 import {Logger, getLogger} from 'Util/Logger';
 
 import type {ConversationService} from './ConversationService';
 
-import type {Conversation} from '../entity/Conversation';
-import type {User} from '../entity/User';
 import type {TeamRepository} from '../team/TeamRepository';
 import {TeamState} from '../team/TeamState';
 import {UserState} from '../user/UserState';

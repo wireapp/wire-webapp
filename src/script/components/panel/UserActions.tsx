@@ -24,6 +24,8 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {Conversation} from 'Entities/Conversation';
+import type {User} from 'Entities/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
@@ -33,8 +35,6 @@ import {PanelActions} from './PanelActions';
 
 import {ACCESS_STATE} from '../../conversation/AccessState';
 import type {ConversationRoleRepository} from '../../conversation/ConversationRoleRepository';
-import {Conversation} from '../../entity/Conversation';
-import type {User} from '../../entity/User';
 import type {ActionsViewModel} from '../../view_model/ActionsViewModel';
 
 export enum Actions {

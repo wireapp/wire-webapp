@@ -22,6 +22,11 @@ import ko from 'knockout';
 
 import {Article, LinkPreview} from '@wireapp/protocol-messaging';
 
+import type {Conversation} from 'Entities/Conversation';
+import type {ContentMessage} from 'Entities/message/ContentMessage';
+import {MediumImage} from 'Entities/message/MediumImage';
+import type {Message} from 'Entities/message/Message';
+import {Text} from 'Entities/message/Text';
 import {getLogger, Logger} from 'Util/Logger';
 import {clamp} from 'Util/NumberUtil';
 import {obfuscate} from 'Util/StringUtil';
@@ -31,11 +36,6 @@ import {arrayToBase64, noop} from 'Util/util';
 import {AbstractConversationEventHandler} from './AbstractConversationEventHandler';
 import {ConversationMapper} from './ConversationMapper';
 
-import type {Conversation} from '../entity/Conversation';
-import type {ContentMessage} from '../entity/message/ContentMessage';
-import {MediumImage} from '../entity/message/MediumImage';
-import type {Message} from '../entity/message/Message';
-import {Text} from '../entity/message/Text';
 import type {EventService} from '../event/EventService';
 import {EphemeralStatusType} from '../message/EphemeralStatusType';
 import {StatusType} from '../message/StatusType';

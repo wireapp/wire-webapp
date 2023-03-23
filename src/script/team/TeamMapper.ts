@@ -21,10 +21,11 @@ import type {MemberData, TeamData} from '@wireapp/api-client/lib/team/';
 import type {TeamUpdateData} from '@wireapp/api-client/lib/team/data/';
 import type {PermissionsData} from '@wireapp/api-client/lib/team/member/PermissionsData';
 
+import type {User} from 'Entities/User';
+
 import {TeamEntity} from './TeamEntity';
 import {TeamMemberEntity} from './TeamMemberEntity';
 
-import type {User} from '../entity/User';
 import {roleFromTeamPermissions} from '../user/UserPermission';
 
 export class TeamMapper {

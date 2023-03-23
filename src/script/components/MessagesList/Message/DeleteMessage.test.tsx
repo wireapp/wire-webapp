@@ -20,8 +20,8 @@
 import {render} from '@testing-library/react';
 import ko from 'knockout';
 
-import {DeleteMessage as DeleteMessageEntity} from 'src/script/entity/message/DeleteMessage';
-import {User} from 'src/script/entity/User';
+import {DeleteMessage as DeleteMessageEntity} from 'Entities/message/DeleteMessage';
+import {User} from 'Entities/User';
 
 import {DeleteMessage} from './DeleteMessage';
 

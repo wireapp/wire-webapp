@@ -21,12 +21,11 @@ import React, {useEffect, useMemo, useRef, useState} from 'react';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {IgnoreOutsideClickWrapper} from 'Components/InputBar/util/clickHandlers';
+import {User} from 'Entities/User';
 import {KEY} from 'Util/KeyboardUtil';
 import {clamp} from 'Util/NumberUtil';
 
 import {MentionSuggestionsItem} from './MentionSuggestionsItem';
-
-import {User} from '../../../../entity/User';
 
 type MentionSuggestionListProps = {
   onSelectionValidated: (data: User) => void;

@@ -22,7 +22,7 @@ import React from 'react';
 import {act, render} from '@testing-library/react';
 import ko from 'knockout';
 
-import {User} from 'src/script/entity/User';
+import {User} from 'Entities/User';
 import {ListState} from 'src/script/page/useAppState';
 import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
 

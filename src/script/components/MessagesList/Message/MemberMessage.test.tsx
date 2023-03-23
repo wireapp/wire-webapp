@@ -20,8 +20,8 @@
 import {render} from '@testing-library/react';
 import ko from 'knockout';
 
-import {MemberMessage as MemberMessageEntity} from 'src/script/entity/message/MemberMessage';
-import {User} from 'src/script/entity/User';
+import {MemberMessage as MemberMessageEntity} from 'Entities/message/MemberMessage';
+import {User} from 'Entities/User';
 
 import {MemberMessage} from './MemberMessage';
 

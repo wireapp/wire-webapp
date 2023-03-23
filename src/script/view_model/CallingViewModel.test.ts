@@ -23,6 +23,7 @@ import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {CALL_TYPE, CONV_TYPE, STATE} from '@wireapp/avs';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {Conversation} from 'Entities/Conversation';
 import {createRandomUuid} from 'Util/util';
 
 import {
@@ -34,7 +35,6 @@ import {
 } from './CallingViewModel.mocks';
 
 import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
-import {Conversation} from '../entity/Conversation';
 
 describe('CallingViewModel', () => {
   afterEach(() => {

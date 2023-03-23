@@ -25,6 +25,8 @@ import {container} from 'tsyringe';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {Conversation} from 'Entities/Conversation';
+import type {Message} from 'Entities/message/Message';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {isConversationEntity} from 'Util/TypePredicateUtil';
@@ -35,8 +37,6 @@ import {Config} from '../Config';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationState} from '../conversation/ConversationState';
 import {MessageRepository} from '../conversation/MessageRepository';
-import {Conversation} from '../entity/Conversation';
-import type {Message} from '../entity/message/Message';
 import {ConversationError} from '../error/ConversationError';
 import '../page/LeftSidebar';
 import '../page/MainContent';

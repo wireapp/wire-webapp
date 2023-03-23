@@ -25,6 +25,7 @@ import {Runtime} from '@wireapp/commons';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {useEnrichedFields} from 'Components/panel/EnrichedFields';
+import {User} from 'Entities/User';
 import {ContentState} from 'src/script/page/useAppState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -50,7 +51,6 @@ import {PreferencesSection} from './components/PreferencesSection';
 import {ClientRepository} from '../../../../client';
 import {Config} from '../../../../Config';
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
-import {User} from '../../../../entity/User';
 import {PropertiesRepository} from '../../../../properties/PropertiesRepository';
 import {StorageKey} from '../../../../storage';
 import {TeamState} from '../../../../team/TeamState';

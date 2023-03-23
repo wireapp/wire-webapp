@@ -26,6 +26,8 @@ import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal, usePrimaryModalState} from 'Components/Modals/PrimaryModal';
+import type {Conversation} from 'Entities/Conversation';
+import type {User} from 'Entities/User';
 import {iterateItem} from 'Util/ArrayUtil';
 import {isEscapeKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -38,8 +40,6 @@ import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 import type {CallingRepository} from '../calling/CallingRepository';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationState} from '../conversation/ConversationState';
-import type {Conversation} from '../entity/Conversation';
-import type {User} from '../entity/User';
 import {PanelState} from '../page/RightSidebar';
 import {useAppMainState} from '../page/state';
 import {ContentState, ListState, useAppState} from '../page/useAppState';

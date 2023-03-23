@@ -32,6 +32,10 @@ import {useEmoji} from 'Components/Emoji/useEmoji';
 import {Icon} from 'Components/Icon';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
+import {Conversation} from 'Entities/Conversation';
+import {ContentMessage} from 'Entities/message/ContentMessage';
+import {Text as TextAsset} from 'Entities/message/Text';
+import {User} from 'Entities/User';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from 'src/script/user/TypingIndicatorMode';
@@ -64,10 +68,6 @@ import {handleClickOutsideOfInputBar, IgnoreOutsideClickWrapper} from './util/cl
 
 import {Config} from '../../Config';
 import {MessageRepository, OutgoingQuote} from '../../conversation/MessageRepository';
-import {Conversation} from '../../entity/Conversation';
-import {ContentMessage} from '../../entity/message/ContentMessage';
-import {Text as TextAsset} from '../../entity/message/Text';
-import {User} from '../../entity/User';
 import {ConversationError} from '../../error/ConversationError';
 import {EventRepository} from '../../event/EventRepository';
 import {MentionEntity} from '../../message/MentionEntity';

@@ -24,6 +24,7 @@ import type {DexieError} from 'dexie';
 import {container} from 'tsyringe';
 
 import {Icon} from 'Components/Icon';
+import type {User} from 'Entities/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import type {Logger} from 'Util/Logger';
@@ -35,7 +36,6 @@ import {Config} from '../../Config';
 import {ConversationState} from '../../conversation/ConversationState';
 import type {MessageRepository} from '../../conversation/MessageRepository';
 import type {CryptographyRepository} from '../../cryptography/CryptographyRepository';
-import type {User} from '../../entity/User';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {DeviceId} from '../DeviceId';
 

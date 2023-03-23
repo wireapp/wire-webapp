@@ -22,10 +22,10 @@ import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {MenuItem} from 'Components/panel/PanelActions';
+import {Conversation} from 'Entities/Conversation';
 import {t} from 'Util/LocalizerUtil';
 
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
-import {Conversation} from '../../../../entity/Conversation';
 import * as UserPermission from '../../../../user/UserPermission';
 import {ActionsViewModel} from '../../../../view_model/ActionsViewModel';
 

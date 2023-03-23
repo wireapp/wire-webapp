@@ -20,11 +20,14 @@
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
 
-import {Asset} from 'src/script/entity/message/Asset';
-import type {FileAsset as FileAssetType} from 'src/script/entity/message/FileAsset';
-import type {Location} from 'src/script/entity/message/Location';
-import type {MediumImage} from 'src/script/entity/message/MediumImage';
-import {Text} from 'src/script/entity/message/Text';
+import {Asset} from 'Entities/message/Asset';
+import {Button} from 'Entities/message/Button';
+import {CompositeMessage} from 'Entities/message/CompositeMessage';
+import {ContentMessage} from 'Entities/message/ContentMessage';
+import type {FileAsset as FileAssetType} from 'Entities/message/FileAsset';
+import type {Location} from 'Entities/message/Location';
+import type {MediumImage} from 'Entities/message/MediumImage';
+import {Text} from 'Entities/message/Text';
 import {StatusType} from 'src/script/message/StatusType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
@@ -40,9 +43,6 @@ import {VideoAsset} from './VideoAsset';
 
 import {MessageActions} from '../..';
 import {AssetType} from '../../../../../assets/AssetType';
-import {Button} from '../../../../../entity/message/Button';
-import {CompositeMessage} from '../../../../../entity/message/CompositeMessage';
-import {ContentMessage} from '../../../../../entity/message/ContentMessage';
 
 const ContentAsset = ({
   asset,

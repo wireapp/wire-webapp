@@ -51,6 +51,13 @@ import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/pr
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {TYPING_TIMEOUT, useTypingIndicatorState} from 'Components/InputBar/components/TypingIndicator';
+import {Conversation} from 'Entities/Conversation';
+import {ContentMessage} from 'Entities/message/ContentMessage';
+import {DeleteConversationMessage} from 'Entities/message/DeleteConversationMessage';
+import {FileAsset} from 'Entities/message/FileAsset';
+import {MemberMessage} from 'Entities/message/MemberMessage';
+import {Message} from 'Entities/message/Message';
+import {User} from 'Entities/User';
 import {getNextItem} from 'Util/ArrayUtil';
 import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/FileTypeUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
@@ -105,13 +112,6 @@ import {
   ReactionEvent,
   TeamMemberLeaveEvent,
 } from '../conversation/EventBuilder';
-import {Conversation} from '../entity/Conversation';
-import {ContentMessage} from '../entity/message/ContentMessage';
-import {DeleteConversationMessage} from '../entity/message/DeleteConversationMessage';
-import {FileAsset} from '../entity/message/FileAsset';
-import {MemberMessage} from '../entity/message/MemberMessage';
-import {Message} from '../entity/message/Message';
-import {User} from '../entity/User';
 import {BackendClientError} from '../error/BackendClientError';
 import {BaseError, BASE_ERROR_TYPE} from '../error/BaseError';
 import {ConversationError} from '../error/ConversationError';
@@ -217,7 +217,7 @@ export class ConversationRepository {
         // If we have found some users that were removed from the conversation, we need to check if those users were also completely removed from the team
         const usersWithoutClients = await this.userRepository.getUserListFromBackend(removedTeamUserIds);
         await Promise.all(
-          usersWithoutClients
+          usersWithoutClients.found
             .filter(user => user.deleted)
             .map(user =>
               this.teamMemberLeave(

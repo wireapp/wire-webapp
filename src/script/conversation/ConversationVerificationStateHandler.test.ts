@@ -17,11 +17,11 @@
  *
  */
 
+import {Conversation} from 'Entities/Conversation';
+import {User} from 'Entities/User';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
 import {EventBuilder} from 'src/script/conversation/EventBuilder';
-import {Conversation} from 'src/script/entity/Conversation';
-import {User} from 'src/script/entity/User';
 import {createRandomUuid} from 'Util/util';
 
 import {ConversationRepository} from './ConversationRepository';

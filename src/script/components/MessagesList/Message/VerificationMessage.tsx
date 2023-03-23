@@ -24,11 +24,11 @@ import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {VerifiedIcon} from 'Components/VerifiedIcon';
+import {VerificationMessage as VerificationMessageEntity} from 'Entities/message/VerificationMessage';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {Declension, joinNames, t} from 'Util/LocalizerUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 
-import {VerificationMessage as VerificationMessageEntity} from '../../../entity/message/VerificationMessage';
 import {VerificationMessageType} from '../../../message/VerificationMessageType';
 
 export interface VerificationMessageProps {

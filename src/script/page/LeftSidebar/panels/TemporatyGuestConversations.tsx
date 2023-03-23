@@ -24,11 +24,11 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {CallingCell} from 'Components/calling/CallingCell';
 import {Icon} from 'Components/Icon';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {User} from 'Entities/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {Config} from '../../../Config';
-import {User} from '../../../entity/User';
 import {CallingViewModel} from '../../../view_model/CallingViewModel';
 import {ListViewModel} from '../../../view_model/ListViewModel';
 

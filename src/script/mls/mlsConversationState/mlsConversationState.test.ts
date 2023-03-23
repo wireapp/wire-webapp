@@ -19,11 +19,10 @@
 
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 
+import {Conversation} from 'Entities/Conversation';
 import {createRandomUuid} from 'Util/util';
 
 import {useMLSConversationState} from './mlsConversationState';
-
-import {Conversation} from '../../entity/Conversation';
 
 describe('mlsPendingStateUtil', () => {
   const createConversation = (protocol: ConversationProtocol) => {

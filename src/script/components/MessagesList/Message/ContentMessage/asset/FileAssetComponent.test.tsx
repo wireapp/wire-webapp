@@ -20,8 +20,8 @@
 import {render} from '@testing-library/react';
 import ko from 'knockout';
 
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {FileAsset} from 'src/script/entity/message/FileAsset';
+import {ContentMessage} from 'Entities/message/ContentMessage';
+import {FileAsset} from 'Entities/message/FileAsset';
 import {TeamState} from 'src/script/team/TeamState';
 
 import {FileAsset as FileAssetComponent} from './FileAssetComponent';

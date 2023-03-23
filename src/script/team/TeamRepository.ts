@@ -38,6 +38,7 @@ import {Runtime} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {User} from 'Entities/User';
 import {Environment} from 'Util/Environment';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
@@ -54,7 +55,6 @@ import {AssetRepository} from '../assets/AssetRepository';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
-import {User} from '../entity/User';
 import {EventSource} from '../event/EventSource';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {IntegrationMapper} from '../integration/IntegrationMapper';

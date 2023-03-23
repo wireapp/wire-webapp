@@ -20,10 +20,10 @@
 import {render, screen, waitFor} from '@testing-library/react';
 import {container} from 'tsyringe';
 
+import {ContentMessage} from 'Entities/message/ContentMessage';
+import {MediumImage} from 'Entities/message/MediumImage';
 import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
 import {AssetRepository} from 'src/script/assets/AssetRepository';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {MediumImage} from 'src/script/entity/message/MediumImage';
 
 import {ImageAsset, ImageAssetProps} from './ImageAsset';
 

@@ -22,9 +22,8 @@ import ko from 'knockout';
 
 import {VIDEO_STATE} from '@wireapp/avs';
 
+import {User} from 'Entities/User';
 import {matchQualifiedIds} from 'Util/QualifiedId';
-
-import {User} from '../entity/User';
 
 export type UserId = string;
 export type ClientId = string;

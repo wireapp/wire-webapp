@@ -20,7 +20,7 @@
 import {fireEvent, render} from '@testing-library/react';
 import ko from 'knockout';
 
-import type {Conversation} from 'src/script/entity/Conversation';
+import type {Conversation} from 'Entities/Conversation';
 import {TeamState} from 'src/script/team/TeamState';
 import * as Context from 'src/script/ui/ContextMenu';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';

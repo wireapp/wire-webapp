@@ -23,11 +23,11 @@ import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/';
 
 import {Icon} from 'Components/Icon';
 import {ReceiptModeToggle} from 'Components/toggle/ReceiptModeToggle';
+import {Conversation} from 'Entities/Conversation';
 import {t} from 'Util/LocalizerUtil';
 
 import {ConversationDetailsOption} from './ConversationDetailsOption';
 
-import {Conversation} from '../../../../../entity/Conversation';
 import {PanelEntity, PanelState} from '../../../RightSidebar';
 
 interface ConversationDetailsOptionsProps {

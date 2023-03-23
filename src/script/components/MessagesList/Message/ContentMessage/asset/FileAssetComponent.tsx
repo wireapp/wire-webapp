@@ -23,6 +23,8 @@ import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import {RestrictedFile} from 'Components/asset/RestrictedFile';
+import type {ContentMessage} from 'Entities/message/ContentMessage';
+import type {FileAsset as FileAssetType} from 'Entities/message/FileAsset';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -33,8 +35,6 @@ import {AssetHeader} from './AssetHeader';
 import {AssetLoader} from './AssetLoader';
 
 import {AssetTransferState} from '../../../../../assets/AssetTransferState';
-import type {ContentMessage} from '../../../../../entity/message/ContentMessage';
-import type {FileAsset as FileAssetType} from '../../../../../entity/message/FileAsset';
 import {TeamState} from '../../../../../team/TeamState';
 import {useMessageFocusedTabIndex} from '../../util';
 

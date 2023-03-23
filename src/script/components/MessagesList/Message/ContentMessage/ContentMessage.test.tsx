@@ -20,15 +20,15 @@
 import {render, waitFor} from '@testing-library/react';
 import ko from 'knockout';
 
-import {LinkPreview} from 'src/script/entity/message/LinkPreview';
+import {Conversation} from 'Entities/Conversation';
+import {ContentMessage} from 'Entities/message/ContentMessage';
+import {LinkPreview} from 'Entities/message/LinkPreview';
+import {Text} from 'Entities/message/Text';
+import {User} from 'Entities/User';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
 
 import {ContentMessageComponent, ContentMessageProps} from './ContentMessage';
 
-import {Conversation} from '../../../../entity/Conversation';
-import {ContentMessage} from '../../../../entity/message/ContentMessage';
-import {Text} from '../../../../entity/message/Text';
-import {User} from '../../../../entity/User';
 import {createRandomUuid} from '../../../../util/util';
 
 describe('message', () => {

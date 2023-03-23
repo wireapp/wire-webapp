@@ -42,9 +42,9 @@ import type {
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
+import type {Conversation as ConversationEntity} from 'Entities/Conversation';
 import {getLogger, Logger} from 'Util/Logger';
 
-import type {Conversation as ConversationEntity} from '../entity/Conversation';
 import type {EventService} from '../event/EventService';
 import {MessageCategory} from '../message/MessageCategory';
 import {search as fullTextSearch} from '../search/FullTextSearch';

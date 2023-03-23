@@ -21,11 +21,11 @@ import React from 'react';
 
 import cx from 'classnames';
 
+import type {User} from 'Entities/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {Config} from '../../Config';
-import type {User} from '../../entity/User';
 import {getPrivacyPolicyUrl} from '../../externalRoute';
 
 interface NoDevicesFoundProps {

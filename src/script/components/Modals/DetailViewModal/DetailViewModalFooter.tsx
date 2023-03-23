@@ -20,11 +20,10 @@
 import {FC} from 'react';
 
 import {Icon} from 'Components/Icon';
+import {Conversation} from 'Entities/Conversation';
+import {ContentMessage} from 'Entities/message/ContentMessage';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-
-import {Conversation} from '../../../entity/Conversation';
-import {ContentMessage} from '../../../entity/message/ContentMessage';
 
 interface DetailViewModalFooterProps {
   messageEntity: ContentMessage;

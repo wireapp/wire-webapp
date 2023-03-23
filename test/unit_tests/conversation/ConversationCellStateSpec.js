@@ -20,11 +20,11 @@
 import {generateCellState} from 'src/script/conversation/ConversationCellState';
 import {ConversationStatusIcon} from 'src/script/conversation/ConversationStatusIcon';
 import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
-import {Conversation} from 'src/script/entity/Conversation';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {PingMessage} from 'src/script/entity/message/PingMessage';
-import {Text} from 'src/script/entity/message/Text';
-import {User} from 'src/script/entity/User';
+import {Conversation} from 'Entities/Conversation';
+import {ContentMessage} from 'Entities/message/ContentMessage';
+import {PingMessage} from 'Entities/message/PingMessage';
+import {Text} from 'Entities/message/Text';
+import {User} from 'Entities/User';
 import {t} from 'Util/LocalizerUtil';
 import {createRandomUuid} from 'Util/util';
 

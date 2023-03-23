@@ -23,6 +23,7 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import type {Conversation} from 'Entities/Conversation';
 import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
@@ -31,7 +32,6 @@ import {ConversationVerificationState} from './ConversationVerificationState';
 
 import type {ClientEntity} from '../client/ClientEntity';
 import {EventBuilder} from '../conversation/EventBuilder';
-import type {Conversation} from '../entity/Conversation';
 import type {EventRepository} from '../event/EventRepository';
 import {VerificationMessageType} from '../message/VerificationMessageType';
 import {UserState} from '../user/UserState';

@@ -20,10 +20,10 @@
 import {render, screen} from '@testing-library/react';
 import ko from 'knockout';
 
-import {DeleteConversationMessage} from 'src/script/entity/message/DeleteConversationMessage';
-import {MessageTimerUpdateMessage} from 'src/script/entity/message/MessageTimerUpdateMessage';
-import {ReceiptModeUpdateMessage} from 'src/script/entity/message/ReceiptModeUpdateMessage';
-import {RenameMessage} from 'src/script/entity/message/RenameMessage';
+import {DeleteConversationMessage} from 'Entities/message/DeleteConversationMessage';
+import {MessageTimerUpdateMessage} from 'Entities/message/MessageTimerUpdateMessage';
+import {ReceiptModeUpdateMessage} from 'Entities/message/ReceiptModeUpdateMessage';
+import {RenameMessage} from 'Entities/message/RenameMessage';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
 
 import {SystemMessage} from './SystemMessage';

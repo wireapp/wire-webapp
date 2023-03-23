@@ -54,6 +54,7 @@
         "map": [
           ["Util", "./src/script/util/"],
           ["Components", "./src/script/components/"],
+          ["Entities", "./src/script/entity/"],
           ["I18n", "./src/i18n/"],
           ["Resource", "./resource/"],
           ["src", "./src/"],

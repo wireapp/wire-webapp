@@ -25,13 +25,14 @@ import {CSSTransition, SwitchTransition} from 'react-transition-group';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {User} from 'Entities/User';
+
 import {Archive} from './panels/Archive';
 import {Conversations} from './panels/Conversations';
 import {Preferences} from './panels/Preferences';
 import {StartUI} from './panels/StartUI';
 import {TemporaryGuestConversations} from './panels/TemporatyGuestConversations';
 
-import {User} from '../../entity/User';
 import {ListViewModel} from '../../view_model/ListViewModel';
 import {useAppState, ListState} from '../useAppState';
 

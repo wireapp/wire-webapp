@@ -19,9 +19,9 @@
 
 import {render} from '@testing-library/react';
 
-import {GroupAvatar} from './GroupAvatar';
+import {User} from 'Entities/User';
 
-import {User} from '../../entity/User';
+import {GroupAvatar} from './GroupAvatar';
 
 describe('GroupAvatar', () => {
   it('renders avatar', async () => {

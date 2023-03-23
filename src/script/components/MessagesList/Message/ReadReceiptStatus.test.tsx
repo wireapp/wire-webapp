@@ -20,7 +20,7 @@
 import {render, fireEvent} from '@testing-library/react';
 import ko from 'knockout';
 
-import {Message as MessageEntity} from 'src/script/entity/message/Message';
+import {Message as MessageEntity} from 'Entities/message/Message';
 import {ReadReceipt} from 'src/script/storage';
 import {formatTimeShort} from 'Util/TimeUtil';
 

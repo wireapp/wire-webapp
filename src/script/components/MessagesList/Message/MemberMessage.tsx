@@ -22,14 +22,13 @@ import React from 'react';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {Icon} from 'Components/Icon';
-import {User} from 'src/script/entity/User';
+import {MemberMessage as MemberMessageEntity} from 'Entities/message/MemberMessage';
+import {User} from 'Entities/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {ConnectedMessage} from './memberMessage/ConnectedMessage';
 import {MessageTime} from './MessageTime';
-
-import {MemberMessage as MemberMessageEntity} from '../../../entity/message/MemberMessage';
 
 export interface MemberMessageProps {
   classifiedDomains?: string[];

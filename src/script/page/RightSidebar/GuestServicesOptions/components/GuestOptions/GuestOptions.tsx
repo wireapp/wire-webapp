@@ -27,6 +27,7 @@ import {CopyToClipboard} from 'Components/CopyToClipboard';
 import {Icon} from 'Components/Icon';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {BaseToggle} from 'Components/toggle/BaseToggle';
+import {Conversation} from 'Entities/Conversation';
 import {copyText} from 'Util/ClipboardUtil';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -35,7 +36,6 @@ import {Config} from '../../../../../Config';
 import {ACCESS_STATE} from '../../../../../conversation/AccessState';
 import {teamPermissionsForAccessState} from '../../../../../conversation/ConversationAccessPermission';
 import {ConversationRepository} from '../../../../../conversation/ConversationRepository';
-import {Conversation} from '../../../../../entity/Conversation';
 import {TeamRepository} from '../../../../../team/TeamRepository';
 
 const COPY_LINK_CONFIRM_DURATION = 1500;

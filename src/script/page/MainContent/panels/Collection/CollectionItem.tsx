@@ -23,8 +23,8 @@ import {Image} from 'Components/Image';
 import {AudioAsset} from 'Components/MessagesList/Message/ContentMessage/asset/AudioAsset';
 import {FileAsset} from 'Components/MessagesList/Message/ContentMessage/asset/FileAssetComponent';
 import {LinkPreviewAsset} from 'Components/MessagesList/Message/ContentMessage/asset/LinkPreviewAssetComponent';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {MediumImage} from 'src/script/entity/message/MediumImage';
+import {ContentMessage} from 'Entities/message/ContentMessage';
+import {MediumImage} from 'Entities/message/MediumImage';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {isOfCategory} from './utils';

@@ -31,6 +31,7 @@ import {LegalHoldModal} from 'Components/Modals/LegalHoldModal/LegalHoldModal';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
 import {showUserModal, UserModal} from 'Components/Modals/UserModal';
+import {User} from 'Entities/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {AppLock} from './AppLock';
@@ -43,7 +44,6 @@ import {useAppState, ContentState} from './useAppState';
 import {useWindowTitle} from './useWindowTitle';
 
 import {ConversationState} from '../conversation/ConversationState';
-import {User} from '../entity/User';
 import {useInitializeRootFontSize} from '../hooks/useRootFontSize';
 import {App} from '../main/app';
 import {generateConversationUrl} from '../router/routeGenerator';

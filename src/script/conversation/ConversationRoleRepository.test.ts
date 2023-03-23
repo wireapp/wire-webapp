@@ -19,13 +19,13 @@
 
 import {ConversationRole, DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/lib/conversation/';
 
+import {Conversation} from 'Entities/Conversation';
+import {User} from 'Entities/User';
 import {createRandomUuid} from 'Util/util';
 
 import {ConversationRoleRepository, Permissions} from './ConversationRoleRepository';
 
 import {TestFactory} from '../../../test/helper/TestFactory';
-import {Conversation} from '../entity/Conversation';
-import {User} from '../entity/User';
 import {TeamEntity} from '../team/TeamEntity';
 
 describe('ConversationRoleRepository', () => {

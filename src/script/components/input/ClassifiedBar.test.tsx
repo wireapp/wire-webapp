@@ -19,7 +19,7 @@
 
 import {render} from '@testing-library/react';
 
-import {User} from 'src/script/entity/User';
+import {User} from 'Entities/User';
 import {createRandomUuid} from 'Util/util';
 
 import {ClassifiedBar} from './ClassifiedBar';

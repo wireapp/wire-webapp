@@ -22,6 +22,7 @@ import React, {useEffect, useState} from 'react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
+import type {Conversation} from 'Entities/Conversation';
 import {ListViewModel} from 'src/script/view_model/ListViewModel';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
@@ -39,7 +40,6 @@ import {
 } from '../../../../conversation/ConversationLabelRepository';
 import type {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import {ConversationState} from '../../../../conversation/ConversationState';
-import type {Conversation} from '../../../../entity/Conversation';
 
 const useLabels = (conversationLabelRepository: ConversationLabelRepository) => {
   const {labels: conversationLabels} = useKoSubscribableChildren(conversationLabelRepository, ['labels']);

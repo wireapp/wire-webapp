@@ -21,6 +21,7 @@ import React from 'react';
 
 import cx from 'classnames';
 
+import type {User} from 'Entities/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -28,7 +29,6 @@ import {DeviceCard} from './DeviceCard';
 
 import type {ClientEntity} from '../../client/ClientEntity';
 import {Config} from '../../Config';
-import type {User} from '../../entity/User';
 import {getPrivacyWhyUrl} from '../../externalRoute';
 
 interface DeviceListProps {

@@ -18,7 +18,7 @@
  */
 
 import {ConversationLabelRepository} from 'src/script/conversation/ConversationLabelRepository';
-import {Conversation} from 'src/script/entity/Conversation';
+import {Conversation} from 'Entities/Conversation';
 import {createRandomUuid} from 'Util/util';
 
 describe('ConversationLabelRepository', () => {

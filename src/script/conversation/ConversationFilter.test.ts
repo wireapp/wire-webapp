@@ -24,11 +24,11 @@ import {
 } from '@wireapp/api-client/lib/conversation';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
 
+import {Conversation} from 'Entities/Conversation';
+
 import {ConversationFilter} from './ConversationFilter';
 import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';
 import {ConversationStatus} from './ConversationStatus';
-
-import {Conversation} from '../entity/Conversation';
 
 describe('ConversationFilter', () => {
   describe('showCallControls', () => {

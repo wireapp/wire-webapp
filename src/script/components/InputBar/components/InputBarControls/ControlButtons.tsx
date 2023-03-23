@@ -20,8 +20,8 @@
 import React from 'react';
 
 import {Icon} from 'Components/Icon';
+import {Conversation} from 'Entities/Conversation';
 import {Config} from 'src/script/Config';
-import {Conversation} from 'src/script/entity/Conversation';
 import {t} from 'Util/LocalizerUtil';
 
 import {GiphyButton} from './GiphyButton';

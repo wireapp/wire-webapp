@@ -20,9 +20,9 @@
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {create} from 'zustand';
 
-import {loadState, saveState} from './conversationStateStorage';
+import {Conversation} from 'Entities/Conversation';
 
-import {Conversation} from '../../entity/Conversation';
+import {loadState, saveState} from './conversationStateStorage';
 
 export interface MLSConversationState {
   /** list of conversations that are fully joined */

@@ -29,6 +29,7 @@ import {IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-ki
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {Icon} from 'Components/Icon';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';
+import type {Conversation} from 'Entities/Conversation';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -50,7 +51,6 @@ import type {Call} from '../../calling/Call';
 import {MuteState} from '../../calling/CallState';
 import type {Participant} from '../../calling/Participant';
 import type {Grid} from '../../calling/videoGridHandler';
-import type {Conversation} from '../../entity/Conversation';
 import {DeviceTypes, ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
 import type {Multitasking} from '../../notification/NotificationRepository';
 import {useAppState} from '../../page/useAppState';

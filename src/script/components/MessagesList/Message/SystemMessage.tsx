@@ -20,12 +20,12 @@
 import React from 'react';
 
 import {Icon} from 'Components/Icon';
-import {SystemMessage as SystemMessageEntity} from 'src/script/entity/message/SystemMessage';
+import {RenameMessage} from 'Entities/message/RenameMessage';
+import {SystemMessage as SystemMessageEntity} from 'Entities/message/SystemMessage';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {MessageTime} from './MessageTime';
 
-import {RenameMessage} from '../../../entity/message/RenameMessage';
 import {SystemMessageType} from '../../../message/SystemMessageType';
 export interface SystemMessageProps {
   message: SystemMessageEntity;

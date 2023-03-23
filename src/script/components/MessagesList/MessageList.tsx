@@ -23,13 +23,14 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
+import {Conversation as ConversationEntity, Conversation} from 'Entities/Conversation';
+import {ContentMessage} from 'Entities/message/ContentMessage';
+import {DecryptErrorMessage} from 'Entities/message/DecryptErrorMessage';
+import {MemberMessage} from 'Entities/message/MemberMessage';
+import {Message as MessageEntity} from 'Entities/message/Message';
+import {User} from 'Entities/User';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {DecryptErrorMessage} from 'src/script/entity/message/DecryptErrorMessage';
-import {MemberMessage} from 'src/script/entity/message/MemberMessage';
-import {Message as MessageEntity} from 'src/script/entity/message/Message';
-import {User} from 'src/script/entity/User';
 import {useRoveFocus} from 'src/script/hooks/useRoveFocus';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -38,7 +39,6 @@ import {useResizeObserver} from 'Util/DOM/resizeObserver';
 
 import {Message, MessageActions} from './Message';
 
-import {Conversation as ConversationEntity, Conversation} from '../../entity/Conversation';
 import {isMemberMessage, isContentMessage} from '../../guards/Message';
 import {StatusType} from '../../message/StatusType';
 

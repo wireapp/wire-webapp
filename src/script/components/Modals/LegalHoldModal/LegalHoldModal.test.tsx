@@ -22,6 +22,8 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import ko from 'knockout';
 
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
+import {Conversation} from 'Entities/Conversation';
+import {User} from 'Entities/User';
 
 import {LegalHoldModal, LegalHoldModalType} from './LegalHoldModal';
 
@@ -31,8 +33,6 @@ import {ClientRepository} from '../../../client';
 import {ConversationRepository} from '../../../conversation/ConversationRepository';
 import {MessageRepository} from '../../../conversation/MessageRepository';
 import {CryptographyRepository} from '../../../cryptography/CryptographyRepository';
-import {Conversation} from '../../../entity/Conversation';
-import {User} from '../../../entity/User';
 import {SearchRepository} from '../../../search/SearchRepository';
 import {SearchService} from '../../../search/SearchService';
 import {TeamRepository} from '../../../team/TeamRepository';

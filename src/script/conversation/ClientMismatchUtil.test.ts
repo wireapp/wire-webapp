@@ -17,10 +17,11 @@
  *
  */
 
+import {User} from 'Entities/User';
+
 import {extractClientDiff, findDeletedClients} from './ClientMismatchUtil';
 
 import {ClientEntity} from '../client/ClientEntity';
-import {User} from '../entity/User';
 
 describe('ClientMismatchUtil', () => {
   describe('findDeletedClients', () => {

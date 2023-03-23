@@ -19,9 +19,9 @@
 
 import {render} from '@testing-library/react';
 
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {LinkPreview} from 'src/script/entity/message/LinkPreview';
-import {Text} from 'src/script/entity/message/Text';
+import {ContentMessage} from 'Entities/message/ContentMessage';
+import {LinkPreview} from 'Entities/message/LinkPreview';
+import {Text} from 'Entities/message/Text';
 import {StatusType} from 'src/script/message/StatusType';
 
 import {LinkPreviewAsset} from './LinkPreviewAssetComponent';

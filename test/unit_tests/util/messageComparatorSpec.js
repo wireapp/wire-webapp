@@ -17,7 +17,7 @@
  *
  */
 
-import {Text} from 'src/script/entity/message/Text';
+import {Text} from 'Entities/message/Text';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
 import {createRandomUuid} from 'Util/util';
 

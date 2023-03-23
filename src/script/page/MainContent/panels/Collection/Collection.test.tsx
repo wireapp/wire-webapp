@@ -20,12 +20,13 @@
 import {fireEvent, render, waitFor, act} from '@testing-library/react';
 import {container} from 'tsyringe';
 
+import {Conversation} from 'Entities/Conversation';
+import {ContentMessage} from 'Entities/message/ContentMessage';
+import {FileAsset} from 'Entities/message/FileAsset';
+import {LinkPreview} from 'Entities/message/LinkPreview';
+import {MediumImage} from 'Entities/message/MediumImage';
+import {Text} from 'Entities/message/Text';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {Conversation} from 'src/script/entity/Conversation';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {FileAsset} from 'src/script/entity/message/FileAsset';
-import {LinkPreview} from 'src/script/entity/message/LinkPreview';
-import {MediumImage} from 'src/script/entity/message/MediumImage';
 import {MessageCategory} from 'src/script/message/MessageCategory';
 import {createRandomUuid} from 'Util/util';
 
@@ -33,7 +34,6 @@ import {Collection} from './Collection';
 
 import {AssetRepository} from '../../../../assets/AssetRepository';
 import {MessageRepository} from '../../../../conversation/MessageRepository';
-import {Text} from '../../../../entity/message/Text';
 
 jest.mock('./CollectionDetails', () => ({
   CollectionDetails: () => <div>CollectionDetails</div>,

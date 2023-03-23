@@ -21,9 +21,10 @@ import {ConversationProtocol, CONVERSATION_TYPE} from '@wireapp/api-client/lib/c
 
 import {randomUUID} from 'crypto';
 
+import {Conversation} from 'Entities/Conversation';
+
 import {ConversationState} from './ConversationState';
 
-import {Conversation} from '../entity/Conversation';
 import {TeamState} from '../team/TeamState';
 import {UserState} from '../user/UserState';
 

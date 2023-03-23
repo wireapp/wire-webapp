@@ -19,7 +19,7 @@
 
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 
-import {Conversation} from 'src/script/entity/Conversation';
+import {Conversation} from 'Entities/Conversation';
 import {ClientEvent} from 'src/script/event/Client';
 import {ServiceMiddleware} from 'src/script/event/preprocessor/ServiceMiddleware';
 

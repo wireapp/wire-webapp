@@ -20,10 +20,10 @@
 import {render} from '@testing-library/react';
 import {act} from 'react-dom/test-utils';
 
+import {User} from 'Entities/User';
+
 import {TypingIndicator, TypingIndicatorProps} from './TypingIndicator';
 import {useTypingIndicatorState} from './TypingIndicator.state';
-
-import {User} from '../../../../entity/User';
 
 describe('TypingIndicator', () => {
   afterEach(() => {

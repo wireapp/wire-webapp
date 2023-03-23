@@ -25,9 +25,11 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {Conversation} from 'Entities/Conversation';
+import {CompositeMessage} from 'Entities/message/CompositeMessage';
+import {ContentMessage} from 'Entities/message/ContentMessage';
+import {Text} from 'Entities/message/Text';
 import {OutgoingQuote} from 'src/script/conversation/MessageRepository';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {Text} from 'src/script/entity/message/Text';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
 import {t} from 'Util/LocalizerUtil';
 
@@ -45,8 +47,6 @@ import {SystemMessage} from './SystemMessage';
 import {VerificationMessage} from './VerificationMessage';
 
 import {AssetRepository} from '../../../assets/AssetRepository';
-import {Conversation} from '../../../entity/Conversation';
-import {CompositeMessage} from '../../../entity/message/CompositeMessage';
 import {TeamState} from '../../../team/TeamState';
 import {ContextMenuEntry} from '../../../ui/ContextMenu';
 

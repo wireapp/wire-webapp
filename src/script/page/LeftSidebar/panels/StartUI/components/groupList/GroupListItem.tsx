@@ -23,10 +23,10 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {GroupAvatar} from 'Components/avatar/GroupAvatar';
+import type {Conversation} from 'Entities/Conversation';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 
-import type {Conversation} from '../../../../../../entity/Conversation';
 import {generateConversationUrl} from '../../../../../../router/routeGenerator';
 import {navigate} from '../../../../../../router/Router';
 

@@ -17,11 +17,11 @@
  *
  */
 
+import {Conversation} from 'Entities/Conversation';
+import {ContentMessage} from 'Entities/message/ContentMessage';
 import {generateConversationInputStorageKey} from 'Util/util';
 
 import {MessageRepository} from '../conversation/MessageRepository';
-import {Conversation} from '../entity/Conversation';
-import {ContentMessage} from '../entity/message/ContentMessage';
 import {MentionEntity} from '../message/MentionEntity';
 import {StorageRepository} from '../storage';
 

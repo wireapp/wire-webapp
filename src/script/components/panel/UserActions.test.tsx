@@ -21,9 +21,9 @@ import {render} from '@testing-library/react';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import ko from 'knockout';
 
+import {Conversation} from 'Entities/Conversation';
+import {User} from 'Entities/User';
 import {ConversationRoleRepository} from 'src/script/conversation/ConversationRoleRepository';
-import {Conversation} from 'src/script/entity/Conversation';
-import {User} from 'src/script/entity/User';
 import {ActionsViewModel} from 'src/script/view_model/ActionsViewModel';
 import {noop} from 'Util/util';
 

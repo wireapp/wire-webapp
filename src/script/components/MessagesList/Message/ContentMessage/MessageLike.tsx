@@ -21,7 +21,7 @@ import React from 'react';
 
 import cx from 'classnames';
 
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import {ContentMessage} from 'Entities/message/ContentMessage';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 

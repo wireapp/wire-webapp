@@ -17,10 +17,9 @@
  *
  */
 
+import type {Conversation} from 'Entities/Conversation';
+import type {User} from 'Entities/User';
 import {matchQualifiedIds} from 'Util/QualifiedId';
-
-import type {Conversation} from '../entity/Conversation';
-import type {User} from '../entity/User';
 
 export class ConversationFilter {
   static is1To1WithUser(conversationEntity: Conversation, userEntity: User): boolean {

@@ -19,9 +19,10 @@
 
 import {escape} from 'underscore';
 
+import type {User} from 'Entities/User';
+
 import {Substitutes, Declension, StringIdentifer} from './LocalizerUtil.types';
 
-import type {User} from '../../entity/User';
 import {sortUsersByPriority} from '../StringUtil';
 
 export const DEFAULT_LOCALE = 'en';

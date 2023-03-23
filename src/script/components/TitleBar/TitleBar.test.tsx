@@ -27,6 +27,8 @@ import * as uiKit from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {TitleBar} from 'Components/TitleBar';
+import {Conversation} from 'Entities/Conversation';
+import {User} from 'Entities/User';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {ContentState} from 'src/script/page/useAppState';
 
@@ -34,8 +36,6 @@ import {TestFactory} from '../../../../test/helper/TestFactory';
 import {CallingRepository} from '../../calling/CallingRepository';
 import {CallState} from '../../calling/CallState';
 import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
-import {Conversation} from '../../entity/Conversation';
-import {User} from '../../entity/User';
 import {PanelState} from '../../page/RightSidebar/RightSidebar';
 import {TeamState} from '../../team/TeamState';
 import {UserState} from '../../user/UserState';
