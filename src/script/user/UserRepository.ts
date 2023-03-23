@@ -163,30 +163,31 @@ export class UserRepository {
   /**
    * Will load the availability status to the team users and subscribe to changes.
    */
-  async loadTeamUserAvailabilities(): Promise<void> {
-    const users = this.userState.users();
-    if (this.userState.isTeam() && users.length) {
-      const availabilities = await this.userService.loadUserFromDb();
-
-      this.logger.log(`Loaded state of '${users.length}' users from database`, users);
-      /** availabilities we have in the DB that are not matching any loaded users */
-      const orphanAvailabilities = availabilities.filter(
-        availability => !users.find(user => matchQualifiedIds(user.qualifiedId, availability)),
-      );
-
-      // Remove availabilities that are not linked to any loaded users
-      orphanAvailabilities.forEach(async availability => {
-        await this.userService.removeUserFromDb({id: availability.id, domain: availability.domain ?? ''});
-      });
-
-      users.forEach(user => {
-        const userAvailability = availabilities.find(availability => matchQualifiedIds(availability, user.qualifiedId));
-        if (userAvailability) {
-          user.availability(userAvailability.availability);
-        }
-        user.subscribeToChanges();
-      });
+  async loadTeamUserAvailabilities(teamMembers: User[]): Promise<void> {
+    if (!teamMembers.length) {
+      return;
     }
+
+    const availabilities = await this.userService.loadUserFromDb();
+
+    this.logger.log(`Loaded state of '${teamMembers.length}' users from database`, teamMembers);
+    /** availabilities we have in the DB that are not matching any loaded users */
+    const orphanAvailabilities = availabilities.filter(
+      availability => !teamMembers.find(user => matchQualifiedIds(user.qualifiedId, availability)),
+    );
+
+    // Remove availabilities that are not linked to any loaded users
+    orphanAvailabilities.forEach(async availability => {
+      await this.userService.removeUserFromDb({id: availability.id, domain: availability.domain ?? ''});
+    });
+
+    teamMembers.forEach(user => {
+      const userAvailability = availabilities.find(availability => matchQualifiedIds(availability, user.qualifiedId));
+      if (userAvailability) {
+        user.availability(userAvailability.availability);
+      }
+      user.subscribeToChanges();
+    });
   }
 
   /**
@@ -632,19 +633,8 @@ export class UserRepository {
     return knownUserEntities.concat(userEntities);
   }
 
-  getUserListFromBackend(userIds: QualifiedId[]): Promise<APIClientUser[]> {
-    const qualifiedUserIds = userIds.map(({id, domain}) => ({domain: domain || this.userState.self().domain, id}));
-    return this.userService.getUsers(qualifiedUserIds);
-  }
-
-  /**
-   * Is the user the logged in user?
-   */
-  isMe(userId: User | string): boolean {
-    if (typeof userId !== 'string') {
-      userId = userId.id;
-    }
-    return this.userState.self().id === userId;
+  getUserListFromBackend(userIds: QualifiedId[]) {
+    return this.userService.getUsers(userIds);
   }
 
   /**

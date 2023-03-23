@@ -125,10 +125,9 @@ export class UserService {
    */
   async getUsers(userIds: QualifiedId[]) {
     if (userIds.length === 0) {
-      return Promise.resolve([]);
+      return [];
     }
-    const {found} = await this.apiClient.api.user.postListUsers({qualified_ids: userIds});
-    return found;
+    return (await this.apiClient.api.user.postListUsers({qualified_ids: userIds})).found;
   }
 
   /**
