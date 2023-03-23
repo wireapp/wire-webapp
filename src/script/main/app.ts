@@ -392,7 +392,7 @@ export class App {
       onProgress(10);
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
-      const team = await teamRepository.initTeam();
+      const team = await teamRepository.initTeam(selfUser.teamId);
 
       const conversationEntities = await conversationRepository.loadConversations();
 
