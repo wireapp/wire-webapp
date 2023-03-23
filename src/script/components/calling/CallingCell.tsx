@@ -593,7 +593,6 @@ const CallingCell: React.FC<CallingCellProps> = ({
                           <li key={participant.clientId} className="call-ui__participant-list__participant">
                             <CallParticipantsListItem
                               key={participant.clientId}
-                              participant={participant.user}
                               callParticipant={participant}
                               selfInTeam={selfUser?.inTeam()}
                               isSelfVerified={isSelfVerified}

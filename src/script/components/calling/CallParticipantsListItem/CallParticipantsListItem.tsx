@@ -26,37 +26,37 @@ import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {ParticipantMicOnIcon} from 'Components/calling/ParticipantMicOnIcon';
 import {Icon} from 'Components/Icon';
 import {Participant} from 'src/script/calling/Participant';
-import {User} from 'src/script/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
-import {noop, setContextMenuPosition} from 'Util/util';
+import {setContextMenuPosition} from 'Util/util';
 
-export interface ParticipantItemProps extends Omit<React.HTMLProps<HTMLDivElement>, 'onClick' | 'onKeyDown'> {
-  participant: User;
+export interface ParticipantItemProps {
   callParticipant: Participant;
   selfInTeam?: boolean;
   isSelfVerified?: boolean;
   external?: boolean;
   showDropdown?: boolean;
+  onContextMenu?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
 }
 
 export const CallParticipantsListItem = ({
   callParticipant,
   external,
   isSelfVerified = false,
-  participant,
   selfInTeam,
   showDropdown = false,
-  onContextMenu = noop,
+  onContextMenu,
 }: React.PropsWithChildren<ParticipantItemProps>): React.ReactElement | null => {
+  const {user} = callParticipant;
+
   const {
     isDirectGuest,
     is_verified: isVerified,
     availability,
     name: participantName,
-  } = useKoSubscribableChildren(participant, ['isDirectGuest', 'is_verified', 'availability', 'name']);
+  } = useKoSubscribableChildren(user, ['isDirectGuest', 'is_verified', 'availability', 'name']);
 
   const {sharesCamera, sharesScreen, isActivelySpeaking, isMuted} = useKoSubscribableChildren(callParticipant, [
     'sharesCamera',
@@ -68,12 +68,12 @@ export const CallParticipantsListItem = ({
   const handleContextKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if ([KEY.SPACE, KEY.ENTER].includes(event.key)) {
       const newEvent = setContextMenuPosition(event);
-      onContextMenu(newEvent as unknown as React.MouseEvent<HTMLDivElement>);
+      onContextMenu?.(newEvent as unknown as React.MouseEvent<HTMLDivElement>);
     }
   };
 
-  const isSelf = participant.isMe;
-  const isFederated = participant.isFederated;
+  const isSelf = user.isMe;
+  const isFederated = user.isFederated;
   const selfString = `(${capitalizeFirstChar(t('conversationYouNominative'))})`;
 
   return (
@@ -90,7 +90,7 @@ export const CallParticipantsListItem = ({
     >
       <div className="participant-item">
         <div className="participant-item__image">
-          <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={participant} aria-hidden="true" />
+          <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={user} aria-hidden="true" />
         </div>
 
         <div className="participant-item__content">
@@ -118,7 +118,7 @@ export const CallParticipantsListItem = ({
             <button
               tabIndex={TabIndex.UNFOCUSABLE}
               className="participant-item__content__chevron"
-              onClick={event => onContextMenu(event as unknown as React.MouseEvent<HTMLDivElement>)}
+              onClick={event => onContextMenu?.(event as unknown as React.MouseEvent<HTMLDivElement>)}
               type="button"
               data-uie-name="participant-menu-icon"
             >
