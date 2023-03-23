@@ -32,7 +32,7 @@ import {t} from 'Util/LocalizerUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 import {setContextMenuPosition} from 'Util/util';
 
-export interface ParticipantItemProps {
+export interface CallParticipantsListItemProps {
   callParticipant: Participant;
   selfInTeam?: boolean;
   isSelfVerified?: boolean;
@@ -48,14 +48,14 @@ export const CallParticipantsListItem = ({
   selfInTeam,
   showDropdown = false,
   onContextMenu,
-}: React.PropsWithChildren<ParticipantItemProps>): React.ReactElement | null => {
+}: CallParticipantsListItemProps) => {
   const {user} = callParticipant;
 
   const {
     isDirectGuest,
     is_verified: isVerified,
     availability,
-    name: participantName,
+    name: userName,
   } = useKoSubscribableChildren(user, ['isDirectGuest', 'is_verified', 'availability', 'name']);
 
   const {sharesCamera, sharesScreen, isActivelySpeaking, isMuted} = useKoSubscribableChildren(callParticipant, [
@@ -72,8 +72,7 @@ export const CallParticipantsListItem = ({
     }
   };
 
-  const isSelf = user.isMe;
-  const isFederated = user.isFederated;
+  const {isMe: isSelf, isFederated} = user;
   const selfString = `(${capitalizeFirstChar(t('conversationYouNominative'))})`;
 
   return (
@@ -84,8 +83,8 @@ export const CallParticipantsListItem = ({
       onClick={onContextMenu}
       onKeyDown={handleContextKeyDown}
       data-uie-name="item-user"
-      data-uie-value={participantName}
-      aria-label={t('accessibility.openConversation', participantName)}
+      data-uie-value={userName}
+      aria-label={t('accessibility.openConversation', userName)}
       className="participant-item-wrapper no-interaction no-underline"
     >
       <div className="participant-item">
@@ -96,18 +95,16 @@ export const CallParticipantsListItem = ({
         <div className="participant-item__content">
           <div className="participant-item__content__text">
             <div className="participant-item__content__name-wrapper">
-              {selfInTeam && (
+              {selfInTeam ? (
                 <AvailabilityState
                   availability={availability}
                   className="participant-item__content__availability participant-item__content__name"
                   dataUieName="status-name"
-                  label={participantName}
+                  label={userName}
                 />
-              )}
-
-              {!selfInTeam && (
+              ) : (
                 <div className="participant-item__content__name" data-uie-name="status-name">
-                  {participantName}
+                  {userName}
                 </div>
               )}
               {isSelf && <div className="participant-item__content__self-indicator">{selfString}</div>}
@@ -156,26 +153,21 @@ export const CallParticipantsListItem = ({
             <Icon.Verified data-uie-name="status-verified" />
           </span>
         )}
+        {sharesScreen && <Icon.Screenshare className="screenshare-icon" data-uie-name="status-screenshare" />}
 
-        {
-          <>
-            {sharesScreen && <Icon.Screenshare className="screenshare-icon" data-uie-name="status-screenshare" />}
+        {sharesCamera && <Icon.Camera className="camera-icon" data-uie-name="status-video" />}
 
-            {sharesCamera && <Icon.Camera className="camera-icon" data-uie-name="status-video" />}
+        {!isMuted && (
+          <ParticipantMicOnIcon
+            className="participant-mic-on-icon"
+            isActive={isActivelySpeaking}
+            data-uie-name={isActivelySpeaking ? 'status-active-speaking' : 'status-audio-on'}
+          />
+        )}
 
-            {!isMuted && (
-              <ParticipantMicOnIcon
-                className="participant-mic-on-icon"
-                isActive={isActivelySpeaking}
-                data-uie-name={isActivelySpeaking ? 'status-active-speaking' : 'status-audio-on'}
-              />
-            )}
-
-            {isMuted && (
-              <Icon.MicOff className="mic-off-icon" data-uie-name="status-audio-off" style={{height: 12, width: 12}} />
-            )}
-          </>
-        }
+        {isMuted && (
+          <Icon.MicOff className="mic-off-icon" data-uie-name="status-audio-off" style={{height: 12, width: 12}} />
+        )}
       </div>
     </div>
   );
