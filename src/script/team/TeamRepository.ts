@@ -121,13 +121,15 @@ export class TeamRepository {
     );
   };
 
-  initTeam = async (): Promise<void> => {
+  initTeam = async (): Promise<TeamEntity | undefined> => {
     const team = await this.getTeam();
-    if (this.userState.self().teamId) {
+    const inTeam = this.userState.self().teamId;
+    if (inTeam) {
       await this.updateTeamMembers(team);
     }
     this.updateFeatureConfig();
     this.scheduleTeamRefresh();
+    return inTeam ? team : undefined;
   };
 
   async updateFeatureConfig() {
