@@ -33,14 +33,14 @@ export enum MODE {
 
 export interface ServiceListProps {
   services: ServiceEntity[];
-  onClick: (serviceEntity: ServiceEntity) => void;
+  onServiceClick: (serviceEntity: ServiceEntity) => void;
   isSearching?: boolean;
   mode?: MODE;
   dataUieName?: string;
 }
 
 export const ServiceList: React.FC<ServiceListProps> = ({
-  onClick,
+  onServiceClick,
   isSearching = false,
   mode = MODE.DEFAULT,
   services,
@@ -54,7 +54,7 @@ export const ServiceList: React.FC<ServiceListProps> = ({
       {services.map(service => (
         <li key={service.id}>
           <div className="search-list-button" data-uie-name={`service-list-service-${service.id}`}>
-            <ServiceListItem service={service} onClick={onClick} />
+            <ServiceListItem service={service} onClick={onServiceClick} />
           </div>
         </li>
       ))}

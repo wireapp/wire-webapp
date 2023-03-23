@@ -31,7 +31,7 @@ describe('ServiceList', () => {
     const serviceEntity2 = new ServiceEntity({id: createRandomUuid()});
 
     const props = {
-      onClick: () => {},
+      onServiceClick: () => {},
       isSearching: false,
       services: [serviceEntity1, serviceEntity2],
     };
@@ -44,7 +44,7 @@ describe('ServiceList', () => {
 
   it('shows the "no results found" element when there are no services', () => {
     const props = {
-      onClick: () => {},
+      onServiceClick: () => {},
       isSearching: true,
       services: [] as ServiceEntity[],
     };

@@ -76,7 +76,7 @@ export const ServicesTab: React.FC<{
             </ul>
           )}
 
-          <ServiceList onClick={onClickService} services={services} />
+          <ServiceList onServiceClick={onClickService} services={services} />
         </>
       )}
       {services.length === 0 && !isInitial && (

@@ -262,7 +262,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
                     </ul>
                   )}
 
-                  <ServiceList services={services} onClick={onServiceSelect} isSearching={isSearching} />
+                  <ServiceList services={services} onServiceClick={onServiceSelect} isSearching={isSearching} />
                 </>
               )}
 
