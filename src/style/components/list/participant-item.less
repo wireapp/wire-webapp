@@ -17,8 +17,6 @@
  *
  */
 
-@participant-max-width: 180px;
-
 .participant-item-wrapper {
   position: relative;
   display: block;
@@ -95,7 +93,7 @@
     overflow: hidden;
     height: 56px;
     align-items: center;
-    padding-right: 24px;
+    padding-right: 16px;
     margin: 0;
     cursor: pointer;
 
@@ -120,7 +118,6 @@
       &__text {
         display: flex;
         min-width: 0; // this will ensure that ellipses is working
-        max-width: @participant-max-width;
         min-height: @avatar-diameter-m;
         flex-direction: column;
         flex-grow: 1;

@@ -401,13 +401,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
                 <div className="conversation-details__participants">
                   <h3 className="conversation-details__list-head">{t('conversationDetailsServices')}</h3>
 
-                  <ServiceList
-                    services={serviceParticipants}
-                    click={showService}
-                    noUnderline
-                    arrow
-                    dataUieName="list-services"
-                  />
+                  <ServiceList services={serviceParticipants} onClick={showService} dataUieName="list-services" />
                 </div>
               )}
             </>
