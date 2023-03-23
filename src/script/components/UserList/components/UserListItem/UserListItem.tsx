@@ -17,7 +17,7 @@
  *
  */
 
-import React, {ChangeEvent, useId, useMemo, useState} from 'react';
+import React, {ChangeEvent, useId, useState} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
@@ -36,11 +36,11 @@ import {capitalizeFirstChar} from 'Util/StringUtil';
 import {User} from '../../../../entity/User';
 
 export interface UserListItemProps {
-  badge?: boolean;
   canSelect: boolean;
   customInfo?: string;
   external: boolean;
   hideInfo?: boolean;
+  isHighlighted: boolean;
   isSelected: boolean;
   isSelfVerified: boolean;
   mode: UserlistMode;
@@ -54,11 +54,11 @@ export interface UserListItemProps {
 }
 
 const UserListItem = ({
-  badge,
   canSelect,
   customInfo,
   external,
   hideInfo,
+  isHighlighted,
   isSelected,
   isSelfVerified = false,
   mode = UserlistMode.DEFAULT,
@@ -83,14 +83,13 @@ const UserListItem = ({
   const {isMe: isSelf, isFederated} = user;
   const isTemporaryGuest = user.isTemporaryGuest();
 
-  const hasCustomInfo = !!customInfo;
-  const hasUsernameInfo = !hideInfo && !hasCustomInfo && !isTemporaryGuest;
+  const hasUsernameInfo = !hideInfo && !customInfo && !isTemporaryGuest;
   const isOthersMode = mode === UserlistMode.OTHERS;
 
   const selfString = `(${capitalizeFirstChar(t('conversationYouNominative'))})`;
 
-  const contentInfoText = useMemo(() => {
-    if (hasCustomInfo) {
+  const getContentInfoText = () => {
+    if (customInfo) {
       return customInfo;
     }
 
@@ -103,7 +102,9 @@ const UserListItem = ({
     }
 
     return user.handle;
-  }, [customInfo, expirationText, hasCustomInfo, hideInfo, isTemporaryGuest, user.handle]);
+  };
+
+  const contentInfoText = getContentInfoText();
 
   const RenderParticipant = () => {
     return (
@@ -117,16 +118,14 @@ const UserListItem = ({
             <div className="participant-item__content">
               <div className="participant-item__content__text">
                 <div className="participant-item__content__name-wrapper">
-                  {selfInTeam && (
+                  {selfInTeam ? (
                     <AvailabilityState
                       availability={availability}
                       className="participant-item__content__availability participant-item__content__name"
                       dataUieName="status-name"
                       label={userName}
                     />
-                  )}
-
-                  {!selfInTeam && (
+                  ) : (
                     <div className="participant-item__content__name" data-uie-name="status-name">
                       {userName}
                     </div>
@@ -146,11 +145,12 @@ const UserListItem = ({
                       {contentInfoText}
                     </span>
 
-                    {hasUsernameInfo && badge && (
-                      <span className="participant-item__content__badge" data-uie-name="status-partner">
-                        {badge}
-                      </span>
-                    )}
+                    {/* TODO: It's not used, saved for future if it will be needed, and add prop badge */}
+                    {/*{hasUsernameInfo && badge && (*/}
+                    {/*  <span className="participant-item__content__badge" data-uie-name="status-partner">*/}
+                    {/*    {badge}*/}
+                    {/*  </span>*/}
+                    {/*)}*/}
                   </div>
                 )}
               </div>
@@ -197,6 +197,7 @@ const UserListItem = ({
   };
 
   const commonClassName = cx('participant-item-wrapper', {
+    highlighted: isHighlighted,
     'no-interaction': noInteraction,
     'no-underline': noUnderline,
   });

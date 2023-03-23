@@ -23,11 +23,12 @@ import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import {Icon} from 'Components/Icon';
-import {UserListItem} from 'Components/UserList/components/UserListItem';
 import {collapseButton, collapseIcon} from 'Components/UserList/UserList.styles';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isEnterKey, isSpaceKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
+
+import {UserListItem} from './components/UserListItem';
 
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
 import {ConversationState} from '../../conversation/ConversationState';
@@ -134,7 +135,7 @@ export const UserList = ({
             noInteraction={noSelfInteraction && user.isMe}
             user={user}
             noUnderline={isLastItem || noUnderline}
-            badge={highlightedUserIds.includes(user.id)}
+            isHighlighted={highlightedUserIds.includes(user.id)}
             customInfo={infos?.[user.id]}
             canSelect={isSelectable}
             isSelected={isSelected(user)}
