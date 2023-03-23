@@ -123,11 +123,11 @@ export class UserService {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/users
    * @example ['0bb84213-8cc2-4bb1-9e0b-b8dd522396d5', '15ede065-72b3-433a-9917-252f076ed031']
    */
-  getUsers(userIds: QualifiedId[]): Promise<APIClientUser[]> {
+  async getUsers(userIds: QualifiedId[]) {
     if (userIds.length === 0) {
-      return Promise.resolve([]);
+      return [];
     }
-    return this.apiClient.api.user.postListUsers({qualified_ids: userIds});
+    return (await this.apiClient.api.user.postListUsers({qualified_ids: userIds})).found;
   }
 
   /**

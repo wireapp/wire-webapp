@@ -17,72 +17,53 @@
  *
  */
 
-import React, {Fragment} from 'react';
+import React from 'react';
 
 import cx from 'classnames';
 
-import {ParticipantItem} from 'Components/list/ParticipantItem';
-import {KEY} from 'Util/KeyboardUtil';
+import {ServiceListItem} from 'Components/ServiceList/components/ServiceListItem';
 import {t} from 'Util/LocalizerUtil';
 
 import type {ServiceEntity} from '../../integration/ServiceEntity';
-
-export interface ServiceListProps {
-  services: ServiceEntity[];
-  click: (serviceEntity: ServiceEntity) => void;
-  arrow: boolean;
-  noUnderline: boolean;
-  isSearching?: boolean;
-  mode?: MODE;
-  dataUieName?: string;
-}
 
 export enum MODE {
   COMPACT = 'ServiceList.MODE.COMPACT',
   DEFAULT = 'ServiceList.MODE.DEFAULT',
 }
 
+export interface ServiceListProps {
+  services: ServiceEntity[];
+  onServiceClick: (serviceEntity: ServiceEntity) => void;
+  isSearching?: boolean;
+  mode?: MODE;
+  dataUieName?: string;
+}
+
 export const ServiceList: React.FC<ServiceListProps> = ({
-  arrow,
-  click,
+  onServiceClick,
   isSearching = false,
   mode = MODE.DEFAULT,
-  noUnderline,
   services,
   dataUieName = '',
-}) => {
-  const handleKeyDown = (event: KeyboardEvent, service: ServiceEntity) => {
-    if (event.key === KEY.ENTER || event.key === KEY.SPACE) {
-      click(service);
-    }
-  };
+}) => (
+  <>
+    <ul
+      className={cx('search-list', mode === MODE.COMPACT ? 'search-list-sm' : 'search-list-lg')}
+      data-uie-name={dataUieName}
+    >
+      {services.map(service => (
+        <li key={service.id}>
+          <div className="search-list-button" data-uie-name={`service-list-service-${service.id}`}>
+            <ServiceListItem service={service} onClick={onServiceClick} />
+          </div>
+        </li>
+      ))}
+    </ul>
 
-  return (
-    <Fragment>
-      <ul
-        className={cx('search-list', mode === MODE.COMPACT ? 'search-list-sm' : 'search-list-lg')}
-        data-uie-name={dataUieName}
-      >
-        {services.map(service => (
-          <li key={service.id}>
-            <div className="search-list-button" data-uie-name={`service-list-service-${service.id}`}>
-              <ParticipantItem
-                participant={service}
-                noUnderline={noUnderline}
-                showArrow={arrow}
-                onClick={() => click(service)}
-                onKeyDown={(service, event) => handleKeyDown(event, service)}
-              />
-            </div>
-          </li>
-        ))}
-      </ul>
-
-      {isSearching && !services.length && (
-        <div className="no-results" data-uie-name="service-list-no-results">
-          {t('searchListNoMatches')}
-        </div>
-      )}
-    </Fragment>
-  );
-};
+    {isSearching && !services.length && (
+      <div className="no-results" data-uie-name="service-list-no-results">
+        {t('searchListNoMatches')}
+      </div>
+    )}
+  </>
+);
