@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [40.1.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@40.0.0...@wireapp/core@40.1.0) (2023-03-23)
+
+### Features
+
+* **core:** allow retrying to send asset metadatas on an existing message ([#4995](https://github.com/wireapp/wire-web-packages/issues/4995)) ([3553d2a](https://github.com/wireapp/wire-web-packages/commit/3553d2a71b43a890ea99c4d6f479b222dd758bd0))
+
 # [40.0.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@39.3.4...@wireapp/core@40.0.0) (2023-03-22)
 
 ### Features
