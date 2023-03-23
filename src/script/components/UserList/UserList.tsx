@@ -123,7 +123,7 @@ export const UserList = ({
     onClick?.(userEntity, event);
   };
 
-  const renderParticipantItem = useCallback(
+  const renderListItem = useCallback(
     (user: User, isLastItem: boolean = false) => {
       const isSelected = (userEntity: User): boolean =>
         isSelectable && selectedUsers.some(user => user.id === userEntity.id);
@@ -132,10 +132,10 @@ export const UserList = ({
         <li key={user.id}>
           <UserListItem
             noInteraction={noSelfInteraction && user.isMe}
-            participant={user}
+            user={user}
             noUnderline={isLastItem || noUnderline}
-            highlighted={highlightedUserIds.includes(user.id)}
-            customInfo={infos && infos[user.id]}
+            badge={highlightedUserIds.includes(user.id)}
+            customInfo={infos?.[user.id]}
             canSelect={isSelectable}
             isSelected={isSelected(user)}
             mode={mode}
@@ -189,7 +189,7 @@ export const UserList = ({
 
             {admins.length > 0 && (
               <ul className={cx('search-list', cssClasses)} data-uie-name="list-admins">
-                {admins.slice(0, maxShownUsers).map(user => renderParticipantItem(user))}
+                {admins.slice(0, maxShownUsers).map(user => renderListItem(user))}
               </ul>
             )}
 
@@ -208,7 +208,7 @@ export const UserList = ({
             </h3>
 
             <ul className={cx('search-list', cssClasses)} data-uie-name="list-members">
-              {members.slice(0, maxShownUsers - admins.length).map(user => renderParticipantItem(user))}
+              {members.slice(0, maxShownUsers - admins.length).map(user => renderListItem(user))}
             </ul>
           </>
         )}
@@ -258,7 +258,7 @@ export const UserList = ({
                 currentUsers.map((user, index) => {
                   const isLastItem = index === selectedUsersCount - 1;
 
-                  return renderParticipantItem(user, isLastItem);
+                  return renderListItem(user, isLastItem);
                 })}
             </ul>
           </>
@@ -283,7 +283,7 @@ export const UserList = ({
             truncatedUsers
               .slice(0, maxShownUsers)
               .filter(user => !isSelected(user))
-              .map(user => renderParticipantItem(user))}
+              .map(user => renderListItem(user))}
         </ul>
       </>
     );

@@ -32,27 +32,25 @@ import {InViewport} from 'Components/utils/InViewport';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
-import {noop} from 'Util/util';
 
 import {User} from '../../../../entity/User';
 
-export interface ParticipantItemProps extends Omit<React.HTMLProps<HTMLDivElement>, 'onClick' | 'onKeyDown'> {
+export interface UserListItemProps {
   badge?: boolean;
-  canSelect?: boolean;
+  canSelect: boolean;
   customInfo?: string;
-  external?: boolean;
+  external: boolean;
   hideInfo?: boolean;
-  highlighted?: boolean;
-  isSelected?: boolean;
-  isSelfVerified?: boolean;
-  mode?: UserlistMode;
-  noInteraction?: boolean;
-  noUnderline?: boolean;
-  onClick?: (user: User, event: MouseEvent | ChangeEvent) => void;
-  onKeyDown?: (user: User, event: KeyboardEvent) => void;
-  participant: User;
-  selfInTeam?: boolean;
-  showArrow?: boolean;
+  isSelected: boolean;
+  isSelfVerified: boolean;
+  mode: UserlistMode;
+  noInteraction: boolean;
+  noUnderline: boolean;
+  onClick: (user: User, event: MouseEvent | ChangeEvent) => void;
+  onKeyDown: (user: User, event: KeyboardEvent) => void;
+  user: User;
+  selfInTeam: boolean;
+  showArrow: boolean;
 }
 
 const UserListItem = ({
@@ -61,42 +59,35 @@ const UserListItem = ({
   customInfo,
   external,
   hideInfo,
-  highlighted = false,
   isSelected,
   isSelfVerified = false,
   mode = UserlistMode.DEFAULT,
-  noInteraction = false,
+  noInteraction,
   noUnderline = false,
-  participant,
+  user,
   selfInTeam,
-  onClick = noop,
-  onKeyDown = noop,
-}: ParticipantItemProps): React.ReactElement => {
+  onClick,
+  onKeyDown,
+}: UserListItemProps) => {
   const checkboxId = useId();
   const [isInViewport, setIsInViewport] = useState(false);
-
-  const {isMe: isSelf, isFederated} = participant;
-  const isTemporaryGuest = participant.isTemporaryGuest();
-
-  const hasCustomInfo = !!customInfo;
-  const hasUsernameInfo = !hideInfo && !hasCustomInfo && !isTemporaryGuest;
-  const isOthersMode = mode === UserlistMode.OTHERS;
-
-  const selfString = `(${capitalizeFirstChar(t('conversationYouNominative'))})`;
 
   const {
     is_verified: isVerified,
     isDirectGuest,
     availability,
     expirationText,
-    name: participantName,
-  } = useKoSubscribableChildren(participant, [
-    'isDirectGuest',
-    'is_verified',
-    'availability',
-    'expirationText',
-    'name',
-  ]);
+    name: userName,
+  } = useKoSubscribableChildren(user, ['isDirectGuest', 'is_verified', 'availability', 'expirationText', 'name']);
+
+  const {isMe: isSelf, isFederated} = user;
+  const isTemporaryGuest = user.isTemporaryGuest();
+
+  const hasCustomInfo = !!customInfo;
+  const hasUsernameInfo = !hideInfo && !hasCustomInfo && !isTemporaryGuest;
+  const isOthersMode = mode === UserlistMode.OTHERS;
+
+  const selfString = `(${capitalizeFirstChar(t('conversationYouNominative'))})`;
 
   const contentInfoText = useMemo(() => {
     if (hasCustomInfo) {
@@ -111,8 +102,8 @@ const UserListItem = ({
       return expirationText;
     }
 
-    return participant.handle;
-  }, [customInfo, expirationText, hasCustomInfo, hideInfo, isTemporaryGuest, participant.handle]);
+    return user.handle;
+  }, [customInfo, expirationText, hasCustomInfo, hideInfo, isTemporaryGuest, user.handle]);
 
   const RenderParticipant = () => {
     return (
@@ -120,7 +111,7 @@ const UserListItem = ({
         {isInViewport && (
           <>
             <div className="participant-item__image">
-              <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={participant} aria-hidden="true" />
+              <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={user} aria-hidden="true" />
             </div>
 
             <div className="participant-item__content">
@@ -131,15 +122,16 @@ const UserListItem = ({
                       availability={availability}
                       className="participant-item__content__availability participant-item__content__name"
                       dataUieName="status-name"
-                      label={participantName}
+                      label={userName}
                     />
                   )}
 
                   {!selfInTeam && (
                     <div className="participant-item__content__name" data-uie-name="status-name">
-                      {participantName}
+                      {userName}
                     </div>
                   )}
+
                   {isSelf && <div className="participant-item__content__self-indicator">{selfString}</div>}
                 </div>
 
@@ -201,11 +193,10 @@ const UserListItem = ({
 
   const dataUieValues = {
     'data-uie-name': 'item-user',
-    'data-uie-value': participantName,
+    'data-uie-value': userName,
   };
 
   const commonClassName = cx('participant-item-wrapper', {
-    highlighted,
     'no-interaction': noInteraction,
     'no-underline': noUnderline,
   });
@@ -213,10 +204,10 @@ const UserListItem = ({
   return (
     <>
       {canSelect ? (
-        <div aria-label={t('accessibility.openConversation', participantName)} className={commonClassName}>
+        <div aria-label={t('accessibility.openConversation', userName)} className={commonClassName}>
           <Checkbox
             checked={isSelected}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => onClick(participant, event)}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => onClick(user, event)}
             id={checkboxId}
             labelBeforeCheckbox
             aligncenter={false}
@@ -233,11 +224,11 @@ const UserListItem = ({
         <div
           tabIndex={TabIndex.FOCUSABLE}
           role="button"
-          aria-label={t('accessibility.openConversation', participantName)}
+          aria-label={t('accessibility.openConversation', userName)}
           className={commonClassName}
           {...(!noInteraction && {
-            onClick: event => onClick(participant, event.nativeEvent),
-            onKeyDown: event => onKeyDown(participant, event.nativeEvent),
+            onClick: event => onClick(user, event.nativeEvent),
+            onKeyDown: event => onKeyDown(user, event.nativeEvent),
           })}
           {...dataUieValues}
         >
