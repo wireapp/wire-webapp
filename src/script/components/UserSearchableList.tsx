@@ -158,9 +158,9 @@ const UserSearchableList: React.FC<UserListProps> = ({
     user => !props.excludeUsers?.some(excludeId => matchQualifiedIds(user.qualifiedId, excludeId)),
   );
   const isEmptyUserList = userList.length === 0;
-  const hasUsers = users.length === 0;
-  const noResultsDataUieName = hasUsers ? 'status-all-added' : 'status-no-matches';
-  const noResultsTranslationText = hasUsers ? 'searchListEveryoneParticipates' : 'searchListNoMatches';
+  const isSearching = filter.length > 0;
+  const noResultsDataUieName = !isSearching ? 'status-all-added' : 'status-no-matches';
+  const noResultsTranslationText = !isSearching ? 'searchListEveryoneParticipates' : 'searchListNoMatches';
 
   return (
     <div className="user-list-wrapper" data-uie-name={dataUieName} role="list">
