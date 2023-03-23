@@ -26,7 +26,7 @@ import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 
 import {AvailabilityState} from 'Components/AvailabilityState';
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import {Icon} from 'Components/Icon';
+import {UserBadges} from 'Components/UserBadges';
 import {UserlistMode} from 'Components/UserList';
 import {InViewport} from 'Components/utils/InViewport';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -156,35 +156,14 @@ const UserListItem = ({
               </div>
             </div>
 
-            {!isOthersMode && isDirectGuest && (
-              <span
-                className="guest-icon with-tooltip with-tooltip--external"
-                data-tooltip={t('conversationGuestIndicator')}
-              >
-                <Icon.Guest data-uie-name="status-guest" />
-              </span>
-            )}
-
-            {isFederated && (
-              <span
-                className="federation-icon with-tooltip with-tooltip--external"
-                data-tooltip={t('conversationFederationIndicator')}
-              >
-                <Icon.Federation data-uie-name="status-federated-user" />
-              </span>
-            )}
-
-            {external && (
-              <span className="partner-icon with-tooltip with-tooltip--external" data-tooltip={t('rolePartner')}>
-                <Icon.External data-uie-name="status-external" />
-              </span>
-            )}
-
-            {isSelfVerified && isVerified && (
-              <span className="verified-icon">
-                <Icon.Verified data-uie-name="status-verified" />
-              </span>
-            )}
+            <UserBadges
+              config={{
+                guest: !isOthersMode && isDirectGuest,
+                federated: isFederated,
+                external,
+                verified: isSelfVerified && isVerified,
+              }}
+            />
           </>
         )}
       </InViewport>

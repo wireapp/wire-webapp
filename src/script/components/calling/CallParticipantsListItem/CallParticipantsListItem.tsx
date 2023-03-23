@@ -25,6 +25,7 @@ import {AvailabilityState} from 'Components/AvailabilityState';
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {ParticipantMicOnIcon} from 'Components/calling/ParticipantMicOnIcon';
 import {Icon} from 'Components/Icon';
+import {UserBadges} from 'Components/UserBadges';
 import {Participant} from 'src/script/calling/Participant';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
@@ -124,35 +125,15 @@ export const CallParticipantsListItem = ({
           )}
         </div>
 
-        {isDirectGuest && (
-          <span
-            className="guest-icon with-tooltip with-tooltip--external"
-            data-tooltip={t('conversationGuestIndicator')}
-          >
-            <Icon.Guest data-uie-name="status-guest" />
-          </span>
-        )}
+        <UserBadges
+          config={{
+            guest: isDirectGuest,
+            federated: isFederated,
+            external,
+            verified: isSelfVerified && isVerified,
+          }}
+        />
 
-        {isFederated && (
-          <span
-            className="federation-icon with-tooltip with-tooltip--external"
-            data-tooltip={t('conversationFederationIndicator')}
-          >
-            <Icon.Federation data-uie-name="status-federated-user" />
-          </span>
-        )}
-
-        {external && (
-          <span className="partner-icon with-tooltip with-tooltip--external" data-tooltip={t('rolePartner')}>
-            <Icon.External data-uie-name="status-external" />
-          </span>
-        )}
-
-        {isSelfVerified && isVerified && (
-          <span className="verified-icon">
-            <Icon.Verified data-uie-name="status-verified" />
-          </span>
-        )}
         {sharesScreen && <Icon.Screenshare className="screenshare-icon" data-uie-name="status-screenshare" />}
 
         {sharesCamera && <Icon.Camera className="camera-icon" data-uie-name="status-video" />}
