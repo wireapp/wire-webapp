@@ -50,6 +50,7 @@ export const CallParticipantsListItem = ({
   onContextMenu,
 }: CallParticipantsListItemProps) => {
   const {user} = callParticipant;
+  const {isMe: isSelf, isFederated} = user;
 
   const {
     isDirectGuest,
@@ -72,7 +73,6 @@ export const CallParticipantsListItem = ({
     });
   };
 
-  const {isMe: isSelf, isFederated} = user;
   const selfString = `(${capitalizeFirstChar(t('conversationYouNominative'))})`;
 
   return (
