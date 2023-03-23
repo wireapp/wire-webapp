@@ -145,7 +145,10 @@ export function buildFileDataMessage(
   return genericMessage;
 }
 
-export function buildFileMetaDataMessage(payloadBundle: FileAssetMetaDataMessage['content']): GenericMessage {
+export function buildFileMetaDataMessage(
+  payloadBundle: FileAssetMetaDataMessage['content'],
+  messageId: string = createId(),
+): GenericMessage {
   const {expectsReadConfirmation, legalHoldStatus, metaData} = payloadBundle;
 
   const original = Asset.Original.create({
@@ -165,7 +168,7 @@ export function buildFileMetaDataMessage(payloadBundle: FileAssetMetaDataMessage
 
   const genericMessage = GenericMessage.create({
     [GenericMessageType.ASSET]: assetMessage,
-    messageId: createId(),
+    messageId,
   });
 
   return genericMessage;
