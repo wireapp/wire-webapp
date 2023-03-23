@@ -403,9 +403,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
 
                   <ServiceList
                     services={serviceParticipants}
-                    click={showService}
-                    noUnderline
-                    arrow
+                    onServiceClick={showService}
                     dataUieName="list-services"
                   />
                 </div>
