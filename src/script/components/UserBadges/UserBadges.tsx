@@ -48,8 +48,9 @@ const badgeToComponentMap = {
   ),
 } as const;
 
+type BadgeKey = keyof typeof badgeToComponentMap;
 interface UserBadgesProps {
-  config: {[key in keyof typeof badgeToComponentMap]?: boolean};
+  config: {[key in BadgeKey]?: boolean};
 }
 
 export const UserBadges = ({config}: UserBadgesProps) => {
@@ -58,11 +59,7 @@ export const UserBadges = ({config}: UserBadgesProps) => {
       {Object.entries(config)
         .filter(([_badge, shouldShow]) => shouldShow)
         .map(([badge]) => {
-          return (
-            <React.Fragment key={badge}>
-              {badgeToComponentMap[badge as keyof typeof badgeToComponentMap]()}
-            </React.Fragment>
-          );
+          return <React.Fragment key={badge}>{badgeToComponentMap[badge as BadgeKey]()}</React.Fragment>;
         })}
       ;
     </>
