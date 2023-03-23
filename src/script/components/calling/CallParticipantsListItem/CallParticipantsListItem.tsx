@@ -27,7 +27,7 @@ import {ParticipantMicOnIcon} from 'Components/calling/ParticipantMicOnIcon';
 import {Icon} from 'Components/Icon';
 import {Participant} from 'src/script/calling/Participant';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {KEY} from 'Util/KeyboardUtil';
+import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 import {setContextMenuPosition} from 'Util/util';
@@ -66,10 +66,10 @@ export const CallParticipantsListItem = ({
   ]);
 
   const handleContextKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    if ([KEY.SPACE, KEY.ENTER].includes(event.key)) {
+    handleKeyDown(event, () => {
       const newEvent = setContextMenuPosition(event);
       onContextMenu?.(newEvent as unknown as React.MouseEvent<HTMLDivElement>);
-    }
+    });
   };
 
   const {isMe: isSelf, isFederated} = user;
