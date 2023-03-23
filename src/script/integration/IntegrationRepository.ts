@@ -210,14 +210,10 @@ export class IntegrationRepository {
    * Remove service from conversation.
    *
    * @param conversationEntity Conversation to remove service from
-   * @param userEntity Service user to be removed from the conversation
+   * @param service Service user to be removed from the conversation
    */
-  removeService(conversationEntity: Conversation, userEntity: User): Promise<MemberLeaveEvent> {
-    const {id: userId, domain} = userEntity;
-    return this.conversationRepository.removeService(conversationEntity, {
-      domain,
-      id: userId,
-    });
+  removeService(conversationEntity: Conversation, service: ServiceEntity): Promise<MemberLeaveEvent> {
+    return this.conversationRepository.removeService(conversationEntity, service.id);
   }
 
   async searchForServices(

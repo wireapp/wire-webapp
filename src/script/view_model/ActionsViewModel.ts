@@ -35,6 +35,7 @@ import type {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
 import type {User} from '../entity/User';
 import {BackendClientError} from '../error/BackendClientError';
+import {isServiceEntity} from '../guards/Service';
 import type {IntegrationRepository} from '../integration/IntegrationRepository';
 import type {ServiceEntity} from '../integration/ServiceEntity';
 import {UserState} from '../user/UserState';
@@ -342,9 +343,12 @@ export class ActionsViewModel {
     amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
   };
 
-  removeFromConversation = async (conversationEntity: Conversation, userEntity: User): Promise<void> => {
+  removeFromConversation = async (
+    conversationEntity: Conversation,
+    userEntity: User | ServiceEntity,
+  ): Promise<void> => {
     if (conversationEntity && userEntity) {
-      if (userEntity.isService) {
+      if (isServiceEntity(userEntity)) {
         await this.integrationRepository.removeService(conversationEntity, userEntity);
         return;
       }

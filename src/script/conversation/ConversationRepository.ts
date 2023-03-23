@@ -1575,17 +1575,17 @@ export class ConversationRepository {
    * Remove service from conversation.
    *
    * @param conversationEntity Conversation to remove service from
-   * @param user ID of service user to be removed from the conversation
+   * @param service ID of service user to be removed from the conversation
    * @returns Resolves when service was removed from the conversation
    */
-  public removeService(conversationEntity: Conversation, user: QualifiedId) {
-    return this.conversationService.deleteBots(conversationEntity.id, user.id).then((response: any) => {
+  public removeService(conversationEntity: Conversation, service: string) {
+    return this.conversationService.deleteBots(conversationEntity.id, service).then((response: any) => {
       // TODO: Can this even have a response? in the API Client it look like it always returns `void`
       const hasResponse = response?.event;
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
       const event = hasResponse
         ? response.event
-        : EventBuilder.buildMemberLeave(conversationEntity, user, true, currentTimestamp);
+        : EventBuilder.buildMemberLeave(conversationEntity, {id: service, domain: ''}, true, currentTimestamp);
 
       this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
       return event;

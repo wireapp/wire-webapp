@@ -27,10 +27,8 @@ import {ServiceDetails} from 'Components/panel/ServiceDetails';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
-import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {Conversation} from '../../../entity/Conversation';
-import {User} from '../../../entity/User';
 import {IntegrationRepository} from '../../../integration/IntegrationRepository';
 import {ServiceEntity} from '../../../integration/ServiceEntity';
 import {generatePermissionHelpers} from '../../../user/UserPermission';
@@ -46,7 +44,6 @@ interface GroupParticipantServiceProps {
   onBack: () => void;
   onClose: () => void;
   serviceEntity: ServiceEntity;
-  userEntity: User;
   userState: UserState;
   isAddMode?: boolean;
 }
@@ -59,7 +56,6 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
   onBack,
   onClose,
   serviceEntity,
-  userEntity,
   userState,
   isAddMode = false,
 }) => {
@@ -73,7 +69,7 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
 
   const {canChatWithServices, canUpdateGroupParticipants} = generatePermissionHelpers(teamRole);
 
-  const selectedInConversation = participatingUserIds.some(user => matchQualifiedIds(userEntity, user));
+  const selectedInConversation = participatingUserIds.some(user => serviceEntity.id === user.id);
 
   const showActions = isActiveParticipant && selectedInConversation && inTeam;
 
@@ -82,7 +78,7 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
   };
 
   const onRemove = () => {
-    actionsViewModel.removeFromConversation(activeConversation, userEntity);
+    actionsViewModel.removeFromConversation(activeConversation, serviceEntity);
     onBack();
   };
 

@@ -43,7 +43,7 @@ import {Conversation} from '../../entity/Conversation';
 import {Message} from '../../entity/message/Message';
 import {User} from '../../entity/User';
 import {isReadableMessage} from '../../guards/Message';
-import {isUserEntity, isUserServiceEntity} from '../../guards/Panel';
+import {isUserEntity} from '../../guards/Panel';
 import {isServiceEntity} from '../../guards/Service';
 import {ServiceEntity} from '../../integration/ServiceEntity';
 import {TeamState} from '../../team/TeamState';
@@ -117,7 +117,6 @@ const RightSidebar: FC<RightSidebarProps> = ({
   const currentState = rightSidebar.history[lastItem];
 
   const userEntity = currentEntity && isUserEntity(currentEntity) ? currentEntity : null;
-  const userServiceEntity = currentEntity && isUserServiceEntity(currentEntity) ? currentEntity : null;
   const messageEntity = currentEntity && isReadableMessage(currentEntity) ? currentEntity : null;
   const serviceEntity = currentEntity && isServiceEntity(currentEntity) ? currentEntity : null;
 
@@ -267,7 +266,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
             />
           )}
 
-          {currentState === PanelState.GROUP_PARTICIPANT_SERVICE && serviceEntity && userServiceEntity && (
+          {currentState === PanelState.GROUP_PARTICIPANT_SERVICE && serviceEntity && (
             <GroupParticipantService
               activeConversation={activeConversation}
               actionsViewModel={actionsViewModel}
@@ -276,7 +275,6 @@ const RightSidebar: FC<RightSidebarProps> = ({
               onBack={onBackClick}
               onClose={closePanel}
               serviceEntity={serviceEntity}
-              userEntity={userServiceEntity}
               userState={userState}
               isAddMode={isAddMode}
             />
