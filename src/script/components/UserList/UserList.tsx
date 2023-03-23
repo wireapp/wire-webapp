@@ -23,7 +23,7 @@ import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import {Icon} from 'Components/Icon';
-import {ParticipantItem} from 'Components/list/ParticipantItem';
+import {UserListItem} from 'Components/UserList/components/UserListItem';
 import {collapseButton, collapseIcon} from 'Components/UserList/UserList.styles';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isEnterKey, isSpaceKey} from 'Util/KeyboardUtil';
@@ -130,7 +130,7 @@ export const UserList = ({
 
       return (
         <li key={user.id}>
-          <ParticipantItem
+          <UserListItem
             noInteraction={noSelfInteraction && user.isMe}
             participant={user}
             noUnderline={isLastItem || noUnderline}
