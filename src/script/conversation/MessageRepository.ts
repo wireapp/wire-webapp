@@ -496,9 +496,24 @@ export class MessageRepository {
         error,
       );
       const messageEntity = await this.getMessageInConversationById(conversation, id);
-      this.sendAssetUploadFailed(conversation, messageEntity.id);
+      await this.sendAssetUploadFailed(conversation, messageEntity.id);
       return this.updateMessageAsUploadFailed(messageEntity);
     }
+  }
+
+  private async storeFileInDb(conversation: Conversation, messageId: string, file: Blob) {
+    try {
+      const messageEntity = await this.getMessageInConversationById(conversation, messageId);
+      messageEntity.storedBlob(file);
+      return await this.eventService.updateEvent(messageEntity.primary_key, {
+        storedBlob: file,
+      });
+    } catch (error) {
+      if ((error as any).type !== ConversationError.TYPE.MESSAGE_NOT_FOUND) {
+        throw error;
+      }
+    }
+    return undefined;
   }
 
   /**
