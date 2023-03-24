@@ -37,14 +37,12 @@ export interface CallParticipantsListItemProps {
   callParticipant: Participant;
   selfInTeam?: boolean;
   isSelfVerified?: boolean;
-  external?: boolean;
   showDropdown?: boolean;
   onContextMenu?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
 }
 
 export const CallParticipantsListItem = ({
   callParticipant,
-  external,
   isSelfVerified = false,
   selfInTeam,
   showDropdown = false,
@@ -58,7 +56,8 @@ export const CallParticipantsListItem = ({
     is_verified: isVerified,
     availability,
     name: userName,
-  } = useKoSubscribableChildren(user, ['isDirectGuest', 'is_verified', 'availability', 'name']);
+    isExternal,
+  } = useKoSubscribableChildren(user, ['isDirectGuest', 'is_verified', 'availability', 'name', 'isExternal']);
 
   const handleContextKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     handleKeyDown(event, () => {
@@ -103,7 +102,7 @@ export const CallParticipantsListItem = ({
           config={{
             guest: isDirectGuest,
             federated: isFederated,
-            external,
+            external: isExternal,
             verified: isSelfVerified && isVerified,
           }}
         />
