@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useCallback} from 'react';
+import React from 'react';
 
 import {ReactionType} from '@wireapp/core/lib/conversation';
 import {amplify} from 'amplify';
@@ -191,11 +191,11 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
   });
 
   const handleReactionClick = (reaction: ReactionType) => {
-      if (!message.isContent()) {
-        return;
-      }
-      return void messageRepository.toggleReaction(conversation, message, reaction, selfId.id);
-    };
+    if (!message.isContent()) {
+      return;
+    }
+    return void messageRepository.toggleReaction(conversation, message, reaction, selfId.id);
+  };
   if (message.isContent()) {
     return (
       <ContentMessageComponent

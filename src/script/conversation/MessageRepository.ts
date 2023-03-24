@@ -789,28 +789,21 @@ export class MessageRepository {
 
   public updateUserReactions(reactions: UserReactionMap, userId: string, reaction: ReactionType) {
     const userReactions = reactions[userId] || '';
-    const shouldAdd = !userReactions.includes(reaction);
-    const shouldDelete = userReactions.includes(reaction);
-
     const updatedReactions = {...reactions};
 
-    if (shouldAdd) {
-      const msgReactions = {...reactions};
-      const msgReactionsByUser = msgReactions && msgReactions[userId];
-      if (msgReactionsByUser) {
-        let msgReactionsUserArr = msgReactionsByUser.split(',');
-        msgReactionsUserArr = [...msgReactionsUserArr, reaction];
-        updatedReactions[userId] = msgReactionsUserArr.join(',');
+    if (userReactions) {
+      const reactionsArr = userReactions.split(',');
+      const reactionIndex = reactionsArr.indexOf(reaction);
+      if (reactionIndex === -1) {
+        reactionsArr.push(reaction);
       } else {
-        updatedReactions[userId] = reaction;
+        reactionsArr.splice(reactionIndex, 1);
       }
-    } else if (shouldDelete) {
-      const msgReactions = {...reactions};
-      const msgReactionsByUser = msgReactions && msgReactions[userId].split(',');
-      const filtered = msgReactionsByUser.filter(value => {
-        return value !== reaction;
-      });
-      updatedReactions[userId] = filtered.length ? filtered.join(',') : '';
+      // if all reactions removed return empty string
+      updatedReactions[userId] = reactionsArr.length ? reactionsArr.join(',') : '';
+    } else {
+      // first time reacted
+      updatedReactions[userId] = reaction;
     }
     return updatedReactions[userId];
   }
