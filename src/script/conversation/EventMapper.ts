@@ -191,6 +191,10 @@ export class EventMapper {
       originalEntity.failedToSend(event.failedToSend);
     }
 
+    if (event.storedBlob) {
+      originalEntity.storedBlob(event.storedBlob);
+    }
+
     if (event.selected_button_id) {
       originalEntity.version = event.version;
     }

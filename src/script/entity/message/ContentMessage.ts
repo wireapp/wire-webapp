@@ -47,6 +47,7 @@ export class ContentMessage extends Message {
   public readonly other_likes: ko.PureComputed<User[]>;
   public readonly failedToSend: ko.Observable<{queued?: QualifiedUserClients; failed?: QualifiedId[]} | undefined> =
     ko.observable();
+  public readonly storedBlob: ko.Observable<Blob | undefined> = ko.observable();
   public readonly quote: ko.Observable<QuoteEntity>;
   // TODO: Rename to `reactionsUsers`
   public readonly reactions_user_ids: ko.PureComputed<string>;
