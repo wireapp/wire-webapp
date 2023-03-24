@@ -24,7 +24,7 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import {AvailabilityState} from 'Components/AvailabilityState';
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {Icon} from 'Components/Icon';
-import {UserBadges} from 'Components/UserBadges';
+import {UserStatusBadges} from 'Components/UserBadges';
 import {Participant} from 'src/script/calling/Participant';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
@@ -119,7 +119,7 @@ export const CallParticipantsListItem = ({
           )}
         </div>
 
-        <UserBadges
+        <UserStatusBadges
           config={{
             guest: isDirectGuest,
             federated: isFederated,
