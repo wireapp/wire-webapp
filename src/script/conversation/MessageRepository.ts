@@ -478,9 +478,15 @@ export class MessageRepository {
     conversation: Conversation,
     file: Blob,
     asImage: boolean = false,
+    originalId?: string,
   ): Promise<EventRecord | void> {
     const uploadStarted = Date.now();
-    const {id, state} = await this.sendAssetMetadata(conversation, file, asImage);
+
+    const {id, state} = await this.sendAssetMetadata(conversation, file, asImage, originalId);
+    if (state === SendAndInjectSendingState.FAILED) {
+      await this.storeFileInDb(conversation, id, file);
+      return;
+    }
     if (state === MessageSendingState.CANCELED) {
       throw new ConversationError(
         ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION,
@@ -505,6 +511,15 @@ export class MessageRepository {
       await this.sendAssetUploadFailed(conversation, messageEntity.id);
       return this.updateMessageAsUploadFailed(messageEntity);
     }
+  }
+
+  public async retryUploadFile(
+    conversation: Conversation,
+    file: Blob,
+    asImage: boolean = false,
+    originalId: string,
+  ): Promise<EventRecord | void> {
+    await this.uploadFile(conversation, file, asImage, originalId);
   }
 
   private async storeFileInDb(conversation: Conversation, messageId: string, file: Blob) {
@@ -571,7 +586,12 @@ export class MessageRepository {
   /**
    * Send asset metadata message to specified conversation.
    */
-  private async sendAssetMetadata(conversation: Conversation, file: File | Blob, allowImageDetection?: boolean) {
+  private async sendAssetMetadata(
+    conversation: Conversation,
+    file: File | Blob,
+    allowImageDetection?: boolean,
+    originalId?: string,
+  ) {
     let metadata;
     try {
       metadata = await buildMetadata(file);
@@ -590,9 +610,7 @@ export class MessageRepository {
     } else if (allowImageDetection && isImage(file)) {
       meta.image = metadata as ImageMetaData;
     }
-    const message = MessageBuilder.buildFileMetaDataMessage({
-      metaData: meta as FileMetaDataContent,
-    });
+    const message = MessageBuilder.buildFileMetaDataMessage({metaData: meta as FileMetaDataContent}, originalId);
     return this.sendAndInjectMessage(message, conversation, {enableEphemeral: true});
   }
 
