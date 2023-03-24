@@ -136,6 +136,12 @@ type TextMessagePayload = {
 };
 type EditMessagePayload = TextMessagePayload & {originalMessageId: string};
 
+const enum SendAndInjectSendingState {
+  FAILED = 'FAILED',
+}
+
+type SendAndInjectResult = Omit<SendResult, 'state'> & {state: MessageSendingState | SendAndInjectSendingState};
+
 /** A message that has already been stored in DB and has a primary key */
 type StoredMessage = Message & {primary_key: string};
 type StoredContentMessage = ContentMessage & {primary_key: string};
@@ -711,7 +717,7 @@ export class MessageRepository {
     } = {
       syncTimestamp: true,
     },
-  ) {
+  ): Promise<SendAndInjectResult> {
     const {groupId} = conversation;
 
     const messageTimer = conversation.messageTimer();
@@ -770,7 +776,7 @@ export class MessageRepository {
 
     const shouldProceedSending = await injectOptimisticEvent();
     if (shouldProceedSending === false) {
-      return {id: payload.messageId, state: MessageSendingState.CANCELED};
+      return {id: payload.messageId, sentAt: new Date().toISOString(), state: MessageSendingState.CANCELED};
     }
 
     try {
@@ -782,7 +788,7 @@ export class MessageRepository {
       return result;
     } catch (error) {
       await this.updateMessageAsFailed(conversation, payload.messageId);
-      throw error;
+      return {id: payload.messageId, sentAt: new Date().toISOString(), state: SendAndInjectSendingState.FAILED};
     }
   }
 
