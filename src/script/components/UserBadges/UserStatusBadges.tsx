@@ -49,11 +49,11 @@ const badgeToComponentMap = {
 } as const;
 
 type BadgeKey = keyof typeof badgeToComponentMap;
-interface UserBadgesProps {
+interface UserStatusBadgesProps {
   config: {[key in BadgeKey]?: boolean};
 }
 
-export const UserBadges = ({config}: UserBadgesProps) => (
+export const UserStatusBadges = ({config}: UserStatusBadgesProps) => (
   <>
     {Object.entries(config)
       .filter(([_badge, shouldShow]) => shouldShow)

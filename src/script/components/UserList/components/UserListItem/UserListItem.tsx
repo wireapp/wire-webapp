@@ -26,7 +26,7 @@ import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {ParticipantItemContent} from 'Components/ParticipantItemContent';
-import {UserBadges} from 'Components/UserBadges';
+import {UserStatusBadges} from 'Components/UserBadges';
 import {UserlistMode} from 'Components/UserList';
 import {InViewport} from 'Components/utils/InViewport';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -124,7 +124,7 @@ const UserListItem = ({
               hasUsernameInfo={hasUsernameInfo}
             />
 
-            <UserBadges
+            <UserStatusBadges
               config={{
                 guest: !isOthersMode && isDirectGuest,
                 federated: isFederated,
