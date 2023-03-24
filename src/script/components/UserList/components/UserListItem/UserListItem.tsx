@@ -116,7 +116,7 @@ const UserListItem = ({
             </div>
 
             <ParticipantItemContent
-              name={`${userName} ${noInteraction}`}
+              name={userName}
               shortDescription={contentInfoText}
               selfInTeam={selfInTeam}
               availability={availability}
