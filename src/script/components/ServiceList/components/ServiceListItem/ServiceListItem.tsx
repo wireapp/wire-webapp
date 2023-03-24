@@ -20,7 +20,7 @@
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import {Icon} from 'Components/Icon';
+import {ParticipantItemContent} from 'Components/ParticipantItemContent';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -52,28 +52,7 @@ export const ServiceListItem = ({service, onClick}: ServiceListItemProps) => {
           <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={service} aria-hidden="true" />
         </div>
 
-        <div className="participant-item__content">
-          <div className="participant-item__content__text">
-            <div className="participant-item__content__name-wrapper">
-              <div className="participant-item__content__name" data-uie-name="status-name">
-                {serviceName}
-              </div>
-            </div>
-
-            {serviceShortDescription && (
-              <div className="participant-item__content__info">
-                <span
-                  className="participant-item__content__username label-username-notext"
-                  data-uie-name="status-username"
-                >
-                  {serviceShortDescription}
-                </span>
-              </div>
-            )}
-          </div>
-
-          <Icon.ChevronRight className="chevron-right-icon participant-item__content__chevron" />
-        </div>
+        <ParticipantItemContent name={serviceName} shortDescription={serviceShortDescription} showArrow />
       </div>
     </div>
   );
