@@ -27,7 +27,7 @@ import {Availability} from '@wireapp/protocol-messaging';
 import {AvailabilityState} from 'Components/AvailabilityState';
 import {Icon} from 'Components/Icon';
 
-export interface ServiceListItemProps {
+export interface ParticipantItemContentProps {
   name: string;
   selfInTeam?: boolean;
   availability?: Availability.Type;
@@ -47,7 +47,7 @@ export const ParticipantItemContent = ({
   hasUsernameInfo = false,
   onDropdownClick,
   showArrow = false,
-}: ServiceListItemProps) => {
+}: ParticipantItemContentProps) => {
   return (
     <div className="participant-item__content">
       <div className="participant-item__content__text">
