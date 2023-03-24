@@ -23,7 +23,6 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {AvailabilityState} from 'Components/AvailabilityState';
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import {ParticipantMicOnIcon} from 'Components/calling/ParticipantMicOnIcon';
 import {Icon} from 'Components/Icon';
 import {UserBadges} from 'Components/UserBadges';
 import {Participant} from 'src/script/calling/Participant';
@@ -32,6 +31,8 @@ import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 import {setContextMenuPosition} from 'Util/util';
+
+import {CallParticipantStatusIcons} from './CallParticipantStatusIcons';
 
 export interface CallParticipantsListItemProps {
   callParticipant: Participant;
@@ -59,13 +60,6 @@ export const CallParticipantsListItem = ({
     availability,
     name: userName,
   } = useKoSubscribableChildren(user, ['isDirectGuest', 'is_verified', 'availability', 'name']);
-
-  const {sharesCamera, sharesScreen, isActivelySpeaking, isMuted} = useKoSubscribableChildren(callParticipant, [
-    'sharesCamera',
-    'sharesScreen',
-    'isActivelySpeaking',
-    'isMuted',
-  ]);
 
   const handleContextKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     handleKeyDown(event, () => {
@@ -134,21 +128,7 @@ export const CallParticipantsListItem = ({
           }}
         />
 
-        {sharesScreen && <Icon.Screenshare className="screenshare-icon" data-uie-name="status-screenshare" />}
-
-        {sharesCamera && <Icon.Camera className="camera-icon" data-uie-name="status-video" />}
-
-        {!isMuted && (
-          <ParticipantMicOnIcon
-            className="participant-mic-on-icon"
-            isActive={isActivelySpeaking}
-            data-uie-name={isActivelySpeaking ? 'status-active-speaking' : 'status-audio-on'}
-          />
-        )}
-
-        {isMuted && (
-          <Icon.MicOff className="mic-off-icon" data-uie-name="status-audio-off" style={{height: 12, width: 12}} />
-        )}
+        <CallParticipantStatusIcons callParticipant={callParticipant} />
       </div>
     </div>
   );
