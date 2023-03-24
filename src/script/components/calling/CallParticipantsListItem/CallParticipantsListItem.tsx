@@ -21,9 +21,8 @@ import React from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
-import {AvailabilityState} from 'Components/AvailabilityState';
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import {Icon} from 'Components/Icon';
+import {ParticipantItemContent} from 'Components/ParticipantItemContent';
 import {UserStatusBadges} from 'Components/UserBadges';
 import {Participant} from 'src/script/calling/Participant';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -86,37 +85,15 @@ export const CallParticipantsListItem = ({
           <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={user} aria-hidden="true" />
         </div>
 
-        <div className="participant-item__content">
-          <div className="participant-item__content__text">
-            <div className="participant-item__content__name-wrapper">
-              {selfInTeam ? (
-                <AvailabilityState
-                  availability={availability}
-                  className="participant-item__content__availability participant-item__content__name"
-                  dataUieName="status-name"
-                  label={userName}
-                />
-              ) : (
-                <div className="participant-item__content__name" data-uie-name="status-name">
-                  {userName}
-                </div>
-              )}
-              {isSelf && <div className="participant-item__content__self-indicator">{selfString}</div>}
-            </div>
-          </div>
-
-          {showDropdown && (
-            <button
-              tabIndex={TabIndex.UNFOCUSABLE}
-              className="participant-item__content__chevron"
-              onClick={event => onContextMenu?.(event as unknown as React.MouseEvent<HTMLDivElement>)}
-              type="button"
-              data-uie-name="participant-menu-icon"
-            >
-              <Icon.Chevron />
-            </button>
-          )}
-        </div>
+        <ParticipantItemContent
+          name={userName}
+          selfInTeam={selfInTeam}
+          availability={availability}
+          {...(isSelf && {selfString})}
+          {...(showDropdown && {
+            onDropdownClick: event => onContextMenu?.(event as unknown as React.MouseEvent<HTMLDivElement>),
+          })}
+        />
 
         <UserStatusBadges
           config={{

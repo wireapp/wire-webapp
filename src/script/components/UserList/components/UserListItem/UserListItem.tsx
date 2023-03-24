@@ -24,8 +24,8 @@ import cx from 'classnames';
 
 import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 
-import {AvailabilityState} from 'Components/AvailabilityState';
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {ParticipantItemContent} from 'Components/ParticipantItemContent';
 import {UserStatusBadges} from 'Components/UserBadges';
 import {UserlistMode} from 'Components/UserList';
 import {InViewport} from 'Components/utils/InViewport';
@@ -115,46 +115,14 @@ const UserListItem = ({
               <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={user} aria-hidden="true" />
             </div>
 
-            <div className="participant-item__content">
-              <div className="participant-item__content__text">
-                <div className="participant-item__content__name-wrapper">
-                  {selfInTeam ? (
-                    <AvailabilityState
-                      availability={availability}
-                      className="participant-item__content__availability participant-item__content__name"
-                      dataUieName="status-name"
-                      label={userName}
-                    />
-                  ) : (
-                    <div className="participant-item__content__name" data-uie-name="status-name">
-                      {userName}
-                    </div>
-                  )}
-
-                  {isSelf && <div className="participant-item__content__self-indicator">{selfString}</div>}
-                </div>
-
-                {contentInfoText && (
-                  <div className="participant-item__content__info">
-                    <span
-                      className={cx('participant-item__content__username label-username-notext', {
-                        'label-username': hasUsernameInfo,
-                      })}
-                      data-uie-name="status-username"
-                    >
-                      {contentInfoText}
-                    </span>
-
-                    {/* TODO: It's not used, saved for future if it will be needed, and add prop badge */}
-                    {/*{hasUsernameInfo && badge && (*/}
-                    {/*  <span className="participant-item__content__badge" data-uie-name="status-partner">*/}
-                    {/*    {badge}*/}
-                    {/*  </span>*/}
-                    {/*)}*/}
-                  </div>
-                )}
-              </div>
-            </div>
+            <ParticipantItemContent
+              name={userName}
+              shortDescription={contentInfoText}
+              selfInTeam={selfInTeam}
+              availability={availability}
+              {...(isSelf && {selfString})}
+              hasUsernameInfo={hasUsernameInfo}
+            />
 
             <UserStatusBadges
               config={{
