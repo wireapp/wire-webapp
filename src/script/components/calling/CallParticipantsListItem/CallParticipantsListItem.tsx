@@ -81,9 +81,12 @@ export const CallParticipantsListItem = ({
       className="participant-item-wrapper no-interaction no-underline"
     >
       <div className="participant-item">
-        <div className="participant-item__image">
-          <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={user} aria-hidden="true" />
-        </div>
+        <Avatar
+          avatarSize={AVATAR_SIZE.SMALL}
+          participant={user}
+          aria-hidden="true"
+          className="participant-item__image"
+        />
 
         <ParticipantItemContent
           name={userName}

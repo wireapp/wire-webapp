@@ -89,7 +89,7 @@ export const ParticipantItemContent = ({
         )}
       </div>
 
-      {typeof onDropdownClick === 'function' && (
+      {onDropdownClick && (
         <button
           tabIndex={TabIndex.UNFOCUSABLE}
           className="participant-item__content__chevron"
