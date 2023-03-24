@@ -48,9 +48,12 @@ export const ServiceListItem = ({service, onClick}: ServiceListItemProps) => {
       className="participant-item-wrapper no-underline"
     >
       <div className="participant-item">
-        <div className="participant-item__image">
-          <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={service} aria-hidden="true" />
-        </div>
+        <Avatar
+          avatarSize={AVATAR_SIZE.SMALL}
+          participant={service}
+          aria-hidden="true"
+          className="participant-item__image"
+        />
 
         <ParticipantItemContent name={serviceName} shortDescription={serviceShortDescription} showArrow />
       </div>
