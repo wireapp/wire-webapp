@@ -68,19 +68,20 @@ export const getReactionsButtonCSS = (isActive?: boolean): CSSObject => {
       backgroundColor: 'var(--message-reactions-active-background)',
       color: 'var(--accent-color)',
       outline: 'none',
+
+      '&:focus-visible': {
+        border: '1px solid var(--message-reactions-focus-border)',
+        outline: 'none',
+      },
     };
   }
   return {
-    border: '1px solid var(--message-actions-border)',
-    backgroundColor: 'var(--message-actions-background)',
+    border: '1px solid var(--message-reactions-border)',
+    backgroundColor: 'var(--message-reactions-background)',
     outline: 'none',
 
-    '&:hover': {
-      backgroundColor: 'var(--message-actions-background-hover)',
-      border: '1px solid var(--message-actions-border-hover)',
-    },
     '&:focus-visible': {
-      border: '1px solid var(--accent-color-focus)',
+      border: '1px solid var(--message-reactions-focus-border)',
       outline: 'none',
     },
   };

@@ -230,11 +230,15 @@ each(.colors(), .(@color-key, @color-name) {
   @message-actions-active-background: '@{name}-50';
   @message-reactions-active-border: '@{name}-300';
   @message-reactions-active-background: '@{name}-50';
+  @message-reactions-background: 'w-gray-20';
+  @message-reactions-border: 'w-gray-50';
+  @message-reactions-focus-border: '@{name}-500';
   @toggle-button-hover-bg: '@{name}-700';
   @icon-primary-active-fill: '@{name}-500';
   @icon-secondary-active-border: 'accent_colors-0';
   @indicator-range-input-thumb: '@{name}-700';
   @toggle-button-unselected-bg: '@{name}-100';
+  @content-message-timestamp: 'w-gray-70';
 
   .main-accent-color-@{color-key} {
     --button-primary-hover: @@button-primary-hover;
@@ -248,6 +252,10 @@ each(.colors(), .(@color-key, @color-name) {
     --message-actions-active-background:@@message-actions-active-background;
     --message-reactions-active-border:@@message-reactions-active-border;
     --message-reactions-active-background:@@message-reactions-active-background;
+    --message-reactions-background: @@message-reactions-background;
+    --message-reactions-border: @@message-reactions-border;
+    --message-reactions-focus-border: @@message-reactions-focus-border;
+    --content-message-timestamp:@@content-message-timestamp;
     --toggle-button-hover-bg: @@toggle-button-hover-bg;
     --icon-primary-active-fill: @@icon-primary-active-fill;
     --icon-secondary-active-border: @@icon-secondary-active-border;
@@ -292,6 +300,10 @@ each(.colors(), .(@color-key, @color-name) {
     @message-actions-active-background-dark: '@{name}-dark-800';
     @message-reactions-active-border-dark: '@{name}-dark-700';
     @message-reactions-active-background-dark: '@{name}-dark-900';
+    @message-reactions-background-dark: 'w-gray-90';
+    @message-reactions-border-dark: 'w-gray-80';
+    @message-reactions-focus-border-dark: '@{name}-dark-500';
+    @content-message-timestamp-dark: 'w-gray-60';
     @toggle-button-hover-bg-dark: '@{name}-dark-300';
     @icon-primary-active-fill-dark: 'w-white';
     @icon-secondary-active-border-dark: '@{name}-dark-800' ;
@@ -309,6 +321,10 @@ each(.colors(), .(@color-key, @color-name) {
       --message-actions-active-background: @@message-actions-active-background-dark;
       --message-reactions-active-border: @@message-reactions-active-border-dark;
       --message-reactions-active-background: @@message-reactions-active-background-dark;
+      --message-reactions-background: @@message-reactions-background-dark;
+      --message-reactions-border: @@message-reactions-border-dark;
+      --message-reactions-focus-border: @@message-reactions-focus-border-dark;
+      --content-message-timestamp:@@content-message-timestamp-dark;
       --icon-primary-active-fill: @@icon-primary-active-fill-dark;
       --icon-secondary-active-border: @@icon-secondary-active-border-dark;
       --indicator-range-input-thumb: @@indicator-range-input-thumb-dark;

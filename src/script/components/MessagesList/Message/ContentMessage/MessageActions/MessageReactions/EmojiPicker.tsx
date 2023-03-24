@@ -100,7 +100,7 @@ const EmojiPickerContainer: FC<EmojiPickerContainerProps> = ({
             role="dialog"
             data-uie-name="emoji-picker-dialog"
           >
-            <EmojiPicker onEmojiClick={onEmojiClick} getEmojiUrl={getEmojiUrl} />
+            <EmojiPicker onEmojiClick={onEmojiClick} getEmojiUrl={getEmojiUrl} lazyLoadEmojis={true} />
           </div>
         </div>,
         document.body,
