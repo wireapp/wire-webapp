@@ -596,7 +596,6 @@ const CallingCell: React.FC<CallingCellProps> = ({
                               callParticipant={participant}
                               selfInTeam={selfUser?.inTeam()}
                               isSelfVerified={isSelfVerified}
-                              external={teamState.isExternal(participant.user.id)}
                               showDropdown={isModerator}
                               onContextMenu={
                                 isModerator ? event => getParticipantContext(event, participant) : undefined
