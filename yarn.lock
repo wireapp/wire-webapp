@@ -2203,13 +2203,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@datadog/browser-core@npm:4.34.3":
-  version: 4.34.3
-  resolution: "@datadog/browser-core@npm:4.34.3"
-  checksum: 50f3d63929a2848c30f03df8c376b85df7ec0821b6e45459586a86f30a570401bc4a71a0da405779d8bd92849cbbc738c95ebe2d5e8c1ac2457e7881c401819a
-  languageName: node
-  linkType: hard
-
 "@datadog/browser-core@npm:4.36.0":
   version: 4.36.0
   resolution: "@datadog/browser-core@npm:4.36.0"
@@ -2231,27 +2224,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@datadog/browser-rum-core@npm:4.34.3":
-  version: 4.34.3
-  resolution: "@datadog/browser-rum-core@npm:4.34.3"
+"@datadog/browser-rum-core@npm:4.36.0":
+  version: 4.36.0
+  resolution: "@datadog/browser-rum-core@npm:4.36.0"
   dependencies:
-    "@datadog/browser-core": 4.34.3
-  checksum: 07616a22eb363208b96cece712eb2c49784788f328ada81f0d715d1637fc4cbb41e47e11483c83661cafb51715d820e0b9251a8f745df4149962ac21f993099f
+    "@datadog/browser-core": 4.36.0
+  checksum: 6683397f742a5b735c3a645cc6aab608328bbe8386e5db4947ea1de4d25119ca39c5c0985f03a0903092b862d6b7ebd410b9e84857fcb24bba3352c9017aa92a
   languageName: node
   linkType: hard
 
-"@datadog/browser-rum@npm:^4.34.3":
-  version: 4.34.3
-  resolution: "@datadog/browser-rum@npm:4.34.3"
+"@datadog/browser-rum@npm:^4.36.0":
+  version: 4.36.0
+  resolution: "@datadog/browser-rum@npm:4.36.0"
   dependencies:
-    "@datadog/browser-core": 4.34.3
-    "@datadog/browser-rum-core": 4.34.3
+    "@datadog/browser-core": 4.36.0
+    "@datadog/browser-rum-core": 4.36.0
   peerDependencies:
-    "@datadog/browser-logs": 4.34.3
+    "@datadog/browser-logs": 4.36.0
   peerDependenciesMeta:
     "@datadog/browser-logs":
       optional: true
-  checksum: 0b10606b39bfceaad9c8b9ef36f913b932b2b16e14030c4a8d211234a52c0b41fbb37101a9c592f88b96881c02fbedd75ca5a9ba2eec9eedcd1bd09eb13fc00c
+  checksum: ca56f07c5f968d2af53755cf0e25d6970b800c89914d6d4a2c03dd2af03cfc42733b1a160048dfccfff2295e1e11c1582b4dda97d9bfea6ff8dc6b7bdab8d6b5
   languageName: node
   linkType: hard
 
@@ -16813,7 +16806,7 @@ dexie@latest:
     "@babel/preset-react": 7.18.6
     "@babel/preset-typescript": 7.21.0
     "@datadog/browser-logs": ^4.36.0
-    "@datadog/browser-rum": ^4.34.3
+    "@datadog/browser-rum": ^4.36.0
     "@emotion/eslint-plugin": ^11.10.0
     "@emotion/react": 11.10.6
     "@faker-js/faker": 7.6.0
