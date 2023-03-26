@@ -16660,9 +16660,9 @@ dexie@latest:
   languageName: node
   linkType: hard
 
-"webpack-dev-middleware@npm:6.0.1":
-  version: 6.0.1
-  resolution: "webpack-dev-middleware@npm:6.0.1"
+"webpack-dev-middleware@npm:6.0.2":
+  version: 6.0.2
+  resolution: "webpack-dev-middleware@npm:6.0.2"
   dependencies:
     colorette: ^2.0.10
     memfs: ^3.4.12
@@ -16671,7 +16671,10 @@ dexie@latest:
     schema-utils: ^4.0.0
   peerDependencies:
     webpack: ^5.0.0
-  checksum: eeda09cf4a1fdb09ee95f96ab657b0fb8d32c56f4d20c7f4499457a015c703f243711fda0b5bc0d103ff9e7c7b9b60568210a4c0fbd6d02361d09d2387cd723a
+  peerDependenciesMeta:
+    webpack:
+      optional: true
+  checksum: a2f65ffdec8120ae2a2def17f0f2941e65b26ee2922708aaec47ada4e262ad99f4e644136d0463fa9bbc32c4168425a1f55d928b7f3e0a2a3905c579358141b8
   languageName: node
   linkType: hard
 
@@ -17077,7 +17080,7 @@ dexie@latest:
     uuidjs: 4.2.13
     webpack: 5.76.3
     webpack-cli: 5.0.1
-    webpack-dev-middleware: 6.0.1
+    webpack-dev-middleware: 6.0.2
     webpack-hot-middleware: 2.25.3
     webrtc-adapter: 6.4.8
     workbox-webpack-plugin: 6.5.4
