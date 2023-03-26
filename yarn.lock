@@ -2481,12 +2481,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@formatjs/fast-memoize@npm:2.0.0":
-  version: 2.0.0
-  resolution: "@formatjs/fast-memoize@npm:2.0.0"
+"@formatjs/fast-memoize@npm:2.0.1":
+  version: 2.0.1
+  resolution: "@formatjs/fast-memoize@npm:2.0.1"
   dependencies:
     tslib: ^2.4.0
-  checksum: 0afca38e57a90bbb204cf56116f96c18066c4df6a46dbed010f4f9e724ff4efa0e3a9e73717a4112096b31a93cc2136d26ccce0acb16400843a30ef82440c8ae
+  checksum: e434cdc53354666459c47556c403f0ed3391ebab0e851a64e5622d8d81e3b684a74a09c4bf5189885c66e743004601f64e2e2c8c70adf6b00071d4afea20f69d
   languageName: node
   linkType: hard
 
@@ -2542,23 +2542,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@formatjs/intl@npm:2.6.8":
-  version: 2.6.8
-  resolution: "@formatjs/intl@npm:2.6.8"
+"@formatjs/intl@npm:2.6.9":
+  version: 2.6.9
+  resolution: "@formatjs/intl@npm:2.6.9"
   dependencies:
     "@formatjs/ecma402-abstract": 1.14.3
-    "@formatjs/fast-memoize": 2.0.0
+    "@formatjs/fast-memoize": 2.0.1
     "@formatjs/icu-messageformat-parser": 2.3.0
     "@formatjs/intl-displaynames": 6.2.6
     "@formatjs/intl-listformat": 7.1.9
-    intl-messageformat: 10.3.2
+    intl-messageformat: 10.3.3
     tslib: ^2.4.0
   peerDependencies:
     typescript: ^4.7
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: bcd1cd5c89859c94d82dc7292f67bdf8d3956004d4d196bbd43911d41e749a49c588238d8aae5db4bbc409de6dcc53d97bccfd7d128651298d052a000ad1d1a0
+  checksum: 66243ef05c6bdb5f5d9005e831e946ae1052fc3e49a58642fac36f8bd12757e371a17820530268ffe9805152739b4540c8be6b16277711e050886ac65eb623b0
   languageName: node
   linkType: hard
 
@@ -9340,15 +9340,15 @@ dexie@latest:
   languageName: node
   linkType: hard
 
-"intl-messageformat@npm:10.3.2":
-  version: 10.3.2
-  resolution: "intl-messageformat@npm:10.3.2"
+"intl-messageformat@npm:10.3.3":
+  version: 10.3.3
+  resolution: "intl-messageformat@npm:10.3.3"
   dependencies:
     "@formatjs/ecma402-abstract": 1.14.3
-    "@formatjs/fast-memoize": 2.0.0
+    "@formatjs/fast-memoize": 2.0.1
     "@formatjs/icu-messageformat-parser": 2.3.0
     tslib: ^2.4.0
-  checksum: 466f2d01e6b7acc621699539266a24a0fbf66099fa0e3f1b74cbdba223280f9aef736236527b5248fef420743c5070244cc2d76506c323590e9b445ff10b4e00
+  checksum: 05baee05d31b911dc4bb1774ddf0799dc136723203461f73fecb185e2e2d18b148311db7ef14294d664a6212311c5d9116c3e850cf609dd6348e347f3d07e660
   languageName: node
   linkType: hard
 
@@ -13775,19 +13775,19 @@ dexie@latest:
   languageName: node
   linkType: hard
 
-"react-intl@npm:6.3.1":
-  version: 6.3.1
-  resolution: "react-intl@npm:6.3.1"
+"react-intl@npm:6.3.2":
+  version: 6.3.2
+  resolution: "react-intl@npm:6.3.2"
   dependencies:
     "@formatjs/ecma402-abstract": 1.14.3
     "@formatjs/icu-messageformat-parser": 2.3.0
-    "@formatjs/intl": 2.6.8
+    "@formatjs/intl": 2.6.9
     "@formatjs/intl-displaynames": 6.2.6
     "@formatjs/intl-listformat": 7.1.9
     "@types/hoist-non-react-statics": ^3.3.1
     "@types/react": 16 || 17 || 18
     hoist-non-react-statics: ^3.3.2
-    intl-messageformat: 10.3.2
+    intl-messageformat: 10.3.3
     tslib: ^2.4.0
   peerDependencies:
     react: ^16.6.0 || 17 || 18
@@ -13795,7 +13795,7 @@ dexie@latest:
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 03b45e3603ed9017a9e0600a11eb27af9d8bb8c0654a6a0a1e60fa9c2c100603cec004c24dc92416ba6fc8f6be53de51332d32201badd7419f8668bc9950155c
+  checksum: 0b1ee1170ac800da8396b1f7d59111db3b2c1eb6db0c071b02fc15c0c81b19641badfab0060db39faf3ed1d02f932b8976b39d371d61eb8322e38127b2dc7e00
   languageName: node
   linkType: hard
 
@@ -16878,7 +16878,7 @@ dexie@latest:
     raf: 3.4.1
     react: 18.2.0
     react-dom: 18.2.0
-    react-intl: 6.3.1
+    react-intl: 6.3.2
     react-redux: 8.0.5
     react-router: 6.9.0
     react-router-dom: 6.9.0
