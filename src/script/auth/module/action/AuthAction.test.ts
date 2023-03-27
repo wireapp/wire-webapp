@@ -18,6 +18,7 @@
  */
 
 import {ClientType} from '@wireapp/api-client/lib/client/';
+import {RecursivePartial} from '@wireapp/commons/lib/util/TypeUtil';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import type {APIClient} from '@wireapp/api-client';
@@ -28,7 +29,7 @@ import {AuthActionCreator} from './creator/';
 
 import {mockStoreFactory} from '../../util/test/mockStoreFactory';
 
-import {actionRoot} from './';
+import {ActionRoot, actionRoot} from './';
 
 describe('AuthAction', () => {
   it('authenticates a user successfully', async () => {
@@ -134,7 +135,7 @@ describe('AuthAction', () => {
       clientAction: {
         generateClientPayload: jest.fn().mockReturnValue({}),
       },
-    };
+    } as RecursivePartial<ActionRoot>;
     const mockedCore = {
       login: () => Promise.reject(backendError),
     };

@@ -241,8 +241,7 @@ const OAuthPermissionsComponent = ({
               <FormattedMessage
                 {...oauthStrings.privacyPolicy}
                 values={{
-                  // eslint-disable-next-line react/display-name
-                  privacypolicy: ((...chunks: string[] | React.ReactNode[]) => (
+                  privacypolicy: (...chunks: string[] | React.ReactNode[]) => (
                     <a
                       target="_blank"
                       rel="noopener noreferrer"
@@ -251,7 +250,7 @@ const OAuthPermissionsComponent = ({
                     >
                       {chunks}
                     </a>
-                  )) as any,
+                  ),
                 }}
               />
             </Paragraph>

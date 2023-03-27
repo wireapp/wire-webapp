@@ -264,8 +264,7 @@ const AccountFormComponent = ({account, ...props}: Props & ConnectedProps & Disp
             <FormattedMessage
               {...accountFormStrings.termsAndPrivacyPolicy}
               values={{
-                // eslint-disable-next-line react/display-name
-                privacypolicy: ((...chunks: string[] | React.ReactNode[]) => (
+                privacypolicy: (...chunks: string[] | React.ReactNode[]) => (
                   <a
                     target="_blank"
                     rel="noopener noreferrer"
@@ -274,9 +273,8 @@ const AccountFormComponent = ({account, ...props}: Props & ConnectedProps & Disp
                   >
                     {chunks}
                   </a>
-                )) as any,
-                // eslint-disable-next-line react/display-name
-                terms: ((...chunks: string[] | React.ReactNode[]) => (
+                ),
+                terms: (...chunks: string[] | React.ReactNode[]) => (
                   <a
                     target="_blank"
                     rel="noopener noreferrer"
@@ -289,15 +287,14 @@ const AccountFormComponent = ({account, ...props}: Props & ConnectedProps & Disp
                   >
                     {chunks}
                   </a>
-                )) as any,
+                ),
               }}
             />
           ) : (
             <FormattedMessage
               {...accountFormStrings.terms}
               values={{
-                // eslint-disable-next-line react/display-name
-                terms: ((...chunks: string[] | React.ReactNode[]) => (
+                terms: (...chunks: string[] | React.ReactNode[]) => (
                   <a
                     target="_blank"
                     rel="noopener noreferrer"
@@ -310,7 +307,7 @@ const AccountFormComponent = ({account, ...props}: Props & ConnectedProps & Disp
                   >
                     {chunks}
                   </a>
-                )) as any,
+                ),
               }}
             />
           )}
