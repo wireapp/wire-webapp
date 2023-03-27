@@ -331,6 +331,13 @@ describe('renderMessage', () => {
         testCase: 'mention works correctly as part of a link text',
         text: '[@you](https://wire.com)',
       },
+      {
+        expected:
+          '<a href="http://wire.com#@you" target="_blank" rel="nofollow noopener noreferrer">http://wire.com#<div class="message-mention" data-uie-name="label-other-mention" data-user-id="pain-id" role="button"><span class="mention-at-sign">@</span>you</div></a>',
+        mentions: [{length: 4, startIndex: 16, userId: 'pain-id'}],
+        testCase: "mentions don't affect auto-detected links",
+        text: 'http://wire.com#@you',
+      },
     ];
 
     tests.forEach(({expected, mentions, testCase, text}) => {

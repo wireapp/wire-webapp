@@ -174,14 +174,11 @@ export const renderMessage = (message: string, selfId: QualifiedId | null, menti
       link.attrPush(['target', '_blank']);
       link.attrPush(['rel', 'nofollow noopener noreferrer']);
     }
+    link.attrSet('href', href);
     if (!isWireDeepLink && !['autolink', 'linkify'].includes(link.markup)) {
       const title = link.attrGet('title');
       if (title) {
         link.attrSet('title', removeMentionsHashes(title));
-      }
-      link.attrSet('href', href);
-      if (nextToken?.type === 'text') {
-        nextToken.content = text;
       }
       link.attrPush(['data-md-link', 'true']);
       link.attrPush(['data-uie-name', 'markdown-link']);
