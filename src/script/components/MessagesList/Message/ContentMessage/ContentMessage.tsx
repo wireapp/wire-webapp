@@ -23,7 +23,6 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {Icon} from 'Components/Icon';
-import {Config} from 'src/script/Config';
 import {Conversation} from 'src/script/entity/Conversation';
 import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
@@ -46,7 +45,6 @@ import {EphemeralStatusType} from '../../../../message/EphemeralStatusType';
 import {ContextMenuEntry} from '../../../../ui/ContextMenu';
 import {EphemeralTimer} from '../EphemeralTimer';
 import {MessageTime} from '../MessageTime';
-import {ReadReceiptStatus} from '../ReadReceiptStatus';
 import {useMessageFocusedTabIndex} from '../util';
 
 export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetSession'> {
@@ -211,7 +209,6 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
 
   const [isActionMenuVisible, setActionMenuVisibility] = useState(true);
   const isMenuOpen = useMessageActionsState(state => state.isMenuOpen);
-  const isReactionFeatureEnabled = Config.getConfig().FEATURE.ENABLE_REACTION;
 
   useEffect(() => {
     if (isMessageFocused || msgFocusState) {
@@ -258,7 +255,6 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             <EphemeralTimer message={message} />
           </div>
         )}
-
         {assets.map(asset => (
           <ContentAsset
             key={asset.type}
@@ -271,11 +267,9 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             isMessageFocused={msgFocusState}
           />
         ))}
-
         {failedToSend && (
           <PartialFailureToSendWarning failedToSend={failedToSend} knownUsers={conversation.allUserEntities()} />
         )}
-
         {status === StatusType.FAILED && (
           <CompleteFailureToSendWarning
             isTextAsset={message.getFirstAsset().isText()}
@@ -283,7 +277,8 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             onRetry={() => onRetry(message)}
           />
         )}
-        <div className="message-body-actions">
+        {/* In Progress to make read receipts responsive */}
+        {/* <div className="message-body-actions">
           <ReadReceiptStatus
             message={message}
             is1to1Conversation={conversation.is1to1()}
@@ -291,9 +286,8 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             onClickReceipts={onClickReceipts}
             isMessageFocused={msgFocusState}
           />
-        </div>
-
-        {isActionMenuVisible && isReactionFeatureEnabled && (
+        </div> */}
+        {isActionMenuVisible && (
           <MessageActionsMenu
             isMsgWithHeader={shouldShowAvatar()}
             message={message}

@@ -888,3 +888,37 @@
   margin-left: 0.5rem;
   color: var(--content-message-timestamp);
 }
+
+.EmojiPickerReact {
+  border-style: none !important;
+  background-color: var(--message-actions-background) !important;
+  box-shadow: 1px 2px 6px rgba(0, 0, 0, 0.3);
+
+  body.theme-dark & {
+    box-shadow: 1px 2px 6px rgba(0, 0, 0, 0.3) !important;
+  }
+}
+
+.EmojiPickerReact li.epr-emoji-category > .epr-emoji-category-label {
+  background-color: var(--message-actions-background) !important;
+}
+
+.EmojiPickerReact .epr-preview {
+  border-top: 1px solid var(--message-actions-border-hover) !important;
+}
+
+.EmojiPickerReact .epr-search-container input.epr-search {
+  body.theme-dark & {
+    border: 1px solid var(--gray-70);
+    border-radius: 12px;
+    background: var(--gray-100);
+  }
+}
+
+.EmojiPickerReact button.epr-emoji > * {
+  &:hover,
+  &:focus,
+  &:focus-visible {
+    background-color: var(--message-actions-background-hover) !important;
+  }
+}
