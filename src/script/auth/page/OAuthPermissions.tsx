@@ -19,7 +19,6 @@
 
 import React, {useState} from 'react';
 
-import {OAuthBody} from '@wireapp/api-client/lib/oauth/OAuthBody';
 import {OAuthClient} from '@wireapp/api-client/lib/oauth/OAuthClient';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
@@ -42,7 +41,7 @@ import {
 import {Icon} from 'Components/Icon';
 import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
 import {AssetRepository} from 'src/script/assets/AssetRepository';
-import {KEY} from 'Util/KeyboardUtil';
+import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {loadDataUrl} from 'Util/util';
 
 import {Page} from './Page';
@@ -52,6 +51,7 @@ import {oauthStrings} from '../../strings';
 import {actionRoot} from '../module/action';
 import {bindActionCreators, RootState} from '../module/reducer';
 import * as SelfSelector from '../module/selector/SelfSelector';
+import {oAuthParams, oAuthScope} from '../util/oauthUtil';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {
   assetRepository?: AssetRepository;
@@ -77,19 +77,9 @@ const OAuthPermissionsComponent = ({
   const {formatMessage: _} = useIntl();
   const [teamImage, setTeamImage] = React.useState<string | ArrayBuffer | undefined>(undefined);
 
-  const oauthParams = decodeURIComponent(window.location.search.slice(1))
-    .split('&')
-    .reduce((acc, param) => {
-      const [key, value] = param.split('=');
-      if (key === 'scope') {
-        return {...acc, [key]: value.replaceAll('+', ' ')};
-      }
-      return {...acc, [key]: value};
-    }, {} as OAuthBody);
   const [oAuthApp, setOAuthApp] = useState<OAuthClient | null>(null);
-  const oAuthScope = oauthParams.scope
-    .split(/\+|%20|\s/)
-    .filter(scope => Object.values(Scope).includes(scope as Scope)) as Scope[];
+  const oauthParams = oAuthParams(window.location);
+  const oauthScope = oAuthScope(oauthParams);
 
   const onContinue = async () => {
     try {
@@ -107,13 +97,15 @@ const OAuthPermissionsComponent = ({
   React.useEffect(() => {
     const getUserData = async () => {
       await getSelf();
-      const team = await getTeam(selfTeamId);
-      const teamIcon = AssetRemoteData.v3(team.icon, selfUser.qualified_id?.domain);
-      if (teamIcon.identifier === 'default') {
-        setTeamImage(`${Config.getConfig().APP_BASE}/image/logo/wire-logo-120.png`);
-      } else {
-        const teamImageBlob = await assetRepository.load(teamIcon);
-        setTeamImage(teamImageBlob && (await loadDataUrl(teamImageBlob)));
+      if (selfTeamId) {
+        const team = await getTeam(selfTeamId);
+        const teamIcon = AssetRemoteData.v3(team.icon, selfUser.qualified_id?.domain);
+        if (teamIcon.identifier === 'default') {
+          setTeamImage(`${Config.getConfig().APP_BASE}/image/logo/wire-logo-120.png`);
+        } else {
+          const teamImageBlob = await assetRepository.load(teamIcon);
+          setTeamImage(teamImageBlob && (await loadDataUrl(teamImageBlob)));
+        }
       }
       setOAuthApp(!!oauthParams.client_id ? await getOAuthApp(oauthParams.client_id) : null);
     };
@@ -185,7 +177,7 @@ const OAuthPermissionsComponent = ({
                     fontSize: '12px',
                   }}
                 >
-                  {oAuthScope.map((scope, index) => (
+                  {oauthScope.map((scope, index) => (
                     <li key={index} style={{textAlign: 'start'}}>
                       <Text>{_(oauthStrings[scope])}</Text>
                     </li>
@@ -202,8 +194,7 @@ const OAuthPermissionsComponent = ({
                   <FormattedMessage
                     {...oauthStrings.learnMore}
                     values={{
-                      // eslint-disable-next-line react/display-name
-                      learnMore: ((...chunks: string[] | React.ReactNode[]) => (
+                      learnMore: (...chunks: string[] | React.ReactNode[]) => (
                         <a
                           target="_blank"
                           rel="noopener noreferrer"
@@ -212,7 +203,7 @@ const OAuthPermissionsComponent = ({
                         >
                           {chunks}
                         </a>
-                      )) as any,
+                      ),
                     }}
                   />
                 </Text>
@@ -241,11 +232,7 @@ const OAuthPermissionsComponent = ({
                 type="button"
                 onClick={onContinue}
                 data-uie-name="do-oauth-allow"
-                onKeyDown={(event: React.KeyboardEvent) => {
-                  if (event.key === KEY.ENTER) {
-                    onContinue();
-                  }
-                }}
+                onKeyDown={event => handleKeyDown(event, () => onContinue())}
               >
                 {_(oauthStrings.allow)}
               </Button>

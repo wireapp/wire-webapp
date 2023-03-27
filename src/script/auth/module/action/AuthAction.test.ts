@@ -132,7 +132,7 @@ describe('AuthAction', () => {
 
     const mockedActions = {
       clientAction: {
-        generateClientPayload: jasmine.createSpy().and.returnValue({}),
+        generateClientPayload: jest.fn().mockReturnValue({}),
       },
     };
     const mockedCore = {
