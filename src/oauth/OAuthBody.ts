@@ -19,6 +19,8 @@
 
 export interface OAuthBody {
   client_id: string;
+  code_challenge: string;
+  code_challenge_method: string;
   redirect_uri: string;
   response_type: string;
   scope: string;
