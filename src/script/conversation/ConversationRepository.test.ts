@@ -700,6 +700,9 @@ describe('ConversationRepository', () => {
       });
 
       it('should process create event for a new conversation created locally', () => {
+        jest
+          .spyOn(testFactory.conversation_repository['conversationService'], 'getConversationById')
+          .mockResolvedValue(createEvent.data);
         return testFactory.conversation_repository['handleConversationEvent'](createEvent).then(() => {
           expect(testFactory.conversation_repository['onCreate']).toHaveBeenCalled();
           expect(testFactory.conversation_repository.mapConversations).toHaveBeenCalledWith([createEvent.data], 1);
@@ -710,6 +713,9 @@ describe('ConversationRepository', () => {
         const time = new Date();
         createEvent.time = time.toISOString();
 
+        jest
+          .spyOn(testFactory.conversation_repository['conversationService'], 'getConversationById')
+          .mockResolvedValue(createEvent.data);
         return testFactory.conversation_repository['handleConversationEvent'](createEvent).then(() => {
           expect(testFactory.conversation_repository['onCreate']).toHaveBeenCalled();
           expect(testFactory.conversation_repository.mapConversations).toHaveBeenCalledWith(

@@ -2352,19 +2352,25 @@ export class ConversationRepository {
     eventJson: ConversationCreateEvent,
     eventSource?: EventSource,
   ): Promise<{conversationEntity: Conversation}> {
-    const {conversation: conversationId, data: eventData, time} = eventJson;
+    const {conversation, data: eventData, qualified_conversation, time} = eventJson;
     const eventTimestamp = new Date(time).getTime();
     const initialTimestamp = isNaN(eventTimestamp) ? this.getLatestEventTimestamp(true) : eventTimestamp;
+    const conversationId = qualified_conversation ?? {
+      domain: eventJson.qualified_conversation?.domain ?? '',
+      id: conversation,
+    };
     try {
-      const existingConversationEntity = this.conversationState.findConversation({
-        domain: eventJson.qualified_conversation?.domain,
-        id: conversationId,
-      });
+      const existingConversationEntity = this.conversationState.findConversation(conversationId);
       if (existingConversationEntity) {
         throw new ConversationError(ConversationError.TYPE.NO_CHANGES, ConversationError.MESSAGE.NO_CHANGES);
       }
 
-      const [conversationEntity] = this.mapConversations([eventData], initialTimestamp);
+      const conversationData = !eventSource
+        ? // If there is no source, it means its a conversation created locally, no need to fetch it again
+          eventData
+        : await this.conversationService.getConversationById(conversationId);
+
+      const [conversationEntity] = this.mapConversations([conversationData], initialTimestamp);
       if (conversationEntity) {
         if (conversationEntity.participating_user_ids().length) {
           this.addCreationMessage(conversationEntity, false, initialTimestamp, eventSource);
@@ -2393,14 +2399,6 @@ export class ConversationRepository {
     const createdBySelfUser = conversationEntity.isCreatedBySelf();
 
     const creatorIsParticipant = createdByParticipant || createdBySelfUser;
-
-    const data = await this.conversationService.getConversationById(conversationEntity);
-    const allMembers = [...data.members.others, data.members.self];
-    const conversationRoles = allMembers.reduce<Record<string, string>>((roles, member) => {
-      roles[member.id] = member.conversation_role;
-      return roles;
-    }, {});
-    conversationEntity.roles(conversationRoles);
 
     if (!creatorIsParticipant) {
       (messageEntity as MemberMessage).memberMessageType = SystemMessageType.CONVERSATION_RESUME;
