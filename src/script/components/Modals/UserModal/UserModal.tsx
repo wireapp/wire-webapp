@@ -179,6 +179,9 @@ const UserModal: React.FC<UserModalProps> = ({
         onBgClick={hide}
         onClosed={onModalClosed}
         data-uie-name={user ? 'modal-user-profile' : userNotFound ? 'modal-cannot-open-profile' : ''}
+        wrapperCSS={{
+          padding: 0,
+        }}
       >
         <div className="modal__header">
           {userNotFound && (

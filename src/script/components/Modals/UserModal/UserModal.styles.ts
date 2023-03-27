@@ -20,10 +20,6 @@
 import {css} from '@emotion/react';
 
 export const userModalStyle = css`
-  & > div > div {
-    padding: 0;
-  }
-
   .enriched-fields {
     margin: 0 0 16px 0;
   }
