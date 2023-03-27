@@ -202,10 +202,6 @@ const UserModal: React.FC<UserModalProps> = ({
                 avatarStyles={{
                   marginTop: 60,
                 }}
-                classifiedBarStyles={{
-                  position: 'absolute',
-                  top: user.handle ? 130 : 100,
-                }}
                 participant={user}
                 isSelfVerified={isSelfVerified}
                 classifiedDomains={classifiedDomains}
