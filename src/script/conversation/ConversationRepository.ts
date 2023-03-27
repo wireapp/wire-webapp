@@ -1221,7 +1221,7 @@ export class ConversationRepository {
    * @param connectionEntities Connections entities
    */
   mapConnections(connectionEntities: ConnectionEntity[]): Promise<Conversation>[] {
-    this.logger.info(`Mapping '${connectionEntities.length}' user connection(s) to conversations`, connectionEntities);
+    this.logger.log(`Mapping '${connectionEntities.length}' user connection(s) to conversations`, connectionEntities);
 
     return connectionEntities.map(connectionEntity => this.mapConnection(connectionEntity));
   }
@@ -2097,7 +2097,7 @@ export class ConversationRepository {
         }
 
         const message = `Received '${type}' event from user '${senderId}' unknown in '${conversationEntity.id}'`;
-        this.logger.warn(message, eventJson);
+        this.logger.warn(message);
 
         const qualifiedSender: QualifiedId = {domain: '', id: senderId};
 
@@ -2394,14 +2394,6 @@ export class ConversationRepository {
 
     const creatorIsParticipant = createdByParticipant || createdBySelfUser;
 
-    const data = await this.conversationService.getConversationById(conversationEntity);
-    const allMembers = [...data.members.others, data.members.self];
-    const conversationRoles = allMembers.reduce<Record<string, string>>((roles, member) => {
-      roles[member.id] = member.conversation_role;
-      return roles;
-    }, {});
-    conversationEntity.roles(conversationRoles);
-
     if (!creatorIsParticipant) {
       (messageEntity as MemberMessage).memberMessageType = SystemMessageType.CONVERSATION_RESUME;
     }
@@ -2639,17 +2631,13 @@ export class ConversationRepository {
     if (!inSelfConversation && conversation && !isBackendEvent) {
       this.logger.warn(
         `A conversation update message was not sent in the selfConversation. Skipping conversation update`,
-        eventData,
       );
       return;
     }
 
     const isFromSelf = !this.userState.self() || from === this.userState.self().id;
     if (!isFromSelf) {
-      this.logger.warn(
-        `A conversation update message was not sent by the self user. Skipping conversation update`,
-        eventData,
-      );
+      this.logger.warn(`A conversation update message was not sent by the self user. Skipping conversation update`);
       return;
     }
 
@@ -2811,8 +2799,7 @@ export class ConversationRepository {
       if (!messageEntity || !messageEntity.isContent()) {
         const type = messageEntity ? messageEntity.type : 'unknown';
 
-        const logMessage = `Cannot react to '${type}' message '${messageId}' in conversation '${conversationId}'`;
-        this.logger.error(logMessage, messageEntity);
+        this.logger.error(`Cannot react to '${type}' message '${messageId}' in conversation '${conversationId}'`);
         throw new ConversationError(ConversationError.TYPE.WRONG_TYPE, ConversationError.MESSAGE.WRONG_TYPE);
       }
 
@@ -2828,7 +2815,7 @@ export class ConversationRepository {
       const isNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
       if (!isNotFound) {
         const logMessage = `Failed to handle reaction to message '${messageId}' in conversation '${conversationId}'`;
-        this.logger.error(logMessage, {error, event: eventJson});
+        this.logger.error(logMessage, error);
         throw error;
       }
     }
@@ -2842,8 +2829,9 @@ export class ConversationRepository {
       if (!messageEntity || !messageEntity.isComposite()) {
         const type = messageEntity ? messageEntity.type : 'unknown';
 
-        const log = `Cannot react to '${type}' message '${messageId}' in conversation '${conversationEntity.id}'`;
-        this.logger.error(log, messageEntity);
+        this.logger.error(
+          `Cannot react to '${type}' message '${messageId}' in conversation '${conversationEntity.id}'`,
+        );
         throw new ConversationError(ConversationError.TYPE.WRONG_TYPE, ConversationError.MESSAGE.WRONG_TYPE);
       }
       const changes = messageEntity.getSelectionChange(buttonId);
@@ -2855,7 +2843,7 @@ export class ConversationRepository {
       const isNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
       if (!isNotFound) {
         const log = `Failed to handle reaction to message '${messageId}' in conversation '${conversationEntity.id}'`;
-        this.logger.error(log, {error, event: eventJson});
+        this.logger.error(log, error);
         throw error;
       }
     }

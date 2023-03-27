@@ -103,7 +103,7 @@ export class EventMapper {
           return await this._mapJsonEvent(event, conversationEntity);
         } catch (error) {
           const errorMessage = `Failure while mapping events. Affected '${event.type}' event: ${error.message}`;
-          this.logger.error(errorMessage, {error, event});
+          this.logger.error(errorMessage, error);
         }
       }),
     );
@@ -124,7 +124,7 @@ export class EventMapper {
         throw error;
       }
       const errorMessage = `Failure while mapping events. Affected '${event.type}' event: ${error.message}`;
-      this.logger.error(errorMessage, {error, event});
+      this.logger.error(errorMessage, error);
 
       throw new ConversationError(
         ConversationError.TYPE.MESSAGE_NOT_FOUND,
@@ -342,7 +342,7 @@ export class EventMapper {
 
       default: {
         const {type, id} = event as LegacyEventRecord;
-        this.logger.warn(`Ignored unhandled '${type}' event ${id ? `'${id}' ` : ''}`, event);
+        this.logger.warn(`Ignored unhandled '${type}' event ${id ? `'${id}' ` : ''}`);
         throw new ConversationError(
           ConversationError.TYPE.MESSAGE_NOT_FOUND,
           ConversationError.MESSAGE.MESSAGE_NOT_FOUND,
@@ -399,7 +399,7 @@ export class EventMapper {
     }
 
     if (isNaN(messageEntity.timestamp())) {
-      this.logger.warn(`Could not get timestamp for message '${messageEntity.id}'. Skipping it.`, event);
+      this.logger.warn(`Could not get timestamp for message '${messageEntity.id}'. Skipping it.`);
       messageEntity = undefined;
     }
 
@@ -891,7 +891,7 @@ export class EventMapper {
           try {
             return mentionEntity.validate(messageText, allMentions);
           } catch (error) {
-            this.logger.warn(`Removed invalid mention when mapping message: ${error.message}`, mentionEntity);
+            this.logger.warn(`Removed invalid mention when mapping message: ${error.message}`);
             return false;
           }
         }

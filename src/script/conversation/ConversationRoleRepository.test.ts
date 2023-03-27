@@ -17,7 +17,7 @@
  *
  */
 
-import {ConversationRole, DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/lib/conversation/';
+import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/lib/conversation/';
 
 import {createRandomUuid} from 'Util/util';
 
@@ -68,24 +68,6 @@ describe('ConversationRoleRepository', () => {
       await roleRepository.loadTeamRoles();
 
       expect(roleRepository.teamRoles.length).toBe(1);
-    });
-  });
-
-  describe('setConversationRoles', () => {
-    it('sets conversation roles', async () => {
-      const newRoles: ConversationRole[] = [
-        {
-          actions: [Permissions.leaveConversation],
-          conversation_role: DefaultRole.WIRE_MEMBER,
-        },
-      ];
-
-      const conversationEntity = new Conversation();
-      roleRepository.setConversationRoles(conversationEntity, newRoles);
-
-      const realRoles = roleRepository.getConversationRoles(conversationEntity);
-
-      expect(realRoles.length).toBe(1);
     });
   });
 

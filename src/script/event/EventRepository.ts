@@ -307,7 +307,7 @@ export class EventRepository {
     const conversationId = 'conversation' in event && event.conversation;
     const inSelfConversation = conversationId === this.userState.self().id;
     if (!inSelfConversation) {
-      this.logger.info(`Injected event ID '${id}' of type '${event.type}' with source '${source}'`, event);
+      this.logger.info(`Injected event ID '${id}' of type '${event.type}' with source '${source}'`);
       return this.processEvent(event, source);
     }
     return undefined;
@@ -352,7 +352,6 @@ export class EventRepository {
    * @returns Resolves with the saved record or the plain event if the event was skipped
    */
   private async handleEvent({event, decryptedData, decryptionError}: ProcessedEventPayload, source: EventSource) {
-    const logObject = {eventJson: JSON.stringify(event), eventObject: event};
     const validationResult = validateEvent(
       event as {time: string; type: CONVERSATION_EVENT | USER_EVENT},
       source,
@@ -363,7 +362,7 @@ export class EventRepository {
         return event;
       }
       case EventValidation.OUTDATED_TIMESTAMP: {
-        this.logger.info(`Ignored outdated event type: '${event.type}'`, logObject);
+        this.logger.info(`Ignored outdated event type: '${event.type}'`);
         return event;
       }
       case EventValidation.VALID:
@@ -653,7 +652,7 @@ export class EventRepository {
     const from = 'from' in event && event.from;
 
     const baseLogMessage = `Ignored '${event.type}' in '${conversation}' from '${from}''`;
-    this.logger.warn(`${baseLogMessage} ${logMessage || errorMessage}`, event);
+    this.logger.warn(`${baseLogMessage} ${logMessage || errorMessage}`);
     throw new EventError(EventError.TYPE.VALIDATION_FAILED, `Event validation failed: ${errorMessage}`);
   }
 }

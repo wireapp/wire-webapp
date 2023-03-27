@@ -68,7 +68,6 @@ export class ReceiptsMiddleware {
         originalEvents.forEach(originalEvent => this.updateConfirmationStatus(originalEvent, event));
         this.logger.info(
           `Confirmed '${originalEvents.length}' messages with status '${event.data.status}' from '${event.from}'`,
-          originalEvents,
         );
         return event;
       }

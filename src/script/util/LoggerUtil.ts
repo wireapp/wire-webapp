@@ -17,12 +17,18 @@
  *
  */
 
+import {initializeDataDog} from 'Util/DataDog';
+
 import {getStorage} from './localStorage';
 
-export function enableLogging(force = false, search = window.location.search): void {
-  const storage = getStorage();
+import {Configuration} from '../Config';
 
+export async function enableLogging(config: Configuration, search = window.location.search) {
+  await initializeDataDog(config);
+
+  const storage = getStorage();
   const namespace = new URLSearchParams(search).get('enableLogging');
+  const force = config.FEATURE.ENABLE_DEBUG;
 
   if (namespace) {
     storage?.setItem('debug', namespace);

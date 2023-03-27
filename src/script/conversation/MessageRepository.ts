@@ -19,13 +19,7 @@
 
 import {ConversationProtocol, MessageSendingStatus, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId, RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/lib/user';
-import {
-  MessageSendingState,
-  MessageTargetMode,
-  ReactionType,
-  GenericMessageType,
-  SendResult,
-} from '@wireapp/core/lib/conversation';
+import {MessageSendingState, MessageTargetMode, GenericMessageType, SendResult} from '@wireapp/core/lib/conversation';
 import {
   AudioMetaData,
   EditedTextContent,
@@ -75,7 +69,7 @@ import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {Conversation} from '../entity/Conversation';
 import {CompositeMessage} from '../entity/message/CompositeMessage';
-import {ContentMessage} from '../entity/message/ContentMessage';
+import {ContentMessage, ReactionType} from '../entity/message/ContentMessage';
 import {FileAsset} from '../entity/message/FileAsset';
 import {Message} from '../entity/message/Message';
 import {User} from '../entity/User';
@@ -995,7 +989,7 @@ export class MessageRepository {
         return;
       }
       const logMessage = `Failed to delete message '${messageId}' in conversation '${conversationId}' for everyone`;
-      this.logger.info(logMessage, error);
+      this.logger.warn(logMessage, error);
       throw error;
     }
   }
@@ -1018,7 +1012,7 @@ export class MessageRepository {
       await this.sendToSelfConversations(payload);
       await this.deleteMessageById(conversation, message.id);
     } catch (error) {
-      this.logger.info(
+      this.logger.warn(
         `Failed to send delete message with id '${message.id}' for conversation '${conversation.id}'`,
         error,
       );

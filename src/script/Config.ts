@@ -119,6 +119,12 @@ export class Configuration {
 
   /** Which min and max version of the backend api do we support */
   readonly SUPPORTED_API_RANGE = [1, env.ENABLE_DEV_BACKEND_API ? Infinity : 3];
+
+  /** DataDog client api keys acces */
+  readonly dataDog = {
+    clientToken: env.DATADOG_CLIENT_TOKEN,
+    applicationId: env.DATADOG_APPLICATION_ID,
+  };
 }
 
 let instance: Configuration;

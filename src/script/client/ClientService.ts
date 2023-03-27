@@ -163,7 +163,7 @@ export class ClientService {
       return primaryKey;
     }
 
-    this.logger.info(`Loaded client record from database '${primaryKey}'`, clientRecord);
+    this.logger.info(`Loaded client record from database '${primaryKey}'`);
     return clientRecord;
   }
 
@@ -182,7 +182,7 @@ export class ClientService {
     clientPayload.meta.primary_key = primaryKey;
 
     return this.storageService.save(this.CLIENT_STORE_NAME, primaryKey, clientPayload).then(() => {
-      this.logger.info(`Client '${clientPayload.id}' stored with primary key '${primaryKey}'`, clientPayload);
+      this.logger.info(`Client '${clientPayload.id}' stored with primary key '${primaryKey}'`);
       return clientPayload;
     });
   }
