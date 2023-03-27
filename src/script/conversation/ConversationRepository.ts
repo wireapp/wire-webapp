@@ -2394,14 +2394,6 @@ export class ConversationRepository {
 
     const creatorIsParticipant = createdByParticipant || createdBySelfUser;
 
-    const data = await this.conversationService.getConversationById(conversationEntity);
-    const allMembers = [...data.members.others, data.members.self];
-    const conversationRoles = allMembers.reduce<Record<string, string>>((roles, member) => {
-      roles[member.id] = member.conversation_role;
-      return roles;
-    }, {});
-    conversationEntity.roles(conversationRoles);
-
     if (!creatorIsParticipant) {
       (messageEntity as MemberMessage).memberMessageType = SystemMessageType.CONVERSATION_RESUME;
     }
