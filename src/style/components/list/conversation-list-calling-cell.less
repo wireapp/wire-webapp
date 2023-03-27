@@ -147,6 +147,10 @@
     }
 
     .participant-item {
+      svg {
+        margin: 0;
+      }
+
       &__image {
         width: 48px !important;
       }
@@ -155,7 +159,12 @@
         display: none !important;
       }
 
-      .verified-icon,
+      .verified-icon {
+        display: flex;
+        width: 14px !important;
+        height: 16px !important;
+      }
+
       .guest-icon svg {
         display: flex;
         width: 12px !important;
@@ -170,8 +179,8 @@
 
       .participant-mic-on-icon svg {
         display: flex;
-        width: 12px !important;
-        height: 12px !important;
+        width: 14px !important;
+        height: 14px !important;
       }
     }
   }

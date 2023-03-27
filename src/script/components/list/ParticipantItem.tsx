@@ -249,7 +249,7 @@ const ParticipantItem = <UserType extends User | ServiceEntity>(
                   <Icon.MicOff
                     className="mic-off-icon"
                     data-uie-name="status-audio-off"
-                    style={{height: 12, width: 12}}
+                    style={{height: 14, width: 14, marginLeft: 8}}
                   />
                 )}
               </>
