@@ -466,6 +466,7 @@ export class MessageRepository {
    * @param conversation Conversation to post the file
    * @param file File object
    * @param asImage whether or not the file should be treated as an image
+   * @param originalId Id of the messsage currently in db, necessary to replace the original message
    * @returns Resolves when file was uploaded
    */
   private async uploadFile(
@@ -507,6 +508,15 @@ export class MessageRepository {
     }
   }
 
+  /**
+   * Retry sending a file to a conversation when the original message failed to be sent
+   *
+   * @param conversation Conversation to post the file
+   * @param file File object
+   * @param asImage whether or not the file should be treated as an image
+   * @param originalId Id of the messsage currently in db, necessary to replace the original message
+   * @returns Resolves when file was uploaded
+   */
   public async retryUploadFile(
     conversation: Conversation,
     file: Blob,
@@ -516,6 +526,14 @@ export class MessageRepository {
     await this.uploadFile(conversation, file, asImage, originalId);
   }
 
+  /**
+   * Store a file in offline db to be able to send it later
+   *
+   * @param conversation Conversation to post the file
+   * @param file File object to be stored in db
+   * @param messageId Id of the messsage in db to update
+   * @returns Resolves when database was updated
+   */
   private async storeFileInDb(conversation: Conversation, messageId: string, file: Blob) {
     try {
       const messageEntity = await this.getMessageInConversationById(conversation, messageId);
