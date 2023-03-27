@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [24.1.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@24.0.0...@wireapp/api-client@24.1.0) (2023-03-27)
+
+### Features
+
+* updated api for pkce ([#5010](https://github.com/wireapp/wire-web-packages/issues/5010)) ([38ba539](https://github.com/wireapp/wire-web-packages/commit/38ba53972d5cb357f8cfde7d8f8b887171428897))
+
 # [24.0.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@23.3.1...@wireapp/api-client@24.0.0) (2023-03-22)
 
 ### Features
