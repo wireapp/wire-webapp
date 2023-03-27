@@ -35,7 +35,7 @@ export const userModalStyle = css`
     justify-content: center;
   }
 
-  loading-icon {
+  .loading-icon {
     fill: currentColor;
   }
 
