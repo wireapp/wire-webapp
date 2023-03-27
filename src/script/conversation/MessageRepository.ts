@@ -800,7 +800,7 @@ export class MessageRepository {
         reactionsArr.splice(reactionIndex, 1);
       }
       // if all reactions removed return empty string
-      updatedReactions[userId] = reactionsArr.length ? reactionsArr.join(',') : '';
+      updatedReactions[userId] = reactionsArr.join(',');
     } else {
       // first time reacted
       updatedReactions[userId] = reaction;
