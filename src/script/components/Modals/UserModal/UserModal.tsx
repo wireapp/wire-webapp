@@ -36,6 +36,7 @@ import {handleKeyDown} from 'Util/KeyboardUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 
 import {useUserModalState} from './UserModal.state';
+import {userModalStyle} from './UserModal.styles';
 
 import {Config} from '../../../Config';
 import {User} from '../../../entity/User';
@@ -172,7 +173,7 @@ const UserModal: React.FC<UserModalProps> = ({
   }, [userId?.id, userId?.domain]);
 
   return (
-    <div className="user-modal">
+    <div className="user-modal" css={userModalStyle}>
       <ModalComponent
         isShown={isShown}
         onBgClick={hide}
