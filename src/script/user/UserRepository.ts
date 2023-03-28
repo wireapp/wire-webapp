@@ -468,8 +468,7 @@ export class UserRepository {
       const chunkOfQualifiedUserIds = chunkOfUserIds.map(({id, domain}) => ({domain: domain || selfDomain, id}));
 
       try {
-        const fakeFailed = chunkOfQualifiedUserIds.pop() as QualifiedId; // REMOVEME
-        const {found, failed = [fakeFailed], not_found = []} = await this.userService.getUsers(chunkOfQualifiedUserIds);
+        const {found, failed = [], not_found = []} = await this.userService.getUsers(chunkOfQualifiedUserIds);
         const failedToLoad = [...failed, ...not_found].map(userId => {
           /* When a federated backend is unreachable, we generate placeholder users locally with some default values
            * This allows the webapp to load correctly and display conversations with those federated users
