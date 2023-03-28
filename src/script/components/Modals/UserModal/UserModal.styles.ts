@@ -31,10 +31,6 @@ export const userModalStyle = css`
     justify-content: center;
   }
 
-  .loading-icon {
-    fill: currentColor;
-  }
-
   &__wrapper {
     min-height: 0;
     overflow-x: hidden;
