@@ -1167,9 +1167,10 @@ export class MessageRepository {
       const messageEntity = await this.getMessageInConversationById(conversationEntity, eventId);
       const updatedStatus = messageEntity.readReceipts().length ? StatusType.SEEN : StatusType.SENT;
       messageEntity.status(updatedStatus);
-      const changes: Pick<Partial<EventRecord>, 'status' | 'time' | 'failedToSend'> = {
+      const changes: Pick<Partial<EventRecord>, 'status' | 'time' | 'failedToSend' | 'fileData'> = {
         status: updatedStatus,
         failedToSend,
+        fileData: undefined,
       };
       if (isoDate) {
         const timestamp = new Date(isoDate).getTime();
