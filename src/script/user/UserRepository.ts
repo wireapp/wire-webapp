@@ -474,7 +474,9 @@ export class UserRepository {
           /* When a federated backend is unreachable, we generate placeholder users locally with some default values
            * This allows the webapp to load correctly and display conversations with those federated users
            */
-          return new PlaceholderUser(userId);
+          const placeholderUser = new PlaceholderUser(userId);
+          placeholderUser.name(t('unavailableUser'));
+          return placeholderUser;
         });
         return [...this.userMapper.mapUsersFromJson(found), ...failedToLoad];
       } catch (error: any) {
