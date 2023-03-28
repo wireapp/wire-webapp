@@ -108,27 +108,40 @@
 @font-size-large: 1.25rem;
 @font-size-xlarge: 1.5rem;
 
-@line-height-xs: 0.6875rem;
-@line-height-sm: 1rem;
-@line-height-md: 1.25rem;
-@line-height-lg: 1.5rem;
-@line-height-xl: 2rem;
-@line-height-xxl: 4rem;
-
-@font-weight-bold: 700;
-@font-weight-semibold: 600;
-@font-weight-medium: 500;
-@font-weight-regular: 400; // font-weight-xs should this this
-@font-weight-light: 300;
-
 body {
+  --line-height-xs: 0.6875rem;
+  --line-height-sm: 1rem;
+  --line-height-md: 1.25rem;
+  --line-height-lg: 1.5rem;
+  --line-height-xl: 2rem;
+  --line-height-xxl: 4rem;
+
   --font-size-xsmall: 0.6875rem;
   --font-size-small: 0.75rem;
   --font-size-medium: 0.875rem;
   --font-size-base: 1rem;
   --font-size-large: 1.25rem;
   --font-size-xlarge: 1.5rem;
+
+  --font-weight-bold: 700;
+  --font-weight-semibold: 600;
+  --font-weight-medium: 500;
+  --font-weight-regular: 400; // font-weight-xs should this this
+  --font-weight-light: 300;
 }
+
+@line-height-xs: var(--line-height-xs);
+@line-height-sm: var(--line-height-sm);
+@line-height-md: var(--line-height-md);
+@line-height-lg: var(--line-height-lg);
+@line-height-xl: var(--line-height-xl);
+@line-height-xxl: var(--line-height-xxl);
+
+@font-weight-bold: var(--font-weight-bold);
+@font-weight-semibold: var(--font-weight-semibold);
+@font-weight-medium: var(--font-weight-medium);
+@font-weight-regular: var(--font-weight-regular);
+@font-weight-light: var(--font-weight-light);
 
 // ----------------------------------------------------------------------------
 // Icons
@@ -259,13 +272,21 @@ body {
 // ----------------------------------------------------------------------------
 // Avatar
 // ---------------------------------------------------------------------------
+body {
+  --avatar-diameter-m: '40px';
+  --font-weight-semibold: 600;
+  --font-weight-medium: 500;
+  --font-weight-regular: 400; // font-weight-xs should this this
+  --font-weight-light: 300;
+}
+
 @avatar-diameter-xl: 200px;
 @avatar-initials-xl: @font-size-xl;
 
 @avatar-diameter-l: 72px;
 @avatar-initials-l: @font-size-lg;
 
-@avatar-diameter-m: 40px;
+@avatar-diameter-m: var(--avatar-diameter-m);
 @avatar-initials-m: @font-size-sm;
 
 @avatar-diameter-s: 28px;

@@ -20,12 +20,24 @@
 import React from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
-import cx from 'classnames';
 
 import {Availability} from '@wireapp/protocol-messaging';
 
 import {AvailabilityState} from 'Components/AvailabilityState';
 import {Icon} from 'Components/Icon';
+
+import {
+  contentInfoWrapper,
+  contentInfoText,
+  selfIndicator,
+  userName,
+  userAvailability,
+  ellipsis,
+  nameWrapper,
+  chevronIcon,
+  contentText,
+  wrapper,
+} from './ParticipantItemContent.styles';
 
 export interface ParticipantItemContentProps {
   name: string;
@@ -49,31 +61,30 @@ export const ParticipantItemContent = ({
   showArrow = false,
 }: ParticipantItemContentProps) => {
   return (
-    <div className="participant-item__content">
-      <div className="participant-item__content__text">
-        <div className="participant-item__content__name-wrapper">
+    <div css={wrapper}>
+      <div css={contentText}>
+        <div css={nameWrapper}>
           {selfInTeam && availability ? (
             <AvailabilityState
               availability={availability}
-              className="participant-item__content__availability participant-item__content__name"
+              css={[userName, userAvailability, ellipsis]}
               dataUieName="status-name"
               label={name}
             />
           ) : (
-            <div className="participant-item__content__name" data-uie-name="status-name">
+            <div css={[userName, ellipsis]} data-uie-name="status-name">
               {name}
             </div>
           )}
 
-          {selfString && <div className="participant-item__content__self-indicator">{selfString}</div>}
+          {selfString && <div css={selfIndicator}>{selfString}</div>}
         </div>
 
         {shortDescription && (
-          <div className="participant-item__content__info">
+          <div css={contentInfoWrapper}>
             <span
-              className={cx('participant-item__content__username label-username-notext', {
-                'label-username': hasUsernameInfo,
-              })}
+              css={[contentInfoText(hasUsernameInfo), ellipsis]}
+              className="subline"
               data-uie-name="status-username"
             >
               {shortDescription}
@@ -81,9 +92,9 @@ export const ParticipantItemContent = ({
 
             {/* TODO: It's not used, saved for future if it will be needed, and add prop badge */}
             {/*{hasUsernameInfo && badge && (*/}
-            {/*  <span className="participant-item__content__badge" data-uie-name="status-partner">*/}
-            {/*    {badge}*/}
-            {/*  </span>*/}
+            {/*<span css={badge} data-uie-name="status-partner">*/}
+            {/*  {badge}*/}
+            {/*</span>*/}
             {/*)}*/}
           </div>
         )}
@@ -92,7 +103,7 @@ export const ParticipantItemContent = ({
       {onDropdownClick && (
         <button
           tabIndex={TabIndex.UNFOCUSABLE}
-          className="participant-item__content__chevron"
+          css={chevronIcon}
           onClick={onDropdownClick}
           type="button"
           data-uie-name="participant-menu-icon"
@@ -101,7 +112,7 @@ export const ParticipantItemContent = ({
         </button>
       )}
 
-      {showArrow && <Icon.ChevronRight className="chevron-right-icon participant-item__content__chevron" />}
+      {showArrow && <Icon.ChevronRight css={chevronIcon} />}
     </div>
   );
 };
