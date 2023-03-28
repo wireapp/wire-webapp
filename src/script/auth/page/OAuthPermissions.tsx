@@ -44,6 +44,16 @@ import {AssetRepository} from 'src/script/assets/AssetRepository';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {loadDataUrl} from 'Util/util';
 
+import {
+  getBoxCSS,
+  getButtonCSS,
+  getButtonsCSS,
+  getContainerCSS,
+  getHeaderCSS,
+  getListCSS,
+  getTeamImageCSS,
+  getTextCSS,
+} from './OauthPermissions.styles';
 import {Page} from './Page';
 
 import {Config} from '../../Config';
@@ -124,33 +134,16 @@ const OAuthPermissionsComponent = ({
 
   return (
     <Page>
-      <ContainerXS
-        centerText
-        verticalCenter
-        style={{width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center'}}
-      >
+      <ContainerXS centerText verticalCenter css={getContainerCSS()}>
         {!oAuthApp ? (
           <Icon.Loading width="36" height="36" css={{path: {fill: COLOR_V2.BLUE_DARK_500}}} />
         ) : (
           <>
-            <H2 style={{fontWeight: 500, lineHeight: '28.64px', fontSize: '24px'}}>{_(oauthStrings.headline)}</H2>
-            {typeof teamImage === 'string' && (
-              <img
-                src={teamImage}
-                style={{
-                  width: '22px',
-                  height: '22px',
-                  borderRadius: '6px',
-                  border: 'black 1px solid',
-                  padding: '2px',
-                  margin: '15px',
-                }}
-                alt="teamIcon"
-              />
-            )}
-            <Text style={{marginBottom: '8px'}}>{selfUser.email}</Text>
+            <H2 css={getHeaderCSS()}>{_(oauthStrings.headline)}</H2>
+            {typeof teamImage === 'string' && <img src={teamImage} css={getTeamImageCSS()} alt="teamIcon" />}
+            <Text css={{marginBottom: '8px'}}>{selfUser.email}</Text>
             <Link
-              style={{marginBottom: '32px'}}
+              css={{marginBottom: '32px'}}
               onClick={doLogout}
               data-uie-name="go-logout"
               variant={LinkVariant.PRIMARY}
@@ -159,38 +152,18 @@ const OAuthPermissionsComponent = ({
               {_(oauthStrings.logout)}
             </Link>
 
-            <Text style={{marginBottom: '24px'}}>{_(oauthStrings.subhead, {app: oAuthApp?.application_name})}</Text>
+            <Text css={{marginBottom: '24px'}}>{_(oauthStrings.subhead, {app: oAuthApp?.application_name})}</Text>
 
             {oauthParams.scope.length > 1 && (
-              <Box
-                style={{
-                  marginBottom: '24px',
-                  background: COLOR_V2.GRAY_20,
-                  borderColor: COLOR_V2.GRAY_20,
-                  padding: '8px',
-                }}
-              >
-                <ul
-                  style={{
-                    marginTop: 0,
-                    paddingInlineStart: '20px',
-                    fontSize: '12px',
-                  }}
-                >
+              <Box css={getBoxCSS()}>
+                <ul css={getListCSS()}>
                   {oauthScope.map((scope, index) => (
-                    <li key={index} style={{textAlign: 'start'}}>
+                    <li key={index} css={{textAlign: 'start'}}>
                       <Text>{_(oauthStrings[scope])}</Text>
                     </li>
                   ))}
                 </ul>
-                <Text
-                  data-uie-name="oauth-learn-more"
-                  style={{
-                    fontSize: '12px',
-                    lineHeight: '16px',
-                    display: 'block',
-                  }}
-                >
+                <Text data-uie-name="oauth-learn-more" css={getTextCSS()}>
                   <FormattedMessage
                     {...oauthStrings.learnMore}
                     values={{
@@ -209,13 +182,13 @@ const OAuthPermissionsComponent = ({
                 </Text>
               </Box>
             )}
-            <Text muted style={{fontSize: '12px', lineHeight: '16px', display: 'block'}} data-uie-name="oauth-details">
+            <Text muted css={getTextCSS()} data-uie-name="oauth-details">
               {_(oauthStrings.details)}
             </Text>
-            <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: '74px', gap: '16px'}}>
+            <div css={getButtonsCSS()}>
               <Button
                 variant={ButtonVariant.SECONDARY}
-                style={{margin: 'auto', width: 200}}
+                css={getButtonCSS()}
                 type="button"
                 onClick={onCancel}
                 data-uie-name="do-oauth-cancel"
@@ -228,7 +201,7 @@ const OAuthPermissionsComponent = ({
                 {_(oauthStrings.cancel)}
               </Button>
               <Button
-                style={{margin: 'auto', width: 200}}
+                css={getButtonCSS()}
                 type="button"
                 onClick={onContinue}
                 data-uie-name="do-oauth-allow"
@@ -237,7 +210,7 @@ const OAuthPermissionsComponent = ({
                 {_(oauthStrings.allow)}
               </Button>
             </div>
-            <Paragraph center style={{marginTop: 40}}>
+            <Paragraph center css={{marginTop: 40}}>
               <FormattedMessage
                 {...oauthStrings.privacyPolicy}
                 values={{
