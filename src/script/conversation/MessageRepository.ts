@@ -537,9 +537,9 @@ export class MessageRepository {
   private async storeFileInDb(conversation: Conversation, messageId: string, file: Blob) {
     try {
       const messageEntity = await this.getMessageInConversationById(conversation, messageId);
-      messageEntity.storedBlob(file);
+      messageEntity.fileData(file);
       return await this.eventService.updateEvent(messageEntity.primary_key, {
-        storedBlob: file,
+        fileData: file,
       });
     } catch (error) {
       if ((error as any).type !== ConversationError.TYPE.MESSAGE_NOT_FOUND) {

@@ -191,8 +191,8 @@ export class EventMapper {
       originalEntity.failedToSend(event.failedToSend);
     }
 
-    if (event.storedBlob) {
-      originalEntity.storedBlob(event.storedBlob);
+    if (event.fileData) {
+      originalEntity.fileData(event.fileData);
     }
 
     if (event.selected_button_id) {

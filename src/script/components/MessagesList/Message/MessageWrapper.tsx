@@ -100,7 +100,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
 
   const onRetry = async (message: ContentMessage) => {
     const firstAsset = message.getFirstAsset();
-    const file = message.storedBlob();
+    const file = message.fileData();
 
     if (firstAsset instanceof Text) {
       const messageId = message.id;
