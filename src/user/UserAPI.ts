@@ -56,7 +56,7 @@ function isPrekeysResponse(object: any): object is PrekeysResponse {
 }
 
 type UsersReponse = {
-  found?: User[];
+  found: User[];
   failed?: QualifiedId[];
   not_found?: QualifiedId[];
 };
