@@ -67,6 +67,7 @@ import {Config} from '../Config';
 import type {ConnectionEntity} from '../connection/ConnectionEntity';
 import {flattenUserClientsQualifiedIds} from '../conversation/userClientsUtils';
 import {User} from '../entity/User';
+import {PlaceholderUser} from '../entity/User/PlaceholderUser';
 import {UserError} from '../error/UserError';
 import {USER} from '../event/Client';
 import {EventRepository} from '../event/EventRepository';
@@ -467,14 +468,13 @@ export class UserRepository {
       const chunkOfQualifiedUserIds = chunkOfUserIds.map(({id, domain}) => ({domain: domain || selfDomain, id}));
 
       try {
-        const {found, failed = [], not_found = []} = await this.userService.getUsers(chunkOfQualifiedUserIds);
+        const fakeFailed = chunkOfQualifiedUserIds.pop() as QualifiedId; // REMOVEME
+        const {found, failed = [fakeFailed], not_found = []} = await this.userService.getUsers(chunkOfQualifiedUserIds);
         const failedToLoad = [...failed, ...not_found].map(userId => {
-          /* When a federated backend is unreachable, we generate fake users locally with some default values
+          /* When a federated backend is unreachable, we generate placeholder users locally with some default values
            * This allows the webapp to load correctly and display conversations with those federated users
            */
-          const fakeUser = new User(userId.id, userId.domain);
-          fakeUser.name(t('unavailableUser'));
-          return fakeUser;
+          return new PlaceholderUser(userId);
         });
         return [...this.userMapper.mapUsersFromJson(found), ...failedToLoad];
       } catch (error: any) {
