@@ -538,7 +538,7 @@ export class MessageRepository {
     try {
       const messageEntity = await this.getMessageInConversationById(conversation, messageId);
       messageEntity.fileData(file);
-      return await this.eventService.updateEvent(messageEntity.primary_key, {
+      return this.eventService.updateEvent(messageEntity.primary_key, {
         fileData: file,
       });
     } catch (error) {
