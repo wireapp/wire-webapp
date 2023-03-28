@@ -540,10 +540,7 @@ export class EventRepository {
     switch (previewStatus) {
       case ASSET_PREVIEW:
 
-      case RETRY_EVENT: {
-        return updateEvent();
-      }
-
+      case RETRY_EVENT: 
       case AssetTransferState.UPLOADED: {
         return updateEvent();
       }
