@@ -87,7 +87,7 @@ export class User {
   public readonly name: ko.Observable<string>;
   public readonly phone: ko.Observable<string>;
   public readonly previewPictureResource: ko.Observable<AssetRemoteData>;
-  public readonly providerName: ko.Observable<string>;
+  public readonly providerName: ko.Observable<string | undefined> = ko.observable();
   public readonly teamRole: ko.Observable<TEAM_ROLE>;
   public readonly username: ko.Observable<string>;
   public isFederated: boolean = false;
@@ -132,7 +132,6 @@ export class User {
     this.isDeleted = false;
     this.providerId = undefined;
     this.serviceId = undefined;
-    this.providerName = ko.observable(undefined);
 
     this.joaatHash = -1;
 

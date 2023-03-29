@@ -157,10 +157,10 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
   const {
     user: quotedUser,
     assets: quotedAssets,
-    headerSenderName,
+    senderName,
     was_edited,
     timestamp,
-  } = useKoSubscribableChildren(quotedMessage, ['user', 'assets', 'headerSenderName', 'was_edited', 'timestamp']);
+  } = useKoSubscribableChildren(quotedMessage, ['user', 'assets', 'senderName', 'was_edited', 'timestamp']);
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
 
   return (
@@ -173,7 +173,7 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
           data-uie-name="label-name-quote"
           tabIndex={messageFocusedTabIndex}
         >
-          {headerSenderName}
+          {senderName}
         </button>
         {was_edited && (
           <span data-uie-name="message-edited-quote" title={quotedMessage.displayEditedTimestamp()}>
