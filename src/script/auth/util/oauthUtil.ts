@@ -24,18 +24,12 @@ import {Scope} from '../page/OAuthPermissions';
 /**
  *  Takes the oauth parameters and returns the oauth object expected by the API.
  * @param location window.location
- * @returns
+ * @returns OAuthBody
  */
-export const oAuthParams = (location: Location) =>
-  decodeURIComponent(location.search.slice(1))
-    .split('&')
-    .reduce((acc, param) => {
-      const [key, value] = param.split('=');
-      if (key === 'scope') {
-        return {...acc, [key]: value.replaceAll('+', ' ')};
-      }
-      return {...acc, [key]: value};
-    }, {} as OAuthBody);
+export const oAuthParams = (location: Location) => {
+  const params = new URLSearchParams(location.search);
+  return Object.fromEntries(params) as unknown as OAuthBody;
+};
 
 /**
  * Takes the oauth body and returns the scopes as an array of Scopes accepted by the app.
