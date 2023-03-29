@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,16 +17,5 @@
  *
  */
 
-const cache = new Map<string, Promise<string>>();
-
-export const getAssetUrl = (identifier: string): Promise<string> | undefined => cache.get(identifier);
-
-export const setAssetUrl = (identifier: string, url: Promise<string>) => {
-  const isExistingUrl = getAssetUrl(identifier);
-
-  if (!isExistingUrl) {
-    cache.set(identifier, url);
-  }
-
-  return url;
-};
+export * from './User';
+export * from './PlaceholderUser';

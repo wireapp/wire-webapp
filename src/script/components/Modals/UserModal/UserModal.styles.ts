@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,16 +17,44 @@
  *
  */
 
-const cache = new Map<string, Promise<string>>();
+import {css} from '@emotion/react';
 
-export const getAssetUrl = (identifier: string): Promise<string> | undefined => cache.get(identifier);
-
-export const setAssetUrl = (identifier: string, url: Promise<string>) => {
-  const isExistingUrl = getAssetUrl(identifier);
-
-  if (!isExistingUrl) {
-    cache.set(identifier, url);
+export const userModalStyle = css`
+  .enriched-fields {
+    margin: 0 0 16px 0;
   }
 
-  return url;
-};
+  .loading-wrapper {
+    align-items: center;
+    display: flex;
+    height: 448px;
+    justify-content: center;
+  }
+
+  &__wrapper {
+    min-height: 0;
+    overflow-x: hidden;
+    transition: all 0.15s linear;
+
+    &--max {
+      min-height: 448px;
+    }
+  }
+
+  .panel-participant {
+    padding: 0;
+  }
+
+  .modal__header {
+    margin: 16px;
+  }
+
+  .modal__body {
+    padding: 16px;
+
+    .classified-bar {
+      margin-top: 12px;
+      width: calc(100% + 32px);
+    }
+  }
+`;

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,16 +17,15 @@
  *
  */
 
-const cache = new Map<string, Promise<string>>();
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-export const getAssetUrl = (identifier: string): Promise<string> | undefined => cache.get(identifier);
+import {User} from './User';
 
-export const setAssetUrl = (identifier: string, url: Promise<string>) => {
-  const isExistingUrl = getAssetUrl(identifier);
-
-  if (!isExistingUrl) {
-    cache.set(identifier, url);
+export class PlaceholderUser extends User {
+  /**
+   * A placeholder user is a user that could not be loaded from the backend. That usually means that the backend owning the user is offline
+   */
+  constructor(id: QualifiedId) {
+    super(id.id, id.domain);
   }
-
-  return url;
-};
+}
