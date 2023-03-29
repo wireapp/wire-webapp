@@ -49,7 +49,7 @@ import type {MessageCategory} from '../../message/MessageCategory';
 import {StatusType} from '../../message/StatusType';
 import {SuperType} from '../../message/SuperType';
 import type {ReadReceipt} from '../../storage/record/EventRecord';
-import {User} from '../User';
+import {PlaceholderUser, User} from '../User';
 
 export class Message {
   private messageTimerStarted: boolean;
@@ -77,7 +77,7 @@ export class Message {
   public readonly timestamp_affects_order: ko.PureComputed<boolean>;
   public readonly timestamp: ko.Observable<number>;
   public readonly unsafeSenderName: ko.PureComputed<string>;
-  public readonly user: ko.Observable<User>;
+  public readonly user: ko.Observable<User | PlaceholderUser>;
   public readonly visible: ko.Observable<boolean>;
   public readReceipts: ko.ObservableArray<ReadReceipt>;
   public super_type: SuperType;

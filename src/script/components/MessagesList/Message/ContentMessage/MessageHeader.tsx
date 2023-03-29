@@ -18,9 +18,10 @@
  */
 
 import {AVATAR_SIZE, Avatar} from 'Components/Avatar';
+import {PlaceholderAvatar} from 'Components/avatar/PlaceholderAvatar';
 import {Icon} from 'Components/Icon';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {User} from 'src/script/entity/User';
+import {PlaceholderUser, User} from 'src/script/entity/User';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -31,9 +32,29 @@ type MessageHeaderParams = {
   focusTabIndex?: number;
 };
 
+function PlaceholderSenderHeader({sender}: {sender: PlaceholderUser}) {
+  return (
+    <div className="message-header">
+      <div className="message-header-icon">
+        <PlaceholderAvatar size={AVATAR_SIZE.X_SMALL} />
+      </div>
+
+      <div className="message-header-label">
+        <h4 className="message-header-label-sender" data-uie-name="sender-name">
+          not available
+        </h4>
+      </div>
+    </div>
+  );
+}
+
 export function MessageHeader({message, onClickAvatar, focusTabIndex}: MessageHeaderParams) {
   const {was_edited, user: sender} = useKoSubscribableChildren(message, ['was_edited', 'user']);
   const {name: senderName} = useKoSubscribableChildren(sender, ['name']);
+
+  if (sender instanceof PlaceholderUser) {
+    return <PlaceholderSenderHeader sender={sender} />;
+  }
 
   return (
     <div className="message-header">
