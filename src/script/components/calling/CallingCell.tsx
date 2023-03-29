@@ -589,7 +589,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
                       {participants
                         .slice()
                         .sort((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user))
-                        .map(participant => (
+                        .map((participant, index, participantsArray) => (
                           <li key={participant.clientId} className="call-ui__participant-list__participant">
                             <CallParticipantsListItem
                               key={participant.clientId}
@@ -600,6 +600,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
                               onContextMenu={
                                 isModerator ? event => getParticipantContext(event, participant) : undefined
                               }
+                              isLast={participantsArray.length === index}
                             />
                           </li>
                         ))}

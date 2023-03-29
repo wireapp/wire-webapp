@@ -22,27 +22,30 @@ import React from 'react';
 import {Icon} from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
+import {badgesWrapper, icon} from './UserStatusBadges.styles';
+
 const badgeToComponentMap = {
   guest: () => (
-    <span className="guest-icon with-tooltip with-tooltip--external" data-tooltip={t('conversationGuestIndicator')}>
+    <span css={icon} className="with-tooltip with-tooltip--external" data-tooltip={t('conversationGuestIndicator')}>
       <Icon.Guest data-uie-name="status-guest" />
     </span>
   ),
   federated: () => (
     <span
-      className="federation-icon with-tooltip with-tooltip--external"
+      css={icon}
+      className="with-tooltip with-tooltip--external"
       data-tooltip={t('conversationFederationIndicator')}
     >
       <Icon.Federation data-uie-name="status-federated-user" />
     </span>
   ),
   external: () => (
-    <span className="partner-icon with-tooltip with-tooltip--external" data-tooltip={t('rolePartner')}>
+    <span css={icon} className="with-tooltip with-tooltip--external" data-tooltip={t('rolePartner')}>
       <Icon.External data-uie-name="status-external" />
     </span>
   ),
   verified: () => (
-    <span className="verified-icon">
+    <span css={icon}>
       <Icon.Verified data-uie-name="status-verified" />
     </span>
   ),
@@ -53,12 +56,19 @@ interface UserStatusBadgesProps {
   config: {[key in BadgeKey]?: boolean};
 }
 
-export const UserStatusBadges = ({config}: UserStatusBadgesProps) => (
-  <>
-    {Object.entries(config)
-      .filter(([_badge, shouldShow]) => shouldShow)
-      .map(([badge]) => (
+export const UserStatusBadges = ({config}: UserStatusBadgesProps) => {
+  const badges = Object.entries(config).filter(([_badge, shouldShow]) => shouldShow);
+  const badgesCount = badges.length;
+
+  if (!badgesCount) {
+    return null;
+  }
+
+  return (
+    <div css={badgesWrapper(badgesCount)}>
+      {badges.map(([badge]) => (
         <React.Fragment key={badge}>{badgeToComponentMap[badge as BadgeKey]()}</React.Fragment>
       ))}
-  </>
-);
+    </div>
+  );
+};
