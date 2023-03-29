@@ -23,11 +23,13 @@ import {DefaultAvatarImageSmall, DefaultAvatarImageLarge} from './DefaultAvatarI
 
 import {AvatarWrapper} from '../AvatarWrapper';
 
-export function PlaceholderAvatar({size}: {size: AVATAR_SIZE}) {
+type PlaceholderAvatarProps = {size: AVATAR_SIZE; onClick: () => void};
+
+export function PlaceholderAvatar({size, onClick}: PlaceholderAvatarProps) {
   const diameter = DIAMETER[size];
   const ImageComponent = diameter >= DIAMETER[AVATAR_SIZE.LARGE] ? DefaultAvatarImageLarge : DefaultAvatarImageSmall;
   return (
-    <AvatarWrapper avatarSize={size} color={''}>
+    <AvatarWrapper avatarSize={size} color={''} onClick={onClick}>
       <ImageComponent diameter={diameter} />
     </AvatarWrapper>
   );

@@ -32,16 +32,22 @@ type MessageHeaderParams = {
   focusTabIndex?: number;
 };
 
-function PlaceholderSenderHeader({sender}: {sender: PlaceholderUser}) {
+function PlaceholderSenderHeader({
+  sender,
+  onClick,
+}: {
+  sender: PlaceholderUser;
+  onClick: (user: PlaceholderUser) => void;
+}) {
   return (
     <div className="message-header">
       <div className="message-header-icon">
-        <PlaceholderAvatar size={AVATAR_SIZE.X_SMALL} />
+        <PlaceholderAvatar onClick={() => onClick(sender)} size={AVATAR_SIZE.X_SMALL} />
       </div>
 
       <div className="message-header-label">
-        <h4 className="message-header-label-sender" data-uie-name="sender-name">
-          not available
+        <h4 className="message-header-label-sender" css={{color: '#676B71'}} data-uie-name="sender-name">
+          Name not available
         </h4>
       </div>
     </div>
@@ -53,7 +59,7 @@ export function MessageHeader({message, onClickAvatar, focusTabIndex}: MessageHe
   const {name: senderName} = useKoSubscribableChildren(sender, ['name']);
 
   if (sender instanceof PlaceholderUser) {
-    return <PlaceholderSenderHeader sender={sender} />;
+    return <PlaceholderSenderHeader onClick={onClickAvatar} sender={sender} />;
   }
 
   return (
