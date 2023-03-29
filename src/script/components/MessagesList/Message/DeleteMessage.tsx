@@ -19,12 +19,11 @@
 
 import React from 'react';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {User} from 'src/script/entity/User';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
 
+import {MessageHeader} from './ContentMessage/MessageHeader';
 import {MessageTime} from './MessageTime';
 
 import {DeleteMessage as DeleteMessageEntity} from '../../../entity/message/DeleteMessage';
@@ -36,8 +35,6 @@ export interface DeleteMessageProps {
 }
 
 const DeleteMessage: React.FC<DeleteMessageProps> = ({message, onClickAvatar}) => {
-  const {unsafeSenderName, user} = useKoSubscribableChildren(message, ['unsafeSenderName', 'user']);
-
   const deletedTimeStamp = message.deleted_timestamp || 0;
 
   const formattedDeletionTime = t(
@@ -46,21 +43,8 @@ const DeleteMessage: React.FC<DeleteMessageProps> = ({message, onClickAvatar}) =
   );
 
   return (
-    <div className="message-header">
-      <div className="message-header-icon">
-        <Avatar
-          className="cursor-pointer"
-          participant={user}
-          onAvatarClick={onClickAvatar}
-          avatarSize={AVATAR_SIZE.X_SMALL}
-        />
-      </div>
-      <div className="message-header-label" data-uie-name="element-message-delete">
-        <p className="message-header-label-sender" data-uie-name="element-message-delete-sender-name">
-          {unsafeSenderName}
-        </p>
-        <span className="message-header-label-icon icon-trash" title={formattedDeletionTime} />
-      </div>
+    <MessageHeader message={message} onClickAvatar={onClickAvatar} uieName="element-message-delete" noBadges noColor>
+      <span className="message-header-label-icon icon-trash" title={formattedDeletionTime} />
       <p className="message-body-actions">
         <MessageTime
           timestamp={deletedTimeStamp}
@@ -70,7 +54,7 @@ const DeleteMessage: React.FC<DeleteMessageProps> = ({message, onClickAvatar}) =
           {formattedDeletionTime}
         </MessageTime>
       </p>
-    </div>
+    </MessageHeader>
   );
 };
 

@@ -21,23 +21,32 @@ import {AVATAR_SIZE, Avatar} from 'Components/Avatar';
 import {PlaceholderAvatar} from 'Components/avatar/PlaceholderAvatar';
 import {Icon} from 'Components/Icon';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import {DeleteMessage} from 'src/script/entity/message/DeleteMessage';
 import {PlaceholderUser, User} from 'src/script/entity/User';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 type MessageHeaderParams = {
-  message: ContentMessage;
+  message: ContentMessage | DeleteMessage;
   onClickAvatar: (user: User | ServiceEntity) => void;
   focusTabIndex?: number;
+  /** Will not display the guest, federated or service badges next to the user name */
+  noBadges?: boolean;
+  /** Will not use the user's accent color to display the user name */
+  noColor?: boolean;
+  uieName?: string;
+  children?: React.ReactNode;
 };
 
 function PlaceholderSenderHeader({
   sender,
   onClick,
+  children,
 }: {
   sender: PlaceholderUser;
   onClick: (user: PlaceholderUser) => void;
+  children?: React.ReactNode;
 }) {
   return (
     <div className="message-header">
@@ -50,16 +59,71 @@ function PlaceholderSenderHeader({
           Name not available
         </h4>
       </div>
+      {children}
     </div>
   );
 }
 
-export function MessageHeader({message, onClickAvatar, focusTabIndex}: MessageHeaderParams) {
-  const {was_edited, user: sender} = useKoSubscribableChildren(message, ['was_edited', 'user']);
+function BadgeSection({sender}: {sender: User}) {
+  return (
+    <>
+      {sender.isService && (
+        <span className="message-header-icon-service">
+          <Icon.Service />
+        </span>
+      )}
+
+      {sender.isExternal() && (
+        <span
+          className="message-header-icon-external with-tooltip with-tooltip--external"
+          data-tooltip={t('rolePartner')}
+          data-uie-name="sender-external"
+        >
+          <Icon.External />
+        </span>
+      )}
+
+      {sender.isFederated && (
+        <span
+          className="message-header-icon-guest with-tooltip with-tooltip--external"
+          data-tooltip={sender.handle}
+          data-uie-name="sender-federated"
+        >
+          <Icon.Federation />
+        </span>
+      )}
+
+      {sender.isDirectGuest() && (
+        <span
+          className="message-header-icon-guest with-tooltip with-tooltip--external"
+          data-tooltip={t('conversationGuestIndicator')}
+          data-uie-name="sender-guest"
+        >
+          <Icon.Guest />
+        </span>
+      )}
+    </>
+  );
+}
+
+export function MessageHeader({
+  message,
+  onClickAvatar,
+  focusTabIndex,
+  noBadges = false,
+  noColor = false,
+  uieName = '',
+  children,
+}: MessageHeaderParams) {
+  const {user: sender} = useKoSubscribableChildren(message, ['user']);
   const {name: senderName} = useKoSubscribableChildren(sender, ['name']);
 
   if (sender instanceof PlaceholderUser) {
-    return <PlaceholderSenderHeader onClick={onClickAvatar} sender={sender} />;
+    return (
+      <PlaceholderSenderHeader onClick={onClickAvatar} sender={sender}>
+        {children}
+      </PlaceholderSenderHeader>
+    );
   }
 
   return (
@@ -73,54 +137,18 @@ export function MessageHeader({message, onClickAvatar, focusTabIndex}: MessageHe
         />
       </div>
 
-      <div className="message-header-label">
+      <div className="message-header-label" data-uie-name={uieName}>
         <h4
-          className={`message-header-label-sender ${message.accent_color()}`}
-          data-uie-name="sender-name"
+          className={`message-header-label-sender ${!noColor && message.accent_color()}`}
+          data-uie-name={uieName ? `${uieName}-sender-name` : 'sender-name'}
           data-uie-uid={sender.id}
         >
           {senderName}
         </h4>
 
-        {sender.isService && (
-          <span className="message-header-icon-service">
-            <Icon.Service />
-          </span>
-        )}
+        {!noBadges && <BadgeSection sender={sender} />}
 
-        {sender.isExternal() && (
-          <span
-            className="message-header-icon-external with-tooltip with-tooltip--external"
-            data-tooltip={t('rolePartner')}
-            data-uie-name="sender-external"
-          >
-            <Icon.External />
-          </span>
-        )}
-
-        {sender.isFederated && (
-          <span
-            className="message-header-icon-guest with-tooltip with-tooltip--external"
-            data-tooltip={sender.handle}
-            data-uie-name="sender-federated"
-          >
-            <Icon.Federation />
-          </span>
-        )}
-
-        {sender.isDirectGuest() && (
-          <span
-            className="message-header-icon-guest with-tooltip with-tooltip--external"
-            data-tooltip={t('conversationGuestIndicator')}
-            data-uie-name="sender-guest"
-          >
-            <Icon.Guest />
-          </span>
-        )}
-
-        {was_edited && (
-          <span className="message-header-label-icon icon-edit" title={message.displayEditedTimestamp()}></span>
-        )}
+        {children}
       </div>
     </div>
   );
