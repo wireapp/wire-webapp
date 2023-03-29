@@ -217,8 +217,14 @@ const LoginComponent = ({
               try {
                 await doSendTwoFactorCode(login.email || login.handle || '');
               } catch (error) {
-                if (error.code !== StatusCodes.TOO_MANY_REQUESTS) {
-                  throw error;
+                if (isBackendError(error)) {
+                  /**  The BE can respond quite restrictively to the send code request.
+                   * We don't want to block the user from logging in if they have already received a code in the last few minutes.
+                   * Any other error should still be thrown.
+                   */
+                  if (error.code !== StatusCodes.TOO_MANY_REQUESTS) {
+                    throw error;
+                  }
                 }
               } finally {
                 setTwoFactorLoginData(login);
