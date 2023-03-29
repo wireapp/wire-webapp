@@ -45,14 +45,14 @@ import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {loadDataUrl} from 'Util/util';
 
 import {
-  getBoxCSS,
-  getButtonCSS,
-  getButtonsCSS,
-  getContainerCSS,
-  getHeaderCSS,
-  getListCSS,
-  getTeamImageCSS,
-  getTextCSS,
+  boxCSS,
+  buttonCSS,
+  buttonsCSS,
+  containerCSS,
+  headerCSS,
+  listCSS,
+  teamImageCSS,
+  textCSS,
 } from './OauthPermissions.styles';
 import {Page} from './Page';
 
@@ -134,13 +134,13 @@ const OAuthPermissionsComponent = ({
 
   return (
     <Page>
-      <ContainerXS centerText verticalCenter css={getContainerCSS()}>
+      <ContainerXS centerText verticalCenter css={containerCSS}>
         {!oAuthApp ? (
           <Icon.Loading width="36" height="36" css={{path: {fill: COLOR_V2.BLUE_DARK_500}}} />
         ) : (
           <>
-            <H2 css={getHeaderCSS()}>{_(oauthStrings.headline)}</H2>
-            {typeof teamImage === 'string' && <img src={teamImage} css={getTeamImageCSS()} alt="teamIcon" />}
+            <H2 css={headerCSS}>{_(oauthStrings.headline)}</H2>
+            {typeof teamImage === 'string' && <img src={teamImage} css={teamImageCSS} alt="teamIcon" />}
             <Text css={{marginBottom: '8px'}}>{selfUser.email}</Text>
             <Link
               css={{marginBottom: '32px'}}
@@ -155,15 +155,15 @@ const OAuthPermissionsComponent = ({
             <Text css={{marginBottom: '24px'}}>{_(oauthStrings.subhead, {app: oAuthApp?.application_name})}</Text>
 
             {oauthParams.scope.length > 1 && (
-              <Box css={getBoxCSS()}>
-                <ul css={getListCSS()}>
+              <Box css={boxCSS}>
+                <ul css={listCSS}>
                   {oauthScope.map((scope, index) => (
                     <li key={index} css={{textAlign: 'start'}}>
                       <Text>{_(oauthStrings[scope])}</Text>
                     </li>
                   ))}
                 </ul>
-                <Text data-uie-name="oauth-learn-more" css={getTextCSS()}>
+                <Text data-uie-name="oauth-learn-more" css={textCSS}>
                   <FormattedMessage
                     {...oauthStrings.learnMore}
                     values={{
@@ -182,13 +182,13 @@ const OAuthPermissionsComponent = ({
                 </Text>
               </Box>
             )}
-            <Text muted css={getTextCSS()} data-uie-name="oauth-details">
+            <Text muted css={textCSS} data-uie-name="oauth-details">
               {_(oauthStrings.details)}
             </Text>
-            <div css={getButtonsCSS()}>
+            <div css={buttonsCSS}>
               <Button
                 variant={ButtonVariant.SECONDARY}
-                css={getButtonCSS()}
+                css={buttonCSS}
                 type="button"
                 onClick={onCancel}
                 data-uie-name="do-oauth-cancel"
@@ -201,7 +201,7 @@ const OAuthPermissionsComponent = ({
                 {_(oauthStrings.cancel)}
               </Button>
               <Button
-                css={getButtonCSS()}
+                css={buttonCSS}
                 type="button"
                 onClick={onContinue}
                 data-uie-name="do-oauth-allow"

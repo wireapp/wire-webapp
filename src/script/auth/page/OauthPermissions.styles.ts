@@ -21,49 +21,49 @@ import {CSSObject} from '@emotion/react';
 
 import {COLOR_V2} from '@wireapp/react-ui-kit';
 
-export const getTeamImageCSS = (): CSSObject => ({
+export const teamImageCSS: CSSObject = {
   width: '22px',
   height: '22px',
   borderRadius: '6px',
   border: 'black 1px solid',
   padding: '2px',
   margin: '15px',
-});
+};
 
-export const getContainerCSS = (): CSSObject => ({
+export const containerCSS: CSSObject = {
   width: '100%',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-});
+};
 
-export const getHeaderCSS = (): CSSObject => ({
+export const headerCSS: CSSObject = {
   fontWeight: 500,
   lineHeight: '28.64px',
   fontSize: '24px',
-});
+};
 
-export const getBoxCSS = (): CSSObject => ({
+export const boxCSS: CSSObject = {
   marginBottom: '24px',
   background: COLOR_V2.GRAY_20,
   borderColor: COLOR_V2.GRAY_20,
   padding: '8px',
-});
+};
 
-export const getTextCSS = (): CSSObject => ({fontSize: '12px', lineHeight: '16px', display: 'block'});
+export const textCSS: CSSObject = {fontSize: '12px', lineHeight: '16px', display: 'block'};
 
-export const getButtonsCSS = (): CSSObject => ({
+export const buttonsCSS: CSSObject = {
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
   marginTop: '74px',
   gap: '16px',
-});
+};
 
-export const getButtonCSS = (): CSSObject => ({margin: 'auto', width: 200});
+export const buttonCSS: CSSObject = {margin: 'auto', width: 200};
 
-export const getListCSS = (): CSSObject => ({
+export const listCSS: CSSObject = {
   marginTop: 0,
   paddingInlineStart: '20px',
   fontSize: '12px',
-});
+};
