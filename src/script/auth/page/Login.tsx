@@ -214,9 +214,16 @@ const LoginComponent = ({
             await resetAuthError();
             const login: LoginData = {...formLoginData, clientType: loginData.clientType};
             if (login.email || login.handle) {
-              await doSendTwoFactorCode(login.email || login.handle || '');
-              setTwoFactorLoginData(login);
-              await doSetLocalStorage(QUERY_KEY.JOIN_EXPIRES, Date.now() + 1000 * 60 * 10);
+              try {
+                await doSendTwoFactorCode(login.email || login.handle || '');
+              } catch (error) {
+                if (error.code !== StatusCodes.TOO_MANY_REQUESTS) {
+                  throw error;
+                }
+              } finally {
+                setTwoFactorLoginData(login);
+                await doSetLocalStorage(QUERY_KEY.JOIN_EXPIRES, Date.now() + 1000 * 60 * 10);
+              }
             }
             break;
           }
