@@ -20,21 +20,20 @@
 import {AVATAR_SIZE, Avatar} from 'Components/Avatar';
 import {Icon} from 'Components/Icon';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {User, PlaceholderUser} from 'src/script/entity/User';
+import {User} from 'src/script/entity/User';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 type MessageHeaderParams = {
-  sender: User | PlaceholderUser;
   message: ContentMessage;
   onClickAvatar: (user: User | ServiceEntity) => void;
   focusTabIndex?: number;
 };
 
-export function MessageHeader({sender, message, onClickAvatar, focusTabIndex}: MessageHeaderParams) {
+export function MessageHeader({message, onClickAvatar, focusTabIndex}: MessageHeaderParams) {
+  const {was_edited, user: sender} = useKoSubscribableChildren(message, ['was_edited', 'user']);
   const {name: senderName} = useKoSubscribableChildren(sender, ['name']);
-  const {was_edited} = useKoSubscribableChildren(message, ['was_edited']);
 
   return (
     <div className="message-header">
