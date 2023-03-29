@@ -17,11 +17,11 @@
  *
  */
 
-const cache = new Map<string, string>();
+const cache = new Map<string, Promise<string>>();
 
-export const getAssetUrl = (identifier: string): string | undefined => cache.get(identifier);
+export const getAssetUrl = (identifier: string): Promise<string> | undefined => cache.get(identifier);
 
-export const setAssetUrl = (identifier: string, url: string) => {
+export const setAssetUrl = (identifier: string, url: Promise<string>) => {
   const isExistingUrl = getAssetUrl(identifier);
 
   if (!isExistingUrl) {
