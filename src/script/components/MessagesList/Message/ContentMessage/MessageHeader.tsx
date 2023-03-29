@@ -58,8 +58,8 @@ function PlaceholderSenderHeader({
         <h4 className="message-header-label-sender" css={{color: '#676B71'}} data-uie-name="sender-name">
           Name not available
         </h4>
+        {children}
       </div>
-      {children}
     </div>
   );
 }
