@@ -22,7 +22,7 @@ import {PlaceholderAvatar} from 'Components/avatar/PlaceholderAvatar';
 import {Icon} from 'Components/Icon';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {DeleteMessage} from 'src/script/entity/message/DeleteMessage';
-import {PlaceholderUser, User} from 'src/script/entity/User';
+import {User} from 'src/script/entity/User';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -91,14 +91,12 @@ export function MessageHeader({
   children,
 }: MessageHeaderParams) {
   const {user: sender} = useKoSubscribableChildren(message, ['user']);
-  const {name: senderName} = useKoSubscribableChildren(sender, ['name']);
-
-  const isPlaceholderUser = sender instanceof PlaceholderUser;
+  const {name: senderName, isAvailable} = useKoSubscribableChildren(sender, ['name', 'isAvailable']);
 
   return (
     <div className="message-header">
       <div className="message-header-icon">
-        {isPlaceholderUser ? (
+        {!isAvailable ? (
           <PlaceholderAvatar onClick={() => onClickAvatar(sender)} size={AVATAR_SIZE.X_SMALL} />
         ) : (
           <Avatar
@@ -113,11 +111,11 @@ export function MessageHeader({
       <div className="message-header-label" data-uie-name={uieName}>
         <h4
           className={`message-header-label-sender ${!noColor && message.accent_color()}`}
-          css={isPlaceholderUser ? {color: '#676B71'} : {}}
+          css={!isAvailable ? {color: '#676B71'} : {}}
           data-uie-name={uieName ? `${uieName}-sender-name` : 'sender-name'}
           data-uie-uid={sender.id}
         >
-          {isPlaceholderUser ? t('unavailableUser') : senderName}
+          {!isAvailable ? t('unavailableUser') : senderName}
         </h4>
 
         {!noBadges && <BadgeSection sender={sender} />}
