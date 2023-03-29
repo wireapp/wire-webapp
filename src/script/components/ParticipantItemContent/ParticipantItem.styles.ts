@@ -95,10 +95,6 @@ export const chevronIcon: CSSObject = {
   opacity: '0',
   transition: 'opacity 0.25s ease-in-out',
   width: '16px',
-  // '& [data-hoverClass="chevron-icon"]:hover, [data-hoverClass="chevron-icon"]:focus &, [data-hoverClass="chevron-icon"]:focus-visible &':
-  //   {
-  //     opacity: '1',
-  //   },
   svg: {
     width: '8px',
     path: {
