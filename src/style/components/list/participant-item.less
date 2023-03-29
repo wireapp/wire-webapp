@@ -45,10 +45,6 @@
   &:focus-visible {
     background: var(--app-bg-secondary);
 
-    .participant-item__content__chevron {
-      opacity: 1;
-    }
-
     &::after {
       border-bottom: none;
     }
@@ -99,97 +95,6 @@
 
     &__image {
       margin: 0 16px;
-    }
-
-    &__content {
-      display: flex;
-      min-width: 0;
-      height: @avatar-diameter-m;
-      flex: 1 1;
-      align-items: center;
-      line-height: @line-height-sm;
-
-      &__text {
-        display: flex;
-        min-width: 0; // this will ensure that ellipses is working
-        min-height: @avatar-diameter-m;
-        flex-direction: column;
-        flex-grow: 1;
-        align-items: flex-start;
-        justify-content: center;
-        font-size: @font-size-medium;
-        font-weight: @font-weight-medium;
-      }
-
-      &__chevron {
-        .button-reset-default;
-        display: flex;
-        width: 16px;
-        height: 16px;
-        align-items: center;
-        justify-content: center;
-        opacity: 0;
-        transition: opacity 0.25s ease-in-out;
-
-        svg {
-          width: 8px;
-          path {
-            fill: currentColor;
-          }
-        }
-      }
-      &__availability {
-        .availability-state-label {
-          .ellipsis;
-        }
-
-        .availability-state-icon {
-          display: flex;
-        }
-      }
-
-      &__name-wrapper {
-        display: flex;
-        overflow: hidden;
-        width: 100%;
-        padding-right: 8px;
-        color: var(--main-color);
-      }
-
-      &__name {
-        .ellipsis;
-        max-width: 100%;
-        white-space: nowrap;
-      }
-
-      &__username {
-        .ellipsis;
-        max-width: 100%;
-        white-space: nowrap;
-      }
-
-      &__self-indicator {
-        margin-left: 4px;
-      }
-
-      &__info {
-        .ellipsis;
-        display: flex;
-        width: 100%;
-        margin-top: 4px;
-        color: var(--background);
-        font-size: 0;
-
-        * {
-          .subline;
-        }
-      }
-
-      &__badge::before {
-        display: inline-block;
-        margin: 0 4px;
-        content: '\00b7';
-      }
     }
   }
 
