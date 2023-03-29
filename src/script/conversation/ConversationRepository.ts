@@ -215,7 +215,7 @@ export class ConversationRepository {
 
       if (removedTeamUserIds.length) {
         // If we have found some users that were removed from the conversation, we need to check if those users were also completely removed from the team
-        const usersWithoutClients = await this.userRepository.getUserListFromBackend(removedTeamUserIds);
+        const {found: usersWithoutClients} = await this.userRepository.getUserListFromBackend(removedTeamUserIds);
         await Promise.all(
           usersWithoutClients
             .filter(user => user.deleted)
