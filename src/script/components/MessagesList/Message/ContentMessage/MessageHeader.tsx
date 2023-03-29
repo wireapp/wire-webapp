@@ -39,31 +39,6 @@ type MessageHeaderParams = {
   children?: React.ReactNode;
 };
 
-function PlaceholderSenderHeader({
-  sender,
-  onClick,
-  children,
-}: {
-  sender: PlaceholderUser;
-  onClick: (user: PlaceholderUser) => void;
-  children?: React.ReactNode;
-}) {
-  return (
-    <div className="message-header">
-      <div className="message-header-icon">
-        <PlaceholderAvatar onClick={() => onClick(sender)} size={AVATAR_SIZE.X_SMALL} />
-      </div>
-
-      <div className="message-header-label">
-        <h4 className="message-header-label-sender" css={{color: '#676B71'}} data-uie-name="sender-name">
-          {t('unavailableUser')}
-        </h4>
-        {children}
-      </div>
-    </div>
-  );
-}
-
 function BadgeSection({sender}: {sender: User}) {
   return (
     <>
@@ -118,32 +93,31 @@ export function MessageHeader({
   const {user: sender} = useKoSubscribableChildren(message, ['user']);
   const {name: senderName} = useKoSubscribableChildren(sender, ['name']);
 
-  if (sender instanceof PlaceholderUser) {
-    return (
-      <PlaceholderSenderHeader onClick={onClickAvatar} sender={sender}>
-        {children}
-      </PlaceholderSenderHeader>
-    );
-  }
+  const isPlaceholderUser = sender instanceof PlaceholderUser;
 
   return (
     <div className="message-header">
       <div className="message-header-icon">
-        <Avatar
-          tabIndex={focusTabIndex}
-          participant={sender}
-          onAvatarClick={onClickAvatar}
-          avatarSize={AVATAR_SIZE.X_SMALL}
-        />
+        {isPlaceholderUser ? (
+          <PlaceholderAvatar onClick={() => onClickAvatar(sender)} size={AVATAR_SIZE.X_SMALL} />
+        ) : (
+          <Avatar
+            tabIndex={focusTabIndex}
+            participant={sender}
+            onAvatarClick={onClickAvatar}
+            avatarSize={AVATAR_SIZE.X_SMALL}
+          />
+        )}
       </div>
 
       <div className="message-header-label" data-uie-name={uieName}>
         <h4
           className={`message-header-label-sender ${!noColor && message.accent_color()}`}
+          css={isPlaceholderUser ? {color: '#676B71'} : {}}
           data-uie-name={uieName ? `${uieName}-sender-name` : 'sender-name'}
           data-uie-uid={sender.id}
         >
-          {senderName}
+          {isPlaceholderUser ? t('unavailableUser') : senderName}
         </h4>
 
         {!noBadges && <BadgeSection sender={sender} />}
