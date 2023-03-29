@@ -37,7 +37,7 @@ import {
   chevronIcon,
   contentText,
   wrapper,
-} from './ParticipantItemContent.styles';
+} from './ParticipantItem.styles';
 
 export interface ParticipantItemContentProps {
   name: string;
@@ -102,6 +102,7 @@ export const ParticipantItemContent = ({
 
       {onDropdownClick && (
         <button
+          data-hoverClass="chevron-icon"
           tabIndex={TabIndex.UNFOCUSABLE}
           css={chevronIcon}
           onClick={onDropdownClick}
@@ -112,7 +113,7 @@ export const ParticipantItemContent = ({
         </button>
       )}
 
-      {showArrow && <Icon.ChevronRight css={chevronIcon} />}
+      {showArrow && <Icon.ChevronRight css={chevronIcon} data-hoverClass="chevron-icon" />}
     </div>
   );
 };

@@ -20,12 +20,12 @@
 import React, {ChangeEvent, useId, useState} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
-import cx from 'classnames';
 
 import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {ParticipantItemContent} from 'Components/ParticipantItemContent';
+import {listItem, listWrapper} from 'Components/ParticipantItemContent/ParticipantItem.styles';
 import {UserStatusBadges} from 'Components/UserBadges';
 import {UserlistMode} from 'Components/UserList';
 import {InViewport} from 'Components/utils/InViewport';
@@ -108,15 +108,10 @@ const UserListItem = ({
 
   const RenderParticipant = () => {
     return (
-      <InViewport className="participant-item" onVisible={() => setIsInViewport(true)}>
+      <InViewport css={listItem(noInteraction)} onVisible={() => setIsInViewport(true)}>
         {isInViewport && (
           <>
-            <Avatar
-              avatarSize={AVATAR_SIZE.SMALL}
-              participant={user}
-              aria-hidden="true"
-              className="participant-item__image"
-            />
+            <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={user} aria-hidden="true" css={{margin: '0 16px'}} />
 
             <ParticipantItemContent
               name={userName}
@@ -146,16 +141,13 @@ const UserListItem = ({
     'data-uie-value': userName,
   };
 
-  const commonClassName = cx('participant-item-wrapper', {
-    highlighted: isHighlighted,
-    'no-interaction': noInteraction,
-    'no-underline': noUnderline,
-  });
-
   return (
     <>
       {canSelect ? (
-        <div aria-label={t('accessibility.openConversation', userName)} className={commonClassName}>
+        <div
+          aria-label={t('accessibility.openConversation', userName)}
+          css={listWrapper({isHighlighted, noUnderline, noInteraction})}
+        >
           <Checkbox
             checked={isSelected}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => onClick(user, event)}
@@ -176,7 +168,7 @@ const UserListItem = ({
           tabIndex={TabIndex.FOCUSABLE}
           role="button"
           aria-label={t('accessibility.openConversation', userName)}
-          className={commonClassName}
+          css={listWrapper({isHighlighted, noUnderline})}
           {...(!noInteraction && {
             onClick: event => onClick(user, event.nativeEvent),
             onKeyDown: event => onKeyDown(user, event.nativeEvent),

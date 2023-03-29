@@ -21,11 +21,21 @@ import {Icon} from 'Components/Icon';
 import {Participant} from 'src/script/calling/Participant';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
+import {
+  callStatusIcons,
+  cameraIcon,
+  micOffIcon,
+  micOffWrapper,
+  screenShareIcon,
+} from './CallParticipantsListItem.styles';
+
 import {ParticipantMicOnIcon} from '../ParticipantMicOnIcon';
 
 interface CallParticipantStatusIconsProps {
   callParticipant: Participant;
 }
+
+const DEFAULT_VISIBLE_ICONS = 1;
 
 export const CallParticipantStatusIcons = ({callParticipant}: CallParticipantStatusIconsProps) => {
   const {sharesCamera, sharesScreen, isActivelySpeaking, isMuted} = useKoSubscribableChildren(callParticipant, [
@@ -35,14 +45,18 @@ export const CallParticipantStatusIcons = ({callParticipant}: CallParticipantSta
     'isMuted',
   ]);
 
-  return (
-    <>
-      {sharesScreen && <Icon.Screenshare className="screenshare-icon" data-uie-name="status-screenshare" />}
+  const activeIconsCount = [sharesCamera, sharesScreen].filter(Boolean).length;
 
-      {sharesCamera && <Icon.Camera className="camera-icon" data-uie-name="status-video" />}
+  return (
+    <div css={callStatusIcons(activeIconsCount + DEFAULT_VISIBLE_ICONS)}>
+      {sharesScreen && <Icon.Screenshare css={screenShareIcon} data-uie-name="status-screenshare" />}
+
+      {sharesCamera && <Icon.Camera css={cameraIcon} data-uie-name="status-video" />}
 
       {isMuted ? (
-        <Icon.MicOff className="mic-off-icon" data-uie-name="status-audio-off" style={{height: 12, width: 12}} />
+        <span css={micOffWrapper}>
+          <Icon.MicOff css={micOffIcon} data-uie-name="status-audio-off" />
+        </span>
       ) : (
         <ParticipantMicOnIcon
           className="participant-mic-on-icon"
@@ -50,6 +64,6 @@ export const CallParticipantStatusIcons = ({callParticipant}: CallParticipantSta
           data-uie-name={isActivelySpeaking ? 'status-active-speaking' : 'status-audio-on'}
         />
       )}
-    </>
+    </div>
   );
 };

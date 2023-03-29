@@ -21,6 +21,7 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {ParticipantItemContent} from 'Components/ParticipantItemContent';
+import {listItem, listWrapper} from 'Components/ParticipantItemContent/ParticipantItem.styles';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -47,15 +48,10 @@ export const ServiceListItem = ({service, onClick}: ServiceListItemProps) => {
       data-uie-name="item-service"
       data-uie-value={serviceName}
       aria-label={t('accessibility.openConversation', serviceName)}
-      className="participant-item-wrapper no-underline"
+      css={listWrapper({noUnderline: true})}
     >
-      <div className="participant-item">
-        <Avatar
-          avatarSize={AVATAR_SIZE.SMALL}
-          participant={service}
-          aria-hidden="true"
-          className="participant-item__image"
-        />
+      <div css={listItem()}>
+        <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={service} aria-hidden="true" css={{margin: '0 16px'}} />
 
         <ParticipantItemContent name={serviceName} shortDescription={serviceShortDescription} showArrow />
       </div>

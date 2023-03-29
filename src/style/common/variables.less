@@ -209,12 +209,20 @@ body {
 // ----------------------------------------------------------------------------
 // Left list
 // ----------------------------------------------------------------------------
+body {
+  --left-list-header-height: 45px;
+  --left-list-item-height: 48px;
+  --left-list-item-left-width: 60px;
+  --left-list-item-right-width: 56px;
+  --left-list-controls-width: 104px;
+}
+
 @left-list-width: @conversation-list-width;
-@left-list-header-height: 45px;
-@left-list-item-height: 48px;
-@left-list-item-left-width: 60px;
-@left-list-item-right-width: 56px;
-@left-list-controls-width: 104px;
+@left-list-header-height: var(--left-list-header-height);
+@left-list-item-height: var(--left-list-item-height);
+@left-list-item-left-width: var(--left-list-item-left-width);
+@left-list-item-right-width: var(--left-list-item-right-width);
+@left-list-controls-width: var(--left-list-controls-width);
 
 // ----------------------------------------------------------------------------
 // Conversation
@@ -347,16 +355,28 @@ body {
 @animation-timing-slow: 0.55s;
 @animation-timing-slower: 0.7s;
 
+body {
+  --ease-in-quad: cubic-bezier(0.165, 0.84, 0.44, 1);
+  --ease-in-cubic: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+  --ease-in-expo: cubic-bezier(0.6, 0.04, 0.98, 0.335);
+  --ease-in-quart: cubic-bezier(0.895, 0.03, 0.685, 0.22);
+  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-out-quart: cubic-bezier(0.165, 0.84, 0.44, 1);
+  --ease-out-back: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --ease-in-out-expo: cubic-bezier(1, 0, 0, 1);
+  --ease-in-out-quart: cubic-bezier(0.77, 0, 0.175, 1);
+}
+
 // easing functions
-@ease-in-quad: cubic-bezier(0.55, 0.085, 0.68, 0.53);
-@ease-in-cubic: cubic-bezier(0.55, 0.055, 0.675, 0.19);
-@ease-in-expo: cubic-bezier(0.6, 0.04, 0.98, 0.335);
-@ease-in-quart: cubic-bezier(0.895, 0.03, 0.685, 0.22);
-@ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
-@ease-out-quart: cubic-bezier(0.165, 0.84, 0.44, 1);
-@ease-out-back: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-@ease-in-out-expo: cubic-bezier(1, 0, 0, 1);
-@ease-in-out-quart: cubic-bezier(0.77, 0, 0.175, 1);
+@ease-in-quad: var(--ease-in-quad);
+@ease-in-cubic: var(--ease-in-cubic);
+@ease-in-expo: var(--ease-in-expo);
+@ease-in-quart: var(--ease-in-quart);
+@ease-out-expo: var(--ease-out-expo);
+@ease-out-quart: var(--ease-out-quart);
+@ease-out-back: var(--ease-out-back);
+@ease-in-out-expo: var(--ease-in-out-expo);
+@ease-in-out-quart: var(--ease-in-out-quart);
 
 // Start UI
 @start-ui-search-bar-offset: 88px;

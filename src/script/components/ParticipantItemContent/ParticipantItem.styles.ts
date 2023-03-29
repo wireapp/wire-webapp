@@ -19,6 +19,72 @@
 
 import {CSSObject} from '@emotion/react';
 
+export const listWrapper = ({isHighlighted = false, noUnderline = false, noInteraction = false}): CSSObject => ({
+  position: 'relative',
+  display: 'block',
+  margin: '1px',
+
+  '&:hover, &:focus, &:focus-visible': {
+    background: 'var(--app-bg-secondary)',
+    '&::after': {
+      borderBottom: 'none',
+    },
+  },
+
+  '&:hover [data-hoverClass="chevron-icon"], &:focus, &:focus-visible [data-hoverClass="chevron-icon"]': {
+    opacity: 1,
+  },
+
+  ...(!noInteraction && {
+    transition: 'background-color 0.15s ease-in-out',
+    '&:hover': {
+      backgroundColor: 'var(--app-bg-secondary)',
+    },
+    '&:focus-visible': {
+      backgroundColor: 'var(--app-bg-secondary)',
+      outline: '1px solid var(--accent-color-focus)',
+    },
+  }),
+
+  'input[type="checkbox"] + label > span': {
+    width: 'calc(100% - 22px - 0.75rem)',
+  },
+
+  ...(!noUnderline && {
+    '&::after': {
+      position: 'absolute',
+      right: 0,
+      bottom: 0,
+      left: 'var(--left-list-item-left-width)',
+      borderBottom: '1px solid var(--gray-40)',
+      content: '""',
+    },
+  }),
+
+  ...(isHighlighted && {
+    animation: 'fadeInUserHighlighting 1s var(--ease-out-quart)',
+    backgroundColor: 'var(--background-fade-8)',
+  }),
+
+  'body.theme-dark &': {
+    ...(!noUnderline && {
+      '&::after': {
+        borderBottomColor: 'var(--gray-90)',
+      },
+    }),
+  },
+});
+
+export const listItem = (noInteraction = false): CSSObject => ({
+  display: 'flex',
+  overflow: 'hidden',
+  height: '56px',
+  alignItems: 'center',
+  paddingRight: '16px',
+  margin: '0',
+  cursor: noInteraction ? 'default' : 'pointer',
+});
+
 export const chevronIcon: CSSObject = {
   border: 'none',
   padding: 0,
@@ -29,9 +95,10 @@ export const chevronIcon: CSSObject = {
   opacity: '0',
   transition: 'opacity 0.25s ease-in-out',
   width: '16px',
-  ['.participant-item-wrapper:hover &, .participant-item-wrapper:focus &, .participant-item-wrapper:focus-visible &']: {
-    opacity: '1',
-  },
+  // '& [data-hoverClass="chevron-icon"]:hover, [data-hoverClass="chevron-icon"]:focus &, [data-hoverClass="chevron-icon"]:focus-visible &':
+  //   {
+  //     opacity: '1',
+  //   },
   svg: {
     width: '8px',
     path: {

@@ -22,7 +22,9 @@ import React from 'react';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {callParticipantListWrapper} from 'Components/calling/CallParticipantsListItem/CallParticipantsListItem.styles';
 import {ParticipantItemContent} from 'Components/ParticipantItemContent';
+import {listItem} from 'Components/ParticipantItemContent/ParticipantItem.styles';
 import {UserStatusBadges} from 'Components/UserBadges';
 import {Participant} from 'src/script/calling/Participant';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -39,6 +41,7 @@ export interface CallParticipantsListItemProps {
   isSelfVerified?: boolean;
   showDropdown?: boolean;
   onContextMenu?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+  isLast?: boolean;
 }
 
 export const CallParticipantsListItem = ({
@@ -47,6 +50,7 @@ export const CallParticipantsListItem = ({
   selfInTeam,
   showDropdown = false,
   onContextMenu,
+  isLast = false,
 }: CallParticipantsListItemProps) => {
   const {user} = callParticipant;
   const {isMe: isSelf, isFederated} = user;
@@ -78,15 +82,10 @@ export const CallParticipantsListItem = ({
       data-uie-name="item-user"
       data-uie-value={userName}
       aria-label={t('accessibility.openConversation', userName)}
-      className="participant-item-wrapper no-interaction no-underline"
+      css={callParticipantListWrapper(isLast)}
     >
-      <div className="participant-item">
-        <Avatar
-          avatarSize={AVATAR_SIZE.SMALL}
-          participant={user}
-          aria-hidden="true"
-          className="participant-item__image"
-        />
+      <div css={listItem(true)}>
+        <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={user} aria-hidden="true" css={{margin: '0 10px'}} />
 
         <ParticipantItemContent
           name={userName}
