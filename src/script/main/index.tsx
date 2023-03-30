@@ -40,7 +40,7 @@ import {StorageKey} from '../storage';
 document.addEventListener('DOMContentLoaded', async () => {
   const config = Config.getConfig();
 
-  await enableLogging(config);
+  enableLogging(config);
   exposeWrapperGlobals();
 
   const appContainer = document.getElementById('wire-app');

@@ -21,7 +21,15 @@ import {Configuration} from '../Config';
 
 const uuidRegex = /([a-z\d]{8})-([a-z\d]{4})-([a-z\d]{4})-([a-z\d]{4})-([a-z\d]{12})/gim;
 
+let isDataDogInitialized = false;
+
 export async function initializeDataDog(config: Configuration, domain?: string) {
+  if (isDataDogInitialized) {
+    return;
+  }
+
+  isDataDogInitialized = true;
+
   const applicationId = config.dataDog?.applicationId;
   const clientToken = config.dataDog?.clientToken;
 
@@ -53,8 +61,6 @@ export async function initializeDataDog(config: Configuration, domain?: string) 
     trackLongTasks: true,
     defaultPrivacyLevel: 'mask-user-input',
   });
-
-  datadogRum.startSessionReplayRecording();
 
   const {datadogLogs} = await import('@datadog/browser-logs');
 
