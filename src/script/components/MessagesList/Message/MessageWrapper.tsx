@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useCallback} from 'react';
+import React from 'react';
 
 import {ReactionType} from '@wireapp/core/lib/conversation';
 import {amplify} from 'amplify';
@@ -71,7 +71,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
   onClickAvatar,
   onClickImage,
   onClickInvitePeople,
-  onClickLikes,
+  onClickReactionDetails,
   onClickMessage,
   onClickTimestamp,
   onClickParticipants,
@@ -191,11 +191,11 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
   });
 
   const handleReactionClick = (reaction: ReactionType) => {
-      if (!message.isContent()) {
-        return;
-      }
-      return void messageRepository.toggleReaction(conversation, message, reaction, selfId.id);
-    };
+    if (!message.isContent()) {
+      return;
+    }
+    return void messageRepository.toggleReaction(conversation, message, reaction, selfId.id);
+  };
   if (message.isContent()) {
     return (
       <ContentMessageComponent
@@ -209,7 +209,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
         onLike={onLike}
         onClickMessage={onClickMessage}
         onClickTimestamp={onClickTimestamp}
-        onClickLikes={onClickLikes}
+        onClickReactionDetails={onClickReactionDetails}
         onClickButton={clickButton}
         onClickAvatar={onClickAvatar}
         contextMenu={{entries: contextMenuEntries}}

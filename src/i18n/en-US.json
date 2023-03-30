@@ -379,6 +379,7 @@
   "conversationLabelGroups": "Groups",
   "conversationLabelPeople": "People",
   "conversationLikesCaption": "{{number}} people",
+  "conversationLikesCaptionReacted": "reacted with {{emojiName}}",
   "conversationLocationLink": "Open Map",
   "conversationMemberJoined": "[bold]{{name}}[/bold] added {{users}} to the conversation",
   "conversationMemberJoinedMore": "[bold]{{name}}[/bold] added {{users}}, and [showmore]{{count}} more[/showmore] to the conversation",

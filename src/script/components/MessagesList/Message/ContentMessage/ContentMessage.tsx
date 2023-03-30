@@ -80,7 +80,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   onClickImage,
   onClickTimestamp,
   onClickMessage,
-  onClickLikes,
+  onClickReactionDetails,
   onClickButton,
   onLike,
   onDiscard,
@@ -277,7 +277,11 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
         )}
       </div>
 
-      <MessageReactionsList reactions={reactions} handleReactionClick={onClickReaction} />
+      <MessageReactionsList
+        reactions={reactions}
+        onTooltipReactionCountClick={() => onClickReactionDetails(message)}
+        handleReactionClick={onClickReaction}
+      />
     </div>
   );
 };
