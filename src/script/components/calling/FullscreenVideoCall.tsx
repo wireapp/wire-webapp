@@ -42,7 +42,8 @@ import {
   videoControlInActiveStyles,
   videoControlDisabledStyles,
   paginationButtonStyles,
-} from './FullscreenVideoCallStyles';
+  classifiedBarStyles,
+} from './FullscreenVideoCall.styles';
 import {GroupVideoGrid} from './GroupVideoGrid';
 import {Pagination} from './Pagination';
 
@@ -259,8 +260,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
             users={allUsers}
             classifiedDomains={classifiedDomains}
             style={{
-              lineHeight: '1.5em',
-              display: 'flex',
+              ...classifiedBarStyles,
             }}
           />
         )}
