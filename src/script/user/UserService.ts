@@ -125,9 +125,9 @@ export class UserService {
    */
   async getUsers(userIds: QualifiedId[]) {
     if (userIds.length === 0) {
-      return [];
+      return {found: []};
     }
-    return (await this.apiClient.api.user.postListUsers({qualified_ids: userIds})).found;
+    return this.apiClient.api.user.postListUsers({qualified_ids: userIds});
   }
 
   /**

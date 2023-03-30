@@ -70,7 +70,7 @@ export class Message {
   public readonly ephemeral_started: ko.Observable<number>;
   public readonly ephemeral_status: ko.Computed<EphemeralStatusType>;
   public expectsReadConfirmation: boolean;
-  public readonly headerSenderName: ko.PureComputed<string>;
+  public readonly senderName: ko.PureComputed<string>;
   public readonly isObfuscated: ko.PureComputed<boolean>;
   public legalHoldStatus?: LegalHoldStatus;
   public readonly status: ko.Observable<StatusType>;
@@ -150,7 +150,7 @@ export class Message {
     this.category = undefined;
 
     this.unsafeSenderName = ko.pureComputed(() => getUserName(this.user(), undefined, true));
-    this.headerSenderName = ko.pureComputed(() => {
+    this.senderName = ko.pureComputed(() => {
       return this.user().name();
     });
 

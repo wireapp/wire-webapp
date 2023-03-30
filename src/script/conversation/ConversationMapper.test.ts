@@ -25,6 +25,7 @@ import {
   CONVERSATION_TYPE,
   Member as MemberBackendData,
   OtherMember as OtherMemberBackendData,
+  DefaultConversationRoleName,
   RemoteConversations,
 } from '@wireapp/api-client/lib/conversation/';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
@@ -99,6 +100,35 @@ describe('ConversationMapper', () => {
       expect(conversationEntity['mutedTimestamp']()).toEqual(expectedMutedTimestamp);
       expect(conversationEntity.last_event_timestamp()).toBe(initialTimestamp);
       expect(conversationEntity.last_server_timestamp()).toBe(initialTimestamp);
+    });
+
+    it('maps a backend conversation roles', () => {
+      const conversation = {
+        ...entities.conversation,
+        roles: undefined,
+        members: {
+          self: {...entities.conversation.members.self, conversation_role: 'wire_admin'},
+          others: [
+            {
+              id: '1',
+              conversation_role: DefaultConversationRoleName.WIRE_ADMIN,
+            },
+            {
+              id: '2',
+              conversation_role: DefaultConversationRoleName.WIRE_MEMBER,
+            },
+          ],
+        },
+      };
+
+      const initialTimestamp = Date.now();
+      const [conversationEntity] = ConversationMapper.mapConversations([conversation], initialTimestamp);
+
+      expect(conversationEntity.roles()).toEqual({
+        [conversation.members.self.id]: DefaultConversationRoleName.WIRE_ADMIN,
+        [conversation.members.others[0].id]: DefaultConversationRoleName.WIRE_ADMIN,
+        [conversation.members.others[1].id]: DefaultConversationRoleName.WIRE_MEMBER,
+      });
     });
 
     it('maps multiple conversations', () => {
