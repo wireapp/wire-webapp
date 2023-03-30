@@ -131,9 +131,15 @@ export type BackendFeatures = {
   isFederated: boolean;
   /** Does the backend API support MLS features */
   supportsMLS: boolean;
+  domain: string;
 };
 
-export type BackendVersionResponse = {supported: number[]; federation?: boolean; development?: number[]};
+export type BackendVersionResponse = {
+  supported: number[];
+  federation?: boolean;
+  development?: number[];
+  domain: string;
+};
 export class APIClient extends EventEmitter {
   private readonly logger: logdown.Logger;
 
@@ -235,6 +241,7 @@ export class APIClient extends EventEmitter {
   private computeBackendFeatures(backendVersion: number, responsePayload?: BackendVersionResponse): BackendFeatures {
     return {
       version: backendVersion,
+      domain: responsePayload?.domain ?? '',
       federationEndpoints: backendVersion > 0,
       isFederated: responsePayload?.federation || false,
       supportsMLS: backendVersion >= 4,
@@ -254,7 +261,7 @@ export class APIClient extends EventEmitter {
    * @return The highest version that is both supported by client and backend
    */
   async useVersion(min: number, max: number, allowDev?: boolean): Promise<BackendFeatures> {
-    let backendVersions: BackendVersionResponse = {supported: [0]};
+    let backendVersions: BackendVersionResponse = {supported: [0], domain: ''};
     try {
       backendVersions = (await this.transport.http.sendRequest<BackendVersionResponse>({url: '/api-version'})).data;
     } catch (error) {}
