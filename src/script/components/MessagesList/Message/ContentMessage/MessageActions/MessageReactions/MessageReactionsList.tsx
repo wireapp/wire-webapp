@@ -22,7 +22,7 @@ import {FC, Fragment, useState} from 'react';
 import {Tooltip} from '@wireapp/react-ui-kit';
 
 import {getEmojiUnicode, getEmojiTitleFromEmojiUnicode} from 'Util/EmojiUtil';
-import {KEY} from 'Util/KeyboardUtil';
+import {isEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {Reactions, getEmojiUrl, groupByReactionUsers} from 'Util/ReactionUtil';
 
@@ -71,7 +71,7 @@ const MessageReactionsList: FC<MessageReactionsListProps> = ({reactions, handleR
                     <span
                       onClick={onUsersClick}
                       onKeyDown={event => {
-                        if (event.key === KEY.ENTER) {
+                        if (!isEnterKey(event)) {
                           onUsersClick();
                         }
                       }}
