@@ -17,15 +17,20 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {AVATAR_SIZE, DIAMETER} from 'Components/Avatar';
 
-import {User} from './User';
+import {DefaultAvatarImageSmall, DefaultAvatarImageLarge} from './DefaultAvatarImage';
 
-export class PlaceholderUser extends User {
-  /**
-   * A placeholder user is a user that could not be loaded from the backend. That usually means that the backend owning the user is offline
-   */
-  constructor(id: QualifiedId) {
-    super(id.id, id.domain);
-  }
+import {AvatarWrapper} from '../AvatarWrapper';
+
+type PlaceholderAvatarProps = {size: AVATAR_SIZE; onClick: () => void};
+
+export function PlaceholderAvatar({size, onClick}: PlaceholderAvatarProps) {
+  const diameter = DIAMETER[size];
+  const ImageComponent = diameter >= DIAMETER[AVATAR_SIZE.LARGE] ? DefaultAvatarImageLarge : DefaultAvatarImageSmall;
+  return (
+    <AvatarWrapper avatarSize={size} color={''} onClick={onClick}>
+      <ImageComponent diameter={diameter} />
+    </AvatarWrapper>
+  );
 }

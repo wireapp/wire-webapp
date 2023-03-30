@@ -1240,7 +1240,7 @@
   "tooltipPreferencesRename": "Change your name",
   "tooltipPreferencesTabs": "Preferences tabs",
   "tooltipSearchClose": "Close (Esc)",
-  "unavailableUser": "Username unavailable",
+  "unavailableUser": "Name not available",
   "unsupported.desktopOnlyMessage": "Please use {brandName} on your desktop app instead.",
   "unsupported.headlineBrowser": "This browser is not supported.",
   "unsupported.headlineCookies": "Enable cookies",

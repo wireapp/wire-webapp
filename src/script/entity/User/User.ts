@@ -69,6 +69,8 @@ export class User {
   public readonly isExpired: ko.Observable<boolean>;
   public readonly isExternal: ko.PureComputed<boolean>;
   public readonly isGuest: ko.Observable<boolean>;
+  /** indicates whether that user entity is available (if we have metadata for the user, it's considered available) */
+  public readonly isAvailable: ko.PureComputed<boolean>;
 
   /**
    * isDirectGuest is true when the user is a guest but not a federated user (a federated user is, by definition, a guest)
@@ -134,6 +136,7 @@ export class User {
     this.serviceId = undefined;
 
     this.joaatHash = -1;
+    this.isAvailable = ko.pureComputed(() => this.id !== '' && this.name() !== '');
 
     this.accent_id = ko.observable(ACCENT_ID.BLUE);
 
