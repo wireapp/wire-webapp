@@ -93,6 +93,10 @@ export interface Theme extends ETheme {
     thumb: string;
     trackBg: string;
   };
+  Tooltip: {
+    backgroundColor: string;
+    color: string;
+  };
   Input: {
     backgroundColor: string;
     backgroundColorDisabled: string;
@@ -172,6 +176,10 @@ export const themes: {[themeId in THEME_ID]: Theme} = {
       optionHoverBg: 'var(--accent-color-highlight)',
       selectedActiveBg: 'var(--button-primary-hover)',
     },
+    Tooltip: {
+      backgroundColor: 'var(--button-tertiary-bg)',
+      color: 'var(--main-color)',
+    },
     general: {
       backgroundColor: 'var(--app-bg)',
       color: 'var(--main-color)',
@@ -242,6 +250,10 @@ export const themes: {[themeId in THEME_ID]: Theme} = {
       optionHoverBg: 'var(--accent-color-highlight)',
       selectedActiveBg: 'var(--button-primary-hover)',
     },
+    Tooltip: {
+      backgroundColor: COLOR.WHITE,
+      color: COLOR.TEXT,
+    },
     general: {
       backgroundColor: COLOR_V2.GRAY_20,
       color: COLOR.TEXT,
@@ -311,6 +323,10 @@ export const themes: {[themeId in THEME_ID]: Theme} = {
       focusedDescriptionColor: COLOR_V2.GRAY_40,
       optionHoverBg: 'var(--accent-color-highlight)',
       selectedActiveBg: 'var(--button-primary-active)',
+    },
+    Tooltip: {
+      backgroundColor: COLOR.TEXT,
+      color: COLOR.WHITE,
     },
     general: {
       backgroundColor: COLOR.BLACK,

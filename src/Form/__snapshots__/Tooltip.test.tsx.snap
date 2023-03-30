@@ -1,0 +1,392 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Tooltip /> renders correctly 1`] = `
+{
+  "asFragment": [Function],
+  "baseElement": .emotion-0 {
+  background: #edeff0;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-1 {
+  position: relative;
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  width: fit-content;
+}
+
+.emotion-1:hover .tooltip-content {
+  visibility: visible;
+  opacity: 1;
+}
+
+.emotion-1 .tooltip-content {
+  text-align: center;
+  visibility: hidden;
+  opacity: 0;
+  width: -webkit-max-content;
+  width: -moz-max-content;
+  width: max-content;
+  height: -webkit-max-content;
+  height: -moz-max-content;
+  height: max-content;
+  position: absolute;
+  box-sizing: border-box;
+  display: block;
+  margin: 0 auto;
+  padding: 4px 8px;
+  background-color: #fff;
+  color: rgb(29, 30, 31);
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+  -webkit-transition: opacity ease-out 150ms,bottom ease-out 150ms;
+  transition: opacity ease-out 150ms,bottom ease-out 150ms;
+  box-shadow: 1px 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.emotion-1 .tooltip-content .tooltip-arrow {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+.emotion-1[data-position='top'] .tooltip-content {
+  bottom: 100%;
+  margin-bottom: 10px;
+  left: 50%;
+  -webkit-transform: translateX(-50%);
+  -moz-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  transform: translateX(-50%);
+}
+
+.emotion-1[data-position='top'] .tooltip-content .tooltip-arrow {
+  -webkit-filter: drop-shadow(0px 2px 1px rgba(0, 0, 0, 0.1));
+  filter: drop-shadow(0px 2px 1px rgba(0, 0, 0, 0.1));
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-top: 12px solid #fff;
+  top: 90%;
+  left: 50%;
+  -webkit-transform: translateX(-50%);
+  -moz-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  transform: translateX(-50%);
+}
+
+.emotion-1[data-position='right'] .tooltip-content {
+  left: 100%;
+  margin-left: 8px!important;
+  top: 0;
+  bottom: 0;
+  margin: auto 0;
+}
+
+.emotion-1[data-position='right'] .tooltip-content .tooltip-arrow {
+  -webkit-filter: drop-shadow(-2px 0px 1px rgba(0, 0, 0, 0.1));
+  filter: drop-shadow(-2px 0px 1px rgba(0, 0, 0, 0.1));
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-right: 8px solid #fff;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+  -moz-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+  left: -7px;
+}
+
+.emotion-1[data-position='bottom'] .tooltip-content {
+  top: 100%;
+  margin-top: 10px;
+  left: 50%;
+  -webkit-transform: translateX(-50%);
+  -moz-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  transform: translateX(-50%);
+}
+
+.emotion-1[data-position='bottom'] .tooltip-content .tooltip-arrow {
+  -webkit-filter: drop-shadow(0px -2px 1px rgba(0, 0, 0, 0.1));
+  filter: drop-shadow(0px -2px 1px rgba(0, 0, 0, 0.1));
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-bottom: 12px solid #fff;
+  bottom: 90%;
+  left: 50%;
+  -webkit-transform: translateX(-50%);
+  -moz-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  transform: translateX(-50%);
+}
+
+.emotion-1[data-position='left'] .tooltip-content {
+  right: 100%;
+  margin-right: 8px!important;
+  top: 0;
+  bottom: 0;
+  margin: auto 0;
+}
+
+.emotion-1[data-position='left'] .tooltip-content .tooltip-arrow {
+  -webkit-filter: drop-shadow(2px 0px 1px rgba(0, 0, 0, 0.1));
+  filter: drop-shadow(2px 0px 1px rgba(0, 0, 0, 0.1));
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-left: 8px solid #fff;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+  -moz-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+  right: -7px;
+}
+
+<body>
+    <div>
+      <div
+        class="emotion-0"
+      >
+        <div
+          class="emotion-1"
+          data-position="top"
+          data-testid="tooltip-wrapper"
+        >
+          <div
+            class="tooltip-content"
+            data-testid="tooltip-content"
+          >
+            <div>
+              Tooltip Content
+            </div>
+            <div
+              class="tooltip-arrow"
+            />
+          </div>
+          Hover Me
+        </div>
+      </div>
+    </div>
+  </body>,
+  "container": .emotion-0 {
+  background: #edeff0;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-1 {
+  position: relative;
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  width: fit-content;
+}
+
+.emotion-1:hover .tooltip-content {
+  visibility: visible;
+  opacity: 1;
+}
+
+.emotion-1 .tooltip-content {
+  text-align: center;
+  visibility: hidden;
+  opacity: 0;
+  width: -webkit-max-content;
+  width: -moz-max-content;
+  width: max-content;
+  height: -webkit-max-content;
+  height: -moz-max-content;
+  height: max-content;
+  position: absolute;
+  box-sizing: border-box;
+  display: block;
+  margin: 0 auto;
+  padding: 4px 8px;
+  background-color: #fff;
+  color: rgb(29, 30, 31);
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+  -webkit-transition: opacity ease-out 150ms,bottom ease-out 150ms;
+  transition: opacity ease-out 150ms,bottom ease-out 150ms;
+  box-shadow: 1px 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.emotion-1 .tooltip-content .tooltip-arrow {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+.emotion-1[data-position='top'] .tooltip-content {
+  bottom: 100%;
+  margin-bottom: 10px;
+  left: 50%;
+  -webkit-transform: translateX(-50%);
+  -moz-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  transform: translateX(-50%);
+}
+
+.emotion-1[data-position='top'] .tooltip-content .tooltip-arrow {
+  -webkit-filter: drop-shadow(0px 2px 1px rgba(0, 0, 0, 0.1));
+  filter: drop-shadow(0px 2px 1px rgba(0, 0, 0, 0.1));
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-top: 12px solid #fff;
+  top: 90%;
+  left: 50%;
+  -webkit-transform: translateX(-50%);
+  -moz-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  transform: translateX(-50%);
+}
+
+.emotion-1[data-position='right'] .tooltip-content {
+  left: 100%;
+  margin-left: 8px!important;
+  top: 0;
+  bottom: 0;
+  margin: auto 0;
+}
+
+.emotion-1[data-position='right'] .tooltip-content .tooltip-arrow {
+  -webkit-filter: drop-shadow(-2px 0px 1px rgba(0, 0, 0, 0.1));
+  filter: drop-shadow(-2px 0px 1px rgba(0, 0, 0, 0.1));
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-right: 8px solid #fff;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+  -moz-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+  left: -7px;
+}
+
+.emotion-1[data-position='bottom'] .tooltip-content {
+  top: 100%;
+  margin-top: 10px;
+  left: 50%;
+  -webkit-transform: translateX(-50%);
+  -moz-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  transform: translateX(-50%);
+}
+
+.emotion-1[data-position='bottom'] .tooltip-content .tooltip-arrow {
+  -webkit-filter: drop-shadow(0px -2px 1px rgba(0, 0, 0, 0.1));
+  filter: drop-shadow(0px -2px 1px rgba(0, 0, 0, 0.1));
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-bottom: 12px solid #fff;
+  bottom: 90%;
+  left: 50%;
+  -webkit-transform: translateX(-50%);
+  -moz-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  transform: translateX(-50%);
+}
+
+.emotion-1[data-position='left'] .tooltip-content {
+  right: 100%;
+  margin-right: 8px!important;
+  top: 0;
+  bottom: 0;
+  margin: auto 0;
+}
+
+.emotion-1[data-position='left'] .tooltip-content .tooltip-arrow {
+  -webkit-filter: drop-shadow(2px 0px 1px rgba(0, 0, 0, 0.1));
+  filter: drop-shadow(2px 0px 1px rgba(0, 0, 0, 0.1));
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-left: 8px solid #fff;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+  -moz-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+  right: -7px;
+}
+
+<div>
+    <div
+      class="emotion-0"
+    >
+      <div
+        class="emotion-1"
+        data-position="top"
+        data-testid="tooltip-wrapper"
+      >
+        <div
+          class="tooltip-content"
+          data-testid="tooltip-content"
+        >
+          <div>
+            Tooltip Content
+          </div>
+          <div
+            class="tooltip-arrow"
+          />
+        </div>
+        Hover Me
+      </div>
+    </div>
+  </div>,
+  "debug": [Function],
+  "findAllByAltText": [Function],
+  "findAllByDisplayValue": [Function],
+  "findAllByLabelText": [Function],
+  "findAllByPlaceholderText": [Function],
+  "findAllByRole": [Function],
+  "findAllByTestId": [Function],
+  "findAllByText": [Function],
+  "findAllByTitle": [Function],
+  "findByAltText": [Function],
+  "findByDisplayValue": [Function],
+  "findByLabelText": [Function],
+  "findByPlaceholderText": [Function],
+  "findByRole": [Function],
+  "findByTestId": [Function],
+  "findByText": [Function],
+  "findByTitle": [Function],
+  "getAllByAltText": [Function],
+  "getAllByDisplayValue": [Function],
+  "getAllByLabelText": [Function],
+  "getAllByPlaceholderText": [Function],
+  "getAllByRole": [Function],
+  "getAllByTestId": [Function],
+  "getAllByText": [Function],
+  "getAllByTitle": [Function],
+  "getByAltText": [Function],
+  "getByDisplayValue": [Function],
+  "getByLabelText": [Function],
+  "getByPlaceholderText": [Function],
+  "getByRole": [Function],
+  "getByTestId": [Function],
+  "getByText": [Function],
+  "getByTitle": [Function],
+  "queryAllByAltText": [Function],
+  "queryAllByDisplayValue": [Function],
+  "queryAllByLabelText": [Function],
+  "queryAllByPlaceholderText": [Function],
+  "queryAllByRole": [Function],
+  "queryAllByTestId": [Function],
+  "queryAllByText": [Function],
+  "queryAllByTitle": [Function],
+  "queryByAltText": [Function],
+  "queryByDisplayValue": [Function],
+  "queryByLabelText": [Function],
+  "queryByPlaceholderText": [Function],
+  "queryByRole": [Function],
+  "queryByTestId": [Function],
+  "queryByText": [Function],
+  "queryByTitle": [Function],
+  "rerender": [Function],
+  "unmount": [Function],
+}
+`;
