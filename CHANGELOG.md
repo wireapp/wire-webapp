@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.5.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.4.3...@wireapp/react-ui-kit@9.5.0) (2023-03-30)
+
+### Features
+
+* **react-ui-kit:** Implement new tooltip ([#5012](https://github.com/wireapp/wire-web-packages/issues/5012)) ([ea4842e](https://github.com/wireapp/wire-web-packages/commit/ea4842ee14c7cda9a18a3a55691dfed749a407f1))
+
 ## [9.4.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.4.2...@wireapp/react-ui-kit@9.4.3) (2023-03-27)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
