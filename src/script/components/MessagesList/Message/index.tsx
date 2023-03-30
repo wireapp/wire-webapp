@@ -49,7 +49,7 @@ export interface MessageActions {
   onClickCancelRequest: (message: MemberMessageEntity) => void;
   onClickImage: (message: ContentMessage, event: React.UIEvent) => void;
   onClickInvitePeople: () => void;
-  onClickLikes: (message: BaseMessage) => void;
+  onShowReactionDetails: (message: BaseMessage) => void;
   onClickMessage: (event: MouseEvent | KeyboardEvent, elementType: ElementType, messageDetails: MessageDetails) => void;
   onClickParticipants: (participants: User[]) => void;
   onClickReceipts: (message: BaseMessage) => void;
