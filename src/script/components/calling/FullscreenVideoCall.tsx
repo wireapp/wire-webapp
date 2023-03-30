@@ -208,22 +208,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
           />
         )}
 
-        {classifiedDomains && (
-          <ClassifiedBar
-            users={allUsers}
-            classifiedDomains={classifiedDomains}
-            style={{
-              lineHeight: '1.5em',
-              margin: '1em 0',
-              position: 'absolute',
-              display: 'flex',
-              right: 0,
-              left: 0,
-              bottom: 100,
-            }}
-          />
-        )}
-
         {/* Calling conversation name and duration */}
         <div
           className="video-remote-name"
@@ -270,6 +254,16 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
           }
           setMaximizedParticipant={participant => setMaximizedParticipant(call, participant)}
         />
+        {classifiedDomains && (
+          <ClassifiedBar
+            users={allUsers}
+            classifiedDomains={classifiedDomains}
+            style={{
+              lineHeight: '1.5em',
+              display: 'flex',
+            }}
+          />
+        )}
       </div>
       {!maximizedParticipant && activeCallViewTab === CallViewTab.ALL && totalPages > 1 && (
         <>

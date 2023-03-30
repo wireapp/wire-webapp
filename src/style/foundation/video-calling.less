@@ -44,7 +44,9 @@
 }
 
 .video-element-remote {
+  display: flex;
   height: calc(100% - 179px);
+  flex-direction: column;
   // fade in animation
   animation: video-fade-in @animation-timing-slower @ease-out-quart forwards;
   opacity: 0;
