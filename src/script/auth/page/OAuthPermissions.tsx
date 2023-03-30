@@ -121,9 +121,13 @@ const OAuthPermissionsComponent = ({
     };
     getUserData().catch(error => {
       console.error(error);
+      doLogout().catch(error => {
+        console.error(error);
+      });
     });
   }, [
     assetRepository,
+    doLogout,
     getOAuthApp,
     getSelf,
     getTeam,
