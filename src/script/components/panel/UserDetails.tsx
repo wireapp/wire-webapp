@@ -44,7 +44,7 @@ export interface UserDetailsProps {
   avatarStyles?: React.CSSProperties;
 }
 
-const UserDetailsComponent: React.FC<UserDetailsProps> = ({
+export const UserDetailsComponent: React.FC<UserDetailsProps> = ({
   badge,
   participant,
   isSelfVerified,
@@ -64,6 +64,7 @@ const UserDetailsComponent: React.FC<UserDetailsProps> = ({
   ]);
 
   useEffect(() => {
+    // This will trigger a user refresh
     amplify.publish(WebAppEvents.USER.UPDATE, participant.qualifiedId);
   }, [participant]);
 
@@ -81,8 +82,12 @@ const UserDetailsComponent: React.FC<UserDetailsProps> = ({
             dataUieName="status-name"
           />
         ) : (
-          <h2 className="panel-participant__head__name" data-uie-name="status-name">
-            {user.isAvailable ? user.name : 'not available'}
+          <h2
+            className="panel-participant__head__name"
+            data-uie-name="status-name"
+            css={user.isAvailable ? undefined : {color: 'var(--gray-70)'}}
+          >
+            {user.isAvailable ? user.name : t('unavailableUser')}
           </h2>
         )}
 
@@ -147,12 +152,10 @@ const UserDetailsComponent: React.FC<UserDetailsProps> = ({
   );
 };
 
-const UserDetails: React.FC<UserDetailsProps> = props => {
+export const UserDetails: React.FC<UserDetailsProps> = props => {
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
       <UserDetailsComponent {...props} />
     </ErrorBoundary>
   );
 };
-
-export {UserDetails};
