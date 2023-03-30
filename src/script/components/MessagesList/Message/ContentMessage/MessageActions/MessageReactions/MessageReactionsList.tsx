@@ -19,7 +19,11 @@
 
 import {FC, Fragment, useState} from 'react';
 
+import {Tooltip} from '@wireapp/react-ui-kit';
+
 import {getEmojiUnicode, getEmojiTitleFromEmojiUnicode} from 'Util/EmojiUtil';
+import {KEY} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
 import {Reactions, getEmojiUrl, groupByReactionUsers} from 'Util/ReactionUtil';
 
 import {EmojiImg} from './EmojiImg';
@@ -28,14 +32,19 @@ import {
   messageReactionCount,
   messageReactionWrapper,
   getReactionsButtonCSS,
+  messageReactionButtonTooltip,
+  messageReactionButtonTooltipTextLink,
+  messageReactionButtonTooltipText,
+  messageReactionButtonTooltipImage,
 } from './MessageReactions.styles';
 
 export interface MessageReactionsListProps {
   reactions: Reactions;
   handleReactionClick: (emoji: string) => void;
+  onUsersClick: () => void;
 }
 
-const MessageReactionsList: FC<MessageReactionsListProps> = ({reactions, handleReactionClick}) => {
+const MessageReactionsList: FC<MessageReactionsListProps> = ({reactions, handleReactionClick, onUsersClick}) => {
   const [isSelectedEmoji, setSelected] = useState('');
   const reactionGroupedByUser = groupByReactionUsers(reactions);
   return (
@@ -47,20 +56,51 @@ const MessageReactionsList: FC<MessageReactionsListProps> = ({reactions, handleR
         const isActive = isSelectedEmoji === emojiUrl;
         return (
           <Fragment key={emojiUnicode}>
-            <button
-              css={{...messageReactionButton, ...getReactionsButtonCSS(isActive)}}
-              aria-label={emojiName}
-              aria-pressed={isActive}
-              type="button"
-              className="button-reset-default"
-              onClick={() => {
-                setSelected(emojiUrl);
-                handleReactionClick(emoji);
-              }}
+            <Tooltip
+              body={
+                <div css={messageReactionButtonTooltip}>
+                  <EmojiImg
+                    emojiImgSize={{
+                      width: '1.2rem',
+                    }}
+                    css={messageReactionButtonTooltipImage}
+                    emojiUrl={emojiUrl}
+                    emojiName={emojiName}
+                  />
+                  <p css={messageReactionButtonTooltipText}>
+                    <span
+                      onClick={onUsersClick}
+                      onKeyDown={event => {
+                        if (event.key === KEY.ENTER) {
+                          onUsersClick();
+                        }
+                      }}
+                      role="button"
+                      tabIndex={0}
+                      css={messageReactionButtonTooltipTextLink}
+                    >
+                      {t('conversationLikesCaption', {number: users.length.toString()})}
+                    </span>{' '}
+                    {t('conversationLikesCaptionReacted', {emojiName})}
+                  </p>
+                </div>
+              }
             >
-              <EmojiImg emojiUrl={emojiUrl} emojiName={emojiName} />
-              <span css={messageReactionCount}>({users.length})</span>
-            </button>
+              <button
+                css={{...messageReactionButton, ...getReactionsButtonCSS(isActive)}}
+                aria-label={emojiName}
+                aria-pressed={isActive}
+                type="button"
+                className="button-reset-default"
+                onClick={() => {
+                  setSelected(emojiUrl);
+                  handleReactionClick(emoji);
+                }}
+              >
+                <EmojiImg emojiUrl={emojiUrl} emojiName={emojiName} />
+                <span css={messageReactionCount}>({users.length})</span>
+              </button>
+            </Tooltip>
           </Fragment>
         );
       })}

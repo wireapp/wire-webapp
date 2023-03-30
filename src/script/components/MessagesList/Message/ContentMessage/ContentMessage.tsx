@@ -277,7 +277,11 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
         )}
       </div>
 
-      <MessageReactionsList reactions={reactions} handleReactionClick={onClickReaction} />
+      <MessageReactionsList
+        reactions={reactions}
+        onUsersClick={() => onClickLikes(message)}
+        handleReactionClick={onClickReaction}
+      />
     </div>
   );
 };
