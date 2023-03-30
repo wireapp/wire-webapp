@@ -39,7 +39,7 @@ const shakeBox = useRef();
         shakeBox.current.shake();
       }}
     >
-      <Tooltip text="This shows a placeholder input">
+      <Tooltip body="This shows a placeholder input">
         <Input placeholder="Placeholder" type="email" required />
       </Tooltip>
       <Button type="submit" formNoValidate>
@@ -71,7 +71,7 @@ const shakeBox = useRef();
       <InputBlock>
         <Input placeholder="InputBlock" markInvalid />
         <Input placeholder="Second Input" markInvalid />
-        <Tooltip text="Lots of icons here">
+        <Tooltip body="Lots of icons here">
           <InputSubmitCombo markInvalid>
             <Input placeholder="InputSubmitCombo" name="password" />
             <RoundIconButton type="submit" formNoValidate>
@@ -119,7 +119,7 @@ const shakeBox = useRef();
       <InputBlock>
         <Input placeholder="InputBlock" />
         <Input placeholder="Second Input" />
-        <Tooltip text="Lots of icons here">
+        <Tooltip body="Lots of icons here">
           <InputSubmitCombo>
             <Input placeholder="InputSubmitCombo" name="password" />
             <RoundIconButton type="submit" formNoValidate>

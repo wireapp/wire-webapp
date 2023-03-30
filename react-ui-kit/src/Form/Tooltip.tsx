@@ -21,64 +21,125 @@ import * as React from 'react';
 
 import {CSSObject} from '@emotion/react';
 
-import {COLOR} from '../Identity';
+import {Theme} from '../Layout';
 import {filterProps} from '../util';
 
 interface ToolTipProps<T = HTMLDivElement> extends React.HTMLProps<T> {
-  bottom?: boolean;
-  disabled?: boolean;
-  left?: boolean;
-  light?: boolean;
-  right?: boolean;
-  text?: string;
+  position?: 'top' | 'right' | 'left' | 'bottom';
+  body: React.ReactNode;
 }
 
-const tooltipStyle: <T>(props: ToolTipProps<T>) => CSSObject = ({
-  disabled = false,
-  bottom = false,
-  left = false,
-  right = false,
-  light = false,
-}) => ({
-  '&::after': {
-    backgroundColor: light ? COLOR.WHITE : COLOR.TEXT,
-    borderRadius: '4px',
-    bottom: bottom || left || right ? 'auto' : 'calc(100% + 8px)',
-    boxShadow: '0 2px 16px 0 rgba(0, 0, 0, 0.12)',
-    color: light ? COLOR.TEXT : COLOR.WHITE,
-    content: 'attr(data-text)',
-    display: 'block',
-    fontSize: '0.75rem',
-    fontWeight: light ? 400 : 600,
-    left: right ? 'calc(100% + 8px)' : 'auto',
-    lineHeight: '0.875rem',
-    maxWidth: '200px',
-    minWidth: '120px',
-    opacity: 0,
-    padding: '12px',
-    pointerEvents: 'none',
-    position: 'absolute',
-    right: left ? 'calc(100% + 8px)' : 'auto',
-    textAlign: 'center',
-    top: bottom ? 'calc(100% + 8px)' : 'auto',
-    transform: left || right ? `translateX(${left ? -16 : 16}px)` : `translateY(${bottom ? -16 : 16}px)`,
-    transition: 'all 0.15s ease-in-out',
-  },
-  '&:hover::after': disabled || {
-    opacity: 1,
-    transform: 'translateY(0) translateX(0)',
-    transition: 'all 0.25s ease-in-out',
-  },
-  alignItems: 'center',
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'center',
+const tooltipStyle: (theme: Theme) => CSSObject = theme => ({
   position: 'relative',
+  width: 'fit-content',
+  '&:hover .tooltip-content': {visibility: 'visible', opacity: 1},
+  '.tooltip-content': {
+    textAlign: 'center',
+    visibility: 'hidden',
+    opacity: 0,
+    width: 'max-content',
+    height: 'max-content',
+    position: 'absolute',
+    boxSizing: 'border-box',
+    display: 'block',
+    margin: '0 auto',
+    padding: '4px 8px',
+    backgroundColor: theme.Tooltip.backgroundColor,
+    color: theme.Tooltip.color,
+    borderRadius: 4,
+    fontSize: theme.fontSizes.small,
+    fontWeight: 500,
+    whiteSpace: 'nowrap',
+    transition: 'opacity ease-out 150ms, bottom ease-out 150ms',
+    boxShadow: '1px 2px 6px rgba(0, 0, 0, 0.3)',
+  },
+  '& .tooltip-content .tooltip-arrow': {
+    position: 'absolute',
+    width: 0,
+    height: 0,
+  },
+  "&[data-position='top'] .tooltip-content": {
+    bottom: '100%',
+    marginBottom: 10,
+    left: '50%',
+    transform: 'translateX(-50%)',
+    '& .tooltip-arrow': {
+      filter: 'drop-shadow(0px 2px 1px rgba(0, 0, 0, 0.1))',
+      borderLeft: '12px solid transparent',
+      borderRight: '12px solid transparent',
+      borderTop: `12px solid ${theme.Tooltip.backgroundColor}`,
+      top: '90%',
+      left: '50%',
+      transform: 'translateX(-50%)',
+    },
+  },
+  "&[data-position='right'] .tooltip-content": {
+    left: '100%',
+    marginLeft: '8px !important',
+    top: 0,
+    bottom: 0,
+    margin: 'auto 0',
+    '& .tooltip-arrow': {
+      filter: 'drop-shadow(-2px 0px 1px rgba(0, 0, 0, 0.1))',
+      borderTop: '8px solid transparent',
+      borderBottom: '8px solid transparent',
+      borderRight: `8px solid ${theme.Tooltip.backgroundColor}`,
+      top: '50%',
+      transform: 'translateY(-50%)',
+      left: -7,
+    },
+  },
+  "&[data-position='bottom'] .tooltip-content": {
+    top: '100%',
+    marginTop: 10,
+    left: '50%',
+    transform: 'translateX(-50%)',
+    '& .tooltip-arrow': {
+      filter: 'drop-shadow(0px -2px 1px rgba(0, 0, 0, 0.1))',
+      borderLeft: '12px solid transparent',
+      borderRight: '12px solid transparent',
+      borderBottom: `12px solid ${theme.Tooltip.backgroundColor}`,
+      bottom: '90%',
+      left: '50%',
+      transform: 'translateX(-50%)',
+    },
+  },
+  "&[data-position='left'] .tooltip-content": {
+    right: '100%',
+    marginRight: '8px !important',
+    top: 0,
+    bottom: 0,
+    margin: 'auto 0',
+    '& .tooltip-arrow': {
+      filter: 'drop-shadow(2px 0px 1px rgba(0, 0, 0, 0.1))',
+      borderTop: '8px solid transparent',
+      borderBottom: '8px solid transparent',
+      borderLeft: `8px solid ${theme.Tooltip.backgroundColor}`,
+      top: '50%',
+      transform: 'translateY(-50%)',
+      right: -7,
+    },
+  },
 });
 
-const filterTooltipProps = (props: ToolTipProps) =>
-  filterProps(props, ['bottom', 'disabled', 'left', 'light', 'right']);
+const filterTooltipProps = (props: ToolTipProps) => filterProps(props, ['position', 'body']);
 
-export const Tooltip = ({text = '', ...props}: ToolTipProps) => (
-  <div css={tooltipStyle(props)} data-text={text} {...filterTooltipProps(props)} />
-);
+export const Tooltip = ({children, ...props}: ToolTipProps) => {
+  const filteredProps = filterTooltipProps(props);
+  const {body, position = 'top'} = props;
+
+  return (
+    <div
+      css={(theme: Theme) => tooltipStyle(theme)}
+      data-position={position}
+      {...filteredProps}
+      data-testid="tooltip-wrapper"
+    >
+      <div className="tooltip-content" data-testid="tooltip-content">
+        {body}
+        <div className="tooltip-arrow"></div>
+      </div>
+      {children}
+    </div>
+  );
+};
