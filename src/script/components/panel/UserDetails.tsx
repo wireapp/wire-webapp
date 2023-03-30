@@ -60,6 +60,7 @@ const UserDetailsComponent: React.FC<UserDetailsProps> = ({
     'name',
     'availability',
     'is_verified',
+    'isAvailable',
   ]);
 
   useEffect(() => {
@@ -81,7 +82,7 @@ const UserDetailsComponent: React.FC<UserDetailsProps> = ({
           />
         ) : (
           <h2 className="panel-participant__head__name" data-uie-name="status-name">
-            {user.name}
+            {user.isAvailable ? user.name : 'not available'}
           </h2>
         )}
 
@@ -123,14 +124,14 @@ const UserDetailsComponent: React.FC<UserDetailsProps> = ({
         </div>
       )}
 
-      {isGuest && (
+      {isGuest && user.isAvailable && (
         <div className="panel-participant__label" data-uie-name="status-guest">
           <Icon.Guest />
           <span>{t('conversationGuestIndicator')}</span>
         </div>
       )}
 
-      {user.isTemporaryGuest && (
+      {user.isTemporaryGuest && user.isAvailable && (
         <div className="panel-participant__guest-expiration" data-uie-name="status-expiration-text">
           {user.expirationText}
         </div>
