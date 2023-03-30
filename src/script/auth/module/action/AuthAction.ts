@@ -21,6 +21,9 @@ import type {DomainData} from '@wireapp/api-client/lib/account/DomainData';
 import type {LoginData, RegisterData, SendLoginCode} from '@wireapp/api-client/lib/auth/';
 import {VerificationActionType} from '@wireapp/api-client/lib/auth/VerificationActionType';
 import {ClientType} from '@wireapp/api-client/lib/client/';
+import {OAuthBody} from '@wireapp/api-client/lib/oauth/OAuthBody';
+import {OAuthClient} from '@wireapp/api-client/lib/oauth/OAuthClient';
+import type {TeamData} from '@wireapp/api-client/lib/team/';
 import {LowDiskSpaceError} from '@wireapp/store-engine/lib/engine/error';
 import {StatusCodes as HTTP_STATUS, StatusCodes} from 'http-status-codes';
 
@@ -145,6 +148,20 @@ export class AuthAction {
     };
   };
 
+  doPostOAuthCode = (oauthBody: OAuthBody): ThunkAction<Promise<string>> => {
+    return async (dispatch, getState, {apiClient}) => {
+      dispatch(AuthActionCreator.startSendOAuthCode());
+      try {
+        const url = await apiClient.api.oauth.postOAuthCode(oauthBody);
+        dispatch(AuthActionCreator.successfulSendOAuthCode());
+        return url;
+      } catch (error) {
+        dispatch(AuthActionCreator.failedSendOAuthCode(error));
+        throw error;
+      }
+    };
+  };
+
   doSendTwoFactorLoginCode = (email: string): ThunkAction => {
     return async (dispatch, getState, {apiClient}) => {
       dispatch(AuthActionCreator.startSendTwoFactorCode());
@@ -180,6 +197,34 @@ export class AuthAction {
         } else {
           dispatch(AuthActionCreator.failedLogin(error));
         }
+        throw error;
+      }
+    };
+  };
+
+  doGetTeamData = (teamId: string): ThunkAction<Promise<TeamData>> => {
+    return async (dispatch, getState, {apiClient}) => {
+      dispatch(AuthActionCreator.startFetchTeam());
+      try {
+        const teamData = await apiClient.api.teams.team.getTeam(teamId);
+        dispatch(AuthActionCreator.successfulFetchTeam(teamData));
+        return teamData;
+      } catch (error) {
+        dispatch(AuthActionCreator.failedFetchTeam(error));
+        throw error;
+      }
+    };
+  };
+
+  doGetOAuthApplication = (applicationId: string): ThunkAction<Promise<OAuthClient>> => {
+    return async (dispatch, getState, {apiClient}) => {
+      dispatch(AuthActionCreator.startFetchOAuth());
+      try {
+        const application = await apiClient.api.oauth.getClient(applicationId);
+        dispatch(AuthActionCreator.successfulFetchOAuth(application));
+        return application;
+      } catch (error) {
+        dispatch(AuthActionCreator.failedFetchOAuth(error));
         throw error;
       }
     };
