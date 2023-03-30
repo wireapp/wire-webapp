@@ -483,19 +483,15 @@ export class MessageRepository {
       return;
     }
     if (state === MessageSendingState.CANCELED) {
-      throw new ConversationError(
-        ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION,
-        ConversationError.MESSAGE.DEGRADED_CONVERSATION_CANCELLATION,
-      );
+      // The user has canceled the upload, no need to do anything else
+      return;
     }
     try {
       await this.sendAssetRemotedata(conversation, file, id, asImage);
       const uploadDuration = (Date.now() - uploadStarted) / TIME_IN_MILLIS.SECOND;
       this.logger.info(`Finished to upload asset for conversation'${conversation.id} in ${uploadDuration}`);
     } catch (error) {
-      if (this.isUserCancellationError(error)) {
-        throw error;
-      } else if (error instanceof RequestCancellationError) {
+      if (error instanceof RequestCancellationError) {
         return;
       }
       this.logger.error(
@@ -638,14 +634,6 @@ export class MessageRepository {
     const payload = MessageBuilder.buildFileAbortMessage({reason}, messageId);
 
     return this.sendAndInjectMessage(payload, conversation);
-  }
-
-  private isUserCancellationError(error: any): boolean {
-    const errorTypes: string[] = [
-      ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION,
-      ConversationError.TYPE.LEGAL_HOLD_CONVERSATION_CANCELLATION,
-    ];
-    return errorTypes.includes(error.type);
   }
 
   /**
@@ -806,6 +794,7 @@ export class MessageRepository {
 
     const shouldProceedSending = await injectOptimisticEvent();
     if (shouldProceedSending === false) {
+      this.logger.log('User has canceled sending a message to a degraded conversation.');
       return {id: payload.messageId, sentAt: new Date().toISOString(), state: MessageSendingState.CANCELED};
     }
 
