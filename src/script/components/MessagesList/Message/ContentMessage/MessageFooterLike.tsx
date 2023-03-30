@@ -32,7 +32,7 @@ import {useMessageFocusedTabIndex} from '../util';
 export interface MessageFooterLikeProps {
   is1to1Conversation: boolean;
   message: ContentMessage;
-  onShowReactionDetails: (message: Message) => void;
+  onClickReactionDetails: (message: Message) => void;
   onLike: (message: ContentMessage, button?: boolean) => void;
   isMessageFocused: boolean;
 }
@@ -41,7 +41,7 @@ const MessageFooterLike: React.FC<MessageFooterLikeProps> = ({
   message,
   is1to1Conversation,
   onLike,
-  onShowReactionDetails,
+  onClickReactionDetails,
   isMessageFocused,
 }) => {
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
@@ -61,7 +61,7 @@ const MessageFooterLike: React.FC<MessageFooterLikeProps> = ({
         className={cx('button-reset-default', 'message-footer-label', {
           'cursor-pointer': !is1to1Conversation,
         })}
-        onClick={is1to1Conversation ? undefined : () => onShowReactionDetails(message)}
+        onClick={is1to1Conversation ? undefined : () => onClickReactionDetails(message)}
         tabIndex={messageFocusedTabIndex}
       >
         <span className="message-footer-text" data-uie-name="message-liked-names" data-uie-value={reactionsUserIds}>

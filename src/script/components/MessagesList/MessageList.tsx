@@ -307,7 +307,7 @@ const MessagesList: FC<MessagesListParams> = ({
               onClickCancelRequest={cancelConnectionRequest}
               onClickImage={showImageDetails}
               onClickInvitePeople={() => invitePeople(conversation)}
-              onShowReactionDetails={message => showMessageDetails(message, true)}
+              onClickReactionDetails={message => showMessageDetails(message, true)}
               onClickMessage={onClickMessage}
               onClickParticipants={showParticipants}
               onClickReceipts={message => showMessageDetails(message)}
