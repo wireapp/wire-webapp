@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [24.2.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@24.1.1...@wireapp/api-client@24.2.0) (2023-03-30)
+
+### Features
+
+* Return domain when api version is initialized ([#5013](https://github.com/wireapp/wire-web-packages/issues/5013)) ([5be4df5](https://github.com/wireapp/wire-web-packages/commit/5be4df550566ffe60019a261cce68dc10479e066))
+
 ## [24.1.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@24.1.0...@wireapp/api-client@24.1.1) (2023-03-28)
 
 **Note:** Version bump only for package @wireapp/api-client
