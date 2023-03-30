@@ -258,6 +258,7 @@ const DetailViewModal: FC<DetailViewModalProps> = ({
           <DetailViewModalFooter
             messageEntity={messageEntity}
             conversationEntity={conversationEntity}
+            messageRepository={messageRepository}
             onLikeClick={onLikeClick}
             onReplyClick={onReplyClick}
             onDownloadClick={onDownloadClick}

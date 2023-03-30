@@ -17,12 +17,16 @@
  *
  */
 
-import {FC} from 'react';
+import {FC, useState} from 'react';
+
+import {ReactionType} from '@wireapp/core/lib/conversation';
 
 import {Icon} from 'Components/Icon';
+import {MessageActionsMenu} from 'Components/MessagesList/Message/ContentMessage/MessageActions/MessageActions';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
+import {MessageRepository} from '../../../conversation/MessageRepository';
 import {Conversation} from '../../../entity/Conversation';
 import {ContentMessage} from '../../../entity/message/ContentMessage';
 
@@ -32,6 +36,7 @@ interface DetailViewModalFooterProps {
   onLikeClick: (conversation: Conversation, message: ContentMessage) => void;
   onReplyClick: (conversation: Conversation, message: ContentMessage) => void;
   onDownloadClick: (message: ContentMessage) => void;
+  messageRepository: MessageRepository;
 }
 
 const DetailViewModalFooter: FC<DetailViewModalFooterProps> = ({
@@ -40,24 +45,40 @@ const DetailViewModalFooter: FC<DetailViewModalFooterProps> = ({
   onLikeClick,
   onReplyClick,
   onDownloadClick,
+  messageRepository,
 }) => {
-  const {is_liked: isLiked} = useKoSubscribableChildren(messageEntity, ['is_liked']);
   const {removed_from_conversation: isRemovedFromConversation} = useKoSubscribableChildren(conversationEntity, [
     'removed_from_conversation',
   ]);
+  const [isActionMenuVisible, setActionMenuVisibility] = useState(true);
+  const handleReactionClick = (reaction: ReactionType) => {
+    if (!messageEntity.isContent()) {
+      return;
+    }
+    return void messageRepository.toggleReaction(conversationEntity, messageEntity, reaction, '1234');
+  };
 
   return (
     <footer className="detail-view-footer">
-      {messageEntity.isReactable() && !isRemovedFromConversation && (
-        <button
-          type="button"
-          className="detail-view-action-button"
-          onClick={() => onLikeClick(conversationEntity, messageEntity)}
-          data-uie-name="do-like-fullscreen-picture"
-        >
-          <span className={isLiked ? 'icon-liked text-red' : 'icon-like'}></span>
-          <span>{t('conversationContextMenuLike')}</span>
-        </button>
+      {messageEntity.isReactable() && !isRemovedFromConversation && isActionMenuVisible && (
+        // <button
+        //   type="button"
+        //   className="detail-view-action-button"
+        //   onClick={() => onLikeClick(conversationEntity, messageEntity)}
+        //   data-uie-name="do-like-fullscreen-picture"
+        // >
+        //   <span className={isLiked ? 'icon-liked text-red' : 'icon-like'}></span>
+        //   <span>{t('conversationContextMenuLike')}</span>
+        // </button>
+        <MessageActionsMenu
+          isMsgWithHeader={false}
+          message={messageEntity}
+          handleActionMenuVisibility={setActionMenuVisibility}
+          contextMenu={{entries: []}}
+          isMessageFocused={true}
+          messageWithSection={false}
+          handleReactionClick={handleReactionClick}
+        />
       )}
 
       {messageEntity.isReplyable() && !isRemovedFromConversation && (
