@@ -279,7 +279,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
 
       <MessageReactionsList
         reactions={reactions}
-        onUsersClick={() => onClickLikes(message)}
+        onTooltipReactionCountClick={() => onClickLikes(message)}
         handleReactionClick={onClickReaction}
       />
     </div>

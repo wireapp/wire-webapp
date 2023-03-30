@@ -41,10 +41,14 @@ import {
 export interface MessageReactionsListProps {
   reactions: Reactions;
   handleReactionClick: (emoji: string) => void;
-  onUsersClick: () => void;
+  onTooltipReactionCountClick: () => void;
 }
 
-const MessageReactionsList: FC<MessageReactionsListProps> = ({reactions, handleReactionClick, onUsersClick}) => {
+const MessageReactionsList: FC<MessageReactionsListProps> = ({
+  reactions,
+  handleReactionClick,
+  onTooltipReactionCountClick,
+}) => {
   const [isSelectedEmoji, setSelected] = useState('');
   const reactionGroupedByUser = groupByReactionUsers(reactions);
   return (
@@ -69,10 +73,10 @@ const MessageReactionsList: FC<MessageReactionsListProps> = ({reactions, handleR
                   />
                   <p css={messageReactionButtonTooltipText}>
                     <span
-                      onClick={onUsersClick}
+                      onClick={onTooltipReactionCountClick}
                       onKeyDown={event => {
                         if (!isEnterKey(event)) {
-                          onUsersClick();
+                          onTooltipReactionCountClick();
                         }
                       }}
                       role="button"
