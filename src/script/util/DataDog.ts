@@ -54,7 +54,6 @@ export async function initializeDataDog(config: Configuration, domain?: string) 
     version: config.VERSION,
     sessionSampleRate: 100,
     sessionReplaySampleRate: 20,
-    silentMultipleInit: true,
     trackUserInteractions: true,
     trackInteractions: true,
     trackResources: true,
@@ -72,7 +71,6 @@ export async function initializeDataDog(config: Configuration, domain?: string) 
     forwardErrorsToLogs: true,
     forwardConsoleLogs: ['info', 'warn', 'error'], // For now those logs should be fine, we need to investigate if we need another logs in the future
     sessionSampleRate: 100,
-    silentMultipleInit: true,
     beforeSend: log => {
       log.view.url = '/';
       log.message = replaceDomains(replaceAllStrings(log.message));
