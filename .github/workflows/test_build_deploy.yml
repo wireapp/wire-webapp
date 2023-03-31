@@ -96,7 +96,7 @@ jobs:
               "edge": { "dev_env": "wire-webapp-edge" },
               "dev": { "dev_env": "wire-webapp-dev" },
               "master": { "dev_env": "wire-webapp-master" },
-              "tmp_qa_migration": { "qa_env": "wire-webapp-qa-al2" }
+              "tmp_qa_migration": { "qa_env": "wire-webapp-qa-al2-migration" }
             }
 
       - uses: kanga333/variable-mapper@master

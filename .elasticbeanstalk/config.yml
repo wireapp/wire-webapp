@@ -4,7 +4,7 @@ branch-defaults:
   master:
     environment: wire-webapp-master
   tmp_migration:
-    environment: wire-webapp-qa-al2
+    environment: wire-webapp-qa-al2-migration
 deploy:
   artifact: server/dist/s3/ebs.zip
 global:
