@@ -28,5 +28,6 @@ export const badgesWrapper = (count: number): CSSObject => ({
 export const icon: CSSObject = {
   alignItems: 'center',
   display: 'flex',
+  fill: 'var(--main-color)',
   justifyContent: 'center',
 };
