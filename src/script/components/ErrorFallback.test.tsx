@@ -21,6 +21,7 @@ import {render} from '@testing-library/react';
 import {ErrorBoundary} from 'react-error-boundary';
 
 import {ErrorFallback} from './ErrorFallback';
+import {PrimaryModal} from './Modals/PrimaryModal';
 
 const SimpleError: React.FC = () => {
   throw new Error('failed to render');
@@ -28,12 +29,15 @@ const SimpleError: React.FC = () => {
 
 describe('ErrorFallback', () => {
   it('Correctly prints the error', () => {
-    const {getByTestId} = render(
+    const action = jest.fn();
+    jest.spyOn(PrimaryModal, 'show').mockImplementation((_, payload) => action());
+
+    render(
       <div>
         <ErrorBoundary FallbackComponent={ErrorFallback}>{<SimpleError />}</ErrorBoundary>
       </div>,
     );
 
-    expect(getByTestId('error-message').textContent).toBe('failed to render');
+    expect(action).toHaveBeenCalled();
   });
 });
