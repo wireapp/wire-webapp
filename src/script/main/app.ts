@@ -32,6 +32,7 @@ import {container} from 'tsyringe';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {initializeDataDog} from 'Util/DataDog';
 import {DebugUtil} from 'Util/DebugUtil';
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
@@ -334,7 +335,9 @@ export class App {
   async initApp(clientType: ClientType, onProgress: (progress: number, message?: string) => void) {
     // add body information
     const [apiVersionMin, apiVersionMax] = this.config.SUPPORTED_API_RANGE;
-    await this.core.useAPIVersion(apiVersionMin, apiVersionMax, this.config.ENABLE_DEV_BACKEND_API);
+    const {domain} = await this.core.useAPIVersion(apiVersionMin, apiVersionMax, this.config.ENABLE_DEV_BACKEND_API);
+    await initializeDataDog(this.config, domain);
+
     const osCssClass = Runtime.isMacOS() ? 'os-mac' : 'os-pc';
     const platformCssClass = Runtime.isDesktopApp() ? 'platform-electron' : 'platform-web';
     document.body.classList.add(osCssClass, platformCssClass);
@@ -389,7 +392,7 @@ export class App {
       onProgress(10);
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
-      await teamRepository.initTeam();
+      const team = await teamRepository.initTeam(selfUser.teamId);
 
       const conversationEntities = await conversationRepository.loadConversations();
 
@@ -409,7 +412,9 @@ export class App {
 
       await conversationRepository.conversationRoleRepository.loadTeamRoles();
 
-      await userRepository.loadTeamUserAvailabilities();
+      if (team) {
+        await userRepository.loadTeamUserAvailabilities([...team.members(), selfUser]);
+      }
 
       await eventRepository.connectWebSocket(this.core, ({done, total}) => {
         const baseMessage = t('initDecryption');
@@ -553,7 +558,7 @@ export class App {
       }
     }
 
-    await container.resolve(StorageService).init(this.core.storage);
+    container.resolve(StorageService).init(this.core.storage);
     this.repository.client.init(userEntity);
     await this.repository.properties.init(userEntity);
 

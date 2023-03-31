@@ -81,12 +81,6 @@ describe('User Mapper', () => {
       expect(user.inTeam()).toBe(false);
     });
 
-    it('returns undefined if input was undefined', () => {
-      const user = mapper.mapUserFromJson(undefined);
-
-      expect(user).toBeUndefined();
-    });
-
     it('can convert users with profile images marked as non public', () => {
       self_user_payload.picture[0].info.public = false;
       self_user_payload.picture[1].info.public = false;

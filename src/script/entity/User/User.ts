@@ -29,11 +29,11 @@ import {clamp} from 'Util/NumberUtil';
 import {getFirstChar} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
-import type {AssetRemoteData} from '../assets/AssetRemoteData';
-import type {ClientEntity} from '../client/ClientEntity';
-import {ACCENT_ID} from '../Config';
-import {ConnectionEntity} from '../connection/ConnectionEntity';
-import {ROLE as TEAM_ROLE} from '../user/UserPermission';
+import type {AssetRemoteData} from '../../assets/AssetRemoteData';
+import type {ClientEntity} from '../../client/ClientEntity';
+import {ACCENT_ID} from '../../Config';
+import {ConnectionEntity} from '../../connection/ConnectionEntity';
+import {ROLE as TEAM_ROLE} from '../../user/UserPermission';
 
 export class User {
   private expirationIntervalId?: number;
@@ -69,6 +69,8 @@ export class User {
   public readonly isExpired: ko.Observable<boolean>;
   public readonly isExternal: ko.PureComputed<boolean>;
   public readonly isGuest: ko.Observable<boolean>;
+  /** indicates whether that user entity is available (if we have metadata for the user, it's considered available) */
+  public readonly isAvailable: ko.PureComputed<boolean>;
 
   /**
    * isDirectGuest is true when the user is a guest but not a federated user (a federated user is, by definition, a guest)
@@ -87,7 +89,7 @@ export class User {
   public readonly name: ko.Observable<string>;
   public readonly phone: ko.Observable<string>;
   public readonly previewPictureResource: ko.Observable<AssetRemoteData>;
-  public readonly providerName: ko.Observable<string>;
+  public readonly providerName: ko.Observable<string | undefined> = ko.observable();
   public readonly teamRole: ko.Observable<TEAM_ROLE>;
   public readonly username: ko.Observable<string>;
   public isFederated: boolean = false;
@@ -132,9 +134,9 @@ export class User {
     this.isDeleted = false;
     this.providerId = undefined;
     this.serviceId = undefined;
-    this.providerName = ko.observable(undefined);
 
     this.joaatHash = -1;
+    this.isAvailable = ko.pureComputed(() => this.id !== '' && this.name() !== '');
 
     this.accent_id = ko.observable(ACCENT_ID.BLUE);
 

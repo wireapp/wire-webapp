@@ -123,6 +123,8 @@ const config: ServerConfig = {
     BRAND_NAME: process.env.BRAND_NAME,
     CHROME_ORIGIN_TRIAL_TOKEN: process.env.CHROME_ORIGIN_TRIAL_TOKEN,
     COUNTLY_API_KEY: process.env.COUNTLY_API_KEY,
+    DATADOG_APPLICATION_ID: process.env.DATADOG_APPLICATION_ID,
+    DATADOG_CLIENT_TOKEN: process.env.DATADOG_CLIENT_TOKEN,
     ENABLE_DEV_BACKEND_API: process.env.ENABLE_DEV_BACKEND_API == 'true',
     ENVIRONMENT: nodeEnvironment,
     FEATURE: {

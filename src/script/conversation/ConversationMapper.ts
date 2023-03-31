@@ -66,13 +66,14 @@ export interface SelfStatusUpdateDatabaseData {
   verification_state: number;
 }
 
+type Roles = {[userId: string]: DefaultConversationRoleName | string};
 export type ConversationDatabaseData = ConversationRecord &
   Partial<ConversationBackendData> & {
     accessModes?: CONVERSATION_ACCESS[];
     //CONVERSATION_LEGACY_ACCESS_ROLE for api <= v2, CONVERSATION_ACCESS_ROLE[] since api v3
     accessRole?: CONVERSATION_LEGACY_ACCESS_ROLE | CONVERSATION_ACCESS_ROLE[];
     accessRoleV2?: CONVERSATION_ACCESS_ROLE[];
-    roles: {[userId: string]: DefaultConversationRoleName | string};
+    roles: Roles;
     status: ConversationStatus;
     team_id: string;
   };
@@ -206,6 +207,24 @@ export class ConversationMapper {
     return conversationEntity;
   }
 
+  private static computeRoles(conversationData: ConversationBackendData | ConversationDatabaseData): Roles {
+    if ('roles' in conversationData && conversationData.roles) {
+      return conversationData.roles;
+    }
+    const {members} = conversationData;
+
+    const allMembers = [...(members?.others ?? []), members?.self];
+    return allMembers.reduce<Record<string, string>>((roles, member) => {
+      if (!member || !member.conversation_role) {
+        return roles;
+      }
+      return {
+        ...roles,
+        [member.id]: member.conversation_role,
+      };
+    }, {});
+  }
+
   private static createConversationEntity(
     conversationData: ConversationDatabaseData,
     initialTimestamp?: number,
@@ -225,7 +244,7 @@ export class ConversationMapper {
       conversationData.domain || conversationData.qualified_id?.domain,
       protocol,
     );
-    conversationEntity.roles(conversationData.roles || {});
+    conversationEntity.roles(this.computeRoles(conversationData));
 
     conversationEntity.creator = creator;
     conversationEntity.groupId = group_id;

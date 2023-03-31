@@ -78,12 +78,15 @@ export class AssetRepository {
       return objectUrl;
     }
 
-    const blob = await this.load(asset);
-    if (!blob) {
-      return undefined;
-    }
-    const url = window.URL.createObjectURL(blob);
-    return setAssetUrl(asset.identifier, url);
+    const urlPromise = new Promise<string>(async (resolve, reject) => {
+      const blob = await this.load(asset);
+      if (!blob) {
+        return reject(undefined);
+      }
+      const url = window.URL.createObjectURL(blob);
+      resolve(url);
+    });
+    return setAssetUrl(asset.identifier, urlPromise);
   }
 
   public async load(asset: AssetRemoteData): Promise<undefined | Blob> {

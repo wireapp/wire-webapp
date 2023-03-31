@@ -99,7 +99,7 @@ export class QuotedMessageMiddleware {
 
     const encodedQuote = base64ToArray(rawQuote);
     const quote = Quote.decode(encodedQuote);
-    this.logger.info('Found quoted message', quote);
+    this.logger.info(`Found quoted message: ${quote.quotedMessageId}`);
 
     const messageId = quote.quotedMessageId;
 

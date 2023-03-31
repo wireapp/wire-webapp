@@ -82,8 +82,7 @@ export class ConnectionRepository {
 
     const isSupportedType = ConnectionRepository.CONFIG.SUPPORTED_EVENTS.includes(eventType);
     if (isSupportedType) {
-      const logObject = {eventJson: JSON.stringify(eventJson), eventObject: eventJson};
-      this.logger.info(`»» User Event: '${eventType}' (Source: ${source})`, logObject);
+      this.logger.info(`User Event: '${eventType}' (Source: ${source})`);
 
       const isUserConnection = eventType === USER_EVENT.CONNECTION;
       if (isUserConnection) {

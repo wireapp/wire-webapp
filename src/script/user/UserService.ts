@@ -75,7 +75,7 @@ export class UserService {
     const primaryKey = constructUserPrimaryKey(userEntity);
 
     return this.storageService.save(this.USER_STORE_NAME, primaryKey, userData).then(primaryKey => {
-      this.logger.info(`State of user '${primaryKey}' was stored`, userData);
+      this.logger.info(`State of user '${userData.id}' was stored`);
       return userEntity;
     });
   }
@@ -123,9 +123,9 @@ export class UserService {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/users
    * @example ['0bb84213-8cc2-4bb1-9e0b-b8dd522396d5', '15ede065-72b3-433a-9917-252f076ed031']
    */
-  getUsers(userIds: QualifiedId[]): Promise<APIClientUser[]> {
+  async getUsers(userIds: QualifiedId[]) {
     if (userIds.length === 0) {
-      return Promise.resolve([]);
+      return {found: []};
     }
     return this.apiClient.api.user.postListUsers({qualified_ids: userIds});
   }

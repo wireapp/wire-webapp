@@ -125,8 +125,7 @@ export class UserRepository {
    * Listener for incoming user events.
    */
   private readonly onUserEvent = (eventJson: UserEvent | UserAvailabilityEvent, source: EventSource): void => {
-    const logObject = {eventJson: JSON.stringify(eventJson), eventObject: eventJson};
-    this.logger.info(`»» User Event: '${eventJson.type}' (Source: ${source})`, logObject);
+    this.logger.info(`User Event: '${eventJson.type}' (Source: ${source})`);
 
     switch (eventJson.type) {
       case USER_EVENT.DELETE:
@@ -164,30 +163,31 @@ export class UserRepository {
   /**
    * Will load the availability status to the team users and subscribe to changes.
    */
-  async loadTeamUserAvailabilities(): Promise<void> {
-    const users = this.userState.users();
-    if (this.userState.isTeam() && users.length) {
-      const availabilities = await this.userService.loadUserFromDb();
-
-      this.logger.log(`Loaded state of '${users.length}' users from database`, users);
-      /** availabilities we have in the DB that are not matching any loaded users */
-      const orphanAvailabilities = availabilities.filter(
-        availability => !users.find(user => matchQualifiedIds(user.qualifiedId, availability)),
-      );
-
-      // Remove availabilities that are not linked to any loaded users
-      orphanAvailabilities.forEach(async availability => {
-        await this.userService.removeUserFromDb({id: availability.id, domain: availability.domain ?? ''});
-      });
-
-      users.forEach(user => {
-        const userAvailability = availabilities.find(availability => matchQualifiedIds(availability, user.qualifiedId));
-        if (userAvailability) {
-          user.availability(userAvailability.availability);
-        }
-        user.subscribeToChanges();
-      });
+  async loadTeamUserAvailabilities(teamMembers: User[]): Promise<void> {
+    if (!teamMembers.length) {
+      return;
     }
+
+    const availabilities = await this.userService.loadUserFromDb();
+
+    this.logger.log(`Loaded state of '${teamMembers.length}' users from database`, teamMembers);
+    /** availabilities we have in the DB that are not matching any loaded users */
+    const orphanAvailabilities = availabilities.filter(
+      availability => !teamMembers.find(user => matchQualifiedIds(user.qualifiedId, availability)),
+    );
+
+    // Remove availabilities that are not linked to any loaded users
+    orphanAvailabilities.forEach(async availability => {
+      await this.userService.removeUserFromDb({id: availability.id, domain: availability.domain ?? ''});
+    });
+
+    teamMembers.forEach(user => {
+      const userAvailability = availabilities.find(availability => matchQualifiedIds(availability, user.qualifiedId));
+      if (userAvailability) {
+        user.availability(userAvailability.availability);
+      }
+      user.subscribeToChanges();
+    });
   }
 
   /**
@@ -278,13 +278,13 @@ export class UserRepository {
       };
     });
 
-    this.logger.info(`Found locally stored clients for '${userIds.length}' users`, recipients);
+    this.logger.log(`Found locally stored clients for '${userIds.length}' users`, recipients);
     const userEntities = await this.getUsersById(userIds);
     userEntities.forEach(userEntity => {
       const clientEntities = recipients[userEntity.id];
       const tooManyClients = clientEntities.length > 8;
       if (tooManyClients) {
-        this.logger.warn(`Found '${clientEntities.length}' clients for '${userEntity.name()}'`, clientEntities);
+        this.logger.warn(`Found '${clientEntities.length}' clients for '${userEntity.name()}'`);
       }
       userEntity.devices(clientEntities);
     });
@@ -467,33 +467,14 @@ export class UserRepository {
       const chunkOfQualifiedUserIds = chunkOfUserIds.map(({id, domain}) => ({domain: domain || selfDomain, id}));
 
       try {
-        const response = await this.userService.getUsers(chunkOfQualifiedUserIds);
-        return response ? this.userMapper.mapUsersFromJson(response) : [];
+        const {found, failed = [], not_found = []} = await this.userService.getUsers(chunkOfQualifiedUserIds);
+        const failedToLoad = [...failed, ...not_found].map(userId => {
+          /* When a federated backend is unreachable, we generate placeholder users locally with some default values
+           */
+          return new User(userId.id, userId.domain);
+        });
+        return [...this.userMapper.mapUsersFromJson(found), ...failedToLoad];
       } catch (error: any) {
-        if (
-          error.label === BackendErrorLabel.FEDERATION_NOT_AVAILABLE ||
-          error.label === BackendErrorLabel.FEDERATION_BACKEND_NOT_FOUND ||
-          error.label === BackendErrorLabel.FEDERATION_REMOTE_ERROR ||
-          error.label === BackendErrorLabel.FEDERATION_TLS_ERROR
-        ) {
-          this.logger.warn('loading federated users failed: trying loading same backend users only');
-          const [sameBackendUsers, federatedUsers] = partition(
-            chunkOfQualifiedUserIds,
-            userId => userId.domain === selfDomain,
-          );
-          const users = await getUsers(sameBackendUsers);
-
-          return users.concat(
-            federatedUsers.map(userId => {
-              /* When a federated backend is unreachable, we generate fake users locally with some default values
-               * This allows the webapp to load correctly and display conversations with those federated users
-               */
-              const fakeUser = new User(userId.id, userId.domain);
-              fakeUser.name(t('unavailableUser'));
-              return fakeUser;
-            }),
-          );
-        }
         const isNotFound =
           (isAxiosError(error) && error.response?.status === HTTP_STATUS.NOT_FOUND) ||
           Number((error as BackendError).code) === HTTP_STATUS.NOT_FOUND;
@@ -633,19 +614,8 @@ export class UserRepository {
     return knownUserEntities.concat(userEntities);
   }
 
-  getUserListFromBackend(userIds: QualifiedId[]): Promise<APIClientUser[]> {
-    const qualifiedUserIds = userIds.map(({id, domain}) => ({domain: domain || this.userState.self().domain, id}));
-    return this.userService.getUsers(qualifiedUserIds);
-  }
-
-  /**
-   * Is the user the logged in user?
-   */
-  isMe(userId: User | string): boolean {
-    if (typeof userId !== 'string') {
-      userId = userId.id;
-    }
-    return this.userState.self().id === userId;
+  getUserListFromBackend(userIds: QualifiedId[]) {
+    return this.userService.getUsers(userIds);
   }
 
   /**

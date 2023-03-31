@@ -117,7 +117,7 @@ export class IntegrationRepository {
     serviceEntity: ServiceEntity,
   ): Promise<ConversationMemberJoinEvent | void> {
     const {id: serviceId, name, providerId} = serviceEntity;
-    this.logger.info(`Adding service '${name}' to conversation '${conversationEntity.id}'`, serviceEntity);
+    this.logger.info(`Adding service '${name}' to conversation '${conversationEntity.id}'`);
 
     return this.conversationRepository.addService(conversationEntity, providerId, serviceId);
   }

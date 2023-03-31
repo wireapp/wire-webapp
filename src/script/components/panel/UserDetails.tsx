@@ -19,7 +19,6 @@
 
 import React, {useEffect} from 'react';
 
-import {CSSObject} from '@emotion/react';
 import {amplify} from 'amplify';
 import {ErrorBoundary} from 'react-error-boundary';
 
@@ -43,7 +42,6 @@ export interface UserDetailsProps {
   isVerified?: boolean;
   participant: User;
   avatarStyles?: React.CSSProperties;
-  classifiedBarStyles?: CSSObject;
 }
 
 const UserDetailsComponent: React.FC<UserDetailsProps> = ({
@@ -53,7 +51,6 @@ const UserDetailsComponent: React.FC<UserDetailsProps> = ({
   isGroupAdmin,
   avatarStyles,
   classifiedDomains,
-  classifiedBarStyles,
 }) => {
   const user = useKoSubscribableChildren(participant, [
     'inTeam',
@@ -102,13 +99,7 @@ const UserDetailsComponent: React.FC<UserDetailsProps> = ({
         </p>
       )}
 
-      {classifiedDomains && (
-        <ClassifiedBar
-          users={[participant]}
-          classifiedDomains={classifiedDomains}
-          style={{width: 'calc(100% + 32px)', ...classifiedBarStyles}}
-        />
-      )}
+      {classifiedDomains && <ClassifiedBar users={[participant]} classifiedDomains={classifiedDomains} />}
 
       <Avatar
         className="panel-participant__avatar"

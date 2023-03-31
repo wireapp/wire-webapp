@@ -138,7 +138,7 @@ const AppMain: FC<AppMainProps> = ({
 
       const activeConversation = conversationState.activeConversation();
 
-      if (repositories.user['userState'].isTemporaryGuest()) {
+      if (selfUser.isTemporaryGuest()) {
         return mainView.list.showTemporaryGuest();
       }
       if (activeConversation) {
