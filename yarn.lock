@@ -17084,7 +17084,7 @@ dexie@latest:
     webpack-hot-middleware: 2.25.3
     webrtc-adapter: 6.4.8
     workbox-webpack-plugin: 6.5.4
-    zustand: 4.3.6
+    zustand: 4.3.7
   languageName: unknown
   linkType: soft
 
@@ -17553,9 +17553,9 @@ dexie@latest:
   languageName: node
   linkType: hard
 
-"zustand@npm:4.3.6":
-  version: 4.3.6
-  resolution: "zustand@npm:4.3.6"
+"zustand@npm:4.3.7":
+  version: 4.3.7
+  resolution: "zustand@npm:4.3.7"
   dependencies:
     use-sync-external-store: 1.2.0
   peerDependencies:
@@ -17566,6 +17566,6 @@ dexie@latest:
       optional: true
     react:
       optional: true
-  checksum: 4d3cec03526f04ff3de6dc45b6f038c47f091836af9660fbf5f682cae1628221102882df20e4048dfe699a43f67424e5d6afc1116f3838a80eea5dd4f95ddaed
+  checksum: 355b414ba4830b6106bcb888077c5f90f40ed649e4127e337eff4fb4ea90e88bf5cccf32344711d743cb92a676a0643a6ab3674ddc60ed49f17ea1bc8e3f58e2
   languageName: node
   linkType: hard
