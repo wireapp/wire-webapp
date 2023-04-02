@@ -3921,7 +3921,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:*, @types/react@npm:16 || 17 || 18, @types/react@npm:18.0.28":
+"@types/react@npm:*, @types/react@npm:16 || 17 || 18":
   version: 18.0.28
   resolution: "@types/react@npm:18.0.28"
   dependencies:
@@ -3929,6 +3929,17 @@ __metadata:
     "@types/scheduler": "*"
     csstype: ^3.0.2
   checksum: e752df961105e5127652460504785897ca6e77259e0da8f233f694f9e8f451cde7fa0709d4456ade0ff600c8ce909cfe29f9b08b9c247fa9b734e126ec53edd7
+  languageName: node
+  linkType: hard
+
+"@types/react@npm:18.0.32":
+  version: 18.0.32
+  resolution: "@types/react@npm:18.0.32"
+  dependencies:
+    "@types/prop-types": "*"
+    "@types/scheduler": "*"
+    csstype: ^3.0.2
+  checksum: c8dbce83c455e520e75f3649988f46100e3a3c0bf7241281ea5bd9067a0368290f0d7c6102e12e6ec9d649134b29a3ef4c421f376ec5aa06ed78cbdd8c144b4c
   languageName: node
   linkType: hard
 
@@ -17038,7 +17049,7 @@ dexie@latest:
     "@types/open-graph": 0.2.2
     "@types/platform": 1.3.4
     "@types/prettier": ^2.7.2
-    "@types/react": 18.0.28
+    "@types/react": 18.0.32
     "@types/react-dom": 18.0.11
     "@types/react-redux": 7.1.25
     "@types/react-transition-group": 4.4.5
