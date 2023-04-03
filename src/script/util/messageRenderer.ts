@@ -77,7 +77,7 @@ const renderMention = (mentionData: MentionText) => {
 
   const mentionText = mentionData.text.replace(/^@/, '');
   const content = `<span class="mention-at-sign">@</span>${escape(mentionText)}`;
-  return `<div class="message-mention${elementClasses}"${elementAttributes}>${content}</div>`;
+  return `<span class="message-mention${elementClasses}"${elementAttributes}>${content}</span>`;
 };
 
 markdownit.normalizeLinkText = text => text;
