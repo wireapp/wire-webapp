@@ -89,13 +89,6 @@ export const ParticipantItemContent = ({
             >
               {shortDescription}
             </span>
-
-            {/* TODO: It's not used, saved for future if it will be needed, and add prop badge */}
-            {/*{hasUsernameInfo && badge && (*/}
-            {/*<span css={badge} data-uie-name="status-partner">*/}
-            {/*  {badge}*/}
-            {/*</span>*/}
-            {/*)}*/}
           </div>
         )}
       </div>

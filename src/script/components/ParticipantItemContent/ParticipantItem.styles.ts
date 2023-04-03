@@ -170,12 +170,3 @@ export const contentInfoText = (noPointer = false): CSSObject => ({
     userSelect: 'initial',
   }),
 });
-
-/* TODO: It's not used, saved for future if it will be needed, and add prop badge */
-// export const badge: CSSObject = {
-//   '&::before': {
-//     content: '"·"', // Unicode: \00B7
-//     display: 'inline-block',
-//     marginInline: '4px',
-//   },
-// };
