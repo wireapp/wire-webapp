@@ -258,14 +258,14 @@ describe('renderMessage', () => {
     const tests = [
       {
         expected:
-          'bonjour <div class="message-mention" data-uie-name="label-other-mention" data-user-id="user-id" role="button"><span class="mention-at-sign">@</span>felix</div>',
+          'bonjour <span class="message-mention" data-uie-name="label-other-mention" data-user-id="user-id" role="button"><span class="mention-at-sign">@</span>felix</span>',
         mentions: [{length: 6, startIndex: 8, userId: 'user-id'}],
         testCase: 'replaces single mention in simple text',
         text: 'bonjour @felix',
       },
       {
         expected:
-          'bonjour <div class="message-mention" data-uie-name="label-other-mention" data-user-id="user-id" role="button"><span class="mention-at-sign">@</span>felix</div>, tu vas bien <div class="message-mention" data-uie-name="label-other-mention" data-user-id="user-id" role="button"><span class="mention-at-sign">@</span>felix</div>?',
+          'bonjour <span class="message-mention" data-uie-name="label-other-mention" data-user-id="user-id" role="button"><span class="mention-at-sign">@</span>felix</span>, tu vas bien <span class="message-mention" data-uie-name="label-other-mention" data-user-id="user-id" role="button"><span class="mention-at-sign">@</span>felix</span>?',
         mentions: [
           {length: 6, startIndex: 8, userId: 'user-id'},
           {length: 6, startIndex: 28, userId: 'user-id'},
@@ -275,21 +275,21 @@ describe('renderMessage', () => {
       },
       {
         expected:
-          'salut <div class="message-mention" data-uie-name="label-other-mention" data-user-id="pain-id" role="button"><span class="mention-at-sign">@</span>&#x60;I am a **pain** in the __a**__&#x60;</div>',
+          'salut <span class="message-mention" data-uie-name="label-other-mention" data-user-id="pain-id" role="button"><span class="mention-at-sign">@</span>&#x60;I am a **pain** in the __a**__&#x60;</span>',
         mentions: [{length: 33, startIndex: 6, userId: 'pain-id'}],
         testCase: "doesn't parse markdown in user names",
         text: 'salut @`I am a **pain** in the __a**__`',
       },
       {
         expected:
-          '<strong>salut</strong> <div class="message-mention" data-uie-name="label-other-mention" data-user-id="pain-id" role="button"><span class="mention-at-sign">@</span>you</div>',
+          '<strong>salut</strong> <span class="message-mention" data-uie-name="label-other-mention" data-user-id="pain-id" role="button"><span class="mention-at-sign">@</span>you</span>',
         mentions: [{length: 4, startIndex: 10, userId: 'pain-id'}],
         testCase: 'parses markdown outside of mentions',
         text: '**salut** @you',
       },
       {
         expected:
-          '<strong>salut</strong> <div class="message-mention self-mention" data-uie-name="label-self-mention" role="button"><span class="mention-at-sign">@</span>you</div> and <div class="message-mention" data-uie-name="label-other-mention" data-user-id="toi-id" role="button"><span class="mention-at-sign">@</span>toi</div>',
+          '<strong>salut</strong> <span class="message-mention self-mention" data-uie-name="label-self-mention" role="button"><span class="mention-at-sign">@</span>you</span> and <span class="message-mention" data-uie-name="label-other-mention" data-user-id="toi-id" role="button"><span class="mention-at-sign">@</span>toi</span>',
         mentions: [
           {length: 4, startIndex: 10, userId: 'self-id'},
           {length: 4, startIndex: 19, userId: 'toi-id'},
@@ -299,7 +299,7 @@ describe('renderMessage', () => {
       },
       {
         expected:
-          'salut<pre><code><div class="message-mention" data-uie-name="label-other-mention" data-user-id="pain-id" role="button"><span class="mention-at-sign">@</span>you</div>\n</code></pre>',
+          'salut<pre><code><span class="message-mention" data-uie-name="label-other-mention" data-user-id="pain-id" role="button"><span class="mention-at-sign">@</span>you</span>\n</code></pre>',
         mentions: [{length: 4, startIndex: 10, userId: 'pain-id'}],
         testCase: 'displays mention inside code block',
         text: 'salut\n```\n@you\n```',
@@ -326,14 +326,14 @@ describe('renderMessage', () => {
       },
       {
         expected:
-          '<a href="https://wire.com" target="_blank" rel="nofollow noopener noreferrer" data-md-link="true" data-uie-name="markdown-link"><div class="message-mention" data-uie-name="label-other-mention" data-user-id="pain-id" role="button"><span class="mention-at-sign">@</span>you</div></a>',
+          '<a href="https://wire.com" target="_blank" rel="nofollow noopener noreferrer" data-md-link="true" data-uie-name="markdown-link"><span class="message-mention" data-uie-name="label-other-mention" data-user-id="pain-id" role="button"><span class="mention-at-sign">@</span>you</span></a>',
         mentions: [{length: 4, startIndex: 1, userId: 'pain-id'}],
         testCase: 'mention works correctly as part of a link text',
         text: '[@you](https://wire.com)',
       },
       {
         expected:
-          '<a href="http://wire.com#@you" target="_blank" rel="nofollow noopener noreferrer">http://wire.com#<div class="message-mention" data-uie-name="label-other-mention" data-user-id="pain-id" role="button"><span class="mention-at-sign">@</span>you</div></a>',
+          '<a href="http://wire.com#@you" target="_blank" rel="nofollow noopener noreferrer">http://wire.com#<span class="message-mention" data-uie-name="label-other-mention" data-user-id="pain-id" role="button"><span class="mention-at-sign">@</span>you</span></a>',
         mentions: [{length: 4, startIndex: 16, userId: 'pain-id'}],
         testCase: "mentions don't affect auto-detected links",
         text: 'http://wire.com#@you',
@@ -356,7 +356,7 @@ describe('renderMessage', () => {
 
     it('does not try to match mention to self id if no userId given', () => {
       const expected =
-        'hey <div class="message-mention" data-uie-name="label-other-mention" data-user-id="pain-id" role="button"><span class="mention-at-sign">@</span>user</div>';
+        'hey <span class="message-mention" data-uie-name="label-other-mention" data-user-id="pain-id" role="button"><span class="mention-at-sign">@</span>user</span>';
       const mentions = [{length: 5, startIndex: 4, userId: 'pain-id'}];
       const mentionEntities = mentions.map(mention => {
         const mentionEntity = new MentionEntity(mention.startIndex, mention.length, mention.userId);
