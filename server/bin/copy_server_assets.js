@@ -30,3 +30,9 @@ const assetFolders = ['.ebextensions/', 'robots/', 'templates/', 'certificate'];
 assetFolders.forEach(assetFolder => {
   fs.copySync(path.resolve(__dirname, srcFolder, assetFolder), path.resolve(__dirname, distFolder, assetFolder));
 });
+
+const srcFile = '../../';
+const copyFolder = '../../bin/';
+const file = 'Procfile/';
+fs.copySync(path.resolve(__dirname, srcFile, file), path.resolve(__dirname, copyFolder, file));
+// fs.copySync('../.platform', './.platform');
