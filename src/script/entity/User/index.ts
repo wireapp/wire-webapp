@@ -18,4 +18,3 @@
  */
 
 export * from './User';
-export * from './PlaceholderUser';

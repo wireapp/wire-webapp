@@ -145,7 +145,11 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   return (
     <div aria-label={messageAriaLabel}>
       {shouldShowAvatar() && (
-        <MessageHeader onClickAvatar={onClickAvatar} message={message} focusTabIndex={messageFocusedTabIndex} />
+        <MessageHeader onClickAvatar={onClickAvatar} message={message} focusTabIndex={messageFocusedTabIndex}>
+          {was_edited && (
+            <span className="message-header-label-icon icon-edit" title={message.displayEditedTimestamp()}></span>
+          )}
+        </MessageHeader>
       )}
       {message.quote() && (
         <Quote

@@ -335,7 +335,9 @@ export class App {
   async initApp(clientType: ClientType, onProgress: (progress: number, message?: string) => void) {
     // add body information
     const [apiVersionMin, apiVersionMax] = this.config.SUPPORTED_API_RANGE;
-    await this.core.useAPIVersion(apiVersionMin, apiVersionMax, this.config.ENABLE_DEV_BACKEND_API);
+    const {domain} = await this.core.useAPIVersion(apiVersionMin, apiVersionMax, this.config.ENABLE_DEV_BACKEND_API);
+    await initializeDataDog(this.config, domain);
+
     const osCssClass = Runtime.isMacOS() ? 'os-mac' : 'os-pc';
     const platformCssClass = Runtime.isDesktopApp() ? 'platform-electron' : 'platform-web';
     document.body.classList.add(osCssClass, platformCssClass);
@@ -378,8 +380,6 @@ export class App {
       });
 
       const selfUser = await this.initiateSelfUser();
-
-      await initializeDataDog(this.config, selfUser.domain);
 
       onProgress(5, t('initReceivedSelfUser', selfUser.name()));
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_SELF_USER);

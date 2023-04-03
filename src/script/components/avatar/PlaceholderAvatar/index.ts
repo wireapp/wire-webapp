@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2019 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,20 +17,4 @@
  *
  */
 
-import {getStorage} from './localStorage';
-
-import {Configuration} from '../Config';
-
-export function enableLogging(config: Configuration, search = window.location.search) {
-  const storage = getStorage();
-  const namespace = new URLSearchParams(search).get('enableLogging');
-  const force = config.FEATURE.ENABLE_DEBUG;
-
-  if (namespace) {
-    storage?.setItem('debug', namespace);
-  } else if (force) {
-    storage?.setItem('debug', '*');
-  } else {
-    storage?.removeItem('debug');
-  }
-}
+export * from './PlaceholderAvatar';

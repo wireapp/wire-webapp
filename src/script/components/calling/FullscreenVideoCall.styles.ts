@@ -19,6 +19,11 @@
 
 import {css, CSSObject} from '@emotion/react';
 
+export const classifiedBarStyles: CSSObject = {
+  lineHeight: '1.5em',
+  display: 'flex',
+};
+
 export const videoControlActiveStyles = css`
   background-color: var(--main-color);
   border: 1px solid var(--main-color);
