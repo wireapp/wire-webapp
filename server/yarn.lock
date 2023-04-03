@@ -2508,6 +2508,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fs-extra@npm:11.1.1":
+  version: 11.1.1
+  resolution: "fs-extra@npm:11.1.1"
+  dependencies:
+    graceful-fs: ^4.2.0
+    jsonfile: ^6.0.1
+    universalify: ^2.0.0
+  checksum: fb883c68245b2d777fbc1f2082c9efb084eaa2bbf9fddaa366130d196c03608eebef7fb490541276429ee1ca99f317e2d73e96f5ca0999eefedf5a624ae1edfd
+  languageName: node
+  linkType: hard
+
 "fs-extra@npm:^8.1.0":
   version: 8.1.0
   resolution: "fs-extra@npm:8.1.0"
@@ -3876,13 +3887,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"maxmind@npm:4.3.8":
-  version: 4.3.8
-  resolution: "maxmind@npm:4.3.8"
+"maxmind@npm:4.3.9":
+  version: 4.3.9
+  resolution: "maxmind@npm:4.3.9"
   dependencies:
     mmdb-lib: 2.0.2
-    tiny-lru: 9.0.3
-  checksum: 39fba2071c93de9d4852478b07c78cb2aadc7ddb485ffacbc5bfa9763931ef4ec6c0b269a397339ee1550196a8e24058df3f237d863c1b0e6d867de8df365f8d
+    tiny-lru: 10.3.0
+  checksum: 4a31b3695e2f0666221f288ad459ceabce3558d02b0afc5b7d7b76265e4578a3019d59ce264fe735dec8eb6c6d5460b4f0ab5bfb3bfb26be2e49b690f1927dd0
   languageName: node
   linkType: hard
 
@@ -4915,14 +4926,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rimraf@npm:4.4.0":
-  version: 4.4.0
-  resolution: "rimraf@npm:4.4.0"
+"rimraf@npm:4.4.1":
+  version: 4.4.1
+  resolution: "rimraf@npm:4.4.1"
   dependencies:
     glob: ^9.2.0
   bin:
     rimraf: dist/cjs/src/bin.js
-  checksum: 0cedaf9d138589d1bb0ab851f05804c6d30827aa66563472b04ab76245f83537e23e7b94f1f79ea6c368c0d84a18fcde6a756fca3a44c967e08792671b3a0a6e
+  checksum: b786adc02651e2e24bbedb04bbdea80652fc9612632931ff2d9f898c5e4708fe30956186597373c568bd5230a4dc2fadfc816ccacba8a1daded3a006a6b74f1a
   languageName: node
   linkType: hard
 
@@ -5345,10 +5356,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tiny-lru@npm:9.0.3":
-  version: 9.0.3
-  resolution: "tiny-lru@npm:9.0.3"
-  checksum: 8ded11a875d622a2d4c3ee2d33331ddfaa80f86b5b280bad17810ecbfd94d774c1726948f91031527bb03e2fd38c4385bd4db27fd5614b3c59fe3fa7d3359451
+"tiny-lru@npm:10.3.0":
+  version: 10.3.0
+  resolution: "tiny-lru@npm:10.3.0"
+  checksum: cf5ae030c729293a319c989a03d97396197b74290a014c28ba2f6303b019078fd64174e9a96c5ca5c8b5ee796c1393a6a48240503cab444e654f14dc58b53599
   languageName: node
   linkType: hard
 
@@ -5445,23 +5456,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:4.9.5":
-  version: 4.9.5
-  resolution: "typescript@npm:4.9.5"
+"typescript@npm:5.0.3":
+  version: 5.0.3
+  resolution: "typescript@npm:5.0.3"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: ee000bc26848147ad423b581bd250075662a354d84f0e06eb76d3b892328d8d4440b7487b5a83e851b12b255f55d71835b008a66cbf8f255a11e4400159237db
+  checksum: 3cce0576d218cb4277ff8b6adfef1a706e9114a98b4261a38ad658a7642f1b274a8396394f6cbff8c0ba852996d7ed2e233e9b8431d5d55ac7c2f6fea645af02
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@4.9.5#~builtin<compat/typescript>":
-  version: 4.9.5
-  resolution: "typescript@patch:typescript@npm%3A4.9.5#~builtin<compat/typescript>::version=4.9.5&hash=a1c5e5"
+"typescript@patch:typescript@5.0.3#~builtin<compat/typescript>":
+  version: 5.0.3
+  resolution: "typescript@patch:typescript@npm%3A5.0.3#~builtin<compat/typescript>::version=5.0.3&hash=a1c5e5"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 2eee5c37cad4390385db5db5a8e81470e42e8f1401b0358d7390095d6f681b410f2c4a0c496c6ff9ebd775423c7785cdace7bcdad76c7bee283df3d9718c0f20
+  checksum: 9ec0a8eed38d46cc2c8794555b7674e413604c56c159f71b8ff21ce7f17334a44127a68724cb2ef8221ff3b19369f8f05654e8a5266621d7d962aeed889bd630
   languageName: node
   linkType: hard
 
@@ -5657,19 +5668,19 @@ __metadata:
     express: 4.18.2
     express-sitemap-xml: 3.0.1
     express-useragent: 1.0.15
-    fs-extra: 11.1.0
+    fs-extra: 11.1.1
     geolite2: 1.3.0
     hbs: 4.2.0
     helmet: 6.0.1
     http-status-codes: 2.2.0
     jest: 29.5.0
     logdown: 3.3.1
-    maxmind: 4.3.8
+    maxmind: 4.3.9
     nocache: 3.0.4
     opn: 6.0.0
     pm2: 5.3.0
-    rimraf: 4.4.0
-    typescript: 4.9.5
+    rimraf: 4.4.1
+    typescript: 5.0.3
   languageName: unknown
   linkType: soft
 

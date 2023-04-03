@@ -25,6 +25,7 @@ import {
   CONVERSATION_TYPE,
   Member as MemberBackendData,
   OtherMember as OtherMemberBackendData,
+  DefaultConversationRoleName,
   RemoteConversations,
 } from '@wireapp/api-client/lib/conversation/';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
@@ -99,6 +100,35 @@ describe('ConversationMapper', () => {
       expect(conversationEntity['mutedTimestamp']()).toEqual(expectedMutedTimestamp);
       expect(conversationEntity.last_event_timestamp()).toBe(initialTimestamp);
       expect(conversationEntity.last_server_timestamp()).toBe(initialTimestamp);
+    });
+
+    it('maps a backend conversation roles', () => {
+      const conversation = {
+        ...entities.conversation,
+        roles: undefined,
+        members: {
+          self: {...entities.conversation.members.self, conversation_role: 'wire_admin'},
+          others: [
+            {
+              id: '1',
+              conversation_role: DefaultConversationRoleName.WIRE_ADMIN,
+            },
+            {
+              id: '2',
+              conversation_role: DefaultConversationRoleName.WIRE_MEMBER,
+            },
+          ],
+        },
+      };
+
+      const initialTimestamp = Date.now();
+      const [conversationEntity] = ConversationMapper.mapConversations([conversation], initialTimestamp);
+
+      expect(conversationEntity.roles()).toEqual({
+        [conversation.members.self.id]: DefaultConversationRoleName.WIRE_ADMIN,
+        [conversation.members.others[0].id]: DefaultConversationRoleName.WIRE_ADMIN,
+        [conversation.members.others[1].id]: DefaultConversationRoleName.WIRE_MEMBER,
+      });
     });
 
     it('maps multiple conversations', () => {
@@ -567,9 +597,15 @@ describe('ConversationMapper', () => {
 
     it('only maps other participants if they are still in the conversation', () => {
       const othersUpdate: OtherMemberBackendData[] = [
-        {id: '39b7f597-dfd1-4dff-86f5-fe1b79cb70a0', status: 1},
+        {
+          id: '39b7f597-dfd1-4dff-86f5-fe1b79cb70a0',
+          status: 1 as any /*status 1 is an impossible state, but we want to test that it is ignored*/,
+        },
         {id: '5eeba863-44be-43ff-8c47-7565a028f182', status: 0},
-        {id: 'a187fd3e-479a-4e85-a77f-5e4ab95477cf', status: 1},
+        {
+          id: 'a187fd3e-479a-4e85-a77f-5e4ab95477cf',
+          status: 1 as any /*status 1 is an impossible state, but we want to test that it is ignored*/,
+        },
         {id: 'd270c7b4-6492-4953-b1bf-be817fe665b2', status: 0},
       ];
 

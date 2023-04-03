@@ -90,8 +90,7 @@ export class PromiseQueue {
 
       this.interval = window.setInterval(() => {
         if (!this.paused) {
-          const logObject = {pendingEntry: queueEntry, queueState: this.queue};
-          this.logger.warn(`Promise queue timed-out after ${this.timeout}ms, unblocking queue`, logObject);
+          this.logger.warn(`Promise queue timed-out after ${this.timeout}ms, unblocking queue`);
           this.resume();
         }
       }, this.timeout);

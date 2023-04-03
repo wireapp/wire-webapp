@@ -121,21 +121,22 @@ export class TeamRepository {
     );
   };
 
-  initTeam = async (): Promise<void> => {
+  initTeam = async (teamId?: string): Promise<TeamEntity | undefined> => {
     const team = await this.getTeam();
-    if (this.userState.self().teamId) {
+    await this.updateFeatureConfig();
+    if (teamId) {
       await this.updateTeamMembers(team);
+      this.scheduleTeamRefresh();
     }
-    this.updateFeatureConfig();
-    this.scheduleTeamRefresh();
+    return teamId ? team : undefined;
   };
 
-  async updateFeatureConfig() {
+  private async updateFeatureConfig() {
     this.teamState.teamFeatures(await this.teamService.getAllTeamFeatures());
     return this.teamState.teamFeatures();
   }
 
-  readonly scheduleTeamRefresh = (): void => {
+  private readonly scheduleTeamRefresh = (): void => {
     window.setInterval(async () => {
       try {
         await this.getTeam();
@@ -147,13 +148,13 @@ export class TeamRepository {
   };
 
   async getTeam(): Promise<TeamEntity> {
-    const selfTeamId = this.userState.self().teamId;
-    const teamData = !!selfTeamId && (await this.getTeamById(selfTeamId));
+    const teamId = this.userState.self().teamId;
+    const teamData = !!teamId && (await this.getTeamById(teamId));
 
     const teamEntity = teamData ? this.teamMapper.mapTeamFromObject(teamData, this.teamState.team()) : new TeamEntity();
     this.teamState.team(teamEntity);
-    if (selfTeamId) {
-      await this.getSelfMember(selfTeamId);
+    if (teamId) {
+      await this.getSelfMember(teamId);
     }
     // doesn't need to be awaited because it publishes the account info over amplify.
     this.sendAccountInfo();
@@ -222,9 +223,8 @@ export class TeamRepository {
     }
 
     const type = eventJson.type;
-    const logObject = {eventJson: JSON.stringify(eventJson), eventObject: eventJson};
 
-    this.logger.info(`Team Event: '${type}' (Source: ${source})`, logObject);
+    this.logger.info(`Team Event: '${type}' (Source: ${source})`);
 
     switch (type) {
       case TEAM_EVENT.CONVERSATION_DELETE: {
@@ -298,7 +298,7 @@ export class TeamRepository {
         accountInfo.availability = this.userState.self().availability();
       }
 
-      this.logger.info('Publishing account info', accountInfo);
+      this.logger.log('Publishing account info', accountInfo);
       amplify.publish(WebAppEvents.TEAM.INFO, accountInfo);
       return accountInfo;
     }

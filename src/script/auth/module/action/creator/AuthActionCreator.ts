@@ -19,6 +19,8 @@
 
 import type {SSOSettings} from '@wireapp/api-client/lib/account/SSOSettings';
 import type {RegisterData} from '@wireapp/api-client/lib/auth/';
+import {OAuthClient} from '@wireapp/api-client/lib/oauth/OAuthClient';
+import {TeamData} from '@wireapp/api-client/lib/team';
 
 import type {LoginDataState, RegistrationDataState} from '../../reducer/authReducer';
 
@@ -29,6 +31,12 @@ export enum AUTH_ACTION {
   ENTER_GENERIC_INVITATION_FLOW = 'ENTER_GENERIC_INVITATION_FLOW',
   ENTER_PERSONAL_CREATION_FLOW = 'ENTER_PERSONAL_CREATION_FLOW',
   ENTER_TEAM_CREATION_FLOW = 'ENTER_TEAM_CREATION_FLOW',
+  FETCH_TEAM_FAILED = 'FETCH_TEAM_FAILED',
+  FETCH_TEAM_START = 'FETCH_TEAM_START',
+  FETCH_TEAM_SUCCESS = 'FETCH_TEAM_SUCCESS',
+  FETCH_OAUTH_APP_FAILED = 'FETCH_OAUTH_APP_FAILED',
+  FETCH_OAUTH_APP_START = 'FETCH_OAUTH_APP_START',
+  FETCH_OAUTH_APP_SUCCESS = 'FETCH_OAUTH_APP_SUCCESS',
   GET_SSO_SETTINGS_FAILED = 'GET_SSO_SETTINGS_FAILED',
   GET_SSO_SETTINGS_START = 'GET_SSO_SETTINGS_START',
   GET_SSO_SETTINGS_SUCCESS = 'GET_SSO_SETTINGS_SUCCESS',
@@ -60,6 +68,9 @@ export enum AUTH_ACTION {
   SEND_PHONE_LOGIN_CODE_FAILED = 'SEND_PHONE_LOGIN_CODE_FAILED',
   SEND_PHONE_LOGIN_CODE_START = 'SEND_PHONE_LOGIN_CODE_START',
   SEND_PHONE_LOGIN_CODE_SUCCESS = 'SEND_PHONE_LOGIN_CODE_SUCCESS',
+  SEND_OAUTH_CODE_FAILED = 'SEND_OAUTH_CODE_FAILED',
+  SEND_OAUTH_CODE_START = 'SEND_OAUTH_CODE_START',
+  SEND_OAUTH_CODE_SUCCESS = 'SEND_OAUTH_CODE_SUCCESS',
   SEND_TWO_FACTOR_CODE_FAILED = 'SEND_TWO_FACTOR_CODE_FAILED',
   SEND_TWO_FACTOR_CODE_START = 'SEND_TWO_FACTOR_CODE_START',
   SEND_TWO_FACTOR_CODE_SUCCESS = 'SEND_TWO_FACTOR_CODE_SUCCESS',
@@ -77,9 +88,18 @@ export type AuthActions =
   | SendPhoneLoginCodeStartAction
   | SendPhoneLoginCodeSuccessAction
   | SendPhoneLoginCodeFailedAction
+  | SendOAuthCodeStartAction
+  | SendOAuthCodeSuccessAction
+  | SendOAuthCodeFailedAction
   | RegisterTeamStartAction
   | RegisterTeamSuccessAction
   | RegisterTeamFailedAction
+  | FetchTeamStartAction
+  | FetchTeamSuccessAction
+  | FetchTeamFailedAction
+  | FetchApplicationStartAction
+  | FetchApplicationSuccessAction
+  | FetchApplicationFailedAction
   | RegisterPersonalStartAction
   | RegisterPersonalSuccessAction
   | RegisterPersonalFailedAction
@@ -134,6 +154,17 @@ export interface SendPhoneLoginCodeFailedAction extends AppAction {
   readonly type: AUTH_ACTION.SEND_PHONE_LOGIN_CODE_FAILED;
 }
 
+export interface SendOAuthCodeStartAction extends AppAction {
+  readonly type: AUTH_ACTION.SEND_OAUTH_CODE_START;
+}
+export interface SendOAuthCodeSuccessAction extends AppAction {
+  readonly type: AUTH_ACTION.SEND_OAUTH_CODE_SUCCESS;
+}
+export interface SendOAuthCodeFailedAction extends AppAction {
+  readonly error: Error;
+  readonly type: AUTH_ACTION.SEND_OAUTH_CODE_FAILED;
+}
+
 export interface SendTwoFactorCodeStartAction extends AppAction {
   readonly type: AUTH_ACTION.SEND_TWO_FACTOR_CODE_START;
 }
@@ -155,6 +186,30 @@ export interface RegisterTeamSuccessAction extends AppAction {
 export interface RegisterTeamFailedAction extends AppAction {
   readonly error: Error;
   readonly type: AUTH_ACTION.REGISTER_TEAM_FAILED;
+}
+
+export interface FetchTeamStartAction extends AppAction {
+  readonly type: AUTH_ACTION.FETCH_TEAM_START;
+}
+export interface FetchTeamSuccessAction extends AppAction {
+  readonly payload: TeamData;
+  readonly type: AUTH_ACTION.FETCH_TEAM_SUCCESS;
+}
+export interface FetchTeamFailedAction extends AppAction {
+  readonly error: Error;
+  readonly type: AUTH_ACTION.FETCH_TEAM_FAILED;
+}
+
+export interface FetchApplicationStartAction extends AppAction {
+  readonly type: AUTH_ACTION.FETCH_OAUTH_APP_START;
+}
+export interface FetchApplicationSuccessAction extends AppAction {
+  readonly payload: OAuthClient;
+  readonly type: AUTH_ACTION.FETCH_OAUTH_APP_SUCCESS;
+}
+export interface FetchApplicationFailedAction extends AppAction {
+  readonly error: Error;
+  readonly type: AUTH_ACTION.FETCH_OAUTH_APP_FAILED;
 }
 
 export interface RegisterPersonalStartAction extends AppAction {
@@ -294,6 +349,19 @@ export class AuthActionCreator {
     type: AUTH_ACTION.SEND_PHONE_LOGIN_CODE_FAILED,
   });
 
+  static startSendOAuthCode = (): SendOAuthCodeStartAction => ({
+    type: AUTH_ACTION.SEND_OAUTH_CODE_START,
+  });
+
+  static successfulSendOAuthCode = (): SendOAuthCodeSuccessAction => ({
+    type: AUTH_ACTION.SEND_OAUTH_CODE_SUCCESS,
+  });
+
+  static failedSendOAuthCode = (error: Error): SendOAuthCodeFailedAction => ({
+    error,
+    type: AUTH_ACTION.SEND_OAUTH_CODE_FAILED,
+  });
+
   static startSendTwoFactorCode = (): SendTwoFactorCodeStartAction => ({
     type: AUTH_ACTION.SEND_TWO_FACTOR_CODE_START,
   });
@@ -319,6 +387,33 @@ export class AuthActionCreator {
   static failedRegisterTeam = (error: Error): RegisterTeamFailedAction => ({
     error,
     type: AUTH_ACTION.REGISTER_TEAM_FAILED,
+  });
+
+  static startFetchTeam = (): FetchTeamStartAction => ({
+    type: AUTH_ACTION.FETCH_TEAM_START,
+  });
+
+  static successfulFetchTeam = (teamData: TeamData): FetchTeamSuccessAction => ({
+    payload: teamData,
+    type: AUTH_ACTION.FETCH_TEAM_SUCCESS,
+  });
+
+  static failedFetchTeam = (error: Error): FetchTeamFailedAction => ({
+    error,
+    type: AUTH_ACTION.FETCH_TEAM_FAILED,
+  });
+  static startFetchOAuth = (): FetchApplicationStartAction => ({
+    type: AUTH_ACTION.FETCH_OAUTH_APP_START,
+  });
+
+  static successfulFetchOAuth = (application: OAuthClient): FetchApplicationSuccessAction => ({
+    payload: application,
+    type: AUTH_ACTION.FETCH_OAUTH_APP_SUCCESS,
+  });
+
+  static failedFetchOAuth = (error: Error): FetchApplicationFailedAction => ({
+    error,
+    type: AUTH_ACTION.FETCH_OAUTH_APP_FAILED,
   });
 
   static startRegisterPersonal = (): RegisterPersonalStartAction => ({

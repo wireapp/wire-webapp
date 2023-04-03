@@ -70,7 +70,7 @@ export class Message {
   public readonly ephemeral_started: ko.Observable<number>;
   public readonly ephemeral_status: ko.Computed<EphemeralStatusType>;
   public expectsReadConfirmation: boolean;
-  public readonly headerSenderName: ko.PureComputed<string>;
+  public readonly senderName: ko.PureComputed<string>;
   public readonly isObfuscated: ko.PureComputed<boolean>;
   public legalHoldStatus?: LegalHoldStatus;
   public readonly status: ko.Observable<StatusType>;
@@ -104,17 +104,18 @@ export class Message {
     this.ephemeral_expires = ko.observable(false);
     this.ephemeral_started = ko.observable(0);
     this.ephemeral_status = ko.computed(() => {
-      const isExpired = this.ephemeral_expires() === true;
+      const expires = this.ephemeral_expires();
+      const isExpired = expires === true;
       if (isExpired) {
         return EphemeralStatusType.TIMED_OUT;
       }
 
-      if (typeof this.ephemeral_expires() === 'number') {
+      if (typeof expires === 'number') {
         return EphemeralStatusType.INACTIVE;
       }
 
-      if (typeof this.ephemeral_expires() === 'string') {
-        const isExpiring = Date.now() >= this.ephemeral_expires();
+      if (typeof expires === 'string') {
+        const isExpiring = Date.now() >= parseInt(expires, 10);
         return isExpiring ? EphemeralStatusType.TIMED_OUT : EphemeralStatusType.ACTIVE;
       }
 
@@ -149,7 +150,7 @@ export class Message {
     this.category = undefined;
 
     this.unsafeSenderName = ko.pureComputed(() => getUserName(this.user(), undefined, true));
-    this.headerSenderName = ko.pureComputed(() => {
+    this.senderName = ko.pureComputed(() => {
       return this.user().name();
     });
 

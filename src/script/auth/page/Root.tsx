@@ -40,6 +40,7 @@ import {HistoryInfo} from './HistoryInfo';
 import {Index} from './Index';
 import {InitialInvite} from './InitialInvite';
 import {Login} from './Login';
+import {OAuthPermissions} from './OAuthPermissions';
 import {PhoneLogin} from './PhoneLogin';
 import {SetAccountType} from './SetAccountType';
 import {SetEmail} from './SetEmail';
@@ -106,6 +107,7 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
   };
 
   const isAuthenticatedCheck = (page: any): any => (page ? (isAuthenticated ? page : navigate('/auth')) : null);
+  const isOAuthCheck = (page: any): any => (page ? isAuthenticated ? page : <Navigate to={ROUTE.LOGIN} /> : null);
 
   const ProtectedHistoryInfo = () => isAuthenticatedCheck(<HistoryInfo />);
   const ProtectedInitialInvite = () => isAuthenticatedCheck(<InitialInvite />);
@@ -114,6 +116,7 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
   const ProtectedSetHandle = () => isAuthenticatedCheck(<SetHandle />);
   const ProtectedSetEmail = () => isAuthenticatedCheck(<SetEmail />);
   const ProtectedSetPassword = () => isAuthenticatedCheck(<SetPassword />);
+  const ProtectedOAuthPermissions = () => isOAuthCheck(<OAuthPermissions />);
 
   const brandName = Config.getConfig().BRAND_NAME;
   return (
@@ -143,6 +146,7 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
               )}
               <Route path={ROUTE.HISTORY_INFO} element={<ProtectedHistoryInfo />} />
               <Route path={ROUTE.INITIAL_INVITE} element={<ProtectedInitialInvite />} />
+              <Route path={`${ROUTE.AUTHORIZE}`} element={<ProtectedOAuthPermissions />} />
               <Route
                 path={`${ROUTE.LOGIN}/*`}
                 element={

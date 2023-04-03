@@ -31,6 +31,7 @@ import {AnyAction, Dispatch} from 'redux';
 import {Runtime, UrlUtil} from '@wireapp/commons';
 import {
   ArrowIcon,
+  Button,
   Checkbox,
   CheckboxLabel,
   CodeInput,
@@ -39,6 +40,7 @@ import {
   Columns,
   Container,
   ContainerXS,
+  FlexBox,
   Form,
   H1,
   H2,
@@ -103,10 +105,13 @@ const LoginComponent = ({
 
   const [twoFactorSubmitError, setTwoFactorSubmitError] = useState<string | Error>('');
   const [twoFactorLoginData, setTwoFactorLoginData] = useState<LoginData>();
+  const [verificationCode, setVerificationCode] = useState('');
+  const [twoFactorSubmitFailedOnce, setTwoFactorSubmitFailedOnce] = useState(false);
+
+  const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE);
 
   const [showEntropyForm, setShowEntropyForm] = useState(false);
   const isEntropyRequired = Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY;
-
   const onEntropyGenerated = useRef<((entropy: Uint8Array) => void) | undefined>();
   const entropy = useRef<Uint8Array | undefined>();
   const getEntropy = isEntropyRequired
@@ -159,7 +164,7 @@ const LoginComponent = ({
     const isImmediateLogin = UrlUtil.hasURLParameter(QUERY_KEY.IMMEDIATE_LOGIN);
     const is2FAEntropy = UrlUtil.hasURLParameter(QUERY_KEY.TWO_FACTOR) && isEntropyRequired;
 
-    if (isImmediateLogin && !is2FAEntropy) {
+    if ((isImmediateLogin && !is2FAEntropy) || isOauth) {
       immediateLogin();
     }
     return () => {
@@ -172,6 +177,10 @@ const LoginComponent = ({
       await doInit({isImmediateLogin: true, shouldValidateLocalClient: false});
       const entropyData = await getEntropy?.();
       await doInitializeClient(ClientType.PERMANENT, undefined, undefined, entropyData);
+
+      if (isOauth) {
+        return navigate(ROUTE.AUTHORIZE);
+      }
       return navigate(ROUTE.HISTORY_INFO);
     } catch (error) {
       logger.error('Unable to login immediately', error);
@@ -194,6 +203,9 @@ const LoginComponent = ({
         await doLogin(login, getEntropy);
       }
 
+      if (isOauth) {
+        return navigate(ROUTE.AUTHORIZE);
+      }
       return navigate(ROUTE.HISTORY_INFO);
     } catch (error) {
       if (isBackendError(error)) {
@@ -214,15 +226,29 @@ const LoginComponent = ({
             await resetAuthError();
             const login: LoginData = {...formLoginData, clientType: loginData.clientType};
             if (login.email || login.handle) {
-              await doSendTwoFactorCode(login.email || login.handle || '');
-              setTwoFactorLoginData(login);
-              await doSetLocalStorage(QUERY_KEY.JOIN_EXPIRES, Date.now() + 1000 * 60 * 10);
+              try {
+                await doSendTwoFactorCode(login.email || login.handle || '');
+              } catch (error) {
+                if (isBackendError(error)) {
+                  /**  The BE can respond quite restrictively to the send code request.
+                   * We don't want to block the user from logging in if they have already received a code in the last few minutes.
+                   * Any other error should still be thrown.
+                   */
+                  if (error.code !== StatusCodes.TOO_MANY_REQUESTS) {
+                    throw error;
+                  }
+                }
+              } finally {
+                setTwoFactorLoginData(login);
+                await doSetLocalStorage(QUERY_KEY.JOIN_EXPIRES, Date.now() + 1000 * 60 * 10);
+              }
             }
             break;
           }
 
           case BackendError.LABEL.CODE_AUTHENTICATION_FAILED: {
             setTwoFactorSubmitError(error);
+            setTwoFactorSubmitFailedOnce(true);
             break;
           }
           case BackendError.LABEL.INVALID_CREDENTIALS:
@@ -260,8 +286,12 @@ const LoginComponent = ({
   };
 
   const submitTwoFactorLogin = (code?: string) => {
+    setVerificationCode(code ?? '');
     setTwoFactorSubmitError('');
-    handleSubmit({...twoFactorLoginData, verificationCode: code}, []);
+    // Do not auto submit if already failed once
+    if (!twoFactorSubmitFailedOnce) {
+      handleSubmit({...twoFactorLoginData, verificationCode: code}, []);
+    }
   };
 
   const storeEntropy = async (entropyData: Uint8Array) => {
@@ -312,10 +342,10 @@ const LoginComponent = ({
                     </Text>
                     <Label markInvalid={!!twoFactorSubmitError}>
                       <CodeInput
+                        disabled={isFetching}
                         style={{marginTop: 60}}
                         onCodeComplete={submitTwoFactorLogin}
                         data-uie-name="enter-code"
-                        markInvalid={!!twoFactorSubmitError}
                       />
                     </Label>
                     <div style={{display: 'flex', justifyContent: 'center', marginTop: 10}}>
@@ -330,6 +360,16 @@ const LoginComponent = ({
                         </TextLink>
                       )}
                     </div>
+                    <FlexBox justify="center">
+                      <Button
+                        disabled={!!twoFactorSubmitError || isFetching}
+                        type="submit"
+                        css={{marginTop: 65}}
+                        onClick={() => handleSubmit({...twoFactorLoginData, verificationCode}, [])}
+                      >
+                        {_({id: 'login.submitTwoFactorButton'})}
+                      </Button>
+                    </FlexBox>
                   </div>
                 ) : (
                   <>

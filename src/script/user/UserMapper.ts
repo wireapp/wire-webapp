@@ -46,11 +46,11 @@ export class UserMapper {
   }
 
   mapUserFromJson(userData: APIClientUser | APIClientSelf): User {
-    return this.updateUserFromObject(new User('', null), userData);
+    return this.updateUserFromObject(new User('', ''), userData);
   }
 
   mapSelfUserFromJson(userData: APIClientSelf | APIClientUser): User {
-    const userEntity = this.updateUserFromObject(new User('', null), userData);
+    const userEntity = this.updateUserFromObject(new User('', ''), userData);
     userEntity.isMe = true;
 
     const dataFromBackend = userData as APIClientSelf;
@@ -82,11 +82,7 @@ export class UserMapper {
    * @param userData Updated user data from backend
    * @todo Pass in "serverTimeHandler", so that it can be removed from the "UserMapper" constructor
    */
-  updateUserFromObject(userEntity: User, userData: Partial<APIClientUser | APIClientSelf>): User | undefined {
-    if (!userData) {
-      return undefined;
-    }
-
+  updateUserFromObject(userEntity: User, userData: Partial<APIClientUser | APIClientSelf>): User {
     // We are trying to update non-matching users
     const isUnexpectedId = userEntity.id !== '' && userData.id !== userEntity.id;
     if (isUnexpectedId) {
