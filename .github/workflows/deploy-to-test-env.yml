@@ -8,7 +8,7 @@ on:
         required: true
         type: choice
         options:
-          - wire-webapp-qa
+          - wire-webapp-qa-al2-migration
           - wire-webapp-edge
 
 concurrency:
