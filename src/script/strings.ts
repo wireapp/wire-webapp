@@ -769,6 +769,10 @@ export const loginStrings = defineMessages({
     defaultMessage: 'Verify your account',
     id: 'login.twoFactorLoginTitle',
   },
+  submitTwoFactorButton: {
+    defaultMessage: 'Submit',
+    id: 'login.submitTwoFactorButton',
+  },
 });
 
 export const ssoLoginStrings = defineMessages({

@@ -660,6 +660,7 @@
   "login.subhead": "Enter your email address or username.",
   "login.twoFactorLoginSubHead": "Please check your email {email} for the verification code and enter it below.",
   "login.twoFactorLoginTitle": "Verify your account",
+  "login.submitTwoFactorButton": "Submit",
   "mediaBtnPause": "Pause",
   "mediaBtnPlay": "Play",
   "messageCouldNotBeSent": "Message could not be sent due to connectivity issues.",

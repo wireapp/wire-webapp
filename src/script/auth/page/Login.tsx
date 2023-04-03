@@ -31,6 +31,7 @@ import {AnyAction, Dispatch} from 'redux';
 import {Runtime, UrlUtil} from '@wireapp/commons';
 import {
   ArrowIcon,
+  Button,
   Checkbox,
   CheckboxLabel,
   CodeInput,
@@ -39,6 +40,7 @@ import {
   Columns,
   Container,
   ContainerXS,
+  FlexBox,
   Form,
   H1,
   H2,
@@ -103,6 +105,8 @@ const LoginComponent = ({
 
   const [twoFactorSubmitError, setTwoFactorSubmitError] = useState<string | Error>('');
   const [twoFactorLoginData, setTwoFactorLoginData] = useState<LoginData>();
+  const [verificationCode, setVerificationCode] = useState('');
+  const [twoFactorSubmitFailedOnce, setTwoFactorSubmitFailedOnce] = useState(false);
 
   const [showEntropyForm, setShowEntropyForm] = useState(false);
   const isEntropyRequired = Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY;
@@ -236,6 +240,7 @@ const LoginComponent = ({
 
           case BackendError.LABEL.CODE_AUTHENTICATION_FAILED: {
             setTwoFactorSubmitError(error);
+            setTwoFactorSubmitFailedOnce(true);
             break;
           }
           case BackendError.LABEL.INVALID_CREDENTIALS:
@@ -273,8 +278,12 @@ const LoginComponent = ({
   };
 
   const submitTwoFactorLogin = (code?: string) => {
+    setVerificationCode(code ?? '');
     setTwoFactorSubmitError('');
-    handleSubmit({...twoFactorLoginData, verificationCode: code}, []);
+    // Do not auto submit if already failed once
+    if (!twoFactorSubmitFailedOnce) {
+      handleSubmit({...twoFactorLoginData, verificationCode: code}, []);
+    }
   };
 
   const storeEntropy = async (entropyData: Uint8Array) => {
@@ -325,10 +334,10 @@ const LoginComponent = ({
                     </Text>
                     <Label markInvalid={!!twoFactorSubmitError}>
                       <CodeInput
+                        disabled={isFetching}
                         style={{marginTop: 60}}
                         onCodeComplete={submitTwoFactorLogin}
                         data-uie-name="enter-code"
-                        markInvalid={!!twoFactorSubmitError}
                       />
                     </Label>
                     <div style={{display: 'flex', justifyContent: 'center', marginTop: 10}}>
@@ -343,6 +352,16 @@ const LoginComponent = ({
                         </TextLink>
                       )}
                     </div>
+                    <FlexBox justify="center">
+                      <Button
+                        disabled={!!twoFactorSubmitError || isFetching}
+                        type="submit"
+                        css={{marginTop: 65}}
+                        onClick={() => handleSubmit({...twoFactorLoginData, verificationCode}, [])}
+                      >
+                        {_({id: 'login.submitTwoFactorButton'})}
+                      </Button>
+                    </FlexBox>
                   </div>
                 ) : (
                   <>
