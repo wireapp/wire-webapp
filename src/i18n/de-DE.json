@@ -660,6 +660,7 @@
   "login.subhead": "E-Mail-Adresse oder Benutzernamen eingeben.",
   "login.twoFactorLoginSubHead": "Bitte prüfen Sie Ihren Posteingang und geben Sie den Bestätigungscode unten ein.",
   "login.twoFactorLoginTitle": "E-Mail-Adresse bestätigen",
+  "login.submitTwoFactorButton": "Absenden",
   "mediaBtnPause": "Pause",
   "mediaBtnPlay": "Wiedergabe",
   "messageCouldNotBeSent": "Nachricht konnte aufgrund von Verbindungsproblemen nicht gesendet werden.",
