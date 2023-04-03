@@ -17,7 +17,7 @@
  *
  */
 
-import React, {ChangeEvent, useId, useState} from 'react';
+import React, {ChangeEvent, useId} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
@@ -28,7 +28,6 @@ import {ParticipantItemContent} from 'Components/ParticipantItemContent';
 import {listItem, listWrapper} from 'Components/ParticipantItemContent/ParticipantItem.styles';
 import {UserStatusBadges} from 'Components/UserBadges';
 import {UserlistMode} from 'Components/UserList';
-import {InViewport} from 'Components/utils/InViewport';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
@@ -70,7 +69,6 @@ const UserListItem = ({
   onKeyDown,
 }: UserListItemProps) => {
   const checkboxId = useId();
-  const [isInViewport, setIsInViewport] = useState(false);
 
   const {
     is_verified: isVerified,
@@ -108,31 +106,27 @@ const UserListItem = ({
 
   const RenderParticipant = () => {
     return (
-      <InViewport css={listItem(noInteraction)} onVisible={() => setIsInViewport(true)}>
-        {isInViewport && (
-          <>
-            <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={user} aria-hidden="true" css={{margin: '0 16px'}} />
+      <div css={listItem(noInteraction)}>
+        <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={user} aria-hidden="true" css={{margin: '0 16px'}} />
 
-            <ParticipantItemContent
-              name={userName}
-              shortDescription={contentInfoText}
-              selfInTeam={selfInTeam}
-              availability={availability}
-              {...(isSelf && {selfString})}
-              hasUsernameInfo={hasUsernameInfo}
-            />
+        <ParticipantItemContent
+          name={userName}
+          shortDescription={contentInfoText}
+          selfInTeam={selfInTeam}
+          availability={availability}
+          {...(isSelf && {selfString})}
+          hasUsernameInfo={hasUsernameInfo}
+        />
 
-            <UserStatusBadges
-              config={{
-                guest: !isOthersMode && isDirectGuest,
-                federated: isFederated,
-                external,
-                verified: isSelfVerified && isVerified,
-              }}
-            />
-          </>
-        )}
-      </InViewport>
+        <UserStatusBadges
+          config={{
+            guest: !isOthersMode && isDirectGuest,
+            federated: isFederated,
+            external,
+            verified: isSelfVerified && isVerified,
+          }}
+        />
+      </div>
     );
   };
 

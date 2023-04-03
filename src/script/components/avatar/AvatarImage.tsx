@@ -23,6 +23,7 @@ import {CSSObject} from '@emotion/serialize';
 import {Transition} from 'react-transition-group';
 import {container} from 'tsyringe';
 
+import {InViewport} from 'Components/utils/InViewport';
 import {CSS_FILL_PARENT} from 'Util/CSSMixin';
 
 import {AssetRemoteData} from '../../assets/AssetRemoteData';
@@ -55,9 +56,10 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
   const [avatarImage, setAvatarImage] = useState('');
   const [showTransition, setShowTransition] = useState(false);
   const [avatarLoadingBlocked, setAvatarLoadingBlocked] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    if (!avatarLoadingBlocked) {
+    if (!avatarLoadingBlocked && isVisible) {
       setAvatarLoadingBlocked(true);
 
       const isSmall = ![AVATAR_SIZE.LARGE, AVATAR_SIZE.X_LARGE].includes(avatarSize);
@@ -82,7 +84,7 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
         }
       })();
     }
-  }, [previewPicture, mediumPicture, avatarSize]);
+  }, [previewPicture, mediumPicture, avatarSize, isVisible]);
 
   const transitionImageStyles: Record<string, CSSObject> = {
     entered: {opacity: 1, transform: 'scale(1)'},
@@ -90,30 +92,32 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
   };
 
   return (
-    <Transition in={!!avatarImage} timeout={showTransition ? 700 : 0}>
-      {(state: string) => {
-        return (
-          <img
-            css={{
-              ...CSS_FILL_PARENT,
-              backgroundColor,
-              borderRadius,
-              filter: isGrey ? 'grayscale(100%)' : 'none',
-              height: '100%',
-              objectFit: 'cover',
-              opacity: 0,
-              overflow: 'hidden',
-              transform: 'scale(0.88)',
-              transition: showTransition ? 'all 0.55s cubic-bezier(0.165, 0.84, 0.44, 1) 0.15s' : 'none',
-              width: '100%',
-              ...transitionImageStyles[state],
-            }}
-            src={avatarImage}
-            alt={avatarAlt}
-          />
-        );
-      }}
-    </Transition>
+    <InViewport onVisible={() => setIsVisible(true)}>
+      <Transition in={!!avatarImage} timeout={showTransition ? 700 : 0}>
+        {(state: string) => {
+          return (
+            <img
+              css={{
+                ...CSS_FILL_PARENT,
+                backgroundColor,
+                borderRadius,
+                filter: isGrey ? 'grayscale(100%)' : 'none',
+                height: '100%',
+                objectFit: 'cover',
+                opacity: 0,
+                overflow: 'hidden',
+                transform: 'scale(0.88)',
+                transition: showTransition ? 'all 0.55s cubic-bezier(0.165, 0.84, 0.44, 1) 0.15s' : 'none',
+                width: '100%',
+                ...transitionImageStyles[state],
+              }}
+              src={avatarImage}
+              alt={avatarAlt}
+            />
+          );
+        }}
+      </Transition>
+    </InViewport>
   );
 };
 
