@@ -22,7 +22,7 @@ import React, {forwardRef} from 'react';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar-m';
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {Icon} from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';

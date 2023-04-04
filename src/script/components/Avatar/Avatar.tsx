@@ -28,8 +28,8 @@ import {TemporaryGuestAvatar} from './TemporaryGuestAvatar';
 import {UserAvatar} from './UserAvatar';
 
 import {User} from '../../entity/User';
-import {isServiceEntity} from '../guards/Service';
-import {ServiceEntity} from '../integration/ServiceEntity';
+import {isServiceEntity} from '../../guards/Service';
+import {ServiceEntity} from '../../integration/ServiceEntity';
 
 export enum AVATAR_SIZE {
   LARGE = 'avatar-l',

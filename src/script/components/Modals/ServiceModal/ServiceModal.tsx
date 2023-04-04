@@ -19,7 +19,7 @@
 
 import React from 'react';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar-m';
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {Icon} from 'Components/Icon';
 import {ModalComponent} from 'Components/ModalComponent';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';

@@ -19,7 +19,7 @@
 
 import {render, waitFor} from '@testing-library/react';
 
-import {AVATAR_SIZE} from 'Components/Avatar-m';
+import {AVATAR_SIZE} from 'Components/Avatar';
 import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
 
 import {AvatarImage} from './AvatarImage';

@@ -17,7 +17,7 @@
  *
  */
 
-import {AVATAR_SIZE, DIAMETER} from 'Components/Avatar-m';
+import {AVATAR_SIZE, DIAMETER} from 'Components/Avatar';
 
 import {DefaultAvatarImageSmall, DefaultAvatarImageLarge} from './DefaultAvatarImage';
 

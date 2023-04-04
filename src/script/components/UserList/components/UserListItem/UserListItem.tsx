@@ -23,7 +23,7 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar-m';
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {ParticipantItemContent} from 'Components/ParticipantItemContent';
 import {listItem, listWrapper} from 'Components/ParticipantItemContent/ParticipantItem.styles';
 import {UserStatusBadges} from 'Components/UserBadges';
