@@ -73,7 +73,7 @@ export const CallParticipantItemContent = ({
             </div>
           )}
 
-          {selfString && <div css={selfIndicator}>{selfString}</div>}
+          {isSelf && <div css={selfIndicator}>{selfString}</div>}
         </div>
       </div>
 
