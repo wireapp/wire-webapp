@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [24.2.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@24.2.0...@wireapp/api-client@24.2.1) (2023-04-04)
+
+### Bug Fixes
+
+* Align failed_to_send signature with backend ([#5033](https://github.com/wireapp/wire-web-packages/issues/5033)) ([2778b7c](https://github.com/wireapp/wire-web-packages/commit/2778b7c79533a8233f084301285ded7a0bfcd7d1))
+
 # [24.2.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@24.1.1...@wireapp/api-client@24.2.0) (2023-03-30)
 
 ### Features
