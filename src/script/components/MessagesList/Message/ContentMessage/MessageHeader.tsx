@@ -106,7 +106,7 @@ export function MessageHeader({
       <div className="message-header-label" data-uie-name={uieName}>
         <h4
           className={`message-header-label-sender ${!noColor && message.accent_color()}`}
-          css={!isAvailable ? {color: '#676B71'} : {}}
+          css={!isAvailable ? {color: 'var(--gray-70)'} : {}}
           data-uie-name={uieName ? `${uieName}-sender-name` : 'sender-name'}
           data-uie-uid={sender.id}
         >

@@ -17,19 +17,24 @@
  *
  */
 
+import React from 'react';
+
 import {AVATAR_SIZE, DIAMETER} from 'Components/Avatar';
 
 import {DefaultAvatarImageSmall, DefaultAvatarImageLarge} from './DefaultAvatarImage';
 
 import {AvatarWrapper} from '../AvatarWrapper';
 
-type PlaceholderAvatarProps = {size: AVATAR_SIZE; onClick: () => void};
+interface PlaceholderAvatarProps extends React.HTMLProps<HTMLDivElement> {
+  avatarSize: AVATAR_SIZE;
+  onClick?: () => void;
+}
 
-export function PlaceholderAvatar({size, onClick}: PlaceholderAvatarProps) {
+export function PlaceholderAvatar({avatarSize: size, onClick, ...props}: PlaceholderAvatarProps) {
   const diameter = DIAMETER[size];
   const ImageComponent = diameter >= DIAMETER[AVATAR_SIZE.LARGE] ? DefaultAvatarImageLarge : DefaultAvatarImageSmall;
   return (
-    <AvatarWrapper avatarSize={size} color={''} onClick={onClick}>
+    <AvatarWrapper avatarSize={size} color={''} onClick={onClick} {...props}>
       <ImageComponent diameter={diameter} />
     </AvatarWrapper>
   );
