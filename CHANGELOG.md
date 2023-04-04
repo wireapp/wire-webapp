@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [24.3.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@24.2.1...@wireapp/api-client@24.3.0) (2023-04-04)
+
+### Features
+
+* mls E2Eid config ([#5015](https://github.com/wireapp/wire-web-packages/issues/5015)) ([d6fdab2](https://github.com/wireapp/wire-web-packages/commit/d6fdab2883a8917cc096c483b860f6be20162f86))
+
 ## [24.2.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@24.2.0...@wireapp/api-client@24.2.1) (2023-04-04)
 
 ### Bug Fixes
