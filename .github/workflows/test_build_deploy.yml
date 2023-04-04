@@ -2,12 +2,12 @@ name: CI
 
 on:
   push:
-    branches: [master, dev, edge, avs, mobile, acc, tmp_qa_migration]
+    branches: [master, dev, edge, avs, mobile, acc]
     tags:
       - '*staging*'
       - '*production*'
   pull_request:
-    branches: [master, dev, edge, avs, mobile, acc, tmp_qa_migration]
+    branches: [master, dev, edge, avs, mobile, acc]
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -96,7 +96,6 @@ jobs:
               "edge": { "dev_env": "wire-webapp-edge" },
               "dev": { "dev_env": "wire-webapp-dev" },
               "master": { "dev_env": "wire-webapp-master" },
-              "tmp_qa_migration": { "qa_env": "wire-webapp-qa-al2-migration" }
             }
 
       - uses: kanga333/variable-mapper@master
@@ -110,7 +109,7 @@ jobs:
             }
 
       - name: Build
-        if: env.prod_env || env.dev_env || env.qa_env
+        if: env.prod_env || env.dev_env
         run: yarn build:prod
 
       - name: Assembling release information
@@ -161,22 +160,6 @@ jobs:
           use_existing_version_if_available: true
           version_description: ${{github.sha}}
           version_label: ${{env.TAG}}-${{github.run_id}}
-          wait_for_deployment: false
-          wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
-
-      - name: Deploy to qa env
-        if: env.qa_env
-        uses: einaregilsson/beanstalk-deploy@v21
-        with:
-          application_name: ${{env.AWS_APPLICATION_NAME}}
-          aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
-          aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
-          deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
-          environment_name: ${{env.qa_env}}
-          region: eu-central-1
-          use_existing_version_if_available: true
-          version_description: ${{github.sha}}
-          version_label: ${{github.run_id}}
           wait_for_deployment: false
           wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
 
