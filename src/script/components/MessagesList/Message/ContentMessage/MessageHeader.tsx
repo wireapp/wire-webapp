@@ -17,8 +17,8 @@
  *
  */
 
-import {AVATAR_SIZE, Avatar} from 'Components/Avatar';
-import {PlaceholderAvatar} from 'Components/Avatar/PlaceholderAvatar';
+import {AVATAR_SIZE, Avatar} from 'Components/Avatar-m';
+import {PlaceholderAvatar} from 'Components/Avatar-m/PlaceholderAvatar';
 import {Icon} from 'Components/Icon';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {DeleteMessage} from 'src/script/entity/message/DeleteMessage';

@@ -21,7 +21,7 @@ import React from 'react';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar-m';
 import {Icon} from 'Components/Icon';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';
 import {UnverifiedUserWarning} from 'Components/Modals/UserModal';

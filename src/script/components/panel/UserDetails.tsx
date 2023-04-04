@@ -25,7 +25,7 @@ import {ErrorBoundary} from 'react-error-boundary';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {AvailabilityState} from 'Components/AvailabilityState';
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar-m';
 import {ErrorFallback} from 'Components/ErrorFallback';
 import {Icon} from 'Components/Icon';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';

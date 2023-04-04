@@ -22,7 +22,7 @@ import React, {CSSProperties, useEffect, useState} from 'react';
 import {css} from '@emotion/react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar-m';
 import {Icon} from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';

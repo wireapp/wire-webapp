@@ -23,7 +23,7 @@ import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar-m';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';
 import {UnverifiedUserWarning} from 'Components/Modals/UserModal';
 import {useAppMainState, ViewType} from 'src/script/page/state';

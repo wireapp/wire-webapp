@@ -19,7 +19,7 @@
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar-m';
 import {ParticipantItemContent} from 'Components/ParticipantItemContent';
 import {listItem, listWrapper} from 'Components/ParticipantItemContent/ParticipantItem.styles';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
