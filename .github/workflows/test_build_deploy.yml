@@ -109,7 +109,7 @@ jobs:
             }
 
       - name: Build
-        if: env.prod_env || env.dev_env || env.qa_env
+        if: env.prod_env || env.dev_env
         run: yarn build:prod
 
       - name: Assembling release information
