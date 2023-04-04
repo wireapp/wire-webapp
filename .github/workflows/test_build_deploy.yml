@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [master, dev, edge, avs, mobile, acc, tmp_qa_migration]
+    branches: [master, dev, edge, avs, mobile, acc]
     tags:
       - '*staging*'
       - '*production*'
