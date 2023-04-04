@@ -23,16 +23,15 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {callParticipantListWrapper} from 'Components/calling/CallParticipantsListItem/CallParticipantsListItem.styles';
-import {ParticipantItemContent} from 'Components/ParticipantItemContent';
 import {listItem} from 'Components/ParticipantItemContent/ParticipantItem.styles';
 import {UserStatusBadges} from 'Components/UserBadges';
 import {Participant} from 'src/script/calling/Participant';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
-import {capitalizeFirstChar} from 'Util/StringUtil';
 import {setContextMenuPosition} from 'Util/util';
 
+import {CallParticipantItemContent} from './CallParticipantItemContent/CallParticipantItemContent';
 import {CallParticipantStatusIcons} from './CallParticipantStatusIcons';
 
 export interface CallParticipantsListItemProps {
@@ -70,8 +69,6 @@ export const CallParticipantsListItem = ({
     });
   };
 
-  const selfString = `(${capitalizeFirstChar(t('conversationYouNominative'))})`;
-
   return (
     <div
       tabIndex={TabIndex.FOCUSABLE}
@@ -87,11 +84,11 @@ export const CallParticipantsListItem = ({
       <div css={listItem(true)}>
         <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={user} aria-hidden="true" css={{margin: '0 10px'}} />
 
-        <ParticipantItemContent
+        <CallParticipantItemContent
           name={userName}
           selfInTeam={selfInTeam}
           availability={availability}
-          {...(isSelf && {selfString})}
+          isSelf={isSelf}
           {...(showDropdown && {
             onDropdownClick: event => onContextMenu?.(event as unknown as React.MouseEvent<HTMLDivElement>),
           })}

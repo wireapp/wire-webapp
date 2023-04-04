@@ -19,14 +19,16 @@
 
 import React from 'react';
 
+import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+
 import {Availability} from '@wireapp/protocol-messaging';
 
 import {AvailabilityState} from 'Components/AvailabilityState';
 import {Icon} from 'Components/Icon';
+import {t} from 'Util/LocalizerUtil';
+import {capitalizeFirstChar} from 'Util/StringUtil';
 
 import {
-  contentInfoWrapper,
-  contentInfoText,
   selfIndicator,
   userName,
   userAvailability,
@@ -35,28 +37,25 @@ import {
   chevronIcon,
   contentText,
   wrapper,
-} from './ParticipantItem.styles';
+} from './CallParticipantItemContent.styles';
 
-export interface ParticipantItemContentProps {
+export interface CallParticipantItemContentProps {
   name: string;
   selfInTeam?: boolean;
   availability?: Availability.Type;
-  shortDescription?: string;
-  selfString?: string;
-  hasUsernameInfo?: boolean;
-  showArrow?: boolean;
+  isSelf?: boolean;
   onDropdownClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
-export const ParticipantItemContent = ({
+export const CallParticipantItemContent = ({
   name,
   selfInTeam = false,
   availability = Availability.Type.NONE,
-  shortDescription = '',
-  selfString = '',
-  hasUsernameInfo = false,
-  showArrow = false,
-}: ParticipantItemContentProps) => {
+  isSelf = false,
+  onDropdownClick,
+}: CallParticipantItemContentProps) => {
+  const selfString = `(${capitalizeFirstChar(t('conversationYouNominative'))})`;
+
   return (
     <div css={wrapper}>
       <div css={contentText}>
@@ -76,21 +75,20 @@ export const ParticipantItemContent = ({
 
           {selfString && <div css={selfIndicator}>{selfString}</div>}
         </div>
-
-        {shortDescription && (
-          <div css={contentInfoWrapper}>
-            <span
-              css={[contentInfoText(hasUsernameInfo), ellipsis]}
-              className="subline"
-              data-uie-name="status-username"
-            >
-              {shortDescription}
-            </span>
-          </div>
-        )}
       </div>
 
-      {showArrow && <Icon.ChevronRight css={chevronIcon} data-hoverClass="chevron-icon" />}
+      {onDropdownClick && (
+        <button
+          data-hoverClass="chevron-icon"
+          tabIndex={TabIndex.UNFOCUSABLE}
+          css={chevronIcon}
+          onClick={onDropdownClick}
+          type="button"
+          data-uie-name="participant-menu-icon"
+        >
+          <Icon.Chevron />
+        </button>
+      )}
     </div>
   );
 };
