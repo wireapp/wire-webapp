@@ -27,7 +27,7 @@ import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
 import {SearchInput} from 'Components/SearchInput';
-import {ServiceList} from 'Components/ServiceList';
+import {ServiceList} from 'Components/ServiceList/ServiceList';
 import {UserSearchableList} from 'Components/UserSearchableList';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
@@ -262,13 +262,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
                     </ul>
                   )}
 
-                  <ServiceList
-                    services={services}
-                    click={onServiceSelect}
-                    arrow
-                    noUnderline
-                    isSearching={isSearching}
-                  />
+                  <ServiceList services={services} onServiceClick={onServiceSelect} isSearching={isSearching} />
                 </>
               )}
 

@@ -34,12 +34,13 @@ import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';
-import {ParticipantItem} from 'Components/list/ParticipantItem';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isEnterKey, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
+
+import {CallParticipantsListItem} from './CallParticipantsListItem';
 
 import type {Call} from '../../calling/Call';
 import type {CallingRepository} from '../../calling/CallingRepository';
@@ -588,22 +589,18 @@ const CallingCell: React.FC<CallingCellProps> = ({
                       {participants
                         .slice()
                         .sort((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user))
-                        .map(participant => (
+                        .map((participant, index, participantsArray) => (
                           <li key={participant.clientId} className="call-ui__participant-list__participant">
-                            <ParticipantItem
+                            <CallParticipantsListItem
                               key={participant.clientId}
-                              participant={participant.user}
-                              hideInfo
-                              noUnderline
                               callParticipant={participant}
                               selfInTeam={selfUser?.inTeam()}
                               isSelfVerified={isSelfVerified}
-                              external={teamState.isExternal(participant.user.id)}
+                              showDropdown={isModerator}
                               onContextMenu={
                                 isModerator ? event => getParticipantContext(event, participant) : undefined
                               }
-                              showDropdown={isModerator}
-                              noInteraction
+                              isLast={participantsArray.length === index}
                             />
                           </li>
                         ))}

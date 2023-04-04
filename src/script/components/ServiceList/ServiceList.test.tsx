@@ -23,15 +23,7 @@ import {createRandomUuid} from 'Util/util';
 
 import {ServiceList} from './ServiceList';
 
-import {ServiceEntity} from '../integration/ServiceEntity';
-
-jest.mock('Components/utils/InViewport', () => ({
-  InViewport: ({onVisible, children}: {onVisible: () => void; children: any}) => {
-    setTimeout(onVisible);
-    return <div>{children}</div>;
-  },
-  __esModule: true,
-}));
+import {ServiceEntity} from '../../integration/ServiceEntity';
 
 describe('ServiceList', () => {
   it('lists the services', () => {
@@ -39,10 +31,8 @@ describe('ServiceList', () => {
     const serviceEntity2 = new ServiceEntity({id: createRandomUuid()});
 
     const props = {
-      arrow: false,
-      click: () => {},
+      onServiceClick: () => {},
       isSearching: false,
-      noUnderline: true,
       services: [serviceEntity1, serviceEntity2],
     };
 
@@ -54,10 +44,8 @@ describe('ServiceList', () => {
 
   it('shows the "no results found" element when there are no services', () => {
     const props = {
-      arrow: false,
-      click: () => {},
+      onServiceClick: () => {},
       isSearching: true,
-      noUnderline: true,
       services: [] as ServiceEntity[],
     };
 
