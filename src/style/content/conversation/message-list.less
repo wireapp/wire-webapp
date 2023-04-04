@@ -484,19 +484,13 @@
   }
 }
 
-// // MESSAGE - ACTIONS
+// MESSAGE - ACTIONS
 .message-body-actions {
-  // height: 24px;
   display: flex;
   min-width: var(--conversation-message-timestamp-width);
   align-items: flex-start;
   justify-content: flex-start;
   padding: 5px;
-
-  @media (max-width: @screen-md-min) {
-    // height: 45px;
-    flex-direction: column;
-  }
 
   // actions pill
   .action-pill-style() {
@@ -510,9 +504,11 @@
   }
 
   .message-status-read {
+    display: flex;
+    align-items: center;
     svg {
-      max-width: 12px;
-      max-height: 12px;
+      width: 12px;
+      min-height: 12px;
       fill: currentColor;
     }
 
@@ -523,6 +519,16 @@
     &:focus,
     &:focus-visible {
       opacity: 1;
+    }
+
+    @media (max-width: @screen-md-min) {
+      &__one-on-one {
+        height: 24px;
+        flex-direction: column;
+        .message-status-read__count {
+          margin-left: 0;
+        }
+      }
     }
   }
 

@@ -19,6 +19,8 @@
 
 import React, {useEffect, useState} from 'react';
 
+import cx from 'classnames';
+
 import {Icon} from 'Components/Icon';
 import {Message} from 'src/script/entity/message/Message';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -29,7 +31,6 @@ export interface ReadReceiptStatusProps {
   is1to1Conversation: boolean;
   isLastDeliveredMessage: boolean;
   message: Message;
-  onClickReceipts?: (message: Message) => void;
 }
 
 const ReadReceiptStatus: React.FC<ReadReceiptStatusProps> = ({message, is1to1Conversation, isLastDeliveredMessage}) => {
@@ -55,7 +56,7 @@ const ReadReceiptStatus: React.FC<ReadReceiptStatusProps> = ({message, is1to1Con
       )}
       {showEyeIndicator && (
         <div
-          className={'message-status-read'}
+          className={cx('message-status-read', is1to1Conversation && 'message-status-read__one-on-one')}
           data-uie-name="status-message-read-receipts"
           aria-label={t('accessibility.messageDetailsReadReceipts', readReceiptText)}
         >

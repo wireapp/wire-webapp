@@ -283,7 +283,6 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             message={message}
             is1to1Conversation={conversation.is1to1()}
             isLastDeliveredMessage={isLastDeliveredMessage}
-            onClickReceipts={onClickReceipts}
           />
         </div>
         {isActionMenuVisible && (
