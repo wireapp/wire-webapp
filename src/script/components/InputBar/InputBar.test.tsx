@@ -18,6 +18,7 @@
  */
 
 import {act, fireEvent, render, waitFor} from '@testing-library/react';
+import ko from 'knockout';
 
 import {InputBar} from 'Components/InputBar/index';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
@@ -87,7 +88,7 @@ describe('InputBar', () => {
     storageRepository,
     teamState: new TeamState(),
     userState: {
-      self: () => new User('id'),
+      self: ko.observable(new User('id')),
     } as UserState,
     onShiftTab: jest.fn(),
     uploadDroppedFiles: jest.fn(),
