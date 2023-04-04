@@ -31,7 +31,7 @@ import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {setContextMenuPosition} from 'Util/util';
 
-import {CallParticipantItemContent} from './CallParticipantItemContent/CallParticipantItemContent';
+import {CallParticipantItemContent} from './CallParticipantItemContent';
 import {CallParticipantStatusIcons} from './CallParticipantStatusIcons';
 
 export interface CallParticipantsListItemProps {
