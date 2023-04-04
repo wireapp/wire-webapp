@@ -77,7 +77,6 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   isLastDeliveredMessage,
   contextMenu,
   previousMessage,
-  onClickReceipts,
   onClickAvatar,
   onClickImage,
   onClickTimestamp,

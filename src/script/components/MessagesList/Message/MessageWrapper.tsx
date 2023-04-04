@@ -75,7 +75,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
   onClickMessage,
   onClickTimestamp,
   onClickParticipants,
-  onClickReceipts,
+  onClickDetails,
   onClickResetSession,
   onClickCancelRequest,
   onLike,
@@ -168,7 +168,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
 
     if (hasDetails) {
       entries.push({
-        click: () => onClickReceipts(message),
+        click: () => onClickDetails(message),
         label: t('conversationContextMenuDetails'),
       });
     }
@@ -217,7 +217,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
         onClickImage={onClickImage}
         onClickInvitePeople={onClickInvitePeople}
         onClickParticipants={onClickParticipants}
-        onClickReceipts={onClickReceipts}
+        onClickDetails={onClickDetails}
         onDiscard={onDiscard}
         onRetry={onRetry}
         isMessageFocused={isMessageFocused}
