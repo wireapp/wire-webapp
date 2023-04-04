@@ -30,7 +30,8 @@ import {AvatarImage} from './AvatarImage';
 import {AvatarWrapper} from './AvatarWrapper';
 
 import {ServiceEntity} from '../../integration/ServiceEntity';
-import {AVATAR_SIZE} from '../Avatar';
+
+import {AVATAR_SIZE} from '.';
 
 export interface ServiceAvatarProps extends React.HTMLProps<HTMLDivElement> {
   avatarSize: AVATAR_SIZE;

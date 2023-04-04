@@ -22,13 +22,14 @@ import {FC, HTMLProps, MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyB
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 
-import {ServiceAvatar} from './avatar/ServiceAvatar';
-import {TemporaryGuestAvatar} from './avatar/TemporaryGuestAvatar';
-import {UserAvatar} from './avatar/UserAvatar';
+import {PlaceholderAvatar} from './PlaceholderAvatar';
+import {ServiceAvatar} from './ServiceAvatar';
+import {TemporaryGuestAvatar} from './TemporaryGuestAvatar';
+import {UserAvatar} from './UserAvatar';
 
-import {User} from '../entity/User';
-import {isServiceEntity} from '../guards/Service';
-import {ServiceEntity} from '../integration/ServiceEntity';
+import {User} from '../../entity/User';
+import {isServiceEntity} from '../../guards/Service';
+import {ServiceEntity} from '../../integration/ServiceEntity';
 
 export enum AVATAR_SIZE {
   LARGE = 'avatar-l',
@@ -77,7 +78,7 @@ export interface AvatarProps extends HTMLProps<HTMLDivElement> {
   noBadge?: boolean;
   noFilter?: boolean;
   isResponsive?: boolean;
-  onAvatarClick?: (participant: User | ServiceEntity, target: Node) => void;
+  onAvatarClick?: (participant: User | ServiceEntity) => void;
 }
 
 const Avatar: FC<AvatarProps> = ({
@@ -95,10 +96,10 @@ const Avatar: FC<AvatarProps> = ({
     const parentNode = event.currentTarget.parentNode;
     if (parentNode) {
       if ('key' in event) {
-        handleKeyDown(event, () => onAvatarClick?.(participant, parentNode));
+        handleKeyDown(event, () => onAvatarClick?.(participant));
         return;
       }
-      onAvatarClick?.(participant, parentNode);
+      onAvatarClick?.(participant);
     }
   };
 
@@ -118,6 +119,10 @@ const Avatar: FC<AvatarProps> = ({
     return (
       <ServiceAvatar avatarSize={avatarSize} participant={participant} onClick={handleAvatarInteraction} {...props} />
     );
+  }
+
+  if (!participant.isAvailable()) {
+    return <PlaceholderAvatar size={avatarSize} onClick={() => onAvatarClick?.(participant)} />;
   }
 
   const isMe = participant?.isMe;

@@ -22,8 +22,7 @@ import React from 'react';
 import {css} from '@emotion/react';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import {GroupAvatar} from 'Components/avatar/GroupAvatar';
+import {GroupAvatar, Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {ConversationListCell} from 'Components/list/ConversationListCell';
 import {Call} from 'src/script/calling/Call';
 import {User} from 'src/script/entity/User';

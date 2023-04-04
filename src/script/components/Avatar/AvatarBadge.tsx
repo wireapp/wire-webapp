@@ -19,38 +19,35 @@
 
 import React from 'react';
 
-import {CSS_SQUARE} from 'Util/CSSMixin';
+import {CSS_FILL_PARENT, CSS_FLEX_CENTER, CSS_ICON} from 'Util/CSSMixin';
 
-import {DIAMETER, AVATAR_SIZE} from '../Avatar';
+import {STATE} from '.';
 
-export interface AvatarWrapperProps extends React.HTMLProps<HTMLDivElement> {
-  avatarSize: AVATAR_SIZE;
-  color: string;
-  isResponsive?: boolean;
+export interface AvatarBadgeProps {
+  state: STATE;
 }
 
-const AvatarWrapper: React.FunctionComponent<AvatarWrapperProps> = ({
-  color,
-  avatarSize,
-  isResponsive = false,
-  ...props
-}) => {
-  const avatarDiameter = isResponsive ? `${DIAMETER[avatarSize] / 16}rem` : DIAMETER[avatarSize];
+const AvatarBadge: React.FunctionComponent<AvatarBadgeProps> = ({state}) => {
+  const icons: Record<string, string> = {
+    [STATE.PENDING]: '\\e165',
+    [STATE.BLOCKED]: '\\e104',
+  };
   return (
     <div
       css={{
-        ...CSS_SQUARE(avatarDiameter),
-        color,
-        display: 'inline-block',
-        overflow: 'hidden',
-        position: 'relative',
-        transform: 'translateZ(0)',
-        userSelect: 'none',
+        ...CSS_FILL_PARENT,
+        ...CSS_FLEX_CENTER,
+        '&::before': {
+          ...CSS_ICON(icons[state]),
+        },
+        backgroundColor: 'rgba(0, 0, 0, .56)',
+        borderRadius: '50%',
+        color: '#fff',
       }}
-      role="button"
-      {...props}
+      data-uie-name="element-avatar-user-badge-icon"
+      data-uie-value={state}
     />
   );
 };
 
-export {AvatarWrapper};
+export {AvatarBadge};

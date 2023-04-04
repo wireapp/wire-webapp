@@ -44,6 +44,7 @@ const createMockParticipant = ({
   isExternal?: boolean;
 }) => {
   const user = new User(createRandomUuid());
+  user.name('user');
   user.isMe = isSelfUser;
   user.isGuest(isGuest);
   user.isFederated = isFederated;

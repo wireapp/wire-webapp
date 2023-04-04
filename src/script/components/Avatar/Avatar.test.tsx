@@ -21,8 +21,8 @@ import {fireEvent, render} from '@testing-library/react';
 
 import {Avatar} from './Avatar';
 
-import {User} from '../entity/User';
-import {ServiceEntity} from '../integration/ServiceEntity';
+import {User} from '../../entity/User';
+import {ServiceEntity} from '../../integration/ServiceEntity';
 
 describe('Avatar', () => {
   it('executes onClick with current participant', () => {
@@ -39,7 +39,7 @@ describe('Avatar', () => {
     const userAvatar = getByTestId('element-avatar-user');
     fireEvent.click(userAvatar);
 
-    expect(props.onAvatarClick).toHaveBeenCalledWith(props.participant, expect.anything());
+    expect(props.onAvatarClick).toHaveBeenCalledWith(props.participant);
   });
 
   it('renders temporary guest avatar', () => {
