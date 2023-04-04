@@ -25,6 +25,7 @@ import {
   FeatureFileSharing,
   FeatureLegalhold,
   FeatureMLS,
+  FeatureMLSE2EId,
   FeatureSelfDeletingMessages,
   FeatureSndFactorPassword,
   FeatureVideoCalling,
@@ -42,6 +43,7 @@ export enum FEATURE_KEY {
   FILE_SHARING = 'fileSharing',
   LEGALHOLD = 'legalhold',
   MLS = 'mls',
+  MLSE2EID = 'mlsE2EId',
   SEARCH_VISIBILITY = 'searchVisibility',
   SELF_DELETING_MESSAGES = 'selfDeletingMessages',
   SND_FACTOR_PASSWORD = 'sndFactorPasswordChallenge',
@@ -63,6 +65,7 @@ export type FeatureList = {
   [FEATURE_KEY.SND_FACTOR_PASSWORD]?: FeatureSndFactorPassword;
   [FEATURE_KEY.SSO]?: FeatureWithoutConfig;
   [FEATURE_KEY.MLS]?: FeatureMLS;
+  [FEATURE_KEY.MLSE2EID]?: FeatureMLSE2EId;
   [FEATURE_KEY.VALIDATE_SAML_EMAILS]?: FeatureWithoutConfig;
   [FEATURE_KEY.VIDEO_CALLING]?: FeatureVideoCalling;
 };

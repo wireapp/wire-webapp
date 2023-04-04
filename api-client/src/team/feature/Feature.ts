@@ -32,6 +32,8 @@ export enum FeatureLockStatus {
 export interface FeatureWithoutConfig {
   status: FeatureStatus;
   lockStatus?: FeatureLockStatus;
+  // Time to Live. The time after which the feature resets to its default value.
+  ttl?: number;
 }
 export interface Feature<T extends FeatureConfig> extends FeatureWithoutConfig {
   config: T;
@@ -68,6 +70,11 @@ export interface FeatureMLSConfig extends FeatureConfig {
   protocolToggleUsers: string[];
 }
 
+export interface FeatureMLSE2EIdConfig extends FeatureConfig {
+  verificationExpiration: number;
+  acmeUrl?: string;
+}
+
 export type FeatureAppLock = Feature<FeatureAppLockConfig>;
 export type FeatureClassifiedDomains = Feature<FeatureClassifiedDomainsConfig>;
 export type FeatureConferenceCalling = FeatureWithoutConfig;
@@ -78,6 +85,7 @@ export type FeatureLegalhold = FeatureWithoutConfig;
 export type FeatureSearchVisibility = FeatureWithoutConfig;
 export type FeatureSelfDeletingMessages = Feature<FeatureSelfDeletingMessagesConfig>;
 export type FeatureMLS = Feature<FeatureMLSConfig>;
+export type FeatureMLSE2EId = Feature<FeatureMLSE2EIdConfig>;
 export type FeatureSSO = FeatureWithoutConfig;
 export type FeatureSndFactorPassword = FeatureWithoutConfig;
 export type FeatureValidateSAMLEmails = FeatureWithoutConfig;

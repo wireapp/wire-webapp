@@ -30,6 +30,7 @@ import {
   FeatureSelfDeletingMessages,
   FeatureSndFactorPassword,
   FeatureMLS,
+  FeatureMLSE2EId,
 } from './Feature';
 import {InvalidAppLockTimeoutError} from './FeatureError';
 import {FeatureList} from './FeatureList';
@@ -55,6 +56,7 @@ export class FeatureAPI {
     SND_FACTOR_PASSWORD: 'sndFactorPasswordChallenge',
     SSO: 'sso',
     MLS: 'mls',
+    MLSE2EID: 'mlsE2EId',
     TEAMS: '/teams',
   };
 
@@ -300,6 +302,20 @@ export class FeatureAPI {
     };
 
     const response = await this.client.sendJSON<FeatureMLS>(config);
+    return response.data;
+  }
+
+  public async putMLSE2EIdFeature(
+    teamId: string,
+    mlsFeature: Omit<FeatureMLSE2EId, 'lockStatus'>,
+  ): Promise<FeatureMLSE2EId> {
+    const config: AxiosRequestConfig = {
+      data: mlsFeature,
+      method: 'put',
+      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.MLSE2EID}`,
+    };
+
+    const response = await this.client.sendJSON<FeatureMLSE2EId>(config);
     return response.data;
   }
 
