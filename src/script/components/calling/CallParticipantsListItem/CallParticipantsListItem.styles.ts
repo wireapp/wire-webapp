@@ -45,7 +45,7 @@ export const callStatusIcons = (activeIconsCount: number): CSSObject => ({
   gap: '8px',
   gridTemplateColumns: `repeat(${activeIconsCount}, 1fr)`,
   placeItems: 'center',
-  marginLeft: '8px',
+  margin: '0 8px',
 
   '.participant-mic-on-icon svg': {
     ...commonIconStyles,
