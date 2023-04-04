@@ -33,7 +33,7 @@ import {Availability} from '@wireapp/protocol-messaging';
 
 import {AvailabilityState} from 'Components/AvailabilityState';
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import {GroupAvatar} from 'Components/avatar/GroupAvatar';
+import {GroupAvatar} from 'Components/Avatar/GroupAvatar';
 import {Icon} from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isKey, isOneOfKeys, KEY} from 'Util/KeyboardUtil';

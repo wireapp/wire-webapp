@@ -27,7 +27,7 @@ import {container} from 'tsyringe';
 import {CALL_TYPE, CONV_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import {GroupAvatar} from 'Components/avatar/GroupAvatar';
+import {GroupAvatar} from 'Components/Avatar/GroupAvatar';
 import {Duration} from 'Components/calling/Duration';
 import {GroupVideoGrid} from 'Components/calling/GroupVideoGrid';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';

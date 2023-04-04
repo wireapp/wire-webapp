@@ -22,7 +22,7 @@ import {render} from '@testing-library/react';
 import {UserAvatar} from './UserAvatar';
 
 import {User} from '../../entity/User';
-import {AVATAR_SIZE, STATE} from '../Avatar';
+import {AVATAR_SIZE, STATE} from '.';
 jest.mock('../../auth/util/SVGProvider');
 
 describe('UserAvatar', () => {

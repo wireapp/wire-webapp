@@ -29,7 +29,7 @@ import {AvatarWrapper} from './AvatarWrapper';
 import {shouldShowBadge} from './UserAvatar';
 
 import {User} from '../../entity/User';
-import {AVATAR_SIZE, STATE, DIAMETER} from '../Avatar';
+import {AVATAR_SIZE, STATE, DIAMETER} from '.';
 
 export interface TemporaryGuestAvatarProps extends React.HTMLProps<HTMLDivElement> {
   avatarSize: AVATAR_SIZE;

@@ -32,7 +32,7 @@ import {AvatarInitials} from './AvatarInitials';
 import {AvatarWrapper} from './AvatarWrapper';
 
 import {User} from '../../entity/User';
-import {AVATAR_SIZE, STATE} from '../Avatar';
+import {AVATAR_SIZE, STATE} from '.';
 
 export interface UserAvatarProps extends React.HTMLProps<HTMLDivElement> {
   avatarSize: AVATAR_SIZE;

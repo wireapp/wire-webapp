@@ -21,7 +21,7 @@ import React from 'react';
 
 import {CSS_FILL_PARENT, CSS_FLEX_CENTER, CSS_ICON} from 'Util/CSSMixin';
 
-import {STATE} from '../Avatar';
+import {STATE} from '.';
 
 export interface AvatarBadgeProps {
   state: STATE;

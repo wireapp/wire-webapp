@@ -28,7 +28,7 @@ import {CSS_FILL_PARENT} from 'Util/CSSMixin';
 
 import {AssetRemoteData} from '../../assets/AssetRemoteData';
 import {AssetRepository} from '../../assets/AssetRepository';
-import {AVATAR_SIZE} from '../Avatar';
+import {AVATAR_SIZE} from '.';
 
 export interface AvatarImageProps {
   assetRepository?: AssetRepository;
