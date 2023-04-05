@@ -25,11 +25,10 @@ import type {User} from '../../entity/User';
 
 export interface GroupAvatarProps {
   className?: string;
-  isLight?: boolean;
   users: User[];
 }
 
-const GroupAvatar: React.FC<GroupAvatarProps> = ({users, isLight = false, className}) => {
+export const GroupAvatar: React.FC<GroupAvatarProps> = ({users, className}) => {
   const slicedUsers = users.slice(0, 4);
 
   return (
@@ -73,5 +72,3 @@ const GroupAvatar: React.FC<GroupAvatarProps> = ({users, isLight = false, classN
     </div>
   );
 };
-
-export {GroupAvatar};
