@@ -647,16 +647,20 @@ export class UserRepository {
   /**
    * Update a local user from the backend by ID.
    */
-  updateUser = async (userId: QualifiedId): Promise<void> => {
-    const updatedUserData = await this.userService.getUser(userId);
-    this.updateSavedUser(updatedUserData);
+  updateUser = async (userId: QualifiedId): Promise<User> => {
+    const [user] = await this.updateUsers([userId]);
+    return user;
   };
 
   async updateUsers(userIds: QualifiedId[]) {
     const {found: users} = await this.userService.getUsers(userIds);
-    users.forEach(user => this.updateSavedUser(user));
+    return users.map(user => this.updateSavedUser(user));
   }
 
+  /**
+   * will update the local user with fresh data from backend
+   * @param user user data from backend
+   */
   private updateSavedUser(user: APIClientUser): User {
     const localUserEntity = this.findUserById(user.qualified_id ?? {id: user.id, domain: ''}) ?? new User();
     const updatedUser = this.userMapper.updateUserFromObject(localUserEntity, user);

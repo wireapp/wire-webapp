@@ -283,4 +283,20 @@ describe('UserRepository', () => {
       });
     });
   });
+
+  describe('updateUsers', () => {
+    it('should update local users', async () => {
+      const userService = userRepository['userService'];
+      const user = new User(entities.user.jane_roe.id);
+      user.name('initial name');
+      userRepository['saveUser'](user);
+
+      jest.spyOn(userService, 'getUsers').mockResolvedValue({found: [entities.user.jane_roe]});
+
+      expect(userRepository.findUserById(user.qualifiedId)?.name()).toBe('initial name');
+      await userRepository.updateUsers([user.qualifiedId]);
+
+      expect(userRepository.findUserById(user.qualifiedId)?.name()).toBe(entities.user.jane_roe.name);
+    });
+  });
 });
