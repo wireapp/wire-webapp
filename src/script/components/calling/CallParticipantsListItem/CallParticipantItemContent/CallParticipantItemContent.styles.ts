@@ -75,15 +75,18 @@ export const contentText: CSSObject = {
   fontWeight: 'var(--font-weight-medium)',
 };
 
-export const nameWrapper: CSSObject = {
-  color: 'var(--main-color)',
+export const nameWrapper = (isAudioEstablished: boolean): CSSObject => ({
+  color: isAudioEstablished ? 'var(--main-color)' : 'var(--gray-70)',
   display: 'flex',
   overflow: 'hidden',
   width: '100%',
   paddingRight: '8px',
-};
+});
 
 export const userAvailability: CSSObject = {
+  maxWidth: '100%',
+  whiteSpace: 'nowrap',
+
   '.availability-state-label': ellipsis,
   '.availability-state-icon': {
     display: 'flex',

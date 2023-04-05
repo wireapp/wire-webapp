@@ -84,7 +84,12 @@ export const CallParticipantsListItem = ({
       css={callParticipantListWrapper(isLast)}
     >
       <div css={listItem(true)}>
-        <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={user} aria-hidden="true" css={{margin: '0 10px'}} />
+        <Avatar
+          avatarSize={AVATAR_SIZE.SMALL}
+          participant={user}
+          aria-hidden="true"
+          css={{margin: '0 10px', opacity: isAudioEstablished ? '1' : '0.5'}}
+        />
 
         <CallParticipantItemContent
           isAudioEstablished={isAudioEstablished}
@@ -97,16 +102,29 @@ export const CallParticipantsListItem = ({
           })}
         />
 
-        <UserStatusBadges
-          config={{
-            guest: isDirectGuest,
-            federated: isFederated,
-            external: isExternal,
-            verified: isSelfVerified && isVerified,
-          }}
-        />
-
-        <CallParticipantStatusIcons callParticipant={callParticipant} />
+        {isAudioEstablished ? (
+          <>
+            <UserStatusBadges
+              config={{
+                guest: isDirectGuest,
+                federated: isFederated,
+                external: isExternal,
+                verified: isSelfVerified && isVerified,
+              }}
+            />
+            <CallParticipantStatusIcons callParticipant={callParticipant} />
+          </>
+        ) : (
+          <span
+            css={{
+              color: 'var(--red-500)',
+              fontSize: 'var(--font-size-small)',
+              flexShrink: 0,
+            }}
+          >
+            {t('videoCallParticipantConnecting')}
+          </span>
+        )}
       </div>
     </div>
   );

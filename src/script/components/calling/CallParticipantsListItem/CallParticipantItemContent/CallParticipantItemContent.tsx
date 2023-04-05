@@ -61,11 +61,11 @@ export const CallParticipantItemContent = ({
   return (
     <div css={wrapper}>
       <div css={contentText}>
-        <div css={nameWrapper}>
-          {selfInTeam ? (
+        <div css={nameWrapper(isAudioEstablished)}>
+          {selfInTeam && availability ? (
             <AvailabilityState
               availability={availability}
-              css={[userName, userAvailability, ellipsis]}
+              css={[userAvailability, ellipsis]}
               dataUieName="status-name"
               label={name}
             />
