@@ -845,10 +845,10 @@
   }
 }
 
-.EmojiPickerReact button.epr-emoji > * {
-  &:hover,
-  &:focus,
-  &:focus-visible {
+.EmojiPickerReact button.epr-emoji {
+  &:hover > *,
+  &:focus > *,
+  &:focus-visible > * {
     background-color: var(--message-actions-background-hover) !important;
   }
 }
