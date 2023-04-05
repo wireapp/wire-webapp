@@ -46,6 +46,7 @@ export interface ParticipantItemContentProps {
   hasUsernameInfo?: boolean;
   showArrow?: boolean;
   onDropdownClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  isUserContent?: boolean;
 }
 
 export const ParticipantItemContent = ({
@@ -56,12 +57,13 @@ export const ParticipantItemContent = ({
   selfString = '',
   hasUsernameInfo = false,
   showArrow = false,
+  isUserContent = false,
 }: ParticipantItemContentProps) => {
   return (
     <div css={wrapper}>
       <div css={contentText}>
         <div css={nameWrapper}>
-          {selfInTeam && availability ? (
+          {isUserContent && selfInTeam ? (
             <AvailabilityState
               availability={availability}
               css={[userName, userAvailability, ellipsis]}

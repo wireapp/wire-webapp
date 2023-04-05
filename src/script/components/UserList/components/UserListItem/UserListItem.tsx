@@ -116,6 +116,7 @@ const UserListItem = ({
           availability={availability}
           {...(isSelf && {selfString})}
           hasUsernameInfo={hasUsernameInfo}
+          isUserContent
         />
 
         <UserStatusBadges
