@@ -80,6 +80,7 @@ export * from './TrashIcon';
 export * from './TrashCrossIcon';
 export * from './TriangleIcon';
 export * from './UploadIcon';
+export * from './VerificationShieldIcon';
 export * from './WireIcon';
 
 // Brand Icons
