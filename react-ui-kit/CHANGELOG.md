@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.6.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.5.1...@wireapp/react-ui-kit@9.6.0) (2023-04-05)
+
+### Features
+
+* add verification shield icon ([#5034](https://github.com/wireapp/wire-web-packages/issues/5034)) ([699a822](https://github.com/wireapp/wire-web-packages/commit/699a8225c502d114ed30f94ed1ad246d150edf5f))
+
 ## [9.5.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.5.0...@wireapp/react-ui-kit@9.5.1) (2023-04-04)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
