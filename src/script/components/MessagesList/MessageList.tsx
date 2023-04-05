@@ -310,7 +310,7 @@ const MessagesList: FC<MessagesListParams> = ({
               onClickLikes={message => showMessageDetails(message, true)}
               onClickMessage={onClickMessage}
               onClickParticipants={showParticipants}
-              onClickReceipts={message => showMessageDetails(message)}
+              onClickDetails={message => showMessageDetails(message)}
               onClickResetSession={resetSession}
               onClickTimestamp={async function (messageId: string) {
                 setFocusedMessage(messageId);

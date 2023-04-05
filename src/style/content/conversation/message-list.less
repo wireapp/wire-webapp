@@ -47,40 +47,22 @@
     margin-bottom: 40px;
   }
 
-  // .context-menu,
-  // .time {
-  //   background-color: var(--app-bg);
-  // }
-
   &.hover .time,
   &:hover .time,
-  &.hover .context-menu,
-  &:hover .context-menu,
-  &.hover .message-status-read,
-  &:hover .message-status-read,
   .show-timestamp.time {
     opacity: 1;
     pointer-events: auto;
   }
 
-  &.hover,
-  &:hover {
-    .message-status,
-    .message-status-read {
-      &::before {
-        content: '·';
-      }
-    }
+  &.hover .message-status-read,
+  &:hover .message-status-read {
+    opacity: 0;
   }
 
   &.hover .time,
   &:hover .time,
   .show-timestamp.time {
     cursor: default;
-  }
-
-  .context-menu {
-    cursor: pointer;
   }
 
   &:not(:hover) {
@@ -117,7 +99,6 @@
 }
 
 .message-marked {
-  .context-menu,
   .time {
     background-color: transparent;
   }
@@ -173,7 +154,6 @@
   min-width: 0; // fixes ellipsis not working with flexbox (FF)
   flex: 1;
   align-items: center;
-  padding-right: var(--conversation-message-timestamp-width);
   font-size: @font-size-small;
   font-weight: @font-weight-regular;
   white-space: normal;
@@ -321,8 +301,7 @@
 
 // MESSAGE - BODY
 .message-body {
-  //position: relative;
-  padding-right: var(--conversation-message-timestamp-width);
+  display: flex;
   padding-left: @conversation-message-sender-width;
 
   .text {
@@ -330,7 +309,7 @@
     .accent-selection;
 
     display: inline-block;
-    width: 100%;
+    flex-grow: 1;
     line-height: @line-height-lg;
     white-space: pre-wrap;
     word-wrap: break-word;
@@ -505,20 +484,13 @@
   }
 }
 
-// // MESSAGE - ACTIONS
+// MESSAGE - ACTIONS
 .message-body-actions {
-  position: absolute;
-  top: -0.5rem;
-  right: 0;
-  left: 28rem;
-  width: var(--conversation-message-timestamp-width);
-  height: 24px;
-  align-items: center;
-
-  @media (max-width: @screen-md-min) {
-    height: 45px;
-    flex-direction: column;
-  }
+  display: flex;
+  min-width: var(--conversation-message-timestamp-width);
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 5px;
 
   // actions pill
   .action-pill-style() {
@@ -531,32 +503,12 @@
     transition: opacity, 0.3s;
   }
 
-  //CONTEXT MENU
-  // .context-menu {
-  //   .action-pill-style;
-  //   .button-icon-secondary;
-  //   .square(16px);
-  //   opacity: 1 !important;
-
-  //   // @media (min-width: @screen-md-min) {
-  //   //   position: absolute;
-  //   //   left: 8px;
-  //   // }
-
-  //   min-width: 0;
-  //   min-height: 0;
-  //   justify-content: center;
-
-  //   &:focus,
-  //   &:focus-visible {
-  //     opacity: 1 !important;
-  //   }
-  // }
-
   .message-status-read {
+    display: flex;
+    align-items: center;
     svg {
-      max-width: 12px;
-      max-height: 12px;
+      width: 12px;
+      min-height: 12px;
       fill: currentColor;
     }
 
@@ -568,55 +520,33 @@
     &:focus-visible {
       opacity: 1;
     }
+
+    @media (max-width: @screen-md-min) {
+      &__one-on-one {
+        height: 24px;
+        flex-direction: column;
+        .message-status-read__count {
+          margin-left: 0;
+        }
+      }
+    }
+  }
+
+  .time {
+    .action-pill-style;
   }
 
   .time,
   .message-status,
   .message-status-read {
-    .action-pill-style;
+    .subline;
     color: var(--gray-70);
     font-size: 12px !important;
     pointer-events: none;
     user-select: none;
 
-    @media (min-width: @screen-md-min) {
-      position: absolute;
-      bottom: 3px;
-    }
-
-    .subline;
-
     body.theme-dark & {
       color: var(--gray-60);
-    }
-
-    &--clickable {
-      cursor: pointer;
-      pointer-events: all;
-    }
-  }
-  .message-status,
-  .message-status-read--visible {
-    opacity: 1;
-  }
-}
-
-@media (min-width: @screen-md-min) {
-  .time {
-    left: 32px;
-  }
-}
-.message-status,
-.message-status-read {
-  left: 83px;
-  &::before {
-    display: none;
-    @media (min-width: @screen-md-min) {
-      display: flex;
-      width: 16px;
-      align-items: center;
-      justify-content: center;
-      content: '';
     }
   }
 }

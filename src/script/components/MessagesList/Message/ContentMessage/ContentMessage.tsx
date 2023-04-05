@@ -45,6 +45,7 @@ import {EphemeralStatusType} from '../../../../message/EphemeralStatusType';
 import {ContextMenuEntry} from '../../../../ui/ContextMenu';
 import {EphemeralTimer} from '../EphemeralTimer';
 import {MessageTime} from '../MessageTime';
+import {ReadReceiptStatus} from '../ReadReceiptStatus';
 import {useMessageFocusedTabIndex} from '../util';
 
 export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetSession'> {
@@ -76,7 +77,6 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   isLastDeliveredMessage,
   contextMenu,
   previousMessage,
-  onClickReceipts,
   onClickAvatar,
   onClickImage,
   onClickTimestamp,
@@ -277,16 +277,13 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             onRetry={() => onRetry(message)}
           />
         )}
-        {/* In Progress to make read receipts responsive */}
-        {/* <div className="message-body-actions">
+        <div className="message-body-actions">
           <ReadReceiptStatus
             message={message}
             is1to1Conversation={conversation.is1to1()}
             isLastDeliveredMessage={isLastDeliveredMessage}
-            onClickReceipts={onClickReceipts}
-            isMessageFocused={msgFocusState}
           />
-        </div> */}
+        </div>
         {isActionMenuVisible && (
           <MessageActionsMenu
             isMsgWithHeader={shouldShowAvatar()}

@@ -41,17 +41,17 @@ import {CSSObject} from '@emotion/react';
 export const messageReactionWrapper: CSSObject = {
   display: 'flex',
   gap: '0.5rem',
-  padding: '0.5rem 0rem',
   paddingLeft: '56px',
 };
 
 export const messageReactionButton: CSSObject = {
-  display: 'inline-flex',
   alignItems: 'center',
-  color: 'var(--white)',
   borderRadius: '4px',
-  padding: '3px',
+  color: 'var(--white)',
+  display: 'inline-flex',
   gap: '4px',
+  margin: '0.5rem 0rem',
+  padding: '3px',
   verticalAlign: 'top',
 };
 
