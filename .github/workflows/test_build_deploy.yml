@@ -2,12 +2,12 @@ name: CI
 
 on:
   push:
-    branches: [master, dev, edge, avs, mobile, acc]
+    branches: [master, dev, edge, avs, mobile, acc, aws-migration]
     tags:
       - '*staging*'
       - '*production*'
   pull_request:
-    branches: [master, dev, edge, avs, mobile, acc]
+    branches: [master, dev, edge, avs, mobile, acc, aws-migration]
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -96,6 +96,7 @@ jobs:
               "edge": { "dev_env": "wire-webapp-edge" },
               "dev": { "dev_env": "wire-webapp-dev" },
               "master": { "dev_env": "wire-webapp-master" }
+              "aws-migration": { "prod_env": "wire-webapp-staging-al2" }
             }
 
       - uses: kanga333/variable-mapper@master
