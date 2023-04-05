@@ -366,6 +366,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                 teamRepository={teamRepository}
                 conversationRepository={conversationRepository}
                 noUnderline
+                allowRemoteSearch
               />
             )}
           </FadingScrollbar>
