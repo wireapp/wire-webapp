@@ -54,6 +54,8 @@ export const CallParticipantsListItem = ({
   const {user} = callParticipant;
   const {isMe: isSelf, isFederated} = user;
 
+  const {isAudioEstablished} = useKoSubscribableChildren(callParticipant, ['isAudioEstablished']);
+
   const {
     isDirectGuest,
     is_verified: isVerified,
@@ -85,6 +87,7 @@ export const CallParticipantsListItem = ({
         <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={user} aria-hidden="true" css={{margin: '0 10px'}} />
 
         <CallParticipantItemContent
+          isAudioEstablished={isAudioEstablished}
           name={userName}
           selfInTeam={selfInTeam}
           availability={availability}

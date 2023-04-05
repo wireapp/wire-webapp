@@ -42,6 +42,7 @@ import {
 export interface CallParticipantItemContentProps {
   name: string;
   selfInTeam?: boolean;
+  isAudioEstablished: boolean;
   availability?: Availability.Type;
   isSelf?: boolean;
   onDropdownClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
@@ -50,6 +51,7 @@ export interface CallParticipantItemContentProps {
 export const CallParticipantItemContent = ({
   name,
   selfInTeam = false,
+  isAudioEstablished,
   availability = Availability.Type.NONE,
   isSelf = false,
   onDropdownClick,
