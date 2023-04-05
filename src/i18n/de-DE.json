@@ -9,7 +9,7 @@
   "BackendError.LABEL.CONVERSATION_NOT_FOUND": "CONVERSATION_NOT_FOUND",
   "BackendError.LABEL.CONVERSATION_TOO_MANY_MEMBERS": "Diese Unterhaltung hat die Grenze der Teilnehmeranzahl erreicht",
   "BackendError.LABEL.EMAIL_EXISTS": "Die angegebene E-Mail-Adresse wird bereits verwendet. {supportEmailExistsLink}",
-  "BackendError.LABEL.EMAIL_REQUIRED": "Log in with an email address is required when two-factor authentication is activated",
+  "BackendError.LABEL.EMAIL_REQUIRED": "Sie können Ihren Benutzernamen nicht verwenden, da Zwei-Faktor-Authentifizierung aktiviert ist. Bitte melden Sie sich stattdessen mit Ihrer E-Mail-Adresse an.",
   "BackendError.LABEL.HANDLE_EXISTS": "Dieser Benutzername ist bereits vergeben",
   "BackendError.LABEL.HANDLE_TOO_SHORT": "Bitte einen Benutzernamen mit mindestens zwei Zeichen eingeben",
   "BackendError.LABEL.INVALID_CODE": "Bitte erneut versuchen oder anderen Code anfordern.",
