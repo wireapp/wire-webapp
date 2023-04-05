@@ -10,6 +10,7 @@ on:
         options:
           - wire-webapp-qa-al2-migration
           - wire-webapp-edge
+          - wire-webapp-staging-al2
 
 concurrency:
   group: ci-${{ github.ref }}
