@@ -18,43 +18,43 @@
  */
 
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
+import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-import {ClientMapper} from 'src/script/client/ClientMapper';
-import {User} from 'src/script/entity/User';
-import {EventRepository} from 'src/script/event/EventRepository';
-import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
-import {ConsentValue} from 'src/script/user/ConsentValue';
-import {UserRepository} from 'src/script/user/UserRepository';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {entities} from '../../api/payloads';
-import {TestFactory} from '../../helper/TestFactory';
+import {entities} from 'test/api/payloads';
+import {TestFactory} from 'test/helper/TestFactory';
+
+import {ConsentValue} from './ConsentValue';
+import {UserRepository} from './UserRepository';
+import {UserState} from './UserState';
+
+import {ClientMapper} from '../client/ClientMapper';
+import {User} from '../entity/User';
+import {EventRepository} from '../event/EventRepository';
+import {PropertiesRepository} from '../properties/PropertiesRepository';
 
 describe('UserRepository', () => {
-  let server = null;
   const testFactory = new TestFactory();
+  let userRepository: UserRepository;
+  let userState: UserState;
 
-  beforeAll(() => testFactory.exposeUserActors());
-
-  beforeEach(() => {
-    server = sinon.fakeServer.create();
-    server.autoRespond = true;
+  beforeAll(async () => {
+    userRepository = await testFactory.exposeUserActors();
+    userState = userRepository['userState'];
   });
 
   afterEach(() => {
-    testFactory.user_repository.userState.users.removeAll();
-    server.restore();
+    userRepository['userState'].users.removeAll();
   });
 
   describe('Account preferences', () => {
-    beforeEach(() => {
-      spyOn(testFactory.user_repository.propertyRepository, 'publishProperties').and.callFake(properties => {
-        return properties;
-      });
-    });
-
     describe('Data usage permissions', () => {
       it('syncs the "Send anonymous data" preference through WebSocket events', () => {
+        const setPropertyMock = jest
+          .spyOn(userRepository['propertyRepository'], 'setProperty')
+          .mockReturnValue(undefined);
         const turnOnErrorReporting = {
           key: 'webapp',
           type: 'user.properties-set',
@@ -82,21 +82,25 @@ describe('UserRepository', () => {
         };
 
         const source = EventRepository.SOURCE.WEB_SOCKET;
-        const errorReporting = () =>
-          testFactory.user_repository.propertyRepository.properties.settings.privacy.improve_wire;
 
-        expect(errorReporting()).toBeUndefined();
+        amplify.publish(WebAppEvents.USER.EVENT_FROM_BACKEND, turnOnErrorReporting, source);
 
-        testFactory.user_repository.onUserEvent(turnOnErrorReporting, source);
+        expect(setPropertyMock).toHaveBeenCalledWith(turnOnErrorReporting.key, turnOnErrorReporting.value);
 
-        expect(errorReporting()).toBe(true);
+        amplify.publish(WebAppEvents.USER.EVENT_FROM_BACKEND, turnOffErrorReporting, source);
 
-        testFactory.user_repository.onUserEvent(turnOffErrorReporting, source);
-
-        expect(errorReporting()).toBe(false);
+        expect(setPropertyMock).toHaveBeenCalledWith(turnOffErrorReporting.key, turnOffErrorReporting.value);
       });
 
       it('syncs the "Receive newsletter" preference through WebSocket events', () => {
+        const setPropertyMock = jest
+          .spyOn(userRepository['propertyRepository'], 'setProperty')
+          .mockReturnValue(undefined);
+
+        const deletePropertyMock = jest
+          .spyOn(userRepository['propertyRepository'], 'deleteProperty')
+          .mockReturnValue(undefined);
+
         const giveOnMarketingConsent = {
           key: PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.key,
           type: 'user.properties-set',
@@ -108,22 +112,27 @@ describe('UserRepository', () => {
         };
 
         const source = EventRepository.SOURCE.WEB_SOCKET;
-        const marketingConsent = testFactory.user_repository.propertyRepository.marketingConsent;
 
-        expect(marketingConsent()).toBe(ConsentValue.NOT_GIVEN);
+        amplify.publish(WebAppEvents.USER.EVENT_FROM_BACKEND, giveOnMarketingConsent, source);
 
-        testFactory.user_repository.onUserEvent(giveOnMarketingConsent, source);
+        expect(setPropertyMock).toHaveBeenCalledWith(giveOnMarketingConsent.key, giveOnMarketingConsent.value);
 
-        expect(marketingConsent()).toBe(ConsentValue.GIVEN);
+        amplify.publish(WebAppEvents.USER.EVENT_FROM_BACKEND, revokeMarketingConsent, source);
 
-        testFactory.user_repository.onUserEvent(revokeMarketingConsent, source);
-
-        expect(marketingConsent()).toBe(ConsentValue.NOT_GIVEN);
+        expect(deletePropertyMock).toHaveBeenCalledWith(revokeMarketingConsent.key);
       });
     });
 
     describe('Privacy', () => {
       it('syncs the "Read receipts" preference through WebSocket events', () => {
+        const setPropertyMock = jest
+          .spyOn(userRepository['propertyRepository'], 'setProperty')
+          .mockReturnValue(undefined);
+
+        const deletePropertyMock = jest
+          .spyOn(userRepository['propertyRepository'], 'deleteProperty')
+          .mockReturnValue(undefined);
+
         const turnOnReceiptMode = {
           key: PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key,
           type: 'user.properties-set',
@@ -134,98 +143,93 @@ describe('UserRepository', () => {
           type: 'user.properties-delete',
         };
         const source = EventRepository.SOURCE.WEB_SOCKET;
-        const receiptMode = testFactory.user_repository.propertyRepository.receiptMode;
 
-        expect(receiptMode()).toBe(RECEIPT_MODE.OFF);
+        amplify.publish(WebAppEvents.USER.EVENT_FROM_BACKEND, turnOnReceiptMode, source);
 
-        testFactory.user_repository.onUserEvent(turnOnReceiptMode, source);
+        expect(setPropertyMock).toHaveBeenCalledWith(turnOnReceiptMode.key, turnOnReceiptMode.value);
 
-        expect(receiptMode()).toBe(RECEIPT_MODE.ON);
+        amplify.publish(WebAppEvents.USER.EVENT_FROM_BACKEND, turnOffReceiptMode, source);
 
-        testFactory.user_repository.onUserEvent(turnOffReceiptMode, source);
-
-        expect(receiptMode()).toBe(RECEIPT_MODE.OFF);
+        expect(deletePropertyMock).toHaveBeenCalledWith(turnOffReceiptMode.key);
       });
     });
   });
 
   describe('User handling', () => {
     describe('findUserById', () => {
-      let user = null;
+      let user: User;
 
       beforeEach(() => {
         user = new User(entities.user.john_doe.id);
-        return testFactory.user_repository.saveUser(user);
+        return userRepository['saveUser'](user);
       });
 
       afterEach(() => {
-        testFactory.user_repository.userState.users.removeAll();
+        userState.users.removeAll();
       });
 
       it('should find an existing user', () => {
-        const userEntity = testFactory.user_repository.findUserById({id: user.id, domain: ''});
+        const userEntity = userRepository.findUserById({id: user.id, domain: ''});
 
         expect(userEntity).toEqual(user);
       });
 
       it('should not find an unknown user', () => {
-        const userEntity = testFactory.user_repository.findUserById({id: '1', domain: ''});
+        const userEntity = userRepository.findUserById({id: '1', domain: ''});
 
         expect(userEntity).toBe(undefined);
       });
     });
 
     describe('saveUser', () => {
-      afterEach(() => testFactory.user_repository.userState.users.removeAll());
+      afterEach(() => userState.users.removeAll());
 
       it('saves a user', () => {
-        const user = new User();
-        user.id = entities.user.jane_roe.id;
+        const user = new User(entities.user.jane_roe.id);
 
-        testFactory.user_repository.saveUser(user);
+        userRepository['saveUser'](user);
 
-        expect(testFactory.user_repository.userState.users().length).toBe(1);
-        expect(testFactory.user_repository.userState.users()[0]).toBe(user);
+        expect(userState.users().length).toBe(1);
+        expect(userState.users()[0]).toBe(user);
       });
 
       it('saves self user', () => {
-        const user = new User();
-        user.id = entities.user.jane_roe.id;
+        const user = new User(entities.user.jane_roe.id);
 
-        testFactory.user_repository.saveUser(user, true);
+        userRepository['saveUser'](user, true);
 
-        expect(testFactory.user_repository.userState.users().length).toBe(1);
-        expect(testFactory.user_repository.userState.users()[0]).toBe(user);
-        expect(testFactory.user_repository.userState.self()).toBe(user);
+        expect(userState.users().length).toBe(1);
+        expect(userState.users()[0]).toBe(user);
+        expect(userState.self()).toBe(user);
       });
     });
 
     describe('assignAllClients', () => {
-      let userJaneRoe = null;
-      let userJohnDoe = null;
+      let userJaneRoe: User;
+      let userJohnDoe: User;
 
       beforeEach(() => {
-        testFactory.user_repository.userState.users.removeAll();
+        userState.users.removeAll();
         userJaneRoe = new User(entities.user.jane_roe.id);
         userJohnDoe = new User(entities.user.john_doe.id);
 
-        testFactory.user_repository.saveUsers([userJaneRoe, userJohnDoe]);
-        const permanent_client = ClientMapper.mapClient(entities.clients.john_doe.permanent);
-        const plain_client = ClientMapper.mapClient(entities.clients.jane_roe.plain);
-        const temporary_client = ClientMapper.mapClient(entities.clients.john_doe.temporary);
+        userRepository['saveUsers']([userJaneRoe, userJohnDoe]);
+        const permanent_client = ClientMapper.mapClient(entities.clients.john_doe.permanent, false);
+        const plain_client = ClientMapper.mapClient(entities.clients.jane_roe.plain, false);
+        const temporary_client = ClientMapper.mapClient(entities.clients.john_doe.temporary, false);
         const recipients = {
           [entities.user.john_doe.id]: [permanent_client, temporary_client],
           [entities.user.jane_roe.id]: [plain_client],
         };
 
-        spyOn(testFactory.client_repository, 'getAllClientsFromDb').and.returnValue(Promise.resolve(recipients));
+        spyOn(testFactory.client_repository!, 'getAllClientsFromDb').and.returnValue(Promise.resolve(recipients));
       });
 
-      afterEach(() => testFactory.user_repository.userState.users.removeAll());
+      afterEach(() => userState.users.removeAll());
 
       it('assigns all available clients to the users', () => {
-        return testFactory.user_repository.assignAllClients().then(() => {
-          expect(testFactory.client_repository.getAllClientsFromDb).toHaveBeenCalled();
+        return userRepository.assignAllClients().then(() => {
+          expect(testFactory.client_repository!.getAllClientsFromDb).toHaveBeenCalled();
           expect(userJaneRoe.devices().length).toBe(1);
           expect(userJaneRoe.devices()[0].id).toBe(entities.clients.jane_roe.plain.id);
           expect(userJohnDoe.devices().length).toBe(2);
@@ -238,18 +242,18 @@ describe('UserRepository', () => {
     describe('verify_username', () => {
       it('resolves with username when username is not taken', async () => {
         const expectedUsername = 'john_doe';
-        const notFoundError = new Error('not found');
+        const notFoundError = new Error('not found') as any;
         notFoundError.response = {status: HTTP_STATUS.NOT_FOUND};
         const userRepo = new UserRepository(
           {
             checkUserHandle: jest.fn().mockImplementation(() => Promise.reject(notFoundError)),
-          }, // UserService
-          {}, // AssetRepository,
-          {}, // SelfService,
-          {}, // ClientRepository,
-          {}, // ServerTimeHandler,
-          {}, // PropertiesRepository,
-          {}, // UserState
+          } as any, // UserService
+          {} as any, // AssetRepository,
+          {} as any, // SelfService,
+          {} as any, // ClientRepository,
+          {} as any, // ServerTimeHandler,
+          {} as any, // PropertiesRepository,
+          {} as any, // UserState
         );
 
         const actualUsername = await userRepo.verifyUserHandle(expectedUsername);
@@ -262,13 +266,13 @@ describe('UserRepository', () => {
         const userRepo = new UserRepository(
           {
             checkUserHandle: jest.fn().mockImplementation(() => Promise.resolve()),
-          }, // UserService
-          {}, // AssetRepository,
-          {}, // SelfService,
-          {}, // ClientRepository,
-          {}, // ServerTimeHandler,
-          {}, // PropertiesRepository,
-          {}, // UserState
+          } as any, // UserService
+          {} as any, // AssetRepository,
+          {} as any, // SelfService,
+          {} as any, // ClientRepository,
+          {} as any, // ServerTimeHandler,
+          {} as any, // PropertiesRepository,
+          {} as any, // UserState
         );
 
         await expect(userRepo.verifyUserHandle(username)).rejects.toMatchObject({
