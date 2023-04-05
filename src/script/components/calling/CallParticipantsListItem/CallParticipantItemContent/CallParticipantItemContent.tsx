@@ -60,7 +60,7 @@ export const CallParticipantItemContent = ({
     <div css={wrapper}>
       <div css={contentText}>
         <div css={nameWrapper}>
-          {selfInTeam && availability ? (
+          {selfInTeam ? (
             <AvailabilityState
               availability={availability}
               css={[userName, userAvailability, ellipsis]}
