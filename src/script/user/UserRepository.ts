@@ -118,7 +118,7 @@ export class UserRepository {
     amplify.subscribe(WebAppEvents.USER.SET_AVAILABILITY, this.setAvailability);
     amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent);
     amplify.subscribe(WebAppEvents.USER.PERSIST, this.saveUserInDb);
-    amplify.subscribe(WebAppEvents.USER.UPDATE, this.updateUserById);
+    amplify.subscribe(WebAppEvents.USER.UPDATE, this.updateUser);
   }
 
   /**
@@ -647,23 +647,33 @@ export class UserRepository {
   /**
    * Update a local user from the backend by ID.
    */
-  updateUserById = async (userId: QualifiedId): Promise<void> => {
-    const localUserEntity = this.findUserById(userId) || new User('', '');
+  updateUser = async (userId: QualifiedId): Promise<void> => {
     const updatedUserData = await this.userService.getUser(userId);
-    const updatedUserEntity = this.userMapper.updateUserFromObject(localUserEntity, updatedUserData);
-    if (this.userState.isTeam()) {
-      this.mapGuestStatus([updatedUserEntity]);
-    }
-    if (updatedUserEntity && updatedUserEntity.inTeam() && updatedUserEntity.isDeleted) {
-      amplify.publish(WebAppEvents.TEAM.MEMBER_LEAVE, updatedUserEntity.teamId, updatedUserEntity.qualifiedId);
-    }
+    this.updateSavedUser(updatedUserData);
   };
 
-  static findMatchingUser(userId: QualifiedId, userEntities: User[]): User | undefined {
+  async updateUsers(userIds: QualifiedId[]) {
+    const {found: users} = await this.userService.getUsers(userIds);
+    users.forEach(user => this.updateSavedUser(user));
+  }
+
+  private updateSavedUser(user: APIClientUser): User {
+    const localUserEntity = this.findUserById(user.qualified_id ?? {id: user.id, domain: ''}) ?? new User();
+    const updatedUser = this.userMapper.updateUserFromObject(localUserEntity, user);
+    if (this.userState.isTeam()) {
+      this.mapGuestStatus([updatedUser]);
+    }
+    if (updatedUser && updatedUser.inTeam() && updatedUser.isDeleted) {
+      amplify.publish(WebAppEvents.TEAM.MEMBER_LEAVE, updatedUser.teamId, updatedUser.qualifiedId);
+    }
+    return updatedUser;
+  }
+
+  private findMatchingUser(userId: QualifiedId, userEntities: User[]): User | undefined {
     return userEntities.find(userEntity => matchQualifiedIds(userEntity, userId));
   }
 
-  static createDeletedUser(userId: QualifiedId): User {
+  private createDeletedUser(userId: QualifiedId): User {
     const userEntity = new User(userId.id, userId.domain);
     userEntity.isDeleted = true;
     userEntity.name(t('nonexistentUser'));
@@ -676,10 +686,10 @@ export class UserRepository {
    */
   private addSuspendedUsers(userIds: QualifiedId[], userEntities: User[]): User[] {
     for (const userId of userIds) {
-      const matchingUserIds = UserRepository.findMatchingUser(userId, userEntities);
+      const matchingUserIds = this.findMatchingUser(userId, userEntities);
 
       if (!matchingUserIds) {
-        userEntities.push(UserRepository.createDeletedUser(userId));
+        userEntities.push(this.createDeletedUser(userId));
       }
     }
     return userEntities;
