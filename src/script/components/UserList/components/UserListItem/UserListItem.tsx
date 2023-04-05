@@ -106,7 +106,7 @@ const UserListItem = ({
 
   const RenderParticipant = () => {
     return (
-      <div css={listItem(noInteraction)}>
+      <div css={listItem(noInteraction)} data-uie-name="item-user" data-uie-value={userName}>
         <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={user} aria-hidden="true" css={{margin: '0 16px'}} />
 
         <ParticipantItemContent
@@ -132,8 +132,8 @@ const UserListItem = ({
   };
 
   const dataUieValues = {
-    'data-uie-name': 'item-user',
-    'data-uie-value': userName,
+    'data-uie-name': 'highlighted',
+    'data-uie-value': isHighlighted,
   };
 
   return (
