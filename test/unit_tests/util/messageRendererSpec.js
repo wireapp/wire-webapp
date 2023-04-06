@@ -70,6 +70,14 @@ describe('renderMessage', () => {
 
     expect(renderMessage(`e.g. ${link}.`)).toBe(expected);
   });
+
+  it('renders URLs with braces in the path component', () => {
+    const link = 'https://www.underscore.com/api/{version}/endpoint';
+    const expected = `e.g. <a href="https://www.underscore.com/api/%7Bversion%7D/endpoint" target="_blank" rel="nofollow noopener noreferrer" data-md-link="true" data-uie-name="markdown-link">https://www.underscore.com/api/{version}/endpoint</a>.`;
+
+    expect(renderMessage(`e.g. ${link}.`)).toBe(expected);
+  });
+
   it('renders URLs with escaped parameters', () => {
     const link = 'http://www.underscore.com/?parameter=%2f';
     const expected = `e.g. <a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a>.`;
