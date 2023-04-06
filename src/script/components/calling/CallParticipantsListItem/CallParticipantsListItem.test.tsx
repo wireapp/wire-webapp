@@ -69,7 +69,9 @@ const createMockParticipant = ({
 describe('CallParticipantsListItem', () => {
   it('should render participant user avatar', () => {
     const participant = createMockParticipant({});
-    const {getByTestId} = render(<CallParticipantsListItem callParticipant={participant} />);
+    const {getByTestId} = render(
+      <CallParticipantsListItem showContextMenu={true} onContextMenu={jest.fn()} callParticipant={participant} />,
+    );
 
     expect(getByTestId('element-avatar-user')).toBeDefined();
   });
@@ -83,7 +85,12 @@ describe('CallParticipantsListItem', () => {
     });
 
     const {getByTestId, getByText} = render(
-      <CallParticipantsListItem callParticipant={participant} selfInTeam={true} />,
+      <CallParticipantsListItem
+        showContextMenu={true}
+        onContextMenu={jest.fn()}
+        callParticipant={participant}
+        selfInTeam={true}
+      />,
     );
 
     expect(getByText(participantName)).toBeDefined();
@@ -95,7 +102,9 @@ describe('CallParticipantsListItem', () => {
   it('should mark user as self if relevant', () => {
     const selfParticipant = createMockParticipant({isSelfUser: true});
 
-    const {getByText} = render(<CallParticipantsListItem callParticipant={selfParticipant} />);
+    const {getByText} = render(
+      <CallParticipantsListItem showContextMenu={true} onContextMenu={jest.fn()} callParticipant={selfParticipant} />,
+    );
 
     expect(getByText('(ConversationYouNominative)')).toBeDefined();
   });
@@ -107,7 +116,9 @@ describe('CallParticipantsListItem', () => {
       isExternal: true,
     });
 
-    const {getByTestId} = render(<CallParticipantsListItem callParticipant={selfParticipant} />);
+    const {getByTestId} = render(
+      <CallParticipantsListItem showContextMenu={true} onContextMenu={jest.fn()} callParticipant={selfParticipant} />,
+    );
 
     expect(getByTestId('status-guest')).toBeDefined();
     expect(getByTestId('status-external')).toBeDefined();
