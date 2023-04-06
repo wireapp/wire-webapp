@@ -257,15 +257,24 @@ describe('renderMessage', () => {
   });
 
   it('conversts unicode links to punycode', () => {
+    const expected = `<a href="https://xn--mller-kva.de" target="_blank" rel="nofollow noopener noreferrer" data-md-link=\"true\" data-uie-name=\"markdown-link\">https://müller.de</a>`;
     expect(renderMessage('https://müller.de')).toBe(
-      // if this test fails because the rendering of the url was changed to no longer display unicode characters urlescaped,
-      // then the output should be the same as the second test, to make the user aware of the fact that it is a punycode url aka "url open info popup"
-      `<a href="https://xn--mller-kva.de" target="_blank" rel="nofollow noopener noreferrer" data-md-link=\"true\" data-uie-name=\"markdown-link\">https://müller.de</a>`,
+      // if this test fails because the rendering of the url was changed to no longer generate the same output as the markdown code below,
+      // then this output needs to be verified against potential unicode confusable output
+      expected,
     );
 
-    expect(renderMessage('[https://müller.de](https://müller.de)')).toBe(
-      `<a href="https://xn--mller-kva.de" target="_blank" rel="nofollow noopener noreferrer" data-md-link=\"true\" data-uie-name=\"markdown-link\">https://müller.de</a>`,
+    expect(renderMessage('[https://müller.de](https://müller.de)')).toBe(expected);
+  });
+  it('unicode confusables generate a code', () => {
+    const expected = `<a href="https://xn--vlid-53d.domain" target="_blank" rel="nofollow noopener noreferrer" data-md-link=\"true\" data-uie-name=\"markdown-link\">https://v\u0430lid.domain</a>`;
+    expect(renderMessage('https://v\u0430lid.domain')).toBe(
+      // if this test fails because the rendering of the url was changed to no longer generate the same output as the markdown code below,
+      // then this output needs to be verified against potential unicode confusable output
+      expected,
     );
+
+    expect(renderMessage('[https://v\u0430lid.domain](https://v\u0430lid.domain)')).toBe(expected);
   });
 
   describe('Mentions', () => {
