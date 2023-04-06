@@ -11,6 +11,7 @@ on:
           - wire-webapp-qa-al2-migration
           - wire-webapp-edge
           - wire-webapp-staging-al2
+          - wire-webapp-dev-al2
 
 concurrency:
   group: ci-${{ github.ref }}
