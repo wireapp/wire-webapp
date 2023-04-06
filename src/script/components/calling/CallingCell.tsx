@@ -355,7 +355,7 @@ const CallingCell: React.FC<CallingCellProps> = ({
             >
               {!temporaryUserStyle && (
                 <div className="conversation-list-cell-left">
-                  {isGroup && <GroupAvatar users={conversationParticipants} isLight />}
+                  {isGroup && <GroupAvatar users={conversationParticipants} />}
                   {!isGroup && !!conversationParticipants.length && (
                     <Avatar participant={conversationParticipants[0]} avatarSize={AVATAR_SIZE.SMALL} />
                   )}

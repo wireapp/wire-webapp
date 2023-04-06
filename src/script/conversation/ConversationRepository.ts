@@ -456,6 +456,14 @@ export class ConversationRepository {
     }
   }
 
+  public async refreshUnavailableParticipants(conversation: Conversation): Promise<void> {
+    const unavailableUsers = conversation.allUserEntities().filter(user => !user.isAvailable());
+    if (!unavailableUsers.length) {
+      return;
+    }
+    await this.userRepository.updateUsers(unavailableUsers.map(user => user.qualifiedId));
+  }
+
   /**
    * Create a guest room.
    */

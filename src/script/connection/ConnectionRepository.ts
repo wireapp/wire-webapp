@@ -120,7 +120,7 @@ export class ConnectionRepository {
     // Update info about user when connection gets accepted
     const shouldUpdateUser = previousStatus === ConnectionStatus.SENT && connectionEntity.isConnected();
     if (shouldUpdateUser) {
-      await this.userRepository.updateUserById(connectionEntity.userId);
+      await this.userRepository.updateUser(connectionEntity.userId);
       // Get conversation related to connection and set its type to 1:1
       // This case is important when the 'user.connection' event arrives after the 'conversation.member-join' event: https://wearezeta.atlassian.net/browse/SQCORE-348
       amplify.publish(WebAppEvents.CONVERSATION.MAP_CONNECTION, connectionEntity);
