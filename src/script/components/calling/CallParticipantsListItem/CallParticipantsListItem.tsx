@@ -36,10 +36,10 @@ import {CallParticipantStatusIcons} from './CallParticipantStatusIcons';
 
 export interface CallParticipantsListItemProps {
   callParticipant: Participant;
+  showContextMenu: boolean;
+  onContextMenu: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   selfInTeam?: boolean;
   isSelfVerified?: boolean;
-  showDropdown?: boolean;
-  onContextMenu?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   isLast?: boolean;
 }
 
@@ -47,7 +47,7 @@ export const CallParticipantsListItem = ({
   callParticipant,
   isSelfVerified = false,
   selfInTeam,
-  showDropdown = false,
+  showContextMenu,
   onContextMenu,
   isLast = false,
 }: CallParticipantsListItemProps) => {
@@ -71,16 +71,22 @@ export const CallParticipantsListItem = ({
     });
   };
 
+  const reactiveProps =
+    isAudioEstablished && showContextMenu
+      ? {
+          role: 'button',
+          tabIndex: TabIndex.FOCUSABLE,
+          onContextMenu,
+          onClick: onContextMenu,
+          onKeyDown: handleContextKeyDown,
+        }
+      : undefined;
+
   return (
     <div
-      tabIndex={TabIndex.FOCUSABLE}
-      role="button"
-      onContextMenu={onContextMenu}
-      onClick={onContextMenu}
-      onKeyDown={handleContextKeyDown}
+      {...reactiveProps}
       data-uie-name="item-user"
       data-uie-value={userName}
-      aria-label={t('accessibility.openConversation', userName)}
       css={callParticipantListWrapper(isLast)}
     >
       <div css={listItem(true)}>
@@ -97,9 +103,8 @@ export const CallParticipantsListItem = ({
           selfInTeam={selfInTeam}
           availability={availability}
           isSelf={isSelf}
-          {...(showDropdown && {
-            onDropdownClick: event => onContextMenu?.(event as unknown as React.MouseEvent<HTMLDivElement>),
-          })}
+          showContextMenu={showContextMenu}
+          onDropdownClick={event => onContextMenu?.(event as unknown as React.MouseEvent<HTMLDivElement>)}
         />
 
         {isAudioEstablished ? (

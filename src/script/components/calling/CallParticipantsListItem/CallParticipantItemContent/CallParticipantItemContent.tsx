@@ -45,7 +45,8 @@ export interface CallParticipantItemContentProps {
   isAudioEstablished: boolean;
   availability?: Availability.Type;
   isSelf?: boolean;
-  onDropdownClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  showContextMenu: boolean;
+  onDropdownClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
 export const CallParticipantItemContent = ({
@@ -54,6 +55,7 @@ export const CallParticipantItemContent = ({
   isAudioEstablished,
   availability = Availability.Type.NONE,
   isSelf = false,
+  showContextMenu,
   onDropdownClick,
 }: CallParticipantItemContentProps) => {
   const selfString = `(${capitalizeFirstChar(t('conversationYouNominative'))})`;
@@ -79,7 +81,7 @@ export const CallParticipantItemContent = ({
         </div>
       </div>
 
-      {onDropdownClick && (
+      {isAudioEstablished && showContextMenu && (
         <button
           data-hoverClass="chevron-icon"
           tabIndex={TabIndex.UNFOCUSABLE}
