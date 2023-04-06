@@ -35,6 +35,7 @@ const createMockParticipant = ({
   isGuest = false,
   isFederated = false,
   isExternal = false,
+  isAudioEstablished = true,
 }: {
   name?: string;
   availability?: Availability.Type;
@@ -42,6 +43,7 @@ const createMockParticipant = ({
   isGuest?: boolean;
   isFederated?: boolean;
   isExternal?: boolean;
+  isAudioEstablished?: boolean;
 }) => {
   const user = new User(createRandomUuid());
   user.name('user');
@@ -62,6 +64,8 @@ const createMockParticipant = ({
 
   const clientId = createRandomUuid();
   const participant = new Participant(user, clientId);
+
+  participant.isAudioEstablished(isAudioEstablished);
 
   return participant;
 };
@@ -122,5 +126,41 @@ describe('CallParticipantsListItem', () => {
 
     expect(getByTestId('status-guest')).toBeDefined();
     expect(getByTestId('status-external')).toBeDefined();
+  });
+
+  it('should open context menu on user item click', () => {
+    const participant = createMockParticipant({});
+    const onContextMenu = jest.fn();
+    const {getByTestId} = render(
+      <CallParticipantsListItem showContextMenu={true} onContextMenu={onContextMenu} callParticipant={participant} />,
+    );
+
+    const userItem = getByTestId('item-user');
+    userItem.click();
+
+    expect(onContextMenu).toHaveBeenCalled();
+  });
+
+  it('should not open context menu when user is in unestablished audio state', () => {
+    const participant = createMockParticipant({isAudioEstablished: false});
+    const onContextMenu = jest.fn();
+    const {getByTestId} = render(
+      <CallParticipantsListItem showContextMenu={true} onContextMenu={onContextMenu} callParticipant={participant} />,
+    );
+
+    const userItem = getByTestId('item-user');
+    userItem.click();
+
+    expect(onContextMenu).not.toHaveBeenCalled();
+  });
+
+  it('should show "connecting..." text if user is in unestablishd audio state', () => {
+    const participant = createMockParticipant({isAudioEstablished: false});
+    const onContextMenu = jest.fn();
+    const {getByText} = render(
+      <CallParticipantsListItem showContextMenu={true} onContextMenu={onContextMenu} callParticipant={participant} />,
+    );
+
+    expect(getByText('videoCallParticipantConnecting')).toBeDefined();
   });
 });
