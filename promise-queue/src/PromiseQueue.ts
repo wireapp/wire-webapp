@@ -29,7 +29,7 @@ const defaultOptions = {
 export class PromiseQueue {
   private blocked: boolean;
   private runningTasks: number;
-  private interval?: number;
+  private interval?: NodeJS.Timer;
   private paused: boolean;
   private readonly concurrent: number;
   private readonly logger?: {warn: (...args: any[]) => void};
@@ -65,7 +65,7 @@ export class PromiseQueue {
       this.blocked = true;
     }
 
-    this.interval = window.setInterval(() => {
+    this.interval = setInterval(() => {
       if (!this.paused) {
         const logObject = {pendingEntry: queueEntry, queueState: this.queue};
         this.logger?.warn(`Promise queue timed-out after ${this.timeout}ms, unblocking queue`, logObject);
@@ -149,7 +149,7 @@ export class PromiseQueue {
 
   private clearInterval(): void {
     if (this.interval) {
-      window.clearInterval(this.interval);
+      clearInterval(this.interval);
       this.interval = undefined;
     }
   }
