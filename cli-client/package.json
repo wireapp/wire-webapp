@@ -4,33 +4,36 @@
   "description": "Command-line interface for Wire's secure messaging platform.",
   "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/cli-client",
   "files": [
-    "lib"
+    "lib",
+    "overrides"
   ],
   "main": "lib/index",
   "dependencies": {
     "@wireapp/api-client": "workspace:^",
     "@wireapp/core": "workspace:^",
+    "@wireapp/core-crypto": "file:./overrides/core-crypto",
     "@wireapp/store-engine-fs": "workspace:^",
     "axios": "1.3.4",
     "commander": "10.0.0",
     "dotenv": "16.0.3",
+    "fake-indexeddb": "^4.0.1",
     "fs-extra": "11.1.0"
   },
   "devDependencies": {
     "@types/fs-extra": "9.0.13",
     "@types/rimraf": "^3.0.2",
     "rimraf": "^3.0.2",
+    "ts-node": "^10.9.1",
     "typescript": "^4.8.4"
   },
   "scripts": {
     "build": "yarn clean && tsc",
     "clean": "rimraf lib",
     "dist": "yarn build",
-    "start": "ts-node -r tsconfig-paths/register lib/index.ts",
-    "test": "exit 0"
+    "start": "ts-node src/index.ts"
   },
   "bin": {
-    "wire-cli": "dist/index.js"
+    "wire-cli": "lib/index.js"
   },
   "version": "12.0.110",
   "gitHead": "5339f01fe01ef0871da8c8bc8662fbe9e604754a"

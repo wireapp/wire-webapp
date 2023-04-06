@@ -1,3 +1,6 @@
+#!/usr/bin/env node
+/* eslint-disable header/header */
+
 /*
  * Wire
  * Copyright (C) 2018 Wire Swiss GmbH
@@ -25,9 +28,9 @@ import {buildTextMessage} from '@wireapp/core/lib/conversation/message/MessageBu
 import axios from 'axios';
 import {program as commander} from 'commander';
 import dotenv from 'dotenv';
+import 'fake-indexeddb/auto';
 import * as fs from 'fs-extra';
 
-import os from 'os';
 import path from 'path';
 
 import {APIClient} from '@wireapp/api-client';
@@ -45,15 +48,16 @@ commander
   .name(Object.keys(bin)[0])
   .version(version)
   .description(description)
-  .option('-e, --email <address>', 'Your email address')
-  .option('-p, --password <password>', 'Your password')
-  .option('-c, --conversation <conversationId>', 'The conversation to write in')
+  .requiredOption('-e, --email <address>', 'Your email address')
+  .requiredOption('-p, --password <password>', 'Your password')
+  .requiredOption('-c, --conversation <conversationId>', 'The conversation to write in')
+  .option('--env <staging | production>', 'The backend to use', 'production')
   .parse(process.argv);
 
-const {conversation, email, password} = commander.opts();
+const {conversation, email, password, env} = commander.opts();
 
 const loginData = {
-  clientType: ClientType.PERMANENT,
+  clientType: ClientType.TEMPORARY,
   email: email || process.env.WIRE_LOGIN_EMAIL,
   password: password || process.env.WIRE_LOGIN_PASSWORD,
 };
@@ -65,7 +69,7 @@ if (!loginData.email || !loginData.password) {
 
 const conversationId = conversation || process.env.WIRE_CONVERSATION_ID;
 
-const directory = path.join(os.homedir(), '.wire-cli', loginData.email);
+const directory = path.join('/tmp', loginData.email);
 
 const storeEngineProvider = async (storeName: string) => {
   const engine = new FileEngine(directory);
@@ -73,18 +77,25 @@ const storeEngineProvider = async (storeName: string) => {
   return engine;
 };
 
-const apiClient = new APIClient({urls: APIClient.BACKEND.PRODUCTION});
+const apiClient = new APIClient({
+  urls: env === 'production' ? APIClient.BACKEND.PRODUCTION : APIClient.BACKEND.STAGING,
+});
 const account = new Account(apiClient, {createStore: storeEngineProvider});
 
 (async () => {
+  let backendFeatures = {domain: ''};
   try {
+    backendFeatures = await account.useAPIVersion(2, 3);
     await account.login(loginData);
-    await account.listen({
+    const client = await account.initClient();
+    if (!client) {
+      await account.registerClient(loginData);
+    }
+    account.listen({
       onEvent: ({event, decryptedData}) => {
         if (decryptedData && event.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD) {
-          console.info(
-            `Received message from user ID "${event.from}" in conversation ID "${event.conversation}": ${decryptedData}`,
-          );
+          console.info(`Received message from user ID "${event.from}" in conversation ID "${event.conversation}"`);
+          console.info(decryptedData);
         }
       },
     });
@@ -108,6 +119,7 @@ const account = new Account(apiClient, {createStore: storeEngineProvider});
         await account.listen();
       }
     }
+    await account.logout();
     throw error;
   }
 
@@ -120,7 +132,7 @@ const account = new Account(apiClient, {createStore: storeEngineProvider});
     if (account.service) {
       const payload = buildTextMessage({text: message});
       await account.service.conversation.send({
-        conversationId: {id: conversationId, domain: ''},
+        conversationId: {id: conversationId, domain: backendFeatures.domain},
         protocol: ConversationProtocol.PROTEUS,
         payload,
       });
