@@ -122,7 +122,7 @@ export const CallParticipantsListItem = ({
         ) : (
           <span
             css={{
-              color: 'var(--red-500)',
+              color: 'var(--danger-color)',
               fontSize: 'var(--font-size-small)',
               flexShrink: 0,
             }}
