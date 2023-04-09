@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "@datadog/browser-logs": "^4.38.0",
-    "@datadog/browser-rum": "^4.37.0",
+    "@datadog/browser-rum": "^4.38.0",
     "@emotion/react": "11.10.6",
     "@types/eslint": "8.4.10",
     "@wireapp/avs": "9.1.13",
