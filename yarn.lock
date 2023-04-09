@@ -4925,9 +4925,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^24.2.1":
-  version: 24.2.1
-  resolution: "@wireapp/api-client@npm:24.2.1"
+"@wireapp/api-client@npm:^24.3.0":
+  version: 24.3.0
+  resolution: "@wireapp/api-client@npm:24.3.0"
   dependencies:
     "@wireapp/commons": ^5.0.4
     "@wireapp/priority-queue": ^2.0.3
@@ -4940,7 +4940,7 @@ __metadata:
     spark-md5: 3.0.2
     tough-cookie: 4.1.2
     ws: 8.11.0
-  checksum: e0bb83f4c79ef449291a33b45797da97c2b2387661d626aebab22124a008f2826aed6bf15bd12754d1fdc81670b21b563cde8b3029f7c628ff448b68e76dc2c8
+  checksum: 2340df018e1d79dec993a752b87e67c3f75ca4aad5dbaf34ec6d9b9984ff368a50d9434a5e16d5b1c9fd19317050ad21244b2bfc03a050bcb6de07aafd0f7c18
   languageName: node
   linkType: hard
 
@@ -4993,15 +4993,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:40.1.4":
-  version: 40.1.4
-  resolution: "@wireapp/core@npm:40.1.4"
+"@wireapp/core@npm:40.1.6":
+  version: 40.1.6
+  resolution: "@wireapp/core@npm:40.1.6"
   dependencies:
-    "@wireapp/api-client": ^24.2.1
+    "@wireapp/api-client": ^24.3.0
     "@wireapp/commons": ^5.0.4
     "@wireapp/core-crypto": 0.7.0-rc.4
     "@wireapp/cryptobox": 12.8.0
-    "@wireapp/promise-queue": ^2.1.1
+    "@wireapp/promise-queue": ^2.1.2
     "@wireapp/protocol-messaging": 1.44.0
     "@wireapp/store-engine": 5.0.3
     "@wireapp/store-engine-dexie": ^2.0.5
@@ -5014,7 +5014,7 @@ __metadata:
     logdown: 3.3.1
     long: ^5.2.0
     uuidjs: 4.2.13
-  checksum: a95e161152811f00af230a846e58cf8c6898a7377ec7939e155e0afde78507b0aad78ae187a371a1934ea8b0e9e9f83a9bb56e7d25b293725884a2589d59690e
+  checksum: 7ea16c872ad697e32dcef5ed61d940f1c9a546b76a99413fe4c933b92b77330cb4b035e269447865d5d9bb208ff150e82cf829699b1484b4de98a5e9d4c2d04e
   languageName: node
   linkType: hard
 
@@ -5094,10 +5094,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/promise-queue@npm:^2.1.1":
-  version: 2.1.1
-  resolution: "@wireapp/promise-queue@npm:2.1.1"
-  checksum: 16da2f1d44bf3a7e488a9789956be8946115a7593407755324583e1743518c61340df46c115789f1ce0f0ba5e4159988525b16bbfd56cc82cf4f7a392bc118ca
+"@wireapp/promise-queue@npm:^2.1.2":
+  version: 2.1.2
+  resolution: "@wireapp/promise-queue@npm:2.1.2"
+  checksum: eb2014b6e1b321f007be6810069589b43e12fdda708ecba876068309aadb2688b63edb4f6bacc921790ca30b97e90fe3dfccba7b3c3799249377343a8a42568c
   languageName: node
   linkType: hard
 
@@ -17529,7 +17529,7 @@ dexie@latest:
     "@typescript-eslint/parser": ^5.57.0
     "@wireapp/avs": 9.1.13
     "@wireapp/copy-config": 2.0.11
-    "@wireapp/core": 40.1.4
+    "@wireapp/core": 40.1.6
     "@wireapp/eslint-config": 2.1.1
     "@wireapp/lru-cache": 3.8.1
     "@wireapp/prettier-config": 0.5.2
