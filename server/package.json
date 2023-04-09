@@ -32,7 +32,7 @@
     "@types/node": "18.11.18",
     "jest": "29.5.0",
     "rimraf": "4.4.1",
-    "typescript": "5.0.3"
+    "typescript": "5.0.4"
   },
   "scripts": {
     "build": "yarn clean && tsc && yarn copy-assets && yarn create-commit-sha && yarn create-version-file",
