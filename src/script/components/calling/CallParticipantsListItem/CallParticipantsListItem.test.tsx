@@ -74,7 +74,7 @@ describe('CallParticipantsListItem', () => {
   it('should render participant user avatar', () => {
     const participant = createMockParticipant({});
     const {getByTestId} = render(
-      <CallParticipantsListItem showContextMenu={true} onContextMenu={jest.fn()} callParticipant={participant} />,
+      <CallParticipantsListItem showContextMenu onContextMenu={jest.fn()} callParticipant={participant} />,
     );
 
     expect(getByTestId('element-avatar-user')).toBeDefined();
@@ -89,12 +89,7 @@ describe('CallParticipantsListItem', () => {
     });
 
     const {getByTestId, getByText} = render(
-      <CallParticipantsListItem
-        showContextMenu={true}
-        onContextMenu={jest.fn()}
-        callParticipant={participant}
-        selfInTeam={true}
-      />,
+      <CallParticipantsListItem showContextMenu onContextMenu={jest.fn()} callParticipant={participant} selfInTeam />,
     );
 
     expect(getByText(participantName)).toBeDefined();
@@ -107,7 +102,7 @@ describe('CallParticipantsListItem', () => {
     const selfParticipant = createMockParticipant({isSelfUser: true});
 
     const {getByText} = render(
-      <CallParticipantsListItem showContextMenu={true} onContextMenu={jest.fn()} callParticipant={selfParticipant} />,
+      <CallParticipantsListItem showContextMenu onContextMenu={jest.fn()} callParticipant={selfParticipant} />,
     );
 
     expect(getByText('(ConversationYouNominative)')).toBeDefined();
@@ -121,7 +116,7 @@ describe('CallParticipantsListItem', () => {
     });
 
     const {getByTestId} = render(
-      <CallParticipantsListItem showContextMenu={true} onContextMenu={jest.fn()} callParticipant={selfParticipant} />,
+      <CallParticipantsListItem showContextMenu onContextMenu={jest.fn()} callParticipant={selfParticipant} />,
     );
 
     expect(getByTestId('status-guest')).toBeDefined();
@@ -132,7 +127,7 @@ describe('CallParticipantsListItem', () => {
     const participant = createMockParticipant({});
     const onContextMenu = jest.fn();
     const {getByTestId} = render(
-      <CallParticipantsListItem showContextMenu={true} onContextMenu={onContextMenu} callParticipant={participant} />,
+      <CallParticipantsListItem showContextMenu onContextMenu={onContextMenu} callParticipant={participant} />,
     );
 
     const userItem = getByTestId('item-user');
@@ -145,7 +140,7 @@ describe('CallParticipantsListItem', () => {
     const participant = createMockParticipant({isAudioEstablished: false});
     const onContextMenu = jest.fn();
     const {getByTestId} = render(
-      <CallParticipantsListItem showContextMenu={true} onContextMenu={onContextMenu} callParticipant={participant} />,
+      <CallParticipantsListItem showContextMenu onContextMenu={onContextMenu} callParticipant={participant} />,
     );
 
     const userItem = getByTestId('item-user');
@@ -158,7 +153,7 @@ describe('CallParticipantsListItem', () => {
     const participant = createMockParticipant({isAudioEstablished: false});
     const onContextMenu = jest.fn();
     const {getByText} = render(
-      <CallParticipantsListItem showContextMenu={true} onContextMenu={onContextMenu} callParticipant={participant} />,
+      <CallParticipantsListItem showContextMenu onContextMenu={onContextMenu} callParticipant={participant} />,
     );
 
     expect(getByText('videoCallParticipantConnecting')).toBeDefined();
