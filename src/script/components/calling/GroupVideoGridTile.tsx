@@ -43,6 +43,24 @@ export interface GroupVideoGridTileProps {
   selfParticipant: Participant;
 }
 
+const getParticipantNameColor = ({
+  isActivelySpeaking,
+  isAudioEstablished,
+}: {
+  isActivelySpeaking: boolean;
+  isAudioEstablished: boolean;
+}) => {
+  if (!isAudioEstablished) {
+    return 'var(--gray-60)';
+  }
+
+  if (isActivelySpeaking) {
+    return 'var(--app-bg-secondary)';
+  }
+
+  return 'var(--white)';
+};
+
 const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
   minimized,
   participant,
@@ -51,12 +69,10 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
   isMaximized,
   onTileDoubleClick,
 }) => {
-  const {isMuted, videoState, videoStream, isActivelySpeaking} = useKoSubscribableChildren(participant, [
-    'isMuted',
-    'videoStream',
-    'isActivelySpeaking',
-    'videoState',
-  ]);
+  const {isMuted, videoState, videoStream, isActivelySpeaking, isAudioEstablished} = useKoSubscribableChildren(
+    participant,
+    ['isMuted', 'videoStream', 'isActivelySpeaking', 'videoState', 'isAudioEstablished'],
+  );
   const {name} = useKoSubscribableChildren(participant?.user, ['name']);
 
   const sharesScreen = videoState === VIDEO_STATE.SCREENSHARE;
@@ -74,6 +90,8 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
     }
   };
 
+  const participantNameColor = getParticipantNameColor({isActivelySpeaking, isAudioEstablished});
+
   const nameContainer = !minimized && (
     <div
       className="group-video-grid__element__label"
@@ -83,12 +101,35 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
     >
       <span
         data-uie-name={isActivelySpeaking ? 'status-active-speaking' : isMuted ? 'status-audio-off' : 'status-audio-on'}
-        className="group-video-grid__element__label__name"
         css={{
-          color: isActivelySpeaking ? 'var(--app-bg-secondary)' : 'var(--white)',
+          overflow: 'hidden',
+          display: 'flex',
+          color: participantNameColor,
         }}
       >
-        {name}
+        <span
+          css={{
+            textOverflow: 'ellipsis',
+            overflow: 'hidden',
+          }}
+        >
+          {name}
+        </span>
+        {!isAudioEstablished && (
+          <span
+            css={{
+              color: 'var(--participant-audio-connecting-color)',
+              flexShrink: 0,
+              '&::before': {
+                content: "' • '",
+                whiteSpace: 'pre',
+                color: participantNameColor,
+              },
+            }}
+          >
+            {t('videoCallParticipantConnecting')}
+          </span>
+        )}
       </span>
     </div>
   );

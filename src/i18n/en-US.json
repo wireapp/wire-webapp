@@ -1303,6 +1303,7 @@
   "videoCallScreenShareNotSupported": "Screen sharing is not supported in this browser",
   "videoSpeakersTabAll": "All ({{count}})",
   "videoSpeakersTabSpeakers": "Speakers",
+  "videoCallParticipantConnecting": "Connecting...",
   "warningCallIssues": "This version of {{brandName}} can not participate in the call. Please use",
   "warningCallQualityPoor": "Poor connection",
   "warningCallUnsupportedIncoming": "{{user}} is calling. Your browser doesn’t support calls.",

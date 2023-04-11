@@ -22,8 +22,6 @@ import React from 'react';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import {callParticipantListWrapper} from 'Components/calling/CallParticipantsListItem/CallParticipantsListItem.styles';
-import {listItem} from 'Components/ParticipantItemContent/ParticipantItem.styles';
 import {UserStatusBadges} from 'Components/UserBadges';
 import {Participant} from 'src/script/calling/Participant';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -32,14 +30,20 @@ import {t} from 'Util/LocalizerUtil';
 import {setContextMenuPosition} from 'Util/util';
 
 import {CallParticipantItemContent} from './CallParticipantItemContent';
+import {
+  callParticipantListItemWrapper,
+  callParticipantListItem,
+  callParticipantAvatar,
+  callParticipantConnecting,
+} from './CallParticipantsListItem.styles';
 import {CallParticipantStatusIcons} from './CallParticipantStatusIcons';
 
 export interface CallParticipantsListItemProps {
   callParticipant: Participant;
+  showContextMenu: boolean;
+  onContextMenu: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   selfInTeam?: boolean;
   isSelfVerified?: boolean;
-  showDropdown?: boolean;
-  onContextMenu?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   isLast?: boolean;
 }
 
@@ -47,12 +51,14 @@ export const CallParticipantsListItem = ({
   callParticipant,
   isSelfVerified = false,
   selfInTeam,
-  showDropdown = false,
+  showContextMenu,
   onContextMenu,
   isLast = false,
 }: CallParticipantsListItemProps) => {
   const {user} = callParticipant;
   const {isMe: isSelf, isFederated} = user;
+
+  const {isAudioEstablished} = useKoSubscribableChildren(callParticipant, ['isAudioEstablished']);
 
   const {
     isDirectGuest,
@@ -69,41 +75,57 @@ export const CallParticipantsListItem = ({
     });
   };
 
+  const reactiveProps =
+    isAudioEstablished && showContextMenu
+      ? {
+          role: 'button',
+          tabIndex: TabIndex.FOCUSABLE,
+          onContextMenu,
+          onClick: onContextMenu,
+          onKeyDown: handleContextKeyDown,
+        }
+      : undefined;
+
   return (
     <div
-      tabIndex={TabIndex.FOCUSABLE}
-      role="button"
-      onContextMenu={onContextMenu}
-      onClick={onContextMenu}
-      onKeyDown={handleContextKeyDown}
+      {...reactiveProps}
       data-uie-name="item-user"
       data-uie-value={userName}
-      aria-label={t('accessibility.openConversation', userName)}
-      css={callParticipantListWrapper(isLast)}
+      css={callParticipantListItemWrapper(isLast)}
     >
-      <div css={listItem(true)}>
-        <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={user} aria-hidden="true" css={{margin: '0 10px'}} />
+      <div css={callParticipantListItem(true)}>
+        <Avatar
+          avatarSize={AVATAR_SIZE.SMALL}
+          participant={user}
+          aria-hidden="true"
+          css={callParticipantAvatar(isAudioEstablished)}
+        />
 
         <CallParticipantItemContent
+          isAudioEstablished={isAudioEstablished}
           name={userName}
           selfInTeam={selfInTeam}
           availability={availability}
           isSelf={isSelf}
-          {...(showDropdown && {
-            onDropdownClick: event => onContextMenu?.(event as unknown as React.MouseEvent<HTMLDivElement>),
-          })}
+          showContextMenu={showContextMenu}
+          onDropdownClick={event => onContextMenu?.(event as unknown as React.MouseEvent<HTMLDivElement>)}
         />
 
-        <UserStatusBadges
-          config={{
-            guest: isDirectGuest,
-            federated: isFederated,
-            external: isExternal,
-            verified: isSelfVerified && isVerified,
-          }}
-        />
-
-        <CallParticipantStatusIcons callParticipant={callParticipant} />
+        {isAudioEstablished ? (
+          <>
+            <UserStatusBadges
+              config={{
+                guest: isDirectGuest,
+                federated: isFederated,
+                external: isExternal,
+                verified: isSelfVerified && isVerified,
+              }}
+            />
+            <CallParticipantStatusIcons callParticipant={callParticipant} />
+          </>
+        ) : (
+          <span css={callParticipantConnecting}>{t('videoCallParticipantConnecting')}</span>
+        )}
       </div>
     </div>
   );

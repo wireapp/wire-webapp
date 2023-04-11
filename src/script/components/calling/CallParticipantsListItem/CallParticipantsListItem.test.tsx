@@ -35,6 +35,7 @@ const createMockParticipant = ({
   isGuest = false,
   isFederated = false,
   isExternal = false,
+  isAudioEstablished = true,
 }: {
   name?: string;
   availability?: Availability.Type;
@@ -42,6 +43,7 @@ const createMockParticipant = ({
   isGuest?: boolean;
   isFederated?: boolean;
   isExternal?: boolean;
+  isAudioEstablished?: boolean;
 }) => {
   const user = new User(createRandomUuid());
   user.name('user');
@@ -63,13 +65,17 @@ const createMockParticipant = ({
   const clientId = createRandomUuid();
   const participant = new Participant(user, clientId);
 
+  participant.isAudioEstablished(isAudioEstablished);
+
   return participant;
 };
 
 describe('CallParticipantsListItem', () => {
   it('should render participant user avatar', () => {
     const participant = createMockParticipant({});
-    const {getByTestId} = render(<CallParticipantsListItem callParticipant={participant} />);
+    const {getByTestId} = render(
+      <CallParticipantsListItem showContextMenu onContextMenu={jest.fn()} callParticipant={participant} />,
+    );
 
     expect(getByTestId('element-avatar-user')).toBeDefined();
   });
@@ -83,7 +89,7 @@ describe('CallParticipantsListItem', () => {
     });
 
     const {getByTestId, getByText} = render(
-      <CallParticipantsListItem callParticipant={participant} selfInTeam={true} />,
+      <CallParticipantsListItem showContextMenu onContextMenu={jest.fn()} callParticipant={participant} selfInTeam />,
     );
 
     expect(getByText(participantName)).toBeDefined();
@@ -95,7 +101,9 @@ describe('CallParticipantsListItem', () => {
   it('should mark user as self if relevant', () => {
     const selfParticipant = createMockParticipant({isSelfUser: true});
 
-    const {getByText} = render(<CallParticipantsListItem callParticipant={selfParticipant} />);
+    const {getByText} = render(
+      <CallParticipantsListItem showContextMenu onContextMenu={jest.fn()} callParticipant={selfParticipant} />,
+    );
 
     expect(getByText('(ConversationYouNominative)')).toBeDefined();
   });
@@ -107,9 +115,47 @@ describe('CallParticipantsListItem', () => {
       isExternal: true,
     });
 
-    const {getByTestId} = render(<CallParticipantsListItem callParticipant={selfParticipant} />);
+    const {getByTestId} = render(
+      <CallParticipantsListItem showContextMenu onContextMenu={jest.fn()} callParticipant={selfParticipant} />,
+    );
 
     expect(getByTestId('status-guest')).toBeDefined();
     expect(getByTestId('status-external')).toBeDefined();
+  });
+
+  it('should open context menu on user item click', () => {
+    const participant = createMockParticipant({});
+    const onContextMenu = jest.fn();
+    const {getByTestId} = render(
+      <CallParticipantsListItem showContextMenu onContextMenu={onContextMenu} callParticipant={participant} />,
+    );
+
+    const userItem = getByTestId('item-user');
+    userItem.click();
+
+    expect(onContextMenu).toHaveBeenCalled();
+  });
+
+  it('should not open context menu when user is in unestablished audio state', () => {
+    const participant = createMockParticipant({isAudioEstablished: false});
+    const onContextMenu = jest.fn();
+    const {getByTestId} = render(
+      <CallParticipantsListItem showContextMenu onContextMenu={onContextMenu} callParticipant={participant} />,
+    );
+
+    const userItem = getByTestId('item-user');
+    userItem.click();
+
+    expect(onContextMenu).not.toHaveBeenCalled();
+  });
+
+  it('should show "connecting..." text if user is in unestablishd audio state', () => {
+    const participant = createMockParticipant({isAudioEstablished: false});
+    const onContextMenu = jest.fn();
+    const {getByText} = render(
+      <CallParticipantsListItem showContextMenu onContextMenu={onContextMenu} callParticipant={participant} />,
+    );
+
+    expect(getByText('videoCallParticipantConnecting')).toBeDefined();
   });
 });

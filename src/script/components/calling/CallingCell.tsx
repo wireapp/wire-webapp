@@ -595,10 +595,8 @@ const CallingCell: React.FC<CallingCellProps> = ({
                               callParticipant={participant}
                               selfInTeam={selfUser?.inTeam()}
                               isSelfVerified={isSelfVerified}
-                              showDropdown={isModerator}
-                              onContextMenu={
-                                isModerator ? event => getParticipantContext(event, participant) : undefined
-                              }
+                              showContextMenu={!!isModerator}
+                              onContextMenu={event => getParticipantContext(event, participant)}
                               isLast={participantsArray.length === index}
                             />
                           </li>
