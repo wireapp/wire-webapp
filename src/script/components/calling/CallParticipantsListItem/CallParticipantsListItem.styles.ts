@@ -21,7 +21,7 @@ import {CSSObject} from '@emotion/react';
 
 import {listWrapper} from '../../ParticipantItemContent/ParticipantItem.styles';
 
-export const callParticipantListWrapper = (isLast = false): CSSObject => ({
+export const callParticipantListItemWrapper = (isLast = false): CSSObject => ({
   ...listWrapper({noUnderline: true, noInteraction: true}),
   '&:hover, &:focus, &:focus-visible': {
     backgroundColor: 'var(--disabled-call-button-bg)',
@@ -38,6 +38,27 @@ const commonIconStyles = {
   height: '12px',
   width: '12px',
 };
+
+export const callParticipantAvatar = (isAudioEstablished = false): CSSObject => ({
+  margin: '0 10px',
+  opacity: isAudioEstablished ? '1' : '0.5',
+});
+
+export const callParticipantConnecting: CSSObject = {
+  color: 'var(--danger-color)',
+  fontSize: 'var(--font-size-small)',
+  flexShrink: 0,
+};
+
+export const callParticipantListItem = (noInteraction = false): CSSObject => ({
+  display: 'flex',
+  overflow: 'hidden',
+  height: '56px',
+  alignItems: 'center',
+  paddingRight: '16px',
+  margin: '0',
+  cursor: noInteraction ? 'default' : 'pointer',
+});
 
 export const callStatusIcons = (activeIconsCount: number): CSSObject => ({
   display: 'grid',

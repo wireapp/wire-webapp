@@ -22,8 +22,6 @@ import React from 'react';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import {callParticipantListWrapper} from 'Components/calling/CallParticipantsListItem/CallParticipantsListItem.styles';
-import {listItem} from 'Components/ParticipantItemContent/ParticipantItem.styles';
 import {UserStatusBadges} from 'Components/UserBadges';
 import {Participant} from 'src/script/calling/Participant';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -32,6 +30,12 @@ import {t} from 'Util/LocalizerUtil';
 import {setContextMenuPosition} from 'Util/util';
 
 import {CallParticipantItemContent} from './CallParticipantItemContent';
+import {
+  callParticipantListItemWrapper,
+  callParticipantListItem,
+  callParticipantAvatar,
+  callParticipantConnecting,
+} from './CallParticipantsListItem.styles';
 import {CallParticipantStatusIcons} from './CallParticipantStatusIcons';
 
 export interface CallParticipantsListItemProps {
@@ -87,14 +91,14 @@ export const CallParticipantsListItem = ({
       {...reactiveProps}
       data-uie-name="item-user"
       data-uie-value={userName}
-      css={callParticipantListWrapper(isLast)}
+      css={callParticipantListItemWrapper(isLast)}
     >
-      <div css={listItem(true)}>
+      <div css={callParticipantListItem(true)}>
         <Avatar
           avatarSize={AVATAR_SIZE.SMALL}
           participant={user}
           aria-hidden="true"
-          css={{margin: '0 10px', opacity: isAudioEstablished ? '1' : '0.5'}}
+          css={callParticipantAvatar(isAudioEstablished)}
         />
 
         <CallParticipantItemContent
@@ -120,15 +124,7 @@ export const CallParticipantsListItem = ({
             <CallParticipantStatusIcons callParticipant={callParticipant} />
           </>
         ) : (
-          <span
-            css={{
-              color: 'var(--danger-color)',
-              fontSize: 'var(--font-size-small)',
-              flexShrink: 0,
-            }}
-          >
-            {t('videoCallParticipantConnecting')}
-          </span>
+          <span css={callParticipantConnecting}>{t('videoCallParticipantConnecting')}</span>
         )}
       </div>
     </div>
