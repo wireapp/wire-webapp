@@ -211,7 +211,7 @@ export class ConnectionRepository {
    * Get a connection for a user ID.
    */
   private getConnectionByUserId(userId: QualifiedId): ConnectionEntity {
-    return this.connectionState.connectionEntities()[userId.id];
+    return this.connectionState.connections()[userId.id];
   }
 
   /**
@@ -220,7 +220,7 @@ export class ConnectionRepository {
    * @returns User connection entity
    */
   getConnectionByConversationId(conversationId: QualifiedId): ConnectionEntity | undefined {
-    const connectionEntities = Object.values(this.connectionState.connectionEntities());
+    const connectionEntities = Object.values(this.connectionState.connections());
     return connectionEntities.find(connectionEntity =>
       matchQualifiedIds(connectionEntity.conversationId, conversationId),
     );
@@ -234,17 +234,11 @@ export class ConnectionRepository {
    * @returns Promise that resolves when all connections have been retrieved and mapped
    */
   async getConnections(): Promise<ConnectionEntity[]> {
-    try {
-      const connectionData = await this.connectionService.getConnections();
-      const newConnectionEntities = ConnectionMapper.mapConnectionsFromJson(connectionData);
+    const connectionData = await this.connectionService.getConnections();
+    const connections = ConnectionMapper.mapConnectionsFromJson(connectionData);
 
-      return newConnectionEntities.length
-        ? await this.updateConnections(newConnectionEntities)
-        : Object.values(this.connectionState.connectionEntities());
-    } catch (error) {
-      this.logger.error(`Failed to retrieve connections from backend: ${error.message}`, error);
-      throw error;
-    }
+    this.connectionState.connections(connections);
+    return connections;
   }
 
   /**
@@ -267,7 +261,7 @@ export class ConnectionRepository {
   }
 
   addConnectionEntity(connectionEntity: ConnectionEntity): void {
-    this.connectionState.connectionEntities()[connectionEntity.userId.id] = connectionEntity;
+    this.connectionState.connections()[connectionEntity.userId.id] = connectionEntity;
   }
 
   /**
@@ -289,11 +283,11 @@ export class ConnectionRepository {
     const updatedConnections = connectionEntities.reduce((allConnections, connectionEntity) => {
       allConnections[connectionEntity.userId.id] = connectionEntity;
       return allConnections;
-    }, this.connectionState.connectionEntities());
+    }, this.connectionState.connections());
 
-    this.connectionState.connectionEntities(updatedConnections);
+    this.connectionState.connections(updatedConnections);
     await this.userRepository.updateUsersFromConnections(connectionEntities);
-    return Object.values(this.connectionState.connectionEntities());
+    return Object.values(this.connectionState.connections());
   }
 
   /**

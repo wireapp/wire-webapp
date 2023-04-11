@@ -132,7 +132,7 @@ describe('ConnectionRepository', () => {
 
       await connectionRepo.getConnections();
 
-      const connectionEntities = Object.values(connectionState.connectionEntities());
+      const connectionEntities = Object.values(connectionState.connections());
       expect(connectionEntities.length).toBe(1);
       expect(connectionEntities[0].status()).toEqual(connectionRequest.status);
       expect(connectionEntities[0].conversationId.id).toEqual(connectionRequest.conversation);

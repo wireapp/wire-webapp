@@ -161,28 +161,41 @@ export class UserRepository {
   };
 
   /**
-   * Will load the availability status to the team users and subscribe to changes.
+   * Will load all the users in memory (and save new users to the database).
    */
-  async loadTeamUserAvailabilities(teamMembers: User[]): Promise<void> {
-    if (!teamMembers.length) {
+  async loadUsers(users: QualifiedId[]): Promise<void> {
+    if (!users.length) {
       return;
     }
 
-    const availabilities = await this.userService.loadUserFromDb();
+    // TODO migrate old user entries that only have availability
+    const localUsers = await this.userService.loadUserFromDb();
 
-    this.logger.log(`Loaded state of '${teamMembers.length}' users from database`, teamMembers);
-    /** availabilities we have in the DB that are not matching any loaded users */
-    const orphanAvailabilities = availabilities.filter(
-      availability => !teamMembers.find(user => matchQualifiedIds(user.qualifiedId, availability)),
+    /** users we have in the DB that are not matching any loaded users */
+    const orphanDBEntries = localUsers.filter(
+      localUser => !users.find(user => matchQualifiedIds(user, localUser.qualified_id)),
     );
 
-    // Remove availabilities that are not linked to any loaded users
-    orphanAvailabilities.forEach(async availability => {
+    // Remove users that are not linked to any loaded users
+    orphanDBEntries.forEach(async availability => {
       await this.userService.removeUserFromDb({id: availability.id, domain: availability.domain ?? ''});
     });
 
-    teamMembers.forEach(user => {
-      const userAvailability = availabilities.find(availability => matchQualifiedIds(availability, user.qualifiedId));
+    const missingUsers = users.filter(
+      user => !localUsers.find(availability => matchQualifiedIds(user, availability.qualified_id)),
+    );
+
+    const {found, failed} = await this.fetchRawUsers(missingUsers);
+
+    // Save all new users to the database
+    await Promise.all(found.map(user => this.saveUserInDb(user)));
+
+    const mappedUsers = this.mapUserResponse(found.concat(localUsers), failed);
+    this.userState.users(mappedUsers);
+    return mappedUsers;
+
+    users.forEach(user => {
+      const userAvailability = localUsers.find(availability => matchQualifiedIds(availability, user));
       if (userAvailability) {
         user.availability(userAvailability.availability);
       }
@@ -200,8 +213,8 @@ export class UserRepository {
   /**
    * Persists a conversation state in the database.
    */
-  private readonly saveUserInDb = (userEntity: User): Promise<User> => {
-    return this.userService.saveUserInDb(userEntity);
+  private readonly saveUserInDb = (user: APIClientUser) => {
+    return this.userService.saveUserInDb(user);
   };
 
   /**
@@ -449,31 +462,24 @@ export class UserRepository {
    * Get a user from the backend.
    */
   private async fetchUserById(userId: QualifiedId): Promise<User> {
-    const [userEntity] = await this.fetchUsersById([userId]);
+    const [userEntity] = await this.fetchUsers([userId]);
     return userEntity;
   }
 
-  /**
-   * Get users from the backend.
-   */
-  private async fetchUsersById(userIds: QualifiedId[]): Promise<User[]> {
-    if (!userIds.length) {
-      return [];
-    }
+  private async fetchRawUsers(userIds: QualifiedId[]): Promise<{found: APIClientUser[]; failed: QualifiedId[]}> {
+    const chunksOfUserIds = chunk<QualifiedId>(
+      userIds.filter(({id}) => !!id),
+      Config.getConfig().MAXIMUM_USERS_PER_REQUEST,
+    );
 
-    const getUsers = async (chunkOfUserIds: QualifiedId[]): Promise<User[]> => {
+    const getChunk = async (chunkOfUserIds: QualifiedId[]) => {
       const selfDomain = this.userState.self().domain;
 
       const chunkOfQualifiedUserIds = chunkOfUserIds.map(({id, domain}) => ({domain: domain || selfDomain, id}));
 
       try {
         const {found, failed = [], not_found = []} = await this.userService.getUsers(chunkOfQualifiedUserIds);
-        const failedToLoad = [...failed, ...not_found].map(userId => {
-          /* When a federated backend is unreachable, we generate placeholder users locally with some default values
-           */
-          return new User(userId.id, userId.domain);
-        });
-        return [...this.userMapper.mapUsersFromJson(found), ...failedToLoad];
+        return {found, failed: [...failed, ...not_found]};
       } catch (error: any) {
         const isNotFound =
           (isAxiosError(error) && error.response?.status === HTTP_STATUS.NOT_FOUND) ||
@@ -482,22 +488,47 @@ export class UserRepository {
           (isAxiosError(error) && error.response?.status === HTTP_STATUS.BAD_REQUEST) ||
           Number((error as BackendError).code) === HTTP_STATUS.BAD_REQUEST;
         if (isNotFound || isBadRequest) {
-          return [];
+          return {found: [], failed: []};
         }
         throw error;
       }
     };
 
-    const chunksOfUserIds = chunk<QualifiedId>(
-      userIds.filter(({id}) => !!id),
-      Config.getConfig().MAXIMUM_USERS_PER_REQUEST,
+    const responses = await Promise.all(chunksOfUserIds.map(getChunk));
+    return responses.reduce<{found: APIClientUser[]; failed: QualifiedId[]}>(
+      (acc, response) => {
+        return {found: [...acc.found, ...response.found], failed: [...acc.failed, ...response.failed]};
+      },
+      {found: [], failed: []},
     );
-    const resolveArray = await Promise.all(chunksOfUserIds.map(getUsers));
-    const newUserEntities = flatten(resolveArray);
-    if (this.userState.isTeam()) {
-      this.mapGuestStatus(newUserEntities);
+  }
+
+  private mapUserResponse(found: APIClientUser[], failed: QualifiedId[]): User[] {
+    const failedToLoad = failed.map(userId => {
+      /* When a federated backend is unreachable, we generate placeholder users locally with some default values
+       */
+      return new User(userId.id, userId.domain);
+    });
+    return this.userMapper.mapUsersFromJson(found).concat(failedToLoad);
+  }
+
+  /**
+   * Get users from the backend.
+   *
+   * @param userIds - the users to fetch from backend
+   * @param raw - if true, the users will not be mapped to User entities
+   */
+  private async fetchUsers(userIds: QualifiedId[]): Promise<User[]> {
+    if (!userIds.length) {
+      return [];
     }
-    let fetchedUserEntities = this.saveUsers(newUserEntities);
+
+    const {found, failed} = await this.fetchRawUsers(userIds);
+    const users = this.mapUserResponse(found, failed);
+    if (this.userState.isTeam()) {
+      this.mapGuestStatus(users);
+    }
+    let fetchedUserEntities = this.saveUsers(users);
     // If there is a difference then we most likely have a case with a suspended user
     const isAllUserIds = userIds.length === fetchedUserEntities.length;
     if (!isAllUserIds) {
@@ -610,7 +641,7 @@ export class UserRepository {
       return knownUserEntities;
     }
 
-    const userEntities = await this.fetchUsersById(unknownUserIds);
+    const userEntities = await this.fetchUsers(unknownUserIds);
     return knownUserEntities.concat(userEntities);
   }
 

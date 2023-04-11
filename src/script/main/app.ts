@@ -392,7 +392,17 @@ export class App {
       onProgress(10);
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
-      const team = await teamRepository.initTeam(selfUser.teamId);
+      const {members} = await teamRepository.initTeam(selfUser.teamId);
+      telemetry.timeStep(AppInitTimingsStep.RECEIVED_USER_DATA);
+
+      const connections = await connectionRepository.getConnections();
+      telemetry.addStatistic(AppInitStatisticsValue.CONNECTIONS, connections.length, 50);
+
+      await userRepository.loadUsers([
+        ...members,
+        ...connections.map(connection => connection.userId),
+        selfUser.qualifiedId,
+      ]);
 
       const conversationEntities = await conversationRepository.loadConversations();
 
@@ -400,21 +410,15 @@ export class App {
         await initMLSConversations(conversationEntities, selfUser, this.core, this.repository.conversation);
       }
 
-      const connectionEntities = await connectionRepository.getConnections();
-      onProgress(25, t('initReceivedUserData'));
-      telemetry.timeStep(AppInitTimingsStep.RECEIVED_USER_DATA);
-      telemetry.addStatistic(AppInitStatisticsValue.CONVERSATIONS, conversationEntities.length, 50);
-      telemetry.addStatistic(AppInitStatisticsValue.CONNECTIONS, connectionEntities.length, 50);
-      if (connectionEntities.length) {
-        await Promise.allSettled(conversationRepository.mapConnections(connectionEntities));
+      if (connections.length) {
+        await Promise.allSettled(conversationRepository.mapConnections(connections));
       }
+
+      onProgress(25, t('initReceivedUserData'));
+      telemetry.addStatistic(AppInitStatisticsValue.CONVERSATIONS, conversationEntities.length, 50);
       this._subscribeToUnloadEvents();
 
       await conversationRepository.conversationRoleRepository.loadTeamRoles();
-
-      if (team) {
-        await userRepository.loadTeamUserAvailabilities([...team.members(), selfUser]);
-      }
 
       await eventRepository.connectWebSocket(this.core, ({done, total}) => {
         const baseMessage = t('initDecryption');

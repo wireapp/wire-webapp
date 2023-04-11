@@ -22,17 +22,12 @@ import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
 
-import type {User} from '../entity/User';
 import {APIClient} from '../service/APIClientSingleton';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {StorageService} from '../storage/StorageService';
 import {constructUserPrimaryKey} from '../util/StorageUtil';
 
-type StoredUser = {
-  availability: number;
-  id: string;
-  domain?: string;
-};
+type StoredUser = APIClientUser;
 
 export class UserService {
   private readonly logger: Logger;
@@ -55,9 +50,8 @@ export class UserService {
    * @todo There might be more keys which are returned by this function
    * @returns Resolves with all the stored user states
    */
-  async loadUserFromDb(): Promise<{availability: number; domain: string; id: string}[]> {
-    const users = await this.storageService.getAll<StoredUser>(this.USER_STORE_NAME);
-    return users.map(user => ({...user, domain: user.domain ?? ''}));
+  loadUserFromDb(): Promise<APIClientUser[]> {
+    return this.storageService.getAll<StoredUser>(this.USER_STORE_NAME);
   }
 
   async removeUserFromDb(user: {id: string; domain: string}): Promise<void> {
@@ -69,15 +63,10 @@ export class UserService {
    * Saves a user entity in the local database.
    * @returns Resolves with the conversation entity
    */
-  saveUserInDb(userEntity: User): Promise<User> {
-    const userData = userEntity.serialize();
+  async saveUserInDb(user: APIClientUser): Promise<void> {
+    const primaryKey = constructUserPrimaryKey(user.qualified_id);
 
-    const primaryKey = constructUserPrimaryKey(userEntity);
-
-    return this.storageService.save(this.USER_STORE_NAME, primaryKey, userData).then(primaryKey => {
-      this.logger.info(`State of user '${userData.id}' was stored`);
-      return userEntity;
-    });
+    await this.storageService.save(this.USER_STORE_NAME, primaryKey, user);
   }
 
   //##############################################################################
