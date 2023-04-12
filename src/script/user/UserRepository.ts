@@ -200,7 +200,8 @@ export class UserRepository {
 
     const missingUsers = users
       .filter(user => !liveUsers.find(localUser => matchQualifiedIds(user, localUser.qualified_id)))
-      .concat(incompleteUsers.map(user => ({id: user.id, domain: user.domain})));
+      // we add the users that are locally incomplete
+      .concat(incompleteUsers.map((user: any) => ({id: user.id, domain: user.domain})));
 
     const {found, failed} = await this.fetchRawUsers(missingUsers);
 
