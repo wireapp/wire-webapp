@@ -132,7 +132,7 @@ export class UserRepository {
         this.userDelete(eventJson);
         break;
       case USER_EVENT.UPDATE:
-        this.userUpdate(eventJson, source === EventRepository.SOURCE.WEB_SOCKET);
+        this.updateUser(eventJson, source === EventRepository.SOURCE.WEB_SOCKET);
         break;
       case USER.AVAILABILITY:
         this.onUserAvailability(eventJson);
@@ -243,26 +243,30 @@ export class UserRepository {
   /**
    * Event to update availability of a user.
    */
-  private onUserAvailability({from, data, fromDomain}: UserAvailabilityEvent): void {
+  private async onUserAvailability({from, data, fromDomain}: UserAvailabilityEvent): void {
     if (this.userState.isTeam()) {
-      this.getUserById({domain: fromDomain, id: from}).then(userEntity => userEntity.availability(data.availability));
+      await this.getUserById({domain: fromDomain, id: from}).then(userEntity =>
+        userEntity.availability(data.availability),
+      );
     }
   }
 
   /**
    * Event to update the matching user.
    */
-  private async userUpdate({user}: {user: Partial<APIClientUser>}, isWebSocket = false): Promise<User> {
-    const isSelfUser = user.id === this.userState.self().id;
-    const userEntity = isSelfUser
-      ? this.userState.self()
-      : await this.getUserById({domain: user.qualified_id?.domain || null, id: user.id});
+  private async updateUser({user}: {user: Partial<APIClientUser> & {id: string}}, isWebSocket = false): Promise<User> {
+    const selfUser = this.userState.self();
+    const qualifiedId = user.qualified_id || {domain: selfUser.domain, id: user.id};
+    const isSelfUser = user.id === selfUser.id;
+    const userEntity = isSelfUser ? selfUser : await this.getUserById(qualifiedId);
 
     if (isWebSocket && user.name) {
       user.name = fixWebsocketString(user.name);
     }
 
     this.userMapper.updateUserFromObject(userEntity, user);
+    // Update the database record
+    await this.userService.updateUser(qualifiedId, user);
     if (isSelfUser) {
       amplify.publish(WebAppEvents.TEAM.UPDATE_INFO);
     }
@@ -740,7 +744,7 @@ export class UserRepository {
    */
   async changeAccentColor(accentId: AccentColor.AccentColorID): Promise<User> {
     await this.selfService.putSelf({accent_id: accentId} as any);
-    return this.userUpdate({user: {accent_id: accentId, id: this.userState.self().id}});
+    return this.updateUser({user: {accent_id: accentId, id: this.userState.self().id}});
   }
 
   /**
@@ -748,7 +752,7 @@ export class UserRepository {
    */
   async changeName(name: string): Promise<User> {
     await this.selfService.putSelf({name});
-    return this.userUpdate({user: {id: this.userState.self().id, name}});
+    return this.updateUser({user: {id: this.userState.self().id, name}});
   }
 
   async changeEmail(email: string): Promise<void> {
@@ -762,7 +766,7 @@ export class UserRepository {
     if (username.length >= UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH) {
       try {
         await this.selfService.putSelfHandle(username);
-        return await this.userUpdate({user: {handle: username, id: this.userState.self().id}});
+        return await this.updateUser({user: {handle: username, id: this.userState.self().id}});
       } catch (error) {
         if ([HTTP_STATUS.CONFLICT, HTTP_STATUS.BAD_REQUEST].includes(error.code)) {
           throw new UserError(UserError.TYPE.USERNAME_TAKEN, UserError.MESSAGE.USERNAME_TAKEN);
@@ -809,7 +813,7 @@ export class UserRepository {
         {domain: mediumImageKey.domain, key: mediumImageKey.key, size: APIClientUserAssetType.COMPLETE, type: 'image'},
       ];
       await this.selfService.putSelf({assets, picture: []} as any);
-      return await this.userUpdate({user: {assets, id: selfUser.id}});
+      return await this.updateUser({user: {assets, id: selfUser.id}});
     } catch (error) {
       throw new Error(`Error during profile image upload: ${error.message || error.code || error}`);
     }

@@ -65,6 +65,11 @@ export class UserService {
     await this.storageService.save(this.USER_STORE_NAME, primaryKey, user);
   }
 
+  async updateUser(userId: QualifiedId, updates: Partial<APIClientUser>) {
+    const primaryKey = constructUserPrimaryKey(userId);
+    await this.storageService.update(this.USER_STORE_NAME, primaryKey, updates);
+  }
+
   //##############################################################################
   // Backend interactions
   //##############################################################################
