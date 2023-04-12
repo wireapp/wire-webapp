@@ -398,7 +398,7 @@ export class App {
       const connections = await connectionRepository.getConnections();
       telemetry.addStatistic(AppInitStatisticsValue.CONNECTIONS, connections.length, 50);
 
-      await userRepository.loadUsers(connections, [...teamMembers, selfUser.qualifiedId]);
+      await userRepository.loadUsers(selfUser, connections, teamMembers);
 
       const conversationEntities = await conversationRepository.loadConversations();
 
