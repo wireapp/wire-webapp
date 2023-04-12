@@ -18,6 +18,7 @@
  */
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
+import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -58,7 +59,7 @@ describe('ConnectionRepository', () => {
     it('sets the connection status to cancelled', () => {
       const user = createConnection();
       connectionRepository.addConnectionEntity(user.connection());
-      jest.spyOn(connectionService, 'putConnections').mockResolvedValue({});
+      jest.spyOn(connectionService, 'putConnections').mockResolvedValue({} as any);
       return connectionRepository.cancelRequest(user).then(() => {
         expect(connectionService.putConnections).toHaveBeenCalled();
       });
