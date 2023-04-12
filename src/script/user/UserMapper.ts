@@ -17,13 +17,12 @@
  *
  */
 
-import type {Self as APIClientSelf} from '@wireapp/api-client/lib/self/';
-import type {User as APIClientUser} from '@wireapp/api-client/lib/user/';
 import {container} from 'tsyringe';
 
 import {joaatHash} from 'Util/Crypto';
 import {getLogger, Logger} from 'Util/Logger';
 
+import {isSelfAPIUser} from './UserGuards';
 import {StoredUser} from './UserService';
 import {UserState} from './UserState';
 
@@ -46,18 +45,16 @@ export class UserMapper {
     this.logger = getLogger('UserMapper');
   }
 
-  mapUserFromJson(userData: APIClientUser | APIClientSelf): User {
+  mapUserFromJson(userData: StoredUser): User {
     return this.updateUserFromObject(new User('', ''), userData);
   }
 
-  mapSelfUserFromJson(userData: APIClientSelf | APIClientUser): User {
+  mapSelfUserFromJson(userData: StoredUser): User {
     const userEntity = this.updateUserFromObject(new User('', ''), userData);
     userEntity.isMe = true;
 
-    const dataFromBackend = userData as APIClientSelf;
-
-    if (dataFromBackend.locale) {
-      userEntity.locale = dataFromBackend.locale;
+    if (isSelfAPIUser(userData)) {
+      userEntity.locale = userData.locale;
     }
 
     return userEntity;
@@ -68,7 +65,7 @@ export class UserMapper {
    * @note Return an empty array in any case to prevent crashes.
    * @returns Mapped user entities
    */
-  mapUsersFromJson(usersData: (APIClientSelf | APIClientUser)[]): User[] {
+  mapUsersFromJson(usersData: StoredUser[]): User[] {
     if (usersData?.length) {
       return usersData.filter(userData => userData).map(userData => this.mapUserFromJson(userData));
     }
@@ -91,7 +88,7 @@ export class UserMapper {
     }
 
     const isNewUser = userEntity.id === '' && userData.id !== '';
-    if (isNewUser) {
+    if (isNewUser && userData.id) {
       userEntity.id = userData.id;
       userEntity.joaatHash = joaatHash(userData.id ?? '');
     }
@@ -105,6 +102,11 @@ export class UserMapper {
           : false;
     }
 
+    const isSelf = isSelfAPIUser(userData);
+    const ssoId = isSelf && userData.sso_id;
+    const managedBy = isSelf && userData.managed_by;
+    const phone = isSelf && userData.phone;
+
     const {
       accent_id: accentId,
       availability,
@@ -112,13 +114,10 @@ export class UserMapper {
       deleted,
       email,
       expires_at: expirationDate,
-      managed_by,
       handle,
       name,
-      phone,
       picture,
       service,
-      sso_id: ssoId,
       team: teamId,
     } = userData;
 
@@ -130,13 +129,11 @@ export class UserMapper {
       userEntity.availability(availability);
     }
 
-    const hasAsset = assets?.length;
-    const hasPicture = picture?.length;
     let mappedAssets;
-    if (hasAsset) {
-      mappedAssets = mapProfileAssets(userEntity.qualifiedId, userData.assets);
-    } else if (hasPicture) {
-      mappedAssets = mapProfileAssetsV1(userEntity.id, userData.picture);
+    if (assets?.length) {
+      mappedAssets = mapProfileAssets(userEntity.qualifiedId, assets);
+    } else if (picture?.length) {
+      mappedAssets = mapProfileAssetsV1(userEntity.id, picture);
     }
     updateUserEntityAssets(userEntity, mappedAssets);
 
@@ -144,8 +141,8 @@ export class UserMapper {
       userEntity.email(email);
     }
 
-    if (managed_by !== undefined) {
-      userEntity.managedBy(managed_by);
+    if (managedBy !== undefined) {
+      userEntity.managedBy(managedBy);
     }
 
     if (expirationDate) {
