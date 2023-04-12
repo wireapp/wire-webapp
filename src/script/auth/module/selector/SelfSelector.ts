@@ -28,6 +28,7 @@ const unsetSelf: Self = {
   expires_at: undefined,
   handle: undefined,
   id: undefined,
+  qualified_id: {id: '', domain: ''},
   locale: undefined,
   name: undefined,
   sso_id: undefined,
