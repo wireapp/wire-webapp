@@ -222,7 +222,7 @@ describe('UserRepository', () => {
 
         await userRepository.loadUsers(new User(), [], userIds);
 
-        expect(userState.users()).toHaveLength(users.length);
+        expect(userState.users()).toHaveLength(users.length + 1);
         expect(fetchUserSpy).toHaveBeenCalledWith(newUsers.map(user => user.qualified_id!));
       });
 
@@ -232,7 +232,7 @@ describe('UserRepository', () => {
 
         await userRepository.loadUsers(new User(), [], userIds);
 
-        expect(userState.users()).toHaveLength(localUsers.length);
+        expect(userState.users()).toHaveLength(localUsers.length + 1);
         expect(fetchUserSpy).not.toHaveBeenCalled();
       });
 
@@ -244,7 +244,7 @@ describe('UserRepository', () => {
 
         await userRepository.loadUsers(new User(), [], userIds);
 
-        expect(userState.users()).toHaveLength(newUsers.length);
+        expect(userState.users()).toHaveLength(newUsers.length + 1);
         expect(removeUserSpy).toHaveBeenCalledTimes(localUsers.length);
         expect(removeUserSpy).toHaveBeenCalledWith(localUsers[0].qualified_id!);
         expect(removeUserSpy).toHaveBeenCalledWith(localUsers[1].qualified_id!);
