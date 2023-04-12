@@ -180,7 +180,7 @@ export class UserRepository {
   /**
    * Will load all the users in memory (and save new users to the database).
    */
-  async loadUsers(connections: ConnectionEntity[], extraUsers: QualifiedId[]): Promise<User[]> {
+  async loadUsers(selfUser: User, connections: ConnectionEntity[], extraUsers: QualifiedId[]): Promise<User[]> {
     const users = connections.map(connectionEntity => connectionEntity.userId).concat(extraUsers);
     // TODO migrate old user entries that only have availability
     const localUsers = await this.userService.loadUserFromDb();
@@ -215,7 +215,7 @@ export class UserRepository {
       }
     });
 
-    this.userState.users(mappedUsers);
+    this.userState.users([selfUser, ...mappedUsers]);
     return mappedUsers;
   }
 
