@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [24.3.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@24.3.0...@wireapp/api-client@24.3.1) (2023-04-12)
+
+### Bug Fixes
+
+* Improve detection of valid prekey responses ([#5048](https://github.com/wireapp/wire-web-packages/issues/5048)) ([649796b](https://github.com/wireapp/wire-web-packages/commit/649796b8b99bc6d59ac87eba191e635ccc49190f))
+
 # [24.3.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@24.2.1...@wireapp/api-client@24.3.0) (2023-04-04)
 
 ### Features
