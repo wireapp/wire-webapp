@@ -342,7 +342,7 @@ describe('UserRepository', () => {
       jest.spyOn(userService, 'getUsers').mockResolvedValue({found: [entities.user.jane_roe]});
 
       expect(userRepository.findUserById(user.qualifiedId)?.name()).toBe('initial name');
-      await userRepository.updateUsers([user.qualifiedId]);
+      await userRepository.refreshUsers([user.qualifiedId]);
 
       expect(userRepository.findUserById(user.qualifiedId)?.name()).toBe(entities.user.jane_roe.name);
     });

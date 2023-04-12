@@ -118,7 +118,7 @@ export class UserRepository {
     amplify.subscribe(WebAppEvents.USER.SET_AVAILABILITY, this.setAvailability);
     amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent);
     amplify.subscribe(WebAppEvents.USER.PERSIST, this.saveUserInDb);
-    amplify.subscribe(WebAppEvents.USER.UPDATE, this.updateUser);
+    amplify.subscribe(WebAppEvents.USER.UPDATE, this.refreshUser);
   }
 
   /**
@@ -468,7 +468,7 @@ export class UserRepository {
   /**
    * Get a user from the backend.
    */
-  private async fetchUserById(userId: QualifiedId): Promise<User> {
+  private async fetchUser(userId: QualifiedId): Promise<User> {
     const [userEntity] = await this.fetchUsers([userId]);
     return userEntity;
   }
@@ -596,7 +596,7 @@ export class UserRepository {
     let user = this.findUserById(userId);
     if (!user) {
       try {
-        user = await this.fetchUserById(userId);
+        user = await this.fetchUser(userId);
       } catch (error) {
         const isNotFound = error.type === UserError.TYPE.USER_NOT_FOUND;
         if (!isNotFound) {
@@ -682,12 +682,12 @@ export class UserRepository {
   /**
    * Update a local user from the backend by ID.
    */
-  updateUser = async (userId: QualifiedId): Promise<User> => {
-    const [user] = await this.updateUsers([userId]);
+  refreshUser = async (userId: QualifiedId): Promise<User> => {
+    const [user] = await this.refreshUsers([userId]);
     return user;
   };
 
-  async updateUsers(userIds: QualifiedId[]) {
+  async refreshUsers(userIds: QualifiedId[]) {
     const {found: users} = await this.userService.getUsers(userIds);
     return users.map(user => this.updateSavedUser(user));
   }
