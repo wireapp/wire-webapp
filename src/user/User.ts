@@ -36,7 +36,7 @@ export interface User {
   id: string;
   name: string;
   picture?: Picture[];
-  qualified_id?: QualifiedId;
+  qualified_id: QualifiedId;
   service?: ServiceRef;
   team?: string;
 }
