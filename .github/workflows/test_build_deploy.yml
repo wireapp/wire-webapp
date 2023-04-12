@@ -105,7 +105,7 @@ jobs:
           map: |
             {
               "production": { "prod_env": "wire-webapp-prod" },
-              "staging": { "prod_env": "wire-webapp-staging-al2" }
+              "staging": { "prod_env": "wire-webapp-staging" }
             }
 
       - name: Build
