@@ -343,6 +343,7 @@ export class TeamRepository {
     this.teamState.memberRoles({});
     this.teamState.memberInviters({});
 
+    this.updateMemberRoles(teamEntity, teamMembers);
     return teamMembers
       .filter(({userId}) => userId !== this.userState.self().id)
       .map(memberEntity => ({domain: this.teamState.teamDomain() ?? '', id: memberEntity.userId}));
@@ -581,31 +582,30 @@ export class TeamRepository {
     }
     if (isLocalTeam && !isSelfUser) {
       const member = await this.getTeamMember(teamId, userId);
-      this.updateMemberRoles(this.teamState.team(), member);
+      this.updateMemberRoles(this.teamState.team(), [member]);
     }
   }
 
-  private updateMemberRoles(team: TeamEntity, memberEntities: TeamMemberEntity | TeamMemberEntity[] = []): void {
-    const memberArray = [].concat(memberEntities);
-    memberArray.forEach(member => {
+  private updateMemberRoles(team: TeamEntity, members: TeamMemberEntity[] = []): void {
+    members.forEach(member => {
       const user = team.members().find(({id}) => member.userId === id);
       if (user) {
         this.teamMapper.mapRole(user, member.permissions);
       }
     });
 
-    const memberRoles = memberArray.reduce((accumulator, member) => {
+    const memberRoles = members.reduce((accumulator, member) => {
       accumulator[member.userId] = member.permissions ? roleFromTeamPermissions(member.permissions) : ROLE.INVALID;
       return accumulator;
     }, this.teamState.memberRoles());
 
-    const memberInvites = memberArray.reduce((accumulator, member) => {
+    const memberInvites = members.reduce((accumulator, member) => {
       accumulator[member.userId] = member.invitedBy;
       return accumulator;
     }, this.teamState.memberInviters());
 
     const supportsLegalHold =
-      this.teamState.supportsLegalHold() || memberArray.some(member => member.hasOwnProperty('legalholdStatus'));
+      this.teamState.supportsLegalHold() || members.some(member => member.hasOwnProperty('legalholdStatus'));
     this.teamState.supportsLegalHold(supportsLegalHold);
     this.teamState.memberRoles(memberRoles);
     this.teamState.memberInviters(memberInvites);
