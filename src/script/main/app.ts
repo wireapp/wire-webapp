@@ -392,17 +392,13 @@ export class App {
       onProgress(10);
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
-      const {members} = await teamRepository.initTeam(selfUser.teamId);
+      const {members: teamMembers} = await teamRepository.initTeam(selfUser.teamId);
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_USER_DATA);
 
       const connections = await connectionRepository.getConnections();
       telemetry.addStatistic(AppInitStatisticsValue.CONNECTIONS, connections.length, 50);
 
-      await userRepository.loadUsers([
-        ...members,
-        ...connections.map(connection => connection.userId),
-        selfUser.qualifiedId,
-      ]);
+      await userRepository.loadUsers(connections, [...teamMembers, selfUser.qualifiedId]);
 
       const conversationEntities = await conversationRepository.loadConversations();
 
