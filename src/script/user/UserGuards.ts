@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2021 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,16 +17,10 @@
  *
  */
 
-import ko from 'knockout';
-import {singleton} from 'tsyringe';
+import type {Self as SelfAPIUser} from '@wireapp/api-client/lib/self';
 
-import {ConnectionEntity} from './ConnectionEntity';
+import {StoredUser} from './UserService';
 
-@singleton()
-export class ConnectionState {
-  public readonly connections: ko.ObservableArray<ConnectionEntity>;
-
-  constructor() {
-    this.connections = ko.observableArray();
-  }
+export function isSelfAPIUser(payload: Partial<StoredUser>): payload is SelfAPIUser {
+  return 'locale' in payload;
 }

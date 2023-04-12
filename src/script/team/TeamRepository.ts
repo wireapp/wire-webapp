@@ -31,6 +31,7 @@ import {TEAM_EVENT} from '@wireapp/api-client/lib/event/TeamEvent';
 import type {FeatureList} from '@wireapp/api-client/lib/team/feature/';
 import {FeatureStatus, FEATURE_KEY, SelfDeletingTimeout} from '@wireapp/api-client/lib/team/feature/';
 import type {TeamData} from '@wireapp/api-client/lib/team/team/TeamData';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
@@ -121,14 +122,17 @@ export class TeamRepository {
     );
   };
 
-  initTeam = async (teamId?: string): Promise<TeamEntity | undefined> => {
+  initTeam = async (
+    teamId?: string,
+  ): Promise<{team: TeamEntity; members: QualifiedId[]} | {team: undefined; members: never[]}> => {
     const team = await this.getTeam();
     await this.updateFeatureConfig();
-    if (teamId) {
-      await this.updateTeamMembers(team);
-      this.scheduleTeamRefresh();
+    if (!teamId) {
+      return {team: undefined, members: []};
     }
-    return teamId ? team : undefined;
+    const members = await this.loadTeamMembers(team);
+    this.scheduleTeamRefresh();
+    return {team, members};
   };
 
   private async updateFeatureConfig() {
@@ -163,7 +167,7 @@ export class TeamRepository {
 
   async getTeamMember(teamId: string, userId: string): Promise<TeamMemberEntity> {
     const memberResponse = await this.teamService.getTeamMember(teamId, userId);
-    return this.teamMapper.mapMemberFromObject(memberResponse);
+    return this.teamMapper.mapMember(memberResponse);
   }
 
   async getSelfMember(teamId: string): Promise<TeamMemberEntity> {
@@ -172,11 +176,12 @@ export class TeamRepository {
     return memberEntity;
   }
 
-  async getAllTeamMembers(teamId: string): Promise<TeamMemberEntity[] | void> {
+  private async getAllTeamMembers(teamId: string): Promise<TeamMemberEntity[]> {
     const {members, hasMore} = await this.teamService.getAllTeamMembers(teamId);
     if (!hasMore && members.length) {
-      return this.teamMapper.mapMemberFromArray(members);
+      return this.teamMapper.mapMembers(members);
     }
+    return [];
   }
 
   async conversationHasGuestLinkEnabled(conversationId: string): Promise<boolean> {
@@ -311,7 +316,7 @@ export class TeamRepository {
     }
 
     const members = await this.teamService.getTeamMembersByIds(teamId, memberIds);
-    const mappedMembers = this.teamMapper.mapMemberFromArray(members);
+    const mappedMembers = this.teamMapper.mapMembers(members);
     const selfId = this.userState.self().id;
     memberIds = mappedMembers.map(member => member.userId).filter(id => id !== selfId);
 
@@ -333,20 +338,15 @@ export class TeamRepository {
     this.updateMemberRoles(teamEntity, mappedMembers);
   }
 
-  async updateTeamMembers(teamEntity: TeamEntity): Promise<void> {
+  private async loadTeamMembers(teamEntity: TeamEntity): Promise<QualifiedId[]> {
     const teamMembers = await this.getAllTeamMembers(teamEntity.id);
-    if (teamMembers) {
-      this.teamState.memberRoles({});
-      this.teamState.memberInviters({});
+    this.teamState.memberRoles({});
+    this.teamState.memberInviters({});
 
-      const memberIds = teamMembers
-        .filter(({userId}) => userId !== this.userState.self().id)
-        .map(memberEntity => ({domain: this.teamState.teamDomain(), id: memberEntity.userId}));
-
-      const userEntities = await this.userRepository.getUsersById(memberIds);
-      teamEntity.members(userEntities);
-      this.updateMemberRoles(teamEntity, teamMembers);
-    }
+    this.updateMemberRoles(teamEntity, teamMembers);
+    return teamMembers
+      .filter(({userId}) => userId !== this.userState.self().id)
+      .map(memberEntity => ({domain: this.teamState.teamDomain() ?? '', id: memberEntity.userId}));
   }
 
   private addUserToTeam(userEntity: User): void {
@@ -390,7 +390,7 @@ export class TeamRepository {
       this.userRepository
         .getUserById({domain: this.userState.self().domain, id: userId})
         .then(userEntity => this.addUserToTeam(userEntity));
-      this.getTeamMember(teamId, userId).then(member => this.updateMemberRoles(this.teamState.team(), member));
+      this.getTeamMember(teamId, userId).then(member => this.updateMemberRoles(this.teamState.team(), [member]));
     }
   }
 
@@ -582,31 +582,30 @@ export class TeamRepository {
     }
     if (isLocalTeam && !isSelfUser) {
       const member = await this.getTeamMember(teamId, userId);
-      this.updateMemberRoles(this.teamState.team(), member);
+      this.updateMemberRoles(this.teamState.team(), [member]);
     }
   }
 
-  private updateMemberRoles(team: TeamEntity, memberEntities: TeamMemberEntity | TeamMemberEntity[] = []): void {
-    const memberArray = [].concat(memberEntities);
-    memberArray.forEach(member => {
+  private updateMemberRoles(team: TeamEntity, members: TeamMemberEntity[] = []): void {
+    members.forEach(member => {
       const user = team.members().find(({id}) => member.userId === id);
       if (user) {
         this.teamMapper.mapRole(user, member.permissions);
       }
     });
 
-    const memberRoles = memberArray.reduce((accumulator, member) => {
+    const memberRoles = members.reduce((accumulator, member) => {
       accumulator[member.userId] = member.permissions ? roleFromTeamPermissions(member.permissions) : ROLE.INVALID;
       return accumulator;
     }, this.teamState.memberRoles());
 
-    const memberInvites = memberArray.reduce((accumulator, member) => {
+    const memberInvites = members.reduce((accumulator, member) => {
       accumulator[member.userId] = member.invitedBy;
       return accumulator;
     }, this.teamState.memberInviters());
 
     const supportsLegalHold =
-      this.teamState.supportsLegalHold() || memberArray.some(member => member.hasOwnProperty('legalholdStatus'));
+      this.teamState.supportsLegalHold() || members.some(member => member.hasOwnProperty('legalholdStatus'));
     this.teamState.supportsLegalHold(supportsLegalHold);
     this.teamState.memberRoles(memberRoles);
     this.teamState.memberInviters(memberInvites);

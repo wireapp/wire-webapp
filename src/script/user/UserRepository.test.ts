@@ -25,6 +25,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {entities} from 'test/api/payloads';
 import {TestFactory} from 'test/helper/TestFactory';
+import {generateAPIUser} from 'test/helper/UserGenerator';
 
 import {ConsentValue} from './ConsentValue';
 import {UserRepository} from './UserRepository';
@@ -204,6 +205,53 @@ describe('UserRepository', () => {
       });
     });
 
+    describe('loadUsers', () => {
+      const localUsers = [generateAPIUser(), generateAPIUser(), generateAPIUser()];
+      //const connections = [new ConnectionEntity()];
+      beforeEach(async () => {
+        jest.resetAllMocks();
+        userState.users.removeAll();
+        jest.spyOn(userRepository['userService'], 'loadUserFromDb').mockResolvedValue(localUsers);
+      });
+
+      it('loads all users from backend if no users are stored locally', async () => {
+        const newUsers = [generateAPIUser(), generateAPIUser()];
+        const users = [...localUsers, ...newUsers];
+        const userIds = users.map(user => user.qualified_id!);
+        const fetchUserSpy = jest.spyOn(userRepository['userService'], 'getUsers').mockResolvedValue({found: newUsers});
+
+        await userRepository.loadUsers([], userIds);
+
+        expect(userState.users()).toHaveLength(users.length);
+        expect(fetchUserSpy).toHaveBeenCalledWith(newUsers.map(user => user.qualified_id!));
+      });
+
+      it('does not load users from backend if they are already in database', async () => {
+        const userIds = localUsers.map(user => user.qualified_id!);
+        const fetchUserSpy = jest.spyOn(userRepository['userService'], 'getUsers').mockResolvedValue({found: []});
+
+        await userRepository.loadUsers([], userIds);
+
+        expect(userState.users()).toHaveLength(localUsers.length);
+        expect(fetchUserSpy).not.toHaveBeenCalled();
+      });
+
+      it('deletes users that are not needed', async () => {
+        const newUsers = [generateAPIUser(), generateAPIUser()];
+        const userIds = newUsers.map(user => user.qualified_id!);
+        const removeUserSpy = jest.spyOn(userRepository['userService'], 'removeUserFromDb').mockResolvedValue();
+        jest.spyOn(userRepository['userService'], 'getUsers').mockResolvedValue({found: newUsers});
+
+        await userRepository.loadUsers([], userIds);
+
+        expect(userState.users()).toHaveLength(newUsers.length);
+        expect(removeUserSpy).toHaveBeenCalledTimes(localUsers.length);
+        expect(removeUserSpy).toHaveBeenCalledWith(localUsers[0].qualified_id!);
+        expect(removeUserSpy).toHaveBeenCalledWith(localUsers[1].qualified_id!);
+        expect(removeUserSpy).toHaveBeenCalledWith(localUsers[2].qualified_id!);
+      });
+    });
+
     describe('assignAllClients', () => {
       let userJaneRoe: User;
       let userJohnDoe: User;
@@ -294,7 +342,7 @@ describe('UserRepository', () => {
       jest.spyOn(userService, 'getUsers').mockResolvedValue({found: [entities.user.jane_roe]});
 
       expect(userRepository.findUserById(user.qualifiedId)?.name()).toBe('initial name');
-      await userRepository.updateUsers([user.qualifiedId]);
+      await userRepository.refreshUsers([user.qualifiedId]);
 
       expect(userRepository.findUserById(user.qualifiedId)?.name()).toBe(entities.user.jane_roe.name);
     });

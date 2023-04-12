@@ -242,10 +242,6 @@ export class User {
     return this.isFederated ? `@${this.username()}@${this.domain}` : `@${this.username()}`;
   }
 
-  subscribeToChanges(): void {
-    this.availability.subscribe(() => amplify.publish(WebAppEvents.USER.PERSIST, this));
-  }
-
   addClient(new_client_et: ClientEntity): boolean {
     for (const client_et of this.devices()) {
       if (client_et.id === new_client_et.id) {

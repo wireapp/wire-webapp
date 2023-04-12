@@ -62,40 +62,30 @@ export class TeamMapper {
     }
   }
 
-  mapMemberFromArray(membersData: MemberData[]): TeamMemberEntity[] {
-    return membersData.map(data => this.updateMemberFromObject(data));
+  mapMembers(membersData: MemberData[]): TeamMemberEntity[] {
+    return membersData.map(data => this.mapMember(data));
   }
 
-  mapMemberFromObject(data: MemberData): TeamMemberEntity {
-    return this.updateMemberFromObject(data);
+  mapMember(data: MemberData): TeamMemberEntity {
+    const {created_by, permissions, user = '', legalhold_status} = data;
+    const member = new TeamMemberEntity(user);
+    if (created_by) {
+      member.invitedBy = created_by;
+    }
+    if (permissions) {
+      member.permissions = permissions;
+    }
+    if (legalhold_status) {
+      member.legalholdStatus = legalhold_status;
+    }
+
+    return member;
   }
 
   mapRole(userEntity: User, permissions?: PermissionsData): void {
     if (permissions) {
       const teamRole = roleFromTeamPermissions(permissions);
       userEntity.teamRole(teamRole);
-    }
-  }
-
-  updateMemberFromObject(): void;
-  updateMemberFromObject(memberData: MemberData, memberEntity?: TeamMemberEntity): TeamMemberEntity;
-  updateMemberFromObject(memberData?: MemberData, memberEntity = new TeamMemberEntity()): TeamMemberEntity | void {
-    if (memberData) {
-      const {created_by, permissions, user, legalhold_status} = memberData;
-      if (created_by) {
-        memberEntity.invitedBy = created_by;
-      }
-      if (permissions) {
-        memberEntity.permissions = permissions;
-      }
-      if (legalhold_status) {
-        memberEntity.legalholdStatus = legalhold_status;
-      }
-      if (user) {
-        memberEntity.userId = user;
-      }
-
-      return memberEntity;
     }
   }
 }

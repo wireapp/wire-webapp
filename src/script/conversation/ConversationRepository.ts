@@ -461,7 +461,7 @@ export class ConversationRepository {
     if (!unavailableUsers.length) {
       return;
     }
-    await this.userRepository.updateUsers(unavailableUsers.map(user => user.qualifiedId));
+    await this.userRepository.refreshUsers(unavailableUsers.map(user => user.qualifiedId));
   }
 
   /**

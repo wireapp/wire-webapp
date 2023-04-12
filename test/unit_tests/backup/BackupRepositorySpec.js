@@ -199,7 +199,7 @@ describe('BackupRepository', () => {
       };
 
       const connectionState = {
-        connectionEntities: jest.fn().mockImplementation(() => []),
+        connections: jest.fn().mockImplementation(() => []),
       };
 
       const clientState = {
