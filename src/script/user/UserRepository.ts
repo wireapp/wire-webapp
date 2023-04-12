@@ -75,6 +75,16 @@ import type {PropertiesRepository} from '../properties/PropertiesRepository';
 import type {SelfService} from '../self/SelfService';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 
+function generateQualifiedId(userData: {id: string; qualified_id?: QualifiedId; domain?: string}): QualifiedId {
+  if (userData.qualified_id) {
+    return userData.qualified_id;
+  }
+  return {
+    domain: userData.domain ?? '',
+    id: userData.id,
+  };
+}
+
 interface UserAvailabilityEvent {
   data: {availability: Availability.Type};
   from: string;
@@ -133,7 +143,7 @@ export class UserRepository {
         break;
       case USER_EVENT.UPDATE:
         const user = eventJson.user;
-        const userId = user.qualified_id || {id: user.id, domain: ''};
+        const userId = generateQualifiedId(user);
         await this.updateUser(userId, user, source === EventRepository.SOURCE.WEB_SOCKET);
         break;
       case USER.AVAILABILITY:
@@ -502,11 +512,10 @@ export class UserRepository {
   }
 
   private mapUserResponse(found: APIClientUser[], failed: QualifiedId[]): User[] {
-    const failedToLoad = failed.map(userId => {
-      /* When a federated backend is unreachable, we generate placeholder users locally with some default values
-       */
-      return new User(userId.id, userId.domain);
-    });
+    const failedToLoad = failed.map(
+      /* When a federated backend is unreachable, we generate placeholder users locally with some default values */
+      userId => new User(userId.id, userId.domain),
+    );
     const mappedUsers = this.userMapper.mapUsersFromJson(found).concat(failedToLoad);
     if (this.userState.isTeam()) {
       this.mapGuestStatus(mappedUsers);
@@ -688,7 +697,7 @@ export class UserRepository {
    * @param user user data from backend
    */
   private updateSavedUser(user: APIClientUser): User {
-    const localUserEntity = this.findUserById(user.qualified_id ?? {id: user.id, domain: ''}) ?? new User();
+    const localUserEntity = this.findUserById(generateQualifiedId(user)) ?? new User();
     const updatedUser = this.userMapper.updateUserFromObject(localUserEntity, user);
     // TODO update the user in db
     if (this.userState.isTeam()) {
