@@ -124,7 +124,7 @@ export class UserRepository {
   /**
    * Listener for incoming user events.
    */
-  private readonly onUserEvent = async (eventJson: UserEvent | UserAvailabilityEvent, source: EventSource): void => {
+  private readonly onUserEvent = async (eventJson: UserEvent | UserAvailabilityEvent, source: EventSource) => {
     this.logger.info(`User Event: '${eventJson.type}' (Source: ${source})`);
 
     switch (eventJson.type) {
@@ -207,14 +207,6 @@ export class UserRepository {
 
     this.userState.users(mappedUsers);
     return mappedUsers;
-
-    users.forEach(user => {
-      const userAvailability = localUsers.find(availability => matchQualifiedIds(availability, user));
-      if (userAvailability) {
-        user.availability(userAvailability.availability);
-      }
-      user.subscribeToChanges();
-    });
   }
 
   /**
@@ -739,7 +731,7 @@ export class UserRepository {
    */
   async changeAccentColor(accentId: AccentColor.AccentColorID): Promise<User> {
     await this.selfService.putSelf({accent_id: accentId} as any);
-    return this.updateUser({user: {accent_id: accentId, id: this.userState.self().id}});
+    return this.updateUser(this.userState.self().qualifiedId, {accent_id: accentId});
   }
 
   /**
@@ -747,7 +739,7 @@ export class UserRepository {
    */
   async changeName(name: string): Promise<User> {
     await this.selfService.putSelf({name});
-    return this.updateUser({user: {id: this.userState.self().id, name}});
+    return this.updateUser(this.userState.self().qualifiedId, {name});
   }
 
   async changeEmail(email: string): Promise<void> {
@@ -761,7 +753,7 @@ export class UserRepository {
     if (username.length >= UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH) {
       try {
         await this.selfService.putSelfHandle(username);
-        return await this.updateUser({user: {handle: username, id: this.userState.self().id}});
+        return await this.updateUser(this.userState.self().qualifiedId, {handle: username});
       } catch (error) {
         if ([HTTP_STATUS.CONFLICT, HTTP_STATUS.BAD_REQUEST].includes(error.code)) {
           throw new UserError(UserError.TYPE.USERNAME_TAKEN, UserError.MESSAGE.USERNAME_TAKEN);
@@ -808,7 +800,7 @@ export class UserRepository {
         {domain: mediumImageKey.domain, key: mediumImageKey.key, size: APIClientUserAssetType.COMPLETE, type: 'image'},
       ];
       await this.selfService.putSelf({assets, picture: []} as any);
-      return await this.updateUser({user: {assets, id: selfUser.id}});
+      return await this.updateUser(selfUser.qualifiedId, {assets});
     } catch (error) {
       throw new Error(`Error during profile image upload: ${error.message || error.code || error}`);
     }

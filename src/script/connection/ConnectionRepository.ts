@@ -77,7 +77,7 @@ export class ConnectionRepository {
    * @param eventJson JSON data for event
    * @param source Source of event
    */
-  private readonly onUserEvent = (eventJson: UserConnectionEvent, source: EventSource): void => {
+  private readonly onUserEvent = async (eventJson: UserConnectionEvent, source: EventSource) => {
     const eventType = eventJson.type;
 
     const isSupportedType = ConnectionRepository.CONFIG.SUPPORTED_EVENTS.includes(eventType);
@@ -86,7 +86,7 @@ export class ConnectionRepository {
 
       const isUserConnection = eventType === USER_EVENT.CONNECTION;
       if (isUserConnection) {
-        this.onUserConnection(eventJson, source);
+        await this.onUserConnection(eventJson, source);
       }
     }
   };
@@ -210,8 +210,8 @@ export class ConnectionRepository {
   /**
    * Get a connection for a user ID.
    */
-  private getConnectionByUserId(userId: QualifiedId): ConnectionEntity {
-    return this.connectionState.connections()[userId.id];
+  private getConnectionByUserId(userId: QualifiedId): ConnectionEntity | undefined {
+    return this.connectionState.connections().find(connection => matchQualifiedIds(connection.userId, userId));
   }
 
   /**
@@ -260,8 +260,8 @@ export class ConnectionRepository {
     return this.updateStatus(userEntity, ConnectionStatus.ACCEPTED);
   }
 
-  addConnectionEntity(connectionEntity: ConnectionEntity): void {
-    this.connectionState.connections()[connectionEntity.userId.id] = connectionEntity;
+  addConnectionEntity(connection: ConnectionEntity): void {
+    this.connectionState.connections().push(connection);
   }
 
   /**
@@ -273,21 +273,6 @@ export class ConnectionRepository {
     // TODO(Federation): Update code once connections are implemented on the backend
     const userEntity = await this.userRepository.getUserById(connectionEntity.userId);
     return userEntity.connection(connectionEntity);
-  }
-
-  /**
-   * Update users matching the given connections.
-   * @returns Promise that resolves when all connections have been updated
-   */
-  private async updateConnections(connectionEntities: ConnectionEntity[]): Promise<ConnectionEntity[]> {
-    const updatedConnections = connectionEntities.reduce((allConnections, connectionEntity) => {
-      allConnections[connectionEntity.userId.id] = connectionEntity;
-      return allConnections;
-    }, this.connectionState.connections());
-
-    this.connectionState.connections(updatedConnections);
-    await this.userRepository.updateUsersFromConnections(connectionEntities);
-    return Object.values(this.connectionState.connections());
   }
 
   /**
