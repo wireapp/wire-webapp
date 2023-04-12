@@ -516,7 +516,11 @@ export class UserRepository {
        */
       return new User(userId.id, userId.domain);
     });
-    return this.userMapper.mapUsersFromJson(found).concat(failedToLoad);
+    const mappedUsers = this.userMapper.mapUsersFromJson(found).concat(failedToLoad);
+    if (this.userState.isTeam()) {
+      this.mapGuestStatus(mappedUsers);
+    }
+    return mappedUsers;
   }
 
   /**
@@ -528,9 +532,6 @@ export class UserRepository {
   private async fetchUsers(userIds: QualifiedId[]): Promise<User[]> {
     const {found, failed} = await this.fetchRawUsers(userIds);
     const users = this.mapUserResponse(found, failed);
-    if (this.userState.isTeam()) {
-      this.mapGuestStatus(users);
-    }
     let fetchedUserEntities = this.saveUsers(users);
     // If there is a difference then we most likely have a case with a suspended user
     const isAllUserIds = userIds.length === fetchedUserEntities.length;
@@ -818,7 +819,7 @@ export class UserRepository {
     const selfTeamId = this.userState.self().teamId;
     userEntities.forEach(userEntity => {
       if (!userEntity.isMe) {
-        const isTeamMember = this.userState.teamMembers().some(teamMember => teamMember.id === userEntity.id);
+        const isTeamMember = selfTeamId === userEntity.teamId;
         const isGuest = !userEntity.isService && !isTeamMember && selfTeamId !== userEntity.teamId;
         userEntity.isGuest(isGuest);
         userEntity.isTeamMember(isTeamMember);
