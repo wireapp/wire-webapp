@@ -54,7 +54,7 @@ import {valueFromType} from './AvailabilityMapper';
 import {showAvailabilityModal} from './AvailabilityModal';
 import {ConsentValue} from './ConsentValue';
 import {UserMapper} from './UserMapper';
-import type {UserService} from './UserService';
+import type {StoredUser, UserService} from './UserService';
 import {UserState} from './UserState';
 
 import {mapProfileAssetsV1} from '../assets/AssetMapper';
@@ -124,7 +124,7 @@ export class UserRepository {
   /**
    * Listener for incoming user events.
    */
-  private readonly onUserEvent = (eventJson: UserEvent | UserAvailabilityEvent, source: EventSource): void => {
+  private readonly onUserEvent = async (eventJson: UserEvent | UserAvailabilityEvent, source: EventSource): void => {
     this.logger.info(`User Event: '${eventJson.type}' (Source: ${source})`);
 
     switch (eventJson.type) {
@@ -132,10 +132,17 @@ export class UserRepository {
         this.userDelete(eventJson);
         break;
       case USER_EVENT.UPDATE:
-        this.updateUser(eventJson, source === EventRepository.SOURCE.WEB_SOCKET);
+        const user = eventJson.user;
+        const userId = user.qualified_id || {id: user.id, domain: ''};
+        await this.updateUser(userId, user, source === EventRepository.SOURCE.WEB_SOCKET);
         break;
       case USER.AVAILABILITY:
-        this.onUserAvailability(eventJson);
+        const {from, data, fromDomain} = eventJson;
+        const updates = {
+          id: from,
+          availability: data.availability,
+        };
+        await this.updateUser({id: from, domain: fromDomain ?? ''}, updates);
         break;
       case USER_EVENT.LEGAL_HOLD_REQUEST: {
         this.onLegalHoldRequest(eventJson);
@@ -241,24 +248,12 @@ export class UserRepository {
   }
 
   /**
-   * Event to update availability of a user.
+   * Will update the user both in database and in memory.
    */
-  private async onUserAvailability({from, data, fromDomain}: UserAvailabilityEvent): void {
-    if (this.userState.isTeam()) {
-      await this.getUserById({domain: fromDomain, id: from}).then(userEntity =>
-        userEntity.availability(data.availability),
-      );
-    }
-  }
-
-  /**
-   * Event to update the matching user.
-   */
-  private async updateUser({user}: {user: Partial<APIClientUser> & {id: string}}, isWebSocket = false): Promise<User> {
+  private async updateUser(userId: QualifiedId, user: Partial<StoredUser>, isWebSocket = false): Promise<User> {
     const selfUser = this.userState.self();
-    const qualifiedId = user.qualified_id || {domain: selfUser.domain, id: user.id};
-    const isSelfUser = user.id === selfUser.id;
-    const userEntity = isSelfUser ? selfUser : await this.getUserById(qualifiedId);
+    const isSelfUser = matchQualifiedIds(userId, selfUser.qualifiedId);
+    const userEntity = isSelfUser ? selfUser : await this.getUserById(userId);
 
     if (isWebSocket && user.name) {
       user.name = fixWebsocketString(user.name);
@@ -266,7 +261,7 @@ export class UserRepository {
 
     this.userMapper.updateUserFromObject(userEntity, user);
     // Update the database record
-    await this.userService.updateUser(qualifiedId, user);
+    await this.userService.updateUser(userEntity.qualifiedId, user);
     if (isSelfUser) {
       amplify.publish(WebAppEvents.TEAM.UPDATE_INFO);
     }

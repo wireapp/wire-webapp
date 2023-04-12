@@ -18,6 +18,7 @@
  */
 
 import type {User as APIClientUser, QualifiedHandle, QualifiedId} from '@wireapp/api-client/lib/user/';
+import {AvailabilityType} from '@wireapp/core/lib/broadcast';
 import {container} from 'tsyringe';
 
 import {APIClient} from '../service/APIClientSingleton';
@@ -25,7 +26,7 @@ import {StorageSchemata} from '../storage/StorageSchemata';
 import {StorageService} from '../storage/StorageService';
 import {constructUserPrimaryKey} from '../util/StorageUtil';
 
-type StoredUser = APIClientUser;
+export type StoredUser = APIClientUser & {availability?: AvailabilityType};
 
 export class UserService {
   private readonly USER_STORE_NAME: string;

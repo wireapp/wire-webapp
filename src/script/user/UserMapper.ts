@@ -24,6 +24,7 @@ import {container} from 'tsyringe';
 import {joaatHash} from 'Util/Crypto';
 import {getLogger, Logger} from 'Util/Logger';
 
+import {StoredUser} from './UserService';
 import {UserState} from './UserState';
 
 import {mapProfileAssets, mapProfileAssetsV1, updateUserEntityAssets} from '../assets/AssetMapper';
@@ -82,7 +83,7 @@ export class UserMapper {
    * @param userData Updated user data from backend
    * @todo Pass in "serverTimeHandler", so that it can be removed from the "UserMapper" constructor
    */
-  updateUserFromObject(userEntity: User, userData: Partial<APIClientUser | APIClientSelf>): User {
+  updateUserFromObject(userEntity: User, userData: Partial<StoredUser>): User {
     // We are trying to update non-matching users
     const isUnexpectedId = userEntity.id !== '' && userData.id !== userEntity.id;
     if (isUnexpectedId) {
@@ -106,6 +107,7 @@ export class UserMapper {
 
     const {
       accent_id: accentId,
+      availability,
       assets,
       deleted,
       email,
@@ -118,10 +120,14 @@ export class UserMapper {
       service,
       sso_id: ssoId,
       team: teamId,
-    } = userData as APIClientSelf;
+    } = userData;
 
     if (accentId) {
       userEntity.accent_id(accentId);
+    }
+
+    if (availability) {
+      userEntity.availability(availability);
     }
 
     const hasAsset = assets?.length;
