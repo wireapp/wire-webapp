@@ -20,8 +20,6 @@
 import type {User as APIClientUser, QualifiedHandle, QualifiedId} from '@wireapp/api-client/lib/user/';
 import {container} from 'tsyringe';
 
-import {Logger, getLogger} from 'Util/Logger';
-
 import {APIClient} from '../service/APIClientSingleton';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {StorageService} from '../storage/StorageService';
@@ -30,14 +28,12 @@ import {constructUserPrimaryKey} from '../util/StorageUtil';
 type StoredUser = APIClientUser;
 
 export class UserService {
-  private readonly logger: Logger;
   private readonly USER_STORE_NAME: string;
 
   constructor(
     private readonly storageService = container.resolve(StorageService),
     private readonly apiClient = container.resolve(APIClient),
   ) {
-    this.logger = getLogger('UserService');
     this.USER_STORE_NAME = StorageSchemata.OBJECT_STORE.USERS;
   }
 

@@ -163,26 +163,23 @@ export class UserRepository {
   /**
    * Will load all the users in memory (and save new users to the database).
    */
-  async loadUsers(users: QualifiedId[]): Promise<void> {
-    if (!users.length) {
-      return;
-    }
-
+  async loadUsers(users: QualifiedId[]): Promise<User[]> {
     // TODO migrate old user entries that only have availability
     const localUsers = await this.userService.loadUserFromDb();
 
     /** users we have in the DB that are not matching any loaded users */
-    const orphanDBEntries = localUsers.filter(
+    const [orphanUsers, liveUsers] = partition(
+      localUsers,
       localUser => !users.find(user => matchQualifiedIds(user, localUser.qualified_id)),
     );
 
     // Remove users that are not linked to any loaded users
-    orphanDBEntries.forEach(async availability => {
-      await this.userService.removeUserFromDb({id: availability.id, domain: availability.domain ?? ''});
+    orphanUsers.forEach(async user => {
+      await this.userService.removeUserFromDb(user.qualified_id);
     });
 
     const missingUsers = users.filter(
-      user => !localUsers.find(availability => matchQualifiedIds(user, availability.qualified_id)),
+      user => !liveUsers.find(localUser => matchQualifiedIds(user, localUser.qualified_id)),
     );
 
     const {found, failed} = await this.fetchRawUsers(missingUsers);
@@ -190,7 +187,7 @@ export class UserRepository {
     // Save all new users to the database
     await Promise.all(found.map(user => this.saveUserInDb(user)));
 
-    const mappedUsers = this.mapUserResponse(found.concat(localUsers), failed);
+    const mappedUsers = this.mapUserResponse(found.concat(liveUsers), failed);
     this.userState.users(mappedUsers);
     return mappedUsers;
 
@@ -519,10 +516,6 @@ export class UserRepository {
    * @param raw - if true, the users will not be mapped to User entities
    */
   private async fetchUsers(userIds: QualifiedId[]): Promise<User[]> {
-    if (!userIds.length) {
-      return [];
-    }
-
     const {found, failed} = await this.fetchRawUsers(userIds);
     const users = this.mapUserResponse(found, failed);
     if (this.userState.isTeam()) {
@@ -695,6 +688,7 @@ export class UserRepository {
   private updateSavedUser(user: APIClientUser): User {
     const localUserEntity = this.findUserById(user.qualified_id ?? {id: user.id, domain: ''}) ?? new User();
     const updatedUser = this.userMapper.updateUserFromObject(localUserEntity, user);
+    // TODO update the user in db
     if (this.userState.isTeam()) {
       this.mapGuestStatus([updatedUser]);
     }
