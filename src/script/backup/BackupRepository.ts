@@ -68,6 +68,7 @@ export class BackupRepository {
     return {
       FILENAME: {
         CONVERSATIONS: 'conversations.json',
+        USERS: 'users.json',
         EVENTS: 'events.json',
         METADATA: 'export.json',
       },
@@ -243,7 +244,7 @@ export class BackupRepository {
       }));
       await this.importHistoryData(fileDescriptors, initCallback, progressCallback);
     } catch (error) {
-      this.logger.error(`Could not export history: ${error.message}`, error);
+      this.logger.error(`Could not import history: ${error.message}`, error);
       throw error;
     }
   }
