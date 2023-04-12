@@ -52,7 +52,7 @@ type PrekeysResponse = {
   failed_to_list?: QualifiedId[];
 };
 function isPrekeysResponse(object: any): object is PrekeysResponse {
-  return object.qualified_user_client_prekeys && object.failed_to_list;
+  return object.qualified_user_client_prekeys;
 }
 
 type UsersReponse = {

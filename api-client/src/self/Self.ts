@@ -18,7 +18,7 @@
  */
 
 import {SSOSignature} from '../self/';
-import {QualifiedId, ManagedSource, User} from '../user/';
+import {ManagedSource, User} from '../user/';
 
 export interface Self extends User {
   locale: string;
@@ -28,6 +28,5 @@ export interface Self extends User {
    */
   managed_by?: ManagedSource;
   phone?: string;
-  qualified_id?: QualifiedId;
   sso_id?: SSOSignature;
 }
