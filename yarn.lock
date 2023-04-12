@@ -17025,6 +17025,15 @@ dexie@latest:
   languageName: node
   linkType: hard
 
+"uuidjs@npm:5.0.1":
+  version: 5.0.1
+  resolution: "uuidjs@npm:5.0.1"
+  bin:
+    uuidjs: dist/cli.js
+  checksum: 9e0c45ab2147127465d51ed61ee037015807c37bba4b26dfdb51779533623df038bce33364fe8801c757da68ce88a2187f885f73beb7f4f550f6116cab9558db
+  languageName: node
+  linkType: hard
+
 "v8-compile-cache-lib@npm:^3.0.1":
   version: 3.0.1
   resolution: "v8-compile-cache-lib@npm:3.0.1"
@@ -17670,7 +17679,7 @@ dexie@latest:
     typescript: 5.0.4
     uint32: 0.2.1
     underscore: 1.13.6
-    uuidjs: 4.2.13
+    uuidjs: 5.0.1
     webpack: 5.78.0
     webpack-cli: 5.0.1
     webpack-dev-middleware: 6.0.2
