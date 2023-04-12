@@ -390,7 +390,7 @@ export class TeamRepository {
       this.userRepository
         .getUserById({domain: this.userState.self().domain, id: userId})
         .then(userEntity => this.addUserToTeam(userEntity));
-      this.getTeamMember(teamId, userId).then(member => this.updateMemberRoles(this.teamState.team(), member));
+      this.getTeamMember(teamId, userId).then(member => this.updateMemberRoles(this.teamState.team(), [member]));
     }
   }
 
