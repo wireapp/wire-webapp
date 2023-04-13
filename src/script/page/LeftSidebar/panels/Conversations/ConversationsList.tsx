@@ -53,6 +53,7 @@ interface ConversationsListProps {
   listViewModel: ListViewModel;
   viewStyle: ConversationViewStyle;
   currentFocus: string;
+  resetConversationFocus: () => void;
   handleArrowKeyDown: (index: number) => (e: React.KeyboardEvent) => void;
 }
 
@@ -65,6 +66,7 @@ export const ConversationsList = ({
   conversationRepository,
   callState,
   currentFocus,
+  resetConversationFocus,
   handleArrowKeyDown,
 }: ConversationsListProps) => {
   const {contentState} = useAppState();
@@ -104,6 +106,7 @@ export const ConversationsList = ({
               key={conversation.id}
               isFocused={currentFocus === conversation.id}
               handleArrowKeyDown={handleArrowKeyDown(index)}
+              resetConversationFocus={resetConversationFocus}
               dataUieName="item-conversation"
               conversation={conversation}
               onClick={event => {
@@ -151,7 +154,7 @@ export const ConversationsList = ({
           tabIndex={TabIndex.FOCUSABLE}
           className={`conversation-list-cell ${isShowingConnectionRequests ? 'conversation-list-cell-active' : ''}`}
           onClick={onConnectionRequestClick}
-          onKeyDown={e => handleKeyDown(e, onConnectionRequestClick)}
+          onKeyDown={event => handleKeyDown(event, onConnectionRequestClick)}
         >
           <div className="conversation-list-cell-left">
             {connectRequests.length === 1 ? (
