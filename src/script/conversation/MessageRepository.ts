@@ -772,21 +772,6 @@ export class MessageRepository {
     }
   }
 
-  /**
-   * Toggle like status of message.
-   *
-   * @param conversationEntity Conversation entity
-   * @param message_et Message to react to
-   */
-  public toggleLike(conversationEntity: Conversation, message_et: ContentMessage): void {
-    if (!conversationEntity.removed_from_conversation()) {
-      const reaction = message_et.is_liked() ? ReactionType.NONE : ReactionType.LIKE;
-      message_et.is_liked(!message_et.is_liked());
-
-      window.setTimeout(() => this.sendReactions(conversationEntity, message_et, reaction), 100);
-    }
-  }
-
   public updateUserReactions(reactions: UserReactionMap, userId: string, reaction: ReactionType) {
     const userReactions = reactions[userId] || '';
     const updatedReactions = {...reactions};
@@ -815,7 +800,7 @@ export class MessageRepository {
     userId: string,
   ) {
     if (conversationEntity.removed_from_conversation()) {
-      return;
+      return null;
     }
     const updatedReactions = this.updateUserReactions(message_et.reactions(), userId, reaction);
     return this.sendReactions(conversationEntity, message_et, updatedReactions);

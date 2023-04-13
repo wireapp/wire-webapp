@@ -78,7 +78,6 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
   onClickDetails,
   onClickResetSession,
   onClickCancelRequest,
-  onLike,
   messageRepository,
   messageActions,
   teamState = container.resolve(TeamState),
@@ -136,15 +135,6 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
       });
     }
 
-    if (message.isReactable() && !conversation.removed_from_conversation()) {
-      const label = message.is_liked() ? t('conversationContextMenuUnlike') : t('conversationContextMenuLike');
-
-      entries.push({
-        click: () => onLike(message, false),
-        label,
-      });
-    }
-
     if (canEdit) {
       entries.push({
         click: () => amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.EDIT, message),
@@ -190,7 +180,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
     return entries;
   });
 
-  const handleReactionClick = (reaction: ReactionType) => {
+  const handleReactionClick = (reaction: ReactionType): void => {
     if (!message.isContent()) {
       return;
     }
@@ -206,7 +196,6 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
         hasMarker={hasMarker}
         selfId={selfId}
         isLastDeliveredMessage={isLastDeliveredMessage}
-        onLike={onLike}
         onClickMessage={onClickMessage}
         onClickTimestamp={onClickTimestamp}
         onClickLikes={onClickLikes}

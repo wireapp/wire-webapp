@@ -323,7 +323,6 @@ const MessagesList: FC<MessagesListParams> = ({
                   conversationRepository.getMessagesWithOffset(conversation, messageEntity);
                 }
               }}
-              onLike={message => messageRepository.toggleLike(conversation, message)}
               selfId={selfUser.qualifiedId}
               shouldShowInvitePeople={shouldShowInvitePeople}
               totalMessage={filteredMessagesLength}

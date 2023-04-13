@@ -55,7 +55,6 @@ export interface MessageActions {
   onClickDetails: (message: BaseMessage) => void;
   onClickResetSession: (messageError: DecryptErrorMessage) => void;
   onClickTimestamp: (messageId: string) => void;
-  onLike: (message: ContentMessage, button?: boolean) => void;
 }
 
 export interface MessageParams extends MessageActions {
