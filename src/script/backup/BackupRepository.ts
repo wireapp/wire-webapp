@@ -32,12 +32,12 @@ import {
   IncompatiblePlatformError,
   InvalidMetaDataError,
 } from './Error';
+import {preprocessConversations, preprocessEvents} from './recordPreprocessors';
 
 import {ConnectionState} from '../connection/ConnectionState';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import type {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
-import {ClientEvent} from '../event/Client';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {WebWorker} from '../util/worker';
@@ -67,7 +67,6 @@ export class BackupRepository {
     return {
       FILENAME: {
         CONVERSATIONS: 'conversations.json',
-        USERS: 'users.json',
         EVENTS: 'events.json',
         METADATA: 'export.json',
       },
@@ -135,69 +134,37 @@ export class BackupRepository {
     }
   }
 
-  private async _exportHistory(progressCallback: (tableRows: number) => void): Promise<Record<string, any[]>> {
-    const tables = this.backupService.getTables();
+  private async _exportHistory(progressCallback: (tableRows: number) => void) {
+    const [conversationTable, eventsTable] = this.backupService.getTables();
     const tableData: Record<string, any[]> = {};
 
-    const conversationsData = await this.exportHistoryConversations(tables, progressCallback);
+    function streamProgress<T>(dataProcessor: (data: T[]) => T[]) {
+      return (data: T[]) => {
+        progressCallback(data.length);
+        return dataProcessor(data);
+      };
+    }
+
+    const conversationsData = await this.exportTable(conversationTable, streamProgress(preprocessConversations));
     tableData[StorageSchemata.OBJECT_STORE.CONVERSATIONS] = conversationsData;
-    const eventsData = await this.exportHistoryEvents(tables, progressCallback);
+
+    const eventsData = await this.exportTable(eventsTable, streamProgress(preprocessEvents));
     tableData[StorageSchemata.OBJECT_STORE.EVENTS] = eventsData;
+
     return tableData;
   }
 
-  private exportHistoryConversations(
-    tables: Dexie.Table<any, string>[],
-    progressCallback: (chunkLength: number) => void,
-  ): Promise<any[]> {
-    const conversationsTable = tables.find(table => table.name === StorageSchemata.OBJECT_STORE.CONVERSATIONS);
-    const onProgress = (tableRows: any[], exportedEntitiesCount: number) => {
-      progressCallback(tableRows.length);
-      this.logger.log(`Exported '${exportedEntitiesCount}' conversation states from history`);
-
-      tableRows.forEach(conversation => delete conversation.verification_state);
-    };
-
-    return this.exportHistoryFromTable(conversationsTable, onProgress);
-  }
-
-  private exportHistoryEvents(
-    tables: Dexie.Table<any, string>[],
-    progressCallback: (chunkLength: number) => void,
-  ): Promise<any[]> {
-    const eventsTable = tables.find(table => table.name === StorageSchemata.OBJECT_STORE.EVENTS);
-    const onProgress = (tableRows: any[], exportedEntitiesCount: number) => {
-      progressCallback(tableRows.length);
-      this.logger.log(`Exported '${exportedEntitiesCount}' events from history`);
-
-      for (let index = tableRows.length - 1; index >= 0; index -= 1) {
-        const event = tableRows[index];
-        const isTypeVerification = event.type === ClientEvent.CONVERSATION.VERIFICATION;
-        if (isTypeVerification) {
-          tableRows.splice(index, 1);
-        }
-      }
-    };
-
-    return this.exportHistoryFromTable(eventsTable, onProgress);
-  }
-
-  private async exportHistoryFromTable(
-    table: Dexie.Table<any, string>,
-    onProgress: (tableRows: any[], exportedEntitiesCount: number) => void,
-  ): Promise<any[]> {
-    const tableData: any[] = [];
-    let exportedEntitiesCount = 0;
+  private async exportTable<T>(table: Dexie.Table<T, unknown>, preprocessor: (tableRows: T[]) => T[]): Promise<any[]> {
+    const tableData: T[] = [];
 
     await this.backupService.exportTable(table, tableRows => {
       if (this.isCanceled) {
         throw new CancelError();
       }
-      exportedEntitiesCount += tableRows.length;
-      onProgress(tableRows, exportedEntitiesCount);
-      tableData.push(tableRows);
+      const processedData = preprocessor(tableRows);
+      tableData.push(...processedData);
     });
-    return [].concat(...tableData);
+    return tableData;
   }
 
   private async compressHistoryFiles(user: User, clientId: string, exportedData: Record<string, any>): Promise<Blob> {

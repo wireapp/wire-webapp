@@ -17,17 +17,14 @@
  *
  */
 
-import type {Self as APIClientSelf} from '@wireapp/api-client/lib/self';
 import type {User as APIClientUser, QualifiedHandle, QualifiedId} from '@wireapp/api-client/lib/user';
-import {AvailabilityType} from '@wireapp/core/lib/broadcast';
 import {container} from 'tsyringe';
 
 import {APIClient} from '../service/APIClientSingleton';
+import {UserRecord} from '../storage';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {StorageService} from '../storage/StorageService';
 import {constructUserPrimaryKey} from '../util/StorageUtil';
-
-export type StoredUser = (APIClientUser | APIClientSelf) & {availability?: AvailabilityType};
 
 export class UserService {
   private readonly USER_STORE_NAME: string;
@@ -48,8 +45,8 @@ export class UserService {
    * @todo There might be more keys which are returned by this function
    * @returns Resolves with all the stored user states
    */
-  loadUserFromDb(): Promise<StoredUser[]> {
-    return this.storageService.getAll<StoredUser>(this.USER_STORE_NAME);
+  loadUserFromDb(): Promise<UserRecord[]> {
+    return this.storageService.getAll<UserRecord>(this.USER_STORE_NAME);
   }
 
   async removeUserFromDb(user: {id: string; domain: string}): Promise<void> {
@@ -61,13 +58,13 @@ export class UserService {
    * Saves a user entity in the local database.
    * @returns Resolves with the conversation entity
    */
-  async saveUserInDb(user: StoredUser): Promise<void> {
+  async saveUserInDb(user: UserRecord): Promise<void> {
     const primaryKey = constructUserPrimaryKey(user.qualified_id);
 
     await this.storageService.save(this.USER_STORE_NAME, primaryKey, user);
   }
 
-  async updateUser(userId: QualifiedId, updates: Partial<StoredUser>) {
+  async updateUser(userId: QualifiedId, updates: Partial<UserRecord>) {
     const primaryKey = constructUserPrimaryKey(userId);
     await this.storageService.update(this.USER_STORE_NAME, primaryKey, updates);
   }
