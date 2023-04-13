@@ -21,11 +21,14 @@ import {ClientEvent} from '../event/Client';
 import {ConversationRecord, EventRecord, UserRecord} from '../storage';
 
 export function preprocessEvents(events: EventRecord[]): EventRecord[] {
+  // The verification message are not relevant for a new device (no conversation can be verified on a new device).
   return events.filter(event => event.type !== ClientEvent.CONVERSATION.VERIFICATION);
 }
 
 export function preprocessConversations(conversations: ConversationRecord[]): ConversationRecord[] {
   return conversations.map(conversation => {
+    // On a new device, no conversation can be verified since the device has no verified connections with other users.
+    // We need to delete that property to be sure we don't wrongly display a conversation as verified.
     delete (conversation as any).verification_state;
     return conversation;
   });
@@ -33,6 +36,7 @@ export function preprocessConversations(conversations: ConversationRecord[]): Co
 
 export function preprocessUsers(users: UserRecord[]): UserRecord[] {
   return users.map(user => {
+    // The availability of a user is not relevant for a new device
     delete user.availability;
     return user;
   });
