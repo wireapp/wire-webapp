@@ -184,7 +184,7 @@ export class UserRepository {
     const users = connections.map(connectionEntity => connectionEntity.userId).concat(extraUsers);
     // TODO migrate old user entries that only have availability
     const dbUsers = await this.userService.loadUserFromDb();
-    /* prio to April 2023, we were only storing the availability in the DB, we need to refetch those users */
+    /* prior to April 2023, we were only storing the availability in the DB, we need to refetch those users */
     const [localUsers, incompleteUsers] = partition(dbUsers, user => !!user.qualified_id);
 
     /** users we have in the DB that are not matching any loaded users */
