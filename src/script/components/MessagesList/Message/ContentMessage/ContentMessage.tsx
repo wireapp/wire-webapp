@@ -151,11 +151,6 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
         >
           {headerSenderName}
         </h4>
-        <span className="content-message-timestamp">
-          <MessageTime timestamp={timestamp} className="label-xs" data-timestamp-type="normal">
-            {timeAgo}
-          </MessageTime>
-        </span>
 
         {message.user().isService && (
           <span className="message-header-icon-service">
@@ -196,6 +191,12 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
         {was_edited && (
           <span className="message-header-label-icon icon-edit" title={message.displayEditedTimestamp()}></span>
         )}
+
+        <span className="content-message-timestamp">
+          <MessageTime timestamp={timestamp} className="label-xs" data-timestamp-type="normal">
+            {timeAgo}
+          </MessageTime>
+        </span>
       </div>
     </div>
   ) : null;
