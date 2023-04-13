@@ -187,7 +187,11 @@ export const renderMessage = (message: string, selfId: QualifiedId | null, menti
       link.attrPush(['data-uie-name', 'wire-deep-link']);
     }
     if (link.markup === 'linkify') {
-      nextToken.content = encodeURI(nextToken.content);
+      const displayedLink = removeMentionsHashes(nextToken.content);
+      if (!href.endsWith(`://${displayedLink}`) && href != displayedLink && href != `mailto:${displayedLink}`) {
+        link.attrPush(['data-md-link', 'true']);
+        link.attrPush(['data-uie-name', 'markdown-link']);
+      }
     }
     return self.renderToken(tokens, idx, options);
   };
