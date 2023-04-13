@@ -88,6 +88,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   isMsgElementsFocusable,
   onClickReaction,
 }) => {
+  // check if current message is focused and its elements focusable
   const msgFocusState = useMemo(
     () => isMsgElementsFocusable && isMessageFocused,
     [isMsgElementsFocusable, isMessageFocused],
@@ -131,7 +132,6 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
 
   const timeAgo = useRelativeTimestamp(message.timestamp());
 
-  // check if current message is focused and its elements focusable
   const avatarSection = shouldShowAvatar() ? (
     <div className="message-header">
       <div className="message-header-icon">
