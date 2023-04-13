@@ -17,13 +17,14 @@
  *
  */
 
-importScripts('jimp.min.js');
+// For some reason, Jimp attaches to self, even in Node.
+// https://github.com/jimp-dev/jimp/issues/466
+import * as _Jimp from 'jimp';
 
-/**
- * @typedef {{buffer: ArrayBuffer, useProfileImageSize?: boolean}} Data
- */
+// @ts-ignore
+const Jimp: typeof _Jimp = typeof self !== 'undefined' ? self.Jimp || _Jimp : _Jimp;
 
-self.addEventListener('message', (/** @type {MessageEvent<Data>} */ event) => {
+self.addEventListener('message', event => {
   const COMPRESSION = 80;
   let MAX_SIZE = 1448;
   let MAX_FILE_SIZE = 310 * 1024;
@@ -34,7 +35,7 @@ self.addEventListener('message', (/** @type {MessageEvent<Data>} */ event) => {
   }
 
   // Unfortunately, Jimp doesn't support MIME type "image/webp": https://github.com/oliver-moran/jimp/issues/144
-  Jimp.read(event.data.buffer).then(image => {
+  Jimp.read(event.data.buffer).then(async image => {
     if (event.data.useProfileImageSize) {
       image.cover(MAX_SIZE, MAX_SIZE);
     } else if (image.bitmap.width > MAX_SIZE || image.bitmap.height > MAX_SIZE) {
@@ -45,9 +46,8 @@ self.addEventListener('message', (/** @type {MessageEvent<Data>} */ event) => {
       image.quality(COMPRESSION);
     }
 
-    return image.getBuffer(Jimp.AUTO, (_error, src) => {
-      self.postMessage(src);
-      return self.close();
-    });
+    const buffer = await image.getBufferAsync(image.getMIME());
+    self.postMessage(buffer);
+    return self.close();
   });
 });
