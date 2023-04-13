@@ -25,12 +25,10 @@ import {User} from 'src/script/entity/User';
 import {ContentState} from 'src/script/page/useAppState';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
-import {formatDuration} from 'Util/TimeUtil';
 import {loadFileBuffer} from 'Util/util';
-import {WebWorker} from 'Util/worker';
 
 import {BackupRepository} from '../../backup/BackupRepository';
-import {CancelError, DifferentAccountError, ImportError, IncompatibleBackupError} from '../../backup/Error';
+import {CancelError, DifferentAccountError, IncompatibleBackupError} from '../../backup/Error';
 import {Config} from '../../Config';
 import {MotionDuration} from '../../motion/MotionDuration';
 
@@ -124,26 +122,10 @@ const HistoryImport: FC<HistoryImportProps> = ({user, backupRepository, file, sw
     setHistoryImportState(HistoryImportState.PREPARING);
     setError(null);
 
-    const fileBuffer = await loadFileBuffer(file);
-    const worker = new WebWorker('/worker/jszip-unpack-worker.js');
+    const data = await loadFileBuffer(file);
 
     try {
-      const unzipTimeStart = performance.now();
-      const files = await worker.post<Record<string, Uint8Array>>(fileBuffer);
-      const unzipTimeEnd = performance.now();
-
-      if (files.error) {
-        throw new ImportError(files.error as unknown as string);
-      }
-
-      const unzipTimeMillis = Math.round(unzipTimeEnd - unzipTimeStart);
-      const unzipTimeFormatted = formatDuration(unzipTimeMillis);
-
-      logger.log(
-        `Unzipped '${Object.keys(files).length}' files for history import (took ${unzipTimeFormatted.text}).`,
-        files,
-      );
-      await backupRepository.importHistory(user, files, onInit, onProgress);
+      await backupRepository.importHistory(user, data, onInit, onProgress);
       onSuccess();
     } catch (error) {
       onError(error as Error);

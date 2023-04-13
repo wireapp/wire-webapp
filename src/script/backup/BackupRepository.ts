@@ -22,12 +22,14 @@ import {container} from 'tsyringe';
 
 import {chunk} from 'Util/ArrayUtil';
 import {Logger, getLogger} from 'Util/Logger';
+import {WebWorker} from 'Util/worker';
 
 import {BackupService} from './BackupService';
 import {
   CancelError,
   DifferentAccountError,
   ExportError,
+  ImportError,
   IncompatibleBackupError,
   IncompatiblePlatformError,
   InvalidMetaDataError,
@@ -40,7 +42,6 @@ import type {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {StorageSchemata} from '../storage/StorageSchemata';
-import {WebWorker} from '../util/worker';
 
 export interface Metadata {
   client_id: string;
@@ -62,6 +63,7 @@ export class BackupRepository {
   private readonly conversationRepository: ConversationRepository;
   private readonly logger: Logger;
   private canceled: boolean;
+  private worker: WebWorker;
 
   static get CONFIG() {
     return {
@@ -85,6 +87,7 @@ export class BackupRepository {
     this.conversationRepository = conversationRepository;
 
     this.canceled = false;
+    this.worker = new WebWorker(new Worker(new URL('./zipWorker.ts', import.meta.url)));
   }
 
   public cancelAction(): void {
@@ -184,9 +187,7 @@ export class BackupRepository {
 
     files[BackupRepository.CONFIG.FILENAME.METADATA] = encodedMetadata;
 
-    const worker = new WebWorker('worker/jszip-pack-worker.js');
-
-    const array = await worker.post<Uint8Array>(files);
+    const array = await this.worker.post<Uint8Array>({type: 'zip', files});
     return new Blob([array], {type: 'application/zip'});
   }
 
@@ -196,11 +197,18 @@ export class BackupRepository {
 
   public async importHistory(
     user: User,
-    files: Record<string, Uint8Array>,
+    data: ArrayBuffer,
     initCallback: (numberOfRecords: number) => void,
     progressCallback: (numberProcessed: number) => void,
   ): Promise<void> {
     this.isCanceled = false;
+
+    const files = await this.worker.post<Record<string, Uint8Array>>({type: 'unzip', bytes: data});
+
+    if (files.error) {
+      throw new ImportError(files.error as unknown as string);
+    }
+
     if (!files[BackupRepository.CONFIG.FILENAME.METADATA]) {
       throw new InvalidMetaDataError();
     }
