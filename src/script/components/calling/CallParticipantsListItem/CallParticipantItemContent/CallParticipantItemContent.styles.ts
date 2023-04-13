@@ -31,6 +31,7 @@ export const listItem = (noInteraction = false): CSSObject => ({
 
 export const chevronIcon: CSSObject = {
   border: 'none',
+  background: 'none',
   padding: 0,
   alignItems: 'center',
   display: 'flex',
