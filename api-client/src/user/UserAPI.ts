@@ -30,7 +30,7 @@ import {ClientPreKey, PreKeyBundle} from '../auth/';
 import {VerificationActionType} from '../auth/VerificationActionType';
 import {PublicClient, QualifiedPublicClients} from '../client/';
 import {QualifiedUserClients} from '../conversation/';
-import {BackendError, HttpClient, RequestCancelable, SyntheticErrorLabel} from '../http/';
+import {BackendError, BackendErrorLabel, HttpClient, RequestCancelable, SyntheticErrorLabel} from '../http/';
 import {
   Activate,
   ActivationResponse,
@@ -533,12 +533,43 @@ export class UserAPI {
       method: 'post',
       url: UserAPI.URL.LIST_USERS,
     };
+    try {
+      /**
+       * We expect two differents responses depending on which version of the API the back-end is running
+       * of type UserResponse in the case of a newer back-end
+       * of type User[] in the case of an older back-end
+       */
+      const {data: userData} = await this.client.sendJSON<User[] | UsersReponse>(config);
+      /* If the response is of type UserResponse, the webapp consumes it as is */
+      if (isUsersResponse(userData)) {
+        return userData;
+      }
+      /* If the response is of type User[], we format it in a way that the webapp can consume */
+      return {found: userData};
+    } catch (error: any) {
+      /* We handle errors with the older API by re-fetching users on the same back-end and returning all federated users as "failed" */
+      if (
+        [
+          BackendErrorLabel.FEDERATION_NOT_AVAILABLE,
+          BackendErrorLabel.FEDERATION_BACKEND_NOT_FOUND,
+          BackendErrorLabel.FEDERATION_REMOTE_ERROR,
+          BackendErrorLabel.FEDERATION_TLS_ERROR,
+        ].includes(error.label) &&
+        'qualified_ids' in users
+      ) {
+        const selfDomain = this.backendFeatures.domain;
+        const sameBackendUsers = users.qualified_ids.filter(userId => userId.domain === selfDomain);
+        const federatedUsers = users.qualified_ids.filter(userId => userId.domain !== selfDomain);
 
-    const {data: userData} = await this.client.sendJSON<User[] | UsersReponse>(config);
-    if (isUsersResponse(userData)) {
-      return userData;
+        const {data: sameBackendUserData} = await this.client.sendJSON<User[]>({
+          data: {qualified_ids: sameBackendUsers},
+          method: 'post',
+          url: UserAPI.URL.LIST_USERS,
+        });
+        return {found: sameBackendUserData, failed: federatedUsers};
+      }
+      throw error;
     }
-    return {found: userData};
   }
 
   /**
