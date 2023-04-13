@@ -83,7 +83,6 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   onClickMessage,
   onClickLikes,
   onClickButton,
-  onLike,
   onDiscard,
   onRetry,
   isMsgElementsFocusable,
@@ -297,7 +296,11 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
         )}
       </div>
 
-      <MessageReactionsList reactions={reactions} handleReactionClick={onClickReaction} />
+      <MessageReactionsList
+        reactions={reactions}
+        handleReactionClick={onClickReaction}
+        isMessageFocused={msgFocusState}
+      />
     </div>
   );
 };

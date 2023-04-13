@@ -19,6 +19,7 @@
 
 import {FC, Fragment, useState} from 'react';
 
+import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
 import {getEmojiUnicode, getEmojiTitleFromEmojiUnicode} from 'Util/EmojiUtil';
 import {Reactions, getEmojiUrl, groupByReactionUsers} from 'Util/ReactionUtil';
 
@@ -33,11 +34,13 @@ import {
 export interface MessageReactionsListProps {
   reactions: Reactions;
   handleReactionClick: (emoji: string) => void;
+  isMessageFocused: boolean;
 }
 
-const MessageReactionsList: FC<MessageReactionsListProps> = ({reactions, handleReactionClick}) => {
+const MessageReactionsList: FC<MessageReactionsListProps> = ({reactions, handleReactionClick, isMessageFocused}) => {
   const [isSelectedEmoji, setSelected] = useState('');
   const reactionGroupedByUser = groupByReactionUsers(reactions);
+  const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
   return (
     <div css={messageReactionWrapper}>
       {Array.from(reactionGroupedByUser).map(([emoji, users], index) => {
@@ -52,6 +55,7 @@ const MessageReactionsList: FC<MessageReactionsListProps> = ({reactions, handleR
               aria-label={emojiName}
               aria-pressed={isActive}
               type="button"
+              tabIndex={messageFocusedTabIndex}
               className="button-reset-default"
               onClick={() => {
                 setSelected(emojiUrl);
