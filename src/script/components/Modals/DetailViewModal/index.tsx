@@ -233,9 +233,10 @@ const DetailViewModal: FC<DetailViewModalProps> = ({
     }
   }, []);
 
+  const modalId = 'detail-view';
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent): void => {
-      preventFocusOutside(event, 'detail-view');
+      preventFocusOutside(event, modalId);
     };
     document.addEventListener('keydown', onKeyDown);
     return () => {
@@ -244,7 +245,7 @@ const DetailViewModal: FC<DetailViewModalProps> = ({
   }, []);
 
   return (
-    <div id="detail-view" className={cx('modal detail-view modal-show', {'modal-fadein': isImageVisible})}>
+    <div id={modalId} className={cx('modal detail-view modal-show', {'modal-fadein': isImageVisible})}>
       {messageEntity && conversationEntity && (
         <div
           className={cx('detail-view-content modal-content-anim-close', {
