@@ -30,7 +30,7 @@ export class BackupService {
 
   static get CONFIG() {
     return {
-      BATCH_SIZE: 10_000,
+      BATCH_SIZE: 5_000,
       SUPPORTED_TABLES: [
         StorageSchemata.OBJECT_STORE.CONVERSATIONS,
         StorageSchemata.OBJECT_STORE.EVENTS,
