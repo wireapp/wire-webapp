@@ -144,7 +144,6 @@ const config: ServerConfig = {
       ENABLE_EXTRA_CLIENT_ENTROPY: process.env.FEATURE_ENABLE_EXTRA_CLIENT_ENTROPY == 'true',
       ENABLE_MEDIA_EMBEDS: process.env.FEATURE_ENABLE_MEDIA_EMBEDS != 'false',
       ENABLE_MLS: process.env.FEATURE_ENABLE_MLS == 'true',
-      ENABLE_REACTION: process.env.FEATURE_ENABLE_REACTION == 'true',
       ENABLE_PHONE_LOGIN: process.env.FEATURE_ENABLE_PHONE_LOGIN != 'false',
       ENABLE_PROTEUS_CORE_CRYPTO: process.env.FEATURE_ENABLE_PROTEUS_CORE_CRYPTO == 'true',
       ENABLE_SSO: process.env.FEATURE_ENABLE_SSO == 'true',

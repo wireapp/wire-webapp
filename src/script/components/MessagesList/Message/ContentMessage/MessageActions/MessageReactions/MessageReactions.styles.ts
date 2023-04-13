@@ -41,17 +41,17 @@ import {CSSObject} from '@emotion/react';
 export const messageReactionWrapper: CSSObject = {
   display: 'flex',
   gap: '0.5rem',
-  padding: '0.5rem 0rem',
   paddingLeft: '56px',
 };
 
 export const messageReactionButton: CSSObject = {
-  display: 'inline-flex',
   alignItems: 'center',
-  color: 'var(--white)',
   borderRadius: '4px',
-  padding: '3px',
+  color: 'var(--white)',
+  display: 'inline-flex',
   gap: '4px',
+  margin: '0.5rem 0rem',
+  padding: '3px',
   verticalAlign: 'top',
 };
 
@@ -77,19 +77,20 @@ export const getReactionsButtonCSS = (isActive?: boolean): CSSObject => {
       backgroundColor: 'var(--message-reactions-active-background)',
       color: 'var(--accent-color)',
       outline: 'none',
+
+      '&:focus-visible': {
+        border: '1px solid var(--message-reactions-focus-border)',
+        outline: 'none',
+      },
     };
   }
   return {
-    border: '1px solid var(--message-actions-border)',
-    backgroundColor: 'var(--message-actions-background)',
+    border: '1px solid var(--message-reactions-border)',
+    backgroundColor: 'var(--message-reactions-background)',
     outline: 'none',
 
-    '&:hover': {
-      backgroundColor: 'var(--message-actions-background-hover)',
-      border: '1px solid var(--message-actions-border-hover)',
-    },
     '&:focus-visible': {
-      border: '1px solid var(--accent-color-focus)',
+      border: '1px solid var(--message-reactions-focus-border)',
       outline: 'none',
     },
   };

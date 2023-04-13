@@ -34,7 +34,7 @@ const defaultProps: MessageReactionsProps = {
   handleReactionClick: jest.fn(),
   messageFocusedTabIndex: 0,
   currentMsgActionName: '',
-  toggleActiveMessageAction: jest.fn(),
+  toggleActiveMenu: jest.fn(),
   handleKeyDown: jest.fn(),
   handleCurrentMsgAction: jest.fn(),
   resetActionMenuStates: jest.fn(),

@@ -52,10 +52,9 @@ export interface MessageActions {
   onClickReactionDetails: (message: BaseMessage) => void;
   onClickMessage: (event: MouseEvent | KeyboardEvent, elementType: ElementType, messageDetails: MessageDetails) => void;
   onClickParticipants: (participants: User[]) => void;
-  onClickReceipts: (message: BaseMessage) => void;
+  onClickDetails: (message: BaseMessage) => void;
   onClickResetSession: (messageError: DecryptErrorMessage) => void;
   onClickTimestamp: (messageId: string) => void;
-  onLike: (message: ContentMessage, button?: boolean) => void;
 }
 
 export interface MessageParams extends MessageActions {

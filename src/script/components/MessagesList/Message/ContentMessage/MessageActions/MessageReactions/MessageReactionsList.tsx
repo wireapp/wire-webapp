@@ -21,6 +21,7 @@ import {FC, Fragment, useState} from 'react';
 
 import {Tooltip} from '@wireapp/react-ui-kit';
 
+import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
 import {getEmojiUnicode, getEmojiTitleFromEmojiUnicode} from 'Util/EmojiUtil';
 import {isEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -41,6 +42,7 @@ import {
 export interface MessageReactionsListProps {
   reactions: Reactions;
   handleReactionClick: (emoji: string) => void;
+  isMessageFocused: boolean;
   onTooltipReactionCountClick: () => void;
 }
 
@@ -48,15 +50,18 @@ const MessageReactionsList: FC<MessageReactionsListProps> = ({
   reactions,
   handleReactionClick,
   onTooltipReactionCountClick,
+  isMessageFocused,
 }) => {
   const [isSelectedEmoji, setSelected] = useState('');
   const reactionGroupedByUser = groupByReactionUsers(reactions);
+  const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
   return (
     <div css={messageReactionWrapper}>
       {Array.from(reactionGroupedByUser).map(([emoji, users], index) => {
         const emojiUnicode = getEmojiUnicode(emoji);
         const emojiUrl = getEmojiUrl(emojiUnicode);
         const emojiName = getEmojiTitleFromEmojiUnicode(emojiUnicode);
+        const emojiCount = users.length;
         const isActive = isSelectedEmoji === emojiUrl;
         return (
           <Fragment key={emojiUnicode}>
@@ -83,7 +88,7 @@ const MessageReactionsList: FC<MessageReactionsListProps> = ({
                       tabIndex={0}
                       css={messageReactionButtonTooltipTextLink}
                     >
-                      {t('conversationLikesCaption', {number: users.length.toString()})}
+                      {t('conversationLikesCaption', {number: emojiCount.toString()})}
                     </span>{' '}
                     {t('conversationLikesCaptionReacted', {emojiName})}
                   </p>
@@ -92,9 +97,10 @@ const MessageReactionsList: FC<MessageReactionsListProps> = ({
             >
               <button
                 css={{...messageReactionButton, ...getReactionsButtonCSS(isActive)}}
-                aria-label={emojiName}
+                aria-label={t('messageReactionDetails', {emojiCount: emojiCount.toString(), emojiName})}
                 aria-pressed={isActive}
                 type="button"
+                tabIndex={messageFocusedTabIndex}
                 className="button-reset-default"
                 onClick={() => {
                   setSelected(emojiUrl);
@@ -102,7 +108,7 @@ const MessageReactionsList: FC<MessageReactionsListProps> = ({
                 }}
               >
                 <EmojiImg emojiUrl={emojiUrl} emojiName={emojiName} />
-                <span css={messageReactionCount}>({users.length})</span>
+                <span css={messageReactionCount}>({emojiCount})</span>
               </button>
             </Tooltip>
           </Fragment>

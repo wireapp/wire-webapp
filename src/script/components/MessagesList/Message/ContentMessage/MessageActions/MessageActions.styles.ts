@@ -30,10 +30,8 @@ export const messageBodyActions: CSSObject = {
   alignItems: 'center',
   height: '24px',
   position: 'absolute',
-  right: 0,
+  right: '16px',
   top: '-0.5rem',
-  left: '28rem',
-  width: 'var(--conversation-message-timestamp-width)',
   '@media (max-width: @screen-md-min)': {
     height: '45px',
     flexDirection: 'column',

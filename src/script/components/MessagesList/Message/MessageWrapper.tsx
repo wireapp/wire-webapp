@@ -75,10 +75,9 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
   onClickMessage,
   onClickTimestamp,
   onClickParticipants,
-  onClickReceipts,
+  onClickDetails,
   onClickResetSession,
   onClickCancelRequest,
-  onLike,
   messageRepository,
   messageActions,
   teamState = container.resolve(TeamState),
@@ -136,15 +135,6 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
       });
     }
 
-    if (message.isReactable() && !conversation.removed_from_conversation()) {
-      const label = message.is_liked() ? t('conversationContextMenuUnlike') : t('conversationContextMenuLike');
-
-      entries.push({
-        click: () => onLike(message, false),
-        label,
-      });
-    }
-
     if (canEdit) {
       entries.push({
         click: () => amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.EDIT, message),
@@ -168,7 +158,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
 
     if (hasDetails) {
       entries.push({
-        click: () => onClickReceipts(message),
+        click: () => onClickDetails(message),
         label: t('conversationContextMenuDetails'),
       });
     }
@@ -190,7 +180,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
     return entries;
   });
 
-  const handleReactionClick = (reaction: ReactionType) => {
+  const handleReactionClick = (reaction: ReactionType): void => {
     if (!message.isContent()) {
       return;
     }
@@ -206,7 +196,6 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
         hasMarker={hasMarker}
         selfId={selfId}
         isLastDeliveredMessage={isLastDeliveredMessage}
-        onLike={onLike}
         onClickMessage={onClickMessage}
         onClickTimestamp={onClickTimestamp}
         onClickReactionDetails={onClickReactionDetails}
@@ -217,7 +206,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
         onClickImage={onClickImage}
         onClickInvitePeople={onClickInvitePeople}
         onClickParticipants={onClickParticipants}
-        onClickReceipts={onClickReceipts}
+        onClickDetails={onClickDetails}
         onDiscard={onDiscard}
         onRetry={onRetry}
         isMessageFocused={isMessageFocused}
@@ -262,15 +251,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
     );
   }
   if (message.isPing()) {
-    return (
-      <PingMessage
-        message={message}
-        is1to1Conversation={conversation.is1to1()}
-        isLastDeliveredMessage={isLastDeliveredMessage}
-        onClickReceipts={onClickReceipts}
-        isMessageFocused={isMessageFocused}
-      />
-    );
+    return <PingMessage message={message} />;
   }
   if (message.isFileTypeRestricted()) {
     return <FileTypeRestrictedMessage message={message} />;

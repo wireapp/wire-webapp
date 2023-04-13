@@ -310,7 +310,7 @@ const MessagesList: FC<MessagesListParams> = ({
               onClickReactionDetails={message => showMessageDetails(message, true)}
               onClickMessage={onClickMessage}
               onClickParticipants={showParticipants}
-              onClickReceipts={message => showMessageDetails(message)}
+              onClickDetails={message => showMessageDetails(message)}
               onClickResetSession={resetSession}
               onClickTimestamp={async function (messageId: string) {
                 setFocusedMessage(messageId);
@@ -323,7 +323,6 @@ const MessagesList: FC<MessagesListParams> = ({
                   conversationRepository.getMessagesWithOffset(conversation, messageEntity);
                 }
               }}
-              onLike={message => messageRepository.toggleLike(conversation, message)}
               selfId={selfUser.qualifiedId}
               shouldShowInvitePeople={shouldShowInvitePeople}
               totalMessage={filteredMessagesLength}

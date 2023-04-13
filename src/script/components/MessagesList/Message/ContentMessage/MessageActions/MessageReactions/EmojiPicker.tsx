@@ -24,12 +24,13 @@ import {createPortal} from 'react-dom';
 
 import {useClickOutside} from 'src/script/hooks/useClickOutside';
 import {isEscapeKey} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
 import {getEmojiUrl} from 'Util/ReactionUtil';
 
 interface EmojiPickerContainerProps {
   posX: number;
   posY: number;
-  handleEscape: () => void;
+  onClose: () => void;
   resetActionMenuStates: () => void;
   wrapperRef: RefObject<HTMLDivElement>;
   handleReactionClick: (emoji: string) => void;
@@ -38,7 +39,7 @@ interface EmojiPickerContainerProps {
 const EmojiPickerContainer: FC<EmojiPickerContainerProps> = ({
   posX,
   posY,
-  handleEscape,
+  onClose,
   resetActionMenuStates,
   wrapperRef,
   handleReactionClick,
@@ -81,6 +82,7 @@ const EmojiPickerContainer: FC<EmojiPickerContainerProps> = ({
 
   function onEmojiClick(emojiData: EmojiClickData, event: MouseEvent) {
     handleReactionClick(emojiData.emoji);
+    onClose();
   }
   return (
     <>
@@ -90,7 +92,7 @@ const EmojiPickerContainer: FC<EmojiPickerContainerProps> = ({
           className="overlay"
           onKeyDown={event => {
             if (isEscapeKey(event)) {
-              handleEscape();
+              onClose();
             }
           }}
         >
@@ -100,7 +102,12 @@ const EmojiPickerContainer: FC<EmojiPickerContainerProps> = ({
             role="dialog"
             data-uie-name="emoji-picker-dialog"
           >
-            <EmojiPicker onEmojiClick={onEmojiClick} getEmojiUrl={getEmojiUrl} />
+            <EmojiPicker
+              onEmojiClick={onEmojiClick}
+              getEmojiUrl={getEmojiUrl}
+              lazyLoadEmojis={true}
+              searchPlaceHolder={t('accessibility.emojiPickerSearchPlaceholder')}
+            />
           </div>
         </div>,
         document.body,

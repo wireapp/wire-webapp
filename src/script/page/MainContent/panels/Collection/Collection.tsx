@@ -29,6 +29,7 @@ import {ConversationRepository} from 'src/script/conversation/ConversationReposi
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate} from 'src/script/router/routerBindings';
+import {UserState} from 'src/script/user/UserState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -47,6 +48,7 @@ interface CollectionDetailsProps {
   conversationRepository: ConversationRepository;
   assetRepository: AssetRepository;
   messageRepository: MessageRepository;
+  readonly userState: UserState;
 }
 
 type Categories = Record<Category, ContentMessage[]>;
@@ -83,11 +85,13 @@ const Collection: React.FC<CollectionDetailsProps> = ({
   conversationRepository,
   assetRepository,
   messageRepository,
+  userState,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const {display_name} = useKoSubscribableChildren(conversation, ['display_name']);
   const [messages, setMessages] = useState<ContentMessage[]>([]);
   const [detailCategory, setDetailCategory] = useState<Category | undefined>(undefined);
+  const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
 
   useEffect(() => {
     conversationRepository
@@ -131,6 +135,7 @@ const Collection: React.FC<CollectionDetailsProps> = ({
       conversationRepository,
       currentMessageEntity: message,
       messageRepository,
+      selfUser,
     });
   };
 

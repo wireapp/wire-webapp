@@ -45,7 +45,7 @@ interface ContextMenuProps {
   entries: ContextMenuEntry[];
   posX: number;
   posY: number;
-  restMenuStates: () => void;
+  resetMenuStates?: () => void;
 }
 
 let container: HTMLDivElement;
@@ -63,13 +63,13 @@ const cleanUp = () => {
 const getButtonId = (label: string): string => `btn-${label?.split(' ').join('-').toLowerCase()}`;
 
 const contextMenuClassName = 'ctx-menu';
-
+const msgMenuIdentifier = 'message-options-menu';
 const ContextMenu: React.FC<ContextMenuProps> = ({
   entries,
   defaultIdentifier = `${contextMenuClassName}-item`,
   posX,
   posY,
-  restMenuStates,
+  resetMenuStates,
 }) => {
   const [mainElement, setMainElement] = useState<HTMLUListElement>();
   const [selected, setSelected] = useState<ContextMenuEntry>();
@@ -129,7 +129,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
       if (isEnterKey(event) || isSpaceKey(event)) {
         if (selected) {
           cleanUp();
-          restMenuStates();
+          resetMsgMenuStates();
           selected.click?.();
           previouslyFocused.focus();
         }
@@ -140,7 +140,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
       const isOutsideClick = mainElement && !mainElement.contains(event.target as Node);
       if (isOutsideClick) {
         cleanUp();
-        restMenuStates();
+        resetMsgMenuStates();
       }
     };
 
@@ -156,6 +156,12 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
       window.removeEventListener('resize', cleanUp);
     };
   }, [mainElement, selected]);
+
+  const resetMsgMenuStates = () => {
+    if (defaultIdentifier === msgMenuIdentifier) {
+      resetMenuStates?.();
+    }
+  };
 
   return (
     <IgnoreOutsideClickWrapper>
@@ -192,7 +198,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
                         onClick: event => {
                           event.preventDefault();
                           cleanUp();
-                          restMenuStates();
+                          resetMsgMenuStates();
                           entry.click?.(event.nativeEvent);
                         },
                         onMouseEnter: () => {
@@ -222,7 +228,7 @@ export const showContextMenu = (
   event: MouseEvent | React.MouseEvent,
   entries: ContextMenuEntry[],
   identifier: string,
-  restMenuStates: () => void,
+  resetMenuStates?: () => void,
 ) => {
   event.preventDefault();
   event.stopPropagation();
@@ -239,7 +245,7 @@ export const showContextMenu = (
       defaultIdentifier={identifier}
       posX={event.clientX}
       posY={event.clientY}
-      restMenuStates={restMenuStates}
+      resetMenuStates={resetMenuStates}
     />,
   );
 };

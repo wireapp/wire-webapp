@@ -270,6 +270,19 @@ describe('MessageRepository', () => {
       expect(result).toEqual(expectedReactions[userId]);
     });
 
+    it('should set the reaction for the user for the first time', async () => {
+      const [messageRepository] = await buildMessageRepository();
+      const reactions = {
+        user1: 'like,love,haha',
+        user2: 'happy,sad',
+      };
+      const userId = 'user3';
+      const reaction = 'like';
+      const expectedReactions = 'like';
+      const result = messageRepository.updateUserReactions(reactions, userId, reaction);
+      expect(result).toEqual(expectedReactions);
+    });
+
     it('should delete reaction if it exists', async () => {
       const [messageRepository] = await buildMessageRepository();
       const reactions = {
@@ -280,22 +293,6 @@ describe('MessageRepository', () => {
       const reaction = 'haha';
       const expectedReactions = {
         user1: 'like,love',
-        user2: 'happy,sad',
-      };
-      const result = messageRepository.updateUserReactions(reactions, userId, reaction);
-      expect(result).toEqual(expectedReactions[userId]);
-    });
-
-    it('should not update reactions if the reaction already exists for the user', async () => {
-      const [messageRepository] = await buildMessageRepository();
-      const reactions = {
-        user1: 'like,love,haha',
-        user2: 'happy,sad',
-      };
-      const userId = 'user1';
-      const reaction = 'like,love,haha';
-      const expectedReactions = {
-        user1: 'like,love,haha',
         user2: 'happy,sad',
       };
       const result = messageRepository.updateUserReactions(reactions, userId, reaction);

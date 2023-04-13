@@ -18,7 +18,7 @@
  */
 
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
-import {GenericMessageType, ReactionType} from '@wireapp/core/lib/conversation';
+import {GenericMessageType} from '@wireapp/core/lib/conversation';
 import {isObject} from 'underscore';
 
 import {
@@ -50,6 +50,7 @@ describe('CryptographyMapper', () => {
   const mapper = new CryptographyMapper();
 
   let event: any = undefined;
+  const emojiReaction = '😇';
 
   beforeEach(() => {
     event = {
@@ -441,7 +442,7 @@ describe('CryptographyMapper', () => {
       const messageId = createRandomUuid();
 
       const reaction = new Reaction({
-        emoji: ReactionType.LIKE,
+        emoji: emojiReaction,
         messageId,
       });
       const generic_message = new GenericMessage({
@@ -457,7 +458,7 @@ describe('CryptographyMapper', () => {
         expect(event_json.time).toBe(event.time);
         expect(event_json.id).toBe(generic_message.messageId);
         expect(event_json.data.message_id).toBe(generic_message.messageId);
-        expect(event_json.data.reaction).toBe(ReactionType.LIKE);
+        expect(event_json.data.reaction).toBe(emojiReaction);
       });
     });
 
@@ -570,7 +571,7 @@ describe('CryptographyMapper', () => {
       const messageId = createRandomUuid();
 
       const reaction = new Reaction({
-        emoji: ReactionType.LIKE,
+        emoji: emojiReaction,
         messageId,
       });
       const generic_message = new GenericMessage({
@@ -586,7 +587,7 @@ describe('CryptographyMapper', () => {
         expect(event_json.time).toBe(event.time);
         expect(event_json.id).toBe(generic_message.messageId);
         expect(event_json.data.message_id).toBe(generic_message.messageId);
-        expect(event_json.data.reaction).toBe(ReactionType.LIKE);
+        expect(event_json.data.reaction).toBe(emojiReaction);
       });
     });
 
