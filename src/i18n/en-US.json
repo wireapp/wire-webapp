@@ -295,8 +295,8 @@
   "accessibility.messageActionsMenuLike": "React with heart",
   "accessibility.messageActionsMenuEmoji": "Select emoji",
   "accessibility.messageActionsMenuLabel": "Message actions",
-  "accessibility.emojiPickerSearchPlaceholder": "Search for emoji"
-,  "conversationCreateReceiptsEnabled": "Read receipts are on",
+  "accessibility.emojiPickerSearchPlaceholder": "Search for emoji",
+  "conversationCreateReceiptsEnabled": "Read receipts are on",
   "conversationCreateTeam": "with [showmore]all team members[/showmore]",
   "conversationCreateTeamGuest": "with [showmore]all team members and one guest[/showmore]",
   "conversationCreateTeamGuests": "with [showmore]all team members and {{count}} guests[/showmore]",
