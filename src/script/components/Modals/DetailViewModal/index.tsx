@@ -24,9 +24,11 @@ import cx from 'classnames';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {User} from 'src/script/entity/User';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {renderElement} from 'Util/renderElement';
+import {preventFocusOutside} from 'Util/util';
 
 import {DetailViewModalFooter} from './DetailViewModalFooter';
 import {DetailViewModalHeader} from './DetailViewModalHeader';
@@ -47,6 +49,7 @@ interface DetailViewModalProps {
   readonly messageRepository: MessageRepository;
   currentMessageEntity: ContentMessage;
   onClose?: () => void;
+  selfUser: User;
 }
 
 const DetailViewModal: FC<DetailViewModalProps> = ({
@@ -55,6 +58,7 @@ const DetailViewModal: FC<DetailViewModalProps> = ({
   messageRepository,
   currentMessageEntity,
   onClose,
+  selfUser,
 }) => {
   const currentMessageEntityId = useRef<string>(currentMessageEntity.id);
 
@@ -80,13 +84,6 @@ const DetailViewModal: FC<DetailViewModalProps> = ({
 
   const handleOnClosePress = (event: KeyboardEvent | ReactKeyboardEvent<HTMLButtonElement>) => {
     handleKeyDown(event, onCloseClick);
-  };
-
-  const onLikeClick = async (conversation: Conversation, message: ContentMessage) => {
-    messageRepository.toggleLike(conversation, message);
-
-    const updatedMessage = await messageRepository.getMessageInConversationById(conversation, message.id);
-    setItems(prevState => prevState.map(item => (item.id === message.id ? updatedMessage : item)));
   };
 
   const onReplyClick = (conversation: Conversation, message: ContentMessage) => {
@@ -236,6 +233,16 @@ const DetailViewModal: FC<DetailViewModalProps> = ({
     }
   }, []);
 
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent): void => {
+      preventFocusOutside(event, 'detail-view');
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, []);
+
   return (
     <div id="detail-view" className={cx('modal detail-view modal-show', {'modal-fadein': isImageVisible})}>
       {messageEntity && conversationEntity && (
@@ -259,9 +266,9 @@ const DetailViewModal: FC<DetailViewModalProps> = ({
             messageEntity={messageEntity}
             conversationEntity={conversationEntity}
             messageRepository={messageRepository}
-            onLikeClick={onLikeClick}
             onReplyClick={onReplyClick}
             onDownloadClick={onDownloadClick}
+            selfId={selfUser.qualifiedId}
           />
         </div>
       )}
