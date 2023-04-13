@@ -30,8 +30,6 @@ import {container} from 'tsyringe';
 
 import {AssetRepository} from 'src/script/assets/AssetRepository';
 import {AssetService} from 'src/script/assets/AssetService';
-import {BackupRepository} from 'src/script/backup/BackupRepository';
-import {BackupService} from 'src/script/backup/BackupService';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {ClientRepository} from 'src/script/client/ClientRepository';

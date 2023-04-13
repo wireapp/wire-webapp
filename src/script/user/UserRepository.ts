@@ -54,7 +54,7 @@ import {valueFromType} from './AvailabilityMapper';
 import {showAvailabilityModal} from './AvailabilityModal';
 import {ConsentValue} from './ConsentValue';
 import {UserMapper} from './UserMapper';
-import type {StoredUser, UserService} from './UserService';
+import type {UserService} from './UserService';
 import {UserState} from './UserState';
 
 import {mapProfileAssetsV1} from '../assets/AssetMapper';
@@ -73,6 +73,7 @@ import {EventRepository} from '../event/EventRepository';
 import type {EventSource} from '../event/EventSource';
 import type {PropertiesRepository} from '../properties/PropertiesRepository';
 import type {SelfService} from '../self/SelfService';
+import {UserRecord} from '../storage';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 
 function generateQualifiedId(userData: {id: string; qualified_id?: QualifiedId; domain?: string}): QualifiedId {
@@ -263,7 +264,7 @@ export class UserRepository {
   /**
    * Will update the user both in database and in memory.
    */
-  private async updateUser(userId: QualifiedId, user: Partial<StoredUser>, isWebSocket = false): Promise<User> {
+  private async updateUser(userId: QualifiedId, user: Partial<UserRecord>, isWebSocket = false): Promise<User> {
     const selfUser = this.userState.self();
     const isSelfUser = matchQualifiedIds(userId, selfUser.qualifiedId);
     const userEntity = isSelfUser ? selfUser : await this.getUserById(userId);

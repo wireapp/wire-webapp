@@ -28,7 +28,6 @@ import {CancelError, DifferentAccountError, IncompatibleBackupError, Incompatibl
 
 import {ConversationRepository} from '../conversation/ConversationRepository';
 import {User} from '../entity/User';
-import {ClientEvent} from '../event/Client';
 import {DatabaseTypes, createStorageEngine} from '../service/StoreEngineProvider';
 import {StorageService} from '../storage';
 import {StorageSchemata} from '../storage/StorageSchemata';
@@ -48,14 +47,13 @@ const conversation = {
   name: 'Tom @ Staging',
   others: ['a7122859-3f16-4870-b7f2-5cbca5572ab2'],
   status: 0,
-  team_id: null,
   type: 2,
 };
 
 const messages = [
   {
     conversation: conversationId,
-    data: {content: 'First message', nonce: '68a28ab1-d7f8-4014-8b52-5e99a05ea3b1', previews: []},
+    data: {content: 'First message', nonce: '68a28ab1-d7f8-4014-8b52-5e99a05ea3b1', previews: [] as any},
     from: '8b497692-7a38-4a5d-8287-e3d1006577d6',
     id: '68a28ab1-d7f8-4014-8b52-5e99a05ea3b1',
     time: '2016-08-04T13:27:55.182Z',
@@ -63,7 +61,7 @@ const messages = [
   },
   {
     conversation: conversationId,
-    data: {content: 'Second message', nonce: '4af67f76-09f9-4831-b3a4-9df877b8c29a', previews: []},
+    data: {content: 'Second message', nonce: '4af67f76-09f9-4831-b3a4-9df877b8c29a', previews: [] as any},
     from: '8b497692-7a38-4a5d-8287-e3d1006577d6',
     id: '4af67f76-09f9-4831-b3a4-9df877b8c29a',
     time: '2016-08-04T13:27:58.993Z',
@@ -114,6 +112,7 @@ describe('BackupRepository', () => {
     const eventStoreName = StorageSchemata.OBJECT_STORE.EVENTS;
 
     // TODO: [JEST] Shim WebWorkers
+    /*
     it.skip('generates an archive of the database', async () => {
       const blob = await backupRepository.generateHistory(noop);
       const zip = await new JSZip().loadAsync(blob);
@@ -145,6 +144,7 @@ describe('BackupRepository', () => {
       expect(events).not.toContain(verificationEvent);
       expect(events.length).toBe(messages.length);
     });
+    */
 
     it('cancels export', async () => {
       const [backupRepository, {storageService}] = await buildBackupRepository();
@@ -189,7 +189,7 @@ describe('BackupRepository', () => {
 
         archive.file(BackupRepository.CONFIG.FILENAME.METADATA, JSON.stringify(meta));
 
-        const files = {};
+        const files: Record<string, any> = {};
         for (const fileName in archive.files) {
           files[fileName] = await archive.files[fileName].async('uint8array');
         }
@@ -218,7 +218,7 @@ describe('BackupRepository', () => {
       });
 
       for (const archive of archives) {
-        const files = {};
+        const files: Record<string, any> = {};
         for (const fileName in archive.files) {
           files[fileName] = await archive.files[fileName].async('uint8array');
         }

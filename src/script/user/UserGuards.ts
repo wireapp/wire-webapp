@@ -19,8 +19,8 @@
 
 import type {Self as SelfAPIUser} from '@wireapp/api-client/lib/self';
 
-import {StoredUser} from './UserService';
+import {UserRecord} from '../storage';
 
-export function isSelfAPIUser(payload: Partial<StoredUser>): payload is SelfAPIUser {
+export function isSelfAPIUser(payload: Partial<UserRecord>): payload is SelfAPIUser {
   return 'locale' in payload;
 }
