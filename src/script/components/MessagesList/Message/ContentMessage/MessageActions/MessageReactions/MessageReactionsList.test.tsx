@@ -19,25 +19,30 @@
 
 import {render, fireEvent, within} from '@testing-library/react';
 
-import {MessageReactionsList} from './MessageReactionsList';
+import {MessageReactionsList, MessageReactionsListProps} from './MessageReactionsList';
 
+const reactions = {
+  '1': '😇,😊',
+  '2': '😊,👍,😉,😇',
+  '3': '😇',
+};
+const defaultProps: MessageReactionsListProps = {
+  reactions: reactions,
+  handleReactionClick: jest.fn(),
+  isMessageFocused: false,
+};
 describe('MessageReactionsList', () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
 
   test('renders a button for each reaction and user count', () => {
-    const reactions = {
-      '1': '😇,😊',
-      '2': '😊,👍,😉,😇',
-      '3': '😇',
-    };
-    const {getAllByLabelText} = render(<MessageReactionsList reactions={reactions} handleReactionClick={jest.fn()} />);
+    const {getAllByLabelText} = render(<MessageReactionsList {...defaultProps} />);
 
-    const winkButton = getAllByLabelText('winking face');
-    const smileyFace1 = getAllByLabelText('smiling face with halo');
-    const thumbsUpButton = getAllByLabelText('thumbs up sign');
-    const smileyFace2 = getAllByLabelText('smiling face with smiling eyes');
+    const winkButton = getAllByLabelText('wink');
+    const smileyFace1 = getAllByLabelText('innocent');
+    const thumbsUpButton = getAllByLabelText('+1');
+    const smileyFace2 = getAllByLabelText('blush');
 
     expect(smileyFace1).toHaveLength(1);
     expect(smileyFace2).toHaveLength(1);
@@ -58,19 +63,11 @@ describe('MessageReactionsList', () => {
   });
 
   test('handles click on reaction button', () => {
-    const reactions = {
-      '1': '😇,😊',
-      '2': '😊,👍,😉,😇',
-      '3': '😇',
-    };
-    const handleReactionClick = jest.fn();
-    const {getByLabelText} = render(
-      <MessageReactionsList reactions={reactions} handleReactionClick={handleReactionClick} />,
-    );
-    const thumbsUpButton = getByLabelText('thumbs up sign');
+    const {getByLabelText} = render(<MessageReactionsList {...defaultProps} />);
+    const thumbsUpButton = getByLabelText('+1');
 
     fireEvent.click(thumbsUpButton);
-
+    const {handleReactionClick} = defaultProps;
     expect(handleReactionClick).toHaveBeenCalled();
     expect(handleReactionClick).toHaveBeenCalledWith('👍');
   });

@@ -54,7 +54,6 @@ const getDefaultParams = (): React.ComponentProps<typeof MessagesList> => {
     messageRepository: {
       getMessageInConversationById: jest.fn(),
       sendButtonAction: jest.fn(),
-      toggleLike: jest.fn(),
     } as any,
     onClickMessage: jest.fn(),
     onLoading: jest.fn(),

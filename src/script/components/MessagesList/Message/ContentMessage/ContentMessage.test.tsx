@@ -60,7 +60,6 @@ describe('message', () => {
       onClickReaction: jest.fn(),
       onClickDetails: jest.fn(),
       onClickTimestamp: jest.fn(),
-      onLike: jest.fn(),
       onDiscard: jest.fn(),
       onRetry: jest.fn(),
       previousMessage: undefined,
