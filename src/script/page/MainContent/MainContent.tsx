@@ -234,11 +234,16 @@ const MainContent: FC<MainContentProps> = ({
             )}
 
             {contentState === ContentState.HISTORY_EXPORT && (
-              <HistoryExport userState={userState} switchContent={switchContent} />
+              <HistoryExport user={userState.self()} switchContent={switchContent} />
             )}
 
             {contentState === ContentState.HISTORY_IMPORT && uploadedFile && (
-              <HistoryImport file={uploadedFile} backupRepository={repositories.backup} switchContent={switchContent} />
+              <HistoryImport
+                user={userState.self()}
+                file={uploadedFile}
+                backupRepository={repositories.backup}
+                switchContent={switchContent}
+              />
             )}
           </>
         </Animated>

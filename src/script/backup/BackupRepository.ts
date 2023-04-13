@@ -33,14 +33,13 @@ import {
   InvalidMetaDataError,
 } from './Error';
 
-import {ClientState} from '../client/ClientState';
 import {ConnectionState} from '../connection/ConnectionState';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import type {Conversation} from '../entity/Conversation';
+import {User} from '../entity/User';
 import {ClientEvent} from '../event/Client';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {StorageSchemata} from '../storage/StorageSchemata';
-import {UserState} from '../user/UserState';
 import {WebWorker} from '../util/worker';
 
 export interface Metadata {
@@ -79,8 +78,6 @@ export class BackupRepository {
   constructor(
     backupService: BackupService,
     conversationRepository: ConversationRepository,
-    private readonly clientState = container.resolve(ClientState),
-    private readonly userState = container.resolve(UserState),
     private readonly connectionState = container.resolve(ConnectionState),
   ) {
     this.logger = getLogger('BackupRepository');
@@ -103,14 +100,14 @@ export class BackupRepository {
     this.canceled = isCanceled;
   }
 
-  public createMetaData(): Metadata {
+  public createMetaData(user: User, clientId: string): Metadata {
     return {
-      client_id: this.clientState.currentClient().id,
+      client_id: clientId,
       creation_time: new Date().toISOString(),
       platform: 'Web',
-      user_handle: this.userState.self().username(),
-      user_id: this.userState.self().id,
-      user_name: this.userState.self().name(),
+      user_handle: user.username(),
+      user_id: user.id,
+      user_name: user.name(),
       version: this.backupService.getDatabaseVersion(),
     };
   }
@@ -121,12 +118,16 @@ export class BackupRepository {
    * @param progressCallback called on every step of the export
    * @returns The promise that contains all the exported tables
    */
-  public async generateHistory(progressCallback: (tableRows: number) => void): Promise<Blob> {
+  public async generateHistory(
+    user: User,
+    clientId: string,
+    progressCallback: (tableRows: number) => void,
+  ): Promise<Blob> {
     this.isCanceled = false;
 
     try {
       const exportedData = await this._exportHistory(progressCallback);
-      return await this.compressHistoryFiles(exportedData);
+      return await this.compressHistoryFiles(user, clientId, exportedData);
     } catch (error) {
       this.logger.error(`Could not export history: ${error.message}`, error);
       const isCancelError = error instanceof CancelError;
@@ -199,8 +200,8 @@ export class BackupRepository {
     return [].concat(...tableData);
   }
 
-  private async compressHistoryFiles(exportedData: Record<string, any>): Promise<Blob> {
-    const metaData = this.createMetaData();
+  private async compressHistoryFiles(user: User, clientId: string, exportedData: Record<string, any>): Promise<Blob> {
+    const metaData = this.createMetaData(user, clientId);
 
     const files: Record<string, Uint8Array> = {};
 
@@ -227,6 +228,7 @@ export class BackupRepository {
   }
 
   public async importHistory(
+    user: User,
     files: Record<string, Uint8Array>,
     initCallback: (numberOfRecords: number) => void,
     progressCallback: (numberProcessed: number) => void,
@@ -237,7 +239,7 @@ export class BackupRepository {
     }
 
     try {
-      await this.verifyMetadata(files);
+      await this.verifyMetadata(user, files);
       const fileDescriptors = Object.entries(files).map(([filename, content]) => ({
         content,
         filename,
@@ -326,7 +328,7 @@ export class BackupRepository {
     }
   }
 
-  public mapEntityDataType(entity: any): any {
+  private mapEntityDataType(entity: any): any {
     if (entity.data) {
       BackupRepository.CONFIG.UINT8ARRAY_FIELDS.forEach(field => {
         const dataField = entity.data[field];
@@ -338,16 +340,16 @@ export class BackupRepository {
     return entity;
   }
 
-  public async verifyMetadata(files: Record<string, Uint8Array>): Promise<void> {
+  private async verifyMetadata(user: User, files: Record<string, Uint8Array>): Promise<void> {
     const rawData = files[BackupRepository.CONFIG.FILENAME.METADATA];
     const metaData = new TextDecoder().decode(rawData);
     const parsedMetaData = JSON.parse(metaData);
-    this._verifyMetadata(parsedMetaData);
+    this._verifyMetadata(user, parsedMetaData);
     this.logger.log('Validated metadata during history import', files);
   }
 
-  private _verifyMetadata(archiveMetadata: Metadata): void {
-    const localMetadata = this.createMetaData();
+  private _verifyMetadata(user: User, archiveMetadata: Metadata): void {
+    const localMetadata = this.createMetaData(user, '');
     const isExpectedUserId = archiveMetadata.user_id === localMetadata.user_id;
     if (!isExpectedUserId) {
       const fromUserId = archiveMetadata.user_id;
