@@ -82,7 +82,7 @@ export class UserMapper {
    */
   updateUserFromObject(userEntity: User, userData: Partial<StoredUser>): User {
     // We are trying to update non-matching users
-    const isUnexpectedId = userEntity.id !== '' && userData.id !== userEntity.id;
+    const isUnexpectedId = userEntity.id && userData.id && userData.id !== userEntity.id;
     if (isUnexpectedId) {
       throw new Error(`Updating wrong user entity. User '${userEntity.id}' does not match data '${userData.id}'.`);
     }
@@ -180,9 +180,9 @@ export class UserMapper {
 
     if (ssoId && Object.keys(ssoId).length) {
       userEntity.isSingleSignOn = true;
-    }
-    if (ssoId?.subject) {
-      userEntity.isNoPasswordSSO = true;
+      if (ssoId.subject) {
+        userEntity.isNoPasswordSSO = true;
+      }
     }
 
     if (teamId && !userEntity.isFederated) {

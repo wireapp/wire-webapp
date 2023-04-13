@@ -183,7 +183,9 @@ export class UserRepository {
   async loadUsers(selfUser: User, connections: ConnectionEntity[], extraUsers: QualifiedId[]): Promise<User[]> {
     const users = connections.map(connectionEntity => connectionEntity.userId).concat(extraUsers);
     // TODO migrate old user entries that only have availability
-    const localUsers = await this.userService.loadUserFromDb();
+    const dbUsers = await this.userService.loadUserFromDb();
+    /* prior to April 2023, we were only storing the availability in the DB, we need to refetch those users */
+    const [localUsers, incompleteUsers] = partition(dbUsers, user => !!user.qualified_id);
 
     /** users we have in the DB that are not matching any loaded users */
     const [orphanUsers, liveUsers] = partition(
@@ -196,16 +198,25 @@ export class UserRepository {
       await this.userService.removeUserFromDb(user.qualified_id);
     });
 
-    const missingUsers = users.filter(
-      user => !liveUsers.find(localUser => matchQualifiedIds(user, localUser.qualified_id)),
-    );
+    const missingUsers = users
+      .filter(user => !liveUsers.find(localUser => matchQualifiedIds(user, localUser.qualified_id)))
+      // we add the users that are locally incomplete
+      .concat(incompleteUsers.map((user: any) => ({id: user.id, domain: user.domain})));
 
     const {found, failed} = await this.fetchRawUsers(missingUsers);
 
-    // Save all new users to the database
-    await Promise.all(found.map(user => this.saveUserInDb(user)));
+    const userWithAvailability = found.map(user => {
+      const availability = incompleteUsers.find(incompleteUser => incompleteUser.id === user.id);
+      if (availability) {
+        return {availability: availability.availability, ...user};
+      }
+      return user;
+    });
 
-    const mappedUsers = this.mapUserResponse(found.concat(liveUsers), failed);
+    // Save all new users to the database
+    await Promise.all(userWithAvailability.map(user => this.saveUserInDb(user)));
+
+    const mappedUsers = this.mapUserResponse(userWithAvailability.concat(liveUsers), failed);
 
     // Assign connections to users
     mappedUsers.forEach(user => {
