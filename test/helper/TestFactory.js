@@ -93,23 +93,6 @@ export class TestFactory {
   }
 
   /**
-   * @returns {Promise<BackupRepository>} The backup repository.
-   */
-  async exposeBackupActors() {
-    await this.exposeStorageActors();
-    await this.exposeConversationActors();
-    this.backup_service = new BackupService(this.storage_service);
-
-    this.backup_repository = new BackupRepository(
-      this.backup_service,
-      this.conversation_repository,
-      this.connection_repository['connectionState'],
-    );
-
-    return this.backup_repository;
-  }
-
-  /**
    * @returns {Promise<CryptographyRepository>} The cryptography repository.
    */
   async exposeCryptographyActors() {
