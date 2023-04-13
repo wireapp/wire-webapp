@@ -71,7 +71,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
   onClickAvatar,
   onClickImage,
   onClickInvitePeople,
-  onClickLikes,
+  onClickReactionDetails,
   onClickMessage,
   onClickTimestamp,
   onClickParticipants,
@@ -198,7 +198,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
         isLastDeliveredMessage={isLastDeliveredMessage}
         onClickMessage={onClickMessage}
         onClickTimestamp={onClickTimestamp}
-        onClickLikes={onClickLikes}
+        onClickReactionDetails={onClickReactionDetails}
         onClickButton={clickButton}
         onClickAvatar={onClickAvatar}
         contextMenu={{entries: contextMenuEntries}}

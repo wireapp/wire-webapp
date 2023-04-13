@@ -55,6 +55,15 @@ export const messageReactionButton: CSSObject = {
   verticalAlign: 'top',
 };
 
+export const messageReactionButtonTooltip: CSSObject = {display: 'flex', maxWidth: 130, whiteSpace: 'break-spaces'};
+export const messageReactionButtonTooltipImage: CSSObject = {marginRight: 8};
+export const messageReactionButtonTooltipText: CSSObject = {fontSize: '0.7rem'};
+export const messageReactionButtonTooltipTextLink: CSSObject = {
+  color: 'var(--blue-500)',
+  cursor: 'pointer',
+  textDecoration: 'underline',
+};
+
 export const messageReactionCount: CSSObject = {
   fontSize: '0.8rem',
   letterSpacing: '0.031rem',

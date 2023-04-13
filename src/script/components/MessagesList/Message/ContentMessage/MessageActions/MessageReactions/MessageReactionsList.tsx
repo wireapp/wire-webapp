@@ -19,8 +19,12 @@
 
 import {FC, Fragment, useState} from 'react';
 
+import {Tooltip} from '@wireapp/react-ui-kit';
+
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
 import {getEmojiUnicode, getEmojiTitleFromEmojiUnicode} from 'Util/EmojiUtil';
+import {isEnterKey} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
 import {Reactions, getEmojiUrl, groupByReactionUsers} from 'Util/ReactionUtil';
 
 import {EmojiImg} from './EmojiImg';
@@ -29,15 +33,25 @@ import {
   messageReactionCount,
   messageReactionWrapper,
   getReactionsButtonCSS,
+  messageReactionButtonTooltip,
+  messageReactionButtonTooltipTextLink,
+  messageReactionButtonTooltipText,
+  messageReactionButtonTooltipImage,
 } from './MessageReactions.styles';
 
 export interface MessageReactionsListProps {
   reactions: Reactions;
   handleReactionClick: (emoji: string) => void;
   isMessageFocused: boolean;
+  onTooltipReactionCountClick: () => void;
 }
 
-const MessageReactionsList: FC<MessageReactionsListProps> = ({reactions, handleReactionClick, isMessageFocused}) => {
+const MessageReactionsList: FC<MessageReactionsListProps> = ({
+  reactions,
+  handleReactionClick,
+  onTooltipReactionCountClick,
+  isMessageFocused,
+}) => {
   const [isSelectedEmoji, setSelected] = useState('');
   const reactionGroupedByUser = groupByReactionUsers(reactions);
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
@@ -50,21 +64,52 @@ const MessageReactionsList: FC<MessageReactionsListProps> = ({reactions, handleR
         const isActive = isSelectedEmoji === emojiUrl;
         return (
           <Fragment key={emojiUnicode}>
-            <button
-              css={{...messageReactionButton, ...getReactionsButtonCSS(isActive)}}
-              aria-label={emojiName}
-              aria-pressed={isActive}
-              type="button"
-              tabIndex={messageFocusedTabIndex}
-              className="button-reset-default"
-              onClick={() => {
-                setSelected(emojiUrl);
-                handleReactionClick(emoji);
-              }}
+            <Tooltip
+              body={
+                <div css={messageReactionButtonTooltip}>
+                  <EmojiImg
+                    emojiImgSize={{
+                      width: '1.2rem',
+                    }}
+                    css={messageReactionButtonTooltipImage}
+                    emojiUrl={emojiUrl}
+                    emojiName={emojiName}
+                  />
+                  <p css={messageReactionButtonTooltipText}>
+                    <span
+                      onClick={onTooltipReactionCountClick}
+                      onKeyDown={event => {
+                        if (!isEnterKey(event)) {
+                          onTooltipReactionCountClick();
+                        }
+                      }}
+                      role="button"
+                      tabIndex={0}
+                      css={messageReactionButtonTooltipTextLink}
+                    >
+                      {t('conversationLikesCaption', {number: users.length.toString()})}
+                    </span>{' '}
+                    {t('conversationLikesCaptionReacted', {emojiName})}
+                  </p>
+                </div>
+              }
             >
-              <EmojiImg emojiUrl={emojiUrl} emojiName={emojiName} />
-              <span css={messageReactionCount}>({users.length})</span>
-            </button>
+              <button
+                css={{...messageReactionButton, ...getReactionsButtonCSS(isActive)}}
+                aria-label={emojiName}
+                aria-pressed={isActive}
+                type="button"
+                tabIndex={messageFocusedTabIndex}
+                className="button-reset-default"
+                onClick={() => {
+                  setSelected(emojiUrl);
+                  handleReactionClick(emoji);
+                }}
+              >
+                <EmojiImg emojiUrl={emojiUrl} emojiName={emojiName} />
+                <span css={messageReactionCount}>({users.length})</span>
+              </button>
+            </Tooltip>
           </Fragment>
         );
       })}
