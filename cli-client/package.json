@@ -35,6 +35,6 @@
   "bin": {
     "wire-cli": "lib/index.js"
   },
-  "version": "12.0.112",
+  "version": "12.0.113",
   "gitHead": "5339f01fe01ef0871da8c8bc8662fbe9e604754a"
 }
