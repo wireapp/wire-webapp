@@ -23,11 +23,11 @@ import {joaatHash} from 'Util/Crypto';
 import {getLogger, Logger} from 'Util/Logger';
 
 import {isSelfAPIUser} from './UserGuards';
-import {StoredUser} from './UserService';
 import {UserState} from './UserState';
 
 import {mapProfileAssets, mapProfileAssetsV1, updateUserEntityAssets} from '../assets/AssetMapper';
 import {User} from '../entity/User';
+import {UserRecord} from '../storage';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import '../view_model/bindings/CommonBindings';
 
@@ -45,11 +45,11 @@ export class UserMapper {
     this.logger = getLogger('UserMapper');
   }
 
-  mapUserFromJson(userData: StoredUser): User {
+  mapUserFromJson(userData: UserRecord): User {
     return this.updateUserFromObject(new User('', ''), userData);
   }
 
-  mapSelfUserFromJson(userData: StoredUser): User {
+  mapSelfUserFromJson(userData: UserRecord): User {
     const userEntity = this.updateUserFromObject(new User('', ''), userData);
     userEntity.isMe = true;
 
@@ -65,7 +65,7 @@ export class UserMapper {
    * @note Return an empty array in any case to prevent crashes.
    * @returns Mapped user entities
    */
-  mapUsersFromJson(usersData: StoredUser[]): User[] {
+  mapUsersFromJson(usersData: UserRecord[]): User[] {
     if (usersData?.length) {
       return usersData.filter(userData => userData).map(userData => this.mapUserFromJson(userData));
     }
@@ -80,7 +80,7 @@ export class UserMapper {
    * @param userData Updated user data from backend
    * @todo Pass in "serverTimeHandler", so that it can be removed from the "UserMapper" constructor
    */
-  updateUserFromObject(userEntity: User, userData: Partial<StoredUser>): User {
+  updateUserFromObject(userEntity: User, userData: Partial<UserRecord>): User {
     // We are trying to update non-matching users
     const isUnexpectedId = userEntity.id && userData.id && userData.id !== userEntity.id;
     if (isUnexpectedId) {

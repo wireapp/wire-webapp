@@ -21,6 +21,7 @@ import {FC, useEffect, useState} from 'react';
 
 import {Icon} from 'Components/Icon';
 import {LoadingBar} from 'Components/LoadingBar/LoadingBar';
+import {User} from 'src/script/entity/User';
 import {ContentState} from 'src/script/page/useAppState';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
@@ -43,9 +44,10 @@ interface HistoryImportProps {
   readonly backupRepository: BackupRepository;
   file: File;
   switchContent: (contentState: ContentState) => void;
+  user: User;
 }
 
-const HistoryImport: FC<HistoryImportProps> = ({backupRepository, file, switchContent}) => {
+const HistoryImport: FC<HistoryImportProps> = ({user, backupRepository, file, switchContent}) => {
   const logger = getLogger('HistoryImportViewModel');
 
   const [historyImportState, setHistoryImportState] = useState(HistoryImportState.PREPARING);
@@ -141,7 +143,7 @@ const HistoryImport: FC<HistoryImportProps> = ({backupRepository, file, switchCo
         `Unzipped '${Object.keys(files).length}' files for history import (took ${unzipTimeFormatted.text}).`,
         files,
       );
-      await backupRepository.importHistory(files, onInit, onProgress);
+      await backupRepository.importHistory(user, files, onInit, onProgress);
       onSuccess();
     } catch (error) {
       onError(error as Error);

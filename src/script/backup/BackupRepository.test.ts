@@ -18,19 +18,19 @@
  */
 
 import JSZip from 'jszip';
+import {container} from 'tsyringe';
 
-import {BackupRepository} from 'src/script/backup/BackupRepository';
-import {
-  CancelError,
-  DifferentAccountError,
-  IncompatibleBackupError,
-  IncompatiblePlatformError,
-} from 'src/script/backup/Error';
-import {ClientEvent} from 'src/script/event/Client';
-import {StorageSchemata} from 'src/script/storage/StorageSchemata';
-import {noop} from 'Util/util';
+import {createRandomUuid, noop} from 'Util/util';
 
-import {TestFactory} from '../../helper/TestFactory';
+import {BackupRepository} from './BackupRepository';
+import {BackupService} from './BackupService';
+import {CancelError, DifferentAccountError, IncompatibleBackupError, IncompatiblePlatformError} from './Error';
+
+import {ConversationRepository} from '../conversation/ConversationRepository';
+import {User} from '../entity/User';
+import {DatabaseTypes, createStorageEngine} from '../service/StoreEngineProvider';
+import {StorageService} from '../storage';
+import {StorageSchemata} from '../storage/StorageSchemata';
 
 const conversationId = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a';
 const conversation = {
@@ -47,14 +47,13 @@ const conversation = {
   name: 'Tom @ Staging',
   others: ['a7122859-3f16-4870-b7f2-5cbca5572ab2'],
   status: 0,
-  team_id: null,
   type: 2,
 };
 
 const messages = [
   {
     conversation: conversationId,
-    data: {content: 'First message', nonce: '68a28ab1-d7f8-4014-8b52-5e99a05ea3b1', previews: []},
+    data: {content: 'First message', nonce: '68a28ab1-d7f8-4014-8b52-5e99a05ea3b1', previews: [] as any},
     from: '8b497692-7a38-4a5d-8287-e3d1006577d6',
     id: '68a28ab1-d7f8-4014-8b52-5e99a05ea3b1',
     time: '2016-08-04T13:27:55.182Z',
@@ -62,7 +61,7 @@ const messages = [
   },
   {
     conversation: conversationId,
-    data: {content: 'Second message', nonce: '4af67f76-09f9-4831-b3a4-9df877b8c29a', previews: []},
+    data: {content: 'Second message', nonce: '4af67f76-09f9-4831-b3a4-9df877b8c29a', previews: [] as any},
     from: '8b497692-7a38-4a5d-8287-e3d1006577d6',
     id: '4af67f76-09f9-4831-b3a4-9df877b8c29a',
     time: '2016-08-04T13:27:58.993Z',
@@ -70,29 +69,41 @@ const messages = [
   },
 ];
 
+async function buildBackupRepository() {
+  const storageService = container.resolve(StorageService);
+  const engine = await createStorageEngine('test', DatabaseTypes.PERMANENT);
+  storageService.init(engine);
+
+  const backupService = new BackupService(storageService);
+  const conversationRepository = {
+    checkForDeletedConversations: jest.fn(),
+    mapConnections: jest.fn().mockImplementation(() => []),
+    updateConversationStates: jest.fn().mockImplementation(conversations => conversations),
+    updateConversations: jest.fn().mockImplementation(async () => {}),
+  } as unknown as ConversationRepository;
+  return [
+    new BackupRepository(backupService, conversationRepository),
+    {backupService, conversationRepository, storageService},
+  ] as const;
+}
+
 describe('BackupRepository', () => {
-  const testFactory = new TestFactory();
-  /** @type {BackupRepository} */
-  let backupRepository;
-
-  beforeEach(async () => {
-    await testFactory.exposeBackupActors();
-    backupRepository = testFactory.backup_repository;
-  });
-
   describe('createMetaData', () => {
-    it('creates backup metadata', () => {
-      jest.useFakeTimers('modern');
+    it('creates backup metadata', async () => {
+      const [backupRepository, {backupService}] = await buildBackupRepository();
+      jest.useFakeTimers();
       const freezedTime = new Date();
       jest.setSystemTime(freezedTime);
+      const userId = createRandomUuid();
+      const clientId = createRandomUuid();
 
-      const metaDescription = backupRepository.createMetaData();
+      const metaDescription = backupRepository.createMetaData(new User(userId), clientId);
 
-      expect(metaDescription.client_id).toBe(testFactory.client_repository['clientState'].currentClient().id);
+      expect(metaDescription.client_id).toBe(clientId);
       expect(metaDescription.creation_time).toBe(freezedTime.toISOString());
       expect(metaDescription.platform).toBe('Web');
-      expect(metaDescription.user_id).toBe(testFactory.user_repository['userState'].self().id);
-      expect(metaDescription.version).toBe(testFactory.backup_service.getDatabaseVersion());
+      expect(metaDescription.user_id).toBe(userId);
+      expect(metaDescription.version).toBe(backupService.getDatabaseVersion());
       jest.useRealTimers();
     });
   });
@@ -100,16 +111,8 @@ describe('BackupRepository', () => {
   describe('generateHistory', () => {
     const eventStoreName = StorageSchemata.OBJECT_STORE.EVENTS;
 
-    beforeEach(() => {
-      return Promise.all([
-        ...messages.map(message => testFactory.storage_service.save(eventStoreName, undefined, message)),
-        testFactory.storage_service.save('conversations', conversationId, conversation),
-      ]);
-    });
-
-    afterEach(() => testFactory.storage_service.clearStores());
-
     // TODO: [JEST] Shim WebWorkers
+    /*
     it.skip('generates an archive of the database', async () => {
       const blob = await backupRepository.generateHistory(noop);
       const zip = await new JSZip().loadAsync(blob);
@@ -141,17 +144,27 @@ describe('BackupRepository', () => {
       expect(events).not.toContain(verificationEvent);
       expect(events.length).toBe(messages.length);
     });
+    */
 
     it('cancels export', async () => {
+      const [backupRepository, {storageService}] = await buildBackupRepository();
+      await Promise.all([
+        ...messages.map(message => storageService.save(eventStoreName, undefined, message)),
+        storageService.save('conversations', conversationId, conversation),
+      ]);
+
       jest.spyOn(backupRepository, 'isCanceled', 'get').mockReturnValue(true);
       backupRepository.cancelAction();
 
-      await expect(backupRepository.generateHistory(noop)).rejects.toThrow(jasmine.any(CancelError));
+      await expect(backupRepository.generateHistory(new User(), 'client1', noop)).rejects.toThrow(
+        jasmine.any(CancelError),
+      );
     });
   });
 
   describe('importHistory', () => {
     it(`fails if metadata doesn't match`, async () => {
+      const [backupRepository] = await buildBackupRepository();
       const tests = [
         {
           expectedError: DifferentAccountError,
@@ -170,61 +183,30 @@ describe('BackupRepository', () => {
       for (const testDescription of tests) {
         const archive = new JSZip();
         const meta = {
-          ...backupRepository.createMetaData(),
+          ...backupRepository.createMetaData(new User('user1'), 'client1'),
           ...testDescription.metaChanges,
         };
 
         archive.file(BackupRepository.CONFIG.FILENAME.METADATA, JSON.stringify(meta));
 
-        const files = {};
+        const files: Record<string, any> = {};
         for (const fileName in archive.files) {
           files[fileName] = await archive.files[fileName].async('uint8array');
         }
 
-        await expect(backupRepository.importHistory(files, noop, noop)).rejects.toThrow(testDescription.expectedError);
+        await expect(backupRepository.importHistory(new User('user1'), files, noop, noop)).rejects.toThrow(
+          testDescription.expectedError,
+        );
       }
     });
 
     it('successfully imports a backup', async () => {
-      const backupService = {
-        getDatabaseVersion: () => 15,
-        importEntities: jest.fn(),
-      };
+      const [backupRepository, {backupService, conversationRepository}] = await buildBackupRepository();
+      const user = new User('user1');
+      jest.spyOn(backupService, 'getDatabaseVersion').mockReturnValue(15);
+      jest.spyOn(backupService, 'importEntities').mockResolvedValue(undefined);
 
-      const conversationRepository = {
-        checkForDeletedConversations: jest.fn(),
-        mapConnections: jest.fn().mockImplementation(() => []),
-        updateConversationStates: jest.fn().mockImplementation(conversations => conversations),
-        updateConversations: jest.fn().mockImplementation(async () => {}),
-      };
-
-      const connectionState = {
-        connections: jest.fn().mockImplementation(() => []),
-      };
-
-      const clientState = {
-        currentClient: jest.fn().mockImplementation(() => ({
-          id: 'client-id',
-        })),
-      };
-
-      const userState = {
-        self: jest.fn().mockImplementation(() => ({
-          id: 'self-id',
-          name: jest.fn().mockImplementation(() => 'selfName'),
-          username: jest.fn().mockImplementation(() => 'selfUsername'),
-        })),
-      };
-
-      const backupRepo = new BackupRepository(
-        backupService,
-        conversationRepository,
-        clientState,
-        userState,
-        connectionState,
-      );
-
-      const metadataArray = [{...backupRepo.createMetaData(), version: 15}];
+      const metadataArray = [{...backupRepository.createMetaData(user, 'client1'), version: 15}];
 
       const archives = metadataArray.map(metadata => {
         const archive = new JSZip();
@@ -236,18 +218,15 @@ describe('BackupRepository', () => {
       });
 
       for (const archive of archives) {
-        const files = {};
+        const files: Record<string, any> = {};
         for (const fileName in archive.files) {
           files[fileName] = await archive.files[fileName].async('uint8array');
         }
 
-        await backupRepo.importHistory(files, noop, noop);
+        await backupRepository.importHistory(user, files, noop, noop);
 
-        expect(backupRepo.conversationRepository.updateConversationStates).toHaveBeenCalledWith([conversation]);
-        expect(backupRepo.backupService.importEntities).toHaveBeenCalledWith(
-          StorageSchemata.OBJECT_STORE.EVENTS,
-          messages,
-        );
+        expect(conversationRepository.updateConversationStates).toHaveBeenCalledWith([conversation]);
+        expect(backupService.importEntities).toHaveBeenCalledWith(StorageSchemata.OBJECT_STORE.EVENTS, messages);
       }
     });
   });

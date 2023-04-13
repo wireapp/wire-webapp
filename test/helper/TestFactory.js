@@ -30,8 +30,6 @@ import {container} from 'tsyringe';
 
 import {AssetRepository} from 'src/script/assets/AssetRepository';
 import {AssetService} from 'src/script/assets/AssetService';
-import {BackupRepository} from 'src/script/backup/BackupRepository';
-import {BackupService} from 'src/script/backup/BackupService';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {ClientRepository} from 'src/script/client/ClientRepository';
@@ -90,25 +88,6 @@ export class TestFactory {
     this.storage_repository = singleton(StorageRepository, this.storage_service);
 
     return this.storage_repository;
-  }
-
-  /**
-   * @returns {Promise<BackupRepository>} The backup repository.
-   */
-  async exposeBackupActors() {
-    await this.exposeStorageActors();
-    await this.exposeConversationActors();
-    this.backup_service = new BackupService(this.storage_service);
-
-    this.backup_repository = new BackupRepository(
-      this.backup_service,
-      this.conversation_repository,
-      this.client_repository['clientState'],
-      this.user_repository['userState'],
-      this.connection_repository['connectionState'],
-    );
-
-    return this.backup_repository;
   }
 
   /**
