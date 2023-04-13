@@ -65,7 +65,7 @@ export class TeamState {
     this.isTeamDeleted = ko.observable(false);
 
     /** Note: this does not include the self user */
-    this.teamMembers = ko.pureComputed(() => this.userState.users().filter(user => user.isTeamMember()));
+    this.teamMembers = ko.pureComputed(() => this.userState.users().filter(user => !user.isMe && user.isTeamMember()));
     this.memberRoles = ko.observable({});
     this.memberInviters = ko.observable({});
     this.teamFeatures = ko.observable();
