@@ -29,6 +29,7 @@ const reactions = {
 const defaultProps: MessageReactionsListProps = {
   reactions: reactions,
   handleReactionClick: jest.fn(),
+  onTooltipReactionCountClick: jest.fn(),
   isMessageFocused: false,
 };
 describe('MessageReactionsList', () => {

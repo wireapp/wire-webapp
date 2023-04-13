@@ -677,6 +677,7 @@
   "messageDetailsSent": "Sent: {{sent}}",
   "messageDetailsTitle": "Details",
   "messageDetailsTitleReactions": "Reactions{{count}}",
+  "messageReactionDetails": "{{emojiCount}} reaction, react with {{emojiName}} emoji",
   "messageDetailsTitleReceipts": "Read{{count}}",
   "messageFailedToSendHideDetails": "Hide details",
   "messageFailedToSendParticipants": "{{count}} Participants",

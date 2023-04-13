@@ -40,23 +40,21 @@ const ReplyButton: FC<ReplyButtonProps> = ({
   onKeyPress,
 }) => {
   return (
-    <>
-      <button
-        css={{
-          ...messageActionsMenuButton,
-          ...getIconCSS,
-          ...getActionsMenuCSS(currentMsgActionName === actionId),
-        }}
-        type="button"
-        tabIndex={messageFocusedTabIndex}
-        data-uie-name={actionId}
-        aria-label={t('conversationContextMenuReply')}
-        onClick={onReplyClick}
-        onKeyDown={onKeyPress}
-      >
-        <Icon.Reply className="svg-icon" />
-      </button>
-    </>
+    <button
+      css={{
+        ...messageActionsMenuButton,
+        ...getIconCSS,
+        ...getActionsMenuCSS(currentMsgActionName === actionId),
+      }}
+      type="button"
+      tabIndex={messageFocusedTabIndex}
+      data-uie-name={actionId}
+      aria-label={t('conversationContextMenuReply')}
+      onClick={onReplyClick}
+      onKeyDown={onKeyPress}
+    >
+      <Icon.Reply className="svg-icon" />
+    </button>
   );
 };
 

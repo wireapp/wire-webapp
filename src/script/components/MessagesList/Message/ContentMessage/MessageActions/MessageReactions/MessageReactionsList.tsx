@@ -61,6 +61,7 @@ const MessageReactionsList: FC<MessageReactionsListProps> = ({
         const emojiUnicode = getEmojiUnicode(emoji);
         const emojiUrl = getEmojiUrl(emojiUnicode);
         const emojiName = getEmojiTitleFromEmojiUnicode(emojiUnicode);
+        const emojiCount = users.length;
         const isActive = isSelectedEmoji === emojiUrl;
         return (
           <Fragment key={emojiUnicode}>
@@ -87,7 +88,7 @@ const MessageReactionsList: FC<MessageReactionsListProps> = ({
                       tabIndex={0}
                       css={messageReactionButtonTooltipTextLink}
                     >
-                      {t('conversationLikesCaption', {number: users.length.toString()})}
+                      {t('conversationLikesCaption', {number: emojiCount.toString()})}
                     </span>{' '}
                     {t('conversationLikesCaptionReacted', {emojiName})}
                   </p>
@@ -96,7 +97,7 @@ const MessageReactionsList: FC<MessageReactionsListProps> = ({
             >
               <button
                 css={{...messageReactionButton, ...getReactionsButtonCSS(isActive)}}
-                aria-label={emojiName}
+                aria-label={t('messageReactionDetails', {emojiCount: emojiCount.toString(), emojiName})}
                 aria-pressed={isActive}
                 type="button"
                 tabIndex={messageFocusedTabIndex}
@@ -107,7 +108,7 @@ const MessageReactionsList: FC<MessageReactionsListProps> = ({
                 }}
               >
                 <EmojiImg emojiUrl={emojiUrl} emojiName={emojiName} />
-                <span css={messageReactionCount}>({users.length})</span>
+                <span css={messageReactionCount}>({emojiCount})</span>
               </button>
             </Tooltip>
           </Fragment>
