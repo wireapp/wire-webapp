@@ -40,9 +40,7 @@ const INITIAL_CLIENT_Y_POS = 0;
 export interface MessageReactionsProps {
   messageFocusedTabIndex: number;
   currentMsgActionName: string;
-  toggleActiveMessageAction: (
-    event: React.MouseEvent<HTMLButtonElement> | React.KeyboardEvent<HTMLButtonElement>,
-  ) => void;
+  toggleActiveMenu: (event: React.MouseEvent<HTMLButtonElement> | React.KeyboardEvent<HTMLButtonElement>) => void;
   handleKeyDown: (event: React.KeyboardEvent<HTMLButtonElement>) => void;
   handleCurrentMsgAction: (actionName: string) => void;
   resetActionMenuStates: () => void;
@@ -55,7 +53,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
   messageFocusedTabIndex,
   currentMsgActionName,
   handleCurrentMsgAction,
-  toggleActiveMessageAction,
+  toggleActiveMenu,
   handleKeyDown,
   resetActionMenuStates,
   wrapperRef,
@@ -141,16 +139,16 @@ const MessageReactions: FC<MessageReactionsProps> = ({
           handleEmojiBtnClick(event);
           break;
         case MessageActionsId.THUMBSUP:
-          toggleActiveMessageAction(event);
+          toggleActiveMenu(event);
           handleReactionClick(thumbsUpEmoji);
           break;
         case MessageActionsId.HEART:
-          toggleActiveMessageAction(event);
+          toggleActiveMenu(event);
           handleReactionClick(likeEmoji);
           break;
       }
     },
-    [handleEmojiBtnClick, toggleActiveMessageAction],
+    [handleEmojiBtnClick, handleReactionClick, toggleActiveMenu],
   );
 
   const handleMsgActionKeyDown = useCallback(
@@ -247,7 +245,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
         <EmojiPickerContainer
           posX={clientX}
           posY={clientY}
-          handleEscape={closeEmojiPicker}
+          onClose={closeEmojiPicker}
           resetActionMenuStates={handleOutsideClick}
           wrapperRef={wrapperRef}
           handleReactionClick={handleReactionClick}

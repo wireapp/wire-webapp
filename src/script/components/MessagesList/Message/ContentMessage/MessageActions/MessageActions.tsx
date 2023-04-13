@@ -23,7 +23,6 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Icon} from 'Components/Icon';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/ContextMenu';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -41,6 +40,7 @@ import {
   messageWithHeaderTop,
 } from './MessageActions.styles';
 import {MessageReactions} from './MessageReactions/MessageReactions';
+import {ReplyButton} from './ReplyButton';
 
 import {useMessageFocusedTabIndex} from '../../util';
 
@@ -119,7 +119,7 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
     [resetActionMenuStates, currentMsgActionName, handleMenuOpen, menuEntries],
   );
 
-  const toggleActiveMessageAction = useCallback(
+  const toggleActiveMenu = useCallback(
     (event: React.MouseEvent<HTMLButtonElement> | React.KeyboardEvent<HTMLButtonElement>) => {
       const selectedMsgActionName = event.currentTarget.dataset.uieName;
       handleMenuOpen(false);
@@ -131,6 +131,14 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
       }
     },
     [currentMsgActionName, handleMenuOpen],
+  );
+
+  const handleMessageReply = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      toggleActiveMenu(event);
+      amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REPLY, message);
+    },
+    [message, toggleActiveMenu],
   );
 
   return (
@@ -145,31 +153,20 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
           messageFocusedTabIndex={messageFocusedTabIndex}
           currentMsgActionName={currentMsgActionName}
           handleCurrentMsgAction={setCurrentMsgAction}
-          toggleActiveMessageAction={toggleActiveMessageAction}
+          toggleActiveMenu={toggleActiveMenu}
           handleKeyDown={handleKeyDown}
           resetActionMenuStates={resetActionMenuStates}
           wrapperRef={wrapperRef}
           message={message}
           handleReactionClick={handleReactionClick}
         />
-        <button
-          css={{
-            ...messageActionsMenuButton,
-            ...getIconCSS,
-            ...getActionsMenuCSS(currentMsgActionName === MessageActionsId.REPLY),
-          }}
-          type="button"
-          tabIndex={messageFocusedTabIndex}
-          data-uie-name={MessageActionsId.REPLY}
-          aria-label={t('conversationContextMenuReply')}
-          onClick={event => {
-            toggleActiveMessageAction(event);
-            amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REPLY, message);
-          }}
-          onKeyDown={handleKeyDown}
-        >
-          <Icon.Reply className="svg-icon" />
-        </button>
+        <ReplyButton
+          actionId={MessageActionsId.REPLY}
+          currentMsgActionName={currentMsgActionName}
+          messageFocusedTabIndex={messageFocusedTabIndex}
+          onReplyClick={handleMessageReply}
+          onKeyPress={handleKeyDown}
+        />
         {menuEntries.length > 0 && (
           <button
             tabIndex={messageFocusedTabIndex}

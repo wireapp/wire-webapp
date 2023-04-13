@@ -343,6 +343,7 @@ export const Conversation: FC<ConversationProps> = ({
       conversationRepository: repositories.conversation,
       currentMessageEntity: messageEntity,
       messageRepository: repositories.message,
+      selfUser,
     });
   };
 
