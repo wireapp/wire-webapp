@@ -515,7 +515,7 @@ export class Conversation {
       if (this.isRequest() || this.is1to1()) {
         const [userEntity] = this.participating_user_ets();
         const userName = userEntity?.name();
-        return userName || t('unavailableUser');
+        return userName || '…';
       }
 
       if (this.isGroup()) {
