@@ -30,7 +30,7 @@ import {getEmojiUrl} from 'Util/ReactionUtil';
 interface EmojiPickerContainerProps {
   posX: number;
   posY: number;
-  handleEscape: () => void;
+  onClose: () => void;
   resetActionMenuStates: () => void;
   wrapperRef: RefObject<HTMLDivElement>;
   handleReactionClick: (emoji: string) => void;
@@ -39,7 +39,7 @@ interface EmojiPickerContainerProps {
 const EmojiPickerContainer: FC<EmojiPickerContainerProps> = ({
   posX,
   posY,
-  handleEscape,
+  onClose,
   resetActionMenuStates,
   wrapperRef,
   handleReactionClick,
@@ -82,6 +82,7 @@ const EmojiPickerContainer: FC<EmojiPickerContainerProps> = ({
 
   function onEmojiClick(emojiData: EmojiClickData, event: MouseEvent) {
     handleReactionClick(emojiData.emoji);
+    onClose();
   }
   return (
     <>
@@ -91,7 +92,7 @@ const EmojiPickerContainer: FC<EmojiPickerContainerProps> = ({
           className="overlay"
           onKeyDown={event => {
             if (isEscapeKey(event)) {
-              handleEscape();
+              onClose();
             }
           }}
         >
