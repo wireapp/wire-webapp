@@ -28,7 +28,7 @@ export interface Action {
 export interface Text {
   htmlMessage?: string;
   input?: string;
-  message?: string;
+  message?: React.ReactNode;
   option?: string;
   title?: string;
   closeBtnLabel?: string;
@@ -37,9 +37,13 @@ export interface Text {
 export interface ModalOptions {
   close?: () => void;
   closeOnConfirm?: boolean;
+  /** Set to `true` to add a password copy to clipboard button */
+  copyPassword?: boolean;
   /** Content needed for visualization on modal */
   data?: ClientNotificationData[] | boolean;
   hideSecondary?: boolean;
+  /** Set to `true` to add a password generator button */
+  passwordGenerator?: boolean;
   /** Set to `true` to disable autoclose behavior */
   preventClose?: boolean;
   /** Called when action in modal is triggered */
@@ -59,23 +63,26 @@ export enum PrimaryModalType {
   MULTI_ACTIONS = 'modal-multi-actions',
   OPTION = 'modal-template-option',
   PASSWORD = 'modal-template-password',
+  GUEST_LINK_PASSWORD = 'modal-template-guest-link-password',
   SESSION_RESET = 'modal-session-reset',
 }
 
 export interface ModalContent {
   checkboxLabel: string;
+  closeBtnTitle?: string;
   closeFn: () => void;
   closeOnConfirm?: boolean;
+  copyPassword?: boolean;
   currentType: string;
   inputPlaceholder: string;
   messageHtml: string;
-  messageText: string;
+  messageText: React.ReactNode;
   modalUie: string;
   onBgClick: () => void;
+  passwordGenerator?: boolean;
   primaryAction: Action | null;
   secondaryAction: Action[] | Action | null;
   titleText: string;
-  closeBtnTitle?: string;
 }
 
 export type ModalItem = {id: string; options: ModalOptions; type: PrimaryModalType};

@@ -58,6 +58,8 @@ const defaultContent: ModalContent = {
   primaryAction: {} as Action,
   secondaryAction: [],
   titleText: '',
+  passwordGenerator: false,
+  copyPassword: false,
 };
 
 const logger = getLogger('PrimaryModalState');
@@ -121,13 +123,15 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
   }
 
   const {
-    closeOnConfirm = true,
     close = noop,
+    closeOnConfirm = true,
+    copyPassword,
     data,
+    hideSecondary,
+    passwordGenerator,
     preventClose = false,
     primaryAction,
     secondaryAction,
-    hideSecondary,
     showClose = false,
     text = {} as Text,
   } = options;
@@ -137,12 +141,14 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
     closeBtnTitle: text.closeBtnLabel,
     closeFn: close,
     closeOnConfirm,
+    copyPassword,
     currentType: type,
     inputPlaceholder: text.input ?? '',
     messageHtml: text.htmlMessage ?? '',
     messageText: text.message ?? '',
     modalUie: type,
     onBgClick: preventClose ? noop : removeCurrentModal,
+    passwordGenerator,
     primaryAction: primaryAction ?? null,
     secondaryAction: secondaryAction ?? null,
     showClose,

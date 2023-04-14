@@ -17,20 +17,21 @@
  *
  */
 
-import {render, fireEvent} from '@testing-library/react';
+import {render} from '@testing-library/react';
+import {act} from 'react-dom/test-utils';
 
-import {CopyToClipboard} from './CopyToClipboard';
+import {SelectText} from './SelectText';
 
 const selectionMock = window.getSelection() || ({} as Selection);
 selectionMock.removeAllRanges = jest.fn();
 selectionMock.addRange = jest.fn();
 window.getSelection = jest.fn(() => selectionMock);
 
-describe('CopyToClipboard', () => {
+describe('SelectText', () => {
   it('displays the given text', () => {
     const text = 'please copy this';
 
-    const {getByText} = render(<CopyToClipboard text={text} />);
+    const {getByText} = render(<SelectText text={text} />);
 
     expect(getByText(text)).not.toBeNull();
   });
@@ -38,11 +39,13 @@ describe('CopyToClipboard', () => {
   it('selects the whole text when clicked', () => {
     const text = 'please copy this';
 
-    const {getByTestId} = render(<CopyToClipboard text={text} />);
+    const {getByTestId} = render(<SelectText text={text} />);
 
-    const textField = getByTestId('copy-to-clipboard');
+    const textField = getByTestId('select-text');
 
-    fireEvent.click(textField);
+    act(() => {
+      textField.click();
+    });
 
     expect(selectionMock.removeAllRanges).toHaveBeenCalled();
     expect(selectionMock.addRange).toHaveBeenCalled();

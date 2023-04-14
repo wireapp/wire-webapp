@@ -21,19 +21,26 @@ import {FC, FormEvent, MouseEvent, useState, useRef, ChangeEvent, useEffect} fro
 
 import cx from 'classnames';
 
-import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
+import {Checkbox, CheckboxLabel, Form, Input} from '@wireapp/react-ui-kit';
 
+import {CopyToClipboardButton} from 'Components/CopyToClipboardButton';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
 import {ModalComponent} from 'Components/ModalComponent';
+import {PasswordGeneratorButton} from 'Components/PasswordGeneratorButton';
+import {Config} from 'src/script/Config';
 import {isEscapeKey} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
 
+import {guestLinkPasswordInputStyles} from './PrimaryModal.styles';
 import {usePrimaryModalState, showNextModalInQueue, defaultContent, removeCurrentModal} from './PrimaryModalState';
 import {Action, PrimaryModalType} from './PrimaryModalTypes';
 
 export const PrimaryModalComponent: FC = () => {
   const [inputValue, updateInputValue] = useState<string>('');
-  const [passwordValue, updatePasswordValue] = useState<string>('');
+  const [passwordValue, setPasswordValue] = useState<string>('');
+  const [passwordConfirmationValue, setPasswordConfirmationValue] = useState<string>('');
+  const [didCopyPassword, setDidCopyPassword] = useState<boolean>(false);
   const [optionChecked, updateOptionChecked] = useState<boolean>(false);
   const content = usePrimaryModalState(state => state.currentModalContent);
   const errorMessage = usePrimaryModalState(state => state.errorMessage);
@@ -55,15 +62,20 @@ export const PrimaryModalComponent: FC = () => {
     secondaryAction,
     titleText,
     closeBtnTitle,
+    passwordGenerator,
+    copyPassword,
   } = content;
+
   const hasPassword = currentType === PrimaryModalType.PASSWORD;
   const hasInput = currentType === PrimaryModalType.INPUT;
   const hasOption = currentType === PrimaryModalType.OPTION;
   const hasMultipleSecondary = currentType === PrimaryModalType.MULTI_ACTIONS;
+  const isGuestLinkPassword = currentType === PrimaryModalType.GUEST_LINK_PASSWORD;
+
   const onModalHidden = () => {
     updateCurrentModalContent(defaultContent);
     updateInputValue('');
-    updatePasswordValue('');
+    setPasswordValue('');
     updateErrorMessage('');
     updateOptionChecked(false);
     showNextModalInQueue();
@@ -88,18 +100,25 @@ export const PrimaryModalComponent: FC = () => {
 
   const confirm = () => {
     const action = content?.primaryAction?.action;
-    if (typeof action === 'function') {
-      const actions = {
-        [PrimaryModalType.OPTION]: () => action(optionChecked),
-        [PrimaryModalType.INPUT]: () => action(inputValue),
-        [PrimaryModalType.PASSWORD]: () => action(passwordValue),
-      };
-      if (Object.keys(actions).includes(content?.currentType ?? '')) {
-        actions[content?.currentType as keyof typeof actions]();
-        return;
-      }
-      action();
+    if (typeof action !== 'function') {
+      return;
     }
+    if (isGuestLinkPassword) {
+      action(passwordValue, didCopyPassword);
+      return;
+    }
+    const actions = {
+      [PrimaryModalType.OPTION]: () => action(optionChecked),
+      [PrimaryModalType.INPUT]: () => action(inputValue),
+      [PrimaryModalType.PASSWORD]: () => action(passwordValue),
+      [PrimaryModalType.GUEST_LINK_PASSWORD]: () => action(passwordValue),
+    };
+
+    if (Object.keys(actions).includes(content?.currentType ?? '')) {
+      actions[content?.currentType as keyof typeof actions]();
+      return;
+    }
+    action();
   };
 
   const onOptionChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -164,6 +183,62 @@ export const PrimaryModalComponent: FC = () => {
                 </div>
               )}
 
+              {passwordGenerator && (
+                <PasswordGeneratorButton
+                  passwordLength={Config.getConfig().MINIMUM_PASSWORD_LENGTH}
+                  onGeneratePassword={password => {
+                    setPasswordValue(password);
+                    setPasswordConfirmationValue(password);
+                  }}
+                />
+              )}
+
+              {isGuestLinkPassword && (
+                <Form
+                  name="guest-password-link-form"
+                  data-uie-name="guest-password-link-form"
+                  onSubmit={doAction(confirm, !!closeOnConfirm)}
+                  autoComplete="off"
+                >
+                  <Input
+                    name="guest-link-password"
+                    required
+                    wrapperCSS={guestLinkPasswordInputStyles}
+                    placeholder="Password Input"
+                    label="Password Input"
+                    helperText="Must have at least one: uppercase letter, lowercase letter, number, symbol"
+                    id="modal_pswd_confiramtion"
+                    className="modal__input"
+                    type="password"
+                    autoComplete="off"
+                    value={passwordValue}
+                    onChange={event => setPasswordValue(event.currentTarget.value)}
+                  />
+                  <Input
+                    name="guest-link-password-confirm"
+                    required
+                    wrapperCSS={guestLinkPasswordInputStyles}
+                    placeholder="Password Input"
+                    label="Password Input"
+                    className="modal__input"
+                    type="password"
+                    id="modal_pswd_confiramtion"
+                    autoComplete="off"
+                    value={passwordConfirmationValue}
+                    onChange={event => setPasswordConfirmationValue(event.currentTarget.value)}
+                  />
+                </Form>
+              )}
+
+              {copyPassword && (
+                <CopyToClipboardButton
+                  textToCopy={passwordValue}
+                  displayText={t('guestOptionsPasswordCopyToClipboard')}
+                  copySuccessText={t('guestOptionsPasswordCopyToClipboardSuccess')}
+                  onCopySuccess={() => setDidCopyPassword(true)}
+                />
+              )}
+
               {hasPassword && (
                 <form onSubmit={doAction(confirm, !!closeOnConfirm)}>
                   <label htmlFor="modal_pswd" className="visually-hidden">
@@ -176,7 +251,7 @@ export const PrimaryModalComponent: FC = () => {
                     type="password"
                     value={passwordValue}
                     placeholder={inputPlaceholder}
-                    onChange={event => updatePasswordValue(event.target.value)}
+                    onChange={event => setPasswordValue(event.target.value)}
                   />
                 </form>
               )}

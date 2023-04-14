@@ -179,8 +179,8 @@ export class ConversationService {
    * @param conversationId ID of conversation to request access code for
    * @returns Resolves with the server response
    */
-  postConversationCode(conversationId: string): Promise<ConversationCodeUpdateEvent> {
-    return this.apiClient.api.conversation.postConversationCodeRequest(conversationId);
+  postConversationCode(conversationId: string, password?: string): Promise<ConversationCodeUpdateEvent> {
+    return this.apiClient.api.conversation.postConversationCodeRequest(conversationId, password);
   }
 
   /**
