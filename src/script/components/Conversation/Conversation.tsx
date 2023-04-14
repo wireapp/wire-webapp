@@ -259,6 +259,10 @@ export const Conversation: FC<ConversationProps> = ({
     }
   };
 
+  const showMessageReactions = (message: Message, showReactions = true) => {
+    openRightSidebar(PanelState.MESSAGE_DETAILS, {entity: message, showReactions});
+  };
+
   const handleEmailClick = (event: Event, messageDetails: MessageDetails) => {
     safeMailOpen(messageDetails.href!);
     event.preventDefault();
@@ -504,6 +508,7 @@ export const Conversation: FC<ConversationProps> = ({
             cancelConnectionRequest={clickOnCancelRequest}
             showUserDetails={showUserDetails}
             showMessageDetails={showMessageDetails}
+            showMessageReactions={showMessageReactions}
             showParticipants={showParticipants}
             showImageDetails={showDetail}
             resetSession={onSessionResetClick}

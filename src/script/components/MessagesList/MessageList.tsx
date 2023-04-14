@@ -62,6 +62,7 @@ interface MessagesListParams {
   selfUser: User;
   showImageDetails: (message: ContentMessage, event: React.UIEvent) => void;
   showMessageDetails: (message: MessageEntity, showReactions?: boolean) => void;
+  showMessageReactions: (message: MessageEntity, showReactions?: boolean) => void;
   showParticipants: (users: User[]) => void;
   showUserDetails: (user: User | ServiceEntity) => void;
   isLastReceivedMessage: (messageEntity: MessageEntity, conversationEntity: ConversationEntity) => boolean;
@@ -108,6 +109,7 @@ const MessagesList: FC<MessagesListParams> = ({
   onClickMessage,
   showUserDetails,
   showMessageDetails,
+  showMessageReactions,
   showImageDetails,
   showParticipants,
   cancelConnectionRequest,
@@ -307,7 +309,7 @@ const MessagesList: FC<MessagesListParams> = ({
               onClickCancelRequest={cancelConnectionRequest}
               onClickImage={showImageDetails}
               onClickInvitePeople={() => invitePeople(conversation)}
-              onClickReactionDetails={message => showMessageDetails(message, true)}
+              onClickReactionDetails={message => showMessageReactions(message, true)}
               onClickMessage={onClickMessage}
               onClickParticipants={showParticipants}
               onClickDetails={message => showMessageDetails(message)}
