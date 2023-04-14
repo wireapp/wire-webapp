@@ -42,6 +42,7 @@ export const messageReactionWrapper: CSSObject = {
   display: 'flex',
   gap: '0.5rem',
   paddingLeft: '56px',
+  '.tooltip-content': {marginBottom: '0 !important'},
 };
 
 export const messageReactionButton: CSSObject = {
