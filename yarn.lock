@@ -11985,7 +11985,14 @@ dexie@latest:
   languageName: node
   linkType: hard
 
-"long@npm:5.2.1, long@npm:^5.0.0, long@npm:^5.2.0":
+"long@npm:5.2.3":
+  version: 5.2.3
+  resolution: "long@npm:5.2.3"
+  checksum: 885ede7c3de4facccbd2cacc6168bae3a02c3e836159ea4252c87b6e34d40af819824b2d4edce330bfb5c4d6e8ce3ec5864bdcf9473fa1f53a4f8225860e5897
+  languageName: node
+  linkType: hard
+
+"long@npm:^5.0.0, long@npm:^5.2.0":
   version: 5.2.1
   resolution: "long@npm:5.2.1"
   checksum: 9264da12d1b7df67e5aa6da4498144293caf1ad12e7f092efe4e9a2d32c53f0bbf7334f7cef997080a2a3af061142558ab366efa71698d98b1cdb883477445a7
@@ -17647,7 +17654,7 @@ dexie@latest:
     libsodium-wrappers: 0.7.10
     linkify-it: 4.0.1
     lint-staged: 13.2.1
-    long: 5.2.1
+    long: 5.2.3
     markdown-it: 13.0.1
     murmurhash: 2.0.1
     node-fetch: 2.6.9
