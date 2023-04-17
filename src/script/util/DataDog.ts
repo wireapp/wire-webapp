@@ -17,13 +17,15 @@
  *
  */
 
+import {QualifiedId} from '@wireapp/api-client/lib/user';
+
 import {Configuration} from '../Config';
 
 const uuidRegex = /([a-z\d]{8})-([a-z\d]{4})-([a-z\d]{4})-([a-z\d]{4})-([a-z\d]{12})/gim;
 
 let isDataDogInitialized = false;
 
-export async function initializeDataDog(config: Configuration, domain?: string) {
+export async function initializeDataDog(config: Configuration, user?: QualifiedId) {
   if (isDataDogInitialized) {
     return;
   }
@@ -37,10 +39,15 @@ export async function initializeDataDog(config: Configuration, domain?: string) 
     return;
   }
 
+  const {domain, id: userId} = user ?? {};
+
   const replacer = (_match: string, p1: string) => `${p1}***`;
   const truncateDomain = (value: string) => `${value.substring(0, 3)}***`;
   const replaceAllStrings = (string: string) => string.replaceAll(uuidRegex, replacer);
   const replaceDomains = (string: string) => (domain ? string.replaceAll(domain, truncateDomain(domain)) : string);
+  const removeColors = (string: string) =>
+    string.replaceAll(/%c/g, '').replaceAll(/color:[^;]+; font-weight:[^;]+; /g, '');
+  const removeTimestamp = (string: string) => string.replaceAll(/\[\d+-\d+-\d+ \d+:\d+:\d+\] /g, '');
 
   const {datadogRum} = await import('@datadog/browser-rum');
 
@@ -73,7 +80,13 @@ export async function initializeDataDog(config: Configuration, domain?: string) 
     sessionSampleRate: 100,
     beforeSend: log => {
       log.view.url = '/';
-      log.message = replaceDomains(replaceAllStrings(log.message));
+      log.message = replaceDomains(replaceAllStrings(removeTimestamp(removeColors(log.message))));
     },
   });
+
+  if (userId) {
+    const id = userId.substring(0, 8);
+    datadogRum.setUser({id});
+    datadogLogs.setUser({id});
+  }
 }

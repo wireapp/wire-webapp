@@ -133,7 +133,7 @@ export class ClientRepository {
       const status = error.response?.status;
       const clientNotFoundBackend = status === HTTP_STATUS.NOT_FOUND;
       if (clientNotFoundBackend) {
-        this.logger.warn(`Local client '${clientId}' no longer exists on the backend`, error);
+        this.logger.warn(`Local client no longer exists on the backend`, error);
         throw new ClientError(ClientError.TYPE.NO_VALID_CLIENT, ClientError.MESSAGE.NO_VALID_CLIENT);
       }
 
@@ -246,8 +246,7 @@ export class ClientRepository {
   async getValidLocalClient(): Promise<ko.Observable<ClientEntity>> {
     try {
       const clientEntity = await this.getCurrentClientFromDb();
-      const clientPayload = await this.getClientByIdFromBackend(clientEntity.id);
-      this.logger.info(`Client with ID '${clientPayload.id}' (${clientPayload.type}) validated on backend`);
+      await this.getClientByIdFromBackend(clientEntity.id);
       const currentClient = this.clientState.currentClient;
 
       await this.clientService.putClientCapabilities(currentClient().id, {
@@ -374,7 +373,6 @@ export class ClientRepository {
    * @returns Resolves with all locally known clients except the current one
    */
   async getClientsForSelf(): Promise<ClientEntity[]> {
-    this.logger.info('Retrieving all clients of the self user from database');
     const {domain, id} = this.selfUser();
     const clientRecords = await this.getClientByUserIdFromDb({domain, id});
     const clientEntities = ClientMapper.mapClients(clientRecords, true, domain);
@@ -444,7 +442,7 @@ export class ClientRepository {
             delete clientsFromBackend[clientId];
 
             if (this.clientState.currentClient() && this.isCurrentClient(userId, clientId)) {
-              this.logger.warn(`Removing duplicate self client '${clientId}' locally`);
+              this.logger.warn(`Removing duplicate local self client`);
               await this.removeClient(userId, clientId);
             }
 
@@ -452,7 +450,7 @@ export class ClientRepository {
             if (wasUpdated) {
               // Clear the previous client in DB (in case the domain changes the primary key will also change, thus invalidating the previous client)
               await this.clientService.deleteClientFromDb(client.meta.primary_key);
-              this.logger.info(`Updating client '${clientId}' of user '${userId.id}' locally`);
+              this.logger.info(`Updating local client`);
               promises.push(this.saveClientInDb(userId, client));
               continue;
             }
@@ -463,7 +461,7 @@ export class ClientRepository {
           }
 
           // Locally known client deleted on backend
-          this.logger.warn(`Removing client '${clientId}' of user '${userId.id}' locally`);
+          this.logger.warn(`Removing local client`);
           await this.removeClient(userId, clientId);
         }
 
@@ -475,7 +473,7 @@ export class ClientRepository {
           }
 
           // Locally unknown client new on backend
-          this.logger.debug(`New client '${clientId}' of user '${userId.id}' will be stored locally`);
+          this.logger.debug(`New client will be stored locally`);
           if (matchQualifiedIds(this.selfUser(), userId)) {
             this.onClientAdd({client: clientPayload as RegisteredClient});
           }
@@ -541,7 +539,7 @@ export class ClientRepository {
    * @param eventJson JSON data of 'user.client-add' event
    */
   private onClientAdd(eventJson: Pick<UserClientAddEvent, 'client'>): void {
-    this.logger.debug('Client of self user added', eventJson);
+    this.logger.debug('Client of self user added');
     amplify.publish(WebAppEvents.CLIENT.ADD, this.selfUser().qualifiedId, eventJson.client, true);
   }
 
