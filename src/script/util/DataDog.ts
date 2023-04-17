@@ -82,6 +82,7 @@ export async function initializeDataDog(config: Configuration, user: {id?: strin
       }
       log.view.url = '/';
       log.message = replaceDomains(replaceAllStrings(removeTimestamp(removeColors(log.message))));
+      return undefined;
     },
   });
 
