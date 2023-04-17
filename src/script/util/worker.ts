@@ -18,7 +18,15 @@
  */
 
 export class WebWorker {
-  constructor(private worker: Worker) {}
+  #worker: Worker | undefined;
+  constructor(private workerCreator: () => Worker) {}
+
+  private get worker(): Worker {
+    if (!this.#worker) {
+      this.#worker = this.workerCreator();
+    }
+    return this.#worker;
+  }
 
   post<T>(data: string | ArrayBuffer | Record<string, any>): Promise<T> {
     return new Promise((resolve, reject) => {

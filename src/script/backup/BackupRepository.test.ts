@@ -17,17 +17,19 @@
  *
  */
 
-import JSZip from 'jszip';
 import {container} from 'tsyringe';
 
 import {createRandomUuid, noop} from 'Util/util';
+import {WebWorker} from 'Util/worker';
 
 import {BackupRepository} from './BackupRepository';
 import {BackupService} from './BackupService';
 import {CancelError, DifferentAccountError, IncompatibleBackupError, IncompatiblePlatformError} from './Error';
+import {handleZipEvent} from './zipWorker';
 
 import {ConversationRepository} from '../conversation/ConversationRepository';
 import {User} from '../entity/User';
+import {ClientEvent} from '../event/Client';
 import {DatabaseTypes, createStorageEngine} from '../service/StoreEngineProvider';
 import {StorageService} from '../storage';
 import {StorageSchemata} from '../storage/StorageSchemata';
@@ -88,6 +90,10 @@ async function buildBackupRepository() {
 }
 
 describe('BackupRepository', () => {
+  beforeAll(async () => {
+    jest.spyOn(WebWorker.prototype, 'post').mockImplementation(handleZipEvent as any);
+  });
+
   describe('createMetaData', () => {
     it('creates backup metadata', async () => {
       const [backupRepository, {backupService}] = await buildBackupRepository();
@@ -111,40 +117,28 @@ describe('BackupRepository', () => {
   describe('generateHistory', () => {
     const eventStoreName = StorageSchemata.OBJECT_STORE.EVENTS;
 
-    // TODO: [JEST] Shim WebWorkers
-    /*
-    it.skip('generates an archive of the database', async () => {
-      const blob = await backupRepository.generateHistory(noop);
-      const zip = await new JSZip().loadAsync(blob);
-      const zipFilenames = Object.keys(zip.files);
-      Object.values(BackupRepository.CONFIG.FILENAME).forEach(filename => expect(zipFilenames).toContain(filename));
-
-      const conversationsStr = await zip.files[BackupRepository.CONFIG.FILENAME.CONVERSATIONS].async('string');
-      const conversations = JSON.parse(conversationsStr);
-      expect(conversations).toEqual([conversation]);
-
-      const eventsStr = await zip.files[BackupRepository.CONFIG.FILENAME.EVENTS].async('string');
-      const events = JSON.parse(eventsStr);
-      expect(events).toEqual(messages);
-    });
-
-    // TODO: [JEST] Shim WebWorkers
-    it.skip('ignores verification events in the backup', async () => {
+    it('ignores verification events in the backup', async () => {
+      const user = new User('user1');
+      const [backupRepository, {storageService, backupService}] = await buildBackupRepository();
       const verificationEvent = {
         conversation: conversationId,
         type: ClientEvent.CONVERSATION.VERIFICATION,
       };
+      const textEvent = {
+        conversation: conversationId,
+        type: ClientEvent.CONVERSATION.MESSAGE_ADD,
+      };
+      const importSpy = jest.spyOn(backupService, 'importEntities');
 
-      await testFactory.storage_service.save(StorageSchemata.OBJECT_STORE.EVENTS, undefined, verificationEvent);
-      const blob = await backupRepository.generateHistory(noop);
-      const zip = await new JSZip().loadAsync(blob);
+      await storageService.save(StorageSchemata.OBJECT_STORE.EVENTS, undefined, verificationEvent);
+      await storageService.save(StorageSchemata.OBJECT_STORE.EVENTS, undefined, textEvent);
+      const blob = await backupRepository.generateHistory(user, 'client1', noop);
 
-      const eventsStr = await zip.files[BackupRepository.CONFIG.FILENAME.EVENTS].async('string');
-      const events = JSON.parse(eventsStr);
-      expect(events).not.toContain(verificationEvent);
-      expect(events.length).toBe(messages.length);
+      await backupRepository.importHistory(new User('user1'), blob, noop, noop);
+
+      expect(importSpy).toHaveBeenCalledWith(eventStoreName, [textEvent]);
+      expect(importSpy).not.toHaveBeenCalledWith(eventStoreName, [verificationEvent]);
     });
-    */
 
     it('cancels export', async () => {
       const [backupRepository, {storageService}] = await buildBackupRepository();
@@ -163,41 +157,36 @@ describe('BackupRepository', () => {
   });
 
   describe('importHistory', () => {
-    it(`fails if metadata doesn't match`, async () => {
-      const [backupRepository] = await buildBackupRepository();
-      const tests = [
+    it.each([
+      [
         {
           expectedError: DifferentAccountError,
           metaChanges: {user_id: 'fail'},
         },
+      ],
+      [
         {
           expectedError: IncompatibleBackupError,
           metaChanges: {version: 13}, // version 14 contains a migration script, thus will generate an error
         },
+      ],
+      [
         {
           expectedError: IncompatiblePlatformError,
           metaChanges: {platform: 'random'},
         },
-      ];
+      ],
+    ])(`fails if metadata doesn't match`, async ({metaChanges, expectedError}) => {
+      const [backupRepository] = await buildBackupRepository();
 
-      for (const testDescription of tests) {
-        const archive = new JSZip();
-        const meta = {
-          ...backupRepository.createMetaData(new User('user1'), 'client1'),
-          ...testDescription.metaChanges,
-        };
+      const meta = {...backupRepository.createMetaData(new User('user1'), 'client1'), ...metaChanges};
 
-        archive.file(BackupRepository.CONFIG.FILENAME.METADATA, JSON.stringify(meta));
+      const files = {
+        [BackupRepository.CONFIG.FILENAME.METADATA]: JSON.stringify(meta),
+      };
+      const zip = (await handleZipEvent({type: 'zip', files})) as Uint8Array;
 
-        const files: Record<string, any> = {};
-        for (const fileName in archive.files) {
-          files[fileName] = await archive.files[fileName].async('uint8array');
-        }
-
-        await expect(backupRepository.importHistory(new User('user1'), files, noop, noop)).rejects.toThrow(
-          testDescription.expectedError,
-        );
-      }
+      await expect(backupRepository.importHistory(new User('user1'), zip, noop, noop)).rejects.toThrow(expectedError);
     });
 
     it('successfully imports a backup', async () => {
@@ -206,28 +195,20 @@ describe('BackupRepository', () => {
       jest.spyOn(backupService, 'getDatabaseVersion').mockReturnValue(15);
       jest.spyOn(backupService, 'importEntities').mockResolvedValue(undefined);
 
-      const metadataArray = [{...backupRepository.createMetaData(user, 'client1'), version: 15}];
+      const metadata = {...backupRepository.createMetaData(user, 'client1'), version: 15};
 
-      const archives = metadataArray.map(metadata => {
-        const archive = new JSZip();
-        archive.file(BackupRepository.CONFIG.FILENAME.METADATA, JSON.stringify(metadata));
-        archive.file(BackupRepository.CONFIG.FILENAME.CONVERSATIONS, JSON.stringify([conversation]));
-        archive.file(BackupRepository.CONFIG.FILENAME.EVENTS, JSON.stringify(messages));
+      const files = {
+        [BackupRepository.CONFIG.FILENAME.METADATA]: JSON.stringify(metadata),
+        [BackupRepository.CONFIG.FILENAME.CONVERSATIONS]: JSON.stringify([conversation]),
+        [BackupRepository.CONFIG.FILENAME.EVENTS]: JSON.stringify(messages),
+      };
 
-        return archive;
-      });
+      const zip = (await handleZipEvent({type: 'zip', files})) as Uint8Array;
 
-      for (const archive of archives) {
-        const files: Record<string, any> = {};
-        for (const fileName in archive.files) {
-          files[fileName] = await archive.files[fileName].async('uint8array');
-        }
+      await backupRepository.importHistory(user, zip, noop, noop);
 
-        await backupRepository.importHistory(user, files, noop, noop);
-
-        expect(conversationRepository.updateConversationStates).toHaveBeenCalledWith([conversation]);
-        expect(backupService.importEntities).toHaveBeenCalledWith(StorageSchemata.OBJECT_STORE.EVENTS, messages);
-      }
+      expect(conversationRepository.updateConversationStates).toHaveBeenCalledWith([conversation]);
+      expect(backupService.importEntities).toHaveBeenCalledWith(StorageSchemata.OBJECT_STORE.EVENTS, messages);
     });
   });
 });

@@ -87,7 +87,7 @@ export class BackupRepository {
     this.conversationRepository = conversationRepository;
 
     this.canceled = false;
-    this.worker = new WebWorker(new Worker(new URL('./zipWorker.ts', import.meta.url)));
+    this.worker = new WebWorker(() => new Worker(new URL('./zipWorker.ts', import.meta.url)));
   }
 
   public cancelAction(): void {
@@ -197,7 +197,7 @@ export class BackupRepository {
 
   public async importHistory(
     user: User,
-    data: ArrayBuffer,
+    data: ArrayBuffer | Blob,
     initCallback: (numberOfRecords: number) => void,
     progressCallback: (numberProcessed: number) => void,
   ): Promise<void> {
