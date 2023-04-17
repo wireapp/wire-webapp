@@ -19,6 +19,12 @@
 
 export class WebWorker {
   #worker: Worker | undefined;
+
+  /**
+   * worker wrapper that will lazy load (a single time) the worker only when it's needed
+   *
+   * @param workerCreator the creation function that will instanciate the worker (only called when the worker is needed)
+   */
   constructor(private workerCreator: () => Worker) {}
 
   private get worker(): Worker {
