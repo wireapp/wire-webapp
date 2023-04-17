@@ -27,7 +27,7 @@ const presetEnvConfig = {
 module.exports = {
   env: {
     test: {
-      plugins: ['@emotion'],
+      plugins: ['@emotion', 'babel-plugin-transform-import-meta'],
       presets: [
         ['@babel/preset-react', {importSource: '@emotion/react', runtime: 'automatic'}],
         '@babel/preset-typescript',
