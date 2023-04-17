@@ -77,6 +77,9 @@ export async function initializeDataDog(config: Configuration, user: {id?: strin
     forwardConsoleLogs: ['info', 'warn', 'error'], // For now those logs should be fine, we need to investigate if we need another logs in the future
     sessionSampleRate: 100,
     beforeSend: log => {
+      if (log.message.match(/@wireapp\/webapp\/avs/)) {
+        return false;
+      }
       log.view.url = '/';
       log.message = replaceDomains(replaceAllStrings(removeTimestamp(removeColors(log.message))));
     },

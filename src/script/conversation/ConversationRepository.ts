@@ -1959,6 +1959,9 @@ export class ConversationRepository {
 
       case ClientEvent.CONVERSATION.MESSAGE_ADD:
         extra.sender = event.from_client_id;
+
+      case ClientEvent.CONVERSATION.MESSAGE_DELETE:
+        extra.deletedMessage = event.data.message_id;
     }
     this.logger.info(logMessage, {time, from, qualified_conversation, ...extra});
   }
