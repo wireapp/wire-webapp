@@ -83,6 +83,7 @@ describe('UrlUtil', () => {
         {expected: baseUrl, url: 'www.wire.com'},
         {expected: baseUrl, url: 'wire.com/'},
         {expected: `${baseUrl}/join`, url: `${baseUrl}/join`},
+        {expected: `${baseUrl}:8080/join`, url: `${baseUrl}:8080/join`},
         {expected: `${baseUrl}/join`, url: `${baseUrl}/join/`},
         {expected: `${baseUrl}/join?key=ZE4543fdRETg`, url: `${baseUrl}/join?key=ZE4543fdRETg`},
         {expected: `${baseUrl}/join?key=ZE4543fdRETg#lOgIn`, url: `${baseUrl}/join?key=ZE4543fdRETg#lOgIn`},

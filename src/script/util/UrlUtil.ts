@@ -70,8 +70,8 @@ export const cleanURL = (url: string = ''): string => {
   // force a protocol if there is none
   url = url.replace(/^(?!https?:\/\/)/i, 'http://');
   try {
-    const {hostname, pathname, search, hash} = new URL(url);
-    return `${hostname.replace(/^www./, '')}${pathname.replace(/\/$/, '')}${search}${hash}`;
+    const {hostname, port, pathname, search, hash} = new URL(url);
+    return `${hostname.replace(/^www./, '')}${port ? `:${port}` : ''}${pathname.replace(/\/$/, '')}${search}${hash}`;
   } catch (error) {
     return '';
   }
