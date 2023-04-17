@@ -24,15 +24,12 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {t} from 'Util/LocalizerUtil';
-import {getLogger} from 'Util/Logger';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 
 import {TYPE} from './WarningsTypes';
 
 import {Config} from '../../Config';
 import {PermissionState} from '../../notification/PermissionState';
-
-const logger = getLogger('WarningsViewModel');
 
 type WarningsState = {
   name: string;
@@ -60,7 +57,6 @@ const hideWarning = (type = getVisibleWarning()) => {
   const {warnings, removeWarning} = useWarningsState.getState();
   if (warnings.includes(type)) {
     removeWarning(type);
-    logger.info(`Dismissed warning of type '${type}'`);
   }
 };
 
@@ -73,8 +69,6 @@ const showWarning = (type: TYPE, info?: {name: string}) => {
   if (isConnectivityWarning && !visibleWarningIsLifecycleUpdate) {
     hideWarning(visibleWarning);
   }
-
-  logger.warn(`Showing warning of type '${type}'`);
 
   if (info) {
     setName(info.name);
@@ -95,7 +89,6 @@ const closeWarning = (): void => {
 
   if (warnings.includes(warningToClose)) {
     removeWarning(warningToClose);
-    logger.info(`Dismissed warning of type '${warningToClose}'`);
   }
 
   switch (warningToClose) {

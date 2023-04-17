@@ -25,7 +25,7 @@ export const serverTimeHandler = {
   computeTimeOffset(serverTimeString: string): void {
     const timeOffset = Date.now() - new Date(serverTimeString).valueOf();
     this.timeOffset(timeOffset);
-    this.logger.info(`Current backend time is '${serverTimeString}'. Time offset updated to '${this.timeOffset()}' ms`);
+    this.logger.log(`Current backend time is '${serverTimeString}'. Time offset updated to '${this.timeOffset()}' ms`);
   },
 
   getTimeOffset(): number {

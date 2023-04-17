@@ -489,7 +489,6 @@ export class ConversationRepository {
       const response = await this.conversationService.getConversationById(qualifiedId);
       const [conversationEntity] = this.mapConversations([response]);
 
-      this.logger.info(`Fetched conversation '${conversationId}' from backend`);
       this.saveConversation(conversationEntity);
 
       fetching_conversations[conversationId].forEach(({resolveFn}) => resolveFn(conversationEntity));
@@ -1943,6 +1942,31 @@ export class ConversationRepository {
   // Event callbacks
   //##############################################################################
 
+  private logConversationEvent(event: IncomingEvent, source: EventSource) {
+    if (event.type === CONVERSATION_EVENT.TYPING) {
+      // Prevent logging typing events
+      return;
+    }
+    const {time, from, qualified_conversation} = event;
+    const extra: Record<string, unknown> = {};
+    extra.messageId = 'id' in event && event.id;
+    const logMessage = `Conversation Event: '${event.type}' (Source: ${source})`;
+    switch (event.type) {
+      case ClientEvent.CONVERSATION.ASSET_ADD:
+        extra.contentType = event.data.content_type;
+        extra.size = event.data.content_length;
+        extra.status = event.data.status;
+
+      case ClientEvent.CONVERSATION.MESSAGE_ADD:
+        extra.sender = event.from_client_id;
+        break;
+
+      case ClientEvent.CONVERSATION.MESSAGE_DELETE:
+        extra.deletedMessage = event.data.message_id;
+    }
+    this.logger.info(logMessage, {time, from, qualified_conversation, ...extra});
+  }
+
   /**
    * Listener for incoming events.
    *
@@ -1951,9 +1975,7 @@ export class ConversationRepository {
    * @returns Resolves when event was handled
    */
   private readonly onConversationEvent = (event: IncomingEvent, source = EventRepository.SOURCE.STREAM) => {
-    const logObject = {eventJson: JSON.stringify(event), eventObject: event};
-    const logMessage = `Conversation Event: '${event.type}' (Source: ${source})`;
-    this.logger.info(logMessage, logObject);
+    this.logConversationEvent(event, source);
     return this.handleConversationEvent(event, source);
   };
 
@@ -1975,9 +1997,6 @@ export class ConversationRepository {
     const conversationId: QualifiedId = eventData?.conversationId
       ? {domain: '', id: eventData.conversationId}
       : qualified_conversation || {domain: '', id: conversation};
-    this.logger.info(
-      `Handling event '${type}' in conversation '${conversationId.id}/${conversationId.domain}' (Source: ${eventSource})`,
-    );
 
     const inSelfConversation = this.conversationState.isSelfConversation(conversationId);
     if (inSelfConversation) {
