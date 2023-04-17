@@ -221,7 +221,11 @@ export class BackupRepository {
       }));
       await this.importHistoryData(fileDescriptors, initCallback, progressCallback);
     } catch (error) {
-      this.logger.error(`Could not import history: ${error.message}`, error);
+      if (error instanceof CancelError) {
+        this.logger.warn('history import canceled');
+      } else {
+        this.logger.error(`Could not import history: ${error.message}`, error);
+      }
       throw error;
     }
   }
