@@ -213,17 +213,12 @@ export class BackupRepository {
       throw new InvalidMetaDataError();
     }
 
-    try {
-      await this.verifyMetadata(user, files);
-      const fileDescriptors = Object.entries(files).map(([filename, content]) => ({
-        content,
-        filename,
-      }));
-      await this.importHistoryData(fileDescriptors, initCallback, progressCallback);
-    } catch (error) {
-      this.logger.error(`Could not import history: ${error.message}`, error);
-      throw error;
-    }
+    await this.verifyMetadata(user, files);
+    const fileDescriptors = Object.entries(files).map(([filename, content]) => ({
+      content,
+      filename,
+    }));
+    await this.importHistoryData(fileDescriptors, initCallback, progressCallback);
   }
 
   private async importHistoryData(
