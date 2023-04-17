@@ -533,8 +533,12 @@ export class ConversationRepository {
       const data = ConversationMapper.mergeConversation(localConversations, remoteConversations);
       conversationsData = (await this.conversationService.saveConversationsInDb(data)) as any[];
     }
-    const conversationEntities = this.mapConversations(conversationsData);
-    this.saveConversations(conversationEntities);
+    const allConversationEntities = this.mapConversations(conversationsData);
+    const newConversationEntities = allConversationEntities.filter(
+      allConversations =>
+        !this.conversationState.conversations().some(oldConversations => oldConversations.id === allConversations.id),
+    );
+    this.saveConversations(newConversationEntities);
     return this.conversationState.conversations();
   }
 
