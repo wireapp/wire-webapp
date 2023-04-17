@@ -17,15 +17,13 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-
 import {Configuration} from '../Config';
 
 const uuidRegex = /([a-z\d]{8})-([a-z\d]{4})-([a-z\d]{4})-([a-z\d]{4})-([a-z\d]{12})/gim;
 
 let isDataDogInitialized = false;
 
-export async function initializeDataDog(config: Configuration, user?: QualifiedId) {
+export async function initializeDataDog(config: Configuration, user: {id?: string; domain: string}) {
   if (isDataDogInitialized) {
     return;
   }
