@@ -50,6 +50,24 @@ const originalFenceRule = markdownit.renderer.rules.fence!;
 
 markdownit.renderer.rules.heading_open = () => '<div class="md-heading">';
 markdownit.renderer.rules.heading_close = () => '</div>';
+const originalNormalizeLink = markdownit.normalizeLink!;
+
+const isValidUrl = (url: string): boolean => {
+  // only allow urls to https://, http:// and mailto:
+  return !!url.match(/^(https?:\/\/|mailto:)/i);
+};
+markdownit.validateLink = isValidUrl;
+markdownit.normalizeLink = (url: string): string => {
+  url = originalNormalizeLink(url);
+  if (isValidUrl(url)) {
+    return url;
+  }
+  // prepend "https://" if url does not contain a protocol
+  if (!url.match(/^[a-z]+:/i)) {
+    return `https://${url}`;
+  }
+  return url;
+};
 
 markdownit.renderer.rules.softbreak = () => '<br>';
 markdownit.renderer.rules.hardbreak = () => '<br>';
