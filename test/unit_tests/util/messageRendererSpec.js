@@ -191,7 +191,9 @@ describe('renderMessage', () => {
   });
 
   it('renders a link from markdown notation with formatting', () => {
-    expect(renderMessage('[**doop**](http://www.example.com)')).toBe('[](http://www.example.com)<strong>doop</strong>');
+    expect(renderMessage('[**doop**](http://www.example.com)')).toBe(
+      '<a href="http://www.example.com" target="_blank" rel="nofollow noopener noreferrer" data-md-link="true" data-uie-name="markdown-link"><strong>doop</strong></a>',
+    );
   });
 
   it('renders a without protocol link from markdown notation', () => {

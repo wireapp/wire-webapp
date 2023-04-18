@@ -173,18 +173,17 @@ export const renderMessage = (message: string, selfId: QualifiedId | null, menti
     const link = tokens[idx];
     const href = removeMentionsHashes(link.attrGet('href') ?? '');
     const isEmail = href?.startsWith('mailto:');
-    const isWireDeepLink = href?.toLowerCase().startsWith('wire://');
+    const isWireDeepLink = href.toLowerCase().startsWith('wire://');
     const nextToken = tokens[idx + 1];
     const text = nextToken?.type === 'text' ? nextToken.content : '';
+    const closeToken = tokens.slice(idx).find(token => token.type === 'link_close');
 
-    if (!href || !text.trim()) {
-      nextToken.content = '';
-      const closeToken = tokens.slice(idx).find(token => token.type === 'link_close');
+    if (href == '' || closeToken == nextToken || (!text.trim() && closeToken == tokens[idx + 2])) {
       if (closeToken) {
         closeToken.type = 'text';
-        closeToken.content = '';
+        closeToken.content = `](${cleanString(href)})`;
       }
-      return `[${cleanString(text)}](${cleanString(href)})`;
+      return '['; //'${cleanString(text)}`;
     }
     if (isEmail) {
       link.attrPush(['data-email-link', 'true']);
