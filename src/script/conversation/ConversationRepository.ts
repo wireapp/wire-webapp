@@ -740,7 +740,8 @@ export class ConversationRepository {
    */
   private async getUnreadEvents(conversationEntity: Conversation): Promise<void> {
     const first_message = conversationEntity.getOldestMessage();
-    const lower_bound = new Date(conversationEntity.last_read_timestamp());
+    // The lower bound should be right after the last read timestamp in order not to load the last read message again (thus the +1)
+    const lower_bound = new Date(conversationEntity.last_read_timestamp() + 1);
     const upper_bound = first_message
       ? new Date(first_message.timestamp())
       : new Date(conversationEntity.getLatestTimestamp(this.serverTimeHandler.toServerTimestamp()) + 1);
