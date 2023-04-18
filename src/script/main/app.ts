@@ -398,12 +398,12 @@ export class App {
       const connections = await connectionRepository.getConnections();
       telemetry.addStatistic(AppInitStatisticsValue.CONNECTIONS, connections.length, 50);
 
-      await userRepository.loadUsers(selfUser, connections, teamMembers);
+      const conversations = await conversationRepository.loadConversations();
 
-      const conversationEntities = await conversationRepository.loadConversations();
+      await userRepository.loadUsers(selfUser, connections, conversations, teamMembers);
 
       if (supportsMLS()) {
-        await initMLSConversations(conversationEntities, selfUser, this.core, this.repository.conversation);
+        await initMLSConversations(conversations, selfUser, this.core, this.repository.conversation);
       }
 
       if (connections.length) {
@@ -411,7 +411,7 @@ export class App {
       }
 
       onProgress(25, t('initReceivedUserData'));
-      telemetry.addStatistic(AppInitStatisticsValue.CONVERSATIONS, conversationEntities.length, 50);
+      telemetry.addStatistic(AppInitStatisticsValue.CONVERSATIONS, conversations.length, 50);
       this._subscribeToUnloadEvents();
 
       await conversationRepository.conversationRoleRepository.loadTeamRoles();
@@ -428,7 +428,7 @@ export class App {
 
       if (supportsMLS()) {
         // Once all the messages have been processed and the message sending queue freed we can now add the potential `self` and `team` conversations
-        await registerUninitializedConversations(conversationEntities, selfUser, clientEntity().id, this.core);
+        await registerUninitializedConversations(conversations, selfUser, clientEntity().id, this.core);
       }
 
       telemetry.timeStep(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);

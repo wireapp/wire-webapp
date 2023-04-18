@@ -36,7 +36,7 @@ import {
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
-import {flatten} from 'underscore';
+import {flatten, uniq} from 'underscore';
 
 import type {AccentColor} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
@@ -66,6 +66,7 @@ import {ClientMapper} from '../client/ClientMapper';
 import {Config} from '../Config';
 import type {ConnectionEntity} from '../connection/ConnectionEntity';
 import {flattenUserClientsQualifiedIds} from '../conversation/userClientsUtils';
+import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {UserError} from '../error/UserError';
 import {USER} from '../event/Client';
@@ -180,10 +181,23 @@ export class UserRepository {
 
   /**
    * Will load all the users in memory (and save new users to the database).
+   * @param selfUser the user currently logged in (will be excluded from fetch)
+   * @param connections the connection to other users
+   * @param conversations the conversation the user is part of (used to compute extra users that are part of those conversations but not directly connected to the user)
+   * @param extraUsers other users that would need to be loaded (team users usually that are not direct connections)
    */
-  async loadUsers(selfUser: User, connections: ConnectionEntity[], extraUsers: QualifiedId[]): Promise<User[]> {
-    const users = connections.map(connectionEntity => connectionEntity.userId).concat(extraUsers);
-    // TODO migrate old user entries that only have availability
+  async loadUsers(
+    selfUser: User,
+    connections: ConnectionEntity[],
+    conversations: Conversation[],
+    extraUsers: QualifiedId[],
+  ): Promise<User[]> {
+    const conversationMembers = flatten(conversations.map(conversation => conversation.participating_user_ids()));
+    const allUserIds = connections
+      .map(connectionEntity => connectionEntity.userId)
+      .concat(conversationMembers)
+      .concat(extraUsers);
+    const users = uniq(allUserIds, false, (userId: QualifiedId) => userId.id);
     const dbUsers = await this.userService.loadUserFromDb();
     /* prior to April 2023, we were only storing the availability in the DB, we need to refetch those users */
     const [localUsers, incompleteUsers] = partition(dbUsers, user => !!user.qualified_id);

@@ -740,7 +740,8 @@ export class ConversationRepository {
    */
   private async getUnreadEvents(conversationEntity: Conversation): Promise<void> {
     const first_message = conversationEntity.getOldestMessage();
-    const lower_bound = new Date(conversationEntity.last_read_timestamp());
+    // The lower bound should be right after the last read timestamp in order not to load the last read message again (thus the +1)
+    const lower_bound = new Date(conversationEntity.last_read_timestamp() + 1);
     const upper_bound = first_message
       ? new Date(first_message.timestamp())
       : new Date(conversationEntity.getLatestTimestamp(this.serverTimeHandler.toServerTimestamp()) + 1);
@@ -779,11 +780,7 @@ export class ConversationRepository {
    */
   public async updateConversationsOnAppInit() {
     this.logger.info('Updating group participants');
-    await this.updateUnarchivedConversations();
-    const updatePromises = this.conversationState.filteredConversations().map(conversationEntity => {
-      return this.updateParticipatingUserEntities(conversationEntity, true);
-    });
-    return Promise.all(updatePromises);
+    await this.updateConversations(this.conversationState.filteredConversations());
   }
 
   /**
@@ -791,13 +788,6 @@ export class ConversationRepository {
    */
   public updateArchivedConversations() {
     return this.updateConversations(this.conversationState.archivedConversations());
-  }
-
-  /**
-   * Update users and events for all unarchived conversations.
-   */
-  private updateUnarchivedConversations() {
-    return this.updateConversations(this.conversationState.visibleConversations());
   }
 
   private async updateConversationFromBackend(conversationEntity: Conversation) {

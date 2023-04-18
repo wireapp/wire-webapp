@@ -220,7 +220,7 @@ describe('UserRepository', () => {
         const userIds = users.map(user => user.qualified_id!);
         const fetchUserSpy = jest.spyOn(userRepository['userService'], 'getUsers').mockResolvedValue({found: newUsers});
 
-        await userRepository.loadUsers(new User(), [], userIds);
+        await userRepository.loadUsers(new User(), [], [], userIds);
 
         expect(userState.users()).toHaveLength(users.length + 1);
         expect(fetchUserSpy).toHaveBeenCalledWith(newUsers.map(user => user.qualified_id!));
@@ -230,7 +230,7 @@ describe('UserRepository', () => {
         const userIds = localUsers.map(user => user.qualified_id!);
         const fetchUserSpy = jest.spyOn(userRepository['userService'], 'getUsers').mockResolvedValue({found: []});
 
-        await userRepository.loadUsers(new User(), [], userIds);
+        await userRepository.loadUsers(new User(), [], [], userIds);
 
         expect(userState.users()).toHaveLength(localUsers.length + 1);
         expect(fetchUserSpy).not.toHaveBeenCalled();
@@ -242,7 +242,7 @@ describe('UserRepository', () => {
         const removeUserSpy = jest.spyOn(userRepository['userService'], 'removeUserFromDb').mockResolvedValue();
         jest.spyOn(userRepository['userService'], 'getUsers').mockResolvedValue({found: newUsers});
 
-        await userRepository.loadUsers(new User(), [], userIds);
+        await userRepository.loadUsers(new User(), [], [], userIds);
 
         expect(userState.users()).toHaveLength(newUsers.length + 1);
         expect(removeUserSpy).toHaveBeenCalledTimes(localUsers.length);
