@@ -198,6 +198,7 @@ export class UserRepository {
       .concat(conversationMembers)
       .concat(extraUsers);
     const users = uniq(allUserIds, false, (userId: QualifiedId) => userId.id);
+
     const dbUsers = await this.userService.loadUserFromDb();
     /* prior to April 2023, we were only storing the availability in the DB, we need to refetch those users */
     const [localUsers, incompleteUsers] = partition(dbUsers, user => !!user.qualified_id);
@@ -213,10 +214,9 @@ export class UserRepository {
       await this.userService.removeUserFromDb(user.qualified_id);
     });
 
-    const missingUsers = users
-      .filter(user => !liveUsers.find(localUser => matchQualifiedIds(user, localUser.qualified_id)))
-      // we add the users that are locally incomplete
-      .concat(incompleteUsers.map((user: any) => ({id: user.id, domain: user.domain})));
+    const missingUsers = users.filter(
+      user => !liveUsers.find(localUser => matchQualifiedIds(user, localUser.qualified_id)),
+    );
 
     const {found, failed} = await this.fetchRawUsers(missingUsers);
 
