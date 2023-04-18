@@ -62,8 +62,8 @@ markdownit.normalizeLink = (url: string): string => {
   if (isValidUrl(url)) {
     return url;
   }
-  // prepend "https://" if url does not contain a protocol
-  if (!url.match(/^[a-z]+:/i)) {
+  // prepend "https://" if url does not begin with a protocol or vbscript:, javascript:, file:, data:
+  if (!url.match(/^(.*:\/\/|(vbscript|javascript|file|data):)/i)) {
     return `https://${url}`;
   }
   return url;
