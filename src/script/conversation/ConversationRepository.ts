@@ -779,11 +779,7 @@ export class ConversationRepository {
    */
   public async updateConversationsOnAppInit() {
     this.logger.info('Updating group participants');
-    await this.updateUnarchivedConversations();
-    const updatePromises = this.conversationState.filteredConversations().map(conversationEntity => {
-      return this.updateParticipatingUserEntities(conversationEntity, true);
-    });
-    return Promise.all(updatePromises);
+    await this.updateConversations(this.conversationState.filteredConversations());
   }
 
   /**
@@ -791,13 +787,6 @@ export class ConversationRepository {
    */
   public updateArchivedConversations() {
     return this.updateConversations(this.conversationState.archivedConversations());
-  }
-
-  /**
-   * Update users and events for all unarchived conversations.
-   */
-  private updateUnarchivedConversations() {
-    return this.updateConversations(this.conversationState.visibleConversations());
   }
 
   private async updateConversationFromBackend(conversationEntity: Conversation) {
