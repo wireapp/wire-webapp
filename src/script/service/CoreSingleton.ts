@@ -61,6 +61,7 @@ export class Core extends Account {
         mls: supportsMLS()
           ? {
               keyingMaterialUpdateThreshold: Config.getConfig().FEATURE.MLS_CONFIG_KEYING_MATERIAL_UPDATE_THRESHOLD,
+              useE2EI: Config.getConfig().FEATURE.ENABLE_E2EI,
             }
           : undefined,
 

@@ -60,4 +60,11 @@ export const RedirectRoutes = (config: ServerConfig) => [
   router.get('/version/?', (_req, res) => {
     return res.json({version: config.CLIENT.VERSION});
   }),
+  router.get('/oidc/?', (_req, res) => {
+    const {query} = _req;
+    const queryString = Object.keys(query)
+      .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(query[key] as string)}`)
+      .join('&');
+    return res.redirect(HTTP_STATUS.MOVED_PERMANENTLY, `/auth/#/oidc${queryString ? '?' : ''}${queryString}`);
+  }),
 ];

@@ -41,6 +41,7 @@ export interface ServerConfig {
       ENABLE_ACCOUNT_REGISTRATION_ACCEPT_TERMS_AND_PRIVACY_POLICY: boolean;
       ENABLE_DEBUG: boolean;
       ENABLE_MLS: boolean;
+      ENABLE_E2EI: boolean;
       ENABLE_DOMAIN_DISCOVERY: boolean;
       ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY: boolean;
       ENABLE_EXTRA_CLIENT_ENTROPY: boolean;

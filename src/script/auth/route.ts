@@ -74,6 +74,7 @@ export const ROUTE = {
   SET_HANDLE: '/sethandle',
   SET_PASSWORD: '/setpassword',
   SSO: '/sso',
+  E2E_IDENTITY_OIDC: '/oidc',
   VERIFY_EMAIL_CODE: '/verifyemailcode',
   VERIFY_EMAIL_LINK: '/verifyemaillink',
   VERIFY_PHONE_CODE: '/verifyphonecode',

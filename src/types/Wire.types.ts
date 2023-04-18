@@ -34,6 +34,7 @@ type FeatureVariables = {
   FORCE_EXTRA_CLIENT_ENTROPY: boolean;
   ENABLE_MEDIA_EMBEDS: boolean;
   ENABLE_MLS: boolean;
+  ENABLE_E2EI: boolean;
   ENABLE_PHONE_LOGIN: boolean;
   ENABLE_PROTEUS_CORE_CRYPTO: boolean;
   ENABLE_SSO: boolean;
