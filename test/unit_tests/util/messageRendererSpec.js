@@ -190,8 +190,34 @@ describe('renderMessage', () => {
     );
   });
 
+  it('renders a link from markdown notation with formatting', () => {
+    expect(renderMessage('[**doop**](http://www.example.com)')).toBe(
+      '<a href="http://www.example.com" target="_blank" rel="nofollow noopener noreferrer" data-md-link="true" data-uie-name="markdown-link"><strong>doop</strong></a>',
+    );
+  });
+
+  it('renders a without protocol link from markdown notation', () => {
+    expect(renderMessage('[doop](www.example.com)')).toBe(
+      '<a href="https://www.example.com" target="_blank" rel="nofollow noopener noreferrer" data-md-link="true" data-uie-name="markdown-link">doop</a>',
+    );
+  });
+
   it('does not render a js link from markdown notation', () => {
     expect(renderMessage("[doop](javascript:alert('nope'))")).toBe("[doop](javascript:alert('nope'))");
+    expect(renderMessage("[doop](javaScript:alert('nope'))")).toBe("[doop](javaScript:alert('nope'))");
+  });
+
+  it('does not render a link to a custom protocol from markdown notation', () => {
+    expect(renderMessage('[doop](something://123-444-666)')).toBe('[doop](something://123-444-666)');
+  });
+
+  it('does not render a data URL from markdown notation', () => {
+    expect(
+      renderMessage('[doop](data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7)'),
+    ).toBe('[doop](data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7)');
+    expect(
+      renderMessage('[**doop**](data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7)'),
+    ).toBe('[<strong>doop</strong>](data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7)');
   });
 
   it('does not render markdown links with empty or only whitespace values', () => {

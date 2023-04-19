@@ -50,6 +50,24 @@ const originalFenceRule = markdownit.renderer.rules.fence!;
 
 markdownit.renderer.rules.heading_open = () => '<div class="md-heading">';
 markdownit.renderer.rules.heading_close = () => '</div>';
+const originalNormalizeLink = markdownit.normalizeLink!;
+
+const isValidUrl = (url: string): boolean => {
+  // only allow urls to https://, http:// and mailto:
+  return !!url.match(/^(https?:\/\/|mailto:)/i);
+};
+markdownit.validateLink = isValidUrl;
+markdownit.normalizeLink = (url: string): string => {
+  url = originalNormalizeLink(url);
+  if (isValidUrl(url)) {
+    return url;
+  }
+  // prepend "https://" if url does not begin with a protocol or vbscript:, javascript:, file:, data:
+  if (!url.match(/^(.*:\/\/|(vbscript|javascript|file|data):)/i)) {
+    return `https://${url}`;
+  }
+  return url;
+};
 
 markdownit.renderer.rules.softbreak = () => '<br>';
 markdownit.renderer.rules.hardbreak = () => '<br>';
@@ -155,18 +173,17 @@ export const renderMessage = (message: string, selfId: QualifiedId | null, menti
     const link = tokens[idx];
     const href = removeMentionsHashes(link.attrGet('href') ?? '');
     const isEmail = href?.startsWith('mailto:');
-    const isWireDeepLink = href?.toLowerCase().startsWith('wire://');
+    const isWireDeepLink = href.toLowerCase().startsWith('wire://');
     const nextToken = tokens[idx + 1];
     const text = nextToken?.type === 'text' ? nextToken.content : '';
+    const closeToken = tokens.slice(idx).find(token => token.type === 'link_close');
 
-    if (!href || !text.trim()) {
-      nextToken.content = '';
-      const closeToken = tokens.slice(idx).find(token => token.type === 'link_close');
+    if (href == '' || closeToken == nextToken || (!text.trim() && closeToken == tokens[idx + 2])) {
       if (closeToken) {
         closeToken.type = 'text';
-        closeToken.content = '';
+        closeToken.content = `](${cleanString(href)})`;
       }
-      return `[${cleanString(text)}](${cleanString(href)})`;
+      return '['; //'${cleanString(text)}`;
     }
     if (isEmail) {
       link.attrPush(['data-email-link', 'true']);
