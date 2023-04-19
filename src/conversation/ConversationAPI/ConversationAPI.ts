@@ -28,6 +28,7 @@ import {
   Conversations,
   DefaultConversationRoleName,
   Invite,
+  JoinConversationByCodePayload,
   Member,
   MessageSendingStatus,
   NewConversation,
@@ -558,11 +559,18 @@ export class ConversationAPI {
    * @param conversationId ID of conversation to request the code for
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/createConversationCode
    */
-  public async postConversationCodeRequest(conversationId: string): Promise<ConversationCodeUpdateEvent> {
+  public async postConversationCodeRequest(
+    conversationId: string,
+    password?: string,
+  ): Promise<ConversationCodeUpdateEvent> {
     const config: AxiosRequestConfig = {
       method: 'post',
       url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.CODE}`,
     };
+
+    if (password) {
+      config.data = {password};
+    }
 
     const response = await this.client.sendJSON<ConversationCodeUpdateEvent>(config);
     return response.data;
@@ -598,7 +606,7 @@ export class ConversationAPI {
    * @param conversationCode The conversation code
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/joinConversationByCode
    */
-  public async postJoinByCode(conversationCode: ConversationCode): Promise<ConversationMemberJoinEvent> {
+  public async postJoinByCode(conversationCode: JoinConversationByCodePayload): Promise<ConversationMemberJoinEvent> {
     const config: AxiosRequestConfig = {
       data: conversationCode,
       method: 'post',
