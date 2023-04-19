@@ -58,12 +58,9 @@ export async function initializeDataDog(config: Configuration, user: {id?: strin
     // Specify a version number to identify the deployed version of your application in Datadog
     version: config.VERSION,
     sessionSampleRate: 100,
-    sessionReplaySampleRate: 20,
-    trackUserInteractions: true,
-    trackInteractions: true,
     trackResources: true,
     trackLongTasks: true,
-    defaultPrivacyLevel: 'mask-user-input',
+    defaultPrivacyLevel: 'mask',
   });
 
   const {datadogLogs} = await import('@datadog/browser-logs');
