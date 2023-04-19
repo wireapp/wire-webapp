@@ -77,6 +77,14 @@ import type {SelfService} from '../self/SelfService';
 import {UserRecord} from '../storage';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 
+type GetUserOptions = {
+  /**
+   * will only lookup for users that are in memory (will avoid a backend request in case the user is not found locally)
+   * Note that it will return a user considered `deleted` if the user is not found in memory
+   */
+  localOnly?: boolean;
+};
+
 function generateQualifiedId(userData: {id: string; qualified_id?: QualifiedId; domain?: string}): QualifiedId {
   if (userData.qualified_id) {
     return userData.qualified_id;
@@ -492,14 +500,6 @@ export class UserRepository {
     }
   }
 
-  /**
-   * Get a user from the backend.
-   */
-  private async fetchUser(userId: QualifiedId): Promise<User> {
-    const [userEntity] = await this.fetchUsers([userId]);
-    return userEntity;
-  }
-
   private async fetchRawUsers(userIds: QualifiedId[]): Promise<{found: APIClientUser[]; failed: QualifiedId[]}> {
     const chunksOfUserIds = chunk<QualifiedId>(
       userIds.filter(({id}) => !!id),
@@ -618,24 +618,28 @@ export class UserRepository {
   /**
    * Check for user locally and fetch it from the server otherwise.
    */
-  async getUserById(userId: QualifiedId): Promise<User> {
-    let user = this.findUserById(userId);
-    if (!user) {
-      try {
-        user = await this.fetchUser(userId);
-      } catch (error) {
-        const isNotFound = error.type === UserError.TYPE.USER_NOT_FOUND;
-        if (!isNotFound) {
-          this.logger.warn(
-            `Failed to find user with ID '${userId.id}' and domain '${userId.domain}': ${error.message}`,
-            error,
-          );
-        }
-        throw error;
-      }
+  async getUserById(userId: QualifiedId, {localOnly}: GetUserOptions = {}): Promise<User> {
+    const user = this.findUserById(userId);
+    if (user) {
+      return user;
     }
-
-    return user;
+    if (localOnly) {
+      const deletedUser = new User(userId.id, userId.domain);
+      deletedUser.isDeleted = true;
+      return deletedUser;
+    }
+    try {
+      return this.userMapper.mapUserFromJson(await this.userService.getUser(userId));
+    } catch (error) {
+      const isNotFound = error.type === UserError.TYPE.USER_NOT_FOUND;
+      if (!isNotFound) {
+        this.logger.warn(
+          `Failed to find user with ID '${userId.id}' and domain '${userId.domain}': ${error.message}`,
+          error,
+        );
+      }
+      throw error;
+    }
   }
 
   async getUserByHandle(fqn: QualifiedHandle): Promise<undefined | APIClientUser> {
@@ -656,7 +660,7 @@ export class UserRepository {
   /**
    * Check for users locally and fetch them from the server otherwise.
    */
-  async getUsersById(userIds: QualifiedId[] = [], offline: boolean = false): Promise<User[]> {
+  async getUsersById(userIds: QualifiedId[] = [], {localOnly}: GetUserOptions = {}): Promise<User[]> {
     if (!userIds.length) {
       return [];
     }
@@ -667,7 +671,7 @@ export class UserRepository {
       QualifiedId[],
     ];
 
-    if (offline || !unknownUserIds.length) {
+    if (localOnly || !unknownUserIds.length) {
       return knownUserEntities;
     }
 

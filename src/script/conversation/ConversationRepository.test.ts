@@ -468,6 +468,7 @@ describe('ConversationRepository', () => {
         type: 'conversation.message-add',
       };
 
+      jest.spyOn(testFactory.user_repository, 'getUserById').mockResolvedValue(new User());
       spyOn(testFactory.conversation_repository, 'addMissingMember').and.returnValue(
         Promise.resolve(conversationEntity),
       );
