@@ -73,6 +73,7 @@ export async function initializeDataDog(config: Configuration, user: {id?: strin
     site: 'datadoghq.eu',
     service: 'web-internal',
     env: config.ENVIRONMENT,
+    version: config.VERSION,
     forwardErrorsToLogs: true,
     forwardConsoleLogs: ['info', 'warn', 'error'], // For now those logs should be fine, we need to investigate if we need another logs in the future
     sessionSampleRate: 100,
