@@ -26,7 +26,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
-import {cleanURL} from 'Util/UrlUtil';
+import {cleanURL, prependProtocol} from 'Util/UrlUtil';
 import {isTweetUrl} from 'Util/ValidationUtil';
 
 import {AssetHeader} from './AssetHeader';
@@ -116,13 +116,16 @@ const LinkPreviewAsset: React.FC<LinkPreviewAssetProps> = ({header = false, mess
                 <p>{t('conversationTweetAuthor')}</p>
               </div>
             ) : (
-              <p
+              <a
                 className="link-preview-info-link text-foreground ellipsis"
+                href={prependProtocol(preview.url)}
+                target="_blank"
+                rel="noopener noreferrer"
                 title={preview.url}
                 data-uie-name="link-preview-url"
               >
                 {cleanURL(preview.url)}
-              </p>
+              </a>
             )}
           </>
         )}
