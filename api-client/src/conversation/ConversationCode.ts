@@ -24,4 +24,19 @@ export interface ConversationCode {
   key: string;
   /** Full URI (containing key/code) to join a conversation */
   uri?: string;
+  /** If the conversation/code has a password */
+  has_password?: boolean;
+}
+
+/**
+ * Request body for joining a conversation by code
+ */
+export interface JoinConversationByCodePayload extends Omit<ConversationCode, 'has_password'> {
+  /**
+   * password for the conversation/code invite
+   * can be optional because a converation/code may or may not have a password
+   * minLength: 8
+   * maxLength: 1024
+   */
+  password?: string;
 }
