@@ -615,6 +615,11 @@ export class UserRepository {
     return userData;
   }
 
+  private async fetchUser(userId: QualifiedId): Promise<User> {
+    const [userEntity] = await this.fetchUsers([userId]);
+    return userEntity;
+  }
+
   /**
    * Check for user locally and fetch it from the server otherwise.
    */
@@ -629,7 +634,7 @@ export class UserRepository {
       return deletedUser;
     }
     try {
-      return this.userMapper.mapUserFromJson(await this.userService.getUser(userId));
+      return this.fetchUser(userId);
     } catch (error) {
       const isNotFound = error.type === UserError.TYPE.USER_NOT_FOUND;
       if (!isNotFound) {
