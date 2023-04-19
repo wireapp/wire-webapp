@@ -77,6 +77,7 @@ export interface ServerConfig {
         MICROPHONE_ACCESS_DENIED: string;
         PRIVACY_VERIFY_FINGERPRINT: string;
         SCREEN_ACCESS_DENIED: string;
+        LEARN_MORE_ABOUT_GUEST_LINKS: string;
       };
       TEAMS_BASE: string;
       TEAMS_CREATE: string;

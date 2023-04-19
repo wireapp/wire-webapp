@@ -365,6 +365,29 @@ export const acceptNewsModalStrings = defineMessages({
   },
 });
 
+export const guestLinkPasswordModalStrings = defineMessages({
+  headline: {
+    defaultMessage: '[Group Conversation] \n Enter password',
+    id: 'guestLinkPasswordModal.headline',
+  },
+  description: {
+    defaultMessage: 'Please enter the password you have received with the access link for this conversation.',
+    id: 'guestLinkPasswordModal.description',
+  },
+  passwordInputLabel: {
+    defaultMessage: 'Conversation password',
+    id: 'guestLinkPasswordModal.passwordInputLabel',
+  },
+  learnMoreLink: {
+    defaultMessage: 'Learn more about guest links',
+    id: 'guestLinkPasswordModal.learnMoreLink',
+  },
+  joinConversation: {
+    defaultMessage: 'Join Conversation',
+    id: 'guestLinkPasswordModal.joinConversation',
+  },
+});
+
 export const unsupportedStrings = defineMessages({
   desktopOnlyMessage: {
     defaultMessage: 'Please use {brandName} on your desktop app instead.',

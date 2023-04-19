@@ -73,23 +73,16 @@ const GuestOptions: FC<GuestOptionsProps> = ({
     PasswordPreference.PASSWORD_SECURED,
   );
 
-  const {
-    accessCode,
-    // accessCodeHasPassword,
-    hasGuest,
-    inTeam,
-    isGuestAndServicesRoom,
-    isGuestRoom,
-    isServicesRoom,
-  } = useKoSubscribableChildren(activeConversation, [
-    'accessCode',
-    'accessCodeHasPassword',
-    'hasGuest',
-    'inTeam',
-    'isGuestAndServicesRoom',
-    'isGuestRoom',
-    'isServicesRoom',
-  ]);
+  const {accessCode, accessCodeHasPassword, hasGuest, inTeam, isGuestAndServicesRoom, isGuestRoom, isServicesRoom} =
+    useKoSubscribableChildren(activeConversation, [
+      'accessCode',
+      'accessCodeHasPassword',
+      'hasGuest',
+      'inTeam',
+      'isGuestAndServicesRoom',
+      'isGuestRoom',
+      'isServicesRoom',
+    ]);
 
   const isGuestEnabled = isGuestRoom || isGuestAndServicesRoom;
   const isGuestLinkEnabled = inTeam
@@ -99,13 +92,11 @@ const GuestOptions: FC<GuestOptionsProps> = ({
 
   const hasAccessCode: boolean = isGuestEnabled ? !!accessCode : false;
 
-  const accessCodeHasPassword2 = true;
-
   const guestInfoText = useMemo(() => {
     if (!inTeam) {
       return t('guestRoomToggleInfoDisabled');
     }
-    if (accessCodeHasPassword2) {
+    if (accessCodeHasPassword) {
       return isGuestEnabled ? (
         <span>
           <span style={{marginBottom: 8, display: 'block'}}>{t('guestOptionsInfoTextWithPassword')}</span>
@@ -117,7 +108,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
       );
     }
     return isGuestEnabled ? t('guestOptionsInfoText', Config.getConfig().BRAND_NAME) : t('guestRoomToggleInfo');
-  }, [inTeam, isGuestEnabled, accessCodeHasPassword2]);
+  }, [inTeam, isGuestEnabled, accessCodeHasPassword]);
 
   const guestLinkDisabledInfo = !conversationHasGuestLinkEnabled
     ? t('guestLinkDisabledByOtherTeam')
@@ -266,8 +257,6 @@ const GuestOptions: FC<GuestOptionsProps> = ({
     setOptionPasswordSecured(preference);
   };
 
-  console.info('bardia accessCodeHasPassword2', accessCodeHasPassword2);
-
   return (
     <>
       <div className="guest-options__content">
@@ -279,7 +268,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
           toggleId="guests"
         />
         <p className="guest-options__info-head">
-          {accessCodeHasPassword2 ? (
+          {accessCodeHasPassword ? (
             <span style={{display: 'flex', alignItems: 'center', marginBottom: 8}}>
               <Icon.Shield data-uie-name="generate-password-icon" width="16" height="16" css={{marginRight: '10px'}} />
               {t('guestOptionsInfoPasswordSecured')}

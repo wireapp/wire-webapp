@@ -200,6 +200,7 @@ export const PrimaryModalComponent: FC = () => {
                   onSubmit={doAction(confirm, !!closeOnConfirm)}
                   autoComplete="off"
                 >
+                  {/* @todo move to en.json */}
                   <Input
                     name="guest-link-password"
                     required

@@ -41,6 +41,7 @@ import {
   Text,
 } from '@wireapp/react-ui-kit';
 
+import {isBackendError} from 'Util/TypePredicateUtil';
 import {noop} from 'Util/util';
 
 import {EntropyContainer} from './EntropyContainer';
@@ -48,6 +49,7 @@ import {EntropyContainer} from './EntropyContainer';
 import {Config} from '../../Config';
 import {conversationJoinStrings} from '../../strings';
 import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
+import {GuestLinkPasswordModal} from '../component/GuestLinkPasswordModal';
 import {RouterLink} from '../component/RouterLink';
 import {UnsupportedBrowser} from '../component/UnsupportedBrowser';
 import {WirelessContainer} from '../component/WirelessContainer';
@@ -78,7 +80,7 @@ const ConversationJoinComponent = ({
   selfName,
   conversationError,
 }: Props & ConnectedProps & DispatchProps) => {
-  const nameInput = React.useRef<HTMLInputElement>();
+  const nameInput = React.useRef<HTMLInputElement>(null);
   const {formatMessage: _} = useIntl();
 
   const [accentColor] = useState(AccentColor.random());
@@ -123,7 +125,7 @@ const ConversationJoinComponent = ({
   useEffect(() => {
     const isEnabled =
       Config.getConfig().URL.MOBILE_BASE && UrlUtil.hasURLParameter(QUERY_KEY.PWA_AWARE) && isPwaSupportedBrowser();
-    setIsPwaEnabled(isEnabled);
+    setIsPwaEnabled(!!isEnabled);
     if (isEnabled) {
       setForceNewTemporaryGuestAccount(true);
     }
@@ -138,9 +140,31 @@ const ConversationJoinComponent = ({
     window.location.replace(redirectLocation);
   };
 
+  const handleSubmitError = (error: BackendError) => {
+    switch (error.label) {
+      case BackendError.CONVERSATION_ERRORS.INVALID_CONVERSATION_PASSWORD: {
+        // @todo: open GuestLinkPasswordModal here
+        break;
+      }
+      default: {
+        const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
+          (error as BackendError).label.endsWith(errorType),
+        );
+        if (!isValidationError) {
+          doLogout();
+          console.warn('Unable to create wireless account', error);
+          setShowEntropyForm(false);
+        }
+      }
+    }
+  };
+
   const handleSubmit = async (entropyData?: Uint8Array) => {
+    if (!conversationKey || !conversationCode) {
+      return;
+    }
     try {
-      const name = enteredName.trim();
+      const name = enteredName?.trim();
       const registrationData = {
         accent_id: accentColor.id,
         expires_in: expiresIn,
@@ -162,19 +186,8 @@ const ConversationJoinComponent = ({
 
       routeToApp(conversationEvent.conversation, conversationEvent.qualified_conversation?.domain ?? '');
     } catch (error) {
-      if (error.label) {
-        switch (error.label) {
-          default: {
-            const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
-              error.label.endsWith(errorType),
-            );
-            if (!isValidationError) {
-              doLogout();
-              console.warn('Unable to create wireless account', error);
-              setShowEntropyForm(false);
-            }
-          }
-        }
+      if (isBackendError(error)) {
+        handleSubmitError(error as BackendError);
       } else {
         await doLogout();
         console.warn('Unable to create wireless account', error);
@@ -188,6 +201,9 @@ const ConversationJoinComponent = ({
 
   const checkNameValidity = (event: React.FormEvent) => {
     event.preventDefault();
+    if (!nameInput.current) {
+      return;
+    }
     nameInput.current.value = nameInput.current.value.trim();
     if (!nameInput.current.checkValidity()) {
       setError(ValidationError.handleValidationState('name', nameInput.current.validity));
@@ -220,6 +236,7 @@ const ConversationJoinComponent = ({
   }
   return (
     <UnsupportedBrowser isTemporaryGuest>
+      <GuestLinkPasswordModal onSubmitPassword={console.info} />
       <WirelessContainer
         showCookiePolicyBanner={showCookiePolicyBanner}
         onCookiePolicyBannerClose={() => setShowCookiePolicyBanner(false)}
@@ -312,11 +329,17 @@ const ConversationJoinComponent = ({
               type="button"
               style={{marginTop: 16}}
               onClick={async () => {
+                if (!conversationKey || !conversationCode) {
+                  return;
+                }
                 try {
                   const conversationEvent = await doJoinConversationByCode(conversationKey, conversationCode);
                   routeToApp(conversationEvent.conversation, conversationEvent.qualified_conversation?.domain ?? '');
                 } catch (error) {
                   console.warn('Unable to join conversation with existing account', error);
+                  if (isBackendError(error)) {
+                    handleSubmitError(error as BackendError);
+                  }
                 }
               }}
               data-uie-name="do-open"

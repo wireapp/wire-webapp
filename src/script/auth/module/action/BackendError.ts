@@ -60,6 +60,7 @@ export class BackendError extends Error {
     CONVERSATION_CODE_NOT_FOUND: 'no-conversation-code',
     CONVERSATION_NOT_FOUND: 'no-conversation',
     CONVERSATION_TOO_MANY_MEMBERS: 'too-many-members',
+    INVALID_CONVERSATION_PASSWORD: 'invalid-conversation-password',
   };
 
   static GENERAL_ERRORS = {

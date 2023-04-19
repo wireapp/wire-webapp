@@ -69,6 +69,8 @@ export class Configuration {
       MICROPHONE_ACCESS_DENIED: 'https://support.wire.com/hc/articles/202590081',
       PRIVACY_VERIFY_FINGERPRINT: 'https://support.wire.com/hc/en-us/articles/207692235',
       SCREEN_ACCESS_DENIED: 'https://support.wire.com/hc/articles/202935412',
+      LEARN_MORE_ABOUT_GUEST_LINKS:
+        'https://support.wire.com/hc/en-us/articles/360000574069-Share-a-link-with-a-person-without-a-Wire-account-to-join-a-guest-room-conversation-in-my-team',
     },
     TEAMS_BASE: 'https://teams.wire.com',
     TEAMS_BILLING: 'https://teams.wire.com/billing',
