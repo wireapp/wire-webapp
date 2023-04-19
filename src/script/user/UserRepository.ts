@@ -500,14 +500,6 @@ export class UserRepository {
     }
   }
 
-  /**
-   * Get a user from the backend.
-   */
-  private async fetchUser(userId: QualifiedId): Promise<User> {
-    const [userEntity] = await this.fetchUsers([userId]);
-    return userEntity;
-  }
-
   private async fetchRawUsers(userIds: QualifiedId[]): Promise<{found: APIClientUser[]; failed: QualifiedId[]}> {
     const chunksOfUserIds = chunk<QualifiedId>(
       userIds.filter(({id}) => !!id),
@@ -625,12 +617,6 @@ export class UserRepository {
 
   /**
    * Check for user locally and fetch it from the server otherwise.
-   */
-  /**
-   *
-   * @param userId
-   * @param param1
-   * @returns
    */
   async getUserById(userId: QualifiedId, {localOnly}: GetUserOptions = {}): Promise<User> {
     const user = this.findUserById(userId);
