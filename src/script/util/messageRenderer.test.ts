@@ -418,7 +418,7 @@ describe('renderMessage', () => {
         const mentionEntity = new MentionEntity(mention.startIndex, mention.length, mention.userId);
         return mentionEntity;
       });
-      const result = renderMessage('hey @user', null, mentionEntities);
+      const result = renderMessage('hey @user', undefined, mentionEntities);
 
       expect(result).toEqual(expected);
     });
