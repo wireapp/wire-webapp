@@ -53,8 +53,8 @@ markdownit.renderer.rules.heading_close = () => '</div>';
 const originalNormalizeLink = markdownit.normalizeLink!;
 
 const isValidUrl = (url: string): boolean => {
-  // only allow urls to https://, http:// and mailto:
-  return !!url.match(/^(https?:\/\/|mailto:)/i);
+  // only allow urls to wire://, https://, http:// and mailto:
+  return !!url.match(/^(wire:|https?:\/\/|mailto:)/i);
 };
 markdownit.validateLink = isValidUrl;
 markdownit.normalizeLink = (url: string): string => {
@@ -100,7 +100,7 @@ const renderMention = (mentionData: MentionText) => {
 
 markdownit.normalizeLinkText = text => text;
 
-export const renderMessage = (message: string, selfId: QualifiedId | null, mentionEntities: MentionEntity[] = []) => {
+export const renderMessage = (message: string, selfId?: QualifiedId, mentionEntities: MentionEntity[] = []) => {
   const createMentionHash = (mention: MentionEntity) => `@@${window.btoa(JSON.stringify(mention)).replace(/=/g, '')}`;
 
   const mentionTexts: Record<string, MentionText> = {};
@@ -172,7 +172,7 @@ export const renderMessage = (message: string, selfId: QualifiedId | null, menti
     const cleanString = (hashedString: string) => escape(removeMentionsHashes(hashedString));
     const link = tokens[idx];
     const href = removeMentionsHashes(link.attrGet('href') ?? '');
-    const isEmail = href?.startsWith('mailto:');
+    const isEmail = href.startsWith('mailto:');
     const isWireDeepLink = href.toLowerCase().startsWith('wire://');
     const nextToken = tokens[idx + 1];
     const text = nextToken?.type === 'text' ? nextToken.content : '';
