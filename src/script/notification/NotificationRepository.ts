@@ -101,7 +101,7 @@ export class NotificationRepository {
   private readonly notificationsPreference: ko.Observable<NotificationPreference>;
   private readonly permissionRepository: PermissionRepository;
   private readonly permissionState: ko.Observable<PermissionState | PermissionStatusState | NotificationPermission>;
-  private readonly selfUser: ko.Observable<User>;
+  private readonly selfUser: ko.Subscribable<User>;
   private readonly assetRepository: AssetRepository;
 
   static get CONFIG() {

@@ -43,7 +43,7 @@ describe('MediaConstraintsHandler', () => {
     selfUserId?: string;
   } = {}) => {
     const userState: Partial<UserState> = {
-      self: ko.observable(new User(selfUserId, null)),
+      self: ko.pureComputed(() => new User(selfUserId, '')),
     };
     return new MediaConstraintsHandler(availableDevices, userState as UserState);
   };

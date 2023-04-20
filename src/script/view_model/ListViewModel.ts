@@ -72,7 +72,7 @@ export class ListViewModel {
   public readonly contentViewModel: ContentViewModel;
   public readonly callingViewModel: CallingViewModel;
   private readonly isProAccount: ko.PureComputed<boolean>;
-  public readonly selfUser: ko.Observable<User>;
+  public readonly selfUser: ko.Subscribable<User>;
   private readonly visibleListItems: ko.PureComputed<(string | Conversation)[]>;
 
   get isFederated() {

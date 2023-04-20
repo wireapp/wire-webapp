@@ -174,6 +174,11 @@ export class TestFactory {
     this.user_service = new UserService(this.storage_service);
     this.propertyRepository = new PropertiesRepository(new PropertiesService(), new SelfService());
 
+    const userState = new UserState();
+    const selfUser = new User('self-id');
+    selfUser.isMe = true;
+    userState.users([selfUser]);
+
     this.user_repository = new UserRepository(
       this.user_service,
       this.assetRepository,
@@ -181,10 +186,8 @@ export class TestFactory {
       this.client_repository,
       serverTimeHandler,
       this.propertyRepository,
-      new UserState(),
+      userState,
     );
-
-    this.user_repository['userState'].self(this.client_repository.selfUser());
 
     return this.user_repository;
   }

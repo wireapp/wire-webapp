@@ -18,7 +18,6 @@
  */
 
 import {act, fireEvent, render, waitFor} from '@testing-library/react';
-import ko from 'knockout';
 
 import {InputBar} from 'Components/InputBar/index';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
@@ -40,7 +39,6 @@ import {PropertiesRepository} from '../../properties/PropertiesRepository';
 import {SearchRepository} from '../../search/SearchRepository';
 import {StorageRepository} from '../../storage';
 import {TeamState} from '../../team/TeamState';
-import {UserState} from '../../user/UserState';
 
 const testFactory = new TestFactory();
 
@@ -87,9 +85,7 @@ describe('InputBar', () => {
     searchRepository,
     storageRepository,
     teamState: new TeamState(),
-    userState: {
-      self: ko.observable(new User('id')),
-    } as UserState,
+    selfUser: new User('id'),
     onShiftTab: jest.fn(),
     uploadDroppedFiles: jest.fn(),
     uploadImages: jest.fn(),

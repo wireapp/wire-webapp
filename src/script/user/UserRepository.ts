@@ -226,7 +226,7 @@ export class UserRepository {
       user => !liveUsers.find(localUser => matchQualifiedIds(user, localUser.qualified_id)),
     );
 
-    const {found, failed} = await this.fetchRawUsers(missingUsers);
+    const {found, failed} = await this.fetchRawUsers(missingUsers, selfUser.domain);
 
     const userWithAvailability = found.map(user => {
       const availability = incompleteUsers.find(incompleteUser => incompleteUser.id === user.id);
@@ -500,16 +500,17 @@ export class UserRepository {
     }
   }
 
-  private async fetchRawUsers(userIds: QualifiedId[]): Promise<{found: APIClientUser[]; failed: QualifiedId[]}> {
+  private async fetchRawUsers(
+    userIds: QualifiedId[],
+    defaultDomain: string,
+  ): Promise<{found: APIClientUser[]; failed: QualifiedId[]}> {
     const chunksOfUserIds = chunk<QualifiedId>(
       userIds.filter(({id}) => !!id),
       Config.getConfig().MAXIMUM_USERS_PER_REQUEST,
     );
 
     const getChunk = async (chunkOfUserIds: QualifiedId[]) => {
-      const selfDomain = this.userState.self().domain;
-
-      const chunkOfQualifiedUserIds = chunkOfUserIds.map(({id, domain}) => ({domain: domain || selfDomain, id}));
+      const chunkOfQualifiedUserIds = chunkOfUserIds.map(({id, domain}) => ({domain: domain || defaultDomain, id}));
 
       try {
         const {found, failed = [], not_found = []} = await this.userService.getUsers(chunkOfQualifiedUserIds);
@@ -556,7 +557,7 @@ export class UserRepository {
    * @param raw - if true, the users will not be mapped to User entities
    */
   private async fetchUsers(userIds: QualifiedId[]): Promise<User[]> {
-    const {found, failed} = await this.fetchRawUsers(userIds);
+    const {found, failed} = await this.fetchRawUsers(userIds, this.userState.self().domain);
     const users = this.mapUserResponse(found, failed);
     let fetchedUserEntities = this.saveUsers(users);
     // If there is a difference then we most likely have a case with a suspended user
@@ -697,7 +698,6 @@ export class UserRepository {
     if (!user) {
       if (isMe) {
         userEntity.isMe = true;
-        this.userState.self(userEntity);
       }
       this.userState.users.push(userEntity);
     }

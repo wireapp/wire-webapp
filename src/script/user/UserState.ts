@@ -39,10 +39,10 @@ export class UserState {
   public readonly isActivatedAccount: ko.PureComputed<boolean>;
   public readonly isTemporaryGuest: ko.PureComputed<boolean>;
   public readonly numberOfContacts: ko.PureComputed<number>;
-  public readonly self: ko.Observable<User>;
+  public readonly self: ko.PureComputed<User>;
 
   constructor() {
-    this.self = ko.observable();
+    this.self = ko.pureComputed<User>(() => this.users().find(user => user.isMe));
     this.users = ko.observableArray([]);
 
     this.connectRequests = ko
