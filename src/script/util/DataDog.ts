@@ -47,30 +47,33 @@ export async function initializeDataDog(config: Configuration, user: {id?: strin
     string.replaceAll(/%c/g, '').replaceAll(/color:[^;]+; font-weight:[^;]+; /g, '');
   const removeTimestamp = (string: string) => string.replaceAll(/\[\d+-\d+-\d+ \d+:\d+:\d+\] /g, '');
 
-  const {datadogRum} = await import('@datadog/browser-rum');
-
-  datadogRum.init({
-    applicationId,
+  const commonConfig = {
     clientToken,
     site: 'datadoghq.eu',
     service: 'web-internal',
     env: config.ENVIRONMENT,
-    // Specify a version number to identify the deployed version of your application in Datadog
     version: config.VERSION,
+  };
+
+  const {datadogRum} = await import('@datadog/browser-rum');
+
+  datadogRum.init({
+    ...commonConfig,
+    applicationId,
     sessionSampleRate: 100,
     trackResources: true,
     trackLongTasks: true,
     defaultPrivacyLevel: 'mask',
+    beforeSend(event, context) {
+      delete event.view.referrer;
+      event.view.url = '/';
+    },
   });
 
   const {datadogLogs} = await import('@datadog/browser-logs');
 
   datadogLogs.init({
-    clientToken,
-    site: 'datadoghq.eu',
-    service: 'web-internal',
-    env: config.ENVIRONMENT,
-    version: config.VERSION,
+    ...commonConfig,
     forwardErrorsToLogs: true,
     forwardConsoleLogs: ['info', 'warn', 'error'], // For now those logs should be fine, we need to investigate if we need another logs in the future
     sessionSampleRate: 100,
@@ -78,7 +81,7 @@ export async function initializeDataDog(config: Configuration, user: {id?: strin
       if (log.message.match(/@wireapp\/webapp\/avs/)) {
         return false;
       }
-      log.view.url = '/';
+      log.view = {url: '/'};
       log.message = replaceDomains(replaceAllStrings(removeTimestamp(removeColors(log.message))));
       return undefined;
     },
