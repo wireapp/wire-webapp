@@ -1262,5 +1262,202 @@ describe('ConversationRepository', () => {
     });
   });
 
-  describe('deleteConversationLocally', () => {});
+  describe('loadConversations', () => {
+    beforeEach(() => {
+      testFactory.conversation_repository!['conversationState'].conversations.removeAll();
+      testFactory.conversation_repository!['conversationState'].missingConversations.removeAll();
+    });
+
+    it('loads all conversations from backend when there is no local conversations', async () => {
+      const conversationRepository = testFactory.conversation_repository!;
+      const conversationService = conversationRepository['conversationService'];
+      const remoteConversations = {
+        found: [
+          {
+            members: {
+              others: [],
+              self: {},
+            },
+            name: 'conv1',
+            protocol: 'proteus',
+            qualified_id: {
+              domain: 'staging.zinfra.io',
+              id: '05d0f240-bfe9-40d7-b6cb-602dac89fa1b',
+            },
+            receipt_mode: 1,
+            team: 'b0dcee1f-c64e-4d40-8b50-5baf932906b8',
+            type: 0,
+          },
+          {
+            members: {
+              others: [],
+              self: {},
+            },
+            name: 'conv2',
+            protocol: 'proteus',
+            qualified_id: {
+              domain: 'staging.zinfra.io',
+              id: '05d0f240-bfe9-40d7-1234-602dac89fa1b',
+            },
+            receipt_mode: 1,
+            team: 'b0dcee1f-c64e-4d40-8b50-5baf932906b8',
+            type: 0,
+          },
+        ],
+      };
+      const localConversations: any = [];
+
+      jest.spyOn(conversationService, 'getAllConversations').mockResolvedValue(remoteConversations as any);
+      jest.spyOn(conversationService, 'loadConversationStatesFromDb').mockResolvedValue(localConversations);
+      jest.spyOn(conversationService, 'saveConversationsInDb').mockImplementation(data => Promise.resolve(data));
+
+      const conversations = await conversationRepository.loadConversations();
+
+      expect(conversations).toHaveLength(remoteConversations.found.length);
+    });
+
+    it('merges local conversation and remotes', async () => {
+      const remoteConversations = {
+        found: [
+          {
+            members: {
+              others: [],
+              self: {},
+            },
+            name: 'conv1',
+            protocol: 'proteus',
+            qualified_id: {
+              domain: 'staging.zinfra.io',
+              id: '05d0f240-bfe9-40d7-b6cb-602dac89fa1b',
+            },
+            receipt_mode: 1,
+            team: 'b0dcee1f-c64e-4d40-8b50-5baf932906b8',
+            type: 0,
+          },
+          {
+            members: {
+              others: [],
+              self: {},
+            },
+            name: 'conv2',
+            protocol: 'proteus',
+            qualified_id: {
+              domain: 'staging.zinfra.io',
+              id: '05d0f240-bfe9-40d7-1234-602dac89fa1b',
+            },
+            receipt_mode: 1,
+            team: 'b0dcee1f-c64e-4d40-8b50-5baf932906b8',
+            type: 0,
+          },
+          {
+            id: 'feabf90e-c785-577b-800a-556d8018542c',
+            // archived_state: true,
+            members: {
+              others: [],
+              self: {},
+            },
+            message_timer: null,
+            name: null,
+            protocol: 'proteus',
+            qualified_id: {
+              domain: 'anta.wire.link',
+              id: 'feabf90e-c785-577b-800a-556d8018542c',
+            },
+            receipt_mode: null,
+            team: null,
+            type: 2,
+          },
+        ],
+      };
+      const localConversations: any = [
+        {
+          id: 'feabf90e-c785-577b-asdf-556d8018542c',
+          // archived_state: true,
+          members: {
+            others: [],
+            self: {},
+          },
+          name: 'conv1',
+          protocol: 'proteus',
+          qualified_id: {
+            domain: 'staging.zinfra.io',
+            id: 'feabf90e-c785-577b-asdf-556d8018542c',
+          },
+          receipt_mode: 1,
+          team: 'b0dcee1f-c64e-4d40-8b50-5baf932906b8',
+          type: 0,
+        },
+        {
+          id: 'feabf90e-c785-577b-800a-556d8018542c',
+          members: {
+            others: [],
+            self: {},
+          },
+          name: 'conv2',
+          protocol: 'proteus',
+          qualified_id: {
+            domain: 'staging.zinfra.io',
+            id: '05d0f240-bfe9-40d7-1234-602dac89fa1b',
+          },
+          receipt_mode: 1,
+          team: 'b0dcee1f-c64e-4d40-8b50-5baf932906b8',
+          type: 0,
+        },
+      ];
+
+      const mergedConversation = ConversationMapper.mergeConversation(localConversations, remoteConversations as any);
+      // expect(mergedConversation).toHaveLength(remoteConversations.found.length + localConversations.length);
+      expect(mergedConversation).toHaveLength(3);
+    });
+    it('keeps track of missing conversations', async () => {
+      const conversationRepository = testFactory.conversation_repository!;
+      const conversationService = conversationRepository['conversationService'];
+      const conversationState = conversationRepository['conversationState'];
+      const remoteConversations = {
+        found: [
+          {
+            members: {
+              others: [],
+              self: {},
+            },
+            name: 'conv1',
+            protocol: 'proteus',
+            qualified_id: {
+              domain: 'staging.zinfra.io',
+              id: '05d0f240-bfe9-40d7-b6cb-602dac89fa1b',
+            },
+            receipt_mode: 1,
+            team: 'b0dcee1f-c64e-4d40-8b50-5baf932906b8',
+            type: 0,
+          },
+        ],
+        failed: [
+          {
+            members: {
+              others: [],
+              self: {},
+            },
+            name: 'conv2',
+            protocol: 'proteus',
+            qualified_id: {
+              domain: 'staging.zinfra.io',
+              id: '05d0f240-bfe9-40d7-1234-602dac89fa1b',
+            },
+            receipt_mode: 1,
+            team: 'b0dcee1f-c64e-4d40-8b50-5baf932906b8',
+            type: 0,
+          },
+        ],
+      };
+      const localConversations: any = [];
+
+      jest.spyOn(conversationService, 'getAllConversations').mockResolvedValue(remoteConversations as any);
+      jest.spyOn(conversationService, 'loadConversationStatesFromDb').mockResolvedValue(localConversations);
+      jest.spyOn(conversationService, 'saveConversationsInDb').mockImplementation(data => Promise.resolve(data));
+
+      await conversationRepository.loadConversations();
+
+      expect(conversationState.missingConversations()).toHaveLength(remoteConversations.failed.length);
+    });
+  });
 });
