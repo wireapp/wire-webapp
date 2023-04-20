@@ -54,7 +54,7 @@ const originalNormalizeLink = markdownit.normalizeLink!;
 
 const isValidUrl = (url: string): boolean => {
   // only allow urls to wire://, https://, http:// and mailto:
-  return !!url.match(/^(wire:|https?:\/\/|mailto:)/i);
+  return !!url.match(/^(wire:\/\/|https?:\/\/|mailto:)/i);
 };
 markdownit.validateLink = isValidUrl;
 markdownit.normalizeLink = (url: string): string => {
