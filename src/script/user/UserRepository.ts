@@ -223,7 +223,10 @@ export class UserRepository {
     });
 
     const missingUsers = users.filter(
-      user => !liveUsers.find(localUser => matchQualifiedIds(user, localUser.qualified_id)),
+      user =>
+        // The self user doesn't need to be re-fetched
+        !matchQualifiedIds(selfUser.qualifiedId, user) &&
+        !liveUsers.find(localUser => matchQualifiedIds(user, localUser.qualified_id)),
     );
 
     const {found, failed} = await this.fetchRawUsers(missingUsers, selfUser.domain);
@@ -248,6 +251,11 @@ export class UserRepository {
         user.connection(connection);
       }
     });
+
+    const selfUserAvailability = dbUsers.find(user => user.id === selfUser.id);
+    if (selfUserAvailability && selfUserAvailability.availability) {
+      selfUser.availability(selfUserAvailability.availability);
+    }
 
     this.userState.users([selfUser, ...mappedUsers]);
     return mappedUsers;
