@@ -443,13 +443,17 @@ export class UserRepository {
     });
   };
 
-  private readonly setAvailability = (availability: Availability.Type): void => {
-    const hasAvailabilityChanged = availability !== this.userState.self().availability();
+  private readonly setAvailability = async (availability: Availability.Type): Promise<void> => {
+    const selfUser = this.userState.self();
+    if (!selfUser) {
+      return;
+    }
+    const hasAvailabilityChanged = availability !== selfUser.availability();
     const newAvailabilityValue = valueFromType(availability);
     if (hasAvailabilityChanged) {
-      const oldAvailabilityValue = valueFromType(this.userState.self().availability());
+      const oldAvailabilityValue = valueFromType(selfUser.availability());
       this.logger.log(`Availability was changed from '${oldAvailabilityValue}' to '${newAvailabilityValue}'`);
-      this.userState.self().availability(availability);
+      await this.updateUser(selfUser.qualifiedId, {availability});
       amplify.publish(WebAppEvents.TEAM.UPDATE_INFO);
       showAvailabilityModal(availability);
     } else {
