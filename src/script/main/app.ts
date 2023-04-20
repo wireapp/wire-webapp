@@ -334,6 +334,7 @@ export class App {
    */
   async initApp(clientType: ClientType, onProgress: (progress: number, message?: string) => void) {
     // add body information
+    const startTime = Date.now();
     const [apiVersionMin, apiVersionMax] = this.config.SUPPORTED_API_RANGE;
     await this.core.useAPIVersion(apiVersionMin, apiVersionMax, this.config.ENABLE_DEV_BACKEND_API);
 
@@ -461,8 +462,7 @@ export class App {
       callingRepository.setReady();
       telemetry.timeStep(AppInitTimingsStep.APP_LOADED);
 
-      const loadTime = telemetry.report();
-      this.logger.info(`App loaded within ${loadTime}s`);
+      this.logger.info(`App loaded in ${Date.now() - startTime}ms`);
 
       return selfUser;
     } catch (error) {

@@ -781,7 +781,6 @@ export class ConversationRepository {
    * Update all conversations on app init.
    */
   public async updateConversationsOnAppInit() {
-    this.logger.info('Updating group participants');
     await this.updateConversations(this.conversationState.filteredConversations());
   }
 
@@ -1941,10 +1940,10 @@ export class ConversationRepository {
       // Prevent logging typing events
       return;
     }
-    const {time, from, qualified_conversation} = event;
+    const {time, from, qualified_conversation, type} = event;
     const extra: Record<string, unknown> = {};
     extra.messageId = 'id' in event && event.id;
-    const logMessage = `Conversation Event: '${event.type}' (Source: ${source})`;
+    const logMessage = `Conversation Event: '${type}' (Source: ${source})`;
     switch (event.type) {
       case ClientEvent.CONVERSATION.ASSET_ADD:
         extra.contentType = event.data.content_type;
@@ -1958,7 +1957,7 @@ export class ConversationRepository {
       case ClientEvent.CONVERSATION.MESSAGE_DELETE:
         extra.deletedMessage = event.data.message_id;
     }
-    this.logger.info(logMessage, {time, from, qualified_conversation, ...extra});
+    this.logger.info(logMessage, {time, from, type, qualified_conversation, ...extra});
   }
 
   /**
