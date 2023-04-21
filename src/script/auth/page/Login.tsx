@@ -63,6 +63,7 @@ import {Page} from './Page';
 import {Config} from '../../Config';
 import {loginStrings, verifyStrings} from '../../strings';
 import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
+import {GuestLinkPasswordModal} from '../component/GuestLinkPasswordModal';
 import {LoginForm} from '../component/LoginForm';
 import {RouterLink} from '../component/RouterLink';
 import {EXTERNAL_ROUTE} from '../externalRoute';
@@ -72,6 +73,7 @@ import {LabeledError} from '../module/action/LabeledError';
 import {ValidationError} from '../module/action/ValidationError';
 import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
+import * as ConversationSelector from '../module/selector/ConversationSelector';
 import {QUERY_KEY, ROUTE} from '../route';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 
@@ -86,6 +88,7 @@ const LoginComponent = ({
   doInitializeClient,
   doLoginAndJoin,
   doLogin,
+  conversationError,
   pushEntropyData,
   doSendTwoFactorCode,
   isFetching,
@@ -99,6 +102,7 @@ const LoginComponent = ({
   const navigate = useNavigate();
   const [conversationCode, setConversationCode] = useState<string | null>(null);
   const [conversationKey, setConversationKey] = useState<string | null>(null);
+  const [conversationSubmitData, setConversationSubmitData] = useState<Partial<LoginData> | null>(null);
 
   const [isValidLink, setIsValidLink] = useState(true);
   const [validationErrors, setValidationErrors] = useState<Error[]>([]);
@@ -114,6 +118,9 @@ const LoginComponent = ({
   const isEntropyRequired = Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY;
   const onEntropyGenerated = useRef<((entropy: Uint8Array) => void) | undefined>();
   const entropy = useRef<Uint8Array | undefined>();
+  const isLinkPasswordModalOpen =
+    conversationError && conversationError.label === BackendError.CONVERSATION_ERRORS.INVALID_CONVERSATION_PASSWORD;
+
   const getEntropy = isEntropyRequired
     ? () => {
         // This is somewhat hacky. When the login action detects a new device and that entropy is required, then we give back a promise to the login action.
@@ -188,7 +195,11 @@ const LoginComponent = ({
     }
   };
 
-  const handleSubmit = async (formLoginData: Partial<LoginData>, validationErrors: Error[] = []) => {
+  const handleSubmit = async (
+    formLoginData: Partial<LoginData>,
+    validationErrors: Error[] = [],
+    conversationPassword?: string,
+  ) => {
     setValidationErrors(validationErrors);
     try {
       const login: LoginData = {...formLoginData, clientType: loginData.clientType};
@@ -198,7 +209,15 @@ const LoginComponent = ({
 
       const hasKeyAndCode = conversationKey && conversationCode;
       if (hasKeyAndCode) {
-        await doLoginAndJoin(login, conversationKey, conversationCode, undefined, getEntropy);
+        try {
+          await doLoginAndJoin(login, conversationKey, conversationCode, undefined, getEntropy, conversationPassword);
+        } catch (error) {
+          if (isBackendError(error) && error.label === BackendError.LABEL.INVALID_CONVERSATION_PASSWORD) {
+            setConversationSubmitData(formLoginData);
+            return;
+          }
+          throw error;
+        }
       } else {
         await doLogin(login, getEntropy);
       }
@@ -304,6 +323,13 @@ const LoginComponent = ({
     </RouterLink>
   );
 
+  const submitJoinCodeWithPassword = async (password: string) => {
+    if (!conversationSubmitData) {
+      return;
+    }
+    await handleSubmit(conversationSubmitData, [], password);
+  };
+
   return (
     <Page>
       {(Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ||
@@ -319,6 +345,7 @@ const LoginComponent = ({
         <Container centerText verticalCenter style={{width: '100%'}}>
           {!isValidLink && <Navigate to={ROUTE.CONVERSATION_JOIN_INVALID} replace />}
           <AppAlreadyOpen />
+          {isLinkPasswordModalOpen && <GuestLinkPasswordModal onSubmitPassword={submitJoinCodeWithPassword} />}
           <Columns>
             <IsMobile not>
               <Column style={{display: 'flex'}}>
@@ -442,6 +469,7 @@ type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
   defaultSSOCode: AuthSelector.getDefaultSSOCode(state),
   isFetching: AuthSelector.isFetching(state),
+  conversationError: ConversationSelector.getError(state),
   isSendingTwoFactorCode: AuthSelector.isSendingTwoFactorCode(state),
   loginData: AuthSelector.getLoginData(state),
   authError: AuthSelector.getError(state),

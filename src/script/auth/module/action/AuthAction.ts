@@ -65,6 +65,7 @@ export class AuthAction {
     code: string,
     uri?: string,
     getEntropy?: () => Promise<Uint8Array>,
+    password?: string,
   ): ThunkAction => {
     const onBeforeLogin: LoginLifecycleFunction = async (dispatch, getState, {actions: {authAction}}) =>
       dispatch(authAction.doSilentLogout());
@@ -73,7 +74,7 @@ export class AuthAction {
       getState,
       {actions: {localStorageAction, conversationAction}},
     ) => {
-      const conversation = await dispatch(conversationAction.doJoinConversationByCode(key, code, uri));
+      const conversation = await dispatch(conversationAction.doJoinConversationByCode(key, code, uri, password));
       const domain = conversation?.qualified_conversation?.domain;
       return (
         conversation &&

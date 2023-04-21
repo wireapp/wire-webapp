@@ -37,11 +37,16 @@ export class ConversationAction {
     };
   };
 
-  doJoinConversationByCode = (key: string, code: string, uri?: string): ThunkAction<Promise<ConversationEvent>> => {
+  doJoinConversationByCode = (
+    key: string,
+    code: string,
+    uri?: string,
+    password?: string,
+  ): ThunkAction<Promise<ConversationEvent>> => {
     return async (dispatch, getState, {apiClient}) => {
       dispatch(ConversationActionCreator.startJoinConversationByCode());
       try {
-        const conversationEvent = await apiClient.api.conversation.postJoinByCode({code, key, uri});
+        const conversationEvent = await apiClient.api.conversation.postJoinByCode({code, key, uri, password});
         dispatch(ConversationActionCreator.successfulJoinConversationByCode(conversationEvent));
         return conversationEvent;
       } catch (error) {

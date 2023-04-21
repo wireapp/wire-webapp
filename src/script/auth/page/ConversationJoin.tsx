@@ -97,6 +97,9 @@ const ConversationJoinComponent = ({
   const [showEntropyForm, setShowEntropyForm] = useState(false);
   const isEntropyRequired = Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY;
 
+  const isLinkPasswordModalOpen =
+    conversationError && conversationError.label === BackendError.CONVERSATION_ERRORS.INVALID_CONVERSATION_PASSWORD;
+
   const isPwaSupportedBrowser = () => {
     return Runtime.isMobileOS() || Runtime.isSafari();
   };
@@ -142,10 +145,6 @@ const ConversationJoinComponent = ({
 
   const handleSubmitError = (error: BackendError) => {
     switch (error.label) {
-      case BackendError.CONVERSATION_ERRORS.INVALID_CONVERSATION_PASSWORD: {
-        // @todo: open GuestLinkPasswordModal here
-        break;
-      }
       default: {
         const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
           (error as BackendError).label.endsWith(errorType),
@@ -159,7 +158,7 @@ const ConversationJoinComponent = ({
     }
   };
 
-  const handleSubmit = async (entropyData?: Uint8Array) => {
+  const handleSubmit = async (entropyData?: Uint8Array, password?: string) => {
     if (!conversationKey || !conversationCode) {
       return;
     }
@@ -177,7 +176,7 @@ const ConversationJoinComponent = ({
         },
         entropyData,
       );
-      const conversationEvent = await doJoinConversationByCode(conversationKey, conversationCode);
+      const conversationEvent = await doJoinConversationByCode(conversationKey, conversationCode, undefined, password);
       /* When we join a conversation, we create the join event before loading the webapp.
        * That means that when the webapp loads and tries to fetch the notificationStream is will get the join event once again and will try to handle it
        * Here we set the core's lastEventDate so that it knows that this duplicated event should be skipped
@@ -231,12 +230,17 @@ const ConversationJoinComponent = ({
     conversationError.label === BackendError.CONVERSATION_ERRORS.CONVERSATION_TOO_MANY_MEMBERS;
   const renderTemporaryGuestAccountCreation = !isAuthenticated || isTemporaryGuest || forceNewTemporaryGuestAccount;
 
+  const submitJoinCodeWithPassword = async (password: string) => {
+    await handleSubmit(undefined, password);
+  };
+
   if (!isValidLink) {
     return <Navigate to={ROUTE.CONVERSATION_JOIN_INVALID} replace />;
   }
+
   return (
     <UnsupportedBrowser isTemporaryGuest>
-      <GuestLinkPasswordModal onSubmitPassword={console.info} />
+      {isLinkPasswordModalOpen && <GuestLinkPasswordModal onSubmitPassword={submitJoinCodeWithPassword} />}
       <WirelessContainer
         showCookiePolicyBanner={showCookiePolicyBanner}
         onCookiePolicyBannerClose={() => setShowCookiePolicyBanner(false)}
@@ -295,7 +299,7 @@ const ConversationJoinComponent = ({
                     </RoundIconButton>
                   </InputSubmitCombo>
                 </InputBlock>
-                {error ? parseValidationErrors(error) : parseError(conversationError)}
+                {!isLinkPasswordModalOpen && (error ? parseValidationErrors(error) : parseError(conversationError))}
               </Form>
               {!isPwaEnabled && (
                 <Small block>
@@ -346,7 +350,7 @@ const ConversationJoinComponent = ({
             >
               {_(conversationJoinStrings.existentAccountOpenButton, {brandName: Config.getConfig().BRAND_NAME})}
             </Button>
-            {error ? parseValidationErrors(error) : parseError(conversationError)}
+            {!isLinkPasswordModalOpen && (error ? parseValidationErrors(error) : parseError(conversationError))}
             <Small block>
               {_(conversationJoinStrings.existentAccountJoinWithoutText, {
                 existentAccountJoinWithoutLink: (
