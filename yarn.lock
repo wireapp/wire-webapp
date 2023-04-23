@@ -4455,13 +4455,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/jest@npm:29.5.0":
-  version: 29.5.0
-  resolution: "@types/jest@npm:29.5.0"
+"@types/jest@npm:29.5.1":
+  version: 29.5.1
+  resolution: "@types/jest@npm:29.5.1"
   dependencies:
     expect: ^29.0.0
     pretty-format: ^29.0.0
-  checksum: cd877e5c56d299cceb8bfdcbb1a77723c706750dd3c3bc47403bc3599b8faff590a3b009c68bb5b11bf7a8c77d1fb01de5e124329b4a08e65f1cdda28b0ecdb8
+  checksum: 0a22491dec86333c0e92b897be2c809c922a7b2b0aa5604ac369810d6b2360908b4a3f2c6892e8a237a54fa1f10ecefe0e823ec5fcb7915195af4dfe88d2197e
   languageName: node
   linkType: hard
 
@@ -18224,7 +18224,7 @@ dexie@latest:
     "@types/fs-extra": 11.0.1
     "@types/generate-changelog": 1.8.1
     "@types/highlight.js": 10.1.0
-    "@types/jest": 29.5.0
+    "@types/jest": 29.5.1
     "@types/jquery": ^3
     "@types/js-cookie": 3.0.3
     "@types/jsdom": 21.1.1
