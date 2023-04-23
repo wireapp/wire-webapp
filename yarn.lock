@@ -2479,9 +2479,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@csstools/postcss-gradients-interpolation-method@npm:^3.0.3":
-  version: 3.0.3
-  resolution: "@csstools/postcss-gradients-interpolation-method@npm:3.0.3"
+"@csstools/postcss-gradients-interpolation-method@npm:^3.0.4":
+  version: 3.0.4
+  resolution: "@csstools/postcss-gradients-interpolation-method@npm:3.0.4"
   dependencies:
     "@csstools/css-color-parser": ^1.1.2
     "@csstools/css-parser-algorithms": ^2.1.1
@@ -2489,7 +2489,7 @@ __metadata:
     "@csstools/postcss-progressive-custom-properties": ^2.0.0
   peerDependencies:
     postcss: ^8.4
-  checksum: ee01775a94ec6e764388f25a554af5e64aab1fc3d2dccf421c2e9b90349a6e0cf6c927ff612467de9a834fa67e59aa1516dadd145bd309aa2fc24231c5b01b2a
+  checksum: 4a69c12d12b9ada23af55cb54a331d04e01c28e52f5f111e9229000b35c52d90515f90cdd854f896503b7d56e5130d67ca96bfd81f1491f5784eca1011a95c4c
   languageName: node
   linkType: hard
 
@@ -14641,15 +14641,15 @@ dexie@latest:
   languageName: node
   linkType: hard
 
-"postcss-preset-env@npm:^8.3.1":
-  version: 8.3.1
-  resolution: "postcss-preset-env@npm:8.3.1"
+"postcss-preset-env@npm:^8.3.2":
+  version: 8.3.2
+  resolution: "postcss-preset-env@npm:8.3.2"
   dependencies:
     "@csstools/postcss-cascade-layers": ^3.0.1
     "@csstools/postcss-color-function": ^2.2.1
     "@csstools/postcss-color-mix-function": ^1.0.1
     "@csstools/postcss-font-format-keywords": ^2.0.2
-    "@csstools/postcss-gradients-interpolation-method": ^3.0.3
+    "@csstools/postcss-gradients-interpolation-method": ^3.0.4
     "@csstools/postcss-hwb-function": ^2.2.1
     "@csstools/postcss-ic-unit": ^2.0.2
     "@csstools/postcss-is-pseudo-class": ^3.2.0
@@ -14702,7 +14702,7 @@ dexie@latest:
     postcss-value-parser: ^4.2.0
   peerDependencies:
     postcss: ^8.4
-  checksum: 8b91a9e83e872d987f6fb28d46de1c1d135dde3ee197d4d203a6e9175362da5b2e2f0360e910b0366bf484bc29c07d024f422709860323f2c18c9bbc298b8a62
+  checksum: d0ebfcc4f06a0f6ec2bdfbd2d19388e65c6eb0922e5b4638e32af013c84c955ad7b2702c24987b599ccc287af814f5fbd80df0c1ecff37e8c3e311e7c4c0785c
   languageName: node
   linkType: hard
 
@@ -18407,7 +18407,7 @@ dexie@latest:
     postcss-import: ^15.1.0
     postcss-less: 6.0.0
     postcss-loader: ^7.2.4
-    postcss-preset-env: ^8.3.1
+    postcss-preset-env: ^8.3.2
     postcss-scss: 4.0.6
     prettier: ^2.8.8
     raf: 3.4.1
