@@ -15094,14 +15094,14 @@ dexie@latest:
   languageName: node
   linkType: hard
 
-"react-error-boundary@npm:3.1.4":
-  version: 3.1.4
-  resolution: "react-error-boundary@npm:3.1.4"
+"react-error-boundary@npm:4.0.4":
+  version: 4.0.4
+  resolution: "react-error-boundary@npm:4.0.4"
   dependencies:
     "@babel/runtime": ^7.12.5
   peerDependencies:
     react: ">=16.13.1"
-  checksum: f36270a5d775a25c8920f854c0d91649ceea417b15b5bc51e270a959b0476647bb79abb4da3be7dd9a4597b029214e8fe43ea914a7f16fa7543c91f784977f1b
+  checksum: 02f04bdf8526f4b2474cb129ece32e5e32fbe81a72a71fdcf056c440aa9f4308b372383f5e817eea76220dcf0901459be2834d6ab8106cd9c36e8ec230df70f9
   languageName: node
   linkType: hard
 
@@ -18350,7 +18350,7 @@ dexie@latest:
     raf: 3.4.1
     react: 18.2.0
     react-dom: 18.2.0
-    react-error-boundary: 3.1.4
+    react-error-boundary: 4.0.4
     react-intl: 6.4.1
     react-redux: 8.0.5
     react-router: 6.10.0
