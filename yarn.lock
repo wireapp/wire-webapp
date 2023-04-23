@@ -4610,10 +4610,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^18.15.11":
-  version: 18.15.11
-  resolution: "@types/node@npm:18.15.11"
-  checksum: 977b4ad04708897ff0eb049ecf82246d210939c82461922d20f7d2dcfd81bbc661582ba3af28869210f7e8b1934529dcd46bff7d448551400f9d48b9d3bddec3
+"@types/node@npm:^18.16.0":
+  version: 18.16.0
+  resolution: "@types/node@npm:18.16.0"
+  checksum: 63e0042136663b9e85ce503a4c65406cc6621fdba63ea66c74b4b1364a9aa9bdb57cadcb76696abab177f38a819b0fa6ace9e7f1647dcb990aedb1b4bd01012f
   languageName: node
   linkType: hard
 
@@ -18232,7 +18232,7 @@ dexie@latest:
     "@types/libsodium-wrappers": ^0
     "@types/linkify-it": 3.0.2
     "@types/markdown-it": 12.2.3
-    "@types/node": ^18.15.11
+    "@types/node": ^18.16.0
     "@types/open-graph": 0.2.2
     "@types/platform": 1.3.4
     "@types/prettier": ^2.7.2
