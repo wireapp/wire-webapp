@@ -34,7 +34,7 @@ import {
   IncompatiblePlatformError,
   InvalidMetaDataError,
 } from './Error';
-import {preprocessConversations, preprocessEvents} from './recordPreprocessors';
+import {preprocessConversations, preprocessEvents, preprocessUsers} from './recordPreprocessors';
 
 import {ConnectionState} from '../connection/ConnectionState';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
@@ -69,6 +69,7 @@ export type FileDescriptor =
 export enum Filename {
   CONVERSATIONS = 'conversations.json',
   EVENTS = 'events.json',
+  USERS = 'users.json',
   METADATA = 'export.json',
 }
 
@@ -131,7 +132,7 @@ export class BackupRepository {
   }
 
   private async _exportHistory(progressCallback: ProgressCallback) {
-    const [conversationTable, eventsTable] = this.backupService.getTables();
+    const [conversationTable, eventsTable, usersTable] = this.backupService.getTables();
     const tableData: Record<string, any[]> = {};
 
     function streamProgress<T>(dataProcessor: (data: T[]) => T[]) {
@@ -146,6 +147,9 @@ export class BackupRepository {
 
     const eventsData = await this.exportTable(eventsTable, streamProgress(preprocessEvents));
     tableData[StorageSchemata.OBJECT_STORE.EVENTS] = eventsData;
+
+    const usersData = await this.exportTable(usersTable, streamProgress(preprocessUsers));
+    tableData[StorageSchemata.OBJECT_STORE.USERS] = usersData;
 
     return tableData;
   }

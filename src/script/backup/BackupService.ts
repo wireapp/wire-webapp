@@ -59,7 +59,11 @@ export class BackupService {
   }
 
   getTables() {
-    return [this.storageService.db!.conversations, this.storageService.db!.events] as const;
+    return [
+      this.storageService.db!.conversations,
+      this.storageService.db!.events,
+      this.storageService.db!.users,
+    ] as const;
   }
 
   async importEntities(tableName: string, entities: any[]): Promise<void> {
