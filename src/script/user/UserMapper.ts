@@ -19,6 +19,8 @@
 
 import {container} from 'tsyringe';
 
+import {Availability} from '@wireapp/protocol-messaging';
+
 import {joaatHash} from 'Util/Crypto';
 import {getLogger, Logger} from 'Util/Logger';
 
@@ -109,7 +111,7 @@ export class UserMapper {
 
     const {
       accent_id: accentId,
-      availability,
+      availability = Availability.Type.NONE,
       assets,
       deleted,
       email,
@@ -125,9 +127,7 @@ export class UserMapper {
       userEntity.accent_id(accentId);
     }
 
-    if (availability) {
-      userEntity.availability(availability);
-    }
+    userEntity.availability(availability);
 
     let mappedAssets;
     if (assets?.length) {
