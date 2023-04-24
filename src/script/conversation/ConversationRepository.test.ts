@@ -23,6 +23,7 @@ import {
   CONVERSATION_ACCESS,
   CONVERSATION_LEGACY_ACCESS_ROLE,
   CONVERSATION_TYPE,
+  RemoteConversations,
 } from '@wireapp/api-client/lib/conversation/';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
@@ -1306,8 +1307,12 @@ describe('ConversationRepository', () => {
       };
       const localConversations: any = [];
 
-      jest.spyOn(conversationService, 'getAllConversations').mockResolvedValue(remoteConversations as any);
-      jest.spyOn(conversationService, 'loadConversationStatesFromDb').mockResolvedValue(localConversations);
+      jest
+        .spyOn(conversationService, 'getAllConversations')
+        .mockResolvedValue(remoteConversations as unknown as RemoteConversations);
+      jest
+        .spyOn(conversationService, 'loadConversationStatesFromDb')
+        .mockResolvedValue(localConversations as unknown as ConversationDatabaseData[]);
       jest.spyOn(conversationService, 'saveConversationsInDb').mockImplementation(data => Promise.resolve(data));
 
       const conversations = await conversationRepository.loadConversations();
@@ -1367,8 +1372,8 @@ describe('ConversationRepository', () => {
             type: 2,
           },
         ],
-      };
-      const localConversations: any = [
+      } as unknown as RemoteConversations;
+      const localConversations = [
         {
           id: 'feabf90e-c785-577b-asdf-556d8018542c',
           // archived_state: true,
@@ -1404,8 +1409,11 @@ describe('ConversationRepository', () => {
         },
       ];
 
-      const mergedConversation = ConversationMapper.mergeConversation(localConversations, remoteConversations as any);
-      expect(mergedConversation).toHaveLength(remoteConversations.found.length);
+      const mergedConversation = ConversationMapper.mergeConversation(
+        localConversations as unknown as ConversationDatabaseData[],
+        remoteConversations as unknown as RemoteConversations,
+      );
+      expect(mergedConversation).toHaveLength(remoteConversations.found ? remoteConversations.found.length : 0);
     });
     it('keeps track of missing conversations', async () => {
       const conversationRepository = testFactory.conversation_repository!;
@@ -1463,7 +1471,9 @@ describe('ConversationRepository', () => {
         ],
       };
 
-      jest.spyOn(conversationService, 'getAllConversations').mockResolvedValue(remoteConversations as any);
+      jest
+        .spyOn(conversationService, 'getAllConversations')
+        .mockResolvedValue(remoteConversations as unknown as RemoteConversations);
 
       await conversationRepository.loadConversations();
 
@@ -1482,34 +1492,12 @@ describe('ConversationRepository', () => {
 
       const missingConversations = [
         {
-          members: {
-            others: [],
-            self: {},
-          },
-          name: 'conv1',
-          protocol: 'proteus',
-          qualified_id: {
-            domain: 'staging.zinfra.io',
-            id: '05d0f240-bfe9-40d7-b6cb-602dac89fa1b',
-          },
-          receipt_mode: 1,
-          team: 'b0dcee1f-c64e-4d40-8b50-5baf932906b8',
-          type: 0,
+          domain: 'staging.zinfra.io',
+          id: '05d0f240-bfe9-40d7-b6cb-602dac89fa1b',
         },
         {
-          members: {
-            others: [],
-            self: {},
-          },
-          name: 'conv2',
-          protocol: 'proteus',
-          qualified_id: {
-            domain: 'staging.zinfra.io',
-            id: '05d0f240-bfe9-40d7-1234-602dac89fa1b',
-          },
-          receipt_mode: 1,
-          team: 'b0dcee1f-c64e-4d40-8b50-5baf932906b8',
-          type: 0,
+          domain: 'staging.zinfra.io',
+          id: '05d0f240-bfe9-40d7-1234-602dac89fa1b',
         },
       ];
 
@@ -1551,7 +1539,9 @@ describe('ConversationRepository', () => {
       };
 
       jest.replaceProperty(conversationState, 'missingConversations', missingConversations as any);
-      jest.spyOn(conversationService, 'getConversationByIds').mockResolvedValue(remoteConversations as any);
+      jest
+        .spyOn(conversationService, 'getConversationByIds')
+        .mockResolvedValue(remoteConversations as unknown as RemoteConversations);
 
       expect(conversationState.missingConversations).toHaveLength(missingConversations.length);
 
