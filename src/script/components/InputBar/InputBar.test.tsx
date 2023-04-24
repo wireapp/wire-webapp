@@ -39,7 +39,6 @@ import {PropertiesRepository} from '../../properties/PropertiesRepository';
 import {SearchRepository} from '../../search/SearchRepository';
 import {StorageRepository} from '../../storage';
 import {TeamState} from '../../team/TeamState';
-import {UserState} from '../../user/UserState';
 
 const testFactory = new TestFactory();
 
@@ -86,9 +85,7 @@ describe('InputBar', () => {
     searchRepository,
     storageRepository,
     teamState: new TeamState(),
-    userState: {
-      self: () => new User('id'),
-    } as UserState,
+    selfUser: new User('id'),
     onShiftTab: jest.fn(),
     uploadDroppedFiles: jest.fn(),
     uploadImages: jest.fn(),

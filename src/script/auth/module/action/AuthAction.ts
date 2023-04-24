@@ -30,6 +30,7 @@ import {StatusCodes as HTTP_STATUS, StatusCodes} from 'http-status-codes';
 import type {CRUDEngine} from '@wireapp/store-engine';
 import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
 
+import {isAxiosError} from 'Util/TypePredicateUtil';
 import {isTemporaryClientAndNonPersistent} from 'Util/util';
 
 import {BackendError} from './BackendError';
@@ -170,6 +171,17 @@ export class AuthAction {
         await apiClient.api.user.postVerificationCode(email, VerificationActionType.LOGIN);
         dispatch(AuthActionCreator.successfulSendTwoFactorCode());
       } catch (error) {
+        /**  The BE can respond quite restrictively to the send code request.
+         * We don't want to block the user from logging in if they have already received a code in the last few minutes.
+         * Any other error should still be thrown.
+         */
+        if (isAxiosError(error) && error.response?.status === StatusCodes.TOO_MANY_REQUESTS) {
+          dispatch(AuthActionCreator.successfulSendTwoFactorCode());
+          return;
+        }
+        /**
+         * The BE will respond with a 400 if a user tries to use a handle instead of an email.
+         */
         if (error.label === BackendError.LABEL.BAD_REQUEST) {
           error = new BackendError({
             code: StatusCodes.BAD_REQUEST,

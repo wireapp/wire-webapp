@@ -30,8 +30,7 @@ export class BackupService {
 
   static get CONFIG() {
     return {
-      BATCH_SIZE: 10_000,
-      SUPPORTED_TABLES: [StorageSchemata.OBJECT_STORE.CONVERSATIONS, StorageSchemata.OBJECT_STORE.EVENTS],
+      BATCH_SIZE: 5_000,
     };
   }
 
@@ -39,12 +38,11 @@ export class BackupService {
     this.logger = getLogger('BackupService');
   }
 
-  async exportTable(table: Dexie.Table<any, string>, onProgress: (batch: any[]) => void): Promise<void> {
+  async exportTable<T>(table: Dexie.Table<T, unknown>, onProgress: (batch: T[]) => void): Promise<void> {
     const collection = table.toCollection();
     const tableCount = await table.count();
     const parallelBatchDriver = new DexieBatch({batchSize: BackupService.CONFIG.BATCH_SIZE, limit: tableCount});
-    // TODO: The "collection as any" typing can be fixed once this is released: https://github.com/DefinitelyTyped/DefinitelyTyped/pull/51541
-    const batchCount = await parallelBatchDriver.eachBatch(collection as any, batch => onProgress(batch));
+    const batchCount = await parallelBatchDriver.eachBatch(collection, batch => onProgress(batch));
     this.logger.log(`Exported store '${table.name}' in '${batchCount}' batches`);
   }
 
@@ -60,8 +58,8 @@ export class BackupService {
     return recordsPerTable.reduce((accumulator, recordCount) => accumulator + recordCount, 0);
   }
 
-  getTables(): Dexie.Table<any, string>[] {
-    return this.storageService.getTables(BackupService.CONFIG.SUPPORTED_TABLES);
+  getTables() {
+    return [this.storageService.db!.conversations, this.storageService.db!.events] as const;
   }
 
   async importEntities(tableName: string, entities: any[]): Promise<void> {

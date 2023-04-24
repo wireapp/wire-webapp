@@ -28,7 +28,6 @@ import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {ModalComponent} from 'Components/ModalComponent';
 import {useUserDevicesHistory, UserDevicesState, UserDevices} from 'Components/UserDevices';
 import {UserSearchableList} from 'Components/UserSearchableList';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleEnterDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -41,7 +40,6 @@ import {CryptographyRepository} from '../../../cryptography/CryptographyReposito
 import {User} from '../../../entity/User';
 import {SearchRepository} from '../../../search/SearchRepository';
 import {TeamRepository} from '../../../team/TeamRepository';
-import {UserState} from '../../../user/UserState';
 
 const DISABLE_SUBMIT_TEXT_LENGTH = 1;
 
@@ -57,11 +55,11 @@ export interface LegalHoldModalProps {
   messageRepository: MessageRepository;
   searchRepository: SearchRepository;
   teamRepository: TeamRepository;
-  userState: UserState;
+  selfUser: User;
 }
 
 const LegalHoldModal: FC<LegalHoldModalProps> = ({
-  userState,
+  selfUser,
   conversationRepository,
   searchRepository,
   teamRepository,
@@ -97,8 +95,6 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
   const [passwordValue, setPasswordValue] = useState<string>('');
   const [requestError, setRequestError] = useState<string>('');
   const [userDevices, setUserDevices] = useState<User | undefined>(undefined);
-
-  const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
 
   const requiresPassword = isRequest && !selfUser.isNoPasswordSSO;
   const disableSubmit = requiresPassword && passwordValue.length < DISABLE_SUBMIT_TEXT_LENGTH;
@@ -415,7 +411,6 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
 
                 <UserSearchableList
                   users={users}
-                  userState={userState}
                   conversationRepository={conversationRepository}
                   searchRepository={searchRepository}
                   teamRepository={teamRepository}

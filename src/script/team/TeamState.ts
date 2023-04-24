@@ -65,14 +65,14 @@ export class TeamState {
     this.isTeamDeleted = ko.observable(false);
 
     /** Note: this does not include the self user */
-    this.teamMembers = ko.pureComputed(() => (this.isTeam() ? this.team().members() : []));
+    this.teamMembers = ko.pureComputed(() => this.userState.users().filter(user => !user.isMe && user.isTeamMember()));
     this.memberRoles = ko.observable({});
     this.memberInviters = ko.observable({});
     this.teamFeatures = ko.observable();
 
     this.teamDomain = ko.pureComputed(() => userState.self().domain);
     this.teamName = ko.pureComputed(() => (this.isTeam() ? this.team().name() : this.userState.self().name()));
-    this.teamSize = ko.pureComputed(() => (this.isTeam() ? this.teamMembers().length + 1 : 0));
+    this.teamSize = ko.pureComputed(() => this.teamMembers().length + 1);
     this.teamUsers = ko.pureComputed(() => {
       return this.teamMembers()
         .concat(this.userState.connectedUsers())

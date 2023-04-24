@@ -18,7 +18,6 @@
  */
 
 import {AVATAR_SIZE, Avatar} from 'Components/Avatar';
-import {PlaceholderAvatar} from 'Components/avatar/PlaceholderAvatar';
 import {Icon} from 'Components/Icon';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {DeleteMessage} from 'src/script/entity/message/DeleteMessage';
@@ -96,22 +95,18 @@ export function MessageHeader({
   return (
     <div className="message-header">
       <div className="message-header-icon">
-        {!isAvailable ? (
-          <PlaceholderAvatar onClick={() => onClickAvatar(sender)} size={AVATAR_SIZE.X_SMALL} />
-        ) : (
-          <Avatar
-            tabIndex={focusTabIndex}
-            participant={sender}
-            onAvatarClick={onClickAvatar}
-            avatarSize={AVATAR_SIZE.X_SMALL}
-          />
-        )}
+        <Avatar
+          tabIndex={focusTabIndex}
+          participant={sender}
+          onAvatarClick={onClickAvatar}
+          avatarSize={AVATAR_SIZE.X_SMALL}
+        />
       </div>
 
       <div className="message-header-label" data-uie-name={uieName}>
         <h4
           className={`message-header-label-sender ${!noColor && message.accent_color()}`}
-          css={!isAvailable ? {color: '#676B71'} : {}}
+          css={!isAvailable ? {color: 'var(--gray-70)'} : {}}
           data-uie-name={uieName ? `${uieName}-sender-name` : 'sender-name'}
           data-uie-uid={sender.id}
         >

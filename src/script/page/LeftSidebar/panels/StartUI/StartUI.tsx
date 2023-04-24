@@ -133,7 +133,7 @@ const StartUI: React.FC<StartUIProps> = ({
     });
   };
 
-  const openInviteModal = () => showInviteModal({userState});
+  const openInviteModal = () => showInviteModal({selfUser: userState.self()});
 
   const openConversation = async (conversation: Conversation): Promise<void> => {
     await actions.openGroupConversation(conversation);

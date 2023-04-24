@@ -42,6 +42,7 @@ export interface BaseEvent {
   data?: unknown;
   from: string;
   id: string;
+  from_client_id?: string;
   qualified_conversation?: QualifiedId;
   qualified_from?: QualifiedId;
   server_time?: string;

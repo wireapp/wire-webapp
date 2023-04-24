@@ -19,6 +19,7 @@
 
 import {render} from '@testing-library/react';
 
+import {t} from 'Util/LocalizerUtil';
 import {createRandomUuid} from 'Util/util';
 
 import {UserDetails} from './UserDetails';
@@ -88,6 +89,7 @@ describe('UserDetails', () => {
     const expirationText = '1h remaining';
     const participant = new User(createRandomUuid());
     participant.isGuest(true);
+    participant.name("I'm a guest");
     participant.isTemporaryGuest(true);
     participant.expirationText(expirationText);
 
@@ -102,5 +104,21 @@ describe('UserDetails', () => {
 
     expect(getByTestId('status-guest')).not.toBeNull();
     expect(getByText(expirationText)).not.toBeNull();
+  });
+
+  it('renders the placeholder avatar for a user that could not be loaded', () => {
+    const participant = new User(createRandomUuid());
+    participant.name('');
+
+    const props = {
+      isGroupAdmin: false,
+      isSelfVerified: true,
+      isVerified: false,
+      participant,
+    };
+
+    const {getByTestId} = render(<UserDetails {...props} />);
+
+    expect(getByTestId('status-name').textContent).toBe(t('unavailableUser'));
   });
 });

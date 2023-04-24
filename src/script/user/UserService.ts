@@ -17,32 +17,22 @@
  *
  */
 
-import type {User as APIClientUser, QualifiedHandle, QualifiedId} from '@wireapp/api-client/lib/user/';
+import type {User as APIClientUser, QualifiedHandle, QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
-import {Logger, getLogger} from 'Util/Logger';
-
-import type {User} from '../entity/User';
 import {APIClient} from '../service/APIClientSingleton';
+import {UserRecord} from '../storage';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {StorageService} from '../storage/StorageService';
 import {constructUserPrimaryKey} from '../util/StorageUtil';
 
-type StoredUser = {
-  availability: number;
-  id: string;
-  domain?: string;
-};
-
 export class UserService {
-  private readonly logger: Logger;
   private readonly USER_STORE_NAME: string;
 
   constructor(
     private readonly storageService = container.resolve(StorageService),
     private readonly apiClient = container.resolve(APIClient),
   ) {
-    this.logger = getLogger('UserService');
     this.USER_STORE_NAME = StorageSchemata.OBJECT_STORE.USERS;
   }
 
@@ -55,9 +45,8 @@ export class UserService {
    * @todo There might be more keys which are returned by this function
    * @returns Resolves with all the stored user states
    */
-  async loadUserFromDb(): Promise<{availability: number; domain: string; id: string}[]> {
-    const users = await this.storageService.getAll<StoredUser>(this.USER_STORE_NAME);
-    return users.map(user => ({...user, domain: user.domain ?? ''}));
+  loadUserFromDb(): Promise<UserRecord[]> {
+    return this.storageService.getAll<UserRecord>(this.USER_STORE_NAME);
   }
 
   async removeUserFromDb(user: {id: string; domain: string}): Promise<void> {
@@ -69,15 +58,19 @@ export class UserService {
    * Saves a user entity in the local database.
    * @returns Resolves with the conversation entity
    */
-  saveUserInDb(userEntity: User): Promise<User> {
-    const userData = userEntity.serialize();
+  async saveUserInDb(user: UserRecord): Promise<void> {
+    const primaryKey = constructUserPrimaryKey(user.qualified_id);
 
-    const primaryKey = constructUserPrimaryKey(userEntity);
+    await this.storageService.save(this.USER_STORE_NAME, primaryKey, user);
+  }
 
-    return this.storageService.save(this.USER_STORE_NAME, primaryKey, userData).then(primaryKey => {
-      this.logger.info(`State of user '${userData.id}' was stored`);
-      return userEntity;
-    });
+  async updateUser(userId: QualifiedId, updates: Partial<UserRecord>) {
+    const primaryKey = constructUserPrimaryKey(userId);
+    const hasBeenUpdated = await this.storageService.update(this.USER_STORE_NAME, primaryKey, updates);
+    if (!hasBeenUpdated) {
+      // If the user could not be found, create an entry for it
+      await this.storageService.save(this.USER_STORE_NAME, primaryKey, {id: userId.id, ...updates});
+    }
   }
 
   //##############################################################################

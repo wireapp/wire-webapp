@@ -17,17 +17,17 @@
  *
  */
 
-import type {Self as APIClientSelf} from '@wireapp/api-client/lib/self/';
-import type {User as APIClientUser} from '@wireapp/api-client/lib/user/';
 import {container} from 'tsyringe';
 
 import {joaatHash} from 'Util/Crypto';
 import {getLogger, Logger} from 'Util/Logger';
 
+import {isSelfAPIUser} from './UserGuards';
 import {UserState} from './UserState';
 
 import {mapProfileAssets, mapProfileAssetsV1, updateUserEntityAssets} from '../assets/AssetMapper';
 import {User} from '../entity/User';
+import {UserRecord} from '../storage';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import '../view_model/bindings/CommonBindings';
 
@@ -45,18 +45,16 @@ export class UserMapper {
     this.logger = getLogger('UserMapper');
   }
 
-  mapUserFromJson(userData: APIClientUser | APIClientSelf): User {
+  mapUserFromJson(userData: UserRecord): User {
     return this.updateUserFromObject(new User('', ''), userData);
   }
 
-  mapSelfUserFromJson(userData: APIClientSelf | APIClientUser): User {
+  mapSelfUserFromJson(userData: UserRecord): User {
     const userEntity = this.updateUserFromObject(new User('', ''), userData);
     userEntity.isMe = true;
 
-    const dataFromBackend = userData as APIClientSelf;
-
-    if (dataFromBackend.locale) {
-      userEntity.locale = dataFromBackend.locale;
+    if (isSelfAPIUser(userData)) {
+      userEntity.locale = userData.locale;
     }
 
     return userEntity;
@@ -67,7 +65,7 @@ export class UserMapper {
    * @note Return an empty array in any case to prevent crashes.
    * @returns Mapped user entities
    */
-  mapUsersFromJson(usersData: (APIClientSelf | APIClientUser)[]): User[] {
+  mapUsersFromJson(usersData: UserRecord[]): User[] {
     if (usersData?.length) {
       return usersData.filter(userData => userData).map(userData => this.mapUserFromJson(userData));
     }
@@ -82,15 +80,15 @@ export class UserMapper {
    * @param userData Updated user data from backend
    * @todo Pass in "serverTimeHandler", so that it can be removed from the "UserMapper" constructor
    */
-  updateUserFromObject(userEntity: User, userData: Partial<APIClientUser | APIClientSelf>): User {
+  updateUserFromObject(userEntity: User, userData: Partial<UserRecord>): User {
     // We are trying to update non-matching users
-    const isUnexpectedId = userEntity.id !== '' && userData.id !== userEntity.id;
+    const isUnexpectedId = userEntity.id && userData.id && userData.id !== userEntity.id;
     if (isUnexpectedId) {
       throw new Error(`Updating wrong user entity. User '${userEntity.id}' does not match data '${userData.id}'.`);
     }
 
     const isNewUser = userEntity.id === '' && userData.id !== '';
-    if (isNewUser) {
+    if (isNewUser && userData.id) {
       userEntity.id = userData.id;
       userEntity.joaatHash = joaatHash(userData.id ?? '');
     }
@@ -104,33 +102,38 @@ export class UserMapper {
           : false;
     }
 
+    const isSelf = isSelfAPIUser(userData);
+    const ssoId = isSelf && userData.sso_id;
+    const managedBy = isSelf && userData.managed_by;
+    const phone = isSelf && userData.phone;
+
     const {
       accent_id: accentId,
+      availability,
       assets,
       deleted,
       email,
       expires_at: expirationDate,
-      managed_by,
       handle,
       name,
-      phone,
       picture,
       service,
-      sso_id: ssoId,
       team: teamId,
-    } = userData as APIClientSelf;
+    } = userData;
 
     if (accentId) {
       userEntity.accent_id(accentId);
     }
 
-    const hasAsset = assets?.length;
-    const hasPicture = picture?.length;
+    if (availability) {
+      userEntity.availability(availability);
+    }
+
     let mappedAssets;
-    if (hasAsset) {
-      mappedAssets = mapProfileAssets(userEntity.qualifiedId, userData.assets);
-    } else if (hasPicture) {
-      mappedAssets = mapProfileAssetsV1(userEntity.id, userData.picture);
+    if (assets?.length) {
+      mappedAssets = mapProfileAssets(userEntity.qualifiedId, assets);
+    } else if (picture?.length) {
+      mappedAssets = mapProfileAssetsV1(userEntity.id, picture);
     }
     updateUserEntityAssets(userEntity, mappedAssets);
 
@@ -138,8 +141,8 @@ export class UserMapper {
       userEntity.email(email);
     }
 
-    if (managed_by !== undefined) {
-      userEntity.managedBy(managed_by);
+    if (managedBy) {
+      userEntity.managedBy(managedBy);
     }
 
     if (expirationDate) {
@@ -177,9 +180,9 @@ export class UserMapper {
 
     if (ssoId && Object.keys(ssoId).length) {
       userEntity.isSingleSignOn = true;
-    }
-    if (ssoId?.subject) {
-      userEntity.isNoPasswordSSO = true;
+      if (ssoId.subject) {
+        userEntity.isNoPasswordSSO = true;
+      }
     }
 
     if (teamId && !userEntity.isFederated) {

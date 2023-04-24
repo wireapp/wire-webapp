@@ -30,6 +30,7 @@ import {container} from 'tsyringe';
 import 'webrtc-adapter';
 
 import {
+  AUDIO_STATE,
   CALL_TYPE,
   CONV_TYPE,
   ENV as AVS_ENV,
@@ -1429,6 +1430,14 @@ export class CallingRepository {
     members.forEach(member => call.getParticipant(member.userId, member.clientid)?.isSendingVideo(!!member.vrecv));
   }
 
+  private updateParticipantAudioState(call: Call, members: QualifiedWcallMember[]): void {
+    members.forEach(member =>
+      call
+        .getParticipant(member.userId, member.clientid)
+        ?.isAudioEstablished(member.aestab === AUDIO_STATE.ESTABLISHED),
+    );
+  }
+
   private updateParticipantList(call: Call, members: QualifiedWcallMember[]): void {
     const newMembers = members
       .filter(({userId, clientid}) => !call.getParticipant(userId, clientid))
@@ -1473,6 +1482,7 @@ export class CallingRepository {
     this.updateParticipantList(call, members);
     this.updateParticipantMutedState(call, members);
     this.updateParticipantVideoState(call, members);
+    this.updateParticipantAudioState(call, members);
     this.callParticipantChangedCallback(conversationId, members);
   };
 

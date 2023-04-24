@@ -56,7 +56,7 @@ import {ConversationRepository} from './ConversationRepository';
 
 import {entities, payload} from '../../../test/api/payloads';
 import {TestFactory} from '../../../test/helper/TestFactory';
-import {UserGenerator} from '../../../test/helper/UserGenerator';
+import {generateUser} from '../../../test/helper/UserGenerator';
 import {Core} from '../service/CoreSingleton';
 import {LegacyEventRecord, StorageService} from '../storage';
 
@@ -264,7 +264,7 @@ describe('ConversationRepository', () => {
       const teamMemberId = team1to1Conversation.members.others[0].id;
       const userEntity = new User(teamMemberId, 'test-domain');
 
-      const selfUser = UserGenerator.getRandomUser();
+      const selfUser = generateUser();
       selfUser.teamId = teamId;
       spyOn(testFactory.conversation_repository['userState'], 'self').and.returnValue(selfUser);
       userEntity.inTeam(true);
@@ -347,7 +347,7 @@ describe('ConversationRepository', () => {
   describe('getPrecedingMessages', () => {
     it('gets messages which are not broken by design', async () => {
       spyOn(testFactory.user_repository, 'getUserById').and.returnValue(Promise.resolve(new User('id', null)));
-      const selfUser = UserGenerator.getRandomUser();
+      const selfUser = generateUser();
       spyOn(testFactory.conversation_repository['userState'], 'self').and.returnValue(selfUser);
 
       const conversation = new Conversation(createRandomUuid());
@@ -457,7 +457,7 @@ describe('ConversationRepository', () => {
 
   describe('handleConversationEvent', () => {
     it('detects events send by a user not in the conversation', () => {
-      const selfUser = UserGenerator.getRandomUser();
+      const selfUser = generateUser();
       const conversationEntity = _generateConversation(CONVERSATION_TYPE.REGULAR);
       const event = {
         conversation: conversationEntity.id,
@@ -468,6 +468,7 @@ describe('ConversationRepository', () => {
         type: 'conversation.message-add',
       };
 
+      jest.spyOn(testFactory.user_repository, 'getUserById').mockResolvedValue(new User());
       spyOn(testFactory.conversation_repository, 'addMissingMember').and.returnValue(
         Promise.resolve(conversationEntity),
       );
@@ -573,7 +574,7 @@ describe('ConversationRepository', () => {
       });
 
       it("shows a failed message on the sender's side if the upload fails", () => {
-        const selfUser = UserGenerator.getRandomUser();
+        const selfUser = generateUser();
         const conversation_id = createRandomUuid();
         const message_id = createRandomUuid();
         const sending_user_id = selfUser.id;
@@ -749,7 +750,7 @@ describe('ConversationRepository', () => {
       });
 
       it('should process member-join event when joining a group conversation', () => {
-        const selfUser = UserGenerator.getRandomUser();
+        const selfUser = generateUser();
         spyOn(testFactory.conversation_repository['userState'], 'self').and.returnValue(selfUser);
 
         return testFactory.conversation_repository['handleConversationEvent'](memberJoinEvent).then(() => {
@@ -761,7 +762,7 @@ describe('ConversationRepository', () => {
       it('should add other self clients to mls group if user was event creator', () => {
         const mockDomain = 'example.com';
         const mockSelfClientId = 'self-client-id';
-        const selfUser = UserGenerator.getRandomUser(mockDomain);
+        const selfUser = generateUser({id: createRandomUuid(), domain: mockDomain});
 
         const conversationEntity = _generateConversation(
           CONVERSATION_TYPE.REGULAR,
@@ -799,7 +800,7 @@ describe('ConversationRepository', () => {
       });
 
       it('should ignore member-join event when joining a 1to1 conversation', () => {
-        const selfUser = UserGenerator.getRandomUser();
+        const selfUser = generateUser();
         const conversationRepo = testFactory.conversation_repository!;
         // conversation has a corresponding pending connection
         const connectionEntity = new ConnectionEntity();
@@ -819,7 +820,7 @@ describe('ConversationRepository', () => {
 
     describe('conversation.message-delete', () => {
       let message_et: Message;
-      const selfUser = UserGenerator.getRandomUser();
+      const selfUser = generateUser();
 
       beforeEach(() => {
         conversation_et = _generateConversation(CONVERSATION_TYPE.REGULAR);
@@ -951,7 +952,7 @@ describe('ConversationRepository', () => {
 
     describe('conversation.message-hidden', () => {
       let messageId: string;
-      const selfUser = UserGenerator.getRandomUser();
+      const selfUser = generateUser();
 
       beforeEach(() => {
         conversation_et = _generateConversation(CONVERSATION_TYPE.REGULAR);

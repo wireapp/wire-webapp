@@ -303,11 +303,9 @@ export class EventRepository {
       source = EventRepository.SOURCE.INJECTED;
     }
 
-    const id = 'id' in event ? event.id : 'ID not specified';
     const conversationId = 'conversation' in event && event.conversation;
     const inSelfConversation = conversationId === this.userState.self().id;
     if (!inSelfConversation) {
-      this.logger.info(`Injected event ID '${id}' of type '${event.type}' with source '${source}'`);
       return this.processEvent(event, source);
     }
     return undefined;
@@ -362,7 +360,7 @@ export class EventRepository {
         return event;
       }
       case EventValidation.OUTDATED_TIMESTAMP: {
-        this.logger.info(`Ignored outdated event type: '${event.type}'`);
+        this.logger.warn(`Ignored outdated event type: '${event.type}'`);
         return event;
       }
       case EventValidation.VALID:

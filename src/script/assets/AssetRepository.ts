@@ -214,7 +214,7 @@ export class AssetRepository {
     if (skipCompression === true) {
       compressedBytes = new Uint8Array(buffer as ArrayBuffer);
     } else {
-      const worker = new WebWorker('/worker/image-worker.js');
+      const worker = new WebWorker(() => new Worker(new URL('./imageWorker', import.meta.url)));
       compressedBytes = await worker.post({buffer, useProfileImageSize});
     }
     const compressedImage = await loadImage(new Blob([compressedBytes], {type: image.type}));
