@@ -308,24 +308,6 @@ export class TestFactory {
   }
 
   /**
-   * @returns {Promise<NotificationRepository>} The repository for system notifications.
-   */
-  async exposeNotificationActors() {
-    await this.exposeConversationActors();
-    await this.exposeCallingActors();
-
-    this.notification_repository = new NotificationRepository(
-      this.conversation_repository,
-      new PermissionRepository(),
-      this.user_repository['userState'],
-      this.conversation_repository['conversationState'],
-      this.calling_repository['callState'],
-    );
-
-    return this.notification_repository;
-  }
-
-  /**
    * @returns {Promise<EventTrackingRepository>} The event tracking repository.
    */
   async exposeTrackingActors() {

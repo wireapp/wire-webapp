@@ -101,7 +101,6 @@ export class NotificationRepository {
   private readonly notificationsPreference: ko.Observable<NotificationPreference>;
   private readonly permissionRepository: PermissionRepository;
   private readonly permissionState: ko.Observable<PermissionState | PermissionStatusState | NotificationPermission>;
-  private readonly selfUser: ko.Subscribable<User>;
   private readonly assetRepository: AssetRepository;
 
   static get CONFIG() {
@@ -152,7 +151,6 @@ export class NotificationRepository {
     });
 
     this.permissionState = this.permissionRepository.permissionState[PermissionType.NOTIFICATIONS];
-    this.selfUser = this.userState.self;
   }
 
   setContentViewModelStates(state: ContentState, multitasking: {isMinimized: ko.Observable<boolean>}): void {
@@ -215,15 +213,16 @@ export class NotificationRepository {
     connectionEntity: ConnectionEntity,
     conversationEntity: Conversation,
   ): Promise<void> => {
-    const isUserAway = this.selfUser().availability() === Availability.Type.AWAY;
+    const isUserAway = this.userState.self().availability() === Availability.Type.AWAY;
     const isComposite = messageEntity.isComposite();
 
     if (isUserAway && !isComposite) {
       return Promise.resolve();
     }
 
-    const isUserBusy = this.selfUser().availability() === Availability.Type.BUSY;
-    const isSelfMentionOrReply = messageEntity.isContent() && messageEntity.isUserTargeted(this.selfUser().qualifiedId);
+    const isUserBusy = this.userState.self().availability() === Availability.Type.BUSY;
+    const isSelfMentionOrReply =
+      messageEntity.isContent() && messageEntity.isUserTargeted(this.userState.self().qualifiedId);
     const isCallMessage = messageEntity.super_type === SuperType.CALL;
 
     if (isUserBusy && !isSelfMentionOrReply && !isCallMessage && !isComposite) {
@@ -234,7 +233,7 @@ export class NotificationRepository {
       ? NotificationRepository.shouldNotifyInConversation(
           conversationEntity,
           messageEntity,
-          this.selfUser().qualifiedId,
+          this.userState.self().qualifiedId,
         )
       : true;
 
@@ -311,9 +310,9 @@ export class NotificationRepository {
         if (assetEntity.isText()) {
           let notificationText;
 
-          if (assetEntity.isUserMentioned(this.selfUser().qualifiedId)) {
+          if (assetEntity.isUserMentioned(this.userState.self().qualifiedId)) {
             notificationText = t('notificationMention', assetEntity.text, {}, true);
-          } else if (messageEntity.isUserQuoted(this.selfUser().id)) {
+          } else if (messageEntity.isUserQuoted(this.userState.self().id)) {
             notificationText = t('notificationReply', assetEntity.text, {}, true);
           } else {
             notificationText = getRenderedTextContent(assetEntity.text);
@@ -429,13 +428,13 @@ export class NotificationRepository {
    */
   private createBodyObfuscated(messageEntity: ContentMessage): string {
     if (messageEntity.isContent()) {
-      const isSelfMentioned = messageEntity.isUserMentioned(this.selfUser().qualifiedId);
+      const isSelfMentioned = messageEntity.isUserMentioned(this.userState.self().qualifiedId);
 
       if (isSelfMentioned) {
         return t('notificationObfuscatedMention');
       }
 
-      const isSelfQuoted = messageEntity.isUserQuoted(this.selfUser().id);
+      const isSelfQuoted = messageEntity.isUserQuoted(this.userState.self().id);
 
       if (isSelfQuoted) {
         return t('notificationObfuscatedReply');
@@ -653,7 +652,7 @@ export class NotificationRepository {
     const conversationId = this.getConversationId(connectionEntity, conversationEntity);
 
     const containsSelfMention =
-      messageEntity.isContent() && (messageEntity as ContentMessage).isUserMentioned(this.selfUser().qualifiedId);
+      messageEntity.isContent() && (messageEntity as ContentMessage).isUserMentioned(this.userState.self().qualifiedId);
     if (containsSelfMention) {
       const showOptions = {exposeMessage: messageEntity, openFirstSelfMention: true};
       return () => amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, showOptions);
