@@ -20,4 +20,5 @@
 export interface ConversationJoinData {
   id: string;
   name: string;
+  has_password: boolean;
 }
