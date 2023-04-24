@@ -21,7 +21,7 @@ import {UserAsset, UserAssetType} from '@wireapp/api-client/lib/user';
 
 import {Availability} from '@wireapp/protocol-messaging';
 
-import {ACCENT_ID, Config} from 'src/script/Config';
+import {ACCENT_ID} from 'src/script/Config';
 import {User} from 'src/script/entity/User';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 import {entities, payload} from 'test/api/payloads';
@@ -30,8 +30,7 @@ import {createRandomUuid} from 'Util/util';
 import {UserMapper} from './UserMapper';
 
 describe('User Mapper', () => {
-  const userState: any = {self: () => ({domain: 'local.test'})};
-  const mapper = new UserMapper(serverTimeHandler, userState);
+  const mapper = new UserMapper(serverTimeHandler);
 
   let self_user_payload: any = null;
 
@@ -54,13 +53,16 @@ describe('User Mapper', () => {
       ['local.test', false],
       ['federated.test', true],
     ])('can detect if a user is a federated user (%s)', (domain, expected) => {
-      spyOn(Config, 'getConfig').and.returnValue({FEATURE: {ENABLE_FEDERATION: true}});
-      const user = mapper.mapUserFromJson({
-        id: 'id',
-        locale: '',
-        name: 'user',
-        qualified_id: {domain: domain, id: 'id'},
-      });
+      const user = mapper.updateUserFromObject(
+        new User('', ''),
+        {
+          id: 'id',
+          locale: '',
+          name: 'user',
+          qualified_id: {domain: domain, id: 'id'},
+        },
+        'local.test',
+      );
 
       expect(user.isFederated).toBe(expected);
     });
@@ -68,16 +70,18 @@ describe('User Mapper', () => {
     // @SF.Federation @SF.Separation @TSFI.UserInterface @S0.2
     it('Detects that user is not in the team if teamId is the same but domain is different', () => {
       const teamId = 'team1';
-      spyOn(Config, 'getConfig').and.returnValue({FEATURE: {ENABLE_FEDERATION: true}});
-      spyOn(userState, 'self').and.returnValue({domain: 'domain.test', teamId: teamId});
 
-      const user = mapper.mapSelfUserFromJson({
-        id: 'id',
-        locale: '',
-        name: 'guest',
-        qualified_id: {domain: 'otherdomain.test', id: 'id'},
-        team: teamId,
-      });
+      const user = mapper.updateUserFromObject(
+        new User('', ''),
+        {
+          id: 'id',
+          locale: '',
+          name: 'guest',
+          qualified_id: {domain: 'otherdomain.test', id: 'id'},
+          team: teamId,
+        },
+        'local.domain',
+      );
 
       expect(user.isFederated).toBe(true);
       expect(user.inTeam()).toBe(false);
@@ -151,7 +155,7 @@ describe('User Mapper', () => {
       const user_et = new User();
       user_et.id = entities.user.john_doe.id;
       const data = {accent_id: 1, id: entities.user.john_doe.id};
-      const updated_user_et = mapper.updateUserFromObject(user_et, data);
+      const updated_user_et = mapper.updateUserFromObject(user_et, data, '');
 
       expect(updated_user_et.accent_id()).toBe(ACCENT_ID.BLUE);
     });
@@ -160,7 +164,7 @@ describe('User Mapper', () => {
       const user_et = new User();
       user_et.id = entities.user.john_doe.id;
       const data = {id: entities.user.john_doe.id, name: entities.user.jane_roe.name};
-      const updated_user_et = mapper.updateUserFromObject(user_et, data);
+      const updated_user_et = mapper.updateUserFromObject(user_et, data, '');
 
       expect(updated_user_et.name()).toBe(entities.user.jane_roe.name);
     });
@@ -169,7 +173,7 @@ describe('User Mapper', () => {
       const user_et = new User();
       user_et.id = entities.user.john_doe.id;
       const data = {handle: entities.user.jane_roe.handle, id: entities.user.john_doe.id};
-      const updated_user_et = mapper.updateUserFromObject(user_et, data);
+      const updated_user_et = mapper.updateUserFromObject(user_et, data, '');
 
       expect(updated_user_et.username()).toBe(entities.user.jane_roe.handle);
     });
@@ -186,7 +190,7 @@ describe('User Mapper', () => {
       });
 
       const data = {expires_at: expirationDate.toISOString(), id: userEntity.id};
-      mapper.updateUserFromObject(userEntity, data);
+      mapper.updateUserFromObject(userEntity, data, '');
 
       expect(mapper['serverTimeHandler'].toLocalTimestamp).not.toHaveBeenCalledWith();
       mapper['serverTimeHandler'].timeOffset(10);
@@ -198,7 +202,7 @@ describe('User Mapper', () => {
       const user_et = new User();
       user_et.id = entities.user.john_doe.id;
       const data = {id: entities.user.jane_roe.id, name: entities.user.jane_roe.name};
-      const functionCall = () => mapper.updateUserFromObject(user_et, data);
+      const functionCall = () => mapper.updateUserFromObject(user_et, data, '');
 
       expect(functionCall).toThrow();
     });
@@ -209,7 +213,7 @@ describe('User Mapper', () => {
     ])('updates the availability (from %s to %s)', (from, to) => {
       const user = new User();
       user.availability(from);
-      mapper.updateUserFromObject(user, {availability: to});
+      mapper.updateUserFromObject(user, {availability: to}, '');
       expect(user.availability()).toBe(to);
     });
 
@@ -224,7 +228,7 @@ describe('User Mapper', () => {
         id: entities.user.john_doe.id,
         name: entities.user.jane_roe.name,
       };
-      const updated_user_et = mapper.updateUserFromObject(user_et, data);
+      const updated_user_et = mapper.updateUserFromObject(user_et, data, '');
 
       expect(updated_user_et.previewPictureResource()).toBeDefined();
       expect(updated_user_et.mediumPictureResource()).toBeDefined();

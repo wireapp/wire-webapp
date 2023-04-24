@@ -358,6 +358,7 @@ describe('UserRepository', () => {
       const userService = userRepository['userService'];
       const user = new User(entities.user.jane_roe.id);
       user.name('initial name');
+      user.isMe = true;
       userRepository['saveUser'](user);
 
       jest.spyOn(userService, 'getUsers').mockResolvedValue({found: [entities.user.jane_roe]});

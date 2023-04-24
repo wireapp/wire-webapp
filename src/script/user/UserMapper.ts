@@ -17,15 +17,12 @@
  *
  */
 
-import {container} from 'tsyringe';
-
 import {Availability} from '@wireapp/protocol-messaging';
 
 import {joaatHash} from 'Util/Crypto';
 import {getLogger, Logger} from 'Util/Logger';
 
 import {isSelfAPIUser} from './UserGuards';
-import {UserState} from './UserState';
 
 import {mapProfileAssets, mapProfileAssetsV1, updateUserEntityAssets} from '../assets/AssetMapper';
 import {User} from '../entity/User';
@@ -40,19 +37,16 @@ export class UserMapper {
    * Construct a new User Mapper.
    * @param serverTimeHandler Handles time shift between server and client
    */
-  constructor(
-    private readonly serverTimeHandler: ServerTimeHandler,
-    private readonly userState: UserState = container.resolve(UserState),
-  ) {
+  constructor(private readonly serverTimeHandler: ServerTimeHandler) {
     this.logger = getLogger('UserMapper');
   }
 
   mapUserFromJson(userData: UserRecord): User {
-    return this.updateUserFromObject(new User('', ''), userData);
+    return this.updateUserFromObject(new User('', ''), userData, '');
   }
 
   mapSelfUserFromJson(userData: UserRecord): User {
-    const userEntity = this.updateUserFromObject(new User('', ''), userData);
+    const userEntity = this.updateUserFromObject(new User('', ''), userData, userData.qualified_id.domain);
     userEntity.isMe = true;
 
     if (isSelfAPIUser(userData)) {
@@ -82,7 +76,7 @@ export class UserMapper {
    * @param userData Updated user data from backend
    * @todo Pass in "serverTimeHandler", so that it can be removed from the "UserMapper" constructor
    */
-  updateUserFromObject(userEntity: User, userData: Partial<UserRecord>): User {
+  updateUserFromObject(userEntity: User, userData: Partial<UserRecord>, localDomain: string): User {
     // We are trying to update non-matching users
     const isUnexpectedId = userEntity.id && userData.id && userData.id !== userEntity.id;
     if (isUnexpectedId) {
@@ -98,10 +92,7 @@ export class UserMapper {
     if (userData.qualified_id) {
       userEntity.domain = userData.qualified_id.domain;
       userEntity.id = userData.qualified_id.id;
-      userEntity.isFederated =
-        this.userState.self() && this.userState.self().domain
-          ? userData.qualified_id.domain !== this.userState.self().domain
-          : false;
+      userEntity.isFederated = !!localDomain && userData.qualified_id.domain !== localDomain;
     }
 
     const isSelf = isSelfAPIUser(userData);

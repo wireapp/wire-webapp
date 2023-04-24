@@ -304,7 +304,7 @@ export class UserRepository {
       user.name = fixWebsocketString(user.name);
     }
 
-    this.userMapper.updateUserFromObject(userEntity, user);
+    this.userMapper.updateUserFromObject(userEntity, user, selfUser.domain);
     // Update the database record
     await this.userService.updateUser(userEntity.qualifiedId, user);
     if (isSelfUser) {
@@ -736,7 +736,7 @@ export class UserRepository {
   };
 
   async refreshUsers(userIds: QualifiedId[]) {
-    const {found: users} = await this.userService.getUsers(userIds);
+    const {found: users} = await this.fetchRawUsers(userIds, this.userState.self().domain);
     return users.map(user => this.updateSavedUser(user));
   }
 
@@ -746,7 +746,7 @@ export class UserRepository {
    */
   private updateSavedUser(user: APIClientUser): User {
     const localUserEntity = this.findUserById(generateQualifiedId(user)) ?? new User();
-    const updatedUser = this.userMapper.updateUserFromObject(localUserEntity, user);
+    const updatedUser = this.userMapper.updateUserFromObject(localUserEntity, user, this.userState.self().domain);
     // TODO update the user in db
     if (this.userState.isTeam()) {
       this.mapGuestStatus([updatedUser]);
