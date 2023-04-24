@@ -223,7 +223,10 @@ export class UserRepository {
     });
 
     const missingUsers = users.filter(
-      user => !liveUsers.find(localUser => matchQualifiedIds(user, localUser.qualified_id)),
+      user =>
+        // The self user doesn't need to be re-fetched
+        !matchQualifiedIds(selfUser.qualifiedId, user) &&
+        !liveUsers.find(localUser => matchQualifiedIds(user, localUser.qualified_id)),
     );
 
     const {found, failed} = await this.fetchRawUsers(missingUsers, selfUser.domain);
@@ -248,6 +251,12 @@ export class UserRepository {
         user.connection(connection);
       }
     });
+
+    // Map self user's availability status
+    const {availability: selfUserAvailability} = dbUsers.find(user => user.id === selfUser.id) ?? {};
+    if (selfUserAvailability) {
+      selfUser.availability(selfUserAvailability);
+    }
 
     this.userState.users([selfUser, ...mappedUsers]);
     return mappedUsers;
@@ -435,13 +444,17 @@ export class UserRepository {
     });
   };
 
-  private readonly setAvailability = (availability: Availability.Type): void => {
-    const hasAvailabilityChanged = availability !== this.userState.self().availability();
+  private readonly setAvailability = async (availability: Availability.Type): Promise<void> => {
+    const selfUser = this.userState.self();
+    if (!selfUser) {
+      return;
+    }
+    const hasAvailabilityChanged = availability !== selfUser.availability();
     const newAvailabilityValue = valueFromType(availability);
     if (hasAvailabilityChanged) {
-      const oldAvailabilityValue = valueFromType(this.userState.self().availability());
+      const oldAvailabilityValue = valueFromType(selfUser.availability());
       this.logger.log(`Availability was changed from '${oldAvailabilityValue}' to '${newAvailabilityValue}'`);
-      this.userState.self().availability(availability);
+      await this.updateUser(selfUser.qualifiedId, {availability});
       amplify.publish(WebAppEvents.TEAM.UPDATE_INFO);
       showAvailabilityModal(availability);
     } else {
