@@ -191,8 +191,8 @@ export class ConversationService {
    * @param code Conversation access code
    * @returns Resolves with the server response
    */
-  postConversationJoin(key: string, code: string): Promise<ConversationMemberJoinEvent> {
-    return this.apiClient.api.conversation.postJoinByCode({code, key});
+  postConversationJoin(key: string, code: string, password?: string): Promise<ConversationMemberJoinEvent> {
+    return this.apiClient.api.conversation.postJoinByCode({code, key, password});
   }
 
   /**
