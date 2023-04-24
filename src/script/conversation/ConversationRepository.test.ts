@@ -51,6 +51,7 @@ import {ClientEvent} from 'src/script/event/Client';
 import {EventRepository} from 'src/script/event/EventRepository';
 import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
 import {StorageSchemata} from 'src/script/storage/StorageSchemata';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 import {escapeRegex} from 'Util/SanitizationUtil';
 import {createRandomUuid} from 'Util/util';
 
@@ -1491,8 +1492,6 @@ describe('ConversationRepository', () => {
             type: 0,
           },
           {
-            id: 'feabf90e-c785-577b-800a-556d8018542c',
-            // archived_state: true,
             members: {
               others: [] as QualifiedId[],
               self: {},
@@ -1509,11 +1508,20 @@ describe('ConversationRepository', () => {
             type: 2,
           },
         ],
+        failed: [
+          {
+            domain: 'staging.zinfra.io',
+            id: '05d0f240-bfe9-40d7-1234-602dac89fa1b',
+          },
+          {
+            domain: 'staging.zinfra.io',
+            id: '05d0f240-bfe9-40d7-5678-602dac89fa1b',
+          },
+        ],
       } as unknown as RemoteConversations;
       const localConversations = [
         {
-          id: 'feabf90e-c785-577b-asdf-556d8018542c',
-          // archived_state: true,
+          id: '05d0f240-bfe9-40d7-b6cb-602dac89fa1b',
           members: {
             others: [] as QualifiedId[],
             self: {},
@@ -1522,14 +1530,14 @@ describe('ConversationRepository', () => {
           protocol: 'proteus',
           qualified_id: {
             domain: 'staging.zinfra.io',
-            id: 'feabf90e-c785-577b-asdf-556d8018542c',
+            id: '05d0f240-bfe9-40d7-b6cb-602dac89fa1b',
           },
           receipt_mode: 1,
           team: 'b0dcee1f-c64e-4d40-8b50-5baf932906b8',
           type: 0,
         },
         {
-          id: 'feabf90e-c785-577b-800a-556d8018542c',
+          id: '05d0f240-bfe9-40d7-1234-602dac89fa1b',
           members: {
             others: [] as QualifiedId[],
             self: {},
@@ -1544,13 +1552,53 @@ describe('ConversationRepository', () => {
           team: 'b0dcee1f-c64e-4d40-8b50-5baf932906b8',
           type: 0,
         },
-      ];
+        {
+          id: '05d0f240-bfe9-40d7-1234-602dac89fa1b',
+          members: {
+            others: [] as QualifiedId[],
+            self: {},
+          },
+          name: 'conv3',
+          protocol: 'proteus',
+          qualified_id: {
+            domain: 'staging.zinfra.io',
+            id: '05d0f240-bfe9-40d7-1234-602dac89fa1b',
+          },
+          receipt_mode: 1,
+          team: 'b0dcee1f-c64e-4d40-8b50-5baf932906b8',
+          type: 0,
+        },
+      ] as unknown as ConversationDatabaseData[];
 
-      const mergedConversation = ConversationMapper.mergeConversation(
-        localConversations as unknown as ConversationDatabaseData[],
-        remoteConversations as unknown as RemoteConversations,
-      );
-      expect(mergedConversation).toHaveLength(remoteConversations.found ? remoteConversations.found.length : 0);
+      const mergedConversation = ConversationMapper.mergeConversation(localConversations, remoteConversations);
+
+      /**
+       * The method mergeConversation should return all found conversations and the failed conversations that already exist locally
+       * @param remoteConversations new conversations fetched from backend
+       * @param localConversations conversations locally stored in database
+       * @returns the expected lenght of the merged conversations
+       */
+      const findExpectedLenght = (
+        remoteConversations: RemoteConversations,
+        localConversations: ConversationDatabaseData[],
+      ) => {
+        if (remoteConversations.found) {
+          if (remoteConversations.failed) {
+            const failedConversations = (remoteConversations.failed ?? []).reduce(
+              (prev: ConversationDatabaseData[], curr: QualifiedId) => {
+                const convo = localConversations.find(conversationId => matchQualifiedIds(conversationId, curr));
+                return convo ? [...prev, convo] : prev;
+              },
+              [],
+            );
+            return remoteConversations.found.length + failedConversations.length;
+          }
+          return remoteConversations.found.length;
+        }
+        return 0;
+      };
+
+      expect(mergedConversation).toHaveLength(findExpectedLenght(remoteConversations, localConversations));
     });
   });
 });
