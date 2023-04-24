@@ -34,7 +34,7 @@ import {
   IncompatiblePlatformError,
   InvalidMetaDataError,
 } from './Error';
-import {preprocessConversations, preprocessEvents} from './recordPreprocessors';
+import {preprocessConversations, preprocessEvents, preprocessUsers} from './recordPreprocessors';
 
 import {ConnectionState} from '../connection/ConnectionState';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
@@ -58,23 +58,21 @@ export interface FileDescriptor {
   filename: string;
 }
 
+export enum Filename {
+  CONVERSATIONS = 'conversations.json',
+  EVENTS = 'events.json',
+  USERS = 'users.json',
+  METADATA = 'export.json',
+}
+
+const UINT8ARRAY_FIELDS = ['otr_key', 'sha256'];
+
 export class BackupRepository {
   private readonly backupService: BackupService;
   private readonly conversationRepository: ConversationRepository;
   private readonly logger: Logger;
   private canceled: boolean;
   private worker: WebWorker;
-
-  static get CONFIG() {
-    return {
-      FILENAME: {
-        CONVERSATIONS: 'conversations.json',
-        EVENTS: 'events.json',
-        METADATA: 'export.json',
-      },
-      UINT8ARRAY_FIELDS: ['otr_key', 'sha256'],
-    };
-  }
 
   constructor(
     backupService: BackupService,
@@ -138,7 +136,7 @@ export class BackupRepository {
   }
 
   private async _exportHistory(progressCallback: (tableRows: number) => void) {
-    const [conversationTable, eventsTable] = this.backupService.getTables();
+    const [conversationTable, eventsTable, usersTable] = this.backupService.getTables();
     const tableData: Record<string, any[]> = {};
 
     function streamProgress<T>(dataProcessor: (data: T[]) => T[]) {
@@ -153,6 +151,9 @@ export class BackupRepository {
 
     const eventsData = await this.exportTable(eventsTable, streamProgress(preprocessEvents));
     tableData[StorageSchemata.OBJECT_STORE.EVENTS] = eventsData;
+
+    const usersData = await this.exportTable(usersTable, streamProgress(preprocessUsers));
+    tableData[StorageSchemata.OBJECT_STORE.USERS] = usersData;
 
     return tableData;
   }
@@ -185,7 +186,7 @@ export class BackupRepository {
       files[fileName] = encodedData;
     }
 
-    files[BackupRepository.CONFIG.FILENAME.METADATA] = encodedMetadata;
+    files[Filename.METADATA] = encodedMetadata;
 
     const array = await this.worker.post<Uint8Array>({type: 'zip', files});
     return new Blob([array], {type: 'application/zip'});
@@ -209,7 +210,7 @@ export class BackupRepository {
       throw new ImportError(files.error as unknown as string);
     }
 
-    if (!files[BackupRepository.CONFIG.FILENAME.METADATA]) {
+    if (!files[Filename.METADATA]) {
       throw new InvalidMetaDataError();
     }
 
@@ -227,11 +228,11 @@ export class BackupRepository {
     progressCallback: (numberProcessed: number) => void,
   ): Promise<void> {
     const conversationFileDescriptor = fileDescriptors.find(fileDescriptor => {
-      return fileDescriptor.filename === BackupRepository.CONFIG.FILENAME.CONVERSATIONS;
+      return fileDescriptor.filename === Filename.CONVERSATIONS;
     });
 
     const eventFileDescriptor = fileDescriptors.find(fileDescriptor => {
-      return fileDescriptor.filename === BackupRepository.CONFIG.FILENAME.EVENTS;
+      return fileDescriptor.filename === Filename.EVENTS;
     });
 
     const conversationFileContent = new TextDecoder().decode(conversationFileDescriptor.content);
@@ -300,7 +301,7 @@ export class BackupRepository {
 
   private mapEntityDataType(entity: any): any {
     if (entity.data) {
-      BackupRepository.CONFIG.UINT8ARRAY_FIELDS.forEach(field => {
+      UINT8ARRAY_FIELDS.forEach(field => {
         const dataField = entity.data[field];
         if (dataField) {
           entity.data[field] = new Uint8Array(Object.values(dataField));
@@ -311,7 +312,7 @@ export class BackupRepository {
   }
 
   private async verifyMetadata(user: User, files: Record<string, Uint8Array>): Promise<void> {
-    const rawData = files[BackupRepository.CONFIG.FILENAME.METADATA];
+    const rawData = files[Filename.METADATA];
     const metaData = new TextDecoder().decode(rawData);
     const parsedMetaData = JSON.parse(metaData);
     this._verifyMetadata(user, parsedMetaData);
