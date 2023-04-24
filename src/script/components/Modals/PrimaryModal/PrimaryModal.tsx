@@ -200,14 +200,13 @@ export const PrimaryModalComponent: FC = () => {
                   onSubmit={doAction(confirm, !!closeOnConfirm)}
                   autoComplete="off"
                 >
-                  {/* @todo move to en.json */}
                   <Input
                     name="guest-link-password"
                     required
                     wrapperCSS={guestLinkPasswordInputStyles}
-                    placeholder="Password Input"
-                    label="Password Input"
-                    helperText="Must have at least one: uppercase letter, lowercase letter, number, symbol"
+                    placeholder={t('modalGuestLinkJoinPlaceholder')}
+                    label={t('modalGuestLinkJoinPlaceholder')}
+                    helperText={t('modalGuestLinkJoinHelperText')}
                     id="modal_pswd_confiramtion"
                     className="modal__input"
                     type="password"
@@ -219,8 +218,8 @@ export const PrimaryModalComponent: FC = () => {
                     name="guest-link-password-confirm"
                     required
                     wrapperCSS={guestLinkPasswordInputStyles}
-                    placeholder="Password Input"
-                    label="Password Input"
+                    placeholder={t('modalGuestLinkJoinPlaceholder')}
+                    label={t('modalGuestLinkJoinPlaceholder')}
                     className="modal__input"
                     type="password"
                     id="modal_pswd_confiramtion"

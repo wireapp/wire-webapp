@@ -836,6 +836,8 @@
   "modalConversationGuestOptionsGetCodeMessage": "Could not get access link.",
   "modalConversationGuestOptionsRequestCodeMessage": "Could not request access link. Please try again.",
   "modalConversationGuestOptionsRevokeCodeMessage": "Could not revoke access link. Please try again.",
+  "modalGuestLinkJoinPlaceholder": "Password Input",
+  "modalGuestLinkJoinHelperText": "Must have at least one: uppercase letter, lowercase letter, number, symbol",
   "modalConversationJoinConfirm": "Join",
   "modalConversationJoinFullHeadline": "You could not join the conversation",
   "modalConversationJoinFullMessage": "The conversation is full.",
