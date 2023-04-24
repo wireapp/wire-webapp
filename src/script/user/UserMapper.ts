@@ -41,12 +41,12 @@ export class UserMapper {
     this.logger = getLogger('UserMapper');
   }
 
-  mapUserFromJson(userData: UserRecord): User {
-    return this.updateUserFromObject(new User('', ''), userData, '');
+  mapUserFromJson(userData: UserRecord, localDomain: string): User {
+    return this.updateUserFromObject(new User('', ''), userData, localDomain);
   }
 
   mapSelfUserFromJson(userData: UserRecord): User {
-    const userEntity = this.updateUserFromObject(new User('', ''), userData, userData.qualified_id.domain);
+    const userEntity = this.updateUserFromObject(new User('', ''), userData, '');
     userEntity.isMe = true;
 
     if (isSelfAPIUser(userData)) {
@@ -61,9 +61,9 @@ export class UserMapper {
    * @note Return an empty array in any case to prevent crashes.
    * @returns Mapped user entities
    */
-  mapUsersFromJson(usersData: UserRecord[]): User[] {
+  mapUsersFromJson(usersData: UserRecord[], localDomain: string): User[] {
     if (usersData?.length) {
-      return usersData.filter(userData => userData).map(userData => this.mapUserFromJson(userData));
+      return usersData.filter(userData => userData).map(userData => this.mapUserFromJson(userData, localDomain));
     }
     this.logger.warn('We got no user data from the backend');
     return [];
@@ -74,6 +74,7 @@ export class UserMapper {
    * @note Mapping of single properties to an existing user happens when the user changes his name or accent color.
    * @param userEntity User entity that the info shall be mapped to
    * @param userData Updated user data from backend
+   * @param localDomain Domain of the current backend (used to determine if the user is federated)
    * @todo Pass in "serverTimeHandler", so that it can be removed from the "UserMapper" constructor
    */
   updateUserFromObject(userEntity: User, userData: Partial<UserRecord>, localDomain: string): User {

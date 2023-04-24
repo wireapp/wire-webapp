@@ -40,7 +40,7 @@ describe('User Mapper', () => {
 
   describe('mapUserFromJson', () => {
     it('can convert JSON into a single user entity', () => {
-      const user_et = mapper.mapUserFromJson(self_user_payload);
+      const user_et = mapper.mapUserFromJson(self_user_payload, '');
 
       expect(user_et.email()).toBe('jd@wire.com');
       expect(user_et.name()).toBe('John Doe');
@@ -53,8 +53,7 @@ describe('User Mapper', () => {
       ['local.test', false],
       ['federated.test', true],
     ])('can detect if a user is a federated user (%s)', (domain, expected) => {
-      const user = mapper.updateUserFromObject(
-        new User('', ''),
+      const user = mapper.mapUserFromJson(
         {
           id: 'id',
           locale: '',
@@ -71,8 +70,7 @@ describe('User Mapper', () => {
     it('Detects that user is not in the team if teamId is the same but domain is different', () => {
       const teamId = 'team1';
 
-      const user = mapper.updateUserFromObject(
-        new User('', ''),
+      const user = mapper.mapUserFromJson(
         {
           id: 'id',
           locale: '',
@@ -90,14 +88,14 @@ describe('User Mapper', () => {
     it('can convert users with profile images marked as non public', () => {
       self_user_payload.picture[0].info.public = false;
       self_user_payload.picture[1].info.public = false;
-      const user_et = mapper.mapUserFromJson(self_user_payload);
+      const user_et = mapper.mapUserFromJson(self_user_payload, '');
 
       expect(user_et.name()).toBe('John Doe');
     });
 
     it('will return default accent color if null/undefined', () => {
       self_user_payload.accent_id = null;
-      const user_et = mapper.mapUserFromJson(self_user_payload);
+      const user_et = mapper.mapUserFromJson(self_user_payload, '');
 
       expect(user_et.name()).toBe('John Doe');
       expect(user_et.accent_id()).toBe(ACCENT_ID.BLUE);
@@ -105,7 +103,7 @@ describe('User Mapper', () => {
 
     it('will return default accent color if backend returns 0', () => {
       self_user_payload.accent_id = 0;
-      const user_et = mapper.mapUserFromJson(self_user_payload);
+      const user_et = mapper.mapUserFromJson(self_user_payload, '');
 
       expect(user_et.name()).toBe('John Doe');
       expect(user_et.joaatHash).toBe(526273169);
@@ -128,7 +126,7 @@ describe('User Mapper', () => {
 
   describe('mapUsersFromJson', () => {
     it('can convert JSON into multiple user entities', () => {
-      const user_ets = mapper.mapUsersFromJson(payload.users.get.many);
+      const user_ets = mapper.mapUsersFromJson(payload.users.get.many, '');
 
       expect(user_ets.length).toBe(2);
       expect(user_ets[0].email()).toBe('jd@wire.com');
@@ -136,14 +134,14 @@ describe('User Mapper', () => {
     });
 
     it('returns an empty array if input was undefined', () => {
-      const user_ets = mapper.mapUsersFromJson(undefined);
+      const user_ets = mapper.mapUsersFromJson(undefined, '');
 
       expect(user_ets).toBeDefined();
       expect(user_ets.length).toBe(0);
     });
 
     it('returns an empty array if input was an empty array', () => {
-      const user_ets = mapper.mapUsersFromJson([]);
+      const user_ets = mapper.mapUsersFromJson([], '');
 
       expect(user_ets).toBeDefined();
       expect(user_ets.length).toBe(0);

@@ -556,7 +556,7 @@ export class UserRepository {
       /* When a federated backend is unreachable, we generate placeholder users locally with some default values */
       userId => new User(userId.id, userId.domain),
     );
-    const mappedUsers = this.userMapper.mapUsersFromJson(found).concat(failedToLoad);
+    const mappedUsers = this.userMapper.mapUsersFromJson(found, this.userState.self().domain).concat(failedToLoad);
     if (this.userState.isTeam()) {
       this.mapGuestStatus(mappedUsers);
     }
