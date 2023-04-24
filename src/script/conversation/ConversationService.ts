@@ -22,6 +22,7 @@ import type {
   Conversation as BackendConversation,
   ConversationCode,
   CONVERSATION_ACCESS,
+  RemoteConversations,
 } from '@wireapp/api-client/lib/conversation';
 import type {
   ConversationJoinData,
@@ -84,6 +85,14 @@ export class ConversationService {
    */
   getConversationById({id, domain}: QualifiedId): Promise<BackendConversation> {
     return this.apiClient.api.conversation.getConversation({domain, id});
+  }
+
+  /**
+   * Get conversations for a list of conversation IDs.
+   * @see https://staging-nginz-https.zinfra.io/v4/api/swagger-ui/#/default/post_conversations_list
+   */
+  getConversationByIds(conversations: QualifiedId[]): Promise<RemoteConversations> {
+    return this.apiClient.api.conversation.getConversationsByQualifiedIds(conversations);
   }
 
   /**
