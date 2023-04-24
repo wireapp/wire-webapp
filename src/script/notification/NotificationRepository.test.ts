@@ -17,9 +17,10 @@
  *
  */
 
-import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
-import {NotificationPreference} from '@wireapp/api-client/lib/user/data/';
+import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
+import {NotificationPreference} from '@wireapp/api-client/lib/user/data';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
@@ -49,7 +50,6 @@ import {CALL_MESSAGE_TYPE} from 'src/script/message/CallMessageType';
 import {MentionEntity} from 'src/script/message/MentionEntity';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
-import {NotificationRepository} from 'src/script/notification/NotificationRepository';
 import {ContentState, useAppState} from 'src/script/page/useAppState';
 import {PermissionStatusState} from 'src/script/permission/PermissionStatusState';
 import {entities, payload} from 'test/api/payloads';
@@ -57,8 +57,12 @@ import {t} from 'Util/LocalizerUtil';
 import {truncate} from 'Util/StringUtil';
 import {createRandomUuid} from 'Util/util';
 
+import {NotificationRepository} from './NotificationRepository';
+
 import {CallState} from '../calling/CallState';
+import {ConnectionEntity} from '../connection/ConnectionEntity';
 import {ConversationState} from '../conversation/ConversationState';
+import {Message} from '../entity/message/Message';
 import {PermissionRepository} from '../permission/PermissionRepository';
 import {UserMapper} from '../user/UserMapper';
 import {UserState} from '../user/UserState';
@@ -79,12 +83,14 @@ function buildNotificationRepository() {
   return [notificationRepository, {userState}] as const;
 }
 
+(window as any).Notification = jest.fn();
+
 describe('NotificationRepository', () => {
   const userState = container.resolve(UserState);
   let notificationRepository: NotificationRepository;
   const userMapper = new UserMapper({} as any);
   let conversation: Conversation;
-  let message: ContentMessage;
+  let message: Message;
   let user: User;
   let verifyNotification: (...args: any[]) => void;
   let verifyNotificationEphemeral: (...args: any[]) => void;
@@ -92,7 +98,7 @@ describe('NotificationRepository', () => {
   let verifyNotificationSystem: (...args: any[]) => void;
 
   let notification_content: any;
-  const contentViewModelState = {};
+  const contentViewModelState: any = {};
 
   beforeEach(() => {
     [notificationRepository] = buildNotificationRepository();
@@ -126,9 +132,8 @@ describe('NotificationRepository', () => {
     // Mocks
     document.hasFocus = () => false;
     notificationRepository.updatePermissionState(PermissionStatusState.GRANTED);
-    jasmine.getEnv().allowRespy(true);
     spyOn(Runtime, 'isSupportingNotifications').and.returnValue(true);
-    spyOn(notificationRepository.assetRepository, 'generateAssetUrl').and.returnValue(
+    spyOn(notificationRepository['assetRepository'], 'generateAssetUrl').and.returnValue(
       Promise.resolve('/image/logo/notification.png'),
     );
 
@@ -145,7 +150,7 @@ describe('NotificationRepository', () => {
       return notificationRepository.notify(_message, undefined, _conversation).then(() => {
         expect(showNotificationSpy).toHaveBeenCalledTimes(1);
 
-        const trigger = notificationRepository.createTrigger(message, null, conversation);
+        const trigger = notificationRepository['createTrigger'](message, undefined, conversation);
         notification_content.options.body = _expected_body;
         notification_content.options.data.messageType = _message.type;
         notification_content.trigger = trigger;
@@ -159,7 +164,7 @@ describe('NotificationRepository', () => {
           notification_content.title = '…';
         }
 
-        const [firstResultArgs] = showNotificationSpy.getMockImplementation().calls.first().args;
+        const [firstResultArgs] = showNotificationSpy.mock.calls[0];
 
         expect(JSON.stringify(firstResultArgs)).toEqual(JSON.stringify(notification_content));
       });
@@ -169,13 +174,13 @@ describe('NotificationRepository', () => {
       return notificationRepository.notify(_message, undefined, _conversation).then(() => {
         expect(notificationRepository['showNotification']).toHaveBeenCalledTimes(1);
 
-        const trigger = notificationRepository.createTrigger(message, null, conversation);
+        const trigger = notificationRepository['createTrigger'](message, undefined, conversation);
         notification_content.options.body = t('notificationObfuscated');
         notification_content.options.data.messageType = _message.type;
         notification_content.title = t('notificationObfuscatedTitle');
         notification_content.trigger = trigger;
 
-        const [firstResultArgs] = notificationRepository['showNotification'].calls.first().args;
+        const [firstResultArgs] = showNotificationSpy.mock.calls[0];
 
         expect(JSON.stringify(firstResultArgs)).toEqual(JSON.stringify(notification_content));
       });
@@ -185,7 +190,7 @@ describe('NotificationRepository', () => {
       return notificationRepository.notify(_message, undefined, _conversation).then(() => {
         expect(notificationRepository['showNotification']).toHaveBeenCalledTimes(1);
 
-        const trigger = notificationRepository.createTrigger(message, null, conversation);
+        const trigger = notificationRepository['createTrigger'](message, undefined, conversation);
         notification_content.trigger = trigger;
 
         const obfuscateMessage = _setting === NotificationPreference.OBFUSCATE_MESSAGE;
@@ -201,7 +206,7 @@ describe('NotificationRepository', () => {
         }
         notification_content.options.data.messageType = _message.type;
 
-        const [firstResultArgs] = notificationRepository['showNotification'].calls.first().args;
+        const [firstResultArgs] = showNotificationSpy.mock.calls[0];
 
         expect(JSON.stringify(firstResultArgs)).toEqual(JSON.stringify(notification_content));
       });
@@ -211,7 +216,7 @@ describe('NotificationRepository', () => {
       return notificationRepository.notify(_message, undefined, _conversation).then(() => {
         expect(notificationRepository['showNotification']).toHaveBeenCalledTimes(1);
 
-        const trigger = notificationRepository.createTrigger(message, null, conversation);
+        const trigger = notificationRepository['createTrigger'](message, undefined, conversation);
         notification_content.trigger = trigger;
         notification_content.options.body = _expected_body;
         notification_content.options.data.messageType = _message.type;
@@ -222,7 +227,7 @@ describe('NotificationRepository', () => {
           notification_content.title = _expected_title;
         }
 
-        const [firstResultArgs] = notificationRepository['showNotification'].calls.first().args;
+        const [firstResultArgs] = showNotificationSpy.mock.calls[0];
 
         expect(JSON.stringify(firstResultArgs)).toEqual(JSON.stringify(notification_content));
       });
@@ -231,12 +236,12 @@ describe('NotificationRepository', () => {
 
   describe('does not show a notification', () => {
     beforeEach(() => {
-      message = new PingMessage();
+      message = new PingMessage() as any;
       message.user(user);
     });
 
     it('if the browser does not support them', () => {
-      spyOn(Runtime, 'isSupportingNotifications').and.returnValue(false);
+      jest.spyOn(Runtime, 'isSupportingNotifications').mockReturnValue(false);
       return notificationRepository.notify(message, undefined, conversation).then(() => {
         expect(notificationRepository['showNotification']).not.toHaveBeenCalled();
       });
@@ -280,9 +285,7 @@ describe('NotificationRepository', () => {
     });
 
     it('for a successfully completed call', () => {
-      message = new CallMessage();
-      message.call_message_type = CALL_MESSAGE_TYPE.DEACTIVATED;
-      message.finished_reason = TERMINATION_REASON.COMPLETED;
+      message = new CallMessage(CALL_MESSAGE_TYPE.DEACTIVATED, TERMINATION_REASON.COMPLETED) as any;
 
       return notificationRepository.notify(message, undefined, conversation).then(() => {
         expect(notificationRepository['showNotification']).not.toHaveBeenCalled();
@@ -290,7 +293,7 @@ describe('NotificationRepository', () => {
     });
 
     it('if preference is set to none', () => {
-      notificationRepository.notificationsPreference(NotificationPreference.NONE);
+      notificationRepository.updatedNotificationsProperty(NotificationPreference.NONE);
 
       return notificationRepository.notify(message, undefined, conversation).then(() => {
         expect(notificationRepository['showNotification']).not.toHaveBeenCalled();
@@ -307,7 +310,7 @@ describe('NotificationRepository', () => {
   });
 
   describe('reacts according to availability status', () => {
-    let allMessageTypes;
+    let allMessageTypes: Record<string, any>;
     function generateTextAsset() {
       const textEntity = new Text(createRandomUuid(), 'hey there');
       return textEntity;
@@ -323,8 +326,7 @@ describe('NotificationRepository', () => {
       const compositeMessage = new CompositeMessage(createRandomUuid());
       compositeMessage.addAsset(generateTextAsset());
 
-      const callMessage = new CallMessage();
-      callMessage.call_message_type = CALL_MESSAGE_TYPE.ACTIVATED;
+      const callMessage = new CallMessage(CALL_MESSAGE_TYPE.ACTIVATED);
       allMessageTypes = {
         call: callMessage,
         composite: compositeMessage,
@@ -391,8 +393,7 @@ describe('NotificationRepository', () => {
       const expected_body = t('notificationVoiceChannelActivate');
 
       beforeEach(() => {
-        message = new CallMessage();
-        message.call_message_type = CALL_MESSAGE_TYPE.ACTIVATED;
+        message = new CallMessage(CALL_MESSAGE_TYPE.ACTIVATED) as any;
         message.user(user);
       });
 
@@ -410,9 +411,7 @@ describe('NotificationRepository', () => {
       const expected_body = t('notificationVoiceChannelDeactivate');
 
       beforeEach(() => {
-        message = new CallMessage();
-        message.call_message_type = CALL_MESSAGE_TYPE.DEACTIVATED;
-        message.finished_reason = TERMINATION_REASON.MISSED;
+        message = new CallMessage(CALL_MESSAGE_TYPE.DEACTIVATED, TERMINATION_REASON.MISSED) as any;
         message.user(user);
       });
 
@@ -428,117 +427,118 @@ describe('NotificationRepository', () => {
   });
 
   describe('shows a well-formed content notification', () => {
-    let expected_body = undefined;
+    let expected_body: string;
+    let textMessage: ContentMessage;
 
     beforeEach(() => {
-      message = new ContentMessage();
-      message.user(user);
+      textMessage = new ContentMessage();
+      textMessage.user(user);
     });
 
     describe('for a text message', () => {
       beforeEach(() => {
         const asset_et = new Text('id', 'Lorem ipsum');
-        message.assets.push(asset_et);
+        textMessage.assets.push(asset_et);
         expected_body = asset_et.text;
       });
 
       it('in a 1:1 conversation', () => {
         conversation.type(CONVERSATION_TYPE.ONE_TO_ONE);
-        return verifyNotification(conversation, message, expected_body);
+        return verifyNotification(conversation, textMessage, expected_body);
       });
 
       it('in a group conversation', () => {
-        return verifyNotification(conversation, message, expected_body);
+        return verifyNotification(conversation, textMessage, expected_body);
       });
 
       it('when preference is set to obfuscate-message', () => {
         const notification_preference = NotificationPreference.OBFUSCATE_MESSAGE;
-        notificationRepository.notificationsPreference(notification_preference);
-        return verifyNotificationObfuscated(conversation, message, notification_preference);
+        notificationRepository.updatedNotificationsProperty(notification_preference);
+        return verifyNotificationObfuscated(conversation, textMessage, notification_preference);
       });
 
       it('when preference is set to obfuscate', () => {
         const notification_preference = NotificationPreference.OBFUSCATE;
-        notificationRepository.notificationsPreference(notification_preference);
-        return verifyNotificationObfuscated(conversation, message, notification_preference);
+        notificationRepository.updatedNotificationsProperty(notification_preference);
+        return verifyNotificationObfuscated(conversation, textMessage, notification_preference);
       });
     });
 
     describe('for a picture', () => {
       beforeEach(() => {
-        message.assets.push(new MediumImage());
+        textMessage.assets.push(new MediumImage('image'));
         expected_body = t('notificationAssetAdd');
       });
 
       it('in a 1:1 conversation', () => {
         conversation.type(CONVERSATION_TYPE.ONE_TO_ONE);
-        return verifyNotification(conversation, message, expected_body);
+        return verifyNotification(conversation, textMessage, expected_body);
       });
 
       it('in a group conversation', () => {
-        return verifyNotification(conversation, message, expected_body);
+        return verifyNotification(conversation, textMessage, expected_body);
       });
 
       it('when preference is set to obfuscate-message', () => {
         const notification_preference = NotificationPreference.OBFUSCATE_MESSAGE;
-        notificationRepository.notificationsPreference(notification_preference);
-        return verifyNotificationObfuscated(conversation, message, notification_preference);
+        notificationRepository.updatedNotificationsProperty(notification_preference);
+        return verifyNotificationObfuscated(conversation, textMessage, notification_preference);
       });
 
       it('when preference is set to obfuscate', () => {
         const notification_preference = NotificationPreference.OBFUSCATE;
-        notificationRepository.notificationsPreference(notification_preference);
-        return verifyNotificationObfuscated(conversation, message, notification_preference);
+        notificationRepository.updatedNotificationsProperty(notification_preference);
+        return verifyNotificationObfuscated(conversation, textMessage, notification_preference);
       });
     });
 
     describe('for a location', () => {
       beforeEach(() => {
-        message.assets.push(new Location());
+        textMessage.assets.push(new Location());
         expected_body = t('notificationSharedLocation');
       });
 
       it('in a 1:1 conversation', () => {
         conversation.type(CONVERSATION_TYPE.ONE_TO_ONE);
-        return verifyNotification(conversation, message, expected_body);
+        return verifyNotification(conversation, textMessage, expected_body);
       });
 
       it('in a group conversation', () => {
-        return verifyNotification(conversation, message, expected_body);
+        return verifyNotification(conversation, textMessage, expected_body);
       });
 
       it('when preference is set to obfuscate-message', () => {
         const notification_preference = NotificationPreference.OBFUSCATE_MESSAGE;
-        notificationRepository.notificationsPreference(notification_preference);
-        return verifyNotificationObfuscated(conversation, message, notification_preference);
+        notificationRepository.updatedNotificationsProperty(notification_preference);
+        return verifyNotificationObfuscated(conversation, textMessage, notification_preference);
       });
 
       it('when preference is set to obfuscate', () => {
         const notification_preference = NotificationPreference.OBFUSCATE;
-        notificationRepository.notificationsPreference(notification_preference);
+        notificationRepository.updatedNotificationsProperty(notification_preference);
         expect(expected_body).toBeDefined();
-        return verifyNotificationObfuscated(conversation, message, notification_preference);
+        return verifyNotificationObfuscated(conversation, textMessage, notification_preference);
       });
     });
 
     describe('for ephemeral messages', () => {
       beforeEach(() => {
-        message.ephemeral_expires(5000);
+        textMessage.ephemeral_expires(5000);
       });
 
       it('that contains text', () => {
-        message.assets.push(new Text('id', 'Hello world!'));
-        return verifyNotificationEphemeral(conversation, message);
+        textMessage.assets.push(new Text('id', 'Hello world!'));
+        return verifyNotificationEphemeral(conversation, textMessage);
       });
 
       it('that contains an image', () => {
-        message.assets.push(new Location());
-        return verifyNotificationEphemeral(conversation, message);
+        textMessage.assets.push(new Location());
+        return verifyNotificationEphemeral(conversation, textMessage);
       });
 
       it('that contains a location', () => {
-        message.assets.push(new MediumImage());
-        return verifyNotificationEphemeral(conversation, message);
+        textMessage.assets.push(new MediumImage('image'));
+        return verifyNotificationEphemeral(conversation, textMessage);
       });
     });
   });
@@ -552,11 +552,11 @@ describe('NotificationRepository', () => {
     });
 
     it('if a group is created', () => {
-      conversation.from = payload.users.get.one[0].id;
-      message = new MemberMessage();
+      (conversation as any).from = payload.users.get.one[0].id;
+      message = new MemberMessage() as any;
       message.user(user);
       message.type = CONVERSATION_EVENT.CREATE;
-      message.memberMessageType = SystemMessageType.CONVERSATION_CREATE;
+      (message as any).memberMessageType = SystemMessageType.CONVERSATION_CREATE;
 
       const expected_body = `${user.name()} started a conversation`;
       expect(expected_body).toBeDefined();
@@ -564,13 +564,13 @@ describe('NotificationRepository', () => {
     });
 
     it('if a group is renamed', () => {
-      message = new RenameMessage();
-      message.user(user);
-      message.name = 'Lorem Ipsum Conversation';
+      const renameMessage = new RenameMessage();
+      renameMessage.user(user);
+      (renameMessage as any).name = 'Lorem Ipsum Conversation';
 
-      const expected_body = `${user.name()} renamed the conversation to ${message.name}`;
+      const expected_body = `${user.name()} renamed the conversation to ${renameMessage.name}`;
       expect(expected_body).toBeDefined();
-      return verifyNotificationSystem(conversation, message, expected_body);
+      return verifyNotificationSystem(conversation, renameMessage, expected_body);
     });
 
     it('if a group message timer is updated', () => {
@@ -593,92 +593,93 @@ describe('NotificationRepository', () => {
   });
 
   describe('shows a well-formed member notification', () => {
-    let other_user_et = undefined;
+    let otherUser: User;
+    let memberMessage: MemberMessage;
 
     beforeEach(() => {
-      message = new MemberMessage();
-      message.user(user);
-      message.memberMessageType = SystemMessageType.NORMAL;
-      other_user_et = userMapper.mapUserFromJson(payload.users.get.many[1]);
+      memberMessage = new MemberMessage();
+      memberMessage.user(user);
+      (memberMessage as any).memberMessageType = SystemMessageType.NORMAL;
+      otherUser = userMapper.mapUserFromJson(payload.users.get.many[1]);
     });
 
     describe('if people are added', () => {
       beforeEach(() => {
-        message.type = CONVERSATION_EVENT.MEMBER_JOIN;
+        memberMessage.type = CONVERSATION_EVENT.MEMBER_JOIN;
 
         const titleLength = NotificationRepository.CONFIG.TITLE_LENGTH;
-        const titleText = `${message.user().name()} in ${conversation.display_name()}`;
+        const titleText = `${memberMessage.user().name()} in ${conversation.display_name()}`;
 
         notification_content.title = truncate(titleText, titleLength, false);
       });
 
       it('with one user being added to the conversation', () => {
-        message.userEntities([other_user_et]);
+        memberMessage.userEntities([otherUser]);
 
         const user_name_added = entities.user.jane_roe.name;
         const expected_body = `${user.name()} added ${user_name_added} to the conversation`;
         expect(expected_body).toBeDefined();
-        return verifyNotificationSystem(conversation, message, expected_body);
+        return verifyNotificationSystem(conversation, memberMessage, expected_body);
       });
 
       it('with you being added to the conversation', () => {
-        other_user_et.isMe = true;
-        message.userEntities([other_user_et]);
+        otherUser.isMe = true;
+        memberMessage.userEntities([otherUser]);
 
         const expected_body = `${user.name()} added you to the conversation`;
         expect(expected_body).toBeDefined();
-        return verifyNotificationSystem(conversation, message, expected_body);
+        return verifyNotificationSystem(conversation, memberMessage, expected_body);
       });
 
       it('with multiple users being added to the conversation', () => {
         const user_ids = [entities.user.john_doe.id, entities.user.jane_roe.id];
-        message.userIds(user_ids);
+        memberMessage.userIds(user_ids);
 
         const expected_body = `${user.name()} added 2 people to the conversation`;
         expect(expected_body).toBeDefined();
-        return verifyNotificationSystem(conversation, message, expected_body);
+        return verifyNotificationSystem(conversation, memberMessage, expected_body);
       });
     });
 
     describe('if people are removed', () => {
       beforeEach(() => {
-        message.type = CONVERSATION_EVENT.MEMBER_LEAVE;
+        memberMessage.type = CONVERSATION_EVENT.MEMBER_LEAVE;
         const titleLength = NotificationRepository.CONFIG.TITLE_LENGTH;
-        const titleText = `${message.user().name()} in ${conversation.display_name()}`;
+        const titleText = `${memberMessage.user().name()} in ${conversation.display_name()}`;
 
         notification_content.title = truncate(titleText, titleLength, false);
       });
 
       it('with one user being removed from the conversation', () => {
-        message.userEntities([other_user_et]);
+        memberMessage.userEntities([otherUser]);
 
-        return notificationRepository.notify(message, undefined, conversation).then(() => {
+        return notificationRepository.notify(memberMessage, undefined, conversation).then(() => {
           expect(notificationRepository['showNotification']).not.toHaveBeenCalled();
         });
       });
 
       it('with you being removed from the conversation', () => {
-        other_user_et.isMe = true;
-        message.userEntities([other_user_et]);
+        otherUser.isMe = true;
+        memberMessage.userEntities([otherUser]);
 
         const expected_body = `${user.name()} removed you from the conversation`;
         expect(expected_body).toBeDefined();
-        return verifyNotificationSystem(conversation, message, expected_body);
+        return verifyNotificationSystem(conversation, memberMessage, expected_body);
       });
 
       it('with multiple users being removed from the conversation', () => {
         const user_ets = userMapper.mapUsersFromJson(payload.users.get.many);
-        message.userEntities(user_ets);
+        memberMessage.userEntities(user_ets);
 
-        return notificationRepository.notify(message, undefined, conversation).then(() => {
+        return notificationRepository.notify(memberMessage, undefined, conversation).then(() => {
           expect(notificationRepository['showNotification']).not.toHaveBeenCalled();
         });
       });
 
       it('with someone leaving the conversation by himself', () => {
-        message.userEntities([message.user()]);
+        memberMessage.userEntities([memberMessage.user()]);
 
-        return notificationRepository.notify(message, undefined, conversation).then(() => {
+        return notificationRepository.notify(memberMessage, undefined, conversation).then(() => {
           expect(notificationRepository['showNotification']).not.toHaveBeenCalled();
         });
       });
@@ -686,40 +687,41 @@ describe('NotificationRepository', () => {
   });
 
   describe('shows a well-formed request notification', () => {
-    let connectionEntity = undefined;
+    let connectionEntity: ConnectionEntity;
     const expected_title = '…';
+    let memberMessage: MemberMessage;
 
     beforeEach(() => {
       conversation.type(CONVERSATION_TYPE.ONE_TO_ONE);
 
       connectionEntity = ConnectionMapper.mapConnectionFromJson(entities.connection);
-      message = new MemberMessage();
-      message.user(user);
+      memberMessage = new MemberMessage();
+      memberMessage.user(user);
     });
 
     it('if a connection request is incoming', () => {
-      connectionEntity.status = 'pending';
-      message.memberMessageType = SystemMessageType.CONNECTION_REQUEST;
+      connectionEntity.status(ConnectionStatus.PENDING);
+      memberMessage.memberMessageType = SystemMessageType.CONNECTION_REQUEST;
 
       const expected_body = t('notificationConnectionRequest');
       expect(expected_body).toBeDefined();
-      return verifyNotificationSystem(conversation, message, expected_body, expected_title);
+      return verifyNotificationSystem(conversation, memberMessage, expected_body, expected_title);
     });
 
     it('if your connection request was accepted', () => {
-      message.memberMessageType = SystemMessageType.CONNECTION_ACCEPTED;
+      memberMessage.memberMessageType = SystemMessageType.CONNECTION_ACCEPTED;
 
       const expected_body = t('notificationConnectionAccepted');
       expect(expected_body).toBeDefined();
-      return verifyNotificationSystem(conversation, message, expected_body, expected_title);
+      return verifyNotificationSystem(conversation, memberMessage, expected_body, expected_title);
     });
 
     it('if you are automatically connected', () => {
-      message.memberMessageType = SystemMessageType.CONNECTION_CONNECTED;
+      memberMessage.memberMessageType = SystemMessageType.CONNECTION_CONNECTED;
 
       const expected_body = t('notificationConnectionConnected');
       expect(expected_body).toBeDefined();
-      return verifyNotificationSystem(conversation, message, expected_body, expected_title);
+      return verifyNotificationSystem(conversation, memberMessage, expected_body, expected_title);
     });
   });
 
@@ -751,30 +753,31 @@ describe('NotificationRepository', () => {
   });
 
   describe('shows a well-formed composite notification', () => {
+    let compositeMessage: CompositeMessage;
     beforeEach(() => {
-      message = new CompositeMessage();
-      message.addAsset(new Text(createRandomUuid(), '## headline!'));
+      compositeMessage = new CompositeMessage();
+      compositeMessage.addAsset(new Text(createRandomUuid(), '## headline!'));
     });
 
     it('even if notifications are disabled in preferences', () => {
-      notificationRepository.notificationsPreference(NotificationPreference.NONE);
+      notificationRepository.updatedNotificationsProperty(NotificationPreference.NONE);
 
-      return notificationRepository.notify(message, undefined, conversation).then(() => {
+      return notificationRepository.notify(compositeMessage, undefined, conversation).then(() => {
         expect(notificationRepository['showNotification']).toHaveBeenCalled();
       });
     });
 
     it('even if notifications are disabled in conversation settings', () => {
       conversation.mutedState(NOTIFICATION_STATE.NOTHING);
-      return notificationRepository.notify(message, undefined, conversation).then(() => {
+      return notificationRepository.notify(compositeMessage, undefined, conversation).then(() => {
         expect(notificationRepository['showNotification']).toHaveBeenCalled();
       });
     });
   });
 
   describe('shouldNotifyInConversation', () => {
-    let conversationEntity;
-    let messageEntity;
+    let conversationEntity: Conversation;
+    let messageEntity: ContentMessage;
 
     const userId = {domain: '', id: createRandomUuid()};
     const shouldNotifyInConversation = NotificationRepository.shouldNotifyInConversation;
@@ -790,7 +793,7 @@ describe('NotificationRepository', () => {
     }
 
     beforeEach(() => {
-      const selfUserEntity = new User(userId);
+      const selfUserEntity = new User(userId.id);
       selfUserEntity.isMe = true;
       selfUserEntity.inTeam(true);
 

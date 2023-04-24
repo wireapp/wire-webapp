@@ -209,9 +209,9 @@ export class NotificationRepository {
    * @returns Resolves when notification has been handled
    */
   readonly notify = (
-    messageEntity: ContentMessage,
-    connectionEntity: ConnectionEntity,
-    conversationEntity: Conversation,
+    messageEntity: Message,
+    connectionEntity?: ConnectionEntity,
+    conversationEntity?: Conversation,
   ): Promise<void> => {
     const isUserAway = this.userState.self().availability() === Availability.Type.AWAY;
     const isComposite = messageEntity.isComposite();
@@ -426,7 +426,7 @@ export class NotificationRepository {
    * @param messageEntity Message to obfuscate body for
    * @returns Notification message body
    */
-  private createBodyObfuscated(messageEntity: ContentMessage): string {
+  private createBodyObfuscated(messageEntity: Message): string {
     if (messageEntity.isContent()) {
       const isSelfMentioned = messageEntity.isUserMentioned(this.userState.self().qualifiedId);
 
@@ -505,9 +505,9 @@ export class NotificationRepository {
    * @returns Resolves with the notification content
    */
   private createNotificationContent(
-    messageEntity: ContentMessage,
-    connectionEntity: ConnectionEntity,
-    conversationEntity: Conversation,
+    messageEntity: Message,
+    connectionEntity?: ConnectionEntity,
+    conversationEntity?: Conversation,
   ): Promise<NotificationContent | undefined> {
     const body = this.createOptionsBody(messageEntity, conversationEntity);
     if (!body) {
@@ -540,7 +540,7 @@ export class NotificationRepository {
    */
   private createOptionsBody(
     messageEntity: Message | CallMessage | ContentMessage | MemberMessage,
-    conversationEntity: Conversation,
+    conversationEntity?: Conversation,
   ): string | void {
     switch (messageEntity.super_type) {
       case SuperType.CALL:
@@ -565,8 +565,8 @@ export class NotificationRepository {
    */
   private createOptionsData(
     messageEntity: Message,
-    connectionEntity: ConnectionEntity,
-    conversationEntity: Conversation,
+    connectionEntity?: ConnectionEntity,
+    conversationEntity?: Conversation,
   ): NotificationContent['options']['data'] {
     const {id: messageId, type: messageType} = messageEntity;
 
@@ -645,7 +645,7 @@ export class NotificationRepository {
    * @returns Function to be called when notification is clicked
    */
   private createTrigger(
-    messageEntity: ContentMessage | MemberMessage,
+    messageEntity: Message,
     connectionEntity?: ConnectionEntity,
     conversationEntity?: Conversation,
   ): () => void {
@@ -714,9 +714,9 @@ export class NotificationRepository {
    * @returns Resolves when notification was handled
    */
   private async notifyBanner(
-    messageEntity: ContentMessage,
-    connectionEntity: ConnectionEntity,
-    conversationEntity: Conversation,
+    messageEntity: Message,
+    connectionEntity?: ConnectionEntity,
+    conversationEntity?: Conversation,
   ): Promise<void> {
     if (!this.shouldShowNotification(messageEntity, conversationEntity)) {
       return;
@@ -898,7 +898,7 @@ export class NotificationRepository {
    */
   static shouldNotifyInConversation(
     conversationEntity: Conversation,
-    messageEntity: ContentMessage,
+    messageEntity: Message,
     userId: QualifiedId,
   ): boolean {
     if (messageEntity.isComposite()) {
