@@ -48,6 +48,7 @@ export class ConversationState {
   public readonly visibleConversations: ko.PureComputed<Conversation[]>;
   public readonly filteredConversations: ko.PureComputed<Conversation[]>;
   public readonly archivedConversations: ko.PureComputed<Conversation[]>;
+  public readonly missingConversations: QualifiedId[] = [];
   private readonly selfProteusConversation: ko.PureComputed<Conversation | undefined>;
   private readonly selfMLSConversation: ko.PureComputed<Conversation | undefined>;
   public readonly unreadConversations: ko.PureComputed<Conversation[]>;
