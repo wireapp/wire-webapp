@@ -92,7 +92,10 @@ const StartUI: React.FC<StartUIProps> = ({
   } = generatePermissionHelpers(selfUser.teamRole());
 
   useEffect(() => {
-    void conversationRepository.loadConversations();
+    const updateConversations = async () => {
+      await conversationRepository.loadMissingConversations();
+    };
+    void updateConversations();
   }, [conversationRepository]);
 
   const actions = mainViewModel.actions;

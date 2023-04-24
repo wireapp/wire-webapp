@@ -24,6 +24,7 @@ import {
   DefaultConversationRoleName as DefaultRole,
   NewConversation,
   MessageSendingStatus,
+  RemoteConversations,
 } from '@wireapp/api-client/lib/conversation/';
 import {ConversationReceiptModeUpdateData} from '@wireapp/api-client/lib/conversation/data/';
 import {CONVERSATION_TYPING} from '@wireapp/api-client/lib/conversation/data/ConversationTypingData';
@@ -519,14 +520,40 @@ export class ConversationRepository {
   public async loadConversations(): Promise<Conversation[]> {
     const remoteConversationsPromise = this.conversationService.getAllConversations().catch(error => {
       this.logger.error(`Failed to get all conversations from backend: ${error.message}`);
-      return {found: []};
+      return {found: []} as RemoteConversations;
     });
 
     const [localConversations, remoteConversations] = await Promise.all([
       this.conversationService.loadConversationStatesFromDb<ConversationDatabaseData>(),
       remoteConversationsPromise,
     ]);
+    return this.handleRemoteConversationsPromise(localConversations, remoteConversations);
+  }
+
+  public async loadMissingConversations(): Promise<Conversation[]> {
+    const missingConversations = this.conversationState.missingConversations;
+    if (missingConversations.length) {
+      const remoteConversationsPromise = await this.conversationService
+        .getConversationByIds(missingConversations)
+        .catch(error => {
+          this.logger.error(`Failed to get all conversations from backend: ${error.message}`);
+          return {found: [], failed: missingConversations} as RemoteConversations;
+        });
+      missingConversations.splice(0, missingConversations.length);
+      return this.handleRemoteConversationsPromise([], remoteConversationsPromise);
+    }
+
+    return this.conversationState.conversations();
+  }
+
+  private async handleRemoteConversationsPromise(
+    localConversations: ConversationDatabaseData[],
+    remoteConversations: RemoteConversations,
+  ): Promise<Conversation[]> {
     let conversationsData: any[];
+    if (remoteConversations.failed?.length) {
+      this.conversationState.missingConversations.push(...remoteConversations.failed);
+    }
     if (!remoteConversations.found?.length) {
       conversationsData = localConversations;
     } else {
