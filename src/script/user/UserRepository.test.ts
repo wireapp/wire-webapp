@@ -184,8 +184,6 @@ describe('UserRepository', () => {
     });
 
     describe('saveUser', () => {
-      afterEach(() => userState.users.removeAll());
-
       it('saves a user', () => {
         const user = new User(entities.user.jane_roe.id);
 
@@ -210,8 +208,10 @@ describe('UserRepository', () => {
       const localUsers = [generateAPIUser(), generateAPIUser(), generateAPIUser()];
       beforeEach(async () => {
         jest.resetAllMocks();
-        userState.users.removeAll();
         jest.spyOn(userRepository['userService'], 'loadUserFromDb').mockResolvedValue(localUsers);
+        const selfUser = new User('self');
+        selfUser.isMe = true;
+        userState.users([selfUser]);
       });
 
       it('loads all users from backend if no users are stored locally', async () => {
@@ -278,7 +278,6 @@ describe('UserRepository', () => {
       let userJohnDoe: User;
 
       beforeEach(() => {
-        userState.users.removeAll();
         userJaneRoe = new User(entities.user.jane_roe.id);
         userJohnDoe = new User(entities.user.john_doe.id);
 
@@ -293,8 +292,6 @@ describe('UserRepository', () => {
 
         spyOn(testFactory.client_repository!, 'getAllClientsFromDb').and.returnValue(Promise.resolve(recipients));
       });
-
-      afterEach(() => userState.users.removeAll());
 
       it('assigns all available clients to the users', () => {
         return userRepository.assignAllClients().then(() => {
