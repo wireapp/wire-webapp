@@ -19,7 +19,7 @@
 
 import {Router} from 'express';
 
-import type {ServerConfig} from '../../ServerConfig';
+import type {ServerConfig} from '../../config';
 
 export const GoogleWebmasterRoute = (config: ServerConfig) => {
   if (config.SERVER.GOOGLE_WEBMASTER_ID) {

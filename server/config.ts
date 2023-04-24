@@ -23,8 +23,6 @@ import logdown from 'logdown';
 
 import path from 'path';
 
-import type {ServerConfig} from './ServerConfig';
-
 const nodeEnvironment = process.env.NODE_ENV || 'production';
 
 const COMMIT_FILE = path.join(__dirname, 'commit');
@@ -113,7 +111,7 @@ function mergedCSP(): Record<string, Iterable<string>> {
     .reduce((accumulator, [key, value]) => ({...accumulator, [key]: value}), {});
 }
 
-const config: ServerConfig = {
+const config = {
   CLIENT: {
     ANALYTICS_API_KEY: process.env.ANALYTICS_API_KEY,
     APP_NAME: process.env.APP_NAME,
@@ -217,6 +215,8 @@ const config: ServerConfig = {
       process.env.SSL_CERTIFICATE_KEY_PATH || path.join(__dirname, 'certificate/development-key.pem'),
     SSL_CERTIFICATE_PATH: process.env.SSL_CERTIFICATE_PATH || path.join(__dirname, 'certificate/development-cert.pem'),
   },
-};
+} as const;
+
+export type ServerConfig = typeof config;
 
 export {config};
