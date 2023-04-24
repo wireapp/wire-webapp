@@ -29,6 +29,7 @@ import http from 'http';
 import https from 'https';
 import path from 'path';
 
+import type {ServerConfig} from './config';
 import {HealthCheckRoute} from './routes/_health/HealthRoute';
 import {AppleAssociationRoute} from './routes/appleassociation/AppleAssociationRoute';
 import {ConfigRoute} from './routes/config/ConfigRoute';
@@ -36,7 +37,6 @@ import {InternalErrorRoute, NotFoundRoute} from './routes/error/ErrorRoutes';
 import {GoogleWebmasterRoute} from './routes/googlewebmaster/GoogleWebmasterRoute';
 import {RedirectRoutes} from './routes/RedirectRoutes';
 import {Root} from './routes/Root';
-import type {ServerConfig} from './ServerConfig';
 import * as BrowserUtil from './util/BrowserUtil';
 
 class Server {

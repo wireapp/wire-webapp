@@ -19,6 +19,8 @@
 
 import {UserAsset, UserAssetType} from '@wireapp/api-client/lib/user';
 
+import {Availability} from '@wireapp/protocol-messaging';
+
 import {ACCENT_ID, Config} from 'src/script/Config';
 import {User} from 'src/script/entity/User';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
@@ -199,6 +201,16 @@ describe('User Mapper', () => {
       const functionCall = () => mapper.updateUserFromObject(user_et, data);
 
       expect(functionCall).toThrow();
+    });
+
+    it.each([
+      [Availability.Type.AVAILABLE, Availability.Type.NONE],
+      [Availability.Type.NONE, Availability.Type.AVAILABLE],
+    ])('updates the availability (from %s to %s)', (from, to) => {
+      const user = new User();
+      user.availability(from);
+      mapper.updateUserFromObject(user, {availability: to});
+      expect(user.availability()).toBe(to);
     });
 
     it('can update user with v3 assets', () => {
