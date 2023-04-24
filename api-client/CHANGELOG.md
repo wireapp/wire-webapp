@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [24.5.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@24.4.0...@wireapp/api-client@24.5.0) (2023-04-24)
+
+### Features
+
+* Update getConversationJoin result data (SQSERVICES-1975) ([#5087](https://github.com/wireapp/wire-web-packages/issues/5087)) ([39213a1](https://github.com/wireapp/wire-web-packages/commit/39213a1711a4d6e3e83709a0409678aa9e91b0cd))
+
 # [24.4.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@24.3.2...@wireapp/api-client@24.4.0) (2023-04-19)
 
 ### Features
