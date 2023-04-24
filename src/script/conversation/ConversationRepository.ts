@@ -515,7 +515,7 @@ export class ConversationRepository {
 
   /**
    * Will load all the conversations in memory
-   * @returns all the load conversations from backend merged with the locally stored conversations
+   * @returns all the conversations from backend merged with the locally stored conversations and loaded into memory
    */
   public async loadConversations(): Promise<Conversation[]> {
     const remoteConversationsPromise = this.conversationService.getAllConversations().catch(error => {
@@ -527,9 +527,13 @@ export class ConversationRepository {
       this.conversationService.loadConversationStatesFromDb<ConversationDatabaseData>(),
       remoteConversationsPromise,
     ]);
-    return this.handleRemoteConversationsPromise(localConversations, remoteConversations);
+    return this.handleRemoteConversationsPromise(remoteConversations, localConversations);
   }
 
+  /**
+   * Will try to fetch and load all the missing conversations in memory
+   * @returns all the missing conversations freshly fetched from backend appended to the locally stored conversations
+   */
   public async loadMissingConversations(): Promise<Conversation[]> {
     const missingConversations = this.conversationState.missingConversations;
     if (missingConversations.length) {
@@ -540,15 +544,21 @@ export class ConversationRepository {
           return {found: [], failed: missingConversations} as RemoteConversations;
         });
       missingConversations.splice(0, missingConversations.length);
-      return this.handleRemoteConversationsPromise([], remoteConversationsPromise);
+      return this.handleRemoteConversationsPromise(remoteConversationsPromise);
     }
 
     return this.conversationState.conversations();
   }
 
+  /**
+   * Will append the new conversations from backend to the locally stored conversations in memory
+   * @param remoteConversations new conversations fetched from backend
+   * @param localConversations conversations locally stored in database, but not in memory. Omitted after first loading of the app
+   * @returns the new conversations from backend merged with the locally stored conversations
+   */
   private async handleRemoteConversationsPromise(
-    localConversations: ConversationDatabaseData[],
     remoteConversations: RemoteConversations,
+    localConversations: ConversationDatabaseData[] = [],
   ): Promise<Conversation[]> {
     let conversationsData: any[];
     if (remoteConversations.failed?.length) {
@@ -563,7 +573,9 @@ export class ConversationRepository {
     const allConversationEntities = this.mapConversations(conversationsData);
     const newConversationEntities = allConversationEntities.filter(
       allConversations =>
-        !this.conversationState.conversations().some(oldConversations => oldConversations.id === allConversations.id),
+        !this.conversationState
+          .conversations()
+          .some(storedConversations => storedConversations.id === allConversations.id),
     );
     this.saveConversations(newConversationEntities);
     return this.conversationState.conversations();
