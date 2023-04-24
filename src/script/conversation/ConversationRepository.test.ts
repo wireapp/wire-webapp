@@ -28,6 +28,7 @@ import {
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
 import {ConversationCreateEvent, ConversationMemberJoinEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import ko from 'knockout';
@@ -1275,7 +1276,7 @@ describe('ConversationRepository', () => {
         found: [
           {
             members: {
-              others: [],
+              others: [] as QualifiedId[],
               self: {},
             },
             name: 'conv1',
@@ -1290,7 +1291,7 @@ describe('ConversationRepository', () => {
           },
           {
             members: {
-              others: [],
+              others: [] as QualifiedId[],
               self: {},
             },
             name: 'conv2',
@@ -1325,7 +1326,7 @@ describe('ConversationRepository', () => {
         found: [
           {
             members: {
-              others: [],
+              others: [] as QualifiedId[],
               self: {},
             },
             name: 'conv1',
@@ -1340,7 +1341,7 @@ describe('ConversationRepository', () => {
           },
           {
             members: {
-              others: [],
+              others: [] as QualifiedId[],
               self: {},
             },
             name: 'conv2',
@@ -1357,7 +1358,7 @@ describe('ConversationRepository', () => {
             id: 'feabf90e-c785-577b-800a-556d8018542c',
             // archived_state: true,
             members: {
-              others: [],
+              others: [] as QualifiedId[],
               self: {},
             },
             message_timer: null,
@@ -1378,7 +1379,7 @@ describe('ConversationRepository', () => {
           id: 'feabf90e-c785-577b-asdf-556d8018542c',
           // archived_state: true,
           members: {
-            others: [],
+            others: [] as QualifiedId[],
             self: {},
           },
           name: 'conv1',
@@ -1394,7 +1395,7 @@ describe('ConversationRepository', () => {
         {
           id: 'feabf90e-c785-577b-800a-556d8018542c',
           members: {
-            others: [],
+            others: [] as QualifiedId[],
             self: {},
           },
           name: 'conv2',
@@ -1423,7 +1424,7 @@ describe('ConversationRepository', () => {
         found: [
           {
             members: {
-              others: [],
+              others: [] as QualifiedId[],
               self: {},
             },
             name: 'conv1',
@@ -1440,7 +1441,7 @@ describe('ConversationRepository', () => {
         failed: [
           {
             members: {
-              others: [],
+              others: [] as QualifiedId[],
               self: {},
             },
             name: 'conv2',
@@ -1455,7 +1456,7 @@ describe('ConversationRepository', () => {
           },
           {
             members: {
-              others: [],
+              others: [] as QualifiedId[],
               self: {},
             },
             name: 'conv3',
@@ -1505,7 +1506,7 @@ describe('ConversationRepository', () => {
         found: [
           {
             members: {
-              others: [],
+              others: [] as QualifiedId[],
               self: {},
             },
             name: 'conv1',
@@ -1522,7 +1523,7 @@ describe('ConversationRepository', () => {
         failed: [
           {
             members: {
-              others: [],
+              others: [] as QualifiedId[],
               self: {},
             },
             name: 'conv2',
