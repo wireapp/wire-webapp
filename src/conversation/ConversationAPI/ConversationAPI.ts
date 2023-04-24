@@ -635,7 +635,9 @@ export class ConversationAPI {
    * @param conversationCode The conversation code
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/joinConversationByCode
    */
-  public async getJoinByCode(conversationCode: Omit<ConversationCode, 'uri'>): Promise<ConversationJoinData> {
+  public async getJoinByCode(
+    conversationCode: Omit<ConversationCode, 'uri' | 'has_password'>,
+  ): Promise<ConversationJoinData> {
     const config: AxiosRequestConfig = {
       params: conversationCode,
       method: 'get',
