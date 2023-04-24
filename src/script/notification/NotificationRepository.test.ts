@@ -67,9 +67,6 @@ import {PermissionRepository} from '../permission/PermissionRepository';
 import {UserMapper} from '../user/UserMapper';
 import {UserState} from '../user/UserState';
 
-window.wire = window.wire || {};
-window.wire.app = window.wire.app || {};
-
 function buildNotificationRepository() {
   const userState = container.resolve(UserState);
   const notificationRepository = new NotificationRepository(
