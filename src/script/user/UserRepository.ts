@@ -252,6 +252,7 @@ export class UserRepository {
       }
     });
 
+    // Map self user's availability status
     const selfUserAvailability = dbUsers.find(user => user.id === selfUser.id);
     if (selfUserAvailability && selfUserAvailability.availability) {
       selfUser.availability(selfUserAvailability.availability);
