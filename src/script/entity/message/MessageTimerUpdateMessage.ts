@@ -31,7 +31,7 @@ import {SystemMessageType} from '../../message/SystemMessageType';
 export class MessageTimerUpdateMessage extends SystemMessage {
   public readonly message_timer: number;
 
-  constructor(messageTimer: number) {
+  constructor(messageTimer: number | null) {
     super();
 
     this.type = CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE;

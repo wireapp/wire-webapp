@@ -524,7 +524,7 @@ export const Conversation: FC<ConversationProps> = ({
             searchRepository={repositories.search}
             storageRepository={repositories.storage}
             teamState={teamState}
-            userState={userState}
+            selfUser={selfUser}
             onShiftTab={() => setMsgElementsFocusable(false)}
             uploadDroppedFiles={uploadDroppedFiles}
             uploadImages={uploadImages}

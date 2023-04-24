@@ -43,8 +43,9 @@ describe('UserList', () => {
   it('lists all selected users', () => {
     const userState = new UserState();
     const user = new User('test-id');
+    user.isMe = true;
 
-    userState.self(user);
+    userState.users([user]);
 
     const users = ['1', '2', '3', '4'].map(id => new User(id));
     const props = {
@@ -64,8 +65,9 @@ describe('UserList', () => {
   it('select user', async () => {
     const userState = new UserState();
     const user = new User('test-id');
+    user.isMe = true;
 
-    userState.self(user);
+    userState.users([user]);
 
     const setStateMock = jest.fn();
     const useStateMock: any = (useState: any) => [useState, setStateMock];

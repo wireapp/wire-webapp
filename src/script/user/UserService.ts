@@ -66,7 +66,11 @@ export class UserService {
 
   async updateUser(userId: QualifiedId, updates: Partial<UserRecord>) {
     const primaryKey = constructUserPrimaryKey(userId);
-    await this.storageService.update(this.USER_STORE_NAME, primaryKey, updates);
+    const hasBeenUpdated = await this.storageService.update(this.USER_STORE_NAME, primaryKey, updates);
+    if (!hasBeenUpdated) {
+      // If the user could not be found, create an entry for it
+      await this.storageService.save(this.USER_STORE_NAME, primaryKey, {id: userId.id, ...updates});
+    }
   }
 
   //##############################################################################

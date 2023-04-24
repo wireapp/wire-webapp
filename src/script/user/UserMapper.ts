@@ -141,7 +141,7 @@ export class UserMapper {
       userEntity.email(email);
     }
 
-    if (managedBy !== undefined) {
+    if (managedBy) {
       userEntity.managedBy(managedBy);
     }
 

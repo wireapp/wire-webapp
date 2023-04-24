@@ -102,7 +102,7 @@ export class CallingViewModel {
     readonly permissionRepository: PermissionRepository,
     readonly teamRepository: TeamRepository,
     readonly propertiesRepository: PropertiesRepository,
-    private readonly selfUser: ko.Observable<User>,
+    private readonly selfUser: ko.Subscribable<User>,
     readonly multitasking: Multitasking,
     private readonly conversationState = container.resolve(ConversationState),
     readonly callState = container.resolve(CallState),

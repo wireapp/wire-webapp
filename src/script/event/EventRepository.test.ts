@@ -33,6 +33,7 @@ import {EventSource} from './EventSource';
 
 import {TestFactory} from '../../../test/helper/TestFactory';
 import {ClientConversationEvent} from '../conversation/EventBuilder';
+import {User} from '../entity/User';
 import {StatusType} from '../message/StatusType';
 import {EventRecord} from '../storage';
 
@@ -547,7 +548,7 @@ describe('EventRepository', () => {
 
       jest
         .spyOn(testFactory.event_repository!['userState'], 'self')
-        .mockImplementation(() => ({id: assetAddEvent.from}));
+        .mockReturnValue(new User(assetAddEvent.from) as any);
       jest.spyOn(testFactory.event_service!, 'loadEvent').mockResolvedValue(assetAddEvent as any);
       jest
         .spyOn(testFactory.event_service!, 'updateEventAsUploadFailed')
