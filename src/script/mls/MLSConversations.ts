@@ -39,11 +39,23 @@ type MLSConversationRepository = Pick<
   'findConversationByGroupId' | 'getConversationById' | 'conversationRoleRepository'
 >;
 
+/**
+ * Will initialize all the MLS conversations that the user is member of but that are not yet locally established.
+ *
+ * @param conversations - all the conversations that the user is part of
+ * @param core - the instance of the core
+ */
 export function initMLSConversations(conversations: Conversation[], core: Account): Promise<void> {
   const mlsConversations = conversations.filter(isMLSConversation);
   return joinNewConversations(mlsConversations, core);
 }
 
+/**
+ * Will initialise the MLS callbacks for the core.
+ *
+ * @param core - the instance of the core
+ * @param conversationRepository - conversations repository
+ */
 export async function initMLSCallbacks(
   core: Account,
   conversationRepository: MLSConversationRepository,
@@ -75,7 +87,7 @@ async function joinNewConversations(conversations: MLSConversation[], core: Acco
 }
 
 /**
- * Will register self and team mls conversations.
+ * Will register self and team MLS conversations.
  * The self conversation and the team conversation are special conversations created by noone and, thus, need to be manually created by the first device that detects them
  *
  * @param conversations all the conversations the user is part of
