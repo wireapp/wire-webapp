@@ -44,7 +44,7 @@ const GuestLinkPasswordModal: React.FC<GuestLinkPasswordModalProps> = ({onSubmit
         <H2 style={{whiteSpace: 'break-spaces', fontWeight: 500, marginTop: '10px', textAlign: 'center'}}>
           {_(guestLinkPasswordModalStrings.headline)}
         </H2>
-        <Text block fontSize="16px" style={{marginBottom: 24}}>
+        <Text block fontSize="var(--font-size-base)" style={{marginBottom: 24}}>
           {_(guestLinkPasswordModalStrings.description)}
         </Text>
         <Form
