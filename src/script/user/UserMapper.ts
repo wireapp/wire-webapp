@@ -17,8 +17,6 @@
  *
  */
 
-import {Availability} from '@wireapp/protocol-messaging';
-
 import {joaatHash} from 'Util/Crypto';
 import {getLogger, Logger} from 'Util/Logger';
 
@@ -103,7 +101,7 @@ export class UserMapper {
 
     const {
       accent_id: accentId,
-      availability = Availability.Type.NONE,
+      availability,
       assets,
       deleted,
       email,
@@ -119,7 +117,10 @@ export class UserMapper {
       userEntity.accent_id(accentId);
     }
 
-    userEntity.availability(availability);
+    if (availability !== undefined) {
+      // Availability should only change when it's a valid value (undefined should reset the availability)
+      userEntity.availability(availability);
+    }
 
     let mappedAssets;
     if (assets?.length) {
