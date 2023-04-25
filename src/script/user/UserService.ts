@@ -52,12 +52,18 @@ export class UserService {
   /**
    * Will remove all the non-qualified entries in the DB
    */
-  async clearNonQualifiedUsers(): Promise<void> {
+  async clearNonQualifiedUsers(): Promise<UserRecord[]> {
     const keys = await this.storageService.readAllPrimaryKeys(this.USER_STORE_NAME);
     const nonQualifiedKeys = keys.filter(key => !key.includes('@'));
+    const deletedEntries = [];
     for (const key of nonQualifiedKeys) {
-      await this.storageService.delete(this.USER_STORE_NAME, key);
+      const entry = await this.storageService.load<UserRecord>(this.USER_STORE_NAME, key);
+      if (entry) {
+        deletedEntries.push(entry);
+        await this.storageService.delete(this.USER_STORE_NAME, key);
+      }
     }
+    return deletedEntries;
   }
 
   async removeUserFromDb(user: {id: string; domain: string}): Promise<void> {

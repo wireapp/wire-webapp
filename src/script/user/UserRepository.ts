@@ -206,6 +206,11 @@ export class UserRepository {
       .concat(extraUsers);
     const users = uniq(allUserIds, false, (userId: QualifiedId) => userId.id);
 
+    // Remove all users that have non-qualified Ids in DB (there could be duplicated entries one qualified and one non-qualified)
+    // we want to get rid of the ambiguous entries
+    // the entries we get back will be used to feed the availabilities of those users
+    const nonQualifiedUsers = await this.userService.clearNonQualifiedUsers();
+
     const dbUsers = await this.userService.loadUserFromDb();
     /* prior to April 2023, we were only storing the availability in the DB, we need to refetch those users */
     const [localUsers, incompleteUsers] = partition(dbUsers, user => !!user.qualified_id);
@@ -220,9 +225,6 @@ export class UserRepository {
       // Remove users that are not linked to any loaded users
       await this.userService.removeUserFromDb(orphanUser.qualified_id);
     }
-    // Remove all users that have non-qualified Ids in DB (there could be duplicated entries one qualified and one non-qualified)
-    // we want to get rid of the ambiguous entries
-    await this.userService.clearNonQualifiedUsers();
 
     const missingUsers = users.filter(
       user =>
@@ -234,7 +236,10 @@ export class UserRepository {
     const {found, failed} = await this.fetchRawUsers(missingUsers, selfUser.domain);
 
     const userWithAvailability = found.map(user => {
-      const availability = incompleteUsers.find(incompleteUser => incompleteUser.id === user.id);
+      const availability = incompleteUsers
+        .concat(nonQualifiedUsers)
+        .find(incompleteUser => incompleteUser.id === user.id);
+
       if (availability) {
         return {availability: availability.availability, ...user};
       }
@@ -255,9 +260,10 @@ export class UserRepository {
     });
 
     // Map self user's availability status
-    const {availability: selfUserAvailability} = dbUsers.find(user => user.id === selfUser.id) ?? {};
-    if (selfUserAvailability) {
-      selfUser.availability(selfUserAvailability);
+    const {availability: selfUserAvailability} =
+      dbUsers.concat(nonQualifiedUsers).find(user => user.id === selfUser.id) ?? {};
+    if (selfUserAvailability !== undefined) {
+      await this.updateUser(selfUser.qualifiedId, {availability: selfUserAvailability});
     }
 
     this.userState.users([selfUser, ...mappedUsers]);
