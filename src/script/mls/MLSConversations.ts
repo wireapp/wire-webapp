@@ -52,6 +52,7 @@ export function initMLSConversations(conversations: Conversation[], core: Accoun
 
 /**
  * Will initialise the MLS callbacks for the core.
+ * It should be called before processing messages queue as the callbacks are being used when decrypting mls messages.
  *
  * @param core - the instance of the core
  * @param conversationRepository - conversations repository
