@@ -199,6 +199,8 @@ export class AudioRepository {
   readonly stop = (audioId: AudioType): void => {
     const audioElement = this.getSoundById(audioId);
     if (!audioElement?.paused) {
+      // This log is used by QA
+      this.logger.log(`Stopping sound '${audioId}'`);
       audioElement.pause();
       audioElement.load();
     }
