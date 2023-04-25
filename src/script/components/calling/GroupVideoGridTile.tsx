@@ -108,6 +108,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
         }}
       >
         <span
+          data-uie-name="call-participant-name"
           css={{
             textOverflow: 'ellipsis',
             overflow: 'hidden',
