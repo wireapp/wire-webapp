@@ -137,7 +137,6 @@ export class UserRepository {
     amplify.subscribe(WebAppEvents.CLIENT.UPDATE, this.updateClientsFromUser);
     amplify.subscribe(WebAppEvents.USER.SET_AVAILABILITY, this.setAvailability);
     amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent);
-    amplify.subscribe(WebAppEvents.USER.PERSIST, this.saveUserInDb);
     amplify.subscribe(WebAppEvents.USER.UPDATE, this.refreshUser);
   }
 
@@ -217,10 +216,13 @@ export class UserRepository {
       localUser => !users.find(user => matchQualifiedIds(user, localUser.qualified_id)),
     );
 
-    // Remove users that are not linked to any loaded users
-    orphanUsers.forEach(async user => {
-      await this.userService.removeUserFromDb(user.qualified_id);
-    });
+    for (const orphanUser of orphanUsers) {
+      // Remove users that are not linked to any loaded users
+      await this.userService.removeUserFromDb(orphanUser.qualified_id);
+    }
+    // Remove all users that have non-qualified Ids in DB (there could be duplicated entries one qualified and one non-qualified)
+    // we want to get rid of the ambiguous entries
+    await this.userService.clearNonQualifiedUsers();
 
     const missingUsers = users.filter(
       user =>
