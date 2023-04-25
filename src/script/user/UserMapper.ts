@@ -118,7 +118,7 @@ export class UserMapper {
     }
 
     if (availability !== undefined) {
-      // Availability should only change when it's a valid value (undefined should reset the availability)
+      // Availability should only change when it's a valid value (undefined should not reset the availability)
       userEntity.availability(availability);
     }
 
