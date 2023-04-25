@@ -404,7 +404,7 @@ export class App {
       await userRepository.loadUsers(selfUser, connections, conversations, teamMembers);
 
       if (supportsMLS()) {
-        //if mls is supported, we need to initialize the callbacks (the are used when decrypting messages)
+        //if mls is supported, we need to initialize the callbacks (they are used when decrypting messages)
         await initMLSCallbacks(this.core, this.repository.conversation);
       }
 

@@ -63,7 +63,7 @@ describe('MLSConversations', () => {
       const mlsConversations = createConversations(nbMLSConversations);
       const conversations = [...proteusConversations, ...mlsConversations];
 
-      await initMLSConversations(conversations, new User(), new Account(), {} as any);
+      await initMLSConversations(conversations, new Account());
 
       expect(useMLSConversationState.getState().sendExternalToPendingJoin).toHaveBeenCalledWith(
         mlsConversations,
@@ -107,7 +107,7 @@ describe('MLSConversations', () => {
       const mlsConversations = createConversations(nbMLSConversations);
       const conversations = [...proteusConversations, teamConversation, ...mlsConversations, selfConversation];
 
-      await initMLSConversations(conversations, new User(), core, {} as any);
+      await initMLSConversations(conversations, core);
 
       expect(core.service!.mls.registerConversation).toHaveBeenCalledTimes(0);
     });
