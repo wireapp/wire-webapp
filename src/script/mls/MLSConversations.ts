@@ -75,13 +75,13 @@ async function joinNewConversations(conversations: MLSConversation[], core: Acco
 }
 
 /**
- * Will register special conversations agains the core.
- * The self conversation and the team conversation as special conversation that are created by noone and, thus, need to be manually created by the first device that detects them
+ * Will register self and team mls conversations.
+ * The self conversation and the team conversation are special conversations created by noone and, thus, need to be manually created by the first device that detects them
  *
  * @param conversations all the conversations the user is part of
  * @param core instance of the core
  */
-export async function registerUninitializedConversations(
+export async function registerUninitializedSelfAndTeamConversations(
   conversations: Conversation[],
   selfUser: User,
   selfClientId: string,
