@@ -39,13 +39,16 @@ type MLSConversationRepository = Pick<
   'findConversationByGroupId' | 'getConversationById' | 'conversationRoleRepository'
 >;
 
-export async function initMLSConversations(
-  conversations: Conversation[],
-  selfUser: User,
+export function initMLSConversations(conversations: Conversation[], core: Account): Promise<void> {
+  const mlsConversations = conversations.filter(isMLSConversation);
+  return joinNewConversations(mlsConversations, core);
+}
+
+export async function initMLSCallbacks(
   core: Account,
   conversationRepository: MLSConversationRepository,
 ): Promise<void> {
-  core.configureMLSCallbacks({
+  return core.configureMLSCallbacks({
     groupIdFromConversationId: async conversationId => {
       const conversation = await conversationRepository.getConversationById(conversationId);
       return conversation?.groupId;
@@ -54,9 +57,6 @@ export async function initMLSConversations(
     authorize: async () => true,
     userAuthorize: async () => true,
   });
-
-  const mlsConversations = conversations.filter(isMLSConversation);
-  await joinNewConversations(mlsConversations, core);
 }
 
 /**
