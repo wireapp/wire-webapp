@@ -129,7 +129,7 @@ export const PartialFailureToSendWarning = ({failedToSend, knownUsers}: Props) =
 
               {/* maps through the unreachable users that will never receive the message:
               "3 participants from alpha.domain, 1 participant from beta.domain won't get your message" */}
-              {failed && (
+              {unreachableUsers.length !== 0 && (
                 <p css={warning}>
                   {joinWith(
                     unreachableUsers.map(user => (

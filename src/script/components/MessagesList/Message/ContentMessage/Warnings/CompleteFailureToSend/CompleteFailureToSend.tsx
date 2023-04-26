@@ -26,10 +26,9 @@ import {warning} from '../Warnings.styles';
 type Props = {
   isTextAsset: boolean;
   onRetry: () => void;
-  onDiscard?: () => void;
 };
 
-export const CompleteFailureToSendWarning = ({isTextAsset, onRetry, onDiscard}: Props) => {
+export const CompleteFailureToSendWarning = ({isTextAsset, onRetry}: Props) => {
   return (
     <>
       <div>
@@ -37,9 +36,6 @@ export const CompleteFailureToSendWarning = ({isTextAsset, onRetry, onDiscard}: 
         <div css={{display: 'flex'}}>
           <Button type="button" variant={ButtonVariant.TERTIARY} onClick={onRetry}>
             {t('messageCouldNotBeSentRetry')}
-          </Button>
-          <Button type="button" variant={ButtonVariant.TERTIARY} onClick={onDiscard}>
-            {t('messageWillNotBeSentDiscard')}
           </Button>
         </div>
       </div>

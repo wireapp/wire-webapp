@@ -219,4 +219,35 @@ describe('PartialFailureToSendWarning', () => {
 
     expect(getByText('Show details')).not.toBeNull();
   });
+
+  it('does not display an unreachable user warning if there are no unreachable users', () => {
+    const namedUsers = generateUsers(2, 'domain1');
+    const queued = generateUserClients(namedUsers);
+
+    const failed = [] as QualifiedId[];
+
+    const {getByText, container} = render(
+      withTheme(<PartialFailureToSendWarning knownUsers={namedUsers} failedToSend={{queued, failed}} />),
+    );
+    act(() => {
+      getByText('Show details').click();
+    });
+
+    expect(container.textContent).not.toContain(`won't get your message`);
+  });
+
+  it('does not display a named user warning if there are no named users', () => {
+    const failed = [...generateQualifiedIds(2, 'domain2')];
+
+    const queued = {} as QualifiedUserClients;
+
+    const {getByText, container} = render(
+      withTheme(<PartialFailureToSendWarning knownUsers={[]} failedToSend={{queued, failed}} />),
+    );
+    act(() => {
+      getByText('Show details').click();
+    });
+
+    expect(container.textContent).not.toContain(`will get your message later`);
+  });
 });
