@@ -72,6 +72,57 @@ const messages = [
   },
 ];
 
+const users = [
+  {
+    accent_id: 2,
+    assets: [
+      {
+        key: '3-1-cd6ba715-8f1d-47fe-bcfe-68c7c49c6a91',
+        size: 'preview',
+        type: 'image',
+      },
+      {
+        key: '3-1-cfaece2f-83cf-4b5f-966f-5c2bca6cd25f',
+        size: 'complete',
+        type: 'image',
+      },
+    ],
+    handle: 'atomrc_felix',
+    id: '920053b3-e82d-4b38-a465-d997f0987a8e',
+    legalhold_status: 'no_consent',
+    name: 'felix',
+    qualified_id: {
+      domain: 'staging.zinfra.io',
+      id: '920053b3-e82d-4b38-a465-d997f0987a8e',
+    },
+  },
+  {
+    accent_id: 1,
+    assets: [
+      {
+        key: '3-1-500a987d-1c2d-44a6-ad14-50d7d8d02b4f',
+        size: 'preview',
+        type: 'image',
+      },
+      {
+        key: '3-1-33e80c59-60e7-400e-bbb1-703bb3a266c5',
+        size: 'complete',
+        type: 'image',
+      },
+    ],
+    email: 'thomas.belin+team1@wire.com',
+    handle: 'thomas_team1',
+    id: 'e2f450b4-0413-42de-8e4a-f6761b76b0cc',
+    legalhold_status: 'no_consent',
+    name: 'thomas_team1',
+    qualified_id: {
+      domain: 'staging.zinfra.io',
+      id: 'e2f450b4-0413-42de-8e4a-f6761b76b0cc',
+    },
+    team: 'b0dcee1f-c64e-4d40-8b50-5baf932906b8',
+  },
+];
+
 async function buildBackupRepository() {
   const storageService = container.resolve(StorageService);
   const engine = await createStorageEngine('test', DatabaseTypes.PERMANENT);
@@ -200,6 +251,7 @@ describe('BackupRepository', () => {
         [Filename.METADATA]: JSON.stringify(metadata),
         [Filename.CONVERSATIONS]: JSON.stringify([conversation]),
         [Filename.EVENTS]: JSON.stringify(messages),
+        [Filename.USERS]: JSON.stringify(users),
       };
 
       const zip = (await handleZipEvent({type: 'zip', files})) as Uint8Array;
@@ -211,6 +263,8 @@ describe('BackupRepository', () => {
         StorageSchemata.OBJECT_STORE.EVENTS,
         messages.map(message => omit(message, 'primary_key')),
       );
+
+      expect(importSpy).toHaveBeenCalledWith(StorageSchemata.OBJECT_STORE.USERS, users);
     });
   });
 });
