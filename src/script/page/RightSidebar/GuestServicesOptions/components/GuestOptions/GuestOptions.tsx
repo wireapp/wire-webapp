@@ -57,7 +57,7 @@ interface GuestOptionsProps {
   isRequestOngoing?: boolean;
   isTeamStateGuestLinkEnabled?: boolean;
   isToggleDisabled?: boolean;
-  core: Core;
+  core?: Core;
 }
 
 const MINIMUM_BACKEND_VERSION_FOR_GUEST_LINKS_WITH_PASSWORD = 3;
