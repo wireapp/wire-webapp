@@ -17,7 +17,7 @@
  *
  */
 
-import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
+import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 

@@ -19,7 +19,7 @@
 
 import React, {useState} from 'react';
 
-import {BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
+import {BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';

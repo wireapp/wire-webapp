@@ -19,7 +19,7 @@
 
 import React, {useEffect, useRef, useState} from 'react';
 
-import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http/';
+import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
