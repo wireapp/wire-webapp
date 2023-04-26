@@ -284,9 +284,9 @@ export class BackupRepository {
     const entityCount = events.length;
     let importedEntities = 0;
 
-    const entities = events.map(entity => this.mapEntityDataType(entity));
+    const entities = events.map(entity => this.prepareEvents(entity));
 
-    const importEventChunk = async (eventChunk: EventRecord[]) => {
+    const importEventChunk = async (eventChunk: Omit<EventRecord, 'primary_key'>[]) => {
       await this.backupService.importEntities(StorageSchemata.OBJECT_STORE.EVENTS, eventChunk);
       importedEntities += eventChunk.length;
       this.logger.log(`Imported '${importedEntities}' of '${entityCount}' events`);
@@ -298,15 +298,22 @@ export class BackupRepository {
 
   private async importUsers(users: UserRecord[], progressCallback: ProgressCallback) {
     let importedEntities = 0;
+    let alreadyExistingEntities = 0;
+
     /* we want to remove users that don't have qualified ids (has we cannot generate primary keys for them) */
     const qualifiedUsers = users.filter(user => !!user.qualified_id);
 
     const importEventChunk = async (usersChunk: UserRecord[]) => {
-      await this.backupService.importEntities(StorageSchemata.OBJECT_STORE.USERS, usersChunk, user =>
-        constructUserPrimaryKey(user.qualified_id),
+      const successfulImports = await this.backupService.importEntities(
+        StorageSchemata.OBJECT_STORE.USERS,
+        usersChunk,
+        user => constructUserPrimaryKey(user.qualified_id),
       );
       importedEntities += usersChunk.length;
-      this.logger.log(`Imported '${importedEntities}' of '${qualifiedUsers.length}' users`);
+      alreadyExistingEntities += usersChunk.length - successfulImports;
+      this.logger.log(
+        `Imported '${importedEntities}' of '${qualifiedUsers.length}' users (${alreadyExistingEntities} skipped))`,
+      );
       progressCallback(usersChunk.length);
     };
 
@@ -323,7 +330,7 @@ export class BackupRepository {
     }
   }
 
-  private mapEntityDataType(entity: any): any {
+  private prepareEvents(entity: EventRecord) {
     if (entity.data) {
       UINT8ARRAY_FIELDS.forEach(field => {
         const dataField = entity.data[field];
@@ -332,7 +339,11 @@ export class BackupRepository {
         }
       });
     }
-    return entity;
+    return {
+      ...entity,
+      // We clear the primary key in order for dexie to generate new ones (primary keys are auto generated so they do not deterministic)
+      primary_key: undefined,
+    };
   }
 
   private async verifyMetadata(user: User, files: Record<string, Uint8Array>): Promise<void> {

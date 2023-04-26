@@ -17,7 +17,7 @@
  *
  */
 
-import type Dexie from 'dexie';
+import Dexie from 'dexie';
 import DexieBatch from 'dexie-batch';
 import {container} from 'tsyringe';
 
@@ -66,14 +66,37 @@ export class BackupService {
     ] as const;
   }
 
-  async importEntities<T>(tableName: string, entities: T[], generatePrimaryKey?: (entry: T) => string): Promise<void> {
+  /**
+   * Will import all entities in the Database.
+   * If a primaryKey generator is given, it will only import the entities that are not already in the DB
+   *
+   * @param tableName the table to put the entities in
+   * @param entities the entities to insert
+   * @param generatePrimaryKey a function that will generate a primaryKey for the entity (will only add entities that are not in the DB)
+   */
+  async importEntities<T>(
+    tableName: string,
+    entities: T[],
+    generatePrimaryKey?: (entry: T) => string,
+  ): Promise<number> {
     const primaryKeys = generatePrimaryKey ? entities.map(generatePrimaryKey) : undefined;
     if (this.storageService.db) {
-      await this.storageService.db.table(tableName).bulkPut(entities, primaryKeys);
-    } else {
-      for (const entity of entities) {
-        await this.storageService.save(tableName, entity.id, entity);
+      try {
+        await this.storageService.db.table(tableName).bulkAdd(entities, primaryKeys);
+        return entities.length;
+      } catch (error) {
+        if (error instanceof Dexie.BulkError) {
+          const {failures} = error;
+          const successCount = entities.length - failures.length;
+          return successCount;
+        }
+        throw error;
       }
     }
+
+    for (const entity of entities) {
+      await this.storageService.save(tableName, entity.id, entity);
+    }
+    return entities.length;
   }
 }
