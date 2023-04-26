@@ -75,7 +75,7 @@ const GuestLinkPasswordModal: React.FC<GuestLinkPasswordModalProps> = ({onSubmit
         <Button
           block
           type="button"
-          disabled={passwordValue === ''}
+          disabled={!passwordValue}
           onClick={onSubmit}
           data-uie-name="guest-link-join-submit-button"
         >
