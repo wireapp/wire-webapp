@@ -22,6 +22,7 @@ import {container} from 'tsyringe';
 
 import {chunk} from 'Util/ArrayUtil';
 import {Logger, getLogger} from 'Util/Logger';
+import {constructUserPrimaryKey} from 'Util/StorageUtil';
 import {WebWorker} from 'Util/worker';
 
 import {BackupService} from './BackupService';
@@ -40,7 +41,7 @@ import {ConnectionState} from '../connection/ConnectionState';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import type {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
-import {EventRecord} from '../storage';
+import {EventRecord, UserRecord} from '../storage';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {StorageSchemata} from '../storage/StorageSchemata';
 
@@ -57,6 +58,10 @@ interface Metadata {
 type ProgressCallback = (done: number) => void;
 
 export type FileDescriptor =
+  | {
+      entities: UserRecord[];
+      filename: Filename.USERS;
+    }
   | {
       entities: EventRecord[];
       filename: Filename.EVENTS;
@@ -242,6 +247,10 @@ export class BackupRepository {
         case Filename.EVENTS:
           await this.importEvents(entities, progressCallback);
           break;
+
+        case Filename.USERS:
+          await this.importUsers(entities, progressCallback);
+          break;
       }
     }
 
@@ -263,7 +272,7 @@ export class BackupRepository {
         conversationChunk,
       );
       importedEntities = importedEntities.concat(importedConversationEntities);
-      this.logger.log(`Imported '${importedEntities.length}' of '${entityCount}' conversation states from backup`);
+      this.logger.log(`Imported '${importedEntities.length}' of '${entityCount}' conversations`);
       progressCallback(conversationChunk.length);
     };
 
@@ -280,11 +289,28 @@ export class BackupRepository {
     const importEventChunk = async (eventChunk: EventRecord[]) => {
       await this.backupService.importEntities(StorageSchemata.OBJECT_STORE.EVENTS, eventChunk);
       importedEntities += eventChunk.length;
-      this.logger.log(`Imported '${importedEntities}' of '${entityCount}' events from backup`);
+      this.logger.log(`Imported '${importedEntities}' of '${entityCount}' events`);
       progressCallback(eventChunk.length);
     };
 
     return this.chunkImport(importEventChunk, entities);
+  }
+
+  private async importUsers(users: UserRecord[], progressCallback: ProgressCallback) {
+    let importedEntities = 0;
+    /* we want to remove users that don't have qualified ids (has we cannot generate primary keys for them) */
+    const qualifiedUsers = users.filter(user => !!user.qualified_id);
+
+    const importEventChunk = async (usersChunk: UserRecord[]) => {
+      await this.backupService.importEntities(StorageSchemata.OBJECT_STORE.USERS, usersChunk, user =>
+        constructUserPrimaryKey(user.qualified_id),
+      );
+      importedEntities += usersChunk.length;
+      this.logger.log(`Imported '${importedEntities}' of '${qualifiedUsers.length}' users`);
+      progressCallback(usersChunk.length);
+    };
+
+    return this.chunkImport(importEventChunk, qualifiedUsers);
   }
 
   private async chunkImport<T>(importFunction: (eventChunk: T[]) => Promise<void>, entities: T[]): Promise<void> {
