@@ -19,9 +19,11 @@
 
 import type Dexie from 'dexie';
 import {container} from 'tsyringe';
+import {omit} from 'underscore';
 
 import {chunk} from 'Util/ArrayUtil';
 import {Logger, getLogger} from 'Util/Logger';
+import {constructUserPrimaryKey} from 'Util/StorageUtil';
 import {WebWorker} from 'Util/worker';
 
 import {BackupService} from './BackupService';
@@ -34,13 +36,13 @@ import {
   IncompatiblePlatformError,
   InvalidMetaDataError,
 } from './Error';
-import {preprocessConversations, preprocessEvents} from './recordPreprocessors';
+import {preprocessConversations, preprocessEvents, preprocessUsers} from './recordPreprocessors';
 
 import {ConnectionState} from '../connection/ConnectionState';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import type {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
-import {EventRecord} from '../storage';
+import {EventRecord, UserRecord} from '../storage';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {StorageSchemata} from '../storage/StorageSchemata';
 
@@ -58,6 +60,10 @@ type ProgressCallback = (done: number) => void;
 
 export type FileDescriptor =
   | {
+      entities: UserRecord[];
+      filename: Filename.USERS;
+    }
+  | {
       entities: EventRecord[];
       filename: Filename.EVENTS;
     }
@@ -69,6 +75,7 @@ export type FileDescriptor =
 export enum Filename {
   CONVERSATIONS = 'conversations.json',
   EVENTS = 'events.json',
+  USERS = 'users.json',
   METADATA = 'export.json',
 }
 
@@ -131,7 +138,7 @@ export class BackupRepository {
   }
 
   private async _exportHistory(progressCallback: ProgressCallback) {
-    const [conversationTable, eventsTable] = this.backupService.getTables();
+    const [conversationTable, eventsTable, usersTable] = this.backupService.getTables();
     const tableData: Record<string, any[]> = {};
 
     function streamProgress<T>(dataProcessor: (data: T[]) => T[]) {
@@ -146,6 +153,9 @@ export class BackupRepository {
 
     const eventsData = await this.exportTable(eventsTable, streamProgress(preprocessEvents));
     tableData[StorageSchemata.OBJECT_STORE.EVENTS] = eventsData;
+
+    const usersData = await this.exportTable(usersTable, streamProgress(preprocessUsers));
+    tableData[StorageSchemata.OBJECT_STORE.USERS] = usersData;
 
     return tableData;
   }
@@ -238,6 +248,10 @@ export class BackupRepository {
         case Filename.EVENTS:
           await this.importEvents(entities, progressCallback);
           break;
+
+        case Filename.USERS:
+          await this.importUsers(entities, progressCallback);
+          break;
       }
     }
 
@@ -251,7 +265,6 @@ export class BackupRepository {
     conversations: ConversationRecord[],
     progressCallback: ProgressCallback,
   ): Promise<Conversation[]> {
-    const entityCount = conversations.length;
     let importedEntities: Conversation[] = [];
 
     const importConversationChunk = async (conversationChunk: ConversationRecord[]) => {
@@ -259,41 +272,64 @@ export class BackupRepository {
         conversationChunk,
       );
       importedEntities = importedEntities.concat(importedConversationEntities);
-      this.logger.log(`Imported '${importedEntities.length}' of '${entityCount}' conversation states from backup`);
       progressCallback(conversationChunk.length);
+      return importedEntities.length;
     };
 
-    await this.chunkImport(importConversationChunk, conversations);
+    await this.chunkImport(importConversationChunk, conversations, Filename.CONVERSATIONS);
     return importedEntities;
   }
 
   private async importEvents(events: EventRecord[], progressCallback: ProgressCallback): Promise<void> {
-    const entityCount = events.length;
-    let importedEntities = 0;
+    const entities = events.map(entity => this.prepareEvents(entity));
 
-    const entities = events.map(entity => this.mapEntityDataType(entity));
-
-    const importEventChunk = async (eventChunk: EventRecord[]) => {
-      await this.backupService.importEntities(StorageSchemata.OBJECT_STORE.EVENTS, eventChunk);
-      importedEntities += eventChunk.length;
-      this.logger.log(`Imported '${importedEntities}' of '${entityCount}' events from backup`);
+    const importEventChunk = async (eventChunk: Omit<EventRecord, 'primary_key'>[]) => {
+      const nbImported = await this.backupService.importEntities(StorageSchemata.OBJECT_STORE.EVENTS, eventChunk);
       progressCallback(eventChunk.length);
+      return nbImported;
     };
 
-    return this.chunkImport(importEventChunk, entities);
+    return this.chunkImport(importEventChunk, entities, Filename.EVENTS);
   }
 
-  private async chunkImport<T>(importFunction: (eventChunk: T[]) => Promise<void>, entities: T[]): Promise<void> {
+  private async importUsers(users: UserRecord[], progressCallback: ProgressCallback) {
+    /* we want to remove users that don't have qualified ids (has we cannot generate primary keys for them) */
+    const qualifiedUsers = users.filter(user => !!user.qualified_id);
+
+    const importEventChunk = async (usersChunk: UserRecord[]) => {
+      const nbImported = await this.backupService.importEntities(StorageSchemata.OBJECT_STORE.USERS, usersChunk, user =>
+        constructUserPrimaryKey(user.qualified_id),
+      );
+      progressCallback(usersChunk.length);
+      return nbImported;
+    };
+
+    return this.chunkImport(importEventChunk, qualifiedUsers, Filename.USERS);
+  }
+
+  private async chunkImport<T>(
+    importFunction: (eventChunk: T[]) => Promise<number>,
+    entities: T[],
+    type: string,
+  ): Promise<void> {
+    const stats = {
+      imported: 0,
+      total: entities.length,
+      ignored: 0,
+    };
     const chunks = chunk(entities, BackupService.CONFIG.BATCH_SIZE);
     for (const chunk of chunks) {
-      await importFunction(chunk);
+      const nbImported = await importFunction(chunk);
+      stats.imported += nbImported;
+      stats.ignored += chunk.length - nbImported;
+      this.logger.info(`Imported entities from '${type}'`, JSON.stringify(stats));
       if (this.canceled) {
         throw new CancelError();
       }
     }
   }
 
-  private mapEntityDataType(entity: any): any {
+  private prepareEvents(entity: EventRecord) {
     if (entity.data) {
       UINT8ARRAY_FIELDS.forEach(field => {
         const dataField = entity.data[field];
@@ -302,7 +338,7 @@ export class BackupRepository {
         }
       });
     }
-    return entity;
+    return omit(entity, 'primary_key');
   }
 
   private async verifyMetadata(user: User, files: Record<string, Uint8Array>): Promise<void> {
