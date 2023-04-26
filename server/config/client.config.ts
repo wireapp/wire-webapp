@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,114 +17,22 @@
  *
  */
 
-import dotenv from 'dotenv-extended';
-import fs from 'fs-extra';
-import logdown from 'logdown';
+import {ConfigGeneratorParams} from './config.types';
 
-import path from 'path';
-
-const nodeEnvironment = process.env.NODE_ENV || 'production';
-
-const COMMIT_FILE = path.join(__dirname, 'commit');
-const ROBOTS_DIR = path.join(__dirname, 'robots');
-const ROBOTS_ALLOW_FILE = path.join(ROBOTS_DIR, 'robots.txt');
-const ROBOTS_DISALLOW_FILE = path.join(ROBOTS_DIR, 'robots-disallow.txt');
-const VERSION_FILE = path.join(__dirname, 'version');
-
-dotenv.load();
-
-const federation = process.env.FEDERATION;
-
-let APP_BASE = process.env.APP_BASE;
-let BACKEND_REST = process.env.BACKEND_REST;
-let BACKEND_WS = process.env.BACKEND_WS;
-
-if (federation) {
-  APP_BASE = `https://local.${federation}.wire.link:8081`;
-  BACKEND_REST = `https://nginz-https.${federation}.wire.link`;
-  BACKEND_WS = `wss://nginz-ssl.${federation}.wire.link`;
-}
-
-const defaultCSP = {
-  connectSrc: ["'self'", 'blob:', 'data:', 'https://*.giphy.com'],
-  defaultSrc: ["'self'"],
-  fontSrc: ["'self'", 'data:'],
-  frameSrc: [
-    'https://*.soundcloud.com',
-    'https://*.spotify.com',
-    'https://*.vimeo.com',
-    'https://*.youtube-nocookie.com',
-  ],
-  imgSrc: ["'self'", 'blob:', 'data:', 'https://*.giphy.com'],
-  manifestSrc: ["'self'"],
-  mediaSrc: ["'self'", 'blob:', 'data:'],
-  prefetchSrc: ["'self'"],
-  scriptSrc: ["'self'", "'unsafe-eval'"],
-  styleSrc: ["'self'", "'unsafe-inline'"],
-  workerSrc: ["'self'", 'blob:'],
-};
-const logger = logdown('config', {
-  logger: console,
-  markdown: false,
-});
-
-function readFile(path: string, fallback?: string): string {
-  try {
-    return fs.readFileSync(path, {encoding: 'utf8', flag: 'r'});
-  } catch (error) {
-    logger.warn(`Cannot access "${path}": ${error.message}`);
-    return fallback;
-  }
-}
-
-function parseCommaSeparatedList(list: string = ''): string[] {
-  const cleanedList = list.replace(/\s/g, '');
-  if (!cleanedList) {
-    return [];
-  }
-  return cleanedList.split(',');
-}
-
-function mergedCSP(): Record<string, Iterable<string>> {
-  const objectSrc = parseCommaSeparatedList(process.env.CSP_EXTRA_OBJECT_SRC);
-  const csp = {
-    connectSrc: [
-      ...defaultCSP.connectSrc,
-      BACKEND_REST,
-      BACKEND_WS,
-      ...parseCommaSeparatedList(process.env.CSP_EXTRA_CONNECT_SRC),
-    ],
-    defaultSrc: [...defaultCSP.defaultSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_DEFAULT_SRC)],
-    fontSrc: [...defaultCSP.fontSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_FONT_SRC)],
-    frameSrc: [...defaultCSP.frameSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_FRAME_SRC)],
-    imgSrc: [...defaultCSP.imgSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_IMG_SRC)],
-    manifestSrc: [...defaultCSP.manifestSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_MANIFEST_SRC)],
-    mediaSrc: [...defaultCSP.mediaSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_MEDIA_SRC)],
-    objectSrc: objectSrc.length > 0 ? objectSrc : ["'none'"],
-    prefetchSrc: [...defaultCSP.prefetchSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_PREFETCH_SRC)],
-    scriptSrc: [...defaultCSP.scriptSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_SCRIPT_SRC)],
-    styleSrc: [...defaultCSP.styleSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_STYLE_SRC)],
-    workerSrc: [...defaultCSP.workerSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_WORKER_SRC)],
-  };
-  return Object.entries(csp)
-    .filter(([key, value]) => !!Array.from(value).length)
-    .reduce((accumulator, [key, value]) => ({...accumulator, [key]: value}), {});
-}
-
-const config = {
-  CLIENT: {
+export function generateConfig(params: ConfigGeneratorParams) {
+  const {urls, version, env} = params;
+  return {
     ANALYTICS_API_KEY: process.env.ANALYTICS_API_KEY,
     APP_NAME: process.env.APP_NAME,
     BACKEND_NAME: process.env.BACKEND_NAME,
-    BACKEND_REST,
-    BACKEND_WS,
+    BACKEND_REST: urls.api,
+    BACKEND_WS: urls.ws,
     BRAND_NAME: process.env.BRAND_NAME,
-    CHROME_ORIGIN_TRIAL_TOKEN: process.env.CHROME_ORIGIN_TRIAL_TOKEN,
     COUNTLY_API_KEY: process.env.COUNTLY_API_KEY,
     DATADOG_APPLICATION_ID: process.env.DATADOG_APPLICATION_ID,
     DATADOG_CLIENT_TOKEN: process.env.DATADOG_CLIENT_TOKEN,
     ENABLE_DEV_BACKEND_API: process.env.ENABLE_DEV_BACKEND_API == 'true',
-    ENVIRONMENT: nodeEnvironment,
+    ENVIRONMENT: env,
     FEATURE: {
       ALLOWED_FILE_UPLOAD_EXTENSIONS: (process.env.FEATURE_ALLOWED_FILE_UPLOAD_EXTENSIONS || '*')
         .split(',')
@@ -188,35 +96,7 @@ const config = {
       WEBSITE_BASE: process.env.URL_WEBSITE_BASE,
       WHATS_NEW: process.env.URL_WHATS_NEW,
     },
-    VERSION: readFile(VERSION_FILE, '0.0.0'),
+    VERSION: version,
     WEBSITE_LABEL: process.env.WEBSITE_LABEL,
-  },
-  COMMIT: readFile(COMMIT_FILE, ''),
-  SERVER: {
-    APP_BASE,
-    CACHE_DURATION_SECONDS: 300,
-    CSP: mergedCSP(),
-    DEVELOPMENT: nodeEnvironment === 'development',
-    ENFORCE_HTTPS: process.env.ENFORCE_HTTPS != 'false',
-    ENVIRONMENT: nodeEnvironment,
-    GOOGLE_WEBMASTER_ID: process.env.GOOGLE_WEBMASTER_ID,
-    OPEN_GRAPH: {
-      DESCRIPTION: process.env.OPEN_GRAPH_DESCRIPTION,
-      IMAGE_URL: process.env.OPEN_GRAPH_IMAGE_URL,
-      TITLE: process.env.OPEN_GRAPH_TITLE,
-    },
-    PORT_HTTP: Number(process.env.PORT) || 21080,
-    ROBOTS: {
-      ALLOW: readFile(ROBOTS_ALLOW_FILE, 'User-agent: *\r\nDisallow: /'),
-      ALLOWED_HOSTS: ['app.wire.com'],
-      DISALLOW: readFile(ROBOTS_DISALLOW_FILE, 'User-agent: *\r\nDisallow: /'),
-    },
-    SSL_CERTIFICATE_KEY_PATH:
-      process.env.SSL_CERTIFICATE_KEY_PATH || path.join(__dirname, 'certificate/development-key.pem'),
-    SSL_CERTIFICATE_PATH: process.env.SSL_CERTIFICATE_PATH || path.join(__dirname, 'certificate/development-cert.pem'),
-  },
-} as const;
-
-export type ServerConfig = typeof config;
-
-export {config};
+  } as const;
+}

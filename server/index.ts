@@ -17,18 +17,18 @@
  *
  */
 
-import {config} from './config';
+import {clientConfig, serverConfig} from './config';
 import {Server} from './Server';
 import {formatDate} from './util/TimeUtil';
 
-const server = new Server(config);
+const server = new Server(serverConfig, clientConfig);
 
 server
   .start()
   .then(port => {
     console.info(`[${formatDate()}] Server is running on port ${port}.`);
-    if (config.SERVER.DEVELOPMENT) {
-      require('opn')(config.SERVER.APP_BASE);
+    if (serverConfig.DEVELOPMENT) {
+      require('opn')(serverConfig.APP_BASE);
     }
   })
   .catch(error => console.error(`[${formatDate()}] ${error.stack}`));

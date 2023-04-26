@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,13 @@
  *
  */
 
-const path = require('path');
-const fs = require('fs-extra');
-const {format} = require('date-fns');
-
-const distFolder = 'dist';
-
-const version = format(new Date(), 'yyyy.MM.dd.HH.mm');
-
-console.log(`Version set to ${version}`);
-
-fs.outputFileSync(path.resolve(distFolder, 'version'), version);
+export type ConfigGeneratorParams = {
+  env: string;
+  urls: {
+    base: string;
+    api: string;
+    ws: string;
+  };
+  commit: string;
+  version: string;
+};
