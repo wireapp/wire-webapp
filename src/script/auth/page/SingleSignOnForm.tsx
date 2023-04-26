@@ -160,12 +160,10 @@ const SingleSignOnFormComponent = ({
     if (event) {
       event.preventDefault();
     }
-    resetAuthError();
-    if (isFetching) {
-      return;
-    }
 
-    if (!codeOrMailInput.current) {
+    resetAuthError();
+
+    if (isFetching || !codeOrMailInput.current) {
       return;
     }
 
