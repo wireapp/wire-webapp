@@ -20,7 +20,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 
 import {ClientType} from '@wireapp/api-client/lib/client/index';
-import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
+import {BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http';
 import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
 import {isValidEmail, PATTERN} from '@wireapp/commons/lib/util/ValidationUtil';
 import {FormattedMessage, useIntl} from 'react-intl';
@@ -45,7 +45,6 @@ import {
 import {Config} from '../../Config';
 import {loginStrings, logoutReasonStrings, ssoLoginStrings} from '../../strings';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
-import {BackendError} from '../module/action/BackendError';
 import {ValidationError} from '../module/action/ValidationError';
 import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
@@ -212,7 +211,7 @@ const SingleSignOnFormComponent = ({
     } catch (error) {
       setIsLoading(false);
       switch (error.label) {
-        case BackendError.LABEL.TOO_MANY_CLIENTS: {
+        case BackendErrorLabel.TOO_MANY_CLIENTS: {
           resetAuthError();
           navigate(ROUTE.CLIENTS);
           break;
@@ -221,8 +220,8 @@ const SingleSignOnFormComponent = ({
           setSsoError(error);
           break;
         }
-        case BackendError.LABEL.SSO_USER_CANCELLED_ERROR:
-        case BackendError.LABEL.SSO_NOT_FOUND: {
+        case SyntheticErrorLabel.SSO_USER_CANCELLED_ERROR:
+        case BackendErrorLabel.NOT_FOUND: {
           break;
         }
         default: {
