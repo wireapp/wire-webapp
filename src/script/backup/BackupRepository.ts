@@ -265,7 +265,6 @@ export class BackupRepository {
     conversations: ConversationRecord[],
     progressCallback: ProgressCallback,
   ): Promise<Conversation[]> {
-    const entityCount = conversations.length;
     let importedEntities: Conversation[] = [];
 
     const importConversationChunk = async (conversationChunk: ConversationRecord[]) => {
@@ -273,59 +272,57 @@ export class BackupRepository {
         conversationChunk,
       );
       importedEntities = importedEntities.concat(importedConversationEntities);
-      this.logger.log(`Imported '${importedEntities.length}' of '${entityCount}' conversations`);
       progressCallback(conversationChunk.length);
+      return importedEntities.length;
     };
 
-    await this.chunkImport(importConversationChunk, conversations);
+    await this.chunkImport(importConversationChunk, conversations, Filename.CONVERSATIONS);
     return importedEntities;
   }
 
   private async importEvents(events: EventRecord[], progressCallback: ProgressCallback): Promise<void> {
-    const entityCount = events.length;
-    let importedEntities = 0;
-
     const entities = events.map(entity => this.prepareEvents(entity));
 
     const importEventChunk = async (eventChunk: Omit<EventRecord, 'primary_key'>[]) => {
-      await this.backupService.importEntities(StorageSchemata.OBJECT_STORE.EVENTS, eventChunk);
-      importedEntities += eventChunk.length;
-      this.logger.log(`Imported '${importedEntities}' of '${entityCount}' events`);
+      const nbImported = await this.backupService.importEntities(StorageSchemata.OBJECT_STORE.EVENTS, eventChunk);
       progressCallback(eventChunk.length);
+      return nbImported;
     };
 
-    return this.chunkImport(importEventChunk, entities);
+    return this.chunkImport(importEventChunk, entities, Filename.EVENTS);
   }
 
   private async importUsers(users: UserRecord[], progressCallback: ProgressCallback) {
-    let importedEntities = 0;
-    let alreadyExistingEntities = 0;
-
     /* we want to remove users that don't have qualified ids (has we cannot generate primary keys for them) */
     const qualifiedUsers = users.filter(user => !!user.qualified_id);
 
     const importEventChunk = async (usersChunk: UserRecord[]) => {
-      const chunkSize = usersChunk.length;
-      const successfulImports = await this.backupService.importEntities(
-        StorageSchemata.OBJECT_STORE.USERS,
-        usersChunk,
-        user => constructUserPrimaryKey(user.qualified_id),
-      );
-      importedEntities += chunkSize;
-      alreadyExistingEntities += chunkSize - successfulImports;
-      this.logger.log(
-        `Imported '${importedEntities}' of '${qualifiedUsers.length}' users (${alreadyExistingEntities} skipped))`,
+      const nbImported = await this.backupService.importEntities(StorageSchemata.OBJECT_STORE.USERS, usersChunk, user =>
+        constructUserPrimaryKey(user.qualified_id),
       );
       progressCallback(usersChunk.length);
+      return nbImported;
     };
 
-    return this.chunkImport(importEventChunk, qualifiedUsers);
+    return this.chunkImport(importEventChunk, qualifiedUsers, Filename.USERS);
   }
 
-  private async chunkImport<T>(importFunction: (eventChunk: T[]) => Promise<void>, entities: T[]): Promise<void> {
+  private async chunkImport<T>(
+    importFunction: (eventChunk: T[]) => Promise<number>,
+    entities: T[],
+    type: string,
+  ): Promise<void> {
+    const stats = {
+      imported: 0,
+      total: entities.length,
+      ignored: 0,
+    };
     const chunks = chunk(entities, BackupService.CONFIG.BATCH_SIZE);
     for (const chunk of chunks) {
-      await importFunction(chunk);
+      const nbImported = await importFunction(chunk);
+      stats.imported += nbImported;
+      stats.ignored += chunk.length - nbImported;
+      this.logger.info(`Imported entities from '${type}'`, JSON.stringify(stats));
       if (this.canceled) {
         throw new CancelError();
       }
