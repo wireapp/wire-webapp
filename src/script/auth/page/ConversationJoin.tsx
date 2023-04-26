@@ -20,7 +20,7 @@
 import React, {useEffect, useState} from 'react';
 
 import type {RegisterData} from '@wireapp/api-client/lib/auth';
-import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
+import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {Navigate} from 'react-router-dom';
