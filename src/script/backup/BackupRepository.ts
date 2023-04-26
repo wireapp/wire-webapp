@@ -78,7 +78,7 @@ export class BackupRepository {
   private readonly backupService: BackupService;
   private readonly conversationRepository: ConversationRepository;
   private readonly logger: Logger;
-  private canceled: boolean;
+  private canceled: boolean = false;
   private worker: WebWorker;
 
   constructor(
@@ -91,20 +91,11 @@ export class BackupRepository {
     this.backupService = backupService;
     this.conversationRepository = conversationRepository;
 
-    this.canceled = false;
     this.worker = new WebWorker(() => new Worker(new URL('./zipWorker.ts', import.meta.url)));
   }
 
   public cancelAction(): void {
-    this.isCanceled = true;
-  }
-
-  get isCanceled(): boolean {
-    return this.canceled;
-  }
-
-  set isCanceled(isCanceled) {
-    this.canceled = isCanceled;
+    this.canceled = true;
   }
 
   public createMetaData(user: User, clientId: string): Metadata {
@@ -126,13 +117,14 @@ export class BackupRepository {
    * @returns The promise that contains all the exported tables
    */
   public async generateHistory(user: User, clientId: string, progressCallback: ProgressCallback): Promise<Blob> {
-    this.isCanceled = false;
+    this.canceled = false;
 
     try {
       const exportedData = await this._exportHistory(progressCallback);
       return await this.compressHistoryFiles(user, clientId, exportedData);
     } catch (error) {
-      this.logger.error(`Could not export history: ${error.message}`, error);
+      const errorMessage = error instanceof Error ? error.message : error;
+      this.logger.error(`Could not export history: ${errorMessage}`, error);
       const isCancelError = error instanceof CancelError;
       throw isCancelError ? error : new ExportError();
     }
@@ -162,7 +154,7 @@ export class BackupRepository {
     const tableData: T[] = [];
 
     await this.backupService.exportTable(table, tableRows => {
-      if (this.isCanceled) {
+      if (this.canceled) {
         throw new CancelError();
       }
       const processedData = preprocessor(tableRows);
@@ -202,7 +194,7 @@ export class BackupRepository {
     initCallback: ProgressCallback,
     progressCallback: ProgressCallback,
   ): Promise<void> {
-    this.isCanceled = false;
+    this.canceled = false;
 
     const files = await this.worker.post<Record<string, Uint8Array>>({type: 'unzip', bytes: data});
 
@@ -262,9 +254,7 @@ export class BackupRepository {
     const entityCount = conversations.length;
     let importedEntities: Conversation[] = [];
 
-    const entityChunks = chunk(conversations, BackupService.CONFIG.BATCH_SIZE);
-
-    const importConversationChunk = async (conversationChunk: ConversationRecord[]): Promise<void> => {
+    const importConversationChunk = async (conversationChunk: ConversationRecord[]) => {
       const importedConversationEntities = await this.conversationRepository.updateConversationStates(
         conversationChunk,
       );
@@ -273,7 +263,7 @@ export class BackupRepository {
       progressCallback(conversationChunk.length);
     };
 
-    await this.chunkImport(importConversationChunk, entityChunks);
+    await this.chunkImport(importConversationChunk, conversations);
     return importedEntities;
   }
 
@@ -282,22 +272,22 @@ export class BackupRepository {
     let importedEntities = 0;
 
     const entities = events.map(entity => this.mapEntityDataType(entity));
-    const entityChunks = chunk(entities, BackupService.CONFIG.BATCH_SIZE);
 
-    const importEventChunk = async (eventChunk: any[]): Promise<void> => {
+    const importEventChunk = async (eventChunk: EventRecord[]) => {
       await this.backupService.importEntities(StorageSchemata.OBJECT_STORE.EVENTS, eventChunk);
       importedEntities += eventChunk.length;
       this.logger.log(`Imported '${importedEntities}' of '${entityCount}' events from backup`);
       progressCallback(eventChunk.length);
     };
 
-    return this.chunkImport(importEventChunk, entityChunks);
+    return this.chunkImport(importEventChunk, entities);
   }
 
-  private async chunkImport(importFunction: <T>(eventChunk: T[]) => Promise<void>, importChunks: T[][]): Promise<void> {
-    for (const importChunk of importChunks) {
-      await importFunction(importChunk);
-      if (this.isCanceled) {
+  private async chunkImport<T>(importFunction: (eventChunk: T[]) => Promise<void>, entities: T[]): Promise<void> {
+    const chunks = chunk(entities, BackupService.CONFIG.BATCH_SIZE);
+    for (const chunk of chunks) {
+      await importFunction(chunk);
+      if (this.canceled) {
         throw new CancelError();
       }
     }

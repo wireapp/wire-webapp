@@ -147,12 +147,10 @@ describe('BackupRepository', () => {
         storageService.save('conversations', conversationId, conversation),
       ]);
 
-      jest.spyOn(backupRepository, 'isCanceled', 'get').mockReturnValue(true);
+      const exportPromise = backupRepository.generateHistory(new User(), 'client1', noop);
       backupRepository.cancelAction();
 
-      await expect(backupRepository.generateHistory(new User(), 'client1', noop)).rejects.toThrow(
-        jasmine.any(CancelError),
-      );
+      await expect(exportPromise).rejects.toThrow(jasmine.any(CancelError));
     });
   });
 
