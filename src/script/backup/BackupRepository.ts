@@ -19,6 +19,7 @@
 
 import type Dexie from 'dexie';
 import {container} from 'tsyringe';
+import {omit} from 'underscore';
 
 import {chunk} from 'Util/ArrayUtil';
 import {Logger, getLogger} from 'Util/Logger';
@@ -339,11 +340,7 @@ export class BackupRepository {
         }
       });
     }
-    return {
-      ...entity,
-      // We clear the primary key in order for dexie to generate new ones (primary keys are auto generated so they do not deterministic)
-      primary_key: undefined,
-    };
+    return omit(entity, 'primary_key');
   }
 
   private async verifyMetadata(user: User, files: Record<string, Uint8Array>): Promise<void> {

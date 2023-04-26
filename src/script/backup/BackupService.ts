@@ -95,7 +95,8 @@ export class BackupService {
     }
 
     for (const entity of entities) {
-      await this.storageService.save(tableName, entity.id, entity);
+      const key = generatePrimaryKey ? generatePrimaryKey(entity) : undefined;
+      await this.storageService.save(tableName, key, entity);
     }
     return entities.length;
   }
