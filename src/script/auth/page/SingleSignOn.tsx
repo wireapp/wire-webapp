@@ -19,7 +19,7 @@
 
 import React, {useRef, useState} from 'react';
 
-import {BackendError, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
+import {BackendError, SyntheticErrorLabel} from '@wireapp/api-client/lib/http';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS, StatusCodes} from 'http-status-codes';
 import {useIntl} from 'react-intl';
