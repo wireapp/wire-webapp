@@ -22,7 +22,7 @@ import {container} from 'tsyringe';
 import {createRandomUuid, noop} from 'Util/util';
 import {WebWorker} from 'Util/worker';
 
-import {BackupRepository} from './BackupRepository';
+import {BackupRepository, Filename} from './BackupRepository';
 import {BackupService} from './BackupService';
 import {CancelError, DifferentAccountError, IncompatibleBackupError, IncompatiblePlatformError} from './Error';
 import {handleZipEvent} from './zipWorker';
@@ -147,12 +147,10 @@ describe('BackupRepository', () => {
         storageService.save('conversations', conversationId, conversation),
       ]);
 
-      jest.spyOn(backupRepository, 'isCanceled', 'get').mockReturnValue(true);
+      const exportPromise = backupRepository.generateHistory(new User(), 'client1', noop);
       backupRepository.cancelAction();
 
-      await expect(backupRepository.generateHistory(new User(), 'client1', noop)).rejects.toThrow(
-        jasmine.any(CancelError),
-      );
+      await expect(exportPromise).rejects.toThrow(jasmine.any(CancelError));
     });
   });
 
@@ -182,7 +180,7 @@ describe('BackupRepository', () => {
       const meta = {...backupRepository.createMetaData(new User('user1'), 'client1'), ...metaChanges};
 
       const files = {
-        [BackupRepository.CONFIG.FILENAME.METADATA]: JSON.stringify(meta),
+        [Filename.METADATA]: JSON.stringify(meta),
       };
       const zip = (await handleZipEvent({type: 'zip', files})) as Uint8Array;
 
@@ -198,9 +196,9 @@ describe('BackupRepository', () => {
       const metadata = {...backupRepository.createMetaData(user, 'client1'), version: 15};
 
       const files = {
-        [BackupRepository.CONFIG.FILENAME.METADATA]: JSON.stringify(metadata),
-        [BackupRepository.CONFIG.FILENAME.CONVERSATIONS]: JSON.stringify([conversation]),
-        [BackupRepository.CONFIG.FILENAME.EVENTS]: JSON.stringify(messages),
+        [Filename.METADATA]: JSON.stringify(metadata),
+        [Filename.CONVERSATIONS]: JSON.stringify([conversation]),
+        [Filename.EVENTS]: JSON.stringify(messages),
       };
 
       const zip = (await handleZipEvent({type: 'zip', files})) as Uint8Array;
