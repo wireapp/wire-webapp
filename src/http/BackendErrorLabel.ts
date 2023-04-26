@@ -120,6 +120,15 @@ export enum BackendErrorLabel {
   FEDERATION_BACKEND_NOT_FOUND = 'srv-record-not-found',
   FEDERATION_REMOTE_ERROR = 'federation-remote-error',
   FEDERATION_TLS_ERROR = 'federation-tls-error',
+
+  // SSO errors
+  SSO_FORBIDDEN = 'forbidden',
+  SSO_INVALID_FAILURE_REDIRECT = 'bad-failure-redirect',
+  SSO_INVALID_SUCCESS_REDIRECT = 'bad-success-redirect',
+  SSO_INVALID_UPSTREAM = 'bad-upstream',
+  SSO_INVALID_USERNAME = 'bad-username',
+  SSO_NO_MATCHING_AUTH = 'no-matching-auth-req',
+  SSO_UNSUPPORTED_SAML = 'server-error-unsupported-saml',
 }
 
 export enum SyntheticErrorLabel {
@@ -135,4 +144,6 @@ export enum SyntheticErrorLabel {
   INVITATION_NOT_FOUND = 'invitation-not-found',
   INVITATION_MULTIPLE_FOUND = 'invitation-multiple-found',
   UNKNOWN = 'unknown-error',
+  TOO_MANY_REQUESTS = 'too-many-requests',
+  EMAIL_REQUIRED = 'email-required',
 }
