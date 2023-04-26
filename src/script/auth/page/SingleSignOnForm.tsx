@@ -20,7 +20,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 
 import {ClientType} from '@wireapp/api-client/lib/client/index';
-import {BackendErrorLabel, BackendError as ApiClientBackendError} from '@wireapp/api-client/lib/http';
+import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
 import {isValidEmail, PATTERN} from '@wireapp/commons/lib/util/ValidationUtil';
 import {FormattedMessage, useIntl} from 'react-intl';
@@ -84,7 +84,7 @@ const SingleSignOnFormComponent = ({
   const {formatMessage: _} = useIntl();
   const navigate = useNavigate();
   const [clientType, setClientType] = useState<ClientType | null>(null);
-  const [ssoError, setSsoError] = useState<ApiClientBackendError | null>(null);
+  const [ssoError, setSsoError] = useState<BackendError | null>(null);
   const [isCodeOrMailInputValid, setIsCodeOrMailInputValid] = useState(true);
   const [validationError, setValidationError] = useState<any>();
   const [logoutReason, setLogoutReason] = useState<string>();

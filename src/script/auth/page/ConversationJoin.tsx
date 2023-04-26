@@ -186,7 +186,7 @@ const ConversationJoinComponent = ({
       routeToApp(conversationEvent.conversation, conversationEvent.qualified_conversation?.domain ?? '');
     } catch (error) {
       if (isBackendError(error)) {
-        handleSubmitError(error as BackendError);
+        handleSubmitError(error);
       } else {
         await doLogout();
         console.warn('Unable to create wireless account', error);
@@ -342,7 +342,7 @@ const ConversationJoinComponent = ({
                 } catch (error) {
                   console.warn('Unable to join conversation with existing account', error);
                   if (isBackendError(error)) {
-                    handleSubmitError(error as BackendError);
+                    handleSubmitError(error);
                   }
                 }
               }}
