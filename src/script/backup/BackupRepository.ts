@@ -34,16 +34,17 @@ import {
   IncompatiblePlatformError,
   InvalidMetaDataError,
 } from './Error';
-import {preprocessConversations, preprocessEvents, preprocessUsers} from './recordPreprocessors';
+import {preprocessConversations, preprocessEvents} from './recordPreprocessors';
 
 import {ConnectionState} from '../connection/ConnectionState';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import type {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
+import {EventRecord} from '../storage';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {StorageSchemata} from '../storage/StorageSchemata';
 
-export interface Metadata {
+interface Metadata {
   client_id: string;
   creation_time: string;
   platform: 'Web';
@@ -53,15 +54,21 @@ export interface Metadata {
   version: number;
 }
 
-export interface FileDescriptor {
-  content: Uint8Array;
-  filename: string;
-}
+type ProgressCallback = (done: number) => void;
+
+export type FileDescriptor =
+  | {
+      entities: EventRecord[];
+      filename: Filename.EVENTS;
+    }
+  | {
+      entities: ConversationRecord[];
+      filename: Filename.CONVERSATIONS;
+    };
 
 export enum Filename {
   CONVERSATIONS = 'conversations.json',
   EVENTS = 'events.json',
-  USERS = 'users.json',
   METADATA = 'export.json',
 }
 
@@ -118,11 +125,7 @@ export class BackupRepository {
    * @param progressCallback called on every step of the export
    * @returns The promise that contains all the exported tables
    */
-  public async generateHistory(
-    user: User,
-    clientId: string,
-    progressCallback: (tableRows: number) => void,
-  ): Promise<Blob> {
+  public async generateHistory(user: User, clientId: string, progressCallback: ProgressCallback): Promise<Blob> {
     this.isCanceled = false;
 
     try {
@@ -135,8 +138,8 @@ export class BackupRepository {
     }
   }
 
-  private async _exportHistory(progressCallback: (tableRows: number) => void) {
-    const [conversationTable, eventsTable, usersTable] = this.backupService.getTables();
+  private async _exportHistory(progressCallback: ProgressCallback) {
+    const [conversationTable, eventsTable] = this.backupService.getTables();
     const tableData: Record<string, any[]> = {};
 
     function streamProgress<T>(dataProcessor: (data: T[]) => T[]) {
@@ -151,9 +154,6 @@ export class BackupRepository {
 
     const eventsData = await this.exportTable(eventsTable, streamProgress(preprocessEvents));
     tableData[StorageSchemata.OBJECT_STORE.EVENTS] = eventsData;
-
-    const usersData = await this.exportTable(usersTable, streamProgress(preprocessUsers));
-    tableData[StorageSchemata.OBJECT_STORE.USERS] = usersData;
 
     return tableData;
   }
@@ -199,8 +199,8 @@ export class BackupRepository {
   public async importHistory(
     user: User,
     data: ArrayBuffer | Blob,
-    initCallback: (numberOfRecords: number) => void,
-    progressCallback: (numberProcessed: number) => void,
+    initCallback: ProgressCallback,
+    progressCallback: ProgressCallback,
   ): Promise<void> {
     this.isCanceled = false;
 
@@ -215,50 +215,54 @@ export class BackupRepository {
     }
 
     await this.verifyMetadata(user, files);
-    const fileDescriptors = Object.entries(files).map(([filename, content]) => ({
-      content,
-      filename,
-    }));
-    await this.importHistoryData(fileDescriptors, initCallback, progressCallback);
+    const fileDescriptors = Object.entries(files)
+      .filter(([filename]) => filename !== Filename.METADATA)
+      .map(([filename, content]) => {
+        const data = new TextDecoder().decode(content);
+        const entities = JSON.parse(data);
+        return {
+          entities,
+          filename,
+        } as FileDescriptor;
+      });
+
+    const nbEntities = fileDescriptors.reduce((acc, {entities}) => acc + entities.length, 0);
+    initCallback(nbEntities);
+
+    await this.importHistoryData(fileDescriptors, progressCallback);
   }
 
   private async importHistoryData(
     fileDescriptors: FileDescriptor[],
-    initCallback: (numberOfRecords: number) => void,
-    progressCallback: (numberProcessed: number) => void,
+    progressCallback: ProgressCallback,
   ): Promise<void> {
-    const conversationFileDescriptor = fileDescriptors.find(fileDescriptor => {
-      return fileDescriptor.filename === Filename.CONVERSATIONS;
-    });
+    let importedConversations: Conversation[] = [];
+    for (const {filename, entities} of fileDescriptors) {
+      switch (filename) {
+        case Filename.CONVERSATIONS: {
+          importedConversations = await this.importConversations(entities, progressCallback);
+          break;
+        }
+        case Filename.EVENTS:
+          await this.importEvents(entities, progressCallback);
+          break;
+      }
+    }
 
-    const eventFileDescriptor = fileDescriptors.find(fileDescriptor => {
-      return fileDescriptor.filename === Filename.EVENTS;
-    });
-
-    const conversationFileContent = new TextDecoder().decode(conversationFileDescriptor.content);
-    const conversationEntities = JSON.parse(conversationFileContent) as Conversation[];
-
-    const eventFileContent = new TextDecoder().decode(eventFileDescriptor.content);
-    const eventEntities = JSON.parse(eventFileContent);
-    const entityCount = conversationEntities.length + eventEntities.length;
-    initCallback(entityCount);
-
-    const importedEntities = await this.importHistoryConversations(conversationEntities, progressCallback);
-    await this.importHistoryEvents(eventEntities, progressCallback);
-    await this.conversationRepository.updateConversations(importedEntities);
+    await this.conversationRepository.updateConversations(importedConversations);
     await Promise.all(this.conversationRepository.mapConnections(this.connectionState.connections()));
     // doesn't need to be awaited
     void this.conversationRepository.checkForDeletedConversations();
   }
 
-  private async importHistoryConversations(
-    conversationEntities: Conversation[],
-    progressCallback: (chunkLength: number) => void,
+  private async importConversations(
+    conversations: ConversationRecord[],
+    progressCallback: ProgressCallback,
   ): Promise<Conversation[]> {
-    const entityCount = conversationEntities.length;
+    const entityCount = conversations.length;
     let importedEntities: Conversation[] = [];
 
-    const entityChunks = chunk(conversationEntities, BackupService.CONFIG.BATCH_SIZE);
+    const entityChunks = chunk(conversations, BackupService.CONFIG.BATCH_SIZE);
 
     const importConversationChunk = async (conversationChunk: ConversationRecord[]): Promise<void> => {
       const importedConversationEntities = await this.conversationRepository.updateConversationStates(
@@ -273,11 +277,11 @@ export class BackupRepository {
     return importedEntities;
   }
 
-  private importHistoryEvents(eventEntities: any[], progressCallback: (chunkLength: number) => void): Promise<void> {
-    const entityCount = eventEntities.length;
+  private async importEvents(events: EventRecord[], progressCallback: ProgressCallback): Promise<void> {
+    const entityCount = events.length;
     let importedEntities = 0;
 
-    const entities = eventEntities.map(entity => this.mapEntityDataType(entity));
+    const entities = events.map(entity => this.mapEntityDataType(entity));
     const entityChunks = chunk(entities, BackupService.CONFIG.BATCH_SIZE);
 
     const importEventChunk = async (eventChunk: any[]): Promise<void> => {
@@ -290,7 +294,7 @@ export class BackupRepository {
     return this.chunkImport(importEventChunk, entityChunks);
   }
 
-  private async chunkImport(importFunction: (eventChunk: any[]) => Promise<void>, importChunks: any[]): Promise<void> {
+  private async chunkImport(importFunction: <T>(eventChunk: T[]) => Promise<void>, importChunks: T[][]): Promise<void> {
     for (const importChunk of importChunks) {
       await importFunction(importChunk);
       if (this.isCanceled) {
