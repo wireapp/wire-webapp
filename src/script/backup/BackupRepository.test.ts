@@ -18,6 +18,7 @@
  */
 
 import {container} from 'tsyringe';
+import {omit} from 'underscore';
 
 import {createRandomUuid, noop} from 'Util/util';
 import {WebWorker} from 'Util/worker';
@@ -136,7 +137,7 @@ describe('BackupRepository', () => {
 
       await backupRepository.importHistory(new User('user1'), blob, noop, noop);
 
-      expect(importSpy).toHaveBeenCalledWith(eventStoreName, [textEvent]);
+      expect(importSpy).toHaveBeenCalledWith(eventStoreName, [omit(textEvent, 'primary_key')]);
       expect(importSpy).not.toHaveBeenCalledWith(eventStoreName, [verificationEvent]);
     });
 
@@ -191,7 +192,7 @@ describe('BackupRepository', () => {
       const [backupRepository, {backupService, conversationRepository}] = await buildBackupRepository();
       const user = new User('user1');
       jest.spyOn(backupService, 'getDatabaseVersion').mockReturnValue(15);
-      jest.spyOn(backupService, 'importEntities').mockResolvedValue(undefined);
+      const importSpy = jest.spyOn(backupService, 'importEntities').mockResolvedValue(1);
 
       const metadata = {...backupRepository.createMetaData(user, 'client1'), version: 15};
 
@@ -206,7 +207,10 @@ describe('BackupRepository', () => {
       await backupRepository.importHistory(user, zip, noop, noop);
 
       expect(conversationRepository.updateConversationStates).toHaveBeenCalledWith([conversation]);
-      expect(backupService.importEntities).toHaveBeenCalledWith(StorageSchemata.OBJECT_STORE.EVENTS, messages);
+      expect(importSpy).toHaveBeenCalledWith(
+        StorageSchemata.OBJECT_STORE.EVENTS,
+        messages.map(message => omit(message, 'primary_key')),
+      );
     });
   });
 });
