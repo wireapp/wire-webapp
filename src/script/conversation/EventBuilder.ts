@@ -25,7 +25,7 @@ import {DecryptionError} from '@wireapp/core/lib/errors/DecryptionError';
 import type {REASON as AVS_REASON} from '@wireapp/avs';
 import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {CALL_MESSAGE_TYPE} from '../calling/enum/CallMessageType';
 import type {Conversation} from '../entity/Conversation';
@@ -246,7 +246,7 @@ export const EventBuilder = {
         userIds: conversationEntity.participating_user_ids(),
       },
       from: creatorId,
-      id: createRandomUuid(),
+      id: createUuid(),
       time: isoDate,
       type: ClientEvent.CONVERSATION.ONE2ONE_CREATION,
     };
@@ -259,7 +259,7 @@ export const EventBuilder = {
         type: VerificationMessageType.VERIFIED,
       },
       from: conversationEntity.selfUser().id,
-      id: createRandomUuid(),
+      id: createUuid(),
       time: new Date(conversationEntity.getNextTimestamp()).toISOString(),
       type: ClientEvent.CONVERSATION.VERIFICATION,
     };
@@ -287,7 +287,7 @@ export const EventBuilder = {
         reason,
       },
       from: userId,
-      id: createRandomUuid(),
+      id: createUuid(),
       time: conversation.getNextIsoDate(),
       type: ClientEvent.CONVERSATION.CALL_TIME_OUT,
     };
@@ -305,7 +305,7 @@ export const EventBuilder = {
         userIds,
       },
       from: conversationEntity.selfUser().id,
-      id: createRandomUuid(),
+      id: createUuid(),
       time: new Date(conversationEntity.getNextTimestamp()).toISOString(),
       type: ClientEvent.CONVERSATION.VERIFICATION,
     };
@@ -373,7 +373,7 @@ export const EventBuilder = {
         userIds,
       },
       from: isTemporaryGuest ? selfUserId : creatorId,
-      id: createRandomUuid(),
+      id: createUuid(),
       time: isoDate,
       type: ClientEvent.CONVERSATION.GROUP_CREATION,
     };
@@ -391,7 +391,7 @@ export const EventBuilder = {
       error: `${messageError.message} (${eventData.sender})`,
       error_code: errorCode,
       from,
-      id: createRandomUuid(),
+      id: createUuid(),
       time,
       type: ClientEvent.CONVERSATION.INCOMING_MESSAGE_TOO_BIG,
     };
@@ -410,7 +410,7 @@ export const EventBuilder = {
         legal_hold_status: legalHoldStatus,
       },
       from: userId.id,
-      id: createRandomUuid(),
+      id: createUuid(),
       qualified_conversation: conversationId,
       qualified_from: userId,
       time: new Date(timestamp + (beforeMessage ? -1 : 0)).toISOString(),
@@ -476,7 +476,7 @@ export const EventBuilder = {
     return {
       ...buildQualifiedId(conversationEntity),
       from: conversationEntity.selfUser().id,
-      id: createRandomUuid(),
+      id: createUuid(),
       time: conversationEntity.getNextIsoDate(currentTimestamp),
       type: ClientEvent.CONVERSATION.MISSED_MESSAGES,
     };
@@ -494,7 +494,7 @@ export const EventBuilder = {
         user_ids: [userEntity.id],
       },
       from: userEntity.id,
-      id: createRandomUuid(),
+      id: createUuid(),
       time: new Date(isoDate).toISOString(),
       type: ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE,
     };
@@ -508,7 +508,7 @@ export const EventBuilder = {
       error: `${decryptionError.message} (${eventData.sender})`,
       error_code: decryptionError.code ?? '',
       from,
-      id: createRandomUuid(),
+      id: createUuid(),
       qualified_from: qualified_from || {domain: '', id: from},
       time,
       type: ClientEvent.CONVERSATION.UNABLE_TO_DECRYPT,
@@ -524,7 +524,7 @@ export const EventBuilder = {
     return {
       ...buildQualifiedId(conversation),
       from: userId.id,
-      id: createRandomUuid(),
+      id: createUuid(),
       protocol_version: protocolVersion,
       qualified_from: userId,
       time,
@@ -547,7 +547,7 @@ export const EventBuilder = {
         reason,
       },
       from: userId.id,
-      id: createRandomUuid(),
+      id: createUuid(),
       protocol_version: protocolVersion,
       qualified_from: userId,
       time,

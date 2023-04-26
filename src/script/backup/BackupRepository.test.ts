@@ -21,7 +21,8 @@ import {container} from 'tsyringe';
 import {omit} from 'underscore';
 
 import {generateAPIUser} from 'test/helper/UserGenerator';
-import {createRandomUuid, noop} from 'Util/util';
+import {noop} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 import {WebWorker} from 'Util/worker';
 
 import {BackupRepository, Filename} from './BackupRepository';
@@ -102,8 +103,8 @@ describe('BackupRepository', () => {
       jest.useFakeTimers();
       const freezedTime = new Date();
       jest.setSystemTime(freezedTime);
-      const userId = createRandomUuid();
-      const clientId = createRandomUuid();
+      const userId = createUuid();
+      const clientId = createUuid();
 
       const metaDescription = backupRepository.createMetaData(new User(userId), clientId);
 

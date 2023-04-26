@@ -19,7 +19,7 @@
 
 import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/lib/conversation/';
 
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {ConversationRoleRepository, Permissions} from './ConversationRoleRepository';
 
@@ -45,7 +45,7 @@ describe('ConversationRoleRepository', () => {
   describe('constructor', () => {
     it('knows if you are in a team', () => {
       expect(roleRepository['teamState'].isTeam()).toBe(false);
-      testFactory.team_repository['teamState'].team(new TeamEntity(createRandomUuid()));
+      testFactory.team_repository['teamState'].team(new TeamEntity(createUuid()));
 
       expect(roleRepository['teamState'].isTeam()).toBe(true);
     });
@@ -64,7 +64,7 @@ describe('ConversationRoleRepository', () => {
         }),
       );
 
-      testFactory.team_repository['teamState'].team(new TeamEntity(createRandomUuid()));
+      testFactory.team_repository['teamState'].team(new TeamEntity(createUuid()));
       await roleRepository.loadTeamRoles();
 
       expect(roleRepository.teamRoles.length).toBe(1);
@@ -73,8 +73,8 @@ describe('ConversationRoleRepository', () => {
 
   describe('canAddParticipants', () => {
     it('checks if a user can add participants to a group', async () => {
-      const conversationEntity = new Conversation(createRandomUuid());
-      const userEntity = new User(createRandomUuid(), null);
+      const conversationEntity = new Conversation(createUuid());
+      const userEntity = new User(createUuid(), null);
       conversationEntity.participating_user_ets.push(userEntity);
 
       let canAddParticipants = roleRepository.canAddParticipants(conversationEntity, userEntity);

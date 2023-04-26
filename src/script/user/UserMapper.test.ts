@@ -25,7 +25,7 @@ import {ACCENT_ID} from 'src/script/Config';
 import {User} from 'src/script/entity/User';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 import {entities, payload} from 'test/api/payloads';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {UserMapper} from './UserMapper';
 
@@ -220,8 +220,8 @@ describe('User Mapper', () => {
       user_et.id = entities.user.john_doe.id;
       const data = {
         assets: [
-          {key: createRandomUuid(), size: UserAssetType.PREVIEW, type: 'image' as UserAsset['type']},
-          {key: createRandomUuid(), size: UserAssetType.COMPLETE, type: 'image' as UserAsset['type']},
+          {key: createUuid(), size: UserAssetType.PREVIEW, type: 'image' as UserAsset['type']},
+          {key: createUuid(), size: UserAssetType.COMPLETE, type: 'image' as UserAsset['type']},
         ],
         id: entities.user.john_doe.id,
         name: entities.user.jane_roe.name,

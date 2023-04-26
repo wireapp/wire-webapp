@@ -23,7 +23,7 @@ import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {generateUser} from 'test/helper/UserGenerator';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {ConnectionEntity} from './ConnectionEntity';
 import {ConnectionRepository} from './ConnectionRepository';
@@ -47,7 +47,7 @@ function createConnection() {
   const user = generateUser();
   const connection = new ConnectionEntity();
   connection.userId = user.qualifiedId;
-  connection.conversationId = {id: createRandomUuid(), domain: user.domain};
+  connection.conversationId = {id: createUuid(), domain: user.domain};
   user.connection(connection);
   return user;
 }

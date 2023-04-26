@@ -19,7 +19,7 @@
 
 import {Runtime} from '@wireapp/commons';
 
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 const env = window.wire.env;
 
 export const ACCENT_ID = {
@@ -33,7 +33,7 @@ export const ACCENT_ID = {
 
 const config = {
   ...env,
-  APP_INSTANCE_ID: createRandomUuid(),
+  APP_INSTANCE_ID: createUuid(),
   FEATURE: {
     ...env.FEATURE,
     ENABLE_EXTRA_CLIENT_ENTROPY:

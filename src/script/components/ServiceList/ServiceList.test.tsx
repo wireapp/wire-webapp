@@ -19,7 +19,7 @@
 
 import {render} from '@testing-library/react';
 
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {ServiceList} from './ServiceList';
 
@@ -27,8 +27,8 @@ import {ServiceEntity} from '../../integration/ServiceEntity';
 
 describe('ServiceList', () => {
   it('lists the services', () => {
-    const serviceEntity1 = new ServiceEntity({id: createRandomUuid()});
-    const serviceEntity2 = new ServiceEntity({id: createRandomUuid()});
+    const serviceEntity1 = new ServiceEntity({id: createUuid()});
+    const serviceEntity2 = new ServiceEntity({id: createUuid()});
 
     const props = {
       onServiceClick: () => {},

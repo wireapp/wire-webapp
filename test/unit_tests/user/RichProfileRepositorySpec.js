@@ -18,7 +18,7 @@
  */
 
 import {RichProfileRepository} from 'src/script/user/RichProfileRepository';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 describe('RichProfileRepository', () => {
   let richProfileRepository;
@@ -29,7 +29,7 @@ describe('RichProfileRepository', () => {
 
   describe('getUserRichProfile', () => {
     it("fetches the user's rich profile if it is not already in cache", () => {
-      const userId = createRandomUuid();
+      const userId = createUuid();
       const response = [];
       spyOn(richProfileRepository.apiClient.api.user, 'getRichInfo').and.returnValue(Promise.resolve(response));
 

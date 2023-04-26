@@ -31,7 +31,7 @@ import 'src/script/localization/Localizer';
 import {CALL_MESSAGE_TYPE} from 'src/script/message/CallMessageType';
 import {MentionEntity} from 'src/script/message/MentionEntity';
 import {StatusType} from 'src/script/message/StatusType';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {Conversation} from './Conversation';
 import {CallMessage} from './message/CallMessage';
@@ -93,7 +93,7 @@ describe('Conversation', () => {
     });
 
     it('should return the expected value for team conversations', () => {
-      conversation_et.team_id = createRandomUuid();
+      conversation_et.team_id = createUuid();
 
       conversation_et.type(CONVERSATION_TYPE.CONNECT);
 
@@ -123,7 +123,7 @@ describe('Conversation', () => {
       expect(conversation_et.isRequest()).toBeFalsy();
       expect(conversation_et.isSelf()).toBeFalsy();
 
-      conversation_et.participating_user_ids.push({domain: '', id: createRandomUuid()});
+      conversation_et.participating_user_ids.push({domain: '', id: createUuid()});
       conversation_et.type(CONVERSATION_TYPE.REGULAR);
 
       expect(conversation_et.isGroup()).toBeFalsy();
@@ -131,7 +131,7 @@ describe('Conversation', () => {
       expect(conversation_et.isRequest()).toBeFalsy();
       expect(conversation_et.isSelf()).toBeFalsy();
 
-      conversation_et.participating_user_ids.push({domain: '', id: createRandomUuid()});
+      conversation_et.participating_user_ids.push({domain: '', id: createUuid()});
       conversation_et.type(CONVERSATION_TYPE.REGULAR);
 
       expect(conversation_et.isGroup()).toBeTruthy();
@@ -145,7 +145,7 @@ describe('Conversation', () => {
     let initial_message_et: Message = undefined;
 
     beforeEach(() => {
-      initial_message_et = new Message(createRandomUuid());
+      initial_message_et = new Message(createUuid());
       initial_message_et.timestamp(first_timestamp);
       conversation_et.addMessage(initial_message_et);
     });
@@ -160,7 +160,7 @@ describe('Conversation', () => {
 
     it('does not add new message if it already exists in the message list', () => {
       const initialLength = conversation_et.messages().length;
-      const newMessageEntity = new Message(createRandomUuid());
+      const newMessageEntity = new Message(createUuid());
       newMessageEntity.id = initial_message_et.id;
 
       conversation_et.addMessage(newMessageEntity);
@@ -170,7 +170,7 @@ describe('Conversation', () => {
     });
 
     it('should add message with a newer timestamp', () => {
-      const message_et = new Message(createRandomUuid());
+      const message_et = new Message(createUuid());
       message_et.timestamp(second_timestamp);
 
       conversation_et.addMessage(message_et);
@@ -184,7 +184,7 @@ describe('Conversation', () => {
 
     it('should add message with an older timestamp', () => {
       const older_timestamp = first_timestamp - 100;
-      const message_et = new Message(createRandomUuid());
+      const message_et = new Message(createUuid());
       message_et.timestamp(older_timestamp);
 
       conversation_et.addMessage(message_et);
@@ -198,7 +198,7 @@ describe('Conversation', () => {
 
     describe('affects last_event_timestamp', () => {
       it('and adding a message should update it', () => {
-        const message_et = new Message(createRandomUuid());
+        const message_et = new Message(createUuid());
         message_et.timestamp(second_timestamp);
 
         conversation_et.last_event_timestamp(first_timestamp);
@@ -210,7 +210,7 @@ describe('Conversation', () => {
       });
 
       it('and adding a message should not update it if affect_order is false', () => {
-        const message_et = new Message(createRandomUuid());
+        const message_et = new Message(createUuid());
         message_et.timestamp(second_timestamp);
         //@ts-ignore
         message_et.affect_order(false);
@@ -224,7 +224,7 @@ describe('Conversation', () => {
       });
 
       it('and adding a message should not update it if timestamp is greater than the last server timestamp', () => {
-        const message_et = new Message(createRandomUuid());
+        const message_et = new Message(createUuid());
         message_et.timestamp(second_timestamp);
 
         conversation_et.last_event_timestamp(first_timestamp);
@@ -238,7 +238,7 @@ describe('Conversation', () => {
 
     describe('affects last_read_timestamp', () => {
       it('and adding a message should update it if sent by self user', () => {
-        const message_et = new Message(createRandomUuid());
+        const message_et = new Message(createUuid());
         message_et.timestamp(second_timestamp);
         message_et.user(self_user);
 
@@ -251,7 +251,7 @@ describe('Conversation', () => {
       });
 
       it('should not update last read if last message was not send from self user', () => {
-        const message_et = new Message(createRandomUuid());
+        const message_et = new Message(createUuid());
         message_et.timestamp(second_timestamp);
 
         conversation_et.last_read_timestamp(first_timestamp);
@@ -263,7 +263,7 @@ describe('Conversation', () => {
       });
 
       it('should not update last read if timestamp is greater than the last server timestamp', () => {
-        const message_et = new Message(createRandomUuid());
+        const message_et = new Message(createUuid());
         message_et.timestamp(second_timestamp);
 
         conversation_et.last_read_timestamp(first_timestamp);
@@ -280,12 +280,12 @@ describe('Conversation', () => {
     const reference_timestamp = Date.now();
 
     const message1 = new ContentMessage();
-    message1.id = createRandomUuid();
+    message1.id = createUuid();
     message1.timestamp(reference_timestamp - 10000);
     message1.user(self_user);
 
     const message2 = new ContentMessage();
-    message2.id = createRandomUuid();
+    message2.id = createUuid();
     message2.timestamp(reference_timestamp - 5000);
 
     it('adds multiple messages', () => {
@@ -302,39 +302,39 @@ describe('Conversation', () => {
     });
 
     it('returns last delivered message', () => {
-      const remoteUserEntity = new User(createRandomUuid(), null);
-      const selfUserEntity = new User(createRandomUuid(), null);
+      const remoteUserEntity = new User(createUuid(), null);
+      const selfUserEntity = new User(createUuid(), null);
       selfUserEntity.isMe = true;
 
-      const sentMessageEntity = new ContentMessage(createRandomUuid());
+      const sentMessageEntity = new ContentMessage(createUuid());
       sentMessageEntity.user(selfUserEntity);
       sentMessageEntity.status(StatusType.SENT);
       conversation_et.addMessage(sentMessageEntity);
 
       expect(conversation_et.getLastDeliveredMessage()).not.toBeDefined();
 
-      const deliveredMessageEntity = new ContentMessage(createRandomUuid());
+      const deliveredMessageEntity = new ContentMessage(createUuid());
       deliveredMessageEntity.user(selfUserEntity);
       deliveredMessageEntity.status(StatusType.DELIVERED);
       conversation_et.addMessage(deliveredMessageEntity);
 
       expect(conversation_et.getLastDeliveredMessage()).toBe(deliveredMessageEntity);
 
-      const nextSentMessageEntity = new ContentMessage(createRandomUuid());
+      const nextSentMessageEntity = new ContentMessage(createUuid());
       nextSentMessageEntity.user(selfUserEntity);
       nextSentMessageEntity.status(StatusType.SENT);
       conversation_et.addMessage(nextSentMessageEntity);
 
       expect(conversation_et.getLastDeliveredMessage()).toBe(deliveredMessageEntity);
 
-      const nextDeliveredMessageEntity = new ContentMessage(createRandomUuid());
+      const nextDeliveredMessageEntity = new ContentMessage(createUuid());
       nextDeliveredMessageEntity.user(selfUserEntity);
       nextDeliveredMessageEntity.status(StatusType.DELIVERED);
       conversation_et.addMessage(nextDeliveredMessageEntity);
 
       expect(conversation_et.getLastDeliveredMessage()).toBe(nextDeliveredMessageEntity);
 
-      const remoteMessageEntity = new ContentMessage(createRandomUuid());
+      const remoteMessageEntity = new ContentMessage(createUuid());
       remoteMessageEntity.user(remoteUserEntity);
       remoteMessageEntity.status(StatusType.DELIVERED);
       conversation_et.addMessage(remoteMessageEntity);
@@ -359,7 +359,7 @@ describe('Conversation', () => {
 
     it('returns undefined if last message is not text and not added by self user', () => {
       const message_et = new PingMessage();
-      message_et.id = createRandomUuid();
+      message_et.id = createUuid();
       message_et.user(new User('', null));
       conversation_et.addMessage(message_et);
 
@@ -368,7 +368,7 @@ describe('Conversation', () => {
 
     it('returns undefined if last message is not text and is added by self user', () => {
       const message_et = new PingMessage();
-      message_et.id = createRandomUuid();
+      message_et.id = createUuid();
       message_et.user(self_user_et);
       conversation_et.addMessage(message_et);
 
@@ -378,7 +378,7 @@ describe('Conversation', () => {
     it('returns undefined if last message is text and not send by self user', () => {
       const message_et = new ContentMessage();
       message_et.addAsset(new Text());
-      message_et.id = createRandomUuid();
+      message_et.id = createUuid();
       message_et.user(new User('', null));
       conversation_et.addMessage(message_et);
 
@@ -388,7 +388,7 @@ describe('Conversation', () => {
     it('returns message if last message is text and send by self user', () => {
       const message_et = new ContentMessage();
       message_et.addAsset(new Text());
-      message_et.id = createRandomUuid();
+      message_et.id = createUuid();
       message_et.user(self_user_et);
       conversation_et.addMessage(message_et);
 
@@ -398,12 +398,12 @@ describe('Conversation', () => {
     it('returns last text message if last message is not text and send by self user', () => {
       const message_et = new ContentMessage();
       message_et.addAsset(new Text());
-      message_et.id = createRandomUuid();
+      message_et.id = createUuid();
       message_et.user(self_user_et);
       conversation_et.addMessage(message_et);
 
       const ping_message_et = new PingMessage();
-      ping_message_et.id = createRandomUuid();
+      ping_message_et.id = createUuid();
       ping_message_et.user(new User('', null));
       conversation_et.addMessage(ping_message_et);
 
@@ -414,13 +414,13 @@ describe('Conversation', () => {
     it('returns last message if last message is text and send by self user', () => {
       const message_et = new ContentMessage();
       message_et.addAsset(new Text());
-      message_et.id = createRandomUuid();
+      message_et.id = createUuid();
       message_et.user(self_user_et);
       conversation_et.addMessage(message_et);
 
       const next_message_et = new ContentMessage();
       next_message_et.addAsset(new Text());
-      next_message_et.id = createRandomUuid();
+      next_message_et.id = createUuid();
       next_message_et.user(self_user_et);
       conversation_et.addMessage(next_message_et);
 
@@ -431,13 +431,13 @@ describe('Conversation', () => {
     it('returns message if last message is text and ephemeral', () => {
       const message_et = new ContentMessage();
       message_et.addAsset(new Text());
-      message_et.id = createRandomUuid();
+      message_et.id = createUuid();
       message_et.user(self_user_et);
       conversation_et.addMessage(message_et);
 
       const ephemeral_message_et = new ContentMessage();
       ephemeral_message_et.addAsset(new Text());
-      ephemeral_message_et.id = createRandomUuid();
+      ephemeral_message_et.id = createUuid();
       ephemeral_message_et.user(self_user_et);
       ephemeral_message_et.ephemeral_expires(true);
       conversation_et.addMessage(ephemeral_message_et);
@@ -492,7 +492,7 @@ describe('Conversation', () => {
     });
 
     it('displays a group conversation name with names from the participants', () => {
-      const third_user = new User(createRandomUuid(), null);
+      const third_user = new User(createUuid(), null);
       third_user.name('Brad Delson');
       other_user.name(entities.user.jane_roe.name);
       conversation_et.participating_user_ets.push(other_user);
@@ -512,7 +512,7 @@ describe('Conversation', () => {
     });
 
     it('displays a fallback if no user name has been set for a group conversation', () => {
-      const user = new User(createRandomUuid(), null);
+      const user = new User(createUuid(), null);
       conversation_et.type(CONVERSATION_TYPE.REGULAR);
       conversation_et.participating_user_ids.push({domain: '', id: other_user.id});
       conversation_et.participating_user_ids.push({domain: '', id: user.id});
@@ -566,7 +566,7 @@ describe('Conversation', () => {
       const verified_client_et = new ClientEntity(false, null);
       verified_client_et.meta.isVerified(true);
 
-      const self_user_et = new User(createRandomUuid(), null);
+      const self_user_et = new User(createUuid(), null);
       self_user_et.isMe = true;
       conversation_et.selfUser(self_user_et);
 
@@ -623,14 +623,14 @@ describe('Conversation', () => {
 
   describe('hasGuest', () => {
     it('detects conversations with guest', () => {
-      conversation_et = new Conversation(createRandomUuid());
-      const selfUserEntity = new User(createRandomUuid(), null);
+      conversation_et = new Conversation(createUuid());
+      const selfUserEntity = new User(createUuid(), null);
       selfUserEntity.isMe = true;
       selfUserEntity.inTeam(true);
       conversation_et.selfUser(selfUserEntity);
 
       // Is false for conversations not containing a guest
-      const userEntity = new User(createRandomUuid(), null);
+      const userEntity = new User(createUuid(), null);
       conversation_et.participating_user_ets.push(userEntity);
 
       conversation_et.type(CONVERSATION_TYPE.ONE_TO_ONE);
@@ -642,7 +642,7 @@ describe('Conversation', () => {
       expect(conversation_et.hasGuest()).toBe(false);
 
       // Is true for group conversations containing a guest
-      const secondUserEntity = new User(createRandomUuid(), null);
+      const secondUserEntity = new User(createUuid(), null);
       secondUserEntity.isGuest(true);
       conversation_et.participating_user_ets.push(secondUserEntity);
 
@@ -669,9 +669,9 @@ describe('Conversation', () => {
   describe('federation', () => {
     it('is considered a team conversation when teamId and domain are equal', () => {
       const teamId = 'team1';
-      const conversation = new Conversation(createRandomUuid(), 'domain.test');
+      const conversation = new Conversation(createUuid(), 'domain.test');
       conversation.team_id = teamId;
-      const selfUser = new User(createRandomUuid(), 'domain.test');
+      const selfUser = new User(createUuid(), 'domain.test');
       selfUser.isMe = true;
       selfUser.inTeam(true);
       selfUser.teamId = teamId;
@@ -683,9 +683,9 @@ describe('Conversation', () => {
     // @SF.Federation @SF.Separation @TSFI.UserInterface @S0.2
     it('is not considered a team conversation when teamId are equal but domains differ', () => {
       const teamId = 'team1';
-      const conversation = new Conversation(createRandomUuid(), 'otherdomain.test');
+      const conversation = new Conversation(createUuid(), 'otherdomain.test');
       conversation.team_id = teamId;
-      const selfUser = new User(createRandomUuid(), 'domain.test');
+      const selfUser = new User(createUuid(), 'domain.test');
       selfUser.isMe = true;
       selfUser.inTeam(true);
       selfUser.teamId = teamId;
@@ -697,9 +697,9 @@ describe('Conversation', () => {
 
   describe('hasService', () => {
     it('detects conversations with services', () => {
-      const userEntity = new User(createRandomUuid(), null);
+      const userEntity = new User(createUuid(), null);
 
-      conversation_et = new Conversation(createRandomUuid());
+      conversation_et = new Conversation(createUuid());
       conversation_et.participating_user_ets.push(userEntity);
 
       conversation_et.type(CONVERSATION_TYPE.ONE_TO_ONE);
@@ -710,7 +710,7 @@ describe('Conversation', () => {
 
       expect(conversation_et.hasService()).toBe(false);
 
-      const secondUserEntity = new User(createRandomUuid(), null);
+      const secondUserEntity = new User(createUuid(), null);
       secondUserEntity.isService = true;
       conversation_et.participating_user_ets.push(secondUserEntity);
 
@@ -732,19 +732,19 @@ describe('Conversation', () => {
 
     it('returns visible unmerged pings', () => {
       const timestamp = Date.now();
-      conversation_et.id = createRandomUuid();
+      conversation_et.id = createUuid();
 
       const ping_message_1 = new PingMessage();
       ping_message_1.timestamp(timestamp - 4000);
-      ping_message_1.id = createRandomUuid();
+      ping_message_1.id = createUuid();
 
       const ping_message_2 = new PingMessage();
       ping_message_2.timestamp(timestamp - 2000);
-      ping_message_2.id = createRandomUuid();
+      ping_message_2.id = createUuid();
 
       const ping_message_3 = new PingMessage();
       ping_message_3.timestamp(timestamp);
-      ping_message_3.id = createRandomUuid();
+      ping_message_3.id = createUuid();
 
       conversation_et.addMessage(ping_message_1);
       conversation_et.addMessage(ping_message_2);
@@ -758,7 +758,7 @@ describe('Conversation', () => {
 
   describe('release', () => {
     it('should not release messages if conversation has unread messages', () => {
-      const message_et = new Message(createRandomUuid());
+      const message_et = new Message(createUuid());
       message_et.timestamp(second_timestamp);
       conversation_et.addMessage(message_et);
       conversation_et.last_read_timestamp(first_timestamp);
@@ -773,7 +773,7 @@ describe('Conversation', () => {
     });
 
     it('should release messages if conversation has no unread messages', () => {
-      const message_et = new Message(createRandomUuid());
+      const message_et = new Message(createUuid());
       message_et.timestamp(first_timestamp);
       conversation_et.addMessage(message_et);
       conversation_et.last_read_timestamp(first_timestamp);
@@ -794,7 +794,7 @@ describe('Conversation', () => {
     let message_id: string = undefined;
 
     beforeEach(() => {
-      const message_et = new Message(createRandomUuid());
+      const message_et = new Message(createUuid());
       conversation_et.addMessage(message_et);
       message_id = message_et.id;
     });
@@ -829,11 +829,11 @@ describe('Conversation', () => {
     let message_et = undefined;
 
     beforeEach(() => {
-      const first_message_et = new Message(createRandomUuid());
+      const first_message_et = new Message(createUuid());
       first_message_et.timestamp(first_timestamp);
       conversation_et.addMessage(first_message_et);
 
-      message_et = new Message(createRandomUuid());
+      message_et = new Message(createUuid());
       message_et.timestamp(second_timestamp);
       conversation_et.addMessage(message_et);
     });
@@ -906,9 +906,9 @@ describe('Conversation', () => {
     let outdatedMessage: PingMessage = undefined;
     let pingMessage: PingMessage = undefined;
     let selfMentionMessage: ContentMessage = undefined;
-    const conversationEntity = new Conversation(createRandomUuid());
+    const conversationEntity = new Conversation(createUuid());
 
-    const selfUserEntity = new User(createRandomUuid(), null);
+    const selfUserEntity = new User(createUuid(), null);
     selfUserEntity.isMe = true;
     selfUserEntity.inTeam(true);
     conversationEntity.selfUser(selfUserEntity);
@@ -1133,8 +1133,8 @@ describe('Conversation', () => {
   describe('notificationState', () => {
     it('returns expected values', () => {
       const NOTIFICATION_STATES = NOTIFICATION_STATE;
-      const conversationEntity = new Conversation(createRandomUuid());
-      const selfUserEntity = new User(createRandomUuid(), null);
+      const conversationEntity = new Conversation(createUuid());
+      const selfUserEntity = new User(createUuid(), null);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.NOTHING);
       conversationEntity.selfUser(selfUserEntity);

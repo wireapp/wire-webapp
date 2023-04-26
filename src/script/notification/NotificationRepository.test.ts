@@ -55,7 +55,7 @@ import {PermissionStatusState} from 'src/script/permission/PermissionStatusState
 import {entities, payload} from 'test/api/payloads';
 import {t} from 'Util/LocalizerUtil';
 import {truncate} from 'Util/StringUtil';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {NotificationRepository} from './NotificationRepository';
 
@@ -104,7 +104,7 @@ describe('NotificationRepository', () => {
     // Create entities
     user = userMapper.mapUserFromJson(payload.users.get.one[0], '');
     [conversation] = ConversationMapper.mapConversations([entities.conversation]);
-    const selfUserEntity = new User(createRandomUuid());
+    const selfUserEntity = new User(createUuid());
     selfUserEntity.isMe = true;
     selfUserEntity.inTeam(true);
     conversation.selfUser(selfUserEntity);
@@ -309,18 +309,18 @@ describe('NotificationRepository', () => {
   describe('reacts according to availability status', () => {
     let allMessageTypes: Record<string, any>;
     function generateTextAsset() {
-      const textEntity = new Text(createRandomUuid(), 'hey there');
+      const textEntity = new Text(createUuid(), 'hey there');
       return textEntity;
     }
 
     beforeEach(() => {
-      const mentionMessage = new ContentMessage(createRandomUuid());
+      const mentionMessage = new ContentMessage(createUuid());
       mentionMessage.addAsset(generateTextAsset());
       spyOn(mentionMessage, 'isUserMentioned').and.returnValue(true);
 
-      const textMessage = new ContentMessage(createRandomUuid());
+      const textMessage = new ContentMessage(createUuid());
       textMessage.addAsset(generateTextAsset());
-      const compositeMessage = new CompositeMessage(createRandomUuid());
+      const compositeMessage = new CompositeMessage(createUuid());
       compositeMessage.addAsset(generateTextAsset());
 
       const callMessage = new CallMessage(CALL_MESSAGE_TYPE.ACTIVATED);
@@ -753,7 +753,7 @@ describe('NotificationRepository', () => {
     let compositeMessage: CompositeMessage;
     beforeEach(() => {
       compositeMessage = new CompositeMessage();
-      compositeMessage.addAsset(new Text(createRandomUuid(), '## headline!'));
+      compositeMessage.addAsset(new Text(createUuid(), '## headline!'));
     });
 
     it('even if notifications are disabled in preferences', () => {
@@ -776,13 +776,13 @@ describe('NotificationRepository', () => {
     let conversationEntity: Conversation;
     let messageEntity: ContentMessage;
 
-    const userId = {domain: '', id: createRandomUuid()};
+    const userId = {domain: '', id: createUuid()};
     const shouldNotifyInConversation = NotificationRepository.shouldNotifyInConversation;
 
     function generateTextAsset(selfMentioned = false) {
-      const mentionId = selfMentioned ? userId.id : createRandomUuid();
+      const mentionId = selfMentioned ? userId.id : createUuid();
 
-      const textEntity = new Text(createRandomUuid(), '@Gregor can you take a look?');
+      const textEntity = new Text(createUuid(), '@Gregor can you take a look?');
       const mentionEntity = new MentionEntity(0, 7, mentionId, userId.domain);
       textEntity.mentions([mentionEntity]);
 
@@ -794,10 +794,10 @@ describe('NotificationRepository', () => {
       selfUserEntity.isMe = true;
       selfUserEntity.inTeam(true);
 
-      conversationEntity = new Conversation(createRandomUuid());
+      conversationEntity = new Conversation(createUuid());
       conversationEntity.selfUser(selfUserEntity);
 
-      messageEntity = new ContentMessage(createRandomUuid());
+      messageEntity = new ContentMessage(createUuid());
       messageEntity.user(selfUserEntity);
     });
 
@@ -836,7 +836,7 @@ describe('NotificationRepository', () => {
     it('returns the correct value for self replies', () => {
       messageEntity.addAsset(generateTextAsset());
 
-      const quoteEntity = new QuoteEntity({messageId: createRandomUuid(), userId: userId.id});
+      const quoteEntity = new QuoteEntity({messageId: createUuid(), userId: userId.id});
       messageEntity.quote(quoteEntity);
 
       conversationEntity.mutedState(NOTIFICATION_STATE.MENTIONS_AND_REPLIES);
@@ -849,8 +849,8 @@ describe('NotificationRepository', () => {
       messageEntity.addAsset(generateTextAsset());
 
       const quoteEntity = new QuoteEntity({
-        messageId: createRandomUuid(),
-        userId: createRandomUuid(),
+        messageId: createUuid(),
+        userId: createUuid(),
       });
       messageEntity.quote(quoteEntity);
 

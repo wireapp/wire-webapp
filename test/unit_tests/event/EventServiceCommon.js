@@ -22,7 +22,7 @@ import {ConversationError} from 'src/script/error/ConversationError';
 import {StorageError} from 'src/script/error/StorageError';
 import {MessageCategory} from 'src/script/message/MessageCategory';
 import {StorageSchemata} from 'src/script/storage/StorageSchemata';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {TestFactory} from '../../helper/TestFactory';
 
@@ -91,7 +91,7 @@ const testEventServiceClass = (testedServiceName, className) => {
       });
 
       it('returns undefined if no event with id is found', () => {
-        return testFactory[testedServiceName].loadEvent(conversationId, createRandomUuid()).then(messageEntity => {
+        return testFactory[testedServiceName].loadEvent(conversationId, createUuid()).then(messageEntity => {
           expect(messageEntity).not.toBeDefined();
         });
       });
