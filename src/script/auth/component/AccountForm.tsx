@@ -19,6 +19,7 @@
 
 import React, {useEffect, useRef, useState} from 'react';
 
+import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
@@ -34,7 +35,6 @@ import {Exception} from './Exception';
 import {Config} from '../../Config';
 import {accountFormStrings} from '../../strings';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
-import {BackendError} from '../module/action/BackendError';
 import {ValidationError} from '../module/action/ValidationError';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
@@ -127,16 +127,16 @@ const AccountFormComponent = ({account, ...props}: Props & ConnectedProps & Disp
       const label = (error as BackendError)?.label;
       if (label) {
         switch (label) {
-          case BackendError.AUTH_ERRORS.BLACKLISTED_EMAIL:
-          case BackendError.AUTH_ERRORS.DOMAIN_BLOCKED_FOR_REGISTRATION:
-          case BackendError.AUTH_ERRORS.INVALID_EMAIL:
-          case BackendError.AUTH_ERRORS.KEY_EXISTS: {
+          case BackendErrorLabel.BLACKLISTED_EMAIL:
+          case BackendErrorLabel.DOMAIN_BLOCKED_FOR_REGISTRATION:
+          case BackendErrorLabel.INVALID_EMAIL:
+          case BackendErrorLabel.KEY_EXISTS: {
             inputs.email.current?.setCustomValidity(label);
             setValidInputs({...validInputs, email: false});
             break;
           }
-          case BackendError.AUTH_ERRORS.INVALID_CREDENTIALS:
-          case BackendError.GENERAL_ERRORS.UNAUTHORIZED: {
+          case BackendErrorLabel.INVALID_CREDENTIALS:
+          case BackendErrorLabel.UNAUTHORIZED: {
             inputs.email.current?.setCustomValidity(label);
             inputs.password.current?.setCustomValidity(label);
             setValidInputs({...validInputs, email: false, password: false});

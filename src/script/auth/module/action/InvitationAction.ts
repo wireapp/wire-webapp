@@ -17,11 +17,11 @@
  *
  */
 
+import {BackendError, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
 import type {NewTeamInvitation} from '@wireapp/api-client/lib/team/';
 import {Role} from '@wireapp/api-client/lib/team/member/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-import {BackendError} from './BackendError';
 import {InvitationActionCreator} from './creator/';
 
 import type {ThunkAction} from '../reducer';
@@ -38,11 +38,11 @@ export class InvitationAction {
       const invitationEmail = invitation.email?.toLowerCase();
       const alreadyInvited = inviteList.find(inviteItem => inviteItem.email.toLowerCase() === invitationEmail);
       if (alreadyInvited) {
-        const error = new BackendError({
-          code: HTTP_STATUS.CONFLICT,
-          label: BackendError.LABEL.ALREADY_INVITED,
-          message: 'This email has already been invited',
-        });
+        const error = new BackendError(
+          'This email has already been invited',
+          SyntheticErrorLabel.ALREADY_INVITED,
+          HTTP_STATUS.CONFLICT,
+        );
         dispatch(InvitationActionCreator.failedAddInvite(error));
         throw error;
       }
@@ -55,6 +55,9 @@ export class InvitationAction {
       };
 
       const teamId = selfSelector.getSelfTeamId(state);
+      if (!teamId) {
+        return;
+      }
       try {
         const createdInvite = await apiClient.api.teams.invitation.postInvitation(teamId, newInvite);
         dispatch(InvitationActionCreator.successfulAddInvite(createdInvite));

@@ -17,6 +17,7 @@
  *
  */
 
+import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
@@ -34,7 +35,6 @@ import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
 import type {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
 import type {User} from '../entity/User';
-import {BackendClientError} from '../error/BackendClientError';
 import type {IntegrationRepository} from '../integration/IntegrationRepository';
 import type {ServiceEntity} from '../integration/ServiceEntity';
 import {UserState} from '../user/UserState';
@@ -157,8 +157,8 @@ export class ActionsViewModel {
 
     return new Promise<void>(resolve => {
       const expectedErrors = {
-        [BackendClientError.LABEL.BAD_REQUEST]: t('BackendError.LABEL.BAD_REQUEST'),
-        [BackendClientError.LABEL.INVALID_CREDENTIALS]: t('BackendError.LABEL.INVALID_CREDENTIALS'),
+        [BackendErrorLabel.BAD_REQUEST]: t('BackendError.LABEL.BAD_REQUEST'),
+        [BackendErrorLabel.INVALID_CREDENTIALS]: t('BackendError.LABEL.INVALID_CREDENTIALS'),
       };
       let isSending = false;
       PrimaryModal.show(
@@ -177,7 +177,14 @@ export class ActionsViewModel {
                 } catch (error) {
                   if (isBackendError(error)) {
                     const {updateErrorMessage} = usePrimaryModalState.getState();
-                    updateErrorMessage(expectedErrors[error.label] || error.message);
+                    if (
+                      error.label === BackendErrorLabel.BAD_REQUEST ||
+                      error.label === BackendErrorLabel.INVALID_CREDENTIALS
+                    ) {
+                      updateErrorMessage(expectedErrors[error.label]);
+                    } else {
+                      updateErrorMessage(error.message);
+                    }
                   }
                 } finally {
                   isSending = false;

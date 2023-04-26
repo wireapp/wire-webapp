@@ -40,6 +40,7 @@ import {
   CONVERSATION_EVENT,
 } from '@wireapp/api-client/lib/event';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
+import type {BackendError} from '@wireapp/api-client/lib/http/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {MLSReturnType} from '@wireapp/core/lib/conversation';
 import {amplify} from 'amplify';
@@ -65,6 +66,7 @@ import {
   startsWith,
 } from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {isBackendError} from 'Util/TypePredicateUtil';
 import {createRandomUuid, noop} from 'Util/util';
 
 import {ACCESS_STATE} from './AccessState';
@@ -112,7 +114,6 @@ import {FileAsset} from '../entity/message/FileAsset';
 import {MemberMessage} from '../entity/message/MemberMessage';
 import {Message} from '../entity/message/Message';
 import {User} from '../entity/User';
-import {BackendClientError} from '../error/BackendClientError';
 import {BaseError, BASE_ERROR_TYPE} from '../error/BaseError';
 import {ConversationError} from '../error/ConversationError';
 import {ClientEvent, CONVERSATION as CLIENT_CONVERSATION_EVENT} from '../event/Client';
@@ -1381,8 +1382,8 @@ export class ConversationRepository {
         }
       }
     } catch (error) {
-      if (error) {
-        this.handleAddToConversationError(error as BackendClientError, conversation, qualifiedUsers);
+      if (isBackendError(error)) {
+        this.handleAddToConversationError(error, conversation, qualifiedUsers);
       }
     }
   }
@@ -1417,21 +1418,17 @@ export class ConversationRepository {
       .catch(error => this.handleAddToConversationError(error, conversationEntity, [{domain: '', id: serviceId}]));
   }
 
-  private handleAddToConversationError(
-    error: BackendClientError,
-    conversationEntity: Conversation,
-    userIds: QualifiedId[],
-  ) {
+  private handleAddToConversationError(error: BackendError, conversationEntity: Conversation, userIds: QualifiedId[]) {
     switch (error.label) {
       case BackendErrorLabel.NOT_CONNECTED: {
         this.handleUsersNotConnected(userIds);
         break;
       }
 
-      case BackendClientError.LABEL.BAD_GATEWAY:
-      case BackendClientError.LABEL.SERVER_ERROR:
-      case BackendClientError.LABEL.SERVICE_DISABLED:
-      case BackendClientError.LABEL.TOO_MANY_BOTS: {
+      case BackendErrorLabel.BAD_GATEWAY:
+      case BackendErrorLabel.SERVER_ERROR:
+      case BackendErrorLabel.SERVICE_DISABLED:
+      case BackendErrorLabel.TOO_MANY_SERVICES: {
         const messageText = t('modalServiceUnavailableMessage');
         const titleText = t('modalServiceUnavailableHeadline');
 
@@ -1817,12 +1814,12 @@ export class ConversationRepository {
     }
   }
 
-  private handleConversationCreateError(error: BackendClientError, userIds: QualifiedId[]): void {
+  private handleConversationCreateError(error: BackendError, userIds: QualifiedId[]): void {
     switch (error.label) {
-      case BackendClientError.LABEL.CLIENT_ERROR:
+      case BackendErrorLabel.CLIENT_ERROR:
         this.handleTooManyMembersError();
         break;
-      case BackendClientError.LABEL.NOT_CONNECTED:
+      case BackendErrorLabel.NOT_CONNECTED:
         this.handleUsersNotConnected(userIds);
         break;
       case BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT:
@@ -2060,8 +2057,7 @@ export class ConversationRepository {
           ConversationError.TYPE.CONVERSATION_NOT_FOUND,
         ];
 
-        const isRemovedFromConversation =
-          (error as BackendClientError).label === BackendClientError.LABEL.ACCESS_DENIED;
+        const isRemovedFromConversation = (error as unknown as BackendError).label === BackendErrorLabel.ACCESS_DENIED;
         if (isRemovedFromConversation) {
           const messageText = t('conversationNotFoundMessage');
           const titleText = t('conversationNotFoundTitle', Config.getConfig().BRAND_NAME);
