@@ -305,13 +305,14 @@ export class BackupRepository {
     const qualifiedUsers = users.filter(user => !!user.qualified_id);
 
     const importEventChunk = async (usersChunk: UserRecord[]) => {
+      const chunkSize = usersChunk.length;
       const successfulImports = await this.backupService.importEntities(
         StorageSchemata.OBJECT_STORE.USERS,
         usersChunk,
         user => constructUserPrimaryKey(user.qualified_id),
       );
-      importedEntities += usersChunk.length;
-      alreadyExistingEntities += usersChunk.length - successfulImports;
+      importedEntities += chunkSize;
+      alreadyExistingEntities += chunkSize - successfulImports;
       this.logger.log(
         `Imported '${importedEntities}' of '${qualifiedUsers.length}' users (${alreadyExistingEntities} skipped))`,
       );
