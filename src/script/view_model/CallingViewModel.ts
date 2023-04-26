@@ -505,7 +505,7 @@ export class CallingViewModel {
         PrimaryModal.show(PrimaryModal.type.CONFIRM, {
           primaryAction: {
             action: () => {
-              safeWindowOpen(Config.getConfig().URL.TEAMS_BILLING);
+              safeWindowOpen(Config.getConfig().URL.TERMS_BILLING);
             },
             text: t('callingRestrictedConferenceCallOwnerModalUpgradeButton'),
           },

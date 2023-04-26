@@ -22,8 +22,9 @@ import {ConfigGeneratorParams} from './config.types';
 export function generateConfig(params: ConfigGeneratorParams) {
   const {urls, version, env} = params;
   return {
+    APP_BASE: urls.base,
     ANALYTICS_API_KEY: process.env.ANALYTICS_API_KEY,
-    APP_NAME: process.env.APP_NAME,
+    APP_NAME: process.env.APP_NAME ?? 'Wire',
     BACKEND_NAME: process.env.BACKEND_NAME,
     BACKEND_REST: urls.api,
     BACKEND_WS: urls.ws,
@@ -69,32 +70,38 @@ export function generateConfig(params: ConfigGeneratorParams) {
     NEW_PASSWORD_MINIMUM_LENGTH:
       (process.env.NEW_PASSWORD_MINIMUM_LENGTH && Number(process.env.NEW_PASSWORD_MINIMUM_LENGTH)) || 8,
     URL: {
-      ACCOUNT_BASE: process.env.URL_ACCOUNT_BASE,
+      ACCOUNT_BASE: process.env.URL_ACCOUNT_BASE ?? 'https://account.wire.com',
       MOBILE_BASE: process.env.URL_MOBILE_BASE,
-      PRICING: process.env.URL_PRICING,
-      PRIVACY_POLICY: process.env.URL_PRIVACY_POLICY,
+      PRICING: process.env.URL_PRICING ?? '#',
+      PRIVACY_POLICY: process.env.URL_PRIVACY_POLICY ?? 'https://wire-website-staging.zinfra.io/security',
       SUPPORT: {
-        BUG_REPORT: process.env.URL_SUPPORT_BUG_REPORT,
-        CALLING: process.env.URL_SUPPORT_CALLING,
+        BUG_REPORT: process.env.URL_SUPPORT_BUG_REPORT ?? 'https://support.wire.com/new?ticket_form_id:101615',
+        CALLING: process.env.URL_SUPPORT_CALLING ?? 'https://support.wire.com/hc/articles/202969412',
         CAMERA_ACCESS_DENIED: process.env.URL_SUPPORT_CAMERA_ACCESS_DENIED,
-        CONTACT: process.env.URL_SUPPORT_CONTACT,
-        DEVICE_ACCESS_DENIED: process.env.URL_SUPPORT_DEVICE_ACCESS_DENIED,
-        DEVICE_NOT_FOUND: process.env.URL_SUPPORT_DEVICE_NOT_FOUND,
-        EMAIL_EXISTS: process.env.URL_SUPPORT_EMAIL_EXISTS,
-        HISTORY: process.env.URL_SUPPORT_HISTORY,
-        INDEX: process.env.URL_SUPPORT_INDEX,
+        CONTACT: process.env.URL_SUPPORT_CONTACT ?? 'https://support.wire.com/new',
+        DEVICE_ACCESS_DENIED:
+          process.env.URL_SUPPORT_DEVICE_ACCESS_DENIED ?? 'https://support.wire.com/hc/articles/213512545',
+        DEVICE_NOT_FOUND: process.env.URL_SUPPORT_DEVICE_NOT_FOUND ?? 'https://support.wire.com/hc/articles/202970662',
+        EMAIL_EXISTS: process.env.URL_SUPPORT_EMAIL_EXISTS ?? 'https://support.wire.com/hc/articles/115004082129',
+        HISTORY: process.env.URL_SUPPORT_HISTORY ?? 'https://support.wire.com/hc/articles/207834645',
+        INDEX: process.env.URL_SUPPORT_INDEX ?? 'https://support.wire.com/',
         LEGAL_HOLD_BLOCK: process.env.URL_SUPPORT_LEGAL_HOLD_BLOCK,
-        MICROPHONE_ACCESS_DENIED: process.env.URL_SUPPORT_MICROPHONE_ACCESS_DENIED,
-        PRIVACY_VERIFY_FINGERPRINT: process.env.URL_SUPPORT_PRIVACY_VERIFY_FINGERPRINT,
-        SCREEN_ACCESS_DENIED: process.env.URL_SUPPORT_SCREEN_ACCESS_DENIED,
+        MICROPHONE_ACCESS_DENIED:
+          process.env.URL_SUPPORT_MICROPHONE_ACCESS_DENIED ?? 'https://support.wire.com/hc/articles/202590081',
+        PRIVACY_VERIFY_FINGERPRINT:
+          process.env.URL_SUPPORT_PRIVACY_VERIFY_FINGERPRINT ?? 'https://support.wire.com/hc/en-us/articles/207692235',
+        SCREEN_ACCESS_DENIED:
+          process.env.URL_SUPPORT_SCREEN_ACCESS_DENIED ?? 'https://support.wire.com/hc/articles/202935412',
       },
-      TEAMS_BASE: process.env.URL_TEAMS_BASE,
-      TEAMS_CREATE: process.env.URL_TEAMS_CREATE,
-      TERMS_BILLING: process.env.URL_TERMS_BILLING,
-      TERMS_OF_USE_PERSONAL: process.env.URL_TERMS_OF_USE_PERSONAL,
-      TERMS_OF_USE_TEAMS: process.env.URL_TERMS_OF_USE_TEAMS,
-      WEBSITE_BASE: process.env.URL_WEBSITE_BASE,
-      WHATS_NEW: process.env.URL_WHATS_NEW,
+      TEAMS_BASE: process.env.URL_TEAMS_BASE ?? 'https://teams.wire.com',
+      TEAMS_CREATE: process.env.URL_TEAMS_CREATE ?? 'https://wire.com/create-team/?pk_campaign:client&pk_kwd:desktop',
+      TERMS_BILLING: process.env.URL_TERMS_BILLING ?? 'https://teams.wire.com/billing',
+      TERMS_OF_USE_PERSONAL:
+        process.env.URL_TERMS_OF_USE_PERSONAL ?? 'https://wire-website-staging.zinfra.io/legal/terms/personal',
+      TERMS_OF_USE_TEAMS:
+        process.env.URL_TERMS_OF_USE_TEAMS ?? 'https://wire-website-staging.zinfra.io/legal/terms/teams',
+      WEBSITE_BASE: process.env.URL_WEBSITE_BASE ?? 'https://wire.com',
+      WHATS_NEW: process.env.URL_WHATS_NEW ?? 'https://medium.com/wire-news/webapp-updates/home',
     },
     VERSION: version,
     WEBSITE_LABEL: process.env.WEBSITE_LABEL,
