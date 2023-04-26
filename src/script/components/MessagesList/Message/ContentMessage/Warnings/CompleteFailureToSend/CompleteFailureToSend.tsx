@@ -38,9 +38,6 @@ export const CompleteFailureToSendWarning = ({isTextAsset, onRetry, onDiscard}: 
           <Button type="button" variant={ButtonVariant.TERTIARY} onClick={onRetry}>
             {t('messageCouldNotBeSentRetry')}
           </Button>
-          <Button type="button" variant={ButtonVariant.TERTIARY} onClick={onDiscard}>
-            {t('messageWillNotBeSentDiscard')}
-          </Button>
         </div>
       </div>
     </>
