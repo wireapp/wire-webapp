@@ -68,60 +68,54 @@ function parseCommaSeparatedList(list: string = ''): string[] {
   return cleanedList.split(',');
 }
 
-function mergedCSP({urls}: ConfigGeneratorParams): Record<string, Iterable<string>> {
-  const objectSrc = parseCommaSeparatedList(process.env.CSP_EXTRA_OBJECT_SRC);
+function mergedCSP({urls}: ConfigGeneratorParams, env: Record<string, string>): Record<string, Iterable<string>> {
+  const objectSrc = parseCommaSeparatedList(env.CSP_EXTRA_OBJECT_SRC);
   const csp = {
-    connectSrc: [
-      ...defaultCSP.connectSrc,
-      urls.api,
-      urls.ws,
-      ...parseCommaSeparatedList(process.env.CSP_EXTRA_CONNECT_SRC),
-    ],
-    defaultSrc: [...defaultCSP.defaultSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_DEFAULT_SRC)],
-    fontSrc: [...defaultCSP.fontSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_FONT_SRC)],
-    frameSrc: [...defaultCSP.frameSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_FRAME_SRC)],
-    imgSrc: [...defaultCSP.imgSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_IMG_SRC)],
-    manifestSrc: [...defaultCSP.manifestSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_MANIFEST_SRC)],
-    mediaSrc: [...defaultCSP.mediaSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_MEDIA_SRC)],
+    connectSrc: [...defaultCSP.connectSrc, urls.api, urls.ws, ...parseCommaSeparatedList(env.CSP_EXTRA_CONNECT_SRC)],
+    defaultSrc: [...defaultCSP.defaultSrc, ...parseCommaSeparatedList(env.CSP_EXTRA_DEFAULT_SRC)],
+    fontSrc: [...defaultCSP.fontSrc, ...parseCommaSeparatedList(env.CSP_EXTRA_FONT_SRC)],
+    frameSrc: [...defaultCSP.frameSrc, ...parseCommaSeparatedList(env.CSP_EXTRA_FRAME_SRC)],
+    imgSrc: [...defaultCSP.imgSrc, ...parseCommaSeparatedList(env.CSP_EXTRA_IMG_SRC)],
+    manifestSrc: [...defaultCSP.manifestSrc, ...parseCommaSeparatedList(env.CSP_EXTRA_MANIFEST_SRC)],
+    mediaSrc: [...defaultCSP.mediaSrc, ...parseCommaSeparatedList(env.CSP_EXTRA_MEDIA_SRC)],
     objectSrc: objectSrc.length > 0 ? objectSrc : ["'none'"],
-    prefetchSrc: [...defaultCSP.prefetchSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_PREFETCH_SRC)],
-    scriptSrc: [...defaultCSP.scriptSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_SCRIPT_SRC)],
-    styleSrc: [...defaultCSP.styleSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_STYLE_SRC)],
-    workerSrc: [...defaultCSP.workerSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_WORKER_SRC)],
+    prefetchSrc: [...defaultCSP.prefetchSrc, ...parseCommaSeparatedList(env.CSP_EXTRA_PREFETCH_SRC)],
+    scriptSrc: [...defaultCSP.scriptSrc, ...parseCommaSeparatedList(env.CSP_EXTRA_SCRIPT_SRC)],
+    styleSrc: [...defaultCSP.styleSrc, ...parseCommaSeparatedList(env.CSP_EXTRA_STYLE_SRC)],
+    workerSrc: [...defaultCSP.workerSrc, ...parseCommaSeparatedList(env.CSP_EXTRA_WORKER_SRC)],
   };
   return Object.entries(csp)
     .filter(([key, value]) => !!Array.from(value).length)
     .reduce((accumulator, [key, value]) => ({...accumulator, [key]: value}), {});
 }
 
-export function generateConfig(params: ConfigGeneratorParams) {
-  const {commit, version, urls, env} = params;
+export function generateConfig(params: ConfigGeneratorParams, env: Record<string, string>) {
+  const {commit, version, urls, env: nodeEnv} = params;
   return {
     APP_BASE: urls.base,
     COMMIT: commit,
     VERSION: version,
     CACHE_DURATION_SECONDS: 300,
-    CSP: mergedCSP(params),
+    CSP: mergedCSP(params, env),
     BACKEND_REST: urls.api,
     BACKEND_WS: urls.ws,
-    DEVELOPMENT: env === 'development',
-    ENFORCE_HTTPS: process.env.ENFORCE_HTTPS != 'false',
-    ENVIRONMENT: env,
-    GOOGLE_WEBMASTER_ID: process.env.GOOGLE_WEBMASTER_ID,
+    DEVELOPMENT: nodeEnv === 'development',
+    ENFORCE_HTTPS: env.ENFORCE_HTTPS != 'false',
+    ENVIRONMENT: nodeEnv,
+    GOOGLE_WEBMASTER_ID: env.GOOGLE_WEBMASTER_ID,
     OPEN_GRAPH: {
-      DESCRIPTION: process.env.OPEN_GRAPH_DESCRIPTION,
-      IMAGE_URL: process.env.OPEN_GRAPH_IMAGE_URL,
-      TITLE: process.env.OPEN_GRAPH_TITLE,
+      DESCRIPTION: env.OPEN_GRAPH_DESCRIPTION,
+      IMAGE_URL: env.OPEN_GRAPH_IMAGE_URL,
+      TITLE: env.OPEN_GRAPH_TITLE,
     },
-    PORT_HTTP: Number(process.env.PORT) || 21080,
+    PORT_HTTP: Number(env.PORT) || 21080,
     ROBOTS: {
       ALLOW: readFile(ROBOTS_ALLOW_FILE, 'User-agent: *\r\nDisallow: /'),
       ALLOWED_HOSTS: ['app.wire.com'],
       DISALLOW: readFile(ROBOTS_DISALLOW_FILE, 'User-agent: *\r\nDisallow: /'),
     },
     SSL_CERTIFICATE_KEY_PATH:
-      process.env.SSL_CERTIFICATE_KEY_PATH || path.join(__dirname, '../certificate/development-key.pem'),
-    SSL_CERTIFICATE_PATH:
-      process.env.SSL_CERTIFICATE_PATH || path.join(__dirname, '../certificate/development-cert.pem'),
+      env.SSL_CERTIFICATE_KEY_PATH || path.join(__dirname, '../certificate/development-key.pem'),
+    SSL_CERTIFICATE_PATH: env.SSL_CERTIFICATE_PATH || path.join(__dirname, '../certificate/development-cert.pem'),
   } as const;
 }
