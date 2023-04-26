@@ -23,15 +23,15 @@ import {readFileSync} from 'fs';
 import path from 'path';
 
 import {generateConfig as generateClientConfig} from './client.config';
+import {Env} from './env';
 import {generateConfig as generateServerConfig} from './server.config';
 
 const versionData = readFileSync(path.resolve(__dirname, './version.json'), 'utf8');
 const version = versionData ? JSON.parse(versionData) : {version: 'unknown', commit: 'unknown'};
 
 const env = dotenv.load({
-  errorOnMissing: true,
   includeProcessEnv: true,
-});
+}) as Env;
 
 function generateUrls() {
   const federation = env.FEDERATION;

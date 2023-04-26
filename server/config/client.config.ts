@@ -18,8 +18,9 @@
  */
 
 import {ConfigGeneratorParams} from './config.types';
+import {Env} from './env';
 
-export function generateConfig(params: ConfigGeneratorParams, env: Record<string, string>) {
+export function generateConfig(params: ConfigGeneratorParams, env: Env) {
   const {urls, version, env: nodeEnv} = params;
   return {
     APP_BASE: urls.base,

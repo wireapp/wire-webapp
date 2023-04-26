@@ -23,6 +23,7 @@ import logdown from 'logdown';
 import path from 'path';
 
 import {ConfigGeneratorParams} from './config.types';
+import {Env} from './env';
 
 const ROBOTS_DIR = path.join(__dirname, 'robots');
 const ROBOTS_ALLOW_FILE = path.join(ROBOTS_DIR, 'robots.txt');
@@ -89,7 +90,7 @@ function mergedCSP({urls}: ConfigGeneratorParams, env: Record<string, string>): 
     .reduce((accumulator, [key, value]) => ({...accumulator, [key]: value}), {});
 }
 
-export function generateConfig(params: ConfigGeneratorParams, env: Record<string, string>) {
+export function generateConfig(params: ConfigGeneratorParams, env: Env) {
   const {commit, version, urls, env: nodeEnv} = params;
   return {
     APP_BASE: urls.base,
