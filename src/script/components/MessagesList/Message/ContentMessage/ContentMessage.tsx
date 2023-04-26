@@ -57,7 +57,6 @@ export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetS
   isLastDeliveredMessage: boolean;
   message: ContentMessage;
   onClickButton: (message: CompositeMessage, buttonId: string) => void;
-  onDiscard: () => void;
   onRetry: (message: ContentMessage) => void;
   previousMessage?: Message;
   quotedMessage?: ContentMessage;
@@ -83,7 +82,6 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   onClickLikes,
   onClickButton,
   onLike,
-  onDiscard,
   onRetry,
   isMsgElementsFocusable,
 }) => {
@@ -191,7 +189,6 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
         {status === StatusType.FAILED && (
           <CompleteFailureToSendWarning
             isTextAsset={message.getFirstAsset().isText()}
-            onDiscard={() => onDiscard()}
             onRetry={() => onRetry(message)}
           />
         )}

@@ -26,10 +26,9 @@ import {warning} from '../Warnings.styles';
 type Props = {
   isTextAsset: boolean;
   onRetry: () => void;
-  onDiscard?: () => void;
 };
 
-export const CompleteFailureToSendWarning = ({isTextAsset, onRetry, onDiscard}: Props) => {
+export const CompleteFailureToSendWarning = ({isTextAsset, onRetry}: Props) => {
   return (
     <>
       <div>
