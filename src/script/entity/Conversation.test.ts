@@ -673,7 +673,6 @@ describe('Conversation', () => {
       conversation.team_id = teamId;
       const selfUser = new User(createRandomUuid(), 'domain.test');
       selfUser.isMe = true;
-      selfUser.inTeam(true);
       selfUser.teamId = teamId;
       conversation.selfUser(selfUser);
 
@@ -687,7 +686,6 @@ describe('Conversation', () => {
       conversation.team_id = teamId;
       const selfUser = new User(createRandomUuid(), 'domain.test');
       selfUser.isMe = true;
-      selfUser.inTeam(true);
       selfUser.teamId = teamId;
       conversation.selfUser(selfUser);
 

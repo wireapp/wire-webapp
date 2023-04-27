@@ -189,7 +189,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
       setModalParams(true);
     }
 
-    if (!selfUser.inTeam()) {
+    if (!selfUser.teamId) {
       setModalParams(false);
 
       return;
