@@ -17,7 +17,6 @@
  *
  */
 
-import {format} from 'date-fns';
 import dotenv from 'dotenv-extended';
 
 import {execSync} from 'child_process';
@@ -28,7 +27,10 @@ import {generateConfig as generateServerConfig} from './server.config';
 dotenv.load();
 
 function generateVersion() {
-  return format(new Date(), 'yyyy.MM.dd.HH.mm');
+  return new Date()
+    .toISOString()
+    .replace(/[T\-:]/g, '.')
+    .replace(/\.\d+Z/, '');
 }
 
 function generateCommmitHash() {

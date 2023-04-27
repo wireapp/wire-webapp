@@ -17,7 +17,7 @@
  *
  */
 
-import {ClientConfig} from '../../server/config';
+import type {ClientConfig} from '../../server/config';
 import {App} from '../script/main/app';
 
 export interface WireModule {
