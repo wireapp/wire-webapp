@@ -40,7 +40,7 @@ interface ConnectRequestsProps {
   readonly teamState: TeamState;
 }
 
-const ConnectRequests: FC<ConnectRequestsProps> = ({
+export const ConnectRequests: FC<ConnectRequestsProps> = ({
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
 }) => {
@@ -49,7 +49,11 @@ const ConnectRequests: FC<ConnectRequestsProps> = ({
 
   const mainViewModel = useContext(RootContext);
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
-  const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
+  const {connectRequests: unsortedConnectionRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
+  const connectionRequests = unsortedConnectionRequests.sort(
+    (user1, user2) =>
+      new Date(user1.connection().lastUpdate).getTime() - new Date(user2.connection().lastUpdate).getTime(),
+  );
 
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
   const smBreakpoint = useMatchMedia('max-width: 640px');
@@ -63,12 +67,12 @@ const ConnectRequests: FC<ConnectRequestsProps> = ({
   };
 
   useEffect(() => {
-    if (temporaryConnectRequestsCount.current + 1 === connectRequests.length) {
+    if (temporaryConnectRequestsCount.current + 1 === connectionRequests.length) {
       scrollToBottom('smooth');
     }
 
-    temporaryConnectRequestsCount.current = connectRequests.length;
-  }, [connectRequests]);
+    temporaryConnectRequestsCount.current = connectionRequests.length;
+  }, [connectionRequests]);
 
   useEffect(() => {
     scrollToBottom();
@@ -88,7 +92,7 @@ const ConnectRequests: FC<ConnectRequestsProps> = ({
     await actionsViewModel.acceptConnectionRequest(userEntity);
     const conversationEntity = await actionsViewModel.getOrCreate1to1Conversation(userEntity);
 
-    if (connectRequests.length === 1) {
+    if (connectionRequests.length === 1) {
       /**
        * In the connect request view modal, we show an overview of all incoming connection requests. When there are multiple open connection requests, we want that the user sees them all and can accept them one-by-one. When the last open connection request gets accepted, we want the user to switch to this conversation.
        */
@@ -110,7 +114,7 @@ const ConnectRequests: FC<ConnectRequestsProps> = ({
               />
             </div>
           )}
-          {connectRequests.map(connectRequest => (
+          {connectionRequests.map(connectRequest => (
             <div
               key={connectRequest.id}
               className="connect-request"
@@ -162,5 +166,3 @@ const ConnectRequests: FC<ConnectRequestsProps> = ({
     </div>
   );
 };
-
-export {ConnectRequests};
