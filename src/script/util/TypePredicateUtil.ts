@@ -17,9 +17,9 @@
  *
  */
 
+import type {BackendError} from '@wireapp/api-client/lib/http';
 import {AxiosError} from 'axios';
 
-import {BackendError} from '../auth/module/action/BackendError';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {ClientRecord} from '../storage/record/ClientRecord';
