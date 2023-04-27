@@ -23,24 +23,27 @@ import {readFileSync} from 'fs';
 import path from 'path';
 
 import {generateConfig as generateClientConfig} from './client.config';
+import {Env} from './env';
 import {generateConfig as generateServerConfig} from './server.config';
 
 const versionData = readFileSync(path.resolve(__dirname, './version.json'), 'utf8');
 const version = versionData ? JSON.parse(versionData) : {version: 'unknown', commit: 'unknown'};
 
-dotenv.load();
+const env = dotenv.load({
+  includeProcessEnv: true,
+}) as Env;
 
 function generateUrls() {
-  const federation = process.env.FEDERATION;
+  const federation = env.FEDERATION;
 
   if (!federation) {
-    if (!process.env.APP_BASE || !process.env.BACKEND_REST || !process.env.BACKEND_WS) {
+    if (!env.APP_BASE || !env.BACKEND_REST || !env.BACKEND_WS) {
       throw new Error('missing environment variables');
     }
     return {
-      base: process.env.APP_BASE,
-      api: process.env.BACKEND_REST,
-      ws: process.env.BACKEND_WS,
+      base: env.APP_BASE,
+      api: env.BACKEND_REST,
+      ws: env.BACKEND_WS,
     };
   }
 
@@ -54,12 +57,12 @@ function generateUrls() {
 const commonConfig = {
   commit: version.commit,
   version: version.version,
-  env: process.env.NODE_ENV || 'production',
+  env: env.NODE_ENV || 'production',
   urls: generateUrls(),
 };
 
-export const clientConfig = generateClientConfig(commonConfig);
+export const clientConfig = generateClientConfig(commonConfig, env);
 export type ClientConfig = ReturnType<typeof generateClientConfig>;
 
-export const serverConfig = generateServerConfig(commonConfig);
+export const serverConfig = generateServerConfig(commonConfig, env);
 export type ServerConfig = ReturnType<typeof generateServerConfig>;
