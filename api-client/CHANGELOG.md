@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [24.6.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@24.5.1...@wireapp/api-client@24.6.0) (2023-04-27)
+
+### Features
+
+* **api-client:** Add invalid conversation password error to BackendErro (SQSERVICES-1975) ([#5096](https://github.com/wireapp/wire-web-packages/issues/5096)) ([0109093](https://github.com/wireapp/wire-web-packages/commit/0109093aa521a5b3b92ca73223601e41088742dd))
+
 ## [24.5.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@24.5.0...@wireapp/api-client@24.5.1) (2023-04-26)
 
 **Note:** Version bump only for package @wireapp/api-client
