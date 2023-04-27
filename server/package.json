@@ -35,10 +35,8 @@
     "typescript": "5.0.4"
   },
   "scripts": {
-    "build": "yarn clean && tsc && yarn copy-assets && yarn create-commit-sha && yarn create-version-file",
+    "build": "yarn clean && tsc && yarn copy-assets",
     "copy-assets": "node ./bin/copy_server_assets.js",
-    "create-commit-sha": "node ./bin/create_commit_sha_file.js",
-    "create-version-file": "node ./bin/create_version_file.js",
     "clean": "rimraf ./dist/",
     "start:prod": "pm2 start \"./index.js\" --name \"Webapp\" && pm2 logs",
     "test": "jest"

@@ -21,7 +21,7 @@ import {renderHook} from '@testing-library/react';
 
 import {Conversation} from 'src/script/entity/Conversation';
 import {Message} from 'src/script/entity/message/Message';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {useReadReceiptSender} from './useReadReceipt';
 
@@ -33,10 +33,10 @@ describe('useReadReceipt', () => {
   it('batches the read receipt sending per conversation', async () => {
     const sendReadReceipt = jest.fn();
     const {result} = renderHook(() => useReadReceiptSender({sendReadReceipt}));
-    const conversation1 = new Conversation(createRandomUuid());
-    const conversation2 = new Conversation(createRandomUuid());
+    const conversation1 = new Conversation(createUuid());
+    const conversation2 = new Conversation(createUuid());
 
-    const sender = createRandomUuid();
+    const sender = createUuid();
 
     const firstBatch = [
       [conversation1, sender],
@@ -45,7 +45,7 @@ describe('useReadReceipt', () => {
     ] as const;
 
     firstBatch.forEach(([conversation, sender]) => {
-      const message = new Message(createRandomUuid());
+      const message = new Message(createUuid());
       message.from = sender;
       result.current.addReadReceiptToBatch(conversation, message);
     });
@@ -54,7 +54,7 @@ describe('useReadReceipt', () => {
     jest.runAllTimers();
     expect(sendReadReceipt).toHaveBeenCalledTimes(2);
 
-    result.current.addReadReceiptToBatch(conversation1, new Message(createRandomUuid()));
+    result.current.addReadReceiptToBatch(conversation1, new Message(createUuid()));
     expect(sendReadReceipt).toHaveBeenCalledTimes(2);
     jest.runAllTimers();
     expect(sendReadReceipt).toHaveBeenCalledTimes(3);
@@ -63,10 +63,10 @@ describe('useReadReceipt', () => {
   it('batches the read receipt sending per sender', async () => {
     const sendReadReceipt = jest.fn();
     const {result} = renderHook(() => useReadReceiptSender({sendReadReceipt}));
-    const conversation = new Conversation(createRandomUuid());
+    const conversation = new Conversation(createUuid());
 
-    const sender1 = createRandomUuid();
-    const sender2 = createRandomUuid();
+    const sender1 = createUuid();
+    const sender2 = createUuid();
 
     const firstBatch = [
       [conversation, sender1],
@@ -76,7 +76,7 @@ describe('useReadReceipt', () => {
     ] as const;
 
     firstBatch.forEach(([conversation, sender]) => {
-      const message = new Message(createRandomUuid());
+      const message = new Message(createUuid());
       message.from = sender;
       result.current.addReadReceiptToBatch(conversation, message);
     });
@@ -89,10 +89,10 @@ describe('useReadReceipt', () => {
   it('does not add the same message multiple times', async () => {
     const sendReadReceipt = jest.fn();
     const {result} = renderHook(() => useReadReceiptSender({sendReadReceipt}));
-    const conversation = new Conversation(createRandomUuid());
+    const conversation = new Conversation(createUuid());
 
-    const message = new Message(createRandomUuid());
-    message.from = createRandomUuid();
+    const message = new Message(createUuid());
+    message.from = createUuid();
 
     const firstBatch = [
       [conversation, message],

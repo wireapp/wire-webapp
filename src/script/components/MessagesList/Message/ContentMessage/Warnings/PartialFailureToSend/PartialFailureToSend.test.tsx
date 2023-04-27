@@ -24,7 +24,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import en from 'I18n/en-US.json';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {setStrings} from 'Util/LocalizerUtil';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {PartialFailureToSendWarning, User} from './PartialFailureToSend';
 
@@ -32,7 +32,7 @@ setStrings({en});
 function generateUsers(nbUsers: number, domain: string) {
   const users: User[] = [];
   for (let i = 0; i < nbUsers; i++) {
-    users.push({qualifiedId: {id: createRandomUuid(), domain}, username: () => `User ${i}`});
+    users.push({qualifiedId: {id: createUuid(), domain}, username: () => `User ${i}`});
   }
   return users;
 }
@@ -49,7 +49,7 @@ function generateUserClients(users: User[]): QualifiedUserClients {
 function generateQualifiedIds(nbUsers: number, domain: string) {
   const users: QualifiedId[] = [];
   for (let i = 0; i < nbUsers; i++) {
-    users.push({id: createRandomUuid(), domain});
+    users.push({id: createUuid(), domain});
   }
   return users;
 }

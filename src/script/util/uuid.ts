@@ -1,8 +1,6 @@
-#!/usr/bin/env node
-
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,17 +17,6 @@
  *
  */
 
-const fs = require('fs-extra');
-const path = require('path');
-const {execSync} = require('child_process');
+import UUID from 'uuidjs';
 
-const distFolder = 'dist';
-let commitSHA = 'unknown';
-
-try {
-  commitSHA = execSync('git rev-parse HEAD')
-    .toString()
-    .trim();
-} catch (error) {}
-
-fs.outputFileSync(path.resolve(distFolder, 'commit'), commitSHA);
+export const createUuid = (version: 4 | 1 = 4): string => (version === 4 ? UUID.genV4() : UUID.genV1()).toString();

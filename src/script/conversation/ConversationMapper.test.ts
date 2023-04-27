@@ -41,7 +41,7 @@ import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
 import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
 import {Conversation} from 'src/script/entity/Conversation';
 import {BaseError} from 'src/script/error/BaseError';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {ACCESS_STATE} from './AccessState';
 
@@ -185,7 +185,7 @@ describe('ConversationMapper', () => {
 
   describe('updateProperties', () => {
     it('can update the properties of a conversation', () => {
-      const creatorId = createRandomUuid();
+      const creatorId = createUuid();
       const conversationsData = [payload.conversations.get.conversations[0]];
       const [conversationEntity] = ConversationMapper.mapConversations(conversationsData);
       const data: Partial<Record<keyof Conversation, string>> = {
@@ -202,7 +202,7 @@ describe('ConversationMapper', () => {
 
     it('only updates existing properties', () => {
       const updatedName = 'Christmas 2017';
-      const conversationEntity = new Conversation(createRandomUuid());
+      const conversationEntity = new Conversation(createUuid());
       conversationEntity.name('Christmas 2016');
 
       expect(conversationEntity.name()).toBeDefined();
@@ -344,11 +344,11 @@ describe('ConversationMapper', () => {
       localReceiptMode: RECEIPT_MODE,
       remoteReceiptMode: RECEIPT_MODE,
     ): Partial<ConversationDatabaseData>[] {
-      const conversationCreatorId = createRandomUuid();
-      const conversationId = createRandomUuid();
+      const conversationCreatorId = createUuid();
+      const conversationId = createUuid();
       const conversationName = 'Hello, World!';
-      const selfUserId = createRandomUuid();
-      const teamId = createRandomUuid();
+      const selfUserId = createUuid();
+      const teamId = createUuid();
 
       const localData: Partial<ConversationDatabaseData> = {
         archived_state: false,
@@ -481,7 +481,7 @@ describe('ConversationMapper', () => {
       };
 
       const remoteData2: ConversationBackendData = JSON.parse(JSON.stringify(remoteData));
-      remoteData2.id = createRandomUuid();
+      remoteData2.id = createUuid();
 
       const [merged_conversation, merged_conversation_2] = ConversationMapper.mergeConversation(
         [localData] as ConversationDatabaseData[],

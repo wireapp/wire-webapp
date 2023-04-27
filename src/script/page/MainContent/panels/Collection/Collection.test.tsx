@@ -27,7 +27,7 @@ import {FileAsset} from 'src/script/entity/message/FileAsset';
 import {LinkPreview} from 'src/script/entity/message/LinkPreview';
 import {MediumImage} from 'src/script/entity/message/MediumImage';
 import {MessageCategory} from 'src/script/message/MessageCategory';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {Collection} from './Collection';
 
@@ -45,25 +45,25 @@ jest.mock('./CollectionItem', () => ({
 }));
 
 const createImageMessage = (timestamp: number = Date.now()) => {
-  const message = new ContentMessage(createRandomUuid());
+  const message = new ContentMessage(createUuid());
   message.timestamp(timestamp);
-  const image = new MediumImage(createRandomUuid());
+  const image = new MediumImage(createUuid());
   message.assets.push(image);
   message.category = MessageCategory.IMAGE;
   return message;
 };
 
 const createFileMessage = () => {
-  const message = new ContentMessage(createRandomUuid());
-  const file = new FileAsset(createRandomUuid());
+  const message = new ContentMessage(createUuid());
+  const file = new FileAsset(createUuid());
   message.assets.push(file);
   message.category = MessageCategory.FILE;
   return message;
 };
 
 const createLinkMessage = () => {
-  const message = new ContentMessage(createRandomUuid());
-  const link = new Text(createRandomUuid());
+  const message = new ContentMessage(createUuid());
+  const link = new Text(createUuid());
   link.previews.push(new LinkPreview({}));
   message.assets.push(link);
   message.category = MessageCategory.LINK_PREVIEW;
@@ -71,8 +71,8 @@ const createLinkMessage = () => {
 };
 
 const createAudioMessage = () => {
-  const message = new ContentMessage(createRandomUuid());
-  const audio = new FileAsset(createRandomUuid());
+  const message = new ContentMessage(createUuid());
+  const audio = new FileAsset(createUuid());
   audio.isAudio = () => true;
   message.assets.push(audio);
   message.category = MessageCategory.FILE;

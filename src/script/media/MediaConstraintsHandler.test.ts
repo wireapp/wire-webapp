@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {MediaConstraintsHandler, ScreensharingMethods} from './MediaConstraintsHandler';
 import {CurrentAvailableDeviceId} from './MediaDevicesHandler';
@@ -36,7 +36,7 @@ describe('MediaConstraintsHandler', () => {
   });
 
   const createConstraintsHandler = ({
-    selfUserId = createRandomUuid(),
+    selfUserId = createUuid(),
     availableDevices = createAvailableDevices(),
   }: {
     availableDevices?: CurrentAvailableDeviceId;
@@ -118,7 +118,7 @@ describe('MediaConstraintsHandler', () => {
   describe('setAgcPreference', () => {
     it('stores the stringified preference for the userId', () => {
       const setItemSpy = spyOn(Object.getPrototypeOf(localStorage), 'setItem').and.returnValue(undefined);
-      const selfUserId = createRandomUuid();
+      const selfUserId = createUuid();
       const constraintsHandler = createConstraintsHandler({selfUserId});
       constraintsHandler.setAgcPreference(true);
 
@@ -129,7 +129,7 @@ describe('MediaConstraintsHandler', () => {
   describe('getAgcPreference', () => {
     it('loads the preference for the userId', () => {
       const getItemSpy = spyOn(Object.getPrototypeOf(localStorage), 'getItem').and.returnValue('true');
-      const selfUserId = createRandomUuid();
+      const selfUserId = createUuid();
       const constraintsHandler = createConstraintsHandler({selfUserId});
 
       expect(constraintsHandler.getAgcPreference()).toEqual(true);

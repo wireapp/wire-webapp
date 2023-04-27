@@ -24,14 +24,14 @@ import {act, render, waitFor} from '@testing-library/react';
 import {Conversation} from 'src/script/entity/Conversation';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {User} from 'src/script/entity/User';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {Text} from '../../entity/message/Text';
 
 import {MessagesList} from './';
 
 const getDefaultParams = (): React.ComponentProps<typeof MessagesList> => {
-  const conversation = new Conversation(createRandomUuid());
+  const conversation = new Conversation(createUuid());
 
   return {
     cancelConnectionRequest: jest.fn(),
@@ -70,8 +70,8 @@ const getDefaultParams = (): React.ComponentProps<typeof MessagesList> => {
 };
 
 const createTextMessage = (text: string) => {
-  const message = new ContentMessage(createRandomUuid());
-  const textAsset = new Text(createRandomUuid(), text);
+  const message = new ContentMessage(createUuid());
+  const textAsset = new Text(createUuid(), text);
   message.assets.push(textAsset);
   return message;
 };
