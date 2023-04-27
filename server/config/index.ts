@@ -19,27 +19,16 @@
 
 import dotenv from 'dotenv-extended';
 
-import {execSync} from 'child_process';
+import {readFileSync} from 'fs';
+import path from 'path';
 
 import {generateConfig as generateClientConfig} from './client.config';
 import {generateConfig as generateServerConfig} from './server.config';
 
+const versionData = readFileSync(path.resolve(__dirname, './version.json'), 'utf8');
+const version = versionData ? JSON.parse(versionData) : {version: 'unknown', commit: 'unknown'};
+
 dotenv.load();
-
-function generateVersion() {
-  return new Date()
-    .toISOString()
-    .replace(/[T\-:]/g, '.')
-    .replace(/\.\d+Z/, '');
-}
-
-function generateCommmitHash() {
-  try {
-    return execSync('git rev-parse HEAD').toString().trim();
-  } catch (error) {
-    return 'unknown';
-  }
-}
 
 function generateUrls() {
   const federation = process.env.FEDERATION;
@@ -63,8 +52,8 @@ function generateUrls() {
 }
 
 const commonConfig = {
-  commit: generateCommmitHash(),
-  version: generateVersion(),
+  commit: version.commit,
+  version: version.version,
   env: process.env.NODE_ENV || 'production',
   urls: generateUrls(),
 };
