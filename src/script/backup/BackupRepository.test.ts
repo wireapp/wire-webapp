@@ -138,8 +138,10 @@ describe('BackupRepository', () => {
 
       await backupRepository.importHistory(new User('user1'), blob, noop, noop);
 
-      expect(importSpy).toHaveBeenCalledWith(eventStoreName, [omit(textEvent, 'primary_key')]);
-      expect(importSpy).not.toHaveBeenCalledWith(eventStoreName, [verificationEvent]);
+      expect(importSpy).toHaveBeenCalledWith(eventStoreName, [omit(textEvent, 'primary_key')], {
+        generateId: expect.any(Function),
+      });
+      expect(importSpy).not.toHaveBeenCalledWith(eventStoreName, [verificationEvent], expect.any(Object));
     });
 
     it('cancels export', async () => {
@@ -213,9 +215,12 @@ describe('BackupRepository', () => {
       expect(importSpy).toHaveBeenCalledWith(
         StorageSchemata.OBJECT_STORE.EVENTS,
         messages.map(message => omit(message, 'primary_key')),
+        {generateId: expect.any(Function)},
       );
 
-      expect(importSpy).toHaveBeenCalledWith(StorageSchemata.OBJECT_STORE.USERS, users, expect.any(Function));
+      expect(importSpy).toHaveBeenCalledWith(StorageSchemata.OBJECT_STORE.USERS, users, {
+        generatePrimaryKey: expect.any(Function),
+      });
     });
   });
 });
