@@ -119,7 +119,7 @@ const LoginComponent = ({
   const onEntropyGenerated = useRef<((entropy: Uint8Array) => void) | undefined>();
   const entropy = useRef<Uint8Array | undefined>();
   const isLinkPasswordModalOpen =
-    conversationError && conversationError.label === BackendError.CONVERSATION_ERRORS.INVALID_CONVERSATION_PASSWORD;
+    conversationError && conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD;
 
   const getEntropy = isEntropyRequired
     ? () => {
@@ -212,7 +212,7 @@ const LoginComponent = ({
         try {
           await doLoginAndJoin(login, conversationKey, conversationCode, undefined, getEntropy, conversationPassword);
         } catch (error) {
-          if (isBackendError(error) && error.label === BackendError.LABEL.INVALID_CONVERSATION_PASSWORD) {
+          if (isBackendError(error) && error.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD) {
             setConversationSubmitData(formLoginData);
             return;
           }

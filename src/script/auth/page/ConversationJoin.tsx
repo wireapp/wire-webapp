@@ -20,7 +20,7 @@
 import React, {useEffect, useState} from 'react';
 
 import type {RegisterData} from '@wireapp/api-client/lib/auth';
-import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
+import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {Navigate} from 'react-router-dom';
@@ -98,7 +98,7 @@ const ConversationJoinComponent = ({
   const isEntropyRequired = Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY;
 
   const isLinkPasswordModalOpen =
-    conversationError && conversationError.label === BackendError.CONVERSATION_ERRORS.INVALID_CONVERSATION_PASSWORD;
+    conversationError && conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD;
 
   const isPwaSupportedBrowser = () => {
     return Runtime.isMobileOS() || Runtime.isSafari();

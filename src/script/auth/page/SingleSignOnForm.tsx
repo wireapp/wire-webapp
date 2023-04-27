@@ -20,7 +20,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 
 import {ClientType} from '@wireapp/api-client/lib/client/index';
-import {BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http';
+import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http';
 import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
 import {isValidEmail, PATTERN} from '@wireapp/commons/lib/util/ValidationUtil';
 import {FormattedMessage, useIntl} from 'react-intl';
@@ -96,7 +96,7 @@ const SingleSignOnFormComponent = ({
   const [shouldAutoLogin, setShouldAutoLogin] = useState(false);
 
   const isLinkPasswordModalOpen =
-    conversationError && conversationError.label === BackendError.CONVERSATION_ERRORS.INVALID_CONVERSATION_PASSWORD;
+    conversationError && conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD;
 
   useEffect(() => {
     const queryAutoLogin = UrlUtil.hasURLParameter(QUERY_KEY.SSO_AUTO_LOGIN);
@@ -231,10 +231,10 @@ const SingleSignOnFormComponent = ({
             setSsoError(error);
             break;
           }
-          // case BackendError.LABEL.INVALID_CONVERSATION_PASSWORD: {
-          //   // error will be hanlded by opening modal
-          //   break;
-          // }
+          case BackendErrorLabel.INVALID_CONVERSATION_PASSWORD: {
+            // error will be hanlded by opening modal
+            break;
+          }
           case SyntheticErrorLabel.SSO_USER_CANCELLED_ERROR:
           case BackendErrorLabel.NOT_FOUND: {
             break;
