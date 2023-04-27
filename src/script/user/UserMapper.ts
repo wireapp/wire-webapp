@@ -17,6 +17,8 @@
  *
  */
 
+import {container} from 'tsyringe';
+
 import {joaatHash} from 'Util/Crypto';
 import {getLogger, Logger} from 'Util/Logger';
 
@@ -25,6 +27,7 @@ import {isSelfAPIUser} from './UserGuards';
 import {mapProfileAssets, mapProfileAssetsV1, updateUserEntityAssets} from '../assets/AssetMapper';
 import {User} from '../entity/User';
 import {UserRecord} from '../storage';
+import {TeamState} from '../team/TeamState';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import '../view_model/bindings/CommonBindings';
 
@@ -35,7 +38,7 @@ export class UserMapper {
    * Construct a new User Mapper.
    * @param serverTimeHandler Handles time shift between server and client
    */
-  constructor(private readonly serverTimeHandler: ServerTimeHandler) {
+  constructor(private readonly serverTimeHandler: ServerTimeHandler, private teamState = container.resolve(TeamState)) {
     this.logger = getLogger('UserMapper');
   }
 
@@ -178,7 +181,8 @@ export class UserMapper {
       }
     }
 
-    if (teamId && !userEntity.isFederated) {
+    const currentTeam = this.teamState.team()?.id;
+    if (isSelf || (currentTeam && teamId && teamId === currentTeam && !userEntity.isFederated)) {
       // To be in the same team, the user needs to have the same teamId and to be on the same domain (not federated)
       userEntity.inTeam(true);
       userEntity.teamId = teamId;

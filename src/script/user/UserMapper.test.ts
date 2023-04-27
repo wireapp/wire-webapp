@@ -73,7 +73,6 @@ describe('User Mapper', () => {
       const user = mapper.mapUserFromJson(
         {
           id: 'id',
-          locale: '',
           name: 'guest',
           qualified_id: {domain: 'otherdomain.test', id: 'id'},
           team: teamId,
