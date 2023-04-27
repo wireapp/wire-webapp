@@ -284,7 +284,9 @@ export class BackupRepository {
     const entities = events.map(entity => this.prepareEvents(entity));
 
     const importEventChunk = async (eventChunk: Omit<EventRecord, 'primary_key'>[]) => {
-      const nbImported = await this.backupService.importEntities(StorageSchemata.OBJECT_STORE.EVENTS, eventChunk);
+      const nbImported = await this.backupService.importEntities(StorageSchemata.OBJECT_STORE.EVENTS, eventChunk, {
+        generateId: event => event.id,
+      });
       progressCallback(eventChunk.length);
       return nbImported;
     };
@@ -297,9 +299,9 @@ export class BackupRepository {
     const qualifiedUsers = users.filter(user => !!user.qualified_id);
 
     const importEventChunk = async (usersChunk: UserRecord[]) => {
-      const nbImported = await this.backupService.importEntities(StorageSchemata.OBJECT_STORE.USERS, usersChunk, user =>
-        constructUserPrimaryKey(user.qualified_id),
-      );
+      const nbImported = await this.backupService.importEntities(StorageSchemata.OBJECT_STORE.USERS, usersChunk, {
+        generatePrimaryKey: user => constructUserPrimaryKey(user.qualified_id),
+      });
       progressCallback(usersChunk.length);
       return nbImported;
     };
