@@ -102,7 +102,7 @@ describe('NotificationRepository', () => {
     amplify.publish(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
 
     // Create entities
-    user = userMapper.mapUserFromJson(payload.users.get.one[0]);
+    user = userMapper.mapUserFromJson(payload.users.get.one[0], '');
     [conversation] = ConversationMapper.mapConversations([entities.conversation]);
     const selfUserEntity = new User(createRandomUuid());
     selfUserEntity.isMe = true;
@@ -597,7 +597,7 @@ describe('NotificationRepository', () => {
       memberMessage = new MemberMessage();
       memberMessage.user(user);
       (memberMessage as any).memberMessageType = SystemMessageType.NORMAL;
-      otherUser = userMapper.mapUserFromJson(payload.users.get.many[1]);
+      otherUser = userMapper.mapUserFromJson(payload.users.get.many[1], '');
     });
 
     describe('if people are added', () => {
@@ -665,7 +665,7 @@ describe('NotificationRepository', () => {
       });
 
       it('with multiple users being removed from the conversation', () => {
-        const user_ets = userMapper.mapUsersFromJson(payload.users.get.many);
+        const user_ets = userMapper.mapUsersFromJson(payload.users.get.many, '');
         memberMessage.userEntities(user_ets);
 
         return notificationRepository.notify(memberMessage, undefined, conversation).then(() => {
@@ -726,7 +726,7 @@ describe('NotificationRepository', () => {
     const expected_body = t('notificationPing');
 
     beforeAll(() => {
-      user = userMapper.mapUserFromJson(payload.users.get.one[0]);
+      user = userMapper.mapUserFromJson(payload.users.get.one[0], '');
     });
 
     beforeEach(() => {

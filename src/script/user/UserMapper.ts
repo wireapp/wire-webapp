@@ -19,17 +19,15 @@
 
 import {container} from 'tsyringe';
 
-import {Availability} from '@wireapp/protocol-messaging';
-
 import {joaatHash} from 'Util/Crypto';
 import {getLogger, Logger} from 'Util/Logger';
 
 import {isSelfAPIUser} from './UserGuards';
-import {UserState} from './UserState';
 
 import {mapProfileAssets, mapProfileAssetsV1, updateUserEntityAssets} from '../assets/AssetMapper';
 import {User} from '../entity/User';
 import {UserRecord} from '../storage';
+import {TeamState} from '../team/TeamState';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import '../view_model/bindings/CommonBindings';
 
@@ -40,19 +38,16 @@ export class UserMapper {
    * Construct a new User Mapper.
    * @param serverTimeHandler Handles time shift between server and client
    */
-  constructor(
-    private readonly serverTimeHandler: ServerTimeHandler,
-    private readonly userState: UserState = container.resolve(UserState),
-  ) {
+  constructor(private readonly serverTimeHandler: ServerTimeHandler, private teamState = container.resolve(TeamState)) {
     this.logger = getLogger('UserMapper');
   }
 
-  mapUserFromJson(userData: UserRecord): User {
-    return this.updateUserFromObject(new User('', ''), userData);
+  mapUserFromJson(userData: UserRecord, localDomain: string): User {
+    return this.updateUserFromObject(new User('', ''), userData, localDomain);
   }
 
   mapSelfUserFromJson(userData: UserRecord): User {
-    const userEntity = this.updateUserFromObject(new User('', ''), userData);
+    const userEntity = this.updateUserFromObject(new User('', ''), userData, '');
     userEntity.isMe = true;
 
     if (isSelfAPIUser(userData)) {
@@ -67,9 +62,9 @@ export class UserMapper {
    * @note Return an empty array in any case to prevent crashes.
    * @returns Mapped user entities
    */
-  mapUsersFromJson(usersData: UserRecord[]): User[] {
+  mapUsersFromJson(usersData: UserRecord[], localDomain: string): User[] {
     if (usersData?.length) {
-      return usersData.filter(userData => userData).map(userData => this.mapUserFromJson(userData));
+      return usersData.filter(userData => userData).map(userData => this.mapUserFromJson(userData, localDomain));
     }
     this.logger.warn('We got no user data from the backend');
     return [];
@@ -80,9 +75,10 @@ export class UserMapper {
    * @note Mapping of single properties to an existing user happens when the user changes his name or accent color.
    * @param userEntity User entity that the info shall be mapped to
    * @param userData Updated user data from backend
+   * @param localDomain Domain of the current backend (used to determine if the user is federated)
    * @todo Pass in "serverTimeHandler", so that it can be removed from the "UserMapper" constructor
    */
-  updateUserFromObject(userEntity: User, userData: Partial<UserRecord>): User {
+  updateUserFromObject(userEntity: User, userData: Partial<UserRecord>, localDomain: string): User {
     // We are trying to update non-matching users
     const isUnexpectedId = userEntity.id && userData.id && userData.id !== userEntity.id;
     if (isUnexpectedId) {
@@ -98,10 +94,7 @@ export class UserMapper {
     if (userData.qualified_id) {
       userEntity.domain = userData.qualified_id.domain;
       userEntity.id = userData.qualified_id.id;
-      userEntity.isFederated =
-        this.userState.self() && this.userState.self().domain
-          ? userData.qualified_id.domain !== this.userState.self().domain
-          : false;
+      userEntity.isFederated = !!localDomain && userData.qualified_id.domain !== localDomain;
     }
 
     const isSelf = isSelfAPIUser(userData);
@@ -111,7 +104,7 @@ export class UserMapper {
 
     const {
       accent_id: accentId,
-      availability = Availability.Type.NONE,
+      availability,
       assets,
       deleted,
       email,
@@ -127,7 +120,10 @@ export class UserMapper {
       userEntity.accent_id(accentId);
     }
 
-    userEntity.availability(availability);
+    if (availability !== undefined) {
+      // Availability should only change when it's a valid value (undefined should not reset the availability)
+      userEntity.availability(availability);
+    }
 
     let mappedAssets;
     if (assets?.length) {
@@ -185,9 +181,10 @@ export class UserMapper {
       }
     }
 
-    if (teamId && !userEntity.isFederated) {
+    const currentTeam = this.teamState.team()?.id;
+    if (isSelf || (currentTeam && teamId && teamId === currentTeam && !userEntity.isFederated)) {
       // To be in the same team, the user needs to have the same teamId and to be on the same domain (not federated)
-      userEntity.inTeam(true);
+      userEntity.inTeam(!!teamId);
       userEntity.teamId = teamId;
     }
 

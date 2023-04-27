@@ -21,6 +21,7 @@ import React, {useEffect, useRef, useState} from 'react';
 
 import {LoginData} from '@wireapp/api-client/lib/auth';
 import {ClientType} from '@wireapp/api-client/lib/client/index';
+import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
 import {StatusCodes} from 'http-status-codes';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
@@ -68,7 +69,6 @@ import {LoginForm} from '../component/LoginForm';
 import {RouterLink} from '../component/RouterLink';
 import {EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot} from '../module/action/';
-import {BackendError} from '../module/action/BackendError';
 import {LabeledError} from '../module/action/LabeledError';
 import {ValidationError} from '../module/action/ValidationError';
 import {bindActionCreators, RootState} from '../module/reducer';
@@ -229,7 +229,7 @@ const LoginComponent = ({
     } catch (error) {
       if (isBackendError(error)) {
         switch (error.label) {
-          case BackendError.LABEL.TOO_MANY_CLIENTS: {
+          case BackendErrorLabel.TOO_MANY_CLIENTS: {
             await resetAuthError();
             if (formLoginData?.verificationCode) {
               await doSetLocalStorage(QUERY_KEY.CONVERSATION_CODE, formLoginData.verificationCode);
@@ -241,7 +241,7 @@ const LoginComponent = ({
             break;
           }
 
-          case BackendError.LABEL.CODE_AUTHENTICATION_REQUIRED: {
+          case BackendErrorLabel.CODE_AUTHENTICATION_REQUIRED: {
             await resetAuthError();
             const login: LoginData = {...formLoginData, clientType: loginData.clientType};
             if (login.email || login.handle) {
@@ -252,13 +252,13 @@ const LoginComponent = ({
             break;
           }
 
-          case BackendError.LABEL.CODE_AUTHENTICATION_FAILED: {
+          case BackendErrorLabel.CODE_AUTHENTICATION_FAILED: {
             setTwoFactorSubmitError(error);
             setTwoFactorSubmitFailedOnce(true);
             break;
           }
-          case BackendError.LABEL.INVALID_CREDENTIALS:
-          case BackendError.LABEL.SUSPENDED:
+          case BackendErrorLabel.INVALID_CREDENTIALS:
+          case BackendErrorLabel.ACCOUNT_SUSPENDED:
           case LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE: {
             break;
           }
@@ -286,7 +286,7 @@ const LoginComponent = ({
       }
     } catch (error) {
       setTwoFactorSubmitError(
-        new BackendError({code: StatusCodes.TOO_MANY_REQUESTS, label: BackendError.GENERAL_ERRORS.TOO_MANY_REQUESTS}),
+        new BackendError('', SyntheticErrorLabel.TOO_MANY_REQUESTS, StatusCodes.TOO_MANY_REQUESTS),
       );
     }
   };

@@ -55,5 +55,5 @@ export function generateAPIUser(
 
 export function generateUser(id?: QualifiedId): User {
   const apiUser = generateAPIUser(id);
-  return new UserMapper(serverTimeHandler).mapUserFromJson(apiUser);
+  return new UserMapper(serverTimeHandler).mapUserFromJson(apiUser, '');
 }

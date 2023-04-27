@@ -79,7 +79,7 @@ import {IntegrationRepository} from '../integration/IntegrationRepository';
 import {IntegrationService} from '../integration/IntegrationService';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {MediaRepository} from '../media/MediaRepository';
-import {initMLSConversations, registerUninitializedConversations} from '../mls';
+import {initMLSCallbacks, initMLSConversations, registerUninitializedSelfAndTeamConversations} from '../mls';
 import {NotificationRepository} from '../notification/NotificationRepository';
 import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
 import {PermissionRepository} from '../permission/PermissionRepository';
@@ -404,7 +404,8 @@ export class App {
       await userRepository.loadUsers(selfUser, connections, conversations, teamMembers);
 
       if (supportsMLS()) {
-        await initMLSConversations(conversations, selfUser, this.core, this.repository.conversation);
+        //if mls is supported, we need to initialize the callbacks (they are used when decrypting messages)
+        await initMLSCallbacks(this.core, this.repository.conversation);
       }
 
       if (connections.length) {
@@ -428,8 +429,13 @@ export class App {
       const notificationsCount = eventRepository.notificationsTotal;
 
       if (supportsMLS()) {
-        // Once all the messages have been processed and the message sending queue freed we can now add the potential `self` and `team` conversations
-        await registerUninitializedConversations(conversations, selfUser, clientEntity().id, this.core);
+        // Once all the messages have been processed and the message sending queue freed we can now:
+
+        //join all the mls groups we're member of and have not yet joined (eg. we were not send welcome message)
+        await initMLSConversations(conversations, this.core);
+
+        //add the potential `self` and `team` conversations
+        await registerUninitializedSelfAndTeamConversations(conversations, selfUser, clientEntity().id, this.core);
       }
 
       telemetry.timeStep(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);

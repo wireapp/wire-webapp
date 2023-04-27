@@ -21,6 +21,7 @@ import type {DomainData} from '@wireapp/api-client/lib/account/DomainData';
 import type {LoginData, RegisterData, SendLoginCode} from '@wireapp/api-client/lib/auth/';
 import {VerificationActionType} from '@wireapp/api-client/lib/auth/VerificationActionType';
 import {ClientType} from '@wireapp/api-client/lib/client/';
+import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http';
 import {OAuthBody} from '@wireapp/api-client/lib/oauth/OAuthBody';
 import {OAuthClient} from '@wireapp/api-client/lib/oauth/OAuthClient';
 import type {TeamData} from '@wireapp/api-client/lib/team/';
@@ -30,10 +31,9 @@ import {StatusCodes as HTTP_STATUS, StatusCodes} from 'http-status-codes';
 import type {CRUDEngine} from '@wireapp/store-engine';
 import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
 
-import {isAxiosError} from 'Util/TypePredicateUtil';
+import {isAxiosError, isBackendError} from 'Util/TypePredicateUtil';
 import {isTemporaryClientAndNonPersistent} from 'Util/util';
 
-import {BackendError} from './BackendError';
 import {AuthActionCreator} from './creator/';
 import {LabeledError} from './LabeledError';
 import {LocalStorageAction, LocalStorageKey} from './LocalStorageAction';
@@ -124,7 +124,7 @@ export class AuthAction {
         );
         dispatch(AuthActionCreator.successfulLogin());
       } catch (error) {
-        if (error.label === BackendError.LABEL.TOO_MANY_CLIENTS) {
+        if (error.label === BackendErrorLabel.TOO_MANY_CLIENTS) {
           dispatch(AuthActionCreator.successfulLogin());
         } else {
           if (error instanceof LowDiskSpaceError) {
@@ -182,12 +182,8 @@ export class AuthAction {
         /**
          * The BE will respond with a 400 if a user tries to use a handle instead of an email.
          */
-        if (error.label === BackendError.LABEL.BAD_REQUEST) {
-          error = new BackendError({
-            code: StatusCodes.BAD_REQUEST,
-            label: BackendError.AUTH_ERRORS.EMAIL_REQUIRED,
-            message: error.message,
-          });
+        if (isBackendError(error) && error.label === BackendErrorLabel.BAD_REQUEST) {
+          error = new BackendError(error.message, SyntheticErrorLabel.EMAIL_REQUIRED, StatusCodes.BAD_REQUEST);
         }
         dispatch(AuthActionCreator.failedSendTwoFactorCode(error));
         throw error;
@@ -205,7 +201,7 @@ export class AuthAction {
         await dispatch(clientAction.doInitializeClient(clientType));
         dispatch(AuthActionCreator.successfulLogin());
       } catch (error) {
-        if (error.label === BackendError.LABEL.TOO_MANY_CLIENTS) {
+        if (isBackendError(error) && error.label === BackendErrorLabel.TOO_MANY_CLIENTS) {
           dispatch(AuthActionCreator.successfulLogin());
         } else {
           dispatch(AuthActionCreator.failedLogin(error));
@@ -248,18 +244,12 @@ export class AuthAction {
       const mapError = (error: any) => {
         const statusCode = error?.response?.status;
         if (statusCode === HTTP_STATUS.NOT_FOUND) {
-          return new BackendError({code: HTTP_STATUS.NOT_FOUND, label: BackendError.SSO_ERRORS.SSO_NOT_FOUND});
+          return new BackendError('', BackendErrorLabel.NOT_FOUND, HTTP_STATUS.NOT_FOUND);
         }
         if (statusCode >= HTTP_STATUS.INTERNAL_SERVER_ERROR) {
-          return new BackendError({
-            code: HTTP_STATUS.INTERNAL_SERVER_ERROR,
-            label: BackendError.SSO_ERRORS.SSO_SERVER_ERROR,
-          });
+          return new BackendError('', BackendErrorLabel.SERVER_ERROR, HTTP_STATUS.INTERNAL_SERVER_ERROR);
         }
-        return new BackendError({
-          code: HTTP_STATUS.INTERNAL_SERVER_ERROR,
-          label: BackendError.SSO_ERRORS.SSO_GENERIC_ERROR,
-        });
+        return new BackendError('', SyntheticErrorLabel.SSO_GENERIC_ERROR, HTTP_STATUS.INTERNAL_SERVER_ERROR);
       };
 
       try {

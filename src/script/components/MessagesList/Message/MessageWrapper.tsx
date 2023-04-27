@@ -116,10 +116,6 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
     }
   };
 
-  const onDiscard = async () => {
-    await messageRepository.deleteMessageById(conversation, message.id);
-  };
-
   const contextMenuEntries = ko.pureComputed(() => {
     const entries: ContextMenuEntry[] = [];
 
@@ -214,7 +210,6 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
         onClickInvitePeople={onClickInvitePeople}
         onClickParticipants={onClickParticipants}
         onClickReceipts={onClickReceipts}
-        onDiscard={onDiscard}
         onRetry={onRetry}
         isMessageFocused={isMessageFocused}
         isMsgElementsFocusable={isMsgElementsFocusable}

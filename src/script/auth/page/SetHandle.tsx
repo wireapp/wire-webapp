@@ -19,6 +19,7 @@
 
 import React, {useEffect, useState} from 'react';
 
+import {BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
 import {ConsentType} from '@wireapp/api-client/lib/self/index';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
@@ -38,12 +39,13 @@ import {
   Text,
 } from '@wireapp/react-ui-kit';
 
+import {isBackendError} from 'Util/TypePredicateUtil';
+
 import {Page} from './Page';
 
 import {chooseHandleStrings} from '../../strings';
 import {AcceptNewsModal} from '../component/AcceptNewsModal';
 import {actionRoot as ROOT_ACTIONS} from '../module/action';
-import {BackendError} from '../module/action/BackendError';
 import {bindActionCreators, RootState} from '../module/reducer';
 import * as SelfSelector from '../module/selector/SelfSelector';
 import {ROUTE} from '../route';
@@ -93,8 +95,8 @@ const SetHandleComponent = ({
     try {
       await doSetHandle(handle.trim());
     } catch (error) {
-      if (error.label === BackendError.HANDLE_ERRORS.INVALID_HANDLE && handle.trim().length < 2) {
-        error.label = BackendError.HANDLE_ERRORS.HANDLE_TOO_SHORT;
+      if (isBackendError(error) && error.label === BackendErrorLabel.INVALID_HANDLE && handle.trim().length < 2) {
+        error.label = SyntheticErrorLabel.HANDLE_TOO_SHORT;
       }
       setError(error);
     }

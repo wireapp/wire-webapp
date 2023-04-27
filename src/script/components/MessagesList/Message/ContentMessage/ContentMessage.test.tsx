@@ -60,7 +60,6 @@ describe('message', () => {
       onClickReceipts: jest.fn(),
       onClickTimestamp: jest.fn(),
       onLike: jest.fn(),
-      onDiscard: jest.fn(),
       onRetry: jest.fn(),
       previousMessage: undefined,
       selfId: {domain: '', id: createRandomUuid()},

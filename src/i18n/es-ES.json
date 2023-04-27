@@ -375,7 +375,7 @@
   "conversationLabelFavorites": "Favorites",
   "conversationLabelGroups": "Groups",
   "conversationLabelPeople": "People",
-  "conversationLikesCaption": "{{number}}o de personas",
+  "conversationLikesCaption": "{{number}} de personas",
   "conversationLocationLink": "Abrir Mapa",
   "conversationMemberJoined": "[bold]{{name}}[/bold] añadió a {{users}} a la conversación",
   "conversationMemberJoinedMore": "[bold]{{name}}[/bold] agregó a {{users}} y [showmore]{{count}} más[/showmore] a la conversación",
