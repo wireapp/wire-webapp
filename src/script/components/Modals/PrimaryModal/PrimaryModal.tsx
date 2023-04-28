@@ -79,6 +79,8 @@ export const PrimaryModalComponent: FC = () => {
     updateErrorMessage('');
     updateOptionChecked(false);
     showNextModalInQueue();
+    setPasswordConfirmationValue('');
+    setDidCopyPassword(false);
   };
 
   const actionEnabled = !hasInput || !!inputValue.trim().length;
