@@ -17,7 +17,7 @@
     "copy-webpack-plugin": "11.0.0",
     "core-js": "3.25.5",
     "countly-sdk-web": "23.2.1",
-    "date-fns": "2.29.3",
+    "date-fns": "2.30.0",
     "dexie-batch": "0.4.3",
     "highlight.js": "11.7.0",
     "http-status-codes": "2.2.0",
