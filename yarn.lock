@@ -16779,9 +16779,9 @@ dexie@latest:
   languageName: node
   linkType: hard
 
-"tsc-watch@npm:6.0.0":
-  version: 6.0.0
-  resolution: "tsc-watch@npm:6.0.0"
+"tsc-watch@npm:6.0.4":
+  version: 6.0.4
+  resolution: "tsc-watch@npm:6.0.4"
   dependencies:
     cross-spawn: ^7.0.3
     node-cleanup: ^2.1.2
@@ -16791,7 +16791,7 @@ dexie@latest:
     typescript: "*"
   bin:
     tsc-watch: dist/lib/tsc-watch.js
-  checksum: 34e74a703ecb28689d0f6ba311781ff68be47f5f095439654b095f3ea4a5921708fca61b5727e33527639a9a147b42d10bc3fe3595afee92b41b2bacfba06043
+  checksum: f7bf7eefbc5a8bbf7c989edd1e5199ac95ad1654b11ea39bfe7fc2e5a83480926928bd405aebe2cbd783fc6ffac521b9ad650cb300d51d4a9b616b7c69da02da
   languageName: node
   linkType: hard
 
@@ -17865,7 +17865,7 @@ dexie@latest:
     terser-webpack-plugin: 5.3.7
     text-encoding: 0.7.0
     ts-node: 10.9.1
-    tsc-watch: 6.0.0
+    tsc-watch: 6.0.4
     tsyringe: 4.7.0
     typescript: 5.0.4
     uint32: 0.2.1

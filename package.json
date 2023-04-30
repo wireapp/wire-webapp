@@ -174,7 +174,7 @@
     "terser-webpack-plugin": "5.3.7",
     "text-encoding": "0.7.0",
     "ts-node": "10.9.1",
-    "tsc-watch": "6.0.0",
+    "tsc-watch": "6.0.4",
     "typescript": "5.0.4",
     "webpack": "5.81.0",
     "webpack-cli": "5.0.2",
