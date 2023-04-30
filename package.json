@@ -148,7 +148,7 @@
     "jsdom-worker": "0.3.0",
     "less": "3.13.1",
     "less-loader": "^11.1.0",
-    "lint-staged": "13.2.1",
+    "lint-staged": "13.2.2",
     "node-fetch": "2.6.9",
     "os-browserify": "0.3.0",
     "path-browserify": "1.0.1",
