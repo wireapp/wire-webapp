@@ -38,7 +38,7 @@
     "react-error-boundary": "4.0.4",
     "react-intl": "6.4.1",
     "react-redux": "8.0.5",
-    "react-router": "6.10.0",
+    "react-router": "6.11.0",
     "react-router-dom": "6.11.0",
     "react-transition-group": "4.4.5",
     "redux": "4.2.1",
