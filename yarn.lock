@@ -9404,10 +9404,17 @@ dexie@latest:
   languageName: node
   linkType: hard
 
-"highlight.js@npm:*, highlight.js@npm:11.7.0":
+"highlight.js@npm:*":
   version: 11.7.0
   resolution: "highlight.js@npm:11.7.0"
   checksum: 19e3fb8b56f4b361b057a8523b989dfeb6479bbd1e29cec3fac6fa5c78d09927d5fa61b7dba6631fdb57cfdca9b3084aa4da49405ceaf4a67f67beae2ed5b77d
+  languageName: node
+  linkType: hard
+
+"highlight.js@npm:11.8.0":
+  version: 11.8.0
+  resolution: "highlight.js@npm:11.8.0"
+  checksum: d2578a57aee7315946ff19379053fd0a28b127baabf7617ab1d28d62cdc4eaf3d75053569cb8479a5afdc7a68f1ba9a6c1d612d8ae399b4b9aa43093b4fb6831
   languageName: node
   linkType: hard
 
@@ -17518,7 +17525,7 @@ dexie@latest:
     eslint-plugin-unused-imports: ^2.0.0
     fake-indexeddb: 4.0.1
     generate-changelog: 1.8.0
-    highlight.js: 11.7.0
+    highlight.js: 11.8.0
     html-webpack-plugin: ^5.5.1
     http-status-codes: 2.2.0
     husky: 7.0.4
