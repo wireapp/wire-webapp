@@ -332,7 +332,9 @@ const LoginComponent = ({
         <Container centerText verticalCenter style={{width: '100%'}}>
           {!isValidLink && <Navigate to={ROUTE.CONVERSATION_JOIN_INVALID} replace />}
           <AppAlreadyOpen />
-          {isLinkPasswordModalOpen && <GuestLinkPasswordModal onSubmitPassword={submitJoinCodeWithPassword} />}
+          {isLinkPasswordModalOpen && (
+            <GuestLinkPasswordModal isLoading={isFetching} onSubmitPassword={submitJoinCodeWithPassword} />
+          )}
           <Columns>
             <IsMobile not>
               <Column style={{display: 'flex'}}>

@@ -281,7 +281,9 @@ const SingleSignOnFormComponent = ({
 
   return (
     <>
-      {isLinkPasswordModalOpen && <GuestLinkPasswordModal onSubmitPassword={submitJoinCodeWithPassword} />}
+      {isLinkPasswordModalOpen && (
+        <GuestLinkPasswordModal isLoading={isFetching} onSubmitPassword={submitJoinCodeWithPassword} />
+      )}
       <Form style={{marginTop: 30}} data-uie-name="sso" onSubmit={handleSubmit}>
         {!isValidLink && <Navigate to={ROUTE.CONVERSATION_JOIN_INVALID} replace />}
         <InputBlock>

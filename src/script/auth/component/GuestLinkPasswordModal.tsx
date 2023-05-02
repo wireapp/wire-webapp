@@ -28,9 +28,10 @@ import {guestLinkPasswordModalStrings} from '../../strings';
 
 export interface GuestLinkPasswordModalProps {
   onSubmitPassword: (password: string) => void;
+  isLoading?: boolean;
 }
 
-const GuestLinkPasswordModal: React.FC<GuestLinkPasswordModalProps> = ({onSubmitPassword}) => {
+const GuestLinkPasswordModal: React.FC<GuestLinkPasswordModalProps> = ({onSubmitPassword, isLoading}) => {
   const {formatMessage: _} = useIntl();
   const [passwordValue, setPasswordValue] = useState<string>('');
 
@@ -73,6 +74,7 @@ const GuestLinkPasswordModal: React.FC<GuestLinkPasswordModalProps> = ({onSubmit
           </Text>
         </Link>
         <Button
+          showLoading={isLoading}
           block
           type="button"
           disabled={!passwordValue}

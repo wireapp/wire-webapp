@@ -39,6 +39,7 @@ import {
   Link,
   RoundIconButton,
   Small,
+  Loading,
   Text,
 } from '@wireapp/react-ui-kit';
 
@@ -79,6 +80,8 @@ const ConversationJoinComponent = ({
   isTemporaryGuest,
   selfName,
   conversationError,
+  isFetchingAuth,
+  isFetchingConversation,
 }: Props & ConnectedProps & DispatchProps) => {
   const nameInput = React.useRef<HTMLInputElement>(null);
   const {formatMessage: _} = useIntl();
@@ -96,6 +99,8 @@ const ConversationJoinComponent = ({
   const [showCookiePolicyBanner, setShowCookiePolicyBanner] = useState(true);
   const [showEntropyForm, setShowEntropyForm] = useState(false);
   const isEntropyRequired = Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY;
+
+  const isFetching = isFetchingAuth || isFetchingConversation;
 
   const isLinkPasswordModalOpen =
     conversationError && conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD;
@@ -238,7 +243,9 @@ const ConversationJoinComponent = ({
 
   return (
     <UnsupportedBrowser isTemporaryGuest>
-      {isLinkPasswordModalOpen && <GuestLinkPasswordModal onSubmitPassword={submitJoinCodeWithPassword} />}
+      {isLinkPasswordModalOpen && (
+        <GuestLinkPasswordModal isLoading={isFetching} onSubmitPassword={submitJoinCodeWithPassword} />
+      )}
       <WirelessContainer
         showCookiePolicyBanner={showCookiePolicyBanner}
         onCookiePolicyBannerClose={() => setShowCookiePolicyBanner(false)}
@@ -293,7 +300,7 @@ const ConversationJoinComponent = ({
                       onClick={checkNameValidity}
                       data-uie-name="do-next"
                     >
-                      <ArrowIcon />
+                      {isFetching ? <Loading /> : <ArrowIcon />}
                     </RoundIconButton>
                   </InputSubmitCombo>
                 </InputBlock>
@@ -373,7 +380,8 @@ type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
   conversationError: ConversationSelector.getError(state),
   isAuthenticated: AuthSelector.isAuthenticated(state),
-  isFetching: ConversationSelector.isFetching(state),
+  isFetchingAuth: AuthSelector.isFetching(state),
+  isFetchingConversation: ConversationSelector.isFetching(state),
   isTemporaryGuest: SelfSelector.isTemporaryGuest(state),
   selfName: SelfSelector.getSelfName(state),
 });
