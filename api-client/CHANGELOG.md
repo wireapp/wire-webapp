@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [24.7.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@24.6.0...@wireapp/api-client@24.7.0) (2023-05-02)
+
+### Features
+
+* **api-client:** Add support guest links with passwords to backend features (SQSERVICES-1975) ([#5114](https://github.com/wireapp/wire-web-packages/issues/5114)) ([3137b0c](https://github.com/wireapp/wire-web-packages/commit/3137b0c90a14e03a7301f17b2f7d94a3ffe2d99e))
+
 # [24.6.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@24.5.1...@wireapp/api-client@24.6.0) (2023-04-27)
 
 ### Features
