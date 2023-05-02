@@ -131,6 +131,8 @@ export type BackendFeatures = {
   isFederated: boolean;
   /** Does the backend API support MLS features */
   supportsMLS: boolean;
+  /** Does the backend API support creating guest links with password */
+  supportsGuestLinksWithPassword: boolean;
   domain: string;
 };
 
@@ -245,6 +247,7 @@ export class APIClient extends EventEmitter {
       federationEndpoints: backendVersion > 0,
       isFederated: responsePayload?.federation || false,
       supportsMLS: backendVersion >= 4,
+      supportsGuestLinksWithPassword: backendVersion >= 4,
     };
   }
 
