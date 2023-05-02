@@ -527,7 +527,7 @@ export class ConversationRepository {
       this.conversationService.loadConversationStatesFromDb<ConversationDatabaseData>(),
       remoteConversationsPromise,
     ]);
-    return this.handleRemoteConversationsPromise(remoteConversations, localConversations);
+    return this.loadRemoteConversations(remoteConversations, localConversations);
   }
 
   /**
@@ -536,18 +536,17 @@ export class ConversationRepository {
    */
   public async loadMissingConversations(): Promise<Conversation[]> {
     const missingConversations = this.conversationState.missingConversations;
-    if (missingConversations.length) {
-      const remoteConversationsPromise = await this.conversationService
-        .getConversationByIds(missingConversations)
-        .catch(error => {
-          this.logger.error(`Failed to get all conversations from backend: ${error.message}`);
-          return {found: [], failed: missingConversations} as RemoteConversations;
-        });
-      missingConversations.splice(0, missingConversations.length);
-      return this.handleRemoteConversationsPromise(remoteConversationsPromise);
+    if (!missingConversations.length) {
+      return this.conversationState.conversations();
     }
-
-    return this.conversationState.conversations();
+    const remoteConversations = await this.conversationService
+      .getConversationByIds(missingConversations)
+      .catch(error => {
+        this.logger.error(`Failed to get all conversations from backend: ${error.message}`);
+        return {found: [], failed: missingConversations} as RemoteConversations;
+      });
+    missingConversations.splice(0, missingConversations.length);
+    return this.loadRemoteConversations(remoteConversations);
   }
 
   /**
@@ -556,7 +555,7 @@ export class ConversationRepository {
    * @param localConversations conversations locally stored in database, but not in memory. Omitted after first loading of the app
    * @returns the new conversations from backend merged with the locally stored conversations
    */
-  private async handleRemoteConversationsPromise(
+  private async loadRemoteConversations(
     remoteConversations: RemoteConversations,
     localConversations: ConversationDatabaseData[] = [],
   ): Promise<Conversation[]> {
