@@ -20,7 +20,6 @@
 import {FC, useCallback, useEffect, useMemo, useState} from 'react';
 
 import cx from 'classnames';
-import {container} from 'tsyringe';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
@@ -29,7 +28,6 @@ import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {RadioGroup} from 'Components/Radio';
 import {SelectText} from 'Components/SelectText';
 import {BaseToggle} from 'Components/toggle/BaseToggle';
-import {Core} from 'src/script/service/CoreSingleton';
 import {copyText} from 'Util/ClipboardUtil';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -57,10 +55,8 @@ interface GuestOptionsProps {
   isRequestOngoing?: boolean;
   isTeamStateGuestLinkEnabled?: boolean;
   isToggleDisabled?: boolean;
-  core?: Core;
+  isPasswordSupported?: boolean;
 }
-
-const MINIMUM_BACKEND_VERSION_FOR_GUEST_LINKS_WITH_PASSWORD = 3;
 
 const GuestOptions: FC<GuestOptionsProps> = ({
   activeConversation,
@@ -71,15 +67,13 @@ const GuestOptions: FC<GuestOptionsProps> = ({
   isRequestOngoing = false,
   isTeamStateGuestLinkEnabled = false,
   isToggleDisabled = false,
-  core = container.resolve(Core),
+  isPasswordSupported = false,
 }) => {
   const [isLinkCopied, setIsLinkCopied] = useState<boolean>(false);
   const [conversationHasGuestLinkEnabled, setConversationHasGuestLinkEnabled] = useState<boolean>(false);
   const [optionPasswordSecured, setOptionPasswordSecured] = useState<PasswordPreference>(
     PasswordPreference.PASSWORD_SECURED,
   );
-  const backendApiVersion = core.backendFeatures.version;
-  const isPasswordSupported = backendApiVersion > MINIMUM_BACKEND_VERSION_FOR_GUEST_LINKS_WITH_PASSWORD;
   const {accessCode, accessCodeHasPassword, hasGuest, inTeam, isGuestAndServicesRoom, isGuestRoom, isServicesRoom} =
     useKoSubscribableChildren(activeConversation, [
       'accessCode',

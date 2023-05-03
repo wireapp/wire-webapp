@@ -46,6 +46,7 @@ import {isReadableMessage} from '../../guards/Message';
 import {isUserEntity, isUserServiceEntity} from '../../guards/Panel';
 import {isServiceEntity} from '../../guards/Service';
 import {ServiceEntity} from '../../integration/ServiceEntity';
+import {Core} from '../../service/CoreSingleton';
 import {TeamState} from '../../team/TeamState';
 import {UserState} from '../../user/UserState';
 import {ActionsViewModel} from '../../view_model/ActionsViewModel';
@@ -87,6 +88,7 @@ interface RightSidebarProps {
   userState: UserState;
   isFederated: boolean;
   lastViewedMessageDetailsEntity: Message | null;
+  core?: Core;
 }
 
 const RightSidebar: FC<RightSidebarProps> = ({
@@ -97,6 +99,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
   userState,
   isFederated,
   lastViewedMessageDetailsEntity,
+  core,
 }) => {
   const {
     conversation: conversationRepository,
@@ -257,6 +260,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
 
           {(currentState === PanelState.GUEST_OPTIONS || currentState === PanelState.SERVICES_OPTIONS) && (
             <GuestServicesOptions
+              isPasswordSupported={core?.backendFeatures.supportsGuestLinksWithPassword}
               isGuest={currentState === PanelState.GUEST_OPTIONS}
               activeConversation={activeConversation}
               conversationRepository={conversationRepository}
