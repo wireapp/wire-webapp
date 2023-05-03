@@ -156,11 +156,13 @@ const OAuthPermissionsComponent = ({
               {_(oauthStrings.logout)}
             </Link>
 
-            <Text css={{marginBottom: '24px'}}>{_(oauthStrings.subhead, {app: oAuthApp?.application_name})}</Text>
+            <Text data-uie-name="oauth-permissions-requester" css={{marginBottom: '24px'}}>
+              {_(oauthStrings.subhead, {app: oAuthApp?.application_name})}
+            </Text>
 
             {oauthParams.scope.length > 1 && (
               <Box css={boxCSS}>
-                <ul css={listCSS}>
+                <ul css={listCSS} data-uie-name="oauth-permissions-list">
                   {oauthScope.map((scope, index) => (
                     <li key={index} css={{textAlign: 'start'}}>
                       <Text>{_(oauthStrings[scope])}</Text>
