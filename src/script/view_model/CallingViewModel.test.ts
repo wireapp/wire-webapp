@@ -23,7 +23,7 @@ import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {CALL_TYPE, CONV_TYPE, STATE} from '@wireapp/avs';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {
   buildCall,
@@ -74,7 +74,7 @@ describe('CallingViewModel', () => {
   describe('startCall', () => {
     it('starts a call directly if no call is ongoing', async () => {
       const callingViewModel = buildCallingViewModel();
-      const conversation = new Conversation(createRandomUuid());
+      const conversation = new Conversation(createUuid());
       await callingViewModel.callActions.startAudio(conversation);
       expect(mockCallingRepository.startCall).toHaveBeenCalledWith(conversation, CALL_TYPE.NORMAL);
     });

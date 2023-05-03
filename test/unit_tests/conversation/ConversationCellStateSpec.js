@@ -26,13 +26,13 @@ import {PingMessage} from 'src/script/entity/message/PingMessage';
 import {Text} from 'src/script/entity/message/Text';
 import {User} from 'src/script/entity/User';
 import {t} from 'Util/LocalizerUtil';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 describe('ConversationCellState', () => {
   describe('Notification state icon', () => {
-    const conversationEntity = new Conversation(createRandomUuid());
+    const conversationEntity = new Conversation(createUuid());
 
-    const selfUserEntity = new User(createRandomUuid());
+    const selfUserEntity = new User(createUuid());
     selfUserEntity.isMe = true;
     selfUserEntity.inTeam(true);
     conversationEntity.selfUser(selfUserEntity);
@@ -67,9 +67,9 @@ describe('ConversationCellState', () => {
       selfReplies: [],
     };
 
-    const conversationEntity = new Conversation(createRandomUuid());
+    const conversationEntity = new Conversation(createUuid());
 
-    const selfUserEntity = new User(createRandomUuid());
+    const selfUserEntity = new User(createUuid());
     selfUserEntity.isMe = true;
     selfUserEntity.inTeam(true);
     conversationEntity.selfUser(selfUserEntity);

@@ -2,7 +2,7 @@
 
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,17 +19,26 @@
  *
  */
 
-const fs = require('fs-extra');
 const path = require('path');
+const {writeFileSync} = require('fs');
 const {execSync} = require('child_process');
 
-const distFolder = 'dist';
-let commitSHA = 'unknown';
+function generateVersion() {
+  return new Date()
+    .toISOString()
+    .replace(/[T\-:]/g, '.')
+    .replace(/\.\d+Z/, '');
+}
 
-try {
-  commitSHA = execSync('git rev-parse HEAD')
-    .toString()
-    .trim();
-} catch (error) {}
+function generateCommmitHash() {
+  try {
+    return execSync('git rev-parse HEAD').toString().trim();
+  } catch (error) {
+    return 'unknown';
+  }
+}
 
-fs.outputFileSync(path.resolve(distFolder, 'commit'), commitSHA);
+writeFileSync(
+  path.resolve(__dirname, '../dist/config/version.json'),
+  JSON.stringify({version: generateVersion(), commit: generateCommmitHash()}),
+);

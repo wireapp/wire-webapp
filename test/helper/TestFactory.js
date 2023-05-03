@@ -48,7 +48,6 @@ import {EventService} from 'src/script/event/EventService';
 import {EventServiceNoCompound} from 'src/script/event/EventServiceNoCompound';
 import {NotificationService} from 'src/script/event/NotificationService';
 import {MediaRepository} from 'src/script/media/MediaRepository';
-import {NotificationRepository} from 'src/script/notification/NotificationRepository';
 import {PermissionRepository} from 'src/script/permission/PermissionRepository';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {PropertiesService} from 'src/script/properties/PropertiesService';
@@ -174,6 +173,11 @@ export class TestFactory {
     this.user_service = new UserService(this.storage_service);
     this.propertyRepository = new PropertiesRepository(new PropertiesService(), new SelfService());
 
+    const userState = new UserState();
+    const selfUser = new User('self-id');
+    selfUser.isMe = true;
+    userState.users([selfUser]);
+
     this.user_repository = new UserRepository(
       this.user_service,
       this.assetRepository,
@@ -181,10 +185,8 @@ export class TestFactory {
       this.client_repository,
       serverTimeHandler,
       this.propertyRepository,
-      new UserState(),
+      userState,
     );
-
-    this.user_repository['userState'].self(this.client_repository.selfUser());
 
     return this.user_repository;
   }
@@ -302,24 +304,6 @@ export class TestFactory {
     );
 
     return this.calling_repository;
-  }
-
-  /**
-   * @returns {Promise<NotificationRepository>} The repository for system notifications.
-   */
-  async exposeNotificationActors() {
-    await this.exposeConversationActors();
-    await this.exposeCallingActors();
-
-    this.notification_repository = new NotificationRepository(
-      this.conversation_repository,
-      new PermissionRepository(),
-      this.user_repository['userState'],
-      this.conversation_repository['conversationState'],
-      this.calling_repository['callState'],
-    );
-
-    return this.notification_repository;
   }
 
   /**

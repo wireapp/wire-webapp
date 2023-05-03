@@ -19,17 +19,18 @@
 
 import {UserAsset, UserAssetType} from '@wireapp/api-client/lib/user';
 
-import {ACCENT_ID, Config} from 'src/script/Config';
+import {Availability} from '@wireapp/protocol-messaging';
+
+import {ACCENT_ID} from 'src/script/Config';
 import {User} from 'src/script/entity/User';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 import {entities, payload} from 'test/api/payloads';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {UserMapper} from './UserMapper';
 
 describe('User Mapper', () => {
-  const userState: any = {self: () => ({domain: 'local.test'})};
-  const mapper = new UserMapper(serverTimeHandler, userState);
+  const mapper = new UserMapper(serverTimeHandler);
 
   let self_user_payload: any = null;
 
@@ -39,7 +40,7 @@ describe('User Mapper', () => {
 
   describe('mapUserFromJson', () => {
     it('can convert JSON into a single user entity', () => {
-      const user_et = mapper.mapUserFromJson(self_user_payload);
+      const user_et = mapper.mapUserFromJson(self_user_payload, '');
 
       expect(user_et.email()).toBe('jd@wire.com');
       expect(user_et.name()).toBe('John Doe');
@@ -52,13 +53,15 @@ describe('User Mapper', () => {
       ['local.test', false],
       ['federated.test', true],
     ])('can detect if a user is a federated user (%s)', (domain, expected) => {
-      spyOn(Config, 'getConfig').and.returnValue({FEATURE: {ENABLE_FEDERATION: true}});
-      const user = mapper.mapUserFromJson({
-        id: 'id',
-        locale: '',
-        name: 'user',
-        qualified_id: {domain: domain, id: 'id'},
-      });
+      const user = mapper.mapUserFromJson(
+        {
+          id: 'id',
+          locale: '',
+          name: 'user',
+          qualified_id: {domain: domain, id: 'id'},
+        },
+        'local.test',
+      );
 
       expect(user.isFederated).toBe(expected);
     });
@@ -66,16 +69,16 @@ describe('User Mapper', () => {
     // @SF.Federation @SF.Separation @TSFI.UserInterface @S0.2
     it('Detects that user is not in the team if teamId is the same but domain is different', () => {
       const teamId = 'team1';
-      spyOn(Config, 'getConfig').and.returnValue({FEATURE: {ENABLE_FEDERATION: true}});
-      spyOn(userState, 'self').and.returnValue({domain: 'domain.test', teamId: teamId});
 
-      const user = mapper.mapSelfUserFromJson({
-        id: 'id',
-        locale: '',
-        name: 'guest',
-        qualified_id: {domain: 'otherdomain.test', id: 'id'},
-        team: teamId,
-      });
+      const user = mapper.mapUserFromJson(
+        {
+          id: 'id',
+          name: 'guest',
+          qualified_id: {domain: 'otherdomain.test', id: 'id'},
+          team: teamId,
+        },
+        'local.domain',
+      );
 
       expect(user.isFederated).toBe(true);
       expect(user.inTeam()).toBe(false);
@@ -84,14 +87,14 @@ describe('User Mapper', () => {
     it('can convert users with profile images marked as non public', () => {
       self_user_payload.picture[0].info.public = false;
       self_user_payload.picture[1].info.public = false;
-      const user_et = mapper.mapUserFromJson(self_user_payload);
+      const user_et = mapper.mapUserFromJson(self_user_payload, '');
 
       expect(user_et.name()).toBe('John Doe');
     });
 
     it('will return default accent color if null/undefined', () => {
       self_user_payload.accent_id = null;
-      const user_et = mapper.mapUserFromJson(self_user_payload);
+      const user_et = mapper.mapUserFromJson(self_user_payload, '');
 
       expect(user_et.name()).toBe('John Doe');
       expect(user_et.accent_id()).toBe(ACCENT_ID.BLUE);
@@ -99,7 +102,7 @@ describe('User Mapper', () => {
 
     it('will return default accent color if backend returns 0', () => {
       self_user_payload.accent_id = 0;
-      const user_et = mapper.mapUserFromJson(self_user_payload);
+      const user_et = mapper.mapUserFromJson(self_user_payload, '');
 
       expect(user_et.name()).toBe('John Doe');
       expect(user_et.joaatHash).toBe(526273169);
@@ -122,7 +125,7 @@ describe('User Mapper', () => {
 
   describe('mapUsersFromJson', () => {
     it('can convert JSON into multiple user entities', () => {
-      const user_ets = mapper.mapUsersFromJson(payload.users.get.many);
+      const user_ets = mapper.mapUsersFromJson(payload.users.get.many, '');
 
       expect(user_ets.length).toBe(2);
       expect(user_ets[0].email()).toBe('jd@wire.com');
@@ -130,14 +133,14 @@ describe('User Mapper', () => {
     });
 
     it('returns an empty array if input was undefined', () => {
-      const user_ets = mapper.mapUsersFromJson(undefined);
+      const user_ets = mapper.mapUsersFromJson(undefined, '');
 
       expect(user_ets).toBeDefined();
       expect(user_ets.length).toBe(0);
     });
 
     it('returns an empty array if input was an empty array', () => {
-      const user_ets = mapper.mapUsersFromJson([]);
+      const user_ets = mapper.mapUsersFromJson([], '');
 
       expect(user_ets).toBeDefined();
       expect(user_ets.length).toBe(0);
@@ -149,7 +152,7 @@ describe('User Mapper', () => {
       const user_et = new User();
       user_et.id = entities.user.john_doe.id;
       const data = {accent_id: 1, id: entities.user.john_doe.id};
-      const updated_user_et = mapper.updateUserFromObject(user_et, data);
+      const updated_user_et = mapper.updateUserFromObject(user_et, data, '');
 
       expect(updated_user_et.accent_id()).toBe(ACCENT_ID.BLUE);
     });
@@ -158,7 +161,7 @@ describe('User Mapper', () => {
       const user_et = new User();
       user_et.id = entities.user.john_doe.id;
       const data = {id: entities.user.john_doe.id, name: entities.user.jane_roe.name};
-      const updated_user_et = mapper.updateUserFromObject(user_et, data);
+      const updated_user_et = mapper.updateUserFromObject(user_et, data, '');
 
       expect(updated_user_et.name()).toBe(entities.user.jane_roe.name);
     });
@@ -167,7 +170,7 @@ describe('User Mapper', () => {
       const user_et = new User();
       user_et.id = entities.user.john_doe.id;
       const data = {handle: entities.user.jane_roe.handle, id: entities.user.john_doe.id};
-      const updated_user_et = mapper.updateUserFromObject(user_et, data);
+      const updated_user_et = mapper.updateUserFromObject(user_et, data, '');
 
       expect(updated_user_et.username()).toBe(entities.user.jane_roe.handle);
     });
@@ -184,7 +187,7 @@ describe('User Mapper', () => {
       });
 
       const data = {expires_at: expirationDate.toISOString(), id: userEntity.id};
-      mapper.updateUserFromObject(userEntity, data);
+      mapper.updateUserFromObject(userEntity, data, '');
 
       expect(mapper['serverTimeHandler'].toLocalTimestamp).not.toHaveBeenCalledWith();
       mapper['serverTimeHandler'].timeOffset(10);
@@ -196,9 +199,19 @@ describe('User Mapper', () => {
       const user_et = new User();
       user_et.id = entities.user.john_doe.id;
       const data = {id: entities.user.jane_roe.id, name: entities.user.jane_roe.name};
-      const functionCall = () => mapper.updateUserFromObject(user_et, data);
+      const functionCall = () => mapper.updateUserFromObject(user_et, data, '');
 
       expect(functionCall).toThrow();
+    });
+
+    it.each([
+      [Availability.Type.AVAILABLE, Availability.Type.NONE],
+      [Availability.Type.NONE, Availability.Type.AVAILABLE],
+    ])('updates the availability (from %s to %s)', (from, to) => {
+      const user = new User();
+      user.availability(from);
+      mapper.updateUserFromObject(user, {availability: to}, '');
+      expect(user.availability()).toBe(to);
     });
 
     it('can update user with v3 assets', () => {
@@ -206,13 +219,13 @@ describe('User Mapper', () => {
       user_et.id = entities.user.john_doe.id;
       const data = {
         assets: [
-          {key: createRandomUuid(), size: UserAssetType.PREVIEW, type: 'image' as UserAsset['type']},
-          {key: createRandomUuid(), size: UserAssetType.COMPLETE, type: 'image' as UserAsset['type']},
+          {key: createUuid(), size: UserAssetType.PREVIEW, type: 'image' as UserAsset['type']},
+          {key: createUuid(), size: UserAssetType.COMPLETE, type: 'image' as UserAsset['type']},
         ],
         id: entities.user.john_doe.id,
         name: entities.user.jane_roe.name,
       };
-      const updated_user_et = mapper.updateUserFromObject(user_et, data);
+      const updated_user_et = mapper.updateUserFromObject(user_et, data, '');
 
       expect(updated_user_et.previewPictureResource()).toBeDefined();
       expect(updated_user_et.mediumPictureResource()).toBeDefined();

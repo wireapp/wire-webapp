@@ -24,7 +24,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import en from 'I18n/en-US.json';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {setStrings} from 'Util/LocalizerUtil';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {PartialFailureToSendWarning, User} from './PartialFailureToSend';
 
@@ -32,7 +32,7 @@ setStrings({en});
 function generateUsers(nbUsers: number, domain: string) {
   const users: User[] = [];
   for (let i = 0; i < nbUsers; i++) {
-    users.push({qualifiedId: {id: createRandomUuid(), domain}, username: () => `User ${i}`});
+    users.push({qualifiedId: {id: createUuid(), domain}, username: () => `User ${i}`});
   }
   return users;
 }
@@ -49,7 +49,7 @@ function generateUserClients(users: User[]): QualifiedUserClients {
 function generateQualifiedIds(nbUsers: number, domain: string) {
   const users: QualifiedId[] = [];
   for (let i = 0; i < nbUsers; i++) {
-    users.push({id: createRandomUuid(), domain});
+    users.push({id: createUuid(), domain});
   }
   return users;
 }
@@ -218,5 +218,36 @@ describe('PartialFailureToSendWarning', () => {
     });
 
     expect(getByText('Show details')).not.toBeNull();
+  });
+
+  it('does not display an unreachable user warning if there are no unreachable users', () => {
+    const namedUsers = generateUsers(2, 'domain1');
+    const queued = generateUserClients(namedUsers);
+
+    const failed = [] as QualifiedId[];
+
+    const {getByText, container} = render(
+      withTheme(<PartialFailureToSendWarning knownUsers={namedUsers} failedToSend={{queued, failed}} />),
+    );
+    act(() => {
+      getByText('Show details').click();
+    });
+
+    expect(container.textContent).not.toContain(`won't get your message`);
+  });
+
+  it('does not display a named user warning if there are no named users', () => {
+    const failed = [...generateQualifiedIds(2, 'domain2')];
+
+    const queued = {} as QualifiedUserClients;
+
+    const {getByText, container} = render(
+      withTheme(<PartialFailureToSendWarning knownUsers={[]} failedToSend={{queued, failed}} />),
+    );
+    act(() => {
+      getByText('Show details').click();
+    });
+
+    expect(container.textContent).not.toContain(`will get your message later`);
   });
 });

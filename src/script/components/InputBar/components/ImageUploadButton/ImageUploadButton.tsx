@@ -26,7 +26,7 @@ import {t} from 'Util/LocalizerUtil';
 
 interface ImageUploadButtonProps {
   onSelectImages: (files: File[]) => void;
-  acceptedImageTypes: string[];
+  acceptedImageTypes: ReadonlyArray<string>;
 }
 
 export const ImageUploadButton = ({onSelectImages, acceptedImageTypes}: ImageUploadButtonProps) => {

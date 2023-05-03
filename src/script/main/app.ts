@@ -79,7 +79,7 @@ import {IntegrationRepository} from '../integration/IntegrationRepository';
 import {IntegrationService} from '../integration/IntegrationService';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {MediaRepository} from '../media/MediaRepository';
-import {initMLSConversations, registerUninitializedConversations} from '../mls';
+import {initMLSCallbacks, initMLSConversations, registerUninitializedSelfAndTeamConversations} from '../mls';
 import {NotificationRepository} from '../notification/NotificationRepository';
 import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
 import {PermissionRepository} from '../permission/PermissionRepository';
@@ -334,6 +334,7 @@ export class App {
    */
   async initApp(clientType: ClientType, onProgress: (progress: number, message?: string) => void) {
     // add body information
+    const startTime = Date.now();
     const [apiVersionMin, apiVersionMax] = this.config.SUPPORTED_API_RANGE;
     await this.core.useAPIVersion(apiVersionMin, apiVersionMax, this.config.ENABLE_DEV_BACKEND_API);
 
@@ -398,12 +399,13 @@ export class App {
       const connections = await connectionRepository.getConnections();
       telemetry.addStatistic(AppInitStatisticsValue.CONNECTIONS, connections.length, 50);
 
-      await userRepository.loadUsers(selfUser, connections, teamMembers);
+      const conversations = await conversationRepository.loadConversations();
 
-      const conversationEntities = await conversationRepository.loadConversations();
+      await userRepository.loadUsers(selfUser, connections, conversations, teamMembers);
 
       if (supportsMLS()) {
-        await initMLSConversations(conversationEntities, selfUser, this.core, this.repository.conversation);
+        //if mls is supported, we need to initialize the callbacks (they are used when decrypting messages)
+        await initMLSCallbacks(this.core, this.repository.conversation);
       }
 
       if (connections.length) {
@@ -411,7 +413,7 @@ export class App {
       }
 
       onProgress(25, t('initReceivedUserData'));
-      telemetry.addStatistic(AppInitStatisticsValue.CONVERSATIONS, conversationEntities.length, 50);
+      telemetry.addStatistic(AppInitStatisticsValue.CONVERSATIONS, conversations.length, 50);
       this._subscribeToUnloadEvents();
 
       await conversationRepository.conversationRoleRepository.loadTeamRoles();
@@ -427,8 +429,13 @@ export class App {
       const notificationsCount = eventRepository.notificationsTotal;
 
       if (supportsMLS()) {
-        // Once all the messages have been processed and the message sending queue freed we can now add the potential `self` and `team` conversations
-        await registerUninitializedConversations(conversationEntities, selfUser, clientEntity().id, this.core);
+        // Once all the messages have been processed and the message sending queue freed we can now:
+
+        //join all the mls groups we're member of and have not yet joined (eg. we were not send welcome message)
+        await initMLSConversations(conversations, this.core);
+
+        //add the potential `self` and `team` conversations
+        await registerUninitializedSelfAndTeamConversations(conversations, selfUser, clientEntity().id, this.core);
       }
 
       telemetry.timeStep(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
@@ -461,8 +468,7 @@ export class App {
       callingRepository.setReady();
       telemetry.timeStep(AppInitTimingsStep.APP_LOADED);
 
-      const loadTime = telemetry.report();
-      this.logger.info(`App loaded within ${loadTime}s`);
+      this.logger.info(`App loaded in ${Date.now() - startTime}ms`);
 
       return selfUser;
     } catch (error) {

@@ -24,7 +24,7 @@ import {Availability} from '@wireapp/protocol-messaging';
 import {Participant} from 'src/script/calling/Participant';
 import {User} from 'src/script/entity/User';
 import {ROLE} from 'src/script/user/UserPermission';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {CallParticipantsListItem} from './CallParticipantsListItem';
 
@@ -45,7 +45,7 @@ const createMockParticipant = ({
   isExternal?: boolean;
   isAudioEstablished?: boolean;
 }) => {
-  const user = new User(createRandomUuid());
+  const user = new User(createUuid());
   user.name('user');
   user.isMe = isSelfUser;
   user.isGuest(isGuest);
@@ -62,7 +62,7 @@ const createMockParticipant = ({
     user.availability(availability);
   }
 
-  const clientId = createRandomUuid();
+  const clientId = createUuid();
   const participant = new Participant(user, clientId);
 
   participant.isAudioEstablished(isAudioEstablished);

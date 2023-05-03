@@ -25,13 +25,13 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Notification, PreferenceNotificationRepository} from 'src/script/notification/PreferenceNotificationRepository';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {ClientEntity} from '../client/ClientEntity';
 import {User} from '../entity/User';
 
 describe('PreferenceNotificationRepository', () => {
-  const user = new User(createRandomUuid(), null);
+  const user = new User(createUuid(), null);
   const userObservable = ko.observable(user);
 
   beforeEach(() => {
@@ -84,7 +84,7 @@ describe('PreferenceNotificationRepository', () => {
     const preferenceNotificationRepository = new PreferenceNotificationRepository(userObservable);
     const newClientData = new ClientEntity(true, '');
 
-    amplify.publish(WebAppEvents.USER.CLIENT_ADDED, {domain: '', id: createRandomUuid()}, newClientData);
+    amplify.publish(WebAppEvents.USER.CLIENT_ADDED, {domain: '', id: createUuid()}, newClientData);
 
     expect(preferenceNotificationRepository.notifications().length).toBe(0);
   });

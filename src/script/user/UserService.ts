@@ -49,6 +49,23 @@ export class UserService {
     return this.storageService.getAll<UserRecord>(this.USER_STORE_NAME);
   }
 
+  /**
+   * Will remove all the non-qualified entries in the DB
+   */
+  async clearNonQualifiedUsers(): Promise<UserRecord[]> {
+    const keys = await this.storageService.readAllPrimaryKeys(this.USER_STORE_NAME);
+    const nonQualifiedKeys = keys.filter(key => !key.includes('@'));
+    const deletedEntries = [];
+    for (const key of nonQualifiedKeys) {
+      const entry = await this.storageService.load<UserRecord>(this.USER_STORE_NAME, key);
+      if (entry) {
+        deletedEntries.push(entry);
+        await this.storageService.delete(this.USER_STORE_NAME, key);
+      }
+    }
+    return deletedEntries;
+  }
+
   async removeUserFromDb(user: {id: string; domain: string}): Promise<void> {
     const primaryKey = constructUserPrimaryKey(user);
     await this.storageService.delete(this.USER_STORE_NAME, primaryKey);
@@ -66,7 +83,11 @@ export class UserService {
 
   async updateUser(userId: QualifiedId, updates: Partial<UserRecord>) {
     const primaryKey = constructUserPrimaryKey(userId);
-    await this.storageService.update(this.USER_STORE_NAME, primaryKey, updates);
+    const hasBeenUpdated = await this.storageService.update(this.USER_STORE_NAME, primaryKey, updates);
+    if (!hasBeenUpdated) {
+      // If the user could not be found, create an entry for it
+      await this.storageService.save(this.USER_STORE_NAME, primaryKey, {id: userId.id, ...updates});
+    }
   }
 
   //##############################################################################

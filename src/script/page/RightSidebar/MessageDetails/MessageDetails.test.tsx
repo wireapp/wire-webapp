@@ -21,7 +21,7 @@ import {render, waitFor} from '@testing-library/react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {Conversation} from 'src/script/entity/Conversation';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {MessageDetails} from './MessageDetails';
 
@@ -70,10 +70,10 @@ describe('MessageDetails', () => {
     const timestamp = new Date('2022-01-21T15:08:14.225Z').getTime();
     const userName = 'Jan Kowalski';
 
-    const user = new User(createRandomUuid());
+    const user = new User(createUuid());
     user.name(userName);
 
-    const message = new ContentMessage(createRandomUuid());
+    const message = new ContentMessage(createUuid());
     message.timestamp(timestamp);
     message.user(user);
 

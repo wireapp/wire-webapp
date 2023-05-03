@@ -224,7 +224,11 @@ const AppMain: FC<AppMainProps> = ({
             )}
 
             {(!smBreakpoint || !isLeftSidebarVisible) && (
-              <MainContent isRightSidebarOpen={!!currentState} openRightSidebar={toggleRightSidebar} />
+              <MainContent
+                selfUser={selfUser}
+                isRightSidebarOpen={!!currentState}
+                openRightSidebar={toggleRightSidebar}
+              />
             )}
 
             {currentState && (
@@ -250,7 +254,7 @@ const AppMain: FC<AppMainProps> = ({
           />
 
           <LegalHoldModal
-            userState={userState}
+            selfUser={selfUser}
             conversationRepository={repositories.conversation}
             searchRepository={repositories.search}
             teamRepository={repositories.team}

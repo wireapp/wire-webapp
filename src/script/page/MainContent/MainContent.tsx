@@ -29,6 +29,7 @@ import {HistoryExport} from 'Components/HistoryExport';
 import {HistoryImport} from 'Components/HistoryImport';
 import {Icon} from 'Components/Icon';
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
+import {User} from 'src/script/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {incomingCssClass, removeAnimationsClass} from 'Util/util';
@@ -60,19 +61,21 @@ const Animated: FC<{children: ReactNode}> = ({children, ...rest}) => (
 interface MainContentProps {
   openRightSidebar: (panelState: PanelState, params: RightSidebarParams, compareEntityId?: boolean) => void;
   isRightSidebarOpen?: boolean;
+  selfUser: User;
   conversationState?: ConversationState;
 }
 
 const MainContent: FC<MainContentProps> = ({
   openRightSidebar,
   isRightSidebarOpen = false,
+  selfUser,
   conversationState = container.resolve(ConversationState),
 }) => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const mainViewModel = useContext(RootContext);
 
-  const teamState = container.resolve(TeamState);
   const userState = container.resolve(UserState);
+  const teamState = container.resolve(TeamState);
   const {showRequestModal} = useLegalHoldModalState();
 
   const {contentState, isShowingConversation} = useAppState();
@@ -193,7 +196,7 @@ const MainContent: FC<MainContentProps> = ({
                   resetSession={(userId, device, conversation) =>
                     repositories.message.resetSession(userId, device.id, conversation)
                   }
-                  userState={container.resolve(UserState)}
+                  userState={userState}
                   verifyDevice={(userId, device, verified) =>
                     repositories.client.verifyClient(userId, device, verified)
                   }
@@ -234,12 +237,12 @@ const MainContent: FC<MainContentProps> = ({
             )}
 
             {contentState === ContentState.HISTORY_EXPORT && (
-              <HistoryExport user={userState.self()} switchContent={switchContent} />
+              <HistoryExport user={selfUser} switchContent={switchContent} />
             )}
 
             {contentState === ContentState.HISTORY_IMPORT && uploadedFile && (
               <HistoryImport
-                user={userState.self()}
+                user={selfUser}
                 file={uploadedFile}
                 backupRepository={repositories.backup}
                 switchContent={switchContent}

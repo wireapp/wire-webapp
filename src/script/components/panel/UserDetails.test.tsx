@@ -20,7 +20,7 @@
 import {render} from '@testing-library/react';
 
 import {t} from 'Util/LocalizerUtil';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {UserDetails} from './UserDetails';
 
@@ -31,7 +31,7 @@ describe('UserDetails', () => {
   it('renders the correct infos for a user', () => {
     const name = 'test-name';
     const userName = 'test-user-name';
-    const participant = new User(createRandomUuid());
+    const participant = new User(createUuid());
     participant.name(name);
     participant.username(userName);
 
@@ -55,7 +55,7 @@ describe('UserDetails', () => {
   });
 
   it('shows a verified icon when all clients from the self user are verified and all clients of the other participant are verified', () => {
-    const otherParticipant = new User(createRandomUuid());
+    const otherParticipant = new User(createUuid());
     const verifiedClient = new ClientEntity(false, null);
     verifiedClient.meta.isVerified?.(true);
     otherParticipant.devices.push(verifiedClient);
@@ -70,7 +70,7 @@ describe('UserDetails', () => {
 
   it('renders the badge for a user', () => {
     const badge = 'badgeText';
-    const participant = new User(createRandomUuid());
+    const participant = new User(createUuid());
 
     const props = {
       badge,
@@ -87,7 +87,7 @@ describe('UserDetails', () => {
 
   it('renders the badge for a guest', () => {
     const expirationText = '1h remaining';
-    const participant = new User(createRandomUuid());
+    const participant = new User(createUuid());
     participant.isGuest(true);
     participant.name("I'm a guest");
     participant.isTemporaryGuest(true);
@@ -107,7 +107,7 @@ describe('UserDetails', () => {
   });
 
   it('renders the placeholder avatar for a user that could not be loaded', () => {
-    const participant = new User(createRandomUuid());
+    const participant = new User(createUuid());
     participant.name('');
 
     const props = {

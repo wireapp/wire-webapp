@@ -685,7 +685,6 @@
   "messageFailedToSendWillReceivePlural": "получит ваше сообщение позднее.",
   "messageFailedToSendWillReceiveSingular": "получит ваше сообщение позднее.",
   "messageWillNotBeSent": "Не удалось отправить файл из-за проблем с подключением.",
-  "messageWillNotBeSentDiscard": "Отменить",
   "mlsToggleInfo": "При включении в беседе будет использоваться новый протокол безопасности уровня обмена сообщениями (MLS).",
   "mlsToggleName": "MLS",
   "modalAccountCreateAction": "OK",

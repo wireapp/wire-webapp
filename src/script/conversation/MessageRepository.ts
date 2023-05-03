@@ -49,7 +49,8 @@ import {roundLogarithmic} from 'Util/NumberUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {createRandomUuid, loadUrlBlob, supportsMLS} from 'Util/util';
+import {loadUrlBlob, supportsMLS} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {findDeletedClients} from './ClientMismatchUtil';
 import {ConversationRepository} from './ConversationRepository';
@@ -336,7 +337,7 @@ export class MessageRepository {
       quote: quoteEntity,
       // We set the id explicitely in order to be able to override the message if we generate a link preview
       // Similarly, we provide that same id when we retry to send a failed message in order to override the original
-      messageId: messageId ?? createRandomUuid(),
+      messageId: messageId ?? createUuid(),
     };
     const {state} = await this.sendText(textPayload);
     if (state !== MessageSendingState.CANCELED) {
@@ -374,7 +375,7 @@ export class MessageRepository {
       conversation,
       mentions,
       message: textMessage,
-      messageId: createRandomUuid(), // We set the id explicitely in order to be able to override the message if we generate a link preview
+      messageId: createUuid(), // We set the id explicitely in order to be able to override the message if we generate a link preview
       originalMessageId: originalMessage.id,
     };
     const {state} = await this.sendEdit(messagePayload);
@@ -1108,7 +1109,7 @@ export class MessageRepository {
     const protoAvailability = new Availability({type: protoFromType(availability)});
     const genericMessage = new GenericMessage({
       [GenericMessageType.AVAILABILITY]: protoAvailability,
-      messageId: createRandomUuid(),
+      messageId: createUuid(),
     });
 
     const sortedUsers = this.userState

@@ -31,7 +31,7 @@ import {User} from 'src/script/entity/User';
 import {MediaDevicesHandler} from 'src/script/media/MediaDevicesHandler';
 import {TeamState} from 'src/script/team/TeamState';
 import {CallActions} from 'src/script/view_model/CallingViewModel';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {CallingCell, CallingCellProps} from './CallingCell';
 
@@ -43,7 +43,7 @@ jest.mock('Components/utils/InViewport', () => ({
   __esModule: true,
 }));
 
-const createCall = (state: CALL_STATE, selfUser = new User(createRandomUuid()), selfClientId = createRandomUuid()) => {
+const createCall = (state: CALL_STATE, selfUser = new User(createUuid()), selfClientId = createUuid()) => {
   const selfParticipant = new Participant(selfUser, selfClientId);
   const call = new Call({domain: '', id: ''}, {domain: '', id: ''}, 0, selfParticipant, CALL_TYPE.NORMAL, {
     currentAvailableDeviceId: {

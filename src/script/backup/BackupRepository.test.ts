@@ -18,11 +18,14 @@
  */
 
 import {container} from 'tsyringe';
+import {omit} from 'underscore';
 
-import {createRandomUuid, noop} from 'Util/util';
+import {generateAPIUser} from 'test/helper/UserGenerator';
+import {noop} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 import {WebWorker} from 'Util/worker';
 
-import {BackupRepository} from './BackupRepository';
+import {BackupRepository, Filename} from './BackupRepository';
 import {BackupService} from './BackupService';
 import {CancelError, DifferentAccountError, IncompatibleBackupError, IncompatiblePlatformError} from './Error';
 import {handleZipEvent} from './zipWorker';
@@ -100,8 +103,8 @@ describe('BackupRepository', () => {
       jest.useFakeTimers();
       const freezedTime = new Date();
       jest.setSystemTime(freezedTime);
-      const userId = createRandomUuid();
-      const clientId = createRandomUuid();
+      const userId = createUuid();
+      const clientId = createUuid();
 
       const metaDescription = backupRepository.createMetaData(new User(userId), clientId);
 
@@ -136,8 +139,10 @@ describe('BackupRepository', () => {
 
       await backupRepository.importHistory(new User('user1'), blob, noop, noop);
 
-      expect(importSpy).toHaveBeenCalledWith(eventStoreName, [textEvent]);
-      expect(importSpy).not.toHaveBeenCalledWith(eventStoreName, [verificationEvent]);
+      expect(importSpy).toHaveBeenCalledWith(eventStoreName, [omit(textEvent, 'primary_key')], {
+        generateId: expect.any(Function),
+      });
+      expect(importSpy).not.toHaveBeenCalledWith(eventStoreName, [verificationEvent], expect.any(Object));
     });
 
     it('cancels export', async () => {
@@ -147,12 +152,10 @@ describe('BackupRepository', () => {
         storageService.save('conversations', conversationId, conversation),
       ]);
 
-      jest.spyOn(backupRepository, 'isCanceled', 'get').mockReturnValue(true);
+      const exportPromise = backupRepository.generateHistory(new User(), 'client1', noop);
       backupRepository.cancelAction();
 
-      await expect(backupRepository.generateHistory(new User(), 'client1', noop)).rejects.toThrow(
-        jasmine.any(CancelError),
-      );
+      await expect(exportPromise).rejects.toThrow(jasmine.any(CancelError));
     });
   });
 
@@ -182,7 +185,7 @@ describe('BackupRepository', () => {
       const meta = {...backupRepository.createMetaData(new User('user1'), 'client1'), ...metaChanges};
 
       const files = {
-        [BackupRepository.CONFIG.FILENAME.METADATA]: JSON.stringify(meta),
+        [Filename.METADATA]: JSON.stringify(meta),
       };
       const zip = (await handleZipEvent({type: 'zip', files})) as Uint8Array;
 
@@ -193,14 +196,16 @@ describe('BackupRepository', () => {
       const [backupRepository, {backupService, conversationRepository}] = await buildBackupRepository();
       const user = new User('user1');
       jest.spyOn(backupService, 'getDatabaseVersion').mockReturnValue(15);
-      jest.spyOn(backupService, 'importEntities').mockResolvedValue(undefined);
+      const importSpy = jest.spyOn(backupService, 'importEntities').mockResolvedValue(1);
+      const users = [generateAPIUser(), generateAPIUser()];
 
       const metadata = {...backupRepository.createMetaData(user, 'client1'), version: 15};
 
       const files = {
-        [BackupRepository.CONFIG.FILENAME.METADATA]: JSON.stringify(metadata),
-        [BackupRepository.CONFIG.FILENAME.CONVERSATIONS]: JSON.stringify([conversation]),
-        [BackupRepository.CONFIG.FILENAME.EVENTS]: JSON.stringify(messages),
+        [Filename.METADATA]: JSON.stringify(metadata),
+        [Filename.CONVERSATIONS]: JSON.stringify([conversation]),
+        [Filename.EVENTS]: JSON.stringify(messages),
+        [Filename.USERS]: JSON.stringify(users),
       };
 
       const zip = (await handleZipEvent({type: 'zip', files})) as Uint8Array;
@@ -208,7 +213,15 @@ describe('BackupRepository', () => {
       await backupRepository.importHistory(user, zip, noop, noop);
 
       expect(conversationRepository.updateConversationStates).toHaveBeenCalledWith([conversation]);
-      expect(backupService.importEntities).toHaveBeenCalledWith(StorageSchemata.OBJECT_STORE.EVENTS, messages);
+      expect(importSpy).toHaveBeenCalledWith(
+        StorageSchemata.OBJECT_STORE.EVENTS,
+        messages.map(message => omit(message, 'primary_key')),
+        {generateId: expect.any(Function)},
+      );
+
+      expect(importSpy).toHaveBeenCalledWith(StorageSchemata.OBJECT_STORE.USERS, users, {
+        generatePrimaryKey: expect.any(Function),
+      });
     });
   });
 });

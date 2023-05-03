@@ -685,7 +685,6 @@
   "messageFailedToSendWillReceivePlural": "will get your message later.",
   "messageFailedToSendWillReceiveSingular": "will get your message later.",
   "messageWillNotBeSent": "File could not be sent due to connectivity issues.",
-  "messageWillNotBeSentDiscard": "Discard",
   "mlsToggleInfo": "When this is on, conversation will use the new messaging layer security (MLS) protocol.",
   "mlsToggleName": "MLS",
   "modalAccountCreateAction": "U redu",

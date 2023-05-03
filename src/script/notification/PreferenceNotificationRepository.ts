@@ -67,9 +67,9 @@ export class PreferenceNotificationRepository {
   }
 
   /**
-   * @param selfUserObservable an observable that contains the self user
+   * @param selfUser an observable that contains the self user
    */
-  constructor(selfUserObservable: ko.Observable<User>) {
+  constructor(selfUser: ko.Subscribable<User>) {
     const notificationsStorageKey = PreferenceNotificationRepository.CONFIG.STORAGE_KEY;
     const storedNotifications = loadValue<string>(notificationsStorageKey);
     this.notifications = ko.observableArray(storedNotifications ? JSON.parse(storedNotifications) : []);
@@ -80,7 +80,7 @@ export class PreferenceNotificationRepository {
     });
 
     amplify.subscribe(WebAppEvents.USER.CLIENT_ADDED, (user: QualifiedId, clientEntity?: ClientEntity) => {
-      if (clientEntity && !clientEntity.isLegalHold() && matchQualifiedIds(user, selfUserObservable())) {
+      if (clientEntity && !clientEntity.isLegalHold() && matchQualifiedIds(user, selfUser())) {
         const {id, domain, type, time, model} = clientEntity;
         this.notifications.push({
           data: {domain, id, model, time, type},
@@ -89,7 +89,7 @@ export class PreferenceNotificationRepository {
       }
     });
     amplify.subscribe(WebAppEvents.USER.CLIENT_REMOVED, (user: QualifiedId, clientId: string) => {
-      if (matchQualifiedIds(user, selfUserObservable())) {
+      if (matchQualifiedIds(user, selfUser())) {
         this.onClientRemove(user.id, clientId, user.domain);
       }
     });

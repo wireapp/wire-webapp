@@ -36,7 +36,7 @@ import {
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
-import {flatten} from 'underscore';
+import {flatten, uniq} from 'underscore';
 
 import type {AccentColor} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
@@ -66,6 +66,7 @@ import {ClientMapper} from '../client/ClientMapper';
 import {Config} from '../Config';
 import type {ConnectionEntity} from '../connection/ConnectionEntity';
 import {flattenUserClientsQualifiedIds} from '../conversation/userClientsUtils';
+import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {UserError} from '../error/UserError';
 import {USER} from '../event/Client';
@@ -75,6 +76,14 @@ import type {PropertiesRepository} from '../properties/PropertiesRepository';
 import type {SelfService} from '../self/SelfService';
 import {UserRecord} from '../storage';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
+
+type GetUserOptions = {
+  /**
+   * will only lookup for users that are in memory (will avoid a backend request in case the user is not found locally)
+   * Note that it will return a user considered `deleted` if the user is not found in memory
+   */
+  localOnly?: boolean;
+};
 
 function generateQualifiedId(userData: {id: string; qualified_id?: QualifiedId; domain?: string}): QualifiedId {
   if (userData.qualified_id) {
@@ -128,7 +137,6 @@ export class UserRepository {
     amplify.subscribe(WebAppEvents.CLIENT.UPDATE, this.updateClientsFromUser);
     amplify.subscribe(WebAppEvents.USER.SET_AVAILABILITY, this.setAvailability);
     amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent);
-    amplify.subscribe(WebAppEvents.USER.PERSIST, this.saveUserInDb);
     amplify.subscribe(WebAppEvents.USER.UPDATE, this.refreshUser);
   }
 
@@ -180,10 +188,29 @@ export class UserRepository {
 
   /**
    * Will load all the users in memory (and save new users to the database).
+   * @param selfUser the user currently logged in (will be excluded from fetch)
+   * @param connections the connection to other users
+   * @param conversations the conversation the user is part of (used to compute extra users that are part of those conversations but not directly connected to the user)
+   * @param extraUsers other users that would need to be loaded (team users usually that are not direct connections)
    */
-  async loadUsers(selfUser: User, connections: ConnectionEntity[], extraUsers: QualifiedId[]): Promise<User[]> {
-    const users = connections.map(connectionEntity => connectionEntity.userId).concat(extraUsers);
-    // TODO migrate old user entries that only have availability
+  async loadUsers(
+    selfUser: User,
+    connections: ConnectionEntity[],
+    conversations: Conversation[],
+    extraUsers: QualifiedId[],
+  ): Promise<User[]> {
+    const conversationMembers = flatten(conversations.map(conversation => conversation.participating_user_ids()));
+    const allUserIds = connections
+      .map(connectionEntity => connectionEntity.userId)
+      .concat(conversationMembers)
+      .concat(extraUsers);
+    const users = uniq(allUserIds, false, (userId: QualifiedId) => userId.id);
+
+    // Remove all users that have non-qualified Ids in DB (there could be duplicated entries one qualified and one non-qualified)
+    // we want to get rid of the ambiguous entries
+    // the entries we get back will be used to feed the availabilities of those users
+    const nonQualifiedUsers = await this.userService.clearNonQualifiedUsers();
+
     const dbUsers = await this.userService.loadUserFromDb();
     /* prior to April 2023, we were only storing the availability in the DB, we need to refetch those users */
     const [localUsers, incompleteUsers] = partition(dbUsers, user => !!user.qualified_id);
@@ -194,20 +221,25 @@ export class UserRepository {
       localUser => !users.find(user => matchQualifiedIds(user, localUser.qualified_id)),
     );
 
-    // Remove users that are not linked to any loaded users
-    orphanUsers.forEach(async user => {
-      await this.userService.removeUserFromDb(user.qualified_id);
-    });
+    for (const orphanUser of orphanUsers) {
+      // Remove users that are not linked to any loaded users
+      await this.userService.removeUserFromDb(orphanUser.qualified_id);
+    }
 
-    const missingUsers = users
-      .filter(user => !liveUsers.find(localUser => matchQualifiedIds(user, localUser.qualified_id)))
-      // we add the users that are locally incomplete
-      .concat(incompleteUsers.map((user: any) => ({id: user.id, domain: user.domain})));
+    const missingUsers = users.filter(
+      user =>
+        // The self user doesn't need to be re-fetched
+        !matchQualifiedIds(selfUser.qualifiedId, user) &&
+        !liveUsers.find(localUser => matchQualifiedIds(user, localUser.qualified_id)),
+    );
 
-    const {found, failed} = await this.fetchRawUsers(missingUsers);
+    const {found, failed} = await this.fetchRawUsers(missingUsers, selfUser.domain);
 
     const userWithAvailability = found.map(user => {
-      const availability = incompleteUsers.find(incompleteUser => incompleteUser.id === user.id);
+      const availability = incompleteUsers
+        .concat(nonQualifiedUsers)
+        .find(incompleteUser => incompleteUser.id === user.id);
+
       if (availability) {
         return {availability: availability.availability, ...user};
       }
@@ -226,6 +258,13 @@ export class UserRepository {
         user.connection(connection);
       }
     });
+
+    // Map self user's availability status
+    const {availability: selfUserAvailability} =
+      dbUsers.concat(nonQualifiedUsers).find(user => user.id === selfUser.id) ?? {};
+    if (selfUserAvailability !== undefined) {
+      await this.updateUser(selfUser.qualifiedId, {availability: selfUserAvailability});
+    }
 
     this.userState.users([selfUser, ...mappedUsers]);
     return mappedUsers;
@@ -273,7 +312,7 @@ export class UserRepository {
       user.name = fixWebsocketString(user.name);
     }
 
-    this.userMapper.updateUserFromObject(userEntity, user);
+    this.userMapper.updateUserFromObject(userEntity, user, selfUser.domain);
     // Update the database record
     await this.userService.updateUser(userEntity.qualifiedId, user);
     if (isSelfUser) {
@@ -413,13 +452,17 @@ export class UserRepository {
     });
   };
 
-  private readonly setAvailability = (availability: Availability.Type): void => {
-    const hasAvailabilityChanged = availability !== this.userState.self().availability();
+  private readonly setAvailability = async (availability: Availability.Type): Promise<void> => {
+    const selfUser = this.userState.self();
+    if (!selfUser) {
+      return;
+    }
+    const hasAvailabilityChanged = availability !== selfUser.availability();
     const newAvailabilityValue = valueFromType(availability);
     if (hasAvailabilityChanged) {
-      const oldAvailabilityValue = valueFromType(this.userState.self().availability());
+      const oldAvailabilityValue = valueFromType(selfUser.availability());
       this.logger.log(`Availability was changed from '${oldAvailabilityValue}' to '${newAvailabilityValue}'`);
-      this.userState.self().availability(availability);
+      await this.updateUser(selfUser.qualifiedId, {availability});
       amplify.publish(WebAppEvents.TEAM.UPDATE_INFO);
       showAvailabilityModal(availability);
     } else {
@@ -478,24 +521,17 @@ export class UserRepository {
     }
   }
 
-  /**
-   * Get a user from the backend.
-   */
-  private async fetchUser(userId: QualifiedId): Promise<User> {
-    const [userEntity] = await this.fetchUsers([userId]);
-    return userEntity;
-  }
-
-  private async fetchRawUsers(userIds: QualifiedId[]): Promise<{found: APIClientUser[]; failed: QualifiedId[]}> {
+  private async fetchRawUsers(
+    userIds: QualifiedId[],
+    defaultDomain: string,
+  ): Promise<{found: APIClientUser[]; failed: QualifiedId[]}> {
     const chunksOfUserIds = chunk<QualifiedId>(
       userIds.filter(({id}) => !!id),
       Config.getConfig().MAXIMUM_USERS_PER_REQUEST,
     );
 
     const getChunk = async (chunkOfUserIds: QualifiedId[]) => {
-      const selfDomain = this.userState.self().domain;
-
-      const chunkOfQualifiedUserIds = chunkOfUserIds.map(({id, domain}) => ({domain: domain || selfDomain, id}));
+      const chunkOfQualifiedUserIds = chunkOfUserIds.map(({id, domain}) => ({domain: domain || defaultDomain, id}));
 
       try {
         const {found, failed = [], not_found = []} = await this.userService.getUsers(chunkOfQualifiedUserIds);
@@ -528,7 +564,7 @@ export class UserRepository {
       /* When a federated backend is unreachable, we generate placeholder users locally with some default values */
       userId => new User(userId.id, userId.domain),
     );
-    const mappedUsers = this.userMapper.mapUsersFromJson(found).concat(failedToLoad);
+    const mappedUsers = this.userMapper.mapUsersFromJson(found, this.userState.self().domain).concat(failedToLoad);
     if (this.userState.isTeam()) {
       this.mapGuestStatus(mappedUsers);
     }
@@ -542,7 +578,7 @@ export class UserRepository {
    * @param raw - if true, the users will not be mapped to User entities
    */
   private async fetchUsers(userIds: QualifiedId[]): Promise<User[]> {
-    const {found, failed} = await this.fetchRawUsers(userIds);
+    const {found, failed} = await this.fetchRawUsers(userIds, this.userState.self().domain);
     const users = this.mapUserResponse(found, failed);
     let fetchedUserEntities = this.saveUsers(users);
     // If there is a difference then we most likely have a case with a suspended user
@@ -601,27 +637,36 @@ export class UserRepository {
     return userData;
   }
 
+  private async fetchUser(userId: QualifiedId): Promise<User> {
+    const [userEntity] = await this.fetchUsers([userId]);
+    return userEntity;
+  }
+
   /**
    * Check for user locally and fetch it from the server otherwise.
    */
-  async getUserById(userId: QualifiedId): Promise<User> {
-    let user = this.findUserById(userId);
-    if (!user) {
-      try {
-        user = await this.fetchUser(userId);
-      } catch (error) {
-        const isNotFound = error.type === UserError.TYPE.USER_NOT_FOUND;
-        if (!isNotFound) {
-          this.logger.warn(
-            `Failed to find user with ID '${userId.id}' and domain '${userId.domain}': ${error.message}`,
-            error,
-          );
-        }
-        throw error;
-      }
+  async getUserById(userId: QualifiedId, {localOnly}: GetUserOptions = {}): Promise<User> {
+    const user = this.findUserById(userId);
+    if (user) {
+      return user;
     }
-
-    return user;
+    if (localOnly) {
+      const deletedUser = new User(userId.id, userId.domain);
+      deletedUser.isDeleted = true;
+      return deletedUser;
+    }
+    try {
+      return this.fetchUser(userId);
+    } catch (error) {
+      const isNotFound = error.type === UserError.TYPE.USER_NOT_FOUND;
+      if (!isNotFound) {
+        this.logger.warn(
+          `Failed to find user with ID '${userId.id}' and domain '${userId.domain}': ${error.message}`,
+          error,
+        );
+      }
+      throw error;
+    }
   }
 
   async getUserByHandle(fqn: QualifiedHandle): Promise<undefined | APIClientUser> {
@@ -642,7 +687,7 @@ export class UserRepository {
   /**
    * Check for users locally and fetch them from the server otherwise.
    */
-  async getUsersById(userIds: QualifiedId[] = [], offline: boolean = false): Promise<User[]> {
+  async getUsersById(userIds: QualifiedId[] = [], {localOnly}: GetUserOptions = {}): Promise<User[]> {
     if (!userIds.length) {
       return [];
     }
@@ -653,7 +698,7 @@ export class UserRepository {
       QualifiedId[],
     ];
 
-    if (offline || !unknownUserIds.length) {
+    if (localOnly || !unknownUserIds.length) {
       return knownUserEntities;
     }
 
@@ -674,7 +719,6 @@ export class UserRepository {
     if (!user) {
       if (isMe) {
         userEntity.isMe = true;
-        this.userState.self(userEntity);
       }
       this.userState.users.push(userEntity);
     }
@@ -700,7 +744,7 @@ export class UserRepository {
   };
 
   async refreshUsers(userIds: QualifiedId[]) {
-    const {found: users} = await this.userService.getUsers(userIds);
+    const {found: users} = await this.fetchRawUsers(userIds, this.userState.self().domain);
     return users.map(user => this.updateSavedUser(user));
   }
 
@@ -710,7 +754,7 @@ export class UserRepository {
    */
   private updateSavedUser(user: APIClientUser): User {
     const localUserEntity = this.findUserById(generateQualifiedId(user)) ?? new User();
-    const updatedUser = this.userMapper.updateUserFromObject(localUserEntity, user);
+    const updatedUser = this.userMapper.updateUserFromObject(localUserEntity, user, this.userState.self().domain);
     // TODO update the user in db
     if (this.userState.isTeam()) {
       this.mapGuestStatus([updatedUser]);

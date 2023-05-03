@@ -21,7 +21,8 @@ import {fireEvent, render} from '@testing-library/react';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {createRandomUuid, noop} from 'Util/util';
+import {noop} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {GroupList} from './GroupList';
 
@@ -37,16 +38,16 @@ const getGroupItemById = (container: HTMLElement, id: string) =>
   container.querySelector(`[data-uie-name="item-group"][data-uie-uid="${id}"]`);
 
 describe('GroupList', () => {
-  const createGroupConversation = (name: string, id = createRandomUuid()) => {
+  const createGroupConversation = (name: string, id = createUuid()) => {
     const conversation = new Conversation(id);
     const userIds: QualifiedId[] = [
       {
         domain: '',
-        id: createRandomUuid(),
+        id: createUuid(),
       },
       {
         domain: '',
-        id: createRandomUuid(),
+        id: createUuid(),
       },
     ];
     const users = userIds.map(userId => new User(userId.id, userId.domain));
@@ -55,7 +56,7 @@ describe('GroupList', () => {
     return conversation;
   };
 
-  const create1on1Conversation = (name: string, id = createRandomUuid()) => {
+  const create1on1Conversation = (name: string, id = createUuid()) => {
     const conversation = createGroupConversation(name, id);
     conversation.type(CONVERSATION_TYPE.ONE_TO_ONE);
     return conversation;

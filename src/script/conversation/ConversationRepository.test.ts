@@ -50,7 +50,7 @@ import {EventRepository} from 'src/script/event/EventRepository';
 import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
 import {StorageSchemata} from 'src/script/storage/StorageSchemata';
 import {escapeRegex} from 'Util/SanitizationUtil';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {ConversationRepository} from './ConversationRepository';
 
@@ -68,7 +68,7 @@ const _generateConversation = (
   conversationProtocol = ConversationProtocol.PROTEUS,
   domain = '',
 ) => {
-  const conversation = new Conversation(createRandomUuid(), domain, conversationProtocol);
+  const conversation = new Conversation(createUuid(), domain, conversationProtocol);
   conversation.type(conversation_type);
 
   const connectionEntity = new ConnectionEntity();
@@ -91,7 +91,7 @@ describe('ConversationRepository', () => {
   let self_user_et;
   let server: sinon.SinonFakeServer;
   let storage_service: StorageService;
-  const messageSenderId = createRandomUuid();
+  const messageSenderId = createUuid();
 
   const _findConversation = (conversation: Conversation, conversations: () => Conversation[]) => {
     return ko.utils.arrayFirst(conversations(), _conversation => _conversation.id === conversation.id);
@@ -350,7 +350,7 @@ describe('ConversationRepository', () => {
       const selfUser = generateUser();
       spyOn(testFactory.conversation_repository['userState'], 'self').and.returnValue(selfUser);
 
-      const conversation = new Conversation(createRandomUuid());
+      const conversation = new Conversation(createUuid());
       const messageWithoutTime = {
         conversation: `${conversation.id}`,
         data: {content: 'Hello World :)', nonce: 'aeac8355-739b-4dfc-a119-891a52c6a8dc'},
@@ -463,11 +463,12 @@ describe('ConversationRepository', () => {
         conversation: conversationEntity.id,
         data: {},
         from: messageSenderId,
-        id: createRandomUuid(),
+        id: createUuid(),
         time: '2017-09-06T09:43:36.528Z',
         type: 'conversation.message-add',
       };
 
+      jest.spyOn(testFactory.user_repository, 'getUserById').mockResolvedValue(new User());
       spyOn(testFactory.conversation_repository, 'addMissingMember').and.returnValue(
         Promise.resolve(conversationEntity),
       );
@@ -574,8 +575,8 @@ describe('ConversationRepository', () => {
 
       it("shows a failed message on the sender's side if the upload fails", () => {
         const selfUser = generateUser();
-        const conversation_id = createRandomUuid();
-        const message_id = createRandomUuid();
+        const conversation_id = createUuid();
+        const message_id = createUuid();
         const sending_user_id = selfUser.id;
         spyOn(testFactory.conversation_repository['userState'], 'self').and.returnValue(selfUser);
         spyOn(Config, 'getConfig').and.returnValue({
@@ -640,12 +641,12 @@ describe('ConversationRepository', () => {
       beforeEach(() => {
         spyOn(testFactory.conversation_repository as any, 'onCreate').and.callThrough();
         spyOn(testFactory.conversation_repository, 'mapConversations').and.returnValue([
-          new Conversation(createRandomUuid()),
+          new Conversation(createUuid()),
         ]);
         spyOn(testFactory.conversation_repository, 'updateParticipatingUserEntities').and.returnValue(true);
         spyOn(testFactory.conversation_repository as any, 'saveConversation').and.returnValue(false);
 
-        conversationId = createRandomUuid();
+        conversationId = createUuid();
         createEvent = {
           conversation: conversationId,
           data: {
@@ -761,7 +762,7 @@ describe('ConversationRepository', () => {
       it('should add other self clients to mls group if user was event creator', () => {
         const mockDomain = 'example.com';
         const mockSelfClientId = 'self-client-id';
-        const selfUser = generateUser({id: createRandomUuid(), domain: mockDomain});
+        const selfUser = generateUser({id: createUuid(), domain: mockDomain});
 
         const conversationEntity = _generateConversation(
           CONVERSATION_TYPE.REGULAR,
@@ -824,7 +825,7 @@ describe('ConversationRepository', () => {
       beforeEach(() => {
         conversation_et = _generateConversation(CONVERSATION_TYPE.REGULAR);
         return testFactory.conversation_repository['saveConversation'](conversation_et).then(() => {
-          message_et = new Message(createRandomUuid());
+          message_et = new Message(createUuid());
           message_et.from = selfUser.id;
           conversation_et.addMessage(message_et);
 
@@ -843,8 +844,8 @@ describe('ConversationRepository', () => {
             message_id: message_et.id,
             time: '',
           },
-          from: createRandomUuid(),
-          id: createRandomUuid(),
+          from: createUuid(),
+          id: createUuid(),
           qualified_conversation: {domain: '', id: conversation_et.id},
           time: new Date().toISOString(),
           type: ClientEvent.CONVERSATION.MESSAGE_DELETE,
@@ -873,7 +874,7 @@ describe('ConversationRepository', () => {
             time: '',
           },
           from: selfUser.id,
-          id: createRandomUuid(),
+          id: createUuid(),
           qualified_conversation: {domain: '', id: conversation_et.id},
           time: new Date().toISOString(),
           type: ClientEvent.CONVERSATION.MESSAGE_DELETE,
@@ -891,7 +892,7 @@ describe('ConversationRepository', () => {
 
       it('should delete message and add delete message if user is not self', () => {
         spyOn(testFactory.event_service, 'deleteEvent');
-        const other_user_id = createRandomUuid();
+        const other_user_id = createUuid();
         message_et.from = other_user_id;
 
         const message_delete_event: DeleteEvent = {
@@ -902,7 +903,7 @@ describe('ConversationRepository', () => {
             time: '',
           },
           from: other_user_id,
-          id: createRandomUuid(),
+          id: createUuid(),
           qualified_conversation: {domain: '', id: conversation_et.id},
           time: new Date().toISOString(),
           type: ClientEvent.CONVERSATION.MESSAGE_DELETE,
@@ -920,7 +921,7 @@ describe('ConversationRepository', () => {
 
       it('should delete message and skip adding delete message for ephemeral messages', () => {
         spyOn(testFactory.event_service, 'deleteEvent');
-        const other_user_id = createRandomUuid();
+        const other_user_id = createUuid();
         message_et.from = other_user_id;
         message_et.ephemeral_expires(true);
 
@@ -932,7 +933,7 @@ describe('ConversationRepository', () => {
             time: '',
           },
           from: other_user_id,
-          id: createRandomUuid(),
+          id: createUuid(),
           qualified_conversation: {domain: '', id: conversation_et.id},
           time: new Date().toISOString(),
           type: ClientEvent.CONVERSATION.MESSAGE_DELETE,
@@ -957,7 +958,7 @@ describe('ConversationRepository', () => {
         conversation_et = _generateConversation(CONVERSATION_TYPE.REGULAR);
 
         return testFactory.conversation_repository['saveConversation'](conversation_et).then(() => {
-          const messageToHideEt = new Message(createRandomUuid());
+          const messageToHideEt = new Message(createUuid());
           conversation_et.addMessage(messageToHideEt);
 
           messageId = messageToHideEt.id;
@@ -972,8 +973,8 @@ describe('ConversationRepository', () => {
             conversation_id: conversation_et.id,
             message_id: messageId,
           },
-          from: createRandomUuid(),
-          id: createRandomUuid(),
+          from: createUuid(),
+          id: createUuid(),
           qualified_conversation: selfConversation.qualifiedId,
           time: new Date().toISOString(),
           type: ClientEvent.CONVERSATION.MESSAGE_HIDDEN,
@@ -999,7 +1000,7 @@ describe('ConversationRepository', () => {
             message_id: messageId,
           },
           from: selfUser.id,
-          id: createRandomUuid(),
+          id: createUuid(),
           qualified_conversation: selfConversation.qualifiedId,
           time: new Date().toISOString(),
           type: ClientEvent.CONVERSATION.MESSAGE_HIDDEN,
@@ -1018,13 +1019,13 @@ describe('ConversationRepository', () => {
       it('should not hide message if not send via self conversation', async () => {
         spyOn(testFactory.event_service, 'deleteEvent');
         const messageHiddenEvent: MessageHiddenEvent = {
-          conversation: createRandomUuid(),
+          conversation: createUuid(),
           data: {
             conversation_id: conversation_et.id,
             message_id: messageId,
           },
           from: selfUser.id,
-          id: createRandomUuid(),
+          id: createUuid(),
           qualified_conversation: {domain: '', id: conversation_et.id},
           time: new Date().toISOString(),
           type: ClientEvent.CONVERSATION.MESSAGE_HIDDEN,
@@ -1043,9 +1044,9 @@ describe('ConversationRepository', () => {
 
       it('syncs message deletion with the database', () => {
         const deletedMessagePayload = {
-          conversation: createRandomUuid(),
+          conversation: createUuid(),
           from: '',
-          id: createRandomUuid(),
+          id: createUuid(),
           time: '',
           type: CONVERSATION_EVENT.DELETE,
         };
@@ -1194,7 +1195,7 @@ describe('ConversationRepository', () => {
 
   describe('addMissingMember', () => {
     it('injects a member-join event if unknown user is detected', () => {
-      const conversationId = createRandomUuid();
+      const conversationId = createUuid();
       const event = {conversation: conversationId, from: 'unknown-user-id'};
       spyOn(testFactory.conversation_repository, 'getConversationById').and.returnValue(Promise.resolve({}));
       spyOn(EventBuilder, 'buildMemberJoin').and.returnValue(event);

@@ -18,13 +18,13 @@
  */
 
 import {ClientType} from '@wireapp/api-client/lib/client/';
+import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
 import {RecursivePartial} from '@wireapp/commons/lib/util/TypeUtil';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import type {APIClient} from '@wireapp/api-client';
 import type {TypeUtil} from '@wireapp/commons';
 
-import {BackendError} from './BackendError';
 import {AuthActionCreator} from './creator/';
 
 import {mockStoreFactory} from '../../util/test/mockStoreFactory';
@@ -85,7 +85,7 @@ describe('AuthAction', () => {
     const spies = {
       doInitializeClient: jasmine
         .createSpy()
-        .and.returnValue(() => Promise.reject({label: BackendError.LABEL.TOO_MANY_CLIENTS})),
+        .and.returnValue(() => Promise.reject({label: BackendErrorLabel.TOO_MANY_CLIENTS})),
       fetchSelf: jasmine.createSpy().and.returnValue(() => Promise.resolve()),
       generateClientPayload: jasmine.createSpy().and.returnValue({}),
       setLocalStorage: jasmine.createSpy().and.returnValue(() => Promise.resolve()),
@@ -118,7 +118,7 @@ describe('AuthAction', () => {
     await expect(
       store.dispatch(actionRoot.authAction.doLoginPlain({clientType: ClientType.PERMANENT, email, password})),
     ).rejects.toMatchObject({
-      label: BackendError.LABEL.TOO_MANY_CLIENTS,
+      label: BackendErrorLabel.TOO_MANY_CLIENTS,
     });
     expect(store.getActions()).toEqual([AuthActionCreator.startLogin(), AuthActionCreator.successfulLogin()]);
     expect(spies.doInitializeClient.calls.count()).toEqual(1);
@@ -235,10 +235,7 @@ describe('AuthAction', () => {
 
   it('handles failed request for phone login code (not found)', async () => {
     const error = {response: {status: HTTP_STATUS.NOT_FOUND}};
-    const expectedNotFoundError = new BackendError({
-      code: HTTP_STATUS.NOT_FOUND,
-      label: BackendError.SSO_ERRORS.SSO_NOT_FOUND,
-    });
+    const expectedNotFoundError = new BackendError('', BackendErrorLabel.NOT_FOUND, HTTP_STATUS.NOT_FOUND);
     const ssoCode = 'wire-uuid';
     const mockedApiClient = {
       api: {
@@ -257,10 +254,8 @@ describe('AuthAction', () => {
 
   it('handles failed request for phone login code (server error)', async () => {
     const error = {response: {status: HTTP_STATUS.INTERNAL_SERVER_ERROR}};
-    const expectedServerError = new BackendError({
-      code: HTTP_STATUS.INTERNAL_SERVER_ERROR,
-      label: BackendError.SSO_ERRORS.SSO_SERVER_ERROR,
-    });
+    const expectedServerError = new BackendError('', BackendErrorLabel.SERVER_ERROR, HTTP_STATUS.INTERNAL_SERVER_ERROR);
+
     const ssoCode = 'wire-uuid';
     const mockedApiClient = {
       api: {
@@ -279,10 +274,12 @@ describe('AuthAction', () => {
 
   it('handles failed request for phone login code (generic error)', async () => {
     const error = {response: {status: HTTP_STATUS.FORBIDDEN}};
-    const expectedGenericError = new BackendError({
-      code: HTTP_STATUS.INTERNAL_SERVER_ERROR,
-      label: BackendError.SSO_ERRORS.SSO_GENERIC_ERROR,
-    });
+    const expectedGenericError = new BackendError(
+      '',
+      SyntheticErrorLabel.SSO_GENERIC_ERROR,
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+    );
+
     const ssoCode = 'wire-uuid';
     const mockedApiClient = {
       api: {

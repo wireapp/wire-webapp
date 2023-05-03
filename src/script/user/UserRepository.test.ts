@@ -21,6 +21,7 @@ import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
+import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {entities} from 'test/api/payloads';
@@ -183,8 +184,6 @@ describe('UserRepository', () => {
     });
 
     describe('saveUser', () => {
-      afterEach(() => userState.users.removeAll());
-
       it('saves a user', () => {
         const user = new User(entities.user.jane_roe.id);
 
@@ -207,11 +206,12 @@ describe('UserRepository', () => {
 
     describe('loadUsers', () => {
       const localUsers = [generateAPIUser(), generateAPIUser(), generateAPIUser()];
-      //const connections = [new ConnectionEntity()];
       beforeEach(async () => {
         jest.resetAllMocks();
-        userState.users.removeAll();
         jest.spyOn(userRepository['userService'], 'loadUserFromDb').mockResolvedValue(localUsers);
+        const selfUser = new User('self');
+        selfUser.isMe = true;
+        userState.users([selfUser]);
       });
 
       it('loads all users from backend if no users are stored locally', async () => {
@@ -220,7 +220,7 @@ describe('UserRepository', () => {
         const userIds = users.map(user => user.qualified_id!);
         const fetchUserSpy = jest.spyOn(userRepository['userService'], 'getUsers').mockResolvedValue({found: newUsers});
 
-        await userRepository.loadUsers(new User(), [], userIds);
+        await userRepository.loadUsers(new User('self'), [], [], userIds);
 
         expect(userState.users()).toHaveLength(users.length + 1);
         expect(fetchUserSpy).toHaveBeenCalledWith(newUsers.map(user => user.qualified_id!));
@@ -230,10 +230,31 @@ describe('UserRepository', () => {
         const userIds = localUsers.map(user => user.qualified_id!);
         const fetchUserSpy = jest.spyOn(userRepository['userService'], 'getUsers').mockResolvedValue({found: []});
 
-        await userRepository.loadUsers(new User(), [], userIds);
+        await userRepository.loadUsers(new User('self'), [], [], userIds);
 
         expect(userState.users()).toHaveLength(localUsers.length + 1);
         expect(fetchUserSpy).not.toHaveBeenCalled();
+      });
+
+      it('loads users that are partially stored in the DB and maps availability', async () => {
+        const userIds = localUsers.map(user => user.qualified_id!);
+        const partialUsers = [
+          {id: userIds[0].id, availability: Availability.Type.AVAILABLE},
+          {id: userIds[1].id, availability: Availability.Type.BUSY},
+        ];
+
+        jest.spyOn(userRepository['userService'], 'loadUserFromDb').mockResolvedValue(partialUsers as any);
+        const fetchUserSpy = jest
+          .spyOn(userRepository['userService'], 'getUsers')
+          .mockResolvedValue({found: localUsers});
+
+        await userRepository.loadUsers(new User('self'), [], [], userIds);
+
+        expect(userState.users()).toHaveLength(localUsers.length + 1);
+        expect(fetchUserSpy).toHaveBeenCalledWith(userIds);
+
+        const userWithAvailability = userState.users().filter(user => user.availability() !== Availability.Type.NONE);
+        expect(userWithAvailability).toHaveLength(partialUsers.length);
       });
 
       it('deletes users that are not needed', async () => {
@@ -242,7 +263,7 @@ describe('UserRepository', () => {
         const removeUserSpy = jest.spyOn(userRepository['userService'], 'removeUserFromDb').mockResolvedValue();
         jest.spyOn(userRepository['userService'], 'getUsers').mockResolvedValue({found: newUsers});
 
-        await userRepository.loadUsers(new User(), [], userIds);
+        await userRepository.loadUsers(new User(), [], [], userIds);
 
         expect(userState.users()).toHaveLength(newUsers.length + 1);
         expect(removeUserSpy).toHaveBeenCalledTimes(localUsers.length);
@@ -257,7 +278,6 @@ describe('UserRepository', () => {
       let userJohnDoe: User;
 
       beforeEach(() => {
-        userState.users.removeAll();
         userJaneRoe = new User(entities.user.jane_roe.id);
         userJohnDoe = new User(entities.user.john_doe.id);
 
@@ -272,8 +292,6 @@ describe('UserRepository', () => {
 
         spyOn(testFactory.client_repository!, 'getAllClientsFromDb').and.returnValue(Promise.resolve(recipients));
       });
-
-      afterEach(() => userState.users.removeAll());
 
       it('assigns all available clients to the users', () => {
         return userRepository.assignAllClients().then(() => {
@@ -337,6 +355,7 @@ describe('UserRepository', () => {
       const userService = userRepository['userService'];
       const user = new User(entities.user.jane_roe.id);
       user.name('initial name');
+      user.isMe = true;
       userRepository['saveUser'](user);
 
       jest.spyOn(userService, 'getUsers').mockResolvedValue({found: [entities.user.jane_roe]});
