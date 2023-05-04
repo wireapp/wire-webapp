@@ -60,7 +60,7 @@ export const roleToPermissions = (role: string): Permissions => {
       return combinePermissions([Permissions.CREATE_CONVERSATION, Permissions.GET_TEAM_CONVERSATIONS]);
     }
     default: {
-      return 0;
+      return Permissions.DEFAULT;
     }
   }
 };

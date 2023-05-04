@@ -18,6 +18,7 @@
  */
 
 export enum Permissions {
+  DEFAULT = 0,
   CREATE_CONVERSATION = 1 << 0,
   DELETE_CONVERSATION = 1 << 1,
   ADD_TEAM_MEMBER = 1 << 2,
@@ -39,5 +40,5 @@ export const hasPermissions = (permissions: Permissions, expectedPermissions: Pe
 };
 
 export const combinePermissions = (permissionList: Permissions[]): Permissions => {
-  return permissionList.reduce((acc, permission) => acc | permission, 0);
+  return permissionList.reduce<number>((acc, permission) => acc | permission, 0);
 };
