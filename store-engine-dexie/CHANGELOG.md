@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.1.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/store-engine-dexie@2.0.5...@wireapp/store-engine-dexie@2.1.0) (2023-05-04)
+
+### Features
+
+* update typescript ([#5115](https://github.com/wireapp/wire-web-packages/issues/5115)) ([f1f39de](https://github.com/wireapp/wire-web-packages/commit/f1f39dee4d5985980b187dc00199beeb1e849f55))
+
 ## [2.0.5](https://github.com/wireapp/wire-web-packages/compare/@wireapp/store-engine-dexie@2.0.4...@wireapp/store-engine-dexie@2.0.5) (2023-01-30)
 
 **Note:** Version bump only for package @wireapp/store-engine-dexie

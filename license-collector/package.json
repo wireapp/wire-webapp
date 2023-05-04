@@ -31,5 +31,5 @@
     "dist": "yarn build",
     "start": "ts-node -r tsconfig-paths/register ./src/cli.ts"
   },
-  "version": "0.11.5"
+  "version": "0.12.0"
 }

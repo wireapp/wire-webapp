@@ -30,7 +30,7 @@
     "prettier": "^2",
     "typescript": "^4"
   },
-  "version": "2.1.2",
+  "version": "2.2.0",
   "devDependencies": {
     "@types/eslint": "^8",
     "@types/prettier": "^2",

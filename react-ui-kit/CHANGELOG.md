@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.7.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.6.1...@wireapp/react-ui-kit@9.7.0) (2023-05-04)
+
+### Features
+
+* update typescript ([#5115](https://github.com/wireapp/wire-web-packages/issues/5115)) ([f1f39de](https://github.com/wireapp/wire-web-packages/commit/f1f39dee4d5985980b187dc00199beeb1e849f55))
+
 ## [9.6.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.6.0...@wireapp/react-ui-kit@9.6.1) (2023-05-02)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit

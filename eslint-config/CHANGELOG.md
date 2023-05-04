@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.2.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@2.1.2...@wireapp/eslint-config@2.2.0) (2023-05-04)
+
+### Features
+
+* update typescript ([#5115](https://github.com/wireapp/wire-web-packages/issues/5115)) ([f1f39de](https://github.com/wireapp/wire-web-packages/commit/f1f39dee4d5985980b187dc00199beeb1e849f55))
+
 ## [2.1.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@2.1.1...@wireapp/eslint-config@2.1.2) (2023-04-26)
 
 **Note:** Version bump only for package @wireapp/eslint-config
