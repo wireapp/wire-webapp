@@ -72,7 +72,7 @@ export interface FeatureMLSConfig extends FeatureConfig {
 
 export interface FeatureMLSE2EIdConfig extends FeatureConfig {
   verificationExpiration: number;
-  acmeUrl?: string;
+  acmeDiscoveryUrl?: string;
 }
 
 export type FeatureAppLock = Feature<FeatureAppLockConfig>;
