@@ -80,6 +80,7 @@ import {IntegrationService} from '../integration/IntegrationService';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {MediaRepository} from '../media/MediaRepository';
 import {initMLSCallbacks, initMLSConversations, registerUninitializedSelfAndTeamConversations} from '../mls';
+import {migrateConversationsToMLS} from '../mls/MLSMigration/MLSMigration';
 import {NotificationRepository} from '../notification/NotificationRepository';
 import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
 import {PermissionRepository} from '../permission/PermissionRepository';
@@ -433,6 +434,12 @@ export class App {
 
         //join all the mls groups we're member of and have not yet joined (eg. we were not send welcome message)
         await initMLSConversations(conversations, this.core);
+
+        await migrateConversationsToMLS({
+          conversations,
+          core: this.core,
+          isOwnedByTeam: ({team_id}) => !!selfUser.teamId && team_id === selfUser.teamId,
+        });
 
         //add the potential `self` and `team` conversations
         await registerUninitializedSelfAndTeamConversations(conversations, selfUser, clientEntity().id, this.core);
