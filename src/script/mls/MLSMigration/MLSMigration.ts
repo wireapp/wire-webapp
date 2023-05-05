@@ -17,19 +17,86 @@
  *
  */
 
-import {ConversationProtocol, CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {registerRecurringTask} from '@wireapp/core/lib/util/RecurringTaskScheduler';
 
+import {APIClient} from '@wireapp/api-client';
 import {Account} from '@wireapp/core';
 
-import {
-  isProteusConversation,
-  isMixedConversation,
-  isMLSConversation,
-  MixedConversation,
-  MLSConversation,
-  ProteusConversation,
-} from 'src/script/conversation/ConversationSelectors';
+import {MixedConversation, ProteusConversation} from 'src/script/conversation/ConversationSelectors';
+import {groupConversationsByProtocol} from 'src/script/conversation/groupConversationsByProtocol';
 import {Conversation} from 'src/script/entity/Conversation';
+import {getLogger} from 'Util/Logger';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+
+import {isMLSSupportedByEnvironment} from '../isMLSSupportedByEnvironment';
+
+const logger = getLogger('MLSMigration');
+
+//FIXME: This will not live here, it will be part of team features config once it's implemented on backend
+interface MLSMigrationConfig {
+  startTime: number; //migrtion start timestamp
+  finaliseRegardlessAfter: number; //timestamp of the date until the migration has to finalise
+  usersThreshold: number; //percentage of migrated users needed for migration to finalize (0-100)
+  clientsThreshold: number; ////percentage of migrated clients needed for migration to finalize (0-100)
+}
+
+const MIGRATION_TASK_KEY = 'mls-migration';
+
+export const periodicallyCheckMigrationConfig = async ({
+  conversations,
+  migrationConfig,
+  isConversationOwnedByTeam,
+  core,
+  apiClient,
+}: {
+  conversations: Conversation[];
+  migrationConfig: MLSMigrationConfig;
+  isConversationOwnedByTeam: (conversation: Conversation) => boolean;
+  core: Account;
+  apiClient: APIClient;
+}) => {
+  const checkMigrationConfigTask = () =>
+    checkMigrationConfig({conversations, migrationConfig, isConversationOwnedByTeam, core, apiClient});
+
+  // We check the migration config immediately (on app load) and every 24 hours
+  await checkMigrationConfigTask();
+
+  registerRecurringTask({
+    every: TIME_IN_MILLIS.DAY,
+    task: checkMigrationConfigTask,
+    key: MIGRATION_TASK_KEY,
+  });
+};
+
+const checkMigrationConfig = async ({
+  conversations,
+  migrationConfig,
+  isConversationOwnedByTeam,
+  core,
+  apiClient,
+}: {
+  conversations: Conversation[];
+  migrationConfig: MLSMigrationConfig;
+  isConversationOwnedByTeam: (conversation: Conversation) => boolean;
+  core: Account;
+  apiClient: APIClient;
+}) => {
+  logger.info('MLS migration feature enabled, checking the configuration...');
+  const isMLSSupportedByEnv = await isMLSSupportedByEnvironment({core, apiClient});
+
+  if (!isMLSSupportedByEnv) {
+    logger.error('MLS migration feature is enabled but MLS is not supported by the environment.');
+    return;
+  }
+
+  //at this point we know that MLS is supported by environment, we can check MLS migration config
+  //check if migration startTime has arrived
+  const hasStartTimeArrived = Date.now() >= migrationConfig.startTime;
+  if (!hasStartTimeArrived) {
+    logger.error('MLS migration start time has not arrived yet, will retry in 24 hours or on app reload.');
+  }
+};
 
 /**
  * Will check the config of migration feature and try to initialise/finalise the migration on provided conversations.
@@ -72,32 +139,3 @@ const finaliseMigrationOfMixedConversations = async ({
   mixedConversations: MixedConversation[];
   core: Account;
 }) => {};
-
-const groupConversationsByProtocol = (conversations: Conversation[]) => {
-  const groupedConversations: {
-    [ConversationProtocol.PROTEUS]: ProteusConversation[];
-    [ConversationProtocol.MIXED]: MixedConversation[];
-    [ConversationProtocol.MLS]: MLSConversation[];
-  } = {
-    [ConversationProtocol.PROTEUS]: [],
-    [ConversationProtocol.MIXED]: [],
-    [ConversationProtocol.MLS]: [],
-  };
-
-  for (const conversation of conversations) {
-    if (isProteusConversation(conversation)) {
-      groupedConversations[ConversationProtocol.PROTEUS].push(conversation);
-      continue;
-    }
-    if (isMixedConversation(conversation)) {
-      groupedConversations[ConversationProtocol.MIXED].push(conversation);
-      continue;
-    }
-    if (isMLSConversation(conversation)) {
-      groupedConversations[ConversationProtocol.MLS].push(conversation);
-      continue;
-    }
-  }
-
-  return groupedConversations;
-};
