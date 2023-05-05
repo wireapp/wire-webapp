@@ -80,7 +80,7 @@ import {IntegrationService} from '../integration/IntegrationService';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {MediaRepository} from '../media/MediaRepository';
 import {initMLSCallbacks, initMLSConversations, registerUninitializedSelfAndTeamConversations} from '../mls';
-import {initialiseMLSMigration} from '../mls/MLSMigration';
+import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';
 import {NotificationRepository} from '../notification/NotificationRepository';
 import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
 import {PermissionRepository} from '../permission/PermissionRepository';
@@ -446,7 +446,7 @@ export class App {
           startTime: 1683280357523,
         };
 
-        await initialiseMLSMigration(mockedMigrationConfig, conversations, {
+        await initialiseMLSMigrationFlow(mockedMigrationConfig, conversations, {
           core: this.core,
           apiClient: this.apiClient,
           isConversationOwnedBySelfTeam: ({team_id}) => !!selfUser.teamId && team_id === selfUser.teamId,

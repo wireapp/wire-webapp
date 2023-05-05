@@ -52,7 +52,7 @@ const MIGRATION_TASK_KEY = 'mls-migration';
  * @param apiClient - the instance of the apiClient
  * @param isConversationOwnedBySelfTeam - callback that checks if the provided conversation is owned by a self team
  */
-export const initialiseMLSMigration = async (
+export const initialiseMLSMigrationFlow = async (
   migrationConfig: MLSMigrationConfig,
   conversations: Conversation[],
   {
