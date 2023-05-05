@@ -80,7 +80,6 @@ const UserListItem = ({
 
   const {isMe: isSelf, isFederated} = user;
   const isTemporaryGuest = user.isTemporaryGuest();
-
   const isAvailable = user.isAvailable();
 
   const hasUsernameInfo = !hideInfo && !customInfo && !isTemporaryGuest;
