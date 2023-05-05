@@ -76,15 +76,7 @@ const UserListItem = ({
     availability,
     expirationText,
     name,
-    domain,
-  } = useKoSubscribableChildren(user, [
-    'isDirectGuest',
-    'is_verified',
-    'availability',
-    'expirationText',
-    'name',
-    'domain',
-  ]);
+  } = useKoSubscribableChildren(user, ['isDirectGuest', 'is_verified', 'availability', 'expirationText', 'name']);
 
   const {isMe: isSelf, isFederated} = user;
   const isTemporaryGuest = user.isTemporaryGuest();
@@ -111,7 +103,7 @@ const UserListItem = ({
       return expirationText;
     }
     if (!isAvailable) {
-      return domain;
+      return user.domain;
     }
 
     return user.handle;
