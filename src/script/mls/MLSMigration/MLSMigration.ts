@@ -43,21 +43,48 @@ interface MLSMigrationConfig {
 
 const MIGRATION_TASK_KEY = 'mls-migration';
 
-export const periodicallyCheckMigrationConfig = async ({
-  conversations,
-  migrationConfig,
-  isConversationOwnedByTeam,
-  core,
-  apiClient,
-}: {
-  conversations: Conversation[];
-  migrationConfig: MLSMigrationConfig;
-  isConversationOwnedByTeam: (conversation: Conversation) => boolean;
-  core: Account;
-  apiClient: APIClient;
-}) => {
+/**
+ * Will check the config of migration feature and try to initialise/finalise the migration on provided conversations.
+ *
+ * @param migrationConfig - the config of the MLS migration feature
+ * @param conversations - all the conversations that the user is part of
+ * @param core - the instance of the core
+ * @param apiClient - the instance of the apiClient
+ * @param isConversationOwnedBySelfTeam - callback that checks if the provided conversation is owned by a self team
+ */
+export const initialiseMLSMigration = async (
+  migrationConfig: MLSMigrationConfig,
+  conversations: Conversation[],
+  {
+    core,
+    apiClient,
+    isConversationOwnedBySelfTeam,
+  }: {
+    core: Account;
+    apiClient: APIClient;
+    isConversationOwnedBySelfTeam: (conversation: Conversation) => boolean;
+  },
+) => {
+  return periodicallyCheckMigrationConfig(
+    migrationConfig,
+    () => migrateConversationsToMLS(conversations, {isConversationOwnedBySelfTeam, core}),
+    {core, apiClient},
+  );
+};
+
+const periodicallyCheckMigrationConfig = async (
+  migrationConfig: MLSMigrationConfig,
+  onMigrationStartTimeArrived: () => Promise<void>,
+  {
+    core,
+    apiClient,
+  }: {
+    core: Account;
+    apiClient: APIClient;
+  },
+) => {
   const checkMigrationConfigTask = () =>
-    checkMigrationConfig({conversations, migrationConfig, isConversationOwnedByTeam, core, apiClient});
+    checkMigrationConfig(migrationConfig, onMigrationStartTimeArrived, {core, apiClient});
 
   // We check the migration config immediately (on app load) and every 24 hours
   await checkMigrationConfigTask();
@@ -69,19 +96,17 @@ export const periodicallyCheckMigrationConfig = async ({
   });
 };
 
-const checkMigrationConfig = async ({
-  conversations,
-  migrationConfig,
-  isConversationOwnedByTeam,
-  core,
-  apiClient,
-}: {
-  conversations: Conversation[];
-  migrationConfig: MLSMigrationConfig;
-  isConversationOwnedByTeam: (conversation: Conversation) => boolean;
-  core: Account;
-  apiClient: APIClient;
-}) => {
+const checkMigrationConfig = async (
+  migrationConfig: MLSMigrationConfig,
+  onMigrationStartTimeArrived: () => Promise<void>,
+  {
+    core,
+    apiClient,
+  }: {
+    core: Account;
+    apiClient: APIClient;
+  },
+) => {
   logger.info('MLS migration feature enabled, checking the configuration...');
   const isMLSSupportedByEnv = await isMLSSupportedByEnvironment({core, apiClient});
 
@@ -96,46 +121,48 @@ const checkMigrationConfig = async ({
   if (!hasStartTimeArrived) {
     logger.error('MLS migration start time has not arrived yet, will retry in 24 hours or on app reload.');
   }
+
+  return onMigrationStartTimeArrived();
 };
 
-/**
- * Will check the config of migration feature and try to initialise/finalise the migration on provided conversations.
- *
- * @param conversations - all the conversations that the user is part of
- * @param core - the instance of the core
- */
-export const migrateConversationsToMLS = async ({
-  conversations,
-  core,
-  isOwnedByTeam,
-}: {
-  conversations: Conversation[];
-  core: Account;
-  isOwnedByTeam: (conversation: Conversation) => boolean;
-}) => {
+const migrateConversationsToMLS = async (
+  conversations: Conversation[],
+  {
+    core,
+    isConversationOwnedBySelfTeam,
+  }: {
+    core: Account;
+    isConversationOwnedBySelfTeam: (conversation: Conversation) => boolean;
+  },
+) => {
   //TODO: implement logic for 1on1 conversations (both team owned and federated)
   const groupConversations = conversations.filter(
-    conversation => conversation.type() === CONVERSATION_TYPE.REGULAR && isOwnedByTeam(conversation),
+    conversation =>
+      conversation.type() === CONVERSATION_TYPE.REGULAR &&
+      isConversationOwnedBySelfTeam(conversation) &&
+      !conversation.isTeam1to1(),
   );
 
   const {proteus: proteusConversations, mixed: mixedConversations} = groupConversationsByProtocol(groupConversations);
 
-  await initialiseMigrationOfProteusConversations({proteusConversations, core});
-  await finaliseMigrationOfMixedConversations({mixedConversations, core});
+  await initialiseMigrationOfProteusConversations(proteusConversations, {core});
+  await finaliseMigrationOfMixedConversations(mixedConversations, {core});
 };
 
-const initialiseMigrationOfProteusConversations = async ({
-  proteusConversations,
-  core,
-}: {
-  proteusConversations: ProteusConversation[];
-  core: Account;
-}) => {};
+const initialiseMigrationOfProteusConversations = async (
+  proteusConversations: ProteusConversation[],
+  {
+    core,
+  }: {
+    core: Account;
+  },
+) => {};
 
-const finaliseMigrationOfMixedConversations = async ({
-  mixedConversations,
-  core,
-}: {
-  mixedConversations: MixedConversation[];
-  core: Account;
-}) => {};
+const finaliseMigrationOfMixedConversations = async (
+  mixedConversations: MixedConversation[],
+  {
+    core,
+  }: {
+    core: Account;
+  },
+) => {};

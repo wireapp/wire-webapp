@@ -80,7 +80,7 @@ import {IntegrationService} from '../integration/IntegrationService';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {MediaRepository} from '../media/MediaRepository';
 import {initMLSCallbacks, initMLSConversations, registerUninitializedSelfAndTeamConversations} from '../mls';
-import {periodicallyCheckMigrationConfig} from '../mls/MLSMigration';
+import {initialiseMLSMigration} from '../mls/MLSMigration';
 import {NotificationRepository} from '../notification/NotificationRepository';
 import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
 import {PermissionRepository} from '../permission/PermissionRepository';
@@ -438,17 +438,18 @@ export class App {
         //add the potential `self` and `team` conversations
         await registerUninitializedSelfAndTeamConversations(conversations, selfUser, clientEntity().id, this.core);
 
-        await periodicallyCheckMigrationConfig({
-          conversations,
-          isConversationOwnedByTeam: ({team_id}) => !!selfUser.teamId && team_id === selfUser.teamId,
-          migrationConfig: {
-            clientsThreshold: 100,
-            usersThreshold: 100,
-            finaliseRegardlessAfter: 1683885139353,
-            startTime: 1683280357523,
-          },
+        //FIXME: this value will be read from team feature config
+        const mockedMigrationConfig = {
+          clientsThreshold: 100,
+          usersThreshold: 100,
+          finaliseRegardlessAfter: 1683885139353,
+          startTime: 1683280357523,
+        };
+
+        await initialiseMLSMigration(mockedMigrationConfig, conversations, {
           core: this.core,
           apiClient: this.apiClient,
+          isConversationOwnedBySelfTeam: ({team_id}) => !!selfUser.teamId && team_id === selfUser.teamId,
         });
       }
 
