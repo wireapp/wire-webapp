@@ -5517,17 +5517,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/store-engine@npm:5.1.0":
+"@wireapp/store-engine@npm:5.1.0, @wireapp/store-engine@npm:^5.1.0":
   version: 5.1.0
   resolution: "@wireapp/store-engine@npm:5.1.0"
   checksum: 31d333b18b0316a8be6e13f20ab6f8faf88e00ad83828ee5f93aec59a8b6cc8372d4172125fd309698c66520982ef2420b20b853912df0042c57baf8ea3b3f79
-  languageName: node
-  linkType: hard
-
-"@wireapp/store-engine@npm:^5.0.3":
-  version: 5.0.3
-  resolution: "@wireapp/store-engine@npm:5.0.3"
-  checksum: 3e2bff6c318911f3f75298a4a60b1ca4b83bc90d71bdc3bd1f41ffa75ece47ed70316612f7847e9c2436981fb8d8cf6f31cb31540f4319b481b537a69f42dce8
   languageName: node
   linkType: hard
 
@@ -18073,7 +18066,7 @@ dexie@latest:
     "@wireapp/lru-cache": 3.8.1
     "@wireapp/prettier-config": 0.6.0
     "@wireapp/react-ui-kit": 9.6.0
-    "@wireapp/store-engine": ^5.0.3
+    "@wireapp/store-engine": ^5.1.0
     "@wireapp/store-engine-dexie": 2.1.0
     "@wireapp/store-engine-sqleet": 1.8.9
     "@wireapp/webapp-events": 0.17.0
