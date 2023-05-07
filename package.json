@@ -27,7 +27,7 @@
     "jszip": "3.10.1",
     "keyboardjs": "2.7.0",
     "knockout": "3.5.1",
-    "libsodium-wrappers": "0.7.10",
+    "libsodium-wrappers": "0.7.11",
     "linkify-it": "4.0.1",
     "long": "5.2.3",
     "markdown-it": "13.0.1",
