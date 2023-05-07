@@ -2666,12 +2666,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@emotion/eslint-plugin@npm:^11.10.0":
-  version: 11.10.0
-  resolution: "@emotion/eslint-plugin@npm:11.10.0"
+"@emotion/eslint-plugin@npm:^11.11.0":
+  version: 11.11.0
+  resolution: "@emotion/eslint-plugin@npm:11.11.0"
   peerDependencies:
     eslint: 6 || 7 || 8
-  checksum: b848600bbd047a5100e541369ab56ee84f7a4fae59f811b3835ba686c5b35d0c564953f946c9912d98df0e70fa5533b574f629aa10791e02bcd268263ff7adf1
+  checksum: 2d555b6790700e0d0c2862d4aa2fd697ea5851faa7e406ab459028e66daad2ee0dc3dec29362c2edc2656a63f826ac15629112d3e9aca64323fa40f9e5674bd4
   languageName: node
   linkType: hard
 
@@ -17877,7 +17877,7 @@ dexie@latest:
     "@babel/preset-typescript": 7.21.5
     "@datadog/browser-logs": ^4.41.0
     "@datadog/browser-rum": ^4.41.0
-    "@emotion/eslint-plugin": ^11.10.0
+    "@emotion/eslint-plugin": ^11.11.0
     "@emotion/react": 11.10.8
     "@faker-js/faker": 7.6.0
     "@formatjs/cli": 6.1.0
