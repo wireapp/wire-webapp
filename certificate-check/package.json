@@ -15,7 +15,7 @@
     "@swc/jest": "^0.2.23",
     "@types/jest": "^29.2.0",
     "@types/jsrsasign": "10.5.8",
-    "@types/node": "^18.11.5",
+    "@types/node": "^20.1.0",
     "@types/rimraf": "^3.0.2",
     "jest": "^29.2.1",
     "rimraf": "^3.0.2",

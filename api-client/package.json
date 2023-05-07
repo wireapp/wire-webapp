@@ -30,7 +30,7 @@
     "@swc/jest": "^0.2.23",
     "@types/axios": "^0.14.0",
     "@types/jest": "^29.2.0",
-    "@types/node": "^18.11.5",
+    "@types/node": "^20.1.0",
     "@types/spark-md5": "3.0.2",
     "@types/tough-cookie": "4.0.2",
     "@types/ws": "8.5.3",

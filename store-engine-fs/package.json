@@ -18,7 +18,7 @@
     "@swc/jest": "^0.2.23",
     "@types/fs-extra": "9.0.13",
     "@types/jest": "^29.2.0",
-    "@types/node": "^18.11.5",
+    "@types/node": "^20.1.0",
     "@types/rimraf": "^3.0.2",
     "@wireapp/store-engine": "workspace:^",
     "jest": "^29.2.1",
