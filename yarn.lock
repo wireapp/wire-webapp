@@ -4557,12 +4557,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-dom@npm:18.2.1":
-  version: 18.2.1
-  resolution: "@types/react-dom@npm:18.2.1"
+"@types/react-dom@npm:18.2.4":
+  version: 18.2.4
+  resolution: "@types/react-dom@npm:18.2.4"
   dependencies:
     "@types/react": "*"
-  checksum: 4e607a9d08f707ae2bd6b377f1da32989dcbe4e38ac39110423a1f6bc95dd53a5484f7f952b34e9d12b5f29a265d52a8c74c1a7d1d1e25be0fa69ccf9d64209f
+  checksum: 8301f35cf1cbfec8c723e9477aecf87774e3c168bd457d353b23c45064737213d3e8008b067c6767b7b08e4f2b3823ee239242a6c225fc91e7f8725ef8734124
   languageName: node
   linkType: hard
 
@@ -17904,7 +17904,7 @@ dexie@latest:
     "@types/platform": 1.3.4
     "@types/prettier": ^2.7.2
     "@types/react": 18.0.28
-    "@types/react-dom": 18.2.1
+    "@types/react-dom": 18.2.4
     "@types/react-redux": 7.1.25
     "@types/react-transition-group": 4.4.5
     "@types/redux-mock-store": 1.0.3
