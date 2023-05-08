@@ -67,7 +67,8 @@ import {
 } from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {isBackendError} from 'Util/TypePredicateUtil';
-import {createRandomUuid, noop} from 'Util/util';
+import {noop} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {ACCESS_STATE} from './AccessState';
 import {extractClientDiff} from './ClientMismatchUtil';
@@ -1928,7 +1929,7 @@ export class ConversationRepository {
     user: User,
     isIncoming: boolean,
     fileExt: string,
-    id = createRandomUuid(),
+    id = createUuid(),
   ) {
     const fileRestrictionMessage = EventBuilder.buildFileTypeRestricted(conversation, user, isIncoming, fileExt, id);
     await this.eventRepository.injectEvent(fileRestrictionMessage);

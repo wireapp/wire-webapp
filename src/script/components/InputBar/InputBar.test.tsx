@@ -25,7 +25,7 @@ import {Config} from 'src/script/Config';
 import {PropertiesService} from 'src/script/properties/PropertiesService';
 import {SelfService} from 'src/script/self/SelfService';
 import {createMentionEntity, getMentionCandidate} from 'Util/MentionUtil';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
 import {AssetRepository} from '../../assets/AssetRepository';
@@ -73,7 +73,7 @@ describe('InputBar', () => {
 
   const getDefaultProps = () => ({
     assetRepository: new AssetRepository(new AssetService()),
-    conversationEntity: new Conversation(createRandomUuid()),
+    conversationEntity: new Conversation(createUuid()),
     conversationRepository: {
       sendTypingStart: jest.fn(),
       sendTypingStop: jest.fn(),
@@ -193,7 +193,7 @@ describe('InputBar', () => {
 
     const mentionCandidate = getMentionCandidate([], selectionStart, selectionEnd, inputValue);
 
-    const userEntity = new User(createRandomUuid());
+    const userEntity = new User(createUuid());
     userEntity.name(userName);
 
     const mentionEntity = createMentionEntity(userEntity, mentionCandidate);

@@ -29,7 +29,7 @@ import http from 'http';
 import https from 'https';
 import path from 'path';
 
-import type {ServerConfig} from './config';
+import type {ClientConfig, ServerConfig} from './config';
 import {HealthCheckRoute} from './routes/_health/HealthRoute';
 import {AppleAssociationRoute} from './routes/appleassociation/AppleAssociationRoute';
 import {ConfigRoute} from './routes/config/ConfigRoute';
@@ -43,11 +43,11 @@ class Server {
   private readonly app: express.Express;
   private server?: http.Server | https.Server;
 
-  constructor(private readonly config: ServerConfig) {
-    if (this.config.SERVER.DEVELOPMENT) {
+  constructor(private readonly config: ServerConfig, private readonly clientConfig: ClientConfig) {
+    if (this.config.DEVELOPMENT) {
       console.info(this.config);
-    } else if (!this.config.SERVER.APP_BASE.startsWith('https')) {
-      throw new Error(`Config variable 'APP_BASE' must be protocol https but is '${this.config.SERVER.APP_BASE}'`);
+    } else if (!this.config.APP_BASE.startsWith('https')) {
+      throw new Error(`Config variable 'APP_BASE' must be protocol https but is '${this.config.APP_BASE}'`);
     }
 
     this.app = express();
@@ -66,7 +66,7 @@ class Server {
     this.initSiteMap(this.config);
     this.app.use(Root());
     this.app.use(HealthCheckRoute());
-    this.app.use(ConfigRoute(this.config));
+    this.app.use(ConfigRoute(this.clientConfig));
     this.app.use(GoogleWebmasterRoute(this.config));
     this.app.use(AppleAssociationRoute());
     this.app.use(NotFoundRoute());
@@ -74,7 +74,7 @@ class Server {
   }
 
   private initWebpack() {
-    if (!this.config.SERVER.DEVELOPMENT) {
+    if (!this.config.DEVELOPMENT) {
       return;
     }
 
@@ -87,16 +87,13 @@ class Server {
   }
 
   private initCaching() {
-    if (this.config.SERVER.DEVELOPMENT) {
+    if (this.config.DEVELOPMENT) {
       this.app.use(nocache());
     } else {
       this.app.use((req, res, next) => {
         const milliSeconds = 1000;
-        res.header('Cache-Control', `public, max-age=${this.config.SERVER.CACHE_DURATION_SECONDS}`);
-        res.header(
-          'Expires',
-          new Date(Date.now() + this.config.SERVER.CACHE_DURATION_SECONDS * milliSeconds).toUTCString(),
-        );
+        res.header('Cache-Control', `public, max-age=${this.config.CACHE_DURATION_SECONDS}`);
+        res.header('Expires', new Date(Date.now() + this.config.CACHE_DURATION_SECONDS * milliSeconds).toUTCString());
         next();
       });
     }
@@ -104,11 +101,11 @@ class Server {
 
   private initForceSSL(): void {
     const SSLMiddleware: express.RequestHandler = (req, res, next) => {
-      const shouldEnforceHTTPS = !this.config.SERVER.ENFORCE_HTTPS || req.url.match(/_health\/?/);
+      const shouldEnforceHTTPS = !this.config.ENFORCE_HTTPS || req.url.match(/_health\/?/);
       const isInsecure = !req.secure || req.get('X-Forwarded-Proto') !== 'https';
 
       if (isInsecure && !shouldEnforceHTTPS) {
-        return res.redirect(HTTP_STATUS.MOVED_PERMANENTLY, `${this.config.SERVER.APP_BASE}${req.url}`);
+        return res.redirect(HTTP_STATUS.MOVED_PERMANENTLY, `${this.config.APP_BASE}${req.url}`);
       }
 
       next();
@@ -138,7 +135,7 @@ class Server {
     );
     this.app.use(
       helmet.contentSecurityPolicy({
-        directives: this.config.SERVER.CSP,
+        directives: this.config.CSP,
         reportOnly: false,
       }),
     );
@@ -157,7 +154,7 @@ class Server {
   }
 
   private initStaticRoutes() {
-    this.app.use(RedirectRoutes(this.config));
+    this.app.use(RedirectRoutes(this.config, this.clientConfig));
 
     this.app.use('/audio', express.static(path.join(__dirname, 'static/audio')));
     this.app.use('/ext', express.static(path.join(__dirname, 'static/ext')));
@@ -169,7 +166,7 @@ class Server {
     this.app.use('/worker', express.static(path.join(__dirname, 'static/worker')));
 
     this.app.get('/favicon.ico', (_req, res) => res.sendFile(path.join(__dirname, 'static/image/favicon.ico')));
-    if (!this.config.SERVER.DEVELOPMENT) {
+    if (!this.config.DEVELOPMENT) {
       this.app.get('/sw.js', (_req, res) => res.sendFile(path.join(__dirname, 'static/sw.js')));
     }
   }
@@ -205,16 +202,14 @@ class Server {
     this.app.set('views', [path.resolve(__dirname, 'static'), path.resolve(__dirname, 'templates')]);
     hbs.localsAsTemplateData(this.app);
     this.app.locals.config = {
-      APP_BASE: this.config.SERVER.APP_BASE,
-      BRAND_NAME: this.config.CLIENT.BRAND_NAME,
-      CHROME_ORIGIN_TRIAL_TOKEN: this.config.CLIENT.CHROME_ORIGIN_TRIAL_TOKEN,
-      OPEN_GRAPH: this.config.SERVER.OPEN_GRAPH,
-      VERSION: this.config.CLIENT.VERSION,
+      APP_BASE: this.config.APP_BASE,
+      OPEN_GRAPH: this.config.OPEN_GRAPH,
+      VERSION: this.config.VERSION,
     };
   }
 
   private initSiteMap(config: ServerConfig) {
-    if (config.SERVER.APP_BASE) {
+    if (config.APP_BASE) {
       const pages = () => [
         {
           changeFreq: 'weekly',
@@ -225,7 +220,7 @@ class Server {
           url: '/',
         },
       ];
-      this.app.use(expressSitemapXml(pages, config.SERVER.APP_BASE));
+      this.app.use(expressSitemapXml(pages, config.APP_BASE));
     }
   }
 
@@ -233,19 +228,17 @@ class Server {
     return new Promise((resolve, reject) => {
       if (this.server) {
         reject('Server is already running.');
-      } else if (this.config.SERVER.PORT_HTTP) {
-        if (this.config.SERVER.DEVELOPMENT) {
+      } else if (this.config.PORT_HTTP) {
+        if (this.config.DEVELOPMENT) {
           const options = {
-            cert: fs.readFileSync(this.config.SERVER.SSL_CERTIFICATE_PATH),
-            key: fs.readFileSync(this.config.SERVER.SSL_CERTIFICATE_KEY_PATH),
+            cert: fs.readFileSync(this.config.SSL_CERTIFICATE_PATH),
+            key: fs.readFileSync(this.config.SSL_CERTIFICATE_KEY_PATH),
           };
           this.server = https
             .createServer(options, this.app)
-            .listen(this.config.SERVER.PORT_HTTP, '0.0.0.0', () => resolve(this.config.SERVER.PORT_HTTP));
+            .listen(this.config.PORT_HTTP, '0.0.0.0', () => resolve(this.config.PORT_HTTP));
         } else {
-          this.server = this.app.listen(this.config.SERVER.PORT_HTTP, '0.0.0.0', () =>
-            resolve(this.config.SERVER.PORT_HTTP),
-          );
+          this.server = this.app.listen(this.config.PORT_HTTP, '0.0.0.0', () => resolve(this.config.PORT_HTTP));
         }
       } else {
         reject('Server port not specified.');

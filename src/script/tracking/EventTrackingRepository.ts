@@ -28,7 +28,7 @@ import {roundLogarithmic} from 'Util/NumberUtil';
 import {loadValue, storeValue, resetStoreValue} from 'Util/StorageUtil';
 import {includesString} from 'Util/StringUtil';
 import {getParameter} from 'Util/UrlUtil';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {EventName} from './EventName';
 import {getPlatform} from './Helpers';
@@ -146,7 +146,7 @@ export class EventTrackingRepository {
         }
       }
     } else {
-      this.countlyDeviceId = createRandomUuid();
+      this.countlyDeviceId = createUuid();
       storeValue(
         EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_DEVICE_ID_LOCAL_STORAGE_KEY,
         this.countlyDeviceId,

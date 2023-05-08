@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2022 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,10 +17,6 @@
  *
  */
 
-import type {ClientConfig} from '../../server/config';
-import {App} from '../script/main/app';
+import UUID from 'uuidjs';
 
-export interface WireModule {
-  app: App;
-  env: ClientConfig;
-}
+export const createUuid = (version: 4 | 1 = 4): string => (version === 4 ? UUID.genV4() : UUID.genV1()).toString();

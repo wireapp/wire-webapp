@@ -75,16 +75,19 @@ const UserListItem = ({
     isDirectGuest,
     availability,
     expirationText,
-    name: userName,
+    name,
   } = useKoSubscribableChildren(user, ['isDirectGuest', 'is_verified', 'availability', 'expirationText', 'name']);
 
   const {isMe: isSelf, isFederated} = user;
   const isTemporaryGuest = user.isTemporaryGuest();
+  const isAvailable = user.isAvailable();
 
   const hasUsernameInfo = !hideInfo && !customInfo && !isTemporaryGuest;
   const isOthersMode = mode === UserlistMode.OTHERS;
 
   const selfString = `(${capitalizeFirstChar(t('conversationYouNominative'))})`;
+
+  const userName = isAvailable ? name : t('unavailableUser');
 
   const getContentInfoText = () => {
     if (customInfo) {
@@ -97,6 +100,9 @@ const UserListItem = ({
 
     if (isTemporaryGuest) {
       return expirationText;
+    }
+    if (!isAvailable) {
+      return user.domain;
     }
 
     return user.handle;

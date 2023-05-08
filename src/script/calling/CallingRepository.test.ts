@@ -34,7 +34,7 @@ import {EventRepository} from 'src/script/event/EventRepository';
 import {MediaType} from 'src/script/media/MediaType';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 import {TestFactory} from 'test/helper/TestFactory';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
@@ -53,8 +53,8 @@ const createConversation = (
   type: CONVERSATION_TYPE = CONVERSATION_TYPE.ONE_TO_ONE,
   protocol: ConversationProtocol = ConversationProtocol.PROTEUS,
 ) => {
-  const conversation = new Conversation(createRandomUuid(), '', protocol);
-  conversation.participating_user_ets.push(new User(createRandomUuid()));
+  const conversation = new Conversation(createUuid(), '', protocol);
+  conversation.participating_user_ets.push(new User(createUuid()));
   conversation.type(type);
   return conversation;
 };
@@ -64,9 +64,9 @@ describe('CallingRepository', () => {
   let callingRepository: CallingRepository;
   let wCall: Wcall;
   let wUser: number;
-  const selfUser = new User(createRandomUuid());
+  const selfUser = new User(createUuid());
   selfUser.isMe = true;
-  const clientId = createRandomUuid();
+  const clientId = createUuid();
 
   const mediaDevices = {
     audioInput: ko.pureComputed(() => 'test'),
@@ -281,10 +281,10 @@ describe('CallingRepository ISO', () => {
     });
 
     it('creates and stores a new call when an incoming call arrives', async () => {
-      const selfUser = new User(createRandomUuid());
+      const selfUser = new User(createUuid());
       selfUser.isMe = true;
 
-      const conversation = new Conversation(createRandomUuid());
+      const conversation = new Conversation(createUuid());
 
       const callingRepo = new CallingRepository(
         {
@@ -309,7 +309,7 @@ describe('CallingRepository ISO', () => {
         new CallState(),
       );
 
-      const avs = await callingRepo.initAvs(selfUser, createRandomUuid());
+      const avs = await callingRepo.initAvs(selfUser, createUuid());
       // provide global handle for cleanup
       avsUser = avs.wUser;
       avsCall = avs.wCall;
@@ -561,8 +561,8 @@ function extractAudioStats(stats: any) {
 }
 
 function createAutoAnsweringWuser(wCall: Wcall, remoteCallingRepository: CallingRepository) {
-  const selfUserId = createRandomUuid();
-  const selfClientId = createRandomUuid();
+  const selfUserId = createUuid();
+  const selfClientId = createUuid();
   const sendMsg = (
     _context: number,
     conversationId: string,

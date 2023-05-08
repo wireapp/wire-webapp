@@ -26,7 +26,7 @@ import {EventError} from 'src/script/error/EventError';
 import {ClientEvent} from 'src/script/event/Client';
 import {EventRepository} from 'src/script/event/EventRepository';
 import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {EventService} from './EventService';
 import {EventSource} from './EventSource';
@@ -240,13 +240,13 @@ describe('EventRepository', () => {
 
     beforeEach(() => {
       event = {
-        conversation: createRandomUuid(),
+        conversation: createUuid(),
         data: {
           content: 'Lorem Ipsum',
           previews: [],
         },
-        from: createRandomUuid(),
-        id: createRandomUuid(),
+        from: createUuid(),
+        id: createUuid(),
         time: new Date().toISOString(),
         type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       };
@@ -266,7 +266,7 @@ describe('EventRepository', () => {
 
     it('ignores an event with an ID previously used by another user', () => {
       previously_stored_event = JSON.parse(JSON.stringify(event));
-      previously_stored_event.from = createRandomUuid();
+      previously_stored_event.from = createUuid();
       jest
         .spyOn(testFactory.event_service!, 'loadEvent')
         .mockImplementation(() => Promise.resolve(previously_stored_event));
@@ -440,7 +440,7 @@ describe('EventRepository', () => {
       const initial_time = event.time;
       const changed_time = new Date(new Date(event.time).getTime() + 60 * 1000).toISOString();
       originalMessage.primary_key = 12;
-      event.id = createRandomUuid();
+      event.id = createUuid();
       event.data.content = 'new content';
       event.data.replacing_message_id = originalMessage.id;
       event.time = changed_time;
@@ -492,7 +492,7 @@ describe('EventRepository', () => {
     it('deletes cancelled conversation.asset-add event', async () => {
       const fromIds = [
         // cancel from an other user
-        createRandomUuid(),
+        createUuid(),
         // cancel from the self user
         testFactory.user_repository['userState'].self().id,
       ];

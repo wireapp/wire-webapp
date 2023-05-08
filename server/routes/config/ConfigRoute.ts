@@ -19,18 +19,10 @@
 
 import {Router} from 'express';
 
-import type {ServerConfig} from '../../config';
+import {ClientConfig} from '../../config';
 
-export const ConfigRoute = (config: ServerConfig) =>
+export const ConfigRoute = (config: ClientConfig) =>
   Router().get('/config.js', (_, res) => {
-    const clientConfig = {
-      ...config.CLIENT,
-      APP_BASE: config.SERVER.APP_BASE,
-    };
-
-    const payload = `
-window.wire = window.wire || {};
-window.wire.env = ${JSON.stringify(clientConfig)};`;
-
+    const payload = `window.wire = window.wire || {}; window.wire.env = ${JSON.stringify(config)};`;
     res.type('application/javascript').send(payload);
   });

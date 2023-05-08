@@ -182,10 +182,11 @@ export class UserMapper {
     }
 
     const currentTeam = this.teamState.team()?.id;
-    if (isSelf || (currentTeam && teamId && teamId === currentTeam && !userEntity.isFederated)) {
-      // To be in the same team, the user needs to have the same teamId and to be on the same domain (not federated)
-      userEntity.inTeam(!!teamId);
+    if (teamId) {
       userEntity.teamId = teamId;
+      if (!userEntity.isFederated && currentTeam && currentTeam === teamId) {
+        userEntity.inTeam(true);
+      }
     }
 
     if (deleted) {

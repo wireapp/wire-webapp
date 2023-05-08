@@ -23,6 +23,7 @@ import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
 
+import {CONVERSATION} from '../event/Client';
 import {StorageService} from '../storage';
 
 export class BackupService {
@@ -97,6 +98,14 @@ export class BackupService {
     return entities.length;
   }
 
+  async getConversationCreationEvents() {
+    const events = await this.storageService
+      .db!.events.where('type')
+      .anyOf([CONVERSATION.ONE2ONE_CREATION, CONVERSATION.GROUP_CREATION])
+      .toArray();
+    return events;
+  }
+
   /**
    * Will add all the entities that are not already in the database (identified by their id)
    */
@@ -105,15 +114,18 @@ export class BackupService {
     entities: T[],
     generateId?: (entry: T) => string,
   ): Promise<number> {
-    const ids = generateId ? entities.map(generateId) : [];
-    const existingEntities = await table.where('id').anyOf(ids).toArray();
-    const newEntities = generateId
-      ? entities.filter(
-          entity => !existingEntities.some(existingEntity => generateId(existingEntity) === generateId(entity)),
-        )
-      : entities;
+    if (!generateId) {
+      await table.bulkAdd(entities);
+      return entities.length;
+    }
 
+    const ids = entities.map(generateId);
+    const existingEntities = await table.where('id').anyOf(ids).toArray();
+    const newEntities = entities.filter(
+      entity => !existingEntities.some(existingEntity => generateId(existingEntity) === generateId(entity)),
+    );
     await table.bulkAdd(newEntities);
+
     return newEntities.length;
   }
 
