@@ -558,7 +558,7 @@ export class ConversationRepository {
     remoteConversations: RemoteConversations,
     localConversations: ConversationDatabaseData[] = [],
   ): Promise<Conversation[]> {
-    const missingConversations = this.conversationState.missingConversations;
+    const {missingConversations} = this.conversationState;
     let conversationsData: any[];
     if (remoteConversations.failed?.length) {
       missingConversations.push(...remoteConversations.failed);
