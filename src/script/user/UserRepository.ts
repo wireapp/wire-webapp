@@ -544,7 +544,7 @@ export class UserRepository {
           (isAxiosError(error) && error.response?.status === HTTP_STATUS.BAD_REQUEST) ||
           Number((error as BackendError).code) === HTTP_STATUS.BAD_REQUEST;
         if (isNotFound || isBadRequest) {
-          return {found: [], failed: []};
+          return {found: [], failed: [...chunkOfQualifiedUserIds]};
         }
         throw error;
       }

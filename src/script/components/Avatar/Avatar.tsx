@@ -122,7 +122,7 @@ const Avatar: FC<AvatarProps> = ({
   }
 
   if (!participant.isAvailable()) {
-    return <PlaceholderAvatar avatarSize={avatarSize} onClick={() => onAvatarClick?.(participant)} />;
+    return <PlaceholderAvatar {...props} avatarSize={avatarSize} onClick={() => onAvatarClick?.(participant)} />;
   }
 
   const isMe = participant?.isMe;
