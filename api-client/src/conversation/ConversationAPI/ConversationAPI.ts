@@ -566,6 +566,7 @@ export class ConversationAPI {
     const config: AxiosRequestConfig = {
       method: 'post',
       url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.CODE}`,
+      data: {},
     };
 
     if (password) {
