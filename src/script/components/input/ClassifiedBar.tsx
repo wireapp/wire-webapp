@@ -20,7 +20,9 @@
 import React from 'react';
 
 import {CSSObject} from '@emotion/react';
+import cx from 'classnames';
 
+import {Icon} from 'Components/Icon';
 import {User} from 'src/script/entity/User';
 import {t} from 'Util/LocalizerUtil';
 
@@ -37,31 +39,21 @@ interface ClassifiedBarProps {
   users: User[];
 }
 
-const barStyle = (highContrast: boolean): CSSObject => ({
-  alignItems: 'center',
-  backgroundColor: `var(--${highContrast ? 'background' : 'app-bg-secondary'})`,
-  borderColor: 'var(--foreground-fade-40)',
-  borderStyle: highContrast ? 'none' : 'solid',
-  borderWidth: '1px 0',
-  color: `var(--${highContrast ? 'app-bg' : 'background'})`,
-  display: 'flex',
-  fontSize: '0.6875rem',
-  fontWeight: 600,
-  height: '16px',
-  justifyContent: 'center',
-  textTransform: 'uppercase',
-  width: '100%',
-});
-
 const ClassifiedBar: React.FC<ClassifiedBarProps> = ({users, classifiedDomains, style}) => {
   if (typeof classifiedDomains === 'undefined') {
     return null;
   }
+
   const classified = isClassified(users, classifiedDomains);
   const text = classified ? t('conversationClassified') : t('conversationNotClassified');
-  const highContrast = !classified;
+
   return (
-    <div data-uie-name="classified-label" css={{...barStyle(highContrast), ...style}}>
+    <div
+      className={cx('classified-bar', {green: classified, red: !classified})}
+      data-uie-name="classified-label"
+      css={{...style}}
+    >
+      {classified ? <Icon.Check /> : <Icon.Info />}
       {text}
     </div>
   );

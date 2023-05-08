@@ -21,6 +21,7 @@ import React, {useEffect, useRef, useState} from 'react';
 
 import {LoginData} from '@wireapp/api-client/lib/auth';
 import {ClientType} from '@wireapp/api-client/lib/client/index';
+import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
 import {StatusCodes} from 'http-status-codes';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
@@ -31,6 +32,7 @@ import {AnyAction, Dispatch} from 'redux';
 import {Runtime, UrlUtil} from '@wireapp/commons';
 import {
   ArrowIcon,
+  Button,
   Checkbox,
   CheckboxLabel,
   CodeInput,
@@ -39,6 +41,7 @@ import {
   Columns,
   Container,
   ContainerXS,
+  FlexBox,
   Form,
   H1,
   H2,
@@ -65,7 +68,6 @@ import {LoginForm} from '../component/LoginForm';
 import {RouterLink} from '../component/RouterLink';
 import {EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot} from '../module/action/';
-import {BackendError} from '../module/action/BackendError';
 import {LabeledError} from '../module/action/LabeledError';
 import {ValidationError} from '../module/action/ValidationError';
 import {bindActionCreators, RootState} from '../module/reducer';
@@ -103,10 +105,13 @@ const LoginComponent = ({
 
   const [twoFactorSubmitError, setTwoFactorSubmitError] = useState<string | Error>('');
   const [twoFactorLoginData, setTwoFactorLoginData] = useState<LoginData>();
+  const [verificationCode, setVerificationCode] = useState('');
+  const [twoFactorSubmitFailedOnce, setTwoFactorSubmitFailedOnce] = useState(false);
+
+  const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE);
 
   const [showEntropyForm, setShowEntropyForm] = useState(false);
   const isEntropyRequired = Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY;
-
   const onEntropyGenerated = useRef<((entropy: Uint8Array) => void) | undefined>();
   const entropy = useRef<Uint8Array | undefined>();
   const getEntropy = isEntropyRequired
@@ -136,7 +141,7 @@ const LoginComponent = ({
     if (defaultSSOCode) {
       navigate(`${ROUTE.SSO}/${defaultSSOCode}`);
     }
-  }, [defaultSSOCode]);
+  }, [defaultSSOCode, navigate]);
 
   useEffect(() => {
     const queryConversationCode = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE) || null;
@@ -157,7 +162,9 @@ const LoginComponent = ({
   useEffect(() => {
     resetAuthError();
     const isImmediateLogin = UrlUtil.hasURLParameter(QUERY_KEY.IMMEDIATE_LOGIN);
-    if (isImmediateLogin) {
+    const is2FAEntropy = UrlUtil.hasURLParameter(QUERY_KEY.TWO_FACTOR) && isEntropyRequired;
+
+    if ((isImmediateLogin && !is2FAEntropy) || isOauth) {
       immediateLogin();
     }
     return () => {
@@ -170,9 +177,14 @@ const LoginComponent = ({
       await doInit({isImmediateLogin: true, shouldValidateLocalClient: false});
       const entropyData = await getEntropy?.();
       await doInitializeClient(ClientType.PERMANENT, undefined, undefined, entropyData);
+
+      if (isOauth) {
+        return navigate(ROUTE.AUTHORIZE);
+      }
       return navigate(ROUTE.HISTORY_INFO);
     } catch (error) {
       logger.error('Unable to login immediately', error);
+      setShowEntropyForm(false);
     }
   };
 
@@ -191,36 +203,43 @@ const LoginComponent = ({
         await doLogin(login, getEntropy);
       }
 
+      if (isOauth) {
+        return navigate(ROUTE.AUTHORIZE);
+      }
       return navigate(ROUTE.HISTORY_INFO);
     } catch (error) {
       if (isBackendError(error)) {
         switch (error.label) {
-          case BackendError.LABEL.TOO_MANY_CLIENTS: {
-            resetAuthError();
+          case BackendErrorLabel.TOO_MANY_CLIENTS: {
+            await resetAuthError();
             if (formLoginData?.verificationCode) {
-              doSetLocalStorage(QUERY_KEY.CONVERSATION_CODE, formLoginData.verificationCode);
+              await doSetLocalStorage(QUERY_KEY.CONVERSATION_CODE, formLoginData.verificationCode);
             }
             if (entropy.current) {
-              pushEntropyData(entropy.current);
+              await pushEntropyData(entropy.current);
             }
             navigate(ROUTE.CLIENTS);
             break;
           }
-          case BackendError.LABEL.CODE_AUTHENTICATION_REQUIRED: {
+
+          case BackendErrorLabel.CODE_AUTHENTICATION_REQUIRED: {
+            await resetAuthError();
             const login: LoginData = {...formLoginData, clientType: loginData.clientType};
-            if (login.email) {
+            if (login.email || login.handle) {
+              await doSendTwoFactorCode(login.email || login.handle || '');
               setTwoFactorLoginData(login);
-              doSendTwoFactorCode(login.email);
-              doSetLocalStorage(QUERY_KEY.JOIN_EXPIRES, Date.now() + 1000 * 60 * 10);
+              await doSetLocalStorage(QUERY_KEY.JOIN_EXPIRES, Date.now() + 1000 * 60 * 10);
             }
             break;
           }
-          case BackendError.LABEL.CODE_AUTHENTICATION_FAILED: {
+
+          case BackendErrorLabel.CODE_AUTHENTICATION_FAILED: {
             setTwoFactorSubmitError(error);
+            setTwoFactorSubmitFailedOnce(true);
             break;
           }
-          case BackendError.LABEL.INVALID_CREDENTIALS:
-          case BackendError.LABEL.SUSPENDED:
+          case BackendErrorLabel.INVALID_CREDENTIALS:
+          case BackendErrorLabel.ACCOUNT_SUSPENDED:
           case LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE: {
             break;
           }
@@ -248,14 +267,18 @@ const LoginComponent = ({
       }
     } catch (error) {
       setTwoFactorSubmitError(
-        new BackendError({code: StatusCodes.TOO_MANY_REQUESTS, label: BackendError.GENERAL_ERRORS.TOO_MANY_REQUESTS}),
+        new BackendError('', SyntheticErrorLabel.TOO_MANY_REQUESTS, StatusCodes.TOO_MANY_REQUESTS),
       );
     }
   };
 
   const submitTwoFactorLogin = (code?: string) => {
+    setVerificationCode(code ?? '');
     setTwoFactorSubmitError('');
-    handleSubmit({...twoFactorLoginData, verificationCode: code}, []);
+    // Do not auto submit if already failed once
+    if (!twoFactorSubmitFailedOnce) {
+      handleSubmit({...twoFactorLoginData, verificationCode: code}, []);
+    }
   };
 
   const storeEntropy = async (entropyData: Uint8Array) => {
@@ -306,10 +329,10 @@ const LoginComponent = ({
                     </Text>
                     <Label markInvalid={!!twoFactorSubmitError}>
                       <CodeInput
+                        disabled={isFetching}
                         style={{marginTop: 60}}
                         onCodeComplete={submitTwoFactorLogin}
                         data-uie-name="enter-code"
-                        markInvalid={!!twoFactorSubmitError}
                       />
                     </Label>
                     <div style={{display: 'flex', justifyContent: 'center', marginTop: 10}}>
@@ -324,6 +347,16 @@ const LoginComponent = ({
                         </TextLink>
                       )}
                     </div>
+                    <FlexBox justify="center">
+                      <Button
+                        disabled={!!twoFactorSubmitError || isFetching}
+                        type="submit"
+                        css={{marginTop: 65}}
+                        onClick={() => handleSubmit({...twoFactorLoginData, verificationCode}, [])}
+                      >
+                        {_({id: 'login.submitTwoFactorButton'})}
+                      </Button>
+                    </FlexBox>
                   </div>
                 ) : (
                   <>

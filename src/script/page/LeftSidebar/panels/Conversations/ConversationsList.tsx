@@ -17,13 +17,12 @@
  *
  */
 
-import React, {MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent} from 'react';
+import React from 'react';
 
 import {css} from '@emotion/react';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import {GroupAvatar} from 'Components/avatar/GroupAvatar';
+import {GroupAvatar, Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {ConversationListCell} from 'Components/list/ConversationListCell';
 import {Call} from 'src/script/calling/Call';
 import {User} from 'src/script/entity/User';
@@ -45,7 +44,7 @@ import {ListViewModel} from '../../../../view_model/ListViewModel';
 import {useAppMainState, ViewType} from '../../../state';
 import {ContentState, useAppState} from '../../../useAppState';
 
-export const ConversationsList: React.FC<{
+interface ConversationsListProps {
   callState: CallState;
   connectRequests: User[];
   conversationRepository: ConversationRepository;
@@ -53,11 +52,12 @@ export const ConversationsList: React.FC<{
   conversationState: ConversationState;
   listViewModel: ListViewModel;
   viewStyle: ConversationViewStyle;
-  currentFocus: number;
-  isConversationListFocus: boolean;
-  handleFocus: (index: number) => void;
-  handleArrowKeyDown: (e: React.KeyboardEvent) => void;
-}> = ({
+  currentFocus: string;
+  resetConversationFocus: () => void;
+  handleArrowKeyDown: (index: number) => (e: React.KeyboardEvent) => void;
+}
+
+export const ConversationsList = ({
   conversations,
   listViewModel,
   viewStyle,
@@ -66,10 +66,9 @@ export const ConversationsList: React.FC<{
   conversationRepository,
   callState,
   currentFocus,
-  isConversationListFocus,
-  handleFocus,
+  resetConversationFocus,
   handleArrowKeyDown,
-}) => {
+}: ConversationsListProps) => {
   const {contentState} = useAppState();
 
   const {joinableCalls} = useKoSubscribableChildren(callState, ['joinableCalls']);
@@ -105,14 +104,12 @@ export const ConversationsList: React.FC<{
           return (
             <ConversationListCell
               key={conversation.id}
-              focusConversation={currentFocus === index}
-              isConversationListFocus={isConversationListFocus}
-              handleFocus={handleFocus}
-              handleArrowKeyDown={handleArrowKeyDown}
-              index={index}
+              isFocused={currentFocus === conversation.id}
+              handleArrowKeyDown={handleArrowKeyDown(index)}
+              resetConversationFocus={resetConversationFocus}
               dataUieName="item-conversation"
               conversation={conversation}
-              onClick={(event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>) => {
+              onClick={event => {
                 if ('key' in event) {
                   createNavigateKeyboard(generateConversationUrl(conversation.qualifiedId), true)(event);
                 } else {
@@ -157,7 +154,7 @@ export const ConversationsList: React.FC<{
           tabIndex={TabIndex.FOCUSABLE}
           className={`conversation-list-cell ${isShowingConnectionRequests ? 'conversation-list-cell-active' : ''}`}
           onClick={onConnectionRequestClick}
-          onKeyDown={e => handleKeyDown(e, onConnectionRequestClick)}
+          onKeyDown={event => handleKeyDown(event, onConnectionRequestClick)}
         >
           <div className="conversation-list-cell-left">
             {connectRequests.length === 1 ? (

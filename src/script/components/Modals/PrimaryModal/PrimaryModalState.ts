@@ -18,12 +18,14 @@
  */
 
 import {isValid} from 'date-fns';
+import {escape} from 'underscore';
 import {create} from 'zustand';
 
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {formatLocale} from 'Util/TimeUtil';
-import {noop, createRandomUuid} from 'Util/util';
+import {noop} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {Action, ModalContent, ModalItem, ModalOptions, ModalQueue, PrimaryModalType, Text} from './PrimaryModalTypes';
 
@@ -82,7 +84,7 @@ const usePrimaryModalState = create<PrimaryModalState>((set, get) => ({
   updateErrorMessage: nextErrorMessage => set(state => ({...state, errorMessage: nextErrorMessage})),
 }));
 
-const addNewModalToQueue = (type: PrimaryModalType, options: ModalOptions, modalId = createRandomUuid()): void => {
+const addNewModalToQueue = (type: PrimaryModalType, options: ModalOptions, modalId = createUuid()): void => {
   const {currentModalId, existsInQueue, addToQueue, replaceInQueue} = usePrimaryModalState.getState();
 
   const alreadyOpen = modalId === currentModalId;

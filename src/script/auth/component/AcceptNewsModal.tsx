@@ -46,8 +46,7 @@ const AcceptNewsModal = ({onConfirm, onDecline}: Props) => {
               <FormattedMessage
                 {...acceptNewsModalStrings.privacyDescription}
                 values={{
-                  // eslint-disable-next-line react/display-name
-                  strong: ((...chunks: any[]) => <strong>{chunks}</strong>) as any,
+                  strong: (...chunks: any[]) => <strong>{chunks}</strong>,
                 }}
               />
             </Text>

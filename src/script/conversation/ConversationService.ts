@@ -19,11 +19,9 @@
 
 import type {
   CONVERSATION_ACCESS_ROLE,
-  ClientMismatch,
   Conversation as BackendConversation,
   ConversationCode,
   CONVERSATION_ACCESS,
-  NewOTRMessage,
 } from '@wireapp/api-client/lib/conversation';
 import type {
   ConversationJoinData,
@@ -280,43 +278,6 @@ export class ConversationService {
     return this.apiClient.api.conversation.postBot(conversationId, providerId, serviceId);
   }
 
-  /**
-   * Post an encrypted message to a conversation.
-   *
-   * @note If "recipients" are not specified you will receive a list of all missing OTR recipients (user-client-map).
-   * @note Options for the precondition check on missing clients are:
-   * - `false` - all clients
-   * - `Array<string>` - only clients of listed users
-   * - `true` - force sending
-   *
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/postOtrMessage
-   * @example How to send "recipients" payload
-   * "recipients": {
-   *   "<user-id>": {
-   *     "<client-id>": "<base64-encoded-encrypted-content>"
-   *   }
-   * }
-   *
-   * @param conversationId ID of conversation to send message in
-   * @param payload Payload to be posted
-   * @returns Promise that resolves when the message was sent
-   */
-  postEncryptedMessage(
-    conversationId: QualifiedId,
-    payload: NewOTRMessage<string>,
-    preconditionOption?: boolean | string[],
-  ): Promise<ClientMismatch> {
-    const reportMissing = Array.isArray(preconditionOption) ? preconditionOption : undefined;
-    const ignoreMissing = preconditionOption === true ? true : undefined;
-
-    if (reportMissing) {
-      payload.report_missing = reportMissing;
-    }
-
-    // TODO(federation): add domain in the postOTRMessage (?)
-    return this.apiClient.api.conversation.postOTRMessage(payload.sender, conversationId.id, payload, ignoreMissing);
-  }
-
   //##############################################################################
   // Database interactions
   //##############################################################################
@@ -405,8 +366,8 @@ export class ConversationService {
 
     return this.storageService
       .save(StorageSchemata.OBJECT_STORE.CONVERSATIONS, conversation_et.id, conversationData)
-      .then(primary_key => {
-        this.logger.info(`State of conversation '${primary_key}' was stored`, conversationData);
+      .then(() => {
+        this.logger.info(`State of conversation '${conversation_et.id}' was stored`);
         return conversation_et;
       });
   }

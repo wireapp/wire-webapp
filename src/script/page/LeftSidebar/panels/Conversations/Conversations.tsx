@@ -32,7 +32,6 @@ import {Icon} from 'Components/Icon';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {ListState} from 'src/script/page/useAppState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {isTabKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {ConversationsList} from './ConversationsList';
@@ -43,7 +42,7 @@ import {DefaultLabelIds} from '../../../../conversation/ConversationLabelReposit
 import {ConversationRepository} from '../../../../conversation/ConversationRepository';
 import {ConversationState} from '../../../../conversation/ConversationState';
 import {User} from '../../../../entity/User';
-import {useRoveFocus} from '../../../../hooks/useRoveFocus';
+import {useConversationFocus} from '../../../../hooks/useConversationFocus';
 import {useMLSConversationState} from '../../../../mls';
 import {PreferenceNotificationRepository} from '../../../../notification/PreferenceNotificationRepository';
 import {PropertiesRepository} from '../../../../properties/PropertiesRepository';
@@ -119,7 +118,6 @@ const Conversations: React.FC<ConversationsProps> = ({
   const {isOpen: isFolderOpen, openFolder} = useFolderState();
 
   const {conversationLabelRepository} = conversationRepository;
-  const [isConversationListFocus, focusConversationList] = useState(false);
 
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
   const {close: closeRightSidebar} = useAppMainState(state => state.rightSidebar);
@@ -180,8 +178,6 @@ const Conversations: React.FC<ConversationsProps> = ({
             className="left-list-header-availability"
             css={{...(showLegalHold && {gridColumn: '2/3'})}}
             onClick={event => AvailabilityContextMenu.show(event.nativeEvent, 'left-list-availability-menu')}
-            // on blur conversation list should get the focus
-            onBlur={() => focusConversationList(true)}
           >
             <AvailabilityState
               className="availability-state"
@@ -206,9 +202,6 @@ const Conversations: React.FC<ConversationsProps> = ({
           data-uie-name="status-name"
           role="presentation"
           tabIndex={TabIndex.FOCUSABLE}
-          // personal user won't see availability status menu, on blur of the userName
-          // conversation list should get the focus
-          onBlur={() => focusConversationList(true)}
         >
           {userName}
         </span>
@@ -229,12 +222,6 @@ const Conversations: React.FC<ConversationsProps> = ({
           type="button"
           className="conversations-footer-btn"
           onClick={() => switchList(ListState.START_UI)}
-          onKeyDown={event => {
-            //shift+tab from contacts tab should focus on the first conversation
-            if (event.shiftKey && isTabKey(event)) {
-              focusConversationList(true);
-            }
-          }}
           title={t('tooltipConversationsStart', Shortcut.getShortcutTooltip(ShortcutType.START))}
           data-uie-name="go-people"
         >
@@ -294,6 +281,7 @@ const Conversations: React.FC<ConversationsProps> = ({
         const conversation = conversationState.findConversation(call.conversationId);
         const callingViewModel = listViewModel.callingViewModel;
         const callingRepository = callingViewModel.callingRepository;
+
         return (
           conversation && (
             <div className="calling-cell" key={conversation.id}>
@@ -315,7 +303,8 @@ const Conversations: React.FC<ConversationsProps> = ({
     </>
   );
 
-  const {currentFocus, handleKeyDown, setCurrentFocus} = useRoveFocus(conversations.length);
+  const filteredConversations = filterEstablishedConversations(conversations);
+  const {currentFocus, handleKeyDown, resetConversationFocus} = useConversationFocus(filteredConversations);
 
   return (
     <ListWrapper id="conversations" headerElement={header} footer={footer} before={callingView}>
@@ -334,14 +323,13 @@ const Conversations: React.FC<ConversationsProps> = ({
         <ConversationsList
           connectRequests={connectRequests}
           callState={callState}
-          conversations={filterEstablishedConversations(conversations)}
+          conversations={filteredConversations}
           viewStyle={viewStyle}
           listViewModel={listViewModel}
           conversationState={conversationState}
           conversationRepository={conversationRepository}
-          handleFocus={setCurrentFocus}
           currentFocus={currentFocus}
-          isConversationListFocus={isConversationListFocus}
+          resetConversationFocus={resetConversationFocus}
           handleArrowKeyDown={handleKeyDown}
         />
       )}

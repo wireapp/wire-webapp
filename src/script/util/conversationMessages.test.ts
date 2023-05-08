@@ -41,7 +41,7 @@ describe('Conversation messages', () => {
         },
       ],
       displayTimestampShort: '5:15 PM',
-      headerSenderName: 'Arjita',
+      senderName: 'Arjita',
     };
 
     it(`returns the expected aria label for a file type message`, () => {
@@ -71,7 +71,7 @@ describe('Conversation messages', () => {
         },
       ],
       displayTimestampShort: '2:15 PM',
-      headerSenderName: 'Tim',
+      senderName: 'Tim',
     };
     it(`returns the expected aria label for a audio type message`, () => {
       const actual = getMessageAriaLabel(sample2);
@@ -100,7 +100,7 @@ describe('Conversation messages', () => {
         },
       ],
       displayTimestampShort: '10:15 PM',
-      headerSenderName: 'Virgil',
+      senderName: 'Virgil',
     };
     it(`returns the expected aria label for a text message`, () => {
       const actual = getMessageAriaLabel(sample3);

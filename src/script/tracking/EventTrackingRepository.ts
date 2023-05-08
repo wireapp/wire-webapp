@@ -28,7 +28,7 @@ import {roundLogarithmic} from 'Util/NumberUtil';
 import {loadValue, storeValue, resetStoreValue} from 'Util/StorageUtil';
 import {includesString} from 'Util/StringUtil';
 import {getParameter} from 'Util/UrlUtil';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {EventName} from './EventName';
 import {getPlatform} from './Helpers';
@@ -98,7 +98,7 @@ export class EventTrackingRepository {
         this.stopProductReporting();
       }
     } catch (error) {
-      this.logger.info(`Failed to send new countly tracking id to other devices ${error}`);
+      this.logger.warn(`Failed to send new countly tracking id to other devices ${error}`);
       storeValue(EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_FAILED_TO_MIGRATE_DEVICE_ID, newId);
     }
   };
@@ -119,7 +119,7 @@ export class EventTrackingRepository {
         this.messageRepository.sendCountlySync(this.countlyDeviceId);
         resetStoreValue(EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_UNSYNCED_DEVICE_ID_LOCAL_STORAGE_KEY);
       } catch (error) {
-        this.logger.info(`Failed to send new countly tracking id to other devices ${error}`);
+        this.logger.warn(`Failed to send new countly tracking id to other devices ${error}`);
       }
     }
 
@@ -146,7 +146,7 @@ export class EventTrackingRepository {
         }
       }
     } else {
-      this.countlyDeviceId = createRandomUuid();
+      this.countlyDeviceId = createUuid();
       storeValue(
         EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_DEVICE_ID_LOCAL_STORAGE_KEY,
         this.countlyDeviceId,
@@ -154,7 +154,7 @@ export class EventTrackingRepository {
       try {
         this.messageRepository.sendCountlySync(this.countlyDeviceId);
       } catch (error) {
-        this.logger.info(`Failed to send new countly tracking id to other devices ${error}`);
+        this.logger.warn(`Failed to send new countly tracking id to other devices ${error}`);
         storeValue(EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_UNSYNCED_DEVICE_ID_LOCAL_STORAGE_KEY, true);
       }
     }
@@ -288,8 +288,8 @@ export class EventTrackingRepository {
       });
 
       // NOTE: This log is required by QA
-      this.logger.info(`Reporting custom data for product event ${eventName}@${JSON.stringify(userData)}`);
-      this.logger.info(`Reporting product event ${eventName}@${JSON.stringify(segmentation)}`);
+      this.logger.log(`Reporting custom data for product event ${eventName}@${JSON.stringify(userData)}`);
+      this.logger.log(`Reporting product event ${eventName}@${JSON.stringify(segmentation)}`);
     }
   }
 

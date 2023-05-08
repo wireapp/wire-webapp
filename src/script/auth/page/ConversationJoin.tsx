@@ -20,6 +20,7 @@
 import React, {useEffect, useState} from 'react';
 
 import type {RegisterData} from '@wireapp/api-client/lib/auth';
+import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {Navigate} from 'react-router-dom';
@@ -53,7 +54,6 @@ import {UnsupportedBrowser} from '../component/UnsupportedBrowser';
 import {WirelessContainer} from '../component/WirelessContainer';
 import {EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
-import {BackendError} from '../module/action/BackendError';
 import {ValidationError} from '../module/action/ValidationError';
 import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
@@ -160,7 +160,7 @@ const ConversationJoinComponent = ({
        */
       await setLastEventDate(new Date(conversationEvent.time));
 
-      routeToApp(conversationEvent.conversation, conversationEvent.qualified_conversation.domain);
+      routeToApp(conversationEvent.conversation, conversationEvent.qualified_conversation?.domain ?? '');
     } catch (error) {
       if (error.label) {
         switch (error.label) {
@@ -210,9 +210,7 @@ const ConversationJoinComponent = ({
   };
 
   const isFullConversation =
-    conversationError &&
-    conversationError.label &&
-    conversationError.label === BackendError.CONVERSATION_ERRORS.CONVERSATION_TOO_MANY_MEMBERS;
+    conversationError && conversationError.label && conversationError.label === BackendErrorLabel.TOO_MANY_MEMBERS;
   const renderTemporaryGuestAccountCreation = !isAuthenticated || isTemporaryGuest || forceNewTemporaryGuestAccount;
 
   if (!isValidLink) {
@@ -314,7 +312,7 @@ const ConversationJoinComponent = ({
               onClick={async () => {
                 try {
                   const conversationEvent = await doJoinConversationByCode(conversationKey, conversationCode);
-                  routeToApp(conversationEvent.conversation, conversationEvent.qualified_conversation.domain);
+                  routeToApp(conversationEvent.conversation, conversationEvent.qualified_conversation?.domain ?? '');
                 } catch (error) {
                   console.warn('Unable to join conversation with existing account', error);
                 }

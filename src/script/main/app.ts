@@ -32,6 +32,7 @@ import {container} from 'tsyringe';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {initializeDataDog} from 'Util/DataDog';
 import {DebugUtil} from 'Util/DebugUtil';
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
@@ -78,7 +79,7 @@ import {IntegrationRepository} from '../integration/IntegrationRepository';
 import {IntegrationService} from '../integration/IntegrationService';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {MediaRepository} from '../media/MediaRepository';
-import {initMLSConversations, registerUninitializedConversations} from '../mls';
+import {initMLSCallbacks, initMLSConversations, registerUninitializedSelfAndTeamConversations} from '../mls';
 import {NotificationRepository} from '../notification/NotificationRepository';
 import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
 import {PermissionRepository} from '../permission/PermissionRepository';
@@ -208,7 +209,7 @@ export class App {
     repositories.storage = new StorageRepository();
 
     repositories.cryptography = new CryptographyRepository();
-    repositories.client = new ClientRepository(new ClientService(), repositories.cryptography, repositories.storage);
+    repositories.client = new ClientRepository(new ClientService(), repositories.cryptography);
     repositories.media = new MediaRepository(new PermissionRepository());
     repositories.audio = new AudioRepository(repositories.media.devicesHandler);
 
@@ -333,7 +334,10 @@ export class App {
    */
   async initApp(clientType: ClientType, onProgress: (progress: number, message?: string) => void) {
     // add body information
-    await this.core.useAPIVersion(this.config.SUPPORTED_API_VERSIONS, this.config.ENABLE_DEV_BACKEND_API);
+    const startTime = Date.now();
+    const [apiVersionMin, apiVersionMax] = this.config.SUPPORTED_API_RANGE;
+    await this.core.useAPIVersion(apiVersionMin, apiVersionMax, this.config.ENABLE_DEV_BACKEND_API);
+
     const osCssClass = Runtime.isMacOS() ? 'os-mac' : 'os-pc';
     const platformCssClass = Runtime.isDesktopApp() ? 'platform-electron' : 'platform-web';
     document.body.classList.add(osCssClass, platformCssClass);
@@ -376,6 +380,7 @@ export class App {
       });
 
       const selfUser = await this.initiateSelfUser();
+      await initializeDataDog(this.config, selfUser.qualifiedId);
 
       onProgress(5, t('initReceivedSelfUser', selfUser.name()));
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_SELF_USER);
@@ -388,27 +393,30 @@ export class App {
       onProgress(10);
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
-      await teamRepository.initTeam();
+      const {members: teamMembers} = await teamRepository.initTeam(selfUser.teamId);
+      telemetry.timeStep(AppInitTimingsStep.RECEIVED_USER_DATA);
 
-      const conversationEntities = await conversationRepository.loadConversations();
+      const connections = await connectionRepository.getConnections();
+      telemetry.addStatistic(AppInitStatisticsValue.CONNECTIONS, connections.length, 50);
+
+      const conversations = await conversationRepository.loadConversations();
+
+      await userRepository.loadUsers(selfUser, connections, conversations, teamMembers);
 
       if (supportsMLS()) {
-        await initMLSConversations(conversationEntities, selfUser, this.core, this.repository.conversation);
+        //if mls is supported, we need to initialize the callbacks (they are used when decrypting messages)
+        await initMLSCallbacks(this.core, this.repository.conversation);
       }
 
-      const connectionEntities = await connectionRepository.getConnections();
-      onProgress(25, t('initReceivedUserData'));
-      telemetry.timeStep(AppInitTimingsStep.RECEIVED_USER_DATA);
-      telemetry.addStatistic(AppInitStatisticsValue.CONVERSATIONS, conversationEntities.length, 50);
-      telemetry.addStatistic(AppInitStatisticsValue.CONNECTIONS, connectionEntities.length, 50);
-      if (connectionEntities.length) {
-        await Promise.allSettled(conversationRepository.mapConnections(connectionEntities));
+      if (connections.length) {
+        await Promise.allSettled(conversationRepository.mapConnections(connections));
       }
+
+      onProgress(25, t('initReceivedUserData'));
+      telemetry.addStatistic(AppInitStatisticsValue.CONVERSATIONS, conversations.length, 50);
       this._subscribeToUnloadEvents();
 
       await conversationRepository.conversationRoleRepository.loadTeamRoles();
-
-      await userRepository.loadUsers();
 
       await eventRepository.connectWebSocket(this.core, ({done, total}) => {
         const baseMessage = t('initDecryption');
@@ -421,8 +429,13 @@ export class App {
       const notificationsCount = eventRepository.notificationsTotal;
 
       if (supportsMLS()) {
-        // Once all the messages have been processed and the message sending queue freed we can now add the potential `self` and `team` conversations
-        await registerUninitializedConversations(conversationEntities, selfUser, clientEntity().id, this.core);
+        // Once all the messages have been processed and the message sending queue freed we can now:
+
+        //join all the mls groups we're member of and have not yet joined (eg. we were not send welcome message)
+        await initMLSConversations(conversations, this.core);
+
+        //add the potential `self` and `team` conversations
+        await registerUninitializedSelfAndTeamConversations(conversations, selfUser, clientEntity().id, this.core);
       }
 
       telemetry.timeStep(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
@@ -439,14 +452,10 @@ export class App {
       telemetry.timeStep(AppInitTimingsStep.APP_PRE_LOADED);
 
       userRepository['userState'].self().devices(clientEntities);
-      this.logger.info('App pre-loading completed');
       this._handleUrlParams();
       await conversationRepository.updateConversationsOnAppInit();
       await conversationRepository.conversationLabelRepository.loadLabels();
 
-      telemetry.timeStep(AppInitTimingsStep.APP_LOADED);
-
-      telemetry.report();
       amplify.publish(WebAppEvents.LIFECYCLE.LOADED);
 
       telemetry.timeStep(AppInitTimingsStep.UPDATED_CONVERSATIONS);
@@ -457,12 +466,14 @@ export class App {
       audioRepository.init(true);
       conversationRepository.cleanupConversations();
       callingRepository.setReady();
-      this.logger.info('App fully loaded');
+      telemetry.timeStep(AppInitTimingsStep.APP_LOADED);
+
+      this.logger.info(`App loaded in ${Date.now() - startTime}ms`);
 
       return selfUser;
     } catch (error) {
       if (error instanceof BaseError) {
-        this._appInitFailure(error);
+        await this._appInitFailure(error);
         return undefined;
       }
       throw error;
@@ -472,11 +483,11 @@ export class App {
   /**
    * Initialize ServiceWorker if supported.
    */
-  private initServiceWorker(): void {
+  private async initServiceWorker() {
     if (navigator.serviceWorker) {
-      navigator.serviceWorker
+      await navigator.serviceWorker
         .register(`/sw.js?${Environment.version(false)}`)
-        .then(({scope}) => this.logger.info(`ServiceWorker registration successful with scope: ${scope}`));
+        .then(({scope}) => this.logger.debug(`ServiceWorker registration successful with scope: ${scope}`));
     }
   }
 
@@ -553,7 +564,7 @@ export class App {
       }
     }
 
-    await container.resolve(StorageService).init(this.core.storage);
+    container.resolve(StorageService).init(this.core.storage);
     this.repository.client.init(userEntity);
     await this.repository.properties.init(userEntity);
 
@@ -673,13 +684,18 @@ export class App {
 
         const keepConversationInput = signOutReason === SIGN_OUT_REASON.SESSION_EXPIRED;
         const deletedKeys = CacheRepository.clearLocalStorage(keepConversationInput, keysToKeep);
-        this.logger.info(`Deleted "${deletedKeys.length}" keys from localStorage.`, deletedKeys);
+        this.logger.debug(`Deleted "${deletedKeys.length}" keys from localStorage.`, deletedKeys);
+      }
+      const shouldWipeIdentity = clearData || signOutReason === SIGN_OUT_REASON.CLIENT_REMOVED;
+
+      if (shouldWipeIdentity) {
+        localStorage.clear();
       }
 
+      await this.core.logout(shouldWipeIdentity);
       if (clearData) {
         // Info: This async call cannot be awaited in an "beforeunload" scenario, so we call it without waiting for it in order to delete the CacheStorage in the background.
         CacheRepository.clearCacheStorage();
-        localStorage.clear();
 
         try {
           await this.repository.storage.deleteDatabase();
@@ -688,7 +704,6 @@ export class App {
         }
       }
 
-      await this.core.logout(clearData);
       return _redirectToLogin();
     };
 

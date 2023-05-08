@@ -18,10 +18,8 @@
  */
 
 import type {BackendError} from '@wireapp/api-client/lib/http/';
-import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {AxiosError} from 'axios';
 
-import {QualifiedUserClientEntityMap} from '../client';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {ClientRecord} from '../storage/record/ClientRecord';
@@ -38,22 +36,10 @@ export function isUser(userCandidate: any): userCandidate is User {
   return userCandidate instanceof User;
 }
 
-export function isQualifiedIdArray(ids: string[] | QualifiedId[]): ids is QualifiedId[] {
-  return !!ids.length && isQualifiedId(ids[0]);
-}
-
-export function isQualifiedId(userId: string | QualifiedId): userId is QualifiedId {
-  return typeof userId === 'object' && 'domain' in userId;
-}
-
 export function isConversationEntity(conversation: any): conversation is Conversation {
   return conversation instanceof Conversation;
 }
 
 export function isClientRecord(record: any): record is ClientRecord {
   return !!record.meta;
-}
-
-export function isQualifiedUserClientEntityMap(map: any): map is QualifiedUserClientEntityMap {
-  return Object.keys(map)[0]?.includes('.');
 }

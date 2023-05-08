@@ -20,12 +20,14 @@
 import {FC, useEffect, useLayoutEffect} from 'react';
 
 import {amplify} from 'amplify';
+import {ErrorBoundary} from 'react-error-boundary';
 import {container} from 'tsyringe';
 
 import {StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingContainer} from 'Components/calling/CallingOverlayContainer';
+import {ErrorFallback} from 'Components/ErrorFallback';
 import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationModal';
 import {LegalHoldModal} from 'Components/Modals/LegalHoldModal/LegalHoldModal';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -136,7 +138,7 @@ const AppMain: FC<AppMainProps> = ({
 
       const activeConversation = conversationState.activeConversation();
 
-      if (repositories.user['userState'].isTemporaryGuest()) {
+      if (selfUser.isTemporaryGuest()) {
         return mainView.list.showTemporaryGuest();
       }
       if (activeConversation) {
@@ -215,14 +217,18 @@ const AppMain: FC<AppMainProps> = ({
       data-uie-value="is-loaded"
     >
       <RootProvider value={mainView}>
-        <>
+        <ErrorBoundary FallbackComponent={ErrorFallback}>
           <div id="app" className="app">
             {(!smBreakpoint || isLeftSidebarVisible) && (
               <LeftSidebar listViewModel={mainView.list} selfUser={selfUser} isActivatedAccount={isActivatedAccount} />
             )}
 
             {(!smBreakpoint || !isLeftSidebarVisible) && (
-              <MainContent isRightSidebarOpen={!!currentState} openRightSidebar={toggleRightSidebar} />
+              <MainContent
+                selfUser={selfUser}
+                isRightSidebarOpen={!!currentState}
+                openRightSidebar={toggleRightSidebar}
+              />
             )}
 
             {currentState && (
@@ -248,7 +254,7 @@ const AppMain: FC<AppMainProps> = ({
           />
 
           <LegalHoldModal
-            userState={userState}
+            selfUser={selfUser}
             conversationRepository={repositories.conversation}
             searchRepository={repositories.search}
             teamRepository={repositories.team}
@@ -261,7 +267,7 @@ const AppMain: FC<AppMainProps> = ({
           <UserModal userRepository={repositories.user} />
           <PrimaryModalComponent />
           <GroupCreationModal userState={userState} teamState={teamState} />
-        </>
+        </ErrorBoundary>
       </RootProvider>
     </StyledApp>
   );

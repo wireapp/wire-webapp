@@ -78,12 +78,15 @@ export class AssetRepository {
       return objectUrl;
     }
 
-    const blob = await this.load(asset);
-    if (!blob) {
-      return undefined;
-    }
-    const url = window.URL.createObjectURL(blob);
-    return setAssetUrl(asset.identifier, url);
+    const urlPromise = new Promise<string>(async (resolve, reject) => {
+      const blob = await this.load(asset);
+      if (!blob) {
+        return reject(undefined);
+      }
+      const url = window.URL.createObjectURL(blob);
+      resolve(url);
+    });
+    return setAssetUrl(asset.identifier, urlPromise);
   }
 
   public async load(asset: AssetRemoteData): Promise<undefined | Blob> {
@@ -211,7 +214,7 @@ export class AssetRepository {
     if (skipCompression === true) {
       compressedBytes = new Uint8Array(buffer as ArrayBuffer);
     } else {
-      const worker = new WebWorker('/worker/image-worker.js');
+      const worker = new WebWorker(() => new Worker(new URL('./imageWorker', import.meta.url)));
       compressedBytes = await worker.post({buffer, useProfileImageSize});
     }
     const compressedImage = await loadImage(new Blob([compressedBytes], {type: image.type}));

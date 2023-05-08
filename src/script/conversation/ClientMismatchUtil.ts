@@ -17,14 +17,9 @@
  *
  */
 
-import type {
-  ClientMismatch,
-  MessageSendingStatus,
-  QualifiedUserClients,
-  UserClients,
-} from '@wireapp/api-client/lib/conversation/';
+import type {MessageSendingStatus, QualifiedUserClients, UserClients} from '@wireapp/api-client/lib/conversation/';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {flattenQualifiedUserClients, flattenUserClients} from '@wireapp/core/lib/conversation/message/UserClientsUtil';
+import {flattenUserMap} from '@wireapp/core/lib/conversation/message/UserClientsUtil';
 import {isQualifiedUserClients} from '@wireapp/core/lib/util';
 import {difference, intersection} from 'underscore';
 
@@ -53,17 +48,13 @@ type ClientDiff = {
  * @param users? A list a users against which to match the mismatch. (if not given will dumbly flatten the given mismatch)
  */
 export function extractClientDiff(
-  {deleted = {}, redundant = {}, missing = {}}: Partial<ClientMismatch> | Partial<MessageSendingStatus>,
+  {deleted = {}, redundant = {}, missing = {}}: Partial<MessageSendingStatus>,
   users?: User[],
   defaultDomain: string = '',
 ): ClientDiff {
-  const allDeleted = {...deleted, ...redundant} as QualifiedUserClients | UserClients;
-  const deletedClients = isQualifiedUserClients(allDeleted)
-    ? flattenQualifiedUserClients(allDeleted)
-    : flattenUserClients(allDeleted, defaultDomain);
-  const missingClients = isQualifiedUserClients(missing)
-    ? flattenQualifiedUserClients(missing)
-    : flattenUserClients(missing, defaultDomain);
+  const allDeleted = {...deleted, ...redundant} as QualifiedUserClients;
+  const deletedClients = flattenUserMap(allDeleted);
+  const missingClients = flattenUserMap(missing);
 
   const toClientDiff = ({userId, data}: {data: string[]; userId: QualifiedId}) => ({clients: data, userId});
 

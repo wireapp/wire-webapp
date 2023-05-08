@@ -30,11 +30,12 @@ import type {Notification} from '@wireapp/api-client/lib/notification/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {DatabaseKeys} from '@wireapp/core/lib/notification/NotificationDatabaseRepository';
 import Dexie from 'dexie';
+import keyboardjs from 'keyboardjs';
 import {container} from 'tsyringe';
 
 import {getLogger, Logger} from 'Util/Logger';
 
-import {createRandomUuid} from './util';
+import {createUuid} from './uuid';
 
 import {CallingRepository} from '../calling/CallingRepository';
 import {CallState} from '../calling/CallState';
@@ -48,7 +49,6 @@ import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {EventRepository} from '../event/EventRepository';
 import {checkVersion} from '../lifecycle/newVersionHandler';
-import {MessageCategory} from '../message/MessageCategory';
 import {Core} from '../service/CoreSingleton';
 import {EventRecord, StorageRepository, StorageSchemata} from '../storage';
 import {UserRepository} from '../user/UserRepository';
@@ -93,13 +93,43 @@ export class DebugUtil {
     this.messageRepository = message;
 
     this.logger = getLogger('DebugUtil');
+
+    keyboardjs.bind('command+shift+1', this.toggleDebugUi);
+  }
+
+  /** will print all the ids of entities that show on screen (userIds, conversationIds, messageIds) */
+  toggleDebugUi(): void {
+    const removeDebugInfo = (els: NodeListOf<HTMLElement>) => els.forEach(el => el.parentNode?.removeChild(el));
+
+    const addDebugInfo = (els: NodeListOf<HTMLElement>) =>
+      els.forEach(el => {
+        const debugInfo = document.createElement('div');
+        debugInfo.classList.add('debug-info');
+        const value = el.dataset.uieUid;
+        if (value) {
+          debugInfo.textContent = value;
+          el.appendChild(debugInfo);
+        }
+      });
+
+    const debugInfos = document.querySelectorAll<HTMLElement>('.debug-info');
+    const isShowingDebugInfo = debugInfos.length > 0;
+
+    if (isShowingDebugInfo) {
+      removeDebugInfo(debugInfos);
+    } else {
+      const debugElements = document.querySelectorAll<HTMLElement>(
+        '.message[data-uie-uid], .conversation-list-cell[data-uie-uid], [data-uie-name=sender-name]',
+      );
+      addDebugInfo(debugElements);
+    }
   }
 
   breakLastNotificationId() {
     return this.storageRepository.storageService.update(
       StorageSchemata.OBJECT_STORE.AMPLIFY,
       DatabaseKeys.PRIMARY_KEY_LAST_NOTIFICATION,
-      {value: createRandomUuid(1)},
+      {value: createUuid(1)},
     );
   }
 
@@ -115,10 +145,9 @@ export class DebugUtil {
   }
 
   /** Used by QA test automation. */
-  async breakSession(userId: string | QualifiedId, clientId: string): Promise<void> {
+  async breakSession(userId: QualifiedId, clientId: string): Promise<void> {
     const proteusService = this.core.service!.proteus;
-    const qualifiedId = typeof userId === 'string' ? {domain: '', id: userId} : userId;
-    const sessionId = proteusService.constructSessionId(qualifiedId, clientId);
+    const sessionId = proteusService.constructSessionId(userId, clientId);
     await proteusService['cryptoClient'].debugBreakSession(sessionId);
   }
 
@@ -318,21 +347,23 @@ export class DebugUtil {
     const conversation = this.conversationState.activeConversation();
     let users = [];
     if (includeSelf) {
-      users.push(this.userState.self().id);
+      users.push(this.userState.self().qualifiedId);
     }
     users.push(...conversation.participating_user_ids());
     users = users.slice(0, maxUsers);
     return this.eventRepository['handleEvent'](
       {
         event: {
-          category: MessageCategory.NONE,
           conversation: conversation.id,
-          data: {reason: MemberLeaveReason.LEGAL_HOLD_POLICY_CONFLICT, user_ids: users},
+          data: {
+            reason: MemberLeaveReason.LEGAL_HOLD_POLICY_CONFLICT,
+            user_ids: users.map(({id}) => id),
+            qualified_user_ids: users,
+          },
           from: this.userState.self().id,
-          id: createRandomUuid(),
           time: conversation.getNextIsoDate(),
           type: CONVERSATION_EVENT.MEMBER_LEAVE,
-        } as EventRecord,
+        },
       },
       EventRepository.SOURCE.WEB_SOCKET,
     );
@@ -352,7 +383,7 @@ export class DebugUtil {
             to: userId,
           },
           type: USER_EVENT.CONNECTION,
-        } as unknown as EventRecord,
+        } as BackendEvent,
       },
       EventRepository.SOURCE.WEB_SOCKET,
     );

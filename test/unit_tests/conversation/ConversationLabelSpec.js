@@ -19,11 +19,11 @@
 
 import {ConversationLabelRepository} from 'src/script/conversation/ConversationLabelRepository';
 import {Conversation} from 'src/script/entity/Conversation';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 describe('ConversationLabelRepository', () => {
   const createConversation = isGroup => {
-    const conversation = new Conversation(createRandomUuid());
+    const conversation = new Conversation(createUuid());
     conversation.isGroup = () => isGroup;
     return conversation;
   };

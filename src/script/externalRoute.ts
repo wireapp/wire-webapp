@@ -25,6 +25,7 @@ const env = window.wire.env;
 export const URL = {
   ACCOUNT: env.URL?.ACCOUNT_BASE,
   PRIVACY_POLICY: env.URL?.PRIVACY_POLICY,
+  SUPPORT: env.URL?.SUPPORT.INDEX,
   TEAM_SETTINGS: env.URL?.TEAMS_BASE,
   TERMS_OF_USE_PERSONAL: env.URL?.TERMS_OF_USE_PERSONAL,
   TERMS_OF_USE_TEAMS: env.URL?.TERMS_OF_USE_TEAMS,
@@ -38,15 +39,16 @@ export const URL = {
 
 export const URL_PATH = {
   CREATE_TEAM: '/create-team/',
-  DECRYPT_ERROR_1: '/privacy/error-1/',
+  DECRYPT_ERROR_1: '/articles/207948115',
   DECRYPT_ERROR_2: '/privacy/error-2/',
   MANAGE_SERVICES: '/services/',
   MANAGE_TEAM: '/login/',
   PASSWORD_RESET: '/forgot/',
   PRIVACY_HOW: '/privacy/how/',
-  PRIVACY_WHY: '/privacy/why/',
+  PRIVACY_UNVERIFIED_USERS: '/articles/202857164',
+  PRIVACY_WHY: '/articles/207859815',
   SUPPORT_USERNAME: '/support/username/',
-};
+} as const;
 
 const getTeamSettingsUrl = (path: string = '', utmSource?: string): string | undefined => {
   const query = utmSource ? `?utm_source=${utmSource}&utm_term=desktop` : '';
@@ -59,6 +61,13 @@ export const getWebsiteUrl = (path: string = '', pkCampaign?: string): string | 
     const query = pkCampaign ? `?pk_campaign=${pkCampaign}&pk_kwd=desktop` : '';
     const websiteUrl = `${URL.WEBSITE}${path}${query}`;
     return addLocaleToUrl(URL.WEBSITE ? websiteUrl : undefined);
+  }
+  return undefined;
+};
+export const getHelpCenterUrl = (path: (typeof URL_PATH)[keyof typeof URL_PATH]) => {
+  if (URL.SUPPORT) {
+    const helpcenterUrl = `${URL.SUPPORT}${path}`;
+    return addLocaleToHelpCenterUrl(URL.SUPPORT ? helpcenterUrl : undefined);
   }
   return undefined;
 };
@@ -78,8 +87,10 @@ export const getManageTeamUrl = (utmSource?: string): string => getTeamSettingsU
 
 export const getCreateTeamUrl = (): string =>
   Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && `${Config.getConfig().URL.TEAMS_BASE}/register/email`;
+export const getDecryptErrorUrl = (): string => getHelpCenterUrl(URL_PATH.DECRYPT_ERROR_1);
 export const getPrivacyHowUrl = (): string => getWebsiteUrl(URL_PATH.PRIVACY_HOW);
-export const getPrivacyWhyUrl = (): string => getWebsiteUrl(URL_PATH.PRIVACY_WHY);
+export const getPrivacyUnverifiedUsersUrl = (): string => getHelpCenterUrl(URL_PATH.PRIVACY_UNVERIFIED_USERS);
+export const getPrivacyWhyUrl = (): string => getHelpCenterUrl(URL_PATH.PRIVACY_WHY);
 export const getSupportUsernameUrl = (): string => getWebsiteUrl(URL_PATH.SUPPORT_USERNAME);
 
 export const addLocaleToUrl = (url?: string): string => {
@@ -89,4 +100,16 @@ export const addLocaleToUrl = (url?: string): string => {
   const language = currentLanguage().slice(0, 2);
   const websiteLanguage = language == 'de' ? language : 'en';
   return url.replace(Config.getConfig().URL.WEBSITE_BASE, `${Config.getConfig().URL.WEBSITE_BASE}/${websiteLanguage}`);
+};
+
+const addLocaleToHelpCenterUrl = (url?: string): string => {
+  if (!url) {
+    return undefined;
+  }
+  const language = currentLanguage().slice(0, 2);
+  const websiteLanguage = language == 'de' ? language : 'en-us';
+  return url.replace(
+    `${Config.getConfig().URL.SUPPORT.INDEX}`,
+    `${Config.getConfig().URL.SUPPORT.INDEX}/hc/${websiteLanguage}`,
+  );
 };

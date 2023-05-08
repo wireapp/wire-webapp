@@ -51,7 +51,7 @@ export class AppInitTimings {
     const appLoaded = this.timings[AppInitTimingsStep.APP_LOADED];
     const appLoadedInSeconds = appLoaded / TIME_IN_MILLIS.SECOND;
 
-    return (Math.floor(appLoadedInSeconds / AppInitTimings.CONFIG.BUCKET_SIZE) + 1) * AppInitTimings.CONFIG.BUCKET_SIZE;
+    return Math.floor(appLoadedInSeconds);
   }
 
   log() {

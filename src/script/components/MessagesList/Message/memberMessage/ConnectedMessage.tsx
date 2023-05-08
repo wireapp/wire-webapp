@@ -19,8 +19,12 @@
 
 import React from 'react';
 
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
+
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {Icon} from 'Components/Icon';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';
+import {UnverifiedUserWarning} from 'Components/Modals/UserModal';
 import {User} from 'src/script/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -65,20 +69,36 @@ const ConnectedMessage: React.FC<ConnectedMessageProps> = ({
       />
 
       {isOutgoingRequest && (
-        <button
-          type="button"
-          className="button-reset-default message-connected-cancel accent-text"
-          onClick={onClickCancelRequest}
-          data-uie-name="do-cancel-request"
-        >
-          {t('conversationConnectionCancelRequest')}
-        </button>
+        <>
+          <div css={{margin: '2em'}}>
+            <UnverifiedUserWarning />
+          </div>
+
+          <Button variant={ButtonVariant.SECONDARY} onClick={onClickCancelRequest} data-uie-name="do-cancel-request">
+            {t('conversationConnectionCancelRequest')}
+          </Button>
+        </>
       )}
 
       {showServicesWarning && (
         <div className="message-services-warning" data-uie-name="label-services-warning">
           {t('conversationServicesWarning')}
         </div>
+      )}
+
+      {!isOutgoingRequest && (
+        <>
+          <div className="message-header" css={{marginTop: '1em'}}>
+            <div className="message-header-icon" />
+            <p className="message-header-label">{t('conversationNewConversation')}</p>
+          </div>
+          <div className="message-header">
+            <div className="message-header-icon message-header-icon--svg text-foreground">
+              <Icon.Info />
+            </div>
+            <p className="message-header-label">{t('conversationUnverifiedUserWarning')}</p>
+          </div>
+        </>
       )}
     </div>
   );

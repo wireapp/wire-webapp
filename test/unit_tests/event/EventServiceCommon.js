@@ -22,7 +22,7 @@ import {ConversationError} from 'src/script/error/ConversationError';
 import {StorageError} from 'src/script/error/StorageError';
 import {MessageCategory} from 'src/script/message/MessageCategory';
 import {StorageSchemata} from 'src/script/storage/StorageSchemata';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {TestFactory} from '../../helper/TestFactory';
 
@@ -91,7 +91,7 @@ const testEventServiceClass = (testedServiceName, className) => {
       });
 
       it('returns undefined if no event with id is found', () => {
-        return testFactory[testedServiceName].loadEvent(conversationId, createRandomUuid()).then(messageEntity => {
+        return testFactory[testedServiceName].loadEvent(conversationId, createUuid()).then(messageEntity => {
           expect(messageEntity).not.toBeDefined();
         });
       });
@@ -300,17 +300,19 @@ const testEventServiceClass = (testedServiceName, className) => {
       const newEvent = {
         conversation: conversationId,
         id: '4af67f76-09f9-4831-b3a4-9df877b8c29a',
+        data: {},
         from: senderId,
         time: '2016-08-04T13:27:58.993Z',
         type: 'conversation.message-add',
       };
+      const categorizedEvent = {...newEvent, category: MessageCategory.TEXT};
 
       it('save event in the database', () => {
         spyOn(testFactory.storage_service, 'save').and.callFake(event => Promise.resolve(event));
 
         return testFactory[testedServiceName].saveEvent(newEvent).then(event => {
           expect(event.category).toBeDefined();
-          expect(testFactory.storage_service.save).toHaveBeenCalledWith(eventStoreName, undefined, newEvent);
+          expect(testFactory.storage_service.save).toHaveBeenCalledWith(eventStoreName, undefined, categorizedEvent);
         });
       });
     });

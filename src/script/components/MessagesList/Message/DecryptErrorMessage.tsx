@@ -21,7 +21,7 @@ import React, {useState} from 'react';
 
 import {DeviceId} from 'Components/DeviceId';
 import {Icon} from 'Components/Icon';
-import {getWebsiteUrl, URL_PATH} from 'src/script/externalRoute';
+import {getDecryptErrorUrl} from 'src/script/externalRoute';
 import {MotionDuration} from 'src/script/motion/MotionDuration';
 import {t} from 'Util/LocalizerUtil';
 
@@ -35,7 +35,7 @@ export interface DecryptErrorMessageProps {
 const DecryptErrorMessage: React.FC<DecryptErrorMessageProps> = ({message, onClickResetSession}) => {
   const [isResettingSession, setIsResettingSession] = useState(false);
 
-  const link = getWebsiteUrl(URL_PATH.DECRYPT_ERROR_1);
+  const link = getDecryptErrorUrl();
   const caption = message.isIdentityChanged
     ? t('conversationUnableToDecrypt2', message.user().name(), {
         '/highlight': '</span>',

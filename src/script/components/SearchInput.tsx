@@ -19,6 +19,8 @@
 
 import React, {useEffect, useLayoutEffect, useRef} from 'react';
 
+import cx from 'classnames';
+
 import {isRemovalAction, isEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
@@ -77,7 +79,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
           <div className="search-icon icon-search" />
 
           <input
-            className="search-input"
+            className={cx('search-input', {'search-input-padding': !!input})}
             data-uie-name="enter-users"
             maxLength={MAX_HANDLE_LENGTH}
             onChange={event => setInput(event.target.value)}

@@ -17,21 +17,36 @@
  *
  */
 
-export class Account {
+import {EventEmitter} from 'stream';
+
+export class Account extends EventEmitter {
   backendFeatures = {
-    federationEndpoints: false,
+    federationEndpoints: true,
   };
 
   configureMLSCallbacks = jest.fn();
 
   service = {
-    mls: {registerConversation: jest.fn()},
+    mls: {
+      registerConversation: jest.fn(),
+      joinConferenceSubconversation: jest.fn(),
+      getGroupIdFromConversationId: jest.fn(),
+      renewKeyMaterial: jest.fn(),
+      getClientIds: jest.fn(),
+      getEpoch: jest.fn(),
+      exportSecretKey: jest.fn(),
+      leaveConferenceSubconversation: jest.fn(),
+      on: this.on,
+      emit: this.emit,
+      off: this.off,
+    },
     asset: {
       uploadAsset: jest.fn(),
     },
     conversation: {
       send: jest.fn(),
       isMLSConversationEstablished: jest.fn(),
+      addUsersToMLSConversation: jest.fn(),
       messageTimer: {
         setConversationLevelTimer: jest.fn(),
       },

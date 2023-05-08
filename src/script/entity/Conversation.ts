@@ -59,6 +59,7 @@ import {ConversationStatus} from '../conversation/ConversationStatus';
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
 import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
 import {ConversationError} from '../error/ConversationError';
+import {isContentMessage} from '../guards/Message';
 import {StatusType} from '../message/StatusType';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {TeamState} from '../team/TeamState';
@@ -156,6 +157,7 @@ export class Conversation {
   public readonly notificationState: ko.PureComputed<number>;
   public readonly participating_user_ets: ko.ObservableArray<User>;
   public readonly participating_user_ids: ko.ObservableArray<QualifiedId>;
+  public readonly allUserEntities: ko.PureComputed<User[]>;
   public readonly receiptMode: ko.Observable<RECEIPT_MODE>;
   public readonly removed_from_conversation: ko.PureComputed<boolean>;
   public readonly roles: ko.Observable<Record<string, string>>;
@@ -212,6 +214,11 @@ export class Conversation {
 
     this.participating_user_ets = ko.observableArray([]); // Does not include self user
     this.participating_user_ids = ko.observableArray([]); // Does not include self user
+    this.allUserEntities = ko.pureComputed(() => {
+      const selfUser = this.selfUser();
+      const selfUserArray = selfUser ? [selfUser] : [];
+      return selfUserArray.concat(this.participating_user_ets());
+    });
     this.selfUser = ko.observable();
     this.roles = ko.observable({});
 
@@ -322,14 +329,14 @@ export class Conversation {
         return undefined;
       }
 
-      return this.allUserEntities.every(userEntity => userEntity.is_verified());
+      return this.allUserEntities().every(userEntity => userEntity.is_verified());
     });
 
     this.legalHoldStatus = ko.observable(LegalHoldStatus.DISABLED);
 
     this.hasLegalHold = ko.computed(() => {
       const isInitialized = this.hasInitializedUsers();
-      const hasLegalHold = isInitialized && this.allUserEntities.some(userEntity => userEntity.isOnLegalHold());
+      const hasLegalHold = isInitialized && this.allUserEntities().some(userEntity => userEntity.isOnLegalHold());
 
       if (isInitialized) {
         this.legalHoldStatus(hasLegalHold ? LegalHoldStatus.ENABLED : LegalHoldStatus.DISABLED);
@@ -573,10 +580,6 @@ export class Conversation {
       this.type,
       this.verification_state,
     ].forEach(property => (property as ko.Observable).subscribe(this.persistState));
-  }
-
-  get allUserEntities() {
-    return [this.selfUser()].concat(this.participating_user_ets());
   }
 
   readonly persistState = (): void => {
@@ -844,8 +847,7 @@ export class Conversation {
     if (messageEntity) {
       const existingMessageEntity = this._findDuplicate(messageEntity.id, messageEntity.from);
       if (existingMessageEntity) {
-        const logData = {additionalMessage: messageEntity, existingMessage: existingMessageEntity};
-        this.logger.warn(`Filtered message '${messageEntity.id}' as duplicate in view`, logData);
+        this.logger.warn(`Filtered message '${messageEntity.id}' as duplicate in view`);
         return undefined;
       }
       return messageEntity;
@@ -889,7 +891,10 @@ export class Conversation {
     if (message_et) {
       const timestamp = message_et.timestamp();
       if (timestamp <= this.last_server_timestamp()) {
-        if (message_et.timestamp_affects_order()) {
+        // Some message do not bubble the conversation up in the conversation list (call messages for example or some system messages).
+        // Those should not update the conversation timestamp.
+        // This is ignored if the `forceUpdate` flag is set.
+        if (message_et.timestamp_affects_order() || forceUpdate) {
           this.setTimestamp(timestamp, TIMESTAMP_TYPE.LAST_EVENT, forceUpdate);
 
           const from_self = message_et.user()?.isMe;
@@ -975,7 +980,9 @@ export class Conversation {
    * @param messageId ID of message to be retrieved
    */
   getMessageByReplacementId(messageId: string): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
-    return this.messages().find(messageEntity => (messageEntity as ContentMessage)?.replacing_message_id === messageId);
+    return this.messages().find(
+      messageEntity => isContentMessage(messageEntity) && messageEntity.replacing_message_id === messageId,
+    );
   }
 
   updateGuests(): void {

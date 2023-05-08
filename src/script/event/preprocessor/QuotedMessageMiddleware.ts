@@ -99,26 +99,33 @@ export class QuotedMessageMiddleware {
 
     const encodedQuote = base64ToArray(rawQuote);
     const quote = Quote.decode(encodedQuote);
-    this.logger.info('Found quoted message', quote);
+    this.logger.info(`Found quoted message: ${quote.quotedMessageId}`);
 
     const messageId = quote.quotedMessageId;
 
-    const quotedMessage = await this.eventService.loadEvent(event.conversation, messageId);
+    let quotedMessage =
+      (await this.eventService.loadEvent(event.conversation, messageId)) ??
+      (await this.eventService.loadReplacingEvent(event.conversation, messageId));
     if (!quotedMessage) {
-      this.logger.warn(`Quoted message with ID "${messageId}" not found.`);
-      const quoteData = {
-        error: {
-          type: QuoteEntity.ERROR.MESSAGE_NOT_FOUND,
-        },
-      };
+      const replacedMessage = await this.eventService.loadReplacingEvent(event.conversation, messageId);
+      if (!replacedMessage) {
+        this.logger.warn(`Quoted message with ID "${messageId}" not found.`);
+        const quoteData = {
+          error: {
+            type: QuoteEntity.ERROR.MESSAGE_NOT_FOUND,
+          },
+        };
 
-      const decoratedData = {...event.data, quote: quoteData};
-      return {...event, data: decoratedData};
+        const decoratedData = {...event.data, quote: quoteData};
+        return {...event, data: decoratedData};
+      }
+      quotedMessage = replacedMessage;
     }
 
     const quoteData = {
       message_id: messageId,
       user_id: quotedMessage.from,
+      hash: quote.quotedMessageSha256,
     };
 
     const decoratedData = {...event.data, quote: quoteData};

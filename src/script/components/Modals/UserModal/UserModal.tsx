@@ -23,16 +23,20 @@ import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
+import {Link, LinkVariant} from '@wireapp/react-ui-kit';
+
 import {Icon} from 'Components/Icon';
 import {ModalComponent} from 'Components/ModalComponent';
 import {EnrichedFields} from 'Components/panel/EnrichedFields';
 import {UserActions} from 'Components/panel/UserActions';
 import {UserDetails} from 'Components/panel/UserDetails';
+import {getPrivacyUnverifiedUsersUrl} from 'src/script/externalRoute';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 
 import {useUserModalState} from './UserModal.state';
+import {userModalStyle} from './UserModal.styles';
 
 import {Config} from '../../../Config';
 import {User} from '../../../entity/User';
@@ -98,6 +102,29 @@ const UserModalUserActionsSection: React.FC<UserModalUserActionsSectionProps> = 
   );
 };
 
+interface UnverifiedUserWarningProps {
+  user?: User;
+}
+
+export const UnverifiedUserWarning: React.FC<UnverifiedUserWarningProps> = ({user}) => {
+  return (
+    <div css={{display: 'flex', color: 'var(--danger-color)', fill: 'var(--danger-color)', margin: '1em 0'}}>
+      <Icon.Info css={{height: '1rem', margin: '0.15em 1em', minWidth: '1rem'}} />
+      <p css={{fontSize: 'var(--font-size-medium)'}}>
+        {user ? t('userNotVerified', {user: user.name()}) : t('conversationConnectionVerificationWarning')}
+        <Link
+          css={{fontSize: 'var(--font-size-medium)', margin: '0 0.2em'}}
+          variant={LinkVariant.PRIMARY}
+          targetBlank
+          href={getPrivacyUnverifiedUsersUrl()}
+        >
+          {t('modalUserLearnMore')}
+        </Link>
+      </p>
+    </div>
+  );
+};
+
 const UserModal: React.FC<UserModalProps> = ({
   userRepository,
   core = container.resolve(Core),
@@ -120,6 +147,7 @@ const UserModal: React.FC<UserModalProps> = ({
   };
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
   const {self, isActivatedAccount} = useKoSubscribableChildren(userState, ['self', 'isActivatedAccount']);
+  const {is_trusted: isTrusted} = useKoSubscribableChildren(self, ['is_trusted']);
   const {is_verified: isSelfVerified} = useKoSubscribableChildren(self, ['is_verified']);
   const isFederated = core.backendFeatures?.isFederated;
 
@@ -145,12 +173,15 @@ const UserModal: React.FC<UserModalProps> = ({
   }, [userId?.id, userId?.domain]);
 
   return (
-    <div className="user-modal">
+    <div className="user-modal" css={userModalStyle}>
       <ModalComponent
         isShown={isShown}
         onBgClick={hide}
         onClosed={onModalClosed}
         data-uie-name={user ? 'modal-user-profile' : userNotFound ? 'modal-cannot-open-profile' : ''}
+        wrapperCSS={{
+          padding: 0,
+        }}
       >
         <div className="modal__header">
           {userNotFound && (
@@ -171,9 +202,18 @@ const UserModal: React.FC<UserModalProps> = ({
         <div className={cx('modal__body user-modal__wrapper', {'user-modal__wrapper--max': !user && !userNotFound})}>
           {user && (
             <>
-              <UserDetails participant={user} isSelfVerified={isSelfVerified} classifiedDomains={classifiedDomains} />
+              <UserDetails
+                avatarStyles={{
+                  marginTop: 60,
+                }}
+                participant={user}
+                isSelfVerified={isSelfVerified}
+                classifiedDomains={classifiedDomains}
+              />
 
               <EnrichedFields user={user} showDomain={isFederated} />
+
+              {!isTrusted && <UnverifiedUserWarning user={user} />}
 
               <UserModalUserActionsSection
                 user={user}

@@ -17,6 +17,7 @@
  *
  */
 
+import {User} from 'src/script/entity/User';
 import {TeamRepository} from 'src/script/team/TeamRepository';
 import {TeamState} from 'src/script/team/TeamState';
 import {UserState} from 'src/script/user/UserState';
@@ -46,7 +47,10 @@ describe('TeamRepository', () => {
   describe('getTeam()', () => {
     it('returns the team entity', async () => {
       const userState = new UserState();
-      userState.self({id: 'self-id', teamId: 'e6d3adc5-9140-477a-abc1-8279d210ceab'});
+      const selfUser = new User('self-id');
+      selfUser.teamId = 'e6d3adc5-9140-477a-abc1-8279d210ceab';
+      selfUser.isMe = true;
+      userState.users([selfUser]);
       const teamService = {
         getTeamById: jest.fn(team => Promise.resolve(team_metadata)),
       };
@@ -86,13 +90,10 @@ describe('TeamRepository', () => {
   describe('sendAccountInfo', () => {
     it('does not crash when there is no team logo', async () => {
       const userState = new UserState();
-      userState.self({
-        accent_id: () => 2,
-        teamRole: () => 'z.team.TeamRole.ROLE.NONE',
-        getIconResource: async () => ({
-          load: async () => undefined,
-        }),
-      });
+      const selfUser = new User();
+      selfUser.isMe = true;
+      selfUser.teamRole('z.team.TeamRole.ROLE.NONE');
+      userState.users([selfUser]);
       const teamState = new TeamState(userState);
       teamState.team({
         id: 'team-id',

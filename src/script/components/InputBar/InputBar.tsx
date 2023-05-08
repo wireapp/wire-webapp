@@ -77,7 +77,6 @@ import {useAppMainState} from '../../page/state';
 import {SearchRepository} from '../../search/SearchRepository';
 import {StorageRepository} from '../../storage';
 import {TeamState} from '../../team/TeamState';
-import {UserState} from '../../user/UserState';
 
 const CONFIG = {
   ...Config.getConfig(),
@@ -94,7 +93,7 @@ interface InputBarProps {
   readonly searchRepository: SearchRepository;
   readonly storageRepository: StorageRepository;
   readonly teamState: TeamState;
-  readonly userState: UserState;
+  readonly selfUser: User;
   onShiftTab: () => void;
   uploadDroppedFiles: (droppedFiles: File[]) => void;
   uploadImages: (images: File[]) => void;
@@ -112,7 +111,7 @@ const InputBar = ({
   propertiesRepository,
   searchRepository,
   storageRepository,
-  userState = container.resolve(UserState),
+  selfUser,
   teamState = container.resolve(TeamState),
   onShiftTab,
   uploadDroppedFiles,
@@ -123,10 +122,10 @@ const InputBar = ({
     teamState,
     ['classifiedDomains', 'isSelfDeletingMessagesEnabled', 'isFileSharingSendingEnabled'],
   );
-  const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
   const {
     connection,
     participating_user_ets: participatingUserEts,
+    allUserEntities: allUsers,
     localMessageTimer,
     messageTimer,
     hasGlobalMessageTimer,
@@ -134,6 +133,7 @@ const InputBar = ({
   } = useKoSubscribableChildren(conversationEntity, [
     'connection',
     'firstUserEntity',
+    'allUserEntities',
     'participating_user_ets',
     'localMessageTimer',
     'messageTimer',
@@ -542,8 +542,18 @@ const InputBar = ({
     } else {
       sendMessage(messageText, updatedMentions);
     }
-
-    resetDraftState(true);
+    /*
+      When trying to update a textarea with japanese value to
+      empty in onKeyDown handler the text is not fully cleared
+      and some parts of text is pasted by the OS/Browser after
+      we do setInputValue('');
+      To fix this we have to add a setTimeout in order to postpone
+      the operation of clearing the text to after of the proccess
+      of the onKeyDown and onKeyUp DOM events.
+    */
+    setTimeout(() => {
+      resetDraftState(true);
+    }, 0);
     textareaRef.current?.focus();
   };
 
@@ -567,6 +577,9 @@ const InputBar = ({
 
   const handlePasteFiles = (files: FileList): void => {
     const [pastedFile] = files;
+    if (!pastedFile) {
+      return;
+    }
     const {lastModified} = pastedFile;
 
     const date = formatLocale(lastModified || new Date(), 'PP, pp');
@@ -763,7 +776,7 @@ const InputBar = ({
       {!!isTypingIndicatorEnabled && <TypingIndicator conversationId={conversationEntity.id} />}
 
       {classifiedDomains && !isConnectionRequest && (
-        <ClassifiedBar users={participatingUserEts} classifiedDomains={classifiedDomains} />
+        <ClassifiedBar users={allUsers} classifiedDomains={classifiedDomains} />
       )}
 
       {isReplying && !isEditing && <ReplyBar replyMessageEntity={replyMessageEntity} onCancel={handleCancelReply} />}

@@ -72,7 +72,7 @@ const ContentAsset = ({
               onMessageClick={onClickMessage}
               text={(asset as Text).render(selfId, message.accent_color())}
               className={cx('text', {
-                'text-foreground': status === StatusType.SENDING,
+                'text-foreground': status === StatusType.SENDING || status === StatusType.FAILED,
                 'text-large': includesOnlyEmojis(asset.text),
                 'ephemeral-message-obfuscated': isObfuscated,
               })}

@@ -20,7 +20,7 @@
 import {render} from '@testing-library/react';
 
 import * as TimeUtil from 'Util/TimeUtil';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {AssetHeader} from './AssetHeader';
 
@@ -34,10 +34,10 @@ describe('AssetHeader', () => {
     jest.spyOn(TimeUtil, 'formatTimeShort').mockReturnValue('3:08 PM');
     jest.spyOn(TimeUtil, 'formatDateShort').mockReturnValue('01/21');
 
-    const user = new User(createRandomUuid());
+    const user = new User(createUuid());
     user.name(userName);
 
-    const message = new Message(createRandomUuid());
+    const message = new Message(createUuid());
     message.timestamp(timestamp);
     message.user(user);
 

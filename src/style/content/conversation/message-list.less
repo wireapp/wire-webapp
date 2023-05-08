@@ -39,10 +39,6 @@
   position: relative;
   margin-bottom: 16px;
 
-  & a {
-    text-decoration: none;
-  }
-
   & * {
     .accent-selection;
   }
@@ -94,7 +90,6 @@
   }
 
   .message-mention {
-    display: inline-block;
     color: var(--accent-color);
     .text-medium;
 
@@ -142,6 +137,7 @@
 .message-header {
   position: relative;
   display: flex;
+  width: 100%;
   padding-top: 6px;
   margin-bottom: 4px;
   line-height: @avatar-diameter-xs;
@@ -659,13 +655,6 @@
 
 .message-connected-avatar {
   margin-top: 24px;
-}
-
-.message-connected-cancel {
-  .label-xs;
-
-  margin-top: 32px;
-  cursor: pointer;
 }
 
 .message-group-creation-header,

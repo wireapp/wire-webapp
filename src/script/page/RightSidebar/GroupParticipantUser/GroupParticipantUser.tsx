@@ -36,7 +36,7 @@ import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {ConversationRoleRepository} from '../../../conversation/ConversationRoleRepository';
-import {MemberLeaveEvent} from '../../../conversation/EventBuilder';
+import {MemberLeaveEvent, TeamMemberLeaveEvent} from '../../../conversation/EventBuilder';
 import {Conversation} from '../../../entity/Conversation';
 import {User} from '../../../entity/User';
 import {ClientEvent} from '../../../event/Client';
@@ -109,7 +109,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
     }
   };
 
-  const checkMemberLeave = ({type, data}: MemberLeaveEvent) => {
+  const checkMemberLeave = ({type, data}: MemberLeaveEvent | TeamMemberLeaveEvent) => {
     if (type === ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE && data.user_ids.includes(currentUser.id)) {
       goToRoot();
     }

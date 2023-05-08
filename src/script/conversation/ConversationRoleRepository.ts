@@ -63,7 +63,6 @@ const defaultMemberRole: ConversationRole = {
 };
 
 export class ConversationRoleRepository {
-  readonly conversationRoles: Record<string, ConversationRole[]>;
   readonly logger: Logger;
   teamRoles: ConversationRole[];
 
@@ -74,7 +73,6 @@ export class ConversationRoleRepository {
     private readonly teamState = container.resolve(TeamState),
   ) {
     this.logger = getLogger('ConversationRoleRepository');
-    this.conversationRoles = {};
     this.teamRoles = [defaultAdminRole, defaultMemberRole];
   }
 
@@ -87,10 +85,6 @@ export class ConversationRoleRepository {
         this.logger.warn('Could not load team conversation roles', error);
       }
     }
-  };
-
-  readonly setConversationRoles = (conversation: Conversation, newRoles: ConversationRole[]): void => {
-    this.conversationRoles[conversation.id] = newRoles;
   };
 
   updateConversationRoles = async (conversation: Conversation): Promise<void> => {
@@ -122,7 +116,7 @@ export class ConversationRoleRepository {
     });
   };
 
-  readonly getUserRole = (conversation: Conversation, userEntity: User): string => {
+  private readonly getUserRole = (conversation: Conversation, userEntity: User): string => {
     return conversation.roles()[userEntity.id];
   };
 
@@ -130,18 +124,14 @@ export class ConversationRoleRepository {
     return this.getUserRole(conversation, userEntity) === DefaultRole.WIRE_ADMIN;
   };
 
-  readonly isSelfGroupAdmin = (conversation: Conversation): boolean => {
-    return this.isUserGroupAdmin(conversation, this.userState.self());
-  };
-
-  readonly getConversationRoles = (conversation: Conversation): ConversationRole[] => {
+  private readonly getConversationRoles = (conversation: Conversation): ConversationRole[] => {
     if (this.teamState.isTeam() && this.teamState.team()?.id === conversation.team_id) {
       return this.teamRoles;
     }
-    return this.conversationRoles[conversation.id] || this.teamRoles;
+    return this.teamRoles;
   };
 
-  readonly getUserPermissions = (conversation: Conversation, user: User): ConversationRole => {
+  private readonly getUserPermissions = (conversation: Conversation, user: User): ConversationRole => {
     const conversationRoles = this.getConversationRoles(conversation);
     const userRole: string = this.getUserRole(conversation, user);
     return conversationRoles?.find(({conversation_role}) => conversation_role === userRole) || defaultMemberRole;

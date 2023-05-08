@@ -34,13 +34,6 @@ export class WindowHandler {
     window.addEventListener('unhandledrejection', (promiseRejectionEvent: any): void | false => {
       const error = promiseRejectionEvent.reason || {};
 
-      const isDegraded = error.type === ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION;
-      if (isDegraded) {
-        this.logger.log('User has canceled sending a message to a degraded conversation.');
-        promiseRejectionEvent.preventDefault();
-        promiseRejectionEvent.stopPropagation();
-        return false;
-      }
       const isLegalHoldReject = error.type === ConversationError.TYPE.LEGAL_HOLD_CONVERSATION_CANCELLATION;
       if (isLegalHoldReject) {
         this.logger.log('User has canceled sending a message to a conversation under legal hold.');

@@ -21,12 +21,12 @@ import {act, render, waitFor} from '@testing-library/react';
 
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {ClientEntity} from 'src/script/client/ClientEntity';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {DeviceDetailsPreferences} from './DeviceDetailsPreferences';
 
 describe('DeviceDetailsPreferences', () => {
-  const device = new ClientEntity(true, '', createRandomUuid());
+  const device = new ClientEntity(true, '', createUuid());
   device.model = 'test';
   device.time = new Date().toISOString();
   const defaultParams = {

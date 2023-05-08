@@ -161,3 +161,56 @@ export const fixWebsocketString = (originalString: string): string => {
   const decoder = new TextDecoder();
   return decoder.decode(charArray);
 };
+
+const accentsMap: Record<string, string> = {
+  ä: 'a',
+  á: 'a',
+  à: 'a',
+  ã: 'a',
+  â: 'a',
+  À: 'a',
+  Á: 'a',
+  Ã: 'a',
+  Â: 'a',
+  ë: 'e',
+  é: 'e',
+  è: 'e',
+  ê: 'e',
+  É: 'e',
+  È: 'e',
+  Ê: 'e',
+  ï: 'i',
+  í: 'i',
+  ì: 'i',
+  î: 'i',
+  Í: 'i',
+  Ì: 'i',
+  Î: 'i',
+  ö: 'o',
+  ó: 'o',
+  ò: 'o',
+  ô: 'o',
+  õ: 'o',
+  Ó: 'o',
+  Ò: 'o',
+  Ô: 'o',
+  Õ: 'o',
+  ú: 'u',
+  ù: 'u',
+  û: 'u',
+  ü: 'u',
+  Ú: 'u',
+  Ù: 'u',
+  Û: 'u',
+  Ü: 'u',
+  ç: 'c',
+  Ç: 'c',
+  ñ: 'n',
+  Ñ: 'n',
+};
+
+/**
+ * @param text The string to replace accents its charachters
+ * @returns new string with replaced accents charachters
+ */
+export const replaceAccents = (text: string) => getSlug(text, {custom: accentsMap, uric: true});

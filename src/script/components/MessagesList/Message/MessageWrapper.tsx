@@ -25,6 +25,10 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {OutgoingQuote} from 'src/script/conversation/MessageRepository';
+import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import {Text} from 'src/script/entity/message/Text';
+import {QuoteEntity} from 'src/script/message/QuoteEntity';
 import {t} from 'Util/LocalizerUtil';
 
 import {CallMessage} from './CallMessage';
@@ -47,6 +51,10 @@ import {TeamState} from '../../../team/TeamState';
 import {ContextMenuEntry} from '../../../ui/ContextMenu';
 
 import {MessageParams} from './index';
+
+const isOutgoingQuote = (quoteEntity: QuoteEntity): quoteEntity is OutgoingQuote => {
+  return quoteEntity.hash !== undefined;
+};
 
 export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMessageFocused: boolean}> = ({
   message,
@@ -77,13 +85,34 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
   totalMessage,
   isMsgElementsFocusable,
 }) => {
-  const findMessage = (conversation: Conversation, messageId: string) => {
-    return messageRepository.getMessageInConversationById(conversation, messageId, true, true);
+  const findMessage = async (conversation: Conversation, messageId: string) => {
+    const event =
+      (await messageRepository.getMessageInConversationById(conversation, messageId)) ||
+      (await messageRepository.getMessageInConversationByReplacementId(conversation, messageId));
+    return await messageRepository.ensureMessageSender(event);
   };
   const clickButton = (message: CompositeMessage, buttonId: string) => {
     if (message.selectedButtonId() !== buttonId && message.waitingButtonId() !== buttonId) {
       message.waitingButtonId(buttonId);
       messageRepository.sendButtonAction(conversation, message, buttonId);
+    }
+  };
+
+  const onRetry = async (message: ContentMessage) => {
+    const firstAsset = message.getFirstAsset();
+    const file = message.fileData();
+
+    if (firstAsset instanceof Text) {
+      const messageId = message.id;
+      const messageText = firstAsset.text;
+      const mentions = firstAsset.mentions();
+      const incomingQuote = message.quote();
+      const quote: OutgoingQuote | undefined =
+        incomingQuote && isOutgoingQuote(incomingQuote) ? (incomingQuote as OutgoingQuote) : undefined;
+
+      await messageRepository.sendTextWithLinkPreview(conversation, messageText, mentions, quote, messageId);
+    } else if (file) {
+      await messageRepository.retryUploadFile(conversation, file, firstAsset.isImage(), message.id);
     }
   };
 
@@ -181,9 +210,8 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
         onClickInvitePeople={onClickInvitePeople}
         onClickParticipants={onClickParticipants}
         onClickReceipts={onClickReceipts}
+        onRetry={onRetry}
         isMessageFocused={isMessageFocused}
-        handleFocus={handleFocus}
-        totalMessage={totalMessage}
         isMsgElementsFocusable={isMsgElementsFocusable}
       />
     );

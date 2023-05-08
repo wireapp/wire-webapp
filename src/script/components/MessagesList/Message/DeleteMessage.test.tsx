@@ -18,40 +18,28 @@
  */
 
 import {render} from '@testing-library/react';
-import ko from 'knockout';
 
 import {DeleteMessage as DeleteMessageEntity} from 'src/script/entity/message/DeleteMessage';
 import {User} from 'src/script/entity/User';
+import {createUuid} from 'Util/uuid';
 
 import {DeleteMessage} from './DeleteMessage';
 
-const createDeleteMessage = (partialDeleteMessage: Partial<DeleteMessageEntity>) => {
-  const DeleteMessage: Partial<DeleteMessageEntity> = {
-    deleted_timestamp: Date.now(),
-    displayTimestampLong: () => '',
-    displayTimestampShort: () => '',
-    timestamp: ko.observable(Date.now()),
-    unsafeSenderName: ko.pureComputed(() => ''),
-    user: ko.observable(new User('userId')),
-    ...partialDeleteMessage,
-  };
-  return DeleteMessage as DeleteMessageEntity;
+const createDeleteMessage = (sender: User) => {
+  const deleteMessage = new DeleteMessageEntity();
+  deleteMessage.user(sender);
+  return deleteMessage;
 };
 
 describe('DeleteMessage', () => {
   it('shows sender name', async () => {
-    const senderName = 'name';
+    const sender = new User(createUuid());
+    sender.name('felix');
+    const message = createDeleteMessage(sender);
 
-    const props = {
-      message: createDeleteMessage({
-        unsafeSenderName: ko.pureComputed(() => senderName),
-      }),
-      onClickAvatar: jest.fn(),
-    };
+    const {getByTestId, getByText} = render(<DeleteMessage message={message} />);
 
-    const {queryByTestId, queryByText} = render(<DeleteMessage {...props} />);
-
-    expect(queryByTestId('element-message-delete')).not.toBeNull();
-    expect(queryByText(senderName)).not.toBeNull();
+    expect(getByTestId('element-message-delete')).not.toBeNull();
+    expect(getByText(sender.name())).not.toBeNull();
   });
 });
