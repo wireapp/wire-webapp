@@ -560,15 +560,18 @@ export class ConversationRepository {
   ): Promise<Conversation[]> {
     const {missingConversations} = this.conversationState;
     let conversationsData: any[];
+
     if (remoteConversations.failed?.length) {
       missingConversations.push(...remoteConversations.failed);
     }
+
     if (!remoteConversations.found?.length) {
       conversationsData = localConversations;
     } else {
       const data = ConversationMapper.mergeConversation(localConversations, remoteConversations);
       conversationsData = (await this.conversationService.saveConversationsInDb(data)) as any[];
     }
+
     const allConversationEntities = this.mapConversations(conversationsData);
     const newConversationEntities = allConversationEntities.filter(
       allConversations =>
@@ -577,10 +580,12 @@ export class ConversationRepository {
           .some(storedConversations => storedConversations.id === allConversations.id),
     );
     this.saveConversations(newConversationEntities);
+
     const remainingMissingConversations = missingConversations.filter(missingConversationsId =>
       newConversationEntities.some(conversation => conversation.id !== missingConversationsId.id),
     );
     this.conversationState.missingConversations = [...new Set(remainingMissingConversations)];
+
     return this.conversationState.conversations();
   }
 
