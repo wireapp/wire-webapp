@@ -229,6 +229,8 @@ export type Env = {
 
   URL_SUPPORT_SCREEN_ACCESS_DENIED: string;
 
+  URL_LEARN_MORE_ABOUT_GUEST_LINKS: string;
+
   URL_WHATS_NEW: string;
 
   /** Content Security Policy
