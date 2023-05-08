@@ -545,7 +545,6 @@ export class ConversationRepository {
         this.logger.error(`Failed to get all conversations from backend: ${error.message}`);
         return {found: [], failed: missingConversations} as RemoteConversations;
       });
-    missingConversations.splice(0, missingConversations.length);
     return this.loadRemoteConversations(remoteConversations);
   }
 
@@ -559,9 +558,10 @@ export class ConversationRepository {
     remoteConversations: RemoteConversations,
     localConversations: ConversationDatabaseData[] = [],
   ): Promise<Conversation[]> {
+    const missingConversations = this.conversationState.missingConversations;
     let conversationsData: any[];
     if (remoteConversations.failed?.length) {
-      this.conversationState.missingConversations.push(...remoteConversations.failed);
+      missingConversations.push(...remoteConversations.failed);
     }
     if (!remoteConversations.found?.length) {
       conversationsData = localConversations;
@@ -577,6 +577,10 @@ export class ConversationRepository {
           .some(storedConversations => storedConversations.id === allConversations.id),
     );
     this.saveConversations(newConversationEntities);
+    const remainingMissingConversations = missingConversations.filter(missingConversationsId =>
+      newConversationEntities.some(conversation => conversation.id !== missingConversationsId.id),
+    );
+    this.conversationState.missingConversations = [...new Set(remainingMissingConversations)];
     return this.conversationState.conversations();
   }
 

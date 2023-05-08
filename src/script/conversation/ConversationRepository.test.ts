@@ -1382,11 +1382,18 @@ describe('ConversationRepository', () => {
           domain: 'staging.zinfra.io',
           id: '05d0f240-bfe9-40d7-1234-602dac89fa1b',
         },
+        {
+          domain: 'staging.zinfra.io',
+          id: '05d0f240-bfe9-40d7-5678-602dac89fa1b',
+        },
       ];
 
       const remoteConversations = {
         found: [generateConversation(missingConversations[0], 'conv1')],
-        failed: [generateConversation(missingConversations[1], 'conv2')],
+        failed: [
+          generateConversation(missingConversations[1], 'conv2').qualified_id,
+          generateConversation(missingConversations[2], 'conv3').qualified_id,
+        ],
       };
 
       jest.replaceProperty(conversationState, 'missingConversations', missingConversations as any);
