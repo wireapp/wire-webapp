@@ -25,7 +25,6 @@ import {MessageSendingState} from '@wireapp/core/lib/conversation';
 import {flattenUserMap} from '@wireapp/core/lib/conversation/message/UserClientsUtil';
 import {amplify} from 'amplify';
 import axios from 'axios';
-import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 import 'webrtc-adapter';
@@ -1201,10 +1200,11 @@ export class CallingRepository {
       const jsonData = JSON.stringify(axiosData);
       this.wCall?.sftResp(this.wUser!, status, jsonData, jsonData.length, context);
     };
+    const avsSftResponseFailedCode = 1000;
     _sendSFTRequest().catch(error => {
       this.avsLogHandler(LOG_LEVEL.WARN, `Request to sft server failed with error: ${error?.message}`, error);
       avsLogger.warn(`Request to sft server failed with error`, error);
-      this.wCall?.sftResp(this.wUser!, HTTP_STATUS.SERVICE_UNAVAILABLE, '', 0, context);
+      this.wCall?.sftResp(this.wUser!, avsSftResponseFailedCode, '', 0, context);
     });
 
     return 0;
