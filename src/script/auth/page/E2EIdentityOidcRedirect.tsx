@@ -17,11 +17,41 @@
  *
  */
 
+import {container} from 'tsyringe';
+
+import {Core} from 'src/script/service/CoreSingleton';
+
 const E2EIdentityOidcRedirect = () => {
+  const search = window.location.href.split('/#/oidc')[1];
+  const urlParams = new URLSearchParams(search);
+
+  const oidcRedirectParams: Record<string, string | null> = {
+    code: urlParams.get('code'),
+    state: urlParams.get('state'),
+    scope: urlParams.get('scope'),
+    error: urlParams.get('error'),
+    errorDescription: urlParams.get('error_description'),
+  };
+
+  const core = container.resolve(Core);
+  void core.continueOAuthFlow();
+
   return (
-    <>
-      <h1>E2EIdentityOidcRedirectComponent</h1>
-    </>
+    <div style={{display: 'flex', flexDirection: 'column', padding: '1rem'}}>
+      <div style={{display: 'flex'}}>
+        <h1>E2EIdentityOidcRedirectComponent</h1>
+      </div>
+      <>
+        <div style={{display: 'flex', flexDirection: 'column'}}>
+          {oidcRedirectParams &&
+            Object.keys(oidcRedirectParams).map(key => (
+              <p key={key}>
+                {key}: {oidcRedirectParams[key]}
+              </p>
+            ))}
+        </div>
+      </>
+    </div>
   );
 };
 
