@@ -23,11 +23,13 @@ import {registerRecurringTask} from '@wireapp/core/lib/util/RecurringTaskSchedul
 import {APIClient} from '@wireapp/api-client';
 import {Account} from '@wireapp/core';
 
-import {MixedConversation, ProteusConversation} from 'src/script/conversation/ConversationSelectors';
 import {groupConversationsByProtocol} from 'src/script/conversation/groupConversationsByProtocol';
 import {Conversation} from 'src/script/entity/Conversation';
 import {getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+
+import {finaliseMigrationOfMixedConversations} from './finaliseMigration';
+import {initialiseMigrationOfProteusConversations} from './initialiseMigration';
 
 import {isMLSSupportedByEnvironment} from '../isMLSSupportedByEnvironment';
 
@@ -67,7 +69,7 @@ export const initialiseMLSMigrationFlow = async (
 ) => {
   return periodicallyCheckMigrationConfig(
     migrationConfig,
-    () => migrateConversationsToMLS(conversations, {isConversationOwnedBySelfTeam, core}),
+    () => migrateConversationsToMLS(conversations, {isConversationOwnedBySelfTeam, apiClient, core}),
     {core, apiClient},
   );
 };
@@ -128,41 +130,26 @@ const checkMigrationConfig = async (
 const migrateConversationsToMLS = async (
   conversations: Conversation[],
   {
+    apiClient,
     core,
     isConversationOwnedBySelfTeam,
   }: {
+    apiClient: APIClient;
     core: Account;
     isConversationOwnedBySelfTeam: (conversation: Conversation) => boolean;
   },
 ) => {
   //TODO: implement logic for 1on1 conversations (both team owned and federated)
-  const groupConversations = conversations.filter(
+  const regularGroupConversations = conversations.filter(
     conversation =>
       conversation.type() === CONVERSATION_TYPE.REGULAR &&
       isConversationOwnedBySelfTeam(conversation) &&
       !conversation.isTeam1to1(),
   );
 
-  const {proteus: proteusConversations, mixed: mixedConversations} = groupConversationsByProtocol(groupConversations);
+  const {proteus: proteusConversations, mixed: mixedConversations} =
+    groupConversationsByProtocol(regularGroupConversations);
 
-  await initialiseMigrationOfProteusConversations(proteusConversations, {core});
-  await finaliseMigrationOfMixedConversations(mixedConversations, {core});
+  await initialiseMigrationOfProteusConversations(proteusConversations, {core, apiClient});
+  await finaliseMigrationOfMixedConversations(mixedConversations, {core, apiClient});
 };
-
-const initialiseMigrationOfProteusConversations = async (
-  proteusConversations: ProteusConversation[],
-  {
-    core,
-  }: {
-    core: Account;
-  },
-) => {};
-
-const finaliseMigrationOfMixedConversations = async (
-  mixedConversations: MixedConversation[],
-  {
-    core,
-  }: {
-    core: Account;
-  },
-) => {};
