@@ -100,7 +100,7 @@
     "@wireapp/copy-config": "2.1.0",
     "@wireapp/eslint-config": "2.2.0",
     "@wireapp/prettier-config": "0.6.0",
-    "@wireapp/store-engine": "^5.1.0",
+    "@wireapp/store-engine": "^5.1.1",
     "adm-zip": "0.5.10",
     "archiver": "^5.3.1",
     "autoprefixer": "^10.4.13",
