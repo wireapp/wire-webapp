@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [24.9.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@24.9.0...@wireapp/api-client@24.9.1) (2023-05-08)
+
+### Bug Fixes
+
+* Add empty body to code creation endpoint (FS-1836) ([#5137](https://github.com/wireapp/wire-web-packages/issues/5137)) ([037fad3](https://github.com/wireapp/wire-web-packages/commit/037fad3c7f3733102f28b0c0511e59ebf9124543))
+
 # [24.9.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@24.8.0...@wireapp/api-client@24.9.0) (2023-05-04)
 
 ### Features
