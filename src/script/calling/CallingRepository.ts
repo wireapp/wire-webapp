@@ -797,7 +797,7 @@ export class CallingRepository {
       if (newState === VIDEO_STATE.STOPPED) {
         selfParticipant.releaseVideoStream(true);
       } else {
-        void this.warmupMediaStreams(call, false, true);
+        this.warmupMediaStreams(call, false, true);
       }
     }
     this.wCall?.setVideoSendState(this.wUser, this.serializeQualifiedId(call.conversationId), newState);
@@ -1179,12 +1179,12 @@ export class CallingRepository {
 
   readonly sendModeratorMute = (conversationId: QualifiedId, participants: Participant[]) => {
     const recipients = this.convertParticipantsToCallingMessageRecepients(participants);
-    void this.sendCallingMessage(conversationId, {type: CALL_MESSAGE_TYPE.REMOTE_MUTE}, {nativePush: true, recipients});
+    this.sendCallingMessage(conversationId, {type: CALL_MESSAGE_TYPE.REMOTE_MUTE}, {nativePush: true, recipients});
   };
 
   readonly sendModeratorKick = (conversationId: QualifiedId, participants: Participant[]) => {
     const recipients = this.convertParticipantsToCallingMessageRecepients(participants);
-    void this.sendCallingMessage(conversationId, {type: CALL_MESSAGE_TYPE.REMOTE_KICK}, {nativePush: true, recipients});
+    this.sendCallingMessage(conversationId, {type: CALL_MESSAGE_TYPE.REMOTE_KICK}, {nativePush: true, recipients});
   };
 
   private readonly sendSFTRequest = (
@@ -1384,7 +1384,7 @@ export class CallingRepository {
     }
     call.state(CALL_STATE.INCOMING);
     if (canRing && isVideoCall) {
-      void this.warmupMediaStreams(call, true, true);
+      this.warmupMediaStreams(call, true, true);
     }
     this.injectActivateEvent(conversationId, qualifiedUserId, new Date(timestamp * 1000).toISOString());
 
