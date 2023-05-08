@@ -17,7 +17,10 @@
  *
  */
 
+import type {ConversationJoinData} from '@wireapp/api-client/lib/conversation/data/ConversationJoinData';
 import type {ConversationEvent} from '@wireapp/api-client/lib/event/';
+
+import {isBackendError} from 'Util/TypePredicateUtil';
 
 import {ConversationActionCreator} from './creator/';
 
@@ -52,6 +55,21 @@ export class ConversationAction {
       } catch (error) {
         dispatch(ConversationActionCreator.failedJoinConversationByCode(error));
         throw error;
+      }
+    };
+  };
+
+  doGetConversationInfoByCode = (key: string, code: string): ThunkAction<Promise<ConversationJoinData | undefined>> => {
+    return async (dispatch, getState, {apiClient}) => {
+      dispatch(ConversationActionCreator.startConversationCodeGetInfo());
+      try {
+        const conversationInfo = await apiClient.api.conversation.getJoinByCode({code, key});
+        dispatch(ConversationActionCreator.successfulConversationCodeGetInfo(conversationInfo));
+        return conversationInfo;
+      } catch (error) {
+        if (isBackendError(error)) {
+          dispatch(ConversationActionCreator.failedConversationCodeGetInfo(error));
+        }
       }
     };
   };

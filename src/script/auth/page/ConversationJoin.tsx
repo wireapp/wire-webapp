@@ -76,18 +76,24 @@ const ConversationJoinComponent = ({
   doRegisterWireless,
   setLastEventDate,
   doLogout,
+  doGetConversationInfoByCode,
   isAuthenticated,
   isTemporaryGuest,
   selfName,
   conversationError,
   isFetchingAuth,
   isFetchingConversation,
+  conversationInfo,
+  conversationInfoFetching,
 }: Props & ConnectedProps & DispatchProps) => {
   const nameInput = React.useRef<HTMLInputElement>(null);
   const {formatMessage: _} = useIntl();
 
+  const invalidConversationPassword =
+    conversationError && conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD;
   const [accentColor] = useState(AccentColor.random());
   const [isPwaEnabled, setIsPwaEnabled] = useState<boolean>();
+  const [conversationHasPassword, setConversationHasPassword] = useState<boolean>(invalidConversationPassword);
   const [conversationCode, setConversationCode] = useState<string>();
   const [conversationKey, setConversationKey] = useState<string>();
   const [enteredName, setEnteredName] = useState<string>();
@@ -100,10 +106,7 @@ const ConversationJoinComponent = ({
   const [showEntropyForm, setShowEntropyForm] = useState(false);
   const isEntropyRequired = Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY;
 
-  const isFetching = isFetchingAuth || isFetchingConversation;
-
-  const isLinkPasswordModalOpen =
-    conversationError && conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD;
+  const isFetching = isFetchingAuth || isFetchingConversation || conversationInfoFetching;
 
   const isPwaSupportedBrowser = () => {
     return Runtime.isMobileOS() || Runtime.isSafari();
@@ -120,11 +123,12 @@ const ConversationJoinComponent = ({
     setIsValidLink(true);
     doInit({isImmediateLogin: false, shouldValidateLocalClient: true})
       .catch(noop)
-      .then(() =>
-        localConversationCode && localConversationKey
-          ? doCheckConversationCode(localConversationKey, localConversationCode)
-          : null,
-      )
+      .then(async () => {
+        if (localConversationCode && localConversationKey) {
+          await doCheckConversationCode(localConversationKey, localConversationCode);
+          await doGetConversationInfoByCode(localConversationKey, localConversationCode);
+        }
+      })
       .catch(error => {
         setIsValidLink(false);
       });
@@ -214,6 +218,8 @@ const ConversationJoinComponent = ({
       setIsValidName(false);
     } else if (isEntropyRequired) {
       setShowEntropyForm(true);
+    } else if (conversationInfo?.has_password) {
+      setConversationHasPassword(true);
     } else {
       handleSubmit();
     }
@@ -241,10 +247,16 @@ const ConversationJoinComponent = ({
     return <Navigate to={ROUTE.CONVERSATION_JOIN_INVALID} replace />;
   }
 
+  const isGuestLinkPasswordModalOpen = conversationHasPassword || invalidConversationPassword;
+
   return (
     <UnsupportedBrowser isTemporaryGuest>
-      {isLinkPasswordModalOpen && (
-        <GuestLinkPasswordModal isLoading={isFetching} onSubmitPassword={submitJoinCodeWithPassword} />
+      {isGuestLinkPasswordModalOpen && (
+        <GuestLinkPasswordModal
+          isLoading={isFetching}
+          conversationName={conversationInfo?.name}
+          onSubmitPassword={submitJoinCodeWithPassword}
+        />
       )}
       <WirelessContainer
         showCookiePolicyBanner={showCookiePolicyBanner}
@@ -304,7 +316,8 @@ const ConversationJoinComponent = ({
                     </RoundIconButton>
                   </InputSubmitCombo>
                 </InputBlock>
-                {!isLinkPasswordModalOpen && (error ? parseValidationErrors(error) : parseError(conversationError))}
+                {!isGuestLinkPasswordModalOpen &&
+                  (error ? parseValidationErrors(error) : parseError(conversationError))}
               </Form>
               {!isPwaEnabled && (
                 <Small block>
@@ -355,7 +368,7 @@ const ConversationJoinComponent = ({
             >
               {_(conversationJoinStrings.existentAccountOpenButton, {brandName: Config.getConfig().BRAND_NAME})}
             </Button>
-            {!isLinkPasswordModalOpen && (error ? parseValidationErrors(error) : parseError(conversationError))}
+            {!isGuestLinkPasswordModalOpen && (error ? parseValidationErrors(error) : parseError(conversationError))}
             <Small block>
               {_(conversationJoinStrings.existentAccountJoinWithoutText, {
                 existentAccountJoinWithoutLink: (
@@ -378,12 +391,14 @@ const ConversationJoinComponent = ({
 
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
-  conversationError: ConversationSelector.getError(state),
-  isAuthenticated: AuthSelector.isAuthenticated(state),
   isFetchingAuth: AuthSelector.isFetching(state),
-  isFetchingConversation: ConversationSelector.isFetching(state),
-  isTemporaryGuest: SelfSelector.isTemporaryGuest(state),
+  isAuthenticated: AuthSelector.isAuthenticated(state),
   selfName: SelfSelector.getSelfName(state),
+  isTemporaryGuest: SelfSelector.isTemporaryGuest(state),
+  conversationError: ConversationSelector.getError(state),
+  isFetchingConversation: ConversationSelector.isFetching(state),
+  conversationInfo: ConversationSelector.conversationInfo(state),
+  conversationInfoFetching: ConversationSelector.conversationInfoFetching(state),
 });
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
@@ -391,6 +406,7 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
   bindActionCreators(
     {
       doCheckConversationCode: ROOT_ACTIONS.conversationAction.doCheckConversationCode,
+      doGetConversationInfoByCode: ROOT_ACTIONS.conversationAction.doGetConversationInfoByCode,
       doInit: ROOT_ACTIONS.authAction.doInit,
       doJoinConversationByCode: ROOT_ACTIONS.conversationAction.doJoinConversationByCode,
       doLogout: ROOT_ACTIONS.authAction.doLogout,

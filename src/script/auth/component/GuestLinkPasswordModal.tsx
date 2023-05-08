@@ -29,9 +29,14 @@ import {guestLinkPasswordModalStrings} from '../../strings';
 export interface GuestLinkPasswordModalProps {
   onSubmitPassword: (password: string) => void;
   isLoading?: boolean;
+  conversationName?: string;
 }
 
-const GuestLinkPasswordModal: React.FC<GuestLinkPasswordModalProps> = ({onSubmitPassword, isLoading}) => {
+const GuestLinkPasswordModal: React.FC<GuestLinkPasswordModalProps> = ({
+  isLoading,
+  conversationName,
+  onSubmitPassword,
+}) => {
   const {formatMessage: _} = useIntl();
   const [passwordValue, setPasswordValue] = useState<string>('');
 
@@ -43,7 +48,9 @@ const GuestLinkPasswordModal: React.FC<GuestLinkPasswordModalProps> = ({onSubmit
     <Modal>
       <Container style={{maxWidth: '400px'}}>
         <H2 style={{whiteSpace: 'break-spaces', fontWeight: 500, marginTop: '10px', textAlign: 'center'}}>
-          {_(guestLinkPasswordModalStrings.headline)}
+          {conversationName
+            ? _(guestLinkPasswordModalStrings.headline, {conversationName})
+            : _(guestLinkPasswordModalStrings.headlineDefault)}
         </H2>
         <Text block fontSize="var(--font-size-base)" style={{marginBottom: 24}}>
           {_(guestLinkPasswordModalStrings.description)}

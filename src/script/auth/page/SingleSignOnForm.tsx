@@ -68,6 +68,8 @@ const SingleSignOnFormComponent = ({
   isFetching,
   authError,
   conversationError,
+  conversationInfo,
+  conversationInfoFetching,
   resetAuthError,
   validateSSOCode,
   doLogin,
@@ -75,6 +77,7 @@ const SingleSignOnFormComponent = ({
   doGetDomainInfo,
   doCheckConversationCode,
   doJoinConversationByCode,
+  doGetConversationInfoByCode,
   doNavigate,
 }: SingleSignOnFormProps & ConnectedProps & DispatchProps) => {
   const codeOrMailInput = useRef<HTMLInputElement>();
@@ -132,6 +135,10 @@ const SingleSignOnFormComponent = ({
       setIsValidLink(true);
       doCheckConversationCode(queryConversationKey, queryConversationCode).catch(error => {
         console.warn('Invalid conversation code', error);
+        setIsValidLink(false);
+      });
+      doGetConversationInfoByCode(queryConversationKey, queryConversationCode).catch(error => {
+        console.warn('Failed to fetch conversation info', error);
         setIsValidLink(false);
       });
     }
@@ -282,7 +289,11 @@ const SingleSignOnFormComponent = ({
   return (
     <>
       {isLinkPasswordModalOpen && (
-        <GuestLinkPasswordModal isLoading={isFetching} onSubmitPassword={submitJoinCodeWithPassword} />
+        <GuestLinkPasswordModal
+          conversationName={conversationInfo?.name}
+          isLoading={isFetching || conversationInfoFetching}
+          onSubmitPassword={submitJoinCodeWithPassword}
+        />
       )}
       <Form style={{marginTop: 30}} data-uie-name="sso" onSubmit={handleSubmit}>
         {!isValidLink && <Navigate to={ROUTE.CONVERSATION_JOIN_INVALID} replace />}
@@ -352,6 +363,8 @@ const mapStateToProps = (state: RootState) => ({
   isFetching: AuthSelector.isFetching(state),
   authError: AuthSelector.getError(state),
   conversationError: ConversationSelector.getError(state),
+  conversationInfo: ConversationSelector.conversationInfo(state),
+  conversationInfoFetching: ConversationSelector.conversationInfoFetching(state),
 });
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
@@ -362,6 +375,7 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
       doFinalizeSSOLogin: ROOT_ACTIONS.authAction.doFinalizeSSOLogin,
       doGetDomainInfo: ROOT_ACTIONS.authAction.doGetDomainInfo,
       doJoinConversationByCode: ROOT_ACTIONS.conversationAction.doJoinConversationByCode,
+      doGetConversationInfoByCode: ROOT_ACTIONS.conversationAction.doGetConversationInfoByCode,
       doNavigate: ROOT_ACTIONS.navigationAction.doNavigate,
       resetAuthError: ROOT_ACTIONS.authAction.resetAuthError,
       validateSSOCode: ROOT_ACTIONS.authAction.validateSSOCode,

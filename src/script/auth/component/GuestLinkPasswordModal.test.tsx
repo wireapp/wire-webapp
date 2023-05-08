@@ -27,6 +27,7 @@ describe('GuestLinkPasswordModal', () => {
   const onSubmitPasswordMock = jest.fn();
   const props: GuestLinkPasswordModalProps = {
     onSubmitPassword: onSubmitPasswordMock,
+    conversationName: 'test group',
   };
 
   beforeEach(() => {

@@ -1143,7 +1143,9 @@ export class ConversationRepository {
           message: hasPassword
             ? t('guestLinkPasswordModal.description')
             : t('modalConversationJoinMessage', {conversationName}),
-          title: hasPassword ? t('guestLinkPasswordModal.headline') : t('modalConversationJoinHeadline'),
+          title: hasPassword
+            ? t('guestLinkPasswordModal.headline', {conversationName})
+            : t('modalConversationJoinHeadline'),
         },
       });
     } catch (error) {

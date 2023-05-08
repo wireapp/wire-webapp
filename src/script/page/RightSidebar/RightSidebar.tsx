@@ -99,7 +99,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
   userState,
   isFederated,
   lastViewedMessageDetailsEntity,
-  core,
+  core = container.resolve(Core),
 }) => {
   const {
     conversation: conversationRepository,

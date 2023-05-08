@@ -17,7 +17,9 @@
  *
  */
 
+import type {ConversationJoinData} from '@wireapp/api-client/lib/conversation/data/ConversationJoinData';
 import type {ConversationEvent} from '@wireapp/api-client/lib/event/';
+import type {BackendError} from '@wireapp/api-client/lib/http/';
 
 import type {AppAction} from '.';
 
@@ -25,6 +27,9 @@ export enum CONVERSATION_ACTION {
   CONVERSATION_CODE_CHECK_FAILED = 'CONVERSATION_CODE_CHECK_FAILED',
   CONVERSATION_CODE_CHECK_START = 'CONVERSATION_CODE_CHECK_START',
   CONVERSATION_CODE_CHECK_SUCCESS = 'CONVERSATION_CODE_CHECK_SUCCESS',
+  CONVERSATION_CODE_GET_INFO_FAILED = 'CONVERSATION_CODE_GET_INFO_FAILED',
+  CONVERSATION_CODE_GET_INFO_START = 'CONVERSATION_CODE_GET_INFO_START',
+  CONVERSATION_CODE_GET_INFO_SUCCESS = 'CONVERSATION_CODE_GET_INFO_SUCCESS',
   CONVERSATION_CODE_JOIN_FAILED = 'CONVERSATION_CODE_JOIN_FAILED',
   CONVERSATION_CODE_JOIN_START = 'CONVERSATION_CODE_JOIN_START',
   CONVERSATION_CODE_JOIN_SUCCESS = 'CONVERSATION_CODE_JOIN_SUCCESS',
@@ -34,6 +39,9 @@ export type ConversationActions =
   | ConversationCodeCheckStartAction
   | ConversationCodeCheckSuccessAction
   | ConversationCodeCheckFailedAction
+  | ConversationCodeGetInfoStartAction
+  | ConversationCodeGetInfoSuccessAction
+  | ConversationCodeGetInfoFailedAction
   | ConversationCodeJoinStartAction
   | ConversationCodeJoinSuccessAction
   | ConversationCodeJoinFailedAction;
@@ -47,6 +55,18 @@ export interface ConversationCodeCheckSuccessAction extends AppAction {
 export interface ConversationCodeCheckFailedAction extends AppAction {
   readonly error: Error;
   readonly type: CONVERSATION_ACTION.CONVERSATION_CODE_CHECK_FAILED;
+}
+
+export interface ConversationCodeGetInfoStartAction extends AppAction {
+  readonly type: CONVERSATION_ACTION.CONVERSATION_CODE_GET_INFO_START;
+}
+export interface ConversationCodeGetInfoSuccessAction extends AppAction {
+  readonly payload: ConversationJoinData;
+  readonly type: CONVERSATION_ACTION.CONVERSATION_CODE_GET_INFO_SUCCESS;
+}
+export interface ConversationCodeGetInfoFailedAction extends AppAction {
+  readonly error: BackendError;
+  readonly type: CONVERSATION_ACTION.CONVERSATION_CODE_GET_INFO_FAILED;
 }
 
 export interface ConversationCodeJoinStartAction extends AppAction {
@@ -71,6 +91,18 @@ export class ConversationActionCreator {
   static failedConversationCodeCheck = (error: Error): ConversationCodeCheckFailedAction => ({
     error,
     type: CONVERSATION_ACTION.CONVERSATION_CODE_CHECK_FAILED,
+  });
+
+  static startConversationCodeGetInfo = (): ConversationCodeGetInfoStartAction => ({
+    type: CONVERSATION_ACTION.CONVERSATION_CODE_GET_INFO_START,
+  });
+  static successfulConversationCodeGetInfo = (data: ConversationJoinData): ConversationCodeGetInfoSuccessAction => ({
+    payload: data,
+    type: CONVERSATION_ACTION.CONVERSATION_CODE_GET_INFO_SUCCESS,
+  });
+  static failedConversationCodeGetInfo = (error: BackendError): ConversationCodeGetInfoFailedAction => ({
+    error,
+    type: CONVERSATION_ACTION.CONVERSATION_CODE_GET_INFO_FAILED,
   });
 
   static startJoinConversationByCode = (): ConversationCodeJoinStartAction => ({

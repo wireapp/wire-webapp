@@ -83,6 +83,7 @@ const LoginComponent = ({
   authError,
   resetAuthError,
   doCheckConversationCode,
+  doGetConversationInfoByCode,
   doInit,
   doSetLocalStorage,
   doInitializeClient,
@@ -96,6 +97,8 @@ const LoginComponent = ({
   loginData,
   defaultSSOCode,
   isSendingTwoFactorCode,
+  conversationInfo,
+  conversationInfoFetching,
 }: Props & ConnectedProps & DispatchProps) => {
   const logger = getLogger('Login');
   const {formatMessage: _} = useIntl();
@@ -161,6 +164,10 @@ const LoginComponent = ({
       setIsValidLink(true);
       doCheckConversationCode(queryConversationKey, queryConversationCode).catch(error => {
         logger.warn('Invalid conversation code', error);
+        setIsValidLink(false);
+      });
+      doGetConversationInfoByCode(queryConversationKey, queryConversationCode).catch(error => {
+        logger.warn('Failed to fetch conversation info', error);
         setIsValidLink(false);
       });
     }
@@ -333,7 +340,11 @@ const LoginComponent = ({
           {!isValidLink && <Navigate to={ROUTE.CONVERSATION_JOIN_INVALID} replace />}
           <AppAlreadyOpen />
           {isLinkPasswordModalOpen && (
-            <GuestLinkPasswordModal isLoading={isFetching} onSubmitPassword={submitJoinCodeWithPassword} />
+            <GuestLinkPasswordModal
+              conversationName={conversationInfo?.name}
+              isLoading={isFetching || conversationInfoFetching}
+              onSubmitPassword={submitJoinCodeWithPassword}
+            />
           )}
           <Columns>
             <IsMobile not>
@@ -462,6 +473,8 @@ const mapStateToProps = (state: RootState) => ({
   isSendingTwoFactorCode: AuthSelector.isSendingTwoFactorCode(state),
   loginData: AuthSelector.getLoginData(state),
   authError: AuthSelector.getError(state),
+  conversationInfo: ConversationSelector.conversationInfo(state),
+  conversationInfoFetching: ConversationSelector.conversationInfoFetching(state),
 });
 
 type DispatchProps = ReturnType<typeof mapDispatchToProps>;
@@ -478,6 +491,7 @@ const mapDispatchToProps = (dispatch: Dispatch<AnyAction>) =>
       pushEntropyData: actionRoot.authAction.pushEntropyData,
       pushLoginData: actionRoot.authAction.pushLoginData,
       resetAuthError: actionRoot.authAction.resetAuthError,
+      doGetConversationInfoByCode: actionRoot.conversationAction.doGetConversationInfoByCode,
     },
     dispatch,
   );
