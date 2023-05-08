@@ -59,7 +59,7 @@ export class ConversationAction {
     };
   };
 
-  doGetConversationInfoByCode = (key: string, code: string): ThunkAction<Promise<ConversationJoinData | undefined>> => {
+  doGetConversationInfoByCode = (key: string, code: string): ThunkAction<Promise<ConversationJoinData>> => {
     return async (dispatch, getState, {apiClient}) => {
       dispatch(ConversationActionCreator.startConversationCodeGetInfo());
       try {
@@ -70,6 +70,7 @@ export class ConversationAction {
         if (isBackendError(error)) {
           dispatch(ConversationActionCreator.failedConversationCodeGetInfo(error));
         }
+        throw error;
       }
     };
   };
