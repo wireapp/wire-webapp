@@ -106,8 +106,6 @@ export class AudioRepository {
     Object.values(AudioType).forEach(audioId => {
       this.audioElements[audioId] = this.createAudioElement(`./audio/${audioId}.mp3`, preload);
     });
-
-    this.logger.info(`Sounds initialized (preload: '${preload}')`);
   }
 
   private stopAll(): void {
@@ -168,7 +166,7 @@ export class AudioRepository {
       case AUDIO_PLAY_PERMISSION.ALLOWED:
         try {
           await this.playAudio(audioElement, playInLoop);
-          this.logger.info(`Playing sound '${audioId}' (loop: '${playInLoop}')`);
+          this.logger.log(`Playing sound '${audioId}' (loop: '${playInLoop}')`);
         } catch (error) {
           this.logger.error(`Failed to play sound '${audioId}': ${error.message}`);
           throw error;
@@ -201,7 +199,8 @@ export class AudioRepository {
   readonly stop = (audioId: AudioType): void => {
     const audioElement = this.getSoundById(audioId);
     if (!audioElement?.paused) {
-      this.logger.info(`Stopping sound '${audioId}'`);
+      // This log is used by QA
+      this.logger.log(`Stopping sound '${audioId}'`);
       audioElement.pause();
       audioElement.load();
     }

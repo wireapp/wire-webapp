@@ -17,6 +17,9 @@
  *
  */
 
+import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {KeyPackageClaimUser} from '@wireapp/core/lib/conversation';
+
 import {Account} from '@wireapp/core';
 
 import {useMLSConversationState} from './mlsConversationState';
@@ -36,13 +39,29 @@ type MLSConversationRepository = Pick<
   'findConversationByGroupId' | 'getConversationById' | 'conversationRoleRepository'
 >;
 
-export async function initMLSConversations(
-  conversations: Conversation[],
-  selfUser: User,
+/**
+ * Will initialize all the MLS conversations that the user is member of but that are not yet locally established.
+ *
+ * @param conversations - all the conversations that the user is part of
+ * @param core - the instance of the core
+ */
+export function initMLSConversations(conversations: Conversation[], core: Account): Promise<void> {
+  const mlsConversations = conversations.filter(isMLSConversation);
+  return joinNewConversations(mlsConversations, core);
+}
+
+/**
+ * Will initialise the MLS callbacks for the core.
+ * It should be called before processing messages queue as the callbacks are being used when decrypting mls messages.
+ *
+ * @param core - the instance of the core
+ * @param conversationRepository - conversations repository
+ */
+export async function initMLSCallbacks(
   core: Account,
   conversationRepository: MLSConversationRepository,
 ): Promise<void> {
-  core.configureMLSCallbacks({
+  return core.configureMLSCallbacks({
     groupIdFromConversationId: async conversationId => {
       const conversation = await conversationRepository.getConversationById(conversationId);
       return conversation?.groupId;
@@ -51,9 +70,6 @@ export async function initMLSConversations(
     authorize: async () => true,
     userAuthorize: async () => true,
   });
-
-  const mlsConversations = conversations.filter(isMLSConversation);
-  await joinNewConversations(mlsConversations, core);
 }
 
 /**
@@ -72,13 +88,13 @@ async function joinNewConversations(conversations: MLSConversation[], core: Acco
 }
 
 /**
- * Will register special conversations agains the core.
- * The self conversation and the team conversation as special conversation that are created by noone and, thus, need to be manually created by the first device that detects them
+ * Will register self and team MLS conversations.
+ * The self conversation and the team conversation are special conversations created by noone and, thus, need to be manually created by the first device that detects them
  *
  * @param conversations all the conversations the user is part of
  * @param core instance of the core
  */
-export async function registerUninitializedConversations(
+export async function registerUninitializedSelfAndTeamConversations(
   conversations: Conversation[],
   selfUser: User,
   selfClientId: string,
@@ -99,4 +115,36 @@ export async function registerUninitializedConversations(
       }),
     ),
   );
+}
+
+/**
+ * Will add all other user's self clients to the mls group.
+ *
+ * @param conversation id of the conversation
+ * @param selfUserId id of the self user who's clients should be added
+ * @param selfClientId id of the current client (that should be skipped)
+ * @param core instance of the core
+ */
+export async function addOtherSelfClientsToMLSConversation(
+  conversation: Conversation,
+  selfUserId: QualifiedId,
+  selfClientId: string,
+  core: Account,
+) {
+  const {groupId, qualifiedId} = conversation;
+
+  if (!groupId) {
+    throw new Error(`No group id found for MLS conversation ${conversation.id}`);
+  }
+
+  const selfQualifiedUser: KeyPackageClaimUser = {
+    ...selfUserId,
+    skipOwnClientId: selfClientId,
+  };
+
+  await core.service?.conversation.addUsersToMLSConversation({
+    conversationId: qualifiedId,
+    groupId,
+    qualifiedUsers: [selfQualifiedUser],
+  });
 }

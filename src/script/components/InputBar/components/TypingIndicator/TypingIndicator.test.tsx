@@ -25,6 +25,12 @@ import {useTypingIndicatorState} from './TypingIndicator.state';
 
 import {User} from '../../../../entity/User';
 
+function createUser(id: string, name: string): User {
+  const user = new User(id);
+  user.name(name);
+  return user;
+}
+
 describe('TypingIndicator', () => {
   afterEach(() => {
     act(() => {
@@ -50,13 +56,13 @@ describe('TypingIndicator', () => {
 
     const {addTypingUser} = useTypingIndicatorState.getState();
 
-    addTypingUser({conversationId: 'test-conversation-id', user: new User('test-id-1'), timerId: 0});
-    addTypingUser({conversationId: 'test-conversation-id', user: new User('test-id-2'), timerId: 0});
-    addTypingUser({conversationId: 'test-conversation-id', user: new User('test-id-3'), timerId: 0});
+    addTypingUser({conversationId: 'test-conversation-id', user: createUser('test-id-1', 'user1'), timerId: 0});
+    addTypingUser({conversationId: 'test-conversation-id', user: createUser('test-id-2', 'user2'), timerId: 0});
+    addTypingUser({conversationId: 'test-conversation-id', user: createUser('test-id-3', 'user3'), timerId: 0});
 
-    const {container} = render(<TypingIndicator {...props} />);
+    const {getAllByTestId} = render(<TypingIndicator {...props} />);
 
-    expect(container.querySelectorAll('[data-uie-name="element-avatar-user"]').length).toBe(3);
+    expect(getAllByTestId('element-avatar-user')).toHaveLength(3);
   });
 
   it('does render new users when there start typing', async () => {
@@ -64,19 +70,19 @@ describe('TypingIndicator', () => {
       conversationId: 'test-conversation-id',
     };
 
-    const {container} = render(<TypingIndicator {...props} />);
+    const {container, getAllByTestId} = render(<TypingIndicator {...props} />);
 
     expect(container.innerHTML).toEqual('');
 
     const {addTypingUser} = useTypingIndicatorState.getState();
 
     act(() => {
-      addTypingUser({conversationId: 'test-conversation-id', user: new User('test-id-1'), timerId: 0});
-      addTypingUser({conversationId: 'test-conversation-id', user: new User('test-id-2'), timerId: 0});
-      addTypingUser({conversationId: 'test-conversation-id', user: new User('test-id-3'), timerId: 0});
+      addTypingUser({conversationId: 'test-conversation-id', user: createUser('test-id-1', 'u1'), timerId: 0});
+      addTypingUser({conversationId: 'test-conversation-id', user: createUser('test-id-2', 'u2'), timerId: 0});
+      addTypingUser({conversationId: 'test-conversation-id', user: createUser('test-id-3', 'u2'), timerId: 0});
     });
 
-    expect(container.querySelectorAll('[data-uie-name="element-avatar-user"]').length).toBe(3);
+    expect(getAllByTestId('element-avatar-user')).toHaveLength(3);
   });
 
   it('does render less users when a user stops typing', async () => {
@@ -84,24 +90,24 @@ describe('TypingIndicator', () => {
       conversationId: 'test-conversation-id',
     };
 
-    const {container} = render(<TypingIndicator {...props} />);
+    const {container, getAllByTestId} = render(<TypingIndicator {...props} />);
 
     expect(container.innerHTML).toEqual('');
 
     const {addTypingUser, removeTypingUser} = useTypingIndicatorState.getState();
 
     act(() => {
-      addTypingUser({conversationId: 'test-conversation-id', user: new User('test-id-1'), timerId: 0});
-      addTypingUser({conversationId: 'test-conversation-id', user: new User('test-id-2'), timerId: 0});
-      addTypingUser({conversationId: 'test-conversation-id', user: new User('test-id-3'), timerId: 0});
+      addTypingUser({conversationId: 'test-conversation-id', user: createUser('test-id-1', 'u1'), timerId: 0});
+      addTypingUser({conversationId: 'test-conversation-id', user: createUser('test-id-2', 'u2'), timerId: 0});
+      addTypingUser({conversationId: 'test-conversation-id', user: createUser('test-id-3', 'u3'), timerId: 0});
     });
 
-    expect(container.querySelectorAll('[data-uie-name="element-avatar-user"]').length).toBe(3);
+    expect(getAllByTestId('element-avatar-user')).toHaveLength(3);
 
     act(() => {
       removeTypingUser(new User('test-id-3'), 'test-conversation-id');
     });
 
-    expect(container.querySelectorAll('[data-uie-name="element-avatar-user"]').length).toBe(2);
+    expect(getAllByTestId('element-avatar-user')).toHaveLength(2);
   });
 });

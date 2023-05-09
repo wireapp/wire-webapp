@@ -25,7 +25,7 @@ import {Text} from 'src/script/entity/message/Text';
 import {User} from 'src/script/entity/User';
 import 'src/script/localization/Localizer';
 import {StatusType} from 'src/script/message/StatusType';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 describe('Member Message', () => {
   describe('generateNameString', () => {
@@ -36,27 +36,27 @@ describe('Member Message', () => {
     });
 
     it('can return correct string for one user', () => {
-      const user_a = new User(createRandomUuid());
+      const user_a = new User(createUuid());
       user_a.name('John');
       message_et.userEntities.push(user_a);
       expect(message_et.generateNameString()).toBe('[bold]John[/bold]');
     });
 
     it('can return correct string for two users', () => {
-      const user_a = new User(createRandomUuid(), null);
+      const user_a = new User(createUuid(), null);
       user_a.name('John');
-      const user_b = new User(createRandomUuid(), null);
+      const user_b = new User(createUuid(), null);
       user_b.name('Jim');
       message_et.userEntities.push(user_a, user_b);
       expect(message_et.generateNameString()).toBe('[bold]Jim[/bold] and [bold]John[/bold]');
     });
 
     it('can return correct string for more than two users', () => {
-      const user_a = new User(createRandomUuid());
+      const user_a = new User(createUuid());
       user_a.name('John');
-      const user_b = new User(createRandomUuid());
+      const user_b = new User(createUuid());
       user_b.name('Jim');
-      const user_c = new User(createRandomUuid());
+      const user_c = new User(createUuid());
       user_c.name('Jill');
       message_et.userEntities.push(user_a, user_b, user_c);
 
@@ -64,15 +64,15 @@ describe('Member Message', () => {
     });
 
     it('can return correct string for more than one user without sender', () => {
-      const user_sender = new User(createRandomUuid());
+      const user_sender = new User(createUuid());
       user_sender.name('Sender');
       message_et.user(user_sender);
 
-      const user_a = new User(createRandomUuid(), null);
+      const user_a = new User(createUuid(), null);
       user_a.name('John');
-      const user_b = new User(createRandomUuid(), null);
+      const user_b = new User(createUuid(), null);
       user_b.name('Jim');
-      const user_c = new User(createRandomUuid(), null);
+      const user_c = new User(createUuid(), null);
       user_c.name('Jill');
       message_et.userEntities.push(user_sender, user_a, user_b, user_c);
 

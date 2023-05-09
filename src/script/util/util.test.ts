@@ -22,7 +22,6 @@ import {
   arrayToBase64,
   base64ToArray,
   base64ToBlob,
-  createRandomUuid,
   formatBytes,
   getContentTypeFromDataUrl,
   getFileExtension,
@@ -32,6 +31,8 @@ import {
   trimFileExtension,
   zeroPadding,
 } from 'Util/util';
+
+import {createUuid} from './uuid';
 
 describe('base64ToBlob', () => {
   it('encodes Base64 data URI to blob', () => {
@@ -45,9 +46,9 @@ describe('base64ToBlob', () => {
 
 describe('createRandomUuid', () => {
   it('has the expected format', () => {
-    expect(createRandomUuid().length).toBe(36);
-    expect(createRandomUuid().split('-').length).toBe(5);
-    expect(createRandomUuid()).not.toEqual(createRandomUuid());
+    expect(createUuid().length).toBe(36);
+    expect(createUuid().split('-').length).toBe(5);
+    expect(createUuid()).not.toEqual(createUuid());
   });
 });
 

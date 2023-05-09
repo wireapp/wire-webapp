@@ -19,8 +19,9 @@
 
 import React, {useRef, useState} from 'react';
 
+import {BackendError, SyntheticErrorLabel} from '@wireapp/api-client/lib/http';
 import {amplify} from 'amplify';
-import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {StatusCodes as HTTP_STATUS, StatusCodes} from 'http-status-codes';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {useParams} from 'react-router-dom';
@@ -52,7 +53,6 @@ import {Config} from '../../Config';
 import {ssoLoginStrings} from '../../strings';
 import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
 import {RouterLink} from '../component/RouterLink';
-import {BackendError} from '../module/action/BackendError';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
 import {ROUTE} from '../route';
@@ -93,13 +93,13 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
           onChildWindowClose();
           closeSSOWindow();
           return reject(
-            new BackendError({
-              code: HTTP_STATUS.INTERNAL_SERVER_ERROR,
-              label: BackendError.LABEL.SSO_GENERIC_ERROR,
-              message: `Origin "${event.origin}" of event "${serializedEvent}" not matching "${
+            new BackendError(
+              `Origin "${event.origin}" of event "${serializedEvent}" not matching "${
                 Config.getConfig().BACKEND_REST
               }"`,
-            }),
+              SyntheticErrorLabel.SSO_GENERIC_ERROR,
+              HTTP_STATUS.INTERNAL_SERVER_ERROR,
+            ),
           );
         }
 
@@ -115,11 +115,11 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
             onChildWindowClose();
             closeSSOWindow();
             return reject(
-              new BackendError({
-                code: HTTP_STATUS.UNAUTHORIZED,
-                label: event.data.payload.label || BackendError.LABEL.SSO_GENERIC_ERROR,
-                message: `Authentication error: "${JSON.stringify(event.data.payload)}"`,
-              }),
+              new BackendError(
+                `Authentication error: "${JSON.stringify(event.data.payload)}"`,
+                event.data.payload.label || SyntheticErrorLabel.SSO_GENERIC_ERROR,
+                HTTP_STATUS.UNAUTHORIZED,
+              ),
             );
           }
           default: {
@@ -156,20 +156,22 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
 
       amplify.subscribe(WebAppEvents.LIFECYCLE.SSO_WINDOW_CLOSED, () => {
         onChildWindowClose();
-        reject(new BackendError({code: 500, label: BackendError.LABEL.SSO_USER_CANCELLED_ERROR}));
+        reject(new BackendError('', SyntheticErrorLabel.SSO_USER_CANCELLED_ERROR, StatusCodes.INTERNAL_SERVER_ERROR));
       });
 
       if (ssoWindowRef.current) {
         timerId = window.setInterval(() => {
           if (ssoWindowRef.current && ssoWindowRef.current.closed) {
             onChildWindowClose();
-            reject(new BackendError({code: 500, label: BackendError.LABEL.SSO_USER_CANCELLED_ERROR}));
+            reject(
+              new BackendError('', SyntheticErrorLabel.SSO_USER_CANCELLED_ERROR, StatusCodes.INTERNAL_SERVER_ERROR),
+            );
           }
         }, SSO_WINDOW_CLOSE_POLLING_INTERVAL);
 
         onParentWindowClose = () => {
           closeSSOWindow();
-          reject(new BackendError({code: 500, label: BackendError.LABEL.SSO_USER_CANCELLED_ERROR}));
+          reject(new BackendError('', SyntheticErrorLabel.SSO_USER_CANCELLED_ERROR, StatusCodes.INTERNAL_SERVER_ERROR));
         };
         window.addEventListener('unload', onParentWindowClose);
       }

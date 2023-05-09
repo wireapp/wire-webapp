@@ -53,7 +53,7 @@ const InputLevel: React.FC<InputLevelProps> = ({disabled, mediaStream, className
     if (!mediaStream) {
       return undefined;
     }
-    logger.info(`Initiating new audio meter for stream ID "${mediaStream.id}"`, mediaStream);
+    logger.info(`Initiating new audio meter for stream ID "${mediaStream.id}"`);
     if (!window.AudioContext?.prototype.createMediaStreamSource) {
       logger.warn('AudioContext is not supported, no volume indicator can be generated');
     }

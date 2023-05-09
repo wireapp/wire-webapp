@@ -18,18 +18,27 @@
  */
 
 export class WebWorker {
-  private readonly uri: string;
+  #worker: Worker | undefined;
 
-  constructor(uri: string) {
-    this.uri = uri;
+  /**
+   * worker wrapper that will lazy load (a single time) the worker only when it's needed
+   *
+   * @param workerCreator the creation function that will instanciate the worker (only called when the worker is needed)
+   */
+  constructor(private workerCreator: () => Worker) {}
+
+  private get worker(): Worker {
+    if (!this.#worker) {
+      this.#worker = this.workerCreator();
+    }
+    return this.#worker;
   }
 
   post<T>(data: string | ArrayBuffer | Record<string, any>): Promise<T> {
     return new Promise((resolve, reject) => {
-      const worker = new Worker(this.uri);
-      worker.onmessage = event => resolve(event.data);
-      worker.onerror = error => reject(error);
-      worker.postMessage(data);
+      this.worker.onmessage = event => resolve(event.data);
+      this.worker.onerror = error => reject(error);
+      this.worker.postMessage(data);
     });
   }
 }

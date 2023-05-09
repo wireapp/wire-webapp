@@ -22,23 +22,13 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 type UserClientsContainer<T> = {[userId: string]: T[]};
 type QualifiedUserClientsContainer<T> = {[domain: string]: UserClientsContainer<T>};
 
-function isQualifiedUserClients(obj: any): obj is QualifiedUserClientsContainer<unknown> {
-  if (typeof obj === 'object') {
-    const firstUserClientObject = Object.values(obj)?.[0];
-    if (typeof firstUserClientObject === 'object') {
-      const firstClientIdArray = Object.values(firstUserClientObject)[0];
-      return Array.isArray(firstClientIdArray);
-    }
-  }
-  return false;
-}
-
 function extractUserIds<T>(
   userClients: UserClientsContainer<T>,
   domain: string,
 ): {clients: T[]; userId: QualifiedId}[] {
   return Object.entries(userClients).map(([id, clients]) => ({clients, userId: {domain, id}}));
 }
+
 /**
  * Will flatten a container of users=>clients infos to an array
  *
@@ -46,12 +36,9 @@ function extractUserIds<T>(
  * @return An array containing the qualified user Ids and the clients info
  */
 export function flattenUserClientsQualifiedIds<T = unknown>(
-  userClients: UserClientsContainer<T> | QualifiedUserClientsContainer<T>,
+  userClients: QualifiedUserClientsContainer<T>,
 ): {clients: T[]; userId: QualifiedId}[] {
-  if (isQualifiedUserClients(userClients)) {
-    return Object.entries(userClients).reduce((ids, [domain, userClients]) => {
-      return [...ids, ...extractUserIds(userClients, domain)];
-    }, [] as {clients: T[]; userId: QualifiedId}[]);
-  }
-  return extractUserIds(userClients, '');
+  return Object.entries(userClients).reduce((ids, [domain, userClients]) => {
+    return [...ids, ...extractUserIds(userClients, domain)];
+  }, [] as {clients: T[]; userId: QualifiedId}[]);
 }

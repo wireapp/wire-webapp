@@ -66,7 +66,7 @@ const Archive = ({
     conversationRepository.updateArchivedConversations();
   }, []);
 
-  const {currentFocus, handleKeyDown} = useConversationFocus(conversations);
+  const {currentFocus, handleKeyDown, resetConversationFocus} = useConversationFocus(conversations);
 
   return (
     <ListWrapper id="archive" header={t('archiveHeader')} onClose={onClose}>
@@ -76,6 +76,7 @@ const Archive = ({
         {conversations.map((conversation, index) => (
           <ConversationListCell
             isFocused={currentFocus === conversation.id}
+            resetConversationFocus={resetConversationFocus}
             key={conversation.id}
             handleArrowKeyDown={handleKeyDown(index)}
             dataUieName="item-conversation-archived"

@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -91,6 +91,10 @@ const StartUI: React.FC<StartUIProps> = ({
     canCreateGroupConversation,
   } = generatePermissionHelpers(selfUser.teamRole());
 
+  useEffect(() => {
+    void conversationRepository.loadMissingConversations();
+  }, [conversationRepository]);
+
   const actions = mainViewModel.actions;
   const isTeam = teamState.isTeam();
   const teamName = teamState.teamName();
@@ -133,7 +137,7 @@ const StartUI: React.FC<StartUIProps> = ({
     });
   };
 
-  const openInviteModal = () => showInviteModal({userState});
+  const openInviteModal = () => showInviteModal({selfUser: userState.self()});
 
   const openConversation = async (conversation: Conversation): Promise<void> => {
     await actions.openGroupConversation(conversation);

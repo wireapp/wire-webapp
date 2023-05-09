@@ -52,7 +52,7 @@ const GroupedConversationsFolder = ({
 }: GroupedConversationsFolderProps) => {
   const isExpanded: boolean = expandedFolders.includes(folder.id);
   const {conversations} = useKoSubscribableChildren(folder, ['conversations']);
-  const {currentFocus, handleKeyDown} = useConversationFocus(conversations);
+  const {currentFocus, handleKeyDown, resetConversationFocus} = useConversationFocus(conversations);
 
   return (
     <li className="conversation-folder" data-uie-name="conversation-folder" data-uie-value={folder.name}>
@@ -65,6 +65,7 @@ const GroupedConversationsFolder = ({
               isFocused={currentFocus === conversation.id}
               key={conversation.id}
               handleArrowKeyDown={handleKeyDown(index)}
+              resetConversationFocus={resetConversationFocus}
               onClick={event => {
                 if ('key' in event) {
                   createNavigateKeyboard(generateConversationUrl(conversation.qualifiedId), true)(event);

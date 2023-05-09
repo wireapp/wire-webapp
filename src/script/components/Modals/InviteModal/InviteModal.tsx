@@ -23,23 +23,21 @@ import {Runtime} from '@wireapp/commons';
 
 import {Icon} from 'Components/Icon';
 import {ModalComponent} from 'Components/ModalComponent';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {User} from 'src/script/entity/User';
 import {t} from 'Util/LocalizerUtil';
 import {renderElement} from 'Util/renderElement';
 
 import {Config} from '../../../Config';
-import {UserState} from '../../../user/UserState';
 
 export interface InviteModalProps {
-  readonly userState: UserState;
+  readonly selfUser: User;
   onClose?: () => void;
 }
 
 const {BRAND_NAME: brandName} = Config.getConfig();
 
-const InviteModal: React.FC<InviteModalProps> = ({userState, onClose}) => {
+const InviteModal: React.FC<InviteModalProps> = ({selfUser, onClose}) => {
   const [isInviteMessageSelected, setIsInviteMessageSelected] = useState<boolean>(false);
-  const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
   const userName = selfUser.username();
   const inviteMessage = userName
     ? t('inviteMessage', {brandName: brandName, username: `@${userName}`})

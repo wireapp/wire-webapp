@@ -100,6 +100,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
 
   const onRetry = async (message: ContentMessage) => {
     const firstAsset = message.getFirstAsset();
+    const file = message.fileData();
 
     if (firstAsset instanceof Text) {
       const messageId = message.id;
@@ -110,11 +111,9 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
         incomingQuote && isOutgoingQuote(incomingQuote) ? (incomingQuote as OutgoingQuote) : undefined;
 
       await messageRepository.sendTextWithLinkPreview(conversation, messageText, mentions, quote, messageId);
+    } else if (file) {
+      await messageRepository.retryUploadFile(conversation, file, firstAsset.isImage(), message.id);
     }
-  };
-
-  const onDiscard = async () => {
-    await messageRepository.deleteMessageById(conversation, message.id);
   };
 
   const contextMenuEntries = ko.pureComputed(() => {
@@ -207,7 +206,6 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
         onClickInvitePeople={onClickInvitePeople}
         onClickParticipants={onClickParticipants}
         onClickDetails={onClickDetails}
-        onDiscard={onDiscard}
         onRetry={onRetry}
         isMessageFocused={isMessageFocused}
         isMsgElementsFocusable={isMsgElementsFocusable}

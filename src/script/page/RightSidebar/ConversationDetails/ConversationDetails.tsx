@@ -29,7 +29,7 @@ import {EnrichedFields} from 'Components/panel/EnrichedFields';
 import {PanelActions} from 'Components/panel/PanelActions';
 import {ServiceDetails} from 'Components/panel/ServiceDetails';
 import {UserDetails} from 'Components/panel/UserDetails';
-import {ServiceList} from 'Components/ServiceList';
+import {ServiceList} from 'Components/ServiceList/ServiceList';
 import {UserSearchableList} from 'Components/UserSearchableList';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -257,6 +257,10 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
     );
 
     useEffect(() => {
+      conversationRepository.refreshUnavailableParticipants(activeConversation);
+    }, [activeConversation, conversationRepository]);
+
+    useEffect(() => {
       if (isTeam && isSingleUserMode) {
         teamRepository.updateTeamMembersByIds(team, [firstParticipant.id], true);
       }
@@ -295,7 +299,6 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
                 isSelfVerified={isSelfVerified}
                 badge={teamRepository.getRoleBadge(firstParticipant.id)}
                 classifiedDomains={classifiedDomains}
-                classifiedBarStyles={{marginTop: 16}}
               />
 
               <EnrichedFields user={firstParticipant} showDomain={isFederated} />
@@ -403,9 +406,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
 
                   <ServiceList
                     services={serviceParticipants}
-                    click={showService}
-                    noUnderline
-                    arrow
+                    onServiceClick={showService}
                     dataUieName="list-services"
                   />
                 </div>

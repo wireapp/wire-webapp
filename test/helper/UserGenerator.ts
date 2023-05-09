@@ -18,36 +18,42 @@
  */
 
 import {faker} from '@faker-js/faker';
+import {QualifiedId, UserAssetType} from '@wireapp/api-client/lib/user';
 import type {User as APIClientUser} from '@wireapp/api-client/lib/user/';
-import {UserAssetType} from '@wireapp/api-client/lib/user/';
 
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import type {User} from '../../src/script/entity/User';
 import {serverTimeHandler} from '../../src/script/time/serverTimeHandler';
 import {UserMapper} from '../../src/script/user/UserMapper';
 
-export class UserGenerator {
-  static getRandomUser(): User {
-    const template: APIClientUser = {
-      accent_id: Math.floor(Math.random() * 7 + 1),
-      assets: [
-        {
-          key: `3-1-${createRandomUuid()}`,
-          size: UserAssetType.PREVIEW,
-          type: 'image',
-        },
-        {
-          key: `3-1-${createRandomUuid()}`,
-          size: UserAssetType.COMPLETE,
-          type: 'image',
-        },
-      ],
-      handle: faker.internet.userName(),
-      id: createRandomUuid(),
-      name: faker.name.fullName(),
-    };
+export function generateAPIUser(
+  id: QualifiedId = {id: createUuid(), domain: 'test.wire.link'},
+  overwites?: Partial<APIClientUser>,
+): APIClientUser {
+  return {
+    accent_id: Math.floor(Math.random() * 7 + 1),
+    assets: [
+      {
+        key: `3-1-${createUuid()}`,
+        size: UserAssetType.PREVIEW,
+        type: 'image',
+      },
+      {
+        key: `3-1-${createUuid()}`,
+        size: UserAssetType.COMPLETE,
+        type: 'image',
+      },
+    ],
+    handle: faker.internet.userName(),
+    id: id.id,
+    name: faker.name.fullName(),
+    qualified_id: id,
+    ...overwites,
+  };
+}
 
-    return new UserMapper(serverTimeHandler).mapUserFromJson(template);
-  }
+export function generateUser(id?: QualifiedId): User {
+  const apiUser = generateAPIUser(id);
+  return new UserMapper(serverTimeHandler).mapUserFromJson(apiUser, '');
 }
