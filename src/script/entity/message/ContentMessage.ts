@@ -19,6 +19,7 @@
 
 import type {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {ReactionType} from '@wireapp/core/lib/conversation/ReactionType';
 import ko from 'knockout';
 
 import {copyText} from 'Util/ClipboardUtil';
@@ -36,11 +37,6 @@ import type {QuoteEntity} from '../../message/QuoteEntity';
 import {SuperType} from '../../message/SuperType';
 import {UserReactionMap} from '../../storage';
 import {User} from '../User';
-
-export enum ReactionType {
-  LIKE = '❤️',
-  NONE = '',
-}
 
 export class ContentMessage extends Message {
   private readonly isLikedProvisional: ko.Observable<boolean>;

@@ -32,6 +32,7 @@ import {getMessageAriaLabel} from 'Util/conversationMessages';
 
 import {ContentAsset} from './asset';
 import {MessageActionsMenu} from './MessageActions/MessageActions';
+import {useMessageActionsState} from './MessageActions/MessageActions.state';
 import {MessageReactionsList} from './MessageActions/MessageReactions/MessageReactionsList';
 import {MessageHeader} from './MessageHeader';
 import {Quote} from './MessageQuote';
@@ -133,7 +134,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   });
 
   const [isActionMenuVisible, setActionMenuVisibility] = useState(true);
-
+  const isMenuOpen = useMessageActionsState(state => state.isMenuOpen);
   useEffect(() => {
     if (isMessageFocused || msgFocusState) {
       setActionMenuVisibility(true);
@@ -143,7 +144,22 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   }, [msgFocusState, isMessageFocused]);
 
   return (
-    <div aria-label={messageAriaLabel}>
+    <div
+      aria-label={messageAriaLabel}
+      className="content-message-wrapper"
+      onMouseEnter={event => {
+        // open another floating action menu if none already open
+        if (!isMenuOpen) {
+          setActionMenuVisibility(true);
+        }
+      }}
+      onMouseLeave={event => {
+        // close floating message actions when no active menu is open like context menu/emoji picker
+        if (!isMenuOpen) {
+          setActionMenuVisibility(false);
+        }
+      }}
+    >
       {shouldShowAvatar() && (
         <MessageHeader onClickAvatar={onClickAvatar} message={message} focusTabIndex={messageFocusedTabIndex}>
           {was_edited && (

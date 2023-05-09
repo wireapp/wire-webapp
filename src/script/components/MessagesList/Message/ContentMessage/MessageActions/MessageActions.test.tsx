@@ -22,13 +22,12 @@ import ko from 'knockout';
 
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {t} from 'Util/LocalizerUtil';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {MessageActionsMenu, MessageActionsMenuProps} from './MessageActions';
-
 const defaultProps: MessageActionsMenuProps = {
   isMsgWithHeader: true,
-  message: new ContentMessage(createRandomUuid()),
+  message: new ContentMessage(createUuid()),
   contextMenu: {entries: ko.observable([{label: 'option1', text: 'option1'}])},
   isMessageFocused: true,
   handleActionMenuVisibility: jest.fn(),
