@@ -23,10 +23,12 @@ import {
   CONVERSATION_ACCESS,
   CONVERSATION_LEGACY_ACCESS_ROLE,
   CONVERSATION_TYPE,
+  RemoteConversations,
 } from '@wireapp/api-client/lib/conversation/';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
 import {ConversationCreateEvent, ConversationMemberJoinEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import ko from 'knockout';
@@ -1263,5 +1265,148 @@ describe('ConversationRepository', () => {
     });
   });
 
-  describe('deleteConversationLocally', () => {});
+  function generateConversation(id: QualifiedId, name: string) {
+    return {
+      members: {
+        others: [] as QualifiedId[],
+        self: {},
+      },
+      name,
+      protocol: 'proteus',
+      qualified_id: id,
+      receipt_mode: 1,
+      team: 'b0dcee1f-c64e-4d40-8b50-5baf932906b8',
+      type: 0,
+    };
+  }
+
+  describe('loadConversations', () => {
+    beforeEach(() => {
+      testFactory.conversation_repository!['conversationState'].conversations.removeAll();
+    });
+
+    it('loads all conversations from backend when there is no local conversations', async () => {
+      const conversationRepository = testFactory.conversation_repository!;
+      const conversationService = conversationRepository['conversationService'];
+      const remoteConversations = {
+        found: [
+          generateConversation(
+            {
+              domain: 'staging.zinfra.io',
+              id: '05d0f240-bfe9-40d7-b6cb-602dac89fa1b',
+            },
+            'conv1',
+          ),
+
+          generateConversation(
+            {
+              domain: 'staging.zinfra.io',
+              id: '05d0f240-bfe9-1234-b6cb-602dac89fa1b',
+            },
+            'conv2',
+          ),
+        ],
+      };
+      const localConversations: any = [];
+
+      jest
+        .spyOn(conversationService, 'getAllConversations')
+        .mockResolvedValue(remoteConversations as unknown as RemoteConversations);
+      jest
+        .spyOn(conversationService, 'loadConversationStatesFromDb')
+        .mockResolvedValue(localConversations as unknown as ConversationDatabaseData[]);
+      jest.spyOn(conversationService, 'saveConversationsInDb').mockImplementation(data => Promise.resolve(data));
+
+      const conversations = await conversationRepository.loadConversations();
+
+      expect(conversations).toHaveLength(remoteConversations.found.length);
+    });
+
+    it('keeps track of missing conversations', async () => {
+      const conversationRepository = testFactory.conversation_repository!;
+      const conversationService = conversationRepository['conversationService'];
+      const conversationState = conversationRepository['conversationState'];
+      const remoteConversations = {
+        found: [
+          generateConversation(
+            {
+              domain: 'staging.zinfra.io',
+              id: '05d0f240-bfe9-40d7-b6cb-602dac89fa1b',
+            },
+            'conv1',
+          ),
+        ],
+        failed: [
+          generateConversation(
+            {
+              domain: 'staging.zinfra.io',
+              id: '05d0f240-bfe9-1234-b6cb-602dac89fa1b',
+            },
+            'conv2',
+          ),
+
+          generateConversation(
+            {
+              domain: 'staging.zinfra.io',
+              id: '05d0f240-bfe9-5678-b6cb-602dac89fa1b',
+            },
+            'conv3',
+          ),
+        ],
+      };
+
+      jest
+        .spyOn(conversationService, 'getAllConversations')
+        .mockResolvedValue(remoteConversations as unknown as RemoteConversations);
+
+      await conversationRepository.loadConversations();
+
+      expect(conversationState.missingConversations).toHaveLength(remoteConversations.failed.length);
+    });
+  });
+  describe('loadMissingConversations', () => {
+    beforeEach(() => {
+      testFactory.conversation_repository!['conversationState'].conversations.removeAll();
+    });
+
+    it('make sure missing conversations are properly updated', async () => {
+      const conversationRepository = testFactory.conversation_repository!;
+      const conversationService = conversationRepository['conversationService'];
+      const conversationState = conversationRepository['conversationState'];
+
+      const missingConversations = [
+        {
+          domain: 'staging.zinfra.io',
+          id: '05d0f240-bfe9-40d7-b6cb-602dac89fa1b',
+        },
+        {
+          domain: 'staging.zinfra.io',
+          id: '05d0f240-bfe9-40d7-1234-602dac89fa1b',
+        },
+        {
+          domain: 'staging.zinfra.io',
+          id: '05d0f240-bfe9-40d7-5678-602dac89fa1b',
+        },
+      ];
+
+      const remoteConversations = {
+        found: [generateConversation(missingConversations[0], 'conv1')],
+        failed: [
+          generateConversation(missingConversations[1], 'conv2').qualified_id,
+          generateConversation(missingConversations[2], 'conv3').qualified_id,
+        ],
+      };
+
+      jest.replaceProperty(conversationState, 'missingConversations', missingConversations as any);
+      jest
+        .spyOn(conversationService, 'getConversationByIds')
+        .mockResolvedValue(remoteConversations as unknown as RemoteConversations);
+
+      expect(conversationState.missingConversations).toHaveLength(missingConversations.length);
+
+      await conversationRepository.loadMissingConversations();
+
+      expect(conversationState.missingConversations).toHaveLength(remoteConversations.failed.length);
+    });
+  });
 });
