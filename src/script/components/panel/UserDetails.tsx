@@ -19,13 +19,14 @@
 
 import React, {useEffect} from 'react';
 
-import {CSSObject} from '@emotion/react';
 import {amplify} from 'amplify';
+import {ErrorBoundary} from 'react-error-boundary';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {AvailabilityState} from 'Components/AvailabilityState';
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {ErrorFallback} from 'Components/ErrorFallback';
 import {Icon} from 'Components/Icon';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -41,17 +42,15 @@ export interface UserDetailsProps {
   isVerified?: boolean;
   participant: User;
   avatarStyles?: React.CSSProperties;
-  classifiedBarStyles?: CSSObject;
 }
 
-const UserDetails: React.FC<UserDetailsProps> = ({
+export const UserDetailsComponent: React.FC<UserDetailsProps> = ({
   badge,
   participant,
   isSelfVerified,
   isGroupAdmin,
   avatarStyles,
   classifiedDomains,
-  classifiedBarStyles,
 }) => {
   const user = useKoSubscribableChildren(participant, [
     'inTeam',
@@ -61,14 +60,16 @@ const UserDetails: React.FC<UserDetailsProps> = ({
     'name',
     'availability',
     'is_verified',
+    'isAvailable',
   ]);
 
   useEffect(() => {
+    // This will trigger a user refresh
     amplify.publish(WebAppEvents.USER.UPDATE, participant.qualifiedId);
   }, [participant]);
 
   const isFederated = participant.isFederated;
-  const isGuest = !isFederated && participant.isGuest();
+  const isGuest = !isFederated && user.isGuest;
 
   return (
     <div className="panel-participant">
@@ -81,8 +82,12 @@ const UserDetails: React.FC<UserDetailsProps> = ({
             dataUieName="status-name"
           />
         ) : (
-          <h2 className="panel-participant__head__name" data-uie-name="status-name">
-            {user.name}
+          <h2
+            className="panel-participant__head__name"
+            data-uie-name="status-name"
+            css={user.isAvailable ? undefined : {color: 'var(--gray-70)'}}
+          >
+            {user.isAvailable ? user.name : t('unavailableUser')}
           </h2>
         )}
 
@@ -100,13 +105,7 @@ const UserDetails: React.FC<UserDetailsProps> = ({
         </p>
       )}
 
-      {classifiedDomains && (
-        <ClassifiedBar
-          users={[participant]}
-          classifiedDomains={classifiedDomains}
-          style={{width: 'calc(100% + 32px)', ...classifiedBarStyles}}
-        />
-      )}
+      {classifiedDomains && <ClassifiedBar users={[participant]} classifiedDomains={classifiedDomains} />}
 
       <Avatar
         className="panel-participant__avatar"
@@ -130,14 +129,14 @@ const UserDetails: React.FC<UserDetailsProps> = ({
         </div>
       )}
 
-      {isGuest && (
+      {isGuest && user.isAvailable && (
         <div className="panel-participant__label" data-uie-name="status-guest">
           <Icon.Guest />
           <span>{t('conversationGuestIndicator')}</span>
         </div>
       )}
 
-      {user.isTemporaryGuest && (
+      {user.isTemporaryGuest && user.isAvailable && (
         <div className="panel-participant__guest-expiration" data-uie-name="status-expiration-text">
           {user.expirationText}
         </div>
@@ -153,4 +152,10 @@ const UserDetails: React.FC<UserDetailsProps> = ({
   );
 };
 
-export {UserDetails};
+export const UserDetails: React.FC<UserDetailsProps> = props => {
+  return (
+    <ErrorBoundary FallbackComponent={ErrorFallback}>
+      <UserDetailsComponent {...props} />
+    </ErrorBoundary>
+  );
+};

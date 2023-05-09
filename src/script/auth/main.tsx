@@ -28,6 +28,7 @@ import {createRoot} from 'react-dom/client';
 import {Provider} from 'react-redux';
 import {container} from 'tsyringe';
 
+import {initializeDataDog} from 'Util/DataDog';
 import {enableLogging} from 'Util/LoggerUtil';
 import {exposeWrapperGlobals} from 'Util/wrapper';
 
@@ -72,10 +73,13 @@ const render = (Component: FC): void => {
   );
 };
 
+const config = Config.getConfig();
+
 async function runApp() {
-  const config = Config.getConfig();
   const [min, max] = config.SUPPORTED_API_RANGE;
-  await core.useAPIVersion(min, max, config.ENABLE_DEV_BACKEND_API);
+  const {domain} = await core.useAPIVersion(min, max, config.ENABLE_DEV_BACKEND_API);
+  await initializeDataDog(config, {domain: domain});
+
   render(Root);
   if (module.hot) {
     module.hot.accept('./page/Root', () => {
@@ -84,5 +88,5 @@ async function runApp() {
   }
 }
 
-enableLogging(Config.getConfig().FEATURE.ENABLE_DEBUG);
+enableLogging(config);
 runApp();

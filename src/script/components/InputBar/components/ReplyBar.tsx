@@ -41,9 +41,9 @@ interface ReplyBarProps {
 const ReplyBar: FC<ReplyBarProps> = ({replyMessageEntity, onCancel}) => {
   const {
     assets,
-    headerSenderName,
+    senderName,
     was_edited: wasEdited,
-  } = useKoSubscribableChildren(replyMessageEntity, ['assets', 'headerSenderName', 'was_edited']);
+  } = useKoSubscribableChildren(replyMessageEntity, ['assets', 'senderName', 'was_edited']);
   const replyAsset = assets?.[0];
 
   return (
@@ -64,7 +64,7 @@ const ReplyBar: FC<ReplyBarProps> = ({replyMessageEntity, onCancel}) => {
         <div className="input-bar__reply__text">
           <div className="input-bar__reply__sender-name">
             <span data-uie-name="label-name-reply-box" tabIndex={TabIndex.FOCUSABLE}>
-              {headerSenderName}
+              {senderName}
             </span>
 
             {wasEdited && (

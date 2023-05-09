@@ -19,7 +19,7 @@
 
 import {fireEvent, render} from '@testing-library/react';
 
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {CollectionSection} from './CollectionSection';
 
@@ -27,7 +27,7 @@ import {ContentMessage} from '../../../../entity/message/ContentMessage';
 
 const NUMBER_OF_ASSETS = 5;
 
-const messages = new Array(NUMBER_OF_ASSETS).fill(null).map(() => new ContentMessage(createRandomUuid()));
+const messages = new Array(NUMBER_OF_ASSETS).fill(null).map(() => new ContentMessage(createUuid()));
 
 const getDefaultProps = (limit: number) => ({
   label: 'cool collection',

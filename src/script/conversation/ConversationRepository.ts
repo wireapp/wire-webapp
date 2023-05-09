@@ -24,6 +24,7 @@ import {
   DefaultConversationRoleName as DefaultRole,
   NewConversation,
   MessageSendingStatus,
+  RemoteConversations,
 } from '@wireapp/api-client/lib/conversation/';
 import {ConversationReceiptModeUpdateData} from '@wireapp/api-client/lib/conversation/data/';
 import {CONVERSATION_TYPING} from '@wireapp/api-client/lib/conversation/data/ConversationTypingData';
@@ -40,6 +41,7 @@ import {
   CONVERSATION_EVENT,
 } from '@wireapp/api-client/lib/event';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
+import type {BackendError} from '@wireapp/api-client/lib/http/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {MLSReturnType} from '@wireapp/core/lib/conversation';
 import {amplify} from 'amplify';
@@ -65,7 +67,9 @@ import {
   startsWith,
 } from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {createRandomUuid, noop} from 'Util/util';
+import {isBackendError} from 'Util/TypePredicateUtil';
+import {noop} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {ACCESS_STATE} from './AccessState';
 import {extractClientDiff} from './ClientMismatchUtil';
@@ -112,7 +116,6 @@ import {FileAsset} from '../entity/message/FileAsset';
 import {MemberMessage} from '../entity/message/MemberMessage';
 import {Message} from '../entity/message/Message';
 import {User} from '../entity/User';
-import {BackendClientError} from '../error/BackendClientError';
 import {BaseError, BASE_ERROR_TYPE} from '../error/BaseError';
 import {ConversationError} from '../error/ConversationError';
 import {ClientEvent, CONVERSATION as CLIENT_CONVERSATION_EVENT} from '../event/Client';
@@ -125,7 +128,7 @@ import * as LegalHoldEvaluator from '../legal-hold/LegalHoldEvaluator';
 import {MessageCategory} from '../message/MessageCategory';
 import {SuperType} from '../message/SuperType';
 import {SystemMessageType} from '../message/SystemMessageType';
-import {useMLSConversationState} from '../mls';
+import {addOtherSelfClientsToMLSConversation, useMLSConversationState} from '../mls';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {Core} from '../service/CoreSingleton';
 import type {EventRecord} from '../storage';
@@ -215,7 +218,7 @@ export class ConversationRepository {
 
       if (removedTeamUserIds.length) {
         // If we have found some users that were removed from the conversation, we need to check if those users were also completely removed from the team
-        const usersWithoutClients = await this.userRepository.getUserListFromBackend(removedTeamUserIds);
+        const {found: usersWithoutClients} = await this.userRepository.getUserListFromBackend(removedTeamUserIds);
         await Promise.all(
           usersWithoutClients
             .filter(user => user.deleted)
@@ -456,6 +459,14 @@ export class ConversationRepository {
     }
   }
 
+  public async refreshUnavailableParticipants(conversation: Conversation): Promise<void> {
+    const unavailableUsers = conversation.allUserEntities().filter(user => !user.isAvailable());
+    if (!unavailableUsers.length) {
+      return;
+    }
+    await this.userRepository.refreshUsers(unavailableUsers.map(user => user.qualifiedId));
+  }
+
   /**
    * Create a guest room.
    */
@@ -481,7 +492,6 @@ export class ConversationRepository {
       const response = await this.conversationService.getConversationById(qualifiedId);
       const [conversationEntity] = this.mapConversations([response]);
 
-      this.logger.info(`Fetched conversation '${conversationId}' from backend`);
       this.saveConversation(conversationEntity);
 
       fetching_conversations[conversationId].forEach(({resolveFn}) => resolveFn(conversationEntity));
@@ -506,27 +516,77 @@ export class ConversationRepository {
 
   /**
    * Will load all the conversations in memory
-   * @returns all the load conversations from backend merged with the locally stored conversations
+   * @returns all the conversations from backend merged with the locally stored conversations and loaded into memory
    */
   public async loadConversations(): Promise<Conversation[]> {
     const remoteConversationsPromise = this.conversationService.getAllConversations().catch(error => {
       this.logger.error(`Failed to get all conversations from backend: ${error.message}`);
-      return {found: []};
+      return {found: []} as RemoteConversations;
     });
 
     const [localConversations, remoteConversations] = await Promise.all([
       this.conversationService.loadConversationStatesFromDb<ConversationDatabaseData>(),
       remoteConversationsPromise,
     ]);
+    return this.loadRemoteConversations(remoteConversations, localConversations);
+  }
+
+  /**
+   * Will try to fetch and load all the missing conversations in memory
+   * @returns all the missing conversations freshly fetched from backend appended to the locally stored conversations
+   */
+  public async loadMissingConversations(): Promise<Conversation[]> {
+    const missingConversations = this.conversationState.missingConversations;
+    if (!missingConversations.length) {
+      return this.conversationState.conversations();
+    }
+    const remoteConversations = await this.conversationService
+      .getConversationByIds(missingConversations)
+      .catch(error => {
+        this.logger.error(`Failed to get all conversations from backend: ${error.message}`);
+        return {found: [], failed: missingConversations} as RemoteConversations;
+      });
+    return this.loadRemoteConversations(remoteConversations);
+  }
+
+  /**
+   * Will append the new conversations from backend to the locally stored conversations in memory
+   * @param remoteConversations new conversations fetched from backend
+   * @param localConversations conversations locally stored in database, but not in memory. Omitted after first loading of the app
+   * @returns the new conversations from backend merged with the locally stored conversations
+   */
+  private async loadRemoteConversations(
+    remoteConversations: RemoteConversations,
+    localConversations: ConversationDatabaseData[] = [],
+  ): Promise<Conversation[]> {
+    const {missingConversations} = this.conversationState;
     let conversationsData: any[];
+
+    if (remoteConversations.failed?.length) {
+      missingConversations.push(...remoteConversations.failed);
+    }
+
     if (!remoteConversations.found?.length) {
       conversationsData = localConversations;
     } else {
       const data = ConversationMapper.mergeConversation(localConversations, remoteConversations);
       conversationsData = (await this.conversationService.saveConversationsInDb(data)) as any[];
     }
-    const conversationEntities = this.mapConversations(conversationsData);
-    this.saveConversations(conversationEntities);
+
+    const allConversationEntities = this.mapConversations(conversationsData);
+    const newConversationEntities = allConversationEntities.filter(
+      allConversations =>
+        !this.conversationState
+          .conversations()
+          .some(storedConversations => storedConversations.id === allConversations.id),
+    );
+    this.saveConversations(newConversationEntities);
+
+    const remainingMissingConversations = missingConversations.filter(missingConversationsId =>
+      newConversationEntities.some(conversation => conversation.id !== missingConversationsId.id),
+    );
+    this.conversationState.missingConversations = [...new Set(remainingMissingConversations)];
+
     return this.conversationState.conversations();
   }
 
@@ -695,7 +755,7 @@ export class ConversationRepository {
       messageDate,
       Config.getConfig().MESSAGES_FETCH_LIMIT,
     )) as EventRecord[];
-    const mappedMessageEntities = await this.addEventsToConversation(events, conversationEntity, false);
+    const mappedMessageEntities = await this.addEventsToConversation(events, conversationEntity, {prepend: false});
     conversationEntity.is_pending(false);
     return mappedMessageEntities;
   }
@@ -733,7 +793,8 @@ export class ConversationRepository {
    */
   private async getUnreadEvents(conversationEntity: Conversation): Promise<void> {
     const first_message = conversationEntity.getOldestMessage();
-    const lower_bound = new Date(conversationEntity.last_read_timestamp());
+    // The lower bound should be right after the last read timestamp in order not to load the last read message again (thus the +1)
+    const lower_bound = new Date(conversationEntity.last_read_timestamp() + 1);
     const upper_bound = first_message
       ? new Date(first_message.timestamp())
       : new Date(conversationEntity.getLatestTimestamp(this.serverTimeHandler.toServerTimestamp()) + 1);
@@ -748,7 +809,9 @@ export class ConversationRepository {
           upper_bound,
         )) as EventRecord[];
         if (events.length) {
-          this.addEventsToConversation(events, conversationEntity);
+          // To prevent firing a ton of potential backend calls for missing users, we use an optimistic approach and do an offline update of those events
+          // In case a user is missing in the local state, then they will be considered an `unavailable` user
+          await this.addEventsToConversation(events, conversationEntity, {offline: true});
         }
       } catch (error) {
         this.logger.info(`Could not load unread events for conversation: ${conversationEntity.id}`, error);
@@ -771,12 +834,7 @@ export class ConversationRepository {
    * Update all conversations on app init.
    */
   public async updateConversationsOnAppInit() {
-    this.logger.info('Updating group participants');
-    await this.updateUnarchivedConversations();
-    const updatePromises = this.conversationState.filteredConversations().map(conversationEntity => {
-      return this.updateParticipatingUserEntities(conversationEntity, true);
-    });
-    return Promise.all(updatePromises);
+    await this.updateConversations(this.conversationState.filteredConversations());
   }
 
   /**
@@ -784,13 +842,6 @@ export class ConversationRepository {
    */
   public updateArchivedConversations() {
     return this.updateConversations(this.conversationState.archivedConversations());
-  }
-
-  /**
-   * Update users and events for all unarchived conversations.
-   */
-  private updateUnarchivedConversations() {
-    return this.updateConversations(this.conversationState.visibleConversations());
   }
 
   private async updateConversationFromBackend(conversationEntity: Conversation) {
@@ -1221,7 +1272,7 @@ export class ConversationRepository {
    * @param connectionEntities Connections entities
    */
   mapConnections(connectionEntities: ConnectionEntity[]): Promise<Conversation>[] {
-    this.logger.info(`Mapping '${connectionEntities.length}' user connection(s) to conversations`, connectionEntities);
+    this.logger.log(`Mapping '${connectionEntities.length}' user connection(s) to conversations`, connectionEntities);
 
     return connectionEntities.map(connectionEntity => this.mapConnection(connectionEntity));
   }
@@ -1329,7 +1380,9 @@ export class ConversationRepository {
     offline = false,
     updateGuests = false,
   ): Promise<Conversation> {
-    const userEntities = await this.userRepository.getUsersById(conversationEntity.participating_user_ids(), offline);
+    const userEntities = await this.userRepository.getUsersById(conversationEntity.participating_user_ids(), {
+      localOnly: offline,
+    });
     userEntities.sort(sortUsersByPriority);
     conversationEntity.participating_user_ets(userEntities);
 
@@ -1381,8 +1434,8 @@ export class ConversationRepository {
         }
       }
     } catch (error) {
-      if (error) {
-        this.handleAddToConversationError(error as BackendClientError, conversation, qualifiedUsers);
+      if (isBackendError(error)) {
+        this.handleAddToConversationError(error, conversation, qualifiedUsers);
       }
     }
   }
@@ -1417,21 +1470,17 @@ export class ConversationRepository {
       .catch(error => this.handleAddToConversationError(error, conversationEntity, [{domain: '', id: serviceId}]));
   }
 
-  private handleAddToConversationError(
-    error: BackendClientError,
-    conversationEntity: Conversation,
-    userIds: QualifiedId[],
-  ) {
+  private handleAddToConversationError(error: BackendError, conversationEntity: Conversation, userIds: QualifiedId[]) {
     switch (error.label) {
       case BackendErrorLabel.NOT_CONNECTED: {
         this.handleUsersNotConnected(userIds);
         break;
       }
 
-      case BackendClientError.LABEL.BAD_GATEWAY:
-      case BackendClientError.LABEL.SERVER_ERROR:
-      case BackendClientError.LABEL.SERVICE_DISABLED:
-      case BackendClientError.LABEL.TOO_MANY_BOTS: {
+      case BackendErrorLabel.BAD_GATEWAY:
+      case BackendErrorLabel.SERVER_ERROR:
+      case BackendErrorLabel.SERVICE_DISABLED:
+      case BackendErrorLabel.TOO_MANY_SERVICES: {
         const messageText = t('modalServiceUnavailableMessage');
         const titleText = t('modalServiceUnavailableHeadline');
 
@@ -1817,12 +1866,12 @@ export class ConversationRepository {
     }
   }
 
-  private handleConversationCreateError(error: BackendClientError, userIds: QualifiedId[]): void {
+  private handleConversationCreateError(error: BackendError, userIds: QualifiedId[]): void {
     switch (error.label) {
-      case BackendClientError.LABEL.CLIENT_ERROR:
+      case BackendErrorLabel.CLIENT_ERROR:
         this.handleTooManyMembersError();
         break;
-      case BackendClientError.LABEL.NOT_CONNECTED:
+      case BackendErrorLabel.NOT_CONNECTED:
         this.handleUsersNotConnected(userIds);
         break;
       case BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT:
@@ -1925,7 +1974,7 @@ export class ConversationRepository {
     user: User,
     isIncoming: boolean,
     fileExt: string,
-    id = createRandomUuid(),
+    id = createUuid(),
   ) {
     const fileRestrictionMessage = EventBuilder.buildFileTypeRestricted(conversation, user, isIncoming, fileExt, id);
     await this.eventRepository.injectEvent(fileRestrictionMessage);
@@ -1935,6 +1984,31 @@ export class ConversationRepository {
   // Event callbacks
   //##############################################################################
 
+  private logConversationEvent(event: IncomingEvent, source: EventSource) {
+    if (event.type === CONVERSATION_EVENT.TYPING) {
+      // Prevent logging typing events
+      return;
+    }
+    const {time, from, qualified_conversation, type} = event;
+    const extra: Record<string, unknown> = {};
+    extra.messageId = 'id' in event && event.id;
+    const logMessage = `Conversation Event: '${type}' (Source: ${source})`;
+    switch (event.type) {
+      case ClientEvent.CONVERSATION.ASSET_ADD:
+        extra.contentType = event.data.content_type;
+        extra.size = event.data.content_length;
+        extra.status = event.data.status;
+
+      case ClientEvent.CONVERSATION.MESSAGE_ADD:
+        extra.sender = event.from_client_id;
+        break;
+
+      case ClientEvent.CONVERSATION.MESSAGE_DELETE:
+        extra.deletedMessage = event.data.message_id;
+    }
+    this.logger.info(logMessage, {time, from, type, qualified_conversation, ...extra});
+  }
+
   /**
    * Listener for incoming events.
    *
@@ -1943,9 +2017,7 @@ export class ConversationRepository {
    * @returns Resolves when event was handled
    */
   private readonly onConversationEvent = (event: IncomingEvent, source = EventRepository.SOURCE.STREAM) => {
-    const logObject = {eventJson: JSON.stringify(event), eventObject: event};
-    const logMessage = `Conversation Event: '${event.type}' (Source: ${source})`;
-    this.logger.info(logMessage, logObject);
+    this.logConversationEvent(event, source);
     return this.handleConversationEvent(event, source);
   };
 
@@ -1967,9 +2039,6 @@ export class ConversationRepository {
     const conversationId: QualifiedId = eventData?.conversationId
       ? {domain: '', id: eventData.conversationId}
       : qualified_conversation || {domain: '', id: conversation};
-    this.logger.info(
-      `Handling event '${type}' in conversation '${conversationId.id}/${conversationId.domain}' (Source: ${eventSource})`,
-    );
 
     const inSelfConversation = this.conversationState.isSelfConversation(conversationId);
     if (inSelfConversation) {
@@ -2040,8 +2109,7 @@ export class ConversationRepository {
           ConversationError.TYPE.CONVERSATION_NOT_FOUND,
         ];
 
-        const isRemovedFromConversation =
-          (error as BackendClientError).label === BackendClientError.LABEL.ACCESS_DENIED;
+        const isRemovedFromConversation = (error as unknown as BackendError).label === BackendErrorLabel.ACCESS_DENIED;
         if (isRemovedFromConversation) {
           const messageText = t('conversationNotFoundMessage');
           const titleText = t('conversationNotFoundTitle', Config.getConfig().BRAND_NAME);
@@ -2097,7 +2165,7 @@ export class ConversationRepository {
         }
 
         const message = `Received '${type}' event from user '${senderId}' unknown in '${conversationEntity.id}'`;
-        this.logger.warn(message, eventJson);
+        this.logger.warn(message);
 
         const qualifiedSender: QualifiedId = {domain: '', id: senderId};
 
@@ -2352,19 +2420,25 @@ export class ConversationRepository {
     eventJson: ConversationCreateEvent,
     eventSource?: EventSource,
   ): Promise<{conversationEntity: Conversation}> {
-    const {conversation: conversationId, data: eventData, time} = eventJson;
+    const {conversation, data: eventData, qualified_conversation, time} = eventJson;
     const eventTimestamp = new Date(time).getTime();
     const initialTimestamp = isNaN(eventTimestamp) ? this.getLatestEventTimestamp(true) : eventTimestamp;
+    const conversationId = qualified_conversation ?? {
+      domain: eventJson.qualified_conversation?.domain ?? '',
+      id: conversation,
+    };
     try {
-      const existingConversationEntity = this.conversationState.findConversation({
-        domain: eventJson.qualified_conversation?.domain,
-        id: conversationId,
-      });
+      const existingConversationEntity = this.conversationState.findConversation(conversationId);
       if (existingConversationEntity) {
         throw new ConversationError(ConversationError.TYPE.NO_CHANGES, ConversationError.MESSAGE.NO_CHANGES);
       }
 
-      const [conversationEntity] = this.mapConversations([eventData], initialTimestamp);
+      const conversationData = !eventSource
+        ? // If there is no source, it means its a conversation created locally, no need to fetch it again
+          eventData
+        : await this.conversationService.getConversationById(conversationId);
+
+      const [conversationEntity] = this.mapConversations([conversationData], initialTimestamp);
       if (conversationEntity) {
         if (conversationEntity.participating_user_ids().length) {
           this.addCreationMessage(conversationEntity, false, initialTimestamp, eventSource);
@@ -2393,14 +2467,6 @@ export class ConversationRepository {
     const createdBySelfUser = conversationEntity.isCreatedBySelf();
 
     const creatorIsParticipant = createdByParticipant || createdBySelfUser;
-
-    const data = await this.conversationService.getConversationById(conversationEntity);
-    const allMembers = [...data.members.others, data.members.self];
-    const conversationRoles = allMembers.reduce<Record<string, string>>((roles, member) => {
-      roles[member.id] = member.conversation_role;
-      return roles;
-    }, {});
-    conversationEntity.roles(conversationRoles);
 
     if (!creatorIsParticipant) {
       (messageEntity as MemberMessage).memberMessageType = SystemMessageType.CONVERSATION_RESUME;
@@ -2460,28 +2526,32 @@ export class ConversationRepository {
       });
     }
 
-    // Self user joins again
-    const selfUserRejoins = eventData.user_ids.includes(this.userState.self().id);
-    if (selfUserRejoins) {
+    // Self user is a creator of the event
+    const isFromSelf = eventJson.from === this.userState.self().id;
+
+    const containsSelfId = eventData.user_ids.includes(this.userState.self().id);
+    const containsSelfQualifiedId = !!eventData.users?.some(
+      ({qualified_id: qualifiedId}) => qualifiedId && matchQualifiedIds(qualifiedId, this.userState.self().qualifiedId),
+    );
+
+    const selfUserJoins = containsSelfId || containsSelfQualifiedId;
+
+    if (selfUserJoins) {
       conversationEntity.status(ConversationStatus.CURRENT_MEMBER);
       await this.conversationRoleRepository.updateConversationRoles(conversationEntity);
     }
 
     const updateSequence =
-      selfUserRejoins || connectionEntity?.isConnected()
+      selfUserJoins || connectionEntity?.isConnected()
         ? this.updateConversationFromBackend(conversationEntity)
         : Promise.resolve();
 
     const qualifiedUserIds =
       eventData.users?.map(user => user.qualified_id) || eventData.user_ids.map(userId => ({domain: '', id: userId}));
 
-    if (
-      conversationEntity.groupId &&
-      !useMLSConversationState.getState().isEstablished(conversationEntity.groupId) &&
-      (await this.core.service!.conversation.isMLSConversationEstablished(conversationEntity.groupId))
-    ) {
-      // If the conversation was not previously marked as established and the core if aware of this conversation, we can mark is as established
-      useMLSConversationState.getState().markAsEstablished(conversationEntity.groupId);
+    if (conversationEntity.isUsingMLSProtocol) {
+      const isSelfJoin = isFromSelf && selfUserJoins;
+      await this.handleMLSConversationMemberJoin(conversationEntity, isSelfJoin);
     }
 
     return updateSequence
@@ -2491,6 +2561,49 @@ export class ConversationRepository {
         this.verificationStateHandler.onMemberJoined(conversationEntity, qualifiedUserIds);
         return {conversationEntity, messageEntity};
       });
+  }
+
+  /**
+   * Handles member join event on mls group - updating mls conversation state and adding other self clients if user has joined by itself.
+   *
+   * @param conversation Conversation member joined to
+   * @param isSelfJoin whether user has joined by itself, if so we need to add other self clients to mls group
+   */
+  private async handleMLSConversationMemberJoin(conversation: Conversation, isSelfJoin: boolean) {
+    const {groupId} = conversation;
+
+    if (!groupId) {
+      throw new Error(`groupId not found for MLS conversation ${conversation.id}`);
+    }
+
+    const isMLSConversationEstablished = await this.core.service!.conversation.isMLSConversationEstablished(groupId);
+
+    if (!isMLSConversationEstablished) {
+      return;
+    }
+
+    const mlsConversationState = useMLSConversationState.getState();
+
+    const isMLSConversationMarkedAsEstablished = mlsConversationState.isEstablished(groupId);
+
+    if (!isMLSConversationMarkedAsEstablished) {
+      // If the conversation was not previously marked as established and the core if aware of this conversation, we can mark is as established
+      mlsConversationState.markAsEstablished(groupId);
+    }
+
+    if (isSelfJoin) {
+      // if user has joined and was also event creator (eg. joined via guest link) we need to add its other clients to mls group
+      try {
+        await addOtherSelfClientsToMLSConversation(
+          conversation,
+          this.userState.self().qualifiedId,
+          this.core.clientId,
+          this.core,
+        );
+      } catch (error) {
+        this.logger.warn(`Failed to add other self clients to MLS conversation: ${conversation.id}`, error);
+      }
+    }
   }
 
   /**
@@ -2592,17 +2705,13 @@ export class ConversationRepository {
     if (!inSelfConversation && conversation && !isBackendEvent) {
       this.logger.warn(
         `A conversation update message was not sent in the selfConversation. Skipping conversation update`,
-        eventData,
       );
       return;
     }
 
     const isFromSelf = !this.userState.self() || from === this.userState.self().id;
     if (!isFromSelf) {
-      this.logger.warn(
-        `A conversation update message was not sent by the self user. Skipping conversation update`,
-        eventData,
-      );
+      this.logger.warn(`A conversation update message was not sent by the self user. Skipping conversation update`);
       return;
     }
 
@@ -2764,8 +2873,7 @@ export class ConversationRepository {
       if (!messageEntity || !messageEntity.isContent()) {
         const type = messageEntity ? messageEntity.type : 'unknown';
 
-        const logMessage = `Cannot react to '${type}' message '${messageId}' in conversation '${conversationId}'`;
-        this.logger.error(logMessage, messageEntity);
+        this.logger.error(`Cannot react to '${type}' message '${messageId}' in conversation '${conversationId}'`);
         throw new ConversationError(ConversationError.TYPE.WRONG_TYPE, ConversationError.MESSAGE.WRONG_TYPE);
       }
 
@@ -2781,7 +2889,7 @@ export class ConversationRepository {
       const isNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
       if (!isNotFound) {
         const logMessage = `Failed to handle reaction to message '${messageId}' in conversation '${conversationId}'`;
-        this.logger.error(logMessage, {error, event: eventJson});
+        this.logger.error(logMessage, error);
         throw error;
       }
     }
@@ -2795,8 +2903,9 @@ export class ConversationRepository {
       if (!messageEntity || !messageEntity.isComposite()) {
         const type = messageEntity ? messageEntity.type : 'unknown';
 
-        const log = `Cannot react to '${type}' message '${messageId}' in conversation '${conversationEntity.id}'`;
-        this.logger.error(log, messageEntity);
+        this.logger.error(
+          `Cannot react to '${type}' message '${messageId}' in conversation '${conversationEntity.id}'`,
+        );
         throw new ConversationError(ConversationError.TYPE.WRONG_TYPE, ConversationError.MESSAGE.WRONG_TYPE);
       }
       const changes = messageEntity.getSelectionChange(buttonId);
@@ -2808,7 +2917,7 @@ export class ConversationRepository {
       const isNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
       if (!isNotFound) {
         const log = `Failed to handle reaction to message '${messageId}' in conversation '${conversationEntity.id}'`;
-        this.logger.error(log, {error, event: eventJson});
+        this.logger.error(log, error);
         throw error;
       }
     }
@@ -2959,9 +3068,15 @@ export class ConversationRepository {
    * @param conversationEntity Conversation entity the events will be added to
    * @returns Resolves with an array of mapped messages
    */
-  private async validateMessages(events: EventRecord[], conversationEntity: Conversation) {
+  private async validateMessages(
+    events: EventRecord[],
+    conversationEntity: Conversation,
+    {offline}: {offline?: boolean} = {},
+  ) {
     const mappedEvents = await this.event_mapper.mapJsonEvents(events, conversationEntity);
-    const updatedEvents = (await this.updateMessagesUserEntities(mappedEvents)) as ContentMessage[];
+    const updatedEvents = (await this.updateMessagesUserEntities(mappedEvents, {
+      localOnly: offline,
+    })) as ContentMessage[];
     const validatedMessages = (await this.ephemeralHandler.validateMessages(updatedEvents)) as ContentMessage[];
     return validatedMessages;
   }
@@ -2974,8 +3089,12 @@ export class ConversationRepository {
    * @param prepend Should existing messages be prepended
    * @returns Resolves with an array of mapped messages
    */
-  private async addEventsToConversation(events: EventRecord[], conversationEntity: Conversation, prepend = true) {
-    const validatedMessages = await this.validateMessages(events, conversationEntity);
+  private async addEventsToConversation(
+    events: EventRecord[],
+    conversationEntity: Conversation,
+    {prepend = true, offline}: {prepend?: boolean; offline?: boolean} = {},
+  ) {
+    const validatedMessages = await this.validateMessages(events, conversationEntity, {offline});
     if (prepend && conversationEntity.messages().length) {
       conversationEntity.prependMessages(validatedMessages);
     } else {
@@ -3023,8 +3142,8 @@ export class ConversationRepository {
     return {conversationEntity};
   }
 
-  private updateMessagesUserEntities(messageEntities: Message[]) {
-    return Promise.all(messageEntities.map(messageEntity => this.updateMessageUserEntities(messageEntity)));
+  private updateMessagesUserEntities(messageEntities: Message[], options: {localOnly?: boolean} = {}) {
+    return Promise.all(messageEntities.map(messageEntity => this.updateMessageUserEntities(messageEntity, options)));
   }
 
   /**
@@ -3033,18 +3152,23 @@ export class ConversationRepository {
    * @param messageEntity Message to be updated
    * @returns Resolves when users have been update
    */
-  private async updateMessageUserEntities(messageEntity: Message) {
-    const userEntity = await this.userRepository.getUserById({
-      domain: messageEntity.fromDomain,
-      id: messageEntity.from,
-    });
+  private async updateMessageUserEntities(messageEntity: Message, options: {localOnly?: boolean} = {}) {
+    const userEntity = await this.userRepository.getUserById(
+      {
+        domain: messageEntity.fromDomain,
+        id: messageEntity.from,
+      },
+      options,
+    );
     messageEntity.user(userEntity);
     if (isMemberMessage(messageEntity) || messageEntity.hasOwnProperty('userEntities')) {
-      return this.userRepository.getUsersById((messageEntity as MemberMessage).userIds()).then(userEntities => {
-        userEntities.sort(sortUsersByPriority);
-        (messageEntity as MemberMessage).userEntities(userEntities);
-        return messageEntity;
-      });
+      return this.userRepository
+        .getUsersById((messageEntity as MemberMessage).userIds(), options)
+        .then(userEntities => {
+          userEntities.sort(sortUsersByPriority);
+          (messageEntity as MemberMessage).userEntities(userEntities);
+          return messageEntity;
+        });
     }
     if (messageEntity.isContent()) {
       const userIds = Object.keys(messageEntity.reactions());

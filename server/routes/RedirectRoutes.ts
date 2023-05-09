@@ -20,16 +20,16 @@
 import express from 'express';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-import type {ServerConfig} from '../ServerConfig';
+import type {ClientConfig, ServerConfig} from '../config';
 import * as BrowserUtil from '../util/BrowserUtil';
 
 const router = express.Router();
 
-export const RedirectRoutes = (config: ServerConfig) => [
+export const RedirectRoutes = (config: ServerConfig, clientConfig: ClientConfig) => [
   router.get('/robots.txt', async (req, res) => {
-    const robotsContent = config.SERVER.ROBOTS.ALLOWED_HOSTS.includes(req.hostname)
-      ? config.SERVER.ROBOTS.ALLOW
-      : config.SERVER.ROBOTS.DISALLOW;
+    const robotsContent = (config.ROBOTS.ALLOWED_HOSTS as ReadonlyArray<string>).includes(req.hostname)
+      ? config.ROBOTS.ALLOW
+      : config.ROBOTS.DISALLOW;
     return res.contentType('text/plain; charset=UTF-8').send(robotsContent);
   }),
   router.get('/join/?', (req, res) => {
@@ -38,13 +38,13 @@ export const RedirectRoutes = (config: ServerConfig) => [
     res.redirect(HTTP_STATUS.MOVED_TEMPORARILY, `/auth/?join_key=${key}&join_code=${code}#/join-conversation`);
   }),
   router.get('/browser/?', (req, res, next) => {
-    if (config.SERVER.DEVELOPMENT) {
+    if (config.DEVELOPMENT) {
       return next();
     }
     const userAgent = req.header('User-Agent');
     const parseResult = BrowserUtil.parseUserAgent(userAgent);
     if (!parseResult) {
-      return res.redirect(HTTP_STATUS.MOVED_TEMPORARILY, `${config.CLIENT.URL.WEBSITE_BASE}/unsupported/`);
+      return res.redirect(HTTP_STATUS.MOVED_TEMPORARILY, `${clientConfig.URL.WEBSITE_BASE}/unsupported/`);
     }
 
     return res.json(parseResult);
@@ -58,6 +58,6 @@ export const RedirectRoutes = (config: ServerConfig) => [
     return res.send(config.COMMIT);
   }),
   router.get('/version/?', (_req, res) => {
-    return res.json({version: config.CLIENT.VERSION});
+    return res.json({version: config.VERSION});
   }),
 ];

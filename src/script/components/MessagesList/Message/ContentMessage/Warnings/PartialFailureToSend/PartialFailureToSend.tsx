@@ -21,6 +21,7 @@ import {useState} from 'react';
 
 import type {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {countBy, map} from 'underscore';
 
 import {Bold, Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
@@ -60,23 +61,41 @@ function generateNamedUsers(users: User[], userClients: QualifiedUserClients): P
   );
 }
 
+function generateUnreachableUsers(users: QualifiedId[]) {
+  const userCountByDomain = countBy(users, 'domain');
+  return map(userCountByDomain, (count, domain) => ({count, domain}));
+}
+
+function joinWith(elements: React.ReactNode[], separator: string) {
+  return elements.reduce<React.ReactNode[]>((prev, element) => {
+    return prev.length === 0 ? [element] : [...prev, separator, element];
+  }, []);
+}
+
 export const PartialFailureToSendWarning = ({failedToSend, knownUsers}: Props) => {
   const [isOpen, setIsOpen] = useState(false);
-  const {queued = {}} = failedToSend;
+  const {queued = {}, failed = []} = failedToSend;
 
-  const userCount = Object.entries(queued).reduce((count, [_domain, users]) => count + Object.keys(users).length, 0);
+  const userCount =
+    Object.entries(queued).reduce((count, [_domain, users]) => count + Object.keys(users).length, 0) + failed.length;
 
   const showToggle = userCount > 1;
 
   const {namedUsers} = generateNamedUsers(knownUsers, queued);
 
-  const message =
-    namedUsers.length === 1
-      ? {head: namedUsers[0].username(), rest: t('messageFailedToSendToOne')}
-      : {
-          head: t('messageFailedToSendParticipants', {count: userCount.toString()}),
-          rest: t('messageFailedToSendToSome'),
-        };
+  const unreachableUsers = generateUnreachableUsers(failed);
+
+  const message = {head: '', rest: ''};
+  if (showToggle) {
+    message.head = t('messageFailedToSendParticipants', {count: userCount.toString()});
+    message.rest = t('messageFailedToSendPlural');
+  } else if (namedUsers.length === 1) {
+    message.head = namedUsers[0].username();
+    message.rest = t('messageFailedToSendWillReceiveSingular');
+  } else if (unreachableUsers.length === 1) {
+    message.head = t('messageFailedToSendParticipantsFromDomainSingular', {domain: unreachableUsers[0].domain});
+    message.rest = t('messageFailedToSendWillNotReceiveSingular');
+  }
 
   return (
     <div>
@@ -86,18 +105,53 @@ export const PartialFailureToSendWarning = ({failedToSend, knownUsers}: Props) =
       {showToggle && (
         <>
           {isOpen && (
-            <p css={warning}>
-              {namedUsers
-                .map(user => (
-                  <span data-uie-name="recipient" data-uie-value={user.qualifiedId.id} key={user.qualifiedId.id}>
-                    {user.username()}
-                  </span>
-                ))
-                .reduce<React.ReactNode[]>((prev, element) => {
-                  return prev.length === 0 ? [element] : [...prev, ', ', element];
-                }, [])}
-              {` ${t('messageFailedToSendWillReceive')}`}
-            </p>
+            <>
+              {/* maps through the known users that will receive the message later:
+              "Alice, Bob will get your message later" */}
+              {namedUsers.length !== 0 && (
+                <p css={warning}>
+                  {joinWith(
+                    namedUsers.map(user => (
+                      <Bold
+                        css={warning}
+                        data-uie-name="named-user"
+                        data-uie-value={user.qualifiedId.id}
+                        key={user.qualifiedId.id}
+                      >
+                        {user.username()}
+                      </Bold>
+                    )),
+                    ', ',
+                  )}
+                  {` ${t('messageFailedToSendWillReceivePlural')}`}
+                </p>
+              )}
+
+              {/* maps through the unreachable users that will never receive the message:
+              "3 participants from alpha.domain, 1 participant from beta.domain won't get your message" */}
+              {unreachableUsers.length !== 0 && (
+                <p css={warning}>
+                  {joinWith(
+                    unreachableUsers.map(user => (
+                      <Bold css={warning} data-uie-name="unreachable-domain" key={user.domain + user.count.toString()}>
+                        {user.count > 1
+                          ? t('messageFailedToSendParticipantsFromDomainPlural', {
+                              count: user.count.toString(),
+                              domain: user.domain,
+                            })
+                          : t('messageFailedToSendParticipantsFromDomainSingular', {
+                              domain: user.domain,
+                            })}
+                      </Bold>
+                    )),
+                    ', ',
+                  )}
+                  {unreachableUsers.length === 1
+                    ? ` ${t('messageFailedToSendWillNotReceiveSingular')}`
+                    : ` ${t('messageFailedToSendWillNotReceivePlural')}`}
+                </p>
+              )}
+            </>
           )}
           <Button type="button" variant={ButtonVariant.TERTIARY} onClick={() => setIsOpen(state => !state)}>
             {isOpen ? t('messageFailedToSendHideDetails') : t('messageFailedToSendShowDetails')}

@@ -26,7 +26,7 @@ import {User} from 'src/script/entity/User';
 import {ClientEvent} from 'src/script/event/Client';
 import {SuperType} from 'src/script/message/SuperType';
 import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {VerificationMessage} from '../entity/message/VerificationMessage';
 
@@ -36,10 +36,10 @@ describe('EventBuilder', () => {
   let self_user_et: User = undefined;
 
   beforeEach(() => {
-    self_user_et = new User(createRandomUuid(), null);
+    self_user_et = new User(createUuid(), null);
     self_user_et.isMe = true;
 
-    conversation_et = new Conversation(createRandomUuid());
+    conversation_et = new Conversation(createUuid());
     conversation_et.selfUser(self_user_et);
 
     event_mapper = new EventMapper();
@@ -56,7 +56,7 @@ describe('EventBuilder', () => {
   });
 
   it('buildDegraded', async () => {
-    const users: QualifiedId[] = [{domain: '', id: createRandomUuid()}];
+    const users: QualifiedId[] = [{domain: '', id: createUuid()}];
     const event = EventBuilder.buildDegraded(conversation_et, users, VerificationMessageType.NEW_DEVICE);
     const messageEntity = (await event_mapper.mapJsonEvent(event, conversation_et)) as VerificationMessage;
     expect(messageEntity).toBeDefined();

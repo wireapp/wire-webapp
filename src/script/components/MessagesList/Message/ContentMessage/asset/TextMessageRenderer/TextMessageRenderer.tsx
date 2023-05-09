@@ -107,17 +107,23 @@ const TextMessage: FC<TextMessageRendererProps> = ({
     if (!target) {
       return;
     }
-    const isEmail = target.closest('[data-email-link]');
-    const isMarkdownLink = target.closest('[data-md-link]');
-    const isMention = target.closest('.message-mention');
+    const emailElement = target.closest('[data-email-link]');
+    const markdownLinkElement = target.closest('[data-md-link]');
+    const mentionElement = target.closest('.message-mention');
 
-    if (isEmail || isMarkdownLink) {
-      const href = (event.target as HTMLAnchorElement).href;
+    if (markdownLinkElement) {
+      const href = (markdownLinkElement as HTMLAnchorElement).href;
       const markdownLinkDetails = {
         href: href,
       };
-      forwardEvent(event.nativeEvent, isEmail ? 'email' : 'markdownLink', markdownLinkDetails);
-    } else if (isMention) {
+      forwardEvent(event.nativeEvent, 'markdownLink', markdownLinkDetails);
+    } else if (emailElement) {
+      const href = (emailElement as HTMLAnchorElement).href;
+      const markdownLinkDetails = {
+        href: href,
+      };
+      forwardEvent(event.nativeEvent, 'email', markdownLinkDetails);
+    } else if (mentionElement) {
       const mentionMsgDetails = {
         userId: target.dataset.userId,
         userDomain: target.dataset.userDomain,

@@ -21,15 +21,14 @@ import {FC, useEffect, useState} from 'react';
 
 import {Icon} from 'Components/Icon';
 import {LoadingBar} from 'Components/LoadingBar/LoadingBar';
+import {User} from 'src/script/entity/User';
 import {ContentState} from 'src/script/page/useAppState';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
-import {formatDuration} from 'Util/TimeUtil';
 import {loadFileBuffer} from 'Util/util';
-import {WebWorker} from 'Util/worker';
 
 import {BackupRepository} from '../../backup/BackupRepository';
-import {CancelError, DifferentAccountError, ImportError, IncompatibleBackupError} from '../../backup/Error';
+import {CancelError, DifferentAccountError, IncompatibleBackupError} from '../../backup/Error';
 import {Config} from '../../Config';
 import {MotionDuration} from '../../motion/MotionDuration';
 
@@ -43,9 +42,10 @@ interface HistoryImportProps {
   readonly backupRepository: BackupRepository;
   file: File;
   switchContent: (contentState: ContentState) => void;
+  user: User;
 }
 
-const HistoryImport: FC<HistoryImportProps> = ({backupRepository, file, switchContent}) => {
+const HistoryImport: FC<HistoryImportProps> = ({user, backupRepository, file, switchContent}) => {
   const logger = getLogger('HistoryImportViewModel');
 
   const [historyImportState, setHistoryImportState] = useState(HistoryImportState.PREPARING);
@@ -122,26 +122,10 @@ const HistoryImport: FC<HistoryImportProps> = ({backupRepository, file, switchCo
     setHistoryImportState(HistoryImportState.PREPARING);
     setError(null);
 
-    const fileBuffer = await loadFileBuffer(file);
-    const worker = new WebWorker('/worker/jszip-unpack-worker.js');
+    const data = await loadFileBuffer(file);
 
     try {
-      const unzipTimeStart = performance.now();
-      const files = await worker.post<Record<string, Uint8Array>>(fileBuffer);
-      const unzipTimeEnd = performance.now();
-
-      if (files.error) {
-        throw new ImportError(files.error as unknown as string);
-      }
-
-      const unzipTimeMillis = Math.round(unzipTimeEnd - unzipTimeStart);
-      const unzipTimeFormatted = formatDuration(unzipTimeMillis);
-
-      logger.log(
-        `Unzipped '${Object.keys(files).length}' files for history import (took ${unzipTimeFormatted.text}).`,
-        files,
-      );
-      await backupRepository.importHistory(files, onInit, onProgress);
+      await backupRepository.importHistory(user, data, onInit, onProgress);
       onSuccess();
     } catch (error) {
       onError(error as Error);

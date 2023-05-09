@@ -69,7 +69,10 @@ window.$ = jQuery;
 
 window.wire = {
   env: {
+    BACKEND_REST: 'https://test.wire.link',
     FEATURE: {},
+    URL: {SUPPORT: {}},
+    NEW_PASSWORD_MINIMUM_LENGTH: 8,
   },
 };
 

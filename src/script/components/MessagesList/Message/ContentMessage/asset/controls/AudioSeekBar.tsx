@@ -23,7 +23,7 @@ import cx from 'classnames';
 
 import {interpolate} from 'Util/ArrayUtil';
 import {clamp} from 'Util/NumberUtil';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {FileAsset} from '../../../../../../entity/message/FileAsset';
 
@@ -39,7 +39,7 @@ const AudioSeekBar: React.FC<AudioSeekBarProps> = ({asset, audioElement, disable
   const [loudness, setLoudness] = useState<number[]>([]);
   const [position, setPosition] = useState(0);
   const svgNode = useRef<SVGSVGElement>(null);
-  const [clipId] = useState(`clip-${createRandomUuid()}`);
+  const [clipId] = useState(`clip-${createUuid()}`);
 
   useEffect(() => {
     window.addEventListener('resize', updateSvgWidth);

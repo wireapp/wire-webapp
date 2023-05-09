@@ -21,7 +21,7 @@ import {render} from '@testing-library/react';
 import ko from 'knockout';
 import {act} from 'react-dom/test-utils';
 
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {GroupedConversationHeader} from './GroupedConversationHeader';
 
@@ -30,12 +30,12 @@ import {Conversation} from '../../../../entity/Conversation';
 
 describe('GroupedConversationHeader', () => {
   it('displays the unread badge', () => {
-    const conversations = ko.observableArray([new Conversation(createRandomUuid())]);
+    const conversations = ko.observableArray([new Conversation(createUuid())]);
 
     const conversationLabel: ConversationLabel = {
       conversations,
-      id: createRandomUuid(),
-      name: createRandomUuid(),
+      id: createUuid(),
+      name: createUuid(),
       type: LabelType.Custom,
     };
 
