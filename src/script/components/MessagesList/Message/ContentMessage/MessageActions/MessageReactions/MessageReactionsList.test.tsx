@@ -42,12 +42,12 @@ describe('MessageReactionsList', () => {
   });
 
   test('renders a button for each reaction and user count', () => {
-    const {getAllByLabelText} = render(withTheme(<MessageReactionsList {...defaultProps} />));
+    const {getAllByTitle} = render(withTheme(<MessageReactionsList {...defaultProps} />));
 
-    const winkButton = getAllByLabelText('wink');
-    const smileyFace1 = getAllByLabelText('innocent');
-    const thumbsUpButton = getAllByLabelText('+1');
-    const smileyFace2 = getAllByLabelText('blush');
+    const winkButton = getAllByTitle('wink');
+    const smileyFace1 = getAllByTitle('innocent');
+    const thumbsUpButton = getAllByTitle('+1');
+    const smileyFace2 = getAllByTitle('blush');
 
     expect(smileyFace1).toHaveLength(1);
     expect(smileyFace2).toHaveLength(1);
@@ -68,10 +68,9 @@ describe('MessageReactionsList', () => {
   });
 
   test('handles click on reaction button', () => {
-    const {getByLabelText} = render(withTheme(<MessageReactionsList {...defaultProps} />));
-    const thumbsUpButton = getByLabelText('+1');
+    const {getByTitle} = render(withTheme(<MessageReactionsList {...defaultProps} />));
 
-    fireEvent.click(thumbsUpButton);
+    fireEvent.click(getByTitle('+1'));
     const {handleReactionClick} = defaultProps;
     expect(handleReactionClick).toHaveBeenCalled();
     expect(handleReactionClick).toHaveBeenCalledWith('👍');

@@ -98,6 +98,7 @@ const MessageReactionsList: FC<MessageReactionsListProps> = ({
               <button
                 css={{...messageReactionButton, ...getReactionsButtonCSS(isActive)}}
                 aria-label={t('messageReactionDetails', {emojiCount: emojiCount.toString(), emojiName})}
+                title={emojiName}
                 aria-pressed={isActive}
                 type="button"
                 tabIndex={messageFocusedTabIndex}

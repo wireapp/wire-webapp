@@ -63,7 +63,7 @@ const getDefaultParams = (showReactions: boolean = false) => {
 };
 
 describe('MessageDetails', () => {
-  it('renders no likes view', async () => {
+  it('renders no reactions view', async () => {
     const conversation = new Conversation();
     conversation.team_id = 'mock-team-id';
 
@@ -97,9 +97,9 @@ describe('MessageDetails', () => {
     );
 
     await waitFor(() => {
-      getByText('messageDetailsNoLikes');
+      getByText('messageDetailsNoReactions');
     });
 
-    expect(getByText('messageDetailsNoLikes')).not.toBeNull();
+    expect(getByText('messageDetailsNoReactions')).not.toBeNull();
   });
 });
