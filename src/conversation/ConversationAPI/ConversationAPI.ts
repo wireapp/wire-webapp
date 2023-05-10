@@ -24,6 +24,7 @@ import {AxiosRequestConfig} from 'axios';
 import {
   Conversation,
   ConversationCode,
+  ConversationProtocol,
   ConversationRolesList,
   Conversations,
   DefaultConversationRoleName,
@@ -44,6 +45,7 @@ import {
   ConversationMemberJoinEvent,
   ConversationMemberLeaveEvent,
   ConversationMessageTimerUpdateEvent,
+  ConversationProtocolUpdateEvent,
   ConversationReceiptModeUpdateEvent,
   ConversationRenameEvent,
 } from '../../event';
@@ -94,6 +96,7 @@ export class ConversationAPI {
     NAME: 'name',
     OTR: 'otr',
     PROTEUS: 'proteus',
+    PROTOCOL: 'protocol',
     RECEIPT_MODE: 'receipt-mode',
     ROLES: 'roles',
     SELF: 'self',
@@ -930,5 +933,28 @@ export class ConversationAPI {
     };
 
     await this.client.sendJSON(config);
+  }
+
+  /**
+   * Update the protocol of the conversation.
+   * Used in MLS Migration feature:
+   * - changing the protocol from "proteus" to "mixed" will assign a groupId to the conversation.
+   * - changing the protocol from "mixed" to "mls" will finalise the migration of the conversation.
+   * @param conversationId id of the conversation
+   * @param memberData the new conversation
+   * @see https://wearezeta.atlassian.net/wiki/spaces/CORE/pages/746488003/Proteus+to+MLS+Migration for more details
+   */
+  public async putConversationProtocol(
+    conversationId: QualifiedId,
+    protocol: ConversationProtocol.MIXED | ConversationProtocol.MLS,
+  ): Promise<ConversationProtocolUpdateEvent> {
+    const config: AxiosRequestConfig = {
+      data: {protocol},
+      method: 'put',
+      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId.domain}/${conversationId.id}/${ConversationAPI.URL.PROTOCOL}`,
+    };
+
+    const response = await this.client.sendJSON<ConversationProtocolUpdateEvent>(config);
+    return response.data;
   }
 }

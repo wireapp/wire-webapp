@@ -34,10 +34,12 @@ import {
   ConversationMLSWelcomeData,
   ConversationMLSMessageAddData,
 } from '../conversation/data/';
+import {ConversationProtocolUpdateData} from '../conversation/data/ConversationProtocolUpdateData';
 import {QualifiedId} from '../user';
 
 export enum CONVERSATION_EVENT {
   ACCESS_UPDATE = 'conversation.access-update',
+  PROTOCOL_UPDATE = 'conversation.protocol-update',
   CODE_DELETE = 'conversation.code-delete',
   CODE_UPDATE = 'conversation.code-update',
   CONNECT_REQUEST = 'conversation.connect-request',
@@ -57,6 +59,7 @@ export enum CONVERSATION_EVENT {
 
 export type ConversationEventData =
   | ConversationAccessUpdateData
+  | ConversationProtocolUpdateData
   | ConversationCodeUpdateData
   | ConversationConnectRequestData
   | ConversationCreateData
@@ -103,6 +106,11 @@ export interface BaseConversationEvent {
 export interface ConversationAccessUpdateEvent extends BaseConversationEvent {
   data: ConversationAccessUpdateData;
   type: CONVERSATION_EVENT.ACCESS_UPDATE;
+}
+
+export interface ConversationProtocolUpdateEvent extends BaseConversationEvent {
+  data: ConversationProtocolUpdateData;
+  type: CONVERSATION_EVENT.PROTOCOL_UPDATE;
 }
 
 export interface ConversationCodeDeleteEvent extends BaseConversationEvent {
