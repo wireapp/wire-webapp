@@ -27,6 +27,7 @@ import {QualifiedId} from '../user/';
 export enum ConversationProtocol {
   MLS = 'mls',
   PROTEUS = 'proteus',
+  MIXED = 'mixed',
 }
 
 export interface NewConversation
