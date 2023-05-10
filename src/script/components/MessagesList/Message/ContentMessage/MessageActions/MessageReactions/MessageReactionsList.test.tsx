@@ -19,6 +19,8 @@
 
 import {render, fireEvent, within} from '@testing-library/react';
 
+import {withTheme} from 'src/script/auth/util/test/TestUtil';
+
 import {MessageReactionsList, MessageReactionsListProps} from './MessageReactionsList';
 
 const reactions = {
@@ -26,19 +28,21 @@ const reactions = {
   '2': '😊,👍,😉,😇',
   '3': '😇',
 };
+
 const defaultProps: MessageReactionsListProps = {
   reactions: reactions,
   handleReactionClick: jest.fn(),
   onTooltipReactionCountClick: jest.fn(),
   isMessageFocused: false,
 };
+
 describe('MessageReactionsList', () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
 
   test('renders a button for each reaction and user count', () => {
-    const {getAllByLabelText} = render(<MessageReactionsList {...defaultProps} />);
+    const {getAllByLabelText} = render(withTheme(<MessageReactionsList {...defaultProps} />));
 
     const winkButton = getAllByLabelText('wink');
     const smileyFace1 = getAllByLabelText('innocent');
@@ -64,7 +68,7 @@ describe('MessageReactionsList', () => {
   });
 
   test('handles click on reaction button', () => {
-    const {getByLabelText} = render(<MessageReactionsList {...defaultProps} />);
+    const {getByLabelText} = render(withTheme(<MessageReactionsList {...defaultProps} />));
     const thumbsUpButton = getByLabelText('+1');
 
     fireEvent.click(thumbsUpButton);
