@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [24.10.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@24.9.1...@wireapp/api-client@24.10.0) (2023-05-10)
+
+### Features
+
+* **api-client:** put conversation protocol [FS-1888] ([#5138](https://github.com/wireapp/wire-web-packages/issues/5138)) ([2aed6cd](https://github.com/wireapp/wire-web-packages/commit/2aed6cda2a458ea09989517aaea7654038d402a4))
+
 ## [24.9.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@24.9.0...@wireapp/api-client@24.9.1) (2023-05-08)
 
 ### Bug Fixes
