@@ -182,6 +182,11 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
       content.messageText = (!text.htmlMessage && text.message) || '';
       break;
     }
+    case PrimaryModalType.WITHOUT_TITLE: {
+      content.primaryAction = {...primaryAction};
+      content.messageText = (!text.htmlMessage && text.message) || '';
+      break;
+    }
     case PrimaryModalType.CONFIRM: {
       content.secondaryAction = {text: t('modalConfirmSecondary'), ...content.secondaryAction};
       break;

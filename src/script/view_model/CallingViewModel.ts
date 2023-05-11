@@ -88,7 +88,7 @@ declare global {
     setSinkId?: (sinkId: string) => Promise<void>;
   }
 }
-
+const maxGroupSize = 4;
 export class CallingViewModel {
   readonly activeCalls: ko.PureComputed<Call[]>;
   readonly callActions: CallActions;
@@ -374,7 +374,25 @@ export class CallingViewModel {
         if (conversationEntity.isGroup() && !this.teamState.isConferenceCallingEnabled()) {
           this.showRestrictedConferenceCallingModal();
         } else {
-          await startCall(conversationEntity, CALL_TYPE.NORMAL);
+          const memberCount = conversationEntity.participating_user_ets().length;
+          if (memberCount > maxGroupSize) {
+            PrimaryModal.show(PrimaryModal.type.WITHOUT_TITLE, {
+              preventClose: true,
+              primaryAction: {
+                action: async () => await startCall(conversationEntity, CALL_TYPE.NORMAL),
+                text: t('groupCallModalPrimaryBtnName'),
+              },
+              secondaryAction: {
+                text: t('modalConfirmSecondary'),
+              },
+              text: {
+                message: t('groupCallConfirmationModalTitle', maxGroupSize),
+                closeBtnLabel: t('groupCallModalCloseBtnLabel'),
+              },
+            });
+          } else {
+            await startCall(conversationEntity, CALL_TYPE.NORMAL);
+          }
         }
       },
       startVideo: async (conversationEntity: Conversation) => {
