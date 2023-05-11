@@ -291,7 +291,10 @@ export class ConversationRepository {
 
     this.conversationRoleRepository = new ConversationRoleRepository(this.teamRepository, this.conversationService);
     this.leaveCall = noop;
-    this.scheduleMissingUsersAndConversationsMetadataRefresh();
+
+    if (this.core.backendFeatures.isFederated) {
+      this.scheduleMissingUsersAndConversationsMetadataRefresh();
+    }
   }
 
   checkMessageTimer(messageEntity: ContentMessage): void {
@@ -484,9 +487,6 @@ export class ConversationRepository {
    * @Note Federation only
    */
   private readonly scheduleMissingUsersAndConversationsMetadataRefresh = () => {
-    if (!this.core.backendFeatures.isFederated) {
-      return;
-    }
     window.setInterval(async () => {
       try {
         await this.loadMissingConversations();
