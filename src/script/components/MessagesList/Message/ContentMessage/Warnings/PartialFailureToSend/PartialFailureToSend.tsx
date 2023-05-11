@@ -44,7 +44,7 @@ function generateNamedUsers(users: User[], userClients: QualifiedUserClients): P
       const domainNamedUsers = Object.keys(domainUsers).reduce<ParsedUsers>(
         (domainNamedUsers, userId) => {
           const user = users.find(user => matchQualifiedIds(user.qualifiedId, {id: userId, domain}));
-          if (user) {
+          if (user && user.username()) {
             domainNamedUsers.namedUsers.push(user);
           } else {
             domainNamedUsers.unknownUsers.push({id: userId, domain});
@@ -81,7 +81,9 @@ export const PartialFailureToSendWarning = ({failedToSend, knownUsers}: Props) =
 
   const showToggle = userCount > 1;
 
-  const {namedUsers} = generateNamedUsers(knownUsers, queued);
+  const {namedUsers, unknownUsers} = generateNamedUsers(knownUsers, queued);
+
+  failed.push(...unknownUsers);
 
   const unreachableUsers = generateUnreachableUsers(failed);
 
