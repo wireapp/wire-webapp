@@ -469,10 +469,10 @@ export class ConversationRepository {
   }
 
   public async refreshAllConversationsUnavailableParticipants(): Promise<void> {
-    const allUnavailableUsers: User[] = [];
-    this.conversationState.conversations().forEach(conversation => {
-      allUnavailableUsers.push(...conversation.allUserEntities().filter(user => !user.isAvailable()));
+    const allUnavailableUsers = this.conversationState.conversations().flatMap(conversation => {
+      return conversation.allUserEntities().filter(user => !user.isAvailable());
     });
+
     if (!allUnavailableUsers.length) {
       return;
     }
