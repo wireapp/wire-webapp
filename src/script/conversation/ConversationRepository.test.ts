@@ -1420,9 +1420,7 @@ describe('ConversationRepository', () => {
         return user;
       });
 
-      conversation.participating_user_ets.push(unavailableUsers[0]);
-      conversation.participating_user_ets.push(unavailableUsers[1]);
-      conversation.participating_user_ets.push(unavailableUsers[2]);
+      conversation.participating_user_ets.push(unavailableUsers[0], unavailableUsers[1], unavailableUsers[2]);
 
       const conversationRepo = await testFactory.exposeConversationActors();
       spyOn(testFactory.user_repository!, 'refreshUsers').and.callFake(() => {
@@ -1438,6 +1436,50 @@ describe('ConversationRepository', () => {
       expect(unavailableUsers[0].name).toBeTruthy();
       expect(unavailableUsers[1].name).toBeTruthy();
       expect(unavailableUsers[2].name).toBeTruthy();
+    });
+  });
+
+  describe('refreshAllConversationsUnavailableParticipants', () => {
+    it('should refresh all unavailable users & conversations', async () => {
+      const conversation1 = _generateConversation();
+      const conversation2 = _generateConversation();
+      const unavailableUsers1 = [generateUser(), generateUser(), generateUser()].map(user => {
+        user.id = '';
+        user.name('');
+        return user;
+      });
+      const unavailableUsers2 = [generateUser(), generateUser(), generateUser()].map(user => {
+        user.id = '';
+        user.name('');
+        return user;
+      });
+
+      conversation1.participating_user_ets.push(unavailableUsers1[0], unavailableUsers1[1], unavailableUsers1[2]);
+      conversation2.participating_user_ets.push(unavailableUsers2[0], unavailableUsers2[1], unavailableUsers2[2]);
+
+      const conversationRepo = await testFactory.exposeConversationActors();
+      testFactory.conversation_repository!['conversationState'].conversations([conversation1, conversation2]);
+
+      spyOn(testFactory.user_repository!, 'refreshUsers').and.callFake(() => {
+        unavailableUsers1.map(user => {
+          user.id = createUuid();
+          user.name(faker.name.fullName());
+        });
+        unavailableUsers2.map(user => {
+          user.id = createUuid();
+          user.name(faker.name.fullName());
+        });
+      });
+
+      await conversationRepo['refreshAllConversationsUnavailableParticipants']();
+
+      expect(testFactory.user_repository!.refreshUsers).toHaveBeenCalled();
+      expect(unavailableUsers1[0].name).toBeTruthy();
+      expect(unavailableUsers1[1].name).toBeTruthy();
+      expect(unavailableUsers1[2].name).toBeTruthy();
+      expect(unavailableUsers2[0].name).toBeTruthy();
+      expect(unavailableUsers2[1].name).toBeTruthy();
+      expect(unavailableUsers2[2].name).toBeTruthy();
     });
   });
 
