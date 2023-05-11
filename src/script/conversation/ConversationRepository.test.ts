@@ -1419,7 +1419,20 @@ describe('ConversationRepository', () => {
       jest.useRealTimers();
     });
 
-    it('should call loadMissingConversations & refreshAllConversationsUnavailableParticipants every 3 hours', async () => {
+    it('should not call loadMissingConversations & refreshAllConversationsUnavailableParticipants for non federated envs', async () => {
+      const conversationRepo = await testFactory.exposeConversationActors();
+
+      spyOn(testFactory.conversation_repository!, 'loadMissingConversations').and.callThrough();
+      spyOn(testFactory.conversation_repository!, 'refreshAllConversationsUnavailableParticipants').and.callThrough();
+
+      expect(conversationRepo.loadMissingConversations).not.toHaveBeenCalled();
+      expect(conversationRepo.refreshAllConversationsUnavailableParticipants).not.toHaveBeenCalled();
+    });
+
+    it('should call loadMissingConversations & refreshAllConversationsUnavailableParticipants every 3 hours for federated envs', async () => {
+      Object.defineProperty(container.resolve(Core).backendFeatures, 'isFederated', {
+        get: jest.fn(() => true),
+      });
       const conversationRepo = await testFactory.exposeConversationActors();
 
       spyOn(testFactory.conversation_repository!, 'loadMissingConversations').and.callThrough();

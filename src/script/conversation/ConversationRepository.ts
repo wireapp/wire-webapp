@@ -484,6 +484,9 @@ export class ConversationRepository {
    * @Note Federation only
    */
   private readonly scheduleMissingUsersAndConversationsMetadataRefresh = () => {
+    if (!this.core.backendFeatures.isFederated) {
+      return;
+    }
     window.setInterval(async () => {
       try {
         await this.loadMissingConversations();
