@@ -471,7 +471,7 @@ export class ConversationRepository {
     await this.userRepository.refreshUsers(unavailableUsers.map(user => user.qualifiedId));
   }
 
-  public async refreshAllConversationsUnavailableParticipants(): Promise<void> {
+  private async refreshAllConversationsUnavailableParticipants(): Promise<void> {
     const allUnavailableUsers = this.conversationState
       .conversations()
       .flatMap(conversation => conversation.allUserEntities().filter(user => !user.isAvailable()));

@@ -1422,11 +1422,14 @@ describe('ConversationRepository', () => {
     it('should not call loadMissingConversations & refreshAllConversationsUnavailableParticipants for non federated envs', async () => {
       const conversationRepo = await testFactory.exposeConversationActors();
 
-      spyOn(testFactory.conversation_repository!, 'loadMissingConversations').and.callThrough();
-      spyOn(testFactory.conversation_repository!, 'refreshAllConversationsUnavailableParticipants').and.callThrough();
+      spyOn(conversationRepo, 'loadMissingConversations').and.callThrough();
+      spyOn(
+        conversationRepo,
+        'refreshAllConversationsUnavailableParticipants' as keyof ConversationRepository,
+      ).and.callThrough();
 
       expect(conversationRepo.loadMissingConversations).not.toHaveBeenCalled();
-      expect(conversationRepo.refreshAllConversationsUnavailableParticipants).not.toHaveBeenCalled();
+      expect(conversationRepo['refreshAllConversationsUnavailableParticipants']).not.toHaveBeenCalled();
     });
 
     it('should call loadMissingConversations & refreshAllConversationsUnavailableParticipants every 3 hours for federated envs', async () => {
@@ -1435,15 +1438,18 @@ describe('ConversationRepository', () => {
       });
       const conversationRepo = await testFactory.exposeConversationActors();
 
-      spyOn(testFactory.conversation_repository!, 'loadMissingConversations').and.callThrough();
-      spyOn(testFactory.conversation_repository!, 'refreshAllConversationsUnavailableParticipants').and.callThrough();
+      spyOn(conversationRepo, 'loadMissingConversations').and.callThrough();
+      spyOn(
+        conversationRepo,
+        'refreshAllConversationsUnavailableParticipants' as keyof ConversationRepository,
+      ).and.callThrough();
 
       jest.advanceTimersByTime(3600000 * 4);
 
       await Promise.resolve();
 
       expect(conversationRepo.loadMissingConversations).toHaveBeenCalled();
-      expect(conversationRepo.refreshAllConversationsUnavailableParticipants).toHaveBeenCalled();
+      expect(conversationRepo['refreshAllConversationsUnavailableParticipants']).toHaveBeenCalled();
     });
   });
 });
