@@ -100,6 +100,8 @@ describe('ConversationRepository', () => {
   };
 
   beforeAll(async () => {
+    jest.useFakeTimers();
+
     server = sinon.fakeServer.create();
     server.autoRespond = true;
 
@@ -143,6 +145,7 @@ describe('ConversationRepository', () => {
   afterAll(() => {
     server.restore();
     storage_service.clearStores();
+    jest.useRealTimers();
   });
 
   describe('filtered_conversations', () => {
@@ -1407,6 +1410,22 @@ describe('ConversationRepository', () => {
       await conversationRepository.loadMissingConversations();
 
       expect(conversationState.missingConversations).toHaveLength(remoteConversations.failed.length);
+    });
+  });
+
+  describe('scheduleMissingUsersAndConversationsMetadataRefresh', () => {
+    it('should call loadMissingConversations & refreshAllConversationsUnavailableParticipants every 3 hours', async () => {
+      const conversationRepo = testFactory.conversation_repository!;
+
+      spyOn(testFactory.conversation_repository!, 'loadMissingConversations').and.callThrough();
+      spyOn(testFactory.conversation_repository!, 'refreshAllConversationsUnavailableParticipants').and.callThrough();
+
+      jest.advanceTimersByTime(3600000 * 4);
+
+      await Promise.resolve();
+
+      expect(conversationRepo.loadMissingConversations).toHaveBeenCalled();
+      expect(conversationRepo.refreshAllConversationsUnavailableParticipants).toHaveBeenCalled();
     });
   });
 });
