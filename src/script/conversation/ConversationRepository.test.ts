@@ -100,8 +100,6 @@ describe('ConversationRepository', () => {
   };
 
   beforeAll(async () => {
-    jest.useFakeTimers();
-
     server = sinon.fakeServer.create();
     server.autoRespond = true;
 
@@ -145,7 +143,6 @@ describe('ConversationRepository', () => {
   afterAll(() => {
     server.restore();
     storage_service.clearStores();
-    jest.useRealTimers();
   });
 
   describe('filtered_conversations', () => {
@@ -1414,8 +1411,16 @@ describe('ConversationRepository', () => {
   });
 
   describe('scheduleMissingUsersAndConversationsMetadataRefresh', () => {
+    beforeAll(() => {
+      jest.useFakeTimers();
+    });
+
+    afterAll(() => {
+      jest.useRealTimers();
+    });
+
     it('should call loadMissingConversations & refreshAllConversationsUnavailableParticipants every 3 hours', async () => {
-      const conversationRepo = testFactory.conversation_repository!;
+      const conversationRepo = await testFactory.exposeConversationActors();
 
       spyOn(testFactory.conversation_repository!, 'loadMissingConversations').and.callThrough();
       spyOn(testFactory.conversation_repository!, 'refreshAllConversationsUnavailableParticipants').and.callThrough();
