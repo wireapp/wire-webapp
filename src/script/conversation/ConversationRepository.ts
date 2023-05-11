@@ -469,9 +469,9 @@ export class ConversationRepository {
   }
 
   public async refreshAllConversationsUnavailableParticipants(): Promise<void> {
-    const allUnavailableUsers = this.conversationState.conversations().flatMap(conversation => {
-      return conversation.allUserEntities().filter(user => !user.isAvailable());
-    });
+    const allUnavailableUsers = this.conversationState
+      .conversations()
+      .flatMap(conversation => conversation.allUserEntities().filter(user => !user.isAvailable()));
 
     if (!allUnavailableUsers.length) {
       return;
