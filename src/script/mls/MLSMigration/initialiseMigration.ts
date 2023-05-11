@@ -52,5 +52,7 @@ const initialiseMigrationOfProteusConversation = async (
   //change the conversation protocol to mixed
   await apiClient.api.conversation.putConversationProtocol(proteusConversation.qualifiedId, ConversationProtocol.MIXED);
 
+  //refetch the conversation to get all new fields including groupId, epoch and new protocol
+  await apiClient.api.conversation.getConversation(proteusConversation.qualifiedId);
   //create MLS group with derived groupId
 };
