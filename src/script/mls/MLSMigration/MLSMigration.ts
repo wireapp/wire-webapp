@@ -28,7 +28,6 @@ import {Conversation} from 'src/script/entity/Conversation';
 import {getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
-import {finaliseMigrationOfMixedConversations} from './finaliseMigration';
 import {initialiseMigrationOfProteusConversations} from './initialiseMigration';
 
 import {isMLSSupportedByEnvironment} from '../isMLSSupportedByEnvironment';
@@ -147,9 +146,9 @@ const migrateConversationsToMLS = async (
       !conversation.isTeam1to1(),
   );
 
-  const {proteus: proteusConversations, mixed: mixedConversations} =
-    groupConversationsByProtocol(regularGroupConversations);
+  const {proteus: proteusConversations} = groupConversationsByProtocol(regularGroupConversations);
 
   await initialiseMigrationOfProteusConversations(proteusConversations, {core, apiClient});
-  await finaliseMigrationOfMixedConversations(mixedConversations, {core, apiClient});
+
+  //TODO: implement logic for finalising mixed conversations
 };

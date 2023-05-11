@@ -48,6 +48,7 @@ import {ConversationState} from '../conversation/ConversationState';
 import {User} from '../entity/User';
 import {useInitializeRootFontSize} from '../hooks/useRootFontSize';
 import {App} from '../main/app';
+import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';
 import {generateConversationUrl} from '../router/routeGenerator';
 import {configureRoutes, navigate} from '../router/Router';
 import {TeamState} from '../team/TeamState';
@@ -127,7 +128,7 @@ const AppMain: FC<AppMainProps> = ({
   const {currentView} = useAppMainState(state => state.responsiveView);
   const isLeftSidebarVisible = currentView == ViewType.LEFT_SIDEBAR;
 
-  const initializeApp = () => {
+  const initializeApp = async () => {
     repositories.notification.setContentViewModelStates(contentState, mainView.multitasking);
 
     const showMostRecentConversation = () => {
@@ -193,6 +194,23 @@ const AppMain: FC<AppMainProps> = ({
 
     repositories.properties.checkPrivacyPermission().then(() => {
       window.setTimeout(() => repositories.notification.checkPermission(), App.CONFIG.NOTIFICATION_CHECK);
+    });
+
+    //after the app is initialized, we can run migration process in the background if feature is enabled
+    //FIXME: this value will be read from team feature config, call the method only if feature is enabled and config is defined
+    const mockedMigrationConfig = {
+      clientsThreshold: 100,
+      usersThreshold: 100,
+      finaliseRegardlessAfter: 1683885139353,
+      startTime: 1683280357523,
+    };
+
+    const allConversations = conversationState.conversations();
+
+    await initialiseMLSMigrationFlow(mockedMigrationConfig, allConversations, {
+      core: app.core,
+      apiClient: app.apiClient,
+      isConversationOwnedBySelfTeam: ({team_id}) => !!selfUser.teamId && team_id === selfUser.teamId,
     });
   };
 
