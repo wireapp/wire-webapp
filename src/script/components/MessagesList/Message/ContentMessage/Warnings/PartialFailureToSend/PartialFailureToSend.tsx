@@ -30,7 +30,7 @@ import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {warning} from '../Warnings.styles';
 
-export type User = {qualifiedId: QualifiedId; username: () => string};
+export type User = {qualifiedId: QualifiedId; name: () => string};
 type Props = {
   failedToSend: {queued?: QualifiedUserClients; failed?: QualifiedId[]};
   knownUsers: User[];
@@ -44,7 +44,7 @@ function generateNamedUsers(users: User[], userClients: QualifiedUserClients): P
       const domainNamedUsers = Object.keys(domainUsers).reduce<ParsedUsers>(
         (domainNamedUsers, userId) => {
           const user = users.find(user => matchQualifiedIds(user.qualifiedId, {id: userId, domain}));
-          if (user && user.username()) {
+          if (user && user.name()) {
             domainNamedUsers.namedUsers.push(user);
           } else {
             domainNamedUsers.unknownUsers.push({id: userId, domain});
@@ -92,7 +92,7 @@ export const PartialFailureToSendWarning = ({failedToSend, knownUsers}: Props) =
     message.head = t('messageFailedToSendParticipants', {count: userCount.toString()});
     message.rest = t('messageFailedToSendPlural');
   } else if (namedUsers.length === 1) {
-    message.head = namedUsers[0].username();
+    message.head = namedUsers[0].name();
     message.rest = t('messageFailedToSendWillReceiveSingular');
   } else if (unreachableUsers.length === 1) {
     message.head = t('messageFailedToSendParticipantsFromDomainSingular', {domain: unreachableUsers[0].domain});
@@ -120,7 +120,7 @@ export const PartialFailureToSendWarning = ({failedToSend, knownUsers}: Props) =
                         data-uie-value={user.qualifiedId.id}
                         key={user.qualifiedId.id}
                       >
-                        {user.username()}
+                        {user.name()}
                       </Bold>
                     )),
                     ', ',

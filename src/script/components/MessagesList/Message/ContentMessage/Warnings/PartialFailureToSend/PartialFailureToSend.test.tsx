@@ -32,7 +32,7 @@ setStrings({en});
 function generateUsers(nbUsers: number, domain: string) {
   const users: User[] = [];
   for (let i = 0; i < nbUsers; i++) {
-    users.push({qualifiedId: {id: createUuid(), domain}, username: () => `User ${i}`});
+    users.push({qualifiedId: {id: createUuid(), domain}, name: () => `User ${i}`});
   }
   return users;
 }
@@ -124,7 +124,7 @@ describe('PartialFailureToSendWarning', () => {
     );
 
     expect(queryByText('Show details')).toBeNull();
-    expect(container.textContent).toContain(`${users[0].username()} will get your message later`);
+    expect(container.textContent).toContain(`${users[0].name()} will get your message later`);
   });
 
   it('does not show the extra info toggle if there is only a single unreachable user', () => {
