@@ -17,6 +17,7 @@
  *
  */
 
+import {faker} from '@faker-js/faker';
 import {ClientClassification} from '@wireapp/api-client/lib/client/';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {
@@ -1407,6 +1408,36 @@ describe('ConversationRepository', () => {
       await conversationRepository.loadMissingConversations();
 
       expect(conversationState.missingConversations).toHaveLength(remoteConversations.failed.length);
+    });
+  });
+
+  describe('refreshUnavailableParticipants', () => {
+    it('should refresh unavailable users', async () => {
+      const conversation = _generateConversation();
+      const unavailableUsers = [generateUser(), generateUser(), generateUser()].map(user => {
+        user.id = '';
+        user.name('');
+        return user;
+      });
+
+      conversation.participating_user_ets.push(unavailableUsers[0]);
+      conversation.participating_user_ets.push(unavailableUsers[1]);
+      conversation.participating_user_ets.push(unavailableUsers[2]);
+
+      const conversationRepo = await testFactory.exposeConversationActors();
+      spyOn(testFactory.user_repository!, 'refreshUsers').and.callFake(() => {
+        unavailableUsers.map(user => {
+          user.id = createUuid();
+          user.name(faker.name.fullName());
+        });
+      });
+
+      await conversationRepo.refreshUnavailableParticipants(conversation);
+
+      expect(testFactory.user_repository!.refreshUsers).toHaveBeenCalled();
+      expect(unavailableUsers[0].name).toBeTruthy();
+      expect(unavailableUsers[1].name).toBeTruthy();
+      expect(unavailableUsers[2].name).toBeTruthy();
     });
   });
 
