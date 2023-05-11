@@ -17,6 +17,7 @@
  *
  */
 
+import {faker} from '@faker-js/faker';
 import {ClientClassification} from '@wireapp/api-client/lib/client/';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {
@@ -1407,6 +1408,121 @@ describe('ConversationRepository', () => {
       await conversationRepository.loadMissingConversations();
 
       expect(conversationState.missingConversations).toHaveLength(remoteConversations.failed.length);
+    });
+  });
+
+  describe('refreshUnavailableParticipants', () => {
+    it('should refresh unavailable users', async () => {
+      const conversation = _generateConversation();
+      const unavailableUsers = [generateUser(), generateUser(), generateUser()].map(user => {
+        user.id = '';
+        user.name('');
+        return user;
+      });
+
+      conversation.participating_user_ets.push(unavailableUsers[0], unavailableUsers[1], unavailableUsers[2]);
+
+      const conversationRepo = await testFactory.exposeConversationActors();
+      spyOn(testFactory.user_repository!, 'refreshUsers').and.callFake(() => {
+        unavailableUsers.map(user => {
+          user.id = createUuid();
+          user.name(faker.name.fullName());
+        });
+      });
+
+      await conversationRepo.refreshUnavailableParticipants(conversation);
+
+      expect(testFactory.user_repository!.refreshUsers).toHaveBeenCalled();
+      expect(unavailableUsers[0].name).toBeTruthy();
+      expect(unavailableUsers[1].name).toBeTruthy();
+      expect(unavailableUsers[2].name).toBeTruthy();
+    });
+  });
+
+  describe('refreshAllConversationsUnavailableParticipants', () => {
+    it('should refresh all unavailable users & conversations', async () => {
+      const conversation1 = _generateConversation();
+      const conversation2 = _generateConversation();
+      const unavailableUsers1 = [generateUser(), generateUser(), generateUser()].map(user => {
+        user.id = '';
+        user.name('');
+        return user;
+      });
+      const unavailableUsers2 = [generateUser(), generateUser(), generateUser()].map(user => {
+        user.id = '';
+        user.name('');
+        return user;
+      });
+
+      conversation1.participating_user_ets.push(unavailableUsers1[0], unavailableUsers1[1], unavailableUsers1[2]);
+      conversation2.participating_user_ets.push(unavailableUsers2[0], unavailableUsers2[1], unavailableUsers2[2]);
+
+      const conversationRepo = await testFactory.exposeConversationActors();
+      testFactory.conversation_repository!['conversationState'].conversations([conversation1, conversation2]);
+
+      spyOn(testFactory.user_repository!, 'refreshUsers').and.callFake(() => {
+        unavailableUsers1.map(user => {
+          user.id = createUuid();
+          user.name(faker.name.fullName());
+        });
+        unavailableUsers2.map(user => {
+          user.id = createUuid();
+          user.name(faker.name.fullName());
+        });
+      });
+
+      await conversationRepo['refreshAllConversationsUnavailableParticipants']();
+
+      expect(testFactory.user_repository!.refreshUsers).toHaveBeenCalled();
+      expect(unavailableUsers1[0].name).toBeTruthy();
+      expect(unavailableUsers1[1].name).toBeTruthy();
+      expect(unavailableUsers1[2].name).toBeTruthy();
+      expect(unavailableUsers2[0].name).toBeTruthy();
+      expect(unavailableUsers2[1].name).toBeTruthy();
+      expect(unavailableUsers2[2].name).toBeTruthy();
+    });
+  });
+
+  describe('scheduleMissingUsersAndConversationsMetadataRefresh', () => {
+    beforeAll(() => {
+      jest.useFakeTimers();
+    });
+
+    afterAll(() => {
+      jest.useRealTimers();
+    });
+
+    it('should not call loadMissingConversations & refreshAllConversationsUnavailableParticipants for non federated envs', async () => {
+      const conversationRepo = await testFactory.exposeConversationActors();
+
+      spyOn(conversationRepo, 'loadMissingConversations').and.callThrough();
+      spyOn(
+        conversationRepo,
+        'refreshAllConversationsUnavailableParticipants' as keyof ConversationRepository,
+      ).and.callThrough();
+
+      expect(conversationRepo.loadMissingConversations).not.toHaveBeenCalled();
+      expect(conversationRepo['refreshAllConversationsUnavailableParticipants']).not.toHaveBeenCalled();
+    });
+
+    it('should call loadMissingConversations & refreshAllConversationsUnavailableParticipants every 3 hours for federated envs', async () => {
+      Object.defineProperty(container.resolve(Core).backendFeatures, 'isFederated', {
+        get: jest.fn(() => true),
+      });
+      const conversationRepo = await testFactory.exposeConversationActors();
+
+      spyOn(conversationRepo, 'loadMissingConversations').and.callThrough();
+      spyOn(
+        conversationRepo,
+        'refreshAllConversationsUnavailableParticipants' as keyof ConversationRepository,
+      ).and.callThrough();
+
+      jest.advanceTimersByTime(3600000 * 4);
+
+      await Promise.resolve();
+
+      expect(conversationRepo.loadMissingConversations).toHaveBeenCalled();
+      expect(conversationRepo['refreshAllConversationsUnavailableParticipants']).toHaveBeenCalled();
     });
   });
 });

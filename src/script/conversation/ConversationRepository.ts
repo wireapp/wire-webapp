@@ -291,6 +291,10 @@ export class ConversationRepository {
 
     this.conversationRoleRepository = new ConversationRoleRepository(this.teamRepository, this.conversationService);
     this.leaveCall = noop;
+
+    if (this.core.backendFeatures.isFederated) {
+      this.scheduleMissingUsersAndConversationsMetadataRefresh();
+    }
   }
 
   checkMessageTimer(messageEntity: ContentMessage): void {
@@ -466,6 +470,32 @@ export class ConversationRepository {
     }
     await this.userRepository.refreshUsers(unavailableUsers.map(user => user.qualifiedId));
   }
+
+  private async refreshAllConversationsUnavailableParticipants(): Promise<void> {
+    const allUnavailableUsers = this.conversationState
+      .conversations()
+      .flatMap(conversation => conversation.allUserEntities().filter(user => !user.isAvailable()));
+
+    if (!allUnavailableUsers.length) {
+      return;
+    }
+    await this.userRepository.refreshUsers(allUnavailableUsers.map(user => user.qualifiedId));
+  }
+
+  /**
+   * Refresh missing conversations and unavailable users metadata every 3 hours
+   * @Note Federation only
+   */
+  private readonly scheduleMissingUsersAndConversationsMetadataRefresh = () => {
+    window.setInterval(async () => {
+      try {
+        await this.loadMissingConversations();
+        await this.refreshAllConversationsUnavailableParticipants();
+      } catch (error) {
+        this.logger.warn(`failed to refresh missing users & conversations metat data`, error);
+      }
+    }, TIME_IN_MILLIS.HOUR * 3);
+  };
 
   /**
    * Create a guest room.
