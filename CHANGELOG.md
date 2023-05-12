@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [24.11.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@24.10.0...@wireapp/api-client@24.11.0) (2023-05-12)
+
+### Features
+
+* Add new failed_to_add field to conversation (FS-1548) ([#5139](https://github.com/wireapp/wire-web-packages/issues/5139)) ([5e76b64](https://github.com/wireapp/wire-web-packages/commit/5e76b64be0173c10658336f6f900a8ddea3a92ea))
+
 # [24.10.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@24.9.1...@wireapp/api-client@24.10.0) (2023-05-10)
 
 ### Features
