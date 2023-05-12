@@ -158,7 +158,7 @@ describe('NotificationRepository', () => {
 
           notification_content.title = truncate(titleText, titleLength, false);
         } else {
-          notification_content.title = '…';
+          notification_content.title = 'Name not available';
         }
 
         const [firstResultArgs] = showNotificationSpy.mock.calls[0];
@@ -685,7 +685,7 @@ describe('NotificationRepository', () => {
 
   describe('shows a well-formed request notification', () => {
     let connectionEntity: ConnectionEntity;
-    const expected_title = '…';
+    const expected_title = 'Name not available';
     let memberMessage: MemberMessage;
 
     beforeEach(() => {
