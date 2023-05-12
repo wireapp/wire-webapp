@@ -386,7 +386,7 @@ export class CallingViewModel {
                 text: t('modalConfirmSecondary'),
               },
               text: {
-                message: t('groupCallConfirmationModalTitle', maxGroupSize),
+                message: t('groupCallConfirmationModalTitle', memberCount),
                 closeBtnLabel: t('groupCallModalCloseBtnLabel'),
               },
             });
