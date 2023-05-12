@@ -25,14 +25,12 @@ import {Account} from '@wireapp/core';
 
 import {groupConversationsByProtocol} from 'src/script/conversation/groupConversationsByProtocol';
 import {Conversation} from 'src/script/entity/Conversation';
-import {getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {initialiseMigrationOfProteusConversations} from './initialiseMigration';
+import {mlsMigrationLogger} from './MLSMigrationLogger';
 
 import {isMLSSupportedByEnvironment} from '../isMLSSupportedByEnvironment';
-
-const logger = getLogger('MLSMigration');
 
 //FIXME: This will not live here, it will be part of team features config once it's implemented on backend
 interface MLSMigrationConfig {
@@ -108,11 +106,11 @@ const checkMigrationConfig = async (
     apiClient: APIClient;
   },
 ) => {
-  logger.info('MLS migration feature enabled, checking the configuration...');
+  mlsMigrationLogger.info('MLS migration feature enabled, checking the configuration...');
   const isMLSSupportedByEnv = await isMLSSupportedByEnvironment({core, apiClient});
 
   if (!isMLSSupportedByEnv) {
-    logger.error('MLS migration feature is enabled but MLS is not supported by the environment.');
+    mlsMigrationLogger.error('MLS migration feature is enabled but MLS is not supported by the environment.');
     return;
   }
 
@@ -120,7 +118,7 @@ const checkMigrationConfig = async (
   //check if migration startTime has arrived
   const hasStartTimeArrived = Date.now() >= migrationConfig.startTime;
   if (!hasStartTimeArrived) {
-    logger.error('MLS migration start time has not arrived yet, will retry in 24 hours or on app reload.');
+    mlsMigrationLogger.error('MLS migration start time has not arrived yet, will retry in 24 hours or on app reload.');
   }
 
   return onMigrationStartTimeArrived();

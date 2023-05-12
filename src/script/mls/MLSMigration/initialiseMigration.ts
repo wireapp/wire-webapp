@@ -24,6 +24,8 @@ import {Account} from '@wireapp/core';
 
 import {ProteusConversation} from 'src/script/conversation/ConversationSelectors';
 
+import {mlsMigrationLogger} from './MLSMigrationLogger';
+
 export const initialiseMigrationOfProteusConversations = async (
   proteusConversations: ProteusConversation[],
   {
@@ -49,10 +51,24 @@ const initialiseMigrationOfProteusConversation = async (
     apiClient: APIClient;
   },
 ) => {
-  //change the conversation protocol to mixed
-  await apiClient.api.conversation.putConversationProtocol(proteusConversation.qualifiedId, ConversationProtocol.MIXED);
+  mlsMigrationLogger.info(
+    `Initialising MLS migration for "proteus" conversation: ${proteusConversation.qualifiedId.id}`,
+  );
 
-  //refetch the conversation to get all new fields including groupId, epoch and new protocol
-  await apiClient.api.conversation.getConversation(proteusConversation.qualifiedId);
-  //create MLS group with derived groupId
+  try {
+    //change the conversation protocol to mixed
+    await apiClient.api.conversation.putConversationProtocol(
+      proteusConversation.qualifiedId,
+      ConversationProtocol.MIXED,
+    );
+
+    //refetch the conversation to get all new fields including groupId, epoch and new protocol
+    await apiClient.api.conversation.getConversation(proteusConversation.qualifiedId);
+    //create MLS group with derived groupId
+  } catch (error) {
+    mlsMigrationLogger.error(
+      `Error while initialising MLS migration for "proteus" conversation: ${proteusConversation.qualifiedId.id}`,
+      error,
+    );
+  }
 };
