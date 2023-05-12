@@ -593,6 +593,9 @@ export class ConversationRepository {
     let conversationsData: any[];
 
     if (remoteConversations.failed?.length) {
+      if (missingConversations) {
+        this.conversationState.missingConversations = [...new Set(remoteConversations.failed)];
+      }
       missingConversations.push(...remoteConversations.failed);
     }
 
