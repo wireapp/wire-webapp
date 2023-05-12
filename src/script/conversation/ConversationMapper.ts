@@ -332,10 +332,18 @@ export class ConversationMapper {
     return [...foundRemoteConversations, ...failedConversations, ...localArchives];
   }
 
+  /**
+   * Merge a remote conversation payload with a locally stored conversation
+   *
+   * @param localConversationData Local conversation data from the store
+   * @param remoteConversationData Remote conversation data from backend
+   * @param lastEventTimestampFallback Fallback timestamp to use if no last event timestamp is available
+   * @returns Merged conversation data in the format of the local store
+   */
   static mergeSingleConversation(
     localConversationData: ConversationDatabaseData,
     remoteConversationData: ConversationBackendData,
-    conversationOrder?: number,
+    lastEventTimestampFallback?: number,
   ): ConversationDatabaseData {
     const {
       access,
@@ -411,8 +419,8 @@ export class ConversationMapper {
     }
 
     // This should ensure a proper order
-    if (!mergedConversation.last_event_timestamp && conversationOrder !== undefined) {
-      mergedConversation.last_event_timestamp = conversationOrder + 1;
+    if (!mergedConversation.last_event_timestamp && lastEventTimestampFallback !== undefined) {
+      mergedConversation.last_event_timestamp = lastEventTimestampFallback + 1;
     }
 
     // Set initially or correct server timestamp
