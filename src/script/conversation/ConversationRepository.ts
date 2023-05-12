@@ -599,7 +599,7 @@ export class ConversationRepository {
     if (!remoteConversations.found?.length) {
       conversationsData = localConversations;
     } else {
-      const data = ConversationMapper.mergeConversation(localConversations, remoteConversations);
+      const data = ConversationMapper.mergeConversations(localConversations, remoteConversations);
       conversationsData = (await this.conversationService.saveConversationsInDb(data)) as any[];
     }
 
