@@ -4728,12 +4728,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/sinon@npm:10.0.14":
-  version: 10.0.14
-  resolution: "@types/sinon@npm:10.0.14"
+"@types/sinon@npm:10.0.15":
+  version: 10.0.15
+  resolution: "@types/sinon@npm:10.0.15"
   dependencies:
     "@types/sinonjs__fake-timers": "*"
-  checksum: b6e1d46bfb03fa5c11ba4a84790795dcb72dae4e599318ca6983affff106bf56874a0b1b5e263ca15319c7e7bd92132d6db30fa62890ffb2ee29b011bdd5d548
+  checksum: cec6d7d9d5582ca3ac851b029d5d90451bfe6d376164253792a6eb6ddcd609a0411a7fac9ed92e1879e7d3ec091d2ea2e8dbb4f6140a1065439b81dc20cafa7c
   languageName: node
   linkType: hard
 
@@ -18052,7 +18052,7 @@ dexie@latest:
     "@types/react-transition-group": 4.4.6
     "@types/redux-mock-store": 1.0.3
     "@types/seedrandom": ^3
-    "@types/sinon": 10.0.14
+    "@types/sinon": 10.0.15
     "@types/speakingurl": 13.0.3
     "@types/uint32": 0.2.0
     "@types/underscore": 1.11.4
