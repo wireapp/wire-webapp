@@ -30,7 +30,7 @@
     "uuidjs": "4.2.13"
   },
   "devDependencies": {
-    "@faker-js/faker": "^7.6.0",
+    "@faker-js/faker": "^8.0.0",
     "@swc/core": "^1.3.10",
     "@swc/jest": "^0.2.23",
     "@types/jest": "^29.2.0",
