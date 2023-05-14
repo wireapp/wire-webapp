@@ -6715,10 +6715,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"caniuse-lite@npm:^1.0.30001486":
-  version: 1.0.30001486
-  resolution: "caniuse-lite@npm:1.0.30001486"
-  checksum: 5e8c2ba2679e4ad17dea6d2761a6449b814441bfeac81af6cc9d58af187df6af4b79b27befcbfc4a557e720b21c0399a7d1911c8705922e38938dcc0f40b5d4b
+"caniuse-lite@npm:^1.0.30001487":
+  version: 1.0.30001487
+  resolution: "caniuse-lite@npm:1.0.30001487"
+  checksum: b5a9e72ec165765fb3e07913cc389685ce8a30ac48967f99baec773a4353d2037fb534241e87b3c95d40a5081079be2263710b784883183bb2998b73f7202233
   languageName: node
   linkType: hard
 
@@ -18143,7 +18143,7 @@ dexie@latest:
     babel-loader: 9.1.2
     babel-plugin-transform-import-meta: ^2.2.0
     beautiful-react-hooks: ^4.3.0
-    caniuse-lite: ^1.0.30001486
+    caniuse-lite: ^1.0.30001487
     classnames: 2.3.2
     copy-webpack-plugin: 11.0.0
     core-js: 3.25.5
