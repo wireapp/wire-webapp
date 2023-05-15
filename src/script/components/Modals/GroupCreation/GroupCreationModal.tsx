@@ -36,6 +36,8 @@ import {TextInput} from 'Components/TextInput';
 import {BaseToggle} from 'Components/toggle/BaseToggle';
 import {InfoToggle} from 'Components/toggle/InfoToggle';
 import {UserSearchableList} from 'Components/UserSearchableList';
+import {generateConversationUrl} from 'src/script/router/routeGenerator';
+import {createNavigate} from 'src/script/router/routerBindings';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleEnterDown, offEscKey, onEscKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -201,12 +203,12 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
     setAccessState(ACCESS_STATE.TEAM.GUESTS_SERVICES);
   };
 
-  const clickOnCreate = async (): Promise<void> => {
+  const clickOnCreate = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): Promise<void> => {
     if (!isCreatingConversation) {
       setIsCreatingConversation(true);
 
       try {
-        const conversationEntity = await conversationRepository.createGroupConversation(
+        const conversation = await conversationRepository.createGroupConversation(
           selectedContacts,
           groupName,
           isTeam ? accessState : undefined,
@@ -216,7 +218,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
           },
         );
         setIsShown(false);
-        amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
+        createNavigate(generateConversationUrl(conversation.qualifiedId))(event);
       } catch (error) {
         setIsCreatingConversation(false);
         logger.error(error);

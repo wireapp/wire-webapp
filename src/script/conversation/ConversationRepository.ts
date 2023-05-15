@@ -380,7 +380,7 @@ export class ConversationRepository {
     groupName?: string,
     accessState?: ACCESS_STATE,
     options: Partial<NewConversation> = {},
-  ): Promise<Conversation | undefined> {
+  ): Promise<Conversation> {
     const userIds = userEntities.map(user => user.qualifiedId);
     const usersPayload = {
       qualified_users: userIds,
@@ -455,11 +455,20 @@ export class ConversationRepository {
       }
       return conversationEntity;
     } catch (error) {
-      this.handleConversationCreateError(
-        error,
-        userEntities.map(user => user.qualifiedId),
-      );
-      return undefined;
+      if (!isBackendError(error)) {
+        throw error;
+      }
+
+      switch (error.label) {
+        case BackendErrorLabel.CLIENT_ERROR:
+          this.handleTooManyMembersError();
+        case BackendErrorLabel.NOT_CONNECTED:
+          await this.handleUsersNotConnected(userEntities.map(user => user.qualifiedId));
+        case BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT:
+          this.showLegalHoldConsentError();
+        default:
+          throw error;
+      }
     }
   }
 
@@ -1893,22 +1902,6 @@ export class ConversationRepository {
     if (conversationEntity.removed_from_conversation()) {
       this.conversationService.deleteConversationFromDb(conversationEntity);
       this.deleteConversationFromRepository(conversationEntity);
-    }
-  }
-
-  private handleConversationCreateError(error: BackendError, userIds: QualifiedId[]): void {
-    switch (error.label) {
-      case BackendErrorLabel.CLIENT_ERROR:
-        this.handleTooManyMembersError();
-        break;
-      case BackendErrorLabel.NOT_CONNECTED:
-        this.handleUsersNotConnected(userIds);
-        break;
-      case BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT:
-        this.showLegalHoldConsentError();
-        break;
-      default:
-        throw error;
     }
   }
 
