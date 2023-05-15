@@ -89,12 +89,14 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
       ? teamState.teamFeatures().mls?.config.defaultProtocol
       : ConversationProtocol.PROTEUS;
 
-  const protocolOptions: ProtocolOption[] = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS].map(protocol => ({
-    label: `${t(`modalCreateGroupProtocolSelect.${protocol}`)}${
-      protocol === defaultProtocol ? t(`modalCreateGroupProtocolSelect.default`) : ''
-    }`,
-    value: protocol,
-  }));
+  const protocolOptions: ProtocolOption[] = ([ConversationProtocol.PROTEUS, ConversationProtocol.MLS] as const).map(
+    protocol => ({
+      label: `${t(`modalCreateGroupProtocolSelect.${protocol}`)}${
+        protocol === defaultProtocol ? t(`modalCreateGroupProtocolSelect.default`) : ''
+      }`,
+      value: protocol,
+    }),
+  );
 
   const initialProtocol = protocolOptions.find(protocol => protocol.value === defaultProtocol)!;
 

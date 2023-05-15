@@ -870,7 +870,6 @@
   "modalCreateGroupProtocolSelect.default": " (default)",
   "modalCreateGroupProtocolSelect.mls": "MLS",
   "modalCreateGroupProtocolSelect.proteus": "Proteus",
-  "modalCreateGroupProtocolSelect.mixed": "Mixed",
   "modalGifTooLargeHeadline": "Selected animation is too large",
   "modalGifTooLargeMessage": "Maximum size is {{number}} MB.",
   "modalImproveWireAction": "I Agree",
