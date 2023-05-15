@@ -36,8 +36,10 @@ import {TextInput} from 'Components/TextInput';
 import {BaseToggle} from 'Components/toggle/BaseToggle';
 import {InfoToggle} from 'Components/toggle/InfoToggle';
 import {UserSearchableList} from 'Components/UserSearchableList';
+import {generateConversationUrl} from 'src/script/router/routeGenerator';
+import {createNavigate, createNavigateKeyboard} from 'src/script/router/routerBindings';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleEnterDown, offEscKey, onEscKey} from 'Util/KeyboardUtil';
+import {handleEnterDown, isKeyboardEvent, offEscKey, onEscKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {sortUsersByPriority} from 'Util/StringUtil';
@@ -203,12 +205,14 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
     setAccessState(ACCESS_STATE.TEAM.GUESTS_SERVICES);
   };
 
-  const clickOnCreate = async (): Promise<void> => {
+  const clickOnCreate = async (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.KeyboardEvent<HTMLInputElement>,
+  ): Promise<void> => {
     if (!isCreatingConversation) {
       setIsCreatingConversation(true);
 
       try {
-        const conversationEntity = await conversationRepository.createGroupConversation(
+        const conversation = await conversationRepository.createGroupConversation(
           selectedContacts,
           groupName,
           isTeam ? accessState : undefined,
@@ -218,7 +222,12 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
           },
         );
         setIsShown(false);
-        amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
+
+        if (isKeyboardEvent(event)) {
+          createNavigateKeyboard(generateConversationUrl(conversation.qualifiedId), true)(event);
+        } else {
+          createNavigate(generateConversationUrl(conversation.qualifiedId))(event);
+        }
       } catch (error) {
         setIsCreatingConversation(false);
         logger.error(error);
@@ -351,7 +360,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
             selectedUsers={selectedContacts}
             setSelectedUsers={setSelectedContacts}
             placeholder={t('groupCreationParticipantsPlaceholder')}
-            enter={clickOnCreate}
+            onEnter={clickOnCreate}
           />
         )}
 

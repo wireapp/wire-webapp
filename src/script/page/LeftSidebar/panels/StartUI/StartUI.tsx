@@ -152,7 +152,7 @@ const StartUI: React.FC<StartUIProps> = ({
           placeholder={t('searchPeoplePlaceholder')}
           selectedUsers={[]}
           setInput={setSearchQuery}
-          enter={openFirstConversation}
+          onEnter={openFirstConversation}
           forceDark
         />
       </div>
