@@ -32,6 +32,7 @@ import {
   MLSConversation,
 } from '../conversation/ConversationSelectors';
 import {Conversation} from '../entity/Conversation';
+import {User} from '../entity/User';
 
 type MLSConversationRepository = Pick<
   ConversationRepository,
