@@ -30,7 +30,7 @@ import type {User} from '../entity/User';
 import {MAX_HANDLE_LENGTH} from '../user/UserHandleGenerator';
 
 export interface SearchInputProps {
-  enter?: () => void | Promise<void>;
+  onEnter?: (event: React.KeyboardEvent<HTMLInputElement>) => void | Promise<void>;
   /** Will force the component to have a dark theme and not follow user's theme */
   forceDark?: boolean;
   input: string;
@@ -41,7 +41,7 @@ export interface SearchInputProps {
 }
 
 const SearchInput: React.FC<SearchInputProps> = ({
-  enter: onEnter,
+  onEnter,
   input,
   selectedUsers = [],
   setSelectedUsers = () => {},
@@ -88,7 +88,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
                 setSelectedUsers(selectedUsers.slice(0, -1));
               } else if (isEnterKey(event.nativeEvent)) {
                 event.preventDefault();
-                onEnter?.();
+                onEnter?.(event);
               }
               return true;
             }}
