@@ -17,7 +17,7 @@
  *
  */
 
-import type {KeyboardEvent as ReactKeyboardEvent} from 'react';
+import type {KeyboardEvent as ReactKeyboardEvent, SyntheticEvent as ReactEvent} from 'react';
 
 import {Runtime} from '@wireapp/commons';
 
@@ -52,6 +52,10 @@ export const isPageUpDownKey = (keyboardEvent: KeyboardEvent): boolean =>
 export const isKey = (keyboardEvent?: KeyboardEvent | ReactKeyboardEvent, expectedKey = '') => {
   const eventKey = keyboardEvent?.key?.toLowerCase() || '';
   return eventKey === expectedKey.toLowerCase();
+};
+
+export const isKeyboardEvent = (event: Event | ReactEvent): event is KeyboardEvent | ReactKeyboardEvent => {
+  return 'key' in event;
 };
 
 export const isTabKey = (keyboardEvent: KeyboardEvent | ReactKeyboardEvent): boolean => isKey(keyboardEvent, KEY.TAB);

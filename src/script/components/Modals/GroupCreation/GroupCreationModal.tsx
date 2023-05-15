@@ -39,7 +39,7 @@ import {UserSearchableList} from 'Components/UserSearchableList';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from 'src/script/router/routerBindings';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleEnterDown, offEscKey, onEscKey} from 'Util/KeyboardUtil';
+import {handleEnterDown, isKeyboardEvent, offEscKey, onEscKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {sortUsersByPriority} from 'Util/StringUtil';
@@ -221,7 +221,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
         );
         setIsShown(false);
 
-        if ('key' in event) {
+        if (isKeyboardEvent(event)) {
           createNavigateKeyboard(generateConversationUrl(conversation.qualifiedId), true)(event);
         } else {
           createNavigate(generateConversationUrl(conversation.qualifiedId))(event);
