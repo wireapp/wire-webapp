@@ -19,6 +19,7 @@
 
 import {FC, useEffect, useLayoutEffect} from 'react';
 
+import {FeatureStatus} from '@wireapp/api-client/lib/team';
 import {amplify} from 'amplify';
 import {ErrorBoundary} from 'react-error-boundary';
 import {container} from 'tsyringe';
@@ -197,20 +198,24 @@ const AppMain: FC<AppMainProps> = ({
     });
 
     //after the app is initialized, we can run migration process in the background if feature is enabled
-    //FIXME: this value will be read from team feature config, call the method only if feature is enabled and config is defined
-    const mockedMigrationConfig = {
-      clientsThreshold: 100,
-      usersThreshold: 100,
-      finaliseRegardlessAfter: 1683885139353,
-      startTime: 1683280357523,
-    };
+    const mlsMigrationFeature = teamState.teamFeatures().mlsMigration;
 
-    const allConversations = conversationState.conversations();
+    if (mlsMigrationFeature && mlsMigrationFeature.status === FeatureStatus.ENABLED) {
+      //FIXME: remove this after backend part of mls migration feature config is implemented
+      mlsMigrationFeature.config = {
+        clientsThreshold: 100,
+        usersThreshold: 100,
+        finaliseRegardlessAfter: 1683885139353,
+        startTime: 1683280357523,
+      };
 
-    await initialiseMLSMigrationFlow(mockedMigrationConfig, allConversations, {
-      conversationRepository: repositories.conversation,
-      isConversationOwnedBySelfTeam: ({team_id}) => !!selfUser.teamId && team_id === selfUser.teamId,
-    });
+      const allConversations = conversationState.conversations();
+
+      await initialiseMLSMigrationFlow(mlsMigrationFeature.config, allConversations, {
+        conversationRepository: repositories.conversation,
+        isConversationOwnedBySelfTeam: ({team_id}) => !!selfUser.teamId && team_id === selfUser.teamId,
+      });
+    }
   };
 
   useEffect(() => {

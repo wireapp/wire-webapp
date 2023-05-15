@@ -18,6 +18,7 @@
  */
 
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {FeatureMLSMigrationConfig} from '@wireapp/api-client/lib/team';
 import {registerRecurringTask} from '@wireapp/core/lib/util/RecurringTaskScheduler';
 import {container} from 'tsyringe';
 
@@ -35,14 +36,6 @@ import {mlsMigrationLogger} from './MLSMigrationLogger';
 
 import {isMLSSupportedByEnvironment} from '../isMLSSupportedByEnvironment';
 
-//FIXME: This will not live here, it will be part of team features config once it's implemented on backend
-interface MLSMigrationConfig {
-  startTime: number; //migrtion start timestamp
-  finaliseRegardlessAfter: number; //timestamp of the date until the migration has to finalise
-  usersThreshold: number; //percentage of migrated users needed for migration to finalize (0-100)
-  clientsThreshold: number; ////percentage of migrated clients needed for migration to finalize (0-100)
-}
-
 const MIGRATION_TASK_KEY = 'mls-migration';
 
 /**
@@ -55,7 +48,7 @@ const MIGRATION_TASK_KEY = 'mls-migration';
  * @param isConversationOwnedBySelfTeam - callback that checks if the provided conversation is owned by a self team
  */
 export const initialiseMLSMigrationFlow = async (
-  migrationConfig: MLSMigrationConfig,
+  migrationConfig: FeatureMLSMigrationConfig,
   conversations: Conversation[],
   {
     conversationRepository,
