@@ -162,7 +162,11 @@ export const PrimaryModalComponent: FC = () => {
               {(messageHtml || messageText) && (
                 <div className="modal__text" data-uie-name="status-modal-text">
                   {messageHtml && <p id="modal-description-html" dangerouslySetInnerHTML={{__html: messageHtml}} />}
-                  {messageText && <p id="modal-description-text">{messageText}</p>}
+                  {messageText && (
+                    <p id="modal-description-text" className="modal-description">
+                      {messageText}
+                    </p>
+                  )}
                 </div>
               )}
 

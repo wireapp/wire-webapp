@@ -24,6 +24,7 @@ import {
   DefaultConversationRoleName as DefaultRole,
   NewConversation,
   MessageSendingStatus,
+  RemoteConversations,
 } from '@wireapp/api-client/lib/conversation/';
 import {ConversationReceiptModeUpdateData} from '@wireapp/api-client/lib/conversation/data/';
 import {CONVERSATION_TYPING} from '@wireapp/api-client/lib/conversation/data/ConversationTypingData';
@@ -290,6 +291,10 @@ export class ConversationRepository {
 
     this.conversationRoleRepository = new ConversationRoleRepository(this.teamRepository, this.conversationService);
     this.leaveCall = noop;
+
+    if (this.core.backendFeatures.isFederated) {
+      this.scheduleMissingUsersAndConversationsMetadataRefresh();
+    }
   }
 
   checkMessageTimer(messageEntity: ContentMessage): void {
@@ -466,6 +471,32 @@ export class ConversationRepository {
     await this.userRepository.refreshUsers(unavailableUsers.map(user => user.qualifiedId));
   }
 
+  private async refreshAllConversationsUnavailableParticipants(): Promise<void> {
+    const allUnavailableUsers = this.conversationState
+      .conversations()
+      .flatMap(conversation => conversation.allUserEntities().filter(user => !user.isAvailable()));
+
+    if (!allUnavailableUsers.length) {
+      return;
+    }
+    await this.userRepository.refreshUsers(allUnavailableUsers.map(user => user.qualifiedId));
+  }
+
+  /**
+   * Refresh missing conversations and unavailable users metadata every 3 hours
+   * @Note Federation only
+   */
+  private readonly scheduleMissingUsersAndConversationsMetadataRefresh = () => {
+    window.setInterval(async () => {
+      try {
+        await this.loadMissingConversations();
+        await this.refreshAllConversationsUnavailableParticipants();
+      } catch (error) {
+        this.logger.warn(`failed to refresh missing users & conversations metat data`, error);
+      }
+    }, TIME_IN_MILLIS.HOUR * 3);
+  };
+
   /**
    * Create a guest room.
    */
@@ -515,27 +546,77 @@ export class ConversationRepository {
 
   /**
    * Will load all the conversations in memory
-   * @returns all the load conversations from backend merged with the locally stored conversations
+   * @returns all the conversations from backend merged with the locally stored conversations and loaded into memory
    */
   public async loadConversations(): Promise<Conversation[]> {
     const remoteConversationsPromise = this.conversationService.getAllConversations().catch(error => {
       this.logger.error(`Failed to get all conversations from backend: ${error.message}`);
-      return {found: []};
+      return {found: []} as RemoteConversations;
     });
 
     const [localConversations, remoteConversations] = await Promise.all([
       this.conversationService.loadConversationStatesFromDb<ConversationDatabaseData>(),
       remoteConversationsPromise,
     ]);
+    return this.loadRemoteConversations(remoteConversations, localConversations);
+  }
+
+  /**
+   * Will try to fetch and load all the missing conversations in memory
+   * @returns all the missing conversations freshly fetched from backend appended to the locally stored conversations
+   */
+  public async loadMissingConversations(): Promise<Conversation[]> {
+    const missingConversations = this.conversationState.missingConversations;
+    if (!missingConversations.length) {
+      return this.conversationState.conversations();
+    }
+    const remoteConversations = await this.conversationService
+      .getConversationByIds(missingConversations)
+      .catch(error => {
+        this.logger.error(`Failed to get all conversations from backend: ${error.message}`);
+        return {found: [], failed: missingConversations} as RemoteConversations;
+      });
+    return this.loadRemoteConversations(remoteConversations);
+  }
+
+  /**
+   * Will append the new conversations from backend to the locally stored conversations in memory
+   * @param remoteConversations new conversations fetched from backend
+   * @param localConversations conversations locally stored in database, but not in memory. Omitted after first loading of the app
+   * @returns the new conversations from backend merged with the locally stored conversations
+   */
+  private async loadRemoteConversations(
+    remoteConversations: RemoteConversations,
+    localConversations: ConversationDatabaseData[] = [],
+  ): Promise<Conversation[]> {
+    const {missingConversations} = this.conversationState;
     let conversationsData: any[];
+
+    if (remoteConversations.failed?.length) {
+      missingConversations.push(...remoteConversations.failed);
+    }
+
     if (!remoteConversations.found?.length) {
       conversationsData = localConversations;
     } else {
-      const data = ConversationMapper.mergeConversation(localConversations, remoteConversations);
+      const data = ConversationMapper.mergeConversations(localConversations, remoteConversations);
       conversationsData = (await this.conversationService.saveConversationsInDb(data)) as any[];
     }
-    const conversationEntities = this.mapConversations(conversationsData);
-    this.saveConversations(conversationEntities);
+
+    const allConversationEntities = this.mapConversations(conversationsData);
+    const newConversationEntities = allConversationEntities.filter(
+      allConversations =>
+        !this.conversationState
+          .conversations()
+          .some(storedConversations => storedConversations.id === allConversations.id),
+    );
+    this.saveConversations(newConversationEntities);
+
+    const remainingMissingConversations = missingConversations.filter(missingConversationsId =>
+      newConversationEntities.some(conversation => conversation.id !== missingConversationsId.id),
+    );
+    this.conversationState.missingConversations = [...new Set(remainingMissingConversations)];
+
     return this.conversationState.conversations();
   }
 

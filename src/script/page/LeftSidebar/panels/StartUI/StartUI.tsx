@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -90,6 +90,10 @@ const StartUI: React.FC<StartUIProps> = ({
     canCreateGuestRoom,
     canCreateGroupConversation,
   } = generatePermissionHelpers(selfUser.teamRole());
+
+  useEffect(() => {
+    void conversationRepository.loadMissingConversations();
+  }, [conversationRepository]);
 
   const actions = mainViewModel.actions;
   const isTeam = teamState.isTeam();
