@@ -165,8 +165,8 @@ export class App {
    * @param apiClient Configured backend client
    */
   constructor(
-    public readonly core: Core,
-    public readonly apiClient: APIClient,
+    private readonly core: Core,
+    private readonly apiClient: APIClient,
     private readonly config: Configuration,
   ) {
     this.config = config;

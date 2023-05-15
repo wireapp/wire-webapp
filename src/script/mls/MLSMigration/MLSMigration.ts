@@ -19,6 +19,7 @@
 
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {registerRecurringTask} from '@wireapp/core/lib/util/RecurringTaskScheduler';
+import {container} from 'tsyringe';
 
 import {APIClient} from '@wireapp/api-client';
 import {Account} from '@wireapp/core';
@@ -26,6 +27,8 @@ import {Account} from '@wireapp/core';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {groupConversationsByProtocol} from 'src/script/conversation/groupConversationsByProtocol';
 import {Conversation} from 'src/script/entity/Conversation';
+import {APIClient as APIClientSingleton} from 'src/script/service/APIClientSingleton';
+import {Core as CoreSingleton} from 'src/script/service/CoreSingleton';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {mlsMigrationLogger} from './MLSMigrationLogger';
@@ -55,17 +58,16 @@ export const initialiseMLSMigrationFlow = async (
   migrationConfig: MLSMigrationConfig,
   conversations: Conversation[],
   {
-    core,
-    apiClient,
     conversationRepository,
     isConversationOwnedBySelfTeam,
   }: {
-    core: Account;
-    apiClient: APIClient;
     conversationRepository: ConversationRepository;
     isConversationOwnedBySelfTeam: (conversation: Conversation) => boolean;
   },
 ) => {
+  const core = container.resolve(CoreSingleton);
+  const apiClient = container.resolve(APIClientSingleton);
+
   return periodicallyCheckMigrationConfig(
     migrationConfig,
     () =>

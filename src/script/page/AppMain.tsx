@@ -208,8 +208,6 @@ const AppMain: FC<AppMainProps> = ({
     const allConversations = conversationState.conversations();
 
     await initialiseMLSMigrationFlow(mockedMigrationConfig, allConversations, {
-      core: app.core,
-      apiClient: app.apiClient,
       conversationRepository: repositories.conversation,
       isConversationOwnedBySelfTeam: ({team_id}) => !!selfUser.teamId && team_id === selfUser.teamId,
     });
