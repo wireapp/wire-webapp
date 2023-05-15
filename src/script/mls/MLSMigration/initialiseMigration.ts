@@ -22,6 +22,7 @@ import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {APIClient} from '@wireapp/api-client';
 import {Account} from '@wireapp/core';
 
+import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {ProteusConversation} from 'src/script/conversation/ConversationSelectors';
 
 import {mlsMigrationLogger} from './MLSMigrationLogger';
@@ -31,13 +32,15 @@ export const initialiseMigrationOfProteusConversations = async (
   {
     core,
     apiClient,
+    conversationRepository,
   }: {
     core: Account;
     apiClient: APIClient;
+    conversationRepository: ConversationRepository;
   },
 ) => {
   for (const proteusConversation of proteusConversations) {
-    await initialiseMigrationOfProteusConversation(proteusConversation, {core, apiClient});
+    await initialiseMigrationOfProteusConversation(proteusConversation, {core, apiClient, conversationRepository});
   }
 };
 
@@ -46,9 +49,11 @@ const initialiseMigrationOfProteusConversation = async (
   {
     core,
     apiClient,
+    conversationRepository,
   }: {
     core: Account;
     apiClient: APIClient;
+    conversationRepository: ConversationRepository;
   },
 ) => {
   mlsMigrationLogger.info(
@@ -63,7 +68,10 @@ const initialiseMigrationOfProteusConversation = async (
     );
 
     //refetch the conversation to get all new fields including groupId, epoch and new protocol
-    await apiClient.api.conversation.getConversation(proteusConversation.qualifiedId);
+    const remoteConversationData = await apiClient.api.conversation.getConversation(proteusConversation.qualifiedId);
+
+    await conversationRepository.updateConversationLocally(proteusConversation.id, remoteConversationData);
+
     //create MLS group with derived groupId
   } catch (error) {
     mlsMigrationLogger.error(

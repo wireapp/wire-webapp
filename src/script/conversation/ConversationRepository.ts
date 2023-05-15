@@ -18,6 +18,7 @@
  */
 
 import {
+  Conversation as ConversationBackendData,
   Conversation as BackendConversation,
   ConversationProtocol,
   CONVERSATION_TYPE,
@@ -25,7 +26,7 @@ import {
   NewConversation,
   MessageSendingStatus,
   RemoteConversations,
-} from '@wireapp/api-client/lib/conversation/';
+} from '@wireapp/api-client/lib/conversation';
 import {ConversationReceiptModeUpdateData} from '@wireapp/api-client/lib/conversation/data/';
 import {CONVERSATION_TYPING} from '@wireapp/api-client/lib/conversation/data/ConversationTypingData';
 import {
@@ -618,6 +619,52 @@ export class ConversationRepository {
     this.conversationState.missingConversations = [...new Set(remoteConversations.failed)];
 
     return this.conversationState.conversations();
+  }
+
+  /**
+   * Will refresh the conversation in memory (database and observable state) with the updated data from backend
+   * @param conversationId id of the conversation to refresh
+   * @param remoteConversationData updated data of the conversation
+   * @returns the updated conversation entity
+   */
+  public async updateConversationLocally(conversationId: string, remoteConversationData: ConversationBackendData) {
+    const localConversation = await this.conversationService.loadConversation<ConversationDatabaseData>(conversationId);
+
+    if (!localConversation) {
+      throw new ConversationError(
+        ConversationError.TYPE.CONVERSATION_NOT_FOUND,
+        ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
+      );
+    }
+
+    //merge the local conversation with the remote conversation data
+    const mergedConversation = ConversationMapper.mergeSingleConversation(localConversation, remoteConversationData);
+
+    //save the merged conversation in database
+    const conversationRecords = await this.conversationService.saveConversationsInDb([mergedConversation]);
+
+    //map the conversation record (db response) to conversation entity
+    const [updatedConversation] = this.mapConversations(conversationRecords as any[]); //FIXME: remove any
+
+    //make sure conversation exists in memory, get its reference and replace it with the updated conversation
+    const existingConversation = this.conversationState
+      .conversations()
+      .find(conversation => matchQualifiedIds(conversation, updatedConversation));
+
+    if (!existingConversation) {
+      throw new ConversationError(
+        ConversationError.TYPE.CONVERSATION_NOT_FOUND,
+        ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
+      );
+    }
+
+    this.conversationState.conversations.replace(existingConversation, updatedConversation);
+
+    //check if conversation was active and if so, update the active conversation
+    if (this.conversationState.isActiveConversation(existingConversation)) {
+      this.conversationState.activeConversation(updatedConversation);
+    }
+    return updatedConversation;
   }
 
   public async updateConversationStates(conversationsDataArray: ConversationRecord[]) {

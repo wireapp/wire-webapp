@@ -23,6 +23,7 @@ import {registerRecurringTask} from '@wireapp/core/lib/util/RecurringTaskSchedul
 import {APIClient} from '@wireapp/api-client';
 import {Account} from '@wireapp/core';
 
+import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {groupConversationsByProtocol} from 'src/script/conversation/groupConversationsByProtocol';
 import {Conversation} from 'src/script/entity/Conversation';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -57,16 +58,24 @@ export const initialiseMLSMigrationFlow = async (
   {
     core,
     apiClient,
+    conversationRepository,
     isConversationOwnedBySelfTeam,
   }: {
     core: Account;
     apiClient: APIClient;
+    conversationRepository: ConversationRepository;
     isConversationOwnedBySelfTeam: (conversation: Conversation) => boolean;
   },
 ) => {
   return periodicallyCheckMigrationConfig(
     migrationConfig,
-    () => migrateConversationsToMLS(conversations, {isConversationOwnedBySelfTeam, apiClient, core}),
+    () =>
+      migrateConversationsToMLS(conversations, {
+        isConversationOwnedBySelfTeam,
+        apiClient,
+        core,
+        conversationRepository,
+      }),
     {core, apiClient},
   );
 };
@@ -129,10 +138,12 @@ const migrateConversationsToMLS = async (
   {
     apiClient,
     core,
+    conversationRepository,
     isConversationOwnedBySelfTeam,
   }: {
     apiClient: APIClient;
     core: Account;
+    conversationRepository: ConversationRepository;
     isConversationOwnedBySelfTeam: (conversation: Conversation) => boolean;
   },
 ) => {
@@ -146,7 +157,7 @@ const migrateConversationsToMLS = async (
 
   const {proteus: proteusConversations} = groupConversationsByProtocol(regularGroupConversations);
 
-  await initialiseMigrationOfProteusConversations(proteusConversations, {core, apiClient});
+  await initialiseMigrationOfProteusConversations(proteusConversations, {core, apiClient, conversationRepository});
 
   //TODO: implement logic for finalising mixed conversations
 };
