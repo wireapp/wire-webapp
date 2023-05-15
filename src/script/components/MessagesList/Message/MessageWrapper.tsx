@@ -234,6 +234,19 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
   if (message.isCallTimeout()) {
     return <CallTimeoutMessage message={message} />;
   }
+  if (message.isFailedToAddUsersMessage()) {
+    return (
+      <div>
+        {message.qualifiedIds.map(user => (
+          <div key={user.id} style={{color: 'red'}}>
+            <span>{user.id}</span>
+            <span>{user.domain}</span>
+            could not be added
+          </div>
+        ))}
+      </div>
+    );
+  }
   if (message.isSystem()) {
     return <SystemMessage message={message} />;
   }
