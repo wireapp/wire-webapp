@@ -398,14 +398,14 @@ export class CallingViewModel {
         if (conversationEntity.isGroup() && !this.teamState.isConferenceCallingEnabled()) {
           this.showRestrictedConferenceCallingModal();
         } else {
-          handleCallAction(conversationEntity, CALL_TYPE.NORMAL);
+          await handleCallAction(conversationEntity, CALL_TYPE.NORMAL);
         }
       },
       startVideo: async (conversationEntity: Conversation) => {
         if (conversationEntity.isGroup() && !this.teamState.isConferenceCallingEnabled()) {
           this.showRestrictedConferenceCallingModal();
         } else {
-          handleCallAction(conversationEntity, CALL_TYPE.VIDEO);
+          await handleCallAction(conversationEntity, CALL_TYPE.VIDEO);
         }
       },
       switchCameraInput: (call: Call, deviceId: string) => {
