@@ -230,9 +230,11 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
           createNavigate(generateConversationUrl(conversation.qualifiedId))(event);
         }
       } catch (error) {
+        amplify.publish(WebAppEvents.CONVERSATION.SHOW, undefined, {});
         setIsCreatingConversation(false);
         logger.error(error);
       }
+
       setIsShown(false);
     }
   };
