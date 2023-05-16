@@ -105,12 +105,15 @@ export const PeopleTab: React.FC<{
     }
     if (isTeam) {
       return unfiltered
-        ? teamState.teamUsers()
+        ? teamState.teamUsers().filter(user => user.isAvailable())
         : teamState
             .teamUsers()
-            .filter(user => connectedUsers.includes(user) || teamRepository.isSelfConnectedTo(user.id));
+            .filter(
+              user =>
+                (connectedUsers.includes(user) || teamRepository.isSelfConnectedTo(user.id)) && user.isAvailable(),
+            );
     }
-    return userState.connectedUsers();
+    return userState.connectedUsers().filter(user => user.isAvailable());
   };
   const [results, setResults] = useState<SearchResultsData>({contacts: getLocalUsers(), groups: [], others: []});
   const searchOnFederatedDomain = () => '';
