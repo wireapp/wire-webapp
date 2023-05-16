@@ -41,7 +41,6 @@ import {createNavigate, createNavigateKeyboard} from 'src/script/router/routerBi
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleEnterDown, isKeyboardEvent, offEscKey, onEscKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
-import {getLogger} from 'Util/Logger';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {Config} from '../../../Config';
@@ -68,8 +67,6 @@ enum GroupCreationModalState {
   PARTICIPANTS = 'GroupCreationModal.STATE.PARTICIPANTS',
   PREFERENCES = 'GroupCreationModal.STATE.PREFERENCES',
 }
-
-const logger = getLogger('GroupCreationModal');
 
 const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   userState = container.resolve(UserState),
@@ -232,7 +229,6 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
       } catch (error) {
         amplify.publish(WebAppEvents.CONVERSATION.SHOW, undefined, {});
         setIsCreatingConversation(false);
-        logger.error(error);
       }
 
       setIsShown(false);
