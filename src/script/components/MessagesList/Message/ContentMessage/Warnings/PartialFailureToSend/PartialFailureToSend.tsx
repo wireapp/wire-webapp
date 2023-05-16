@@ -83,9 +83,7 @@ export const PartialFailureToSendWarning = ({failedToSend, knownUsers}: Props) =
 
   const {namedUsers, unknownUsers} = generateNamedUsers(knownUsers, queued);
 
-  failed.push(...unknownUsers);
-
-  const unreachableUsers = generateUnreachableUsers(failed);
+  const unreachableUsers = generateUnreachableUsers([...failed, ...unknownUsers]);
 
   const message = {head: '', rest: ''};
   if (showToggle) {
