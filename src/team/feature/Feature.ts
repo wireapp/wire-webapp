@@ -76,8 +76,8 @@ export interface FeatureMLSE2EIdConfig extends FeatureConfig {
 }
 
 export interface FeatureMLSMigrationConfig extends FeatureConfig {
-  startTime?: number;
-  finaliseRegardlessAfter?: number;
+  startTime?: string;
+  finaliseRegardlessAfter?: string;
   usersThreshold?: number;
   clientsThreshold?: number;
 }
