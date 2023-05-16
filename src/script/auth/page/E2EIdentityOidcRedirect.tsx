@@ -34,7 +34,7 @@ const E2EIdentityOidcRedirect = () => {
   };
 
   const core = container.resolve(Core);
-  void core.continueOAuthFlow();
+  void core.continueE2EIEnrollment();
 
   return (
     <div style={{display: 'flex', flexDirection: 'column', padding: '1rem'}}>
