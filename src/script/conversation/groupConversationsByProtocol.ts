@@ -30,37 +30,39 @@ import {
 
 import {Conversation} from '../entity/Conversation';
 
+type ConversationsGroupedByProtocol = {
+  [ConversationProtocol.PROTEUS]: ProteusConversation[];
+  [ConversationProtocol.MIXED]: MixedConversation[];
+  [ConversationProtocol.MLS]: MLSConversation[];
+};
+
 /**
  * Will group the conversations by protocol field and return an object with the grouped conversations
  *
  * @param apiClient -the instance of the apiClient
  * @param core - the instance of the core
  */
-export const groupConversationsByProtocol = (conversations: Conversation[]) => {
-  const groupedConversations: {
-    [ConversationProtocol.PROTEUS]: ProteusConversation[];
-    [ConversationProtocol.MIXED]: MixedConversation[];
-    [ConversationProtocol.MLS]: MLSConversation[];
-  } = {
-    [ConversationProtocol.PROTEUS]: [],
-    [ConversationProtocol.MIXED]: [],
-    [ConversationProtocol.MLS]: [],
-  };
-
-  for (const conversation of conversations) {
-    if (isProteusConversation(conversation)) {
-      groupedConversations[ConversationProtocol.PROTEUS].push(conversation);
-      continue;
-    }
-    if (isMixedConversation(conversation)) {
-      groupedConversations[ConversationProtocol.MIXED].push(conversation);
-      continue;
-    }
-    if (isMLSConversation(conversation)) {
-      groupedConversations[ConversationProtocol.MLS].push(conversation);
-      continue;
-    }
-  }
-
-  return groupedConversations;
+export const groupConversationsByProtocol = (conversations: Conversation[]): ConversationsGroupedByProtocol => {
+  return conversations.reduce<ConversationsGroupedByProtocol>(
+    (acc, conversation) => {
+      if (isProteusConversation(conversation)) {
+        acc[ConversationProtocol.PROTEUS].push(conversation);
+        return acc;
+      }
+      if (isMixedConversation(conversation)) {
+        acc[ConversationProtocol.MIXED].push(conversation);
+        return acc;
+      }
+      if (isMLSConversation(conversation)) {
+        acc[ConversationProtocol.MLS].push(conversation);
+        return acc;
+      }
+      return acc;
+    },
+    {
+      [ConversationProtocol.PROTEUS]: [],
+      [ConversationProtocol.MIXED]: [],
+      [ConversationProtocol.MLS]: [],
+    },
+  );
 };
