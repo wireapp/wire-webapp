@@ -77,6 +77,7 @@ export interface ModalContent {
   secondaryAction: Action[] | Action | null;
   titleText: string;
   closeBtnTitle?: string;
+  showClose?: boolean;
 }
 
 export type ModalItem = {id: string; options: ModalOptions; type: PrimaryModalType};

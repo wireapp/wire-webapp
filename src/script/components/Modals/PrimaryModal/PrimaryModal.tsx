@@ -55,6 +55,7 @@ export const PrimaryModalComponent: FC = () => {
     secondaryAction,
     titleText,
     closeBtnTitle,
+    showClose,
   } = content;
   const hasPassword = currentType === PrimaryModalType.PASSWORD;
   const hasInput = currentType === PrimaryModalType.INPUT;
@@ -142,20 +143,20 @@ export const PrimaryModalComponent: FC = () => {
         {isModalVisible && (
           <>
             <div className="modal__header" data-uie-name="status-modal-title">
-              {titleText && (
-                <h2 className="modal__header__title" id="modal-title">
-                  {titleText}
-                </h2>
+              <h2 className="modal__header__title" id="modal-title">
+                {titleText}
+              </h2>
+              {showClose && (
+                <button
+                  type="button"
+                  className="modal__header__button"
+                  onClick={removeCurrentModal}
+                  aria-label={closeBtnTitle}
+                  data-uie-name="do-close"
+                >
+                  <Icon.Close className="modal__header__icon" aria-hidden="true" />
+                </button>
               )}
-              <button
-                type="button"
-                className="modal__header__button"
-                onClick={removeCurrentModal}
-                aria-label={closeBtnTitle}
-                data-uie-name="do-close"
-              >
-                <Icon.Close className="modal__header__icon" aria-hidden="true" />
-              </button>
             </div>
 
             <FadingScrollbar className="modal__body">
