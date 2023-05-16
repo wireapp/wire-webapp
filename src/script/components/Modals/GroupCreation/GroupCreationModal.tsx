@@ -71,8 +71,6 @@ enum GroupCreationModalState {
 
 const logger = getLogger('GroupCreationModal');
 
-const filterAvailableOnlyUsers = (user: User) => user.isAvailable();
-
 const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
@@ -151,17 +149,19 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   const contacts = useMemo(() => {
     if (showContacts) {
       if (!isTeam) {
-        return userState.connectedUsers().filter(filterAvailableOnlyUsers);
+        return userState.connectedUsers();
       }
 
       if (isGuestEnabled) {
-        return teamState.teamUsers().filter(filterAvailableOnlyUsers);
+        return teamState.teamUsers();
       }
 
-      return teamState.teamMembers().filter(filterAvailableOnlyUsers).sort(sortUsersByPriority);
+      return teamState.teamMembers().sort(sortUsersByPriority);
     }
     return [];
   }, [isGuestEnabled, isTeam, showContacts, teamState, userState]);
+
+  const filteredContacts = contacts.filter(user => user.isAvailable());
 
   useEffect(() => {
     if (stateIsPreferences) {
@@ -368,9 +368,9 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
 
         {stateIsParticipants && (
           <FadingScrollbar className="group-creation__list">
-            {contacts.length > 0 && (
+            {filteredContacts.length > 0 && (
               <UserSearchableList
-                users={contacts}
+                users={filteredContacts}
                 filter={participantsInput}
                 selected={selectedContacts}
                 isSelectable
