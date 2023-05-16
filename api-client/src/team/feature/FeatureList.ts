@@ -26,6 +26,7 @@ import {
   FeatureLegalhold,
   FeatureMLS,
   FeatureMLSE2EId,
+  FeatureMLSMigration,
   FeatureSelfDeletingMessages,
   FeatureSndFactorPassword,
   FeatureVideoCalling,
@@ -44,6 +45,7 @@ export enum FEATURE_KEY {
   LEGALHOLD = 'legalhold',
   MLS = 'mls',
   MLSE2EID = 'mlsE2EId',
+  MLS_MIGRATION = 'mlsMigration',
   SEARCH_VISIBILITY = 'searchVisibility',
   SELF_DELETING_MESSAGES = 'selfDeletingMessages',
   SND_FACTOR_PASSWORD = 'sndFactorPasswordChallenge',
@@ -66,6 +68,7 @@ export type FeatureList = {
   [FEATURE_KEY.SSO]?: FeatureWithoutConfig;
   [FEATURE_KEY.MLS]?: FeatureMLS;
   [FEATURE_KEY.MLSE2EID]?: FeatureMLSE2EId;
+  [FEATURE_KEY.MLS_MIGRATION]?: FeatureMLSMigration;
   [FEATURE_KEY.VALIDATE_SAML_EMAILS]?: FeatureWithoutConfig;
   [FEATURE_KEY.VIDEO_CALLING]?: FeatureVideoCalling;
 };

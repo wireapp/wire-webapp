@@ -31,6 +31,7 @@ import {
   FeatureSndFactorPassword,
   FeatureMLS,
   FeatureMLSE2EId,
+  FeatureMLSMigration,
 } from './Feature';
 import {InvalidAppLockTimeoutError} from './FeatureError';
 import {FeatureList} from './FeatureList';
@@ -57,6 +58,7 @@ export class FeatureAPI {
     SSO: 'sso',
     MLS: 'mls',
     MLSE2EID: 'mlsE2EId',
+    MLS_MIGRATION: 'mlsMigration',
     TEAMS: '/teams',
   };
 
@@ -316,6 +318,20 @@ export class FeatureAPI {
     };
 
     const response = await this.client.sendJSON<FeatureMLSE2EId>(config);
+    return response.data;
+  }
+
+  public async putMLSMigrationFeature(
+    teamId: string,
+    mlsMigrationFeature: Omit<FeatureMLSMigration, 'lockStatus'>,
+  ): Promise<FeatureMLSMigration> {
+    const config: AxiosRequestConfig = {
+      data: mlsMigrationFeature,
+      method: 'put',
+      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.MLS_MIGRATION}`,
+    };
+
+    const response = await this.client.sendJSON<FeatureMLSMigration>(config);
     return response.data;
   }
 
