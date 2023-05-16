@@ -997,6 +997,13 @@ export class ConversationRepository {
   }
 
   /**
+   * Get all the conversations from memory.
+   */
+  public getLocalConversations(): Conversation[] {
+    return this.conversationState.conversations();
+  }
+
+  /**
    * Get group conversations by name.
    *
    * @param query Query to be searched in group conversation names

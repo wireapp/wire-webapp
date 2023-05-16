@@ -18,7 +18,7 @@
  */
 
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
-import {FeatureMLSMigrationConfig} from '@wireapp/api-client/lib/team';
+import {FeatureStatus} from '@wireapp/api-client/lib/team';
 import {registerRecurringTask} from '@wireapp/core/lib/util/RecurringTaskScheduler';
 import {container} from 'tsyringe';
 
@@ -30,6 +30,7 @@ import {groupConversationsByProtocol} from 'src/script/conversation/groupConvers
 import {Conversation} from 'src/script/entity/Conversation';
 import {APIClient as APIClientSingleton} from 'src/script/service/APIClientSingleton';
 import {Core as CoreSingleton} from 'src/script/service/CoreSingleton';
+import {TeamState} from 'src/script/team/TeamState';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {mlsMigrationLogger} from './MLSMigrationLogger';
@@ -47,46 +48,44 @@ const MIGRATION_TASK_KEY = 'mls-migration';
  * @param apiClient - the instance of the apiClient
  * @param isConversationOwnedBySelfTeam - callback that checks if the provided conversation is owned by a self team
  */
-export const initialiseMLSMigrationFlow = async (
-  migrationConfig: FeatureMLSMigrationConfig,
-  conversations: Conversation[],
-  {
-    conversationRepository,
-    isConversationOwnedBySelfTeam,
-  }: {
-    conversationRepository: ConversationRepository;
-    isConversationOwnedBySelfTeam: (conversation: Conversation) => boolean;
-  },
-) => {
+export const initialiseMLSMigrationFlow = async ({
+  teamState,
+  conversationRepository,
+  isConversationOwnedBySelfTeam,
+}: {
+  teamState: TeamState;
+  conversationRepository: ConversationRepository;
+  isConversationOwnedBySelfTeam: (conversation: Conversation) => boolean;
+}) => {
   const core = container.resolve(CoreSingleton);
   const apiClient = container.resolve(APIClientSingleton);
 
   return periodicallyCheckMigrationConfig(
-    migrationConfig,
     () =>
-      migrateConversationsToMLS(conversations, {
+      migrateConversationsToMLS({
         isConversationOwnedBySelfTeam,
         apiClient,
         core,
         conversationRepository,
       }),
-    {core, apiClient},
+    {core, apiClient, teamState},
   );
 };
 
 const periodicallyCheckMigrationConfig = async (
-  migrationConfig: MLSMigrationConfig,
   onMigrationStartTimeArrived: () => Promise<void>,
   {
     core,
     apiClient,
+    teamState,
   }: {
     core: Account;
     apiClient: APIClient;
+    teamState: TeamState;
   },
 ) => {
   const checkMigrationConfigTask = () =>
-    checkMigrationConfig(migrationConfig, onMigrationStartTimeArrived, {core, apiClient});
+    checkMigrationConfig(onMigrationStartTimeArrived, {core, apiClient, teamState});
 
   // We check the migration config immediately (on app load) and every 24 hours
   await checkMigrationConfigTask();
@@ -99,48 +98,73 @@ const periodicallyCheckMigrationConfig = async (
 };
 
 const checkMigrationConfig = async (
-  migrationConfig: MLSMigrationConfig,
   onMigrationStartTimeArrived: () => Promise<void>,
   {
     core,
     apiClient,
+    teamState,
   }: {
     core: Account;
     apiClient: APIClient;
+    teamState: TeamState;
   },
 ) => {
-  mlsMigrationLogger.info('MLS migration feature enabled, checking the configuration...');
   const isMLSSupportedByEnv = await isMLSSupportedByEnvironment({core, apiClient});
 
   if (!isMLSSupportedByEnv) {
-    mlsMigrationLogger.error('MLS migration feature is enabled but MLS is not supported by the environment.');
+    return;
+  }
+  //at this point we know that MLS is supported by environment, we can check MLS migration config
+  //fetch current mls migration feature config from memory
+  let mlsMigrationFeature = teamState.teamFeatures().mlsMigration;
+
+  //FIXME: remove this when we have a proper config from the backend
+  mlsMigrationFeature = {
+    config: {
+      clientsThreshold: 100,
+      usersThreshold: 100,
+      finaliseRegardlessAfter: 1683885139353,
+      startTime: 1683280357523,
+    },
+    status: FeatureStatus.ENABLED,
+  };
+
+  if (!mlsMigrationFeature || mlsMigrationFeature.status === FeatureStatus.DISABLED) {
+    mlsMigrationLogger.info('MLS migration feature is disabled, will retry in 24 hours or on next app reload.');
     return;
   }
 
-  //at this point we know that MLS is supported by environment, we can check MLS migration config
-  //check if migration startTime has arrived
-  const hasStartTimeArrived = Date.now() >= migrationConfig.startTime;
+  mlsMigrationLogger.info('MLS migration feature enabled, checking the configuration...');
+
+  //if startTime is not defined, we never start the migration, will retry in 24 hours or on next app reload
+  const startTime = mlsMigrationFeature.config.startTime || Infinity;
+  const hasStartTimeArrived = Date.now() >= startTime;
+
   if (!hasStartTimeArrived) {
-    mlsMigrationLogger.error('MLS migration start time has not arrived yet, will retry in 24 hours or on app reload.');
+    mlsMigrationLogger.info(
+      'MLS migration start time has not arrived yet, will retry in 24 hours or on next app reload.',
+    );
   }
 
+  mlsMigrationLogger.info(
+    'MLS migration start time has arrived, will start the migration process for all the conversations.',
+  );
   return onMigrationStartTimeArrived();
 };
 
-const migrateConversationsToMLS = async (
-  conversations: Conversation[],
-  {
-    apiClient,
-    core,
-    conversationRepository,
-    isConversationOwnedBySelfTeam,
-  }: {
-    apiClient: APIClient;
-    core: Account;
-    conversationRepository: ConversationRepository;
-    isConversationOwnedBySelfTeam: (conversation: Conversation) => boolean;
-  },
-) => {
+const migrateConversationsToMLS = async ({
+  apiClient,
+  core,
+  conversationRepository,
+  isConversationOwnedBySelfTeam,
+}: {
+  apiClient: APIClient;
+  core: Account;
+  conversationRepository: ConversationRepository;
+  isConversationOwnedBySelfTeam: (conversation: Conversation) => boolean;
+}) => {
+  const conversations = conversationRepository.getLocalConversations();
+
   //TODO: implement logic for 1on1 conversations (both team owned and federated)
   const regularGroupConversations = conversations.filter(
     conversation =>
