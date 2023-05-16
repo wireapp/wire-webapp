@@ -36,6 +36,7 @@ import {CallTimeoutMessage} from './CallTimeoutMessage';
 import {ContentMessageComponent} from './ContentMessage';
 import {DecryptErrorMessage} from './DecryptErrorMessage';
 import {DeleteMessage} from './DeleteMessage';
+import {FailedToAddUsersMessage} from './FailedToAddUsersMessage';
 import {FileTypeRestrictedMessage} from './FileTypeRestrictedMessage';
 import {LegalHoldMessage} from './LegalHoldMessage';
 import {MemberMessage} from './MemberMessage';
@@ -235,17 +236,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
     return <CallTimeoutMessage message={message} />;
   }
   if (message.isFailedToAddUsersMessage()) {
-    return (
-      <div>
-        {message.qualifiedIds.map(user => (
-          <div key={user.id} style={{color: 'red'}}>
-            <span>{user.id}</span>
-            <span>{user.domain}</span>
-            could not be added
-          </div>
-        ))}
-      </div>
-    );
+    return <FailedToAddUsersMessage message={message} />;
   }
   if (message.isSystem()) {
     return <SystemMessage message={message} />;
