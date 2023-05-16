@@ -143,9 +143,11 @@ export const PrimaryModalComponent: FC = () => {
         {isModalVisible && (
           <>
             <div className="modal__header" data-uie-name="status-modal-title">
-              <h2 className="modal__header__title" id="modal-title">
-                {titleText}
-              </h2>
+              {titleText && (
+                <h2 className="modal__header__title" id="modal-title">
+                  {titleText}
+                </h2>
+              )}
               {showClose && (
                 <button
                   type="button"
