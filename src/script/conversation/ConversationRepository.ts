@@ -558,16 +558,11 @@ export class ConversationRepository {
    * @returns all the conversations from backend merged with the locally stored conversations and loaded into memory
    */
   public async loadConversations(): Promise<Conversation[]> {
-    const remoteConversationsPromise = this.conversationService.getAllConversations().catch(error => {
+    const remoteConversations = await this.conversationService.getAllConversations().catch(error => {
       this.logger.error(`Failed to get all conversations from backend: ${error.message}`);
       return {found: []} as RemoteConversations;
     });
-
-    const [localConversations, remoteConversations] = await Promise.all([
-      this.conversationService.loadConversationStatesFromDb<ConversationDatabaseData>(),
-      remoteConversationsPromise,
-    ]);
-    return this.loadRemoteConversations(remoteConversations, localConversations);
+    return this.loadRemoteConversations(remoteConversations);
   }
 
   /**
@@ -591,19 +586,11 @@ export class ConversationRepository {
   /**
    * Will append the new conversations from backend to the locally stored conversations in memory
    * @param remoteConversations new conversations fetched from backend
-   * @param localConversations conversations locally stored in database, but not in memory. Omitted after first loading of the app
    * @returns the new conversations from backend merged with the locally stored conversations
    */
-  private async loadRemoteConversations(
-    remoteConversations: RemoteConversations,
-    localConversations: ConversationDatabaseData[] = [],
-  ): Promise<Conversation[]> {
-    const {missingConversations} = this.conversationState;
+  private async loadRemoteConversations(remoteConversations: RemoteConversations): Promise<Conversation[]> {
+    const localConversations = await this.conversationService.loadConversationStatesFromDb<ConversationDatabaseData>();
     let conversationsData: any[];
-
-    if (remoteConversations.failed?.length) {
-      missingConversations.push(...remoteConversations.failed);
-    }
 
     if (!remoteConversations.found?.length) {
       conversationsData = localConversations;
@@ -619,12 +606,11 @@ export class ConversationRepository {
           .conversations()
           .some(storedConversations => storedConversations.id === allConversations.id),
     );
-    this.saveConversations(newConversationEntities);
+    if (newConversationEntities.length) {
+      this.saveConversations(newConversationEntities);
+    }
 
-    const remainingMissingConversations = missingConversations.filter(missingConversationsId =>
-      newConversationEntities.some(conversation => conversation.id !== missingConversationsId.id),
-    );
-    this.conversationState.missingConversations = [...new Set(remainingMissingConversations)];
+    this.conversationState.missingConversations = [...new Set(remoteConversations.failed)];
 
     return this.conversationState.conversations();
   }
