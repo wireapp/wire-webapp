@@ -40,12 +40,10 @@ import {isMLSSupportedByEnvironment} from '../isMLSSupportedByEnvironment';
 const MIGRATION_TASK_KEY = 'mls-migration';
 
 /**
- * Will check the config of migration feature and try to initialise/finalise the migration on provided conversations.
+ * Will check the config of MLS migration feature and if the start time has arrived, will start (continue) the migration process based on the current state of the conversations and feature config.
  *
- * @param migrationConfig - the config of the MLS migration feature
- * @param conversations - all the conversations that the user is part of
- * @param core - the instance of the core
- * @param apiClient - the instance of the apiClient
+ * @param teamState - team state
+ * @param conversationRepository - conversation repository
  * @param isConversationOwnedBySelfTeam - callback that checks if the provided conversation is owned by a self team
  */
 export const initialiseMLSMigrationFlow = async ({
