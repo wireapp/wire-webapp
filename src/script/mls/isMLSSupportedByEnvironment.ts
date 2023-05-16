@@ -44,9 +44,7 @@ export const isMLSSupportedByEnvironment = async ({core, apiClient}: {core: Acco
   let isBackendRemovalKeyPresent = false;
   try {
     const backendRemovalKey = (await apiClient.api.client.getPublicKeys()).removal;
-    if (backendRemovalKey) {
-      isBackendRemovalKeyPresent = true;
-    }
+    isBackendRemovalKeyPresent = !!backendRemovalKey;
   } catch {}
 
   return isBackendRemovalKeyPresent;
