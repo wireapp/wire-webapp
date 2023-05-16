@@ -223,7 +223,6 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
             receipt_mode: enableReadReceipts ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF,
           },
         );
-        setIsShown(false);
 
         if (isKeyboardEvent(event)) {
           createNavigateKeyboard(generateConversationUrl(conversation.qualifiedId), true)(event);
@@ -231,9 +230,12 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
           createNavigate(generateConversationUrl(conversation.qualifiedId))(event);
         }
       } catch (error) {
+        amplify.publish(WebAppEvents.CONVERSATION.SHOW, undefined, {});
         setIsCreatingConversation(false);
         logger.error(error);
       }
+
+      setIsShown(false);
     }
   };
 
