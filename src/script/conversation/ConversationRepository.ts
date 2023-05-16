@@ -40,8 +40,7 @@ import {
   ConversationTypingEvent,
   CONVERSATION_EVENT,
 } from '@wireapp/api-client/lib/event';
-import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
-import type {BackendError} from '@wireapp/api-client/lib/http/';
+import {BackendErrorLabel, BackendError} from '@wireapp/api-client/lib/http/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {MLSReturnType} from '@wireapp/core/lib/conversation';
 import {amplify} from 'amplify';
@@ -462,10 +461,13 @@ export class ConversationRepository {
       switch (error.label) {
         case BackendErrorLabel.CLIENT_ERROR:
           this.handleTooManyMembersError();
+          break;
         case BackendErrorLabel.NOT_CONNECTED:
           await this.handleUsersNotConnected(userEntities.map(user => user.qualifiedId));
+          break;
         case BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT:
           this.showLegalHoldConsentError();
+          break;
         default:
           throw error;
       }
