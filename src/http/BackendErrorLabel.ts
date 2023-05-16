@@ -147,4 +147,5 @@ export enum SyntheticErrorLabel {
   UNKNOWN = 'unknown-error',
   TOO_MANY_REQUESTS = 'too-many-requests',
   EMAIL_REQUIRED = 'email-required',
+  INVALID_URL_FORMAT = 'invalid-url-format',
 }
