@@ -40,7 +40,8 @@ import {
   ConversationTypingEvent,
   CONVERSATION_EVENT,
 } from '@wireapp/api-client/lib/event';
-import {BackendErrorLabel, BackendError} from '@wireapp/api-client/lib/http/';
+import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
+import type {BackendError} from '@wireapp/api-client/lib/http/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {MLSReturnType} from '@wireapp/core/lib/conversation';
 import {amplify} from 'amplify';
