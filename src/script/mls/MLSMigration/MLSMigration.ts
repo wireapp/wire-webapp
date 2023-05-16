@@ -121,8 +121,8 @@ const checkMigrationConfig = async (
     config: {
       clientsThreshold: 100,
       usersThreshold: 100,
-      finaliseRegardlessAfter: 1683885139353,
-      startTime: 1683280357523,
+      finaliseRegardlessAfter: '2025-05-16T09:25:27.123Z',
+      startTime: '2023-05-16T13:17:32.739Z',
     },
     status: FeatureStatus.ENABLED,
   };
@@ -135,7 +135,8 @@ const checkMigrationConfig = async (
   mlsMigrationLogger.info('MLS migration feature enabled, checking the configuration...');
 
   //if startTime is not defined, we never start the migration, will retry in 24 hours or on next app reload
-  const startTime = mlsMigrationFeature.config.startTime || Infinity;
+  const startDateISO = mlsMigrationFeature.config.startTime;
+  const startTime = (startDateISO && Date.parse(startDateISO)) || Infinity;
   const hasStartTimeArrived = Date.now() >= startTime;
 
   if (!hasStartTimeArrived) {

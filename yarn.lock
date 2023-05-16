@@ -5263,9 +5263,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^24.12.0":
-  version: 24.12.0
-  resolution: "@wireapp/api-client@npm:24.12.0"
+"@wireapp/api-client@npm:^24.13.0":
+  version: 24.13.0
+  resolution: "@wireapp/api-client@npm:24.13.0"
   dependencies:
     "@wireapp/commons": ^5.1.0
     "@wireapp/priority-queue": ^2.1.1
@@ -5278,7 +5278,7 @@ __metadata:
     spark-md5: 3.0.2
     tough-cookie: 4.1.2
     ws: 8.11.0
-  checksum: d8ac9cc47d2c9b7a82a28863346aca69f75370afd4a05d6bb8e2dbb3668b72a1f7263d652453e1810bb7d0dde2447db62c9a27d68fb48f8e1c49c9eb323e2fb4
+  checksum: 3121e8ec777328432e715cbd947d1a1014a1c590eccaded029ad85b9e5c6c86e48d654a6e4dd61dc4dea0a59479c52932b3602681555f44a592db79f44ef0a1c
   languageName: node
   linkType: hard
 
@@ -5324,20 +5324,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core-crypto@npm:0.7.0-rc.4":
-  version: 0.7.0-rc.4
-  resolution: "@wireapp/core-crypto@npm:0.7.0-rc.4"
-  checksum: 20beaa17648a069042445506aaf63e61164972b5ddbb1891c21ef919bda1c6dd5e36a9186945e0ac5b176cc59e3e5fbba4efedc96cefa66e123a86d4cc1e598b
+"@wireapp/core-crypto@npm:0.8.2":
+  version: 0.8.2
+  resolution: "@wireapp/core-crypto@npm:0.8.2"
+  checksum: f28a44ed5c4adba56453cd6a62813d6ba433b9ee2143522a741c52f5581aca86de3296b0afe4011fc1d5d5cf76d7afda747bb2171c7c129ba73d3b15087a4e99
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:40.2.5":
-  version: 40.2.5
-  resolution: "@wireapp/core@npm:40.2.5"
+"@wireapp/core@npm:40.2.6":
+  version: 40.2.6
+  resolution: "@wireapp/core@npm:40.2.6"
   dependencies:
-    "@wireapp/api-client": ^24.12.0
+    "@wireapp/api-client": ^24.13.0
     "@wireapp/commons": ^5.1.0
-    "@wireapp/core-crypto": 0.7.0-rc.4
+    "@wireapp/core-crypto": 0.8.2
     "@wireapp/cryptobox": 12.8.0
     "@wireapp/promise-queue": ^2.2.0
     "@wireapp/protocol-messaging": 1.44.0
@@ -5352,7 +5352,7 @@ __metadata:
     logdown: 3.3.1
     long: ^5.2.0
     uuidjs: 4.2.13
-  checksum: f1e6cbb7fe4f4216d2a27511fc46d64443525c3e3b1cb7904f5169b0b64a70c2115f3264ac9ae31f29e650e32ef39277575798b96cb017c6c4d71f9124f4d998
+  checksum: 2da7941e0d32407a9b8a69acf94838849a3267684f2fb8bdab2d4845535057aa5eefce858ce7f840cfd68ee915f6e59572bb3c85477b7cdd838e62354c5852fa
   languageName: node
   linkType: hard
 
@@ -18085,7 +18085,7 @@ dexie@latest:
     "@typescript-eslint/parser": ^5.59.5
     "@wireapp/avs": 9.2.13
     "@wireapp/copy-config": 2.1.0
-    "@wireapp/core": 40.2.5
+    "@wireapp/core": 40.2.6
     "@wireapp/eslint-config": 2.2.0
     "@wireapp/lru-cache": 3.8.1
     "@wireapp/prettier-config": 0.6.0
