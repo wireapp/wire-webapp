@@ -223,7 +223,6 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
             receipt_mode: enableReadReceipts ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF,
           },
         );
-        setIsShown(false);
 
         if (isKeyboardEvent(event)) {
           createNavigateKeyboard(generateConversationUrl(conversation.qualifiedId), true)(event);
@@ -234,6 +233,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
         setIsCreatingConversation(false);
         logger.error(error);
       }
+      setIsShown(false);
     }
   };
 
