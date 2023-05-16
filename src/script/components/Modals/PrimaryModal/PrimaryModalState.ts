@@ -129,7 +129,7 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
     primaryAction,
     secondaryAction,
     hideSecondary,
-    showClose = false,
+    hideCloseBtn = false,
     text = {} as Text,
   } = options;
 
@@ -146,7 +146,7 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
     onBgClick: preventClose ? noop : removeCurrentModal,
     primaryAction: primaryAction ?? null,
     secondaryAction: secondaryAction ?? null,
-    showClose,
+    hideCloseBtn,
     titleText: text.title ?? '',
   };
 

@@ -46,7 +46,7 @@ export interface ModalOptions {
   primaryAction?: Action;
   /** Called when secondary action in modal is triggered */
   secondaryAction?: Action[] | Action;
-  showClose?: boolean;
+  hideCloseBtn?: boolean;
   text?: Text;
 }
 
@@ -77,7 +77,7 @@ export interface ModalContent {
   secondaryAction: Action[] | Action | null;
   titleText: string;
   closeBtnTitle?: string;
-  showClose?: boolean;
+  hideCloseBtn?: boolean;
 }
 
 export type ModalItem = {id: string; options: ModalOptions; type: PrimaryModalType};

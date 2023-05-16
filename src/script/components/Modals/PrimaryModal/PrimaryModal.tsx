@@ -55,7 +55,7 @@ export const PrimaryModalComponent: FC = () => {
     secondaryAction,
     titleText,
     closeBtnTitle,
-    showClose,
+    hideCloseBtn = false,
   } = content;
   const hasPassword = currentType === PrimaryModalType.PASSWORD;
   const hasInput = currentType === PrimaryModalType.INPUT;
@@ -148,7 +148,7 @@ export const PrimaryModalComponent: FC = () => {
                   {titleText}
                 </h2>
               )}
-              {showClose && (
+              {!hideCloseBtn && (
                 <button
                   type="button"
                   className="modal__header__button"
