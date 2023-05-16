@@ -71,6 +71,8 @@ enum GroupCreationModalState {
 
 const logger = getLogger('GroupCreationModal');
 
+const filterAvailableOnlyUsers = (user: User) => user.isAvailable();
+
 const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
@@ -149,14 +151,14 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   const contacts = useMemo(() => {
     if (showContacts) {
       if (!isTeam) {
-        return userState.connectedUsers();
+        return userState.connectedUsers().filter(filterAvailableOnlyUsers);
       }
 
       if (isGuestEnabled) {
-        return teamState.teamUsers();
+        return teamState.teamUsers().filter(filterAvailableOnlyUsers);
       }
 
-      return teamState.teamMembers().sort(sortUsersByPriority);
+      return teamState.teamMembers().filter(filterAvailableOnlyUsers).sort(sortUsersByPriority);
     }
     return [];
   }, [isGuestEnabled, isTeam, showContacts, teamState, userState]);
