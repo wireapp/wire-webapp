@@ -85,7 +85,7 @@ describe('PrimaryModal', () => {
   });
 
   it('shows close button by default', async () => {
-    const {container} = render(<PrimaryModalComponent />);
+    const {getByTestId} = render(<PrimaryModalComponent />);
 
     act(() => {
       PrimaryModal.show(PrimaryModal.type.CONFIRM, {
@@ -103,13 +103,14 @@ describe('PrimaryModal', () => {
         },
       });
     });
-    const closeButton = container.querySelector('button[data-uie-name="do-close"]');
+    const closeButton = getByTestId('do-close');
 
     expect(closeButton).toBeTruthy();
   });
 
   it('hides close button when hideCloseBtn is true', async () => {
-    const {container} = render(<PrimaryModalComponent />);
+    const {queryByTestId} = render(<PrimaryModalComponent />);
+
     act(() => {
       PrimaryModal.show(PrimaryModal.type.CONFIRM, {
         primaryAction: {
@@ -127,7 +128,8 @@ describe('PrimaryModal', () => {
         hideCloseBtn: true,
       });
     });
-    const closeButton = container.querySelector('button[data-uie-name="do-close"]');
+    const closeButton = queryByTestId('do-close');
+
     expect(closeButton).toBeFalsy();
   });
 });
