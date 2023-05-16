@@ -100,20 +100,21 @@ export const PeopleTab: React.FC<{
 
   const {connectedUsers} = useKoSubscribableChildren(conversationState, ['connectedUsers']);
   const getLocalUsers = (unfiltered?: boolean) => {
+    const contacts = () => {
+      if (isTeam) {
+        return unfiltered
+          ? teamState.teamUsers()
+          : teamState
+              .teamUsers()
+              .filter(user => connectedUsers.includes(user) || teamRepository.isSelfConnectedTo(user.id));
+      }
+      return userState.connectedUsers();
+    };
+
     if (!canSearchUnconnectedUsers) {
       return connectedUsers;
     }
-    if (isTeam) {
-      return unfiltered
-        ? teamState.teamUsers().filter(user => user.isAvailable())
-        : teamState
-            .teamUsers()
-            .filter(
-              user =>
-                (connectedUsers.includes(user) || teamRepository.isSelfConnectedTo(user.id)) && user.isAvailable(),
-            );
-    }
-    return userState.connectedUsers().filter(user => user.isAvailable());
+    return contacts().filter(user => user.isAvailable());
   };
   const [results, setResults] = useState<SearchResultsData>({contacts: getLocalUsers(), groups: [], others: []});
   const searchOnFederatedDomain = () => '';
