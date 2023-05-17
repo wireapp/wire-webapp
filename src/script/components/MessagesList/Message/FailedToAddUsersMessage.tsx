@@ -22,7 +22,7 @@ import React, {useMemo, useState} from 'react';
 import {container} from 'tsyringe';
 import {groupBy} from 'underscore';
 
-import {Button, ButtonVariant, COLOR_V2, Link, LinkVariant} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 import {Icon} from 'Components/Icon';
 import {Config} from 'src/script/Config';
@@ -75,7 +75,7 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
         href={config.URL.SUPPORT.USER_ADD_FAILURE}
         data-uie-name="go-contact-support"
         style={{
-          color: COLOR_V2.BLUE_LIGHT_500,
+          color: 'var(--blue-500)',
           fontSize: '0.75rem',
           fontWeight: 600,
           textDecoration: 'underline',
