@@ -39,6 +39,12 @@ import {isMLSSupportedByEnvironment} from '../isMLSSupportedByEnvironment';
 
 const MIGRATION_TASK_KEY = 'mls-migration';
 
+interface InitialiseMLSMigrationFlowParams {
+  teamState: TeamState;
+  conversationRepository: ConversationRepository;
+  isConversationOwnedBySelfTeam: (conversation: Conversation) => boolean;
+}
+
 /**
  * Will check the config of MLS migration feature and if the start time has arrived, will start (continue) the migration process based on the current state of the conversations and feature config.
  *
@@ -50,11 +56,7 @@ export const initialiseMLSMigrationFlow = async ({
   teamState,
   conversationRepository,
   isConversationOwnedBySelfTeam,
-}: {
-  teamState: TeamState;
-  conversationRepository: ConversationRepository;
-  isConversationOwnedBySelfTeam: (conversation: Conversation) => boolean;
-}) => {
+}: InitialiseMLSMigrationFlowParams) => {
   const core = container.resolve(CoreSingleton);
   const apiClient = container.resolve(APIClientSingleton);
 
@@ -70,17 +72,15 @@ export const initialiseMLSMigrationFlow = async ({
   );
 };
 
+interface CheckMigrationConfigParams {
+  core: Account;
+  apiClient: APIClient;
+  teamState: TeamState;
+}
+
 const periodicallyCheckMigrationConfig = async (
   onMigrationStartTimeArrived: () => Promise<void>,
-  {
-    core,
-    apiClient,
-    teamState,
-  }: {
-    core: Account;
-    apiClient: APIClient;
-    teamState: TeamState;
-  },
+  {core, apiClient, teamState}: CheckMigrationConfigParams,
 ) => {
   const checkMigrationConfigTask = () =>
     checkMigrationConfig(onMigrationStartTimeArrived, {core, apiClient, teamState});
@@ -97,15 +97,7 @@ const periodicallyCheckMigrationConfig = async (
 
 const checkMigrationConfig = async (
   onMigrationStartTimeArrived: () => Promise<void>,
-  {
-    core,
-    apiClient,
-    teamState,
-  }: {
-    core: Account;
-    apiClient: APIClient;
-    teamState: TeamState;
-  },
+  {core, apiClient, teamState}: CheckMigrationConfigParams,
 ) => {
   const isMLSSupportedByEnv = await isMLSSupportedByEnvironment({core, apiClient});
 
@@ -151,17 +143,19 @@ const checkMigrationConfig = async (
   return onMigrationStartTimeArrived();
 };
 
+interface MigrateConversationsToMLSParams {
+  apiClient: APIClient;
+  core: Account;
+  conversationRepository: ConversationRepository;
+  isConversationOwnedBySelfTeam: (conversation: Conversation) => boolean;
+}
+
 const migrateConversationsToMLS = async ({
   apiClient,
   core,
   conversationRepository,
   isConversationOwnedBySelfTeam,
-}: {
-  apiClient: APIClient;
-  core: Account;
-  conversationRepository: ConversationRepository;
-  isConversationOwnedBySelfTeam: (conversation: Conversation) => boolean;
-}) => {
+}: MigrateConversationsToMLSParams) => {
   const conversations = conversationRepository.getLocalConversations();
 
   //TODO: implement logic for 1on1 conversations (both team owned and federated)
