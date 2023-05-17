@@ -20,6 +20,8 @@
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {create} from 'zustand';
 
+import {isMLSConversation} from 'src/script/conversation/ConversationSelectors';
+
 import {loadState, saveState} from './conversationStateStorage';
 
 import {Conversation} from '../../entity/Conversation';
@@ -56,7 +58,10 @@ export const useMLSConversationState = create<StoreState>((set, get) => {
   return {
     established: initialState.established,
     filterEstablishedConversations: conversations =>
-      conversations.filter(conversation => !conversation.groupId || get().isEstablished(conversation.groupId)),
+      conversations.filter(conversation => {
+        const isMLS = isMLSConversation(conversation);
+        return !isMLS || get().isEstablished(conversation.groupId);
+      }),
 
     isEstablished: groupId => get().established.has(groupId),
 
