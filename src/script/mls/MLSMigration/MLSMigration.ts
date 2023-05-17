@@ -19,6 +19,7 @@
 
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {FeatureStatus} from '@wireapp/api-client/lib/team';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {registerRecurringTask} from '@wireapp/core/lib/util/RecurringTaskScheduler';
 import {container} from 'tsyringe';
 
@@ -33,7 +34,7 @@ import {Core as CoreSingleton} from 'src/script/service/CoreSingleton';
 import {TeamState} from 'src/script/team/TeamState';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
-import {initialiseMigrationOfProteusConversations} from './initialiseMigration';
+import {initialiseMigrationOfProteusConversations} from './initialiseMigration/initialiseMigration';
 import {mlsMigrationLogger} from './MLSMigrationLogger';
 
 import {isMLSSupportedByEnvironment} from '../isMLSSupportedByEnvironment';
@@ -44,6 +45,7 @@ interface InitialiseMLSMigrationFlowParams {
   teamState: TeamState;
   conversationRepository: ConversationRepository;
   isConversationOwnedBySelfTeam: (conversation: Conversation) => boolean;
+  selfUserId: QualifiedId;
 }
 
 /**
@@ -57,6 +59,7 @@ export const initialiseMLSMigrationFlow = async ({
   teamState,
   conversationRepository,
   isConversationOwnedBySelfTeam,
+  selfUserId,
 }: InitialiseMLSMigrationFlowParams) => {
   const core = container.resolve(CoreSingleton);
   const apiClient = container.resolve(APIClientSingleton);
@@ -68,6 +71,7 @@ export const initialiseMLSMigrationFlow = async ({
         apiClient,
         core,
         conversationRepository,
+        selfUserId,
       }),
     {core, apiClient, teamState},
   );
@@ -147,6 +151,7 @@ const checkMigrationConfig = async (
 interface MigrateConversationsToMLSParams {
   apiClient: APIClient;
   core: Account;
+  selfUserId: QualifiedId;
   conversationRepository: ConversationRepository;
   isConversationOwnedBySelfTeam: (conversation: Conversation) => boolean;
 }
@@ -154,6 +159,7 @@ interface MigrateConversationsToMLSParams {
 const migrateConversationsToMLS = async ({
   apiClient,
   core,
+  selfUserId,
   conversationRepository,
   isConversationOwnedBySelfTeam,
 }: MigrateConversationsToMLSParams) => {
@@ -170,7 +176,12 @@ const migrateConversationsToMLS = async ({
   //TODO: it returns a map of protocol -> conversations, we need to iterate over it and continue with the migration based on the protocol
   const {proteus: proteusConversations} = groupConversationsByProtocol(regularGroupConversations);
 
-  await initialiseMigrationOfProteusConversations(proteusConversations, {core, apiClient, conversationRepository});
+  await initialiseMigrationOfProteusConversations(proteusConversations, {
+    core,
+    apiClient,
+    conversationRepository,
+    selfUserId,
+  });
 
   //TODO: implement logic for init and finalise the migration
 };
