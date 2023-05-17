@@ -117,7 +117,6 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
           {!isEditingName ? (
             <div
               className="conversation-details__name"
-              title={t('tooltipConversationDetailsRename')}
               data-uie-name="status-name"
               {...(canRenameGroup && {
                 onClick: clickToEditGroupName,
@@ -130,7 +129,7 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
                   className="conversation-details__name__edit-icon"
                   aria-label={t('tooltipConversationDetailsRename')}
                 >
-                  <Icon.Edit aria-hidden="true" />
+                  <Icon.Edit />
                 </button>
               )}
             </div>
