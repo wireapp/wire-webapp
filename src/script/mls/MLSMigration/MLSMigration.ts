@@ -33,6 +33,7 @@ import {Core as CoreSingleton} from 'src/script/service/CoreSingleton';
 import {TeamState} from 'src/script/team/TeamState';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
+import {initialiseMigrationOfProteusConversations} from './initialiseMigration';
 import {mlsMigrationLogger} from './MLSMigrationLogger';
 
 import {isMLSSupportedByEnvironment} from '../isMLSSupportedByEnvironment';
@@ -167,7 +168,9 @@ const migrateConversationsToMLS = async ({
   );
 
   //TODO: it returns a map of protocol -> conversations, we need to iterate over it and continue with the migration based on the protocol
-  groupConversationsByProtocol(regularGroupConversations);
+  const {proteus: proteusConversations} = groupConversationsByProtocol(regularGroupConversations);
+
+  await initialiseMigrationOfProteusConversations(proteusConversations, {core, apiClient, conversationRepository});
 
   //TODO: implement logic for init and finalise the migration
 };
