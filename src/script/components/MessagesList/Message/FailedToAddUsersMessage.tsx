@@ -98,7 +98,11 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
             <Icon.Info />
           </div>
         </div>
-        <div className="message-header-label" data-uie-name="element-message-failed-to-add-users">
+        <div
+          className="message-header-label"
+          data-uie-name="element-message-failed-to-add-users"
+          data-uie-value={total <= 1 ? '1-user-not-added' : 'multi-users-not-added'}
+        >
           <p
             css={warning}
             dangerouslySetInnerHTML={{
@@ -119,7 +123,7 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
         {isOpen && (
           <>
             {total <= 1 && (
-              <p>
+              <p data-uie-name="1-user-not-added-details" data-uie-value={users[0].id}>
                 <span
                   css={warning}
                   dangerouslySetInnerHTML={{
@@ -131,7 +135,7 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
             )}
             {total > 1 &&
               Object.entries(groupedUsers).map(([domain, domainUsers]) => (
-                <p key={domain}>
+                <p key={domain} data-uie-name="multi-user-not-added-details" data-uie-value={domain}>
                   <span
                     css={warning}
                     dangerouslySetInnerHTML={{
@@ -150,7 +154,12 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
               ))}
           </>
         )}
-        <Button type="button" variant={ButtonVariant.TERTIARY} onClick={() => setIsOpen(state => !state)}>
+        <Button
+          data-uie-name="toggle-failed-to-add-users"
+          type="button"
+          variant={ButtonVariant.TERTIARY}
+          onClick={() => setIsOpen(state => !state)}
+        >
           {isOpen ? t('messageFailedToSendHideDetails') : t('messageFailedToSendShowDetails')}
         </Button>
       </div>
