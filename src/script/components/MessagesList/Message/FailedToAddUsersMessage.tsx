@@ -55,10 +55,7 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
   const [users, total, groupedUsers] = useMemo(() => {
     const users: User[] = message.qualifiedIds.reduce<User[]>((previous, current) => {
       const foundUser = allUsers.find(user => matchQualifiedIds(current, user.qualifiedId));
-      if (foundUser) {
-        return [...previous, foundUser];
-      }
-      return previous;
+      return foundUser ? [...previous, foundUser] : previous;
     }, []);
     const groupedUsers = groupBy(users, user => user.domain);
     const total = users.length;
