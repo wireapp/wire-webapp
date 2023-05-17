@@ -126,8 +126,11 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
               {displayName && <span className="conversation-details__name">{displayName}</span>}
 
               {canRenameGroup && (
-                <button className="conversation-details__name__edit-icon">
-                  <Icon.Edit />
+                <button
+                  className="conversation-details__name__edit-icon"
+                  aria-label={t('tooltipConversationDetailsRename')}
+                >
+                  <Icon.Edit aria-hidden="true" />
                 </button>
               )}
             </div>
