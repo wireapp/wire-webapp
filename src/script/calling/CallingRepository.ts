@@ -1192,36 +1192,34 @@ export class CallingRepository {
     url: string,
     data: string,
     _dataLength: number,
-    _: number,
+    __: number,
   ): number => {
-    (async () => {
-      try {
-        const response = await axios.post(url, data);
-
-        const {status, data: axiosData} = response;
-        const jsonData = JSON.stringify(axiosData);
-        this.wCall?.sftResp(this.wUser!, status, jsonData, jsonData.length, context);
-      } catch (error) {
-        const message = error instanceof Error ? error.message : error;
-        this.avsLogHandler(LOG_LEVEL.WARN, `Request to sft server failed with error: ${message}`, error);
-        avsLogger.warn(`Request to sft server failed with error`, error);
-      }
-    })();
+    const _sendSFTRequest = async () => {
+      const response = await axios.post(url, data);
+      const {status, data: axiosData} = response;
+      const jsonData = JSON.stringify(axiosData);
+      this.wCall?.sftResp(this.wUser!, status, jsonData, jsonData.length, context);
+    };
+    const avsSftResponseFailedCode = 1000;
+    _sendSFTRequest().catch(error => {
+      this.avsLogHandler(LOG_LEVEL.WARN, `Request to sft server failed with error: ${error?.message}`, error);
+      avsLogger.warn(`Request to sft server failed with error`, error);
+      this.wCall?.sftResp(this.wUser!, avsSftResponseFailedCode, '', 0, context);
+    });
 
     return 0;
   };
 
   private readonly requestConfig = () => {
-    (async () => {
+    const _requestConfig = async () => {
       const limit = Runtime.isFirefox() ? CallingRepository.CONFIG.MAX_FIREFOX_TURN_COUNT : undefined;
-      try {
-        const config = await this.fetchConfig(limit);
-        this.wCall?.configUpdate(this.wUser, 0, JSON.stringify(config));
-      } catch (error) {
-        this.logger.warn('Failed fetching calling config', error);
-        this.wCall?.configUpdate(this.wUser, 1, '');
-      }
-    })();
+      const config = await this.fetchConfig(limit);
+      this.wCall?.configUpdate(this.wUser, 0, JSON.stringify(config));
+    };
+    _requestConfig().catch(error => {
+      this.logger.warn('Failed fetching calling config', error);
+      this.wCall?.configUpdate(this.wUser, 1, '');
+    });
 
     return 0;
   };
@@ -1486,7 +1484,7 @@ export class CallingRepository {
     this.callParticipantChangedCallback(conversationId, members);
   };
 
-  private readonly requestClients = async (wUser: number, convId: SerializedConversationId, _: number) => {
+  private readonly requestClients = async (wUser: number, convId: SerializedConversationId, __: number) => {
     const call = this.findCall(this.parseQualifiedId(convId));
     if (!call) {
       this.logger.warn(`Unable to find a call for the conversation id of ${convId}`);
@@ -1565,12 +1563,14 @@ export class CallingRepository {
       }
     })();
 
-    this.mediaStreamQuery.then(() => {
-      const selfParticipant = call.getSelfParticipant();
-      if (selfParticipant.videoState() === VIDEO_STATE.STOPPED) {
-        selfParticipant.releaseVideoStream(true);
-      }
-    });
+    this.mediaStreamQuery
+      .then(() => {
+        const selfParticipant = call.getSelfParticipant();
+        if (selfParticipant.videoState() === VIDEO_STATE.STOPPED) {
+          selfParticipant.releaseVideoStream(true);
+        }
+      })
+      .catch(this.logger.warn);
     return this.mediaStreamQuery;
   };
 

@@ -261,9 +261,6 @@ export type Env = {
   /** Adds additional CSP object-src entries */
   CSP_EXTRA_OBJECT_SRC: string;
 
-  /** Adds additional CSP prefetch-src entries */
-  CSP_EXTRA_PREFETCH_SRC: string;
-
   /** Adds additional CSP script-src entries */
   CSP_EXTRA_SCRIPT_SRC: string;
 

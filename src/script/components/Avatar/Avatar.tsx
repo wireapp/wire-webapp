@@ -20,7 +20,7 @@
 import {FC, HTMLProps, MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent} from 'react';
 
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleKeyDown} from 'Util/KeyboardUtil';
+import {handleKeyDown, isKeyboardEvent} from 'Util/KeyboardUtil';
 
 import {PlaceholderAvatar} from './PlaceholderAvatar';
 import {ServiceAvatar} from './ServiceAvatar';
@@ -95,7 +95,7 @@ const Avatar: FC<AvatarProps> = ({
   ) => {
     const parentNode = event.currentTarget.parentNode;
     if (parentNode) {
-      if ('key' in event) {
+      if (isKeyboardEvent(event)) {
         handleKeyDown(event, () => onAvatarClick?.(participant));
         return;
       }

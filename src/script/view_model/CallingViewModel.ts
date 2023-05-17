@@ -88,7 +88,7 @@ declare global {
     setSinkId?: (sinkId: string) => Promise<void>;
   }
 }
-
+const maxGroupSize = 4;
 export class CallingViewModel {
   readonly activeCalls: ko.PureComputed<Call[]>;
   readonly callActions: CallActions;
@@ -331,6 +331,30 @@ export class CallingViewModel {
       }
     };
 
+    const handleCallAction = async (conversationEntity: Conversation, callType: CALL_TYPE): Promise<void> => {
+      const memberCount = conversationEntity.participating_user_ets().length;
+      if (memberCount > maxGroupSize) {
+        PrimaryModal.show(PrimaryModal.type.WITHOUT_TITLE, {
+          preventClose: true,
+          primaryAction: {
+            action: async () => await startCall(conversationEntity, callType),
+            text: t('groupCallModalPrimaryBtnName'),
+          },
+          secondaryAction: {
+            text: t('modalConfirmSecondary'),
+          },
+          text: {
+            htmlMessage: `<div class="modal-description">
+            ${t('groupCallConfirmationModalTitle', memberCount)}
+          </div>`,
+            closeBtnLabel: t('groupCallModalCloseBtnLabel'),
+          },
+        });
+      } else {
+        await startCall(conversationEntity, callType);
+      }
+    };
+
     //update epoch info when AVS requests new epoch
     this.callingRepository.onRequestNewEpochCallback(conversationId => updateEpochInfo(conversationId, true));
 
@@ -374,14 +398,14 @@ export class CallingViewModel {
         if (conversationEntity.isGroup() && !this.teamState.isConferenceCallingEnabled()) {
           this.showRestrictedConferenceCallingModal();
         } else {
-          await startCall(conversationEntity, CALL_TYPE.NORMAL);
+          await handleCallAction(conversationEntity, CALL_TYPE.NORMAL);
         }
       },
       startVideo: async (conversationEntity: Conversation) => {
         if (conversationEntity.isGroup() && !this.teamState.isConferenceCallingEnabled()) {
           this.showRestrictedConferenceCallingModal();
         } else {
-          await startCall(conversationEntity, CALL_TYPE.VIDEO);
+          await handleCallAction(conversationEntity, CALL_TYPE.VIDEO);
         }
       },
       switchCameraInput: (call: Call, deviceId: string) => {
