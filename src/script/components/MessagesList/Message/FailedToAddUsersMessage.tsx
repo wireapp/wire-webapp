@@ -75,7 +75,7 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
       <Link
         targetBlank
         variant={LinkVariant.PRIMARY}
-        href={config.URL.SUPPORT.CONTACT}
+        href={config.URL.SUPPORT.USER_ADD_FAILURE}
         data-uie-name="go-contact-support"
         style={{
           color: COLOR_V2.BLUE_LIGHT_500,
