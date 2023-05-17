@@ -47,5 +47,5 @@ export const messageReactionEmoji: CSSObject = {
 };
 
 export const reactionImgSize = {
-  width: '0.75rem',
+  width: 'var(--font-size-base)',
 };

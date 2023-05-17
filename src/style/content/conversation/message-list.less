@@ -97,6 +97,17 @@
   }
 }
 
+.content-message-wrapper {
+  &:hover,
+  &:focus-visible {
+    background-color: #fff;
+
+    body.theme-dark & {
+      background-color: var(--gray-90);
+    }
+  }
+}
+
 .message-marked {
   .time {
     background-color: transparent;
@@ -281,17 +292,6 @@
 
 .message-wrapper {
   outline-offset: -0.1rem;
-}
-
-.message-wrapper {
-  &:hover,
-  &:focus-visible {
-    background-color: #fff;
-
-    body.theme-dark & {
-      background-color: var(--gray-90);
-    }
-  }
 }
 
 .message-mention {
