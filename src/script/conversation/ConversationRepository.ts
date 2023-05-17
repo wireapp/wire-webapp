@@ -25,7 +25,7 @@ import {
   NewConversation,
   MessageSendingStatus,
   RemoteConversations,
-} from '@wireapp/api-client/lib/conversation/';
+} from '@wireapp/api-client/lib/conversation';
 import {ConversationReceiptModeUpdateData} from '@wireapp/api-client/lib/conversation/data/';
 import {CONVERSATION_TYPING} from '@wireapp/api-client/lib/conversation/data/ConversationTypingData';
 import {
@@ -994,6 +994,13 @@ export class ConversationRepository {
 
       throw error;
     }
+  }
+
+  /**
+   * Get all the conversations from memory.
+   */
+  public getLocalConversations(): Conversation[] {
+    return this.conversationState.conversations();
   }
 
   /**
