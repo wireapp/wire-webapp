@@ -21,9 +21,12 @@ import {render, fireEvent, act} from '@testing-library/react';
 
 import {PrimaryModalComponent} from './PrimaryModal';
 
-import {PrimaryModal} from '.';
+import {PrimaryModal, removeCurrentModal} from '.';
 
 describe('PrimaryModal', () => {
+  beforeEach(() => {
+    removeCurrentModal();
+  });
   it('does not render when no item is in the queue', async () => {
     const {getByTestId} = render(<PrimaryModalComponent />);
     const PrimaryModalWrapper = getByTestId('primary-modals-container');
@@ -79,5 +82,54 @@ describe('PrimaryModal', () => {
     fireEvent.click(secondaryActionButton);
 
     expect(secondaryActionCallback).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows close button by default', async () => {
+    const {getByTestId} = render(<PrimaryModalComponent />);
+
+    act(() => {
+      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+        primaryAction: {
+          action: () => {},
+          text: 'test-text',
+        },
+        secondaryAction: {
+          action: () => {},
+          text: 'secondary-text',
+        },
+        text: {
+          message: 'test-message',
+          title: 'test-title',
+        },
+      });
+    });
+    const closeButton = getByTestId('do-close');
+
+    expect(closeButton).toBeTruthy();
+  });
+
+  it('hides close button when hideCloseBtn is true', async () => {
+    const {queryByTestId} = render(<PrimaryModalComponent />);
+
+    act(() => {
+      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+        primaryAction: {
+          action: () => {},
+          text: 'test-text2',
+        },
+        secondaryAction: {
+          action: () => {},
+          text: 'secondary-text',
+        },
+        text: {
+          message: 'test-message',
+          title: 'test-title',
+        },
+        hideCloseBtn: true,
+      });
+    });
+    const closeButton = queryByTestId('do-close');
+
+    expect(closeButton).toBeFalsy();
   });
 });
