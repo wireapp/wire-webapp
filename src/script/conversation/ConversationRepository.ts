@@ -2291,6 +2291,9 @@ export class ConversationRepository {
       case CONVERSATION_EVENT.TYPING:
         return this.onTyping(conversationEntity, eventJson);
 
+      case CONVERSATION_EVENT.PROTOCOL_UPDATE:
+        return this.onProtocolUpdate(conversationEntity, eventJson);
+
       case CONVERSATION_EVENT.RENAME:
         return this.onRename(conversationEntity, eventJson, eventSource === EventRepository.SOURCE.WEB_SOCKET);
 
@@ -2327,7 +2330,6 @@ export class ConversationRepository {
         return this.addEventToConversation(conversationEntity, eventJson);
 
       case CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE:
-      case CONVERSATION_EVENT.PROTOCOL_UPDATE:
       case ClientEvent.CONVERSATION.COMPOSITE_MESSAGE_ADD:
       case ClientEvent.CONVERSATION.DELETE_EVERYWHERE:
       case ClientEvent.CONVERSATION.FILE_TYPE_RESTRICTED:
@@ -2969,6 +2971,17 @@ export class ConversationRepository {
     const {messageEntity} = await this.addEventToConversation(conversationEntity, eventJson);
     ConversationMapper.updateProperties(conversationEntity, eventJson.data);
     return {conversationEntity, messageEntity};
+  }
+
+  /**
+   * Conversation protocol was updated.
+   *
+   * @param conversation Conversation that has updated protocol
+   * @param eventJson JSON data of 'conversation.protocol-update' event
+   * @returns Resolves when the event was handled
+   */
+  private async onProtocolUpdate(conversation: Conversation, eventJson: ConversationProtocolUpdateEvent) {
+    return this.addEventToConversation(conversation, eventJson);
   }
 
   /**

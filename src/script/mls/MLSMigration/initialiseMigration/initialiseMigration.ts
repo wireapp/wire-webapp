@@ -79,7 +79,7 @@ const initialiseMigrationOfProteusConversation = async (
 
   try {
     //change the conversation protocol to mixed
-    await apiClient.api.conversation.putConversationProtocol(
+    const conversationProtocolUpdateResponse = await apiClient.api.conversation.putConversationProtocol(
       proteusConversation.qualifiedId,
       ConversationProtocol.MIXED,
     );
@@ -152,6 +152,10 @@ const initialiseMigrationOfProteusConversation = async (
     mlsMigrationLogger.info(
       `Added ${usersToAdd.length} users to MLS Group for conversation ${updatedConversation.qualifiedId.id}.`,
     );
+
+    if (conversationProtocolUpdateResponse) {
+      await conversationRepository.injectConversationProtocolUpdate(conversationProtocolUpdateResponse);
+    }
   } catch (error) {
     mlsMigrationLogger.error(
       `Error while initialising MLS migration for "proteus" conversation: ${proteusConversation.qualifiedId.id}`,
