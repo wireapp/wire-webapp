@@ -19,13 +19,13 @@
 
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {KeyPackageClaimUser} from '@wireapp/core/lib/conversation';
 
 import {Account} from '@wireapp/core';
 
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {ProteusConversation, isMixedConversation} from 'src/script/conversation/ConversationSelectors';
 
+import {addMixedConversationMembersToMLSGroup} from '../addMixedConversationMembersToMLSGroup';
 import {mlsMigrationLogger} from '../MLSMigrationLogger';
 
 interface InitialiseMigrationOfProteusConversationParams {
@@ -34,6 +34,14 @@ interface InitialiseMigrationOfProteusConversationParams {
   selfUserId: QualifiedId;
 }
 
+/**
+ * Will initialise MLS migration for provided proteus conversations.
+ *
+ * @param proteusConversations - proteus conversations to initialise MLS migration for
+ * @param core - instance of core
+ * @param conversationRepository - conversation repository
+ * @param selfUserId - id of the current (self) user
+ */
 export const initialiseMigrationOfProteusConversations = async (
   proteusConversations: ProteusConversation[],
   {core, conversationRepository, selfUserId}: InitialiseMigrationOfProteusConversationParams,
@@ -62,28 +70,28 @@ const initialiseMigrationOfProteusConversation = async (
 
   try {
     //update conversation protocol on both backend and local store
-    const updatedConversation = await conversationRepository.updateConversationProtocol(
+    const updatedMixedConversation = await conversationRepository.updateConversationProtocol(
       proteusConversation,
       ConversationProtocol.MIXED,
     );
 
     //we have to make sure that conversation's protocol is mixed and it contains groupId
-    if (!isMixedConversation(updatedConversation)) {
-      throw new Error(`Conversation ${updatedConversation.qualifiedId.id} was not updated to mixed protocol.`);
+    if (!isMixedConversation(updatedMixedConversation)) {
+      throw new Error(`Conversation ${updatedMixedConversation.qualifiedId.id} was not updated to mixed protocol.`);
     }
 
     //create MLS group with derived groupId
-    const {mls: mlsService, conversation: conversationService} = core.service || {};
-    if (!mlsService || !conversationService) {
-      throw new Error('MLS and Conversation services are not available!');
+    const {mls: mlsService} = core.service || {};
+    if (!mlsService) {
+      throw new Error('MLS service is not available!');
     }
 
-    const {participating_user_ids, groupId} = updatedConversation;
+    const {groupId} = updatedMixedConversation;
 
-    const doesConversationExist = await mlsService.conversationExists(groupId);
-    if (doesConversationExist) {
+    const isMLSGroupAlreadyEstablished = await mlsService.conversationExists(groupId);
+    if (isMLSGroupAlreadyEstablished) {
       mlsMigrationLogger.info(
-        `MLS Group for conversation ${updatedConversation.qualifiedId.id} already exists, skipping the initialisation.`,
+        `MLS Group for conversation ${updatedMixedConversation.qualifiedId.id} already exists, skipping the initialisation.`,
       );
       return;
     }
@@ -100,29 +108,17 @@ const initialiseMigrationOfProteusConversation = async (
     //we should wait for the welcome message or try joining with external commit later
     if (!groupCreationResponse) {
       mlsMigrationLogger.info(
-        `MLS Group for conversation ${updatedConversation.qualifiedId.id} was not created, wiping the conversation.`,
+        `MLS Group for conversation ${updatedMixedConversation.qualifiedId.id} was not created, wiping the conversation.`,
       );
       await mlsService.wipeConversation(groupId);
       return;
     }
 
     mlsMigrationLogger.info(
-      `MLS Group for conversation ${updatedConversation.qualifiedId.id} was initialised successfully, adding other users...`,
+      `MLS Group for conversation ${updatedMixedConversation.qualifiedId.id} was initialised successfully, adding other users...`,
     );
 
-    //if group was created successfully, we can add other clients to the group (including our own other clients, but skipping current client)
-    const otherUsersToAdd = participating_user_ids();
-    const usersToAdd: KeyPackageClaimUser[] = [...otherUsersToAdd, {...selfUserId, skipOwnClientId: core.clientId}];
-
-    await conversationService.addUsersToMLSConversation({
-      groupId,
-      conversationId: updatedConversation.qualifiedId,
-      qualifiedUsers: usersToAdd,
-    });
-
-    mlsMigrationLogger.info(
-      `Added ${usersToAdd.length} users to MLS Group for conversation ${updatedConversation.qualifiedId.id}.`,
-    );
+    await addMixedConversationMembersToMLSGroup(updatedMixedConversation, {core, selfUserId});
   } catch (error) {
     mlsMigrationLogger.error(
       `Error while initialising MLS migration for "proteus" conversation: ${proteusConversation.qualifiedId.id}`,
