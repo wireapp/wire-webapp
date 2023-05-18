@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [24.14.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@24.13.0...@wireapp/api-client@24.14.0) (2023-05-18)
+
+### Features
+
+* **api-client:** improve conversation protocol put request handler ([#5151](https://github.com/wireapp/wire-web-packages/issues/5151)) ([ab52d8f](https://github.com/wireapp/wire-web-packages/commit/ab52d8f87ea38cf7ffa9eb319223f0f4cddcdccf))
+
 # [24.13.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@24.12.0...@wireapp/api-client@24.13.0) (2023-05-16)
 
 ### Features
