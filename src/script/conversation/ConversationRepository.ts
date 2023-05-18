@@ -1699,6 +1699,39 @@ export class ConversationRepository {
   }
 
   /**
+   * Update conversation protocol
+   * This will update the protocol of the conversation and refetch the conversation to get all new fields (groupId, ciphersuite, epoch and new protocol)
+   * If protocol was updated successfully, conversation protocol update system message will be injected
+   *
+   * @param conversationId id of the conversation
+   * @param protocol new conversation protocol
+   * @returns Resolves with updated conversation entity
+   */
+  public async updateConversationProtocol(
+    conversation: Conversation,
+    protocol: ConversationProtocol.MIXED | ConversationProtocol.MLS,
+  ): Promise<Conversation> {
+    const response = await this.conversationService.updateConversationProtocol(conversation.qualifiedId, protocol);
+    if (response) {
+      await this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
+    }
+
+    //refetch the conversation to get all new fields (groupId, ciphersuite, epoch and new protocol)
+    const remoteConversationData = await this.conversationService.getConversationById(conversation.qualifiedId);
+
+    //update fields that came after protocol update
+    const {cipher_suite: cipherSuite, epoch, group_id: newGroupId, protocol: newProtocol} = remoteConversationData;
+    const updatedConversation = ConversationMapper.updateProperties(conversation, {
+      cipherSuite,
+      epoch,
+      groupId: newGroupId,
+      protocol: newProtocol,
+    });
+
+    return updatedConversation;
+  }
+
+  /**
    * Inject protocol change event into the conversation.
    *
    * @param event - protocol change event to inject

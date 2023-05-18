@@ -24,7 +24,6 @@ import {KeyPackageClaimUser} from '@wireapp/core/lib/conversation';
 import {APIClient} from '@wireapp/api-client';
 import {Account} from '@wireapp/core';
 
-import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {ProteusConversation, isMixedConversation} from 'src/script/conversation/ConversationSelectors';
 
@@ -78,23 +77,11 @@ const initialiseMigrationOfProteusConversation = async (
   );
 
   try {
-    //change the conversation protocol to mixed
-    const conversationProtocolUpdateResponse = await apiClient.api.conversation.putConversationProtocol(
-      proteusConversation.qualifiedId,
+    //update conversation protocol on backend and locally
+    const updatedConversation = await conversationRepository.updateConversationProtocol(
+      proteusConversation,
       ConversationProtocol.MIXED,
     );
-
-    //refetch the conversation to get all new fields including groupId, epoch and new protocol
-    const remoteConversationData = await apiClient.api.conversation.getConversation(proteusConversation.qualifiedId);
-
-    //update fields that came after protocol update
-    const {cipher_suite: cipherSuite, epoch, group_id: newGroupId, protocol} = remoteConversationData;
-    const updatedConversation = ConversationMapper.updateProperties(proteusConversation, {
-      cipherSuite,
-      epoch,
-      groupId: newGroupId,
-      protocol,
-    });
 
     //we have to make sure that conversation's protocol is mixed and it contains groupId
     if (!isMixedConversation(updatedConversation)) {
@@ -152,10 +139,6 @@ const initialiseMigrationOfProteusConversation = async (
     mlsMigrationLogger.info(
       `Added ${usersToAdd.length} users to MLS Group for conversation ${updatedConversation.qualifiedId.id}.`,
     );
-
-    if (conversationProtocolUpdateResponse) {
-      await conversationRepository.injectConversationProtocolUpdate(conversationProtocolUpdateResponse);
-    }
   } catch (error) {
     mlsMigrationLogger.error(
       `Error while initialising MLS migration for "proteus" conversation: ${proteusConversation.qualifiedId.id}`,
