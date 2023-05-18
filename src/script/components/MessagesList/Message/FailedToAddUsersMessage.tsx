@@ -132,7 +132,12 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
             )}
             {total > 1 &&
               Object.entries(groupedUsers).map(([domain, domainUsers]) => (
-                <p key={domain} data-uie-name="multi-user-not-added-details" data-uie-value={domain}>
+                <p
+                  key={domain}
+                  data-uie-name="multi-user-not-added-details"
+                  data-uie-value={domain}
+                  style={{lineHeight: 'var(--line-height-sm)'}}
+                >
                   <span
                     css={warning}
                     dangerouslySetInnerHTML={{
@@ -156,6 +161,7 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
           type="button"
           variant={ButtonVariant.TERTIARY}
           onClick={() => setIsOpen(state => !state)}
+          style={{marginTop: 4}}
         >
           {isOpen ? t('messageFailedToSendHideDetails') : t('messageFailedToSendShowDetails')}
         </Button>
