@@ -1715,7 +1715,18 @@ export class ConversationRepository {
     if (response) {
       await this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
     }
+    return this.refreshConversationProtocolProperties(conversation);
+  }
 
+  /**
+   * Refresh conversation protocol properties
+   * Will refetch the conversation to get all new protocol-related fields (groupId, ciphersuite, epoch and new protocol)
+   * Will update the conversation entity in memory and in the local database
+   *
+   * @param conversationId id of the conversation
+   * @returns Resolves with updated conversation entity
+   */
+  private async refreshConversationProtocolProperties(conversation: Conversation) {
     //refetch the conversation to get all new fields (groupId, ciphersuite, epoch and new protocol)
     const remoteConversationData = await this.conversationService.getConversationById(conversation.qualifiedId);
 
@@ -3006,7 +3017,8 @@ export class ConversationRepository {
    * @returns Resolves when the event was handled
    */
   private async onProtocolUpdate(conversation: Conversation, eventJson: ConversationProtocolUpdateEvent) {
-    return this.addEventToConversation(conversation, eventJson);
+    const updatedConversation = await this.refreshConversationProtocolProperties(conversation);
+    return this.addEventToConversation(updatedConversation, eventJson);
   }
 
   /**

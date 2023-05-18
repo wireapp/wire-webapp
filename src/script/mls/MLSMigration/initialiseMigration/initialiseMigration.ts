@@ -21,7 +21,6 @@ import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {KeyPackageClaimUser} from '@wireapp/core/lib/conversation';
 
-import {APIClient} from '@wireapp/api-client';
 import {Account} from '@wireapp/core';
 
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
@@ -29,19 +28,15 @@ import {ProteusConversation, isMixedConversation} from 'src/script/conversation/
 
 import {mlsMigrationLogger} from '../MLSMigrationLogger';
 
+interface InitialiseMigrationOfProteusConversationParams {
+  core: Account;
+  conversationRepository: ConversationRepository;
+  selfUserId: QualifiedId;
+}
+
 export const initialiseMigrationOfProteusConversations = async (
   proteusConversations: ProteusConversation[],
-  {
-    core,
-    apiClient,
-    conversationRepository,
-    selfUserId,
-  }: {
-    core: Account;
-    apiClient: APIClient;
-    conversationRepository: ConversationRepository;
-    selfUserId: QualifiedId;
-  },
+  {core, conversationRepository, selfUserId}: InitialiseMigrationOfProteusConversationParams,
 ) => {
   if (proteusConversations.length < 1) {
     return;
@@ -51,7 +46,6 @@ export const initialiseMigrationOfProteusConversations = async (
   for (const proteusConversation of proteusConversations) {
     await initialiseMigrationOfProteusConversation(proteusConversation, {
       core,
-      apiClient,
       conversationRepository,
       selfUserId,
     });
@@ -60,17 +54,7 @@ export const initialiseMigrationOfProteusConversations = async (
 
 const initialiseMigrationOfProteusConversation = async (
   proteusConversation: ProteusConversation,
-  {
-    core,
-    apiClient,
-    conversationRepository,
-    selfUserId,
-  }: {
-    core: Account;
-    apiClient: APIClient;
-    conversationRepository: ConversationRepository;
-    selfUserId: QualifiedId;
-  },
+  {core, conversationRepository, selfUserId}: InitialiseMigrationOfProteusConversationParams,
 ) => {
   mlsMigrationLogger.info(
     `Initialising MLS migration for "proteus" conversation: ${proteusConversation.qualifiedId.id}`,
