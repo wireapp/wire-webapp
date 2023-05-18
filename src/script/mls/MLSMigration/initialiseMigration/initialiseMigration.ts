@@ -24,6 +24,7 @@ import {KeyPackageClaimUser} from '@wireapp/core/lib/conversation';
 import {APIClient} from '@wireapp/api-client';
 import {Account} from '@wireapp/core';
 
+import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {ProteusConversation, isMixedConversation} from 'src/script/conversation/ConversationSelectors';
 
@@ -86,11 +87,14 @@ const initialiseMigrationOfProteusConversation = async (
     //refetch the conversation to get all new fields including groupId, epoch and new protocol
     const remoteConversationData = await apiClient.api.conversation.getConversation(proteusConversation.qualifiedId);
 
-    //update conversation locally
-    const updatedConversation = await conversationRepository.updateConversationLocally(
-      proteusConversation.id,
-      remoteConversationData,
-    );
+    //update fields that came after protocol update
+    const {cipher_suite: cipherSuite, epoch, group_id: newGroupId, protocol} = remoteConversationData;
+    const updatedConversation = ConversationMapper.updateProperties(proteusConversation, {
+      cipherSuite,
+      epoch,
+      groupId: newGroupId,
+      protocol,
+    });
 
     //we have to make sure that conversation's protocol is mixed and it contains groupId
     if (!isMixedConversation(updatedConversation)) {
@@ -103,7 +107,7 @@ const initialiseMigrationOfProteusConversation = async (
       throw new Error('MLS and Conversation services are not available!');
     }
 
-    const {groupId, participating_user_ids} = updatedConversation;
+    const {participating_user_ids, groupId} = updatedConversation;
 
     const doesConversationExist = await mlsService.conversationExists(groupId);
     if (doesConversationExist) {

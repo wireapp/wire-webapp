@@ -620,53 +620,6 @@ export class ConversationRepository {
     return this.conversationState.conversations();
   }
 
-  /**
-   * Will refresh the conversation in memory (database and observable state) with the updated data from backend
-   * @param conversationId id of the conversation to refresh
-   * @param remoteConversationData updated data of the conversation
-   * @returns the updated conversation entity
-   */
-  public async updateConversationLocally(conversationId: string, remoteConversationData: BackendConversation) {
-    const localConversation = await this.conversationService.loadConversation<ConversationDatabaseData>(conversationId);
-
-    if (!localConversation) {
-      throw new ConversationError(
-        ConversationError.TYPE.CONVERSATION_NOT_FOUND,
-        ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
-      );
-    }
-
-    //merge the local conversation with the remote conversation data
-    const mergedConversation = ConversationMapper.mergeSingleConversation(localConversation, remoteConversationData);
-
-    //save the merged conversation in database
-    await this.conversationService.saveConversationsInDb([mergedConversation]);
-
-    //map the conversation record to conversation entitity
-    const [conversationEntity] = this.mapConversations([mergedConversation]);
-
-    //make sure conversation exists in memory, get its reference and replace it with the updated conversation
-    const existingConversation = this.conversationState
-      .conversations()
-      .find(conversation => matchQualifiedIds(conversation, conversationEntity));
-
-    if (!existingConversation) {
-      throw new ConversationError(
-        ConversationError.TYPE.CONVERSATION_NOT_FOUND,
-        ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
-      );
-    }
-
-    this.conversationState.conversations.replace(existingConversation, conversationEntity);
-
-    //check if conversation was active and if so, update the active conversation
-    if (this.conversationState.isActiveConversation(existingConversation)) {
-      this.conversationState.activeConversation(conversationEntity);
-    }
-
-    return conversationEntity;
-  }
-
   public async updateConversationStates(conversationsDataArray: ConversationRecord[]) {
     const handledConversationEntities: Conversation[] = [];
     const unknownConversations: ConversationRecord[] = [];
