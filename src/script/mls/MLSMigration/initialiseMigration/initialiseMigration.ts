@@ -77,7 +77,7 @@ const initialiseMigrationOfProteusConversation = async (
   );
 
   try {
-    //update conversation protocol on backend and locally
+    //update conversation protocol on both backend and local store
     const updatedConversation = await conversationRepository.updateConversationProtocol(
       proteusConversation,
       ConversationProtocol.MIXED,
@@ -110,7 +110,7 @@ const initialiseMigrationOfProteusConversation = async (
       client: core.clientId,
     });
 
-    //if there's no response, it means that commit bundle was not sent properly
+    //if there's no response, it means that commit bundle was not sent successfully
     //at this point we should wipe conversation locally
     //it's possible that somebody else has already created the group,
     //we should wait for the welcome message or try joining with external commit later

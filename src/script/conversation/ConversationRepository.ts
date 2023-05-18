@@ -1728,16 +1728,8 @@ export class ConversationRepository {
       protocol: newProtocol,
     });
 
+    await this.saveConversationStateInDb(updatedConversation);
     return updatedConversation;
-  }
-
-  /**
-   * Inject protocol change event into the conversation.
-   *
-   * @param event - protocol change event to inject
-   */
-  public async injectConversationProtocolUpdate(event: ConversationProtocolUpdateEvent) {
-    return this.eventRepository.injectEvent(event);
   }
 
   /**
