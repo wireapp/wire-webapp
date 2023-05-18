@@ -941,13 +941,14 @@ export class ConversationAPI {
    * - changing the protocol from "proteus" to "mixed" will assign a groupId to the conversation.
    * - changing the protocol from "mixed" to "mls" will finalise the migration of the conversation.
    * @param conversationId id of the conversation
-   * @param memberData the new conversation
+   * @param protocol new protocol of the conversation
+   * @returns ConversationProtocolUpdateEvent if the protocol was updated, null if the protocol was not changed
    * @see https://wearezeta.atlassian.net/wiki/spaces/CORE/pages/746488003/Proteus+to+MLS+Migration for more details
    */
   public async putConversationProtocol(
     conversationId: QualifiedId,
     protocol: ConversationProtocol.MIXED | ConversationProtocol.MLS,
-  ): Promise<ConversationProtocolUpdateEvent> {
+  ): Promise<ConversationProtocolUpdateEvent | null> {
     const config: AxiosRequestConfig = {
       data: {protocol},
       method: 'put',
@@ -955,6 +956,12 @@ export class ConversationAPI {
     };
 
     const response = await this.client.sendJSON<ConversationProtocolUpdateEvent>(config);
+
+    //if the protocol was not changed (it already was the same), the response will be 204, response data is empty
+    if (response.status === 204) {
+      return null;
+    }
+
     return response.data;
   }
 }

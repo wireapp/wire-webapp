@@ -77,6 +77,7 @@ export type ConversationEventData =
 
 export type ConversationEvent =
   | ConversationAccessUpdateEvent
+  | ConversationProtocolUpdateEvent
   | ConversationCodeDeleteEvent
   | ConversationConnectRequestEvent
   | ConversationCreateEvent
