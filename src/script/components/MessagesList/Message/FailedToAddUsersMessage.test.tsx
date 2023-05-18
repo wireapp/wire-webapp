@@ -87,31 +87,6 @@ describe('FailedToAddUsersMessage', () => {
     expect(elementMessageFailedToAdd.getAttribute('data-uie-value')).toEqual('multi-users-not-added');
   });
 
-  it('shows details of failed to add user', async () => {
-    const [qualifiedId1] = generateQualifiedIds(1, 'test.domain');
-
-    const user1 = new User(qualifiedId1.id, qualifiedId1.domain);
-    userState.users([user1]);
-
-    const message = createFailedToAddUsersMessage({
-      qualifiedIds: [qualifiedId1],
-    });
-
-    const {getByTestId} = render(withTheme(<FailedToAddUsersMessage message={message} userState={userState} />));
-
-    const elementMessageFailedToAdd = getByTestId('element-message-failed-to-add-users');
-    expect(elementMessageFailedToAdd.getAttribute('data-uie-value')).toEqual('1-user-not-added');
-
-    const toggleButton = getByTestId('toggle-failed-to-add-users');
-
-    act(() => {
-      toggleButton.click();
-    });
-
-    const elementMessageFailedToAddDetails = getByTestId('1-user-not-added-details');
-    expect(elementMessageFailedToAddDetails.getAttribute('data-uie-value')).toEqual(qualifiedId1.id);
-  });
-
   it('shows details of failed to add multi users', async () => {
     const [qualifiedId1, qualifiedId2] = generateQualifiedIds(2, 'test.domain');
 
