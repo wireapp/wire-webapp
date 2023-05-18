@@ -20,7 +20,7 @@
 import {act, render} from '@testing-library/react';
 import ko from 'knockout';
 
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {withTheme, generateQualifiedIds} from 'src/script/auth/util/test/TestUtil';
 import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from 'src/script/entity/message/FailedToAddUsersMessage';
 import {User} from 'src/script/entity/User';
 import {UserRepository} from 'src/script/user/UserRepository';
@@ -55,10 +55,7 @@ describe('FailedToAddUsersMessage', () => {
   });
 
   it('shows that 1 user could not be added', async () => {
-    const qualifiedId1 = {
-      domain: 'foma.wire.link',
-      id: 'oi123no4-4f9f-4b9e-8c51-124b1uy24i12',
-    };
+    const [qualifiedId1] = generateQualifiedIds(1, 'test.domain');
 
     const user1 = new User(qualifiedId1.id, qualifiedId1.domain);
     userState.users.push(user1);
@@ -74,14 +71,7 @@ describe('FailedToAddUsersMessage', () => {
   });
 
   it('shows that multiple users could not be added', async () => {
-    const qualifiedId1 = {
-      domain: 'foma.wire.link',
-      id: 'oi123no4-4f9f-4b9e-8c51-124b1uy24i12',
-    };
-    const qualifiedId2 = {
-      domain: 'foma.wire.link',
-      id: 'n1iuo42h-0c6e-4b6c-b973-12i4b12ib412',
-    };
+    const [qualifiedId1, qualifiedId2] = generateQualifiedIds(2, 'test.domain');
 
     const user1 = new User(qualifiedId1.id, qualifiedId1.domain);
     const user2 = new User(qualifiedId2.id, qualifiedId2.domain);
@@ -98,10 +88,7 @@ describe('FailedToAddUsersMessage', () => {
   });
 
   it('shows details of failed to add user', async () => {
-    const qualifiedId1 = {
-      domain: 'foma.wire.link',
-      id: 'oi123no4-4f9f-4b9e-8c51-124b1uy24i12',
-    };
+    const [qualifiedId1] = generateQualifiedIds(1, 'test.domain');
 
     const user1 = new User(qualifiedId1.id, qualifiedId1.domain);
     userState.users([user1]);
@@ -126,14 +113,7 @@ describe('FailedToAddUsersMessage', () => {
   });
 
   it('shows details of failed to add multi users', async () => {
-    const qualifiedId1 = {
-      domain: 'foma.wire.link',
-      id: 'oi123no4-4f9f-4b9e-8c51-124b1uy24i12',
-    };
-    const qualifiedId2 = {
-      domain: 'foma.wire.link',
-      id: 'n1iuo42h-0c6e-4b6c-b973-12i4b12ib412',
-    };
+    const [qualifiedId1, qualifiedId2] = generateQualifiedIds(2, 'test.domain');
 
     const user1 = new User(qualifiedId1.id, qualifiedId1.domain);
     const user2 = new User(qualifiedId2.id, qualifiedId2.domain);
@@ -159,14 +139,8 @@ describe('FailedToAddUsersMessage', () => {
   });
 
   it('shows details of failed to add multi users from 2 different backends', async () => {
-    const qualifiedId1 = {
-      domain: 'foma.wire.link',
-      id: 'oi123no4-4f9f-4b9e-8c51-124b1uy24i12',
-    };
-    const qualifiedId2 = {
-      domain: 'chala.wire.link',
-      id: 'n1iuo42h-0c6e-4b6c-b973-12i4b12ib412',
-    };
+    const [qualifiedId1] = generateQualifiedIds(1, 'test.domain');
+    const [qualifiedId2] = generateQualifiedIds(1, 'test-2.domain');
 
     const user1 = new User(qualifiedId1.id, qualifiedId1.domain);
     const user2 = new User(qualifiedId2.id, qualifiedId2.domain);
