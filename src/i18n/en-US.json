@@ -514,7 +514,7 @@
   "extensionsGiphyMessage": "{{tag}} • via giphy.com",
   "extensionsGiphyNoGifs": "Oops, no gifs",
   "extensionsGiphyRandom": "Random",
-  "failedToAddParticipant": "[bold]1 participant[/bold] could not be added to the group.",
+  "failedToAddParticipant": "[bold]{{name}}[/bold] could not be added to the group as the backend of [bold]{{domain}}[/bold] could not be reached.",
   "failedToAddParticipants": "[bold]{{total}} participants[/bold] could not be added to the group.",
   "failedToAddParticipantDetails": "[bold]{{name}}[/bold] could not be added to the group as the backend of [bold]{{domain}}[/bold] could not be reached.",
   "failedToAddParticipantsDetails": "[bold]{{names}}[/bold] and [bold]{{name}}[/bold] could not be added to the group as the backend of [bold]{{domain}}[/bold] could not be reached.",

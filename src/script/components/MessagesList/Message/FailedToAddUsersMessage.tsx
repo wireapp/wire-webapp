@@ -104,7 +104,9 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
             css={warning}
             dangerouslySetInnerHTML={{
               __html:
-                total <= 1 ? t('failedToAddParticipant') : t('failedToAddParticipants', {total: total.toString()}),
+                total <= 1
+                  ? t('failedToAddParticipant', {name: users[0].name(), domain: users[0].domain})
+                  : t('failedToAddParticipants', {total: total.toString()}),
             }}
           />
         </div>
@@ -156,15 +158,17 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
               ))}
           </>
         )}
-        <Button
-          data-uie-name="toggle-failed-to-add-users"
-          type="button"
-          variant={ButtonVariant.TERTIARY}
-          onClick={() => setIsOpen(state => !state)}
-          style={{marginTop: 4}}
-        >
-          {isOpen ? t('messageFailedToSendHideDetails') : t('messageFailedToSendShowDetails')}
-        </Button>
+        {total > 1 && (
+          <Button
+            data-uie-name="toggle-failed-to-add-users"
+            type="button"
+            variant={ButtonVariant.TERTIARY}
+            onClick={() => setIsOpen(state => !state)}
+            style={{marginTop: 4}}
+          >
+            {isOpen ? t('messageFailedToSendHideDetails') : t('messageFailedToSendShowDetails')}
+          </Button>
+        )}
       </div>
     </>
   );
