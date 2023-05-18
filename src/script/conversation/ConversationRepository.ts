@@ -39,6 +39,7 @@ import {
   ConversationRenameEvent,
   ConversationTypingEvent,
   CONVERSATION_EVENT,
+  ConversationProtocolUpdateEvent,
 } from '@wireapp/api-client/lib/event';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import type {BackendError} from '@wireapp/api-client/lib/http/';
@@ -1698,6 +1699,15 @@ export class ConversationRepository {
   }
 
   /**
+   * Inject protocol change event into the conversation.
+   *
+   * @param event - protocol change event to inject
+   */
+  public async injectConversationProtocolUpdate(event: ConversationProtocolUpdateEvent) {
+    return this.eventRepository.injectEvent(event);
+  }
+
+  /**
    * Set the global message timer
    */
   async updateConversationMessageTimer(
@@ -2317,6 +2327,7 @@ export class ConversationRepository {
         return this.addEventToConversation(conversationEntity, eventJson);
 
       case CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE:
+      case CONVERSATION_EVENT.PROTOCOL_UPDATE:
       case ClientEvent.CONVERSATION.COMPOSITE_MESSAGE_ADD:
       case ClientEvent.CONVERSATION.DELETE_EVERYWHERE:
       case ClientEvent.CONVERSATION.FILE_TYPE_RESTRICTED:

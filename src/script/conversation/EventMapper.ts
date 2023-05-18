@@ -17,7 +17,7 @@
  *
  */
 
-import {CONVERSATION_EVENT, ConversationEvent} from '@wireapp/api-client/lib/event/';
+import {CONVERSATION_EVENT, ConversationEvent, ConversationProtocolUpdateEvent} from '@wireapp/api-client/lib/event/';
 import {container} from 'tsyringe';
 
 import {LinkPreview, Mention} from '@wireapp/protocol-messaging';
@@ -58,6 +58,7 @@ import type {Message} from '../entity/message/Message';
 import {MessageTimerUpdateMessage} from '../entity/message/MessageTimerUpdateMessage';
 import {MissedMessage} from '../entity/message/MissedMessage';
 import {PingMessage} from '../entity/message/PingMessage';
+import {ProtocolUpdateMessage} from '../entity/message/ProtocolUpdateMessage';
 import {ReceiptModeUpdateMessage} from '../entity/message/ReceiptModeUpdateMessage';
 import {RenameMessage} from '../entity/message/RenameMessage';
 import {Text} from '../entity/message/Text';
@@ -249,6 +250,11 @@ export class EventMapper {
 
       case CONVERSATION_EVENT.RENAME: {
         messageEntity = this._mapEventRename(event);
+        break;
+      }
+
+      case CONVERSATION_EVENT.PROTOCOL_UPDATE: {
+        messageEntity = this._mapEventProtocolUpdate(event);
         break;
       }
 
@@ -610,6 +616,13 @@ export class EventMapper {
    */
   private _mapEventPing(): PingMessage {
     return new PingMessage();
+  }
+
+  /**
+   * Maps JSON data of `conversation.protocol-update` message into message entity.
+   */
+  private _mapEventProtocolUpdate(event: ConversationProtocolUpdateEvent): ProtocolUpdateMessage {
+    return new ProtocolUpdateMessage(event.data.protocol);
   }
 
   /**

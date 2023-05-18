@@ -29,6 +29,7 @@ export enum SuperType {
   LOCATION = 'location',
   MEMBER = 'member',
   MISSED = 'missed',
+  PROTOCOL_UPDATE = 'protocol-update',
   PING = 'ping',
   REACTION = 'reaction',
   SPECIAL = 'special',

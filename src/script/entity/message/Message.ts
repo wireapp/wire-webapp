@@ -39,6 +39,7 @@ import type {LinkPreview} from './LinkPreview';
 import type {MemberMessage} from './MemberMessage';
 import {MissedMessage} from './MissedMessage';
 import type {PingMessage} from './PingMessage';
+import {ProtocolUpdateMessage} from './ProtocolUpdateMessage';
 import type {SystemMessage} from './SystemMessage';
 import type {VerificationMessage} from './VerificationMessage';
 
@@ -313,6 +314,10 @@ export class Message {
 
   isMissed(): this is MissedMessage {
     return this.super_type === SuperType.MISSED;
+  }
+
+  isProtocolUpdate(): this is ProtocolUpdateMessage {
+    return this.super_type === SuperType.PROTOCOL_UPDATE;
   }
 
   isCallTimeout(): this is CallingTimeoutMessage {
