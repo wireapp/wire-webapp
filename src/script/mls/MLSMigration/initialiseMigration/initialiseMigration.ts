@@ -92,6 +92,8 @@ const initialiseMigrationOfProteusConversation = async (
     });
 
     if (!hasEstablishedMLSGroup) {
+      //we don't want to add members to the group if we have not established it
+      //only client who established the group should add members to it
       return;
     }
 
