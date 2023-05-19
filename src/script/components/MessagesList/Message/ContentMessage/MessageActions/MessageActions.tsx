@@ -141,6 +141,8 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
     [message, toggleActiveMenu],
   );
 
+  const isMsgReactable = message.isReactable();
+
   return (
     <div css={{...messageBodyActions, ...mesageReactionTop}} ref={wrapperRef}>
       <div
@@ -149,29 +151,34 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
         aria-label={t('accessibility.messageActionsMenuLabel')}
         data-uie-name="message-actions"
       >
-        <MessageReactions
-          messageFocusedTabIndex={messageFocusedTabIndex}
-          currentMsgActionName={currentMsgActionName}
-          handleCurrentMsgAction={setCurrentMsgAction}
-          toggleActiveMenu={toggleActiveMenu}
-          handleKeyDown={handleKeyDown}
-          resetActionMenuStates={resetActionMenuStates}
-          wrapperRef={wrapperRef}
-          message={message}
-          handleReactionClick={handleReactionClick}
-        />
-        <ReplyButton
-          actionId={MessageActionsId.REPLY}
-          currentMsgActionName={currentMsgActionName}
-          messageFocusedTabIndex={messageFocusedTabIndex}
-          onReplyClick={handleMessageReply}
-          onKeyPress={handleKeyDown}
-        />
+        {isMsgReactable ? (
+          <>
+            <MessageReactions
+              messageFocusedTabIndex={messageFocusedTabIndex}
+              currentMsgActionName={currentMsgActionName}
+              handleCurrentMsgAction={setCurrentMsgAction}
+              toggleActiveMenu={toggleActiveMenu}
+              handleKeyDown={handleKeyDown}
+              resetActionMenuStates={resetActionMenuStates}
+              wrapperRef={wrapperRef}
+              message={message}
+              handleReactionClick={handleReactionClick}
+            />
+            <ReplyButton
+              actionId={MessageActionsId.REPLY}
+              currentMsgActionName={currentMsgActionName}
+              messageFocusedTabIndex={messageFocusedTabIndex}
+              onReplyClick={handleMessageReply}
+              onKeyPress={handleKeyDown}
+            />
+          </>
+        ) : null}
+
         {menuEntries.length > 0 && (
           <button
             tabIndex={messageFocusedTabIndex}
             css={{
-              ...messageActionsMenuButton,
+              ...messageActionsMenuButton(isMsgReactable),
               ...getIconCSS,
               ...getActionsMenuCSS(currentMsgActionName === MessageActionsId.OPTIONS),
             }}

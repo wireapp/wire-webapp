@@ -19,43 +19,42 @@
 
 import {FC} from 'react';
 
-import {Icon} from 'Components/Icon';
+import {CSSObject} from '@emotion/react';
+
 import {t} from 'Util/LocalizerUtil';
 
-import {getActionsMenuCSS, getIconCSS, messageActionsMenuButton} from './MessageActions.styles';
-
-export interface ReplyButtonProps {
+export interface DownloadButtonProps {
   actionId: string;
-  currentMsgActionName: string;
   messageFocusedTabIndex: number;
-  onReplyClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  onDownloadClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onKeyPress: (event: React.KeyboardEvent<HTMLButtonElement>) => void;
+  children: React.ReactNode;
+  btnClass?: string;
+  styleObj?: CSSObject;
 }
 
-const ReplyButton: FC<ReplyButtonProps> = ({
+const DownloadButton: FC<DownloadButtonProps> = ({
   actionId,
-  currentMsgActionName,
   messageFocusedTabIndex,
-  onReplyClick,
+  onDownloadClick,
   onKeyPress,
+  children,
+  btnClass = '',
+  styleObj = {},
 }) => {
   return (
     <button
-      css={{
-        ...messageActionsMenuButton(),
-        ...getIconCSS,
-        ...getActionsMenuCSS(currentMsgActionName === actionId),
-      }}
+      css={styleObj}
       type="button"
       tabIndex={messageFocusedTabIndex}
       data-uie-name={actionId}
-      aria-label={t('conversationContextMenuReply')}
-      onClick={onReplyClick}
-      onKeyDown={onKeyPress}
+      aria-label={t('conversationContextMenuDownload')}
+      onClick={onDownloadClick}
+      className={btnClass}
     >
-      <Icon.Reply className="svg-icon" />
+      {children}
     </button>
   );
 };
 
-export {ReplyButton};
+export {DownloadButton};
