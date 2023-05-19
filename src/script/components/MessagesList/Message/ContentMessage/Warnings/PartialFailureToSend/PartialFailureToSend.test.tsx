@@ -22,37 +22,12 @@ import type {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import en from 'I18n/en-US.json';
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {generateQualifiedIds, generateUserClients, generateUsers, withTheme} from 'src/script/auth/util/test/TestUtil';
 import {setStrings} from 'Util/LocalizerUtil';
-import {createUuid} from 'Util/uuid';
 
-import {PartialFailureToSendWarning, User} from './PartialFailureToSend';
+import {PartialFailureToSendWarning} from './PartialFailureToSend';
 
 setStrings({en});
-function generateUsers(nbUsers: number, domain: string) {
-  const users: User[] = [];
-  for (let i = 0; i < nbUsers; i++) {
-    users.push({qualifiedId: {id: createUuid(), domain}, name: () => `User ${i}`});
-  }
-  return users;
-}
-
-function generateUserClients(users: User[]): QualifiedUserClients {
-  const userClients: QualifiedUserClients = {};
-  users.forEach(user => {
-    const domainUsers = userClients[user.qualifiedId.domain] || {};
-    domainUsers[user.qualifiedId.id] = [];
-    userClients[user.qualifiedId.domain] = domainUsers;
-  });
-  return userClients;
-}
-function generateQualifiedIds(nbUsers: number, domain: string) {
-  const users: QualifiedId[] = [];
-  for (let i = 0; i < nbUsers; i++) {
-    users.push({id: createUuid(), domain});
-  }
-  return users;
-}
 
 describe('PartialFailureToSendWarning', () => {
   it('displays the number of users that did not get the message', () => {
