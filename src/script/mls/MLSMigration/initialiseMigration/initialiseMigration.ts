@@ -25,7 +25,9 @@ import {Account} from '@wireapp/core';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {ProteusConversation, isMixedConversation} from 'src/script/conversation/ConversationSelectors';
 
-import {addMixedConversationMembersToMLSGroup} from '../addMixedConversationMembersToMLSGroup';
+import {addMixedConversationMembersToMLSGroup} from './addMixedConversationMembersToMLSGroup';
+import {tryEstablishingMLSGroupForMixedConversation} from './tryEstablishingMLSGroupForMixedConversation';
+
 import {mlsMigrationLogger} from '../MLSMigrationLogger';
 
 interface InitialiseMigrationOfProteusConversationParams {
@@ -75,42 +77,21 @@ const initialiseMigrationOfProteusConversation = async (
       ConversationProtocol.MIXED,
     );
 
-    //we have to make sure that conversation's protocol is mixed and it contains groupId
+    //we have to make sure that conversation's protocol has really changed to mixed and it contains groupId
     if (!isMixedConversation(updatedMixedConversation)) {
       throw new Error(`Conversation ${updatedMixedConversation.qualifiedId.id} was not updated to mixed protocol.`);
     }
 
-    //create MLS group with derived groupId
-    const {mls: mlsService} = core.service || {};
-    if (!mlsService) {
-      throw new Error('MLS service is not available!');
-    }
+    mlsMigrationLogger.info(
+      `Conversation ${updatedMixedConversation.qualifiedId.id} was updated to mixed protocol successfully, trying to initialise MLS Group...`,
+    );
 
-    const {groupId} = updatedMixedConversation;
-
-    const isMLSGroupAlreadyEstablished = await mlsService.conversationExists(groupId);
-    if (isMLSGroupAlreadyEstablished) {
-      mlsMigrationLogger.info(
-        `MLS Group for conversation ${updatedMixedConversation.qualifiedId.id} already exists, skipping the initialisation.`,
-      );
-      return;
-    }
-
-    //we try to register empty conversation
-    const groupCreationResponse = await mlsService.registerConversation(groupId, [], {
-      user: selfUserId,
-      client: core.clientId,
+    const hasEstablishedMLSGroup = await tryEstablishingMLSGroupForMixedConversation(updatedMixedConversation, {
+      core,
+      selfUserId,
     });
 
-    //if there's no response, it means that commit bundle was not sent successfully
-    //at this point we should wipe conversation locally
-    //it's possible that somebody else has already created the group,
-    //we should wait for the welcome message or try joining with external commit later
-    if (!groupCreationResponse) {
-      mlsMigrationLogger.info(
-        `MLS Group for conversation ${updatedMixedConversation.qualifiedId.id} was not created, wiping the conversation.`,
-      );
-      await mlsService.wipeConversation(groupId);
+    if (!hasEstablishedMLSGroup) {
       return;
     }
 

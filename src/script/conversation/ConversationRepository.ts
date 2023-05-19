@@ -1715,6 +1715,8 @@ export class ConversationRepository {
     if (response) {
       await this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
     }
+
+    //even if protocol was already updated, we need to refetch the conversation
     return this.refreshConversationProtocolProperties(conversation);
   }
 

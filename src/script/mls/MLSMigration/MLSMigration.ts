@@ -34,7 +34,7 @@ import {Core as CoreSingleton} from 'src/script/service/CoreSingleton';
 import {TeamState} from 'src/script/team/TeamState';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
-import {initialiseMigrationOfProteusConversations} from './initialiseMigration/initialiseMigration';
+import {initialiseMigrationOfProteusConversations} from './initialiseMigration';
 import {mlsMigrationLogger} from './MLSMigrationLogger';
 
 import {isMLSSupportedByEnvironment} from '../isMLSSupportedByEnvironment';
@@ -178,7 +178,6 @@ const migrateConversationsToMLS = async ({
 
   await initialiseMigrationOfProteusConversations(proteusConversations, {
     core,
-    apiClient,
     conversationRepository,
     selfUserId,
   });

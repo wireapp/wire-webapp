@@ -24,7 +24,7 @@ import {Account} from '@wireapp/core';
 
 import {MixedConversation} from 'src/script/conversation/ConversationSelectors';
 
-import {mlsMigrationLogger} from './MLSMigrationLogger';
+import {mlsMigrationLogger} from '../MLSMigrationLogger';
 
 /**
  * Will add all existing members of mixed conversation to its MLS group.
