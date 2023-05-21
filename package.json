@@ -36,7 +36,7 @@
     "@types/ws": "8.5.3",
     "@wireapp/store-engine": "workspace:^",
     "@wireapp/store-engine-fs": "workspace:^",
-    "browser-sync": "2.29.1",
+    "browser-sync": "2.29.3",
     "concurrently": "8.0.1",
     "cross-env": "7.0.3",
     "dotenv": "16.0.3",
