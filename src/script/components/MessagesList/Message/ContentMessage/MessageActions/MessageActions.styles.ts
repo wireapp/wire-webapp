@@ -38,19 +38,34 @@ export const messageBodyActions: CSSObject = {
   },
 };
 
-export const messageActionsMenuButton: CSSObject = {
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-  padding: '8px 12px',
-  cursor: 'pointer',
-  '&:first-of-type': {
-    borderRadius: '12px 0px 0px 12px',
-  },
-  '&:last-of-type': {
-    borderRadius: '0px 12px 12px 0px',
-  },
+export const messageActionsMenuButton = (isReactable = true): CSSObject => {
+  const defaultStyle: CSSObject = {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: '8px 12px',
+    cursor: 'pointer',
+  };
+  if (isReactable) {
+    return {
+      ...defaultStyle,
+      '&:first-of-type': {
+        borderRadius: '12px 0px 0px 12px',
+      },
+      '&:last-of-type': {
+        borderRadius: '0px 12px 12px 0px',
+      },
+    };
+  }
+  return {
+    ...defaultStyle,
+    borderRadius: '12px',
+  };
+};
+
+export const nonReactableMSgMenu: CSSObject = {
+  borderRadius: '12px',
 };
 
 export const getIconCSS: CSSObject = {

@@ -65,10 +65,12 @@ export const messageReactionButtonTooltipTextLink: CSSObject = {
   textDecoration: 'underline',
 };
 
-export const messageReactionCount: CSSObject = {
-  fontSize: '0.8rem',
-  letterSpacing: '0.031rem',
-  color: 'var(--accent-color)',
+export const messageReactionCount = (isActive?: boolean): CSSObject => {
+  return {
+    color: isActive ? 'var(--accent-color)' : 'var(--message-reactions-count)',
+    fontSize: 'var(--font-size-base)',
+    letterSpacing: '0.031rem',
+  };
 };
 
 export const getReactionsButtonCSS = (isActive?: boolean): CSSObject => {

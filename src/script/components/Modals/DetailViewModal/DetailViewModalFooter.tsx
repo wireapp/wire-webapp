@@ -23,7 +23,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {ReactionType} from '@wireapp/core/lib/conversation';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 
-import {MessageActionsId} from 'Components/MessagesList/Message/ContentMessage/MessageActions/MessageActions';
+import {DownloadButton} from 'Components/MessagesList/Message/ContentMessage/MessageActions/DownloadButton';
 import {useMessageActionsState} from 'Components/MessagesList/Message/ContentMessage/MessageActions/MessageActions.state';
 import {
   getActionsMenuCSS,
@@ -65,6 +65,7 @@ const DetailViewModalFooter: FC<DetailViewModalFooterProps> = ({
   ]);
   const [currentMsgActionName, setCurrentMsgAction] = useState('');
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const isMsgReactable = messageEntity.isReactable();
   const handleReactionClick = (reaction: ReactionType): void => {
     if (!messageEntity.isContent()) {
       return;
@@ -105,9 +106,17 @@ const DetailViewModalFooter: FC<DetailViewModalFooterProps> = ({
     [conversationEntity, messageEntity, onReplyClick, toggleActiveMenu],
   );
 
+  const handleAssetDownload = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      toggleActiveMenu(event);
+      onDownloadClick(messageEntity);
+    },
+    [messageEntity, onDownloadClick, toggleActiveMenu],
+  );
+
   return (
     <footer className="detail-view-footer">
-      {messageEntity.isReactable() && !isRemovedFromConversation && (
+      {isMsgReactable && !isRemovedFromConversation && (
         <div ref={wrapperRef} style={{display: 'flex'}}>
           <MessageReactions
             messageFocusedTabIndex={TabIndex.FOCUSABLE}
@@ -130,22 +139,33 @@ const DetailViewModalFooter: FC<DetailViewModalFooterProps> = ({
             />
           )}
           {messageEntity.isDownloadable() && (
-            <button
+            <DownloadButton
+              actionId={MESSAGE_DOWNLOAD_ID}
+              messageFocusedTabIndex={TabIndex.FOCUSABLE}
+              onDownloadClick={handleAssetDownload}
+              onKeyPress={handleKeyDown}
               css={{
-                ...messageActionsMenuButton,
+                ...messageActionsMenuButton(),
                 ...getIconCSS,
-                ...getActionsMenuCSS(currentMsgActionName === MessageActionsId.REPLY),
+                ...getActionsMenuCSS(currentMsgActionName === MESSAGE_DOWNLOAD_ID),
               }}
-              type="button"
-              tabIndex={TabIndex.FOCUSABLE}
-              data-uie-name={MESSAGE_DOWNLOAD_ID}
-              aria-label={t('conversationContextMenuDownload')}
-              onClick={() => onDownloadClick(messageEntity)}
             >
               <span className="icon-download" />
-            </button>
+            </DownloadButton>
           )}
         </div>
+      )}
+      {messageEntity.isDownloadable() && !isMsgReactable && (
+        <DownloadButton
+          actionId={MESSAGE_DOWNLOAD_ID}
+          messageFocusedTabIndex={TabIndex.FOCUSABLE}
+          onDownloadClick={handleAssetDownload}
+          onKeyPress={handleKeyDown}
+          className="detail-view-action-button"
+        >
+          <span className="icon-download" />
+          <span>{t('conversationContextMenuDownload')}</span>
+        </DownloadButton>
       )}
     </footer>
   );

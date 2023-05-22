@@ -109,7 +109,7 @@ const MessageReactionsList: FC<MessageReactionsListProps> = ({
                 }}
               >
                 <EmojiImg emojiUrl={emojiUrl} emojiName={emojiName} />
-                <span css={messageReactionCount}>({emojiCount})</span>
+                <span css={messageReactionCount(isActive)}>{emojiCount}</span>
               </button>
             </Tooltip>
           </Fragment>

@@ -173,7 +173,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
     <>
       <button
         css={{
-          ...messageActionsMenuButton,
+          ...messageActionsMenuButton(),
           ...getIconCSS,
           ...getActionsMenuCSS(isThumbUpAction),
         }}
@@ -193,7 +193,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
       </button>
       <button
         css={{
-          ...messageActionsMenuButton,
+          ...messageActionsMenuButton(),
           ...getIconCSS,
           ...getActionsMenuCSS(isLikeAction),
         }}
@@ -213,7 +213,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
       </button>
       <button
         css={{
-          ...messageActionsMenuButton,
+          ...messageActionsMenuButton(),
           ...getIconCSS,
           ...getActionsMenuCSS(currentMsgActionName === MessageActionsId.EMOJI),
         }}
