@@ -45,6 +45,7 @@ const DownloadButton: FC<DownloadButtonProps> = ({
       data-uie-name={actionId}
       aria-label={t('conversationContextMenuDownload')}
       onClick={onDownloadClick}
+      onKeyDown={onKeyPress}
     >
       {children}
     </button>
