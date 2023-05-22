@@ -47,6 +47,11 @@ export const addMixedConversationMembersToMLSGroup = async (
     throw new Error('Conversation service is not available!');
   }
 
+  if (usersToAdd.length === 0) {
+    mlsMigrationLogger.info(`No users to add to MLS Group for conversation ${mixedConversation.qualifiedId.id}.`);
+    return;
+  }
+
   const addUsersResponse = await conversationService.addUsersToMLSConversation({
     groupId: mixedConversation.groupId,
     conversationId: mixedConversation.qualifiedId,
