@@ -24,7 +24,7 @@ import {Account} from '@wireapp/core';
 
 import {MixedConversation} from 'src/script/conversation/ConversationSelectors';
 
-import {mlsMigrationLogger} from '../MLSMigrationLogger';
+import {mlsMigrationLogger} from '../../MLSMigrationLogger';
 
 /**
  * Will add all existing members of mixed conversation to its MLS group.
@@ -39,17 +39,13 @@ export const addMixedConversationMembersToMLSGroup = async (
 ) => {
   //if group was created successfully, we can add other clients to the group (including our own other clients, but skipping current client)
   const otherUsersToAdd = mixedConversation.participating_user_ids();
+
   const usersToAdd: KeyPackageClaimUser[] = [...otherUsersToAdd, {...selfUserId, skipOwnClientId: core.clientId}];
 
   const conversationService = core.service?.conversation;
 
   if (!conversationService) {
     throw new Error('Conversation service is not available!');
-  }
-
-  if (usersToAdd.length === 0) {
-    mlsMigrationLogger.info(`No users to add to MLS Group for conversation ${mixedConversation.qualifiedId.id}.`);
-    return;
   }
 
   const addUsersResponse = await conversationService.addUsersToMLSConversation({
