@@ -66,15 +66,8 @@ export const messageReactionButtonTooltipTextLink: CSSObject = {
 };
 
 export const messageReactionCount = (isActive?: boolean): CSSObject => {
-  if (isActive) {
-    return {
-      color: 'var(--accent-color)',
-      fontSize: 'var(--font-size-base)',
-      letterSpacing: '0.031rem',
-    };
-  }
   return {
-    color: 'var(--message-reactions-count)',
+    color: isActive ? 'var(--accent-color)' : 'var(--message-reactions-count)',
     fontSize: 'var(--font-size-base)',
     letterSpacing: '0.031rem',
   };
