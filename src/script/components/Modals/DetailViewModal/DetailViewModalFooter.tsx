@@ -34,6 +34,7 @@ import {MessageReactions} from 'Components/MessagesList/Message/ContentMessage/M
 import {ReplyButton} from 'Components/MessagesList/Message/ContentMessage/MessageActions/ReplyButton';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isTabKey} from 'Util/KeyboardUtil';
+import {t} from 'Util/LocalizerUtil';
 
 import {MessageRepository} from '../../../conversation/MessageRepository';
 import {Conversation} from '../../../entity/Conversation';
@@ -143,7 +144,7 @@ const DetailViewModalFooter: FC<DetailViewModalFooterProps> = ({
               messageFocusedTabIndex={TabIndex.FOCUSABLE}
               onDownloadClick={handleAssetDownload}
               onKeyPress={handleKeyDown}
-              styleObj={{
+              styles={{
                 ...messageActionsMenuButton(),
                 ...getIconCSS,
                 ...getActionsMenuCSS(currentMsgActionName === MESSAGE_DOWNLOAD_ID),
@@ -163,7 +164,7 @@ const DetailViewModalFooter: FC<DetailViewModalFooterProps> = ({
           btnClass="detail-view-action-button"
         >
           <span className="icon-download" />
-          <span>Download</span>
+          <span>{t('conversationContextMenuDownload')}</span>
         </DownloadButton>
       )}
     </footer>

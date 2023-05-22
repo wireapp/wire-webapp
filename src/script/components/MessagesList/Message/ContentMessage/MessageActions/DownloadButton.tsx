@@ -30,7 +30,7 @@ export interface DownloadButtonProps {
   onKeyPress: (event: React.KeyboardEvent<HTMLButtonElement>) => void;
   children: React.ReactNode;
   btnClass?: string;
-  styleObj?: CSSObject;
+  styles?: CSSObject;
 }
 
 const DownloadButton: FC<DownloadButtonProps> = ({
@@ -40,11 +40,11 @@ const DownloadButton: FC<DownloadButtonProps> = ({
   onKeyPress,
   children,
   btnClass = '',
-  styleObj = {},
+  styles = {},
 }) => {
   return (
     <button
-      css={styleObj}
+      css={styles}
       type="button"
       tabIndex={messageFocusedTabIndex}
       data-uie-name={actionId}

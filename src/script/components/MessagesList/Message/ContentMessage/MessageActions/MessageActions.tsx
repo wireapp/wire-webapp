@@ -151,7 +151,7 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
         aria-label={t('accessibility.messageActionsMenuLabel')}
         data-uie-name="message-actions"
       >
-        {isMsgReactable ? (
+        {isMsgReactable && (
           <>
             <MessageReactions
               messageFocusedTabIndex={messageFocusedTabIndex}
@@ -172,7 +172,7 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
               onKeyPress={handleKeyDown}
             />
           </>
-        ) : null}
+        )}
 
         {menuEntries.length > 0 && (
           <button
