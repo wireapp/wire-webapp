@@ -144,7 +144,7 @@ const DetailViewModalFooter: FC<DetailViewModalFooterProps> = ({
               messageFocusedTabIndex={TabIndex.FOCUSABLE}
               onDownloadClick={handleAssetDownload}
               onKeyPress={handleKeyDown}
-              styles={{
+              css={{
                 ...messageActionsMenuButton(),
                 ...getIconCSS,
                 ...getActionsMenuCSS(currentMsgActionName === MESSAGE_DOWNLOAD_ID),
@@ -161,7 +161,7 @@ const DetailViewModalFooter: FC<DetailViewModalFooterProps> = ({
           messageFocusedTabIndex={TabIndex.FOCUSABLE}
           onDownloadClick={handleAssetDownload}
           onKeyPress={handleKeyDown}
-          btnClass="detail-view-action-button"
+          className="detail-view-action-button"
         >
           <span className="icon-download" />
           <span>{t('conversationContextMenuDownload')}</span>

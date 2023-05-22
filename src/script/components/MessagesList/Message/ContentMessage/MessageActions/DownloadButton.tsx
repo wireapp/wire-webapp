@@ -17,20 +17,16 @@
  *
  */
 
-import {FC} from 'react';
-
-import {CSSObject} from '@emotion/react';
+import {FC, ReactNode} from 'react';
 
 import {t} from 'Util/LocalizerUtil';
 
-export interface DownloadButtonProps {
+export interface DownloadButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   actionId: string;
   messageFocusedTabIndex: number;
   onDownloadClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
   onKeyPress: (event: React.KeyboardEvent<HTMLButtonElement>) => void;
-  children: React.ReactNode;
-  btnClass?: string;
-  styles?: CSSObject;
+  children: ReactNode;
 }
 
 const DownloadButton: FC<DownloadButtonProps> = ({
@@ -39,18 +35,16 @@ const DownloadButton: FC<DownloadButtonProps> = ({
   onDownloadClick,
   onKeyPress,
   children,
-  btnClass = '',
-  styles = {},
+  ...rest
 }) => {
   return (
     <button
-      css={styles}
+      {...rest}
       type="button"
       tabIndex={messageFocusedTabIndex}
       data-uie-name={actionId}
       aria-label={t('conversationContextMenuDownload')}
       onClick={onDownloadClick}
-      className={btnClass}
     >
       {children}
     </button>
