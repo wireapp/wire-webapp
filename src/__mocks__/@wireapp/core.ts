@@ -28,6 +28,8 @@ export class Account extends EventEmitter {
 
   service = {
     mls: {
+      conversationExists: jest.fn(),
+      wipeConversation: jest.fn(),
       registerConversation: jest.fn(),
       joinConferenceSubconversation: jest.fn(),
       getGroupIdFromConversationId: jest.fn(),

@@ -23,7 +23,7 @@ import {Account} from '@wireapp/core';
 
 import {MixedConversation} from 'src/script/conversation/ConversationSelectors';
 
-import {mlsMigrationLogger} from '../MLSMigrationLogger';
+import {mlsMigrationLogger} from '../../MLSMigrationLogger';
 
 /**
  * Will try to establish MLS group for provided mixed conversation.
