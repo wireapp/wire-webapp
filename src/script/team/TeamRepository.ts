@@ -431,7 +431,8 @@ export class TeamRepository {
   };
 
   private readonly handleFileSharingFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
-    const hasFileSharingChanged = previousConfig?.fileSharing?.status !== newConfig?.fileSharing?.status;
+    const hasFileSharingChanged =
+      previousConfig?.fileSharing?.status && previousConfig?.fileSharing?.status !== newConfig?.fileSharing?.status;
     const hasChangedToEnabled = newConfig?.fileSharing?.status === FeatureStatus.ENABLED;
 
     if (hasFileSharingChanged) {
@@ -448,6 +449,7 @@ export class TeamRepository {
 
   private readonly handleGuestLinkFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
     const hasGuestLinkChanged =
+      previousConfig?.conversationGuestLinks?.status &&
       previousConfig?.conversationGuestLinks?.status !== newConfig?.conversationGuestLinks?.status;
     const hasGuestLinkChangedToEnabled = newConfig?.conversationGuestLinks?.status === FeatureStatus.ENABLED;
 
@@ -467,35 +469,40 @@ export class TeamRepository {
     {selfDeletingMessages: previousState}: FeatureList,
     {selfDeletingMessages: newState}: FeatureList,
   ) => {
-    const previousTimeout = previousState?.config?.enforcedTimeoutSeconds * 1000;
-    const newTimeout = newState?.config?.enforcedTimeoutSeconds * 1000;
-    const previousStatus = previousState?.status;
-    const newStatus = newState?.status;
+    if (previousState?.status) {
+      const previousTimeout = previousState?.config?.enforcedTimeoutSeconds * 1000;
+      const newTimeout = newState?.config?.enforcedTimeoutSeconds * 1000;
+      const previousStatus = previousState?.status;
+      const newStatus = newState?.status;
 
-    const hasTimeoutChanged = previousTimeout !== newTimeout;
-    const isEnforced = newTimeout > SelfDeletingTimeout.OFF;
-    const hasStatusChanged = previousStatus !== newStatus;
-    const hasFeatureChanged = hasStatusChanged || hasTimeoutChanged;
-    const isFeatureEnabled = newStatus === FeatureStatus.ENABLED;
+      const hasTimeoutChanged = previousTimeout !== newTimeout;
+      const isEnforced = newTimeout > SelfDeletingTimeout.OFF;
+      const hasStatusChanged = previousStatus !== newStatus;
+      const hasFeatureChanged = hasStatusChanged || hasTimeoutChanged;
+      const isFeatureEnabled = newStatus === FeatureStatus.ENABLED;
 
-    if (hasFeatureChanged) {
-      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-        text: {
-          htmlMessage: isFeatureEnabled
-            ? isEnforced
-              ? t('featureConfigChangeModalSelfDeletingMessagesDescriptionItemEnforced', {
-                  timeout: formatDuration(newTimeout).text,
-                })
-              : t('featureConfigChangeModalSelfDeletingMessagesDescriptionItemEnabled')
-            : t('featureConfigChangeModalSelfDeletingMessagesDescriptionItemDisabled'),
-          title: t('featureConfigChangeModalSelfDeletingMessagesHeadline', {brandName: Config.getConfig().BRAND_NAME}),
-        },
-      });
+      if (hasFeatureChanged) {
+        PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
+          text: {
+            htmlMessage: isFeatureEnabled
+              ? isEnforced
+                ? t('featureConfigChangeModalSelfDeletingMessagesDescriptionItemEnforced', {
+                    timeout: formatDuration(newTimeout).text,
+                  })
+                : t('featureConfigChangeModalSelfDeletingMessagesDescriptionItemEnabled')
+              : t('featureConfigChangeModalSelfDeletingMessagesDescriptionItemDisabled'),
+            title: t('featureConfigChangeModalSelfDeletingMessagesHeadline', {
+              brandName: Config.getConfig().BRAND_NAME,
+            }),
+          },
+        });
+      }
     }
   };
 
   private readonly handleAudioVideoFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
-    const hasVideoCallingChanged = previousConfig?.videoCalling?.status !== newConfig?.videoCalling?.status;
+    const hasVideoCallingChanged =
+      previousConfig?.videoCalling?.status && previousConfig?.videoCalling?.status !== newConfig?.videoCalling?.status;
     const hasChangedToEnabled = newConfig?.videoCalling?.status === FeatureStatus.ENABLED;
 
     if (hasVideoCallingChanged) {
@@ -511,7 +518,10 @@ export class TeamRepository {
   };
 
   private readonly handleConferenceCallingFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
-    if (previousConfig?.conferenceCalling?.status !== newConfig?.conferenceCalling?.status) {
+    if (
+      previousConfig?.conferenceCalling?.status &&
+      previousConfig?.conferenceCalling?.status !== newConfig?.conferenceCalling?.status
+    ) {
       const hasChangedToEnabled = newConfig?.conferenceCalling?.status === FeatureStatus.ENABLED;
       if (hasChangedToEnabled) {
         const replaceEnterprise = replaceLink(
@@ -535,7 +545,7 @@ export class TeamRepository {
 
   private readonly loadPreviousFeatureConfig = (): FeatureList | void => {
     const featureConfigs: {[selfId: string]: FeatureList} = JSON.parse(
-      window.localStorage.getItem(TeamRepository.LOCAL_STORAGE_FEATURE_CONFIG_KEY),
+      window.localStorage.getItem(TeamRepository.LOCAL_STORAGE_FEATURE_CONFIG_KEY) ?? '{}',
     );
     if (featureConfigs && featureConfigs[this.userState.self().id]) {
       return featureConfigs[this.userState.self().id];
