@@ -32,6 +32,7 @@ import type {CompositeMessage} from './CompositeMessage';
 import type {ContentMessage} from './ContentMessage';
 import type {DecryptErrorMessage} from './DecryptErrorMessage';
 import {DeleteMessage} from './DeleteMessage';
+import {FailedToAddUsersMessage} from './FailedToAddUsersMessage';
 import type {FileAsset} from './FileAsset';
 import {FileTypeRestrictedMessage} from './FileTypeRestrictedMessage';
 import type {LegalHoldMessage} from './LegalHoldMessage';
@@ -70,7 +71,7 @@ export class Message {
   public readonly ephemeral_started: ko.Observable<number>;
   public readonly ephemeral_status: ko.Computed<EphemeralStatusType>;
   public expectsReadConfirmation: boolean;
-  public readonly headerSenderName: ko.PureComputed<string>;
+  public readonly senderName: ko.PureComputed<string>;
   public readonly isObfuscated: ko.PureComputed<boolean>;
   public legalHoldStatus?: LegalHoldStatus;
   public readonly status: ko.Observable<StatusType>;
@@ -150,7 +151,7 @@ export class Message {
     this.category = undefined;
 
     this.unsafeSenderName = ko.pureComputed(() => getUserName(this.user(), undefined, true));
-    this.headerSenderName = ko.pureComputed(() => {
+    this.senderName = ko.pureComputed(() => {
       return this.user().name();
     });
 
@@ -317,6 +318,10 @@ export class Message {
 
   isCallTimeout(): this is CallingTimeoutMessage {
     return this.super_type === SuperType.CALL_TIME_OUT;
+  }
+
+  isFailedToAddUsersMessage(): this is FailedToAddUsersMessage {
+    return this.super_type === SuperType.FAILED_TO_ADD_USERS;
   }
 
   /**

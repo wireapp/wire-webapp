@@ -36,10 +36,11 @@ import {TextInput} from 'Components/TextInput';
 import {BaseToggle} from 'Components/toggle/BaseToggle';
 import {InfoToggle} from 'Components/toggle/InfoToggle';
 import {UserSearchableList} from 'Components/UserSearchableList';
+import {generateConversationUrl} from 'src/script/router/routeGenerator';
+import {createNavigate, createNavigateKeyboard} from 'src/script/router/routerBindings';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleEnterDown, offEscKey, onEscKey} from 'Util/KeyboardUtil';
+import {handleEnterDown, isKeyboardEvent, offEscKey, onEscKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
-import {getLogger} from 'Util/Logger';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {Config} from '../../../Config';
@@ -67,8 +68,6 @@ enum GroupCreationModalState {
   PREFERENCES = 'GroupCreationModal.STATE.PREFERENCES',
 }
 
-const logger = getLogger('GroupCreationModal');
-
 const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
@@ -89,12 +88,14 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
       ? teamState.teamFeatures().mls?.config.defaultProtocol
       : ConversationProtocol.PROTEUS;
 
-  const protocolOptions: ProtocolOption[] = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS].map(protocol => ({
-    label: `${t(`modalCreateGroupProtocolSelect.${protocol}`)}${
-      protocol === defaultProtocol ? t(`modalCreateGroupProtocolSelect.default`) : ''
-    }`,
-    value: protocol,
-  }));
+  const protocolOptions: ProtocolOption[] = ([ConversationProtocol.PROTEUS, ConversationProtocol.MLS] as const).map(
+    protocol => ({
+      label: `${t(`modalCreateGroupProtocolSelect.${protocol}`)}${
+        protocol === defaultProtocol ? t(`modalCreateGroupProtocolSelect.default`) : ''
+      }`,
+      value: protocol,
+    }),
+  );
 
   const initialProtocol = protocolOptions.find(protocol => protocol.value === defaultProtocol)!;
 
@@ -157,6 +158,8 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
     return [];
   }, [isGuestEnabled, isTeam, showContacts, teamState, userState]);
 
+  const filteredContacts = contacts.filter(user => user.isAvailable());
+
   useEffect(() => {
     if (stateIsPreferences) {
       onEscKey(onEscape);
@@ -201,12 +204,14 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
     setAccessState(ACCESS_STATE.TEAM.GUESTS_SERVICES);
   };
 
-  const clickOnCreate = async (): Promise<void> => {
+  const clickOnCreate = async (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.KeyboardEvent<HTMLInputElement>,
+  ): Promise<void> => {
     if (!isCreatingConversation) {
       setIsCreatingConversation(true);
 
       try {
-        const conversationEntity = await conversationRepository.createGroupConversation(
+        const conversation = await conversationRepository.createGroupConversation(
           selectedContacts,
           groupName,
           isTeam ? accessState : undefined,
@@ -215,12 +220,18 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
             receipt_mode: enableReadReceipts ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF,
           },
         );
-        setIsShown(false);
-        amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
+
+        if (isKeyboardEvent(event)) {
+          createNavigateKeyboard(generateConversationUrl(conversation.qualifiedId), true)(event);
+        } else {
+          createNavigate(generateConversationUrl(conversation.qualifiedId))(event);
+        }
       } catch (error) {
+        amplify.publish(WebAppEvents.CONVERSATION.SHOW, undefined, {});
         setIsCreatingConversation(false);
-        logger.error(error);
       }
+
+      setIsShown(false);
     }
   };
 
@@ -349,15 +360,15 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
             selectedUsers={selectedContacts}
             setSelectedUsers={setSelectedContacts}
             placeholder={t('groupCreationParticipantsPlaceholder')}
-            enter={clickOnCreate}
+            onEnter={clickOnCreate}
           />
         )}
 
         {stateIsParticipants && (
           <FadingScrollbar className="group-creation__list">
-            {contacts.length > 0 && (
+            {filteredContacts.length > 0 && (
               <UserSearchableList
-                users={contacts}
+                users={filteredContacts}
                 filter={participantsInput}
                 selected={selectedContacts}
                 isSelectable
@@ -366,6 +377,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                 teamRepository={teamRepository}
                 conversationRepository={conversationRepository}
                 noUnderline
+                allowRemoteSearch
               />
             )}
           </FadingScrollbar>

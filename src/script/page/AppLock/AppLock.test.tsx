@@ -24,7 +24,7 @@ import ko from 'knockout';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {AppLock, APPLOCK_STATE} from './AppLock';
 
@@ -76,7 +76,7 @@ const createAppLockState = (teamState?: TeamState) => {
 const createAppLockRepository = (appLockState?: AppLockState) => {
   const userState = new UserState();
   appLockState = appLockState ?? createAppLockState();
-  jest.spyOn(userState, 'self').mockImplementation(ko.observable({id: createRandomUuid()}));
+  jest.spyOn(userState, 'self').mockImplementation(ko.observable({id: createUuid()}));
   const appLockRepository = new AppLockRepository(userState, appLockState);
   return appLockRepository;
 };

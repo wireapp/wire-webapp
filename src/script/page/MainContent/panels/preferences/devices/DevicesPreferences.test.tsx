@@ -25,12 +25,12 @@ import {ClientState} from 'src/script/client/ClientState';
 import {ConversationState} from 'src/script/conversation/ConversationState';
 import {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
 import {UserState} from 'src/script/user/UserState';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {DevicesPreferences} from './DevicesPreferences';
 
 function createDevice(): ClientEntity {
-  const device = new ClientEntity(true, '', createRandomUuid());
+  const device = new ClientEntity(true, '', createUuid());
   device.model = 'test device';
   device.time = new Date().toISOString();
   return device;

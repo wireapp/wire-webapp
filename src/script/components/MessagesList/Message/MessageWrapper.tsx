@@ -36,6 +36,7 @@ import {CallTimeoutMessage} from './CallTimeoutMessage';
 import {ContentMessageComponent} from './ContentMessage';
 import {DecryptErrorMessage} from './DecryptErrorMessage';
 import {DeleteMessage} from './DeleteMessage';
+import {FailedToAddUsersMessage} from './FailedToAddUsersMessage';
 import {FileTypeRestrictedMessage} from './FileTypeRestrictedMessage';
 import {LegalHoldMessage} from './LegalHoldMessage';
 import {MemberMessage} from './MemberMessage';
@@ -100,6 +101,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
 
   const onRetry = async (message: ContentMessage) => {
     const firstAsset = message.getFirstAsset();
+    const file = message.fileData();
 
     if (firstAsset instanceof Text) {
       const messageId = message.id;
@@ -110,11 +112,9 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
         incomingQuote && isOutgoingQuote(incomingQuote) ? (incomingQuote as OutgoingQuote) : undefined;
 
       await messageRepository.sendTextWithLinkPreview(conversation, messageText, mentions, quote, messageId);
+    } else if (file) {
+      await messageRepository.retryUploadFile(conversation, file, firstAsset.isImage(), message.id);
     }
-  };
-
-  const onDiscard = async () => {
-    await messageRepository.deleteMessageById(conversation, message.id);
   };
 
   const contextMenuEntries = ko.pureComputed(() => {
@@ -211,7 +211,6 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
         onClickInvitePeople={onClickInvitePeople}
         onClickParticipants={onClickParticipants}
         onClickReceipts={onClickReceipts}
-        onDiscard={onDiscard}
         onRetry={onRetry}
         isMessageFocused={isMessageFocused}
         isMsgElementsFocusable={isMsgElementsFocusable}
@@ -235,6 +234,9 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
   }
   if (message.isCallTimeout()) {
     return <CallTimeoutMessage message={message} />;
+  }
+  if (message.isFailedToAddUsersMessage()) {
+    return <FailedToAddUsersMessage message={message} />;
   }
   if (message.isSystem()) {
     return <SystemMessage message={message} />;

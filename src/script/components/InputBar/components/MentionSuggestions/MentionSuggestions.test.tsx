@@ -19,7 +19,7 @@
 
 import {render, fireEvent, screen} from '@testing-library/react';
 
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {MentionSuggestionList} from './MentionSuggestions';
 
@@ -75,6 +75,6 @@ function generateUser(username: string, name: string) {
   const user = new User();
   user.username(username);
   user.name(name);
-  user.id = createRandomUuid();
+  user.id = createUuid();
   return user;
 }

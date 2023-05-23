@@ -81,7 +81,7 @@ jobs:
           yarn test --coverage --coverage-reporters=lcov --detectOpenHandles=false 2>&1 | tee ./unit-tests.log
 
       - name: Monitor coverage
-        uses: codecov/codecov-action@v3.1.1
+        uses: codecov/codecov-action@v3.1.4
         with:
           fail_ci_if_error: false
           files: ./coverage/lcov.info
@@ -307,7 +307,7 @@ jobs:
       - name: Creating Pull Request
         id: create-pr
         if: ${{ steps.release-info-file.outputs.exists == 'true' }}
-        uses: peter-evans/create-pull-request@v4
+        uses: peter-evans/create-pull-request@v5
         with:
           draft: false
           token: ${{ secrets.ZEBOT_GH_TOKEN }}

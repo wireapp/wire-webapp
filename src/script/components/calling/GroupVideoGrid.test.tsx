@@ -26,16 +26,27 @@ import {GroupVideoGrid, GroupVideoGripProps} from './GroupVideoGrid';
 import {Participant} from '../../calling/Participant';
 import {User} from '../../entity/User';
 
+const createMockParticipant = (
+  userId: string,
+  clientId: string,
+  {isMuted = false, isAudioEstablished = true}: {isMuted?: boolean; isAudioEstablished?: boolean},
+) => {
+  const user = new User(userId);
+
+  const participant = new Participant(user, clientId);
+  participant.isMuted(isMuted);
+  participant.isAudioEstablished(isAudioEstablished);
+
+  return participant;
+};
+
 describe('GroupVideoGrid', () => {
   it('renders video grids', async () => {
-    const self = new User('self');
-    self.name('Anton Bertha');
+    const selfParticipant = createMockParticipant('selfUser', 'selfClient', {isMuted: true});
+    selfParticipant.user.name('Anton Bertha');
 
-    const user = new User('user1');
-    user.name('Anot Heruser');
-
-    const selfParticipant = new Participant(self, 'selfClient');
-    const participant = new Participant(user, 'otherClient');
+    const participant = createMockParticipant('userId', 'clientId', {isMuted: true});
+    participant.user.name('Anot Heruser');
 
     const props: GroupVideoGripProps = {
       grid: {
@@ -56,23 +67,20 @@ describe('GroupVideoGrid', () => {
   });
 
   it('maximizes a grid on double click', async () => {
-    const userOne = new User('idOne');
-    userOne.name('Testing User One');
+    const participant = createMockParticipant('user1', 'clientId1', {});
+    participant.user.name('Testing User One');
 
-    const userTwo = new User('idTwo');
-    userOne.name('Testing User Two');
-
-    const participantOne = new Participant(userOne, 'exampleOne');
-    const participantTwo = new Participant(userTwo, 'exampleTwo');
+    const participant2 = createMockParticipant('user2', 'clientId2', {});
+    participant2.user.name('Testing User Two');
 
     const props: GroupVideoGripProps = {
       grid: {
-        grid: [participantOne, participantTwo],
+        grid: [participant, participant2],
         thumbnail: null,
       },
       maximizedParticipant: null,
       minimized: false,
-      selfParticipant: participantOne,
+      selfParticipant: participant,
       setMaximizedParticipant: jest.fn(),
     };
 
@@ -85,14 +93,12 @@ describe('GroupVideoGrid', () => {
     const gridFirstChild = groupVideoGrid.children[0];
 
     fireEvent.doubleClick(gridFirstChild);
-    expect(props.setMaximizedParticipant).toHaveBeenCalledWith(participantOne);
+    expect(props.setMaximizedParticipant).toHaveBeenCalledWith(participant);
   });
 
   it('renders a grid with paused video', async () => {
-    const user = new User('id');
-    user.name('Anton Bertha');
-
-    const participant = new Participant(user, 'example');
+    const participant = createMockParticipant('userId', 'clientId', {isMuted: true});
+    participant.user.name('Anton Bertha');
     participant.videoState(VIDEO_STATE.PAUSED);
 
     const props: GroupVideoGripProps = {
@@ -112,11 +118,8 @@ describe('GroupVideoGrid', () => {
   });
 
   it('renders thumbnail', async () => {
-    const user = new User('user1');
-    user.name('Anton Bertha');
-
-    const participant = new Participant(user, 'example1');
-    participant.isMuted(true);
+    const participant = createMockParticipant('userId', 'clientId', {isMuted: true});
+    participant.user.name('Anton Bertha');
 
     const props: GroupVideoGripProps = {
       grid: {
@@ -138,9 +141,7 @@ describe('GroupVideoGrid', () => {
   });
 
   it('does not render muted thumbnail when un-muted', async () => {
-    const user = new User('id');
-    const participant = new Participant(user, 'example');
-    participant.isMuted(false);
+    const participant = createMockParticipant('userId', 'clientId', {});
 
     const props: GroupVideoGripProps = {
       grid: {
@@ -156,5 +157,25 @@ describe('GroupVideoGrid', () => {
     const {queryByTestId} = render(<GroupVideoGrid {...props} />);
     const thumbnailMutedIcon = queryByTestId('status-call-audio-muted');
     expect(thumbnailMutedIcon).toBeNull();
+  });
+
+  it('Does render "connecting..." text for users that are in non established audio state', async () => {
+    const participant = createMockParticipant('user1', 'clientId1', {});
+    const participant2 = createMockParticipant('user2', 'clientId2', {isAudioEstablished: false});
+    const participant3 = createMockParticipant('user3', 'clientId3', {isAudioEstablished: false});
+
+    const props: GroupVideoGripProps = {
+      grid: {
+        grid: [participant, participant2, participant3],
+        thumbnail: participant,
+      },
+      maximizedParticipant: null,
+      minimized: false,
+      selfParticipant: participant,
+      setMaximizedParticipant: jest.fn(),
+    };
+
+    const {getAllByText} = render(<GroupVideoGrid {...props} />);
+    expect(getAllByText('videoCallParticipantConnecting')).toHaveLength(2);
   });
 });

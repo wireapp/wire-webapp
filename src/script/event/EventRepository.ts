@@ -303,11 +303,9 @@ export class EventRepository {
       source = EventRepository.SOURCE.INJECTED;
     }
 
-    const id = 'id' in event ? event.id : 'ID not specified';
     const conversationId = 'conversation' in event && event.conversation;
     const inSelfConversation = conversationId === this.userState.self().id;
     if (!inSelfConversation) {
-      this.logger.info(`Injected event ID '${id}' of type '${event.type}' with source '${source}'`);
       return this.processEvent(event, source);
     }
     return undefined;
@@ -362,7 +360,7 @@ export class EventRepository {
         return event;
       }
       case EventValidation.OUTDATED_TIMESTAMP: {
-        this.logger.info(`Ignored outdated event type: '${event.type}'`);
+        this.logger.warn(`Ignored outdated event type: '${event.type}'`);
         return event;
       }
       case EventValidation.VALID:
@@ -524,15 +522,24 @@ export class EventRepository {
     const newEventData = newEvent.data;
     // the preview status is not sent by the client so we fake a 'preview' status in order to cleanly handle it in the switch statement
     const ASSET_PREVIEW = 'preview';
+    // similarly, no status is sent by the client when we retry sending a failed message
+    const RETRY_EVENT = 'retry';
     const isPreviewEvent = !newEventData.status && !!newEventData.preview_key;
-    const previewStatus = isPreviewEvent ? ASSET_PREVIEW : newEventData.status;
+    const isRetryEvent = !!newEventData.content_length;
+    const handledEvent = isRetryEvent ? RETRY_EVENT : newEventData.status;
+    const previewStatus = isPreviewEvent ? ASSET_PREVIEW : handledEvent;
+
+    const updateEvent = () => {
+      const updatedData = {...originalEvent.data, ...newEventData};
+      const updatedEvent = {...originalEvent, data: updatedData};
+      return this.eventService.replaceEvent(updatedEvent);
+    };
 
     switch (previewStatus) {
       case ASSET_PREVIEW:
+      case RETRY_EVENT:
       case AssetTransferState.UPLOADED: {
-        const updatedData = {...originalEvent.data, ...newEventData};
-        const updatedEvent = {...originalEvent, data: updatedData};
-        return this.eventService.replaceEvent(updatedEvent);
+        return updateEvent();
       }
 
       case AssetTransferState.UPLOAD_FAILED: {

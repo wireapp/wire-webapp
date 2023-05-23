@@ -24,7 +24,8 @@ import {EventMapper} from 'src/script/conversation/EventMapper';
 import {Conversation} from 'src/script/entity/Conversation';
 import {ClientEvent} from 'src/script/event/Client';
 import {MentionEntity} from 'src/script/message/MentionEntity';
-import {createRandomUuid, arrayToBase64} from 'Util/util';
+import {arrayToBase64} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {TestFactory} from '../../helper/TestFactory';
 
@@ -44,13 +45,13 @@ describe('Event Mapper', () => {
   });
 
   beforeEach(() => {
-    conversation_et = new Conversation(createRandomUuid());
+    conversation_et = new Conversation(createUuid());
     event_mapper = new EventMapper();
   });
 
   describe('mapJsonEvent', () => {
     it('maps text messages without link previews', () => {
-      const event_id = createRandomUuid();
+      const event_id = createUuid();
 
       const event = {
         conversation: conversation_et.id,
@@ -58,7 +59,7 @@ describe('Event Mapper', () => {
           content: 'foo',
           nonce: event_id,
         },
-        from: createRandomUuid,
+        from: createUuid,
         id: event_id,
         time: new Date().toISOString(),
         type: ClientEvent.CONVERSATION.MESSAGE_ADD,
@@ -71,7 +72,7 @@ describe('Event Mapper', () => {
     });
 
     it('maps text messages with deprecated link preview format', async () => {
-      const event_id = createRandomUuid();
+      const event_id = createUuid();
 
       const article = new Article({
         permanentUrl: 'test.com',
@@ -93,7 +94,7 @@ describe('Event Mapper', () => {
           nonce: event_id,
           previews: [base64LinkPreview],
         },
-        from: createRandomUuid,
+        from: createUuid,
         id: event_id,
         time: new Date().toISOString(),
         type: ClientEvent.CONVERSATION.MESSAGE_ADD,
@@ -108,7 +109,7 @@ describe('Event Mapper', () => {
     });
 
     it('maps text messages with link preview', async () => {
-      const event_id = createRandomUuid();
+      const event_id = createUuid();
 
       const link_preview = new LinkPreview({
         article: null,
@@ -128,7 +129,7 @@ describe('Event Mapper', () => {
           nonce: event_id,
           previews: [base64Preview],
         },
-        from: createRandomUuid,
+        from: createUuid,
         id: event_id,
         time: new Date().toISOString(),
         type: ClientEvent.CONVERSATION.MESSAGE_ADD,
@@ -268,10 +269,10 @@ describe('Event Mapper', () => {
       const randy = '@Randy';
       const text = `Hi ${mandy} and ${randy}.`;
 
-      const validMention = new MentionEntity(text.indexOf('@'), mandy.length, createRandomUuid());
-      const outOfRangeMention = new MentionEntity(text.length, randy.length, createRandomUuid());
+      const validMention = new MentionEntity(text.indexOf('@'), mandy.length, createUuid());
+      const outOfRangeMention = new MentionEntity(text.length, randy.length, createUuid());
 
-      const conversationEntity = new Conversation(createRandomUuid());
+      const conversationEntity = new Conversation(createUuid());
 
       const mentionArrays = [
         arrayToBase64(Mention.encode(validMention.toProto()).finish()),
@@ -286,8 +287,8 @@ describe('Event Mapper', () => {
           mentions: mentionArrays,
           previews: [],
         },
-        from: createRandomUuid(),
-        id: createRandomUuid(),
+        from: createUuid(),
+        id: createUuid(),
         primary_key: 5,
         time: '2018-09-27T15:23:14.177Z',
         type: 'conversation.message-add',
@@ -307,13 +308,13 @@ describe('Event Mapper', () => {
 
       const mandyStart = text.indexOf(mandy);
       const sandyStart = text.indexOf(sandy);
-      const validMention1 = new MentionEntity(mandyStart, mandy.length, createRandomUuid());
-      const validMention2 = new MentionEntity(sandyStart, sandy.length, createRandomUuid());
+      const validMention1 = new MentionEntity(mandyStart, mandy.length, createUuid());
+      const validMention2 = new MentionEntity(sandyStart, sandy.length, createUuid());
 
       const overlappingStart = mandyStart + mandy.length - 1;
-      const overlappingMention = new MentionEntity(overlappingStart, randy.length, createRandomUuid());
+      const overlappingMention = new MentionEntity(overlappingStart, randy.length, createUuid());
 
-      const conversationEntity = new Conversation(createRandomUuid());
+      const conversationEntity = new Conversation(createUuid());
 
       const mentionArrays = [
         arrayToBase64(Mention.encode(validMention1.toProto()).finish()),
@@ -329,8 +330,8 @@ describe('Event Mapper', () => {
           mentions: mentionArrays,
           previews: [],
         },
-        from: createRandomUuid(),
-        id: createRandomUuid(),
+        from: createUuid(),
+        id: createUuid(),
         primary_key: 5,
         time: '2018-09-27T15:23:14.177Z',
         type: 'conversation.message-add',

@@ -51,6 +51,8 @@ export class ContentMessage extends Message {
   public readonly other_likes: ko.PureComputed<User[]>;
   public readonly failedToSend: ko.Observable<{queued?: QualifiedUserClients; failed?: QualifiedId[]} | undefined> =
     ko.observable();
+  // raw content of a file that was supposed to be sent but failed. Is undefined if the message has been successfully sent
+  public readonly fileData: ko.Observable<Blob | undefined> = ko.observable();
   public readonly quote: ko.Observable<QuoteEntity>;
   // TODO: Rename to `reactionsUsers`
   public readonly reactions_user_ids: ko.PureComputed<string>;

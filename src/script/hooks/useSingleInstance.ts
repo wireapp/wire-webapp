@@ -24,7 +24,7 @@ import Cookies from 'js-cookie';
 import {Runtime} from '@wireapp/commons';
 
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 const CONFIG = {
   COOKIE_NAME: 'app_opened',
@@ -64,7 +64,7 @@ export function useSingleInstance() {
   const [hasOtherInstance, setHasOtherInstance] = useState(!isRunningInstance(instanceId.current));
 
   const registerInstance = () => {
-    instanceId.current = createRandomUuid();
+    instanceId.current = createUuid();
     return register(instanceId.current);
   };
 

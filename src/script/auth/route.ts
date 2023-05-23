@@ -33,6 +33,7 @@ export const QUERY_KEY = {
   PERSIST_TEMPORARY_CLIENTS: 'persist_temporary_clients',
   PWA_AWARE: 'pwa_aware',
   SSO_AUTO_LOGIN: 'sso_auto_login',
+  SCOPE: 'scope',
   TRACKING: 'tracking',
   TWO_FACTOR: '2fa',
 };
@@ -53,6 +54,7 @@ export const LOGOUT_REASON = {
 };
 
 export const ROUTE = {
+  AUTHORIZE: '/authorize',
   CHECK_PASSWORD: '/checkpassword',
   CLIENTS: '/clients',
   CONVERSATION_JOIN: '/join-conversation',

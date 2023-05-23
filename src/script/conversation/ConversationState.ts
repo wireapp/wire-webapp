@@ -54,6 +54,10 @@ export class ConversationState {
   public readonly connectedUsers: ko.PureComputed<User[]>;
 
   public readonly sortedConversations: ko.PureComputed<Conversation[]>;
+  /**
+   * conversations that could not be loaded because their back-end is currently offline
+   */
+  public missingConversations: QualifiedId[] = [];
 
   constructor(
     private readonly userState = container.resolve(UserState),

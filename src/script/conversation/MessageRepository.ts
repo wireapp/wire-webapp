@@ -49,7 +49,8 @@ import {roundLogarithmic} from 'Util/NumberUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {createRandomUuid, loadUrlBlob, supportsMLS} from 'Util/util';
+import {loadUrlBlob, supportsMLS} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {findDeletedClients} from './ClientMismatchUtil';
 import {ConversationRepository} from './ConversationRepository';
@@ -129,6 +130,12 @@ type TextMessagePayload = {
   quote?: OutgoingQuote;
 };
 type EditMessagePayload = TextMessagePayload & {originalMessageId: string};
+
+const enum SendAndInjectSendingState {
+  FAILED = 'FAILED',
+}
+
+type SendAndInjectResult = Omit<SendResult, 'state'> & {state: MessageSendingState | SendAndInjectSendingState};
 
 /** A message that has already been stored in DB and has a primary key */
 type StoredMessage = Message & {primary_key: string};
@@ -330,7 +337,7 @@ export class MessageRepository {
       quote: quoteEntity,
       // We set the id explicitely in order to be able to override the message if we generate a link preview
       // Similarly, we provide that same id when we retry to send a failed message in order to override the original
-      messageId: messageId ?? createRandomUuid(),
+      messageId: messageId ?? createUuid(),
     };
     const {state} = await this.sendText(textPayload);
     if (state !== MessageSendingState.CANCELED) {
@@ -368,7 +375,7 @@ export class MessageRepository {
       conversation,
       mentions,
       message: textMessage,
-      messageId: createRandomUuid(), // We set the id explicitely in order to be able to override the message if we generate a link preview
+      messageId: createUuid(), // We set the id explicitely in order to be able to override the message if we generate a link preview
       originalMessageId: originalMessage.id,
     };
     const {state} = await this.sendEdit(messagePayload);
@@ -460,29 +467,32 @@ export class MessageRepository {
    * @param conversation Conversation to post the file
    * @param file File object
    * @param asImage whether or not the file should be treated as an image
+   * @param originalId Id of the messsage currently in db, necessary to replace the original message
    * @returns Resolves when file was uploaded
    */
   private async uploadFile(
     conversation: Conversation,
     file: Blob,
     asImage: boolean = false,
+    originalId?: string,
   ): Promise<EventRecord | void> {
     const uploadStarted = Date.now();
-    const {id, state} = await this.sendAssetMetadata(conversation, file, asImage);
+
+    const {id, state} = await this.sendAssetMetadata(conversation, file, asImage, originalId);
+    if (state === SendAndInjectSendingState.FAILED) {
+      await this.storeFileInDb(conversation, id, file);
+      return;
+    }
     if (state === MessageSendingState.CANCELED) {
-      throw new ConversationError(
-        ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION,
-        ConversationError.MESSAGE.DEGRADED_CONVERSATION_CANCELLATION,
-      );
+      // The user has canceled the upload, no need to do anything else
+      return;
     }
     try {
       await this.sendAssetRemotedata(conversation, file, id, asImage);
       const uploadDuration = (Date.now() - uploadStarted) / TIME_IN_MILLIS.SECOND;
       this.logger.info(`Finished to upload asset for conversation'${conversation.id} in ${uploadDuration}`);
     } catch (error) {
-      if (this.isUserCancellationError(error)) {
-        throw error;
-      } else if (error instanceof RequestCancellationError) {
+      if (error instanceof RequestCancellationError) {
         return;
       }
       this.logger.error(
@@ -490,9 +500,50 @@ export class MessageRepository {
         error,
       );
       const messageEntity = await this.getMessageInConversationById(conversation, id);
-      this.sendAssetUploadFailed(conversation, messageEntity.id);
+      await this.sendAssetUploadFailed(conversation, messageEntity.id);
       return this.updateMessageAsUploadFailed(messageEntity);
     }
+  }
+
+  /**
+   * Retry sending a file to a conversation when the original message failed to be sent
+   *
+   * @param conversation Conversation to post the file
+   * @param file File object
+   * @param asImage whether or not the file should be treated as an image
+   * @param originalId Id of the messsage currently in db, necessary to replace the original message
+   * @returns Resolves when file was uploaded
+   */
+  public async retryUploadFile(
+    conversation: Conversation,
+    file: Blob,
+    asImage: boolean = false,
+    originalId: string,
+  ): Promise<EventRecord | void> {
+    await this.uploadFile(conversation, file, asImage, originalId);
+  }
+
+  /**
+   * Store a file in offline db to be able to send it later
+   *
+   * @param conversation Conversation to post the file
+   * @param file File object to be stored in db
+   * @param messageId Id of the messsage in db to update
+   * @returns Resolves when database was updated
+   */
+  private async storeFileInDb(conversation: Conversation, messageId: string, file: Blob) {
+    try {
+      const messageEntity = await this.getMessageInConversationById(conversation, messageId);
+      messageEntity.fileData(file);
+      return this.eventService.updateEvent(messageEntity.primary_key, {
+        fileData: file,
+      });
+    } catch (error) {
+      if ((error as any).type !== ConversationError.TYPE.MESSAGE_NOT_FOUND) {
+        throw error;
+      }
+    }
+    return undefined;
   }
 
   /**
@@ -544,7 +595,12 @@ export class MessageRepository {
   /**
    * Send asset metadata message to specified conversation.
    */
-  private async sendAssetMetadata(conversation: Conversation, file: File | Blob, allowImageDetection?: boolean) {
+  private async sendAssetMetadata(
+    conversation: Conversation,
+    file: File | Blob,
+    allowImageDetection?: boolean,
+    originalId?: string,
+  ) {
     let metadata;
     try {
       metadata = await buildMetadata(file);
@@ -563,9 +619,7 @@ export class MessageRepository {
     } else if (allowImageDetection && isImage(file)) {
       meta.image = metadata as ImageMetaData;
     }
-    const message = MessageBuilder.buildFileMetaDataMessage({
-      metaData: meta as FileMetaDataContent,
-    });
+    const message = MessageBuilder.buildFileMetaDataMessage({metaData: meta as FileMetaDataContent}, originalId);
     return this.sendAndInjectMessage(message, conversation, {enableEphemeral: true});
   }
 
@@ -581,14 +635,6 @@ export class MessageRepository {
     const payload = MessageBuilder.buildFileAbortMessage({reason}, messageId);
 
     return this.sendAndInjectMessage(payload, conversation);
-  }
-
-  private isUserCancellationError(error: any): boolean {
-    const errorTypes: string[] = [
-      ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION,
-      ConversationError.TYPE.LEGAL_HOLD_CONVERSATION_CANCELLATION,
-    ];
-    return errorTypes.includes(error.type);
   }
 
   /**
@@ -690,7 +736,7 @@ export class MessageRepository {
     } = {
       syncTimestamp: true,
     },
-  ) {
+  ): Promise<SendAndInjectResult> {
     const {groupId} = conversation;
 
     const messageTimer = conversation.messageTimer();
@@ -749,7 +795,8 @@ export class MessageRepository {
 
     const shouldProceedSending = await injectOptimisticEvent();
     if (shouldProceedSending === false) {
-      return {id: payload.messageId, state: MessageSendingState.CANCELED};
+      this.logger.log('User has canceled sending a message to a degraded conversation.');
+      return {id: payload.messageId, sentAt: new Date().toISOString(), state: MessageSendingState.CANCELED};
     }
 
     try {
@@ -761,7 +808,7 @@ export class MessageRepository {
       return result;
     } catch (error) {
       await this.updateMessageAsFailed(conversation, payload.messageId);
-      throw error;
+      return {id: payload.messageId, sentAt: new Date().toISOString(), state: SendAndInjectSendingState.FAILED};
     }
   }
 
@@ -1062,7 +1109,7 @@ export class MessageRepository {
     const protoAvailability = new Availability({type: protoFromType(availability)});
     const genericMessage = new GenericMessage({
       [GenericMessageType.AVAILABILITY]: protoAvailability,
-      messageId: createRandomUuid(),
+      messageId: createUuid(),
     });
 
     const sortedUsers = this.userState
@@ -1110,9 +1157,10 @@ export class MessageRepository {
       const messageEntity = await this.getMessageInConversationById(conversationEntity, eventId);
       const updatedStatus = messageEntity.readReceipts().length ? StatusType.SEEN : StatusType.SENT;
       messageEntity.status(updatedStatus);
-      const changes: Pick<Partial<EventRecord>, 'status' | 'time' | 'failedToSend'> = {
+      const changes: Pick<Partial<EventRecord>, 'status' | 'time' | 'failedToSend' | 'fileData'> = {
         status: updatedStatus,
         failedToSend,
+        fileData: undefined,
       };
       if (isoDate) {
         const timestamp = new Date(isoDate).getTime();
