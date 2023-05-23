@@ -90,7 +90,8 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
     if (isTabKey(event)) {
       setCurrentMsgAction('');
     }
-    // on escape from any of message actions menu item should close the reaction and focus on message input bar
+    // on escape from any of the message actions menu item, it should close the action menu
+    // and focus on message input bar
     if (isEscapeKey(event)) {
       resetActionMenuStates();
     }
@@ -102,7 +103,7 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
         const newEvent = setContextMenuPosition(event);
         showContextMenu(newEvent, menuEntries, 'message-options-menu', resetActionMenuStates);
       } else if (!event.shiftKey && isTabKey(event) && !reactionsTotalCount) {
-        // if there's no reaction then on tab from context menu should hide message actions menu
+        // if there's no reaction then on tab from context menu hide the message actions menu
         setCurrentMsgAction('');
         handleActionMenuVisibility(false);
       } else if (isEscapeKey(event)) {

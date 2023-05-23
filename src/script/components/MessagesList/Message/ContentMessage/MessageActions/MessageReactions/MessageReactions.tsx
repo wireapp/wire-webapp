@@ -76,7 +76,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
   };
 
   useEffect(() => {
-    // after emoji selection/esc key close the picker and retain the focus on the emoji button
+    // after emoji selection/esc key press, close the picker and retain the focus on the emoji button
     if (!showEmojis && currentMsgActionName === MessageActionsId.EMOJI) {
       if (emojiButtonRef.current) {
         emojiButtonRef.current.focus();
