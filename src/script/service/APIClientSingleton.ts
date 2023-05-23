@@ -22,15 +22,26 @@ import {singleton} from 'tsyringe';
 import {APIClient as APIClientUnconfigured} from '@wireapp/api-client';
 
 import {Config} from '../Config';
+const REST_URL = 'https://nginz-https';
+const WS_URL = 'wss://nginz-ssl';
 
 @singleton()
 export class APIClient extends APIClientUnconfigured {
   constructor() {
     super({
       urls: {
-        name: Config.getConfig().ENVIRONMENT,
-        rest: Config.getConfig().BACKEND_REST,
-        ws: Config.getConfig().BACKEND_WS,
+        name:
+          Config.getConfig().ENVIRONMENT === document.location.origin
+            ? Config.getConfig().ENVIRONMENT
+            : document.location.origin,
+        rest:
+          Config.getConfig().ENVIRONMENT === document.location.origin
+            ? Config.getConfig().BACKEND_REST
+            : REST_URL + document.location.host.slice(document.location.host.indexOf('.')),
+        ws:
+          Config.getConfig().ENVIRONMENT === document.location.origin
+            ? Config.getConfig().BACKEND_WS
+            : WS_URL + document.location.host.slice(document.location.host.indexOf('.')),
       },
     });
   }
