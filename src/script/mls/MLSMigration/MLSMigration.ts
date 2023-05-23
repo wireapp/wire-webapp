@@ -173,7 +173,6 @@ const migrateConversationsToMLS = async ({
       !conversation.isTeam1to1(),
   );
 
-  //TODO: it returns a map of protocol -> conversations, we need to iterate over it and continue with the migration based on the protocol
   const {proteus: proteusConversations} = groupConversationsByProtocol(regularGroupConversations);
 
   await initialiseMigrationOfProteusConversations(proteusConversations, {
