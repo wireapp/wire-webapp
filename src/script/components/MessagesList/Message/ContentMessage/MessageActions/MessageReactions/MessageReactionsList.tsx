@@ -60,7 +60,7 @@ const MessageReactionsList: FC<MessageReactionsListProps> = ({
   const reactionsList = Array.from(reactionGroupedByUser);
   return (
     <div css={messageReactionWrapper}>
-      {Array.from(reactionsList).map(([emoji, users], index) => {
+      {reactionsList.map(([emoji, users], index) => {
         const emojiUnicode = getEmojiUnicode(emoji);
         const emojiUrl = getEmojiUrl(emojiUnicode);
         const emojiName = getEmojiTitleFromEmojiUnicode(emojiUnicode);
