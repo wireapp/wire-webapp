@@ -17,7 +17,7 @@
  *
  */
 
-import {useState, useEffect, useCallback, RefObject, FC} from 'react';
+import {useState, useEffect, useCallback, RefObject, FC, useRef} from 'react';
 
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {KEY} from 'Util/KeyboardUtil';
@@ -66,13 +66,23 @@ const MessageReactions: FC<MessageReactionsProps> = ({
   const {handleMenuOpen} = useMessageActionsState();
   const [clientX, setPOSX] = useState(INITIAL_CLIENT_X_POS);
   const [clientY, setPOSY] = useState(INITIAL_CLIENT_Y_POS);
+  const emojiButtonRef = useRef<HTMLButtonElement>(null);
 
   const closeEmojiPicker = () => {
     if (showEmojis) {
-      handleCurrentMsgAction('');
       handleMenuOpen(false);
+      setShowEmojis(false);
     }
   };
+
+  useEffect(() => {
+    // after emoji selection/esc key close the picker and retain the focus on the emoji button
+    if (!showEmojis && currentMsgActionName === MessageActionsId.EMOJI) {
+      if (emojiButtonRef.current) {
+        emojiButtonRef.current.focus();
+      }
+    }
+  }, [currentMsgActionName, showEmojis]);
 
   const handleOutsideClick = () => {
     resetActionMenuStates();
@@ -83,7 +93,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
     if (currentMsgActionName !== MessageActionsId.EMOJI && showEmojis) {
       setShowEmojis(false);
     }
-  }, [currentMsgActionName]);
+  }, [currentMsgActionName, showEmojis]);
 
   const handleReactionCurrentState = useCallback(
     (actionName = '') => {
@@ -223,6 +233,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
         tabIndex={messageFocusedTabIndex}
         onClick={handleMsgActionClick}
         onKeyDown={handleMsgActionKeyDown}
+        ref={emojiButtonRef}
       >
         <svg width="23" height="23" viewBox="0 0 23 23" fill="none">
           <path

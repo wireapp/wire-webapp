@@ -91,6 +91,8 @@ const EmojiPickerContainer: FC<EmojiPickerContainerProps> = ({
         <div
           className="overlay"
           onKeyDown={event => {
+            // prevent emoji picker up/down arrow key to naviage between messages in background
+            event.stopPropagation();
             if (isEscapeKey(event)) {
               onClose();
             }

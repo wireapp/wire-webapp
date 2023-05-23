@@ -171,16 +171,6 @@ const Message: React.FC<
     setElementsTabIndex(interactiveMsgElements, isMsgElementsFocusable && isMessageFocused);
   }, [isMessageFocused, isMsgElementsFocusable, message]);
 
-  // set message elements focus for non content type mesages
-  // some non content type message has interactive element like invite people for member message
-  useEffect(() => {
-    if (!messageRef.current || message.isContent()) {
-      return;
-    }
-    const interactiveMsgElements = getAllFocusableElements(messageRef.current);
-    setElementsTabIndex(interactiveMsgElements, isMsgElementsFocusable && isMessageFocused);
-  }, [isMessageFocused, isMsgElementsFocusable, message]);
-
   const getTimestampClass = (): string => {
     const classes = {
       [MessageMarkerType.NONE]: '',
