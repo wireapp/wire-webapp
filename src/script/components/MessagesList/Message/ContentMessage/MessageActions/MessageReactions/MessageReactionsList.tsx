@@ -23,7 +23,7 @@ import {Tooltip} from '@wireapp/react-ui-kit';
 
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
 import {getEmojiUnicode, getEmojiTitleFromEmojiUnicode} from 'Util/EmojiUtil';
-import {isEnterKey} from 'Util/KeyboardUtil';
+import {isEnterKey, isTabKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {Reactions, getEmojiUrl, groupByReactionUsers} from 'Util/ReactionUtil';
 
@@ -44,6 +44,7 @@ export interface MessageReactionsListProps {
   handleReactionClick: (emoji: string) => void;
   isMessageFocused: boolean;
   onTooltipReactionCountClick: () => void;
+  onLastReactionKeyEvent: () => void;
 }
 
 const MessageReactionsList: FC<MessageReactionsListProps> = ({
@@ -51,13 +52,15 @@ const MessageReactionsList: FC<MessageReactionsListProps> = ({
   handleReactionClick,
   onTooltipReactionCountClick,
   isMessageFocused,
+  onLastReactionKeyEvent,
 }) => {
   const [isSelectedEmoji, setSelected] = useState('');
   const reactionGroupedByUser = groupByReactionUsers(reactions);
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
+  const reactionsList = Array.from(reactionGroupedByUser);
   return (
     <div css={messageReactionWrapper}>
-      {Array.from(reactionGroupedByUser).map(([emoji, users], index) => {
+      {reactionsList.map(([emoji, users], index) => {
         const emojiUnicode = getEmojiUnicode(emoji);
         const emojiUrl = getEmojiUrl(emojiUnicode);
         const emojiName = getEmojiTitleFromEmojiUnicode(emojiUnicode);
@@ -106,6 +109,14 @@ const MessageReactionsList: FC<MessageReactionsListProps> = ({
                 onClick={() => {
                   setSelected(emojiUrl);
                   handleReactionClick(emoji);
+                }}
+                onKeyDown={event => {
+                  // is last reaction then on tab key press it should hide the reaction menu
+                  if (index === reactionsList.length - 1) {
+                    if (!event.shiftKey && isTabKey(event)) {
+                      onLastReactionKeyEvent();
+                    }
+                  }
                 }}
               >
                 <EmojiImg emojiUrl={emojiUrl} emojiName={emojiName} />

@@ -26,7 +26,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/ContextMenu';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {isTabKey, KEY} from 'Util/KeyboardUtil';
+import {isEscapeKey, isTabKey, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {setContextMenuPosition} from 'Util/util';
 
@@ -60,6 +60,7 @@ export interface MessageActionsMenuProps {
   handleActionMenuVisibility: (isVisible: boolean) => void;
   messageWithSection: boolean;
   handleReactionClick: (emoji: string) => void;
+  reactionsTotalCount: number;
 }
 
 const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
@@ -70,6 +71,7 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
   message,
   messageWithSection,
   handleReactionClick,
+  reactionsTotalCount,
 }) => {
   const {entries: menuEntries} = useKoSubscribableChildren(contextMenu, ['entries']);
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
@@ -88,6 +90,11 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
     if (isTabKey(event)) {
       setCurrentMsgAction('');
     }
+    // on escape from any of the message actions menu item, it should close the action menu
+    // and focus on message input bar
+    if (isEscapeKey(event)) {
+      resetActionMenuStates();
+    }
   }, []);
 
   const handleContextKeyDown = useCallback(
@@ -95,12 +102,15 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
       if ([KEY.SPACE, KEY.ENTER].includes(event.key)) {
         const newEvent = setContextMenuPosition(event);
         showContextMenu(newEvent, menuEntries, 'message-options-menu', resetActionMenuStates);
-      } else if (isTabKey(event)) {
+      } else if (!event.shiftKey && isTabKey(event) && !reactionsTotalCount) {
+        // if there's no reaction then on tab from context menu hide the message actions menu
         setCurrentMsgAction('');
         handleActionMenuVisibility(false);
+      } else if (isEscapeKey(event)) {
+        resetActionMenuStates();
       }
     },
-    [handleActionMenuVisibility, menuEntries, resetActionMenuStates],
+    [handleActionMenuVisibility, menuEntries, reactionsTotalCount, resetActionMenuStates],
   );
 
   const handleContextMenuClick = useCallback(

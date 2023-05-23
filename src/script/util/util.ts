@@ -23,9 +23,9 @@ import type {ObservableArray} from 'knockout';
 
 import {UrlUtil, Runtime} from '@wireapp/commons';
 
-import {isTabKey} from 'Util/KeyboardUtil';
 import {findMentionAtPosition} from 'Util/MentionUtil';
 
+import {isTabKey} from './KeyboardUtil';
 import {loadValue} from './StorageUtil';
 
 import {QUERY_KEY} from '../auth/route';
