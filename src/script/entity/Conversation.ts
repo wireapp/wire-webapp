@@ -503,19 +503,19 @@ export class Conversation {
      *
      * - Name of the other participant
      * - Name of the other user of the associated connection
-     * - "..." if neither of those has been attached yet
+     * - "Name not available" if neither of those has been attached yet
      *
      * 'Group Conversation':
      * - Conversation name received from backend
      * - If unnamed, we will create a name from the participant names
      * - Join the user's first names to a comma separated list or uses the user's first name if only one user participating
-     * - "..." if the user entities have not yet been attached yet
+     * - "..." if the user entities have not yet been attached
      */
     this.display_name = ko.pureComputed(() => {
       if (this.isRequest() || this.is1to1()) {
         const [userEntity] = this.participating_user_ets();
         const userName = userEntity?.name();
-        return userName || '…';
+        return userName || t('unavailableUser');
       }
 
       if (this.isGroup()) {

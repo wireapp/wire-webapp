@@ -103,15 +103,22 @@ export const PeopleTab: React.FC<{
     if (!canSearchUnconnectedUsers) {
       return connectedUsers;
     }
-    if (isTeam) {
-      return unfiltered
-        ? teamState.teamUsers()
-        : teamState
-            .teamUsers()
-            .filter(user => connectedUsers.includes(user) || teamRepository.isSelfConnectedTo(user.id));
+
+    let contacts: User[] = [];
+
+    if (!isTeam) {
+      contacts = userState.connectedUsers();
+    } else {
+      const teamUsers = teamState.teamUsers();
+
+      contacts = unfiltered
+        ? teamUsers
+        : teamUsers.filter(user => connectedUsers.includes(user) || teamRepository.isSelfConnectedTo(user.id));
     }
-    return userState.connectedUsers();
+
+    return contacts.filter(user => user.isAvailable());
   };
+
   const [results, setResults] = useState<SearchResultsData>({contacts: getLocalUsers(), groups: [], others: []});
   const searchOnFederatedDomain = () => '';
   const hasResults = results.contacts.length + results.groups.length + results.others.length > 0;

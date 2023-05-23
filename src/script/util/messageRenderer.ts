@@ -50,6 +50,24 @@ const originalFenceRule = markdownit.renderer.rules.fence!;
 
 markdownit.renderer.rules.heading_open = () => '<div class="md-heading">';
 markdownit.renderer.rules.heading_close = () => '</div>';
+const originalNormalizeLink = markdownit.normalizeLink!;
+
+const isValidUrl = (url: string): boolean => {
+  // only allow urls to wire://, https://, http:// and mailto:
+  return !!url.match(/^(wire:\/\/|https?:\/\/|mailto:)/i);
+};
+markdownit.validateLink = isValidUrl;
+markdownit.normalizeLink = (url: string): string => {
+  url = originalNormalizeLink(url);
+  if (isValidUrl(url)) {
+    return url;
+  }
+  // prepend "https://" if url does not begin with a protocol or vbscript:, javascript:, file:, data:
+  if (!url.match(/^(.*:\/\/|(vbscript|javascript|file|data):)/i)) {
+    return `https://${url}`;
+  }
+  return url;
+};
 
 markdownit.renderer.rules.softbreak = () => '<br>';
 markdownit.renderer.rules.hardbreak = () => '<br>';
@@ -82,7 +100,7 @@ const renderMention = (mentionData: MentionText) => {
 
 markdownit.normalizeLinkText = text => text;
 
-export const renderMessage = (message: string, selfId: QualifiedId | null, mentionEntities: MentionEntity[] = []) => {
+export const renderMessage = (message: string, selfId?: QualifiedId, mentionEntities: MentionEntity[] = []) => {
   const createMentionHash = (mention: MentionEntity) => `@@${window.btoa(JSON.stringify(mention)).replace(/=/g, '')}`;
 
   const mentionTexts: Record<string, MentionText> = {};
@@ -154,19 +172,18 @@ export const renderMessage = (message: string, selfId: QualifiedId | null, menti
     const cleanString = (hashedString: string) => escape(removeMentionsHashes(hashedString));
     const link = tokens[idx];
     const href = removeMentionsHashes(link.attrGet('href') ?? '');
-    const isEmail = href?.startsWith('mailto:');
-    const isWireDeepLink = href?.toLowerCase().startsWith('wire://');
+    const isEmail = href.startsWith('mailto:');
+    const isWireDeepLink = href.toLowerCase().startsWith('wire://');
     const nextToken = tokens[idx + 1];
     const text = nextToken?.type === 'text' ? nextToken.content : '';
+    const closeToken = tokens.slice(idx).find(token => token.type === 'link_close');
 
-    if (!href || !text.trim()) {
-      nextToken.content = '';
-      const closeToken = tokens.slice(idx).find(token => token.type === 'link_close');
+    if (href == '' || closeToken == nextToken || (!text.trim() && closeToken == tokens[idx + 2])) {
       if (closeToken) {
         closeToken.type = 'text';
-        closeToken.content = '';
+        closeToken.content = `](${cleanString(href)})`;
       }
-      return `[${cleanString(text)}](${cleanString(href)})`;
+      return '['; //'${cleanString(text)}`;
     }
     if (isEmail) {
       link.attrPush(['data-email-link', 'true']);
@@ -187,7 +204,11 @@ export const renderMessage = (message: string, selfId: QualifiedId | null, menti
       link.attrPush(['data-uie-name', 'wire-deep-link']);
     }
     if (link.markup === 'linkify') {
-      nextToken.content = encodeURI(nextToken.content);
+      const displayedLink = removeMentionsHashes(nextToken.content);
+      if (!href.endsWith(`://${displayedLink}`) && href != displayedLink && href != `mailto:${displayedLink}`) {
+        link.attrPush(['data-md-link', 'true']);
+        link.attrPush(['data-uie-name', 'markdown-link']);
+      }
     }
     return self.renderToken(tokens, idx, options);
   };

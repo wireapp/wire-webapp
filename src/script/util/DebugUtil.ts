@@ -35,7 +35,7 @@ import {container} from 'tsyringe';
 
 import {getLogger, Logger} from 'Util/Logger';
 
-import {createRandomUuid} from './util';
+import {createUuid} from './uuid';
 
 import {CallingRepository} from '../calling/CallingRepository';
 import {CallState} from '../calling/CallState';
@@ -129,7 +129,7 @@ export class DebugUtil {
     return this.storageRepository.storageService.update(
       StorageSchemata.OBJECT_STORE.AMPLIFY,
       DatabaseKeys.PRIMARY_KEY_LAST_NOTIFICATION,
-      {value: createRandomUuid(1)},
+      {value: createUuid(1)},
     );
   }
 

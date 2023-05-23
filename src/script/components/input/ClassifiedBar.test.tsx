@@ -20,15 +20,15 @@
 import {render} from '@testing-library/react';
 
 import {User} from 'src/script/entity/User';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {ClassifiedBar} from './ClassifiedBar';
 
 describe('ClassifiedBar', () => {
   const classifiedDomains = ['same.domain', 'classified.domain', 'other-classified.domain'];
-  const sameDomainUser = new User(createRandomUuid(), 'same.domain');
-  const classifiedDomainUser = new User(createRandomUuid(), 'classified.domain');
-  const otherDomainUser = new User(createRandomUuid(), 'other.domain');
+  const sameDomainUser = new User(createUuid(), 'same.domain');
+  const classifiedDomainUser = new User(createUuid(), 'classified.domain');
+  const otherDomainUser = new User(createUuid(), 'other.domain');
 
   it.each([[[sameDomainUser]], [[sameDomainUser, otherDomainUser]]])('is empty if no domains are given', users => {
     const {container} = render(<ClassifiedBar users={users} />);

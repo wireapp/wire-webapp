@@ -33,7 +33,9 @@ interface PastedFileControlsProps {
 }
 
 const PastedFileControls: FC<PastedFileControlsProps> = ({pastedFile, onClear, onSend}) => {
-  const isSupportedFileType = Config.getConfig().ALLOWED_IMAGE_TYPES.includes(pastedFile.type);
+  const isSupportedFileType = (Config.getConfig().ALLOWED_IMAGE_TYPES as ReadonlyArray<string>).includes(
+    pastedFile.type,
+  );
   const pastedFilePreviewUrl = isSupportedFileType ? URL.createObjectURL(pastedFile) : '';
 
   return (

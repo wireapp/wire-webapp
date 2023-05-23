@@ -19,6 +19,7 @@
 
 import {act, render, screen, waitFor} from '@testing-library/react';
 
+import {User} from 'src/script/entity/User';
 import {ContentViewModel} from 'src/script/view_model/ContentViewModel';
 
 import {MainContent} from './MainContent';
@@ -42,6 +43,7 @@ describe('Preferences', () => {
 
   const defaultParams = {
     openRightSidebar: jest.fn(),
+    selfUser: new User('selfUser'),
   };
 
   it('renders the right component according to view state', () => {

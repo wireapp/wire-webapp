@@ -22,37 +22,12 @@ import type {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import en from 'I18n/en-US.json';
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {generateQualifiedIds, generateUserClients, generateUsers, withTheme} from 'src/script/auth/util/test/TestUtil';
 import {setStrings} from 'Util/LocalizerUtil';
-import {createRandomUuid} from 'Util/util';
 
-import {PartialFailureToSendWarning, User} from './PartialFailureToSend';
+import {PartialFailureToSendWarning} from './PartialFailureToSend';
 
 setStrings({en});
-function generateUsers(nbUsers: number, domain: string) {
-  const users: User[] = [];
-  for (let i = 0; i < nbUsers; i++) {
-    users.push({qualifiedId: {id: createRandomUuid(), domain}, username: () => `User ${i}`});
-  }
-  return users;
-}
-
-function generateUserClients(users: User[]): QualifiedUserClients {
-  const userClients: QualifiedUserClients = {};
-  users.forEach(user => {
-    const domainUsers = userClients[user.qualifiedId.domain] || {};
-    domainUsers[user.qualifiedId.id] = [];
-    userClients[user.qualifiedId.domain] = domainUsers;
-  });
-  return userClients;
-}
-function generateQualifiedIds(nbUsers: number, domain: string) {
-  const users: QualifiedId[] = [];
-  for (let i = 0; i < nbUsers; i++) {
-    users.push({id: createRandomUuid(), domain});
-  }
-  return users;
-}
 
 describe('PartialFailureToSendWarning', () => {
   it('displays the number of users that did not get the message', () => {
@@ -124,7 +99,7 @@ describe('PartialFailureToSendWarning', () => {
     );
 
     expect(queryByText('Show details')).toBeNull();
-    expect(container.textContent).toContain(`${users[0].username()} will get your message later`);
+    expect(container.textContent).toContain(`${users[0].name()} will get your message later`);
   });
 
   it('does not show the extra info toggle if there is only a single unreachable user', () => {
@@ -218,5 +193,36 @@ describe('PartialFailureToSendWarning', () => {
     });
 
     expect(getByText('Show details')).not.toBeNull();
+  });
+
+  it('does not display an unreachable user warning if there are no unreachable users', () => {
+    const namedUsers = generateUsers(2, 'domain1');
+    const queued = generateUserClients(namedUsers);
+
+    const failed = [] as QualifiedId[];
+
+    const {getByText, container} = render(
+      withTheme(<PartialFailureToSendWarning knownUsers={namedUsers} failedToSend={{queued, failed}} />),
+    );
+    act(() => {
+      getByText('Show details').click();
+    });
+
+    expect(container.textContent).not.toContain(`won't get your message`);
+  });
+
+  it('does not display a named user warning if there are no named users', () => {
+    const failed = [...generateQualifiedIds(2, 'domain2')];
+
+    const queued = {} as QualifiedUserClients;
+
+    const {getByText, container} = render(
+      withTheme(<PartialFailureToSendWarning knownUsers={[]} failedToSend={{queued, failed}} />),
+    );
+    act(() => {
+      getByText('Show details').click();
+    });
+
+    expect(container.textContent).not.toContain(`will get your message later`);
   });
 });

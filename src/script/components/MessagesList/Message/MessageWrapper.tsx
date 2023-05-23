@@ -36,6 +36,7 @@ import {CallTimeoutMessage} from './CallTimeoutMessage';
 import {ContentMessageComponent} from './ContentMessage';
 import {DecryptErrorMessage} from './DecryptErrorMessage';
 import {DeleteMessage} from './DeleteMessage';
+import {FailedToAddUsersMessage} from './FailedToAddUsersMessage';
 import {FileTypeRestrictedMessage} from './FileTypeRestrictedMessage';
 import {LegalHoldMessage} from './LegalHoldMessage';
 import {MemberMessage} from './MemberMessage';
@@ -114,10 +115,6 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
     } else if (file) {
       await messageRepository.retryUploadFile(conversation, file, firstAsset.isImage(), message.id);
     }
-  };
-
-  const onDiscard = async () => {
-    await messageRepository.deleteMessageById(conversation, message.id);
   };
 
   const contextMenuEntries = ko.pureComputed(() => {
@@ -214,7 +211,6 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
         onClickInvitePeople={onClickInvitePeople}
         onClickParticipants={onClickParticipants}
         onClickReceipts={onClickReceipts}
-        onDiscard={onDiscard}
         onRetry={onRetry}
         isMessageFocused={isMessageFocused}
         isMsgElementsFocusable={isMsgElementsFocusable}
@@ -238,6 +234,9 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
   }
   if (message.isCallTimeout()) {
     return <CallTimeoutMessage message={message} />;
+  }
+  if (message.isFailedToAddUsersMessage()) {
+    return <FailedToAddUsersMessage message={message} />;
   }
   if (message.isSystem()) {
     return <SystemMessage message={message} />;

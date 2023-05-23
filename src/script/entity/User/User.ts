@@ -81,7 +81,7 @@ export class User {
   public readonly isOnLegalHold: ko.PureComputed<boolean>;
   public readonly isOutgoingRequest: ko.PureComputed<boolean>;
   public readonly isRequest: ko.PureComputed<boolean>;
-  public readonly isTeamMember: ko.Observable<boolean>;
+  public readonly isTeamMember: ko.Observable<boolean> = ko.observable(false);
   public readonly isTemporaryGuest: ko.Observable<boolean>;
   public readonly isUnknown: ko.PureComputed<boolean>;
   public readonly managedBy: ko.Observable<string>;
@@ -182,7 +182,6 @@ export class User {
       return this.isGuest() && !this.isFederated;
     });
     this.isTemporaryGuest = ko.observable(false);
-    this.isTeamMember = ko.observable(false);
     this.teamRole = ko.observable(TEAM_ROLE.NONE);
     this.teamId = undefined;
 
@@ -240,10 +239,6 @@ export class User {
       return '';
     }
     return this.isFederated ? `@${this.username()}@${this.domain}` : `@${this.username()}`;
-  }
-
-  subscribeToChanges(): void {
-    this.availability.subscribe(() => amplify.publish(WebAppEvents.USER.PERSIST, this));
   }
 
   addClient(new_client_et: ClientEntity): boolean {

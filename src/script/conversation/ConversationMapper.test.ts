@@ -41,7 +41,7 @@ import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
 import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
 import {Conversation} from 'src/script/entity/Conversation';
 import {BaseError} from 'src/script/error/BaseError';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {ACCESS_STATE} from './AccessState';
 
@@ -185,7 +185,7 @@ describe('ConversationMapper', () => {
 
   describe('updateProperties', () => {
     it('can update the properties of a conversation', () => {
-      const creatorId = createRandomUuid();
+      const creatorId = createUuid();
       const conversationsData = [payload.conversations.get.conversations[0]];
       const [conversationEntity] = ConversationMapper.mapConversations(conversationsData);
       const data: Partial<Record<keyof Conversation, string>> = {
@@ -202,7 +202,7 @@ describe('ConversationMapper', () => {
 
     it('only updates existing properties', () => {
       const updatedName = 'Christmas 2017';
-      const conversationEntity = new Conversation(createRandomUuid());
+      const conversationEntity = new Conversation(createUuid());
       conversationEntity.name('Christmas 2016');
 
       expect(conversationEntity.name()).toBeDefined();
@@ -344,11 +344,11 @@ describe('ConversationMapper', () => {
       localReceiptMode: RECEIPT_MODE,
       remoteReceiptMode: RECEIPT_MODE,
     ): Partial<ConversationDatabaseData>[] {
-      const conversationCreatorId = createRandomUuid();
-      const conversationId = createRandomUuid();
+      const conversationCreatorId = createUuid();
+      const conversationId = createUuid();
       const conversationName = 'Hello, World!';
-      const selfUserId = createRandomUuid();
-      const teamId = createRandomUuid();
+      const selfUserId = createUuid();
+      const teamId = createUuid();
 
       const localData: Partial<ConversationDatabaseData> = {
         archived_state: false,
@@ -447,7 +447,7 @@ describe('ConversationMapper', () => {
         verification_state: 0,
       };
 
-      const [mergedConversation] = ConversationMapper.mergeConversation(
+      const [mergedConversation] = ConversationMapper.mergeConversations(
         [local_data] as ConversationDatabaseData[],
         {found: [remoteData]} as RemoteConversations,
       );
@@ -481,9 +481,9 @@ describe('ConversationMapper', () => {
       };
 
       const remoteData2: ConversationBackendData = JSON.parse(JSON.stringify(remoteData));
-      remoteData2.id = createRandomUuid();
+      remoteData2.id = createUuid();
 
-      const [merged_conversation, merged_conversation_2] = ConversationMapper.mergeConversation(
+      const [merged_conversation, merged_conversation_2] = ConversationMapper.mergeConversations(
         [localData] as ConversationDatabaseData[],
         {found: [remoteData, remoteData2]} as RemoteConversations,
       );
@@ -532,7 +532,7 @@ describe('ConversationMapper', () => {
           remote: {...baseConversation, message_timer: 0},
         },
       ].forEach(({local, remote, expected}) => {
-        const [merged_conversation] = ConversationMapper.mergeConversation(
+        const [merged_conversation] = ConversationMapper.mergeConversations(
           [local] as ConversationDatabaseData[],
           {found: [remote]} as RemoteConversations,
         );
@@ -564,7 +564,7 @@ describe('ConversationMapper', () => {
 
       remoteData.members.self = {...remoteData.members.self, ...selfUpdate};
 
-      const [merged_conversation] = ConversationMapper.mergeConversation(
+      const [merged_conversation] = ConversationMapper.mergeConversations(
         [localData] as ConversationDatabaseData[],
         {found: [remoteData]} as RemoteConversations,
       );
@@ -611,7 +611,7 @@ describe('ConversationMapper', () => {
 
       remoteData.members.others = remoteData.members.others.concat(othersUpdate);
 
-      const [merged_conversation] = ConversationMapper.mergeConversation([], {
+      const [merged_conversation] = ConversationMapper.mergeConversations([], {
         found: [remoteData],
       } as RemoteConversations);
 
@@ -629,7 +629,7 @@ describe('ConversationMapper', () => {
         verification_state: 0,
       };
 
-      const [merged_conversation] = ConversationMapper.mergeConversation(
+      const [merged_conversation] = ConversationMapper.mergeConversations(
         [localData] as ConversationDatabaseData[],
         {found: [remoteData]} as RemoteConversations,
       );
@@ -641,7 +641,7 @@ describe('ConversationMapper', () => {
     it('prefers local data over remote data when mapping the read receipts value', () => {
       const localReceiptMode = 0;
       const [localData, remoteData] = getDataWithReadReceiptMode(localReceiptMode, 1);
-      const [mergedConversation] = ConversationMapper.mergeConversation(
+      const [mergedConversation] = ConversationMapper.mergeConversations(
         [localData] as ConversationDatabaseData[],
         {found: [remoteData]} as RemoteConversations,
       );
@@ -653,7 +653,7 @@ describe('ConversationMapper', () => {
       const remoteReceiptMode = 0;
       const [localData, remoteData] = getDataWithReadReceiptMode(null, remoteReceiptMode);
 
-      const [mergedConversation] = ConversationMapper.mergeConversation(
+      const [mergedConversation] = ConversationMapper.mergeConversations(
         [localData] as ConversationDatabaseData[],
         {found: [remoteData]} as RemoteConversations,
       );

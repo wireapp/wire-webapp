@@ -77,7 +77,6 @@ import {useAppMainState} from '../../page/state';
 import {SearchRepository} from '../../search/SearchRepository';
 import {StorageRepository} from '../../storage';
 import {TeamState} from '../../team/TeamState';
-import {UserState} from '../../user/UserState';
 
 const CONFIG = {
   ...Config.getConfig(),
@@ -94,7 +93,7 @@ interface InputBarProps {
   readonly searchRepository: SearchRepository;
   readonly storageRepository: StorageRepository;
   readonly teamState: TeamState;
-  readonly userState: UserState;
+  readonly selfUser: User;
   onShiftTab: () => void;
   uploadDroppedFiles: (droppedFiles: File[]) => void;
   uploadImages: (images: File[]) => void;
@@ -112,7 +111,7 @@ const InputBar = ({
   propertiesRepository,
   searchRepository,
   storageRepository,
-  userState = container.resolve(UserState),
+  selfUser,
   teamState = container.resolve(TeamState),
   onShiftTab,
   uploadDroppedFiles,
@@ -123,7 +122,6 @@ const InputBar = ({
     teamState,
     ['classifiedDomains', 'isSelfDeletingMessagesEnabled', 'isFileSharingSendingEnabled'],
   );
-  const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
   const {
     connection,
     participating_user_ets: participatingUserEts,

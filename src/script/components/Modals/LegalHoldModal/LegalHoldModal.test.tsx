@@ -19,7 +19,6 @@
 
 import {act, render} from '@testing-library/react';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
-import ko from 'knockout';
 
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 
@@ -37,7 +36,6 @@ import {SearchRepository} from '../../../search/SearchRepository';
 import {SearchService} from '../../../search/SearchService';
 import {TeamRepository} from '../../../team/TeamRepository';
 import {UserRepository} from '../../../user/UserRepository';
-import {UserState} from '../../../user/UserState';
 
 const userRepository = {} as UserRepository;
 const testFactory = new TestFactory();
@@ -61,10 +59,7 @@ const defaultProps = () => ({
   } as MessageRepository,
   searchRepository: new SearchRepository(new SearchService(), userRepository),
   teamRepository: {} as TeamRepository,
-  userState: {
-    ...new UserState(),
-    self: ko.observable(new User('mocked-id')),
-  },
+  selfUser: new User('mocked-id'),
 });
 
 describe('LegalHoldModal', () => {
@@ -80,7 +75,7 @@ describe('LegalHoldModal', () => {
   it('is showUser', async () => {
     const props = defaultProps();
     await render(<LegalHoldModal {...props} />);
-    const selfConversation = new Conversation(props.userState.self().id);
+    const selfConversation = new Conversation(props.selfUser.id);
 
     await act(() => {
       useLegalHoldModalState.getState().showUsers(false, selfConversation);
