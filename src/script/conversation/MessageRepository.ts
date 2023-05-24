@@ -18,6 +18,7 @@
  */
 
 import {ConversationProtocol, MessageSendingStatus, QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
+import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import {QualifiedId, RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/lib/user';
 import {MessageSendingState, MessageTargetMode, GenericMessageType, SendResult} from '@wireapp/core/lib/conversation';
 import {
@@ -807,7 +808,7 @@ export class MessageRepository {
       }
       return result;
     } catch (error) {
-      await this.updateMessageAsFailed(conversation, payload.messageId);
+      await this.updateMessageAsFailed(conversation, payload.messageId, error as BackendError);
       return {id: payload.messageId, sentAt: new Date().toISOString(), state: SendAndInjectSendingState.FAILED};
     }
   }
@@ -1183,11 +1184,15 @@ export class MessageRepository {
     return undefined;
   }
 
-  private async updateMessageAsFailed(conversationEntity: Conversation, eventId: string) {
+  private async updateMessageAsFailed(conversationEntity: Conversation, eventId: string, error: BackendError) {
     try {
       const messageEntity = await this.getMessageInConversationById(conversationEntity, eventId);
+      if (error.label === BackendErrorLabel.FEDERATION_REMOTE_ERROR) {
+        messageEntity.status(StatusType.FEDERATION_ERROR);
+        return this.eventService.updateEvent(messageEntity.primary_key, {status: StatusType.FEDERATION_ERROR});
+      }
       messageEntity.status(StatusType.FAILED);
-      return await this.eventService.updateEvent(messageEntity.primary_key, {status: StatusType.FAILED});
+      return this.eventService.updateEvent(messageEntity.primary_key, {status: StatusType.FAILED});
     } catch (error) {
       if ((error as any).type !== ConversationError.TYPE.MESSAGE_NOT_FOUND) {
         throw error;
