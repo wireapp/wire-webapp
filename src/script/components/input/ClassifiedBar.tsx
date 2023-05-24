@@ -27,6 +27,7 @@ import {User} from 'src/script/entity/User';
 import {t} from 'Util/LocalizerUtil';
 
 function isClassified(users: User[], classifiedDomains: string[], conversationDomain?: string): boolean {
+  // if a conversation is hosted on an unclassified domain it is not considered classified
   if (conversationDomain && !classifiedDomains.includes(conversationDomain)) {
     return false;
   }
