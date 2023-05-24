@@ -27,11 +27,16 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
+import {EmojiImg} from 'Components/MessagesList/Message/ContentMessage/MessageActions/MessageReactions/EmojiImg';
+import {
+  messageReactionDetailsMargin,
+  reactionsCountAlignment,
+} from 'Components/MessagesList/Message/ContentMessage/MessageActions/MessageReactions/MessageReactions.styles';
 import {UserSearchableList} from 'Components/UserSearchableList';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getEmojiTitleFromEmojiUnicode, getEmojiUnicode} from 'Util/EmojiUtil';
 import {t} from 'Util/LocalizerUtil';
-import {groupByReactionUsers} from 'Util/ReactionUtil';
+import {getEmojiUrl, groupByReactionUsers} from 'Util/ReactionUtil';
 import {formatLocale} from 'Util/TimeUtil';
 
 import {panelContentTitleStyles} from './MessageDetails.styles';
@@ -269,11 +274,16 @@ const MessageDetails: FC<MessageDetailsProps> = ({
         {messageState === MESSAGE_STATES.REACTIONS &&
           Array.from(reactionUsers).map(reactions => {
             const [reactionKey, users] = reactions;
+            const emojiUnicode = getEmojiUnicode(reactionKey);
+            const emojiUrl = getEmojiUrl(emojiUnicode);
+            const emojiName = getEmojiTitleFromEmojiUnicode(emojiUnicode);
+            const emojiCount = users.length;
             return (
               <Fragment key={reactionKey}>
                 <div css={panelContentTitleStyles} className="font-weight-bold">
-                  <span>{reactionKey}</span>
-                  <span>{getEmojiTitleFromEmojiUnicode(getEmojiUnicode(reactionKey))}</span>
+                  <EmojiImg emojiUrl={emojiUrl} emojiName={emojiName} styles={messageReactionDetailsMargin} />
+                  <span css={messageReactionDetailsMargin}>{emojiName}</span>
+                  <span css={reactionsCountAlignment}>({emojiCount})</span>
                 </div>
                 <UserSearchableList
                   key={reactionKey}

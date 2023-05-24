@@ -58,6 +58,8 @@ export const messageReactionButton: CSSObject = {
 
 export const messageReactionButtonTooltip: CSSObject = {display: 'flex', maxWidth: 130, whiteSpace: 'break-spaces'};
 export const messageReactionButtonTooltipImage: CSSObject = {marginRight: 8};
+export const messageReactionDetailsMargin: CSSObject = {marginRight: '0.4rem'};
+export const reactionsCountAlignment: CSSObject = {display: 'flex', alignItems: 'center'};
 export const messageReactionButtonTooltipText: CSSObject = {fontSize: '0.7rem'};
 export const messageReactionButtonTooltipTextLink: CSSObject = {
   color: 'var(--blue-500)',

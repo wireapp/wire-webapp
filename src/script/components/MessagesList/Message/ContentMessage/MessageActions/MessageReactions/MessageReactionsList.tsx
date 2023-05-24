@@ -75,7 +75,7 @@ const MessageReactionsList: FC<MessageReactionsListProps> = ({
                     emojiImgSize={{
                       width: '1.2rem',
                     }}
-                    css={messageReactionButtonTooltipImage}
+                    styles={messageReactionButtonTooltipImage}
                     emojiUrl={emojiUrl}
                     emojiName={emojiName}
                   />
