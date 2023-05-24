@@ -257,6 +257,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
         />
         {classifiedDomains && (
           <ClassifiedBar
+            conversationDomain={conversation.domain}
             users={allUsers}
             classifiedDomains={classifiedDomains}
             style={{

@@ -776,7 +776,11 @@ const InputBar = ({
       {!!isTypingIndicatorEnabled && <TypingIndicator conversationId={conversationEntity.id} />}
 
       {classifiedDomains && !isConnectionRequest && (
-        <ClassifiedBar users={allUsers} classifiedDomains={classifiedDomains} />
+        <ClassifiedBar
+          conversationDomain={conversationEntity.domain}
+          users={allUsers}
+          classifiedDomains={classifiedDomains}
+        />
       )}
 
       {isReplying && !isEditing && <ReplyBar replyMessageEntity={replyMessageEntity} onCancel={handleCancelReply} />}

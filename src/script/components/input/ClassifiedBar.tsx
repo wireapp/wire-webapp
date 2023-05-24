@@ -26,7 +26,10 @@ import {Icon} from 'Components/Icon';
 import {User} from 'src/script/entity/User';
 import {t} from 'Util/LocalizerUtil';
 
-function isClassified(users: User[], classifiedDomains: string[]): boolean {
+function isClassified(users: User[], classifiedDomains: string[], conversationDomain?: string): boolean {
+  if (conversationDomain && !classifiedDomains.includes(conversationDomain)) {
+    return false;
+  }
   // if a conversation has any temporary guests then it is not considered classified
   if (users.some(user => !classifiedDomains.includes(user.domain) || user.isTemporaryGuest())) {
     return false;
@@ -38,14 +41,15 @@ interface ClassifiedBarProps {
   classifiedDomains?: string[];
   style?: CSSObject;
   users: User[];
+  conversationDomain?: string;
 }
 
-const ClassifiedBar: React.FC<ClassifiedBarProps> = ({users, classifiedDomains, style}) => {
+const ClassifiedBar: React.FC<ClassifiedBarProps> = ({users, classifiedDomains, conversationDomain, style}) => {
   if (typeof classifiedDomains === 'undefined') {
     return null;
   }
 
-  const classified = isClassified(users, classifiedDomains);
+  const classified = isClassified(users, classifiedDomains, conversationDomain);
   const text = classified ? t('conversationClassified') : t('conversationNotClassified');
 
   return (
