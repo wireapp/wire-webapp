@@ -20,12 +20,14 @@
 import {CSSObject} from '@emotion/react';
 
 export const panelContentTitleStyles: CSSObject = {
+  display: 'inline-flex',
   paddingLeft: 20,
   borderBottom: '1px solid var(--sidebar-border-color)',
   marginTop: 20,
-  'span:first-child': {marginRight: '5px'},
-  'span:last-child': {
+  span: {
     color: 'var(--text-input-placeholder)',
     fontSize: 'var(--font-size-medium)',
+    lineHeight: 'var(--line-height-lg)',
+    letterSpacing: '0.5px',
   },
 };

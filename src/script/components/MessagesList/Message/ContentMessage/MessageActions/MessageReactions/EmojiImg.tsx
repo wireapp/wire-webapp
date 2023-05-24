@@ -27,17 +27,17 @@ export interface EmojiImgProps {
   emojiUrl: string;
   emojiName: string;
   emojiImgSize?: CSSObject;
-  css?: CSSObject;
+  styles?: CSSObject;
 }
 
-const EmojiImg: FC<EmojiImgProps> = ({emojiUrl, css, emojiName, emojiImgSize = reactionImgSize}) => {
+const EmojiImg: FC<EmojiImgProps> = ({emojiUrl, styles, emojiName, emojiImgSize = reactionImgSize}) => {
   return (
     <>
       <img
         src={emojiUrl}
         alt={emojiName}
         loading="eager"
-        css={{...emojiImgSize, ...messageReactionEmoji, ...css}}
+        css={{...emojiImgSize, ...messageReactionEmoji, ...styles}}
         aria-hidden={true}
       />
     </>
