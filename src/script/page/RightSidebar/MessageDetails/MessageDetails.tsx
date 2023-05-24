@@ -29,8 +29,8 @@ import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
 import {EmojiImg} from 'Components/MessagesList/Message/ContentMessage/MessageActions/MessageReactions/EmojiImg';
 import {
-  messageReactionDetailsCount,
   messageReactionDetailsMargin,
+  reactionsCountAlignment,
 } from 'Components/MessagesList/Message/ContentMessage/MessageActions/MessageReactions/MessageReactions.styles';
 import {UserSearchableList} from 'Components/UserSearchableList';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -283,7 +283,7 @@ const MessageDetails: FC<MessageDetailsProps> = ({
                 <div css={panelContentTitleStyles} className="font-weight-bold">
                   <EmojiImg emojiUrl={emojiUrl} emojiName={emojiName} styles={messageReactionDetailsMargin} />
                   <span css={messageReactionDetailsMargin}>{emojiName}</span>
-                  <span css={messageReactionDetailsCount}>({emojiCount})</span>
+                  <span css={reactionsCountAlignment}>({emojiCount})</span>
                 </div>
                 <UserSearchableList
                   key={reactionKey}
