@@ -30,16 +30,13 @@ export class APIClient extends APIClientUnconfigured {
   constructor() {
     super({
       urls: {
-        name:
-          Config.getConfig().ENVIRONMENT === document.location.origin
-            ? Config.getConfig().ENVIRONMENT
-            : document.location.origin,
+        name: Config.getConfig().ENVIRONMENT,
         rest:
-          Config.getConfig().ENVIRONMENT === document.location.origin
+          Config.getConfig().APP_BASE === document.location.origin || Config.getConfig().BACKEND_REST?.includes('test')
             ? Config.getConfig().BACKEND_REST
             : REST_URL + document.location.host.slice(document.location.host.indexOf('.')),
         ws:
-          Config.getConfig().ENVIRONMENT === document.location.origin
+          Config.getConfig().APP_BASE === document.location.origin
             ? Config.getConfig().BACKEND_WS
             : WS_URL + document.location.host.slice(document.location.host.indexOf('.')),
       },
