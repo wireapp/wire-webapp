@@ -27,7 +27,8 @@ import {User} from 'src/script/entity/User';
 import {t} from 'Util/LocalizerUtil';
 
 function isClassified(users: User[], classifiedDomains: string[]): boolean {
-  if (users.some(user => !classifiedDomains.includes(user.domain))) {
+  // if a conversation has any temporary guests then it is not considered classified
+  if (users.some(user => !classifiedDomains.includes(user.domain) || user.isTemporaryGuest())) {
     return false;
   }
   return true;
