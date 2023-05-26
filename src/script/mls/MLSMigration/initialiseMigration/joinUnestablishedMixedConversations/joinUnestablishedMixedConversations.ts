@@ -60,5 +60,6 @@ const joinUnestablishedMixedConversation = async (
   mlsMigrationLogger.info(
     `Found "mixed" conversation without established MLS group: ${mixedConversation.qualifiedId.id}, joining via external commit...`,
   );
+
   await conversationService.joinByExternalCommit(mixedConversation.qualifiedId);
 };
