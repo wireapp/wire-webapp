@@ -32,6 +32,7 @@ import type {CompositeMessage} from './CompositeMessage';
 import type {ContentMessage} from './ContentMessage';
 import type {DecryptErrorMessage} from './DecryptErrorMessage';
 import {DeleteMessage} from './DeleteMessage';
+import {FailedToAddUsersMessage} from './FailedToAddUsersMessage';
 import type {FileAsset} from './FileAsset';
 import {FileTypeRestrictedMessage} from './FileTypeRestrictedMessage';
 import type {LegalHoldMessage} from './LegalHoldMessage';
@@ -322,6 +323,10 @@ export class Message {
 
   isCallTimeout(): this is CallingTimeoutMessage {
     return this.super_type === SuperType.CALL_TIME_OUT;
+  }
+
+  isFailedToAddUsersMessage(): this is FailedToAddUsersMessage {
+    return this.super_type === SuperType.FAILED_TO_ADD_USERS;
   }
 
   /**

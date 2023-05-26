@@ -70,10 +70,18 @@
     }
 
     &__edit-icon {
-      flex-grow: 1;
-      margin-left: 11px;
+      display: flex;
+      align-items: center;
+      padding: 4px;
+      border: none;
+      margin-left: 7px;
+      background: transparent;
       opacity: 0;
       transition: opacity @animation-timing-faster @ease-in-quart;
+
+      &:focus {
+        opacity: 1;
+      }
 
       svg {
         width: 12px;
