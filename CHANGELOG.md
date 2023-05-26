@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [24.14.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@24.14.0...@wireapp/api-client@24.14.1) (2023-05-26)
+
+### Bug Fixes
+
+* [wire-webapp] Add validation of domain for assets in api-client(… ([#5170](https://github.com/wireapp/wire-web-packages/issues/5170)) ([db09832](https://github.com/wireapp/wire-web-packages/commit/db098329c20566bac57ce7bd5aa42f9f193729ef))
+
 # [24.14.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@24.13.0...@wireapp/api-client@24.14.0) (2023-05-18)
 
 ### Features
