@@ -310,6 +310,12 @@ export class AssetAPI {
       throw new TypeError(`Expected asset ID "${assetId}" to only contain alphanumeric values and dashes.`);
     }
 
+    const isValidDomain = (domain: string) =>
+      !!domain && /^([a-zA-Z0-9]+(-[a-zA-Z0-9]+)*\.)+[a-zA-Z]{2,}$/.test(domain);
+
+    if (!isValidDomain(assetDomain)) {
+      throw new TypeError(`Invalid asset domain ${assetDomain}`);
+    }
     const assetBaseUrl = this.backendFeatures.version >= 2 ? ASSET_URLS.ASSETS_URL : ASSET_URLS.ASSET_V4_URL;
     return this.getAssetShared(`${assetBaseUrl}/${assetDomain}/${assetId}`, token, forceCaching, progressCallback);
   }
