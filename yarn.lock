@@ -4809,10 +4809,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/underscore@npm:1.11.4":
-  version: 1.11.4
-  resolution: "@types/underscore@npm:1.11.4"
-  checksum: db9f8486bc851b732259e51f42d62aad1ae2158be5724612dc125ece5f5d61c51447f9dea28284c2a0f79cb95e788d01cb5ce97709880019213e69fab0dd1696
+"@types/underscore@npm:1.11.5":
+  version: 1.11.5
+  resolution: "@types/underscore@npm:1.11.5"
+  checksum: 6cd928c436bd65a7b544c979e0958762816dc3fd4f0d430d055faa1e914336568c3a8dd52350760c16ecc37be71d40b0792012bae455d8c5d63e50f02986c9e2
   languageName: node
   linkType: hard
 
@@ -18147,7 +18147,7 @@ dexie@latest:
     "@types/sinon": 10.0.15
     "@types/speakingurl": 13.0.3
     "@types/uint32": 0.2.0
-    "@types/underscore": 1.11.4
+    "@types/underscore": 1.11.5
     "@types/webpack-env": 1.18.0
     "@typescript-eslint/eslint-plugin": ^5.59.6
     "@typescript-eslint/parser": ^5.59.7
