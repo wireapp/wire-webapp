@@ -48,6 +48,8 @@ declare global {
 @singleton()
 export class Core extends Account {
   constructor(apiClient = container.resolve(APIClient)) {
+    // eslint-disable-next-line no-console
+    console.log(apiClient, 'inside CoreSingleton.ts');
     super(apiClient, {
       createStore: (storeName, context) => {
         const dbType = isTemporaryClientAndNonPersistent(context.clientType === ClientType.PERMANENT)
