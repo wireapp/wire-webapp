@@ -37,6 +37,7 @@ import type {User} from '../../entity/User';
 export interface UserDetailsProps {
   badge?: string;
   classifiedDomains?: string[];
+  conversationDomain?: string;
   isGroupAdmin?: boolean;
   isSelfVerified: boolean;
   isVerified?: boolean;
@@ -51,6 +52,7 @@ export const UserDetailsComponent: React.FC<UserDetailsProps> = ({
   isGroupAdmin,
   avatarStyles,
   classifiedDomains,
+  conversationDomain,
 }) => {
   const user = useKoSubscribableChildren(participant, [
     'inTeam',
@@ -105,7 +107,13 @@ export const UserDetailsComponent: React.FC<UserDetailsProps> = ({
         </p>
       )}
 
-      {classifiedDomains && <ClassifiedBar users={[participant]} classifiedDomains={classifiedDomains} />}
+      {classifiedDomains && (
+        <ClassifiedBar
+          conversationDomain={conversationDomain}
+          users={[participant]}
+          classifiedDomains={classifiedDomains}
+        />
+      )}
 
       <Avatar
         className="panel-participant__avatar"
