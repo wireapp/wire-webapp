@@ -37,7 +37,8 @@ export class APIClient extends APIClientUnconfigured {
       urls: {
         name: Config.getConfig().ENVIRONMENT,
         rest:
-          Config.getConfig().APP_BASE === document.location.origin || Config.getConfig().BACKEND_REST?.includes('test')
+          Config.getConfig().APP_BASE === document.location.origin ||
+          Config.getConfig().BACKEND_REST?.includes('https://test.wire.link')
             ? Config.getConfig().BACKEND_REST
             : REST_URL + document.location.host.slice(document.location.host.indexOf('.')),
         ws:
