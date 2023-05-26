@@ -21,6 +21,7 @@ import {faker} from '@faker-js/faker';
 import {ClientClassification} from '@wireapp/api-client/lib/client/';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {
+  Conversation as BackendConversation,
   CONVERSATION_ACCESS,
   CONVERSATION_LEGACY_ACCESS_ROLE,
   CONVERSATION_TYPE,
@@ -28,7 +29,12 @@ import {
 } from '@wireapp/api-client/lib/conversation/';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
-import {ConversationCreateEvent, ConversationMemberJoinEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
+import {
+  ConversationCreateEvent,
+  ConversationMemberJoinEvent,
+  ConversationProtocolUpdateEvent,
+  CONVERSATION_EVENT,
+} from '@wireapp/api-client/lib/event/';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
@@ -84,6 +90,53 @@ const _generateConversation = (
   }
 
   return conversation;
+};
+
+const generateConversationBackendResponse = (protocol: ConversationProtocol, cipherSuite = 1, epoch = 1) => {
+  const conversationBackendResponse = {
+    access: ['invite', 'code'],
+    access_role: ['team_member', 'non_team_member', 'guest', 'service'],
+    cipher_suite: cipherSuite,
+    creator: '2695c0ea-68e3-4e1b-8a18-04c4ef24a3b0',
+    epoch: protocol === ConversationProtocol.PROTEUS ? -1 : epoch,
+    epoch_timestamp: '2023-05-24T06:54:46.112Z',
+    group_id: protocol === ConversationProtocol.PROTEUS ? undefined : 'W6NsZUcqwg/jyX4WeKfXgCEdjOxnUN6jsqRebJFNtDU=',
+    id: 'c5ac85a8-90a5-4973-ae34-e474a95337a0',
+    last_event: '0.0',
+    last_event_time: '1970-01-01T00:00:00.000Z',
+    members: {
+      others: [],
+      self: {
+        hidden_ref: null,
+        id: '2695c0ea-68e3-4e1b-8a18-04c4ef24a3b0',
+        otr_archived: false,
+        otr_archived_ref: null,
+        otr_muted_ref: null,
+        otr_muted_status: null,
+        qualified_id: {
+          domain: 'anta.wire.link',
+          id: '2695c0ea-68e3-4e1b-8a18-04c4ef24a3b0',
+        },
+        service: null,
+        status: 0,
+        status_ref: '0.0',
+        status_time: '1970-01-01T00:00:00.000Z',
+      },
+    },
+    message_timer: 0,
+    name: 'conference',
+    protocol,
+    qualified_id: {
+      domain: 'anta.wire.link',
+      id: 'c5ac85a8-90a5-4973-ae34-e474a95337a0',
+    },
+    receipt_mode: 1,
+    team: '7491ae3b-b5e3-4822-b158-acd855fe5e95',
+    type: 0,
+    failed_to_add: [],
+  } as BackendConversation;
+
+  return conversationBackendResponse;
 };
 
 describe('ConversationRepository', () => {
@@ -1524,6 +1577,53 @@ describe('ConversationRepository', () => {
 
       expect(conversationRepo.loadMissingConversations).toHaveBeenCalled();
       expect(conversationRepo['refreshAllConversationsUnavailableParticipants']).toHaveBeenCalled();
+    });
+  });
+
+  describe('updateConversationProtocol', () => {
+    it('should update the protocol-related fields after protocol was updated to mixed and inject event', async () => {
+      const conversation = _generateConversation();
+      const conversationRepository = await testFactory.exposeConversationActors();
+
+      const mockedProtocolUpdateEventResponse = {
+        data: {
+          protocol: ConversationProtocol.MIXED,
+        },
+        qualified_conversation: {
+          domain: 'anta.wire.link',
+          id: 'fb1c0e0f-60a9-4a6c-9644-041260e7aac9',
+        },
+        time: '2020-10-13T14:00:00.000Z',
+        type: CONVERSATION_EVENT.PROTOCOL_UPDATE,
+      } as ConversationProtocolUpdateEvent;
+
+      jest
+        .spyOn(conversationRepository['conversationService'], 'updateConversationProtocol')
+        .mockResolvedValueOnce(mockedProtocolUpdateEventResponse);
+
+      const newProtocol = ConversationProtocol.MIXED;
+      const newCipherSuite = 1;
+      const newEpoch = 2;
+      const mockedConversationResponse = generateConversationBackendResponse(newProtocol, newCipherSuite, newEpoch);
+      jest
+        .spyOn(conversationRepository['conversationService'], 'getConversationById')
+        .mockResolvedValueOnce(mockedConversationResponse);
+
+      jest.spyOn(conversationRepository['eventRepository'], 'injectEvent').mockResolvedValueOnce(undefined);
+
+      const updatedConversation = await conversationRepository.updateConversationProtocol(
+        conversation,
+        ConversationProtocol.MIXED,
+      );
+
+      expect(conversationRepository['eventRepository'].injectEvent).toHaveBeenCalledWith(
+        mockedProtocolUpdateEventResponse,
+        EventRepository.SOURCE.BACKEND_RESPONSE,
+      );
+
+      expect(updatedConversation.protocol).toEqual(ConversationProtocol.MIXED);
+      expect(updatedConversation.cipherSuite).toEqual(newCipherSuite);
+      expect(updatedConversation.epoch).toEqual(newEpoch);
     });
   });
 });
