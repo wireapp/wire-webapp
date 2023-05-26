@@ -39,6 +39,7 @@ import {
   ConversationRenameEvent,
   ConversationTypingEvent,
   CONVERSATION_EVENT,
+  ConversationProtocolUpdateEvent,
 } from '@wireapp/api-client/lib/event';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import type {BackendError} from '@wireapp/api-client/lib/http/';
@@ -1327,7 +1328,7 @@ export class ConversationRepository {
    * @returns Mapped conversation/s
    */
   mapConversations(
-    payload: BackendConversation[],
+    payload: (BackendConversation | ConversationDatabaseData)[],
     initialTimestamp = this.getLatestEventTimestamp(true),
   ): Conversation[] {
     const entities = ConversationMapper.mapConversations(payload as ConversationDatabaseData[], initialTimestamp);
@@ -1700,6 +1701,56 @@ export class ConversationRepository {
       return response;
     }
     return undefined;
+  }
+
+  /**
+   * Update conversation protocol
+   * This will update the protocol of the conversation and refetch the conversation to get all new fields (groupId, ciphersuite, epoch and new protocol)
+   * If protocol was updated successfully, conversation protocol update system message will be injected
+   *
+   * @param conversationId id of the conversation
+   * @param protocol new conversation protocol
+   * @returns Resolves with updated conversation entity
+   */
+  public async updateConversationProtocol(
+    conversation: Conversation,
+    protocol: ConversationProtocol.MIXED | ConversationProtocol.MLS,
+  ): Promise<Conversation> {
+    const protocolUpdateEventResponse = await this.conversationService.updateConversationProtocol(
+      conversation.qualifiedId,
+      protocol,
+    );
+    if (protocolUpdateEventResponse) {
+      await this.eventRepository.injectEvent(protocolUpdateEventResponse, EventRepository.SOURCE.BACKEND_RESPONSE);
+    }
+
+    //even if protocol was already updated (no response), we need to refetch the conversation
+    return this.refreshConversationProtocolProperties(conversation);
+  }
+
+  /**
+   * Refresh conversation protocol properties
+   * Will refetch the conversation to get all new protocol-related fields (groupId, ciphersuite, epoch and new protocol)
+   * Will update the conversation entity in memory and in the local database
+   *
+   * @param conversationId id of the conversation
+   * @returns Resolves with updated conversation entity
+   */
+  private async refreshConversationProtocolProperties(conversation: Conversation) {
+    //refetch the conversation to get all new fields (groupId, ciphersuite, epoch and new protocol)
+    const remoteConversationData = await this.conversationService.getConversationById(conversation.qualifiedId);
+
+    //update fields that came after protocol update
+    const {cipher_suite: cipherSuite, epoch, group_id: newGroupId, protocol: newProtocol} = remoteConversationData;
+    const updatedConversation = ConversationMapper.updateProperties(conversation, {
+      cipherSuite,
+      epoch,
+      groupId: newGroupId,
+      protocol: newProtocol,
+    });
+
+    await this.saveConversationStateInDb(updatedConversation);
+    return updatedConversation;
   }
 
   /**
@@ -2285,6 +2336,9 @@ export class ConversationRepository {
 
       case CONVERSATION_EVENT.TYPING:
         return this.onTyping(conversationEntity, eventJson);
+
+      case CONVERSATION_EVENT.PROTOCOL_UPDATE:
+        return this.onProtocolUpdate(conversationEntity, eventJson);
 
       case CONVERSATION_EVENT.RENAME:
         return this.onRename(conversationEntity, eventJson, eventSource === EventRepository.SOURCE.WEB_SOCKET);
@@ -2964,6 +3018,18 @@ export class ConversationRepository {
     const {messageEntity} = await this.addEventToConversation(conversationEntity, eventJson);
     ConversationMapper.updateProperties(conversationEntity, eventJson.data);
     return {conversationEntity, messageEntity};
+  }
+
+  /**
+   * Conversation protocol was updated.
+   *
+   * @param conversation Conversation that has updated protocol
+   * @param eventJson JSON data of 'conversation.protocol-update' event
+   * @returns Resolves when the event was handled
+   */
+  private async onProtocolUpdate(conversation: Conversation, eventJson: ConversationProtocolUpdateEvent) {
+    const updatedConversation = await this.refreshConversationProtocolProperties(conversation);
+    return this.addEventToConversation(updatedConversation, eventJson);
   }
 
   /**
