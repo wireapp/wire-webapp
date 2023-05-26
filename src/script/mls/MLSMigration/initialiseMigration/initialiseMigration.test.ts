@@ -124,10 +124,11 @@ describe('initialiseMigrationOfProteusConversations', () => {
   });
 
   it('Should initialise migration for proteus conversations and add other users to MLS group', async () => {
-    const user1Id = {id: 'user1', domain: 'local.wire.link'};
-    const user2Id = {id: 'user2', domain: 'local.wire.link'};
+    const conversationMembers = Array(3)
+      .fill(0)
+      .map(() => ({id: createUuid(), domain: 'local.wire.com'}));
 
-    const proteusConversation = createProteusConversation([user1Id, user2Id]);
+    const proteusConversation = createProteusConversation(conversationMembers);
 
     const mockGroupId = 'niceGroupId';
     const mockedConversationRepository = getConversationRepositoryMock(mockGroupId);
@@ -155,7 +156,7 @@ describe('initialiseMigrationOfProteusConversations', () => {
     expect(mockCore.service!.conversation!.addUsersToMLSConversation).toHaveBeenCalledWith({
       conversationId: proteusConversation.qualifiedId,
       groupId: mockGroupId,
-      qualifiedUsers: [user1Id, user2Id, {...selfUserId, skipOwnClientId: selfUserClientId}],
+      qualifiedUsers: [...conversationMembers, {...selfUserId, skipOwnClientId: selfUserClientId}],
     });
   });
 });

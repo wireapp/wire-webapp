@@ -1711,9 +1711,12 @@ export class ConversationRepository {
     conversation: Conversation,
     protocol: ConversationProtocol.MIXED | ConversationProtocol.MLS,
   ): Promise<Conversation> {
-    const response = await this.conversationService.updateConversationProtocol(conversation.qualifiedId, protocol);
-    if (response) {
-      await this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
+    const protocolUpdateEventResponse = await this.conversationService.updateConversationProtocol(
+      conversation.qualifiedId,
+      protocol,
+    );
+    if (protocolUpdateEventResponse) {
+      await this.eventRepository.injectEvent(protocolUpdateEventResponse, EventRepository.SOURCE.BACKEND_RESPONSE);
     }
 
     //even if protocol was already updated (no response), we need to refetch the conversation

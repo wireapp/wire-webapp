@@ -46,10 +46,10 @@ describe('addMixedConversationMembersToMLSGroup', () => {
   Object.defineProperty(mockCore, 'clientId', {value: selfUserClientId});
 
   it('should add all mixed conversation members to MLS group', async () => {
-    const user1Id = {id: createUuid(), domain: 'local.wire.com'};
-    const user2Id = {id: createUuid(), domain: 'local.wire.com'};
-    const user3Id = {id: createUuid(), domain: 'local.wire.com'};
-    const conversationMembers = [user1Id, user2Id, user3Id];
+    const conversationMembers = Array(3)
+      .fill(0)
+      .map(() => ({id: createUuid(), domain: 'local.wire.com'}));
+
     const mixedConversation = createMixedConversation(conversationMembers);
 
     await addMixedConversationMembersToMLSGroup(mixedConversation, {core: mockCore, selfUserId});
@@ -57,7 +57,7 @@ describe('addMixedConversationMembersToMLSGroup', () => {
     expect(mockCore.service?.conversation.addUsersToMLSConversation).toHaveBeenCalledWith({
       groupId: mixedConversation.groupId,
       conversationId: mixedConversation.qualifiedId,
-      qualifiedUsers: [user1Id, user2Id, user3Id, {...selfUserId, skipOwnClientId: selfUserClientId}],
+      qualifiedUsers: [...conversationMembers, {...selfUserId, skipOwnClientId: selfUserClientId}],
     });
   });
 
