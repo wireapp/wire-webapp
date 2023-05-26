@@ -29,6 +29,9 @@ export class Account extends EventEmitter {
   service = {
     mls: {
       schedulePeriodicKeyMaterialRenewals: jest.fn(),
+      addUsersToExistingConversation: jest.fn(),
+      conversationExists: jest.fn(),
+      wipeConversation: jest.fn(),
       registerConversation: jest.fn(),
       joinConferenceSubconversation: jest.fn(),
       getGroupIdFromConversationId: jest.fn(),
