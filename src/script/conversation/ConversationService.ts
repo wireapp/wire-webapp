@@ -23,6 +23,7 @@ import type {
   ConversationCode,
   CONVERSATION_ACCESS,
   RemoteConversations,
+  ConversationProtocol,
 } from '@wireapp/api-client/lib/conversation';
 import type {
   ConversationJoinData,
@@ -30,6 +31,7 @@ import type {
   ConversationOtherMemberUpdateData,
   ConversationReceiptModeUpdateData,
 } from '@wireapp/api-client/lib/conversation/data';
+import {ConversationProtocolUpdateEvent} from '@wireapp/api-client/lib/event';
 import type {
   ConversationCodeDeleteEvent,
   ConversationCodeUpdateEvent,
@@ -108,6 +110,22 @@ export class ConversationService {
     return this.apiClient.api.conversation.putConversation(conversationId, {
       name,
     });
+  }
+
+  /**
+   * Update the conversation protocol.
+   *
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/updateConversation
+   *
+   * @param conversationId ID of conversation to rename
+   * @param protocol new protocol of the conversation
+   * @returns Resolves with the server response
+   */
+  updateConversationProtocol(
+    conversationId: QualifiedId,
+    protocol: ConversationProtocol.MIXED | ConversationProtocol.MLS,
+  ): Promise<ConversationProtocolUpdateEvent | null> {
+    return this.apiClient.api.conversation.putConversationProtocol(conversationId, protocol);
   }
 
   /**
