@@ -54,7 +54,7 @@
     "zustand": "4.3.8"
   },
   "devDependencies": {
-    "@babel/core": "7.21.8",
+    "@babel/core": "7.22.1",
     "@babel/eslint-parser": "7.21.8",
     "@babel/plugin-proposal-decorators": "7.21.0",
     "@babel/preset-env": "7.21.5",
