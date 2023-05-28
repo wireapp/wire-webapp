@@ -109,7 +109,7 @@
     "caniuse-lite": "^1.0.30001489",
     "cross-env": "7.0.3",
     "cspell": "6.31.1",
-    "css-loader": "^6.7.4",
+    "css-loader": "^6.8.1",
     "cssnano": "^5.1.14",
     "dexie": "3.2.3",
     "dotenv": "16.0.3",
