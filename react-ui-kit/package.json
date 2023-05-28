@@ -34,7 +34,7 @@
     "@types/react": "^18.0.25",
     "@types/react-dom": "^18.0.8",
     "@types/rimraf": "^3.0.2",
-    "@types/webpack-env": "1.18.0",
+    "@types/webpack-env": "1.18.1",
     "babel-jest": "29.5.0",
     "babel-loader": "9.1.2",
     "jest": "^29.2.1",
