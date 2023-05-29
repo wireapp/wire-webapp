@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [24.15.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@24.14.1...@wireapp/api-client@24.15.0) (2023-05-29)
+
+### Features
+
+* Return failed users when sending mls message (FS-2030) ([#5186](https://github.com/wireapp/wire-web-packages/issues/5186)) ([93b01d8](https://github.com/wireapp/wire-web-packages/commit/93b01d86f9cba1f09c7ffdc7084c8e8c777ffaf1))
+
 ## [24.14.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@24.14.0...@wireapp/api-client@24.14.1) (2023-05-26)
 
 ### Bug Fixes
