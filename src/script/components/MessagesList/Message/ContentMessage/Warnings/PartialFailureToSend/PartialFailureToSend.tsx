@@ -23,12 +23,13 @@ import type {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {countBy, map} from 'underscore';
 
-import {Bold, Button, ButtonVariant} from '@wireapp/react-ui-kit';
+import {Bold, Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
+import {Config} from 'src/script/Config';
 import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
-import {warning} from '../Warnings.styles';
+import {backendErrorLink, warning} from '../Warnings.styles';
 
 export type User = {qualifiedId: QualifiedId; name: () => string};
 type Props = {
@@ -75,6 +76,8 @@ function joinWith(elements: React.ReactNode[], separator: string) {
 export const PartialFailureToSendWarning = ({failedToSend, knownUsers}: Props) => {
   const [isOpen, setIsOpen] = useState(false);
   const {queued = {}, failed = []} = failedToSend;
+
+  const config = Config.getConfig();
 
   const userCount =
     Object.entries(queued).reduce((count, [_domain, users]) => count + Object.keys(users).length, 0) + failed.length;
@@ -148,7 +151,16 @@ export const PartialFailureToSendWarning = ({failedToSend, knownUsers}: Props) =
                   )}
                   {unreachableUsers.length === 1
                     ? ` ${t('messageFailedToSendWillNotReceiveSingular')}`
-                    : ` ${t('messageFailedToSendWillNotReceivePlural')}`}
+                    : ` ${t('messageFailedToSendWillNotReceivePlural')}`}{' '}
+                  <Link
+                    targetBlank
+                    variant={LinkVariant.PRIMARY}
+                    href={config.URL.SUPPORT.OFFLINE_BACKEND}
+                    data-uie-name="go-offline-backend"
+                    css={backendErrorLink}
+                  >
+                    {t('offlineBackendLearnMore')}
+                  </Link>
                 </p>
               )}
             </>
