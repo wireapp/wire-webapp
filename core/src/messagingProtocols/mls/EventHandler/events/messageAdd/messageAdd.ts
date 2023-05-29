@@ -34,7 +34,7 @@ interface HandleMLSMessageAddParams extends EventHandlerParams {
 }
 const handleMLSMessageAdd = async (
   {mlsService, event}: HandleMLSMessageAddParams,
-  onEpochChanged: (groupId: string) => void,
+  onEpochChanged: (groupId: string) => Promise<void>,
 ): EventHandlerResult => {
   const encryptedData = Decoder.fromBase64(event.data).asBytes;
 
@@ -75,8 +75,9 @@ const handleMLSMessageAdd = async (
       eventTime: event.time,
     });
   }
+
   if (hasEpochChanged) {
-    onEpochChanged(groupId);
+    await onEpochChanged(groupId);
   }
 
   return message ? {event, decryptedData: GenericMessage.decode(message)} : undefined;
