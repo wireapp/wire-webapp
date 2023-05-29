@@ -157,7 +157,7 @@ const OAuthPermissionsComponent = ({
             </Link>
 
             <Text data-uie-name="oauth-permissions-requester" css={{marginBottom: '24px'}}>
-              {_(oauthStrings.subhead, {app: oAuthApp?.application_name})}
+              {_(oauthStrings.subhead)}
             </Text>
 
             {oauthParams.scope.length > 1 && (
