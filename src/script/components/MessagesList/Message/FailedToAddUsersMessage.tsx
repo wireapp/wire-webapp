@@ -32,7 +32,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
-import {warning} from './ContentMessage/Warnings/Warnings.styles';
+import {backendErrorLink, warning} from './ContentMessage/Warnings/Warnings.styles';
 import {MessageTime} from './MessageTime';
 
 import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from '../../../entity/message/FailedToAddUsersMessage';
@@ -72,17 +72,11 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
       <Link
         targetBlank
         variant={LinkVariant.PRIMARY}
-        href={config.URL.SUPPORT.USER_ADD_FAILURE}
-        data-uie-name="go-contact-support"
-        style={{
-          color: 'var(--blue-500)',
-          fontSize: '0.75rem',
-          fontWeight: 600,
-          textDecoration: 'underline',
-          textTransform: 'none',
-        }}
+        href={config.URL.SUPPORT.OFFLINE_BACKEND}
+        data-uie-name="go-offline-backend"
+        css={backendErrorLink}
       >
-        {t('failedToAddParticipantsLearnMore')}
+        {t('offlineBackendLearnMore')}
       </Link>
     </>
   );

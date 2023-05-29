@@ -20,3 +20,4 @@
 import {CSSObject} from '@emotion/react';
 
 export const warning: CSSObject = {color: 'var(--danger-color)', fontSize: 'var(--font-size-small)'};
+export const backendErrorLink: CSSObject = {fontSize: 'var(--font-size-small)'};
