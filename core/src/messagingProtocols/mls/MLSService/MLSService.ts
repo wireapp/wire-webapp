@@ -153,6 +153,11 @@ export class MLSService extends TypedEventEmitter<Events> {
   }
 
   public addUsersToExistingConversation(groupId: Uint8Array, invitee: Invitee[]) {
+    if (invitee.length < 1) {
+      // providing an empty invitee list to addClientsToConversation method would make core-crypto throw an error
+      // we want to skip adding clinets in this case
+      return null;
+    }
     return this.processCommitAction(groupId, () => this.coreCryptoClient.addClientsToConversation(groupId, invitee));
   }
 
