@@ -34,6 +34,7 @@ import {
   MessageSendingStatus,
   NewConversation,
   QualifiedConversationIds,
+  QualifiedUserClients,
   RemoteConversations,
 } from '..';
 import {BackendFeatures} from '../../APIClient';
@@ -69,6 +70,8 @@ import {
 import {Subconversation, SUBCONVERSATION_ID} from '../Subconversation';
 
 export type PostMlsMessageResponse = {
+  failed_to_send?: QualifiedUserClients;
+  failed?: QualifiedId[];
   events: ConversationEvent[];
   time: string;
 };
@@ -724,7 +727,7 @@ export class ConversationAPI {
    * @see https://messaginglayersecurity.rocks/mls-protocol/draft-ietf-mls-protocol.html#name-message-framing
    * @see https://staging-nginz-https.zinfra.io/api/swagger-ui/#/default/post_mls_messages
    */
-  public async postMlsMessage(messageData: Uint8Array) {
+  public async postMlsMessage(messageData: Uint8Array): Promise<PostMlsMessageResponse> {
     const config: AxiosRequestConfig = {
       data: messageData,
       method: 'post',

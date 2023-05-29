@@ -25,6 +25,7 @@ import {
   QualifiedUserClients,
   ConversationProtocol,
   RemoteConversations,
+  PostMlsMessageResponse,
 } from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_TYPING, ConversationMemberUpdateData} from '@wireapp/api-client/lib/conversation/data';
 import {ConversationMemberLeaveEvent} from '@wireapp/api-client/lib/event';
@@ -273,15 +274,31 @@ export class ConversationService {
 
     const encrypted = await this.mlsService.encryptMessage(groupIdBytes, GenericMessage.encode(payload).finish());
 
-    let sentAt: string = '';
+    let response: PostMlsMessageResponse = {
+      time: new Date().toISOString(),
+      events: [],
+      failed_to_send: {},
+      failed: [],
+    };
+
     try {
-      const {time = ''} = await this.apiClient.api.conversation.postMlsMessage(encrypted);
-      sentAt = time?.length > 0 ? time : new Date().toISOString();
+      response = await this.apiClient.api.conversation.postMlsMessage(encrypted);
     } catch {}
+
+    const sentAt = response.time;
+
+    const failedToSend =
+      response.failed || Object.keys(response.failed_to_send ?? {}).length > 0
+        ? {
+            queued: response.failed_to_send,
+            failed: response.failed,
+          }
+        : undefined;
 
     return {
       id: payload.messageId,
       sentAt,
+      failedToSend,
       state: sentAt ? MessageSendingState.OUTGOING_SENT : MessageSendingState.CANCELED,
     };
   }
