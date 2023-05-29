@@ -367,6 +367,11 @@ export class ConversationService {
   }
 
   public async wipeMLSConversation(groupId: string): Promise<void> {
+    const isMLSConversationEstablished = await this.isMLSConversationEstablished(groupId);
+    if (!isMLSConversationEstablished) {
+      //if the mls group does not exist, we don't need to wipe it
+      return;
+    }
     return this.mlsService.wipeConversation(groupId);
   }
 

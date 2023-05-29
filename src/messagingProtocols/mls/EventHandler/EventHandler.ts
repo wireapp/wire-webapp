@@ -24,7 +24,7 @@ import {EventHandlerResult} from '../../common.types';
 
 const handleBackendEvent = async (
   params: EventHandlerParams,
-  onEpochChanged: (groupId: string) => void,
+  onEpochChanged: (groupId: string) => Promise<void>,
 ): EventHandlerResult => {
   const {event} = params;
   if (isWelcomeMessageEvent(event)) {
