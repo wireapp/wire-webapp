@@ -34,10 +34,12 @@ import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {backendErrorLink, warning} from './ContentMessage/Warnings/Warnings.styles';
 import {MessageTime} from './MessageTime';
+import {useMessageFocusedTabIndex} from './util';
 
 import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from '../../../entity/message/FailedToAddUsersMessage';
 
 export interface FailedToAddUsersMessageProps {
+  isMessageFocused: boolean;
   message: FailedToAddUsersMessageEntity;
   userState?: UserState;
 }
@@ -45,9 +47,12 @@ export interface FailedToAddUsersMessageProps {
 const config = Config.getConfig();
 
 const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
+  isMessageFocused,
   message,
   userState = container.resolve(UserState),
 }) => {
+  const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
+
   const [isOpen, setIsOpen] = useState(false);
   const {timestamp} = useKoSubscribableChildren(message, ['timestamp']);
 
@@ -71,6 +76,7 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
     <>
       {' '}
       <Link
+        tabIndex={messageFocusedTabIndex}
         targetBlank
         variant={LinkVariant.PRIMARY}
         href={config.URL.SUPPORT.OFFLINE_BACKEND}
@@ -155,6 +161,7 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
         )}
         {total > 1 && (
           <Button
+            tabIndex={messageFocusedTabIndex}
             data-uie-name="toggle-failed-to-add-users"
             type="button"
             variant={ButtonVariant.TERTIARY}
