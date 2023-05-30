@@ -123,7 +123,7 @@ export interface SubconversationEpochInfoMember {
   in_subconv: boolean;
 }
 
-type SubconversationData = {epoch: number; secretKey: string; keyLength: number};
+type SubconversationData = {epoch: number; secretKey: string};
 
 export class CallingRepository {
   private readonly acceptVersionWarning: (conversationId: QualifiedId) => void;
@@ -882,20 +882,13 @@ export class CallingRepository {
     members: SubconversationEpochInfoMember[],
   ) {
     const serializedConversationId = this.serializeQualifiedId(conversationId);
-    const {epoch, secretKey, keyLength} = subconversationData;
+    const {epoch, secretKey} = subconversationData;
     const clients = {
       convid: serializedConversationId,
       clients: members,
     };
 
-    return this.wCall?.setEpochInfo(
-      this.wUser,
-      serializedConversationId,
-      epoch,
-      JSON.stringify(clients),
-      secretKey,
-      keyLength,
-    );
+    return this.wCall?.setEpochInfo(this.wUser, serializedConversationId, epoch, JSON.stringify(clients), secretKey);
   }
 
   rejectCall(conversationId: QualifiedId): void {
