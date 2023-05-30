@@ -29,6 +29,7 @@ export enum SystemMessageType {
   CONVERSATION_MESSAGE_TIMER_UPDATE = 'message-timer-update',
   CONVERSATION_RECEIPT_MODE_UPDATE = 'receipt-mode-update',
   CONVERSATION_RENAME = 'rename',
+  CONVERSATION_PROTOCOL_UPDATE = 'protocol-update',
   CONVERSATION_RESUME = 'resume',
   MEMBER_JOIN = 'join',
   MEMBER_LEAVE = 'leave',
