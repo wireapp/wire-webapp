@@ -18,10 +18,9 @@
  */
 
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import ko from 'knockout';
 
-import {SuperType} from 'src/script/message/SuperType';
+import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import {t} from 'Util/LocalizerUtil';
 
 import {SystemMessage} from './SystemMessage';
@@ -29,8 +28,7 @@ import {SystemMessage} from './SystemMessage';
 export class ProtocolUpdateMessage extends SystemMessage {
   constructor(public protocol: ConversationProtocol.MIXED | ConversationProtocol.MLS) {
     super();
-    this.type = CONVERSATION_EVENT.PROTOCOL_UPDATE;
-    this.super_type = SuperType.PROTOCOL_UPDATE;
+    this.system_message_type = SystemMessageType.CONVERSATION_PROTOCOL_UPDATE;
     this.caption = ko.pureComputed(() =>
       this.protocol === ConversationProtocol.MIXED
         ? t('conversationProtocolUpdatedToMixed')
