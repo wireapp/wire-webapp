@@ -108,7 +108,7 @@ describe('CallingViewModel', () => {
     it('updates epoch info after initiating a call', async () => {
       const mockParentGroupId = 'mockParentGroupId1';
       const mockSubGroupId = 'mockSubGroupId1';
-      const {expectedMemberListResult, mockEpochNumber, mockKeyLength, mockSecretKey} = prepareMLSConferenceMocks(
+      const {expectedMemberListResult, mockEpochNumber, mockSecretKey} = prepareMLSConferenceMocks(
         mockParentGroupId,
         mockSubGroupId,
       );
@@ -128,7 +128,6 @@ describe('CallingViewModel', () => {
         conversationId,
         {
           epoch: mockEpochNumber,
-          keyLength: mockKeyLength,
           secretKey: mockSecretKey,
         },
         expectedMemberListResult,
@@ -138,7 +137,7 @@ describe('CallingViewModel', () => {
     it('updates epoch info after answering a call', async () => {
       const mockParentGroupId = 'mockParentGroupId2';
       const mockSubGroupId = 'mockSubGroupId2';
-      const {expectedMemberListResult, mockEpochNumber, mockKeyLength, mockSecretKey} = prepareMLSConferenceMocks(
+      const {expectedMemberListResult, mockEpochNumber, mockSecretKey} = prepareMLSConferenceMocks(
         mockParentGroupId,
         mockSubGroupId,
       );
@@ -156,7 +155,6 @@ describe('CallingViewModel', () => {
         conversationId,
         {
           epoch: mockEpochNumber,
-          keyLength: mockKeyLength,
           secretKey: mockSecretKey,
         },
         expectedMemberListResult,
@@ -166,7 +164,7 @@ describe('CallingViewModel', () => {
     it('updates epoch info after mls service has emmited "newEpoch" event', async () => {
       const mockParentGroupId = 'mockParentGroupId3';
       const mockSubGroupId = 'mockSubGroupId3';
-      const {expectedMemberListResult, mockEpochNumber, mockKeyLength, mockSecretKey} = prepareMLSConferenceMocks(
+      const {expectedMemberListResult, mockEpochNumber, mockSecretKey} = prepareMLSConferenceMocks(
         mockParentGroupId,
         mockSubGroupId,
       );
@@ -183,7 +181,6 @@ describe('CallingViewModel', () => {
         conversationId,
         {
           epoch: mockEpochNumber,
-          keyLength: mockKeyLength,
           secretKey: mockSecretKey,
         },
         expectedMemberListResult,
@@ -201,7 +198,6 @@ describe('CallingViewModel', () => {
           conversationId,
           {
             epoch: newEpochNumber,
-            keyLength: mockKeyLength,
             secretKey: mockSecretKey,
           },
           expectedMemberListResult,
@@ -226,7 +222,6 @@ describe('CallingViewModel', () => {
         conversationId,
         {
           epoch: anotherEpochNumber,
-          keyLength: mockKeyLength,
           secretKey: mockSecretKey,
         },
         expectedMemberListResult,
