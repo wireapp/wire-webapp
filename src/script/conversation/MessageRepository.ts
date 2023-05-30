@@ -50,6 +50,7 @@ import {roundLogarithmic} from 'Util/NumberUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {isBackendError} from 'Util/TypePredicateUtil';
 import {loadUrlBlob, supportsMLS} from 'Util/util';
 import {createUuid} from 'Util/uuid';
 
@@ -808,7 +809,9 @@ export class MessageRepository {
       }
       return result;
     } catch (error) {
-      await this.updateMessageAsFailed(conversation, payload.messageId, error as BackendError);
+      if (isBackendError(error)) {
+        await this.updateMessageAsFailed(conversation, payload.messageId, error);
+      }
       return {id: payload.messageId, sentAt: new Date().toISOString(), state: SendAndInjectSendingState.FAILED};
     }
   }
