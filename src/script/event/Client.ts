@@ -25,6 +25,7 @@ export enum CONVERSATION {
   ASSET_ADD = 'conversation.asset-add',
   BUTTON_ACTION_CONFIRMATION = 'conversation.button-action-confirmation',
   CALL_TIME_OUT = 'conversation.call-time-out',
+  FAILED_TO_ADD_USERS = 'conversation.failed-to-add-users',
   COMPOSITE_MESSAGE_ADD = 'conversation.composite-message-add',
   CONFIRMATION = 'conversation.confirmation',
   DELETE_EVERYWHERE = 'conversation.delete-everywhere',

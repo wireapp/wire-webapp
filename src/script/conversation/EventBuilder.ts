@@ -189,6 +189,9 @@ export type FileTypeRestrictedEvent = ConversationEvent<{fileExt: string; isInco
 export type CallingTimeoutEvent = ConversationEvent<{reason: AVS_REASON.NOONE_JOINED | AVS_REASON.EVERYONE_LEFT}> & {
   type: CONVERSATION.CALL_TIME_OUT;
 };
+export type FailedToAddUsersMessageEvent = ConversationEvent<{qualifiedIds: QualifiedId[]}> & {
+  type: CONVERSATION.FAILED_TO_ADD_USERS;
+};
 
 export interface ErrorEvent extends BaseEvent {
   error: string;
@@ -221,6 +224,7 @@ export type ClientConversationEvent =
   | VoiceChannelDeactivateEvent
   | FileTypeRestrictedEvent
   | CallingTimeoutEvent
+  | FailedToAddUsersMessageEvent
   | UnableToDecryptEvent
   | MissedEvent
   | LocationEvent
@@ -290,6 +294,23 @@ export const EventBuilder = {
       id: createUuid(),
       time: conversation.getNextIsoDate(),
       type: ClientEvent.CONVERSATION.CALL_TIME_OUT,
+    };
+  },
+
+  buildFailedToAddUsersEvent(
+    qualifiedIds: QualifiedId[],
+    conversation: Conversation,
+    userId: string,
+  ): FailedToAddUsersMessageEvent {
+    return {
+      ...buildQualifiedId(conversation),
+      data: {
+        qualifiedIds,
+      },
+      from: userId,
+      id: createUuid(),
+      time: conversation.getNextIsoDate(),
+      type: ClientEvent.CONVERSATION.FAILED_TO_ADD_USERS,
     };
   },
 

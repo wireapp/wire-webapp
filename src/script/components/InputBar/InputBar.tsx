@@ -46,7 +46,7 @@ import {
   updateMentionRanges,
 } from 'Util/MentionUtil';
 import {formatDuration, formatLocale, TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {getSelectionPosition} from 'Util/util';
+import {getFileExtension, getSelectionPosition} from 'Util/util';
 
 import {ControlButtons} from './components/InputBarControls/ControlButtons';
 import {GiphyButton} from './components/InputBarControls/GiphyButton';
@@ -583,7 +583,7 @@ const InputBar = ({
     const {lastModified} = pastedFile;
 
     const date = formatLocale(lastModified || new Date(), 'PP, pp');
-    const fileName = t('conversationSendPastedFile', date);
+    const fileName = `${t('conversationSendPastedFile', date)}.${getFileExtension(pastedFile.name)}`;
 
     const newFile = new File([pastedFile], fileName, {
       type: pastedFile.type,
@@ -776,7 +776,11 @@ const InputBar = ({
       {!!isTypingIndicatorEnabled && <TypingIndicator conversationId={conversationEntity.id} />}
 
       {classifiedDomains && !isConnectionRequest && (
-        <ClassifiedBar users={allUsers} classifiedDomains={classifiedDomains} />
+        <ClassifiedBar
+          conversationDomain={conversationEntity.domain}
+          users={allUsers}
+          classifiedDomains={classifiedDomains}
+        />
       )}
 
       {isReplying && !isEditing && <ReplyBar replyMessageEntity={replyMessageEntity} onCancel={handleCancelReply} />}

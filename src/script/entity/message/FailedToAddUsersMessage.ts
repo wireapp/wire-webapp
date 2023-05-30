@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,23 +17,16 @@
  *
  */
 
-/** Enum for different message super types */
-export enum SuperType {
-  CALL = 'call',
-  CALL_TIME_OUT = 'call-time-out',
-  FAILED_TO_ADD_USERS = 'failed-to-add-users',
-  CONTENT = 'normal',
-  DELETE = 'delete',
-  DEVICE = 'device',
-  FILE_TYPE_RESTRICTED = 'file-type-restricted',
-  LEGALHOLD = 'legal-hold',
-  LOCATION = 'location',
-  MEMBER = 'member',
-  MISSED = 'missed',
-  PING = 'ping',
-  REACTION = 'reaction',
-  SPECIAL = 'special',
-  SYSTEM = 'system',
-  UNABLE_TO_DECRYPT = 'unable-to-decrypt',
-  VERIFICATION = 'verification',
+import {QualifiedId} from '@wireapp/api-client/lib/user';
+
+import {Message} from './Message';
+
+import {SuperType} from '../../message/SuperType';
+
+export class FailedToAddUsersMessage extends Message {
+  constructor(public qualifiedIds: QualifiedId[], time: number) {
+    super();
+    this.super_type = SuperType.FAILED_TO_ADD_USERS;
+    this.timestamp(time);
+  }
 }

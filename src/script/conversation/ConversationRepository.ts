@@ -453,6 +453,18 @@ export class ConversationRepository {
         // since we are the creator of the conversation, we can safely mark it as established
         useMLSConversationState.getState().markAsEstablished(conversationEntity.groupId);
       }
+
+      const {failed_to_add: failedToAddUsers} = response.conversation;
+
+      if (failedToAddUsers && failedToAddUsers.length > 0) {
+        const failedToAddUsersEvent = EventBuilder.buildFailedToAddUsersEvent(
+          failedToAddUsers,
+          conversationEntity,
+          this.userState.self().id,
+        );
+        await this.eventRepository.injectEvent(failedToAddUsersEvent);
+      }
+
       return conversationEntity;
     } catch (error) {
       if (!isBackendError(error)) {
@@ -2316,6 +2328,7 @@ export class ConversationRepository {
       case ClientEvent.CONVERSATION.INCOMING_MESSAGE_TOO_BIG:
       case ClientEvent.CONVERSATION.KNOCK:
       case ClientEvent.CONVERSATION.CALL_TIME_OUT:
+      case ClientEvent.CONVERSATION.FAILED_TO_ADD_USERS:
       case ClientEvent.CONVERSATION.LEGAL_HOLD_UPDATE:
       case ClientEvent.CONVERSATION.LOCATION:
       case ClientEvent.CONVERSATION.MISSED_MESSAGES:
