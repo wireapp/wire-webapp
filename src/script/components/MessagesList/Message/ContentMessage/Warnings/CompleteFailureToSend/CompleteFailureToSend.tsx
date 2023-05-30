@@ -19,19 +19,22 @@
 
 import {Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
+import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
 import {Config} from 'src/script/Config';
 import {t} from 'Util/LocalizerUtil';
 
 import {backendErrorLink, warning} from '../Warnings.styles';
 
 type Props = {
+  isMessageFocused: boolean;
   onRetry: () => void;
   unreachableDomain?: string;
 };
 
 const config = Config.getConfig();
 
-export const CompleteFailureToSendWarning = ({onRetry, unreachableDomain}: Props) => {
+export const CompleteFailureToSendWarning = ({isMessageFocused, onRetry, unreachableDomain}: Props) => {
+  const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
   return (
     <>
       {unreachableDomain ? (
@@ -43,6 +46,7 @@ export const CompleteFailureToSendWarning = ({onRetry, unreachableDomain}: Props
             }}
           />{' '}
           <Link
+            tabIndex={messageFocusedTabIndex}
             targetBlank
             variant={LinkVariant.PRIMARY}
             href={config.URL.SUPPORT.OFFLINE_BACKEND}
@@ -56,7 +60,7 @@ export const CompleteFailureToSendWarning = ({onRetry, unreachableDomain}: Props
         <p>{t('messageCouldNotBeSentConnectivityIssues')}</p>
       )}
       <div css={{display: 'flex'}}>
-        <Button type="button" variant={ButtonVariant.TERTIARY} onClick={onRetry}>
+        <Button tabIndex={messageFocusedTabIndex} type="button" variant={ButtonVariant.TERTIARY} onClick={onRetry}>
           {t('messageCouldNotBeSentRetry')}
         </Button>
       </div>

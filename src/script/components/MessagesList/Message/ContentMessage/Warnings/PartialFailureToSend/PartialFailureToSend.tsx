@@ -25,6 +25,7 @@ import {countBy, map} from 'underscore';
 
 import {Bold, Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
+import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
 import {Config} from 'src/script/Config';
 import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
@@ -34,6 +35,7 @@ import {backendErrorLink, warning} from '../Warnings.styles';
 export type User = {qualifiedId: QualifiedId; name: () => string};
 type Props = {
   failedToSend: {queued?: QualifiedUserClients; failed?: QualifiedId[]};
+  isMessageFocused: boolean;
   knownUsers: User[];
 };
 
@@ -75,9 +77,11 @@ function joinWith(elements: React.ReactNode[], separator: string) {
   }, []);
 }
 
-export const PartialFailureToSendWarning = ({failedToSend, knownUsers}: Props) => {
+export const PartialFailureToSendWarning = ({failedToSend, isMessageFocused, knownUsers}: Props) => {
   const [isOpen, setIsOpen] = useState(false);
   const {queued = {}, failed = []} = failedToSend;
+
+  const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
 
   const userCount =
     Object.entries(queued).reduce((count, [_domain, users]) => count + Object.keys(users).length, 0) + failed.length;
@@ -153,6 +157,7 @@ export const PartialFailureToSendWarning = ({failedToSend, knownUsers}: Props) =
                     ? ` ${t('messageFailedToSendWillNotReceiveSingular')}`
                     : ` ${t('messageFailedToSendWillNotReceivePlural')}`}{' '}
                   <Link
+                    tabIndex={messageFocusedTabIndex}
                     targetBlank
                     variant={LinkVariant.PRIMARY}
                     href={config.URL.SUPPORT.OFFLINE_BACKEND}
@@ -165,7 +170,12 @@ export const PartialFailureToSendWarning = ({failedToSend, knownUsers}: Props) =
               )}
             </>
           )}
-          <Button type="button" variant={ButtonVariant.TERTIARY} onClick={() => setIsOpen(state => !state)}>
+          <Button
+            type="button"
+            tabIndex={messageFocusedTabIndex}
+            variant={ButtonVariant.TERTIARY}
+            onClick={() => setIsOpen(state => !state)}
+          >
             {isOpen ? t('messageFailedToSendHideDetails') : t('messageFailedToSendShowDetails')}
           </Button>
         </>
