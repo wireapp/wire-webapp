@@ -101,7 +101,7 @@ const filterDuplicatedSystemMessages = (messages: MessageEntity[]) => {
     }
 
     if (currentMessage.isSystem()) {
-      const systemMessagesToFilter = [CONVERSATION_EVENT.RENAME] as string[];
+      const systemMessagesToFilter = [CONVERSATION_EVENT.RENAME, CONVERSATION_EVENT.PROTOCOL_UPDATE] as string[];
       if (systemMessagesToFilter.includes(currentMessage.type)) {
         const uniqUpdateMessages = uniqMessages.filter(
           (message): message is SystemMessage => message.isSystem() && systemMessagesToFilter.includes(message.type),
