@@ -37,6 +37,12 @@ export function isMLSConversation(conversation: Conversation): conversation is M
   return !!conversation.groupId && conversation.protocol === ConversationProtocol.MLS;
 }
 
+export function isMLSCapableConversation(
+  conversation: Conversation,
+): conversation is MixedConversation | MLSConversation {
+  return isMixedConversation(conversation) || isMLSConversation(conversation);
+}
+
 export function isSelfConversation(conversation: Conversation): boolean {
   return conversation.type() === CONVERSATION_TYPE.SELF;
 }

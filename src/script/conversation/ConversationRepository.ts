@@ -80,6 +80,7 @@ import {ConversationFilter} from './ConversationFilter';
 import {ConversationLabelRepository} from './ConversationLabelRepository';
 import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';
 import {ConversationRoleRepository} from './ConversationRoleRepository';
+import {isMLSCapableConversation} from './ConversationSelectors';
 import {ConversationService} from './ConversationService';
 import {ConversationState} from './ConversationState';
 import {ConversationStateHandler} from './ConversationStateHandler';
@@ -951,11 +952,9 @@ export class ConversationRepository {
     }
     this.deleteConversationFromRepository(conversationId);
     await this.conversationService.deleteConversationFromDb(conversationId);
-    if (conversationEntity.protocol === ConversationProtocol.MLS) {
+    if (isMLSCapableConversation(conversationEntity)) {
       const {groupId} = conversationEntity;
-      if (groupId) {
-        await this.core.service!.conversation.wipeMLSConversation(groupId);
-      }
+      await this.core.service!.conversation.wipeMLSConversation(groupId);
     }
   };
 
@@ -2714,11 +2713,9 @@ export class ConversationRepository {
         eventJson.from = this.userState.self().id;
       }
 
-      if (conversationEntity.protocol === ConversationProtocol.MLS) {
+      if (isMLSCapableConversation(conversationEntity)) {
         const {groupId} = conversationEntity;
-        if (groupId) {
-          await this.core.service!.conversation.wipeMLSConversation(groupId);
-        }
+        await this.core.service!.conversation.wipeMLSConversation(groupId);
       }
     } else {
       // Update conversation roles (in case the removed user had some special role and it's not the self user)
