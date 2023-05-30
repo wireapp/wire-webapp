@@ -64,7 +64,9 @@ describe('FailedToAddUsersMessage', () => {
       qualifiedIds: [qualifiedId1],
     });
 
-    const {getByTestId} = render(withTheme(<FailedToAddUsersMessage message={message} userState={userState} />));
+    const {getByTestId} = render(
+      withTheme(<FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />),
+    );
 
     const elementMessageFailedToAdd = getByTestId('element-message-failed-to-add-users');
     expect(elementMessageFailedToAdd.getAttribute('data-uie-value')).toEqual('1-user-not-added');
@@ -81,7 +83,9 @@ describe('FailedToAddUsersMessage', () => {
       qualifiedIds: [qualifiedId1, qualifiedId2],
     });
 
-    const {getByTestId} = render(withTheme(<FailedToAddUsersMessage message={message} userState={userState} />));
+    const {getByTestId} = render(
+      withTheme(<FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />),
+    );
 
     const elementMessageFailedToAdd = getByTestId('element-message-failed-to-add-users');
     expect(elementMessageFailedToAdd.getAttribute('data-uie-value')).toEqual('multi-users-not-added');
@@ -98,7 +102,9 @@ describe('FailedToAddUsersMessage', () => {
       qualifiedIds: [qualifiedId1, qualifiedId2],
     });
 
-    const {getByTestId} = render(withTheme(<FailedToAddUsersMessage message={message} userState={userState} />));
+    const {getByTestId} = render(
+      withTheme(<FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />),
+    );
 
     const elementMessageFailedToAdd = getByTestId('element-message-failed-to-add-users');
     expect(elementMessageFailedToAdd.getAttribute('data-uie-value')).toEqual('multi-users-not-added');
@@ -126,7 +132,7 @@ describe('FailedToAddUsersMessage', () => {
     });
 
     const {getByTestId, getAllByTestId} = render(
-      withTheme(<FailedToAddUsersMessage message={message} userState={userState} />),
+      withTheme(<FailedToAddUsersMessage isMessageFocused message={message} userState={userState} />),
     );
 
     const elementMessageFailedToAdd = getByTestId('element-message-failed-to-add-users');
