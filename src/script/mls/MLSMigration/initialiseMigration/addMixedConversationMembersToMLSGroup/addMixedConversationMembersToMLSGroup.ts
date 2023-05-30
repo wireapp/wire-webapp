@@ -54,9 +54,11 @@ export const addMixedConversationMembersToMLSGroup = async (
     qualifiedUsers: usersToAdd,
   });
 
-  mlsMigrationLogger.info(
-    `Added ${usersToAdd.length} users to MLS Group for conversation ${mixedConversation.qualifiedId.id}.`,
-  );
+  if (otherUsersToAdd.length > 0) {
+    mlsMigrationLogger.info(
+      `Added ${otherUsersToAdd.length} users to MLS Group for conversation ${mixedConversation.qualifiedId.id}.`,
+    );
+  }
 
   return addUsersResponse;
 };
