@@ -35,6 +35,7 @@ import {TeamState} from 'src/script/team/TeamState';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {initialiseMigrationOfProteusConversations} from './initialiseMigration';
+import {joinUnestablishedMixedConversations} from './initialiseMigration/joinUnestablishedMixedConversations';
 import {mlsMigrationLogger} from './MLSMigrationLogger';
 
 import {isMLSSupportedByEnvironment} from '../isMLSSupportedByEnvironment';
@@ -173,13 +174,16 @@ const migrateConversationsToMLS = async ({
       !conversation.isTeam1to1(),
   );
 
-  const {proteus: proteusConversations} = groupConversationsByProtocol(regularGroupConversations);
+  const {proteus: proteusConversations, mixed: mixedConversatons} =
+    groupConversationsByProtocol(regularGroupConversations);
 
   await initialiseMigrationOfProteusConversations(proteusConversations, {
     core,
     conversationRepository,
     selfUserId,
   });
+
+  await joinUnestablishedMixedConversations(mixedConversatons, {core});
 
   //TODO: implement logic for init and finalise the migration
 };
