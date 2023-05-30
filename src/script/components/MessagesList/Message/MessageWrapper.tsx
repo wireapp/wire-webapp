@@ -43,7 +43,6 @@ import {LegalHoldMessage} from './LegalHoldMessage';
 import {MemberMessage} from './MemberMessage';
 import {MissedMessage} from './MissedMessage';
 import {PingMessage} from './PingMessage';
-import {ProtocolUpdateMessage} from './ProtocolUpdateMessage';
 import {SystemMessage} from './SystemMessage';
 import {VerificationMessage} from './VerificationMessage';
 
@@ -273,9 +272,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
   if (message.isFileTypeRestricted()) {
     return <FileTypeRestrictedMessage message={message} />;
   }
-  if (message.isProtocolUpdate()) {
-    return <ProtocolUpdateMessage message={message} />;
-  }
+
   if (message.isMissed()) {
     return <MissedMessage />;
   }

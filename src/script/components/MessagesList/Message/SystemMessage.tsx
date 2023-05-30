@@ -41,6 +41,12 @@ const SystemMessage: React.FC<SystemMessageProps> = ({message}) => {
   // Only set for RenameMessage, MemberMessage has a different super_type
   const messageName = (message as RenameMessage).name;
 
+  const includeSenderNameMessages = [
+    SystemMessageType.CONVERSATION_RENAME,
+    SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE,
+    SystemMessageType.CONVERSATION_RECEIPT_MODE_UPDATE,
+  ];
+
   return (
     <>
       <div className="message-header" data-uie-name="element-message-system">
@@ -48,10 +54,13 @@ const SystemMessage: React.FC<SystemMessageProps> = ({message}) => {
           {message.system_message_type === SystemMessageType.CONVERSATION_RENAME && <Icon.Edit />}
           {message.system_message_type === SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE && <Icon.Timer />}
           {message.system_message_type === SystemMessageType.CONVERSATION_RECEIPT_MODE_UPDATE && <Icon.Read />}
+          {message.system_message_type === SystemMessageType.CONVERSATION_PROTOCOL_UPDATE && <Icon.Info />}
         </div>
         <p className="message-header-label">
           <span className="message-header-label__multiline">
-            <span className="message-header-sender-name">{unsafeSenderName}</span>
+            {includeSenderNameMessages.includes(message.system_message_type) && (
+              <span className="message-header-sender-name">{unsafeSenderName}</span>
+            )}
             <span className="ellipsis">{caption}</span>
           </span>
         </p>
