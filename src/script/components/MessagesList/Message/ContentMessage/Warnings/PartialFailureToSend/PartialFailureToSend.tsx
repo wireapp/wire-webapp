@@ -37,6 +37,8 @@ type Props = {
   knownUsers: User[];
 };
 
+const config = Config.getConfig();
+
 type ParsedUsers = {namedUsers: User[]; unknownUsers: QualifiedId[]};
 
 function generateNamedUsers(users: User[], userClients: QualifiedUserClients): ParsedUsers {
@@ -76,8 +78,6 @@ function joinWith(elements: React.ReactNode[], separator: string) {
 export const PartialFailureToSendWarning = ({failedToSend, knownUsers}: Props) => {
   const [isOpen, setIsOpen] = useState(false);
   const {queued = {}, failed = []} = failedToSend;
-
-  const config = Config.getConfig();
 
   const userCount =
     Object.entries(queued).reduce((count, [_domain, users]) => count + Object.keys(users).length, 0) + failed.length;

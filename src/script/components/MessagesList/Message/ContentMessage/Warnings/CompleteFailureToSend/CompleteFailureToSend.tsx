@@ -29,8 +29,9 @@ type Props = {
   unreachableDomain?: string;
 };
 
+const config = Config.getConfig();
+
 export const CompleteFailureToSendWarning = ({onRetry, unreachableDomain}: Props) => {
-  const config = Config.getConfig();
   return (
     <>
       {unreachableDomain ? (

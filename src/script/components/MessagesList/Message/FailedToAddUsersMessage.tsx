@@ -42,13 +42,14 @@ export interface FailedToAddUsersMessageProps {
   userState?: UserState;
 }
 
+const config = Config.getConfig();
+
 const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
   message,
   userState = container.resolve(UserState),
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const {timestamp} = useKoSubscribableChildren(message, ['timestamp']);
-  const config = Config.getConfig();
 
   const {users: allUsers} = useKoSubscribableChildren(userState, ['users']);
 
