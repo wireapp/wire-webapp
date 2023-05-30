@@ -186,7 +186,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
           <PartialFailureToSendWarning failedToSend={failedToSend} knownUsers={conversation.allUserEntities()} />
         )}
 
-        {(status === StatusType.FAILED || status === StatusType.FEDERATION_ERROR) && (
+        {[StatusType.FAILED, StatusType.FEDERATION_ERROR].includes(status) && (
           <CompleteFailureToSendWarning
             {...(status === StatusType.FEDERATION_ERROR && {unreachableDomain: conversation.domain})}
             onRetry={() => onRetry(message)}
