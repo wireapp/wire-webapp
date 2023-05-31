@@ -34,7 +34,10 @@ import {backendErrorLink, warning} from '../Warnings.styles';
 
 export type User = {qualifiedId: QualifiedId; name: () => string};
 type Props = {
-  failedToSend: {queued?: QualifiedUserClients; failed?: QualifiedId[]};
+  failedToSend: {
+    queued?: QualifiedUserClients | QualifiedId[];
+    failed?: QualifiedId[];
+  };
   isMessageFocused: boolean;
   knownUsers: User[];
 };
@@ -43,8 +46,25 @@ const config = Config.getConfig();
 
 type ParsedUsers = {namedUsers: User[]; unknownUsers: QualifiedId[]};
 
-function generateNamedUsers(users: User[], userClients: QualifiedUserClients): ParsedUsers {
-  return Object.entries(userClients).reduce<ParsedUsers>(
+function generateNamedUsers(
+  users: User[],
+  userClientsOrQualifiedIds: QualifiedUserClients | QualifiedId[],
+): ParsedUsers {
+  if (Array.isArray(userClientsOrQualifiedIds)) {
+    return userClientsOrQualifiedIds.reduce<ParsedUsers>(
+      (parsedUsers, currentQulifiedId) => {
+        const user = users.find(user => matchQualifiedIds(user.qualifiedId, currentQulifiedId));
+        if (user && user.name()) {
+          parsedUsers.namedUsers.push(user);
+        } else {
+          parsedUsers.unknownUsers.push(currentQulifiedId);
+        }
+        return parsedUsers;
+      },
+      {namedUsers: [], unknownUsers: []},
+    );
+  }
+  return Object.entries(userClientsOrQualifiedIds).reduce<ParsedUsers>(
     (namedUsers, [domain, domainUsers]) => {
       const domainNamedUsers = Object.keys(domainUsers).reduce<ParsedUsers>(
         (domainNamedUsers, userId) => {
@@ -81,10 +101,10 @@ export const PartialFailureToSendWarning = ({failedToSend, isMessageFocused, kno
   const [isOpen, setIsOpen] = useState(false);
   const {queued = {}, failed = []} = failedToSend;
 
+  const userCount = Array.isArray(queued)
+    ? queued.length
+    : Object.entries(queued).reduce((count, [_domain, users]) => count + Object.keys(users).length, 0) + failed.length;
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
-
-  const userCount =
-    Object.entries(queued).reduce((count, [_domain, users]) => count + Object.keys(users).length, 0) + failed.length;
 
   const showToggle = userCount > 1;
 
