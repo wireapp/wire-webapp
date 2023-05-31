@@ -29,6 +29,7 @@ import {formatDuration} from 'Util/TimeUtil';
 
 import {Conversation} from '../../../entity/Conversation';
 import {EphemeralTimings} from '../../../ephemeral/EphemeralTimings';
+import {TeamState} from '../../../team/TeamState';
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';
 import {PanelHeader} from '../PanelHeader';
 
@@ -37,6 +38,7 @@ interface TimedMessagesPanelProps {
   onClose: () => void;
   onGoBack: () => void;
   repositories: ViewModelRepositories;
+  teamState: TeamState;
 }
 
 interface MessageTime {
@@ -45,14 +47,26 @@ interface MessageTime {
   value: number;
 }
 
-const TimedMessages: FC<TimedMessagesPanelProps> = ({activeConversation, onClose, onGoBack, repositories}) => {
+const TimedMessages: FC<TimedMessagesPanelProps> = ({
+  activeConversation,
+  onClose,
+  onGoBack,
+  repositories,
+  teamState,
+}) => {
   const [currentMessageTimer, setCurrentMessageTimer] = useState(0);
   const [messageTimes, setMessageTimes] = useState<MessageTime[]>([]);
 
   const {globalMessageTimer} = useKoSubscribableChildren(activeConversation, ['globalMessageTimer']);
+  const {isSelfDeletingMessagesEnforced, getEnforcedSelfDeletingMessagesTimeout} = useKoSubscribableChildren(
+    teamState,
+    ['isSelfDeletingMessagesEnforced', 'getEnforcedSelfDeletingMessagesTimeout'],
+  );
 
   useEffect(() => {
-    const messageTimer = globalMessageTimer ?? 0;
+    const messageTimer = isSelfDeletingMessagesEnforced
+      ? getEnforcedSelfDeletingMessagesTimeout
+      : globalMessageTimer ?? 0;
     setCurrentMessageTimer(messageTimer);
 
     const mappedTimes = EphemeralTimings.VALUES.map(time => ({
@@ -104,7 +118,7 @@ const TimedMessages: FC<TimedMessagesPanelProps> = ({activeConversation, onClose
             options={messageTimes.map(({text, isCustom, value}) => ({
               label: text,
               value: value,
-              isDisabled: isCustom,
+              isDisabled: isCustom || isSelfDeletingMessagesEnforced,
               optionUeiName: 'item-timed-messages-option',
             }))}
           />

@@ -139,9 +139,19 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
 
     const teamId = activeConversation.team_id;
 
-    const {isTeam, classifiedDomains, team} = useKoSubscribableChildren(teamState, [
+    const {
+      isTeam,
+      classifiedDomains,
+      team,
+      isSelfDeletingMessagesEnabled,
+      isSelfDeletingMessagesEnforced,
+      getEnforcedSelfDeletingMessagesTimeout,
+    } = useKoSubscribableChildren(teamState, [
       'isTeam',
       'classifiedDomains',
+      'isSelfDeletingMessagesEnabled',
+      'isSelfDeletingMessagesEnforced',
+      'getEnforcedSelfDeletingMessagesTimeout',
       'team',
     ]);
 
@@ -153,7 +163,8 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
     const showOptionGuests = isActiveGroupParticipant && !!teamId && roleRepository.canToggleGuests(activeConversation);
     const hasAdvancedNotifications = isMutable && isTeam;
     const showOptionNotificationsGroup = hasAdvancedNotifications && isGroup;
-    const showOptionTimedMessages = isActiveGroupParticipant && roleRepository.canToggleTimeout(activeConversation);
+    const showOptionTimedMessages =
+      isActiveGroupParticipant && roleRepository.canToggleTimeout(activeConversation) && isSelfDeletingMessagesEnabled;
     const showOptionServices =
       isActiveGroupParticipant && !!teamId && roleRepository.canToggleGuests(activeConversation);
     const showOptionReadReceipts = !!teamId && roleRepository.canToggleReadReceipts(activeConversation);
@@ -175,8 +186,11 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
     const servicesOptionsText = isServicesRoom ? t('conversationDetailsOn') : t('conversationDetailsOff');
 
     const notificationStatusText = getNotificationText(notificationState);
-    const timedMessagesText =
-      hasTimer && globalMessageTimer ? formatDuration(globalMessageTimer).text : t('ephemeralUnitsNone');
+    const timedMessagesText = isSelfDeletingMessagesEnforced
+      ? formatDuration(getEnforcedSelfDeletingMessagesTimeout).text
+      : hasTimer && globalMessageTimer
+      ? formatDuration(globalMessageTimer).text
+      : t('ephemeralUnitsNone');
 
     const showActionMute = isMutable && !isTeam;
     const isVerified = verificationState === ConversationVerificationState.VERIFIED;
