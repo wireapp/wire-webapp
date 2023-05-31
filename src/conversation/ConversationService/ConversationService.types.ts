@@ -126,7 +126,7 @@ export type SendResult = {
   /** In case the message was sent to some federated backend, if the backend was down at the moment of sending the `failedToSend` property will contain all the users/devices that couldn't get the message */
   failedToSend?: {
     /** the message was encrypted for those recipients but will reach them later (a session existed but their backend is offline) */
-    queued?: QualifiedUserClients;
+    queued?: QualifiedUserClients | QualifiedId[];
     /** the message could not be encrypted for those recipients and thus will never reach them (a session did not exist and their backend if offline) */
     failed?: QualifiedId[];
   };

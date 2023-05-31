@@ -274,24 +274,18 @@ export class ConversationService {
 
     const encrypted = await this.mlsService.encryptMessage(groupIdBytes, GenericMessage.encode(payload).finish());
 
-    let response: PostMlsMessageResponse = {
-      time: new Date().toISOString(),
-      events: [],
-      failed_to_send: {},
-      failed: [],
-    };
-
+    let response: PostMlsMessageResponse | null = null;
+    let sentAt: string = '';
     try {
       response = await this.apiClient.api.conversation.postMlsMessage(encrypted);
+      sentAt = response.time?.length > 0 ? response.time : new Date().toISOString();
     } catch {}
 
-    const sentAt = response.time;
-
     const failedToSend =
-      response.failed || Object.keys(response.failed_to_send ?? {}).length > 0
+      response?.failed || (response?.failed_to_send ?? []).length > 0
         ? {
-            queued: response.failed_to_send,
-            failed: response.failed,
+            queued: response?.failed_to_send,
+            failed: response?.failed,
           }
         : undefined;
 
