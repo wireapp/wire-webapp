@@ -53,13 +53,11 @@ function generateNamedUsers(
   if (Array.isArray(userClientsOrQualifiedIds)) {
     return userClientsOrQualifiedIds.reduce<ParsedUsers>(
       (parsedUsers, currentQulifiedId) => {
-        const user = users.find(user =>
-          matchQualifiedIds(user.qualifiedId, {id: currentQulifiedId.id, domain: currentQulifiedId.domain}),
-        );
+        const user = users.find(user => matchQualifiedIds(user.qualifiedId, currentQulifiedId));
         if (user && user.name()) {
           parsedUsers.namedUsers.push(user);
         } else {
-          parsedUsers.unknownUsers.push({id: currentQulifiedId.id, domain: currentQulifiedId.domain});
+          parsedUsers.unknownUsers.push(currentQulifiedId);
         }
         return parsedUsers;
       },
