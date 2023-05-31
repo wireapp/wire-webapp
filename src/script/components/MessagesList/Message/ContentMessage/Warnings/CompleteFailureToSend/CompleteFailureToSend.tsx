@@ -17,27 +17,52 @@
  *
  */
 
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
+import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
+import {Config} from 'src/script/Config';
 import {t} from 'Util/LocalizerUtil';
 
-import {warning} from '../Warnings.styles';
+import {backendErrorLink, warning} from '../Warnings.styles';
 
 type Props = {
-  isTextAsset: boolean;
+  isMessageFocused: boolean;
   onRetry: () => void;
+  unreachableDomain?: string;
 };
 
-export const CompleteFailureToSendWarning = ({isTextAsset, onRetry}: Props) => {
+const config = Config.getConfig();
+
+export const CompleteFailureToSendWarning = ({isMessageFocused, onRetry, unreachableDomain}: Props) => {
+  const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
   return (
     <>
-      <div>
-        <p css={warning}>{isTextAsset ? t('messageCouldNotBeSent') : t('messageWillNotBeSent')}</p>
-        <div css={{display: 'flex'}}>
-          <Button type="button" variant={ButtonVariant.TERTIARY} onClick={onRetry}>
-            {t('messageCouldNotBeSentRetry')}
-          </Button>
-        </div>
+      {unreachableDomain ? (
+        <p>
+          <span
+            css={warning}
+            dangerouslySetInnerHTML={{
+              __html: t('messageCouldNotBeSentBackEndOffline', {domain: unreachableDomain}),
+            }}
+          />{' '}
+          <Link
+            tabIndex={messageFocusedTabIndex}
+            targetBlank
+            variant={LinkVariant.PRIMARY}
+            href={config.URL.SUPPORT.OFFLINE_BACKEND}
+            data-uie-name="go-offline-backend"
+            css={backendErrorLink}
+          >
+            {t('offlineBackendLearnMore')}
+          </Link>
+        </p>
+      ) : (
+        <p>{t('messageCouldNotBeSentConnectivityIssues')}</p>
+      )}
+      <div css={{display: 'flex'}}>
+        <Button tabIndex={messageFocusedTabIndex} type="button" variant={ButtonVariant.TERTIARY} onClick={onRetry}>
+          {t('messageCouldNotBeSentRetry')}
+        </Button>
       </div>
     </>
   );

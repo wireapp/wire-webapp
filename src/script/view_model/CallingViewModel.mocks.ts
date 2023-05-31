@@ -119,7 +119,6 @@ export const prepareMLSConferenceMocks = (parentGroupId: string, subGroupId: str
 
   const mockSecretKey = 'secretKey';
   const mockEpochNumber = 1;
-  const mockKeyLength = 32;
 
   jest
     .spyOn(mockCore.service!.mls!, 'joinConferenceSubconversation')
@@ -148,5 +147,5 @@ export const prepareMLSConferenceMocks = (parentGroupId: string, subGroupId: str
     .spyOn(mockCallingRepository, 'leaveCall')
     .mockImplementation(conversationId => callClosedCallback(conversationId, CONV_TYPE.CONFERENCE_MLS));
 
-  return {expectedMemberListResult, mockSecretKey, mockEpochNumber, mockKeyLength};
+  return {expectedMemberListResult, mockSecretKey, mockEpochNumber};
 };

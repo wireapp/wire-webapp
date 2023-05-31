@@ -21,6 +21,7 @@
 export enum StatusType {
   DELIVERED = 3,
   FAILED = 0,
+  FEDERATION_ERROR = 5,
   SEEN = 4,
   SENDING = 1,
   SENT = 2,

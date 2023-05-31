@@ -229,7 +229,7 @@ export type Env = {
 
   URL_SUPPORT_SCREEN_ACCESS_DENIED: string;
 
-  URL_SUPPORT_USER_ADD_FAILURE: string;
+  URL_SUPPORT_OFFLINE_BACKEND: string;
 
   URL_WHATS_NEW: string;
 

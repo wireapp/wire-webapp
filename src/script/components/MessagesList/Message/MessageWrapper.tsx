@@ -236,7 +236,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
     return <CallTimeoutMessage message={message} />;
   }
   if (message.isFailedToAddUsersMessage()) {
-    return <FailedToAddUsersMessage message={message} />;
+    return <FailedToAddUsersMessage isMessageFocused={isMessageFocused} message={message} />;
   }
   if (message.isSystem()) {
     return <SystemMessage message={message} />;
