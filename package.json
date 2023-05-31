@@ -3,7 +3,7 @@
     "@datadog/browser-logs": "^4.42.2",
     "@datadog/browser-rum": "^4.42.2",
     "@emotion/react": "11.11.0",
-    "@types/eslint": "8.37.0",
+    "@types/eslint": "8.40.0",
     "@wireapp/avs": "9.2.15",
     "@wireapp/core": "40.3.1",
     "@wireapp/lru-cache": "3.8.1",
