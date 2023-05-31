@@ -34,7 +34,6 @@ import {
   MessageSendingStatus,
   NewConversation,
   QualifiedConversationIds,
-  QualifiedUserClients,
   RemoteConversations,
 } from '..';
 import {BackendFeatures} from '../../APIClient';
@@ -70,7 +69,7 @@ import {
 import {Subconversation, SUBCONVERSATION_ID} from '../Subconversation';
 
 export type PostMlsMessageResponse = {
-  failed_to_send?: QualifiedUserClients;
+  failed_to_send?: QualifiedId[];
   failed?: QualifiedId[];
   events: ConversationEvent[];
   time: string;
