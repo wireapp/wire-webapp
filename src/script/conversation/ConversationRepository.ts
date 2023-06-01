@@ -1454,13 +1454,11 @@ export class ConversationRepository {
 
     const qualifiedUsers = userEntities.map(userEntity => userEntity.qualifiedId);
 
-    const {qualifiedId: conversationId, groupId} = conversation;
-
     try {
-      if (conversation.isUsingMLSProtocol && groupId) {
+      if (isMLSCapableConversation(conversation)) {
         const {events} = await this.core.service!.conversation.addUsersToMLSConversation({
-          conversationId,
-          groupId,
+          conversationId: conversation.qualifiedId,
+          groupId: conversation.groupId,
           qualifiedUsers,
         });
         if (!!events.length) {
@@ -1468,7 +1466,7 @@ export class ConversationRepository {
         }
       } else {
         const conversationMemberJoinEvent = await this.core.service!.conversation.addUsersToProteusConversation({
-          conversationId,
+          conversationId: conversation.qualifiedId,
           qualifiedUsers,
         });
         if (conversationMemberJoinEvent) {
