@@ -45,9 +45,10 @@ type MLSConversationRepository = Pick<
  * @param conversations - all the conversations that the user is part of
  * @param core - the instance of the core
  */
-export function initMLSConversations(conversations: Conversation[], core: Account): Promise<void> {
+export async function initMLSConversations(conversations: Conversation[], core: Account): Promise<void> {
   const mlsConversations = conversations.filter(isMLSConversation);
-  return joinNewConversations(mlsConversations, core);
+  await joinNewConversations(mlsConversations, core);
+  return core.service?.mls?.schedulePeriodicKeyMaterialRenewals(mlsConversations.map(({groupId}) => groupId));
 }
 
 /**
