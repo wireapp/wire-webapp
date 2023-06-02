@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [40.4.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@40.3.1...@wireapp/core@40.4.0) (2023-06-02)
+
+### Features
+
+* add persistance option to TaskScheduler ([#5188](https://github.com/wireapp/wire-web-packages/issues/5188)) ([09bc24d](https://github.com/wireapp/wire-web-packages/commit/09bc24d3221b6f5130b081080e51d87bbb29cd4f))
+
 ## [40.3.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@40.3.0...@wireapp/core@40.3.1) (2023-05-31)
 
 ### Bug Fixes
