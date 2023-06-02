@@ -19,6 +19,8 @@
 
 import logdown from 'logdown';
 
+import {TaskSchedulerStore} from './TaskScheduler.store';
+
 const logger = logdown('@wireapp/core/TaskScheduler', {
   logger: console,
   markdown: false,
@@ -28,6 +30,7 @@ type ScheduleTaskParams = {
   task: () => void;
   firingDate: number;
   key: string;
+  persist?: boolean;
 };
 
 const activeTimeouts: Record<string, NodeJS.Timeout> = {};
@@ -39,11 +42,14 @@ const activeTimeouts: Record<string, NodeJS.Timeout> = {};
  * @param firingDate execution date
  * @param key unique key for the task
  */
-const addTask = ({task, firingDate, key}: ScheduleTaskParams) => {
-  const now = new Date();
+const addTask = ({task, firingDate, key, persist = false}: ScheduleTaskParams) => {
+  const now = Date.now();
   const execute = new Date(firingDate);
-  const delay = execute.getTime() - now.getTime();
+  const delay = execute.getTime() - now;
 
+  if (TaskSchedulerStore.has(key)) {
+    TaskSchedulerStore.remove(key);
+  }
   if (activeTimeouts[key]) {
     cancelTask(key);
   }
@@ -52,6 +58,7 @@ const addTask = ({task, firingDate, key}: ScheduleTaskParams) => {
     async () => {
       logger.info(`Executing task with key "${key}"`);
       delete activeTimeouts[key];
+      TaskSchedulerStore.remove(key);
       await task();
     },
     delay > 0 ? delay : 0,
@@ -59,6 +66,9 @@ const addTask = ({task, firingDate, key}: ScheduleTaskParams) => {
 
   // add the task to the list of active tasks
   activeTimeouts[key] = timeout;
+  if (persist) {
+    TaskSchedulerStore.add(key, firingDate);
+  }
 
   logger.info(`New scheduled task to be executed at "${execute}" with key "${key}"`);
 };
@@ -77,7 +87,21 @@ const cancelTask = (key: string) => {
   }
 };
 
+/**
+ * Checks if a task has been scheduled in the past and reschedules it
+ * @param task function to be executed
+ * @param key unique key for the task
+ */
+const continueTask = ({key, task}: Omit<ScheduleTaskParams, 'firingDate' | 'persist'>) => {
+  const activeTaskEndTime = TaskSchedulerStore.get(key);
+  if (activeTaskEndTime) {
+    addTask({task, firingDate: activeTaskEndTime, key, persist: true});
+  }
+};
+
 export const TaskScheduler = {
   addTask,
   cancelTask,
+  continueTask,
+  hasActiveTask: TaskSchedulerStore.has,
 };
