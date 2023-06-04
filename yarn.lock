@@ -18385,9 +18385,9 @@ dexie@latest:
   languageName: node
   linkType: hard
 
-"webpack@npm:5.84.1":
-  version: 5.84.1
-  resolution: "webpack@npm:5.84.1"
+"webpack@npm:5.85.0":
+  version: 5.85.0
+  resolution: "webpack@npm:5.85.0"
   dependencies:
     "@types/eslint-scope": ^3.7.3
     "@types/estree": ^1.0.0
@@ -18418,7 +18418,7 @@ dexie@latest:
       optional: true
   bin:
     webpack: bin/webpack.js
-  checksum: 646b645df5badf2dac2ddd0193c9e9a177d51283d18f918eead36a0cdf7b750c4111d9ac11d9825c1334cbd0a6fb8f82628fbfb90d0066f927265dd11b47b192
+  checksum: b013be9fbc7f6810d1f229f570c70710ddbc7290f817411acffe4214b2b6c783a041ab1f2005d9e1109f4ab21c136f0f8d8c067a5fb64f20a82dcbc1ee0d3f42
   languageName: node
   linkType: hard
 
@@ -18757,7 +18757,7 @@ dexie@latest:
     uint32: 0.2.1
     underscore: 1.13.6
     uuidjs: 4.2.13
-    webpack: 5.84.1
+    webpack: 5.85.0
     webpack-cli: 5.1.2
     webpack-dev-middleware: 6.1.1
     webpack-hot-middleware: 2.25.3
