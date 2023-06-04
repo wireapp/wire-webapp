@@ -4824,7 +4824,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/fs-extra@npm:11.0.1, @types/fs-extra@npm:^11.0.1":
+"@types/fs-extra@npm:11.0.1":
   version: 11.0.1
   resolution: "@types/fs-extra@npm:11.0.1"
   dependencies:
@@ -5298,7 +5298,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/yargs@npm:^17.0.23, @types/yargs@npm:^17.0.8":
+"@types/yargs@npm:^17.0.8":
   version: 17.0.23
   resolution: "@types/yargs@npm:17.0.23"
   dependencies:
@@ -8562,12 +8562,10 @@ dexie@latest:
   languageName: node
   linkType: hard
 
-"dpdm@npm:3.13.0":
-  version: 3.13.0
-  resolution: "dpdm@npm:3.13.0"
+"dpdm@npm:3.13.1":
+  version: 3.13.1
+  resolution: "dpdm@npm:3.13.1"
   dependencies:
-    "@types/fs-extra": ^11.0.1
-    "@types/yargs": ^17.0.23
     chalk: ^4.1.2
     fs-extra: ^11.1.1
     glob: ^9.3.1
@@ -8577,7 +8575,7 @@ dexie@latest:
     yargs: ^17.7.1
   bin:
     dpdm: lib/bin/dpdm.js
-  checksum: 2bd34d41f659d7e19396fa0116de73636537ca10d4559676d01bbe2d236516c6e86b74c0a922e2e2485dde625d55f09fd35e124c3524d64d8e883eebd3772c9b
+  checksum: a19260fb6cfc72a81317c65d1f1104f811c763b80404e7a86f7621cd2de7002b57272718ea1dcf4649836e70656a53fe28344a92cd1c699c586ef5aa4d7bd65b
   languageName: node
   linkType: hard
 
@@ -18657,7 +18655,7 @@ dexie@latest:
     dexie: 3.2.3
     dexie-batch: 0.4.3
     dotenv: 16.1.1
-    dpdm: 3.13.0
+    dpdm: 3.13.1
     eslint: ^8.41.0
     eslint-config-prettier: ^8.8.0
     eslint-import-resolver-alias: ^1.1.2
