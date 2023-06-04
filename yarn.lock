@@ -5100,10 +5100,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/prettier@npm:^2.1.5, @types/prettier@npm:^2.7.2":
+"@types/prettier@npm:^2.1.5":
   version: 2.7.2
   resolution: "@types/prettier@npm:2.7.2"
   checksum: b47d76a5252265f8d25dd2fe2a5a61dc43ba0e6a96ffdd00c594cb4fd74c1982c2e346497e3472805d97915407a09423804cc2110a0b8e1b22cffcab246479b7
+  languageName: node
+  linkType: hard
+
+"@types/prettier@npm:^2.7.3":
+  version: 2.7.3
+  resolution: "@types/prettier@npm:2.7.3"
+  checksum: 705384209cea6d1433ff6c187c80dcc0b95d99d5c5ce21a46a9a58060c527973506822e428789d842761e0280d25e3359300f017fbe77b9755bc772ab3dc2f83
   languageName: node
   linkType: hard
 
@@ -18612,7 +18619,7 @@ dexie@latest:
     "@types/node": ^18.16.3
     "@types/open-graph": 0.2.2
     "@types/platform": 1.3.4
-    "@types/prettier": ^2.7.2
+    "@types/prettier": ^2.7.3
     "@types/react": 18.0.28
     "@types/react-dom": 18.2.4
     "@types/react-redux": 7.1.25
