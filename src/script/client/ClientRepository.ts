@@ -556,9 +556,8 @@ export class ClientRepository {
 
     const isCurrentClient = clientId === this.clientState.currentClient().id;
     if (isCurrentClient) {
-      const shouldClearData = this.clientState.currentClient().isTemporary();
       // If the current client has been removed, we need to sign out
-      amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.CLIENT_REMOVED, shouldClearData);
+      amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.CLIENT_REMOVED, true);
       return;
     }
     const localClients = await this.getClientsForSelf();
