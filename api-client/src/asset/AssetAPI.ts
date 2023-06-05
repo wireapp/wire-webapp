@@ -99,7 +99,7 @@ export class AssetAPI {
 
     const handleRequest = async (): Promise<AssetResponse> => {
       try {
-        const response = await this.client.sendRequest<ArrayBuffer>(config, true);
+        const response = await this.client.sendRequest<ArrayBuffer>(config, false);
         return {
           buffer: response.data,
           mimeType: response.headers['content-type'],
