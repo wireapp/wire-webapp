@@ -45,7 +45,6 @@ import {
 
 import {toProtobufCommitBundle} from './commitBundleUtil';
 import {MLSServiceConfig, UploadCommitOptions} from './MLSService.types';
-import {keyMaterialUpdatesStore} from './stores/keyMaterialUpdatesStore';
 import {pendingProposalsStore} from './stores/pendingProposalsStore';
 import {subconversationGroupIdStore} from './stores/subconversationGroupIdStore/subconversationGroupIdStore';
 
@@ -217,10 +216,18 @@ export class MLSService extends TypedEventEmitter<Events> {
       return {groupId: conversationId, commitBundle};
     };
     const {commitBundle, groupId} = await generateCommit();
-    return this.uploadCommitBundle(groupId, commitBundle, {
+    const mlsResponse = await this.uploadCommitBundle(groupId, commitBundle, {
       isExternalCommit: true,
       regenerateCommitBundle: async () => (await generateCommit()).commitBundle,
     });
+
+    if (mlsResponse) {
+      //after we've successfully joined via external commit, we schedule periodic key material renewal
+      const groupIdStr = Encoder.toBase64(groupId).asString;
+      this.scheduleKeyMaterialRenewal(groupIdStr);
+    }
+
+    return mlsResponse;
   }
 
   public async getConferenceSubconversation(conversationId: QualifiedId): Promise<Subconversation> {
@@ -405,7 +412,7 @@ export class MLSService extends TypedEventEmitter<Events> {
         : // If there are no clients to add, just update the keying material
           await this.processCommitAction(groupIdBytes, () => this.coreCryptoClient.updateKeyingMaterial(groupIdBytes));
 
-    // We schedule a key material renewal
+    // We schedule a periodic key material renewal
     this.scheduleKeyMaterialRenewal(groupId);
 
     return response;
@@ -455,7 +462,7 @@ export class MLSService extends TypedEventEmitter<Events> {
       const groupConversationExists = await this.conversationExists(groupId);
 
       if (!groupConversationExists) {
-        keyMaterialUpdatesStore.deleteLastKeyMaterialUpdateDate({groupId});
+        this.cancelKeyMaterialRenewal(groupId);
         return;
       }
 
@@ -475,8 +482,16 @@ export class MLSService extends TypedEventEmitter<Events> {
    * @param groupId The group that should have its key material updated
    */
   public resetKeyMaterialRenewal(groupId: string) {
-    cancelRecurringTask(this.createKeyMaterialUpdateTaskSchedulerId(groupId));
+    this.cancelKeyMaterialRenewal(groupId);
     this.scheduleKeyMaterialRenewal(groupId);
+  }
+
+  /**
+   * Will cancel the renewal of the key material for a given groupId
+   * @param groupId The group that should stop having its key material updated
+   */
+  public cancelKeyMaterialRenewal(groupId: string) {
+    return cancelRecurringTask(this.createKeyMaterialUpdateTaskSchedulerId(groupId));
   }
 
   /**
@@ -497,10 +512,9 @@ export class MLSService extends TypedEventEmitter<Events> {
    * Get all keying material last update dates and schedule tasks for renewal
    * Function must only be called once, after application start
    */
-  public checkForKeyMaterialsUpdate() {
+  public schedulePeriodicKeyMaterialRenewals(groupIds: string[]) {
     try {
-      const keyMaterialUpdateDates = keyMaterialUpdatesStore.getAllUpdateDates();
-      keyMaterialUpdateDates.forEach(({groupId}) => this.scheduleKeyMaterialRenewal(groupId));
+      groupIds.forEach(groupId => this.scheduleKeyMaterialRenewal(groupId));
     } catch (error) {
       this.logger.error('Could not get last key material update dates', error);
     }
@@ -557,6 +571,13 @@ export class MLSService extends TypedEventEmitter<Events> {
   }
 
   public async wipeConversation(groupId: string): Promise<void> {
+    const isMLSConversationEstablished = await this.conversationExists(groupId);
+    if (!isMLSConversationEstablished) {
+      //if the mls group does not exist, we don't need to wipe it
+      return;
+    }
+    this.cancelKeyMaterialRenewal(groupId);
+
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
     return this.coreCryptoClient.wipeConversation(groupIdBytes);
   }

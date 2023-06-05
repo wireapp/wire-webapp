@@ -45,6 +45,7 @@ const mockParams = {
   source: {} as NotificationSource,
   mlsService: {
     processWelcomeMessage: jest.fn().mockResolvedValue('conversationId'),
+    scheduleKeyMaterialRenewal: jest.fn(),
   } as unknown as MLSService,
   dryRun: false,
 };
@@ -67,9 +68,10 @@ describe('MLS welcomeMessage eventHandler', () => {
   });
 
   describe('handleWelcomeMessage', () => {
-    it('calls processWelcomeMessage', async () => {
+    it('calls processWelcomeMessage and schedules periodic key material updates', async () => {
       await handleWelcomeMessage(mockParams);
       expect(mockParams.mlsService.processWelcomeMessage).toHaveBeenCalled();
+      expect(mockParams.mlsService.scheduleKeyMaterialRenewal).toHaveBeenCalled();
     });
 
     it('returns a eventHandlerResult', async () => {

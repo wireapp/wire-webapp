@@ -35,6 +35,8 @@ describe('MLSService', () => {
   const apiClient = new APIClient();
   const mockCoreCrypto = {
     createConversation: jest.fn(),
+    conversationExists: jest.fn(),
+    wipeConversation: jest.fn(),
   } as unknown as CoreCrypto;
 
   describe('registerConversation', () => {
@@ -49,6 +51,7 @@ describe('MLSService', () => {
       jest.spyOn(apiClient.api.client, 'claimMLSKeyPackages').mockResolvedValue({key_packages: []});
       jest.spyOn(mlsService, 'scheduleKeyMaterialRenewal').mockImplementation();
       jest.spyOn(mlsService as any, 'processCommitAction').mockImplementation();
+      jest.spyOn(mlsService as any, 'cancelKeyMaterialRenewal').mockImplementation();
     });
 
     it('creates a new mls conversation and avoid adding the selfUser', async () => {
@@ -74,6 +77,13 @@ describe('MLSService', () => {
       await mlsService.registerConversation(groupId, [createUserId(), createUserId()]);
 
       expect(mlsService.scheduleKeyMaterialRenewal).toHaveBeenCalledWith(groupId);
+    });
+
+    it('cancels key material timers after group is wiped', async () => {
+      const groupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm4OQFc=';
+      jest.spyOn(mockCoreCrypto, 'conversationExists').mockResolvedValueOnce(true);
+      await mlsService.wipeConversation(groupId);
+      expect(mlsService.cancelKeyMaterialRenewal).toHaveBeenCalledWith(groupId);
     });
   });
 });

@@ -304,9 +304,6 @@ export class Account extends TypedEventEmitter<Events> {
       // initialize schedulers for pending mls proposals once client is initialized
       await this.service.mls.checkExistingPendingProposals();
 
-      // initialize schedulers for renewing key materials
-      this.service.mls.checkForKeyMaterialsUpdate();
-
       // initialize scheduler for syncing key packages with backend
       this.service.mls.checkForKeyPackagesBackendSync();
 
