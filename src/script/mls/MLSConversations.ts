@@ -46,9 +46,15 @@ type MLSConversationRepository = Pick<
  * @param core - the instance of the core
  */
 export async function initMLSConversations(conversations: Conversation[], core: Account): Promise<void> {
+  const mlsService = core.service?.mls;
+  if (!mlsService) {
+    throw new Error('MLS service not available');
+  }
+
   const mlsConversations = conversations.filter(isMLSConversation);
   await joinNewConversations(mlsConversations, core);
-  return core.service?.mls?.schedulePeriodicKeyMaterialRenewals(mlsConversations.map(({groupId}) => groupId));
+
+  return mlsService.schedulePeriodicKeyMaterialRenewals(mlsConversations.map(({groupId}) => groupId));
 }
 
 /**
