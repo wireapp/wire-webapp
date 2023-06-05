@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [24.15.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@24.15.2...@wireapp/api-client@24.15.3) (2023-06-05)
+
+### Bug Fixes
+
+* pass tokenAsParam = false to set the access token using Authorisation header ([#5206](https://github.com/wireapp/wire-web-packages/issues/5206)) ([01bd078](https://github.com/wireapp/wire-web-packages/commit/01bd078f586855b7a875b8f4819a297667062c17))
+
 ## [24.15.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@24.15.1...@wireapp/api-client@24.15.2) (2023-06-05)
 
 **Note:** Version bump only for package @wireapp/api-client
