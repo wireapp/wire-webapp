@@ -2,7 +2,7 @@
 !/.idea/modules.xml
 .env
 .env.*
-!.env.defaults
+!.env.localhost
 .DS_Store
 .idea
 .vscode
