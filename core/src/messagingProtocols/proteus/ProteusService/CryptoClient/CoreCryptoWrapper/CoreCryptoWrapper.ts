@@ -21,7 +21,7 @@ import {PreKey} from '@wireapp/api-client/lib/auth';
 import {Encoder} from 'bazinga64';
 import {deleteDB} from 'idb';
 
-import {CoreCrypto} from '@wireapp/core-crypto';
+import {Ciphersuite, CoreCrypto} from '@wireapp/core-crypto';
 import type {CRUDEngine} from '@wireapp/store-engine';
 
 import {PrekeyTracker} from './PrekeysTracker';
@@ -70,6 +70,7 @@ export async function buildClient(
     databaseName: coreCryptoDbName,
     key: Encoder.toBase64(key.key).asString,
     wasmFilePath: coreCryptoWasmFilePath,
+    ciphersuites: [Ciphersuite.MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519],
   });
   return new CoreCryptoWrapper(coreCrypto, {nbPrekeys, onNewPrekeys, onWipe: key.deleteKey});
 }

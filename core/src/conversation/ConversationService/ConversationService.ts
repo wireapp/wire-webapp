@@ -35,7 +35,7 @@ import {Decoder} from 'bazinga64';
 import logdown from 'logdown';
 
 import {APIClient} from '@wireapp/api-client';
-import {ExternalProposalType} from '@wireapp/core-crypto';
+import {Ciphersuite, CredentialType, ExternalProposalType} from '@wireapp/core-crypto';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {AddUsersParams, MLSReturnType, SendMlsMessageParams, SendResult} from './ConversationService.types';
@@ -362,6 +362,8 @@ export class ConversationService {
       const externalProposal = await this.mlsService.newExternalProposal(ExternalProposalType.Add, {
         epoch,
         conversationId: groupIdBytes,
+        ciphersuite: Ciphersuite.MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519,
+        credentialType: CredentialType.Basic,
       });
       await this.apiClient.api.conversation.postMlsMessage(
         //@todo: it's temporary - we wait for core-crypto fix to return the actual Uint8Array instead of regular array
