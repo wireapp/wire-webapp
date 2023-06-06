@@ -61,7 +61,7 @@ import {oauthStrings} from '../../strings';
 import {actionRoot} from '../module/action';
 import {bindActionCreators, RootState} from '../module/reducer';
 import * as SelfSelector from '../module/selector/SelfSelector';
-import {oAuthParams, oAuthScope} from '../util/oauthUtil';
+import {oAuthParams, oAuthScope, oAuthScopesToString} from '../util/oauthUtil';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {
   assetRepository?: AssetRepository;
@@ -90,10 +90,11 @@ const OAuthPermissionsComponent = ({
   const [oAuthApp, setOAuthApp] = useState<OAuthClient | null>(null);
   const oauthParams = oAuthParams(window.location);
   const oauthScope = oAuthScope(oauthParams);
+  const cleanedScopes = oAuthScopesToString(oauthScope);
 
   const onContinue = async () => {
     try {
-      const url = await postOauthCode(oauthParams);
+      const url = await postOauthCode({...oauthParams, scope: cleanedScopes});
       window.location.replace(url);
     } catch (error) {
       console.error(error);
