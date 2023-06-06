@@ -122,9 +122,13 @@ const OAuthPermissionsComponent = ({
     };
     getUserData().catch(error => {
       console.error(error);
-      doLogout().catch(error => {
-        console.error(error);
-      });
+      if (error.message === 'OAuth client not found') {
+        window.location.replace('/');
+      } else {
+        doLogout().catch(error => {
+          console.error(error);
+        });
+      }
     });
   }, [
     assetRepository,
