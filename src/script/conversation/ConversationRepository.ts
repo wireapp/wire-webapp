@@ -91,7 +91,6 @@ import {NOTIFICATION_STATE} from './NotificationSetting';
 
 import {AssetTransferState} from '../assets/AssetTransferState';
 import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
-import {ClientState} from '../client/ClientState';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
@@ -183,7 +182,6 @@ export class ConversationRepository {
     private readonly teamState = container.resolve(TeamState),
     private readonly conversationState = container.resolve(ConversationState),
     private readonly core = container.resolve(Core),
-    private readonly clientState = container.resolve(ClientState),
   ) {
     this.eventService = eventRepository.eventService;
     // we register a client mismatch handler agains the message repository so that we can react to missing members
@@ -395,15 +393,6 @@ export class ConversationRepository {
       ...options,
     };
 
-    /**
-     * we need to add this creator_client to conversation creation payload
-     * for creating MLS conversations
-     */
-    if (options.protocol === ConversationProtocol.MLS) {
-      payload.creator_client = this.clientState.currentClient().id;
-      payload.selfUserId = this.userState.self().qualifiedId;
-    }
-
     if (this.teamState.team().id) {
       payload.team = {
         managed: false,
@@ -431,7 +420,11 @@ export class ConversationRepository {
       let response: MLSReturnType;
       const isMLSConversation = payload.protocol === ConversationProtocol.MLS;
       if (isMLSConversation) {
-        response = await this.core.service!.conversation.createMLSConversation(payload);
+        response = await this.core.service!.conversation.createMLSConversation(
+          payload,
+          this.userState.self().qualifiedId,
+          this.core.clientId,
+        );
       } else {
         response = {conversation: await this.core.service!.conversation.createProteusConversation(payload), events: []};
       }
