@@ -29,12 +29,14 @@ import {APIClient} from '@wireapp/api-client';
 import {TimeUtil} from '@wireapp/commons';
 import {
   AddProposalArgs,
+  Ciphersuite,
   CommitBundle,
   ConversationConfiguration,
   ConversationId,
   CoreCrypto,
+  CredentialType,
   DecryptedMessage,
-  ExternalProposalArgs,
+  ExternalAddProposalArgs,
   ExternalProposalType,
   ExternalRemoveProposalArgs,
   Invitee,
@@ -102,14 +104,21 @@ export class MLSService extends TypedEventEmitter<Events> {
 
   public async initClient(userId: QualifiedId, clientId: string) {
     const qualifiedClientId = constructFullyQualifiedClientId(userId.id, clientId, userId.domain);
-    await this.coreCryptoClient.mlsInit(this.textEncoder.encode(qualifiedClientId));
+    await this.coreCryptoClient.mlsInit(this.textEncoder.encode(qualifiedClientId), [
+      Ciphersuite.MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519,
+    ]);
   }
 
   public async createClient(userId: QualifiedId, clientId: string) {
     await this.initClient(userId, clientId);
     // If the device is new, we need to upload keypackages and public key to the backend
-    const publicKey = await this.coreCryptoClient.clientPublicKey();
-    const keyPackages = await this.coreCryptoClient.clientKeypackages(this.config.nbKeyPackages);
+    const publicKey = await this.coreCryptoClient.clientPublicKey(
+      Ciphersuite.MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519,
+    );
+    const keyPackages = await this.coreCryptoClient.clientKeypackages(
+      Ciphersuite.MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519,
+      this.config.nbKeyPackages,
+    );
     await this.uploadMLSPublicKeys(publicKey, clientId);
     await this.uploadMLSKeyPackages(keyPackages, clientId);
   }
@@ -212,7 +221,10 @@ export class MLSService extends TypedEventEmitter<Events> {
   public async joinByExternalCommit(getGroupInfo: () => Promise<Uint8Array>) {
     const generateCommit = async () => {
       const groupInfo = await getGroupInfo();
-      const {conversationId, ...commitBundle} = await this.coreCryptoClient.joinByExternalCommit(groupInfo);
+      const {conversationId, ...commitBundle} = await this.coreCryptoClient.joinByExternalCommit(
+        groupInfo,
+        CredentialType.Basic,
+      );
       return {groupId: conversationId, commitBundle};
     };
     const {commitBundle, groupId} = await generateCommit();
@@ -332,7 +344,7 @@ export class MLSService extends TypedEventEmitter<Events> {
 
   public async newExternalProposal(
     externalProposalType: ExternalProposalType,
-    args: ExternalProposalArgs | ExternalRemoveProposalArgs,
+    args: ExternalAddProposalArgs | ExternalRemoveProposalArgs,
   ) {
     return this.coreCryptoClient.newExternalProposal(externalProposalType, args);
   }
@@ -388,10 +400,10 @@ export class MLSService extends TypedEventEmitter<Events> {
     const mlsKeyBytes = Object.values(mlsKeys).map((key: string) => Decoder.fromBase64(key).asBytes);
     const configuration: ConversationConfiguration = {
       externalSenders: mlsKeyBytes,
-      ciphersuite: 1, // TODO: Use the correct ciphersuite enum.
+      ciphersuite: Ciphersuite.MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519,
     };
 
-    await this.coreCryptoClient.createConversation(groupIdBytes, configuration);
+    await this.coreCryptoClient.createConversation(groupIdBytes, CredentialType.Basic, configuration);
 
     const keyPackages = await this.getKeyPackagesPayload(
       users.map(user => {
@@ -445,11 +457,14 @@ export class MLSService extends TypedEventEmitter<Events> {
   }
 
   public async clientValidKeypackagesCount(): Promise<number> {
-    return this.coreCryptoClient.clientValidKeypackagesCount();
+    return this.coreCryptoClient.clientValidKeypackagesCount(Ciphersuite.MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519);
   }
 
   public async clientKeypackages(amountRequested: number): Promise<Uint8Array[]> {
-    return this.coreCryptoClient.clientKeypackages(amountRequested);
+    return this.coreCryptoClient.clientKeypackages(
+      Ciphersuite.MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519,
+      amountRequested,
+    );
   }
 
   /**

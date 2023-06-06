@@ -18,6 +18,15 @@
  */
 
 export interface CommitBundle {}
+
+export enum Ciphersuite {
+  MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519 = 1,
+}
+
+export enum CredentialType {
+  Basic = 1,
+}
+
 export enum PublicGroupStateEncryptionType {
   Plaintext = 1,
   JweEncrypted = 2,

@@ -17,11 +17,10 @@
  *
  */
 
-import {CoreCrypto} from '@wireapp/core-crypto/platforms/web/corecrypto';
-
 import {randomUUID} from 'crypto';
 
 import {APIClient} from '@wireapp/api-client';
+import {CoreCrypto} from '@wireapp/core-crypto';
 
 import {MLSService} from './MLSService';
 
