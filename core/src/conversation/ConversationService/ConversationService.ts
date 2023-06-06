@@ -231,11 +231,12 @@ export class ConversationService {
    * Will create a conversation on backend and register it to CoreCrypto once created
    * @param conversationData
    */
-  public async createMLSConversation(conversationData: NewConversation): Promise<MLSReturnType> {
-    const {selfUserId, qualified_users: qualifiedUsers = []} = conversationData;
-    if (!selfUserId) {
-      throw new Error('You need to pass self user qualified id in order to create an MLS conversation');
-    }
+  public async createMLSConversation(
+    conversationData: NewConversation,
+    selfUserId: QualifiedId,
+    selfClientId: string,
+  ): Promise<MLSReturnType> {
+    const {qualified_users: qualifiedUsers = []} = conversationData;
 
     /**
      * @note For creating MLS conversations the users & qualified_users
@@ -254,7 +255,7 @@ export class ConversationService {
 
     const response = await this.mlsService.registerConversation(groupId, qualifiedUsers.concat(selfUserId), {
       user: selfUserId,
-      client: conversationData.creator_client,
+      client: selfClientId,
     });
 
     // We fetch the fresh version of the conversation created on backend with the newly added users
