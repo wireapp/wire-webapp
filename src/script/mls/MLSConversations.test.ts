@@ -72,6 +72,19 @@ describe('MLSConversations', () => {
       );
     });
 
+    it('schedules key renewal intervals for all the mls groups', async () => {
+      const core = new Account();
+      const nbMLSConversations = 5 + Math.ceil(Math.random() * 10);
+
+      const mlsConversations = createConversations(nbMLSConversations);
+
+      await initMLSConversations(mlsConversations, core);
+
+      expect(core.service!.mls!.schedulePeriodicKeyMaterialRenewals).toHaveBeenCalledWith(
+        mlsConversations.map(c => c.groupId),
+      );
+    });
+
     it('register all uninitiated conversations', async () => {
       const core = new Account();
       const nbProteusConversations = 5 + Math.ceil(Math.random() * 10);
