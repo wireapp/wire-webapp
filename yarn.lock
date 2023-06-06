@@ -5754,9 +5754,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^24.15.2":
-  version: 24.15.2
-  resolution: "@wireapp/api-client@npm:24.15.2"
+"@wireapp/api-client@npm:^24.15.3":
+  version: 24.15.3
+  resolution: "@wireapp/api-client@npm:24.15.3"
   dependencies:
     "@wireapp/commons": ^5.1.0
     "@wireapp/priority-queue": ^2.1.1
@@ -5769,7 +5769,7 @@ __metadata:
     spark-md5: 3.0.2
     tough-cookie: 4.1.2
     ws: 8.11.0
-  checksum: 2efe2a32064e60da5b4b01077349ef84ff236e1992bb91eefff7a12651b8656d11080ab9decc9f12784a17c30dd0858fe24713b3c012d1f746f6bf529d495672
+  checksum: 9471314d2ca8ca9559bb2b1945cda8122f35f2ebf3be7bca34e05131383fd3d265d7535fa7c25930f6359b43245f3373e6f432635f0029a73024992278a2a955
   languageName: node
   linkType: hard
 
@@ -5822,11 +5822,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:40.4.1":
-  version: 40.4.1
-  resolution: "@wireapp/core@npm:40.4.1"
+"@wireapp/core@npm:40.4.2":
+  version: 40.4.2
+  resolution: "@wireapp/core@npm:40.4.2"
   dependencies:
-    "@wireapp/api-client": ^24.15.2
+    "@wireapp/api-client": ^24.15.3
     "@wireapp/commons": ^5.1.0
     "@wireapp/core-crypto": 0.8.2
     "@wireapp/cryptobox": 12.8.0
@@ -5843,7 +5843,7 @@ __metadata:
     logdown: 3.3.1
     long: ^5.2.0
     uuidjs: 4.2.13
-  checksum: 7be98ab99cb717116c6ab034c2ca994ede5c47a8f3ae1d3003a1b2ce18049a38681f6a80876d638b44b7c8015c96c824585e3ee0a368f87fcddad3c59bdea04e
+  checksum: f81f0eb00a6e9188530f4f52861846dacba50fe7b5964661cad374c238b1548a03c9a61e287acc98c6e04ef53c6c10fd8ce3350b6dfd5b7bb088ec9308486918
   languageName: node
   linkType: hard
 
@@ -18652,7 +18652,7 @@ dexie@latest:
     "@typescript-eslint/parser": ^5.59.9
     "@wireapp/avs": 9.2.15
     "@wireapp/copy-config": 2.1.0
-    "@wireapp/core": 40.4.1
+    "@wireapp/core": 40.4.2
     "@wireapp/eslint-config": 2.2.2
     "@wireapp/lru-cache": 3.8.1
     "@wireapp/prettier-config": 0.6.0
