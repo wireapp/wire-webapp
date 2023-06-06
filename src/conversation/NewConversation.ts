@@ -38,6 +38,4 @@ export interface NewConversation
   protocol?: ConversationProtocol;
   team?: TeamInfo;
   users?: string[]; // users must be empty for creating MLS conversations
-  creator_client?: string; // client id of self user, used for creating MLS conversations
-  selfUserId?: QualifiedId;
 }
