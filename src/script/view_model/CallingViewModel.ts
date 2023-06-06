@@ -165,7 +165,7 @@ export class CallingViewModel {
           {mlsService: this.mlsService, conversationState: this.conversationState},
           conversation.qualifiedId,
           ({epoch, keyLength, secretKey, members}) => {
-            this.callingRepository.setEpochInfo(conversation.qualifiedId, {epoch, keyLength, secretKey}, members);
+            this.callingRepository.setEpochInfo(conversation.qualifiedId, {epoch, secretKey}, members);
           },
         );
 
@@ -179,7 +179,7 @@ export class CallingViewModel {
         {mlsService: this.mlsService, conversationState: this.conversationState},
         call.conversationId,
         ({epoch, keyLength, secretKey, members}) => {
-          this.callingRepository.setEpochInfo(call.conversationId, {epoch, keyLength, secretKey}, members);
+          this.callingRepository.setEpochInfo(call.conversationId, {epoch, secretKey}, members);
         },
       );
 
@@ -232,12 +232,12 @@ export class CallingViewModel {
         return;
       }
 
-      const {epoch, keyLength, secretKey, members} = await getSubconversationEpochInfo(
+      const {epoch, secretKey, members} = await getSubconversationEpochInfo(
         {mlsService: this.mlsService},
         conversationId,
         shouldAdvanceEpoch,
       );
-      this.callingRepository.setEpochInfo(conversationId, {epoch, keyLength, secretKey}, members);
+      this.callingRepository.setEpochInfo(conversationId, {epoch, secretKey}, members);
     };
 
     const closeCall = async (conversationId: QualifiedId, conversationType: CONV_TYPE) => {

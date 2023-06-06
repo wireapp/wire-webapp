@@ -32,23 +32,29 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
-import {warning} from './ContentMessage/Warnings/Warnings.styles';
+import {backendErrorLink, warning} from './ContentMessage/Warnings/Warnings.styles';
 import {MessageTime} from './MessageTime';
+import {useMessageFocusedTabIndex} from './util';
 
 import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from '../../../entity/message/FailedToAddUsersMessage';
 
 export interface FailedToAddUsersMessageProps {
+  isMessageFocused: boolean;
   message: FailedToAddUsersMessageEntity;
   userState?: UserState;
 }
 
+const config = Config.getConfig();
+
 const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
+  isMessageFocused,
   message,
   userState = container.resolve(UserState),
 }) => {
+  const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
+
   const [isOpen, setIsOpen] = useState(false);
   const {timestamp} = useKoSubscribableChildren(message, ['timestamp']);
-  const config = Config.getConfig();
 
   const {users: allUsers} = useKoSubscribableChildren(userState, ['users']);
 
@@ -70,19 +76,14 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
     <>
       {' '}
       <Link
+        tabIndex={messageFocusedTabIndex}
         targetBlank
         variant={LinkVariant.PRIMARY}
-        href={config.URL.SUPPORT.USER_ADD_FAILURE}
-        data-uie-name="go-contact-support"
-        style={{
-          color: 'var(--blue-500)',
-          fontSize: '0.75rem',
-          fontWeight: 600,
-          textDecoration: 'underline',
-          textTransform: 'none',
-        }}
+        href={config.URL.SUPPORT.OFFLINE_BACKEND}
+        data-uie-name="go-offline-backend"
+        css={backendErrorLink}
       >
-        {t('failedToAddParticipantsLearnMore')}
+        {t('offlineBackendLearnMore')}
       </Link>
     </>
   );
@@ -160,6 +161,7 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
         )}
         {total > 1 && (
           <Button
+            tabIndex={messageFocusedTabIndex}
             data-uie-name="toggle-failed-to-add-users"
             type="button"
             variant={ButtonVariant.TERTIARY}
