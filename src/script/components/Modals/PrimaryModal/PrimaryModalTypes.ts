@@ -61,6 +61,7 @@ export enum PrimaryModalType {
   PASSWORD = 'modal-template-password',
   SESSION_RESET = 'modal-session-reset',
   WITHOUT_TITLE = 'modal-without-title',
+  LOADING = 'modal-loading',
 }
 
 export interface ModalContent {

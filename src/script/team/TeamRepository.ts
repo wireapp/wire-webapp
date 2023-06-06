@@ -28,7 +28,7 @@ import type {
   TeamUpdateEvent,
 } from '@wireapp/api-client/lib/event';
 import {TEAM_EVENT} from '@wireapp/api-client/lib/event/TeamEvent';
-import type {FeatureList} from '@wireapp/api-client/lib/team/feature/';
+import type {FeatureList, FeatureMLS, FeatureMLSE2EId} from '@wireapp/api-client/lib/team/feature/';
 import {FeatureStatus, FEATURE_KEY, SelfDeletingTimeout} from '@wireapp/api-client/lib/team/feature/';
 import type {TeamData} from '@wireapp/api-client/lib/team/team/TeamData';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
@@ -39,7 +39,7 @@ import {Runtime} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {initE2EI} from 'Util/E2EIdentity';
+import {E2EIHandler} from 'Util/E2EIdentity';
 import {Environment} from 'Util/Environment';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
@@ -127,7 +127,11 @@ export class TeamRepository {
     teamId?: string,
   ): Promise<{team: TeamEntity; members: QualifiedId[]} | {team: undefined; members: never[]}> => {
     const team = await this.getTeam();
-    await this.updateFeatureConfig();
+    const {mlsE2EId, mls} = await this.updateFeatureConfig();
+
+    // Trigger E2E identity handler
+    this.handleE2EIdentityFeatureChange(mlsE2EId, mls);
+
     if (!teamId) {
       return {team: undefined, members: []};
     }
@@ -427,51 +431,47 @@ export class TeamRepository {
       this.handleSelfDeletingMessagesFeatureChange(previousConfig, featureConfigList);
       this.handleConferenceCallingFeatureChange(previousConfig, featureConfigList);
       this.handleGuestLinkFeatureChange(previousConfig, featureConfigList);
-      this.handleE2EIdentityFeatureChange(previousConfig, featureConfigList);
     }
+
+    // Trigger E2E identity handler
+    this.handleE2EIdentityFeatureChange(featureConfigList.mlsE2EId, featureConfigList.mls);
+
     this.saveFeatureConfig(featureConfigList);
   };
 
-  private readonly handleE2EIdentityFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
-    const hasE2EIdentityChanged = previousConfig?.mlsE2EId?.status !== newConfig?.mlsE2EId?.status;
-    const hasChangedToEnabled = newConfig?.mlsE2EId?.status === FeatureStatus.ENABLED;
-    const isMLSActive = newConfig?.mls?.status === FeatureStatus.ENABLED;
+  private readonly handleE2EIdentityFeatureChange = (mlsE2EId?: FeatureMLSE2EId, mls?: FeatureMLS) => {
+    if (!mlsE2EId || !mls) {
+      return;
+    }
+
+    const isE2EIActive = mlsE2EId?.status === FeatureStatus.ENABLED;
+    const isMLSActive = mls?.status === FeatureStatus.ENABLED;
     const hasConfig =
-      newConfig?.mlsE2EId?.config &&
-      newConfig?.mlsE2EId?.config.acmeDiscoveryUrl &&
-      newConfig?.mlsE2EId?.config.acmeDiscoveryUrl.length > 0;
+      mlsE2EId?.config && mlsE2EId?.config.acmeDiscoveryUrl && mlsE2EId?.config.acmeDiscoveryUrl.length > 0;
 
-    // remove when development is done
-
-    initE2EI({
-      discoveryUrl: 'https://balderdash.hogwash.work:9000/acme/wire/',
-      gracePeriodInMS: 0,
-    });
-
-    if (hasE2EIdentityChanged) {
-      if (hasChangedToEnabled) {
-        if (!isMLSActive) {
-          this.logger.info('Warning: E2E identity feature enabled but MLS feature is not active');
-          return;
-        }
-        if (!hasConfig) {
-          this.logger.info('Warning: E2E identity feature enabled but no config provided');
-          return;
-        }
-        initE2EI({
-          discoveryUrl: newConfig.mlsE2EId!.config.acmeDiscoveryUrl!,
-          gracePeriodInMS: newConfig.mlsE2EId!.config.verificationExpiration,
-        });
-      } else {
-        this.logger.info('Warning: E2E identity feature disabled');
+    if (isE2EIActive) {
+      if (!isMLSActive) {
+        this.logger.info('Warning: E2E identity feature enabled but MLS feature is not active');
+        return;
       }
+      if (!hasConfig) {
+        this.logger.info('Warning: E2E identity feature enabled but no config provided');
+        return;
+      }
+      const e2eHandler = E2EIHandler.getInstance({
+        discoveryUrl: mlsE2EId!.config.acmeDiscoveryUrl!,
+        gracePeriodInMS: mlsE2EId!.config.verificationExpiration,
+      });
+      e2eHandler.initialize();
+    } else {
+      this.logger.info('Warning: E2E identity feature disabled');
     }
   };
 
   private readonly handleFileSharingFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
     const hasFileSharingChanged =
-      previousConfig?.fileSharing?.status && previousConfig.fileSharing.status !== newConfig?.fileSharing?.status;
-    const hasChangedToEnabled = newConfig?.fileSharing?.status === FeatureStatus.ENABLED;
+      previousConfig?.fileSharing?.status && previousConfig.fileSharing.status !== fileSharing?.status;
+    const hasChangedToEnabled = fileSharing?.status === FeatureStatus.ENABLED;
 
     if (hasFileSharingChanged) {
       PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
@@ -488,8 +488,8 @@ export class TeamRepository {
   private readonly handleGuestLinkFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
     const hasGuestLinkChanged =
       previousConfig?.conversationGuestLinks?.status &&
-      previousConfig.conversationGuestLinks.status !== newConfig?.conversationGuestLinks?.status;
-    const hasGuestLinkChangedToEnabled = newConfig?.conversationGuestLinks?.status === FeatureStatus.ENABLED;
+      previousConfig.conversationGuestLinks.status !== conversationGuestLinks?.status;
+    const hasGuestLinkChangedToEnabled = conversationGuestLinks?.status === FeatureStatus.ENABLED;
 
     if (hasGuestLinkChanged) {
       PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
@@ -541,8 +541,8 @@ export class TeamRepository {
 
   private readonly handleAudioVideoFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
     const hasVideoCallingChanged =
-      previousConfig?.videoCalling?.status && previousConfig.videoCalling.status !== newConfig?.videoCalling?.status;
-    const hasChangedToEnabled = newConfig?.videoCalling?.status === FeatureStatus.ENABLED;
+      previousConfig?.videoCalling?.status && previousConfig.videoCalling.status !== videoCalling?.status;
+    const hasChangedToEnabled = videoCalling?.status === FeatureStatus.ENABLED;
 
     if (hasVideoCallingChanged) {
       PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
@@ -559,9 +559,9 @@ export class TeamRepository {
   private readonly handleConferenceCallingFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
     if (
       previousConfig?.conferenceCalling?.status &&
-      previousConfig.conferenceCalling.status !== newConfig?.conferenceCalling?.status
+      previousConfig.conferenceCalling.status !== conferenceCalling?.status
     ) {
-      const hasChangedToEnabled = newConfig?.conferenceCalling?.status === FeatureStatus.ENABLED;
+      const hasChangedToEnabled = conferenceCalling?.status === FeatureStatus.ENABLED;
       if (hasChangedToEnabled) {
         const replaceEnterprise = replaceLink(
           Config.getConfig().URL.PRICING,

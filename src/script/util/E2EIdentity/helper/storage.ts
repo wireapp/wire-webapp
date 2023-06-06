@@ -17,40 +17,24 @@
  *
  */
 
-const EndTimeKey = 'E2EIdentity_DelayTimer_EndTime';
-const LastDelayTimeKey = 'E2EIdentity_DelayTimer_LastDelayTime';
+const FiringDateKey = 'E2EIdentity_DelayTimer_FiringDate';
 const GracePeriodKey = 'E2EIdentity_DelayTimer_GracePeriod';
-const TotalDelayTimeKey = 'E2EIdentity_DelayTimer_TotalDelayTime';
 
 const DelayTimerStore = {
   set: {
-    endTime: (endTime: number) => localStorage.setItem(EndTimeKey, String(endTime)),
+    firingDate: (firingDate: number) => localStorage.setItem(FiringDateKey, String(firingDate)),
     gracePeriod: (gracePeriod: number) => localStorage.setItem(GracePeriodKey, String(gracePeriod)),
-    lastDelayTime: (lastDelayTime: number) => localStorage.setItem(LastDelayTimeKey, String(lastDelayTime)),
-    totalDelayTime: (totalDelayTime: number) => localStorage.setItem(TotalDelayTimeKey, String(totalDelayTime)),
   },
   get: {
-    endTime: () => Number(localStorage.getItem(EndTimeKey)),
+    firingDate: () => Number(localStorage.getItem(FiringDateKey)),
     gracePeriod: () => Number(localStorage.getItem(GracePeriodKey)),
-    lastDelayTime: () => Number(localStorage.getItem(LastDelayTimeKey)),
-    totalDelayTime: () => Number(localStorage.getItem(TotalDelayTimeKey)),
-  },
-  has: {
-    endTime: () => localStorage.getItem(EndTimeKey) !== null,
-    gracePeriod: () => localStorage.getItem(GracePeriodKey) !== null,
-    lastDelayTime: () => localStorage.getItem(LastDelayTimeKey) !== null,
-    totalDelayTime: () => localStorage.getItem(TotalDelayTimeKey) !== null,
   },
   clear: {
-    endTime: () => localStorage.removeItem(EndTimeKey),
+    firingDate: () => localStorage.removeItem(FiringDateKey),
     gracePeriod: () => localStorage.removeItem(GracePeriodKey),
-    lastDelayTime: () => localStorage.removeItem(LastDelayTimeKey),
-    totalDelayTime: () => localStorage.removeItem(TotalDelayTimeKey),
     all: () => {
-      DelayTimerStore.clear.endTime();
+      DelayTimerStore.clear.firingDate();
       DelayTimerStore.clear.gracePeriod();
-      DelayTimerStore.clear.lastDelayTime();
-      DelayTimerStore.clear.totalDelayTime();
     },
   },
 };

@@ -17,10 +17,6 @@
  *
  */
 
-import {container} from 'tsyringe';
-
-import {Core} from 'src/script/service/CoreSingleton';
-
 const E2EIdentityOidcRedirect = () => {
   const search = window.location.href.split('/#/oidc')[1];
   const urlParams = new URLSearchParams(search);
@@ -32,9 +28,6 @@ const E2EIdentityOidcRedirect = () => {
     error: urlParams.get('error'),
     errorDescription: urlParams.get('error_description'),
   };
-
-  const core = container.resolve(Core);
-  void core.continueE2EIEnrollment();
 
   return (
     <div style={{display: 'flex', flexDirection: 'column', padding: '1rem'}}>

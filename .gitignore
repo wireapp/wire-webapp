@@ -1,7 +1,8 @@
 !/.idea/codeStyleSettings.xml
 !/.idea/modules.xml
 .env
-.env.defaults
+.env.*
+!.env.defaults
 .DS_Store
 .idea
 .vscode
@@ -24,3 +25,4 @@ yarn-error.log
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+

@@ -17,23 +17,27 @@
  *
  */
 
-export const ONE_MINUTE = 60000;
-export const FIFTEEN_MINUTES = 900000;
-export const ONE_HOUR = 3600000;
-export const TWO_HOURS = 7200000;
-export const FOUR_HOURS = 14400000;
-export const ONE_DAY = 86400000;
+/* eslint-disable no-magic-numbers */
+
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+
+export const ONE_MINUTE = TIME_IN_MILLIS.MINUTE;
+export const FIVE_MINUTES = TIME_IN_MILLIS.MINUTE * 5;
+export const FIFTEEN_MINUTES = TIME_IN_MILLIS.MINUTE * 15;
+export const ONE_HOUR = TIME_IN_MILLIS.HOUR;
+export const FOUR_HOURS = TIME_IN_MILLIS.HOUR * 4;
+export const ONE_DAY = TIME_IN_MILLIS.DAY;
 
 export function getDelayTime(gracePeriodInMs: number): number {
   if (gracePeriodInMs > 0) {
     if (gracePeriodInMs <= FIFTEEN_MINUTES) {
-      return Math.min(ONE_MINUTE / 2, gracePeriodInMs);
+      return Math.min(FIVE_MINUTES, gracePeriodInMs);
     } else if (gracePeriodInMs <= ONE_HOUR) {
       return Math.min(FIFTEEN_MINUTES, gracePeriodInMs);
     } else if (gracePeriodInMs <= FOUR_HOURS) {
       return Math.min(ONE_HOUR, gracePeriodInMs);
     } else if (gracePeriodInMs <= ONE_DAY) {
-      return Math.min(TWO_HOURS, gracePeriodInMs);
+      return Math.min(FOUR_HOURS, gracePeriodInMs);
     }
     return Math.min(ONE_DAY, gracePeriodInMs);
   }

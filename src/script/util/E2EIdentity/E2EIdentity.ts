@@ -19,66 +19,170 @@
 
 import {container} from 'tsyringe';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {ModalOptions, PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
+import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
 import {Config} from 'src/script/Config';
 import {Core} from 'src/script/service/CoreSingleton';
-import {t} from 'Util/LocalizerUtil';
+import {UserState} from 'src/script/user/UserState';
 import {supportsMLS} from 'Util/util';
 
-const shouldUseE2EI = () => supportsMLS() && Config.getConfig().FEATURE.ENABLE_E2EI;
+import {GracePeriodTimer} from './DelayTimer';
+import {getModalOptions, ModalType} from './Modals';
 
-const delayE2EI = (gracePeriodInMS: number) => {
-  console.log('delay init in grace period');
-};
-const enrollE2EI = (discoveryUrl: string) => {
-  const core = container.resolve(Core);
-  void core.startE2EIEnrollment(discoveryUrl);
-};
-
-type NotifyUserAboutE2EIParams = {
-  primaryCallback: () => void;
-  secondaryCallback: () => void;
-  showSecondary: boolean;
-};
-const notifyUserAboutE2EI = ({primaryCallback, secondaryCallback, showSecondary}: NotifyUserAboutE2EIParams) => {
-  const modalOptions: ModalOptions = {
-    primaryAction: {
-      action: primaryCallback,
-      text: t('acme.settingsChanged.button.primary'),
-    },
-    text: {
-      closeBtnLabel: t('acme.settingsChanged.button.close'),
-      htmlMessage: t('acme.settingsChanged.paragraph'),
-      title: t('acme.settingsChanged.headline.alt'),
-    },
-    preventClose: true,
-    showClose: false,
-  };
-  if (showSecondary) {
-    modalOptions.secondaryAction = {
-      action: secondaryCallback,
-      text: t('acme.settingsChanged.button.secondary'),
-    };
-  }
-  const modalType: PrimaryModalType = showSecondary ? PrimaryModal.type.CONFIRM : PrimaryModal.type.ACKNOWLEDGE;
-
-  console.log(showSecondary, modalOptions);
-
-  PrimaryModal.show(modalType, modalOptions);
-};
-
-interface InitE2EIParams {
-  gracePeriodInMS: number;
-  discoveryUrl: string;
+enum E2EIHandlerStep {
+  INITIALIZE = 'initialize',
+  ENROLL = 'enroll',
+  SUCCESS = 'success',
+  ERROR = 'error',
+  SNOOZE = 'snooze',
 }
 
-export const initE2EI = ({discoveryUrl, gracePeriodInMS}: InitE2EIParams) => {
-  if (shouldUseE2EI() || true) {
-    notifyUserAboutE2EI({
-      showSecondary: gracePeriodInMS > 0,
-      primaryCallback: () => enrollE2EI(discoveryUrl),
-      secondaryCallback: () => delayE2EI(gracePeriodInMS),
-    });
+interface E2EIHandlerParams {
+  discoveryUrl: string;
+  gracePeriodInMS: number;
+}
+
+class E2EIHandler {
+  private static instance: E2EIHandler | null = null;
+  private timer: GracePeriodTimer;
+  private discoveryUrl: string;
+  private gracePeriodInMS: number;
+  private currentStep: E2EIHandlerStep | null = null;
+
+  private constructor({discoveryUrl, gracePeriodInMS}: E2EIHandlerParams) {
+    // ToDo: Do these values need to te able to be updated? Should we use a singleton with update fn?
+    this.discoveryUrl = discoveryUrl;
+    this.gracePeriodInMS = gracePeriodInMS;
+    this.timer = GracePeriodTimer.getInstance({delayCallback: () => null, gpCallback: () => null, gracePeriodInMS});
   }
-};
+
+  /**
+   * Get the singleton instance of GracePeriodTimer or create a new one
+   * For the first time, params are required to create the instance
+   * After that, params are optional and can be used to update the grace period timer
+   * @param params The params to create the grace period timer
+   * @returns The singleton instance of GracePeriodTimer
+   */
+  public static getInstance(params?: E2EIHandlerParams) {
+    if (!E2EIHandler.instance) {
+      if (!params) {
+        throw new Error('GracePeriodTimer is not initialized. Please call getInstance with params.');
+      }
+      E2EIHandler.instance = new E2EIHandler(params);
+    }
+    return E2EIHandler.instance;
+  }
+
+  /**
+   * @param E2EIHandlerParams The params to create the grace period timer
+   */
+  public updateParams({gracePeriodInMS, discoveryUrl}: E2EIHandlerParams) {
+    this.gracePeriodInMS = gracePeriodInMS;
+    this.discoveryUrl = discoveryUrl;
+    this.timer = GracePeriodTimer.getInstance({delayCallback: () => null, gpCallback: () => null, gracePeriodInMS});
+    this.initialize();
+  }
+
+  public initialize(): void {
+    if (this.isE2EIEnabled) {
+      this.currentStep = E2EIHandlerStep.INITIALIZE;
+      this.notifyUserAboutE2EI();
+    }
+  }
+
+  get isE2EIEnabled(): boolean {
+    return supportsMLS() && Config.getConfig().FEATURE.ENABLE_E2EI;
+  }
+
+  private async enrollE2EI() {
+    try {
+      const userState = container.resolve(UserState);
+      const core = container.resolve(Core);
+      // Notify user about E2EI enrollment in progress
+      this.currentStep = E2EIHandlerStep.ENROLL;
+      this.showLoadingMessage();
+      await core.startE2EIEnrollment(this.discoveryUrl, userState.self().name(), userState.self().username());
+      // Notify user about E2EI enrollment success
+      removeCurrentModal();
+      this.currentStep = E2EIHandlerStep.SUCCESS;
+      this.showSuccessMessage();
+    } catch (e) {
+      removeCurrentModal();
+      this.currentStep = E2EIHandlerStep.ERROR;
+      this.showErrorMessage();
+    }
+  }
+
+  private showLoadingMessage(): void {
+    if (this.currentStep !== E2EIHandlerStep.ENROLL) {
+      return;
+    }
+
+    const {modalOptions, modalType} = getModalOptions({
+      type: ModalType.LOADING,
+      hideClose: true,
+    });
+    PrimaryModal.show(modalType, modalOptions);
+  }
+
+  private showSuccessMessage(): void {
+    if (this.currentStep !== E2EIHandlerStep.SUCCESS) {
+      return;
+    }
+
+    const {modalOptions, modalType} = getModalOptions({
+      type: ModalType.SUCCESS,
+      hideSecondary: true,
+      hideClose: false,
+      primaryActionFn: () => null,
+    });
+    PrimaryModal.show(modalType, modalOptions);
+  }
+
+  private showErrorMessage(): void {
+    if (this.currentStep !== E2EIHandlerStep.ERROR) {
+      return;
+    }
+
+    const {modalOptions, modalType} = getModalOptions({
+      type: ModalType.ERROR,
+      hideClose: true,
+      primaryActionFn: async () => {
+        this.currentStep = E2EIHandlerStep.INITIALIZE;
+        await this.enrollE2EI();
+      },
+      secondaryActionFn: () => {
+        this.notifyUserAboutE2EI();
+      },
+    });
+    PrimaryModal.show(modalType, modalOptions);
+  }
+
+  private notifyUserAboutE2EI(): void {
+    if (this.currentStep === E2EIHandlerStep.INITIALIZE) {
+      this.timer.updateParams({
+        gracePeriodInMS: this.gracePeriodInMS,
+        gpCallback: () => {
+          this.notifyUserAboutE2EI();
+        },
+        delayCallback: () => {
+          this.notifyUserAboutE2EI();
+        },
+      });
+    }
+
+    if (!this.timer.isDelayTimerActive()) {
+      const {modalOptions, modalType} = getModalOptions({
+        hideSecondary: !this.timer.isSnoozeTimeAvailable(),
+        primaryActionFn: () => this.enrollE2EI(),
+        secondaryActionFn: () => {
+          this.timer.delayPrompt();
+        },
+        type: ModalType.ENROLL,
+        hideClose: true,
+      });
+      PrimaryModal.show(modalType, modalOptions);
+    }
+  }
+}
+
+export {E2EIHandler};
