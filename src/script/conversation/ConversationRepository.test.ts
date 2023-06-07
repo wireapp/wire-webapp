@@ -76,6 +76,7 @@ const _generateConversation = (
   connection_status = ConnectionStatus.ACCEPTED,
   conversationProtocol = ConversationProtocol.PROTEUS,
   domain = '',
+  groupId = 'groupId',
 ) => {
   const conversation = new Conversation(createUuid(), domain, conversationProtocol);
   conversation.type(conversation_type);
@@ -85,8 +86,8 @@ const _generateConversation = (
   connectionEntity.status(connection_status);
   conversation.connection(connectionEntity);
 
-  if (conversationProtocol === ConversationProtocol.MLS) {
-    conversation.groupId = 'groupId';
+  if ([ConversationProtocol.MLS, ConversationProtocol.MIXED].includes(conversationProtocol)) {
+    conversation.groupId = groupId;
   }
 
   return conversation;
@@ -1625,5 +1626,50 @@ describe('ConversationRepository', () => {
       expect(updatedConversation.cipherSuite).toEqual(newCipherSuite);
       expect(updatedConversation.epoch).toEqual(newEpoch);
     });
+  });
+
+  describe('addUsers', () => {
+    it('should add users to proteus conversation', async () => {
+      const conversation = _generateConversation();
+      const conversationRepository = await testFactory.exposeConversationActors();
+
+      const user1 = generateUser();
+      const user2 = generateUser();
+
+      const usersToAdd = [user1, user2];
+
+      const coreConversationService = container.resolve(Core).service!.conversation;
+      spyOn(coreConversationService, 'addUsersToProteusConversation');
+
+      await conversationRepository.addUsers(conversation, usersToAdd);
+      expect(coreConversationService.addUsersToProteusConversation).toHaveBeenCalledWith({
+        conversationId: conversation.qualifiedId,
+        qualifiedUsers: usersToAdd.map(user => user.qualifiedId),
+      });
+    });
+
+    it.each([ConversationProtocol.MIXED, ConversationProtocol.MLS])(
+      'should add users to mls group for mls and mixed conversations',
+      async protocol => {
+        const mockedGroupId = `mockedGroupId-${protocol}`;
+        const conversation = _generateConversation(undefined, undefined, protocol, '', mockedGroupId);
+        const conversationRepository = await testFactory.exposeConversationActors();
+
+        const user1 = generateUser();
+        const user2 = generateUser();
+
+        const usersToAdd = [user1, user2];
+
+        const coreConversationService = container.resolve(Core).service!.conversation;
+        spyOn(coreConversationService, 'addUsersToMLSConversation');
+
+        await conversationRepository.addUsers(conversation, usersToAdd);
+        expect(coreConversationService.addUsersToMLSConversation).toHaveBeenCalledWith({
+          conversationId: conversation.qualifiedId,
+          qualifiedUsers: usersToAdd.map(user => user.qualifiedId),
+          groupId: mockedGroupId,
+        });
+      },
+    );
   });
 });
