@@ -572,7 +572,7 @@ export class EventRepository {
     }
 
     const containsLinkPreview = newEventData.previews && !!newEventData.previews.length;
-    const isRetryAttempt = originalEvent.status === StatusType.FAILED || StatusType.FEDERATION_ERROR;
+    const isRetryAttempt = originalEvent.status === (StatusType.FAILED || StatusType.FEDERATION_ERROR);
 
     if (!containsLinkPreview && !isRetryAttempt) {
       const errorMessage =
