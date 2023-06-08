@@ -3611,10 +3611,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@remix-run/router@npm:1.6.2":
-  version: 1.6.2
-  resolution: "@remix-run/router@npm:1.6.2"
-  checksum: 5969d313bff6ba5c75917910090cebafda84b9d3b4b453fae6b3d60fea9f938078578ffca769c532ab7ce252cd4a207b78d1024d7c727ab80dd572e62fd3b3f2
+"@remix-run/router@npm:1.6.3":
+  version: 1.6.3
+  resolution: "@remix-run/router@npm:1.6.3"
+  checksum: f6968b1626af930b42f8cb5a044f05e4fbce05af6c7947beb1704e45c9570944e3be16ee008b185e5e13baac97948299eb55341b2a359c3e2e54b9d6646ae167
   languageName: node
   linkType: hard
 
@@ -4787,9 +4787,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^24.15.3":
-  version: 24.15.3
-  resolution: "@wireapp/api-client@npm:24.15.3"
+"@wireapp/api-client@npm:^24.15.4":
+  version: 24.15.4
+  resolution: "@wireapp/api-client@npm:24.15.4"
   dependencies:
     "@wireapp/commons": ^5.1.0
     "@wireapp/priority-queue": ^2.1.1
@@ -4802,7 +4802,7 @@ __metadata:
     spark-md5: 3.0.2
     tough-cookie: 4.1.2
     ws: 8.11.0
-  checksum: 9471314d2ca8ca9559bb2b1945cda8122f35f2ebf3be7bca34e05131383fd3d265d7535fa7c25930f6359b43245f3373e6f432635f0029a73024992278a2a955
+  checksum: 2689634c012cba0e68f2cc67226a32ac3f5e59e1d99ed8877642fc9fc60b01f9ecacae0e333f7ba4975c70fe2b3925eeedd2f1c2743b209234ad1ac6fc275f58
   languageName: node
   linkType: hard
 
@@ -4848,20 +4848,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core-crypto@npm:0.8.2":
-  version: 0.8.2
-  resolution: "@wireapp/core-crypto@npm:0.8.2"
-  checksum: f28a44ed5c4adba56453cd6a62813d6ba433b9ee2143522a741c52f5581aca86de3296b0afe4011fc1d5d5cf76d7afda747bb2171c7c129ba73d3b15087a4e99
+"@wireapp/core-crypto@npm:0.11.0":
+  version: 0.11.0
+  resolution: "@wireapp/core-crypto@npm:0.11.0"
+  checksum: 247272085a734b15a1fc82caaaad1c1f935609564a4fa8b5954727bcd16df23c4e85192772d853fcd15baabb6efd7e1777901aa4021e9e34fd46e89d98bab8ca
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:40.4.2":
-  version: 40.4.2
-  resolution: "@wireapp/core@npm:40.4.2"
+"@wireapp/core@npm:40.5.1":
+  version: 40.5.1
+  resolution: "@wireapp/core@npm:40.5.1"
   dependencies:
-    "@wireapp/api-client": ^24.15.3
+    "@wireapp/api-client": ^24.15.4
     "@wireapp/commons": ^5.1.0
-    "@wireapp/core-crypto": 0.8.2
+    "@wireapp/core-crypto": 0.11.0
     "@wireapp/cryptobox": 12.8.0
     "@wireapp/promise-queue": ^2.2.0
     "@wireapp/protocol-messaging": 1.44.0
@@ -4876,7 +4876,7 @@ __metadata:
     logdown: 3.3.1
     long: ^5.2.0
     uuidjs: 4.2.13
-  checksum: f81f0eb00a6e9188530f4f52861846dacba50fe7b5964661cad374c238b1548a03c9a61e287acc98c6e04ef53c6c10fd8ce3350b6dfd5b7bb088ec9308486918
+  checksum: b360d94a6312f4d1ed5d72959da8d699f772f2ec0c87300c246130e42c6234f1724cceee60541bd41f54b6968720774e4a291f0a0089fb5cb95d7cd61937cb1f
   languageName: node
   linkType: hard
 
@@ -14677,27 +14677,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-router-dom@npm:6.11.2":
-  version: 6.11.2
-  resolution: "react-router-dom@npm:6.11.2"
+"react-router-dom@npm:6.12.0":
+  version: 6.12.0
+  resolution: "react-router-dom@npm:6.12.0"
   dependencies:
-    "@remix-run/router": 1.6.2
-    react-router: 6.11.2
+    "@remix-run/router": 1.6.3
+    react-router: 6.12.0
   peerDependencies:
     react: ">=16.8"
     react-dom: ">=16.8"
-  checksum: ba44ff37f2956bc18991f2eedb32a3fa46d35832f61ded6c5d167e853ca289868fca6635467866280c73bc3da00dce8437dbbec57da100c0a3e3e3850af00b83
+  checksum: e7c620596eb9853dcaeaae337da029fd16dbae2452eed36fbb4746916d23c02efaa4c35e31c2d3c670bd9db51541a985fe093714f0bd82c8a6eca129d6ab5d44
   languageName: node
   linkType: hard
 
-"react-router@npm:6.11.2":
-  version: 6.11.2
-  resolution: "react-router@npm:6.11.2"
+"react-router@npm:6.12.0":
+  version: 6.12.0
+  resolution: "react-router@npm:6.12.0"
   dependencies:
-    "@remix-run/router": 1.6.2
+    "@remix-run/router": 1.6.3
   peerDependencies:
     react: ">=16.8"
-  checksum: e47f875dca70033a3b42704cb5ec076b60f9629a5cdc3be613707f3d5a5706123fb80301037455c285c6d5a1011b443e1784e0103969ebfac7071648d360c413
+  checksum: 3151af8539f89ff41d39c98f6bacdb47769cb661e97fb21cea2f91b27d9b620e0486d67b9ad60c395606401909f1a7fd53e9be6a2361a65b12fcfec055e9838e
   languageName: node
   linkType: hard
 
@@ -17707,7 +17707,7 @@ __metadata:
     "@typescript-eslint/parser": ^5.59.9
     "@wireapp/avs": 9.2.15
     "@wireapp/copy-config": 2.1.0
-    "@wireapp/core": 40.4.2
+    "@wireapp/core": 40.5.1
     "@wireapp/eslint-config": 2.2.2
     "@wireapp/lru-cache": 3.8.1
     "@wireapp/prettier-config": 0.6.0
@@ -17802,8 +17802,8 @@ __metadata:
     react-error-boundary: 4.0.9
     react-intl: 6.4.3
     react-redux: 8.0.7
-    react-router: 6.11.2
-    react-router-dom: 6.11.2
+    react-router: 6.12.0
+    react-router-dom: 6.12.0
     react-transition-group: 4.4.5
     redux: 4.2.1
     redux-devtools-extension: 2.13.9
