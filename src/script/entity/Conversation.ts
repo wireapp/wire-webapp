@@ -419,7 +419,7 @@ export class Conversation {
 
     this.incomingMessages = ko.observableArray();
 
-    this.hasAdditionalMessages = ko.observable(true);
+    this.hasAdditionalMessages = ko.observable(false);
 
     this.messages_visible = ko
       .pureComputed(() => (!this.id ? [] : this.messages().filter(messageEntity => messageEntity.visible())))
