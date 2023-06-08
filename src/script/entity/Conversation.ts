@@ -1003,6 +1003,11 @@ export class Conversation {
     return userEntities.filter(userEntity => !userEntity.is_verified());
   }
 
+  hasUserMessages(): boolean {
+    const messages = this.getAllMessages();
+    return messages.some(message => message.isContent()) || this.hasAdditionalMessages();
+  }
+
   supportsVideoCall(sftEnabled: boolean): boolean {
     if (sftEnabled) {
       return true;
