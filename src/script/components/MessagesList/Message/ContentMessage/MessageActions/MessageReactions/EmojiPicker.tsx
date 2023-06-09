@@ -23,14 +23,14 @@ import EmojiPicker, {EmojiClickData} from 'emoji-picker-react';
 import {createPortal} from 'react-dom';
 
 import {useClickOutside} from 'src/script/hooks/useClickOutside';
-import {isEscapeKey} from 'Util/KeyboardUtil';
+import {isEnterKey, isEscapeKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getEmojiUrl} from 'Util/ReactionUtil';
 
 interface EmojiPickerContainerProps {
   posX: number;
   posY: number;
-  onClose: () => void;
+  onKeyPress: () => void;
   resetActionMenuStates: () => void;
   wrapperRef: RefObject<HTMLDivElement>;
   handleReactionClick: (emoji: string) => void;
@@ -39,7 +39,7 @@ interface EmojiPickerContainerProps {
 const EmojiPickerContainer: FC<EmojiPickerContainerProps> = ({
   posX,
   posY,
-  onClose,
+  onKeyPress,
   resetActionMenuStates,
   wrapperRef,
   handleReactionClick,
@@ -53,6 +53,7 @@ const EmojiPickerContainer: FC<EmojiPickerContainerProps> = ({
     width: '0px',
     position: 'absolute',
   });
+  let isKeyboardEvent = false;
 
   useEffect(() => {
     const mainElement = emojiRef && emojiRef.current;
@@ -82,7 +83,14 @@ const EmojiPickerContainer: FC<EmojiPickerContainerProps> = ({
 
   function onEmojiClick(emojiData: EmojiClickData, event: MouseEvent) {
     handleReactionClick(emojiData.emoji);
-    onClose();
+
+    if (isKeyboardEvent) {
+      // keyboard event still retains emoji button focus
+      onKeyPress();
+    } else {
+      // click event will close the picker and reset active states
+      resetActionMenuStates();
+    }
   }
   return (
     <>
@@ -94,7 +102,10 @@ const EmojiPickerContainer: FC<EmojiPickerContainerProps> = ({
             // prevent emoji picker up/down arrow key to naviage between messages in background
             event.stopPropagation();
             if (isEscapeKey(event)) {
-              onClose();
+              onKeyPress();
+            }
+            if (isEnterKey(event)) {
+              isKeyboardEvent = true;
             }
           }}
         >

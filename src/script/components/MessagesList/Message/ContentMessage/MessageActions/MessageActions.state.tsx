@@ -23,12 +23,16 @@ type MessageActionsState = {
   isMenuOpen: boolean;
   handleMenuOpen: (isMenuOpen: boolean) => void;
   getMenuState: () => boolean;
+  resetActiveMenu: (isResetActiveMenu: boolean) => void;
+  isResetActiveMenu: boolean;
 };
 
 const useMessageActionsState = create<MessageActionsState>((set, get) => ({
   isMenuOpen: false,
   handleMenuOpen: isMenuOpen => set(state => ({...state, isMenuOpen: isMenuOpen})),
   getMenuState: () => get().isMenuOpen,
+  isResetActiveMenu: false,
+  resetActiveMenu: isResetActiveMenu => set(state => ({...state, isResetActiveMenu: isResetActiveMenu})),
 }));
 
 export {useMessageActionsState};

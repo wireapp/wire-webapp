@@ -30,6 +30,7 @@ import {getAllFocusableElements, setElementsTabIndex} from 'Util/focusUtil';
 import {isTabKey} from 'Util/KeyboardUtil';
 
 import {ElementType, MessageDetails} from './ContentMessage/asset/TextMessageRenderer';
+import {useMessageActionsState} from './ContentMessage/MessageActions/MessageActions.state';
 import {MessageTime} from './MessageTime';
 import {MessageWrapper} from './MessageWrapper';
 import {useMessageFocusedTabIndex} from './util';
@@ -114,6 +115,7 @@ const Message: React.FC<
   const timeAgoDay = useRelativeTimestamp(message.timestamp(), true);
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
   const markerType = getMessageMarkerType(message, lastReadTimestamp, previousMessage);
+  const {resetActiveMenu} = useMessageActionsState();
 
   useLayoutEffect(() => {
     if (!messageElementRef.current) {
@@ -139,6 +141,8 @@ const Message: React.FC<
     }
     if (isTabKey(event)) {
       // don't call arrow key down for tab key
+      // on tab key from message element reset the floating action menu selection
+      resetActiveMenu(true);
       return;
     }
     handleArrowKeyDown(event);
@@ -233,6 +237,10 @@ const Message: React.FC<
         ref={messageRef}
         role="listitem"
         onKeyDown={handleDivKeyDown}
+        onClick={event => {
+          handleFocus(index);
+          resetActiveMenu(false);
+        }}
         className="message-wrapper"
       >
         {wrappedContent}

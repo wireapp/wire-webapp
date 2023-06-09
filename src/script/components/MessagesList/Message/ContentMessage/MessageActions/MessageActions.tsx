@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, useState, useCallback, useRef} from 'react';
+import {FC, useCallback, useEffect, useRef, useState} from 'react';
 
 import {amplify} from 'amplify';
 
@@ -78,7 +78,7 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
   const [currentMsgActionName, setCurrentMsgAction] = useState('');
   const wrapperRef = useRef<HTMLDivElement>(null);
   const mesageReactionTop = isMsgWithHeader && messageWithSection ? messageWithHeaderTop : null;
-  const {handleMenuOpen} = useMessageActionsState();
+  const {handleMenuOpen, isResetActiveMenu} = useMessageActionsState();
 
   const resetActionMenuStates = useCallback(() => {
     setCurrentMsgAction('');
@@ -96,7 +96,11 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
       resetActionMenuStates();
     }
   }, []);
-
+  useEffect(() => {
+    if (isResetActiveMenu) {
+      setCurrentMsgAction('');
+    }
+  }, [isResetActiveMenu]);
   const handleContextKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLButtonElement>) => {
       if ([KEY.SPACE, KEY.ENTER].includes(event.key)) {

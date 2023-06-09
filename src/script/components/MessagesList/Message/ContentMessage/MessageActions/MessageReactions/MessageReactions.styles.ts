@@ -42,6 +42,9 @@ export const messageReactionWrapper: CSSObject = {
   display: 'flex',
   gap: '0.5rem',
   paddingLeft: '56px',
+  flexWrap: 'wrap',
+  maxWidth: '100%',
+  overflow: 'hidden',
   '.tooltip-content': {marginBottom: '0 !important'},
 };
 

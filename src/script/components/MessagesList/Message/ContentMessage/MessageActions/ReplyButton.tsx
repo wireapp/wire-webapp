@@ -23,6 +23,7 @@ import {Icon} from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 
 import {getActionsMenuCSS, getIconCSS, messageActionsMenuButton} from './MessageActions.styles';
+import {reactionImgSize} from './MessageReactions/EmojiImg.styles';
 
 export interface ReplyButtonProps {
   actionId: string;
@@ -53,7 +54,7 @@ const ReplyButton: FC<ReplyButtonProps> = ({
       onClick={onReplyClick}
       onKeyDown={onKeyPress}
     >
-      <Icon.Reply className="svg-icon" />
+      <Icon.Reply className="svg-icon" css={reactionImgSize} />
     </button>
   );
 };
