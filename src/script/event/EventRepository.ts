@@ -53,7 +53,7 @@ import {CryptographyMapper} from '../cryptography/CryptographyMapper';
 import {CryptographyError} from '../error/CryptographyError';
 import {EventError} from '../error/EventError';
 import {categoryFromEvent} from '../message/MessageCategorization';
-import {StatusType} from '../message/StatusType';
+import {isEventRecordFailed, isEventRecordWithFederationError} from '../message/StatusType';
 import type {EventRecord, StoredEvent} from '../storage';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import {EventName} from '../tracking/EventName';
@@ -566,13 +566,6 @@ export class EventRepository {
     const newEventData = newEvent.data;
     const originalData = originalEvent.data;
 
-    const isFailed = (status: StatusType | undefined): status is StatusType.FAILED => {
-      return status === StatusType.FAILED;
-    };
-    const isFederationError = (status: StatusType | undefined): status is StatusType.FEDERATION_ERROR => {
-      return status === StatusType.FEDERATION_ERROR;
-    };
-
     if (originalEvent.from !== newEvent.from) {
       const logMessage = `ID previously used by user '${newEvent.from}'`;
       const errorMessage = 'ID reused by other user';
@@ -580,7 +573,7 @@ export class EventRepository {
     }
 
     const containsLinkPreview = newEventData.previews && !!newEventData.previews.length;
-    const isRetryAttempt = isFailed(originalEvent.status) || isFederationError(originalEvent.status);
+    const isRetryAttempt = isEventRecordFailed(originalEvent) || isEventRecordWithFederationError(originalEvent);
 
     if (!containsLinkPreview && !isRetryAttempt) {
       const errorMessage =
