@@ -470,8 +470,8 @@ export class TeamRepository {
 
   private readonly handleFileSharingFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
     const hasFileSharingChanged =
-      previousConfig?.fileSharing?.status && previousConfig.fileSharing.status !== fileSharing?.status;
-    const hasChangedToEnabled = fileSharing?.status === FeatureStatus.ENABLED;
+      previousConfig?.fileSharing?.status && previousConfig.fileSharing.status !== newConfig.fileSharing?.status;
+    const hasChangedToEnabled = newConfig.fileSharing?.status === FeatureStatus.ENABLED;
 
     if (hasFileSharingChanged) {
       PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
@@ -488,8 +488,8 @@ export class TeamRepository {
   private readonly handleGuestLinkFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
     const hasGuestLinkChanged =
       previousConfig?.conversationGuestLinks?.status &&
-      previousConfig.conversationGuestLinks.status !== conversationGuestLinks?.status;
-    const hasGuestLinkChangedToEnabled = conversationGuestLinks?.status === FeatureStatus.ENABLED;
+      previousConfig.conversationGuestLinks.status !== newConfig.conversationGuestLinks?.status;
+    const hasGuestLinkChangedToEnabled = newConfig.conversationGuestLinks?.status === FeatureStatus.ENABLED;
 
     if (hasGuestLinkChanged) {
       PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
@@ -541,8 +541,8 @@ export class TeamRepository {
 
   private readonly handleAudioVideoFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
     const hasVideoCallingChanged =
-      previousConfig?.videoCalling?.status && previousConfig.videoCalling.status !== videoCalling?.status;
-    const hasChangedToEnabled = videoCalling?.status === FeatureStatus.ENABLED;
+      previousConfig?.videoCalling?.status && previousConfig.videoCalling.status !== newConfig.videoCalling?.status;
+    const hasChangedToEnabled = newConfig.videoCalling?.status === FeatureStatus.ENABLED;
 
     if (hasVideoCallingChanged) {
       PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
@@ -559,9 +559,9 @@ export class TeamRepository {
   private readonly handleConferenceCallingFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
     if (
       previousConfig?.conferenceCalling?.status &&
-      previousConfig.conferenceCalling.status !== conferenceCalling?.status
+      previousConfig.conferenceCalling.status !== newConfig.conferenceCalling?.status
     ) {
-      const hasChangedToEnabled = conferenceCalling?.status === FeatureStatus.ENABLED;
+      const hasChangedToEnabled = newConfig.conferenceCalling?.status === FeatureStatus.ENABLED;
       if (hasChangedToEnabled) {
         const replaceEnterprise = replaceLink(
           Config.getConfig().URL.PRICING,

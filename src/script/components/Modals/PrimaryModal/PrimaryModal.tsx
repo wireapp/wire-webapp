@@ -21,7 +21,7 @@ import {FC, FormEvent, MouseEvent, useState, useRef, ChangeEvent, useEffect} fro
 
 import cx from 'classnames';
 
-import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
+import {Checkbox, CheckboxLabel, Loading} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
@@ -222,7 +222,16 @@ export const PrimaryModalComponent: FC = () => {
               )}
 
               {showLoadingIndicator ? (
-                <>Loading....</>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    margin: '1.5rem 0 2rem 0',
+                  }}
+                >
+                  <Loading />
+                </div>
               ) : (
                 <div className={cx('modal__buttons', {'modal__buttons--column': hasMultipleSecondary})}>
                   {secondaryActions

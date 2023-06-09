@@ -28,7 +28,7 @@ import {supportsMLS} from 'Util/util';
 import {GracePeriodTimer} from './DelayTimer';
 import {getModalOptions, ModalType} from './Modals';
 
-enum E2EIHandlerStep {
+export enum E2EIHandlerStep {
   INITIALIZE = 'initialize',
   ENROLL = 'enroll',
   SUCCESS = 'success',
@@ -73,6 +73,13 @@ class E2EIHandler {
   }
 
   /**
+   * Reset the instance
+   */
+  public static resetInstance() {
+    E2EIHandler.instance = null;
+  }
+
+  /**
    * @param E2EIHandlerParams The params to create the grace period timer
    */
   public updateParams({gracePeriodInMS, discoveryUrl}: E2EIHandlerParams) {
@@ -85,7 +92,7 @@ class E2EIHandler {
   public initialize(): void {
     if (this.isE2EIEnabled) {
       this.currentStep = E2EIHandlerStep.INITIALIZE;
-      this.notifyUserAboutE2EI();
+      this.showE2EINotificationMessage();
     }
   }
 
@@ -100,7 +107,15 @@ class E2EIHandler {
       // Notify user about E2EI enrollment in progress
       this.currentStep = E2EIHandlerStep.ENROLL;
       this.showLoadingMessage();
-      await core.startE2EIEnrollment(this.discoveryUrl, userState.self().name(), userState.self().username());
+      const success = await core.startE2EIEnrollment(
+        this.discoveryUrl,
+        userState.self().name(),
+        userState.self().username(),
+      );
+      console.log('success', success);
+      if (!success) {
+        throw new Error('E2EI enrollment failed');
+      }
       // Notify user about E2EI enrollment success
       removeCurrentModal();
       this.currentStep = E2EIHandlerStep.SUCCESS;
@@ -151,21 +166,21 @@ class E2EIHandler {
         await this.enrollE2EI();
       },
       secondaryActionFn: () => {
-        this.notifyUserAboutE2EI();
+        this.showE2EINotificationMessage();
       },
     });
     PrimaryModal.show(modalType, modalOptions);
   }
 
-  private notifyUserAboutE2EI(): void {
+  private showE2EINotificationMessage(): void {
     if (this.currentStep === E2EIHandlerStep.INITIALIZE) {
       this.timer.updateParams({
         gracePeriodInMS: this.gracePeriodInMS,
         gpCallback: () => {
-          this.notifyUserAboutE2EI();
+          this.showE2EINotificationMessage();
         },
         delayCallback: () => {
-          this.notifyUserAboutE2EI();
+          this.showE2EINotificationMessage();
         },
       });
     }
