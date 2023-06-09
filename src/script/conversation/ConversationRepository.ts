@@ -80,7 +80,7 @@ import {ConversationFilter} from './ConversationFilter';
 import {ConversationLabelRepository} from './ConversationLabelRepository';
 import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';
 import {ConversationRoleRepository} from './ConversationRoleRepository';
-import {isMLSCapableConversation} from './ConversationSelectors';
+import {isMLSCapableConversation, MixedConversation, MLSConversation} from './ConversationSelectors';
 import {ConversationService} from './ConversationService';
 import {ConversationState} from './ConversationState';
 import {ConversationStateHandler} from './ConversationStateHandler';
@@ -2627,7 +2627,7 @@ export class ConversationRepository {
     const qualifiedUserIds =
       eventData.users?.map(user => user.qualified_id) || eventData.user_ids.map(userId => ({domain: '', id: userId}));
 
-    if (conversationEntity.isUsingMLSProtocol) {
+    if (isMLSCapableConversation(conversationEntity)) {
       const isSelfJoin = isFromSelf && selfUserJoins;
       await this.handleMLSConversationMemberJoin(conversationEntity, isSelfJoin);
     }
@@ -2647,12 +2647,11 @@ export class ConversationRepository {
    * @param conversation Conversation member joined to
    * @param isSelfJoin whether user has joined by itself, if so we need to add other self clients to mls group
    */
-  private async handleMLSConversationMemberJoin(conversation: Conversation, isSelfJoin: boolean) {
+  private async handleMLSConversationMemberJoin(
+    conversation: MLSConversation | MixedConversation,
+    isSelfJoin: boolean,
+  ) {
     const {groupId} = conversation;
-
-    if (!groupId) {
-      throw new Error(`groupId not found for MLS conversation ${conversation.id}`);
-    }
 
     const isMLSConversationEstablished = await this.core.service!.conversation.isMLSConversationEstablished(groupId);
 

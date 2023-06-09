@@ -817,45 +817,41 @@ describe('ConversationRepository', () => {
         });
       });
 
-      it('should add other self clients to mls group if user was event creator', () => {
-        const mockDomain = 'example.com';
-        const mockSelfClientId = 'self-client-id';
-        const selfUser = generateUser({id: createUuid(), domain: mockDomain});
+      it.each([ConversationProtocol.MIXED, ConversationProtocol.MLS])(
+        'should add other self clients to mls/mixed conversation MLS group if user was event creator',
+        protocol => {
+          const mockDomain = 'example.com';
+          const mockSelfClientId = 'self-client-id';
+          const selfUser = generateUser({id: createUuid(), domain: mockDomain});
 
-        const conversationEntity = _generateConversation(
-          CONVERSATION_TYPE.REGULAR,
-          undefined,
-          ConversationProtocol.MLS,
-          mockDomain,
-        );
-        testFactory.conversation_repository['saveConversation'](conversationEntity);
+          const conversationEntity = _generateConversation(CONVERSATION_TYPE.REGULAR, undefined, protocol, mockDomain);
+          testFactory.conversation_repository['saveConversation'](conversationEntity);
 
-        const memberJoinEvent = {
-          conversation: conversationEntity.id,
-          data: {
-            user_ids: [selfUser.id],
-          },
-          from: selfUser.id,
-          time: '2015-04-27T11:42:31.475Z',
-          type: CONVERSATION_EVENT.MEMBER_JOIN,
-        } as ConversationMemberJoinEvent;
+          const memberJoinEvent = {
+            conversation: conversationEntity.id,
+            data: {
+              user_ids: [selfUser.id],
+            },
+            from: selfUser.id,
+            time: '2015-04-27T11:42:31.475Z',
+            type: CONVERSATION_EVENT.MEMBER_JOIN,
+          } as ConversationMemberJoinEvent;
 
-        spyOn(testFactory.conversation_repository['userState'], 'self').and.returnValue(selfUser);
+          spyOn(testFactory.conversation_repository['userState'], 'self').and.returnValue(selfUser);
 
-        Object.defineProperty(container.resolve(Core), 'clientId', {
-          get: jest.fn(() => mockSelfClientId),
-        });
+          container.resolve(Core).clientId = mockSelfClientId;
 
-        return testFactory.conversation_repository['handleConversationEvent'](memberJoinEvent).then(() => {
-          expect(testFactory.conversation_repository['onMemberJoin']).toHaveBeenCalled();
-          expect(testFactory.conversation_repository.updateParticipatingUserEntities).toHaveBeenCalled();
-          expect(container.resolve(Core).service!.conversation.addUsersToMLSConversation).toHaveBeenCalledWith({
-            conversationId: conversationEntity.qualifiedId,
-            groupId: 'groupId',
-            qualifiedUsers: [{domain: mockDomain, id: selfUser.id, skipOwnClientId: mockSelfClientId}],
+          return testFactory.conversation_repository['handleConversationEvent'](memberJoinEvent).then(() => {
+            expect(testFactory.conversation_repository['onMemberJoin']).toHaveBeenCalled();
+            expect(testFactory.conversation_repository.updateParticipatingUserEntities).toHaveBeenCalled();
+            expect(container.resolve(Core).service!.conversation.addUsersToMLSConversation).toHaveBeenCalledWith({
+              conversationId: conversationEntity.qualifiedId,
+              groupId: 'groupId',
+              qualifiedUsers: [{domain: mockDomain, id: selfUser.id, skipOwnClientId: mockSelfClientId}],
+            });
           });
-        });
-      });
+        },
+      );
 
       it('should ignore member-join event when joining a 1to1 conversation', () => {
         const selfUser = generateUser();
