@@ -1645,7 +1645,7 @@ describe('ConversationRepository', () => {
     });
 
     it.each([ConversationProtocol.MIXED, ConversationProtocol.MLS])(
-      'should add users to mls group for mls and mixed conversations',
+      'should add users to mls group of %s conversation',
       async protocol => {
         const mockedGroupId = `mockedGroupId-${protocol}`;
         const conversation = _generateConversation(undefined, undefined, protocol, '', mockedGroupId);
@@ -1667,5 +1667,91 @@ describe('ConversationRepository', () => {
         });
       },
     );
+  });
+
+  describe('removeMember', () => {
+    it.each([ConversationProtocol.PROTEUS, ConversationProtocol.MIXED])(
+      'should remove member from %s conversation',
+      async protocol => {
+        const conversationRepository = await testFactory.exposeConversationActors();
+
+        const conversation = _generateConversation(undefined, undefined, protocol);
+
+        const selfUser = generateUser();
+        conversation.selfUser(selfUser);
+
+        const user1 = generateUser();
+        const user2 = generateUser();
+
+        conversation.participating_user_ets([user1, user2]);
+
+        const coreConversationService = container.resolve(Core).service!.conversation;
+
+        await conversationRepository.removeMember(conversation, user1.qualifiedId);
+
+        expect(coreConversationService.removeUserFromConversation).toHaveBeenCalledWith(
+          conversation.qualifiedId,
+          user1.qualifiedId,
+        );
+      },
+    );
+
+    it('should remove member from mls conversation', async () => {
+      const conversationRepository = await testFactory.exposeConversationActors();
+
+      const mockGroupId = 'mockGroupId';
+      const conversation = _generateConversation(undefined, undefined, ConversationProtocol.MLS, '', mockGroupId);
+
+      const selfUser = generateUser();
+      conversation.selfUser(selfUser);
+
+      const user1 = generateUser();
+      const user2 = generateUser();
+
+      conversation.participating_user_ets([user1, user2]);
+
+      const coreConversationService = container.resolve(Core).service!.conversation;
+
+      jest
+        .spyOn(coreConversationService, 'removeUsersFromMLSConversation')
+        .mockResolvedValueOnce({events: [], conversation: {} as BackendConversation});
+      await conversationRepository.removeMember(conversation, user1.qualifiedId);
+
+      expect(coreConversationService.removeUsersFromMLSConversation).toHaveBeenCalledWith({
+        conversationId: conversation.qualifiedId,
+        qualifiedUserIds: [user1.qualifiedId],
+        groupId: mockGroupId,
+      });
+    });
+
+    describe('leaveConversation', () => {
+      it.each([ConversationProtocol.PROTEUS, ConversationProtocol.MIXED, ConversationProtocol.MLS])(
+        'should leave %s conversation',
+        async protocol => {
+          const conversationRepository = await testFactory.exposeConversationActors();
+
+          const conversation = _generateConversation(undefined, undefined, protocol);
+
+          const selfUser = generateUser();
+          conversation.selfUser(selfUser);
+
+          spyOn(testFactory.conversation_repository['userState'], 'self').and.returnValue(selfUser);
+
+          const user1 = generateUser();
+          const user2 = generateUser();
+
+          conversation.participating_user_ets([user1, user2]);
+
+          const coreConversationService = container.resolve(Core).service!.conversation;
+
+          await conversationRepository.removeMember(conversation, selfUser.qualifiedId);
+
+          expect(coreConversationService.removeUserFromConversation).toHaveBeenCalledWith(
+            conversation.qualifiedId,
+            selfUser.qualifiedId,
+          );
+        },
+      );
+    });
   });
 });

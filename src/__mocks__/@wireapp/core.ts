@@ -52,6 +52,8 @@ export class Account extends EventEmitter {
       isMLSConversationEstablished: jest.fn(),
       joinByExternalCommit: jest.fn(),
       addUsersToMLSConversation: jest.fn(),
+      removeUserFromConversation: jest.fn(),
+      removeUsersFromMLSConversation: jest.fn(),
       addUsersToProteusConversation: jest.fn(),
       messageTimer: {
         setConversationLevelTimer: jest.fn(),
