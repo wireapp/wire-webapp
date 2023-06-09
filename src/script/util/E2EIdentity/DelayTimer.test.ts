@@ -57,8 +57,8 @@ describe('createGracePeriodTimer', () => {
     window.localStorage.clear();
     timer = GracePeriodTimer?.getInstance({
       gracePeriodInMS: 0,
-      gpCallback: jest.fn(),
-      delayCallback: jest.fn(),
+      gracePeriodExpiredCallback: jest.fn(),
+      delayPeriodExpiredCallback: jest.fn(),
     });
   });
 
@@ -68,106 +68,106 @@ describe('createGracePeriodTimer', () => {
     jest.useRealTimers();
   });
 
-  it('should call the gpCallback when the grace period is over', () => {
-    const gpCallback = jest.fn();
+  it('should call the gracePeriodExpiredCallback when the grace period is over', () => {
+    const gracePeriodExpiredCallback = jest.fn();
     timer?.updateParams({
       gracePeriodInMS: 1000,
-      gpCallback,
-      delayCallback: jest.fn(),
+      gracePeriodExpiredCallback,
+      delayPeriodExpiredCallback: jest.fn(),
     });
 
     jest.advanceTimersByTime(1000);
-    expect(gpCallback).toHaveBeenCalled();
+    expect(gracePeriodExpiredCallback).toHaveBeenCalled();
   });
 
-  it('should call the gpCallback only after the delay time is over', () => {
-    const gpCallback = jest.fn();
+  it('should call the gracePeriodExpiredCallback only after the delay time is over', () => {
+    const gracePeriodExpiredCallback = jest.fn();
 
     timer?.updateParams({
       gracePeriodInMS: ONE_HOUR,
-      gpCallback,
-      delayCallback: jest.fn(),
+      gracePeriodExpiredCallback,
+      delayPeriodExpiredCallback: jest.fn(),
     });
 
     timer?.delayPrompt();
 
     jest.advanceTimersByTime(FIFTEEN_MINUTES);
-    expect(gpCallback).not.toHaveBeenCalled();
+    expect(gracePeriodExpiredCallback).not.toHaveBeenCalled();
 
     jest.advanceTimersByTime(ONE_HOUR);
-    expect(gpCallback).toHaveBeenCalled();
+    expect(gracePeriodExpiredCallback).toHaveBeenCalled();
   });
 
   it('should not allow delaying the prompt if the grace period is already over', () => {
-    const gpCallback = jest.fn();
+    const gracePeriodExpiredCallback = jest.fn();
     timer?.updateParams({
       gracePeriodInMS: 0,
-      gpCallback,
-      delayCallback: jest.fn(),
+      gracePeriodExpiredCallback,
+      delayPeriodExpiredCallback: jest.fn(),
     });
     timer?.delayPrompt();
 
     jest.advanceTimersByTime(500);
-    expect(gpCallback).toHaveBeenCalled();
+    expect(gracePeriodExpiredCallback).toHaveBeenCalled();
   });
 
   it('should allow delaying the prompt multiple times within the grace period', () => {
-    const gpCallback = jest.fn();
+    const gracePeriodExpiredCallback = jest.fn();
     timer?.updateParams({
       gracePeriodInMS: 7200000,
-      gpCallback,
-      delayCallback: jest.fn(),
+      gracePeriodExpiredCallback,
+      delayPeriodExpiredCallback: jest.fn(),
     });
     timer?.delayPrompt();
     jest.advanceTimersByTime(3600000);
     timer?.delayPrompt();
     jest.advanceTimersByTime(3600000);
 
-    expect(gpCallback).toHaveBeenCalled();
+    expect(gracePeriodExpiredCallback).toHaveBeenCalled();
   });
 
-  it('should call the delayCallback after a delay based on the grace period', () => {
-    const delayCallback = jest.fn();
+  it('should call the delayPeriodExpiredCallback after a delay based on the grace period', () => {
+    const delayPeriodExpiredCallback = jest.fn();
     timer?.updateParams({
       gracePeriodInMS: ONE_HOUR,
-      gpCallback: jest.fn(),
-      delayCallback,
+      gracePeriodExpiredCallback: jest.fn(),
+      delayPeriodExpiredCallback,
     });
 
     timer?.delayPrompt();
 
     // getDelayTime(ONE_HOUR) will return FIFTEEN_MINUTES according to the function provided.
     jest.advanceTimersByTime(FIFTEEN_MINUTES);
-    expect(delayCallback).toHaveBeenCalled();
+    expect(delayPeriodExpiredCallback).toHaveBeenCalled();
   });
 
-  it('should not call delayCallback if grace period is over', () => {
-    const delayCallback = jest.fn();
-    const gpCallback = jest.fn();
+  it('should not call delayPeriodExpiredCallback if grace period is over', () => {
+    const delayPeriodExpiredCallback = jest.fn();
+    const gracePeriodExpiredCallback = jest.fn();
     timer?.updateParams({
       gracePeriodInMS: ONE_HOUR,
-      delayCallback,
-      gpCallback,
+      delayPeriodExpiredCallback,
+      gracePeriodExpiredCallback,
     });
 
     timer?.delayPrompt();
 
     // Here, instead of advancing time by "ONE_HOUR + FIFTEEN_MINUTES", we advance by "ONE_HOUR", which is the end of the grace period.
     jest.advanceTimersByTime(ONE_HOUR + FIFTEEN_MINUTES);
-    expect(delayCallback).toHaveBeenCalled(); // The delayCallback should be called after ONE_HOUR.
-    expect(gpCallback).toHaveBeenCalled(); // The gpCallback should be called when the grace period ends, which is after ONE_HOUR.
+    expect(delayPeriodExpiredCallback).toHaveBeenCalled(); // The delayPeriodExpiredCallback should be called after ONE_HOUR.
+    expect(gracePeriodExpiredCallback).toHaveBeenCalled(); // The gracePeriodExpiredCallback should be called when the grace period ends, which is after ONE_HOUR.
 
     timer?.delayPrompt(); // We try to delay after the grace period has ended.
     jest.advanceTimersByTime(FIFTEEN_MINUTES);
-    expect(delayCallback).toHaveBeenCalledTimes(1); // The delayCallback should not be called again since we're now past the grace period.
+    expect(delayPeriodExpiredCallback).toHaveBeenCalledTimes(1); // The delayPeriodExpiredCallback should not be called again since we're now past the grace period.
   });
 
-  it('should call delayCallback multiple times if delayPrompt is called multiple times within the grace period', () => {
-    const delayCallback = jest.fn();
+  it('should call delayPeriodExpiredCallback multiple times if delayPrompt is called multiple times within the grace period', () => {
+    const delayPeriodExpiredCallback = jest.fn();
     timer?.updateParams({
       gracePeriodInMS: FOUR_HOURS,
-      gpCallback: jest.fn(),
-      delayCallback,
+      gracePeriodExpiredCallback: jest.fn(),
+      delayPeriodExpiredCallback,
     });
 
     timer?.delayPrompt();
@@ -179,22 +179,22 @@ describe('createGracePeriodTimer', () => {
     timer?.delayPrompt();
     jest.advanceTimersByTime(ONE_HOUR);
 
-    expect(delayCallback).toHaveBeenCalledTimes(3);
+    expect(delayPeriodExpiredCallback).toHaveBeenCalledTimes(3);
   });
 
   it('should not execute the delayPrompt() if the grace period is over', () => {
-    const delayCallback = jest.fn();
-    const gpCallback = jest.fn();
+    const delayPeriodExpiredCallback = jest.fn();
+    const gracePeriodExpiredCallback = jest.fn();
     timer?.updateParams({
       gracePeriodInMS: ONE_MINUTE,
-      gpCallback,
-      delayCallback,
+      gracePeriodExpiredCallback,
+      delayPeriodExpiredCallback,
     });
 
     timer?.delayPrompt();
     jest.advanceTimersByTime(ONE_MINUTE);
 
-    expect(delayCallback).not.toHaveBeenCalled();
-    expect(gpCallback).toHaveBeenCalled();
+    expect(delayPeriodExpiredCallback).not.toHaveBeenCalled();
+    expect(gracePeriodExpiredCallback).toHaveBeenCalled();
   });
 });

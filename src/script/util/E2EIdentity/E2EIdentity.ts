@@ -52,7 +52,11 @@ class E2EIHandler {
     // ToDo: Do these values need to te able to be updated? Should we use a singleton with update fn?
     this.discoveryUrl = discoveryUrl;
     this.gracePeriodInMS = gracePeriodInMS;
-    this.timer = GracePeriodTimer.getInstance({delayCallback: () => null, gpCallback: () => null, gracePeriodInMS});
+    this.timer = GracePeriodTimer.getInstance({
+      delayPeriodExpiredCallback: () => null,
+      gracePeriodExpiredCallback: () => null,
+      gracePeriodInMS,
+    });
   }
 
   /**
@@ -85,7 +89,11 @@ class E2EIHandler {
   public updateParams({gracePeriodInMS, discoveryUrl}: E2EIHandlerParams) {
     this.gracePeriodInMS = gracePeriodInMS;
     this.discoveryUrl = discoveryUrl;
-    this.timer = GracePeriodTimer.getInstance({delayCallback: () => null, gpCallback: () => null, gracePeriodInMS});
+    this.timer = GracePeriodTimer.getInstance({
+      delayPeriodExpiredCallback: () => null,
+      gracePeriodExpiredCallback: () => null,
+      gracePeriodInMS,
+    });
     this.initialize();
   }
 
@@ -112,7 +120,6 @@ class E2EIHandler {
         userState.self().name(),
         userState.self().username(),
       );
-      console.log('success', success);
       if (!success) {
         throw new Error('E2EI enrollment failed');
       }
@@ -176,10 +183,10 @@ class E2EIHandler {
     if (this.currentStep === E2EIHandlerStep.INITIALIZE) {
       this.timer.updateParams({
         gracePeriodInMS: this.gracePeriodInMS,
-        gpCallback: () => {
+        gracePeriodExpiredCallback: () => {
           this.showE2EINotificationMessage();
         },
-        delayCallback: () => {
+        delayPeriodExpiredCallback: () => {
           this.showE2EINotificationMessage();
         },
       });

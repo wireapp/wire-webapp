@@ -28,22 +28,26 @@ const logger = getLogger('E2EIdentity.DelayTimer');
 
 interface CreateGracePeriodTimerParams {
   gracePeriodInMS: number;
-  gpCallback: () => void;
-  delayCallback: () => void;
+  gracePeriodExpiredCallback: () => void;
+  delayPeriodExpiredCallback: () => void;
 }
 
 class GracePeriodTimer {
   private static instance: GracePeriodTimer | null = null;
   private gracePeriodInMS: number;
-  private gpCallback: () => void;
-  private delayCallback: () => void;
+  private gracePeriodExpiredCallback: () => void;
+  private delayPeriodExpiredCallback: () => void;
   private delayPeriodTimerKey: string = 'E2EIdentity_DelayTimer';
   private gracePeriodTimerKey: string = 'E2EIdentity_GracePeriodTimer';
 
-  private constructor({gracePeriodInMS, gpCallback, delayCallback}: CreateGracePeriodTimerParams) {
+  private constructor({
+    gracePeriodInMS,
+    gracePeriodExpiredCallback,
+    delayPeriodExpiredCallback,
+  }: CreateGracePeriodTimerParams) {
     this.gracePeriodInMS = gracePeriodInMS;
-    this.gpCallback = gpCallback;
-    this.delayCallback = delayCallback;
+    this.gracePeriodExpiredCallback = gracePeriodExpiredCallback;
+    this.delayPeriodExpiredCallback = delayPeriodExpiredCallback;
     this.initialize();
   }
 
@@ -67,13 +71,17 @@ class GracePeriodTimer {
   /**
    * @param CreateGracePeriodTimerParams The params to create the grace period timer
    */
-  public updateParams({gracePeriodInMS, gpCallback, delayCallback}: CreateGracePeriodTimerParams) {
+  public updateParams({
+    gracePeriodInMS,
+    gracePeriodExpiredCallback,
+    delayPeriodExpiredCallback,
+  }: CreateGracePeriodTimerParams) {
     DelayTimerStore.clear.all();
     this.clearGracePeriodTimer();
     this.clearDelayPeriodTimer();
     this.gracePeriodInMS = gracePeriodInMS;
-    this.gpCallback = gpCallback;
-    this.delayCallback = delayCallback;
+    this.gracePeriodExpiredCallback = gracePeriodExpiredCallback;
+    this.delayPeriodExpiredCallback = delayPeriodExpiredCallback;
     this.initialize();
   }
 
@@ -164,14 +172,14 @@ class GracePeriodTimer {
   /**
    * Exit the function
    * @param exitMessage The exit message
-   * @returns Calls the gpCallback
+   * @returns Calls the gracePeriodExpiredCallback
    */
   private exit(exitMessage: string) {
     logger.info(exitMessage);
     this.clearDelayPeriodTimer();
     this.clearGracePeriodTimer();
     DelayTimerStore.clear.all();
-    return this.gpCallback();
+    return this.gracePeriodExpiredCallback();
   }
 
   /**
@@ -209,7 +217,7 @@ class GracePeriodTimer {
 
     const task = () => {
       logger.info('Delay time is over.');
-      return this.delayCallback();
+      return this.delayPeriodExpiredCallback();
     };
 
     if (TaskScheduler.hasActiveTask(this.delayPeriodTimerKey)) {
