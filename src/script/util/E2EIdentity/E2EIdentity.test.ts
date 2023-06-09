@@ -158,7 +158,7 @@ describe('E2EIHandler', () => {
   it('should set currentStep to INITIALIZE after initialize is called', () => {
     const instance = E2EIHandler.getInstance(params);
     instance.initialize();
-    expect(instance['currentStep']).toBe(E2EIHandlerStep.INITIALIZE);
+    expect(instance['currentStep']).toBe(E2EIHandlerStep.INITIALIZED);
   });
 
   it('should set currentStep to ENROLL when enrollE2EI is called and enrollment succeeds', async () => {

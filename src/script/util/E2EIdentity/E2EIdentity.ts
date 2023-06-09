@@ -29,7 +29,8 @@ import {GracePeriodTimer} from './DelayTimer';
 import {getModalOptions, ModalType} from './Modals';
 
 export enum E2EIHandlerStep {
-  INITIALIZE = 'initialize',
+  UNINITIALIZED = 'uninitialized',
+  INITIALIZED = 'initialized',
   ENROLL = 'enroll',
   SUCCESS = 'success',
   ERROR = 'error',
@@ -46,7 +47,7 @@ class E2EIHandler {
   private timer: GracePeriodTimer;
   private discoveryUrl: string;
   private gracePeriodInMS: number;
-  private currentStep: E2EIHandlerStep | null = null;
+  private currentStep: E2EIHandlerStep | null = E2EIHandlerStep.UNINITIALIZED;
 
   private constructor({discoveryUrl, gracePeriodInMS}: E2EIHandlerParams) {
     // ToDo: Do these values need to te able to be updated? Should we use a singleton with update fn?
@@ -99,7 +100,6 @@ class E2EIHandler {
 
   public initialize(): void {
     if (this.isE2EIEnabled) {
-      this.currentStep = E2EIHandlerStep.INITIALIZE;
       this.showE2EINotificationMessage();
     }
   }
@@ -169,7 +169,7 @@ class E2EIHandler {
       type: ModalType.ERROR,
       hideClose: true,
       primaryActionFn: async () => {
-        this.currentStep = E2EIHandlerStep.INITIALIZE;
+        this.currentStep = E2EIHandlerStep.INITIALIZED;
         await this.enrollE2EI();
       },
       secondaryActionFn: () => {
@@ -180,7 +180,11 @@ class E2EIHandler {
   }
 
   private showE2EINotificationMessage(): void {
-    if (this.currentStep === E2EIHandlerStep.INITIALIZE) {
+    if (this.currentStep !== E2EIHandlerStep.UNINITIALIZED && this.currentStep !== E2EIHandlerStep.SNOOZE) {
+      return;
+    }
+
+    if (this.currentStep === E2EIHandlerStep.UNINITIALIZED) {
       this.timer.updateParams({
         gracePeriodInMS: this.gracePeriodInMS,
         gracePeriodExpiredCallback: () => {
@@ -190,6 +194,7 @@ class E2EIHandler {
           this.showE2EINotificationMessage();
         },
       });
+      this.currentStep = E2EIHandlerStep.INITIALIZED;
     }
 
     if (!this.timer.isDelayTimerActive()) {
@@ -197,6 +202,7 @@ class E2EIHandler {
         hideSecondary: !this.timer.isSnoozeTimeAvailable(),
         primaryActionFn: () => this.enrollE2EI(),
         secondaryActionFn: () => {
+          this.currentStep = E2EIHandlerStep.SNOOZE;
           this.timer.delayPrompt();
         },
         type: ModalType.ENROLL,

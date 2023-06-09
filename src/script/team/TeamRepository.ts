@@ -434,7 +434,7 @@ export class TeamRepository {
     }
 
     // Trigger E2E identity handler
-    this.handleE2EIdentityFeatureChange(featureConfigList.mlsE2EId, featureConfigList.mls);
+    // this.handleE2EIdentityFeatureChange(featureConfigList.mlsE2EId, featureConfigList.mls);
 
     this.saveFeatureConfig(featureConfigList);
   };
