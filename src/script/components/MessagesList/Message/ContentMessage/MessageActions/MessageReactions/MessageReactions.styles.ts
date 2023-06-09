@@ -44,7 +44,7 @@ export const messageReactionWrapper: CSSObject = {
   paddingLeft: '56px',
   flexWrap: 'wrap',
   maxWidth: '100%',
-  overflow: 'hidden',
+  marginRight: 'var(--conversation-message-timestamp-width)',
   '.tooltip-content': {marginBottom: '0 !important'},
 };
 

@@ -28,10 +28,11 @@ export const messageActionsGroup: CSSObject = {
 export const messageBodyActions: CSSObject = {
   display: 'inline-flex',
   alignItems: 'center',
-  height: '24px',
+  minHeight: '32px',
+  minWidth: '40px',
   position: 'absolute',
   right: '16px',
-  top: '-0.5rem',
+  top: '-20px',
   '@media (max-width: @screen-md-min)': {
     height: '45px',
     flexDirection: 'column',
@@ -105,5 +106,5 @@ export const getActionsMenuCSS = (isActive?: boolean): CSSObject => {
 };
 
 export const messageWithHeaderTop: CSSObject = {
-  top: '2.8rem',
+  top: '45px',
 };
