@@ -80,7 +80,14 @@ import {ConversationFilter} from './ConversationFilter';
 import {ConversationLabelRepository} from './ConversationLabelRepository';
 import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';
 import {ConversationRoleRepository} from './ConversationRoleRepository';
-import {isMLSCapableConversation, MixedConversation, MLSConversation} from './ConversationSelectors';
+import {
+  isMixedConversation,
+  isMLSCapableConversation,
+  isMLSConversation,
+  isProteusConversation,
+  MixedConversation,
+  MLSConversation,
+} from './ConversationSelectors';
 import {ConversationService} from './ConversationService';
 import {ConversationState} from './ConversationState';
 import {ConversationStateHandler} from './ConversationStateHandler';
@@ -1455,22 +1462,24 @@ export class ConversationRepository {
     const qualifiedUsers = userEntities.map(userEntity => userEntity.qualifiedId);
 
     try {
+      if (isProteusConversation(conversation) || isMixedConversation(conversation)) {
+        const conversationMemberJoinEvent = await this.core.service!.conversation.addUsersToProteusConversation({
+          conversationId: conversation.qualifiedId,
+          qualifiedUsers,
+        });
+        if (conversationMemberJoinEvent) {
+          await this.eventRepository.injectEvent(conversationMemberJoinEvent, EventRepository.SOURCE.BACKEND_RESPONSE);
+        }
+      }
+
       if (isMLSCapableConversation(conversation)) {
         const {events} = await this.core.service!.conversation.addUsersToMLSConversation({
           conversationId: conversation.qualifiedId,
           groupId: conversation.groupId,
           qualifiedUsers,
         });
-        if (!!events.length) {
+        if (!!events.length && isMLSConversation(conversation)) {
           events.forEach(event => this.eventRepository.injectEvent(event));
-        }
-      } else {
-        const conversationMemberJoinEvent = await this.core.service!.conversation.addUsersToProteusConversation({
-          conversationId: conversation.qualifiedId,
-          qualifiedUsers,
-        });
-        if (conversationMemberJoinEvent) {
-          this.eventRepository.injectEvent(conversationMemberJoinEvent, EventRepository.SOURCE.BACKEND_RESPONSE);
         }
       }
     } catch (error) {
