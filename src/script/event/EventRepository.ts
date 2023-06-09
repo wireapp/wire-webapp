@@ -565,6 +565,14 @@ export class EventRepository {
   private handleMessageUpdate(originalEvent: EventRecord, newEvent: MessageAddEvent) {
     const newEventData = newEvent.data;
     const originalData = originalEvent.data;
+
+    const isFailed = (status: StatusType | undefined): status is StatusType.FAILED => {
+      return status === StatusType.FAILED;
+    };
+    const isFederationError = (status: StatusType | undefined): status is StatusType.FEDERATION_ERROR => {
+      return status === StatusType.FEDERATION_ERROR;
+    };
+
     if (originalEvent.from !== newEvent.from) {
       const logMessage = `ID previously used by user '${newEvent.from}'`;
       const errorMessage = 'ID reused by other user';
@@ -572,8 +580,7 @@ export class EventRepository {
     }
 
     const containsLinkPreview = newEventData.previews && !!newEventData.previews.length;
-    const isRetryAttempt =
-      originalEvent.status === StatusType.FAILED || originalEvent.status === StatusType.FEDERATION_ERROR;
+    const isRetryAttempt = isFailed(originalEvent.status) || isFederationError(originalEvent.status);
 
     if (!containsLinkPreview && !isRetryAttempt) {
       const errorMessage =
