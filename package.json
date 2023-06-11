@@ -137,7 +137,7 @@
     "eslint-plugin-unused-imports": "^2.0.0",
     "fake-indexeddb": "4.0.1",
     "generate-changelog": "1.8.0",
-    "html-webpack-plugin": "^5.5.1",
+    "html-webpack-plugin": "^5.5.3",
     "husky": "7.0.4",
     "i18next-scanner": "4.2.0",
     "intersection-observer": "0.12.2",
