@@ -147,7 +147,7 @@
     "jest-jasmine2": "29.5.0",
     "jsdom-worker": "0.3.0",
     "less": "3.13.1",
-    "less-loader": "^11.1.2",
+    "less-loader": "^11.1.3",
     "lint-staged": "13.2.2",
     "node-fetch": "2.6.11",
     "os-browserify": "0.3.0",
