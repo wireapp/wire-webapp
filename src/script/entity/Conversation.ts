@@ -115,6 +115,7 @@ export class Conversation {
   public readonly firstUserEntity: ko.PureComputed<User>;
   public readonly enforcedTeamMessageTimer: ko.PureComputed<number>;
   public readonly globalMessageTimer: ko.Observable<number | null>;
+  public readonly hasContentMessages: ko.Observable<boolean>;
   public readonly hasAdditionalMessages: ko.Observable<boolean>;
   public readonly hasGlobalMessageTimer: ko.PureComputed<boolean>;
   public readonly hasGuest: ko.PureComputed<boolean>;
@@ -421,6 +422,11 @@ export class Conversation {
 
     this.hasAdditionalMessages = ko.observable(true);
 
+    // Since we release messages from memory when the conversation is not active, we use an observable to keep track of conversations with messages
+    this.hasContentMessages = ko.observable(
+      [...this.messages(), ...this.incomingMessages()].some(message => message.isContent()),
+    );
+
     this.messages_visible = ko
       .pureComputed(() => (!this.id ? [] : this.messages().filter(messageEntity => messageEntity.visible())))
       .extend({trackArrayChanges: true});
@@ -677,6 +683,10 @@ export class Conversation {
       const editedMessage = () =>
         this._findDuplicate((messageEntity as ContentMessage).replacing_message_id, messageEntity.from);
       const alreadyAdded = messageWithLinkPreview() || editedMessage();
+
+      if (messageEntity.isContent()) {
+        this.hasContentMessages(true);
+      }
       if (alreadyAdded) {
         return false;
       }
