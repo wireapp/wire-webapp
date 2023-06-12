@@ -80,7 +80,9 @@ export class ConversationState {
           !conversation.is_cleared() &&
           !conversation.is_archived() &&
           // We filter out 1 on 1 conversation with unavailable users that don't have messages
-          (conversation.hasUserMessages() || conversation.firstUserEntity()?.isAvailable()),
+          (!conversation.is1to1() ||
+            conversation.hasContentMessages() ||
+            conversation.firstUserEntity()?.isAvailable()),
       );
     });
     this.unreadConversations = ko.pureComputed(() => {
