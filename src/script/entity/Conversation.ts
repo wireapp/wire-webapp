@@ -603,10 +603,9 @@ export class Conversation {
    */
   release(): void {
     if (!this.unreadState().allEvents.length) {
-      this.is_loaded(false);
-      // Check if the Conversation has User-Messages that we need to load
-      this.hasAdditionalMessages(this.getAllMessages().some(message => message.isContent()));
       this.removeMessages();
+      this.is_loaded(false);
+      this.hasAdditionalMessages(true);
     }
   }
 
