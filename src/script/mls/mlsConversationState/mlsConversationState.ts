@@ -20,7 +20,7 @@
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {create} from 'zustand';
 
-import {isMLSConversation} from 'src/script/conversation/ConversationSelectors';
+import {isMLSCapableConversation, isMLSConversation} from 'src/script/conversation/ConversationSelectors';
 
 import {loadState, saveState} from './conversationStateStorage';
 
@@ -58,8 +58,7 @@ export const useMLSConversationState = create<StoreState>((set, get) => {
     established: initialState.established,
     filterEstablishedConversations: conversations =>
       conversations.filter(conversation => {
-        const isMLS = isMLSConversation(conversation);
-        return !isMLS || get().isEstablished(conversation.groupId);
+        return !isMLSConversation(conversation) || get().isEstablished(conversation.groupId);
       }),
 
     isEstablished: groupId => get().established.has(groupId),
@@ -95,10 +94,10 @@ export const useMLSConversationState = create<StoreState>((set, get) => {
       const alreadyEstablishedConversations: string[] = [];
 
       for (const conversation of conversations) {
-        const groupId = conversation.groupId;
-        if (!conversation.isUsingMLSProtocol || !groupId) {
+        if (!isMLSCapableConversation(conversation)) {
           continue;
         }
+        const {groupId} = conversation;
         if (!currentState.isEstablished(groupId) && !currentState.isPendingWelcome(groupId)) {
           if (await isAlreadyEstablished(groupId)) {
             // check is the conversation is not actually already established
