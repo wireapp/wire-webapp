@@ -80,7 +80,7 @@ import {ConversationFilter} from './ConversationFilter';
 import {ConversationLabelRepository} from './ConversationLabelRepository';
 import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';
 import {ConversationRoleRepository} from './ConversationRoleRepository';
-import {isMLSConversation} from './ConversationSelectors';
+import {isMLSCapableConversation, isMLSConversation} from './ConversationSelectors';
 import {ConversationService} from './ConversationService';
 import {ConversationState} from './ConversationState';
 import {ConversationStateHandler} from './ConversationStateHandler';
@@ -952,7 +952,7 @@ export class ConversationRepository {
     }
     this.deleteConversationFromRepository(conversationId);
     await this.conversationService.deleteConversationFromDb(conversationId.id);
-    if (isMLSConversation(conversationEntity)) {
+    if (isMLSCapableConversation(conversationEntity)) {
       await this.conversationService.wipeMLSConversation(conversationEntity);
     }
   };
@@ -1453,25 +1453,25 @@ export class ConversationRepository {
 
     const qualifiedUsers = userEntities.map(userEntity => userEntity.qualifiedId);
 
-    const {qualifiedId: conversationId, groupId} = conversation;
-
     try {
-      if (conversation.isUsingMLSProtocol && groupId) {
-        const {events} = await this.core.service!.conversation.addUsersToMLSConversation({
-          conversationId,
-          groupId,
-          qualifiedUsers,
-        });
-        if (!!events.length) {
-          events.forEach(event => this.eventRepository.injectEvent(event));
-        }
-      } else {
+      if (isProteusConversation(conversation) || isMixedConversation(conversation)) {
         const conversationMemberJoinEvent = await this.core.service!.conversation.addUsersToProteusConversation({
-          conversationId,
+          conversationId: conversation.qualifiedId,
           qualifiedUsers,
         });
         if (conversationMemberJoinEvent) {
-          this.eventRepository.injectEvent(conversationMemberJoinEvent, EventRepository.SOURCE.BACKEND_RESPONSE);
+          await this.eventRepository.injectEvent(conversationMemberJoinEvent, EventRepository.SOURCE.BACKEND_RESPONSE);
+        }
+      }
+
+      if (isMLSCapableConversation(conversation)) {
+        const {events} = await this.core.service!.conversation.addUsersToMLSConversation({
+          conversationId: conversation.qualifiedId,
+          groupId: conversation.groupId,
+          qualifiedUsers,
+        });
+        if (!!events.length && isMLSConversation(conversation)) {
+          events.forEach(event => this.eventRepository.injectEvent(event));
         }
       }
     } catch (error) {
@@ -2627,7 +2627,7 @@ export class ConversationRepository {
     const qualifiedUserIds =
       eventData.users?.map(user => user.qualified_id) || eventData.user_ids.map(userId => ({domain: '', id: userId}));
 
-    if (conversationEntity.isUsingMLSProtocol) {
+    if (isMLSCapableConversation(conversationEntity)) {
       const isSelfJoin = isFromSelf && selfUserJoins;
       await this.handleMLSConversationMemberJoin(conversationEntity, isSelfJoin);
     }
@@ -2647,12 +2647,8 @@ export class ConversationRepository {
    * @param conversation Conversation member joined to
    * @param isSelfJoin whether user has joined by itself, if so we need to add other self clients to mls group
    */
-  private async handleMLSConversationMemberJoin(conversation: Conversation, isSelfJoin: boolean) {
+  private async handleMLSConversationMemberJoin(conversation: MLSCapableConversation, isSelfJoin: boolean) {
     const {groupId} = conversation;
-
-    if (!groupId) {
-      throw new Error(`groupId not found for MLS conversation ${conversation.id}`);
-    }
 
     const isMLSConversationEstablished = await this.core.service!.conversation.isMLSConversationEstablished(groupId);
 
@@ -2711,7 +2707,7 @@ export class ConversationRepository {
         eventJson.from = this.userState.self().id;
       }
 
-      if (isMLSConversation(conversationEntity)) {
+      if (isMLSCapableConversation(conversationEntity)) {
         await this.conversationService.wipeMLSConversation(conversationEntity);
       }
     } else {

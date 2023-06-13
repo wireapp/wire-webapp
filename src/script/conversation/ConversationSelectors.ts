@@ -24,6 +24,7 @@ import {Conversation} from '../entity/Conversation';
 export type ProteusConversation = Conversation & {protocol: ConversationProtocol.PROTEUS};
 export type MixedConversation = Conversation & {groupId: string; protocol: ConversationProtocol.MIXED};
 export type MLSConversation = Conversation & {groupId: string; protocol: ConversationProtocol.MLS};
+export type MLSCapableConversation = MixedConversation | MLSConversation;
 
 export function isProteusConversation(conversation: Conversation): conversation is ProteusConversation {
   return !conversation.groupId && conversation.protocol === ConversationProtocol.PROTEUS;
@@ -35,6 +36,10 @@ export function isMixedConversation(conversation: Conversation): conversation is
 
 export function isMLSConversation(conversation: Conversation): conversation is MLSConversation {
   return !!conversation.groupId && conversation.protocol === ConversationProtocol.MLS;
+}
+
+export function isMLSCapableConversation(conversation: Conversation): conversation is MLSCapableConversation {
+  return isMixedConversation(conversation) || isMLSConversation(conversation);
 }
 
 export function isSelfConversation(conversation: Conversation): boolean {
