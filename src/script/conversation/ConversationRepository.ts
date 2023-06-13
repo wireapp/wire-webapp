@@ -85,8 +85,7 @@ import {
   isMLSCapableConversation,
   isMLSConversation,
   isProteusConversation,
-  MixedConversation,
-  MLSConversation,
+  MLSCapableConversation,
 } from './ConversationSelectors';
 import {ConversationService} from './ConversationService';
 import {ConversationState} from './ConversationState';
@@ -2656,10 +2655,7 @@ export class ConversationRepository {
    * @param conversation Conversation member joined to
    * @param isSelfJoin whether user has joined by itself, if so we need to add other self clients to mls group
    */
-  private async handleMLSConversationMemberJoin(
-    conversation: MLSConversation | MixedConversation,
-    isSelfJoin: boolean,
-  ) {
+  private async handleMLSConversationMemberJoin(conversation: MLSCapableConversation, isSelfJoin: boolean) {
     const {groupId} = conversation;
 
     const isMLSConversationEstablished = await this.core.service!.conversation.isMLSConversationEstablished(groupId);
