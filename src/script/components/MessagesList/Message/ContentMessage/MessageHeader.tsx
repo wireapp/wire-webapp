@@ -67,7 +67,7 @@ function BadgeSection({sender}: {sender: User}) {
         </span>
       )}
 
-      {sender.isDirectGuest() && (
+      {sender.isDirectGuest() && !sender.isFederated && (
         <span
           className="message-header-icon-guest with-tooltip with-tooltip--external"
           data-tooltip={t('conversationGuestIndicator')}
