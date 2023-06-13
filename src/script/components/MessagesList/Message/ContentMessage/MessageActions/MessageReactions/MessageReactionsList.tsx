@@ -59,7 +59,7 @@ const MessageReactionsList: FC<MessageReactionsListProps> = ({
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
   const reactionsList = Array.from(reactionGroupedByUser);
   return (
-    <div css={messageReactionWrapper}>
+    <div css={messageReactionWrapper} data-uie-name="message-reactions">
       {reactionsList.map(([emoji, users], index) => {
         const emojiUnicode = getEmojiUnicode(emoji);
         const emojiUrl = getEmojiUrl(emojiUnicode);
@@ -97,6 +97,7 @@ const MessageReactionsList: FC<MessageReactionsListProps> = ({
                 type="button"
                 tabIndex={messageFocusedTabIndex}
                 className="button-reset-default"
+                data-uie-name="emoji-pill"
                 onClick={() => {
                   setSelected(emojiUrl);
                   handleReactionClick(emoji);
