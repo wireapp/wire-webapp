@@ -26,9 +26,11 @@ import {useMLSConversationState} from './mlsConversationState';
 
 import {ConversationRepository} from '../conversation/ConversationRepository';
 import {
+  isMLSCapableConversation,
   isMLSConversation,
   isSelfConversation,
   isTeamConversation,
+  MLSCapableConversation,
   MLSConversation,
 } from '../conversation/ConversationSelectors';
 import {Conversation} from '../entity/Conversation';
@@ -51,10 +53,10 @@ export async function initMLSConversations(conversations: Conversation[], core: 
     throw new Error('MLS service not available');
   }
 
-  const mlsConversations = conversations.filter(isMLSConversation);
-  await joinNewConversations(mlsConversations, core);
+  const mlsCapableConversations = conversations.filter(isMLSCapableConversation);
+  await joinNewConversations(mlsCapableConversations, core);
 
-  return mlsService.schedulePeriodicKeyMaterialRenewals(mlsConversations.map(({groupId}) => groupId));
+  return mlsService.schedulePeriodicKeyMaterialRenewals(mlsCapableConversations.map(({groupId}) => groupId));
 }
 
 /**
@@ -85,7 +87,7 @@ export async function initMLSCallbacks(
  * @param conversations - all the conversations that the user is part of
  * @param core - the instance of the core
  */
-async function joinNewConversations(conversations: MLSConversation[], core: Account): Promise<void> {
+async function joinNewConversations(conversations: MLSCapableConversation[], core: Account): Promise<void> {
   // We send external proposal to all the MLS conversations that are in an unknown state (not established nor pendingWelcome)
   await useMLSConversationState.getState().sendExternalToPendingJoin(
     conversations,

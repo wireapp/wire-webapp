@@ -47,7 +47,7 @@ import {container} from 'tsyringe';
 
 import {getLogger, Logger} from 'Util/Logger';
 
-import {MLSConversation} from './ConversationSelectors';
+import {MLSCapableConversation, MLSConversation} from './ConversationSelectors';
 
 import type {Conversation as ConversationEntity} from '../entity/Conversation';
 import type {EventService} from '../event/EventService';
@@ -423,8 +423,8 @@ export class ConversationService {
    * Wipes MLS conversation in corecrypto and deletes the conversation state.
    * @param mlsConversation mls conversation
    */
-  async wipeMLSConversation(mlsConversation: MLSConversation) {
-    const {groupId} = mlsConversation;
+  async wipeMLSCapableConversation(conversation: MLSCapableConversation) {
+    const {groupId} = conversation;
     await this.core.service!.conversation.wipeMLSConversation(groupId);
     return useMLSConversationState.getState().wipeConversationState(groupId);
   }
