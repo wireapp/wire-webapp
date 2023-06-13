@@ -137,7 +137,7 @@ export const UserDetailsComponent: React.FC<UserDetailsProps> = ({
         </div>
       )}
 
-      {isGuest && user.isAvailable && (
+      {isGuest && user.isAvailable && !isFederated && (
         <div className="panel-participant__label" data-uie-name="status-guest">
           <Icon.Guest />
           <span>{t('conversationGuestIndicator')}</span>
