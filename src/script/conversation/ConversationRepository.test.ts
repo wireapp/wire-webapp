@@ -71,6 +71,8 @@ import {LegacyEventRecord, StorageService} from '../storage';
 
 jest.deepUnmock('axios');
 
+const mlsCapableProtocols = [ConversationProtocol.MLS, ConversationProtocol.MIXED];
+
 const _generateConversation = (
   conversation_type = CONVERSATION_TYPE.REGULAR,
   connection_status = ConnectionStatus.ACCEPTED,
@@ -86,7 +88,7 @@ const _generateConversation = (
   connectionEntity.status(connection_status);
   conversation.connection(connectionEntity);
 
-  if ([ConversationProtocol.MLS, ConversationProtocol.MIXED].includes(conversationProtocol)) {
+  if (mlsCapableProtocols.includes(conversationProtocol)) {
     conversation.groupId = groupId;
   }
 
@@ -1629,10 +1631,7 @@ describe('ConversationRepository', () => {
       const conversation = _generateConversation();
       const conversationRepository = await testFactory.exposeConversationActors();
 
-      const user1 = generateUser();
-      const user2 = generateUser();
-
-      const usersToAdd = [user1, user2];
+      const usersToAdd = [generateUser(), generateUser()];
 
       const coreConversationService = container.resolve(Core).service!.conversation;
       spyOn(coreConversationService, 'addUsersToProteusConversation');
@@ -1649,10 +1648,7 @@ describe('ConversationRepository', () => {
       const conversation = _generateConversation(undefined, undefined, ConversationProtocol.MIXED, '', mockedGroupId);
       const conversationRepository = await testFactory.exposeConversationActors();
 
-      const user1 = generateUser();
-      const user2 = generateUser();
-
-      const usersToAdd = [user1, user2];
+      const usersToAdd = [generateUser(), generateUser()];
 
       const coreConversationService = container.resolve(Core).service!.conversation;
       spyOn(coreConversationService, 'addUsersToMLSConversation');
@@ -1674,10 +1670,7 @@ describe('ConversationRepository', () => {
       const conversation = _generateConversation(undefined, undefined, ConversationProtocol.MLS, '', mockedGroupId);
       const conversationRepository = await testFactory.exposeConversationActors();
 
-      const user1 = generateUser();
-      const user2 = generateUser();
-
-      const usersToAdd = [user1, user2];
+      const usersToAdd = [generateUser(), generateUser()];
 
       const coreConversationService = container.resolve(Core).service!.conversation;
       spyOn(coreConversationService, 'addUsersToMLSConversation');
@@ -1759,10 +1752,7 @@ describe('ConversationRepository', () => {
 
           spyOn(testFactory.conversation_repository['userState'], 'self').and.returnValue(selfUser);
 
-          const user1 = generateUser();
-          const user2 = generateUser();
-
-          conversation.participating_user_ets([user1, user2]);
+          conversation.participating_user_ets([generateUser(), generateUser()]);
 
           const coreConversationService = container.resolve(Core).service!.conversation;
 
