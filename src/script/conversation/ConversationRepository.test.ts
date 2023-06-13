@@ -841,7 +841,7 @@ describe('ConversationRepository', () => {
 
           spyOn(testFactory.conversation_repository['userState'], 'self').and.returnValue(selfUser);
 
-          container.resolve(Core).clientId = mockSelfClientId;
+          Object.defineProperty(container.resolve(Core), 'clientId', {value: mockSelfClientId});
 
           return testFactory.conversation_repository['handleConversationEvent'](memberJoinEvent).then(() => {
             expect(testFactory.conversation_repository['onMemberJoin']).toHaveBeenCalled();
