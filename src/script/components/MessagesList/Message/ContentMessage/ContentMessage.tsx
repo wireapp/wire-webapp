@@ -233,6 +233,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             messageWithSection={hasMarker}
             handleReactionClick={onClickReaction}
             reactionsTotalCount={reactionsTotalCount}
+            isRemovedFromConversation={conversation.removed_from_conversation()}
           />
         )}
       </div>
@@ -243,6 +244,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
         isMessageFocused={msgFocusState}
         onTooltipReactionCountClick={() => onClickReactionDetails(message)}
         onLastReactionKeyEvent={() => setActionMenuVisibility(false)}
+        isRemovedFromConversation={conversation.removed_from_conversation()}
       />
     </div>
   );

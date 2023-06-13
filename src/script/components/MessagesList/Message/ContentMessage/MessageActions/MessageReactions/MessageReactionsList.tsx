@@ -45,6 +45,7 @@ export interface MessageReactionsListProps {
   isMessageFocused: boolean;
   onTooltipReactionCountClick: () => void;
   onLastReactionKeyEvent: () => void;
+  isRemovedFromConversation: boolean;
 }
 
 const MessageReactionsList: FC<MessageReactionsListProps> = ({
@@ -53,6 +54,7 @@ const MessageReactionsList: FC<MessageReactionsListProps> = ({
   onTooltipReactionCountClick,
   isMessageFocused,
   onLastReactionKeyEvent,
+  isRemovedFromConversation,
 }) => {
   const [isSelectedEmoji, setSelected] = useState('');
   const reactionGroupedByUser = groupByReactionUsers(reactions);
@@ -65,7 +67,7 @@ const MessageReactionsList: FC<MessageReactionsListProps> = ({
         const emojiUrl = getEmojiUrl(emojiUnicode);
         const emojiName = getEmojiTitleFromEmojiUnicode(emojiUnicode);
         const emojiCount = users.length;
-        const isActive = isSelectedEmoji === emojiUrl;
+        const isActive = isSelectedEmoji === emojiUrl && !isRemovedFromConversation;
         return (
           <Fragment key={emojiUnicode}>
             <Tooltip
@@ -90,7 +92,7 @@ const MessageReactionsList: FC<MessageReactionsListProps> = ({
               }
             >
               <button
-                css={{...messageReactionButton, ...getReactionsButtonCSS(isActive)}}
+                css={{...messageReactionButton, ...getReactionsButtonCSS(isActive, isRemovedFromConversation)}}
                 aria-label={t('messageReactionDetails', {emojiCount: emojiCount.toString(), emojiName})}
                 title={emojiName}
                 aria-pressed={isActive}
