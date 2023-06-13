@@ -78,8 +78,6 @@ export interface FeatureMLSE2EIdConfig extends FeatureConfig {
 export interface FeatureMLSMigrationConfig extends FeatureConfig {
   startTime?: string;
   finaliseRegardlessAfter?: string;
-  usersThreshold?: number;
-  clientsThreshold?: number;
 }
 
 export type FeatureAppLock = Feature<FeatureAppLockConfig>;
