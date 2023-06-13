@@ -58,8 +58,7 @@ export const useMLSConversationState = create<StoreState>((set, get) => {
     established: initialState.established,
     filterEstablishedConversations: conversations =>
       conversations.filter(conversation => {
-        const isMLS = isMLSConversation(conversation);
-        return !isMLS || get().isEstablished(conversation.groupId);
+        return !isMLSConversation(conversation) || get().isEstablished(conversation.groupId);
       }),
 
     isEstablished: groupId => get().established.has(groupId),
