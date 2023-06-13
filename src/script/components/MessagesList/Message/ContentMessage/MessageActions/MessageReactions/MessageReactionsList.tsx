@@ -23,7 +23,7 @@ import {Tooltip} from '@wireapp/react-ui-kit';
 
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
 import {getEmojiUnicode, getEmojiTitleFromEmojiUnicode} from 'Util/EmojiUtil';
-import {isEnterKey, isTabKey} from 'Util/KeyboardUtil';
+import {isTabKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {Reactions, getEmojiUrl, groupByReactionUsers} from 'Util/ReactionUtil';
 
@@ -80,17 +80,8 @@ const MessageReactionsList: FC<MessageReactionsListProps> = ({
                     emojiName={emojiName}
                   />
                   <p css={messageReactionButtonTooltipText}>
-                    <span
-                      onClick={onTooltipReactionCountClick}
-                      onKeyDown={event => {
-                        if (!isEnterKey(event)) {
-                          onTooltipReactionCountClick();
-                        }
-                      }}
-                      role="button"
-                      tabIndex={0}
-                      css={messageReactionButtonTooltipTextLink}
-                    >
+                    {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */}
+                    <span onClick={onTooltipReactionCountClick} css={messageReactionButtonTooltipTextLink}>
                       {t('conversationLikesCaption', {number: emojiCount.toString()})}
                     </span>{' '}
                     {t('conversationLikesCaptionReacted', {emojiName})}
