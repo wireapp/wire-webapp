@@ -112,18 +112,7 @@ const checkMigrationConfig = async (
   }
   //at this point we know that MLS is supported by environment, we can check MLS migration config
   //fetch current mls migration feature config from memory
-  let mlsMigrationFeature = teamState.teamFeatures().mlsMigration;
-
-  //FIXME: remove this when we have a proper config from the backend
-  mlsMigrationFeature = {
-    config: {
-      clientsThreshold: 100,
-      usersThreshold: 100,
-      finaliseRegardlessAfter: '2025-05-16T09:25:27.123Z',
-      startTime: '2023-05-16T13:17:32.739Z',
-    },
-    status: FeatureStatus.ENABLED,
-  };
+  const mlsMigrationFeature = teamState.teamFeatures().mlsMigration;
 
   if (!mlsMigrationFeature || mlsMigrationFeature.status === FeatureStatus.DISABLED) {
     mlsMigrationLogger.info('MLS migration feature is disabled, will retry in 24 hours or on next app reload.');

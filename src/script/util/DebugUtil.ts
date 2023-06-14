@@ -27,6 +27,7 @@ import {
   USER_EVENT,
 } from '@wireapp/api-client/lib/event/';
 import type {Notification} from '@wireapp/api-client/lib/notification/';
+import {FeatureStatus} from '@wireapp/api-client/lib/team/feature/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {DatabaseKeys} from '@wireapp/core/lib/notification/NotificationDatabaseRepository';
 import Dexie from 'dexie';
@@ -35,6 +36,7 @@ import {container} from 'tsyringe';
 
 import {getLogger, Logger} from 'Util/Logger';
 
+import {TIME_IN_MILLIS} from './TimeUtil';
 import {createUuid} from './uuid';
 
 import {CallingRepository} from '../calling/CallingRepository';
@@ -49,6 +51,7 @@ import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {EventRepository} from '../event/EventRepository';
 import {checkVersion} from '../lifecycle/newVersionHandler';
+import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
 import {EventRecord, StorageRepository, StorageSchemata} from '../storage';
 import {UserRepository} from '../user/UserRepository';
@@ -78,6 +81,7 @@ export class DebugUtil {
     private readonly conversationState = container.resolve(ConversationState),
     private readonly callState = container.resolve(CallState),
     private readonly core = container.resolve(Core),
+    private readonly apiClient = container.resolve(APIClient),
   ) {
     this.$ = $;
     this.Dexie = Dexie;
@@ -149,6 +153,28 @@ export class DebugUtil {
     const proteusService = this.core.service!.proteus;
     const sessionId = proteusService.constructSessionId(userId, clientId);
     await proteusService['cryptoClient'].debugBreakSession(sessionId);
+  }
+
+  /** Used by QA test automation. */
+  async setMLSMigrationConfig(
+    isEnabled = true,
+    config = {
+      startTime: new Date().toISOString(),
+      finaliseRegardlessAfter: new Date(Date.now() + TIME_IN_MILLIS.YEAR).toISOString(),
+    },
+  ) {
+    const {teamId} = await this.userRepository.getSelf();
+
+    if (!teamId) {
+      throw new Error('teamId of self user is undefined');
+    }
+
+    const response = await this.apiClient.api.teams.feature.putMLSMigrationFeature(teamId, {
+      config,
+      status: isEnabled ? FeatureStatus.ENABLED : FeatureStatus.DISABLED,
+    });
+
+    return response;
   }
 
   /** Used by QA test automation. */
