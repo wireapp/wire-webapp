@@ -114,6 +114,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
         // escape/tab key press while the menu is open will close the menu and focus the trigerer
         cleanUp();
         previouslyFocused.focus();
+        resetMsgMenuStates();
       }
 
       if (isOneOfKeys(event, [KEY.ARROW_UP, KEY.ARROW_DOWN])) {

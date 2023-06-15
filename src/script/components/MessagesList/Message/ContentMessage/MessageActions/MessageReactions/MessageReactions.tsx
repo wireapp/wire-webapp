@@ -102,6 +102,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
 
   const handleEmojiBtnClick = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.stopPropagation();
       const selectedMsgActionName = event.currentTarget.dataset.uieName;
       if (currentMsgActionName === selectedMsgActionName) {
         // reset on double click
@@ -116,6 +117,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
 
   const handleEmojiKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLButtonElement>) => {
+      event.stopPropagation();
       const selectedMsgActionName = event.currentTarget.dataset.uieName;
       handleKeyDown(event);
       if ([KEY.SPACE, KEY.ENTER].includes(event.key)) {
@@ -138,6 +140,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
 
   const handleMsgActionClick = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.stopPropagation();
       const actionType = event.currentTarget.dataset.uieName;
       switch (actionType) {
         case MessageActionsId.EMOJI:
@@ -158,6 +161,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
 
   const handleMsgActionKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLButtonElement>) => {
+      event.stopPropagation();
       const actionType = event.currentTarget.dataset.uieName;
       switch (actionType) {
         case MessageActionsId.EMOJI:

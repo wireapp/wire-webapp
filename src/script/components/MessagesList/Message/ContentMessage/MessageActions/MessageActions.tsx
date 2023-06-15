@@ -112,8 +112,6 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
         // if there's no reaction then on tab from context menu hide the message actions menu
         setCurrentMsgAction('');
         handleActionMenuVisibility(false);
-      } else if (isEscapeKey(event)) {
-        resetActionMenuStates();
       }
     },
     [handleActionMenuVisibility, menuEntries, reactionsTotalCount, resetActionMenuStates],
