@@ -71,6 +71,12 @@ export class ConversationState {
     this.selfMLSConversation = ko.pureComputed(() =>
       this.conversations().find(conversation => isMLSConversation(conversation) && isSelfConversation(conversation)),
     );
+
+    //anytime mls conversation state changes, we update the sorted conversations that will recalculate visible conversations
+    useMLSConversationState.subscribe(() => {
+      this.sortedConversations.notifySubscribers();
+    });
+
     this.visibleConversations = ko.pureComputed(() => {
       const filteredMLSConversations = useMLSConversationState
         .getState()
