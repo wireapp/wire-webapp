@@ -81,7 +81,7 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
   const [currentMsgActionName, setCurrentMsgAction] = useState('');
   const wrapperRef = useRef<HTMLDivElement>(null);
   const mesageReactionTop = isMsgWithHeader && messageWithSection ? messageWithHeaderTop : null;
-  const {handleMenuOpen} = useMessageActionsState();
+  const {handleMenuOpen, isMenuOpen} = useMessageActionsState();
 
   const resetActionMenuStates = useCallback(() => {
     setCurrentMsgAction('');
@@ -159,7 +159,9 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
   const isMsgReactable = message.isReactable() && !isRemovedFromConversation;
   // clicking anywhere else other than the message action menu removes action menu active state
   useClickOutside(wrapperRef, () => {
-    setCurrentMsgAction('');
+    if (!isMenuOpen) {
+      setCurrentMsgAction('');
+    }
   });
   return (
     <div css={{...messageBodyActions, ...mesageReactionTop}} ref={wrapperRef}>
