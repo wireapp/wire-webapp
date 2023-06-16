@@ -139,6 +139,7 @@ const Message: React.FC<
     }
     if (isTabKey(event)) {
       // don't call arrow key down for tab key
+      // on tab key from message element reset the floating action menu selection
       return;
     }
     handleArrowKeyDown(event);
@@ -233,6 +234,9 @@ const Message: React.FC<
         ref={messageRef}
         role="listitem"
         onKeyDown={handleDivKeyDown}
+        onClick={event => {
+          handleFocus(index);
+        }}
         className="message-wrapper"
       >
         {wrappedContent}

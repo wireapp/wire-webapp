@@ -26,6 +26,7 @@ import {Availability} from '@wireapp/protocol-messaging';
 
 import {Icon} from 'Components/Icon';
 import {IgnoreOutsideClickWrapper} from 'Components/InputBar/util/clickHandlers';
+import {useMessageActionsState} from 'Components/MessagesList/Message/ContentMessage/MessageActions/MessageActions.state';
 import {isEnterKey, isEscapeKey, isKey, isOneOfKeys, isSpaceKey, KEY} from 'Util/KeyboardUtil';
 
 export interface ContextMenuEntry {
@@ -114,6 +115,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
         // escape/tab key press while the menu is open will close the menu and focus the trigerer
         cleanUp();
         previouslyFocused.focus();
+        resetMsgMenuStates();
       }
 
       if (isOneOfKeys(event, [KEY.ARROW_UP, KEY.ARROW_DOWN])) {
@@ -140,7 +142,7 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
       const isOutsideClick = mainElement && !mainElement.contains(event.target as Node);
       if (isOutsideClick) {
         cleanUp();
-        resetMsgMenuStates();
+        resetMsgMenuStates(isOutsideClick);
       }
     };
 
@@ -157,9 +159,14 @@ const ContextMenu: React.FC<ContextMenuProps> = ({
     };
   }, [mainElement, selected]);
 
-  const resetMsgMenuStates = () => {
+  const {handleMenuOpen} = useMessageActionsState();
+  const resetMsgMenuStates = (isOutsideClick = false) => {
     if (defaultIdentifier === msgMenuIdentifier) {
-      resetMenuStates?.();
+      handleMenuOpen?.(false);
+
+      if (isOutsideClick) {
+        resetMenuStates?.();
+      }
     }
   };
 

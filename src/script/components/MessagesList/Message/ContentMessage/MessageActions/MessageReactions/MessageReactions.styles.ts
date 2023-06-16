@@ -42,6 +42,9 @@ export const messageReactionWrapper: CSSObject = {
   display: 'flex',
   gap: '0.5rem',
   paddingLeft: '56px',
+  flexWrap: 'wrap',
+  maxWidth: '100%',
+  marginRight: 'var(--conversation-message-timestamp-width)',
   '.tooltip-content': {marginBottom: '0 !important'},
 };
 
@@ -74,8 +77,7 @@ export const messageReactionCount = (isActive?: boolean): CSSObject => {
     letterSpacing: '0.031rem',
   };
 };
-
-export const getReactionsButtonCSS = (isActive?: boolean): CSSObject => {
+export const getReactionsButtonCSS = (isActive?: boolean, isDisabled?: boolean): CSSObject => {
   if (isActive) {
     return {
       border: '1px solid var(--message-reactions-active-border)',
@@ -86,6 +88,21 @@ export const getReactionsButtonCSS = (isActive?: boolean): CSSObject => {
       '&:focus-visible': {
         border: '1px solid var(--message-reactions-focus-border)',
         outline: 'none',
+      },
+    };
+  }
+  if (isDisabled) {
+    return {
+      border: '1px solid var(--gray-40)',
+      backgroundColor: 'var(--gray-20)',
+      color: 'var(--gray-60)',
+      cursor: 'not-allowed',
+      outline: 'none',
+
+      'body.theme-dark &': {
+        border: '1px solid var(--gray-95)',
+        backgroundColor: 'var(--gray-90)',
+        color: 'var(--gray-60)',
       },
     };
   }

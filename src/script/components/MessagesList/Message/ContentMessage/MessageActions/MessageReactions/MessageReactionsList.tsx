@@ -17,27 +17,13 @@
  *
  */
 
-import {FC, Fragment, useState} from 'react';
+import {FC} from 'react';
 
-import {Tooltip} from '@wireapp/react-ui-kit';
+import {getEmojiUnicode} from 'Util/EmojiUtil';
+import {Reactions, groupByReactionUsers} from 'Util/ReactionUtil';
 
-import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
-import {getEmojiUnicode, getEmojiTitleFromEmojiUnicode} from 'Util/EmojiUtil';
-import {isEnterKey, isTabKey} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
-import {Reactions, getEmojiUrl, groupByReactionUsers} from 'Util/ReactionUtil';
-
-import {EmojiImg} from './EmojiImg';
-import {
-  messageReactionButton,
-  messageReactionCount,
-  messageReactionWrapper,
-  getReactionsButtonCSS,
-  messageReactionButtonTooltip,
-  messageReactionButtonTooltipTextLink,
-  messageReactionButtonTooltipText,
-  messageReactionButtonTooltipImage,
-} from './MessageReactions.styles';
+import {EmojiPill} from './EmojiPill';
+import {messageReactionWrapper} from './MessageReactions.styles';
 
 export interface MessageReactionsListProps {
   reactions: Reactions;
@@ -45,85 +31,28 @@ export interface MessageReactionsListProps {
   isMessageFocused: boolean;
   onTooltipReactionCountClick: () => void;
   onLastReactionKeyEvent: () => void;
+  isRemovedFromConversation: boolean;
 }
 
-const MessageReactionsList: FC<MessageReactionsListProps> = ({
-  reactions,
-  handleReactionClick,
-  onTooltipReactionCountClick,
-  isMessageFocused,
-  onLastReactionKeyEvent,
-}) => {
-  const [isSelectedEmoji, setSelected] = useState('');
+const MessageReactionsList: FC<MessageReactionsListProps> = ({reactions, ...props}) => {
   const reactionGroupedByUser = groupByReactionUsers(reactions);
-  const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
   const reactionsList = Array.from(reactionGroupedByUser);
   return (
-    <div css={messageReactionWrapper}>
+    <div css={messageReactionWrapper} data-uie-name="message-reactions">
       {reactionsList.map(([emoji, users], index) => {
         const emojiUnicode = getEmojiUnicode(emoji);
-        const emojiUrl = getEmojiUrl(emojiUnicode);
-        const emojiName = getEmojiTitleFromEmojiUnicode(emojiUnicode);
-        const emojiCount = users.length;
-        const isActive = isSelectedEmoji === emojiUrl;
+        const emojiListCount = reactionsList.length;
+
         return (
-          <Fragment key={emojiUnicode}>
-            <Tooltip
-              body={
-                <div css={messageReactionButtonTooltip}>
-                  <EmojiImg
-                    emojiImgSize={{
-                      width: '1.2rem',
-                    }}
-                    styles={messageReactionButtonTooltipImage}
-                    emojiUrl={emojiUrl}
-                    emojiName={emojiName}
-                  />
-                  <p css={messageReactionButtonTooltipText}>
-                    <span
-                      onClick={onTooltipReactionCountClick}
-                      onKeyDown={event => {
-                        if (!isEnterKey(event)) {
-                          onTooltipReactionCountClick();
-                        }
-                      }}
-                      role="button"
-                      tabIndex={0}
-                      css={messageReactionButtonTooltipTextLink}
-                    >
-                      {t('conversationLikesCaption', {number: emojiCount.toString()})}
-                    </span>{' '}
-                    {t('conversationLikesCaptionReacted', {emojiName})}
-                  </p>
-                </div>
-              }
-            >
-              <button
-                css={{...messageReactionButton, ...getReactionsButtonCSS(isActive)}}
-                aria-label={t('messageReactionDetails', {emojiCount: emojiCount.toString(), emojiName})}
-                title={emojiName}
-                aria-pressed={isActive}
-                type="button"
-                tabIndex={messageFocusedTabIndex}
-                className="button-reset-default"
-                onClick={() => {
-                  setSelected(emojiUrl);
-                  handleReactionClick(emoji);
-                }}
-                onKeyDown={event => {
-                  // is last reaction then on tab key press it should hide the reaction menu
-                  if (index === reactionsList.length - 1) {
-                    if (!event.shiftKey && isTabKey(event)) {
-                      onLastReactionKeyEvent();
-                    }
-                  }
-                }}
-              >
-                <EmojiImg emojiUrl={emojiUrl} emojiName={emojiName} />
-                <span css={messageReactionCount(isActive)}>{emojiCount}</span>
-              </button>
-            </Tooltip>
-          </Fragment>
+          <EmojiPill
+            emojiCount={users.length}
+            emojiUnicode={emojiUnicode}
+            emoji={emoji}
+            index={index}
+            emojiListCount={emojiListCount}
+            {...props}
+            key={emojiUnicode}
+          />
         );
       })}
     </div>

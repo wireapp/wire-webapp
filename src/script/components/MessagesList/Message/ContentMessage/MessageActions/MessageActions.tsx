@@ -17,16 +17,17 @@
  *
  */
 
-import {FC, useState, useCallback, useRef} from 'react';
+import {FC, useCallback, useRef, useState} from 'react';
 
 import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
+import {useClickOutside} from 'src/script/hooks/useClickOutside';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/ContextMenu';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {isEscapeKey, isTabKey, KEY} from 'Util/KeyboardUtil';
+import {isTabKey, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {setContextMenuPosition} from 'Util/util';
 
@@ -61,6 +62,7 @@ export interface MessageActionsMenuProps {
   messageWithSection: boolean;
   handleReactionClick: (emoji: string) => void;
   reactionsTotalCount: number;
+  isRemovedFromConversation: boolean;
 }
 
 const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
@@ -72,6 +74,7 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
   messageWithSection,
   handleReactionClick,
   reactionsTotalCount,
+  isRemovedFromConversation,
 }) => {
   const {entries: menuEntries} = useKoSubscribableChildren(contextMenu, ['entries']);
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
@@ -90,27 +93,29 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
     if (isTabKey(event)) {
       setCurrentMsgAction('');
     }
-    // on escape from any of the message actions menu item, it should close the action menu
-    // and focus on message input bar
-    if (isEscapeKey(event)) {
-      resetActionMenuStates();
-    }
   }, []);
 
   const handleContextKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLButtonElement>) => {
+      const selectedMsgActionName = event.currentTarget.dataset.uieName;
       if ([KEY.SPACE, KEY.ENTER].includes(event.key)) {
-        const newEvent = setContextMenuPosition(event);
-        showContextMenu(newEvent, menuEntries, 'message-options-menu', resetActionMenuStates);
+        if (selectedMsgActionName) {
+          setCurrentMsgAction(selectedMsgActionName);
+          handleMenuOpen(true);
+          const newEvent = setContextMenuPosition(event);
+          showContextMenu(newEvent, menuEntries, 'message-options-menu');
+        }
       } else if (!event.shiftKey && isTabKey(event) && !reactionsTotalCount) {
         // if there's no reaction then on tab from context menu hide the message actions menu
         setCurrentMsgAction('');
         handleActionMenuVisibility(false);
-      } else if (isEscapeKey(event)) {
-        resetActionMenuStates();
+        handleMenuOpen(false);
+      } else if (isTabKey(event)) {
+        // shift+tab/tab will remove the focus from the menu button
+        setCurrentMsgAction('');
       }
     },
-    [handleActionMenuVisibility, menuEntries, reactionsTotalCount, resetActionMenuStates],
+    [handleActionMenuVisibility, menuEntries, reactionsTotalCount],
   );
 
   const handleContextMenuClick = useCallback(
@@ -126,7 +131,7 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
         showContextMenu(event, menuEntries, 'message-options-menu', resetActionMenuStates);
       }
     },
-    [resetActionMenuStates, currentMsgActionName, handleMenuOpen, menuEntries],
+    [currentMsgActionName, handleMenuOpen, menuEntries],
   );
 
   const toggleActiveMenu = useCallback(
@@ -151,8 +156,11 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
     [message, toggleActiveMenu],
   );
 
-  const isMsgReactable = message.isReactable();
-
+  const isMsgReactable = message.isReactable() && !isRemovedFromConversation;
+  // clicking anywhere else other than the message action menu removes action menu active state
+  useClickOutside(wrapperRef, () => {
+    setCurrentMsgAction('');
+  });
   return (
     <div css={{...messageBodyActions, ...mesageReactionTop}} ref={wrapperRef}>
       <div

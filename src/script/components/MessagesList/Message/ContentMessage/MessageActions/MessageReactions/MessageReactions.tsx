@@ -24,6 +24,7 @@ import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {EmojiImg} from './EmojiImg';
+import {reactionImgSize} from './EmojiImg.styles';
 import {EmojiPickerContainer} from './EmojiPicker';
 import {actionMenuEmojiSize} from './MessageReactions.styles';
 
@@ -68,21 +69,15 @@ const MessageReactions: FC<MessageReactionsProps> = ({
   const [clientY, setPOSY] = useState(INITIAL_CLIENT_Y_POS);
   const emojiButtonRef = useRef<HTMLButtonElement>(null);
 
-  const closeEmojiPicker = () => {
+  const handleEmojiSelectionWithKeyboard = () => {
     if (showEmojis) {
       handleMenuOpen(false);
       setShowEmojis(false);
     }
-  };
-
-  useEffect(() => {
-    // after emoji selection/esc key press, close the picker and retain the focus on the emoji button
-    if (!showEmojis && currentMsgActionName === MessageActionsId.EMOJI) {
-      if (emojiButtonRef.current) {
-        emojiButtonRef.current.focus();
-      }
+    if (emojiButtonRef.current) {
+      emojiButtonRef.current.focus();
     }
-  }, [currentMsgActionName, showEmojis]);
+  };
 
   const handleOutsideClick = () => {
     resetActionMenuStates();
@@ -107,6 +102,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
 
   const handleEmojiBtnClick = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.stopPropagation();
       const selectedMsgActionName = event.currentTarget.dataset.uieName;
       if (currentMsgActionName === selectedMsgActionName) {
         // reset on double click
@@ -121,6 +117,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
 
   const handleEmojiKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLButtonElement>) => {
+      event.stopPropagation();
       const selectedMsgActionName = event.currentTarget.dataset.uieName;
       handleKeyDown(event);
       if ([KEY.SPACE, KEY.ENTER].includes(event.key)) {
@@ -143,6 +140,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
 
   const handleMsgActionClick = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.stopPropagation();
       const actionType = event.currentTarget.dataset.uieName;
       switch (actionType) {
         case MessageActionsId.EMOJI:
@@ -163,6 +161,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
 
   const handleMsgActionKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLButtonElement>) => {
+      event.stopPropagation();
       const actionType = event.currentTarget.dataset.uieName;
       switch (actionType) {
         case MessageActionsId.EMOJI:
@@ -235,7 +234,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
         onKeyDown={handleMsgActionKeyDown}
         ref={emojiButtonRef}
       >
-        <svg width="23" height="23" viewBox="0 0 23 23" fill="none">
+        <svg css={reactionImgSize} viewBox="0 0 23 23" fill="none">
           <path
             fillRule="evenodd"
             clipRule="evenodd"
@@ -256,7 +255,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
         <EmojiPickerContainer
           posX={clientX}
           posY={clientY}
-          onClose={closeEmojiPicker}
+          onKeyPress={handleEmojiSelectionWithKeyboard}
           resetActionMenuStates={handleOutsideClick}
           wrapperRef={wrapperRef}
           handleReactionClick={handleReactionClick}
