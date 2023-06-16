@@ -69,8 +69,16 @@ const EmojiPill: FC<EmojiPillProps> = ({
   const emojiUrl = getEmojiUrl(emojiUnicode);
   const emojiName = getEmojiTitleFromEmojiUnicode(emojiUnicode);
   const isActive = isSelectedEmoji === emojiUrl && !isRemovedFromConversation;
+
+  const showTooltip = () => {
+    setTooltipVisibility(true);
+  };
+
+  const hideTooltip = () => {
+    setTooltipVisibility(false);
+  };
   return (
-    <>
+    <div onMouseEnter={showTooltip} onMouseLeave={hideTooltip} onFocus={showTooltip} onBlur={hideTooltip}>
       <Tooltip
         body={
           <div css={messageReactionButtonTooltip}>
@@ -114,24 +122,12 @@ const EmojiPill: FC<EmojiPillProps> = ({
               }
             }
           }}
-          onMouseEnter={() => {
-            setTooltipVisibility(true);
-          }}
-          onMouseLeave={() => {
-            setTooltipVisibility(false);
-          }}
-          onFocus={() => {
-            setTooltipVisibility(true);
-          }}
-          onBlur={() => {
-            setTooltipVisibility(false);
-          }}
         >
           <EmojiImg emojiUrl={emojiUrl} emojiName={emojiName} />
           <span css={messageReactionCount(isActive)}>{emojiCount}</span>
         </button>
       </Tooltip>
-    </>
+    </div>
   );
 };
 

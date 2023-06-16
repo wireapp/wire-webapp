@@ -44,16 +44,15 @@ const MessageReactionsList: FC<MessageReactionsListProps> = ({reactions, ...prop
         const emojiListCount = reactionsList.length;
 
         return (
-          <div key={emojiUnicode}>
-            <EmojiPill
-              emojiCount={users.length}
-              emojiUnicode={emojiUnicode}
-              emoji={emoji}
-              index={index}
-              emojiListCount={emojiListCount}
-              {...props}
-            />
-          </div>
+          <EmojiPill
+            emojiCount={users.length}
+            emojiUnicode={emojiUnicode}
+            emoji={emoji}
+            index={index}
+            emojiListCount={emojiListCount}
+            {...props}
+            key={emojiUnicode}
+          />
         );
       })}
     </div>
