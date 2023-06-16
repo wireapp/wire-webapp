@@ -114,10 +114,10 @@ const EmojiPill: FC<EmojiPillProps> = ({
               }
             }
           }}
-          onMouseEnter={event => {
+          onMouseEnter={() => {
             setTooltipVisibility(true);
           }}
-          onMouseLeave={event => {
+          onMouseLeave={() => {
             setTooltipVisibility(false);
           }}
           onFocus={() => {
