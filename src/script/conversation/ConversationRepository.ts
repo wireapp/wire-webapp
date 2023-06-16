@@ -351,7 +351,7 @@ export class ConversationRepository {
         conversationEntity.is_cleared() &&
         conversationEntity.removed_from_conversation()
       ) {
-        this.conversationService.deleteConversationFromDb(conversationEntity);
+        this.conversationService.deleteConversationFromDb(conversationEntity.id);
         this.deleteConversationFromRepository(conversationEntity);
       }
     });
@@ -949,7 +949,7 @@ export class ConversationRepository {
       this.conversationLabelRepository.saveLabels();
     }
     this.deleteConversationFromRepository(conversationId);
-    await this.conversationService.deleteConversationFromDb(conversationId);
+    await this.conversationService.deleteConversationFromDb(conversationId.id);
     if (conversationEntity.protocol === ConversationProtocol.MLS) {
       const {groupId} = conversationEntity;
       if (groupId) {
@@ -1896,7 +1896,7 @@ export class ConversationRepository {
     this.deleteMessages(conversationEntity, timestamp);
 
     if (conversationEntity.removed_from_conversation()) {
-      this.conversationService.deleteConversationFromDb(conversationEntity);
+      this.conversationService.deleteConversationFromDb(conversationEntity.id);
       this.deleteConversationFromRepository(conversationEntity);
     }
   }
