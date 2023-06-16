@@ -16,7 +16,9 @@ exports[`<Tooltip /> renders correctly 1`] = `
   width: fit-content;
 }
 
-.emotion-1:hover .tooltip-content {
+.emotion-1:hover .tooltip-content,
+.emotion-1:focus-within .tooltip-content,
+.emotion-1 {
   visibility: visible;
   opacity: 1;
 }
@@ -184,7 +186,9 @@ exports[`<Tooltip /> renders correctly 1`] = `
   width: fit-content;
 }
 
-.emotion-1:hover .tooltip-content {
+.emotion-1:hover .tooltip-content,
+.emotion-1:focus-within .tooltip-content,
+.emotion-1 {
   visibility: visible;
   opacity: 1;
 }
