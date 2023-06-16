@@ -296,8 +296,7 @@ export class ConversationService {
    * @returns Resolves when the entity was deleted
    */
   async deleteConversationFromDb(conversationId: string): Promise<string> {
-    const primaryKey = await this.storageService.delete(StorageSchemata.OBJECT_STORE.CONVERSATIONS, conversationId);
-    return primaryKey;
+    return this.storageService.delete(StorageSchemata.OBJECT_STORE.CONVERSATIONS, conversationId);
   }
 
   loadConversation<T>(conversationId: string): Promise<T | undefined> {
