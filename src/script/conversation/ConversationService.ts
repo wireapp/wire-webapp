@@ -295,9 +295,8 @@ export class ConversationService {
    * Deletes a conversation entity from the local database.
    * @returns Resolves when the entity was deleted
    */
-  async deleteConversationFromDb({id, domain}: QualifiedId): Promise<string> {
-    const key = domain ? `${id}@${domain}` : id;
-    const primaryKey = await this.storageService.delete(StorageSchemata.OBJECT_STORE.CONVERSATIONS, key);
+  async deleteConversationFromDb(conversationId: string): Promise<string> {
+    const primaryKey = await this.storageService.delete(StorageSchemata.OBJECT_STORE.CONVERSATIONS, conversationId);
     return primaryKey;
   }
 
