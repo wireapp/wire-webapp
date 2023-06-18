@@ -6183,19 +6183,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/copy-config@npm:2.1.0":
-  version: 2.1.0
-  resolution: "@wireapp/copy-config@npm:2.1.0"
+"@wireapp/copy-config@npm:2.1.1":
+  version: 2.1.1
+  resolution: "@wireapp/copy-config@npm:2.1.1"
   dependencies:
     axios: 1.4.0
     copy: 0.3.2
-    cosmiconfig: 8.1.3
+    cosmiconfig: 8.2.0
     fs-extra: 11.1.0
     jszip: 3.10.1
     logdown: 3.3.1
   bin:
     copy-config: lib/cli.js
-  checksum: 13e35a2041f705dd3cab3f4c101209f0d5a8f6096a35bfb39dec3dd5974a148ca8e087518d32657ebd537eba7ce8bbbadc1f9ce01d5faa8f351e941495b7fde3
+  checksum: 2af760dafb3597deb071c0332e0f1d5938ad00b6a599c23ac053f5cc8cceb94797c3e6f947242436b9129413c1a37d6fff00bd527e44cb77d9ebe19f4c82d847
   languageName: node
   linkType: hard
 
@@ -8138,15 +8138,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cosmiconfig@npm:8.1.3, cosmiconfig@npm:^8.1.3":
-  version: 8.1.3
-  resolution: "cosmiconfig@npm:8.1.3"
+"cosmiconfig@npm:8.2.0":
+  version: 8.2.0
+  resolution: "cosmiconfig@npm:8.2.0"
   dependencies:
     import-fresh: ^3.2.1
     js-yaml: ^4.1.0
     parse-json: ^5.0.0
     path-type: ^4.0.0
-  checksum: b3d277bc3a8a9e649bf4c3fc9740f4c52bf07387481302aa79839f595045368903bf26ea24a8f7f7b8b180bf46037b027c5cb63b1391ab099f3f78814a147b2b
+  checksum: 836d5d8efa750f3fb17b03d6ca74cd3154ed025dffd045304b3ef59637f662bde1e5dc88f8830080d180ec60841719cf4ea2ce73fb21ec694b16865c478ff297
   languageName: node
   linkType: hard
 
@@ -8160,6 +8160,18 @@ __metadata:
     path-type: ^4.0.0
     yaml: ^1.10.0
   checksum: c53bf7befc1591b2651a22414a5e786cd5f2eeaa87f3678a3d49d6069835a9d8d1aef223728e98aa8fec9a95bf831120d245096db12abe019fecb51f5696c96f
+  languageName: node
+  linkType: hard
+
+"cosmiconfig@npm:^8.1.3":
+  version: 8.1.3
+  resolution: "cosmiconfig@npm:8.1.3"
+  dependencies:
+    import-fresh: ^3.2.1
+    js-yaml: ^4.1.0
+    parse-json: ^5.0.0
+    path-type: ^4.0.0
+  checksum: b3d277bc3a8a9e649bf4c3fc9740f4c52bf07387481302aa79839f595045368903bf26ea24a8f7f7b8b180bf46037b027c5cb63b1391ab099f3f78814a147b2b
   languageName: node
   linkType: hard
 
@@ -19055,7 +19067,7 @@ dexie@latest:
     "@typescript-eslint/eslint-plugin": ^5.59.9
     "@typescript-eslint/parser": ^5.59.11
     "@wireapp/avs": 9.2.15
-    "@wireapp/copy-config": 2.1.0
+    "@wireapp/copy-config": 2.1.1
     "@wireapp/core": 40.5.1
     "@wireapp/eslint-config": 2.2.2
     "@wireapp/lru-cache": 3.8.1
