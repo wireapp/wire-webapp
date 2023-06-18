@@ -15985,9 +15985,9 @@ dexie@latest:
   languageName: node
   linkType: hard
 
-"react-redux@npm:8.0.7":
-  version: 8.0.7
-  resolution: "react-redux@npm:8.0.7"
+"react-redux@npm:8.1.0":
+  version: 8.1.0
+  resolution: "react-redux@npm:8.1.0"
   dependencies:
     "@babel/runtime": ^7.12.1
     "@types/hoist-non-react-statics": ^3.3.1
@@ -16016,7 +16016,7 @@ dexie@latest:
       optional: true
     redux:
       optional: true
-  checksum: d903aa79b12154258fd76b8e61fcf56f72123f69c31033b262805646371e23822cd0cd11d24194cda1e03569a7b1bf86e935cd57a9bab4523186804ed2742fac
+  checksum: a6b9a07b056677b75596f3eeb56816c1cd611fc52e09ff03e9538cd050223c4f0187f9572b703c1b1d648ad115c5753894f8c709d0f58278e5652026963bf9d6
   languageName: node
   linkType: hard
 
@@ -19150,7 +19150,7 @@ dexie@latest:
     react-dom: 18.2.0
     react-error-boundary: 4.0.10
     react-intl: 6.4.3
-    react-redux: 8.0.7
+    react-redux: 8.1.0
     react-router: 6.12.1
     react-router-dom: 6.13.0
     react-transition-group: 4.4.5
