@@ -3291,9 +3291,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@csstools/postcss-relative-color-syntax@npm:^1.0.1":
-  version: 1.0.1
-  resolution: "@csstools/postcss-relative-color-syntax@npm:1.0.1"
+"@csstools/postcss-relative-color-syntax@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "@csstools/postcss-relative-color-syntax@npm:1.0.2"
   dependencies:
     "@csstools/css-color-parser": ^1.2.0
     "@csstools/css-parser-algorithms": ^2.1.1
@@ -3301,7 +3301,7 @@ __metadata:
     "@csstools/postcss-progressive-custom-properties": ^2.3.0
   peerDependencies:
     postcss: ^8.4
-  checksum: 1065676c62801735443d1db015bae9b2b1d8450e4ea0b82a75931e9e34ff2b4a35b1cb864dcfdbf1b3c72d38b485c0127ee98090e4f6f87125d5d21e4ee47012
+  checksum: 2c921094a959384553bab26d7d9feb87a5ee6b2b5f29b447572d1b471433dd5829102fb79a2fb0b0d585deaa050063fbdc43bacbaea1118197b3f7496a13a835
   languageName: node
   linkType: hard
 
@@ -15249,15 +15249,15 @@ dexie@latest:
   languageName: node
   linkType: hard
 
-"postcss-nesting@npm:^11.2.1":
-  version: 11.2.2
-  resolution: "postcss-nesting@npm:11.2.2"
+"postcss-nesting@npm:^11.3.0":
+  version: 11.3.0
+  resolution: "postcss-nesting@npm:11.3.0"
   dependencies:
     "@csstools/selector-specificity": ^2.0.0
     postcss-selector-parser: ^6.0.10
   peerDependencies:
     postcss: ^8.4
-  checksum: 84149edbfe9b0adf069b7ddf06d21fc7a543e7f44b97c3975d8b1f088dddc20853689cb859d5be06000cca83bdc56929b13581bfdaf1971cfafa492add867831
+  checksum: bc8f59e8114f21ec3fcbd0661072f3e706f25dc5300a925863485a0ab82950c48b75c1fed9548acddc924fa479ab7277b55fcdcc33eb0fe1742b389683479384
   languageName: node
   linkType: hard
 
@@ -15412,9 +15412,9 @@ dexie@latest:
   languageName: node
   linkType: hard
 
-"postcss-preset-env@npm:^8.4.2":
-  version: 8.4.2
-  resolution: "postcss-preset-env@npm:8.4.2"
+"postcss-preset-env@npm:^8.5.0":
+  version: 8.5.0
+  resolution: "postcss-preset-env@npm:8.5.0"
   dependencies:
     "@csstools/postcss-cascade-layers": ^3.0.1
     "@csstools/postcss-color-function": ^2.2.3
@@ -15433,7 +15433,7 @@ dexie@latest:
     "@csstools/postcss-normalize-display-values": ^2.0.1
     "@csstools/postcss-oklab-function": ^2.2.3
     "@csstools/postcss-progressive-custom-properties": ^2.3.0
-    "@csstools/postcss-relative-color-syntax": ^1.0.1
+    "@csstools/postcss-relative-color-syntax": ^1.0.2
     "@csstools/postcss-scope-pseudo-class": ^2.0.2
     "@csstools/postcss-stepped-value-functions": ^2.1.1
     "@csstools/postcss-text-decoration-shorthand": ^2.2.4
@@ -15463,7 +15463,7 @@ dexie@latest:
     postcss-initial: ^4.0.1
     postcss-lab-function: ^5.2.3
     postcss-logical: ^6.2.0
-    postcss-nesting: ^11.2.1
+    postcss-nesting: ^11.3.0
     postcss-opacity-percentage: ^2.0.0
     postcss-overflow-shorthand: ^4.0.1
     postcss-page-break: ^3.0.4
@@ -15474,7 +15474,7 @@ dexie@latest:
     postcss-value-parser: ^4.2.0
   peerDependencies:
     postcss: ^8.4
-  checksum: 16b6833964a05c0440c2070228554460a1761228090c59e5c51c542d7b8f162cd55d42cbc74324c269f9cc64119ab7b17f740b75c6fd06ef1fd1a1413451de81
+  checksum: 29e285c16580aecc5b584f82e3990b6161d3984e0b7eeb134107e80b59cad4282359c67aef02099a30496b21c10fa0be2c92e396ac0b9ff05fc4774ee86a10e9
   languageName: node
   linkType: hard
 
@@ -19142,7 +19142,7 @@ dexie@latest:
     postcss-import: ^15.1.0
     postcss-less: 6.0.0
     postcss-loader: ^7.3.2
-    postcss-preset-env: ^8.4.2
+    postcss-preset-env: ^8.5.0
     postcss-scss: 4.0.6
     prettier: ^2.8.8
     raf: 3.4.1
