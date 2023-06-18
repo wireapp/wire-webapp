@@ -6138,9 +6138,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^24.15.4":
-  version: 24.15.4
-  resolution: "@wireapp/api-client@npm:24.15.4"
+"@wireapp/api-client@npm:^24.15.5":
+  version: 24.15.5
+  resolution: "@wireapp/api-client@npm:24.15.5"
   dependencies:
     "@wireapp/commons": ^5.1.0
     "@wireapp/priority-queue": ^2.1.1
@@ -6151,9 +6151,9 @@ __metadata:
     logdown: 3.3.1
     reconnecting-websocket: 4.4.0
     spark-md5: 3.0.2
-    tough-cookie: 4.1.2
+    tough-cookie: 4.1.3
     ws: 8.11.0
-  checksum: 2689634c012cba0e68f2cc67226a32ac3f5e59e1d99ed8877642fc9fc60b01f9ecacae0e333f7ba4975c70fe2b3925eeedd2f1c2743b209234ad1ac6fc275f58
+  checksum: 525aced6e2f8f4d7ebf4fb3baed3be29ff4ee928e513248362b46d4a093a79b08a3b7661cd485248fa80305acb2299742daf79b99195ef09cf8eae1fa7e2d2fd
   languageName: node
   linkType: hard
 
@@ -6206,11 +6206,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:40.5.1":
-  version: 40.5.1
-  resolution: "@wireapp/core@npm:40.5.1"
+"@wireapp/core@npm:40.5.2":
+  version: 40.5.2
+  resolution: "@wireapp/core@npm:40.5.2"
   dependencies:
-    "@wireapp/api-client": ^24.15.4
+    "@wireapp/api-client": ^24.15.5
     "@wireapp/commons": ^5.1.0
     "@wireapp/core-crypto": 0.11.0
     "@wireapp/cryptobox": 12.8.0
@@ -6227,7 +6227,7 @@ __metadata:
     logdown: 3.3.1
     long: ^5.2.0
     uuidjs: 4.2.13
-  checksum: b360d94a6312f4d1ed5d72959da8d699f772f2ec0c87300c246130e42c6234f1724cceee60541bd41f54b6968720774e4a291f0a0089fb5cb95d7cd61937cb1f
+  checksum: f7e0cb030d2d1faf1f08848059252b252681ad80f2fbcd1404c02e70cad2c49617c60b3bd96f80dfc3540dd1c1758a470b38224d864a7aad2c97f516ef15d3c7
   languageName: node
   linkType: hard
 
@@ -17977,7 +17977,19 @@ dexie@latest:
   languageName: node
   linkType: hard
 
-"tough-cookie@npm:4.1.2, tough-cookie@npm:^4.0.0":
+"tough-cookie@npm:4.1.3":
+  version: 4.1.3
+  resolution: "tough-cookie@npm:4.1.3"
+  dependencies:
+    psl: ^1.1.33
+    punycode: ^2.1.1
+    universalify: ^0.2.0
+    url-parse: ^1.5.3
+  checksum: c9226afff36492a52118432611af083d1d8493a53ff41ec4ea48e5b583aec744b989e4280bcf476c910ec1525a89a4a0f1cae81c08b18fb2ec3a9b3a72b91dcc
+  languageName: node
+  linkType: hard
+
+"tough-cookie@npm:^4.0.0":
   version: 4.1.2
   resolution: "tough-cookie@npm:4.1.2"
   dependencies:
@@ -19037,7 +19049,7 @@ dexie@latest:
     "@typescript-eslint/parser": ^5.59.11
     "@wireapp/avs": 9.2.15
     "@wireapp/copy-config": 2.1.1
-    "@wireapp/core": 40.5.1
+    "@wireapp/core": 40.5.2
     "@wireapp/eslint-config": 2.2.2
     "@wireapp/lru-cache": 3.8.1
     "@wireapp/prettier-config": 0.6.0
