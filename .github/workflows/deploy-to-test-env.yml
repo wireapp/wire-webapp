@@ -14,7 +14,6 @@ on:
           - wire-webapp-edge-al2
           - wire-webapp-prod-al2
           - wire-webapp-master-al2
-          - wire-webapp-avs-al2
           - wire-webapp-mls-al2
 
 concurrency:
