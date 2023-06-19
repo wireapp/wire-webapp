@@ -114,6 +114,7 @@ export class UserMapper {
       picture,
       service,
       team: teamId,
+      supported_protocols: supportedProtocols,
     } = userData;
 
     if (accentId) {
@@ -139,6 +140,10 @@ export class UserMapper {
 
     if (managedBy) {
       userEntity.managedBy(managedBy);
+    }
+
+    if (supportedProtocols) {
+      userEntity.supportedProtocols(supportedProtocols);
     }
 
     if (expirationDate) {
