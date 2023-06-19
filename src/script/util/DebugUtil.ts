@@ -45,6 +45,7 @@ import {ClientRepository} from '../client';
 import {ClientState} from '../client/ClientState';
 import {ConnectionRepository} from '../connection/ConnectionRepository';
 import {ConversationRepository} from '../conversation/ConversationRepository';
+import {isMLSCapableConversation} from '../conversation/ConversationSelectors';
 import {ConversationState} from '../conversation/ConversationState';
 import type {MessageRepository} from '../conversation/MessageRepository';
 import {Conversation} from '../entity/Conversation';
@@ -102,7 +103,39 @@ export class DebugUtil {
   }
 
   /** will print all the ids of entities that show on screen (userIds, conversationIds, messageIds) */
-  toggleDebugUi(): void {
+  toggleDebugUi = (): void => {
+    const logMLSInfo = async (event: Event) => {
+      const eventTarget = event.currentTarget;
+      if (!(eventTarget instanceof HTMLDivElement)) {
+        return;
+      }
+      const value = eventTarget.innerText;
+      const localConversation = this.conversationState.conversations().find(({id}) => id === value);
+
+      if (!localConversation || !isMLSCapableConversation(localConversation)) {
+        return;
+      }
+
+      const {id, groupId, domain} = localConversation;
+      const remoteConversation = await this.core.service?.conversation.getConversation({id, domain});
+      const epochCC = await this.core.service?.mls?.getEpoch(groupId);
+      const membersCC = (await this.core.service?.mls?.getClientIds(groupId))?.reduce<Record<string, string[]>>(
+        (acc, curr) => {
+          acc[curr.userId] = acc[curr.userId] ? [...acc[curr.userId], curr.clientId] : [curr.clientId];
+          return acc;
+        },
+        {},
+      );
+
+      this.logger.info({
+        id,
+        groupId,
+        epochCC: Number(epochCC),
+        epochRemote: remoteConversation?.epoch,
+        membersCC,
+      });
+    };
+
     const removeDebugInfo = (els: NodeListOf<HTMLElement>) => els.forEach(el => el.parentNode?.removeChild(el));
 
     const addDebugInfo = (els: NodeListOf<HTMLElement>) =>
@@ -114,6 +147,13 @@ export class DebugUtil {
           debugInfo.textContent = value;
           el.appendChild(debugInfo);
         }
+
+        const isConversation = el.dataset.uieName === 'item-conversation';
+
+        if (!isConversation) {
+          return;
+        }
+        debugInfo.addEventListener('click', logMLSInfo);
       });
 
     const debugInfos = document.querySelectorAll<HTMLElement>('.debug-info');
@@ -127,7 +167,7 @@ export class DebugUtil {
       );
       addDebugInfo(debugElements);
     }
-  }
+  };
 
   breakLastNotificationId() {
     return this.storageRepository.storageService.update(
