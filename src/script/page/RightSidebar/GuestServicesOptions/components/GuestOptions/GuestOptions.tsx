@@ -223,7 +223,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
   };
 
   const createLink = async () => {
-    if (optionPasswordSecured) {
+    if (optionPasswordSecured === PasswordPreference.PASSWORD_SECURED) {
       await createGuestLinkWithPassword();
       return;
     }
