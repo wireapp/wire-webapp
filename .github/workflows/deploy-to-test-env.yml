@@ -9,11 +9,7 @@ on:
         type: choice
         options:
           - wire-webapp-qa-al2-migration
-          - wire-webapp-staging-al2
-          - wire-webapp-dev-al2
           - wire-webapp-edge-al2
-          - wire-webapp-prod-al2
-          - wire-webapp-master-al2
           - wire-webapp-mls-al2
 
 concurrency:
