@@ -47,6 +47,7 @@ import {CompositeMessage} from '../entity/message/CompositeMessage';
 import {ContentMessage} from '../entity/message/ContentMessage';
 import {DecryptErrorMessage} from '../entity/message/DecryptErrorMessage';
 import {DeleteMessage} from '../entity/message/DeleteMessage';
+import {FailedToAddUsersMessage} from '../entity/message/FailedToAddUsersMessage';
 import {FileAsset} from '../entity/message/FileAsset';
 import {FileTypeRestrictedMessage} from '../entity/message/FileTypeRestrictedMessage';
 import {LegalHoldMessage} from '../entity/message/LegalHoldMessage';
@@ -289,6 +290,11 @@ export class EventMapper {
         break;
       }
 
+      case ClientEvent.CONVERSATION.FAILED_TO_ADD_USERS: {
+        messageEntity = this._mapEventFailedToAddUsers(event);
+        break;
+      }
+
       case ClientEvent.CONVERSATION.LEGAL_HOLD_UPDATE: {
         messageEntity = this._mapEventLegalHoldUpdate(event);
         break;
@@ -475,6 +481,10 @@ export class EventMapper {
 
   _mapEventCallingTimeout({data, time}: LegacyEventRecord) {
     return new CallingTimeoutMessage(data.reason, parseInt(time, 10));
+  }
+
+  _mapEventFailedToAddUsers({data, time}: LegacyEventRecord) {
+    return new FailedToAddUsersMessage(data.qualifiedIds, parseInt(time, 10));
   }
 
   _mapEventLegalHoldUpdate({data, timestamp}: LegacyEventRecord) {

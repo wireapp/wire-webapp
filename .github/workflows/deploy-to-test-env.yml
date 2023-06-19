@@ -10,6 +10,7 @@ on:
         options:
           - wire-webapp-qa
           - wire-webapp-edge
+          - wire-webapp-mls
 
 concurrency:
   group: ci-${{ github.ref }}

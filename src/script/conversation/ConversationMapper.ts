@@ -296,7 +296,7 @@ export class ConversationMapper {
     return conversationEntity;
   }
 
-  static mergeConversation(
+  static mergeConversations(
     localConversations: ConversationDatabaseData[],
     remoteConversations: RemoteConversations,
   ): ConversationDatabaseData[] {
@@ -326,121 +326,135 @@ export class ConversationMapper {
           localConversations.find(conversationId => matchQualifiedIds(conversationId, remoteConversationId)) ||
           (remoteConversationId as ConversationDatabaseData);
 
-        const {
-          access,
-          access_role,
-          access_role_v2,
-          creator,
-          members,
-          message_timer,
-          qualified_id,
-          receipt_mode,
-          name,
-          team,
-          type,
-          group_id,
-          epoch,
-          cipher_suite,
-          protocol,
-        } = remoteConversationData;
-        const {others: othersStates, self: selfState} = members;
-
-        const updates: Partial<ConversationDatabaseData> = {
-          accessModes: access,
-          accessRole: access_role,
-          accessRoleV2: access_role_v2,
-          cipher_suite,
-          creator,
-          domain: qualified_id?.domain,
-          group_id,
-          message_timer,
-          name,
-          protocol,
-          receipt_mode,
-          roles: {},
-          status: (selfState as any).status,
-          team_id: team,
-          type,
-        };
-
-        const qualified_others = othersStates
-          ?.filter(other => !!other.qualified_id)
-          .map(({qualified_id}) => qualified_id);
-
-        if (qualified_others.length) {
-          updates.qualified_others = qualified_others;
-        }
-
-        if (typeof epoch === 'number') {
-          updates.epoch = epoch;
-        }
-
-        // Add roles for self
-        if (selfState.conversation_role && !(selfState.id in updates.roles)) {
-          updates.roles[selfState.id] = selfState.conversation_role;
-        }
-
-        // Add roles for others
-        othersStates.map(other => {
-          if (other.conversation_role && !(other.conversation_role in updates.roles)) {
-            updates.roles[other.id] = other.conversation_role;
-          }
-        });
-
-        if (typeof localConversationData.receipt_mode === 'number') {
-          updates.receipt_mode = localConversationData.receipt_mode;
-        }
-
-        const mergedConversation: ConversationDatabaseData = {...localConversationData, ...updates};
-
-        const isGroup = type === CONVERSATION_TYPE.REGULAR;
-        const noOthers = !mergedConversation.others || !mergedConversation.others.length;
-        if (isGroup || noOthers) {
-          mergedConversation.others = othersStates
-            .filter(otherState => (otherState.status as number) === (ConversationStatus.CURRENT_MEMBER as number))
-            .map(otherState => otherState.id);
-        }
-
-        // This should ensure a proper order
-        if (!mergedConversation.last_event_timestamp) {
-          mergedConversation.last_event_timestamp = index + 1;
-        }
-
-        // Set initially or correct server timestamp
-        const wrongServerTimestamp = mergedConversation.last_server_timestamp < mergedConversation.last_event_timestamp;
-        if (!mergedConversation.last_server_timestamp || wrongServerTimestamp) {
-          mergedConversation.last_server_timestamp = mergedConversation.last_event_timestamp;
-        }
-
-        const isRemoteTimestampNewer = (localTimestamp: number | undefined, remoteTimestamp: number): boolean => {
-          return localTimestamp !== undefined && remoteTimestamp > localTimestamp;
-        };
-
-        // Some archived timestamp were not properly stored in the database.
-        // To fix this we check if the remote one is newer and update our local timestamp.
-        const {archived_state: archivedState, archived_timestamp: archivedTimestamp} = localConversationData;
-        const remoteArchivedTimestamp = new Date(selfState.otr_archived_ref).getTime();
-        const isRemoteArchivedTimestampNewer = isRemoteTimestampNewer(archivedTimestamp, remoteArchivedTimestamp);
-
-        if (isRemoteArchivedTimestampNewer || archivedState === undefined) {
-          mergedConversation.archived_state = selfState.otr_archived;
-          mergedConversation.archived_timestamp = remoteArchivedTimestamp;
-        }
-
-        const {muted_state: mutedState, muted_timestamp: mutedTimestamp} = localConversationData;
-        const remoteMutedTimestamp = new Date(selfState.otr_muted_ref).getTime();
-        const isRemoteMutedTimestampNewer = isRemoteTimestampNewer(mutedTimestamp, remoteMutedTimestamp);
-
-        if (isRemoteMutedTimestampNewer || mutedState === undefined) {
-          const remoteMutedState = selfState.otr_muted_status;
-          mergedConversation.muted_state = remoteMutedState;
-          mergedConversation.muted_timestamp = remoteMutedTimestamp;
-        }
-
-        return mergedConversation;
+        return this.mergeSingleConversation(localConversationData, remoteConversationData, index);
       },
     );
     return [...foundRemoteConversations, ...failedConversations, ...localArchives];
+  }
+
+  /**
+   * Merge a remote conversation payload with a locally stored conversation
+   *
+   * @param localConversationData Local conversation data from the store
+   * @param remoteConversationData Remote conversation data from backend
+   * @param lastEventTimestampFallback Fallback timestamp to use if no last event timestamp is available
+   * @returns Merged conversation data in the format of the local store
+   */
+  static mergeSingleConversation(
+    localConversationData: ConversationDatabaseData,
+    remoteConversationData: ConversationBackendData,
+    lastEventTimestampFallback?: number,
+  ): ConversationDatabaseData {
+    const {
+      access,
+      access_role,
+      access_role_v2,
+      creator,
+      members,
+      message_timer,
+      qualified_id,
+      receipt_mode,
+      name,
+      team,
+      type,
+      group_id,
+      epoch,
+      cipher_suite,
+      protocol,
+    } = remoteConversationData;
+    const {others: othersStates, self: selfState} = members;
+
+    const updates: Partial<ConversationDatabaseData> = {
+      accessModes: access,
+      accessRole: access_role,
+      accessRoleV2: access_role_v2,
+      cipher_suite,
+      creator,
+      domain: qualified_id?.domain,
+      group_id,
+      message_timer,
+      name,
+      protocol,
+      receipt_mode,
+      roles: {},
+      status: (selfState as any).status,
+      team_id: team,
+      type,
+    };
+
+    const qualified_others = othersStates?.filter(other => !!other.qualified_id).map(({qualified_id}) => qualified_id);
+
+    if (qualified_others.length) {
+      updates.qualified_others = qualified_others;
+    }
+
+    if (typeof epoch === 'number') {
+      updates.epoch = epoch;
+    }
+
+    // Add roles for self
+    if (selfState.conversation_role && !(selfState.id in updates.roles)) {
+      updates.roles[selfState.id] = selfState.conversation_role;
+    }
+
+    // Add roles for others
+    othersStates.map(other => {
+      if (other.conversation_role && !(other.conversation_role in updates.roles)) {
+        updates.roles[other.id] = other.conversation_role;
+      }
+    });
+
+    if (typeof localConversationData.receipt_mode === 'number') {
+      updates.receipt_mode = localConversationData.receipt_mode;
+    }
+
+    const mergedConversation: ConversationDatabaseData = {...localConversationData, ...updates};
+
+    const isGroup = type === CONVERSATION_TYPE.REGULAR;
+    const noOthers = !mergedConversation.others || !mergedConversation.others.length;
+    if (isGroup || noOthers) {
+      mergedConversation.others = othersStates
+        .filter(otherState => (otherState.status as number) === (ConversationStatus.CURRENT_MEMBER as number))
+        .map(otherState => otherState.id);
+    }
+
+    // This should ensure a proper order
+    if (!mergedConversation.last_event_timestamp && lastEventTimestampFallback !== undefined) {
+      mergedConversation.last_event_timestamp = lastEventTimestampFallback + 1;
+    }
+
+    // Set initially or correct server timestamp
+    const wrongServerTimestamp = mergedConversation.last_server_timestamp < mergedConversation.last_event_timestamp;
+    if (!mergedConversation.last_server_timestamp || wrongServerTimestamp) {
+      mergedConversation.last_server_timestamp = mergedConversation.last_event_timestamp;
+    }
+
+    const isRemoteTimestampNewer = (localTimestamp: number | undefined, remoteTimestamp: number): boolean => {
+      return localTimestamp !== undefined && remoteTimestamp > localTimestamp;
+    };
+
+    // Some archived timestamp were not properly stored in the database.
+    // To fix this we check if the remote one is newer and update our local timestamp.
+    const {archived_state: archivedState, archived_timestamp: archivedTimestamp} = localConversationData;
+    const remoteArchivedTimestamp = new Date(selfState.otr_archived_ref).getTime();
+    const isRemoteArchivedTimestampNewer = isRemoteTimestampNewer(archivedTimestamp, remoteArchivedTimestamp);
+
+    if (isRemoteArchivedTimestampNewer || archivedState === undefined) {
+      mergedConversation.archived_state = selfState.otr_archived;
+      mergedConversation.archived_timestamp = remoteArchivedTimestamp;
+    }
+
+    const {muted_state: mutedState, muted_timestamp: mutedTimestamp} = localConversationData;
+    const remoteMutedTimestamp = new Date(selfState.otr_muted_ref).getTime();
+    const isRemoteMutedTimestampNewer = isRemoteTimestampNewer(mutedTimestamp, remoteMutedTimestamp);
+
+    if (isRemoteMutedTimestampNewer || mutedState === undefined) {
+      const remoteMutedState = selfState.otr_muted_status;
+      mergedConversation.muted_state = remoteMutedState;
+      mergedConversation.muted_timestamp = remoteMutedTimestamp;
+    }
+
+    return mergedConversation;
   }
 
   static mapAccessCode(conversation: Conversation, accessCode: ConversationCode): void {

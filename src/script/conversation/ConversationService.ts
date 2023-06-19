@@ -22,6 +22,7 @@ import type {
   Conversation as BackendConversation,
   ConversationCode,
   CONVERSATION_ACCESS,
+  RemoteConversations,
 } from '@wireapp/api-client/lib/conversation';
 import type {
   ConversationJoinData,
@@ -84,6 +85,14 @@ export class ConversationService {
    */
   getConversationById({id, domain}: QualifiedId): Promise<BackendConversation> {
     return this.apiClient.api.conversation.getConversation({domain, id});
+  }
+
+  /**
+   * Get conversations for a list of conversation IDs.
+   * @see https://staging-nginz-https.zinfra.io/v4/api/swagger-ui/#/default/post_conversations_list
+   */
+  getConversationByIds(conversations: QualifiedId[]): Promise<RemoteConversations> {
+    return this.apiClient.api.conversation.getConversationsByQualifiedIds(conversations);
   }
 
   /**
@@ -286,10 +295,8 @@ export class ConversationService {
    * Deletes a conversation entity from the local database.
    * @returns Resolves when the entity was deleted
    */
-  async deleteConversationFromDb({id, domain}: QualifiedId): Promise<string> {
-    const key = domain ? `${id}@${domain}` : id;
-    const primaryKey = await this.storageService.delete(StorageSchemata.OBJECT_STORE.CONVERSATIONS, key);
-    return primaryKey;
+  async deleteConversationFromDb(conversationId: string): Promise<string> {
+    return this.storageService.delete(StorageSchemata.OBJECT_STORE.CONVERSATIONS, conversationId);
   }
 
   loadConversation<T>(conversationId: string): Promise<T | undefined> {

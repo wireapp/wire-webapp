@@ -64,6 +64,7 @@ export const PrimaryModalComponent: FC = () => {
     closeBtnTitle,
     passwordGenerator,
     copyPassword,
+    hideCloseBtn = false,
   } = content;
 
   const hasPassword = currentType === PrimaryModalType.PASSWORD;
@@ -163,18 +164,22 @@ export const PrimaryModalComponent: FC = () => {
         {isModalVisible && (
           <>
             <div className="modal__header" data-uie-name="status-modal-title">
-              <h2 className="modal__header__title" id="modal-title">
-                {titleText}
-              </h2>
-              <button
-                type="button"
-                className="modal__header__button"
-                onClick={removeCurrentModal}
-                aria-label={closeBtnTitle}
-                data-uie-name="do-close"
-              >
-                <Icon.Close className="modal__header__icon" aria-hidden="true" />
-              </button>
+              {titleText && (
+                <h2 className="modal__header__title" id="modal-title">
+                  {titleText}
+                </h2>
+              )}
+              {!hideCloseBtn && (
+                <button
+                  type="button"
+                  className="modal__header__button"
+                  onClick={removeCurrentModal}
+                  aria-label={closeBtnTitle}
+                  data-uie-name="do-close"
+                >
+                  <Icon.Close className="modal__header__icon" aria-hidden="true" />
+                </button>
+              )}
             </div>
 
             <FadingScrollbar className="modal__body">

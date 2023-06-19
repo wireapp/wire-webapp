@@ -50,7 +50,7 @@ export interface ModalOptions {
   primaryAction?: Action;
   /** Called when secondary action in modal is triggered */
   secondaryAction?: Action[] | Action;
-  showClose?: boolean;
+  hideCloseBtn?: boolean;
   text?: Text;
 }
 
@@ -65,6 +65,7 @@ export enum PrimaryModalType {
   PASSWORD = 'modal-template-password',
   GUEST_LINK_PASSWORD = 'modal-template-guest-link-password',
   SESSION_RESET = 'modal-session-reset',
+  WITHOUT_TITLE = 'modal-without-title',
 }
 
 export interface ModalContent {
@@ -83,6 +84,7 @@ export interface ModalContent {
   primaryAction: Action | null;
   secondaryAction: Action[] | Action | null;
   titleText: string;
+  hideCloseBtn?: boolean;
 }
 
 export type ModalItem = {id: string; options: ModalOptions; type: PrimaryModalType};

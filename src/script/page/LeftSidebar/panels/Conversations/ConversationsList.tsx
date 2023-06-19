@@ -27,7 +27,7 @@ import {ConversationListCell} from 'Components/list/ConversationListCell';
 import {Call} from 'src/script/calling/Call';
 import {User} from 'src/script/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleKeyDown} from 'Util/KeyboardUtil';
+import {handleKeyDown, isKeyboardEvent} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
@@ -110,7 +110,7 @@ export const ConversationsList = ({
               dataUieName="item-conversation"
               conversation={conversation}
               onClick={event => {
-                if ('key' in event) {
+                if (isKeyboardEvent(event)) {
                   createNavigateKeyboard(generateConversationUrl(conversation.qualifiedId), true)(event);
                 } else {
                   createNavigate(generateConversationUrl(conversation.qualifiedId))(event);

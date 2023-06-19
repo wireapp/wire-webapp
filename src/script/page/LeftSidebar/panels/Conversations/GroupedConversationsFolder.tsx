@@ -24,6 +24,7 @@ import type {ConversationLabel} from 'src/script/conversation/ConversationLabelR
 import {Conversation} from 'src/script/entity/Conversation';
 import {ListViewModel} from 'src/script/view_model/ListViewModel';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {isKeyboardEvent} from 'Util/KeyboardUtil';
 
 import {GroupedConversationHeader} from './GroupedConversationHeader';
 
@@ -67,7 +68,7 @@ const GroupedConversationsFolder = ({
               handleArrowKeyDown={handleKeyDown(index)}
               resetConversationFocus={resetConversationFocus}
               onClick={event => {
-                if ('key' in event) {
+                if (isKeyboardEvent(event)) {
                   createNavigateKeyboard(generateConversationUrl(conversation.qualifiedId), true)(event);
                 } else {
                   createNavigate(generateConversationUrl(conversation.qualifiedId))(event);

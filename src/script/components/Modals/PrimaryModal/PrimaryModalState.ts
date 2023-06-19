@@ -128,12 +128,12 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
     closeOnConfirm = true,
     copyPassword,
     data,
-    hideSecondary,
     passwordGenerator,
     preventClose = false,
     primaryAction,
     secondaryAction,
-    showClose = false,
+    hideSecondary,
+    hideCloseBtn = false,
     text = {} as Text,
   } = options;
 
@@ -152,7 +152,7 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
     passwordGenerator,
     primaryAction: primaryAction ?? null,
     secondaryAction: secondaryAction ?? null,
-    showClose,
+    hideCloseBtn,
     titleText: text.title ?? '',
   };
 
@@ -185,6 +185,11 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
     case PrimaryModalType.ACKNOWLEDGE: {
       content.primaryAction = {text: t('modalAcknowledgeAction'), ...primaryAction};
       content.titleText = text.title || t('modalAcknowledgeHeadline');
+      content.messageText = (!text.htmlMessage && text.message) || '';
+      break;
+    }
+    case PrimaryModalType.WITHOUT_TITLE: {
+      content.primaryAction = {...primaryAction};
       content.messageText = (!text.htmlMessage && text.message) || '';
       break;
     }

@@ -231,6 +231,8 @@ export type Env = {
 
   URL_LEARN_MORE_ABOUT_GUEST_LINKS: string;
 
+  URL_SUPPORT_OFFLINE_BACKEND: string;
+
   URL_WHATS_NEW: string;
 
   /** Content Security Policy
@@ -259,9 +261,6 @@ export type Env = {
 
   /** Adds additional CSP object-src entries */
   CSP_EXTRA_OBJECT_SRC: string;
-
-  /** Adds additional CSP prefetch-src entries */
-  CSP_EXTRA_PREFETCH_SRC: string;
 
   /** Adds additional CSP script-src entries */
   CSP_EXTRA_SCRIPT_SRC: string;

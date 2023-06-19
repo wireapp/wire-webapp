@@ -51,7 +51,7 @@ type SentEvent = {
   /** raw content of a file that was supposed to be sent but failed. Is undefined if the message has been successfully sent  */
   fileData?: Blob;
   failedToSend?: {
-    queue?: QualifiedUserClients;
+    queue?: QualifiedUserClients | QualifiedId[];
     failed?: QualifiedId[];
   };
 };
