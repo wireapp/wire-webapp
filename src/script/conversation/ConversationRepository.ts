@@ -1547,7 +1547,7 @@ export class ConversationRepository {
    * @param conversationEntity Conversation to clear
    * @param leaveConversation Should we leave the conversation before clearing the content?
    */
-  public clearConversation(conversationEntity: Conversation, leaveConversation = false) {
+  public async clearConversation(conversationEntity: Conversation, leaveConversation = false) {
     const isActiveConversation = this.conversationState.isActiveConversation(conversationEntity);
     const nextConversationEntity = this.getNextConversation(conversationEntity);
 
@@ -1556,11 +1556,11 @@ export class ConversationRepository {
       this.leaveCall(conversationEntity.qualifiedId, LEAVE_CALL_REASON.USER_MANUALY_LEFT_CONVERSATION);
     }
 
-    this.messageRepository.updateClearedTimestamp(conversationEntity);
-    this._clearConversation(conversationEntity);
+    await this.messageRepository.updateClearedTimestamp(conversationEntity);
+    await this._clearConversation(conversationEntity);
 
     if (leaveConversation) {
-      this.removeMember(conversationEntity, this.userState.self().qualifiedId);
+      await this.removeMember(conversationEntity, this.userState.self().qualifiedId);
     }
 
     if (isActiveConversation) {
@@ -1626,12 +1626,11 @@ export class ConversationRepository {
    * @returns Resolves when user was removed from the conversation
    */
   private async leaveConversation(conversationEntity: Conversation, clearContent: boolean) {
-    if (clearContent) {
-      this.clearConversation(conversationEntity, false);
-    }
-
     const userQualifiedId = this.userState.self().qualifiedId;
-    return this.removeMemberFromConversation(conversationEntity, userQualifiedId);
+
+    return clearContent
+      ? this.clearConversation(conversationEntity, true)
+      : this.removeMemberFromConversation(conversationEntity, userQualifiedId);
   }
 
   /**
@@ -1892,11 +1891,11 @@ export class ConversationRepository {
    * @param conversationEntity Conversation entity to delete
    * @param timestamp Optional timestamps for which messages to remove
    */
-  private _clearConversation(conversationEntity: Conversation, timestamp?: number) {
+  private async _clearConversation(conversationEntity: Conversation, timestamp?: number) {
     this.deleteMessages(conversationEntity, timestamp);
 
     if (conversationEntity.removed_from_conversation()) {
-      this.conversationService.deleteConversationFromDb(conversationEntity.id);
+      await this.conversationService.deleteConversationFromDb(conversationEntity.id);
       this.deleteConversationFromRepository(conversationEntity);
     }
   }
@@ -2747,7 +2746,7 @@ export class ConversationRepository {
     }
 
     if (conversationEntity.is_cleared()) {
-      this._clearConversation(conversationEntity, conversationEntity.cleared_timestamp());
+      await this._clearConversation(conversationEntity, conversationEntity.cleared_timestamp());
     }
 
     if (isActiveConversation && (conversationEntity.is_archived() || conversationEntity.is_cleared())) {
