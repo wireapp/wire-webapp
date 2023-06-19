@@ -62,16 +62,24 @@ export const useMLSConversationState = create<StoreState>((set, get) => {
     isPendingWelcome: groupId => get().pendingWelcome.has(groupId),
 
     markAsEstablished: groupId =>
-      set(state => ({
-        ...state,
-        established: state.established.add(groupId),
-      })),
+      set(state => {
+        const newState = new Set(state.established);
+        newState.add(groupId);
+        return {
+          ...state,
+          established: newState,
+        };
+      }),
 
     markAsPendingWelcome: groupId =>
-      set(state => ({
-        ...state,
-        pendingWelcome: state.pendingWelcome.add(groupId),
-      })),
+      set(state => {
+        const newState = new Set(state.pendingWelcome);
+        newState.add(groupId);
+        return {
+          ...state,
+          pendingWelcome: newState,
+        };
+      }),
 
     pendingWelcome: initialState.pendingWelcome,
 

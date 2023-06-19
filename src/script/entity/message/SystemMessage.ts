@@ -20,6 +20,7 @@
 import ko from 'knockout';
 
 import {Message} from './Message';
+import {RenameMessage} from './RenameMessage';
 
 import {SuperType} from '../../message/SuperType';
 import {SystemMessageType} from '../../message/SystemMessageType';
@@ -34,7 +35,7 @@ export class SystemMessage extends Message {
     this.system_message_type = SystemMessageType.NORMAL;
   }
 
-  isConversationRename(): boolean {
+  isConversationRename(): this is RenameMessage {
     return this.system_message_type === SystemMessageType.CONVERSATION_RENAME;
   }
 }

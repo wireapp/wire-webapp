@@ -23,23 +23,48 @@ import type {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {countBy, map} from 'underscore';
 
-import {Bold, Button, ButtonVariant} from '@wireapp/react-ui-kit';
+import {Bold, Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
+import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
+import {Config} from 'src/script/Config';
 import {t} from 'Util/LocalizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
-import {warning} from '../Warnings.styles';
+import {backendErrorLink, warning} from '../Warnings.styles';
 
 export type User = {qualifiedId: QualifiedId; name: () => string};
 type Props = {
-  failedToSend: {queued?: QualifiedUserClients; failed?: QualifiedId[]};
+  failedToSend: {
+    queued?: QualifiedUserClients | QualifiedId[];
+    failed?: QualifiedId[];
+  };
+  isMessageFocused: boolean;
   knownUsers: User[];
 };
 
+const config = Config.getConfig();
+
 type ParsedUsers = {namedUsers: User[]; unknownUsers: QualifiedId[]};
 
-function generateNamedUsers(users: User[], userClients: QualifiedUserClients): ParsedUsers {
-  return Object.entries(userClients).reduce<ParsedUsers>(
+function generateNamedUsers(
+  users: User[],
+  userClientsOrQualifiedIds: QualifiedUserClients | QualifiedId[],
+): ParsedUsers {
+  if (Array.isArray(userClientsOrQualifiedIds)) {
+    return userClientsOrQualifiedIds.reduce<ParsedUsers>(
+      (parsedUsers, currentQulifiedId) => {
+        const user = users.find(user => matchQualifiedIds(user.qualifiedId, currentQulifiedId));
+        if (user && user.name()) {
+          parsedUsers.namedUsers.push(user);
+        } else {
+          parsedUsers.unknownUsers.push(currentQulifiedId);
+        }
+        return parsedUsers;
+      },
+      {namedUsers: [], unknownUsers: []},
+    );
+  }
+  return Object.entries(userClientsOrQualifiedIds).reduce<ParsedUsers>(
     (namedUsers, [domain, domainUsers]) => {
       const domainNamedUsers = Object.keys(domainUsers).reduce<ParsedUsers>(
         (domainNamedUsers, userId) => {
@@ -72,12 +97,14 @@ function joinWith(elements: React.ReactNode[], separator: string) {
   }, []);
 }
 
-export const PartialFailureToSendWarning = ({failedToSend, knownUsers}: Props) => {
+export const PartialFailureToSendWarning = ({failedToSend, isMessageFocused, knownUsers}: Props) => {
   const [isOpen, setIsOpen] = useState(false);
   const {queued = {}, failed = []} = failedToSend;
 
-  const userCount =
-    Object.entries(queued).reduce((count, [_domain, users]) => count + Object.keys(users).length, 0) + failed.length;
+  const userCount = Array.isArray(queued)
+    ? queued.length
+    : Object.entries(queued).reduce((count, [_domain, users]) => count + Object.keys(users).length, 0) + failed.length;
+  const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
 
   const showToggle = userCount > 1;
 
@@ -148,12 +175,27 @@ export const PartialFailureToSendWarning = ({failedToSend, knownUsers}: Props) =
                   )}
                   {unreachableUsers.length === 1
                     ? ` ${t('messageFailedToSendWillNotReceiveSingular')}`
-                    : ` ${t('messageFailedToSendWillNotReceivePlural')}`}
+                    : ` ${t('messageFailedToSendWillNotReceivePlural')}`}{' '}
+                  <Link
+                    tabIndex={messageFocusedTabIndex}
+                    targetBlank
+                    variant={LinkVariant.PRIMARY}
+                    href={config.URL.SUPPORT.OFFLINE_BACKEND}
+                    data-uie-name="go-offline-backend"
+                    css={backendErrorLink}
+                  >
+                    {t('offlineBackendLearnMore')}
+                  </Link>
                 </p>
               )}
             </>
           )}
-          <Button type="button" variant={ButtonVariant.TERTIARY} onClick={() => setIsOpen(state => !state)}>
+          <Button
+            type="button"
+            tabIndex={messageFocusedTabIndex}
+            variant={ButtonVariant.TERTIARY}
+            onClick={() => setIsOpen(state => !state)}
+          >
             {isOpen ? t('messageFailedToSendHideDetails') : t('messageFailedToSendShowDetails')}
           </Button>
         </>
