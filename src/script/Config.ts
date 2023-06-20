@@ -21,6 +21,8 @@ import {Runtime} from '@wireapp/commons';
 
 import {createUuid} from 'Util/uuid';
 const env = window.wire.env;
+const TEAMS_URL = 'https://teams';
+const ACCOUNT_URL = 'https://account';
 
 export const ACCENT_ID = {
   AMBER: 5,
@@ -78,6 +80,17 @@ const config = {
   /** Which min and max version of the backend api do we support */
   SUPPORTED_API_RANGE: [1, env.ENABLE_DEV_BACKEND_API ? Infinity : 3],
 
+  URL: {
+    ...env.URL,
+    ACCOUNT_BASE:
+      env.APP_BASE === document.location.origin
+        ? env.URL.ACCOUNT_BASE
+        : ACCOUNT_URL + document.location.host.slice(document.location.host.indexOf('.')),
+    TEAMS_BASE:
+      env.APP_BASE === document.location.origin
+        ? env.URL.TEAMS_BASE
+        : TEAMS_URL + document.location.host.slice(document.location.host.indexOf('.')),
+  },
   /** DataDog client api keys acces */
   dataDog: {
     clientToken: env.DATADOG_CLIENT_TOKEN,

@@ -28,11 +28,6 @@ const WS_URL = 'wss://nginz-ssl';
 @singleton()
 export class APIClient extends APIClientUnconfigured {
   constructor() {
-    // eslint-disable-next-line no-console
-    console.log('APIClient', document.location, Config.getConfig().APP_BASE === document.location.origin, {
-      rest: REST_URL + document.location.host.slice(document.location.host.indexOf('.')),
-      ws: WS_URL + document.location.host.slice(document.location.host.indexOf('.')),
-    });
     super({
       urls: {
         name: Config.getConfig().ENVIRONMENT,
