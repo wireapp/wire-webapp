@@ -93,9 +93,9 @@ jobs:
           key: '${{github.ref}}'
           map: |
             {
-              "edge": { "dev_env": "wire-webapp-edge" },
-              "dev": { "dev_env": "wire-webapp-dev" },
-              "master": { "dev_env": "wire-webapp-master" }
+              "edge": { "dev_env": "wire-webapp-edge-al2" },
+              "dev": { "dev_env": "wire-webapp-dev-al2" },
+              "master": { "dev_env": "wire-webapp-master-al2" }
             }
 
       - uses: kanga333/variable-mapper@master
@@ -104,8 +104,8 @@ jobs:
           key: '${{env.TAG}}'
           map: |
             {
-              "production": { "prod_env": "wire-webapp-prod" },
-              "staging": { "prod_env": "wire-webapp-staging" }
+              "production": { "prod_env": "wire-webapp-prod-al2" },
+              "staging": { "prod_env": "wire-webapp-staging-al2" }
             }
 
       - name: Build
