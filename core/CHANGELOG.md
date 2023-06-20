@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [40.5.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@40.5.3...@wireapp/core@40.5.4) (2023-06-20)
+
+### Bug Fixes
+
+* handle error when sending mls message [WBP-2300] ([#5254](https://github.com/wireapp/wire-web-packages/issues/5254)) ([b757118](https://github.com/wireapp/wire-web-packages/commit/b7571181fd72fbe145ab291e20e9fa0c60bd78f2))
+
 ## [40.5.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@40.5.2...@wireapp/core@40.5.3) (2023-06-20)
 
 **Note:** Version bump only for package @wireapp/core
