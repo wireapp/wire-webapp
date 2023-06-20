@@ -33,6 +33,8 @@ const defaultProps: MessageActionsMenuProps = {
   handleActionMenuVisibility: jest.fn(),
   messageWithSection: false,
   handleReactionClick: jest.fn(),
+  reactionsTotalCount: 0,
+  isRemovedFromConversation: false,
 };
 
 describe('MessageActions', () => {
