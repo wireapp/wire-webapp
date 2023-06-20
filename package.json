@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@datadog/browser-logs": "^4.42.2",
+    "@datadog/browser-logs": "^4.43.0",
     "@datadog/browser-rum": "^4.42.2",
     "@emotion/react": "11.11.1",
     "@types/eslint": "8.37.0",
