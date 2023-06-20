@@ -127,7 +127,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     groupId: Uint8Array,
     commitBundle: CommitBundle,
     {regenerateCommitBundle, isExternalCommit}: UploadCommitOptions = {},
-  ): Promise<PostMlsMessageResponse | null> {
+  ): Promise<PostMlsMessageResponse> {
     const bundlePayload = toProtobufCommitBundle(commitBundle);
     try {
       const response = await this.apiClient.api.conversation.postMlsCommitBundle(bundlePayload.slice());
@@ -156,15 +156,20 @@ export class MLSService extends TypedEventEmitter<Events> {
       } else {
         await this.coreCryptoClient.clearPendingCommit(groupId);
       }
+      throw error;
     }
-    return null;
   }
 
+  /**
+   * Will add users to an existing MLS group and send a commit bundle to backend.
+   * Cannot be called with an empty array of keys.
+   *
+   * @param groupId - the group id of the MLS group
+   * @param invitee - the list of keys of clients to add to the MLS group
+   */
   public addUsersToExistingConversation(groupId: Uint8Array, invitee: Invitee[]) {
     if (invitee.length < 1) {
-      // providing an empty invitee list to addClientsToConversation method would make core-crypto throw an error
-      // we want to skip adding clinets in this case
-      return null;
+      throw new Error('Empty list of keys provided to addUsersToExistingConversation');
     }
     return this.processCommitAction(groupId, () => this.coreCryptoClient.addClientsToConversation(groupId, invitee));
   }
@@ -372,7 +377,7 @@ export class MLSService extends TypedEventEmitter<Events> {
    * @param generateCommit The function that will generate a coreCrypto CommitBundle
    */
   private async processCommitAction(groupId: ConversationId, generateCommit: () => Promise<CommitBundle>) {
-    return sendMessage<PostMlsMessageResponse | null>(async () => {
+    return sendMessage<PostMlsMessageResponse>(async () => {
       await this.commitProposals(groupId);
       const commitBundle = await generateCommit();
       return this.uploadCommitBundle(groupId, commitBundle);
@@ -393,7 +398,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     groupId: string,
     users: QualifiedId[],
     creator?: {user: QualifiedId; client?: string},
-  ): Promise<PostMlsMessageResponse | null | undefined> {
+  ): Promise<PostMlsMessageResponse> {
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
 
     const mlsKeys = (await this.apiClient.api.client.getPublicKeys()).removal;
