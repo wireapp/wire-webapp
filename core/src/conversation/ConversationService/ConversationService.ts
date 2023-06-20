@@ -262,7 +262,7 @@ export class ConversationService {
     const conversation = await this.apiClient.api.conversation.getConversation(qualifiedId);
 
     return {
-      events: response?.events ?? [],
+      events: response.events,
       conversation,
     };
   }
@@ -318,7 +318,7 @@ export class ConversationService {
     //We store the info when user was added (and key material was created), so we will know when to renew it
     this.mlsService.resetKeyMaterialRenewal(groupId);
     return {
-      events: response?.events || [],
+      events: response.events,
       conversation,
     };
   }
@@ -342,7 +342,7 @@ export class ConversationService {
     const conversation = await this.getConversation(conversationId);
 
     return {
-      events: messageResponse?.events || [],
+      events: messageResponse.events,
       conversation,
     };
   }
