@@ -37,6 +37,7 @@ import {CallTimeoutMessage} from './CallTimeoutMessage';
 import {ContentMessageComponent} from './ContentMessage';
 import {DecryptErrorMessage} from './DecryptErrorMessage';
 import {DeleteMessage} from './DeleteMessage';
+import {FailedToAddUsersMessage} from './FailedToAddUsersMessage';
 import {FileTypeRestrictedMessage} from './FileTypeRestrictedMessage';
 import {LegalHoldMessage} from './LegalHoldMessage';
 import {MemberMessage} from './MemberMessage';
@@ -230,6 +231,9 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
   }
   if (message.isCallTimeout()) {
     return <CallTimeoutMessage message={message} />;
+  }
+  if (message.isFailedToAddUsersMessage()) {
+    return <FailedToAddUsersMessage isMessageFocused={isMessageFocused} message={message} />;
   }
   if (message.isSystem()) {
     return <SystemMessage message={message} />;

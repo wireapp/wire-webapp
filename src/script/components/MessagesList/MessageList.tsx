@@ -19,6 +19,7 @@
 
 import React, {FC, useEffect, useLayoutEffect, useRef, useState} from 'react';
 
+import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
 import cx from 'classnames';
 
@@ -29,7 +30,9 @@ import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {DecryptErrorMessage} from 'src/script/entity/message/DecryptErrorMessage';
 import {MemberMessage} from 'src/script/entity/message/MemberMessage';
 import {Message as MessageEntity} from 'src/script/entity/message/Message';
+import {SystemMessage} from 'src/script/entity/message/SystemMessage';
 import {User} from 'src/script/entity/User';
+import {ClientEvent} from 'src/script/event/Client';
 import {useRoveFocus} from 'src/script/hooks/useRoveFocus';
 import {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -70,25 +73,58 @@ interface MessagesListParams {
   setMsgElementsFocusable: (isMsgElementsFocusable: boolean) => void;
 }
 
-const filterDuplicatedMemberMessages = (messages: MessageEntity[]) => {
-  const typesToFilter = ['conversation.member-join', 'conversation.group-creation', 'conversation.member-leave'];
+const filterDuplicatedSystemMessages = (messages: MessageEntity[]) => {
   return messages.reduce<MessageEntity[]>((uniqMessages, currentMessage) => {
     if (isMemberMessage(currentMessage)) {
+      const typesToFilter = [
+        CONVERSATION_EVENT.MEMBER_JOIN,
+        CONVERSATION_EVENT.MEMBER_LEAVE,
+        ClientEvent.CONVERSATION.GROUP_CREATION,
+      ] as string[];
+
       const uniqMemberMessages = uniqMessages.filter(isMemberMessage);
 
       if (!!uniqMemberMessages.length && typesToFilter.includes(currentMessage.type)) {
         switch (currentMessage.type) {
-          case 'conversation.group-creation':
+          case ClientEvent.CONVERSATION.GROUP_CREATION:
             // Dont show duplicated group creation messages
             if (uniqMemberMessages.some(m => m.type === currentMessage.type)) {
               return uniqMessages;
             }
-          case 'conversation.member-join':
-          case 'conversation.member-leave':
+          case CONVERSATION_EVENT.MEMBER_JOIN:
+          case CONVERSATION_EVENT.MEMBER_LEAVE:
             // Dont show duplicated member join/leave messages that follow each other
             if (uniqMemberMessages?.[uniqMemberMessages.length - 1]?.htmlCaption() === currentMessage.htmlCaption()) {
               return uniqMessages;
             }
+        }
+      }
+    }
+
+    if (currentMessage.isSystem()) {
+      const systemMessagesToFilter = [CONVERSATION_EVENT.RENAME] as string[];
+      if (systemMessagesToFilter.includes(currentMessage.type)) {
+        const uniqUpdateMessages = uniqMessages.filter(
+          (message): message is SystemMessage => message.isSystem() && systemMessagesToFilter.includes(message.type),
+        );
+
+        if (uniqUpdateMessages.length > 0) {
+          const prevMessage = uniqUpdateMessages?.[uniqUpdateMessages.length - 1];
+          if (!prevMessage) {
+            return [...uniqMessages, currentMessage];
+          }
+
+          if (prevMessage.isConversationRename() && currentMessage.isConversationRename()) {
+            // for rename messages, only name changes are relevant, caption stays the same
+            if (prevMessage.name === currentMessage.name) {
+              return uniqMessages;
+            }
+            return [...uniqMessages, currentMessage];
+          }
+          // Dont show duplicated system messages that follow each other
+          if (prevMessage.caption() === currentMessage.caption()) {
+            return uniqMessages;
+          }
         }
       }
     }
@@ -145,7 +181,7 @@ const MessagesList: FC<MessagesListParams> = ({
   const [loaded, setLoaded] = useState(false);
   const [focusedMessage, setFocusedMessage] = useState<string | undefined>(initialMessage?.id);
 
-  const filteredMessages = filterDuplicatedMemberMessages(filterHiddenMessages(allMessages));
+  const filteredMessages = filterDuplicatedSystemMessages(filterHiddenMessages(allMessages));
   const filteredMessagesLength = filteredMessages.length;
 
   const [messagesContainer, setMessageContainer] = useState<HTMLDivElement | null>(null);

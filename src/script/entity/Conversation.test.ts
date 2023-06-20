@@ -484,11 +484,11 @@ describe('Conversation', () => {
     it('displays a fallback if no user name has been set', () => {
       conversation_et.type(CONVERSATION_TYPE.ONE_TO_ONE);
 
-      expect(conversation_et.display_name()).toBe('…');
+      expect(conversation_et.display_name()).toBe('Name not available');
 
       conversation_et.type(CONVERSATION_TYPE.CONNECT);
 
-      expect(conversation_et.display_name()).toBe('…');
+      expect(conversation_et.display_name()).toBe('Name not available');
     });
 
     it('displays a group conversation name with names from the participants', () => {

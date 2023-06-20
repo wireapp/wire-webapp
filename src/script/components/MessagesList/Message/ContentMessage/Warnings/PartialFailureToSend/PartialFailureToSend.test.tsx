@@ -22,37 +22,12 @@ import type {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import en from 'I18n/en-US.json';
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {generateQualifiedIds, generateUserClients, generateUsers, withTheme} from 'src/script/auth/util/test/TestUtil';
 import {setStrings} from 'Util/LocalizerUtil';
-import {createUuid} from 'Util/uuid';
 
-import {PartialFailureToSendWarning, User} from './PartialFailureToSend';
+import {PartialFailureToSendWarning} from './PartialFailureToSend';
 
 setStrings({en});
-function generateUsers(nbUsers: number, domain: string) {
-  const users: User[] = [];
-  for (let i = 0; i < nbUsers; i++) {
-    users.push({qualifiedId: {id: createUuid(), domain}, username: () => `User ${i}`});
-  }
-  return users;
-}
-
-function generateUserClients(users: User[]): QualifiedUserClients {
-  const userClients: QualifiedUserClients = {};
-  users.forEach(user => {
-    const domainUsers = userClients[user.qualifiedId.domain] || {};
-    domainUsers[user.qualifiedId.id] = [];
-    userClients[user.qualifiedId.domain] = domainUsers;
-  });
-  return userClients;
-}
-function generateQualifiedIds(nbUsers: number, domain: string) {
-  const users: QualifiedId[] = [];
-  for (let i = 0; i < nbUsers; i++) {
-    users.push({id: createUuid(), domain});
-  }
-  return users;
-}
 
 describe('PartialFailureToSendWarning', () => {
   it('displays the number of users that did not get the message', () => {
@@ -60,7 +35,9 @@ describe('PartialFailureToSendWarning', () => {
     const users = generateUsers(nbUsers, 'domain');
 
     const queued = generateUserClients(users);
-    const {container} = render(withTheme(<PartialFailureToSendWarning knownUsers={[]} failedToSend={{queued}} />));
+    const {container} = render(
+      withTheme(<PartialFailureToSendWarning isMessageFocused knownUsers={[]} failedToSend={{queued}} />),
+    );
     expect(container.textContent).toContain(`${nbUsers} participants didn't get your message`);
   });
 
@@ -74,7 +51,9 @@ describe('PartialFailureToSendWarning', () => {
       ...generateUserClients(users1),
       ...generateUserClients(users2),
     };
-    const {container} = render(withTheme(<PartialFailureToSendWarning knownUsers={[]} failedToSend={{queued}} />));
+    const {container} = render(
+      withTheme(<PartialFailureToSendWarning isMessageFocused knownUsers={[]} failedToSend={{queued}} />),
+    );
     expect(container.textContent).toContain(`${nbUsersDomain1 + nbUsersDomain2} participants didn't get your message`);
   });
 
@@ -85,7 +64,9 @@ describe('PartialFailureToSendWarning', () => {
     const users2 = generateQualifiedIds(nbUsersDomain2, 'domain2');
 
     const failed = [...users1, ...users2];
-    const {container} = render(withTheme(<PartialFailureToSendWarning knownUsers={[]} failedToSend={{failed}} />));
+    const {container} = render(
+      withTheme(<PartialFailureToSendWarning isMessageFocused knownUsers={[]} failedToSend={{failed}} />),
+    );
     expect(container.textContent).toContain(`${nbUsersDomain1 + nbUsersDomain2} participants didn't get your message`);
   });
 
@@ -107,7 +88,7 @@ describe('PartialFailureToSendWarning', () => {
 
     const failed = [...unreachableUsers1, ...unreachableUsers2];
     const {container} = render(
-      withTheme(<PartialFailureToSendWarning knownUsers={[]} failedToSend={{queued, failed}} />),
+      withTheme(<PartialFailureToSendWarning isMessageFocused knownUsers={[]} failedToSend={{queued, failed}} />),
     );
     expect(container.textContent).toContain(
       `${
@@ -120,18 +101,18 @@ describe('PartialFailureToSendWarning', () => {
     const users = generateUsers(1, 'domain');
     const queued = generateUserClients(users);
     const {queryByText, container} = render(
-      withTheme(<PartialFailureToSendWarning knownUsers={users} failedToSend={{queued}} />),
+      withTheme(<PartialFailureToSendWarning isMessageFocused knownUsers={users} failedToSend={{queued}} />),
     );
 
     expect(queryByText('Show details')).toBeNull();
-    expect(container.textContent).toContain(`${users[0].username()} will get your message later`);
+    expect(container.textContent).toContain(`${users[0].name()} will get your message later`);
   });
 
   it('does not show the extra info toggle if there is only a single unreachable user', () => {
     const users = generateQualifiedIds(1, 'domain');
     const failed = users;
     const {queryByText, container} = render(
-      withTheme(<PartialFailureToSendWarning knownUsers={[]} failedToSend={{failed}} />),
+      withTheme(<PartialFailureToSendWarning isMessageFocused knownUsers={[]} failedToSend={{failed}} />),
     );
 
     expect(queryByText('Show details')).toBeNull();
@@ -140,7 +121,9 @@ describe('PartialFailureToSendWarning', () => {
 
   it('toggles the extra info', () => {
     const queued = generateUserClients(generateUsers(2, 'domain'));
-    const {getByText} = render(withTheme(<PartialFailureToSendWarning knownUsers={[]} failedToSend={{queued}} />));
+    const {getByText} = render(
+      withTheme(<PartialFailureToSendWarning isMessageFocused knownUsers={[]} failedToSend={{queued}} />),
+    );
 
     act(() => {
       getByText('Show details').click();
@@ -161,7 +144,7 @@ describe('PartialFailureToSendWarning', () => {
 
     const queued = generateUserClients(users);
     const {getByText, getAllByTestId} = render(
-      withTheme(<PartialFailureToSendWarning knownUsers={users} failedToSend={{queued}} />),
+      withTheme(<PartialFailureToSendWarning isMessageFocused knownUsers={users} failedToSend={{queued}} />),
     );
 
     act(() => {
@@ -185,7 +168,9 @@ describe('PartialFailureToSendWarning', () => {
     ];
 
     const {getByText, getAllByTestId, container} = render(
-      withTheme(<PartialFailureToSendWarning knownUsers={namedUsers} failedToSend={{queued, failed}} />),
+      withTheme(
+        <PartialFailureToSendWarning isMessageFocused knownUsers={namedUsers} failedToSend={{queued, failed}} />,
+      ),
     );
 
     act(() => {
@@ -205,7 +190,9 @@ describe('PartialFailureToSendWarning', () => {
     const failed = [...generateQualifiedIds(1, 'domain2')];
 
     const {getByText} = render(
-      withTheme(<PartialFailureToSendWarning knownUsers={namedUsers} failedToSend={{queued, failed}} />),
+      withTheme(
+        <PartialFailureToSendWarning isMessageFocused knownUsers={namedUsers} failedToSend={{queued, failed}} />,
+      ),
     );
     act(() => {
       getByText('Show details').click();
@@ -227,7 +214,9 @@ describe('PartialFailureToSendWarning', () => {
     const failed = [] as QualifiedId[];
 
     const {getByText, container} = render(
-      withTheme(<PartialFailureToSendWarning knownUsers={namedUsers} failedToSend={{queued, failed}} />),
+      withTheme(
+        <PartialFailureToSendWarning isMessageFocused knownUsers={namedUsers} failedToSend={{queued, failed}} />,
+      ),
     );
     act(() => {
       getByText('Show details').click();
@@ -242,7 +231,7 @@ describe('PartialFailureToSendWarning', () => {
     const queued = {} as QualifiedUserClients;
 
     const {getByText, container} = render(
-      withTheme(<PartialFailureToSendWarning knownUsers={[]} failedToSend={{queued, failed}} />),
+      withTheme(<PartialFailureToSendWarning isMessageFocused knownUsers={[]} failedToSend={{queued, failed}} />),
     );
     act(() => {
       getByText('Show details').click();

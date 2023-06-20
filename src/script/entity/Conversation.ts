@@ -115,6 +115,7 @@ export class Conversation {
   public readonly firstUserEntity: ko.PureComputed<User>;
   public readonly enforcedTeamMessageTimer: ko.PureComputed<number>;
   public readonly globalMessageTimer: ko.Observable<number | null>;
+  public readonly hasContentMessages: ko.Observable<boolean>;
   public readonly hasAdditionalMessages: ko.Observable<boolean>;
   public readonly hasGlobalMessageTimer: ko.PureComputed<boolean>;
   public readonly hasGuest: ko.PureComputed<boolean>;
@@ -421,6 +422,11 @@ export class Conversation {
 
     this.hasAdditionalMessages = ko.observable(true);
 
+    // Since we release messages from memory when the conversation is not active, we use an observable to keep track of conversations with messages
+    this.hasContentMessages = ko.observable(
+      [...this.messages(), ...this.incomingMessages()].some(message => message.isContent()),
+    );
+
     this.messages_visible = ko
       .pureComputed(() => (!this.id ? [] : this.messages().filter(messageEntity => messageEntity.visible())))
       .extend({trackArrayChanges: true});
@@ -503,19 +509,19 @@ export class Conversation {
      *
      * - Name of the other participant
      * - Name of the other user of the associated connection
-     * - "..." if neither of those has been attached yet
+     * - "Name not available" if neither of those has been attached yet
      *
      * 'Group Conversation':
      * - Conversation name received from backend
      * - If unnamed, we will create a name from the participant names
      * - Join the user's first names to a comma separated list or uses the user's first name if only one user participating
-     * - "..." if the user entities have not yet been attached yet
+     * - "..." if the user entities have not yet been attached
      */
     this.display_name = ko.pureComputed(() => {
       if (this.isRequest() || this.is1to1()) {
         const [userEntity] = this.participating_user_ets();
         const userName = userEntity?.name();
-        return userName || '…';
+        return userName || t('unavailableUser');
       }
 
       if (this.isGroup()) {
@@ -677,6 +683,10 @@ export class Conversation {
       const editedMessage = () =>
         this._findDuplicate((messageEntity as ContentMessage).replacing_message_id, messageEntity.from);
       const alreadyAdded = messageWithLinkPreview() || editedMessage();
+
+      if (messageEntity.isContent()) {
+        this.hasContentMessages(true);
+      }
       if (alreadyAdded) {
         return false;
       }

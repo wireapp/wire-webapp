@@ -53,6 +53,7 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
   isTeam = false,
 }) => {
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
+  const isEditGroupNameTouched = useRef(false);
 
   const [isEditingName, setIsEditingName] = useState<boolean>(false);
   const [groupName, setGroupName] = useState(displayName);
@@ -73,16 +74,16 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
     if (isEnterKey(event)) {
       event.preventDefault();
       const {value: currentValue} = event.currentTarget;
-
       const currentConversationName = displayName.trim();
       const newConversationName = removeLineBreaks(currentValue.trim());
-
       const isNameChanged = newConversationName !== currentConversationName;
 
       if (isNameChanged) {
         updateConversationName(newConversationName);
         setGroupName(newConversationName);
         setIsEditingName(false);
+
+        isEditGroupNameTouched.current = false;
       }
     }
   };
@@ -95,13 +96,17 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
         textAreaRef.current.style.height = `${scrollHeight}px`;
       }
 
-      setTimeout(() => {
-        const currentValue = textAreaRef.current?.value;
-        const caretPosition = currentValue?.length || 0;
+      if (!isEditGroupNameTouched.current) {
+        setTimeout(() => {
+          const currentValue = textAreaRef.current?.value;
+          const caretPosition = currentValue?.length || 0;
 
-        textAreaRef.current?.setSelectionRange(caretPosition, caretPosition);
-        textAreaRef.current?.focus();
-      }, 0);
+          textAreaRef.current?.setSelectionRange(caretPosition, caretPosition);
+          textAreaRef.current?.focus();
+
+          isEditGroupNameTouched.current = true;
+        }, 0);
+      }
     }
   }, [isEditingName, groupName]);
 
@@ -112,7 +117,6 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
           {!isEditingName ? (
             <div
               className="conversation-details__name"
-              title={t('tooltipConversationDetailsRename')}
               data-uie-name="status-name"
               {...(canRenameGroup && {
                 onClick: clickToEditGroupName,
@@ -120,7 +124,14 @@ const ConversationDetailsHeader: FC<ConversationDetailsHeaderProps> = ({
             >
               {displayName && <span className="conversation-details__name">{displayName}</span>}
 
-              {canRenameGroup && <Icon.Edit className="conversation-details__name__edit-icon" />}
+              {canRenameGroup && (
+                <button
+                  className="conversation-details__name__edit-icon"
+                  aria-label={t('tooltipConversationDetailsRename')}
+                >
+                  <Icon.Edit />
+                </button>
+              )}
             </div>
           ) : (
             <textarea

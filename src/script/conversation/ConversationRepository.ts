@@ -91,7 +91,6 @@ import {NOTIFICATION_STATE} from './NotificationSetting';
 
 import {AssetTransferState} from '../assets/AssetTransferState';
 import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
-import {ClientState} from '../client/ClientState';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
@@ -183,7 +182,6 @@ export class ConversationRepository {
     private readonly teamState = container.resolve(TeamState),
     private readonly conversationState = container.resolve(ConversationState),
     private readonly core = container.resolve(Core),
-    private readonly clientState = container.resolve(ClientState),
   ) {
     this.eventService = eventRepository.eventService;
     // we register a client mismatch handler agains the message repository so that we can react to missing members
@@ -291,6 +289,10 @@ export class ConversationRepository {
 
     this.conversationRoleRepository = new ConversationRoleRepository(this.teamRepository, this.conversationService);
     this.leaveCall = noop;
+
+    if (this.core.backendFeatures.isFederated) {
+      this.scheduleMissingUsersAndConversationsMetadataRefresh();
+    }
   }
 
   checkMessageTimer(messageEntity: ContentMessage): void {
@@ -349,7 +351,7 @@ export class ConversationRepository {
         conversationEntity.is_cleared() &&
         conversationEntity.removed_from_conversation()
       ) {
-        this.conversationService.deleteConversationFromDb(conversationEntity);
+        this.conversationService.deleteConversationFromDb(conversationEntity.id);
         this.deleteConversationFromRepository(conversationEntity);
       }
     });
@@ -376,7 +378,7 @@ export class ConversationRepository {
     groupName?: string,
     accessState?: ACCESS_STATE,
     options: Partial<NewConversation> = {},
-  ): Promise<Conversation | undefined> {
+  ): Promise<Conversation> {
     const userIds = userEntities.map(user => user.qualifiedId);
     const usersPayload = {
       qualified_users: userIds,
@@ -390,15 +392,6 @@ export class ConversationRepository {
       ...usersPayload,
       ...options,
     };
-
-    /**
-     * we need to add this creator_client to conversation creation payload
-     * for creating MLS conversations
-     */
-    if (options.protocol === ConversationProtocol.MLS) {
-      payload.creator_client = this.clientState.currentClient().id;
-      payload.selfUserId = this.userState.self().qualifiedId;
-    }
 
     if (this.teamState.team().id) {
       payload.team = {
@@ -427,7 +420,11 @@ export class ConversationRepository {
       let response: MLSReturnType;
       const isMLSConversation = payload.protocol === ConversationProtocol.MLS;
       if (isMLSConversation) {
-        response = await this.core.service!.conversation.createMLSConversation(payload);
+        response = await this.core.service!.conversation.createMLSConversation(
+          payload,
+          this.userState.self().qualifiedId,
+          this.core.clientId,
+        );
       } else {
         response = {conversation: await this.core.service!.conversation.createProteusConversation(payload), events: []};
       }
@@ -449,13 +446,39 @@ export class ConversationRepository {
         // since we are the creator of the conversation, we can safely mark it as established
         useMLSConversationState.getState().markAsEstablished(conversationEntity.groupId);
       }
+
+      const {failed_to_add: failedToAddUsers} = response.conversation;
+
+      if (failedToAddUsers && failedToAddUsers.length > 0) {
+        const failedToAddUsersEvent = EventBuilder.buildFailedToAddUsersEvent(
+          failedToAddUsers,
+          conversationEntity,
+          this.userState.self().id,
+        );
+        await this.eventRepository.injectEvent(failedToAddUsersEvent);
+      }
+
       return conversationEntity;
     } catch (error) {
-      this.handleConversationCreateError(
-        error,
-        userEntities.map(user => user.qualifiedId),
-      );
-      return undefined;
+      if (!isBackendError(error)) {
+        this.logger.error(error);
+        throw error;
+      }
+
+      switch (error.label) {
+        case BackendErrorLabel.CLIENT_ERROR:
+          this.handleTooManyMembersError();
+          break;
+        case BackendErrorLabel.NOT_CONNECTED:
+          await this.handleUsersNotConnected(userEntities.map(user => user.qualifiedId));
+          break;
+        case BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT:
+          this.showLegalHoldConsentError();
+          break;
+        default:
+          this.logger.error(error);
+      }
+      throw error;
     }
   }
 
@@ -466,6 +489,32 @@ export class ConversationRepository {
     }
     await this.userRepository.refreshUsers(unavailableUsers.map(user => user.qualifiedId));
   }
+
+  private async refreshAllConversationsUnavailableParticipants(): Promise<void> {
+    const allUnavailableUsers = this.conversationState
+      .conversations()
+      .flatMap(conversation => conversation.allUserEntities().filter(user => !user.isAvailable()));
+
+    if (!allUnavailableUsers.length) {
+      return;
+    }
+    await this.userRepository.refreshUsers(allUnavailableUsers.map(user => user.qualifiedId));
+  }
+
+  /**
+   * Refresh missing conversations and unavailable users metadata every 3 hours
+   * @Note Federation only
+   */
+  private readonly scheduleMissingUsersAndConversationsMetadataRefresh = () => {
+    window.setInterval(async () => {
+      try {
+        await this.loadMissingConversations();
+        await this.refreshAllConversationsUnavailableParticipants();
+      } catch (error) {
+        this.logger.warn(`failed to refresh missing users & conversations metat data`, error);
+      }
+    }, TIME_IN_MILLIS.HOUR * 3);
+  };
 
   /**
    * Create a guest room.
@@ -519,16 +568,11 @@ export class ConversationRepository {
    * @returns all the conversations from backend merged with the locally stored conversations and loaded into memory
    */
   public async loadConversations(): Promise<Conversation[]> {
-    const remoteConversationsPromise = this.conversationService.getAllConversations().catch(error => {
+    const remoteConversations = await this.conversationService.getAllConversations().catch(error => {
       this.logger.error(`Failed to get all conversations from backend: ${error.message}`);
       return {found: []} as RemoteConversations;
     });
-
-    const [localConversations, remoteConversations] = await Promise.all([
-      this.conversationService.loadConversationStatesFromDb<ConversationDatabaseData>(),
-      remoteConversationsPromise,
-    ]);
-    return this.loadRemoteConversations(remoteConversations, localConversations);
+    return this.loadRemoteConversations(remoteConversations);
   }
 
   /**
@@ -552,24 +596,16 @@ export class ConversationRepository {
   /**
    * Will append the new conversations from backend to the locally stored conversations in memory
    * @param remoteConversations new conversations fetched from backend
-   * @param localConversations conversations locally stored in database, but not in memory. Omitted after first loading of the app
    * @returns the new conversations from backend merged with the locally stored conversations
    */
-  private async loadRemoteConversations(
-    remoteConversations: RemoteConversations,
-    localConversations: ConversationDatabaseData[] = [],
-  ): Promise<Conversation[]> {
-    const {missingConversations} = this.conversationState;
+  private async loadRemoteConversations(remoteConversations: RemoteConversations): Promise<Conversation[]> {
+    const localConversations = await this.conversationService.loadConversationStatesFromDb<ConversationDatabaseData>();
     let conversationsData: any[];
-
-    if (remoteConversations.failed?.length) {
-      missingConversations.push(...remoteConversations.failed);
-    }
 
     if (!remoteConversations.found?.length) {
       conversationsData = localConversations;
     } else {
-      const data = ConversationMapper.mergeConversation(localConversations, remoteConversations);
+      const data = ConversationMapper.mergeConversations(localConversations, remoteConversations);
       conversationsData = (await this.conversationService.saveConversationsInDb(data)) as any[];
     }
 
@@ -580,12 +616,11 @@ export class ConversationRepository {
           .conversations()
           .some(storedConversations => storedConversations.id === allConversations.id),
     );
-    this.saveConversations(newConversationEntities);
+    if (newConversationEntities.length) {
+      this.saveConversations(newConversationEntities);
+    }
 
-    const remainingMissingConversations = missingConversations.filter(missingConversationsId =>
-      newConversationEntities.some(conversation => conversation.id !== missingConversationsId.id),
-    );
-    this.conversationState.missingConversations = [...new Set(remainingMissingConversations)];
+    this.conversationState.missingConversations = [...new Set(remoteConversations.failed)];
 
     return this.conversationState.conversations();
   }
@@ -914,7 +949,7 @@ export class ConversationRepository {
       this.conversationLabelRepository.saveLabels();
     }
     this.deleteConversationFromRepository(conversationId);
-    await this.conversationService.deleteConversationFromDb(conversationId);
+    await this.conversationService.deleteConversationFromDb(conversationId.id);
     if (conversationEntity.protocol === ConversationProtocol.MLS) {
       const {groupId} = conversationEntity;
       if (groupId) {
@@ -1512,7 +1547,7 @@ export class ConversationRepository {
    * @param conversationEntity Conversation to clear
    * @param leaveConversation Should we leave the conversation before clearing the content?
    */
-  public clearConversation(conversationEntity: Conversation, leaveConversation = false) {
+  public async clearConversation(conversationEntity: Conversation, leaveConversation = false) {
     const isActiveConversation = this.conversationState.isActiveConversation(conversationEntity);
     const nextConversationEntity = this.getNextConversation(conversationEntity);
 
@@ -1521,11 +1556,11 @@ export class ConversationRepository {
       this.leaveCall(conversationEntity.qualifiedId, LEAVE_CALL_REASON.USER_MANUALY_LEFT_CONVERSATION);
     }
 
-    this.messageRepository.updateClearedTimestamp(conversationEntity);
-    this._clearConversation(conversationEntity);
+    await this.messageRepository.updateClearedTimestamp(conversationEntity);
+    await this._clearConversation(conversationEntity);
 
     if (leaveConversation) {
-      this.removeMember(conversationEntity, this.userState.self().qualifiedId);
+      await this.removeMember(conversationEntity, this.userState.self().qualifiedId);
     }
 
     if (isActiveConversation) {
@@ -1591,12 +1626,11 @@ export class ConversationRepository {
    * @returns Resolves when user was removed from the conversation
    */
   private async leaveConversation(conversationEntity: Conversation, clearContent: boolean) {
-    if (clearContent) {
-      this.clearConversation(conversationEntity, false);
-    }
-
     const userQualifiedId = this.userState.self().qualifiedId;
-    return this.removeMemberFromConversation(conversationEntity, userQualifiedId);
+
+    return clearContent
+      ? this.clearConversation(conversationEntity, true)
+      : this.removeMemberFromConversation(conversationEntity, userQualifiedId);
   }
 
   /**
@@ -1857,28 +1891,12 @@ export class ConversationRepository {
    * @param conversationEntity Conversation entity to delete
    * @param timestamp Optional timestamps for which messages to remove
    */
-  private _clearConversation(conversationEntity: Conversation, timestamp?: number) {
+  private async _clearConversation(conversationEntity: Conversation, timestamp?: number) {
     this.deleteMessages(conversationEntity, timestamp);
 
     if (conversationEntity.removed_from_conversation()) {
-      this.conversationService.deleteConversationFromDb(conversationEntity);
+      await this.conversationService.deleteConversationFromDb(conversationEntity.id);
       this.deleteConversationFromRepository(conversationEntity);
-    }
-  }
-
-  private handleConversationCreateError(error: BackendError, userIds: QualifiedId[]): void {
-    switch (error.label) {
-      case BackendErrorLabel.CLIENT_ERROR:
-        this.handleTooManyMembersError();
-        break;
-      case BackendErrorLabel.NOT_CONNECTED:
-        this.handleUsersNotConnected(userIds);
-        break;
-      case BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT:
-        this.showLegalHoldConsentError();
-        break;
-      default:
-        throw error;
     }
   }
 
@@ -2302,6 +2320,7 @@ export class ConversationRepository {
       case ClientEvent.CONVERSATION.INCOMING_MESSAGE_TOO_BIG:
       case ClientEvent.CONVERSATION.KNOCK:
       case ClientEvent.CONVERSATION.CALL_TIME_OUT:
+      case ClientEvent.CONVERSATION.FAILED_TO_ADD_USERS:
       case ClientEvent.CONVERSATION.LEGAL_HOLD_UPDATE:
       case ClientEvent.CONVERSATION.LOCATION:
       case ClientEvent.CONVERSATION.MISSED_MESSAGES:
@@ -2727,7 +2746,7 @@ export class ConversationRepository {
     }
 
     if (conversationEntity.is_cleared()) {
-      this._clearConversation(conversationEntity, conversationEntity.cleared_timestamp());
+      await this._clearConversation(conversationEntity, conversationEntity.cleared_timestamp());
     }
 
     if (isActiveConversation && (conversationEntity.is_archived() || conversationEntity.is_cleared())) {
@@ -2912,7 +2931,6 @@ export class ConversationRepository {
       if (changes) {
         this.eventService.updateEventSequentially(messageEntity.primary_key, changes);
       }
-      return;
     } catch (error) {
       const isNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
       if (!isNotFound) {

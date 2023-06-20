@@ -21,6 +21,7 @@
 export enum SuperType {
   CALL = 'call',
   CALL_TIME_OUT = 'call-time-out',
+  FAILED_TO_ADD_USERS = 'failed-to-add-users',
   CONTENT = 'normal',
   DELETE = 'delete',
   DEVICE = 'device',

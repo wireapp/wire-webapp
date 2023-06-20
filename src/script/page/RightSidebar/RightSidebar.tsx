@@ -248,6 +248,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
 
           {currentState === PanelState.TIMED_MESSAGES && (
             <TimedMessages
+              teamState={teamState}
               activeConversation={activeConversation}
               repositories={repositories}
               onClose={closePanel}

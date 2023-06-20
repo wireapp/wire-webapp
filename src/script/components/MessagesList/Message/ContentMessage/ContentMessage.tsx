@@ -208,11 +208,17 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
           />
         ))}
         {failedToSend && (
-          <PartialFailureToSendWarning failedToSend={failedToSend} knownUsers={conversation.allUserEntities()} />
+          <PartialFailureToSendWarning
+            isMessageFocused={msgFocusState}
+            failedToSend={failedToSend}
+            knownUsers={conversation.allUserEntities()}
+          />
         )}
-        {status === StatusType.FAILED && (
+
+        {[StatusType.FAILED, StatusType.FEDERATION_ERROR].includes(status) && (
           <CompleteFailureToSendWarning
-            isTextAsset={message.getFirstAsset().isText()}
+            {...(status === StatusType.FEDERATION_ERROR && {unreachableDomain: conversation.domain})}
+            isMessageFocused={msgFocusState}
             onRetry={() => onRetry(message)}
           />
         )}
