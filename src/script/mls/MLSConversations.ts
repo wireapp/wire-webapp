@@ -54,7 +54,7 @@ export async function initMLSConversations(conversations: Conversation[], core: 
   }
 
   const mlsCapableConversations = conversations.filter(isMLSCapableConversation);
-  await joinNewConversations(mlsCapableConversations, core);
+  await joinNewMLSConversations(mlsCapableConversations, core);
 
   return mlsService.schedulePeriodicKeyMaterialRenewals(mlsCapableConversations.map(({groupId}) => groupId));
 }
@@ -87,7 +87,7 @@ export async function initMLSCallbacks(
  * @param conversations - all the conversations that the user is part of
  * @param core - the instance of the core
  */
-async function joinNewConversations(conversations: MLSCapableConversation[], core: Account): Promise<void> {
+async function joinNewMLSConversations(conversations: MLSCapableConversation[], core: Account): Promise<void> {
   // We send external proposal to all the MLS conversations that are in an unknown state (not established nor pendingWelcome)
   await useMLSConversationState.getState().sendExternalToPendingJoin(
     conversations,

@@ -20,6 +20,7 @@
 import {Account} from '@wireapp/core';
 
 import {MixedConversation} from 'src/script/conversation/ConversationSelectors';
+import {initMLSConversations} from 'src/script/mls/MLSConversations';
 
 import {mlsMigrationLogger} from '../../MLSMigrationLogger';
 
@@ -31,35 +32,7 @@ export const joinUnestablishedMixedConversations = async (
   mixedConversations: MixedConversation[],
   {core}: JoinUnestablishedMixedConversationsParams,
 ) => {
-  mlsMigrationLogger.info(
-    `Found ${mixedConversations.length} "mixed" conversations, checking if all of them have established MLS groups...`,
-  );
+  mlsMigrationLogger.info(`Found ${mixedConversations.length} "mixed" conversations, joining unestablished ones...`);
 
-  for (const mixedConversation of mixedConversations) {
-    await joinUnestablishedMixedConversation(mixedConversation, {core});
-  }
-};
-
-const joinUnestablishedMixedConversation = async (
-  mixedConversation: MixedConversation,
-  {core}: JoinUnestablishedMixedConversationsParams,
-) => {
-  const conversationService = core.service?.conversation;
-  if (!conversationService) {
-    throw new Error('ConversationService is not available');
-  }
-
-  const isMLSGroupAlreadyEstablished = await conversationService.isMLSConversationEstablished(
-    mixedConversation.groupId,
-  );
-
-  if (isMLSGroupAlreadyEstablished) {
-    return;
-  }
-
-  mlsMigrationLogger.info(
-    `Found "mixed" conversation without established MLS group: ${mixedConversation.qualifiedId.id}, joining via external commit...`,
-  );
-
-  await conversationService.joinByExternalCommit(mixedConversation.qualifiedId);
+  await initMLSConversations(mixedConversations, core);
 };
