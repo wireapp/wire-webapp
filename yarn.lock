@@ -6102,9 +6102,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 "@wireapp/api-client@npm:^24.16.0":
   version: 24.16.0
   resolution: "@wireapp/api-client@npm:24.16.0"
+=======
+"@wireapp/api-client@npm:^24.15.7-draft-20-cc.0":
+  version: 24.15.7-draft-20-cc.0
+  resolution: "@wireapp/api-client@npm:24.15.7-draft-20-cc.0"
+>>>>>>> af7529c65 (feat: parse supported protocols (#15379))
   dependencies:
     "@wireapp/commons": ^5.1.0
     "@wireapp/priority-queue": ^2.1.1
@@ -6117,7 +6123,11 @@ __metadata:
     spark-md5: 3.0.2
     tough-cookie: 4.1.3
     ws: 8.11.0
+<<<<<<< HEAD
   checksum: 92af35a97144148d460a68c163f9b159fd9b4796376301e1434bf84698fad46980da0bd1409cada959ab82b0de282907e57a2a720955210077f1b96267c22c40
+=======
+  checksum: 45972dcdcfe8775eb0f52420767083be9e0f72d3838565a7567f824282da9ec6c3be8954564d52fa1cba582023ed0cb48255e8750e9b8918e27f06d571ccf526
+>>>>>>> af7529c65 (feat: parse supported protocols (#15379))
   languageName: node
   linkType: hard
 
@@ -6170,11 +6180,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 "@wireapp/core@npm:40.6.0":
   version: 40.6.0
   resolution: "@wireapp/core@npm:40.6.0"
   dependencies:
     "@wireapp/api-client": ^24.16.0
+=======
+"@wireapp/core@npm:40.5.5-draft-20-cc.0":
+  version: 40.5.5-draft-20-cc.0
+  resolution: "@wireapp/core@npm:40.5.5-draft-20-cc.0"
+  dependencies:
+    "@wireapp/api-client": ^24.15.7-draft-20-cc.0
+>>>>>>> af7529c65 (feat: parse supported protocols (#15379))
     "@wireapp/commons": ^5.1.0
     "@wireapp/core-crypto": 1.0.0-pre.5
     "@wireapp/cryptobox": 12.8.0
@@ -6191,7 +6209,11 @@ __metadata:
     logdown: 3.3.1
     long: ^5.2.0
     uuidjs: 4.2.13
+<<<<<<< HEAD
   checksum: e27e71409de6224847a283d30a3c98ed748da40d4a881c940eb372964f3586263fc7691782eaa2ad2239cabaa6b27fa9dd3066c98ca8fc7e5a6511f63788ba99
+=======
+  checksum: a09cb920666baef651b50f93104c8aa68035428bc1b2f3b117eeecededd37c148ed80fbbca4f403d77d4b43fbda70a9e62481478d978b34918ef51d9dc3605ae
+>>>>>>> af7529c65 (feat: parse supported protocols (#15379))
   languageName: node
   linkType: hard
 
@@ -19060,7 +19082,11 @@ dexie@latest:
     "@typescript-eslint/parser": ^5.60.0
     "@wireapp/avs": 9.2.15
     "@wireapp/copy-config": 2.1.1
+<<<<<<< HEAD
     "@wireapp/core": 40.6.0
+=======
+    "@wireapp/core": 40.5.5-draft-20-cc.0
+>>>>>>> af7529c65 (feat: parse supported protocols (#15379))
     "@wireapp/eslint-config": 2.2.2
     "@wireapp/lru-cache": 3.8.1
     "@wireapp/prettier-config": 0.6.0

@@ -47,7 +47,7 @@ import {container} from 'tsyringe';
 
 import {getLogger, Logger} from 'Util/Logger';
 
-import {MLSCapableConversation, MLSConversation} from './ConversationSelectors';
+import {MLSCapableConversation} from './ConversationSelectors';
 
 import type {Conversation as ConversationEntity} from '../entity/Conversation';
 import type {EventService} from '../event/EventService';

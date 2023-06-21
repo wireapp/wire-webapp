@@ -80,7 +80,13 @@ import {ConversationFilter} from './ConversationFilter';
 import {ConversationLabelRepository} from './ConversationLabelRepository';
 import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';
 import {ConversationRoleRepository} from './ConversationRoleRepository';
-import {isMLSCapableConversation, isMLSConversation} from './ConversationSelectors';
+import {
+  isMixedConversation,
+  isMLSCapableConversation,
+  isMLSConversation,
+  isProteusConversation,
+  MLSCapableConversation,
+} from './ConversationSelectors';
 import {ConversationService} from './ConversationService';
 import {ConversationState} from './ConversationState';
 import {ConversationStateHandler} from './ConversationStateHandler';
