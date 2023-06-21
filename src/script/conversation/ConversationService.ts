@@ -47,11 +47,15 @@ import {container} from 'tsyringe';
 
 import {getLogger, Logger} from 'Util/Logger';
 
+import {MLSCapableConversation} from './ConversationSelectors';
+
 import type {Conversation as ConversationEntity} from '../entity/Conversation';
 import type {EventService} from '../event/EventService';
 import {MessageCategory} from '../message/MessageCategory';
+import {useMLSConversationState} from '../mls';
 import {search as fullTextSearch} from '../search/FullTextSearch';
 import {APIClient} from '../service/APIClientSingleton';
+import {Core} from '../service/CoreSingleton';
 import {StorageService} from '../storage';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {StorageSchemata} from '../storage/StorageSchemata';
@@ -64,6 +68,7 @@ export class ConversationService {
     eventService: EventService,
     private readonly storageService = container.resolve(StorageService),
     private readonly apiClient = container.resolve(APIClient),
+    private readonly core = container.resolve(Core),
   ) {
     this.eventService = eventService;
     this.logger = getLogger('ConversationService');
@@ -412,5 +417,15 @@ export class ConversationService {
     return events
       .filter(record => record.ephemeral_expires !== true)
       .filter(({data: event_data}: any) => fullTextSearch(event_data.content, query));
+  }
+
+  /**
+   * Wipes MLS conversation in corecrypto and deletes the conversation state.
+   * @param mlsConversation mls conversation
+   */
+  async wipeMLSCapableConversation(conversation: MLSCapableConversation) {
+    const {groupId} = conversation;
+    await this.core.service!.conversation.wipeMLSConversation(groupId);
+    return useMLSConversationState.getState().wipeConversationState(groupId);
   }
 }

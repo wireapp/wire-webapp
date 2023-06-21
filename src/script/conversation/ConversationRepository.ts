@@ -959,8 +959,7 @@ export class ConversationRepository {
     this.deleteConversationFromRepository(conversationId);
     await this.conversationService.deleteConversationFromDb(conversationId.id);
     if (isMLSCapableConversation(conversationEntity)) {
-      const {groupId} = conversationEntity;
-      await this.core.service!.conversation.wipeMLSConversation(groupId);
+      await this.conversationService.wipeMLSConversation(conversationEntity);
     }
   };
 
@@ -2707,8 +2706,7 @@ export class ConversationRepository {
       }
 
       if (isMLSCapableConversation(conversationEntity)) {
-        const {groupId} = conversationEntity;
-        await this.core.service!.conversation.wipeMLSConversation(groupId);
+        await this.conversationService.wipeMLSConversation(conversationEntity);
       }
     } else {
       // Update conversation roles (in case the removed user had some special role and it's not the self user)

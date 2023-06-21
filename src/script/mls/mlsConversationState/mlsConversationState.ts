@@ -41,6 +41,7 @@ type StoreState = MLSConversationState & {
   filterEstablishedConversations: (conversations: Conversation[]) => Conversation[];
   markAsEstablished: (groupId: string) => void;
   markAsPendingWelcome: (groupId: string) => void;
+  wipeConversationState: (groupId: string) => void;
   /**
    * Will send external proposal for all the conversations that are not pendingWelcome or established
    * @param conversations The conversations that we want to process (only the mls conversations will be considered)
@@ -67,21 +68,25 @@ export const useMLSConversationState = create<StoreState>((set, get) => {
 
     markAsEstablished: groupId =>
       set(state => {
-        const newState = new Set(state.established);
-        newState.add(groupId);
+        const established = new Set(state.established);
+        established.add(groupId);
+
+        const pendingWelcome = new Set(state.pendingWelcome);
+        pendingWelcome.delete(groupId);
+
         return {
-          ...state,
-          established: newState,
+          established,
+          pendingWelcome,
         };
       }),
 
     markAsPendingWelcome: groupId =>
       set(state => {
-        const newState = new Set(state.pendingWelcome);
-        newState.add(groupId);
+        const pendingWelcome = new Set(state.pendingWelcome);
+        pendingWelcome.add(groupId);
         return {
           ...state,
-          pendingWelcome: newState,
+          pendingWelcome,
         };
       }),
 
@@ -125,6 +130,19 @@ export const useMLSConversationState = create<StoreState>((set, get) => {
         pendingWelcome: new Set([...currentState.pendingWelcome, ...pendingConversations]),
       });
     },
+
+    wipeConversationState: groupId =>
+      set(state => {
+        const established = new Set(state.established);
+        established.delete(groupId);
+        const pendingWelcome = new Set(state.pendingWelcome);
+        pendingWelcome.delete(groupId);
+        return {
+          ...state,
+          established,
+          pendingWelcome,
+        };
+      }),
   };
 });
 
