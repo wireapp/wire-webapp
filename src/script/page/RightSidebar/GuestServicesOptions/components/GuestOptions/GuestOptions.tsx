@@ -165,7 +165,8 @@ const GuestOptions: FC<GuestOptionsProps> = ({
           text: t('guestOptionsPasswordCopyToClipboard'),
         },
         text: {
-          title: t('guestOptionsPasswordForceToCopy'),
+          title: t('guestOptionsPasswordCopyToClipboard'),
+          message: t('guestOptionsPasswordForceToCopy'),
         },
       },
       undefined,
