@@ -212,7 +212,7 @@ export const PrimaryModalComponent: FC = () => {
                     required
                     wrapperCSS={guestLinkPasswordInputStyles}
                     placeholder={t('modalGuestLinkJoinPlaceholder')}
-                    label={t('modalGuestLinkJoinPlaceholder')}
+                    label={t('modalGuestLinkJoinLabel')}
                     helperText={t('modalGuestLinkJoinHelperText')}
                     id="modal_pswd_confiramtion"
                     className="modal__input"
@@ -225,8 +225,8 @@ export const PrimaryModalComponent: FC = () => {
                     name="guest-link-password-confirm"
                     required
                     wrapperCSS={guestLinkPasswordInputStyles}
-                    placeholder={t('modalGuestLinkJoinPlaceholder')}
-                    label={t('modalGuestLinkJoinPlaceholder')}
+                    placeholder={t('modalGuestLinkJoinConfirmPlaceholder')}
+                    label={t('modalGuestLinkJoinConfirmLabel')}
                     className="modal__input"
                     type="password"
                     id="modal_pswd_confiramtion"
