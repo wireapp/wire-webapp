@@ -17,9 +17,26 @@
  *
  */
 
+import {useEffect} from 'react';
+
+import {container} from 'tsyringe';
+
+import {Core} from 'src/script/service/CoreSingleton';
+
 const E2EIdentityOidcRedirect = () => {
   const search = window.location.href.split('/#/oidc')[1];
   const urlParams = new URLSearchParams(search);
+
+  useEffect(() => {
+    async function enroll() {
+      const core = container.resolve(Core);
+      await core.init();
+      return await core.continueE2EIEnrollment();
+    }
+    enroll()
+      .then(success => console.log('done', success))
+      .catch(error => console.log('error', error));
+  }, []);
 
   const oidcRedirectParams: Record<string, string | null> = {
     code: urlParams.get('code'),

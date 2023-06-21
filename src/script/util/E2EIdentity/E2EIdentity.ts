@@ -116,9 +116,9 @@ class E2EIHandler {
       this.currentStep = E2EIHandlerStep.ENROLL;
       this.showLoadingMessage();
       const success = await core.startE2EIEnrollment(
-        this.discoveryUrl,
         userState.self().name(),
         userState.self().username(),
+        this.discoveryUrl,
       );
       if (!success) {
         throw new Error('E2EI enrollment failed');
