@@ -67,10 +67,10 @@ export const PrimaryModalComponent: FC = () => {
     hideCloseBtn = false,
   } = content;
 
-  const hasPassword = currentType === PrimaryModalType.PASSWORD;
-  const hasInput = currentType === PrimaryModalType.INPUT;
-  const hasOption = currentType === PrimaryModalType.OPTION;
-  const hasMultipleSecondary = currentType === PrimaryModalType.MULTI_ACTIONS;
+  const isPassword = currentType === PrimaryModalType.PASSWORD;
+  const isInput = currentType === PrimaryModalType.INPUT;
+  const isOption = currentType === PrimaryModalType.OPTION;
+  const isMultipleSecondary = currentType === PrimaryModalType.MULTI_ACTIONS;
   const isGuestLinkPassword = currentType === PrimaryModalType.GUEST_LINK_PASSWORD;
 
   const onModalHidden = () => {
@@ -84,13 +84,16 @@ export const PrimaryModalComponent: FC = () => {
     setDidCopyPassword(false);
   };
 
-  const actionEnabled = !hasInput || !!inputValue.trim().length;
+  const inputActionEnabled = !isInput || !!inputValue.trim().length;
+  const passwordActionEnabled =
+    (!isGuestLinkPassword || !!passwordValue.trim().length) && passwordValue === passwordConfirmationValue;
+  console.info('bardia', {inputActionEnabled, passwordActionEnabled});
   const doAction =
     (action?: Function, closeAfter = true, skipValidation = false) =>
     (event: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement>) => {
       event.preventDefault();
 
-      if (!skipValidation && !actionEnabled) {
+      if (!skipValidation && !inputActionEnabled) {
         return;
       }
       if (typeof action === 'function') {
@@ -246,7 +249,7 @@ export const PrimaryModalComponent: FC = () => {
                 />
               )}
 
-              {hasPassword && (
+              {isPassword && (
                 <form onSubmit={doAction(confirm, !!closeOnConfirm)}>
                   <label htmlFor="modal_pswd" className="visually-hidden">
                     {inputPlaceholder}
@@ -263,7 +266,7 @@ export const PrimaryModalComponent: FC = () => {
                 </form>
               )}
 
-              {hasInput && (
+              {isInput && (
                 <form onSubmit={doAction(confirm, !!closeOnConfirm)}>
                   <label htmlFor="modal-input" className="visually-hidden">
                     {inputPlaceholder}
@@ -282,7 +285,7 @@ export const PrimaryModalComponent: FC = () => {
 
               {errorMessage && <div className="modal__input__error">{errorMessage}</div>}
 
-              {hasOption && (
+              {isOption && (
                 <div className="modal-option">
                   <Checkbox
                     checked={optionChecked}
@@ -297,7 +300,7 @@ export const PrimaryModalComponent: FC = () => {
                 </div>
               )}
 
-              <div className={cx('modal__buttons', {'modal__buttons--column': hasMultipleSecondary})}>
+              <div className={cx('modal__buttons', {'modal__buttons--column': isMultipleSecondary})}>
                 {secondaryActions
                   .filter((action): action is Action => action !== null && !!action.text)
                   .map(action => (
@@ -307,7 +310,7 @@ export const PrimaryModalComponent: FC = () => {
                       onClick={doAction(action.action, true, true)}
                       data-uie-name={action?.uieName}
                       className={cx('modal__button modal__button--secondary', {
-                        'modal__button--full': hasMultipleSecondary,
+                        'modal__button--full': isMultipleSecondary,
                       })}
                     >
                       {action.text}
@@ -318,9 +321,9 @@ export const PrimaryModalComponent: FC = () => {
                     ref={primaryActionButtonRef}
                     type="button"
                     onClick={doAction(confirm, !!closeOnConfirm)}
-                    disabled={!actionEnabled}
+                    disabled={!inputActionEnabled || !passwordActionEnabled}
                     className={cx('modal__button modal__button--primary', {
-                      'modal__button--full': hasMultipleSecondary,
+                      'modal__button--full': isMultipleSecondary,
                     })}
                     data-uie-name="do-action"
                   >

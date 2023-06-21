@@ -192,6 +192,9 @@ const GuestOptions: FC<GuestOptionsProps> = ({
           action: onCreate,
           text: t('guestOptionsInfoModalAction'),
         },
+        secondaryAction: {
+          text: t('modalConfirmSecondary'),
+        },
         text: {
           closeBtnLabel: t('guestOptionsInfoModalCancel'),
           input: t('guestOptionsInfoModalFormLabel'),
