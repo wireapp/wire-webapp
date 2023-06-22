@@ -34,7 +34,7 @@ const createMemberMessage = (partialMemberMessage: Partial<MemberMessageEntity>)
     isMemberLeave: () => false,
     isMemberRemoval: () => false,
     showLargeAvatar: () => false,
-    showNamedCreation: ko.pureComputed(() => false),
+    showNamedCreation: ko.pureComputed(() => true),
     timestamp: ko.observable(Date.now()),
     ...partialMemberMessage,
   };
@@ -54,10 +54,27 @@ describe('MemberMessage', () => {
       onClickInvitePeople: () => {},
       onClickParticipants: () => {},
       shouldShowInvitePeople: false,
+      conversationName: 'group 1',
     };
 
     const {queryByTestId} = render(<MemberMessage {...props} />);
-
     expect(queryByTestId('element-connected-message')).not.toBeNull();
+  });
+  it('shows conversation title', async () => {
+    const props = {
+      hasReadReceiptsTurnedOn: false,
+      isSelfTemporaryGuest: false,
+      message: createMemberMessage({
+        otherUser: ko.pureComputed(() => new User('id')),
+      }),
+      onClickCancelRequest: () => {},
+      onClickInvitePeople: () => {},
+      onClickParticipants: () => {},
+      shouldShowInvitePeople: false,
+      conversationName: 'group 1',
+    };
+
+    const {getByTestId} = render(<MemberMessage {...props} />);
+    expect(getByTestId('conversation-name').textContent).toBe(props.conversationName);
   });
 });
