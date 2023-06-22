@@ -17,6 +17,7 @@
  *
  */
 
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import type {TraceState} from '@wireapp/api-client/lib/http/';
 import type {Consent, Self} from '@wireapp/api-client/lib/self/';
 import type {UserUpdate} from '@wireapp/api-client/lib/user/';
@@ -66,5 +67,9 @@ export class SelfService {
 
   putSelfPhone(phone: string): Promise<void> {
     return this.apiClient.api.self.putPhone({phone});
+  }
+
+  putSupportedProtocols(supportedProtocols: ConversationProtocol[]): Promise<void> {
+    return this.apiClient.api.self.putSupportedProtocols(supportedProtocols);
   }
 }

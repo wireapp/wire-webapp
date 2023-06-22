@@ -18,6 +18,7 @@
  */
 
 import type {AddedClient, PublicClient} from '@wireapp/api-client/lib/client';
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {
   UserEvent,
   UserLegalHoldDisableEvent,
@@ -805,6 +806,16 @@ export class UserRepository {
   async changeName(name: string): Promise<User> {
     await this.selfService.putSelf({name});
     return this.updateUser(this.userState.self().qualifiedId, {name});
+  }
+
+  /**
+   * Change supported protocols.
+   * It will send a request to the backend to change the supported protocols and then update the user in the local state.
+   * @param supportedProtocols - an array of new supported protocols
+   */
+  async changeSupportedProtocols(supportedProtocols: ConversationProtocol[]): Promise<User> {
+    await this.selfService.putSupportedProtocols(supportedProtocols);
+    return this.updateUser(this.userState.self().qualifiedId, {supported_protocols: supportedProtocols});
   }
 
   async changeEmail(email: string): Promise<void> {

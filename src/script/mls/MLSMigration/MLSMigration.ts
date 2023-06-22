@@ -36,6 +36,7 @@ import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {initialiseMigrationOfProteusConversations} from './initialiseMigration';
 import {joinUnestablishedMixedConversations} from './initialiseMigration/joinUnestablishedMixedConversations';
+import {getMLSMigrationStatus, MLSMigrationStatus} from './migrationStatus';
 import {mlsMigrationLogger} from './MLSMigrationLogger';
 
 import {isMLSSupportedByEnvironment} from '../isMLSSupportedByEnvironment';
@@ -120,16 +121,13 @@ const checkMigrationConfig = async (
   }
 
   mlsMigrationLogger.info('MLS migration feature enabled, checking the configuration...');
+  const migrationStatus = getMLSMigrationStatus(mlsMigrationFeature);
 
-  //if startTime is not defined, we never start the migration, will retry in 24 hours or on next app reload
-  const startDateISO = mlsMigrationFeature.config.startTime;
-  const startTime = (startDateISO && Date.parse(startDateISO)) || Infinity;
-  const hasStartTimeArrived = Date.now() >= startTime;
-
-  if (!hasStartTimeArrived) {
+  if (migrationStatus === MLSMigrationStatus.NOT_STARTED) {
     mlsMigrationLogger.info(
       'MLS migration start time has not arrived yet, will retry in 24 hours or on next app reload.',
     );
+    return;
   }
 
   mlsMigrationLogger.info(
