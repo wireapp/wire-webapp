@@ -31,6 +31,7 @@ import {checkFileSharingPermission} from 'Components/Conversation/utils/checkFil
 import {useEmoji} from 'Components/Emoji/useEmoji';
 import {Icon} from 'Components/Icon';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
@@ -567,10 +568,21 @@ const InputBar = ({
 
   const onPingClick = () => {
     if (conversationEntity && !pingDisabled) {
-      setIsPingDisabled(true);
-
-      messageRepository.sendPing(conversationEntity).then(() => {
-        window.setTimeout(() => setIsPingDisabled(false), CONFIG.PING_TIMEOUT);
+      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+        primaryAction: {
+          action: () => {
+            setIsPingDisabled(true);
+            messageRepository.sendPing(conversationEntity).then(() => {
+              window.setTimeout(() => setIsPingDisabled(false), CONFIG.PING_TIMEOUT);
+            });
+          },
+          text: 'Yes, Ping!',
+        },
+        text: {
+          message:
+            'Are you sure you want to disturb the chat realm with your mighty ping? Proceed with caution, for the chat gods are watching.',
+          title: `You're about to ping ${conversationEntity.participating_user_ets().length} users`,
+        },
       });
     }
   };
