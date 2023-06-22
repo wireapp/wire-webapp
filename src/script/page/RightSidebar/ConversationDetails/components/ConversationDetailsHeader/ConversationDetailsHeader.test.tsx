@@ -19,16 +19,21 @@
 
 import {render, fireEvent} from '@testing-library/react';
 
+import {User} from 'src/script/entity/User';
+import {ServiceEntity} from 'src/script/integration/ServiceEntity';
+
 import {ConversationDetailsHeader} from './ConversationDetailsHeader';
 
+const participant = new User('id');
+const service = new ServiceEntity({id: 'id'});
 const getDefaultProps = () => ({
   isActiveGroupParticipant: true,
   canRenameGroup: true,
   displayName: 'Group Chat',
   updateConversationName: jest.fn(),
   isGroup: true,
-  userParticipants: [],
-  serviceParticipants: [],
+  userParticipants: new Array(participant),
+  serviceParticipants: new Array(service),
   allUsersCount: 0,
   isTeam: false,
 });
