@@ -57,6 +57,7 @@ import {Configuration} from '../Config';
 import {ConnectionRepository} from '../connection/ConnectionRepository';
 import {ConnectionService} from '../connection/ConnectionService';
 import {ConversationRepository} from '../conversation/ConversationRepository';
+import {isMLSConversation} from '../conversation/ConversationSelectors';
 import {ConversationService} from '../conversation/ConversationService';
 import {MessageRepository} from '../conversation/MessageRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
@@ -430,6 +431,11 @@ export class App {
 
       if (supportsMLS()) {
         // Once all the messages have been processed and the message sending queue freed we can now:
+
+        const mlsConversations = conversations.filter(isMLSConversation);
+
+        //join all the mls groups we're member of and have not yet joined (eg. we were not send welcome message)
+        await initMLSConversations(mlsConversations, this.core);
 
         //add the potential `self` and `team` conversations
         await registerUninitializedSelfAndTeamConversations(conversations, selfUser, clientEntity().id, this.core);
