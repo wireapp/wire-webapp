@@ -21,7 +21,7 @@ import {FC, FormEvent, MouseEvent, useState, useRef, ChangeEvent, useEffect} fro
 
 import cx from 'classnames';
 
-import {Checkbox, CheckboxLabel, Form, Input} from '@wireapp/react-ui-kit';
+import {Checkbox, CheckboxLabel, COLOR, Form, Input, Link, Text} from '@wireapp/react-ui-kit';
 
 import {CopyToClipboardButton} from 'Components/CopyToClipboardButton';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
@@ -72,6 +72,7 @@ export const PrimaryModalComponent: FC = () => {
   const isOption = currentType === PrimaryModalType.OPTION;
   const isMultipleSecondary = currentType === PrimaryModalType.MULTI_ACTIONS;
   const isGuestLinkPassword = currentType === PrimaryModalType.GUEST_LINK_PASSWORD;
+  const isJoinGuestLinkPassword = currentType === PrimaryModalType.JOIN_GUEST_LINK_PASSWORD;
 
   const onModalHidden = () => {
     updateCurrentModalContent(defaultContent);
@@ -118,6 +119,7 @@ export const PrimaryModalComponent: FC = () => {
       [PrimaryModalType.INPUT]: () => action(inputValue),
       [PrimaryModalType.PASSWORD]: () => action(passwordValue),
       [PrimaryModalType.GUEST_LINK_PASSWORD]: () => action(passwordValue),
+      [PrimaryModalType.JOIN_GUEST_LINK_PASSWORD]: () => action(passwordValue),
     };
 
     if (Object.keys(actions).includes(content?.currentType ?? '')) {
@@ -264,6 +266,52 @@ export const PrimaryModalComponent: FC = () => {
                     onChange={event => setPasswordValue(event.target.value)}
                   />
                 </form>
+              )}
+
+              {isJoinGuestLinkPassword && (
+                <Form
+                  name="guest-password-join-form"
+                  data-uie-name="guest-password-join-form"
+                  onSubmit={doAction(confirm, !!closeOnConfirm)}
+                  autoComplete="off"
+                >
+                  <label
+                    style={{
+                      fontSize: '0.875rem',
+                      fontWeight: 400,
+                      lineHeight: '1rem',
+                      color: 'var(--text-input-label)',
+                      marginBottom: 2,
+                    }}
+                    htmlFor="modal_pswd"
+                  >
+                    {t('guestLinkPasswordModal.passwordInputLabel')}
+                  </label>
+
+                  <input
+                    style={{
+                      boxShadow: '0 0 0 1px var(--text-input-border)',
+                      borderRadius: 12,
+                      margin: 0,
+                    }}
+                    id="modal_pswd"
+                    className="modal__input"
+                    type="password"
+                    value={passwordValue}
+                    placeholder={t('guestLinkPasswordModal.passwordInputPlaceholder')}
+                    onChange={event => setPasswordValue(event.target.value)}
+                  />
+
+                  <Link
+                    style={{marginTop: 24}}
+                    href={Config.getConfig().URL.SUPPORT.LEARN_MORE_ABOUT_GUEST_LINKS}
+                    target="_blank"
+                  >
+                    <Text block color={COLOR.BLUE} style={{textDecoration: 'underline', marginBottom: 24}}>
+                      {t('guestLinkPasswordModal.learnMoreLink')}
+                    </Text>
+                  </Link>
+                </Form>
               )}
 
               {isInput && (

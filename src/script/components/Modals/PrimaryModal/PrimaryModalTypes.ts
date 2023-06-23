@@ -64,6 +64,7 @@ export enum PrimaryModalType {
   OPTION = 'modal-template-option',
   PASSWORD = 'modal-template-password',
   GUEST_LINK_PASSWORD = 'modal-template-guest-link-password',
+  JOIN_GUEST_LINK_PASSWORD = 'modal-template-join-guest-link-password',
   SESSION_RESET = 'modal-session-reset',
   WITHOUT_TITLE = 'modal-without-title',
 }

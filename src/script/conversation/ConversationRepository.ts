@@ -1191,7 +1191,7 @@ export class ConversationRepository {
         amplify.publish(WebAppEvents.CONVERSATION.SHOW, knownConversation, {});
         return;
       }
-      PrimaryModal.show(hasPassword ? PrimaryModal.type.PASSWORD : PrimaryModal.type.CONFIRM, {
+      PrimaryModal.show(hasPassword ? PrimaryModal.type.JOIN_GUEST_LINK_PASSWORD : PrimaryModal.type.CONFIRM, {
         preventClose: false,
         primaryAction: {
           action: async (password?: string) => {
@@ -1224,11 +1224,11 @@ export class ConversationRepository {
               }
             }
           },
-          text: t('modalConversationJoinConfirm'),
+          text: t('guestLinkPasswordModal.joinConversation'),
         },
         text: {
           message: hasPassword
-            ? t('guestLinkPasswordModal.description')
+            ? t('guestLinkPasswordModal.conversationPasswordProtected')
             : t('modalConversationJoinMessage', {conversationName}),
           title: hasPassword
             ? t('guestLinkPasswordModal.headline', {conversationName})
