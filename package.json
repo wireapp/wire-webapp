@@ -106,7 +106,7 @@
     "autoprefixer": "^10.4.13",
     "babel-loader": "9.1.2",
     "babel-plugin-transform-import-meta": "^2.2.0",
-    "caniuse-lite": "^1.0.30001506",
+    "caniuse-lite": "^1.0.30001507",
     "cross-env": "7.0.3",
     "cspell": "6.31.1",
     "css-loader": "^6.8.1",
