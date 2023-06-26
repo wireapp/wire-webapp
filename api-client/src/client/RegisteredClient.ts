@@ -28,6 +28,7 @@ export interface AddedClient extends PublicClient {
   /** An ISO 8601 Date string */
   time: string;
   type: ClientType.PERMANENT | ClientType.TEMPORARY;
+  mls_public_keys?: Record<string, string>;
 }
 
 export interface RegisteredClient extends AddedClient {

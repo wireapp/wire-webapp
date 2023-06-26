@@ -750,7 +750,7 @@ export class ConversationAPI {
       url: `${ConversationAPI.URL.MLS}/commit-bundles`,
     };
 
-    const response = await this.client.sendProtocolBuffer<PostMlsMessageResponse>(config, true);
+    const response = await this.client.sendProtocolMls<PostMlsMessageResponse>(config, true);
     return response.data;
   }
 

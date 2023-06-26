@@ -27,10 +27,11 @@ export enum CredentialType {
   Basic = 1,
 }
 
-export enum PublicGroupStateEncryptionType {
+export enum GroupInfoEncryptionType {
   Plaintext = 1,
   JweEncrypted = 2,
 }
+
 export enum RatchetTreeType {
   Full = 1,
   Delta = 2,
