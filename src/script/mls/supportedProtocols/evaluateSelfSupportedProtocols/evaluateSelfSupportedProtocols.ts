@@ -92,7 +92,10 @@ const isProteusSupported = async ({
   mlsMigrationStatus: MLSMigrationStatus;
 }): Promise<boolean> => {
   const isProteusSupportedByTeam = teamSupportedProtocols.has(ConversationProtocol.PROTEUS);
-  return isProteusSupportedByTeam || mlsMigrationStatus === MLSMigrationStatus.ONGOING;
+  return (
+    isProteusSupportedByTeam ||
+    [MLSMigrationStatus.NOT_STARTED, MLSMigrationStatus.ONGOING].includes(mlsMigrationStatus)
+  );
 };
 
 const wasClientActiveWithinLast4Weeks = (client: RegisteredClient): boolean => {

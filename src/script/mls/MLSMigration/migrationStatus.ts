@@ -44,14 +44,15 @@ const hasMigrationFinaliseRegardlessAfterDateArrived = (mlsMigrationFeature: Fea
 };
 
 export enum MLSMigrationStatus {
-  NOT_STARTED = 'NOT_STARTED', //disabled or startTime has not arrived
-  ONGOING = 'ONGOING', //enabled and startTime has arrived, but finaliseRegardlessAfter has not arrived
-  FINALISED = 'FINALISED', //enabled and finaliseRegardlessAfter has arrived
+  DISABLED = 'DISABLED', //migration feature is disabled
+  NOT_STARTED = 'NOT_STARTED', //migration feature is enabled but startTime has not arrived
+  ONGOING = 'ONGOING', //migration feature is enabled and startTime has arrived, but finaliseRegardlessAfter has not arrived
+  FINALISED = 'FINALISED', //migration feature is enabled and finaliseRegardlessAfter has arrived
 }
 
 export const getMLSMigrationStatus = (mlsMigrationFeature?: FeatureMLSMigration): MLSMigrationStatus => {
   if (!mlsMigrationFeature || mlsMigrationFeature.status === FeatureStatus.DISABLED) {
-    return MLSMigrationStatus.NOT_STARTED;
+    return MLSMigrationStatus.DISABLED;
   }
 
   const hasMigrationStarted = hasMigrationStartTimeArrived(mlsMigrationFeature);

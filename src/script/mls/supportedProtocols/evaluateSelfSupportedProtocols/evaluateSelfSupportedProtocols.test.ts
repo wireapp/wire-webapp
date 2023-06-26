@@ -34,24 +34,59 @@ import {MLSMigrationStatus} from '../../MLSMigration/migrationStatus';
 
 jest.spyOn(mlsSupport, 'isMLSSupportedByEnvironment').mockResolvedValue(true);
 
-const generateMigrationDates = (migrationStatus: MLSMigrationStatus) => {
+const generateMLSFeaturesConfig = (migrationStatus: MLSMigrationStatus, supportedProtocols: ConversationProtocol[]) => {
   const now = Date.now();
 
   switch (migrationStatus) {
+    case MLSMigrationStatus.DISABLED:
+      return {
+        mls: {
+          status: FeatureStatus.ENABLED,
+          config: {supportedProtocols},
+        },
+        mlsMigration: {status: FeatureStatus.DISABLED, config: {}},
+      };
     case MLSMigrationStatus.NOT_STARTED:
       return {
-        startTime: new Date(now + 1 * TIME_IN_MILLIS.DAY).toISOString(),
-        finaliseRegardlessAfter: new Date(now + 2 * TIME_IN_MILLIS.DAY).toISOString(),
+        mls: {
+          status: FeatureStatus.ENABLED,
+          config: {supportedProtocols},
+        },
+        mlsMigration: {
+          status: FeatureStatus.ENABLED,
+          config: {
+            startTime: new Date(now + 1 * TIME_IN_MILLIS.DAY).toISOString(),
+            finaliseRegardlessAfter: new Date(now + 2 * TIME_IN_MILLIS.DAY).toISOString(),
+          },
+        },
       };
     case MLSMigrationStatus.ONGOING:
       return {
-        startTime: new Date(now - 1 * TIME_IN_MILLIS.DAY).toISOString(),
-        finaliseRegardlessAfter: new Date(now + 1 * TIME_IN_MILLIS.DAY).toISOString(),
+        mls: {
+          status: FeatureStatus.ENABLED,
+          config: {supportedProtocols},
+        },
+        mlsMigration: {
+          status: FeatureStatus.ENABLED,
+          config: {
+            startTime: new Date(now - 1 * TIME_IN_MILLIS.DAY).toISOString(),
+            finaliseRegardlessAfter: new Date(now + 1 * TIME_IN_MILLIS.DAY).toISOString(),
+          },
+        },
       };
     case MLSMigrationStatus.FINALISED:
       return {
-        startTime: new Date(now - 2 * TIME_IN_MILLIS.DAY).toISOString(),
-        finaliseRegardlessAfter: new Date(now - 1 * TIME_IN_MILLIS.DAY).toISOString(),
+        mls: {
+          status: FeatureStatus.ENABLED,
+          config: {supportedProtocols},
+        },
+        mlsMigration: {
+          status: FeatureStatus.ENABLED,
+          config: {
+            startTime: new Date(now - 2 * TIME_IN_MILLIS.DAY).toISOString(),
+            finaliseRegardlessAfter: new Date(now - 1 * TIME_IN_MILLIS.DAY).toISOString(),
+          },
+        },
       };
   }
 };
@@ -65,141 +100,113 @@ const createMockClientResponse = (doesSupportMLS = false, wasActiveWithinLast4We
   } as unknown as RegisteredClient;
 };
 
-const generateListOfSelfClients = ({
-  activeMLS,
-  activeProteus,
-  nonActiveProteus,
-}: {
-  activeProteus: number;
-  activeMLS: number;
-  nonActiveProteus: number;
-}) => {
+const generateListOfSelfClients = ({allActiveClientsMLSCapable}: {allActiveClientsMLSCapable: boolean}) => {
   const clients: RegisteredClient[] = [];
 
-  new Array(activeProteus).fill(0).forEach(() => clients.push(createMockClientResponse(false, true)));
-  new Array(activeMLS).fill(0).forEach(() => clients.push(createMockClientResponse(true, true)));
-  new Array(nonActiveProteus).fill(0).forEach(() => clients.push(createMockClientResponse(false, false)));
+  new Array(4).fill(0).forEach(() => clients.push(createMockClientResponse(true, true)));
+  if (!allActiveClientsMLSCapable) {
+    new Array(2).fill(0).forEach(() => clients.push(createMockClientResponse(false, true)));
+  }
 
   return clients;
 };
 
-const cases = [
+const testScenarios = [
   [
-    'supports both protocols when team support both protocols',
+    //with given config
+    generateMLSFeaturesConfig(MLSMigrationStatus.DISABLED, [ConversationProtocol.PROTEUS]),
+
+    //we expect the following result based on whether all active clients are MLS capable or not
     {
-      selfClients: generateListOfSelfClients({
-        activeMLS: 4,
-        activeProteus: 0,
-        nonActiveProteus: 1,
-      }),
-      mls: {supportedProtocols: [ConversationProtocol.PROTEUS, ConversationProtocol.MLS]},
-      mlsMigration: generateMigrationDates(MLSMigrationStatus.NOT_STARTED),
+      allActiveClientsMLSCapable: new Set([ConversationProtocol.PROTEUS]),
+      someActiveClientsNotMLSCapable: new Set([ConversationProtocol.PROTEUS]),
     },
-    new Set([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]),
   ],
   [
-    "supports only proteus when team supports both, but there's at least one active client that does not support MLS",
+    generateMLSFeaturesConfig(MLSMigrationStatus.DISABLED, [ConversationProtocol.PROTEUS, ConversationProtocol.MLS]),
     {
-      selfClients: generateListOfSelfClients({
-        activeMLS: 4,
-        activeProteus: 1,
-        nonActiveProteus: 1,
-      }),
-      mls: {supportedProtocols: [ConversationProtocol.PROTEUS, ConversationProtocol.MLS]},
-      mlsMigration: generateMigrationDates(MLSMigrationStatus.NOT_STARTED),
+      allActiveClientsMLSCapable: new Set([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]),
+      someActiveClientsNotMLSCapable: new Set([ConversationProtocol.PROTEUS]),
     },
-    new Set([ConversationProtocol.PROTEUS]),
   ],
   [
-    'supports only proteus when team supports only proteus',
+    generateMLSFeaturesConfig(MLSMigrationStatus.DISABLED, [ConversationProtocol.MLS]),
     {
-      selfClients: generateListOfSelfClients({
-        activeMLS: 4,
-        activeProteus: 0,
-        nonActiveProteus: 1,
-      }),
-      mls: {supportedProtocols: [ConversationProtocol.PROTEUS]},
-      mlsMigration: generateMigrationDates(MLSMigrationStatus.NOT_STARTED),
+      allActiveClientsMLSCapable: new Set([ConversationProtocol.MLS]),
+      someActiveClientsNotMLSCapable: new Set([]), //FIXME: This may be [ConversationProtocol.PROTEUS]
     },
-    new Set([ConversationProtocol.PROTEUS]),
   ],
   [
-    'supports only mls when team supports only mls - migration not started',
+    generateMLSFeaturesConfig(MLSMigrationStatus.NOT_STARTED, [ConversationProtocol.PROTEUS, ConversationProtocol.MLS]),
     {
-      selfClients: generateListOfSelfClients({
-        activeMLS: 4,
-        activeProteus: 0,
-        nonActiveProteus: 1,
-      }),
-      mls: {supportedProtocols: [ConversationProtocol.MLS]},
-      mlsMigration: generateMigrationDates(MLSMigrationStatus.NOT_STARTED),
+      allActiveClientsMLSCapable: new Set([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]),
+      someActiveClientsNotMLSCapable: new Set([ConversationProtocol.PROTEUS]),
     },
-    new Set([ConversationProtocol.MLS]),
   ],
   [
-    'supports only mls when team supports only mls - migration finalised',
+    generateMLSFeaturesConfig(MLSMigrationStatus.NOT_STARTED, [ConversationProtocol.MLS]),
     {
-      selfClients: generateListOfSelfClients({
-        activeMLS: 4,
-        activeProteus: 0,
-        nonActiveProteus: 1,
-      }),
-      mls: {supportedProtocols: [ConversationProtocol.MLS]},
-      mlsMigration: generateMigrationDates(MLSMigrationStatus.FINALISED),
+      allActiveClientsMLSCapable: new Set([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]),
+      someActiveClientsNotMLSCapable: new Set([ConversationProtocol.PROTEUS]),
     },
-    new Set([ConversationProtocol.MLS]),
   ],
   [
-    'supports both protocols when team supports only mls - migration is ongoing',
+    generateMLSFeaturesConfig(MLSMigrationStatus.ONGOING, [ConversationProtocol.PROTEUS, ConversationProtocol.MLS]),
     {
-      selfClients: generateListOfSelfClients({
-        activeMLS: 4,
-        activeProteus: 0,
-        nonActiveProteus: 1,
-      }),
-      mls: {supportedProtocols: [ConversationProtocol.MLS]},
-      mlsMigration: generateMigrationDates(MLSMigrationStatus.ONGOING),
+      allActiveClientsMLSCapable: new Set([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]),
+      someActiveClientsNotMLSCapable: new Set([ConversationProtocol.PROTEUS]),
     },
-    new Set([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]),
   ],
   [
-    'supports only mls when there are some users who do not support MLS but migrations has finalised',
+    generateMLSFeaturesConfig(MLSMigrationStatus.ONGOING, [ConversationProtocol.MLS]),
     {
-      selfClients: generateListOfSelfClients({
-        activeMLS: 4,
-        activeProteus: 2,
-        nonActiveProteus: 1,
-      }),
-      mls: {supportedProtocols: [ConversationProtocol.MLS]},
-      mlsMigration: generateMigrationDates(MLSMigrationStatus.FINALISED),
+      allActiveClientsMLSCapable: new Set([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]),
+      someActiveClientsNotMLSCapable: new Set([ConversationProtocol.PROTEUS]),
     },
-    new Set([ConversationProtocol.MLS]),
+  ],
+  [
+    generateMLSFeaturesConfig(MLSMigrationStatus.FINALISED, [ConversationProtocol.PROTEUS, ConversationProtocol.MLS]),
+    {
+      allActiveClientsMLSCapable: new Set([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]),
+      someActiveClientsNotMLSCapable: new Set([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]),
+    },
+  ],
+  [
+    generateMLSFeaturesConfig(MLSMigrationStatus.FINALISED, [ConversationProtocol.MLS]),
+    {
+      allActiveClientsMLSCapable: new Set([ConversationProtocol.MLS]),
+      someActiveClientsNotMLSCapable: new Set([ConversationProtocol.MLS]),
+    },
   ],
 ] as const;
 
 describe('evaluateSelfSupportedProtocols', () => {
-  it.each(cases)('%s', async (name, {mls, mlsMigration, selfClients}, expected) => {
-    const mockedApiClient = {api: {client: {getClients: jest.fn()}}} as unknown as APIClient;
-    const mockCore = container.resolve(Core);
+  describe.each([{allActiveClientsMLSCapable: true}, {allActiveClientsMLSCapable: false}])(
+    '%o',
+    ({allActiveClientsMLSCapable}) => {
+      const selfClients = generateListOfSelfClients({allActiveClientsMLSCapable});
 
-    jest.spyOn(mockedApiClient.api.client, 'getClients').mockResolvedValueOnce(selfClients);
+      it.each(testScenarios)('evaluates self supported protocols', async ({mls, mlsMigration}, expected) => {
+        const mockedApiClient = {api: {client: {getClients: jest.fn()}}} as unknown as APIClient;
+        const mockCore = container.resolve(Core);
 
-    const teamFeatureList = {
-      mlsMigration: {
-        status: FeatureStatus.ENABLED,
-        config: mlsMigration,
-      },
-      mls: {
-        enabled: FeatureStatus.ENABLED,
-        config: mls,
-      },
-    } as unknown as FeatureList;
+        jest.spyOn(mockedApiClient.api.client, 'getClients').mockResolvedValueOnce(selfClients);
 
-    const supportedProtocols = await evaluateSelfSupportedProtocols({
-      apiClient: mockedApiClient,
-      core: mockCore,
-      teamFeatureList,
-    });
-    expect(supportedProtocols).toEqual(expected);
-  });
+        const teamFeatureList = {
+          mlsMigration,
+          mls,
+        } as unknown as FeatureList;
+
+        const supportedProtocols = await evaluateSelfSupportedProtocols({
+          apiClient: mockedApiClient,
+          core: mockCore,
+          teamFeatureList,
+        });
+
+        expect(supportedProtocols).toEqual(
+          allActiveClientsMLSCapable ? expected.allActiveClientsMLSCapable : expected.someActiveClientsNotMLSCapable,
+        );
+      });
+    },
+  );
 });
