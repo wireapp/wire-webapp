@@ -174,6 +174,8 @@ export class BackupRepository {
   }
 
   private async compressHistoryFiles(user: User, clientId: string, exportedData: Record<string, any>): Promise<Blob> {
+    const password = prompt('Enter the password for encryption (leave blank for no encryption):');
+
     const metaData = this.createMetaData(user, clientId);
 
     const files: Record<string, Uint8Array> = {};
@@ -190,7 +192,7 @@ export class BackupRepository {
 
     files[Filename.METADATA] = encodedMetadata;
 
-    const array = await this.worker.post<Uint8Array>({type: 'zip', files});
+    const array = await this.worker.post<Uint8Array>({type: 'zip', files, password});
     return new Blob([array], {type: 'application/zip'});
   }
 
@@ -205,10 +207,11 @@ export class BackupRepository {
     progressCallback: ProgressCallback,
   ): Promise<void> {
     this.canceled = false;
-
-    const files = await this.worker.post<Record<string, Uint8Array>>({type: 'unzip', bytes: data});
+    const password = prompt('Enter the password for encryption (leave blank for no encryption):');
+    const files = await this.worker.post<Record<string, Uint8Array>>({type: 'unzip', bytes: data, password});
 
     if (files.error) {
+      //console.log('files.error ', files.error);
       throw new ImportError(files.error as unknown as string);
     }
 
