@@ -29,6 +29,7 @@ import {isMLSConversation, isSelfConversation} from './ConversationSelectors';
 
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
+import {useMLSConversationState} from '../mls';
 import {TeamState} from '../team/TeamState';
 import {UserState} from '../user/UserState';
 
@@ -71,9 +72,23 @@ export class ConversationState {
       this.conversations().find(conversation => isMLSConversation(conversation) && isSelfConversation(conversation)),
     );
 
+    //anytime mls conversation state changes, we update the sorted conversations that will recalculate visible conversations
+    useMLSConversationState.subscribe(() => {
+      this.sortedConversations.notifySubscribers();
+    });
+
     this.visibleConversations = ko.pureComputed(() => {
-      return this.sortedConversations().filter(
-        conversation => !conversation.is_cleared() && !conversation.is_archived(),
+      const filteredMLSConversations = useMLSConversationState
+        .getState()
+        .filterEstablishedConversations(this.sortedConversations());
+      return filteredMLSConversations.filter(
+        conversation =>
+          !conversation.is_cleared() &&
+          !conversation.is_archived() &&
+          // We filter out 1 on 1 conversation with unavailable users that don't have messages
+          (!conversation.is1to1() ||
+            conversation.hasContentMessages() ||
+            conversation.firstUserEntity()?.isAvailable()),
       );
     });
     this.unreadConversations = ko.pureComputed(() => {
@@ -81,7 +96,10 @@ export class ConversationState {
     });
 
     this.archivedConversations = ko.pureComputed(() => {
-      return this.sortedConversations().filter(conversation => conversation.is_archived());
+      const filteredMLSConversations = useMLSConversationState
+        .getState()
+        .filterEstablishedConversations(this.sortedConversations());
+      return filteredMLSConversations.filter(conversation => conversation.is_archived());
     });
 
     this.filteredConversations = ko.pureComputed(() => {

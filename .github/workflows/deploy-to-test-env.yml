@@ -8,8 +8,9 @@ on:
         required: true
         type: choice
         options:
-          - wire-webapp-qa
-          - wire-webapp-edge
+          - wire-webapp-qa-al2-migration
+          - wire-webapp-edge-al2
+          - wire-webapp-mls-al2
 
 concurrency:
   group: ci-${{ github.ref }}

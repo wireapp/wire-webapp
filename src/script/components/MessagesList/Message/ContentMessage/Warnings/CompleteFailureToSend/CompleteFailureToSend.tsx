@@ -57,7 +57,7 @@ export const CompleteFailureToSendWarning = ({isMessageFocused, onRetry, unreach
           </Link>
         </p>
       ) : (
-        <p>{t('messageCouldNotBeSentConnectivityIssues')}</p>
+        <p css={warning}>{t('messageCouldNotBeSentConnectivityIssues')}</p>
       )}
       <div css={{display: 'flex'}}>
         <Button tabIndex={messageFocusedTabIndex} type="button" variant={ButtonVariant.TERTIARY} onClick={onRetry}>

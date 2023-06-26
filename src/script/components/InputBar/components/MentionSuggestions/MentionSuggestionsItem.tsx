@@ -86,7 +86,7 @@ const MentionSuggestionsItemComponent: React.ForwardRefRenderFunction<HTMLDivEle
       {suggestion.isFederated && (
         <Icon.Federation className="mention-suggestion-list__item__guest-badge" data-uie-name="status-federated" />
       )}
-      {isDirectGuest && (
+      {isDirectGuest && !suggestion.isFederated && (
         <Icon.Guest className="mention-suggestion-list__item__guest-badge" data-uie-name="status-guest" />
       )}
     </div>

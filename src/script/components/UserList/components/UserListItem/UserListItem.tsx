@@ -127,7 +127,7 @@ const UserListItem = ({
 
         <UserStatusBadges
           config={{
-            guest: !isOthersMode && isDirectGuest,
+            guest: !isOthersMode && isDirectGuest && !isFederated,
             federated: isFederated,
             external,
             verified: isSelfVerified && isVerified,

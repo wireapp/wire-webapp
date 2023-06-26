@@ -39,6 +39,7 @@ type StoreState = MLSConversationState & {
   filterEstablishedConversations: (conversations: Conversation[]) => Conversation[];
   markAsEstablished: (groupId: string) => void;
   markAsPendingWelcome: (groupId: string) => void;
+  wipeConversationState: (groupId: string) => void;
   /**
    * Will send external proposal for all the conversations that are not pendingWelcome or established
    * @param conversations The conversations that we want to process (only the mls conversations will be considered)
@@ -62,16 +63,28 @@ export const useMLSConversationState = create<StoreState>((set, get) => {
     isPendingWelcome: groupId => get().pendingWelcome.has(groupId),
 
     markAsEstablished: groupId =>
-      set(state => ({
-        ...state,
-        established: state.established.add(groupId),
-      })),
+      set(state => {
+        const established = new Set(state.established);
+        established.add(groupId);
+
+        const pendingWelcome = new Set(state.pendingWelcome);
+        pendingWelcome.delete(groupId);
+
+        return {
+          established,
+          pendingWelcome,
+        };
+      }),
 
     markAsPendingWelcome: groupId =>
-      set(state => ({
-        ...state,
-        pendingWelcome: state.pendingWelcome.add(groupId),
-      })),
+      set(state => {
+        const pendingWelcome = new Set(state.pendingWelcome);
+        pendingWelcome.add(groupId);
+        return {
+          ...state,
+          pendingWelcome,
+        };
+      }),
 
     pendingWelcome: initialState.pendingWelcome,
 
@@ -113,6 +126,19 @@ export const useMLSConversationState = create<StoreState>((set, get) => {
         pendingWelcome: new Set([...currentState.pendingWelcome, ...pendingConversations]),
       });
     },
+
+    wipeConversationState: groupId =>
+      set(state => {
+        const established = new Set(state.established);
+        established.delete(groupId);
+        const pendingWelcome = new Set(state.pendingWelcome);
+        pendingWelcome.delete(groupId);
+        return {
+          ...state,
+          established,
+          pendingWelcome,
+        };
+      }),
   };
 });
 
