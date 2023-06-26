@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [24.16.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@24.15.7...@wireapp/api-client@24.16.0) (2023-06-26)
+
+### Features
+
+* draft-20 core-crypto ([#5258](https://github.com/wireapp/wire-web-packages/issues/5258)) ([138222e](https://github.com/wireapp/wire-web-packages/commit/138222ec6b3d233b44ac2764fec89eb824dde5a8)), closes [#5272](https://github.com/wireapp/wire-web-packages/issues/5272)
+
 ## [24.15.7](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@24.15.6...@wireapp/api-client@24.15.7) (2023-06-22)
 
 ### Reverts
