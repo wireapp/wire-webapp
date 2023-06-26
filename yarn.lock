@@ -17768,7 +17768,7 @@ dexie@latest:
     css-loader: ^6.8.1
     cssnano: ^5.1.14
     date-fns: 2.30.0
-    dexie: 3.2.3
+    dexie: 3.2.4
     dexie-batch: 0.4.3
     dotenv: 16.3.1
     dpdm: 3.13.1
