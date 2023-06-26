@@ -20,7 +20,7 @@
 import {mls} from '@wireapp/protocol-messaging/web/mls';
 import {Encoder} from 'bazinga64';
 
-import {CommitBundle, PublicGroupStateEncryptionType, RatchetTreeType} from '@wireapp/core-crypto';
+import {CommitBundle, RatchetTreeType, GroupInfoEncryptionType} from '@wireapp/core-crypto';
 
 import {toProtobufCommitBundle} from './commitBundleUtil';
 
@@ -29,10 +29,10 @@ describe('toProtobufCommitBundle', () => {
     const payload: CommitBundle = {
       commit: Uint8Array.from([0]),
       welcome: Uint8Array.from([1]),
-      publicGroupState: {
+      groupInfo: {
         ratchetTreeType: RatchetTreeType.Full,
         payload: Uint8Array.from([2]),
-        encryptionType: PublicGroupStateEncryptionType.Plaintext,
+        encryptionType: GroupInfoEncryptionType.Plaintext,
       },
     };
     const result = toProtobufCommitBundle(payload);
@@ -40,7 +40,7 @@ describe('toProtobufCommitBundle', () => {
 
     expect(Encoder.toBase64(commit)).toEqual(Encoder.toBase64(payload.commit));
     expect(Encoder.toBase64(welcome)).toEqual(Encoder.toBase64(payload.welcome!));
-    expect(Encoder.toBase64(groupInfoBundle.groupInfo)).toEqual(Encoder.toBase64(payload.publicGroupState.payload));
+    expect(Encoder.toBase64(groupInfoBundle.groupInfo)).toEqual(Encoder.toBase64(payload.groupInfo.payload));
     expect(groupInfoBundle.ratchetTreeType).toEqual(mls.RatchetTreeType.FULL);
     expect(groupInfoBundle.groupInfoType).toEqual(mls.GroupInfoType.PUBLIC_GROUP_STATE);
   });
