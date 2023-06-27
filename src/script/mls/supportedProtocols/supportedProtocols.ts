@@ -28,11 +28,14 @@ import {User} from 'src/script/entity/User';
 import {APIClient as APIClientSingleton} from 'src/script/service/APIClientSingleton';
 import {Core as CoreSingleton} from 'src/script/service/CoreSingleton';
 import {UserRepository} from 'src/script/user/UserRepository';
+import {getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {evaluateSelfSupportedProtocols} from './evaluateSelfSupportedProtocols';
 
 const SELF_SUPPORTED_PROTOCOLS_CHECK_KEY = 'self-supported-protocols-check';
+
+const logger = getLogger('SupportedProtocols');
 
 /**
  * Will initialise the intervals for checking (and updating if necessary) self supported protocols.
@@ -77,16 +80,23 @@ const updateSelfSupportedProtocols = async (
   },
 ) => {
   const localSupportedProtocols = new Set(selfUser.supportedProtocols());
-  const refreshedSupportedProtocols = await evaluateSelfSupportedProtocols({apiClient, core, teamFeatureList});
+  logger.info('Evaluating self supported protocols, currently supported protocols:', localSupportedProtocols);
 
-  const hasSupportedProtocolsChanged = !(
-    localSupportedProtocols.size === refreshedSupportedProtocols.size &&
-    [...localSupportedProtocols].every(protocol => refreshedSupportedProtocols.has(protocol))
-  );
+  try {
+    const refreshedSupportedProtocols = await evaluateSelfSupportedProtocols({apiClient, core, teamFeatureList});
 
-  if (!hasSupportedProtocolsChanged) {
-    return;
+    const hasSupportedProtocolsChanged = !(
+      localSupportedProtocols.size === refreshedSupportedProtocols.size &&
+      [...localSupportedProtocols].every(protocol => refreshedSupportedProtocols.has(protocol))
+    );
+
+    if (!hasSupportedProtocolsChanged) {
+      return;
+    }
+
+    logger.info('Supported protocols will get updated to:', refreshedSupportedProtocols);
+    await userRepository.changeSupportedProtocols(Array.from(refreshedSupportedProtocols));
+  } catch (error) {
+    logger.error('Failed to update self supported protocols, will retry after 24h. Error: ', error);
   }
-
-  await userRepository.changeSupportedProtocols(Array.from(refreshedSupportedProtocols));
 };

@@ -80,6 +80,7 @@ import {IntegrationService} from '../integration/IntegrationService';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {MediaRepository} from '../media/MediaRepository';
 import {initMLSCallbacks, initMLSConversations, registerUninitializedSelfAndTeamConversations} from '../mls';
+import {initialisePeriodicSelfSupportedProtocolsCheck} from '../mls/supportedProtocols';
 import {NotificationRepository} from '../notification/NotificationRepository';
 import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
 import {PermissionRepository} from '../permission/PermissionRepository';
@@ -93,6 +94,7 @@ import {Core} from '../service/CoreSingleton';
 import {StorageKey, StorageRepository, StorageService} from '../storage';
 import {TeamRepository} from '../team/TeamRepository';
 import {TeamService} from '../team/TeamService';
+import {TeamState} from '../team/TeamState';
 import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';
 import {AppInitTelemetry} from '../telemetry/app_init/AppInitTelemetry';
 import {AppInitTimingsStep} from '../telemetry/app_init/AppInitTimingsStep';
@@ -467,6 +469,11 @@ export class App {
       conversationRepository.cleanupConversations();
       callingRepository.setReady();
       telemetry.timeStep(AppInitTimingsStep.APP_LOADED);
+
+      const teamState = container.resolve(TeamState);
+      await initialisePeriodicSelfSupportedProtocolsCheck(selfUser, teamState.teamFeatures(), {
+        userRepository: this.repository.user,
+      });
 
       this.logger.info(`App loaded in ${Date.now() - startTime}ms`);
 
