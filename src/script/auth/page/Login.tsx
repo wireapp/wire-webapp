@@ -64,7 +64,7 @@ import {Page} from './Page';
 import {Config} from '../../Config';
 import {loginStrings, verifyStrings} from '../../strings';
 import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
-import {GuestLinkPasswordModal} from '../component/GuestLinkPasswordModal';
+import {JoinGuestLinkPasswordModal} from '../component/JoinGuestLinkPasswordModal';
 import {LoginForm} from '../component/LoginForm';
 import {RouterLink} from '../component/RouterLink';
 import {EXTERNAL_ROUTE} from '../externalRoute';
@@ -340,7 +340,7 @@ const LoginComponent = ({
           {!isValidLink && <Navigate to={ROUTE.CONVERSATION_JOIN_INVALID} replace />}
           <AppAlreadyOpen />
           {isLinkPasswordModalOpen && (
-            <GuestLinkPasswordModal
+            <JoinGuestLinkPasswordModal
               conversationName={conversationInfo?.name}
               isLoading={isFetching || conversationInfoFetching}
               onSubmitPassword={submitJoinCodeWithPassword}

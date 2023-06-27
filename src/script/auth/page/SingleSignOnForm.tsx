@@ -46,7 +46,7 @@ import {isBackendError} from 'Util/TypePredicateUtil';
 
 import {Config} from '../../Config';
 import {loginStrings, logoutReasonStrings, ssoLoginStrings} from '../../strings';
-import {GuestLinkPasswordModal} from '../component/GuestLinkPasswordModal';
+import {JoinGuestLinkPasswordModal} from '../component/JoinGuestLinkPasswordModal';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {ValidationError} from '../module/action/ValidationError';
 import {bindActionCreators, RootState} from '../module/reducer';
@@ -289,7 +289,7 @@ const SingleSignOnFormComponent = ({
   return (
     <>
       {isLinkPasswordModalOpen && (
-        <GuestLinkPasswordModal
+        <JoinGuestLinkPasswordModal
           conversationName={conversationInfo?.name}
           isLoading={isFetching || conversationInfoFetching}
           onSubmitPassword={submitJoinCodeWithPassword}

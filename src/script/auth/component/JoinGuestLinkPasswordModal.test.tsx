@@ -19,13 +19,13 @@
 
 import {fireEvent, render} from '@testing-library/react';
 
-import {GuestLinkPasswordModal, GuestLinkPasswordModalProps} from './GuestLinkPasswordModal';
+import {JoinGuestLinkPasswordModal, JoinGuestLinkPasswordModalProps} from './JoinGuestLinkPasswordModal';
 
 import {withIntl, withTheme} from '../util/test/TestUtil';
 
-describe('GuestLinkPasswordModal', () => {
+describe('JoinGuestLinkPasswordModal', () => {
   const onSubmitPasswordMock = jest.fn();
-  const props: GuestLinkPasswordModalProps = {
+  const props: JoinGuestLinkPasswordModalProps = {
     onSubmitPassword: onSubmitPasswordMock,
     conversationName: 'test group',
   };
@@ -35,7 +35,7 @@ describe('GuestLinkPasswordModal', () => {
   });
 
   it('should call onSubmitPassword with the password value when the form is submitted', () => {
-    const {getByTestId} = render(withTheme(withIntl(<GuestLinkPasswordModal {...props} />)));
+    const {getByTestId} = render(withTheme(withIntl(<JoinGuestLinkPasswordModal {...props} />)));
     const input = getByTestId('guest-link-join-password-input') as HTMLInputElement;
     const joinConversationButton = getByTestId('guest-link-join-submit-button') as HTMLButtonElement;
     fireEvent.change(input, {target: {value: 'password'}});
@@ -44,13 +44,13 @@ describe('GuestLinkPasswordModal', () => {
   });
 
   it('should disable the join conversation button when the password input is empty', () => {
-    const {getByTestId} = render(withTheme(withIntl(<GuestLinkPasswordModal {...props} />)));
+    const {getByTestId} = render(withTheme(withIntl(<JoinGuestLinkPasswordModal {...props} />)));
     const joinConversationButton = getByTestId('guest-link-join-submit-button') as HTMLButtonElement;
     expect(joinConversationButton.disabled).toBe(true);
   });
 
   it('should enable the join conversation button when the password input is not empty', () => {
-    const {getByTestId} = render(withTheme(withIntl(<GuestLinkPasswordModal {...props} />)));
+    const {getByTestId} = render(withTheme(withIntl(<JoinGuestLinkPasswordModal {...props} />)));
     const input = getByTestId('guest-link-join-password-input');
     const joinConversationButton = getByTestId('guest-link-join-submit-button') as HTMLButtonElement;
     fireEvent.change(input, {target: {value: 'password'}});
@@ -58,7 +58,7 @@ describe('GuestLinkPasswordModal', () => {
   });
 
   it('should not call onSubmitPassword with an empty string when the form is submitted with an empty password input', () => {
-    const {getByTestId} = render(withTheme(withIntl(<GuestLinkPasswordModal {...props} />)));
+    const {getByTestId} = render(withTheme(withIntl(<JoinGuestLinkPasswordModal {...props} />)));
     const joinConversationButton = getByTestId('guest-link-join-submit-button') as HTMLButtonElement;
     joinConversationButton.click();
     expect(onSubmitPasswordMock).toHaveBeenCalledTimes(0);

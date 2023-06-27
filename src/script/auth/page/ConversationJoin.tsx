@@ -51,7 +51,7 @@ import {EntropyContainer} from './EntropyContainer';
 import {Config} from '../../Config';
 import {conversationJoinStrings} from '../../strings';
 import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
-import {GuestLinkPasswordModal} from '../component/GuestLinkPasswordModal';
+import {JoinGuestLinkPasswordModal} from '../component/JoinGuestLinkPasswordModal';
 import {RouterLink} from '../component/RouterLink';
 import {UnsupportedBrowser} from '../component/UnsupportedBrowser';
 import {WirelessContainer} from '../component/WirelessContainer';
@@ -247,12 +247,12 @@ const ConversationJoinComponent = ({
     return <Navigate to={ROUTE.CONVERSATION_JOIN_INVALID} replace />;
   }
 
-  const isGuestLinkPasswordModalOpen = conversationHasPassword || invalidConversationPassword;
+  const isJoinGuestLinkPasswordModalOpen = conversationHasPassword || invalidConversationPassword;
 
   return (
     <UnsupportedBrowser isTemporaryGuest>
-      {isGuestLinkPasswordModalOpen && (
-        <GuestLinkPasswordModal
+      {isJoinGuestLinkPasswordModalOpen && (
+        <JoinGuestLinkPasswordModal
           isLoading={isFetching}
           conversationName={conversationInfo?.name}
           onSubmitPassword={submitJoinCodeWithPassword}
@@ -316,7 +316,7 @@ const ConversationJoinComponent = ({
                     </RoundIconButton>
                   </InputSubmitCombo>
                 </InputBlock>
-                {!isGuestLinkPasswordModalOpen &&
+                {!isJoinGuestLinkPasswordModalOpen &&
                   (error ? parseValidationErrors(error) : parseError(conversationError))}
               </Form>
               {!isPwaEnabled && (
@@ -368,7 +368,8 @@ const ConversationJoinComponent = ({
             >
               {_(conversationJoinStrings.existentAccountOpenButton, {brandName: Config.getConfig().BRAND_NAME})}
             </Button>
-            {!isGuestLinkPasswordModalOpen && (error ? parseValidationErrors(error) : parseError(conversationError))}
+            {!isJoinGuestLinkPasswordModalOpen &&
+              (error ? parseValidationErrors(error) : parseError(conversationError))}
             <Small block>
               {_(conversationJoinStrings.existentAccountJoinWithoutText, {
                 existentAccountJoinWithoutLink: (

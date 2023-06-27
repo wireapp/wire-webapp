@@ -363,7 +363,7 @@ export const acceptNewsModalStrings = defineMessages({
   },
 });
 
-export const guestLinkPasswordModalStrings = defineMessages({
+export const joinGuestLinkPasswordModalStrings = defineMessages({
   headline: {
     defaultMessage: '{conversationName} \n Enter password',
     id: 'guestLinkPasswordModal.headline',
