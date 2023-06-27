@@ -26,8 +26,6 @@ import {useMLSConversationState} from './mlsConversationState';
 
 import {ConversationRepository} from '../conversation/ConversationRepository';
 import {
-  isMLSCapableConversation,
-  isMLSConversation,
   isSelfConversation,
   isTeamConversation,
   MLSCapableConversation,
@@ -47,13 +45,15 @@ type MLSConversationRepository = Pick<
  * @param conversations - all the conversations that the user is part of
  * @param core - the instance of the core
  */
-export async function initMLSConversations(conversations: Conversation[], core: Account): Promise<void> {
+export async function initMLSConversations(
+  mlsCapableConversations: MLSCapableConversation[],
+  core: Account,
+): Promise<void> {
   const mlsService = core.service?.mls;
   if (!mlsService) {
     throw new Error('MLS service not available');
   }
 
-  const mlsCapableConversations = conversations.filter(isMLSCapableConversation);
   await joinNewMLSConversations(mlsCapableConversations, core);
 
   return mlsService.schedulePeriodicKeyMaterialRenewals(mlsCapableConversations.map(({groupId}) => groupId));
@@ -104,21 +104,24 @@ async function joinNewMLSConversations(conversations: MLSCapableConversation[], 
  * @param core instance of the core
  */
 export async function registerUninitializedSelfAndTeamConversations(
-  conversations: Conversation[],
+  mlsConversations: MLSConversation[],
   selfUser: User,
   selfClientId: string,
   core: Account,
 ): Promise<void> {
-  const uninitializedConversations = conversations.filter(
-    (conversation): conversation is MLSConversation =>
-      isMLSConversation(conversation) &&
-      conversation.epoch === 0 &&
-      (isSelfConversation(conversation) || isTeamConversation(conversation)),
+  const mlsService = core.service?.mls;
+
+  if (!mlsService) {
+    throw new Error('MLS service not available');
+  }
+
+  const uninitializedConversations = mlsConversations.filter(
+    conversation => conversation.epoch === 0 && (isSelfConversation(conversation) || isTeamConversation(conversation)),
   );
 
   await Promise.all(
     uninitializedConversations.map(conversation =>
-      core.service?.mls.registerConversation(conversation.groupId, [selfUser.qualifiedId], {
+      mlsService.registerConversation(conversation.groupId, [selfUser.qualifiedId], {
         user: selfUser,
         client: selfClientId,
       }),

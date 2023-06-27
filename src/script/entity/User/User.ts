@@ -149,7 +149,7 @@ export class User {
 
     this.name = ko.observable('');
 
-    this.supportedProtocols = ko.observableArray<ConversationProtocol>();
+    this.supportedProtocols = ko.observableArray<ConversationProtocol>([]);
 
     this.managedBy = ko.observable(User.CONFIG.MANAGED_BY.WIRE);
 
