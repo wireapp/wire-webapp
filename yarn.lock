@@ -4772,7 +4772,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/api-client@npm:^24.16.0":
+"@wireapp/api-client@npm:^24.17.0":
   version: 24.17.0
   resolution: "@wireapp/api-client@npm:24.17.0"
   dependencies:
@@ -4840,11 +4840,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core@npm:40.6.0":
-  version: 40.6.0
-  resolution: "@wireapp/core@npm:40.6.0"
+"@wireapp/core@npm:40.6.1":
+  version: 40.6.1
+  resolution: "@wireapp/core@npm:40.6.1"
   dependencies:
-    "@wireapp/api-client": ^24.16.0
+    "@wireapp/api-client": ^24.17.0
     "@wireapp/commons": ^5.1.0
     "@wireapp/core-crypto": 1.0.0-pre.5
     "@wireapp/cryptobox": 12.8.0
@@ -4861,7 +4861,7 @@ __metadata:
     logdown: 3.3.1
     long: ^5.2.0
     uuidjs: 4.2.13
-  checksum: e27e71409de6224847a283d30a3c98ed748da40d4a881c940eb372964f3586263fc7691782eaa2ad2239cabaa6b27fa9dd3066c98ca8fc7e5a6511f63788ba99
+  checksum: 7b55b56994d2b15cbdef9459cc0bc1880522e27108d50fe286ec25cd43e29203f3c7bd1a6d2ac52ed15989661f03373cd9be3a099351bdffc46b690afbb5b298
   languageName: node
   linkType: hard
 
@@ -17720,7 +17720,7 @@ __metadata:
     "@typescript-eslint/parser": ^5.60.0
     "@wireapp/avs": 9.2.15
     "@wireapp/copy-config": 2.1.1
-    "@wireapp/core": 40.6.0
+    "@wireapp/core": 40.6.1
     "@wireapp/eslint-config": 2.2.2
     "@wireapp/lru-cache": 3.8.1
     "@wireapp/prettier-config": 0.6.0
