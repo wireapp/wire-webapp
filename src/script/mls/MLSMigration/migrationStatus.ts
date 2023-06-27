@@ -25,10 +25,9 @@ const hasMigrationStartTimeArrived = (mlsMigrationFeature: FeatureMLSMigration):
   }
 
   const startDateISO = mlsMigrationFeature.config.startTime;
-  const startTime = (startDateISO && Date.parse(startDateISO)) || Infinity;
-  const hasStartTimeArrived = Date.now() >= startTime;
+  const startTime = startDateISO ? Date.parse(startDateISO) : Infinity;
 
-  return hasStartTimeArrived;
+  return Date.now() >= startTime;
 };
 
 const hasMigrationFinaliseRegardlessAfterDateArrived = (mlsMigrationFeature: FeatureMLSMigration): boolean => {
@@ -38,9 +37,8 @@ const hasMigrationFinaliseRegardlessAfterDateArrived = (mlsMigrationFeature: Fea
 
   const finaliseDateISO = mlsMigrationFeature.config.finaliseRegardlessAfter;
   const finaliseTime = finaliseDateISO ? Date.parse(finaliseDateISO) : Infinity;
-  const hasFinaliseRegardlessAfterTimeArrived = Date.now() >= finaliseTime;
 
-  return hasFinaliseRegardlessAfterTimeArrived;
+  return Date.now() >= finaliseTime;
 };
 
 export enum MLSMigrationStatus {
