@@ -42,7 +42,6 @@ export const evaluateSelfSupportedProtocols = async ({
 
   const {mlsMigration: mlsMigrationFeature, mls: mlsFeature} = teamFeatureList;
 
-  //FIXME: fetch actual supported protocols from mls feature config
   const teamSupportedProtocols = getSelfTeamSupportedProtocols(mlsFeature);
 
   const selfClients = await apiClient.api.client.getClients();
@@ -114,7 +113,7 @@ const haveAllActiveClientsRegisteredMLSDevice = async (selfClients: RegisteredCl
 
 const getSelfTeamSupportedProtocols = (mlsFeature?: FeatureMLS): Set<ConversationProtocol> => {
   if (!mlsFeature || mlsFeature.status === FeatureStatus.DISABLED) {
-    return new Set([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]);
+    return new Set([ConversationProtocol.PROTEUS]);
   }
 
   //FIXME: fix type after supportedProtocols is implemented on backend

@@ -307,6 +307,7 @@ export class UserRepository {
   private async updateUser(userId: QualifiedId, user: Partial<UserRecord>, isWebSocket = false): Promise<User> {
     const selfUser = this.userState.self();
     const isSelfUser = matchQualifiedIds(userId, selfUser.qualifiedId);
+
     const userEntity = isSelfUser ? selfUser : await this.getUserById(userId);
 
     if (isWebSocket && user.name) {
@@ -815,7 +816,7 @@ export class UserRepository {
    */
   async changeSupportedProtocols(supportedProtocols: ConversationProtocol[]): Promise<User> {
     await this.selfService.putSupportedProtocols(supportedProtocols);
-    return this.updateUser(this.userState.self().qualifiedId, {supported_protocols: supportedProtocols});
+    return await this.updateUser(this.userState.self().qualifiedId, {supported_protocols: supportedProtocols});
   }
 
   async changeEmail(email: string): Promise<void> {
