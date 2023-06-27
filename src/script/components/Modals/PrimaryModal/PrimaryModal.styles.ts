@@ -26,5 +26,6 @@ export const guestLinkPasswordInputStyles: CSSObject = {
     border: '1px solid var(--button-tertiary-border)',
     boxShadow: 'none !important',
     '&:hover': {boxShadow: 'none'},
+    '&:focus': {border: '1px solid var(--accent-color)'},
   },
 };
