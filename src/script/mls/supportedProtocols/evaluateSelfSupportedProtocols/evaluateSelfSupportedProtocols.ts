@@ -117,7 +117,10 @@ const getSelfTeamSupportedProtocols = (mlsFeature?: FeatureMLS): Set<Conversatio
   }
 
   //FIXME: fix type after supportedProtocols is implemented on backend
-  const teamSupportedProtocols = (mlsFeature.config as any).supportedProtocols || [];
+  const teamSupportedProtocols = (mlsFeature.config as any).supportedProtocols || [
+    ConversationProtocol.PROTEUS,
+    ConversationProtocol.MLS,
+  ];
 
   return new Set<ConversationProtocol>(teamSupportedProtocols);
 };
