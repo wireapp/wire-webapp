@@ -438,7 +438,7 @@ export class App {
         await initMLSConversations(mlsConversations, this.core);
 
         //add the potential `self` and `team` conversations
-        await registerUninitializedSelfAndTeamConversations(conversations, selfUser, clientEntity().id, this.core);
+        await registerUninitializedSelfAndTeamConversations(mlsConversations, selfUser, clientEntity().id, this.core);
       }
 
       telemetry.timeStep(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
