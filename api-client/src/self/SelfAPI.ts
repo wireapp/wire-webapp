@@ -19,6 +19,7 @@
 
 import {AxiosRequestConfig, AxiosResponse} from 'axios';
 
+import {ConversationProtocol} from '../conversation';
 import {HttpClient, TraceState} from '../http/';
 import {UserUpdate} from '../user/';
 
@@ -35,6 +36,7 @@ export class SelfAPI {
     NAME: 'name',
     PASSWORD: 'password',
     PHONE: 'phone',
+    SUPPORTED_PROTOCOLS: 'supported-protocols',
     SELF: '/self',
   };
 
@@ -207,6 +209,20 @@ export class SelfAPI {
       data: profileData,
       method: 'put',
       url: SelfAPI.URL.SELF,
+    };
+
+    await this.client.sendJSON(config);
+  }
+
+  /**
+   * Update self user's list of supported-protocols
+   * @param supportedProtocols The list of supported protocols
+   */
+  public async putSupportedProtocols(supportedProtocols: ConversationProtocol[]): Promise<void> {
+    const config: AxiosRequestConfig = {
+      data: {supported_protocols: supportedProtocols},
+      method: 'put',
+      url: `${SelfAPI.URL.SELF}/${SelfAPI.URL.SUPPORTED_PROTOCOLS}`,
     };
 
     await this.client.sendJSON(config);
