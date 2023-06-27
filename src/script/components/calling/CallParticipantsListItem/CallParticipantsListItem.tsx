@@ -115,7 +115,7 @@ export const CallParticipantsListItem = ({
           <>
             <UserStatusBadges
               config={{
-                guest: isDirectGuest,
+                guest: isDirectGuest && !isFederated,
                 federated: isFederated,
                 external: isExternal,
                 verified: isSelfVerified && isVerified,

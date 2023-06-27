@@ -79,6 +79,7 @@ import {ConversationFilter} from './ConversationFilter';
 import {ConversationLabelRepository} from './ConversationLabelRepository';
 import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';
 import {ConversationRoleRepository} from './ConversationRoleRepository';
+import {isMLSConversation} from './ConversationSelectors';
 import {ConversationService} from './ConversationService';
 import {ConversationState} from './ConversationState';
 import {ConversationStateHandler} from './ConversationStateHandler';
@@ -91,7 +92,6 @@ import {NOTIFICATION_STATE} from './NotificationSetting';
 
 import {AssetTransferState} from '../assets/AssetTransferState';
 import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
-import {ClientState} from '../client/ClientState';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
@@ -183,7 +183,6 @@ export class ConversationRepository {
     private readonly teamState = container.resolve(TeamState),
     private readonly conversationState = container.resolve(ConversationState),
     private readonly core = container.resolve(Core),
-    private readonly clientState = container.resolve(ClientState),
   ) {
     this.eventService = eventRepository.eventService;
     // we register a client mismatch handler agains the message repository so that we can react to missing members
@@ -353,7 +352,7 @@ export class ConversationRepository {
         conversationEntity.is_cleared() &&
         conversationEntity.removed_from_conversation()
       ) {
-        this.conversationService.deleteConversationFromDb(conversationEntity);
+        this.conversationService.deleteConversationFromDb(conversationEntity.id);
         this.deleteConversationFromRepository(conversationEntity);
       }
     });
@@ -395,15 +394,6 @@ export class ConversationRepository {
       ...options,
     };
 
-    /**
-     * we need to add this creator_client to conversation creation payload
-     * for creating MLS conversations
-     */
-    if (options.protocol === ConversationProtocol.MLS) {
-      payload.creator_client = this.clientState.currentClient().id;
-      payload.selfUserId = this.userState.self().qualifiedId;
-    }
-
     if (this.teamState.team().id) {
       payload.team = {
         managed: false,
@@ -431,7 +421,11 @@ export class ConversationRepository {
       let response: MLSReturnType;
       const isMLSConversation = payload.protocol === ConversationProtocol.MLS;
       if (isMLSConversation) {
-        response = await this.core.service!.conversation.createMLSConversation(payload);
+        response = await this.core.service!.conversation.createMLSConversation(
+          payload,
+          this.userState.self().qualifiedId,
+          this.core.clientId,
+        );
       } else {
         response = {conversation: await this.core.service!.conversation.createProteusConversation(payload), events: []};
       }
@@ -956,12 +950,9 @@ export class ConversationRepository {
       this.conversationLabelRepository.saveLabels();
     }
     this.deleteConversationFromRepository(conversationId);
-    await this.conversationService.deleteConversationFromDb(conversationId);
-    if (conversationEntity.protocol === ConversationProtocol.MLS) {
-      const {groupId} = conversationEntity;
-      if (groupId) {
-        await this.core.service!.conversation.wipeMLSConversation(groupId);
-      }
+    await this.conversationService.deleteConversationFromDb(conversationId.id);
+    if (isMLSConversation(conversationEntity)) {
+      await this.conversationService.wipeMLSConversation(conversationEntity);
     }
   };
 
@@ -1554,7 +1545,7 @@ export class ConversationRepository {
    * @param conversationEntity Conversation to clear
    * @param leaveConversation Should we leave the conversation before clearing the content?
    */
-  public clearConversation(conversationEntity: Conversation, leaveConversation = false) {
+  public async clearConversation(conversationEntity: Conversation, leaveConversation = false) {
     const isActiveConversation = this.conversationState.isActiveConversation(conversationEntity);
     const nextConversationEntity = this.getNextConversation(conversationEntity);
 
@@ -1563,11 +1554,11 @@ export class ConversationRepository {
       this.leaveCall(conversationEntity.qualifiedId, LEAVE_CALL_REASON.USER_MANUALY_LEFT_CONVERSATION);
     }
 
-    this.messageRepository.updateClearedTimestamp(conversationEntity);
-    this._clearConversation(conversationEntity);
+    await this.messageRepository.updateClearedTimestamp(conversationEntity);
+    await this._clearConversation(conversationEntity);
 
     if (leaveConversation) {
-      this.removeMember(conversationEntity, this.userState.self().qualifiedId);
+      await this.removeMember(conversationEntity, this.userState.self().qualifiedId);
     }
 
     if (isActiveConversation) {
@@ -1633,12 +1624,11 @@ export class ConversationRepository {
    * @returns Resolves when user was removed from the conversation
    */
   private async leaveConversation(conversationEntity: Conversation, clearContent: boolean) {
-    if (clearContent) {
-      this.clearConversation(conversationEntity, false);
-    }
-
     const userQualifiedId = this.userState.self().qualifiedId;
-    return this.removeMemberFromConversation(conversationEntity, userQualifiedId);
+
+    return clearContent
+      ? this.clearConversation(conversationEntity, true)
+      : this.removeMemberFromConversation(conversationEntity, userQualifiedId);
   }
 
   /**
@@ -1899,11 +1889,11 @@ export class ConversationRepository {
    * @param conversationEntity Conversation entity to delete
    * @param timestamp Optional timestamps for which messages to remove
    */
-  private _clearConversation(conversationEntity: Conversation, timestamp?: number) {
+  private async _clearConversation(conversationEntity: Conversation, timestamp?: number) {
     this.deleteMessages(conversationEntity, timestamp);
 
     if (conversationEntity.removed_from_conversation()) {
-      this.conversationService.deleteConversationFromDb(conversationEntity);
+      await this.conversationService.deleteConversationFromDb(conversationEntity.id);
       this.deleteConversationFromRepository(conversationEntity);
     }
   }
@@ -2660,11 +2650,8 @@ export class ConversationRepository {
         eventJson.from = this.userState.self().id;
       }
 
-      if (conversationEntity.protocol === ConversationProtocol.MLS) {
-        const {groupId} = conversationEntity;
-        if (groupId) {
-          await this.core.service!.conversation.wipeMLSConversation(groupId);
-        }
+      if (isMLSConversation(conversationEntity)) {
+        await this.conversationService.wipeMLSConversation(conversationEntity);
       }
     } else {
       // Update conversation roles (in case the removed user had some special role and it's not the self user)
@@ -2754,7 +2741,7 @@ export class ConversationRepository {
     }
 
     if (conversationEntity.is_cleared()) {
-      this._clearConversation(conversationEntity, conversationEntity.cleared_timestamp());
+      await this._clearConversation(conversationEntity, conversationEntity.cleared_timestamp());
     }
 
     if (isActiveConversation && (conversationEntity.is_archived() || conversationEntity.is_cleared())) {

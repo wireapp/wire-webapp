@@ -447,7 +447,13 @@ const CallingCell: React.FC<CallingCellProps> = ({
             )
           )}
 
-          {classifiedDomains && <ClassifiedBar users={allUsers} classifiedDomains={classifiedDomains} />}
+          {classifiedDomains && (
+            <ClassifiedBar
+              conversationDomain={conversation.domain}
+              users={allUsers}
+              classifiedDomains={classifiedDomains}
+            />
+          )}
 
           {!isDeclined && (
             <>

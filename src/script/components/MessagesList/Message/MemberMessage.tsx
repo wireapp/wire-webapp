@@ -40,6 +40,7 @@ export interface MemberMessageProps {
   onClickInvitePeople: () => void;
   onClickParticipants: (participants: User[]) => void;
   shouldShowInvitePeople: boolean;
+  conversationName: string;
 }
 
 const MemberMessage: React.FC<MemberMessageProps> = ({
@@ -51,12 +52,12 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
   onClickParticipants,
   onClickCancelRequest,
   classifiedDomains,
+  conversationName,
 }) => {
   const {
     otherUser,
     timestamp,
     user,
-    name,
     htmlGroupCreationHeader,
     htmlCaption,
     highlightedUsers,
@@ -105,7 +106,9 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
                 className="message-group-creation-header-text"
                 dangerouslySetInnerHTML={{__html: htmlGroupCreationHeader}}
               />
-              <h2 className="message-group-creation-header-name">{name}</h2>
+              <h2 className="message-group-creation-header-name" data-uie-name="conversation-name">
+                {conversationName}
+              </h2>
             </div>
           )}
           {hasUsers && (

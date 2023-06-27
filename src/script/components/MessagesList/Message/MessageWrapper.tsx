@@ -29,6 +29,7 @@ import {OutgoingQuote} from 'src/script/conversation/MessageRepository';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {Text} from 'src/script/entity/message/Text';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {CallMessage} from './CallMessage';
@@ -116,6 +117,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
       await messageRepository.retryUploadFile(conversation, file, firstAsset.isImage(), message.id);
     }
   };
+  const {display_name: displayName} = useKoSubscribableChildren(conversation, ['display_name']);
 
   const contextMenuEntries = ko.pureComputed(() => {
     const entries: ContextMenuEntry[] = [];
@@ -236,7 +238,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
     return <CallTimeoutMessage message={message} />;
   }
   if (message.isFailedToAddUsersMessage()) {
-    return <FailedToAddUsersMessage message={message} />;
+    return <FailedToAddUsersMessage isMessageFocused={isMessageFocused} message={message} />;
   }
   if (message.isSystem()) {
     return <SystemMessage message={message} />;
@@ -245,6 +247,7 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
     return (
       <MemberMessage
         message={message}
+        conversationName={displayName}
         onClickInvitePeople={onClickInvitePeople}
         onClickParticipants={onClickParticipants}
         onClickCancelRequest={onClickCancelRequest}
