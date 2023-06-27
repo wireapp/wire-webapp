@@ -176,24 +176,26 @@ export class BackupRepository {
   private async compressHistoryFiles(user: User, clientId: string, exportedData: Record<string, any>): Promise<Blob> {
     const password = prompt('Enter the password for encryption (leave blank for no encryption):');
 
-    const metaData = this.createMetaData(user, clientId);
+    if (!!password) {
+      const metaData = this.createMetaData(user, clientId);
 
-    const files: Record<string, Uint8Array> = {};
+      const files: Record<string, Uint8Array> = {};
 
-    const stringifiedMetadata = JSON.stringify(metaData, null, 2);
-    const encodedMetadata = new TextEncoder().encode(stringifiedMetadata);
+      const stringifiedMetadata = JSON.stringify(metaData, null, 2);
+      const encodedMetadata = new TextEncoder().encode(stringifiedMetadata);
 
-    for (const tableName in exportedData) {
-      const stringifiedData = JSON.stringify(exportedData[tableName]);
-      const encodedData = new TextEncoder().encode(stringifiedData);
-      const fileName = `${tableName}.json`;
-      files[fileName] = encodedData;
+      for (const tableName in exportedData) {
+        const stringifiedData = JSON.stringify(exportedData[tableName]);
+        const encodedData = new TextEncoder().encode(stringifiedData);
+        const fileName = `${tableName}.json`;
+        files[fileName] = encodedData;
+      }
+
+      files[Filename.METADATA] = encodedMetadata;
+
+      const array = await this.worker.post<Uint8Array>({type: 'zip', files, password});
+      return new Blob([array], {type: 'application/zip'});
     }
-
-    files[Filename.METADATA] = encodedMetadata;
-
-    const array = await this.worker.post<Uint8Array>({type: 'zip', files, password});
-    return new Blob([array], {type: 'application/zip'});
   }
 
   public getBackupInitData(): Promise<number> {
@@ -208,33 +210,35 @@ export class BackupRepository {
   ): Promise<void> {
     this.canceled = false;
     const password = prompt('Enter the password for encryption (leave blank for no encryption):');
-    const files = await this.worker.post<Record<string, Uint8Array>>({type: 'unzip', bytes: data, password});
+    if (!!password) {
+      const files = await this.worker.post<Record<string, Uint8Array>>({type: 'unzip', bytes: data, password});
 
-    if (files.error) {
-      //console.log('files.error ', files.error);
-      throw new ImportError(files.error as unknown as string);
+      if (files.error) {
+        //console.log('files.error ', files.error);
+        throw new ImportError(files.error as unknown as string);
+      }
+
+      if (!files[Filename.METADATA]) {
+        throw new InvalidMetaDataError();
+      }
+
+      await this.verifyMetadata(user, files);
+      const fileDescriptors = Object.entries(files)
+        .filter(([filename]) => filename !== Filename.METADATA)
+        .map(([filename, content]) => {
+          const data = new TextDecoder().decode(content);
+          const entities = JSON.parse(data);
+          return {
+            entities,
+            filename,
+          } as FileDescriptor;
+        });
+
+      const nbEntities = fileDescriptors.reduce((acc, {entities}) => acc + entities.length, 0);
+      initCallback(nbEntities);
+
+      await this.importHistoryData(fileDescriptors, progressCallback);
     }
-
-    if (!files[Filename.METADATA]) {
-      throw new InvalidMetaDataError();
-    }
-
-    await this.verifyMetadata(user, files);
-    const fileDescriptors = Object.entries(files)
-      .filter(([filename]) => filename !== Filename.METADATA)
-      .map(([filename, content]) => {
-        const data = new TextDecoder().decode(content);
-        const entities = JSON.parse(data);
-        return {
-          entities,
-          filename,
-        } as FileDescriptor;
-      });
-
-    const nbEntities = fileDescriptors.reduce((acc, {entities}) => acc + entities.length, 0);
-    initCallback(nbEntities);
-
-    await this.importHistoryData(fileDescriptors, progressCallback);
   }
 
   private async importHistoryData(

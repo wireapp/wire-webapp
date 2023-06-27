@@ -17,7 +17,6 @@
  *
  */
 
-import CryptoJS from 'crypto-js';
 import JSZip from 'jszip';
 
 type Payload =
@@ -33,32 +32,29 @@ export async function handleZipEvent(payload: Payload) {
         zip.file(filename, file, {binary: true});
       }
 
-      const array = await zip.generateAsync({compression: 'DEFLATE', type: 'uint8array'});
+      const OriginalData = await zip.generateAsync({compression: 'DEFLATE', type: 'uint8array'});
 
       if (password) {
         // Encrypt the ZIP archive using the provided password
-        const encryptedData = encryptData(array, password);
+        const encryptedData = await encryptData(OriginalData, password);
+        // console.log('encryptedData', OriginalData, encryptedData);
         return encryptedData;
       }
-
-      return array;
+      // console.log('array', OriginalData.length);
+      return OriginalData;
 
     case 'unzip':
       let decryptedBytes: Uint8Array;
       if (password) {
         // Decrypt the ZIP archive using the provided password
-        decryptedBytes = decryptData(payload.bytes, password);
+        const payloadBytes = new Uint8Array(payload.bytes);
+        decryptedBytes = await decryptData(payloadBytes, password);
       } else {
         decryptedBytes = new Uint8Array(payload.bytes);
       }
-      //console.log('decryptedBytes', decryptedBytes);
-      const archive = await JSZip.loadAsync(decryptedBytes)
-        .then(zip => {
-          // console.log('zip', zip);
-        })
-        .catch(err => {
-          //  console.log('err-here', err);
-        });
+      // const isVerificationSuccessful = JSON.stringify(decryptedBytes) === JSON.stringify(originalData);
+      // console.log('Verification successful:', isVerificationSuccessful);
+      const archive = await JSZip.loadAsync(decryptedBytes);
       const files: Record<string, Uint8Array> = {};
 
       for (const fileName in archive.files) {
@@ -69,18 +65,60 @@ export async function handleZipEvent(payload: Payload) {
   }
 }
 
-function encryptData(data: Uint8Array, password: string): Uint8Array {
-  const wordArray = CryptoJS.lib.WordArray.create(data);
-  const encrypted = CryptoJS.AES.encrypt(wordArray, password);
-  const ciphertext = CryptoJS.enc.Base64.parse(encrypted.toString());
-  return new Uint8Array(ciphertext.words);
+async function encryptData(data: Uint8Array, password: string): Promise<Uint8Array> {
+  // Derive the encryption key from the password using a suitable key derivation algorithm
+  const encoder = new TextEncoder();
+  const encodedPassword = encoder.encode(password);
+  const keyMaterial = await crypto.subtle.importKey('raw', encodedPassword, 'PBKDF2', false, ['deriveKey']);
+  const key = await crypto.subtle.deriveKey(
+    {
+      name: 'PBKDF2',
+      salt: new Uint8Array(16), // Provide the actual salt to be used during encryption
+      iterations: 100000, // Provide the desired iteration count
+      hash: {name: 'SHA-256'},
+    },
+    keyMaterial,
+    {name: 'AES-GCM', length: 256},
+    false,
+    ['encrypt'],
+  );
+
+  // Encrypt the data using the derived key
+  const encryptedData = await crypto.subtle.encrypt(
+    {name: 'AES-GCM', iv: new Uint8Array(12)}, // Provide the actual initialization vector (IV) to be used during encryption
+    key,
+    data,
+  );
+
+  return new Uint8Array(encryptedData);
 }
 
-function decryptData(encryptedData: Uint8Array, password: string): Uint8Array {
-  const ciphertext = CryptoJS.lib.WordArray.create(encryptedData);
-  const encrypted = CryptoJS.enc.Base64.stringify(ciphertext);
-  const decrypted = CryptoJS.AES.decrypt(encrypted, password);
-  return new Uint8Array(decrypted.words);
+async function decryptData(encryptedData: Uint8Array, password: string): Promise<Uint8Array> {
+  // Derive the encryption key from the password using a suitable key derivation algorithm
+  const encoder = new TextEncoder();
+  const encodedPassword = encoder.encode(password);
+  const keyMaterial = await crypto.subtle.importKey('raw', encodedPassword, 'PBKDF2', false, ['deriveKey']);
+  const key = await crypto.subtle.deriveKey(
+    {
+      name: 'PBKDF2',
+      salt: new Uint8Array(16), // Provide the actual salt used during encryption
+      iterations: 100000, // Provide the actual iteration count used during encryption
+      hash: {name: 'SHA-256'},
+    },
+    keyMaterial,
+    {name: 'AES-GCM', length: 256},
+    false,
+    ['decrypt'],
+  );
+
+  // Decrypt the data using the derived key
+  const decryptedData = await crypto.subtle.decrypt(
+    {name: 'AES-GCM', iv: new Uint8Array(12)}, // Provide the actual initialization vector (IV) used during encryption
+    key,
+    encryptedData,
+  );
+
+  return new Uint8Array(decryptedData);
 }
 
 self.addEventListener('message', async (event: MessageEvent<Payload>) => {
