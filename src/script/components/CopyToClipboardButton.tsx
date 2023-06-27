@@ -29,11 +29,13 @@ interface CopyToClipboardButtonProps {
   displayText: string;
   copySuccessText: string;
   onCopySuccess?: () => void;
+  disabled?: boolean;
 }
 
 const COPY_CONFIRM_DURATION = 1500;
 
 const CopyToClipboardButton: React.FC<CopyToClipboardButtonProps> = ({
+  disabled,
   textToCopy,
   displayText,
   copySuccessText,
@@ -42,6 +44,9 @@ const CopyToClipboardButton: React.FC<CopyToClipboardButtonProps> = ({
   const [isCopying, setIsCopying] = useState<boolean>(false);
 
   const copyToClipboard = async () => {
+    if (disabled) {
+      return;
+    }
     if (!isCopying) {
       await copyText(textToCopy);
       onCopySuccess?.();
@@ -51,7 +56,12 @@ const CopyToClipboardButton: React.FC<CopyToClipboardButtonProps> = ({
   };
 
   return (
-    <Button onClick={copyToClipboard} variant={ButtonVariant.TERTIARY} data-uie-name="do-copy-to-clipboard">
+    <Button
+      disabled={disabled}
+      onClick={copyToClipboard}
+      variant={ButtonVariant.TERTIARY}
+      data-uie-name="do-copy-to-clipboard"
+    >
       <Icon.Copy data-uie-name="copy-to-clipboard-icon" width="16" height="16" css={{marginRight: '10px'}} />
       {isCopying ? copySuccessText : displayText}
     </Button>

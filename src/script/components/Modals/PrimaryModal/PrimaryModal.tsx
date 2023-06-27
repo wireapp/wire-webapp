@@ -244,6 +244,7 @@ export const PrimaryModalComponent: FC = () => {
 
               {copyPassword && (
                 <CopyToClipboardButton
+                  disabled={!passwordActionEnabled}
                   textToCopy={passwordValue}
                   displayText={t('guestOptionsPasswordCopyToClipboard')}
                   copySuccessText={t('guestOptionsPasswordCopyToClipboardSuccess')}
