@@ -97,6 +97,7 @@ const UserActions: React.FC<UserActionsProps> = ({
   selfUser,
 }) => {
   const {
+    isAvailable,
     isBlocked,
     isCanceled,
     isRequest,
@@ -107,6 +108,7 @@ const UserActions: React.FC<UserActionsProps> = ({
     isOutgoingRequest,
     isIncomingRequest,
   } = useKoSubscribableChildren(user, [
+    'isAvailable',
     'isTemporaryGuest',
     'isTeamMember',
     'isBlocked',
@@ -157,7 +159,7 @@ const UserActions: React.FC<UserActionsProps> = ({
       : undefined;
 
   const open1To1Conversation: MenuItem | undefined =
-    isNotMe && (isConnected || isTeamMember)
+    isNotMe && isAvailable && (isConnected || isTeamMember)
       ? {
           click: async () => {
             await create1to1Conversation(user, true);
@@ -170,7 +172,7 @@ const UserActions: React.FC<UserActionsProps> = ({
       : undefined;
 
   const acceptConnectionRequest: MenuItem | undefined =
-    isNotMe && isIncomingRequest
+    isNotMe && isAvailable && isIncomingRequest
       ? {
           click: async () => {
             await actionsViewModel.acceptConnectionRequest(user);
@@ -214,7 +216,7 @@ const UserActions: React.FC<UserActionsProps> = ({
   const canConnect = !isTeamMember && !isTemporaryGuest;
 
   const sendConnectionRequest: MenuItem | undefined =
-    isNotMe && isNotConnectedUser && canConnect
+    isNotMe && isAvailable && isNotConnectedUser && canConnect
       ? {
           click: async () => {
             const connectionIsSent = await actionsViewModel.sendConnectionRequest(user);
@@ -238,7 +240,7 @@ const UserActions: React.FC<UserActionsProps> = ({
       : undefined;
 
   const blockUser: MenuItem | undefined =
-    isNotMe && (isConnected || isRequest)
+    isNotMe && isAvailable && (isConnected || isRequest)
       ? {
           click: async () => {
             await actionsViewModel.blockUser(user);
@@ -252,7 +254,7 @@ const UserActions: React.FC<UserActionsProps> = ({
       : undefined;
 
   const unblockUser: MenuItem | undefined =
-    isNotMe && isBlocked
+    isNotMe && isAvailable && isBlocked
       ? {
           click: async () => {
             await actionsViewModel.unblockUser(user);
