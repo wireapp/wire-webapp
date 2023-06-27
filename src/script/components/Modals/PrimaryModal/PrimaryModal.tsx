@@ -88,7 +88,7 @@ export const PrimaryModalComponent: FC = () => {
   const inputActionEnabled = !isInput || !!inputValue.trim().length;
   const passwordActionEnabled =
     (!isGuestLinkPassword || !!passwordValue.trim().length) && passwordValue === passwordConfirmationValue;
-  console.info('bardia', {inputActionEnabled, passwordActionEnabled});
+
   const doAction =
     (action?: Function, closeAfter = true, skipValidation = false) =>
     (event: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement>) => {
