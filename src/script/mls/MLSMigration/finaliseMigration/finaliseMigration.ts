@@ -19,7 +19,8 @@
 
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 
-import {MixedConversation} from 'src/script/conversation/ConversationSelectors';
+import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
+import {MixedConversation, isMLSConversation} from 'src/script/conversation/ConversationSelectors';
 import {TeamState} from 'src/script/team/TeamState';
 
 import {MLSMigrationStatus, getMLSMigrationStatus} from '../migrationStatus';
@@ -27,14 +28,18 @@ import {mlsMigrationLogger} from '../MLSMigrationLogger';
 
 export const finaliseMigrationOfMixedConversations = async (
   mixedConversatons: MixedConversation[],
-  {teamState}: {teamState: TeamState},
+  {teamState, conversationRepository}: {teamState: TeamState; conversationRepository: ConversationRepository},
 ) => {
   mlsMigrationLogger.info(
     `There are ${mixedConversatons.length} mixed conversations, checking if they are ready to be finalised...`,
   );
 
   for (const mixedConversation of mixedConversatons) {
-    await checkFinalisationCriteria(mixedConversation, finaliseMigrationOfMixedConversation, {teamState});
+    await checkFinalisationCriteria(
+      mixedConversation,
+      () => finaliseMigrationOfMixedConversation(mixedConversation, {conversationRepository}),
+      {teamState},
+    );
   }
 };
 
@@ -59,6 +64,24 @@ const doAllConversationParticipantsSupportMLS = (mixedConversation: MixedConvers
     .every(user => user.supportedProtocols().includes(ConversationProtocol.MLS));
 };
 
-const finaliseMigrationOfMixedConversation = async (mixedConversation: MixedConversation) => {
+const finaliseMigrationOfMixedConversation = async (
+  mixedConversation: MixedConversation,
+  {conversationRepository}: {conversationRepository: ConversationRepository},
+) => {
   mlsMigrationLogger.info(`Finalising migration of mixed conversation ${mixedConversation.id}...`);
+  try {
+    //update protocol to mls
+    //update conversation protocol on both backend and local store
+    const updatedMLSConversation = await conversationRepository.updateConversationProtocol(
+      mixedConversation,
+      ConversationProtocol.MLS,
+    );
+
+    //we have to make sure that conversation's protocol has really changed to MLS
+    if (!isMLSConversation(updatedMLSConversation)) {
+      throw new Error(`Conversation ${updatedMLSConversation.qualifiedId.id} has not updated its protocol to MLS.`);
+    }
+  } catch (error) {
+    mlsMigrationLogger.error(`Failed to finalise migration of mixed conversation ${mixedConversation.id}.`, error);
+  }
 };

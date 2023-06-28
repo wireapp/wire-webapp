@@ -33,6 +33,7 @@ import {Core as CoreSingleton} from 'src/script/service/CoreSingleton';
 import {TeamState} from 'src/script/team/TeamState';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
+import {finaliseMigrationOfMixedConversations} from './finaliseMigration/finaliseMigration';
 import {initialiseMigrationOfProteusConversations} from './initialiseMigration';
 import {joinUnestablishedMixedConversations} from './initialiseMigration/joinUnestablishedMixedConversations';
 import {getMLSMigrationStatus, MLSMigrationStatus} from './migrationStatus';
@@ -68,8 +69,8 @@ export const initialiseMLSMigrationFlow = async ({
   return periodicallyCheckMigrationConfig(
     () =>
       migrateConversationsToMLS({
+        teamState,
         isConversationOwnedBySelfTeam,
-        apiClient,
         core,
         conversationRepository,
         selfUserId,
@@ -137,19 +138,19 @@ const checkMigrationConfig = async (
 };
 
 interface MigrateConversationsToMLSParams {
-  apiClient: APIClient;
   core: Account;
   selfUserId: QualifiedId;
   conversationRepository: ConversationRepository;
+  teamState: TeamState;
   isConversationOwnedBySelfTeam: (conversation: Conversation) => boolean;
 }
 
 const migrateConversationsToMLS = async ({
-  apiClient,
   core,
   selfUserId,
   conversationRepository,
   isConversationOwnedBySelfTeam,
+  teamState,
 }: MigrateConversationsToMLSParams) => {
   const conversations = conversationRepository.getLocalConversations();
 
@@ -172,5 +173,5 @@ const migrateConversationsToMLS = async ({
 
   await joinUnestablishedMixedConversations(mixedConversatons, {core});
 
-  //TODO: implement logic for init and finalise the migration
+  await finaliseMigrationOfMixedConversations(mixedConversatons, {conversationRepository, teamState});
 };
