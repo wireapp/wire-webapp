@@ -20,16 +20,18 @@
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
-import {MixedConversation, isMLSConversation} from 'src/script/conversation/ConversationSelectors';
+import {MixedConversation, isMLSConversation, isMixedConversation} from 'src/script/conversation/ConversationSelectors';
+import {Conversation} from 'src/script/entity/Conversation';
 import {TeamState} from 'src/script/team/TeamState';
 
 import {MLSMigrationStatus, getMLSMigrationStatus} from '../migrationStatus';
 import {mlsMigrationLogger} from '../MLSMigrationLogger';
 
 export const finaliseMigrationOfMixedConversations = async (
-  mixedConversatons: MixedConversation[],
+  conversations: Conversation[],
   {teamState, conversationRepository}: {teamState: TeamState; conversationRepository: ConversationRepository},
 ) => {
+  const mixedConversatons = conversations.filter(isMixedConversation);
   mlsMigrationLogger.info(
     `There are ${mixedConversatons.length} mixed conversations, checking if they are ready to be finalised...`,
   );

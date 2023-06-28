@@ -17,7 +17,6 @@
  *
  */
 
-import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {registerRecurringTask} from '@wireapp/core/lib/util/RecurringTaskScheduler';
 import {container} from 'tsyringe';
@@ -26,8 +25,6 @@ import {APIClient} from '@wireapp/api-client';
 import {Account} from '@wireapp/core';
 
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
-import {groupConversationsByProtocol} from 'src/script/conversation/groupConversationsByProtocol';
-import {Conversation} from 'src/script/entity/Conversation';
 import {APIClient as APIClientSingleton} from 'src/script/service/APIClientSingleton';
 import {Core as CoreSingleton} from 'src/script/service/CoreSingleton';
 import {TeamState} from 'src/script/team/TeamState';
@@ -46,7 +43,6 @@ const MIGRATION_TASK_KEY = 'mls-migration';
 interface InitialiseMLSMigrationFlowParams {
   teamState: TeamState;
   conversationRepository: ConversationRepository;
-  isConversationOwnedBySelfTeam: (conversation: Conversation) => boolean;
   selfUserId: QualifiedId;
 }
 
@@ -55,12 +51,10 @@ interface InitialiseMLSMigrationFlowParams {
  *
  * @param teamState - team state
  * @param conversationRepository - conversation repository
- * @param isConversationOwnedBySelfTeam - callback that checks if the provided conversation is owned by a self team
  */
 export const initialiseMLSMigrationFlow = async ({
   teamState,
   conversationRepository,
-  isConversationOwnedBySelfTeam,
   selfUserId,
 }: InitialiseMLSMigrationFlowParams) => {
   const core = container.resolve(CoreSingleton);
@@ -70,7 +64,6 @@ export const initialiseMLSMigrationFlow = async ({
     () =>
       migrateConversationsToMLS({
         teamState,
-        isConversationOwnedBySelfTeam,
         core,
         conversationRepository,
         selfUserId,
@@ -142,36 +135,24 @@ interface MigrateConversationsToMLSParams {
   selfUserId: QualifiedId;
   conversationRepository: ConversationRepository;
   teamState: TeamState;
-  isConversationOwnedBySelfTeam: (conversation: Conversation) => boolean;
 }
 
 const migrateConversationsToMLS = async ({
   core,
   selfUserId,
   conversationRepository,
-  isConversationOwnedBySelfTeam,
   teamState,
 }: MigrateConversationsToMLSParams) => {
-  const conversations = conversationRepository.getLocalConversations();
-
   //TODO: implement logic for 1on1 conversations (both team owned and federated)
-  const regularGroupConversations = conversations.filter(
-    conversation =>
-      conversation.type() === CONVERSATION_TYPE.REGULAR &&
-      isConversationOwnedBySelfTeam(conversation) &&
-      !conversation.isTeam1to1(),
-  );
+  const conversations = conversationRepository.getAllSelfTeamOwnedGroupConversations();
 
-  const {proteus: proteusConversations, mixed: mixedConversatons} =
-    groupConversationsByProtocol(regularGroupConversations);
-
-  await initialiseMigrationOfProteusConversations(proteusConversations, {
+  await initialiseMigrationOfProteusConversations(conversations, {
     core,
     conversationRepository,
     selfUserId,
   });
 
-  await joinUnestablishedMixedConversations(mixedConversatons, {core});
+  await joinUnestablishedMixedConversations(conversations, {core});
 
-  await finaliseMigrationOfMixedConversations(mixedConversatons, {conversationRepository, teamState});
+  await finaliseMigrationOfMixedConversations(conversations, {conversationRepository, teamState});
 };

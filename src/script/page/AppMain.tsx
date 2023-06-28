@@ -201,7 +201,6 @@ const AppMain: FC<AppMainProps> = ({
       teamState,
       conversationRepository: repositories.conversation,
       selfUserId: selfUser.qualifiedId,
-      isConversationOwnedBySelfTeam: ({team_id}) => !!selfUser.teamId && team_id === selfUser.teamId,
     });
   };
 

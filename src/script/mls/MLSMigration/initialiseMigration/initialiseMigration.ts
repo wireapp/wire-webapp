@@ -23,7 +23,12 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Account} from '@wireapp/core';
 
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
-import {ProteusConversation, isMixedConversation} from 'src/script/conversation/ConversationSelectors';
+import {
+  ProteusConversation,
+  isMixedConversation,
+  isProteusConversation,
+} from 'src/script/conversation/ConversationSelectors';
+import {Conversation} from 'src/script/entity/Conversation';
 
 import {addMixedConversationMembersToMLSGroup} from './addMixedConversationMembersToMLSGroup';
 import {tryEstablishingMLSGroupForMixedConversation} from './tryEstablishingMLSGroupForMixedConversation';
@@ -45,9 +50,10 @@ interface InitialiseMigrationOfProteusConversationParams {
  * @param selfUserId - id of the current (self) user
  */
 export const initialiseMigrationOfProteusConversations = async (
-  proteusConversations: ProteusConversation[],
+  conversations: Conversation[],
   {core, conversationRepository, selfUserId}: InitialiseMigrationOfProteusConversationParams,
 ) => {
+  const proteusConversations = conversations.filter(isProteusConversation);
   if (proteusConversations.length < 1) {
     return;
   }

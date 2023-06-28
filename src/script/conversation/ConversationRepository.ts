@@ -1007,10 +1007,13 @@ export class ConversationRepository {
   }
 
   /**
-   * Get all the conversations from memory.
+   * Get all the group conversations owned by self user's team from the local state.
    */
-  public getLocalConversations(): Conversation[] {
-    return this.conversationState.conversations();
+  public getAllSelfTeamOwnedGroupConversations(): Conversation[] {
+    const {teamId: selfUserTeamId} = this.userState.self();
+    return this.conversationState.conversations().filter(conversation => {
+      return conversation.isGroup() && !!selfUserTeamId && conversation.team_id === selfUserTeamId;
+    });
   }
 
   /**
