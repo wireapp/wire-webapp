@@ -18,7 +18,6 @@
  */
 
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
-import {FeatureStatus} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {registerRecurringTask} from '@wireapp/core/lib/util/RecurringTaskScheduler';
 import {container} from 'tsyringe';
@@ -36,6 +35,7 @@ import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {initialiseMigrationOfProteusConversations} from './initialiseMigration';
 import {joinUnestablishedMixedConversations} from './initialiseMigration/joinUnestablishedMixedConversations';
+import {getMLSMigrationStatus, MLSMigrationStatus} from './migrationStatus';
 import {mlsMigrationLogger} from './MLSMigrationLogger';
 
 import {isMLSSupportedByEnvironment} from '../isMLSSupportedByEnvironment';
@@ -110,26 +110,24 @@ const checkMigrationConfig = async (
   if (!isMLSSupportedByEnv) {
     return;
   }
-  //at this point we know that MLS is supported by environment, we can check MLS migration config
+  //at this point we know that MLS is supported by environment, we can check MLS migration status
+
   //fetch current mls migration feature config from memory
   const mlsMigrationFeature = teamState.teamFeatures().mlsMigration;
+  const migrationStatus = getMLSMigrationStatus(mlsMigrationFeature);
 
-  if (!mlsMigrationFeature || mlsMigrationFeature.status === FeatureStatus.DISABLED) {
+  if (migrationStatus === MLSMigrationStatus.DISABLED) {
     mlsMigrationLogger.info('MLS migration feature is disabled, will retry in 24 hours or on next app reload.');
     return;
   }
 
   mlsMigrationLogger.info('MLS migration feature enabled, checking the configuration...');
 
-  //if startTime is not defined, we never start the migration, will retry in 24 hours or on next app reload
-  const startDateISO = mlsMigrationFeature.config.startTime;
-  const startTime = (startDateISO && Date.parse(startDateISO)) || Infinity;
-  const hasStartTimeArrived = Date.now() >= startTime;
-
-  if (!hasStartTimeArrived) {
+  if (migrationStatus === MLSMigrationStatus.NOT_STARTED) {
     mlsMigrationLogger.info(
       'MLS migration start time has not arrived yet, will retry in 24 hours or on next app reload.',
     );
+    return;
   }
 
   mlsMigrationLogger.info(
