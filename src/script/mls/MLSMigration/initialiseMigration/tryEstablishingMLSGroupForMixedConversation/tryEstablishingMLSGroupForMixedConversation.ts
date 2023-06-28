@@ -54,22 +54,21 @@ export const tryEstablishingMLSGroupForMixedConversation = async (
   }
 
   //we try to register empty conversation
-  const groupCreationResponse = await mlsService.registerConversation(groupId, [], {
-    user: selfUserId,
-    client: core.clientId,
-  });
-
-  //if there's no response, it means that commit bundle was not sent successfully
-  //at this point we should wipe conversation locally
-  //it's possible that somebody else has already created the group,
-  //we should wait for the welcome message or try joining with external commit later
-  if (!groupCreationResponse) {
+  try {
+    await mlsService.registerConversation(groupId, [], {
+      user: selfUserId,
+      client: core.clientId,
+    });
+    return true;
+  } catch (error) {
+    //if an error is thrown it means that the commit bundle was not sent successfully
+    //at this point we should wipe conversation locally
+    //it's possible that somebody else has already created the group,
+    //we should wait for the welcome message or try joining with external commit later
     mlsMigrationLogger.info(
       `MLS Group for conversation ${mixedConversation.qualifiedId.id} was not created, wiping the conversation.`,
     );
     await mlsService.wipeConversation(groupId);
     return false;
   }
-
-  return true;
 };
