@@ -975,7 +975,7 @@
   "oauth.scope.read_self": "Access user information",
   "oauth.scope.write_conversations": "Create conversations",
   "oauth.scope.write_conversations_code": "Create conversation guest links",
-  "oauth.subhead": "{app} requires your permission to:",
+  "oauth.subhead": "Microsoft Outlook requires your permission to:",
   "offlineBackendLearnMore": "Learn more",
   "ongoingAudioCall": "Ongoing audio call with {{conversationName}}.",
   "ongoingGroupAudioCall": "Ongoing conference call with {{conversationName}}.",
