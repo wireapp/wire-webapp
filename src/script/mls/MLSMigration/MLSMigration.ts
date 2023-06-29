@@ -28,9 +28,10 @@ import {ConversationRepository} from 'src/script/conversation/ConversationReposi
 import {APIClient as APIClientSingleton} from 'src/script/service/APIClientSingleton';
 import {Core as CoreSingleton} from 'src/script/service/CoreSingleton';
 import {TeamState} from 'src/script/team/TeamState';
+import {UserRepository} from 'src/script/user/UserRepository';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
-import {finaliseMigrationOfMixedConversations} from './finaliseMigration/finaliseMigration';
+import {finaliseMigrationOfMixedConversations} from './finaliseMigration';
 import {initialiseMigrationOfProteusConversations} from './initialiseMigration';
 import {joinUnestablishedMixedConversations} from './initialiseMigration/joinUnestablishedMixedConversations';
 import {getMLSMigrationStatus, MLSMigrationStatus} from './migrationStatus';
@@ -43,6 +44,7 @@ const MIGRATION_TASK_KEY = 'mls-migration';
 interface InitialiseMLSMigrationFlowParams {
   teamState: TeamState;
   conversationRepository: ConversationRepository;
+  userRepository: UserRepository;
   selfUserId: QualifiedId;
 }
 
@@ -55,6 +57,7 @@ interface InitialiseMLSMigrationFlowParams {
 export const initialiseMLSMigrationFlow = async ({
   teamState,
   conversationRepository,
+  userRepository,
   selfUserId,
 }: InitialiseMLSMigrationFlowParams) => {
   const core = container.resolve(CoreSingleton);
@@ -66,6 +69,7 @@ export const initialiseMLSMigrationFlow = async ({
         teamState,
         core,
         conversationRepository,
+        userRepository,
         selfUserId,
       }),
     {core, apiClient, teamState},
@@ -134,6 +138,7 @@ interface MigrateConversationsToMLSParams {
   core: Account;
   selfUserId: QualifiedId;
   conversationRepository: ConversationRepository;
+  userRepository: UserRepository;
   teamState: TeamState;
 }
 
@@ -141,8 +146,12 @@ const migrateConversationsToMLS = async ({
   core,
   selfUserId,
   conversationRepository,
+  userRepository,
   teamState,
 }: MigrateConversationsToMLSParams) => {
+  //refetch all known users so we have the latest lists of the protocols they support
+  await userRepository.refreshAllKnownUsers();
+
   //TODO: implement logic for 1on1 conversations (both team owned and federated)
   const conversations = conversationRepository.getAllSelfTeamOwnedGroupConversations();
 

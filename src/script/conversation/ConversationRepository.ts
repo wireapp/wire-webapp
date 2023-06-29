@@ -1726,6 +1726,7 @@ export class ConversationRepository {
       conversation.qualifiedId,
       protocol,
     );
+
     if (protocolUpdateEventResponse) {
       await this.eventRepository.injectEvent(protocolUpdateEventResponse, EventRepository.SOURCE.BACKEND_RESPONSE);
     }
@@ -1745,7 +1746,6 @@ export class ConversationRepository {
   private async refreshConversationProtocolProperties(conversation: Conversation) {
     //refetch the conversation to get all new fields (groupId, ciphersuite, epoch and new protocol)
     const remoteConversationData = await this.conversationService.getConversationById(conversation.qualifiedId);
-
     //update fields that came after protocol update
     const {cipher_suite: cipherSuite, epoch, group_id: newGroupId, protocol: newProtocol} = remoteConversationData;
     const updatedConversation = ConversationMapper.updateProperties(conversation, {
