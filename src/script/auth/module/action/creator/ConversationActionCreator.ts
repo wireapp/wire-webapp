@@ -77,7 +77,7 @@ export interface ConversationCodeJoinSuccessAction extends AppAction {
   readonly type: CONVERSATION_ACTION.CONVERSATION_CODE_JOIN_SUCCESS;
 }
 export interface ConversationCodeJoinFailedAction extends AppAction {
-  readonly error: Error;
+  readonly error: Error | null;
   readonly type: CONVERSATION_ACTION.CONVERSATION_CODE_JOIN_FAILED;
 }
 
@@ -112,7 +112,7 @@ export class ConversationActionCreator {
     payload: data,
     type: CONVERSATION_ACTION.CONVERSATION_CODE_JOIN_SUCCESS,
   });
-  static failedJoinConversationByCode = (error: Error): ConversationCodeJoinFailedAction => ({
+  static failedJoinConversationByCode = (error: Error | null): ConversationCodeJoinFailedAction => ({
     error,
     type: CONVERSATION_ACTION.CONVERSATION_CODE_JOIN_FAILED,
   });

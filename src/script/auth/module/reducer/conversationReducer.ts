@@ -23,7 +23,7 @@ import type {BackendError} from '@wireapp/api-client/lib/http/';
 import {AppActions, CONVERSATION_ACTION} from '../action/creator/';
 
 export interface ConversationState {
-  error: Error & {label?: string};
+  error: (Error & {label?: string; code?: number; message?: string}) | null;
   fetched: boolean;
   fetching: boolean;
   conversationInfoFetching: boolean;
@@ -85,9 +85,10 @@ export function conversationReducer(
     case CONVERSATION_ACTION.CONVERSATION_CODE_GET_INFO_SUCCESS: {
       return {
         ...state,
+        fetching: false,
         conversationInfoFetching: false,
         conversationInfoError: null,
-        conversationInfo: action.payload,
+        conversationInfo: {...state.conversationInfo, ...action.payload},
       };
     }
     default: {

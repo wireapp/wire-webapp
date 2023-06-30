@@ -388,6 +388,10 @@ export const joinGuestLinkPasswordModalStrings = defineMessages({
     defaultMessage: 'Join Conversation',
     id: 'guestLinkPasswordModal.joinConversation',
   },
+  passwordIncorrect: {
+    defaultMessage: 'Password is incorrect, please try again.',
+    id: 'guestLinkPasswordModal.passwordIncorrect',
+  },
 });
 
 export const unsupportedStrings = defineMessages({

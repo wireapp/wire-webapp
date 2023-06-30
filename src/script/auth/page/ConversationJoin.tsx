@@ -89,11 +89,11 @@ const ConversationJoinComponent = ({
   const nameInput = React.useRef<HTMLInputElement>(null);
   const {formatMessage: _} = useIntl();
 
+  const conversationHasPassword = conversationInfo?.has_password;
   const invalidConversationPassword =
     conversationError && conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD;
   const [accentColor] = useState(AccentColor.random());
   const [isPwaEnabled, setIsPwaEnabled] = useState<boolean>();
-  const [conversationHasPassword, setConversationHasPassword] = useState<boolean>(invalidConversationPassword);
   const [conversationCode, setConversationCode] = useState<string>();
   const [conversationKey, setConversationKey] = useState<string>();
   const [enteredName, setEnteredName] = useState<string>();
@@ -218,8 +218,6 @@ const ConversationJoinComponent = ({
       setIsValidName(false);
     } else if (isEntropyRequired) {
       setShowEntropyForm(true);
-    } else if (conversationInfo?.has_password) {
-      setConversationHasPassword(true);
     } else {
       handleSubmit();
     }
@@ -253,6 +251,7 @@ const ConversationJoinComponent = ({
     <UnsupportedBrowser isTemporaryGuest>
       {isJoinGuestLinkPasswordModalOpen && (
         <JoinGuestLinkPasswordModal
+          error={conversationError}
           isLoading={isFetching}
           conversationName={conversationInfo?.name}
           onSubmitPassword={submitJoinCodeWithPassword}

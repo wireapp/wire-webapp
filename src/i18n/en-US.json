@@ -628,6 +628,7 @@
   "guestLinkPasswordModal.passwordInputPlaceholder": "Enter Conversation password",
   "guestLinkPasswordModal.learnMoreLink": "Learn more about guest links",
   "guestLinkPasswordModal.joinConversation": "Join Conversation",
+  "guestLinkPasswordModal.passwordIncorrect": "Password is incorrect, please try again.",
   "guestRoomToggleName": "Allow Guests",
   "historyInfo.learnMore": "Learn more",
   "historyInfo.noHistoryHeadline": "It’s the first time you’re using {brandName} on this device.",

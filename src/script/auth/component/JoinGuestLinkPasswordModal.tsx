@@ -19,9 +19,10 @@
 
 import React, {useState} from 'react';
 
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {useIntl} from 'react-intl';
 
-import {Button, COLOR, Container, Form, H2, Input, Link, Modal, Text} from '@wireapp/react-ui-kit';
+import {Button, COLOR, Container, ErrorMessage, Form, H2, Input, Link, Modal, Text} from '@wireapp/react-ui-kit';
 
 import {Config} from '../../Config';
 import {joinGuestLinkPasswordModalStrings} from '../../strings';
@@ -30,9 +31,11 @@ export interface JoinGuestLinkPasswordModalProps {
   onSubmitPassword: (password: string) => void;
   isLoading?: boolean;
   conversationName?: string;
+  error: (Error & {label?: string; code?: number; message?: string}) | null;
 }
 
 const JoinGuestLinkPasswordModal: React.FC<JoinGuestLinkPasswordModalProps> = ({
+  error,
   isLoading,
   conversationName,
   onSubmitPassword,
@@ -42,6 +45,13 @@ const JoinGuestLinkPasswordModal: React.FC<JoinGuestLinkPasswordModalProps> = ({
 
   const onSubmit = () => {
     onSubmitPassword(passwordValue);
+  };
+
+  const Error = () => {
+    if (error?.code === HTTP_STATUS.FORBIDDEN || error?.code === HTTP_STATUS.BAD_REQUEST) {
+      return <ErrorMessage>{_(joinGuestLinkPasswordModalStrings.passwordIncorrect)}</ErrorMessage>;
+    }
+    return null;
   };
 
   return (
@@ -62,6 +72,7 @@ const JoinGuestLinkPasswordModal: React.FC<JoinGuestLinkPasswordModalProps> = ({
           autoComplete="off"
         >
           <Input
+            error={<Error />}
             data-uie-name="guest-link-join-password-input"
             name="guest-join-password"
             required
