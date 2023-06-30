@@ -18,6 +18,7 @@
  */
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
 import {
   BackendEvent,
@@ -55,6 +56,7 @@ import {checkVersion} from '../lifecycle/newVersionHandler';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
 import {EventRecord, StorageRepository, StorageSchemata} from '../storage';
+import {TeamState} from '../team/TeamState';
 import {UserRepository} from '../user/UserRepository';
 import {UserState} from '../user/UserState';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
@@ -79,6 +81,7 @@ export class DebugUtil {
     repositories: ViewModelRepositories,
     private readonly clientState = container.resolve(ClientState),
     private readonly userState = container.resolve(UserState),
+    private readonly teamState = container.resolve(TeamState),
     private readonly conversationState = container.resolve(ConversationState),
     private readonly callState = container.resolve(CallState),
     private readonly core = container.resolve(Core),
@@ -193,6 +196,26 @@ export class DebugUtil {
     const proteusService = this.core.service!.proteus;
     const sessionId = proteusService.constructSessionId(userId, clientId);
     await proteusService['cryptoClient'].debugBreakSession(sessionId);
+  }
+
+  async setTeamSupportedProtocols(supportedProtocols: ConversationProtocol[]) {
+    const {teamId} = await this.userRepository.getSelf();
+    if (!teamId) {
+      throw new Error('teamId of self user is undefined');
+    }
+
+    const mlsFeature = this.teamState.teamFeatures().mls;
+
+    if (!mlsFeature) {
+      throw new Error('MLS feature is not enabled');
+    }
+
+    const response = await this.apiClient.api.teams.feature.putMLSFeature(teamId, {
+      config: {...mlsFeature.config, supportedProtocols},
+      status: FeatureStatus.ENABLED,
+    });
+
+    return response;
   }
 
   /** Used by QA test automation. */
