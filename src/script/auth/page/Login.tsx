@@ -122,7 +122,8 @@ const LoginComponent = ({
   const onEntropyGenerated = useRef<((entropy: Uint8Array) => void) | undefined>();
   const entropy = useRef<Uint8Array | undefined>();
   const isLinkPasswordModalOpen =
-    conversationError && conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD;
+    conversationInfo?.has_password ||
+    (conversationError && conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD);
 
   const getEntropy = isEntropyRequired
     ? () => {
@@ -341,6 +342,7 @@ const LoginComponent = ({
           <AppAlreadyOpen />
           {isLinkPasswordModalOpen && (
             <JoinGuestLinkPasswordModal
+              error={conversationError}
               conversationName={conversationInfo?.name}
               isLoading={isFetching || conversationInfoFetching}
               onSubmitPassword={submitJoinCodeWithPassword}

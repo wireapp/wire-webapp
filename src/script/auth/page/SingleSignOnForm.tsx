@@ -99,7 +99,8 @@ const SingleSignOnFormComponent = ({
   const [shouldAutoLogin, setShouldAutoLogin] = useState(false);
 
   const isLinkPasswordModalOpen =
-    conversationError && conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD;
+    conversationInfo?.has_password ||
+    (conversationError && conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD);
 
   useEffect(() => {
     const queryAutoLogin = UrlUtil.hasURLParameter(QUERY_KEY.SSO_AUTO_LOGIN);
@@ -290,6 +291,7 @@ const SingleSignOnFormComponent = ({
     <>
       {isLinkPasswordModalOpen && (
         <JoinGuestLinkPasswordModal
+          error={conversationError}
           conversationName={conversationInfo?.name}
           isLoading={isFetching || conversationInfoFetching}
           onSubmitPassword={submitJoinCodeWithPassword}
