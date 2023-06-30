@@ -84,7 +84,7 @@ export class ConversationAction {
       } catch (error) {
         if (isBackendError(error)) {
           dispatch(ConversationActionCreator.failedConversationCodeGetInfo(error));
-          return;
+          return undefined;
         }
         throw error;
       }
