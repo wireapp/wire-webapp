@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [24.18.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@24.17.0...@wireapp/api-client@24.18.0) (2023-06-30)
+
+### Features
+
+* **api-client:** add supportedProtocols to mls feature config ([#5274](https://github.com/wireapp/wire-web-packages/issues/5274)) ([c2380b8](https://github.com/wireapp/wire-web-packages/commit/c2380b8c7fba02173116ec92e4de18d68d33a306))
+
 # [24.17.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@24.16.0...@wireapp/api-client@24.17.0) (2023-06-27)
 
 ### Features
