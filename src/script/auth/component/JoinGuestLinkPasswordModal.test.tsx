@@ -28,6 +28,7 @@ describe('JoinGuestLinkPasswordModal', () => {
   const props: JoinGuestLinkPasswordModalProps = {
     onSubmitPassword: onSubmitPasswordMock,
     conversationName: 'test group',
+    error: null,
   };
 
   beforeEach(() => {
