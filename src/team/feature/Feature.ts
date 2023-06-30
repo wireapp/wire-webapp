@@ -68,6 +68,7 @@ export interface FeatureMLSConfig extends FeatureConfig {
   defaultCipherSuite: number;
   defaultProtocol: ConversationProtocol;
   protocolToggleUsers: string[];
+  supportedProtocols: ConversationProtocol[];
 }
 
 export interface FeatureMLSE2EIdConfig extends FeatureConfig {
