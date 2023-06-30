@@ -48,14 +48,28 @@ export const evaluateSelfSupportedProtocols = async ({
 
   const mlsMigrationStatus = getMLSMigrationStatus(mlsMigrationFeature);
 
-  if (await isProteusSupported({teamSupportedProtocols, mlsMigrationStatus})) {
+  const isProteusProtocolSupported = await isProteusSupported({teamSupportedProtocols, mlsMigrationStatus});
+  if (isProteusProtocolSupported) {
     supportedProtocols.add(ConversationProtocol.PROTEUS);
   }
 
-  if (
-    (await isMLSSupported({teamSupportedProtocols, selfClients, mlsMigrationStatus, core, apiClient})) ||
-    (await isMLSForcedWithoutMigration({teamSupportedProtocols, selfClients, mlsMigrationStatus, core, apiClient}))
-  ) {
+  const isMLSProtocolSupported = await isMLSSupported({
+    teamSupportedProtocols,
+    selfClients,
+    mlsMigrationStatus,
+    core,
+    apiClient,
+  });
+
+  const isMLSForced = await isMLSForcedWithoutMigration({
+    teamSupportedProtocols,
+    selfClients,
+    mlsMigrationStatus,
+    core,
+    apiClient,
+  });
+
+  if (isMLSProtocolSupported || isMLSForced) {
     supportedProtocols.add(ConversationProtocol.MLS);
   }
 
