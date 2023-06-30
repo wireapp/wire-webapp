@@ -755,8 +755,7 @@ export class UserRepository {
    */
   async refreshAllKnownUsers() {
     const userIds = this.userState.users().map(user => user.qualifiedId);
-    const {found: users} = await this.fetchRawUsers(userIds, this.userState.self().domain);
-    return users.map(user => this.updateSavedUser(user));
+    return this.refreshUsers(userIds);
   }
 
   /**
