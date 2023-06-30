@@ -62,6 +62,11 @@ export const evaluateSelfSupportedProtocols = async ({
   return supportedProtocols;
 };
 
+/*
+  MLS is supported if:
+  - MLS is in the list of supported protocols
+  - All active clients support MLS, or MLS migration is finalised
+*/
 const isMLSSupported = async ({
   teamSupportedProtocols,
   selfClients,
@@ -86,6 +91,14 @@ const isMLSSupported = async ({
   return isMLSSupportedByTeam && (doActiveClientsSupportMLS || mlsMigrationStatus === MLSMigrationStatus.FINALISED);
 };
 
+/*
+  MLS is forced if:
+  - only MLS is in the list of supported protocols
+  - MLS migration is disabled
+  - There are still some active clients that do not support MLS
+
+  It means that team admin wants to force MLS and drop proteus support, even though not all active clients support MLS
+*/
 const isMLSForcedWithoutMigration = async ({
   teamSupportedProtocols,
   selfClients,
@@ -113,6 +126,11 @@ const isMLSForcedWithoutMigration = async ({
   return !doActiveClientsSupportMLS && isMLSSupportedByTeam && !isProteusSupportedByTeam && isMigrationDisabled;
 };
 
+/*
+  Proteus is supported if:
+  - Proteus is in the list of supported protocols
+  - MLS migration is enabled but not finalised
+*/
 const isProteusSupported = async ({
   teamSupportedProtocols,
   mlsMigrationStatus,
