@@ -163,7 +163,7 @@
     "redux-devtools-extension": "2.13.9",
     "redux-mock-store": "1.5.4",
     "seedrandom": "^3.0.5",
-    "simple-git": "3.19.0",
+    "simple-git": "3.19.1",
     "sinon": "15.2.0",
     "snabbdom": "3.5.1",
     "style-loader": "^3.3.3",

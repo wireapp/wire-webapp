@@ -16878,14 +16878,14 @@ dexie@latest:
   languageName: node
   linkType: hard
 
-"simple-git@npm:3.19.0":
-  version: 3.19.0
-  resolution: "simple-git@npm:3.19.0"
+"simple-git@npm:3.19.1":
+  version: 3.19.1
+  resolution: "simple-git@npm:3.19.1"
   dependencies:
     "@kwsites/file-exists": ^1.1.1
     "@kwsites/promise-deferred": ^1.1.1
     debug: ^4.3.4
-  checksum: 103f754cc172f903d7ad798c0dd7a083618e4ef373d27b37f34f4a7d5b6e5f260636376fca180ce25296f0064120af38b7be665e340c2f6ca463f1810bae0414
+  checksum: ab7c6901130eadd5758c5f1b0d957573b13cd981549cb5853e757cf13f8cb53b79a50e1acde8eaceba88da814d252f90cf7feab9bd67c64db903250adc51b02f
   languageName: node
   linkType: hard
 
@@ -19164,7 +19164,7 @@ dexie@latest:
     redux-mock-store: 1.5.4
     redux-thunk: 2.4.2
     seedrandom: ^3.0.5
-    simple-git: 3.19.0
+    simple-git: 3.19.1
     sinon: 15.2.0
     snabbdom: 3.5.1
     speakingurl: 14.0.1
