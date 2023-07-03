@@ -26,7 +26,7 @@ import {PreKeyBundle} from '../auth/';
 import {CreateClientPayload, RegisteredClient, UpdateClientPayload} from '../client/';
 import {BackendError, BackendErrorLabel, HttpClient} from '../http/';
 
-type ClaimedKeyPackages = {
+export type ClaimedKeyPackages = {
   key_packages: {
     client: string;
     domain: string;
