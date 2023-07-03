@@ -3382,13 +3382,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@datadog/browser-core@npm:4.43.0":
-  version: 4.43.0
-  resolution: "@datadog/browser-core@npm:4.43.0"
-  checksum: 455f04d5ea1bc886a064224803e43bc30f6411f1ed827784d94f9fe07b7c0fedf9f69df67bf8d258d25d3e56b16696a842c77df02df168ddfa855ac5ab56713f
-  languageName: node
-  linkType: hard
-
 "@datadog/browser-core@npm:4.44.0":
   version: 4.44.0
   resolution: "@datadog/browser-core@npm:4.44.0"
@@ -3396,17 +3389,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@datadog/browser-logs@npm:^4.43.0":
-  version: 4.43.0
-  resolution: "@datadog/browser-logs@npm:4.43.0"
+"@datadog/browser-logs@npm:^4.44.0":
+  version: 4.44.0
+  resolution: "@datadog/browser-logs@npm:4.44.0"
   dependencies:
-    "@datadog/browser-core": 4.43.0
+    "@datadog/browser-core": 4.44.0
   peerDependencies:
-    "@datadog/browser-rum": 4.43.0
+    "@datadog/browser-rum": 4.44.0
   peerDependenciesMeta:
     "@datadog/browser-rum":
       optional: true
-  checksum: 8b571b0c6e39c8d63940f0120d64c7d88c95b489418ea1d24c4bb917489f92c52f42f5ede33f7b9c5f4aff26629b88729067905b727b547f327d51523b9dfd2e
+  checksum: f8ba22f888f0569ab98c4ec17469e27304759ce463d7a8fe6df35f8e15c134cc7ed1bd903b07310c090134631e77f0cc85b79c60da8b99b3a7f0e6776d15e3d6
   languageName: node
   linkType: hard
 
@@ -19024,7 +19017,7 @@ dexie@latest:
     "@babel/preset-env": 7.22.5
     "@babel/preset-react": 7.22.5
     "@babel/preset-typescript": 7.22.5
-    "@datadog/browser-logs": ^4.43.0
+    "@datadog/browser-logs": ^4.44.0
     "@datadog/browser-rum": ^4.44.0
     "@emotion/eslint-plugin": ^11.11.0
     "@emotion/react": 11.11.1
