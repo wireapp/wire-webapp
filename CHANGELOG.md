@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [40.6.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@40.6.2...@wireapp/core@40.6.3) (2023-07-03)
+
+### Bug Fixes
+
+* **api-client,core:** Handle failure to fetch keypackages (WPB-1913) ([#5286](https://github.com/wireapp/wire-web-packages/issues/5286)) ([56018fa](https://github.com/wireapp/wire-web-packages/commit/56018fa8aac514a30132e8fd391769a0b1c49d5d))
+
 ## [40.6.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@40.6.1...@wireapp/core@40.6.2) (2023-06-30)
 
 **Note:** Version bump only for package @wireapp/core
