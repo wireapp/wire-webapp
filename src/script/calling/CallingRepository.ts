@@ -1418,7 +1418,7 @@ export class CallingRepository {
   }
 
   private updateParticipantVideoState(call: Call, members: QualifiedWcallMember[]): void {
-    members.forEach(member => call.getParticipant(member.userId, member.clientid)?.isSendingVideo(!!member.vrecv));
+    members.forEach(member => call.getParticipant(member.userId, member.clientid)?.videoState(member.vrecv));
   }
 
   private updateParticipantAudioState(call: Call, members: QualifiedWcallMember[]): void {
