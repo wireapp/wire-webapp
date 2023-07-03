@@ -1007,10 +1007,13 @@ export class ConversationRepository {
   }
 
   /**
-   * Get all the conversations from memory.
+   * Get all the group conversations owned by self user's team from the local state.
    */
-  public getLocalConversations(): Conversation[] {
-    return this.conversationState.conversations();
+  public getAllSelfTeamOwnedGroupConversations(): Conversation[] {
+    const {teamId: selfUserTeamId} = this.userState.self();
+    return this.conversationState.conversations().filter(conversation => {
+      return conversation.isGroup() && !!selfUserTeamId && conversation.team_id === selfUserTeamId;
+    });
   }
 
   /**
@@ -1723,6 +1726,7 @@ export class ConversationRepository {
       conversation.qualifiedId,
       protocol,
     );
+
     if (protocolUpdateEventResponse) {
       await this.eventRepository.injectEvent(protocolUpdateEventResponse, EventRepository.SOURCE.BACKEND_RESPONSE);
     }
@@ -1742,7 +1746,6 @@ export class ConversationRepository {
   private async refreshConversationProtocolProperties(conversation: Conversation) {
     //refetch the conversation to get all new fields (groupId, ciphersuite, epoch and new protocol)
     const remoteConversationData = await this.conversationService.getConversationById(conversation.qualifiedId);
-
     //update fields that came after protocol update
     const {cipher_suite: cipherSuite, epoch, group_id: newGroupId, protocol: newProtocol} = remoteConversationData;
     const updatedConversation = ConversationMapper.updateProperties(conversation, {

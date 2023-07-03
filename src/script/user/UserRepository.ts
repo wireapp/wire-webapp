@@ -751,6 +751,14 @@ export class UserRepository {
   }
 
   /**
+   * Refresh all known users (in local state) from the backend.
+   */
+  async refreshAllKnownUsers() {
+    const userIds = this.userState.users().map(user => user.qualifiedId);
+    return this.refreshUsers(userIds);
+  }
+
+  /**
    * will update the local user with fresh data from backend
    * @param user user data from backend
    */

@@ -17,7 +17,6 @@
  *
  */
 
-import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {registerRecurringTask} from '@wireapp/core/lib/util/RecurringTaskScheduler';
 import {container} from 'tsyringe';
@@ -26,13 +25,13 @@ import {APIClient} from '@wireapp/api-client';
 import {Account} from '@wireapp/core';
 
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
-import {groupConversationsByProtocol} from 'src/script/conversation/groupConversationsByProtocol';
-import {Conversation} from 'src/script/entity/Conversation';
 import {APIClient as APIClientSingleton} from 'src/script/service/APIClientSingleton';
 import {Core as CoreSingleton} from 'src/script/service/CoreSingleton';
 import {TeamState} from 'src/script/team/TeamState';
+import {UserRepository} from 'src/script/user/UserRepository';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
+import {finaliseMigrationOfMixedConversations} from './finaliseMigration';
 import {initialiseMigrationOfProteusConversations} from './initialiseMigration';
 import {joinUnestablishedMixedConversations} from './initialiseMigration/joinUnestablishedMixedConversations';
 import {getMLSMigrationStatus, MLSMigrationStatus} from './migrationStatus';
@@ -45,7 +44,7 @@ const MIGRATION_TASK_KEY = 'mls-migration';
 interface InitialiseMLSMigrationFlowParams {
   teamState: TeamState;
   conversationRepository: ConversationRepository;
-  isConversationOwnedBySelfTeam: (conversation: Conversation) => boolean;
+  userRepository: UserRepository;
   selfUserId: QualifiedId;
 }
 
@@ -54,12 +53,11 @@ interface InitialiseMLSMigrationFlowParams {
  *
  * @param teamState - team state
  * @param conversationRepository - conversation repository
- * @param isConversationOwnedBySelfTeam - callback that checks if the provided conversation is owned by a self team
  */
 export const initialiseMLSMigrationFlow = async ({
   teamState,
   conversationRepository,
-  isConversationOwnedBySelfTeam,
+  userRepository,
   selfUserId,
 }: InitialiseMLSMigrationFlowParams) => {
   const core = container.resolve(CoreSingleton);
@@ -68,10 +66,10 @@ export const initialiseMLSMigrationFlow = async ({
   return periodicallyCheckMigrationConfig(
     () =>
       migrateConversationsToMLS({
-        isConversationOwnedBySelfTeam,
-        apiClient,
+        teamState,
         core,
         conversationRepository,
+        userRepository,
         selfUserId,
       }),
     {core, apiClient, teamState},
@@ -137,40 +135,33 @@ const checkMigrationConfig = async (
 };
 
 interface MigrateConversationsToMLSParams {
-  apiClient: APIClient;
   core: Account;
   selfUserId: QualifiedId;
   conversationRepository: ConversationRepository;
-  isConversationOwnedBySelfTeam: (conversation: Conversation) => boolean;
+  userRepository: UserRepository;
+  teamState: TeamState;
 }
 
 const migrateConversationsToMLS = async ({
-  apiClient,
   core,
   selfUserId,
   conversationRepository,
-  isConversationOwnedBySelfTeam,
+  userRepository,
+  teamState,
 }: MigrateConversationsToMLSParams) => {
-  const conversations = conversationRepository.getLocalConversations();
+  //refetch all known users so we have the latest lists of the protocols they support
+  await userRepository.refreshAllKnownUsers();
 
   //TODO: implement logic for 1on1 conversations (both team owned and federated)
-  const regularGroupConversations = conversations.filter(
-    conversation =>
-      conversation.type() === CONVERSATION_TYPE.REGULAR &&
-      isConversationOwnedBySelfTeam(conversation) &&
-      !conversation.isTeam1to1(),
-  );
+  const conversations = conversationRepository.getAllSelfTeamOwnedGroupConversations();
 
-  const {proteus: proteusConversations, mixed: mixedConversatons} =
-    groupConversationsByProtocol(regularGroupConversations);
-
-  await initialiseMigrationOfProteusConversations(proteusConversations, {
+  await initialiseMigrationOfProteusConversations(conversations, {
     core,
     conversationRepository,
     selfUserId,
   });
 
-  await joinUnestablishedMixedConversations(mixedConversatons, {core});
+  await joinUnestablishedMixedConversations(conversations, {core});
 
-  //TODO: implement logic for init and finalise the migration
+  await finaliseMigrationOfMixedConversations(conversations, {conversationRepository, teamState});
 };

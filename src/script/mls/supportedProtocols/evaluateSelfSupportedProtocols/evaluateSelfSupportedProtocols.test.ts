@@ -133,7 +133,7 @@ const testScenarios = [
     generateMLSFeaturesConfig(MLSMigrationStatus.DISABLED, [ConversationProtocol.MLS]),
     {
       allActiveClientsMLSCapable: new Set([ConversationProtocol.MLS]),
-      someActiveClientsNotMLSCapable: new Set([]), //FIXME: This may be [ConversationProtocol.PROTEUS]
+      someActiveClientsNotMLSCapable: new Set([ConversationProtocol.MLS]),
     },
   ],
   [

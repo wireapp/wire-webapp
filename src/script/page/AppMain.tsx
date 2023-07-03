@@ -200,8 +200,8 @@ const AppMain: FC<AppMainProps> = ({
     await initialiseMLSMigrationFlow({
       teamState,
       conversationRepository: repositories.conversation,
+      userRepository: repositories.user,
       selfUserId: selfUser.qualifiedId,
-      isConversationOwnedBySelfTeam: ({team_id}) => !!selfUser.teamId && team_id === selfUser.teamId,
     });
   };
 

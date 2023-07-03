@@ -48,17 +48,35 @@ export const evaluateSelfSupportedProtocols = async ({
 
   const mlsMigrationStatus = getMLSMigrationStatus(mlsMigrationFeature);
 
-  if (await isProteusSupported({teamSupportedProtocols, mlsMigrationStatus})) {
+  const isProteusProtocolSupported = await isProteusSupported({teamSupportedProtocols, mlsMigrationStatus});
+  if (isProteusProtocolSupported) {
     supportedProtocols.add(ConversationProtocol.PROTEUS);
   }
 
-  if (await isMLSSupported({teamSupportedProtocols, selfClients, mlsMigrationStatus, core, apiClient})) {
+  const mlsCheckDependencies = {
+    teamSupportedProtocols,
+    selfClients,
+    mlsMigrationStatus,
+    core,
+    apiClient,
+  };
+
+  const isMLSProtocolSupported = await isMLSSupported(mlsCheckDependencies);
+
+  const isMLSForced = await isMLSForcedWithoutMigration(mlsCheckDependencies);
+
+  if (isMLSProtocolSupported || isMLSForced) {
     supportedProtocols.add(ConversationProtocol.MLS);
   }
 
   return supportedProtocols;
 };
 
+/*
+  MLS is supported if:
+  - MLS is in the list of supported protocols
+  - All active clients support MLS, or MLS migration is finalised
+*/
 const isMLSSupported = async ({
   teamSupportedProtocols,
   selfClients,
@@ -83,6 +101,46 @@ const isMLSSupported = async ({
   return isMLSSupportedByTeam && (doActiveClientsSupportMLS || mlsMigrationStatus === MLSMigrationStatus.FINALISED);
 };
 
+/*
+  MLS is forced if:
+  - only MLS is in the list of supported protocols
+  - MLS migration is disabled
+  - There are still some active clients that do not support MLS
+
+  It means that team admin wants to force MLS and drop proteus support, even though not all active clients support MLS
+*/
+const isMLSForcedWithoutMigration = async ({
+  teamSupportedProtocols,
+  selfClients,
+  mlsMigrationStatus,
+  core,
+  apiClient,
+}: {
+  teamSupportedProtocols: Set<ConversationProtocol>;
+  selfClients: RegisteredClient[];
+  mlsMigrationStatus: MLSMigrationStatus;
+  core: Account;
+  apiClient: APIClient;
+}): Promise<boolean> => {
+  const isMLSSupportedByEnv = await isMLSSupportedByEnvironment({core, apiClient});
+
+  if (!isMLSSupportedByEnv) {
+    return false;
+  }
+
+  const isMLSSupportedByTeam = teamSupportedProtocols.has(ConversationProtocol.MLS);
+  const isProteusSupportedByTeam = teamSupportedProtocols.has(ConversationProtocol.PROTEUS);
+  const doActiveClientsSupportMLS = await haveAllActiveClientsRegisteredMLSDevice(selfClients);
+  const isMigrationDisabled = mlsMigrationStatus === MLSMigrationStatus.DISABLED;
+
+  return !doActiveClientsSupportMLS && isMLSSupportedByTeam && !isProteusSupportedByTeam && isMigrationDisabled;
+};
+
+/*
+  Proteus is supported if:
+  - Proteus is in the list of supported protocols
+  - MLS migration is enabled but not finalised
+*/
 const isProteusSupported = async ({
   teamSupportedProtocols,
   mlsMigrationStatus,
@@ -116,11 +174,5 @@ const getSelfTeamSupportedProtocols = (mlsFeature?: FeatureMLS): Set<Conversatio
     return new Set([ConversationProtocol.PROTEUS]);
   }
 
-  //FIXME: fix type after supportedProtocols is implemented on backend
-  const teamSupportedProtocols = (mlsFeature.config as any).supportedProtocols || [
-    ConversationProtocol.PROTEUS,
-    ConversationProtocol.MLS,
-  ];
-
-  return new Set<ConversationProtocol>(teamSupportedProtocols);
+  return new Set<ConversationProtocol>(mlsFeature.config.supportedProtocols);
 };

@@ -107,7 +107,7 @@ describe('initialiseMigrationOfProteusConversations', () => {
     const mockedConversationRepository = getConversationRepositoryMock(mockGroupId);
 
     jest.spyOn(mockCore.service!.mls!, 'conversationExists').mockResolvedValueOnce(false);
-    jest.spyOn(mockCore.service!.mls!, 'registerConversation').mockResolvedValueOnce(null);
+    jest.spyOn(mockCore.service!.mls!, 'registerConversation').mockRejectedValueOnce(null);
 
     await initialiseMigrationOfProteusConversations([proteusConversation], {
       conversationRepository: mockedConversationRepository,

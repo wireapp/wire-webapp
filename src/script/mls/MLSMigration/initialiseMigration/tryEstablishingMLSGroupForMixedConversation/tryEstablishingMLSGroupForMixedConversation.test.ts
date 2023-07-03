@@ -61,7 +61,7 @@ describe('tryEstablishingMLSGroupForMixedConversation', () => {
     const mixedConversation = createMixedConversation();
 
     jest.spyOn(mockCore.service!.mls!, 'conversationExists').mockResolvedValueOnce(false);
-    jest.spyOn(mockCore.service!.mls!, 'registerConversation').mockResolvedValueOnce(null);
+    jest.spyOn(mockCore.service!.mls!, 'registerConversation').mockRejectedValueOnce(null);
 
     const hasEstablishedMLSGroup = await tryEstablishingMLSGroupForMixedConversation(mixedConversation, {
       core: mockCore,
