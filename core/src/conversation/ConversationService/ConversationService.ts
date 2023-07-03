@@ -261,6 +261,11 @@ export class ConversationService {
     // We fetch the fresh version of the conversation created on backend with the newly added users
     const conversation = await this.apiClient.api.conversation.getConversation(qualifiedId);
 
+    /**
+     * @note Add users whom we could not fetch their keypackages to list of failed to add users.
+     */
+    conversation.failed_to_add = response.failed || [];
+
     return {
       events: response.events,
       conversation,
@@ -313,9 +318,14 @@ export class ConversationService {
     conversationId,
   }: Required<AddUsersParams>): Promise<MLSReturnType> {
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
-    const coreCryptoKeyPackagesPayload = await this.mlsService.getKeyPackagesPayload(qualifiedUsers);
+    const {coreCryptoKeyPackagesPayload, failedToFetchKeyPackages} = await this.mlsService.getKeyPackagesPayload(
+      qualifiedUsers,
+    );
+
     const response = await this.mlsService.addUsersToExistingConversation(groupIdBytes, coreCryptoKeyPackagesPayload);
     const conversation = await this.getConversation(conversationId);
+
+    conversation.failed_to_add = failedToFetchKeyPackages;
 
     //We store the info when user was added (and key material was created), so we will know when to renew it
     this.mlsService.resetKeyMaterialRenewal(groupId);

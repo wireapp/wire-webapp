@@ -49,7 +49,12 @@ describe('MLSService', () => {
 
       jest.spyOn(apiClient.api.client, 'claimMLSKeyPackages').mockResolvedValue({key_packages: []});
       jest.spyOn(mlsService, 'scheduleKeyMaterialRenewal').mockImplementation();
-      jest.spyOn(mlsService as any, 'processCommitAction').mockImplementation();
+      jest.spyOn(mlsService as any, 'processCommitAction').mockImplementation(() => ({
+        failed_to_send: [],
+        failed: [],
+        events: [],
+        time: '',
+      }));
       jest.spyOn(mlsService as any, 'cancelKeyMaterialRenewal').mockImplementation();
     });
 
