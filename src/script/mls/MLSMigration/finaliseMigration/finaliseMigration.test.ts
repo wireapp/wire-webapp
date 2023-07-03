@@ -37,7 +37,7 @@ const createMixedConversation = (): MixedConversation => {
   return conversation as MixedConversation;
 };
 
-const turnConversationToMLS = (conversation: MixedConversation): MLSConversation => {
+const changeConversationProtocolToMLS = (conversation: MixedConversation): MLSConversation => {
   return {
     ...conversation,
     protocol: ConversationProtocol.MLS,
@@ -73,7 +73,7 @@ describe('finaliseMigrationOfMixedConversations', () => {
     const teamState = new TeamState();
 
     const mixedConversation = createMixedConversation();
-    const mlsConversation = turnConversationToMLS(mixedConversation);
+    const mlsConversation = changeConversationProtocolToMLS(mixedConversation);
 
     jest.spyOn(teamState, 'teamFeatures').mockReturnValueOnce({
       mlsMigration: {
@@ -102,7 +102,7 @@ describe('finaliseMigrationOfMixedConversations', () => {
     const mixedConversation = createMixedConversation();
     injectParticipantsIntoConversation(mixedConversation, {doAllSupportMLS: true});
 
-    const mlsConversation = turnConversationToMLS(mixedConversation);
+    const mlsConversation = changeConversationProtocolToMLS(mixedConversation);
 
     jest.spyOn(teamState, 'teamFeatures').mockReturnValueOnce({
       mlsMigration: {

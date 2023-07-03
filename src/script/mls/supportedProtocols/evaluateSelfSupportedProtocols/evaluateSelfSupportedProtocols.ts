@@ -53,21 +53,17 @@ export const evaluateSelfSupportedProtocols = async ({
     supportedProtocols.add(ConversationProtocol.PROTEUS);
   }
 
-  const isMLSProtocolSupported = await isMLSSupported({
+  const mlsCheckDependencies = {
     teamSupportedProtocols,
     selfClients,
     mlsMigrationStatus,
     core,
     apiClient,
-  });
+  };
 
-  const isMLSForced = await isMLSForcedWithoutMigration({
-    teamSupportedProtocols,
-    selfClients,
-    mlsMigrationStatus,
-    core,
-    apiClient,
-  });
+  const isMLSProtocolSupported = await isMLSSupported(mlsCheckDependencies);
+
+  const isMLSForced = await isMLSForcedWithoutMigration(mlsCheckDependencies);
 
   if (isMLSProtocolSupported || isMLSForced) {
     supportedProtocols.add(ConversationProtocol.MLS);
