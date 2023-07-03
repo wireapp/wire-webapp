@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [24.18.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@24.18.0...@wireapp/api-client@24.18.1) (2023-07-03)
+
+### Bug Fixes
+
+* **api-client,core:** Handle failure to fetch keypackages (WPB-1913) ([#5286](https://github.com/wireapp/wire-web-packages/issues/5286)) ([56018fa](https://github.com/wireapp/wire-web-packages/commit/56018fa8aac514a30132e8fd391769a0b1c49d5d))
+
 # [24.18.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/api-client@24.17.0...@wireapp/api-client@24.18.0) (2023-06-30)
 
 ### Features
