@@ -23,10 +23,10 @@ import {Config} from './Config';
 const env = window.wire.env;
 
 export const URL = {
-  ACCOUNT: env.URL?.ACCOUNT_BASE,
+  ACCOUNT: Config.getConfig().URL.ACCOUNT_BASE ?? env.URL?.ACCOUNT_BASE,
   PRIVACY_POLICY: env.URL?.PRIVACY_POLICY,
   SUPPORT: env.URL?.SUPPORT.INDEX,
-  TEAM_SETTINGS: env.URL?.TEAMS_BASE,
+  TEAM_SETTINGS: Config.getConfig().URL.TEAMS_BASE ?? env.URL?.TEAMS_BASE,
   TERMS_OF_USE_PERSONAL: env.URL?.TERMS_OF_USE_PERSONAL,
   TERMS_OF_USE_TEAMS: env.URL?.TERMS_OF_USE_TEAMS,
   WEBAPP: {

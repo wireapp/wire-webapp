@@ -50,8 +50,6 @@ export const AppContainer: FC<AppProps> = ({config, clientType}) => {
 
   useEffect(() => {
     if (hasOtherInstance) {
-      // eslint-disable-next-line no-console
-      console.log('Another instance is already running. AppContainer will not render.', app, Core, APIClient);
       return;
     }
     const killInstance = registerInstance();
