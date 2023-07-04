@@ -91,14 +91,17 @@ describe('UserActions', () => {
 
   it('generates actions for another user profile to which I am connected', () => {
     const user = new User('');
+    jest.spyOn(user, 'isAvailable').mockImplementation(ko.pureComputed(() => true));
     const conversation = new Conversation();
     jest.spyOn(conversation, 'isGroup').mockImplementation(ko.pureComputed(() => true));
+    jest.spyOn(conversation, 'participating_user_ids').mockImplementation(ko.observableArray([new User()]));
     user.connection().status(ConnectionStatus.ACCEPTED);
+    const conversationRoleRepository: Partial<ConversationRoleRepository> = {canRemoveParticipants: () => true};
 
     const props = {
       actionsViewModel,
       conversation,
-      conversationRoleRepository: {} as ConversationRoleRepository,
+      conversationRoleRepository: conversationRoleRepository as ConversationRoleRepository,
       isSelfActivated: true,
       onAction: noop,
       selfUser: new User(''),
@@ -108,11 +111,35 @@ describe('UserActions', () => {
     const {queryByTestId} = render(<UserActions {...props} />);
 
     const allActions = getAllActions(queryByTestId);
-    expect(allActions).toHaveLength(2);
+    expect(allActions).toHaveLength(3);
 
     [Actions.OPEN_CONVERSATION, Actions.BLOCK].forEach(action => {
       const identifier = ActionIdentifier[action];
       expect(queryByTestId(identifier)).not.toBeNull();
     });
+  });
+
+  it('only generates remove participant action for an unavailable user', () => {
+    const user = new User('');
+    const conversation = new Conversation();
+    jest.spyOn(conversation, 'isGroup').mockImplementation(ko.pureComputed(() => true));
+    jest.spyOn(conversation, 'participating_user_ids').mockImplementation(ko.observableArray([new User()]));
+    user.connection().status(ConnectionStatus.ACCEPTED);
+    const conversationRoleRepository: Partial<ConversationRoleRepository> = {canRemoveParticipants: () => true};
+
+    const props = {
+      actionsViewModel,
+      conversation,
+      conversationRoleRepository: conversationRoleRepository as ConversationRoleRepository,
+      isSelfActivated: true,
+      onAction: noop,
+      selfUser: new User(''),
+      user,
+    };
+
+    const {queryByTestId} = render(<UserActions {...props} />);
+
+    const allActions = getAllActions(queryByTestId);
+    expect(allActions).toHaveLength(1);
   });
 });
