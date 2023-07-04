@@ -21,10 +21,10 @@ import {ConversationProtocol, CONVERSATION_TYPE} from '@wireapp/api-client/lib/c
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
-import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {MixedConversation, ProteusConversation} from 'src/script/conversation/ConversationSelectors';
 import {Conversation} from 'src/script/entity/Conversation';
 import {Core} from 'src/script/service/CoreSingleton';
+import {TestFactory} from 'test/helper/TestFactory';
 import {createUuid} from 'Util/uuid';
 
 import {initialiseMigrationOfProteusConversations} from './';
@@ -42,32 +42,25 @@ const createProteusConversation = (userIds: QualifiedId[] = []): ProteusConversa
   return conversation as ProteusConversation;
 };
 
-const getConversationRepositoryMock = (mockGroupId = 'groupId') => {
-  const mockedConversationRepository = {
-    updateConversationProtocol: jest.fn().mockImplementation((proteusConversation, protocol) => {
-      const mixedConversation = {
-        ...proteusConversation,
-        qualifiedId: proteusConversation.qualifiedId,
-        protocol,
-        epoch: 1,
-        cipherSuite: 1,
-        groupId: mockGroupId,
-      } as MixedConversation;
-      return Promise.resolve(mixedConversation);
-    }),
-  } as unknown as ConversationRepository;
-
-  return mockedConversationRepository;
+const changeConversationProtocolToMixed = (conversation: Conversation, groupId: string): MixedConversation => {
+  return {
+    ...conversation,
+    qualifiedId: conversation.qualifiedId,
+    groupId,
+    protocol: ConversationProtocol.MIXED,
+  } as MixedConversation;
 };
 
 describe('initialiseMigrationOfProteusConversations', () => {
+  const testFactory = new TestFactory();
+
   afterEach(() => {
     jest.clearAllMocks();
   });
 
   it('Should not try to establish MLS group if conversation was not updated to mixed', async () => {
     const proteusConversation = createProteusConversation();
-    const mockedConversationRepository = getConversationRepositoryMock();
+    const mockedConversationRepository = await testFactory.exposeConversationActors();
 
     jest.spyOn(mockedConversationRepository, 'updateConversationProtocol').mockResolvedValueOnce(proteusConversation);
 
@@ -88,8 +81,11 @@ describe('initialiseMigrationOfProteusConversations', () => {
 
   it('Should not add other users to MLS group if MLS group was already established', async () => {
     const proteusConversation = createProteusConversation();
-    const mockedConversationRepository = getConversationRepositoryMock();
+    const mockGroupId = 'coolGroupId';
+    const mockedConversationRepository = await testFactory.exposeConversationActors();
 
+    const mixedConversation = changeConversationProtocolToMixed(proteusConversation, mockGroupId);
+    jest.spyOn(mockedConversationRepository, 'updateConversationProtocol').mockResolvedValueOnce(mixedConversation);
     jest.spyOn(mockCore.service!.mls!, 'conversationExists').mockResolvedValueOnce(true);
 
     await initialiseMigrationOfProteusConversations([proteusConversation], {
@@ -104,10 +100,14 @@ describe('initialiseMigrationOfProteusConversations', () => {
   it('Should not add other users to MLS group if and wipe conversation MLS group was not established properly', async () => {
     const proteusConversation = createProteusConversation();
     const mockGroupId = 'coolGroupId';
-    const mockedConversationRepository = getConversationRepositoryMock(mockGroupId);
+    const mockedConversationRepository = await testFactory.exposeConversationActors();
 
     jest.spyOn(mockCore.service!.mls!, 'conversationExists').mockResolvedValueOnce(false);
     jest.spyOn(mockCore.service!.mls!, 'registerConversation').mockRejectedValueOnce(null);
+    jest.spyOn(mockCore.service!.conversation, 'wipeMLSConversation');
+
+    const mixedConversation = changeConversationProtocolToMixed(proteusConversation, mockGroupId);
+    jest.spyOn(mockedConversationRepository, 'updateConversationProtocol').mockResolvedValueOnce(mixedConversation);
 
     await initialiseMigrationOfProteusConversations([proteusConversation], {
       conversationRepository: mockedConversationRepository,
@@ -119,7 +119,9 @@ describe('initialiseMigrationOfProteusConversations', () => {
       client: selfUserClientId,
       user: selfUserId,
     });
-    expect(mockCore.service!.mls!.wipeConversation).toHaveBeenCalledWith(mockGroupId);
+    expect(mockedConversationRepository['core'].service?.conversation.wipeMLSConversation).toHaveBeenCalledWith(
+      mockGroupId,
+    );
     expect(mockCore.service!.conversation!.addUsersToMLSConversation).not.toHaveBeenCalled();
   });
 
@@ -131,8 +133,10 @@ describe('initialiseMigrationOfProteusConversations', () => {
     const proteusConversation = createProteusConversation(conversationMembers);
 
     const mockGroupId = 'niceGroupId';
-    const mockedConversationRepository = getConversationRepositoryMock(mockGroupId);
+    const mockedConversationRepository = await testFactory.exposeConversationActors();
 
+    const mixedConversation = changeConversationProtocolToMixed(proteusConversation, mockGroupId);
+    jest.spyOn(mockedConversationRepository, 'updateConversationProtocol').mockResolvedValueOnce(mixedConversation);
     jest.spyOn(mockCore.service!.mls!, 'conversationExists').mockResolvedValueOnce(false);
     jest.spyOn(mockCore.service!.mls!, 'registerConversation').mockResolvedValueOnce({events: [], time: 'time'});
 
