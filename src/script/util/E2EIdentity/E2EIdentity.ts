@@ -19,6 +19,8 @@
 
 import {container} from 'tsyringe';
 
+import {AcmeStorage} from '@wireapp/core';
+
 import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
 import {Config} from 'src/script/Config';
 import {Core} from 'src/script/service/CoreSingleton';
@@ -100,7 +102,9 @@ class E2EIHandler {
 
   public initialize(): void {
     if (this.isE2EIEnabled) {
-      this.showE2EINotificationMessage();
+      if (!AcmeStorage.hasCertificateData()) {
+        this.showE2EINotificationMessage();
+      }
     }
   }
 
@@ -180,6 +184,14 @@ class E2EIHandler {
   }
 
   private showE2EINotificationMessage(): void {
+    // If the user has already started enrollment, don't show the notification. Instead, show the loading modal
+    // This will occur after the redirect from the oauth provider
+    if (AcmeStorage.hasHandle()) {
+      this.showLoadingMessage();
+      void this.enrollE2EI();
+      return;
+    }
+
     if (this.currentStep !== E2EIHandlerStep.UNINITIALIZED && this.currentStep !== E2EIHandlerStep.SNOOZE) {
       return;
     }

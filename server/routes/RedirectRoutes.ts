@@ -65,6 +65,6 @@ export const RedirectRoutes = (config: ServerConfig, clientConfig: ClientConfig)
     const queryString = Object.keys(query)
       .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(query[key] as string)}`)
       .join('&');
-    return res.redirect(HTTP_STATUS.MOVED_TEMPORARILY, `/auth/${queryString ? '?' : ''}${queryString}`);
+    return res.redirect(HTTP_STATUS.MOVED_TEMPORARILY, `/auth${queryString ? '?' : ''}${queryString}`);
   }),
 ];
