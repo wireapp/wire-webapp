@@ -436,9 +436,6 @@ export class App {
 
         const mlsConversations = conversations.filter(isMLSConversation);
 
-        //join all the mls groups we're member of and have not yet joined (eg. we were not send welcome message)
-        await initMLSConversations(mlsConversations, this.core);
-
         //add the potential `self` and `team` conversations
         await registerUninitializedSelfAndTeamConversations(mlsConversations, selfUser, clientEntity().id, this.core);
 
