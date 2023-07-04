@@ -959,7 +959,7 @@ export class ConversationRepository {
     this.deleteConversationFromRepository(conversationId);
     await this.conversationService.deleteConversationFromDb(conversationId.id);
     if (isMLSCapableConversation(conversationEntity)) {
-      await this.conversationService.wipeMLSCapableConversation(conversationEntity);
+      await this.wipeMLSCapableConversation(conversationEntity);
     }
   };
 
@@ -1581,6 +1581,14 @@ export class ConversationRepository {
     if (isActiveConversation) {
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEntity, {});
     }
+  }
+
+  /**
+   * Wipes MLS conversation in corecrypto and deletes the conversation state.
+   * @param mlsConversation mls conversation
+   */
+  async wipeMLSCapableConversation(conversation: MLSCapableConversation) {
+    return this.conversationService.wipeMLSCapableConversation(conversation);
   }
 
   async leaveGuestRoom(): Promise<void> {
@@ -2709,7 +2717,7 @@ export class ConversationRepository {
       }
 
       if (isMLSCapableConversation(conversationEntity)) {
-        await this.conversationService.wipeMLSCapableConversation(conversationEntity);
+        await this.wipeMLSCapableConversation(conversationEntity);
       }
     } else {
       // Update conversation roles (in case the removed user had some special role and it's not the self user)

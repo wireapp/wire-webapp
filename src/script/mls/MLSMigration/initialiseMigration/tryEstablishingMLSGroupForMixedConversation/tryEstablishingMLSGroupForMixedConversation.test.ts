@@ -23,6 +23,7 @@ import {container} from 'tsyringe';
 import {MixedConversation} from 'src/script/conversation/ConversationSelectors';
 import {Conversation} from 'src/script/entity/Conversation';
 import {Core} from 'src/script/service/CoreSingleton';
+import {TestFactory} from 'test/helper/TestFactory';
 import {createUuid} from 'Util/uuid';
 
 import {tryEstablishingMLSGroupForMixedConversation} from './';
@@ -41,16 +42,20 @@ const selfUserClientId = 'clientId';
 const selfUserId = {id: 'self-user-id', domain: 'local.wire.com'};
 
 describe('tryEstablishingMLSGroupForMixedConversation', () => {
+  const testFactory = new TestFactory();
+
   Object.defineProperty(mockCore, 'clientId', {value: selfUserClientId});
 
   it('Should not try to establish mls group if it already exists locally', async () => {
     const mixedConversation = createMixedConversation();
+    const conversationRepository = await testFactory.exposeConversationActors();
 
     jest.spyOn(mockCore.service!.mls!, 'conversationExists').mockResolvedValueOnce(true);
 
     const hasEstablishedMLSGroup = await tryEstablishingMLSGroupForMixedConversation(mixedConversation, {
       core: mockCore,
       selfUserId,
+      conversationRepository,
     });
 
     expect(mockCore.service?.mls?.registerConversation).not.toHaveBeenCalled();
@@ -59,6 +64,7 @@ describe('tryEstablishingMLSGroupForMixedConversation', () => {
 
   it('Should wipe conversation if conversation was not established properly', async () => {
     const mixedConversation = createMixedConversation();
+    const conversationRepository = await testFactory.exposeConversationActors();
 
     jest.spyOn(mockCore.service!.mls!, 'conversationExists').mockResolvedValueOnce(false);
     jest.spyOn(mockCore.service!.mls!, 'registerConversation').mockRejectedValueOnce(null);
@@ -66,6 +72,7 @@ describe('tryEstablishingMLSGroupForMixedConversation', () => {
     const hasEstablishedMLSGroup = await tryEstablishingMLSGroupForMixedConversation(mixedConversation, {
       core: mockCore,
       selfUserId,
+      conversationRepository,
     });
 
     const groupCreator = {user: selfUserId, client: selfUserClientId};
@@ -74,13 +81,16 @@ describe('tryEstablishingMLSGroupForMixedConversation', () => {
       [],
       groupCreator,
     );
-    expect(mockCore.service?.mls?.wipeConversation).toHaveBeenCalledWith(mixedConversation.groupId);
 
+    expect(conversationRepository['core'].service!.conversation.wipeMLSConversation).toHaveBeenCalledWith(
+      mixedConversation.groupId,
+    );
     expect(hasEstablishedMLSGroup).toEqual(false);
   });
 
   it('Should return true if group was initialised successfully', async () => {
     const mixedConversation = createMixedConversation();
+    const conversationRepository = await testFactory.exposeConversationActors();
 
     jest.spyOn(mockCore.service!.mls!, 'conversationExists').mockResolvedValueOnce(false);
     jest.spyOn(mockCore.service!.mls!, 'registerConversation').mockResolvedValueOnce({events: [], time: ''});
@@ -88,6 +98,7 @@ describe('tryEstablishingMLSGroupForMixedConversation', () => {
     const hasEstablishedMLSGroup = await tryEstablishingMLSGroupForMixedConversation(mixedConversation, {
       core: mockCore,
       selfUserId,
+      conversationRepository,
     });
 
     const groupCreator = {user: selfUserId, client: selfUserClientId};

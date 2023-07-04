@@ -21,6 +21,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {Account} from '@wireapp/core';
 
+import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {MixedConversation} from 'src/script/conversation/ConversationSelectors';
 
 import {mlsMigrationLogger} from '../../MLSMigrationLogger';
@@ -35,7 +36,11 @@ import {mlsMigrationLogger} from '../../MLSMigrationLogger';
  */
 export const tryEstablishingMLSGroupForMixedConversation = async (
   mixedConversation: MixedConversation,
-  {core, selfUserId}: {core: Account; selfUserId: QualifiedId},
+  {
+    core,
+    selfUserId,
+    conversationRepository,
+  }: {core: Account; selfUserId: QualifiedId; conversationRepository: ConversationRepository},
 ): Promise<boolean> => {
   const {mls: mlsService} = core.service || {};
   if (!mlsService) {
@@ -46,6 +51,7 @@ export const tryEstablishingMLSGroupForMixedConversation = async (
 
   //client could receive welcome message in the meantime
   const isMLSGroupAlreadyEstablished = await mlsService.conversationExists(groupId);
+
   if (isMLSGroupAlreadyEstablished) {
     mlsMigrationLogger.info(
       `MLS Group for conversation ${mixedConversation.qualifiedId.id} already exists, skipping the initialisation.`,
@@ -68,7 +74,8 @@ export const tryEstablishingMLSGroupForMixedConversation = async (
     mlsMigrationLogger.info(
       `MLS Group for conversation ${mixedConversation.qualifiedId.id} was not created, wiping the conversation.`,
     );
-    await mlsService.wipeConversation(groupId);
+
+    await conversationRepository.wipeMLSCapableConversation(mixedConversation);
     return false;
   }
 };

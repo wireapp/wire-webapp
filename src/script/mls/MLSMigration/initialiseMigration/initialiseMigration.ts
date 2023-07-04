@@ -95,6 +95,7 @@ const initialiseMigrationOfProteusConversation = async (
     const hasEstablishedMLSGroup = await tryEstablishingMLSGroupForMixedConversation(updatedMixedConversation, {
       core,
       selfUserId,
+      conversationRepository,
     });
 
     if (!hasEstablishedMLSGroup) {

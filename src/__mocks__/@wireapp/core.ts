@@ -54,6 +54,7 @@ export class Account extends EventEmitter {
       addUsersToMLSConversation: jest.fn(),
       removeUserFromConversation: jest.fn(),
       removeUsersFromMLSConversation: jest.fn(),
+      wipeMLSConversation: jest.fn(),
       addUsersToProteusConversation: jest.fn(),
       messageTimer: {
         setConversationLevelTimer: jest.fn(),
