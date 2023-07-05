@@ -21,7 +21,7 @@ import {Account} from '@wireapp/core';
 
 import {isMixedConversation} from 'src/script/conversation/ConversationSelectors';
 import {Conversation} from 'src/script/entity/Conversation';
-import {initMLSConversations} from 'src/script/mls/MLSConversations';
+import {joinNewMLSConversations} from 'src/script/mls/MLSConversations';
 
 import {mlsMigrationLogger} from '../../MLSMigrationLogger';
 
@@ -36,5 +36,5 @@ export const joinUnestablishedMixedConversations = async (
   const mixedConversations = conversations.filter(isMixedConversation);
   mlsMigrationLogger.info(`Found ${mixedConversations.length} "mixed" conversations, joining unestablished ones...`);
 
-  await initMLSConversations(mixedConversations, core);
+  await joinNewMLSConversations(mixedConversations, core);
 };

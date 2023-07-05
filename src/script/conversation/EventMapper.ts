@@ -50,6 +50,7 @@ import {DeleteMessage} from '../entity/message/DeleteMessage';
 import {FailedToAddUsersMessage} from '../entity/message/FailedToAddUsersMessage';
 import {FileAsset} from '../entity/message/FileAsset';
 import {FileTypeRestrictedMessage} from '../entity/message/FileTypeRestrictedMessage';
+import {JoinedAfterMLSMigrationFinalisationMessage} from '../entity/message/JoinedAfterMLSMigrationFinalisationMessage';
 import {LegalHoldMessage} from '../entity/message/LegalHoldMessage';
 import {LinkPreview as LinkPreviewEntity, LinkPreviewData} from '../entity/message/LinkPreview';
 import {Location} from '../entity/message/Location';
@@ -319,6 +320,11 @@ export class EventMapper {
 
       case ClientEvent.CONVERSATION.MISSED_MESSAGES: {
         messageEntity = this._mapEventMissedMessages();
+        break;
+      }
+
+      case ClientEvent.CONVERSATION.JOINED_AFTER_MLS_MIGRATION_FINALISATION: {
+        messageEntity = this._mapEventJoinedAfterMLSMigrationFinalisationMessages();
         break;
       }
 
@@ -619,6 +625,13 @@ export class EventMapper {
    */
   private _mapEventMissedMessages(): MissedMessage {
     return new MissedMessage();
+  }
+
+  /**
+   * Maps JSON data of local missed message event to message entity.
+   */
+  private _mapEventJoinedAfterMLSMigrationFinalisationMessages(): JoinedAfterMLSMigrationFinalisationMessage {
+    return new JoinedAfterMLSMigrationFinalisationMessage();
   }
 
   /**

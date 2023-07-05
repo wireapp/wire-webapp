@@ -20,7 +20,11 @@
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {create} from 'zustand';
 
-import {isMLSCapableConversation, isMLSConversation} from 'src/script/conversation/ConversationSelectors';
+import {
+  MLSCapableConversation,
+  isMLSCapableConversation,
+  isMLSConversation,
+} from 'src/script/conversation/ConversationSelectors';
 
 import {loadState, saveState} from './conversationStateStorage';
 
@@ -51,6 +55,7 @@ type StoreState = MLSConversationState & {
     conversations: Conversation[],
     isEstablishedConversation: (groupId: string) => Promise<boolean>,
     sendExternalProposal: (conversationId: QualifiedId) => Promise<unknown>,
+    onSuccessfulJoin?: (conversation: Conversation) => void,
   ): Promise<void>;
 };
 
@@ -92,9 +97,14 @@ export const useMLSConversationState = create<StoreState>((set, get) => {
 
     pendingWelcome: initialState.pendingWelcome,
 
-    async sendExternalToPendingJoin(conversations, isAlreadyEstablished, sendExternalCommit): Promise<void> {
+    async sendExternalToPendingJoin(
+      conversations,
+      isAlreadyEstablished,
+      sendExternalCommit,
+      onSuccessfulJoin,
+    ): Promise<void> {
       const currentState = get();
-      const conversationsToJoin: {groupId: string; conversationId: QualifiedId}[] = [];
+      const conversationsToJoin: MLSCapableConversation[] = [];
       const pendingConversations: string[] = [];
       const alreadyEstablishedConversations: string[] = [];
 
@@ -108,16 +118,18 @@ export const useMLSConversationState = create<StoreState>((set, get) => {
             // check is the conversation is not actually already established
             alreadyEstablishedConversations.push(groupId);
           } else {
-            conversationsToJoin.push({conversationId: conversation.qualifiedId, groupId});
+            conversationsToJoin.push(conversation);
           }
         }
       }
 
       await Promise.all(
-        conversationsToJoin.map(async ({conversationId, groupId}) => {
+        conversationsToJoin.map(async conversation => {
+          const {qualifiedId, groupId} = conversation;
           try {
-            await sendExternalCommit(conversationId);
+            await sendExternalCommit(qualifiedId);
             alreadyEstablishedConversations.push(groupId);
+            onSuccessfulJoin?.(conversation);
           } catch {
             pendingConversations.push(groupId);
           }

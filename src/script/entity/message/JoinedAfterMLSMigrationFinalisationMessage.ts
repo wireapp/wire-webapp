@@ -17,24 +17,13 @@
  *
  */
 
-/** Enum for different message super types */
-export enum SuperType {
-  CALL = 'call',
-  CALL_TIME_OUT = 'call-time-out',
-  FAILED_TO_ADD_USERS = 'failed-to-add-users',
-  CONTENT = 'normal',
-  DELETE = 'delete',
-  DEVICE = 'device',
-  FILE_TYPE_RESTRICTED = 'file-type-restricted',
-  LEGALHOLD = 'legal-hold',
-  LOCATION = 'location',
-  MEMBER = 'member',
-  MISSED = 'missed',
-  JOINED_AFTER_MLS_MIGRATION_FINALISATION = 'joined-after-mls-migration-finalisation',
-  PING = 'ping',
-  REACTION = 'reaction',
-  SPECIAL = 'special',
-  SYSTEM = 'system',
-  UNABLE_TO_DECRYPT = 'unable-to-decrypt',
-  VERIFICATION = 'verification',
+import {SystemMessage} from './SystemMessage';
+
+import {SuperType} from '../../message/SuperType';
+
+export class JoinedAfterMLSMigrationFinalisationMessage extends SystemMessage {
+  constructor() {
+    super();
+    this.super_type = SuperType.JOINED_AFTER_MLS_MIGRATION_FINALISATION;
+  }
 }

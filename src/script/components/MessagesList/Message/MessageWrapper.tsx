@@ -39,6 +39,7 @@ import {DecryptErrorMessage} from './DecryptErrorMessage';
 import {DeleteMessage} from './DeleteMessage';
 import {FailedToAddUsersMessage} from './FailedToAddUsersMessage';
 import {FileTypeRestrictedMessage} from './FileTypeRestrictedMessage';
+import {JoinedAfterMLSMigrationFinalisationMessage} from './JoinedAfterMLSMigrationFinalisationMessage';
 import {LegalHoldMessage} from './LegalHoldMessage';
 import {MemberMessage} from './MemberMessage';
 import {MissedMessage} from './MissedMessage';
@@ -271,6 +272,10 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
   }
   if (message.isFileTypeRestricted()) {
     return <FileTypeRestrictedMessage message={message} />;
+  }
+
+  if (message.isJoinedAfterMLSMigrationFinalisation()) {
+    return <JoinedAfterMLSMigrationFinalisationMessage />;
   }
 
   if (message.isMissed()) {

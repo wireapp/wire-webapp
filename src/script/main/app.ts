@@ -56,6 +56,7 @@ import {ClientRepository, ClientService} from '../client';
 import {Configuration} from '../Config';
 import {ConnectionRepository} from '../connection/ConnectionRepository';
 import {ConnectionService} from '../connection/ConnectionService';
+import {ConversationDatabaseData} from '../conversation/ConversationMapper';
 import {ConversationRepository} from '../conversation/ConversationRepository';
 import {isMLSConversation} from '../conversation/ConversationSelectors';
 import {ConversationService} from '../conversation/ConversationService';
@@ -80,7 +81,13 @@ import {IntegrationRepository} from '../integration/IntegrationRepository';
 import {IntegrationService} from '../integration/IntegrationService';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {MediaRepository} from '../media/MediaRepository';
-import {initMLSCallbacks, initMLSConversations, registerUninitializedSelfAndTeamConversations} from '../mls';
+import {
+  initMLSCallbacks,
+  initialiseEstablishedMLSCapableConversations,
+  joinNewMLSConversations,
+  registerUninitializedSelfAndTeamConversations,
+} from '../mls';
+import {joinConversationsAfterMigrationFinalisation} from '../mls/MLSMigration/finaliseMigration/joinConversationsAfterMigrationFinalisation';
 import {initialisePeriodicSelfSupportedProtocolsCheck} from '../mls/supportedProtocols';
 import {NotificationRepository} from '../notification/NotificationRepository';
 import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
@@ -402,7 +409,10 @@ export class App {
       const connections = await connectionRepository.getConnections();
       telemetry.addStatistic(AppInitStatisticsValue.CONNECTIONS, connections.length, 50);
 
-      const conversations = await conversationRepository.loadConversations();
+      const initialLocalConversations =
+        await this.service.conversation.loadConversationStatesFromDb<ConversationDatabaseData>();
+
+      const conversations = await conversationRepository.loadConversations(initialLocalConversations);
 
       await userRepository.loadUsers(selfUser, connections, conversations, teamMembers);
 
@@ -433,14 +443,24 @@ export class App {
 
       if (supportsMLS()) {
         // Once all the messages have been processed and the message sending queue freed we can now:
-
         const mlsConversations = conversations.filter(isMLSConversation);
+
+        //initialize all the mls groups that are already established (schedule periodic key updates, etc.)
+        await initialiseEstablishedMLSCapableConversations(this.core);
 
         //add the potential `self` and `team` conversations
         await registerUninitializedSelfAndTeamConversations(mlsConversations, selfUser, clientEntity().id, this.core);
 
+        //join all the mls groups that are known by the user but were migrated to mls
+        await joinConversationsAfterMigrationFinalisation({
+          updatedConversations: conversations,
+          initialDatabaseConversations: initialLocalConversations,
+          core: this.core,
+          conversationRepository: conversationRepository,
+        });
+
         //join all the mls groups we're member of and have not yet joined (eg. we were not send welcome message)
-        await initMLSConversations(mlsConversations, this.core);
+        await joinNewMLSConversations(mlsConversations, this.core);
       }
 
       telemetry.timeStep(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
