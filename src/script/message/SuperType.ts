@@ -30,7 +30,6 @@ export enum SuperType {
   LOCATION = 'location',
   MEMBER = 'member',
   MISSED = 'missed',
-  JOINED_AFTER_MLS_MIGRATION_FINALISATION = 'joined-after-mls-migration-finalisation',
   PING = 'ping',
   REACTION = 'reaction',
   SPECIAL = 'special',

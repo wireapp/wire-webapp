@@ -30,6 +30,7 @@ export enum SystemMessageType {
   CONVERSATION_RECEIPT_MODE_UPDATE = 'receipt-mode-update',
   CONVERSATION_RENAME = 'rename',
   CONVERSATION_PROTOCOL_UPDATE = 'protocol-update',
+  JOINED_AFTER_MLS_MIGRATION_FINALISATION = 'joined-after-mls-migration-finalisation',
   CONVERSATION_RESUME = 'resume',
   MEMBER_JOIN = 'join',
   MEMBER_LEAVE = 'leave',

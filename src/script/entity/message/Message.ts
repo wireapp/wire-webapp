@@ -35,7 +35,6 @@ import {DeleteMessage} from './DeleteMessage';
 import {FailedToAddUsersMessage} from './FailedToAddUsersMessage';
 import type {FileAsset} from './FileAsset';
 import {FileTypeRestrictedMessage} from './FileTypeRestrictedMessage';
-import {JoinedAfterMLSMigrationFinalisationMessage} from './JoinedAfterMLSMigrationFinalisationMessage';
 import type {LegalHoldMessage} from './LegalHoldMessage';
 import type {LinkPreview} from './LinkPreview';
 import type {MemberMessage} from './MemberMessage';
@@ -315,10 +314,6 @@ export class Message {
 
   isMissed(): this is MissedMessage {
     return this.super_type === SuperType.MISSED;
-  }
-
-  isJoinedAfterMLSMigrationFinalisation(): this is JoinedAfterMLSMigrationFinalisationMessage {
-    return this.super_type === SuperType.JOINED_AFTER_MLS_MIGRATION_FINALISATION;
   }
 
   isCallTimeout(): this is CallingTimeoutMessage {

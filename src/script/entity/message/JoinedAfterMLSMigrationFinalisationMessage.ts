@@ -17,13 +17,17 @@
  *
  */
 
-import {SystemMessage} from './SystemMessage';
+import ko from 'knockout';
 
-import {SuperType} from '../../message/SuperType';
+import {SystemMessageType} from 'src/script/message/SystemMessageType';
+import {t} from 'Util/LocalizerUtil';
+
+import {SystemMessage} from './SystemMessage';
 
 export class JoinedAfterMLSMigrationFinalisationMessage extends SystemMessage {
   constructor() {
     super();
-    this.super_type = SuperType.JOINED_AFTER_MLS_MIGRATION_FINALISATION;
+    this.system_message_type = SystemMessageType.JOINED_AFTER_MLS_MIGRATION_FINALISATION;
+    this.caption = ko.pureComputed(() => t('conversationJoinedAfterMLSMigrationFinalisation'));
   }
 }
