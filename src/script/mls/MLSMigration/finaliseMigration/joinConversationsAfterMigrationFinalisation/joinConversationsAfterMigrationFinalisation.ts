@@ -26,7 +26,7 @@ import {ConversationRepository} from 'src/script/conversation/ConversationReposi
 import {MLSConversation, isMLSConversation} from 'src/script/conversation/ConversationSelectors';
 import {Conversation} from 'src/script/entity/Conversation';
 
-import {joinNewMLSConversations} from '../../MLSConversations';
+import {joinNewMLSConversations} from '../../../MLSConversations';
 
 /**
  * Will compare the list of initial conversations stored in the local database with conversations fetched from the backend.
