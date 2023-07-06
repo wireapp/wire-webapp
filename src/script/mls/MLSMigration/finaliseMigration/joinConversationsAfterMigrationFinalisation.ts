@@ -25,7 +25,6 @@ import {ConversationDatabaseData} from 'src/script/conversation/ConversationMapp
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {MLSConversation, isMLSConversation} from 'src/script/conversation/ConversationSelectors';
 import {Conversation} from 'src/script/entity/Conversation';
-import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {joinNewMLSConversations} from '../../MLSConversations';
 
@@ -74,8 +73,7 @@ const filterGroupConversationsAlreadyMigratedToMLS = (
     }
 
     const localConversation = initialDatabaseConversations.find(localConversation => {
-      const localQualifiedId = localConversation.qualified_id;
-      return localQualifiedId && matchQualifiedIds(localQualifiedId, conversation.qualifiedId);
+      return localConversation.id === conversation.id;
     });
 
     if (!localConversation) {
