@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useRef, useState} from 'react';
+import {ChangeEvent, FormEvent, KeyboardEvent as ReactKeyboardEvent, useEffect, useRef, useState} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
@@ -28,27 +28,37 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {checkFileSharingPermission} from 'Components/Conversation/utils/checkFileSharingPermission';
+import {useEmoji} from 'Components/Emoji/useEmoji';
+import {Icon} from 'Components/Icon';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';
-import {LexicalInput} from 'Components/LexicalInput/LexicalInput';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from 'src/script/user/TypingIndicatorMode';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {loadDraftStateLexical, saveDraftStateLexical} from 'Util/DraftStateUtil';
-import {KEY} from 'Util/KeyboardUtil';
+import {loadDraftState, saveDraftState} from 'Util/DraftStateUtil';
+import {insertAtCaret, isFunctionKey, isTabKey, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
-import {updateMentionRanges} from 'Util/MentionUtil';
-import {formatLocale, TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {getFileExtension} from 'Util/util';
+import {
+  createMentionEntity,
+  detectMentionEdgeDeletion,
+  getMentionCandidate,
+  updateMentionRanges,
+} from 'Util/MentionUtil';
+import {formatDuration, formatLocale, TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {getFileExtension, getSelectionPosition} from 'Util/util';
 
 import {ControlButtons} from './components/InputBarControls/ControlButtons';
 import {GiphyButton} from './components/InputBarControls/GiphyButton';
+import {MentionSuggestionList} from './components/MentionSuggestions';
 import {PastedFileControls} from './components/PastedFileControls';
 import {ReplyBar} from './components/ReplyBar';
 import {TYPING_TIMEOUT} from './components/TypingIndicator';
 import {TypingIndicator} from './components/TypingIndicator/TypingIndicator';
+import {getRichTextInput} from './getRichTextInput';
 import {useFilePaste} from './hooks/useFilePaste';
+import {useResizeTarget} from './hooks/useResizeTarget';
+import {useScrollSync} from './hooks/useScrollSync';
 import {handleClickOutsideOfInputBar, IgnoreOutsideClickWrapper} from './util/clickHandlers';
 
 import {Config} from '../../Config';
@@ -70,10 +80,6 @@ import {TeamState} from '../../team/TeamState';
 const CONFIG = {
   ...Config.getConfig(),
   PING_TIMEOUT: TIME_IN_MILLIS.SECOND * 2,
-};
-
-const config = {
-  GIPHY_TEXT_LENGTH: 256,
 };
 
 interface InputBarProps {
@@ -117,6 +123,7 @@ const InputBar = ({
   );
   const {
     connection,
+    participating_user_ets: participatingUserEts,
     allUserEntities: allUsers,
     localMessageTimer,
     messageTimer,
@@ -126,6 +133,7 @@ const InputBar = ({
     'connection',
     'firstUserEntity',
     'allUserEntities',
+    'participating_user_ets',
     'localMessageTimer',
     'messageTimer',
     'hasGlobalMessageTimer',
@@ -139,24 +147,21 @@ const InputBar = ({
 
   const {typingIndicatorMode} = useKoSubscribableChildren(propertiesRepository, ['typingIndicatorMode']);
   const isTypingIndicatorEnabled = typingIndicatorMode === CONVERSATION_TYPING_INDICATOR_MODE.ON;
+  const shadowInputRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Message
-  const [inputValue, setInputValue] = useState<string>('');
   const [editMessageEntity, setEditMessageEntity] = useState<ContentMessage | null>(null);
   const [replyMessageEntity, setReplyMessageEntity] = useState<ContentMessage | null>(null);
-  const [isTyping, setIsTyping] = useState<boolean>(false);
-
-  // Mentions
   const [currentMentions, setCurrentMentions] = useState<MentionEntity[]>([]);
-
-  // Files
   const [pastedFile, setPastedFile] = useState<File | null>(null);
-
-  // Common
+  const [inputValue, setInputValue] = useState<string>('');
+  const [selectionStart, setSelectionStart] = useState<number>(0);
+  const [selectionEnd, setSelectionEnd] = useState<number>(0);
   const [pingDisabled, setIsPingDisabled] = useState<boolean>(false);
+  const [isTyping, setIsTyping] = useState<boolean>(false);
   const hasUserTyped = useRef<boolean>(false);
+  const [editedMention, setEditedMention] = useState<{startIndex: number; term: string} | undefined>(undefined);
 
-  // New values
   const {rightSidebar} = useAppMainState.getState();
   const lastItem = rightSidebar.history.length - 1;
   const currentState = rightSidebar.history[lastItem];
@@ -164,17 +169,53 @@ const InputBar = ({
 
   const inputPlaceholder = messageTimer ? t('tooltipConversationEphemeral') : t('tooltipConversationInputPlaceholder');
 
+  const candidates = participatingUserEts.filter(userEntity => !userEntity.isService);
+  const mentionSuggestions = editedMention ? searchRepository.searchUserInSet(editedMention.term, candidates) : [];
+
   const isEditing = !!editMessageEntity;
   const isReplying = !!replyMessageEntity;
   const isConnectionRequest = isOutgoingRequest || isIncomingRequest;
-  const hasLocalEphemeralTimer = isSelfDeletingMessagesEnabled && !!localMessageTimer && !hasGlobalMessageTimer;
+  const hasLocalEphemeralTimer = isSelfDeletingMessagesEnabled && localMessageTimer && !hasGlobalMessageTimer;
 
-  // const richTextInput = getRichTextInput(currentMentions, inputValue);
+  const richTextInput = getRichTextInput(currentMentions, inputValue);
 
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
   const isScaledDown = useMatchMedia('max-width: 768px');
 
+  const config = {
+    GIPHY_TEXT_LENGTH: 256,
+  };
+
   const showGiphyButton = inputValue.length > 0 && inputValue.length <= config.GIPHY_TEXT_LENGTH;
+
+  const updateSelectionState = (updateOnInit = true) => {
+    if (!updateOnInit) {
+      return;
+    }
+
+    if (!textareaRef.current) {
+      return;
+    }
+
+    const {selectionStart: start, selectionEnd: end} = textareaRef.current;
+    const {newEnd, newStart} = getSelectionPosition(textareaRef.current, currentMentions);
+
+    if (newStart !== start || newEnd !== end) {
+      textareaRef.current.selectionStart = newStart;
+      textareaRef.current.selectionEnd = newEnd;
+    }
+
+    setSelectionStart(newStart);
+    setSelectionEnd(newEnd);
+  };
+
+  const moveCursorToEnd = (endPosition: number, updateSelection = true) => {
+    updateSelectionState(updateSelection);
+    setTimeout(() => {
+      textareaRef.current?.setSelectionRange(endPosition, endPosition);
+      // textareaRef.current?.focus();
+    }, 0);
+  };
 
   const resetDraftState = (resetInputValue = false) => {
     setCurrentMentions([]);
@@ -191,6 +232,56 @@ const InputBar = ({
       uploadDroppedFiles([pastedFile]);
       clearPastedFile();
     }
+  };
+
+  const endMentionFlow = () => {
+    setEditedMention(undefined);
+    updateSelectionState();
+  };
+
+  const addMention = (userEntity: User) => {
+    const mentionEntity = createMentionEntity(userEntity, editedMention);
+
+    if (mentionEntity && editedMention) {
+      // keep track of what is before and after the mention being edited
+      const beforeMentionPartial = inputValue.slice(0, mentionEntity.startIndex);
+      const afterMentionPartial = inputValue
+        .slice(mentionEntity.startIndex + editedMention.term.length + 1)
+        .replace(/^ /, '');
+
+      const newInputValue = `${beforeMentionPartial}@${userEntity.name()} ${afterMentionPartial}`;
+      // insert the mention in between
+      setInputValue(newInputValue);
+
+      const currentValueLength = newInputValue.length;
+      const inputValueLength = inputValue.length;
+      const difference = currentValueLength - inputValueLength;
+
+      const updatedMentions = updateMentionRanges(currentMentions, selectionStart, selectionEnd, difference);
+      const newMentions = [...updatedMentions, mentionEntity];
+      const sortedMentions = newMentions.sort((mentionA, mentionB) => mentionA.startIndex - mentionB.startIndex);
+      setCurrentMentions(sortedMentions);
+
+      const caretPosition = mentionEntity.endIndex + 1;
+
+      setEditedMention(undefined);
+      setSelectionStart(caretPosition);
+      setSelectionEnd(caretPosition);
+
+      // Need to use setTimeout, because the setSelectionRange works asynchronously
+      setTimeout(() => {
+        textareaRef.current?.setSelectionRange(caretPosition, caretPosition);
+        // textareaRef.current?.focus();
+      }, 0);
+    }
+  };
+
+  const handleMentionFlow = (event: ReactKeyboardEvent<HTMLTextAreaElement> | FormEvent<HTMLTextAreaElement>) => {
+    const {selectionStart: start, selectionEnd: end, value} = event.currentTarget;
+    const mentionCandidate = getMentionCandidate(currentMentions, start, end, value);
+
+    setEditedMention(mentionCandidate);
+    updateSelectionState();
   };
 
   const cancelMessageReply = (resetDraft = true) => {
@@ -211,9 +302,10 @@ const InputBar = ({
   };
 
   const handleCancelReply = () => {
-    // if (!mentionSuggestions.length) {
-    //   cancelMessageReply(false);
-    // }
+    if (!mentionSuggestions.length) {
+      cancelMessageReply(false);
+    }
+
     // textareaRef.current?.focus();
   };
 
@@ -238,8 +330,8 @@ const InputBar = ({
 
   useEffect(() => {
     if (editMessageEntity?.isEditable()) {
-      // const firstAsset = editMessageEntity.getFirstAsset() as TextAsset;
-      // moveCursorToEnd(firstAsset.text.length);
+      const firstAsset = editMessageEntity.getFirstAsset() as TextAsset;
+      moveCursorToEnd(firstAsset.text.length);
     }
   }, [editMessageEntity]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -278,6 +370,101 @@ const InputBar = ({
 
       // textareaRef.current?.focus();
     }
+  };
+
+  const updateMentions = (event: ReactKeyboardEvent<HTMLTextAreaElement>) => {
+    const textarea = event.currentTarget;
+    const value = textarea.value;
+    const lengthDifference = value.length - inputValue.length;
+
+    const edgeMention = detectMentionEdgeDeletion(
+      textarea,
+      currentMentions,
+      selectionStart,
+      selectionEnd,
+      lengthDifference,
+    );
+
+    if (edgeMention) {
+      textarea.value = inputValue;
+      textarea.selectionStart = edgeMention.startIndex;
+      textarea.selectionEnd = edgeMention.endIndex;
+    }
+  };
+
+  const onTextAreaKeyDown = (keyboardEvent: ReactKeyboardEvent<HTMLTextAreaElement>): void | boolean => {
+    const inputHandledByEmoji = !editedMention && emojiKeyDown(keyboardEvent);
+    // shift+tab from message input bar set last focused message's elements non focusable
+    if (keyboardEvent.shiftKey && isTabKey(keyboardEvent)) {
+      onShiftTab();
+    }
+    if (!inputHandledByEmoji) {
+      switch (keyboardEvent.key) {
+        case KEY.ARROW_UP: {
+          if (!isFunctionKey(keyboardEvent) && !inputValue.length) {
+            editMessage(conversationEntity.getLastEditableMessage() as ContentMessage);
+            updateMentions(keyboardEvent);
+          }
+          break;
+        }
+        case KEY.ESC: {
+          if (mentionSuggestions.length) {
+            endMentionFlow();
+          } else if (pastedFile) {
+            setPastedFile(null);
+          } else if (isEditing) {
+            cancelMessageEditing(true, true);
+          } else if (isReplying) {
+            cancelMessageReply(false);
+          }
+          break;
+        }
+        case KEY.ENTER: {
+          if (!keyboardEvent.shiftKey && !keyboardEvent.altKey && !keyboardEvent.metaKey) {
+            keyboardEvent.preventDefault();
+            onSend(inputValue);
+          }
+
+          if (keyboardEvent.altKey || keyboardEvent.metaKey) {
+            if (keyboardEvent.target) {
+              keyboardEvent.preventDefault();
+              insertAtCaret(keyboardEvent.target.toString(), '\n');
+            }
+          }
+
+          break;
+        }
+
+        default:
+          break;
+      }
+
+      return true;
+    }
+  };
+
+  const onTextareaKeyUp = (keyboardEvent: ReactKeyboardEvent<HTMLTextAreaElement>): void => {
+    if (!editedMention) {
+      emojiKeyUp(keyboardEvent);
+    }
+
+    if (keyboardEvent.key !== KEY.ESC) {
+      handleMentionFlow(keyboardEvent);
+    }
+  };
+
+  const onChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    event.preventDefault();
+
+    const {value: currentValue} = event.currentTarget;
+    hasUserTyped.current = true;
+    setInputValue(currentValue);
+    const currentValueLength = currentValue.length;
+    const previousValueLength = inputValue.length;
+    const difference = currentValueLength - previousValueLength;
+
+    const updatedMentions = updateMentionRanges(currentMentions, selectionStart, selectionEnd, difference);
+    setCurrentMentions(updatedMentions);
   };
 
   const generateQuote = (): Promise<OutgoingQuote | undefined> => {
@@ -327,8 +514,6 @@ const InputBar = ({
     }
   };
 
-  // @ts-ignore
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onSend = (text: string): void | boolean => {
     if (pastedFile) {
       return sendPastedFile();
@@ -371,6 +556,12 @@ const InputBar = ({
     // textareaRef.current?.focus();
   };
 
+  const {
+    onInputKeyDown: emojiKeyDown,
+    onInputKeyUp: emojiKeyUp,
+    renderEmojiComponent,
+  } = useEmoji(propertiesRepository, setInputValue, onSend, currentMentions, setCurrentMentions, textareaRef.current);
+
   const onGifClick = () => openGiphy(inputValue);
 
   const onPingClick = () => {
@@ -398,6 +589,38 @@ const InputBar = ({
     });
 
     setPastedFile(newFile);
+  };
+
+  const loadInitialStateForConversation = async (): Promise<void> => {
+    setPastedFile(null);
+    cancelMessageEditing(true, true);
+    cancelMessageReply();
+    endMentionFlow();
+
+    if (conversationEntity) {
+      const previousSessionData = await loadDraftState(conversationEntity, storageRepository, messageRepository);
+
+      if (previousSessionData?.text) {
+        setInputValue(previousSessionData.text);
+
+        setSelectionStart(previousSessionData.text.length);
+        setSelectionEnd(previousSessionData.text.length);
+      }
+
+      if (previousSessionData?.mentions.length > 0) {
+        setCurrentMentions(previousSessionData.mentions);
+      }
+
+      if (previousSessionData.replyEntityPromise) {
+        previousSessionData.replyEntityPromise.then(replyEntity => {
+          if (replyEntity?.isReplyable()) {
+            setReplyMessageEntity(replyEntity);
+          }
+        });
+      }
+
+      moveCursorToEnd(previousSessionData.text.length, false);
+    }
   };
 
   const sendGiphy = (gifUrl: string, tag: string): void => {
@@ -431,18 +654,32 @@ const InputBar = ({
 
   useEffect(() => {
     hasUserTyped.current = false;
-    // loadInitialStateForConversation();
+    loadInitialStateForConversation();
   }, [conversationEntity]);
 
-  const saveDraft = async (editor: any) => {
-    await saveDraftStateLexical(storageRepository, conversationEntity, editor);
-  };
-
-  const loadDraft = async () => {
-    return loadDraftStateLexical(conversationEntity, storageRepository);
-  };
+  useEffect(() => {
+    if (!isEditing) {
+      saveDraftState(storageRepository, conversationEntity, {
+        mentions: currentMentions,
+        text: inputValue,
+        ...(replyMessageEntity && {reply: replyMessageEntity}),
+      });
+    }
+  }, [isEditing, currentMentions, replyMessageEntity, inputValue]);
 
   // useTextAreaFocus(() => textareaRef.current?.focus());
+
+  useScrollSync(textareaRef.current, shadowInputRef.current, [
+    textareaRef.current,
+    shadowInputRef.current,
+    richTextInput,
+  ]);
+
+  useResizeTarget(shadowInputRef.current, textareaRef.current, [
+    textareaRef.current,
+    shadowInputRef.current,
+    richTextInput,
+  ]);
 
   const handleRepliedMessageDeleted = (messageId: string) => {
     if (replyMessageEntity?.id === messageId) {
@@ -498,6 +735,22 @@ const InputBar = ({
     };
   }, [pastedFile]);
 
+  const sendButton = (
+    <li>
+      <button
+        type="button"
+        className={cx('controls-right-button controls-right-button--send')}
+        disabled={inputValue.length === 0}
+        title={t('tooltipConversationSendMessage')}
+        aria-label={t('tooltipConversationSendMessage')}
+        onClick={() => onSend(inputValue)}
+        data-uie-name="do-send-message"
+      >
+        <Icon.Send />
+      </button>
+    </li>
+  );
+
   const controlButtonsProps = {
     conversation: conversationEntity,
     disableFilesharing: !isFileSharingSendingEnabled,
@@ -545,24 +798,53 @@ const InputBar = ({
             </div>
 
             {!removedFromConversation && !pastedFile && (
-              <LexicalInput
-                conversationEntity={conversationEntity}
-                messageRepository={messageRepository}
-                propertiesRepository={propertiesRepository}
-                searchRepository={searchRepository}
-                placeholder={inputPlaceholder}
-                inputValue={inputValue}
-                setInputValue={setInputValue}
-                currentMentions={currentMentions}
-                sendMessage={sendMessage}
-                hasLocalEphemeralTimer={hasLocalEphemeralTimer}
-                saveDraftStateLexical={saveDraft}
-                loadDraftStateLexical={loadDraft}
-              >
+              <>
+                {renderEmojiComponent()}
+
+                <div className="controls-center">
+                  <textarea
+                    ref={textareaRef}
+                    id={`${conversationInputBarClassName}-text`}
+                    className={cx(`${conversationInputBarClassName}-text`, {
+                      [`${conversationInputBarClassName}-text--accent`]: hasLocalEphemeralTimer,
+                    })}
+                    onKeyDown={onTextAreaKeyDown}
+                    onKeyUp={onTextareaKeyUp}
+                    onClick={handleMentionFlow}
+                    onInput={updateMentions}
+                    onChange={onChange}
+                    onBlur={() => setIsTyping(false)}
+                    value={inputValue}
+                    placeholder={inputPlaceholder}
+                    aria-label={
+                      messageTimer
+                        ? t('tooltipConversationEphemeralAriaLabel', {time: formatDuration(messageTimer).text})
+                        : inputPlaceholder
+                    }
+                    data-uie-name="input-message"
+                    dir="auto"
+                  />
+
+                  <div
+                    ref={shadowInputRef}
+                    className="shadow-input"
+                    dangerouslySetInnerHTML={{__html: richTextInput}}
+                    data-uie-name="input-message-rich-text"
+                    dir="auto"
+                  />
+                </div>
+
+                <MentionSuggestionList
+                  targetInput={textareaRef.current}
+                  suggestions={mentionSuggestions}
+                  onSelectionValidated={addMention}
+                />
+
                 {isScaledDown ? (
                   <>
                     <ul className="controls-right buttons-group" css={{minWidth: '95px'}}>
                       {showGiphyButton && <GiphyButton onGifClick={onGifClick} />}
+                      {sendButton}
                     </ul>
                     <ul className="controls-right buttons-group" css={{justifyContent: 'center', width: '100%'}}>
                       <ControlButtons {...controlButtonsProps} isScaledDown={isScaledDown} />
@@ -571,9 +853,10 @@ const InputBar = ({
                 ) : (
                   <ul className="controls-right buttons-group">
                     <ControlButtons {...controlButtonsProps} showGiphyButton={showGiphyButton} />
+                    {sendButton}
                   </ul>
                 )}
-              </LexicalInput>
+              </>
             )}
           </>
         )}

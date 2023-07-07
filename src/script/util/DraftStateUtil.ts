@@ -92,3 +92,55 @@ export const loadDraftState = async (
 
   return draftMessage;
 };
+
+export const saveDraftStateLexical = async (
+  storageRepository: StorageRepository,
+  conversationEntity: Conversation,
+  data: any,
+  // draftMessage: DraftMessage,
+): Promise<void> => {
+  // we only save state for newly written messages
+  // const storeReply = draftMessage.reply?.id ? {messageId: draftMessage.reply.id} : {};
+  const storageKey = generateConversationInputStorageKey(conversationEntity);
+
+  await storageRepository.storageService.saveToSimpleStorage<any>(storageKey, {
+    editorState: data,
+    // mentions: draftMessage.mentions,
+    // reply: storeReply,
+  });
+};
+
+export const loadDraftStateLexical = async (
+  conversationEntity: Conversation,
+  storageRepository: StorageRepository,
+  // messageRepository: MessageRepository,
+): Promise<any> => {
+  const storageKey = generateConversationInputStorageKey(conversationEntity);
+  const storageValue = await storageRepository.storageService.loadFromSimpleStorage<any>(storageKey);
+
+  if (typeof storageValue === 'undefined') {
+    return {editorState: null};
+  }
+
+  // if (typeof storageValue === 'string') {
+  //   return {mentions: [], text: storageValue};
+  // }
+  //
+  // const draftMessage: DraftMessage = {
+  //   mentions: storageValue.mentions.map(
+  //     mention => new MentionEntity(mention.startIndex, mention.length, mention.userId, mention.domain),
+  //   ),
+  //   text: storageValue.text,
+  // };
+  //
+  // const replyMessageId = storageValue.reply.messageId;
+  //
+  // if (replyMessageId) {
+  //   const message =
+  //     (await messageRepository.getMessageInConversationById(conversationEntity, replyMessageId)) ||
+  //     (await messageRepository.getMessageInConversationByReplacementId(conversationEntity, replyMessageId));
+  //   draftMessage.replyEntityPromise = messageRepository.ensureMessageSender(message) as Promise<ContentMessage>;
+  // }
+
+  return storageValue;
+};

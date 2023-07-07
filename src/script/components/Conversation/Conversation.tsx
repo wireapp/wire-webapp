@@ -514,6 +514,13 @@ export const Conversation: FC<ConversationProps> = ({
             setMsgElementsFocusable={setMsgElementsFocusable}
           />
 
+          {/*<LexicalInput*/}
+          {/*  conversationEntity={activeConversation}*/}
+          {/*  messageRepository={repositories.message}*/}
+          {/*  searchRepository={repositories.search}*/}
+          {/*  selfUser={selfUser}*/}
+          {/*/>*/}
+
           <InputBar
             conversationEntity={activeConversation}
             conversationRepository={repositories.conversation}

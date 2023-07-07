@@ -39,6 +39,17 @@
   }
 }
 
+.conversation-input-bar-text-placeholder::before {
+  padding-left: 8px;
+  color: var(--gray-70);
+  content: attr(data-placeholder);
+  .label-xs;
+
+  body.theme-dark & {
+    color: var(--gray-60);
+  }
+}
+
 .conversation-input-bar-text,
 .shadow-input {
   .accent-selection;
@@ -48,7 +59,7 @@
   max-width: calc(
     @conversation-max-width - @conversation-message-sender-width - var(--conversation-message-timestamp-width)
   );
-  height: @conversation-input-line-height;
+  height: auto;
   min-height: @conversation-input-line-height;
   max-height: @conversation-input-max-height;
   flex: 1 1;
@@ -72,8 +83,9 @@
     }
   }
 
+  &--accent,
   &--accent::placeholder {
-    color: var(--accent-color);
+    color: var(--accent-color) !important;
   }
 }
 
