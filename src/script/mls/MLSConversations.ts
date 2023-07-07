@@ -45,18 +45,15 @@ type MLSConversationRepository = Pick<
  * @param conversations - all the conversations that the user is part of
  * @param core - the instance of the core
  */
-export async function initMLSConversations(
-  mlsCapableConversations: MLSCapableConversation[],
-  core: Account,
-): Promise<void> {
+export async function initialiseEstablishedMLSCapableConversations(core: Account): Promise<void> {
   const mlsService = core.service?.mls;
   if (!mlsService) {
     throw new Error('MLS service not available');
   }
 
-  await joinNewMLSConversations(mlsCapableConversations, core);
-
-  return mlsService.schedulePeriodicKeyMaterialRenewals(mlsCapableConversations.map(({groupId}) => groupId));
+  // we reinitialize the periodic key material renewal for all the already established groups
+  const alreadyEstablishedGroupIds = Array.from(useMLSConversationState.getState().established);
+  mlsService.schedulePeriodicKeyMaterialRenewals(alreadyEstablishedGroupIds);
 }
 
 /**
@@ -82,17 +79,22 @@ export async function initMLSCallbacks(
 }
 
 /**
- * Will join all the conversation that the current user is part of but that are not joined by the current user's device
+ * Will join (with external commit) all the conversation that the current user is part of but that are not joined by the current user's device.
  *
  * @param conversations - all the conversations that the user is part of
  * @param core - the instance of the core
  */
-async function joinNewMLSConversations(conversations: MLSCapableConversation[], core: Account): Promise<void> {
+export async function joinNewMLSConversations(
+  conversations: MLSCapableConversation[],
+  core: Account,
+  onSuccessfulJoin?: (conversation: Conversation) => void,
+): Promise<void> {
   // We send external proposal to all the MLS conversations that are in an unknown state (not established nor pendingWelcome)
-  await useMLSConversationState.getState().sendExternalToPendingJoin(
+  return useMLSConversationState.getState().sendExternalToPendingJoin(
     conversations,
     groupId => core.service!.conversation.isMLSConversationEstablished(groupId),
     conversationId => core.service!.conversation.joinByExternalCommit(conversationId),
+    onSuccessfulJoin,
   );
 }
 

@@ -23,7 +23,11 @@ import {randomUUID} from 'crypto';
 
 import {Account} from '@wireapp/core';
 
-import {initMLSConversations, registerUninitializedSelfAndTeamConversations} from './MLSConversations';
+import {
+  initialiseEstablishedMLSCapableConversations,
+  joinNewMLSConversations,
+  registerUninitializedSelfAndTeamConversations,
+} from './MLSConversations';
 import {useMLSConversationState} from './mlsConversationState';
 
 import {MLSConversation} from '../conversation/ConversationSelectors';
@@ -49,39 +53,46 @@ function createMLSConversations(
 }
 
 describe('MLSConversations', () => {
-  beforeEach(() => {
-    jest.spyOn(useMLSConversationState.getState(), 'sendExternalToPendingJoin').mockReturnValue(undefined);
-  });
-
-  describe('initMLSConversations', () => {
+  describe('joinNewMLSConversations', () => {
     it('joins all the MLS conversations', async () => {
       const nbMLSConversations = 5 + Math.ceil(Math.random() * 10);
 
       const mlsConversations = createMLSConversations(nbMLSConversations);
 
-      await initMLSConversations(mlsConversations, new Account());
+      jest.spyOn(useMLSConversationState.getState(), 'sendExternalToPendingJoin');
+
+      await joinNewMLSConversations(mlsConversations, new Account());
 
       expect(useMLSConversationState.getState().sendExternalToPendingJoin).toHaveBeenCalledWith(
         mlsConversations,
         expect.any(Function),
         expect.any(Function),
+        undefined,
       );
     });
+  });
 
-    it('schedules key renewal intervals for all the mls groups', async () => {
+  describe('initialiseEstablishedMLSCapableConversations', () => {
+    it('schedules key renewal intervals for all the established mls groups', async () => {
       const core = new Account();
       const nbMLSConversations = 5 + Math.ceil(Math.random() * 10);
 
       const mlsConversations = createMLSConversations(nbMLSConversations);
 
-      await initMLSConversations(mlsConversations, core);
+      jest
+        .spyOn(useMLSConversationState, 'getState')
+        .mockReturnValue({established: mlsConversations.map(c => c.groupId)} as any);
+
+      await initialiseEstablishedMLSCapableConversations(core);
 
       expect(core.service!.mls!.schedulePeriodicKeyMaterialRenewals).toHaveBeenCalledWith(
         mlsConversations.map(c => c.groupId),
       );
     });
+  });
 
-    it('register all uninitiated conversations', async () => {
+  describe('registerUninitializedSelfAndTeamConversations', () => {
+    it('register uninitiated team and self mls conversations', async () => {
       const core = new Account();
       const nbMLSConversations = 5 + Math.ceil(Math.random() * 10);
 
@@ -94,7 +105,7 @@ describe('MLSConversations', () => {
 
       await registerUninitializedSelfAndTeamConversations(conversations, new User(), 'client-1', core);
 
-      expect(core.service!.mls.registerConversation).toHaveBeenCalledTimes(2);
+      expect(core.service!.mls!.registerConversation).toHaveBeenCalledTimes(2);
     });
 
     it('does not register self and team conversation that have epoch > 0', async () => {
@@ -112,9 +123,9 @@ describe('MLSConversations', () => {
       const mlsConversations = createMLSConversations(nbMLSConversations);
       const conversations = [teamConversation, ...mlsConversations, selfConversation];
 
-      await initMLSConversations(conversations, core);
+      await registerUninitializedSelfAndTeamConversations(conversations, new User(), 'clientId', core);
 
-      expect(core.service!.mls.registerConversation).toHaveBeenCalledTimes(0);
+      expect(core.service!.mls!.registerConversation).toHaveBeenCalledTimes(0);
     });
   });
 });

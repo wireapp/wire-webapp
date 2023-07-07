@@ -573,14 +573,15 @@ export class ConversationRepository {
 
   /**
    * Will load all the conversations in memory
+   * @param initialLocalConversations conversations stored in the local database
    * @returns all the conversations from backend merged with the locally stored conversations and loaded into memory
    */
-  public async loadConversations(): Promise<Conversation[]> {
+  public async loadConversations(initialLocalConversations?: ConversationDatabaseData[]): Promise<Conversation[]> {
     const remoteConversations = await this.conversationService.getAllConversations().catch(error => {
       this.logger.error(`Failed to get all conversations from backend: ${error.message}`);
       return {found: []} as RemoteConversations;
     });
-    return this.loadRemoteConversations(remoteConversations);
+    return this.loadRemoteConversations(remoteConversations, initialLocalConversations);
   }
 
   /**
@@ -606,8 +607,13 @@ export class ConversationRepository {
    * @param remoteConversations new conversations fetched from backend
    * @returns the new conversations from backend merged with the locally stored conversations
    */
-  private async loadRemoteConversations(remoteConversations: RemoteConversations): Promise<Conversation[]> {
-    const localConversations = await this.conversationService.loadConversationStatesFromDb<ConversationDatabaseData>();
+  private async loadRemoteConversations(
+    remoteConversations: RemoteConversations,
+    initialLocalConversations?: ConversationDatabaseData[],
+  ): Promise<Conversation[]> {
+    const localConversations =
+      initialLocalConversations ||
+      (await this.conversationService.loadConversationStatesFromDb<ConversationDatabaseData>());
     let conversationsData: any[];
 
     if (!remoteConversations.found?.length) {
@@ -2392,6 +2398,7 @@ export class ConversationRepository {
       case ClientEvent.CONVERSATION.LEGAL_HOLD_UPDATE:
       case ClientEvent.CONVERSATION.LOCATION:
       case ClientEvent.CONVERSATION.MISSED_MESSAGES:
+      case ClientEvent.CONVERSATION.JOINED_AFTER_MLS_MIGRATION_FINALISATION:
       case ClientEvent.CONVERSATION.UNABLE_TO_DECRYPT:
       case ClientEvent.CONVERSATION.VERIFICATION:
       case ClientEvent.CONVERSATION.VOICE_CHANNEL_ACTIVATE:
@@ -2478,6 +2485,15 @@ export class ConversationRepository {
         const missed_event = EventBuilder.buildMissed(conversationEntity, currentTimestamp);
         this.eventRepository.injectEvent(missed_event);
       });
+  };
+
+  public readonly injectJoinedAfterMigrationFinalisationMessage = (conversation: Conversation): void => {
+    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
+    const joinedAfterMLSMigrationFinalisationEvent = EventBuilder.buildJoinedAfterMLSMigrationFinalisation(
+      conversation,
+      currentTimestamp,
+    );
+    return void this.eventRepository.injectEvent(joinedAfterMLSMigrationFinalisationEvent);
   };
 
   private on1to1Creation(conversationEntity: Conversation, eventJson: OneToOneCreationEvent) {

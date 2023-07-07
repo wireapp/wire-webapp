@@ -39,6 +39,7 @@ export enum CONVERSATION {
   MESSAGE_DELETE = 'conversation.message-delete',
   MESSAGE_HIDDEN = 'conversation.message-hidden',
   MISSED_MESSAGES = 'conversation.missed-messages',
+  JOINED_AFTER_MLS_MIGRATION_FINALISATION = 'conversation.joined-after-mls-migration-finalisation',
   ONE2ONE_CREATION = 'conversation.one2one-creation',
   REACTION = 'conversation.reaction',
   TEAM_MEMBER_LEAVE = 'conversation.team-member-leave',
