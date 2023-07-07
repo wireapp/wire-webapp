@@ -76,19 +76,40 @@ jobs:
         run: yarn --immutable
 
       - name: Test
-        run: yarn test --coverage --coverage-reporters=lcov --detectOpenHandles=false
+        run: |
+          set -o pipefail
+          yarn test --coverage --coverage-reporters=lcov --detectOpenHandles=false 2>&1 | tee ./unit-tests.log
 
       - name: Monitor coverage
-        uses: codecov/codecov-action@v3.1.1
+        uses: codecov/codecov-action@v3.1.4
         with:
           fail_ci_if_error: false
           files: ./coverage/lcov.info
           flags: unittests
 
+      - uses: kanga333/variable-mapper@master
+        with:
+          # We try to map a branch to a dev environment
+          key: '${{github.ref}}'
+          map: |
+            {
+              "edge": { "dev_env": "wire-webapp-edge-al2" },
+              "dev": { "dev_env": "wire-webapp-dev-al2" },
+              "master": { "dev_env": "wire-webapp-master-al2" }
+            }
+
+      - uses: kanga333/variable-mapper@master
+        with:
+          # We try to map a tag to a dev environment
+          key: '${{env.TAG}}'
+          map: |
+            {
+              "production": { "prod_env": "wire-webapp-prod-al2" },
+              "staging": { "prod_env": "wire-webapp-staging-al2" }
+            }
+
       - name: Build
-        if: |
-          github.event_name != 'pull_request' ||
-          env.BUILD_DESKTOP == 'true'
+        if: env.prod_env || env.dev_env
         run: yarn build:prod
 
       - name: Assembling release information
@@ -109,33 +130,16 @@ jobs:
           name: release-info.json
           path: ./release-info.json
 
-      # https://wire-webapp-avs.zinfra.io/
-      - name: Deploy avs build to Elastic Beanstalk
-        if: env.BRANCH_NAME == 'avs'
-        uses: einaregilsson/beanstalk-deploy@v21
-        with:
-          application_name: ${{env.AWS_APPLICATION_NAME}}
-          aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
-          aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
-          deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
-          environment_name: wire-webapp-avs
-          region: eu-central-1
-          use_existing_version_if_available: true
-          version_description: ${{github.sha}}
-          version_label: ${{github.run_id}}
-          wait_for_deployment: false
-          wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
-
       # Stage 1: https://wire-webapp-edge.zinfra.io/
-      - name: Deploy edge build to Elastic Beanstalk
-        if: env.BRANCH_NAME == 'edge'
+      - name: Deploy to dev env
+        if: env.dev_env
         uses: einaregilsson/beanstalk-deploy@v21
         with:
           application_name: ${{env.AWS_APPLICATION_NAME}}
           aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
           aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
           deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
-          environment_name: wire-webapp-edge
+          environment_name: ${{env.dev_env}}
           region: eu-central-1
           use_existing_version_if_available: true
           version_description: ${{github.sha}}
@@ -143,105 +147,19 @@ jobs:
           wait_for_deployment: false
           wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
 
-      # Stage 2: https://wire-webapp-dev.zinfra.io/
-      - name: Deploy dev build to Elastic Beanstalk
-        if: env.BRANCH_NAME == 'dev'
+      - name: Deploy to prod env
+        if: env.prod_env
         uses: einaregilsson/beanstalk-deploy@v21
         with:
           application_name: ${{env.AWS_APPLICATION_NAME}}
           aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
           aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
           deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
-          environment_name: wire-webapp-dev
-          region: eu-central-1
-          use_existing_version_if_available: true
-          version_description: ${{github.sha}}
-          version_label: ${{github.run_id}}
-          wait_for_deployment: false
-          wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
-
-      # Stage 3: https://wire-webapp-staging.zinfra.io/
-      - name: Deploy staging build to Elastic Beanstalk
-        if: contains(env.TAG, 'staging')
-        uses: einaregilsson/beanstalk-deploy@v21
-        with:
-          application_name: ${{env.AWS_APPLICATION_NAME}}
-          aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
-          aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
-          deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
-          environment_name: wire-webapp-staging
+          environment_name: ${{env.prod_env}}
           region: eu-central-1
           use_existing_version_if_available: true
           version_description: ${{github.sha}}
           version_label: ${{env.TAG}}-${{github.run_id}}
-          wait_for_deployment: false
-          wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
-
-      # Stage 4: https://wire-webapp-master.zinfra.io/
-      - name: Deploy master build to Elastic Beanstalk
-        if: env.BRANCH_NAME == 'master'
-        uses: einaregilsson/beanstalk-deploy@v21
-        with:
-          application_name: ${{env.AWS_APPLICATION_NAME}}
-          aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
-          aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
-          deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
-          environment_name: wire-webapp-master
-          region: eu-central-1
-          use_existing_version_if_available: true
-          version_description: ${{github.sha}}
-          version_label: ${{github.run_id}}
-          wait_for_deployment: false
-          wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
-
-      # Stage 5: https://app.wire.com/
-      - name: Deploy production build to Elastic Beanstalk
-        if: contains(env.TAG, 'production')
-        uses: einaregilsson/beanstalk-deploy@v21
-        with:
-          application_name: ${{env.AWS_APPLICATION_NAME}}
-          aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
-          aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
-          deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
-          environment_name: wire-webapp-prod
-          region: eu-central-1
-          use_existing_version_if_available: true
-          version_description: ${{github.sha}}
-          version_label: ${{env.TAG}}-${{github.run_id}}
-          wait_for_deployment: false
-          wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
-
-      # Stage 6: https://mobile.wire.com
-      - name: Deploy mobile build to Elastic Beanstalk
-        if: env.BRANCH_NAME == 'mobile'
-        uses: einaregilsson/beanstalk-deploy@v21
-        with:
-          application_name: ${{env.AWS_APPLICATION_NAME}}
-          aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
-          aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
-          deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
-          environment_name: wire-webapp-mobile
-          region: eu-central-1
-          use_existing_version_if_available: true
-          version_description: ${{github.sha}}
-          version_label: ${{github.run_id}}
-          wait_for_deployment: false
-          wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
-
-      # Stage 7: https://wire-webapp-qa.zinfra.io/
-      - name: Deploy acc build to Elastic Beanstalk
-        if: env.BRANCH_NAME == 'acc'
-        uses: einaregilsson/beanstalk-deploy@v21
-        with:
-          application_name: ${{env.AWS_APPLICATION_NAME}}
-          aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
-          aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
-          deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
-          environment_name: wire-webapp-acc
-          region: eu-central-1
-          use_existing_version_if_available: true
-          version_description: ${{github.sha}}
-          version_label: ${{github.run_id}}
           wait_for_deployment: false
           wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
 
@@ -272,7 +190,7 @@ jobs:
 
       - name: Generate changelog for production release
         if: contains(env.TAG, 'production')
-        run: yarn changelog:ci
+        run: yarn changelog:production
 
       - name: Create GitHub production release
         id: create_release_production
@@ -284,6 +202,7 @@ jobs:
           tag_name: ${{env.TAG}}
           name: ${{env.TAG}}
           body_path: ./CHANGELOG.md
+          files: ./unit-tests.log
           draft: false
           prerelease: false
 
@@ -298,7 +217,7 @@ jobs:
 
       - name: Generate changelog for staging release
         if: contains(env.TAG, 'staging')
-        run: yarn changelog:dev
+        run: yarn changelog:staging
 
       - name: Create GitHub staging release
         id: create_release_staging
@@ -309,6 +228,8 @@ jobs:
         with:
           tag_name: ${{env.TAG}}
           name: ${{env.TAG}}
+          body_path: ./CHANGELOG.md
+          files: ./unit-tests.log
           draft: false
           prerelease: true
 
@@ -319,7 +240,6 @@ jobs:
           email: ${{secrets.WIRE_BOT_EMAIL}}
           password: ${{secrets.WIRE_BOT_PASSWORD}}
           conversation: '697c93e8-0b13-4204-a35e-59270462366a'
-          send_gif: 'in the oven'
           send_text: 'Staging bump for commit **${{github.sha}}** ("${{env.TITLE}}") done! 🏁'
 
       - name: Notify CI error
@@ -387,7 +307,7 @@ jobs:
       - name: Creating Pull Request
         id: create-pr
         if: ${{ steps.release-info-file.outputs.exists == 'true' }}
-        uses: peter-evans/create-pull-request@v4
+        uses: peter-evans/create-pull-request@v5
         with:
           draft: false
           token: ${{ secrets.ZEBOT_GH_TOKEN }}

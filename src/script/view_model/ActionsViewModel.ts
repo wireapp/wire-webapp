@@ -17,6 +17,7 @@
  *
  */
 
+import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
@@ -34,7 +35,6 @@ import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
 import type {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
 import type {User} from '../entity/User';
-import {BackendClientError} from '../error/BackendClientError';
 import type {IntegrationRepository} from '../integration/IntegrationRepository';
 import type {ServiceEntity} from '../integration/ServiceEntity';
 import {UserState} from '../user/UserState';
@@ -110,8 +110,8 @@ export class ActionsViewModel {
     return new Promise(resolve => {
       PrimaryModal.show(PrimaryModal.type.CONFIRM, {
         primaryAction: {
-          action: () => {
-            this.connectionRepository.cancelRequest(userEntity, hideConversation, nextConversationEntity);
+          action: async () => {
+            await this.connectionRepository.cancelRequest(userEntity, hideConversation, nextConversationEntity);
             resolve();
           },
           text: t('modalConnectCancelAction'),
@@ -157,8 +157,8 @@ export class ActionsViewModel {
 
     return new Promise<void>(resolve => {
       const expectedErrors = {
-        [BackendClientError.LABEL.BAD_REQUEST]: t('BackendError.LABEL.BAD_REQUEST'),
-        [BackendClientError.LABEL.INVALID_CREDENTIALS]: t('BackendError.LABEL.INVALID_CREDENTIALS'),
+        [BackendErrorLabel.BAD_REQUEST]: t('BackendError.LABEL.BAD_REQUEST'),
+        [BackendErrorLabel.INVALID_CREDENTIALS]: t('BackendError.LABEL.INVALID_CREDENTIALS'),
       };
       let isSending = false;
       PrimaryModal.show(
@@ -177,7 +177,14 @@ export class ActionsViewModel {
                 } catch (error) {
                   if (isBackendError(error)) {
                     const {updateErrorMessage} = usePrimaryModalState.getState();
-                    updateErrorMessage(expectedErrors[error.label] || error.message);
+                    if (
+                      error.label === BackendErrorLabel.BAD_REQUEST ||
+                      error.label === BackendErrorLabel.INVALID_CREDENTIALS
+                    ) {
+                      updateErrorMessage(expectedErrors[error.label]);
+                    } else {
+                      updateErrorMessage(error.message);
+                    }
                   }
                 } finally {
                   isSending = false;
@@ -203,8 +210,8 @@ export class ActionsViewModel {
       return new Promise(resolve => {
         PrimaryModal.show(PrimaryModal.type.CONFIRM, {
           primaryAction: {
-            action: () => {
-              this.messageRepository.deleteMessage(conversationEntity, messageEntity);
+            action: async () => {
+              await this.messageRepository.deleteMessage(conversationEntity, messageEntity);
               resolve();
             },
             text: t('modalConversationDeleteMessageAction'),
@@ -226,8 +233,8 @@ export class ActionsViewModel {
       return new Promise(resolve => {
         PrimaryModal.show(PrimaryModal.type.CONFIRM, {
           primaryAction: {
-            action: () => {
-              this.messageRepository.deleteMessageForEveryone(conversationEntity, messageEntity);
+            action: async () => {
+              await this.messageRepository.deleteMessageForEveryone(conversationEntity, messageEntity);
               resolve();
             },
             text: t('modalConversationDeleteMessageEveryoneAction'),
@@ -259,8 +266,8 @@ export class ActionsViewModel {
     return new Promise(resolve => {
       PrimaryModal.show(PrimaryModal.type.OPTION, {
         primaryAction: {
-          action: (clearContent = false) => {
-            this.conversationRepository.removeMember(
+          action: async (clearContent = false) => {
+            await this.conversationRepository.removeMember(
               conversationEntity,
               this.userState.self().qualifiedId,
               clearContent,
@@ -311,7 +318,7 @@ export class ActionsViewModel {
     throw new Error(`Cannot find or create 1:1 conversation with user ID "${userEntity.id}".`);
   };
 
-  open1to1Conversation = (conversationEntity: Conversation): void => {
+  open1to1Conversation = (conversationEntity: Conversation): Promise<void> => {
     return this.openConversation(conversationEntity);
   };
 
@@ -330,9 +337,9 @@ export class ActionsViewModel {
     return this.openConversation(conversationEntity);
   };
 
-  private readonly openConversation = (conversationEntity: Conversation): void => {
+  private readonly openConversation = async (conversationEntity: Conversation): Promise<void> => {
     if (conversationEntity.is_archived()) {
-      this.conversationRepository.unarchiveConversation(conversationEntity, true);
+      await this.conversationRepository.unarchiveConversation(conversationEntity, true);
     }
 
     if (conversationEntity.is_cleared()) {
@@ -382,12 +389,12 @@ export class ActionsViewModel {
     return this.connectionRepository.createConnection(userEntity);
   };
 
-  readonly toggleMuteConversation = (conversationEntity: Conversation): void => {
+  readonly toggleMuteConversation = async (conversationEntity: Conversation): Promise<void> => {
     if (conversationEntity) {
       const notificationState = conversationEntity.showNotificationsEverything()
         ? NOTIFICATION_STATE.NOTHING
         : NOTIFICATION_STATE.EVERYTHING;
-      this.conversationRepository.setNotificationState(conversationEntity, notificationState);
+      await this.conversationRepository.setNotificationState(conversationEntity, notificationState);
     }
   };
 
@@ -404,7 +411,7 @@ export class ActionsViewModel {
             const conversationEntity = await this.conversationRepository.get1To1Conversation(userEntity);
             resolve();
             if (typeof conversationEntity !== 'boolean') {
-              this.conversationRepository.updateParticipatingUserEntities(conversationEntity);
+              await this.conversationRepository.updateParticipatingUserEntities(conversationEntity);
             }
           },
           text: t('modalUserUnblockAction'),

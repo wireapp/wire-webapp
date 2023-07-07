@@ -22,7 +22,6 @@ import {container, singleton} from 'tsyringe';
 
 import {Account} from '@wireapp/core';
 
-import {getStorage} from 'Util/localStorage';
 import {isTemporaryClientAndNonPersistent, supportsCoreCryptoProteus, supportsMLS} from 'Util/util';
 
 import {APIClient} from './APIClientSingleton';
@@ -32,15 +31,22 @@ import {Config} from '../Config';
 
 declare global {
   interface Window {
-    systemCrypto?: {
-      decrypt: (value: Uint8Array) => Promise<Uint8Array>;
-      encrypt: (encrypted: Uint8Array) => Promise<Uint8Array>;
-    };
+    systemCrypto?:
+      | {
+          encrypt: (value: Uint8Array) => Promise<Uint8Array>;
+          decrypt: (payload: Uint8Array) => Promise<Uint8Array>;
+          version: undefined;
+        }
+      | {
+          encrypt: (value: string) => Promise<Uint8Array>;
+          decrypt: (payload: Uint8Array) => Promise<string>;
+          version: 1;
+        };
   }
 }
 
 @singleton()
-export class Core extends Account<Uint8Array> {
+export class Core extends Account {
   constructor(apiClient = container.resolve(APIClient)) {
     super(apiClient, {
       createStore: (storeName, context) => {
@@ -66,7 +72,7 @@ export class Core extends Account<Uint8Array> {
          */
         systemCrypto: window.systemCrypto,
 
-        useCoreCrypto: getStorage()?.getItem('useCoreCrypto') === '1',
+        useCoreCrypto: Config.getConfig().FEATURE.USE_CORE_CRYPTO,
       },
       nbPrekeys: 100,
     });

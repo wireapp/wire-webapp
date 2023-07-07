@@ -75,7 +75,7 @@ export const useKoSubscribableChildren = <
 >(
   parent: P,
   children: C[],
-): UnwrappedValues<P> => {
+): UnwrappedValues<Pick<P, C>> => {
   const [state, setState] = useState<UnwrappedValues<P>>(resolveObservables(parent, children));
   useEffect(() => {
     const subscription = subscribeProperties(

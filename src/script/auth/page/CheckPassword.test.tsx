@@ -18,13 +18,13 @@
  */
 
 import {fireEvent, waitFor} from '@testing-library/dom';
+import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {act} from 'react-dom/test-utils';
 
 import {CheckPassword} from './CheckPassword';
 
 import {actionRoot} from '../module/action';
-import {BackendError} from '../module/action/BackendError';
 import {initialRootState} from '../module/reducer';
 import {ROUTE} from '../route';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
@@ -87,7 +87,7 @@ describe('CheckPassword', () => {
   });
 
   it('handles invalid credentials', async () => {
-    const error = new BackendError({code: HTTP_STATUS.NOT_FOUND, label: BackendError.LABEL.INVALID_CREDENTIALS});
+    const error = new BackendError('', BackendErrorLabel.INVALID_CREDENTIALS, HTTP_STATUS.NOT_FOUND);
     spyOn(actionRoot.authAction, 'doLogin').and.returnValue(() => Promise.reject(error));
 
     const {getByTestId} = mountComponent(
@@ -118,7 +118,7 @@ describe('CheckPassword', () => {
     });
     await waitFor(() => {
       const errorMessage = getByTestId('error-message');
-      expect(errorMessage.dataset.uieValue).toEqual(BackendError.LABEL.INVALID_CREDENTIALS);
+      expect(errorMessage.dataset.uieValue).toEqual(BackendErrorLabel.INVALID_CREDENTIALS);
     });
   });
 
@@ -126,7 +126,7 @@ describe('CheckPassword', () => {
     const history = window.history;
     const historyPushSpy = spyOn(history, 'pushState');
 
-    const error = new BackendError({code: HTTP_STATUS.NOT_FOUND, label: BackendError.LABEL.TOO_MANY_CLIENTS});
+    const error = new BackendError('', BackendErrorLabel.TOO_MANY_CLIENTS, HTTP_STATUS.NOT_FOUND);
     spyOn(actionRoot.authAction, 'doLogin').and.returnValue(() => Promise.reject(error));
 
     const {getByTestId} = mountComponent(

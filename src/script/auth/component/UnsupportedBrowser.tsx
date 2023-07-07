@@ -84,7 +84,6 @@ export const UnsupportedBrowserComponent = ({
           ) : (
             <H3 css={{marginBottom: 10}} data-uie-name="element-unsupported-general">
               {_(unsupportedStrings.subheadBrowser, {
-                // eslint-disable-next-line react/display-name
                 strong: (...chunks: any[]) => <strong style={{fontWeight: 800}}>{chunks}</strong>,
               })}
             </H3>

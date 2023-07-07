@@ -27,7 +27,7 @@ import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
-import {EventRecord} from '../../storage/record/EventRecord';
+import {LegacyEventRecord} from '../../storage/record/EventRecord';
 import type {UserRepository} from '../../user/UserRepository';
 import {UserState} from '../../user/UserState';
 import {ClientEvent} from '../Client';
@@ -61,20 +61,20 @@ export class ServiceMiddleware {
     this.logger = getLogger('ServiceMiddleware');
   }
 
-  processEvent(event: EventRecord<HandledEvents>): Promise<EventRecord> {
+  processEvent(event: LegacyEventRecord<HandledEvents>): Promise<LegacyEventRecord> {
     switch (event.type) {
       case ClientEvent.CONVERSATION.ONE2ONE_CREATION:
-        return this._process1To1ConversationCreationEvent(event as EventRecord<One2OneCreationEvent>);
+        return this._process1To1ConversationCreationEvent(event as LegacyEventRecord<One2OneCreationEvent>);
 
       case CONVERSATION_EVENT.MEMBER_JOIN:
-        return this._processMemberJoinEvent(event as EventRecord<MemberJoinEvent>);
+        return this._processMemberJoinEvent(event as LegacyEventRecord<MemberJoinEvent>);
 
       default:
         return Promise.resolve(event);
     }
   }
 
-  private async _processMemberJoinEvent(event: EventRecord<MemberJoinEvent>) {
+  private async _processMemberJoinEvent(event: LegacyEventRecord<MemberJoinEvent>) {
     this.logger.info(`Preprocessing event of type ${event.type}`);
 
     const {conversation: conversationId, qualified_conversation, data: eventData} = event;
@@ -100,7 +100,7 @@ export class ServiceMiddleware {
     return userIds;
   }
 
-  private async _process1To1ConversationCreationEvent(event: EventRecord<One2OneCreationEvent>) {
+  private async _process1To1ConversationCreationEvent(event: LegacyEventRecord<One2OneCreationEvent>) {
     this.logger.info(`Preprocessing event of type ${event.type}`);
     const hasService = await this._containsService(event.data.userIds);
     return hasService ? this._decorateWithHasServiceFlag(event) : event;
@@ -111,7 +111,7 @@ export class ServiceMiddleware {
     return userEntities.some(userEntity => userEntity.isService);
   }
 
-  private _decorateWithHasServiceFlag(event: EventRecord) {
+  private _decorateWithHasServiceFlag(event: LegacyEventRecord) {
     const updatedData = {...event.data, has_service: true};
     return {...event, data: updatedData};
   }

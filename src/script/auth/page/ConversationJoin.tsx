@@ -20,6 +20,7 @@
 import React, {useEffect, useState} from 'react';
 
 import type {RegisterData} from '@wireapp/api-client/lib/auth';
+import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {Navigate} from 'react-router-dom';
@@ -53,7 +54,6 @@ import {UnsupportedBrowser} from '../component/UnsupportedBrowser';
 import {WirelessContainer} from '../component/WirelessContainer';
 import {EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
-import {BackendError} from '../module/action/BackendError';
 import {ValidationError} from '../module/action/ValidationError';
 import {bindActionCreators, RootState} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
@@ -84,12 +84,13 @@ const ConversationJoinComponent = ({
   const [accentColor] = useState(AccentColor.random());
   const [conversationCode, setConversationCode] = useState<string>();
   const [conversationKey, setConversationKey] = useState<string>();
-  const [enteredName, setEnteredName] = useState<string>();
+  const [enteredName, setEnteredName] = useState<string>('');
   const [error, setError] = useState<any>();
   const [expiresIn, setExpiresIn] = useState<number>();
   const [forceNewTemporaryGuestAccount, setForceNewTemporaryGuestAccount] = useState(false);
   const [isValidLink, setIsValidLink] = useState(true);
   const [isValidName, setIsValidName] = useState(true);
+  const [isSubmitingName, setIsSubmitingName] = useState(false);
   const [showCookiePolicyBanner, setShowCookiePolicyBanner] = useState(true);
   const [showEntropyForm, setShowEntropyForm] = useState(false);
   const isEntropyRequired = Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY;
@@ -123,6 +124,7 @@ const ConversationJoinComponent = ({
   };
 
   const handleSubmit = async (entropyData?: Uint8Array) => {
+    setIsSubmitingName(true);
     try {
       const name = enteredName?.trim();
       const registrationData = {
@@ -144,8 +146,9 @@ const ConversationJoinComponent = ({
        */
       await setLastEventDate(new Date(conversationEvent.time));
 
-      routeToApp(conversationEvent.conversation, conversationEvent.qualified_conversation?.domain);
+      routeToApp(conversationEvent.conversation, conversationEvent.qualified_conversation?.domain ?? '');
     } catch (error) {
+      setIsSubmitingName(false);
       if (error.label) {
         switch (error.label) {
           default: {
@@ -170,16 +173,18 @@ const ConversationJoinComponent = ({
     }
   };
 
-  const checkNameValidity = (event: React.FormEvent) => {
+  const checkNameValidity = async (event: React.FormEvent) => {
     event.preventDefault();
-    nameInput.current.value = nameInput.current?.value.trim() ?? '';
-    if (!nameInput.current.checkValidity()) {
-      setError(ValidationError.handleValidationState('name', nameInput.current.validity));
-      setIsValidName(false);
-    } else if (isEntropyRequired) {
-      setShowEntropyForm(true);
-    } else {
-      handleSubmit();
+    if (nameInput.current) {
+      nameInput.current.value = nameInput.current.value.trim();
+      if (!nameInput.current.checkValidity()) {
+        setError(ValidationError.handleValidationState('name', nameInput.current.validity));
+        setIsValidName(false);
+      } else if (isEntropyRequired) {
+        setShowEntropyForm(true);
+      } else {
+        await handleSubmit();
+      }
     }
   };
 
@@ -194,9 +199,7 @@ const ConversationJoinComponent = ({
   };
 
   const isFullConversation =
-    conversationError &&
-    conversationError.label &&
-    conversationError.label === BackendError.CONVERSATION_ERRORS.CONVERSATION_TOO_MANY_MEMBERS;
+    conversationError && conversationError.label && conversationError.label === BackendErrorLabel.TOO_MANY_MEMBERS;
   const renderTemporaryGuestAccountCreation = !isAuthenticated || isTemporaryGuest || forceNewTemporaryGuestAccount;
 
   if (!isValidLink) {
@@ -252,7 +255,7 @@ const ConversationJoinComponent = ({
                       data-uie-name="enter-name"
                     />
                     <RoundIconButton
-                      disabled={!enteredName || !isValidName}
+                      disabled={!enteredName || !isValidName || isSubmitingName}
                       type="submit"
                       formNoValidate
                       onClick={checkNameValidity}
@@ -295,11 +298,8 @@ const ConversationJoinComponent = ({
               style={{marginTop: 16}}
               onClick={async () => {
                 try {
-                  const conversationEvent = await doJoinConversationByCode(
-                    conversationKey ?? '',
-                    conversationCode ?? '',
-                  );
-                  routeToApp(conversationEvent.conversation, conversationEvent.qualified_conversation?.domain);
+                  const conversationEvent = await doJoinConversationByCode(conversationKey, conversationCode);
+                  routeToApp(conversationEvent.conversation, conversationEvent.qualified_conversation?.domain ?? '');
                 } catch (error) {
                   console.warn('Unable to join conversation with existing account', error);
                 }

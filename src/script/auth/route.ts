@@ -32,7 +32,9 @@ export const QUERY_KEY = {
   LOGOUT_REASON: 'reason',
   PERSIST_TEMPORARY_CLIENTS: 'persist_temporary_clients',
   SSO_AUTO_LOGIN: 'sso_auto_login',
+  SCOPE: 'scope',
   TRACKING: 'tracking',
+  TWO_FACTOR: '2fa',
 };
 
 export const FORWARDED_QUERY_KEYS = [
@@ -51,6 +53,7 @@ export const LOGOUT_REASON = {
 };
 
 export const ROUTE = {
+  AUTHORIZE: '/authorize',
   CHECK_PASSWORD: '/checkpassword',
   CLIENTS: '/clients',
   CONVERSATION_JOIN: '/join-conversation',

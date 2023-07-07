@@ -36,7 +36,7 @@ export const initialSelfState: SelfState = {
   fetched: false,
   fetching: false,
   hasPassword: false,
-  self: {assets: [], id: null, locale: null, name: null, team: null},
+  self: {assets: [], id: null, qualified_id: {id: '', domain: ''}, locale: null, name: null, team: null},
 };
 
 export function selfReducer(state: SelfState = initialSelfState, action: AppActions): SelfState {

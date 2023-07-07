@@ -35,10 +35,11 @@ export const hasAllowedExtension = (fileName: string): boolean => {
 };
 
 export const isAllowedFile = (name: string, type: string): boolean => {
-  const [imageFileExtensions, imageContentTypes] = partition(Config.getConfig().ALLOWED_IMAGE_TYPES, allowedImageType =>
+  const allowedImages = [...Config.getConfig().ALLOWED_IMAGE_TYPES];
+  const [imageFileExtensions, imageContentTypes] = partition(allowedImages, allowedImageType =>
     allowedImageType.startsWith('.'),
   );
-  if (imageContentTypes.includes(type)) {
+  if ((imageContentTypes as ReadonlyArray<string>).includes(type)) {
     return true;
   }
   const allowedExtensions = [...imageFileExtensions, ...Config.getConfig().FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS];

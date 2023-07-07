@@ -17,21 +17,21 @@
  *
  */
 
-import type Dexie from 'dexie';
+import Dexie from 'dexie';
 import DexieBatch from 'dexie-batch';
 import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
 
-import {StorageSchemata, StorageService} from '../storage';
+import {CONVERSATION} from '../event/Client';
+import {StorageService} from '../storage';
 
 export class BackupService {
   private readonly logger: Logger;
 
   static get CONFIG() {
     return {
-      BATCH_SIZE: 10_000,
-      SUPPORTED_TABLES: [StorageSchemata.OBJECT_STORE.CONVERSATIONS, StorageSchemata.OBJECT_STORE.EVENTS],
+      BATCH_SIZE: 5_000,
     };
   }
 
@@ -39,12 +39,11 @@ export class BackupService {
     this.logger = getLogger('BackupService');
   }
 
-  async exportTable(table: Dexie.Table<any, string>, onProgress: (batch: any[]) => void): Promise<void> {
+  async exportTable<T>(table: Dexie.Table<T, unknown>, onProgress: (batch: T[]) => void): Promise<void> {
     const collection = table.toCollection();
     const tableCount = await table.count();
     const parallelBatchDriver = new DexieBatch({batchSize: BackupService.CONFIG.BATCH_SIZE, limit: tableCount});
-    // TODO: The "collection as any" typing can be fixed once this is released: https://github.com/DefinitelyTyped/DefinitelyTyped/pull/51541
-    const batchCount = await parallelBatchDriver.eachBatch(collection as any, batch => onProgress(batch));
+    const batchCount = await parallelBatchDriver.eachBatch(collection, batch => onProgress(batch));
     this.logger.log(`Exported store '${table.name}' in '${batchCount}' batches`);
   }
 
@@ -60,20 +59,95 @@ export class BackupService {
     return recordsPerTable.reduce((accumulator, recordCount) => accumulator + recordCount, 0);
   }
 
-  getTables(): Dexie.Table<any, string>[] {
-    return this.storageService.getTables(BackupService.CONFIG.SUPPORTED_TABLES);
+  getTables() {
+    return [
+      this.storageService.db!.conversations,
+      this.storageService.db!.events,
+      this.storageService.db!.users,
+    ] as const;
   }
 
-  async importEntities(tableName: string, entities: any[]): Promise<void> {
-    // We don't want to set the primaryKey for the events table
-    const isEventsTable = tableName === StorageSchemata.OBJECT_STORE.EVENTS;
-    const primaryKeys = isEventsTable ? undefined : entities.map(entity => entity.id);
+  /**
+   * Will import all entities in the Database.
+   * If a primaryKey generator is given, it will only import the entities that are not already in the DB
+   *
+   * @param tableName the table to put the entities in
+   * @param entities the entities to insert
+   * @param generatePrimaryKey a function that will generate a primaryKey for the entity (will only add entities that are not in the DB)
+   */
+  async importEntities<T>(
+    tableName: string,
+    entities: T[],
+    {
+      generatePrimaryKey,
+      generateId,
+    }: {generatePrimaryKey?: (entry: T) => string; generateId?: (entry: T) => string} = {},
+  ): Promise<number> {
     if (this.storageService.db) {
-      await this.storageService.db.table(tableName).bulkPut(entities, primaryKeys);
-    } else {
-      for (const entity of entities) {
-        await this.storageService.save(tableName, entity.id, entity);
+      const table = await this.storageService.db.table(tableName);
+      if (generatePrimaryKey) {
+        return this.addByPrimaryKeys(table, entities, generatePrimaryKey);
       }
+      return this.addByIds(table, entities, generateId);
+    }
+
+    for (const entity of entities) {
+      const key = generatePrimaryKey ? generatePrimaryKey(entity) : undefined;
+      await this.storageService.save(tableName, key, entity);
+    }
+    return entities.length;
+  }
+
+  async getConversationCreationEvents() {
+    const events = await this.storageService
+      .db!.events.where('type')
+      .anyOf([CONVERSATION.ONE2ONE_CREATION, CONVERSATION.GROUP_CREATION])
+      .toArray();
+    return events;
+  }
+
+  /**
+   * Will add all the entities that are not already in the database (identified by their id)
+   */
+  private async addByIds<T>(
+    table: Dexie.Table<T, unknown>,
+    entities: T[],
+    generateId?: (entry: T) => string,
+  ): Promise<number> {
+    if (!generateId) {
+      await table.bulkAdd(entities);
+      return entities.length;
+    }
+
+    const ids = entities.map(generateId);
+    const existingEntities = await table.where('id').anyOf(ids).toArray();
+    const newEntities = entities.filter(
+      entity => !existingEntities.some(existingEntity => generateId(existingEntity) === generateId(entity)),
+    );
+    await table.bulkAdd(newEntities);
+
+    return newEntities.length;
+  }
+
+  /**
+   * Will bulk add the entities to the database ignoring the entries with primary keys that already exist
+   */
+  private async addByPrimaryKeys<T>(
+    table: Dexie.Table<T, unknown>,
+    entities: T[],
+    generatePrimaryKey: (entry: T) => string,
+  ): Promise<number> {
+    const primaryKeys = entities.map(generatePrimaryKey);
+    try {
+      await table.bulkAdd(entities, primaryKeys);
+      return entities.length;
+    } catch (error) {
+      if (error instanceof Dexie.BulkError) {
+        const {failures} = error;
+        const successCount = entities.length - failures.length;
+        return successCount;
+      }
+      throw error;
     }
   }
 }

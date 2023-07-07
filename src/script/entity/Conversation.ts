@@ -59,6 +59,7 @@ import {ConversationStatus} from '../conversation/ConversationStatus';
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
 import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
 import {ConversationError} from '../error/ConversationError';
+import {isContentMessage} from '../guards/Message';
 import {StatusType} from '../message/StatusType';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {TeamState} from '../team/TeamState';
@@ -114,6 +115,7 @@ export class Conversation {
   public readonly firstUserEntity: ko.PureComputed<User>;
   public readonly enforcedTeamMessageTimer: ko.PureComputed<number>;
   public readonly globalMessageTimer: ko.Observable<number | null>;
+  public readonly hasContentMessages: ko.Observable<boolean>;
   public readonly hasAdditionalMessages: ko.Observable<boolean>;
   public readonly hasGlobalMessageTimer: ko.PureComputed<boolean>;
   public readonly hasGuest: ko.PureComputed<boolean>;
@@ -156,6 +158,7 @@ export class Conversation {
   public readonly notificationState: ko.PureComputed<number>;
   public readonly participating_user_ets: ko.ObservableArray<User>;
   public readonly participating_user_ids: ko.ObservableArray<QualifiedId>;
+  public readonly allUserEntities: ko.PureComputed<User[]>;
   public readonly receiptMode: ko.Observable<RECEIPT_MODE>;
   public readonly removed_from_conversation: ko.PureComputed<boolean>;
   public readonly roles: ko.Observable<Record<string, string>>;
@@ -212,6 +215,11 @@ export class Conversation {
 
     this.participating_user_ets = ko.observableArray([]); // Does not include self user
     this.participating_user_ids = ko.observableArray([]); // Does not include self user
+    this.allUserEntities = ko.pureComputed(() => {
+      const selfUser = this.selfUser();
+      const selfUserArray = selfUser ? [selfUser] : [];
+      return selfUserArray.concat(this.participating_user_ets());
+    });
     this.selfUser = ko.observable();
     this.roles = ko.observable({});
 
@@ -322,14 +330,14 @@ export class Conversation {
         return undefined;
       }
 
-      return this.allUserEntities.every(userEntity => userEntity.is_verified());
+      return this.allUserEntities().every(userEntity => userEntity.is_verified());
     });
 
     this.legalHoldStatus = ko.observable(LegalHoldStatus.DISABLED);
 
     this.hasLegalHold = ko.computed(() => {
       const isInitialized = this.hasInitializedUsers();
-      const hasLegalHold = isInitialized && this.allUserEntities.some(userEntity => userEntity.isOnLegalHold());
+      const hasLegalHold = isInitialized && this.allUserEntities().some(userEntity => userEntity.isOnLegalHold());
 
       if (isInitialized) {
         this.legalHoldStatus(hasLegalHold ? LegalHoldStatus.ENABLED : LegalHoldStatus.DISABLED);
@@ -414,6 +422,11 @@ export class Conversation {
 
     this.hasAdditionalMessages = ko.observable(true);
 
+    // Since we release messages from memory when the conversation is not active, we use an observable to keep track of conversations with messages
+    this.hasContentMessages = ko.observable(
+      [...this.messages(), ...this.incomingMessages()].some(message => message.isContent()),
+    );
+
     this.messages_visible = ko
       .pureComputed(() => (!this.id ? [] : this.messages().filter(messageEntity => messageEntity.visible())))
       .extend({trackArrayChanges: true});
@@ -496,19 +509,19 @@ export class Conversation {
      *
      * - Name of the other participant
      * - Name of the other user of the associated connection
-     * - "..." if neither of those has been attached yet
+     * - "Name not available" if neither of those has been attached yet
      *
      * 'Group Conversation':
      * - Conversation name received from backend
      * - If unnamed, we will create a name from the participant names
      * - Join the user's first names to a comma separated list or uses the user's first name if only one user participating
-     * - "..." if the user entities have not yet been attached yet
+     * - "..." if the user entities have not yet been attached
      */
     this.display_name = ko.pureComputed(() => {
       if (this.isRequest() || this.is1to1()) {
         const [userEntity] = this.participating_user_ets();
         const userName = userEntity?.name();
-        return userName || '…';
+        return userName || t('unavailableUser');
       }
 
       if (this.isGroup()) {
@@ -573,10 +586,6 @@ export class Conversation {
       this.type,
       this.verification_state,
     ].forEach(property => (property as ko.Observable).subscribe(this.persistState));
-  }
-
-  get allUserEntities() {
-    return [this.selfUser()].concat(this.participating_user_ets());
   }
 
   readonly persistState = (): void => {
@@ -674,6 +683,10 @@ export class Conversation {
       const editedMessage = () =>
         this._findDuplicate((messageEntity as ContentMessage).replacing_message_id, messageEntity.from);
       const alreadyAdded = messageWithLinkPreview() || editedMessage();
+
+      if (messageEntity.isContent()) {
+        this.hasContentMessages(true);
+      }
       if (alreadyAdded) {
         return false;
       }
@@ -844,8 +857,7 @@ export class Conversation {
     if (messageEntity) {
       const existingMessageEntity = this._findDuplicate(messageEntity.id, messageEntity.from);
       if (existingMessageEntity) {
-        const logData = {additionalMessage: messageEntity, existingMessage: existingMessageEntity};
-        this.logger.warn(`Filtered message '${messageEntity.id}' as duplicate in view`, logData);
+        this.logger.warn(`Filtered message '${messageEntity.id}' as duplicate in view`);
         return undefined;
       }
       return messageEntity;
@@ -889,7 +901,10 @@ export class Conversation {
     if (message_et) {
       const timestamp = message_et.timestamp();
       if (timestamp <= this.last_server_timestamp()) {
-        if (message_et.timestamp_affects_order()) {
+        // Some message do not bubble the conversation up in the conversation list (call messages for example or some system messages).
+        // Those should not update the conversation timestamp.
+        // This is ignored if the `forceUpdate` flag is set.
+        if (message_et.timestamp_affects_order() || forceUpdate) {
           this.setTimestamp(timestamp, TIMESTAMP_TYPE.LAST_EVENT, forceUpdate);
 
           const from_self = message_et.user()?.isMe;
@@ -975,7 +990,9 @@ export class Conversation {
    * @param messageId ID of message to be retrieved
    */
   getMessageByReplacementId(messageId: string): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
-    return this.messages().find(messageEntity => (messageEntity as ContentMessage)?.replacing_message_id === messageId);
+    return this.messages().find(
+      messageEntity => isContentMessage(messageEntity) && messageEntity.replacing_message_id === messageId,
+    );
   }
 
   updateGuests(): void {

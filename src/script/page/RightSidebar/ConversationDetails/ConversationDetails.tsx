@@ -29,7 +29,7 @@ import {EnrichedFields} from 'Components/panel/EnrichedFields';
 import {PanelActions} from 'Components/panel/PanelActions';
 import {ServiceDetails} from 'Components/panel/ServiceDetails';
 import {UserDetails} from 'Components/panel/UserDetails';
-import {ServiceList} from 'Components/ServiceList';
+import {ServiceList} from 'Components/ServiceList/ServiceList';
 import {UserSearchableList} from 'Components/UserSearchableList';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -139,9 +139,19 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
 
     const teamId = activeConversation.team_id;
 
-    const {isTeam, classifiedDomains, team} = useKoSubscribableChildren(teamState, [
+    const {
+      isTeam,
+      classifiedDomains,
+      team,
+      isSelfDeletingMessagesEnabled,
+      isSelfDeletingMessagesEnforced,
+      getEnforcedSelfDeletingMessagesTimeout,
+    } = useKoSubscribableChildren(teamState, [
       'isTeam',
       'classifiedDomains',
+      'isSelfDeletingMessagesEnabled',
+      'isSelfDeletingMessagesEnforced',
+      'getEnforcedSelfDeletingMessagesTimeout',
       'team',
     ]);
 
@@ -153,7 +163,8 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
     const showOptionGuests = isActiveGroupParticipant && !!teamId && roleRepository.canToggleGuests(activeConversation);
     const hasAdvancedNotifications = isMutable && isTeam;
     const showOptionNotificationsGroup = hasAdvancedNotifications && isGroup;
-    const showOptionTimedMessages = isActiveGroupParticipant && roleRepository.canToggleTimeout(activeConversation);
+    const showOptionTimedMessages =
+      isActiveGroupParticipant && roleRepository.canToggleTimeout(activeConversation) && isSelfDeletingMessagesEnabled;
     const showOptionServices =
       isActiveGroupParticipant && !!teamId && roleRepository.canToggleGuests(activeConversation);
     const showOptionReadReceipts = !!teamId && roleRepository.canToggleReadReceipts(activeConversation);
@@ -175,8 +186,11 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
     const servicesOptionsText = isServicesRoom ? t('conversationDetailsOn') : t('conversationDetailsOff');
 
     const notificationStatusText = getNotificationText(notificationState);
-    const timedMessagesText =
-      hasTimer && globalMessageTimer ? formatDuration(globalMessageTimer).text : t('ephemeralUnitsNone');
+    const timedMessagesText = isSelfDeletingMessagesEnforced
+      ? formatDuration(getEnforcedSelfDeletingMessagesTimeout).text
+      : hasTimer && globalMessageTimer
+      ? formatDuration(globalMessageTimer).text
+      : t('ephemeralUnitsNone');
 
     const showActionMute = isMutable && !isTeam;
     const isVerified = verificationState === ConversationVerificationState.VERIFIED;
@@ -257,6 +271,10 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
     );
 
     useEffect(() => {
+      conversationRepository.refreshUnavailableParticipants(activeConversation);
+    }, [activeConversation, conversationRepository]);
+
+    useEffect(() => {
       if (isTeam && isSingleUserMode) {
         teamRepository.updateTeamMembersByIds(team, [firstParticipant.id], true);
       }
@@ -290,6 +308,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
           {isSingleUserMode && !isServiceMode && firstParticipant && (
             <>
               <UserDetails
+                conversationDomain={activeConversation.domain}
                 participant={firstParticipant}
                 isVerified={isVerified}
                 isSelfVerified={isSelfVerified}
@@ -402,9 +421,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
 
                   <ServiceList
                     services={serviceParticipants}
-                    click={showService}
-                    noUnderline
-                    arrow
+                    onServiceClick={showService}
                     dataUieName="list-services"
                   />
                 </div>

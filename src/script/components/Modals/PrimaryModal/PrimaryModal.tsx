@@ -17,7 +17,7 @@
  *
  */
 
-import {FC, FormEvent, MouseEvent, useState, useRef, ChangeEvent} from 'react';
+import {FC, FormEvent, MouseEvent, useState, useRef, ChangeEvent, useEffect} from 'react';
 
 import cx from 'classnames';
 
@@ -26,6 +26,7 @@ import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
 import {ModalComponent} from 'Components/ModalComponent';
+import {isEscapeKey} from 'Util/KeyboardUtil';
 
 import {usePrimaryModalState, showNextModalInQueue, defaultContent, removeCurrentModal} from './PrimaryModalState';
 import {Action, PrimaryModalType} from './PrimaryModalTypes';
@@ -54,6 +55,7 @@ export const PrimaryModalComponent: FC = () => {
     secondaryAction,
     titleText,
     closeBtnTitle,
+    hideCloseBtn = false,
   } = content;
   const hasPassword = currentType === PrimaryModalType.PASSWORD;
   const hasInput = currentType === PrimaryModalType.INPUT;
@@ -110,30 +112,53 @@ export const PrimaryModalComponent: FC = () => {
 
   const secondaryActions = Array.isArray(secondaryAction) ? secondaryAction : [secondaryAction];
 
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isModalVisible) {
+      modalRef.current?.focus();
+    }
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (isEscapeKey(event) && isModalVisible) {
+        removeCurrentModal();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isModalVisible]);
+
   return (
-    <div id="modals" data-uie-name="primary-modals-container">
-      <ModalComponent
-        isShown={isModalVisible}
-        onClosed={onModalHidden}
-        aria-describedby="modal-description"
-        onBgClick={onBgClick}
-        data-uie-name={modalUie}
-      >
+    <div
+      id="modals"
+      data-uie-name="primary-modals-container"
+      role="dialog"
+      aria-modal="true"
+      aria-label={titleText}
+      tabIndex={-1}
+      ref={modalRef}
+    >
+      <ModalComponent isShown={isModalVisible} onClosed={onModalHidden} onBgClick={onBgClick} data-uie-name={modalUie}>
         {isModalVisible && (
           <>
             <div className="modal__header" data-uie-name="status-modal-title">
-              <h2 className="modal__header__title" id="modal-title">
-                {titleText}
-              </h2>
-              <button
-                type="button"
-                className="modal__header__button"
-                onClick={removeCurrentModal}
-                aria-label={closeBtnTitle}
-                data-uie-name="do-close"
-              >
-                <Icon.Close className="modal__header__icon" aria-hidden="true" />
-              </button>
+              {titleText && (
+                <h2 className="modal__header__title" id="modal-title">
+                  {titleText}
+                </h2>
+              )}
+              {!hideCloseBtn && (
+                <button
+                  type="button"
+                  className="modal__header__button"
+                  onClick={removeCurrentModal}
+                  aria-label={closeBtnTitle}
+                  data-uie-name="do-close"
+                >
+                  <Icon.Close className="modal__header__icon" aria-hidden="true" />
+                </button>
+              )}
             </div>
 
             <FadingScrollbar className="modal__body">

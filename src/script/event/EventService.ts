@@ -25,18 +25,18 @@ import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 import {getLogger, Logger} from 'Util/Logger';
 
 import {AssetTransferState} from '../assets/AssetTransferState';
-import {AssetData} from '../cryptography/CryptographyMapper';
 import {BaseError, BASE_ERROR_TYPE} from '../error/BaseError';
 import {ConversationError} from '../error/ConversationError';
 import {StorageError} from '../error/StorageError';
 import {categoryFromEvent} from '../message/MessageCategorization';
 import {MessageCategory} from '../message/MessageCategory';
-import {StorageService, DatabaseListenerCallback, EventRecord} from '../storage';
+import {StorageService, DatabaseListenerCallback, LegacyEventRecord, EventRecord} from '../storage';
 import {StorageSchemata} from '../storage/StorageSchemata';
 
 export type Includes = {includeFrom: boolean; includeTo: boolean};
 type DexieCollection = Dexie.Collection<any, any>;
 export type DBEvents = DexieCollection | EventRecord[];
+type IdentifiedUpdatePayload = Partial<EventRecord> & Pick<EventRecord, 'primary_key'>;
 
 export const eventTimeToDate = (time: string) => new Date(time) || new Date(parseInt(time, 10));
 
@@ -72,7 +72,7 @@ export class EventService {
         return events;
       }
 
-      const records = (await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS)) as EventRecord[];
+      const records = await this.storageService.getAll<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS);
       return records
         .filter(record => record.conversation === conversationId && eventIds.includes(record.id))
         .sort(compareEventsById);
@@ -102,7 +102,7 @@ export class EventService {
         return events;
       }
 
-      const records = (await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS)) as EventRecord[];
+      const records = await this.storageService.getAll<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS);
       return records
         .filter(record => record.conversation === conversationId && !!record.ephemeral_expires)
         .sort(compareEventsById);
@@ -119,7 +119,7 @@ export class EventService {
    * @param conversationId ID of conversation
    * @param eventId ID of event to retrieve
    */
-  async loadEvent(conversationId: string, eventId: string): Promise<EventRecord> {
+  async loadEvent(conversationId: string, eventId: string): Promise<EventRecord | undefined> {
     if (!conversationId || !eventId) {
       this.logger.error(`Cannot get event '${eventId}' in conversation '${conversationId}' without IDs`);
       throw new ConversationError(BASE_ERROR_TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER);
@@ -127,30 +127,58 @@ export class EventService {
 
     try {
       if (this.storageService.db) {
-        const entry = await this.storageService.db
+        const eventStore = this.storageService.db.table(StorageSchemata.OBJECT_STORE.EVENTS);
+        // First lookup the event by its direct id (using the index)
+        const event = eventStore.where('id').equals(eventId).first();
+        return (
+          event ||
+          // If the event was not found, fallback to filtering all the events and check if a `replacing` message is found
+          eventStore
+            .where('conversation')
+            .equals(conversationId)
+            .filter(item => item.data?.replacing_message_id === eventId || item.id === eventId)
+            .first()
+        );
+      }
+
+      const records = await this.storageService.getAll<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS);
+      return records
+        .filter(record => record.id === eventId && record.conversation === conversationId)
+        .sort(compareEventsById)
+        .shift();
+    } catch (error) {
+      const logMessage = `Failed to get event '${eventId}' for conversation '${conversationId}': ${error.message}`;
+      this.logger.error(logMessage, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Load a replacing event from database.
+   * To be used in certain cases (during some cases with quoting) when the original message cannot be found.
+   *
+   * @param conversationId ID of conversation
+   * @param eventId ID of event to retrieve
+   */
+  async loadReplacingEvent(conversationId: string, eventId: string): Promise<EventRecord> {
+    if (!conversationId || !eventId) {
+      this.logger.error(`Cannot get event '${eventId}' in conversation '${conversationId}' without IDs`);
+      throw new ConversationError(BASE_ERROR_TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER);
+    }
+
+    try {
+      if (this.storageService.db) {
+        return await this.storageService.db
           .table(StorageSchemata.OBJECT_STORE.EVENTS)
           .where('id')
           .equals(eventId)
           .filter(record => record.conversation === conversationId)
           .first();
-        if (entry) {
-          return entry;
-        }
-        return await this.storageService.db
-          .table(StorageSchemata.OBJECT_STORE.EVENTS)
-          .where('conversation')
-          .equals(conversationId)
-          .filter(item => item.data?.replacing_message_id === eventId)
-          .first();
       }
 
       const records = (await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS)) as EventRecord[];
       return records
-        .filter(
-          record =>
-            (record.id === eventId && record.conversation === conversationId) ||
-            (record.conversation === conversationId && record.data?.replacing_message_id === eventId),
-        )
+        .filter(record => record.conversation === conversationId && record.data?.replacing_message_id === eventId)
         .sort(compareEventsById)
         .shift();
     } catch (error) {
@@ -190,7 +218,7 @@ export class EventService {
       return events;
     }
 
-    const records = (await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS)) as EventRecord[];
+    const records = await this.storageService.getAll<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS);
     return records
       .filter(
         record =>
@@ -211,7 +239,7 @@ export class EventService {
       return events;
     }
 
-    const records = (await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS)) as EventRecord[];
+    const records = await this.storageService.getAll<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS);
     return records
       .filter(record => {
         return (
@@ -325,7 +353,7 @@ export class EventService {
       return events;
     }
 
-    const records = (await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS)) as EventRecord[];
+    const records = await this.storageService.getAll<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS);
     return records
       .filter(record => {
         const recordDate = eventTimeToDate(record.time).getTime();
@@ -345,22 +373,28 @@ export class EventService {
    *
    * @param event JSON event to be stored
    */
-  async saveEvent(event: EventRecord): Promise<EventRecord> {
-    event.category = categoryFromEvent(event);
-    event.primary_key = await this.storageService.save(StorageSchemata.OBJECT_STORE.EVENTS, undefined, event);
+  async saveEvent(event: Omit<EventRecord, 'primary_key' | 'category'>): Promise<EventRecord> {
+    const categorizedEvent = {
+      ...event,
+      category: categoryFromEvent(event as EventRecord),
+    };
+    const savedEvent: EventRecord = {
+      ...categorizedEvent,
+      primary_key: await this.storageService.save(StorageSchemata.OBJECT_STORE.EVENTS, undefined, categorizedEvent),
+    } as EventRecord;
     if (this.storageService.isTemporaryAndNonPersistent) {
       /**
        * Dexie supports auto-incrementing primary keys and saves those keys to a predefined column.
        * The SQLeetEngine also supports auto-incrementing primary keys but it does not save them to a predefined column, so we have to do that manually:
        */
-      await this.storageService.update(StorageSchemata.OBJECT_STORE.EVENTS, event.primary_key, {
-        primary_key: event.primary_key,
+      await this.storageService.update(StorageSchemata.OBJECT_STORE.EVENTS, savedEvent.primary_key, {
+        primary_key: savedEvent.primary_key,
       });
     }
-    return event;
+    return savedEvent;
   }
 
-  async replaceEvent<T extends Partial<EventRecord>>(event: T): Promise<T> {
+  async replaceEvent<T extends IdentifiedUpdatePayload>(event: T): Promise<T> {
     await this.storageService.update(StorageSchemata.OBJECT_STORE.EVENTS, event.primary_key, event);
     return event;
   }
@@ -383,12 +417,9 @@ export class EventService {
     primaryKey: string,
     reason: ProtobufAsset.NotUploaded | AssetTransferState,
   ): Promise<EventRecord | undefined> {
-    const record = await this.storageService.load<EventRecord<AssetData>>(
-      StorageSchemata.OBJECT_STORE.EVENTS,
-      primaryKey,
-    );
+    const record = await this.storageService.load<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey);
     if (!record) {
-      this.logger.warn('Did not find message to update asset (failed)', primaryKey);
+      this.logger.warn('Did not find message to update asset (failed)');
       return undefined;
     }
     record.data.reason = reason;
@@ -405,10 +436,7 @@ export class EventService {
    * @param primaryKey event's primary key
    * @param updates Updates to perform on the message.
    */
-  async updateEvent<T extends Partial<EventRecord>>(
-    primaryKey: string,
-    updates: T,
-  ): Promise<T & {primary_key: string}> {
+  async updateEvent<T extends Partial<EventRecord>>(primaryKey: string, updates: T): Promise<IdentifiedUpdatePayload> {
     const hasNoChanges = !updates || !Object.keys(updates).length;
     if (hasNoChanges) {
       throw new ConversationError(ConversationError.TYPE.NO_CHANGES, ConversationError.MESSAGE.NO_CHANGES);
@@ -438,7 +466,10 @@ export class EventService {
     if (this.storageService.db) {
       // Create a DB transaction to avoid concurrent sequential update.
       return this.storageService.db.transaction('rw', StorageSchemata.OBJECT_STORE.EVENTS, async () => {
-        const record = await this.storageService.load<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey);
+        const record = await this.storageService.load<LegacyEventRecord>(
+          StorageSchemata.OBJECT_STORE.EVENTS,
+          primaryKey,
+        );
         if (!record) {
           throw new StorageError(StorageError.TYPE.NOT_FOUND, StorageError.MESSAGE.NOT_FOUND);
         }

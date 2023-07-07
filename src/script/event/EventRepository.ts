@@ -17,14 +17,20 @@
  *
  */
 
-import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/lib/event/';
+import {
+  CONVERSATION_EVENT,
+  USER_EVENT,
+  ConversationOtrMessageAddEvent,
+  ConversationMLSMessageAddEvent,
+} from '@wireapp/api-client/lib/event';
+import type {BackendEvent} from '@wireapp/api-client/lib/event';
 import {NotificationSource, HandledEventPayload} from '@wireapp/core/lib/notification';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
 import {Account, ConnectionState, ProcessedEventPayload} from '@wireapp/core';
-import {Asset as ProtobufAsset, GenericMessage} from '@wireapp/protocol-messaging';
+import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {getLogger, Logger} from 'Util/Logger';
@@ -42,16 +48,19 @@ import type {NotificationService} from './NotificationService';
 
 import {AssetTransferState} from '../assets/AssetTransferState';
 import type {ClientEntity} from '../client/ClientEntity';
-import {EventBuilder} from '../conversation/EventBuilder';
-import {AssetData, CryptographyMapper} from '../cryptography/CryptographyMapper';
+import {AssetAddEvent, ClientConversationEvent, EventBuilder, MessageAddEvent} from '../conversation/EventBuilder';
+import {CryptographyMapper} from '../cryptography/CryptographyMapper';
 import {CryptographyError} from '../error/CryptographyError';
 import {EventError} from '../error/EventError';
 import {categoryFromEvent} from '../message/MessageCategorization';
-import type {EventRecord} from '../storage';
+import {isEventRecordFailed, isEventRecordWithFederationError} from '../message/StatusType';
+import type {EventRecord, StoredEvent} from '../storage';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import {EventName} from '../tracking/EventName';
 import {UserState} from '../user/UserState';
 import {Warnings} from '../view_model/WarningsContainer';
+
+type IncomingEvent = BackendEvent | ClientConversationEvent;
 
 export class EventRepository {
   logger: Logger;
@@ -159,7 +168,7 @@ export class EventRepository {
 
   private readonly handleIncomingEvent = async (payload: HandledEventPayload, source: NotificationSource) => {
     try {
-      await this.handleEvent({...payload, event: payload.event as EventRecord}, source);
+      await this.handleEvent(payload, source);
     } catch (error) {
       if (source === EventSource.NOTIFICATION_STREAM) {
         this.logger.warn(`Failed to handle event of type "${event.type}": ${error.message}`, error);
@@ -231,21 +240,17 @@ export class EventRepository {
     }
   }
 
-  private getIsoDateFromEvent(event: EventRecord, defaultValue = false): string | void {
-    const {client, connection, time: eventDate, type: eventType} = event;
-
-    if (eventDate) {
-      return eventDate;
+  private getIsoDateFromEvent(event: IncomingEvent, defaultValue = false): string | void {
+    if ('time' in event && event.time) {
+      return event.time;
     }
 
-    const isTypeUserClientAdd = eventType === USER_EVENT.CLIENT_ADD;
-    if (isTypeUserClientAdd) {
-      return client.time;
+    if (event.type === USER_EVENT.CLIENT_ADD) {
+      return event.client.time;
     }
 
-    const isTypeUserConnection = eventType === USER_EVENT.CONNECTION;
-    if (isTypeUserConnection) {
-      return connection.lastUpdate;
+    if (event.type === USER_EVENT.CONNECTION) {
+      return event.connection.last_update;
     }
 
     if (defaultValue) {
@@ -288,7 +293,7 @@ export class EventRepository {
    * @param source Source of injection
    * @returns Resolves when the event has been processed
    */
-  async injectEvent(event: EventRecord, source: EventSource = EventSource.INJECTED): Promise<EventRecord | undefined> {
+  async injectEvent(event: ClientConversationEvent | IncomingEvent, source: EventSource = EventSource.INJECTED) {
     if (!event) {
       throw new EventError(EventError.TYPE.NO_EVENT, EventError.MESSAGE.NO_EVENT);
     }
@@ -298,13 +303,12 @@ export class EventRepository {
       source = EventRepository.SOURCE.INJECTED;
     }
 
-    const {conversation: conversationId, id = 'ID not specified', type} = event;
+    const conversationId = 'conversation' in event && event.conversation;
     const inSelfConversation = conversationId === this.userState.self().id;
     if (!inSelfConversation) {
-      this.logger.info(`Injected event ID '${id}' of type '${type}' with source '${source}'`, event);
-      return this.handleEvent({event}, source);
+      return this.processEvent(event, source);
     }
-    return event;
+    return undefined;
   }
 
   /**
@@ -313,15 +317,8 @@ export class EventRepository {
    * @param event Mapped event to be distributed
    * @param source Source of notification
    */
-  private async distributeEvent(event: EventRecord, source: EventSource): Promise<EventRecord> {
-    const {conversation: conversationId, from: userId, type} = event;
-
-    const hasIds = conversationId && userId;
-    const logMessage = hasIds
-      ? `Distributed '${type}' event for conversation '${conversationId}' from user '${userId}'`
-      : `Distributed '${type}' event`;
-    this.logger.info(logMessage, event);
-
+  private async distributeEvent(event: IncomingEvent, source: EventSource) {
+    const {type} = event;
     const [category] = type.split('.');
     switch (category) {
       case EVENT_TYPE.CALL:
@@ -352,11 +349,7 @@ export class EventRepository {
    * @param source Source of event
    * @returns Resolves with the saved record or the plain event if the event was skipped
    */
-  private handleEvent(
-    {event, decryptedData, decryptionError}: Omit<ProcessedEventPayload, 'event'> & {event: EventRecord},
-    source: EventSource,
-  ): Promise<EventRecord | undefined> {
-    const logObject = {eventJson: JSON.stringify(event), eventObject: event};
+  private async handleEvent({event, decryptedData, decryptionError}: ProcessedEventPayload, source: EventSource) {
     const validationResult = validateEvent(
       event as {time: string; type: CONVERSATION_EVENT | USER_EVENT},
       source,
@@ -364,30 +357,29 @@ export class EventRepository {
     );
     switch (validationResult) {
       default: {
-        return Promise.resolve(event as EventRecord);
+        return event;
       }
       case EventValidation.OUTDATED_TIMESTAMP: {
-        this.logger.info(`Ignored outdated event type: '${event.type}'`, logObject);
-        return Promise.resolve(event as EventRecord);
+        this.logger.warn(`Ignored outdated event type: '${event.type}'`);
+        return event;
       }
       case EventValidation.VALID:
-        return this.processEvent(event as EventRecord, source, decryptedData, decryptionError);
+        let eventToProcess: IncomingEvent | undefined = event;
+        if (event.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD || event.type === CONVERSATION_EVENT.MLS_MESSAGE_ADD) {
+          eventToProcess = await this.mapEncryptedEvent(event, {decryptedData, decryptionError});
+        }
+        if (!eventToProcess) {
+          return event;
+        }
+
+        return this.processEvent(eventToProcess, source);
     }
   }
 
-  /**
-   * Decrypts, saves and distributes an event received from the backend.
-   *
-   * @param event Backend event extracted from notification stream
-   * @param source Source of event
-   * @returns Resolves with the saved record or `true` if the event was skipped
-   */
-  private async processEvent(
-    event: EventRecord,
-    source: EventSource,
-    decryptedData?: GenericMessage,
-    decryptionError?: HandledEventPayload['decryptionError'],
-  ): Promise<EventRecord | undefined> {
+  private async mapEncryptedEvent(
+    event: ConversationOtrMessageAddEvent | ConversationMLSMessageAddEvent,
+    {decryptedData, decryptionError}: Pick<HandledEventPayload, 'decryptedData' | 'decryptionError'>,
+  ): Promise<IncomingEvent | undefined> {
     if (decryptionError) {
       this.logger.warn(`Decryption Error: (${decryptionError.code}) ${decryptionError.message}`, decryptionError);
       const ignoredCodes = [
@@ -400,14 +392,22 @@ export class EventRepository {
       amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.E2EE.FAILED_MESSAGE_DECRYPTION, {
         cause: decryptionError.code,
       });
-      event = EventBuilder.buildUnableToDecrypt(event, decryptionError);
+      return EventBuilder.buildUnableToDecrypt(event, decryptionError);
     }
     if (decryptedData) {
-      event = await new CryptographyMapper().mapGenericMessage(decryptedData, event);
-      if (!event) {
-        return undefined;
-      }
+      return await new CryptographyMapper().mapGenericMessage(decryptedData, event);
     }
+    return undefined;
+  }
+
+  /**
+   * Decrypts, saves and distributes an event received from the backend.
+   *
+   * @param event Backend event extracted from notification stream
+   * @param source Source of event
+   * @returns Resolves with the saved record or `true` if the event was skipped
+   */
+  private async processEvent(event: IncomingEvent | ClientConversationEvent, source: EventSource) {
     for (const eventProcessMiddleware of this.eventProcessMiddlewares) {
       event = await eventProcessMiddleware(event);
     }
@@ -428,7 +428,7 @@ export class EventRepository {
    * @param source Source of event
    * @returns The distributed event
    */
-  private handleEventDistribution(event: EventRecord, source: EventSource): Promise<EventRecord> {
+  private handleEventDistribution(event: IncomingEvent, source: EventSource) {
     const eventDate = this.getIsoDateFromEvent(event);
     const isInjectedEvent = source === EventRepository.SOURCE.INJECTED;
     const canSetEventDate = !isInjectedEvent && eventDate;
@@ -452,54 +452,51 @@ export class EventRepository {
    * @param event Backend event extracted from notification stream
    * @returns Resolves with the saved event
    */
-  private handleEventSaving(event: EventRecord): Promise<EventRecord | undefined> {
-    const conversationId = event.conversation;
-    const mappedData = event.data || {};
+  private async handleEventSaving(event: IncomingEvent) {
+    const conversationId = 'conversation' in event && event.conversation;
+    const mappedData = ('data' in event && event.data) ?? {};
 
     // first check if a message that should be replaced exists in DB
-    const findEventToReplacePromise = mappedData.replacing_message_id
-      ? this.eventService.loadEvent(conversationId, mappedData.replacing_message_id)
-      : Promise.resolve();
+    const eventToReplace = mappedData.replacing_message_id
+      ? await this.eventService.loadEvent(conversationId, mappedData.replacing_message_id)
+      : undefined;
 
-    return (findEventToReplacePromise as Promise<EventRecord>).then((eventToReplace: EventRecord) => {
-      const hasLinkPreview = mappedData.previews && mappedData.previews.length;
-      const isReplacementWithoutOriginal = !eventToReplace && mappedData.replacing_message_id;
-      if (isReplacementWithoutOriginal && !hasLinkPreview) {
-        // the only valid case of a replacement with no original message is when an edited message gets a link preview
-        this.throwValidationError(event, 'Edit event without original event');
-      }
+    const hasLinkPreview = mappedData.previews && mappedData.previews.length;
+    const isReplacementWithoutOriginal = !eventToReplace && mappedData.replacing_message_id;
+    if (isReplacementWithoutOriginal && !hasLinkPreview) {
+      // the only valid case of a replacement with no original message is when an edited message gets a link preview
+      this.throwValidationError(event, 'Edit event without original event');
+    }
 
-      const handleEvent = (newEvent: EventRecord) => {
-        // check for duplicates (same id)
-        const loadEventPromise = newEvent.id
-          ? this.eventService.loadEvent(conversationId, newEvent.id)
-          : Promise.resolve(undefined);
+    const handleEvent = async (newEvent: IncomingEvent) => {
+      // check for duplicates (same id)
+      const storedEvent = 'id' in newEvent ? await this.eventService.loadEvent(conversationId, newEvent.id) : undefined;
 
-        return loadEventPromise.then((storedEvent?: EventRecord) => {
-          return storedEvent
-            ? this.handleDuplicatedEvent(storedEvent, newEvent)
-            : this.eventService.saveEvent(newEvent);
-        });
-      };
+      return storedEvent
+        ? this.handleDuplicatedEvent(storedEvent, newEvent)
+        : this.eventService.saveEvent(newEvent as EventRecord);
+    };
 
-      return eventToReplace ? this.handleEventReplacement(eventToReplace, event) : handleEvent(event);
-    });
+    const canReplace =
+      eventToReplace?.type === ClientEvent.CONVERSATION.MESSAGE_ADD &&
+      event.type === ClientEvent.CONVERSATION.MESSAGE_ADD;
+    return canReplace && eventToReplace ? this.handleEventReplacement(eventToReplace, event) : handleEvent(event);
   }
 
-  private handleEventReplacement(originalEvent: EventRecord, newEvent: EventRecord): Promise<EventRecord> {
+  private handleEventReplacement(originalEvent: StoredEvent<MessageAddEvent>, newEvent: MessageAddEvent) {
     if (originalEvent.from !== newEvent.from) {
       const logMessage = `ID previously used by user '${newEvent.from}'`;
       const errorMessage = 'ID reused by other user';
       this.throwValidationError(newEvent, errorMessage, logMessage);
     }
-    const newData = newEvent.data || {};
+    const newData = newEvent.data;
     const primaryKeyUpdate = {primary_key: originalEvent.primary_key};
-    const isLinkPreviewEdit = newData.previews && !!newData.previews.length;
+    const isLinkPreviewEdit = newData?.previews && !!newData?.previews.length;
 
     const commonUpdates = EventRepository.getCommonMessageUpdates(originalEvent, newEvent);
 
     const specificUpdates = isLinkPreviewEdit
-      ? this.getUpdatesForLinkPreview(originalEvent, newEvent)
+      ? this.getUpdatesForMessage(originalEvent, newEvent)
       : EventRepository.getUpdatesForEditMessage(originalEvent, newEvent);
 
     const updates = {...specificUpdates, ...commonUpdates};
@@ -508,35 +505,41 @@ export class EventRepository {
     return this.eventService.replaceEvent(identifiedUpdates);
   }
 
-  private handleDuplicatedEvent(originalEvent: EventRecord, newEvent: EventRecord) {
+  private handleDuplicatedEvent(originalEvent: EventRecord, newEvent: IncomingEvent) {
     switch (newEvent.type) {
       case ClientEvent.CONVERSATION.ASSET_ADD:
         return this.handleAssetUpdate(originalEvent, newEvent);
 
       case ClientEvent.CONVERSATION.MESSAGE_ADD:
-        return this.handleLinkPreviewUpdate(originalEvent, newEvent);
+        return this.handleMessageUpdate(originalEvent, newEvent);
 
       default:
         this.throwValidationError(newEvent, `Forbidden type '${newEvent.type}' for duplicate events`);
     }
   }
 
-  private async handleAssetUpdate(
-    originalEvent: EventRecord<AssetData>,
-    newEvent: EventRecord<AssetData>,
-  ): Promise<EventRecord> {
+  private async handleAssetUpdate(originalEvent: EventRecord, newEvent: AssetAddEvent) {
     const newEventData = newEvent.data;
     // the preview status is not sent by the client so we fake a 'preview' status in order to cleanly handle it in the switch statement
     const ASSET_PREVIEW = 'preview';
+    // similarly, no status is sent by the client when we retry sending a failed message
+    const RETRY_EVENT = 'retry';
     const isPreviewEvent = !newEventData.status && !!newEventData.preview_key;
-    const previewStatus = isPreviewEvent ? ASSET_PREVIEW : newEventData.status;
+    const isRetryEvent = !!newEventData.content_length;
+    const handledEvent = isRetryEvent ? RETRY_EVENT : newEventData.status;
+    const previewStatus = isPreviewEvent ? ASSET_PREVIEW : handledEvent;
+
+    const updateEvent = () => {
+      const updatedData = {...originalEvent.data, ...newEventData};
+      const updatedEvent = {...originalEvent, data: updatedData};
+      return this.eventService.replaceEvent(updatedEvent);
+    };
 
     switch (previewStatus) {
       case ASSET_PREVIEW:
+      case RETRY_EVENT:
       case AssetTransferState.UPLOADED: {
-        const updatedData = {...originalEvent.data, ...newEventData};
-        const updatedEvent = {...originalEvent, data: updatedData};
-        return this.eventService.replaceEvent(updatedEvent);
+        return updateEvent();
       }
 
       case AssetTransferState.UPLOAD_FAILED: {
@@ -559,9 +562,10 @@ export class EventRepository {
     }
   }
 
-  private handleLinkPreviewUpdate(originalEvent: EventRecord, newEvent: EventRecord): Promise<EventRecord> {
+  private handleMessageUpdate(originalEvent: EventRecord, newEvent: MessageAddEvent) {
     const newEventData = newEvent.data;
     const originalData = originalEvent.data;
+
     if (originalEvent.from !== newEvent.from) {
       const logMessage = `ID previously used by user '${newEvent.from}'`;
       const errorMessage = 'ID reused by other user';
@@ -569,15 +573,18 @@ export class EventRepository {
     }
 
     const containsLinkPreview = newEventData.previews && !!newEventData.previews.length;
-    if (!containsLinkPreview) {
-      const errorMessage = 'Link preview event does not contain previews';
+    const isRetryAttempt = isEventRecordFailed(originalEvent) || isEventRecordWithFederationError(originalEvent);
+
+    if (!containsLinkPreview && !isRetryAttempt) {
+      const errorMessage =
+        'Message duplication event invalid: original message did not fail to send and does not contain link preview';
       return this.throwValidationError(newEvent, errorMessage);
     }
 
     const textContentMatches = newEventData.content === originalData.content;
     if (!textContentMatches) {
       const errorMessage = 'ID of link preview reused';
-      const logMessage = 'Text content for link preview not matching';
+      const logMessage = 'Text content for message duplication not matching';
       return this.throwValidationError(newEvent, errorMessage, logMessage);
     }
 
@@ -586,12 +593,12 @@ export class EventRepository {
       return this.throwValidationError(newEvent, 'ID reused by same user');
     }
 
-    const updates = this.getUpdatesForLinkPreview(originalEvent, newEvent);
+    const updates = this.getUpdatesForMessage(originalEvent, newEvent);
     const identifiedUpdates = {primary_key: originalEvent.primary_key, ...updates};
     return this.eventService.replaceEvent(identifiedUpdates);
   }
 
-  private static getCommonMessageUpdates(originalEvent: EventRecord, newEvent: EventRecord) {
+  private static getCommonMessageUpdates(originalEvent: StoredEvent<MessageAddEvent>, newEvent: MessageAddEvent) {
     return {
       ...newEvent,
       data: {...newEvent.data, expects_read_confirmation: originalEvent.data.expects_read_confirmation},
@@ -603,15 +610,12 @@ export class EventRepository {
     };
   }
 
-  private static getUpdatesForEditMessage(
-    originalEvent: EventRecord,
-    newEvent: EventRecord,
-  ): EventRecord & {reactions: {}} {
+  private static getUpdatesForEditMessage(originalEvent: EventRecord, newEvent: MessageAddEvent): MessageAddEvent {
     // Remove reactions, so that likes (hearts) don't stay when a message's text gets edited
     return {...newEvent, reactions: {}};
   }
 
-  private getUpdatesForLinkPreview(originalEvent: EventRecord, newEvent: EventRecord): EventRecord {
+  private getUpdatesForMessage(originalEvent: EventRecord, newEvent: MessageAddEvent) {
     const newData = newEvent.data;
     const originalData = originalEvent.data;
     const updatingLinkPreview = !!originalData.previews.length;
@@ -619,10 +623,10 @@ export class EventRepository {
       this.throwValidationError(newEvent, 'ID of link preview reused');
     }
 
-    const textContentMatches = !newData.previews.length || newData.content === originalData.content;
+    const textContentMatches = !newData.previews?.length || newData.content === originalData.content;
     if (!textContentMatches) {
-      const logMessage = 'Text content for link preview not matching';
-      const errorMessage = 'ID of link preview reused';
+      const logMessage = 'Text content for message duplication not matching';
+      const errorMessage = 'ID of duplicated message reused';
       this.throwValidationError(newEvent, errorMessage, logMessage);
     }
 
@@ -638,12 +642,12 @@ export class EventRepository {
     };
   }
 
-  private throwValidationError(event: EventRecord, errorMessage: string, logMessage?: string): never {
-    const baseLogMessage = `Ignored '${event.type}' (${event.id || 'no ID'}) in '${event.conversation}' from '${
-      event.from
-    }':'`;
-    const baseErrorMessage = 'Event validation failed:';
-    this.logger.warn(`${baseLogMessage} ${logMessage || errorMessage}`, event);
-    throw new EventError(EventError.TYPE.VALIDATION_FAILED, `${baseErrorMessage} ${errorMessage}`);
+  private throwValidationError(event: IncomingEvent, errorMessage: string, logMessage?: string): never {
+    const conversation = 'conversation' in event && event.conversation;
+    const from = 'from' in event && event.from;
+
+    const baseLogMessage = `Ignored '${event.type}' in '${conversation}' from '${from}''`;
+    this.logger.warn(`${baseLogMessage} ${logMessage || errorMessage}`);
+    throw new EventError(EventError.TYPE.VALIDATION_FAILED, `Event validation failed: ${errorMessage}`);
   }
 }

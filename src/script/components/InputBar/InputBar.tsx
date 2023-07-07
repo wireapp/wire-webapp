@@ -17,13 +17,12 @@
  *
  */
 
-import {ChangeEvent, FormEvent, KeyboardEvent as ReactKeyboardEvent, useEffect, useMemo, useRef, useState} from 'react';
+import {ChangeEvent, FormEvent, KeyboardEvent as ReactKeyboardEvent, useEffect, useRef, useState} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {Availability} from '@wireapp/protocol-messaging';
 import {useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -46,8 +45,8 @@ import {
   getMentionCandidate,
   updateMentionRanges,
 } from 'Util/MentionUtil';
-import {formatLocale, TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {getSelectionPosition} from 'Util/util';
+import {formatDuration, formatLocale, TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {getFileExtension, getSelectionPosition} from 'Util/util';
 
 import {ControlButtons} from './components/InputBarControls/ControlButtons';
 import {GiphyButton} from './components/InputBarControls/GiphyButton';
@@ -78,7 +77,6 @@ import {useAppMainState} from '../../page/state';
 import {SearchRepository} from '../../search/SearchRepository';
 import {StorageRepository} from '../../storage';
 import {TeamState} from '../../team/TeamState';
-import {UserState} from '../../user/UserState';
 
 const CONFIG = {
   ...Config.getConfig(),
@@ -95,7 +93,7 @@ interface InputBarProps {
   readonly searchRepository: SearchRepository;
   readonly storageRepository: StorageRepository;
   readonly teamState: TeamState;
-  readonly userState: UserState;
+  readonly selfUser: User;
   onShiftTab: () => void;
   uploadDroppedFiles: (droppedFiles: File[]) => void;
   uploadImages: (images: File[]) => void;
@@ -113,7 +111,7 @@ const InputBar = ({
   propertiesRepository,
   searchRepository,
   storageRepository,
-  userState = container.resolve(UserState),
+  selfUser,
   teamState = container.resolve(TeamState),
   onShiftTab,
   uploadDroppedFiles,
@@ -124,20 +122,18 @@ const InputBar = ({
     teamState,
     ['classifiedDomains', 'isSelfDeletingMessagesEnabled', 'isFileSharingSendingEnabled'],
   );
-  const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
-  const {inTeam} = useKoSubscribableChildren(selfUser, ['inTeam']);
   const {
     connection,
-    firstUserEntity,
     participating_user_ets: participatingUserEts,
+    allUserEntities: allUsers,
     localMessageTimer,
     messageTimer,
     hasGlobalMessageTimer,
     removed_from_conversation: removedFromConversation,
-    is1to1,
   } = useKoSubscribableChildren(conversationEntity, [
     'connection',
     'firstUserEntity',
+    'allUserEntities',
     'participating_user_ets',
     'localMessageTimer',
     'messageTimer',
@@ -145,7 +141,6 @@ const InputBar = ({
     'removed_from_conversation',
     'is1to1',
   ]);
-  const {availability} = useKoSubscribableChildren(firstUserEntity, ['availability']);
   const {isOutgoingRequest, isIncomingRequest} = useKoSubscribableChildren(connection, [
     'isOutgoingRequest',
     'isIncomingRequest',
@@ -173,21 +168,7 @@ const InputBar = ({
   const currentState = rightSidebar.history[lastItem];
   const isRightSidebarOpen = !!currentState;
 
-  const availabilityIsNone = availability === Availability.Type.NONE;
-  const showAvailabilityTooltip = firstUserEntity && inTeam && is1to1 && !availabilityIsNone;
-  const availabilityStrings: Record<string, string> = {
-    [Availability.Type.AVAILABLE]: t('userAvailabilityAvailable'),
-    [Availability.Type.AWAY]: t('userAvailabilityAway'),
-    [Availability.Type.BUSY]: t('userAvailabilityBusy'),
-  };
-
-  const inputPlaceholder = useMemo(() => {
-    if (showAvailabilityTooltip) {
-      return availabilityStrings[availability];
-    }
-
-    return messageTimer ? t('tooltipConversationEphemeral') : t('tooltipConversationInputPlaceholder');
-  }, [availability, messageTimer, showAvailabilityTooltip]); // eslint-disable-line react-hooks/exhaustive-deps
+  const inputPlaceholder = messageTimer ? t('tooltipConversationEphemeral') : t('tooltipConversationInputPlaceholder');
 
   const candidates = participatingUserEts.filter(userEntity => !userEntity.isService);
   const mentionSuggestions = editedMention ? searchRepository.searchUserInSet(editedMention.term, candidates) : [];
@@ -561,8 +542,18 @@ const InputBar = ({
     } else {
       sendMessage(messageText, updatedMentions);
     }
-
-    resetDraftState(true);
+    /*
+      When trying to update a textarea with japanese value to
+      empty in onKeyDown handler the text is not fully cleared
+      and some parts of text is pasted by the OS/Browser after
+      we do setInputValue('');
+      To fix this we have to add a setTimeout in order to postpone
+      the operation of clearing the text to after of the proccess
+      of the onKeyDown and onKeyUp DOM events.
+    */
+    setTimeout(() => {
+      resetDraftState(true);
+    }, 0);
     textareaRef.current?.focus();
   };
 
@@ -586,10 +577,13 @@ const InputBar = ({
 
   const handlePasteFiles = (files: FileList): void => {
     const [pastedFile] = files;
+    if (!pastedFile) {
+      return;
+    }
     const {lastModified} = pastedFile;
 
     const date = formatLocale(lastModified || new Date(), 'PP, pp');
-    const fileName = t('conversationSendPastedFile', date);
+    const fileName = `${t('conversationSendPastedFile', date)}.${getFileExtension(pastedFile.name)}`;
 
     const newFile = new File([pastedFile], fileName, {
       type: pastedFile.type,
@@ -782,7 +776,11 @@ const InputBar = ({
       {!!isTypingIndicatorEnabled && <TypingIndicator conversationId={conversationEntity.id} />}
 
       {classifiedDomains && !isConnectionRequest && (
-        <ClassifiedBar users={participatingUserEts} classifiedDomains={classifiedDomains} />
+        <ClassifiedBar
+          conversationDomain={conversationEntity.domain}
+          users={allUsers}
+          classifiedDomains={classifiedDomains}
+        />
       )}
 
       {isReplying && !isEditing && <ReplyBar replyMessageEntity={replyMessageEntity} onCancel={handleCancelReply} />}
@@ -819,7 +817,11 @@ const InputBar = ({
                     onBlur={() => setIsTyping(false)}
                     value={inputValue}
                     placeholder={inputPlaceholder}
-                    aria-label={inputPlaceholder}
+                    aria-label={
+                      messageTimer
+                        ? t('tooltipConversationEphemeralAriaLabel', {time: formatDuration(messageTimer).text})
+                        : inputPlaceholder
+                    }
                     data-uie-name="input-message"
                     dir="auto"
                   />

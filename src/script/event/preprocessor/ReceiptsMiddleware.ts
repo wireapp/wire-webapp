@@ -64,11 +64,10 @@ export class ReceiptsMiddleware {
       }
       case ClientEvent.CONVERSATION.CONFIRMATION: {
         const messageIds = event.data.more_message_ids.concat(event.data.message_id);
-        const originalEvents: EventRecord[] = await this.eventService.loadEvents(event.conversation, messageIds);
+        const originalEvents = await this.eventService.loadEvents(event.conversation, messageIds);
         originalEvents.forEach(originalEvent => this.updateConfirmationStatus(originalEvent, event));
         this.logger.info(
           `Confirmed '${originalEvents.length}' messages with status '${event.data.status}' from '${event.from}'`,
-          originalEvents,
         );
         return event;
       }
@@ -87,7 +86,7 @@ export class ReceiptsMiddleware {
     confirmationEvent: EventRecord,
   ): Promise<EventRecord | void> {
     const status = confirmationEvent.data.status;
-    const currentReceipts = originalEvent.read_receipts || [];
+    const currentReceipts = ('read_receipts' in originalEvent && originalEvent.read_receipts) || [];
 
     // I shouldn't receive this read receipt
     if (!this.isMyMessage(originalEvent)) {

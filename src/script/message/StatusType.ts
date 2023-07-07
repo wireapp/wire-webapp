@@ -17,12 +17,27 @@
  *
  */
 
+import {EventRecord} from '../storage/record/EventRecord';
+
 /** Enum for different confirmation types */
 export enum StatusType {
   DELIVERED = 3,
   FAILED = 0,
+  FEDERATION_ERROR = 5,
   SEEN = 4,
   SENDING = 1,
   SENT = 2,
   UNSPECIFIED = -1,
 }
+
+type FailedEventRecord = Omit<EventRecord, 'status'> & {
+  status: StatusType.FAILED;
+};
+type EventRecordWithFederationError = Omit<EventRecord, 'status'> & {
+  status: StatusType.FEDERATION_ERROR;
+};
+
+export const isEventRecordFailed = (event: any): event is FailedEventRecord =>
+  'status' in event && event.status === StatusType.FAILED;
+export const isEventRecordWithFederationError = (event: any): event is EventRecordWithFederationError =>
+  'status' in event && event.status === StatusType.FEDERATION_ERROR;

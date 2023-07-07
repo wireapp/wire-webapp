@@ -19,11 +19,10 @@
 
 import type {
   CONVERSATION_ACCESS_ROLE,
-  ClientMismatch,
   Conversation as BackendConversation,
   ConversationCode,
   CONVERSATION_ACCESS,
-  NewOTRMessage,
+  RemoteConversations,
 } from '@wireapp/api-client/lib/conversation';
 import type {
   ConversationJoinData,
@@ -46,11 +45,15 @@ import {container} from 'tsyringe';
 
 import {getLogger, Logger} from 'Util/Logger';
 
+import {MLSConversation} from './ConversationSelectors';
+
 import type {Conversation as ConversationEntity} from '../entity/Conversation';
 import type {EventService} from '../event/EventService';
 import {MessageCategory} from '../message/MessageCategory';
+import {useMLSConversationState} from '../mls';
 import {search as fullTextSearch} from '../search/FullTextSearch';
 import {APIClient} from '../service/APIClientSingleton';
+import {Core} from '../service/CoreSingleton';
 import {StorageService} from '../storage';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {StorageSchemata} from '../storage/StorageSchemata';
@@ -63,6 +66,7 @@ export class ConversationService {
     eventService: EventService,
     private readonly storageService = container.resolve(StorageService),
     private readonly apiClient = container.resolve(APIClient),
+    private readonly core = container.resolve(Core),
   ) {
     this.eventService = eventService;
     this.logger = getLogger('ConversationService');
@@ -86,6 +90,14 @@ export class ConversationService {
    */
   getConversationById({id, domain}: QualifiedId): Promise<BackendConversation> {
     return this.apiClient.api.conversation.getConversation({domain, id});
+  }
+
+  /**
+   * Get conversations for a list of conversation IDs.
+   * @see https://staging-nginz-https.zinfra.io/v4/api/swagger-ui/#/default/post_conversations_list
+   */
+  getConversationByIds(conversations: QualifiedId[]): Promise<RemoteConversations> {
+    return this.apiClient.api.conversation.getConversationsByQualifiedIds(conversations);
   }
 
   /**
@@ -280,43 +292,6 @@ export class ConversationService {
     return this.apiClient.api.conversation.postBot(conversationId, providerId, serviceId);
   }
 
-  /**
-   * Post an encrypted message to a conversation.
-   *
-   * @note If "recipients" are not specified you will receive a list of all missing OTR recipients (user-client-map).
-   * @note Options for the precondition check on missing clients are:
-   * - `false` - all clients
-   * - `Array<string>` - only clients of listed users
-   * - `true` - force sending
-   *
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/postOtrMessage
-   * @example How to send "recipients" payload
-   * "recipients": {
-   *   "<user-id>": {
-   *     "<client-id>": "<base64-encoded-encrypted-content>"
-   *   }
-   * }
-   *
-   * @param conversationId ID of conversation to send message in
-   * @param payload Payload to be posted
-   * @returns Promise that resolves when the message was sent
-   */
-  postEncryptedMessage(
-    conversationId: QualifiedId,
-    payload: NewOTRMessage<string>,
-    preconditionOption?: boolean | string[],
-  ): Promise<ClientMismatch> {
-    const reportMissing = Array.isArray(preconditionOption) ? preconditionOption : undefined;
-    const ignoreMissing = preconditionOption === true ? true : undefined;
-
-    if (reportMissing) {
-      payload.report_missing = reportMissing;
-    }
-
-    // TODO(federation): add domain in the postOTRMessage (?)
-    return this.apiClient.api.conversation.postOTRMessage(payload.sender, conversationId.id, payload, ignoreMissing);
-  }
-
   //##############################################################################
   // Database interactions
   //##############################################################################
@@ -325,10 +300,8 @@ export class ConversationService {
    * Deletes a conversation entity from the local database.
    * @returns Resolves when the entity was deleted
    */
-  async deleteConversationFromDb({id, domain}: QualifiedId): Promise<string> {
-    const key = domain ? `${id}@${domain}` : id;
-    const primaryKey = await this.storageService.delete(StorageSchemata.OBJECT_STORE.CONVERSATIONS, key);
-    return primaryKey;
+  async deleteConversationFromDb(conversationId: string): Promise<string> {
+    return this.storageService.delete(StorageSchemata.OBJECT_STORE.CONVERSATIONS, conversationId);
   }
 
   loadConversation<T>(conversationId: string): Promise<T | undefined> {
@@ -405,8 +378,8 @@ export class ConversationService {
 
     return this.storageService
       .save(StorageSchemata.OBJECT_STORE.CONVERSATIONS, conversation_et.id, conversationData)
-      .then(primary_key => {
-        this.logger.info(`State of conversation '${primary_key}' was stored`, conversationData);
+      .then(() => {
+        this.logger.info(`State of conversation '${conversation_et.id}' was stored`);
         return conversation_et;
       });
   }
@@ -426,5 +399,15 @@ export class ConversationService {
     return events
       .filter(record => record.ephemeral_expires !== true)
       .filter(({data: event_data}: any) => fullTextSearch(event_data.content, query));
+  }
+
+  /**
+   * Wipes MLS conversation in corecrypto and deletes the conversation state.
+   * @param mlsConversation mls conversation
+   */
+  async wipeMLSConversation(mlsConversation: MLSConversation) {
+    const {groupId} = mlsConversation;
+    await this.core.service!.conversation.wipeMLSConversation(groupId);
+    return useMLSConversationState.getState().wipeConversationState(groupId);
   }
 }

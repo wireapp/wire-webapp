@@ -20,15 +20,12 @@
 import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import type {AxiosError} from 'axios';
 
-import {isAxiosError, isBackendError, isQualifiedUserClientEntityMap} from 'Util/TypePredicateUtil';
-
-import {QualifiedUserClientEntityMap, UserClientEntityMap} from '../client';
+import {isAxiosError, isBackendError} from 'Util/TypePredicateUtil';
 
 describe('TypePredicateUtil', () => {
   describe('isAxiosError', () => {
     it('recognizes axios error structures', () => {
       const error: AxiosError = {
-        config: {},
         isAxiosError: true,
         message: 'Server Error',
         name: 'AxiosError',
@@ -64,24 +61,6 @@ describe('TypePredicateUtil', () => {
 
     it('does not fail when an error is a string', () => {
       const actual = isBackendError('Server Error');
-      expect(actual).toBeFalsy();
-    });
-  });
-
-  describe('isQualifiedUserClientEntityMap', () => {
-    it('recognizes a QualifiedUserClientEntityMap', () => {
-      const userId = '532af01e-1e24-4366-aacf-33b67d4ee376';
-      const usersMap: QualifiedUserClientEntityMap = {'example.com': {[userId]: []}};
-      const actual = isQualifiedUserClientEntityMap(usersMap);
-
-      expect(actual).toBeTruthy();
-    });
-
-    it('recognizes a UserClientEntityMap', () => {
-      const userId = '532af01e-1e24-4366-aacf-33b67d4ee376';
-      const usersMap: UserClientEntityMap = {[userId]: []};
-      const actual = isQualifiedUserClientEntityMap(usersMap);
-
       expect(actual).toBeFalsy();
     });
   });

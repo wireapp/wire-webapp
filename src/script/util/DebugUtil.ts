@@ -27,14 +27,17 @@ import {
   USER_EVENT,
 } from '@wireapp/api-client/lib/event/';
 import type {Notification} from '@wireapp/api-client/lib/notification/';
+import {FeatureStatus} from '@wireapp/api-client/lib/team/feature/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {DatabaseKeys} from '@wireapp/core/lib/notification/NotificationDatabaseRepository';
 import Dexie from 'dexie';
+import keyboardjs from 'keyboardjs';
 import {container} from 'tsyringe';
 
 import {getLogger, Logger} from 'Util/Logger';
 
-import {createRandomUuid} from './util';
+import {TIME_IN_MILLIS} from './TimeUtil';
+import {createUuid} from './uuid';
 
 import {CallingRepository} from '../calling/CallingRepository';
 import {CallState} from '../calling/CallState';
@@ -42,13 +45,14 @@ import {ClientRepository} from '../client';
 import {ClientState} from '../client/ClientState';
 import {ConnectionRepository} from '../connection/ConnectionRepository';
 import {ConversationRepository} from '../conversation/ConversationRepository';
+import {isMLSCapableConversation} from '../conversation/ConversationSelectors';
 import {ConversationState} from '../conversation/ConversationState';
 import type {MessageRepository} from '../conversation/MessageRepository';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {EventRepository} from '../event/EventRepository';
 import {checkVersion} from '../lifecycle/newVersionHandler';
-import {MessageCategory} from '../message/MessageCategory';
+import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
 import {EventRecord, StorageRepository, StorageSchemata} from '../storage';
 import {UserRepository} from '../user/UserRepository';
@@ -78,6 +82,7 @@ export class DebugUtil {
     private readonly conversationState = container.resolve(ConversationState),
     private readonly callState = container.resolve(CallState),
     private readonly core = container.resolve(Core),
+    private readonly apiClient = container.resolve(APIClient),
   ) {
     this.$ = $;
     this.Dexie = Dexie;
@@ -93,13 +98,82 @@ export class DebugUtil {
     this.messageRepository = message;
 
     this.logger = getLogger('DebugUtil');
+
+    keyboardjs.bind('command+shift+1', this.toggleDebugUi);
   }
+
+  /** will print all the ids of entities that show on screen (userIds, conversationIds, messageIds) */
+  toggleDebugUi = (): void => {
+    const logMLSInfo = async (event: Event) => {
+      const eventTarget = event.currentTarget;
+      if (!(eventTarget instanceof HTMLDivElement)) {
+        return;
+      }
+      const value = eventTarget.innerText;
+      const localConversation = this.conversationState.conversations().find(({id}) => id === value);
+
+      if (!localConversation || !isMLSCapableConversation(localConversation)) {
+        return;
+      }
+
+      const {id, groupId, domain} = localConversation;
+      const remoteConversation = await this.core.service?.conversation.getConversation({id, domain});
+      const epochCC = await this.core.service?.mls?.getEpoch(groupId);
+      const membersCC = (await this.core.service?.mls?.getClientIds(groupId))?.reduce<Record<string, string[]>>(
+        (acc, curr) => {
+          acc[curr.userId] = acc[curr.userId] ? [...acc[curr.userId], curr.clientId] : [curr.clientId];
+          return acc;
+        },
+        {},
+      );
+
+      this.logger.info({
+        id,
+        groupId,
+        epochCC: Number(epochCC),
+        epochRemote: remoteConversation?.epoch,
+        membersCC,
+      });
+    };
+
+    const removeDebugInfo = (els: NodeListOf<HTMLElement>) => els.forEach(el => el.parentNode?.removeChild(el));
+
+    const addDebugInfo = (els: NodeListOf<HTMLElement>) =>
+      els.forEach(el => {
+        const debugInfo = document.createElement('div');
+        debugInfo.classList.add('debug-info');
+        const value = el.dataset.uieUid;
+        if (value) {
+          debugInfo.textContent = value;
+          el.appendChild(debugInfo);
+        }
+
+        const isConversation = el.dataset.uieName === 'item-conversation';
+
+        if (!isConversation) {
+          return;
+        }
+        debugInfo.addEventListener('click', logMLSInfo);
+      });
+
+    const debugInfos = document.querySelectorAll<HTMLElement>('.debug-info');
+    const isShowingDebugInfo = debugInfos.length > 0;
+
+    if (isShowingDebugInfo) {
+      removeDebugInfo(debugInfos);
+    } else {
+      const debugElements = document.querySelectorAll<HTMLElement>(
+        '.message[data-uie-uid], .conversation-list-cell[data-uie-uid], [data-uie-name=sender-name]',
+      );
+      addDebugInfo(debugElements);
+    }
+  };
 
   breakLastNotificationId() {
     return this.storageRepository.storageService.update(
       StorageSchemata.OBJECT_STORE.AMPLIFY,
       DatabaseKeys.PRIMARY_KEY_LAST_NOTIFICATION,
-      {value: createRandomUuid(1)},
+      {value: createUuid(1)},
     );
   }
 
@@ -115,11 +189,32 @@ export class DebugUtil {
   }
 
   /** Used by QA test automation. */
-  async breakSession(userId: string | QualifiedId, clientId: string): Promise<void> {
+  async breakSession(userId: QualifiedId, clientId: string): Promise<void> {
     const proteusService = this.core.service!.proteus;
-    const qualifiedId = typeof userId === 'string' ? {domain: '', id: userId} : userId;
-    const sessionId = proteusService.constructSessionId(qualifiedId, clientId);
+    const sessionId = proteusService.constructSessionId(userId, clientId);
     await proteusService['cryptoClient'].debugBreakSession(sessionId);
+  }
+
+  /** Used by QA test automation. */
+  async setMLSMigrationConfig(
+    isEnabled = true,
+    config = {
+      startTime: new Date().toISOString(),
+      finaliseRegardlessAfter: new Date(Date.now() + TIME_IN_MILLIS.YEAR).toISOString(),
+    },
+  ) {
+    const {teamId} = await this.userRepository.getSelf();
+
+    if (!teamId) {
+      throw new Error('teamId of self user is undefined');
+    }
+
+    const response = await this.apiClient.api.teams.feature.putMLSMigrationFeature(teamId, {
+      config,
+      status: isEnabled ? FeatureStatus.ENABLED : FeatureStatus.DISABLED,
+    });
+
+    return response;
   }
 
   /** Used by QA test automation. */
@@ -318,21 +413,23 @@ export class DebugUtil {
     const conversation = this.conversationState.activeConversation();
     let users = [];
     if (includeSelf) {
-      users.push(this.userState.self().id);
+      users.push(this.userState.self().qualifiedId);
     }
     users.push(...conversation.participating_user_ids());
     users = users.slice(0, maxUsers);
     return this.eventRepository['handleEvent'](
       {
         event: {
-          category: MessageCategory.NONE,
           conversation: conversation.id,
-          data: {reason: MemberLeaveReason.LEGAL_HOLD_POLICY_CONFLICT, user_ids: users},
+          data: {
+            reason: MemberLeaveReason.LEGAL_HOLD_POLICY_CONFLICT,
+            user_ids: users.map(({id}) => id),
+            qualified_user_ids: users,
+          },
           from: this.userState.self().id,
-          id: createRandomUuid(),
           time: conversation.getNextIsoDate(),
           type: CONVERSATION_EVENT.MEMBER_LEAVE,
-        } as EventRecord,
+        },
       },
       EventRepository.SOURCE.WEB_SOCKET,
     );
@@ -352,7 +449,7 @@ export class DebugUtil {
             to: userId,
           },
           type: USER_EVENT.CONNECTION,
-        } as unknown as EventRecord,
+        } as BackendEvent,
       },
       EventRepository.SOURCE.WEB_SOCKET,
     );

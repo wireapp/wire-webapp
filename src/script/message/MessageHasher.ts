@@ -22,7 +22,7 @@ import Long from 'long';
 import {utf8ToUtf16BE} from 'Util/StringUtil';
 
 import {ClientEvent} from '../event/Client';
-import {EventRecord} from '../storage/record/EventRecord';
+import {LegacyEventRecord} from '../storage/record/EventRecord';
 
 /**
  * @returns Promise with hashed string bytes
@@ -99,7 +99,7 @@ const hashEvent = (event: any): Promise<ArrayBuffer> => {
  *
  * @returns `true` if the event hash is equal to the given hash
  */
-const validateHash = async (event: EventRecord, hash: ArrayBuffer): Promise<boolean> => {
+const validateHash = async (event: LegacyEventRecord, hash: ArrayBuffer): Promise<boolean> => {
   const generatedHash = await hashEvent(event);
   if (hash.byteLength !== generatedHash.byteLength) {
     return false;

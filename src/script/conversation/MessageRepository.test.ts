@@ -32,7 +32,7 @@ import {Message} from 'src/script/entity/message/Message';
 import {Text} from 'src/script/entity/message/Text';
 import {User} from 'src/script/entity/User';
 import {ConversationError} from 'src/script/error/ConversationError';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {ConversationRepository} from './ConversationRepository';
 import {ConversationState} from './ConversationState';
@@ -74,7 +74,7 @@ type MessageRepositoryDependencies = {
 
 async function buildMessageRepository(): Promise<[MessageRepository, MessageRepositoryDependencies]> {
   const userState = new UserState();
-  userState.self(selfUser);
+  userState.users([selfUser]);
   const clientState = new ClientState();
   clientState.currentClient(new ClientEntity(true, ''));
   const core = new Account();
@@ -111,7 +111,7 @@ describe('MessageRepository', () => {
     conversation_type = CONVERSATION_TYPE.REGULAR,
     connection_status = ConnectionStatus.ACCEPTED,
   ) => {
-    const conversation = new Conversation(createRandomUuid());
+    const conversation = new Conversation(createUuid());
     conversation.type(conversation_type);
 
     const connectionEntity = new ConnectionEntity();
@@ -127,7 +127,7 @@ describe('MessageRepository', () => {
 
   const successPayload = {
     sentAt: new Date().toISOString(),
-    id: createRandomUuid(),
+    id: createUuid(),
     state: MessageSendingState.OUTGOING_SENT,
   };
 
@@ -156,8 +156,8 @@ describe('MessageRepository', () => {
       jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
       jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
 
-      const originalMessage = new ContentMessage(createRandomUuid());
-      originalMessage.assets.push(new Text(createRandomUuid(), 'old text'));
+      const originalMessage = new ContentMessage(createUuid());
+      originalMessage.assets.push(new Text(createUuid(), 'old text'));
       const conversation = generateConversation();
       conversation.addMessage(originalMessage);
 
@@ -202,7 +202,7 @@ describe('MessageRepository', () => {
       const conversation = generateConversation(CONVERSATION_TYPE.REGULAR);
       const sender = new User('', '');
       sender.isMe = false;
-      const msgToDelete = new Message(createRandomUuid());
+      const msgToDelete = new Message(createUuid());
       msgToDelete.user(sender);
       conversation.addMessage(msgToDelete);
       const [messageRepository, {core}] = await buildMessageRepository();
@@ -220,7 +220,7 @@ describe('MessageRepository', () => {
       const conversation = generateConversation(CONVERSATION_TYPE.REGULAR);
       conversation.participating_user_ets.push(new User('user1'));
 
-      const messageToDelete = new Message(createRandomUuid());
+      const messageToDelete = new Message(createUuid());
       messageToDelete.user(selfUser);
       conversation.addMessage(messageToDelete);
 
@@ -232,7 +232,7 @@ describe('MessageRepository', () => {
       expect(core.service!.conversation.send).toHaveBeenCalledWith(
         expect.objectContaining({
           payload: expect.objectContaining({deleted: {messageId: messageToDelete.id}}),
-          userIds: {selfid: [], user1: []},
+          userIds: {'': {selfid: [], user1: []}},
         }),
       );
     });

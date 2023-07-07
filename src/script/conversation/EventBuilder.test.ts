@@ -19,17 +19,16 @@
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {DegradedMessageEventData, EventBuilder, GroupCreationEventData} from 'src/script/conversation/EventBuilder';
+import {EventBuilder} from 'src/script/conversation/EventBuilder';
 import {EventMapper} from 'src/script/conversation/EventMapper';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {ClientEvent} from 'src/script/event/Client';
 import {SuperType} from 'src/script/message/SuperType';
 import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {VerificationMessage} from '../entity/message/VerificationMessage';
-import {EventRecord} from '../storage';
 
 describe('EventBuilder', () => {
   let event_mapper: EventMapper = undefined;
@@ -37,10 +36,10 @@ describe('EventBuilder', () => {
   let self_user_et: User = undefined;
 
   beforeEach(() => {
-    self_user_et = new User(createRandomUuid(), null);
+    self_user_et = new User(createUuid(), null);
     self_user_et.isMe = true;
 
-    conversation_et = new Conversation(createRandomUuid());
+    conversation_et = new Conversation(createUuid());
     conversation_et.selfUser(self_user_et);
 
     event_mapper = new EventMapper();
@@ -57,12 +56,8 @@ describe('EventBuilder', () => {
   });
 
   it('buildDegraded', async () => {
-    const users: QualifiedId[] = [{domain: '', id: createRandomUuid()}];
-    const event = EventBuilder.buildDegraded(
-      conversation_et,
-      users,
-      VerificationMessageType.NEW_DEVICE,
-    ) as EventRecord<DegradedMessageEventData>;
+    const users: QualifiedId[] = [{domain: '', id: createUuid()}];
+    const event = EventBuilder.buildDegraded(conversation_et, users, VerificationMessageType.NEW_DEVICE);
     const messageEntity = (await event_mapper.mapJsonEvent(event, conversation_et)) as VerificationMessage;
     expect(messageEntity).toBeDefined();
     expect(messageEntity.super_type).toBe(SuperType.VERIFICATION);
@@ -73,7 +68,7 @@ describe('EventBuilder', () => {
   });
 
   it('buildMissed', async () => {
-    const event = EventBuilder.buildMissed(conversation_et, 0) as EventRecord;
+    const event = EventBuilder.buildMissed(conversation_et, 0);
     const messageEntity = await event_mapper.mapJsonEvent(event, conversation_et);
     expect(messageEntity).toBeDefined();
     expect(messageEntity.super_type).toBe(SuperType.MISSED);
@@ -91,7 +86,7 @@ describe('EventBuilder', () => {
       },
     ]);
     conversation_et.creator = 'one';
-    const event = EventBuilder.buildGroupCreation(conversation_et, false, 0) as EventRecord<GroupCreationEventData>;
+    const event = EventBuilder.buildGroupCreation(conversation_et, false, 0);
     const messageEntity = await event_mapper.mapJsonEvent(event, conversation_et);
     expect(messageEntity).toBeDefined();
     expect(messageEntity.type).toBe(ClientEvent.CONVERSATION.GROUP_CREATION);

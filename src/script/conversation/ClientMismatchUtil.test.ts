@@ -54,12 +54,16 @@ describe('ClientMismatchUtil', () => {
     it('extract missing and deleted clients from a mismatch when no users given', () => {
       const mismatch = {
         deleted: {
-          user3: ['client1', 'client2'],
-          user4: ['client1', 'client2'],
+          domain: {
+            user3: ['client1', 'client2'],
+            user4: ['client1', 'client2'],
+          },
         },
         missing: {
-          user1: ['client1', 'client2'],
-          user2: ['client1', 'client2'],
+          domain: {
+            user1: ['client1', 'client2'],
+            user2: ['client1', 'client2'],
+          },
         },
       };
       const {missingClients, deletedClients, missingUserIds, emptyUsers} = extractClientDiff(mismatch);
@@ -67,24 +71,28 @@ describe('ClientMismatchUtil', () => {
       expect(emptyUsers).toEqual([]);
       expect(missingUserIds).toEqual([]);
       expect(missingClients).toEqual([
-        {clients: ['client1', 'client2'], userId: {domain: '', id: 'user1'}},
-        {clients: ['client1', 'client2'], userId: {domain: '', id: 'user2'}},
+        {clients: ['client1', 'client2'], userId: {domain: 'domain', id: 'user1'}},
+        {clients: ['client1', 'client2'], userId: {domain: 'domain', id: 'user2'}},
       ]);
       expect(deletedClients).toEqual([
-        {clients: ['client1', 'client2'], userId: {domain: '', id: 'user3'}},
-        {clients: ['client1', 'client2'], userId: {domain: '', id: 'user4'}},
+        {clients: ['client1', 'client2'], userId: {domain: 'domain', id: 'user3'}},
+        {clients: ['client1', 'client2'], userId: {domain: 'domain', id: 'user4'}},
       ]);
     });
 
     it('extract full diff with mismatch when users are given', () => {
       const mismatch = {
         deleted: {
-          user3: ['client1', 'client2'],
-          user4: ['client1'],
+          domain: {
+            user3: ['client1', 'client2'],
+            user4: ['client1'],
+          },
         },
         missing: {
-          user1: ['client1', 'client2'],
-          user2: ['client1', 'client2'],
+          domain: {
+            user1: ['client1', 'client2'],
+            user2: ['client1', 'client2'],
+          },
         },
       };
       const userWithoutClients = new User('user3');
@@ -100,24 +108,26 @@ describe('ClientMismatchUtil', () => {
 
       expect(emptyUsers).toEqual([userWithoutClients]);
       expect(missingUserIds).toEqual([
-        {domain: '', id: 'user1'},
-        {domain: '', id: 'user2'},
+        {domain: 'domain', id: 'user1'},
+        {domain: 'domain', id: 'user2'},
       ]);
       expect(missingClients).toEqual([
-        {clients: ['client1', 'client2'], userId: {domain: '', id: 'user1'}},
-        {clients: ['client1', 'client2'], userId: {domain: '', id: 'user2'}},
+        {clients: ['client1', 'client2'], userId: {domain: 'domain', id: 'user1'}},
+        {clients: ['client1', 'client2'], userId: {domain: 'domain', id: 'user2'}},
       ]);
       expect(deletedClients).toEqual([
-        {clients: ['client1', 'client2'], userId: {domain: '', id: 'user3'}},
-        {clients: ['client1'], userId: {domain: '', id: 'user4'}},
+        {clients: ['client1', 'client2'], userId: {domain: 'domain', id: 'user3'}},
+        {clients: ['client1'], userId: {domain: 'domain', id: 'user4'}},
       ]);
     });
 
     it('only gives unknown missing clients when users are given', () => {
       const mismatch = {
         missing: {
-          user1: ['client1', 'client2'],
-          user2: ['client1', 'client2'],
+          domain: {
+            user1: ['client1', 'client2'],
+            user2: ['client1', 'client2'],
+          },
         },
       };
       const user1 = new User('user1');
@@ -128,7 +138,7 @@ describe('ClientMismatchUtil', () => {
 
       const {missingClients} = extractClientDiff(mismatch, [user1, user2]);
 
-      expect(missingClients).toEqual([{clients: ['client2'], userId: {domain: '', id: 'user2'}}]);
+      expect(missingClients).toEqual([{clients: ['client2'], userId: {domain: 'domain', id: 'user2'}}]);
     });
   });
 });

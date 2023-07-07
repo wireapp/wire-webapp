@@ -36,7 +36,7 @@ import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import {ConversationRoleRepository} from '../../../conversation/ConversationRoleRepository';
-import {MemberLeaveEvent} from '../../../conversation/EventBuilder';
+import {MemberLeaveEvent, TeamMemberLeaveEvent} from '../../../conversation/EventBuilder';
 import {Conversation} from '../../../entity/Conversation';
 import {User} from '../../../entity/User';
 import {ClientEvent} from '../../../event/Client';
@@ -77,7 +77,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
   isFederated = false,
 }) => {
   const {isGroup, roles} = useKoSubscribableChildren(activeConversation, ['isGroup', 'roles']);
-  const {isTemporaryGuest} = useKoSubscribableChildren(currentUser, ['isTemporaryGuest']);
+  const {isTemporaryGuest, isAvailable} = useKoSubscribableChildren(currentUser, ['isTemporaryGuest', 'isAvailable']);
   const {classifiedDomains, isTeam, team} = useKoSubscribableChildren(teamState, [
     'classifiedDomains',
     'isTeam',
@@ -109,7 +109,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
     }
   };
 
-  const checkMemberLeave = ({type, data}: MemberLeaveEvent) => {
+  const checkMemberLeave = ({type, data}: MemberLeaveEvent | TeamMemberLeaveEvent) => {
     if (type === ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE && data.user_ids.includes(currentUser.id)) {
       goToRoot();
     }
@@ -148,6 +148,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
 
       <FadingScrollbar className="panel__content">
         <UserDetails
+          conversationDomain={activeConversation.domain}
           participant={currentUser}
           badge={teamRepository.getRoleBadge(currentUser.id)}
           isGroupAdmin={isAdmin}
@@ -155,7 +156,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
           classifiedDomains={classifiedDomains}
         />
 
-        {!currentUser.isMe && (
+        {!currentUser.isMe && isAvailable && (
           <div className="conversation-details__devices">
             <button
               className="panel__action-item"
@@ -175,7 +176,7 @@ const GroupParticipantUser: FC<GroupParticipantUserProps> = ({
           </div>
         )}
 
-        {canChangeRole && (
+        {canChangeRole && isAvailable && (
           <>
             <div className="conversation-details__admin">
               <div

@@ -77,17 +77,16 @@ export class ConnectionRepository {
    * @param eventJson JSON data for event
    * @param source Source of event
    */
-  private readonly onUserEvent = (eventJson: UserConnectionEvent, source: EventSource): void => {
+  private readonly onUserEvent = async (eventJson: UserConnectionEvent, source: EventSource) => {
     const eventType = eventJson.type;
 
     const isSupportedType = ConnectionRepository.CONFIG.SUPPORTED_EVENTS.includes(eventType);
     if (isSupportedType) {
-      const logObject = {eventJson: JSON.stringify(eventJson), eventObject: eventJson};
-      this.logger.info(`»» User Event: '${eventType}' (Source: ${source})`, logObject);
+      this.logger.info(`User Event: '${eventType}' (Source: ${source})`);
 
       const isUserConnection = eventType === USER_EVENT.CONNECTION;
       if (isUserConnection) {
-        this.onUserConnection(eventJson, source);
+        await this.onUserConnection(eventJson, source);
       }
     }
   };
@@ -121,7 +120,7 @@ export class ConnectionRepository {
     // Update info about user when connection gets accepted
     const shouldUpdateUser = previousStatus === ConnectionStatus.SENT && connectionEntity.isConnected();
     if (shouldUpdateUser) {
-      await this.userRepository.updateUserById(connectionEntity.userId);
+      await this.userRepository.refreshUser(connectionEntity.userId);
       // Get conversation related to connection and set its type to 1:1
       // This case is important when the 'user.connection' event arrives after the 'conversation.member-join' event: https://wearezeta.atlassian.net/browse/SQCORE-348
       amplify.publish(WebAppEvents.CONVERSATION.MAP_CONNECTION, connectionEntity);
@@ -185,7 +184,7 @@ export class ConnectionRepository {
    */
   public async createConnection(userEntity: User): Promise<boolean> {
     try {
-      const response = await this.connectionService.postConnections(userEntity.qualifiedId, userEntity.name());
+      const response = await this.connectionService.postConnections(userEntity.qualifiedId);
       const connectionEvent = {connection: response, user: {name: userEntity.name()}};
       await this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED);
       return true;
@@ -211,8 +210,8 @@ export class ConnectionRepository {
   /**
    * Get a connection for a user ID.
    */
-  private getConnectionByUserId(userId: QualifiedId): ConnectionEntity {
-    return this.connectionState.connectionEntities()[userId.id];
+  private getConnectionByUserId(userId: QualifiedId): ConnectionEntity | undefined {
+    return this.connectionState.connections().find(connection => matchQualifiedIds(connection.userId, userId));
   }
 
   /**
@@ -221,7 +220,7 @@ export class ConnectionRepository {
    * @returns User connection entity
    */
   getConnectionByConversationId(conversationId: QualifiedId): ConnectionEntity | undefined {
-    const connectionEntities = Object.values(this.connectionState.connectionEntities());
+    const connectionEntities = Object.values(this.connectionState.connections());
     return connectionEntities.find(connectionEntity =>
       matchQualifiedIds(connectionEntity.conversationId, conversationId),
     );
@@ -235,17 +234,11 @@ export class ConnectionRepository {
    * @returns Promise that resolves when all connections have been retrieved and mapped
    */
   async getConnections(): Promise<ConnectionEntity[]> {
-    try {
-      const connectionData = await this.connectionService.getConnections();
-      const newConnectionEntities = ConnectionMapper.mapConnectionsFromJson(connectionData);
+    const connectionData = await this.connectionService.getConnections();
+    const connections = ConnectionMapper.mapConnectionsFromJson(connectionData);
 
-      return newConnectionEntities.length
-        ? await this.updateConnections(newConnectionEntities)
-        : Object.values(this.connectionState.connectionEntities());
-    } catch (error) {
-      this.logger.error(`Failed to retrieve connections from backend: ${error.message}`, error);
-      throw error;
-    }
+    this.connectionState.connections(connections);
+    return connections;
   }
 
   /**
@@ -267,8 +260,8 @@ export class ConnectionRepository {
     return this.updateStatus(userEntity, ConnectionStatus.ACCEPTED);
   }
 
-  addConnectionEntity(connectionEntity: ConnectionEntity): void {
-    this.connectionState.connectionEntities()[connectionEntity.userId.id] = connectionEntity;
+  addConnectionEntity(connection: ConnectionEntity): void {
+    this.connectionState.connections().push(connection);
   }
 
   /**
@@ -280,21 +273,6 @@ export class ConnectionRepository {
     // TODO(Federation): Update code once connections are implemented on the backend
     const userEntity = await this.userRepository.getUserById(connectionEntity.userId);
     return userEntity.connection(connectionEntity);
-  }
-
-  /**
-   * Update users matching the given connections.
-   * @returns Promise that resolves when all connections have been updated
-   */
-  private async updateConnections(connectionEntities: ConnectionEntity[]): Promise<ConnectionEntity[]> {
-    const updatedConnections = connectionEntities.reduce((allConnections, connectionEntity) => {
-      allConnections[connectionEntity.userId.id] = connectionEntity;
-      return allConnections;
-    }, this.connectionState.connectionEntities());
-
-    this.connectionState.connectionEntities(updatedConnections);
-    await this.userRepository.updateUsersFromConnections(connectionEntities);
-    return Object.values(this.connectionState.connectionEntities());
   }
 
   /**
