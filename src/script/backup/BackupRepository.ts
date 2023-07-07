@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@ import {Logger, getLogger} from 'Util/Logger';
 import {constructUserPrimaryKey} from 'Util/StorageUtil';
 import {WebWorker} from 'Util/worker';
 
+import {BackUpHeader} from './BackUpHeader';
 import {BackupService} from './BackupService';
 import {
   CancelError,
@@ -58,6 +59,7 @@ interface Metadata {
 
 type ProgressCallback = (done: number) => void;
 
+export const ENCRYPTED_BACKUP_FORMAT = 'WBUX';
 export type FileDescriptor =
   | {
       entities: UserRecord[];
@@ -123,12 +125,17 @@ export class BackupRepository {
    * @param progressCallback called on every step of the export
    * @returns The promise that contains all the exported tables
    */
-  public async generateHistory(user: User, clientId: string, progressCallback: ProgressCallback): Promise<Blob> {
+  public async generateHistory(
+    user: User,
+    clientId: string,
+    progressCallback: ProgressCallback,
+    password: string,
+  ): Promise<Blob> {
     this.canceled = false;
 
     try {
       const exportedData = await this._exportHistory(progressCallback);
-      return await this.compressHistoryFiles(user, clientId, exportedData);
+      return await this.compressHistoryFiles(user, clientId, exportedData, password);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : error;
       this.logger.error(`Could not export history: ${errorMessage}`, error);
@@ -172,32 +179,85 @@ export class BackupRepository {
     });
     return tableData;
   }
-
-  private async compressHistoryFiles(user: User, clientId: string, exportedData: Record<string, any>): Promise<Blob> {
-    const password = prompt('Enter the password for encryption (leave blank for no encryption):');
-
-    if (!!password) {
-      const metaData = this.createMetaData(user, clientId);
-
-      const files: Record<string, Uint8Array> = {};
-
-      const stringifiedMetadata = JSON.stringify(metaData, null, 2);
-      const encodedMetadata = new TextEncoder().encode(stringifiedMetadata);
-
-      for (const tableName in exportedData) {
-        const stringifiedData = JSON.stringify(exportedData[tableName]);
-        const encodedData = new TextEncoder().encode(stringifiedData);
-        const fileName = `${tableName}.json`;
-        files[fileName] = encodedData;
-      }
-
-      files[Filename.METADATA] = encodedMetadata;
-
-      const array = await this.worker.post<Uint8Array>({type: 'zip', files, password});
-      return new Blob([array], {type: 'application/zip'});
-    }
+  private async compressHistoryFiles(
+    user: User,
+    clientId: string,
+    exportedData: Record<string, any>,
+    password: string,
+  ): Promise<Blob> {
+    return await this.encryptHistoryFiles(user, clientId, exportedData, password);
   }
 
+  private async encryptHistoryFiles(
+    user: User,
+    clientId: string,
+    exportedData: Record<string, any>,
+    password: string,
+  ): Promise<Blob> {
+    const metaData = this.createMetaData(user, clientId);
+
+    const files: Record<string, Uint8Array> = {};
+
+    const stringifiedMetadata = JSON.stringify(metaData, null, 2);
+    const encodedMetadata = new TextEncoder().encode(stringifiedMetadata);
+
+    for (const tableName in exportedData) {
+      const stringifiedData = JSON.stringify(exportedData[tableName]);
+      const encodedData = new TextEncoder().encode(stringifiedData);
+      const fileName = `${tableName}.json`;
+      files[fileName] = encodedData;
+    }
+    files[Filename.METADATA] = encodedMetadata;
+
+    if (password) {
+      // encode header
+      const backupCoder = new BackUpHeader(user.id, password);
+      const backupHeader = await this.generateBackupHeader(user, password, backupCoder).catch(error => {
+        console.error('Backup error:', error);
+      });
+      // Encrypt the ZIP archive using the provided password
+      const formattedHeader = backupCoder.readBackupHeader(backupHeader);
+      const chaCha20Key = await backupCoder.generateChaCha20Key(formattedHeader);
+      const array = await this.worker.post<Uint8Array>({type: 'zip', files, encrytionKey: chaCha20Key});
+      // Prepend the combinedBytes to the ZIP archive data
+      const combinedArray = this.concatenateByteArrays([backupHeader, array]);
+      console.log('ENCODED backupHeader', backupHeader, backupHeader.byteLength);
+      console.log('========');
+      console.log('combinedArray aray', combinedArray);
+      return new Blob([combinedArray], {type: 'application/zip'});
+    }
+    // If no password, return the regular ZIP archive
+    const array = await this.worker.post<Uint8Array>({type: 'zip', files});
+    return new Blob([array], {type: 'application/zip'});
+  }
+
+  private async generateBackupHeader(user: User, password: string, backupCoder) {
+    const backupHeader = await backupCoder.encodeHeader();
+    if (backupHeader.byteLength === 0) {
+      throw new Error('Backup header is empty');
+    }
+    return backupHeader;
+  }
+
+  private concatenateByteArrays(arrays: Uint8Array[]): Uint8Array {
+    // Calculate the total length of the concatenated array
+    let totalLength = 0;
+    for (const array of arrays) {
+      totalLength += array.length;
+    }
+
+    // Create a new Uint8Array with the total length
+    const concatenatedArray = new Uint8Array(totalLength);
+
+    // Copy each array into the concatenated array
+    let offset = 0;
+    for (const array of arrays) {
+      concatenatedArray.set(array, offset);
+      offset += array.length;
+    }
+
+    return concatenatedArray;
+  }
   public getBackupInitData(): Promise<number> {
     return this.backupService.getHistoryCount();
   }
@@ -207,38 +267,57 @@ export class BackupRepository {
     data: ArrayBuffer | Blob,
     initCallback: ProgressCallback,
     progressCallback: ProgressCallback,
+    password?: string,
   ): Promise<void> {
     this.canceled = false;
-    const password = prompt('Enter the password for encryption (leave blank for no encryption):');
-    if (!!password) {
-      const files = await this.worker.post<Record<string, Uint8Array>>({type: 'unzip', bytes: data, password});
+    let files;
 
-      if (files.error) {
-        //console.log('files.error ', files.error);
-        throw new ImportError(files.error as unknown as string);
+    if (password) {
+      const backupCoder = new BackUpHeader(user.id, password);
+      const {decodingError, decodedHeader} = await backupCoder.decodeHeader(data);
+      console.log('DECODE header', decodingError, decodedHeader);
+      // error decoding the header
+      if (decodingError) {
+        throw new ImportError(decodingError as unknown as string);
       }
+      // We need to read the ChaCha20 generated header prior to the encrypted backup file data to run some sanity checks
+      const chaChaHeaderKey = await backupCoder.generateChaCha20Key(decodedHeader);
 
-      if (!files[Filename.METADATA]) {
-        throw new InvalidMetaDataError();
-      }
-
-      await this.verifyMetadata(user, files);
-      const fileDescriptors = Object.entries(files)
-        .filter(([filename]) => filename !== Filename.METADATA)
-        .map(([filename, content]) => {
-          const data = new TextDecoder().decode(content);
-          const entities = JSON.parse(data);
-          return {
-            entities,
-            filename,
-          } as FileDescriptor;
-        });
-
-      const nbEntities = fileDescriptors.reduce((acc, {entities}) => acc + entities.length, 0);
-      initCallback(nbEntities);
-
-      await this.importHistoryData(fileDescriptors, progressCallback);
+      // ChaCha20 header is needed to validate the encrypted data hasn't been tampered with different authentication
+      files = await this.worker.post<Record<string, Uint8Array>>({
+        type: 'unzip',
+        bytes: data,
+        encrytionKey: chaChaHeaderKey,
+      });
+    } else {
+      files = await this.worker.post<Record<string, Uint8Array>>({type: 'unzip', bytes: data});
     }
+
+    if (files.error) {
+      //console.log('files.error ', files.error);
+      throw new ImportError(files.error as unknown as string);
+    }
+
+    if (!files[Filename.METADATA]) {
+      throw new InvalidMetaDataError();
+    }
+
+    await this.verifyMetadata(user, files);
+    const fileDescriptors = Object.entries(files)
+      .filter(([filename]) => filename !== Filename.METADATA)
+      .map(([filename, content]) => {
+        const data = new TextDecoder().decode(content);
+        const entities = JSON.parse(data);
+        return {
+          entities,
+          filename,
+        } as FileDescriptor;
+      });
+
+    const nbEntities = fileDescriptors.reduce((acc, {entities}) => acc + entities.length, 0);
+    initCallback(nbEntities);
+
+    await this.importHistoryData(fileDescriptors, progressCallback);
   }
 
   private async importHistoryData(
@@ -396,4 +475,11 @@ export class BackupRepository {
       throw new IncompatibleBackupError(message);
     }
   }
+
+  // private fun mappedDecodingError(decodingError: HeaderDecodingErrors): RestoreBackupResult.BackupRestoreFailure =
+  // when (decodingError) {
+  //     INVALID_USER_ID -> InvalidUserId
+  //     INVALID_VERSION -> IncompatibleBackup("The provided backup version is lower than the minimum supported version")
+  //     INVALID_FORMAT -> IncompatibleBackup("The provided backup format is not supported")
+  // }
 }

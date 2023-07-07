@@ -21,13 +21,14 @@ import {FC, useEffect, useState} from 'react';
 
 import {Icon} from 'Components/Icon';
 import {LoadingBar} from 'Components/LoadingBar/LoadingBar';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {User} from 'src/script/entity/User';
 import {ContentState} from 'src/script/page/useAppState';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {loadFileBuffer} from 'Util/util';
 
-import {BackupRepository} from '../../backup/BackupRepository';
+import {BackupRepository, ENCRYPTED_BACKUP_FORMAT} from '../../backup/BackupRepository';
 import {CancelError, DifferentAccountError, IncompatibleBackupError} from '../../backup/Error';
 import {Config} from '../../Config';
 import {MotionDuration} from '../../motion/MotionDuration';
@@ -118,14 +119,87 @@ const HistoryImport: FC<HistoryImportProps> = ({user, backupRepository, file, sw
     }
   };
 
+  const getBackUpPassword = (): Promise<string> => {
+    return new Promise(resolve => {
+      PrimaryModal.show(PrimaryModal.type.PASSWORD, {
+        primaryAction: {
+          action: async (password: string) => {
+            resolve(password);
+          },
+          text: t('backupDecryptionModalAction'),
+        },
+        secondaryAction: {
+          action: () => {
+            resolve('');
+            dismissImport();
+          },
+        },
+        text: {
+          closeBtnLabel: t('backupEncryptionModalCloseBtn'),
+          input: t('backupEncryptionModalPlaceholder'),
+          message: t('backupDecryptionModalMessage'),
+          title: t('backupDecryptionModalTitle'),
+        },
+      });
+    });
+  };
+
+  const checkBackupEncryption = async (data: ArrayBuffer | Blob): Promise<boolean> => {
+    const fileBytes = await getFileBytes(data);
+    const encrptedFileFormat = new TextEncoder().encode(ENCRYPTED_BACKUP_FORMAT);
+
+    for (let i = 0; i < encrptedFileFormat.length; i++) {
+      const eachFileByte = fileBytes[i];
+      const encrptedFileByte = encrptedFileFormat[i];
+      if (eachFileByte !== encrptedFileByte) {
+        // The number doesn't match, indicating the file is not encrypted
+        return false;
+      }
+    }
+    // All file format bytes match, indicating the file is encrypted
+    return true;
+  };
+
+  const getFileBytes = async (data: ArrayBuffer | Blob): Promise<Uint8Array> => {
+    if (data instanceof ArrayBuffer) {
+      return Promise.resolve(new Uint8Array(data));
+    } else if (data instanceof Blob) {
+      return readBlobAsArrayBuffer(data).then(arrayBuffer => new Uint8Array(arrayBuffer));
+    }
+    return Promise.reject(new Error('Invalid data type. Expected ArrayBuffer or Blob.'));
+  };
+
+  const readBlobAsArrayBuffer = (blob: Blob): Promise<ArrayBuffer> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as ArrayBuffer);
+      reader.onerror = reject;
+      reader.readAsArrayBuffer(blob);
+    });
+  };
+
   const importHistory = async (file: File) => {
+    const isEncrypted = await checkBackupEncryption(file);
+
+    if (isEncrypted) {
+      const password = await getBackUpPassword();
+
+      if (password) {
+        await processHistoryImport(password);
+      }
+    } else {
+      await processHistoryImport();
+    }
+  };
+
+  const processHistoryImport = async (password?: string) => {
     setHistoryImportState(HistoryImportState.PREPARING);
     setError(null);
 
     const data = await loadFileBuffer(file);
 
     try {
-      await backupRepository.importHistory(user, data, onInit, onProgress);
+      await backupRepository.importHistory(user, data, onInit, onProgress, password);
       onSuccess();
     } catch (error) {
       onError(error as Error);

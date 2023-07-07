@@ -18,14 +18,16 @@
  */
 
 import JSZip from 'jszip';
+import sodium from 'libsodium-wrappers';
 
 type Payload =
-  | {type: 'zip'; files: Record<string, ArrayBuffer | string>; password?: string}
-  | {type: 'unzip'; bytes: ArrayBuffer; password?: string};
+  | {type: 'zip'; files: Record<string, ArrayBuffer | string>; encrytionKey?: Uint8Array}
+  | {type: 'unzip'; bytes: ArrayBuffer; encrytionKey?: Uint8Array};
 
 export async function handleZipEvent(payload: Payload) {
   const zip = new JSZip();
-  const password = payload.password;
+  const encrytionKey = payload.encrytionKey;
+  console.log('encrytionKey', encrytionKey);
   switch (payload.type) {
     case 'zip':
       for (const [filename, file] of Object.entries(payload.files)) {
@@ -34,24 +36,25 @@ export async function handleZipEvent(payload: Payload) {
 
       const OriginalData = await zip.generateAsync({compression: 'DEFLATE', type: 'uint8array'});
 
-      if (password) {
-        // Encrypt the ZIP archive using the provided password
-        const encryptedData = await encryptData(OriginalData, password);
-        // console.log('encryptedData', OriginalData, encryptedData);
+      if (encrytionKey) {
+        // Encrypt the ZIP archive using the provided encrytionKey
+        const encryptedData = await encryptFile(OriginalData, encrytionKey);
+        console.log('OriginalData', OriginalData);
+        console.log('encryptedData', encryptedData);
         return encryptedData;
       }
-      // console.log('array', OriginalData.length);
       return OriginalData;
 
     case 'unzip':
       let decryptedBytes: Uint8Array;
-      if (password) {
-        // Decrypt the ZIP archive using the provided password
+      if (!!encrytionKey) {
+        // Decrypt the ZIP archive using the provided encrytionKey
         const payloadBytes = new Uint8Array(payload.bytes);
-        decryptedBytes = await decryptData(payloadBytes, password);
+        decryptedBytes = await decryptFile(payloadBytes, encrytionKey);
       } else {
         decryptedBytes = new Uint8Array(payload.bytes);
       }
+      console.log('decryptedBytes', decryptedBytes);
       // const isVerificationSuccessful = JSON.stringify(decryptedBytes) === JSON.stringify(originalData);
       // console.log('Verification successful:', isVerificationSuccessful);
       const archive = await JSZip.loadAsync(decryptedBytes);
@@ -65,65 +68,54 @@ export async function handleZipEvent(payload: Payload) {
   }
 }
 
-async function encryptData(data: Uint8Array, password: string): Promise<Uint8Array> {
-  // Derive the encryption key from the password using a suitable key derivation algorithm
-  const encoder = new TextEncoder();
-  const encodedPassword = encoder.encode(password);
-  const keyMaterial = await crypto.subtle.importKey('raw', encodedPassword, 'PBKDF2', false, ['deriveKey']);
-  const key = await crypto.subtle.deriveKey(
-    {
-      name: 'PBKDF2',
-      salt: new Uint8Array(16), // Provide the actual salt to be used during encryption
-      iterations: 100000, // Provide the desired iteration count
-      hash: {name: 'SHA-256'},
-    },
-    keyMaterial,
-    {name: 'AES-GCM', length: 256},
-    false,
-    ['encrypt'],
+// Encrypt a file
+async function encryptFile(fileContent: Uint8Array, encryptionKey: Uint8Array): Promise<Uint8Array> {
+  await sodium.ready;
+
+  // Create a random nonce
+  const nonce = sodium.randombytes_buf(sodium.crypto_secretstream_xchacha20poly1305_ABYTES);
+
+  // Create the encryption state
+  const stateAndHeader = sodium.crypto_secretstream_xchacha20poly1305_init_push(encryptionKey);
+  const state = stateAndHeader.state;
+
+  // Encrypt the file content
+  const encryptedFile = sodium.crypto_secretstream_xchacha20poly1305_push(
+    state,
+    fileContent,
+    null,
+    sodium.crypto_secretstream_xchacha20poly1305_TAG_FINAL,
   );
 
-  // Encrypt the data using the derived key
-  const encryptedData = await crypto.subtle.encrypt(
-    {name: 'AES-GCM', iv: new Uint8Array(12)}, // Provide the actual initialization vector (IV) to be used during encryption
-    key,
-    data,
-  );
-
-  return new Uint8Array(encryptedData);
+  // Verify the positions
+  // Combine the nonce and encrypted content
+  const encryptedData = new Uint8Array(nonce.length + encryptedFile.length);
+  encryptedData.set(nonce);
+  encryptedData.set(encryptedFile, nonce.length);
+  return encryptedData;
 }
 
-async function decryptData(encryptedData: Uint8Array, password: string): Promise<Uint8Array> {
-  // Derive the encryption key from the password using a suitable key derivation algorithm
-  const encoder = new TextEncoder();
-  const encodedPassword = encoder.encode(password);
-  const keyMaterial = await crypto.subtle.importKey('raw', encodedPassword, 'PBKDF2', false, ['deriveKey']);
-  const key = await crypto.subtle.deriveKey(
-    {
-      name: 'PBKDF2',
-      salt: new Uint8Array(16), // Provide the actual salt used during encryption
-      iterations: 100000, // Provide the actual iteration count used during encryption
-      hash: {name: 'SHA-256'},
-    },
-    keyMaterial,
-    {name: 'AES-GCM', length: 256},
-    false,
-    ['decrypt'],
-  );
+// Decrypt a file
+async function decryptFile(encryptedDataSource: Uint8Array, encryptionKey: Uint8Array) {
+  await sodium.ready;
+  // Split the backupHeader, nonce, header, and encrypted content
+  const backupHeaderLength = 63;
+  const nonceLength = sodium.crypto_secretstream_xchacha20poly1305_ABYTES;
+  const backupHeader = encryptedDataSource.slice(0, sodium.crypto_secretstream_xchacha20poly1305_HEADERBYTES);
+  const encryptedContent = encryptedDataSource.slice(backupHeaderLength + nonceLength + 1);
+  console.log('decryptFile-encryptedContent', encryptedContent);
+  // Create the decryption state
 
-  // Decrypt the data using the derived key
-  const decryptedData = await crypto.subtle.decrypt(
-    {name: 'AES-GCM', iv: new Uint8Array(12)}, // Provide the actual initialization vector (IV) used during encryption
-    key,
-    encryptedData,
-  );
+  const state = sodium.crypto_secretstream_xchacha20poly1305_init_pull(backupHeader, encryptionKey);
 
-  return new Uint8Array(decryptedData);
+  // Decrypt the file content
+  const decryptedFile = sodium.crypto_secretstream_xchacha20poly1305_pull(state, encryptedContent);
+
+  return decryptedFile.message;
 }
 
 self.addEventListener('message', async (event: MessageEvent<Payload>) => {
   try {
-    // const password = prompt('Enter the password for encryption (leave blank for no encryption):');
     const result = await handleZipEvent(event.data);
     self.postMessage(result);
   } catch (error) {
