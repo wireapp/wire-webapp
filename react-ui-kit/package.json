@@ -17,7 +17,7 @@
   "devDependencies": {
     "@babel/cli": "7.22.5",
     "@babel/core": "7.22.5",
-    "@babel/preset-env": "7.22.5",
+    "@babel/preset-env": "7.22.7",
     "@babel/preset-react": "7.22.5",
     "@babel/preset-typescript": "7.22.5",
     "@emotion/babel-preset-css-prop": "^11.10.0",
