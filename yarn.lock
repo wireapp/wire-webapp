@@ -270,6 +270,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/helper-create-class-features-plugin@npm:^7.22.6":
+  version: 7.22.6
+  resolution: "@babel/helper-create-class-features-plugin@npm:7.22.6"
+  dependencies:
+    "@babel/helper-annotate-as-pure": ^7.22.5
+    "@babel/helper-environment-visitor": ^7.22.5
+    "@babel/helper-function-name": ^7.22.5
+    "@babel/helper-member-expression-to-functions": ^7.22.5
+    "@babel/helper-optimise-call-expression": ^7.22.5
+    "@babel/helper-replace-supers": ^7.22.5
+    "@babel/helper-skip-transparent-expression-wrappers": ^7.22.5
+    "@babel/helper-split-export-declaration": ^7.22.6
+    "@nicolo-ribaudo/semver-v6": ^6.3.3
+  peerDependencies:
+    "@babel/core": ^7.0.0
+  checksum: 10412e8a509a607cde6137288d3f12b1f91acd374e29e6dd6a277b67217e9f4c932a0acd89eeda837c8432916df775a8af6321aeb8d8b131ccdbf7688208dda1
+  languageName: node
+  linkType: hard
+
 "@babel/helper-create-regexp-features-plugin@npm:^7.18.6, @babel/helper-create-regexp-features-plugin@npm:^7.20.5":
   version: 7.21.4
   resolution: "@babel/helper-create-regexp-features-plugin@npm:7.21.4"
@@ -821,18 +840,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/plugin-proposal-decorators@npm:7.22.5":
-  version: 7.22.5
-  resolution: "@babel/plugin-proposal-decorators@npm:7.22.5"
+"@babel/plugin-proposal-decorators@npm:7.22.7":
+  version: 7.22.7
+  resolution: "@babel/plugin-proposal-decorators@npm:7.22.7"
   dependencies:
-    "@babel/helper-create-class-features-plugin": ^7.22.5
+    "@babel/helper-create-class-features-plugin": ^7.22.6
     "@babel/helper-plugin-utils": ^7.22.5
     "@babel/helper-replace-supers": ^7.22.5
-    "@babel/helper-split-export-declaration": ^7.22.5
+    "@babel/helper-split-export-declaration": ^7.22.6
     "@babel/plugin-syntax-decorators": ^7.22.5
   peerDependencies:
     "@babel/core": ^7.0.0-0
-  checksum: b3807b92b6ffcaba7519a9b2bb59e4b5530873234cd170ff5727414939334fbcae17bbe523df846a103e2fc8ed2d2890d0d9408f073cfc1e90c28ab565c358e5
+  checksum: d9d6f7cc8b3f1450963d3f26909af025836189b81e43c48ad455db5db2319beaf4ad2fda5aa12a1afcf856de11ecd5ee6894a9e906e8de8ee445c79102b50d26
   languageName: node
   linkType: hard
 
@@ -19507,7 +19526,7 @@ dexie@latest:
   dependencies:
     "@babel/core": 7.22.5
     "@babel/eslint-parser": 7.22.5
-    "@babel/plugin-proposal-decorators": 7.22.5
+    "@babel/plugin-proposal-decorators": 7.22.7
     "@babel/preset-env": 7.22.7
     "@babel/preset-react": 7.22.5
     "@babel/preset-typescript": 7.22.5
