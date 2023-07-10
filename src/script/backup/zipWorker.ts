@@ -27,7 +27,6 @@ type Payload =
 export async function handleZipEvent(payload: Payload) {
   const zip = new JSZip();
   const encrytionKey = payload.encrytionKey;
-  console.log('encrytionKey', encrytionKey);
   switch (payload.type) {
     case 'zip':
       for (const [filename, file] of Object.entries(payload.files)) {
@@ -39,8 +38,6 @@ export async function handleZipEvent(payload: Payload) {
       if (encrytionKey) {
         // Encrypt the ZIP archive using the provided encrytionKey
         const encryptedData = await encryptFile(OriginalData, encrytionKey);
-        console.log('OriginalData', OriginalData);
-        console.log('encryptedData', encryptedData);
         return encryptedData;
       }
       return OriginalData;
@@ -54,9 +51,6 @@ export async function handleZipEvent(payload: Payload) {
       } else {
         decryptedBytes = new Uint8Array(payload.bytes);
       }
-      console.log('decryptedBytes', decryptedBytes);
-      // const isVerificationSuccessful = JSON.stringify(decryptedBytes) === JSON.stringify(originalData);
-      // console.log('Verification successful:', isVerificationSuccessful);
       const archive = await JSZip.loadAsync(decryptedBytes);
       const files: Record<string, Uint8Array> = {};
 
@@ -72,48 +66,41 @@ export async function handleZipEvent(payload: Payload) {
 async function encryptFile(fileContent: Uint8Array, encryptionKey: Uint8Array): Promise<Uint8Array> {
   await sodium.ready;
 
-  // Create a random nonce
-  const nonce = sodium.randombytes_buf(sodium.crypto_secretstream_xchacha20poly1305_ABYTES);
-
-  // Create the encryption state
+  const headerBytes = sodium.crypto_secretstream_xchacha20poly1305_HEADERBYTES;
   const stateAndHeader = sodium.crypto_secretstream_xchacha20poly1305_init_push(encryptionKey);
-  const state = stateAndHeader.state;
+  const {state, header} = stateAndHeader;
 
-  // Encrypt the file content
   const encryptedFile = sodium.crypto_secretstream_xchacha20poly1305_push(
     state,
     fileContent,
     null,
-    sodium.crypto_secretstream_xchacha20poly1305_TAG_FINAL,
+    sodium.crypto_secretstream_xchacha20poly1305_TAG_MESSAGE,
   );
+  const encrypted = new Uint8Array(headerBytes + encryptedFile.length);
 
-  // Verify the positions
-  // Combine the nonce and encrypted content
-  const encryptedData = new Uint8Array(nonce.length + encryptedFile.length);
-  encryptedData.set(nonce);
-  encryptedData.set(encryptedFile, nonce.length);
-  return encryptedData;
+  encrypted.set(header);
+  encrypted.set(encryptedFile, headerBytes);
+
+  return encrypted;
 }
 
 // Decrypt a file
 async function decryptFile(encryptedDataSource: Uint8Array, encryptionKey: Uint8Array) {
   await sodium.ready;
-  // Split the backupHeader, nonce, header, and encrypted content
-  const backupHeaderLength = 63;
-  const nonceLength = sodium.crypto_secretstream_xchacha20poly1305_ABYTES;
-  const backupHeader = encryptedDataSource.slice(0, sodium.crypto_secretstream_xchacha20poly1305_HEADERBYTES);
-  const encryptedContent = encryptedDataSource.slice(backupHeaderLength + nonceLength + 1);
-  console.log('decryptFile-encryptedContent', encryptedContent);
-  // Create the decryption state
 
-  const state = sodium.crypto_secretstream_xchacha20poly1305_init_pull(backupHeader, encryptionKey);
+  const metaDataHeader = 64;
+  const headerBytes = sodium.crypto_secretstream_xchacha20poly1305_HEADERBYTES;
+  const header = encryptedDataSource.slice(metaDataHeader, metaDataHeader + headerBytes);
+  const state = sodium.crypto_secretstream_xchacha20poly1305_init_pull(header, encryptionKey);
+  const encryptedContent = encryptedDataSource.slice(headerBytes + metaDataHeader);
+  const decrypted = sodium.crypto_secretstream_xchacha20poly1305_pull(state, encryptedContent);
 
-  // Decrypt the file content
-  const decryptedFile = sodium.crypto_secretstream_xchacha20poly1305_pull(state, encryptedContent);
+  if (decrypted === null) {
+    throw new Error('Decryption failed');
+  }
 
-  return decryptedFile.message;
+  return decrypted.message;
 }
-
 self.addEventListener('message', async (event: MessageEvent<Payload>) => {
   try {
     const result = await handleZipEvent(event.data);

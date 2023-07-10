@@ -213,7 +213,7 @@ export class BackupRepository {
       // encode header
       const backupCoder = new BackUpHeader(user.id, password);
       const backupHeader = await this.generateBackupHeader(user, password, backupCoder).catch(error => {
-        console.error('Backup error:', error);
+        throw new Error('Backup error:', error);
       });
       // Encrypt the ZIP archive using the provided password
       const formattedHeader = backupCoder.readBackupHeader(backupHeader);
@@ -221,9 +221,6 @@ export class BackupRepository {
       const array = await this.worker.post<Uint8Array>({type: 'zip', files, encrytionKey: chaCha20Key});
       // Prepend the combinedBytes to the ZIP archive data
       const combinedArray = this.concatenateByteArrays([backupHeader, array]);
-      console.log('ENCODED backupHeader', backupHeader, backupHeader.byteLength);
-      console.log('========');
-      console.log('combinedArray aray', combinedArray);
       return new Blob([combinedArray], {type: 'application/zip'});
     }
     // If no password, return the regular ZIP archive
@@ -275,7 +272,6 @@ export class BackupRepository {
     if (password) {
       const backupCoder = new BackUpHeader(user.id, password);
       const {decodingError, decodedHeader} = await backupCoder.decodeHeader(data);
-      console.log('DECODE header', decodingError, decodedHeader);
       // error decoding the header
       if (decodingError) {
         throw new ImportError(decodingError as unknown as string);
@@ -294,7 +290,6 @@ export class BackupRepository {
     }
 
     if (files.error) {
-      //console.log('files.error ', files.error);
       throw new ImportError(files.error as unknown as string);
     }
 
