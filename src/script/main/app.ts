@@ -40,7 +40,7 @@ import {getLogger, Logger} from 'Util/Logger';
 import {includesString} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {appendParameter} from 'Util/UrlUtil';
-import {checkIndexedDb, supportsMLS} from 'Util/util';
+import {checkIndexedDb, supportsMLS, supportsSelfSupportedProtocolsUpdates} from 'Util/util';
 
 import '../../style/default.less';
 import {AssetRepository} from '../assets/AssetRepository';
@@ -493,10 +493,12 @@ export class App {
       callingRepository.setReady();
       telemetry.timeStep(AppInitTimingsStep.APP_LOADED);
 
-      const teamState = container.resolve(TeamState);
-      await initialisePeriodicSelfSupportedProtocolsCheck(selfUser, teamState.teamFeatures(), {
-        userRepository: this.repository.user,
-      });
+      if (supportsSelfSupportedProtocolsUpdates()) {
+        const teamState = container.resolve(TeamState);
+        await initialisePeriodicSelfSupportedProtocolsCheck(selfUser, teamState.teamFeatures(), {
+          userRepository: this.repository.user,
+        });
+      }
 
       this.logger.info(`App loaded in ${Date.now() - startTime}ms`);
 
