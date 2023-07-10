@@ -23,11 +23,11 @@ import {Scope} from '../page/OAuthPermissions';
 
 /**
  *  Takes the oauth parameters and returns the oauth object expected by the API.
- * @param location window.location
+ * @param hash window.hash
  * @returns OAuthBody
  */
-export const oAuthParams = (location: Location) => {
-  const params = new URLSearchParams(location.search);
+export const oAuthParams = (hash: string) => {
+  const params = new URLSearchParams(hash);
   return Object.fromEntries(params) as unknown as OAuthBody;
 };
 

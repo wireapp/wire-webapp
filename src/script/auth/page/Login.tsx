@@ -25,7 +25,7 @@ import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api
 import {StatusCodes} from 'http-status-codes';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
-import {Navigate} from 'react-router';
+import {Navigate, redirect, useLocation} from 'react-router';
 import {useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
@@ -97,6 +97,8 @@ const LoginComponent = ({
   const logger = getLogger('Login');
   const {formatMessage: _} = useIntl();
   const navigate = useNavigate();
+  const location = useLocation();
+  console.log(location.state.hash)
   const [conversationCode, setConversationCode] = useState<string | null>(null);
   const [conversationKey, setConversationKey] = useState<string | null>(null);
 
@@ -108,8 +110,7 @@ const LoginComponent = ({
   const [verificationCode, setVerificationCode] = useState('');
   const [twoFactorSubmitFailedOnce, setTwoFactorSubmitFailedOnce] = useState(false);
 
-  const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE);
-
+  const isOauth = location.state?.hash.includes(QUERY_KEY.SCOPE);
   const [showEntropyForm, setShowEntropyForm] = useState(false);
   const isEntropyRequired = Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY;
   const onEntropyGenerated = useRef<((entropy: Uint8Array) => void) | undefined>();
@@ -179,7 +180,8 @@ const LoginComponent = ({
       await doInitializeClient(ClientType.PERMANENT, undefined, undefined, entropyData);
 
       if (isOauth) {
-        return navigate(ROUTE.AUTHORIZE);
+        console.log('in redirect', location.state.hash)
+        return redirect(`${location.state.hash}`);
       }
       return navigate(ROUTE.HISTORY_INFO);
     } catch (error) {

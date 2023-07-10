@@ -22,6 +22,7 @@ import React, {useState} from 'react';
 import {OAuthClient} from '@wireapp/api-client/lib/oauth/OAuthClient';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
+import {useLocation} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
 import {container} from 'tsyringe';
 
@@ -85,11 +86,12 @@ const OAuthPermissionsComponent = ({
   getTeam,
 }: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
+  const location = useLocation();
   const [teamImage, setTeamImage] = React.useState<string | ArrayBuffer | undefined>(undefined);
-
   const [oAuthApp, setOAuthApp] = useState<OAuthClient | null>(null);
-  const oauthParams = oAuthParams(window.location);
+  const oauthParams = oAuthParams(window.location.hash);
   const oauthScope = oAuthScope(oauthParams);
+  console.log('oauthParams', location.state.hash);
   const cleanedScopes = oAuthScopesToString(oauthScope);
 
   const onContinue = async () => {

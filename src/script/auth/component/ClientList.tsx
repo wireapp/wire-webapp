@@ -57,7 +57,7 @@ const ClientListComponent = ({
 }: Props & ConnectedProps & DispatchProps) => {
   const navigate = useNavigate();
   const [showLoading, setShowLoading] = React.useState(false);
-  const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE);
+  const isOauth = UrlUtil.getURLParameterFromHash(QUERY_KEY.SCOPE);
   const [currentlySelectedClient, setCurrentlySelectedClient] = React.useState<string | null>(null);
 
   const setSelectedClient = (clientId: string) => {

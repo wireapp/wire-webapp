@@ -40,7 +40,7 @@ type Props = React.HTMLProps<HTMLDivElement>;
 const ClientManagerComponent = ({doGetAllClients, doLogout}: Props & ConnectedProps & DispatchProps) => {
   const {formatMessage: _} = useIntl();
   const SFAcode = localStorage.getItem(QUERY_KEY.CONVERSATION_CODE);
-  const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE);
+  const isOauth = UrlUtil.getURLParameterFromHash(QUERY_KEY.SCOPE);
   const device = StringUtil.capitalize(Runtime.getBrowserName());
 
   const timeRemaining = JSON.parse(localStorage.getItem(QUERY_KEY.JOIN_EXPIRES) ?? '{}')?.data ?? Date.now();
