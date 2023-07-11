@@ -90,6 +90,10 @@ const config = {
       env.APP_BASE === document.location.origin
         ? env.URL.TEAMS_BASE
         : TEAMS_URL + document.location.host.slice(document.location.host.indexOf('.')),
+    WEBSITE_BASE:
+      env.APP_BASE === document.location.origin
+        ? env.URL.WEBSITE_BASE
+        : `https://${document.location.host.slice(document.location.host.indexOf('.'))}`,
   },
   /** DataDog client api keys acces */
   dataDog: {

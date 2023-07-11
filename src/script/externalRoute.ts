@@ -34,7 +34,7 @@ export const URL = {
     PRODUCTION: env.APP_BASE || 'https://app.wire.com',
     STAGING: 'https://wire-webapp-staging.zinfra.io',
   },
-  WEBSITE: env.URL?.WEBSITE_BASE,
+  WEBSITE: Config.getConfig().URL.WEBSITE_BASE ?? env.URL?.WEBSITE_BASE,
 };
 
 export const URL_PATH = {
