@@ -68,7 +68,6 @@ import {
 } from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {isBackendError} from 'Util/TypePredicateUtil';
-import {noop} from 'Util/util';
 import {createUuid} from 'Util/uuid';
 
 import {ACCESS_STATE} from './AccessState';
@@ -91,6 +90,7 @@ import {MessageRepository} from './MessageRepository';
 import {NOTIFICATION_STATE} from './NotificationSetting';
 
 import {AssetTransferState} from '../assets/AssetTransferState';
+import {CallingRepository} from '../calling/CallingRepository';
 import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
@@ -153,7 +153,6 @@ export class ConversationRepository {
   public readonly conversationRoleRepository: ConversationRoleRepository;
   private readonly event_mapper: EventMapper;
   private readonly eventService: EventService;
-  public leaveCall: (conversationId: QualifiedId, reason: LEAVE_CALL_REASON) => void;
   private readonly logger: Logger;
   public readonly stateHandler: ConversationStateHandler;
   public readonly verificationStateHandler: ConversationVerificationStateHandler;
@@ -178,6 +177,7 @@ export class ConversationRepository {
     private readonly teamRepository: TeamRepository,
     private readonly userRepository: UserRepository,
     private readonly propertyRepository: PropertiesRepository,
+    private readonly callingRepository: CallingRepository,
     private readonly serverTimeHandler: ServerTimeHandler,
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
@@ -289,7 +289,6 @@ export class ConversationRepository {
     );
 
     this.conversationRoleRepository = new ConversationRoleRepository(this.teamRepository, this.conversationService);
-    this.leaveCall = noop;
 
     if (this.core.backendFeatures.isFederated) {
       this.scheduleMissingUsersAndConversationsMetadataRefresh();
@@ -935,7 +934,7 @@ export class ConversationRepository {
       return;
     }
 
-    this.leaveCall(conversationEntity.qualifiedId, LEAVE_CALL_REASON.USER_MANUALY_LEFT_CONVERSATION);
+    this.callingRepository.leaveCall(conversationEntity.qualifiedId, LEAVE_CALL_REASON.USER_MANUALY_LEFT_CONVERSATION);
 
     if (this.conversationState.isActiveConversation(conversationEntity)) {
       const nextConversation = this.getNextConversation(conversationEntity);
@@ -1551,7 +1550,10 @@ export class ConversationRepository {
 
     if (leaveConversation) {
       conversationEntity.status(ConversationStatus.PAST_MEMBER);
-      this.leaveCall(conversationEntity.qualifiedId, LEAVE_CALL_REASON.USER_MANUALY_LEFT_CONVERSATION);
+      this.callingRepository.leaveCall(
+        conversationEntity.qualifiedId,
+        LEAVE_CALL_REASON.USER_MANUALY_LEFT_CONVERSATION,
+      );
     }
 
     await this.messageRepository.updateClearedTimestamp(conversationEntity);
@@ -2641,7 +2643,7 @@ export class ConversationRepository {
 
     if (removesSelfUser) {
       conversationEntity.status(ConversationStatus.PAST_MEMBER);
-      this.leaveCall(
+      this.callingRepository.leaveCall(
         conversationEntity.qualifiedId,
         LEAVE_CALL_REASON.USER_IS_REMOVED_BY_AN_ADMIN_OR_LEFT_ON_ANOTHER_CLIENT,
       );
@@ -2654,6 +2656,12 @@ export class ConversationRepository {
         await this.conversationService.wipeMLSConversation(conversationEntity);
       }
     } else {
+      /**
+       * @note We have to call pushClients -> setClientsForConv avs api whenever
+       * someone is removed from the conversation in order to make conference calling
+       * encryption keys rotate on involuntary participant leave.
+       */
+      await this.callingRepository.pushClients();
       // Update conversation roles (in case the removed user had some special role and it's not the self user)
       await this.conversationRoleRepository.updateConversationRoles(conversationEntity);
     }

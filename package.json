@@ -4,7 +4,7 @@
     "@datadog/browser-rum": "^4.44.0",
     "@emotion/react": "11.11.1",
     "@types/eslint": "8.37.0",
-    "@wireapp/avs": "9.2.15",
+    "@wireapp/avs": "9.2.20",
     "@wireapp/core": "40.6.3",
     "@wireapp/lru-cache": "3.8.1",
     "@wireapp/react-ui-kit": "9.7.5",

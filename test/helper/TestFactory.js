@@ -277,6 +277,7 @@ export class TestFactory {
       this.team_repository,
       this.user_repository,
       this.propertyRepository,
+      this.calling_repository,
       serverTimeHandler,
       this.user_repository['userState'],
       this.team_repository['teamState'],
