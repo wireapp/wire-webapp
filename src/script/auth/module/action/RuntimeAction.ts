@@ -30,12 +30,12 @@ export class RuntimeAction {
   checkSupportedBrowser = (): ThunkAction<void> => {
     return (dispatch, getState, {getConfig}) => {
       const isMobileSupportedBrowser = () => {
-        return Runtime.isMobileOS() || Runtime.isSafari();
+        return Runtime.isMobileOS() && (Runtime.isSafari() || Runtime.isChrome());
       };
-
+      const isAuthorizationFlow = () => location?.hash?.includes('authorize') ?? false;
       if (
         (!RuntimeSelector.hasToUseDesktopApplication(getState()) && Runtime.isWebappSupportedBrowser()) ||
-        isMobileSupportedBrowser()
+        (isMobileSupportedBrowser() && isAuthorizationFlow())
       ) {
         dispatch(RuntimeActionCreator.confirmSupportedBrowser());
       }
