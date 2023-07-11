@@ -153,10 +153,13 @@ function isSupportedBrowser(userAgent: string): boolean {
   const browserName = parsedUserAgent.browser.name.toLowerCase();
   const supportedBrowserVersionObject = CommonConfig.WEBAPP_SUPPORTED_BROWSERS[browserName];
   const supportedBrowserVersion = supportedBrowserVersionObject?.major;
-  const isSupportedMobile = CommonConfig.BROWSER.SAFARI === browserName && parsedUserAgent.is.mobile;
+  const isSupportedMobile =
+    (CommonConfig.BROWSER.SAFARI === browserName || CommonConfig.BROWSER.CHROME === browserName) &&
+    parsedUserAgent.is.mobile;
+  const isAuthorizationFlow = location.hash.includes('authorize');
 
   try {
-    if (isSupportedMobile) {
+    if (isSupportedMobile && isAuthorizationFlow) {
       return true;
     }
     const browserVersionString = (parsedUserAgent.browser.version.split('.') || [])[0];
