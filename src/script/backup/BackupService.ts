@@ -119,7 +119,7 @@ export class BackupService {
       return entities.length;
     }
 
-    const ids = entities.map(generateId).filter((id): id is string => id !== undefined);
+    const ids = entities.map(generateId).filter((id): id is string => typeof id === 'string');
     const existingEntities = await table.where('id').anyOf(ids).toArray();
     const newEntities = entities.filter(
       entity => !existingEntities.some(existingEntity => generateId(existingEntity) === generateId(entity)),
