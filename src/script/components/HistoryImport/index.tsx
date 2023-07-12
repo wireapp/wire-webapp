@@ -133,7 +133,7 @@ const HistoryImport: FC<HistoryImportProps> = ({user, backupRepository, file, sw
 
   const getBackUpPassword = (): Promise<string> => {
     return new Promise(resolve => {
-      PrimaryModal.show(PrimaryModal.type.PASSWORD, {
+      PrimaryModal.show(PrimaryModal.type.PASSWORD_ADVANCED_SECURITY, {
         primaryAction: {
           action: async (password: string) => {
             resolve(password);
@@ -145,6 +145,7 @@ const HistoryImport: FC<HistoryImportProps> = ({user, backupRepository, file, sw
             resolve('');
             dismissImport();
           },
+          text: t('backupEncryptionModalCloseBtn'),
         },
         text: {
           closeBtnLabel: t('backupEncryptionModalCloseBtn'),

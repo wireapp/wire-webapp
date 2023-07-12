@@ -140,7 +140,7 @@ const HistoryExport: FC<HistoryExportProps> = ({switchContent, user, clientState
 
   const getBackUpPassword = (): Promise<string> => {
     return new Promise(resolve => {
-      PrimaryModal.show(PrimaryModal.type.PASSWORD, {
+      PrimaryModal.show(PrimaryModal.type.PASSWORD_ADVANCED_SECURITY, {
         primaryAction: {
           action: async (password: string) => {
             resolve(password);
@@ -152,6 +152,7 @@ const HistoryExport: FC<HistoryExportProps> = ({switchContent, user, clientState
             resolve('');
             dismissExport();
           },
+          text: t('backupEncryptionModalCloseBtn'),
         },
         text: {
           closeBtnLabel: t('backupEncryptionModalCloseBtn'),
@@ -169,7 +170,6 @@ const HistoryExport: FC<HistoryExportProps> = ({switchContent, user, clientState
     setHasError(false);
 
     try {
-      logger.log(`Exporting records from history`);
       const numberOfRecords = await backupRepository.getBackupInitData();
       logger.log(`Exporting '${numberOfRecords}' records from history`);
 

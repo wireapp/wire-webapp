@@ -59,6 +59,7 @@ export enum PrimaryModalType {
   MULTI_ACTIONS = 'modal-multi-actions',
   OPTION = 'modal-template-option',
   PASSWORD = 'modal-template-password',
+  PASSWORD_ADVANCED_SECURITY = 'modal-template-password-advance',
   SESSION_RESET = 'modal-session-reset',
   WITHOUT_TITLE = 'modal-without-title',
 }

@@ -187,15 +187,6 @@ export class BackupRepository {
     exportedData: Record<string, any>,
     password: string,
   ): Promise<Blob> {
-    return await this.encryptHistoryFiles(user, clientId, exportedData, password);
-  }
-
-  private async encryptHistoryFiles(
-    user: User,
-    clientId: string,
-    exportedData: Record<string, any>,
-    password: string,
-  ): Promise<Blob> {
     const metaData = this.createMetaData(user, clientId);
 
     const files: Record<string, Uint8Array> = {};
