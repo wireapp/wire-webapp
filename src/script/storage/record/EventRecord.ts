@@ -61,7 +61,7 @@ export type StoredEvent<T> = {
   /** Only used with IndexedDB table 'event' */
   primary_key: string;
   category: number;
-  id: string;
+  id?: string;
   /** if the message is ephemeral, that's the amount of time it should be displayed to the user
    * the different types are
    *  - string: a datestring
