@@ -20,6 +20,8 @@
 import JSZip from 'jszip';
 import sodium from 'libsodium-wrappers';
 
+import {ImportError} from './Error';
+
 type Payload =
   | {type: 'zip'; files: Record<string, ArrayBuffer | string>; encrytionKey?: Uint8Array}
   | {type: 'unzip'; bytes: ArrayBuffer; encrytionKey?: Uint8Array};
@@ -47,7 +49,12 @@ export async function handleZipEvent(payload: Payload) {
       if (!!encrytionKey) {
         // Decrypt the ZIP archive using the provided encrytionKey
         const payloadBytes = new Uint8Array(payload.bytes);
-        decryptedBytes = await decryptFile(payloadBytes, encrytionKey);
+        try {
+          decryptedBytes = await decryptFile(payloadBytes, encrytionKey);
+        } catch (error) {
+          // Handle decryption failure
+          throw new ImportError(error.message);
+        }
       } else {
         decryptedBytes = new Uint8Array(payload.bytes);
       }
@@ -95,8 +102,8 @@ async function decryptFile(encryptedDataSource: Uint8Array, encryptionKey: Uint8
   const encryptedContent = encryptedDataSource.slice(headerBytes + metaDataHeader);
   const decrypted = sodium.crypto_secretstream_xchacha20poly1305_pull(state, encryptedContent);
 
-  if (decrypted === null) {
-    throw new Error('Decryption failed');
+  if (!!!decrypted) {
+    throw new ImportError('WRONG_PASSWORD');
   }
 
   return decrypted.message;

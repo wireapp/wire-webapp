@@ -220,6 +220,8 @@
   "backupImportIncompatibleErrorSecondary": "You cannot restore history from a different account.",
   "backupImportFormatErrorHeadline": "Incompatible backup",
   "backupImportFormatErrorSecondary": "The provided backup format is not supported",
+  "backupImportPasswordErrorHeadline": "Wrong Password",
+  "backupImportPasswordErrorSecondary": "Please verify your input and try again",
   "backupImportProgressHeadline": "Preparing…",
   "backupImportProgressSecondary": "Restoring history · {{processed}} of {{total}} — {{progress}}%",
   "backupImportSuccessHeadline": "History restored.",

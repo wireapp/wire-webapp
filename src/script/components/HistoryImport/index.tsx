@@ -29,7 +29,13 @@ import {getLogger} from 'Util/Logger';
 import {loadFileBuffer} from 'Util/util';
 
 import {BackupRepository, ENCRYPTED_BACKUP_FORMAT} from '../../backup/BackupRepository';
-import {CancelError, DifferentAccountError, IncompatibleBackupError} from '../../backup/Error';
+import {
+  CancelError,
+  DifferentAccountError,
+  IncompatibleBackupError,
+  IncompatibleBackupFormatError,
+  InvalidPassword,
+} from '../../backup/Error';
 import {Config} from '../../Config';
 import {MotionDuration} from '../../motion/MotionDuration';
 
@@ -113,6 +119,12 @@ const HistoryImport: FC<HistoryImportProps> = ({user, backupRepository, file, sw
     } else if (error instanceof IncompatibleBackupError) {
       setErrorHeadline(t('backupImportVersionErrorHeadline'));
       setErrorSecondary(t('backupImportVersionErrorSecondary', Config.getConfig().BRAND_NAME));
+    } else if (error instanceof IncompatibleBackupFormatError) {
+      setErrorHeadline(t('backupImportFormatErrorHeadline'));
+      setErrorSecondary(t('backupImportFormatErrorSecondary'));
+    } else if (error instanceof InvalidPassword) {
+      setErrorHeadline(t('backupImportPasswordErrorHeadline'));
+      setErrorSecondary(t('backupImportPasswordErrorSecondary'));
     } else {
       setErrorHeadline(t('backupImportGenericErrorHeadline'));
       setErrorSecondary(t('backupImportGenericErrorSecondary'));

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2023 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,8 +34,10 @@ import {
   ExportError,
   ImportError,
   IncompatibleBackupError,
+  IncompatibleBackupFormatError,
   IncompatiblePlatformError,
   InvalidMetaDataError,
+  InvalidPassword,
 } from './Error';
 import {preprocessConversations, preprocessEvents, preprocessUsers} from './recordPreprocessors';
 
@@ -215,20 +217,23 @@ export class BackupRepository {
       const backupHeader = await this.generateBackupHeader(user, password, backupCoder).catch(error => {
         throw new Error('Backup error:', error);
       });
+
       // Encrypt the ZIP archive using the provided password
       const formattedHeader = backupCoder.readBackupHeader(backupHeader);
       const chaCha20Key = await backupCoder.generateChaCha20Key(formattedHeader);
       const array = await this.worker.post<Uint8Array>({type: 'zip', files, encrytionKey: chaCha20Key});
+
       // Prepend the combinedBytes to the ZIP archive data
       const combinedArray = this.concatenateByteArrays([backupHeader, array]);
       return new Blob([combinedArray], {type: 'application/zip'});
     }
+
     // If no password, return the regular ZIP archive
     const array = await this.worker.post<Uint8Array>({type: 'zip', files});
     return new Blob([array], {type: 'application/zip'});
   }
 
-  private async generateBackupHeader(user: User, password: string, backupCoder) {
+  private async generateBackupHeader(user: User, password: string, backupCoder: BackUpHeader) {
     const backupHeader = await backupCoder.encodeHeader();
     if (backupHeader.byteLength === 0) {
       throw new Error('Backup header is empty');
@@ -274,7 +279,7 @@ export class BackupRepository {
       const {decodingError, decodedHeader} = await backupCoder.decodeHeader(data);
       // error decoding the header
       if (decodingError) {
-        throw new ImportError(decodingError as unknown as string);
+        this.mappedDecodingError(decodingError);
       }
       // We need to read the ChaCha20 generated header prior to the encrypted backup file data to run some sanity checks
       const chaChaHeaderKey = await backupCoder.generateChaCha20Key(decodedHeader);
@@ -290,6 +295,10 @@ export class BackupRepository {
     }
 
     if (files.error) {
+      const error = files.error.toString();
+      if (error === 'WRONG_PASSWORD') {
+        throw new InvalidPassword(error);
+      }
       throw new ImportError(files.error as unknown as string);
     }
 
@@ -471,10 +480,26 @@ export class BackupRepository {
     }
   }
 
-  // private fun mappedDecodingError(decodingError: HeaderDecodingErrors): RestoreBackupResult.BackupRestoreFailure =
-  // when (decodingError) {
-  //     INVALID_USER_ID -> InvalidUserId
-  //     INVALID_VERSION -> IncompatibleBackup("The provided backup version is lower than the minimum supported version")
-  //     INVALID_FORMAT -> IncompatibleBackup("The provided backup format is not supported")
-  // }
+  private mappedDecodingError(decodingError: string) {
+    let message = '';
+    switch (decodingError) {
+      case 'INVALID_USER_ID': {
+        message = 'The user id in the backup file header does not match the expected one';
+        this.logger.info(message);
+        throw new DifferentAccountError(message);
+        break;
+      }
+      case 'INVALID_VERSION':
+        message = 'The provided backup version is lower than the minimum supported version';
+        this.logger.info(message);
+        throw new IncompatibleBackupError(message);
+        break;
+
+      case 'INVALID_FORMAT':
+        message = 'The provided backup version is lower than the minimum supported version';
+        this.logger.info('The provided backup format is not supported');
+        throw new IncompatibleBackupFormatError(message);
+        break;
+    }
+  }
 }

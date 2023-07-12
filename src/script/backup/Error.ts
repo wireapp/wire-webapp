@@ -59,9 +59,23 @@ export class IncompatibleBackupError extends ImportError {
   }
 }
 
+export class IncompatibleBackupFormatError extends ImportError {
+  constructor(message = '"The provided backup format is not supported') {
+    super(message);
+    Object.setPrototypeOf(this, IncompatibleBackupFormatError.prototype);
+  }
+}
+
 export class IncompatiblePlatformError extends ImportError {
   constructor(message = 'Backup created by incompatible platform') {
     super(message);
     Object.setPrototypeOf(this, IncompatiblePlatformError.prototype);
+  }
+}
+
+export class InvalidPassword extends ImportError {
+  constructor(message = 'Wrong Password') {
+    super(message);
+    Object.setPrototypeOf(this, InvalidPassword.prototype);
   }
 }

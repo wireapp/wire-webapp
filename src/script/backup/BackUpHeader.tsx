@@ -19,6 +19,14 @@
 
 import sodium from 'libsodium-wrappers';
 
+interface DecodedHeader {
+  format: string;
+  version: string;
+  salt: Uint8Array;
+  hashedUserId: Uint8Array;
+  opslimit: number;
+  memlimit: number;
+}
 export class BackUpHeader {
   private readonly userId: string;
   private readonly password: string;
@@ -48,11 +56,11 @@ export class BackUpHeader {
       this.OPSLIMIT_INTERACTIVE_VALUE,
       this.MEMLIMIT_INTERACTIVE_VALUE,
     );
-    const formatBytes = new TextEncoder().encode(this.format);
-    const versionBytes = new TextEncoder().encode(this.version);
+    const formatBytes = sodium.from_string(this.format);
+    const versionBytes = sodium.from_string(this.version);
     const nonReadableByte = new Uint8Array([0x00]);
-    const opslimitBytes = new TextEncoder().encode(this.OPSLIMIT_INTERACTIVE_VALUE.toString());
-    const memlimitBytes = new TextEncoder().encode(this.MEMLIMIT_INTERACTIVE_VALUE.toString());
+    const opslimitBytes = sodium.from_string(this.OPSLIMIT_INTERACTIVE_VALUE.toString());
+    const memlimitBytes = sodium.from_string(this.MEMLIMIT_INTERACTIVE_VALUE.toString());
 
     const headerData = new Uint8Array(
       formatBytes.length +
@@ -70,22 +78,23 @@ export class BackUpHeader {
     offset = this.copyBytes(headerData, salt, offset);
     offset = this.copyBytes(headerData, hashedUserId, offset);
     offset = this.copyBytes(headerData, opslimitBytes, offset);
-    offset = this.copyBytes(headerData, memlimitBytes, offset);
+    this.copyBytes(headerData, memlimitBytes, offset);
 
     return headerData;
   }
 
-  copyBytes(destination, source, offset) {
+  copyBytes(destination: Uint8Array, source: Uint8Array, offset: number): number {
     destination.set(source, offset);
     const nextPos = offset + source.length;
     return nextPos;
   }
 
-  async decodeHeader(encryptedDataSource) {
+  async decodeHeader(
+    encryptedDataSource: Uint8Array,
+  ): Promise<{decodingError: string | null; decodedHeader: DecodedHeader}> {
     const dataSrc = new Uint8Array(encryptedDataSource);
     const decodedHeader = this.readBackupHeader(dataSrc);
 
-    console.log('decodedHeader', decodedHeader);
     await sodium.ready;
     // Sanity checks
     const expectedHashedUserId = this.hashUserId(
@@ -100,23 +109,25 @@ export class BackUpHeader {
     return {decodingError, decodedHeader};
   }
 
-  handleHeaderDecodingErrors(decodedHeader, expectedHashedUserId, storedHashedUserId) {
+  handleHeaderDecodingErrors(
+    decodedHeader: DecodedHeader,
+    expectedHashedUserId: Uint8Array,
+    storedHashedUserId: Uint8Array,
+  ) {
     const {format, version} = decodedHeader;
     if (!sodium.memcmp(expectedHashedUserId, storedHashedUserId)) {
-      console.error('The hashed user id in the backup file header does not match the expected one');
       return 'INVALID_USER_ID';
     } else if (format !== this.format) {
-      console.error('The backup format found in the backup file header is not a valid one');
       return 'INVALID_FORMAT';
     } else if (parseInt(version) < parseInt(this.version)) {
-      console.error('The backup version found in the backup file header is not a valid one');
       return 'INVALID_VERSION';
     }
     return null;
   }
 
-  async generateChaCha20Key(header) {
+  async generateChaCha20Key(header: DecodedHeader) {
     await sodium.ready;
+
     return sodium.crypto_pwhash(
       this.PWD_HASH_OUTPUT_BYTES,
       this.password,
@@ -127,7 +138,7 @@ export class BackUpHeader {
     );
   }
 
-  hashUserId(userId, salt, opslimit, memlimit) {
+  hashUserId(userId: string, salt: Uint8Array, opslimit: number, memlimit: number): Uint8Array {
     return sodium.crypto_pwhash(
       this.PWD_HASH_OUTPUT_BYTES,
       userId.toString(),
@@ -138,7 +149,7 @@ export class BackUpHeader {
     );
   }
 
-  readBackupHeader(data: Uint8Array) {
+  readBackupHeader(data: Uint8Array): DecodedHeader {
     const {
       BACKUP_HEADER_FORMAT_LENGTH,
       BACKUP_HEADER_EXTRA_GAP_LENGTH,
@@ -148,11 +159,6 @@ export class BackUpHeader {
     } = this;
     const formatBytes = data.slice(0, BACKUP_HEADER_FORMAT_LENGTH);
     const format = new TextDecoder().decode(formatBytes);
-
-    const extraGapBytes = data.slice(
-      BACKUP_HEADER_FORMAT_LENGTH,
-      BACKUP_HEADER_FORMAT_LENGTH + BACKUP_HEADER_EXTRA_GAP_LENGTH,
-    );
 
     const versionBytes = data.slice(
       BACKUP_HEADER_FORMAT_LENGTH + BACKUP_HEADER_EXTRA_GAP_LENGTH,
