@@ -17,6 +17,8 @@
  *
  */
 
+import {useEffect} from 'react';
+
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import cx from 'classnames';
 import {$getRoot, $nodesOfType, COMMAND_PRIORITY_LOW, KEY_ENTER_COMMAND, type LexicalEditor} from 'lexical';
@@ -77,19 +79,25 @@ export const getMentionsToSend = (editor: LexicalEditor, textValue: string, ment
 export const SendMessageButton = ({textValue, onSend, mentions}: SendMessageButtonProps) => {
   const [editor] = useLexicalComposerContext();
 
-  editor.registerCommand(
-    KEY_ENTER_COMMAND,
-    event => {
-      const mentionEntities = getMentionsToSend(editor, textValue, mentions);
+  useEffect(() => {
+    const removeListener = editor.registerCommand(
+      KEY_ENTER_COMMAND,
+      event => {
+        const mentionEntities = getMentionsToSend(editor, textValue, mentions);
 
-      onSend(textValue, mentionEntities);
-      editor.update(() => {
-        $getRoot().clear();
-      });
-      return false;
-    },
-    COMMAND_PRIORITY_LOW,
-  );
+        onSend(textValue, mentionEntities);
+        editor.update(() => {
+          $getRoot().clear();
+        });
+        return false;
+      },
+      COMMAND_PRIORITY_LOW,
+    );
+
+    return () => {
+      removeListener();
+    };
+  }, [editor, mentions, onSend, textValue]);
 
   return (
     <button
