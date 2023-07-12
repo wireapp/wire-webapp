@@ -81,7 +81,7 @@ export class BackupService {
     {
       generatePrimaryKey,
       generateId,
-    }: {generatePrimaryKey?: (entry: T) => string; generateId?: (entry: T) => string} = {},
+    }: {generatePrimaryKey?: (entry: T) => string; generateId?: (entry: T) => string | undefined} = {},
   ): Promise<number> {
     if (this.storageService.db) {
       const table = await this.storageService.db.table(tableName);
@@ -112,14 +112,14 @@ export class BackupService {
   private async addByIds<T>(
     table: Dexie.Table<T, unknown>,
     entities: T[],
-    generateId?: (entry: T) => string,
+    generateId?: (entry: T) => string | undefined,
   ): Promise<number> {
     if (!generateId) {
       await table.bulkAdd(entities);
       return entities.length;
     }
 
-    const ids = entities.map(generateId);
+    const ids = entities.map(generateId).filter((id): id is string => typeof id === 'string');
     const existingEntities = await table.where('id').anyOf(ids).toArray();
     const newEntities = entities.filter(
       entity => !existingEntities.some(existingEntity => generateId(existingEntity) === generateId(entity)),
