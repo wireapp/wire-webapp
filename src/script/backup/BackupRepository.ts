@@ -264,6 +264,34 @@ export class BackupRepository {
     return this.backupService.getHistoryCount();
   }
 
+  private async convertToUint8Array(data: ArrayBuffer | Blob): Promise<Uint8Array> {
+    if (data instanceof ArrayBuffer) {
+      return new Uint8Array(data);
+    } else if (data instanceof Blob) {
+      return await this.readBlobAsUint8Array(data);
+    }
+    throw new Error('Unsupported data type');
+  }
+  private async readBlobAsUint8Array(blob: Blob): Promise<Uint8Array> {
+    return new Promise<Uint8Array>((resolve, reject) => {
+      const reader = new FileReader();
+
+      reader.onloadend = () => {
+        if (reader.result instanceof ArrayBuffer) {
+          resolve(new Uint8Array(reader.result));
+        } else {
+          reject(new Error('Invalid Blob data'));
+        }
+      };
+
+      reader.onerror = () => {
+        reject(new Error('Failed to read Blob data'));
+      };
+
+      reader.readAsArrayBuffer(blob);
+    });
+  }
+
   public async importHistory(
     user: User,
     data: ArrayBuffer | Blob,
@@ -276,7 +304,11 @@ export class BackupRepository {
 
     if (password) {
       const backupCoder = new BackUpHeader(user.id, password);
-      const {decodingError, decodedHeader} = await backupCoder.decodeHeader(data);
+
+      // Convert data to Uint8Array
+      const dataArray = await this.convertToUint8Array(data);
+      const {decodingError, decodedHeader} = await backupCoder.decodeHeader(dataArray);
+
       // error decoding the header
       if (decodingError) {
         this.mappedDecodingError(decodingError);
