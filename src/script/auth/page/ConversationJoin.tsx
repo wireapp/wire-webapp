@@ -85,12 +85,13 @@ const ConversationJoinComponent = ({
   const [isPwaEnabled, setIsPwaEnabled] = useState<boolean>();
   const [conversationCode, setConversationCode] = useState<string>();
   const [conversationKey, setConversationKey] = useState<string>();
-  const [enteredName, setEnteredName] = useState<string>();
+  const [enteredName, setEnteredName] = useState<string>('');
   const [error, setError] = useState<any>();
   const [expiresIn, setExpiresIn] = useState<number>();
   const [forceNewTemporaryGuestAccount, setForceNewTemporaryGuestAccount] = useState(false);
   const [isValidLink, setIsValidLink] = useState(true);
   const [isValidName, setIsValidName] = useState(true);
+  const [isSubmitingName, setIsSubmitingName] = useState(false);
   const [showCookiePolicyBanner, setShowCookiePolicyBanner] = useState(true);
   const [showEntropyForm, setShowEntropyForm] = useState(false);
   const isEntropyRequired = Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY;
@@ -139,6 +140,7 @@ const ConversationJoinComponent = ({
   };
 
   const handleSubmit = async (entropyData?: Uint8Array) => {
+    setIsSubmitingName(true);
     try {
       const name = enteredName.trim();
       const registrationData = {
@@ -162,6 +164,7 @@ const ConversationJoinComponent = ({
 
       routeToApp(conversationEvent.conversation, conversationEvent.qualified_conversation?.domain ?? '');
     } catch (error) {
+      setIsSubmitingName(false);
       if (error.label) {
         switch (error.label) {
           default: {
@@ -186,16 +189,18 @@ const ConversationJoinComponent = ({
     }
   };
 
-  const checkNameValidity = (event: React.FormEvent) => {
+  const checkNameValidity = async (event: React.FormEvent) => {
     event.preventDefault();
-    nameInput.current.value = nameInput.current.value.trim();
-    if (!nameInput.current.checkValidity()) {
-      setError(ValidationError.handleValidationState('name', nameInput.current.validity));
-      setIsValidName(false);
-    } else if (isEntropyRequired) {
-      setShowEntropyForm(true);
-    } else {
-      handleSubmit();
+    if (nameInput.current) {
+      nameInput.current.value = nameInput.current.value.trim();
+      if (!nameInput.current.checkValidity()) {
+        setError(ValidationError.handleValidationState('name', nameInput.current.validity));
+        setIsValidName(false);
+      } else if (isEntropyRequired) {
+        setShowEntropyForm(true);
+      } else {
+        await handleSubmit();
+      }
     }
   };
 
@@ -266,7 +271,7 @@ const ConversationJoinComponent = ({
                       data-uie-name="enter-name"
                     />
                     <RoundIconButton
-                      disabled={!enteredName || !isValidName}
+                      disabled={!enteredName || !isValidName || isSubmitingName}
                       type="submit"
                       formNoValidate
                       onClick={checkNameValidity}
