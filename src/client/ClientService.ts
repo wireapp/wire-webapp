@@ -100,6 +100,7 @@ export class ClientService {
    * Will try to load the local client from the database into memory.
    * Will return undefined if the client is not found in the database or if the client does not exist on the backend.
    * If the client doesn't exist on backend it will purge the database and return undefined.
+   * If the client is found on the backend it will update the local client in the database and return it.
    *
    * @return the loaded client or undefined
    */
@@ -111,8 +112,8 @@ export class ClientService {
     }
 
     try {
-      await this.apiClient.api.client.getClient(loadedClient.id);
-      return loadedClient;
+      const remoteClient = await this.apiClient.api.client.getClient(loadedClient.id);
+      return this.database.updateLocalClient(remoteClient);
     } catch (error) {
       const notFoundOnBackend = axios.isAxiosError(error) ? error.response?.status === StatusCodes.NOT_FOUND : false;
       if (notFoundOnBackend && this.storeEngine) {
