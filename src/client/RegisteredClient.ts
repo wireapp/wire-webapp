@@ -29,6 +29,7 @@ export interface AddedClient extends PublicClient {
   time: string;
   type: ClientType.PERMANENT | ClientType.TEMPORARY;
   mls_public_keys?: Record<string, string>;
+  last_active?: string;
 }
 
 export interface RegisteredClient extends AddedClient {
