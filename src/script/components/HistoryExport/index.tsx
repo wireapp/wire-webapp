@@ -154,6 +154,7 @@ const HistoryExport: FC<HistoryExportProps> = ({switchContent, user, clientState
           },
           text: t('backupEncryptionModalCloseBtn'),
         },
+        passwordOptional: true,
         text: {
           closeBtnLabel: t('backupEncryptionModalCloseBtn'),
           input: t('backupEncryptionModalPlaceholder'),

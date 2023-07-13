@@ -147,9 +147,10 @@ const HistoryImport: FC<HistoryImportProps> = ({user, backupRepository, file, sw
           },
           text: t('backupEncryptionModalCloseBtn'),
         },
+        passwordOptional: false,
         text: {
           closeBtnLabel: t('backupEncryptionModalCloseBtn'),
-          input: t('backupEncryptionModalPlaceholder'),
+          input: t('backupDecryptionModalPlaceholder'),
           message: t('backupDecryptionModalMessage'),
           title: t('backupDecryptionModalTitle'),
         },

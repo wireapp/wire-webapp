@@ -48,6 +48,7 @@ export interface ModalOptions {
   secondaryAction?: Action[] | Action;
   hideCloseBtn?: boolean;
   text?: Text;
+  passwordOptional?: boolean;
 }
 
 export enum PrimaryModalType {

@@ -59,6 +59,7 @@ export const PrimaryModalComponent: FC = () => {
     titleText,
     closeBtnTitle,
     hideCloseBtn = false,
+    passwordOptional = false,
   } = content;
   const hasPassword = currentType === PrimaryModalType.PASSWORD;
   const hasPasswordWithRules = currentType === PrimaryModalType.PASSWORD_ADVANCED_SECURITY;
@@ -74,12 +75,19 @@ export const PrimaryModalComponent: FC = () => {
     updateOptionChecked(false);
     showNextModalInQueue();
   };
+  const isPasswordOptional = () => {
+    const skipValidation = passwordOptional && !!!passwordInput.trim().length;
+    if (skipValidation) {
+      return true;
+    }
+    return passwordRegex.test(passwordInput);
+  };
 
   const passwordRegex = new RegExp(
     ValidationUtil.getNewPasswordPattern(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH),
   );
   const actionEnabled =
-    (!hasInput || !!inputValue.trim().length) && hasPasswordWithRules && passwordRegex.test(passwordInput);
+    (!hasInput || !!inputValue.trim().length) && (hasPasswordWithRules ? isPasswordOptional() : true);
 
   const doAction =
     (action?: Function, closeAfter = true, skipValidation = false) =>
