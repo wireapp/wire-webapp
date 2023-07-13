@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [40.7.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@40.6.3...@wireapp/core@40.7.0) (2023-07-13)
+
+### Features
+
+* **api-client, core:** parse client last active field [WPB-2186] ([#5306](https://github.com/wireapp/wire-web-packages/issues/5306)) ([09d0153](https://github.com/wireapp/wire-web-packages/commit/09d015359f2225f4d4bf516a3b82f58f6612a689))
+
 ## [40.6.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/core@40.6.2...@wireapp/core@40.6.3) (2023-07-03)
 
 ### Bug Fixes
