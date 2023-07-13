@@ -24,6 +24,7 @@ import {Runtime} from '@wireapp/commons';
 import {RuntimeActionCreator} from './creator/';
 
 import * as RuntimeSelector from '../../module/selector/RuntimeSelector';
+import {QUERY_KEY} from '../../route';
 import type {ThunkAction} from '../reducer';
 
 export class RuntimeAction {
@@ -32,7 +33,7 @@ export class RuntimeAction {
       const isMobileSupportedBrowser = () => {
         return Runtime.isMobileOS() && (Runtime.isSafari() || Runtime.isChrome());
       };
-      const isAuthorizationFlow = () => location?.search?.includes('scope') ?? false;
+      const isAuthorizationFlow = () => location?.search?.includes(QUERY_KEY.SCOPE) ?? false;
       if (
         (!RuntimeSelector.hasToUseDesktopApplication(getState()) && Runtime.isWebappSupportedBrowser()) ||
         (isMobileSupportedBrowser() && isAuthorizationFlow())
