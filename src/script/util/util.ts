@@ -405,8 +405,8 @@ const supportsSecretStorage = () => !Runtime.isDesktopApp() || !!window.systemCr
 // disables mls for old 'broken' desktop clients, see https://github.com/wireapp/wire-desktop/pull/6094
 export const supportsMLS = () => Config.getConfig().FEATURE.ENABLE_MLS && supportsSecretStorage();
 
-export const supportsMLSMigrationInit = () =>
-  Config.getConfig().FEATURE.ENABLE_MLS && Config.getConfig().FEATURE.ENABLE_MLS_MIGRATION_INIT;
+export const supportsMLSMigration = () =>
+  Config.getConfig().FEATURE.ENABLE_MLS && Config.getConfig().FEATURE.ENABLE_MLS_MIGRATION;
 
 export const supportsSelfSupportedProtocolsUpdates = () =>
   Config.getConfig().FEATURE.ENABLE_SELF_SUPPORTED_PROTOCOLS_UPDATES;

@@ -78,7 +78,7 @@ export type Env = {
   FEATURE_ENABLE_MLS?: string;
 
   /** will enable the client to initialise the MLS migration flow of group conversations */
-  FEATURE_ENABLE_MLS_MIGRATION_INIT?: string;
+  FEATURE_ENABLE_MLS_MIGRATION?: string;
 
   /** will enable the user to periodically update the list of supported protocols */
   FEATURE_ENABLE_SELF_SUPPORTED_PROTOCOLS_UPDATES?: string;

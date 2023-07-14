@@ -34,7 +34,7 @@ import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
 import {showUserModal, UserModal} from 'Components/Modals/UserModal';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {supportsMLSMigrationInit} from 'Util/util';
+import {supportsMLSMigration} from 'Util/util';
 
 import {AppLock} from './AppLock';
 import {LeftSidebar} from './LeftSidebar';
@@ -197,7 +197,7 @@ const AppMain: FC<AppMainProps> = ({
       window.setTimeout(() => repositories.notification.checkPermission(), App.CONFIG.NOTIFICATION_CHECK);
     });
 
-    if (supportsMLSMigrationInit()) {
+    if (supportsMLSMigration()) {
       //after app is loaded, check mls migration configuration and start migration if needed
       await initialiseMLSMigrationFlow({
         teamState,
