@@ -24,10 +24,9 @@ import {FeatureList, FeatureMLS, FeatureStatus} from '@wireapp/api-client/lib/te
 import {APIClient} from '@wireapp/api-client';
 import {Account} from '@wireapp/core';
 
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-
 import {isMLSSupportedByEnvironment} from '../../isMLSSupportedByEnvironment';
 import {getMLSMigrationStatus, MLSMigrationStatus} from '../../MLSMigration/migrationStatus';
+import {wasClientActiveWithinLast4Weeks} from '../wasClientActiveWithinLast4Weeks';
 
 export const evaluateSelfSupportedProtocols = async ({
   core,
@@ -155,16 +154,8 @@ const isProteusSupported = async ({
   );
 };
 
-const wasClientActiveWithinLast4Weeks = (client: RegisteredClient): boolean => {
-  //FIXME: once last_active field is added to the client entity
-  const lastActiveISODate = (client as any).last_active as string;
-  const lastActiveDate = new Date(lastActiveISODate).getTime();
-  const fourWeeks = TIME_IN_MILLIS.WEEK * 4;
-  return Date.now() - lastActiveDate < fourWeeks;
-};
-
 const haveAllActiveClientsRegisteredMLSDevice = async (selfClients: RegisteredClient[]): Promise<boolean> => {
-  //TODO: filter only active clients once last_active field is added to the client entity
+  //we consider client active if it was active within last 4 weeks
   const activeClients = selfClients.filter(wasClientActiveWithinLast4Weeks);
   return activeClients.every(client => !!client.mls_public_keys);
 };
