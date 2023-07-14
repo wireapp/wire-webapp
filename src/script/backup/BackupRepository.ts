@@ -210,8 +210,8 @@ export class BackupRepository {
       });
 
       // Encrypt the ZIP archive using the provided password
-      const formattedHeader = backupCoder.readBackupHeader(backupHeader);
-      const chaCha20Key = await backupCoder.generateChaCha20Key(formattedHeader);
+      const {decodedHeader} = backupCoder.readBackupHeader(backupHeader);
+      const chaCha20Key = await backupCoder.generateChaCha20Key(decodedHeader);
       const array = await this.worker.post<Uint8Array>({type: 'zip', files, encrytionKey: chaCha20Key});
 
       // Prepend the combinedBytes to the ZIP archive data
@@ -298,7 +298,7 @@ export class BackupRepository {
 
       // Convert data to Uint8Array
       const dataArray = await this.convertToUint8Array(data);
-      const {decodingError, decodedHeader} = await backupCoder.decodeHeader(dataArray);
+      const {decodingError, decodedHeader, headerSize} = await backupCoder.decodeHeader(dataArray);
 
       // error decoding the header
       if (decodingError) {
@@ -312,9 +312,13 @@ export class BackupRepository {
         type: 'unzip',
         bytes: data,
         encrytionKey: chaChaHeaderKey,
+        headerLength: headerSize,
       });
     } else {
-      files = await this.worker.post<Record<string, Uint8Array>>({type: 'unzip', bytes: data});
+      files = await this.worker.post<Record<string, Uint8Array>>({
+        type: 'unzip',
+        bytes: data,
+      });
     }
 
     if (files.error) {

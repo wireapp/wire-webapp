@@ -49,6 +49,14 @@ export class BackUpHeader {
 
   async encodeHeader() {
     await sodium.ready;
+    const {
+      BACKUP_HEADER_FORMAT_LENGTH,
+      BACKUP_HEADER_EXTRA_GAP_LENGTH,
+      BACKUP_HEADER_VERSION_LENGTH,
+      PWD_HASH_OUTPUT_BYTES,
+      UNSIGNED_INT_LENGTH,
+    } = this;
+
     const salt = sodium.randombytes_buf(sodium.crypto_pwhash_SALTBYTES);
     const hashedUserId = this.hashUserId(
       this.userId,
@@ -59,17 +67,20 @@ export class BackUpHeader {
     const formatBytes = sodium.from_string(this.format);
     const versionBytes = sodium.from_string(this.version);
     const nonReadableByte = new Uint8Array([0x00]);
-    const opslimitBytes = sodium.from_string(this.OPSLIMIT_INTERACTIVE_VALUE.toString());
-    const memlimitBytes = sodium.from_string(this.MEMLIMIT_INTERACTIVE_VALUE.toString());
+    const opslimitBytes = new Uint8Array(UNSIGNED_INT_LENGTH);
+    const memlimitBytes = new Uint8Array(UNSIGNED_INT_LENGTH);
+
+    // Set opslimitBytes and memlimitBytes using DataView
+    new DataView(opslimitBytes.buffer).setUint32(0, this.OPSLIMIT_INTERACTIVE_VALUE, false);
+    new DataView(memlimitBytes.buffer).setUint32(0, this.MEMLIMIT_INTERACTIVE_VALUE, false);
 
     const headerData = new Uint8Array(
-      formatBytes.length +
-        1 +
-        versionBytes.length +
-        salt.length +
-        hashedUserId.length +
-        opslimitBytes.length +
-        memlimitBytes.length,
+      BACKUP_HEADER_FORMAT_LENGTH +
+        BACKUP_HEADER_EXTRA_GAP_LENGTH +
+        BACKUP_HEADER_VERSION_LENGTH +
+        sodium.crypto_pwhash_SALTBYTES +
+        PWD_HASH_OUTPUT_BYTES +
+        2 * UNSIGNED_INT_LENGTH,
     );
     let offset = 0;
     offset = this.copyBytes(headerData, formatBytes, offset);
@@ -91,22 +102,22 @@ export class BackUpHeader {
 
   async decodeHeader(
     encryptedDataSource: Uint8Array,
-  ): Promise<{decodingError: string | null; decodedHeader: DecodedHeader}> {
+  ): Promise<{decodingError: string | null; decodedHeader: DecodedHeader; headerSize: number}> {
     const dataSrc = new Uint8Array(encryptedDataSource);
-    const decodedHeader = this.readBackupHeader(dataSrc);
+    const {decodedHeader, headerSize} = this.readBackupHeader(dataSrc);
 
     await sodium.ready;
     // Sanity checks
     const expectedHashedUserId = this.hashUserId(
       this.userId,
       decodedHeader.salt,
-      this.OPSLIMIT_INTERACTIVE_VALUE,
-      this.MEMLIMIT_INTERACTIVE_VALUE,
+      decodedHeader.opslimit,
+      decodedHeader.memlimit,
     );
     const storedHashedUserId = decodedHeader.hashedUserId;
     const decodingError = this.handleHeaderDecodingErrors(decodedHeader, expectedHashedUserId, storedHashedUserId);
 
-    return {decodingError, decodedHeader};
+    return {decodingError, decodedHeader, headerSize};
   }
 
   handleHeaderDecodingErrors(
@@ -132,8 +143,8 @@ export class BackUpHeader {
       this.PWD_HASH_OUTPUT_BYTES,
       this.password,
       header.salt,
-      this.OPSLIMIT_INTERACTIVE_VALUE,
-      this.MEMLIMIT_INTERACTIVE_VALUE,
+      header.opslimit,
+      header.memlimit,
       sodium.crypto_pwhash_ALG_DEFAULT,
     );
   }
@@ -149,7 +160,7 @@ export class BackUpHeader {
     );
   }
 
-  readBackupHeader(data: Uint8Array): DecodedHeader {
+  readBackupHeader(data: Uint8Array): {decodedHeader: DecodedHeader; headerSize: number} {
     const {
       BACKUP_HEADER_FORMAT_LENGTH,
       BACKUP_HEADER_EXTRA_GAP_LENGTH,
@@ -157,53 +168,32 @@ export class BackUpHeader {
       PWD_HASH_OUTPUT_BYTES,
       UNSIGNED_INT_LENGTH,
     } = this;
+
     const formatBytes = data.slice(0, BACKUP_HEADER_FORMAT_LENGTH);
     const format = new TextDecoder().decode(formatBytes);
 
-    const versionBytes = data.slice(
-      BACKUP_HEADER_FORMAT_LENGTH + BACKUP_HEADER_EXTRA_GAP_LENGTH,
-      BACKUP_HEADER_FORMAT_LENGTH + BACKUP_HEADER_EXTRA_GAP_LENGTH + BACKUP_HEADER_VERSION_LENGTH,
-    );
+    const versionOffset = BACKUP_HEADER_FORMAT_LENGTH + BACKUP_HEADER_EXTRA_GAP_LENGTH;
+    const versionLength = BACKUP_HEADER_VERSION_LENGTH;
+    const versionBytes = data.slice(versionOffset, versionOffset + versionLength);
     const version = new TextDecoder().decode(versionBytes);
 
-    const salt = data.slice(
-      BACKUP_HEADER_FORMAT_LENGTH + BACKUP_HEADER_EXTRA_GAP_LENGTH + BACKUP_HEADER_VERSION_LENGTH,
-      BACKUP_HEADER_FORMAT_LENGTH +
-        BACKUP_HEADER_EXTRA_GAP_LENGTH +
-        BACKUP_HEADER_VERSION_LENGTH +
-        sodium.crypto_pwhash_SALTBYTES,
-    );
+    const saltOffset = versionOffset + versionLength;
+    const saltLength = sodium.crypto_pwhash_SALTBYTES;
+    const salt = data.slice(saltOffset, saltOffset + saltLength);
 
-    const hashedUserId = data.slice(
-      BACKUP_HEADER_FORMAT_LENGTH +
-        BACKUP_HEADER_EXTRA_GAP_LENGTH +
-        BACKUP_HEADER_VERSION_LENGTH +
-        sodium.crypto_pwhash_SALTBYTES,
-      BACKUP_HEADER_FORMAT_LENGTH +
-        BACKUP_HEADER_EXTRA_GAP_LENGTH +
-        BACKUP_HEADER_VERSION_LENGTH +
-        sodium.crypto_pwhash_SALTBYTES +
-        PWD_HASH_OUTPUT_BYTES,
-    );
+    const hashedUserIdOffset = saltOffset + saltLength;
+    const hashedUserIdLength = PWD_HASH_OUTPUT_BYTES;
+    const hashedUserId = data.slice(hashedUserIdOffset, hashedUserIdOffset + hashedUserIdLength);
 
-    const opslimit = new DataView(data.buffer).getInt32(
-      BACKUP_HEADER_FORMAT_LENGTH +
-        BACKUP_HEADER_EXTRA_GAP_LENGTH +
-        BACKUP_HEADER_VERSION_LENGTH +
-        sodium.crypto_pwhash_SALTBYTES +
-        PWD_HASH_OUTPUT_BYTES,
-    );
+    const opslimitOffset = hashedUserIdOffset + hashedUserIdLength;
+    const opslimit = new DataView(data.buffer).getUint32(opslimitOffset, false);
 
-    const memlimit = new DataView(data.buffer).getInt32(
-      BACKUP_HEADER_FORMAT_LENGTH +
-        BACKUP_HEADER_EXTRA_GAP_LENGTH +
-        BACKUP_HEADER_VERSION_LENGTH +
-        sodium.crypto_pwhash_SALTBYTES +
-        PWD_HASH_OUTPUT_BYTES +
-        UNSIGNED_INT_LENGTH,
-    );
+    const memlimitOffset = opslimitOffset + UNSIGNED_INT_LENGTH;
+    const memlimit = new DataView(data.buffer).getUint32(memlimitOffset, false);
 
-    return {
+    const headerSize = memlimitOffset + UNSIGNED_INT_LENGTH;
+
+    const decodedHeader = {
       format,
       version,
       salt,
@@ -211,5 +201,7 @@ export class BackUpHeader {
       opslimit,
       memlimit,
     };
+
+    return {decodedHeader, headerSize};
   }
 }

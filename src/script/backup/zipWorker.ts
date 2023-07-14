@@ -24,9 +24,9 @@ import {ImportError} from './Error';
 
 type Payload =
   | {type: 'zip'; files: Record<string, ArrayBuffer | string>; encrytionKey?: Uint8Array}
-  | {type: 'unzip'; bytes: ArrayBuffer; encrytionKey?: Uint8Array};
+  | {type: 'unzip'; bytes: ArrayBuffer; encrytionKey?: Uint8Array; headerLength?: number};
 
-export async function handleZipEvent(payload: Payload) {
+async function handleZipEvent(payload: Payload) {
   const zip = new JSZip();
   const encrytionKey = payload.encrytionKey;
   switch (payload.type) {
@@ -46,11 +46,13 @@ export async function handleZipEvent(payload: Payload) {
 
     case 'unzip':
       let decryptedBytes: Uint8Array;
+
       if (!!encrytionKey) {
         // Decrypt the ZIP archive using the provided encrytionKey
         const payloadBytes = new Uint8Array(payload.bytes);
+        const headerLength = payload.headerLength ? payload.headerLength : 0;
         try {
-          decryptedBytes = await decryptFile(payloadBytes, encrytionKey);
+          decryptedBytes = await decryptFile(payloadBytes, encrytionKey, headerLength);
         } catch (error) {
           // Handle decryption failure
           throw new ImportError(error.message);
@@ -92,10 +94,10 @@ async function encryptFile(fileContent: Uint8Array, encryptionKey: Uint8Array): 
 }
 
 // Decrypt a file
-async function decryptFile(encryptedDataSource: Uint8Array, encryptionKey: Uint8Array) {
+export async function decryptFile(encryptedDataSource: Uint8Array, encryptionKey: Uint8Array, headerLength: number) {
   await sodium.ready;
 
-  const metaDataHeader = 64;
+  const metaDataHeader = headerLength;
   const headerBytes = sodium.crypto_secretstream_xchacha20poly1305_HEADERBYTES;
   const header = encryptedDataSource.slice(metaDataHeader, metaDataHeader + headerBytes);
   const state = sodium.crypto_secretstream_xchacha20poly1305_init_pull(header, encryptionKey);
