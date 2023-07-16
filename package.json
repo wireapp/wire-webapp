@@ -108,7 +108,7 @@
     "babel-plugin-transform-import-meta": "^2.2.0",
     "caniuse-lite": "^1.0.30001514",
     "cross-env": "7.0.3",
-    "cspell": "6.31.1",
+    "cspell": "6.31.2",
     "css-loader": "^6.8.1",
     "cssnano": "^5.1.14",
     "dexie": "3.2.3",
