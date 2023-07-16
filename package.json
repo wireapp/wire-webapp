@@ -152,7 +152,7 @@
     "node-fetch": "2.6.12",
     "os-browserify": "0.3.0",
     "path-browserify": "1.0.1",
-    "postcss": "8.4.25",
+    "postcss": "8.4.26",
     "postcss-import": "^15.1.0",
     "postcss-less": "6.0.0",
     "postcss-loader": "^7.3.3",
