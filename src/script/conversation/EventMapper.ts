@@ -24,7 +24,7 @@ import {LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
-import {base64ToArray} from 'Util/util';
+import {base64ToArray, supportsMLSMigration} from 'Util/util';
 
 import {
   MemberJoinEvent,
@@ -255,7 +255,7 @@ export class EventMapper {
         break;
       }
 
-      case CONVERSATION_EVENT.PROTOCOL_UPDATE: {
+      case supportsMLSMigration() && CONVERSATION_EVENT.PROTOCOL_UPDATE: {
         messageEntity = this._mapEventProtocolUpdate(event);
         break;
       }
