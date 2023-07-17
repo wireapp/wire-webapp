@@ -71,6 +71,9 @@ export const tryEstablishingMLSGroupForMixedConversation = async (
     //at this point we should wipe conversation locally
     //it's possible that somebody else has already created the group,
     //we should wait for the welcome message or try joining with external commit later
+
+    //TODO: in the future, register conversation (corecrypto.createConversation) will throw an error if the conversation already exists
+    // if conversation already exist we should not wipe it as we were added via welcome message
     mlsMigrationLogger.info(
       `MLS Group for conversation ${mixedConversation.qualifiedId.id} was not created, wiping the conversation.`,
     );
