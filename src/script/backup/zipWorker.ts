@@ -104,7 +104,7 @@ export async function decryptFile(encryptedDataSource: Uint8Array, encryptionKey
   const encryptedContent = encryptedDataSource.slice(headerBytes + metaDataHeader);
   const decrypted = sodium.crypto_secretstream_xchacha20poly1305_pull(state, encryptedContent);
 
-  if (!!!decrypted) {
+  if (!decrypted) {
     throw new ImportError('WRONG_PASSWORD');
   }
 
