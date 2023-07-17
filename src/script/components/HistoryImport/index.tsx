@@ -141,13 +141,15 @@ const HistoryImport: FC<HistoryImportProps> = ({user, backupRepository, file, sw
           },
           text: t('backupDecryptionModalAction'),
         },
-        secondaryAction: {
-          action: () => {
-            resolve('');
-            dismissImport();
+        secondaryAction: [
+          {
+            action: () => {
+              resolve('');
+              dismissImport();
+            },
+            text: t('backupEncryptionModalCloseBtn'),
           },
-          text: t('backupEncryptionModalCloseBtn'),
-        },
+        ],
         passwordOptional: false,
         text: {
           closeBtnLabel: t('backupEncryptionModalCloseBtn'),

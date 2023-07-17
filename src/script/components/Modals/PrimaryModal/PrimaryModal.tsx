@@ -141,17 +141,20 @@ export const PrimaryModalComponent: FC = () => {
     const handleEscape = (event: KeyboardEvent) => {
       if (isEscapeKey(event) && isModalVisible) {
         removeCurrentModal();
-
-        if (hasPasswordWithRules) {
-          const [closeAction] = secondaryAction;
-          closeAction.action();
-        }
+        closeAction();
       }
     };
 
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
   }, [isModalVisible]);
+
+  const closeAction = () => {
+    if (hasPasswordWithRules) {
+      const [closeAction] = secondaryActions;
+      closeAction?.action?.();
+    }
+  };
 
   return (
     <div
@@ -178,10 +181,7 @@ export const PrimaryModalComponent: FC = () => {
                   className="modal__header__button"
                   onClick={() => {
                     removeCurrentModal();
-                    if (hasPasswordWithRules) {
-                      const [closeAction] = secondaryAction;
-                      closeAction.action();
-                    }
+                    closeAction();
                   }}
                   aria-label={closeBtnTitle}
                   data-uie-name="do-close"

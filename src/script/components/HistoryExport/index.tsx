@@ -147,13 +147,15 @@ const HistoryExport: FC<HistoryExportProps> = ({switchContent, user, clientState
           },
           text: t('backupEncryptionModalAction'),
         },
-        secondaryAction: {
-          action: () => {
-            resolve('');
-            dismissExport();
+        secondaryAction: [
+          {
+            action: () => {
+              resolve('');
+              dismissExport();
+            },
+            text: t('backupEncryptionModalCloseBtn'),
           },
-          text: t('backupEncryptionModalCloseBtn'),
-        },
+        ],
         passwordOptional: true,
         text: {
           closeBtnLabel: t('backupEncryptionModalCloseBtn'),

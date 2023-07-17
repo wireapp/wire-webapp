@@ -80,6 +80,7 @@ export interface ModalContent {
   titleText: string;
   closeBtnTitle?: string;
   hideCloseBtn?: boolean;
+  passwordOptional?: boolean;
 }
 
 export type ModalItem = {id: string; options: ModalOptions; type: PrimaryModalType};
