@@ -26,7 +26,7 @@ import {Logger, getLogger} from 'Util/Logger';
 import {constructUserPrimaryKey} from 'Util/StorageUtil';
 import {WebWorker} from 'Util/worker';
 
-import {BackUpHeader} from './BackUpHeader';
+import {BackUpHeader, ERROR_TYPES} from './BackUpHeader';
 import {BackupService} from './BackupService';
 import {
   CancelError,
@@ -202,25 +202,29 @@ export class BackupRepository {
     files[Filename.METADATA] = encodedMetadata;
 
     if (password) {
-      // encode header
-      const backupCoder = new BackUpHeader(user.id, password);
-      const backupHeader = await this.generateBackupHeader(user, password, backupCoder).catch(error => {
-        throw new Error('Backup error:', error);
-      });
-
-      // Encrypt the ZIP archive using the provided password
-      const {decodedHeader} = backupCoder.readBackupHeader(backupHeader);
-      const chaCha20Key = await backupCoder.generateChaCha20Key(decodedHeader);
-      const array = await this.worker.post<Uint8Array>({type: 'zip', files, encrytionKey: chaCha20Key});
-
-      // Prepend the combinedBytes to the ZIP archive data
-      const combinedArray = this.concatenateByteArrays([backupHeader, array]);
-      return new Blob([combinedArray], {type: 'application/zip'});
+      return this.createEncryptedBackup(files, user, password);
     }
 
     // If no password, return the regular ZIP archive
     const array = await this.worker.post<Uint8Array>({type: 'zip', files});
     return new Blob([array], {type: 'application/zip'});
+  }
+
+  private async createEncryptedBackup(files: Record<string, Uint8Array>, user: User, password: string): Promise<Blob> {
+    // encode header
+    const backupCoder = new BackUpHeader(user.id, password);
+    const backupHeader = await this.generateBackupHeader(user, password, backupCoder).catch(error => {
+      throw new Error('Backup error:', error);
+    });
+
+    // Encrypt the ZIP archive using the provided password
+    const {decodedHeader} = backupCoder.readBackupHeader(backupHeader);
+    const chaCha20Key = await backupCoder.generateChaCha20Key(decodedHeader);
+    const array = await this.worker.post<Uint8Array>({type: 'zip', files, encrytionKey: chaCha20Key});
+
+    // Prepend the combinedBytes to the ZIP archive data
+    const combinedArray = this.concatenateByteArrays([backupHeader, array]);
+    return new Blob([combinedArray], {type: 'application/zip'});
   }
 
   private async generateBackupHeader(user: User, password: string, backupCoder: BackUpHeader) {
@@ -293,26 +297,7 @@ export class BackupRepository {
     let files;
 
     if (password) {
-      const backupCoder = new BackUpHeader(user.id, password);
-
-      // Convert data to Uint8Array
-      const dataArray = await this.convertToUint8Array(data);
-      const {decodingError, decodedHeader, headerSize} = await backupCoder.decodeHeader(dataArray);
-
-      // error decoding the header
-      if (decodingError) {
-        this.mappedDecodingError(decodingError);
-      }
-      // We need to read the ChaCha20 generated header prior to the encrypted backup file data to run some sanity checks
-      const chaChaHeaderKey = await backupCoder.generateChaCha20Key(decodedHeader);
-
-      // ChaCha20 header is needed to validate the encrypted data hasn't been tampered with different authentication
-      files = await this.worker.post<Record<string, Uint8Array>>({
-        type: 'unzip',
-        bytes: data,
-        encrytionKey: chaChaHeaderKey,
-        headerLength: headerSize,
-      });
+      files = await this.createDecryptedBackup(data, user, password);
     } else {
       files = await this.worker.post<Record<string, Uint8Array>>({
         type: 'unzip',
@@ -348,6 +333,33 @@ export class BackupRepository {
     initCallback(nbEntities);
 
     await this.importHistoryData(fileDescriptors, progressCallback);
+  }
+
+  private async createDecryptedBackup(
+    data: ArrayBuffer | Blob,
+    user: User,
+    password: string,
+  ): Promise<Record<string, Uint8Array>> {
+    const backupCoder = new BackUpHeader(user.id, password);
+
+    // Convert data to Uint8Array
+    const dataArray = await this.convertToUint8Array(data);
+    const {decodingError, decodedHeader, headerSize} = await backupCoder.decodeHeader(dataArray);
+
+    // error decoding the header
+    if (decodingError) {
+      this.mapDecodingError(decodingError);
+    }
+    // We need to read the ChaCha20 generated header prior to the encrypted backup file data to run some sanity checks
+    const chaChaHeaderKey = await backupCoder.generateChaCha20Key(decodedHeader);
+
+    // ChaCha20 header is needed to validate the encrypted data hasn't been tampered with different authentication
+    return await this.worker.post<Record<string, Uint8Array>>({
+      type: 'unzip',
+      bytes: data,
+      encrytionKey: chaChaHeaderKey,
+      headerLength: headerSize,
+    });
   }
 
   private async importHistoryData(
@@ -506,24 +518,24 @@ export class BackupRepository {
     }
   }
 
-  private mappedDecodingError(decodingError: string) {
+  private mapDecodingError(decodingError: string) {
     let message = '';
     switch (decodingError) {
-      case 'INVALID_USER_ID': {
+      case ERROR_TYPES.INVALID_USER_ID: {
         message = 'The user id in the backup file header does not match the expected one';
-        this.logger.info(message);
+        this.logger.error(message);
         throw new DifferentAccountError(message);
         break;
       }
-      case 'INVALID_VERSION':
+      case ERROR_TYPES.INVALID_FORMAT:
         message = 'The provided backup version is lower than the minimum supported version';
-        this.logger.info(message);
+        this.logger.error(message);
         throw new IncompatibleBackupError(message);
         break;
 
-      case 'INVALID_FORMAT':
+      case ERROR_TYPES.INVALID_VERSION:
         message = 'The provided backup version is lower than the minimum supported version';
-        this.logger.info('The provided backup format is not supported');
+        this.logger.error('The provided backup format is not supported');
         throw new IncompatibleBackupFormatError(message);
         break;
     }

@@ -24,7 +24,7 @@
     "jimp": "0.22.8",
     "jquery": "3.7.0",
     "js-cookie": "3.0.1",
-    "jszip": "^3.10.1",
+    "jszip": "3.10.1",
     "keyboardjs": "2.7.0",
     "knockout": "3.5.1",
     "libsodium-wrappers": "0.7.11",

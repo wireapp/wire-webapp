@@ -60,7 +60,7 @@ export class IncompatibleBackupError extends ImportError {
 }
 
 export class IncompatibleBackupFormatError extends ImportError {
-  constructor(message = '"The provided backup format is not supported') {
+  constructor(message = 'The provided backup format is not supported') {
     super(message);
     Object.setPrototypeOf(this, IncompatibleBackupFormatError.prototype);
   }
