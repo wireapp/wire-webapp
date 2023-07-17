@@ -20,6 +20,7 @@
 import {forwardRef, useEffect, useState} from 'react';
 
 import {InitialConfigType, LexicalComposer} from '@lexical/react/LexicalComposer';
+import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {ContentEditable} from '@lexical/react/LexicalContentEditable';
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary';
 import {OnChangePlugin} from '@lexical/react/LexicalOnChangePlugin';
@@ -27,6 +28,7 @@ import {PlainTextPlugin} from '@lexical/react/LexicalPlainTextPlugin';
 import type {WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
 import cx from 'classnames';
+import {LexicalEditor} from 'lexical';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -36,6 +38,7 @@ import {
   BeautifulMentionsMenuItemProps,
   BeautifulMentionsMenuProps,
 } from 'Components/LexicalInput/types/BeautifulMentionsPluginProps';
+import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {BeautifulMentionNode} from './nodes/MentionNode';
@@ -86,6 +89,7 @@ interface LexicalInputProps {
   placeholder: string;
   inputValue: string;
   setInputValue: (text: string) => void;
+  editMessage: (messageEntity: ContentMessage, editor: LexicalEditor) => void;
   children: any;
   sendMessage: any;
   hasLocalEphemeralTimer: boolean;
@@ -106,6 +110,7 @@ export const LexicalInput = ({
   hasLocalEphemeralTimer,
   saveDraftStateLexical,
   loadDraftStateLexical,
+  editMessage,
 }: LexicalInputProps) => {
   // Emojis
   const [shouldReplaceEmoji, setShouldReplaceEmoji] = useState<boolean>(
@@ -149,6 +154,21 @@ export const LexicalInput = ({
     });
   }, []);
 
+  function RenameMeLaterPlaseOrMoveMe() {
+    const [editor] = useLexicalComposerContext();
+
+    useEffect(() => {
+      amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.EDIT, (messageEntity: ContentMessage) => {
+        editMessage(messageEntity, editor);
+      });
+      return () => {
+        amplify.unsubscribeAll(WebAppEvents.CONVERSATION.MESSAGE.EDIT);
+      };
+    }, [editor]);
+
+    return null;
+  }
+
   return (
     <LexicalComposer initialConfig={editorConfig}>
       <div className="controls-center">
@@ -156,11 +176,12 @@ export const LexicalInput = ({
           <div className="editor-container">
             {/* Connect this with DraftStateUtil.ts */}
             <DraftStatePlugin setInputValue={setInputValue} loadDraftStateLexical={loadDraftStateLexical} />
+            <RenameMeLaterPlaseOrMoveMe />
 
             {shouldReplaceEmoji && <EmojiPickerPlugin />}
 
             <PlainTextPlugin
-              contentEditable={<ContentEditable className="editor-input" />}
+              contentEditable={<ContentEditable value={inputValue} className="editor-input" />}
               placeholder={<Placeholder text={placeholder} hasLocalEphemeralTimer={hasLocalEphemeralTimer} />}
               ErrorBoundary={LexicalErrorBoundary}
             />

@@ -83,6 +83,9 @@ export const SendMessageButton = ({textValue, onSend, mentions}: SendMessageButt
     const removeListener = editor.registerCommand(
       KEY_ENTER_COMMAND,
       event => {
+        if (event?.shiftKey) {
+          return true;
+        }
         const mentionEntities = getMentionsToSend(editor, textValue, mentions);
 
         onSend(textValue, mentionEntities);

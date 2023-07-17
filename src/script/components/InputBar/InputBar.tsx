@@ -21,6 +21,7 @@ import {useEffect, useRef, useState} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
+import {$createParagraphNode, $createTextNode, $getRoot, LexicalEditor} from 'lexical';
 import {container} from 'tsyringe';
 
 import {useMatchMedia} from '@wireapp/react-ui-kit';
@@ -217,7 +218,7 @@ const InputBar = ({
     // textareaRef.current?.focus();
   };
 
-  const editMessage = (messageEntity: ContentMessage) => {
+  const editMessage = (messageEntity: ContentMessage, editor: LexicalEditor) => {
     if (messageEntity?.isEditable() && messageEntity !== editMessageEntity) {
       const firstAsset = messageEntity.getFirstAsset() as TextAsset;
       const newMentions = firstAsset.mentions().slice();
@@ -227,6 +228,13 @@ const InputBar = ({
       setEditMessageEntity(messageEntity);
       setInputValue(firstAsset.text);
       setCurrentMentions(newMentions);
+      editor.update(() => {
+        const root = $getRoot();
+        const paragraphNode = $createParagraphNode();
+        const textNode = $createTextNode(firstAsset.text);
+        paragraphNode.append(textNode);
+        root.append(paragraphNode);
+      });
 
       if (messageEntity.quote() && conversationEntity) {
         messageRepository
@@ -415,7 +423,6 @@ const InputBar = ({
 
   useEffect(() => {
     amplify.subscribe(WebAppEvents.CONVERSATION.IMAGE.SEND, uploadImages);
-    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.EDIT, editMessage);
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REPLY, replyMessage);
     amplify.subscribe(WebAppEvents.EXTENSIONS.GIPHY.SEND, sendGiphy);
     amplify.subscribe(WebAppEvents.SHORTCUT.PING, onPingClick);
@@ -423,7 +430,6 @@ const InputBar = ({
     return () => {
       amplify.unsubscribeAll(WebAppEvents.SHORTCUT.PING);
       amplify.unsubscribeAll(WebAppEvents.CONVERSATION.IMAGE.SEND);
-      amplify.unsubscribeAll(WebAppEvents.CONVERSATION.MESSAGE.EDIT);
       amplify.unsubscribeAll(WebAppEvents.CONVERSATION.MESSAGE.REPLY);
       amplify.unsubscribeAll(WebAppEvents.EXTENSIONS.GIPHY.SEND);
     };
@@ -546,6 +552,7 @@ const InputBar = ({
 
             {!removedFromConversation && !pastedFile && (
               <LexicalInput
+                editMessage={editMessage}
                 conversationEntity={conversationEntity}
                 messageRepository={messageRepository}
                 propertiesRepository={propertiesRepository}
