@@ -40,6 +40,7 @@ import {
   ConversationTypingEvent,
   CONVERSATION_EVENT,
   ConversationProtocolUpdateEvent,
+  ConversationMLSWelcomeEvent,
 } from '@wireapp/api-client/lib/event';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import type {BackendError} from '@wireapp/api-client/lib/http/';
@@ -2141,7 +2142,7 @@ export class ConversationRepository {
       : qualified_conversation || {domain: '', id: conversation};
 
     if (type === CONVERSATION_EVENT.MLS_WELCOME_MESSAGE) {
-      useMLSConversationState.getState().markAsEstablished(eventData);
+      this.handleMLSWelcomeMessageEvent(eventJson);
     }
 
     const inSelfConversation = this.conversationState.isSelfConversation(conversationId);
@@ -2214,6 +2215,11 @@ export class ConversationRepository {
           throw error;
         }
       });
+  }
+
+  private handleMLSWelcomeMessageEvent(eventJson: ConversationMLSWelcomeEvent) {
+    const groupId = eventJson.data;
+    return useMLSConversationState.getState().markAsEstablished(groupId);
   }
 
   /**
