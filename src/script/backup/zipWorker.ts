@@ -45,7 +45,7 @@ export async function handleZipEvent(payload: Payload) {
       return OriginalData;
 
     case 'unzip':
-      let decryptedBytes: Uint8Array;
+      let decryptedBytes;
 
       if (!!encrytionKey) {
         // Decrypt the ZIP archive using the provided encrytionKey
@@ -58,7 +58,7 @@ export async function handleZipEvent(payload: Payload) {
           throw new ImportError(error.message);
         }
       } else {
-        decryptedBytes = new Uint8Array(payload.bytes);
+        decryptedBytes = payload.bytes;
       }
       const archive = await JSZip.loadAsync(decryptedBytes);
       const files: Record<string, Uint8Array> = {};
