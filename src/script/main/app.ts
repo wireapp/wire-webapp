@@ -251,6 +251,15 @@ export class App {
       repositories.asset,
     );
 
+    repositories.calling = new CallingRepository(
+      repositories.message,
+      repositories.event,
+      repositories.user,
+      repositories.media.streamHandler,
+      repositories.media.devicesHandler,
+      serverTimeHandler,
+    );
+
     repositories.conversation = new ConversationRepository(
       this.service.conversation,
       repositories.message,
@@ -259,6 +268,7 @@ export class App {
       repositories.team,
       repositories.user,
       repositories.properties,
+      repositories.calling,
       serverTimeHandler,
     );
 
@@ -275,14 +285,7 @@ export class App {
       readReceiptMiddleware.processEvent.bind(readReceiptMiddleware),
     ]);
     repositories.backup = new BackupRepository(new BackupService(), repositories.conversation);
-    repositories.calling = new CallingRepository(
-      repositories.message,
-      repositories.event,
-      repositories.user,
-      repositories.media.streamHandler,
-      repositories.media.devicesHandler,
-      serverTimeHandler,
-    );
+
     repositories.integration = new IntegrationRepository(
       this.service.integration,
       repositories.conversation,
@@ -292,7 +295,6 @@ export class App {
     repositories.notification = new NotificationRepository(repositories.conversation, repositories.permission);
     repositories.preferenceNotification = new PreferenceNotificationRepository(repositories.user['userState'].self);
 
-    repositories.conversation.leaveCall = repositories.calling.leaveCall;
     return repositories;
   }
 

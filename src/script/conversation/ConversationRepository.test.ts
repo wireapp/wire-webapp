@@ -176,6 +176,7 @@ describe('ConversationRepository', () => {
     const mark_as_read_url = `${Config.getConfig().BACKEND_REST}/conversations/${conversation_et.id}/self`;
     server.respondWith('PUT', mark_as_read_url, [HTTP_STATUS.OK, {}, '']);
 
+    await testFactory.exposeCallingActors();
     const conversationRepository = await testFactory.exposeConversationActors();
     amplify.publish(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
     storage_service = conversationRepository['conversationService']['storageService'];

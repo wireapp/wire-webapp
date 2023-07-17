@@ -91,7 +91,7 @@ const GuestServicesOptions: FC<GuestServicesOptionsProps> = ({
         },
         text: {
           message,
-          title: t('modalConversationRemoveGuestsAndServicesHeadline'),
+          title: isGuest ? t('modalConversationRemoveGuestsHeadline') : t('modalConversationRemoveServicesHeadline'),
         },
       });
     }
