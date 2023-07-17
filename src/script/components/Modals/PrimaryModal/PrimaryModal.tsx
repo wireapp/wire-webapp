@@ -76,7 +76,7 @@ export const PrimaryModalComponent: FC = () => {
     showNextModalInQueue();
   };
   const isPasswordOptional = () => {
-    const skipValidation = passwordOptional && !!!passwordInput.trim().length;
+    const skipValidation = passwordOptional && !passwordInput.trim().length;
     if (skipValidation) {
       return true;
     }
