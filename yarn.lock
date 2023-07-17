@@ -12998,7 +12998,7 @@ dexie@latest:
   languageName: node
   linkType: hard
 
-"jszip@npm:3.10.1, jszip@npm:^3.10.1":
+"jszip@npm:3.10.1":
   version: 3.10.1
   resolution: "jszip@npm:3.10.1"
   dependencies:
@@ -19420,7 +19420,7 @@ dexie@latest:
     jquery: 3.7.0
     js-cookie: 3.0.1
     jsdom-worker: 0.3.0
-    jszip: ^3.10.1
+    jszip: 3.10.1
     keyboardjs: 2.7.0
     knockout: 3.5.1
     less: 3.13.1
