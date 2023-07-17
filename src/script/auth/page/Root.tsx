@@ -60,9 +60,6 @@ import {ROUTE} from '../route';
 /**
  *  Lazy loading components for routes, which can only be accessed by activated feature flags
  */
-const E2EIdentityOidcRedirect = loadable(() => import('./E2EIdentityOidcRedirect'), {
-  resolveComponent: component => component.E2EIdentityOidcRedirect,
-});
 const CreateAccount = loadable(() => import('./CreateAccount'), {
   resolveComponent: component => component.CreateAccount,
 });
@@ -224,9 +221,6 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
               )}
               {Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && (
                 <Route path={ROUTE.CREATE_TEAM_ACCOUNT} element={<CreateAccount />} />
-              )}
-              {Config.getConfig().FEATURE.ENABLE_E2EI && (
-                <Route path={ROUTE.E2E_IDENTITY_OIDC} element={<E2EIdentityOidcRedirect />} />
               )}
               <Route path="*" element={<Navigate to={ROUTE.INDEX} replace />} />
             </Routes>
