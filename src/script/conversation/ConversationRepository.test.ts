@@ -198,9 +198,9 @@ describe('ConversationRepository', () => {
     conversationRepository['conversationState'].conversations.removeAll();
   });
 
-  afterAll(() => {
+  afterAll(async () => {
     server.restore();
-    storage_service.clearStores();
+    await storage_service.clearStores();
   });
 
   describe('filtered_conversations', () => {
@@ -631,6 +631,10 @@ describe('ConversationRepository', () => {
           } as ConversationDatabaseData;
           xhr.respond(HTTP_STATUS.OK, {'Content-Type': 'application/json'}, JSON.stringify(conversation));
         });
+      });
+
+      afterEach(() => {
+        server.restore();
       });
 
       it("shows a failed message on the sender's side if the upload fails", () => {
@@ -1741,6 +1745,10 @@ describe('ConversationRepository', () => {
     });
 
     describe('leaveConversation', () => {
+      afterEach(() => {
+        jest.clearAllMocks();
+      });
+
       it.each([ConversationProtocol.PROTEUS, ConversationProtocol.MIXED, ConversationProtocol.MLS])(
         'should leave %s conversation',
         async protocol => {
@@ -1751,7 +1759,7 @@ describe('ConversationRepository', () => {
           const selfUser = generateUser();
           conversation.selfUser(selfUser);
 
-          spyOn(testFactory.conversation_repository['userState'], 'self').and.returnValue(selfUser);
+          spyOn(conversationRepository['userState'], 'self').and.returnValue(selfUser);
 
           conversation.participating_user_ets([generateUser(), generateUser()]);
 
