@@ -61,7 +61,6 @@ interface Metadata {
 
 type ProgressCallback = (done: number) => void;
 
-export const ENCRYPTED_BACKUP_FORMAT = 'WBUX';
 export type FileDescriptor =
   | {
       entities: UserRecord[];

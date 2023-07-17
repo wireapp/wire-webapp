@@ -25,6 +25,7 @@ import {noop} from 'Util/util';
 import {createUuid} from 'Util/uuid';
 import {WebWorker} from 'Util/worker';
 
+import {BackUpHeader, DecodedHeader, ENCRYPTED_BACKUP_FORMAT, ENCRYPTED_BACKUP_VERSION} from './BackUpHeader';
 import {BackupRepository, Filename} from './BackupRepository';
 import {BackupService} from './BackupService';
 import {CancelError, DifferentAccountError, IncompatibleBackupError, IncompatiblePlatformError} from './Error';
@@ -122,6 +123,7 @@ describe('BackupRepository', () => {
 
     it('ignores verification events in the backup', async () => {
       const user = new User('user1');
+      const password = '';
       const [backupRepository, {storageService, backupService}] = await buildBackupRepository();
       const verificationEvent = {
         conversation: conversationId,
@@ -135,7 +137,7 @@ describe('BackupRepository', () => {
 
       await storageService.save(StorageSchemata.OBJECT_STORE.EVENTS, undefined, verificationEvent);
       await storageService.save(StorageSchemata.OBJECT_STORE.EVENTS, undefined, textEvent);
-      const blob = await backupRepository.generateHistory(user, 'client1', noop);
+      const blob = await backupRepository.generateHistory(user, 'client1', noop, password);
 
       await backupRepository.importHistory(new User('user1'), blob, noop, noop);
 
@@ -147,12 +149,13 @@ describe('BackupRepository', () => {
 
     it('cancels export', async () => {
       const [backupRepository, {storageService}] = await buildBackupRepository();
+      const password = '';
       await Promise.all([
         ...messages.map(message => storageService.save(eventStoreName, undefined, message)),
         storageService.save('conversations', conversationId, conversation),
       ]);
 
-      const exportPromise = backupRepository.generateHistory(new User(), 'client1', noop);
+      const exportPromise = backupRepository.generateHistory(new User(), 'client1', noop, password);
       backupRepository.cancelAction();
 
       await expect(exportPromise).rejects.toThrow(jasmine.any(CancelError));
@@ -222,6 +225,78 @@ describe('BackupRepository', () => {
       expect(importSpy).toHaveBeenCalledWith(StorageSchemata.OBJECT_STORE.USERS, users, {
         generatePrimaryKey: expect.any(Function),
       });
+    });
+  });
+
+  describe('Backup encrytion', () => {
+    test('compressHistoryFiles calls the encryption function if password is provided', async () => {
+      // Mocked values
+      const password = 'Password';
+      const clientId = 'ClientId';
+      const user = new User('user1');
+      const mockHashedUserId = new Uint8Array(32);
+      const mockEncodeHeader = jest.fn().mockResolvedValue(new Uint8Array(63));
+      const mockGenerateChaCha20Key = jest.fn().mockImplementation((header: DecodedHeader) => new Uint8Array(32));
+      const mockSalt = new Uint8Array(16);
+      const mockReadBackupHeader = jest.fn().mockReturnValue({
+        decodedHeader: {
+          format: ENCRYPTED_BACKUP_FORMAT,
+          version: ENCRYPTED_BACKUP_VERSION,
+          salt: mockSalt,
+          hashedUserId: mockHashedUserId,
+          opslimit: 4,
+          memlimit: 33554432,
+        },
+        headerSize: 63,
+      });
+
+      // Mock the behavior of BackUpHeader methods
+      jest.spyOn(BackUpHeader.prototype, 'encodeHeader').mockImplementation(mockEncodeHeader);
+      jest.spyOn(BackUpHeader.prototype, 'generateChaCha20Key').mockImplementation(mockGenerateChaCha20Key);
+      jest.spyOn(BackUpHeader.prototype, 'readBackupHeader').mockImplementation(mockReadBackupHeader);
+
+      const [backupRepository] = await buildBackupRepository();
+      await backupRepository.generateHistory(user, clientId, noop, password);
+
+      // // Assert the expected function calls
+      expect(mockEncodeHeader).toHaveBeenCalled();
+      expect(mockReadBackupHeader).toHaveBeenCalled();
+      expect(mockGenerateChaCha20Key).toHaveBeenCalled();
+
+      const {decodedHeader} = mockReadBackupHeader();
+      expect(mockGenerateChaCha20Key).toHaveBeenCalledWith(decodedHeader);
+    });
+
+    test('compressHistoryFiles does not call the encryption function if no password is provided', async () => {
+      // Mocked values
+      const password = '';
+      const clientId = 'ClientId';
+      const user = new User('user1');
+      const mockEncodeHeader = jest.fn().mockResolvedValue(new Uint8Array(63));
+      const mockGenerateChaCha20Key = jest.fn().mockImplementation(header => new Uint8Array(32));
+
+      // Mock the behavior of BackUpHeader methods
+      jest.spyOn(BackUpHeader.prototype, 'encodeHeader').mockImplementation(mockEncodeHeader);
+      jest.spyOn(BackUpHeader.prototype, 'generateChaCha20Key').mockImplementation(mockGenerateChaCha20Key);
+
+      const [backupRepository] = await buildBackupRepository();
+      await backupRepository.generateHistory(user, clientId, noop, password);
+
+      // Assert the expected function calls
+      expect(mockEncodeHeader).not.toHaveBeenCalled();
+      expect(mockGenerateChaCha20Key).not.toHaveBeenCalled();
+    });
+    test('compressHistoryFiles returns a Blob object with the correct type', async () => {
+      // Mocked values...
+      const password = 'Password';
+      const clientId = 'ClientId';
+      const user = new User('user1');
+
+      const [backupRepository] = await buildBackupRepository();
+      const result = await backupRepository.generateHistory(user, clientId, noop, password);
+
+      expect(result).toBeInstanceOf(Blob);
+      expect(result.type).toBe('application/zip');
     });
   });
 });

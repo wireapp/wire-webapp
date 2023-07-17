@@ -19,7 +19,7 @@
 
 import sodium from 'libsodium-wrappers';
 
-interface DecodedHeader {
+export interface DecodedHeader {
   format: string;
   version: string;
   salt: Uint8Array;
@@ -27,13 +27,16 @@ interface DecodedHeader {
   opslimit: number;
   memlimit: number;
 }
+
+export const ENCRYPTED_BACKUP_FORMAT = 'WBUX';
+export const ENCRYPTED_BACKUP_VERSION = '03';
 export class BackUpHeader {
   private readonly userId: string;
   private readonly password: string;
 
   // Defined by given specs on: https://wearezeta.atlassian.net/wiki/spaces/ENGINEERIN/pages/59867179/Exporting+history+v2
-  private readonly format = 'WBUX';
-  private readonly version = '03';
+  private readonly format = ENCRYPTED_BACKUP_FORMAT;
+  private readonly version = ENCRYPTED_BACKUP_VERSION;
   private readonly MEMLIMIT_INTERACTIVE_VALUE = 33554432;
   private readonly OPSLIMIT_INTERACTIVE_VALUE = 4;
   private readonly PWD_HASH_OUTPUT_BYTES = 32;

@@ -22,13 +22,14 @@ import {FC, useEffect, useState} from 'react';
 import {Icon} from 'Components/Icon';
 import {LoadingBar} from 'Components/LoadingBar/LoadingBar';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {ENCRYPTED_BACKUP_FORMAT} from 'src/script/backup/BackUpHeader';
 import {User} from 'src/script/entity/User';
 import {ContentState} from 'src/script/page/useAppState';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {loadFileBuffer} from 'Util/util';
 
-import {BackupRepository, ENCRYPTED_BACKUP_FORMAT} from '../../backup/BackupRepository';
+import {BackupRepository} from '../../backup/BackupRepository';
 import {
   CancelError,
   DifferentAccountError,

@@ -26,7 +26,7 @@ type Payload =
   | {type: 'zip'; files: Record<string, ArrayBuffer | string>; encrytionKey?: Uint8Array}
   | {type: 'unzip'; bytes: ArrayBuffer; encrytionKey?: Uint8Array; headerLength?: number};
 
-async function handleZipEvent(payload: Payload) {
+export async function handleZipEvent(payload: Payload) {
   const zip = new JSZip();
   const encrytionKey = payload.encrytionKey;
   switch (payload.type) {
