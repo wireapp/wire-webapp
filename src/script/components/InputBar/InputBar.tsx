@@ -102,7 +102,6 @@ interface InputBarProps {
 }
 
 const conversationInputBarClassName = 'conversation-input-bar';
-const MAX_USERS_TO_PING_WITHOUT_ALERT = 3;
 
 const InputBar = ({
   conversationEntity,
@@ -132,6 +131,7 @@ const InputBar = ({
     messageTimer,
     hasGlobalMessageTimer,
     removed_from_conversation: removedFromConversation,
+    is1to1,
   } = useKoSubscribableChildren(conversationEntity, [
     'connection',
     'firstUserEntity',
@@ -567,23 +567,27 @@ const InputBar = ({
 
   const onGifClick = () => openGiphy(inputValue);
 
-  const ping = () => {
+  const pingConversation = () => {
     setIsPingDisabled(true);
     void messageRepository.sendPing(conversationEntity).then(() => {
       window.setTimeout(() => setIsPingDisabled(false), CONFIG.PING_TIMEOUT);
     });
   };
 
-  const totalConversationUsers = conversationEntity.participating_user_ets().length;
+  const totalConversationUsers = participatingUserEts.length;
 
   const onPingClick = () => {
     if (conversationEntity && !pingDisabled) {
-      if (conversationEntity.is1to1() || totalConversationUsers < MAX_USERS_TO_PING_WITHOUT_ALERT) {
-        ping();
+      if (
+        CONFIG.FEATURE.ENABLE_PING_CONFIRMATION === false ||
+        is1to1 ||
+        totalConversationUsers < CONFIG.FEATURE.MAX_USERS_TO_PING_WITHOUT_ALERT
+      ) {
+        pingConversation();
       } else {
         PrimaryModal.show(PrimaryModal.type.CONFIRM, {
           primaryAction: {
-            action: ping,
+            action: pingConversation,
             text: t('tooltipConversationPing'),
           },
           text: {
