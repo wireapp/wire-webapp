@@ -72,22 +72,20 @@ export const initialiseMLSMigrationFlow = async ({
         userRepository,
         selfUserId,
       }),
-    {core, apiClient, teamState},
+    {apiClient, teamState},
   );
 };
 
 interface CheckMigrationConfigParams {
-  core: Account;
   apiClient: APIClient;
   teamState: TeamState;
 }
 
 const periodicallyCheckMigrationConfig = async (
   onMigrationStartTimeArrived: () => Promise<void>,
-  {core, apiClient, teamState}: CheckMigrationConfigParams,
+  {apiClient, teamState}: CheckMigrationConfigParams,
 ) => {
-  const checkMigrationConfigTask = () =>
-    checkMigrationConfig(onMigrationStartTimeArrived, {core, apiClient, teamState});
+  const checkMigrationConfigTask = () => checkMigrationConfig(onMigrationStartTimeArrived, {apiClient, teamState});
 
   // We check the migration config immediately (on app load) and every 24 hours
   await checkMigrationConfigTask();
@@ -101,9 +99,9 @@ const periodicallyCheckMigrationConfig = async (
 
 const checkMigrationConfig = async (
   onMigrationStartTimeArrived: () => Promise<void>,
-  {core, apiClient, teamState}: CheckMigrationConfigParams,
+  {apiClient, teamState}: CheckMigrationConfigParams,
 ) => {
-  const isMLSSupportedByEnv = await isMLSSupportedByEnvironment({core, apiClient});
+  const isMLSSupportedByEnv = await isMLSSupportedByEnvironment({apiClient});
 
   if (!isMLSSupportedByEnv) {
     return;

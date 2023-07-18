@@ -18,7 +18,6 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
-import {Account} from '@wireapp/core';
 
 import {supportsMLS} from 'Util/util';
 
@@ -28,14 +27,14 @@ import {supportsMLS} from 'Util/util';
  * @param apiClient -the instance of the apiClient
  * @param core - the instance of the core
  */
-export const isMLSSupportedByEnvironment = async ({core, apiClient}: {core: Account; apiClient: APIClient}) => {
+export const isMLSSupportedByEnvironment = async ({apiClient}: {apiClient: APIClient}) => {
   const isMLSSupportedByClient = supportsMLS();
 
   if (!isMLSSupportedByClient) {
     return false;
   }
 
-  const isMLSEnabledOnBackend = core.backendFeatures.supportsMLS;
+  const isMLSEnabledOnBackend = apiClient.backendFeatures.supportsMLS;
 
   if (!isMLSEnabledOnBackend) {
     return false;

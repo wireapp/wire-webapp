@@ -22,11 +22,9 @@ import {registerRecurringTask} from '@wireapp/core/lib/util/RecurringTaskSchedul
 import {container} from 'tsyringe';
 
 import {APIClient} from '@wireapp/api-client';
-import {Account} from '@wireapp/core';
 
 import {User} from 'src/script/entity/User';
 import {APIClient as APIClientSingleton} from 'src/script/service/APIClientSingleton';
-import {Core as CoreSingleton} from 'src/script/service/CoreSingleton';
 import {UserRepository} from 'src/script/user/UserRepository';
 import {getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -51,10 +49,9 @@ export const initialisePeriodicSelfSupportedProtocolsCheck = async (
   {userRepository}: {userRepository: UserRepository},
 ) => {
   const apiClient = container.resolve(APIClientSingleton);
-  const core = container.resolve(CoreSingleton);
 
   const checkSupportedProtocolsTask = () =>
-    updateSelfSupportedProtocols(selfUser, teamFeatureList, {apiClient, core, userRepository});
+    updateSelfSupportedProtocols(selfUser, teamFeatureList, {apiClient, userRepository});
 
   // We update supported protocols of self user on initial app load and then in 24 hours intervals
   await checkSupportedProtocolsTask();
@@ -70,11 +67,9 @@ const updateSelfSupportedProtocols = async (
   selfUser: User,
   teamFeatureList: FeatureList,
   {
-    core,
     apiClient,
     userRepository,
   }: {
-    core: Account;
     apiClient: APIClient;
     userRepository: UserRepository;
   },
@@ -83,7 +78,7 @@ const updateSelfSupportedProtocols = async (
   logger.info('Evaluating self supported protocols, currently supported protocols:', localSupportedProtocols);
 
   try {
-    const refreshedSupportedProtocols = await evaluateSelfSupportedProtocols({apiClient, core, teamFeatureList});
+    const refreshedSupportedProtocols = await evaluateSelfSupportedProtocols({apiClient, teamFeatureList});
 
     const hasSupportedProtocolsChanged = !(
       localSupportedProtocols.size === refreshedSupportedProtocols.size &&

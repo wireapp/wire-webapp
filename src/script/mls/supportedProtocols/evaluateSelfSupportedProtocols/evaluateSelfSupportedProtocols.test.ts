@@ -20,11 +20,9 @@
 import {RegisteredClient} from '@wireapp/api-client/lib/client';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {FeatureList, FeatureStatus} from '@wireapp/api-client/lib/team';
-import {container} from 'tsyringe';
 
 import {APIClient} from '@wireapp/api-client';
 
-import {Core} from 'src/script/service/CoreSingleton';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {evaluateSelfSupportedProtocols} from './evaluateSelfSupportedProtocols';
@@ -188,7 +186,6 @@ describe('evaluateSelfSupportedProtocols', () => {
 
       it.each(testScenarios)('evaluates self supported protocols', async ({mls, mlsMigration}, expected) => {
         const mockedApiClient = {api: {client: {getClients: jest.fn()}}} as unknown as APIClient;
-        const mockCore = container.resolve(Core);
 
         jest.spyOn(mockedApiClient.api.client, 'getClients').mockResolvedValueOnce(selfClients);
 
@@ -199,7 +196,6 @@ describe('evaluateSelfSupportedProtocols', () => {
 
         const supportedProtocols = await evaluateSelfSupportedProtocols({
           apiClient: mockedApiClient,
-          core: mockCore,
           teamFeatureList,
         });
 

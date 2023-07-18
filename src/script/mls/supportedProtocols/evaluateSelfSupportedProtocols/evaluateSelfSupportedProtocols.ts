@@ -22,18 +22,15 @@ import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {FeatureList, FeatureMLS, FeatureStatus} from '@wireapp/api-client/lib/team';
 
 import {APIClient} from '@wireapp/api-client';
-import {Account} from '@wireapp/core';
 
 import {isMLSSupportedByEnvironment} from '../../isMLSSupportedByEnvironment';
 import {getMLSMigrationStatus, MLSMigrationStatus} from '../../MLSMigration/migrationStatus';
 import {wasClientActiveWithinLast4Weeks} from '../wasClientActiveWithinLast4Weeks';
 
 export const evaluateSelfSupportedProtocols = async ({
-  core,
   apiClient,
   teamFeatureList,
 }: {
-  core: Account;
   apiClient: APIClient;
   teamFeatureList: FeatureList;
 }): Promise<Set<ConversationProtocol>> => {
@@ -56,7 +53,6 @@ export const evaluateSelfSupportedProtocols = async ({
     teamSupportedProtocols,
     selfClients,
     mlsMigrationStatus,
-    core,
     apiClient,
   };
 
@@ -80,16 +76,14 @@ const isMLSSupported = async ({
   teamSupportedProtocols,
   selfClients,
   mlsMigrationStatus,
-  core,
   apiClient,
 }: {
   teamSupportedProtocols: Set<ConversationProtocol>;
   selfClients: RegisteredClient[];
   mlsMigrationStatus: MLSMigrationStatus;
-  core: Account;
   apiClient: APIClient;
 }): Promise<boolean> => {
-  const isMLSSupportedByEnv = await isMLSSupportedByEnvironment({core, apiClient});
+  const isMLSSupportedByEnv = await isMLSSupportedByEnvironment({apiClient});
 
   if (!isMLSSupportedByEnv) {
     return false;
@@ -112,16 +106,14 @@ const isMLSForcedWithoutMigration = async ({
   teamSupportedProtocols,
   selfClients,
   mlsMigrationStatus,
-  core,
   apiClient,
 }: {
   teamSupportedProtocols: Set<ConversationProtocol>;
   selfClients: RegisteredClient[];
   mlsMigrationStatus: MLSMigrationStatus;
-  core: Account;
   apiClient: APIClient;
 }): Promise<boolean> => {
-  const isMLSSupportedByEnv = await isMLSSupportedByEnvironment({core, apiClient});
+  const isMLSSupportedByEnv = await isMLSSupportedByEnvironment({apiClient});
 
   if (!isMLSSupportedByEnv) {
     return false;
