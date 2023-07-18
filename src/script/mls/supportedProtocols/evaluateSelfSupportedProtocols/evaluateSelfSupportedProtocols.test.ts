@@ -23,12 +23,15 @@ import {FeatureList, FeatureStatus} from '@wireapp/api-client/lib/team';
 
 import {APIClient} from '@wireapp/api-client';
 
+import {TestFactory} from 'test/helper/TestFactory';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {evaluateSelfSupportedProtocols} from './evaluateSelfSupportedProtocols';
 
 import * as mlsSupport from '../../isMLSSupportedByEnvironment';
 import {MLSMigrationStatus} from '../../MLSMigration/migrationStatus';
+
+const testFactory = new TestFactory();
 
 jest.spyOn(mlsSupport, 'isMLSSupportedByEnvironment').mockResolvedValue(true);
 
@@ -186,6 +189,7 @@ describe('evaluateSelfSupportedProtocols', () => {
 
       it.each(testScenarios)('evaluates self supported protocols', async ({mls, mlsMigration}, expected) => {
         const mockedApiClient = {api: {client: {getClients: jest.fn()}}} as unknown as APIClient;
+        const teamRepository = await testFactory.exposeTeamActors();
 
         jest.spyOn(mockedApiClient.api.client, 'getClients').mockResolvedValueOnce(selfClients);
 
@@ -194,9 +198,11 @@ describe('evaluateSelfSupportedProtocols', () => {
           mls,
         } as unknown as FeatureList;
 
+        jest.spyOn(teamRepository['teamState'], 'teamFeatures').mockReturnValue(teamFeatureList);
+
         const supportedProtocols = await evaluateSelfSupportedProtocols({
           apiClient: mockedApiClient,
-          teamFeatureList,
+          teamRepository,
         });
 
         expect(supportedProtocols).toEqual(

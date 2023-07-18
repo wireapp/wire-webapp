@@ -17,7 +17,6 @@
  *
  */
 
-import {FeatureList} from '@wireapp/api-client/lib/team';
 import {registerRecurringTask} from '@wireapp/core/lib/util/RecurringTaskScheduler';
 import {container} from 'tsyringe';
 
@@ -25,6 +24,7 @@ import {APIClient} from '@wireapp/api-client';
 
 import {User} from 'src/script/entity/User';
 import {APIClient as APIClientSingleton} from 'src/script/service/APIClientSingleton';
+import {TeamRepository} from 'src/script/team/TeamRepository';
 import {UserRepository} from 'src/script/user/UserRepository';
 import {getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -45,13 +45,12 @@ const logger = getLogger('SupportedProtocols');
  */
 export const initialisePeriodicSelfSupportedProtocolsCheck = async (
   selfUser: User,
-  teamFeatureList: FeatureList,
-  {userRepository}: {userRepository: UserRepository},
+  {userRepository, teamRepository}: {userRepository: UserRepository; teamRepository: TeamRepository},
 ) => {
   const apiClient = container.resolve(APIClientSingleton);
 
   const checkSupportedProtocolsTask = () =>
-    updateSelfSupportedProtocols(selfUser, teamFeatureList, {apiClient, userRepository});
+    updateSelfSupportedProtocols(selfUser, {apiClient, teamRepository, userRepository});
 
   // We update supported protocols of self user on initial app load and then in 24 hours intervals
   await checkSupportedProtocolsTask();
@@ -65,20 +64,21 @@ export const initialisePeriodicSelfSupportedProtocolsCheck = async (
 
 const updateSelfSupportedProtocols = async (
   selfUser: User,
-  teamFeatureList: FeatureList,
   {
     apiClient,
     userRepository,
+    teamRepository,
   }: {
     apiClient: APIClient;
     userRepository: UserRepository;
+    teamRepository: TeamRepository;
   },
 ) => {
   const localSupportedProtocols = new Set(selfUser.supportedProtocols());
   logger.info('Evaluating self supported protocols, currently supported protocols:', localSupportedProtocols);
 
   try {
-    const refreshedSupportedProtocols = await evaluateSelfSupportedProtocols({apiClient, teamFeatureList});
+    const refreshedSupportedProtocols = await evaluateSelfSupportedProtocols({apiClient, teamRepository});
 
     const hasSupportedProtocolsChanged = !(
       localSupportedProtocols.size === refreshedSupportedProtocols.size &&

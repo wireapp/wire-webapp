@@ -18,7 +18,6 @@
  */
 
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
-import {FeatureList} from '@wireapp/api-client/lib/team';
 import {act} from 'react-dom/test-utils';
 
 import {TestFactory} from 'test/helper/TestFactory';
@@ -43,17 +42,17 @@ describe('supportedProtocols', () => {
     [[ConversationProtocol.PROTEUS], [ConversationProtocol.MLS]],
   ])('Updates the list of supported protocols', async (initialProtocols, evaluatedProtocols) => {
     const userRepository = await testFactory.exposeUserActors();
+    const teamRepository = await testFactory.exposeTeamActors();
+
     const selfUser = userRepository['userState'].self();
 
     selfUser.supportedProtocols(initialProtocols);
-
-    const mockFeatureList = {} as FeatureList;
 
     //this funciton is tested standalone in evaluateSelfSupportedProtocols.test.ts
     jest.spyOn(supportedProtocols, 'evaluateSelfSupportedProtocols').mockResolvedValueOnce(new Set(evaluatedProtocols));
     jest.spyOn(userRepository, 'changeSupportedProtocols');
 
-    await initialisePeriodicSelfSupportedProtocolsCheck(selfUser, mockFeatureList, {userRepository});
+    await initialisePeriodicSelfSupportedProtocolsCheck(selfUser, {userRepository, teamRepository});
 
     expect(userRepository.changeSupportedProtocols).toHaveBeenCalledWith(evaluatedProtocols);
     expect(selfUser.supportedProtocols()).toEqual(evaluatedProtocols);
@@ -61,6 +60,8 @@ describe('supportedProtocols', () => {
 
   it("Does not update supported protocols if they didn't change", async () => {
     const userRepository = await testFactory.exposeUserActors();
+    const teamRepository = await testFactory.exposeTeamActors();
+
     const selfUser = userRepository['userState'].self();
 
     const initialProtocols = [ConversationProtocol.PROTEUS];
@@ -68,19 +69,18 @@ describe('supportedProtocols', () => {
 
     const evaluatedProtocols = [ConversationProtocol.PROTEUS];
 
-    const mockFeatureList = {} as FeatureList;
-
     //this funciton is tested standalone in evaluateSelfSupportedProtocols.test.ts
     jest.spyOn(supportedProtocols, 'evaluateSelfSupportedProtocols').mockResolvedValueOnce(new Set(evaluatedProtocols));
     jest.spyOn(userRepository, 'changeSupportedProtocols');
 
-    await initialisePeriodicSelfSupportedProtocolsCheck(selfUser, mockFeatureList, {userRepository});
+    await initialisePeriodicSelfSupportedProtocolsCheck(selfUser, {userRepository, teamRepository});
     expect(selfUser.supportedProtocols()).toEqual(evaluatedProtocols);
     expect(userRepository.changeSupportedProtocols).not.toHaveBeenCalled();
   });
 
   it('Re-evaluates supported protocols every 24h', async () => {
     const userRepository = await testFactory.exposeUserActors();
+    const teamRepository = await testFactory.exposeTeamActors();
     const selfUser = userRepository['userState'].self();
 
     const initialProtocols = [ConversationProtocol.PROTEUS];
@@ -88,13 +88,11 @@ describe('supportedProtocols', () => {
 
     const evaluatedProtocols = [ConversationProtocol.PROTEUS];
 
-    const mockFeatureList = {} as FeatureList;
-
     //this funciton is tested standalone in evaluateSelfSupportedProtocols.test.ts
     jest.spyOn(supportedProtocols, 'evaluateSelfSupportedProtocols').mockResolvedValueOnce(new Set(evaluatedProtocols));
     jest.spyOn(userRepository, 'changeSupportedProtocols');
 
-    await initialisePeriodicSelfSupportedProtocolsCheck(selfUser, mockFeatureList, {userRepository});
+    await initialisePeriodicSelfSupportedProtocolsCheck(selfUser, {userRepository, teamRepository});
     expect(selfUser.supportedProtocols()).toEqual(evaluatedProtocols);
     expect(userRepository.changeSupportedProtocols).not.toHaveBeenCalled();
 
