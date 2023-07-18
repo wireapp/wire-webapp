@@ -405,6 +405,7 @@
   "conversationParticipantsTitle": "People",
   "conversationPing": " pinged",
   "conversationPingYou": " pinged",
+  "conversationPingConfirmTitle": "Are you sure you want to ping {{memberCount}} people?",
   "conversationPlaybackError": "Unable to play",
   "conversationPopoverFavorite": "Add to favorites",
   "conversationPopoverUnfavorite": "Remove from favorites",
