@@ -579,7 +579,7 @@ const InputBar = ({
   const onPingClick = () => {
     if (conversationEntity && !pingDisabled) {
       if (
-        CONFIG.FEATURE.ENABLE_PING_CONFIRMATION === false ||
+        !CONFIG.FEATURE.ENABLE_PING_CONFIRMATION ||
         is1to1 ||
         totalConversationUsers < CONFIG.FEATURE.MAX_USERS_TO_PING_WITHOUT_ALERT
       ) {
