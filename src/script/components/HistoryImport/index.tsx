@@ -22,9 +22,9 @@ import {FC, useEffect, useState} from 'react';
 import {Icon} from 'Components/Icon';
 import {LoadingBar} from 'Components/LoadingBar/LoadingBar';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {ENCRYPTED_BACKUP_FORMAT} from 'src/script/backup/BackUpHeader';
 import {User} from 'src/script/entity/User';
 import {ContentState} from 'src/script/page/useAppState';
+import {checkBackupEncryption} from 'Util/BackupUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {loadFileBuffer} from 'Util/util';
@@ -158,40 +158,6 @@ const HistoryImport: FC<HistoryImportProps> = ({user, backupRepository, file, sw
           title: t('backupDecryptionModalTitle'),
         },
       });
-    });
-  };
-
-  const checkBackupEncryption = async (data: ArrayBuffer | Blob): Promise<boolean> => {
-    const fileBytes = await getFileBytes(data);
-    const encrptedFileFormat = new TextEncoder().encode(ENCRYPTED_BACKUP_FORMAT);
-
-    for (let i = 0; i < encrptedFileFormat.length; i++) {
-      const eachFileByte = fileBytes[i];
-      const encrptedFileByte = encrptedFileFormat[i];
-      if (eachFileByte !== encrptedFileByte) {
-        // The number doesn't match, indicating the file is not encrypted
-        return false;
-      }
-    }
-    // All file format bytes match, indicating the file is encrypted
-    return true;
-  };
-
-  const getFileBytes = async (data: ArrayBuffer | Blob): Promise<Uint8Array> => {
-    if (data instanceof ArrayBuffer) {
-      return Promise.resolve(new Uint8Array(data));
-    } else if (data instanceof Blob) {
-      return readBlobAsArrayBuffer(data).then(arrayBuffer => new Uint8Array(arrayBuffer));
-    }
-    return Promise.reject(new Error('Invalid data type. Expected ArrayBuffer or Blob.'));
-  };
-
-  const readBlobAsArrayBuffer = (blob: Blob): Promise<ArrayBuffer> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as ArrayBuffer);
-      reader.onerror = reject;
-      reader.readAsArrayBuffer(blob);
     });
   };
 
