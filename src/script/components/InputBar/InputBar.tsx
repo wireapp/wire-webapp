@@ -566,24 +566,33 @@ const InputBar = ({
 
   const onGifClick = () => openGiphy(inputValue);
 
+  const ping = () => {
+    void messageRepository.sendPing(conversationEntity).then(() => {
+      window.setTimeout(() => setIsPingDisabled(false), CONFIG.PING_TIMEOUT);
+    });
+  };
+
+  const totalConversationUsers = conversationEntity.participating_user_ets().length;
+
   const onPingClick = () => {
     if (conversationEntity && !pingDisabled) {
-      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-        primaryAction: {
-          action: () => {
-            setIsPingDisabled(true);
-            messageRepository.sendPing(conversationEntity).then(() => {
-              window.setTimeout(() => setIsPingDisabled(false), CONFIG.PING_TIMEOUT);
-            });
+      if (conversationEntity.is1to1() || totalConversationUsers < 3) {
+        setIsPingDisabled(true);
+        ping();
+      } else {
+        PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+          primaryAction: {
+            action: () => {
+              setIsPingDisabled(true);
+              ping();
+            },
+            text: t('tooltipConversationPing'),
           },
-          text: 'Yes, Ping!',
-        },
-        text: {
-          message:
-            'Are you sure you want to disturb the chat realm with your mighty ping? Proceed with caution, for the chat gods are watching.',
-          title: `You're about to ping ${conversationEntity.participating_user_ets().length} users`,
-        },
-      });
+          text: {
+            title: t('conversationPingConfirmTitle', {memberCount: totalConversationUsers.toString()}),
+          },
+        });
+      }
     }
   };
 
