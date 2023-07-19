@@ -19,33 +19,27 @@
 
 import {RegisteredClient} from '@wireapp/api-client/lib/client';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
-import {FeatureList, FeatureMLS, FeatureStatus} from '@wireapp/api-client/lib/team';
 
-import {APIClient} from '@wireapp/api-client';
-import {Account} from '@wireapp/core';
+import {TeamRepository} from 'src/script/team/TeamRepository';
+import {UserRepository} from 'src/script/user/UserRepository';
 
 import {isMLSSupportedByEnvironment} from '../../isMLSSupportedByEnvironment';
-import {getMLSMigrationStatus, MLSMigrationStatus} from '../../MLSMigration/migrationStatus';
+import {MLSMigrationStatus} from '../../MLSMigration/migrationStatus';
 import {wasClientActiveWithinLast4Weeks} from '../wasClientActiveWithinLast4Weeks';
 
 export const evaluateSelfSupportedProtocols = async ({
-  core,
-  apiClient,
-  teamFeatureList,
+  teamRepository,
+  userRepository,
 }: {
-  core: Account;
-  apiClient: APIClient;
-  teamFeatureList: FeatureList;
+  teamRepository: TeamRepository;
+  userRepository: UserRepository;
 }): Promise<Set<ConversationProtocol>> => {
   const supportedProtocols = new Set<ConversationProtocol>();
 
-  const {mlsMigration: mlsMigrationFeature, mls: mlsFeature} = teamFeatureList;
+  const teamSupportedProtocols = teamRepository.getTeamSupportedProtocols();
+  const mlsMigrationStatus = teamRepository.getTeamMLSMigrationStatus();
 
-  const teamSupportedProtocols = getSelfTeamSupportedProtocols(mlsFeature);
-
-  const selfClients = await apiClient.api.client.getClients();
-
-  const mlsMigrationStatus = getMLSMigrationStatus(mlsMigrationFeature);
+  const selfClients = await userRepository.getAllSelfClients();
 
   const isProteusProtocolSupported = await isProteusSupported({teamSupportedProtocols, mlsMigrationStatus});
   if (isProteusProtocolSupported) {
@@ -56,8 +50,6 @@ export const evaluateSelfSupportedProtocols = async ({
     teamSupportedProtocols,
     selfClients,
     mlsMigrationStatus,
-    core,
-    apiClient,
   };
 
   const isMLSProtocolSupported = await isMLSSupported(mlsCheckDependencies);
@@ -80,16 +72,12 @@ const isMLSSupported = async ({
   teamSupportedProtocols,
   selfClients,
   mlsMigrationStatus,
-  core,
-  apiClient,
 }: {
   teamSupportedProtocols: Set<ConversationProtocol>;
   selfClients: RegisteredClient[];
   mlsMigrationStatus: MLSMigrationStatus;
-  core: Account;
-  apiClient: APIClient;
 }): Promise<boolean> => {
-  const isMLSSupportedByEnv = await isMLSSupportedByEnvironment({core, apiClient});
+  const isMLSSupportedByEnv = await isMLSSupportedByEnvironment();
 
   if (!isMLSSupportedByEnv) {
     return false;
@@ -112,16 +100,12 @@ const isMLSForcedWithoutMigration = async ({
   teamSupportedProtocols,
   selfClients,
   mlsMigrationStatus,
-  core,
-  apiClient,
 }: {
   teamSupportedProtocols: Set<ConversationProtocol>;
   selfClients: RegisteredClient[];
   mlsMigrationStatus: MLSMigrationStatus;
-  core: Account;
-  apiClient: APIClient;
 }): Promise<boolean> => {
-  const isMLSSupportedByEnv = await isMLSSupportedByEnvironment({core, apiClient});
+  const isMLSSupportedByEnv = await isMLSSupportedByEnvironment();
 
   if (!isMLSSupportedByEnv) {
     return false;
@@ -158,12 +142,4 @@ const haveAllActiveClientsRegisteredMLSDevice = async (selfClients: RegisteredCl
   //we consider client active if it was active within last 4 weeks
   const activeClients = selfClients.filter(wasClientActiveWithinLast4Weeks);
   return activeClients.every(client => !!client.mls_public_keys);
-};
-
-const getSelfTeamSupportedProtocols = (mlsFeature?: FeatureMLS): Set<ConversationProtocol> => {
-  if (!mlsFeature || mlsFeature.status === FeatureStatus.DISABLED) {
-    return new Set([ConversationProtocol.PROTEUS]);
-  }
-
-  return new Set<ConversationProtocol>(mlsFeature.config.supportedProtocols);
 };

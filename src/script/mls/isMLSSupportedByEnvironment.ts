@@ -17,25 +17,24 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
-import {Account} from '@wireapp/core';
+import {container} from 'tsyringe';
 
 import {supportsMLS} from 'Util/util';
 
+import {APIClient} from '../service/APIClientSingleton';
+
 /**
  * Will check if MLS is supported by client (whether MLS feature is enabled and secret store is supported) and backend (whether used api version supports MLS and backend removal key is present).
- *
- * @param apiClient -the instance of the apiClient
- * @param core - the instance of the core
  */
-export const isMLSSupportedByEnvironment = async ({core, apiClient}: {core: Account; apiClient: APIClient}) => {
+export const isMLSSupportedByEnvironment = async () => {
   const isMLSSupportedByClient = supportsMLS();
 
   if (!isMLSSupportedByClient) {
     return false;
   }
 
-  const isMLSEnabledOnBackend = core.backendFeatures.supportsMLS;
+  const apiClient = container.resolve(APIClient);
+  const isMLSEnabledOnBackend = apiClient.backendFeatures.supportsMLS;
 
   if (!isMLSEnabledOnBackend) {
     return false;

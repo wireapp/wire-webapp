@@ -22,14 +22,17 @@ import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {MixedConversation, isMLSConversation, isMixedConversation} from 'src/script/conversation/ConversationSelectors';
 import {Conversation} from 'src/script/entity/Conversation';
-import {TeamState} from 'src/script/team/TeamState';
+import {TeamRepository} from 'src/script/team/TeamRepository';
 
-import {MLSMigrationStatus, getMLSMigrationStatus} from '../migrationStatus';
+import {MLSMigrationStatus} from '../migrationStatus';
 import {mlsMigrationLogger} from '../MLSMigrationLogger';
 
 export const finaliseMigrationOfMixedConversations = async (
   conversations: Conversation[],
-  {teamState, conversationRepository}: {teamState: TeamState; conversationRepository: ConversationRepository},
+  {
+    teamRepository,
+    conversationRepository,
+  }: {teamRepository: TeamRepository; conversationRepository: ConversationRepository},
 ) => {
   const mixedConversatons = conversations.filter(isMixedConversation);
   mlsMigrationLogger.info(
@@ -40,7 +43,7 @@ export const finaliseMigrationOfMixedConversations = async (
     await checkFinalisationCriteria(
       mixedConversation,
       () => finaliseMigrationOfMixedConversation(mixedConversation, {conversationRepository}),
-      {teamState},
+      teamRepository,
     );
   }
 };
@@ -48,10 +51,9 @@ export const finaliseMigrationOfMixedConversations = async (
 const checkFinalisationCriteria = async (
   mixedConversation: MixedConversation,
   onReadyToFinalise: (mixedConversation: MixedConversation) => Promise<void>,
-  {teamState}: {teamState: TeamState},
+  teamRepository: TeamRepository,
 ) => {
-  const mlsMigrationFeature = teamState.teamFeatures().mlsMigration;
-  const migrationStatus = getMLSMigrationStatus(mlsMigrationFeature);
+  const migrationStatus = teamRepository.getTeamMLSMigrationStatus();
   const isMigrationFinalised = migrationStatus === MLSMigrationStatus.FINALISED;
 
   if (isMigrationFinalised || doAllConversationParticipantsSupportMLS(mixedConversation)) {

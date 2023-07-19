@@ -22,7 +22,6 @@ import {FeatureStatus} from '@wireapp/api-client/lib/team';
 
 import {MixedConversation, MLSConversation} from 'src/script/conversation/ConversationSelectors';
 import {Conversation} from 'src/script/entity/Conversation';
-import {TeamState} from 'src/script/team/TeamState';
 import {TestFactory} from 'test/helper/TestFactory';
 import {generateUser} from 'test/helper/UserGenerator';
 import {createUuid} from 'Util/uuid';
@@ -70,12 +69,12 @@ const testFactory = new TestFactory();
 describe('finaliseMigrationOfMixedConversations', () => {
   it('should finalise when finaliseRegardlessAfter date arrived', async () => {
     const conversationRepository = await testFactory.exposeConversationActors();
-    const teamState = new TeamState();
+    const teamRepository = await testFactory.exposeTeamActors();
 
     const mixedConversation = createMixedConversation();
     const mlsConversation = changeConversationProtocolToMLS(mixedConversation);
 
-    jest.spyOn(teamState, 'teamFeatures').mockReturnValueOnce({
+    jest.spyOn(teamRepository['teamState'], 'teamFeatures').mockReturnValueOnce({
       mlsMigration: {
         status: FeatureStatus.ENABLED,
         config: {
@@ -87,7 +86,7 @@ describe('finaliseMigrationOfMixedConversations', () => {
 
     jest.spyOn(conversationRepository, 'updateConversationProtocol').mockResolvedValueOnce(mlsConversation);
 
-    await finaliseMigrationOfMixedConversations([mixedConversation], {teamState, conversationRepository});
+    await finaliseMigrationOfMixedConversations([mixedConversation], {teamRepository, conversationRepository});
 
     expect(conversationRepository.updateConversationProtocol).toHaveBeenCalledWith(
       mixedConversation,
@@ -97,14 +96,14 @@ describe('finaliseMigrationOfMixedConversations', () => {
 
   it('should finalise when all conversation participants support MLS', async () => {
     const conversationRepository = await testFactory.exposeConversationActors();
-    const teamState = new TeamState();
+    const teamRepository = await testFactory.exposeTeamActors();
 
     const mixedConversation = createMixedConversation();
     injectParticipantsIntoConversation(mixedConversation, {doAllSupportMLS: true});
 
     const mlsConversation = changeConversationProtocolToMLS(mixedConversation);
 
-    jest.spyOn(teamState, 'teamFeatures').mockReturnValueOnce({
+    jest.spyOn(teamRepository['teamState'], 'teamFeatures').mockReturnValueOnce({
       mlsMigration: {
         status: FeatureStatus.ENABLED,
         config: {
@@ -116,7 +115,7 @@ describe('finaliseMigrationOfMixedConversations', () => {
 
     jest.spyOn(conversationRepository, 'updateConversationProtocol').mockResolvedValueOnce(mlsConversation);
 
-    await finaliseMigrationOfMixedConversations([mixedConversation], {teamState, conversationRepository});
+    await finaliseMigrationOfMixedConversations([mixedConversation], {teamRepository, conversationRepository});
 
     expect(conversationRepository.updateConversationProtocol).toHaveBeenCalledWith(
       mixedConversation,
@@ -126,12 +125,12 @@ describe('finaliseMigrationOfMixedConversations', () => {
 
   it('should not be finalized if none of the requirements are met', async () => {
     const conversationRepository = await testFactory.exposeConversationActors();
-    const teamState = new TeamState();
+    const teamRepository = await testFactory.exposeTeamActors();
 
     const mixedConversation = createMixedConversation();
     injectParticipantsIntoConversation(mixedConversation, {doAllSupportMLS: false});
 
-    jest.spyOn(teamState, 'teamFeatures').mockReturnValueOnce({
+    jest.spyOn(teamRepository['teamState'], 'teamFeatures').mockReturnValueOnce({
       mlsMigration: {
         status: FeatureStatus.ENABLED,
         config: {
@@ -143,7 +142,7 @@ describe('finaliseMigrationOfMixedConversations', () => {
 
     jest.spyOn(conversationRepository, 'updateConversationProtocol');
 
-    await finaliseMigrationOfMixedConversations([mixedConversation], {teamState, conversationRepository});
+    await finaliseMigrationOfMixedConversations([mixedConversation], {teamRepository, conversationRepository});
 
     expect(conversationRepository.updateConversationProtocol).not.toHaveBeenCalled();
   });

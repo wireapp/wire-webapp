@@ -102,7 +102,6 @@ import {Core} from '../service/CoreSingleton';
 import {StorageKey, StorageRepository, StorageService} from '../storage';
 import {TeamRepository} from '../team/TeamRepository';
 import {TeamService} from '../team/TeamService';
-import {TeamState} from '../team/TeamState';
 import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';
 import {AppInitTelemetry} from '../telemetry/app_init/AppInitTelemetry';
 import {AppInitTimingsStep} from '../telemetry/app_init/AppInitTimingsStep';
@@ -498,9 +497,9 @@ export class App {
       telemetry.timeStep(AppInitTimingsStep.APP_LOADED);
 
       if (supportsSelfSupportedProtocolsUpdates()) {
-        const teamState = container.resolve(TeamState);
-        await initialisePeriodicSelfSupportedProtocolsCheck(selfUser, teamState.teamFeatures(), {
+        await initialisePeriodicSelfSupportedProtocolsCheck(selfUser, {
           userRepository: this.repository.user,
+          teamRepository: this.repository.team,
         });
       }
 

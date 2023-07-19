@@ -827,6 +827,11 @@ export class UserRepository {
     return await this.updateUser(this.userState.self().qualifiedId, {supported_protocols: supportedProtocols});
   }
 
+  getSelfSupportedProtocols(): Set<ConversationProtocol> {
+    const supportedProtocols = this.userState.self().supportedProtocols();
+    return new Set(supportedProtocols);
+  }
+
   async changeEmail(email: string): Promise<void> {
     return this.selfService.putSelfEmail(email);
   }
@@ -928,5 +933,9 @@ export class UserRepository {
     } catch (error) {
       this.logger.warn(`Failed to retrieve marketing consent: ${error.message || error.code}`, error);
     }
+  }
+
+  public async getAllSelfClients() {
+    return this.clientRepository.getAllSelfClients();
   }
 }

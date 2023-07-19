@@ -396,9 +396,13 @@ export class ClientRepository {
    * @returns Resolves when the clients have been updated
    */
   async updateClientsForSelf(): Promise<ClientEntity[]> {
-    const clientsData = await this.clientService.getClients();
+    const clientsData = await this.getAllSelfClients();
     const {domain, id} = this.selfUser();
     return this.updateUserClients({domain, id}, clientsData, false);
+  }
+
+  public async getAllSelfClients(): Promise<RegisteredClient[]> {
+    return this.clientService.getClients();
   }
 
   /**
