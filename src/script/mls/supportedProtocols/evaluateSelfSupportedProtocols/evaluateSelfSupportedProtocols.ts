@@ -20,27 +20,26 @@
 import {RegisteredClient} from '@wireapp/api-client/lib/client';
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 
-import {APIClient} from '@wireapp/api-client';
-
 import {TeamRepository} from 'src/script/team/TeamRepository';
+import {UserRepository} from 'src/script/user/UserRepository';
 
 import {isMLSSupportedByEnvironment} from '../../isMLSSupportedByEnvironment';
 import {MLSMigrationStatus} from '../../MLSMigration/migrationStatus';
 import {wasClientActiveWithinLast4Weeks} from '../wasClientActiveWithinLast4Weeks';
 
 export const evaluateSelfSupportedProtocols = async ({
-  apiClient,
   teamRepository,
+  userRepository,
 }: {
-  apiClient: APIClient;
   teamRepository: TeamRepository;
+  userRepository: UserRepository;
 }): Promise<Set<ConversationProtocol>> => {
   const supportedProtocols = new Set<ConversationProtocol>();
 
   const teamSupportedProtocols = teamRepository.getTeamSupportedProtocols();
   const mlsMigrationStatus = teamRepository.getTeamMLSMigrationStatus();
 
-  const selfClients = await apiClient.api.client.getClients();
+  const selfClients = await userRepository.getAllSelfClients();
 
   const isProteusProtocolSupported = await isProteusSupported({teamSupportedProtocols, mlsMigrationStatus});
   if (isProteusProtocolSupported) {
@@ -51,7 +50,6 @@ export const evaluateSelfSupportedProtocols = async ({
     teamSupportedProtocols,
     selfClients,
     mlsMigrationStatus,
-    apiClient,
   };
 
   const isMLSProtocolSupported = await isMLSSupported(mlsCheckDependencies);
@@ -74,14 +72,12 @@ const isMLSSupported = async ({
   teamSupportedProtocols,
   selfClients,
   mlsMigrationStatus,
-  apiClient,
 }: {
   teamSupportedProtocols: Set<ConversationProtocol>;
   selfClients: RegisteredClient[];
   mlsMigrationStatus: MLSMigrationStatus;
-  apiClient: APIClient;
 }): Promise<boolean> => {
-  const isMLSSupportedByEnv = await isMLSSupportedByEnvironment({apiClient});
+  const isMLSSupportedByEnv = await isMLSSupportedByEnvironment();
 
   if (!isMLSSupportedByEnv) {
     return false;
@@ -104,14 +100,12 @@ const isMLSForcedWithoutMigration = async ({
   teamSupportedProtocols,
   selfClients,
   mlsMigrationStatus,
-  apiClient,
 }: {
   teamSupportedProtocols: Set<ConversationProtocol>;
   selfClients: RegisteredClient[];
   mlsMigrationStatus: MLSMigrationStatus;
-  apiClient: APIClient;
 }): Promise<boolean> => {
-  const isMLSSupportedByEnv = await isMLSSupportedByEnvironment({apiClient});
+  const isMLSSupportedByEnv = await isMLSSupportedByEnvironment();
 
   if (!isMLSSupportedByEnv) {
     return false;

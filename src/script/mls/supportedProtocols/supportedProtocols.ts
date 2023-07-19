@@ -20,8 +20,6 @@
 import {registerRecurringTask} from '@wireapp/core/lib/util/RecurringTaskScheduler';
 import {container} from 'tsyringe';
 
-import {APIClient} from '@wireapp/api-client';
-
 import {User} from 'src/script/entity/User';
 import {APIClient as APIClientSingleton} from 'src/script/service/APIClientSingleton';
 import {TeamRepository} from 'src/script/team/TeamRepository';
@@ -65,11 +63,9 @@ export const initialisePeriodicSelfSupportedProtocolsCheck = async (
 const updateSelfSupportedProtocols = async (
   selfUser: User,
   {
-    apiClient,
     userRepository,
     teamRepository,
   }: {
-    apiClient: APIClient;
     userRepository: UserRepository;
     teamRepository: TeamRepository;
   },
@@ -78,7 +74,7 @@ const updateSelfSupportedProtocols = async (
   logger.info('Evaluating self supported protocols, currently supported protocols:', localSupportedProtocols);
 
   try {
-    const refreshedSupportedProtocols = await evaluateSelfSupportedProtocols({apiClient, teamRepository});
+    const refreshedSupportedProtocols = await evaluateSelfSupportedProtocols({teamRepository, userRepository});
 
     const hasSupportedProtocolsChanged = !(
       localSupportedProtocols.size === refreshedSupportedProtocols.size &&

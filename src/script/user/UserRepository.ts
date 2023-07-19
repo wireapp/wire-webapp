@@ -929,4 +929,8 @@ export class UserRepository {
       this.logger.warn(`Failed to retrieve marketing consent: ${error.message || error.code}`, error);
     }
   }
+
+  public async getAllSelfClients() {
+    return this.clientRepository.getAllSelfClients();
+  }
 }
