@@ -229,6 +229,13 @@ const MessageDetails: FC<MessageDetailsProps> = ({
 
   const onParticipantClick = (userEntity: User) => togglePanel(PanelState.GROUP_PARTICIPANT_USER, userEntity);
 
+  function capitalizeFirstLetter(emojiName: string) {
+    if (emojiName && emojiName.trim() !== '') {
+      return emojiName.charAt(0).toUpperCase() + emojiName.slice(1);
+    }
+    return '';
+  }
+
   return (
     <div id="message-details" className="panel__page message-details">
       <PanelHeader
@@ -277,12 +284,13 @@ const MessageDetails: FC<MessageDetailsProps> = ({
             const emojiUnicode = getEmojiUnicode(reactionKey);
             const emojiUrl = getEmojiUrl(emojiUnicode);
             const emojiName = getEmojiTitleFromEmojiUnicode(emojiUnicode);
+            const capitalizedEmojiName = capitalizeFirstLetter(emojiName);
             const emojiCount = users.length;
             return (
               <Fragment key={reactionKey}>
                 <div css={panelContentTitleStyles} className="font-weight-bold">
                   <EmojiImg emojiUrl={emojiUrl} emojiName={emojiName} styles={messageReactionDetailsMargin} />
-                  <span css={messageReactionDetailsMargin}>{emojiName}</span>
+                  <span css={messageReactionDetailsMargin}>{capitalizedEmojiName}</span>
                   <span css={reactionsCountAlignment}>({emojiCount})</span>
                 </div>
                 <UserSearchableList
