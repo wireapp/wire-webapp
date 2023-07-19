@@ -43,7 +43,7 @@ export const finaliseMigrationOfMixedConversations = async (
     await checkFinalisationCriteria(
       mixedConversation,
       () => finaliseMigrationOfMixedConversation(mixedConversation, {conversationRepository}),
-      {teamRepository},
+      teamRepository,
     );
   }
 };
@@ -51,7 +51,7 @@ export const finaliseMigrationOfMixedConversations = async (
 const checkFinalisationCriteria = async (
   mixedConversation: MixedConversation,
   onReadyToFinalise: (mixedConversation: MixedConversation) => Promise<void>,
-  {teamRepository}: {teamRepository: TeamRepository},
+  teamRepository: TeamRepository,
 ) => {
   const migrationStatus = teamRepository.getTeamMLSMigrationStatus();
   const isMigrationFinalised = migrationStatus === MLSMigrationStatus.FINALISED;
