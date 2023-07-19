@@ -37,6 +37,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getEmojiTitleFromEmojiUnicode, getEmojiUnicode} from 'Util/EmojiUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getEmojiUrl, groupByReactionUsers} from 'Util/ReactionUtil';
+import {capitalizeFirstChar} from 'Util/StringUtil';
 import {formatLocale} from 'Util/TimeUtil';
 
 import {panelContentTitleStyles} from './MessageDetails.styles';
@@ -229,13 +230,6 @@ const MessageDetails: FC<MessageDetailsProps> = ({
 
   const onParticipantClick = (userEntity: User) => togglePanel(PanelState.GROUP_PARTICIPANT_USER, userEntity);
 
-  function capitalizeFirstLetter(emojiName: string) {
-    if (emojiName && emojiName.trim() !== '') {
-      return emojiName.charAt(0).toUpperCase() + emojiName.slice(1);
-    }
-    return '';
-  }
-
   return (
     <div id="message-details" className="panel__page message-details">
       <PanelHeader
@@ -284,7 +278,7 @@ const MessageDetails: FC<MessageDetailsProps> = ({
             const emojiUnicode = getEmojiUnicode(reactionKey);
             const emojiUrl = getEmojiUrl(emojiUnicode);
             const emojiName = getEmojiTitleFromEmojiUnicode(emojiUnicode);
-            const capitalizedEmojiName = capitalizeFirstLetter(emojiName);
+            const capitalizedEmojiName = capitalizeFirstChar(emojiName);
             const emojiCount = users.length;
             return (
               <Fragment key={reactionKey}>
