@@ -37,6 +37,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getEmojiTitleFromEmojiUnicode, getEmojiUnicode} from 'Util/EmojiUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getEmojiUrl, groupByReactionUsers} from 'Util/ReactionUtil';
+import {capitalizeFirstChar} from 'Util/StringUtil';
 import {formatLocale} from 'Util/TimeUtil';
 
 import {panelContentTitleStyles} from './MessageDetails.styles';
@@ -277,12 +278,13 @@ const MessageDetails: FC<MessageDetailsProps> = ({
             const emojiUnicode = getEmojiUnicode(reactionKey);
             const emojiUrl = getEmojiUrl(emojiUnicode);
             const emojiName = getEmojiTitleFromEmojiUnicode(emojiUnicode);
+            const capitalizedEmojiName = capitalizeFirstChar(emojiName);
             const emojiCount = users.length;
             return (
               <Fragment key={reactionKey}>
                 <div css={panelContentTitleStyles} className="font-weight-bold">
                   <EmojiImg emojiUrl={emojiUrl} emojiName={emojiName} styles={messageReactionDetailsMargin} />
-                  <span css={messageReactionDetailsMargin}>{emojiName}</span>
+                  <span css={messageReactionDetailsMargin}>{capitalizedEmojiName}</span>
                   <span css={reactionsCountAlignment}>({emojiCount})</span>
                 </div>
                 <UserSearchableList
