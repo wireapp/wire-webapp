@@ -142,13 +142,6 @@ export const MessageWrapper: React.FC<MessageParams & {hasMarker: boolean; isMes
       });
     }
 
-    if (message.isReplyable() && !conversation.removed_from_conversation()) {
-      entries.push({
-        click: () => amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REPLY, message),
-        label: t('conversationContextMenuReply'),
-      });
-    }
-
     if (message.isCopyable() && !isRestrictedFileShare) {
       entries.push({
         click: () => message.copy(),
