@@ -184,13 +184,15 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
               message={message}
               handleReactionClick={handleReactionClick}
             />
-            <ReplyButton
-              actionId={MessageActionsId.REPLY}
-              currentMsgActionName={currentMsgActionName}
-              messageFocusedTabIndex={messageFocusedTabIndex}
-              onReplyClick={handleMessageReply}
-              onKeyPress={handleKeyDown}
-            />
+            {message.isReplyable() && (
+              <ReplyButton
+                actionId={MessageActionsId.REPLY}
+                currentMsgActionName={currentMsgActionName}
+                messageFocusedTabIndex={messageFocusedTabIndex}
+                onReplyClick={handleMessageReply}
+                onKeyPress={handleKeyDown}
+              />
+            )}
           </>
         )}
 
