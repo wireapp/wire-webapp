@@ -17,6 +17,7 @@
  *
  */
 
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {registerRecurringTask} from '@wireapp/core/lib/util/RecurringTaskScheduler';
 import {container} from 'tsyringe';
@@ -66,24 +67,26 @@ export const initialiseMLSMigrationFlow = async ({
     () =>
       migrateConversationsToMLS({
         teamRepository,
+        userRepository,
         core,
         conversationRepository,
-        userRepository,
         selfUserId,
       }),
-    {teamRepository},
+    {teamRepository, userRepository},
   );
 };
 
 interface CheckMigrationConfigParams {
   teamRepository: TeamRepository;
+  userRepository: UserRepository;
 }
 
 const periodicallyCheckMigrationConfig = async (
   onMigrationStartTimeArrived: () => Promise<void>,
-  {teamRepository}: CheckMigrationConfigParams,
+  {teamRepository, userRepository}: CheckMigrationConfigParams,
 ) => {
-  const checkMigrationConfigTask = () => checkMigrationConfig(onMigrationStartTimeArrived, {teamRepository});
+  const checkMigrationConfigTask = () =>
+    checkMigrationConfig(onMigrationStartTimeArrived, {teamRepository, userRepository});
 
   // We check the migration config immediately (on app load) and every 24 hours
   await checkMigrationConfigTask();
@@ -97,14 +100,19 @@ const periodicallyCheckMigrationConfig = async (
 
 const checkMigrationConfig = async (
   onMigrationStartTimeArrived: () => Promise<void>,
-  {teamRepository}: CheckMigrationConfigParams,
+  {teamRepository, userRepository}: CheckMigrationConfigParams,
 ) => {
   const isMLSSupportedByEnv = await isMLSSupportedByEnvironment();
-
   if (!isMLSSupportedByEnv) {
     return;
   }
-  //at this point we know that MLS is supported by environment, we can check MLS migration status
+
+  const isMLSSupportedByUser = userRepository.getSelfSupportedProtocols().has(ConversationProtocol.MLS);
+  if (!isMLSSupportedByUser) {
+    return;
+  }
+
+  //at this point we know that MLS is supported by environment, and the user itself we can check MLS migration status
 
   //fetch current mls migration feature config from memory
   const migrationStatus = teamRepository.getTeamMLSMigrationStatus();

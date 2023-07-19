@@ -827,6 +827,11 @@ export class UserRepository {
     return await this.updateUser(this.userState.self().qualifiedId, {supported_protocols: supportedProtocols});
   }
 
+  getSelfSupportedProtocols(): Set<ConversationProtocol> {
+    const supportedProtocols = this.userState.self().supportedProtocols();
+    return new Set(supportedProtocols);
+  }
+
   async changeEmail(email: string): Promise<void> {
     return this.selfService.putSelfEmail(email);
   }
