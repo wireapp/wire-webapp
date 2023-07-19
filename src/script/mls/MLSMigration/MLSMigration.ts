@@ -25,14 +25,14 @@ import {Account} from '@wireapp/core';
 
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {Core as CoreSingleton} from 'src/script/service/CoreSingleton';
-import {TeamState} from 'src/script/team/TeamState';
+import {TeamRepository} from 'src/script/team/TeamRepository';
 import {UserRepository} from 'src/script/user/UserRepository';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {finaliseMigrationOfMixedConversations} from './finaliseMigration';
 import {initialiseMigrationOfProteusConversations} from './initialiseMigration';
 import {joinUnestablishedMixedConversations} from './initialiseMigration/joinUnestablishedMixedConversations';
-import {getMLSMigrationStatus, MLSMigrationStatus} from './migrationStatus';
+import {MLSMigrationStatus} from './migrationStatus';
 import {mlsMigrationLogger} from './MLSMigrationLogger';
 
 import {isMLSSupportedByEnvironment} from '../isMLSSupportedByEnvironment';
@@ -40,7 +40,7 @@ import {isMLSSupportedByEnvironment} from '../isMLSSupportedByEnvironment';
 const MIGRATION_TASK_KEY = 'mls-migration';
 
 interface InitialiseMLSMigrationFlowParams {
-  teamState: TeamState;
+  teamRepository: TeamRepository;
   conversationRepository: ConversationRepository;
   userRepository: UserRepository;
   selfUserId: QualifiedId;
@@ -49,11 +49,13 @@ interface InitialiseMLSMigrationFlowParams {
 /**
  * Will check the config of MLS migration feature and if the start time has arrived, will start (continue) the migration process based on the current state of the conversations and feature config.
  *
- * @param teamState - team state
+ * @param teamRepository - team repository
  * @param conversationRepository - conversation repository
+ * @param userRepository - user repository
+ * @param selfUserId - self user id
  */
 export const initialiseMLSMigrationFlow = async ({
-  teamState,
+  teamRepository,
   conversationRepository,
   userRepository,
   selfUserId,
@@ -63,25 +65,25 @@ export const initialiseMLSMigrationFlow = async ({
   return periodicallyCheckMigrationConfig(
     () =>
       migrateConversationsToMLS({
-        teamState,
+        teamRepository,
         core,
         conversationRepository,
         userRepository,
         selfUserId,
       }),
-    {teamState},
+    {teamRepository},
   );
 };
 
 interface CheckMigrationConfigParams {
-  teamState: TeamState;
+  teamRepository: TeamRepository;
 }
 
 const periodicallyCheckMigrationConfig = async (
   onMigrationStartTimeArrived: () => Promise<void>,
-  {teamState}: CheckMigrationConfigParams,
+  {teamRepository}: CheckMigrationConfigParams,
 ) => {
-  const checkMigrationConfigTask = () => checkMigrationConfig(onMigrationStartTimeArrived, {teamState});
+  const checkMigrationConfigTask = () => checkMigrationConfig(onMigrationStartTimeArrived, {teamRepository});
 
   // We check the migration config immediately (on app load) and every 24 hours
   await checkMigrationConfigTask();
@@ -95,7 +97,7 @@ const periodicallyCheckMigrationConfig = async (
 
 const checkMigrationConfig = async (
   onMigrationStartTimeArrived: () => Promise<void>,
-  {teamState}: CheckMigrationConfigParams,
+  {teamRepository}: CheckMigrationConfigParams,
 ) => {
   const isMLSSupportedByEnv = await isMLSSupportedByEnvironment();
 
@@ -105,8 +107,7 @@ const checkMigrationConfig = async (
   //at this point we know that MLS is supported by environment, we can check MLS migration status
 
   //fetch current mls migration feature config from memory
-  const mlsMigrationFeature = teamState.teamFeatures().mlsMigration;
-  const migrationStatus = getMLSMigrationStatus(mlsMigrationFeature);
+  const migrationStatus = teamRepository.getTeamMLSMigrationStatus();
 
   if (migrationStatus === MLSMigrationStatus.DISABLED) {
     mlsMigrationLogger.info('MLS migration feature is disabled, will retry in 24 hours or on next app reload.');
@@ -133,7 +134,7 @@ interface MigrateConversationsToMLSParams {
   selfUserId: QualifiedId;
   conversationRepository: ConversationRepository;
   userRepository: UserRepository;
-  teamState: TeamState;
+  teamRepository: TeamRepository;
 }
 
 const migrateConversationsToMLS = async ({
@@ -141,7 +142,7 @@ const migrateConversationsToMLS = async ({
   selfUserId,
   conversationRepository,
   userRepository,
-  teamState,
+  teamRepository,
 }: MigrateConversationsToMLSParams) => {
   //refetch all known users so we have the latest lists of the protocols they support
   await userRepository.refreshAllKnownUsers();
@@ -157,5 +158,5 @@ const migrateConversationsToMLS = async ({
 
   await joinUnestablishedMixedConversations(conversations, {core});
 
-  await finaliseMigrationOfMixedConversations(conversations, {conversationRepository, teamState});
+  await finaliseMigrationOfMixedConversations(conversations, {conversationRepository, teamRepository});
 };
