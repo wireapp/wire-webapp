@@ -18,10 +18,8 @@
  */
 
 import {registerRecurringTask} from '@wireapp/core/lib/util/RecurringTaskScheduler';
-import {container} from 'tsyringe';
 
 import {User} from 'src/script/entity/User';
-import {APIClient as APIClientSingleton} from 'src/script/service/APIClientSingleton';
 import {TeamRepository} from 'src/script/team/TeamRepository';
 import {UserRepository} from 'src/script/user/UserRepository';
 import {getLogger} from 'Util/Logger';
@@ -45,10 +43,7 @@ export const initialisePeriodicSelfSupportedProtocolsCheck = async (
   selfUser: User,
   {userRepository, teamRepository}: {userRepository: UserRepository; teamRepository: TeamRepository},
 ) => {
-  const apiClient = container.resolve(APIClientSingleton);
-
-  const checkSupportedProtocolsTask = () =>
-    updateSelfSupportedProtocols(selfUser, {apiClient, teamRepository, userRepository});
+  const checkSupportedProtocolsTask = () => updateSelfSupportedProtocols(selfUser, {teamRepository, userRepository});
 
   // We update supported protocols of self user on initial app load and then in 24 hours intervals
   await checkSupportedProtocolsTask();

@@ -21,11 +21,9 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {registerRecurringTask} from '@wireapp/core/lib/util/RecurringTaskScheduler';
 import {container} from 'tsyringe';
 
-import {APIClient} from '@wireapp/api-client';
 import {Account} from '@wireapp/core';
 
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
-import {APIClient as APIClientSingleton} from 'src/script/service/APIClientSingleton';
 import {Core as CoreSingleton} from 'src/script/service/CoreSingleton';
 import {TeamState} from 'src/script/team/TeamState';
 import {UserRepository} from 'src/script/user/UserRepository';
@@ -61,7 +59,6 @@ export const initialiseMLSMigrationFlow = async ({
   selfUserId,
 }: InitialiseMLSMigrationFlowParams) => {
   const core = container.resolve(CoreSingleton);
-  const apiClient = container.resolve(APIClientSingleton);
 
   return periodicallyCheckMigrationConfig(
     () =>
@@ -72,20 +69,19 @@ export const initialiseMLSMigrationFlow = async ({
         userRepository,
         selfUserId,
       }),
-    {apiClient, teamState},
+    {teamState},
   );
 };
 
 interface CheckMigrationConfigParams {
-  apiClient: APIClient;
   teamState: TeamState;
 }
 
 const periodicallyCheckMigrationConfig = async (
   onMigrationStartTimeArrived: () => Promise<void>,
-  {apiClient, teamState}: CheckMigrationConfigParams,
+  {teamState}: CheckMigrationConfigParams,
 ) => {
-  const checkMigrationConfigTask = () => checkMigrationConfig(onMigrationStartTimeArrived, {apiClient, teamState});
+  const checkMigrationConfigTask = () => checkMigrationConfig(onMigrationStartTimeArrived, {teamState});
 
   // We check the migration config immediately (on app load) and every 24 hours
   await checkMigrationConfigTask();
@@ -99,9 +95,9 @@ const periodicallyCheckMigrationConfig = async (
 
 const checkMigrationConfig = async (
   onMigrationStartTimeArrived: () => Promise<void>,
-  {apiClient, teamState}: CheckMigrationConfigParams,
+  {teamState}: CheckMigrationConfigParams,
 ) => {
-  const isMLSSupportedByEnv = await isMLSSupportedByEnvironment({apiClient});
+  const isMLSSupportedByEnv = await isMLSSupportedByEnvironment();
 
   if (!isMLSSupportedByEnv) {
     return;
