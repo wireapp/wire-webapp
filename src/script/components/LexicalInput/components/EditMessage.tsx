@@ -17,35 +17,32 @@
  *
  */
 
-import {useCallback, useEffect} from 'react';
+import {useEffect} from 'react';
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
+import {amplify} from 'amplify';
+import {type LexicalEditor} from 'lexical';
 
-import {getTextValue} from '../utils/getTextValue';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
-interface DraftStatePluginProps {
-  loadDraftStateLexical: () => Promise<any>;
-  setInputValue: (value: string) => void;
+import {ContentMessage} from '../../../entity/message/ContentMessage';
+
+interface EditMessageProps {
+  onMessageEdit: (messageEntity: ContentMessage, editor: LexicalEditor) => void;
 }
 
-export const DraftStatePlugin = ({loadDraftStateLexical, setInputValue}: DraftStatePluginProps) => {
+export const EditMessage = ({onMessageEdit}: EditMessageProps) => {
   const [editor] = useLexicalComposerContext();
 
-  const getDraftState = useCallback(async () => {
-    const draftState = await loadDraftStateLexical();
-
-    if (draftState.editorState) {
-      const initialEditorState = editor.parseEditorState(draftState.editorState);
-      editor.setEditorState(initialEditorState);
-
-      const textValue = getTextValue(editor);
-      setInputValue(textValue);
-    }
-  }, [editor, loadDraftStateLexical, setInputValue]);
-
   useEffect(() => {
-    getDraftState(); // eslint-disable-line @typescript-eslint/no-floating-promises
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.EDIT, (messageEntity: ContentMessage) => {
+      onMessageEdit(messageEntity, editor);
+    });
+
+    return () => {
+      amplify.unsubscribeAll(WebAppEvents.CONVERSATION.MESSAGE.EDIT);
+    };
+  }, [editor]);
 
   return null;
 };

@@ -21,7 +21,7 @@ import {useEffect, useRef, useState} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
-import {$createParagraphNode, $createTextNode, $getRoot, LexicalEditor} from 'lexical';
+import {$createParagraphNode, $createTextNode, $getRoot, $setSelection, LexicalEditor} from 'lexical';
 import {container} from 'tsyringe';
 
 import {useMatchMedia} from '@wireapp/react-ui-kit';
@@ -31,6 +31,8 @@ import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {checkFileSharingPermission} from 'Components/Conversation/utils/checkFileSharingPermission';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';
 import {LexicalInput} from 'Components/LexicalInput/LexicalInput';
+import {$createBeautifulMentionNode} from 'Components/LexicalInput/nodes/MentionNode';
+import {createNodes} from 'Components/LexicalInput/utils/generateNodes';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
@@ -39,7 +41,6 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {loadDraftStateLexical, saveDraftStateLexical} from 'Util/DraftStateUtil';
 import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
-import {updateMentionRanges} from 'Util/MentionUtil';
 import {formatLocale, TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {getFileExtension} from 'Util/util';
 
@@ -138,6 +139,11 @@ const InputBar = ({
     'isIncomingRequest',
   ]);
 
+  // Lexical
+  const lexicalRef = useRef<LexicalEditor>(null);
+
+  // Typing indicator
+  const [isTyping, setIsTyping] = useState<boolean>(false);
   const {typingIndicatorMode} = useKoSubscribableChildren(propertiesRepository, ['typingIndicatorMode']);
   const isTypingIndicatorEnabled = typingIndicatorMode === CONVERSATION_TYPING_INDICATOR_MODE.ON;
 
@@ -145,7 +151,6 @@ const InputBar = ({
   const [inputValue, setInputValue] = useState<string>('');
   const [editMessageEntity, setEditMessageEntity] = useState<ContentMessage | null>(null);
   const [replyMessageEntity, setReplyMessageEntity] = useState<ContentMessage | null>(null);
-  const [isTyping, setIsTyping] = useState<boolean>(false);
 
   // Mentions
   const [currentMentions, setCurrentMentions] = useState<MentionEntity[]>([]);
@@ -157,7 +162,7 @@ const InputBar = ({
   const [pingDisabled, setIsPingDisabled] = useState<boolean>(false);
   const hasUserTyped = useRef<boolean>(false);
 
-  // New values
+  // Right sidebar
   const {rightSidebar} = useAppMainState.getState();
   const lastItem = rightSidebar.history.length - 1;
   const currentState = rightSidebar.history[lastItem];
@@ -170,8 +175,6 @@ const InputBar = ({
   const isConnectionRequest = isOutgoingRequest || isIncomingRequest;
   const hasLocalEphemeralTimer = isSelfDeletingMessagesEnabled && !!localMessageTimer && !hasGlobalMessageTimer;
 
-  // const richTextInput = getRichTextInput(currentMentions, inputValue);
-
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
   const isScaledDown = useMatchMedia('max-width: 768px');
 
@@ -181,6 +184,10 @@ const InputBar = ({
     setCurrentMentions([]);
 
     if (resetInputValue) {
+      lexicalRef.current?.update(() => {
+        $getRoot().clear();
+      });
+
       setInputValue('');
     }
   };
@@ -213,7 +220,7 @@ const InputBar = ({
 
   const handleCancelReply = () => {
     // if (!mentionSuggestions.length) {
-    //   cancelMessageReply(false);
+    cancelMessageReply(false);
     // }
     // textareaRef.current?.focus();
   };
@@ -229,15 +236,29 @@ const InputBar = ({
       setInputValue(firstAsset.text);
       setCurrentMentions(newMentions);
       editor.update(() => {
+        const nodes = createNodes(newMentions, firstAsset.text);
+
+        const paragraphs = nodes.map(node => {
+          if (node.type === 'beautifulMention') {
+            return $createBeautifulMentionNode('@', node.data.slice(1));
+          }
+
+          return $createTextNode(node.data);
+        });
+
         const root = $getRoot();
         const paragraphNode = $createParagraphNode();
-        const textNode = $createTextNode(firstAsset.text);
-        paragraphNode.append(textNode);
+        paragraphNode.append(...paragraphs);
         root.append(paragraphNode);
+
+        // This behaviour is needed to clear selection, if we not clear selection will be on beginning.
+        $setSelection(null);
+
+        editor.focus();
       });
 
       if (messageEntity.quote() && conversationEntity) {
-        messageRepository
+        void messageRepository
           .getMessageInConversationById(conversationEntity, messageEntity.quote().messageId)
           .then(quotedMessage => setReplyMessageEntity(quotedMessage));
       }
@@ -245,20 +266,14 @@ const InputBar = ({
   };
 
   useEffect(() => {
-    if (editMessageEntity?.isEditable()) {
-      // const firstAsset = editMessageEntity.getFirstAsset() as TextAsset;
-      // moveCursorToEnd(firstAsset.text.length);
-    }
-  }, [editMessageEntity]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
     if (!hasUserTyped.current || !isTypingIndicatorEnabled) {
       return;
     }
+
     if (isTyping) {
-      conversationRepository.sendTypingStart(conversationEntity);
+      void conversationRepository.sendTypingStart(conversationEntity);
     } else {
-      conversationRepository.sendTypingStop(conversationEntity);
+      void conversationRepository.sendTypingStop(conversationEntity);
     }
   }, [isTyping, conversationRepository, conversationEntity, isTypingIndicatorEnabled]);
 
@@ -266,16 +281,17 @@ const InputBar = ({
     if (!hasUserTyped.current) {
       return () => {};
     }
+
     let timerId: number;
+
     if (inputValue.length > 0) {
       setIsTyping(true);
       timerId = window.setTimeout(() => setIsTyping(false), TYPING_TIMEOUT);
     } else {
       setIsTyping(false);
     }
-    return () => {
-      window.clearTimeout(timerId);
-    };
+
+    return () => window.clearTimeout(timerId);
   }, [inputValue]);
 
   const replyMessage = (messageEntity: ContentMessage): void => {
@@ -284,7 +300,7 @@ const InputBar = ({
       cancelMessageEditing(!!editMessageEntity);
       setReplyMessageEntity(messageEntity);
 
-      // textareaRef.current?.focus();
+      lexicalRef.current?.focus();
     }
   };
 
@@ -301,17 +317,6 @@ const InputBar = ({
               userId: replyMessageEntity.from,
             }) as OutgoingQuote;
           });
-  };
-
-  const sendMessage = (messageText: string, mentions: MentionEntity[]) => {
-    if (messageText.length) {
-      const mentionEntities = mentions.slice(0);
-
-      generateQuote().then(quoteEntity => {
-        messageRepository.sendTextWithLinkPreview(conversationEntity, messageText, mentionEntities, quoteEntity);
-        cancelMessageReply();
-      });
-    }
   };
 
   const sendMessageEdit = (messageText: string, mentions: MentionEntity[]): void | Promise<any> => {
@@ -335,18 +340,25 @@ const InputBar = ({
     }
   };
 
-  // @ts-ignore
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const onSend = (text: string): void | boolean => {
+  const sendMessage = (messageText: string, mentions: MentionEntity[]) => {
+    if (messageText.length) {
+      const mentionEntities = mentions.slice(0);
+
+      void generateQuote().then(quoteEntity => {
+        void messageRepository.sendTextWithLinkPreview(conversationEntity, messageText, mentionEntities, quoteEntity);
+        cancelMessageReply();
+      });
+    }
+  };
+
+  const onSend = (messageText: string, mentions: MentionEntity[]): void | boolean => {
     if (pastedFile) {
       return sendPastedFile();
     }
 
-    const beforeLength = text.length;
-    const messageTrimmedStart = text.trimLeft();
-    const trimmedStartLength = messageTrimmedStart.length;
-    const messageText = messageTrimmedStart.trimRight();
-    const isMessageTextTooLong = messageText.length > CONFIG.MAXIMUM_MESSAGE_LENGTH;
+    const messageTrimmedStart = messageText.trimStart();
+    const text = messageTrimmedStart.trimEnd();
+    const isMessageTextTooLong = text.length > CONFIG.MAXIMUM_MESSAGE_LENGTH;
 
     if (isMessageTextTooLong) {
       showWarningModal(
@@ -357,26 +369,13 @@ const InputBar = ({
       return;
     }
 
-    const updatedMentions = updateMentionRanges(currentMentions, 0, 0, trimmedStartLength - beforeLength);
-
     if (isEditing) {
-      sendMessageEdit(messageText, updatedMentions);
+      void sendMessageEdit(text, mentions);
     } else {
-      sendMessage(messageText, updatedMentions);
+      sendMessage(text, mentions);
     }
-    /*
-      When trying to update a textarea with japanese value to
-      empty in onKeyDown handler the text is not fully cleared
-      and some parts of text is pasted by the OS/Browser after
-      we do setInputValue('');
-      To fix this we have to add a setTimeout in order to postpone
-      the operation of clearing the text to after of the proccess
-      of the onKeyDown and onKeyUp DOM events.
-    */
-    setTimeout(() => {
-      resetDraftState(true);
-    }, 0);
-    // textareaRef.current?.focus();
+
+    lexicalRef.current?.focus();
   };
 
   const onGifClick = () => openGiphy(inputValue);
@@ -385,7 +384,7 @@ const InputBar = ({
     if (conversationEntity && !pingDisabled) {
       setIsPingDisabled(true);
 
-      messageRepository.sendPing(conversationEntity).then(() => {
+      void messageRepository.sendPing(conversationEntity).then(() => {
         window.setTimeout(() => setIsPingDisabled(false), CONFIG.PING_TIMEOUT);
       });
     }
@@ -393,6 +392,7 @@ const InputBar = ({
 
   const handlePasteFiles = (files: FileList): void => {
     const [pastedFile] = files;
+
     if (!pastedFile) {
       return;
     }
@@ -409,8 +409,8 @@ const InputBar = ({
   };
 
   const sendGiphy = (gifUrl: string, tag: string): void => {
-    generateQuote().then(quoteEntity => {
-      messageRepository.sendGif(conversationEntity, gifUrl, tag, quoteEntity);
+    void generateQuote().then(quoteEntity => {
+      void messageRepository.sendGif(conversationEntity, gifUrl, tag, quoteEntity);
       cancelMessageEditing(true, true);
     });
   };
@@ -437,18 +437,13 @@ const InputBar = ({
 
   useEffect(() => {
     hasUserTyped.current = false;
-    // loadInitialStateForConversation();
   }, [conversationEntity]);
 
   const saveDraft = async (editor: any) => {
     await saveDraftStateLexical(storageRepository, conversationEntity, editor);
   };
 
-  const loadDraft = async () => {
-    return loadDraftStateLexical(conversationEntity, storageRepository);
-  };
-
-  // useTextAreaFocus(() => textareaRef.current?.focus());
+  const loadDraft = async () => loadDraftStateLexical(conversationEntity, storageRepository);
 
   const handleRepliedMessageDeleted = (messageId: string) => {
     if (replyMessageEntity?.id === messageId) {
@@ -525,7 +520,7 @@ const InputBar = ({
       className={cx(conversationInputBarClassName, {'is-right-panel-open': isRightSidebarOpen})}
       aria-live="assertive"
     >
-      {!!isTypingIndicatorEnabled && <TypingIndicator conversationId={conversationEntity.id} />}
+      {isTypingIndicatorEnabled && <TypingIndicator conversationId={conversationEntity.id} />}
 
       {classifiedDomains && !isConnectionRequest && (
         <ClassifiedBar
@@ -552,16 +547,16 @@ const InputBar = ({
 
             {!removedFromConversation && !pastedFile && (
               <LexicalInput
+                ref={lexicalRef}
                 editMessage={editMessage}
                 conversationEntity={conversationEntity}
-                messageRepository={messageRepository}
                 propertiesRepository={propertiesRepository}
                 searchRepository={searchRepository}
                 placeholder={inputPlaceholder}
                 inputValue={inputValue}
                 setInputValue={setInputValue}
                 currentMentions={currentMentions}
-                sendMessage={sendMessage}
+                sendMessage={onSend}
                 hasLocalEphemeralTimer={hasLocalEphemeralTimer}
                 saveDraftStateLexical={saveDraft}
                 loadDraftStateLexical={loadDraft}

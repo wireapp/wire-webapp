@@ -20,7 +20,6 @@
 import {forwardRef, useEffect, useState} from 'react';
 
 import {InitialConfigType, LexicalComposer} from '@lexical/react/LexicalComposer';
-import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {ContentEditable} from '@lexical/react/LexicalContentEditable';
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary';
 import {OnChangePlugin} from '@lexical/react/LexicalOnChangePlugin';
@@ -32,21 +31,19 @@ import {LexicalEditor} from 'lexical';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {SendMessageButton} from 'Components/LexicalInput/components/SendMessageButton';
-import {BeautifulMentionsPlugin, MenuOption} from 'Components/LexicalInput/plugins/BeautifulMentionsPlugin';
-import {
-  BeautifulMentionsMenuItemProps,
-  BeautifulMentionsMenuProps,
-} from 'Components/LexicalInput/types/BeautifulMentionsPluginProps';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
+import {EditMessage} from './components/EditMessage';
+import {SendMessageButton} from './components/SendMessageButton';
 import {BeautifulMentionNode} from './nodes/MentionNode';
+import {BeautifulMentionsPlugin} from './plugins/BeautifulMentionsPlugin';
 import {DraftStatePlugin} from './plugins/DraftStatePlugin';
 import {EmojiPickerPlugin} from './plugins/EmojiPickerPlugin';
+import {EditorRefPlugin} from './plugins/LexicalEditorRefPlugin';
 import './tempStyle.less';
+import {BeautifulMentionsMenuItemProps, BeautifulMentionsMenuProps} from './types/BeautifulMentionsPluginProps';
 
-import {MessageRepository} from '../../conversation/MessageRepository';
 import {Conversation} from '../../entity/Conversation';
 import {MentionEntity} from '../../message/MentionEntity';
 import {PropertiesRepository} from '../../properties/PropertiesRepository';
@@ -83,7 +80,6 @@ MenuItem.displayName = 'MenuItem';
 interface LexicalInputProps {
   readonly conversationEntity: Conversation;
   currentMentions: MentionEntity[];
-  readonly messageRepository: MessageRepository;
   readonly propertiesRepository: PropertiesRepository;
   readonly searchRepository: SearchRepository;
   placeholder: string;
@@ -97,123 +93,103 @@ interface LexicalInputProps {
   loadDraftStateLexical: any;
 }
 
-export const LexicalInput = ({
-  conversationEntity,
-  messageRepository,
-  placeholder,
-  propertiesRepository,
-  searchRepository,
-  inputValue,
-  setInputValue,
-  children,
-  sendMessage,
-  hasLocalEphemeralTimer,
-  saveDraftStateLexical,
-  loadDraftStateLexical,
-  editMessage,
-}: LexicalInputProps) => {
-  // Emojis
-  const [shouldReplaceEmoji, setShouldReplaceEmoji] = useState<boolean>(
-    propertiesRepository.getPreference(PROPERTIES_TYPE.EMOJI.REPLACE_INLINE),
-  );
-
-  // Mentions
-  // @ts-ignore
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [currentMentions, setCurrentMentions] = useState<MenuOption[]>([]);
-  const {participating_user_ets: participatingUserEts} = useKoSubscribableChildren(conversationEntity, [
-    'participating_user_ets',
-  ]);
-  const candidates = participatingUserEts.filter(userEntity => !userEntity.isService);
-
-  const editorConfig: InitialConfigType = {
-    namespace: 'WireLexicalEditor',
-    theme,
-    onError(error: any) {
-      // eslint-disable-next-line no-console
-      console.log('[LexicalInput.tsx] przemvs error', error);
-      throw error;
+export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
+  (
+    {
+      conversationEntity,
+      placeholder,
+      propertiesRepository,
+      searchRepository,
+      inputValue,
+      setInputValue,
+      children,
+      sendMessage,
+      hasLocalEphemeralTimer,
+      saveDraftStateLexical,
+      loadDraftStateLexical,
+      editMessage,
     },
-    nodes: [BeautifulMentionNode, BeautifulMentionNode],
-    // editorState: initEditor,
-    // editorState: text,
-  };
+    ref,
+  ) => {
+    // Emojis
+    const [shouldReplaceEmoji, setShouldReplaceEmoji] = useState<boolean>(
+      propertiesRepository.getPreference(PROPERTIES_TYPE.EMOJI.REPLACE_INLINE),
+    );
 
-  const queryMentions = (_trigger: string, queryString?: string | null) => {
-    return queryString ? searchRepository.searchUserInSet(queryString, candidates) : [];
-  };
+    // Mentions
+    const {participating_user_ets: participatingUserEts} = useKoSubscribableChildren(conversationEntity, [
+      'participating_user_ets',
+    ]);
+    const candidates = participatingUserEts.filter(userEntity => !userEntity.isService);
 
-  const addMention = (mention: MenuOption) => {
-    setCurrentMentions(prevState => [...prevState, mention]);
-  };
+    const editorConfig: InitialConfigType = {
+      namespace: 'WireLexicalEditor',
+      theme,
+      onError(error: any) {
+        // eslint-disable-next-line no-console
+        console.log('[LexicalInput.tsx] przemvs error', error);
+        throw error;
+      },
+      nodes: [BeautifulMentionNode, BeautifulMentionNode],
+    };
 
-  useEffect(() => {
-    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE, setShouldReplaceEmoji);
-    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, (properties: WebappProperties) => {
-      setShouldReplaceEmoji(properties.settings.emoji.replace_inline);
-    });
-  }, []);
-
-  function RenameMeLaterPlaseOrMoveMe() {
-    const [editor] = useLexicalComposerContext();
+    const queryMentions = (_trigger: string, queryString?: string | null) => {
+      return queryString ? searchRepository.searchUserInSet(queryString, candidates) : [];
+    };
 
     useEffect(() => {
-      amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.EDIT, (messageEntity: ContentMessage) => {
-        editMessage(messageEntity, editor);
+      amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE, setShouldReplaceEmoji);
+      amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, (properties: WebappProperties) => {
+        setShouldReplaceEmoji(properties.settings.emoji.replace_inline);
       });
-      return () => {
-        amplify.unsubscribeAll(WebAppEvents.CONVERSATION.MESSAGE.EDIT);
-      };
-    }, [editor]);
+    }, []);
 
-    return null;
-  }
+    return (
+      <LexicalComposer initialConfig={editorConfig}>
+        <div className="controls-center">
+          <div css={{width: '100%'}} className={cx('input-bar--wrapper')}>
+            <div className="editor-container">
+              <EditorRefPlugin editorRef={ref} />
+              {/* Connect this with DraftStateUtil.ts */}
+              <DraftStatePlugin setInputValue={setInputValue} loadDraftStateLexical={loadDraftStateLexical} />
+              <EditMessage onMessageEdit={editMessage} />
 
-  return (
-    <LexicalComposer initialConfig={editorConfig}>
-      <div className="controls-center">
-        <div css={{width: '100%'}} className={cx('input-bar--wrapper')}>
-          <div className="editor-container">
-            {/* Connect this with DraftStateUtil.ts */}
-            <DraftStatePlugin setInputValue={setInputValue} loadDraftStateLexical={loadDraftStateLexical} />
-            <RenameMeLaterPlaseOrMoveMe />
+              {shouldReplaceEmoji && <EmojiPickerPlugin />}
 
-            {shouldReplaceEmoji && <EmojiPickerPlugin />}
+              <PlainTextPlugin
+                contentEditable={<ContentEditable value={inputValue} className="editor-input" />}
+                placeholder={<Placeholder text={placeholder} hasLocalEphemeralTimer={hasLocalEphemeralTimer} />}
+                ErrorBoundary={LexicalErrorBoundary}
+              />
 
-            <PlainTextPlugin
-              contentEditable={<ContentEditable value={inputValue} className="editor-input" />}
-              placeholder={<Placeholder text={placeholder} hasLocalEphemeralTimer={hasLocalEphemeralTimer} />}
-              ErrorBoundary={LexicalErrorBoundary}
-            />
+              <BeautifulMentionsPlugin
+                onSearch={queryMentions}
+                triggers={['@']}
+                menuComponent={Menu}
+                menuItemComponent={MenuItem}
+              />
 
-            <BeautifulMentionsPlugin
-              onSearch={queryMentions}
-              onAddMention={addMention}
-              triggers={['@']}
-              menuComponent={Menu}
-              menuItemComponent={MenuItem}
-            />
+              <OnChangePlugin
+                onChange={(editorState, lexicalEditor) => {
+                  lexicalEditor.registerTextContentListener(textContent => {
+                    setInputValue(textContent);
+                  });
 
-            <OnChangePlugin
-              onChange={(editorState, lexicalEditor) => {
-                lexicalEditor.registerTextContentListener(textContent => {
-                  setInputValue(textContent);
-                });
-
-                const stringifyEditor = JSON.stringify(editorState.toJSON());
-                saveDraftStateLexical(stringifyEditor);
-              }}
-            />
+                  const stringifyEditor = JSON.stringify(editorState.toJSON());
+                  saveDraftStateLexical(stringifyEditor);
+                }}
+              />
+            </div>
           </div>
         </div>
-      </div>
 
-      {children}
+        {children}
 
-      <SendMessageButton textValue={inputValue} onSend={sendMessage} mentions={candidates} />
-    </LexicalComposer>
-  );
-};
+        <SendMessageButton textValue={inputValue} onSend={sendMessage} mentions={candidates} />
+      </LexicalComposer>
+    );
+  },
+);
 
 LexicalInput.displayName = 'LexicalInput';
 

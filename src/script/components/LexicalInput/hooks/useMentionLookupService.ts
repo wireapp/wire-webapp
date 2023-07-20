@@ -60,7 +60,7 @@ export function useMentionLookupService(
       return;
     }
 
-    lookupService(queryString, trigger).then(res => setResults(res));
+    void lookupService(queryString, trigger).then(res => setResults(res));
   }, [queryString, lookupService, trigger]);
 
   return useMemo(() => ({loading, results}), [loading, results]);

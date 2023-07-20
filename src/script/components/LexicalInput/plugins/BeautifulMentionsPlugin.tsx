@@ -87,7 +87,6 @@ export function BeautifulMentionsPlugin(props: BeautifulMentionsPluginProps) {
   const {
     items,
     onSearch,
-    onAddMention,
     searchDelay = props.onSearch ? 250 : 0,
     creatable,
     allowSpaces = true,
@@ -388,7 +387,6 @@ export function BeautifulMentionsPlugin(props: BeautifulMentionsPluginProps) {
                       onClick={() => {
                         setHighlightedIndex(i);
                         selectOptionAndCleanUp(option);
-                        onAddMention(option);
                       }}
                       onMouseDown={event => {
                         event.preventDefault();

@@ -30,18 +30,11 @@ import {User} from '../../../../entity/User';
 import {MentionEntity} from '../../../../message/MentionEntity';
 import {BeautifulMentionNode} from '../../nodes/MentionNode';
 
-const createMentionEntity = (
-  user: Pick<User, 'id' | 'name' | 'domain'>,
-  mentionPosition: number,
-): MentionEntity | null => {
+const createMentionEntity = (user: Pick<User, 'id' | 'name' | 'domain'>, mentionPosition: number): MentionEntity => {
   const userName = user.name();
   const mentionLength = userName.length + 1;
 
-  if (mentionPosition) {
-    return new MentionEntity(mentionPosition, mentionLength, user.id, user.domain);
-  }
-
-  return null;
+  return new MentionEntity(mentionPosition, mentionLength, user.id, user.domain);
 };
 
 interface SendMessageButtonProps {
@@ -63,11 +56,7 @@ export const getMentionsToSend = (editor: LexicalEditor, textValue: string, ment
     const mentionOption = mentions.find(user => user.name() === mention);
 
     if (mentionOption) {
-      const newMention = createMentionEntity(mentionOption, mentionPosition);
-
-      if (newMention) {
-        mentionEntities.push(newMention);
-      }
+      mentionEntities.push(createMentionEntity(mentionOption, mentionPosition));
     }
 
     position = mentionPosition;

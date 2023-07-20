@@ -19,8 +19,6 @@
 
 import {ComponentPropsWithRef, ElementType} from 'react';
 
-import {MenuOption} from 'Components/LexicalInput/plugins/BeautifulMentionsPlugin';
-
 import {User} from '../../../entity/User';
 
 export interface BeautifulMentionsMenuProps extends ComponentPropsWithRef<any> {
@@ -97,7 +95,6 @@ export interface BeautifulMentionsSearchProps extends BeautifulMentionsProps {
    * @default 250
    */
   searchDelay?: number;
-  onAddMention: (mention: MenuOption) => void;
 }
 
 export interface BeautifulMentionsItemsProps extends BeautifulMentionsProps {
@@ -108,7 +105,6 @@ export interface BeautifulMentionsItemsProps extends BeautifulMentionsProps {
    * will be shown in the menu.
    */
   items: Record<string, User[]>;
-  onAddMention: (mention: MenuOption) => void;
   triggers?: never;
   onSearch?: never;
   searchDelay?: never;
