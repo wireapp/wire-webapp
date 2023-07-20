@@ -108,6 +108,15 @@ export type Env = {
   /** Feature toggle for debug utils. Can be set to true or false */
   FEATURE_ENABLE_DEBUG: string;
 
+  /** Feature to open a confirm modal before pinging large groups */
+  FEATURE_ENABLE_PING_CONFIRMATION: string;
+
+  /**
+   * Minimum amount of users required in a conversation to open confirm modal for ping
+   * Must be used with FEATURE_ENABLE_PING_CONFIRMATION
+   */
+  FEATURE_MAX_USERS_TO_PING_WITHOUT_ALERT: string;
+
   /** Feature toggle for domain discovery. Can be set to true or false */
   FEATURE_ENABLE_DOMAIN_DISCOVERY: string;
 

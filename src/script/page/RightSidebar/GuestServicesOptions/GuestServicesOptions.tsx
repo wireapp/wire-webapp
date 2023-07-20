@@ -87,7 +87,7 @@ const GuestServicesOptions: FC<GuestServicesOptionsProps> = ({
         preventClose: true,
         primaryAction: {
           action: changeAccessState,
-          text: t('modalConversationRemoveAction'),
+          text: t('modalConversationRemoveGuestsOrServicesAction'),
         },
         text: {
           message,
