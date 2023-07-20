@@ -292,3 +292,18 @@ export const isYoungerThan7Days = (date: FnDate) => differenceInDays(new Date(),
 export const fromNowLocale = (date: FnDate) => formatDistanceToNow(date, {addSuffix: true, locale});
 
 export {isToday, fromUnixTime, isYesterday, isSameDay, isSameMonth, isThisYear, differenceInHours, differenceInMinutes};
+
+/**
+ * Returns a number of weeks elapsed since the given date.
+ * Should be read as passed less than 1 week ago, passed less than 2 weeks ago, etc.
+ * @param date date to compare with
+ * @returns number of weeks passed since the given date
+ */
+export const weeksPassedSinceDate = (date: Date): number => {
+  const now = new Date();
+
+  const diff = now.getTime() - date.getTime();
+  const diffInWeeks = diff / TIME_IN_MILLIS.WEEK;
+
+  return Math.max(1, Math.ceil(diffInWeeks));
+};

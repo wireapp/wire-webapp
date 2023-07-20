@@ -18,6 +18,7 @@
  */
 
 import type {AddedClient, PublicClient} from '@wireapp/api-client/lib/client';
+import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 import {
   UserEvent,
   UserLegalHoldDisableEvent,
@@ -746,6 +747,33 @@ export class UserRepository {
   async refreshUsers(userIds: QualifiedId[]) {
     const {found: users} = await this.fetchRawUsers(userIds, this.userState.self().domain);
     return users.map(user => this.updateSavedUser(user));
+  }
+
+  /**
+   * Refresh all known users (in local state) from the backend.
+   */
+  async refreshAllKnownUsers() {
+    const userIds = this.userState.users().map(user => user.qualifiedId);
+    return this.refreshUsers(userIds);
+  }
+
+  /**
+   * Change supported protocols.
+   * It will send a request to the backend to change the supported protocols and then update the user in the local state.
+   * @param supportedProtocols - an array of new supported protocols
+   */
+  async changeSupportedProtocols(supportedProtocols: ConversationProtocol[]): Promise<User> {
+    await this.selfService.putSupportedProtocols(supportedProtocols);
+    return await this.updateUser(this.userState.self().qualifiedId, {supported_protocols: supportedProtocols});
+  }
+
+  getSelfSupportedProtocols(): Set<ConversationProtocol> {
+    const supportedProtocols = this.userState.self().supportedProtocols();
+    return new Set(supportedProtocols);
+  }
+
+  public async getAllSelfClients() {
+    return this.clientRepository.getAllSelfClients();
   }
 
   /**

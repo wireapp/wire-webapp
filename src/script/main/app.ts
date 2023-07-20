@@ -40,7 +40,7 @@ import {getLogger, Logger} from 'Util/Logger';
 import {includesString} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {appendParameter} from 'Util/UrlUtil';
-import {checkIndexedDb, supportsMLS} from 'Util/util';
+import {checkIndexedDb, supportsMLS, supportsSelfSupportedProtocolsUpdates} from 'Util/util';
 
 import '../../style/default.less';
 import {AssetRepository} from '../assets/AssetRepository';
@@ -80,6 +80,7 @@ import {IntegrationService} from '../integration/IntegrationService';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {MediaRepository} from '../media/MediaRepository';
 import {initMLSCallbacks, initMLSConversations, registerUninitializedSelfAndTeamConversations} from '../mls';
+import {initialisePeriodicSelfSupportedProtocolsCheck} from '../mls/supportedProtocols';
 import {NotificationRepository} from '../notification/NotificationRepository';
 import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
 import {PermissionRepository} from '../permission/PermissionRepository';
@@ -457,6 +458,13 @@ export class App {
       this._handleUrlParams();
       await conversationRepository.updateConversationsOnAppInit();
       await conversationRepository.conversationLabelRepository.loadLabels();
+
+      if (supportsSelfSupportedProtocolsUpdates()) {
+        await initialisePeriodicSelfSupportedProtocolsCheck(selfUser, {
+          userRepository: this.repository.user,
+          teamRepository: this.repository.team,
+        });
+      }
 
       amplify.publish(WebAppEvents.LIFECYCLE.LOADED);
 
