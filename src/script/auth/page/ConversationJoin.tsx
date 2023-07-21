@@ -126,6 +126,9 @@ const ConversationJoinComponent = ({
   const handleSubmit = async (entropyData?: Uint8Array) => {
     setIsSubmitingName(true);
     try {
+      if (!conversationCode || !conversationKey) {
+        throw Error('Conversation code or key missing');
+      }
       const name = enteredName?.trim();
       const registrationData = {
         accent_id: accentColor.id,
@@ -139,7 +142,7 @@ const ConversationJoinComponent = ({
         },
         entropyData,
       );
-      const conversationEvent = await doJoinConversationByCode(conversationKey ?? '', conversationCode ?? '');
+      const conversationEvent = await doJoinConversationByCode(conversationKey, conversationCode);
       /* When we join a conversation, we create the join event before loading the webapp.
        * That means that when the webapp loads and tries to fetch the notificationStream is will get the join event once again and will try to handle it
        * Here we set the core's lastEventDate so that it knows that this duplicated event should be skipped
