@@ -1240,46 +1240,56 @@ export class ConversationRepository {
     }
   };
 
+  private readonly getConnectionConversation = (connectionEntity: ConnectionEntity) => {
+    const {conversationId} = connectionEntity;
+
+    const localConversation = this.conversationState.findConversation(conversationId);
+
+    if (localConversation) {
+      return localConversation;
+    }
+
+    if (connectionEntity.isConnected() || connectionEntity.isOutgoingRequest()) {
+      return this.fetchConversationById(conversationId);
+    }
+
+    return undefined;
+  };
+
   /**
    * Maps user connection to the corresponding conversation.
    *
    * @note If there is no conversation it will request it from the backend
    * @returns Resolves when connection was mapped return value
    */
-  private readonly mapConnection = (connectionEntity: ConnectionEntity): Promise<Conversation | undefined> => {
-    const qualifiedId: QualifiedId = connectionEntity.conversationId;
-    return Promise.resolve(this.conversationState.findConversation(qualifiedId))
-      .then(conversationEntity => {
-        if (!conversationEntity) {
-          if (connectionEntity.isConnected() || connectionEntity.isOutgoingRequest()) {
-            return this.fetchConversationById(qualifiedId);
-          }
-        }
-        return conversationEntity;
-      })
-      .then(conversationEntity => {
-        if (!conversationEntity) {
-          return undefined;
-        }
-        conversationEntity.connection(connectionEntity);
+  private readonly mapConnection = async (connectionEntity: ConnectionEntity): Promise<Conversation | undefined> => {
+    try {
+      const conversation = await this.getConnectionConversation(connectionEntity);
 
-        if (connectionEntity.isConnected()) {
-          conversationEntity.type(CONVERSATION_TYPE.ONE_TO_ONE);
-        }
-
-        return this.updateParticipatingUserEntities(conversationEntity);
-      })
-      .then(updatedConversationEntity => {
-        this.conversationState.conversations.notifySubscribers();
-        return updatedConversationEntity;
-      })
-      .catch(error => {
-        const isConversationNotFound = error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
-        if (!isConversationNotFound) {
-          throw error;
-        }
+      if (!conversation) {
         return undefined;
-      });
+      }
+
+      conversation.connection(connectionEntity);
+
+      if (connectionEntity.isConnected()) {
+        conversation.type(CONVERSATION_TYPE.ONE_TO_ONE);
+      }
+
+      const updatedConversation = await this.updateParticipatingUserEntities(conversation);
+
+      this.conversationState.conversations.notifySubscribers();
+
+      return updatedConversation;
+    } catch (error) {
+      const isConversationNotFound =
+        error instanceof ConversationError && error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
+      if (!isConversationNotFound) {
+        throw error;
+      }
+
+      return undefined;
+    }
   };
 
   /**
