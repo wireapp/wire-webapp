@@ -990,7 +990,7 @@
   "oauth.scope.read_self": "Доступ к информации пользователя",
   "oauth.scope.write_conversations": "Создать беседу",
   "oauth.scope.write_conversations_code": "Создать гостевую ссылку на беседу",
-  "oauth.subhead": "{app} необходимы разрешения для:",
+  "oauth.subhead": "{app} requires your permission to:",
   "offlineBackendLearnMore": "Подробнее",
   "ongoingAudioCall": "Текущий аудиовызов с {{conversationName}}.",
   "ongoingGroupAudioCall": "Текущий групповой вызов с {{conversationName}}.",
