@@ -1250,7 +1250,7 @@ export class ConversationRepository {
     }
 
     if (connectionEntity.isConnected() || connectionEntity.isOutgoingRequest()) {
-      return this.fetchConversationById(qualifiedId);
+      return this.fetchConversationById(conversationId);
     }
 
     return undefined;
