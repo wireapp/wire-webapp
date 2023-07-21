@@ -33,10 +33,13 @@ export class RuntimeAction {
       const isMobileSupportedBrowser = () => {
         return Runtime.isMobileOS() && (Runtime.isSafari() || Runtime.isChrome());
       };
+      const isOutlookApp = () => {
+        return Runtime.getBrowserName() === 'unknown';
+      };
       const isAuthorizationFlow = () => location?.search?.includes(QUERY_KEY.SCOPE) ?? false;
       if (
         (!RuntimeSelector.hasToUseDesktopApplication(getState()) && Runtime.isWebappSupportedBrowser()) ||
-        (isMobileSupportedBrowser() && isAuthorizationFlow())
+        ((isMobileSupportedBrowser() || isOutlookApp()) && isAuthorizationFlow())
       ) {
         dispatch(RuntimeActionCreator.confirmSupportedBrowser());
       }
