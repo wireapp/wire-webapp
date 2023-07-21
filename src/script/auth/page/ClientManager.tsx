@@ -24,7 +24,7 @@ import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 
 import {UrlUtil, StringUtil, Runtime} from '@wireapp/commons';
-import {Button, ButtonVariant, ContainerXS, H1, Muted, useTimeout} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, ContainerXS, H1, Muted, QUERY, useMatchMedia, useTimeout} from '@wireapp/react-ui-kit';
 
 import {Page} from './Page';
 
@@ -41,6 +41,8 @@ const ClientManagerComponent = ({doGetAllClients, doLogout}: Props & ConnectedPr
   const {formatMessage: _} = useIntl();
   const SFAcode = localStorage.getItem(QUERY_KEY.CONVERSATION_CODE);
   const isOauth = UrlUtil.hasURLParameter(QUERY_KEY.SCOPE);
+  const isMobile = useMatchMedia(QUERY.mobile);
+
   const device = StringUtil.capitalize(Runtime.getBrowserName());
 
   const timeRemaining = JSON.parse(localStorage.getItem(QUERY_KEY.JOIN_EXPIRES) ?? '{}')?.data ?? Date.now();
@@ -73,12 +75,24 @@ const ClientManagerComponent = ({doGetAllClients, doLogout}: Props & ConnectedPr
       <ContainerXS
         centerText
         verticalCenter
-        style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-around', minHeight: 428}}
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-around',
+          minHeight: 428,
+          marginInline: isMobile ? '20px' : 'inherit',
+        }}
       >
         <H1 center style={{marginTop: '140px'}}>
           {_(clientManagerStrings.headline)}
         </H1>
-        <Muted center style={{marginBottom: '42px'}} data-uie-name="status-device-limit-info">
+        <Muted
+          center
+          style={{
+            marginBottom: '42px',
+          }}
+          data-uie-name="status-device-limit-info"
+        >
           {isOauth
             ? _(clientManagerStrings.oauth, {device})
             : _(clientManagerStrings.subhead, {brandName: Config.getConfig().BRAND_NAME})}
