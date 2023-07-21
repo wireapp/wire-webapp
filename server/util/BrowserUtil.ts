@@ -154,8 +154,7 @@ function isSupportedBrowser(userAgent: string): boolean {
   const supportedBrowserVersionObject = CommonConfig.WEBAPP_SUPPORTED_BROWSERS[browserName];
   const supportedBrowserVersion = supportedBrowserVersionObject?.major;
   const isSupportedMobile =
-    (CommonConfig.BROWSER.SAFARI === browserName || CommonConfig.BROWSER.CHROME === browserName) &&
-    parsedUserAgent.is.mobile;
+    [CommonConfig.BROWSER.SAFARI, CommonConfig.BROWSER.CHROME].includes(browserName) && parsedUserAgent.is.mobile;
 
   try {
     if (isSupportedMobile) {
