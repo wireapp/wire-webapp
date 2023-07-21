@@ -1241,9 +1241,9 @@ export class ConversationRepository {
   };
 
   private readonly getConnectionConversation = (connectionEntity: ConnectionEntity) => {
-    const qualifiedId = connectionEntity.conversationId;
+    const {conversationId} = connectionEntity;
 
-    const localConversation = this.conversationState.findConversation(qualifiedId);
+    const localConversation = this.conversationState.findConversation(conversationId);
 
     if (localConversation) {
       return localConversation;
