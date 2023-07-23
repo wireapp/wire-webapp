@@ -5016,13 +5016,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@remix-run/router@npm:1.7.1":
-  version: 1.7.1
-  resolution: "@remix-run/router@npm:1.7.1"
-  checksum: d13ad7e0b3b35379f8fdec1eec4f515325b618e431915e12fb9f1cd812ee959add0e7045edcb229ba17888ecfc787869b64e6cb4153ae3be148887e234b6ffac
-  languageName: node
-  linkType: hard
-
 "@remix-run/router@npm:1.7.2":
   version: 1.7.2
   resolution: "@remix-run/router@npm:1.7.2"
@@ -16262,17 +16255,6 @@ dexie@latest:
   languageName: node
   linkType: hard
 
-"react-router@npm:6.14.1":
-  version: 6.14.1
-  resolution: "react-router@npm:6.14.1"
-  dependencies:
-    "@remix-run/router": 1.7.1
-  peerDependencies:
-    react: ">=16.8"
-  checksum: 16f3d108e0f833bfee447192e3f40bd6731b8b11d42ca6925443ec8aeb157a889fe8ece67baf690f75f0d146d0a212656f9216fcc2df6fd3a2bd263108ed0abb
-  languageName: node
-  linkType: hard
-
 "react-router@npm:6.14.2":
   version: 6.14.2
   resolution: "react-router@npm:6.14.2"
@@ -19401,7 +19383,7 @@ dexie@latest:
     react-error-boundary: 4.0.10
     react-intl: 6.4.4
     react-redux: 8.1.1
-    react-router: 6.14.1
+    react-router: 6.14.2
     react-router-dom: 6.14.2
     react-transition-group: 4.4.5
     redux: 4.2.1
