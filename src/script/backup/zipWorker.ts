@@ -18,24 +18,49 @@
  */
 
 import JSZip from 'jszip';
+import sodium from 'libsodium-wrappers';
 
-type Payload = {type: 'zip'; files: Record<string, ArrayBuffer | string>} | {type: 'unzip'; bytes: ArrayBuffer};
+import {ImportError} from './Error';
+
+type Payload =
+  | {type: 'zip'; files: Record<string, ArrayBuffer | string>; encrytionKey?: Uint8Array}
+  | {type: 'unzip'; bytes: ArrayBuffer; encrytionKey?: Uint8Array; headerLength?: number};
 
 export async function handleZipEvent(payload: Payload) {
   const zip = new JSZip();
+  const encrytionKey = payload.encrytionKey;
   switch (payload.type) {
     case 'zip':
       for (const [filename, file] of Object.entries(payload.files)) {
         zip.file(filename, file, {binary: true});
       }
 
-      const array = await zip.generateAsync({compression: 'DEFLATE', type: 'uint8array'});
+      const OriginalData = await zip.generateAsync({compression: 'DEFLATE', type: 'uint8array'});
 
-      return array;
+      if (encrytionKey) {
+        // Encrypt the ZIP archive using the provided encrytionKey
+        const encryptedData = await encryptFile(OriginalData, encrytionKey);
+        return encryptedData;
+      }
+      return OriginalData;
 
     case 'unzip':
-      const archive = await JSZip.loadAsync(payload.bytes);
+      let decryptedBytes;
 
+      if (!!encrytionKey) {
+        // Decrypt the ZIP archive using the provided encrytionKey
+        const payloadBytes = new Uint8Array(payload.bytes);
+        const headerLength = payload.headerLength ? payload.headerLength : 0;
+        try {
+          decryptedBytes = await decryptFile(payloadBytes, encrytionKey, headerLength);
+        } catch (error) {
+          // Handle decryption failure
+          throw new ImportError(error.message);
+        }
+      } else {
+        decryptedBytes = payload.bytes;
+      }
+      const archive = await JSZip.loadAsync(decryptedBytes);
       const files: Record<string, Uint8Array> = {};
 
       for (const fileName in archive.files) {
@@ -46,6 +71,45 @@ export async function handleZipEvent(payload: Payload) {
   }
 }
 
+// Encrypt a file
+async function encryptFile(fileContent: Uint8Array, encryptionKey: Uint8Array): Promise<Uint8Array> {
+  await sodium.ready;
+
+  const headerBytes = sodium.crypto_secretstream_xchacha20poly1305_HEADERBYTES;
+  const stateAndHeader = sodium.crypto_secretstream_xchacha20poly1305_init_push(encryptionKey);
+  const {state, header} = stateAndHeader;
+
+  const encryptedFile = sodium.crypto_secretstream_xchacha20poly1305_push(
+    state,
+    fileContent,
+    null,
+    sodium.crypto_secretstream_xchacha20poly1305_TAG_MESSAGE,
+  );
+  const encrypted = new Uint8Array(headerBytes + encryptedFile.length);
+
+  encrypted.set(header);
+  encrypted.set(encryptedFile, headerBytes);
+
+  return encrypted;
+}
+
+// Decrypt a file
+export async function decryptFile(encryptedDataSource: Uint8Array, encryptionKey: Uint8Array, headerLength: number) {
+  await sodium.ready;
+
+  const metaDataHeader = headerLength;
+  const headerBytes = sodium.crypto_secretstream_xchacha20poly1305_HEADERBYTES;
+  const header = encryptedDataSource.slice(metaDataHeader, metaDataHeader + headerBytes);
+  const state = sodium.crypto_secretstream_xchacha20poly1305_init_pull(header, encryptionKey);
+  const encryptedContent = encryptedDataSource.slice(headerBytes + metaDataHeader);
+  const decrypted = sodium.crypto_secretstream_xchacha20poly1305_pull(state, encryptedContent);
+
+  if (!decrypted) {
+    throw new ImportError('WRONG_PASSWORD');
+  }
+
+  return decrypted.message;
+}
 self.addEventListener('message', async (event: MessageEvent<Payload>) => {
   try {
     const result = await handleZipEvent(event.data);

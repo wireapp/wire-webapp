@@ -26,7 +26,7 @@ import {connect} from 'react-redux';
 import {Navigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
-import {Runtime, UrlUtil} from '@wireapp/commons';
+import {UrlUtil} from '@wireapp/commons';
 import {
   ArrowIcon,
   Button,
@@ -82,7 +82,6 @@ const ConversationJoinComponent = ({
   const {formatMessage: _} = useIntl();
 
   const [accentColor] = useState(AccentColor.random());
-  const [isPwaEnabled, setIsPwaEnabled] = useState<boolean>();
   const [conversationCode, setConversationCode] = useState<string>();
   const [conversationKey, setConversationKey] = useState<string>();
   const [enteredName, setEnteredName] = useState<string>('');
@@ -95,10 +94,6 @@ const ConversationJoinComponent = ({
   const [showCookiePolicyBanner, setShowCookiePolicyBanner] = useState(true);
   const [showEntropyForm, setShowEntropyForm] = useState(false);
   const isEntropyRequired = Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY;
-
-  const isPwaSupportedBrowser = () => {
-    return Runtime.isMobileOS() || Runtime.isSafari();
-  };
 
   useEffect(() => {
     const localConversationCode = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE);
@@ -121,28 +116,20 @@ const ConversationJoinComponent = ({
       });
   }, []);
 
-  useEffect(() => {
-    const isEnabled =
-      Config.getConfig().URL.MOBILE_BASE && UrlUtil.hasURLParameter(QUERY_KEY.PWA_AWARE) && isPwaSupportedBrowser();
-    setIsPwaEnabled(isEnabled);
-    if (isEnabled) {
-      setForceNewTemporaryGuestAccount(true);
-    }
-  }, []);
-
   const routeToApp = (conversation: string = '', domain: string = '') => {
-    const redirectLocation = isPwaEnabled
-      ? UrlUtil.pathWithParams(EXTERNAL_ROUTE.PWA_LOGIN, {[QUERY_KEY.IMMEDIATE_LOGIN]: 'true'})
-      : `${UrlUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP)}${
-          conversation && `#/conversation/${conversation}${domain && `/${domain}`}`
-        }`;
+    const redirectLocation = `${UrlUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP)}${
+      conversation && `#/conversation/${conversation}${domain && `/${domain}`}`
+    }`;
     window.location.replace(redirectLocation);
   };
 
   const handleSubmit = async (entropyData?: Uint8Array) => {
     setIsSubmitingName(true);
     try {
-      const name = enteredName.trim();
+      if (!conversationCode || !conversationKey) {
+        throw Error('Conversation code or key missing');
+      }
+      const name = enteredName?.trim();
       const registrationData = {
         accent_id: accentColor.id,
         expires_in: expiresIn,
@@ -151,7 +138,7 @@ const ConversationJoinComponent = ({
       await doRegisterWireless(
         registrationData as RegisterData,
         {
-          shouldInitializeClient: !isPwaEnabled,
+          shouldInitializeClient: true,
         },
         entropyData,
       );
@@ -241,7 +228,7 @@ const ConversationJoinComponent = ({
         ) : renderTemporaryGuestAccountCreation ? (
           <div>
             <ContainerXS style={{margin: 'auto 0'}}>
-              <AppAlreadyOpen fullscreen={isPwaEnabled} />
+              <AppAlreadyOpen />
               <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}}>
                 <FormattedMessage
                   {...conversationJoinStrings.headline}
@@ -283,23 +270,21 @@ const ConversationJoinComponent = ({
                 </InputBlock>
                 {error ? parseValidationErrors(error) : parseError(conversationError)}
               </Form>
-              {!isPwaEnabled && (
-                <Small block>
-                  {`${_(conversationJoinStrings.hasAccount)} `}
-                  <RouterLink
-                    to={`${ROUTE.LOGIN}/${conversationKey}/${conversationCode}`}
-                    textTransform={'none'}
-                    data-uie-name="go-login"
-                  >
-                    {_(conversationJoinStrings.loginLink)}
-                  </RouterLink>
-                </Small>
-              )}
+              <Small block>
+                {`${_(conversationJoinStrings.hasAccount)} `}
+                <RouterLink
+                  to={`${ROUTE.LOGIN}/${conversationKey}/${conversationCode}`}
+                  textTransform={'none'}
+                  data-uie-name="go-login"
+                >
+                  {_(conversationJoinStrings.loginLink)}
+                </RouterLink>
+              </Small>
             </ContainerXS>
           </div>
         ) : (
           <ContainerXS style={{margin: 'auto 0'}}>
-            <AppAlreadyOpen fullscreen={isPwaEnabled} />
+            <AppAlreadyOpen />
             <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} data-uie-name="status-join-headline">
               {selfName
                 ? _(conversationJoinStrings.existentAccountHeadline, {
