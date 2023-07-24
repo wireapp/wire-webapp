@@ -131,6 +131,20 @@ export class SelfRepository {
     return supportedProtocols;
   }
 
+  public async getSelfSupportedProtocols(): Promise<ConversationProtocol[]> {
+    const selfUser = this.userState.self();
+
+    const localSupportedProtocols = selfUser.supportedProtocols();
+
+    if (localSupportedProtocols) {
+      return localSupportedProtocols;
+    }
+
+    const supportedProtocols = await this.refreshSelfSupportedProtocols();
+
+    return supportedProtocols;
+  }
+
   /**
    * Update self user's list of supported protocols.
    * It will send a request to the backend to change the supported protocols and then update the user in the local state.
