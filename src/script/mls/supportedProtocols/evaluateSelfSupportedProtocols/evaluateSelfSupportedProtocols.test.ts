@@ -117,64 +117,64 @@ const testScenarios = [
 
     //we expect the following result based on whether all active clients are MLS capable or not
     {
-      allActiveClientsMLSCapable: new Set([ConversationProtocol.PROTEUS]),
-      someActiveClientsNotMLSCapable: new Set([ConversationProtocol.PROTEUS]),
+      allActiveClientsMLSCapable: [ConversationProtocol.PROTEUS],
+      someActiveClientsNotMLSCapable: [ConversationProtocol.PROTEUS],
     },
   ],
   [
     generateMLSFeaturesConfig(MLSMigrationStatus.DISABLED, [ConversationProtocol.PROTEUS, ConversationProtocol.MLS]),
     {
-      allActiveClientsMLSCapable: new Set([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]),
-      someActiveClientsNotMLSCapable: new Set([ConversationProtocol.PROTEUS]),
+      allActiveClientsMLSCapable: [ConversationProtocol.PROTEUS, ConversationProtocol.MLS],
+      someActiveClientsNotMLSCapable: [ConversationProtocol.PROTEUS],
     },
   ],
   [
     generateMLSFeaturesConfig(MLSMigrationStatus.DISABLED, [ConversationProtocol.MLS]),
     {
-      allActiveClientsMLSCapable: new Set([ConversationProtocol.MLS]),
-      someActiveClientsNotMLSCapable: new Set([ConversationProtocol.MLS]),
+      allActiveClientsMLSCapable: [ConversationProtocol.MLS],
+      someActiveClientsNotMLSCapable: [ConversationProtocol.MLS],
     },
   ],
   [
     generateMLSFeaturesConfig(MLSMigrationStatus.NOT_STARTED, [ConversationProtocol.PROTEUS, ConversationProtocol.MLS]),
     {
-      allActiveClientsMLSCapable: new Set([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]),
-      someActiveClientsNotMLSCapable: new Set([ConversationProtocol.PROTEUS]),
+      allActiveClientsMLSCapable: [ConversationProtocol.PROTEUS, ConversationProtocol.MLS],
+      someActiveClientsNotMLSCapable: [ConversationProtocol.PROTEUS],
     },
   ],
   [
     generateMLSFeaturesConfig(MLSMigrationStatus.NOT_STARTED, [ConversationProtocol.MLS]),
     {
-      allActiveClientsMLSCapable: new Set([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]),
-      someActiveClientsNotMLSCapable: new Set([ConversationProtocol.PROTEUS]),
+      allActiveClientsMLSCapable: [ConversationProtocol.PROTEUS, ConversationProtocol.MLS],
+      someActiveClientsNotMLSCapable: [ConversationProtocol.PROTEUS],
     },
   ],
   [
     generateMLSFeaturesConfig(MLSMigrationStatus.ONGOING, [ConversationProtocol.PROTEUS, ConversationProtocol.MLS]),
     {
-      allActiveClientsMLSCapable: new Set([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]),
-      someActiveClientsNotMLSCapable: new Set([ConversationProtocol.PROTEUS]),
+      allActiveClientsMLSCapable: [ConversationProtocol.PROTEUS, ConversationProtocol.MLS],
+      someActiveClientsNotMLSCapable: [ConversationProtocol.PROTEUS],
     },
   ],
   [
     generateMLSFeaturesConfig(MLSMigrationStatus.ONGOING, [ConversationProtocol.MLS]),
     {
-      allActiveClientsMLSCapable: new Set([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]),
-      someActiveClientsNotMLSCapable: new Set([ConversationProtocol.PROTEUS]),
+      allActiveClientsMLSCapable: [ConversationProtocol.PROTEUS, ConversationProtocol.MLS],
+      someActiveClientsNotMLSCapable: [ConversationProtocol.PROTEUS],
     },
   ],
   [
     generateMLSFeaturesConfig(MLSMigrationStatus.FINALISED, [ConversationProtocol.PROTEUS, ConversationProtocol.MLS]),
     {
-      allActiveClientsMLSCapable: new Set([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]),
-      someActiveClientsNotMLSCapable: new Set([ConversationProtocol.PROTEUS, ConversationProtocol.MLS]),
+      allActiveClientsMLSCapable: [ConversationProtocol.PROTEUS, ConversationProtocol.MLS],
+      someActiveClientsNotMLSCapable: [ConversationProtocol.PROTEUS, ConversationProtocol.MLS],
     },
   ],
   [
     generateMLSFeaturesConfig(MLSMigrationStatus.FINALISED, [ConversationProtocol.MLS]),
     {
-      allActiveClientsMLSCapable: new Set([ConversationProtocol.MLS]),
-      someActiveClientsNotMLSCapable: new Set([ConversationProtocol.MLS]),
+      allActiveClientsMLSCapable: [ConversationProtocol.MLS],
+      someActiveClientsNotMLSCapable: [ConversationProtocol.MLS],
     },
   ],
 ] as const;
