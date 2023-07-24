@@ -104,6 +104,7 @@ export class ConversationAPI {
     SELF: 'self',
     TYPING: 'typing',
     V2: 'v2',
+    ONE_2_ONE: 'one2one',
   };
 
   constructor(protected readonly client: HttpClient, protected readonly backendFeatures: BackendFeatures) {}
@@ -470,10 +471,24 @@ export class ConversationAPI {
     const config: AxiosRequestConfig = {
       data: conversationData,
       method: 'post',
-      url: `${ConversationAPI.URL.CONVERSATIONS}/one2one`,
+      url: `${ConversationAPI.URL.CONVERSATIONS}/${ConversationAPI.URL.ONE_2_ONE}`,
     };
 
     await this.client.sendJSON(config);
+  }
+
+  /**
+   * Get a MLS 1:1-conversation with a given user.
+   * @param userId - qualified user id
+   */
+  public async getMLS1to1Conversation({domain, id}: QualifiedId): Promise<Conversation> {
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      url: `${ConversationAPI.URL.CONVERSATIONS}/${ConversationAPI.URL.ONE_2_ONE}/${domain}/${id}`,
+    };
+
+    const response = await this.client.sendJSON<Conversation>(config);
+    return response.data;
   }
 
   /**
