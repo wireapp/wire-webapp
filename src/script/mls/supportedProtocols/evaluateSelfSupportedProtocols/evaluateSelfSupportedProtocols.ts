@@ -33,8 +33,8 @@ export const evaluateSelfSupportedProtocols = async ({
 }: {
   teamRepository: TeamRepository;
   userRepository: UserRepository;
-}): Promise<Set<ConversationProtocol>> => {
-  const supportedProtocols = new Set<ConversationProtocol>();
+}): Promise<ConversationProtocol[]> => {
+  const supportedProtocols: ConversationProtocol[] = [];
 
   const teamSupportedProtocols = teamRepository.getTeamSupportedProtocols();
   const mlsMigrationStatus = teamRepository.getTeamMLSMigrationStatus();
@@ -43,7 +43,7 @@ export const evaluateSelfSupportedProtocols = async ({
 
   const isProteusProtocolSupported = await isProteusSupported({teamSupportedProtocols, mlsMigrationStatus});
   if (isProteusProtocolSupported) {
-    supportedProtocols.add(ConversationProtocol.PROTEUS);
+    supportedProtocols.push(ConversationProtocol.PROTEUS);
   }
 
   const mlsCheckDependencies = {
@@ -57,7 +57,7 @@ export const evaluateSelfSupportedProtocols = async ({
   const isMLSForced = await isMLSForcedWithoutMigration(mlsCheckDependencies);
 
   if (isMLSProtocolSupported || isMLSForced) {
-    supportedProtocols.add(ConversationProtocol.MLS);
+    supportedProtocols.push(ConversationProtocol.MLS);
   }
 
   return supportedProtocols;
@@ -73,7 +73,7 @@ const isMLSSupported = async ({
   selfClients,
   mlsMigrationStatus,
 }: {
-  teamSupportedProtocols: Set<ConversationProtocol>;
+  teamSupportedProtocols: ConversationProtocol[];
   selfClients: RegisteredClient[];
   mlsMigrationStatus: MLSMigrationStatus;
 }): Promise<boolean> => {
@@ -83,7 +83,7 @@ const isMLSSupported = async ({
     return false;
   }
 
-  const isMLSSupportedByTeam = teamSupportedProtocols.has(ConversationProtocol.MLS);
+  const isMLSSupportedByTeam = teamSupportedProtocols.includes(ConversationProtocol.MLS);
   const doActiveClientsSupportMLS = await haveAllActiveClientsRegisteredMLSDevice(selfClients);
   return isMLSSupportedByTeam && (doActiveClientsSupportMLS || mlsMigrationStatus === MLSMigrationStatus.FINALISED);
 };
@@ -100,7 +100,7 @@ const isMLSForcedWithoutMigration = async ({
   selfClients,
   mlsMigrationStatus,
 }: {
-  teamSupportedProtocols: Set<ConversationProtocol>;
+  teamSupportedProtocols: ConversationProtocol[];
   selfClients: RegisteredClient[];
   mlsMigrationStatus: MLSMigrationStatus;
 }): Promise<boolean> => {
@@ -110,8 +110,8 @@ const isMLSForcedWithoutMigration = async ({
     return false;
   }
 
-  const isMLSSupportedByTeam = teamSupportedProtocols.has(ConversationProtocol.MLS);
-  const isProteusSupportedByTeam = teamSupportedProtocols.has(ConversationProtocol.PROTEUS);
+  const isMLSSupportedByTeam = teamSupportedProtocols.includes(ConversationProtocol.MLS);
+  const isProteusSupportedByTeam = teamSupportedProtocols.includes(ConversationProtocol.PROTEUS);
   const doActiveClientsSupportMLS = await haveAllActiveClientsRegisteredMLSDevice(selfClients);
   const isMigrationDisabled = mlsMigrationStatus === MLSMigrationStatus.DISABLED;
 
@@ -127,10 +127,10 @@ const isProteusSupported = async ({
   teamSupportedProtocols,
   mlsMigrationStatus,
 }: {
-  teamSupportedProtocols: Set<ConversationProtocol>;
+  teamSupportedProtocols: ConversationProtocol[];
   mlsMigrationStatus: MLSMigrationStatus;
 }): Promise<boolean> => {
-  const isProteusSupportedByTeam = teamSupportedProtocols.has(ConversationProtocol.PROTEUS);
+  const isProteusSupportedByTeam = teamSupportedProtocols.includes(ConversationProtocol.PROTEUS);
   return (
     isProteusSupportedByTeam ||
     [MLSMigrationStatus.NOT_STARTED, MLSMigrationStatus.ONGOING].includes(mlsMigrationStatus)
