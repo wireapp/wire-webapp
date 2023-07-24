@@ -106,7 +106,10 @@ const LoginComponent = ({
   const [conversationCode, setConversationCode] = useState<string | null>(null);
   const [conversationKey, setConversationKey] = useState<string | null>(null);
   const [conversationSubmitData, setConversationSubmitData] = useState<Partial<LoginData> | null>(null);
-
+  const [isLinkPasswordModalOpen, setIsLinkPasswordModalOpen] = useState<boolean>(
+    !!conversationInfo?.has_password ||
+      (!!conversationError && conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD),
+  );
   const [isValidLink, setIsValidLink] = useState(true);
   const [validationErrors, setValidationErrors] = useState<Error[]>([]);
 
@@ -121,9 +124,6 @@ const LoginComponent = ({
   const isEntropyRequired = Config.getConfig().FEATURE.ENABLE_EXTRA_CLIENT_ENTROPY;
   const onEntropyGenerated = useRef<((entropy: Uint8Array) => void) | undefined>();
   const entropy = useRef<Uint8Array | undefined>();
-  const isLinkPasswordModalOpen =
-    conversationInfo?.has_password ||
-    (conversationError && conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD);
 
   const getEntropy = isEntropyRequired
     ? () => {
@@ -139,6 +139,13 @@ const LoginComponent = ({
         });
       }
     : undefined;
+
+  useEffect(() => {
+    setIsLinkPasswordModalOpen(
+      !!conversationInfo?.has_password ||
+        (!!conversationError && conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD),
+    );
+  }, [conversationError, conversationInfo?.has_password]);
 
   useEffect(() => {
     const queryClientType = UrlUtil.getURLParameter(QUERY_KEY.CLIENT_TYPE);
@@ -209,6 +216,16 @@ const LoginComponent = ({
     conversationPassword?: string,
   ) => {
     setValidationErrors(validationErrors);
+
+    if (
+      !isLinkPasswordModalOpen &&
+      (!!conversationInfo?.has_password ||
+        (!!conversationError && conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD))
+    ) {
+      setIsLinkPasswordModalOpen(true);
+      return;
+    }
+
     try {
       const login: LoginData = {...formLoginData, clientType: loginData.clientType};
       if (validationErrors.length) {
@@ -342,6 +359,7 @@ const LoginComponent = ({
           <AppAlreadyOpen />
           {isLinkPasswordModalOpen && (
             <JoinGuestLinkPasswordModal
+              onClose={() => setIsLinkPasswordModalOpen(false)}
               error={conversationError}
               conversationName={conversationInfo?.name}
               isLoading={isFetching || conversationInfoFetching}
