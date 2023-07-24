@@ -636,14 +636,14 @@ export class TeamRepository {
     }
   }
 
-  public getTeamSupportedProtocols(): Set<ConversationProtocol> {
+  public getTeamSupportedProtocols(): ConversationProtocol[] {
     const mlsFeature = this.teamState.teamFeatures().mls;
 
     if (!mlsFeature || mlsFeature.status === FeatureStatus.DISABLED) {
-      return new Set([ConversationProtocol.PROTEUS]);
+      return [ConversationProtocol.PROTEUS];
     }
 
-    return new Set<ConversationProtocol>(mlsFeature.config.supportedProtocols);
+    return mlsFeature.config.supportedProtocols;
   }
 
   public getTeamMLSMigrationStatus(): MLSMigrationStatus {

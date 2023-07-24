@@ -99,7 +99,7 @@ export class User {
   /** The federated domain (when the user is on a federated server) */
   public domain: string;
   public readonly isBlockedLegalHold: ko.PureComputed<boolean>;
-  public readonly supportedProtocols: ko.ObservableArray<ConversationProtocol>;
+  public readonly supportedProtocols: ko.Observable<null | ConversationProtocol[]>;
 
   static get ACCENT_COLOR() {
     return {
@@ -149,7 +149,7 @@ export class User {
 
     this.name = ko.observable('');
 
-    this.supportedProtocols = ko.observableArray<ConversationProtocol>([]);
+    this.supportedProtocols = ko.observable<null | ConversationProtocol[]>(null);
 
     this.managedBy = ko.observable(User.CONFIG.MANAGED_BY.WIRE);
 

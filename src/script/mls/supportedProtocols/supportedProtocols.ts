@@ -64,24 +64,28 @@ const updateSelfSupportedProtocols = async (
     userRepository: UserRepository;
     teamRepository: TeamRepository;
   },
-) => {
-  const localSupportedProtocols = new Set(selfUser.supportedProtocols());
+): Promise<void> => {
+  const localSupportedProtocols = selfUser.supportedProtocols();
+
   logger.info('Evaluating self supported protocols, currently supported protocols:', localSupportedProtocols);
 
   try {
     const refreshedSupportedProtocols = await evaluateSelfSupportedProtocols({teamRepository, userRepository});
 
+    if (!localSupportedProtocols) {
+      return void userRepository.changeSupportedProtocols(refreshedSupportedProtocols);
+    }
+
     const hasSupportedProtocolsChanged = !(
-      localSupportedProtocols.size === refreshedSupportedProtocols.size &&
-      [...localSupportedProtocols].every(protocol => refreshedSupportedProtocols.has(protocol))
+      localSupportedProtocols.length === refreshedSupportedProtocols.length &&
+      [...localSupportedProtocols].every(protocol => refreshedSupportedProtocols.includes(protocol))
     );
 
     if (!hasSupportedProtocolsChanged) {
       return;
     }
 
-    logger.info('Supported protocols will get updated to:', refreshedSupportedProtocols);
-    await userRepository.changeSupportedProtocols(Array.from(refreshedSupportedProtocols));
+    return void userRepository.changeSupportedProtocols(refreshedSupportedProtocols);
   } catch (error) {
     logger.error('Failed to update self supported protocols, will retry after 24h. Error: ', error);
   }

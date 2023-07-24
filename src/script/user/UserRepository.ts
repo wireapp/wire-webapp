@@ -763,13 +763,13 @@ export class UserRepository {
    * @param supportedProtocols - an array of new supported protocols
    */
   async changeSupportedProtocols(supportedProtocols: ConversationProtocol[]): Promise<User> {
+    this.logger.info('Supported protocols will get updated to:', supportedProtocols);
     await this.selfService.putSupportedProtocols(supportedProtocols);
-    return await this.updateUser(this.userState.self().qualifiedId, {supported_protocols: supportedProtocols});
+    return this.updateUser(this.userState.self().qualifiedId, {supported_protocols: supportedProtocols});
   }
 
-  getSelfSupportedProtocols(): Set<ConversationProtocol> {
-    const supportedProtocols = this.userState.self().supportedProtocols();
-    return new Set(supportedProtocols);
+  getSelfSupportedProtocols(): ConversationProtocol[] | null {
+    return this.userState.self().supportedProtocols();
   }
 
   public async getAllSelfClients() {
