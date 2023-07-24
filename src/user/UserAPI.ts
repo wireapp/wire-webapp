@@ -29,7 +29,7 @@ import {BackendFeatures} from '../APIClient';
 import {ClientPreKey, PreKeyBundle} from '../auth/';
 import {VerificationActionType} from '../auth/VerificationActionType';
 import {PublicClient, QualifiedPublicClients} from '../client/';
-import {QualifiedUserClients} from '../conversation/';
+import {ConversationProtocol, QualifiedUserClients} from '../conversation/';
 import {BackendError, BackendErrorLabel, HttpClient, RequestCancelable, SyntheticErrorLabel} from '../http/';
 import {
   Activate,
@@ -89,6 +89,7 @@ export class UserAPI {
     USERS: '/users',
     V2: 'v2',
     VERIFICATION: '/verification-code',
+    SUPPORTED_PROTOCOLS: 'supported-protocols',
   };
 
   constructor(private readonly client: HttpClient, private readonly backendFeatures: BackendFeatures) {}
@@ -329,6 +330,18 @@ export class UserAPI {
     };
 
     const response = await this.client.sendJSON<PreKeyBundle>(config, true);
+    return response.data;
+  }
+
+  public async getUserSupportedProtocols(userId: QualifiedId): Promise<ConversationProtocol[]> {
+    const url = `${UserAPI.URL.USERS}/${userId.domain}/${userId.id}/${UserAPI.URL.SUPPORTED_PROTOCOLS}`;
+
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      url,
+    };
+
+    const response = await this.client.sendJSON<ConversationProtocol[]>(config, true);
     return response.data;
   }
 
