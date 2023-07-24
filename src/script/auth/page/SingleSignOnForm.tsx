@@ -98,9 +98,17 @@ const SingleSignOnFormComponent = ({
 
   const [shouldAutoLogin, setShouldAutoLogin] = useState(false);
 
-  const isLinkPasswordModalOpen =
-    conversationInfo?.has_password ||
-    (conversationError && conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD);
+  const [isLinkPasswordModalOpen, setIsLinkPasswordModalOpen] = useState<boolean>(
+    !!conversationInfo?.has_password ||
+      (!!conversationError && conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD),
+  );
+
+  useEffect(() => {
+    setIsLinkPasswordModalOpen(
+      !!conversationInfo?.has_password ||
+        (!!conversationError && conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD),
+    );
+  }, [conversationError, conversationInfo?.has_password]);
 
   useEffect(() => {
     const queryAutoLogin = UrlUtil.hasURLParameter(QUERY_KEY.SSO_AUTO_LOGIN);
@@ -171,6 +179,15 @@ const SingleSignOnFormComponent = ({
     resetAuthError();
 
     if (isFetching || !codeOrMailInput.current) {
+      return;
+    }
+
+    if (
+      !isLinkPasswordModalOpen &&
+      (!!conversationInfo?.has_password ||
+        (!!conversationError && conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD))
+    ) {
+      setIsLinkPasswordModalOpen(true);
       return;
     }
 
@@ -291,6 +308,7 @@ const SingleSignOnFormComponent = ({
     <>
       {isLinkPasswordModalOpen && (
         <JoinGuestLinkPasswordModal
+          onClose={() => setIsLinkPasswordModalOpen(false)}
           error={conversationError}
           conversationName={conversationInfo?.name}
           isLoading={isFetching || conversationInfoFetching}
