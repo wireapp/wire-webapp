@@ -40,7 +40,7 @@ import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from 'src/script/router/routerBindings';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleEnterDown, isKeyboardEvent, offEscKey, onEscKey} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {replaceLink, t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 import {isAxiosError} from 'Util/TypePredicateUtil';
 
@@ -239,6 +239,11 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
           const tempName = groupName;
           setIsShown(false);
           const backendString = error.response?.data!.non_federating_backends?.join(', and ');
+          const replaceBackends = replaceLink(
+            'https://support.wire.com/hc/en-us/articles/9357718008093-Backend',
+            'modal__text__read-more',
+            'read-more-backends',
+          );
           return PrimaryModal.show(PrimaryModal.type.MULTI_ACTIONS, {
             preventClose: true,
             primaryAction: {
@@ -257,7 +262,11 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
               },
             },
             text: {
-              htmlMessage: t('groupCreationPreferencesNonFederatingMessage', {backends: backendString}),
+              htmlMessage: t(
+                'groupCreationPreferencesNonFederatingMessage',
+                {backends: backendString},
+                replaceBackends,
+              ),
               title: t('groupCreationPreferencesNonFederatingHeadline'),
             },
           });

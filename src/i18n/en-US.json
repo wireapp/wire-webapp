@@ -574,7 +574,7 @@
   "groupCreationPreferencesNonFederatingHeadline": "Group can’t be created",
   "groupCreationPreferencesNonFederatingEditList": "Edit Participants List",
   "groupCreationPreferencesNonFederatingLeave": "DiscardGroupCreation",
-  "groupCreationPreferencesNonFederatingMessage": "People from backends {{backends}} can’t join the same group conversation, as their backends can’t communicate with each other. To create the group, remove affected participants.Learn more",
+  "groupCreationPreferencesNonFederatingMessage": "People from backends {{backends}} can’t join the same group conversation, as their backends can’t communicate with each other. To create the group, remove affected participants. [link]Learn more[/link]",
   "groupParticipantActionBlock": "Block…",
   "groupParticipantActionCancelRequest": "Cancel request…",
   "groupParticipantActionDevices": "Devices",
