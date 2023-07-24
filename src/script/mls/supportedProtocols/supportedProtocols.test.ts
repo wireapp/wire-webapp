@@ -38,8 +38,8 @@ describe('supportedProtocols', () => {
 
   it.each([
     [[ConversationProtocol.PROTEUS], [ConversationProtocol.PROTEUS, ConversationProtocol.MLS]],
-    // [[ConversationProtocol.PROTEUS, ConversationProtocol.MLS], [ConversationProtocol.PROTEUS]],
-    // [[ConversationProtocol.PROTEUS], [ConversationProtocol.MLS]],
+    [[ConversationProtocol.PROTEUS, ConversationProtocol.MLS], [ConversationProtocol.PROTEUS]],
+    [[ConversationProtocol.PROTEUS], [ConversationProtocol.MLS]],
   ])('Updates the list of supported protocols', async (initialProtocols, evaluatedProtocols) => {
     const userRepository = await testFactory.exposeUserActors();
     const teamRepository = await testFactory.exposeTeamActors();
