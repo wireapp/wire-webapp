@@ -32,10 +32,12 @@ export interface JoinGuestLinkPasswordModalProps {
   isLoading?: boolean;
   conversationName?: string;
   error: (Error & {label?: string; code?: number; message?: string}) | null;
+  onClose: () => void;
 }
 
 const JoinGuestLinkPasswordModal: React.FC<JoinGuestLinkPasswordModalProps> = ({
   error,
+  onClose,
   isLoading,
   conversationName,
   onSubmitPassword,
@@ -55,7 +57,7 @@ const JoinGuestLinkPasswordModal: React.FC<JoinGuestLinkPasswordModalProps> = ({
   };
 
   return (
-    <Modal>
+    <Modal onClose={onClose}>
       <Container style={{maxWidth: '400px'}}>
         <H2 style={{whiteSpace: 'break-spaces', fontWeight: 500, marginTop: '10px', textAlign: 'center'}}>
           {conversationName

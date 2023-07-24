@@ -94,6 +94,9 @@ const ConversationJoinComponent = ({
     conversationError && conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD;
   const [accentColor] = useState(AccentColor.random());
   const [isPwaEnabled, setIsPwaEnabled] = useState<boolean>();
+  const [isJoinGuestLinkPasswordModalOpen, setIsJoinGuestLinkPasswordModalOpen] = useState<boolean>(
+    !!conversationHasPassword || !!invalidConversationPassword,
+  );
   const [conversationCode, setConversationCode] = useState<string>();
   const [conversationKey, setConversationKey] = useState<string>();
   const [enteredName, setEnteredName] = useState<string>();
@@ -111,6 +114,10 @@ const ConversationJoinComponent = ({
   const isPwaSupportedBrowser = () => {
     return Runtime.isMobileOS() || Runtime.isSafari();
   };
+
+  useEffect(() => {
+    setIsJoinGuestLinkPasswordModalOpen(!!conversationHasPassword || !!invalidConversationPassword);
+  }, [conversationHasPassword, invalidConversationPassword]);
 
   useEffect(() => {
     const localConversationCode = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE);
@@ -169,6 +176,10 @@ const ConversationJoinComponent = ({
 
   const handleSubmit = async (entropyData?: Uint8Array, password?: string) => {
     if (!conversationKey || !conversationCode) {
+      return;
+    }
+    if (!isJoinGuestLinkPasswordModalOpen && !!conversationHasPassword) {
+      setIsJoinGuestLinkPasswordModalOpen(true);
       return;
     }
     try {
@@ -245,12 +256,11 @@ const ConversationJoinComponent = ({
     return <Navigate to={ROUTE.CONVERSATION_JOIN_INVALID} replace />;
   }
 
-  const isJoinGuestLinkPasswordModalOpen = conversationHasPassword || invalidConversationPassword;
-
   return (
     <UnsupportedBrowser isTemporaryGuest>
       {isJoinGuestLinkPasswordModalOpen && (
         <JoinGuestLinkPasswordModal
+          onClose={() => setIsJoinGuestLinkPasswordModalOpen(false)}
           error={conversationError}
           isLoading={isFetching}
           conversationName={conversationInfo?.name}
