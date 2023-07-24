@@ -780,15 +780,19 @@ export class UserRepository {
    * will update the local user with fresh data from backend
    * @param user user data from backend
    */
-  private updateSavedUser(user: APIClientUser): User {
+  private async updateSavedUser(user: APIClientUser): Promise<User> {
     const localUserEntity = this.findUserById(generateQualifiedId(user)) ?? new User();
     const updatedUser = this.userMapper.updateUserFromObject(localUserEntity, user, this.userState.self().domain);
-    // TODO update the user in db
+    const {qualifiedId: userId} = updatedUser;
+
+    // update the user in db
+    await this.updateUser(userId, user);
+
     if (this.userState.isTeam()) {
       this.mapGuestStatus([updatedUser]);
     }
     if (updatedUser && updatedUser.inTeam() && updatedUser.isDeleted) {
-      amplify.publish(WebAppEvents.TEAM.MEMBER_LEAVE, updatedUser.teamId, updatedUser.qualifiedId);
+      amplify.publish(WebAppEvents.TEAM.MEMBER_LEAVE, updatedUser.teamId, userId);
     }
     return updatedUser;
   }
