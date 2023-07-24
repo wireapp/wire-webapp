@@ -86,6 +86,7 @@ export class MLSService extends TypedEventEmitter<Events> {
   private readonly textEncoder = new TextEncoder();
   private readonly textDecoder = new TextDecoder();
   private readonly defaultCiphersuite = Ciphersuite.MLS_128_DHKEMX25519_AES128GCM_SHA256_Ed25519;
+  private readonly defaultCredentialType = CredentialType.Basic;
 
   constructor(
     private readonly apiClient: APIClient,
@@ -113,6 +114,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     const publicKey = await this.coreCryptoClient.clientPublicKey(this.defaultCiphersuite);
     const keyPackages = await this.coreCryptoClient.clientKeypackages(
       this.defaultCiphersuite,
+      this.defaultCredentialType,
       this.config.nbKeyPackages,
     );
     await this.uploadMLSPublicKeys(publicKey, clientId);
@@ -241,7 +243,7 @@ export class MLSService extends TypedEventEmitter<Events> {
       const groupInfo = await getGroupInfo();
       const {conversationId, ...commitBundle} = await this.coreCryptoClient.joinByExternalCommit(
         groupInfo,
-        CredentialType.Basic,
+        this.defaultCredentialType,
       );
       return {groupId: conversationId, commitBundle};
     };
@@ -418,7 +420,7 @@ export class MLSService extends TypedEventEmitter<Events> {
       ciphersuite: this.defaultCiphersuite,
     };
 
-    await this.coreCryptoClient.createConversation(groupIdBytes, CredentialType.Basic, configuration);
+    await this.coreCryptoClient.createConversation(groupIdBytes, this.defaultCredentialType, configuration);
 
     const {coreCryptoKeyPackagesPayload: keyPackages, failedToFetchKeyPackages} = await this.getKeyPackagesPayload(
       users.map(user => {
@@ -477,11 +479,15 @@ export class MLSService extends TypedEventEmitter<Events> {
   }
 
   public async clientValidKeypackagesCount(): Promise<number> {
-    return this.coreCryptoClient.clientValidKeypackagesCount(this.defaultCiphersuite);
+    return this.coreCryptoClient.clientValidKeypackagesCount(this.defaultCiphersuite, this.defaultCredentialType);
   }
 
   public async clientKeypackages(amountRequested: number): Promise<Uint8Array[]> {
-    return this.coreCryptoClient.clientKeypackages(this.defaultCiphersuite, amountRequested);
+    return this.coreCryptoClient.clientKeypackages(
+      this.defaultCiphersuite,
+      this.defaultCredentialType,
+      amountRequested,
+    );
   }
 
   /**
