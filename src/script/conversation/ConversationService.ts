@@ -430,4 +430,8 @@ export class ConversationService {
   async mlsGroupExistsLocally(groupId: string): Promise<boolean> {
     return this.coreConversationService.mlsGroupExistsLocally(groupId);
   }
+
+  async getMLS1to1Conversation(userId: QualifiedId) {
+    return this.apiClient.api.conversation.getMLS1to1Conversation(userId);
+  }
 }

@@ -84,7 +84,7 @@ import {ConversationFilter} from './ConversationFilter';
 import {ConversationLabelRepository} from './ConversationLabelRepository';
 import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';
 import {ConversationRoleRepository} from './ConversationRoleRepository';
-import {isMLSConversation} from './ConversationSelectors';
+import {isMLSConversation, MLSConversation} from './ConversationSelectors';
 import {ConversationService} from './ConversationService';
 import {ConversationState} from './ConversationState';
 import {ConversationStateHandler} from './ConversationStateHandler';
@@ -136,6 +136,7 @@ import {SuperType} from '../message/SuperType';
 import {SystemMessageType} from '../message/SystemMessageType';
 import {addOtherSelfClientsToMLSConversation} from '../mls';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
+import {SelfRepository} from '../self/SelfRepository';
 import {Core} from '../service/CoreSingleton';
 import type {EventRecord} from '../storage';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
@@ -182,6 +183,7 @@ export class ConversationRepository {
     private readonly eventRepository: EventRepository,
     private readonly teamRepository: TeamRepository,
     private readonly userRepository: UserRepository,
+    private readonly selfRepository: SelfRepository,
     private readonly propertyRepository: PropertiesRepository,
     private readonly callingRepository: CallingRepository,
     private readonly serverTimeHandler: ServerTimeHandler,
@@ -641,7 +643,7 @@ export class ConversationRepository {
       const response = await this.conversationService.getConversationById(qualifiedId);
       const [conversationEntity] = this.mapConversations([response]);
 
-      this.saveConversation(conversationEntity);
+      await this.saveConversation(conversationEntity);
 
       fetching_conversations[conversationId].forEach(({resolveFn}) => resolveFn(conversationEntity));
       delete fetching_conversations[conversationId];
@@ -708,6 +710,9 @@ export class ConversationRepository {
       const data = ConversationMapper.mergeConversations(localConversations, remoteConversations);
       conversationsData = (await this.conversationService.saveConversationsInDb(data)) as any[];
     }
+
+    //TODO: filter out proteus 1:1 conversations that should use 1:1 mls converstions instead
+    //when filtering them out change the conversation field of each message to the mls conversation id
 
     const allConversationEntities = this.mapConversations(conversationsData);
     const newConversationEntities = allConversationEntities.filter(
@@ -1195,6 +1200,7 @@ export class ConversationRepository {
 
     const conversationId = userEntity.connection().conversationId;
     try {
+      //TODO: check if mls conversation will be returned when fetched with this endpoint
       const conversationEntity = await this.getConversationById(conversationId);
       conversationEntity.connection(userEntity.connection());
       await this.updateParticipatingUserEntities(conversationEntity);
@@ -1351,11 +1357,135 @@ export class ConversationRepository {
     }
   };
 
-  private readonly getConnectionConversation = (connectionEntity: ConnectionEntity) => {
-    const {conversationId} = connectionEntity;
+  private readonly getProtocolFor1to1Conversation = async (otherUserId: QualifiedId) => {
+    const otherUserSupportedProtocolsSet = await this.userRepository.getUserSupportedProtocols(otherUserId);
+    const selfUserSupportedProtocolsSet = await this.selfRepository.getSelfSupportedProtocols();
+
+    const commonProtocols = otherUserSupportedProtocolsSet.filter(protocol =>
+      selfUserSupportedProtocolsSet.includes(protocol),
+    );
+
+    if (commonProtocols.includes(ConversationProtocol.MLS)) {
+      return ConversationProtocol.MLS;
+    }
+
+    if (commonProtocols.includes(ConversationProtocol.PROTEUS)) {
+      return ConversationProtocol.PROTEUS;
+    }
+
+    return null;
+  };
+
+  /**
+   * Fetches a MLS 1:1 conversation between self user and given userId from backend and saves it in both local state and database.
+   *
+   * @param otherUserId - id of the other user
+   * @returns MLS conversation entity
+   */
+  public readonly getMLS1to1Conversation = async (otherUserId: QualifiedId): Promise<MLSConversation> => {
+    const remoteConversation = await this.conversationService.getMLS1to1Conversation(otherUserId);
+    const [conversationEntity] = this.mapConversations([remoteConversation]);
+
+    const conversation = await this.saveConversation(conversationEntity);
+
+    if (!isMLSConversation(conversation)) {
+      throw new Error('Conversation is not MLS');
+    }
+
+    return conversation;
+  };
+
+  /**
+   * Will establish MLS group for 1:1 conversation or just return it if it's already established.
+   *
+   * @param otherUserId - id of the other user
+   * @param localMLSConversation - local MLS conversation entity - if provided, conversation will not be refetched from the backend
+   * @returns established MLS conversation entity
+   *
+   */
+  private readonly getEstablishedMLS1to1Conversation = async (
+    otherUserId: QualifiedId,
+    localMLSConversation?: MLSConversation,
+  ): Promise<MLSConversation> => {
+    const mlsService = this.core.service?.mls;
+
+    if (!mlsService) {
+      throw new Error('MLS service is not available!');
+    }
+
+    const mlsConversation = localMLSConversation || (await this.getMLS1to1Conversation(otherUserId));
+    const {groupId} = mlsConversation;
+
+    //check if converstion already exists and if mls group is already established
+
+    const isMLS1to1ConversationEstablished = await this.isMLSConversationEstablished(groupId);
+
+    //if it's already established it's ready to be used - we just return it
+    if (isMLS1to1ConversationEstablished) {
+      return mlsConversation;
+    }
+
+    //if epoch is higher than 0 it means that the group was already established,
+    //if we didn't receive a welcome message, we join with external commit
+    if (mlsConversation.epoch > 0) {
+      await joinNewConversations([mlsConversation], this.core);
+      return mlsConversation;
+    }
+
+    //if it's not established, establish it and add the other user to the group
+    const selfUserId = this.userState.self().qualifiedId;
+    await mlsService.registerConversation(groupId, [selfUserId, otherUserId], {
+      user: selfUserId,
+      client: this.core.clientId,
+    });
+
+    useMLSConversationState.getState().markAsEstablished(groupId);
+    return mlsConversation;
+  };
+
+  private readonly isMLSConversationEstablished = async (groupId: string) => {
+    const mlsService = this.core.service?.mls;
+
+    if (!mlsService) {
+      throw new Error('MLS service is not available!');
+    }
+
+    const mlsConversationState = useMLSConversationState.getState();
+
+    const isMLSConversationMarkedAsEstablished = mlsConversationState.isEstablished(groupId);
+
+    if (isMLSConversationMarkedAsEstablished) {
+      return true;
+    }
+
+    const isMLSConversationEstablished = await mlsService.conversationExists(groupId);
+
+    if (isMLSConversationEstablished) {
+      //make sure MLS group is marked as established
+      mlsConversationState.markAsEstablished(groupId);
+      return true;
+    }
+
+    return false;
+  };
+
+  private readonly getConnectionConversation = async (connectionEntity: ConnectionEntity) => {
+    //before using the default conversation id, check if both users support MLS, if so use MLS 1:1 conversation instead
+    const {conversationId, userId} = connectionEntity;
+
+    const commonProtocol = await this.getProtocolFor1to1Conversation(userId);
 
     const localConversation = this.conversationState.findConversation(conversationId);
 
+    //if mls is supported by both users, establish a mls conversation
+    if (commonProtocol === ConversationProtocol.MLS) {
+      const localMLSConversation =
+        localConversation && isMLSConversation(localConversation) ? localConversation : undefined;
+
+      return this.getEstablishedMLS1to1Conversation(userId, localMLSConversation);
+    }
+
+    //otherwise use proteus conversation
     if (localConversation) {
       return localConversation;
     }
@@ -1388,6 +1518,7 @@ export class ConversationRepository {
       }
 
       conversation.connection(connectionEntity);
+      connectionEntity.conversationId = conversation.qualifiedId;
 
       if (connectionEntity.isConnected()) {
         conversation.type(CONVERSATION_TYPE.ONE_TO_ONE);
