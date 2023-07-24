@@ -42,6 +42,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleEnterDown, isKeyboardEvent, offEscKey, onEscKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
+import {isAxiosError} from 'Util/TypePredicateUtil';
 
 import {Config} from '../../../Config';
 import {ACCESS_STATE} from '../../../conversation/AccessState';
@@ -56,10 +57,15 @@ import {isProtocolOption, ProtocolOption} from '../../../guards/Protocol';
 import {RootContext} from '../../../page/RootProvider';
 import {TeamState} from '../../../team/TeamState';
 import {UserState} from '../../../user/UserState';
+import {PrimaryModal} from '../PrimaryModal';
 
 interface GroupCreationModalProps {
   userState?: UserState;
   teamState?: TeamState;
+}
+
+interface NonFederatingBackendsData {
+  non_federating_backends: string[];
 }
 
 enum GroupCreationModalState {
@@ -227,6 +233,35 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
           createNavigate(generateConversationUrl(conversation.qualifiedId))(event);
         }
       } catch (error) {
+        const NON_FEDERATING_BACKENDS = 409;
+
+        if (isAxiosError<NonFederatingBackendsData>(error) && error.response?.status === NON_FEDERATING_BACKENDS) {
+          const tempName = groupName;
+          setIsShown(false);
+          const backendString = error.response?.data!.non_federating_backends?.join(', and ');
+          return PrimaryModal.show(PrimaryModal.type.MULTI_ACTIONS, {
+            preventClose: true,
+            primaryAction: {
+              text: t('groupCreationPreferencesNonFederatingEditList'),
+              action: () => {
+                setGroupName(tempName);
+                setIsShown(true);
+                setIsCreatingConversation(false);
+                setGroupCreationState(GroupCreationModalState.PARTICIPANTS);
+              },
+            },
+            secondaryAction: {
+              text: t('groupCreationPreferencesNonFederatingLeave'),
+              action: () => {
+                setIsCreatingConversation(false);
+              },
+            },
+            text: {
+              htmlMessage: t('groupCreationPreferencesNonFederatingMessage', {backends: backendString}),
+              title: t('groupCreationPreferencesNonFederatingHeadline'),
+            },
+          });
+        }
         amplify.publish(WebAppEvents.CONVERSATION.SHOW, undefined, {});
         setIsCreatingConversation(false);
       }
