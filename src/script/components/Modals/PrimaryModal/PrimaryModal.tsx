@@ -31,6 +31,7 @@ import {PasswordGeneratorButton} from 'Components/PasswordGeneratorButton';
 import {Config} from 'src/script/Config';
 import {isEscapeKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
+import {isValidPassword} from 'Util/StringUtil';
 
 import {guestLinkPasswordInputStyles} from './PrimaryModal.styles';
 import {usePrimaryModalState, showNextModalInQueue, defaultContent, removeCurrentModal} from './PrimaryModalState';
@@ -85,9 +86,17 @@ export const PrimaryModalComponent: FC = () => {
     setDidCopyPassword(false);
   };
 
+  const checkPassword = (password: string, passwordConfirm: string): boolean => {
+    if (password !== passwordConfirm) {
+      return false;
+    }
+
+    return isValidPassword(password);
+  };
+
   const inputActionEnabled = !isInput || !!inputValue.trim().length;
   const passwordActionEnabled =
-    (!isGuestLinkPassword || !!passwordValue.trim().length) && passwordValue === passwordConfirmationValue;
+    (!isGuestLinkPassword || !!passwordValue.trim().length) && checkPassword(passwordValue, passwordConfirmationValue);
 
   const doAction =
     (action?: Function, closeAfter = true, skipValidation = false) =>
