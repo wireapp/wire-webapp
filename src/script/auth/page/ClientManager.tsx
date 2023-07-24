@@ -80,7 +80,7 @@ const ClientManagerComponent = ({doGetAllClients, doLogout}: Props & ConnectedPr
           flexDirection: 'column',
           justifyContent: 'space-around',
           minHeight: 428,
-          marginInline: isMobile ? '20px' : 'inherit',
+          marginInline: isMobile ? '20px' : 'auto',
         }}
       >
         <H1 center style={{marginTop: '140px'}}>
