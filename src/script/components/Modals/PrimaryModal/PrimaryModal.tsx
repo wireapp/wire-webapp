@@ -74,6 +74,7 @@ export const PrimaryModalComponent: FC = () => {
   const isMultipleSecondary = currentType === PrimaryModalType.MULTI_ACTIONS;
   const isGuestLinkPassword = currentType === PrimaryModalType.GUEST_LINK_PASSWORD;
   const isJoinGuestLinkPassword = currentType === PrimaryModalType.JOIN_GUEST_LINK_PASSWORD;
+  const isConfirm = currentType === PrimaryModalType.CONFIRM;
 
   const onModalHidden = () => {
     updateCurrentModalContent(defaultContent);
@@ -163,6 +164,13 @@ export const PrimaryModalComponent: FC = () => {
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
   }, [isModalVisible]);
+
+  const isPrimaryActionDisabled = () => {
+    if (isConfirm) {
+      return false;
+    }
+    return !inputActionEnabled || !passwordActionEnabled;
+  };
 
   return (
     <div
@@ -379,7 +387,7 @@ export const PrimaryModalComponent: FC = () => {
                     ref={primaryActionButtonRef}
                     type="button"
                     onClick={doAction(confirm, !!closeOnConfirm)}
-                    disabled={!inputActionEnabled || !passwordActionEnabled}
+                    disabled={isPrimaryActionDisabled()}
                     className={cx('modal__button modal__button--primary', {
                       'modal__button--full': isMultipleSecondary,
                     })}
