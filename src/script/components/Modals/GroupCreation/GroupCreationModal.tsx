@@ -240,7 +240,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
           setIsShown(false);
           const backendString = error.response?.data!.non_federating_backends?.join(', and ');
           const replaceBackends = replaceLink(
-            'https://support.wire.com/hc/en-us/articles/9357718008093-Backend',
+            'https://support.wire.com/hc/articles/9357718008093',
             'modal__text__read-more',
             'read-more-backends',
           );
