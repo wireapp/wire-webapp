@@ -12,8 +12,8 @@
   position: relative;
   width: 100%;
   max-height: 200px;
-  background: #fff;
-  color: #000;
+  background: var(--input-bar-bg);
+  color: var(--main-color);
   overflow-y: scroll;
 }
 
@@ -28,9 +28,8 @@
 .editor-input {
   position: relative;
   min-height: 24px;
-  caret-color: rgb(5, 5, 5);
+  caret-color: var(--accent-color);
   //padding: 10px 10px 5px;
-  caret-color: #444;
   margin-block: 16px;
   outline: 0;
   resize: none;
@@ -45,17 +44,13 @@
 
   overflow: hidden;
 
-  color: var(--gray-70);
+  color: var(--text-input-placeholder);
   font-size: var(--font-size-xsmall);
   font-weight: var(--font-weight-regular);
   pointer-events: none;
   text-overflow: ellipsis;
   translate: 0 -50%;
   user-select: none;
-
-  body.theme-dark & {
-    color: var(--gray-60);
-  }
 }
 
 .editor-paragraph {
