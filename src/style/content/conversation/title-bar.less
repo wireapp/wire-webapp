@@ -16,6 +16,9 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+
+@button-group-width: 128px;
+
 #show-participants {
   min-width: 0; //needed for the truncation of long titles to work properly in flex-boxes
 }
@@ -38,7 +41,6 @@
   display: flex;
   height: 100%;
   flex-grow: 1;
-  margin-left: 10px;
   user-select: none;
 
   &--verified {
@@ -76,8 +78,12 @@ body.theme-dark {
 .conversation-title-bar-icons,
 .conversation-title-bar-library {
   display: flex;
+  min-width: @button-group-width;
   height: 100%;
   align-items: center;
+  @media (min-width: calc(@screen-sm-min * 2)) and (max-width: @screen-md-min) {
+    min-width: 0;
+  }
 }
 
 .conversation-title-bar-icons {
