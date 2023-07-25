@@ -235,7 +235,9 @@ export const PrimaryModalComponent: FC = () => {
                     wrapperCSS={guestLinkPasswordInputStyles}
                     placeholder={t('modalGuestLinkJoinPlaceholder')}
                     label={t('modalGuestLinkJoinLabel')}
-                    helperText={t('modalGuestLinkJoinHelperText')}
+                    helperText={t('modalGuestLinkJoinHelperText', {
+                      minPasswordLength: Config.getConfig().MINIMUM_PASSWORD_LENGTH.toString(),
+                    })}
                     id="modal_pswd_confiramtion"
                     className="modal__input"
                     type="password"

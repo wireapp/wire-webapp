@@ -850,7 +850,7 @@
   "modalGuestLinkJoinConfirmPlaceholder": "Confirm your password",
   "modalGuestLinkJoinLabel": "Set password",
   "modalGuestLinkJoinConfirmLabel": "Confirm password",
-  "modalGuestLinkJoinHelperText": "Must have at least one: uppercase letter, lowercase letter, number, symbol",
+  "modalGuestLinkJoinHelperText": "Use at least {{minPasswordLength}} characters, with one lowercase letter, one capital letter, a number, and a special character.",
   "modalConversationJoinConfirm": "Join",
   "modalConversationJoinFullHeadline": "You could not join the conversation",
   "modalConversationJoinFullMessage": "The conversation is full.",
