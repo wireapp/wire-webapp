@@ -31,7 +31,10 @@ export class RuntimeAction {
   checkSupportedBrowser = (): ThunkAction<void> => {
     return (dispatch, getState, {getConfig}) => {
       const isMobileSupportedBrowser = () => {
-        return Runtime.isMobileOS() && (Runtime.isSafari() || Runtime.isChrome());
+        return (
+          Runtime.isMobileOS() &&
+          (Runtime.isSafari() || Runtime.isChrome() || Runtime.getBrowserName() === 'android browser')
+        );
       };
       const isOutlookApp = () => {
         return Runtime.getBrowserName() === 'unknown';
