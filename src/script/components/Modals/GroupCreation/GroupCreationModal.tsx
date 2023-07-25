@@ -23,6 +23,7 @@ import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/Conversati
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
 import {amplify} from 'amplify';
 import cx from 'classnames';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, Select} from '@wireapp/react-ui-kit';
@@ -73,6 +74,7 @@ enum GroupCreationModalState {
   PARTICIPANTS = 'GroupCreationModal.STATE.PARTICIPANTS',
   PREFERENCES = 'GroupCreationModal.STATE.PREFERENCES',
 }
+const NON_FEDERATING_BACKENDS = HTTP_STATUS.CONFLICT;
 
 const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   userState = container.resolve(UserState),
@@ -233,8 +235,6 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
           createNavigate(generateConversationUrl(conversation.qualifiedId))(event);
         }
       } catch (error) {
-        const NON_FEDERATING_BACKENDS = 409;
-
         if (isAxiosError<NonFederatingBackendsData>(error) && error.response?.status === NON_FEDERATING_BACKENDS) {
           const tempName = groupName;
           setIsShown(false);
