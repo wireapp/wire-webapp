@@ -758,7 +758,7 @@ export class UserRepository {
   }
 
   /**
-   * Will update user entity with provided list of supportedProtocols .
+   * Will update user entity with provided list of supportedProtocols.
    * @param userId - id of the user to update
    * @param supportedProtocols - an array of new supported protocols
    */

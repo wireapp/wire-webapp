@@ -85,7 +85,7 @@ export class SelfRepository {
 
     const isMLSSupportedByTeam = teamSupportedProtocols.includes(ConversationProtocol.MLS);
     const isProteusSupportedByTeam = teamSupportedProtocols.includes(ConversationProtocol.PROTEUS);
-    const doActiveClientsSupportMLS = await this.clientRepository.haveAllActiveClientsRegisteredMLSDevice();
+    const doActiveClientsSupportMLS = await this.clientRepository.haveAllActiveSelfClientsRegisteredMLSDevice();
     const isMigrationDisabled = mlsMigrationStatus === MLSMigrationStatus.DISABLED;
 
     return !doActiveClientsSupportMLS && isMLSSupportedByTeam && !isProteusSupportedByTeam && isMigrationDisabled;
@@ -107,7 +107,7 @@ export class SelfRepository {
     const mlsMigrationStatus = this.teamRepository.getTeamMLSMigrationStatus();
 
     const isMLSSupportedByTeam = teamSupportedProtocols.includes(ConversationProtocol.MLS);
-    const doActiveClientsSupportMLS = await this.clientRepository.haveAllActiveClientsRegisteredMLSDevice();
+    const doActiveClientsSupportMLS = await this.clientRepository.haveAllActiveSelfClientsRegisteredMLSDevice();
     return isMLSSupportedByTeam && (doActiveClientsSupportMLS || mlsMigrationStatus === MLSMigrationStatus.FINALISED);
   }
 

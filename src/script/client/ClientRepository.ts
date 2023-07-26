@@ -585,7 +585,7 @@ export class ClientRepository {
     amplify.publish(WebAppEvents.CLIENT.REMOVE, this.selfUser().qualifiedId, clientId);
   }
 
-  public async haveAllActiveClientsRegisteredMLSDevice(): Promise<boolean> {
+  public async haveAllActiveSelfClientsRegisteredMLSDevice(): Promise<boolean> {
     const selfClients = await this.getAllSelfClients();
     //we consider client active if it was active within last 4 weeks
     const activeClients = selfClients.filter(wasClientActiveWithinLast4Weeks);

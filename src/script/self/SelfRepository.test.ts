@@ -109,7 +109,7 @@ const generateListOfSelfClients = ({allActiveClientsMLSCapable}: {allActiveClien
   return clients;
 };
 
-const testScenarios = [
+const evaluateProtocolsScenarios = [
   [
     //with given config
     generateMLSFeaturesConfig(MLSMigrationStatus.DISABLED, [ConversationProtocol.PROTEUS]),
@@ -185,24 +185,29 @@ describe('SelfRepository', () => {
       ({allActiveClientsMLSCapable}) => {
         const selfClients = generateListOfSelfClients({allActiveClientsMLSCapable});
 
-        it.each(testScenarios)('evaluates self supported protocols', async ({mls, mlsMigration}, expected) => {
-          const selfRepository = await testFactory.exposeSelfActors();
+        it.each(evaluateProtocolsScenarios)(
+          'evaluates self supported protocols',
+          async ({mls, mlsMigration}, expected) => {
+            const selfRepository = await testFactory.exposeSelfActors();
 
-          jest.spyOn(selfRepository['clientRepository'], 'getAllSelfClients').mockResolvedValue(selfClients);
+            jest.spyOn(selfRepository['clientRepository'], 'getAllSelfClients').mockResolvedValue(selfClients);
 
-          const teamFeatureList = {
-            mlsMigration,
-            mls,
-          } as unknown as FeatureList;
+            const teamFeatureList = {
+              mlsMigration,
+              mls,
+            } as unknown as FeatureList;
 
-          jest.spyOn(selfRepository['teamRepository']['teamState'], 'teamFeatures').mockReturnValue(teamFeatureList);
+            jest.spyOn(selfRepository['teamRepository']['teamState'], 'teamFeatures').mockReturnValue(teamFeatureList);
 
-          const supportedProtocols = await selfRepository.evaluateSelfSupportedProtocols();
+            const supportedProtocols = await selfRepository.evaluateSelfSupportedProtocols();
 
-          expect(supportedProtocols).toEqual(
-            allActiveClientsMLSCapable ? expected.allActiveClientsMLSCapable : expected.someActiveClientsNotMLSCapable,
-          );
-        });
+            expect(supportedProtocols).toEqual(
+              allActiveClientsMLSCapable
+                ? expected.allActiveClientsMLSCapable
+                : expected.someActiveClientsNotMLSCapable,
+            );
+          },
+        );
       },
     );
   });
