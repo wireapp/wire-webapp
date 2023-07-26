@@ -30,6 +30,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {checkFileSharingPermission} from 'Components/Conversation/utils/checkFileSharingPermission';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';
+import {SendMessageButton} from 'Components/LexicalInput/components/SendMessageButton';
 import {LexicalInput} from 'Components/LexicalInput/LexicalInput';
 import {$createBeautifulMentionNode} from 'Components/LexicalInput/nodes/MentionNode';
 import {createNodes} from 'Components/LexicalInput/utils/generateNodes';
@@ -179,6 +180,12 @@ const InputBar = ({
   const isScaledDown = useMatchMedia('max-width: 768px');
 
   const showGiphyButton = inputValue.length > 0 && inputValue.length <= config.GIPHY_TEXT_LENGTH;
+
+  // Mentions
+  const {participating_user_ets: participatingUserEts} = useKoSubscribableChildren(conversationEntity, [
+    'participating_user_ets',
+  ]);
+  const mentionCandidates = participatingUserEts.filter(userEntity => !userEntity.isService);
 
   const resetDraftState = (resetInputValue = false) => {
     setCurrentMentions([]);
@@ -565,14 +572,13 @@ const InputBar = ({
               <LexicalInput
                 ref={lexicalRef}
                 editMessage={editMessage}
-                conversationEntity={conversationEntity}
+                mentionCandidates={mentionCandidates}
                 propertiesRepository={propertiesRepository}
                 searchRepository={searchRepository}
                 placeholder={inputPlaceholder}
                 inputValue={inputValue}
                 setInputValue={setInputValue}
                 currentMentions={currentMentions}
-                sendMessage={onSend}
                 hasLocalEphemeralTimer={hasLocalEphemeralTimer}
                 saveDraftStateLexical={saveDraft}
                 loadDraftStateLexical={loadDraft}
@@ -582,15 +588,19 @@ const InputBar = ({
                   <>
                     <ul className="controls-right buttons-group" css={{minWidth: '95px'}}>
                       {showGiphyButton && <GiphyButton onGifClick={onGifClick} />}
+                      <SendMessageButton textValue={inputValue} onSend={onSend} mentions={mentionCandidates} />
                     </ul>
                     <ul className="controls-right buttons-group" css={{justifyContent: 'center', width: '100%'}}>
                       <ControlButtons {...controlButtonsProps} isScaledDown={isScaledDown} />
                     </ul>
                   </>
                 ) : (
-                  <ul className="controls-right buttons-group">
-                    <ControlButtons {...controlButtonsProps} showGiphyButton={showGiphyButton} />
-                  </ul>
+                  <>
+                    <ul className="controls-right buttons-group">
+                      <ControlButtons {...controlButtonsProps} showGiphyButton={showGiphyButton} />
+                      <SendMessageButton textValue={inputValue} onSend={onSend} mentions={mentionCandidates} />
+                    </ul>
+                  </>
                 )}
               </LexicalInput>
             )}
