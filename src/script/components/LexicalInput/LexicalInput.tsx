@@ -33,6 +33,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {User} from 'src/script/entity/User';
+import {DraftState} from 'Util/DraftStateUtil';
 
 import {EditMessage} from './components/EditMessage';
 import {BeautifulMentionNode} from './nodes/MentionNode';
@@ -67,10 +68,10 @@ interface LexicalInputProps {
   inputValue: string;
   setInputValue: (text: string) => void;
   editMessage: (messageEntity: ContentMessage, editor: LexicalEditor) => void;
-  children: any;
+  children: React.ReactNode;
   hasLocalEphemeralTimer: boolean;
   saveDraftStateLexical: any;
-  loadDraftStateLexical: any;
+  loadDraftStateLexical: () => Promise<DraftState>;
   mentionCandidates: User[];
   onShiftTab: any;
 }
@@ -154,8 +155,7 @@ export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
             </div>
           </div>
         </div>
-
-        {children}
+        <>{children}</>
       </LexicalComposer>
     );
   },
