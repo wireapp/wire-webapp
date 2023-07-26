@@ -27,7 +27,6 @@ import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {SelfService} from './SelfService';
 
 import {ClientRepository} from '../client';
-import {User} from '../entity/User';
 import {isMLSSupportedByEnvironment} from '../mls/isMLSSupportedByEnvironment';
 import {MLSMigrationStatus} from '../mls/MLSMigration/migrationStatus';
 import {TeamRepository} from '../team/TeamRepository';
@@ -137,10 +136,13 @@ export class SelfRepository {
    * It will send a request to the backend to change the supported protocols and then update the user in the local state.
    * @param supportedProtocols - an array of new supported protocols
    */
-  private async updateSelfSupportedProtocols(supportedProtocols: ConversationProtocol[]): Promise<User> {
+  private async updateSelfSupportedProtocols(
+    supportedProtocols: ConversationProtocol[],
+  ): Promise<ConversationProtocol[]> {
     this.logger.info('Supported protocols will get updated to:', supportedProtocols);
     await this.selfService.putSupportedProtocols(supportedProtocols);
-    return this.userRepository.updateUserSupportedProtocols(this.userState.self().qualifiedId, supportedProtocols);
+    await this.userRepository.updateUserSupportedProtocols(this.userState.self().qualifiedId, supportedProtocols);
+    return supportedProtocols;
   }
 
   /**
@@ -148,32 +150,27 @@ export class SelfRepository {
    * It will send a request to the backend to change the supported protocols and then update the user in the local state.
    * @param supportedProtocols - an array of new supported protocols
    */
-  public async refreshSelfSupportedProtocols(): Promise<void> {
+  public async refreshSelfSupportedProtocols(): Promise<ConversationProtocol[]> {
     const selfUser = this.userState.self();
     const localSupportedProtocols = selfUser.supportedProtocols();
 
     this.logger.info('Evaluating self supported protocols, currently supported protocols:', localSupportedProtocols);
+    const refreshedSupportedProtocols = await this.evaluateSelfSupportedProtocols();
 
-    try {
-      const refreshedSupportedProtocols = await this.evaluateSelfSupportedProtocols();
-
-      if (!localSupportedProtocols) {
-        return void this.updateSelfSupportedProtocols(refreshedSupportedProtocols);
-      }
-
-      const hasSupportedProtocolsChanged = !(
-        localSupportedProtocols.length === refreshedSupportedProtocols.length &&
-        [...localSupportedProtocols].every(protocol => refreshedSupportedProtocols.includes(protocol))
-      );
-
-      if (!hasSupportedProtocolsChanged) {
-        return;
-      }
-
-      return void this.updateSelfSupportedProtocols(refreshedSupportedProtocols);
-    } catch (error) {
-      this.logger.error('Failed to update self supported protocols, will retry after 24h. Error: ', error);
+    if (!localSupportedProtocols) {
+      return this.updateSelfSupportedProtocols(refreshedSupportedProtocols);
     }
+
+    const hasSupportedProtocolsChanged = !(
+      localSupportedProtocols.length === refreshedSupportedProtocols.length &&
+      [...localSupportedProtocols].every(protocol => refreshedSupportedProtocols.includes(protocol))
+    );
+
+    if (!hasSupportedProtocolsChanged) {
+      return localSupportedProtocols;
+    }
+
+    return this.updateSelfSupportedProtocols(refreshedSupportedProtocols);
   }
 
   /**
@@ -186,11 +183,18 @@ export class SelfRepository {
    */
   public async initialisePeriodicSelfSupportedProtocolsCheck() {
     // We update supported protocols of self user on initial app load and then in 24 hours intervals
-    await this.refreshSelfSupportedProtocols();
+    const refreshProtocolsTask = async () => {
+      await this.refreshSelfSupportedProtocols();
+      try {
+      } catch (error) {
+        this.logger.error('Failed to update self supported protocols, will retry after 24h. Error: ', error);
+      }
+    };
+    await refreshProtocolsTask();
 
     return registerRecurringTask({
       every: TIME_IN_MILLIS.DAY,
-      task: () => this.refreshSelfSupportedProtocols(),
+      task: refreshProtocolsTask,
       key: SELF_SUPPORTED_PROTOCOLS_CHECK_KEY,
     });
   }
