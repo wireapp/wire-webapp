@@ -571,8 +571,8 @@ const InputBar = ({
                   <>
                     <ul className="controls-right buttons-group" css={{minWidth: '95px'}}>
                       {showGiphyButton && <GiphyButton onGifClick={onGifClick} />}
+                      <SendMessageButton textValue={inputValue} onSend={onSend} mentions={mentionCandidates} />
                     </ul>
-                    <SendMessageButton textValue={inputValue} onSend={onSend} mentions={mentionCandidates} />
                     <ul className="controls-right buttons-group" css={{justifyContent: 'center', width: '100%'}}>
                       <ControlButtons {...controlButtonsProps} isScaledDown={isScaledDown} />
                     </ul>
@@ -581,8 +581,8 @@ const InputBar = ({
                   <>
                     <ul className="controls-right buttons-group">
                       <ControlButtons {...controlButtonsProps} showGiphyButton={showGiphyButton} />
+                      <SendMessageButton textValue={inputValue} onSend={onSend} mentions={mentionCandidates} />
                     </ul>
-                    <SendMessageButton textValue={inputValue} onSend={onSend} mentions={mentionCandidates} />
                   </>
                 )}
               </LexicalInput>
