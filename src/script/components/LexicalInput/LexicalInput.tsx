@@ -72,6 +72,7 @@ interface LexicalInputProps {
   saveDraftStateLexical: any;
   loadDraftStateLexical: any;
   mentionCandidates: User[];
+  onShiftTab: any;
 }
 
 export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
@@ -88,6 +89,7 @@ export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
       loadDraftStateLexical,
       editMessage,
       mentionCandidates,
+      onShiftTab,
     },
     ref,
   ) => {

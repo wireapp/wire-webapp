@@ -447,10 +447,26 @@ const InputBar = ({
   }, [conversationEntity]);
 
   const saveDraft = async (editor: any) => {
-    await saveDraftStateLexical(storageRepository, conversationEntity, editor);
+    await saveDraftStateLexical(storageRepository, conversationEntity, editor, replyMessageEntity?.id);
   };
 
-  const loadDraft = async () => loadDraftStateLexical(conversationEntity, storageRepository);
+  const loadDraft = async () => {
+    clearPastedFile();
+    cancelMessageEditing(true, true);
+    cancelMessageReply();
+
+    const draftState = await loadDraftStateLexical(conversationEntity, storageRepository, messageRepository);
+
+    if (draftState.messageReply) {
+      void draftState.messageReply.then(replyEntity => {
+        if (replyEntity?.isReplyable()) {
+          setReplyMessageEntity(replyEntity);
+        }
+      });
+    }
+
+    return draftState;
+  };
 
   const handleRepliedMessageDeleted = (messageId: string) => {
     if (replyMessageEntity?.id === messageId) {
@@ -566,6 +582,7 @@ const InputBar = ({
                 hasLocalEphemeralTimer={hasLocalEphemeralTimer}
                 saveDraftStateLexical={saveDraft}
                 loadDraftStateLexical={loadDraft}
+                onShiftTab={onShiftTab}
               >
                 {isScaledDown ? (
                   <>

@@ -33,6 +33,7 @@ import {sortByPriority} from 'Util/StringUtil';
 
 import {StorageKey} from '../../../../storage';
 import {EmojiItem} from '../../components/EmojiItem';
+import {getDOMRangeRect} from '../../utils/getDomRangeRect';
 
 export class EmojiOption extends MenuOption {
   title: string;
@@ -162,33 +163,17 @@ export const EmojiPickerPlugin = () => {
         }
 
         const getPosition = () => {
-          if (!rootElement) {
+          const nativeSelection = window.getSelection();
+
+          if (!rootElement || !nativeSelection) {
             return {bottom: 0, left: 0};
           }
 
-          // const position = getCursorPixelPosition(rootElement);
-          const nativeSelection = window.getSelection();
-          // console.log('[index.tsx] przemvs nativeSelection', nativeSelection);
-
-          const domRect = nativeSelection?.focusNode?.parentElement?.getBoundingClientRect();
-          const boundingClientRect = rootElement.getBoundingClientRect();
-          const selectionOffset = nativeSelection?.focusNode?.parentElement?.offsetWidth || 0;
-
-          // console.log('[index.tsx] przemvs selectionOffset', selectionOffset);
-
-          if (domRect) {
-            // console.log('[index.tsx] przemvs boundingClientRect', boundingClientRect);
-            // console.log('[index.tsx] przemvs domRect', domRect);
-
-            return {
-              bottom: domRect.height,
-              left: boundingClientRect.left + selectionOffset,
-            };
-          }
+          const rangeRect = getDOMRangeRect(nativeSelection, rootElement);
 
           return {
-            bottom: window.innerHeight - boundingClientRect.top - 24,
-            left: boundingClientRect.left,
+            bottom: window.innerHeight - rangeRect.top,
+            left: rangeRect.x,
           };
         };
 
