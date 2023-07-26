@@ -47,7 +47,6 @@ export class SelfRepository {
     private readonly userState = container.resolve(UserState),
   ) {
     this.logger = getLogger('SelfRepository');
-    void this.initialisePeriodicSelfSupportedProtocolsCheck();
   }
 
   /**
