@@ -759,18 +759,39 @@ export class UserRepository {
   }
 
   /**
+   * Will update user entity with provided list of supportedProtocols.
+   * @param userId - id of the user to update
+   * @param supportedProtocols - an array of new supported protocols
+   */
+  async updateUserSupportedProtocols(userId: QualifiedId, supportedProtocols: ConversationProtocol[]): Promise<User> {
+    return this.updateUser(userId, {supported_protocols: supportedProtocols});
+  }
+
+  getSelfSupportedProtocols(): ConversationProtocol[] | null {
+    return this.userState.self().supportedProtocols();
+  }
+
+  public async getAllSelfClients() {
+    return this.clientRepository.getAllSelfClients();
+  }
+
+  /**
    * will update the local user with fresh data from backend
    * @param user user data from backend
    */
-  private updateSavedUser(user: APIClientUser): User {
+  private async updateSavedUser(user: APIClientUser): Promise<User> {
     const localUserEntity = this.findUserById(generateQualifiedId(user)) ?? new User();
     const updatedUser = this.userMapper.updateUserFromObject(localUserEntity, user, this.userState.self().domain);
-    // TODO update the user in db
+    const {qualifiedId: userId} = updatedUser;
+
+    // update the user in db
+    await this.updateUser(userId, user);
+
     if (this.userState.isTeam()) {
       this.mapGuestStatus([updatedUser]);
     }
     if (updatedUser && updatedUser.inTeam() && updatedUser.isDeleted) {
-      amplify.publish(WebAppEvents.TEAM.MEMBER_LEAVE, updatedUser.teamId, updatedUser.qualifiedId);
+      amplify.publish(WebAppEvents.TEAM.MEMBER_LEAVE, updatedUser.teamId, userId);
     }
     return updatedUser;
   }
@@ -825,11 +846,6 @@ export class UserRepository {
   async changeSupportedProtocols(supportedProtocols: ConversationProtocol[]): Promise<User> {
     await this.selfService.putSupportedProtocols(supportedProtocols);
     return await this.updateUser(this.userState.self().qualifiedId, {supported_protocols: supportedProtocols});
-  }
-
-  getSelfSupportedProtocols(): Set<ConversationProtocol> {
-    const supportedProtocols = this.userState.self().supportedProtocols();
-    return new Set(supportedProtocols);
   }
 
   async changeEmail(email: string): Promise<void> {
@@ -933,9 +949,5 @@ export class UserRepository {
     } catch (error) {
       this.logger.warn(`Failed to retrieve marketing consent: ${error.message || error.code}`, error);
     }
-  }
-
-  public async getAllSelfClients() {
-    return this.clientRepository.getAllSelfClients();
   }
 }

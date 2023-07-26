@@ -107,7 +107,7 @@ const checkMigrationConfig = async (
     return;
   }
 
-  const isMLSSupportedByUser = userRepository.getSelfSupportedProtocols().has(ConversationProtocol.MLS);
+  const isMLSSupportedByUser = userRepository.getSelfSupportedProtocols()?.includes(ConversationProtocol.MLS);
   if (!isMLSSupportedByUser) {
     return;
   }
