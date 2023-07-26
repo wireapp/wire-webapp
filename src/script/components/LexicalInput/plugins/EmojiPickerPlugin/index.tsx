@@ -32,8 +32,9 @@ import {loadValue, storeValue} from 'Util/StorageUtil';
 import {sortByPriority} from 'Util/StringUtil';
 
 import {StorageKey} from '../../../../storage';
+import {EmojiItem} from '../../components/EmojiItem';
 
-class EmojiOption extends MenuOption {
+export class EmojiOption extends MenuOption {
   title: string;
   emoji: string;
   keywords: Array<string>;
@@ -51,42 +52,6 @@ class EmojiOption extends MenuOption {
     this.keywords = options.keywords || [];
   }
 }
-const EmojiMenuItem = ({
-  index,
-  isSelected,
-  onClick,
-  onMouseEnter,
-  option,
-}: {
-  index: number;
-  isSelected: boolean;
-  onClick: () => void;
-  onMouseEnter: () => void;
-  option: EmojiOption;
-}) => {
-  let className = 'item';
-  if (isSelected) {
-    className += ' selected';
-  }
-  return (
-    <li
-      key={option.key}
-      tabIndex={-1}
-      className={className}
-      ref={option.setRefElement}
-      role="option"
-      aria-selected={isSelected}
-      id={`typeahead-item-${index}`}
-      onMouseEnter={onMouseEnter}
-      onClick={onClick}
-      onKeyDown={() => {}}
-    >
-      <span className="text">
-        {option.emoji} {option.title}
-      </span>
-    </li>
-  );
-};
 
 type Emoji = {
   emoji: string;
@@ -99,10 +64,11 @@ type Emoji = {
   skin_tones?: boolean;
 };
 
-const MAX_EMOJI_SUGGESTION_COUNT = 10;
+const MAX_EMOJI_SUGGESTION_COUNT = 5;
 
 export const EmojiPickerPlugin = () => {
-  const [editor] = useLexicalComposerContext();
+  const [lexicalEditor] = useLexicalComposerContext();
+
   const [queryString, setQueryString] = useState<string | null>(null);
   const [emojis, setEmojis] = useState<Array<Emoji>>([]);
 
@@ -162,7 +128,7 @@ export const EmojiPickerPlugin = () => {
 
   const onSelectOption = useCallback(
     (selectedOption: EmojiOption, nodeToRemove: TextNode | null, closeMenu: () => void) => {
-      editor.update(() => {
+      lexicalEditor.update(() => {
         const selection = $getSelection();
 
         if (!$isRangeSelection(selection) || selectedOption == null) {
@@ -179,8 +145,10 @@ export const EmojiPickerPlugin = () => {
         closeMenu();
       });
     },
-    [editor],
+    [lexicalEditor],
   );
+
+  const rootElement = lexicalEditor.getRootElement();
 
   return (
     <LexicalTypeaheadMenuPlugin
@@ -189,31 +157,63 @@ export const EmojiPickerPlugin = () => {
       triggerFn={checkForTriggerMatch}
       options={options}
       menuRenderFn={(anchorElementRef, {selectedIndex, selectOptionAndCleanUp, setHighlightedIndex}) => {
-        return anchorElementRef.current && options.length
-          ? ReactDOM.createPortal(
-              <div className="typeahead-popover emoji-menu">
-                <ul>
-                  {options.map((option: EmojiOption, index) => (
-                    <div key={option.key}>
-                      <EmojiMenuItem
-                        index={index}
-                        isSelected={selectedIndex === index}
-                        onClick={() => {
-                          setHighlightedIndex(index);
-                          selectOptionAndCleanUp(option);
-                        }}
-                        onMouseEnter={() => {
-                          setHighlightedIndex(index);
-                        }}
-                        option={option}
-                      />
-                    </div>
-                  ))}
-                </ul>
-              </div>,
-              anchorElementRef.current,
-            )
-          : null;
+        if (!anchorElementRef.current || !options.length) {
+          return null;
+        }
+
+        const getPosition = () => {
+          if (!rootElement) {
+            return {bottom: 0, left: 0};
+          }
+
+          // const position = getCursorPixelPosition(rootElement);
+          const nativeSelection = window.getSelection();
+          // console.log('[index.tsx] przemvs nativeSelection', nativeSelection);
+
+          const domRect = nativeSelection?.focusNode?.parentElement?.getBoundingClientRect();
+          const boundingClientRect = rootElement.getBoundingClientRect();
+          const selectionOffset = nativeSelection?.focusNode?.parentElement?.offsetWidth || 0;
+
+          // console.log('[index.tsx] przemvs selectionOffset', selectionOffset);
+
+          if (domRect) {
+            // console.log('[index.tsx] przemvs boundingClientRect', boundingClientRect);
+            // console.log('[index.tsx] przemvs domRect', domRect);
+
+            return {
+              bottom: domRect.height,
+              left: boundingClientRect.left + selectionOffset,
+            };
+          }
+
+          return {
+            bottom: window.innerHeight - boundingClientRect.top - 24,
+            left: boundingClientRect.left,
+          };
+        };
+
+        const {bottom, left} = getPosition();
+
+        return ReactDOM.createPortal(
+          <div className="typeahead-popover emoji-menu">
+            <div className="conversation-input-bar-emoji-list" style={{bottom, left}}>
+              {options.map((option: EmojiOption, index) => (
+                <EmojiItem
+                  ref={option.setRefElement}
+                  key={option.key}
+                  selectedEmoji={selectedIndex === index}
+                  emoji={option}
+                  onMouseEnter={() => setHighlightedIndex(index)}
+                  onClick={() => {
+                    setHighlightedIndex(index);
+                    selectOptionAndCleanUp(option);
+                  }}
+                />
+              ))}
+            </div>
+          </div>,
+          anchorElementRef.current,
+        );
       }}
     />
   );

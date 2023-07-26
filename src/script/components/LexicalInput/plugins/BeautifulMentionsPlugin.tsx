@@ -29,27 +29,24 @@ import {
   $isTextNode,
   $nodesOfType,
   $setSelection,
-  BLUR_COMMAND,
   COMMAND_PRIORITY_LOW,
   GridSelection,
   KEY_DOWN_COMMAND,
-  KEY_SPACE_COMMAND,
   NodeSelection,
   RangeSelection,
   TextNode,
 } from 'lexical';
 import * as ReactDOM from 'react-dom';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {FadingScrollbar} from 'Components/FadingScrollbar';
+import {MentionSuggestionsItem} from 'Components/InputBar/components/MentionSuggestions/MentionSuggestionsItem';
+import {IgnoreOutsideClickWrapper} from 'Components/InputBar/util/clickHandlers';
 
 import {LexicalTypeaheadMenuPlugin} from './LexicalTypeheadMenuPlugin';
 
 import {User} from '../../../entity/User';
-import {useDebounce} from '../hooks/useDebounce';
 import {useIsFocused} from '../hooks/useIsFocused';
-import {useMentionLookupService} from '../hooks/useMentionLookupService';
 import {$createBeautifulMentionNode, $isBeautifulMentionNode, BeautifulMentionNode} from '../nodes/MentionNode';
-import {BeautifulMentionsPluginProps} from '../types/BeautifulMentionsPluginProps';
 import {
   INSERT_MENTION_COMMAND,
   OPEN_MENTIONS_MENU_COMMAND,
@@ -65,9 +62,6 @@ import {
   isWordChar,
 } from '../utils/mention-utils';
 
-// At most, 5 suggestions are shown in the popup.
-const SUGGESTION_LIST_LENGTH_LIMIT = 5;
-
 export class MenuOption extends _MenuOption {
   user: User;
   value: string;
@@ -80,28 +74,18 @@ export class MenuOption extends _MenuOption {
   }
 }
 
-/**
- * A plugin that adds mentions to the lexical editor.
- */
-export function BeautifulMentionsPlugin(props: BeautifulMentionsPluginProps) {
-  const {
-    items,
-    onSearch,
-    searchDelay = props.onSearch ? 250 : 0,
-    creatable,
-    allowSpaces = true,
-    insertOnBlur = true,
-    menuComponent: MenuComponent = 'ul',
-    menuItemComponent: MenuItemComponent = 'li',
-    menuAnchorClassName,
-  } = props;
+interface BeautifulMentionsPluginProps {
+  onSearch: (queryString?: string | null) => User[];
+}
+
+export const BeautifulMentionsPlugin = ({onSearch}: BeautifulMentionsPluginProps) => {
   const isEditorFocused = useIsFocused();
-  const triggers = useMemo(() => props.triggers || Object.keys(items || {}), [props.triggers, items]);
+  const triggers = useMemo(() => ['@'], []);
   const [editor] = useLexicalComposerContext();
   const [queryString, setQueryString] = useState<string | null>(null);
-  const debouncedQueryString = useDebounce(queryString, searchDelay);
   const [trigger, setTrigger] = useState<string | null>(null);
-  const {results, loading} = useMentionLookupService(debouncedQueryString, trigger, items, onSearch);
+
+  const results = onSearch(queryString);
 
   const checkForSlashTriggerMatch = useBasicTypeaheadTriggerMatch('/', {
     minLength: 0,
@@ -110,10 +94,8 @@ export function BeautifulMentionsPlugin(props: BeautifulMentionsPluginProps) {
 
   const options = useMemo(() => {
     // Add options from the lookup service
-    return results.map(result => new MenuOption(result, result.name())).slice(0, SUGGESTION_LIST_LENGTH_LIMIT);
+    return results.map(result => new MenuOption(result, result.name()));
   }, [results]);
-
-  const open = isEditorFocused && (!!options.length || loading);
 
   const handleClose = useCallback(() => {
     setTrigger(null);
@@ -148,7 +130,7 @@ export function BeautifulMentionsPlugin(props: BeautifulMentionsPluginProps) {
         return null;
       }
 
-      const queryMatch = checkForMentions(text, triggers, allowSpaces);
+      const queryMatch = checkForMentions(text, triggers, true);
       if (queryMatch) {
         const {replaceableString, matchingString} = queryMatch;
         const index = replaceableString.lastIndexOf(matchingString);
@@ -165,7 +147,7 @@ export function BeautifulMentionsPlugin(props: BeautifulMentionsPluginProps) {
       }
       return null;
     },
-    [checkForSlashTriggerMatch, editor, triggers, allowSpaces],
+    [checkForSlashTriggerMatch, editor, triggers],
   );
 
   const insertTextAsMention = useCallback(() => {
@@ -173,7 +155,7 @@ export function BeautifulMentionsPlugin(props: BeautifulMentionsPluginProps) {
     if (!info || !info.isTextNode) {
       return false;
     }
-    const node = info.node;
+    const {node} = info;
     const textContent = node.getTextContent();
     const queryMatch = checkForMentions(textContent, triggers, false);
     if (queryMatch && queryMatch.replaceableString.length > 1) {
@@ -207,6 +189,8 @@ export function BeautifulMentionsPlugin(props: BeautifulMentionsPluginProps) {
       $setSelection(null);
     }
   }, []);
+
+  const rootElement = editor.getRootElement();
 
   useEffect(() => {
     return mergeRegister(
@@ -248,26 +232,6 @@ export function BeautifulMentionsPlugin(props: BeautifulMentionsPluginProps) {
           if ($isBeautifulMentionNode(node) && nextNode === null) {
             node.insertAfter($createTextNode(' '));
             return true;
-          }
-          return false;
-        },
-        COMMAND_PRIORITY_LOW,
-      ),
-      editor.registerCommand(
-        BLUR_COMMAND,
-        () => {
-          if (insertOnBlur && creatable) {
-            return insertTextAsMention();
-          }
-          return false;
-        },
-        COMMAND_PRIORITY_LOW,
-      ),
-      editor.registerCommand(
-        KEY_SPACE_COMMAND,
-        () => {
-          if (!allowSpaces && creatable) {
-            return insertTextAsMention();
           }
           return false;
         },
@@ -343,72 +307,66 @@ export function BeautifulMentionsPlugin(props: BeautifulMentionsPluginProps) {
         COMMAND_PRIORITY_LOW,
       ),
     );
-  }, [
-    editor,
-    triggers,
-    allowSpaces,
-    insertOnBlur,
-    creatable,
-    isEditorFocused,
-    insertTextAsMention,
-    setSelection,
-    archiveSelection,
-  ]);
+  }, [editor, triggers, isEditorFocused, insertTextAsMention, setSelection, archiveSelection]);
 
   return (
-    <LexicalTypeaheadMenuPlugin<MenuOption>
+    <LexicalTypeaheadMenuPlugin
       onQueryChange={setQueryString}
       onSelectOption={handleSelectOption}
       triggerFn={checkForMentionMatch}
       options={options}
-      anchorClassName={menuAnchorClassName}
       onClose={handleClose}
-      menuRenderFn={(anchorElementRef, {selectedIndex, selectOptionAndCleanUp, setHighlightedIndex}) =>
-        anchorElementRef.current
-          ? ReactDOM.createPortal(
-              <MenuComponent
-                loading={loading}
-                open={open}
-                role="menu"
-                aria-label="Choose a mention"
-                aria-hidden={!open}
-              >
-                {options.map((option, i) => {
-                  return (
-                    <MenuItemComponent
-                      key={option.key}
-                      tabIndex={-1}
-                      selected={selectedIndex === i}
-                      ref={option.setRefElement}
-                      role="menuitem"
-                      // aria-selected={selectedIndex === i}
-                      aria-label={`Choose ${option.label}`}
-                      label={option.label}
-                      onClick={() => {
-                        setHighlightedIndex(i);
-                        selectOptionAndCleanUp(option);
-                      }}
-                      onMouseDown={event => {
-                        event.preventDefault();
-                      }}
-                      onMouseEnter={() => {
-                        setHighlightedIndex(i);
-                      }}
-                    >
-                      <Avatar
-                        participant={option.user}
-                        avatarSize={AVATAR_SIZE.XXX_SMALL}
-                        className="mention-suggestion-list__item__avatar"
+      menuRenderFn={(anchorElementRef, {selectedIndex, selectOptionAndCleanUp, setHighlightedIndex}) => {
+        if (!anchorElementRef.current || !options.length) {
+          return null;
+        }
+
+        const getPosition = () => {
+          if (!rootElement) {
+            return {bottom: 0, left: 0};
+          }
+
+          const boundingClientRect = rootElement.getBoundingClientRect();
+
+          return {bottom: window.innerHeight - boundingClientRect.top + 24, left: boundingClientRect.left};
+        };
+
+        const {bottom, left} = getPosition();
+
+        return ReactDOM.createPortal(
+          <IgnoreOutsideClickWrapper>
+            <FadingScrollbar
+              className="conversation-input-bar-mention-suggestion"
+              style={{bottom, left, overflowY: 'auto'}}
+              data-uie-name="list-mention-suggestions"
+            >
+              <div className="mention-suggestion-list">
+                {options
+                  .map((option, index) => {
+                    const selected = selectedIndex === index;
+                    return (
+                      <MentionSuggestionsItem
+                        ref={option.setRefElement}
+                        key={option.user.id}
+                        suggestion={option.user}
+                        isSelected={selected}
+                        onSuggestionClick={() => {
+                          setHighlightedIndex(index);
+                          selectOptionAndCleanUp(option);
+                        }}
+                        onMouseEnter={() => {
+                          setHighlightedIndex(index);
+                        }}
                       />
-                      {option.label}
-                    </MenuItemComponent>
-                  );
-                })}
-              </MenuComponent>,
-              anchorElementRef.current,
-            )
-          : null
-      }
+                    );
+                  })
+                  .reverse()}
+              </div>
+            </FadingScrollbar>
+          </IgnoreOutsideClickWrapper>,
+          anchorElementRef.current,
+        );
+      }}
     />
   );
-}
+};

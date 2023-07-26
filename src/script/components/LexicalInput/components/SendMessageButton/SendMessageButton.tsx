@@ -72,6 +72,13 @@ export const SendMessageButton = ({textValue, onSend, mentions}: SendMessageButt
     const removeListener = editor.registerCommand(
       KEY_ENTER_COMMAND,
       event => {
+        const isMentionsDropdownActive = document.querySelector('.conversation-input-bar-mention-suggestion');
+        const isEmojisDropdownActive = document.querySelector('.emoji-menu');
+
+        if (isMentionsDropdownActive || isEmojisDropdownActive) {
+          return false;
+        }
+
         if (event?.shiftKey) {
           return true;
         }
@@ -81,6 +88,7 @@ export const SendMessageButton = ({textValue, onSend, mentions}: SendMessageButt
         editor.update(() => {
           $getRoot().clear();
         });
+
         return false;
       },
       COMMAND_PRIORITY_LOW,

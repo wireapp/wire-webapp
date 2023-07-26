@@ -86,6 +86,7 @@ export type MenuRenderFn<TOption extends TypeaheadOption> = (
 
 const scrollIntoViewIfNeeded = (target: HTMLElement) => {
   const typeaheadContainerNode = document.getElementById('typeahead-menu');
+
   if (!typeaheadContainerNode) {
     return;
   }
@@ -395,9 +396,22 @@ function LexicalPopoverMenu<TOption extends TypeaheadOption>({
   }, [editor, updateSelectedIndex]);
 
   useEffect(() => {
+    if (menuVisible && typeof selectedIndex === 'number' && options?.[selectedIndex]) {
+      const currentSelectedOption = options[selectedIndex];
+
+      // Using setTimeout because we need to wait for popover render
+      setTimeout(() => {
+        if (currentSelectedOption.ref != null && currentSelectedOption.ref.current) {
+          scrollIntoViewIfNeeded(currentSelectedOption.ref.current);
+        }
+      }, 0);
+    }
+  }, [editor, menuVisible, selectedIndex, options]);
+
+  useEffect(() => {
     return mergeRegister(
       editor.registerCommand<KeyboardEvent>(
-        KEY_ARROW_DOWN_COMMAND,
+        KEY_ARROW_UP_COMMAND,
         payload => {
           const event = payload;
           if (options !== null && options.length && selectedIndex !== null) {
@@ -418,7 +432,7 @@ function LexicalPopoverMenu<TOption extends TypeaheadOption>({
         COMMAND_PRIORITY_LOW,
       ),
       editor.registerCommand<KeyboardEvent>(
-        KEY_ARROW_UP_COMMAND,
+        KEY_ARROW_DOWN_COMMAND,
         payload => {
           const event = payload;
           if (options !== null && options.length && selectedIndex !== null) {

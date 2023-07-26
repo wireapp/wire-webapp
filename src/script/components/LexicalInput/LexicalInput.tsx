@@ -37,12 +37,12 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {EditMessage} from './components/EditMessage';
 import {SendMessageButton} from './components/SendMessageButton';
 import {BeautifulMentionNode} from './nodes/MentionNode';
+import {AutoFocusPlugin} from './plugins/AutoFocusPlugin';
 import {BeautifulMentionsPlugin} from './plugins/BeautifulMentionsPlugin';
 import {DraftStatePlugin} from './plugins/DraftStatePlugin';
 import {EmojiPickerPlugin} from './plugins/EmojiPickerPlugin';
 import {EditorRefPlugin} from './plugins/LexicalEditorRefPlugin';
 import './tempStyle.less';
-import {BeautifulMentionsMenuItemProps, BeautifulMentionsMenuProps} from './types/BeautifulMentionsPluginProps';
 
 import {Conversation} from '../../entity/Conversation';
 import {MentionEntity} from '../../message/MentionEntity';
@@ -60,22 +60,6 @@ const theme = {
     '@Focused': 'focused-beautiful-mentions', // add the "Focused" suffix to style the focused mention
   },
 };
-
-const Menu = forwardRef<HTMLUListElement, BeautifulMentionsMenuProps>(({open, loading, ...props}, ref) => (
-  <ul className="mention-suggestion-list" {...props} ref={ref} />
-));
-
-Menu.displayName = 'Menu';
-
-const MenuItem = forwardRef<HTMLLIElement, BeautifulMentionsMenuItemProps>(({selected, ...props}, ref) => (
-  <li
-    className={`mention-suggestion-list__item ${selected ? 'mention-suggestion-list__item--highlighted' : ''}`}
-    {...props}
-    ref={ref}
-  />
-));
-
-MenuItem.displayName = 'MenuItem';
 
 interface LexicalInputProps {
   readonly conversationEntity: Conversation;
@@ -133,8 +117,8 @@ export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
       nodes: [BeautifulMentionNode, BeautifulMentionNode],
     };
 
-    const queryMentions = (_trigger: string, queryString?: string | null) => {
-      return queryString ? searchRepository.searchUserInSet(queryString, candidates) : [];
+    const queryMentions = (queryString?: string | null) => {
+      return queryString ? searchRepository.searchUserInSet(queryString, candidates) : candidates;
     };
 
     useEffect(() => {
@@ -149,6 +133,7 @@ export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
         <div className="controls-center">
           <div css={{width: '100%'}} className={cx('input-bar--wrapper')}>
             <div className="editor-container">
+              <AutoFocusPlugin />
               <EditorRefPlugin editorRef={ref} />
               {/* Connect this with DraftStateUtil.ts */}
               <DraftStatePlugin setInputValue={setInputValue} loadDraftStateLexical={loadDraftStateLexical} />
@@ -162,12 +147,7 @@ export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
                 ErrorBoundary={LexicalErrorBoundary}
               />
 
-              <BeautifulMentionsPlugin
-                onSearch={queryMentions}
-                triggers={['@']}
-                menuComponent={Menu}
-                menuItemComponent={MenuItem}
-              />
+              <BeautifulMentionsPlugin onSearch={queryMentions} />
 
               <OnChangePlugin
                 onChange={(editorState, lexicalEditor) => {

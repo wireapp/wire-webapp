@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useCallback, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {useLexicalNodeSelection} from '@lexical/react/useLexicalNodeSelection';
@@ -61,7 +61,7 @@ export const Mention = (props: BeautifulMentionComponentProps) => {
   const [isSelected, setSelected, clearSelection] = useLexicalNodeSelection(nodeKey);
   const [selection, setSelection] = useState<RangeSelection | NodeSelection | GridSelection | null>(null);
   const isFocused = $isNodeSelection(selection) && isSelected;
-  const ref = React.useRef(null);
+  const ref = useRef(null);
 
   const classNameFinal = useMemo(() => {
     const classes = [className];
@@ -182,7 +182,7 @@ export const Mention = (props: BeautifulMentionComponentProps) => {
     return false;
   }, [isSelected, setSelected]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     let isMounted = true;
     const unregister = mergeRegister(
       editor.registerUpdateListener(({editorState}) => {
