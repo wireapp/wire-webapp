@@ -32,10 +32,9 @@ import {LexicalEditor} from 'lexical';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {User} from 'src/script/entity/User';
 
 import {EditMessage} from './components/EditMessage';
-import {SendMessageButton} from './components/SendMessageButton';
 import {BeautifulMentionNode} from './nodes/MentionNode';
 import {AutoFocusPlugin} from './plugins/AutoFocusPlugin';
 import {BeautifulMentionsPlugin} from './plugins/BeautifulMentionsPlugin';
@@ -44,7 +43,6 @@ import {EmojiPickerPlugin} from './plugins/EmojiPickerPlugin';
 import {EditorRefPlugin} from './plugins/LexicalEditorRefPlugin';
 import './tempStyle.less';
 
-import {Conversation} from '../../entity/Conversation';
 import {MentionEntity} from '../../message/MentionEntity';
 import {PropertiesRepository} from '../../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
@@ -62,7 +60,6 @@ const theme = {
 };
 
 interface LexicalInputProps {
-  readonly conversationEntity: Conversation;
   currentMentions: MentionEntity[];
   readonly propertiesRepository: PropertiesRepository;
   readonly searchRepository: SearchRepository;
@@ -75,23 +72,23 @@ interface LexicalInputProps {
   hasLocalEphemeralTimer: boolean;
   saveDraftStateLexical: any;
   loadDraftStateLexical: any;
+  mentionCandidates: User[];
 }
 
 export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
   (
     {
-      conversationEntity,
       placeholder,
       propertiesRepository,
       searchRepository,
       inputValue,
       setInputValue,
       children,
-      sendMessage,
       hasLocalEphemeralTimer,
       saveDraftStateLexical,
       loadDraftStateLexical,
       editMessage,
+      mentionCandidates,
     },
     ref,
   ) => {
@@ -99,12 +96,6 @@ export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
     const [shouldReplaceEmoji, setShouldReplaceEmoji] = useState<boolean>(
       propertiesRepository.getPreference(PROPERTIES_TYPE.EMOJI.REPLACE_INLINE),
     );
-
-    // Mentions
-    const {participating_user_ets: participatingUserEts} = useKoSubscribableChildren(conversationEntity, [
-      'participating_user_ets',
-    ]);
-    const candidates = participatingUserEts.filter(userEntity => !userEntity.isService);
 
     const editorConfig: InitialConfigType = {
       namespace: 'WireLexicalEditor',
@@ -118,7 +109,7 @@ export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
     };
 
     const queryMentions = (queryString?: string | null) => {
-      return queryString ? searchRepository.searchUserInSet(queryString, candidates) : candidates;
+      return queryString ? searchRepository.searchUserInSet(queryString, mentionCandidates) : mentionCandidates;
     };
 
     useEffect(() => {
@@ -164,8 +155,6 @@ export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
         </div>
 
         {children}
-
-        <SendMessageButton textValue={inputValue} onSend={sendMessage} mentions={candidates} />
       </LexicalComposer>
     );
   },
