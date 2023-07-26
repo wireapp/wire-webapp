@@ -563,7 +563,6 @@ const InputBar = ({
                 inputValue={inputValue}
                 setInputValue={setInputValue}
                 currentMentions={currentMentions}
-                sendMessage={onSend}
                 hasLocalEphemeralTimer={hasLocalEphemeralTimer}
                 saveDraftStateLexical={saveDraft}
                 loadDraftStateLexical={loadDraft}
@@ -573,7 +572,7 @@ const InputBar = ({
                     <ul className="controls-right buttons-group" css={{minWidth: '95px'}}>
                       {showGiphyButton && <GiphyButton onGifClick={onGifClick} />}
                     </ul>
-                    <SendMessageButton textValue={inputValue} onSend={sendMessage} mentions={mentionCandidates} />
+                    <SendMessageButton textValue={inputValue} onSend={onSend} mentions={mentionCandidates} />
                     <ul className="controls-right buttons-group" css={{justifyContent: 'center', width: '100%'}}>
                       <ControlButtons {...controlButtonsProps} isScaledDown={isScaledDown} />
                     </ul>
@@ -583,7 +582,7 @@ const InputBar = ({
                     <ul className="controls-right buttons-group">
                       <ControlButtons {...controlButtonsProps} showGiphyButton={showGiphyButton} />
                     </ul>
-                    <SendMessageButton textValue={inputValue} onSend={sendMessage} mentions={mentionCandidates} />
+                    <SendMessageButton textValue={inputValue} onSend={onSend} mentions={mentionCandidates} />
                   </>
                 )}
               </LexicalInput>

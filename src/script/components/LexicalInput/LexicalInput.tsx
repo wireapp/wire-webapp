@@ -68,7 +68,6 @@ interface LexicalInputProps {
   setInputValue: (text: string) => void;
   editMessage: (messageEntity: ContentMessage, editor: LexicalEditor) => void;
   children: any;
-  sendMessage: any;
   hasLocalEphemeralTimer: boolean;
   saveDraftStateLexical: any;
   loadDraftStateLexical: any;
