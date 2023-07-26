@@ -28,6 +28,7 @@ import {messageReactionWrapper} from './MessageReactions.styles';
 export interface MessageReactionsListProps {
   reactions: Reactions;
   handleReactionClick: (emoji: string) => void;
+  selectedEmojiurl: string;
   isMessageFocused: boolean;
   onTooltipReactionCountClick: () => void;
   onLastReactionKeyEvent: () => void;

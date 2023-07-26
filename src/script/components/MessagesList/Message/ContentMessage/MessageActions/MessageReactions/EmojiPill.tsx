@@ -49,6 +49,7 @@ export interface EmojiPillProps {
   isRemovedFromConversation: boolean;
   index: number;
   emojiListCount: number;
+  selectedEmojiurl: string;
 }
 
 const EmojiPill: FC<EmojiPillProps> = ({
@@ -62,13 +63,13 @@ const EmojiPill: FC<EmojiPillProps> = ({
   isRemovedFromConversation,
   index,
   emojiListCount,
+  selectedEmojiurl,
 }) => {
-  const [isSelectedEmoji, setSelected] = useState('');
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
   const [isOpen, setTooltipVisibility] = useState(false);
   const emojiUrl = getEmojiUrl(emojiUnicode);
   const emojiName = getEmojiTitleFromEmojiUnicode(emojiUnicode);
-  const isActive = isSelectedEmoji === emojiUrl && !isRemovedFromConversation;
+  const isActive = selectedEmojiurl === emojiUrl && !isRemovedFromConversation;
 
   const showTooltip = () => {
     setTooltipVisibility(true);
@@ -111,7 +112,6 @@ const EmojiPill: FC<EmojiPillProps> = ({
           className="button-reset-default"
           data-uie-name="emoji-pill"
           onClick={() => {
-            setSelected(emojiUrl);
             handleReactionClick(emoji);
           }}
           onKeyDown={event => {
