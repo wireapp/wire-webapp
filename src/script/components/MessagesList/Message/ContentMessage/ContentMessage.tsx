@@ -150,24 +150,22 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   const reactionsTotalCount = Array.from(reactionGroupedByUser).length;
 
   const isUserRemovingReaction = (reaction: ReactionType): boolean => {
-    const reactions = message.reactions();
     const userId = selfId.id;
     const userReactions = reactions[userId] || '';
 
-    if (userReactions) {
-      const reactionsArr = userReactions.split(',');
-      const reactionIndex = reactionsArr.indexOf(reaction);
-      return reactionIndex !== -1;
-    }
     // first time reacted
-    return false;
+    if (!userReactions) {
+      return false;
+    }
+    const reactionsArr = userReactions.split(',');
+    return reactionsArr.includes(reaction);
   };
-  const [selectedEmojiurl, setSelected] = useState('');
+  const [selectedEmojiurl, setSelectedEmojiUrl] = useState('');
 
   const handleReactionClick = (reaction: ReactionType) => {
     const emojiUnicode = getEmojiUnicode(reaction);
     const emojiUrl = getEmojiUrl(emojiUnicode);
-    setSelected(isUserRemovingReaction(reaction) ? '' : emojiUrl);
+    setSelectedEmojiUrl(isUserRemovingReaction(reaction) ? '' : emojiUrl);
     onClickReaction(reaction);
   };
 
