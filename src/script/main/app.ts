@@ -80,7 +80,6 @@ import {IntegrationService} from '../integration/IntegrationService';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {MediaRepository} from '../media/MediaRepository';
 import {initMLSCallbacks, initMLSConversations, registerUninitializedSelfAndTeamConversations} from '../mls';
-import {initialisePeriodicSelfSupportedProtocolsCheck} from '../mls/supportedProtocols';
 import {NotificationRepository} from '../notification/NotificationRepository';
 import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
 import {PermissionRepository} from '../permission/PermissionRepository';
@@ -88,6 +87,7 @@ import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PropertiesService} from '../properties/PropertiesService';
 import {SearchRepository} from '../search/SearchRepository';
 import {SearchService} from '../search/SearchService';
+import {SelfRepository} from '../self/SelfRepository';
 import {SelfService} from '../self/SelfService';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
@@ -263,6 +263,8 @@ export class App {
       serverTimeHandler,
     );
 
+    repositories.self = new SelfRepository(selfService, repositories.user, repositories.team, repositories.client);
+
     repositories.eventTracker = new EventTrackingRepository(repositories.message);
 
     const serviceMiddleware = new ServiceMiddleware(repositories.conversation, repositories.user);
@@ -360,6 +362,7 @@ export class App {
         properties: propertiesRepository,
         team: teamRepository,
         user: userRepository,
+        self: selfRepository,
       } = this.repository;
       await checkIndexedDb();
       onProgress(2.5);
@@ -460,10 +463,7 @@ export class App {
       await conversationRepository.conversationLabelRepository.loadLabels();
 
       if (supportsSelfSupportedProtocolsUpdates()) {
-        await initialisePeriodicSelfSupportedProtocolsCheck(selfUser, {
-          userRepository: this.repository.user,
-          teamRepository: this.repository.team,
-        });
+        await selfRepository.initialisePeriodicSelfSupportedProtocolsCheck();
       }
 
       amplify.publish(WebAppEvents.LIFECYCLE.LOADED);

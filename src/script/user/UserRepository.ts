@@ -758,14 +758,12 @@ export class UserRepository {
   }
 
   /**
-   * Change supported protocols.
-   * It will send a request to the backend to change the supported protocols and then update the user in the local state.
+   * Will update user entity with provided list of supportedProtocols .
+   * @param userId - id of the user to update
    * @param supportedProtocols - an array of new supported protocols
    */
-  async changeSupportedProtocols(supportedProtocols: ConversationProtocol[]): Promise<User> {
-    this.logger.info('Supported protocols will get updated to:', supportedProtocols);
-    await this.selfService.putSupportedProtocols(supportedProtocols);
-    return this.updateUser(this.userState.self().qualifiedId, {supported_protocols: supportedProtocols});
+  async updateUserSupportedProtocols(userId: QualifiedId, supportedProtocols: ConversationProtocol[]): Promise<User> {
+    return this.updateUser(userId, {supported_protocols: supportedProtocols});
   }
 
   getSelfSupportedProtocols(): ConversationProtocol[] | null {
