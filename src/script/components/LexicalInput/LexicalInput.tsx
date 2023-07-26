@@ -75,6 +75,7 @@ interface LexicalInputProps {
   hasLocalEphemeralTimer: boolean;
   saveDraftStateLexical: any;
   loadDraftStateLexical: any;
+  onShiftTab: any;
 }
 
 export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
@@ -92,6 +93,7 @@ export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
       saveDraftStateLexical,
       loadDraftStateLexical,
       editMessage,
+      onShiftTab,
     },
     ref,
   ) => {

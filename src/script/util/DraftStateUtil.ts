@@ -17,6 +17,8 @@
  *
  */
 
+import {LexicalEditor} from 'lexical';
+
 import {generateConversationInputStorageKey} from 'Util/util';
 
 import {MessageRepository} from '../conversation/MessageRepository';
@@ -96,25 +98,29 @@ export const loadDraftState = async (
 export const saveDraftStateLexical = async (
   storageRepository: StorageRepository,
   conversationEntity: Conversation,
-  data: any,
-  // draftMessage: DraftMessage,
+  editorState: LexicalEditor,
+  replyMessageId?: string,
 ): Promise<void> => {
   // we only save state for newly written messages
-  // const storeReply = draftMessage.reply?.id ? {messageId: draftMessage.reply.id} : {};
+  const storeReply = replyMessageId;
   const storageKey = generateConversationInputStorageKey(conversationEntity);
 
   await storageRepository.storageService.saveToSimpleStorage<any>(storageKey, {
-    editorState: data,
-    // mentions: draftMessage.mentions,
-    // reply: storeReply,
+    editorState,
+    replyId: storeReply,
   });
 };
+
+export interface DraftState {
+  editorState: string | null;
+  messageReply?: Promise<ContentMessage>;
+}
 
 export const loadDraftStateLexical = async (
   conversationEntity: Conversation,
   storageRepository: StorageRepository,
-  // messageRepository: MessageRepository,
-): Promise<any> => {
+  messageRepository: MessageRepository,
+): Promise<DraftState> => {
   const storageKey = generateConversationInputStorageKey(conversationEntity);
   const storageValue = await storageRepository.storageService.loadFromSimpleStorage<any>(storageKey);
 
@@ -122,25 +128,17 @@ export const loadDraftStateLexical = async (
     return {editorState: null};
   }
 
-  // if (typeof storageValue === 'string') {
-  //   return {mentions: [], text: storageValue};
-  // }
-  //
-  // const draftMessage: DraftMessage = {
-  //   mentions: storageValue.mentions.map(
-  //     mention => new MentionEntity(mention.startIndex, mention.length, mention.userId, mention.domain),
-  //   ),
-  //   text: storageValue.text,
-  // };
-  //
-  // const replyMessageId = storageValue.reply.messageId;
-  //
-  // if (replyMessageId) {
-  //   const message =
-  //     (await messageRepository.getMessageInConversationById(conversationEntity, replyMessageId)) ||
-  //     (await messageRepository.getMessageInConversationByReplacementId(conversationEntity, replyMessageId));
-  //   draftMessage.replyEntityPromise = messageRepository.ensureMessageSender(message) as Promise<ContentMessage>;
-  // }
+  const replyMessageId = storageValue?.replyId;
 
-  return storageValue;
+  let messageReply = null;
+
+  if (replyMessageId) {
+    const message =
+      (await messageRepository.getMessageInConversationById(conversationEntity, replyMessageId)) ||
+      (await messageRepository.getMessageInConversationByReplacementId(conversationEntity, replyMessageId));
+
+    messageReply = messageRepository.ensureMessageSender(message) as Promise<ContentMessage>;
+  }
+
+  return {...storageValue, messageReply};
 };

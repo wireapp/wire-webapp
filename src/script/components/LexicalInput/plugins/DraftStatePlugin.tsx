@@ -21,6 +21,8 @@ import {useCallback, useEffect} from 'react';
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 
+import {DraftState} from 'Util/DraftStateUtil';
+
 import {getTextValue} from '../utils/getTextValue';
 
 interface DraftStatePluginProps {
@@ -32,7 +34,7 @@ export const DraftStatePlugin = ({loadDraftStateLexical, setInputValue}: DraftSt
   const [editor] = useLexicalComposerContext();
 
   const getDraftState = useCallback(async () => {
-    const draftState = await loadDraftStateLexical();
+    const draftState: DraftState = await loadDraftStateLexical();
 
     if (draftState.editorState) {
       const initialEditorState = editor.parseEditorState(draftState.editorState);
@@ -44,7 +46,7 @@ export const DraftStatePlugin = ({loadDraftStateLexical, setInputValue}: DraftSt
   }, [editor, loadDraftStateLexical, setInputValue]);
 
   useEffect(() => {
-    getDraftState(); // eslint-disable-line @typescript-eslint/no-floating-promises
+    void getDraftState();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return null;
