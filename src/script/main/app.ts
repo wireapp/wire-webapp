@@ -80,7 +80,6 @@ import {IntegrationService} from '../integration/IntegrationService';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {MediaRepository} from '../media/MediaRepository';
 import {initMLSCallbacks, initMLSConversations, registerUninitializedSelfAndTeamConversations} from '../mls';
-import {initialisePeriodicSelfSupportedProtocolsCheck} from '../mls/supportedProtocols';
 import {NotificationRepository} from '../notification/NotificationRepository';
 import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
 import {PermissionRepository} from '../permission/PermissionRepository';
