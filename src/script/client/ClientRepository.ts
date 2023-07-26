@@ -39,6 +39,7 @@ import {constructClientId, parseClientId} from './ClientIdUtil';
 import {ClientMapper} from './ClientMapper';
 import type {ClientService} from './ClientService';
 import {ClientState} from './ClientState';
+import {wasClientActiveWithinLast4Weeks} from './ClientUtils';
 
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
@@ -396,9 +397,16 @@ export class ClientRepository {
    * @returns Resolves when the clients have been updated
    */
   async updateClientsForSelf(): Promise<ClientEntity[]> {
-    const clientsData = await this.clientService.getClients();
+    const clientsData = await this.getAllSelfClients();
     const {domain, id} = this.selfUser();
     return this.updateUserClients({domain, id}, clientsData, false);
+  }
+
+  /**
+   * Fetches metadata of all the self user's clients.
+   */
+  public async getAllSelfClients(): Promise<RegisteredClient[]> {
+    return this.clientService.getClients();
   }
 
   /**
@@ -575,5 +583,12 @@ export class ClientRepository {
       );
     }
     amplify.publish(WebAppEvents.CLIENT.REMOVE, this.selfUser().qualifiedId, clientId);
+  }
+
+  public async haveAllActiveSelfClientsRegisteredMLSDevice(): Promise<boolean> {
+    const selfClients = await this.getAllSelfClients();
+    //we consider client active if it was active within last 4 weeks
+    const activeClients = selfClients.filter(wasClientActiveWithinLast4Weeks);
+    return activeClients.every(client => !!client.mls_public_keys);
   }
 }
