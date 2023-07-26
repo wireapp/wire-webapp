@@ -27,7 +27,7 @@ import {PlainTextPlugin} from '@lexical/react/LexicalPlainTextPlugin';
 import type {WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
 import cx from 'classnames';
-import {LexicalEditor} from 'lexical';
+import {EditorState, LexicalEditor} from 'lexical';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -70,7 +70,7 @@ interface LexicalInputProps {
   editMessage: (messageEntity: ContentMessage, editor: LexicalEditor) => void;
   children: React.ReactNode;
   hasLocalEphemeralTimer: boolean;
-  saveDraftStateLexical: any;
+  saveDraftStateLexical: (editor: EditorState) => Promise<void>;
   loadDraftStateLexical: () => Promise<DraftState>;
   mentionCandidates: User[];
   onShiftTab: any;
@@ -143,13 +143,11 @@ export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
               <BeautifulMentionsPlugin onSearch={queryMentions} />
 
               <OnChangePlugin
-                onChange={(editorState, lexicalEditor) => {
+                onChange={async (editorState, lexicalEditor) => {
                   lexicalEditor.registerTextContentListener(textContent => {
                     setInputValue(textContent);
                   });
-
-                  const stringifyEditor = JSON.stringify(editorState.toJSON());
-                  saveDraftStateLexical(stringifyEditor);
+                  await saveDraftStateLexical(editorState);
                 }}
               />
             </div>

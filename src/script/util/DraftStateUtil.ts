@@ -17,7 +17,7 @@
  *
  */
 
-import {LexicalEditor} from 'lexical';
+import {EditorState} from 'lexical';
 
 import {generateConversationInputStorageKey} from 'Util/util';
 
@@ -98,7 +98,7 @@ export const loadDraftState = async (
 export const saveDraftStateLexical = async (
   storageRepository: StorageRepository,
   conversationEntity: Conversation,
-  editorState: LexicalEditor,
+  editorState: EditorState,
   replyMessageId?: string,
 ): Promise<void> => {
   // we only save state for newly written messages

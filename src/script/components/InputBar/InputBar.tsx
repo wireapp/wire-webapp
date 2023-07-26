@@ -21,7 +21,7 @@ import {useEffect, useRef, useState} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
-import {$createParagraphNode, $createTextNode, $getRoot, $setSelection, LexicalEditor} from 'lexical';
+import {$createParagraphNode, $createTextNode, $getRoot, $setSelection, EditorState, LexicalEditor} from 'lexical';
 import {container} from 'tsyringe';
 
 import {useMatchMedia} from '@wireapp/react-ui-kit';
@@ -446,7 +446,7 @@ const InputBar = ({
     hasUserTyped.current = false;
   }, [conversationEntity]);
 
-  const saveDraft = async (editor: any) => {
+  const saveDraft = async (editor: EditorState) => {
     await saveDraftStateLexical(storageRepository, conversationEntity, editor, replyMessageEntity?.id);
   };
 
