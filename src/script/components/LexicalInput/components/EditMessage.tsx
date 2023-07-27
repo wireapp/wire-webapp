@@ -44,5 +44,5 @@ export const EditMessage = ({onMessageEdit}: EditMessageProps) => {
     };
   }, [editor]);
 
-  return null;
+  return <></>;
 };

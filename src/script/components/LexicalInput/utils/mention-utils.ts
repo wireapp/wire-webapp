@@ -26,6 +26,7 @@ import {
   $isTextNode,
   LexicalNode,
   TextNode,
+  RangeSelection,
 } from 'lexical';
 
 import {$createBeautifulMentionNode} from '../nodes/MentionNode';
@@ -80,17 +81,31 @@ export function isWordChar(char: string, triggers: string[]) {
   return new RegExp(VALID_CHARS(triggers)).test(char);
 }
 
-export function getSelectionInfo(triggers: string[]) {
+type SelectionInfo = {
+  node: LexicalNode;
+  offset: number;
+  isTextNode: boolean;
+  textContent: string;
+  selection: RangeSelection;
+  prevNode: LexicalNode | null;
+  nextNode: LexicalNode | null;
+  cursorAtStartOfNode: boolean;
+  cursorAtEndOfNode: boolean;
+  wordCharBeforeCursor: boolean;
+  wordCharAfterCursor: boolean;
+};
+
+export function getSelectionInfo(triggers: string[]): SelectionInfo | undefined {
   const selection = $getSelection();
   if (!selection || !$isRangeSelection(selection)) {
-    return;
+    return undefined;
   }
 
   const anchor = selection.anchor;
   const focus = selection.focus;
   const nodes = selection.getNodes();
   if (anchor.key !== focus.key || anchor.offset !== focus.offset || nodes.length === 0) {
-    return;
+    return undefined;
   }
 
   const [node] = nodes;

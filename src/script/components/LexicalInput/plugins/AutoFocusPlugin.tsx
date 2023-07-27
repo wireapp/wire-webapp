@@ -30,5 +30,5 @@ export const AutoFocusPlugin = ({defaultSelection = 'rootEnd'}: AutoFocusPluginP
 
   useTextAreaFocus(() => editor.focus(() => undefined, {defaultSelection}));
 
-  return null;
+  return <></>;
 };

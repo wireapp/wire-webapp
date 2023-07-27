@@ -37,5 +37,5 @@ export const EditorRefPlugin = ({editorRef}: EditorRefPluginProps) => {
     }
   }
 
-  return null;
+  return <></>;
 };

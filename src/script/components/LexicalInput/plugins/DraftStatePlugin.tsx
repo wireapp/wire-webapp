@@ -49,5 +49,5 @@ export const DraftStatePlugin = ({loadDraftState, setInputValue}: DraftStatePlug
     void getDraftState();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  return null;
+  return <></>;
 };

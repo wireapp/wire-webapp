@@ -65,7 +65,7 @@ export const GlobalEventsPlugin = ({onShiftTab}: GlobalEventsPluginProps) => {
     );
   }, [editor, onShiftTab]);
 
-  return null;
+  return <></>;
 };
 
 // Example of usage global commands
