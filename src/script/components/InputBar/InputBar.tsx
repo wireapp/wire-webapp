@@ -39,7 +39,7 @@ import {ConversationRepository} from 'src/script/conversation/ConversationReposi
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from 'src/script/user/TypingIndicatorMode';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {loadDraftStateLexical, saveDraftStateLexical} from 'Util/DraftStateUtil';
+import {loadDraftState, saveDraftState} from 'Util/DraftStateUtil';
 import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatLocale, TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -226,10 +226,7 @@ const InputBar = ({
   };
 
   const handleCancelReply = () => {
-    // if (!mentionSuggestions.length) {
     cancelMessageReply(false);
-    // }
-    // textareaRef.current?.focus();
   };
 
   const editMessage = (messageEntity: ContentMessage, editor: LexicalEditor) => {
@@ -446,8 +443,8 @@ const InputBar = ({
     hasUserTyped.current = false;
   }, [conversationEntity]);
 
-  const saveDraft = async (editor: any) => {
-    await saveDraftStateLexical(storageRepository, conversationEntity, editor, replyMessageEntity?.id);
+  const saveDraft = async (editor: string) => {
+    await saveDraftState(storageRepository, conversationEntity, editor, replyMessageEntity?.id);
   };
 
   const loadDraft = async () => {
@@ -455,7 +452,7 @@ const InputBar = ({
     cancelMessageEditing(true, true);
     cancelMessageReply();
 
-    const draftState = await loadDraftStateLexical(conversationEntity, storageRepository, messageRepository);
+    const draftState = await loadDraftState(conversationEntity, storageRepository, messageRepository);
 
     if (draftState.messageReply) {
       void draftState.messageReply.then(replyEntity => {
@@ -580,8 +577,8 @@ const InputBar = ({
                 setInputValue={setInputValue}
                 currentMentions={currentMentions}
                 hasLocalEphemeralTimer={hasLocalEphemeralTimer}
-                saveDraftStateLexical={saveDraft}
-                loadDraftStateLexical={loadDraft}
+                saveDraftState={saveDraft}
+                loadDraftState={loadDraft}
                 onShiftTab={onShiftTab}
               >
                 {isScaledDown ? (

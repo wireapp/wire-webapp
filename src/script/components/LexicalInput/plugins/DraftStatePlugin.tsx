@@ -26,15 +26,15 @@ import {DraftState} from 'Util/DraftStateUtil';
 import {getTextValue} from '../utils/getTextValue';
 
 interface DraftStatePluginProps {
-  loadDraftStateLexical: () => Promise<any>;
+  loadDraftState: () => Promise<any>;
   setInputValue: (value: string) => void;
 }
 
-export const DraftStatePlugin = ({loadDraftStateLexical, setInputValue}: DraftStatePluginProps) => {
+export const DraftStatePlugin = ({loadDraftState, setInputValue}: DraftStatePluginProps) => {
   const [editor] = useLexicalComposerContext();
 
   const getDraftState = useCallback(async () => {
-    const draftState: DraftState = await loadDraftStateLexical();
+    const draftState: DraftState = await loadDraftState();
 
     if (draftState.editorState) {
       const initialEditorState = editor.parseEditorState(draftState.editorState);
@@ -43,7 +43,7 @@ export const DraftStatePlugin = ({loadDraftStateLexical, setInputValue}: DraftSt
       const textValue = getTextValue(editor);
       setInputValue(textValue);
     }
-  }, [editor, loadDraftStateLexical, setInputValue]);
+  }, [editor, loadDraftState, setInputValue]);
 
   useEffect(() => {
     void getDraftState();

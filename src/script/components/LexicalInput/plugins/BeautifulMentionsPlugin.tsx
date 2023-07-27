@@ -39,12 +39,12 @@ import {
 import * as ReactDOM from 'react-dom';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {MentionSuggestionsItem} from 'Components/InputBar/components/MentionSuggestions/MentionSuggestionsItem';
 import {IgnoreOutsideClickWrapper} from 'Components/InputBar/util/clickHandlers';
 
 import {LexicalTypeaheadMenuPlugin} from './LexicalTypeheadMenuPlugin';
 
 import {User} from '../../../entity/User';
+import {MentionSuggestionsItem} from '../components/Mention/MentionSuggestionsItem';
 import {useIsFocused} from '../hooks/useIsFocused';
 import {$createBeautifulMentionNode, $isBeautifulMentionNode, BeautifulMentionNode} from '../nodes/MentionNode';
 import {

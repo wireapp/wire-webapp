@@ -51,8 +51,7 @@
   }
 }
 
-.conversation-input-bar-text,
-.shadow-input {
+.conversation-input-bar-text {
   .accent-selection;
   .reset-textarea;
 
@@ -73,6 +72,10 @@
   overflow-y: auto;
   text-rendering: optimizeLegibility;
 
+  .input-mention {
+    color: var(--accent-color);
+  }
+
   &::placeholder {
     .label-xs;
 
@@ -90,19 +93,6 @@
   }
 }
 
-@supports (caret-color: #000) {
-  .conversation-input-bar-text {
-    caret-color: var(--accent-color);
-    color: transparent;
-  }
-}
-
-@supports not (caret-color: #000) {
-  .conversation-input-bar-text {
-    -webkit-text-fill-color: transparent;
-  }
-}
-
 .controls-left {
   .flex-center;
 
@@ -116,21 +106,6 @@
   width: 100%;
   flex: 1 1;
   align-items: center;
-
-  .shadow-input {
-    position: absolute;
-    top: 0;
-    right: 0;
-    left: 0;
-    height: auto;
-    overflow-wrap: break-word;
-    pointer-events: none;
-    white-space: pre-wrap;
-
-    .input-mention {
-      color: var(--accent-color);
-    }
-  }
 }
 
 .controls-right {

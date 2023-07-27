@@ -24,7 +24,6 @@ import type {ObservableArray} from 'knockout';
 import {UrlUtil, Runtime} from '@wireapp/commons';
 
 import {isTabKey} from 'Util/KeyboardUtil';
-import {findMentionAtPosition} from 'Util/MentionUtil';
 
 import {loadValue} from './StorageUtil';
 
@@ -32,7 +31,6 @@ import {QUERY_KEY} from '../auth/route';
 import {Config} from '../Config';
 import type {Conversation} from '../entity/Conversation';
 import {AuthError} from '../error/AuthError';
-import {MentionEntity} from '../message/MentionEntity';
 import {StorageKey} from '../storage/StorageKey';
 
 export const isTemporaryClientAndNonPersistent = (persist: boolean): boolean => {
@@ -383,22 +381,6 @@ export const setContextMenuPosition = (event: React.KeyboardEvent) => {
 
 export const generateConversationInputStorageKey = (conversationEntity: Conversation): string =>
   `${StorageKey.CONVERSATION.INPUT}|${conversationEntity.id}`;
-
-export const getSelectionPosition = (element: HTMLTextAreaElement, currentMentions: MentionEntity[]) => {
-  const {selectionStart: start, selectionEnd: end} = element;
-  const defaultRange = {endIndex: 0, startIndex: Infinity};
-
-  const firstMention = findMentionAtPosition(start, currentMentions) || defaultRange;
-  const lastMention = findMentionAtPosition(end, currentMentions) || defaultRange;
-
-  const mentionStart = Math.min(firstMention.startIndex, lastMention.startIndex);
-  const mentionEnd = Math.max(firstMention.endIndex, lastMention.endIndex);
-
-  const newStart = Math.min(mentionStart, start);
-  const newEnd = Math.max(mentionEnd, end);
-
-  return {newEnd, newStart};
-};
 
 const supportsSecretStorage = () => !Runtime.isDesktopApp() || !!window.systemCrypto;
 
