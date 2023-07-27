@@ -20,7 +20,6 @@
 import React, {useMemo, useState, useEffect} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {ReactionType} from '@wireapp/core/lib/conversation';
 
 import {Conversation} from 'src/script/entity/Conversation';
 import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
@@ -30,8 +29,7 @@ import {useRelativeTimestamp} from 'src/script/hooks/useRelativeTimestamp';
 import {StatusType} from 'src/script/message/StatusType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getMessageAriaLabel} from 'Util/conversationMessages';
-import {getEmojiUnicode} from 'Util/EmojiUtil';
-import {getEmojiUrl, groupByReactionUsers} from 'Util/ReactionUtil';
+import {groupByReactionUsers} from 'Util/ReactionUtil';
 
 import {ContentAsset} from './asset';
 import {MessageActionsMenu} from './MessageActions/MessageActions';
@@ -149,26 +147,6 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   const reactionGroupedByUser = groupByReactionUsers(reactions);
   const reactionsTotalCount = Array.from(reactionGroupedByUser).length;
 
-  const isUserRemovingReaction = (reaction: ReactionType): boolean => {
-    const userId = selfId.id;
-    const userReactions = reactions[userId] || '';
-
-    // first time reacted
-    if (!userReactions) {
-      return false;
-    }
-    const reactionsArr = userReactions.split(',');
-    return reactionsArr.includes(reaction);
-  };
-  const [selectedEmojiurl, setSelectedEmojiUrl] = useState('');
-
-  const handleReactionClick = (reaction: ReactionType) => {
-    const emojiUnicode = getEmojiUnicode(reaction);
-    const emojiUrl = getEmojiUrl(emojiUnicode);
-    setSelectedEmojiUrl(isUserRemovingReaction(reaction) ? '' : emojiUrl);
-    onClickReaction(reaction);
-  };
-
   return (
     <div
       aria-label={messageAriaLabel}
@@ -259,7 +237,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
             contextMenu={contextMenu}
             isMessageFocused={msgFocusState}
             messageWithSection={hasMarker}
-            handleReactionClick={handleReactionClick}
+            handleReactionClick={onClickReaction}
             reactionsTotalCount={reactionsTotalCount}
             isRemovedFromConversation={conversation.removed_from_conversation()}
           />
@@ -268,8 +246,8 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
 
       <MessageReactionsList
         reactions={reactions}
-        handleReactionClick={handleReactionClick}
-        selectedEmojiurl={selectedEmojiurl}
+        userId={selfId.id}
+        handleReactionClick={onClickReaction}
         isMessageFocused={msgFocusState}
         onTooltipReactionCountClick={() => onClickReactionDetails(message)}
         onLastReactionKeyEvent={() => setActionMenuVisibility(false)}
