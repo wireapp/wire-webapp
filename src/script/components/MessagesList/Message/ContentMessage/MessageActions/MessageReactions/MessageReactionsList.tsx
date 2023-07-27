@@ -28,7 +28,7 @@ import {messageReactionWrapper} from './MessageReactions.styles';
 export interface MessageReactionsListProps {
   reactions: Reactions;
   handleReactionClick: (emoji: string) => void;
-  selectedEmojiurl: string;
+  userId: string;
   isMessageFocused: boolean;
   onTooltipReactionCountClick: () => void;
   onLastReactionKeyEvent: () => void;
@@ -43,10 +43,12 @@ const MessageReactionsList: FC<MessageReactionsListProps> = ({reactions, ...prop
       {reactionsList.map(([emoji, users], index) => {
         const emojiUnicode = getEmojiUnicode(emoji);
         const emojiListCount = reactionsList.length;
+        const hasUserReacted = users.includes(props.userId);
 
         return (
           <EmojiPill
             emojiCount={users.length}
+            hasUserReacted={hasUserReacted}
             emojiUnicode={emojiUnicode}
             emoji={emoji}
             index={index}

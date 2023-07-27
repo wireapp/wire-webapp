@@ -49,7 +49,7 @@ export interface EmojiPillProps {
   isRemovedFromConversation: boolean;
   index: number;
   emojiListCount: number;
-  selectedEmojiurl: string;
+  hasUserReacted: boolean;
 }
 
 const EmojiPill: FC<EmojiPillProps> = ({
@@ -63,13 +63,13 @@ const EmojiPill: FC<EmojiPillProps> = ({
   isRemovedFromConversation,
   index,
   emojiListCount,
-  selectedEmojiurl,
+  hasUserReacted,
 }) => {
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
   const [isOpen, setTooltipVisibility] = useState(false);
   const emojiUrl = getEmojiUrl(emojiUnicode);
   const emojiName = getEmojiTitleFromEmojiUnicode(emojiUnicode);
-  const isActive = selectedEmojiurl === emojiUrl && !isRemovedFromConversation;
+  const isActive = hasUserReacted && !isRemovedFromConversation;
 
   const showTooltip = () => {
     setTooltipVisibility(true);
