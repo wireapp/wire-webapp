@@ -317,12 +317,11 @@ export class ConversationService {
     groupId,
     conversationId,
   }: Required<AddUsersParams>): Promise<MLSReturnType> {
-    const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
     const {coreCryptoKeyPackagesPayload, failedToFetchKeyPackages} = await this.mlsService.getKeyPackagesPayload(
       qualifiedUsers,
     );
 
-    const response = await this.mlsService.addUsersToExistingConversation(groupIdBytes, coreCryptoKeyPackagesPayload);
+    const response = await this.mlsService.addUsersToExistingConversation(groupId, coreCryptoKeyPackagesPayload);
     const conversation = await this.getConversation(conversationId);
 
     conversation.failed_to_add = failedToFetchKeyPackages;
