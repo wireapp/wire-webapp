@@ -412,6 +412,9 @@ export class App {
         await initMLSCallbacks(this.core, this.repository.conversation);
         conversationRepository.initMLSConversationRecoveredListener();
       }
+      if (supportsSelfSupportedProtocolsUpdates()) {
+        await selfRepository.initialisePeriodicSelfSupportedProtocolsCheck();
+      }
 
       onProgress(25, t('initReceivedUserData'));
       telemetry.addStatistic(AppInitStatisticsValue.CONVERSATIONS, conversations.length, 50);
@@ -460,10 +463,6 @@ export class App {
       this._handleUrlParams();
       await conversationRepository.updateConversationsOnAppInit();
       await conversationRepository.conversationLabelRepository.loadLabels();
-
-      if (supportsSelfSupportedProtocolsUpdates()) {
-        await selfRepository.initialisePeriodicSelfSupportedProtocolsCheck();
-      }
 
       amplify.publish(WebAppEvents.LIFECYCLE.LOADED);
 
