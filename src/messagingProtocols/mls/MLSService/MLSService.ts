@@ -419,7 +419,7 @@ export class MLSService extends TypedEventEmitter<Events> {
       ciphersuite: this.defaultCiphersuite,
     };
 
-    return void this.coreCryptoClient.createConversation(groupIdBytes, this.defaultCredentialType, configuration);
+    return this.coreCryptoClient.createConversation(groupIdBytes, this.defaultCredentialType, configuration);
   }
 
   /**
