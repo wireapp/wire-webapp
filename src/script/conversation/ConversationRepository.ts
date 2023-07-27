@@ -1399,25 +1399,22 @@ export class ConversationRepository {
    * Will establish MLS group for 1:1 conversation or just return it if it's already established.
    *
    * @param otherUserId - id of the other user
-   * @param localMLSConversation - local MLS conversation entity - if provided, conversation will not be refetched from the backend
    * @returns established MLS conversation entity
    *
    */
-  private readonly getEstablishedMLS1to1Conversation = async (
-    otherUserId: QualifiedId,
-    localMLSConversation?: MLSConversation,
-  ): Promise<MLSConversation> => {
+  private readonly getEstablishedMLS1to1Conversation = async (otherUserId: QualifiedId): Promise<MLSConversation> => {
     const mlsService = this.core.service?.mls;
 
     if (!mlsService) {
       throw new Error('MLS service is not available!');
     }
 
+    const localMLSConversation = this.conversationState.findMLS1to1Conversation(otherUserId);
+
     const mlsConversation = localMLSConversation || (await this.getMLS1to1Conversation(otherUserId));
     const {groupId} = mlsConversation;
 
     //check if converstion already exists and if mls group is already established
-
     const isMLS1to1ConversationEstablished = await this.isMLSConversationEstablished(groupId);
 
     //if it's already established it's ready to be used - we just return it
@@ -1425,16 +1422,15 @@ export class ConversationRepository {
       return mlsConversation;
     }
 
-    //if epoch is higher than 0 it means that the group was already established,
-    //if we didn't receive a welcome message, we join with external commit
+    //if epoch is higher that 0 it means that the group is already established but we don't have it in our local state
+    //we have to join with external commit
     if (mlsConversation.epoch > 0) {
       await joinNewConversations([mlsConversation], this.core);
-      return mlsConversation;
     }
 
     //if it's not established, establish it and add the other user to the group
     const selfUserId = this.userState.self().qualifiedId;
-    await mlsService.registerConversation(groupId, [selfUserId, otherUserId], {
+    await mlsService.registerConversation(groupId, [otherUserId, selfUserId], {
       user: selfUserId,
       client: this.core.clientId,
     });
@@ -1473,21 +1469,28 @@ export class ConversationRepository {
     //before using the default conversation id, check if both users support MLS, if so use MLS 1:1 conversation instead
     const {conversationId, userId} = connectionEntity;
 
-    const commonProtocol = await this.getProtocolFor1to1Conversation(userId);
+    const proteusConversation = this.conversationState.findConversation(conversationId);
 
-    const localConversation = this.conversationState.findConversation(conversationId);
+    const commonProtocol = await this.getProtocolFor1to1Conversation(userId);
 
     //if mls is supported by both users, establish a mls conversation
     if (commonProtocol === ConversationProtocol.MLS) {
-      const localMLSConversation =
-        localConversation && isMLSConversation(localConversation) ? localConversation : undefined;
+      const establishedMLS1to1Conversation = await this.getEstablishedMLS1to1Conversation(userId);
 
-      return this.getEstablishedMLS1to1Conversation(userId, localMLSConversation);
+      //move events to new conversation and hide old proteus conversation
+      await this.eventService.moveEventsToConversation(conversationId.id, establishedMLS1to1Conversation.id);
+
+      //if proteus conversation is known locally, clear it so it does not appear in the UI
+      if (proteusConversation) {
+        await this.clearConversation(proteusConversation);
+      }
+
+      return establishedMLS1to1Conversation;
     }
 
     //otherwise use proteus conversation
-    if (localConversation) {
-      return localConversation;
+    if (proteusConversation) {
+      return proteusConversation;
     }
 
     if (connectionEntity.isConnected() || connectionEntity.isOutgoingRequest()) {

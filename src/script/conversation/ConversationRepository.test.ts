@@ -380,6 +380,7 @@ describe('ConversationRepository', () => {
     beforeEach(() => {
       connectionEntity = new ConnectionEntity();
       connectionEntity.conversationId = conversation_et.qualifiedId;
+      connectionEntity.userId = {id: 'id', domain: 'domain'};
 
       const conversation_payload = {
         creator: conversation_et.id,
@@ -402,6 +403,8 @@ describe('ConversationRepository', () => {
       } as ConversationDatabaseData;
 
       spyOn(testFactory.conversation_repository as any, 'fetchConversationById').and.callThrough();
+      spyOn(testFactory.user_repository, 'getUserSupportedProtocols').and.returnValue([ConversationProtocol.PROTEUS]);
+      spyOn(testFactory.self_repository, 'getSelfSupportedProtocols').and.returnValue([ConversationProtocol.PROTEUS]);
       spyOn(testFactory.conversation_service, 'getConversationById').and.returnValue(
         Promise.resolve(conversation_payload),
       );

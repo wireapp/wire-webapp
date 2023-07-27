@@ -18,6 +18,7 @@
  */
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
@@ -25,7 +26,7 @@ import {container, singleton} from 'tsyringe';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {sortGroupsByLastEvent} from 'Util/util';
 
-import {isMLSConversation, isSelfConversation} from './ConversationSelectors';
+import {MLSConversation, isMLSConversation, isSelfConversation} from './ConversationSelectors';
 
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
@@ -190,6 +191,25 @@ export class ConversationState {
       : this.conversations().find(conversation => {
           return matchQualifiedIds(conversation, conversationId);
         });
+  }
+
+  /**
+   * Find a local MLS 1:1 conversation by user Id.
+   * @returns Conversation is locally available
+   */
+  findMLS1to1Conversation(userId: QualifiedId): MLSConversation | undefined {
+    return this.conversations().find((conversation): conversation is MLSConversation => {
+      const conversationMembersIds = conversation.participating_user_ids();
+      const otherUserId = conversationMembersIds[0];
+
+      return (
+        isMLSConversation(conversation) &&
+        conversation.type() === CONVERSATION_TYPE.ONE_TO_ONE &&
+        conversationMembersIds.length === 1 &&
+        otherUserId &&
+        otherUserId.id === userId.id
+      );
+    });
   }
 
   isSelfConversation(conversationId: QualifiedId): boolean {
