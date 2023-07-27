@@ -21,11 +21,13 @@ import {FC, FormEvent, MouseEvent, useState, useRef, ChangeEvent, useEffect} fro
 
 import cx from 'classnames';
 
+import {ValidationUtil} from '@wireapp/commons';
 import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
 import {ModalComponent} from 'Components/ModalComponent';
+import {Config} from 'src/script/Config';
 import {isEscapeKey} from 'Util/KeyboardUtil';
 
 import {usePrimaryModalState, showNextModalInQueue, defaultContent, removeCurrentModal} from './PrimaryModalState';
@@ -34,6 +36,7 @@ import {Action, PrimaryModalType} from './PrimaryModalTypes';
 export const PrimaryModalComponent: FC = () => {
   const [inputValue, updateInputValue] = useState<string>('');
   const [passwordValue, updatePasswordValue] = useState<string>('');
+  const [passwordInput, updatePasswordWithRules] = useState<string>('');
   const [optionChecked, updateOptionChecked] = useState<boolean>(false);
   const content = usePrimaryModalState(state => state.currentModalContent);
   const errorMessage = usePrimaryModalState(state => state.errorMessage);
@@ -56,8 +59,10 @@ export const PrimaryModalComponent: FC = () => {
     titleText,
     closeBtnTitle,
     hideCloseBtn = false,
+    passwordOptional = false,
   } = content;
   const hasPassword = currentType === PrimaryModalType.PASSWORD;
+  const hasPasswordWithRules = currentType === PrimaryModalType.PASSWORD_ADVANCED_SECURITY;
   const hasInput = currentType === PrimaryModalType.INPUT;
   const hasOption = currentType === PrimaryModalType.OPTION;
   const hasMultipleSecondary = currentType === PrimaryModalType.MULTI_ACTIONS;
@@ -65,12 +70,25 @@ export const PrimaryModalComponent: FC = () => {
     updateCurrentModalContent(defaultContent);
     updateInputValue('');
     updatePasswordValue('');
+    updatePasswordWithRules('');
     updateErrorMessage('');
     updateOptionChecked(false);
     showNextModalInQueue();
   };
+  const isPasswordOptional = () => {
+    const skipValidation = passwordOptional && !passwordInput.trim().length;
+    if (skipValidation) {
+      return true;
+    }
+    return passwordRegex.test(passwordInput);
+  };
 
-  const actionEnabled = !hasInput || !!inputValue.trim().length;
+  const passwordRegex = new RegExp(
+    ValidationUtil.getNewPasswordPattern(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH),
+  );
+  const actionEnabled =
+    (!hasInput || !!inputValue.trim().length) && (hasPasswordWithRules ? isPasswordOptional() : true);
+
   const doAction =
     (action?: Function, closeAfter = true, skipValidation = false) =>
     (event: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement>) => {
@@ -94,6 +112,7 @@ export const PrimaryModalComponent: FC = () => {
         [PrimaryModalType.OPTION]: () => action(optionChecked),
         [PrimaryModalType.INPUT]: () => action(inputValue),
         [PrimaryModalType.PASSWORD]: () => action(passwordValue),
+        [PrimaryModalType.PASSWORD_ADVANCED_SECURITY]: () => action(passwordInput),
       };
       if (Object.keys(actions).includes(content?.currentType ?? '')) {
         actions[content?.currentType as keyof typeof actions]();
@@ -122,12 +141,20 @@ export const PrimaryModalComponent: FC = () => {
     const handleEscape = (event: KeyboardEvent) => {
       if (isEscapeKey(event) && isModalVisible) {
         removeCurrentModal();
+        closeAction();
       }
     };
 
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
   }, [isModalVisible]);
+
+  const closeAction = () => {
+    if (hasPasswordWithRules) {
+      const [closeAction] = secondaryActions;
+      closeAction?.action?.();
+    }
+  };
 
   return (
     <div
@@ -152,7 +179,10 @@ export const PrimaryModalComponent: FC = () => {
                 <button
                   type="button"
                   className="modal__header__button"
-                  onClick={removeCurrentModal}
+                  onClick={() => {
+                    removeCurrentModal();
+                    closeAction();
+                  }}
                   aria-label={closeBtnTitle}
                   data-uie-name="do-close"
                 >
@@ -182,6 +212,23 @@ export const PrimaryModalComponent: FC = () => {
                     value={passwordValue}
                     placeholder={inputPlaceholder}
                     onChange={event => updatePasswordValue(event.target.value)}
+                  />
+                </form>
+              )}
+
+              {hasPasswordWithRules && (
+                <form onSubmit={doAction(confirm, !!closeOnConfirm)}>
+                  <label htmlFor="modal_pswd_with_rules" className="visually-hidden">
+                    {inputPlaceholder}
+                  </label>
+
+                  <input
+                    id="modal_pswd_with_rules"
+                    className="modal__input"
+                    type="password"
+                    value={passwordInput}
+                    placeholder={inputPlaceholder}
+                    onChange={event => updatePasswordWithRules(event.target.value)}
                   />
                 </form>
               )}

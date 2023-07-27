@@ -34,6 +34,7 @@ import {SendMessageButton} from 'Components/LexicalInput/components/SendMessageB
 import {LexicalInput} from 'Components/LexicalInput/LexicalInput';
 import {$createBeautifulMentionNode} from 'Components/LexicalInput/nodes/MentionNode';
 import {createNodes} from 'Components/LexicalInput/utils/generateNodes';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
@@ -125,6 +126,7 @@ const InputBar = ({
     messageTimer,
     hasGlobalMessageTimer,
     removed_from_conversation: removedFromConversation,
+    is1to1,
   } = useKoSubscribableChildren(conversationEntity, [
     'connection',
     'firstUserEntity',
@@ -384,13 +386,34 @@ const InputBar = ({
 
   const onGifClick = () => openGiphy(inputValue);
 
+  const pingConversation = () => {
+    setIsPingDisabled(true);
+    void messageRepository.sendPing(conversationEntity).then(() => {
+      window.setTimeout(() => setIsPingDisabled(false), CONFIG.PING_TIMEOUT);
+    });
+  };
+
+  const totalConversationUsers = participatingUserEts.length;
+
   const onPingClick = () => {
     if (conversationEntity && !pingDisabled) {
-      setIsPingDisabled(true);
-
-      void messageRepository.sendPing(conversationEntity).then(() => {
-        window.setTimeout(() => setIsPingDisabled(false), CONFIG.PING_TIMEOUT);
-      });
+      if (
+        !CONFIG.FEATURE.ENABLE_PING_CONFIRMATION ||
+        is1to1 ||
+        totalConversationUsers < CONFIG.FEATURE.MAX_USERS_TO_PING_WITHOUT_ALERT
+      ) {
+        pingConversation();
+      } else {
+        PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+          primaryAction: {
+            action: pingConversation,
+            text: t('tooltipConversationPing'),
+          },
+          text: {
+            title: t('conversationPingConfirmTitle', {memberCount: totalConversationUsers.toString()}),
+          },
+        });
+      }
     }
   };
 

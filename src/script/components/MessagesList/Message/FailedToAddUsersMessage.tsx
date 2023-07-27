@@ -38,9 +38,15 @@ import {useMessageFocusedTabIndex} from './util';
 
 import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from '../../../entity/message/FailedToAddUsersMessage';
 
+export enum ErrorMessageType {
+  offlineBackEnd = 'OfflineBackEnd',
+  nonFullyConnectedGraph = 'NonFullyConnectedGraph',
+}
+
 export interface FailedToAddUsersMessageProps {
   isMessageFocused: boolean;
   message: FailedToAddUsersMessageEntity;
+  errorMessageType?: ErrorMessageType;
   userState?: UserState;
 }
 
@@ -49,6 +55,7 @@ const config = Config.getConfig();
 const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
   isMessageFocused,
   message,
+  errorMessageType = ErrorMessageType.offlineBackEnd,
   userState = container.resolve(UserState),
 }) => {
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
@@ -101,15 +108,28 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
           data-uie-name="element-message-failed-to-add-users"
           data-uie-value={total <= 1 ? '1-user-not-added' : 'multi-users-not-added'}
         >
-          <p
-            css={warning}
-            dangerouslySetInnerHTML={{
-              __html:
-                total <= 1
-                  ? t('failedToAddParticipant', {name: users[0].name(), domain: users[0].domain})
-                  : t('failedToAddParticipants', {total: total.toString()}),
-            }}
-          />
+          {total <= 1 && (
+            <p data-uie-name="1-user-not-added-details" data-uie-value={users[0].id}>
+              <span
+                css={warning}
+                dangerouslySetInnerHTML={{
+                  __html: t(`failedToAddParticipantSingularOfflineBackEnd`, {
+                    name: users[0].name(),
+                    domain: users[0].domain,
+                  }),
+                }}
+              />
+              {learnMore}
+            </p>
+          )}
+          {total > 1 && (
+            <p
+              css={warning}
+              dangerouslySetInnerHTML={{
+                __html: t(`failedToAddParticipantsPlural`, {total: total.toString()}),
+              }}
+            />
+          )}
         </div>
         <p className="message-body-actions">
           <MessageTime
@@ -122,41 +142,29 @@ const FailedToAddUsersMessage: React.FC<FailedToAddUsersMessageProps> = ({
       <div className="message-body">
         {isOpen && (
           <>
-            {total <= 1 && (
-              <p data-uie-name="1-user-not-added-details" data-uie-value={users[0].id}>
+            {Object.entries(groupedUsers).map(([domain, domainUsers]) => (
+              <p
+                key={domain}
+                data-uie-name="multi-user-not-added-details"
+                data-uie-value={domain}
+                style={{lineHeight: 'var(--line-height-sm)'}}
+              >
                 <span
                   css={warning}
                   dangerouslySetInnerHTML={{
-                    __html: t('failedToAddParticipantDetails', {name: users[0].name(), domain: users[0].domain}),
+                    __html: t(`failedToAddParticipantsPluralDetails${errorMessageType}`, {
+                      name: domainUsers[domainUsers.length - 1].name(),
+                      names:
+                        domainUsers.length === 2
+                          ? domainUsers[0].name()
+                          : domainUsers.map(user => user.name()).join(', '),
+                      domain,
+                    }),
                   }}
                 />
                 {learnMore}
               </p>
-            )}
-            {total > 1 &&
-              Object.entries(groupedUsers).map(([domain, domainUsers]) => (
-                <p
-                  key={domain}
-                  data-uie-name="multi-user-not-added-details"
-                  data-uie-value={domain}
-                  style={{lineHeight: 'var(--line-height-sm)'}}
-                >
-                  <span
-                    css={warning}
-                    dangerouslySetInnerHTML={{
-                      __html: t('failedToAddParticipantsDetails', {
-                        name: domainUsers[domainUsers.length - 1].name(),
-                        names:
-                          domainUsers.length === 2
-                            ? domainUsers[0].name()
-                            : domainUsers.map(user => user.name()).join(', '),
-                        domain,
-                      }),
-                    }}
-                  />
-                  {learnMore}
-                </p>
-              ))}
+            ))}
           </>
         )}
         {total > 1 && (

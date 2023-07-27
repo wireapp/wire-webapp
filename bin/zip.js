@@ -29,9 +29,12 @@ const S3_PATH = path.resolve(ROOT_PATH, 'server/dist/s3');
 
 archive.file(path.join(SERVER_PATH, 'package.json'), {name: 'package.json'});
 archive.file(path.join(ROOT_PATH, '.env.defaults'), {name: '.env.defaults'});
+archive.file(path.join(ROOT_PATH, 'Procfile'), {name: 'Procfile'});
 archive.directory(DIST_PATH, false);
 
-fs.mkdirSync(S3_PATH);
+if (!fs.existsSync(S3_PATH)) {
+  fs.mkdirSync(S3_PATH);
+}
 const output = fs.createWriteStream(path.join(S3_PATH, 'ebs.zip'));
 
 archive.pipe(output);
