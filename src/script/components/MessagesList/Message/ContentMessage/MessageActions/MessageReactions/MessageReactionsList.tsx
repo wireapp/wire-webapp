@@ -38,12 +38,13 @@ export interface MessageReactionsListProps {
 const MessageReactionsList: FC<MessageReactionsListProps> = ({reactions, ...props}) => {
   const reactionGroupedByUser = groupByReactionUsers(reactions);
   const reactionsList = Array.from(reactionGroupedByUser);
+  const {userId, ...emojiPillProps} = props;
   return (
     <div css={messageReactionWrapper} data-uie-name="message-reactions">
       {reactionsList.map(([emoji, users], index) => {
         const emojiUnicode = getEmojiUnicode(emoji);
         const emojiListCount = reactionsList.length;
-        const hasUserReacted = users.includes(props.userId);
+        const hasUserReacted = users.includes(userId);
 
         return (
           <EmojiPill
@@ -53,7 +54,7 @@ const MessageReactionsList: FC<MessageReactionsListProps> = ({reactions, ...prop
             emoji={emoji}
             index={index}
             emojiListCount={emojiListCount}
-            {...props}
+            {...emojiPillProps}
             key={emojiUnicode}
           />
         );
