@@ -676,17 +676,10 @@ export class UserRepository {
    */
 
   public async getUserSupportedProtocols(userId: QualifiedId): Promise<ConversationProtocol[]> {
-    const localUser = this.findUserById(userId);
-
-    if (localUser) {
-      const localSupportedProtocols = localUser.supportedProtocols();
-
-      if (localSupportedProtocols) {
-        return localSupportedProtocols;
-      }
-    }
-
     const supportedProtocols = await this.userService.getUserSupportedProtocols(userId);
+
+    //update local user entity with new supported protocols
+    await this.updateUserSupportedProtocols(userId, supportedProtocols);
     return supportedProtocols;
   }
 

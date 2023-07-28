@@ -1409,9 +1409,7 @@ export class ConversationRepository {
       throw new Error('MLS service is not available!');
     }
 
-    const localMLSConversation = this.conversationState.findMLS1to1Conversation(otherUserId);
-
-    const mlsConversation = localMLSConversation || (await this.getMLS1to1Conversation(otherUserId));
+    const mlsConversation = await this.getMLS1to1Conversation(otherUserId);
     const {groupId} = mlsConversation;
 
     //check if converstion already exists and if mls group is already established
@@ -1465,24 +1463,48 @@ export class ConversationRepository {
     return false;
   };
 
-  private readonly getConnectionConversation = async (connectionEntity: ConnectionEntity) => {
-    //before using the default conversation id, check if both users support MLS, if so use MLS 1:1 conversation instead
-    const {conversationId, userId} = connectionEntity;
+  private readonly replace1to1ProteusConversationWithMS = async (
+    proteusConversation: Conversation,
+    mlsConversation: MLSConversation,
+  ) => {
+    //move events to new conversation and hide old proteus conversation
+    await this.eventService.moveEventsToConversation(proteusConversation.id, mlsConversation.id);
 
+    //if proteus conversation is known locally, clear it so it does not appear in the UI
+    await this.clearConversation(proteusConversation);
+  };
+
+  private readonly getConnectionConversation = async (connectionEntity: ConnectionEntity) => {
+    //As of how backed works now (August 2023), proteus 1:1 conversations will always be created, even if both users support MLS conversation.
+    //Proteus 1:1 conversation is created right after a connection request is sent.
+    //Therefore, conversationId filed on connectionEntity will always indicate proteus 1:1 conversation.
+    //We need to manually check if both users support MLS conversation and if so, create (or use if it exists already) a MLS 1:1 conversation.
+
+    const {conversationId, userId} = connectionEntity;
     const proteusConversation = this.conversationState.findConversation(conversationId);
 
+    //if mls 1:1 exists and is already established, nothing more to do, just use it
+    const localMLSConversation = this.conversationState.findMLS1to1Conversation(userId);
+
+    const isMLS1to1ConversationAlreadyEstablishedML =
+      localMLSConversation && (await this.isMLSConversationEstablished(localMLSConversation.groupId));
+
+    if (isMLS1to1ConversationAlreadyEstablishedML) {
+      if (proteusConversation) {
+        await this.replace1to1ProteusConversationWithMS(proteusConversation, localMLSConversation);
+      }
+      return localMLSConversation;
+    }
+
+    //otherwise check common protocol
     const commonProtocol = await this.getProtocolFor1to1Conversation(userId);
 
     //if mls is supported by both users, establish a mls conversation
     if (commonProtocol === ConversationProtocol.MLS) {
       const establishedMLS1to1Conversation = await this.getEstablishedMLS1to1Conversation(userId);
 
-      //move events to new conversation and hide old proteus conversation
-      await this.eventService.moveEventsToConversation(conversationId.id, establishedMLS1to1Conversation.id);
-
-      //if proteus conversation is known locally, clear it so it does not appear in the UI
       if (proteusConversation) {
-        await this.clearConversation(proteusConversation);
+        await this.replace1to1ProteusConversationWithMS(proteusConversation, establishedMLS1to1Conversation);
       }
 
       return establishedMLS1to1Conversation;
@@ -2186,7 +2208,7 @@ export class ConversationRepository {
    * @param timestamp Optional timestamps for which messages to remove
    */
   private async _clearConversation(conversationEntity: Conversation, timestamp?: number) {
-    this.deleteMessages(conversationEntity, timestamp);
+    await this.deleteMessages(conversationEntity, timestamp);
 
     if (conversationEntity.removed_from_conversation()) {
       await this.conversationService.deleteConversationFromDb(conversationEntity.id);
@@ -3515,7 +3537,7 @@ export class ConversationRepository {
     conversationEntity.hasCreationMessage = false;
 
     const iso_date = timestamp ? new Date(timestamp).toISOString() : undefined;
-    this.eventService.deleteEvents(conversationEntity.id, iso_date);
+    return this.eventService.deleteEvents(conversationEntity.id, iso_date);
   }
 
   /**
