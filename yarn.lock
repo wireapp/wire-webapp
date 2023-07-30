@@ -6527,14 +6527,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/react-ui-kit@npm:9.7.6":
-  version: 9.7.6
-  resolution: "@wireapp/react-ui-kit@npm:9.7.6"
+"@wireapp/react-ui-kit@npm:9.7.7":
+  version: 9.7.7
+  resolution: "@wireapp/react-ui-kit@npm:9.7.7"
   dependencies:
     "@types/color": 3.0.3
     color: 4.2.3
     emotion-normalize: 11.0.1
-    react-select: 5.7.3
+    react-select: 5.7.4
     react-transition-group: 4.4.5
   peerDependencies:
     "@emotion/react": 11.10.4
@@ -6544,7 +6544,7 @@ __metadata:
   peerDependenciesMeta:
     "@types/react":
       optional: true
-  checksum: 1cab9a374d5792d88c337f43663f184b983d3f0004d7712422f466f236be9aff4878b7a3e116e12a4d3211b9cf4575a6c9429ab56e3a1b3d30f62152b43db4ee
+  checksum: 5e14ad519b4cec7ec3e578c68dd36eda944600dec23ec7c9cb1ac239b9dd23b173cf2e323aa2162d6eef35bd19ad32c2694e2d0017e222842cfad2d2c934bf2e
   languageName: node
   linkType: hard
 
@@ -16266,9 +16266,9 @@ dexie@latest:
   languageName: node
   linkType: hard
 
-"react-select@npm:5.7.3":
-  version: 5.7.3
-  resolution: "react-select@npm:5.7.3"
+"react-select@npm:5.7.4":
+  version: 5.7.4
+  resolution: "react-select@npm:5.7.4"
   dependencies:
     "@babel/runtime": ^7.12.0
     "@emotion/cache": ^11.4.0
@@ -16282,7 +16282,7 @@ dexie@latest:
   peerDependencies:
     react: ^16.8.0 || ^17.0.0 || ^18.0.0
     react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
-  checksum: 9ffa75afb395e7077076521c529611494164ace0c6b1ceb249406991ac668947cfd0424812c15c2a45c792bb2794b22f2df93c4c2f2515962b7dfc7c91b029ec
+  checksum: ca72941ad1d2c578ec04c09ed3deb7e373f987e589f403fadedc6fcc3e29935b5425ec4d2628f0fe58c21319bcaf153c0d0172432e09fc6423da869d848de757
   languageName: node
   linkType: hard
 
@@ -19292,7 +19292,7 @@ dexie@latest:
     "@wireapp/eslint-config": 2.2.2
     "@wireapp/lru-cache": 3.8.1
     "@wireapp/prettier-config": 0.6.0
-    "@wireapp/react-ui-kit": 9.7.6
+    "@wireapp/react-ui-kit": 9.7.7
     "@wireapp/store-engine": ^5.1.1
     "@wireapp/store-engine-dexie": 2.1.1
     "@wireapp/store-engine-sqleet": 1.8.9
