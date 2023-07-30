@@ -175,7 +175,7 @@
     "text-encoding": "0.7.0",
     "ts-node": "10.9.1",
     "tsc-watch": "6.0.4",
-    "typescript": "5.0.4",
+    "typescript": "5.1.6",
     "webpack": "5.88.2",
     "webpack-cli": "5.1.4",
     "webpack-dev-middleware": "6.1.1",
