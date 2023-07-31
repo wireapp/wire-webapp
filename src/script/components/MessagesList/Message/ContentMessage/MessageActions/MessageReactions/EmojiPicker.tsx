@@ -26,6 +26,7 @@ import {useClickOutside} from 'src/script/hooks/useClickOutside';
 import {isEnterKey, isEscapeKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getEmojiUrl} from 'Util/ReactionUtil';
+
 interface EmojiPickerContainerProps {
   posX: number;
   posY: number;
