@@ -20,7 +20,7 @@
 import {FC} from 'react';
 
 import {getEmojiUnicode} from 'Util/EmojiUtil';
-import {Reactions, groupByReactionUsers} from 'Util/ReactionUtil';
+import {Reactions, groupByReactionUsers, sortReactionsByUserCount} from 'Util/ReactionUtil';
 
 import {EmojiPill} from './EmojiPill';
 import {messageReactionWrapper} from './MessageReactions.styles';
@@ -37,8 +37,13 @@ export interface MessageReactionsListProps {
 
 const MessageReactionsList: FC<MessageReactionsListProps> = ({reactions, ...props}) => {
   const reactionGroupedByUser = groupByReactionUsers(reactions);
-  const reactionsList = Array.from(reactionGroupedByUser);
+  const reactionsGroupedByUserArray = Array.from(reactionGroupedByUser);
+  const reactionsList =
+    reactionsGroupedByUserArray.length > 1
+      ? sortReactionsByUserCount(reactionsGroupedByUserArray)
+      : reactionsGroupedByUserArray;
   const {userId, ...emojiPillProps} = props;
+
   return (
     <div css={messageReactionWrapper} data-uie-name="message-reactions">
       {reactionsList.map(([emoji, users], index) => {

@@ -43,3 +43,9 @@ export function groupByReactionUsers(reactions: Reactions): ReactionsGroupedByUs
 export function getEmojiUrl(unicode: string) {
   return `/image/emojis/img-apple-64/${unicode}.png`;
 }
+
+export function sortReactionsByUserCount(reactionsList: [string, string[]][]) {
+  return reactionsList.sort(
+    ([, reactionAUserList], [, reactionBUserList]) => reactionBUserList.length - reactionAUserList.length,
+  );
+}
