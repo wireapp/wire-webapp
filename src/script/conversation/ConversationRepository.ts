@@ -1463,22 +1463,23 @@ export class ConversationRepository {
     return false;
   };
 
-  private readonly replace1to1ProteusConversationWithMS = async (
+  private readonly replaceProteus1to1ConversationWithMS = async (
     proteusConversation: Conversation,
     mlsConversation: MLSConversation,
   ) => {
     //move events to new conversation and hide old proteus conversation
     await this.eventService.moveEventsToConversation(proteusConversation.id, mlsConversation.id);
 
-    //if proteus conversation is known locally, clear it so it does not appear in the UI
-    await this.clearConversation(proteusConversation);
+    //delete conversation locally so it does not appear in the ui
+    await this.deleteConversationLocally(proteusConversation.qualifiedId, true);
   };
 
   private readonly getConnectionConversation = async (connectionEntity: ConnectionEntity) => {
     //As of how backed works now (August 2023), proteus 1:1 conversations will always be created, even if both users support MLS conversation.
     //Proteus 1:1 conversation is created right after a connection request is sent.
     //Therefore, conversationId filed on connectionEntity will always indicate proteus 1:1 conversation.
-    //We need to manually check if both users support MLS conversation and if so, create (or use if it exists already) a MLS 1:1 conversation.
+    //We need to manually check if mls 1:1 conversation can be used instead.
+    //When both users support MLS conversation and connection is accepted create (or use if it exists already) a MLS 1:1 conversation.
 
     const {conversationId, userId} = connectionEntity;
     const proteusConversation = this.conversationState.findConversation(conversationId);
@@ -1491,7 +1492,7 @@ export class ConversationRepository {
 
     if (isMLS1to1ConversationAlreadyEstablishedML) {
       if (proteusConversation) {
-        await this.replace1to1ProteusConversationWithMS(proteusConversation, localMLSConversation);
+        await this.replaceProteus1to1ConversationWithMS(proteusConversation, localMLSConversation);
       }
       return localMLSConversation;
     }
@@ -1504,7 +1505,7 @@ export class ConversationRepository {
       const establishedMLS1to1Conversation = await this.getEstablishedMLS1to1Conversation(userId);
 
       if (proteusConversation) {
-        await this.replace1to1ProteusConversationWithMS(proteusConversation, establishedMLS1to1Conversation);
+        await this.replaceProteus1to1ConversationWithMS(proteusConversation, establishedMLS1to1Conversation);
       }
 
       return establishedMLS1to1Conversation;
