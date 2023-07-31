@@ -58,7 +58,7 @@ export class EmojiOption extends MenuOption {
 
 const MAX_EMOJI_SUGGESTION_COUNT = 5;
 
-export const EmojiPickerPlugin = () => {
+export function EmojiPickerPlugin() {
   const [lexicalEditor] = useLexicalComposerContext();
 
   const [queryString, setQueryString] = useState<string | null>(null);
@@ -192,4 +192,4 @@ export const EmojiPickerPlugin = () => {
       menuRenderFn={menuRender}
     />
   );
-};
+}

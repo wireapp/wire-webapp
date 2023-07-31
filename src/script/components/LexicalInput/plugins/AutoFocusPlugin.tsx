@@ -25,10 +25,10 @@ type AutoFocusPluginProps = {
   defaultSelection?: 'rootStart' | 'rootEnd';
 };
 
-export const AutoFocusPlugin = ({defaultSelection = 'rootEnd'}: AutoFocusPluginProps) => {
+export function AutoFocusPlugin({defaultSelection = 'rootEnd'}: AutoFocusPluginProps): null {
   const [editor] = useLexicalComposerContext();
 
   useTextAreaFocus(() => editor.focus(() => undefined, {defaultSelection}));
 
-  return <></>;
-};
+  return null;
+}

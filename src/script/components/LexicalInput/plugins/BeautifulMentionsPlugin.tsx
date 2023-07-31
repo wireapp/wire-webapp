@@ -78,7 +78,7 @@ interface BeautifulMentionsPluginProps {
   onSearch: (queryString?: string | null) => User[];
 }
 
-export const BeautifulMentionsPlugin = ({onSearch}: BeautifulMentionsPluginProps) => {
+export function BeautifulMentionsPlugin({onSearch}: BeautifulMentionsPluginProps) {
   const isEditorFocused = useIsFocused();
   const triggers = useMemo(() => ['@'], []);
   const [editor] = useLexicalComposerContext();
@@ -374,4 +374,4 @@ export const BeautifulMentionsPlugin = ({onSearch}: BeautifulMentionsPluginProps
       menuRenderFn={menuRenderFn}
     />
   );
-};
+}

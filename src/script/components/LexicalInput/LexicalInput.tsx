@@ -17,7 +17,7 @@
  *
  */
 
-import {forwardRef, useEffect, useState, ReactElement} from 'react';
+import {forwardRef, useCallback, useEffect, useState, ReactElement} from 'react';
 
 import {InitialConfigType, LexicalComposer} from '@lexical/react/LexicalComposer';
 import {ContentEditable} from '@lexical/react/LexicalContentEditable';
@@ -27,7 +27,7 @@ import {PlainTextPlugin} from '@lexical/react/LexicalPlainTextPlugin';
 import type {WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
 import cx from 'classnames';
-import {LexicalEditor} from 'lexical';
+import {LexicalEditor, EditorState} from 'lexical';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -36,11 +36,11 @@ import {User} from 'src/script/entity/User';
 import {DraftState} from 'Util/DraftStateUtil';
 import {getLogger} from 'Util/Logger';
 
-import {EditMessage} from './components/EditMessage';
 import {BeautifulMentionNode} from './nodes/MentionNode';
 import {AutoFocusPlugin} from './plugins/AutoFocusPlugin';
 import {BeautifulMentionsPlugin} from './plugins/BeautifulMentionsPlugin';
 import {DraftStatePlugin} from './plugins/DraftStatePlugin';
+import {EditMessagePlugin} from './plugins/EditMessagePlugin';
 import {EmojiPickerPlugin} from './plugins/EmojiPickerPlugin';
 import {GlobalEventsPlugin} from './plugins/GlobalEventsPlugin';
 import {EditorRefPlugin} from './plugins/LexicalEditorRefPlugin';
@@ -109,12 +109,24 @@ export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
         logger.error(error);
         throw error;
       },
-      nodes: [BeautifulMentionNode, BeautifulMentionNode],
+      nodes: [BeautifulMentionNode],
     };
 
     const queryMentions = (queryString?: string | null) => {
       return queryString ? searchRepository.searchUserInSet(queryString, mentionCandidates) : mentionCandidates;
     };
+
+    const onChange = useCallback(
+      (editorState: EditorState, lexicalEditor: LexicalEditor) => {
+        lexicalEditor.registerTextContentListener(textContent => {
+          setInputValue(textContent);
+        });
+
+        const stringifyEditor = JSON.stringify(editorState.toJSON());
+        saveDraftState(stringifyEditor);
+      },
+      [saveDraftState, setInputValue],
+    );
 
     useEffect(() => {
       amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE, setShouldReplaceEmoji);
@@ -131,7 +143,7 @@ export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
             <GlobalEventsPlugin onShiftTab={onShiftTab} />
             <EditorRefPlugin editorRef={ref} />
             <DraftStatePlugin setInputValue={setInputValue} loadDraftState={loadDraftState} />
-            <EditMessage onMessageEdit={editMessage} />
+            <EditMessagePlugin onMessageEdit={editMessage} />
 
             {shouldReplaceEmoji && <EmojiPickerPlugin />}
 
@@ -149,16 +161,7 @@ export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
 
             <BeautifulMentionsPlugin onSearch={queryMentions} />
 
-            <OnChangePlugin
-              onChange={(editorState, lexicalEditor) => {
-                lexicalEditor.registerTextContentListener(textContent => {
-                  setInputValue(textContent);
-                });
-
-                const stringifyEditor = JSON.stringify(editorState.toJSON());
-                saveDraftState(stringifyEditor);
-              }}
-            />
+            <OnChangePlugin onChange={onChange} />
           </div>
         </div>
 

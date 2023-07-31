@@ -26,7 +26,7 @@ interface EditorRefPluginProps {
   editorRef: ForwardedRef<LexicalEditor>;
 }
 
-export const EditorRefPlugin = ({editorRef}: EditorRefPluginProps) => {
+export function EditorRefPlugin({editorRef}: EditorRefPluginProps): null {
   const [editor] = useLexicalComposerContext();
 
   if (typeof editorRef === 'function') {
@@ -37,5 +37,5 @@ export const EditorRefPlugin = ({editorRef}: EditorRefPluginProps) => {
     }
   }
 
-  return <></>;
-};
+  return null;
+}

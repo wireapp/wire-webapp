@@ -31,7 +31,7 @@ interface EditMessageProps {
   onMessageEdit: (messageEntity: ContentMessage, editor: LexicalEditor) => void;
 }
 
-export const EditMessage = ({onMessageEdit}: EditMessageProps) => {
+export function EditMessagePlugin({onMessageEdit}: EditMessageProps): null {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {
@@ -44,5 +44,5 @@ export const EditMessage = ({onMessageEdit}: EditMessageProps) => {
     };
   }, [editor]);
 
-  return <></>;
-};
+  return null;
+}

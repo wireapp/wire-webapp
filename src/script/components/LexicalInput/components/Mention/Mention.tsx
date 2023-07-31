@@ -43,6 +43,8 @@ import {
   RangeSelection,
 } from 'lexical';
 
+import {KEY} from 'Util/KeyboardUtil';
+
 import {$isBeautifulMentionNode} from '../../nodes/MentionNode';
 import {getNextSibling, getPreviousSibling} from '../../utils/mention-utils';
 
@@ -97,15 +99,18 @@ export const Mention = (props: BeautifulMentionComponentProps) => {
         return false;
       }
 
-      const isLeftDirection = event.key === 'ArrowLeft';
+      const isLeftDirection = event.key === KEY.ARROW_LEFT;
 
       let handled = false;
       let nodeToSelect = getPreviousSibling(node);
 
+      // Checking if is right direction to handle next sibling element.
       if (!isLeftDirection) {
         nodeToSelect = getNextSibling(node);
       }
 
+      // Checking if is a element node, list of specified Element Nodes You can find here:
+      // https://lexical.dev/docs/api/classes/lexical.ElementNode
       if ($isElementNode(nodeToSelect)) {
         if (isLeftDirection) {
           nodeToSelect.selectEnd();
@@ -116,6 +121,7 @@ export const Mention = (props: BeautifulMentionComponentProps) => {
         handled = true;
       }
 
+      // Handling node
       if ($isTextNode(nodeToSelect)) {
         if (isLeftDirection) {
           nodeToSelect.select();

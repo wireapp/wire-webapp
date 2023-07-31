@@ -30,7 +30,7 @@ interface DraftStatePluginProps {
   setInputValue: (value: string) => void;
 }
 
-export const DraftStatePlugin = ({loadDraftState, setInputValue}: DraftStatePluginProps) => {
+export function DraftStatePlugin({loadDraftState, setInputValue}: DraftStatePluginProps): null {
   const [editor] = useLexicalComposerContext();
 
   const getDraftState = useCallback(async () => {
@@ -49,5 +49,5 @@ export const DraftStatePlugin = ({loadDraftState, setInputValue}: DraftStatePlug
     void getDraftState();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  return <></>;
-};
+  return null;
+}

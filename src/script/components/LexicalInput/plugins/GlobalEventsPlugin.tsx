@@ -31,7 +31,7 @@ interface GlobalEventsPluginProps {
   onShiftTab: () => void;
 }
 
-export const GlobalEventsPlugin = ({onShiftTab}: GlobalEventsPluginProps) => {
+export function GlobalEventsPlugin({onShiftTab}: GlobalEventsPluginProps): null {
   const [editor] = useLexicalComposerContext();
 
   const onKeyDown = (event: KeyboardEvent) => {
@@ -75,10 +75,10 @@ export const GlobalEventsPlugin = ({onShiftTab}: GlobalEventsPluginProps) => {
     };
   }, [editor, onShiftTab]);
 
-  return <></>;
-};
+  return null;
+}
 
-// Example of usage global commands
+// Example of usage global commands, You can use it everywhere in LexicalComposer
 // editor.registerCommand(
 //   ON_SHIFT_TAB,
 //   (event) => {
