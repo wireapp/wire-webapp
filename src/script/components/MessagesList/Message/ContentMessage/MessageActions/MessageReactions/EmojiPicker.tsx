@@ -19,14 +19,13 @@
 
 import {useState, useEffect, useRef, FC, RefObject} from 'react';
 
-import EmojiPicker, {EmojiClickData} from 'emoji-picker-react';
+import EmojiPicker, {EmojiClickData, SkinTones} from 'emoji-picker-react';
 import {createPortal} from 'react-dom';
 
 import {useClickOutside} from 'src/script/hooks/useClickOutside';
 import {isEnterKey, isEscapeKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getEmojiUrl} from 'Util/ReactionUtil';
-
 interface EmojiPickerContainerProps {
   posX: number;
   posY: number;
@@ -82,6 +81,8 @@ const EmojiPickerContainer: FC<EmojiPickerContainerProps> = ({
   }, [posX, posY]);
 
   function onEmojiClick(emojiData: EmojiClickData, event: MouseEvent) {
+    localStorage.setItem('activeSkinTone', emojiData.activeSkinTone);
+
     handleReactionClick(emojiData.emoji);
 
     if (isKeyboardEvent) {
@@ -91,6 +92,12 @@ const EmojiPickerContainer: FC<EmojiPickerContainerProps> = ({
       // click event will close the picker and reset active states
       resetActionMenuStates();
     }
+  }
+
+  function getSkinTone() {
+    const currentSkinTone = localStorage.getItem('activeSkinTone');
+    const skinTone = currentSkinTone ? (currentSkinTone as SkinTones) : SkinTones.NEUTRAL;
+    return skinTone;
   }
   return (
     <>
@@ -120,6 +127,7 @@ const EmojiPickerContainer: FC<EmojiPickerContainerProps> = ({
               getEmojiUrl={getEmojiUrl}
               lazyLoadEmojis={true}
               searchPlaceHolder={t('accessibility.emojiPickerSearchPlaceholder')}
+              defaultSkinTone={getSkinTone()}
             />
           </div>
         </div>,
