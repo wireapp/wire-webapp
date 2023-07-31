@@ -43,3 +43,16 @@ export function groupByReactionUsers(reactions: Reactions): ReactionsGroupedByUs
 export function getEmojiUrl(unicode: string) {
   return `/image/emojis/img-apple-64/${unicode}.png`;
 }
+
+/**
+ *
+ * @param reactionsList This is an array of tuples, each tuple consists of two elements a
+ * string representing an emoji and an array of strings representing users' reactions for that emoji.
+ * @returns tuples are sorted in descending order based on the length of the user
+ * reactions array for each emoji.
+ */
+export function sortReactionsByUserCount(reactionsList: [string, string[]][]) {
+  return reactionsList.sort(
+    ([, reactionAUserList], [, reactionBUserList]) => reactionBUserList.length - reactionAUserList.length,
+  );
+}
