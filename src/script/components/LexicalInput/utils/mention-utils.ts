@@ -60,12 +60,14 @@ function createMentionsRegex(triggers: string[], allowSpaces: boolean) {
 
 export function checkForMentions(text: string, triggers: string[], allowSpaces: boolean): MenuTextMatch | null {
   const match = createMentionsRegex(triggers, allowSpaces).exec(text);
+
   if (match !== null) {
-    // The strategy ignores leading whitespace but we need to know it's
+    // The strategy ignores leading whitespace, but we need to know its
     // length to add it to the leadOffset
     const maybeLeadingWhitespace = match[1];
     const matchingStringWithTrigger = match[2];
     const matchingString = match[3];
+
     if (matchingStringWithTrigger.length >= 1) {
       return {
         leadOffset: match.index + maybeLeadingWhitespace.length,
@@ -74,6 +76,7 @@ export function checkForMentions(text: string, triggers: string[], allowSpaces: 
       };
     }
   }
+
   return null;
 }
 
@@ -97,6 +100,7 @@ type SelectionInfo = {
 
 export function getSelectionInfo(triggers: string[]): SelectionInfo | undefined {
   const selection = $getSelection();
+
   if (!selection || !$isRangeSelection(selection)) {
     return undefined;
   }
@@ -104,6 +108,7 @@ export function getSelectionInfo(triggers: string[]): SelectionInfo | undefined 
   const anchor = selection.anchor;
   const focus = selection.focus;
   const nodes = selection.getNodes();
+
   if (anchor.key !== focus.key || anchor.offset !== focus.offset || nodes.length === 0) {
     return undefined;
   }
@@ -138,6 +143,7 @@ export function getSelectionInfo(triggers: string[]): SelectionInfo | undefined 
 
 export function insertMention(triggers: string[], trigger: string, value?: string) {
   const selectionInfo = getSelectionInfo(triggers);
+
   if (!selectionInfo) {
     return false;
   }
@@ -165,10 +171,13 @@ export function insertMention(triggers: string[], trigger: string, value?: strin
 
   let spaceNode: TextNode | null = null;
   const nodes: LexicalNode[] = [];
+
   if (wordCharBeforeCursor || (cursorAtStartOfNode && prevNode !== null && !$isTextNode(prevNode))) {
     nodes.push($createTextNode(' '));
   }
+
   nodes.push(mentionNode);
+
   if (wordCharAfterCursor || (cursorAtEndOfNode && nextNode !== null && !$isTextNode(nextNode))) {
     spaceNode = $createTextNode(' ');
     nodes.push(spaceNode);
@@ -189,16 +198,20 @@ export function insertMention(triggers: string[], trigger: string, value?: strin
 
 export function getNextSibling(node: LexicalNode) {
   let nextSibling = node.getNextSibling();
+
   while (nextSibling !== null && nextSibling.getType() === 'zeroWidth') {
     nextSibling = nextSibling.getNextSibling();
   }
+
   return nextSibling;
 }
 
 export function getPreviousSibling(node: LexicalNode) {
   let previousSibling = node.getPreviousSibling();
+
   while (previousSibling !== null && previousSibling.getType() === 'zeroWidth') {
     previousSibling = previousSibling.getPreviousSibling();
   }
+
   return previousSibling;
 }
