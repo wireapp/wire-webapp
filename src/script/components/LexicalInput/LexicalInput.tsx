@@ -34,6 +34,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {User} from 'src/script/entity/User';
 import {DraftState} from 'Util/DraftStateUtil';
+import {getLogger} from 'Util/Logger';
 
 import {EditMessage} from './components/EditMessage';
 import {BeautifulMentionNode} from './nodes/MentionNode';
@@ -59,6 +60,8 @@ const theme = {
     '@Focused': 'focused-beautiful-mentions', // add the "Focused" suffix to style the focused mention
   },
 };
+
+const logger = getLogger('LexicalInput');
 
 interface LexicalInputProps {
   currentMentions: MentionEntity[];
@@ -103,8 +106,7 @@ export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
       namespace: 'WireLexicalEditor',
       theme,
       onError(error: unknown) {
-        // eslint-disable-next-line no-console
-        console.log('[LexicalInput.tsx] przemvs error', error);
+        logger.error(error);
         throw error;
       },
       nodes: [BeautifulMentionNode, BeautifulMentionNode],
@@ -124,7 +126,7 @@ export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
     return (
       <LexicalComposer initialConfig={editorConfig}>
         <div className="controls-center">
-          <div css={{width: '100%'}} className={cx('input-bar--wrapper')}>
+          <div className={cx('input-bar--wrapper')}>
             <AutoFocusPlugin />
             <GlobalEventsPlugin onShiftTab={onShiftTab} />
             <EditorRefPlugin editorRef={ref} />

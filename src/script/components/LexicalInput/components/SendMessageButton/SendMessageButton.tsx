@@ -39,7 +39,7 @@ const createMentionEntity = (user: Pick<User, 'id' | 'name' | 'domain'>, mention
 
 interface SendMessageButtonProps {
   textValue: string;
-  onSend: any;
+  onSend: (message: string, mentions: MentionEntity[]) => void;
   mentions: User[];
 }
 
@@ -68,6 +68,16 @@ export const getMentionsToSend = (editor: LexicalEditor, textValue: string, ment
 export const SendMessageButton = ({textValue, onSend, mentions}: SendMessageButtonProps) => {
   const [editor] = useLexicalComposerContext();
 
+  const handleSendMessage = () => {
+    const mentionEntities = getMentionsToSend(editor, textValue, mentions);
+
+    onSend(textValue, mentionEntities);
+
+    editor.update(() => {
+      $getRoot().clear();
+    });
+  };
+
   useEffect(() => {
     const removeListener = editor.registerCommand(
       KEY_ENTER_COMMAND,
@@ -82,12 +92,8 @@ export const SendMessageButton = ({textValue, onSend, mentions}: SendMessageButt
         if (event?.shiftKey) {
           return true;
         }
-        const mentionEntities = getMentionsToSend(editor, textValue, mentions);
 
-        onSend(textValue, mentionEntities);
-        editor.update(() => {
-          $getRoot().clear();
-        });
+        handleSendMessage();
 
         return false;
       },
@@ -107,15 +113,7 @@ export const SendMessageButton = ({textValue, onSend, mentions}: SendMessageButt
       title={t('tooltipConversationSendMessage')}
       aria-label={t('tooltipConversationSendMessage')}
       data-uie-name="do-send-message"
-      onClick={() => {
-        const mentionEntities = getMentionsToSend(editor, textValue, mentions);
-
-        onSend(textValue, mentionEntities);
-
-        editor.update(() => {
-          $getRoot().clear();
-        });
-      }}
+      onClick={() => handleSendMessage()}
     >
       <Icon.Send />
     </button>

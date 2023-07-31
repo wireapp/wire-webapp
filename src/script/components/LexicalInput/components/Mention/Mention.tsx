@@ -30,7 +30,6 @@ import {
   $isNodeSelection,
   $isTextNode,
   $setSelection,
-  BLUR_COMMAND,
   CLICK_COMMAND,
   COMMAND_PRIORITY_LOW,
   GridSelection,
@@ -38,13 +37,12 @@ import {
   KEY_ARROW_RIGHT_COMMAND,
   KEY_BACKSPACE_COMMAND,
   KEY_DELETE_COMMAND,
+  BLUR_COMMAND,
   NodeKey,
   NodeSelection,
   RangeSelection,
-  SELECTION_CHANGE_COMMAND,
 } from 'lexical';
 
-// import {IS_IOS} from './environment';
 import {$isBeautifulMentionNode} from '../../nodes/MentionNode';
 import {getNextSibling, getPreviousSibling} from '../../utils/mention-utils';
 
@@ -61,13 +59,15 @@ export const Mention = (props: BeautifulMentionComponentProps) => {
   const [isSelected, setSelected, clearSelection] = useLexicalNodeSelection(nodeKey);
   const [selection, setSelection] = useState<RangeSelection | NodeSelection | GridSelection | null>(null);
   const isFocused = $isNodeSelection(selection) && isSelected;
-  const ref = useRef(null);
+  const ref = useRef<HTMLSpanElement>(null);
 
   const classNameFinal = useMemo(() => {
     const classes = [className];
+
     if (isFocused) {
       classes.push(classNameFocused);
     }
+
     return classes.join(' ').trim() || undefined;
   }, [className, classNameFocused, isFocused]);
 
@@ -75,76 +75,81 @@ export const Mention = (props: BeautifulMentionComponentProps) => {
     (payload: KeyboardEvent) => {
       if (isSelected && $isNodeSelection($getSelection())) {
         payload.preventDefault();
+
         const node = $getNodeByKey(nodeKey);
+
         if ($isBeautifulMentionNode(node)) {
           node.remove();
         }
+
         setSelected(false);
       }
+
       return false;
     },
     [isSelected, nodeKey, setSelected],
   );
 
-  const onArrowLeftPress = useCallback(
+  const onArrowPress = useCallback(
     (event: KeyboardEvent) => {
       const node = $getNodeByKey(nodeKey);
       if (!node || !node.isSelected()) {
         return false;
       }
-      let handled = false;
-      const nodeToSelect = getPreviousSibling(node);
-      if ($isElementNode(nodeToSelect)) {
-        nodeToSelect.selectEnd();
-        handled = true;
-      }
-      if ($isTextNode(nodeToSelect)) {
-        nodeToSelect.select();
-        handled = true;
-      }
-      if ($isDecoratorNode(nodeToSelect)) {
-        nodeToSelect.selectNext();
-        handled = true;
-      }
-      if (nodeToSelect === null) {
-        node.selectPrevious();
-        handled = true;
-      }
-      if (handled) {
-        event.preventDefault();
-      }
-      return handled;
-    },
-    [nodeKey],
-  );
 
-  const onArrowRightPress = useCallback(
-    (event: KeyboardEvent) => {
-      const node = $getNodeByKey(nodeKey);
-      if (!node || !node.isSelected()) {
-        return false;
-      }
+      const isLeftDirection = event.key === 'ArrowLeft';
+
       let handled = false;
-      const nodeToSelect = getNextSibling(node);
+      let nodeToSelect = getPreviousSibling(node);
+
+      if (!isLeftDirection) {
+        nodeToSelect = getNextSibling(node);
+      }
+
       if ($isElementNode(nodeToSelect)) {
-        nodeToSelect.selectStart();
+        if (isLeftDirection) {
+          nodeToSelect.selectEnd();
+        } else {
+          nodeToSelect.selectStart();
+        }
+
         handled = true;
       }
+
       if ($isTextNode(nodeToSelect)) {
-        nodeToSelect.select(0, 0);
+        if (isLeftDirection) {
+          nodeToSelect.select();
+        } else {
+          nodeToSelect.select(0, 0);
+        }
+
         handled = true;
       }
+
       if ($isDecoratorNode(nodeToSelect)) {
-        nodeToSelect.selectPrevious();
+        if (isLeftDirection) {
+          nodeToSelect.selectNext();
+        } else {
+          nodeToSelect.selectPrevious();
+        }
+
         handled = true;
       }
+
       if (nodeToSelect === null) {
-        node.selectNext();
+        if (isLeftDirection) {
+          node.selectPrevious();
+        } else {
+          node.selectNext();
+        }
+
         handled = true;
       }
+
       if (handled) {
         event.preventDefault();
       }
+
       return handled;
     },
     [nodeKey],
@@ -172,16 +177,6 @@ export const Mention = (props: BeautifulMentionComponentProps) => {
     return false;
   }, [isFocused]);
 
-  // Make sure that the focus is removed when clicking next to the mention
-  const onSelectionChange = useCallback(() => {
-    // if (IS_IOS && isSelected) {
-    if (isSelected) {
-      setSelected(false);
-      return true;
-    }
-    return false;
-  }, [isSelected, setSelected]);
-
   useEffect(() => {
     let isMounted = true;
     const unregister = mergeRegister(
@@ -190,19 +185,20 @@ export const Mention = (props: BeautifulMentionComponentProps) => {
           setSelection(editorState.read(() => $getSelection()));
         }
       }),
+
       editor.registerCommand<MouseEvent>(CLICK_COMMAND, onClick, COMMAND_PRIORITY_LOW),
       editor.registerCommand(KEY_DELETE_COMMAND, onDelete, COMMAND_PRIORITY_LOW),
       editor.registerCommand(KEY_BACKSPACE_COMMAND, onDelete, COMMAND_PRIORITY_LOW),
-      editor.registerCommand(KEY_ARROW_LEFT_COMMAND, onArrowLeftPress, COMMAND_PRIORITY_LOW),
-      editor.registerCommand(KEY_ARROW_RIGHT_COMMAND, onArrowRightPress, COMMAND_PRIORITY_LOW),
+      editor.registerCommand(KEY_ARROW_LEFT_COMMAND, onArrowPress, COMMAND_PRIORITY_LOW),
+      editor.registerCommand(KEY_ARROW_RIGHT_COMMAND, onArrowPress, COMMAND_PRIORITY_LOW),
       editor.registerCommand(BLUR_COMMAND, onBlur, COMMAND_PRIORITY_LOW),
-      editor.registerCommand(SELECTION_CHANGE_COMMAND, onSelectionChange, COMMAND_PRIORITY_LOW),
     );
+
     return () => {
       isMounted = false;
       unregister();
     };
-  }, [editor, onArrowLeftPress, onArrowRightPress, onClick, onBlur, onDelete, onSelectionChange]);
+  }, [editor, onArrowPress, onClick, onBlur, onDelete]);
 
   return (
     <span ref={ref} className={classNameFinal} data-beautiful-mention={mention}>

@@ -34,26 +34,32 @@ interface GlobalEventsPluginProps {
 export const GlobalEventsPlugin = ({onShiftTab}: GlobalEventsPluginProps) => {
   const [editor] = useLexicalComposerContext();
 
-  useLayoutEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      // "Shift" + "Tab"
-      if (event.shiftKey && isTabKey(event)) {
-        editor.dispatchCommand(ON_SHIFT_TAB, event);
-      }
-    };
+  const onKeyDown = (event: KeyboardEvent) => {
+    // "Shift" + "Tab"
+    if (event.shiftKey && isTabKey(event)) {
+      editor.dispatchCommand(ON_SHIFT_TAB, event);
+    }
+  };
 
-    return editor.registerRootListener((rootElement: HTMLElement | null, prevRootElement: HTMLElement | null) => {
-      if (prevRootElement !== null) {
-        prevRootElement.removeEventListener('keydown', onKeyDown);
-      }
-      if (rootElement !== null) {
-        rootElement.addEventListener('keydown', onKeyDown);
-      }
-    });
+  useLayoutEffect(() => {
+    const unregister = editor.registerRootListener(
+      (rootElement: HTMLElement | null, prevRootElement: HTMLElement | null) => {
+        if (prevRootElement !== null) {
+          prevRootElement.removeEventListener('keydown', onKeyDown);
+        }
+        if (rootElement !== null) {
+          rootElement.addEventListener('keydown', onKeyDown);
+        }
+      },
+    );
+
+    return () => {
+      unregister();
+    };
   }, [editor]);
 
   useEffect(() => {
-    return mergeRegister(
+    const unregister = mergeRegister(
       editor.registerCommand(
         ON_SHIFT_TAB,
         () => {
@@ -63,6 +69,10 @@ export const GlobalEventsPlugin = ({onShiftTab}: GlobalEventsPluginProps) => {
         COMMAND_PRIORITY_HIGH,
       ),
     );
+
+    return () => {
+      unregister();
+    };
   }, [editor, onShiftTab]);
 
   return <></>;

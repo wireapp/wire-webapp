@@ -357,9 +357,10 @@ const InputBar = ({
     }
   };
 
-  const onSend = (messageText: string, mentions: MentionEntity[]): void | boolean => {
+  const onSend = (messageText: string, mentions: MentionEntity[]): void => {
     if (pastedFile) {
-      return sendPastedFile();
+      sendPastedFile();
+      return;
     }
 
     const messageTrimmedStart = messageText.trimStart();

@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState, MutableRefObject} from 'react';
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {MenuOption as _MenuOption, useBasicTypeaheadTriggerMatch} from '@lexical/react/LexicalTypeaheadMenuPlugin';
@@ -41,7 +41,7 @@ import * as ReactDOM from 'react-dom';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {IgnoreOutsideClickWrapper} from 'Components/InputBar/util/clickHandlers';
 
-import {LexicalTypeaheadMenuPlugin} from './LexicalTypeheadMenuPlugin';
+import {ItemProps, LexicalTypeaheadMenuPlugin} from './LexicalTypeheadMenuPlugin';
 
 import {User} from '../../../entity/User';
 import {MentionSuggestionsItem} from '../components/Mention/MentionSuggestionsItem';
@@ -309,6 +309,61 @@ export const BeautifulMentionsPlugin = ({onSearch}: BeautifulMentionsPluginProps
     );
   }, [editor, triggers, isEditorFocused, insertTextAsMention, setSelection, archiveSelection]);
 
+  const getPosition = () => {
+    if (!rootElement) {
+      return {bottom: 0, left: 0};
+    }
+
+    const boundingClientRect = rootElement.getBoundingClientRect();
+
+    return {bottom: window.innerHeight - boundingClientRect.top + 24, left: boundingClientRect.left};
+  };
+
+  const menuRenderFn = (
+    anchorElementRef: MutableRefObject<HTMLElement | null>,
+    {selectedIndex, selectOptionAndCleanUp, setHighlightedIndex}: ItemProps<MenuOption>,
+  ) => {
+    if (!anchorElementRef.current || !options.length) {
+      return null;
+    }
+
+    const {bottom, left} = getPosition();
+
+    return ReactDOM.createPortal(
+      <IgnoreOutsideClickWrapper>
+        <FadingScrollbar
+          className="conversation-input-bar-mention-suggestion"
+          style={{bottom, left, overflowY: 'auto'}}
+          data-uie-name="list-mention-suggestions"
+        >
+          <div className="mention-suggestion-list">
+            {options
+              .map((option, index) => {
+                const selected = selectedIndex === index;
+                return (
+                  <MentionSuggestionsItem
+                    ref={option.setRefElement}
+                    key={option.user.id}
+                    suggestion={option.user}
+                    isSelected={selected}
+                    onSuggestionClick={() => {
+                      setHighlightedIndex(index);
+                      selectOptionAndCleanUp(option);
+                    }}
+                    onMouseEnter={() => {
+                      setHighlightedIndex(index);
+                    }}
+                  />
+                );
+              })
+              .reverse()}
+          </div>
+        </FadingScrollbar>
+      </IgnoreOutsideClickWrapper>,
+      anchorElementRef.current,
+    );
+  };
+
   return (
     <LexicalTypeaheadMenuPlugin
       onQueryChange={setQueryString}
@@ -316,57 +371,7 @@ export const BeautifulMentionsPlugin = ({onSearch}: BeautifulMentionsPluginProps
       triggerFn={checkForMentionMatch}
       options={options}
       onClose={handleClose}
-      menuRenderFn={(anchorElementRef, {selectedIndex, selectOptionAndCleanUp, setHighlightedIndex}) => {
-        if (!anchorElementRef.current || !options.length) {
-          return null;
-        }
-
-        const getPosition = () => {
-          if (!rootElement) {
-            return {bottom: 0, left: 0};
-          }
-
-          const boundingClientRect = rootElement.getBoundingClientRect();
-
-          return {bottom: window.innerHeight - boundingClientRect.top + 24, left: boundingClientRect.left};
-        };
-
-        const {bottom, left} = getPosition();
-
-        return ReactDOM.createPortal(
-          <IgnoreOutsideClickWrapper>
-            <FadingScrollbar
-              className="conversation-input-bar-mention-suggestion"
-              style={{bottom, left, overflowY: 'auto'}}
-              data-uie-name="list-mention-suggestions"
-            >
-              <div className="mention-suggestion-list">
-                {options
-                  .map((option, index) => {
-                    const selected = selectedIndex === index;
-                    return (
-                      <MentionSuggestionsItem
-                        ref={option.setRefElement}
-                        key={option.user.id}
-                        suggestion={option.user}
-                        isSelected={selected}
-                        onSuggestionClick={() => {
-                          setHighlightedIndex(index);
-                          selectOptionAndCleanUp(option);
-                        }}
-                        onMouseEnter={() => {
-                          setHighlightedIndex(index);
-                        }}
-                      />
-                    );
-                  })
-                  .reverse()}
-              </div>
-            </FadingScrollbar>
-          </IgnoreOutsideClickWrapper>,
-          anchorElementRef.current,
-        );
-      }}
+      menuRenderFn={menuRenderFn}
     />
   );
 };

@@ -73,14 +73,16 @@ export class TypeaheadOption {
   }
 }
 
+export type ItemProps<TOption extends TypeaheadOption> = {
+  selectedIndex: number | null;
+  selectOptionAndCleanUp: (option: TOption) => void;
+  setHighlightedIndex: (index: number) => void;
+  options: Array<TOption>;
+};
+
 export type MenuRenderFn<TOption extends TypeaheadOption> = (
   anchorElementRef: MutableRefObject<HTMLElement | null>,
-  itemProps: {
-    selectedIndex: number | null;
-    selectOptionAndCleanUp: (option: TOption) => void;
-    setHighlightedIndex: (index: number) => void;
-    options: Array<TOption>;
-  },
+  itemProps: ItemProps<TOption>,
   matchingString: string,
 ) => ReactPortal | JSX.Element | null;
 

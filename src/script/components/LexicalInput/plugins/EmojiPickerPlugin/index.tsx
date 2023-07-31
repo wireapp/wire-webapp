@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useCallback, useMemo, useState, MutableRefObject} from 'react';
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {
@@ -33,7 +33,9 @@ import {sortByPriority} from 'Util/StringUtil';
 
 import {StorageKey} from '../../../../storage';
 import {EmojiItem} from '../../components/EmojiItem';
+import emojis from '../../utils/emoji-list';
 import {getDOMRangeRect} from '../../utils/getDomRangeRect';
+import {ItemProps} from '../LexicalTypeheadMenuPlugin';
 
 export class EmojiOption extends MenuOption {
   title: string;
@@ -54,24 +56,12 @@ export class EmojiOption extends MenuOption {
   }
 }
 
-type Emoji = {
-  emoji: string;
-  description: string;
-  category: string;
-  aliases: Array<string>;
-  tags: Array<string>;
-  unicode_version: string;
-  ios_version: string;
-  skin_tones?: boolean;
-};
-
 const MAX_EMOJI_SUGGESTION_COUNT = 5;
 
 export const EmojiPickerPlugin = () => {
   const [lexicalEditor] = useLexicalComposerContext();
 
   const [queryString, setQueryString] = useState<string | null>(null);
-  const [emojis, setEmojis] = useState<Array<Emoji>>([]);
 
   const emojiUsageCount: Record<string, number> = loadValue(StorageKey.CONVERSATION.EMOJI_USAGE_COUNT) || {};
 
@@ -83,11 +73,6 @@ export const EmojiPickerPlugin = () => {
       storeValue(StorageKey.CONVERSATION.EMOJI_USAGE_COUNT, emojiUsageCount);
     }
   };
-
-  useEffect(() => {
-    // @ts-ignore
-    import('../../utils/emoji-list.ts').then(file => setEmojis(file.default));
-  }, []);
 
   const emojiOptions = useMemo(
     () =>
@@ -151,55 +136,60 @@ export const EmojiPickerPlugin = () => {
 
   const rootElement = lexicalEditor.getRootElement();
 
+  const getPosition = () => {
+    const nativeSelection = window.getSelection();
+
+    if (!rootElement || !nativeSelection) {
+      return {bottom: 0, left: 0};
+    }
+
+    const rangeRect = getDOMRangeRect(nativeSelection, rootElement);
+
+    return {
+      bottom: window.innerHeight - rangeRect.top,
+      left: rangeRect.x,
+    };
+  };
+
+  const menuRender = (
+    anchorElementRef: MutableRefObject<HTMLElement | null>,
+    {selectedIndex, selectOptionAndCleanUp, setHighlightedIndex}: ItemProps<EmojiOption>,
+  ) => {
+    if (!anchorElementRef.current || !options.length) {
+      return null;
+    }
+
+    const {bottom, left} = getPosition();
+
+    return ReactDOM.createPortal(
+      <div className="typeahead-popover emoji-menu">
+        <div className="conversation-input-bar-emoji-list" style={{bottom, left}}>
+          {options.map((option: EmojiOption, index) => (
+            <EmojiItem
+              ref={option.setRefElement}
+              key={option.key}
+              selectedEmoji={selectedIndex === index}
+              emoji={option}
+              onMouseEnter={() => setHighlightedIndex(index)}
+              onClick={() => {
+                setHighlightedIndex(index);
+                selectOptionAndCleanUp(option);
+              }}
+            />
+          ))}
+        </div>
+      </div>,
+      anchorElementRef.current,
+    );
+  };
+
   return (
     <LexicalTypeaheadMenuPlugin
       onQueryChange={setQueryString}
       onSelectOption={onSelectOption}
       triggerFn={checkForTriggerMatch}
       options={options}
-      menuRenderFn={(anchorElementRef, {selectedIndex, selectOptionAndCleanUp, setHighlightedIndex}) => {
-        if (!anchorElementRef.current || !options.length) {
-          return null;
-        }
-
-        const getPosition = () => {
-          const nativeSelection = window.getSelection();
-
-          if (!rootElement || !nativeSelection) {
-            return {bottom: 0, left: 0};
-          }
-
-          const rangeRect = getDOMRangeRect(nativeSelection, rootElement);
-
-          return {
-            bottom: window.innerHeight - rangeRect.top,
-            left: rangeRect.x,
-          };
-        };
-
-        const {bottom, left} = getPosition();
-
-        return ReactDOM.createPortal(
-          <div className="typeahead-popover emoji-menu">
-            <div className="conversation-input-bar-emoji-list" style={{bottom, left}}>
-              {options.map((option: EmojiOption, index) => (
-                <EmojiItem
-                  ref={option.setRefElement}
-                  key={option.key}
-                  selectedEmoji={selectedIndex === index}
-                  emoji={option}
-                  onMouseEnter={() => setHighlightedIndex(index)}
-                  onClick={() => {
-                    setHighlightedIndex(index);
-                    selectOptionAndCleanUp(option);
-                  }}
-                />
-              ))}
-            </div>
-          </div>,
-          anchorElementRef.current,
-        );
-      }}
+      menuRenderFn={menuRender}
     />
   );
 };
