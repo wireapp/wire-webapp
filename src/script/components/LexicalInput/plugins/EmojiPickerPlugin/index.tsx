@@ -88,11 +88,21 @@ export function EmojiPickerPlugin() {
   );
 
   const checkForTriggerMatch = useBasicTypeaheadTriggerMatch(':', {
-    minLength: 0,
+    minLength: 1,
   });
 
   const options: Array<EmojiOption> = useMemo(() => {
     return emojiOptions
+      .sort((emojiA, emojiB) => {
+        const usageCountA = getUsageCount(emojiA.title);
+        const usageCountB = getUsageCount(emojiB.title);
+
+        const sameUsageCount = usageCountA === usageCountB;
+
+        return sameUsageCount
+          ? sortByPriority(emojiA.title, emojiB.title, queryString || '')
+          : usageCountB - usageCountA;
+      })
       .filter((option: EmojiOption) => {
         return queryString != null
           ? new RegExp(queryString, 'gi').exec(option.title) || option.keywords != null
@@ -100,16 +110,7 @@ export function EmojiPickerPlugin() {
             : false
           : emojiOptions;
       })
-      .slice(0, MAX_EMOJI_SUGGESTION_COUNT)
-      .sort((emojiA, emojiB) => {
-        const usageCountA = getUsageCount(emojiA.title);
-        const usageCountB = getUsageCount(emojiB.title);
-
-        const sameUsageCount = usageCountA === usageCountB;
-        return sameUsageCount
-          ? sortByPriority(emojiA.title, emojiB.title, queryString || '')
-          : usageCountB - usageCountA;
-      });
+      .slice(0, MAX_EMOJI_SUGGESTION_COUNT);
   }, [emojiOptions, queryString]);
 
   const onSelectOption = useCallback(

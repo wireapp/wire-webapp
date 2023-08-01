@@ -36,6 +36,7 @@ import {User} from 'src/script/entity/User';
 import {DraftState} from 'Util/DraftStateUtil';
 import {getLogger} from 'Util/Logger';
 
+import {EmojiNode} from './nodes/EmojiNode';
 import {BeautifulMentionNode} from './nodes/MentionNode';
 import {AutoFocusPlugin} from './plugins/AutoFocusPlugin';
 import {BeautifulMentionsPlugin} from './plugins/BeautifulMentionsPlugin';
@@ -44,6 +45,7 @@ import {EditMessagePlugin} from './plugins/EditMessagePlugin';
 import {EmojiPickerPlugin} from './plugins/EmojiPickerPlugin';
 import {GlobalEventsPlugin} from './plugins/GlobalEventsPlugin';
 import {EditorRefPlugin} from './plugins/LexicalEditorRefPlugin';
+import {ReplaceEmojiPlugin} from './plugins/ReplaceEmojiPlugin';
 
 import {MentionEntity} from '../../message/MentionEntity';
 import {PropertiesRepository} from '../../properties/PropertiesRepository';
@@ -79,6 +81,9 @@ interface LexicalInputProps {
   onShiftTab: () => void;
 }
 
+// ID to block
+// 34e551ae-9120-4f06-aa8b-de986df482e6
+
 export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
   (
     {
@@ -109,7 +114,7 @@ export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
         logger.error(error);
         throw error;
       },
-      nodes: [BeautifulMentionNode],
+      nodes: [BeautifulMentionNode, EmojiNode],
     };
 
     const queryMentions = (queryString?: string | null) => {
@@ -125,7 +130,7 @@ export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
         const stringifyEditor = JSON.stringify(editorState.toJSON());
         saveDraftState(stringifyEditor);
       },
-      [saveDraftState, setInputValue],
+      [saveDraftState, setInputValue, shouldReplaceEmoji],
     );
 
     useEffect(() => {
@@ -138,14 +143,19 @@ export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
     return (
       <LexicalComposer initialConfig={editorConfig}>
         <div className="controls-center">
-          <div className={cx('input-bar--wrapper')}>
+          <div className="input-bar--wrapper">
             <AutoFocusPlugin />
             <GlobalEventsPlugin onShiftTab={onShiftTab} />
             <EditorRefPlugin editorRef={ref} />
             <DraftStatePlugin setInputValue={setInputValue} loadDraftState={loadDraftState} />
             <EditMessagePlugin onMessageEdit={editMessage} />
 
-            {shouldReplaceEmoji && <EmojiPickerPlugin />}
+            {shouldReplaceEmoji && (
+              <>
+                <EmojiPickerPlugin />
+                <ReplaceEmojiPlugin />
+              </>
+            )}
 
             <PlainTextPlugin
               contentEditable={

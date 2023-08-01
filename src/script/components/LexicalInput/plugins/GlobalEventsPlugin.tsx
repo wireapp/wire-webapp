@@ -26,7 +26,6 @@ import {LexicalCommand, createCommand, COMMAND_PRIORITY_HIGH} from 'lexical';
 import {isTabKey} from 'Util/KeyboardUtil';
 
 export const ON_SHIFT_TAB: LexicalCommand<KeyboardEvent> = createCommand('ON_SHIFT_TAB');
-
 interface GlobalEventsPluginProps {
   onShiftTab: () => void;
 }
@@ -59,20 +58,16 @@ export function GlobalEventsPlugin({onShiftTab}: GlobalEventsPluginProps): null 
   }, [editor]);
 
   useEffect(() => {
-    const unregister = mergeRegister(
-      editor.registerCommand(
-        ON_SHIFT_TAB,
-        () => {
-          onShiftTab();
-          return true;
-        },
-        COMMAND_PRIORITY_HIGH,
-      ),
+    const removeOnShiftTabCommand = editor.registerCommand(
+      ON_SHIFT_TAB,
+      () => {
+        onShiftTab();
+        return true;
+      },
+      COMMAND_PRIORITY_HIGH,
     );
 
-    return () => {
-      unregister();
-    };
+    return mergeRegister(removeOnShiftTabCommand);
   }, [editor, onShiftTab]);
 
   return null;
