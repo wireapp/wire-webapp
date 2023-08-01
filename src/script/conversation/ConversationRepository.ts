@@ -68,7 +68,6 @@ import {
 } from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {isBackendError} from 'Util/TypePredicateUtil';
-import {noop} from 'Util/util';
 import {createUuid} from 'Util/uuid';
 
 import {ACCESS_STATE} from './AccessState';
@@ -91,6 +90,7 @@ import {MessageRepository} from './MessageRepository';
 import {NOTIFICATION_STATE} from './NotificationSetting';
 
 import {AssetTransferState} from '../assets/AssetTransferState';
+import {CallingRepository} from '../calling/CallingRepository';
 import {LEAVE_CALL_REASON} from '../calling/enum/LeaveCallReason';
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import {Config} from '../Config';
@@ -153,7 +153,6 @@ export class ConversationRepository {
   public readonly conversationRoleRepository: ConversationRoleRepository;
   private readonly event_mapper: EventMapper;
   private readonly eventService: EventService;
-  public leaveCall: (conversationId: QualifiedId, reason: LEAVE_CALL_REASON) => void;
   private readonly logger: Logger;
   public readonly stateHandler: ConversationStateHandler;
   public readonly verificationStateHandler: ConversationVerificationStateHandler;
@@ -178,6 +177,7 @@ export class ConversationRepository {
     private readonly teamRepository: TeamRepository,
     private readonly userRepository: UserRepository,
     private readonly propertyRepository: PropertiesRepository,
+    private readonly callingRepository: CallingRepository,
     private readonly serverTimeHandler: ServerTimeHandler,
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
@@ -289,7 +289,6 @@ export class ConversationRepository {
     );
 
     this.conversationRoleRepository = new ConversationRoleRepository(this.teamRepository, this.conversationService);
-    this.leaveCall = noop;
 
     if (this.core.backendFeatures.isFederated) {
       this.scheduleMissingUsersAndConversationsMetadataRefresh();
@@ -935,7 +934,7 @@ export class ConversationRepository {
       return;
     }
 
-    this.leaveCall(conversationEntity.qualifiedId, LEAVE_CALL_REASON.USER_MANUALY_LEFT_CONVERSATION);
+    this.callingRepository.leaveCall(conversationEntity.qualifiedId, LEAVE_CALL_REASON.USER_MANUALY_LEFT_CONVERSATION);
 
     if (this.conversationState.isActiveConversation(conversationEntity)) {
       const nextConversation = this.getNextConversation(conversationEntity);
@@ -1241,46 +1240,56 @@ export class ConversationRepository {
     }
   };
 
+  private readonly getConnectionConversation = (connectionEntity: ConnectionEntity) => {
+    const {conversationId} = connectionEntity;
+
+    const localConversation = this.conversationState.findConversation(conversationId);
+
+    if (localConversation) {
+      return localConversation;
+    }
+
+    if (connectionEntity.isConnected() || connectionEntity.isOutgoingRequest()) {
+      return this.fetchConversationById(conversationId);
+    }
+
+    return undefined;
+  };
+
   /**
    * Maps user connection to the corresponding conversation.
    *
    * @note If there is no conversation it will request it from the backend
    * @returns Resolves when connection was mapped return value
    */
-  private readonly mapConnection = (connectionEntity: ConnectionEntity): Promise<Conversation | undefined> => {
-    const qualifiedId: QualifiedId = connectionEntity.conversationId;
-    return Promise.resolve(this.conversationState.findConversation(qualifiedId))
-      .then(conversationEntity => {
-        if (!conversationEntity) {
-          if (connectionEntity.isConnected() || connectionEntity.isOutgoingRequest()) {
-            return this.fetchConversationById(qualifiedId);
-          }
-        }
-        return conversationEntity;
-      })
-      .then(conversationEntity => {
-        if (!conversationEntity) {
-          return undefined;
-        }
-        conversationEntity.connection(connectionEntity);
+  private readonly mapConnection = async (connectionEntity: ConnectionEntity): Promise<Conversation | undefined> => {
+    try {
+      const conversation = await this.getConnectionConversation(connectionEntity);
 
-        if (connectionEntity.isConnected()) {
-          conversationEntity.type(CONVERSATION_TYPE.ONE_TO_ONE);
-        }
-
-        return this.updateParticipatingUserEntities(conversationEntity);
-      })
-      .then(updatedConversationEntity => {
-        this.conversationState.conversations.notifySubscribers();
-        return updatedConversationEntity;
-      })
-      .catch(error => {
-        const isConversationNotFound = error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
-        if (!isConversationNotFound) {
-          throw error;
-        }
+      if (!conversation) {
         return undefined;
-      });
+      }
+
+      conversation.connection(connectionEntity);
+
+      if (connectionEntity.isConnected()) {
+        conversation.type(CONVERSATION_TYPE.ONE_TO_ONE);
+      }
+
+      const updatedConversation = await this.updateParticipatingUserEntities(conversation);
+
+      this.conversationState.conversations.notifySubscribers();
+
+      return updatedConversation;
+    } catch (error) {
+      const isConversationNotFound =
+        error instanceof ConversationError && error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
+      if (!isConversationNotFound) {
+        throw error;
+      }
+
+      return undefined;
+    }
   };
 
   /**
@@ -1551,7 +1560,10 @@ export class ConversationRepository {
 
     if (leaveConversation) {
       conversationEntity.status(ConversationStatus.PAST_MEMBER);
-      this.leaveCall(conversationEntity.qualifiedId, LEAVE_CALL_REASON.USER_MANUALY_LEFT_CONVERSATION);
+      this.callingRepository.leaveCall(
+        conversationEntity.qualifiedId,
+        LEAVE_CALL_REASON.USER_MANUALY_LEFT_CONVERSATION,
+      );
     }
 
     await this.messageRepository.updateClearedTimestamp(conversationEntity);
@@ -2641,7 +2653,7 @@ export class ConversationRepository {
 
     if (removesSelfUser) {
       conversationEntity.status(ConversationStatus.PAST_MEMBER);
-      this.leaveCall(
+      this.callingRepository.leaveCall(
         conversationEntity.qualifiedId,
         LEAVE_CALL_REASON.USER_IS_REMOVED_BY_AN_ADMIN_OR_LEFT_ON_ANOTHER_CLIENT,
       );
@@ -2654,6 +2666,12 @@ export class ConversationRepository {
         await this.conversationService.wipeMLSConversation(conversationEntity);
       }
     } else {
+      /**
+       * @note We have to call pushClients -> setClientsForConv avs api whenever
+       * someone is removed from the conversation in order to make conference calling
+       * encryption keys rotate on involuntary participant leave.
+       */
+      await this.callingRepository.pushClients();
       // Update conversation roles (in case the removed user had some special role and it's not the self user)
       await this.conversationRoleRepository.updateConversationRoles(conversationEntity);
     }

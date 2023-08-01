@@ -156,7 +156,7 @@ const UserModal: React.FC<UserModalProps> = ({
       userRepository
         .getUserById(userId)
         .then(user => {
-          if (user.isDeleted) {
+          if (user.isDeleted || !user.isAvailable()) {
             setUserNotFound(true);
             return;
           }

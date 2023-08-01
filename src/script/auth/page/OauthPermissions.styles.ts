@@ -51,6 +51,13 @@ export const boxCSS: CSSObject = {
 };
 
 export const textCSS: CSSObject = {fontSize: '12px', lineHeight: '16px', display: 'block'};
+export const mobileTextCSS: CSSObject = {
+  fontSize: '12px',
+  lineHeight: '16px',
+  display: 'block',
+  marginLeft: '30px',
+  marginRight: '30px',
+};
 
 export const buttonsCSS: CSSObject = {
   display: 'flex',
@@ -60,7 +67,16 @@ export const buttonsCSS: CSSObject = {
   gap: '16px',
 };
 
+export const mobileButtonsCSS: CSSObject = {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  marginTop: '20px',
+  gap: '16px',
+};
+
 export const buttonCSS: CSSObject = {margin: 'auto', width: 200};
+export const mobileButtonCSS: CSSObject = {margin: 'auto', width: 300, height: 60};
 
 export const listCSS: CSSObject = {
   marginTop: 0,

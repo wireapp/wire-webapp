@@ -23,6 +23,7 @@ import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/Conversati
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
 import {amplify} from 'amplify';
 import cx from 'classnames';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, Select} from '@wireapp/react-ui-kit';
@@ -40,8 +41,9 @@ import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from 'src/script/router/routerBindings';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleEnterDown, isKeyboardEvent, offEscKey, onEscKey} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {replaceLink, t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
+import {isAxiosError} from 'Util/TypePredicateUtil';
 
 import {Config} from '../../../Config';
 import {ACCESS_STATE} from '../../../conversation/AccessState';
@@ -56,10 +58,15 @@ import {isProtocolOption, ProtocolOption} from '../../../guards/Protocol';
 import {RootContext} from '../../../page/RootProvider';
 import {TeamState} from '../../../team/TeamState';
 import {UserState} from '../../../user/UserState';
+import {PrimaryModal} from '../PrimaryModal';
 
 interface GroupCreationModalProps {
   userState?: UserState;
   teamState?: TeamState;
+}
+
+interface NonFederatingBackendsData {
+  non_federating_backends: string[];
 }
 
 enum GroupCreationModalState {
@@ -67,6 +74,7 @@ enum GroupCreationModalState {
   PARTICIPANTS = 'GroupCreationModal.STATE.PARTICIPANTS',
   PREFERENCES = 'GroupCreationModal.STATE.PREFERENCES',
 }
+const NON_FEDERATING_BACKENDS = HTTP_STATUS.CONFLICT;
 
 const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   userState = container.resolve(UserState),
@@ -227,6 +235,42 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
           createNavigate(generateConversationUrl(conversation.qualifiedId))(event);
         }
       } catch (error) {
+        if (isAxiosError<NonFederatingBackendsData>(error) && error.response?.status === NON_FEDERATING_BACKENDS) {
+          const tempName = groupName;
+          setIsShown(false);
+          const backendString = error.response?.data!.non_federating_backends?.join(', and ');
+          const replaceBackends = replaceLink(
+            'https://support.wire.com/hc/articles/9357718008093',
+            'modal__text__read-more',
+            'read-more-backends',
+          );
+          return PrimaryModal.show(PrimaryModal.type.MULTI_ACTIONS, {
+            preventClose: true,
+            primaryAction: {
+              text: t('groupCreationPreferencesNonFederatingEditList'),
+              action: () => {
+                setGroupName(tempName);
+                setIsShown(true);
+                setIsCreatingConversation(false);
+                setGroupCreationState(GroupCreationModalState.PARTICIPANTS);
+              },
+            },
+            secondaryAction: {
+              text: t('groupCreationPreferencesNonFederatingLeave'),
+              action: () => {
+                setIsCreatingConversation(false);
+              },
+            },
+            text: {
+              htmlMessage: t(
+                'groupCreationPreferencesNonFederatingMessage',
+                {backends: backendString},
+                replaceBackends,
+              ),
+              title: t('groupCreationPreferencesNonFederatingHeadline'),
+            },
+          });
+        }
         amplify.publish(WebAppEvents.CONVERSATION.SHOW, undefined, {});
         setIsCreatingConversation(false);
       }

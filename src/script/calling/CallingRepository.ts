@@ -326,7 +326,10 @@ export class CallingRepository {
     activeCall?.muteState(isMuted ? this.nextMuteState : MuteState.NOT_MUTED);
   };
 
-  private async pushClients(call: Call, checkMismatch?: boolean) {
+  public async pushClients(call: Call | undefined = this.callState.joinedCall(), checkMismatch?: boolean) {
+    if (!call) {
+      return false;
+    }
     const conversation = this.conversationState.findConversation(call.conversationId);
     if (!conversation) {
       this.logger.warn(`Unable to find a conversation with id of ${call.conversationId}`);
@@ -1418,7 +1421,7 @@ export class CallingRepository {
   }
 
   private updateParticipantVideoState(call: Call, members: QualifiedWcallMember[]): void {
-    members.forEach(member => call.getParticipant(member.userId, member.clientid)?.isSendingVideo(!!member.vrecv));
+    members.forEach(member => call.getParticipant(member.userId, member.clientid)?.videoState(member.vrecv));
   }
 
   private updateParticipantAudioState(call: Call, members: QualifiedWcallMember[]): void {

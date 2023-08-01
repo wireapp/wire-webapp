@@ -21,14 +21,22 @@ import {FC, useEffect, useState} from 'react';
 
 import {Icon} from 'Components/Icon';
 import {LoadingBar} from 'Components/LoadingBar/LoadingBar';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {User} from 'src/script/entity/User';
 import {ContentState} from 'src/script/page/useAppState';
+import {checkBackupEncryption} from 'Util/BackupUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {loadFileBuffer} from 'Util/util';
 
 import {BackupRepository} from '../../backup/BackupRepository';
-import {CancelError, DifferentAccountError, IncompatibleBackupError} from '../../backup/Error';
+import {
+  CancelError,
+  DifferentAccountError,
+  IncompatibleBackupError,
+  IncompatibleBackupFormatError,
+  InvalidPassword,
+} from '../../backup/Error';
 import {Config} from '../../Config';
 import {MotionDuration} from '../../motion/MotionDuration';
 
@@ -112,20 +120,69 @@ const HistoryImport: FC<HistoryImportProps> = ({user, backupRepository, file, sw
     } else if (error instanceof IncompatibleBackupError) {
       setErrorHeadline(t('backupImportVersionErrorHeadline'));
       setErrorSecondary(t('backupImportVersionErrorSecondary', Config.getConfig().BRAND_NAME));
+    } else if (error instanceof IncompatibleBackupFormatError) {
+      setErrorHeadline(t('backupImportFormatErrorHeadline'));
+      setErrorSecondary(t('backupImportFormatErrorSecondary'));
+    } else if (error instanceof InvalidPassword) {
+      setErrorHeadline(t('backupImportPasswordErrorHeadline'));
+      setErrorSecondary(t('backupImportPasswordErrorSecondary'));
     } else {
       setErrorHeadline(t('backupImportGenericErrorHeadline'));
       setErrorSecondary(t('backupImportGenericErrorSecondary'));
     }
   };
 
+  const getBackUpPassword = (): Promise<string> => {
+    return new Promise(resolve => {
+      PrimaryModal.show(PrimaryModal.type.PASSWORD_ADVANCED_SECURITY, {
+        primaryAction: {
+          action: async (password: string) => {
+            resolve(password);
+          },
+          text: t('backupDecryptionModalAction'),
+        },
+        secondaryAction: [
+          {
+            action: () => {
+              resolve('');
+              dismissImport();
+            },
+            text: t('backupEncryptionModalCloseBtn'),
+          },
+        ],
+        passwordOptional: false,
+        text: {
+          closeBtnLabel: t('backupEncryptionModalCloseBtn'),
+          input: t('backupDecryptionModalPlaceholder'),
+          message: t('backupDecryptionModalMessage'),
+          title: t('backupDecryptionModalTitle'),
+        },
+      });
+    });
+  };
+
   const importHistory = async (file: File) => {
+    const isEncrypted = await checkBackupEncryption(file);
+
+    if (isEncrypted) {
+      const password = await getBackUpPassword();
+
+      if (password) {
+        await processHistoryImport(password);
+      }
+    } else {
+      await processHistoryImport();
+    }
+  };
+
+  const processHistoryImport = async (password?: string) => {
     setHistoryImportState(HistoryImportState.PREPARING);
     setError(null);
 
     const data = await loadFileBuffer(file);
 
     try {
-      await backupRepository.importHistory(user, data, onInit, onProgress);
+      await backupRepository.importHistory(user, data, onInit, onProgress, password);
       onSuccess();
     } catch (error) {
       onError(error as Error);
