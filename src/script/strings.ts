@@ -496,6 +496,10 @@ export const errorHandlerStrings = defineMessages({
     defaultMessage: 'This conversation has reached the limit of participants',
     id: 'BackendError.LABEL.CONVERSATION_TOO_MANY_MEMBERS',
   },
+  [BackendErrorLabel.TOO_MANY_TEAM_MEMBERS]: {
+    defaultMessage: 'This team has reached its maximum size',
+    id: 'BackendError.LABEL.TOO_MANY_MEMBERS',
+  },
   [BackendErrorLabel.ACCESS_DENIED]: {
     defaultMessage: 'Please verify your details and try again',
     id: 'BackendError.LABEL.ACCESS_DENIED',
