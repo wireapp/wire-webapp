@@ -119,21 +119,22 @@ class E2EIHandler {
       // Notify user about E2EI enrollment in progress
       this.currentStep = E2EIHandlerStep.ENROLL;
       this.showLoadingMessage();
-      const success = await core.startE2EIEnrollment(
-        userState.self().name(),
-        userState.self().username(),
-        this.discoveryUrl,
-      );
+      const success = await core.enrollE2EI(userState.self().name(), userState.self().username(), this.discoveryUrl);
       if (!success) {
         throw new Error('E2EI enrollment failed');
       }
       // Notify user about E2EI enrollment success
-      removeCurrentModal();
+      setTimeout(() => {
+        removeCurrentModal();
+      }, 0);
+
       this.currentStep = E2EIHandlerStep.SUCCESS;
       this.showSuccessMessage();
     } catch (e) {
-      removeCurrentModal();
       this.currentStep = E2EIHandlerStep.ERROR;
+      setTimeout(() => {
+        removeCurrentModal();
+      }, 0);
       this.showErrorMessage();
     }
   }
@@ -159,7 +160,6 @@ class E2EIHandler {
       type: ModalType.SUCCESS,
       hideSecondary: true,
       hideClose: false,
-      primaryActionFn: () => null,
     });
     PrimaryModal.show(modalType, modalOptions);
   }
@@ -180,12 +180,14 @@ class E2EIHandler {
         this.showE2EINotificationMessage();
       },
     });
+
     PrimaryModal.show(modalType, modalOptions);
   }
 
   private showE2EINotificationMessage(): void {
     // If the user has already started enrollment, don't show the notification. Instead, show the loading modal
     // This will occur after the redirect from the oauth provider
+    console.log('showE2EINotificationMessage');
     if (AcmeStorage.hasHandle()) {
       this.showLoadingMessage();
       void this.enrollE2EI();

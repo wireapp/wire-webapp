@@ -34,7 +34,7 @@ jest.mock('tsyringe');
 jest.mock('src/script/service/CoreSingleton', () => {
   return {
     Core: jest.fn().mockImplementation(() => {
-      return {startE2EIEnrollment: jest.fn()};
+      return {enrollE2EI: jest.fn()};
     }),
   };
 });
@@ -60,7 +60,7 @@ jest.mock('./Modals', () => ({
 }));
 jest.mock('src/script/service/CoreSingleton', () => ({
   Core: jest.fn().mockImplementation(() => ({
-    startE2EIEnrollment: jest.fn(),
+    enrollE2EI: jest.fn(),
   })),
 }));
 jest.mock('src/script/user/UserState', () => ({
@@ -86,7 +86,7 @@ describe('E2EIHandler', () => {
     coreMock = new Core();
     userStateMock = new UserState();
     (userStateMock.self as unknown as jest.Mock).mockReturnValue({name: () => 'John Doe', username: () => 'johndoe'});
-    (coreMock.startE2EIEnrollment as jest.Mock).mockResolvedValue(true);
+    (coreMock.enrollE2EI as jest.Mock).mockResolvedValue(true);
 
     (container.resolve as jest.Mock).mockImplementation(service => {
       if (service === Core) {
@@ -171,7 +171,7 @@ describe('E2EIHandler', () => {
     // Mock the Core service to return an error
     (container.resolve as any) = jest.fn(service => {
       if (service === Core) {
-        return {startE2EIEnrollment: jest.fn(() => Promise.reject())};
+        return {enrollE2EI: jest.fn(() => Promise.reject())};
       }
       return {self: () => user};
     });
