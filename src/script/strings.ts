@@ -569,10 +569,6 @@ export const errorHandlerStrings = defineMessages({
     defaultMessage: 'Invalid input',
     id: 'BackendError.LABEL.INVALID_PAYLOAD',
   },
-  [BackendErrorLabel.NOT_FOUND]: {
-    defaultMessage: 'Could not find resource',
-    id: 'BackendError.LABEL.NOT_FOUND',
-  },
   [BackendErrorLabel.OPERATION_DENIED]: {
     defaultMessage: 'You don’t have permission',
     id: 'BackendError.LABEL.OPERATION_DENIED',
@@ -608,10 +604,6 @@ export const errorHandlerStrings = defineMessages({
   [BackendErrorLabel.NO_TEAM_MEMBER]: {
     defaultMessage: 'Could not find team member',
     id: 'BackendError.LABEL.NO_TEAM_MEMBER',
-  },
-  [BackendErrorLabel.TOO_MANY_MEMBERS]: {
-    defaultMessage: 'This team has reached its maximum size',
-    id: 'BackendError.LABEL.TOO_MANY_MEMBERS',
   },
   [BackendErrorLabel.SUSPENDED_ACCOUNT]: {
     defaultMessage: 'This account is no longer authorized to log in',
