@@ -25,6 +25,7 @@ import {
   MenuOption,
   useBasicTypeaheadTriggerMatch,
 } from '@lexical/react/LexicalTypeaheadMenuPlugin';
+import {emoticon} from 'emoticon';
 import {$createTextNode, $getSelection, $isRangeSelection, TextNode} from 'lexical';
 import * as ReactDOM from 'react-dom';
 
@@ -33,7 +34,6 @@ import {sortByPriority} from 'Util/StringUtil';
 
 import {StorageKey} from '../../../../storage';
 import {EmojiItem} from '../../components/EmojiItem';
-import emojis from '../../utils/emoji-list';
 import {getDOMRangeRect} from '../../utils/getDomRangeRect';
 import {ItemProps} from '../LexicalTypeheadMenuPlugin';
 
@@ -76,15 +76,15 @@ export function EmojiPickerPlugin() {
 
   const emojiOptions = useMemo(
     () =>
-      emojis != null
-        ? emojis.map(
-            ({emoji, aliases, tags}) =>
-              new EmojiOption(aliases[0], emoji, {
-                keywords: [...aliases, ...tags],
+      emoticon != null
+        ? emoticon.map(
+            ({emoji, name, tags}) =>
+              new EmojiOption(name, emoji, {
+                keywords: [name, ...tags],
               }),
           )
         : [],
-    [emojis],
+    [],
   );
 
   const checkForTriggerMatch = useBasicTypeaheadTriggerMatch(':', {

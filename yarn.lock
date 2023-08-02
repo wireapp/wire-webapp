@@ -9582,6 +9582,13 @@ dexie@latest:
   languageName: node
   linkType: hard
 
+"emoticon@npm:^4.0.1":
+  version: 4.0.1
+  resolution: "emoticon@npm:4.0.1"
+  checksum: 991ab6421927601af4eb44036b60e3125759a4d81f32d2ad96b66e3491e2fdb6a026eeb6bffbfa66724592dca95235570785963607d16961ea73a62ecce715e2
+  languageName: node
+  linkType: hard
+
 "emotion-normalize@npm:11.0.1":
   version: 11.0.1
   resolution: "emotion-normalize@npm:11.0.1"
@@ -20031,6 +20038,7 @@ dexie@latest:
     dexie-batch: 0.4.3
     dotenv: 16.3.1
     dpdm: 3.13.1
+    emoticon: ^4.0.1
     eslint: ^8.41.0
     eslint-config-prettier: ^8.9.0
     eslint-import-resolver-alias: ^1.1.2
