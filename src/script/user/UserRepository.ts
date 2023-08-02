@@ -227,14 +227,10 @@ export class UserRepository {
       await this.userService.removeUserFromDb(orphanUser.qualified_id);
     }
 
-    const missingUsers = users.filter(
-      user =>
-        // The self user doesn't need to be re-fetched
-        !matchQualifiedIds(selfUser.qualifiedId, user) &&
-        !liveUsers.find(localUser => matchQualifiedIds(user, localUser.qualified_id)),
-    );
+    // The self user doesn't need to be re-fetched
+    const usersToFetch = users.filter(user => !matchQualifiedIds(selfUser.qualifiedId, user));
 
-    const {found, failed} = await this.fetchRawUsers(missingUsers, selfUser.domain);
+    const {found, failed} = await this.fetchRawUsers(usersToFetch, selfUser.domain);
 
     const userWithAvailability = found.map(user => {
       const availability = incompleteUsers
@@ -676,6 +672,12 @@ export class UserRepository {
    */
 
   public async getUserSupportedProtocols(userId: QualifiedId): Promise<ConversationProtocol[]> {
+    const localSupportedProtocols = this.findUserById(userId)?.supportedProtocols();
+
+    if (localSupportedProtocols) {
+      return localSupportedProtocols;
+    }
+
     const supportedProtocols = await this.userService.getUserSupportedProtocols(userId);
 
     //update local user entity with new supported protocols
