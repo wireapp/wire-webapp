@@ -1466,6 +1466,12 @@ export class ConversationRepository {
       this.addCreationMessage(mlsConversation, this.userState.self().isTemporaryGuest());
     }
 
+    const isActiveConversation = this.conversationState.isActiveConversation(proteusConversation);
+
+    if (isActiveConversation) {
+      amplify.publish(WebAppEvents.CONVERSATION.SHOW, mlsConversation, {});
+    }
+
     //TODO: if proteus conversation was active conversation, make sure mls 1:1 is now active (navigate to it)
     await this.deleteConversationLocally(proteusConversation.qualifiedId, true);
   };
@@ -1539,7 +1545,7 @@ export class ConversationRepository {
     const establishedMLSConversation = await this.establishMLS1to1Conversation(mlsConversation, otherUserId);
     //if it's also supported by the other user we make sure conversation is established and content is migrated
     if (proteusConversation) {
-      await this.replaceProteus1to1WithMLS(proteusConversation, establishedMLSConversation, true);
+      await this.replaceProteus1to1WithMLS(proteusConversation, establishedMLSConversation);
     }
     return establishedMLSConversation;
   };
