@@ -3941,15 +3941,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/classnames@npm:2.3.1":
-  version: 2.3.1
-  resolution: "@types/classnames@npm:2.3.1"
-  dependencies:
-    classnames: "*"
-  checksum: 09a17ea08fcb83380921efdfdac94cfa162f87025cae0bf6f4ba508c2fa5f436459ce7612905a3f968fdddb68c03b8e6ff08e762ed2d0c110c5c4fceb244dc55
-  languageName: node
-  linkType: hard
-
 "@types/color-convert@npm:*":
   version: 2.0.0
   resolution: "@types/color-convert@npm:2.0.0"
@@ -4048,15 +4039,6 @@ __metadata:
   dependencies:
     "@types/node": "*"
   checksum: d076bb61f45d0fc42dee496ef8b1c2f8742e15d5e47e90e20d0243386e426c04d4efd408a48875ab432f7960b4ce3414db20ed0fbbfc7bcc89d84e574f6e045a
-  languageName: node
-  linkType: hard
-
-"@types/highlight.js@npm:10.1.0":
-  version: 10.1.0
-  resolution: "@types/highlight.js@npm:10.1.0"
-  dependencies:
-    highlight.js: "*"
-  checksum: 284f47e89bfe300f307ad76523a257ff12ed7cf0318cdc0a7fe6965a1d7e21840d133cfc623ec705495550d37341c278c2c9641bafce8b8dbb4bea4acd46f0ec
   languageName: node
   linkType: hard
 
@@ -6476,7 +6458,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"classnames@npm:*, classnames@npm:2.3.2":
+"classnames@npm:2.3.2":
   version: 2.3.2
   resolution: "classnames@npm:2.3.2"
   checksum: 2c62199789618d95545c872787137262e741f9db13328e216b093eea91c85ef2bfb152c1f9e63027204e2559a006a92eb74147d46c800a9f96297ae1d9f96f4e
@@ -9668,7 +9650,7 @@ dexie@latest:
   languageName: node
   linkType: hard
 
-"highlight.js@npm:*, highlight.js@npm:11.8.0":
+"highlight.js@npm:11.8.0":
   version: 11.8.0
   resolution: "highlight.js@npm:11.8.0"
   checksum: d2578a57aee7315946ff19379053fd0a28b127baabf7617ab1d28d62cdc4eaf3d75053569cb8479a5afdc7a68f1ba9a6c1d612d8ae399b4b9aa43093b4fb6831
@@ -17691,12 +17673,10 @@ dexie@latest:
     "@testing-library/react": 14.0.0
     "@types/adm-zip": 0.5.0
     "@types/caniuse-lite": ^1.0.1
-    "@types/classnames": 2.3.1
     "@types/dexie-batch": 0.4.3
     "@types/eslint": 8.44.1
     "@types/fs-extra": 11.0.1
     "@types/generate-changelog": 1.8.1
-    "@types/highlight.js": 10.1.0
     "@types/jest": 29.5.3
     "@types/jquery": ^3
     "@types/js-cookie": 3.0.3
