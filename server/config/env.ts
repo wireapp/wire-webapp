@@ -80,6 +80,9 @@ export type Env = {
   /** will enable the MLS protocol */
   FEATURE_ENABLE_MLS?: string;
 
+  /** will enable the MLS protocol for 1:1 conversations */
+  FEATURE_ENABLE_MLS_1_TO_1_CONVERSATIONS?: string;
+
   /** will enable the user to periodically update the list of supported protocols */
   FEATURE_ENABLE_SELF_SUPPORTED_PROTOCOLS_UPDATES?: string;
 
