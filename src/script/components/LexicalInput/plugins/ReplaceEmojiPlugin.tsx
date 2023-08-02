@@ -20,23 +20,12 @@
 import {useEffect} from 'react';
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
+import {emoticon} from 'emoticon';
 import {TextNode, $getSelection, RangeSelection} from 'lexical';
 
 import {isEnterKey, isSpaceKey} from 'Util/KeyboardUtil';
 
 import {$createEmojiNode, EmojiNode} from '../nodes/EmojiNode';
-import {EmojiInlineReplacements, inlineReplacements} from '../utils/inlineReplacements';
-
-const inlineReplacement: EmojiInlineReplacements = new Map(
-  [...inlineReplacements].sort(([firstShortcut], [secondShortcut]) => {
-    const isUnequalLength = firstShortcut.length !== secondShortcut.length;
-
-    return isUnequalLength ? secondShortcut.length - firstShortcut.length : firstShortcut.localeCompare(secondShortcut);
-  }),
-);
-
-const inlineReplacementArray = Array.from(inlineReplacement.keys());
-const INLINE_MAX_LENGTH = Math.max(...inlineReplacementArray.map(shortcut => shortcut.length));
 
 const escapeRegexp = (string: string): string => string.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
 
@@ -49,18 +38,23 @@ function findAndTransformEmoji(node: TextNode): null | TextNode {
     return null;
   }
 
-  const textUntilCursor = text.substring(
-    Math.max(0, currentFocusSelection - INLINE_MAX_LENGTH - 1),
-    currentFocusSelection,
-  );
+  for (const emoji of emoticon) {
+    for (const single of emoji.emoticons) {
+      const escapedRegEx = escapeRegexp(single);
+      const validInlineEmojiRegEx = new RegExp(`(?:^|\\s)${escapedRegEx}(?=\\s|$)`);
 
-  for (const [replacement, [className, emojiIcon]] of inlineReplacement) {
-    const validInlineEmojiRegEx = new RegExp(`(^|\\s)${escapeRegexp(replacement)}$`);
+      const textUntilCursor = text.substring(
+        Math.max(0, currentFocusSelection - single.length - 1),
+        currentFocusSelection,
+      );
 
-    let targetNode;
+      if (!validInlineEmojiRegEx.test(textUntilCursor)) {
+        break;
+      }
 
-    if (validInlineEmojiRegEx.test(textUntilCursor)) {
-      const positionAfterText = currentFocusSelection - replacement.length;
+      let targetNode;
+
+      const positionAfterText = currentFocusSelection - single.length;
 
       if (positionAfterText === 0) {
         [targetNode] = node.splitText(positionAfterText);
@@ -70,7 +64,7 @@ function findAndTransformEmoji(node: TextNode): null | TextNode {
         [, targetNode] = node.splitText(currentFocusSelection, positionAfterText);
       }
 
-      const emojiNode = $createEmojiNode(className, emojiIcon);
+      const emojiNode = $createEmojiNode(emoji.name, emoji.emoji);
       targetNode.replace(emojiNode);
       return emojiNode;
     }
@@ -108,10 +102,10 @@ export function ReplaceEmojiPlugin(): null {
     const spaceOrTabClicked = (event: KeyboardEvent) => {
       if (isSpaceKey(event) || isEnterKey(event)) {
         onEmojiReplace();
+      }
 
-        if (registeredEvent) {
-          registeredEvent();
-        }
+      if (registeredEvent) {
+        registeredEvent();
       }
     };
 
