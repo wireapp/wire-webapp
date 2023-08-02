@@ -20,15 +20,9 @@
 import {useEffect} from 'react';
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {mergeRegister} from '@lexical/utils';
-import {
-  TextNode,
-  KEY_SPACE_COMMAND,
-  KEY_TAB_COMMAND,
-  COMMAND_PRIORITY_NORMAL,
-  $getSelection,
-  RangeSelection,
-} from 'lexical';
+import {TextNode, $getSelection, RangeSelection} from 'lexical';
+
+import {isEnterKey, isSpaceKey} from 'Util/KeyboardUtil';
 
 import {$createEmojiNode, EmojiNode} from '../nodes/EmojiNode';
 import {EmojiInlineReplacements, inlineReplacements} from '../utils/inlineReplacements';
@@ -49,7 +43,7 @@ const escapeRegexp = (string: string): string => string.replace(/[-/\\^$*+?.()|[
 function findAndTransformEmoji(node: TextNode): null | TextNode {
   const text = node.getTextContent();
   const selection = $getSelection();
-  const currentFocusSelection = (selection as RangeSelection)?.anchor?.offset || 0;
+  const currentFocusSelection = (selection as RangeSelection)?.focus?.offset;
 
   if (!text) {
     return null;
@@ -62,6 +56,7 @@ function findAndTransformEmoji(node: TextNode): null | TextNode {
 
   for (const [replacement, [className, emojiIcon]] of inlineReplacement) {
     const validInlineEmojiRegEx = new RegExp(`(^|\\s)${escapeRegexp(replacement)}$`);
+
     let targetNode;
 
     if (validInlineEmojiRegEx.test(textUntilCursor)) {
@@ -77,44 +72,15 @@ function findAndTransformEmoji(node: TextNode): null | TextNode {
 
       const emojiNode = $createEmojiNode(className, emojiIcon);
       targetNode.replace(emojiNode);
-      return null;
+      return emojiNode;
     }
   }
 
   return null;
 }
 
-// function findAndTransformEmojiT(node: TextNode): null | TextNode {
-//   const text = node.getTextContent();
-//
-//   for (let index = 0; index < text.length; index++) {
-//     const normal = inlineReplacements.get(text[index]);
-//     const slicedEmojiData = inlineReplacements.get(text.slice(index, index + 2));
-//     const emojiData = normal || slicedEmojiData;
-//
-//     if (emojiData !== undefined) {
-//       const [emojiStyle, emojiText] = emojiData;
-//       let targetNode;
-//
-//       if (index === 0) {
-//         [targetNode] = node.splitText(index + 2);
-//       } else {
-//         [, targetNode] = node.splitText(index, index + 2);
-//       }
-//
-//       const emojiNode = $createEmojiNode(emojiStyle, emojiText);
-//       targetNode.replace(emojiNode);
-//       return emojiNode;
-//     }
-//   }
-//
-//   return null;
-// }
-
 const textNodeTransform = (node: TextNode) => {
   let targetNode: TextNode | null = node;
-
-  // console.log('[ReplaceEmojiPlugin.tsx] przemvs targetNode', targetNode);
 
   while (targetNode !== null) {
     if (!targetNode.isSimpleText()) {
@@ -125,6 +91,8 @@ const textNodeTransform = (node: TextNode) => {
   }
 };
 
+let registeredEvent: null | Function = null;
+
 export function ReplaceEmojiPlugin(): null {
   const [editor] = useLexicalComposerContext();
 
@@ -133,27 +101,25 @@ export function ReplaceEmojiPlugin(): null {
       throw new Error('EmojisPlugin: EmojiNode not registered on editor');
     }
 
-    const onEmojiReplace = () => editor.registerNodeTransform(TextNode, textNodeTransform);
+    const onEmojiReplace = () => {
+      registeredEvent = editor.registerNodeTransform(TextNode, textNodeTransform);
+    };
 
-    return mergeRegister(
-      editor.registerCommand(
-        KEY_SPACE_COMMAND,
-        (event: KeyboardEvent) => {
-          onEmojiReplace();
-          return false;
-        },
-        COMMAND_PRIORITY_NORMAL,
-      ),
-      editor.registerCommand(
-        KEY_TAB_COMMAND,
-        (event: KeyboardEvent) => {
-          onEmojiReplace();
-          // Handle enter key presses here
-          return false;
-        },
-        COMMAND_PRIORITY_NORMAL,
-      ),
-    );
+    const spaceOrTabClicked = (event: KeyboardEvent) => {
+      if (isSpaceKey(event) || isEnterKey(event)) {
+        onEmojiReplace();
+
+        if (registeredEvent) {
+          registeredEvent();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', spaceOrTabClicked);
+
+    return () => {
+      window.removeEventListener('keydown', spaceOrTabClicked);
+    };
   }, [editor]);
 
   return null;
