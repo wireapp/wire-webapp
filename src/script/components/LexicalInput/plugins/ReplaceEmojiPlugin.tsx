@@ -23,19 +23,22 @@ import {TextNode} from 'lexical';
 
 const escapeRegexp = (string: string): string => string.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
 
-function findAndTransformEmoji(text: string): string | null {
-  for (const emoji of emoticon) {
-    for (const single of emoji.emoticons) {
-      const escapedRegEx = escapeRegexp(single);
-      const validInlineEmojiRegEx = new RegExp(`(?:^|\\s)${escapedRegEx}(?=\\s|$)`);
+const emojiList = emoticon.map(emoji => {
+  const emoticons = emoji.emoticons || [];
 
-      if (!validInlineEmojiRegEx.test(text)) {
+  return {
+    ...emoji,
+    regexes: emoticons.map(emoticon => new RegExp(`(?:^|\\s)${escapeRegexp(emoticon)}(?=\\s|$)`)),
+  };
+});
+
+function findAndTransformEmoji(text: string): string | null {
+  for (const emoji of emojiList) {
+    for (const regex of emoji.regexes) {
+      if (!regex.test(text)) {
         continue;
       }
-
-      const newText = text.replace(validInlineEmojiRegEx, ` ${emoji.emoji}`);
-
-      return newText;
+      return text.replace(regex, ` ${emoji.emoji}`);
     }
   }
 
@@ -52,7 +55,7 @@ export function ReplaceEmojiPlugin(): null {
     if (!lastTextNodeText || hasNewContent) {
       lastTextNodeText = `${newNode.getTextContent()}`;
       const transformedText = findAndTransformEmoji(lastTextNodeText);
-      if (transformedText !== null) {
+      if (transformedText !== null && transformedText.length > 0) {
         newNode.setTextContent(transformedText);
         lastTextNodeText = transformedText;
       }
