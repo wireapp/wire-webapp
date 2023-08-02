@@ -21,7 +21,7 @@
     "@wireapp/store-engine-dexie": "workspace:^",
     "axios": "1.4.0",
     "bazinga64": "6.1.1",
-    "deepmerge-ts": "4.3.0",
+    "deepmerge-ts": "5.1.0",
     "hash.js": "1.1.7",
     "http-status-codes": "2.2.0",
     "idb": "7.1.1",
