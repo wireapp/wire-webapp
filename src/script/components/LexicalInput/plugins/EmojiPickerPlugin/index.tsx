@@ -111,7 +111,7 @@ export function EmojiPickerPlugin() {
           : emojiOptions;
       })
       .slice(0, MAX_EMOJI_SUGGESTION_COUNT);
-  }, [emojiOptions, queryString]);
+  }, [emojiOptions, getUsageCount, queryString]);
 
   const onSelectOption = useCallback(
     (selectedOption: EmojiOption, nodeToRemove: TextNode | null, closeMenu: () => void) => {
@@ -132,7 +132,7 @@ export function EmojiPickerPlugin() {
         closeMenu();
       });
     },
-    [lexicalEditor],
+    [increaseUsageCount, lexicalEditor],
   );
 
   const rootElement = lexicalEditor.getRootElement();

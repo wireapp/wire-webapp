@@ -17,104 +17,47 @@
  *
  */
 
-import {useEffect} from 'react';
-
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {emoticon} from 'emoticon';
-import {TextNode, $getSelection, RangeSelection} from 'lexical';
-
-import {isEnterKey, isSpaceKey} from 'Util/KeyboardUtil';
-
-import {$createEmojiNode, EmojiNode} from '../nodes/EmojiNode';
+import {TextNode} from 'lexical';
 
 const escapeRegexp = (string: string): string => string.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
 
-function findAndTransformEmoji(node: TextNode): null | TextNode {
-  const text = node.getTextContent();
-  const selection = $getSelection();
-  const currentFocusSelection = (selection as RangeSelection)?.focus?.offset;
-
-  if (!text) {
-    return null;
-  }
-
+function findAndTransformEmoji(text: string): string | null {
   for (const emoji of emoticon) {
     for (const single of emoji.emoticons) {
       const escapedRegEx = escapeRegexp(single);
       const validInlineEmojiRegEx = new RegExp(`(?:^|\\s)${escapedRegEx}(?=\\s|$)`);
 
-      const textUntilCursor = text.substring(
-        Math.max(0, currentFocusSelection - single.length - 1),
-        currentFocusSelection,
-      );
-
-      if (!validInlineEmojiRegEx.test(textUntilCursor)) {
-        break;
+      if (!validInlineEmojiRegEx.test(text)) {
+        continue;
       }
 
-      let targetNode;
+      const newText = text.replace(validInlineEmojiRegEx, ` ${emoji.emoji}`);
 
-      const positionAfterText = currentFocusSelection - single.length;
-
-      if (positionAfterText === 0) {
-        [targetNode] = node.splitText(positionAfterText);
-      } else if (currentFocusSelection === text.length) {
-        [, targetNode] = node.splitText(positionAfterText, currentFocusSelection);
-      } else {
-        [, targetNode] = node.splitText(currentFocusSelection, positionAfterText);
-      }
-
-      const emojiNode = $createEmojiNode(emoji.name, emoji.emoji);
-      targetNode.replace(emojiNode);
-      return emojiNode;
+      return newText;
     }
   }
 
   return null;
 }
 
-const textNodeTransform = (node: TextNode) => {
-  let targetNode: TextNode | null = node;
-
-  while (targetNode !== null) {
-    if (!targetNode.isSimpleText()) {
-      return;
-    }
-
-    targetNode = findAndTransformEmoji(targetNode);
-  }
-};
-
-let registeredEvent: null | Function = null;
+let lastTextNodeText: string = '';
 
 export function ReplaceEmojiPlugin(): null {
   const [editor] = useLexicalComposerContext();
 
-  useEffect(() => {
-    if (!editor.hasNodes([EmojiNode])) {
-      throw new Error('EmojisPlugin: EmojiNode not registered on editor');
+  editor.registerNodeTransform(TextNode, newNode => {
+    const hasNewContent = lastTextNodeText !== newNode.getTextContent();
+    if (!lastTextNodeText || hasNewContent) {
+      lastTextNodeText = `${newNode.getTextContent()}`;
+      const transformedText = findAndTransformEmoji(lastTextNodeText);
+      if (transformedText !== null) {
+        newNode.setTextContent(transformedText);
+        lastTextNodeText = transformedText;
+      }
     }
-
-    const onEmojiReplace = () => {
-      registeredEvent = editor.registerNodeTransform(TextNode, textNodeTransform);
-    };
-
-    const spaceOrTabClicked = (event: KeyboardEvent) => {
-      if (isSpaceKey(event) || isEnterKey(event)) {
-        onEmojiReplace();
-      }
-
-      if (registeredEvent) {
-        registeredEvent();
-      }
-    };
-
-    window.addEventListener('keydown', spaceOrTabClicked);
-
-    return () => {
-      window.removeEventListener('keydown', spaceOrTabClicked);
-    };
-  }, [editor]);
+  });
 
   return null;
 }
