@@ -81,9 +81,6 @@ interface LexicalInputProps {
   onShiftTab: () => void;
 }
 
-// ID to block
-// 34e551ae-9120-4f06-aa8b-de986df482e6
-
 export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
   (
     {
