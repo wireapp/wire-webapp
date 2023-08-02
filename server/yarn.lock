@@ -4199,10 +4199,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nocache@npm:3.0.4":
-  version: 3.0.4
-  resolution: "nocache@npm:3.0.4"
-  checksum: 6be9ee67eb561ecedc56d805c024c0fda55b9836ecba659c720073b067929aa4fe04bb7121480e004c9cf52989e62d8720f29a7fe0269f1a4941221a1e4be1c2
+"nocache@npm:4.0.0":
+  version: 4.0.0
+  resolution: "nocache@npm:4.0.0"
+  checksum: ba317f7a5b837069c3bf8616c9a25f61bd5ec63ad7aa2ce83e8425116df402ab5b4914bbdfb1ba54893c0f859886cb3ad9a375f1c45ba7a72a9712cf31392292
   languageName: node
   linkType: hard
 
@@ -5689,7 +5689,7 @@ __metadata:
     jest: 29.6.2
     logdown: 3.3.1
     maxmind: 4.3.9
-    nocache: 3.0.4
+    nocache: 4.0.0
     opn: 6.0.0
     pm2: 5.3.0
     rimraf: 4.4.1
