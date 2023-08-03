@@ -21,6 +21,7 @@ import {QualifiedUserClients} from './QualifiedUserClients';
 
 export interface MessageSendingStatus {
   deleted: QualifiedUserClients;
+  failed_to_confirm_clients?: QualifiedUserClients;
   failed_to_send?: QualifiedUserClients;
   missing: QualifiedUserClients;
   redundant: QualifiedUserClients;
