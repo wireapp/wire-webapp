@@ -147,12 +147,9 @@ export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
             <DraftStatePlugin setInputValue={setInputValue} loadDraftState={loadDraftState} />
             <EditMessagePlugin onMessageEdit={editMessage} />
 
-            {shouldReplaceEmoji && (
-              <>
-                <EmojiPickerPlugin />
-                <ReplaceEmojiPlugin />
-              </>
-            )}
+            <EmojiPickerPlugin />
+
+            {shouldReplaceEmoji && <ReplaceEmojiPlugin />}
 
             <PlainTextPlugin
               contentEditable={
