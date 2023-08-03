@@ -28,10 +28,7 @@ import {CallingViewModel} from './CallingViewModel';
 import {Call} from '../calling/Call';
 import {CallingRepository} from '../calling/CallingRepository';
 import {CallState} from '../calling/CallState';
-import {Conversation} from '../entity/Conversation';
 import {Core} from '../service/CoreSingleton';
-
-let callClosedCallback: (conversationId: QualifiedId) => void = (conversationId: QualifiedId) => {};
 
 export const mockCallingRepository = {
   startCall: jest.fn(),
@@ -40,8 +37,8 @@ export const mockCallingRepository = {
   onRequestClientsCallback: jest.fn(),
   onRequestNewEpochCallback: jest.fn(),
   onCallParticipantChangedCallback: jest.fn(),
-  onCallClosed: jest.fn().mockImplementation(callback => (callClosedCallback = callback)),
-  leaveCall: jest.fn().mockImplementation(conversationId => callClosedCallback(conversationId)),
+  onCallClosed: jest.fn(),
+  leaveCall: jest.fn(),
   setEpochInfo: jest.fn(),
 } as unknown as CallingRepository;
 
@@ -72,10 +69,6 @@ export function buildCallingViewModel() {
     undefined,
     mockCore,
   );
-
-  jest
-    .spyOn(callingViewModel, 'getConversationById')
-    .mockImplementation(() => ({isUsingMLSProtocol: true} as Conversation));
 
   return callingViewModel;
 }
@@ -126,7 +119,6 @@ export const prepareMLSConferenceMocks = (parentGroupId: string, subGroupId: str
 
   const mockSecretKey = 'secretKey';
   const mockEpochNumber = 1;
-  const mockKeyLength = 32;
 
   jest
     .spyOn(mockCore.service!.mls!, 'joinConferenceSubconversation')
@@ -148,5 +140,12 @@ export const prepareMLSConferenceMocks = (parentGroupId: string, subGroupId: str
 
   jest.spyOn(mockCore.service!.mls!, 'exportSecretKey').mockResolvedValue(mockSecretKey);
 
-  return {expectedMemberListResult, mockSecretKey, mockEpochNumber, mockKeyLength};
+  let callClosedCallback: (conversationId: QualifiedId, callType: CONV_TYPE) => void;
+
+  jest.spyOn(mockCallingRepository, 'onCallClosed').mockImplementation(callback => (callClosedCallback = callback));
+  jest
+    .spyOn(mockCallingRepository, 'leaveCall')
+    .mockImplementation(conversationId => callClosedCallback(conversationId, CONV_TYPE.CONFERENCE_MLS));
+
+  return {expectedMemberListResult, mockSecretKey, mockEpochNumber};
 };

@@ -1,24 +1,5 @@
 /*
  * Wire
- * Copyright (C) 2022 Wire Swiss GmbH
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see http://www.gnu.org/licenses/.
- *
- */
-
-/*
- * Wire
  * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
@@ -39,11 +20,10 @@
 import {BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
 import {defineMessages} from 'react-intl';
 
-import {BackendError} from './auth/module/action/BackendError';
 import {LabeledError} from './auth/module/action/LabeledError';
 import {ValidationError} from './auth/module/action/ValidationError';
+import {Scope} from './auth/page/OAuthPermissions';
 import {LOGOUT_REASON} from './auth/route';
-import {BackendClientError} from './error/BackendClientError';
 
 export const footerStrings = defineMessages({
   copy: {
@@ -485,188 +465,185 @@ export const errorHandlerStrings = defineMessages({
     defaultMessage: 'Sorry. This phone number is forbidden.',
     id: 'authErrorPhoneNumberForbidden',
   },
-  [BackendError.LABEL.CONVERSATION_CODE_NOT_FOUND]: {
+  [BackendErrorLabel.NO_CONVERSATION_CODE]: {
     defaultMessage: 'This link is no longer valid. Ask the person who invited you how to join.',
     id: 'BackendError.LABEL.CONVERSATION_CODE_NOT_FOUND',
   },
-  [BackendError.LABEL.CONVERSATION_NOT_FOUND]: {
+  [BackendErrorLabel.NO_CONVERSATION]: {
     defaultMessage: 'CONVERSATION_NOT_FOUND',
     id: 'BackendError.LABEL.CONVERSATION_NOT_FOUND',
   },
-  [BackendError.LABEL.CONVERSATION_TOO_MANY_MEMBERS]: {
+  [BackendErrorLabel.TOO_MANY_MEMBERS]: {
     defaultMessage: 'This conversation has reached the limit of participants',
     id: 'BackendError.LABEL.CONVERSATION_TOO_MANY_MEMBERS',
   },
-  [BackendError.LABEL.ACCESS_DENIED]: {
+  [BackendErrorLabel.TOO_MANY_TEAM_MEMBERS]: {
+    defaultMessage: 'This team has reached its maximum size',
+    id: 'BackendError.LABEL.TOO_MANY_MEMBERS',
+  },
+  [BackendErrorLabel.ACCESS_DENIED]: {
     defaultMessage: 'Please verify your details and try again',
     id: 'BackendError.LABEL.ACCESS_DENIED',
   },
-  [BackendError.LABEL.BLACKLISTED_EMAIL]: {
+  [BackendErrorLabel.BLACKLISTED_EMAIL]: {
     defaultMessage: 'This email address is not allowed',
     id: 'BackendError.LABEL.BLACKLISTED_EMAIL',
   },
-  [BackendError.LABEL.BLACKLISTED_PHONE]: {
+  [BackendErrorLabel.BLACKLISTED_PHONE]: {
     defaultMessage: 'This phone number is not allowed',
     id: 'BackendError.LABEL.BLACKLISTED_PHONE',
   },
-  [BackendClientError.LABEL.DOMAIN_BLOCKED_FOR_REGISTRATION]: {
+  [BackendErrorLabel.DOMAIN_BLOCKED_FOR_REGISTRATION]: {
     defaultMessage:
       'You can’t create this account as your email domain is intentionally blocked. Please ask your team admin to invite you via email.',
     id: 'BackendErrorLabel.DOMAIN_BLOCKED_FOR_REGISTRATION',
   },
-  [BackendError.LABEL.INVALID_CODE]: {
+  [BackendErrorLabel.INVALID_CODE]: {
     defaultMessage: 'Please retry, or request another code.',
     id: 'BackendError.LABEL.INVALID_CODE',
   },
-  [BackendError.LABEL.INVALID_CREDENTIALS]: {
+  [BackendErrorLabel.INVALID_CREDENTIALS]: {
     defaultMessage: 'Please verify your details and try again',
     id: 'BackendError.LABEL.INVALID_CREDENTIALS',
   },
-  [BackendError.LABEL.INVALID_EMAIL]: {
+  [BackendErrorLabel.INVALID_EMAIL]: {
     defaultMessage: 'This email address is invalid',
     id: 'BackendError.LABEL.INVALID_EMAIL',
   },
-  [BackendError.LABEL.KEY_EXISTS]: {
+  [BackendErrorLabel.KEY_EXISTS]: {
     defaultMessage: 'This email address has already been registered. {supportEmailExistsLink}',
     id: 'BackendError.LABEL.KEY_EXISTS',
   },
-  [BackendError.LABEL.ALREADY_INVITED]: {
+  [SyntheticErrorLabel.ALREADY_INVITED]: {
     defaultMessage: 'This email has already been invited',
     id: 'BackendError.LABEL.ALREADY_INVITED',
   },
-  [BackendError.LABEL.MISSING_AUTH]: {
+  [BackendErrorLabel.MISSING_AUTH]: {
     defaultMessage: 'Please verify your details and try again',
     id: 'BackendError.LABEL.MISSING_AUTH',
   },
-  [BackendError.LABEL.PENDING_ACTIVATION]: {
+  [BackendErrorLabel.PENDING_ACTIVATION]: {
     defaultMessage: 'The email address you provided has already been invited. Please check your email',
     id: 'BackendError.LABEL.PENDING_ACTIVATION',
   },
-  [BackendError.LABEL.PENDING_LOGIN]: {
+  [BackendErrorLabel.PENDING_LOGIN]: {
     defaultMessage: 'BackendError.LABEL.PENDING_LOGIN',
     id: 'BackendError.LABEL.PENDING_LOGIN',
   },
-  [BackendError.LABEL.TOO_MANY_LOGINS]: {
+  [BackendErrorLabel.CLIENT_ERROR]: {
     defaultMessage: 'Please try again later',
     id: 'BackendError.LABEL.TOO_MANY_LOGINS',
   },
-  [BackendError.LABEL.TOO_MANY_REQUESTS]: {
+  [SyntheticErrorLabel.TOO_MANY_REQUESTS]: {
     defaultMessage: 'Too many requests, please try again later.',
     id: 'BackendError.LABEL.TOO_MANY_REQUESTS',
   },
-  [BackendError.LABEL.BAD_REQUEST]: {
+  [BackendErrorLabel.BAD_REQUEST]: {
     defaultMessage: 'Invalid input',
     id: 'BackendError.LABEL.BAD_REQUEST',
   },
-  [BackendError.LABEL.EMAIL_REQUIRED]: {
-    defaultMessage: 'Log in with an email address is required when two-factor authentication is activated',
+  [SyntheticErrorLabel.EMAIL_REQUIRED]: {
+    defaultMessage:
+      'You can’t use your username as two-factor authentication is activated. Please log in with your email instead.',
     id: 'BackendError.LABEL.EMAIL_REQUIRED',
   },
-  [BackendError.LABEL.INVALID_OPERATION]: {
+  [BackendErrorLabel.INVALID_OPERATION]: {
     defaultMessage: 'Invalid operation',
     id: 'BackendError.LABEL.INVALID_OPERATION',
   },
-  [BackendError.LABEL.INVALID_PAYLOAD]: {
+  [BackendErrorLabel.INVALID_PAYLOAD]: {
     defaultMessage: 'Invalid input',
     id: 'BackendError.LABEL.INVALID_PAYLOAD',
   },
-  [BackendError.LABEL.NOT_FOUND]: {
-    defaultMessage: 'Could not find resource',
-    id: 'BackendError.LABEL.NOT_FOUND',
-  },
-  [BackendError.LABEL.OPERATION_DENIED]: {
+  [BackendErrorLabel.OPERATION_DENIED]: {
     defaultMessage: 'You don’t have permission',
     id: 'BackendError.LABEL.OPERATION_DENIED',
   },
-  [BackendError.LABEL.UNAUTHORIZED]: {
+  [BackendErrorLabel.UNAUTHORIZED]: {
     defaultMessage: 'Something went wrong. Please reload the page and try again',
     id: 'BackendError.LABEL.UNAUTHORIZED',
   },
-  [BackendError.LABEL.HANDLE_EXISTS]: {
+  [BackendErrorLabel.HANDLE_EXISTS]: {
     defaultMessage: 'This username is already taken',
     id: 'BackendError.LABEL.HANDLE_EXISTS',
   },
-  [BackendError.LABEL.HANDLE_TOO_SHORT]: {
+  [SyntheticErrorLabel.HANDLE_TOO_SHORT]: {
     defaultMessage: 'Please enter a username with at least 2 characters',
     id: 'BackendError.LABEL.HANDLE_TOO_SHORT',
   },
-  [BackendError.LABEL.INVALID_HANDLE]: {
+  [BackendErrorLabel.INVALID_HANDLE]: {
     defaultMessage: 'This username is invalid',
     id: 'BackendError.LABEL.INVALID_HANDLE',
   },
-  [BackendError.LABEL.INVALID_INVITATION_CODE]: {
+  [BackendErrorLabel.INVALID_INVITATION_CODE]: {
     defaultMessage: 'Invitation has been revoked or expired',
     id: 'BackendError.LABEL.INVALID_INVITATION_CODE',
   },
-  [BackendError.LABEL.NO_OTHER_OWNER]: {
+  [BackendErrorLabel.NO_OTHER_OWNER]: {
     defaultMessage: 'The last owner cannot be removed from the team',
     id: 'BackendError.LABEL.NO_OTHER_OWNER',
   },
-  [BackendError.LABEL.NO_TEAM]: {
+  [BackendErrorLabel.NO_TEAM]: {
     defaultMessage: 'Could not find team',
     id: 'BackendError.LABEL.NO_TEAM',
   },
-  [BackendError.LABEL.NO_TEAM_MEMBER]: {
+  [BackendErrorLabel.NO_TEAM_MEMBER]: {
     defaultMessage: 'Could not find team member',
     id: 'BackendError.LABEL.NO_TEAM_MEMBER',
   },
-  [BackendError.LABEL.TOO_MANY_MEMBERS]: {
-    defaultMessage: 'This team has reached its maximum size',
-    id: 'BackendError.LABEL.TOO_MANY_MEMBERS',
-  },
-  [BackendError.LABEL.SUSPENDED]: {
+  [BackendErrorLabel.SUSPENDED_ACCOUNT]: {
     defaultMessage: 'This account is no longer authorized to log in',
     id: 'BackendError.LABEL.SUSPENDED',
   },
-  [BackendError.LABEL.EMAIL_EXISTS]: {
+  [BackendErrorLabel.INVITE_EMAIL_EXISTS]: {
     defaultMessage: 'This email address is already in use. {supportEmailExistsLink}',
     id: 'BackendError.LABEL.EMAIL_EXISTS',
   },
-  [BackendError.LABEL.SSO_FORBIDDEN]: {
+  [BackendErrorLabel.SSO_FORBIDDEN]: {
     defaultMessage: 'Something went wrong. Please contact your team administrator for details (Error 8).',
     id: 'BackendError.LABEL.SSO_FORBIDDEN',
   },
-  [BackendError.LABEL.SSO_INSUFFICIENT_PERMISSIONS]: {
+  [BackendErrorLabel.INSUFFICIENT_PERMISSIONS]: {
     defaultMessage: 'Something went wrong. Please contact your team administrator for details (Error 10).',
     id: 'BackendError.LABEL.SSO_INSUFFICIENT_PERMISSIONS',
   },
-  [BackendError.LABEL.SSO_INVALID_FAILURE_REDIRECT]: {
+  [BackendErrorLabel.SSO_INVALID_FAILURE_REDIRECT]: {
     defaultMessage: 'Something went wrong. Please contact your team administrator for details (Error 3).',
     id: 'BackendError.LABEL.SSO_INVALID_FAILURE_REDIRECT',
   },
-  [BackendError.LABEL.SSO_INVALID_SUCCESS_REDIRECT]: {
+  [BackendErrorLabel.SSO_INVALID_SUCCESS_REDIRECT]: {
     defaultMessage: 'Something went wrong. Please contact your team administrator for details (Error 2).',
     id: 'BackendError.LABEL.SSO_INVALID_SUCCESS_REDIRECT',
   },
-  [BackendError.LABEL.SSO_INVALID_UPSTREAM]: {
+  [BackendErrorLabel.SSO_INVALID_UPSTREAM]: {
     defaultMessage: 'Something went wrong. Please contact your team administrator for details (Error 5).',
     id: 'BackendError.LABEL.SSO_INVALID_UPSTREAM',
   },
-  [BackendError.LABEL.SSO_INVALID_USERNAME]: {
+  [BackendErrorLabel.SSO_INVALID_USERNAME]: {
     defaultMessage: 'Something went wrong. Please contact your team administrator for details (Error 4).',
     id: 'BackendError.LABEL.SSO_INVALID_USERNAME',
   },
-  [BackendError.LABEL.SSO_NO_MATCHING_AUTH]: {
+  [BackendErrorLabel.SSO_NO_MATCHING_AUTH]: {
     defaultMessage: 'Something went wrong. Please contact your team administrator for details (Error 9).',
     id: 'BackendError.LABEL.SSO_NO_MATCHING_AUTH',
   },
-  [BackendError.LABEL.SSO_NOT_FOUND]: {
+  [BackendErrorLabel.NOT_FOUND]: {
     defaultMessage: 'Something went wrong. Please contact your team administrator for details (Error 7).',
     id: 'BackendError.LABEL.SSO_NOT_FOUND',
   },
-  [BackendError.LABEL.SSO_SERVER_ERROR]: {
+  [BackendErrorLabel.SERVER_ERROR]: {
     defaultMessage: 'Something went wrong. Please contact your team administrator for details (Error 6).',
     id: 'BackendError.LABEL.SSO_SERVER_ERROR',
   },
-  [BackendError.LABEL.SSO_UNSUPPORTED_SAML]: {
+  [BackendErrorLabel.SSO_UNSUPPORTED_SAML]: {
     defaultMessage: 'Something went wrong. Please contact your team administrator for details (Error 1).',
     id: 'BackendError.LABEL.SSO_UNSUPPORTED_SAML',
   },
-  [BackendError.LABEL.CODE_AUTHENTICATION_FAILED]: {
+  [BackendErrorLabel.CODE_AUTHENTICATION_FAILED]: {
     defaultMessage: 'Please retry, or request another code.',
     id: 'BackendError.LABEL.CODE_AUTHENTICATION_FAILED',
   },
-  [BackendError.LABEL.SSO_GENERIC_ERROR]: {
+  [SyntheticErrorLabel.SSO_GENERIC_ERROR]: {
     defaultMessage: 'Something went wrong. Please contact your team administrator for details (Error 0).',
     id: 'BackendError.LABEL.SSO_GENERIC_ERROR',
   },
@@ -769,6 +746,10 @@ export const loginStrings = defineMessages({
     defaultMessage: 'Verify your account',
     id: 'login.twoFactorLoginTitle',
   },
+  submitTwoFactorButton: {
+    defaultMessage: 'Submit',
+    id: 'login.submitTwoFactorButton',
+  },
 });
 
 export const ssoLoginStrings = defineMessages({
@@ -870,6 +851,11 @@ export const clientManagerStrings = defineMessages({
     defaultMessage: 'Remove one of your other devices to start using {brandName} on this one.',
     id: 'clientManager.subhead',
   },
+  oauth: {
+    defaultMessage:
+      'You are adding a new device. Only 7 devices can be active. Remove one of your devices to start using Wire on this one ({device}).',
+    id: 'clientManager.oauth',
+  },
 });
 
 export const clientItemStrings = defineMessages({
@@ -895,5 +881,57 @@ export const historyInfoStrings = defineMessages({
   ok: {
     defaultMessage: 'OK',
     id: 'historyInfo.ok',
+  },
+});
+
+export const oauthStrings = defineMessages({
+  headline: {
+    defaultMessage: 'Permissions',
+    id: 'oauth.headline',
+  },
+  logout: {
+    defaultMessage: 'Switch account',
+    id: 'oauth.logout',
+  },
+  cancel: {
+    defaultMessage: "Don't Allow",
+    id: 'oauth.cancel',
+  },
+  allow: {
+    defaultMessage: 'Allow',
+    id: 'oauth.allow',
+  },
+  subhead: {
+    defaultMessage: 'Microsoft Outlook requires your permission to:',
+    id: 'oauth.subhead',
+  },
+  learnMore: {
+    defaultMessage: '<learnMore>Learn more</learnMore> about these permissions',
+    id: 'oauth.learnMore',
+  },
+  details: {
+    defaultMessage:
+      'If you allow the permissions listed above, your Outlook Calendar will be able to connect to Wire. If you don’t grant the permissions, you can’t use this add-in.',
+    id: 'oauth.details',
+  },
+  privacyPolicy: {
+    defaultMessage: "Wire's <privacypolicy>Privacy Policy</privacypolicy>",
+    id: 'oauth.privacypolicy',
+  },
+  [Scope.WRITE_CONVERSATIONS]: {
+    defaultMessage: 'Create conversations in Wire',
+    id: 'oauth.scope.write_conversations',
+  },
+  [Scope.WRITE_CONVERSATIONS_CODE]: {
+    defaultMessage: 'Create guest links to conversations in Wire',
+    id: 'oauth.scope.write_conversations_code',
+  },
+  [Scope.READ_SELF]: {
+    defaultMessage: 'View your team’s feature View your Wire username, profile name, and email',
+    id: 'oauth.scope.read_self',
+  },
+  [Scope.READ_FEATURE_CONFIGS]: {
+    defaultMessage: 'View your team’s feature configurations',
+    id: 'oauth.scope.read_feature_configs',
   },
 });

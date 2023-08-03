@@ -18,7 +18,7 @@
  */
 
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
-import {GenericMessageType, ReactionType} from '@wireapp/core/lib/conversation';
+import {GenericMessageType} from '@wireapp/core/lib/conversation';
 import {isObject} from 'underscore';
 
 import {
@@ -42,9 +42,12 @@ import {encryptAesAsset} from 'src/script/assets/AssetCrypto';
 import {PROTO_MESSAGE_TYPE} from 'src/script/cryptography/ProtoMessageType';
 import {CryptographyError} from 'src/script/error/CryptographyError';
 import {ClientEvent} from 'src/script/event/Client';
-import {arrayToBase64, createRandomUuid} from 'Util/util';
+import {arrayToBase64} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {CryptographyMapper} from './CryptographyMapper';
+
+import {ReactionType} from '../entity/message/ContentMessage';
 
 describe('CryptographyMapper', () => {
   const mapper = new CryptographyMapper();
@@ -53,11 +56,11 @@ describe('CryptographyMapper', () => {
 
   beforeEach(() => {
     event = {
-      conversation: createRandomUuid(),
+      conversation: createUuid(),
       data: {
-        id: createRandomUuid(),
+        id: createUuid(),
       },
-      from: createRandomUuid(),
+      from: createUuid(),
       time: new Date().toISOString(),
       type: CONVERSATION_EVENT.OTR_MESSAGE_ADD,
     };
@@ -80,7 +83,7 @@ describe('CryptographyMapper', () => {
 
       const generic_message = new GenericMessage({
         [GenericMessageType.ASSET]: asset,
-        messageId: createRandomUuid(),
+        messageId: createUuid(),
       });
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
@@ -112,7 +115,7 @@ describe('CryptographyMapper', () => {
 
       const generic_message = new GenericMessage({
         [GenericMessageType.ASSET]: asset,
-        messageId: createRandomUuid(),
+        messageId: createUuid(),
       });
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
@@ -133,10 +136,10 @@ describe('CryptographyMapper', () => {
 
     it('resolves with a mapped uploaded asset message', () => {
       const uploaded = {
-        key: createRandomUuid(),
+        key: createUuid(),
         otr_key: new Uint8Array([1, 2]),
         sha256: new Uint8Array([3, 4]),
-        token: createRandomUuid(),
+        token: createUuid(),
       };
 
       const uploaded_asset = new Asset.RemoteData({
@@ -149,7 +152,7 @@ describe('CryptographyMapper', () => {
 
       const generic_message = new GenericMessage({
         [GenericMessageType.ASSET]: asset,
-        messageId: createRandomUuid(),
+        messageId: createUuid(),
       });
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
@@ -171,7 +174,7 @@ describe('CryptographyMapper', () => {
 
       const generic_message = new GenericMessage({
         [GenericMessageType.ASSET]: asset,
-        messageId: createRandomUuid(),
+        messageId: createUuid(),
       });
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
@@ -192,7 +195,7 @@ describe('CryptographyMapper', () => {
 
       const generic_message = new GenericMessage({
         [GenericMessageType.ASSET]: asset,
-        messageId: createRandomUuid(),
+        messageId: createUuid(),
       });
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
@@ -225,7 +228,7 @@ describe('CryptographyMapper', () => {
 
       const generic_message = new GenericMessage({
         [GenericMessageType.ASSET]: asset,
-        messageId: createRandomUuid(),
+        messageId: createUuid(),
       });
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
@@ -245,7 +248,7 @@ describe('CryptographyMapper', () => {
 
       const generic_message = new GenericMessage({
         [GenericMessageType.AVAILABILITY]: availability,
-        messageId: createRandomUuid(),
+        messageId: createUuid(),
       });
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
@@ -261,7 +264,7 @@ describe('CryptographyMapper', () => {
 
     it('resolves with a mapped cleared message', () => {
       const date = Date.now();
-      const conversation_id = createRandomUuid();
+      const conversation_id = createUuid();
 
       const cleared = new Cleared({
         clearedTimestamp: date,
@@ -269,7 +272,7 @@ describe('CryptographyMapper', () => {
       });
       const generic_message = new GenericMessage({
         [GenericMessageType.CLEARED]: cleared,
-        messageId: createRandomUuid(),
+        messageId: createUuid(),
       });
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
@@ -285,15 +288,15 @@ describe('CryptographyMapper', () => {
     });
 
     it('resolves with a mapped hidden message', () => {
-      const conversation_id = createRandomUuid();
-      const message_id = createRandomUuid();
+      const conversation_id = createUuid();
+      const message_id = createUuid();
       const message_hide = new MessageHide({
         conversationId: conversation_id,
         messageId: message_id,
       });
       const generic_message = new GenericMessage({
         [GenericMessageType.HIDDEN]: message_hide,
-        messageId: createRandomUuid(),
+        messageId: createUuid(),
       });
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
@@ -309,10 +312,10 @@ describe('CryptographyMapper', () => {
     });
 
     it('resolves with a mapped deleted message', () => {
-      const message_id = createRandomUuid();
+      const message_id = createUuid();
       const generic_message = new GenericMessage({
         [GenericMessageType.DELETED]: new MessageDelete({messageId: message_id}),
-        messageId: createRandomUuid(),
+        messageId: createUuid(),
       });
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
@@ -338,8 +341,8 @@ describe('CryptographyMapper', () => {
       });
 
       const remote_data = new Asset.RemoteData({
-        assetId: createRandomUuid(),
-        assetToken: createRandomUuid(),
+        assetId: createUuid(),
+        assetToken: createUuid(),
         otrKey: new Uint8Array([1, 2]),
         sha256: new Uint8Array([3, 4]),
       });
@@ -351,7 +354,7 @@ describe('CryptographyMapper', () => {
 
       const generic_message = new GenericMessage({
         [GenericMessageType.ASSET]: asset,
-        messageId: createRandomUuid(),
+        messageId: createUuid(),
       });
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
@@ -374,7 +377,7 @@ describe('CryptographyMapper', () => {
     it('resolves with a mapped knock message', () => {
       const generic_message = new GenericMessage({
         [GenericMessageType.KNOCK]: new Knock({hotKnock: false}),
-        messageId: createRandomUuid(),
+        messageId: createUuid(),
       });
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
@@ -407,7 +410,7 @@ describe('CryptographyMapper', () => {
 
       const genericMessage = new GenericMessage({
         [GenericMessageType.KNOCK]: protoKnock,
-        messageId: createRandomUuid(),
+        messageId: createUuid(),
       });
 
       const mappedEvent = await mapper.mapGenericMessage(genericMessage, optimisticEvent);
@@ -417,12 +420,12 @@ describe('CryptographyMapper', () => {
 
     it('resolves with a mapped last read message', () => {
       const date = Date.now();
-      const conversation_id = createRandomUuid();
+      const conversation_id = createUuid();
 
       const last_read = new LastRead({conversationId: conversation_id, lastReadTimestamp: date});
       const generic_message = new GenericMessage({
         [GenericMessageType.LAST_READ]: last_read,
-        messageId: createRandomUuid(),
+        messageId: createUuid(),
       });
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
@@ -438,7 +441,7 @@ describe('CryptographyMapper', () => {
     });
 
     it('resolves with a mapped reaction message', () => {
-      const messageId = createRandomUuid();
+      const messageId = createUuid();
 
       const reaction = new Reaction({
         emoji: ReactionType.LIKE,
@@ -464,7 +467,7 @@ describe('CryptographyMapper', () => {
     it('resolves with a mapped text message', () => {
       const generic_message = new GenericMessage({
         [GenericMessageType.TEXT]: new Text({content: 'Unit test'}),
-        messageId: createRandomUuid(),
+        messageId: createUuid(),
       });
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
@@ -494,7 +497,7 @@ describe('CryptographyMapper', () => {
       const text = new Text({content: plaintext});
       const generic_message = new GenericMessage({
         [GenericMessageType.TEXT]: text,
-        messageId: createRandomUuid(),
+        messageId: createUuid(),
       });
 
       const encryptedAsset = await encryptAesAsset(GenericMessage.encode(generic_message).finish());
@@ -504,7 +507,7 @@ describe('CryptographyMapper', () => {
 
       const external_message = new GenericMessage({
         external: new External({otrKey: keyBytes, sha256}),
-        messageId: createRandomUuid(),
+        messageId: createUuid(),
       });
       const event_json = await mapper.mapGenericMessage(external_message, event);
 
@@ -518,7 +521,7 @@ describe('CryptographyMapper', () => {
 
       const genericMessage = new GenericMessage({
         knock: new Knock({hotKnock: false}),
-        messageId: createRandomUuid(),
+        messageId: createUuid(),
       });
 
       const encryptedAsset = await encryptAesAsset(GenericMessage.encode(genericMessage).finish());
@@ -528,7 +531,7 @@ describe('CryptographyMapper', () => {
 
       external_message = new GenericMessage({
         external: new External({otrKey: keyBytes, sha256}),
-        messageId: createRandomUuid(),
+        messageId: createUuid(),
       });
       const event_json = await mapper.mapGenericMessage(external_message, event);
 
@@ -549,7 +552,7 @@ describe('CryptographyMapper', () => {
       });
       const generic_message = new GenericMessage({
         [GenericMessageType.LOCATION]: location,
-        messageId: createRandomUuid(),
+        messageId: createUuid(),
       });
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {
@@ -567,7 +570,7 @@ describe('CryptographyMapper', () => {
     });
 
     it('resolves with a mapped reaction message', () => {
-      const messageId = createRandomUuid();
+      const messageId = createUuid();
 
       const reaction = new Reaction({
         emoji: ReactionType.LIKE,
@@ -601,7 +604,7 @@ describe('CryptographyMapper', () => {
       const calling = new Calling({content: JSON.stringify(content_message)});
       const generic_message = new GenericMessage({
         [GenericMessageType.CALLING]: calling,
-        messageId: createRandomUuid(),
+        messageId: createUuid(),
       });
 
       return mapper.mapGenericMessage(generic_message, event).then(event_json => {

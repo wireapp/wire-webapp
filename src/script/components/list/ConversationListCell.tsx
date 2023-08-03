@@ -32,8 +32,7 @@ import cx from 'classnames';
 import {Availability} from '@wireapp/protocol-messaging';
 
 import {AvailabilityState} from 'Components/AvailabilityState';
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import {GroupAvatar} from 'Components/avatar/GroupAvatar';
+import {Avatar, AVATAR_SIZE, GroupAvatar} from 'Components/Avatar';
 import {Icon} from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isKey, isOneOfKeys, KEY} from 'Util/KeyboardUtil';
@@ -55,6 +54,8 @@ export interface ConversationListCellProps {
   showJoinButton: boolean;
   handleArrowKeyDown: (e: React.KeyboardEvent) => void;
   isFocused?: boolean;
+  // This method resetting the current focused conversation to first conversation on click outside or click tab or shift + tab
+  resetConversationFocus: () => void;
 }
 
 const ConversationListCell = ({
@@ -67,6 +68,7 @@ const ConversationListCell = ({
   dataUieName,
   handleArrowKeyDown,
   isFocused = false,
+  resetConversationFocus,
 }: ConversationListCellProps) => {
   const {
     isGroup,
@@ -132,6 +134,10 @@ const ConversationListCell = ({
       rightClick(conversation, newEvent);
       setContextMenuOpen(true);
       return;
+    }
+
+    if (event.key === KEY.TAB || (event.shiftKey && event.key === KEY.TAB)) {
+      resetConversationFocus();
     }
 
     setContextMenuFocus(false);

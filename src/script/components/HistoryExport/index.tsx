@@ -22,8 +22,10 @@ import {FC, useContext, useEffect, useState} from 'react';
 import {container} from 'tsyringe';
 
 import {LoadingBar} from 'Components/LoadingBar/LoadingBar';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {ClientState} from 'src/script/client/ClientState';
+import {User} from 'src/script/entity/User';
 import {ContentState} from 'src/script/page/useAppState';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {getCurrentDate} from 'Util/TimeUtil';
@@ -32,7 +34,6 @@ import {downloadBlob} from 'Util/util';
 import {CancelError} from '../../backup/Error';
 import {Config} from '../../Config';
 import {RootContext} from '../../page/RootProvider';
-import {UserState} from '../../user/UserState';
 
 enum ExportState {
   COMPRESSING = 'ExportState.STATE.COMPRESSING',
@@ -47,10 +48,11 @@ export const CONFIG = {
 
 interface HistoryExportProps {
   switchContent: (contentState: ContentState) => void;
-  readonly userState: UserState;
+  readonly user: User;
+  readonly clientState?: ClientState;
 }
 
-const HistoryExport: FC<HistoryExportProps> = ({switchContent, userState = container.resolve(UserState)}) => {
+const HistoryExport: FC<HistoryExportProps> = ({switchContent, user, clientState = container.resolve(ClientState)}) => {
   const logger = getLogger('HistoryExport');
 
   const [historyState, setHistoryState] = useState<ExportState>(ExportState.PREPARING);
@@ -60,8 +62,6 @@ const HistoryExport: FC<HistoryExportProps> = ({switchContent, userState = conta
   const [numberOfProcessedRecords, setNumberOfProcessedRecords] = useState<number>(0);
 
   const [archiveBlob, setArchiveBlob] = useState<Blob | null>(null);
-
-  const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
 
   const mainViewModel = useContext(RootContext);
 
@@ -124,7 +124,7 @@ const HistoryExport: FC<HistoryExportProps> = ({switchContent, userState = conta
   };
 
   const downloadArchiveFile = () => {
-    const userName = selfUser.username();
+    const userName = user.username();
     const fileExtension = CONFIG.FILE_EXTENSION;
     const sanitizedBrandName = Config.getConfig().BRAND_NAME.replace(/[^A-Za-z0-9_]/g, '');
     const filename = `${sanitizedBrandName}-${userName}-Backup_${getCurrentDate()}.${fileExtension}`;
@@ -138,7 +138,37 @@ const HistoryExport: FC<HistoryExportProps> = ({switchContent, userState = conta
 
   const onCancel = () => backupRepository.cancelAction();
 
+  const getBackUpPassword = (): Promise<string> => {
+    return new Promise(resolve => {
+      PrimaryModal.show(PrimaryModal.type.PASSWORD_ADVANCED_SECURITY, {
+        primaryAction: {
+          action: async (password: string) => {
+            resolve(password);
+          },
+          text: t('backupEncryptionModalAction'),
+        },
+        secondaryAction: [
+          {
+            action: () => {
+              resolve('');
+              dismissExport();
+            },
+            text: t('backupEncryptionModalCloseBtn'),
+          },
+        ],
+        passwordOptional: true,
+        text: {
+          closeBtnLabel: t('backupEncryptionModalCloseBtn'),
+          input: t('backupEncryptionModalPlaceholder'),
+          message: t('backupEncryptionModalMessage'),
+          title: t('backupEncryptionModalTitle'),
+        },
+      });
+    });
+  };
+
   const exportHistory = async () => {
+    const password = await getBackUpPassword();
     setHistoryState(ExportState.PREPARING);
     setHasError(false);
 
@@ -149,7 +179,12 @@ const HistoryExport: FC<HistoryExportProps> = ({switchContent, userState = conta
       setNumberOfRecords(numberOfRecords);
       setNumberOfProcessedRecords(0);
 
-      const archiveBlob = await backupRepository.generateHistory(onProgress);
+      const archiveBlob = await backupRepository.generateHistory(
+        user,
+        clientState.currentClient().id,
+        onProgress,
+        password,
+      );
 
       onSuccess(archiveBlob);
       logger.log(`Completed export of '${numberOfRecords}' records from history`);

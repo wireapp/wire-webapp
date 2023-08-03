@@ -26,7 +26,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {TypedEventTarget} from 'Util/TypedEventTarget';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {PrimaryModal} from '../components/Modals/PrimaryModal';
 import type {Conversation} from '../entity/Conversation';
@@ -63,7 +63,7 @@ const propertiesKey = 'labels';
 export const createLabel = (
   name: string,
   conversations: Conversation[] = [],
-  id: string = createRandomUuid(),
+  id: string = createUuid(),
   type: LabelType = LabelType.Custom,
 ): ConversationLabel => ({
   conversations: ko.observableArray(conversations),

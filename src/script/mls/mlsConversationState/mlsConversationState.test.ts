@@ -19,7 +19,7 @@
 
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation';
 
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {useMLSConversationState} from './mlsConversationState';
 
@@ -27,9 +27,9 @@ import {Conversation} from '../../entity/Conversation';
 
 describe('mlsPendingStateUtil', () => {
   const createConversation = (protocol: ConversationProtocol) => {
-    const conversation = new Conversation(createRandomUuid(), '', protocol);
+    const conversation = new Conversation(createUuid(), '', protocol);
     if (protocol === ConversationProtocol.MLS) {
-      conversation.groupId = createRandomUuid();
+      conversation.groupId = createUuid();
     }
     return conversation;
   };

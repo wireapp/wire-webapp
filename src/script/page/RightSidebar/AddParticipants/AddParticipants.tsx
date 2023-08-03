@@ -27,12 +27,11 @@ import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Icon} from 'Components/Icon';
 import {SearchInput} from 'Components/SearchInput';
-import {ServiceList} from 'Components/ServiceList';
+import {ServiceList} from 'Components/ServiceList/ServiceList';
 import {UserSearchableList} from 'Components/UserSearchableList';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
-import {matchQualifiedIds} from 'Util/QualifiedId';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
@@ -115,17 +114,12 @@ const AddParticipants: FC<AddParticipantsProps> = ({
 
   const [isInitialServiceSearch, setIsInitialServiceSearch] = useState<boolean>(true);
   const contacts = useMemo(() => {
-    let users: User[] = [];
-
     if (isTeam) {
       const isTeamOrServices = isTeamOnly || isServicesRoom;
-      users = isTeamOrServices ? teamMembers.sort(sortUsersByPriority) : teamUsers;
-    } else {
-      users = connectedUsers;
+      return isTeamOrServices ? teamMembers.sort(sortUsersByPriority) : teamUsers;
     }
-
-    return users.filter(userEntity => !participatingUserIds.find(userId => matchQualifiedIds(userEntity, userId)));
-  }, [connectedUsers, isServicesRoom, isTeam, isTeamOnly, participatingUserIds, teamMembers, teamUsers]);
+    return connectedUsers;
+  }, [connectedUsers, isServicesRoom, isTeam, isTeamOnly, teamMembers, teamUsers]);
 
   const enabledAddAction = selectedContacts.length > ENABLE_ADD_ACTIONS_LENGTH;
 
@@ -240,7 +234,9 @@ const AddParticipants: FC<AddParticipantsProps> = ({
               searchRepository={searchRepository}
               teamRepository={teamRepository}
               conversationRepository={conversationRepository}
+              excludeUsers={participatingUserIds}
               isSelectable
+              allowRemoteSearch
             />
           )}
 
@@ -267,13 +263,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
                     </ul>
                   )}
 
-                  <ServiceList
-                    services={services}
-                    click={onServiceSelect}
-                    arrow
-                    noUnderline
-                    isSearching={isSearching}
-                  />
+                  <ServiceList services={services} onServiceClick={onServiceSelect} isSearching={isSearching} />
                 </>
               )}
 

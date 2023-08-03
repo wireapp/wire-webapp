@@ -23,7 +23,7 @@ import {randomUUID} from 'crypto';
 
 import {Account} from '@wireapp/core';
 
-import {initMLSConversations, registerUninitializedConversations} from './MLSConversations';
+import {initMLSConversations, registerUninitializedSelfAndTeamConversations} from './MLSConversations';
 import {useMLSConversationState} from './mlsConversationState';
 
 import {Conversation} from '../entity/Conversation';
@@ -63,12 +63,25 @@ describe('MLSConversations', () => {
       const mlsConversations = createConversations(nbMLSConversations);
       const conversations = [...proteusConversations, ...mlsConversations];
 
-      await initMLSConversations(conversations, new User(), new Account(), {} as any);
+      await initMLSConversations(conversations, new Account());
 
       expect(useMLSConversationState.getState().sendExternalToPendingJoin).toHaveBeenCalledWith(
         mlsConversations,
         expect.any(Function),
         expect.any(Function),
+      );
+    });
+
+    it('schedules key renewal intervals for all the mls groups', async () => {
+      const core = new Account();
+      const nbMLSConversations = 5 + Math.ceil(Math.random() * 10);
+
+      const mlsConversations = createConversations(nbMLSConversations);
+
+      await initMLSConversations(mlsConversations, core);
+
+      expect(core.service!.mls!.schedulePeriodicKeyMaterialRenewals).toHaveBeenCalledWith(
+        mlsConversations.map(c => c.groupId),
       );
     });
 
@@ -85,7 +98,7 @@ describe('MLSConversations', () => {
       const mlsConversations = createConversations(nbMLSConversations);
       const conversations = [...proteusConversations, teamConversation, ...mlsConversations, selfConversation];
 
-      await registerUninitializedConversations(conversations, new User(), 'client-1', core);
+      await registerUninitializedSelfAndTeamConversations(conversations, new User(), 'client-1', core);
 
       expect(core.service!.mls.registerConversation).toHaveBeenCalledTimes(2);
     });
@@ -107,7 +120,7 @@ describe('MLSConversations', () => {
       const mlsConversations = createConversations(nbMLSConversations);
       const conversations = [...proteusConversations, teamConversation, ...mlsConversations, selfConversation];
 
-      await initMLSConversations(conversations, new User(), core, {} as any);
+      await initMLSConversations(conversations, core);
 
       expect(core.service!.mls.registerConversation).toHaveBeenCalledTimes(0);
     });

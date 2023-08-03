@@ -19,10 +19,11 @@
 
 import {ClientEvent} from 'src/script/event/Client';
 import {ReceiptsMiddleware} from 'src/script/event/preprocessor/ReceiptsMiddleware';
-import {noop, createRandomUuid} from 'Util/util';
+import {noop} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 describe('ReceiptsMiddleware', () => {
-  const selfId = createRandomUuid();
+  const selfId = createUuid();
   let readReceiptMiddleware;
 
   beforeEach(async () => {
@@ -66,7 +67,7 @@ describe('ReceiptsMiddleware', () => {
 
     it('ignores read receipts for messages that are not mine', () => {
       const event = createConfirmationEvent(4);
-      const originaleEvent = {from: createRandomUuid()};
+      const originaleEvent = {from: createUuid()};
       spyOn(readReceiptMiddleware.eventService, 'loadEvents').and.returnValue(Promise.resolve([originaleEvent]));
       spyOn(readReceiptMiddleware.eventService, 'replaceEvent');
       return readReceiptMiddleware.processEvent(event).then(() => {
@@ -116,11 +117,11 @@ describe('ReceiptsMiddleware', () => {
   });
 });
 
-function createConfirmationEvent(status, moreMessageIds = [], fromId = createRandomUuid()) {
+function createConfirmationEvent(status, moreMessageIds = [], fromId = createUuid()) {
   return {
-    conversation: createRandomUuid(),
+    conversation: createUuid(),
     data: {
-      message_id: createRandomUuid(),
+      message_id: createUuid(),
       more_message_ids: moreMessageIds,
       status,
     },

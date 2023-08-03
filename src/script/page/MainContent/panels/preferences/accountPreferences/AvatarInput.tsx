@@ -17,9 +17,10 @@
  *
  */
 
-import React from 'react';
+import {useState, useRef, FC} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit/lib/types/enums';
+import cx from 'classnames';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
@@ -44,8 +45,9 @@ interface AvatarInputProps {
 const FILE_TYPES = ['image/bmp', 'image/jpeg', 'image/jpg', 'image/png', '.jpg-large'];
 const logger = getLogger('AvatarInput');
 
-const AvatarInput: React.FC<AvatarInputProps> = ({selfUser, isActivatedAccount, userRepository}) => {
-  const inputRef = React.useRef<HTMLInputElement>(null);
+const AvatarInput: FC<AvatarInputProps> = ({selfUser, isActivatedAccount, userRepository}) => {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState<boolean>(false);
 
   if (!isActivatedAccount) {
     return <Avatar participant={selfUser} avatarSize={AVATAR_SIZE.X_LARGE} />;
@@ -75,6 +77,8 @@ const AvatarInput: React.FC<AvatarInputProps> = ({selfUser, isActivatedAccount, 
       return showUploadWarning(titleString, messageString);
     }
 
+    setIsUploading(true);
+
     const minHeight = UserRepository.CONFIG.MINIMUM_PICTURE_SIZE.HEIGHT;
     const minWidth = UserRepository.CONFIG.MINIMUM_PICTURE_SIZE.WIDTH;
 
@@ -90,11 +94,28 @@ const AvatarInput: React.FC<AvatarInputProps> = ({selfUser, isActivatedAccount, 
     } catch (error) {
       logger.error('Failed to validate profile image', error);
       return false;
+    } finally {
+      setIsUploading(false);
     }
   };
 
   const inputClick = () => {
     inputRef.current?.click();
+  };
+
+  const onFileInputChange = (files: FileList) => {
+    if (isUploading) {
+      return;
+    }
+    const newUserPicture = files.item(0);
+    if (newUserPicture) {
+      setPicture(newUserPicture).catch(error => {
+        const isInvalidUpdate = error.type === UserError.TYPE.INVALID_UPDATE;
+        if (!isInvalidUpdate) {
+          throw error;
+        }
+      });
+    }
   };
 
   return (
@@ -105,7 +126,7 @@ const AvatarInput: React.FC<AvatarInputProps> = ({selfUser, isActivatedAccount, 
       aria-label={`${t('tooltipPreferencesPicture')}`}
     >
       <label
-        className="preferences-account-picture-button"
+        className={cx('preferences-account-picture-button', {loading: isUploading})}
         htmlFor="self-upload-file-input"
         title={t('tooltipPreferencesPicture')}
       >
@@ -116,22 +137,13 @@ const AvatarInput: React.FC<AvatarInputProps> = ({selfUser, isActivatedAccount, 
           avatarAlt={t('selfProfileImageAlt')}
         />
         <FileInput
+          disabled={isUploading}
           ref={inputRef}
           id="self-upload-file-input"
           data-uie-name="do-select-picture"
           fileTypes={FILE_TYPES}
           tabIndex={TabIndex.UNFOCUSABLE}
-          onFileChange={files => {
-            const newUserPicture = files.item(0);
-            if (newUserPicture) {
-              setPicture(newUserPicture).catch(error => {
-                const isInvalidUpdate = error.type === UserError.TYPE.INVALID_UPDATE;
-                if (!isInvalidUpdate) {
-                  throw error;
-                }
-              });
-            }
-          }}
+          onFileChange={onFileInputChange}
         />
         <span className="icon-camera" />
       </label>

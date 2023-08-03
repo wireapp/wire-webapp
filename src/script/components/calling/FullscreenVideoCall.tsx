@@ -42,7 +42,8 @@ import {
   videoControlInActiveStyles,
   videoControlDisabledStyles,
   paginationButtonStyles,
-} from './FullscreenVideoCallStyles';
+  classifiedBarStyles,
+} from './FullscreenVideoCall.styles';
 import {GroupVideoGrid} from './GroupVideoGrid';
 import {Pagination} from './Pagination';
 
@@ -117,10 +118,10 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     startedAt,
     participants,
   } = useKoSubscribableChildren(call, ['activeSpeakers', 'currentPage', 'pages', 'startedAt', 'participants']);
-  const {display_name: conversationName, participating_user_ets: conversationParticipants} = useKoSubscribableChildren(
-    conversation,
-    ['display_name', 'participating_user_ets'],
-  );
+  const {display_name: conversationName, allUserEntities: allUsers} = useKoSubscribableChildren(conversation, [
+    'display_name',
+    'allUserEntities',
+  ]);
   const {isVideoCallingEnabled, classifiedDomains} = useKoSubscribableChildren(teamState, [
     'isVideoCallingEnabled',
     'classifiedDomains',
@@ -208,22 +209,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
           />
         )}
 
-        {classifiedDomains && (
-          <ClassifiedBar
-            users={conversationParticipants}
-            classifiedDomains={classifiedDomains}
-            style={{
-              display: 'inline-block',
-              left: '12px',
-              lineHeight: '1.5em',
-              margin: '1em 0',
-              padding: '0 1em',
-              position: 'absolute',
-              width: 'auto',
-            }}
-          />
-        )}
-
         {/* Calling conversation name and duration */}
         <div
           className="video-remote-name"
@@ -270,6 +255,16 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
           }
           setMaximizedParticipant={participant => setMaximizedParticipant(call, participant)}
         />
+        {classifiedDomains && (
+          <ClassifiedBar
+            conversationDomain={conversation.domain}
+            users={allUsers}
+            classifiedDomains={classifiedDomains}
+            style={{
+              ...classifiedBarStyles,
+            }}
+          />
+        )}
       </div>
       {!maximizedParticipant && activeCallViewTab === CallViewTab.ALL && totalPages > 1 && (
         <>

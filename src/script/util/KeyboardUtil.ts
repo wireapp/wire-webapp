@@ -17,7 +17,7 @@
  *
  */
 
-import type {KeyboardEvent as ReactKeyboardEvent} from 'react';
+import type {KeyboardEvent as ReactKeyboardEvent, SyntheticEvent as ReactEvent} from 'react';
 
 import {Runtime} from '@wireapp/commons';
 
@@ -52,6 +52,10 @@ export const isPageUpDownKey = (keyboardEvent: KeyboardEvent): boolean =>
 export const isKey = (keyboardEvent?: KeyboardEvent | ReactKeyboardEvent, expectedKey = '') => {
   const eventKey = keyboardEvent?.key?.toLowerCase() || '';
   return eventKey === expectedKey.toLowerCase();
+};
+
+export const isKeyboardEvent = (event: Event | ReactEvent): event is KeyboardEvent | ReactKeyboardEvent => {
+  return 'key' in event;
 };
 
 export const isTabKey = (keyboardEvent: KeyboardEvent | ReactKeyboardEvent): boolean => isKey(keyboardEvent, KEY.TAB);
@@ -125,8 +129,6 @@ const escKeyHandlers: KeyboardHandler[] = [];
 document.addEventListener('keydown', event => {
   if (event.key === 'Escape') {
     escKeyHandlers.forEach(handler => handler(event));
-  } else if (isMetaKey(event) && event.shiftKey && (isKey(event, '1') || isKey(event, '!'))) {
-    handleDebugKey();
   }
 });
 
@@ -154,30 +156,4 @@ export const handleEnterDown = (event: React.KeyboardEvent<HTMLElement> | Keyboa
     callback();
   }
   return true;
-};
-
-const handleDebugKey = () => {
-  const removeDebugInfo = (els: NodeListOf<HTMLElement>) => els.forEach(el => el.parentNode?.removeChild(el));
-
-  const addDebugInfo = (els: NodeListOf<HTMLElement>) =>
-    els.forEach(el => {
-      const debugInfo = document.createElement('div');
-      debugInfo.classList.add('debug-info');
-      if (el.dataset.uieUid) {
-        debugInfo.textContent = el.dataset.uieUid;
-      }
-      el.appendChild(debugInfo);
-    });
-
-  const debugInfos = document.querySelectorAll<HTMLElement>('.debug-info');
-  const isShowingDebugInfo = debugInfos.length > 0;
-
-  if (isShowingDebugInfo) {
-    removeDebugInfo(debugInfos);
-  } else {
-    const debugElements = document.querySelectorAll<HTMLElement>(
-      '.message[data-uie-uid], .conversation-list-cell[data-uie-uid]',
-    );
-    addDebugInfo(debugElements);
-  }
 };

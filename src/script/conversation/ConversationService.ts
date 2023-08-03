@@ -22,6 +22,7 @@ import type {
   Conversation as BackendConversation,
   ConversationCode,
   CONVERSATION_ACCESS,
+  RemoteConversations,
 } from '@wireapp/api-client/lib/conversation';
 import type {
   ConversationJoinData,
@@ -44,11 +45,15 @@ import {container} from 'tsyringe';
 
 import {getLogger, Logger} from 'Util/Logger';
 
+import {MLSConversation} from './ConversationSelectors';
+
 import type {Conversation as ConversationEntity} from '../entity/Conversation';
 import type {EventService} from '../event/EventService';
 import {MessageCategory} from '../message/MessageCategory';
+import {useMLSConversationState} from '../mls';
 import {search as fullTextSearch} from '../search/FullTextSearch';
 import {APIClient} from '../service/APIClientSingleton';
+import {Core} from '../service/CoreSingleton';
 import {StorageService} from '../storage';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {StorageSchemata} from '../storage/StorageSchemata';
@@ -61,6 +66,7 @@ export class ConversationService {
     eventService: EventService,
     private readonly storageService = container.resolve(StorageService),
     private readonly apiClient = container.resolve(APIClient),
+    private readonly core = container.resolve(Core),
   ) {
     this.eventService = eventService;
     this.logger = getLogger('ConversationService');
@@ -84,6 +90,14 @@ export class ConversationService {
    */
   getConversationById({id, domain}: QualifiedId): Promise<BackendConversation> {
     return this.apiClient.api.conversation.getConversation({domain, id});
+  }
+
+  /**
+   * Get conversations for a list of conversation IDs.
+   * @see https://staging-nginz-https.zinfra.io/v4/api/swagger-ui/#/default/post_conversations_list
+   */
+  getConversationByIds(conversations: QualifiedId[]): Promise<RemoteConversations> {
+    return this.apiClient.api.conversation.getConversationsByQualifiedIds(conversations);
   }
 
   /**
@@ -286,10 +300,8 @@ export class ConversationService {
    * Deletes a conversation entity from the local database.
    * @returns Resolves when the entity was deleted
    */
-  async deleteConversationFromDb({id, domain}: QualifiedId): Promise<string> {
-    const key = domain ? `${id}@${domain}` : id;
-    const primaryKey = await this.storageService.delete(StorageSchemata.OBJECT_STORE.CONVERSATIONS, key);
-    return primaryKey;
+  async deleteConversationFromDb(conversationId: string): Promise<string> {
+    return this.storageService.delete(StorageSchemata.OBJECT_STORE.CONVERSATIONS, conversationId);
   }
 
   loadConversation<T>(conversationId: string): Promise<T | undefined> {
@@ -366,8 +378,8 @@ export class ConversationService {
 
     return this.storageService
       .save(StorageSchemata.OBJECT_STORE.CONVERSATIONS, conversation_et.id, conversationData)
-      .then(primary_key => {
-        this.logger.info(`State of conversation '${primary_key}' was stored`, conversationData);
+      .then(() => {
+        this.logger.info(`State of conversation '${conversation_et.id}' was stored`);
         return conversation_et;
       });
   }
@@ -387,5 +399,15 @@ export class ConversationService {
     return events
       .filter(record => record.ephemeral_expires !== true)
       .filter(({data: event_data}: any) => fullTextSearch(event_data.content, query));
+  }
+
+  /**
+   * Wipes MLS conversation in corecrypto and deletes the conversation state.
+   * @param mlsConversation mls conversation
+   */
+  async wipeMLSConversation(mlsConversation: MLSConversation) {
+    const {groupId} = mlsConversation;
+    await this.core.service!.conversation.wipeMLSConversation(groupId);
+    return useMLSConversationState.getState().wipeConversationState(groupId);
   }
 }

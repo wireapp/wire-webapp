@@ -23,6 +23,7 @@ import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/Conversati
 import {ConversationProtocol} from '@wireapp/api-client/lib/conversation/NewConversation';
 import {amplify} from 'amplify';
 import cx from 'classnames';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, Select} from '@wireapp/react-ui-kit';
@@ -36,11 +37,13 @@ import {TextInput} from 'Components/TextInput';
 import {BaseToggle} from 'Components/toggle/BaseToggle';
 import {InfoToggle} from 'Components/toggle/InfoToggle';
 import {UserSearchableList} from 'Components/UserSearchableList';
+import {generateConversationUrl} from 'src/script/router/routeGenerator';
+import {createNavigate, createNavigateKeyboard} from 'src/script/router/routerBindings';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleEnterDown, offEscKey, onEscKey} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
-import {getLogger} from 'Util/Logger';
+import {handleEnterDown, isKeyboardEvent, offEscKey, onEscKey} from 'Util/KeyboardUtil';
+import {replaceLink, t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
+import {isAxiosError} from 'Util/TypePredicateUtil';
 
 import {Config} from '../../../Config';
 import {ACCESS_STATE} from '../../../conversation/AccessState';
@@ -55,10 +58,15 @@ import {isProtocolOption, ProtocolOption} from '../../../guards/Protocol';
 import {RootContext} from '../../../page/RootProvider';
 import {TeamState} from '../../../team/TeamState';
 import {UserState} from '../../../user/UserState';
+import {PrimaryModal} from '../PrimaryModal';
 
 interface GroupCreationModalProps {
   userState?: UserState;
   teamState?: TeamState;
+}
+
+interface NonFederatingBackendsData {
+  non_federating_backends: string[];
 }
 
 enum GroupCreationModalState {
@@ -66,8 +74,7 @@ enum GroupCreationModalState {
   PARTICIPANTS = 'GroupCreationModal.STATE.PARTICIPANTS',
   PREFERENCES = 'GroupCreationModal.STATE.PREFERENCES',
 }
-
-const logger = getLogger('GroupCreationModal');
+const NON_FEDERATING_BACKENDS = HTTP_STATUS.CONFLICT;
 
 const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
   userState = container.resolve(UserState),
@@ -89,12 +96,14 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
       ? teamState.teamFeatures().mls?.config.defaultProtocol
       : ConversationProtocol.PROTEUS;
 
-  const protocolOptions: ProtocolOption[] = [ConversationProtocol.PROTEUS, ConversationProtocol.MLS].map(protocol => ({
-    label: `${t(`modalCreateGroupProtocolSelect.${protocol}`)}${
-      protocol === defaultProtocol ? t(`modalCreateGroupProtocolSelect.default`) : ''
-    }`,
-    value: protocol,
-  }));
+  const protocolOptions: ProtocolOption[] = ([ConversationProtocol.PROTEUS, ConversationProtocol.MLS] as const).map(
+    protocol => ({
+      label: `${t(`modalCreateGroupProtocolSelect.${protocol}`)}${
+        protocol === defaultProtocol ? t(`modalCreateGroupProtocolSelect.default`) : ''
+      }`,
+      value: protocol,
+    }),
+  );
 
   const initialProtocol = protocolOptions.find(protocol => protocol.value === defaultProtocol)!;
 
@@ -157,6 +166,8 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
     return [];
   }, [isGuestEnabled, isTeam, showContacts, teamState, userState]);
 
+  const filteredContacts = contacts.filter(user => user.isAvailable());
+
   useEffect(() => {
     if (stateIsPreferences) {
       onEscKey(onEscape);
@@ -201,12 +212,14 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
     setAccessState(ACCESS_STATE.TEAM.GUESTS_SERVICES);
   };
 
-  const clickOnCreate = async (): Promise<void> => {
+  const clickOnCreate = async (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.KeyboardEvent<HTMLInputElement>,
+  ): Promise<void> => {
     if (!isCreatingConversation) {
       setIsCreatingConversation(true);
 
       try {
-        const conversationEntity = await conversationRepository.createGroupConversation(
+        const conversation = await conversationRepository.createGroupConversation(
           selectedContacts,
           groupName,
           isTeam ? accessState : undefined,
@@ -215,12 +228,54 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
             receipt_mode: enableReadReceipts ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF,
           },
         );
-        setIsShown(false);
-        amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
+
+        if (isKeyboardEvent(event)) {
+          createNavigateKeyboard(generateConversationUrl(conversation.qualifiedId), true)(event);
+        } else {
+          createNavigate(generateConversationUrl(conversation.qualifiedId))(event);
+        }
       } catch (error) {
+        if (isAxiosError<NonFederatingBackendsData>(error) && error.response?.status === NON_FEDERATING_BACKENDS) {
+          const tempName = groupName;
+          setIsShown(false);
+          const backendString = error.response?.data!.non_federating_backends?.join(', and ');
+          const replaceBackends = replaceLink(
+            'https://support.wire.com/hc/articles/9357718008093',
+            'modal__text__read-more',
+            'read-more-backends',
+          );
+          return PrimaryModal.show(PrimaryModal.type.MULTI_ACTIONS, {
+            preventClose: true,
+            primaryAction: {
+              text: t('groupCreationPreferencesNonFederatingEditList'),
+              action: () => {
+                setGroupName(tempName);
+                setIsShown(true);
+                setIsCreatingConversation(false);
+                setGroupCreationState(GroupCreationModalState.PARTICIPANTS);
+              },
+            },
+            secondaryAction: {
+              text: t('groupCreationPreferencesNonFederatingLeave'),
+              action: () => {
+                setIsCreatingConversation(false);
+              },
+            },
+            text: {
+              htmlMessage: t(
+                'groupCreationPreferencesNonFederatingMessage',
+                {backends: backendString},
+                replaceBackends,
+              ),
+              title: t('groupCreationPreferencesNonFederatingHeadline'),
+            },
+          });
+        }
+        amplify.publish(WebAppEvents.CONVERSATION.SHOW, undefined, {});
         setIsCreatingConversation(false);
-        logger.error(error);
       }
+
+      setIsShown(false);
     }
   };
 
@@ -349,15 +404,15 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
             selectedUsers={selectedContacts}
             setSelectedUsers={setSelectedContacts}
             placeholder={t('groupCreationParticipantsPlaceholder')}
-            enter={clickOnCreate}
+            onEnter={clickOnCreate}
           />
         )}
 
         {stateIsParticipants && (
           <FadingScrollbar className="group-creation__list">
-            {contacts.length > 0 && (
+            {filteredContacts.length > 0 && (
               <UserSearchableList
-                users={contacts}
+                users={filteredContacts}
                 filter={participantsInput}
                 selected={selectedContacts}
                 isSelectable
@@ -366,6 +421,7 @@ const GroupCreationModal: React.FC<GroupCreationModalProps> = ({
                 teamRepository={teamRepository}
                 conversationRepository={conversationRepository}
                 noUnderline
+                allowRemoteSearch
               />
             )}
           </FadingScrollbar>

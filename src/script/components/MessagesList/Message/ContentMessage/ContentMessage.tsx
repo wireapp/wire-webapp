@@ -21,12 +21,11 @@ import React, {useMemo} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import {Icon} from 'Components/Icon';
 import {Conversation} from 'src/script/entity/Conversation';
 import {CompositeMessage} from 'src/script/entity/message/CompositeMessage';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {Message} from 'src/script/entity/message/Message';
+import {StatusType} from 'src/script/message/StatusType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getMessageAriaLabel} from 'Util/conversationMessages';
 import {KEY} from 'Util/KeyboardUtil';
@@ -35,9 +34,10 @@ import {setContextMenuPosition} from 'Util/util';
 
 import {ContentAsset} from './asset';
 import {MessageFooterLike} from './MessageFooterLike';
+import {MessageHeader} from './MessageHeader';
 import {MessageLike} from './MessageLike';
 import {Quote} from './MessageQuote';
-import {FailedToSendWarning} from './Warnings';
+import {CompleteFailureToSendWarning, PartialFailureToSendWarning} from './Warnings';
 
 import {MessageActions} from '..';
 import {EphemeralStatusType} from '../../../../message/EphemeralStatusType';
@@ -57,6 +57,7 @@ export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetS
   isLastDeliveredMessage: boolean;
   message: ContentMessage;
   onClickButton: (message: CompositeMessage, buttonId: string) => void;
+  onRetry: (message: ContentMessage) => void;
   previousMessage?: Message;
   quotedMessage?: ContentMessage;
   selfId: QualifiedId;
@@ -81,6 +82,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   onClickLikes,
   onClickButton,
   onLike,
+  onRetry,
   isMsgElementsFocusable,
 }) => {
   const msgFocusState = useMemo(
@@ -90,7 +92,7 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   const messageFocusedTabIndex = useMessageFocusedTabIndex(msgFocusState);
   const {entries: menuEntries} = useKoSubscribableChildren(contextMenu, ['entries']);
   const {
-    headerSenderName,
+    senderName,
     timestamp,
     ephemeral_caption,
     ephemeral_status,
@@ -98,8 +100,10 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
     other_likes,
     was_edited,
     failedToSend,
+    status,
+    user,
   } = useKoSubscribableChildren(message, [
-    'headerSenderName',
+    'senderName',
     'timestamp',
     'ephemeral_caption',
     'ephemeral_status',
@@ -107,6 +111,8 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
     'other_likes',
     'was_edited',
     'failedToSend',
+    'status',
+    'user',
   ]);
 
   const shouldShowAvatar = (): boolean => {
@@ -118,68 +124,8 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
       return true;
     }
 
-    return !previousMessage.isContent() || previousMessage.user().id !== message.user().id;
+    return !previousMessage.isContent() || previousMessage.user().id !== user.id;
   };
-
-  // check if current message is focused and its elements focusable
-  const avatarSection = shouldShowAvatar() ? (
-    <div className="message-header">
-      <div className="message-header-icon">
-        <Avatar
-          tabIndex={messageFocusedTabIndex}
-          participant={message.user()}
-          onAvatarClick={onClickAvatar}
-          avatarSize={AVATAR_SIZE.X_SMALL}
-        />
-      </div>
-
-      <div className="message-header-label">
-        <h4 className={`message-header-label-sender ${message.accent_color()}`} data-uie-name="sender-name">
-          {headerSenderName}
-        </h4>
-
-        {message.user().isService && (
-          <span className="message-header-icon-service">
-            <Icon.Service />
-          </span>
-        )}
-
-        {message.user().isExternal() && (
-          <span
-            className="message-header-icon-external with-tooltip with-tooltip--external"
-            data-tooltip={t('rolePartner')}
-            data-uie-name="sender-external"
-          >
-            <Icon.External />
-          </span>
-        )}
-
-        {message.user().isFederated && (
-          <span
-            className="message-header-icon-guest with-tooltip with-tooltip--external"
-            data-tooltip={message.user().handle}
-            data-uie-name="sender-federated"
-          >
-            <Icon.Federation />
-          </span>
-        )}
-
-        {message.user().isDirectGuest() && (
-          <span
-            className="message-header-icon-guest with-tooltip with-tooltip--external"
-            data-tooltip={t('conversationGuestIndicator')}
-            data-uie-name="sender-guest"
-          >
-            <Icon.Guest />
-          </span>
-        )}
-
-        {was_edited && (
-          <span className="message-header-label-icon icon-edit" title={message.displayEditedTimestamp()}></span>
-        )}
-      </div>
-    </div>
-  ) : null;
 
   const handleContextKeyDown = (event: React.KeyboardEvent) => {
     if ([KEY.SPACE, KEY.ENTER].includes(event.key)) {
@@ -191,12 +137,18 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
   const [messageAriaLabel] = getMessageAriaLabel({
     assets,
     displayTimestampShort: message.displayTimestampShort(),
-    headerSenderName,
+    senderName,
   });
 
   return (
     <div aria-label={messageAriaLabel}>
-      {avatarSection}
+      {shouldShowAvatar() && (
+        <MessageHeader onClickAvatar={onClickAvatar} message={message} focusTabIndex={messageFocusedTabIndex}>
+          {was_edited && (
+            <span className="message-header-label-icon icon-edit" title={message.displayEditedTimestamp()}></span>
+          )}
+        </MessageHeader>
+      )}
       {message.quote() && (
         <Quote
           conversation={conversation}
@@ -230,7 +182,21 @@ const ContentMessageComponent: React.FC<ContentMessageProps> = ({
           />
         ))}
 
-        {failedToSend && <FailedToSendWarning failedToSend={failedToSend} knownUsers={conversation.allUserEntities} />}
+        {failedToSend && (
+          <PartialFailureToSendWarning
+            isMessageFocused={msgFocusState}
+            failedToSend={failedToSend}
+            knownUsers={conversation.allUserEntities()}
+          />
+        )}
+
+        {[StatusType.FAILED, StatusType.FEDERATION_ERROR].includes(status) && (
+          <CompleteFailureToSendWarning
+            {...(status === StatusType.FEDERATION_ERROR && {unreachableDomain: conversation.domain})}
+            isMessageFocused={msgFocusState}
+            onRetry={() => onRetry(message)}
+          />
+        )}
 
         {!other_likes.length && message.isReactable() && (
           <div className="message-body-like">

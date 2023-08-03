@@ -47,6 +47,7 @@ import {CompositeMessage} from '../entity/message/CompositeMessage';
 import {ContentMessage} from '../entity/message/ContentMessage';
 import {DecryptErrorMessage} from '../entity/message/DecryptErrorMessage';
 import {DeleteMessage} from '../entity/message/DeleteMessage';
+import {FailedToAddUsersMessage} from '../entity/message/FailedToAddUsersMessage';
 import {FileAsset} from '../entity/message/FileAsset';
 import {FileTypeRestrictedMessage} from '../entity/message/FileTypeRestrictedMessage';
 import {LegalHoldMessage} from '../entity/message/LegalHoldMessage';
@@ -103,7 +104,7 @@ export class EventMapper {
           return await this._mapJsonEvent(event, conversationEntity);
         } catch (error) {
           const errorMessage = `Failure while mapping events. Affected '${event.type}' event: ${error.message}`;
-          this.logger.error(errorMessage, {error, event});
+          this.logger.error(errorMessage, error);
         }
       }),
     );
@@ -124,7 +125,7 @@ export class EventMapper {
         throw error;
       }
       const errorMessage = `Failure while mapping events. Affected '${event.type}' event: ${error.message}`;
-      this.logger.error(errorMessage, {error, event});
+      this.logger.error(errorMessage, error);
 
       throw new ConversationError(
         ConversationError.TYPE.MESSAGE_NOT_FOUND,
@@ -145,8 +146,8 @@ export class EventMapper {
     const {id, data: eventData, edited_time: editedTime, conversation, qualified_conversation} = event;
 
     if (eventData.quote) {
-      const {message_id: messageId, user_id: userId, error} = eventData.quote;
-      originalEntity.quote(new QuoteEntity({error, messageId, userId}));
+      const {hash, message_id: messageId, user_id: userId, error} = eventData.quote;
+      originalEntity.quote(new QuoteEntity({error, hash, messageId, userId}));
     }
 
     if (id !== originalEntity.id && originalEntity.hasAssetText()) {
@@ -191,6 +192,10 @@ export class EventMapper {
       originalEntity.failedToSend(event.failedToSend);
     }
 
+    if (event.fileData) {
+      originalEntity.fileData(event.fileData);
+    }
+
     if (event.selected_button_id) {
       originalEntity.version = event.version;
     }
@@ -198,7 +203,7 @@ export class EventMapper {
     originalEntity.id = id;
 
     if (originalEntity.isContent() || (originalEntity as Message).isPing()) {
-      originalEntity.status(event.status || StatusType.SENT);
+      originalEntity.status(event.status ?? StatusType.SENT);
     }
 
     originalEntity.replacing_message_id = eventData.replacing_message_id;
@@ -285,6 +290,11 @@ export class EventMapper {
         break;
       }
 
+      case ClientEvent.CONVERSATION.FAILED_TO_ADD_USERS: {
+        messageEntity = this._mapEventFailedToAddUsers(event);
+        break;
+      }
+
       case ClientEvent.CONVERSATION.LEGAL_HOLD_UPDATE: {
         messageEntity = this._mapEventLegalHoldUpdate(event);
         break;
@@ -338,7 +348,7 @@ export class EventMapper {
 
       default: {
         const {type, id} = event as LegacyEventRecord;
-        this.logger.warn(`Ignored unhandled '${type}' event ${id ? `'${id}' ` : ''}`, event);
+        this.logger.warn(`Ignored unhandled '${type}' event ${id ? `'${id}' ` : ''}`);
         throw new ConversationError(
           ConversationError.TYPE.MESSAGE_NOT_FOUND,
           ConversationError.MESSAGE.MESSAGE_NOT_FOUND,
@@ -377,7 +387,7 @@ export class EventMapper {
     }
 
     if (messageEntity.isContent() || messageEntity.isPing()) {
-      messageEntity.status((event as EventRecord).status || StatusType.SENT);
+      messageEntity.status((event as EventRecord).status ?? StatusType.SENT);
     }
 
     if (messageEntity.isComposite()) {
@@ -395,7 +405,7 @@ export class EventMapper {
     }
 
     if (isNaN(messageEntity.timestamp())) {
-      this.logger.warn(`Could not get timestamp for message '${messageEntity.id}'. Skipping it.`, event);
+      this.logger.warn(`Could not get timestamp for message '${messageEntity.id}'. Skipping it.`);
       messageEntity = undefined;
     }
 
@@ -471,6 +481,10 @@ export class EventMapper {
 
   _mapEventCallingTimeout({data, time}: LegacyEventRecord) {
     return new CallingTimeoutMessage(data.reason, parseInt(time, 10));
+  }
+
+  _mapEventFailedToAddUsers({data, time}: LegacyEventRecord) {
+    return new FailedToAddUsersMessage(data.qualifiedIds, parseInt(time, 10));
   }
 
   _mapEventLegalHoldUpdate({data, timestamp}: LegacyEventRecord) {
@@ -887,7 +901,7 @@ export class EventMapper {
           try {
             return mentionEntity.validate(messageText, allMentions);
           } catch (error) {
-            this.logger.warn(`Removed invalid mention when mapping message: ${error.message}`, mentionEntity);
+            this.logger.warn(`Removed invalid mention when mapping message: ${error.message}`);
             return false;
           }
         }

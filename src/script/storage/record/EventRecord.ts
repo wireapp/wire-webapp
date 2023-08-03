@@ -48,7 +48,12 @@ export type UserReactionMap = {[userId: string]: ReactionType};
 type SentEvent = {
   /** sending status of the event*/
   status: StatusType;
-  failedToSend?: QualifiedUserClients;
+  /** raw content of a file that was supposed to be sent but failed. Is undefined if the message has been successfully sent  */
+  fileData?: Blob;
+  failedToSend?: {
+    queue?: QualifiedUserClients | QualifiedId[];
+    failed?: QualifiedId[];
+  };
 };
 
 /** represents an event that was saved to the DB */
@@ -56,7 +61,7 @@ export type StoredEvent<T> = {
   /** Only used with IndexedDB table 'event' */
   primary_key: string;
   category: number;
-  id: string;
+  id?: string;
   /** if the message is ephemeral, that's the amount of time it should be displayed to the user
    * the different types are
    *  - string: a datestring

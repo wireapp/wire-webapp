@@ -242,7 +242,6 @@ export class MediaDevicesHandler {
           setDevices(DeviceTypes.AUDIO_OUTPUT, filteredDevices.speakers);
           setDevices(DeviceTypes.VIDEO_INPUT, filteredDevices.cameras);
 
-          this.logger.info('Updated MediaDevice list', mediaDevices);
           return mediaDevices;
         }
 
@@ -289,7 +288,7 @@ export class MediaDevicesHandler {
 
     const screenSources = await getSourcesWrapper(options);
 
-    this.logger.info(`Detected '${screenSources.length}' sources for screen sharing from Electron`, screenSources);
+    this.logger.info(`Detected '${screenSources.length}' sources for screen sharing from Electron`);
     this.availableDevices.screenInput(screenSources);
     return screenSources;
   }

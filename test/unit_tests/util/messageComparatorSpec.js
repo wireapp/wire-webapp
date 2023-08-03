@@ -19,12 +19,12 @@
 
 import {Text} from 'src/script/entity/message/Text';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 describe('MessageComparator', () => {
   it('areMentionsDifferent', () => {
-    const mentionUser1 = {userId: createRandomUuid()};
-    const mentionUser2 = {userId: createRandomUuid()};
+    const mentionUser1 = {userId: createUuid()};
+    const mentionUser2 = {userId: createUuid()};
 
     const tests = [
       {expected: false, newMentions: [], originalMentions: []},

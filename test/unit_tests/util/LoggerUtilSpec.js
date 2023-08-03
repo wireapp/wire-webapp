@@ -18,18 +18,21 @@
  */
 
 import {enableLogging} from 'src/script/util/LoggerUtil';
+import {Config} from 'src/script/Config';
 
 describe('enableLogging', () => {
   beforeEach(() => window.localStorage.clear());
 
+  const config = Config.getConfig();
+
   it('writes a specified logger namespace into the localStorage API', () => {
     const namespace = '@wireapp';
 
-    enableLogging(false, `?enableLogging=${namespace}`);
+    enableLogging(config, `?enableLogging=${namespace}`);
 
     expect(localStorage.getItem('debug')).toBe(namespace);
 
-    enableLogging(true, `?enableLogging=${namespace}`);
+    enableLogging(config, `?enableLogging=${namespace}`);
 
     expect(localStorage.getItem('debug')).toBe(namespace);
   });
@@ -38,7 +41,7 @@ describe('enableLogging', () => {
     const namespace = '@wireapp';
     localStorage.setItem('debug', namespace);
 
-    enableLogging(false, '');
+    enableLogging(config, '');
 
     expect(localStorage.getItem('debug')).toBe(null);
   });
@@ -47,7 +50,7 @@ describe('enableLogging', () => {
     const namespace = '@wireapp';
     localStorage.setItem('debug', namespace);
 
-    enableLogging(true, '');
+    enableLogging({...config, FEATURE: {...config.FEATURE, ENABLE_DEBUG: true}}, '');
 
     expect(localStorage.getItem('debug')).toBe('*');
   });

@@ -32,6 +32,7 @@ import {container} from 'tsyringe';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {initializeDataDog} from 'Util/DataDog';
 import {DebugUtil} from 'Util/DebugUtil';
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';
@@ -39,7 +40,7 @@ import {getLogger, Logger} from 'Util/Logger';
 import {includesString} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {appendParameter} from 'Util/UrlUtil';
-import {checkIndexedDb, supportsMLS} from 'Util/util';
+import {checkIndexedDb, supportsMLS, supportsSelfSupportedProtocolsUpdates} from 'Util/util';
 
 import '../../style/default.less';
 import {AssetRepository} from '../assets/AssetRepository';
@@ -78,7 +79,7 @@ import {IntegrationRepository} from '../integration/IntegrationRepository';
 import {IntegrationService} from '../integration/IntegrationService';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {MediaRepository} from '../media/MediaRepository';
-import {initMLSConversations, registerUninitializedConversations} from '../mls';
+import {initMLSCallbacks, initMLSConversations, registerUninitializedSelfAndTeamConversations} from '../mls';
 import {NotificationRepository} from '../notification/NotificationRepository';
 import {PreferenceNotificationRepository} from '../notification/PreferenceNotificationRepository';
 import {PermissionRepository} from '../permission/PermissionRepository';
@@ -86,6 +87,7 @@ import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PropertiesService} from '../properties/PropertiesService';
 import {SearchRepository} from '../search/SearchRepository';
 import {SearchService} from '../search/SearchService';
+import {SelfRepository} from '../self/SelfRepository';
 import {SelfService} from '../self/SelfService';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
@@ -240,6 +242,15 @@ export class App {
       repositories.asset,
     );
 
+    repositories.calling = new CallingRepository(
+      repositories.message,
+      repositories.event,
+      repositories.user,
+      repositories.media.streamHandler,
+      repositories.media.devicesHandler,
+      serverTimeHandler,
+    );
+
     repositories.conversation = new ConversationRepository(
       this.service.conversation,
       repositories.message,
@@ -248,8 +259,11 @@ export class App {
       repositories.team,
       repositories.user,
       repositories.properties,
+      repositories.calling,
       serverTimeHandler,
     );
+
+    repositories.self = new SelfRepository(selfService, repositories.user, repositories.team, repositories.client);
 
     repositories.eventTracker = new EventTrackingRepository(repositories.message);
 
@@ -264,14 +278,7 @@ export class App {
       readReceiptMiddleware.processEvent.bind(readReceiptMiddleware),
     ]);
     repositories.backup = new BackupRepository(new BackupService(), repositories.conversation);
-    repositories.calling = new CallingRepository(
-      repositories.message,
-      repositories.event,
-      repositories.user,
-      repositories.media.streamHandler,
-      repositories.media.devicesHandler,
-      serverTimeHandler,
-    );
+
     repositories.integration = new IntegrationRepository(
       this.service.integration,
       repositories.conversation,
@@ -281,7 +288,6 @@ export class App {
     repositories.notification = new NotificationRepository(repositories.conversation, repositories.permission);
     repositories.preferenceNotification = new PreferenceNotificationRepository(repositories.user['userState'].self);
 
-    repositories.conversation.leaveCall = repositories.calling.leaveCall;
     return repositories;
   }
 
@@ -333,7 +339,10 @@ export class App {
    */
   async initApp(clientType: ClientType, onProgress: (progress: number, message?: string) => void) {
     // add body information
-    await this.core.useAPIVersion(this.config.SUPPORTED_API_VERSIONS, this.config.ENABLE_DEV_BACKEND_API);
+    const startTime = Date.now();
+    const [apiVersionMin, apiVersionMax] = this.config.SUPPORTED_API_RANGE;
+    await this.core.useAPIVersion(apiVersionMin, apiVersionMax, this.config.ENABLE_DEV_BACKEND_API);
+
     const osCssClass = Runtime.isMacOS() ? 'os-mac' : 'os-pc';
     const platformCssClass = Runtime.isDesktopApp() ? 'platform-electron' : 'platform-web';
     document.body.classList.add(osCssClass, platformCssClass);
@@ -353,6 +362,7 @@ export class App {
         properties: propertiesRepository,
         team: teamRepository,
         user: userRepository,
+        self: selfRepository,
       } = this.repository;
       await checkIndexedDb();
       onProgress(2.5);
@@ -376,6 +386,7 @@ export class App {
       });
 
       const selfUser = await this.initiateSelfUser();
+      await initializeDataDog(this.config, selfUser.qualifiedId);
 
       onProgress(5, t('initReceivedSelfUser', selfUser.name()));
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_SELF_USER);
@@ -388,27 +399,30 @@ export class App {
       onProgress(10);
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
-      await teamRepository.initTeam();
+      const {members: teamMembers} = await teamRepository.initTeam(selfUser.teamId);
+      telemetry.timeStep(AppInitTimingsStep.RECEIVED_USER_DATA);
 
-      const conversationEntities = await conversationRepository.loadConversations();
+      const connections = await connectionRepository.getConnections();
+      telemetry.addStatistic(AppInitStatisticsValue.CONNECTIONS, connections.length, 50);
+
+      const conversations = await conversationRepository.loadConversations();
+
+      await userRepository.loadUsers(selfUser, connections, conversations, teamMembers);
 
       if (supportsMLS()) {
-        await initMLSConversations(conversationEntities, selfUser, this.core, this.repository.conversation);
+        //if mls is supported, we need to initialize the callbacks (they are used when decrypting messages)
+        await initMLSCallbacks(this.core, this.repository.conversation);
       }
 
-      const connectionEntities = await connectionRepository.getConnections();
-      onProgress(25, t('initReceivedUserData'));
-      telemetry.timeStep(AppInitTimingsStep.RECEIVED_USER_DATA);
-      telemetry.addStatistic(AppInitStatisticsValue.CONVERSATIONS, conversationEntities.length, 50);
-      telemetry.addStatistic(AppInitStatisticsValue.CONNECTIONS, connectionEntities.length, 50);
-      if (connectionEntities.length) {
-        await Promise.allSettled(conversationRepository.mapConnections(connectionEntities));
+      if (connections.length) {
+        await Promise.allSettled(conversationRepository.mapConnections(connections));
       }
+
+      onProgress(25, t('initReceivedUserData'));
+      telemetry.addStatistic(AppInitStatisticsValue.CONVERSATIONS, conversations.length, 50);
       this._subscribeToUnloadEvents();
 
       await conversationRepository.conversationRoleRepository.loadTeamRoles();
-
-      await userRepository.loadUsers();
 
       await eventRepository.connectWebSocket(this.core, ({done, total}) => {
         const baseMessage = t('initDecryption');
@@ -421,8 +435,13 @@ export class App {
       const notificationsCount = eventRepository.notificationsTotal;
 
       if (supportsMLS()) {
-        // Once all the messages have been processed and the message sending queue freed we can now add the potential `self` and `team` conversations
-        await registerUninitializedConversations(conversationEntities, selfUser, clientEntity().id, this.core);
+        // Once all the messages have been processed and the message sending queue freed we can now:
+
+        //add the potential `self` and `team` conversations
+        await registerUninitializedSelfAndTeamConversations(conversations, selfUser, clientEntity().id, this.core);
+
+        //join all the mls groups we're member of and have not yet joined (eg. we were not send welcome message)
+        await initMLSConversations(conversations, this.core);
       }
 
       telemetry.timeStep(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
@@ -443,6 +462,10 @@ export class App {
       await conversationRepository.updateConversationsOnAppInit();
       await conversationRepository.conversationLabelRepository.loadLabels();
 
+      if (supportsSelfSupportedProtocolsUpdates()) {
+        await selfRepository.initialisePeriodicSelfSupportedProtocolsCheck();
+      }
+
       amplify.publish(WebAppEvents.LIFECYCLE.LOADED);
 
       telemetry.timeStep(AppInitTimingsStep.UPDATED_CONVERSATIONS);
@@ -455,8 +478,7 @@ export class App {
       callingRepository.setReady();
       telemetry.timeStep(AppInitTimingsStep.APP_LOADED);
 
-      const loadTime = telemetry.report();
-      this.logger.info(`App loaded within ${loadTime}s for user "${selfUser.id}" and client "${clientEntity().id}"`);
+      this.logger.info(`App loaded in ${Date.now() - startTime}ms`);
 
       return selfUser;
     } catch (error) {
@@ -552,7 +574,7 @@ export class App {
       }
     }
 
-    await container.resolve(StorageService).init(this.core.storage);
+    container.resolve(StorageService).init(this.core.storage);
     this.repository.client.init(userEntity);
     await this.repository.properties.init(userEntity);
 

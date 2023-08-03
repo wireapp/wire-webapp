@@ -26,7 +26,7 @@ interface OverlayElement {
  * Keeps track of elements that are overlayed by other elements (thus not visible on screen).
  */
 const overlayedElements = new Map<HTMLElement, OverlayElement>();
-let overlayCheckerInterval: number = undefined;
+let overlayCheckerInterval: number | undefined = undefined;
 
 function checkOverlayedElements() {
   overlayedElements.forEach(({onVisible, onChange}, element) => {
@@ -35,7 +35,7 @@ function checkOverlayedElements() {
       return onChange(isVisible);
     }
     if (isVisible) {
-      onVisible();
+      onVisible?.();
       removeElement(element);
     }
   });
@@ -54,7 +54,7 @@ const isOverlayed = (domElement: HTMLElement): boolean => {
   const middlePointX = (box.right + box.left) / 2;
   const middlePointY = (box.bottom + box.top) / 2;
   const elementAtPoint = document.elementFromPoint(middlePointX, middlePointY);
-  return elementAtPoint && domElement !== elementAtPoint && !domElement.contains(elementAtPoint);
+  return !!elementAtPoint && domElement !== elementAtPoint && !domElement.contains(elementAtPoint);
 };
 
 const onElementVisible = (element: HTMLElement, onVisible: () => void) => {

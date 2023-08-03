@@ -22,8 +22,7 @@ import type {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {WebappProperties} from '@wireapp/api-client/lib/user/data';
 import {MessageSendingState} from '@wireapp/core/lib/conversation';
-import {flattenQualifiedUserClients, flattenUserClients} from '@wireapp/core/lib/conversation/message/UserClientsUtil';
-import {isQualifiedUserClients} from '@wireapp/core/lib/util';
+import {flattenUserMap} from '@wireapp/core/lib/conversation/message/UserClientsUtil';
 import {amplify} from 'amplify';
 import axios from 'axios';
 import ko from 'knockout';
@@ -31,6 +30,7 @@ import {container} from 'tsyringe';
 import 'webrtc-adapter';
 
 import {
+  AUDIO_STATE,
   CALL_TYPE,
   CONV_TYPE,
   ENV as AVS_ENV,
@@ -123,7 +123,7 @@ export interface SubconversationEpochInfoMember {
   in_subconv: boolean;
 }
 
-type SubconversationData = {epoch: number; secretKey: string; keyLength: number};
+type SubconversationData = {epoch: number; secretKey: string};
 
 export class CallingRepository {
   private readonly acceptVersionWarning: (conversationId: QualifiedId) => void;
@@ -132,7 +132,7 @@ export class CallingRepository {
   private avsVersion: number = 0;
   private incomingCallCallback: (call: Call) => void;
   private requestNewEpochCallback: (conversationId: QualifiedId) => void;
-  private callClosedCallback: (conversationId: QualifiedId) => void;
+  private callClosedCallback: (conversationId: QualifiedId, conversationType: CONV_TYPE) => void;
   private callParticipantChangedCallback: (conversationId: QualifiedId, members: QualifiedWcallMember[]) => void;
   private isReady: boolean = false;
   /** will cache the query to media stream (in order to avoid asking the system for streams multiple times when we have multiple peers) */
@@ -326,7 +326,10 @@ export class CallingRepository {
     activeCall?.muteState(isMuted ? this.nextMuteState : MuteState.NOT_MUTED);
   };
 
-  private async pushClients(call: Call, checkMismatch?: boolean) {
+  public async pushClients(call: Call | undefined = this.callState.joinedCall(), checkMismatch?: boolean) {
+    if (!call) {
+      return false;
+    }
     const conversation = this.conversationState.findConversation(call.conversationId);
     if (!conversation) {
       this.logger.warn(`Unable to find a conversation with id of ${call.conversationId}`);
@@ -335,9 +338,7 @@ export class CallingRepository {
     const allClients = await this.core.service!.conversation.fetchAllParticipantsClients(call.conversationId);
 
     if (!conversation.isUsingMLSProtocol) {
-      const qualifiedClients = isQualifiedUserClients(allClients)
-        ? flattenQualifiedUserClients(allClients)
-        : flattenUserClients(allClients);
+      const qualifiedClients = flattenUserMap(allClients);
 
       const clients: Clients = flatten(
         qualifiedClients.map(({data, userId}) =>
@@ -418,7 +419,7 @@ export class CallingRepository {
     this.incomingCallCallback = callback;
   }
 
-  onCallClosed(callback: (conversationId: QualifiedId) => void): void {
+  onCallClosed(callback: (conversationId: QualifiedId, conversationType: CONV_TYPE) => void): void {
     this.callClosedCallback = callback;
   }
 
@@ -884,20 +885,13 @@ export class CallingRepository {
     members: SubconversationEpochInfoMember[],
   ) {
     const serializedConversationId = this.serializeQualifiedId(conversationId);
-    const {epoch, secretKey, keyLength} = subconversationData;
+    const {epoch, secretKey} = subconversationData;
     const clients = {
       convid: serializedConversationId,
       clients: members,
     };
 
-    return this.wCall?.setEpochInfo(
-      this.wUser,
-      serializedConversationId,
-      epoch,
-      JSON.stringify(clients),
-      secretKey,
-      keyLength,
-    );
+    return this.wCall?.setEpochInfo(this.wUser, serializedConversationId, epoch, JSON.stringify(clients), secretKey);
   }
 
   rejectCall(conversationId: QualifiedId): void {
@@ -1194,36 +1188,34 @@ export class CallingRepository {
     url: string,
     data: string,
     _dataLength: number,
-    _: number,
+    __: number,
   ): number => {
-    (async () => {
-      try {
-        const response = await axios.post(url, data);
-
-        const {status, data: axiosData} = response;
-        const jsonData = JSON.stringify(axiosData);
-        this.wCall?.sftResp(this.wUser!, status, jsonData, jsonData.length, context);
-      } catch (error) {
-        const message = error instanceof Error ? error.message : error;
-        this.avsLogHandler(LOG_LEVEL.WARN, `Request to sft server failed with error: ${message}`, error);
-        avsLogger.warn(`Request to sft server failed with error`, error);
-      }
-    })();
+    const _sendSFTRequest = async () => {
+      const response = await axios.post(url, data);
+      const {status, data: axiosData} = response;
+      const jsonData = JSON.stringify(axiosData);
+      this.wCall?.sftResp(this.wUser!, status, jsonData, jsonData.length, context);
+    };
+    const avsSftResponseFailedCode = 1000;
+    _sendSFTRequest().catch(error => {
+      this.avsLogHandler(LOG_LEVEL.WARN, `Request to sft server failed with error: ${error?.message}`, error);
+      avsLogger.warn(`Request to sft server failed with error`, error);
+      this.wCall?.sftResp(this.wUser!, avsSftResponseFailedCode, '', 0, context);
+    });
 
     return 0;
   };
 
   private readonly requestConfig = () => {
-    (async () => {
+    const _requestConfig = async () => {
       const limit = Runtime.isFirefox() ? CallingRepository.CONFIG.MAX_FIREFOX_TURN_COUNT : undefined;
-      try {
-        const config = await this.fetchConfig(limit);
-        this.wCall?.configUpdate(this.wUser, 0, JSON.stringify(config));
-      } catch (error) {
-        this.logger.warn('Failed fetching calling config', error);
-        this.wCall?.configUpdate(this.wUser, 1, '');
-      }
-    })();
+      const config = await this.fetchConfig(limit);
+      this.wCall?.configUpdate(this.wUser, 0, JSON.stringify(config));
+    };
+    _requestConfig().catch(error => {
+      this.logger.warn('Failed fetching calling config', error);
+      this.wCall?.configUpdate(this.wUser, 1, '');
+    });
 
     return 0;
   };
@@ -1236,7 +1228,7 @@ export class CallingRepository {
       return;
     }
 
-    this.callClosedCallback(conversationId);
+    this.callClosedCallback(conversationId, call.conversationType);
 
     if (reason === REASON.NORMAL) {
       this.callState.selectableScreens([]);
@@ -1429,7 +1421,15 @@ export class CallingRepository {
   }
 
   private updateParticipantVideoState(call: Call, members: QualifiedWcallMember[]): void {
-    members.forEach(member => call.getParticipant(member.userId, member.clientid)?.isSendingVideo(!!member.vrecv));
+    members.forEach(member => call.getParticipant(member.userId, member.clientid)?.videoState(member.vrecv));
+  }
+
+  private updateParticipantAudioState(call: Call, members: QualifiedWcallMember[]): void {
+    members.forEach(member =>
+      call
+        .getParticipant(member.userId, member.clientid)
+        ?.isAudioEstablished(member.aestab === AUDIO_STATE.ESTABLISHED),
+    );
   }
 
   private updateParticipantList(call: Call, members: QualifiedWcallMember[]): void {
@@ -1476,10 +1476,11 @@ export class CallingRepository {
     this.updateParticipantList(call, members);
     this.updateParticipantMutedState(call, members);
     this.updateParticipantVideoState(call, members);
+    this.updateParticipantAudioState(call, members);
     this.callParticipantChangedCallback(conversationId, members);
   };
 
-  private readonly requestClients = async (wUser: number, convId: SerializedConversationId, _: number) => {
+  private readonly requestClients = async (wUser: number, convId: SerializedConversationId, __: number) => {
     const call = this.findCall(this.parseQualifiedId(convId));
     if (!call) {
       this.logger.warn(`Unable to find a call for the conversation id of ${convId}`);
@@ -1558,12 +1559,14 @@ export class CallingRepository {
       }
     })();
 
-    this.mediaStreamQuery.then(() => {
-      const selfParticipant = call.getSelfParticipant();
-      if (selfParticipant.videoState() === VIDEO_STATE.STOPPED) {
-        selfParticipant.releaseVideoStream(true);
-      }
-    });
+    this.mediaStreamQuery
+      .then(() => {
+        const selfParticipant = call.getSelfParticipant();
+        if (selfParticipant.videoState() === VIDEO_STATE.STOPPED) {
+          selfParticipant.releaseVideoStream(true);
+        }
+      })
+      .catch(this.logger.warn);
     return this.mediaStreamQuery;
   };
 

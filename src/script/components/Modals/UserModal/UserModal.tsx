@@ -36,6 +36,7 @@ import {handleKeyDown} from 'Util/KeyboardUtil';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 
 import {useUserModalState} from './UserModal.state';
+import {userModalStyle} from './UserModal.styles';
 
 import {Config} from '../../../Config';
 import {User} from '../../../entity/User';
@@ -155,7 +156,7 @@ const UserModal: React.FC<UserModalProps> = ({
       userRepository
         .getUserById(userId)
         .then(user => {
-          if (user.isDeleted) {
+          if (user.isDeleted || !user.isAvailable()) {
             setUserNotFound(true);
             return;
           }
@@ -172,12 +173,15 @@ const UserModal: React.FC<UserModalProps> = ({
   }, [userId?.id, userId?.domain]);
 
   return (
-    <div className="user-modal">
+    <div className="user-modal" css={userModalStyle}>
       <ModalComponent
         isShown={isShown}
         onBgClick={hide}
         onClosed={onModalClosed}
         data-uie-name={user ? 'modal-user-profile' : userNotFound ? 'modal-cannot-open-profile' : ''}
+        wrapperCSS={{
+          padding: 0,
+        }}
       >
         <div className="modal__header">
           {userNotFound && (
@@ -198,7 +202,14 @@ const UserModal: React.FC<UserModalProps> = ({
         <div className={cx('modal__body user-modal__wrapper', {'user-modal__wrapper--max': !user && !userNotFound})}>
           {user && (
             <>
-              <UserDetails participant={user} isSelfVerified={isSelfVerified} classifiedDomains={classifiedDomains} />
+              <UserDetails
+                avatarStyles={{
+                  marginTop: 60,
+                }}
+                participant={user}
+                isSelfVerified={isSelfVerified}
+                classifiedDomains={classifiedDomains}
+              />
 
               <EnrichedFields user={user} showDomain={isFederated} />
 

@@ -24,11 +24,11 @@
 }
 
 .messages {
-  max-width: @conversation-max-width;
   transform: translateZ(0);
   &.flex-center {
     margin: auto;
     & .message {
+      width: 100%;
       min-width: 75%;
     }
   }
@@ -90,7 +90,6 @@
   }
 
   .message-mention {
-    display: inline-block;
     color: var(--accent-color);
     .text-medium;
 
@@ -315,6 +314,7 @@
 // MESSAGE - BODY
 .message-body {
   position: relative;
+  max-width: @conversation-max-width;
   padding-right: var(--conversation-message-timestamp-width);
   padding-left: @conversation-message-sender-width;
 

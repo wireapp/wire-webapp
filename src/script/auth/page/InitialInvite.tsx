@@ -19,6 +19,7 @@
 
 import React, {useState} from 'react';
 
+import {BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http';
 import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
@@ -46,7 +47,6 @@ import {inviteStrings} from '../../strings';
 import {Exception} from '../component/Exception';
 import {EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
-import {BackendError} from '../module/action/BackendError';
 import {ValidationError} from '../module/action/ValidationError';
 import {RootState, bindActionCreators} from '../module/reducer';
 import * as AuthSelector from '../module/selector/AuthSelector';
@@ -111,8 +111,8 @@ const InitialInviteComponent = ({
       } catch (error) {
         if (error.label) {
           switch (error.label) {
-            case BackendError.LABEL.EMAIL_EXISTS:
-            case BackendError.LABEL.ALREADY_INVITED: {
+            case BackendErrorLabel.INVITE_EMAIL_EXISTS:
+            case SyntheticErrorLabel.ALREADY_INVITED: {
               return;
             }
             default: {

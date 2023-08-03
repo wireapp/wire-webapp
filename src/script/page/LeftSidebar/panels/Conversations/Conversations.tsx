@@ -43,7 +43,6 @@ import {ConversationRepository} from '../../../../conversation/ConversationRepos
 import {ConversationState} from '../../../../conversation/ConversationState';
 import {User} from '../../../../entity/User';
 import {useConversationFocus} from '../../../../hooks/useConversationFocus';
-import {useMLSConversationState} from '../../../../mls';
 import {PreferenceNotificationRepository} from '../../../../notification/PreferenceNotificationRepository';
 import {PropertiesRepository} from '../../../../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../../../../properties/PropertiesType';
@@ -101,8 +100,6 @@ const Conversations: React.FC<ConversationsProps> = ({
   ]);
   const {notifications} = useKoSubscribableChildren(preferenceNotificationRepository, ['notifications']);
   const {activeCalls} = useKoSubscribableChildren(callState, ['activeCalls']);
-
-  const {filterEstablishedConversations} = useMLSConversationState();
 
   const initialViewStyle = propertiesRepository.getPreference(PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS)
     ? ConversationViewStyle.FOLDER
@@ -303,8 +300,7 @@ const Conversations: React.FC<ConversationsProps> = ({
     </>
   );
 
-  const filteredConversations = filterEstablishedConversations(conversations);
-  const {currentFocus, handleKeyDown} = useConversationFocus(filteredConversations);
+  const {currentFocus, handleKeyDown, resetConversationFocus} = useConversationFocus(conversations);
 
   return (
     <ListWrapper id="conversations" headerElement={header} footer={footer} before={callingView}>
@@ -323,12 +319,13 @@ const Conversations: React.FC<ConversationsProps> = ({
         <ConversationsList
           connectRequests={connectRequests}
           callState={callState}
-          conversations={filteredConversations}
+          conversations={conversations}
           viewStyle={viewStyle}
           listViewModel={listViewModel}
           conversationState={conversationState}
           conversationRepository={conversationRepository}
           currentFocus={currentFocus}
+          resetConversationFocus={resetConversationFocus}
           handleArrowKeyDown={handleKeyDown}
         />
       )}

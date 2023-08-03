@@ -21,7 +21,7 @@ import {amplify} from 'amplify';
 
 import {CacheRepository} from 'src/script/cache/CacheRepository';
 import {StorageKey} from 'src/script/storage/StorageKey';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 describe('CacheRepository', () => {
   const TEMP_KEY = 'should_be_deleted';
@@ -30,7 +30,7 @@ describe('CacheRepository', () => {
     beforeEach(() => {
       CacheRepository.clearLocalStorage();
 
-      const conversationInputKey = `${StorageKey.CONVERSATION.INPUT}|${createRandomUuid()}`;
+      const conversationInputKey = `${StorageKey.CONVERSATION.INPUT}|${createUuid()}`;
       amplify.store(conversationInputKey, {mentions: [], reply: {}, text: 'test'});
       amplify.store(StorageKey.AUTH.SHOW_LOGIN, true);
       amplify.store(TEMP_KEY, true);

@@ -42,7 +42,7 @@ export class MemberMessage extends SystemMessage {
   private readonly joinedUserEntities: ko.PureComputed<User[]>;
   public readonly name: ko.Observable<string>;
   public readonly otherUser: ko.PureComputed<User>;
-  private readonly senderName: ko.PureComputed<string>;
+  public readonly senderName: ko.PureComputed<string>;
   public readonly showNamedCreation: ko.PureComputed<boolean>;
   private readonly visibleUsers: ko.Observable<User[]>;
   public readonly highlightedUsers: ko.PureComputed<User[]>;

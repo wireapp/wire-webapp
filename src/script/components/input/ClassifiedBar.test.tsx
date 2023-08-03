@@ -20,18 +20,18 @@
 import {render} from '@testing-library/react';
 
 import {User} from 'src/script/entity/User';
-import {createRandomUuid} from 'Util/util';
+import {createUuid} from 'Util/uuid';
 
 import {ClassifiedBar} from './ClassifiedBar';
 
 describe('ClassifiedBar', () => {
   const classifiedDomains = ['same.domain', 'classified.domain', 'other-classified.domain'];
-  const sameDomainUser = new User(createRandomUuid(), 'same.domain');
-  const classifiedDomainUser = new User(createRandomUuid(), 'classified.domain');
-  const otherDomainUser = new User(createRandomUuid(), 'other.domain');
+  const sameDomainUser = new User(createUuid(), 'same.domain');
+  const classifiedDomainUser = new User(createUuid(), 'classified.domain');
+  const otherDomainUser = new User(createUuid(), 'other.domain');
 
   it.each([[[sameDomainUser]], [[sameDomainUser, otherDomainUser]]])('is empty if no domains are given', users => {
-    const {container} = render(<ClassifiedBar users={users} />);
+    const {container} = render(<ClassifiedBar users={users} conversationDomain="test" />);
 
     expect(container.querySelector('[data-uie-name=classified-label]')).toBe(null);
   });
@@ -39,7 +39,13 @@ describe('ClassifiedBar', () => {
   it.each([[[sameDomainUser]], [[classifiedDomainUser]], [[sameDomainUser, classifiedDomainUser]]])(
     'returns classified if all users in the classified domains',
     users => {
-      const {getByText, queryByText} = render(<ClassifiedBar users={users} classifiedDomains={classifiedDomains} />);
+      const {getByText, queryByText} = render(
+        <ClassifiedBar
+          conversationDomain={classifiedDomainUser.domain}
+          users={users}
+          classifiedDomains={classifiedDomains}
+        />,
+      );
 
       expect(getByText('conversationClassified')).not.toBe(null);
       expect(queryByText('conversationNotClassified')).toBe(null);
@@ -51,7 +57,9 @@ describe('ClassifiedBar', () => {
     [[classifiedDomainUser, otherDomainUser]],
     [[sameDomainUser, classifiedDomainUser, otherDomainUser]],
   ])('returns non-classified if a single user is from another domain', users => {
-    const {queryByText, getByText} = render(<ClassifiedBar users={users} classifiedDomains={classifiedDomains} />);
+    const {queryByText, getByText} = render(
+      <ClassifiedBar conversationDomain={classifiedDomains[0]} users={users} classifiedDomains={classifiedDomains} />,
+    );
 
     expect(queryByText('conversationClassified')).toBe(null);
     expect(getByText('conversationNotClassified')).not.toBe(null);

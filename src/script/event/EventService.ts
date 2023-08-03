@@ -127,12 +127,18 @@ export class EventService {
 
     try {
       if (this.storageService.db) {
-        return await this.storageService.db
-          .table(StorageSchemata.OBJECT_STORE.EVENTS)
-          .where('conversation')
-          .equals(conversationId)
-          .filter(item => item.data?.replacing_message_id === eventId || item.id === eventId)
-          .first();
+        const eventStore = this.storageService.db.table(StorageSchemata.OBJECT_STORE.EVENTS);
+        // First lookup the event by its direct id (using the index)
+        const event = eventStore.where('id').equals(eventId).first();
+        return (
+          event ||
+          // If the event was not found, fallback to filtering all the events and check if a `replacing` message is found
+          eventStore
+            .where('conversation')
+            .equals(conversationId)
+            .filter(item => item.data?.replacing_message_id === eventId || item.id === eventId)
+            .first()
+        );
       }
 
       const records = await this.storageService.getAll<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS);
@@ -413,7 +419,7 @@ export class EventService {
   ): Promise<EventRecord | undefined> {
     const record = await this.storageService.load<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey);
     if (!record) {
-      this.logger.warn('Did not find message to update asset (failed)', primaryKey);
+      this.logger.warn('Did not find message to update asset (failed)');
       return undefined;
     }
     record.data.reason = reason;

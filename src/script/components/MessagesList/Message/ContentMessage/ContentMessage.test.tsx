@@ -22,6 +22,7 @@ import ko from 'knockout';
 
 import {LinkPreview} from 'src/script/entity/message/LinkPreview';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
+import {createUuid} from 'Util/uuid';
 
 import {ContentMessageComponent, ContentMessageProps} from './ContentMessage';
 
@@ -29,7 +30,6 @@ import {Conversation} from '../../../../entity/Conversation';
 import {ContentMessage} from '../../../../entity/message/ContentMessage';
 import {Text} from '../../../../entity/message/Text';
 import {User} from '../../../../entity/User';
-import {createRandomUuid} from '../../../../util/util';
 
 describe('message', () => {
   let defaultParams: ContentMessageProps;
@@ -37,7 +37,7 @@ describe('message', () => {
 
   beforeEach(() => {
     const message = new ContentMessage();
-    message.user(new User(createRandomUuid()));
+    message.user(new User(createUuid()));
     const textAsset = new Text('', textValue);
     spyOn(textAsset, 'render').and.returnValue(`<span>${textValue}</span>`);
     message.assets.push(textAsset);
@@ -60,8 +60,9 @@ describe('message', () => {
       onClickReceipts: jest.fn(),
       onClickTimestamp: jest.fn(),
       onLike: jest.fn(),
+      onRetry: jest.fn(),
       previousMessage: undefined,
-      selfId: {domain: '', id: createRandomUuid()},
+      selfId: {domain: '', id: createUuid()},
       isMsgElementsFocusable: true,
     };
   });
@@ -80,7 +81,7 @@ describe('message', () => {
   });
 
   it('displays a quoted message', async () => {
-    const quotedMessage = new ContentMessage(createRandomUuid());
+    const quotedMessage = new ContentMessage(createUuid());
     const quoteText = 'I am a quote';
     const quoteAsset = new Text('', textValue);
     spyOn(quoteAsset, 'render').and.returnValue(`<span>${quoteText}</span>`);
@@ -88,12 +89,12 @@ describe('message', () => {
     const findMessage = () => Promise.resolve(quotedMessage);
 
     const message = new ContentMessage();
-    message.user(new User(createRandomUuid()));
+    message.user(new User(createUuid()));
     message.quote(new QuoteEntity({messageId: quotedMessage.id, userId: ''}));
 
     const {getByText} = render(
       <ContentMessageComponent {...defaultParams} message={message} findMessage={findMessage} />,
     );
-    await waitFor(() => getByText(quoteText));
+    expect(await waitFor(() => getByText(quoteText))).not.toBe(null);
   });
 });

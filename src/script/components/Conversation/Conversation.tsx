@@ -187,7 +187,7 @@ export const Conversation: FC<ConversationProps> = ({
 
       if (!isHittingUploadLimit(droppedFiles, repositories.asset)) {
         Array.from(droppedFiles).forEach(file => {
-          const isSupportedImage = CONFIG.ALLOWED_IMAGE_TYPES.includes(file.type);
+          const isSupportedImage = (CONFIG.ALLOWED_IMAGE_TYPES as ReadonlyArray<string>).includes(file.type);
 
           if (isSupportedImage) {
             images.push(file);
@@ -255,7 +255,7 @@ export const Conversation: FC<ConversationProps> = ({
 
   const showMessageDetails = (message: Message, showLikes = false) => {
     if (!is1to1) {
-      openRightSidebar(PanelState.MESSAGE_DETAILS, {entity: message, showLikes});
+      openRightSidebar(PanelState.MESSAGE_DETAILS, {entity: message, showLikes}, true);
     }
   };
 
@@ -524,7 +524,7 @@ export const Conversation: FC<ConversationProps> = ({
             searchRepository={repositories.search}
             storageRepository={repositories.storage}
             teamState={teamState}
-            userState={userState}
+            selfUser={selfUser}
             onShiftTab={() => setMsgElementsFocusable(false)}
             uploadDroppedFiles={uploadDroppedFiles}
             uploadImages={uploadImages}

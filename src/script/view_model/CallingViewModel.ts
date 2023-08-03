@@ -88,7 +88,7 @@ declare global {
     setSinkId?: (sinkId: string) => Promise<void>;
   }
 }
-
+const maxGroupSize = 4;
 export class CallingViewModel {
   readonly activeCalls: ko.PureComputed<Call[]>;
   readonly callActions: CallActions;
@@ -102,7 +102,7 @@ export class CallingViewModel {
     readonly permissionRepository: PermissionRepository,
     readonly teamRepository: TeamRepository,
     readonly propertiesRepository: PropertiesRepository,
-    private readonly selfUser: ko.Observable<User>,
+    private readonly selfUser: ko.Subscribable<User>,
     readonly multitasking: Multitasking,
     private readonly conversationState = container.resolve(ConversationState),
     readonly callState = container.resolve(CallState),
@@ -162,10 +162,10 @@ export class CallingViewModel {
 
       if (conversation.isUsingMLSProtocol) {
         const unsubscribe = await subscribeToEpochUpdates(
-          {mlsService: this.mlsService},
+          {mlsService: this.mlsService, conversationState: this.conversationState},
           conversation.qualifiedId,
           ({epoch, keyLength, secretKey, members}) => {
-            this.callingRepository.setEpochInfo(conversation.qualifiedId, {epoch, keyLength, secretKey}, members);
+            this.callingRepository.setEpochInfo(conversation.qualifiedId, {epoch, secretKey}, members);
           },
         );
 
@@ -176,10 +176,10 @@ export class CallingViewModel {
 
     const joinOngoingMlsConference = async (call: Call) => {
       const unsubscribe = await subscribeToEpochUpdates(
-        {mlsService: this.mlsService},
+        {mlsService: this.mlsService, conversationState: this.conversationState},
         call.conversationId,
         ({epoch, keyLength, secretKey, members}) => {
-          this.callingRepository.setEpochInfo(call.conversationId, {epoch, keyLength, secretKey}, members);
+          this.callingRepository.setEpochInfo(call.conversationId, {epoch, secretKey}, members);
         },
       );
 
@@ -232,18 +232,17 @@ export class CallingViewModel {
         return;
       }
 
-      const {epoch, keyLength, secretKey, members} = await getSubconversationEpochInfo(
+      const {epoch, secretKey, members} = await getSubconversationEpochInfo(
         {mlsService: this.mlsService},
         conversationId,
         shouldAdvanceEpoch,
       );
-      this.callingRepository.setEpochInfo(conversationId, {epoch, keyLength, secretKey}, members);
+      this.callingRepository.setEpochInfo(conversationId, {epoch, secretKey}, members);
     };
 
-    const leaveCall = async (conversationId: QualifiedId) => {
-      const conversation = this.getConversationById(conversationId);
-
-      if (!conversation?.isUsingMLSProtocol) {
+    const closeCall = async (conversationId: QualifiedId, conversationType: CONV_TYPE) => {
+      // There's nothing we need to do for non-mls calls
+      if (conversationType !== CONV_TYPE.CONFERENCE_MLS) {
         return;
       }
 
@@ -332,11 +331,35 @@ export class CallingViewModel {
       }
     };
 
+    const handleCallAction = async (conversationEntity: Conversation, callType: CALL_TYPE): Promise<void> => {
+      const memberCount = conversationEntity.participating_user_ets().length;
+      if (memberCount > maxGroupSize) {
+        PrimaryModal.show(PrimaryModal.type.WITHOUT_TITLE, {
+          preventClose: true,
+          primaryAction: {
+            action: async () => await startCall(conversationEntity, callType),
+            text: t('groupCallModalPrimaryBtnName'),
+          },
+          secondaryAction: {
+            text: t('modalConfirmSecondary'),
+          },
+          text: {
+            htmlMessage: `<div class="modal-description">
+            ${t('groupCallConfirmationModalTitle', memberCount)}
+          </div>`,
+            closeBtnLabel: t('groupCallModalCloseBtnLabel'),
+          },
+        });
+      } else {
+        await startCall(conversationEntity, callType);
+      }
+    };
+
     //update epoch info when AVS requests new epoch
     this.callingRepository.onRequestNewEpochCallback(conversationId => updateEpochInfo(conversationId, true));
 
     //once the call gets closed (eg. we leave a call or get dropped), we remove ourselfes from subconversation and unsubscribe from all the call events
-    this.callingRepository.onCallClosed(leaveCall);
+    this.callingRepository.onCallClosed(closeCall);
 
     //handle participant change avs callback to detect stale clients in subconversations
     this.callingRepository.onCallParticipantChangedCallback(handleCallParticipantChange);
@@ -375,14 +398,14 @@ export class CallingViewModel {
         if (conversationEntity.isGroup() && !this.teamState.isConferenceCallingEnabled()) {
           this.showRestrictedConferenceCallingModal();
         } else {
-          await startCall(conversationEntity, CALL_TYPE.NORMAL);
+          await handleCallAction(conversationEntity, CALL_TYPE.NORMAL);
         }
       },
       startVideo: async (conversationEntity: Conversation) => {
         if (conversationEntity.isGroup() && !this.teamState.isConferenceCallingEnabled()) {
           this.showRestrictedConferenceCallingModal();
         } else {
-          await startCall(conversationEntity, CALL_TYPE.VIDEO);
+          await handleCallAction(conversationEntity, CALL_TYPE.VIDEO);
         }
       },
       switchCameraInput: (call: Call, deviceId: string) => {

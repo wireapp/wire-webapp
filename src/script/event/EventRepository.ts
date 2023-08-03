@@ -53,6 +53,7 @@ import {CryptographyMapper} from '../cryptography/CryptographyMapper';
 import {CryptographyError} from '../error/CryptographyError';
 import {EventError} from '../error/EventError';
 import {categoryFromEvent} from '../message/MessageCategorization';
+import {isEventRecordFailed, isEventRecordWithFederationError} from '../message/StatusType';
 import type {EventRecord, StoredEvent} from '../storage';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import {EventName} from '../tracking/EventName';
@@ -302,11 +303,9 @@ export class EventRepository {
       source = EventRepository.SOURCE.INJECTED;
     }
 
-    const id = 'id' in event ? event.id : 'ID not specified';
     const conversationId = 'conversation' in event && event.conversation;
     const inSelfConversation = conversationId === this.userState.self().id;
     if (!inSelfConversation) {
-      this.logger.info(`Injected event ID '${id}' of type '${event.type}' with source '${source}'`, event);
       return this.processEvent(event, source);
     }
     return undefined;
@@ -351,7 +350,6 @@ export class EventRepository {
    * @returns Resolves with the saved record or the plain event if the event was skipped
    */
   private async handleEvent({event, decryptedData, decryptionError}: ProcessedEventPayload, source: EventSource) {
-    const logObject = {eventJson: JSON.stringify(event), eventObject: event};
     const validationResult = validateEvent(
       event as {time: string; type: CONVERSATION_EVENT | USER_EVENT},
       source,
@@ -362,7 +360,7 @@ export class EventRepository {
         return event;
       }
       case EventValidation.OUTDATED_TIMESTAMP: {
-        this.logger.info(`Ignored outdated event type: '${event.type}'`, logObject);
+        this.logger.warn(`Ignored outdated event type: '${event.type}'`);
         return event;
       }
       case EventValidation.VALID:
@@ -498,7 +496,7 @@ export class EventRepository {
     const commonUpdates = EventRepository.getCommonMessageUpdates(originalEvent, newEvent);
 
     const specificUpdates = isLinkPreviewEdit
-      ? this.getUpdatesForLinkPreview(originalEvent, newEvent)
+      ? this.getUpdatesForMessage(originalEvent, newEvent)
       : EventRepository.getUpdatesForEditMessage(originalEvent, newEvent);
 
     const updates = {...specificUpdates, ...commonUpdates};
@@ -513,7 +511,7 @@ export class EventRepository {
         return this.handleAssetUpdate(originalEvent, newEvent);
 
       case ClientEvent.CONVERSATION.MESSAGE_ADD:
-        return this.handleLinkPreviewUpdate(originalEvent, newEvent);
+        return this.handleMessageUpdate(originalEvent, newEvent);
 
       default:
         this.throwValidationError(newEvent, `Forbidden type '${newEvent.type}' for duplicate events`);
@@ -524,15 +522,24 @@ export class EventRepository {
     const newEventData = newEvent.data;
     // the preview status is not sent by the client so we fake a 'preview' status in order to cleanly handle it in the switch statement
     const ASSET_PREVIEW = 'preview';
+    // similarly, no status is sent by the client when we retry sending a failed message
+    const RETRY_EVENT = 'retry';
     const isPreviewEvent = !newEventData.status && !!newEventData.preview_key;
-    const previewStatus = isPreviewEvent ? ASSET_PREVIEW : newEventData.status;
+    const isRetryEvent = !!newEventData.content_length;
+    const handledEvent = isRetryEvent ? RETRY_EVENT : newEventData.status;
+    const previewStatus = isPreviewEvent ? ASSET_PREVIEW : handledEvent;
+
+    const updateEvent = () => {
+      const updatedData = {...originalEvent.data, ...newEventData};
+      const updatedEvent = {...originalEvent, data: updatedData};
+      return this.eventService.replaceEvent(updatedEvent);
+    };
 
     switch (previewStatus) {
       case ASSET_PREVIEW:
+      case RETRY_EVENT:
       case AssetTransferState.UPLOADED: {
-        const updatedData = {...originalEvent.data, ...newEventData};
-        const updatedEvent = {...originalEvent, data: updatedData};
-        return this.eventService.replaceEvent(updatedEvent);
+        return updateEvent();
       }
 
       case AssetTransferState.UPLOAD_FAILED: {
@@ -555,9 +562,10 @@ export class EventRepository {
     }
   }
 
-  private handleLinkPreviewUpdate(originalEvent: EventRecord, newEvent: MessageAddEvent) {
+  private handleMessageUpdate(originalEvent: EventRecord, newEvent: MessageAddEvent) {
     const newEventData = newEvent.data;
     const originalData = originalEvent.data;
+
     if (originalEvent.from !== newEvent.from) {
       const logMessage = `ID previously used by user '${newEvent.from}'`;
       const errorMessage = 'ID reused by other user';
@@ -565,15 +573,18 @@ export class EventRepository {
     }
 
     const containsLinkPreview = newEventData.previews && !!newEventData.previews.length;
-    if (!containsLinkPreview) {
-      const errorMessage = 'Link preview event does not contain previews';
+    const isRetryAttempt = isEventRecordFailed(originalEvent) || isEventRecordWithFederationError(originalEvent);
+
+    if (!containsLinkPreview && !isRetryAttempt) {
+      const errorMessage =
+        'Message duplication event invalid: original message did not fail to send and does not contain link preview';
       return this.throwValidationError(newEvent, errorMessage);
     }
 
     const textContentMatches = newEventData.content === originalData.content;
     if (!textContentMatches) {
       const errorMessage = 'ID of link preview reused';
-      const logMessage = 'Text content for link preview not matching';
+      const logMessage = 'Text content for message duplication not matching';
       return this.throwValidationError(newEvent, errorMessage, logMessage);
     }
 
@@ -582,7 +593,7 @@ export class EventRepository {
       return this.throwValidationError(newEvent, 'ID reused by same user');
     }
 
-    const updates = this.getUpdatesForLinkPreview(originalEvent, newEvent);
+    const updates = this.getUpdatesForMessage(originalEvent, newEvent);
     const identifiedUpdates = {primary_key: originalEvent.primary_key, ...updates};
     return this.eventService.replaceEvent(identifiedUpdates);
   }
@@ -604,7 +615,7 @@ export class EventRepository {
     return {...newEvent, reactions: {}};
   }
 
-  private getUpdatesForLinkPreview(originalEvent: EventRecord, newEvent: MessageAddEvent) {
+  private getUpdatesForMessage(originalEvent: EventRecord, newEvent: MessageAddEvent) {
     const newData = newEvent.data;
     const originalData = originalEvent.data;
     const updatingLinkPreview = !!originalData.previews.length;
@@ -612,10 +623,10 @@ export class EventRepository {
       this.throwValidationError(newEvent, 'ID of link preview reused');
     }
 
-    const textContentMatches = !newData.previews.length || newData.content === originalData.content;
+    const textContentMatches = !newData.previews?.length || newData.content === originalData.content;
     if (!textContentMatches) {
-      const logMessage = 'Text content for link preview not matching';
-      const errorMessage = 'ID of link preview reused';
+      const logMessage = 'Text content for message duplication not matching';
+      const errorMessage = 'ID of duplicated message reused';
       this.throwValidationError(newEvent, errorMessage, logMessage);
     }
 
@@ -636,7 +647,7 @@ export class EventRepository {
     const from = 'from' in event && event.from;
 
     const baseLogMessage = `Ignored '${event.type}' in '${conversation}' from '${from}''`;
-    this.logger.warn(`${baseLogMessage} ${logMessage || errorMessage}`, event);
+    this.logger.warn(`${baseLogMessage} ${logMessage || errorMessage}`);
     throw new EventError(EventError.TYPE.VALIDATION_FAILED, `Event validation failed: ${errorMessage}`);
   }
 }

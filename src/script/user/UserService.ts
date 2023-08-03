@@ -17,26 +17,22 @@
  *
  */
 
-import type {User as APIClientUser, QualifiedHandle, QualifiedId} from '@wireapp/api-client/lib/user/';
+import type {User as APIClientUser, QualifiedHandle, QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
-import {Logger, getLogger} from 'Util/Logger';
-
-import type {User} from '../entity/User';
 import {APIClient} from '../service/APIClientSingleton';
+import {UserRecord} from '../storage';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {StorageService} from '../storage/StorageService';
 import {constructUserPrimaryKey} from '../util/StorageUtil';
 
 export class UserService {
-  private readonly logger: Logger;
   private readonly USER_STORE_NAME: string;
 
   constructor(
     private readonly storageService = container.resolve(StorageService),
     private readonly apiClient = container.resolve(APIClient),
   ) {
-    this.logger = getLogger('UserService');
     this.USER_STORE_NAME = StorageSchemata.OBJECT_STORE.USERS;
   }
 
@@ -49,23 +45,49 @@ export class UserService {
    * @todo There might be more keys which are returned by this function
    * @returns Resolves with all the stored user states
    */
-  loadUserFromDb(): Promise<{availability: number; domain?: string; id: string}[]> {
-    return this.storageService.getAll(this.USER_STORE_NAME);
+  loadUserFromDb(): Promise<UserRecord[]> {
+    return this.storageService.getAll<UserRecord>(this.USER_STORE_NAME);
+  }
+
+  /**
+   * Will remove all the non-qualified entries in the DB
+   */
+  async clearNonQualifiedUsers(): Promise<UserRecord[]> {
+    const keys = await this.storageService.readAllPrimaryKeys(this.USER_STORE_NAME);
+    const nonQualifiedKeys = keys.filter(key => !key.includes('@'));
+    const deletedEntries = [];
+    for (const key of nonQualifiedKeys) {
+      const entry = await this.storageService.load<UserRecord>(this.USER_STORE_NAME, key);
+      if (entry) {
+        deletedEntries.push(entry);
+        await this.storageService.delete(this.USER_STORE_NAME, key);
+      }
+    }
+    return deletedEntries;
+  }
+
+  async removeUserFromDb(user: {id: string; domain: string}): Promise<void> {
+    const primaryKey = constructUserPrimaryKey(user);
+    await this.storageService.delete(this.USER_STORE_NAME, primaryKey);
   }
 
   /**
    * Saves a user entity in the local database.
    * @returns Resolves with the conversation entity
    */
-  saveUserInDb(userEntity: User): Promise<User> {
-    const userData = userEntity.serialize();
+  async saveUserInDb(user: UserRecord): Promise<void> {
+    const primaryKey = constructUserPrimaryKey(user.qualified_id);
 
-    const primaryKey = constructUserPrimaryKey(userEntity);
+    await this.storageService.save(this.USER_STORE_NAME, primaryKey, user);
+  }
 
-    return this.storageService.save(this.USER_STORE_NAME, primaryKey, userData).then(primaryKey => {
-      this.logger.info(`State of user '${primaryKey}' was stored`, userData);
-      return userEntity;
-    });
+  async updateUser(userId: QualifiedId, updates: Partial<UserRecord>) {
+    const primaryKey = constructUserPrimaryKey(userId);
+    const hasBeenUpdated = await this.storageService.update(this.USER_STORE_NAME, primaryKey, updates);
+    if (!hasBeenUpdated) {
+      // If the user could not be found, create an entry for it
+      await this.storageService.save(this.USER_STORE_NAME, primaryKey, {id: userId.id, ...updates});
+    }
   }
 
   //##############################################################################
@@ -111,9 +133,9 @@ export class UserService {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/users
    * @example ['0bb84213-8cc2-4bb1-9e0b-b8dd522396d5', '15ede065-72b3-433a-9917-252f076ed031']
    */
-  getUsers(userIds: QualifiedId[]): Promise<APIClientUser[]> {
+  async getUsers(userIds: QualifiedId[]) {
     if (userIds.length === 0) {
-      return Promise.resolve([]);
+      return {found: []};
     }
     return this.apiClient.api.user.postListUsers({qualified_ids: userIds});
   }

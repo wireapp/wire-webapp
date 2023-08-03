@@ -31,6 +31,7 @@ import {checkFileSharingPermission} from 'Components/Conversation/utils/checkFil
 import {useEmoji} from 'Components/Emoji/useEmoji';
 import {Icon} from 'Components/Icon';
 import {ClassifiedBar} from 'Components/input/ClassifiedBar';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
@@ -46,7 +47,7 @@ import {
   updateMentionRanges,
 } from 'Util/MentionUtil';
 import {formatDuration, formatLocale, TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {getSelectionPosition} from 'Util/util';
+import {getFileExtension, getSelectionPosition} from 'Util/util';
 
 import {ControlButtons} from './components/InputBarControls/ControlButtons';
 import {GiphyButton} from './components/InputBarControls/GiphyButton';
@@ -77,7 +78,6 @@ import {useAppMainState} from '../../page/state';
 import {SearchRepository} from '../../search/SearchRepository';
 import {StorageRepository} from '../../storage';
 import {TeamState} from '../../team/TeamState';
-import {UserState} from '../../user/UserState';
 
 const CONFIG = {
   ...Config.getConfig(),
@@ -94,7 +94,7 @@ interface InputBarProps {
   readonly searchRepository: SearchRepository;
   readonly storageRepository: StorageRepository;
   readonly teamState: TeamState;
-  readonly userState: UserState;
+  readonly selfUser: User;
   onShiftTab: () => void;
   uploadDroppedFiles: (droppedFiles: File[]) => void;
   uploadImages: (images: File[]) => void;
@@ -112,7 +112,7 @@ const InputBar = ({
   propertiesRepository,
   searchRepository,
   storageRepository,
-  userState = container.resolve(UserState),
+  selfUser,
   teamState = container.resolve(TeamState),
   onShiftTab,
   uploadDroppedFiles,
@@ -123,17 +123,19 @@ const InputBar = ({
     teamState,
     ['classifiedDomains', 'isSelfDeletingMessagesEnabled', 'isFileSharingSendingEnabled'],
   );
-  const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
   const {
     connection,
     participating_user_ets: participatingUserEts,
+    allUserEntities: allUsers,
     localMessageTimer,
     messageTimer,
     hasGlobalMessageTimer,
     removed_from_conversation: removedFromConversation,
+    is1to1,
   } = useKoSubscribableChildren(conversationEntity, [
     'connection',
     'firstUserEntity',
+    'allUserEntities',
     'participating_user_ets',
     'localMessageTimer',
     'messageTimer',
@@ -222,18 +224,7 @@ const InputBar = ({
     setCurrentMentions([]);
 
     if (resetInputValue) {
-      /*
-        When trying to update a textarea with japanese value to
-        empty in onKeyDown handler the text is not fully cleared
-        and some parts of text is pasted by the OS/Browser after
-        we do setInputValue('');
-        To fix this we have to add a setTimeout in order to postpone
-        the operation of clearing the text to after of the proccess
-        of the onKeyDown and onKeyUp DOM events.
-       */
-      setTimeout(() => {
-        setInputValue('');
-      }, 0);
+      setInputValue('');
     }
   };
 
@@ -553,8 +544,18 @@ const InputBar = ({
     } else {
       sendMessage(messageText, updatedMentions);
     }
-
-    resetDraftState(true);
+    /*
+      When trying to update a textarea with japanese value to
+      empty in onKeyDown handler the text is not fully cleared
+      and some parts of text is pasted by the OS/Browser after
+      we do setInputValue('');
+      To fix this we have to add a setTimeout in order to postpone
+      the operation of clearing the text to after of the proccess
+      of the onKeyDown and onKeyUp DOM events.
+    */
+    setTimeout(() => {
+      resetDraftState(true);
+    }, 0);
     textareaRef.current?.focus();
   };
 
@@ -566,13 +567,34 @@ const InputBar = ({
 
   const onGifClick = () => openGiphy(inputValue);
 
+  const pingConversation = () => {
+    setIsPingDisabled(true);
+    void messageRepository.sendPing(conversationEntity).then(() => {
+      window.setTimeout(() => setIsPingDisabled(false), CONFIG.PING_TIMEOUT);
+    });
+  };
+
+  const totalConversationUsers = participatingUserEts.length;
+
   const onPingClick = () => {
     if (conversationEntity && !pingDisabled) {
-      setIsPingDisabled(true);
-
-      messageRepository.sendPing(conversationEntity).then(() => {
-        window.setTimeout(() => setIsPingDisabled(false), CONFIG.PING_TIMEOUT);
-      });
+      if (
+        !CONFIG.FEATURE.ENABLE_PING_CONFIRMATION ||
+        is1to1 ||
+        totalConversationUsers < CONFIG.FEATURE.MAX_USERS_TO_PING_WITHOUT_ALERT
+      ) {
+        pingConversation();
+      } else {
+        PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+          primaryAction: {
+            action: pingConversation,
+            text: t('tooltipConversationPing'),
+          },
+          text: {
+            title: t('conversationPingConfirmTitle', {memberCount: totalConversationUsers.toString()}),
+          },
+        });
+      }
     }
   };
 
@@ -584,7 +606,7 @@ const InputBar = ({
     const {lastModified} = pastedFile;
 
     const date = formatLocale(lastModified || new Date(), 'PP, pp');
-    const fileName = t('conversationSendPastedFile', date);
+    const fileName = `${t('conversationSendPastedFile', date)}.${getFileExtension(pastedFile.name)}`;
 
     const newFile = new File([pastedFile], fileName, {
       type: pastedFile.type,
@@ -777,7 +799,11 @@ const InputBar = ({
       {!!isTypingIndicatorEnabled && <TypingIndicator conversationId={conversationEntity.id} />}
 
       {classifiedDomains && !isConnectionRequest && (
-        <ClassifiedBar users={participatingUserEts} classifiedDomains={classifiedDomains} />
+        <ClassifiedBar
+          conversationDomain={conversationEntity.domain}
+          users={allUsers}
+          classifiedDomains={classifiedDomains}
+        />
       )}
 
       {isReplying && !isEditing && <ReplyBar replyMessageEntity={replyMessageEntity} onCancel={handleCancelReply} />}

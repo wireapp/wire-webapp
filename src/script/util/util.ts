@@ -20,7 +20,6 @@
 import {Decoder, Encoder} from 'bazinga64';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import type {ObservableArray} from 'knockout';
-import UUID from 'uuidjs';
 
 import {UrlUtil, Runtime} from '@wireapp/commons';
 
@@ -255,9 +254,6 @@ export const downloadFile = (url: string, fileName: string, mimeType?: string): 
   }, 100);
 };
 
-export const createRandomUuid = (version: 4 | 1 = 4): string =>
-  (version === 4 ? UUID.genV4() : UUID.genV1()).toString();
-
 // Note: IE10 listens to "transitionend" instead of "animationend"
 export const alias = {
   animationend: 'transitionend animationend oAnimationEnd MSAnimationEnd mozAnimationEnd webkitAnimationEnd',
@@ -408,6 +404,9 @@ const supportsSecretStorage = () => !Runtime.isDesktopApp() || !!window.systemCr
 
 // disables mls for old 'broken' desktop clients, see https://github.com/wireapp/wire-desktop/pull/6094
 export const supportsMLS = () => Config.getConfig().FEATURE.ENABLE_MLS && supportsSecretStorage();
+
+export const supportsSelfSupportedProtocolsUpdates = () =>
+  Config.getConfig().FEATURE.ENABLE_SELF_SUPPORTED_PROTOCOLS_UPDATES;
 
 export const supportsCoreCryptoProteus = () =>
   Config.getConfig().FEATURE.ENABLE_PROTEUS_CORE_CRYPTO && supportsSecretStorage();
