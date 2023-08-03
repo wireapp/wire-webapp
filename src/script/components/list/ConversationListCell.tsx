@@ -157,16 +157,17 @@ const ConversationListCell = ({
     }
   }, [isFocused]);
 
-  const availabilityStrings: Record<string, string> = useMemo(
-    () => ({
-      [Availability.Type.AVAILABLE]: t('userAvailabilityAvailable'),
-      [Availability.Type.AWAY]: t('userAvailabilityAway'),
-      [Availability.Type.BUSY]: t('userAvailabilityBusy'),
-    }),
+  const availabilityStrings = useMemo(
+    () =>
+      new Map<Partial<Availability.Type>, string>([
+        [Availability.Type.AVAILABLE, t('userAvailabilityAvailable')],
+        [Availability.Type.AWAY, t('userAvailabilityAway')],
+        [Availability.Type.BUSY, t('userAvailabilityBusy')],
+      ]),
     [],
   );
 
-  const unreadMessages = unreadState.allMessages.length;
+  const unreadMessagesCount = unreadState.allMessages.length;
   const isConversationMuted = cellState.icon === ConversationStatusIcon.MUTED;
   const userHasStatus = [Availability.Type.AWAY, Availability.Type.BUSY, Availability.Type.AVAILABLE].includes(
     availabilityOfUser,
@@ -175,13 +176,13 @@ const ConversationListCell = ({
   const title = useMemo(() => {
     const substitutions = {
       username: displayName,
-      ...(unreadMessages && {unreadMessages: unreadMessages.toString()}),
-      ...(userHasStatus && {status: availabilityStrings[availabilityOfUser]}),
+      ...(unreadMessagesCount && {unreadMessages: unreadMessagesCount.toString()}),
+      ...(userHasStatus && {status: availabilityStrings.get(availabilityOfUser)}),
     };
 
     if (userHasStatus && isConversationMuted) {
       return t(
-        !unreadMessages
+        !unreadMessagesCount
           ? 'accessibility.conversationTitleStatusSilenced'
           : 'accessibility.conversationMutedTitleUnreadMessages',
         substitutions,
@@ -190,7 +191,7 @@ const ConversationListCell = ({
 
     if (isConversationMuted) {
       return t(
-        !unreadMessages
+        !unreadMessagesCount
           ? 'accessibility.conversationTitleSilenced'
           : 'accessibility.conversationMutedTitleUnreadMessagesWithoutStatus',
         substitutions,
@@ -199,22 +200,22 @@ const ConversationListCell = ({
 
     if (userHasStatus) {
       return t(
-        !unreadMessages ? 'accessibility.conversationTitle' : 'accessibility.conversationTitleUnreadMessages',
+        !unreadMessagesCount ? 'accessibility.conversationTitle' : 'accessibility.conversationTitleUnreadMessages',
         substitutions,
       );
     }
 
-    return !unreadMessages
+    return !unreadMessagesCount
       ? displayName
       : t('accessibility.conversationTitleUnreadMessagesWithoutStatus', substitutions);
-  }, [displayName, unreadMessages, userHasStatus, availabilityStrings, availabilityOfUser, isConversationMuted]);
+  }, [displayName, unreadMessagesCount, userHasStatus, availabilityStrings, availabilityOfUser, isConversationMuted]);
 
   const availabilityTitle = [Availability.Type.AWAY, Availability.Type.BUSY, Availability.Type.AVAILABLE].includes(
     availabilityOfUser,
   )
     ? t('accessibility.conversationTitle', {
         username: displayName,
-        status: availabilityStrings[availabilityOfUser],
+        status: availabilityStrings.get(availabilityOfUser) || '',
       })
     : displayName;
 
@@ -235,7 +236,6 @@ const ConversationListCell = ({
           onKeyDown={handleDivKeyDown}
           data-uie-name="go-open-conversation"
           tabIndex={isFocused ? TabIndex.FOCUSABLE : TabIndex.UNFOCUSABLE}
-          // aria-label={t('accessibility.openConversation', displayName)}
           aria-label={cellState.description ? `${title}, ${cellState.description}` : title}
           aria-describedby={contextMenuKeyboardShortcut}
         >
@@ -363,13 +363,13 @@ const ConversationListCell = ({
                 </span>
               )}
 
-              {cellState.icon === ConversationStatusIcon.UNREAD_MESSAGES && unreadMessages > 0 && (
+              {cellState.icon === ConversationStatusIcon.UNREAD_MESSAGES && unreadMessagesCount > 0 && (
                 <span
                   className="conversation-list-cell-badge cell-badge-dark"
                   data-uie-name="status-unread"
                   title={t('accessibility.conversationStatusUnread')}
                 >
-                  {unreadMessages}
+                  {unreadMessagesCount}
                 </span>
               )}
             </>
