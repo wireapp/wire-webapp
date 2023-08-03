@@ -45,19 +45,35 @@ function findAndTransformEmoji(text: string): string | null {
   return null;
 }
 
+// Store the last text node text to avoid unnecessary work
 let lastTextNodeText: string = '';
+// Store words that don't have emojis to avoid unnecessary work
+const wordsWithoutEmojis = new Set<string>();
+// Regex to check if a word is an possible emoticon
+const possibleEmoticons = /^[^\w\s][\w\W_]*$/;
 
 export function ReplaceEmojiPlugin(): null {
   const [editor] = useLexicalComposerContext();
 
   editor.registerNodeTransform(TextNode, newNode => {
     const hasNewContent = lastTextNodeText !== newNode.getTextContent();
+
     if (!lastTextNodeText || hasNewContent) {
       lastTextNodeText = `${newNode.getTextContent()}`;
-      const transformedText = findAndTransformEmoji(lastTextNodeText);
-      if (transformedText !== null && transformedText.length > 0) {
-        newNode.setTextContent(transformedText);
-        lastTextNodeText = transformedText;
+      // Collect new words
+      const wordArray = lastTextNodeText.split(' ').filter(word => !wordsWithoutEmojis.has(word));
+
+      // Check if there are words with possible emojis
+      if (wordArray.some(word => possibleEmoticons.test(word))) {
+        const transformedText = findAndTransformEmoji(lastTextNodeText);
+
+        if (transformedText !== null && transformedText.length > 0) {
+          newNode.setTextContent(transformedText);
+          lastTextNodeText = transformedText;
+        } else {
+          // Add words to the set to avoid unnecessary work
+          wordArray.forEach(word => wordsWithoutEmojis.add(word));
+        }
       }
     }
   });
