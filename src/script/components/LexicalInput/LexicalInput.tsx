@@ -118,7 +118,7 @@ export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
       return queryString ? searchRepository.searchUserInSet(queryString, mentionCandidates) : mentionCandidates;
     };
 
-    const onChange = useCallback(
+    const onInputChange = useCallback(
       (editorState: EditorState, lexicalEditor: LexicalEditor) => {
         lexicalEditor.registerTextContentListener(textContent => {
           setInputValue(textContent);
@@ -127,7 +127,7 @@ export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
         const stringifyEditor = JSON.stringify(editorState.toJSON());
         saveDraftState(stringifyEditor);
       },
-      [saveDraftState, setInputValue, shouldReplaceEmoji],
+      [saveDraftState, setInputValue],
     );
 
     useEffect(() => {
@@ -168,7 +168,7 @@ export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
 
             <BeautifulMentionsPlugin onSearch={queryMentions} />
 
-            <OnChangePlugin onChange={onChange} />
+            <OnChangePlugin onChange={onInputChange} />
           </div>
         </div>
 

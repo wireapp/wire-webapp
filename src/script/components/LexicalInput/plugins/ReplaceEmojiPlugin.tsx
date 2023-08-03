@@ -38,7 +38,8 @@ function findAndTransformEmoji(text: string): string | null {
       if (!regex.test(text)) {
         continue;
       }
-      return text.replace(regex, ` ${emoji.emoji}`);
+
+      return text.replace(regex, `${emoji.emoji} `);
     }
   }
 
