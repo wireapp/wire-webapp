@@ -991,7 +991,7 @@
   "oauth.logout": "Switch account",
   "oauth.privacypolicy": "Wire's <privacypolicy>Privacy Policy</privacypolicy>",
   "oauth.scope.read_feature_configs": "View your team’s feature configurations",
-  "oauth.scope.read_self": "View your team’s feature View your Wire username, profile name, and email",
+  "oauth.scope.read_self": "View your Wire username, profile name, and email",
   "oauth.scope.write_conversations": "Create conversations in Wire",
   "oauth.scope.write_conversations_code": "Create guest links to conversations in Wire",
   "oauth.subhead": "Microsoft Outlook requires your permission to:",
