@@ -255,7 +255,7 @@ export const Conversation: FC<ConversationProps> = ({
 
   const showMessageDetails = (message: Message, showLikes = false) => {
     if (!is1to1) {
-      openRightSidebar(PanelState.MESSAGE_DETAILS, {entity: message, showLikes});
+      openRightSidebar(PanelState.MESSAGE_DETAILS, {entity: message, showLikes}, true);
     }
   };
 
