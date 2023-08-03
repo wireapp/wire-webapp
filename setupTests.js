@@ -33,6 +33,19 @@ require('src/script/util/test/mock/ResponseMock');
 require('src/script/util/test/mock/SVGProviderMock');
 require('src/script/util/test/mock/WebRTCMock');
 require('src/script/util/test/mock/resizeObserver.mock');
+require('emoticon');
+
+jest.mock('emoticon', () => ({
+  emoticon: [
+    {
+      name: 'angry',
+      emoji: '😠',
+      tags: ['mad', 'annoyed'],
+      description: 'angry face',
+      emoticons: ['>:(', '>:[', '>:-(', '>:-[', '>=(', '>=[', '>=-(', '>=-['],
+    },
+  ],
+}));
 
 jest.mock('axios', () => {
   return {
