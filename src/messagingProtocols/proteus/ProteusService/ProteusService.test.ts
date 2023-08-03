@@ -545,7 +545,7 @@ describe('ProteusService', () => {
         jest.spyOn(proteusService['messageService'], 'sendMessage').mockResolvedValue({
           missing: {},
           redundant: {},
-          failed_to_send: {domain2: recipients.domain2},
+          failed_to_confirm_clients: {domain2: recipients.domain2},
           time: new Date().toISOString(),
           deleted: {},
         });

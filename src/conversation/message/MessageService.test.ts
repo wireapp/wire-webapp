@@ -37,7 +37,7 @@ import {getUUID} from '../../test/PayloadHelper';
 const baseMessageSendingStatus: MessageSendingStatus = {
   deleted: {},
   missing: {},
-  failed_to_send: {},
+  failed_to_confirm_clients: {},
   redundant: {},
   time: new Date().toISOString(),
 };
@@ -159,12 +159,12 @@ describe('MessageService', () => {
       expect(apiClient.api.broadcast.postBroadcastMessage).toHaveBeenCalledWith(clientId, expect.any(Object));
     });
 
-    describe('client mismatch', () => {
+    describe('federated client mismatch', () => {
       const baseClientMismatch: MessageSendingStatus = {
         deleted: {},
         missing: {},
         redundant: {},
-        failed_to_send: {},
+        failed_to_confirm_clients: {},
         time: new Date().toISOString(),
       };
 
