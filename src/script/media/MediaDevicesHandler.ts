@@ -118,16 +118,28 @@ export class MediaDevicesHandler {
       }
       const isAvailable = this.availableDevices[deviceType]().find(device => {
         return (
-          ((device as MediaDeviceInfo).deviceId || (device as ElectronDesktopCapturerSource).id) === currentDeviceId
+          ((device as MediaDeviceInfo).groupId || (device as ElectronDesktopCapturerSource).id) === currentDeviceId
         );
       });
 
       const isFavorite = loadValue<String[]>(`${deviceType}-fave`)?.find(id => id === currentDeviceId);
 
+      const isDefault = this.availableDevices[deviceType]().find(device => {
+        return (
+          ((device as MediaDeviceInfo).deviceId || (device as ElectronDesktopCapturerSource).id) === currentDeviceId
+        );
+      });
+
+      function isMediaDevice(
+        device: MediaDeviceInfo | ElectronDesktopCapturerSource | undefined,
+      ): device is MediaDeviceInfo {
+        return (device as MediaDeviceInfo).deviceId !== undefined;
+      }
+
       if (isFavorite || isAvailable) {
         return currentDeviceId;
       }
-      return MediaDevicesHandler.CONFIG.DEFAULT_DEVICE[deviceType];
+      return isMediaDevice(isDefault) ? isDefault?.groupId : isDefault?.id ?? '';
     };
 
     this.currentAvailableDeviceId = {
@@ -247,6 +259,7 @@ export class MediaDevicesHandler {
     const setDevices = (type: DeviceTypes, devices: MediaDeviceInfo[]): void => {
       this.availableDevices[type](devices);
       const currentId = this.currentDeviceId[type];
+
       const favorites = loadValue<string[]>(`${type}-fave`) ?? [];
       const isFavorite = favorites.map(favorite => devices.some(d => d.groupId === favorite));
 
