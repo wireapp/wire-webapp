@@ -17,9 +17,13 @@
  *
  */
 
+import {useEffect} from 'react';
+
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {emoticon} from 'emoticon';
 import {TextNode} from 'lexical';
+
+import {isSpaceKey, isTabKey} from 'Util/KeyboardUtil';
 
 const escapeRegexp = (string: string): string => string.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
 
@@ -39,7 +43,7 @@ function findAndTransformEmoji(text: string): string | null {
         continue;
       }
 
-      return text.replace(regex, `${emoji.emoji} `);
+      return text.replace(regex, ` ${emoji.emoji}`);
     }
   }
 
@@ -52,6 +56,8 @@ let lastTextNodeText: string = '';
 const wordsWithoutEmojis = new Set<string>();
 // Regex to check if a word is an possible emoticon
 const possibleEmoticons = /^[^\w\s][\w\W_]*$/;
+// Checking if space or tab key pressed to replace emoji
+let isSpaceOrTabKeyPressed = false;
 
 export function ReplaceEmojiPlugin(): null {
   const [editor] = useLexicalComposerContext();
@@ -59,7 +65,7 @@ export function ReplaceEmojiPlugin(): null {
   editor.registerNodeTransform(TextNode, newNode => {
     const hasNewContent = lastTextNodeText !== newNode.getTextContent();
 
-    if (!lastTextNodeText || hasNewContent) {
+    if (isSpaceOrTabKeyPressed && (!lastTextNodeText || hasNewContent)) {
       lastTextNodeText = `${newNode.getTextContent()}`;
       // Collect new words
       const wordArray = lastTextNodeText.split(' ').filter(word => !wordsWithoutEmojis.has(word));
@@ -70,6 +76,7 @@ export function ReplaceEmojiPlugin(): null {
 
         if (transformedText !== null && transformedText.length > 0) {
           newNode.setTextContent(transformedText);
+          newNode.select();
           lastTextNodeText = transformedText;
         } else {
           // Add words to the set to avoid unnecessary work
@@ -78,6 +85,18 @@ export function ReplaceEmojiPlugin(): null {
       }
     }
   });
+
+  const onKeyDown = (event: KeyboardEvent) => {
+    isSpaceOrTabKeyPressed = isSpaceKey(event) || isTabKey(event);
+  };
+
+  useEffect(() => {
+    window.addEventListener('keydown', onKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [editor]);
 
   return null;
 }
