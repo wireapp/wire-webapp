@@ -2944,7 +2944,6 @@ export class ConversationRepository {
       if (changes) {
         this.eventService.updateEventSequentially(messageEntity.primary_key, changes);
       }
-      return;
     } catch (error) {
       const isNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
       if (!isNotFound) {
