@@ -138,8 +138,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     (call.initialType === CALL_TYPE.VIDEO ||
       conversation.supportsVideoCall(call.conversationType === CONV_TYPE.CONFERENCE));
   const availableCameras = useMemo(
-    () =>
-      videoInput.map(device => (device as MediaDeviceInfo).deviceId || (device as ElectronDesktopCapturerSource).id),
+    () => videoInput.map(device => (device as MediaDeviceInfo).groupId || (device as ElectronDesktopCapturerSource).id),
     [videoInput],
   );
   const showSwitchCamera = availableCameras.length > 1;
@@ -149,8 +148,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   ]);
   const {audioInput} = useKoSubscribableChildren(mediaDevicesHandler.availableDevices, [DeviceTypes.AUDIO_INPUT]);
   const availableMicrophones = useMemo(
-    () =>
-      audioInput.map(device => (device as MediaDeviceInfo).deviceId || (device as ElectronDesktopCapturerSource).id),
+    () => audioInput.map(device => (device as MediaDeviceInfo).groupId || (device as ElectronDesktopCapturerSource).id),
     [audioInput],
   );
   const showSwitchMicrophone = availableMicrophones.length > 1;

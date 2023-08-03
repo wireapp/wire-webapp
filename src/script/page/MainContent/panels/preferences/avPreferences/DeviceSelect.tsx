@@ -44,9 +44,9 @@ const DeviceSelect: React.FC<DeviceSelectProps> = ({
   onChange,
   title,
 }) => {
-  const devicesList = devices.map(({deviceId, label}) => ({
+  const devicesList = devices.map(({groupId, label}) => ({
     label: label || defaultDeviceName,
-    value: deviceId,
+    value: groupId,
   }));
   const currentValue = devicesList.find(device => device.value === value);
   const lessThanTwoDevices = devices.length < 2;
