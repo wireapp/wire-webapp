@@ -5,7 +5,7 @@
     "@emotion/react": "11.11.1",
     "@types/eslint": "8.44.1",
     "@wireapp/avs": "9.3.7",
-    "@wireapp/core": "40.8.3",
+    "@wireapp/core": "40.8.4",
     "@wireapp/lru-cache": "3.8.1",
     "@wireapp/react-ui-kit": "9.7.7",
     "@wireapp/store-engine-dexie": "2.1.3",
