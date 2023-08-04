@@ -76,7 +76,6 @@ export function ReplaceEmojiPlugin(): null {
 
         if (transformedText !== null && transformedText.length > 0) {
           newNode.setTextContent(transformedText);
-          newNode.select();
           lastTextNodeText = transformedText;
         } else {
           // Add words to the set to avoid unnecessary work
