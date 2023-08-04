@@ -17,19 +17,15 @@
  *
  */
 
-import {forwardRef, useCallback, useEffect, useState, ReactElement} from 'react';
+import {forwardRef, useCallback, ReactElement} from 'react';
 
 import {InitialConfigType, LexicalComposer} from '@lexical/react/LexicalComposer';
 import {ContentEditable} from '@lexical/react/LexicalContentEditable';
 import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary';
 import {OnChangePlugin} from '@lexical/react/LexicalOnChangePlugin';
 import {PlainTextPlugin} from '@lexical/react/LexicalPlainTextPlugin';
-import type {WebappProperties} from '@wireapp/api-client/lib/user/data/';
-import {amplify} from 'amplify';
 import cx from 'classnames';
 import {LexicalEditor, EditorState} from 'lexical';
-
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {User} from 'src/script/entity/User';
@@ -47,7 +43,6 @@ import {EditorRefPlugin} from './plugins/LexicalEditorRefPlugin';
 
 import {MentionEntity} from '../../message/MentionEntity';
 import {PropertiesRepository} from '../../properties/PropertiesRepository';
-import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 import {SearchRepository} from '../../search/SearchRepository';
 
 const theme = {
@@ -97,11 +92,6 @@ export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
     },
     ref,
   ) => {
-    // Emojis
-    const [shouldReplaceEmoji, setShouldReplaceEmoji] = useState<boolean>(
-      propertiesRepository.getPreference(PROPERTIES_TYPE.EMOJI.REPLACE_INLINE),
-    );
-
     const editorConfig: InitialConfigType = {
       namespace: 'WireLexicalEditor',
       theme,
@@ -116,7 +106,7 @@ export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
       return queryString ? searchRepository.searchUserInSet(queryString, mentionCandidates) : mentionCandidates;
     };
 
-    const onChange = useCallback(
+    const onInputChange = useCallback(
       (editorState: EditorState, lexicalEditor: LexicalEditor) => {
         lexicalEditor.registerTextContentListener(textContent => {
           setInputValue(textContent);
@@ -128,13 +118,6 @@ export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
       [saveDraftState, setInputValue],
     );
 
-    useEffect(() => {
-      amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.EMOJI.REPLACE_INLINE, setShouldReplaceEmoji);
-      amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, (properties: WebappProperties) => {
-        setShouldReplaceEmoji(properties.settings.emoji.replace_inline);
-      });
-    }, []);
-
     return (
       <LexicalComposer initialConfig={editorConfig}>
         <div className="controls-center">
@@ -145,7 +128,7 @@ export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
             <DraftStatePlugin setInputValue={setInputValue} loadDraftState={loadDraftState} />
             <EditMessagePlugin onMessageEdit={editMessage} />
 
-            {shouldReplaceEmoji && <EmojiPickerPlugin />}
+            <EmojiPickerPlugin />
 
             <PlainTextPlugin
               contentEditable={
@@ -161,7 +144,7 @@ export const LexicalInput = forwardRef<LexicalEditor, LexicalInputProps>(
 
             <BeautifulMentionsPlugin onSearch={queryMentions} />
 
-            <OnChangePlugin onChange={onChange} />
+            <OnChangePlugin onChange={onInputChange} />
           </div>
         </div>
 
