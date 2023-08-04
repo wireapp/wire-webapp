@@ -40,6 +40,7 @@ declare global {
 
 export type CurrentAvailableDeviceId = Record<DeviceTypes, ko.PureComputed<string>>;
 export type DeviceSupport = Record<DeviceTypes, ko.PureComputed<boolean>>;
+export type PreviousDeviceSupport = Record<Exclude<DeviceTypes, DeviceTypes.SCREEN_INPUT>, number>;
 
 export enum DeviceTypes {
   AUDIO_INPUT = 'audioInput',
@@ -78,6 +79,7 @@ export class MediaDevicesHandler {
   public currentDeviceId: DeviceIds;
   public currentAvailableDeviceId: CurrentAvailableDeviceId;
   public deviceSupport: DeviceSupport;
+  private previousDeviceSupport: PreviousDeviceSupport;
 
   static get CONFIG() {
     return {
@@ -133,13 +135,15 @@ export class MediaDevicesHandler {
       function isMediaDevice(
         device: MediaDeviceInfo | ElectronDesktopCapturerSource | undefined,
       ): device is MediaDeviceInfo {
-        return (device as MediaDeviceInfo).deviceId !== undefined;
+        return (device as MediaDeviceInfo)?.deviceId !== undefined;
       }
 
       if (isFavorite || isAvailable) {
         return currentDeviceId;
       }
-      return isMediaDevice(isDefault) ? isDefault?.groupId : isDefault?.id ?? '';
+      return isMediaDevice(isDefault)
+        ? isDefault?.groupId
+        : isDefault?.id ?? MediaDevicesHandler.CONFIG.DEFAULT_DEVICE[deviceType];
     };
 
     this.currentAvailableDeviceId = {
@@ -154,6 +158,12 @@ export class MediaDevicesHandler {
       audioOutput: ko.pureComputed(() => !!this.availableDevices.audioOutput().length),
       screenInput: ko.pureComputed(() => !!this.availableDevices.screenInput().length),
       videoInput: ko.pureComputed(() => !!this.availableDevices.videoInput().length),
+    };
+
+    this.previousDeviceSupport = {
+      audioInput: this.availableDevices.audioInput().length,
+      audioOutput: this.availableDevices.audioOutput().length,
+      videoInput: this.availableDevices.videoInput().length,
     };
 
     this.initializeMediaDevices();
@@ -185,33 +195,35 @@ export class MediaDevicesHandler {
    * Subscribe to Knockout observables.
    */
   private subscribeToObservables(): void {
-    // console.log('subscribeToObservables');
     this.currentDeviceId.audioInput.subscribe(mediaDeviceId => {
-      // console.log(mediaDeviceId, 'audioInput mediaDeviceId');
       const faveAudioInput = loadValue<string[]>(FavoriteDeviceTypes.AUDIO_INPUT) ?? [];
+      const newFaveAudioInput =
+        this.previousDeviceSupport.audioInput <= this.availableDevices.audioInput().length
+          ? [...faveAudioInput!.filter(id => id !== mediaDeviceId), mediaDeviceId]
+          : [mediaDeviceId, ...faveAudioInput!.filter(id => id !== mediaDeviceId)];
       storeValue(MediaDeviceType.AUDIO_INPUT, mediaDeviceId);
-      storeValue(FavoriteDeviceTypes.AUDIO_INPUT, [
-        mediaDeviceId,
-        ...faveAudioInput!.filter(id => id !== mediaDeviceId),
-      ]);
+      storeValue(FavoriteDeviceTypes.AUDIO_INPUT, newFaveAudioInput);
     });
 
     this.currentDeviceId.audioOutput.subscribe(mediaDeviceId => {
       const faveAudioOutput = loadValue<string[]>(FavoriteDeviceTypes.AUDIO_OUTPUT) ?? [];
+      // console.log(this.previousDeviceSupport.audioOutput, this.availableDevices.audioOutput().length);
+      const newFaveAudioOutput =
+        this.previousDeviceSupport.audioOutput <= this.availableDevices.audioOutput().length
+          ? [...faveAudioOutput!.filter(id => id !== mediaDeviceId), mediaDeviceId]
+          : [mediaDeviceId, ...faveAudioOutput!.filter(id => id !== mediaDeviceId)];
       storeValue(MediaDeviceType.AUDIO_OUTPUT, mediaDeviceId);
-      storeValue(FavoriteDeviceTypes.AUDIO_OUTPUT, [
-        mediaDeviceId,
-        ...faveAudioOutput!.filter(id => id !== mediaDeviceId),
-      ]);
+      storeValue(FavoriteDeviceTypes.AUDIO_OUTPUT, newFaveAudioOutput);
     });
 
     this.currentDeviceId.videoInput.subscribe(mediaDeviceId => {
       const faveVideoInput = loadValue<string[]>(FavoriteDeviceTypes.VIDEO_INPUT) ?? [];
+      const newFaveVideoInput =
+        this.previousDeviceSupport.videoInput <= this.availableDevices.videoInput().length
+          ? [...faveVideoInput!.filter(id => id !== mediaDeviceId), mediaDeviceId]
+          : [mediaDeviceId, ...faveVideoInput!.filter(id => id !== mediaDeviceId)];
       storeValue(MediaDeviceType.VIDEO_INPUT, mediaDeviceId);
-      storeValue(FavoriteDeviceTypes.VIDEO_INPUT, [
-        mediaDeviceId,
-        ...faveVideoInput!.filter(id => id !== mediaDeviceId),
-      ]);
+      storeValue(FavoriteDeviceTypes.VIDEO_INPUT, newFaveVideoInput);
     });
   }
 
@@ -289,7 +301,11 @@ export class MediaDevicesHandler {
           setDevices(DeviceTypes.AUDIO_INPUT, filteredDevices.microphones);
           setDevices(DeviceTypes.AUDIO_OUTPUT, filteredDevices.speakers);
           setDevices(DeviceTypes.VIDEO_INPUT, filteredDevices.cameras);
-
+          this.previousDeviceSupport = {
+            audioInput: filteredDevices.microphones.length,
+            audioOutput: filteredDevices.speakers.length,
+            videoInput: filteredDevices.cameras.length,
+          };
           return mediaDevices;
         }
 
