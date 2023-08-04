@@ -217,8 +217,7 @@ export class UserRepository {
     const [localUsers, incompleteUsers] = partition(dbUsers, user => !!user.qualified_id);
 
     /** users we have in the DB that are not matching any loaded users */
-    const [orphanUsers, liveUsers] = partition(
-      localUsers,
+    const orphanUsers = localUsers.filter(
       localUser => !users.find(user => matchQualifiedIds(user, localUser.qualified_id)),
     );
 
@@ -246,7 +245,7 @@ export class UserRepository {
     // Save all new users to the database
     await Promise.all(userWithAvailability.map(user => this.saveUserInDb(user)));
 
-    const mappedUsers = this.mapUserResponse(userWithAvailability.concat(liveUsers), failed);
+    const mappedUsers = this.mapUserResponse(userWithAvailability, failed);
 
     // Assign connections to users
     mappedUsers.forEach(user => {
