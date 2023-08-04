@@ -191,29 +191,37 @@ export class ConnectionRepository {
       return true;
     } catch (error) {
       if (isBackendError(error)) {
-        if (error.label === BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT) {
-          const replaceLinkLegalHold = replaceLink(
-            Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK,
-            '',
-            'read-more-legal-hold',
-          );
-          PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-            text: {
-              htmlMessage: t('modalUserCannotConnectLegalHoldMessage', {}, replaceLinkLegalHold),
-              title: t('modalUserCannotConnectLegalHoldHeadline'),
-            },
-          });
+        switch (error.label) {
+          case BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT: {
+            const replaceLinkLegalHold = replaceLink(
+              Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK,
+              '',
+              'read-more-legal-hold',
+            );
+            PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
+              text: {
+                htmlMessage: t('modalUserCannotConnectLegalHoldMessage', {}, replaceLinkLegalHold),
+                title: t('modalUserCannotConnectLegalHoldHeadline'),
+              },
+            });
+            break;
+          }
+
+          case BackendErrorLabel.FEDERATION_NOT_ALLOWED: {
+            PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
+              text: {
+                htmlMessage: t('modalUserCannotConnectNotFederatingMessage', userEntity.name()),
+                title: t('modalUserCannotConnectNotFederatingHeadline'),
+              },
+            });
+            break;
+          }
+
+          default: {
+            this.logger.error(`Failed to send connection request to user '${userEntity.id}': ${error.message}`, error);
+            return false;
+          }
         }
-        if (error.label === BackendErrorLabel.FEDERATION_NOT_ALLOWED) {
-          PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-            text: {
-              htmlMessage: t('modalUserCannotConnectNotFederatingMessage', userEntity.name()),
-              title: t('modalUserCannotConnectNotFederatingHeadline'),
-            },
-          });
-        }
-        this.logger.error(`Failed to send connection request to user '${userEntity.id}': ${error.message}`, error);
-        return false;
       }
       throw error;
     }
