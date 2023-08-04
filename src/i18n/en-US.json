@@ -9,7 +9,7 @@
   "BackendError.LABEL.CONVERSATION_NOT_FOUND": "CONVERSATION_NOT_FOUND",
   "BackendError.LABEL.CONVERSATION_TOO_MANY_MEMBERS": "This conversation has reached the limit of participants",
   "BackendError.LABEL.EMAIL_EXISTS": "This email address is already in use. {supportEmailExistsLink}",
-  "BackendError.LABEL.EMAIL_REQUIRED": "You can't use your username as two-factor authentication is activated. Please log in with your email instead.",
+  "BackendError.LABEL.EMAIL_REQUIRED": "You can’t use your username as two-factor authentication is activated. Please log in with your email instead.",
   "BackendError.LABEL.HANDLE_EXISTS": "This username is already taken",
   "BackendError.LABEL.HANDLE_TOO_SHORT": "Please enter a username with at least 2 characters",
   "BackendError.LABEL.INVALID_CODE": "Please retry, or request another code.",
