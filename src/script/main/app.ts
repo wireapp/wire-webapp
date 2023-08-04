@@ -433,6 +433,11 @@ export class App {
       });
       const notificationsCount = eventRepository.notificationsTotal;
 
+      const conversations1to1 = conversations.filter(conversation => conversation.is1to1());
+      await Promise.allSettled(
+        conversations1to1.map(conversation => conversationRepository.init1to1Conversation(conversation)),
+      );
+
       if (connections.length) {
         await Promise.allSettled(conversationRepository.mapConnections(connections));
       }

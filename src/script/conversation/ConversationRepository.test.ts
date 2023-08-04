@@ -399,7 +399,7 @@ describe('ConversationRepository', () => {
           },
         },
         name: null,
-        type: 0,
+        type: 2,
       } as ConversationDatabaseData;
 
       spyOn(testFactory.conversation_repository as any, 'fetchConversationById').and.callThrough();
@@ -411,6 +411,8 @@ describe('ConversationRepository', () => {
     });
 
     it('should map a connection to an existing conversation', () => {
+      conversation_et.type(CONVERSATION_TYPE.ONE_TO_ONE);
+
       return testFactory.conversation_repository['mapConnection'](connectionEntity).then(
         (_conversation: Conversation) => {
           expect(testFactory.conversation_repository['fetchConversationById']).not.toHaveBeenCalled();
@@ -432,6 +434,7 @@ describe('ConversationRepository', () => {
     });
 
     it('should map a cancelled connection to an existing conversation and filter it', () => {
+      conversation_et.type(CONVERSATION_TYPE.ONE_TO_ONE);
       connectionEntity.status(ConnectionStatus.CANCELLED);
 
       return testFactory.conversation_repository['mapConnection'](connectionEntity).then(_conversation => {

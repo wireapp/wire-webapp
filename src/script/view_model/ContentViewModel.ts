@@ -180,18 +180,22 @@ export class ContentViewModel {
         );
       }
 
-      const isActiveConversation = this.conversationState.isActiveConversation(conversationEntity);
+      const initialisedConversation =
+        (conversationEntity.is1to1() && (await this.conversationRepository.init1to1Conversation(conversationEntity))) ||
+        conversationEntity;
+
+      const isActiveConversation = this.conversationState.isActiveConversation(initialisedConversation);
 
       if (!isActiveConversation) {
         rightSidebar.close();
       }
 
       const isConversationState = contentState === ContentState.CONVERSATION;
-      const isOpenedConversation = conversationEntity && isActiveConversation && isConversationState;
+      const isOpenedConversation = initialisedConversation && isActiveConversation && isConversationState;
 
       if (isOpenedConversation) {
         if (openNotificationSettings) {
-          rightSidebar.goTo(PanelState.NOTIFICATIONS, {entity: conversationEntity});
+          rightSidebar.goTo(PanelState.NOTIFICATIONS, {entity: initialisedConversation});
         }
         return;
       }
@@ -200,25 +204,26 @@ export class ContentViewModel {
       this.mainViewModel.list.openConversations();
 
       if (!isActiveConversation) {
-        this.conversationState.activeConversation(conversationEntity);
+        this.conversationState.activeConversation(initialisedConversation);
       }
 
-      const messageEntity = openFirstSelfMention ? conversationEntity.getFirstUnreadSelfMention() : exposeMessageEntity;
+      const messageEntity = openFirstSelfMention
+        ? initialisedConversation.getFirstUnreadSelfMention()
+        : exposeMessageEntity;
 
-      if (conversationEntity.is_cleared()) {
-        conversationEntity.cleared_timestamp(0);
+      if (initialisedConversation.is_cleared()) {
+        initialisedConversation.cleared_timestamp(0);
       }
 
-      if (conversationEntity.is_archived()) {
-        await this.conversationRepository.unarchiveConversation(conversationEntity);
+      if (initialisedConversation.is_archived()) {
+        await this.conversationRepository.unarchiveConversation(initialisedConversation);
       }
 
-      this.changeConversation(conversationEntity, messageEntity);
+      this.changeConversation(initialisedConversation, messageEntity);
       this.showContent(ContentState.CONVERSATION);
       this.previousConversation = this.conversationState.activeConversation();
       setHistoryParam(
-        generateConversationUrl({id: conversationEntity?.id ?? '', domain: conversationEntity?.domain ?? ''}),
-        history.state,
+        generateConversationUrl({id: initialisedConversation?.id ?? '', domain: initialisedConversation?.domain ?? ''}),
       );
 
       if (openNotificationSettings) {
