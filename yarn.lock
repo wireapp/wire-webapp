@@ -6320,6 +6320,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"caniuse-lite@npm:^1.0.30001519":
+  version: 1.0.30001519
+  resolution: "caniuse-lite@npm:1.0.30001519"
+  checksum: 66085133ede05d947e30b62fed2cbae18e5767afda8b0de38840883e1cfe5846bf1568ddbafd31647544e59112355abedaf9c867ac34541bfc20d69e7a19d94c
+  languageName: node
+  linkType: hard
+
 "catharsis@npm:^0.9.0":
   version: 0.9.0
   resolution: "catharsis@npm:0.9.0"
@@ -17781,7 +17788,7 @@ __metadata:
     babel-loader: 9.1.3
     babel-plugin-transform-import-meta: ^2.2.1
     beautiful-react-hooks: ^4.3.0
-    caniuse-lite: ^1.0.30001517
+    caniuse-lite: ^1.0.30001519
     classnames: 2.3.2
     copy-webpack-plugin: 11.0.0
     core-js: 3.25.5
