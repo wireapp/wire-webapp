@@ -154,7 +154,7 @@
     "postcss-import": "^15.1.0",
     "postcss-less": "6.0.0",
     "postcss-loader": "^7.3.3",
-    "postcss-preset-env": "^9.1.0",
+    "postcss-preset-env": "^9.1.1",
     "postcss-scss": "4.0.6",
     "prettier": "^2.8.8",
     "raf": "3.4.1",
