@@ -940,6 +940,8 @@
   "modalUserCannotBeAddedHeadline": "Os convidados não podem ser adicionados",
   "modalUserCannotConnectLegalHoldHeadline": "Não é possível conectar a este usuário",
   "modalUserCannotConnectLegalHoldMessage": "Você não pode se conectar a este usuário devido à Retenção Legal. [link]Saiba mais[/link] ",
+  "modalUserCannotConnectNotFederatingHeadline": "Connection not possible",
+  "modalUserCannotConnectNotFederatingMessage": "You can’t send a connection request as your backend doesn’t federate with the one of {{username}}.",
   "modalUserLearnMore": "Saiba mais",
   "modalUserUnblockAction": "Desbloquear",
   "modalUserUnblockHeadline": "Desbloquear?",

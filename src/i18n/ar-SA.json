@@ -940,6 +940,8 @@
   "modalUserCannotBeAddedHeadline": "Guests cannot be added",
   "modalUserCannotConnectLegalHoldHeadline": "Cannot connect to this user",
   "modalUserCannotConnectLegalHoldMessage": "You cannot connect to this user due to legal hold. [link]Learn more[/link]",
+  "modalUserCannotConnectNotFederatingHeadline": "Connection not possible",
+  "modalUserCannotConnectNotFederatingMessage": "You can’t send a connection request as your backend doesn’t federate with the one of {{username}}.",
   "modalUserLearnMore": "Learn more",
   "modalUserUnblockAction": "إلغاء حظر",
   "modalUserUnblockHeadline": "إلغاء الحظر؟",
