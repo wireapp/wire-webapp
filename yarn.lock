@@ -5921,15 +5921,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"babel-plugin-transform-import-meta@npm:^2.2.0":
-  version: 2.2.0
-  resolution: "babel-plugin-transform-import-meta@npm:2.2.0"
+"babel-plugin-transform-import-meta@npm:^2.2.1":
+  version: 2.2.1
+  resolution: "babel-plugin-transform-import-meta@npm:2.2.1"
   dependencies:
     "@babel/template": ^7.4.4
     tslib: ^2.4.0
   peerDependencies:
     "@babel/core": ^7.10.0
-  checksum: 305b0750f957e4df3ce08e0b24359dc55fb789c96477e944d113d259a8292e7bb8d665944e04b5a690c82a8dc23f54b711a85917d80988dffe1e046e1db940ee
+  checksum: 2868e3ac22fc403003b19750dd04f9f05303d2ade3d005e2e557ba8e260ac0b8ee3717f772ec4db8a9e6a8aac13dc61eb82b79a6479f933290cef2d89e4b731b
   languageName: node
   linkType: hard
 
@@ -17762,7 +17762,7 @@ __metadata:
     archiver: ^5.3.1
     autoprefixer: ^10.4.13
     babel-loader: 9.1.3
-    babel-plugin-transform-import-meta: ^2.2.0
+    babel-plugin-transform-import-meta: ^2.2.1
     beautiful-react-hooks: ^4.3.0
     caniuse-lite: ^1.0.30001517
     classnames: 2.3.2
