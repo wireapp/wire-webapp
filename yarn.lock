@@ -4005,13 +4005,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/eslint@npm:*, @types/eslint@npm:8.44.1":
+"@types/eslint@npm:*":
   version: 8.44.1
   resolution: "@types/eslint@npm:8.44.1"
   dependencies:
     "@types/estree": "*"
     "@types/json-schema": "*"
   checksum: 8b45be72d3c22a1ee0b1cc7e7fb0e34e32bbf959e6b7e0e46d160c17894aedf159c1db5c85750f10068884c741eebc37a1cc7ea659de23a8df0c9a3203e2ff9d
+  languageName: node
+  linkType: hard
+
+"@types/eslint@npm:8.44.2":
+  version: 8.44.2
+  resolution: "@types/eslint@npm:8.44.2"
+  dependencies:
+    "@types/estree": "*"
+    "@types/json-schema": "*"
+  checksum: 25b3ef61bae96350026593c9914c8a61ee02fde48ab8d568a73ee45032f13c0028c62e47a5ff78715af488dfe8e8bba913f7d30f859f60c7f9e639d328e80482
   languageName: node
   linkType: hard
 
@@ -17718,7 +17728,7 @@ __metadata:
     "@types/adm-zip": 0.5.0
     "@types/caniuse-lite": ^1.0.1
     "@types/dexie-batch": 0.4.3
-    "@types/eslint": 8.44.1
+    "@types/eslint": 8.44.2
     "@types/fs-extra": 11.0.1
     "@types/generate-changelog": 1.8.1
     "@types/jest": 29.5.3
